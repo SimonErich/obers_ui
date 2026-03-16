@@ -1,0 +1,17 @@
+dartdoc:
+  name: obers_ui
+  description: A comprehensive Flutter UI kit.
+  categories:
+    "Theme":
+      markdown: doc/categories/theme.md
+      name: Theme
+    "Components":
+      markdown: doc/categories/components.md
+      name: Components
+    "Widgets":
+      markdown: doc/categories/widgets.md
+      name: Widgets
+    "Layouts":
+      markdown: doc/categories/layouts.md
+      name: Layouts
+  showUndocumentedCategories: true
