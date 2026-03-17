@@ -1,6 +1,6 @@
-timestamp: 2026-03-17T10:26:05.187597Z
+timestamp: 2026-03-17T10:35:43.898745Z
 executable: claude
-args: --print --output-format stream-json --verbose --dangerously-skip-permissions --allowedTools Read,Edit,Bash --no-session-persistence
-prompt_length: 2958 chars (~739 tokens)
+args: --max-turns 30 --print --output-format stream-json --verbose --dangerously-skip-permissions --allowedTools Read,Edit,Bash --no-session-persistence
+prompt_length: 579 chars (~144 tokens)
 timeout: 1800s
 working_directory: /home/simonerich/Flutters/obers_ui

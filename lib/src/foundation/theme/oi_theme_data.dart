@@ -35,6 +35,7 @@ class OiThemeData {
     required this.effects,
     required this.decoration,
     required this.components,
+    this.performanceConfig = const OiPerformanceConfig.high(),
     this.fontFamily,
     this.monoFontFamily,
   });
@@ -45,6 +46,7 @@ class OiThemeData {
     String? monoFontFamily,
     OiRadiusPreference radiusPreference = OiRadiusPreference.medium,
     OiComponentThemes? components,
+    OiPerformanceConfig? performanceConfig,
   }) {
     final colors = OiColorScheme.light();
     return OiThemeData(
@@ -64,6 +66,7 @@ class OiThemeData {
         errorColor: colors.error.base,
       ),
       components: components ?? const OiComponentThemes.empty(),
+      performanceConfig: performanceConfig ?? const OiPerformanceConfig.high(),
       fontFamily: fontFamily,
       monoFontFamily: monoFontFamily,
     );
@@ -75,6 +78,7 @@ class OiThemeData {
     String? monoFontFamily,
     OiRadiusPreference radiusPreference = OiRadiusPreference.medium,
     OiComponentThemes? components,
+    OiPerformanceConfig? performanceConfig,
   }) {
     final colors = OiColorScheme.dark();
     return OiThemeData(
@@ -94,6 +98,7 @@ class OiThemeData {
         errorColor: colors.error.base,
       ),
       components: components ?? const OiComponentThemes.empty(),
+      performanceConfig: performanceConfig ?? const OiPerformanceConfig.high(),
       fontFamily: fontFamily,
       monoFontFamily: monoFontFamily,
     );
@@ -110,6 +115,7 @@ class OiThemeData {
     String? monoFontFamily,
     OiRadiusPreference radiusPreference = OiRadiusPreference.medium,
     OiComponentThemes? components,
+    OiPerformanceConfig? performanceConfig,
   }) {
     final base = brightness == Brightness.light
         ? OiThemeData.light(
@@ -117,12 +123,14 @@ class OiThemeData {
             monoFontFamily: monoFontFamily,
             radiusPreference: radiusPreference,
             components: components,
+            performanceConfig: performanceConfig,
           )
         : OiThemeData.dark(
             fontFamily: fontFamily,
             monoFontFamily: monoFontFamily,
             radiusPreference: radiusPreference,
             components: components,
+            performanceConfig: performanceConfig,
           );
 
     // Override primary color with the brand color
@@ -171,6 +179,11 @@ class OiThemeData {
   /// Per-component theme overrides.
   final OiComponentThemes components;
 
+  /// Device performance configuration controlling blur, shadows, and animation.
+  ///
+  /// Defaults to [OiPerformanceConfig.high] (all effects enabled).
+  final OiPerformanceConfig performanceConfig;
+
   /// Optional font family override for text styles.
   final String? fontFamily;
 
@@ -195,6 +208,7 @@ class OiThemeData {
     OiEffectsTheme? effects,
     OiDecorationTheme? decoration,
     OiComponentThemes? components,
+    OiPerformanceConfig? performanceConfig,
     String? fontFamily,
     String? monoFontFamily,
   }) {
@@ -209,6 +223,7 @@ class OiThemeData {
       effects: effects ?? this.effects,
       decoration: decoration ?? this.decoration,
       components: components ?? this.components,
+      performanceConfig: performanceConfig ?? this.performanceConfig,
       fontFamily: fontFamily ?? this.fontFamily,
       monoFontFamily: monoFontFamily ?? this.monoFontFamily,
     );
@@ -228,6 +243,7 @@ class OiThemeData {
       effects: other.effects,
       decoration: other.decoration,
       components: other.components,
+      performanceConfig: other.performanceConfig,
       fontFamily: other.fontFamily,
       monoFontFamily: other.monoFontFamily,
     );
@@ -250,6 +266,7 @@ class OiThemeData {
       effects: t < 0.5 ? a.effects : b.effects,
       decoration: t < 0.5 ? a.decoration : b.decoration,
       components: t < 0.5 ? a.components : b.components,
+      performanceConfig: t < 0.5 ? a.performanceConfig : b.performanceConfig,
       fontFamily: t < 0.5 ? a.fontFamily : b.fontFamily,
       monoFontFamily: t < 0.5 ? a.monoFontFamily : b.monoFontFamily,
     );
@@ -269,6 +286,7 @@ class OiThemeData {
         other.effects == effects &&
         other.decoration == decoration &&
         other.components == components &&
+        other.performanceConfig == performanceConfig &&
         other.fontFamily == fontFamily &&
         other.monoFontFamily == monoFontFamily;
   }
@@ -285,6 +303,7 @@ class OiThemeData {
     effects,
     decoration,
     components,
+    performanceConfig,
     fontFamily,
     monoFontFamily,
   ]);

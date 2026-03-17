@@ -6,6 +6,7 @@ import 'package:obers_ui/src/foundation/oi_platform.dart';
 import 'package:obers_ui/src/foundation/oi_undo_stack.dart';
 import 'package:obers_ui/src/foundation/persistence/oi_settings_driver.dart';
 import 'package:obers_ui/src/foundation/persistence/oi_settings_provider.dart';
+import 'package:obers_ui/src/foundation/theme/oi_animation_config.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme_data.dart';
 
@@ -101,6 +102,7 @@ class OiApp extends StatefulWidget {
     this.darkTheme,
     this.themeMode = ThemeMode.system,
     this.density,
+    this.performanceConfig,
     this.settingsDriver,
     this.undoStackMaxHistory = 50,
     this.locale,
@@ -125,6 +127,12 @@ class OiApp extends StatefulWidget {
 
   /// The information density. When null, auto-detected from the platform.
   final OiDensity? density;
+
+  /// Optional performance configuration applied to both [theme] and [darkTheme].
+  ///
+  /// When provided, overrides the `performanceConfig` of the resolved theme.
+  /// When null, the theme's own [OiThemeData.performanceConfig] is used.
+  final OiPerformanceConfig? performanceConfig;
 
   /// Optional global settings persistence driver.
   ///
@@ -175,14 +183,21 @@ class _OiAppState extends State<OiApp> {
     final lightTheme = widget.theme ?? OiThemeData.light();
     final darkTheme = widget.darkTheme ?? OiThemeData.dark();
 
+    OiThemeData resolved;
     switch (widget.themeMode) {
       case ThemeMode.light:
-        return lightTheme;
+        resolved = lightTheme;
       case ThemeMode.dark:
-        return darkTheme;
+        resolved = darkTheme;
       case ThemeMode.system:
-        return platformBrightness == Brightness.dark ? darkTheme : lightTheme;
+        resolved =
+            platformBrightness == Brightness.dark ? darkTheme : lightTheme;
     }
+
+    if (widget.performanceConfig != null) {
+      return resolved.copyWith(performanceConfig: widget.performanceConfig);
+    }
+    return resolved;
   }
 
   OiDensity _resolveDensity() {

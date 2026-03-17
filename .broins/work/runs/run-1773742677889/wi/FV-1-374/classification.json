@@ -1,0 +1,156 @@
+{
+  "pm_mode_selection": {
+    "primary_modes": [
+      {
+        "mode": "dx",
+        "confidence": 0.92,
+        "rationale": "The task is entirely about public API naming conventions, parameter naming, and callback contracts for a Flutter/Dart UI component library. These are developer-facing API ergonomics issues that directly affect SDK consumers — aligning squarely with developer-experience work."
+      }
+    ],
+    "secondary_modes": [
+      {
+        "mode": "feature",
+        "confidence": 0.55,
+        "rationale": "Three concrete breaking API changes must be implemented (parameter rename, field rename, callback contract fix), which have feature-delivery characteristics: spec compliance, test coverage, and a definition of done at 100%."
+      },
+      {
+        "mode": "ux",
+        "confidence": 0.35,
+        "rationale": "Accessibility props (OiIcon.decorative(), OiImage.decorative()) are referenced in the relevant files, and required accessibility props are explicitly called out in the spec. If those surfaces are revisited during this fix pass, UX concerns apply."
+      }
+    ]
+  },
+  "building_blocks": {
+    "generic": [
+      {
+        "id": "problem_statement",
+        "priority": "must",
+        "rationale": "Three concrete spec violations are identified; the problem statement must precisely document the current broken state vs. the required state for each (OiButton.split dropdown param, OiUndoAction.undo→reverse field, reverse callback contract)."
+      },
+      {
+        "id": "definition_of_done",
+        "priority": "must",
+        "rationale": "Explicitly provided in the task: all three issues resolved, Naming & Conventions compliance reaches 100%, all related tests pass."
+      },
+      {
+        "id": "acceptance_criteria",
+        "priority": "must",
+        "rationale": "Each of the three API violations needs a binary pass/fail acceptance criterion (correct parameter name, correct field name, correct callback signature)."
+      },
+      {
+        "id": "test_cases",
+        "priority": "must",
+        "rationale": "Tests must be updated or added to assert the new parameter names and callback contracts; existing tests calling the old API will break and must be migrated."
+      },
+      {
+        "id": "assumptions",
+        "priority": "must",
+        "rationale": "Several unknowns (downstream callers, whether OiMenuItem exists, migration path) must be surfaced and resolved before code changes land."
+      },
+      {
+        "id": "risks_open_questions",
+        "priority": "must",
+        "rationale": "Renaming public API params is a breaking change for any consumer of the library; risk of downstream breakage and migration burden must be documented."
+      },
+      {
+        "id": "fallbacks_rollbacks",
+        "priority": "should",
+        "rationale": "Given medium risk tolerance and breaking API changes, a deprecation shim or version-bump strategy should be considered as a rollback path."
+      },
+      {
+        "id": "non_goals",
+        "priority": "should",
+        "rationale": "Clarifying scope boundaries (e.g., this pass does NOT redesign widget APIs beyond the three listed violations) prevents scope creep during implementation."
+      },
+      {
+        "id": "constraints",
+        "priority": "could",
+        "rationale": "Stack context is not provided; if there are version pinning or semver constraints, they should be captured to guide whether this is a patch, minor, or major release."
+      }
+    ],
+    "specialized": [
+      {
+        "id": "sdk_design",
+        "priority": "must",
+        "rationale": "The task is a SDK/component-library API contract fix. The corrected signatures (List<OiMenuItem> dropdownItems, reverse callback) must be formally specified as SDK design artifacts before implementation."
+      },
+      {
+        "id": "developer_ergonomics",
+        "priority": "must",
+        "rationale": "The entire Naming & Conventions spec (Oi prefix, English-readable props, verb callbacks, descriptive booleans, factory constructors) is a developer ergonomics contract. The fix must be evaluated against the full ergonomics rubric to reach 100%."
+      },
+      {
+        "id": "api_contracts",
+        "priority": "must",
+        "rationale": "Three breaking API contract violations are the core of this task. Formal before/after API contracts for OiButton.split() and OiUndoAction must be produced and reviewed."
+      },
+      {
+        "id": "cli_interface",
+        "priority": "could",
+        "rationale": "Not directly applicable; included only if a code-generation CLI (e.g., build_runner, mason) is used to scaffold widget stubs and needs to be updated to reflect new naming."
+      }
+    ]
+  },
+  "recommended_specialist_agents": [
+    {
+      "id": "dx_engineer",
+      "priority": "must",
+      "rationale": "Primary owner of this task. Responsible for auditing all public-facing API surfaces against the Naming & Conventions spec, implementing the three fixes, and verifying 100% compliance."
+    },
+    {
+      "id": "frontend_architect",
+      "priority": "must",
+      "rationale": "Flutter/Dart component library architecture expertise is required to correctly model List<OiMenuItem> as the dropdown contract for OiButton.split() and to validate the OiUndoAction callback signature refactor."
+    },
+    {
+      "id": "qa_engineer",
+      "priority": "must",
+      "rationale": "Must update and run all tests affected by the three API renames, verify no regressions in the barrel export (obers_ui.dart), and confirm the definition of done criteria are met."
+    },
+    {
+      "id": "technical_writer",
+      "priority": "should",
+      "rationale": "Any public API change should produce a migration guide or changelog entry. If the library has consumers, a BREAKING CHANGES notice and updated API docs are needed."
+    },
+    {
+      "id": "ux_researcher",
+      "priority": "could",
+      "rationale": "If the accessibility opt-out pattern (OiIcon.decorative(), OiImage.decorative()) is revisited during this pass, a UX researcher should validate the accessibility API ergonomics against WCAG requirements."
+    }
+  ],
+  "assumptions": [
+    "OiMenuItem is an already-defined or concurrently-defined class in the library; it is not being introduced for the first time in this fix.",
+    "The library is consumed by internal teams only (or has a versioned release process), making breaking changes manageable within the timeline.",
+    "The 87% → 100% compliance gap is fully accounted for by the three listed violations; no additional naming issues exist beyond what is documented.",
+    "The existing test suite has coverage for OiButton.split() and OiUndoAction, so tests will fail (and need updating) rather than being absent.",
+    "No deprecation period is required — the fix is a direct rename, not an additive + deprecate pattern.",
+    "The barrel file (lib/obers_ui.dart) correctly re-exports OiMenuItem once it is confirmed to exist."
+  ],
+  "open_questions": [
+    {
+      "question": "Does OiMenuItem currently exist in the library, or does it need to be created as part of this fix?",
+      "why_it_matters": "If OiMenuItem does not exist, the scope of this task expands significantly beyond a rename — it becomes a new type definition with its own API design.",
+      "suggested_default_if_unknown": "Assume OiMenuItem exists; if not found in the codebase, escalate to frontend_architect before proceeding."
+    },
+    {
+      "question": "Is this a public package release (pub.dev) or an internal monorepo library?",
+      "why_it_matters": "Public packages require semver major bump and deprecation notices for breaking API changes; internal packages may allow direct renames.",
+      "suggested_default_if_unknown": "Treat as internal; apply direct rename with a CHANGELOG entry but no deprecation shim."
+    },
+    {
+      "question": "Are there any active callers of OiButton.split(dropdown: ...) or OiUndoAction(undo: ...) that need to be migrated as part of this PR?",
+      "why_it_matters": "If call sites exist outside the library, the fix is incomplete without migrating them, and the definition of done should include those migrations.",
+      "suggested_default_if_unknown": "Run a codebase-wide grep for the old parameter names before merging; include any hits in this PR's scope."
+    },
+    {
+      "question": "What is the expected signature of OiUndoAction.reverse — is it a VoidCallback, a typed callback (e.g., Future<void> Function()), or something else?",
+      "why_it_matters": "The task notes the field is named differently and breaks the API contract, but does not specify the expected type signature for reverse.",
+      "suggested_default_if_unknown": "Use VoidCallback unless the spec document explicitly defines a different type."
+    },
+    {
+      "question": "Is there a spec document (design system / API spec) that defines the full Naming & Conventions rubric beyond what is described in this task?",
+      "why_it_matters": "Reaching 100% requires knowing the complete rubric; the task description may only be a subset of the full spec.",
+      "suggested_default_if_unknown": "Use the task description as the authoritative spec; flag any ambiguities to the dx_engineer for resolution."
+    }
+  ]
+}

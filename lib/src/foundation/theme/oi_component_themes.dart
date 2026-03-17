@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/painting.dart';
+import 'package:flutter/widgets.dart';
 
 /// Theme data for button components.
 ///
@@ -800,4 +801,43 @@ class OiComponentThemes {
     progress,
     sidebar,
   );
+}
+
+/// An [InheritedWidget] that scopes an [OiButtonThemeData] override to a
+/// subtree.
+///
+/// Place this widget above any button widgets that should share the same
+/// theme override. Buttons look up their theme with [OiButtonThemeScope.of];
+/// if no scope is found they fall back to [OiComponentThemes.button].
+///
+/// ```dart
+/// OiButtonThemeScope(
+///   theme: OiButtonThemeData(height: 48),
+///   child: MyButtonArea(),
+/// )
+/// ```
+///
+/// {@category Foundation}
+class OiButtonThemeScope extends InheritedWidget {
+  /// Creates an [OiButtonThemeScope] that provides [theme] to [child].
+  const OiButtonThemeScope({
+    required this.theme,
+    required super.child,
+    super.key,
+  });
+
+  /// The button theme data to inject into the subtree.
+  final OiButtonThemeData theme;
+
+  /// Returns the nearest [OiButtonThemeData] from the widget tree, or `null`
+  /// if no [OiButtonThemeScope] ancestor is found.
+  static OiButtonThemeData? of(BuildContext context) {
+    return context
+        .dependOnInheritedWidgetOfExactType<OiButtonThemeScope>()
+        ?.theme;
+  }
+
+  @override
+  bool updateShouldNotify(OiButtonThemeScope oldWidget) =>
+      theme != oldWidget.theme;
 }

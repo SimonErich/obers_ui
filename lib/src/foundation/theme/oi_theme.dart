@@ -116,3 +116,42 @@ extension OiBuildContextThemeExt on BuildContext {
   /// The [OiComponentThemes] from the nearest [OiTheme].
   OiComponentThemes get components => OiTheme.of(this).components;
 }
+
+/// Spec-named extension on [BuildContext] for convenient access to [OiThemeData].
+///
+/// Provides the same accessors as [OiBuildContextThemeExt] under the
+/// `OiThemeExt` name required by the design-system specification.
+/// Use `context.oiTheme` to access the full theme.
+///
+/// {@category Foundation}
+extension OiThemeExt on BuildContext {
+  /// The full [OiThemeData] from the nearest [OiTheme].
+  OiThemeData get oiTheme => OiTheme.of(this);
+
+  /// The [OiColorScheme] from the nearest [OiTheme].
+  OiColorScheme get oiColors => OiTheme.of(this).colors;
+
+  /// The [OiTextTheme] from the nearest [OiTheme].
+  OiTextTheme get oiTextTheme => OiTheme.of(this).textTheme;
+
+  /// The [OiSpacingScale] from the nearest [OiTheme].
+  OiSpacingScale get oiSpacing => OiTheme.of(this).spacing;
+
+  /// The [OiRadiusScale] from the nearest [OiTheme].
+  OiRadiusScale get oiRadius => OiTheme.of(this).radius;
+
+  /// The [OiShadowScale] from the nearest [OiTheme].
+  OiShadowScale get oiShadows => OiTheme.of(this).shadows;
+
+  /// The [OiEffectsTheme] from the nearest [OiTheme].
+  OiEffectsTheme get oiEffects => OiTheme.of(this).effects;
+
+  /// The [OiAnimationConfig] from the nearest [OiTheme].
+  OiAnimationConfig get oiAnimations => OiTheme.of(this).animations;
+
+  /// The [OiDecorationTheme] from the nearest [OiTheme].
+  OiDecorationTheme get oiDecoration => OiTheme.of(this).decoration;
+
+  /// The [OiComponentThemes] from the nearest [OiTheme].
+  OiComponentThemes get oiComponents => OiTheme.of(this).components;
+}
