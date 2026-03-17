@@ -213,6 +213,7 @@ class OiGallery extends StatelessWidget {
                       OiImage.decorative(
                         src: imgSrc,
                         fit: BoxFit.cover,
+                        errorWidget: const SizedBox.shrink(),
                       ),
                       if (isSelected)
                         Positioned(

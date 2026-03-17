@@ -116,8 +116,11 @@ class _OiCommandBarState extends State<OiCommandBar> {
   void initState() {
     super.initState();
     _textController = TextEditingController();
-    _inputFocusNode = FocusNode();
+    _inputFocusNode = FocusNode(onKeyEvent: _handleKeyEvent);
     _filteredCommands = _sortedCommands(widget.commands);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _inputFocusNode.requestFocus();
+    });
   }
 
   @override
@@ -416,25 +419,22 @@ class _OiCommandBarState extends State<OiCommandBar> {
                     const SizedBox(width: 8),
                   ],
                   Expanded(
-                    child: Focus(
-                      onKeyEvent: _handleKeyEvent,
-                      child: OiRawInput(
-                        controller: _textController,
-                        focusNode: _inputFocusNode,
-                        placeholder: _commandStack != null
-                            ? 'Search in ${_parentLabel ?? "submenu"}\u2026'
-                            : 'Type a command\u2026',
-                        onChanged: _applyFilter,
-                        leading: Padding(
-                          padding: const EdgeInsets.only(right: 8),
-                          child: Icon(
-                            const IconData(
-                              0xe5c5,
-                              fontFamily: 'MaterialIcons',
-                            ),
-                            size: 16,
-                            color: colors.textMuted,
+                    child: OiRawInput(
+                      controller: _textController,
+                      focusNode: _inputFocusNode,
+                      placeholder: _commandStack != null
+                          ? 'Search in ${_parentLabel ?? "submenu"}\u2026'
+                          : 'Type a command\u2026',
+                      onChanged: _applyFilter,
+                      leading: Padding(
+                        padding: const EdgeInsets.only(right: 8),
+                        child: Icon(
+                          const IconData(
+                            0xe5c5,
+                            fontFamily: 'MaterialIcons',
                           ),
+                          size: 16,
+                          color: colors.textMuted,
                         ),
                       ),
                     ),

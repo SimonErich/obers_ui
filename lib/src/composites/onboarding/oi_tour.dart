@@ -144,7 +144,7 @@ class _OiTourState extends State<OiTour> {
     }
 
     final step = widget.steps[_currentStep];
-    final isLastStep = _currentStep == widget.steps.length - 1;
+    final lastStep = _currentStep == widget.steps.length - 1;
 
     // The tooltip must sit above the spotlight overlay in the Stack so that
     // it can receive taps. The spotlight overlay uses HitTestBehavior.opaque,
@@ -166,7 +166,7 @@ class _OiTourState extends State<OiTour> {
           totalSteps: widget.steps.length,
           showProgress: widget.showProgress,
           showSkip: widget.showSkip,
-          isLastStep: isLastStep,
+          lastStep: lastStep,
           onNext: _next,
           onPrevious: _currentStep > 0 ? _previous : null,
           onSkip: _skip,
@@ -184,7 +184,7 @@ class _TourTooltip extends StatefulWidget {
     required this.totalSteps,
     required this.showProgress,
     required this.showSkip,
-    required this.isLastStep,
+    required this.lastStep,
     required this.onNext,
     required this.onPrevious,
     required this.onSkip,
@@ -196,7 +196,7 @@ class _TourTooltip extends StatefulWidget {
   final int totalSteps;
   final bool showProgress;
   final bool showSkip;
-  final bool isLastStep;
+  final bool lastStep;
   final VoidCallback onNext;
   final VoidCallback? onPrevious;
   final VoidCallback onSkip;
@@ -372,7 +372,7 @@ class _TourTooltipState extends State<_TourTooltip> {
                       borderRadius: BorderRadius.circular(6),
                     ),
                     child: Text(
-                      widget.isLastStep ? 'Finish' : 'Next',
+                      widget.lastStep ? 'Finish' : 'Next',
                       style: textTheme.small.copyWith(
                         color: colors.textOnPrimary,
                       ),

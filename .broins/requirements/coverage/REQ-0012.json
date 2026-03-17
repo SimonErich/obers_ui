@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "atomId": "REQ-0012",
+  "atomText": "",
+  "status": "covered",
+  "workItemId": "WI-0064",
+  "history": [
+    {
+      "at": "2026-03-17T09:23:08.695050Z",
+      "event": "covered",
+      "workItemId": "WI-0064",
+      "runId": "run-1773733505170"
+    }
+  ],
+  "evidence": [
+    "lib/src/components/buttons/oi_button_group.dart:28",
+    "lib/src/components/buttons/oi_icon_button.dart:17",
+    "lib/src/components/buttons/oi_toggle_button.dart:22",
+    "lib/src/components/display/oi_diff_view.dart:18-51",
+    "lib/src/composites/data/oi_tree.dart:12-167",
+    "lib/src/composites/media/oi_gallery.dart:26-58",
+    "lib/src/composites/media/oi_lightbox.dart:9-33",
+    "lib/src/composites/media/oi_video_player.dart:13",
+    "lib/src/composites/onboarding/oi_tour.dart:12-52",
+    "lib/src/composites/scheduling/oi_timeline.dart:8-44",
+    "lib/src/composites/search/oi_combo_box.dart:17",
+    "lib/src/composites/search/oi_command_bar.dart:13-68",
+    "lib/src/composites/search/oi_search.dart:14-106",
+    "lib/src/composites/workflow/oi_state_diagram.dart:11-74"
+  ],
+  "coveredAt": "2026-03-17T09:23:08.695050Z"
+}

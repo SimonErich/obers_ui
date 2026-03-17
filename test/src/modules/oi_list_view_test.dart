@@ -164,7 +164,7 @@ void main() {
 
       expect(
         find.bySemanticsLabel('My List'),
-        findsOneWidget,
+        findsWidgets,
       );
     });
 

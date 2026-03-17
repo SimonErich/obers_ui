@@ -200,10 +200,14 @@ void main() {
   testWidgets('semantics include label', (tester) async {
     await tester.pumpObers(_search());
 
-    final semantics = tester.getSemantics(
-      find.byType(Semantics).first,
-    );
-    expect(semantics.label, contains('Global Search'));
+    final semanticsWidgets =
+        tester.widgetList<Semantics>(find.byType(Semantics));
+    final matching = semanticsWidgets
+        .where((s) =>
+            s.properties.label != null &&
+            s.properties.label!.contains('Global Search'))
+        .toList();
+    expect(matching, hasLength(1));
   });
 
   testWidgets('filters render when provided', (tester) async {

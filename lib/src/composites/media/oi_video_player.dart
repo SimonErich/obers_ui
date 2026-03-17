@@ -109,6 +109,7 @@ class _OiVideoPlayerState extends State<OiVideoPlayer> {
                   key: const Key('oi_video_player_poster'),
                   src: widget.posterUrl!,
                   fit: BoxFit.cover,
+                  errorWidget: const SizedBox.shrink(),
                 ),
               ),
             ),

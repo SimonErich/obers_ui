@@ -1,0 +1,81 @@
+{
+  "workItemId": "WI-0007",
+  "runId": "run-1773733505170",
+  "currentStatus": "failed",
+  "updatedAt": "2026-03-17T09:01:02.262888Z",
+  "classificationResult": {
+    "pm_mode_selection": {
+      "primary_modes": [
+        {
+          "mode": "feature",
+          "confidence": 1.0,
+          "rationale": "Default fallback"
+        }
+      ],
+      "secondary_modes": []
+    },
+    "building_blocks": {
+      "generic": [
+        {
+          "id": "problem_statement",
+          "priority": "must",
+          "rationale": "Default"
+        },
+        {
+          "id": "goals",
+          "priority": "must",
+          "rationale": "Default"
+        },
+        {
+          "id": "non_goals",
+          "priority": "must",
+          "rationale": "Default"
+        },
+        {
+          "id": "assumptions",
+          "priority": "must",
+          "rationale": "Default"
+        },
+        {
+          "id": "constraints",
+          "priority": "must",
+          "rationale": "Default"
+        },
+        {
+          "id": "definition_of_done",
+          "priority": "must",
+          "rationale": "Default"
+        },
+        {
+          "id": "acceptance_criteria",
+          "priority": "must",
+          "rationale": "Default"
+        },
+        {
+          "id": "test_cases",
+          "priority": "must",
+          "rationale": "Default"
+        },
+        {
+          "id": "fallbacks_rollbacks",
+          "priority": "must",
+          "rationale": "Default"
+        },
+        {
+          "id": "risks_open_questions",
+          "priority": "must",
+          "rationale": "Default"
+        }
+      ],
+      "specialized": []
+    },
+    "recommended_specialist_agents": [],
+    "assumptions": [
+      "Classification unavailable; defaulted to FEATURE mode"
+    ],
+    "open_questions": []
+  },
+  "pmSpecV1": "API Error: Unable to connect to API (EAI_AGAIN)API Error: Unable to connect to API (EAI_AGAIN)",
+  "architectDesignV1": "API Error: Unable to connect to API (EAI_AGAIN)API Error: Unable to connect to API (EAI_AGAIN)",
+  "qaFindings": "{\"atomResults\":[{\"atomId\":\"REQ-0493\",\"status\":\"missing\",\"evidence\":[],\"missingDetails\":\"All implementation attempts failed due to API connectivity errors (EAI_AGAIN). The automation pipeline produced no plan and no implementation. No source files for OiTextInput, OiNumberInput, OiDateInput, OiSelect or other Tier 2 input components appear in the diff. Expected implementation file: lib/src/composites/forms/oi_form.dart or lib/src/components/inputs/*.dart\",\"recommendedFix\":\"Fix API connectivity and re-run implementation. Create Tier 2 input components (OiTextInput, OiNumberInput, OiDateInput, OiSelect, etc.) inside OiForm.\"},{\"atomId\":\"REQ-0494\",\"status\":\"missing\",\"evidence\":[],\"missingDetails\":\"All implementation attempts failed due to API connectivity errors (EAI_AGAIN). No source files for OiColumn layout component appear in the diff. Expected implementation file: lib/src/composites/forms/oi_form.dart\",\"recommendedFix\":\"Fix API connectivity and re-run implementation. Create OiColumn layout widget within the OiForm composites directory.\"},{\"atomId\":\"REQ-0495\",\"status\":\"missing\",\"evidence\":[],\"missingDetails\":\"All implementation attempts failed due to API connectivity errors (EAI_AGAIN). No source files for OiLabel section title component appear in the diff. Expected implementation file: lib/src/composites/forms/oi_form.dart\",\"recommendedFix\":\"Fix API connectivity and re-run implementation. Create OiLabel section title widget within the OiForm composites directory.\"}],\"overallStatus\":\"fail\",\"notes\":\"The entire WI-0007 pipeline failed due to repeated API connectivity errors (EAI_AGAIN) during planning and implementation phases. The automation produced plan quality score 0.0 across all 3 iterations, totalPlanMethods=0 in all implement audits, and verify_raw outputs contain only API error messages. No actual Flutter source code was modified in this diff — only automation metadata files (.broins/tmp and .broins/work) were changed. All three atoms (REQ-0493, REQ-0494, REQ-0495) remain unimplemented.\"}"
+}

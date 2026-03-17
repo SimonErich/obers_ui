@@ -264,10 +264,15 @@ void main() {
   testWidgets('semantics include label', (tester) async {
     await tester.pumpObers(_commandBar());
 
-    final semantics = tester.getSemantics(
-      find.byType(Semantics).first,
-    );
-    expect(semantics.label, contains('Command Palette'));
+    // Find the Semantics node with the command bar label.
+    final semanticsWidgets =
+        tester.widgetList<Semantics>(find.byType(Semantics));
+    final matching = semanticsWidgets
+        .where((s) =>
+            s.properties.label != null &&
+            s.properties.label!.contains('Command Palette'))
+        .toList();
+    expect(matching, hasLength(1));
   });
 
   testWidgets('preview builder renders for highlighted command',

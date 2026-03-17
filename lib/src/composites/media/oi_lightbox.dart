@@ -140,6 +140,7 @@ class _OiLightboxState extends State<OiLightbox> {
       src: item.src,
       alt: item.alt,
       fit: BoxFit.contain,
+      errorWidget: const SizedBox.shrink(),
     );
 
     if (widget.enableZoom) {
@@ -360,6 +361,7 @@ class _OiLightboxState extends State<OiLightbox> {
                                   width: 56,
                                   height: 56,
                                   fit: BoxFit.cover,
+                                  errorWidget: const SizedBox.shrink(),
                                 ),
                               ),
                             ),

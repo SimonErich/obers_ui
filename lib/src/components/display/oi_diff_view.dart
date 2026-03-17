@@ -20,9 +20,9 @@ class OiDiffLine {
   const OiDiffLine({
     required this.content,
     this.lineNumber,
-    this.isAdded = false,
-    this.isRemoved = false,
-    this.isContext = false,
+    this.added = false,
+    this.removed = false,
+    this.unchanged = false,
   });
 
   /// The text content of this line.
@@ -32,13 +32,13 @@ class OiDiffLine {
   final int? lineNumber;
 
   /// Whether this line was added.
-  final bool isAdded;
+  final bool added;
 
   /// Whether this line was removed.
-  final bool isRemoved;
+  final bool removed;
 
   /// Whether this line is unchanged context.
-  final bool isContext;
+  final bool unchanged;
 }
 
 /// A diff viewer that renders a list of [OiDiffLine] entries.
@@ -88,21 +88,21 @@ class OiDiffView extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: lines.map((line) {
-          final bg = line.isAdded
+          final bg = line.added
               ? colors.success.base.withValues(alpha: 0.12)
-              : line.isRemoved
+              : line.removed
                   ? colors.error.base.withValues(alpha: 0.12)
                   : null;
 
-          final prefix = line.isAdded
+          final prefix = line.added
               ? '+ '
-              : line.isRemoved
+              : line.removed
                   ? '- '
                   : '  ';
 
-          final textColor = line.isAdded
+          final textColor = line.added
               ? colors.success.base
-              : line.isRemoved
+              : line.removed
                   ? colors.error.base
                   : colors.text;
 
@@ -140,8 +140,8 @@ class OiDiffView extends StatelessWidget {
     final colors = context.colors;
     const monoStyle = TextStyle(fontFamily: 'monospace', fontSize: 13, height: 1.5);
 
-    final removed = lines.where((l) => l.isRemoved || l.isContext).toList();
-    final added = lines.where((l) => l.isAdded || l.isContext).toList();
+    final removed = lines.where((l) => l.removed || l.unchanged).toList();
+    final added = lines.where((l) => l.added || l.unchanged).toList();
     final maxLen = removed.length > added.length ? removed.length : added.length;
 
     Widget column(List<OiDiffLine> colLines, {required bool isAddedSide}) {
@@ -152,14 +152,14 @@ class OiDiffView extends StatelessWidget {
           children: List.generate(maxLen, (i) {
             if (i >= colLines.length) return const SizedBox(height: 22);
             final line = colLines[i];
-            final bg = isAddedSide && line.isAdded
+            final bg = isAddedSide && line.added
                 ? colors.success.base.withValues(alpha: 0.12)
-                : !isAddedSide && line.isRemoved
+                : !isAddedSide && line.removed
                     ? colors.error.base.withValues(alpha: 0.12)
                     : null;
-            final textColor = isAddedSide && line.isAdded
+            final textColor = isAddedSide && line.added
                 ? colors.success.base
-                : !isAddedSide && line.isRemoved
+                : !isAddedSide && line.removed
                     ? colors.error.base
                     : colors.text;
 

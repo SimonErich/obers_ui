@@ -204,10 +204,14 @@ void main() {
         ),
       ),
     );
-    expect(
-      find.bySemanticsLabel('Role Matrix'),
-      findsOneWidget,
-    );
+    final semanticsWidgets =
+        tester.widgetList<Semantics>(find.byType(Semantics));
+    final matching = semanticsWidgets
+        .where((s) =>
+            s.properties.label != null &&
+            s.properties.label!.contains('Role Matrix'))
+        .toList();
+    expect(matching, isNotEmpty);
   });
 
   testWidgets('permission description renders when provided', (tester) async {

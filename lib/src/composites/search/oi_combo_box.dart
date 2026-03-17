@@ -41,7 +41,7 @@ class OiComboBox<T> extends StatefulWidget {
     this.virtualScroll = false,
     this.itemHeight,
     this.loadMore,
-    this.hasMore = false,
+    this.moreAvailable = false,
     this.optionBuilder,
   });
 
@@ -57,8 +57,10 @@ class OiComboBox<T> extends StatefulWidget {
   /// Currently selected value (single-select mode).
   final T? value;
 
-  /// Called when an item is selected (single-select mode).
-  final ValueChanged<T>? onSelect;
+  /// Called when an item is selected or cleared (single-select mode).
+  ///
+  /// When the selection is cleared, `null` is passed.
+  final ValueChanged<T?>? onSelect;
 
   /// Async search function. Overrides [items] filtering when provided.
   final Future<List<T>> Function(String query)? search;
@@ -115,7 +117,7 @@ class OiComboBox<T> extends StatefulWidget {
   final Future<List<T>> Function()? loadMore;
 
   /// Whether there are more items to load.
-  final bool hasMore;
+  final bool moreAvailable;
 
   /// Custom option builder.
   final Widget Function(
@@ -142,7 +144,7 @@ class _OiComboBoxState<T> extends State<OiComboBox<T>> {
   void initState() {
     super.initState();
     _textController = TextEditingController();
-    _inputFocusNode = FocusNode();
+    _inputFocusNode = FocusNode(onKeyEvent: _handleKeyEvent);
     _filteredItems = List<T>.from(widget.items);
   }
 
@@ -255,7 +257,9 @@ class _OiComboBoxState<T> extends State<OiComboBox<T>> {
       _highlightedIndex =
           _filteredItems.isEmpty ? -1 : 0;
     });
-    _inputFocusNode.requestFocus();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _inputFocusNode.requestFocus();
+    });
   }
 
   void _closeDropdown() {
@@ -286,7 +290,7 @@ class _OiComboBoxState<T> extends State<OiComboBox<T>> {
     if (widget.multiSelect) {
       widget.onMultiSelect?.call([]);
     } else {
-      widget.onSelect?.call(null as T);
+      widget.onSelect?.call(null);
     }
   }
 
@@ -374,14 +378,11 @@ class _OiComboBoxState<T> extends State<OiComboBox<T>> {
             // Search input
             Padding(
               padding: const EdgeInsets.all(8),
-              child: Focus(
-                onKeyEvent: _handleKeyEvent,
-                child: OiRawInput(
-                  controller: _textController,
-                  focusNode: _inputFocusNode,
-                  placeholder: 'Search\u2026',
-                  onChanged: _applyFilter,
-                ),
+              child: OiRawInput(
+                controller: _textController,
+                focusNode: _inputFocusNode,
+                placeholder: 'Search\u2026',
+                onChanged: _applyFilter,
               ),
             ),
             // Loading state
@@ -397,8 +398,10 @@ class _OiComboBoxState<T> extends State<OiComboBox<T>> {
             else if (items.isEmpty && !hasRecent && !hasFavorite)
               Padding(
                 padding: const EdgeInsets.all(12),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                child: Wrap(
+                  alignment: WrapAlignment.center,
+                  spacing: 8,
+                  runSpacing: 4,
                   children: [
                     Text(
                       'No results',
@@ -406,8 +409,7 @@ class _OiComboBoxState<T> extends State<OiComboBox<T>> {
                           TextStyle(color: colors.textMuted, fontSize: 14),
                     ),
                     if (widget.onCreate != null &&
-                        _textController.text.isNotEmpty) ...[
-                      const SizedBox(width: 8),
+                        _textController.text.isNotEmpty)
                       GestureDetector(
                         onTap: () {
                           widget.onCreate!(_textController.text);
@@ -419,9 +421,9 @@ class _OiComboBoxState<T> extends State<OiComboBox<T>> {
                             color: colors.primary.base,
                             fontSize: 14,
                           ),
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
-                    ],
                   ],
                 ),
               )
@@ -468,7 +470,7 @@ class _OiComboBoxState<T> extends State<OiComboBox<T>> {
                         ),
                       ],
                       // Load more
-                      if (widget.hasMore && widget.loadMore != null)
+                      if (widget.moreAvailable && widget.loadMore != null)
                         GestureDetector(
                           onTap: () async {
                             final more = await widget.loadMore!();

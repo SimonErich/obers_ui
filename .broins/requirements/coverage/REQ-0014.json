@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "atomId": "REQ-0014",
+  "atomText": "",
+  "status": "covered",
+  "workItemId": "WI-0064",
+  "history": [
+    {
+      "at": "2026-03-17T09:23:08.695050Z",
+      "event": "covered",
+      "workItemId": "WI-0064",
+      "runId": "run-1773733505170"
+    }
+  ],
+  "evidence": [
+    "lib/src/components/buttons/oi_icon_button.dart:21 (required this.semanticLabel)",
+    "lib/src/components/buttons/oi_toggle_button.dart:25 (required this.semanticLabel)",
+    "lib/src/composites/media/oi_gallery.dart:31 (OiGalleryItem: required this.alt)",
+    "lib/src/composites/media/oi_lightbox.dart:13 (OiLightboxItem: required this.alt)",
+    "lib/src/composites/media/oi_gallery.dart:63 (OiGallery: required this.label)",
+    "lib/src/composites/media/oi_lightbox.dart:38 (OiLightbox: required this.label)",
+    "lib/src/composites/media/oi_video_player.dart:17 (OiVideoPlayer: required this.label)",
+    "lib/src/composites/search/oi_combo_box.dart:21 (OiComboBox: required this.label)",
+    "lib/src/composites/search/oi_command_bar.dart:78 (OiCommandBar: required this.label)",
+    "lib/src/composites/search/oi_search.dart:118 (OiSearch: required this.label)",
+    "lib/src/composites/scheduling/oi_timeline.dart:49 (OiTimeline: required this.label)",
+    "lib/src/composites/workflow/oi_state_diagram.dart:79 (OiStateDiagram: required this.label)"
+  ],
+  "coveredAt": "2026-03-17T09:23:08.695050Z"
+}

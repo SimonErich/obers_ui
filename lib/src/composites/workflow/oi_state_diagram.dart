@@ -15,8 +15,8 @@ class OiStateNode {
     required this.label,
     this.position = Offset.zero,
     this.color,
-    this.isInitial = false,
-    this.isFinal = false,
+    this.initial = false,
+    this.terminal = false,
   });
 
   /// A unique key used to identify this state when connecting transitions.
@@ -32,10 +32,10 @@ class OiStateNode {
   final Color? color;
 
   /// Whether this is the initial state (drawn with an incoming arrow).
-  final bool isInitial;
+  final bool initial;
 
   /// Whether this is a final/accepting state (drawn with a double border).
-  final bool isFinal;
+  final bool terminal;
 }
 
 /// A transition between states.
@@ -203,7 +203,7 @@ class OiStateDiagram extends StatelessWidget {
     );
 
     // Final states get a double border via an outer container.
-    if (state.isFinal) {
+    if (state.terminal) {
       node = Container(
         key: ValueKey('oi_state_final_${state.key}'),
         padding: const EdgeInsets.all(3),
@@ -216,7 +216,7 @@ class OiStateDiagram extends StatelessWidget {
     }
 
     // Initial states get an incoming marker.
-    if (state.isInitial) {
+    if (state.initial) {
       node = Row(
         mainAxisSize: MainAxisSize.min,
         children: [

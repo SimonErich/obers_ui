@@ -1,0 +1,14 @@
+{
+  "createdAt": "2026-03-17T08:15:58.664870Z",
+  "entries": [
+    {
+      "epicId": "EPIC-0001",
+      "epicTitle": "Accessibility Enforcement",
+      "status": "incomplete",
+      "lastPercentage": 0.0,
+      "cyclesUsed": 6,
+      "lastVerifiedAt": "2026-03-17T08:15:58.664627Z",
+      "remainingGaps": []
+    }
+  ]
+}

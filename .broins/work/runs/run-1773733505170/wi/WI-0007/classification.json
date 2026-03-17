@@ -1,0 +1,72 @@
+{
+  "pm_mode_selection": {
+    "primary_modes": [
+      {
+        "mode": "feature",
+        "confidence": 1.0,
+        "rationale": "Default fallback"
+      }
+    ],
+    "secondary_modes": []
+  },
+  "building_blocks": {
+    "generic": [
+      {
+        "id": "problem_statement",
+        "priority": "must",
+        "rationale": "Default"
+      },
+      {
+        "id": "goals",
+        "priority": "must",
+        "rationale": "Default"
+      },
+      {
+        "id": "non_goals",
+        "priority": "must",
+        "rationale": "Default"
+      },
+      {
+        "id": "assumptions",
+        "priority": "must",
+        "rationale": "Default"
+      },
+      {
+        "id": "constraints",
+        "priority": "must",
+        "rationale": "Default"
+      },
+      {
+        "id": "definition_of_done",
+        "priority": "must",
+        "rationale": "Default"
+      },
+      {
+        "id": "acceptance_criteria",
+        "priority": "must",
+        "rationale": "Default"
+      },
+      {
+        "id": "test_cases",
+        "priority": "must",
+        "rationale": "Default"
+      },
+      {
+        "id": "fallbacks_rollbacks",
+        "priority": "must",
+        "rationale": "Default"
+      },
+      {
+        "id": "risks_open_questions",
+        "priority": "must",
+        "rationale": "Default"
+      }
+    ],
+    "specialized": []
+  },
+  "recommended_specialist_agents": [],
+  "assumptions": [
+    "Classification unavailable; defaulted to FEATURE mode"
+  ],
+  "open_questions": []
+}

@@ -93,7 +93,7 @@ void main() {
     await tester.tap(find.text('notes.txt'));
     await tester.pump(const Duration(milliseconds: 50));
     await tester.tap(find.text('notes.txt'));
-    await tester.pump();
+    await tester.pumpAndSettle();
 
     expect(opened?.name, 'notes.txt');
   });

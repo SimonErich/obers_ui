@@ -63,7 +63,7 @@ class OiButtonGroup extends StatelessWidget {
         count: count,
         orientation: orientation,
         segmented: segmented,
-        isSelected: segmented && selectedIndex == i,
+        selected: segmented && selectedIndex == i,
         onSelected: onSelected,
       );
     });
@@ -85,7 +85,7 @@ class _GroupButtonItem extends StatelessWidget {
     required this.count,
     required this.orientation,
     required this.segmented,
-    required this.isSelected,
+    required this.selected,
     required this.onSelected,
   });
 
@@ -94,7 +94,7 @@ class _GroupButtonItem extends StatelessWidget {
   final int count;
   final Axis orientation;
   final bool segmented;
-  final bool isSelected;
+  final bool selected;
   final ValueChanged<int>? onSelected;
 
   @override
@@ -140,7 +140,7 @@ class _GroupButtonItem extends StatelessWidget {
     final OiButtonVariant effectiveVariant;
     if (segmented) {
       effectiveVariant =
-          isSelected ? OiButtonVariant.primary : OiButtonVariant.ghost;
+          selected ? OiButtonVariant.primary : OiButtonVariant.ghost;
     } else {
       effectiveVariant = button.variant;
     }

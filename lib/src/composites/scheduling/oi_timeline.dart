@@ -87,16 +87,16 @@ class OiTimeline extends StatelessWidget {
         itemCount: events.length,
         itemBuilder: (context, index) {
           final event = events[index];
-          final isLeft = alternating && index.isOdd;
+          final leftAligned = alternating && index.isOdd;
 
           return _OiTimelineEntry(
             key: ValueKey('timeline_event_$index'),
             event: event,
             showTimestamp: showTimestamps,
-            isLeft: isLeft,
+            leftAligned: leftAligned,
             alternating: alternating,
             collapsible: collapsible,
-            isLast: index == events.length - 1,
+            last: index == events.length - 1,
             onTap: onEventTap != null ? () => onEventTap!(event) : null,
           );
         },
@@ -110,20 +110,20 @@ class _OiTimelineEntry extends StatefulWidget {
   const _OiTimelineEntry({
     required this.event,
     required this.showTimestamp,
-    required this.isLeft,
+    required this.leftAligned,
     required this.alternating,
     required this.collapsible,
-    required this.isLast,
+    required this.last,
     super.key,
     this.onTap,
   });
 
   final OiTimelineEvent event;
   final bool showTimestamp;
-  final bool isLeft;
+  final bool leftAligned;
   final bool alternating;
   final bool collapsible;
-  final bool isLast;
+  final bool last;
   final VoidCallback? onTap;
 
   @override
@@ -169,7 +169,7 @@ class _OiTimelineEntryState extends State<_OiTimelineEntry> {
     );
 
     // Vertical connector line.
-    final line = widget.isLast
+    final line = widget.last
         ? const SizedBox(width: lineWidth)
         : Container(
             width: lineWidth,
@@ -265,7 +265,7 @@ class _OiTimelineEntryState extends State<_OiTimelineEntry> {
           children: [
             // Left side.
             Expanded(
-              child: widget.isLeft
+              child: widget.leftAligned
                   ? Padding(
                       padding: const EdgeInsets.only(
                         right: gutter,
@@ -295,7 +295,7 @@ class _OiTimelineEntryState extends State<_OiTimelineEntry> {
             ),
             // Right side.
             Expanded(
-              child: !widget.isLeft
+              child: !widget.leftAligned
                   ? Padding(
                       padding: const EdgeInsets.only(
                         left: gutter,

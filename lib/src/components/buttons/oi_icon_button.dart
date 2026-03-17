@@ -18,11 +18,11 @@ class OiIconButton extends StatelessWidget {
   /// Creates an [OiIconButton].
   const OiIconButton({
     required this.icon,
+    required this.semanticLabel,
     this.onTap,
     this.size = OiButtonSize.medium,
     this.variant = OiButtonVariant.ghost,
     this.enabled = true,
-    this.semanticLabel,
     super.key,
   });
 
@@ -42,7 +42,7 @@ class OiIconButton extends StatelessWidget {
   final bool enabled;
 
   /// Accessibility label announced by screen readers.
-  final String? semanticLabel;
+  final String semanticLabel;
 
   @override
   Widget build(BuildContext context) {

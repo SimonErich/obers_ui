@@ -23,6 +23,7 @@ class OiToggleButton extends StatelessWidget {
   /// Creates an [OiToggleButton].
   const OiToggleButton({
     required this.selected,
+    required this.semanticLabel,
     this.label,
     this.icon,
     this.onChanged,
@@ -30,6 +31,9 @@ class OiToggleButton extends StatelessWidget {
     this.enabled = true,
     super.key,
   });
+
+  /// Accessibility label announced by screen readers.
+  final String semanticLabel;
 
   /// Optional text label.
   final String? label;

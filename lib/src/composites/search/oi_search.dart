@@ -163,7 +163,10 @@ class _OiSearchState extends State<OiSearch> {
   void initState() {
     super.initState();
     _textController = TextEditingController();
-    _inputFocusNode = FocusNode();
+    _inputFocusNode = FocusNode(onKeyEvent: _handleKeyEvent);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _inputFocusNode.requestFocus();
+    });
   }
 
   @override
@@ -380,20 +383,17 @@ class _OiSearchState extends State<OiSearch> {
             // Search input
             Padding(
               padding: const EdgeInsets.all(12),
-              child: Focus(
-                onKeyEvent: _handleKeyEvent,
-                child: OiRawInput(
-                  controller: _textController,
-                  focusNode: _inputFocusNode,
-                  placeholder: 'Search\u2026',
-                  onChanged: _onQueryChanged,
-                  leading: Padding(
-                    padding: const EdgeInsets.only(right: 8),
-                    child: Icon(
-                      const IconData(0xe8b6, fontFamily: 'MaterialIcons'),
-                      size: 20,
-                      color: colors.textMuted,
-                    ),
+              child: OiRawInput(
+                controller: _textController,
+                focusNode: _inputFocusNode,
+                placeholder: 'Search\u2026',
+                onChanged: _onQueryChanged,
+                leading: Padding(
+                  padding: const EdgeInsets.only(right: 8),
+                  child: Icon(
+                    const IconData(0xe8b6, fontFamily: 'MaterialIcons'),
+                    size: 20,
+                    color: colors.textMuted,
                   ),
                 ),
               ),

@@ -16,7 +16,7 @@ class OiTreeNode<T> {
     required this.label,
     this.data,
     this.children = const [],
-    this.isLeaf = false,
+    this.leaf = false,
     this.icon,
   });
 
@@ -34,13 +34,13 @@ class OiTreeNode<T> {
 
   /// When `true`, this node is always treated as a leaf even if [children] is
   /// non-empty (e.g. for lazy-loading scenarios).
-  final bool isLeaf;
+  final bool leaf;
 
   /// Optional leading icon widget.
   final Widget? icon;
 
   /// Whether this node has any children and is not forced to leaf mode.
-  bool get hasChildren => !isLeaf && children.isNotEmpty;
+  bool get hasChildren => !leaf && children.isNotEmpty;
 }
 
 // ── Controller ────────────────────────────────────────────────────────────────
@@ -212,8 +212,8 @@ class OiTree<T> extends StatefulWidget {
     BuildContext context,
     OiTreeNode<T> node,
     int depth, {
-    required bool isExpanded,
-    required bool isSelected,
+    required bool expanded,
+    required bool selected,
   })? nodeBuilder;
 
   /// Indent width in logical pixels per depth level.
@@ -355,8 +355,8 @@ class _OiTreeState<T> extends State<OiTree<T>> {
           ctx,
           node,
           depth,
-          isExpanded: expanded,
-          isSelected: selected,
+          expanded: expanded,
+          selected: selected,
         ),
       );
     }
