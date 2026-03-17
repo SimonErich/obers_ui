@@ -22,9 +22,7 @@ void main() {
   });
 
   testWidgets('renders without explicit initial size', (tester) async {
-    await tester.pumpObers(
-      const OiResizable(child: Text('no size')),
-    );
+    await tester.pumpObers(const OiResizable(child: Text('no size')));
     expect(find.text('no size'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });

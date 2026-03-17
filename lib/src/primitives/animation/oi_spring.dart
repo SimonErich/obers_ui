@@ -44,7 +44,7 @@ class OiSpring extends StatefulWidget {
   /// The optional [child] argument is the widget passed to [OiSpring.child],
   /// which is not rebuilt each frame.
   final Widget Function(BuildContext context, double value, Widget? child)
-      builder;
+  builder;
 
   /// Optional child passed through to [builder] without being rebuilt on
   /// every animation frame.

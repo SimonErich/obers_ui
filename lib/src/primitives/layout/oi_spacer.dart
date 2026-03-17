@@ -9,12 +9,7 @@ import 'package:flutter/widgets.dart';
 /// {@category Primitives}
 class OiSpacer extends StatelessWidget {
   /// Creates an [OiSpacer].
-  const OiSpacer({
-    this.size,
-    this.flex,
-    this.axis = Axis.vertical,
-    super.key,
-  });
+  const OiSpacer({this.size, this.flex, this.axis = Axis.vertical, super.key});
 
   /// Fixed size in logical pixels. Used when [flex] is null.
   final double? size;

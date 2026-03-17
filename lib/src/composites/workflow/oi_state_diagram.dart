@@ -175,9 +175,7 @@ class OiStateDiagram extends StatelessWidget {
   ) {
     final isCurrent = currentState == state.key;
     final nodeColor = state.color ?? colors.surface;
-    final borderColor = isCurrent
-        ? colors.primary.base
-        : colors.border;
+    final borderColor = isCurrent ? colors.primary.base : colors.border;
     final borderWidth = isCurrent ? 3.0 : 1.5;
 
     Widget node = Container(
@@ -229,11 +227,7 @@ class OiStateDiagram extends StatelessWidget {
               shape: BoxShape.circle,
             ),
           ),
-          Container(
-            width: 12,
-            height: 2,
-            color: borderColor,
-          ),
+          Container(width: 12, height: 2, color: borderColor),
           node,
         ],
       );

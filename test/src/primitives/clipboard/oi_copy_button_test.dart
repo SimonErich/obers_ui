@@ -11,16 +11,15 @@ import '../../../helpers/pump_app.dart';
 void main() {
   setUp(() {
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-        .setMockMethodCallHandler(
-      SystemChannels.platform,
-      (MethodCall call) async {
-        if (call.method == 'Clipboard.setData') return null;
-        if (call.method == 'Clipboard.getData') {
-          return {'text': 'mock'};
-        }
-        return null;
-      },
-    );
+        .setMockMethodCallHandler(SystemChannels.platform, (
+          MethodCall call,
+        ) async {
+          if (call.method == 'Clipboard.setData') return null;
+          if (call.method == 'Clipboard.getData') {
+            return {'text': 'mock'};
+          }
+          return null;
+        });
   });
 
   tearDown(() {
@@ -31,9 +30,7 @@ void main() {
   // ── 1. Shows default copy icon initially ──────────────────────────────────
 
   testWidgets('shows default copy icon initially', (tester) async {
-    await tester.pumpObers(
-      const OiCopyButton(value: 'text'),
-    );
+    await tester.pumpObers(const OiCopyButton(value: 'text'));
     // Default icon is "⎘".
     expect(find.text('⎘'), findsOneWidget);
     expect(find.text('✓'), findsNothing);
@@ -42,9 +39,7 @@ void main() {
   // ── 2. Shows copied widget after tap ──────────────────────────────────────
 
   testWidgets('shows copied widget after tap', (tester) async {
-    await tester.pumpObers(
-      const OiCopyButton(value: 'text'),
-    );
+    await tester.pumpObers(const OiCopyButton(value: 'text'));
 
     await tester.tap(find.byType(OiCopyButton));
     await tester.pump();
@@ -77,20 +72,17 @@ void main() {
   testWidgets('copies value to clipboard on tap', (tester) async {
     String? written;
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-        .setMockMethodCallHandler(
-      SystemChannels.platform,
-      (MethodCall call) async {
-        if (call.method == 'Clipboard.setData') {
-          written = (call.arguments as Map)['text'] as String?;
+        .setMockMethodCallHandler(SystemChannels.platform, (
+          MethodCall call,
+        ) async {
+          if (call.method == 'Clipboard.setData') {
+            written = (call.arguments as Map)['text'] as String?;
+            return null;
+          }
           return null;
-        }
-        return null;
-      },
-    );
+        });
 
-    await tester.pumpObers(
-      const OiCopyButton(value: 'my value'),
-    );
+    await tester.pumpObers(const OiCopyButton(value: 'my value'));
 
     await tester.tap(find.byType(OiCopyButton));
     await tester.pump();
@@ -101,21 +93,13 @@ void main() {
   // ── 5. Custom icon and copiedWidget are shown ─────────────────────────────
 
   testWidgets('custom icon is shown by default', (tester) async {
-    await tester.pumpObers(
-      const OiCopyButton(
-        value: 'x',
-        icon: Text('COPY'),
-      ),
-    );
+    await tester.pumpObers(const OiCopyButton(value: 'x', icon: Text('COPY')));
     expect(find.text('COPY'), findsOneWidget);
   });
 
   testWidgets('custom copiedWidget shown after tap', (tester) async {
     await tester.pumpObers(
-      const OiCopyButton(
-        value: 'x',
-        copiedWidget: Text('DONE'),
-      ),
+      const OiCopyButton(value: 'x', copiedWidget: Text('DONE')),
     );
 
     await tester.tap(find.byType(OiCopyButton));

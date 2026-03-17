@@ -11,9 +11,7 @@ void main() {
   // ── 1. Renders child ───────────────────────────────────────────────────────
 
   testWidgets('renders child widget', (tester) async {
-    await tester.pumpObers(
-      const OiDoubleTap(child: Text('hello')),
-    );
+    await tester.pumpObers(const OiDoubleTap(child: Text('hello')));
     expect(find.text('hello'), findsOneWidget);
   });
 

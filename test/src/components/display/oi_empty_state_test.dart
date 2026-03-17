@@ -9,17 +9,13 @@ import '../../../helpers/pump_app.dart';
 
 void main() {
   testWidgets('renders title', (tester) async {
-    await tester.pumpObers(
-      const OiEmptyState(title: 'Nothing here'),
-    );
+    await tester.pumpObers(const OiEmptyState(title: 'Nothing here'));
     expect(find.text('Nothing here'), findsOneWidget);
   });
 
   testWidgets('renders icon when provided', (tester) async {
     const icon = IconData(0xe88e, fontFamily: 'MaterialIcons');
-    await tester.pumpObers(
-      const OiEmptyState(title: 'Empty', icon: icon),
-    );
+    await tester.pumpObers(const OiEmptyState(title: 'Empty', icon: icon));
     expect(find.byIcon(icon), findsOneWidget);
   });
 
@@ -38,10 +34,7 @@ void main() {
 
   testWidgets('renders description when provided', (tester) async {
     await tester.pumpObers(
-      const OiEmptyState(
-        title: 'Empty',
-        description: 'Try adding some items.',
-      ),
+      const OiEmptyState(title: 'Empty', description: 'Try adding some items.'),
     );
     expect(find.text('Try adding some items.'), findsOneWidget);
   });

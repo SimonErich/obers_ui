@@ -62,8 +62,7 @@ class OiPulse extends StatefulWidget {
   State<OiPulse> createState() => _OiPulseState();
 }
 
-class _OiPulseState extends State<OiPulse>
-    with SingleTickerProviderStateMixin {
+class _OiPulseState extends State<OiPulse> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _opacityAnim;
   late Animation<double> _scaleAnim;
@@ -141,10 +140,7 @@ class _OiPulseState extends State<OiPulse>
       builder: (context, child) {
         return Opacity(
           opacity: _opacityAnim.value,
-          child: Transform.scale(
-            scale: _scaleAnim.value,
-            child: child,
-          ),
+          child: Transform.scale(scale: _scaleAnim.value, child: child),
         );
       },
       child: widget.child,

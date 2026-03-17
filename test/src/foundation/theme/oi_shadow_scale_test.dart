@@ -104,9 +104,7 @@ void main() {
 
       test('overrides xs', () {
         final scale = OiShadowScale.standard();
-        final newXs = [
-          const BoxShadow(blurRadius: 99),
-        ];
+        final newXs = [const BoxShadow(blurRadius: 99)];
         final copy = scale.copyWith(xs: newXs);
         expect(copy.xs, newXs);
         expect(copy.sm, scale.sm);
@@ -134,10 +132,7 @@ void main() {
       });
 
       test('standard and dark are not equal', () {
-        expect(
-          OiShadowScale.standard(),
-          isNot(equals(OiShadowScale.dark())),
-        );
+        expect(OiShadowScale.standard(), isNot(equals(OiShadowScale.dark())));
       });
 
       test('hashCode is consistent for standard()', () {

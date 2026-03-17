@@ -71,10 +71,8 @@ class _OiDateInputState extends State<OiDateInput> {
   late FixedExtentScrollController _dayCtrl;
 
   // Derived year range.
-  int get _firstYear =>
-      (widget.firstDate ?? DateTime(1900)).year;
-  int get _lastYear =>
-      (widget.lastDate ?? DateTime(2100)).year;
+  int get _firstYear => (widget.firstDate ?? DateTime(1900)).year;
+  int get _lastYear => (widget.lastDate ?? DateTime(2100)).year;
   int get _yearCount => _lastYear - _firstYear + 1;
 
   @override
@@ -111,8 +109,7 @@ class _OiDateInputState extends State<OiDateInput> {
         .replaceAll('dd', d.day.toString().padLeft(2, '0'));
   }
 
-  int _daysInMonth(int year, int month) =>
-      DateTime(year, month + 1, 0).day;
+  int _daysInMonth(int year, int month) => DateTime(year, month + 1, 0).day;
 
   void _confirmPicker() {
     final days = _daysInMonth(_pickerYear, _pickerMonth);
@@ -244,9 +241,7 @@ class _OiDateInputState extends State<OiDateInput> {
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
-    final displayText = widget.value != null
-        ? _formatDate(widget.value!)
-        : '';
+    final displayText = widget.value != null ? _formatDate(widget.value!) : '';
 
     final calendarIcon = Icon(
       const IconData(0xe0d3, fontFamily: 'MaterialIcons'),
@@ -268,8 +263,7 @@ class _OiDateInputState extends State<OiDateInput> {
           displayText,
           style: TextStyle(
             fontSize: 14,
-            color:
-                displayText.isEmpty ? colors.textMuted : colors.text,
+            color: displayText.isEmpty ? colors.textMuted : colors.text,
           ),
         ),
       ),

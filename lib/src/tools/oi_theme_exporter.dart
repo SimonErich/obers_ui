@@ -132,9 +132,7 @@ class OiThemeExporter {
   /// generated code.
   static String toDart(OiThemeData theme, {String variableName = 'theme'}) {
     final buf = StringBuffer()
-      ..writeln(
-        'final $variableName = OiThemeData(',
-      )
+      ..writeln('final $variableName = OiThemeData(')
       ..writeln(
         '  brightness: ${theme.brightness == Brightness.dark ? 'Brightness.dark' : 'Brightness.light'},',
       )
@@ -190,9 +188,9 @@ class OiThemeExporter {
     final g = (color.g * 255).round();
     final b = (color.b * 255).round();
     return '#${a.toRadixString(16).padLeft(2, '0')}'
-        '${r.toRadixString(16).padLeft(2, '0')}'
-        '${g.toRadixString(16).padLeft(2, '0')}'
-        '${b.toRadixString(16).padLeft(2, '0')}'
+            '${r.toRadixString(16).padLeft(2, '0')}'
+            '${g.toRadixString(16).padLeft(2, '0')}'
+            '${b.toRadixString(16).padLeft(2, '0')}'
         .toUpperCase();
   }
 
@@ -305,15 +303,16 @@ class OiThemeExporter {
         map['error'] as Map<String, dynamic>?,
         fallback.error,
       ),
-      info: _swatchFromMap(
-        map['info'] as Map<String, dynamic>?,
-        fallback.info,
+      info: _swatchFromMap(map['info'] as Map<String, dynamic>?, fallback.info),
+      background: _hexToColorOr(
+        map['background'] as String?,
+        fallback.background,
       ),
-      background:
-          _hexToColorOr(map['background'] as String?, fallback.background),
       surface: _hexToColorOr(map['surface'] as String?, fallback.surface),
-      surfaceHover:
-          _hexToColorOr(map['surfaceHover'] as String?, fallback.surfaceHover),
+      surfaceHover: _hexToColorOr(
+        map['surfaceHover'] as String?,
+        fallback.surfaceHover,
+      ),
       surfaceActive: _hexToColorOr(
         map['surfaceActive'] as String?,
         fallback.surfaceActive,
@@ -324,29 +323,40 @@ class OiThemeExporter {
       ),
       overlay: _hexToColorOr(map['overlay'] as String?, fallback.overlay),
       text: _hexToColorOr(map['text'] as String?, fallback.text),
-      textSubtle:
-          _hexToColorOr(map['textSubtle'] as String?, fallback.textSubtle),
-      textMuted:
-          _hexToColorOr(map['textMuted'] as String?, fallback.textMuted),
-      textInverse:
-          _hexToColorOr(map['textInverse'] as String?, fallback.textInverse),
+      textSubtle: _hexToColorOr(
+        map['textSubtle'] as String?,
+        fallback.textSubtle,
+      ),
+      textMuted: _hexToColorOr(map['textMuted'] as String?, fallback.textMuted),
+      textInverse: _hexToColorOr(
+        map['textInverse'] as String?,
+        fallback.textInverse,
+      ),
       textOnPrimary: _hexToColorOr(
         map['textOnPrimary'] as String?,
         fallback.textOnPrimary,
       ),
       border: _hexToColorOr(map['border'] as String?, fallback.border),
-      borderSubtle:
-          _hexToColorOr(map['borderSubtle'] as String?, fallback.borderSubtle),
-      borderFocus:
-          _hexToColorOr(map['borderFocus'] as String?, fallback.borderFocus),
-      borderError:
-          _hexToColorOr(map['borderError'] as String?, fallback.borderError),
+      borderSubtle: _hexToColorOr(
+        map['borderSubtle'] as String?,
+        fallback.borderSubtle,
+      ),
+      borderFocus: _hexToColorOr(
+        map['borderFocus'] as String?,
+        fallback.borderFocus,
+      ),
+      borderError: _hexToColorOr(
+        map['borderError'] as String?,
+        fallback.borderError,
+      ),
       glassBackground: _hexToColorOr(
         map['glassBackground'] as String?,
         fallback.glassBackground,
       ),
-      glassBorder:
-          _hexToColorOr(map['glassBorder'] as String?, fallback.glassBorder),
+      glassBorder: _hexToColorOr(
+        map['glassBorder'] as String?,
+        fallback.glassBorder,
+      ),
       chart: _chartFromMap(map['chart'], fallback.chart),
     );
   }
@@ -388,12 +398,13 @@ class OiThemeExporter {
     return TextStyle(
       fontFamily: map['fontFamily'] as String? ?? fallback.fontFamily,
       fontSize: (map['fontSize'] as num?)?.toDouble() ?? fallback.fontSize,
-      fontWeight: _intToFontWeight(map['fontWeight'] as int?) ??
-          fallback.fontWeight,
+      fontWeight:
+          _intToFontWeight(map['fontWeight'] as int?) ?? fallback.fontWeight,
       height: (map['height'] as num?)?.toDouble() ?? fallback.height,
       letterSpacing:
           (map['letterSpacing'] as num?)?.toDouble() ?? fallback.letterSpacing,
-      decoration: _stringToTextDecoration(map['decoration'] as String?) ??
+      decoration:
+          _stringToTextDecoration(map['decoration'] as String?) ??
           fallback.decoration,
     );
   }
@@ -429,22 +440,10 @@ class OiThemeExporter {
         map['display'] as Map<String, dynamic>?,
         fallback.display,
       ),
-      h1: _textStyleFromMap(
-        map['h1'] as Map<String, dynamic>?,
-        fallback.h1,
-      ),
-      h2: _textStyleFromMap(
-        map['h2'] as Map<String, dynamic>?,
-        fallback.h2,
-      ),
-      h3: _textStyleFromMap(
-        map['h3'] as Map<String, dynamic>?,
-        fallback.h3,
-      ),
-      h4: _textStyleFromMap(
-        map['h4'] as Map<String, dynamic>?,
-        fallback.h4,
-      ),
+      h1: _textStyleFromMap(map['h1'] as Map<String, dynamic>?, fallback.h1),
+      h2: _textStyleFromMap(map['h2'] as Map<String, dynamic>?, fallback.h2),
+      h3: _textStyleFromMap(map['h3'] as Map<String, dynamic>?, fallback.h3),
+      h4: _textStyleFromMap(map['h4'] as Map<String, dynamic>?, fallback.h4),
       body: _textStyleFromMap(
         map['body'] as Map<String, dynamic>?,
         fallback.body,
@@ -562,17 +561,21 @@ class OiThemeExporter {
       lg: (map['lg'] as num?)?.toDouble() ?? fallback.lg,
       xl: (map['xl'] as num?)?.toDouble() ?? fallback.xl,
       xxl: (map['xxl'] as num?)?.toDouble() ?? fallback.xxl,
-      pageGutterCompact: (map['pageGutterCompact'] as num?)?.toDouble() ??
+      pageGutterCompact:
+          (map['pageGutterCompact'] as num?)?.toDouble() ??
           fallback.pageGutterCompact,
-      pageGutterMedium: (map['pageGutterMedium'] as num?)?.toDouble() ??
+      pageGutterMedium:
+          (map['pageGutterMedium'] as num?)?.toDouble() ??
           fallback.pageGutterMedium,
-      pageGutterExpanded: (map['pageGutterExpanded'] as num?)?.toDouble() ??
+      pageGutterExpanded:
+          (map['pageGutterExpanded'] as num?)?.toDouble() ??
           fallback.pageGutterExpanded,
-      pageGutterLarge: (map['pageGutterLarge'] as num?)?.toDouble() ??
+      pageGutterLarge:
+          (map['pageGutterLarge'] as num?)?.toDouble() ??
           fallback.pageGutterLarge,
       pageGutterExtraLarge:
           (map['pageGutterExtraLarge'] as num?)?.toDouble() ??
-              fallback.pageGutterExtraLarge,
+          fallback.pageGutterExtraLarge,
     );
   }
 
@@ -614,24 +617,19 @@ class OiThemeExporter {
             _borderRadiusToDouble(fallback.none),
       ),
       xs: _doubleToBorderRadius(
-        (map['xs'] as num?)?.toDouble() ??
-            _borderRadiusToDouble(fallback.xs),
+        (map['xs'] as num?)?.toDouble() ?? _borderRadiusToDouble(fallback.xs),
       ),
       sm: _doubleToBorderRadius(
-        (map['sm'] as num?)?.toDouble() ??
-            _borderRadiusToDouble(fallback.sm),
+        (map['sm'] as num?)?.toDouble() ?? _borderRadiusToDouble(fallback.sm),
       ),
       md: _doubleToBorderRadius(
-        (map['md'] as num?)?.toDouble() ??
-            _borderRadiusToDouble(fallback.md),
+        (map['md'] as num?)?.toDouble() ?? _borderRadiusToDouble(fallback.md),
       ),
       lg: _doubleToBorderRadius(
-        (map['lg'] as num?)?.toDouble() ??
-            _borderRadiusToDouble(fallback.lg),
+        (map['lg'] as num?)?.toDouble() ?? _borderRadiusToDouble(fallback.lg),
       ),
       xl: _doubleToBorderRadius(
-        (map['xl'] as num?)?.toDouble() ??
-            _borderRadiusToDouble(fallback.xl),
+        (map['xl'] as num?)?.toDouble() ?? _borderRadiusToDouble(fallback.xl),
       ),
       full: _doubleToBorderRadius(
         (map['full'] as num?)?.toDouble() ??
@@ -738,16 +736,17 @@ class OiThemeExporter {
     if (map == null) return fallback;
     return OiAnimationConfig(
       fast: Duration(
-        milliseconds: (map['fastMs'] as num?)?.toInt() ??
-            fallback.fast.inMilliseconds,
+        milliseconds:
+            (map['fastMs'] as num?)?.toInt() ?? fallback.fast.inMilliseconds,
       ),
       normal: Duration(
-        milliseconds: (map['normalMs'] as num?)?.toInt() ??
+        milliseconds:
+            (map['normalMs'] as num?)?.toInt() ??
             fallback.normal.inMilliseconds,
       ),
       slow: Duration(
-        milliseconds: (map['slowMs'] as num?)?.toInt() ??
-            fallback.slow.inMilliseconds,
+        milliseconds:
+            (map['slowMs'] as num?)?.toInt() ?? fallback.slow.inMilliseconds,
       ),
       reducedMotion: map['reducedMotion'] as bool? ?? fallback.reducedMotion,
     );
@@ -778,9 +777,7 @@ class OiThemeExporter {
   }
 
   /// Serializes an [OiInteractiveStyle] to a map.
-  static Map<String, dynamic> _interactiveStyleToMap(
-    OiInteractiveStyle style,
-  ) {
+  static Map<String, dynamic> _interactiveStyleToMap(OiInteractiveStyle style) {
     return {
       'backgroundOverlay': _colorToHex(style.backgroundOverlay),
       'halo': _haloToMap(style.halo),
@@ -799,10 +796,7 @@ class OiThemeExporter {
         map['backgroundOverlay'] as String?,
         fallback.backgroundOverlay,
       ),
-      halo: _haloFromMap(
-        map['halo'] as Map<String, dynamic>?,
-        fallback.halo,
-      ),
+      halo: _haloFromMap(map['halo'] as Map<String, dynamic>?, fallback.halo),
       scale: (map['scale'] as num?)?.toDouble() ?? fallback.scale,
     );
   }
@@ -895,7 +889,7 @@ class OiThemeExporter {
   /// Serializes an [OiGradientStyle] to a map.
   static Map<String, dynamic> _gradientStyleToMap(OiGradientStyle gradient) {
     return {
-      'isLinear': gradient.isLinear,
+      'linear': gradient.linear,
       'colors': gradient.colors.map(_colorToHex).toList(),
       if (gradient.stops != null) 'stops': gradient.stops,
     };
@@ -906,10 +900,11 @@ class OiThemeExporter {
     final colors = (map['colors'] as List)
         .map((c) => _hexToColor(c as String? ?? ''))
         .toList();
-    final stops =
-        (map['stops'] as List?)?.map((s) => (s as num).toDouble()).toList();
+    final stops = (map['stops'] as List?)
+        ?.map((s) => (s as num).toDouble())
+        .toList();
     return OiGradientStyle(
-      isLinear: map['isLinear'] as bool? ?? true,
+      linear: map['linear'] as bool? ?? true,
       colors: colors,
       stops: stops,
     );
@@ -937,8 +932,9 @@ class OiThemeExporter {
     final gradients = <String, OiGradientStyle>{};
     if (gradientsRaw != null) {
       for (final entry in gradientsRaw.entries) {
-        gradients[entry.key] =
-            _gradientStyleFromMap(entry.value as Map<String, dynamic>);
+        gradients[entry.key] = _gradientStyleFromMap(
+          entry.value as Map<String, dynamic>,
+        );
       }
     }
     return OiDecorationTheme(
@@ -995,9 +991,7 @@ class OiThemeExporter {
       ..writeln('    borderSubtle: ${_colorToDart(colors.borderSubtle)},')
       ..writeln('    borderFocus: ${_colorToDart(colors.borderFocus)},')
       ..writeln('    borderError: ${_colorToDart(colors.borderError)},')
-      ..writeln(
-        '    glassBackground: ${_colorToDart(colors.glassBackground)},',
-      )
+      ..writeln('    glassBackground: ${_colorToDart(colors.glassBackground)},')
       ..writeln('    glassBorder: ${_colorToDart(colors.glassBorder)},')
       ..write('    chart: [');
     for (final c in colors.chart) {
@@ -1059,9 +1053,7 @@ class OiThemeExporter {
       ..writeln('    pageGutterMedium: ${spacing.pageGutterMedium},')
       ..writeln('    pageGutterExpanded: ${spacing.pageGutterExpanded},')
       ..writeln('    pageGutterLarge: ${spacing.pageGutterLarge},')
-      ..writeln(
-        '    pageGutterExtraLarge: ${spacing.pageGutterExtraLarge},',
-      );
+      ..writeln('    pageGutterExtraLarge: ${spacing.pageGutterExtraLarge},');
   }
 
   /// Writes radius fields as Dart source code.
@@ -1172,9 +1164,7 @@ class OiThemeExporter {
     void writeBorder(String name, OiBorderStyle b) {
       buf
         ..writeln('    $name: OiBorderStyle(')
-        ..writeln(
-          '      lineStyle: OiBorderLineStyle.${b.lineStyle.name},',
-        )
+        ..writeln('      lineStyle: OiBorderLineStyle.${b.lineStyle.name},')
         ..writeln('      color: ${_colorToDart(b.color)},')
         ..writeln('      width: ${b.width},');
       if (b.borderRadius != null) {
@@ -1197,7 +1187,7 @@ class OiThemeExporter {
     for (final entry in decoration.gradients.entries) {
       buf
         ..write("      '${entry.key}': OiGradientStyle(")
-        ..write('isLinear: ${entry.value.isLinear}, ')
+        ..write('linear: ${entry.value.linear}, ')
         ..write('colors: [');
       for (final c in entry.value.colors) {
         buf.write('${_colorToDart(c)}, ');

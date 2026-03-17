@@ -83,10 +83,7 @@ class OiTextTheme {
   /// [fontFamily] is applied to every style except [code].
   /// [monoFontFamily] is applied to [code].  When omitted both fall back to
   /// system defaults.
-  factory OiTextTheme.standard({
-    String? fontFamily,
-    String? monoFontFamily,
-  }) {
+  factory OiTextTheme.standard({String? fontFamily, String? monoFontFamily}) {
     const defaultMono = 'monospace';
     return OiTextTheme(
       display: TextStyle(
@@ -185,20 +182,20 @@ class OiTextTheme {
   /// [t] must be in the range [0, 1]. At [t] = 0 the result equals [a];
   /// at [t] = 1 the result equals [b].
   OiTextTheme.lerp(OiTextTheme a, OiTextTheme b, double t)
-      : display = TextStyle.lerp(a.display, b.display, t)!,
-        h1 = TextStyle.lerp(a.h1, b.h1, t)!,
-        h2 = TextStyle.lerp(a.h2, b.h2, t)!,
-        h3 = TextStyle.lerp(a.h3, b.h3, t)!,
-        h4 = TextStyle.lerp(a.h4, b.h4, t)!,
-        body = TextStyle.lerp(a.body, b.body, t)!,
-        bodyStrong = TextStyle.lerp(a.bodyStrong, b.bodyStrong, t)!,
-        small = TextStyle.lerp(a.small, b.small, t)!,
-        smallStrong = TextStyle.lerp(a.smallStrong, b.smallStrong, t)!,
-        tiny = TextStyle.lerp(a.tiny, b.tiny, t)!,
-        caption = TextStyle.lerp(a.caption, b.caption, t)!,
-        code = TextStyle.lerp(a.code, b.code, t)!,
-        overline = TextStyle.lerp(a.overline, b.overline, t)!,
-        link = TextStyle.lerp(a.link, b.link, t)!;
+    : display = TextStyle.lerp(a.display, b.display, t)!,
+      h1 = TextStyle.lerp(a.h1, b.h1, t)!,
+      h2 = TextStyle.lerp(a.h2, b.h2, t)!,
+      h3 = TextStyle.lerp(a.h3, b.h3, t)!,
+      h4 = TextStyle.lerp(a.h4, b.h4, t)!,
+      body = TextStyle.lerp(a.body, b.body, t)!,
+      bodyStrong = TextStyle.lerp(a.bodyStrong, b.bodyStrong, t)!,
+      small = TextStyle.lerp(a.small, b.small, t)!,
+      smallStrong = TextStyle.lerp(a.smallStrong, b.smallStrong, t)!,
+      tiny = TextStyle.lerp(a.tiny, b.tiny, t)!,
+      caption = TextStyle.lerp(a.caption, b.caption, t)!,
+      code = TextStyle.lerp(a.code, b.code, t)!,
+      overline = TextStyle.lerp(a.overline, b.overline, t)!,
+      link = TextStyle.lerp(a.link, b.link, t)!;
 
   // ── Styles ────────────────────────────────────────────────────────────────
 
@@ -337,21 +334,21 @@ class OiTextTheme {
 
   @override
   int get hashCode => Object.hashAll([
-        display,
-        h1,
-        h2,
-        h3,
-        h4,
-        body,
-        bodyStrong,
-        small,
-        smallStrong,
-        tiny,
-        caption,
-        code,
-        overline,
-        link,
-      ]);
+    display,
+    h1,
+    h2,
+    h3,
+    h4,
+    body,
+    bodyStrong,
+    small,
+    smallStrong,
+    tiny,
+    caption,
+    code,
+    overline,
+    link,
+  ]);
 
   @override
   String toString() => 'OiTextTheme(body: $body, h1: $h1, display: $display)';

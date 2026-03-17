@@ -25,9 +25,7 @@ const _users = [
 void main() {
   testWidgets('avatars overlap via positioned left offsets', (tester) async {
     await tester.pumpObers(
-      const Center(
-        child: OiAvatarStack(users: _users, maxVisible: 3),
-      ),
+      const Center(child: OiAvatarStack(users: _users, maxVisible: 3)),
     );
 
     final positioned = tester
@@ -44,41 +42,34 @@ void main() {
     }
   });
 
-  testWidgets('maxVisible caps the number of displayed avatars',
-      (tester) async {
+  testWidgets('maxVisible caps the number of displayed avatars', (
+    tester,
+  ) async {
     await tester.pumpObers(
-      const Center(
-        child: OiAvatarStack(users: _users, maxVisible: 2),
-      ),
+      const Center(child: OiAvatarStack(users: _users, maxVisible: 2)),
     );
 
     // Only 2 OiAvatar widgets should be rendered (not 6).
     expect(find.byType(OiAvatar), findsNWidgets(2));
   });
 
-  testWidgets('overflow indicator shows +N when users exceed maxVisible',
-      (tester) async {
-    await tester.pumpObers(
-      const Center(
-        child: OiAvatarStack(users: _users),
-      ),
-    );
+  testWidgets('overflow indicator shows +N when users exceed maxVisible', (
+    tester,
+  ) async {
+    await tester.pumpObers(const Center(child: OiAvatarStack(users: _users)));
 
     // 6 users - 4 visible (default maxVisible) = +2.
     expect(find.text('+2'), findsOneWidget);
   });
 
-  testWidgets('no overflow indicator when users fit within maxVisible',
-      (tester) async {
+  testWidgets('no overflow indicator when users fit within maxVisible', (
+    tester,
+  ) async {
     const twoUsers = [
       OiAvatarStackItem(label: 'Alice', initials: 'AL'),
       OiAvatarStackItem(label: 'Bob', initials: 'BO'),
     ];
-    await tester.pumpObers(
-      const Center(
-        child: OiAvatarStack(users: twoUsers),
-      ),
-    );
+    await tester.pumpObers(const Center(child: OiAvatarStack(users: twoUsers)));
 
     expect(find.textContaining('+'), findsNothing);
   });
@@ -103,9 +94,7 @@ void main() {
     await tester.pumpObers(
       Center(
         child: OiAvatarStack(
-          users: const [
-            OiAvatarStackItem(label: 'Alice', initials: 'AL'),
-          ],
+          users: const [OiAvatarStackItem(label: 'Alice', initials: 'AL')],
           onTap: (user) => tappedUser = user,
         ),
       ),
@@ -118,11 +107,7 @@ void main() {
   });
 
   testWidgets('empty user list renders nothing', (tester) async {
-    await tester.pumpObers(
-      const Center(
-        child: OiAvatarStack(users: []),
-      ),
-    );
+    await tester.pumpObers(const Center(child: OiAvatarStack(users: [])));
 
     expect(find.byType(OiAvatar), findsNothing);
   });

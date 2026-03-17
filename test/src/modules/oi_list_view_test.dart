@@ -35,13 +35,16 @@ void main() {
           itemBuilder: (item) => Text(item),
           itemKey: (item) => item,
           label: 'Search list',
-          onSearch: (q) => searchedQuery = q,
+          onSearch: (q) {
+            searchedQuery = q;
+          },
         ),
         surfaceSize: const Size(400, 600),
       );
 
       // The search input placeholder should be visible.
       expect(find.text('Search...'), findsOneWidget);
+      expect(searchedQuery, isNull); // callback not yet triggered
     });
 
     testWidgets('sort options render', (tester) async {
@@ -120,20 +123,22 @@ void main() {
       expect(find.text('Nothing here'), findsOneWidget);
     });
 
-    testWidgets('default empty state shows when no items and no custom widget',
-        (tester) async {
-      await tester.pumpObers(
-        OiListView<String>(
-          items: const [],
-          itemBuilder: (item) => Text(item),
-          itemKey: (item) => item,
-          label: 'Empty list default',
-        ),
-        surfaceSize: const Size(400, 600),
-      );
+    testWidgets(
+      'default empty state shows when no items and no custom widget',
+      (tester) async {
+        await tester.pumpObers(
+          OiListView<String>(
+            items: const [],
+            itemBuilder: (item) => Text(item),
+            itemKey: (item) => item,
+            label: 'Empty list default',
+          ),
+          surfaceSize: const Size(400, 600),
+        );
 
-      expect(find.text('No items'), findsOneWidget);
-    });
+        expect(find.text('No items'), findsOneWidget);
+      },
+    );
 
     testWidgets('header actions render', (tester) async {
       await tester.pumpObers(
@@ -142,8 +147,11 @@ void main() {
           itemBuilder: (item) => Text(item),
           itemKey: (item) => item,
           label: 'Actions list',
-          headerActions:
-              const SizedBox(key: Key('header-action'), width: 24, height: 24),
+          headerActions: const SizedBox(
+            key: Key('header-action'),
+            width: 24,
+            height: 24,
+          ),
         ),
         surfaceSize: const Size(400, 600),
       );
@@ -162,14 +170,12 @@ void main() {
         surfaceSize: const Size(400, 600),
       );
 
-      expect(
-        find.bySemanticsLabel('My List'),
-        findsWidgets,
-      );
+      expect(find.bySemanticsLabel('My List'), findsWidgets);
     });
 
-    testWidgets('selection actions bar shows when items selected',
-        (tester) async {
+    testWidgets('selection actions bar shows when items selected', (
+      tester,
+    ) async {
       await tester.pumpObers(
         OiListView<String>(
           items: const ['A', 'B'],

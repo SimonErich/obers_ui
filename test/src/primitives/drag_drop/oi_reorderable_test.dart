@@ -33,13 +33,13 @@ void main() {
 
   // ── 2. Wraps in CustomScrollView + SliverReorderableList ──────────────────
 
-  testWidgets('uses CustomScrollView and SliverReorderableList', (tester) async {
+  testWidgets('uses CustomScrollView and SliverReorderableList', (
+    tester,
+  ) async {
     await tester.pumpObers(
       OiReorderable(
         onReorder: (_, __) {},
-        children: const [
-          Text('item', key: ValueKey('i')),
-        ],
+        children: const [Text('item', key: ValueKey('i'))],
       ),
     );
     expect(find.byType(CustomScrollView), findsOneWidget);
@@ -48,8 +48,9 @@ void main() {
 
   // ── 3. Pointer density wraps items in ReorderableDragStartListener ─────────
 
-  testWidgets('pointer density uses ReorderableDragStartListener',
-      (tester) async {
+  testWidgets('pointer density uses ReorderableDragStartListener', (
+    tester,
+  ) async {
     await tester.pumpObers(
       _withDensity(
         OiDensity.compact,
@@ -68,8 +69,9 @@ void main() {
 
   // ── 4. Touch density wraps items in ReorderableDelayedDragStartListener ────
 
-  testWidgets('touch density uses ReorderableDelayedDragStartListener',
-      (tester) async {
+  testWidgets('touch density uses ReorderableDelayedDragStartListener', (
+    tester,
+  ) async {
     await tester.pumpObers(
       _withDensity(
         OiDensity.comfortable,
@@ -93,9 +95,7 @@ void main() {
       OiReorderable(
         onReorder: (_, __) {},
         padding: const EdgeInsets.all(16),
-        children: const [
-          Text('item', key: ValueKey('i')),
-        ],
+        children: const [Text('item', key: ValueKey('i'))],
       ),
     );
     expect(find.byType(SliverPadding), findsOneWidget);
@@ -107,9 +107,7 @@ void main() {
     await tester.pumpObers(
       OiReorderable(
         onReorder: (_, __) {},
-        children: const [
-          Text('item', key: ValueKey('i')),
-        ],
+        children: const [Text('item', key: ValueKey('i'))],
       ),
     );
     expect(find.byType(SliverPadding), findsNothing);
@@ -132,21 +130,9 @@ void main() {
               capturedNew = newIndex;
             },
             children: const [
-              SizedBox(
-                key: ValueKey('a'),
-                height: 60,
-                child: Text('alpha'),
-              ),
-              SizedBox(
-                key: ValueKey('b'),
-                height: 60,
-                child: Text('beta'),
-              ),
-              SizedBox(
-                key: ValueKey('c'),
-                height: 60,
-                child: Text('gamma'),
-              ),
+              SizedBox(key: ValueKey('a'), height: 60, child: Text('alpha')),
+              SizedBox(key: ValueKey('b'), height: 60, child: Text('beta')),
+              SizedBox(key: ValueKey('c'), height: 60, child: Text('gamma')),
             ],
           ),
         ),

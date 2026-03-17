@@ -12,24 +12,18 @@ import '../../../helpers/pump_app.dart';
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 /// Wraps [child] with [OiApp] in touch (comfortable) density.
-Widget touchApp(Widget child) => OiApp(
-      density: OiDensity.comfortable,
-      home: child,
-    );
+Widget touchApp(Widget child) =>
+    OiApp(density: OiDensity.comfortable, home: child);
 
 /// Wraps [child] with [OiApp] in pointer (compact) density.
-Widget pointerApp(Widget child) => OiApp(
-      density: OiDensity.compact,
-      home: child,
-    );
+Widget pointerApp(Widget child) =>
+    OiApp(density: OiDensity.compact, home: child);
 
 void main() {
   // ── 1. Renders child ───────────────────────────────────────────────────────
 
   testWidgets('renders child widget', (tester) async {
-    await tester.pumpObers(
-      const OiTappable(child: Text('tap me')),
-    );
+    await tester.pumpObers(const OiTappable(child: Text('tap me')));
     expect(find.text('tap me'), findsOneWidget);
   });
 
@@ -95,22 +89,17 @@ void main() {
 
   testWidgets('disabled=true: Opacity widget present with 0.4', (tester) async {
     await tester.pumpObers(
-      const OiTappable(
-        enabled: false,
-        child: SizedBox(width: 60, height: 60),
-      ),
+      const OiTappable(enabled: false, child: SizedBox(width: 60, height: 60)),
     );
     final opacityWidgets = tester.widgetList<Opacity>(find.byType(Opacity));
-    expect(
-      opacityWidgets.any((o) => o.opacity == 0.4),
-      isTrue,
-    );
+    expect(opacityWidgets.any((o) => o.opacity == 0.4), isTrue);
   });
 
   // ── 6. focusable=false: Focus cannot request focus ─────────────────────────
 
-  testWidgets('focusable=false: canRequestFocus is false on Focus node',
-      (tester) async {
+  testWidgets('focusable=false: canRequestFocus is false on Focus node', (
+    tester,
+  ) async {
     await tester.pumpObers(
       const OiTappable(
         focusable: false,
@@ -123,8 +112,9 @@ void main() {
 
   // ── 7. semanticLabel renders Semantics node ────────────────────────────────
 
-  testWidgets('semanticLabel creates a Semantics node with label',
-      (tester) async {
+  testWidgets('semanticLabel creates a Semantics node with label', (
+    tester,
+  ) async {
     await tester.pumpObers(
       const OiTappable(
         semanticLabel: 'close dialog',
@@ -144,15 +134,12 @@ void main() {
 
   // ── 8. Touch device: 48 dp minimum touch target ────────────────────────────
 
-  testWidgets('touch device: small child gets minimum 48dp touch target',
-      (tester) async {
+  testWidgets('touch device: small child gets minimum 48dp touch target', (
+    tester,
+  ) async {
     await tester.pumpWidget(
       touchApp(
-        const Center(
-          child: OiTappable(
-            child: SizedBox(width: 24, height: 24),
-          ),
-        ),
+        const Center(child: OiTappable(child: SizedBox(width: 24, height: 24))),
       ),
     );
     await tester.pump();
@@ -164,14 +151,12 @@ void main() {
 
   // ── 9. Pointer device: no extra padding ────────────────────────────────────
 
-  testWidgets('pointer device: child size is not padded to 48dp', (tester) async {
+  testWidgets('pointer device: child size is not padded to 48dp', (
+    tester,
+  ) async {
     await tester.pumpWidget(
       pointerApp(
-        const Center(
-          child: OiTappable(
-            child: SizedBox(width: 24, height: 24),
-          ),
-        ),
+        const Center(child: OiTappable(child: SizedBox(width: 24, height: 24))),
       ),
     );
     await tester.pump();
@@ -184,8 +169,9 @@ void main() {
 
   // ── 10. Hover state on pointer device ─────────────────────────────────────
 
-  testWidgets('pointer device: onHover called on MouseRegion enter/exit',
-      (tester) async {
+  testWidgets('pointer device: onHover called on MouseRegion enter/exit', (
+    tester,
+  ) async {
     final hoverStates = <bool>[];
     await tester.pumpWidget(
       pointerApp(
@@ -199,9 +185,7 @@ void main() {
     );
     await tester.pump();
 
-    final gesture = await tester.createGesture(
-      kind: PointerDeviceKind.mouse,
-    );
+    final gesture = await tester.createGesture(kind: PointerDeviceKind.mouse);
     await gesture.addPointer(location: Offset.zero);
     addTearDown(gesture.removePointer);
     await tester.pump();

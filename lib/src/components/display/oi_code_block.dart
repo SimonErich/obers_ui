@@ -43,9 +43,9 @@ List<_Token> _tokenise(String line) {
     }
 
     // String literal (single or double-quoted, or backtick).
-    final stringMatch =
-        RegExp(r'''("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'|`[^`]*`)''')
-            .firstMatch(remaining);
+    final stringMatch = RegExp(
+      r'''("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'|`[^`]*`)''',
+    ).firstMatch(remaining);
     if (stringMatch != null && stringMatch.start == 0) {
       tokens.add(_Token(stringMatch.group(0)!, _TokenKind.string));
       remaining = remaining.substring(stringMatch.end);
@@ -64,8 +64,9 @@ List<_Token> _tokenise(String line) {
     final wordMatch = RegExp(r'\b[a-zA-Z_]\w*\b').firstMatch(remaining);
     if (wordMatch != null && wordMatch.start == 0) {
       final word = wordMatch.group(0)!;
-      final kind =
-          _keywords.contains(word) ? _TokenKind.keyword : _TokenKind.other;
+      final kind = _keywords.contains(word)
+          ? _TokenKind.keyword
+          : _TokenKind.other;
       tokens.add(_Token(word, kind));
       remaining = remaining.substring(wordMatch.end);
       continue;

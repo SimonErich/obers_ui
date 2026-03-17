@@ -69,10 +69,7 @@ class OiSelectionPresence extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _OiSelectionPresenceScope(
-      selections: selections,
-      child: child,
-    );
+    return _OiSelectionPresenceScope(selections: selections, child: child);
   }
 }
 

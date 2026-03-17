@@ -45,23 +45,17 @@ void main() {
     });
 
     test('fromJson handles null collapsedSectionIds gracefully', () {
-      final s = OiSidebarSettings.fromJson(const {
-        'collapsedSectionIds': null,
-      });
+      final s = OiSidebarSettings.fromJson(const {'collapsedSectionIds': null});
       expect(s.collapsedSectionIds, isEmpty);
     });
 
     test('fromJson handles unknown enum value gracefully', () {
-      final s = OiSidebarSettings.fromJson(const {
-        'mode': 'nonexistent',
-      });
+      final s = OiSidebarSettings.fromJson(const {'mode': 'nonexistent'});
       expect(s.mode, OiSidebarMode.full);
     });
 
     test('fromJson parses width from int JSON value', () {
-      final s = OiSidebarSettings.fromJson(const {
-        'width': 200,
-      });
+      final s = OiSidebarSettings.fromJson(const {'width': 200});
       expect(s.width, 200.0);
     });
 
@@ -75,16 +69,14 @@ void main() {
 
     test('mergeWith: empty collapsedSectionIds filled from defaults', () {
       const saved = OiSidebarSettings();
-      const defaults =
-          OiSidebarSettings(collapsedSectionIds: {'nav', 'tools'});
+      const defaults = OiSidebarSettings(collapsedSectionIds: {'nav', 'tools'});
       final merged = saved.mergeWith(defaults);
       expect(merged.collapsedSectionIds, {'nav', 'tools'});
     });
 
     test('mergeWith: non-empty collapsedSectionIds preserved', () {
       const saved = OiSidebarSettings(collapsedSectionIds: {'mine'});
-      const defaults =
-          OiSidebarSettings(collapsedSectionIds: {'nav', 'tools'});
+      const defaults = OiSidebarSettings(collapsedSectionIds: {'nav', 'tools'});
       final merged = saved.mergeWith(defaults);
       expect(merged.collapsedSectionIds, {'mine'});
     });
@@ -97,10 +89,7 @@ void main() {
     });
 
     test('mergeWith: mode and width come from saved', () {
-      const saved = OiSidebarSettings(
-        mode: OiSidebarMode.hidden,
-        width: 100,
-      );
+      const saved = OiSidebarSettings(mode: OiSidebarMode.hidden, width: 100);
       const defaults = OiSidebarSettings();
       final merged = saved.mergeWith(defaults);
       expect(merged.mode, OiSidebarMode.hidden);
@@ -110,10 +99,7 @@ void main() {
     // ── copyWith ──────────────────────────────────────────────────────────────
 
     test('copyWith returns identical when no args provided', () {
-      const s = OiSidebarSettings(
-        mode: OiSidebarMode.compact,
-        width: 80,
-      );
+      const s = OiSidebarSettings(mode: OiSidebarMode.compact, width: 80);
       expect(s.copyWith(), equals(s));
     });
 
@@ -137,10 +123,7 @@ void main() {
     });
 
     test('copyWith preserves unspecified fields', () {
-      const s = OiSidebarSettings(
-        mode: OiSidebarMode.compact,
-        width: 80,
-      );
+      const s = OiSidebarSettings(mode: OiSidebarMode.compact, width: 80);
       final updated = s.copyWith(collapsedSectionIds: {'sec'});
       expect(updated.mode, OiSidebarMode.compact);
       expect(updated.width, 80);

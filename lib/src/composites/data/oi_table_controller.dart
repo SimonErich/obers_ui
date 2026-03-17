@@ -15,10 +15,10 @@ import 'package:obers_ui/src/models/settings/oi_table_settings.dart';
 class OiTableController extends ChangeNotifier {
   /// Creates an [OiTableController].
   OiTableController({int pageSize = 25, int totalRows = 0})
-      : pagination = OiPaginationController(
-          pageSize: pageSize,
-          totalItems: totalRows,
-        ) {
+    : pagination = OiPaginationController(
+        pageSize: pageSize,
+        totalItems: totalRows,
+      ) {
     pagination.addListener(notifyListeners);
   }
 

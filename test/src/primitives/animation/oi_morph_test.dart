@@ -13,9 +13,7 @@ void main() {
 
   testWidgets('renders the initial child', (tester) async {
     await tester.pumpObers(
-      const OiMorph(
-        child: Text('initial', key: ValueKey('initial')),
-      ),
+      const OiMorph(child: Text('initial', key: ValueKey('initial'))),
     );
     await tester.pump();
 
@@ -26,9 +24,7 @@ void main() {
 
   testWidgets('wraps child in AnimatedSwitcher', (tester) async {
     await tester.pumpObers(
-      const OiMorph(
-        child: Text('hello', key: ValueKey('hello')),
-      ),
+      const OiMorph(child: Text('hello', key: ValueKey('hello'))),
     );
     await tester.pump();
 
@@ -37,8 +33,9 @@ void main() {
 
   // ── 3. Child change triggers FadeTransition (default transition=fade) ─────
 
-  testWidgets('child key change: FadeTransition present during switch',
-      (tester) async {
+  testWidgets('child key change: FadeTransition present during switch', (
+    tester,
+  ) async {
     final notifier = ValueNotifier<bool>(false);
 
     await tester.pumpObers(
@@ -67,8 +64,9 @@ void main() {
 
   // ── 4. transition=none: no FadeTransition ─────────────────────────────────
 
-  testWidgets('transition=none: no FadeTransition on child switch',
-      (tester) async {
+  testWidgets('transition=none: no FadeTransition on child switch', (
+    tester,
+  ) async {
     final notifier = ValueNotifier<bool>(false);
 
     await tester.pumpObers(
@@ -95,8 +93,9 @@ void main() {
 
   // ── 5. transition=fadeScale: ScaleTransition present ─────────────────────
 
-  testWidgets('transition=fadeScale: ScaleTransition present during switch',
-      (tester) async {
+  testWidgets('transition=fadeScale: ScaleTransition present during switch', (
+    tester,
+  ) async {
     final notifier = ValueNotifier<bool>(false);
 
     await tester.pumpObers(

@@ -193,15 +193,15 @@ class OiPermissions extends StatelessWidget {
   }
 
   Widget _buildPermissionRow(
-      BuildContext context, OiPermissionItem permission) {
+    BuildContext context,
+    OiPermissionItem permission,
+  ) {
     final colors = context.colors;
     final spacing = context.spacing;
 
     return Container(
       decoration: BoxDecoration(
-        border: Border(
-          bottom: BorderSide(color: colors.borderSubtle),
-        ),
+        border: Border(bottom: BorderSide(color: colors.borderSubtle)),
       ),
       child: Row(
         children: [
@@ -215,20 +215,14 @@ class OiPermissions extends StatelessWidget {
                 children: [
                   Text(
                     permission.label,
-                    style: TextStyle(
-                      color: colors.text,
-                      fontSize: 13,
-                    ),
+                    style: TextStyle(color: colors.text, fontSize: 13),
                   ),
                   if (permission.description != null)
                     Padding(
                       padding: EdgeInsets.only(top: 2),
                       child: Text(
                         permission.description!,
-                        style: TextStyle(
-                          color: colors.textMuted,
-                          fontSize: 11,
-                        ),
+                        style: TextStyle(color: colors.textMuted, fontSize: 11),
                       ),
                     ),
                 ],
@@ -248,8 +242,7 @@ class OiPermissions extends StatelessWidget {
                   child: Semantics(
                     container: true,
                     explicitChildNodes: true,
-                    label:
-                        '${permission.label} for ${role.label}',
+                    label: '${permission.label} for ${role.label}',
                     toggled: _isGranted(role.key, permission.key),
                     child: _OiCheckbox(
                       checked: _isGranted(role.key, permission.key),
@@ -268,11 +261,7 @@ class OiPermissions extends StatelessWidget {
 
 /// A simple checkbox used within the permissions matrix.
 class _OiCheckbox extends StatelessWidget {
-  const _OiCheckbox({
-    required this.checked,
-    required this.enabled,
-    this.color,
-  });
+  const _OiCheckbox({required this.checked, required this.enabled, this.color});
 
   /// Whether the checkbox is checked.
   final bool checked;
@@ -298,8 +287,8 @@ class _OiCheckbox extends StatelessWidget {
           color: checked
               ? effectiveColor
               : enabled
-                  ? colors.border
-                  : colors.borderSubtle,
+              ? colors.border
+              : colors.borderSubtle,
           width: 2,
         ),
       ),

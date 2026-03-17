@@ -25,12 +25,12 @@ class OiPaginationController extends ChangeNotifier {
     int currentPage = 0,
     int pageSize = 25,
     int totalItems = 0,
-  })  : assert(currentPage >= 0, 'currentPage must be >= 0'),
-        assert(pageSize >= 1, 'pageSize must be >= 1'),
-        assert(totalItems >= 0, 'totalItems must be >= 0'),
-        _currentPage = currentPage,
-        _pageSize = pageSize,
-        _totalItems = totalItems;
+  }) : assert(currentPage >= 0, 'currentPage must be >= 0'),
+       assert(pageSize >= 1, 'pageSize must be >= 1'),
+       assert(totalItems >= 0, 'totalItems must be >= 0'),
+       _currentPage = currentPage,
+       _pageSize = pageSize,
+       _totalItems = totalItems;
 
   int _currentPage;
   int _pageSize;
@@ -48,8 +48,7 @@ class OiPaginationController extends ChangeNotifier {
   /// The total number of pages, always >= 1 when [totalItems] > 0.
   ///
   /// Returns 0 when [totalItems] is 0.
-  int get totalPages =>
-      _totalItems == 0 ? 0 : (_totalItems / _pageSize).ceil();
+  int get totalPages => _totalItems == 0 ? 0 : (_totalItems / _pageSize).ceil();
 
   /// The zero-based index of the first item on the current page.
   int get startIndex => _currentPage * _pageSize;

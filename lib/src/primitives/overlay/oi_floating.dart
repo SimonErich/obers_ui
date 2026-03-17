@@ -121,8 +121,7 @@ class _OiFloatingState extends State<OiFloating> {
     super.dispose();
   }
 
-  bool get _useBottomSheet =>
-      widget.bottomSheetOnCompact && context.isCompact;
+  bool get _useBottomSheet => widget.bottomSheetOnCompact && context.isCompact;
 
   void _updateBottomSheet() {
     if (_useBottomSheet && widget.visible) {
@@ -137,12 +136,8 @@ class _OiFloatingState extends State<OiFloating> {
     final overlay = Overlay.maybeOf(context);
     if (overlay == null) return;
     _bottomSheetEntry = OverlayEntry(
-      builder: (ctx) => Positioned(
-        left: 0,
-        right: 0,
-        bottom: 0,
-        child: widget.child,
-      ),
+      builder: (ctx) =>
+          Positioned(left: 0, right: 0, bottom: 0, child: widget.child),
     );
     overlay.insert(_bottomSheetEntry!);
   }
@@ -156,7 +151,7 @@ class _OiFloatingState extends State<OiFloating> {
   /// Returns the [targetAnchor], [followerAnchor], and [linkedOffset] for the
   /// given [alignment] and [gap].
   ({Alignment targetAnchor, Alignment followerAnchor, Offset linkedOffset})
-      _anchorsFor(OiFloatingAlignment alignment, double gap) {
+  _anchorsFor(OiFloatingAlignment alignment, double gap) {
     switch (alignment) {
       case OiFloatingAlignment.topStart:
         return (
@@ -346,11 +341,7 @@ class _OiFloatingState extends State<OiFloating> {
       clipBehavior: Clip.none,
       children: [
         anchorWidget,
-        Positioned(
-          width: 0,
-          height: 0,
-          child: follower,
-        ),
+        Positioned(width: 0, height: 0, child: follower),
       ],
     );
   }

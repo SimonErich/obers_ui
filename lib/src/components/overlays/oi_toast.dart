@@ -149,8 +149,7 @@ class OiToast extends StatefulWidget {
   State<OiToast> createState() => _OiToastState();
 }
 
-class _OiToastState extends State<OiToast>
-    with SingleTickerProviderStateMixin {
+class _OiToastState extends State<OiToast> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _opacity;
   Timer? _timer;

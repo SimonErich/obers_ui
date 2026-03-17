@@ -71,16 +71,12 @@ void main() {
   });
 
   testWidgets('shows placeholder when no value is selected', (tester) async {
-    await tester.pumpObers(
-      _comboBox(placeholder: 'Pick a fruit'),
-    );
+    await tester.pumpObers(_comboBox(placeholder: 'Pick a fruit'));
     expect(find.text('Pick a fruit'), findsOneWidget);
   });
 
   testWidgets('shows selected value label', (tester) async {
-    await tester.pumpObers(
-      _comboBox(value: 'Banana'),
-    );
+    await tester.pumpObers(_comboBox(value: 'Banana'));
     expect(find.text('Banana'), findsOneWidget);
   });
 
@@ -133,27 +129,18 @@ void main() {
   });
 
   testWidgets('error state shows error text', (tester) async {
-    await tester.pumpObers(
-      _comboBox(error: 'Selection required'),
-    );
+    await tester.pumpObers(_comboBox(error: 'Selection required'));
     expect(find.text('Selection required'), findsOneWidget);
   });
 
   testWidgets('hint is shown when no error', (tester) async {
-    await tester.pumpObers(
-      _comboBox(hint: 'Choose your favorite'),
-    );
+    await tester.pumpObers(_comboBox(hint: 'Choose your favorite'));
     expect(find.text('Choose your favorite'), findsOneWidget);
   });
 
   testWidgets('disabled blocks interaction', (tester) async {
-    await tester.pumpObers(
-      _comboBox(enabled: false),
-    );
-    await tester.tap(
-      find.byType(GestureDetector).first,
-      warnIfMissed: false,
-    );
+    await tester.pumpObers(_comboBox(enabled: false));
+    await tester.tap(find.byType(GestureDetector).first, warnIfMissed: false);
     await tester.pump();
 
     // Dropdown search field should NOT appear.
@@ -182,9 +169,7 @@ void main() {
 
   testWidgets('arrow keys navigate and enter selects', (tester) async {
     String? selected;
-    await tester.pumpObers(
-      _comboBox(onSelect: (v) => selected = v),
-    );
+    await tester.pumpObers(_comboBox(onSelect: (v) => selected = v));
 
     // Open.
     await tester.tap(find.byType(GestureDetector).first);
@@ -203,9 +188,7 @@ void main() {
 
   testWidgets('onSelect fires on item tap', (tester) async {
     String? selected;
-    await tester.pumpObers(
-      _comboBox(onSelect: (v) => selected = v),
-    );
+    await tester.pumpObers(_comboBox(onSelect: (v) => selected = v));
 
     // Open.
     await tester.tap(find.byType(GestureDetector).first);
@@ -222,9 +205,7 @@ void main() {
 
   testWidgets('popup closes on single select', (tester) async {
     String? selected;
-    await tester.pumpObers(
-      _comboBox(onSelect: (v) => selected = v),
-    );
+    await tester.pumpObers(_comboBox(onSelect: (v) => selected = v));
 
     // Open.
     await tester.tap(find.byType(GestureDetector).first);
@@ -297,10 +278,7 @@ void main() {
 
   testWidgets('multi-select shows chips for selected values', (tester) async {
     await tester.pumpObers(
-      _comboBox(
-        multiSelect: true,
-        selectedValues: const ['Apple', 'Banana'],
-      ),
+      _comboBox(multiSelect: true, selectedValues: const ['Apple', 'Banana']),
     );
 
     // Both selected items should show as chips.
@@ -327,12 +305,15 @@ void main() {
     await tester.pumpObers(_comboBox());
 
     // Find the Semantics node with the combo box label.
-    final semanticsWidgets =
-        tester.widgetList<Semantics>(find.byType(Semantics));
+    final semanticsWidgets = tester.widgetList<Semantics>(
+      find.byType(Semantics),
+    );
     final matching = semanticsWidgets
-        .where((s) =>
-            s.properties.label != null &&
-            s.properties.label!.contains('Fruit'))
+        .where(
+          (s) =>
+              s.properties.label != null &&
+              s.properties.label!.contains('Fruit'),
+        )
         .toList();
     expect(matching, hasLength(1));
   });
@@ -356,9 +337,7 @@ void main() {
   });
 
   testWidgets('recent items section shows when provided', (tester) async {
-    await tester.pumpObers(
-      _comboBox(recentItems: const ['Cherry']),
-    );
+    await tester.pumpObers(_comboBox(recentItems: const ['Cherry']));
 
     // Open.
     await tester.tap(find.byType(GestureDetector).first);
@@ -368,9 +347,7 @@ void main() {
   });
 
   testWidgets('favorite items section shows when provided', (tester) async {
-    await tester.pumpObers(
-      _comboBox(favoriteItems: const ['Date']),
-    );
+    await tester.pumpObers(_comboBox(favoriteItems: const ['Date']));
 
     // Open.
     await tester.tap(find.byType(GestureDetector).first);
@@ -383,10 +360,7 @@ void main() {
     final completer = Completer<List<String>>();
 
     await tester.pumpObers(
-      _comboBox(
-        items: const [],
-        search: (query) => completer.future,
-      ),
+      _comboBox(items: const [], search: (query) => completer.future),
     );
 
     // Open.
@@ -409,14 +383,12 @@ void main() {
     expect(find.text('Apple'), findsWidgets);
   });
 
-  testWidgets('onCreate shown when no results and query is non-empty',
-      (tester) async {
+  testWidgets('onCreate shown when no results and query is non-empty', (
+    tester,
+  ) async {
     String? created;
     await tester.pumpObers(
-      _comboBox(
-        items: const [],
-        onCreate: (v) => created = v,
-      ),
+      _comboBox(items: const [], onCreate: (v) => created = v),
     );
 
     // Open.

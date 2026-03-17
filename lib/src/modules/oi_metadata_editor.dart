@@ -115,8 +115,9 @@ class _OiMetadataEditorState extends State<OiMetadataEditor> {
 
     String newKey;
     if (widget.availableKeys != null && widget.availableKeys!.isNotEmpty) {
-      final available =
-          widget.availableKeys!.where((k) => !existingKeys.contains(k));
+      final available = widget.availableKeys!.where(
+        (k) => !existingKeys.contains(k),
+      );
       if (available.isEmpty) return;
       newKey = available.first;
     } else {
@@ -146,8 +147,7 @@ class _OiMetadataEditorState extends State<OiMetadataEditor> {
         children: [
           for (var i = 0; i < widget.fields.length; i++)
             _buildFieldRow(context, i, widget.fields[i]),
-          if (widget.allowAdd && widget.enabled)
-            _buildAddButton(context),
+          if (widget.allowAdd && widget.enabled) _buildAddButton(context),
         ],
       ),
     );
@@ -182,9 +182,7 @@ class _OiMetadataEditorState extends State<OiMetadataEditor> {
             ),
           ),
           const SizedBox(width: 12),
-          Expanded(
-            child: _buildValueInput(context, index, field),
-          ),
+          Expanded(child: _buildValueInput(context, index, field)),
           if (widget.allowRemove && widget.enabled) ...[
             const SizedBox(width: 8),
             OiTappable(
@@ -233,7 +231,10 @@ class _OiMetadataEditorState extends State<OiMetadataEditor> {
             _updateField(
               index,
               OiMetadataField(
-                  key: field.key, value: parsed ?? v, type: field.type),
+                key: field.key,
+                value: parsed ?? v,
+                type: field.type,
+              ),
             );
           },
         );
@@ -243,10 +244,13 @@ class _OiMetadataEditorState extends State<OiMetadataEditor> {
         return OiTappable(
           onTap: widget.enabled
               ? () => _updateField(
-                    index,
-                    OiMetadataField(
-                        key: field.key, value: !boolValue, type: field.type),
-                  )
+                  index,
+                  OiMetadataField(
+                    key: field.key,
+                    value: !boolValue,
+                    type: field.type,
+                  ),
+                )
               : null,
           semanticLabel: '${field.key}: ${boolValue ? "on" : "off"}',
           child: Padding(
@@ -260,8 +264,9 @@ class _OiMetadataEditorState extends State<OiMetadataEditor> {
                     color: boolValue ? colors.primary.base : colors.surface,
                     borderRadius: BorderRadius.circular(4),
                     border: Border.all(
-                      color:
-                          boolValue ? colors.primary.base : colors.borderSubtle,
+                      color: boolValue
+                          ? colors.primary.base
+                          : colors.borderSubtle,
                     ),
                   ),
                   child: boolValue

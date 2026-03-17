@@ -30,18 +30,14 @@ void main() {
 
   testWidgets('tapping on switch calls onChanged with false', (tester) async {
     bool? result;
-    await tester.pumpObers(
-      OiSwitch(value: true, onChanged: (v) => result = v),
-    );
+    await tester.pumpObers(OiSwitch(value: true, onChanged: (v) => result = v));
     await tester.tap(find.byType(OiTappable).first);
     await tester.pump();
     expect(result, isFalse);
   });
 
   testWidgets('label is shown', (tester) async {
-    await tester.pumpObers(
-      const OiSwitch(value: false, label: 'Dark mode'),
-    );
+    await tester.pumpObers(const OiSwitch(value: false, label: 'Dark mode'));
     expect(find.text('Dark mode'), findsOneWidget);
   });
 

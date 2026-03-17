@@ -4,13 +4,13 @@ import 'package:flutter/widgets.dart';
 ///
 /// [OiInfiniteScroll] listens to scroll notifications from its [child]. When
 /// the scroll position approaches the bottom (within [threshold] pixels) and
-/// [hasMore] is `true`, [onLoadMore] is called. While the future is in flight
+/// [moreAvailable] is `true`, [onLoadMore] is called. While the future is in flight
 /// a [loadingWidget] (or a default spinner) is shown at the bottom of the
 /// stack. Once the future resolves the loading indicator is removed.
 ///
 /// ```dart
 /// OiInfiniteScroll(
-///   hasMore: _hasMore,
+///   moreAvailable: _hasMore,
 ///   onLoadMore: _fetchNextPage,
 ///   child: ListView.builder(
 ///     itemCount: items.length,
@@ -23,7 +23,7 @@ import 'package:flutter/widgets.dart';
 class OiInfiniteScroll extends StatefulWidget {
   /// Creates an [OiInfiniteScroll].
   const OiInfiniteScroll({
-    required this.hasMore,
+    required this.moreAvailable,
     required this.onLoadMore,
     required this.child,
     this.loadingWidget,
@@ -35,7 +35,7 @@ class OiInfiniteScroll extends StatefulWidget {
   ///
   /// When `false`, [onLoadMore] will not be called even if the user scrolls
   /// to the bottom.
-  final bool hasMore;
+  final bool moreAvailable;
 
   /// Called when the user scrolls within [threshold] pixels of the bottom.
   ///
@@ -65,7 +65,7 @@ class _OiInfiniteScrollState extends State<OiInfiniteScroll> {
   bool _isLoading = false;
 
   bool _onNotification(ScrollNotification notification) {
-    if (!widget.hasMore || _isLoading) return false;
+    if (!widget.moreAvailable || _isLoading) return false;
 
     final metrics = notification.metrics;
     if (metrics.pixels >= metrics.maxScrollExtent - widget.threshold) {
@@ -95,7 +95,8 @@ class _OiInfiniteScrollState extends State<OiInfiniteScroll> {
           if (_isLoading)
             Positioned(
               bottom: 16,
-              child: widget.loadingWidget ??
+              child:
+                  widget.loadingWidget ??
                   const _InfiniteScrollSpinner(
                     key: ValueKey('oi_infinite_scroll_spinner'),
                   ),

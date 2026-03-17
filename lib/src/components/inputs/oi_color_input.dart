@@ -117,8 +117,7 @@ class _OiColorInputState extends State<OiColorInput> {
   void didUpdateWidget(OiColorInput oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.value != widget.value && !_hexFocus.hasFocus) {
-      _hexCtrl.text =
-          widget.value != null ? _colorToHex(widget.value!) : '';
+      _hexCtrl.text = widget.value != null ? _colorToHex(widget.value!) : '';
       _opacity = widget.value?.a ?? 1.0;
     }
   }
@@ -169,7 +168,8 @@ class _OiColorInputState extends State<OiColorInput> {
             spacing: 6,
             runSpacing: 6,
             children: _kPresets.map((c) {
-              final isSelected = widget.value != null &&
+              final isSelected =
+                  widget.value != null &&
                   _colorToHex(widget.value!) == _colorToHex(c);
               return OiTappable(
                 onTap: () => _selectPreset(c),
@@ -180,9 +180,7 @@ class _OiColorInputState extends State<OiColorInput> {
                     color: c,
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color: isSelected
-                          ? colors.primary.base
-                          : colors.border,
+                      color: isSelected ? colors.primary.base : colors.border,
                       width: isSelected ? 2.5 : 1,
                     ),
                   ),
@@ -207,9 +205,7 @@ class _OiColorInputState extends State<OiColorInput> {
                 onSubmitted: _commitHex,
                 selectionColor: colors.primary.base.withValues(alpha: 0.2),
                 inputFormatters: [
-                  FilteringTextInputFormatter.allow(
-                    RegExp('[#0-9a-fA-F]'),
-                  ),
+                  FilteringTextInputFormatter.allow(RegExp('[#0-9a-fA-F]')),
                   LengthLimitingTextInputFormatter(9),
                 ],
               ),
@@ -229,8 +225,7 @@ class _OiColorInputState extends State<OiColorInput> {
               onChanged: (v) {
                 setState(() => _opacity = v);
                 if (widget.value != null) {
-                  widget.onChanged
-                      ?.call(widget.value!.withValues(alpha: v));
+                  widget.onChanged?.call(widget.value!.withValues(alpha: v));
                 }
               },
             ),
@@ -259,9 +254,7 @@ class _OiColorInputState extends State<OiColorInput> {
       ),
     );
 
-    final hexText = widget.value != null
-        ? _colorToHex(widget.value!)
-        : '—';
+    final hexText = widget.value != null ? _colorToHex(widget.value!) : '—';
 
     final anchor = OiInputFrame(
       label: widget.label,
@@ -269,14 +262,8 @@ class _OiColorInputState extends State<OiColorInput> {
       error: widget.error,
       focused: _open,
       enabled: widget.enabled,
-      leading: Padding(
-        padding: const EdgeInsets.only(right: 8),
-        child: swatch,
-      ),
-      child: Text(
-        hexText,
-        style: TextStyle(fontSize: 13, color: colors.text),
-      ),
+      leading: Padding(padding: const EdgeInsets.only(right: 8), child: swatch),
+      child: Text(hexText, style: TextStyle(fontSize: 13, color: colors.text)),
     );
 
     return OiFloating(

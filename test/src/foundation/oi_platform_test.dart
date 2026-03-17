@@ -9,10 +9,7 @@ import 'package:obers_ui/src/foundation/oi_platform.dart';
 Widget buildWithPlatform(OiPlatformData data, Widget child) {
   return Directionality(
     textDirection: TextDirection.ltr,
-    child: OiPlatform(
-      data: data,
-      child: child,
-    ),
+    child: OiPlatform(data: data, child: child),
   );
 }
 
@@ -36,7 +33,7 @@ void main() {
       const data = OiPlatformData(
         platform: TargetPlatform.android,
         keyboardHeight: 0,
-        isKeyboardVisible: false,
+        keyboardVisible: false,
       );
       late OiPlatformData captured;
 
@@ -89,14 +86,12 @@ void main() {
       expect(captured.keyboardHeight, keyboardH);
     });
 
-    testWidgets('isKeyboardVisible is true when keyboard is up', (tester) async {
+    testWidgets('keyboardVisible is true when keyboard is up', (tester) async {
       late OiPlatformData captured;
 
       await tester.pumpWidget(
         MediaQuery(
-          data: const MediaQueryData(
-            viewInsets: EdgeInsets.only(bottom: 250),
-          ),
+          data: const MediaQueryData(viewInsets: EdgeInsets.only(bottom: 250)),
           child: Directionality(
             textDirection: TextDirection.ltr,
             child: Builder(
@@ -116,11 +111,12 @@ void main() {
         ),
       );
 
-      expect(captured.isKeyboardVisible, isTrue);
+      expect(captured.keyboardVisible, isTrue);
     });
 
-    testWidgets('isKeyboardVisible is false when keyboard is hidden',
-        (tester) async {
+    testWidgets('keyboardVisible is false when keyboard is hidden', (
+      tester,
+    ) async {
       late OiPlatformData captured;
 
       await tester.pumpWidget(
@@ -145,7 +141,7 @@ void main() {
         ),
       );
 
-      expect(captured.isKeyboardVisible, isFalse);
+      expect(captured.keyboardVisible, isFalse);
     });
   });
 
@@ -154,7 +150,7 @@ void main() {
       const data = OiPlatformData(
         platform: TargetPlatform.iOS,
         keyboardHeight: 0,
-        isKeyboardVisible: false,
+        keyboardVisible: false,
       );
       late OiPlatformData captured;
 
@@ -200,7 +196,7 @@ void main() {
       const data = OiPlatformData(
         platform: TargetPlatform.android,
         keyboardHeight: 0,
-        isKeyboardVisible: false,
+        keyboardVisible: false,
       );
       const child = SizedBox.shrink();
       const oldWidget = OiPlatform(data: data, child: child);
@@ -213,12 +209,12 @@ void main() {
       const oldData = OiPlatformData(
         platform: TargetPlatform.android,
         keyboardHeight: 0,
-        isKeyboardVisible: false,
+        keyboardVisible: false,
       );
       const newData = OiPlatformData(
         platform: TargetPlatform.android,
         keyboardHeight: 300,
-        isKeyboardVisible: true,
+        keyboardVisible: true,
       );
       const oldWidget = OiPlatform(data: oldData, child: child);
       const newWidget = OiPlatform(data: newData, child: child);

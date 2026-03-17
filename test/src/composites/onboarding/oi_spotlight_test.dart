@@ -120,9 +120,7 @@ void main() {
       await tester.pumpObers(
         OiSpotlight(
           target: targetKey,
-          child: Center(
-            child: Text('Hello', key: targetKey),
-          ),
+          child: Center(child: Text('Hello', key: targetKey)),
         ),
       );
       await tester.pump();

@@ -90,9 +90,7 @@ class OiHeatmap extends StatelessWidget {
     if (cells.isEmpty) {
       return Semantics(
         label: label,
-        child: const SizedBox.shrink(
-          key: Key('oi_heatmap_empty'),
-        ),
+        child: const SizedBox.shrink(key: Key('oi_heatmap_empty')),
       );
     }
 
@@ -138,9 +136,7 @@ class OiHeatmap extends StatelessWidget {
           final labelHeight = hasColLabels ? 24.0 : 0.0;
           final availWidth = constraints.maxWidth - labelWidth;
           // Subtract 2px margin per cell (1px each side).
-          final cellWidth = numCols > 0
-              ? (availWidth / numCols) - 2
-              : 40.0;
+          final cellWidth = numCols > 0 ? (availWidth / numCols) - 2 : 40.0;
           const cellHeight = 32.0;
 
           return Column(
@@ -160,9 +156,7 @@ class OiHeatmap extends StatelessWidget {
                           height: labelHeight,
                           child: Center(
                             child: Text(
-                              c < columnLabels!.length
-                                  ? columnLabels![c]
-                                  : '',
+                              c < columnLabels!.length ? columnLabels![c] : '',
                               style: TextStyle(
                                 color: colors.textMuted,
                                 fontSize: 10,
@@ -238,15 +232,13 @@ class OiHeatmap extends StatelessWidget {
             highColor,
             effectiveMax != effectiveMin
                 ? ((cell.value - effectiveMin) / (effectiveMax - effectiveMin))
-                    .clamp(0.0, 1.0)
+                      .clamp(0.0, 1.0)
                 : 0.5,
           )!
         : lowColor.withValues(alpha: 0.1);
 
     return GestureDetector(
-      onTap: cell != null && onCellTap != null
-          ? () => onCellTap!(cell)
-          : null,
+      onTap: cell != null && onCellTap != null ? () => onCellTap!(cell) : null,
       child: Container(
         key: Key('oi_heatmap_cell_${row}_$column'),
         width: width,
@@ -260,10 +252,7 @@ class OiHeatmap extends StatelessWidget {
             ? Center(
                 child: Text(
                   cell.value.toStringAsFixed(0),
-                  style: TextStyle(
-                    color: textColor,
-                    fontSize: 9,
-                  ),
+                  style: TextStyle(color: textColor, fontSize: 9),
                 ),
               )
             : null,

@@ -62,11 +62,9 @@ class OiCheckbox extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.colors;
     final themeData = context.theme;
-    final size =
-        themeData.components.checkbox?.size ?? 18.0;
+    final size = themeData.components.checkbox?.size ?? 18.0;
     final borderRadius =
-        themeData.components.checkbox?.borderRadius ??
-            BorderRadius.circular(4);
+        themeData.components.checkbox?.borderRadius ?? BorderRadius.circular(4);
 
     final isChecked = value == OiCheckboxState.checked;
     final isIndeterminate = value == OiCheckboxState.indeterminate;
@@ -95,10 +93,7 @@ class OiCheckbox extends StatelessWidget {
         children: [
           box,
           const SizedBox(width: 8),
-          Text(
-            label!,
-            style: TextStyle(fontSize: 14, color: colors.text),
-          ),
+          Text(label!, style: TextStyle(fontSize: 14, color: colors.text)),
         ],
       );
     }

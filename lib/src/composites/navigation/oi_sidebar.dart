@@ -243,7 +243,9 @@ class _OiSidebarState extends State<OiSidebar> {
     if (_flatItems.isEmpty) return;
     var next = _focusedIndex + delta;
     // Skip disabled items.
-    while (next >= 0 && next < _flatItems.length && _flatItems[next].item.disabled) {
+    while (next >= 0 &&
+        next < _flatItems.length &&
+        _flatItems[next].item.disabled) {
       next += delta;
     }
     if (next >= 0 && next < _flatItems.length) {
@@ -281,8 +283,8 @@ class _OiSidebarState extends State<OiSidebar> {
       return const SizedBox.shrink();
     }
 
-    final isCompact = widget.mode == OiSidebarMode.compact;
-    final effectiveWidth = isCompact ? widget.compactWidth : widget.width;
+    final compact = widget.mode == OiSidebarMode.compact;
+    final effectiveWidth = compact ? widget.compactWidth : widget.width;
 
     return Semantics(
       label: widget.label,
@@ -300,7 +302,7 @@ class _OiSidebarState extends State<OiSidebar> {
                 child: SingleChildScrollView(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: _buildSections(context, isCompact),
+                    children: _buildSections(context, compact),
                   ),
                 ),
               ),
@@ -312,25 +314,27 @@ class _OiSidebarState extends State<OiSidebar> {
     );
   }
 
-  List<Widget> _buildSections(BuildContext context, bool isCompact) {
+  List<Widget> _buildSections(BuildContext context, bool compact) {
     final widgets = <Widget>[];
     for (var si = 0; si < widget.sections.length; si++) {
       final section = widget.sections[si];
       final sectionKey = section.title ?? 'section_$si';
-      final isCollapsed = _collapsedSections.contains(sectionKey);
+      final collapsed = _collapsedSections.contains(sectionKey);
 
       // Section header.
-      if (section.title != null && !isCompact) {
-        widgets.add(_buildSectionHeader(context, section, sectionKey, isCollapsed));
+      if (section.title != null && !compact) {
+        widgets.add(
+          _buildSectionHeader(context, section, sectionKey, collapsed),
+        );
       }
 
       // Items.
-      if (!isCollapsed) {
+      if (!collapsed) {
         for (final item in section.items) {
-          widgets.add(_buildItem(context, item, 0, isCompact));
+          widgets.add(_buildItem(context, item, 0, compact));
           if (item.children != null && _expandedParents.contains(item.id)) {
             for (final child in item.children!) {
-              widgets.add(_buildItem(context, child, 1, isCompact));
+              widgets.add(_buildItem(context, child, 1, compact));
             }
           }
         }
@@ -343,7 +347,7 @@ class _OiSidebarState extends State<OiSidebar> {
     BuildContext context,
     OiSidebarSection section,
     String sectionKey,
-    bool isCollapsed,
+    bool collapsed,
   ) {
     final colors = context.colors;
     Widget header = Padding(
@@ -374,19 +378,19 @@ class _OiSidebarState extends State<OiSidebar> {
     BuildContext context,
     OiSidebarItem item,
     int depth,
-    bool isCompact,
+    bool compact,
   ) {
     final colors = context.colors;
-    final isSelected = item.id == widget.selectedId;
-    final hasChildren = item.children != null && item.children!.isNotEmpty;
-    final isExpanded = _expandedParents.contains(item.id);
+    final selected = item.id == widget.selectedId;
+    final hasKids = item.children != null && item.children!.isNotEmpty;
+    final kidsExpanded = _expandedParents.contains(item.id);
 
     // Determine the flat index for keyboard focus styling.
     final flatIndex = _flatItems.indexWhere((fi) => fi.item.id == item.id);
     final isFocused = flatIndex == _focusedIndex;
 
     Color bg;
-    if (isSelected) {
+    if (selected) {
       bg = colors.primary.base.withValues(alpha: 0.1);
     } else if (isFocused) {
       bg = colors.surfaceHover;
@@ -394,20 +398,20 @@ class _OiSidebarState extends State<OiSidebar> {
       bg = const Color(0x00000000);
     }
 
-    final textColor = isSelected
+    final textColor = selected
         ? colors.primary.base
         : item.disabled
-            ? colors.textMuted
-            : colors.text;
+        ? colors.textMuted
+        : colors.text;
 
-    final iconColor = isSelected
+    final iconColor = selected
         ? colors.primary.base
         : item.disabled
-            ? colors.textMuted
-            : colors.textSubtle;
+        ? colors.textMuted
+        : colors.textSubtle;
 
-    if (isCompact) {
-      return _buildCompactItem(context, item, bg, iconColor, isSelected);
+    if (compact) {
+      return _buildCompactItem(context, item, bg, iconColor, selected);
     }
 
     // Full mode.
@@ -415,12 +419,7 @@ class _OiSidebarState extends State<OiSidebar> {
 
     final Widget content = Container(
       color: bg,
-      padding: EdgeInsets.only(
-        left: 12 + indent,
-        right: 12,
-        top: 8,
-        bottom: 8,
-      ),
+      padding: EdgeInsets.only(left: 12 + indent, right: 12, top: 8, bottom: 8),
       child: Row(
         children: [
           Icon(item.icon, size: 20, color: iconColor),
@@ -430,7 +429,7 @@ class _OiSidebarState extends State<OiSidebar> {
               item.label,
               style: TextStyle(
                 fontSize: 14,
-                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+                fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
                 color: textColor,
               ),
               maxLines: 1,
@@ -438,15 +437,12 @@ class _OiSidebarState extends State<OiSidebar> {
             ),
           ),
           if (item.badgeCount != null && item.badgeCount! > 0)
-            OiBadge(
-              label: item.badgeCount.toString(),
-              size: OiBadgeSize.small,
-            ),
-          if (hasChildren)
+            OiBadge(label: item.badgeCount.toString(), size: OiBadgeSize.small),
+          if (hasKids)
             Padding(
               padding: const EdgeInsets.only(left: 4),
               child: Text(
-                isExpanded ? '\u25BC' : '\u25B6',
+                kidsExpanded ? '\u25BC' : '\u25B6',
                 style: TextStyle(fontSize: 10, color: colors.textMuted),
               ),
             ),
@@ -458,7 +454,7 @@ class _OiSidebarState extends State<OiSidebar> {
       enabled: !item.disabled,
       semanticLabel: item.label,
       onTap: () {
-        if (hasChildren) {
+        if (hasKids) {
           _toggleParent(item.id);
         }
         widget.onSelect(item.id);
@@ -472,7 +468,7 @@ class _OiSidebarState extends State<OiSidebar> {
     OiSidebarItem item,
     Color bg,
     Color iconColor,
-    bool isSelected,
+    bool selected,
   ) {
     Widget icon = Container(
       color: bg,

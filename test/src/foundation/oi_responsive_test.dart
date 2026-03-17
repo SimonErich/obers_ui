@@ -9,10 +9,7 @@ import 'package:obers_ui/src/foundation/oi_responsive.dart';
 Widget buildWithWidth(double width, Widget child) {
   return MediaQuery(
     data: MediaQueryData(size: Size(width, 800)),
-    child: Directionality(
-      textDirection: TextDirection.ltr,
-      child: child,
-    ),
+    child: Directionality(textDirection: TextDirection.ltr, child: child),
   );
 }
 
@@ -54,10 +51,7 @@ void main() {
     });
 
     test('extraLarge is greater than large', () {
-      expect(
-        OiBreakpoint.extraLarge.compareTo(OiBreakpoint.large),
-        isPositive,
-      );
+      expect(OiBreakpoint.extraLarge.compareTo(OiBreakpoint.large), isPositive);
     });
 
     test('equal minWidth returns 0', () {

@@ -64,8 +64,7 @@ void main() {
     // Completed steps render an Icon widget with the check icon.
     final icons = tester.widgetList<Icon>(find.byType(Icon)).toList();
     // Two completed steps should each have a check icon (0xe5ca).
-    final checkIcons =
-        icons.where((i) => i.icon?.codePoint == 0xe5ca).toList();
+    final checkIcons = icons.where((i) => i.icon?.codePoint == 0xe5ca).toList();
     expect(checkIcons.length, 2);
   });
 
@@ -77,8 +76,7 @@ void main() {
 
     final icons = tester.widgetList<Icon>(find.byType(Icon)).toList();
     // One error step should have the error icon (0xe000).
-    final errorIcons =
-        icons.where((i) => i.icon?.codePoint == 0xe000).toList();
+    final errorIcons = icons.where((i) => i.icon?.codePoint == 0xe000).toList();
     expect(errorIcons.length, 1);
   });
 
@@ -132,10 +130,7 @@ void main() {
   // 9. Step labels render
   testWidgets('step labels render below step circles', (tester) async {
     await tester.pumpObers(
-      _stepper(
-        totalSteps: 3,
-        stepLabels: ['Account', 'Profile', 'Confirm'],
-      ),
+      _stepper(totalSteps: 3, stepLabels: ['Account', 'Profile', 'Confirm']),
     );
 
     expect(find.text('Account'), findsOneWidget);
@@ -145,9 +140,7 @@ void main() {
 
   // 10. Semantics label is present
   testWidgets('semantics label is provided', (tester) async {
-    await tester.pumpObers(
-      _stepper(totalSteps: 4, currentStep: 1),
-    );
+    await tester.pumpObers(_stepper(totalSteps: 4, currentStep: 1));
 
     // The outermost Semantics widget has the label "Step 2 of 4".
     final semantics = tester.widgetList<Semantics>(find.byType(Semantics));
@@ -171,9 +164,7 @@ void main() {
 
   // 12. No onStepTap means tapping does nothing (no crash)
   testWidgets('tapping step without onStepTap does not crash', (tester) async {
-    await tester.pumpObers(
-      _stepper(totalSteps: 3, currentStep: 0),
-    );
+    await tester.pumpObers(_stepper(totalSteps: 3, currentStep: 0));
 
     // Should not throw.
     await tester.tap(find.text('2'));

@@ -15,13 +15,8 @@ Future<void> pumpTouchApp(
   addTearDown(() => tester.binding.setSurfaceSize(null));
   await tester.pumpWidget(
     MediaQuery(
-      data: MediaQueryData(
-        size: Size(width, height),
-      ),
-      child: Directionality(
-        textDirection: TextDirection.ltr,
-        child: child,
-      ),
+      data: MediaQueryData(size: Size(width, height)),
+      child: Directionality(textDirection: TextDirection.ltr, child: child),
     ),
   );
 }
@@ -37,13 +32,8 @@ Future<void> pumpPointerApp(
   addTearDown(() => tester.binding.setSurfaceSize(null));
   await tester.pumpWidget(
     MediaQuery(
-      data: MediaQueryData(
-        size: Size(width, height),
-      ),
-      child: Directionality(
-        textDirection: TextDirection.ltr,
-        child: child,
-      ),
+      data: MediaQueryData(size: Size(width, height)),
+      child: Directionality(textDirection: TextDirection.ltr, child: child),
     ),
   );
 }
@@ -59,22 +49,14 @@ Future<void> pumpAtBreakpoint(
   addTearDown(() => tester.binding.setSurfaceSize(null));
   await tester.pumpWidget(
     MediaQuery(
-      data: MediaQueryData(
-        size: Size(width, height),
-      ),
-      child: Directionality(
-        textDirection: TextDirection.ltr,
-        child: child,
-      ),
+      data: MediaQueryData(size: Size(width, height)),
+      child: Directionality(textDirection: TextDirection.ltr, child: child),
     ),
   );
 }
 
 /// Simulates the software keyboard appearing with the given height.
-Future<void> showKeyboard(
-  WidgetTester tester, {
-  double height = 302,
-}) async {
+Future<void> showKeyboard(WidgetTester tester, {double height = 302}) async {
   final view = tester.view;
   final logicalWidth = view.physicalSize.width / view.devicePixelRatio;
   final logicalHeight = view.physicalSize.height / view.devicePixelRatio;
@@ -98,10 +80,7 @@ Future<void> withSafeArea(
       data: MediaQueryData(
         padding: EdgeInsets.fromLTRB(left, top, right, bottom),
       ),
-      child: Directionality(
-        textDirection: TextDirection.ltr,
-        child: child,
-      ),
+      child: Directionality(textDirection: TextDirection.ltr, child: child),
     ),
   );
 }
@@ -115,10 +94,7 @@ Future<void> withPlatform(
   await tester.pumpWidget(
     Theme(
       data: ThemeData(platform: platform),
-      child: Directionality(
-        textDirection: TextDirection.ltr,
-        child: child,
-      ),
+      child: Directionality(textDirection: TextDirection.ltr, child: child),
     ),
   );
 }

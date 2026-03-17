@@ -11,24 +11,18 @@ void main() {
   // ── Rendering ──────────────────────────────────────────────────────────────
 
   testWidgets('renders category labels', (tester) async {
-    await tester.pumpObers(
-      OiEmojiPicker(onSelected: (_) {}),
-    );
+    await tester.pumpObers(OiEmojiPicker(onSelected: (_) {}));
     expect(find.text('Smileys'), findsOneWidget);
     expect(find.text('Animals'), findsOneWidget);
   });
 
   testWidgets('renders emoji characters', (tester) async {
-    await tester.pumpObers(
-      OiEmojiPicker(onSelected: (_) {}),
-    );
+    await tester.pumpObers(OiEmojiPicker(onSelected: (_) {}));
     expect(find.text('😀'), findsOneWidget);
   });
 
   testWidgets('showSearch=true renders EditableText', (tester) async {
-    await tester.pumpObers(
-      OiEmojiPicker(onSelected: (_) {}),
-    );
+    await tester.pumpObers(OiEmojiPicker(onSelected: (_) {}));
     expect(find.byType(EditableText), findsOneWidget);
   });
 
@@ -43,9 +37,7 @@ void main() {
 
   testWidgets('tapping emoji fires onSelected with that emoji', (tester) async {
     String? selected;
-    await tester.pumpObers(
-      OiEmojiPicker(onSelected: (e) => selected = e),
-    );
+    await tester.pumpObers(OiEmojiPicker(onSelected: (e) => selected = e));
     await tester.tap(find.text('😀'));
     await tester.pump();
     expect(selected, '😀');
@@ -53,11 +45,10 @@ void main() {
 
   // ── Search ─────────────────────────────────────────────────────────────────
 
-  testWidgets('search input filters emoji — no results shows message',
-      (tester) async {
-    await tester.pumpObers(
-      OiEmojiPicker(onSelected: (_) {}),
-    );
+  testWidgets('search input filters emoji — no results shows message', (
+    tester,
+  ) async {
+    await tester.pumpObers(OiEmojiPicker(onSelected: (_) {}));
     await tester.enterText(find.byType(EditableText), 'zzzznotanemoji');
     await tester.pump();
     expect(find.text('No emoji found'), findsOneWidget);

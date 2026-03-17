@@ -114,15 +114,15 @@ class OiFileExplorerSettings with OiSettingsData {
   /// Serializes this settings object to a JSON-encodable map.
   @override
   Map<String, dynamic> toJson() => {
-        'schemaVersion': schemaVersion,
-        'viewMode': viewMode.name,
-        'sortField': sortField.name,
-        'sortDirection': sortDirection.name,
-        'sidebarWidth': sidebarWidth,
-        'sidebarCollapsed': sidebarCollapsed,
-        'favoriteFolderIds': favoriteFolderIds,
-        'recentPaths': recentPaths,
-      };
+    'schemaVersion': schemaVersion,
+    'viewMode': viewMode.name,
+    'sortField': sortField.name,
+    'sortDirection': sortDirection.name,
+    'sidebarWidth': sidebarWidth,
+    'sidebarCollapsed': sidebarCollapsed,
+    'favoriteFolderIds': favoriteFolderIds,
+    'recentPaths': recentPaths,
+  };
 
   /// Returns new settings, filling in fields from [defaults] where this
   /// instance has empty or default values.
@@ -140,8 +140,7 @@ class OiFileExplorerSettings with OiSettingsData {
       favoriteFolderIds: favoriteFolderIds.isEmpty
           ? defaults.favoriteFolderIds
           : favoriteFolderIds,
-      recentPaths:
-          recentPaths.isEmpty ? defaults.recentPaths : recentPaths,
+      recentPaths: recentPaths.isEmpty ? defaults.recentPaths : recentPaths,
     );
   }
 
@@ -184,15 +183,15 @@ class OiFileExplorerSettings with OiSettingsData {
 
   @override
   int get hashCode => Object.hash(
-        schemaVersion,
-        viewMode,
-        sortField,
-        sortDirection,
-        sidebarWidth,
-        sidebarCollapsed,
-        Object.hashAll(favoriteFolderIds),
-        Object.hashAll(recentPaths),
-      );
+    schemaVersion,
+    viewMode,
+    sortField,
+    sortDirection,
+    sidebarWidth,
+    sidebarCollapsed,
+    Object.hashAll(favoriteFolderIds),
+    Object.hashAll(recentPaths),
+  );
 
   // ── Private helpers ────────────────────────────────────────────────────────
 

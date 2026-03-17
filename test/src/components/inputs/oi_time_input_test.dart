@@ -40,10 +40,7 @@ void main() {
 
   testWidgets('enabled=false prevents picker opening', (tester) async {
     await tester.pumpObers(const OiTimeInput(enabled: false));
-    await tester.tap(
-      find.byType(GestureDetector).first,
-      warnIfMissed: false,
-    );
+    await tester.tap(find.byType(GestureDetector).first, warnIfMissed: false);
     await tester.pump();
     expect(find.text('OK'), findsNothing);
   });

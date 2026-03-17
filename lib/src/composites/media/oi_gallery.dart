@@ -168,16 +168,12 @@ class OiGallery extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: colors.surfaceHover,
                     borderRadius: BorderRadius.circular(8),
-                    border: Border.all(
-                      color: colors.border,
-                    ),
+                    border: Border.all(color: colors.border),
                   ),
                   child: Center(
                     child: Text(
                       '+',
-                      style: textTheme.h2.copyWith(
-                        color: colors.textMuted,
-                      ),
+                      style: textTheme.h2.copyWith(color: colors.textMuted),
                     ),
                   ),
                 ),

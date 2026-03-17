@@ -231,8 +231,9 @@ class _OiTabsState extends State<OiTabs> {
             onKeyEvent: _handleKey,
           )
         : Row(
-            mainAxisSize:
-                widget.scrollable ? MainAxisSize.min : MainAxisSize.max,
+            mainAxisSize: widget.scrollable
+                ? MainAxisSize.min
+                : MainAxisSize.max,
             children: [
               for (var i = 0; i < widget.tabs.length; i++)
                 widget.scrollable
@@ -349,8 +350,10 @@ class _PillTabRowState extends State<_PillTabRow> {
                 onTap: () => widget.onSelected(i),
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 200),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 10,
+                  ),
                   decoration: BoxDecoration(
                     color: isSelected
                         ? colors.primary.base.withValues(alpha: 0.12)
@@ -363,10 +366,7 @@ class _PillTabRowState extends State<_PillTabRow> {
             ),
           );
         }
-        return Row(
-          mainAxisSize: MainAxisSize.min,
-          children: children,
-        );
+        return Row(mainAxisSize: MainAxisSize.min, children: children);
       },
     );
   }

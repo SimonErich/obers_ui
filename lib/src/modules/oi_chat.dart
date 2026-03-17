@@ -119,7 +119,7 @@ class OiChat extends StatefulWidget {
     this.onAttach,
     this.onReact,
     this.onLoadOlder,
-    this.hasOlderMessages = false,
+    this.olderMessagesAvailable = false,
     this.typingUsers,
     this.showAvatars = true,
     this.showTimestamps = true,
@@ -150,7 +150,7 @@ class OiChat extends StatefulWidget {
   final VoidCallback? onLoadOlder;
 
   /// Whether there are older messages available to load.
-  final bool hasOlderMessages;
+  final bool olderMessagesAvailable;
 
   /// List of user names currently typing.
   final List<String>? typingUsers;
@@ -256,9 +256,7 @@ class _OiChatState extends State<OiChat> {
             padding: EdgeInsets.all(spacing.sm),
             decoration: BoxDecoration(
               color: colors.surface,
-              border: Border(
-                top: BorderSide(color: colors.borderSubtle),
-              ),
+              border: Border(top: BorderSide(color: colors.borderSubtle)),
             ),
             child: Row(
               children: [
@@ -306,10 +304,8 @@ class _OiChatState extends State<OiChat> {
     final spacing = context.spacing;
     final isOwn = message.senderId == widget.currentUserId;
 
-    final bubbleColor =
-        isOwn ? colors.primary.base : colors.surfaceHover;
-    final textColor =
-        isOwn ? colors.textOnPrimary : colors.text;
+    final bubbleColor = isOwn ? colors.primary.base : colors.surfaceHover;
+    final textColor = isOwn ? colors.textOnPrimary : colors.text;
 
     final bubble = Container(
       constraints: const BoxConstraints(maxWidth: 280),
@@ -391,8 +387,9 @@ class _OiChatState extends State<OiChat> {
     return Padding(
       padding: EdgeInsets.only(bottom: spacing.sm),
       child: Row(
-        mainAxisAlignment:
-            isOwn ? MainAxisAlignment.end : MainAxisAlignment.start,
+        mainAxisAlignment: isOwn
+            ? MainAxisAlignment.end
+            : MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           if (avatar != null) avatar,

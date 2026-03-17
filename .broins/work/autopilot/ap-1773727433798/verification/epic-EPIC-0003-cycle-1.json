@@ -1,0 +1,123 @@
+{
+  "entries": [
+    {
+      "id": "REQ-0012",
+      "title": "Oi prefix on all public symbols",
+      "description": "Every public widget, class, enum, and extension uses the Oi prefix. Classes are named by what they are in the UI (OiTable, OiButton, OiSidebar).",
+      "implementationPercentage": 100,
+      "evidence": [
+        "lib/src/components/buttons/oi_button.dart:91",
+        "lib/src/primitives/display/oi_image.dart:20",
+        "lib/src/composites/data/oi_table.dart:131",
+        "lib/src/components/buttons/oi_button.dart:13",
+        "lib/src/components/buttons/oi_button.dart:27"
+      ],
+      "issues": [],
+      "status": "complete"
+    },
+    {
+      "id": "REQ-0013",
+      "title": "Props read like English",
+      "description": "Props are named as readable English phrases (multiSelect: true, reorderColumns: true, stickyHeader: true) rather than technical abbreviations or opaque identifiers.",
+      "implementationPercentage": 100,
+      "evidence": [
+        "lib/src/composites/data/oi_table.dart:138 (multiSelect)",
+        "lib/src/composites/data/oi_table.dart:29 (sortable)",
+        "lib/src/composites/data/oi_table.dart:61 (resizable)",
+        "lib/src/composites/media/oi_video_player.dart:37 (autoPlay)",
+        "lib/src/composites/workflow/oi_flow_graph.dart:142 (zoomable)",
+        "lib/src/composites/workflow/oi_flow_graph.dart:148 (snapToGrid)",
+        "lib/src/composites/media/oi_lightbox.dart:41 (showThumbnails)"
+      ],
+      "issues": [],
+      "status": "complete"
+    },
+    {
+      "id": "REQ-0014",
+      "title": "Required props enforce correctness",
+      "description": "Images require alt, buttons (all variants including .icon()) require label, icons require label. These are enforced as Dart required named parameters.",
+      "implementationPercentage": 100,
+      "evidence": [
+        "lib/src/primitives/display/oi_image.dart:24 (required this.alt)",
+        "lib/src/primitives/display/oi_icon.dart:24 (required this.label)",
+        "lib/src/primitives/display/oi_icon.dart:32 (OiIcon.decorative() opt-out)",
+        "lib/src/primitives/display/oi_image.dart:36 (OiImage.decorative() opt-out)",
+        "lib/src/components/buttons/oi_button.dart:117 (required String label in primary)",
+        "lib/src/components/buttons/oi_button.dart:143 (required label in secondary)",
+        "lib/src/components/buttons/oi_button.dart:284 (required label in .icon())",
+        "lib/src/components/buttons/oi_icon_button.dart:21 (required this.semanticLabel)",
+        "lib/src/composites/search/oi_combo_box.dart:21 (required this.label)"
+      ],
+      "issues": [],
+      "status": "complete"
+    },
+    {
+      "id": "REQ-0015",
+      "title": "Factory constructors for variants",
+      "description": "OiButton provides factory constructors for each variant: primary(), secondary(), outline(), ghost(), destructive(), soft(), icon(), split(), countdown(), confirm().",
+      "implementationPercentage": 100,
+      "evidence": [
+        "lib/src/components/buttons/oi_button.dart:116 (OiButton.primary)",
+        "lib/src/components/buttons/oi_button.dart:143 (OiButton.secondary)",
+        "lib/src/components/buttons/oi_button.dart:170 (OiButton.outline)",
+        "lib/src/components/buttons/oi_button.dart:197 (OiButton.ghost)",
+        "lib/src/components/buttons/oi_button.dart:224 (OiButton.destructive)",
+        "lib/src/components/buttons/oi_button.dart:251 (OiButton.soft)",
+        "lib/src/components/buttons/oi_button.dart:282 (OiButton.icon)",
+        "lib/src/components/buttons/oi_button.dart:304 (OiButton.split)",
+        "lib/src/components/buttons/oi_button.dart:327 (OiButton.countdown)",
+        "lib/src/components/buttons/oi_button.dart:348 (OiButton.confirm)"
+      ],
+      "issues": [],
+      "status": "complete"
+    },
+    {
+      "id": "REQ-0016",
+      "title": "Callbacks are verbs",
+      "description": "All callback parameters use the on + verb pattern (onTap, onSave, onSort, onReorder, onChanged, onSubmitted, etc.).",
+      "implementationPercentage": 100,
+      "evidence": [
+        "lib/src/components/buttons/oi_button.dart:386 (onTap)",
+        "lib/src/components/buttons/oi_button.dart:410 (onConfirm)",
+        "lib/src/components/inputs/oi_text_input.dart:75 (onChanged)",
+        "lib/src/components/inputs/oi_text_input.dart:81 (onSubmitted)",
+        "lib/src/composites/data/oi_table.dart:208 (onSort)",
+        "lib/src/composites/data/oi_table.dart:248 (onRowReordered)",
+        "lib/src/composites/navigation/oi_sidebar.dart:140 (onSelect)",
+        "lib/src/composites/search/oi_combo_box.dart:63 (onSelect)",
+        "lib/src/composites/media/oi_gallery.dart:90 (onSelectionChange)"
+      ],
+      "issues": [],
+      "status": "complete"
+    },
+    {
+      "id": "REQ-0017",
+      "title": "Booleans are descriptive",
+      "description": "Boolean parameters use descriptive adjective/noun names (enabled, dismissible, searchable, loading) rather than is/has-prefixed names.",
+      "implementationPercentage": 62,
+      "evidence": [
+        "lib/src/components/buttons/oi_button.dart (loading, disabled, fullWidth — correct)",
+        "lib/src/composites/data/oi_table.dart (sortable, resizable, multiSelect — correct)",
+        "lib/src/composites/media/oi_video_player.dart:37 (autoPlay — correct)"
+      ],
+      "issues": [
+        "lib/src/primitives/scroll/oi_infinite_scroll.dart:38 — public widget OiInfiniteScroll has `hasMore` prop; should be `moreAvailable`",
+        "lib/src/modules/oi_list_view.dart:134 — public widget OiListView has `hasMore` prop; should be `moreAvailable`",
+        "lib/src/modules/oi_activity_feed.dart:90 — public widget OiActivityFeed has `hasMore` prop; should be `moreAvailable`",
+        "lib/src/modules/oi_activity_feed.dart:221 — internal _OiActivityFeedState uses `hasMore`; should be `moreAvailable`",
+        "lib/src/modules/oi_chat.dart:153 — public widget OiChat has `hasOlderMessages` prop; should be `olderMessagesAvailable`",
+        "lib/src/modules/oi_file_manager.dart:26 — public data class OiFileNode has `isFolder`; should be `folder`",
+        "lib/src/foundation/oi_platform.dart:29 — public data class OiPlatformData has `isKeyboardVisible`; should be `keyboardVisible`",
+        "lib/src/foundation/theme/oi_decoration_theme.dart:219 — public class OiGradient has `isLinear`; should be `linear`",
+        "No dedicated naming-convention tests exist — no test file validates boolean naming discipline",
+        "Coverage tracking JSON files for REQ-0015, REQ-0016, REQ-0017 are absent from the EPIC-0003 commit (only REQ-0012, REQ-0013, REQ-0014 have tracking files)"
+      ],
+      "status": "partial"
+    }
+  ],
+  "overallPercentage": 94.0,
+  "cycleNumber": 1,
+  "generatedAt": "2026-03-17T09:29:22.738487Z",
+  "testsPassed": false,
+  "testSummary": "No test commands configured. No dedicated naming convention tests exist. Coverage tracking JSON files for REQ-0015, REQ-0016, REQ-0017 are missing from the EPIC-0003 commit. Widget-level behavior tests exist (e.g., test/src/components/buttons/oi_button_test.dart) but do not specifically validate naming convention compliance."
+}

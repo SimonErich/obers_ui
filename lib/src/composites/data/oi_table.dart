@@ -237,7 +237,7 @@ class OiTable<T> extends StatefulWidget {
 
   /// Called when the user commits an inline cell edit.
   final void Function(T row, int rowIndex, String columnId, dynamic value)?
-      onCellChanged;
+  onCellChanged;
 
   // ── Row reordering ────────────────────────────────────────────────────────
 
@@ -259,7 +259,7 @@ class OiTable<T> extends StatefulWidget {
 
   /// Custom group header builder. When `null` a default header is shown.
   final Widget Function(BuildContext context, String groupKey, List<T> rows)?
-      groupHeaderBuilder;
+  groupHeaderBuilder;
 
   // ── Empty / loading states ────────────────────────────────────────────────
 
@@ -335,8 +335,7 @@ class _OiTableState<T> extends State<StatefulWidget>
   OiTableSettings mergeSettings(
     OiTableSettings saved,
     OiTableSettings defaults,
-  ) =>
-      saved.mergeWith(defaults);
+  ) => saved.mergeWith(defaults);
 
   // ── Lifecycle ──────────────────────────────────────────────────────────────
 
@@ -485,8 +484,9 @@ class _OiTableState<T> extends State<StatefulWidget>
       ..sort((a, b) {
         final cmp = col.comparator != null
             ? col.comparator!(a, b)
-            : (col.valueGetter?.call(a) ?? '')
-                .compareTo(col.valueGetter?.call(b) ?? '');
+            : (col.valueGetter?.call(a) ?? '').compareTo(
+                col.valueGetter?.call(b) ?? '',
+              );
         return _ctrl.sortAscending ? cmp : -cmp;
       });
     return sorted;
@@ -496,10 +496,7 @@ class _OiTableState<T> extends State<StatefulWidget>
   List<T> _paginatedRows(List<T> rows) {
     if (_widget.paginationMode != OiTablePaginationMode.pages) return rows;
     final start = _ctrl.pagination.startIndex;
-    final end = math.min(
-      _ctrl.pagination.endIndex,
-      rows.length,
-    );
+    final end = math.min(_ctrl.pagination.endIndex, rows.length);
     if (start >= rows.length) return const [];
     return rows.sublist(start, end);
   }
@@ -556,8 +553,9 @@ class _OiTableState<T> extends State<StatefulWidget>
     for (final idx in _ctrl.selectedRows.toList()..sort()) {
       if (idx < _widget.rows.length) {
         final row = _widget.rows[idx];
-        final cells =
-            cols.map((c) => c.valueGetter?.call(row) ?? '').join('\t');
+        final cells = cols
+            .map((c) => c.valueGetter?.call(row) ?? '')
+            .join('\t');
         buffer.writeln(cells);
       }
     }
@@ -573,7 +571,8 @@ class _OiTableState<T> extends State<StatefulWidget>
       onKeyEvent: (event) {
         if (!_widget.copyable) return;
         if (event is! KeyDownEvent) return;
-        final isCtrlOrMeta = HardwareKeyboard.instance.isControlPressed ||
+        final isCtrlOrMeta =
+            HardwareKeyboard.instance.isControlPressed ||
             HardwareKeyboard.instance.isMetaPressed;
         if (isCtrlOrMeta && event.logicalKey == LogicalKeyboardKey.keyC) {
           _copySelectedRows();
@@ -642,9 +641,7 @@ class _OiTableState<T> extends State<StatefulWidget>
       child: SizedBox(
         width: 40,
         height: _effectiveRowHeight,
-        child: Center(
-          child: Text(_ctrl.selectAll ? '☑' : '☐'),
-        ),
+        child: Center(child: Text(_ctrl.selectAll ? '☑' : '☐')),
       ),
     );
   }
@@ -668,10 +665,11 @@ class _OiTableState<T> extends State<StatefulWidget>
           if (col.resizable)
             _ColumnResizeHandle(
               onResize: (delta) {
-                final current =
-                    _ctrl.columnWidths[col.id] ?? col.width ?? 120;
-                final next =
-                    (current + delta).clamp(col.minWidth, col.maxWidth);
+                final current = _ctrl.columnWidths[col.id] ?? col.width ?? 120;
+                final next = (current + delta).clamp(
+                  col.minWidth,
+                  col.maxWidth,
+                );
                 _ctrl.setColumnWidth(col.id, next);
               },
             ),
@@ -680,7 +678,8 @@ class _OiTableState<T> extends State<StatefulWidget>
     );
     // When no explicit width is set, use a flexible default so the cell
     // fills available space rather than collapsing to zero.
-    final resolvedWidth = width ?? col.minWidth.clamp(col.minWidth, col.maxWidth);
+    final resolvedWidth =
+        width ?? col.minWidth.clamp(col.minWidth, col.maxWidth);
     final headerChild = GestureDetector(
       onTap: () => _handleHeaderTap(col),
       child: SizedBox(
@@ -693,10 +692,7 @@ class _OiTableState<T> extends State<StatefulWidget>
     if (col.filterable) {
       header = Column(
         mainAxisSize: MainAxisSize.min,
-        children: [
-          header,
-          _buildFilterInput(col),
-        ],
+        children: [header, _buildFilterInput(col)],
       );
     }
     return header;
@@ -736,17 +732,11 @@ class _OiTableState<T> extends State<StatefulWidget>
   }
 
   Widget _buildLoadingState() {
-    return const Center(
-      key: Key('oi_table_loading'),
-      child: _OiTableSpinner(),
-    );
+    return const Center(key: Key('oi_table_loading'), child: _OiTableSpinner());
   }
 
   Widget _buildDefaultEmptyState() {
-    return const Center(
-      key: Key('oi_table_empty'),
-      child: Text('No data'),
-    );
+    return const Center(key: Key('oi_table_empty'), child: Text('No data'));
   }
 
   Widget _buildFlatBody(List<T> rows) {
@@ -784,28 +774,23 @@ class _OiTableState<T> extends State<StatefulWidget>
       final header = _widget.groupHeaderBuilder != null
           ? _widget.groupHeaderBuilder!(context, groupKey, groupRows)
           : _buildDefaultGroupHeader(groupKey, groupRows.length, expanded);
-      items.add(GestureDetector(
-        key: ValueKey('group_$groupKey'),
-        onTap: () => _ctrl.toggleGroup(groupKey),
-        child: header,
-      ));
+      items.add(
+        GestureDetector(
+          key: ValueKey('group_$groupKey'),
+          onTap: () => _ctrl.toggleGroup(groupKey),
+          child: header,
+        ),
+      );
       if (expanded) {
         for (var i = 0; i < groupRows.length; i++) {
           items.add(_buildRow(groupRows[i], i));
         }
       }
     }
-    return ListView(
-      controller: _scrollController,
-      children: items,
-    );
+    return ListView(controller: _scrollController, children: items);
   }
 
-  Widget _buildDefaultGroupHeader(
-    String groupKey,
-    int count,
-    bool expanded,
-  ) {
+  Widget _buildDefaultGroupHeader(String groupKey, int count, bool expanded) {
     return ColoredBox(
       key: ValueKey('group_header_$groupKey'),
       color: const Color(0xFFE2E8F0),
@@ -837,9 +822,7 @@ class _OiTableState<T> extends State<StatefulWidget>
           SizedBox(
             width: 40,
             height: _effectiveRowHeight,
-            child: Center(
-              child: Text(isSelected ? '☑' : '☐'),
-            ),
+            child: Center(child: Text(isSelected ? '☑' : '☐')),
           ),
         for (final col in _visibleColumns) _buildCell(row, index, col),
       ],
@@ -849,9 +832,7 @@ class _OiTableState<T> extends State<StatefulWidget>
       behavior: HitTestBehavior.opaque,
       onTap: () => _handleRowTap(row, index),
       onDoubleTap: () => _handleRowDoubleTap(row, index),
-      child: bg != null
-          ? ColoredBox(color: bg, child: rowContent)
-          : rowContent,
+      child: bg != null ? ColoredBox(color: bg, child: rowContent) : rowContent,
     );
   }
 
@@ -1023,10 +1004,7 @@ class _ColumnResizeHandle extends StatelessWidget {
       onHorizontalDragUpdate: (details) => onResize(details.delta.dx),
       child: MouseRegion(
         cursor: SystemMouseCursors.resizeColumn,
-        child: Container(
-          width: 6,
-          color: const Color(0x00000000),
-        ),
+        child: Container(width: 6, color: const Color(0x00000000)),
       ),
     );
   }

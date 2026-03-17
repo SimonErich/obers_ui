@@ -139,8 +139,9 @@ class _GroupButtonItem extends StatelessWidget {
     // In segmented mode, selected = primary fill, others = ghost with border.
     final OiButtonVariant effectiveVariant;
     if (segmented) {
-      effectiveVariant =
-          selected ? OiButtonVariant.primary : OiButtonVariant.ghost;
+      effectiveVariant = selected
+          ? OiButtonVariant.primary
+          : OiButtonVariant.ghost;
     } else {
       effectiveVariant = button.variant;
     }
@@ -167,8 +168,8 @@ class _GroupButtonItem extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
           )
         : (button.icon != null
-            ? Icon(button.icon, size: _iconSize(), color: fgColor)
-            : const SizedBox.shrink());
+              ? Icon(button.icon, size: _iconSize(), color: fgColor)
+              : const SizedBox.shrink());
 
     final isEnabled = button.enabled;
     final tapCallback = segmented

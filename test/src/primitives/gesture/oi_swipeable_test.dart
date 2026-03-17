@@ -9,11 +9,7 @@ import '../../../helpers/pump_app.dart';
 
 // Performs a horizontal drag in small increments so the
 // HorizontalDragGestureRecognizer wins the arena reliably.
-Future<void> _drag(
-  WidgetTester tester,
-  Offset start,
-  double dx,
-) async {
+Future<void> _drag(WidgetTester tester, Offset start, double dx) async {
   final gesture = await tester.startGesture(start);
   final steps = dx.abs() ~/ 10;
   final step = Offset(dx > 0 ? 10 : -10, 0);
@@ -55,9 +51,7 @@ void main() {
   // ── 1. Renders child ───────────────────────────────────────────────────────
 
   testWidgets('renders child widget', (tester) async {
-    await tester.pumpObers(
-      const OiSwipeable(child: Text('item')),
-    );
+    await tester.pumpObers(const OiSwipeable(child: Text('item')));
     expect(find.text('item'), findsOneWidget);
   });
 
@@ -73,10 +67,7 @@ void main() {
             onTap: () {},
           ),
         ],
-        child: const ColoredBox(
-          color: Color(0xFFEEEEEE),
-          child: Text('item'),
-        ),
+        child: const ColoredBox(color: Color(0xFFEEEEEE), child: Text('item')),
       ),
       surfaceSize: const Size(400, 60),
     );
@@ -103,10 +94,7 @@ void main() {
             onTap: () {},
           ),
         ],
-        child: const ColoredBox(
-          color: Color(0xFFEEEEEE),
-          child: Text('item'),
-        ),
+        child: const ColoredBox(color: Color(0xFFEEEEEE), child: Text('item')),
       ),
       surfaceSize: const Size(400, 60),
     );
@@ -124,46 +112,45 @@ void main() {
   // ── 4. threshold is configurable ─────────────────────────────────────────
 
   testWidgets(
-      'threshold configurable: high threshold not triggered on small drag',
-      (tester) async {
-    var dismissed = false;
-    await tester.pumpObers(
-      OiSwipeable(
-        dismissible: true,
-        threshold: 0.9,
-        onDismissed: () => dismissed = true,
-        child: const ColoredBox(
-          color: Color(0xFFEEEEEE),
-          child: Text('item'),
+    'threshold configurable: high threshold not triggered on small drag',
+    (tester) async {
+      var dismissed = false;
+      await tester.pumpObers(
+        OiSwipeable(
+          dismissible: true,
+          threshold: 0.9,
+          onDismissed: () => dismissed = true,
+          child: const ColoredBox(
+            color: Color(0xFFEEEEEE),
+            child: Text('item'),
+          ),
         ),
-      ),
-      surfaceSize: const Size(400, 60),
-    );
+        surfaceSize: const Size(400, 60),
+      );
 
-    // 80 px on a 400 px widget = 20 %, well below 90 % threshold.
-    await _drag(
-      tester,
-      tester.getTopLeft(find.byType(OiSwipeable)) + const Offset(20, 20),
-      80,
-    );
+      // 80 px on a 400 px widget = 20 %, well below 90 % threshold.
+      await _drag(
+        tester,
+        tester.getTopLeft(find.byType(OiSwipeable)) + const Offset(20, 20),
+        80,
+      );
 
-    expect(dismissed, isFalse);
-    expect(find.text('item'), findsOneWidget);
-  });
+      expect(dismissed, isFalse);
+      expect(find.text('item'), findsOneWidget);
+    },
+  );
 
   // ── 5. dismissible triggers onDismissed ──────────────────────────────────
 
-  testWidgets('dismissible=true triggers onDismissed when threshold exceeded',
-      (tester) async {
+  testWidgets('dismissible=true triggers onDismissed when threshold exceeded', (
+    tester,
+  ) async {
     var dismissed = false;
     await tester.pumpObers(
       OiSwipeable(
         dismissible: true,
         onDismissed: () => dismissed = true,
-        child: const ColoredBox(
-          color: Color(0xFFEEEEEE),
-          child: Text('item'),
-        ),
+        child: const ColoredBox(color: Color(0xFFEEEEEE), child: Text('item')),
       ),
       surfaceSize: const Size(400, 60),
     );
@@ -197,10 +184,7 @@ void main() {
             onTap: () => acted = true,
           ),
         ],
-        child: const ColoredBox(
-          color: Color(0xFFEEEEEE),
-          child: Text('item'),
-        ),
+        child: const ColoredBox(color: Color(0xFFEEEEEE), child: Text('item')),
       ),
       surfaceSize: const Size(400, 60),
     );
@@ -216,7 +200,8 @@ void main() {
     // Directly invoke the onTap of the action GestureDetector.
     // This bypasses pointer-event routing (which has arena conflicts with the
     // live drag) while still verifying that the callback is correctly wired.
-    final actionGD = tester.widgetList<GestureDetector>(find.byType(GestureDetector))
+    final actionGD = tester
+        .widgetList<GestureDetector>(find.byType(GestureDetector))
         .firstWhere((gd) => gd.onTap != null);
     actionGD.onTap!();
     await tester.pump();

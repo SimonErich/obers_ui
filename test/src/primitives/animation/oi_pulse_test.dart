@@ -11,23 +11,17 @@ void main() {
   // ── 1. Renders child ─────────────────────────────────────────────────────
 
   testWidgets('renders child widget', (tester) async {
-    await tester.pumpObers(
-      const OiPulse(child: Text('pulse me')),
-    );
+    await tester.pumpObers(const OiPulse(child: Text('pulse me')));
     await tester.pump();
     expect(find.text('pulse me'), findsOneWidget);
   });
 
   // ── 2. active=false: no AnimatedBuilder ──────────────────────────────────
 
-  testWidgets('active=false: child rendered directly, no AnimatedBuilder',
-      (tester) async {
-    await tester.pumpObers(
-      const OiPulse(
-        active: false,
-        child: Text('still'),
-      ),
-    );
+  testWidgets('active=false: child rendered directly, no AnimatedBuilder', (
+    tester,
+  ) async {
+    await tester.pumpObers(const OiPulse(active: false, child: Text('still')));
     await tester.pump();
 
     expect(find.text('still'), findsOneWidget);
@@ -47,9 +41,7 @@ void main() {
   // ── 3. active=true: AnimatedBuilder present ───────────────────────────────
 
   testWidgets('active=true: AnimatedBuilder wraps child', (tester) async {
-    await tester.pumpObers(
-      const OiPulse(child: Text('pulsing')),
-    );
+    await tester.pumpObers(const OiPulse(child: Text('pulsing')));
     await tester.pump();
 
     // At least one AnimatedBuilder driven by an AnimationController is present.
@@ -64,13 +56,11 @@ void main() {
 
   // ── 4. active=true with scale: Opacity and Transform present ─────────────
 
-  testWidgets('active=true with maxScale>1: Opacity and Transform present',
-      (tester) async {
+  testWidgets('active=true with maxScale>1: Opacity and Transform present', (
+    tester,
+  ) async {
     await tester.pumpObers(
-      const OiPulse(
-        maxScale: 1.2,
-        child: Text('big pulse'),
-      ),
+      const OiPulse(maxScale: 1.2, child: Text('big pulse')),
     );
     await tester.pump();
 
@@ -100,8 +90,9 @@ void main() {
 
   // ── 6. toggling active starts and stops animation widget ─────────────────
 
-  testWidgets('toggling active adds and removes AnimatedBuilder',
-      (tester) async {
+  testWidgets('toggling active adds and removes AnimatedBuilder', (
+    tester,
+  ) async {
     final notifier = ValueNotifier<bool>(true);
 
     await tester.pumpObers(

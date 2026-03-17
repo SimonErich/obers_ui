@@ -29,9 +29,7 @@ OiRemoteCursor _cursor({
 
 void main() {
   testWidgets('cursors render at the specified positions', (tester) async {
-    final cursors = [
-      _cursor(position: const Offset(100, 200)),
-    ];
+    final cursors = [_cursor(position: const Offset(100, 200))];
 
     await tester.pumpObers(
       SizedBox(
@@ -45,9 +43,7 @@ void main() {
     );
 
     // There should be a Positioned widget at left=100, top=200.
-    final positioned = tester.widgetList<Positioned>(
-      find.byType(Positioned),
-    );
+    final positioned = tester.widgetList<Positioned>(find.byType(Positioned));
     final cursorPositioned = positioned.where(
       (p) => p.left == 100 && p.top == 200,
     );
@@ -89,8 +85,9 @@ void main() {
     expect(find.text('Bob'), findsNothing);
   });
 
-  testWidgets('stale cursors are rendered with reduced opacity',
-      (tester) async {
+  testWidgets('stale cursors are rendered with reduced opacity', (
+    tester,
+  ) async {
     final staleCursor = _cursor(
       lastMoved: DateTime.now().subtract(const Duration(seconds: 10)),
     );
@@ -107,9 +104,7 @@ void main() {
     );
 
     // The Opacity wrapper around the stale cursor should have opacity < 1.
-    final opacityWidgets = tester.widgetList<Opacity>(
-      find.byType(Opacity),
-    );
+    final opacityWidgets = tester.widgetList<Opacity>(find.byType(Opacity));
     final staleOpacity = opacityWidgets.where((o) => o.opacity < 1.0);
     expect(staleOpacity, isNotEmpty);
   });
@@ -117,11 +112,7 @@ void main() {
   testWidgets('each cursor uses its assigned color', (tester) async {
     final cursors = [
       _cursor(position: const Offset(10, 10)),
-      _cursor(
-        userId: 'u2',
-        name: 'Bob',
-        color: const Color(0xFF00FF00),
-      ),
+      _cursor(userId: 'u2', name: 'Bob', color: const Color(0xFF00FF00)),
     ];
 
     await tester.pumpObers(
@@ -148,10 +139,7 @@ void main() {
       const SizedBox(
         width: 400,
         height: 400,
-        child: OiCursorPresence(
-          cursors: [],
-          child: Text('Canvas'),
-        ),
+        child: OiCursorPresence(cursors: [], child: Text('Canvas')),
       ),
     );
 

@@ -10,11 +10,7 @@ import 'package:flutter/painting.dart';
 @immutable
 class OiButtonThemeData {
   /// Creates an [OiButtonThemeData].
-  const OiButtonThemeData({
-    this.borderRadius,
-    this.padding,
-    this.textStyle,
-  });
+  const OiButtonThemeData({this.borderRadius, this.padding, this.textStyle});
 
   /// The corner radius applied to button shapes.
   final BorderRadius? borderRadius;
@@ -118,10 +114,7 @@ class OiTextInputThemeData {
 @immutable
 class OiSelectThemeData {
   /// Creates an [OiSelectThemeData].
-  const OiSelectThemeData({
-    this.borderRadius,
-    this.itemHeight,
-  });
+  const OiSelectThemeData({this.borderRadius, this.itemHeight});
 
   /// The corner radius applied to the select control border.
   final BorderRadius? borderRadius;
@@ -130,10 +123,7 @@ class OiSelectThemeData {
   final double? itemHeight;
 
   /// Creates a copy with optionally overridden values.
-  OiSelectThemeData copyWith({
-    BorderRadius? borderRadius,
-    double? itemHeight,
-  }) {
+  OiSelectThemeData copyWith({BorderRadius? borderRadius, double? itemHeight}) {
     return OiSelectThemeData(
       borderRadius: borderRadius ?? this.borderRadius,
       itemHeight: itemHeight ?? this.itemHeight,
@@ -161,11 +151,7 @@ class OiSelectThemeData {
 @immutable
 class OiCardThemeData {
   /// Creates an [OiCardThemeData].
-  const OiCardThemeData({
-    this.borderRadius,
-    this.elevation,
-    this.padding,
-  });
+  const OiCardThemeData({this.borderRadius, this.elevation, this.padding});
 
   /// The corner radius of the card surface.
   final BorderRadius? borderRadius;
@@ -211,10 +197,7 @@ class OiCardThemeData {
 @immutable
 class OiDialogThemeData {
   /// Creates an [OiDialogThemeData].
-  const OiDialogThemeData({
-    this.borderRadius,
-    this.maxWidth,
-  });
+  const OiDialogThemeData({this.borderRadius, this.maxWidth});
 
   /// The corner radius of the dialog surface.
   final BorderRadius? borderRadius;
@@ -223,10 +206,7 @@ class OiDialogThemeData {
   final double? maxWidth;
 
   /// Creates a copy with optionally overridden values.
-  OiDialogThemeData copyWith({
-    BorderRadius? borderRadius,
-    double? maxWidth,
-  }) {
+  OiDialogThemeData copyWith({BorderRadius? borderRadius, double? maxWidth}) {
     return OiDialogThemeData(
       borderRadius: borderRadius ?? this.borderRadius,
       maxWidth: maxWidth ?? this.maxWidth,
@@ -254,10 +234,7 @@ class OiDialogThemeData {
 @immutable
 class OiToastThemeData {
   /// Creates an [OiToastThemeData].
-  const OiToastThemeData({
-    this.borderRadius,
-    this.elevation,
-  });
+  const OiToastThemeData({this.borderRadius, this.elevation});
 
   /// The corner radius of the toast surface.
   final BorderRadius? borderRadius;
@@ -266,10 +243,7 @@ class OiToastThemeData {
   final double? elevation;
 
   /// Creates a copy with optionally overridden values.
-  OiToastThemeData copyWith({
-    BorderRadius? borderRadius,
-    double? elevation,
-  }) {
+  OiToastThemeData copyWith({BorderRadius? borderRadius, double? elevation}) {
     return OiToastThemeData(
       borderRadius: borderRadius ?? this.borderRadius,
       elevation: elevation ?? this.elevation,
@@ -297,10 +271,7 @@ class OiToastThemeData {
 @immutable
 class OiTooltipThemeData {
   /// Creates an [OiTooltipThemeData].
-  const OiTooltipThemeData({
-    this.borderRadius,
-    this.padding,
-  });
+  const OiTooltipThemeData({this.borderRadius, this.padding});
 
   /// The corner radius of the tooltip surface.
   final BorderRadius? borderRadius;
@@ -340,11 +311,7 @@ class OiTooltipThemeData {
 @immutable
 class OiTableThemeData {
   /// Creates an [OiTableThemeData].
-  const OiTableThemeData({
-    this.headerHeight,
-    this.rowHeight,
-    this.borderColor,
-  });
+  const OiTableThemeData({this.headerHeight, this.rowHeight, this.borderColor});
 
   /// The height of the table header row in logical pixels.
   final double? headerHeight;
@@ -390,10 +357,7 @@ class OiTableThemeData {
 @immutable
 class OiTabsThemeData {
   /// Creates an [OiTabsThemeData].
-  const OiTabsThemeData({
-    this.indicatorColor,
-    this.height,
-  });
+  const OiTabsThemeData({this.indicatorColor, this.height});
 
   /// The color of the active-tab indicator bar or highlight.
   final Color? indicatorColor;
@@ -402,10 +366,7 @@ class OiTabsThemeData {
   final double? height;
 
   /// Creates a copy with optionally overridden values.
-  OiTabsThemeData copyWith({
-    Color? indicatorColor,
-    double? height,
-  }) {
+  OiTabsThemeData copyWith({Color? indicatorColor, double? height}) {
     return OiTabsThemeData(
       indicatorColor: indicatorColor ?? this.indicatorColor,
       height: height ?? this.height,
@@ -433,20 +394,14 @@ class OiTabsThemeData {
 @immutable
 class OiBadgeThemeData {
   /// Creates an [OiBadgeThemeData].
-  const OiBadgeThemeData({
-    this.borderRadius,
-  });
+  const OiBadgeThemeData({this.borderRadius});
 
   /// The corner radius of the badge pill shape.
   final BorderRadius? borderRadius;
 
   /// Creates a copy with optionally overridden values.
-  OiBadgeThemeData copyWith({
-    BorderRadius? borderRadius,
-  }) {
-    return OiBadgeThemeData(
-      borderRadius: borderRadius ?? this.borderRadius,
-    );
+  OiBadgeThemeData copyWith({BorderRadius? borderRadius}) {
+    return OiBadgeThemeData(borderRadius: borderRadius ?? this.borderRadius);
   }
 
   @override
@@ -468,10 +423,7 @@ class OiBadgeThemeData {
 @immutable
 class OiCheckboxThemeData {
   /// Creates an [OiCheckboxThemeData].
-  const OiCheckboxThemeData({
-    this.size,
-    this.borderRadius,
-  });
+  const OiCheckboxThemeData({this.size, this.borderRadius});
 
   /// The width and height of the checkbox in logical pixels.
   final double? size;
@@ -480,10 +432,7 @@ class OiCheckboxThemeData {
   final BorderRadius? borderRadius;
 
   /// Creates a copy with optionally overridden values.
-  OiCheckboxThemeData copyWith({
-    double? size,
-    BorderRadius? borderRadius,
-  }) {
+  OiCheckboxThemeData copyWith({double? size, BorderRadius? borderRadius}) {
     return OiCheckboxThemeData(
       size: size ?? this.size,
       borderRadius: borderRadius ?? this.borderRadius,
@@ -511,10 +460,7 @@ class OiCheckboxThemeData {
 @immutable
 class OiSwitchThemeData {
   /// Creates an [OiSwitchThemeData].
-  const OiSwitchThemeData({
-    this.width,
-    this.height,
-  });
+  const OiSwitchThemeData({this.width, this.height});
 
   /// The total width of the switch track in logical pixels.
   final double? width;
@@ -523,10 +469,7 @@ class OiSwitchThemeData {
   final double? height;
 
   /// Creates a copy with optionally overridden values.
-  OiSwitchThemeData copyWith({
-    double? width,
-    double? height,
-  }) {
+  OiSwitchThemeData copyWith({double? width, double? height}) {
     return OiSwitchThemeData(
       width: width ?? this.width,
       height: height ?? this.height,
@@ -554,20 +497,14 @@ class OiSwitchThemeData {
 @immutable
 class OiSheetThemeData {
   /// Creates an [OiSheetThemeData].
-  const OiSheetThemeData({
-    this.borderRadius,
-  });
+  const OiSheetThemeData({this.borderRadius});
 
   /// The corner radius applied to the top corners of the sheet surface.
   final BorderRadius? borderRadius;
 
   /// Creates a copy with optionally overridden values.
-  OiSheetThemeData copyWith({
-    BorderRadius? borderRadius,
-  }) {
-    return OiSheetThemeData(
-      borderRadius: borderRadius ?? this.borderRadius,
-    );
+  OiSheetThemeData copyWith({BorderRadius? borderRadius}) {
+    return OiSheetThemeData(borderRadius: borderRadius ?? this.borderRadius);
   }
 
   @override
@@ -589,9 +526,7 @@ class OiSheetThemeData {
 @immutable
 class OiAvatarThemeData {
   /// Creates an [OiAvatarThemeData].
-  const OiAvatarThemeData({
-    this.borderRadius,
-  });
+  const OiAvatarThemeData({this.borderRadius});
 
   /// The corner radius of the avatar shape.
   ///
@@ -599,12 +534,8 @@ class OiAvatarThemeData {
   final BorderRadius? borderRadius;
 
   /// Creates a copy with optionally overridden values.
-  OiAvatarThemeData copyWith({
-    BorderRadius? borderRadius,
-  }) {
-    return OiAvatarThemeData(
-      borderRadius: borderRadius ?? this.borderRadius,
-    );
+  OiAvatarThemeData copyWith({BorderRadius? borderRadius}) {
+    return OiAvatarThemeData(borderRadius: borderRadius ?? this.borderRadius);
   }
 
   @override
@@ -626,10 +557,7 @@ class OiAvatarThemeData {
 @immutable
 class OiProgressThemeData {
   /// Creates an [OiProgressThemeData].
-  const OiProgressThemeData({
-    this.height,
-    this.borderRadius,
-  });
+  const OiProgressThemeData({this.height, this.borderRadius});
 
   /// The height of the linear progress track in logical pixels.
   final double? height;
@@ -638,10 +566,7 @@ class OiProgressThemeData {
   final BorderRadius? borderRadius;
 
   /// Creates a copy with optionally overridden values.
-  OiProgressThemeData copyWith({
-    double? height,
-    BorderRadius? borderRadius,
-  }) {
+  OiProgressThemeData copyWith({double? height, BorderRadius? borderRadius}) {
     return OiProgressThemeData(
       height: height ?? this.height,
       borderRadius: borderRadius ?? this.borderRadius,
@@ -669,10 +594,7 @@ class OiProgressThemeData {
 @immutable
 class OiSidebarThemeData {
   /// Creates an [OiSidebarThemeData].
-  const OiSidebarThemeData({
-    this.width,
-    this.compactWidth,
-  });
+  const OiSidebarThemeData({this.width, this.compactWidth});
 
   /// The width of the expanded sidebar in logical pixels.
   final double? width;
@@ -681,10 +603,7 @@ class OiSidebarThemeData {
   final double? compactWidth;
 
   /// Creates a copy with optionally overridden values.
-  OiSidebarThemeData copyWith({
-    double? width,
-    double? compactWidth,
-  }) {
+  OiSidebarThemeData copyWith({double? width, double? compactWidth}) {
     return OiSidebarThemeData(
       width: width ?? this.width,
       compactWidth: compactWidth ?? this.compactWidth,
@@ -736,22 +655,22 @@ class OiComponentThemes {
   ///
   /// Components will fall back to their built-in defaults.
   const OiComponentThemes.empty()
-      : button = null,
-        textInput = null,
-        select = null,
-        card = null,
-        dialog = null,
-        toast = null,
-        tooltip = null,
-        table = null,
-        tabs = null,
-        badge = null,
-        checkbox = null,
-        switchTheme = null,
-        sheet = null,
-        avatar = null,
-        progress = null,
-        sidebar = null;
+    : button = null,
+      textInput = null,
+      select = null,
+      card = null,
+      dialog = null,
+      toast = null,
+      tooltip = null,
+      table = null,
+      tabs = null,
+      badge = null,
+      checkbox = null,
+      switchTheme = null,
+      sheet = null,
+      avatar = null,
+      progress = null,
+      sidebar = null;
 
   /// Theme overrides for button components.
   final OiButtonThemeData? button;
@@ -864,21 +783,21 @@ class OiComponentThemes {
 
   @override
   int get hashCode => Object.hash(
-        button,
-        textInput,
-        select,
-        card,
-        dialog,
-        toast,
-        tooltip,
-        table,
-        tabs,
-        badge,
-        checkbox,
-        switchTheme,
-        sheet,
-        avatar,
-        progress,
-        sidebar,
-      );
+    button,
+    textInput,
+    select,
+    card,
+    dialog,
+    toast,
+    tooltip,
+    table,
+    tabs,
+    badge,
+    checkbox,
+    switchTheme,
+    sheet,
+    avatar,
+    progress,
+    sidebar,
+  );
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
-import 'package:obers_ui/src/components/overlays/oi_sheet.dart' show OiPanelSide;
+import 'package:obers_ui/src/components/overlays/oi_sheet.dart'
+    show OiPanelSide;
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/primitives/interaction/oi_focus_trap.dart';
 
@@ -54,8 +55,7 @@ class OiPanel extends StatefulWidget {
   State<OiPanel> createState() => _OiPanelState();
 }
 
-class _OiPanelState extends State<OiPanel>
-    with SingleTickerProviderStateMixin {
+class _OiPanelState extends State<OiPanel> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
 
   bool get _isVertical =>
@@ -136,9 +136,7 @@ class _OiPanelState extends State<OiPanel>
     final slideAnim = Tween<Offset>(
       begin: _slideBegin(),
       end: Offset.zero,
-    ).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic),
-    );
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic));
 
     Widget panel = Container(
       width: _isVertical ? null : widget.size,
@@ -153,10 +151,10 @@ class _OiPanelState extends State<OiPanel>
             offset: widget.side == OiPanelSide.left
                 ? const Offset(4, 0)
                 : widget.side == OiPanelSide.right
-                    ? const Offset(-4, 0)
-                    : widget.side == OiPanelSide.top
-                        ? const Offset(0, 4)
-                        : const Offset(0, -4),
+                ? const Offset(-4, 0)
+                : widget.side == OiPanelSide.top
+                ? const Offset(0, 4)
+                : const Offset(0, -4),
           ),
         ],
       ),
@@ -178,8 +176,9 @@ class _OiPanelState extends State<OiPanel>
               child: AnimatedBuilder(
                 animation: _controller,
                 builder: (_, __) => ColoredBox(
-                  color: colors.overlay
-                      .withValues(alpha: 0.5 * _controller.value),
+                  color: colors.overlay.withValues(
+                    alpha: 0.5 * _controller.value,
+                  ),
                 ),
               ),
             ),

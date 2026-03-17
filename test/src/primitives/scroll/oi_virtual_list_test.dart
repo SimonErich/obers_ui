@@ -52,10 +52,7 @@ void main() {
         height: 80,
         child: OiVirtualList(
           itemCount: 4,
-          itemBuilder: (_, i) => SizedBox(
-            width: 80,
-            child: Text('h$i'),
-          ),
+          itemBuilder: (_, i) => SizedBox(width: 80, child: Text('h$i')),
           scrollDirection: Axis.horizontal,
         ),
       ),
@@ -66,7 +63,9 @@ void main() {
 
   // ── 4. onRefresh=null by default does not crash ────────────────────────────
 
-  testWidgets('onRefresh=null: no crash, no NotificationListener', (tester) async {
+  testWidgets('onRefresh=null: no crash, no NotificationListener', (
+    tester,
+  ) async {
     await tester.pumpObers(
       OiVirtualList(
         itemCount: 3,
@@ -80,15 +79,15 @@ void main() {
 
   // ── 5. shrinkWrap=true sizes list to content ───────────────────────────────
 
-  testWidgets('shrinkWrap=true: list is embedded in a Column without error',
-      (tester) async {
+  testWidgets('shrinkWrap=true: list is embedded in a Column without error', (
+    tester,
+  ) async {
     await tester.pumpObers(
       Column(
         children: [
           OiVirtualList(
             itemCount: 3,
-            itemBuilder: (_, i) =>
-                SizedBox(height: 20, child: Text('sw$i')),
+            itemBuilder: (_, i) => SizedBox(height: 20, child: Text('sw$i')),
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
           ),
@@ -101,7 +100,9 @@ void main() {
 
   // ── 6. onRefresh wraps in NotificationListener when provided ───────────────
 
-  testWidgets('onRefresh provided: NotificationListener is present', (tester) async {
+  testWidgets('onRefresh provided: NotificationListener is present', (
+    tester,
+  ) async {
     await tester.pumpWidget(
       OiApp(
         density: OiDensity.comfortable,

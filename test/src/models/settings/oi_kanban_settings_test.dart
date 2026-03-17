@@ -66,10 +66,7 @@ void main() {
       const s = OiKanbanSettings(collapsedColumnKeys: {'x', 'y'});
       final json = s.toJson();
       expect(json['collapsedColumnKeys'], isA<List<dynamic>>());
-      expect(
-        (json['collapsedColumnKeys'] as List).toSet(),
-        {'x', 'y'},
-      );
+      expect((json['collapsedColumnKeys'] as List).toSet(), {'x', 'y'});
     });
 
     // ── mergeWith ─────────────────────────────────────────────────────────────

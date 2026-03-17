@@ -84,10 +84,7 @@ class OiMetric extends StatelessWidget {
         ),
         const SizedBox(height: 4),
         // Label.
-        Text(
-          label,
-          style: TextStyle(fontSize: 14, color: colors.textMuted),
-        ),
+        Text(label, style: TextStyle(fontSize: 14, color: colors.textMuted)),
         if (subValue != null) ...[
           const SizedBox(height: 2),
           Text(
@@ -122,10 +119,7 @@ class OiMetric extends StatelessWidget {
             ],
           ),
         ],
-        if (sparkline != null) ...[
-          const SizedBox(height: 8),
-          sparkline!,
-        ],
+        if (sparkline != null) ...[const SizedBox(height: 8), sparkline!],
       ],
     );
   }

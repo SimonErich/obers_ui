@@ -12,10 +12,7 @@ void main() {
 
   testWidgets('renders both panes', (tester) async {
     await tester.pumpObers(
-      const OiSplitPane(
-        leading: Text('Leading'),
-        trailing: Text('Trailing'),
-      ),
+      const OiSplitPane(leading: Text('Leading'), trailing: Text('Trailing')),
       surfaceSize: const Size(600, 400),
     );
     expect(find.text('Leading'), findsOneWidget);

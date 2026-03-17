@@ -14,7 +14,7 @@ class OiSelectOption<T> {
   const OiSelectOption({
     required this.value,
     required this.label,
-    this.disabled = false,
+    this.enabled = true,
   });
 
   /// The underlying value represented by this option.
@@ -23,8 +23,8 @@ class OiSelectOption<T> {
   /// The human-readable label shown in the list.
   final String label;
 
-  /// When true the option cannot be selected.
-  final bool disabled;
+  /// Whether the option can be selected.
+  final bool enabled;
 }
 
 /// A dropdown select input component.
@@ -124,7 +124,7 @@ class _OiSelectState<T> extends State<OiSelect<T>> {
   void _close() => setState(() => _open = false);
 
   void _select(OiSelectOption<T> option) {
-    if (option.disabled) return;
+    if (!option.enabled) return;
     widget.onChanged?.call(option.value);
     _close();
   }
@@ -146,78 +146,78 @@ class _OiSelectState<T> extends State<OiSelect<T>> {
     return UnconstrainedBox(
       alignment: Alignment.topLeft,
       child: Container(
-      width: 240,
-      decoration: BoxDecoration(
-        color: colors.surface,
-        borderRadius: BorderRadius.circular(8),
-        boxShadow: [
-          BoxShadow(
-            color: colors.overlay,
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          if (widget.searchable)
-            Padding(
-              padding: const EdgeInsets.all(8),
-              child: OiRawInput(
-                controller: _searchCtrl,
-                focusNode: _searchFocus,
-                placeholder: 'Search…',
-                onChanged: (v) => setState(() => _query = v),
-              ),
+        width: 240,
+        decoration: BoxDecoration(
+          color: colors.surface,
+          borderRadius: BorderRadius.circular(8),
+          boxShadow: [
+            BoxShadow(
+              color: colors.overlay,
+              blurRadius: 12,
+              offset: const Offset(0, 4),
             ),
-          if (filtered.isEmpty)
-            Padding(
-              padding: const EdgeInsets.all(12),
-              child: Text(
-                'No options',
-                style: TextStyle(color: colors.textMuted, fontSize: 14),
+          ],
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (widget.searchable)
+              Padding(
+                padding: const EdgeInsets.all(8),
+                child: OiRawInput(
+                  controller: _searchCtrl,
+                  focusNode: _searchFocus,
+                  placeholder: 'Search…',
+                  onChanged: (v) => setState(() => _query = v),
+                ),
               ),
-            )
-          else
-            SizedBox(
-              height: (itemHeight * filtered.length).clamp(0.0, maxHeight),
-              child: OiVirtualList(
-                itemCount: filtered.length,
-                itemBuilder: (ctx, i) {
-                  final option = filtered[i];
-                  final isSelected = option.value == widget.value;
-                  return GestureDetector(
-                    onTap: option.disabled ? null : () => _select(option),
-                    behavior: HitTestBehavior.opaque,
-                    child: Container(
-                      height: itemHeight,
-                      padding: const EdgeInsets.symmetric(horizontal: 12),
-                      color: isSelected
-                          ? colors.primary.base.withValues(alpha: 0.1)
-                          : null,
-                      child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          option.label,
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: option.disabled
-                                ? colors.textMuted
-                                : isSelected
-                                    ? colors.primary.base
-                                    : colors.text,
+            if (filtered.isEmpty)
+              Padding(
+                padding: const EdgeInsets.all(12),
+                child: Text(
+                  'No options',
+                  style: TextStyle(color: colors.textMuted, fontSize: 14),
+                ),
+              )
+            else
+              SizedBox(
+                height: (itemHeight * filtered.length).clamp(0.0, maxHeight),
+                child: OiVirtualList(
+                  itemCount: filtered.length,
+                  itemBuilder: (ctx, i) {
+                    final option = filtered[i];
+                    final isSelected = option.value == widget.value;
+                    return GestureDetector(
+                      onTap: option.enabled ? () => _select(option) : null,
+                      behavior: HitTestBehavior.opaque,
+                      child: Container(
+                        height: itemHeight,
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        color: isSelected
+                            ? colors.primary.base.withValues(alpha: 0.1)
+                            : null,
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            option.label,
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: !option.enabled
+                                  ? colors.textMuted
+                                  : isSelected
+                                  ? colors.primary.base
+                                  : colors.text,
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                  );
-                },
+                    );
+                  },
+                ),
               ),
-            ),
-        ],
+          ],
+        ),
       ),
-    ),
     );
   }
 

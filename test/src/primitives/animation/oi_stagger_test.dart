@@ -13,9 +13,7 @@ void main() {
 
   testWidgets('renders all children', (tester) async {
     await tester.pumpObers(
-      const OiStagger(
-        children: [Text('first'), Text('second'), Text('third')],
-      ),
+      const OiStagger(children: [Text('first'), Text('second'), Text('third')]),
     );
     await tester.pumpAndSettle();
 
@@ -26,13 +24,10 @@ void main() {
 
   // ── 2. autoPlay=true starts animation on mount ────────────────────────────
 
-  testWidgets('autoPlay=true: AnimatedBuilder is present after mount',
-      (tester) async {
-    await tester.pumpObers(
-      const OiStagger(
-        children: [Text('a'), Text('b')],
-      ),
-    );
+  testWidgets('autoPlay=true: AnimatedBuilder is present after mount', (
+    tester,
+  ) async {
+    await tester.pumpObers(const OiStagger(children: [Text('a'), Text('b')]));
     await tester.pump();
 
     expect(find.byType(AnimatedBuilder), findsWidgets);
@@ -40,13 +35,11 @@ void main() {
 
   // ── 3. autoPlay=false: children still render ─────────────────────────────
 
-  testWidgets('autoPlay=false: children are rendered without auto-play',
-      (tester) async {
+  testWidgets('autoPlay=false: children are rendered without auto-play', (
+    tester,
+  ) async {
     await tester.pumpObers(
-      const OiStagger(
-        autoPlay: false,
-        children: [Text('x'), Text('y')],
-      ),
+      const OiStagger(autoPlay: false, children: [Text('x'), Text('y')]),
     );
     await tester.pump();
 
@@ -57,17 +50,16 @@ void main() {
   // ── 4. Empty children list does not crash ─────────────────────────────────
 
   testWidgets('empty children: renders SizedBox.shrink', (tester) async {
-    await tester.pumpObers(
-      const OiStagger(children: []),
-    );
+    await tester.pumpObers(const OiStagger(children: []));
     await tester.pump();
     expect(find.byType(SizedBox), findsWidgets);
   });
 
   // ── 5. staggerDelay creates sequential intervals (FadeTransitions present) ─
 
-  testWidgets('non-zero staggerDelay creates multiple FadeTransitions',
-      (tester) async {
+  testWidgets('non-zero staggerDelay creates multiple FadeTransitions', (
+    tester,
+  ) async {
     await tester.pumpObers(
       const OiStagger(
         staggerDelay: Duration(milliseconds: 100),
@@ -82,8 +74,9 @@ void main() {
 
   // ── 6. transition=none: no FadeTransition when reduced motion ─────────────
 
-  testWidgets('transition=none: wraps children without FadeTransition',
-      (tester) async {
+  testWidgets('transition=none: wraps children without FadeTransition', (
+    tester,
+  ) async {
     await tester.pumpObers(
       const OiStagger(
         transition: OiTransition.none,
@@ -97,14 +90,13 @@ void main() {
 
   // ── 7. reducedMotion: children shown immediately without FadeTransition ───
 
-  testWidgets('reducedMotion: children visible without animation widgets',
-      (tester) async {
+  testWidgets('reducedMotion: children visible without animation widgets', (
+    tester,
+  ) async {
     await tester.pumpObers(
       const MediaQuery(
         data: MediaQueryData(disableAnimations: true),
-        child: OiStagger(
-          children: [Text('m'), Text('n')],
-        ),
+        child: OiStagger(children: [Text('m'), Text('n')]),
       ),
     );
     await tester.pump();

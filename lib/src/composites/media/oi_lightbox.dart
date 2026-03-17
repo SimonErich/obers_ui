@@ -8,11 +8,7 @@ import 'package:obers_ui/src/primitives/display/oi_image.dart';
 /// {@category Composites}
 class OiLightboxItem {
   /// Creates an [OiLightboxItem].
-  const OiLightboxItem({
-    required this.src,
-    required this.alt,
-    this.caption,
-  });
+  const OiLightboxItem({required this.src, required this.alt, this.caption});
 
   /// The image source URL or asset path.
   final String src;
@@ -88,8 +84,7 @@ class _OiLightboxState extends State<OiLightbox> {
     super.dispose();
   }
 
-  int get _maxIndex =>
-      widget.items.isEmpty ? 0 : widget.items.length - 1;
+  int get _maxIndex => widget.items.isEmpty ? 0 : widget.items.length - 1;
 
   /// Whether navigation to the previous image is possible.
   bool get _hasPrevious => _currentIndex > 0;
@@ -311,9 +306,7 @@ class _OiLightboxState extends State<OiLightbox> {
                   child: Text(
                     item.caption!,
                     key: const Key('oi_lightbox_caption'),
-                    style: textTheme.body.copyWith(
-                      color: colors.textInverse,
-                    ),
+                    style: textTheme.body.copyWith(color: colors.textInverse),
                     textAlign: TextAlign.center,
                   ),
                 ),

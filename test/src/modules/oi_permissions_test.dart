@@ -11,7 +11,10 @@ void main() {
   final permissions = [
     const OiPermissionItem(key: 'read', label: 'Read'),
     const OiPermissionItem(
-        key: 'write', label: 'Write', description: 'Create and edit'),
+      key: 'write',
+      label: 'Write',
+      description: 'Create and edit',
+    ),
     const OiPermissionItem(key: 'delete', label: 'Delete'),
   ];
 
@@ -204,12 +207,15 @@ void main() {
         ),
       ),
     );
-    final semanticsWidgets =
-        tester.widgetList<Semantics>(find.byType(Semantics));
+    final semanticsWidgets = tester.widgetList<Semantics>(
+      find.byType(Semantics),
+    );
     final matching = semanticsWidgets
-        .where((s) =>
-            s.properties.label != null &&
-            s.properties.label!.contains('Role Matrix'))
+        .where(
+          (s) =>
+              s.properties.label != null &&
+              s.properties.label!.contains('Role Matrix'),
+        )
         .toList();
     expect(matching, isNotEmpty);
   });
@@ -222,7 +228,10 @@ void main() {
         child: OiPermissions(
           permissions: [
             const OiPermissionItem(
-                key: 'write', label: 'Write', description: 'Create and edit'),
+              key: 'write',
+              label: 'Write',
+              description: 'Create and edit',
+            ),
           ],
           roles: [const OiRole(key: 'admin', label: 'Admin')],
           matrix: const {},

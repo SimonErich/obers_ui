@@ -21,11 +21,7 @@ import 'package:flutter/widgets.dart';
 /// {@category Primitives}
 class OiPortal extends StatefulWidget {
   /// Creates an [OiPortal].
-  const OiPortal({
-    required this.child,
-    this.active = false,
-    super.key,
-  });
+  const OiPortal({required this.child, this.active = false, super.key});
 
   /// The widget to render in the overlay when [active] is true.
   final Widget child;

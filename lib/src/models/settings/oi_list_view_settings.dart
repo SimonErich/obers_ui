@@ -66,12 +66,12 @@ class OiListViewSettings with OiSettingsData {
   /// Serializes this settings object to a JSON-encodable map.
   @override
   Map<String, dynamic> toJson() => {
-        'schemaVersion': schemaVersion,
-        'layout': layout.name,
-        'activeSortId': activeSortId,
-        'activeFilters': activeFilters,
-        'pageSize': pageSize,
-      };
+    'schemaVersion': schemaVersion,
+    'layout': layout.name,
+    'activeSortId': activeSortId,
+    'activeFilters': activeFilters,
+    'pageSize': pageSize,
+  };
 
   /// Returns new settings, filling in fields from [defaults] where this
   /// instance has empty or default values.
@@ -83,8 +83,9 @@ class OiListViewSettings with OiSettingsData {
       schemaVersion: schemaVersion,
       layout: layout,
       activeSortId: activeSortId ?? defaults.activeSortId,
-      activeFilters:
-          activeFilters.isEmpty ? defaults.activeFilters : activeFilters,
+      activeFilters: activeFilters.isEmpty
+          ? defaults.activeFilters
+          : activeFilters,
       pageSize: pageSize ?? defaults.pageSize,
     );
   }
@@ -123,14 +124,14 @@ class OiListViewSettings with OiSettingsData {
 
   @override
   int get hashCode => Object.hash(
-        schemaVersion,
-        layout,
-        activeSortId,
-        Object.hashAll(
-          activeFilters.entries.map((e) => Object.hash(e.key, e.value)),
-        ),
-        pageSize,
-      );
+    schemaVersion,
+    layout,
+    activeSortId,
+    Object.hashAll(
+      activeFilters.entries.map((e) => Object.hash(e.key, e.value)),
+    ),
+    pageSize,
+  );
 
   // ── Private helpers ────────────────────────────────────────────────────────
 

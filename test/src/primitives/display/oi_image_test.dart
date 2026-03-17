@@ -91,8 +91,9 @@ void main() {
       ),
     );
     await tester.pump();
-    final semanticsWidgets =
-        tester.widgetList<Semantics>(find.byType(Semantics));
+    final semanticsWidgets = tester.widgetList<Semantics>(
+      find.byType(Semantics),
+    );
     final matching = semanticsWidgets
         .where((s) => s.properties.label == 'a cat photo')
         .toList();
@@ -113,7 +114,9 @@ void main() {
     expect(find.byType(ExcludeSemantics), findsAtLeastNWidgets(1));
   });
 
-  testWidgets('decorative image has no labelled Semantics node', (tester) async {
+  testWidgets('decorative image has no labelled Semantics node', (
+    tester,
+  ) async {
     _ignoreImageErrors();
     addTearDown(_restoreOnError);
     await tester.pumpObers(
@@ -123,8 +126,9 @@ void main() {
       ),
     );
     await tester.pump();
-    final semanticsWidgets =
-        tester.widgetList<Semantics>(find.byType(Semantics));
+    final semanticsWidgets = tester.widgetList<Semantics>(
+      find.byType(Semantics),
+    );
     final withLabel = semanticsWidgets
         .where(
           (s) => s.properties.label != null && s.properties.label!.isNotEmpty,

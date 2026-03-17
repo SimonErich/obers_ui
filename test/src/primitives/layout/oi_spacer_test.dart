@@ -11,16 +11,15 @@ void main() {
   // ── Fixed size ─────────────────────────────────────────────────────────────
 
   testWidgets('size renders a vertical SizedBox by default', (tester) async {
-    await tester.pumpObers(
-      const Column(children: [OiSpacer(size: 24)]),
-    );
+    await tester.pumpObers(const Column(children: [OiSpacer(size: 24)]));
     final box = tester.widget<SizedBox>(find.byType(SizedBox));
     expect(box.height, 24);
     expect(box.width, isNull);
   });
 
-  testWidgets('size with horizontal axis renders a horizontal SizedBox',
-      (tester) async {
+  testWidgets('size with horizontal axis renders a horizontal SizedBox', (
+    tester,
+  ) async {
     await tester.pumpObers(
       const Row(children: [OiSpacer(size: 16, axis: Axis.horizontal)]),
     );
@@ -32,25 +31,21 @@ void main() {
   // ── Flex ───────────────────────────────────────────────────────────────────
 
   testWidgets('flex renders a Spacer with given flex', (tester) async {
-    await tester.pumpObers(
-      const Row(children: [OiSpacer(flex: 2)]),
-    );
+    await tester.pumpObers(const Row(children: [OiSpacer(flex: 2)]));
     final spacer = tester.widget<Spacer>(find.byType(Spacer));
     expect(spacer.flex, 2);
   });
 
-  testWidgets('neither size nor flex renders Spacer with flex 1', (tester) async {
-    await tester.pumpObers(
-      const Row(children: [OiSpacer()]),
-    );
+  testWidgets('neither size nor flex renders Spacer with flex 1', (
+    tester,
+  ) async {
+    await tester.pumpObers(const Row(children: [OiSpacer()]));
     final spacer = tester.widget<Spacer>(find.byType(Spacer));
     expect(spacer.flex, 1);
   });
 
   testWidgets('flex takes precedence over size', (tester) async {
-    await tester.pumpObers(
-      const Row(children: [OiSpacer(size: 10, flex: 3)]),
-    );
+    await tester.pumpObers(const Row(children: [OiSpacer(size: 10, flex: 3)]));
     // When flex is set, a Spacer is rendered with the correct flex value.
     final spacer = tester.widget<Spacer>(find.byType(Spacer));
     expect(spacer.flex, 3);

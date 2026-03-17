@@ -16,12 +16,7 @@ extension PumpObers on WidgetTester {
       addTeardownSurfaceSize();
     }
 
-    await pumpWidget(
-      OiApp(
-        theme: theme ?? OiThemeData.light(),
-        home: widget,
-      ),
-    );
+    await pumpWidget(OiApp(theme: theme ?? OiThemeData.light(), home: widget));
   }
 
   /// Resets the surface size after a test.

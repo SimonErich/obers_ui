@@ -71,9 +71,6 @@ class _OiCopyButtonState extends State<OiCopyButton> {
         ? (widget.copiedWidget ?? const Text('✓'))
         : (widget.icon ?? const Text('⎘'));
 
-    return GestureDetector(
-      onTap: _handleTap,
-      child: displayWidget,
-    );
+    return GestureDetector(onTap: _handleTap, child: displayWidget);
   }
 }

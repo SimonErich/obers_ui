@@ -6,10 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui/src/foundation/oi_overlays.dart';
 
 /// Wraps [child] in the overlay host so overlay insertion works.
-Widget buildHost({
-  required OiOverlaysService service,
-  required Widget child,
-}) {
+Widget buildHost({required OiOverlaysService service, required Widget child}) {
   return Directionality(
     textDirection: TextDirection.ltr,
     child: buildOiOverlaysHost(service: service, child: child),
@@ -64,10 +61,7 @@ void main() {
       final service = createOiOverlaysService();
 
       await tester.pumpWidget(
-        buildHost(
-          service: service,
-          child: const SizedBox.shrink(),
-        ),
+        buildHost(service: service, child: const SizedBox.shrink()),
       );
       await tester.pump(); // let post-frame callback attach overlay state
 
@@ -79,10 +73,7 @@ void main() {
       final service = createOiOverlaysService();
 
       await tester.pumpWidget(
-        buildHost(
-          service: service,
-          child: const SizedBox.shrink(),
-        ),
+        buildHost(service: service, child: const SizedBox.shrink()),
       );
       await tester.pump();
 
@@ -95,10 +86,7 @@ void main() {
       final service = createOiOverlaysService();
 
       await tester.pumpWidget(
-        buildHost(
-          service: service,
-          child: const SizedBox.shrink(),
-        ),
+        buildHost(service: service, child: const SizedBox.shrink()),
       );
       await tester.pump();
 
@@ -113,10 +101,7 @@ void main() {
       final service = createOiOverlaysService();
 
       await tester.pumpWidget(
-        buildHost(
-          service: service,
-          child: const SizedBox.shrink(),
-        ),
+        buildHost(service: service, child: const SizedBox.shrink()),
       );
       await tester.pump();
 
@@ -128,10 +113,7 @@ void main() {
       final service = createOiOverlaysService();
 
       await tester.pumpWidget(
-        buildHost(
-          service: service,
-          child: const SizedBox.shrink(),
-        ),
+        buildHost(service: service, child: const SizedBox.shrink()),
       );
       await tester.pump();
 
@@ -146,16 +128,11 @@ void main() {
       final service = createOiOverlaysService();
 
       await tester.pumpWidget(
-        buildHost(
-          service: service,
-          child: const SizedBox.shrink(),
-        ),
+        buildHost(service: service, child: const SizedBox.shrink()),
       );
       await tester.pump();
 
-      service.show(
-        builder: (_) => const Text('overlay content'),
-      );
+      service.show(builder: (_) => const Text('overlay content'));
       await tester.pump();
 
       expect(find.text('overlay content'), findsOneWidget);
@@ -166,10 +143,7 @@ void main() {
       var dismissed = false;
 
       await tester.pumpWidget(
-        buildHost(
-          service: service,
-          child: const SizedBox.shrink(),
-        ),
+        buildHost(service: service, child: const SizedBox.shrink()),
       );
       await tester.pump();
 
@@ -186,15 +160,14 @@ void main() {
       expect(dismissed, isTrue);
     });
 
-    testWidgets('show with dismissible=false has no tap barrier', (tester) async {
+    testWidgets('show with dismissible=false has no tap barrier', (
+      tester,
+    ) async {
       final service = createOiOverlaysService();
       var dismissCalled = false;
 
       await tester.pumpWidget(
-        buildHost(
-          service: service,
-          child: const SizedBox.shrink(),
-        ),
+        buildHost(service: service, child: const SizedBox.shrink()),
       );
       await tester.pump();
 
@@ -219,10 +192,7 @@ void main() {
       final service = createOiOverlaysService();
 
       await tester.pumpWidget(
-        buildHost(
-          service: service,
-          child: const SizedBox.shrink(),
-        ),
+        buildHost(service: service, child: const SizedBox.shrink()),
       );
       await tester.pump();
 
@@ -237,30 +207,26 @@ void main() {
       expect(h3.isDismissed, isTrue);
     });
 
-    testWidgets('dismissAll is safe when no overlays are active',
-        (tester) async {
+    testWidgets('dismissAll is safe when no overlays are active', (
+      tester,
+    ) async {
       final service = createOiOverlaysService();
 
       await tester.pumpWidget(
-        buildHost(
-          service: service,
-          child: const SizedBox.shrink(),
-        ),
+        buildHost(service: service, child: const SizedBox.shrink()),
       );
       await tester.pump();
 
       expect(service.dismissAll, returnsNormally);
     });
 
-    testWidgets('dismissed handle removed, remaining stays visible',
-        (tester) async {
+    testWidgets('dismissed handle removed, remaining stays visible', (
+      tester,
+    ) async {
       final service = createOiOverlaysService();
 
       await tester.pumpWidget(
-        buildHost(
-          service: service,
-          child: const SizedBox.shrink(),
-        ),
+        buildHost(service: service, child: const SizedBox.shrink()),
       );
       await tester.pump();
 
@@ -296,8 +262,9 @@ void main() {
       expect(captured, same(service));
     });
 
-    testWidgets('maybeOf returns null when no OiOverlays in tree',
-        (tester) async {
+    testWidgets('maybeOf returns null when no OiOverlays in tree', (
+      tester,
+    ) async {
       late OiOverlaysService? captured;
 
       await tester.pumpWidget(
@@ -315,17 +282,15 @@ void main() {
       expect(captured, isNull);
     });
 
-    testWidgets('of(context) throws when no OiOverlays in tree',
-        (tester) async {
+    testWidgets('of(context) throws when no OiOverlays in tree', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         Directionality(
           textDirection: TextDirection.ltr,
           child: Builder(
             builder: (context) {
-              expect(
-                () => OiOverlays.of(context),
-                throwsAssertionError,
-              );
+              expect(() => OiOverlays.of(context), throwsAssertionError);
               return const SizedBox.shrink();
             },
           ),
@@ -360,10 +325,7 @@ void main() {
       final service = createOiOverlaysService();
 
       await tester.pumpWidget(
-        buildHost(
-          service: service,
-          child: const Text('child widget'),
-        ),
+        buildHost(service: service, child: const Text('child widget')),
       );
 
       expect(find.text('child widget'), findsOneWidget);
@@ -373,10 +335,7 @@ void main() {
       final service = createOiOverlaysService();
 
       await tester.pumpWidget(
-        buildHost(
-          service: service,
-          child: const SizedBox.shrink(),
-        ),
+        buildHost(service: service, child: const SizedBox.shrink()),
       );
       await tester.pump(); // process post-frame callback
 

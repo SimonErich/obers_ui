@@ -77,9 +77,7 @@ void main() {
     });
 
     test('fromJson parses sidebarWidth from int JSON value', () {
-      final s = OiFileExplorerSettings.fromJson(const {
-        'sidebarWidth': 200,
-      });
+      final s = OiFileExplorerSettings.fromJson(const {'sidebarWidth': 200});
       expect(s.sidebarWidth, 200.0);
     });
 
@@ -93,32 +91,28 @@ void main() {
 
     test('mergeWith: empty favoriteFolderIds filled from defaults', () {
       const saved = OiFileExplorerSettings();
-      const defaults =
-          OiFileExplorerSettings(favoriteFolderIds: ['a', 'b']);
+      const defaults = OiFileExplorerSettings(favoriteFolderIds: ['a', 'b']);
       final merged = saved.mergeWith(defaults);
       expect(merged.favoriteFolderIds, ['a', 'b']);
     });
 
     test('mergeWith: non-empty favoriteFolderIds preserved', () {
       const saved = OiFileExplorerSettings(favoriteFolderIds: ['x']);
-      const defaults =
-          OiFileExplorerSettings(favoriteFolderIds: ['a', 'b']);
+      const defaults = OiFileExplorerSettings(favoriteFolderIds: ['a', 'b']);
       final merged = saved.mergeWith(defaults);
       expect(merged.favoriteFolderIds, ['x']);
     });
 
     test('mergeWith: empty recentPaths filled from defaults', () {
       const saved = OiFileExplorerSettings();
-      const defaults =
-          OiFileExplorerSettings(recentPaths: ['/path/a']);
+      const defaults = OiFileExplorerSettings(recentPaths: ['/path/a']);
       final merged = saved.mergeWith(defaults);
       expect(merged.recentPaths, ['/path/a']);
     });
 
     test('mergeWith: non-empty recentPaths preserved', () {
       const saved = OiFileExplorerSettings(recentPaths: ['/my/path']);
-      const defaults =
-          OiFileExplorerSettings(recentPaths: ['/path/a']);
+      const defaults = OiFileExplorerSettings(recentPaths: ['/path/a']);
       final merged = saved.mergeWith(defaults);
       expect(merged.recentPaths, ['/my/path']);
     });

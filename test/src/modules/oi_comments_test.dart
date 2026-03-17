@@ -48,9 +48,7 @@ void main() {
     final parent = _comment(
       key: 'p1',
       content: 'Parent',
-      replies: [
-        _comment(key: 'r1', content: 'Reply'),
-      ],
+      replies: [_comment(key: 'r1', content: 'Reply')],
     );
 
     await tester.pumpObers(
@@ -70,23 +68,19 @@ void main() {
 
     // The reply Padding should have a left indent > 0
     final parentPadding = tester.widget<Padding>(
-      find.ancestor(
-        of: find.text('Parent'),
-        matching: find.byType(Padding),
-      ).first,
+      find
+          .ancestor(of: find.text('Parent'), matching: find.byType(Padding))
+          .first,
     );
     final replyPadding = tester.widget<Padding>(
-      find.ancestor(
-        of: find.text('Reply'),
-        matching: find.byType(Padding),
-      ).first,
+      find
+          .ancestor(of: find.text('Reply'), matching: find.byType(Padding))
+          .first,
     );
 
     // Reply should be further right than parent
-    final parentLeft =
-        (parentPadding.padding as EdgeInsets).left;
-    final replyLeft =
-        (replyPadding.padding as EdgeInsets).left;
+    final parentLeft = (parentPadding.padding as EdgeInsets).left;
+    final replyLeft = (replyPadding.padding as EdgeInsets).left;
     expect(replyLeft, greaterThanOrEqualTo(parentLeft));
   });
 
@@ -122,10 +116,7 @@ void main() {
     );
     // The timestamp text is relative (e.g. "Xd ago"), so just confirm
     // a text with 'ago' exists or 'Just now'
-    expect(
-      find.textContaining(RegExp(r'ago|Just now')),
-      findsOneWidget,
-    );
+    expect(find.textContaining(RegExp(r'ago|Just now')), findsOneWidget);
   });
 
   testWidgets('comment input is visible', (tester) async {
@@ -157,9 +148,7 @@ void main() {
             _comment(
               key: 'c2',
               content: 'Level 2',
-              replies: [
-                _comment(key: 'c3', content: 'Level 3'),
-              ],
+              replies: [_comment(key: 'c3', content: 'Level 3')],
             ),
           ],
         ),
@@ -214,10 +203,7 @@ void main() {
         ),
       ),
     );
-    expect(
-      find.bySemanticsLabel('Post Comments'),
-      findsOneWidget,
-    );
+    expect(find.bySemanticsLabel('Post Comments'), findsOneWidget);
   });
 
   testWidgets('edited comment shows edited indicator', (tester) async {

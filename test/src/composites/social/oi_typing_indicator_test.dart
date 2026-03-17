@@ -12,9 +12,7 @@ import '../../../helpers/pump_app.dart';
 void main() {
   testWidgets('one user shows "Alice is typing"', (tester) async {
     await tester.pumpObers(
-      const Center(
-        child: OiTypingIndicator(typingUsers: ['Alice']),
-      ),
+      const Center(child: OiTypingIndicator(typingUsers: ['Alice'])),
     );
 
     expect(find.text('Alice is typing'), findsOneWidget);
@@ -22,21 +20,18 @@ void main() {
 
   testWidgets('two users shows "Alice and Bob are typing"', (tester) async {
     await tester.pumpObers(
-      const Center(
-        child: OiTypingIndicator(typingUsers: ['Alice', 'Bob']),
-      ),
+      const Center(child: OiTypingIndicator(typingUsers: ['Alice', 'Bob'])),
     );
 
     expect(find.text('Alice and Bob are typing'), findsOneWidget);
   });
 
-  testWidgets('three or more users shows "N people are typing"',
-      (tester) async {
+  testWidgets('three or more users shows "N people are typing"', (
+    tester,
+  ) async {
     await tester.pumpObers(
       const Center(
-        child: OiTypingIndicator(
-          typingUsers: ['Alice', 'Bob', 'Charlie'],
-        ),
+        child: OiTypingIndicator(typingUsers: ['Alice', 'Bob', 'Charlie']),
       ),
     );
 
@@ -45,9 +40,7 @@ void main() {
 
   testWidgets('empty list renders nothing', (tester) async {
     await tester.pumpObers(
-      const Center(
-        child: OiTypingIndicator(typingUsers: []),
-      ),
+      const Center(child: OiTypingIndicator(typingUsers: [])),
     );
 
     // SizedBox.shrink is rendered.
@@ -57,9 +50,7 @@ void main() {
 
   testWidgets('animated dots are present', (tester) async {
     await tester.pumpObers(
-      const Center(
-        child: OiTypingIndicator(typingUsers: ['Alice']),
-      ),
+      const Center(child: OiTypingIndicator(typingUsers: ['Alice'])),
     );
 
     // The dots are rendered as three '.' Text widgets.
@@ -68,9 +59,7 @@ void main() {
 
   testWidgets('animation controller is active', (tester) async {
     await tester.pumpObers(
-      const Center(
-        child: OiTypingIndicator(typingUsers: ['Alice']),
-      ),
+      const Center(child: OiTypingIndicator(typingUsers: ['Alice'])),
     );
 
     // Pump a frame to advance animation — no errors.

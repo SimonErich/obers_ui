@@ -22,11 +22,7 @@ void main() {
 
   testWidgets('renders all item labels', (tester) async {
     await tester.pumpObers(
-      OiBottomBar(
-        items: _kItems,
-        selectedIndex: 0,
-        onSelected: (_) {},
-      ),
+      OiBottomBar(items: _kItems, selectedIndex: 0, onSelected: (_) {}),
     );
     expect(find.text('Home'), findsOneWidget);
     expect(find.text('Search'), findsOneWidget);
@@ -35,11 +31,7 @@ void main() {
 
   testWidgets('renders all item icons', (tester) async {
     await tester.pumpObers(
-      OiBottomBar(
-        items: _kItems,
-        selectedIndex: 0,
-        onSelected: (_) {},
-      ),
+      OiBottomBar(items: _kItems, selectedIndex: 0, onSelected: (_) {}),
     );
     expect(find.byIcon(_kIcon), findsOneWidget);
     expect(find.byIcon(_kIcon2), findsOneWidget);
@@ -48,8 +40,9 @@ void main() {
 
   // ── Selection ──────────────────────────────────────────────────────────────
 
-  testWidgets('onSelected fires with correct index when item tapped',
-      (tester) async {
+  testWidgets('onSelected fires with correct index when item tapped', (
+    tester,
+  ) async {
     int? selected;
     await tester.pumpObers(
       OiBottomBar(
@@ -77,14 +70,11 @@ void main() {
     expect(selected, 2);
   });
 
-  testWidgets('selected item label uses a different colour from unselected',
-      (tester) async {
+  testWidgets('selected item label uses a different colour from unselected', (
+    tester,
+  ) async {
     await tester.pumpObers(
-      OiBottomBar(
-        items: _kItems,
-        selectedIndex: 0,
-        onSelected: (_) {},
-      ),
+      OiBottomBar(items: _kItems, selectedIndex: 0, onSelected: (_) {}),
     );
     // Retrieve the Text widgets for Home (selected) and Search (not selected).
     final homeText = tester.widget<Text>(find.text('Home'));
@@ -98,8 +88,9 @@ void main() {
 
   // ── Badge ──────────────────────────────────────────────────────────────────
 
-  testWidgets('badge count renders as text overlay when non-zero',
-      (tester) async {
+  testWidgets('badge count renders as text overlay when non-zero', (
+    tester,
+  ) async {
     await tester.pumpObers(
       OiBottomBar(
         items: const [
@@ -129,9 +120,7 @@ void main() {
   testWidgets('zero badge count renders no badge text', (tester) async {
     await tester.pumpObers(
       OiBottomBar(
-        items: const [
-          OiBottomBarItem(icon: _kIcon, label: 'Home'),
-        ],
+        items: const [OiBottomBarItem(icon: _kIcon, label: 'Home')],
         selectedIndex: 0,
         onSelected: (_) {},
       ),
@@ -155,8 +144,9 @@ void main() {
     expect(find.text('Home'), findsOneWidget);
   });
 
-  testWidgets('floating style wraps bar in a DecoratedBox with border radius',
-      (tester) async {
+  testWidgets('floating style wraps bar in a DecoratedBox with border radius', (
+    tester,
+  ) async {
     await tester.pumpObers(
       OiBottomBar(
         items: _kItems,

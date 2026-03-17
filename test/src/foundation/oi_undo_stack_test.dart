@@ -25,20 +25,12 @@ void main() {
     });
 
     test('groupId defaults to null', () {
-      final action = OiUndoAction(
-        label: 'A',
-        execute: () {},
-        undo: () {},
-      );
+      final action = OiUndoAction(label: 'A', execute: () {}, undo: () {});
       expect(action.groupId, isNull);
     });
 
     test('merge defaults to null', () {
-      final action = OiUndoAction(
-        label: 'A',
-        execute: () {},
-        undo: () {},
-      );
+      final action = OiUndoAction(label: 'A', execute: () {}, undo: () {});
       expect(action.merge, isNull);
     });
 
@@ -161,11 +153,7 @@ void main() {
 
     group('undo', () {
       test('moves last history entry to future', () {
-        final action = OiUndoAction(
-          label: 'A',
-          execute: () {},
-          undo: () {},
-        );
+        final action = OiUndoAction(label: 'A', execute: () {}, undo: () {});
         stack
           ..push(action)
           ..undo();
@@ -223,11 +211,7 @@ void main() {
 
     group('redo', () {
       test('moves last future entry back to history', () {
-        final action = OiUndoAction(
-          label: 'A',
-          execute: () {},
-          undo: () {},
-        );
+        final action = OiUndoAction(label: 'A', execute: () {}, undo: () {});
         stack
           ..push(action)
           ..undo()
@@ -336,7 +320,8 @@ void main() {
               mergeCallCount++;
               if (next.groupId == 'typing') {
                 return OiUndoAction(
-                  label: 'Type "${text + next.label.substring(6).replaceAll('"', '')}"',
+                  label:
+                      'Type "${text + next.label.substring(6).replaceAll('"', '')}"',
                   execute: () {},
                   undo: () {},
                   groupId: 'typing',
@@ -427,9 +412,8 @@ void main() {
           ..undo();
         final future = stack.future;
         expect(
-          () => future.add(
-            OiUndoAction(label: 'B', execute: () {}, undo: () {}),
-          ),
+          () =>
+              future.add(OiUndoAction(label: 'B', execute: () {}, undo: () {})),
           throwsUnsupportedError,
         );
       });
@@ -437,8 +421,9 @@ void main() {
   });
 
   group('OiUndoStackProvider', () {
-    testWidgets('provides OiUndoStack to descendants via OiUndoStack.of',
-        (tester) async {
+    testWidgets('provides OiUndoStack to descendants via OiUndoStack.of', (
+      tester,
+    ) async {
       final testStack = OiUndoStack();
       late OiUndoStack captured;
 
@@ -461,8 +446,9 @@ void main() {
       testStack.dispose();
     });
 
-    testWidgets('OiUndoStack.maybeOf returns null when no provider in tree',
-        (tester) async {
+    testWidgets('OiUndoStack.maybeOf returns null when no provider in tree', (
+      tester,
+    ) async {
       late OiUndoStack? captured;
 
       await tester.pumpWidget(
@@ -480,17 +466,15 @@ void main() {
       expect(captured, isNull);
     });
 
-    testWidgets('OiUndoStack.of throws when no provider in tree',
-        (tester) async {
+    testWidgets('OiUndoStack.of throws when no provider in tree', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         Directionality(
           textDirection: TextDirection.ltr,
           child: Builder(
             builder: (context) {
-              expect(
-                () => OiUndoStack.of(context),
-                throwsAssertionError,
-              );
+              expect(() => OiUndoStack.of(context), throwsAssertionError);
               return const SizedBox.shrink();
             },
           ),

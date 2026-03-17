@@ -31,11 +31,10 @@ class _TestImageProvider extends ImageProvider<_TestImageProvider> {
 
   Future<ImageInfo> _createImage() async {
     final recorder = ui.PictureRecorder();
-    Canvas(recorder)
-      ..drawRect(
-        const Rect.fromLTWH(0, 0, 100, 100),
-        Paint()..color = const Color(0xFFFF0000),
-      );
+    Canvas(recorder)..drawRect(
+      const Rect.fromLTWH(0, 0, 100, 100),
+      Paint()..color = const Color(0xFFFF0000),
+    );
     final picture = recorder.endRecording();
     final image = await picture.toImage(100, 100);
     return ImageInfo(image: image);
@@ -67,56 +66,34 @@ Widget _cropper({
 void main() {
   group('OiImageCropper', () {
     testWidgets('renders the cropper widget', (tester) async {
-      await tester.pumpObers(
-        _cropper(),
-        surfaceSize: const Size(400, 500),
-      );
+      await tester.pumpObers(_cropper(), surfaceSize: const Size(400, 500));
       await tester.pump();
 
       expect(find.byKey(const Key('oi_image_cropper')), findsOneWidget);
     });
 
     testWidgets('image is displayed', (tester) async {
-      await tester.pumpObers(
-        _cropper(),
-        surfaceSize: const Size(400, 500),
-      );
+      await tester.pumpObers(_cropper(), surfaceSize: const Size(400, 500));
       await tester.pump();
 
-      expect(
-        find.byKey(const Key('oi_image_cropper_image')),
-        findsOneWidget,
-      );
+      expect(find.byKey(const Key('oi_image_cropper_image')), findsOneWidget);
     });
 
     testWidgets('crop overlay is visible', (tester) async {
-      await tester.pumpObers(
-        _cropper(),
-        surfaceSize: const Size(400, 500),
-      );
+      await tester.pumpObers(_cropper(), surfaceSize: const Size(400, 500));
       await tester.pump();
 
-      expect(
-        find.byKey(const Key('oi_image_cropper_overlay')),
-        findsOneWidget,
-      );
+      expect(find.byKey(const Key('oi_image_cropper_overlay')), findsOneWidget);
     });
 
     testWidgets('crop handle is visible', (tester) async {
-      await tester.pumpObers(
-        _cropper(),
-        surfaceSize: const Size(400, 500),
-      );
+      await tester.pumpObers(_cropper(), surfaceSize: const Size(400, 500));
       await tester.pump();
 
-      expect(
-        find.byKey(const Key('oi_image_cropper_handle')),
-        findsOneWidget,
-      );
+      expect(find.byKey(const Key('oi_image_cropper_handle')), findsOneWidget);
     });
 
-    testWidgets('onCrop fires with result when confirm tapped',
-        (tester) async {
+    testWidgets('onCrop fires with result when confirm tapped', (tester) async {
       OiCropResult? result;
       await tester.pumpObers(
         _cropper(onCrop: (r) => result = r),
@@ -186,22 +163,19 @@ void main() {
       expect(result!.flippedVertical, isTrue);
     });
 
-    testWidgets('rotate button hidden when enableRotate is false',
-        (tester) async {
+    testWidgets('rotate button hidden when enableRotate is false', (
+      tester,
+    ) async {
       await tester.pumpObers(
         _cropper(enableRotate: false),
         surfaceSize: const Size(400, 500),
       );
       await tester.pump();
 
-      expect(
-        find.byKey(const Key('oi_image_cropper_rotate')),
-        findsNothing,
-      );
+      expect(find.byKey(const Key('oi_image_cropper_rotate')), findsNothing);
     });
 
-    testWidgets('flip buttons hidden when enableFlip is false',
-        (tester) async {
+    testWidgets('flip buttons hidden when enableFlip is false', (tester) async {
       await tester.pumpObers(
         _cropper(enableFlip: false),
         surfaceSize: const Size(400, 500),
@@ -213,10 +187,7 @@ void main() {
     });
 
     testWidgets('semantics label is applied', (tester) async {
-      await tester.pumpObers(
-        _cropper(),
-        surfaceSize: const Size(400, 500),
-      );
+      await tester.pumpObers(_cropper(), surfaceSize: const Size(400, 500));
       await tester.pump();
 
       expect(find.bySemanticsLabel('Test cropper'), findsOneWidget);
@@ -235,10 +206,7 @@ void main() {
 
       expect(result, isNotNull);
       // With 1:1 aspect ratio, width and height of the crop rect should match.
-      expect(
-        result!.rect.width,
-        closeTo(result!.rect.height, 0.01),
-      );
+      expect(result!.rect.width, closeTo(result!.rect.height, 0.01));
     });
   });
 

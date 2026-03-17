@@ -70,10 +70,7 @@ class OiColorUtils {
   ///
   /// A [ratio] of 0.0 returns [first]; a [ratio] of 1.0 returns [second].
   static Color blend(Color first, Color second, double ratio) {
-    assert(
-      ratio >= 0.0 && ratio <= 1.0,
-      'Ratio must be between 0.0 and 1.0',
-    );
+    assert(ratio >= 0.0 && ratio <= 1.0, 'Ratio must be between 0.0 and 1.0');
     final r = first.r + (second.r - first.r) * ratio;
     final g = first.g + (second.g - first.g) * ratio;
     final b = first.b + (second.b - first.b) * ratio;
@@ -89,7 +86,12 @@ class OiColorUtils {
       opacity >= 0.0 && opacity <= 1.0,
       'Opacity must be between 0.0 and 1.0',
     );
-    return Color.from(alpha: opacity, red: color.r, green: color.g, blue: color.b);
+    return Color.from(
+      alpha: opacity,
+      red: color.r,
+      green: color.g,
+      blue: color.b,
+    );
   }
 
   /// Converts a [Color] to hex string (e.g., "#FF5500").
@@ -102,8 +104,9 @@ class OiColorUtils {
     final b = _to8Bit(color.b).toRadixString(16).padLeft(2, '0').toUpperCase();
 
     if (includeAlpha) {
-      final a =
-          _to8Bit(color.a).toRadixString(16).padLeft(2, '0').toUpperCase();
+      final a = _to8Bit(
+        color.a,
+      ).toRadixString(16).padLeft(2, '0').toUpperCase();
       return '#$a$r$g$b';
     }
     return '#$r$g$b';

@@ -29,38 +29,26 @@ class OiSpringPhysics {
   /// A slow, gentle spring with minimal bounce.
   ///
   /// Suitable for subtle transitions and background animations.
-  static SpringDescription get gentle => const SpringDescription(
-        mass: 1,
-        stiffness: 100,
-        damping: 26,
-      );
+  static SpringDescription get gentle =>
+      const SpringDescription(mass: 1, stiffness: 100, damping: 26);
 
   /// A balanced spring suitable for most UI animations.
   ///
   /// Provides a natural feel with moderate speed and slight overshoot.
-  static SpringDescription get standard => const SpringDescription(
-        mass: 1,
-        stiffness: 180,
-        damping: 20,
-      );
+  static SpringDescription get standard =>
+      const SpringDescription(mass: 1, stiffness: 180, damping: 20);
 
   /// A fast, responsive spring with minimal overshoot.
   ///
   /// Suitable for quick interactions like button presses and toggles.
-  static SpringDescription get snappy => const SpringDescription(
-        mass: 1,
-        stiffness: 400,
-        damping: 30,
-      );
+  static SpringDescription get snappy =>
+      const SpringDescription(mass: 1, stiffness: 400, damping: 30);
 
   /// A playful spring with noticeable bounce.
   ///
   /// Suitable for attention-grabbing animations and fun interactions.
-  static SpringDescription get bouncy => const SpringDescription(
-        mass: 1,
-        stiffness: 300,
-        damping: 12,
-      );
+  static SpringDescription get bouncy =>
+      const SpringDescription(mass: 1, stiffness: 300, damping: 12);
 
   /// Calculates the approximate duration of a spring animation.
   ///

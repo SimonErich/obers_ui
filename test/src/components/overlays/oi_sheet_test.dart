@@ -16,8 +16,9 @@ void main() {
     expect(find.text('Sheet content'), findsOneWidget);
   });
 
-  testWidgets('open=false hides child content via slide animation',
-      (tester) async {
+  testWidgets('open=false hides child content via slide animation', (
+    tester,
+  ) async {
     await tester.pumpObers(
       const OiSheet(open: false, child: Text('Hidden content')),
     );
@@ -27,8 +28,9 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('onClose fires when scrim is tapped (dismissible=true)',
-      (tester) async {
+  testWidgets('onClose fires when scrim is tapped (dismissible=true)', (
+    tester,
+  ) async {
     var closed = false;
     await tester.pumpObers(
       OiSheet(
@@ -44,8 +46,9 @@ void main() {
     expect(closed, isTrue);
   });
 
-  testWidgets('dismissible=false: scrim tap does not call onClose',
-      (tester) async {
+  testWidgets('dismissible=false: scrim tap does not call onClose', (
+    tester,
+  ) async {
     var closed = false;
     await tester.pumpObers(
       OiSheet(
@@ -63,11 +66,7 @@ void main() {
 
   testWidgets('dragHandle=true renders drag handle widget', (tester) async {
     await tester.pumpObers(
-      const OiSheet(
-        open: true,
-        dragHandle: true,
-        child: Text('With handle'),
-      ),
+      const OiSheet(open: true, dragHandle: true, child: Text('With handle')),
     );
     await tester.pump();
     // The handle is a small Container; the sheet child text must be visible.

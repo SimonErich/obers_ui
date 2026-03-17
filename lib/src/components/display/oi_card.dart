@@ -64,8 +64,7 @@ class OiCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
-    final effectivePadding =
-        padding ?? const EdgeInsets.all(16);
+    final effectivePadding = padding ?? const EdgeInsets.all(16);
 
     OiBorderStyle? border;
     List<BoxShadow>? shadow;
@@ -108,11 +107,7 @@ class OiCard extends StatelessWidget {
     );
 
     if (variant == OiCardVariant.interactive) {
-      return OiTappable(
-        onTap: onTap,
-        enabled: onTap != null,
-        child: surface,
-      );
+      return OiTappable(onTap: onTap, enabled: onTap != null, child: surface);
     }
 
     return surface;

@@ -9,27 +9,19 @@ import 'package:obers_ui/src/primitives/scroll/oi_scrollbar.dart';
 import '../../../helpers/pump_app.dart';
 
 /// Wraps [child] in a pointer-density [OiApp].
-Widget pointerApp(Widget child) => OiApp(
-      density: OiDensity.compact,
-      home: child,
-    );
+Widget pointerApp(Widget child) =>
+    OiApp(density: OiDensity.compact, home: child);
 
 /// Wraps [child] in a touch-density [OiApp].
-Widget touchApp(Widget child) => OiApp(
-      density: OiDensity.comfortable,
-      home: child,
-    );
+Widget touchApp(Widget child) =>
+    OiApp(density: OiDensity.comfortable, home: child);
 
 void main() {
   // ── 1. Renders RawScrollbar wrapping child ─────────────────────────────────
 
   testWidgets('renders RawScrollbar containing the child', (tester) async {
     await tester.pumpObers(
-      OiScrollbar(
-        child: ListView(
-          children: const [Text('item')],
-        ),
-      ),
+      OiScrollbar(child: ListView(children: const [Text('item')])),
     );
     expect(find.byType(RawScrollbar), findsOneWidget);
     expect(find.text('item'), findsOneWidget);
@@ -37,7 +29,9 @@ void main() {
 
   // ── 2. Pointer device: thumbVisibility defaults to true ────────────────────
 
-  testWidgets('pointer density: thumb always visible by default', (tester) async {
+  testWidgets('pointer density: thumb always visible by default', (
+    tester,
+  ) async {
     final controller = ScrollController();
     addTearDown(controller.dispose);
 
@@ -59,7 +53,9 @@ void main() {
 
   // ── 3. Touch device: thumbVisibility defaults to false ─────────────────────
 
-  testWidgets('touch density: thumb not always visible by default', (tester) async {
+  testWidgets('touch density: thumb not always visible by default', (
+    tester,
+  ) async {
     final controller = ScrollController();
     addTearDown(controller.dispose);
 
@@ -81,7 +77,9 @@ void main() {
 
   // ── 4. alwaysShow passed through ──────────────────────────────────────────
 
-  testWidgets('alwaysShow=true overrides default on touch device', (tester) async {
+  testWidgets('alwaysShow=true overrides default on touch device', (
+    tester,
+  ) async {
     final controller = ScrollController();
     addTearDown(controller.dispose);
 
@@ -102,31 +100,33 @@ void main() {
     expect(scrollbar.thumbVisibility, isTrue);
   });
 
-  testWidgets('alwaysShow=false overrides default on pointer device and suppresses track',
-      (tester) async {
-    final controller = ScrollController();
-    addTearDown(controller.dispose);
+  testWidgets(
+    'alwaysShow=false overrides default on pointer device and suppresses track',
+    (tester) async {
+      final controller = ScrollController();
+      addTearDown(controller.dispose);
 
-    await tester.pumpWidget(
-      pointerApp(
-        OiScrollbar(
-          controller: controller,
-          alwaysShow: false,
-          // showTrack must also be false to satisfy RawScrollbar invariant
-          // (track cannot be shown without thumb).
-          showTrack: false,
-          child: ListView(
+      await tester.pumpWidget(
+        pointerApp(
+          OiScrollbar(
             controller: controller,
-            children: const [SizedBox(height: 2000)],
+            alwaysShow: false,
+            // showTrack must also be false to satisfy RawScrollbar invariant
+            // (track cannot be shown without thumb).
+            showTrack: false,
+            child: ListView(
+              controller: controller,
+              children: const [SizedBox(height: 2000)],
+            ),
           ),
         ),
-      ),
-    );
+      );
 
-    final scrollbar = tester.widget<RawScrollbar>(find.byType(RawScrollbar));
-    expect(scrollbar.thumbVisibility, isFalse);
-    expect(scrollbar.trackVisibility, isFalse);
-  });
+      final scrollbar = tester.widget<RawScrollbar>(find.byType(RawScrollbar));
+      expect(scrollbar.thumbVisibility, isFalse);
+      expect(scrollbar.trackVisibility, isFalse);
+    },
+  );
 
   // ── 5. thickness configurable ─────────────────────────────────────────────
 

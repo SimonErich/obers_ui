@@ -22,8 +22,8 @@ class OiDivider extends StatelessWidget {
     this.style = OiBorderLineStyle.solid,
     this.spacing = 0,
     super.key,
-  })  : _label = null,
-        _content = null;
+  }) : _label = null,
+       _content = null;
 
   /// Creates a [OiDivider] with a text [label] centred in the line.
   const OiDivider.withLabel(
@@ -34,8 +34,8 @@ class OiDivider extends StatelessWidget {
     this.style = OiBorderLineStyle.solid,
     this.spacing = 0,
     super.key,
-  })  : _label = label,
-        _content = null;
+  }) : _label = label,
+       _content = null;
 
   /// Creates a [OiDivider] with an arbitrary [content] widget centred in
   /// the line.
@@ -47,8 +47,8 @@ class OiDivider extends StatelessWidget {
     this.style = OiBorderLineStyle.solid,
     this.spacing = 0,
     super.key,
-  })  : _label = null,
-        _content = content;
+  }) : _label = null,
+       _content = content;
 
   /// The direction of the divider line.
   final Axis axis;
@@ -73,8 +73,7 @@ class OiDivider extends StatelessWidget {
 
   // ---------------------------------------------------------------------------
 
-  Color _resolvedColor(BuildContext context) =>
-      color ?? context.colors.border;
+  Color _resolvedColor(BuildContext context) => color ?? context.colors.border;
 
   Widget _buildLine(BuildContext context, {bool flex = true}) {
     final resolvedColor = _resolvedColor(context);
@@ -94,8 +93,14 @@ class OiDivider extends StatelessWidget {
       style: style,
     );
     final line = axis == Axis.horizontal
-        ? SizedBox(height: thickness, child: CustomPaint(painter: painter))
-        : SizedBox(width: thickness, child: CustomPaint(painter: painter));
+        ? SizedBox(
+            height: thickness,
+            child: CustomPaint(painter: painter),
+          )
+        : SizedBox(
+            width: thickness,
+            child: CustomPaint(painter: painter),
+          );
     return flex ? Expanded(child: line) : line;
   }
 
@@ -173,11 +178,11 @@ class _OiDividerPainter extends CustomPainter {
       ..strokeWidth = thickness
       ..style = PaintingStyle.stroke;
 
-    final segmentLength =
-        style == OiBorderLineStyle.dashed ? thickness * 4 : thickness;
+    final segmentLength = style == OiBorderLineStyle.dashed
+        ? thickness * 4
+        : thickness;
     final gapLength = segmentLength * 1.5;
-    final total =
-        axis == Axis.horizontal ? size.width : size.height;
+    final total = axis == Axis.horizontal ? size.width : size.height;
 
     var pos = 0.0;
     var draw = true;

@@ -48,16 +48,12 @@ void main() {
     });
 
     test('fromJson handles null maps gracefully', () {
-      final s = OiListViewSettings.fromJson(const {
-        'activeFilters': null,
-      });
+      final s = OiListViewSettings.fromJson(const {'activeFilters': null});
       expect(s.activeFilters, isEmpty);
     });
 
     test('fromJson handles unknown enum value gracefully', () {
-      final s = OiListViewSettings.fromJson(const {
-        'layout': 'carousel',
-      });
+      final s = OiListViewSettings.fromJson(const {'layout': 'carousel'});
       expect(s.layout, OiListViewLayout.list);
     });
 
@@ -93,20 +89,14 @@ void main() {
 
     test('mergeWith: empty activeFilters filled from defaults', () {
       const saved = OiListViewSettings();
-      const defaults = OiListViewSettings(
-        activeFilters: {'status': 'active'},
-      );
+      const defaults = OiListViewSettings(activeFilters: {'status': 'active'});
       final merged = saved.mergeWith(defaults);
       expect(merged.activeFilters, {'status': 'active'});
     });
 
     test('mergeWith: non-empty activeFilters preserved', () {
-      const saved = OiListViewSettings(
-        activeFilters: {'mine': 'yes'},
-      );
-      const defaults = OiListViewSettings(
-        activeFilters: {'status': 'active'},
-      );
+      const saved = OiListViewSettings(activeFilters: {'mine': 'yes'});
+      const defaults = OiListViewSettings(activeFilters: {'status': 'active'});
       final merged = saved.mergeWith(defaults);
       expect(merged.activeFilters, {'mine': 'yes'});
     });
@@ -209,14 +199,8 @@ void main() {
     });
 
     test('hashCode is same for equal instances', () {
-      const a = OiListViewSettings(
-        activeFilters: {'x': 'y'},
-        pageSize: 10,
-      );
-      const b = OiListViewSettings(
-        activeFilters: {'x': 'y'},
-        pageSize: 10,
-      );
+      const a = OiListViewSettings(activeFilters: {'x': 'y'}, pageSize: 10);
+      const b = OiListViewSettings(activeFilters: {'x': 'y'}, pageSize: 10);
       expect(a.hashCode, equals(b.hashCode));
     });
 

@@ -160,8 +160,7 @@ class _OiCommandBarState extends State<OiCommandBar> {
       } else {
         _filteredCommands = _substringFilter(_activeCommands, query);
       }
-      _highlightedIndex =
-          _filteredCommands.isEmpty ? -1 : 0;
+      _highlightedIndex = _filteredCommands.isEmpty ? -1 : 0;
     });
   }
 
@@ -172,8 +171,9 @@ class _OiCommandBarState extends State<OiCommandBar> {
         final matchLabel = cmd.label.toLowerCase().contains(lower);
         final matchDesc =
             cmd.description?.toLowerCase().contains(lower) ?? false;
-        final matchKeywords =
-            cmd.keywords.any((k) => k.toLowerCase().contains(lower));
+        final matchKeywords = cmd.keywords.any(
+          (k) => k.toLowerCase().contains(lower),
+        );
         return matchLabel || matchDesc || matchKeywords;
       }).toList(),
     );
@@ -259,8 +259,7 @@ class _OiCommandBarState extends State<OiCommandBar> {
         _parentLabel = cmd.label;
         _textController.clear();
         _filteredCommands = _sortedCommands(cmd.children!);
-        _highlightedIndex =
-            _filteredCommands.isEmpty ? -1 : 0;
+        _highlightedIndex = _filteredCommands.isEmpty ? -1 : 0;
       });
       return;
     }
@@ -274,8 +273,7 @@ class _OiCommandBarState extends State<OiCommandBar> {
       _parentLabel = null;
       _textController.clear();
       _filteredCommands = _sortedCommands(widget.commands);
-      _highlightedIndex =
-          _filteredCommands.isEmpty ? -1 : 0;
+      _highlightedIndex = _filteredCommands.isEmpty ? -1 : 0;
     });
   }
 
@@ -302,16 +300,20 @@ class _OiCommandBarState extends State<OiCommandBar> {
 
     if (event.logicalKey == LogicalKeyboardKey.arrowDown) {
       setState(() {
-        _highlightedIndex =
-            (_highlightedIndex + 1).clamp(0, _filteredCommands.length - 1);
+        _highlightedIndex = (_highlightedIndex + 1).clamp(
+          0,
+          _filteredCommands.length - 1,
+        );
       });
       return KeyEventResult.handled;
     }
 
     if (event.logicalKey == LogicalKeyboardKey.arrowUp) {
       setState(() {
-        _highlightedIndex =
-            (_highlightedIndex - 1).clamp(0, _filteredCommands.length - 1);
+        _highlightedIndex = (_highlightedIndex - 1).clamp(
+          0,
+          _filteredCommands.length - 1,
+        );
       });
       return KeyEventResult.handled;
     }
@@ -365,8 +367,8 @@ class _OiCommandBarState extends State<OiCommandBar> {
   Widget build(BuildContext context) {
     final colors = context.colors;
     final grouped = _grouped;
-    final highlightedCommand = _highlightedIndex >= 0 &&
-            _highlightedIndex < _filteredCommands.length
+    final highlightedCommand =
+        _highlightedIndex >= 0 && _highlightedIndex < _filteredCommands.length
         ? _filteredCommands[_highlightedIndex]
         : null;
 
@@ -411,8 +413,7 @@ class _OiCommandBarState extends State<OiCommandBar> {
                         ),
                         child: Text(
                           _parentLabel ?? 'Back',
-                          style:
-                              TextStyle(fontSize: 12, color: colors.text),
+                          style: TextStyle(fontSize: 12, color: colors.text),
                         ),
                       ),
                     ),
@@ -429,10 +430,7 @@ class _OiCommandBarState extends State<OiCommandBar> {
                       leading: Padding(
                         padding: const EdgeInsets.only(right: 8),
                         child: Icon(
-                          const IconData(
-                            0xe5c5,
-                            fontFamily: 'MaterialIcons',
-                          ),
+                          const IconData(0xe5c5, fontFamily: 'MaterialIcons'),
                           size: 16,
                           color: colors.textMuted,
                         ),
@@ -447,9 +445,7 @@ class _OiCommandBarState extends State<OiCommandBar> {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Expanded(
-                    child: _buildCommandList(context, grouped),
-                  ),
+                  Expanded(child: _buildCommandList(context, grouped)),
                   if (widget.previewBuilder != null &&
                       highlightedCommand != null)
                     Container(
@@ -568,8 +564,7 @@ class _OiCommandBarState extends State<OiCommandBar> {
                   if (cmd.description != null)
                     Text(
                       cmd.description!,
-                      style:
-                          TextStyle(fontSize: 12, color: colors.textMuted),
+                      style: TextStyle(fontSize: 12, color: colors.textMuted),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -589,8 +584,10 @@ class _OiCommandBarState extends State<OiCommandBar> {
               Padding(
                 padding: const EdgeInsets.only(left: 8),
                 child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 6,
+                    vertical: 2,
+                  ),
                   decoration: BoxDecoration(
                     color: colors.surfaceSubtle,
                     borderRadius: BorderRadius.circular(4),

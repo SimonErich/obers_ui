@@ -156,12 +156,11 @@ void main() {
       expect(find.text('5'), findsOneWidget);
     });
 
-    testWidgets('keyboard navigation with arrow keys and enter',
-        (tester) async {
+    testWidgets('keyboard navigation with arrow keys and enter', (
+      tester,
+    ) async {
       String? selected;
-      await tester.pumpObers(
-        _sidebar(onSelect: (id) => selected = id),
-      );
+      await tester.pumpObers(_sidebar(onSelect: (id) => selected = id));
 
       // Focus the sidebar.
       await tester.tap(find.text('Home'));
@@ -189,10 +188,7 @@ void main() {
 
     testWidgets('header and footer render', (tester) async {
       await tester.pumpObers(
-        _sidebar(
-          header: const Text('Header'),
-          footer: const Text('Footer'),
-        ),
+        _sidebar(header: const Text('Header'), footer: const Text('Footer')),
       );
 
       expect(find.text('Header'), findsOneWidget);
@@ -201,9 +197,7 @@ void main() {
 
     testWidgets('onSelect fires when item is tapped', (tester) async {
       String? selected;
-      await tester.pumpObers(
-        _sidebar(onSelect: (id) => selected = id),
-      );
+      await tester.pumpObers(_sidebar(onSelect: (id) => selected = id));
 
       await tester.tap(find.text('Home'));
       await tester.pumpAndSettle();
@@ -213,9 +207,7 @@ void main() {
 
     testWidgets('disabled items are not selectable', (tester) async {
       String? selected;
-      await tester.pumpObers(
-        _sidebar(onSelect: (id) => selected = id),
-      );
+      await tester.pumpObers(_sidebar(onSelect: (id) => selected = id));
 
       // Tap the disabled item — the OiTappable should prevent the tap.
       await tester.tap(find.text('Disabled'));

@@ -130,8 +130,9 @@ void main() {
   });
 
   // 5. Weekend shading renders via CustomPaint when showWeekends is true.
-  testWidgets('weekend shading is present when showWeekends is true',
-      (tester) async {
+  testWidgets('weekend shading is present when showWeekends is true', (
+    tester,
+  ) async {
     await tester.pumpObers(_gantt());
     // The weekend painter is rendered via CustomPaint. Verify it exists.
     expect(find.byType(CustomPaint), findsWidgets);
@@ -159,10 +160,7 @@ void main() {
   testWidgets('onTaskTap fires when task bar is tapped', (tester) async {
     OiGanttTask? tapped;
     await tester.pumpObers(
-      _gantt(
-        onTaskTap: (task) => tapped = task,
-        showDependencies: false,
-      ),
+      _gantt(onTaskTap: (task) => tapped = task, showDependencies: false),
     );
     await tester.tap(find.byKey(const ValueKey('gantt_task_t1')));
     await tester.pump();
@@ -181,27 +179,23 @@ void main() {
   testWidgets('progress fill widget is rendered for tasks', (tester) async {
     await tester.pumpObers(_gantt());
     // Progress fill keys.
-    expect(
-      find.byKey(const ValueKey('gantt_progress_t1')),
-      findsOneWidget,
-    );
-    expect(
-      find.byKey(const ValueKey('gantt_progress_t2')),
-      findsOneWidget,
-    );
+    expect(find.byKey(const ValueKey('gantt_progress_t1')), findsOneWidget);
+    expect(find.byKey(const ValueKey('gantt_progress_t2')), findsOneWidget);
   });
 
   // 12. Dependencies drawn as arrows (via CustomPaint).
-  testWidgets('dependencies are drawn when showDependencies is true',
-      (tester) async {
+  testWidgets('dependencies are drawn when showDependencies is true', (
+    tester,
+  ) async {
     await tester.pumpObers(_gantt());
     // The dependency painter is rendered via CustomPaint.
     expect(find.byType(CustomPaint), findsWidgets);
   });
 
   // 13. No dependencies when showDependencies is false.
-  testWidgets('dependencies are not drawn when showDependencies is false',
-      (tester) async {
+  testWidgets('dependencies are not drawn when showDependencies is false', (
+    tester,
+  ) async {
     // Count CustomPaint widgets with and without dependencies.
     await tester.pumpObers(_gantt());
     final withDeps = tester.widgetList(find.byType(CustomPaint)).length;
@@ -239,10 +233,7 @@ void main() {
       ),
     ];
     await tester.pumpObers(
-      _gantt(
-        tasks: groupedTasks,
-        groupBy: (task) => task.group!,
-      ),
+      _gantt(tasks: groupedTasks, groupBy: (task) => task.group!),
     );
     // Group headers should be rendered.
     expect(find.text('Phase 1'), findsWidgets);
@@ -264,23 +255,19 @@ void main() {
       _gantt(
         tasks: groupedTasks,
         groupBy: (task) => task.group!,
-        groupHeader: (key) => Text(
-          'Group: $key',
-          key: ValueKey('custom_header_$key'),
-        ),
+        groupHeader: (key) =>
+            Text('Group: $key', key: ValueKey('custom_header_$key')),
       ),
     );
-    expect(
-      find.byKey(const ValueKey('custom_header_Alpha')),
-      findsOneWidget,
-    );
+    expect(find.byKey(const ValueKey('custom_header_Alpha')), findsOneWidget);
   });
 
   // 16. Semantics label is applied.
   testWidgets('semantics label is applied', (tester) async {
     await tester.pumpObers(_gantt(label: 'Project Plan'));
     final semantics = find.byWidgetPredicate(
-      (widget) => widget is Semantics && widget.properties.label == 'Project Plan',
+      (widget) =>
+          widget is Semantics && widget.properties.label == 'Project Plan',
     );
     expect(semantics, findsOneWidget);
   });

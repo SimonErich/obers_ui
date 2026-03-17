@@ -10,9 +10,7 @@ import '../../../helpers/pump_app.dart';
 void main() {
   testWidgets('renders children inside a Wrap', (tester) async {
     await tester.pumpObers(
-      const OiWrapLayout(
-        children: [Text('A'), Text('B'), Text('C')],
-      ),
+      const OiWrapLayout(children: [Text('A'), Text('B'), Text('C')]),
     );
     expect(find.byType(Wrap), findsOneWidget);
     expect(find.text('A'), findsOneWidget);
@@ -22,11 +20,7 @@ void main() {
 
   testWidgets('passes spacing and runSpacing to Wrap', (tester) async {
     await tester.pumpObers(
-      const OiWrapLayout(
-        spacing: 8,
-        runSpacing: 16,
-        children: [Text('X')],
-      ),
+      const OiWrapLayout(spacing: 8, runSpacing: 16, children: [Text('X')]),
     );
     final wrap = tester.widget<Wrap>(find.byType(Wrap));
     expect(wrap.spacing, 8);
@@ -46,10 +40,7 @@ void main() {
 
   testWidgets('passes direction to Wrap', (tester) async {
     await tester.pumpObers(
-      const OiWrapLayout(
-        direction: Axis.vertical,
-        children: [Text('X')],
-      ),
+      const OiWrapLayout(direction: Axis.vertical, children: [Text('X')]),
     );
     final wrap = tester.widget<Wrap>(find.byType(Wrap));
     expect(wrap.direction, Axis.vertical);

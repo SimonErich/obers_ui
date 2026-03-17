@@ -9,9 +9,7 @@ import '../../../helpers/pump_app.dart';
 
 void main() {
   testWidgets('renders value and label', (tester) async {
-    await tester.pumpObers(
-      const OiMetric(label: 'Revenue', value: r'$1,234'),
-    );
+    await tester.pumpObers(const OiMetric(label: 'Revenue', value: r'$1,234'));
     expect(find.text(r'$1,234'), findsOneWidget);
     expect(find.text('Revenue'), findsOneWidget);
   });
@@ -38,11 +36,7 @@ void main() {
 
   testWidgets('renders down trend arrow', (tester) async {
     await tester.pumpObers(
-      const OiMetric(
-        label: 'Churn',
-        value: '5',
-        trend: OiMetricTrend.down,
-      ),
+      const OiMetric(label: 'Churn', value: '5', trend: OiMetricTrend.down),
     );
     expect(find.text('↓'), findsOneWidget);
   });
@@ -59,9 +53,7 @@ void main() {
   });
 
   testWidgets('no trend indicator when trend is null', (tester) async {
-    await tester.pumpObers(
-      const OiMetric(label: 'Total', value: '0'),
-    );
+    await tester.pumpObers(const OiMetric(label: 'Total', value: '0'));
     expect(find.text('↑'), findsNothing);
     expect(find.text('↓'), findsNothing);
   });

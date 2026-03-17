@@ -11,11 +11,7 @@ void main() {
   // ── 1. active=false renders nothing in overlay ────────────────────────────
 
   testWidgets('active=false: child is not visible', (tester) async {
-    await tester.pumpObers(
-      const OiPortal(
-        child: Text('portal content'),
-      ),
-    );
+    await tester.pumpObers(const OiPortal(child: Text('portal content')));
     await tester.pump();
     expect(find.text('portal content'), findsNothing);
   });
@@ -24,10 +20,7 @@ void main() {
 
   testWidgets('active=true: child is rendered in the overlay', (tester) async {
     await tester.pumpObers(
-      const OiPortal(
-        active: true,
-        child: Text('portal content'),
-      ),
+      const OiPortal(active: true, child: Text('portal content')),
     );
     // Post-frame callback defers the insert; pump twice to flush it.
     await tester.pump();
@@ -44,10 +37,8 @@ void main() {
     await tester.pumpObers(
       ValueListenableBuilder<bool>(
         valueListenable: notifier,
-        builder: (context, isActive, _) => OiPortal(
-          active: isActive,
-          child: const Text('portal content'),
-        ),
+        builder: (context, isActive, _) =>
+            OiPortal(active: isActive, child: const Text('portal content')),
       ),
     );
     await tester.pump();
@@ -71,11 +62,7 @@ void main() {
   // ── 4. OiPortal itself contributes no visible widget in-tree ─────────────
 
   testWidgets('OiPortal in-tree widget is a SizedBox.shrink', (tester) async {
-    await tester.pumpObers(
-      const OiPortal(
-        child: Text('portal content'),
-      ),
-    );
+    await tester.pumpObers(const OiPortal(child: Text('portal content')));
     await tester.pump();
     // The in-tree representation is a zero-size box (SizedBox.shrink()).
     final box = tester.widget<SizedBox>(
@@ -90,18 +77,17 @@ void main() {
 
   // ── 5. child update while active marks entry as needing rebuild ───────────
 
-  testWidgets('updating child while active rebuilds the overlay entry',
-      (tester) async {
+  testWidgets('updating child while active rebuilds the overlay entry', (
+    tester,
+  ) async {
     final notifier = ValueNotifier<String>('first');
     addTearDown(notifier.dispose);
 
     await tester.pumpObers(
       ValueListenableBuilder<String>(
         valueListenable: notifier,
-        builder: (context, label, _) => OiPortal(
-          active: true,
-          child: Text(label),
-        ),
+        builder: (context, label, _) =>
+            OiPortal(active: true, child: Text(label)),
       ),
     );
     // Flush post-frame insert.

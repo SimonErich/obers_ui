@@ -9,17 +9,13 @@ import '../../../helpers/pump_app.dart';
 
 void main() {
   testWidgets('display mode shows label text', (tester) async {
-    await tester.pumpObers(
-      const OiEditableText(value: 'hello world'),
-    );
+    await tester.pumpObers(const OiEditableText(value: 'hello world'));
     expect(find.text('hello world'), findsOneWidget);
     expect(find.byType(OiTextInput), findsNothing);
   });
 
   testWidgets('tap switches to edit mode', (tester) async {
-    await tester.pumpObers(
-      const OiEditableText(value: 'hello'),
-    );
+    await tester.pumpObers(const OiEditableText(value: 'hello'));
     await tester.tap(find.text('hello'));
     await tester.pump();
     expect(find.byType(OiTextInput), findsOneWidget);
@@ -28,10 +24,7 @@ void main() {
   testWidgets('submitting input commits the value', (tester) async {
     String? committed;
     await tester.pumpObers(
-      OiEditableText(
-        value: 'old',
-        onChanged: (v) => committed = v,
-      ),
+      OiEditableText(value: 'old', onChanged: (v) => committed = v),
     );
     await tester.tap(find.text('old'));
     await tester.pump();

@@ -79,10 +79,7 @@ class OiCursorPresence extends StatelessWidget {
             top: cursor.position.dy,
             child: Opacity(
               opacity: opacity,
-              child: _CursorWidget(
-                cursor: cursor,
-                showName: showNames,
-              ),
+              child: _CursorWidget(cursor: cursor, showName: showNames),
             ),
           );
         }),
@@ -92,10 +89,7 @@ class OiCursorPresence extends StatelessWidget {
 }
 
 class _CursorWidget extends StatelessWidget {
-  const _CursorWidget({
-    required this.cursor,
-    required this.showName,
-  });
+  const _CursorWidget({required this.cursor, required this.showName});
 
   final OiRemoteCursor cursor;
   final bool showName;

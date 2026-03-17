@@ -76,7 +76,11 @@ class OiDiffView extends StatelessWidget {
 
   Widget _buildUnified(BuildContext context) {
     final colors = context.colors;
-    const monoStyle = TextStyle(fontFamily: 'monospace', fontSize: 13, height: 1.5);
+    const monoStyle = TextStyle(
+      fontFamily: 'monospace',
+      fontSize: 13,
+      height: 1.5,
+    );
 
     return Container(
       decoration: BoxDecoration(
@@ -91,20 +95,20 @@ class OiDiffView extends StatelessWidget {
           final bg = line.added
               ? colors.success.base.withValues(alpha: 0.12)
               : line.removed
-                  ? colors.error.base.withValues(alpha: 0.12)
-                  : null;
+              ? colors.error.base.withValues(alpha: 0.12)
+              : null;
 
           final prefix = line.added
               ? '+ '
               : line.removed
-                  ? '- '
-                  : '  ';
+              ? '- '
+              : '  ';
 
           final textColor = line.added
               ? colors.success.base
               : line.removed
-                  ? colors.error.base
-                  : colors.text;
+              ? colors.error.base
+              : colors.text;
 
           Widget row = Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 1),
@@ -138,11 +142,17 @@ class OiDiffView extends StatelessWidget {
 
   Widget _buildSideBySide(BuildContext context) {
     final colors = context.colors;
-    const monoStyle = TextStyle(fontFamily: 'monospace', fontSize: 13, height: 1.5);
+    const monoStyle = TextStyle(
+      fontFamily: 'monospace',
+      fontSize: 13,
+      height: 1.5,
+    );
 
     final removed = lines.where((l) => l.removed || l.unchanged).toList();
     final added = lines.where((l) => l.added || l.unchanged).toList();
-    final maxLen = removed.length > added.length ? removed.length : added.length;
+    final maxLen = removed.length > added.length
+        ? removed.length
+        : added.length;
 
     Widget column(List<OiDiffLine> colLines, {required bool isAddedSide}) {
       return Expanded(
@@ -155,13 +165,13 @@ class OiDiffView extends StatelessWidget {
             final bg = isAddedSide && line.added
                 ? colors.success.base.withValues(alpha: 0.12)
                 : !isAddedSide && line.removed
-                    ? colors.error.base.withValues(alpha: 0.12)
-                    : null;
+                ? colors.error.base.withValues(alpha: 0.12)
+                : null;
             final textColor = isAddedSide && line.added
                 ? colors.success.base
                 : !isAddedSide && line.removed
-                    ? colors.error.base
-                    : colors.text;
+                ? colors.error.base
+                : colors.text;
 
             Widget cell = Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 1),

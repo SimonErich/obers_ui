@@ -110,9 +110,7 @@ void main() {
 
   testWidgets('onSelect fires when result is tapped', (tester) async {
     OiSearchResult? selected;
-    await tester.pumpObers(
-      _search(onSelect: (r) => selected = r),
-    );
+    await tester.pumpObers(_search(onSelect: (r) => selected = r));
 
     final editableTexts = find.byType(EditableText);
     await tester.enterText(editableTexts.first, 'main');
@@ -127,9 +125,7 @@ void main() {
 
   testWidgets('onSelect fires via keyboard enter', (tester) async {
     OiSearchResult? selected;
-    await tester.pumpObers(
-      _search(onSelect: (r) => selected = r),
-    );
+    await tester.pumpObers(_search(onSelect: (r) => selected = r));
 
     final editableTexts = find.byType(EditableText);
     await tester.enterText(editableTexts.first, 'main');
@@ -146,9 +142,7 @@ void main() {
 
   testWidgets('escape calls onDismiss', (tester) async {
     var dismissed = false;
-    await tester.pumpObers(
-      _search(onDismiss: () => dismissed = true),
-    );
+    await tester.pumpObers(_search(onDismiss: () => dismissed = true));
 
     await tester.sendKeyEvent(LogicalKeyboardKey.escape);
     await tester.pump();
@@ -164,9 +158,7 @@ void main() {
       search: (query) => completer.future,
     );
 
-    await tester.pumpObers(
-      _search(sources: [slowSource]),
-    );
+    await tester.pumpObers(_search(sources: [slowSource]));
 
     final editableTexts = find.byType(EditableText);
     await tester.enterText(editableTexts.first, 'test');
@@ -186,9 +178,7 @@ void main() {
       search: (query) async => [],
     );
 
-    await tester.pumpObers(
-      _search(sources: [emptySource]),
-    );
+    await tester.pumpObers(_search(sources: [emptySource]));
 
     final editableTexts = find.byType(EditableText);
     await tester.enterText(editableTexts.first, 'nothing');
@@ -200,12 +190,15 @@ void main() {
   testWidgets('semantics include label', (tester) async {
     await tester.pumpObers(_search());
 
-    final semanticsWidgets =
-        tester.widgetList<Semantics>(find.byType(Semantics));
+    final semanticsWidgets = tester.widgetList<Semantics>(
+      find.byType(Semantics),
+    );
     final matching = semanticsWidgets
-        .where((s) =>
-            s.properties.label != null &&
-            s.properties.label!.contains('Global Search'))
+        .where(
+          (s) =>
+              s.properties.label != null &&
+              s.properties.label!.contains('Global Search'),
+        )
         .toList();
     expect(matching, hasLength(1));
   });
@@ -238,10 +231,7 @@ void main() {
     );
 
     await tester.pumpObers(
-      _search(
-        sources: [source],
-        debounce: const Duration(milliseconds: 300),
-      ),
+      _search(sources: [source], debounce: const Duration(milliseconds: 300)),
     );
 
     final editableTexts = find.byType(EditableText);

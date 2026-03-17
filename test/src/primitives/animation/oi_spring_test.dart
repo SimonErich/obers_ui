@@ -27,10 +27,7 @@ void main() {
 
   testWidgets('wraps output in AnimatedBuilder', (tester) async {
     await tester.pumpObers(
-      OiSpring(
-        value: 0,
-        builder: (_, __, ___) => const SizedBox(),
-      ),
+      OiSpring(value: 0, builder: (_, __, ___) => const SizedBox()),
     );
     await tester.pump();
 
@@ -58,8 +55,9 @@ void main() {
 
   // ── 4. value change triggers spring animation ─────────────────────────────
 
-  testWidgets('value change: controller animates toward new target',
-      (tester) async {
+  testWidgets('value change: controller animates toward new target', (
+    tester,
+  ) async {
     final notifier = ValueNotifier<double>(0);
 
     await tester.pumpObers(
@@ -90,8 +88,9 @@ void main() {
 
   // ── 5. custom spring parameters accepted without error ────────────────────
 
-  testWidgets('custom stiffness/damping/mass renders without error',
-      (tester) async {
+  testWidgets('custom stiffness/damping/mass renders without error', (
+    tester,
+  ) async {
     await tester.pumpObers(
       OiSpring(
         value: 1,

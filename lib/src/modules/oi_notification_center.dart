@@ -201,8 +201,7 @@ class OiNotificationCenter extends StatelessWidget {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Icon(
-                          const IconData(0xe7f5,
-                              fontFamily: 'MaterialIcons'),
+                          const IconData(0xe7f5, fontFamily: 'MaterialIcons'),
                           size: 48,
                           color: colors.textMuted,
                         ),
@@ -227,7 +226,9 @@ class OiNotificationCenter extends StatelessWidget {
   }
 
   Widget _buildNotificationTile(
-      BuildContext context, OiNotification notification) {
+    BuildContext context,
+    OiNotification notification,
+  ) {
     final colors = context.colors;
     final spacing = context.spacing;
 
@@ -240,10 +241,10 @@ class OiNotificationCenter extends StatelessWidget {
           vertical: spacing.sm,
         ),
         decoration: BoxDecoration(
-          color: notification.read ? null : colors.primary.muted.withValues(alpha: 0.08),
-          border: Border(
-            bottom: BorderSide(color: colors.borderSubtle),
-          ),
+          color: notification.read
+              ? null
+              : colors.primary.muted.withValues(alpha: 0.08),
+          border: Border(bottom: BorderSide(color: colors.borderSubtle)),
         ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -271,8 +272,9 @@ class OiNotificationCenter extends StatelessWidget {
                     style: TextStyle(
                       color: colors.text,
                       fontSize: 14,
-                      fontWeight:
-                          notification.read ? FontWeight.w400 : FontWeight.w600,
+                      fontWeight: notification.read
+                          ? FontWeight.w400
+                          : FontWeight.w600,
                     ),
                   ),
                   if (notification.body != null)
@@ -292,10 +294,7 @@ class OiNotificationCenter extends StatelessWidget {
                     padding: EdgeInsets.only(top: spacing.xs),
                     child: Text(
                       _formatTimestamp(notification.timestamp),
-                      style: TextStyle(
-                        color: colors.textMuted,
-                        fontSize: 11,
-                      ),
+                      style: TextStyle(color: colors.textMuted, fontSize: 11),
                     ),
                   ),
                 ],

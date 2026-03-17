@@ -29,7 +29,11 @@ void main() {
       await tester.pumpObers(
         OiKanban<String>(
           columns: const [
-            OiKanbanColumn(key: 'col1', title: 'Column', items: ['Card A', 'Card B']),
+            OiKanbanColumn(
+              key: 'col1',
+              title: 'Column',
+              items: ['Card A', 'Card B'],
+            ),
           ],
           label: 'Board',
         ),
@@ -102,9 +106,7 @@ void main() {
       var addCalled = false;
       await tester.pumpObers(
         OiKanban<String>(
-          columns: const [
-            OiKanbanColumn(key: 'a', title: 'A', items: []),
-          ],
+          columns: const [OiKanbanColumn(key: 'a', title: 'A', items: [])],
           label: 'Board',
           addColumn: true,
           onAddColumn: () => addCalled = true,
@@ -123,7 +125,11 @@ void main() {
       await tester.pumpObers(
         OiKanban<String>(
           columns: const [
-            OiKanbanColumn(key: 'wip', title: 'WIP Col', items: ['a', 'b', 'c']),
+            OiKanbanColumn(
+              key: 'wip',
+              title: 'WIP Col',
+              items: ['a', 'b', 'c'],
+            ),
           ],
           label: 'Board',
           wipLimits: const {'wip': 2},
@@ -138,9 +144,7 @@ void main() {
     testWidgets('semantics label is applied', (tester) async {
       await tester.pumpObers(
         OiKanban<String>(
-          columns: const [
-            OiKanbanColumn(key: 'a', title: 'A', items: []),
-          ],
+          columns: const [OiKanbanColumn(key: 'a', title: 'A', items: [])],
           label: 'My Board',
         ),
         surfaceSize: const Size(800, 600),

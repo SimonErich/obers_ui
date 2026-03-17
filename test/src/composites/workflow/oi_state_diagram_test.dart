@@ -61,10 +61,7 @@ void main() {
   testWidgets('state nodes have expected keys', (tester) async {
     await tester.pumpObers(_diagram());
     expect(find.byKey(const ValueKey('oi_state_node_idle')), findsOneWidget);
-    expect(
-      find.byKey(const ValueKey('oi_state_node_loading')),
-      findsOneWidget,
-    );
+    expect(find.byKey(const ValueKey('oi_state_node_loading')), findsOneWidget);
     expect(find.byKey(const ValueKey('oi_state_node_done')), findsOneWidget);
   });
 
@@ -106,7 +103,7 @@ void main() {
         key: 'start',
         label: 'Start',
         position: Offset(10, 50),
-        isInitial: true,
+        initial: true,
       ),
     ];
     await tester.pumpObers(
@@ -125,24 +122,19 @@ void main() {
         key: 'end',
         label: 'End',
         position: Offset(10, 50),
-        isFinal: true,
+        terminal: true,
       ),
     ];
     await tester.pumpObers(
       _diagram(states: finalStates, transitions: const []),
     );
-    expect(
-      find.byKey(const ValueKey('oi_state_final_end')),
-      findsOneWidget,
-    );
+    expect(find.byKey(const ValueKey('oi_state_final_end')), findsOneWidget);
   });
 
   // 8. onStateSelect fires when a state is tapped.
   testWidgets('onStateSelect fires with correct key', (tester) async {
     Object? selectedKey;
-    await tester.pumpObers(
-      _diagram(onStateSelect: (key) => selectedKey = key),
-    );
+    await tester.pumpObers(_diagram(onStateSelect: (key) => selectedKey = key));
     await tester.tap(find.text('Loading'));
     await tester.pump();
     expect(selectedKey, 'loading');
@@ -151,9 +143,7 @@ void main() {
   // 9. onStateSelect fires for different states.
   testWidgets('onStateSelect fires for first state', (tester) async {
     Object? selectedKey;
-    await tester.pumpObers(
-      _diagram(onStateSelect: (key) => selectedKey = key),
-    );
+    await tester.pumpObers(_diagram(onStateSelect: (key) => selectedKey = key));
     await tester.tap(find.text('Idle'));
     await tester.pump();
     expect(selectedKey, 'idle');
@@ -181,9 +171,7 @@ void main() {
 
   // 12. Empty states list renders without errors.
   testWidgets('empty states list renders without errors', (tester) async {
-    await tester.pumpObers(
-      _diagram(states: const [], transitions: const []),
-    );
+    await tester.pumpObers(_diagram(states: const [], transitions: const []));
     expect(find.byType(SizedBox), findsWidgets);
   });
 
@@ -218,22 +206,20 @@ void main() {
   });
 
   // 15. Transition with custom color is accepted.
-  testWidgets('transition with custom color renders without error',
-      (tester) async {
+  testWidgets('transition with custom color renders without error', (
+    tester,
+  ) async {
     const customTransitions = [
-      OiStateTransition(
-        from: 'idle',
-        to: 'loading',
-        color: Color(0xFF00FF00),
-      ),
+      OiStateTransition(from: 'idle', to: 'loading', color: Color(0xFF00FF00)),
     ];
     await tester.pumpObers(_diagram(transitions: customTransitions));
     expect(find.byType(CustomPaint), findsWidgets);
   });
 
   // 16. No onStateSelect means tapping does not throw.
-  testWidgets('tapping state without onStateSelect does not throw',
-      (tester) async {
+  testWidgets('tapping state without onStateSelect does not throw', (
+    tester,
+  ) async {
     await tester.pumpObers(_diagram());
     await tester.tap(find.text('Idle'));
     await tester.pump();
@@ -241,27 +227,23 @@ void main() {
   });
 
   // 17. Both initial and final on same node.
-  testWidgets('node that is both initial and final renders both markers',
-      (tester) async {
+  testWidgets('node that is both initial and final renders both markers', (
+    tester,
+  ) async {
     const bothStates = [
       OiStateNode(
         key: 'both',
         label: 'Both',
         position: Offset(30, 50),
-        isInitial: true,
-        isFinal: true,
+        initial: true,
+        terminal: true,
       ),
     ];
-    await tester.pumpObers(
-      _diagram(states: bothStates, transitions: const []),
-    );
+    await tester.pumpObers(_diagram(states: bothStates, transitions: const []));
     expect(
       find.byKey(const ValueKey('oi_state_initial_marker')),
       findsOneWidget,
     );
-    expect(
-      find.byKey(const ValueKey('oi_state_final_both')),
-      findsOneWidget,
-    );
+    expect(find.byKey(const ValueKey('oi_state_final_both')), findsOneWidget);
   });
 }

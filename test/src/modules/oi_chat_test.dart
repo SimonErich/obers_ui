@@ -76,8 +76,9 @@ void main() {
     expect(row.mainAxisAlignment, MainAxisAlignment.start);
   });
 
-  testWidgets('avatars show for other users when showAvatars is true',
-      (tester) async {
+  testWidgets('avatars show for other users when showAvatars is true', (
+    tester,
+  ) async {
     await tester.pumpObers(
       SizedBox(
         width: 400,
@@ -110,8 +111,9 @@ void main() {
     expect(find.text('10:30'), findsOneWidget);
   });
 
-  testWidgets('typing indicator shows when typingUsers is not empty',
-      (tester) async {
+  testWidgets('typing indicator shows when typingUsers is not empty', (
+    tester,
+  ) async {
     await tester.pumpObers(
       SizedBox(
         width: 400,
@@ -191,11 +193,7 @@ void main() {
       SizedBox(
         width: 400,
         height: 600,
-        child: OiChat(
-          messages: const [],
-          currentUserId: 'me',
-          label: 'Chat',
-        ),
+        child: OiChat(messages: const [], currentUserId: 'me', label: 'Chat'),
       ),
     );
     expect(find.text('No messages yet'), findsOneWidget);
@@ -213,9 +211,6 @@ void main() {
         ),
       ),
     );
-    expect(
-      find.bySemanticsLabel('Team Chat'),
-      findsOneWidget,
-    );
+    expect(find.bySemanticsLabel('Team Chat'), findsOneWidget);
   });
 }

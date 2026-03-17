@@ -10,7 +10,7 @@ import 'package:flutter/widgets.dart';
 class OiBreakpoint implements Comparable<OiBreakpoint> {
   /// Creates a custom breakpoint with a [name] and [minWidth].
   const OiBreakpoint(this.name, this.minWidth)
-      : assert(minWidth >= 0, 'minWidth must be >= 0');
+    : assert(minWidth >= 0, 'minWidth must be >= 0');
 
   /// Compact — phones in portrait (<600dp).
   static const OiBreakpoint compact = OiBreakpoint('compact', 0);

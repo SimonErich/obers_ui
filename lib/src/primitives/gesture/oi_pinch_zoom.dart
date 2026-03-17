@@ -82,8 +82,10 @@ class _OiPinchZoomState extends State<OiPinchZoom> {
 
   void _onScaleUpdate(ScaleUpdateDetails details) {
     setState(() {
-      final newScale =
-          (_baseScale * details.scale).clamp(widget.minScale, widget.maxScale);
+      final newScale = (_baseScale * details.scale).clamp(
+        widget.minScale,
+        widget.maxScale,
+      );
       _scale = newScale;
       if (widget.panEnabled) {
         _offset += details.focalPointDelta;

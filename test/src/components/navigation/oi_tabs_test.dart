@@ -44,11 +44,7 @@ void main() {
   testWidgets('onSelected fires with correct index on tap', (tester) async {
     int? selected;
     await tester.pumpObers(
-      OiTabs(
-        tabs: _tabs,
-        selectedIndex: 0,
-        onSelected: (i) => selected = i,
-      ),
+      OiTabs(tabs: _tabs, selectedIndex: 0, onSelected: (i) => selected = i),
     );
     await tester.tap(find.text('Beta'));
     await tester.pump();
@@ -58,11 +54,7 @@ void main() {
   testWidgets('tapping third tab calls onSelected(2)', (tester) async {
     int? selected;
     await tester.pumpObers(
-      OiTabs(
-        tabs: _tabs,
-        selectedIndex: 0,
-        onSelected: (i) => selected = i,
-      ),
+      OiTabs(tabs: _tabs, selectedIndex: 0, onSelected: (i) => selected = i),
     );
     await tester.tap(find.text('Gamma'));
     await tester.pump();
@@ -71,13 +63,11 @@ void main() {
 
   // ── Indicator styles ───────────────────────────────────────────────────────
 
-  testWidgets('underline indicator style renders without error', (tester) async {
+  testWidgets('underline indicator style renders without error', (
+    tester,
+  ) async {
     await tester.pumpObers(
-      OiTabs(
-        tabs: _tabs,
-        selectedIndex: 0,
-        onSelected: (_) {},
-      ),
+      OiTabs(tabs: _tabs, selectedIndex: 0, onSelected: (_) {}),
     );
     expect(tester.takeException(), isNull);
   });
@@ -110,8 +100,9 @@ void main() {
 
   // ── Scrollable ─────────────────────────────────────────────────────────────
 
-  testWidgets('scrollable=true wraps row in SingleChildScrollView',
-      (tester) async {
+  testWidgets('scrollable=true wraps row in SingleChildScrollView', (
+    tester,
+  ) async {
     await tester.pumpObers(
       OiTabs(
         tabs: _tabs,
@@ -139,14 +130,17 @@ void main() {
 
   // ── Keyboard navigation ────────────────────────────────────────────────────
 
-  testWidgets('selected text uses different weight from unselected',
-      (tester) async {
+  testWidgets('selected text uses different weight from unselected', (
+    tester,
+  ) async {
     await tester.pumpObers(
       OiTabs(tabs: _tabs, selectedIndex: 0, onSelected: (_) {}),
     );
     final selectedText = tester.widget<Text>(find.text('Alpha'));
     final unselectedText = tester.widget<Text>(find.text('Beta'));
-    expect(selectedText.style?.fontWeight,
-        isNot(equals(unselectedText.style?.fontWeight)));
+    expect(
+      selectedText.style?.fontWeight,
+      isNot(equals(unselectedText.style?.fontWeight)),
+    );
   });
 }

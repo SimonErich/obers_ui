@@ -21,10 +21,7 @@ Future<void> pumpAtWidth(
       data: MediaQueryData(size: Size(width, 800)),
       child: Directionality(
         textDirection: TextDirection.ltr,
-        child: OiTheme(
-          data: OiThemeData.light(),
-          child: widget,
-        ),
+        child: OiTheme(data: OiThemeData.light(), child: widget),
       ),
     ),
   );
@@ -34,11 +31,7 @@ void main() {
   // ── Basic rendering ────────────────────────────────────────────────────────
 
   testWidgets('renders as Row by default', (tester) async {
-    await tester.pumpObers(
-      const OiRow(
-        children: [Text('A'), Text('B')],
-      ),
-    );
+    await tester.pumpObers(const OiRow(children: [Text('A'), Text('B')]));
     expect(find.byType(Row), findsOneWidget);
     expect(find.text('A'), findsOneWidget);
     expect(find.text('B'), findsOneWidget);
@@ -48,26 +41,17 @@ void main() {
 
   testWidgets('inserts SizedBox with correct width for gap', (tester) async {
     await tester.pumpObers(
-      const OiRow(
-        gap: 12,
-        children: [Text('A'), Text('B'), Text('C')],
-      ),
+      const OiRow(gap: 12, children: [Text('A'), Text('B'), Text('C')]),
     );
     // Two gaps for three children.
-    final boxes =
-        tester.widgetList<SizedBox>(find.byType(SizedBox)).toList();
+    final boxes = tester.widgetList<SizedBox>(find.byType(SizedBox)).toList();
     final gapBoxes = boxes.where((b) => b.width == 12).toList();
     expect(gapBoxes, hasLength(2));
   });
 
   testWidgets('no SizedBox spacers when gap is 0', (tester) async {
-    await tester.pumpObers(
-      const OiRow(
-        children: [Text('A'), Text('B')],
-      ),
-    );
-    final boxes =
-        tester.widgetList<SizedBox>(find.byType(SizedBox)).toList();
+    await tester.pumpObers(const OiRow(children: [Text('A'), Text('B')]));
+    final boxes = tester.widgetList<SizedBox>(find.byType(SizedBox)).toList();
     expect(boxes.where((b) => b.width != null && b.width! > 0), isEmpty);
   });
 
@@ -113,8 +97,7 @@ void main() {
       ),
       400,
     );
-    final boxes =
-        tester.widgetList<SizedBox>(find.byType(SizedBox)).toList();
+    final boxes = tester.widgetList<SizedBox>(find.byType(SizedBox)).toList();
     final heightBoxes = boxes.where((b) => b.height == 8).toList();
     expect(heightBoxes, hasLength(1));
   });

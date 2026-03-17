@@ -227,8 +227,7 @@ class _TourTooltipState extends State<_TourTooltip> {
   }
 
   void _updateTargetRect() {
-    final renderObject =
-        widget.step.target.currentContext?.findRenderObject();
+    final renderObject = widget.step.target.currentContext?.findRenderObject();
     if (renderObject is RenderBox && renderObject.hasSize) {
       final offset = renderObject.localToGlobal(Offset.zero);
       final size = renderObject.size;

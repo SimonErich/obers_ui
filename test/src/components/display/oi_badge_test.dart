@@ -9,16 +9,12 @@ import '../../../helpers/pump_app.dart';
 
 void main() {
   testWidgets('renders label text', (tester) async {
-    await tester.pumpObers(
-      const OiBadge(label: 'New'),
-    );
+    await tester.pumpObers(const OiBadge(label: 'New'));
     expect(find.text('New'), findsOneWidget);
   });
 
   testWidgets('dot mode renders no text', (tester) async {
-    await tester.pumpObers(
-      const OiBadge(label: 'ignored', dot: true),
-    );
+    await tester.pumpObers(const OiBadge(label: 'ignored', dot: true));
     expect(find.text('ignored'), findsNothing);
   });
 
@@ -37,16 +33,12 @@ void main() {
   });
 
   testWidgets('renders small size', (tester) async {
-    await tester.pumpObers(
-      const OiBadge(label: 'sm', size: OiBadgeSize.small),
-    );
+    await tester.pumpObers(const OiBadge(label: 'sm', size: OiBadgeSize.small));
     expect(find.text('sm'), findsOneWidget);
   });
 
   testWidgets('renders large size', (tester) async {
-    await tester.pumpObers(
-      const OiBadge(label: 'lg', size: OiBadgeSize.large),
-    );
+    await tester.pumpObers(const OiBadge(label: 'lg', size: OiBadgeSize.large));
     expect(find.text('lg'), findsOneWidget);
   });
 
@@ -66,9 +58,7 @@ void main() {
 
   testWidgets('renders with icon', (tester) async {
     const icon = IconData(0xe318, fontFamily: 'MaterialIcons');
-    await tester.pumpObers(
-      const OiBadge(label: 'with icon', icon: icon),
-    );
+    await tester.pumpObers(const OiBadge(label: 'with icon', icon: icon));
     expect(find.text('with icon'), findsOneWidget);
     expect(find.byType(Icon), findsOneWidget);
   });

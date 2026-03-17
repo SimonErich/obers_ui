@@ -12,10 +12,7 @@ void main() {
 
   testWidgets('visible=true: child is in the tree and visible', (tester) async {
     await tester.pumpObers(
-      const OiVisibility(
-        visible: true,
-        child: Text('hello'),
-      ),
+      const OiVisibility(visible: true, child: Text('hello')),
     );
     await tester.pump();
     expect(find.text('hello'), findsOneWidget);
@@ -23,8 +20,9 @@ void main() {
 
   // ── 2. visible=false hides child ──────────────────────────────────────────
 
-  testWidgets('visible=false with transition=none: child not rendered',
-      (tester) async {
+  testWidgets('visible=false with transition=none: child not rendered', (
+    tester,
+  ) async {
     await tester.pumpObers(
       const OiVisibility(
         visible: false,
@@ -40,7 +38,9 @@ void main() {
 
   // ── 3. transition=none just shows/hides ───────────────────────────────────
 
-  testWidgets('transition=none visible=true: no FadeTransition', (tester) async {
+  testWidgets('transition=none visible=true: no FadeTransition', (
+    tester,
+  ) async {
     await tester.pumpObers(
       const OiVisibility(
         visible: true,
@@ -57,10 +57,7 @@ void main() {
 
   testWidgets('transition=fade: FadeTransition is present', (tester) async {
     await tester.pumpObers(
-      const OiVisibility(
-        visible: true,
-        child: Text('hello'),
-      ),
+      const OiVisibility(visible: true, child: Text('hello')),
     );
     await tester.pump();
     expect(find.byType(FadeTransition), findsOneWidget);
@@ -68,19 +65,21 @@ void main() {
 
   // ── 5. transition=fadeScale uses FadeTransition + ScaleTransition ─────────
 
-  testWidgets('transition=fadeScale: FadeTransition and ScaleTransition present',
-      (tester) async {
-    await tester.pumpObers(
-      const OiVisibility(
-        visible: true,
-        transition: OiTransition.fadeScale,
-        child: Text('hello'),
-      ),
-    );
-    await tester.pump();
-    expect(find.byType(FadeTransition), findsOneWidget);
-    expect(find.byType(ScaleTransition), findsOneWidget);
-  });
+  testWidgets(
+    'transition=fadeScale: FadeTransition and ScaleTransition present',
+    (tester) async {
+      await tester.pumpObers(
+        const OiVisibility(
+          visible: true,
+          transition: OiTransition.fadeScale,
+          child: Text('hello'),
+        ),
+      );
+      await tester.pump();
+      expect(find.byType(FadeTransition), findsOneWidget);
+      expect(find.byType(ScaleTransition), findsOneWidget);
+    },
+  );
 
   // ── 6. transition=slideUp uses SlideTransition ────────────────────────────
 
@@ -98,8 +97,9 @@ void main() {
 
   // ── 7. transition=slideDown uses SlideTransition ─────────────────────────
 
-  testWidgets('transition=slideDown: SlideTransition is present',
-      (tester) async {
+  testWidgets('transition=slideDown: SlideTransition is present', (
+    tester,
+  ) async {
     await tester.pumpObers(
       const OiVisibility(
         visible: true,
@@ -113,8 +113,9 @@ void main() {
 
   // ── 8. transition=slideLeft uses SlideTransition ─────────────────────────
 
-  testWidgets('transition=slideLeft: SlideTransition is present',
-      (tester) async {
+  testWidgets('transition=slideLeft: SlideTransition is present', (
+    tester,
+  ) async {
     await tester.pumpObers(
       const OiVisibility(
         visible: true,
@@ -128,8 +129,9 @@ void main() {
 
   // ── 9. transition=slideRight uses SlideTransition ────────────────────────
 
-  testWidgets('transition=slideRight: SlideTransition is present',
-      (tester) async {
+  testWidgets('transition=slideRight: SlideTransition is present', (
+    tester,
+  ) async {
     await tester.pumpObers(
       const OiVisibility(
         visible: true,
@@ -144,22 +146,24 @@ void main() {
   // ── 10. maintainState=false removes child when hidden ────────────────────
 
   testWidgets(
-      'maintainState=false transition=none: child removed from tree when hidden',
-      (tester) async {
-    await tester.pumpObers(
-      const OiVisibility(
-        visible: false,
-        transition: OiTransition.none,
-        maintainState: false,
-        child: Text('gone'),
-      ),
-    );
-    await tester.pump();
-    expect(find.text('gone'), findsNothing);
-  });
+    'maintainState=false transition=none: child removed from tree when hidden',
+    (tester) async {
+      await tester.pumpObers(
+        const OiVisibility(
+          visible: false,
+          transition: OiTransition.none,
+          maintainState: false,
+          child: Text('gone'),
+        ),
+      );
+      await tester.pump();
+      expect(find.text('gone'), findsNothing);
+    },
+  );
 
-  testWidgets('maintainState=false: child present when visible=true',
-      (tester) async {
+  testWidgets('maintainState=false: child present when visible=true', (
+    tester,
+  ) async {
     await tester.pumpObers(
       const OiVisibility(
         visible: true,
@@ -181,10 +185,8 @@ void main() {
     await tester.pumpObers(
       ValueListenableBuilder<bool>(
         valueListenable: notifier,
-        builder: (context, isVisible, _) => OiVisibility(
-          visible: isVisible,
-          child: const Text('animated'),
-        ),
+        builder: (context, isVisible, _) =>
+            OiVisibility(visible: isVisible, child: const Text('animated')),
       ),
     );
     await tester.pump();
@@ -205,39 +207,41 @@ void main() {
   // ── 12. Responsive constructor uses different transitions per breakpoint ──
 
   testWidgets(
-      'OiVisibility.responsive on compact: uses compactTransition (slideUp)',
-      (tester) async {
-    // Inject a compact-width MediaQuery directly so context.isCompact = true.
-    await tester.pumpObers(
-      const MediaQuery(
-        data: MediaQueryData(size: Size(400, 800)),
-        child: OiVisibility.responsive(
-          visible: true,
-          child: Text('responsive'),
+    'OiVisibility.responsive on compact: uses compactTransition (slideUp)',
+    (tester) async {
+      // Inject a compact-width MediaQuery directly so context.isCompact = true.
+      await tester.pumpObers(
+        const MediaQuery(
+          data: MediaQueryData(size: Size(400, 800)),
+          child: OiVisibility.responsive(
+            visible: true,
+            child: Text('responsive'),
+          ),
         ),
-      ),
-    );
-    await tester.pump();
-    // On compact we expect a SlideTransition (from slideUp).
-    expect(find.byType(SlideTransition), findsOneWidget);
-  });
+      );
+      await tester.pump();
+      // On compact we expect a SlideTransition (from slideUp).
+      expect(find.byType(SlideTransition), findsOneWidget);
+    },
+  );
 
   testWidgets(
-      'OiVisibility.responsive on expanded: uses expandedTransition (fade)',
-      (tester) async {
-    // Inject an expanded-width MediaQuery directly so context.isCompact = false.
-    await tester.pumpObers(
-      const MediaQuery(
-        data: MediaQueryData(size: Size(900, 800)),
-        child: OiVisibility.responsive(
-          visible: true,
-          child: Text('responsive'),
+    'OiVisibility.responsive on expanded: uses expandedTransition (fade)',
+    (tester) async {
+      // Inject an expanded-width MediaQuery directly so context.isCompact = false.
+      await tester.pumpObers(
+        const MediaQuery(
+          data: MediaQueryData(size: Size(900, 800)),
+          child: OiVisibility.responsive(
+            visible: true,
+            child: Text('responsive'),
+          ),
         ),
-      ),
-    );
-    await tester.pump();
-    // On expanded we expect only a FadeTransition (no SlideTransition).
-    expect(find.byType(FadeTransition), findsOneWidget);
-    expect(find.byType(SlideTransition), findsNothing);
-  });
+      );
+      await tester.pump();
+      // On expanded we expect only a FadeTransition (no SlideTransition).
+      expect(find.byType(FadeTransition), findsOneWidget);
+      expect(find.byType(SlideTransition), findsNothing);
+    },
+  );
 }

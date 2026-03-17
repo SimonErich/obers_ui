@@ -12,13 +12,17 @@ const _kIcon = IconData(0xe318, fontFamily: 'MaterialIcons');
 
 void main() {
   testWidgets('renders icon', (tester) async {
-    await tester.pumpObers(const OiIconButton(icon: _kIcon));
+    await tester.pumpObers(
+      const OiIconButton(icon: _kIcon, semanticLabel: 'Test'),
+    );
     expect(find.byIcon(_kIcon), findsOneWidget);
   });
 
   testWidgets('onTap fires when tapped', (tester) async {
     var count = 0;
-    await tester.pumpObers(OiIconButton(icon: _kIcon, onTap: () => count++));
+    await tester.pumpObers(
+      OiIconButton(icon: _kIcon, semanticLabel: 'Test', onTap: () => count++),
+    );
     await tester.tap(find.byIcon(_kIcon));
     await tester.pump();
     expect(count, 1);
@@ -27,7 +31,12 @@ void main() {
   testWidgets('onTap not called when enabled=false', (tester) async {
     var count = 0;
     await tester.pumpObers(
-      OiIconButton(icon: _kIcon, enabled: false, onTap: () => count++),
+      OiIconButton(
+        icon: _kIcon,
+        semanticLabel: 'Test',
+        enabled: false,
+        onTap: () => count++,
+      ),
     );
     await tester.tap(find.byIcon(_kIcon), warnIfMissed: false);
     await tester.pump();
@@ -36,7 +45,11 @@ void main() {
 
   testWidgets('delegates to OiButton.icon', (tester) async {
     await tester.pumpObers(
-      const OiIconButton(icon: _kIcon, variant: OiButtonVariant.primary),
+      const OiIconButton(
+        icon: _kIcon,
+        semanticLabel: 'Test',
+        variant: OiButtonVariant.primary,
+      ),
     );
     expect(find.byType(OiButton), findsOneWidget);
   });
@@ -49,8 +62,13 @@ void main() {
     await tester.pumpObers(
       const Column(
         children: [
-          OiIconButton(key: Key('md'), icon: _kIcon),
-          OiIconButton(key: Key('lg'), icon: _kIcon, size: OiButtonSize.large),
+          OiIconButton(key: Key('md'), icon: _kIcon, semanticLabel: 'Medium'),
+          OiIconButton(
+            key: Key('lg'),
+            icon: _kIcon,
+            semanticLabel: 'Large',
+            size: OiButtonSize.large,
+          ),
         ],
       ),
     );

@@ -77,7 +77,8 @@ class _OiTooltipState extends State<OiTooltip> {
 
   Widget _buildTooltipContent(BuildContext context) {
     final colors = context.colors;
-    final body = widget.content ??
+    final body =
+        widget.content ??
         Text(
           widget.message,
           style: TextStyle(

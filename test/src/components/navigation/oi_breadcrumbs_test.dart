@@ -121,8 +121,9 @@ void main() {
     expect(find.text('Hidden'), findsOneWidget);
   });
 
-  testWidgets('maxVisible not exceeded shows all items normally',
-      (tester) async {
+  testWidgets('maxVisible not exceeded shows all items normally', (
+    tester,
+  ) async {
     await tester.pumpObers(
       const OiBreadcrumbs(
         items: [

@@ -63,8 +63,7 @@ class _WState extends State<StatefulWidget> with OiSettingsMixin<_S> {
   void runUpdate(
     _S s, {
     Duration debounce = const Duration(milliseconds: 500),
-  }) =>
-      updateSettings(s, debounce: debounce);
+  }) => updateSettings(s, debounce: debounce);
 
   Future<void> runSaveNow() => saveSettingsNow();
 
@@ -92,8 +91,9 @@ void main() {
       expect(state.settingsLoaded, isTrue);
     });
 
-    testWidgets(
-        'driver with no saved data: currentSettings equals defaults', (t) async {
+    testWidgets('driver with no saved data: currentSettings equals defaults', (
+      t,
+    ) async {
       final driver = OiInMemorySettingsDriver();
       await t.pumpWidget(wrap(_W(driver: driver)));
       await t.pump();
@@ -101,8 +101,9 @@ void main() {
       expect(state.currentSettings.n, equals(0));
     });
 
-    testWidgets('driver with saved data: currentSettings is restored',
-        (t) async {
+    testWidgets('driver with saved data: currentSettings is restored', (
+      t,
+    ) async {
       final driver = OiInMemorySettingsDriver();
       await driver.save(
         namespace: 'test',
@@ -115,7 +116,9 @@ void main() {
       expect(state.currentSettings.n, equals(99));
     });
 
-    testWidgets('updateSettings changes currentSettings immediately', (t) async {
+    testWidgets('updateSettings changes currentSettings immediately', (
+      t,
+    ) async {
       await t.pumpWidget(wrap(const _W()));
       final state = t.state<_WState>(find.byType(_W))
         ..runUpdate(const _S(n: 7), debounce: const Duration(seconds: 60));
@@ -125,10 +128,12 @@ void main() {
     testWidgets('updateSettings saves after debounce', (t) async {
       final driver = OiInMemorySettingsDriver();
       await t.pumpWidget(wrap(_W(driver: driver)));
-      t.state<_WState>(find.byType(_W)).runUpdate(
-        const _S(n: 5),
-        debounce: const Duration(milliseconds: 100),
-      );
+      t
+          .state<_WState>(find.byType(_W))
+          .runUpdate(
+            const _S(n: 5),
+            debounce: const Duration(milliseconds: 100),
+          );
       final store = driver.store;
       expect(store.isEmpty, isTrue);
       await t.pump(const Duration(milliseconds: 150));
@@ -144,8 +149,9 @@ void main() {
       expect(driver.store.isNotEmpty, isTrue);
     });
 
-    testWidgets(
-        'resetSettings reverts to defaults and deletes from driver', (t) async {
+    testWidgets('resetSettings reverts to defaults and deletes from driver', (
+      t,
+    ) async {
       final driver = OiInMemorySettingsDriver();
       await driver.save(
         namespace: 'test',
@@ -163,10 +169,9 @@ void main() {
     testWidgets('dispose cancels pending save timer', (t) async {
       final driver = OiInMemorySettingsDriver();
       await t.pumpWidget(wrap(_W(driver: driver)));
-      t.state<_WState>(find.byType(_W)).runUpdate(
-        const _S(n: 1),
-        debounce: const Duration(seconds: 10),
-      );
+      t
+          .state<_WState>(find.byType(_W))
+          .runUpdate(const _S(n: 1), debounce: const Duration(seconds: 10));
       await t.pumpWidget(const SizedBox());
     });
   });

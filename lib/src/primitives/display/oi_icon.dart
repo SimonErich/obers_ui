@@ -34,8 +34,8 @@ class OiIcon extends StatelessWidget {
     this.size,
     this.color,
     super.key,
-  })  : label = '',
-        _decorative = true;
+  }) : label = '',
+       _decorative = true;
 
   /// The icon glyph to render.
   final IconData icon;
@@ -59,7 +59,8 @@ class OiIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final resolvedSize = size ??
+    final resolvedSize =
+        size ??
         context.textTheme.styleFor(OiLabelVariant.body).fontSize ??
         16.0;
 

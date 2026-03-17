@@ -6,8 +6,18 @@ import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
 const List<String> _kWeekdays = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
 
 const List<String> _kMonths = [
-  'January', 'February', 'March', 'April', 'May', 'June',
-  'July', 'August', 'September', 'October', 'November', 'December',
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December',
 ];
 
 /// A calendar date picker with optional date-range selection.
@@ -78,15 +88,13 @@ class _OiDatePickerState extends State<OiDatePicker> {
 
   void _prevMonth() {
     setState(() {
-      _displayMonth =
-          DateTime(_displayMonth.year, _displayMonth.month - 1);
+      _displayMonth = DateTime(_displayMonth.year, _displayMonth.month - 1);
     });
   }
 
   void _nextMonth() {
     setState(() {
-      _displayMonth =
-          DateTime(_displayMonth.year, _displayMonth.month + 1);
+      _displayMonth = DateTime(_displayMonth.year, _displayMonth.month + 1);
     });
   }
 
@@ -153,8 +161,11 @@ class _OiDatePickerState extends State<OiDatePicker> {
     final firstOfMonth = _displayMonth;
     // Day-of-week offset: 0=Sun, 1=Mon ... 6=Sat
     final startOffset = firstOfMonth.weekday % 7; // DateTime.weekday: 1=Mon
-    final daysInMonth =
-        DateTime(firstOfMonth.year, firstOfMonth.month + 1, 0).day;
+    final daysInMonth = DateTime(
+      firstOfMonth.year,
+      firstOfMonth.month + 1,
+      0,
+    ).day;
 
     // Build the 6-row grid cells.
     const totalCells = 42; // 6 rows × 7
@@ -165,8 +176,7 @@ class _OiDatePickerState extends State<OiDatePicker> {
         cells.add(const SizedBox.shrink());
         continue;
       }
-      final day =
-          DateTime(firstOfMonth.year, firstOfMonth.month, dayNum);
+      final day = DateTime(firstOfMonth.year, firstOfMonth.month, dayNum);
       final selected = _isSelected(day);
       final inRange = _isInRange(day);
       final endpoint = _isRangeEndpoint(day);
@@ -186,10 +196,7 @@ class _OiDatePickerState extends State<OiDatePicker> {
 
       final cell = Container(
         margin: const EdgeInsets.all(2),
-        decoration: BoxDecoration(
-          color: bgColor,
-          shape: BoxShape.circle,
-        ),
+        decoration: BoxDecoration(color: bgColor, shape: BoxShape.circle),
         child: Center(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -229,85 +236,82 @@ class _OiDatePickerState extends State<OiDatePicker> {
 
     return SingleChildScrollView(
       child: Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        // Month/year header with navigation.
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-          child: Row(
-            children: [
-              OiTappable(
-                onTap: _prevMonth,
-                child: Padding(
-                  padding: const EdgeInsets.all(8),
-                  child: Icon(
-                    const IconData(0xe5cb, fontFamily: 'MaterialIcons'),
-                    size: 20,
-                    color: colors.textMuted,
-                  ),
-                ),
-              ),
-              Expanded(
-                child: Center(
-                  child: Text(
-                    '${_kMonths[_displayMonth.month - 1]} ${_displayMonth.year}',
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
-                      color: colors.text,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Month/year header with navigation.
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+            child: Row(
+              children: [
+                OiTappable(
+                  onTap: _prevMonth,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8),
+                    child: Icon(
+                      const IconData(0xe5cb, fontFamily: 'MaterialIcons'),
+                      size: 20,
+                      color: colors.textMuted,
                     ),
                   ),
                 ),
-              ),
-              OiTappable(
-                onTap: _nextMonth,
-                child: Padding(
-                  padding: const EdgeInsets.all(8),
-                  child: Icon(
-                    const IconData(0xe5cc, fontFamily: 'MaterialIcons'),
-                    size: 20,
-                    color: colors.textMuted,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-        // Weekday headers.
-        Row(
-          children: _kWeekdays
-              .map(
-                (d) => Expanded(
+                Expanded(
                   child: Center(
                     child: Text(
-                      d,
+                      '${_kMonths[_displayMonth.month - 1]} ${_displayMonth.year}',
                       style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                        color: colors.textMuted,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                        color: colors.text,
                       ),
                     ),
                   ),
                 ),
-              )
-              .toList(),
-        ),
-        const SizedBox(height: 4),
-        // Day grid: 6 rows of 7.
-        for (int row = 0; row < 6; row++)
-          Row(
-            children: List.generate(7, (col) {
-              final idx = row * 7 + col;
-              return Expanded(
-                child: AspectRatio(
-                  aspectRatio: 1,
-                  child: cells[idx],
+                OiTappable(
+                  onTap: _nextMonth,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8),
+                    child: Icon(
+                      const IconData(0xe5cc, fontFamily: 'MaterialIcons'),
+                      size: 20,
+                      color: colors.textMuted,
+                    ),
+                  ),
                 ),
-              );
-            }),
+              ],
+            ),
           ),
-      ],
-    ),
+          // Weekday headers.
+          Row(
+            children: _kWeekdays
+                .map(
+                  (d) => Expanded(
+                    child: Center(
+                      child: Text(
+                        d,
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                          color: colors.textMuted,
+                        ),
+                      ),
+                    ),
+                  ),
+                )
+                .toList(),
+          ),
+          const SizedBox(height: 4),
+          // Day grid: 6 rows of 7.
+          for (int row = 0; row < 6; row++)
+            Row(
+              children: List.generate(7, (col) {
+                final idx = row * 7 + col;
+                return Expanded(
+                  child: AspectRatio(aspectRatio: 1, child: cells[idx]),
+                );
+              }),
+            ),
+        ],
+      ),
     );
   }
 }

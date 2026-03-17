@@ -74,8 +74,7 @@ class _OiNumberInputState extends State<OiNumberInput> {
   void initState() {
     super.initState();
     _controller = TextEditingController(text: _format(widget.value));
-    _focusNode = FocusNode()
-      ..addListener(_handleFocusChange);
+    _focusNode = FocusNode()..addListener(_handleFocusChange);
   }
 
   @override
@@ -193,9 +192,7 @@ class _OiNumberInputState extends State<OiNumberInput> {
         textAlign: TextAlign.center,
         onSubmitted: _commitText,
         enabled: widget.enabled,
-        inputFormatters: [
-          FilteringTextInputFormatter.allow(RegExp('[-0-9.]')),
-        ],
+        inputFormatters: [FilteringTextInputFormatter.allow(RegExp('[-0-9.]'))],
       ),
     );
   }

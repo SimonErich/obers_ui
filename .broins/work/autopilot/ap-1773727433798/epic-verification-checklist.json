@@ -9,6 +9,43 @@
       "cyclesUsed": 6,
       "lastVerifiedAt": "2026-03-17T08:15:58.664627Z",
       "remainingGaps": []
+    },
+    {
+      "epicId": "EPIC-0003",
+      "epicTitle": "Naming Conventions",
+      "status": "incomplete",
+      "lastPercentage": 95.0,
+      "cyclesUsed": 6,
+      "lastVerifiedAt": "2026-03-17T09:53:53.099203Z",
+      "remainingGaps": [
+        {
+          "id": "REQ-0017",
+          "title": "Booleans are descriptive",
+          "description": "Boolean parameters use descriptive adjective/noun names (enabled, dismissible, searchable, loading) rather than is/has-prefixed names.",
+          "implementationPercentage": 72,
+          "evidence": [
+            "lib/src/primitives/scroll/oi_infinite_scroll.dart:38 (moreAvailable — fixed from hasMore)",
+            "lib/src/modules/oi_list_view.dart:134 (moreAvailable — fixed from hasMore)",
+            "lib/src/modules/oi_activity_feed.dart:90 (moreAvailable — public class fixed)",
+            "lib/src/modules/oi_chat.dart:153 (olderMessagesAvailable — fixed from hasOlderMessages)",
+            "lib/src/modules/oi_file_manager.dart:26 (folder — fixed from isFolder)",
+            "lib/src/foundation/oi_platform.dart:29 (keyboardVisible — fixed from isKeyboardVisible)",
+            "lib/src/foundation/theme/oi_decoration_theme.dart:219 (linear — fixed from isLinear)",
+            "test/src/naming_conventions_test.dart (dedicated naming convention tests added)"
+          ],
+          "issues": [
+            "lib/src/modules/oi_activity_feed.dart:212 — internal _OiActivityFeedList constructor still uses `required this.hasMore` while the field at line 221 was renamed to `final bool moreAvailable`; this is an incomplete fix that produces a Dart compile error (field `hasMore` does not exist)",
+            "lib/src/modules/oi_activity_feed.dart:291,299 — internal _OiActivityEventTile has `required this.isLast` (constructor) and `final bool isLast` (field); not fixed from cycle 1",
+            "lib/src/foundation/oi_accessibility.dart:57 — public static method OiA11y.announce() has named param `bool isAssertive`; should be `assertive`",
+            "lib/src/composites/data/oi_tree.dart:142,145 — method return types `bool isExpanded()` and `bool isSelected()` caught by naming convention test regex",
+            "lib/src/composites/navigation/oi_sidebar.dart:346,377,475 — local method parameters `bool isCollapsed`, `bool isCompact`, `bool isSelected` caught by naming convention test regex",
+            "lib/src/modules/oi_kanban.dart:177 — local method parameter `bool isCollapsed` caught by naming convention test regex",
+            "Naming convention tests added but BOTH fail: test 1 (bool field prefix) and test 2 (constructor param prefix) both report violations",
+            "Coverage tracking JSON files for REQ-0015, REQ-0016, REQ-0017 still absent"
+          ],
+          "status": "partial"
+        }
+      ]
     }
   ]
 }

@@ -155,21 +155,9 @@ void main() {
   testWidgets('arrow keys navigate commands', (tester) async {
     var executedId = '';
     final cmds = [
-      OiCommand(
-        id: 'a',
-        label: 'Alpha',
-        onExecute: () => executedId = 'a',
-      ),
-      OiCommand(
-        id: 'b',
-        label: 'Beta',
-        onExecute: () => executedId = 'b',
-      ),
-      OiCommand(
-        id: 'c',
-        label: 'Gamma',
-        onExecute: () => executedId = 'c',
-      ),
+      OiCommand(id: 'a', label: 'Alpha', onExecute: () => executedId = 'a'),
+      OiCommand(id: 'b', label: 'Beta', onExecute: () => executedId = 'b'),
+      OiCommand(id: 'c', label: 'Gamma', onExecute: () => executedId = 'c'),
     ];
 
     await tester.pumpObers(_commandBar(commands: cmds));
@@ -190,9 +178,7 @@ void main() {
 
   testWidgets('escape calls onDismiss', (tester) async {
     var dismissed = false;
-    await tester.pumpObers(
-      _commandBar(onDismiss: () => dismissed = true),
-    );
+    await tester.pumpObers(_commandBar(onDismiss: () => dismissed = true));
 
     await tester.sendKeyEvent(LogicalKeyboardKey.escape);
     await tester.pump();
@@ -243,8 +229,9 @@ void main() {
     expect(find.text('Open File'), findsOneWidget);
   });
 
-  testWidgets('shortcut text shows for commands with shortcuts',
-      (tester) async {
+  testWidgets('shortcut text shows for commands with shortcuts', (
+    tester,
+  ) async {
     await tester.pumpObers(_commandBar());
 
     // The shortcut for 'Open File' is Ctrl+O.
@@ -265,22 +252,24 @@ void main() {
     await tester.pumpObers(_commandBar());
 
     // Find the Semantics node with the command bar label.
-    final semanticsWidgets =
-        tester.widgetList<Semantics>(find.byType(Semantics));
+    final semanticsWidgets = tester.widgetList<Semantics>(
+      find.byType(Semantics),
+    );
     final matching = semanticsWidgets
-        .where((s) =>
-            s.properties.label != null &&
-            s.properties.label!.contains('Command Palette'))
+        .where(
+          (s) =>
+              s.properties.label != null &&
+              s.properties.label!.contains('Command Palette'),
+        )
         .toList();
     expect(matching, hasLength(1));
   });
 
-  testWidgets('preview builder renders for highlighted command',
-      (tester) async {
+  testWidgets('preview builder renders for highlighted command', (
+    tester,
+  ) async {
     await tester.pumpObers(
-      _commandBar(
-        previewBuilder: (cmd) => Text('Preview: ${cmd.label}'),
-      ),
+      _commandBar(previewBuilder: (cmd) => Text('Preview: ${cmd.label}')),
     );
 
     // The first command is highlighted by default.
@@ -314,16 +303,8 @@ void main() {
   testWidgets('arrow up at top stays at top', (tester) async {
     var executedId = '';
     final cmds = [
-      OiCommand(
-        id: 'a',
-        label: 'Alpha',
-        onExecute: () => executedId = 'a',
-      ),
-      OiCommand(
-        id: 'b',
-        label: 'Beta',
-        onExecute: () => executedId = 'b',
-      ),
+      OiCommand(id: 'a', label: 'Alpha', onExecute: () => executedId = 'a'),
+      OiCommand(id: 'b', label: 'Beta', onExecute: () => executedId = 'b'),
     ];
 
     await tester.pumpObers(_commandBar(commands: cmds));
@@ -340,9 +321,7 @@ void main() {
   });
 
   testWidgets('substring search works when fuzzy disabled', (tester) async {
-    await tester.pumpObers(
-      _commandBar(fuzzySearch: false),
-    );
+    await tester.pumpObers(_commandBar(fuzzySearch: false));
 
     final editableTexts = find.byType(EditableText);
     await tester.enterText(editableTexts.first, 'Terminal');

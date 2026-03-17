@@ -80,7 +80,7 @@ class OiListView<T> extends StatefulWidget {
     this.onSelectionChange,
     this.selectionActions,
     this.onLoadMore,
-    this.hasMore = false,
+    this.moreAvailable = false,
     this.loading = false,
     this.emptyState,
     this.layout = OiListViewLayout.list,
@@ -131,7 +131,7 @@ class OiListView<T> extends StatefulWidget {
   final Future<void> Function()? onLoadMore;
 
   /// Whether more items are available to load.
-  final bool hasMore;
+  final bool moreAvailable;
 
   /// Whether the list is currently loading data.
   final bool loading;
@@ -169,7 +169,7 @@ class _OiListViewState<T> extends State<OiListView<T>> {
   }
 
   void _onScroll() {
-    if (!widget.hasMore || widget.loading) return;
+    if (!widget.moreAvailable || widget.loading) return;
     if (widget.onLoadMore == null) return;
     final maxScroll = _scrollController.position.maxScrollExtent;
     final currentScroll = _scrollController.position.pixels;
@@ -212,8 +212,7 @@ class _OiListViewState<T> extends State<OiListView<T>> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           _buildHeader(context),
-          if (widget.selectionActions != null &&
-              widget.selectedKeys.isNotEmpty)
+          if (widget.selectionActions != null && widget.selectedKeys.isNotEmpty)
             _buildSelectionBar(context),
           Expanded(child: _buildBody(context)),
         ],
@@ -251,8 +250,7 @@ class _OiListViewState<T> extends State<OiListView<T>> {
               controller: TextEditingController(text: widget.searchQuery),
             ),
           ],
-          if (widget.sortOptions != null &&
-              widget.sortOptions!.isNotEmpty) ...[
+          if (widget.sortOptions != null && widget.sortOptions!.isNotEmpty) ...[
             const SizedBox(height: 8),
             _buildSortBar(context),
           ],
@@ -273,8 +271,10 @@ class _OiListViewState<T> extends State<OiListView<T>> {
               child: OiTappable(
                 onTap: () => widget.onSort?.call(option),
                 child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
                   decoration: BoxDecoration(
                     color: widget.activeSort?.id == option.id
                         ? colors.primary.base.withValues(alpha: 0.1)
@@ -337,14 +337,13 @@ class _OiListViewState<T> extends State<OiListView<T>> {
     }
 
     if (widget.items.isEmpty && !widget.loading) {
-      return widget.emptyState ??
-          const OiEmptyState(title: 'No items');
+      return widget.emptyState ?? const OiEmptyState(title: 'No items');
     }
 
     return ListView.builder(
       key: const Key('oi_list_view_scroll'),
       controller: _scrollController,
-      itemCount: widget.items.length + (widget.hasMore ? 1 : 0),
+      itemCount: widget.items.length + (widget.moreAvailable ? 1 : 0),
       itemBuilder: (context, index) {
         if (index >= widget.items.length) {
           return const Padding(

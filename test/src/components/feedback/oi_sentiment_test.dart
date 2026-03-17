@@ -15,19 +15,16 @@ void main() {
   });
 
   testWidgets('renders custom emojis', (tester) async {
-    await tester.pumpObers(
-      const OiSentiment(emojis: ['🐶', '🐱']),
-    );
+    await tester.pumpObers(const OiSentiment(emojis: ['🐶', '🐱']));
     expect(find.text('🐶'), findsOneWidget);
     expect(find.text('🐱'), findsOneWidget);
   });
 
-  testWidgets('tapping an emoji fires onChanged with that emoji',
-      (tester) async {
+  testWidgets('tapping an emoji fires onChanged with that emoji', (
+    tester,
+  ) async {
     String? received;
-    await tester.pumpObers(
-      OiSentiment(onChanged: (v) => received = v),
-    );
+    await tester.pumpObers(OiSentiment(onChanged: (v) => received = v));
     await tester.tap(find.text('😄'));
     await tester.pump();
     expect(received, '😄');
@@ -43,11 +40,10 @@ void main() {
     expect(received, isNull);
   });
 
-  testWidgets('selected emoji is highlighted (widget builds without error)',
-      (tester) async {
-    await tester.pumpObers(
-      const OiSentiment(value: '🙂'),
-    );
+  testWidgets('selected emoji is highlighted (widget builds without error)', (
+    tester,
+  ) async {
+    await tester.pumpObers(const OiSentiment(value: '🙂'));
     expect(find.text('🙂'), findsOneWidget);
   });
 }

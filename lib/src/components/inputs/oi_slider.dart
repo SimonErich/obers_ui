@@ -134,8 +134,7 @@ class _OiSliderState extends State<OiSlider> {
           onHorizontalDragEnd: _handleDragEnd,
           behavior: HitTestBehavior.opaque,
           child: SizedBox(
-            height: totalHeight +
-                (widget.showLabels ? 20.0 : 0.0),
+            height: totalHeight + (widget.showLabels ? 20.0 : 0.0),
             width: double.infinity,
             child: CustomPaint(
               painter: _OiSliderPainter(
@@ -162,10 +161,7 @@ class _OiSliderState extends State<OiSlider> {
     );
 
     if (widget.label != null) {
-      slider = OiInputFrame(
-        label: widget.label,
-        child: slider,
-      );
+      slider = OiInputFrame(label: widget.label, child: slider);
     }
 
     return slider;
@@ -245,8 +241,7 @@ class _OiSliderPainter extends CustomPainter {
     );
 
     // Active portion.
-    final activeStart =
-        secondaryX != null ? primaryX : trackStart;
+    final activeStart = secondaryX != null ? primaryX : trackStart;
     final activeEnd = secondaryX ?? primaryX;
     if (activeEnd > activeStart) {
       canvas.drawLine(
@@ -283,7 +278,8 @@ class _OiSliderPainter extends CustomPainter {
       ..drawCircle(
         Offset(x, y),
         thumbRadius,
-        Paint()..color = enabled ? thumbColor : thumbColor.withValues(alpha: 0.4),
+        Paint()
+          ..color = enabled ? thumbColor : thumbColor.withValues(alpha: 0.4),
       )
       ..drawCircle(
         Offset(x, y),

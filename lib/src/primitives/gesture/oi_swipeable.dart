@@ -120,10 +120,8 @@ class _OiSwipeableState extends State<OiSwipeable> {
   Widget build(BuildContext context) {
     if (_dismissed) return const SizedBox.shrink();
 
-    final showLeading =
-        _dragOffset > 0 && widget.leadingActions.isNotEmpty;
-    final showTrailing =
-        _dragOffset < 0 && widget.trailingActions.isNotEmpty;
+    final showLeading = _dragOffset > 0 && widget.leadingActions.isNotEmpty;
+    final showTrailing = _dragOffset < 0 && widget.trailingActions.isNotEmpty;
 
     return GestureDetector(
       onHorizontalDragUpdate: _onHorizontalDragUpdate,

@@ -8,11 +8,7 @@ import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 /// {@category Composites}
 class OiAvatarStackItem {
   /// Creates an [OiAvatarStackItem].
-  const OiAvatarStackItem({
-    required this.label,
-    this.imageUrl,
-    this.initials,
-  });
+  const OiAvatarStackItem({required this.label, this.imageUrl, this.initials});
 
   /// The display name of the user. Used for the tooltip and semantic label.
   final String label;
@@ -110,10 +106,7 @@ class OiAvatarStack extends StatelessWidget {
       );
 
       if (onTap != null) {
-        avatar = GestureDetector(
-          onTap: () => onTap!(user),
-          child: avatar,
-        );
+        avatar = GestureDetector(onTap: () => onTap!(user), child: avatar);
       }
 
       children.add(
@@ -124,10 +117,7 @@ class OiAvatarStack extends StatelessWidget {
             child: Container(
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                border: Border.all(
-                  color: colors.surface,
-                  width: 2,
-                ),
+                border: Border.all(color: colors.surface, width: 2),
               ),
               child: avatar,
             ),
@@ -142,20 +132,14 @@ class OiAvatarStack extends StatelessWidget {
         Positioned(
           left: left,
           child: OiTooltip(
-            message: users
-                .skip(maxVisible)
-                .map((u) => u.label)
-                .join(', '),
+            message: users.skip(maxVisible).map((u) => u.label).join(', '),
             child: Container(
               width: d,
               height: d,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 color: colors.surfaceHover,
-                border: Border.all(
-                  color: colors.surface,
-                  width: 2,
-                ),
+                border: Border.all(color: colors.surface, width: 2),
               ),
               child: Center(
                 child: Text(

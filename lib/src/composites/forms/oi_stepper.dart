@@ -71,12 +71,16 @@ class OiStepper extends StatelessWidget {
   // ---------------------------------------------------------------------------
 
   /// Material Icons check mark.
-  static const IconData _checkIcon =
-      IconData(0xe5ca, fontFamily: 'MaterialIcons');
+  static const IconData _checkIcon = IconData(
+    0xe5ca,
+    fontFamily: 'MaterialIcons',
+  );
 
   /// Material Icons error (exclamation circle).
-  static const IconData _errorIcon =
-      IconData(0xe000, fontFamily: 'MaterialIcons');
+  static const IconData _errorIcon = IconData(
+    0xe000,
+    fontFamily: 'MaterialIcons',
+  );
 
   // ---------------------------------------------------------------------------
   // Build helpers
@@ -95,26 +99,16 @@ class OiStepper extends StatelessWidget {
   Widget? _stepIcon(BuildContext context, int index) {
     final colors = context.colors;
     if (errorSteps.contains(index)) {
-      return Icon(
-        _errorIcon,
-        size: 14,
-        color: colors.textOnPrimary,
-      );
+      return Icon(_errorIcon, size: 14, color: colors.textOnPrimary);
     }
     if (completedSteps.contains(index)) {
-      return Icon(
-        _checkIcon,
-        size: 14,
-        color: colors.textOnPrimary,
-      );
+      return Icon(_checkIcon, size: 14, color: colors.textOnPrimary);
     }
     if (stepIcons != null && index < stepIcons!.length) {
       return Icon(
         stepIcons![index],
         size: 14,
-        color: index == currentStep
-            ? colors.textOnPrimary
-            : colors.textMuted,
+        color: index == currentStep ? colors.textOnPrimary : colors.textMuted,
       );
     }
     return null;
@@ -133,7 +127,8 @@ class OiStepper extends StatelessWidget {
       width: circleSize,
       height: circleSize,
       decoration: BoxDecoration(
-        color: (completedSteps.contains(index) ||
+        color:
+            (completedSteps.contains(index) ||
                 errorSteps.contains(index) ||
                 isCurrent)
             ? color
@@ -142,7 +137,8 @@ class OiStepper extends StatelessWidget {
         border: Border.all(color: color, width: 2),
       ),
       child: Center(
-        child: icon ??
+        child:
+            icon ??
             Text(
               '${index + 1}',
               style: TextStyle(
@@ -169,23 +165,13 @@ class OiStepper extends StatelessWidget {
   Widget _buildConnector(BuildContext context, int beforeIndex) {
     final colors = context.colors;
     final isCompleted = completedSteps.contains(beforeIndex);
-    final lineColor =
-        isCompleted ? colors.success.base : colors.borderSubtle;
+    final lineColor = isCompleted ? colors.success.base : colors.borderSubtle;
 
     if (style == OiStepperStyle.horizontal) {
-      return Expanded(
-        child: Container(
-          height: 2,
-          color: lineColor,
-        ),
-      );
+      return Expanded(child: Container(height: 2, color: lineColor));
     }
 
-    return Container(
-      width: 2,
-      height: 24,
-      color: lineColor,
-    );
+    return Container(width: 2, height: 24, color: lineColor);
   }
 
   /// Builds the compact representation: "Step N of M".

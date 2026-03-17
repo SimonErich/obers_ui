@@ -69,8 +69,8 @@ class OiKanban<T> extends StatefulWidget {
   final String label;
 
   /// Called when a card is moved between columns.
-  final void Function(
-      T item, Object fromColumn, Object toColumn, int newIndex)? onCardMove;
+  final void Function(T item, Object fromColumn, Object toColumn, int newIndex)?
+  onCardMove;
 
   /// Called when columns are reordered.
   final void Function(int oldIndex, int newIndex)? onColumnReorder;
@@ -136,8 +136,7 @@ class _OiKanbanState<T> extends State<OiKanban<T>> {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            for (final column in widget.columns)
-              _buildColumn(context, column),
+            for (final column in widget.columns) _buildColumn(context, column),
             if (widget.addColumn) _buildAddColumnButton(context),
           ],
         ),
@@ -147,7 +146,7 @@ class _OiKanbanState<T> extends State<OiKanban<T>> {
 
   Widget _buildColumn(BuildContext context, OiKanbanColumn<T> column) {
     final colors = context.colors;
-    final isCollapsed = _collapsedColumns.contains(column.key);
+    final collapsed = _collapsedColumns.contains(column.key);
     final overWip = _isOverWipLimit(column);
 
     return Container(
@@ -164,8 +163,8 @@ class _OiKanbanState<T> extends State<OiKanban<T>> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          _buildColumnHeader(context, column, isCollapsed, overWip),
-          if (!isCollapsed) _buildColumnBody(context, column),
+          _buildColumnHeader(context, column, collapsed, overWip),
+          if (!collapsed) _buildColumnBody(context, column),
         ],
       ),
     );
@@ -174,7 +173,7 @@ class _OiKanbanState<T> extends State<OiKanban<T>> {
   Widget _buildColumnHeader(
     BuildContext context,
     OiKanbanColumn<T> column,
-    bool isCollapsed,
+    bool collapsed,
     bool overWip,
   ) {
     final colors = context.colors;
@@ -232,7 +231,7 @@ class _OiKanbanState<T> extends State<OiKanban<T>> {
             if (widget.collapsibleColumns) ...[
               const SizedBox(width: 4),
               Icon(
-                isCollapsed
+                collapsed
                     ? const IconData(0xe5cf, fontFamily: 'MaterialIcons')
                     : const IconData(0xe5ce, fontFamily: 'MaterialIcons'),
                 size: 16,

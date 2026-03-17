@@ -12,18 +12,15 @@ void main() {
   // ── 1. Renders child ───────────────────────────────────────────────────────
 
   testWidgets('renders child widget', (tester) async {
-    await tester.pumpObers(
-      const OiFocusTrap(
-        child: Text('inside trap'),
-      ),
-    );
+    await tester.pumpObers(const OiFocusTrap(child: Text('inside trap')));
     expect(find.text('inside trap'), findsOneWidget);
   });
 
   // ── 2. initialFocus=true: first focusable element gets focus ───────────────
 
-  testWidgets('initialFocus=true: first focusable element gets focus',
-      (tester) async {
+  testWidgets('initialFocus=true: first focusable element gets focus', (
+    tester,
+  ) async {
     final focusNode = FocusNode();
     addTearDown(focusNode.dispose);
 
@@ -43,8 +40,9 @@ void main() {
 
   // ── 3. initialFocus=false: no auto-focus ───────────────────────────────────
 
-  testWidgets('initialFocus=false: no element receives focus automatically',
-      (tester) async {
+  testWidgets('initialFocus=false: no element receives focus automatically', (
+    tester,
+  ) async {
     final focusNode = FocusNode();
     addTearDown(focusNode.dispose);
 
@@ -90,52 +88,54 @@ void main() {
 
   // ── 5. restoreFocus=true: previous focus restored after dispose ────────────
 
-  testWidgets('restoreFocus=true: previous focus node regains focus on dispose',
-      (tester) async {
-    final outerNode = FocusNode(debugLabel: 'outer');
-    addTearDown(outerNode.dispose);
+  testWidgets(
+    'restoreFocus=true: previous focus node regains focus on dispose',
+    (tester) async {
+      final outerNode = FocusNode(debugLabel: 'outer');
+      addTearDown(outerNode.dispose);
 
-    var showTrap = true;
+      var showTrap = true;
 
-    await tester.pumpObers(
-      StatefulBuilder(
-        builder: (context, setState) {
-          return SizedBox(
-            width: 400,
-            height: 400,
-            child: Column(
-              children: [
-                Focus(
-                  focusNode: outerNode,
-                  child: const SizedBox(width: 40, height: 40),
-                ),
-                if (showTrap)
-                  OiFocusTrap(
-                    initialFocus: false,
-                    child: GestureDetector(
-                      onTap: () => setState(() => showTrap = false),
-                      child: const SizedBox(width: 40, height: 40),
-                    ),
+      await tester.pumpObers(
+        StatefulBuilder(
+          builder: (context, setState) {
+            return SizedBox(
+              width: 400,
+              height: 400,
+              child: Column(
+                children: [
+                  Focus(
+                    focusNode: outerNode,
+                    child: const SizedBox(width: 40, height: 40),
                   ),
-              ],
-            ),
-          );
-        },
-      ),
-    );
+                  if (showTrap)
+                    OiFocusTrap(
+                      initialFocus: false,
+                      child: GestureDetector(
+                        onTap: () => setState(() => showTrap = false),
+                        child: const SizedBox(width: 40, height: 40),
+                      ),
+                    ),
+                ],
+              ),
+            );
+          },
+        ),
+      );
 
-    // Give focus to the outer node before the trap takes over.
-    outerNode.requestFocus();
-    await tester.pump();
-    expect(outerNode.hasPrimaryFocus, isTrue);
+      // Give focus to the outer node before the trap takes over.
+      outerNode.requestFocus();
+      await tester.pump();
+      expect(outerNode.hasPrimaryFocus, isTrue);
 
-    // Dismiss the trap by tapping the GestureDetector inside it.
-    await tester.tap(find.byType(GestureDetector), warnIfMissed: false);
-    await tester.pump();
+      // Dismiss the trap by tapping the GestureDetector inside it.
+      await tester.tap(find.byType(GestureDetector), warnIfMissed: false);
+      await tester.pump();
 
-    // The outer node should have regained focus after trap disposal.
-    expect(outerNode.hasPrimaryFocus, isTrue);
-  });
+      // The outer node should have regained focus after trap disposal.
+      expect(outerNode.hasPrimaryFocus, isTrue);
+    },
+  );
 
   // ── 6. Tab navigation stays within trap ────────────────────────────────────
 
@@ -186,15 +186,21 @@ void main() {
     // Tab forward — should stay inside the trap (move to nodeB or wrap back).
     await tester.sendKeyEvent(LogicalKeyboardKey.tab);
     await tester.pump();
-    expect(outerNode.hasPrimaryFocus, isFalse,
-        reason: 'Tab should not escape the trap to outerNode');
+    expect(
+      outerNode.hasPrimaryFocus,
+      isFalse,
+      reason: 'Tab should not escape the trap to outerNode',
+    );
 
     // Shift+Tab backward — should stay inside the trap.
     await tester.sendKeyDownEvent(LogicalKeyboardKey.shift);
     await tester.sendKeyEvent(LogicalKeyboardKey.tab);
     await tester.sendKeyUpEvent(LogicalKeyboardKey.shift);
     await tester.pump();
-    expect(outerNode.hasPrimaryFocus, isFalse,
-        reason: 'Shift+Tab should not escape the trap to outerNode');
+    expect(
+      outerNode.hasPrimaryFocus,
+      isFalse,
+      reason: 'Shift+Tab should not escape the trap to outerNode',
+    );
   });
 }

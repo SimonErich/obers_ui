@@ -10,21 +10,9 @@ import '../../../helpers/pump_app.dart';
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
 const _filters = [
-  OiFilterDefinition(
-    key: 'status',
-    label: 'Status',
-    type: OiFilterType.select,
-  ),
-  OiFilterDefinition(
-    key: 'name',
-    label: 'Name',
-    type: OiFilterType.text,
-  ),
-  OiFilterDefinition(
-    key: 'date',
-    label: 'Date',
-    type: OiFilterType.date,
-  ),
+  OiFilterDefinition(key: 'status', label: 'Status', type: OiFilterType.select),
+  OiFilterDefinition(key: 'name', label: 'Name', type: OiFilterType.text),
+  OiFilterDefinition(key: 'date', label: 'Date', type: OiFilterType.date),
 ];
 
 Widget _filterBar({
@@ -71,9 +59,7 @@ void main() {
     testWidgets('active filter shows filled chip with value', (tester) async {
       await tester.pumpObers(
         _filterBar(
-          activeFilters: const {
-            'status': OiColumnFilter(value: 'Active'),
-          },
+          activeFilters: const {'status': OiColumnFilter(value: 'Active')},
         ),
       );
 
@@ -81,14 +67,13 @@ void main() {
       expect(find.text('Status: Active'), findsOneWidget);
     });
 
-    testWidgets('removing filter calls onFilterChange without the key',
-        (tester) async {
+    testWidgets('removing filter calls onFilterChange without the key', (
+      tester,
+    ) async {
       Map<String, OiColumnFilter>? result;
       await tester.pumpObers(
         _filterBar(
-          activeFilters: const {
-            'status': OiColumnFilter(value: 'Active'),
-          },
+          activeFilters: const {'status': OiColumnFilter(value: 'Active')},
           onFilterChange: (f) => result = f,
         ),
       );
@@ -108,9 +93,7 @@ void main() {
     });
 
     testWidgets('trailing widget renders', (tester) async {
-      await tester.pumpObers(
-        _filterBar(trailing: const Text('Clear all')),
-      );
+      await tester.pumpObers(_filterBar(trailing: const Text('Clear all')));
 
       expect(find.text('Clear all'), findsOneWidget);
     });
@@ -125,9 +108,7 @@ void main() {
 
     testWidgets('applying a filter calls onFilterChange', (tester) async {
       Map<String, OiColumnFilter>? result;
-      await tester.pumpObers(
-        _filterBar(onFilterChange: (f) => result = f),
-      );
+      await tester.pumpObers(_filterBar(onFilterChange: (f) => result = f));
 
       // Tap the Name chip to open the popover.
       await tester.tap(find.text('Name'));

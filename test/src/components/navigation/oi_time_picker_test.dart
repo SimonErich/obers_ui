@@ -27,17 +27,13 @@ void main() {
   });
 
   testWidgets('24-hour mode: no AM/PM toggle shown', (tester) async {
-    await tester.pumpObers(
-      const OiTimePicker(),
-    );
+    await tester.pumpObers(const OiTimePicker());
     expect(find.text('AM'), findsNothing);
     expect(find.text('PM'), findsNothing);
   });
 
   testWidgets('12-hour mode: AM and PM buttons shown', (tester) async {
-    await tester.pumpObers(
-      const OiTimePicker(use24Hour: false),
-    );
+    await tester.pumpObers(const OiTimePicker(use24Hour: false));
     expect(find.text('AM'), findsOneWidget);
     expect(find.text('PM'), findsOneWidget);
   });

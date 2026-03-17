@@ -11,9 +11,7 @@ void main() {
   // ── Rendering ──────────────────────────────────────────────────────────────
 
   testWidgets('renders child', (tester) async {
-    await tester.pumpObers(
-      const OiContainer(child: Text('hello')),
-    );
+    await tester.pumpObers(const OiContainer(child: Text('hello')));
     expect(find.text('hello'), findsOneWidget);
   });
 
@@ -25,9 +23,7 @@ void main() {
   // ── maxWidth constraint ────────────────────────────────────────────────────
 
   testWidgets('applies maxWidth via ConstrainedBox', (tester) async {
-    await tester.pumpObers(
-      const OiContainer(maxWidth: 300, child: Text('x')),
-    );
+    await tester.pumpObers(const OiContainer(maxWidth: 300, child: Text('x')));
     final boxes = tester
         .widgetList<ConstrainedBox>(find.byType(ConstrainedBox))
         .where((b) => b.constraints.maxWidth == 300)
@@ -36,9 +32,7 @@ void main() {
   });
 
   testWidgets('maxWidth defaults to infinity when not set', (tester) async {
-    await tester.pumpObers(
-      const OiContainer(child: Text('x')),
-    );
+    await tester.pumpObers(const OiContainer(child: Text('x')));
     final boxes = tester
         .widgetList<ConstrainedBox>(find.byType(ConstrainedBox))
         .where((b) => b.constraints.maxWidth == double.infinity)
@@ -50,28 +44,21 @@ void main() {
 
   testWidgets('applies padding when provided', (tester) async {
     await tester.pumpObers(
-      const OiContainer(
-        padding: EdgeInsets.all(16),
-        child: Text('padded'),
-      ),
+      const OiContainer(padding: EdgeInsets.all(16), child: Text('padded')),
     );
     final padding = tester.widget<Padding>(find.byType(Padding));
     expect(padding.padding, const EdgeInsets.all(16));
   });
 
   testWidgets('no Padding widget when padding is null', (tester) async {
-    await tester.pumpObers(
-      const OiContainer(child: Text('no pad')),
-    );
+    await tester.pumpObers(const OiContainer(child: Text('no pad')));
     expect(find.byType(Padding), findsNothing);
   });
 
   // ── Centering ─────────────────────────────────────────────────────────────
 
   testWidgets('centered=true wraps in Center', (tester) async {
-    await tester.pumpObers(
-      const OiContainer(child: Text('centered')),
-    );
+    await tester.pumpObers(const OiContainer(child: Text('centered')));
     expect(find.byType(Center), findsOneWidget);
   });
 

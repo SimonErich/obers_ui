@@ -12,10 +12,7 @@ void main() {
 
   testWidgets('renders the anchor widget', (tester) async {
     await tester.pumpObers(
-      const OiFloating(
-        anchor: Text('anchor'),
-        child: Text('floating'),
-      ),
+      const OiFloating(anchor: Text('anchor'), child: Text('floating')),
     );
     expect(find.text('anchor'), findsOneWidget);
   });
@@ -74,8 +71,9 @@ void main() {
 
   // ── 5. autoFlip=false does not change alignment ────────────────────────────
 
-  testWidgets('autoFlip=false: uses provided alignment without flipping',
-      (tester) async {
+  testWidgets('autoFlip=false: uses provided alignment without flipping', (
+    tester,
+  ) async {
     await tester.pumpObers(
       const OiFloating(
         anchor: SizedBox(width: 80, height: 40),
@@ -138,18 +136,12 @@ void main() {
     await tester.pump();
 
     // Initially hidden.
-    expect(
-      tester.widget<Visibility>(find.byType(Visibility)).visible,
-      isFalse,
-    );
+    expect(tester.widget<Visibility>(find.byType(Visibility)).visible, isFalse);
 
     // Toggle visible=true via notifier (no hit-test issues).
     notifier.value = true;
     await tester.pump();
 
-    expect(
-      tester.widget<Visibility>(find.byType(Visibility)).visible,
-      isTrue,
-    );
+    expect(tester.widget<Visibility>(find.byType(Visibility)).visible, isTrue);
   });
 }

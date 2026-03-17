@@ -38,7 +38,8 @@ class OiCropResult {
           flippedVertical == other.flippedVertical;
 
   @override
-  int get hashCode => Object.hash(rect, rotation, flippedHorizontal, flippedVertical);
+  int get hashCode =>
+      Object.hash(rect, rotation, flippedHorizontal, flippedVertical);
 
   @override
   String toString() =>
@@ -204,7 +205,12 @@ class _OiImageCropperState extends State<OiImageCropper> {
                         alignment: Alignment.center,
                         transform: Matrix4.identity()
                           ..rotateZ(_rotationRadians)
-                          ..scaleByDouble(_flippedH ? -1.0 : 1.0, _flippedV ? -1.0 : 1.0, 1, 1),
+                          ..scaleByDouble(
+                            _flippedH ? -1.0 : 1.0,
+                            _flippedV ? -1.0 : 1.0,
+                            1,
+                            1,
+                          ),
                         child: Image(
                           key: const Key('oi_image_cropper_image'),
                           image: widget.image,
@@ -235,10 +241,7 @@ class _OiImageCropperState extends State<OiImageCropper> {
                         onPanUpdate: (d) => _onPanUpdate(d, size),
                         child: Container(
                           decoration: BoxDecoration(
-                            border: Border.all(
-                              color: colors.surface,
-                              width: 2,
-                            ),
+                            border: Border.all(color: colors.surface, width: 2),
                           ),
                         ),
                       ),
@@ -334,10 +337,10 @@ class _OiImageCropperState extends State<OiImageCropper> {
                     final arLabel = ar == 1.0
                         ? '1:1'
                         : ar == 16 / 9
-                            ? '16:9'
-                            : ar == 4 / 3
-                                ? '4:3'
-                                : ar.toStringAsFixed(2);
+                        ? '16:9'
+                        : ar == 4 / 3
+                        ? '4:3'
+                        : ar.toStringAsFixed(2);
                     return Padding(
                       padding: const EdgeInsets.only(right: 8),
                       child: GestureDetector(
@@ -440,7 +443,10 @@ class _CropOverlayPainter extends CustomPainter {
       // Left
       ..drawRect(Rect.fromLTRB(0, crop.top, crop.left, crop.bottom), paint)
       // Right
-      ..drawRect(Rect.fromLTRB(crop.right, crop.top, size.width, crop.bottom), paint);
+      ..drawRect(
+        Rect.fromLTRB(crop.right, crop.top, size.width, crop.bottom),
+        paint,
+      );
   }
 
   @override

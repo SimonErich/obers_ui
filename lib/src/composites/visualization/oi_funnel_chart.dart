@@ -7,11 +7,7 @@ import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 /// and an optional [color] override.
 class OiFunnelStage {
   /// Creates an [OiFunnelStage].
-  const OiFunnelStage({
-    required this.label,
-    required this.value,
-    this.color,
-  });
+  const OiFunnelStage({required this.label, required this.value, this.color});
 
   /// The human-readable label for this stage.
   final String label;
@@ -71,9 +67,7 @@ class OiFunnelChart extends StatelessWidget {
     if (stages.isEmpty) {
       return Semantics(
         label: label,
-        child: const SizedBox.shrink(
-          key: Key('oi_funnel_chart_empty'),
-        ),
+        child: const SizedBox.shrink(key: Key('oi_funnel_chart_empty')),
       );
     }
 
@@ -98,8 +92,7 @@ class OiFunnelChart extends StatelessWidget {
                   maxValue: maxValue,
                   availableWidth: availableWidth,
                   stageHeight: stageHeight,
-                  color: stages[i].color ??
-                      chartColors[i % chartColors.length],
+                  color: stages[i].color ?? chartColors[i % chartColors.length],
                   textColor: colors.textOnPrimary,
                   percentColor: colors.textMuted,
                 ),
@@ -123,11 +116,10 @@ class OiFunnelChart extends StatelessWidget {
   }) {
     final ratio = maxValue > 0 ? (stage.value / maxValue).clamp(0.0, 1.0) : 0.0;
     // Minimum width of 20% so the narrowest stage is still visible.
-    final stageWidth =
-        availableWidth * (0.2 + 0.8 * ratio);
+    final stageWidth = availableWidth * (0.2 + 0.8 * ratio);
 
-    final formattedValue = formatValue?.call(stage.value) ??
-        stage.value.toStringAsFixed(0);
+    final formattedValue =
+        formatValue?.call(stage.value) ?? stage.value.toStringAsFixed(0);
     final percentage = maxValue > 0
         ? (stage.value / maxValue * 100).toStringAsFixed(0)
         : '0';

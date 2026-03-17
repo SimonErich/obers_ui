@@ -68,15 +68,11 @@ class _OiFileInputState extends State<OiFileInput> {
     try {
       final result = await FilePicker.platform.pickFiles(
         allowMultiple: widget.multiple,
-        type: widget.allowedExtensions != null
-            ? FileType.custom
-            : FileType.any,
+        type: widget.allowedExtensions != null ? FileType.custom : FileType.any,
         allowedExtensions: widget.allowedExtensions,
       );
       if (result != null) {
-        final paths = result.files
-            .map((f) => f.path ?? f.name)
-            .toList();
+        final paths = result.files.map((f) => f.path ?? f.name).toList();
         widget.onChanged?.call(paths);
       }
     } finally {
@@ -142,9 +138,7 @@ class _OiFileInputState extends State<OiFileInput> {
       decoration: BoxDecoration(
         color: colors.surfaceSubtle,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          color: colors.borderSubtle,
-        ),
+        border: Border.all(color: colors.borderSubtle),
       ),
       child: Center(
         child: Text(
@@ -180,10 +174,7 @@ class _OiFileInputState extends State<OiFileInput> {
                 child: DecoratedBox(
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    border: Border.all(
-                      color: colors.primary.base,
-                      width: 2,
-                    ),
+                    border: Border.all(color: colors.primary.base, width: 2),
                   ),
                 ),
               )

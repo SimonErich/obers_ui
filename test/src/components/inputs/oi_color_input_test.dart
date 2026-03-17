@@ -14,16 +14,12 @@ void main() {
   });
 
   testWidgets('shows hex value when color provided', (tester) async {
-    await tester.pumpObers(
-      const OiColorInput(value: Color(0xFF2563EB)),
-    );
+    await tester.pumpObers(const OiColorInput(value: Color(0xFF2563EB)));
     expect(find.text('#2563eb'), findsOneWidget);
   });
 
   testWidgets('label is shown', (tester) async {
-    await tester.pumpObers(
-      const OiColorInput(label: 'Brand color'),
-    );
+    await tester.pumpObers(const OiColorInput(label: 'Brand color'));
     expect(find.text('Brand color'), findsOneWidget);
   });
 
@@ -37,24 +33,16 @@ void main() {
   testWidgets('enabled=false prevents opening picker', (tester) async {
     var called = false;
     await tester.pumpObers(
-      OiColorInput(
-        enabled: false,
-        onChanged: (_) => called = true,
-      ),
+      OiColorInput(enabled: false, onChanged: (_) => called = true),
     );
-    await tester.tap(
-      find.byType(GestureDetector).first,
-      warnIfMissed: false,
-    );
+    await tester.tap(find.byType(GestureDetector).first, warnIfMissed: false);
     await tester.pump();
     expect(called, isFalse);
   });
 
   testWidgets('onChanged can be called on color selection', (tester) async {
     final received = <Color?>[];
-    await tester.pumpObers(
-      OiColorInput(onChanged: received.add),
-    );
+    await tester.pumpObers(OiColorInput(onChanged: received.add));
     // Open picker then interact — just verify no crash.
     await tester.tap(find.byType(OiColorInput));
     await tester.pump();

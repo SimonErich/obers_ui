@@ -148,7 +148,15 @@ class OiFileUtils {
   static bool isImage(String ext) {
     final normalized = ext.toLowerCase().replaceFirst('.', '');
     return const {
-      'png', 'jpg', 'jpeg', 'gif', 'svg', 'webp', 'bmp', 'ico', 'tiff',
+      'png',
+      'jpg',
+      'jpeg',
+      'gif',
+      'svg',
+      'webp',
+      'bmp',
+      'ico',
+      'tiff',
       'tif',
     }.contains(normalized);
   }
@@ -157,7 +165,14 @@ class OiFileUtils {
   static bool isVideo(String ext) {
     final normalized = ext.toLowerCase().replaceFirst('.', '');
     return const {
-      'mp4', 'avi', 'mov', 'wmv', 'mkv', 'webm', 'flv', 'm4v',
+      'mp4',
+      'avi',
+      'mov',
+      'wmv',
+      'mkv',
+      'webm',
+      'flv',
+      'm4v',
     }.contains(normalized);
   }
 
@@ -165,7 +180,13 @@ class OiFileUtils {
   static bool isAudio(String ext) {
     final normalized = ext.toLowerCase().replaceFirst('.', '');
     return const {
-      'mp3', 'wav', 'flac', 'aac', 'ogg', 'wma', 'm4a',
+      'mp3',
+      'wav',
+      'flac',
+      'aac',
+      'ogg',
+      'wma',
+      'm4a',
     }.contains(normalized);
   }
 
@@ -173,8 +194,19 @@ class OiFileUtils {
   static bool isDocument(String ext) {
     final normalized = ext.toLowerCase().replaceFirst('.', '');
     return const {
-      'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt', 'csv',
-      'rtf', 'odt', 'ods', 'odp',
+      'pdf',
+      'doc',
+      'docx',
+      'xls',
+      'xlsx',
+      'ppt',
+      'pptx',
+      'txt',
+      'csv',
+      'rtf',
+      'odt',
+      'ods',
+      'odp',
     }.contains(normalized);
   }
 
@@ -194,9 +226,20 @@ class OiFileUtils {
       'xls' || 'xlsx' || 'ods' || 'csv' => Icons.table_chart,
       'ppt' || 'pptx' || 'odp' => Icons.slideshow,
       'zip' || 'rar' || 'tar' || 'gz' || '7z' => Icons.folder_zip,
-      'html' || 'css' || 'js' || 'ts' || 'dart' || 'py' || 'java' ||
-      'kt' || 'swift' || 'go' || 'rs' || 'c' || 'cpp' || 'rb' =>
-        Icons.code,
+      'html' ||
+      'css' ||
+      'js' ||
+      'ts' ||
+      'dart' ||
+      'py' ||
+      'java' ||
+      'kt' ||
+      'swift' ||
+      'go' ||
+      'rs' ||
+      'c' ||
+      'cpp' ||
+      'rb' => Icons.code,
       'json' || 'xml' || 'yaml' || 'yml' => Icons.data_object,
       'txt' || 'md' => Icons.text_snippet,
       _ => Icons.insert_drive_file,

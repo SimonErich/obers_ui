@@ -47,18 +47,12 @@ void main() {
 
         // Flat color fields should be hex strings.
         expect(colors['background'], isA<String>());
-        expect(
-          (colors['background'] as String).startsWith('#'),
-          isTrue,
-        );
+        expect((colors['background'] as String).startsWith('#'), isTrue);
 
         // Swatch fields should be maps with hex values.
         final primary = colors['primary'] as Map<String, dynamic>;
         expect(primary['base'], isA<String>());
-        expect(
-          (primary['base'] as String).startsWith('#'),
-          isTrue,
-        );
+        expect((primary['base'] as String).startsWith('#'), isTrue);
       });
 
       test('font weights are serialized as integers', () {
@@ -89,10 +83,7 @@ void main() {
         final restored = OiThemeExporter.fromJson(json);
 
         // Colors should match.
-        expect(
-          restored.colors.background,
-          equals(original.colors.background),
-        );
+        expect(restored.colors.background, equals(original.colors.background));
         expect(
           restored.colors.primary.base,
           equals(original.colors.primary.base),
@@ -104,10 +95,7 @@ void main() {
         expect(restored.spacing.xxl, equals(original.spacing.xxl));
 
         // Animations should match.
-        expect(
-          restored.animations.fast,
-          equals(original.animations.fast),
-        );
+        expect(restored.animations.fast, equals(original.animations.fast));
       });
 
       test('corrupted JSON falls back to light theme', () {
@@ -115,10 +103,7 @@ void main() {
         final light = OiThemeData.light();
 
         expect(result.brightness, equals(light.brightness));
-        expect(
-          result.colors.background,
-          equals(light.colors.background),
-        );
+        expect(result.colors.background, equals(light.colors.background));
       });
     });
 
@@ -128,24 +113,18 @@ void main() {
         final light = OiThemeData.light();
 
         expect(result.brightness, equals(light.brightness));
-        expect(
-          result.colors.background,
-          equals(light.colors.background),
-        );
+        expect(result.colors.background, equals(light.colors.background));
         expect(result.spacing.md, equals(light.spacing.md));
       });
 
       test('dark brightness uses dark defaults for missing fields', () {
-        final result = OiThemeExporter.fromMap(
-          const <String, dynamic>{'brightness': 'dark'},
-        );
+        final result = OiThemeExporter.fromMap(const <String, dynamic>{
+          'brightness': 'dark',
+        });
         final dark = OiThemeData.dark();
 
         expect(result.brightness, equals(dark.brightness));
-        expect(
-          result.colors.background,
-          equals(dark.colors.background),
-        );
+        expect(result.colors.background, equals(dark.colors.background));
       });
     });
 
@@ -183,10 +162,7 @@ void main() {
           restored.colors.primary.base,
           equals(original.colors.primary.base),
         );
-        expect(
-          restored.colors.background,
-          equals(original.colors.background),
-        );
+        expect(restored.colors.background, equals(original.colors.background));
       });
 
       test('roundtrips through Map', () {

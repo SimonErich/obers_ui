@@ -249,10 +249,7 @@ class _OiWizardState extends State<OiWizard> {
                 Expanded(
                   child: Text(
                     '${entry.value}',
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: colors.textMuted,
-                    ),
+                    style: TextStyle(fontSize: 13, color: colors.textMuted),
                   ),
                 ),
               ],
@@ -289,10 +286,7 @@ class _OiWizardState extends State<OiWizard> {
     if (widget.animated) {
       body = AnimatedSwitcher(
         duration: const Duration(milliseconds: 250),
-        child: KeyedSubtree(
-          key: ValueKey(_currentStep),
-          child: stepContent,
-        ),
+        child: KeyedSubtree(key: ValueKey(_currentStep), child: stepContent),
       );
     } else {
       body = stepContent;
@@ -307,8 +301,7 @@ class _OiWizardState extends State<OiWizard> {
           totalSteps: widget.steps.length,
           currentStep: _currentStep,
           style: widget.stepperStyle,
-          stepLabels:
-              widget.steps.map((s) => s.title).toList(),
+          stepLabels: widget.steps.map((s) => s.title).toList(),
           stepIcons: widget.steps.any((s) => s.icon != null)
               ? widget.steps.map((s) => s.icon ?? const IconData(0)).toList()
               : null,
@@ -331,10 +324,7 @@ class _OiWizardState extends State<OiWizard> {
           const SizedBox(height: 4),
           Text(
             step.subtitle!,
-            style: TextStyle(
-              fontSize: 13,
-              color: colors.textMuted,
-            ),
+            style: TextStyle(fontSize: 13, color: colors.textMuted),
           ),
         ],
         const SizedBox(height: 16),
@@ -363,13 +353,12 @@ class _OiWizardState extends State<OiWizard> {
                     onTap: widget.onCancel,
                     child: Padding(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 8),
+                        horizontal: 12,
+                        vertical: 8,
+                      ),
                       child: Text(
                         'Cancel',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: colors.textMuted,
-                        ),
+                        style: TextStyle(fontSize: 14, color: colors.textMuted),
                       ),
                     ),
                   ),
@@ -378,17 +367,16 @@ class _OiWizardState extends State<OiWizard> {
                     onTap: _goPrevious,
                     child: Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 8),
+                        horizontal: 12,
+                        vertical: 8,
+                      ),
                       decoration: BoxDecoration(
                         border: Border.all(color: colors.border),
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: Text(
                         'Previous',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: colors.text,
-                        ),
+                        style: TextStyle(fontSize: 14, color: colors.text),
                       ),
                     ),
                   ),
@@ -404,13 +392,12 @@ class _OiWizardState extends State<OiWizard> {
                     onTap: () => _goToStep(_currentStep + 1),
                     child: Padding(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 8),
+                        horizontal: 12,
+                        vertical: 8,
+                      ),
                       child: Text(
                         'Skip',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: colors.textMuted,
-                        ),
+                        style: TextStyle(fontSize: 14, color: colors.textMuted),
                       ),
                     ),
                   ),
@@ -418,7 +405,9 @@ class _OiWizardState extends State<OiWizard> {
                   onTap: _goNext,
                   child: Container(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 8),
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
                     decoration: BoxDecoration(
                       color: colors.primary.base,
                       borderRadius: BorderRadius.circular(6),

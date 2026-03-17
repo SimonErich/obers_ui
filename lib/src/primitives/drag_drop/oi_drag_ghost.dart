@@ -52,22 +52,13 @@ class OiDragGhost extends StatelessWidget {
     var result = child;
 
     if (effectiveRotation != 0.0) {
-      result = Transform.rotate(
-        angle: effectiveRotation,
-        child: result,
-      );
+      result = Transform.rotate(angle: effectiveRotation, child: result);
     }
 
     if (effectiveScale != 1.0) {
-      result = Transform.scale(
-        scale: effectiveScale,
-        child: result,
-      );
+      result = Transform.scale(scale: effectiveScale, child: result);
     }
 
-    return Opacity(
-      opacity: opacity,
-      child: result,
-    );
+    return Opacity(opacity: opacity, child: result);
   }
 }

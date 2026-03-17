@@ -38,8 +38,9 @@ void main() {
       });
 
       test('radiusPreference.sharp gives zero radii', () {
-        final theme =
-            OiThemeData.light(radiusPreference: OiRadiusPreference.sharp);
+        final theme = OiThemeData.light(
+          radiusPreference: OiRadiusPreference.sharp,
+        );
         expect(theme.radius.md, equals(BorderRadius.zero));
       });
     });

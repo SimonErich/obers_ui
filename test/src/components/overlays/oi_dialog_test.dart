@@ -10,24 +10,18 @@ import '../../../helpers/pump_app.dart';
 
 void main() {
   testWidgets('renders title text', (tester) async {
-    await tester.pumpObers(
-      const OiDialog(title: 'Confirm delete'),
-    );
+    await tester.pumpObers(const OiDialog(title: 'Confirm delete'));
     expect(find.text('Confirm delete'), findsOneWidget);
   });
 
   testWidgets('renders content widget', (tester) async {
-    await tester.pumpObers(
-      const OiDialog(content: Text('Are you sure?')),
-    );
+    await tester.pumpObers(const OiDialog(content: Text('Are you sure?')));
     expect(find.text('Are you sure?'), findsOneWidget);
   });
 
   testWidgets('renders action widgets', (tester) async {
     await tester.pumpObers(
-      const OiDialog(
-        actions: [Text('Cancel'), Text('OK')],
-      ),
+      const OiDialog(actions: [Text('Cancel'), Text('OK')]),
     );
     expect(find.text('Cancel'), findsOneWidget);
     expect(find.text('OK'), findsOneWidget);
@@ -36,10 +30,7 @@ void main() {
   testWidgets('Escape key calls onClose', (tester) async {
     var closed = false;
     await tester.pumpObers(
-      OiDialog(
-        title: 'Alert',
-        onClose: () => closed = true,
-      ),
+      OiDialog(title: 'Alert', onClose: () => closed = true),
     );
     await tester.sendKeyEvent(LogicalKeyboardKey.escape);
     await tester.pump();
@@ -49,10 +40,7 @@ void main() {
   testWidgets('dismissible=true: tapping scrim calls onClose', (tester) async {
     var closed = false;
     await tester.pumpObers(
-      OiDialog(
-        title: 'Dismissible',
-        onClose: () => closed = true,
-      ),
+      OiDialog(title: 'Dismissible', onClose: () => closed = true),
     );
     // Tap far corner — outside the centered panel, on the scrim.
     await tester.tapAt(const Offset(5, 5));
@@ -60,8 +48,9 @@ void main() {
     expect(closed, isTrue);
   });
 
-  testWidgets('dismissible=false: tapping scrim does not call onClose',
-      (tester) async {
+  testWidgets('dismissible=false: tapping scrim does not call onClose', (
+    tester,
+  ) async {
     var closed = false;
     await tester.pumpObers(
       OiDialog(
@@ -103,10 +92,8 @@ void main() {
     await tester.pumpObers(
       Builder(
         builder: (ctx) => GestureDetector(
-          onTap: () => OiDialog.show(
-            ctx,
-            dialog: const OiDialog(title: 'Shown'),
-          ),
+          onTap: () =>
+              OiDialog.show(ctx, dialog: const OiDialog(title: 'Shown')),
           child: const Text('tap'),
         ),
       ),

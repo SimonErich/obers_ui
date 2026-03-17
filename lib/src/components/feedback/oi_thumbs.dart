@@ -81,13 +81,7 @@ class OiThumbs extends StatelessWidget {
             ),
             child: Transform.scale(
               scaleY: flipped ? -1 : 1,
-              child: Text(
-                '👍',
-                style: TextStyle(
-                  fontSize: 20,
-                  color: fg,
-                ),
-              ),
+              child: Text('👍', style: TextStyle(fontSize: 20, color: fg)),
             ),
           ),
         ),

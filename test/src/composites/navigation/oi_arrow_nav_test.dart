@@ -147,28 +147,23 @@ void main() {
       expect(reported, isNull, reason: 'should not change at boundary');
     });
 
-    testWidgets('Enter fires onSelect with current highlightedIndex',
-        (tester) async {
+    testWidgets('Enter fires onSelect with current highlightedIndex', (
+      tester,
+    ) async {
       int? selected;
       await tester.pumpObers(
-        _verticalNav(
-          highlightedIndex: 2,
-          onSelect: (i) => selected = i,
-        ),
+        _verticalNav(highlightedIndex: 2, onSelect: (i) => selected = i),
       );
 
       await _sendKeyDown(tester, LogicalKeyboardKey.enter);
       expect(selected, 2);
     });
 
-    testWidgets('Enter does nothing when highlightedIndex is null',
-        (tester) async {
+    testWidgets('Enter does nothing when highlightedIndex is null', (
+      tester,
+    ) async {
       int? selected;
-      await tester.pumpObers(
-        _verticalNav(
-          onSelect: (i) => selected = i,
-        ),
-      );
+      await tester.pumpObers(_verticalNav(onSelect: (i) => selected = i));
 
       await _sendKeyDown(tester, LogicalKeyboardKey.enter);
       expect(selected, isNull);
@@ -177,18 +172,14 @@ void main() {
     testWidgets('Escape fires onEscape', (tester) async {
       var escaped = false;
       await tester.pumpObers(
-        _verticalNav(
-          highlightedIndex: 0,
-          onEscape: () => escaped = true,
-        ),
+        _verticalNav(highlightedIndex: 0, onEscape: () => escaped = true),
       );
 
       await _sendKeyDown(tester, LogicalKeyboardKey.escape);
       expect(escaped, isTrue);
     });
 
-    testWidgets('enabled=false disables all keyboard handling',
-        (tester) async {
+    testWidgets('enabled=false disables all keyboard handling', (tester) async {
       int? reported;
       var escaped = false;
       await tester.pumpObers(
@@ -210,10 +201,7 @@ void main() {
     testWidgets('itemCount=0 handles gracefully', (tester) async {
       int? reported;
       await tester.pumpObers(
-        _verticalNav(
-          itemCount: 0,
-          onHighlightChange: (i) => reported = i,
-        ),
+        _verticalNav(itemCount: 0, onHighlightChange: (i) => reported = i),
       );
 
       await _sendKeyDown(tester, LogicalKeyboardKey.arrowDown);
@@ -223,8 +211,7 @@ void main() {
       expect(reported, isNull);
     });
 
-    testWidgets('multiple rapid arrow presses work correctly',
-        (tester) async {
+    testWidgets('multiple rapid arrow presses work correctly', (tester) async {
       final changes = <int>[];
 
       // Use a stateful wrapper to simulate rebuilds with updated index.
@@ -244,28 +231,24 @@ void main() {
       expect(changes, [0, 1, 2, 3]);
     });
 
-    testWidgets(
-        'arrow down with null highlightedIndex starts at 0',
-        (tester) async {
+    testWidgets('arrow down with null highlightedIndex starts at 0', (
+      tester,
+    ) async {
       int? reported;
       await tester.pumpObers(
-        _verticalNav(
-          onHighlightChange: (i) => reported = i,
-        ),
+        _verticalNav(onHighlightChange: (i) => reported = i),
       );
 
       await _sendKeyDown(tester, LogicalKeyboardKey.arrowDown);
       expect(reported, 0);
     });
 
-    testWidgets(
-        'arrow up with null highlightedIndex starts at last',
-        (tester) async {
+    testWidgets('arrow up with null highlightedIndex starts at last', (
+      tester,
+    ) async {
       int? reported;
       await tester.pumpObers(
-        _verticalNav(
-          onHighlightChange: (i) => reported = i,
-        ),
+        _verticalNav(onHighlightChange: (i) => reported = i),
       );
 
       await _sendKeyDown(tester, LogicalKeyboardKey.arrowUp);
@@ -300,8 +283,9 @@ void main() {
       expect(reported, 2);
     });
 
-    testWidgets('up/down arrows are ignored in horizontal mode',
-        (tester) async {
+    testWidgets('up/down arrows are ignored in horizontal mode', (
+      tester,
+    ) async {
       int? reported;
       await tester.pumpObers(
         _horizontalNav(

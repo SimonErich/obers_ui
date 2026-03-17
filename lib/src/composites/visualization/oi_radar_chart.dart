@@ -85,12 +85,14 @@ class OiRadarChart extends StatelessWidget {
     final resolvedSeries = <_ResolvedSeries>[];
     for (var i = 0; i < series.length; i++) {
       final s = series[i];
-      resolvedSeries.add(_ResolvedSeries(
-        values: s.values,
-        color: s.color ?? chartColors[i % chartColors.length],
-        fillOpacity: s.fillOpacity,
-        label: s.label,
-      ));
+      resolvedSeries.add(
+        _ResolvedSeries(
+          values: s.values,
+          color: s.color ?? chartColors[i % chartColors.length],
+          fillOpacity: s.fillOpacity,
+          label: s.label,
+        ),
+      );
     }
 
     return Semantics(

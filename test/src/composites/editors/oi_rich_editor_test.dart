@@ -45,7 +45,10 @@ void main() {
     test('toHtml escapes HTML entities', () {
       const content = OiRichContent(
         blocks: [
-          OiContentBlock(type: OiBlockType.paragraph, text: '<script>alert("xss")</script>'),
+          OiContentBlock(
+            type: OiBlockType.paragraph,
+            text: '<script>alert("xss")</script>',
+          ),
         ],
       );
 
@@ -122,7 +125,9 @@ void main() {
     });
 
     test('fromPlainText creates paragraph blocks', () {
-      final content = OiRichContent.fromPlainText('First paragraph\n\nSecond paragraph');
+      final content = OiRichContent.fromPlainText(
+        'First paragraph\n\nSecond paragraph',
+      );
 
       expect(content.blocks.length, 2);
       expect(content.blocks[0].type, OiBlockType.paragraph);
@@ -161,9 +166,7 @@ void main() {
       addTearDown(controller.dispose);
 
       const newContent = OiRichContent(
-        blocks: [
-          OiContentBlock(type: OiBlockType.heading1, text: 'Title'),
-        ],
+        blocks: [OiContentBlock(type: OiBlockType.heading1, text: 'Title')],
       );
       controller.content = newContent;
 
@@ -174,9 +177,7 @@ void main() {
     test('insertText appends to last block', () {
       final controller = OiRichEditorController(
         initialContent: const OiRichContent(
-          blocks: [
-            OiContentBlock(type: OiBlockType.paragraph, text: 'Hello'),
-          ],
+          blocks: [OiContentBlock(type: OiBlockType.paragraph, text: 'Hello')],
         ),
       );
       addTearDown(controller.dispose);
@@ -230,9 +231,7 @@ void main() {
     test('toHtml delegates to content', () {
       final controller = OiRichEditorController(
         initialContent: const OiRichContent(
-          blocks: [
-            OiContentBlock(type: OiBlockType.paragraph, text: 'Hello'),
-          ],
+          blocks: [OiContentBlock(type: OiBlockType.paragraph, text: 'Hello')],
         ),
       );
       addTearDown(controller.dispose);
@@ -243,9 +242,7 @@ void main() {
     test('toMarkdown delegates to content', () {
       final controller = OiRichEditorController(
         initialContent: const OiRichContent(
-          blocks: [
-            OiContentBlock(type: OiBlockType.heading1, text: 'Title'),
-          ],
+          blocks: [OiContentBlock(type: OiBlockType.heading1, text: 'Title')],
         ),
       );
       addTearDown(controller.dispose);
@@ -290,10 +287,7 @@ void main() {
 
       await tester.pumpObers(
         Center(
-          child: OiRichEditor(
-            controller: controller,
-            label: 'Description',
-          ),
+          child: OiRichEditor(controller: controller, label: 'Description'),
         ),
       );
 
@@ -320,9 +314,7 @@ void main() {
     testWidgets('placeholder hides when content has text', (tester) async {
       final controller = OiRichEditorController(
         initialContent: const OiRichContent(
-          blocks: [
-            OiContentBlock(type: OiBlockType.paragraph, text: 'Hello'),
-          ],
+          blocks: [OiContentBlock(type: OiBlockType.paragraph, text: 'Hello')],
         ),
       );
       addTearDown(controller.dispose);
@@ -375,10 +367,7 @@ void main() {
 
       await tester.pumpObers(
         Center(
-          child: OiRichEditor(
-            controller: controller,
-            label: 'Editor',
-          ),
+          child: OiRichEditor(controller: controller, label: 'Editor'),
         ),
       );
 
@@ -463,10 +452,7 @@ void main() {
 
       await tester.pumpObers(
         Center(
-          child: OiRichEditor(
-            controller: controller,
-            label: 'Editor',
-          ),
+          child: OiRichEditor(controller: controller, label: 'Editor'),
         ),
       );
 
@@ -522,10 +508,7 @@ void main() {
 
       await tester.pumpObers(
         Center(
-          child: OiRichEditor(
-            controller: controller,
-            label: 'Rich Editor',
-          ),
+          child: OiRichEditor(controller: controller, label: 'Rich Editor'),
         ),
       );
 
@@ -553,10 +536,7 @@ void main() {
 
       await tester.pumpObers(
         Center(
-          child: OiRichEditor(
-            controller: controller,
-            label: 'Editor',
-          ),
+          child: OiRichEditor(controller: controller, label: 'Editor'),
         ),
       );
 
@@ -578,10 +558,7 @@ void main() {
 
       await tester.pumpObers(
         Center(
-          child: OiRichEditor(
-            controller: controller,
-            label: 'Editor',
-          ),
+          child: OiRichEditor(controller: controller, label: 'Editor'),
         ),
       );
 

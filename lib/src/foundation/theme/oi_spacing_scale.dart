@@ -123,16 +123,16 @@ class OiSpacingScale {
 
   @override
   int get hashCode => Object.hashAll([
-        xs,
-        sm,
-        md,
-        lg,
-        xl,
-        xxl,
-        pageGutterCompact,
-        pageGutterMedium,
-        pageGutterExpanded,
-        pageGutterLarge,
-        pageGutterExtraLarge,
-      ]);
+    xs,
+    sm,
+    md,
+    lg,
+    xl,
+    xxl,
+    pageGutterCompact,
+    pageGutterMedium,
+    pageGutterExpanded,
+    pageGutterLarge,
+    pageGutterExtraLarge,
+  ]);
 }

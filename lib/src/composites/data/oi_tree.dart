@@ -139,10 +139,10 @@ class OiTreeController extends ChangeNotifier {
   }
 
   /// Whether the node identified by [id] is expanded.
-  bool isExpanded(String id) => expandedIds.contains(id);
+  bool expanded(String id) => expandedIds.contains(id);
 
   /// Whether the node identified by [id] is selected.
-  bool isSelected(String id) => selectedIds.contains(id);
+  bool selected(String id) => selectedIds.contains(id);
 }
 
 // ── Widget ────────────────────────────────────────────────────────────────────
@@ -199,7 +199,8 @@ class OiTree<T> extends StatefulWidget {
   ///
   /// The boolean argument is `true` when the node expands and `false`
   /// when it collapses.
-  final void Function(OiTreeNode<T> node, {required bool expanded})? onExpansionChanged;
+  final void Function(OiTreeNode<T> node, {required bool expanded})?
+  onExpansionChanged;
 
   /// Called when the selection changes.
   final void Function(Set<String> selectedIds)? onSelectionChanged;
@@ -214,7 +215,8 @@ class OiTree<T> extends StatefulWidget {
     int depth, {
     required bool expanded,
     required bool selected,
-  })? nodeBuilder;
+  })?
+  nodeBuilder;
 
   /// Indent width in logical pixels per depth level.
   final double indentWidth;
@@ -285,7 +287,7 @@ class _OiTreeState<T> extends State<OiTree<T>> {
     final items = <({int depth, OiTreeNode<T> node})>[];
     void visit(OiTreeNode<T> node, int depth) {
       items.add((depth: depth, node: node));
-      if (node.hasChildren && _ctrl.isExpanded(node.id)) {
+      if (node.hasChildren && _ctrl.expanded(node.id)) {
         for (final child in node.children) {
           visit(child, depth + 1);
         }
@@ -303,7 +305,7 @@ class _OiTreeState<T> extends State<OiTree<T>> {
   void _handleTap(OiTreeNode<T> node) {
     if (widget.selectable) {
       if (_ctrl.multiSelect) {
-        if (_ctrl.isSelected(node.id)) {
+        if (_ctrl.selected(node.id)) {
           _ctrl.deselect(node.id);
         } else {
           _ctrl.select(node.id);
@@ -321,7 +323,7 @@ class _OiTreeState<T> extends State<OiTree<T>> {
   }
 
   void _handleToggle(OiTreeNode<T> node) {
-    final willExpand = !_ctrl.isExpanded(node.id);
+    final willExpand = !_ctrl.expanded(node.id);
     _ctrl.toggle(node.id);
     widget.onExpansionChanged?.call(node, expanded: willExpand);
   }
@@ -342,8 +344,8 @@ class _OiTreeState<T> extends State<OiTree<T>> {
   }
 
   Widget _buildNodeRow(BuildContext ctx, OiTreeNode<T> node, int depth) {
-    final expanded = _ctrl.isExpanded(node.id);
-    final selected = _ctrl.isSelected(node.id);
+    final expanded = _ctrl.expanded(node.id);
+    final selected = _ctrl.selected(node.id);
 
     if (widget.nodeBuilder != null) {
       return GestureDetector(
@@ -420,10 +422,7 @@ class _DefaultNodeRow<T> extends StatelessWidget {
           )
         else
           SizedBox(width: 24, height: rowHeight),
-        if (node.icon != null) ...[
-          node.icon!,
-          const SizedBox(width: 4),
-        ],
+        if (node.icon != null) ...[node.icon!, const SizedBox(width: 4)],
         Expanded(
           child: Align(
             alignment: AlignmentDirectional.centerStart,

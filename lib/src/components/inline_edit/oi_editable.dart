@@ -29,7 +29,7 @@ class OiEditable<T> extends StatefulWidget {
   /// Receives the current [BuildContext], the [value], and a [startEdit]
   /// callback that transitions to edit mode when called.
   final Widget Function(BuildContext context, T value, VoidCallback startEdit)
-      displayBuilder;
+  displayBuilder;
 
   /// Builds the edit widget.
   ///
@@ -40,7 +40,8 @@ class OiEditable<T> extends StatefulWidget {
     T value,
     void Function(T newValue) commit,
     VoidCallback cancel,
-  ) editBuilder;
+  )
+  editBuilder;
 
   /// Called when the user commits a new value.
   final ValueChanged<T>? onChanged;

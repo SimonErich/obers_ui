@@ -89,8 +89,10 @@ class _SplitSettings with OiSettingsData {
   int get schemaVersion => 1;
 
   @override
-  Map<String, dynamic> toJson() =>
-      {'ratio': ratio, 'schemaVersion': schemaVersion};
+  Map<String, dynamic> toJson() => {
+    'ratio': ratio,
+    'schemaVersion': schemaVersion,
+  };
 }
 
 // ── State ──────────────────────────────────────────────────────────────────
@@ -140,8 +142,10 @@ class _OiSplitPaneState extends State<OiSplitPane> {
         ? details.delta.dx
         : details.delta.dy;
     setState(() {
-      _ratio =
-          (_ratio + delta / totalSize).clamp(widget.minRatio, widget.maxRatio);
+      _ratio = (_ratio + delta / totalSize).clamp(
+        widget.minRatio,
+        widget.maxRatio,
+      );
     });
     widget.onRatioChanged?.call(_ratio);
     unawaited(_saveRatio(_ratio));
@@ -177,8 +181,9 @@ class _OiSplitPaneState extends State<OiSplitPane> {
             onHorizontalDragUpdate: widget.direction == Axis.horizontal
                 ? (d) => _handleDragUpdate(d, totalSize)
                 : null,
-            onVerticalDragStart:
-                widget.direction == Axis.vertical ? _handleDragStart : null,
+            onVerticalDragStart: widget.direction == Axis.vertical
+                ? _handleDragStart
+                : null,
             onVerticalDragUpdate: widget.direction == Axis.vertical
                 ? (d) => _handleDragUpdate(d, totalSize)
                 : null,
@@ -186,8 +191,9 @@ class _OiSplitPaneState extends State<OiSplitPane> {
               width: widget.direction == Axis.horizontal
                   ? widget.dividerSize
                   : null,
-              height:
-                  widget.direction == Axis.vertical ? widget.dividerSize : null,
+              height: widget.direction == Axis.vertical
+                  ? widget.dividerSize
+                  : null,
               child: DecoratedBox(
                 decoration: BoxDecoration(color: colors.borderSubtle),
               ),
@@ -195,7 +201,11 @@ class _OiSplitPaneState extends State<OiSplitPane> {
           ),
         );
 
-        final children = [leadingPane, divider, Expanded(child: widget.trailing)];
+        final children = [
+          leadingPane,
+          divider,
+          Expanded(child: widget.trailing),
+        ];
 
         return widget.direction == Axis.horizontal
             ? Row(

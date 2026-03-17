@@ -12,10 +12,7 @@ void main() {
 
   testWidgets('renders child widget', (tester) async {
     await tester.pumpObers(
-      const OiLongPressMenu(
-        items: [],
-        child: Text('hold me'),
-      ),
+      const OiLongPressMenu(items: [], child: Text('hold me')),
     );
     expect(find.text('hold me'), findsOneWidget);
   });
@@ -29,11 +26,7 @@ void main() {
           OiLongPressMenuItem(label: 'Copy', onTap: () {}),
           OiLongPressMenuItem(label: 'Share', onTap: () {}),
         ],
-        child: const SizedBox(
-          width: 100,
-          height: 50,
-          child: Text('hold me'),
-        ),
+        child: const SizedBox(width: 100, height: 50, child: Text('hold me')),
       ),
     );
 
@@ -50,14 +43,8 @@ void main() {
     await tester.pumpObers(
       OiLongPressMenu(
         enabled: false,
-        items: [
-          OiLongPressMenuItem(label: 'Copy', onTap: () {}),
-        ],
-        child: const SizedBox(
-          width: 100,
-          height: 50,
-          child: Text('hold me'),
-        ),
+        items: [OiLongPressMenuItem(label: 'Copy', onTap: () {})],
+        child: const SizedBox(width: 100, height: 50, child: Text('hold me')),
       ),
     );
 
@@ -73,14 +60,8 @@ void main() {
     var tapped = false;
     await tester.pumpObers(
       OiLongPressMenu(
-        items: [
-          OiLongPressMenuItem(label: 'Copy', onTap: () => tapped = true),
-        ],
-        child: const SizedBox(
-          width: 100,
-          height: 50,
-          child: Text('hold me'),
-        ),
+        items: [OiLongPressMenuItem(label: 'Copy', onTap: () => tapped = true)],
+        child: const SizedBox(width: 100, height: 50, child: Text('hold me')),
       ),
     );
 
@@ -98,7 +79,9 @@ void main() {
 
   // ── 5. Menu items are visible in overlay ─────────────────────────────────
 
-  testWidgets('multiple menu items all visible after long press', (tester) async {
+  testWidgets('multiple menu items all visible after long press', (
+    tester,
+  ) async {
     await tester.pumpObers(
       OiLongPressMenu(
         items: [
@@ -106,11 +89,7 @@ void main() {
           OiLongPressMenuItem(label: 'Copy', onTap: () {}),
           OiLongPressMenuItem(label: 'Paste', onTap: () {}),
         ],
-        child: const SizedBox(
-          width: 100,
-          height: 50,
-          child: Text('hold me'),
-        ),
+        child: const SizedBox(width: 100, height: 50, child: Text('hold me')),
       ),
     );
 

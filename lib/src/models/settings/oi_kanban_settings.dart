@@ -38,11 +38,12 @@ class OiKanbanSettings with OiSettingsData {
   /// Serializes this settings object to a JSON-encodable map.
   @override
   Map<String, dynamic> toJson() => {
-        'schemaVersion': schemaVersion,
-        'columnOrder': columnOrder.map((e) => e.toString()).toList(),
-        'collapsedColumnKeys':
-            collapsedColumnKeys.map((e) => e.toString()).toList(),
-      };
+    'schemaVersion': schemaVersion,
+    'columnOrder': columnOrder.map((e) => e.toString()).toList(),
+    'collapsedColumnKeys': collapsedColumnKeys
+        .map((e) => e.toString())
+        .toList(),
+  };
 
   /// Returns new settings, filling in fields from [defaults] where this
   /// instance has empty or default values.
@@ -83,10 +84,10 @@ class OiKanbanSettings with OiSettingsData {
 
   @override
   int get hashCode => Object.hash(
-        schemaVersion,
-        Object.hashAll(columnOrder),
-        Object.hashAll(collapsedColumnKeys),
-      );
+    schemaVersion,
+    Object.hashAll(columnOrder),
+    Object.hashAll(collapsedColumnKeys),
+  );
 
   // ── Private helpers ────────────────────────────────────────────────────────
 

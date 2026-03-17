@@ -135,11 +135,9 @@ class OiBadge extends StatelessWidget {
     }
   }
 
-  ({
-    Color background,
-    Color textColor,
-    Color? borderColor,
-  }) _resolveColors(OiColorScheme colors) {
+  ({Color background, Color textColor, Color? borderColor}) _resolveColors(
+    OiColorScheme colors,
+  ) {
     final base = _baseColor(colors);
     final muted = _mutedColor(colors);
     switch (style) {
@@ -164,12 +162,8 @@ class OiBadge extends StatelessWidget {
     }
   }
 
-  ({
-    EdgeInsets padding,
-    double fontSize,
-    double dotSize,
-    double iconSize,
-  }) _resolveDimensions() {
+  ({EdgeInsets padding, double fontSize, double dotSize, double iconSize})
+  _resolveDimensions() {
     switch (size) {
       case OiBadgeSize.small:
         return (

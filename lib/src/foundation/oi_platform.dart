@@ -12,7 +12,7 @@ class OiPlatformData {
   const OiPlatformData({
     required this.platform,
     required this.keyboardHeight,
-    required this.isKeyboardVisible,
+    required this.keyboardVisible,
   });
 
   /// The host platform.
@@ -26,7 +26,7 @@ class OiPlatformData {
   /// Whether the on-screen keyboard is currently visible.
   ///
   /// True when [keyboardHeight] is greater than zero.
-  final bool isKeyboardVisible;
+  final bool keyboardVisible;
 
   @override
   bool operator ==(Object other) {
@@ -34,16 +34,16 @@ class OiPlatformData {
     return other is OiPlatformData &&
         other.platform == platform &&
         other.keyboardHeight == keyboardHeight &&
-        other.isKeyboardVisible == isKeyboardVisible;
+        other.keyboardVisible == keyboardVisible;
   }
 
   @override
-  int get hashCode => Object.hash(platform, keyboardHeight, isKeyboardVisible);
+  int get hashCode => Object.hash(platform, keyboardHeight, keyboardVisible);
 
   @override
   String toString() =>
       'OiPlatformData(platform: $platform, keyboardHeight: $keyboardHeight, '
-      'isKeyboardVisible: $isKeyboardVisible)';
+      'keyboardVisible: $keyboardVisible)';
 }
 
 /// An [InheritedWidget] that provides [OiPlatformData] to its descendants.
@@ -54,11 +54,7 @@ class OiPlatformData {
 /// {@category Foundation}
 class OiPlatform extends InheritedWidget {
   /// Creates an [OiPlatform] with explicit [data].
-  const OiPlatform({
-    required this.data,
-    required super.child,
-    super.key,
-  });
+  const OiPlatform({required this.data, required super.child, super.key});
 
   /// Creates an [OiPlatform] that derives its data from [MediaQuery].
   ///
@@ -76,7 +72,7 @@ class OiPlatform extends InheritedWidget {
       data: OiPlatformData(
         platform: platform ?? defaultTargetPlatform,
         keyboardHeight: keyboardHeight,
-        isKeyboardVisible: keyboardHeight > 0,
+        keyboardVisible: keyboardHeight > 0,
       ),
       child: child,
     );

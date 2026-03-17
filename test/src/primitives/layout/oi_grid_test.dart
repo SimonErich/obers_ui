@@ -25,23 +25,18 @@ void main() {
 
   testWidgets('uses LayoutBuilder and Wrap internally', (tester) async {
     await tester.pumpObers(
-      const OiGrid(
-        columns: 2,
-        children: [Text('X'), Text('Y')],
-      ),
+      const OiGrid(columns: 2, children: [Text('X'), Text('Y')]),
     );
     expect(find.byType(LayoutBuilder), findsOneWidget);
     expect(find.byType(Wrap), findsOneWidget);
   });
 
-  testWidgets('each child wrapped in SizedBox with computed width',
-      (tester) async {
+  testWidgets('each child wrapped in SizedBox with computed width', (
+    tester,
+  ) async {
     // Surface 800px wide, 2 columns, gap 0 → each item = 400px.
     await tester.pumpObers(
-      const OiGrid(
-        columns: 2,
-        children: [Text('A'), Text('B')],
-      ),
+      const OiGrid(columns: 2, children: [Text('A'), Text('B')]),
       surfaceSize: const Size(800, 600),
     );
     final boxes = tester
@@ -59,11 +54,7 @@ void main() {
 
   testWidgets('gap is applied to Wrap spacing', (tester) async {
     await tester.pumpObers(
-      const OiGrid(
-        columns: 2,
-        gap: 8,
-        children: [Text('A'), Text('B')],
-      ),
+      const OiGrid(columns: 2, gap: 8, children: [Text('A'), Text('B')]),
     );
     final wrap = tester.widget<Wrap>(find.byType(Wrap));
     expect(wrap.spacing, 8);

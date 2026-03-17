@@ -67,8 +67,7 @@ class OiCalendarUtils {
 
   /// Returns whether [date] falls on a weekend (Saturday or Sunday).
   static bool isWeekend(DateTime date) {
-    return date.weekday == DateTime.saturday ||
-        date.weekday == DateTime.sunday;
+    return date.weekday == DateTime.saturday || date.weekday == DateTime.sunday;
   }
 
   /// Returns the ISO 8601 week number for [date].
@@ -160,8 +159,9 @@ class OiCalendarUtils {
     }
 
     // "<month> <day>" or "<month> <day>, <year>"
-    final monthDayMatch =
-        RegExp(r'^(\w+)\s+(\d{1,2})(?:,?\s+(\d{4}))?$').firstMatch(normalized);
+    final monthDayMatch = RegExp(
+      r'^(\w+)\s+(\d{1,2})(?:,?\s+(\d{4}))?$',
+    ).firstMatch(normalized);
     if (monthDayMatch != null) {
       final monthNum = _parseMonth(monthDayMatch.group(1)!);
       if (monthNum != null) {
@@ -206,13 +206,23 @@ class OiCalendarUtils {
   /// Parses a weekday name to [DateTime] weekday number (1=Monday..7=Sunday).
   static int? _parseWeekday(String name) {
     const days = {
-      'monday': 1, 'mon': 1,
-      'tuesday': 2, 'tue': 2, 'tues': 2,
-      'wednesday': 3, 'wed': 3,
-      'thursday': 4, 'thu': 4, 'thur': 4, 'thurs': 4,
-      'friday': 5, 'fri': 5,
-      'saturday': 6, 'sat': 6,
-      'sunday': 7, 'sun': 7,
+      'monday': 1,
+      'mon': 1,
+      'tuesday': 2,
+      'tue': 2,
+      'tues': 2,
+      'wednesday': 3,
+      'wed': 3,
+      'thursday': 4,
+      'thu': 4,
+      'thur': 4,
+      'thurs': 4,
+      'friday': 5,
+      'fri': 5,
+      'saturday': 6,
+      'sat': 6,
+      'sunday': 7,
+      'sun': 7,
     };
     return days[name.toLowerCase()];
   }
@@ -220,18 +230,30 @@ class OiCalendarUtils {
   /// Parses a month name (full or abbreviated) to month number (1-12).
   static int? _parseMonth(String name) {
     const months = {
-      'january': 1, 'jan': 1,
-      'february': 2, 'feb': 2,
-      'march': 3, 'mar': 3,
-      'april': 4, 'apr': 4,
+      'january': 1,
+      'jan': 1,
+      'february': 2,
+      'feb': 2,
+      'march': 3,
+      'mar': 3,
+      'april': 4,
+      'apr': 4,
       'may': 5,
-      'june': 6, 'jun': 6,
-      'july': 7, 'jul': 7,
-      'august': 8, 'aug': 8,
-      'september': 9, 'sep': 9, 'sept': 9,
-      'october': 10, 'oct': 10,
-      'november': 11, 'nov': 11,
-      'december': 12, 'dec': 12,
+      'june': 6,
+      'jun': 6,
+      'july': 7,
+      'jul': 7,
+      'august': 8,
+      'aug': 8,
+      'september': 9,
+      'sep': 9,
+      'sept': 9,
+      'october': 10,
+      'oct': 10,
+      'november': 11,
+      'nov': 11,
+      'december': 12,
+      'dec': 12,
     };
     return months[name.toLowerCase()];
   }

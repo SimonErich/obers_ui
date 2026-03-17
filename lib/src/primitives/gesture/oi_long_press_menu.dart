@@ -145,10 +145,7 @@ class _OiLongPressMenuOverlay extends StatelessWidget {
 
 /// Internal panel that renders the list of menu items.
 class _OiMenuPanel extends StatelessWidget {
-  const _OiMenuPanel({
-    required this.items,
-    required this.onClose,
-  });
+  const _OiMenuPanel({required this.items, required this.onClose});
 
   final List<OiLongPressMenuItem> items;
   final VoidCallback onClose;

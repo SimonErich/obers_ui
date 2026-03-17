@@ -15,10 +15,12 @@ void main() {
       late OiThemeData? capturedTheme;
       await tester.pumpWidget(
         OiApp(
-          home: Builder(builder: (ctx) {
-            capturedTheme = OiTheme.maybeOf(ctx);
-            return const SizedBox();
-          }),
+          home: Builder(
+            builder: (ctx) {
+              capturedTheme = OiTheme.maybeOf(ctx);
+              return const SizedBox();
+            },
+          ),
         ),
       );
       expect(capturedTheme, isNotNull);
@@ -28,10 +30,12 @@ void main() {
       late OiUndoStack? captured;
       await tester.pumpWidget(
         OiApp(
-          home: Builder(builder: (ctx) {
-            captured = OiUndoStack.maybeOf(ctx);
-            return const SizedBox();
-          }),
+          home: Builder(
+            builder: (ctx) {
+              captured = OiUndoStack.maybeOf(ctx);
+              return const SizedBox();
+            },
+          ),
         ),
       );
       expect(captured, isNotNull);
@@ -41,10 +45,12 @@ void main() {
       late OiPlatformData? captured;
       await tester.pumpWidget(
         OiApp(
-          home: Builder(builder: (ctx) {
-            captured = OiPlatform.maybeOf(ctx);
-            return const SizedBox();
-          }),
+          home: Builder(
+            builder: (ctx) {
+              captured = OiPlatform.maybeOf(ctx);
+              return const SizedBox();
+            },
+          ),
         ),
       );
       expect(captured, isNotNull);
@@ -57,10 +63,12 @@ void main() {
         OiApp(
           theme: lightTheme,
           themeMode: ThemeMode.light,
-          home: Builder(builder: (ctx) {
-            captured = OiTheme.maybeOf(ctx);
-            return const SizedBox();
-          }),
+          home: Builder(
+            builder: (ctx) {
+              captured = OiTheme.maybeOf(ctx);
+              return const SizedBox();
+            },
+          ),
         ),
       );
       expect(captured?.isLight, isTrue);
@@ -73,10 +81,12 @@ void main() {
         OiApp(
           darkTheme: darkTheme,
           themeMode: ThemeMode.dark,
-          home: Builder(builder: (ctx) {
-            captured = OiTheme.maybeOf(ctx);
-            return const SizedBox();
-          }),
+          home: Builder(
+            builder: (ctx) {
+              captured = OiTheme.maybeOf(ctx);
+              return const SizedBox();
+            },
+          ),
         ),
       );
       expect(captured?.isDark, isTrue);
@@ -87,10 +97,12 @@ void main() {
       await tester.pumpWidget(
         OiApp(
           density: OiDensity.dense,
-          home: Builder(builder: (ctx) {
-            captured = OiDensityScope.of(ctx);
-            return const SizedBox();
-          }),
+          home: Builder(
+            builder: (ctx) {
+              captured = OiDensityScope.of(ctx);
+              return const SizedBox();
+            },
+          ),
         ),
       );
       expect(captured, equals(OiDensity.dense));

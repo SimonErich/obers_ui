@@ -32,11 +32,7 @@ void main() {
   testWidgets('enabled=false blocks onChanged', (tester) async {
     int? received;
     await tester.pumpObers(
-      OiScaleRating(
-        scale: 5,
-        enabled: false,
-        onChanged: (v) => received = v,
-      ),
+      OiScaleRating(scale: 5, enabled: false, onChanged: (v) => received = v),
     );
     await tester.tap(find.text('2'), warnIfMissed: false);
     await tester.pump();

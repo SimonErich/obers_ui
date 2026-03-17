@@ -42,8 +42,8 @@ class OiImage extends StatelessWidget {
     this.errorWidget,
     this.lazy = false,
     super.key,
-  })  : alt = '',
-        _decorative = true;
+  }) : alt = '',
+       _decorative = true;
 
   /// The image source: a network URL (`http://` / `https://`) or asset path.
   final String src;
@@ -119,10 +119,6 @@ class OiImage extends StatelessWidget {
       return ExcludeSemantics(child: image);
     }
 
-    return Semantics(
-      image: true,
-      label: alt,
-      child: image,
-    );
+    return Semantics(image: true, label: alt, child: image);
   }
 }

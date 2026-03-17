@@ -1,5 +1,4 @@
-import 'package:flutter/foundation.dart'
-    show defaultTargetPlatform, kIsWeb;
+import 'package:flutter/foundation.dart' show defaultTargetPlatform, kIsWeb;
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
@@ -266,9 +265,10 @@ class _OiShortcutsState extends State<OiShortcuts> {
     // Add "?" shortcut for help if enabled.
     if (widget.showHelpOnQuestionMark) {
       shortcutMap[const SingleActivator(
-        LogicalKeyboardKey.slash,
-        shift: true,
-      )] = const _OiShowHelpIntent();
+            LogicalKeyboardKey.slash,
+            shift: true,
+          )] =
+          const _OiShowHelpIntent();
     }
 
     return Shortcuts(
@@ -278,10 +278,7 @@ class _OiShortcutsState extends State<OiShortcuts> {
           _OiShortcutIntent: _OiShortcutAction(widget.shortcuts),
           if (widget.showHelpOnQuestionMark) _OiShowHelpIntent: helpAction,
         },
-        child: Focus(
-          autofocus: true,
-          child: widget.child,
-        ),
+        child: Focus(autofocus: true, child: widget.child),
       ),
     );
   }
@@ -320,10 +317,7 @@ class _OiShortcutHelpOverlay extends StatelessWidget {
           padding: const EdgeInsets.only(bottom: 8),
           child: Text(
             entry.key,
-            style: const TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 16,
-            ),
+            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
           ),
         ),
       );
@@ -336,10 +330,7 @@ class _OiShortcutHelpOverlay extends StatelessWidget {
             padding: const EdgeInsets.only(bottom: 4),
             child: Row(
               children: [
-                SizedBox(
-                  width: 120,
-                  child: Text(activatorLabel),
-                ),
+                SizedBox(width: 120, child: Text(activatorLabel)),
                 Expanded(child: Text(binding.label)),
               ],
             ),
@@ -370,10 +361,7 @@ class _OiShortcutHelpOverlay extends StatelessWidget {
                 children: [
                   const Text(
                     'Keyboard Shortcuts',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 20,
-                    ),
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
                   ),
                   const SizedBox(height: 16),
                   Flexible(

@@ -10,30 +10,20 @@ import '../../../helpers/pump_app.dart';
 
 void main() {
   testWidgets('elevated variant renders child', (tester) async {
-    await tester.pumpObers(
-      const OiCard(
-        child: Text('content'),
-      ),
-    );
+    await tester.pumpObers(const OiCard(child: Text('content')));
     expect(find.text('content'), findsOneWidget);
   });
 
   testWidgets('outlined variant renders child', (tester) async {
     await tester.pumpObers(
-      const OiCard(
-        variant: OiCardVariant.outlined,
-        child: Text('content'),
-      ),
+      const OiCard(variant: OiCardVariant.outlined, child: Text('content')),
     );
     expect(find.text('content'), findsOneWidget);
   });
 
   testWidgets('flat variant renders child', (tester) async {
     await tester.pumpObers(
-      const OiCard(
-        variant: OiCardVariant.flat,
-        child: Text('content'),
-      ),
+      const OiCard(variant: OiCardVariant.flat, child: Text('content')),
     );
     expect(find.text('content'), findsOneWidget);
   });
@@ -74,13 +64,10 @@ void main() {
     expect(tapped, isTrue);
   });
 
-  testWidgets('non-interactive variant does not use OiTappable',
-      (tester) async {
-    await tester.pumpObers(
-      const OiCard(
-        child: Text('content'),
-      ),
-    );
+  testWidgets('non-interactive variant does not use OiTappable', (
+    tester,
+  ) async {
+    await tester.pumpObers(const OiCard(child: Text('content')));
     expect(find.byType(OiTappable), findsNothing);
   });
 }

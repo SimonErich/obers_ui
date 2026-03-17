@@ -64,98 +64,69 @@ void main() {
     tearDown(_restoreOnError);
 
     testWidgets('renders the video player widget', (tester) async {
-      await tester.pumpObers(
-        _player(),
-        surfaceSize: const Size(400, 300),
-      );
+      await tester.pumpObers(_player(), surfaceSize: const Size(400, 300));
       await tester.pump();
 
-      expect(
-        find.byKey(const Key('oi_video_player_surface')),
-        findsOneWidget,
-      );
+      expect(find.byKey(const Key('oi_video_player_surface')), findsOneWidget);
     });
 
-    testWidgets('displays poster image when posterUrl is provided',
-        (tester) async {
+    testWidgets('displays poster image when posterUrl is provided', (
+      tester,
+    ) async {
       await tester.pumpObers(
         _player(posterUrl: 'https://example.com/poster.png'),
         surfaceSize: const Size(400, 300),
       );
       await tester.pump();
 
-      expect(
-        find.byKey(const Key('oi_video_player_poster')),
-        findsOneWidget,
-      );
+      expect(find.byKey(const Key('oi_video_player_poster')), findsOneWidget);
     });
 
     testWidgets('hides poster when posterUrl is null', (tester) async {
-      await tester.pumpObers(
-        _player(),
-        surfaceSize: const Size(400, 300),
-      );
+      await tester.pumpObers(_player(), surfaceSize: const Size(400, 300));
       await tester.pump();
 
-      expect(
-        find.byKey(const Key('oi_video_player_poster')),
-        findsNothing,
-      );
+      expect(find.byKey(const Key('oi_video_player_poster')), findsNothing);
     });
 
     testWidgets('shows source text when no poster', (tester) async {
-      await tester.pumpObers(
-        _player(),
-        surfaceSize: const Size(400, 300),
-      );
+      await tester.pumpObers(_player(), surfaceSize: const Size(400, 300));
       await tester.pump();
 
-      expect(
-        find.byKey(const Key('oi_video_player_src')),
-        findsOneWidget,
-      );
+      expect(find.byKey(const Key('oi_video_player_src')), findsOneWidget);
     });
 
-    testWidgets('controls are visible when showControls is true',
-        (tester) async {
-      await tester.pumpObers(
-        _player(),
-        surfaceSize: const Size(400, 300),
-      );
+    testWidgets('controls are visible when showControls is true', (
+      tester,
+    ) async {
+      await tester.pumpObers(_player(), surfaceSize: const Size(400, 300));
       await tester.pump();
 
-      expect(
-        find.byKey(const Key('oi_video_player_controls')),
-        findsOneWidget,
-      );
+      expect(find.byKey(const Key('oi_video_player_controls')), findsOneWidget);
     });
 
-    testWidgets('controls are hidden when showControls is false',
-        (tester) async {
+    testWidgets('controls are hidden when showControls is false', (
+      tester,
+    ) async {
       await tester.pumpObers(
         _player(showControls: false),
         surfaceSize: const Size(400, 300),
       );
       await tester.pump();
 
-      expect(
-        find.byKey(const Key('oi_video_player_controls')),
-        findsNothing,
-      );
+      expect(find.byKey(const Key('oi_video_player_controls')), findsNothing);
     });
 
-    testWidgets('progress bar is hidden when showControls is false',
-        (tester) async {
+    testWidgets('progress bar is hidden when showControls is false', (
+      tester,
+    ) async {
       await tester.pumpObers(
         _player(showControls: false),
         surfaceSize: const Size(400, 300),
       );
       await tester.pump();
 
-      expect(
-        find.byKey(const Key('oi_video_player_progress')),
-        findsNothing,
-      );
+      expect(find.byKey(const Key('oi_video_player_progress')), findsNothing);
     });
 
     testWidgets('aspect ratio is applied', (tester) async {
@@ -172,10 +143,7 @@ void main() {
     });
 
     testWidgets('default aspect ratio is 16:9', (tester) async {
-      await tester.pumpObers(
-        _player(),
-        surfaceSize: const Size(400, 300),
-      );
+      await tester.pumpObers(_player(), surfaceSize: const Size(400, 300));
       await tester.pump();
 
       final aspectRatio = tester.widget<AspectRatio>(
@@ -202,10 +170,7 @@ void main() {
     testWidgets('tapping pause fires onPause after playing', (tester) async {
       var pauseCalled = false;
       await tester.pumpObers(
-        _player(
-          onPlay: () {},
-          onPause: () => pauseCalled = true,
-        ),
+        _player(onPlay: () {}, onPause: () => pauseCalled = true),
         surfaceSize: const Size(400, 300),
       );
       await tester.pump();
@@ -234,20 +199,14 @@ void main() {
     });
 
     testWidgets('semantics label is applied', (tester) async {
-      await tester.pumpObers(
-        _player(),
-        surfaceSize: const Size(400, 300),
-      );
+      await tester.pumpObers(_player(), surfaceSize: const Size(400, 300));
       await tester.pump();
 
       expect(find.bySemanticsLabel('Test video player'), findsOneWidget);
     });
 
     testWidgets('play icon changes after toggle', (tester) async {
-      await tester.pumpObers(
-        _player(),
-        surfaceSize: const Size(400, 300),
-      );
+      await tester.pumpObers(_player(), surfaceSize: const Size(400, 300));
       await tester.pump();
 
       // Initially should show play icon (▶).

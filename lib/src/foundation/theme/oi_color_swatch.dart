@@ -28,10 +28,12 @@ class OiColorSwatch {
   /// - [foreground]: white or black depending on contrast with [base]
   factory OiColorSwatch.from(Color base) {
     final hsl = HSLColor.fromColor(base);
-    final light =
-        hsl.withLightness((hsl.lightness + 0.20).clamp(0.0, 1.0)).toColor();
-    final dark =
-        hsl.withLightness((hsl.lightness - 0.20).clamp(0.0, 1.0)).toColor();
+    final light = hsl
+        .withLightness((hsl.lightness + 0.20).clamp(0.0, 1.0))
+        .toColor();
+    final dark = hsl
+        .withLightness((hsl.lightness - 0.20).clamp(0.0, 1.0))
+        .toColor();
     final muted = hsl
         .withSaturation((hsl.saturation * 0.4).clamp(0.0, 1.0))
         .withLightness((hsl.lightness + 0.30).clamp(0.0, 1.0))
@@ -55,11 +57,11 @@ class OiColorSwatch {
   /// [t] must be in the range [0, 1]. At [t] = 0 the result equals [a];
   /// at [t] = 1 the result equals [b].
   OiColorSwatch.lerp(OiColorSwatch a, OiColorSwatch b, double t)
-      : base = Color.lerp(a.base, b.base, t)!,
-        light = Color.lerp(a.light, b.light, t)!,
-        dark = Color.lerp(a.dark, b.dark, t)!,
-        muted = Color.lerp(a.muted, b.muted, t)!,
-        foreground = Color.lerp(a.foreground, b.foreground, t)!;
+    : base = Color.lerp(a.base, b.base, t)!,
+      light = Color.lerp(a.light, b.light, t)!,
+      dark = Color.lerp(a.dark, b.dark, t)!,
+      muted = Color.lerp(a.muted, b.muted, t)!,
+      foreground = Color.lerp(a.foreground, b.foreground, t)!;
 
   /// The primary/base shade.
   final Color base;
@@ -108,7 +110,8 @@ class OiColorSwatch {
   int get hashCode => Object.hash(base, light, dark, muted, foreground);
 
   @override
-  String toString() => 'OiColorSwatch('
+  String toString() =>
+      'OiColorSwatch('
       'base: $base, '
       'light: $light, '
       'dark: $dark, '

@@ -22,9 +22,11 @@ class OiAnimationConfig {
   /// Set [reducedMotion] to true to eliminate all animations (e.g. when
   /// `MediaQuery.disableAnimations` is true).
   const OiAnimationConfig.standard({this.reducedMotion = false})
-      : fast = reducedMotion ? Duration.zero : const Duration(milliseconds: 150),
-        normal = reducedMotion ? Duration.zero : const Duration(milliseconds: 250),
-        slow = reducedMotion ? Duration.zero : const Duration(milliseconds: 400);
+    : fast = reducedMotion ? Duration.zero : const Duration(milliseconds: 150),
+      normal = reducedMotion
+          ? Duration.zero
+          : const Duration(milliseconds: 250),
+      slow = reducedMotion ? Duration.zero : const Duration(milliseconds: 400);
 
   /// Fast transition duration (150ms). Used for micro-interactions.
   final Duration fast;
@@ -89,27 +91,27 @@ class OiPerformanceConfig {
 
   /// High-performance configuration. All effects enabled.
   const OiPerformanceConfig.high()
-      : disableBlur = false,
-        disableShadows = false,
-        reduceAnimations = false,
-        disableHalo = false,
-        animationScale = 1.0;
+    : disableBlur = false,
+      disableShadows = false,
+      reduceAnimations = false,
+      disableHalo = false,
+      animationScale = 1.0;
 
   /// Mid-performance configuration. Blur disabled, other effects enabled.
   const OiPerformanceConfig.mid()
-      : disableBlur = true,
-        disableShadows = false,
-        reduceAnimations = false,
-        disableHalo = false,
-        animationScale = 1.0;
+    : disableBlur = true,
+      disableShadows = false,
+      reduceAnimations = false,
+      disableHalo = false,
+      animationScale = 1.0;
 
   /// Low-performance configuration. All expensive effects disabled.
   const OiPerformanceConfig.low()
-      : disableBlur = true,
-        disableShadows = true,
-        reduceAnimations = true,
-        disableHalo = true,
-        animationScale = 0.5;
+    : disableBlur = true,
+      disableShadows = true,
+      reduceAnimations = true,
+      disableHalo = true,
+      animationScale = 0.5;
 
   /// Automatically selects a tier based on the current platform.
   ///
@@ -164,6 +166,11 @@ class OiPerformanceConfig {
   }
 
   @override
-  int get hashCode =>
-      Object.hash(disableBlur, disableShadows, reduceAnimations, disableHalo, animationScale);
+  int get hashCode => Object.hash(
+    disableBlur,
+    disableShadows,
+    reduceAnimations,
+    disableHalo,
+    animationScale,
+  );
 }

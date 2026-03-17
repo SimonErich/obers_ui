@@ -53,7 +53,9 @@ class OiEditableSelect<T> extends StatelessWidget {
           onTap: enabled ? startEdit : null,
           behavior: HitTestBehavior.opaque,
           child: MouseRegion(
-            cursor: enabled ? SystemMouseCursors.click : SystemMouseCursors.basic,
+            cursor: enabled
+                ? SystemMouseCursors.click
+                : SystemMouseCursors.basic,
             child: Text(
               _labelFor(v),
               style: TextStyle(fontSize: 14, color: colors.text),

@@ -18,9 +18,9 @@ class _TestSettings with OiSettingsData {
 
   @override
   Map<String, dynamic> toJson() => {
-        'count': count,
-        'schemaVersion': schemaVersion,
-      };
+    'count': count,
+    'schemaVersion': schemaVersion,
+  };
 }
 
 void main() {

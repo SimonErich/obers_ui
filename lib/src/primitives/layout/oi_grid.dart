@@ -20,9 +20,9 @@ class OiGrid extends StatelessWidget {
     this.rowGap,
     super.key,
   }) : assert(
-          columns == null || minColumnWidth == null,
-          'Provide either columns or minColumnWidth, not both.',
-        );
+         columns == null || minColumnWidth == null,
+         'Provide either columns or minColumnWidth, not both.',
+       );
 
   /// Fixed number of columns. Mutually exclusive with [minColumnWidth].
   final int? columns;

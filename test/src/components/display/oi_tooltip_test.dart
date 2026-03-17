@@ -11,10 +11,7 @@ import '../../../helpers/pump_app.dart';
 void main() {
   testWidgets('tooltip hidden by default', (tester) async {
     await tester.pumpObers(
-      const OiTooltip(
-        message: 'Tip text',
-        child: Text('hover me'),
-      ),
+      const OiTooltip(message: 'Tip text', child: Text('hover me')),
     );
     expect(find.text('Tip text'), findsNothing);
   });
@@ -57,11 +54,8 @@ void main() {
       ),
     );
 
-    final gesture =
-        await tester.createGesture(kind: PointerDeviceKind.mouse);
-    await gesture.addPointer(
-      location: tester.getCenter(find.text('hover me')),
-    );
+    final gesture = await tester.createGesture(kind: PointerDeviceKind.mouse);
+    await gesture.addPointer(location: tester.getCenter(find.text('hover me')));
     addTearDown(gesture.removePointer);
     await tester.pump();
 

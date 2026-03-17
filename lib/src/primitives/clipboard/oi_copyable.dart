@@ -49,7 +49,8 @@ class OiCopyable extends StatelessWidget {
     if (!enabled) return KeyEventResult.ignored;
     if (event is! KeyDownEvent) return KeyEventResult.ignored;
 
-    final isCtrlOrMeta = HardwareKeyboard.instance.isControlPressed ||
+    final isCtrlOrMeta =
+        HardwareKeyboard.instance.isControlPressed ||
         HardwareKeyboard.instance.isMetaPressed;
 
     if (isCtrlOrMeta && event.logicalKey == LogicalKeyboardKey.keyC) {
@@ -63,10 +64,7 @@ class OiCopyable extends StatelessWidget {
   Widget build(BuildContext context) {
     return Focus(
       onKeyEvent: _handleKeyEvent,
-      child: GestureDetector(
-        onTap: enabled ? _copy : null,
-        child: child,
-      ),
+      child: GestureDetector(onTap: enabled ? _copy : null, child: child),
     );
   }
 }

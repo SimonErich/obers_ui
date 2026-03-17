@@ -9,16 +9,12 @@ import '../../../helpers/pump_app.dart';
 
 void main() {
   testWidgets('renders title', (tester) async {
-    await tester.pumpObers(
-      const OiListTile(title: 'Item One'),
-    );
+    await tester.pumpObers(const OiListTile(title: 'Item One'));
     expect(find.text('Item One'), findsOneWidget);
   });
 
   testWidgets('renders subtitle when provided', (tester) async {
-    await tester.pumpObers(
-      const OiListTile(title: 'Title', subtitle: 'Sub'),
-    );
+    await tester.pumpObers(const OiListTile(title: 'Title', subtitle: 'Sub'));
     expect(find.text('Title'), findsOneWidget);
     expect(find.text('Sub'), findsOneWidget);
   });
@@ -54,16 +50,12 @@ void main() {
   });
 
   testWidgets('selected tile has highlight background', (tester) async {
-    await tester.pumpObers(
-      const OiListTile(title: 'Selected', selected: true),
-    );
+    await tester.pumpObers(const OiListTile(title: 'Selected', selected: true));
     expect(find.byType(ColoredBox), findsOneWidget);
   });
 
   testWidgets('dense reduces vertical space', (tester) async {
-    await tester.pumpObers(
-      const OiListTile(title: 'Dense', dense: true),
-    );
+    await tester.pumpObers(const OiListTile(title: 'Dense', dense: true));
     expect(find.text('Dense'), findsOneWidget);
   });
 }

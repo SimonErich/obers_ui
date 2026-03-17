@@ -10,7 +10,7 @@ class OiFileNode {
   const OiFileNode({
     required this.key,
     required this.name,
-    required this.isFolder,
+    required this.folder,
     this.size,
     this.modified,
     this.thumbnailUrl,
@@ -23,7 +23,7 @@ class OiFileNode {
   final String name;
 
   /// Whether this node is a folder.
-  final bool isFolder;
+  final bool folder;
 
   /// The file size in bytes. Null for folders.
   final int? size;
@@ -177,8 +177,7 @@ class _OiFileManagerState extends State<OiFileManager> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Icon(
-                          const IconData(0xe2c7,
-                              fontFamily: 'MaterialIcons'),
+                          const IconData(0xe2c7, fontFamily: 'MaterialIcons'),
                           size: 48,
                           color: colors.textMuted,
                         ),
@@ -191,8 +190,8 @@ class _OiFileManagerState extends State<OiFileManager> {
                     ),
                   )
                 : widget.layout == OiFileManagerLayout.grid
-                    ? _buildGrid(context)
-                    : _buildList(context),
+                ? _buildGrid(context)
+                : _buildList(context),
           ),
         ],
       ),
@@ -215,10 +214,7 @@ class _OiFileManagerState extends State<OiFileManager> {
             onTap: () => widget.onNavigate?.call(const []),
             child: Text(
               'Home',
-              style: TextStyle(
-                color: colors.primary.base,
-                fontSize: 14,
-              ),
+              style: TextStyle(color: colors.primary.base, fontSize: 14),
             ),
           ),
           for (var i = 0; i < path.length; i++) ...[
@@ -230,8 +226,7 @@ class _OiFileManagerState extends State<OiFileManager> {
               ),
             ),
             GestureDetector(
-              onTap: () =>
-                  widget.onNavigate?.call(path.sublist(0, i + 1)),
+              onTap: () => widget.onNavigate?.call(path.sublist(0, i + 1)),
               child: Text(
                 path[i],
                 style: TextStyle(
@@ -283,27 +278,22 @@ class _OiFileManagerState extends State<OiFileManager> {
               ? colors.primary.muted.withValues(alpha: 0.15)
               : null,
           borderRadius: BorderRadius.circular(8),
-          border: isSelected
-              ? Border.all(color: colors.primary.base)
-              : null,
+          border: isSelected ? Border.all(color: colors.primary.base) : null,
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
-              node.isFolder
+              node.folder
                   ? const IconData(0xe2c7, fontFamily: 'MaterialIcons')
                   : const IconData(0xe24d, fontFamily: 'MaterialIcons'),
               size: 40,
-              color: node.isFolder ? colors.warning.base : colors.textSubtle,
+              color: node.folder ? colors.warning.base : colors.textSubtle,
             ),
             SizedBox(height: spacing.xs),
             Text(
               node.name,
-              style: TextStyle(
-                color: colors.text,
-                fontSize: 12,
-              ),
+              style: TextStyle(color: colors.text, fontSize: 12),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
               textAlign: TextAlign.center,
@@ -341,27 +331,22 @@ class _OiFileManagerState extends State<OiFileManager> {
           color: isSelected
               ? colors.primary.muted.withValues(alpha: 0.15)
               : null,
-          border: Border(
-            bottom: BorderSide(color: colors.borderSubtle),
-          ),
+          border: Border(bottom: BorderSide(color: colors.borderSubtle)),
         ),
         child: Row(
           children: [
             Icon(
-              node.isFolder
+              node.folder
                   ? const IconData(0xe2c7, fontFamily: 'MaterialIcons')
                   : const IconData(0xe24d, fontFamily: 'MaterialIcons'),
               size: 24,
-              color: node.isFolder ? colors.warning.base : colors.textSubtle,
+              color: node.folder ? colors.warning.base : colors.textSubtle,
             ),
             SizedBox(width: spacing.sm),
             Expanded(
               child: Text(
                 node.name,
-                style: TextStyle(
-                  color: colors.text,
-                  fontSize: 14,
-                ),
+                style: TextStyle(color: colors.text, fontSize: 14),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
@@ -369,10 +354,7 @@ class _OiFileManagerState extends State<OiFileManager> {
             if (node.size != null)
               Text(
                 _formatSize(node.size!),
-                style: TextStyle(
-                  color: colors.textMuted,
-                  fontSize: 12,
-                ),
+                style: TextStyle(color: colors.textMuted, fontSize: 12),
               ),
           ],
         ),

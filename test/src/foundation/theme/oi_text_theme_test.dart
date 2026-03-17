@@ -228,10 +228,7 @@ void main() {
 
       test('returns overline style for overline variant', () {
         final theme = OiTextTheme.standard();
-        expect(
-          theme.styleFor(OiLabelVariant.overline),
-          equals(theme.overline),
-        );
+        expect(theme.styleFor(OiLabelVariant.overline), equals(theme.overline));
       });
 
       test('returns link style for link variant', () {

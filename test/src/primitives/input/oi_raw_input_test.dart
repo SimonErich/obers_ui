@@ -46,8 +46,9 @@ void main() {
 
   // ── Placeholder ────────────────────────────────────────────────────────────
 
-  testWidgets('placeholder visible when controller text is empty',
-      (tester) async {
+  testWidgets('placeholder visible when controller text is empty', (
+    tester,
+  ) async {
     await tester.pumpObers(buildInput(placeholder: 'Enter text'));
     expect(find.text('Enter text'), findsOneWidget);
   });
@@ -110,9 +111,7 @@ void main() {
 
   testWidgets('onChanged fires when text changes', (tester) async {
     final received = <String>[];
-    await tester.pumpObers(
-      buildInput(onChanged: received.add),
-    );
+    await tester.pumpObers(buildInput(onChanged: received.add));
     await tester.enterText(find.byType(EditableText), 'hi');
     expect(received, isNotEmpty);
     expect(received.last, 'hi');
@@ -123,10 +122,7 @@ void main() {
   testWidgets('onSubmitted fires on submit action', (tester) async {
     final submitted = <String>[];
     await tester.pumpObers(
-      buildInput(
-        onSubmitted: submitted.add,
-        onChanged: (_) {},
-      ),
+      buildInput(onSubmitted: submitted.add, onChanged: (_) {}),
     );
     await tester.enterText(find.byType(EditableText), 'send');
     await tester.testTextInput.receiveAction(TextInputAction.done);
@@ -138,9 +134,7 @@ void main() {
 
   testWidgets('enabled=false makes field readOnly', (tester) async {
     final controller = TextEditingController(text: 'initial');
-    await tester.pumpObers(
-      buildInput(controller: controller, enabled: false),
-    );
+    await tester.pumpObers(buildInput(controller: controller, enabled: false));
     final et = tester.widget<EditableText>(find.byType(EditableText));
     expect(et.readOnly, isTrue);
   });

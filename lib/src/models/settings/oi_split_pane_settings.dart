@@ -20,8 +20,7 @@ class OiSplitPaneSettings with OiSettingsData {
   factory OiSplitPaneSettings.fromJson(Map<String, dynamic> json) {
     return OiSplitPaneSettings(
       schemaVersion: (json['schemaVersion'] as int?) ?? 1,
-      dividerPosition:
-          (json['dividerPosition'] as num?)?.toDouble() ?? 0.5,
+      dividerPosition: (json['dividerPosition'] as num?)?.toDouble() ?? 0.5,
       paneCollapsed: (json['paneCollapsed'] as bool?) ?? false,
     );
   }
@@ -39,10 +38,10 @@ class OiSplitPaneSettings with OiSettingsData {
   /// Serializes this settings object to a JSON-encodable map.
   @override
   Map<String, dynamic> toJson() => {
-        'schemaVersion': schemaVersion,
-        'dividerPosition': dividerPosition,
-        'paneCollapsed': paneCollapsed,
-      };
+    'schemaVersion': schemaVersion,
+    'dividerPosition': dividerPosition,
+    'paneCollapsed': paneCollapsed,
+  };
 
   /// Returns new settings, filling in fields from [defaults] where this
   /// instance has empty or default values.
@@ -80,9 +79,6 @@ class OiSplitPaneSettings with OiSettingsData {
   }
 
   @override
-  int get hashCode => Object.hash(
-        schemaVersion,
-        dividerPosition,
-        paneCollapsed,
-      );
+  int get hashCode =>
+      Object.hash(schemaVersion, dividerPosition, paneCollapsed);
 }

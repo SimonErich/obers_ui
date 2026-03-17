@@ -55,8 +55,9 @@ void main() {
 
     expect(lastState, OiDropState.idle);
 
-    final gesture = await tester
-        .startGesture(tester.getCenter(find.byKey(const Key('src'))));
+    final gesture = await tester.startGesture(
+      tester.getCenter(find.byKey(const Key('src'))),
+    );
     await gesture.moveBy(const Offset(100, 0));
     await tester.pump();
 
@@ -98,8 +99,9 @@ void main() {
       ),
     );
 
-    final gesture = await tester
-        .startGesture(tester.getCenter(find.byKey(const Key('src'))));
+    final gesture = await tester.startGesture(
+      tester.getCenter(find.byKey(const Key('src'))),
+    );
     // Move onto zone.
     await gesture.moveBy(const Offset(100, 0));
     await tester.pump();
@@ -133,18 +135,16 @@ void main() {
           ),
           OiDropZone<String>(
             onAccept: (data) => accepted = data,
-            builder: (context, state) => const SizedBox(
-              key: Key('zone'),
-              width: 80,
-              height: 80,
-            ),
+            builder: (context, state) =>
+                const SizedBox(key: Key('zone'), width: 80, height: 80),
           ),
         ],
       ),
     );
 
-    final gesture = await tester
-        .startGesture(tester.getCenter(find.byKey(const Key('src'))));
+    final gesture = await tester.startGesture(
+      tester.getCenter(find.byKey(const Key('src'))),
+    );
     await gesture.moveBy(const Offset(100, 0));
     await tester.pump();
     await gesture.up();
@@ -155,8 +155,9 @@ void main() {
 
   // ── 5. onWillAccept=false → rejected state ────────────────────────────────
 
-  testWidgets('state is rejected when onWillAccept returns false',
-      (tester) async {
+  testWidgets('state is rejected when onWillAccept returns false', (
+    tester,
+  ) async {
     OiDropState? lastState;
     await tester.pumpObers(
       Row(
@@ -188,8 +189,9 @@ void main() {
       ),
     );
 
-    final gesture = await tester
-        .startGesture(tester.getCenter(find.byKey(const Key('src'))));
+    final gesture = await tester.startGesture(
+      tester.getCenter(find.byKey(const Key('src'))),
+    );
     await gesture.moveBy(const Offset(100, 0));
     await tester.pump();
 

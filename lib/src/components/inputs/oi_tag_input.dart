@@ -63,8 +63,7 @@ class _OiTagInputState extends State<OiTagInput> {
   void initState() {
     super.initState();
     _ctrl = TextEditingController();
-    _focusNode = FocusNode()
-      ..addListener(_handleFocusChange);
+    _focusNode = FocusNode()..addListener(_handleFocusChange);
   }
 
   @override
@@ -85,7 +84,10 @@ class _OiTagInputState extends State<OiTagInput> {
       widget.maxTags == null || widget.tags.length < widget.maxTags!;
 
   void _addTag(String raw) {
-    final parts = raw.split(',').map((s) => s.trim()).where((s) => s.isNotEmpty);
+    final parts = raw
+        .split(',')
+        .map((s) => s.trim())
+        .where((s) => s.isNotEmpty);
     final newTags = List<String>.from(widget.tags);
     for (final tag in parts) {
       if (!newTags.contains(tag) && _canAdd) {
@@ -148,14 +150,12 @@ class _OiTagInputState extends State<OiTagInput> {
       placeholder: canAdd ? (widget.placeholder ?? 'Add tag…') : '',
       enabled: widget.enabled && canAdd,
       onSubmitted: _addTag,
-      inputFormatters: [
-        _CommaFormatter(onComma: _addTag),
-      ],
+      inputFormatters: [_CommaFormatter(onComma: _addTag)],
     );
 
     final chips = widget.tags.asMap().entries.map(
-          (e) => _buildChip(context, e.value, e.key),
-        );
+      (e) => _buildChip(context, e.value, e.key),
+    );
 
     final content = Wrap(
       crossAxisAlignment: WrapCrossAlignment.center,

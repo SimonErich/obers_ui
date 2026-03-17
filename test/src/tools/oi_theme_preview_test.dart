@@ -26,8 +26,7 @@ void main() {
       expect(find.byType(OiThemePreview), findsOneWidget);
     });
 
-    testWidgets('wraps content in OiTheme with provided theme',
-        (tester) async {
+    testWidgets('wraps content in OiTheme with provided theme', (tester) async {
       final theme = OiThemeData.dark();
 
       await tester.pumpObers(
@@ -70,10 +69,7 @@ void main() {
       );
 
       expect(find.text('Typography'), findsOneWidget);
-      expect(
-        find.text('display: The quick brown fox'),
-        findsOneWidget,
-      );
+      expect(find.text('display: The quick brown fox'), findsOneWidget);
       expect(find.text('body: The quick brown fox'), findsOneWidget);
       expect(find.text('h1: The quick brown fox'), findsOneWidget);
     });
@@ -144,23 +140,18 @@ void main() {
     group('show* flags', () {
       testWidgets('showColors=false hides color section', (tester) async {
         await tester.pumpObers(
-          OiThemePreview(
-            theme: OiThemeData.light(),
-            showColors: false,
-          ),
+          OiThemePreview(theme: OiThemeData.light(), showColors: false),
           surfaceSize: const Size(1200, 3000),
         );
 
         expect(find.text('Colors'), findsNothing);
       });
 
-      testWidgets('showTypography=false hides typography section',
-          (tester) async {
+      testWidgets('showTypography=false hides typography section', (
+        tester,
+      ) async {
         await tester.pumpObers(
-          OiThemePreview(
-            theme: OiThemeData.light(),
-            showTypography: false,
-          ),
+          OiThemePreview(theme: OiThemeData.light(), showTypography: false),
           surfaceSize: const Size(1200, 3000),
         );
 
@@ -169,10 +160,7 @@ void main() {
 
       testWidgets('showSpacing=false hides spacing section', (tester) async {
         await tester.pumpObers(
-          OiThemePreview(
-            theme: OiThemeData.light(),
-            showSpacing: false,
-          ),
+          OiThemePreview(theme: OiThemeData.light(), showSpacing: false),
           surfaceSize: const Size(1200, 3000),
         );
 
@@ -181,10 +169,7 @@ void main() {
 
       testWidgets('showButtons=false hides buttons section', (tester) async {
         await tester.pumpObers(
-          OiThemePreview(
-            theme: OiThemeData.light(),
-            showButtons: false,
-          ),
+          OiThemePreview(theme: OiThemeData.light(), showButtons: false),
           surfaceSize: const Size(1200, 3000),
         );
 
@@ -193,10 +178,7 @@ void main() {
 
       testWidgets('showInputs=false hides inputs section', (tester) async {
         await tester.pumpObers(
-          OiThemePreview(
-            theme: OiThemeData.light(),
-            showInputs: false,
-          ),
+          OiThemePreview(theme: OiThemeData.light(), showInputs: false),
           surfaceSize: const Size(1200, 3000),
         );
 
@@ -205,10 +187,7 @@ void main() {
 
       testWidgets('showCards=false hides cards section', (tester) async {
         await tester.pumpObers(
-          OiThemePreview(
-            theme: OiThemeData.light(),
-            showCards: false,
-          ),
+          OiThemePreview(theme: OiThemeData.light(), showCards: false),
           surfaceSize: const Size(1200, 3000),
         );
 
@@ -217,23 +196,16 @@ void main() {
 
       testWidgets('showBadges=false hides badges section', (tester) async {
         await tester.pumpObers(
-          OiThemePreview(
-            theme: OiThemeData.light(),
-            showBadges: false,
-          ),
+          OiThemePreview(theme: OiThemeData.light(), showBadges: false),
           surfaceSize: const Size(1200, 3000),
         );
 
         expect(find.text('Badges'), findsNothing);
       });
 
-      testWidgets('showProgress=false hides progress section',
-          (tester) async {
+      testWidgets('showProgress=false hides progress section', (tester) async {
         await tester.pumpObers(
-          OiThemePreview(
-            theme: OiThemeData.light(),
-            showProgress: false,
-          ),
+          OiThemePreview(theme: OiThemeData.light(), showProgress: false),
           surfaceSize: const Size(1200, 3000),
         );
 

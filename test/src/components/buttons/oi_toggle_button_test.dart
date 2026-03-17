@@ -12,14 +12,22 @@ const _kIcon = IconData(0xe318, fontFamily: 'MaterialIcons');
 void main() {
   testWidgets('renders label', (tester) async {
     await tester.pumpObers(
-      const OiToggleButton(selected: false, label: 'Bold'),
+      const OiToggleButton(
+        selected: false,
+        label: 'Bold',
+        semanticLabel: 'Bold',
+      ),
     );
     expect(find.text('Bold'), findsOneWidget);
   });
 
   testWidgets('renders icon', (tester) async {
     await tester.pumpObers(
-      const OiToggleButton(selected: false, icon: _kIcon),
+      const OiToggleButton(
+        selected: false,
+        icon: _kIcon,
+        semanticLabel: 'Icon',
+      ),
     );
     expect(find.byIcon(_kIcon), findsOneWidget);
   });
@@ -30,6 +38,7 @@ void main() {
       OiToggleButton(
         selected: false,
         label: 'Bold',
+        semanticLabel: 'Bold',
         onChanged: (v) => received = v,
       ),
     );
@@ -44,6 +53,7 @@ void main() {
       OiToggleButton(
         selected: true,
         label: 'Bold',
+        semanticLabel: 'Bold',
         onChanged: (v) => received = v,
       ),
     );
@@ -58,6 +68,7 @@ void main() {
       OiToggleButton(
         selected: false,
         label: 'Bold',
+        semanticLabel: 'Bold',
         enabled: false,
         onChanged: (v) => received = v,
       ),
@@ -71,7 +82,11 @@ void main() {
     // Check that the decorated container has a non-transparent colour when
     // selected.  We do this by looking at the Container decoration.
     await tester.pumpObers(
-      const OiToggleButton(selected: true, label: 'Bold'),
+      const OiToggleButton(
+        selected: true,
+        label: 'Bold',
+        semanticLabel: 'Bold',
+      ),
     );
     final container = tester.widget<Container>(find.byType(Container).first);
     final decoration = container.decoration! as BoxDecoration;
@@ -81,7 +96,11 @@ void main() {
 
   testWidgets('selected=false uses transparent background', (tester) async {
     await tester.pumpObers(
-      const OiToggleButton(selected: false, label: 'Bold'),
+      const OiToggleButton(
+        selected: false,
+        label: 'Bold',
+        semanticLabel: 'Bold',
+      ),
     );
     final container = tester.widget<Container>(find.byType(Container).first);
     final decoration = container.decoration! as BoxDecoration;

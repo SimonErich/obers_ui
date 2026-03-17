@@ -200,7 +200,9 @@ class _OiNavMenuBodyState extends State<_OiNavMenuBody> {
   void _moveFocus(int delta) {
     if (widget.items.isEmpty) return;
     var next = _focusedIndex + delta;
-    while (next >= 0 && next < widget.items.length && widget.items[next].disabled) {
+    while (next >= 0 &&
+        next < widget.items.length &&
+        widget.items[next].disabled) {
       next += delta;
     }
     if (next >= 0 && next < widget.items.length) {
@@ -243,10 +245,11 @@ class _OiNavMenuBodyState extends State<_OiNavMenuBody> {
     final textColor = isSelected
         ? colors.primary.base
         : item.disabled
-            ? colors.textMuted
-            : colors.text;
+        ? colors.textMuted
+        : colors.text;
 
-    final iconColor = item.color ?? (isSelected ? colors.primary.base : colors.textSubtle);
+    final iconColor =
+        item.color ?? (isSelected ? colors.primary.base : colors.textSubtle);
 
     Widget row = Container(
       color: bg,
@@ -254,7 +257,11 @@ class _OiNavMenuBodyState extends State<_OiNavMenuBody> {
       child: Row(
         children: [
           if (item.icon != null) ...[
-            Icon(item.icon, size: 18, color: item.disabled ? colors.textMuted : iconColor),
+            Icon(
+              item.icon,
+              size: 18,
+              color: item.disabled ? colors.textMuted : iconColor,
+            ),
             const SizedBox(width: 10),
           ],
           Expanded(
@@ -270,10 +277,7 @@ class _OiNavMenuBodyState extends State<_OiNavMenuBody> {
             ),
           ),
           if (item.badgeCount != null && item.badgeCount! > 0)
-            OiBadge(
-              label: item.badgeCount.toString(),
-              size: OiBadgeSize.small,
-            ),
+            OiBadge(label: item.badgeCount.toString(), size: OiBadgeSize.small),
         ],
       ),
     );
@@ -286,10 +290,7 @@ class _OiNavMenuBodyState extends State<_OiNavMenuBody> {
     );
 
     if (widget.contextMenu != null) {
-      row = OiContextMenu(
-        items: widget.contextMenu!(item),
-        child: row,
-      );
+      row = OiContextMenu(items: widget.contextMenu!(item), child: row);
     }
 
     return row;

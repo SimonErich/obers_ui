@@ -28,20 +28,24 @@ Container? _solidLineContainer(WidgetTester tester) {
 void main() {
   // ── Horizontal solid divider ───────────────────────────────────────────────
 
-  testWidgets('horizontal solid divider renders a thin Container', (tester) async {
+  testWidgets('horizontal solid divider renders a thin Container', (
+    tester,
+  ) async {
     await tester.pumpObers(const OiDivider());
     final c = _solidLineContainer(tester);
     expect(c, isNotNull);
   });
 
-  testWidgets('horizontal solid divider height equals thickness', (tester) async {
-    await tester.pumpObers(
-      const OiDivider(key: ValueKey('div'), thickness: 2),
-    );
+  testWidgets('horizontal solid divider height equals thickness', (
+    tester,
+  ) async {
+    await tester.pumpObers(const OiDivider(key: ValueKey('div'), thickness: 2));
     // The line Container declares its height via BoxConstraints.
     final containerFinder = find.descendant(
       of: find.byKey(const ValueKey('div')),
-      matching: find.byWidgetPredicate((w) => w is Container && w.color != null),
+      matching: find.byWidgetPredicate(
+        (w) => w is Container && w.color != null,
+      ),
     );
     expect(containerFinder, findsOneWidget);
     final c = tester.widget<Container>(containerFinder);
@@ -50,14 +54,14 @@ void main() {
   });
 
   testWidgets('uses provided color', (tester) async {
-    await tester.pumpObers(
-      const OiDivider(color: Color(0xFFFF0000)),
-    );
+    await tester.pumpObers(const OiDivider(color: Color(0xFFFF0000)));
     final c = _solidLineContainer(tester)!;
     expect(c.color, const Color(0xFFFF0000));
   });
 
-  testWidgets('defaults to theme border color when color is null', (tester) async {
+  testWidgets('defaults to theme border color when color is null', (
+    tester,
+  ) async {
     final theme = OiThemeData.light();
     await tester.pumpObers(const OiDivider());
     final c = _solidLineContainer(tester)!;
@@ -66,7 +70,9 @@ void main() {
 
   // ── Vertical solid divider ────────────────────────────────────────────────
 
-  testWidgets('vertical solid divider declares width equal to thickness', (tester) async {
+  testWidgets('vertical solid divider declares width equal to thickness', (
+    tester,
+  ) async {
     await tester.pumpObers(
       const SizedBox(
         height: 100,
@@ -76,7 +82,9 @@ void main() {
     // The vertical line Container declares its width via BoxConstraints.
     final containerFinder = find.descendant(
       of: find.byKey(const ValueKey('div')),
-      matching: find.byWidgetPredicate((w) => w is Container && w.color != null),
+      matching: find.byWidgetPredicate(
+        (w) => w is Container && w.color != null,
+      ),
     );
     expect(containerFinder, findsOneWidget);
     final c = tester.widget<Container>(containerFinder);
@@ -88,10 +96,7 @@ void main() {
 
   testWidgets('dashed style uses CustomPaint', (tester) async {
     await tester.pumpObers(
-      const OiDivider(
-        key: ValueKey('div'),
-        style: OiBorderLineStyle.dashed,
-      ),
+      const OiDivider(key: ValueKey('div'), style: OiBorderLineStyle.dashed),
     );
     expect(
       find.descendant(
@@ -103,19 +108,14 @@ void main() {
   });
 
   testWidgets('dashed style produces no solid Container line', (tester) async {
-    await tester.pumpObers(
-      const OiDivider(style: OiBorderLineStyle.dashed),
-    );
+    await tester.pumpObers(const OiDivider(style: OiBorderLineStyle.dashed));
     // No Container with a direct color (the solid-line path) should exist.
     expect(_solidLineContainer(tester), isNull);
   });
 
   testWidgets('dotted style uses CustomPaint', (tester) async {
     await tester.pumpObers(
-      const OiDivider(
-        key: ValueKey('div'),
-        style: OiBorderLineStyle.dotted,
-      ),
+      const OiDivider(key: ValueKey('div'), style: OiBorderLineStyle.dotted),
     );
     expect(
       find.descendant(
@@ -129,23 +129,17 @@ void main() {
   // ── withLabel ─────────────────────────────────────────────────────────────
 
   testWidgets('withLabel renders the label text', (tester) async {
-    await tester.pumpObers(
-      const OiDivider.withLabel('Section'),
-    );
+    await tester.pumpObers(const OiDivider.withLabel('Section'));
     expect(find.text('Section'), findsOneWidget);
   });
 
   testWidgets('withLabel uses a Row for horizontal axis', (tester) async {
-    await tester.pumpObers(
-      const OiDivider.withLabel('OR'),
-    );
+    await tester.pumpObers(const OiDivider.withLabel('OR'));
     expect(find.byType(Row), findsOneWidget);
   });
 
   testWidgets('withLabel flanks text with two line widgets', (tester) async {
-    await tester.pumpObers(
-      const OiDivider.withLabel('OR'),
-    );
+    await tester.pumpObers(const OiDivider.withLabel('OR'));
     // Two Expanded children inside the Row each hold a solid line Container.
     final expanded = tester.widgetList<Expanded>(find.byType(Expanded));
     expect(expanded.length, greaterThanOrEqualTo(2));
@@ -165,9 +159,7 @@ void main() {
   // ── withContent ───────────────────────────────────────────────────────────
 
   testWidgets('withContent renders the provided child widget', (tester) async {
-    await tester.pumpObers(
-      const OiDivider.withContent(Icon(IconData(0xe000))),
-    );
+    await tester.pumpObers(const OiDivider.withContent(Icon(IconData(0xe000))));
     expect(find.byType(Icon), findsOneWidget);
   });
 
@@ -181,16 +173,12 @@ void main() {
   // ── spacing ───────────────────────────────────────────────────────────────
 
   testWidgets('spacing > 0 wraps divider in Padding', (tester) async {
-    await tester.pumpObers(
-      const OiDivider(spacing: 16),
-    );
+    await tester.pumpObers(const OiDivider(spacing: 16));
     expect(find.byType(Padding), findsAtLeastNWidgets(1));
   });
 
   testWidgets('spacing == 0 does not add extra Padding', (tester) async {
-    await tester.pumpObers(
-      const OiDivider(),
-    );
+    await tester.pumpObers(const OiDivider());
     expect(find.byType(Padding), findsNothing);
   });
 
@@ -203,10 +191,7 @@ void main() {
         data: const MediaQueryData(size: Size(400, 800)),
         child: Directionality(
           textDirection: TextDirection.ltr,
-          child: OiTheme(
-            data: theme,
-            child: const OiDivider(),
-          ),
+          child: OiTheme(data: theme, child: const OiDivider()),
         ),
       ),
     );

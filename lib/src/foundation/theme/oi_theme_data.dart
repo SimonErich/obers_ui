@@ -275,17 +275,17 @@ class OiThemeData {
 
   @override
   int get hashCode => Object.hashAll([
-        brightness,
-        colors,
-        textTheme,
-        spacing,
-        radius,
-        shadows,
-        animations,
-        effects,
-        decoration,
-        components,
-        fontFamily,
-        monoFontFamily,
-      ]);
+    brightness,
+    colors,
+    textTheme,
+    spacing,
+    radius,
+    shadows,
+    animations,
+    effects,
+    decoration,
+    components,
+    fontFamily,
+    monoFontFamily,
+  ]);
 }

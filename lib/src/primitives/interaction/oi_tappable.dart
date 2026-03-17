@@ -144,7 +144,8 @@ class _OiTappableState extends State<OiTappable> {
     final isTouch = density == OiDensity.comfortable;
     final style = _effectiveStyle(effects);
 
-    final effectiveCursor = widget.cursor ??
+    final effectiveCursor =
+        widget.cursor ??
         (widget.enabled ? SystemMouseCursors.click : SystemMouseCursors.basic);
 
     // ── Build inner content with state overlay ───────────────────────────────
@@ -171,19 +172,14 @@ class _OiTappableState extends State<OiTappable> {
     if (halo != OiHaloStyle.none &&
         (halo.color.a > 0 || halo.spread > 0 || halo.blur > 0)) {
       content = DecoratedBox(
-        decoration: BoxDecoration(
-          boxShadow: [halo.toBoxShadow()],
-        ),
+        decoration: BoxDecoration(boxShadow: [halo.toBoxShadow()]),
         child: content,
       );
     }
 
     // Scale transform for pressed states.
     if (style.scale != 1) {
-      content = Transform.scale(
-        scale: style.scale,
-        child: content,
-      );
+      content = Transform.scale(scale: style.scale, child: content);
     }
 
     // Reduced opacity when disabled.

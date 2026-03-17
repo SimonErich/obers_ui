@@ -136,10 +136,7 @@ class _OiBreadcrumbsState extends State<OiBreadcrumbs> {
       }
     }
 
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: rowChildren,
-    );
+    return Row(mainAxisSize: MainAxisSize.min, children: rowChildren);
   }
 }
 
@@ -168,61 +165,57 @@ class _EllipsisButton extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
         child: Text(
           '…',
-          style: TextStyle(
-            fontSize: 14,
-            color: colors.primary.base,
-          ),
+          style: TextStyle(fontSize: 14, color: colors.primary.base),
         ),
       ),
     );
 
     final popover = IntrinsicWidth(
       child: Container(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      decoration: BoxDecoration(
-        color: colors.surface,
-        borderRadius: BorderRadius.circular(8),
-        boxShadow: [
-          BoxShadow(
-            color: colors.overlay.withValues(alpha: 0.12),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
-        border: Border.all(color: colors.borderSubtle),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: hidden.map((item) {
-          return OiTappable(
-            onTap: item.onTap != null
-                ? () {
-                    onClose();
-                    item.onTap!();
-                  }
-                : null,
-            child: Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              child: Text(
-                item.label,
-                style: TextStyle(fontSize: 14, color: colors.text),
-              ),
+        padding: const EdgeInsets.symmetric(vertical: 4),
+        decoration: BoxDecoration(
+          color: colors.surface,
+          borderRadius: BorderRadius.circular(8),
+          boxShadow: [
+            BoxShadow(
+              color: colors.overlay.withValues(alpha: 0.12),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
             ),
-          );
-        }).toList(),
+          ],
+          border: Border.all(color: colors.borderSubtle),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: hidden.map((item) {
+            return OiTappable(
+              onTap: item.onTap != null
+                  ? () {
+                      onClose();
+                      item.onTap!();
+                    }
+                  : null,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
+                child: Text(
+                  item.label,
+                  style: TextStyle(fontSize: 14, color: colors.text),
+                ),
+              ),
+            );
+          }).toList(),
+        ),
       ),
-    ),
     );
 
     return OiFloating(
       visible: open,
       anchor: button,
-      child: UnconstrainedBox(
-        alignment: Alignment.topLeft,
-        child: popover,
-      ),
+      child: UnconstrainedBox(alignment: Alignment.topLeft, child: popover),
     );
   }
 }

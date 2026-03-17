@@ -30,9 +30,7 @@ void main() {
     var tapped = false;
     await tester.pumpObers(
       OiContextMenu(
-        items: [
-          OiMenuItem(label: 'Action', onTap: () => tapped = true),
-        ],
+        items: [OiMenuItem(label: 'Action', onTap: () => tapped = true)],
         child: const Text('target'),
       ),
     );
@@ -50,7 +48,11 @@ void main() {
     await tester.pumpObers(
       OiContextMenu(
         items: [
-          OiMenuItem(label: 'Disabled', disabled: true, onTap: () => tapped = true),
+          OiMenuItem(
+            label: 'Disabled',
+            disabled: true,
+            onTap: () => tapped = true,
+          ),
         ],
         child: const Text('target'),
       ),
@@ -78,8 +80,9 @@ void main() {
     expect(find.text('Item'), findsNothing);
   });
 
-  testWidgets('right-click shows menu (secondary pointer button)',
-      (tester) async {
+  testWidgets('right-click shows menu (secondary pointer button)', (
+    tester,
+  ) async {
     await tester.pumpObers(
       const OiContextMenu(
         items: [OiMenuItem(label: 'Right-click item')],

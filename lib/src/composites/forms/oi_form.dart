@@ -153,8 +153,8 @@ class OiFormSection {
 class OiFormController extends ChangeNotifier {
   /// Creates an [OiFormController] with optional [initialValues].
   OiFormController({Map<String, dynamic>? initialValues})
-      : _values = Map<String, dynamic>.from(initialValues ?? {}),
-        _initialValues = Map<String, dynamic>.from(initialValues ?? {});
+    : _values = Map<String, dynamic>.from(initialValues ?? {}),
+      _initialValues = Map<String, dynamic>.from(initialValues ?? {});
 
   final Map<String, dynamic> _values;
   final Map<String, dynamic> _initialValues;
@@ -440,8 +440,9 @@ class _OiFormState extends State<OiForm> {
         final boolValue = value as bool? ?? false;
         return OiCheckbox(
           key: ValueKey('oi_form_field_${field.key}'),
-          value:
-              boolValue ? OiCheckboxState.checked : OiCheckboxState.unchecked,
+          value: boolValue
+              ? OiCheckboxState.checked
+              : OiCheckboxState.unchecked,
           label: field.label,
           onChanged: (v) => widget.controller.setValue(field.key, v),
         );
@@ -498,8 +499,7 @@ class _OiFormState extends State<OiForm> {
 
   Widget _buildSection(BuildContext context, OiFormSection section) {
     final colors = context.colors;
-    final visibleFields =
-        section.fields.where(_isFieldVisible).toList();
+    final visibleFields = section.fields.where(_isFieldVisible).toList();
 
     if (visibleFields.isEmpty) return const SizedBox.shrink();
 
@@ -524,10 +524,7 @@ class _OiFormState extends State<OiForm> {
             padding: const EdgeInsets.only(bottom: 8),
             child: Text(
               section.description!,
-              style: TextStyle(
-                fontSize: 13,
-                color: colors.textMuted,
-              ),
+              style: TextStyle(fontSize: 13, color: colors.textMuted),
             ),
           ),
         ..._layoutFields(context, visibleFields),
@@ -535,15 +532,16 @@ class _OiFormState extends State<OiForm> {
     );
   }
 
-  List<Widget> _layoutFields(
-      BuildContext context, List<OiFormField> fields) {
+  List<Widget> _layoutFields(BuildContext context, List<OiFormField> fields) {
     switch (widget.layout) {
       case OiFormLayout.vertical:
         return fields
-            .map((f) => Padding(
-                  padding: const EdgeInsets.only(bottom: 12),
-                  child: _buildField(context, f),
-                ))
+            .map(
+              (f) => Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: _buildField(context, f),
+              ),
+            )
             .toList();
 
       case OiFormLayout.horizontal:
@@ -551,12 +549,14 @@ class _OiFormState extends State<OiForm> {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: fields
-                .map((f) => Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.only(right: 12),
-                        child: _buildField(context, f),
-                      ),
-                    ))
+                .map(
+                  (f) => Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.only(right: 12),
+                      child: _buildField(context, f),
+                    ),
+                  ),
+                )
                 .toList(),
           ),
         ];
@@ -566,9 +566,7 @@ class _OiFormState extends State<OiForm> {
           Wrap(
             spacing: 12,
             runSpacing: 12,
-            children: fields
-                .map((f) => _buildField(context, f))
-                .toList(),
+            children: fields.map((f) => _buildField(context, f)).toList(),
           ),
         ];
     }
@@ -600,13 +598,12 @@ class _OiFormState extends State<OiForm> {
                 onTap: _handleCancel,
                 child: Padding(
                   padding: const EdgeInsets.symmetric(
-                      horizontal: 16, vertical: 8),
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
                   child: Text(
                     'Cancel',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: colors.textMuted,
-                    ),
+                    style: TextStyle(fontSize: 14, color: colors.textMuted),
                   ),
                 ),
               ),
@@ -615,7 +612,9 @@ class _OiFormState extends State<OiForm> {
                 onTap: canSubmit ? _handleSubmit : null,
                 child: Container(
                   padding: const EdgeInsets.symmetric(
-                      horizontal: 16, vertical: 8),
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
                   decoration: BoxDecoration(
                     color: canSubmit
                         ? colors.primary.base

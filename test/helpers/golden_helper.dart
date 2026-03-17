@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 /// Builds a golden test scenario with light and dark theme variants.
 ///
 /// Usage:

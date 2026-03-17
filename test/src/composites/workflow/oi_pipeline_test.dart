@@ -19,7 +19,8 @@ Widget _pipeline({
     width: 800,
     height: 400,
     child: OiPipeline(
-      stages: stages ??
+      stages:
+          stages ??
           const [
             OiPipelineStage(label: 'Build', status: OiPipelineStatus.completed),
             OiPipelineStage(label: 'Test', status: OiPipelineStatus.running),
@@ -65,14 +66,8 @@ void main() {
   testWidgets('renders connecting arrows between stages', (tester) async {
     await tester.pumpObers(_pipeline());
     // There should be 2 arrows for 3 stages (at indices 1 and 2).
-    expect(
-      find.byKey(const ValueKey('oi_pipeline_arrow_1')),
-      findsOneWidget,
-    );
-    expect(
-      find.byKey(const ValueKey('oi_pipeline_arrow_2')),
-      findsOneWidget,
-    );
+    expect(find.byKey(const ValueKey('oi_pipeline_arrow_1')), findsOneWidget);
+    expect(find.byKey(const ValueKey('oi_pipeline_arrow_2')), findsOneWidget);
   });
 
   // 4. Horizontal direction renders a Row.
@@ -180,10 +175,7 @@ void main() {
       OiPipelineStage(label: 'Quick', status: OiPipelineStatus.pending),
     ];
     await tester.pumpObers(_pipeline(stages: stages));
-    expect(
-      find.byKey(const ValueKey('oi_pipeline_duration_0')),
-      findsNothing,
-    );
+    expect(find.byKey(const ValueKey('oi_pipeline_duration_0')), findsNothing);
   });
 
   // 14. Content widget is rendered inside stage.

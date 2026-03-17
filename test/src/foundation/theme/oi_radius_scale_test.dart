@@ -14,7 +14,9 @@ void main() {
   group('OiRadiusScale', () {
     group('forPreference(sharp)', () {
       late OiRadiusScale scale;
-      setUp(() => scale = OiRadiusScale.forPreference(OiRadiusPreference.sharp));
+      setUp(
+        () => scale = OiRadiusScale.forPreference(OiRadiusPreference.sharp),
+      );
 
       test('none is zero', () => expect(scale.none, BorderRadius.zero));
       test('xs is zero', () => expect(scale.xs, BorderRadius.zero));
@@ -36,16 +38,10 @@ void main() {
         expect(scale.xs, isNot(BorderRadius.zero));
       });
       test('md has circular radius 8', () {
-        expect(
-          scale.md,
-          const BorderRadius.all(Radius.circular(8)),
-        );
+        expect(scale.md, const BorderRadius.all(Radius.circular(8)));
       });
       test('full has circular radius 9999', () {
-        expect(
-          scale.full,
-          const BorderRadius.all(Radius.circular(9999)),
-        );
+        expect(scale.full, const BorderRadius.all(Radius.circular(9999)));
       });
     });
 
@@ -53,15 +49,12 @@ void main() {
       late OiRadiusScale roundedScale;
       late OiRadiusScale mediumScale;
       setUp(() {
-        roundedScale =
-            OiRadiusScale.forPreference(OiRadiusPreference.rounded);
-        mediumScale =
-            OiRadiusScale.forPreference(OiRadiusPreference.medium);
+        roundedScale = OiRadiusScale.forPreference(OiRadiusPreference.rounded);
+        mediumScale = OiRadiusScale.forPreference(OiRadiusPreference.medium);
       });
 
       test('md is larger than medium md', () {
-        final roundedMd =
-            roundedScale.md.topLeft.x;
+        final roundedMd = roundedScale.md.topLeft.x;
         final mediumMd = mediumScale.md.topLeft.x;
         expect(roundedMd, greaterThan(mediumMd));
       });
@@ -83,14 +76,12 @@ void main() {
 
     group('copyWith', () {
       test('returns same values when no overrides', () {
-        final scale =
-            OiRadiusScale.forPreference(OiRadiusPreference.medium);
+        final scale = OiRadiusScale.forPreference(OiRadiusPreference.medium);
         expect(scale.copyWith(), equals(scale));
       });
 
       test('overrides md only', () {
-        final scale =
-            OiRadiusScale.forPreference(OiRadiusPreference.medium);
+        final scale = OiRadiusScale.forPreference(OiRadiusPreference.medium);
         const newMd = BorderRadius.all(Radius.circular(99));
         final copy = scale.copyWith(md: newMd);
         expect(copy.md, newMd);
@@ -101,8 +92,7 @@ void main() {
       });
 
       test('overrides none and full', () {
-        final scale =
-            OiRadiusScale.forPreference(OiRadiusPreference.rounded);
+        final scale = OiRadiusScale.forPreference(OiRadiusPreference.rounded);
         const newFull = BorderRadius.all(Radius.circular(500));
         final copy = scale.copyWith(full: newFull);
         expect(copy.full, newFull);
@@ -121,9 +111,7 @@ void main() {
       test('different preferences are not equal', () {
         expect(
           OiRadiusScale.forPreference(OiRadiusPreference.sharp),
-          isNot(
-            equals(OiRadiusScale.forPreference(OiRadiusPreference.medium)),
-          ),
+          isNot(equals(OiRadiusScale.forPreference(OiRadiusPreference.medium))),
         );
       });
 
@@ -137,8 +125,7 @@ void main() {
       });
 
       test('identical instance equals itself', () {
-        final scale =
-            OiRadiusScale.forPreference(OiRadiusPreference.rounded);
+        final scale = OiRadiusScale.forPreference(OiRadiusPreference.rounded);
         expect(scale == scale, isTrue);
       });
     });

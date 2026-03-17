@@ -114,10 +114,7 @@ class _OiTypingIndicatorState extends State<OiTypingIndicator>
 
 /// Three dots whose opacity animates in sequence to create a wave effect.
 class _AnimatedDots extends StatelessWidget {
-  const _AnimatedDots({
-    required this.controller,
-    required this.color,
-  });
+  const _AnimatedDots({required this.controller, required this.color});
 
   /// The animation controller driving the dot cycle.
   final AnimationController controller;

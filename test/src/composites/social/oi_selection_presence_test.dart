@@ -12,10 +12,7 @@ import '../../../helpers/pump_app.dart';
 void main() {
   testWidgets('renders child widget', (tester) async {
     await tester.pumpObers(
-      const OiSelectionPresence(
-        selections: [],
-        child: Text('Hello'),
-      ),
+      const OiSelectionPresence(selections: [], child: Text('Hello')),
     );
 
     expect(find.text('Hello'), findsOneWidget);
@@ -32,8 +29,9 @@ void main() {
     expect(find.byType(OiSelectionPresence), findsOneWidget);
   });
 
-  testWidgets('selections data is accessible via selectionsOf helper',
-      (tester) async {
+  testWidgets('selections data is accessible via selectionsOf helper', (
+    tester,
+  ) async {
     const key1 = 'item-1';
     const key2 = 'item-2';
 
@@ -91,17 +89,19 @@ void main() {
     expect(find.byType(OiSelectionPresence), findsOneWidget);
   });
 
-  testWidgets('selection with null selectedKeys is not matched by selectionsOf',
-      (tester) async {
-    const selections = [
-      OiRemoteSelection(
-        userId: 'u1',
-        name: 'Alice',
-        color: Color(0xFFFF0000),
-      ),
-    ];
+  testWidgets(
+    'selection with null selectedKeys is not matched by selectionsOf',
+    (tester) async {
+      const selections = [
+        OiRemoteSelection(
+          userId: 'u1',
+          name: 'Alice',
+          color: Color(0xFFFF0000),
+        ),
+      ];
 
-    final result = OiSelectionPresence.selectionsOf(selections, 'any-key');
-    expect(result, isEmpty);
-  });
+      final result = OiSelectionPresence.selectionsOf(selections, 'any-key');
+      expect(result, isEmpty);
+    },
+  );
 }

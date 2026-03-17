@@ -22,14 +22,13 @@ void main() {
     expect(find.text('7'), findsOneWidget);
   });
 
-  testWidgets('tapping a reaction chip calls onReact with correct emoji',
-      (tester) async {
+  testWidgets('tapping a reaction chip calls onReact with correct emoji', (
+    tester,
+  ) async {
     String? reacted;
     await tester.pumpObers(
       OiReactionBar(
-        reactions: const [
-          OiReactionData(emoji: '😂', count: 5),
-        ],
+        reactions: const [OiReactionData(emoji: '😂', count: 5)],
         onReact: (e) => reacted = e,
       ),
     );
@@ -39,18 +38,14 @@ void main() {
   });
 
   testWidgets('add reaction button is present', (tester) async {
-    await tester.pumpObers(
-      const OiReactionBar(reactions: []),
-    );
+    await tester.pumpObers(const OiReactionBar(reactions: []));
     expect(find.text('+ Add'), findsOneWidget);
   });
 
   testWidgets('selected reaction is rendered', (tester) async {
     await tester.pumpObers(
       const OiReactionBar(
-        reactions: [
-          OiReactionData(emoji: '🔥', count: 2, selected: true),
-        ],
+        reactions: [OiReactionData(emoji: '🔥', count: 2, selected: true)],
       ),
     );
     expect(find.text('🔥'), findsOneWidget);

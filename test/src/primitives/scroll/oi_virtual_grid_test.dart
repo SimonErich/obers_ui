@@ -26,21 +26,23 @@ void main() {
 
   // ── 2. crossAxisCount propagates to SliverGridDelegate ────────────────────
 
-  testWidgets('crossAxisCount is forwarded to SliverGridDelegateWithFixedCrossAxisCount',
-      (tester) async {
-    await tester.pumpObers(
-      OiVirtualGrid(
-        itemCount: 4,
-        crossAxisCount: 4,
-        itemBuilder: (_, i) => Text('c$i'),
-        shrinkWrap: true,
-      ),
-    );
-    final gv = tester.widget<GridView>(find.byType(GridView));
-    final delegate = gv.gridDelegate
-        as SliverGridDelegateWithFixedCrossAxisCount;
-    expect(delegate.crossAxisCount, 4);
-  });
+  testWidgets(
+    'crossAxisCount is forwarded to SliverGridDelegateWithFixedCrossAxisCount',
+    (tester) async {
+      await tester.pumpObers(
+        OiVirtualGrid(
+          itemCount: 4,
+          crossAxisCount: 4,
+          itemBuilder: (_, i) => Text('c$i'),
+          shrinkWrap: true,
+        ),
+      );
+      final gv = tester.widget<GridView>(find.byType(GridView));
+      final delegate =
+          gv.gridDelegate as SliverGridDelegateWithFixedCrossAxisCount;
+      expect(delegate.crossAxisCount, 4);
+    },
+  );
 
   // ── 3. mainAxisSpacing / crossAxisSpacing propagate ───────────────────────
 
@@ -55,8 +57,8 @@ void main() {
       ),
     );
     final gv = tester.widget<GridView>(find.byType(GridView));
-    final delegate = gv.gridDelegate
-        as SliverGridDelegateWithFixedCrossAxisCount;
+    final delegate =
+        gv.gridDelegate as SliverGridDelegateWithFixedCrossAxisCount;
     expect(delegate.mainAxisSpacing, 8);
     expect(delegate.crossAxisSpacing, 12);
   });
@@ -73,8 +75,8 @@ void main() {
       ),
     );
     final gv = tester.widget<GridView>(find.byType(GridView));
-    final delegate = gv.gridDelegate
-        as SliverGridDelegateWithFixedCrossAxisCount;
+    final delegate =
+        gv.gridDelegate as SliverGridDelegateWithFixedCrossAxisCount;
     expect(delegate.childAspectRatio, 0.5);
   });
 

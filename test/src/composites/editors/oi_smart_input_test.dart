@@ -10,11 +10,7 @@ import '../../../helpers/pump_app.dart';
 void main() {
   group('OiSmartInput', () {
     testWidgets('renders text input and label', (tester) async {
-      await tester.pumpObers(
-        const Center(
-          child: OiSmartInput(label: 'Name'),
-        ),
-      );
+      await tester.pumpObers(const Center(child: OiSmartInput(label: 'Name')));
 
       expect(find.text('Name'), findsOneWidget);
     });
@@ -23,10 +19,7 @@ void main() {
       String? changed;
       await tester.pumpObers(
         Center(
-          child: OiSmartInput(
-            label: 'Name',
-            onChange: (v) => changed = v,
-          ),
+          child: OiSmartInput(label: 'Name', onChange: (v) => changed = v),
         ),
       );
 
@@ -119,10 +112,7 @@ void main() {
     testWidgets('error message shows', (tester) async {
       await tester.pumpObers(
         const Center(
-          child: OiSmartInput(
-            label: 'Email',
-            error: 'Invalid email',
-          ),
+          child: OiSmartInput(label: 'Email', error: 'Invalid email'),
         ),
       );
 
@@ -132,10 +122,7 @@ void main() {
     testWidgets('hint text shows', (tester) async {
       await tester.pumpObers(
         const Center(
-          child: OiSmartInput(
-            label: 'Name',
-            hint: 'Enter your full name',
-          ),
+          child: OiSmartInput(label: 'Name', hint: 'Enter your full name'),
         ),
       );
 
@@ -148,10 +135,7 @@ void main() {
 
       await tester.pumpObers(
         Center(
-          child: OiSmartInput(
-            label: 'Name',
-            focusNode: focusNode,
-          ),
+          child: OiSmartInput(label: 'Name', focusNode: focusNode),
         ),
       );
 
@@ -167,10 +151,7 @@ void main() {
       final controller = TextEditingController(text: 'hello @world');
       await tester.pumpObers(
         Center(
-          child: OiSmartInput(
-            label: 'Plain',
-            controller: controller,
-          ),
+          child: OiSmartInput(label: 'Plain', controller: controller),
         ),
       );
 
@@ -184,16 +165,17 @@ void main() {
 
     testWidgets('has correct semantics', (tester) async {
       await tester.pumpObers(
-        const Center(
-          child: OiSmartInput(label: 'Username'),
-        ),
+        const Center(child: OiSmartInput(label: 'Username')),
       );
 
       // The Semantics widget wrapping the input should be present
       // and marked as a text field.
       final semanticsWidgets = tester.widgetList<Semantics>(
         find.byWidgetPredicate(
-          (w) => w is Semantics && w.properties.label == 'Username' && w.properties.textField == true,
+          (w) =>
+              w is Semantics &&
+              w.properties.label == 'Username' &&
+              w.properties.textField == true,
         ),
       );
       expect(semanticsWidgets, isNotEmpty);
@@ -202,10 +184,7 @@ void main() {
     testWidgets('initial value is set from value parameter', (tester) async {
       await tester.pumpObers(
         const Center(
-          child: OiSmartInput(
-            label: 'Name',
-            value: 'initial text',
-          ),
+          child: OiSmartInput(label: 'Name', value: 'initial text'),
         ),
       );
 

@@ -9,9 +9,7 @@ import '../../../helpers/pump_app.dart';
 
 void main() {
   testWidgets('renders without error', (tester) async {
-    await tester.pumpObers(
-      const OiSlider(value: 0.5, min: 0, max: 1),
-    );
+    await tester.pumpObers(const OiSlider(value: 0.5, min: 0, max: 1));
     expect(find.byType(OiSlider), findsOneWidget);
   });
 
@@ -25,12 +23,7 @@ void main() {
   testWidgets('dragging slider fires onChanged', (tester) async {
     double? result;
     await tester.pumpObers(
-      OiSlider(
-        value: 0,
-        min: 0,
-        max: 100,
-        onChanged: (v) => result = v,
-      ),
+      OiSlider(value: 0, min: 0, max: 100, onChanged: (v) => result = v),
       surfaceSize: const Size(400, 200),
     );
     final sliderFinder = find.byType(OiSlider);
@@ -43,12 +36,7 @@ void main() {
   testWidgets('value is clamped to min', (tester) async {
     double? result;
     await tester.pumpObers(
-      OiSlider(
-        value: 0,
-        min: 0,
-        max: 100,
-        onChanged: (v) => result = v,
-      ),
+      OiSlider(value: 0, min: 0, max: 100, onChanged: (v) => result = v),
       surfaceSize: const Size(400, 200),
     );
     final sliderFinder = find.byType(OiSlider);
@@ -61,12 +49,7 @@ void main() {
   testWidgets('value is clamped to max', (tester) async {
     double? result;
     await tester.pumpObers(
-      OiSlider(
-        value: 100,
-        min: 0,
-        max: 100,
-        onChanged: (v) => result = v,
-      ),
+      OiSlider(value: 100, min: 0, max: 100, onChanged: (v) => result = v),
       surfaceSize: const Size(400, 200),
     );
     final sliderFinder = find.byType(OiSlider);
@@ -79,13 +62,7 @@ void main() {
   testWidgets('divisions snap to nearest step', (tester) async {
     final values = <double>[];
     await tester.pumpObers(
-      OiSlider(
-        value: 0,
-        min: 0,
-        max: 10,
-        divisions: 10,
-        onChanged: values.add,
-      ),
+      OiSlider(value: 0, min: 0, max: 10, divisions: 10, onChanged: values.add),
       surfaceSize: const Size(400, 200),
     );
     final center = tester.getCenter(find.byType(OiSlider));
@@ -98,12 +75,7 @@ void main() {
 
   testWidgets('range slider renders with secondaryValue', (tester) async {
     await tester.pumpObers(
-      const OiSlider(
-        value: 20,
-        secondaryValue: 80,
-        min: 0,
-        max: 100,
-      ),
+      const OiSlider(value: 20, secondaryValue: 80, min: 0, max: 100),
     );
     expect(find.byType(OiSlider), findsOneWidget);
   });

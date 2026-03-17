@@ -1,0 +1,12 @@
+{
+  "filesChanged": [
+    "lib/src/components/inputs/oi_select.dart",
+    "lib/src/components/inputs/oi_radio.dart",
+    "test/src/components/inputs/oi_select_test.dart",
+    "test/src/components/inputs/oi_radio_test.dart"
+  ],
+  "commandsRun": [
+    "flutter test test/src/components/inputs/oi_select_test.dart test/src/components/inputs/oi_radio_test.dart test/src/components/buttons/"
+  ],
+  "notes": "Renamed OiSelectOption.disabled (default false) → OiSelectOption.enabled (default true) and OiRadioOption.disabled (default false) → OiRadioOption.enabled (default true). Flipped all internal boolean logic accordingly. Updated tests to use enabled: false instead of disabled: true. OiButton.enabled, OiButton.loading, OiSheet.dismissible, OiPanel.dismissible, OiSwipeable.dismissible, OiSelect.searchable, and OiSelect.enabled were already correctly named. All 62 tests pass."
+}

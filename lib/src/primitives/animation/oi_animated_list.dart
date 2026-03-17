@@ -144,7 +144,8 @@ class _OiAnimatedListState<T> extends State<OiAnimatedList<T>> {
     final removedItem = _items.removeAt(index);
     _listKey.currentState?.removeItem(
       index,
-      (context, animation) => _buildRemoveWidget(context, removedItem, animation),
+      (context, animation) =>
+          _buildRemoveWidget(context, removedItem, animation),
     );
   }
 

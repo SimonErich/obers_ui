@@ -35,9 +35,7 @@ void main() {
       await tester.pumpObers(
         const OiWhatsNew(
           title: 'Release Notes',
-          items: [
-            OiWhatsNewItem(title: 'Feature', description: 'A feature.'),
-          ],
+          items: [OiWhatsNewItem(title: 'Feature', description: 'A feature.')],
         ),
       );
 
@@ -77,8 +75,9 @@ void main() {
       expect(find.byKey(const Key('oi_whats_new_version')), findsOneWidget);
     });
 
-    testWidgets('onDismiss fires when dismiss button is tapped',
-        (tester) async {
+    testWidgets('onDismiss fires when dismiss button is tapped', (
+      tester,
+    ) async {
       var dismissed = false;
       await tester.pumpObers(
         OiWhatsNew(
@@ -96,9 +95,7 @@ void main() {
     });
 
     testWidgets('empty items handles gracefully', (tester) async {
-      await tester.pumpObers(
-        const OiWhatsNew(items: []),
-      );
+      await tester.pumpObers(const OiWhatsNew(items: []));
 
       expect(find.byKey(const Key('oi_whats_new_empty')), findsOneWidget);
       expect(find.text('No updates at this time.'), findsOneWidget);
@@ -107,9 +104,7 @@ void main() {
     testWidgets("default title is What's New", (tester) async {
       await tester.pumpObers(
         const OiWhatsNew(
-          items: [
-            OiWhatsNewItem(title: 'Feature', description: 'A feature.'),
-          ],
+          items: [OiWhatsNewItem(title: 'Feature', description: 'A feature.')],
         ),
       );
 
@@ -119,9 +114,7 @@ void main() {
     testWidgets('Got it button is always shown', (tester) async {
       await tester.pumpObers(
         const OiWhatsNew(
-          items: [
-            OiWhatsNewItem(title: 'Feature', description: 'A feature.'),
-          ],
+          items: [OiWhatsNewItem(title: 'Feature', description: 'A feature.')],
         ),
       );
 
@@ -131,15 +124,11 @@ void main() {
     testWidgets('multiple items all render', (tester) async {
       final items = List.generate(
         5,
-        (i) => OiWhatsNewItem(
-          title: 'Feature $i',
-          description: 'Description $i',
-        ),
+        (i) =>
+            OiWhatsNewItem(title: 'Feature $i', description: 'Description $i'),
       );
 
-      await tester.pumpObers(
-        OiWhatsNew(items: items),
-      );
+      await tester.pumpObers(OiWhatsNew(items: items));
 
       for (var i = 0; i < 5; i++) {
         expect(find.text('Feature $i'), findsOneWidget);

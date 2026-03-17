@@ -61,38 +61,39 @@ void main() {
 
   // 4. Custom colors applied via segments.
   testWidgets('renders with custom segments without errors', (tester) async {
-    await tester.pumpObers(_gauge(
-      segments: [
-        const OiGaugeSegment(
-          from: 0,
-          to: 30,
-          color: Color(0xFF00FF00),
-          label: 'Low',
-        ),
-        const OiGaugeSegment(
-          from: 30,
-          to: 70,
-          color: Color(0xFFFFFF00),
-          label: 'Medium',
-        ),
-        const OiGaugeSegment(
-          from: 70,
-          to: 100,
-          color: Color(0xFFFF0000),
-          label: 'High',
-        ),
-      ],
-    ));
+    await tester.pumpObers(
+      _gauge(
+        segments: [
+          const OiGaugeSegment(
+            from: 0,
+            to: 30,
+            color: Color(0xFF00FF00),
+            label: 'Low',
+          ),
+          const OiGaugeSegment(
+            from: 30,
+            to: 70,
+            color: Color(0xFFFFFF00),
+            label: 'Medium',
+          ),
+          const OiGaugeSegment(
+            from: 70,
+            to: 100,
+            color: Color(0xFFFF0000),
+            label: 'High',
+          ),
+        ],
+      ),
+    );
     expect(find.byType(OiGauge), findsOneWidget);
     expect(find.byKey(const Key('oi_gauge_painter')), findsOneWidget);
   });
 
   // 5. formatValue callback is used.
   testWidgets('formatValue callback formats displayed value', (tester) async {
-    await tester.pumpObers(_gauge(
-      value: 42.5,
-      formatValue: (v) => '${v.toStringAsFixed(1)}%',
-    ));
+    await tester.pumpObers(
+      _gauge(value: 42.5, formatValue: (v) => '${v.toStringAsFixed(1)}%'),
+    );
     expect(find.text('42.5%'), findsOneWidget);
   });
 
@@ -111,13 +112,7 @@ void main() {
   // 8. Size adapts to container.
   testWidgets('adapts to custom size', (tester) async {
     await tester.pumpObers(
-      Center(
-        child: OiGauge(
-          value: 50,
-          label: 'Size Test',
-          size: 150,
-        ),
-      ),
+      Center(child: OiGauge(value: 50, label: 'Size Test', size: 150)),
     );
     final painter = find.byKey(const Key('oi_gauge_painter'));
     final painterSize = tester.getSize(painter);

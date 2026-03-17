@@ -60,8 +60,9 @@ void main() {
 
   // ── Connected border radii ─────────────────────────────────────────────────
 
-  testWidgets('middle button has zero border radius in horizontal group',
-      (tester) async {
+  testWidgets('middle button has zero border radius in horizontal group', (
+    tester,
+  ) async {
     await tester.pumpObers(
       const OiButtonGroup(
         buttons: [
@@ -85,8 +86,9 @@ void main() {
 
   // ── Segmented mode ─────────────────────────────────────────────────────────
 
-  testWidgets('segmented: tapping button calls onSelected with correct index',
-      (tester) async {
+  testWidgets('segmented: tapping button calls onSelected with correct index', (
+    tester,
+  ) async {
     int? selected;
     await tester.pumpObers(
       OiButtonGroup(

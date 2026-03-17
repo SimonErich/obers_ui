@@ -137,11 +137,7 @@ class OiOverlaysService {
 /// {@category Foundation}
 class OiOverlays extends InheritedWidget {
   /// Creates an [OiOverlays] provider.
-  const OiOverlays({
-    required this.service,
-    required super.child,
-    super.key,
-  });
+  const OiOverlays({required this.service, required super.child, super.key});
 
   /// The overlay service.
   final OiOverlaysService service;
@@ -172,10 +168,7 @@ class OiOverlays extends InheritedWidget {
 ///
 /// This widget is rendered internally by [OiApp] and is not exported.
 class _OiOverlaysHost extends StatefulWidget {
-  const _OiOverlaysHost({
-    required this.service,
-    required this.child,
-  });
+  const _OiOverlaysHost({required this.service, required this.child});
 
   final OiOverlaysService service;
   final Widget child;
@@ -211,9 +204,7 @@ class _OiOverlaysHostState extends State<_OiOverlaysHost> {
       service: widget.service,
       child: Overlay(
         key: _overlayKey,
-        initialEntries: [
-          OverlayEntry(builder: (_) => widget.child),
-        ],
+        initialEntries: [OverlayEntry(builder: (_) => widget.child)],
       ),
     );
   }

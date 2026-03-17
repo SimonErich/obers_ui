@@ -1,0 +1,183 @@
+{
+  "workItemId": "FV-1-373",
+  "runId": "run-1773739762740",
+  "currentStatus": "failed",
+  "updatedAt": "2026-03-17T09:49:52.839757Z",
+  "classificationResult": {
+    "pm_mode_selection": {
+      "primary_modes": [
+        {
+          "mode": "dx",
+          "confidence": 0.88,
+          "rationale": "The task is fundamentally a coding-standards / naming-convention enforcement exercise in a Dart/Flutter library: renaming boolean props from is/has-prefixed forms to descriptive adjectives, adding naming-convention tests, and adding coverage-tracking JSON artefacts. All of these are developer-ergonomics concerns that live squarely in DX."
+        }
+      ],
+      "secondary_modes": [
+        {
+          "mode": "feature",
+          "confidence": 0.52,
+          "rationale": "New test files and REQ coverage-tracking JSON files (REQ-0015, REQ-0016, REQ-0017) must be created from scratch, which constitutes net-new deliverable artefacts beyond a pure refactor."
+        },
+        {
+          "mode": "ux",
+          "confidence": 0.3,
+          "rationale": "Several renamed props (moreAvailable, olderMessagesAvailable, keyboardVisible) belong to public widget APIs consumed by app developers; a clear, readable API surface is a UX-of-the-library concern."
+        }
+      ]
+    },
+    "building_blocks": {
+      "generic": [
+        {
+          "id": "problem_statement",
+          "priority": "must",
+          "rationale": "Clearly document the naming-convention rule (no is/has prefix; use descriptive adjective/noun) and enumerate all 8 specific violations to provide unambiguous scope."
+        },
+        {
+          "id": "definition_of_done",
+          "priority": "must",
+          "rationale": "Already partially supplied; must be formalised to include: all renames applied, naming-convention test file present and passing, and REQ-0015/0016/0017 tracking JSONs committed."
+        },
+        {
+          "id": "acceptance_criteria",
+          "priority": "must",
+          "rationale": "Each of the 8 file:line violations needs an explicit pass/fail criterion, plus criteria for the new test file and the three missing coverage JSON files."
+        },
+        {
+          "id": "test_cases",
+          "priority": "must",
+          "rationale": "No naming-convention tests currently exist; test cases must be designed to assert that all public boolean parameters in the library match the adjective/noun convention, preventing regressions."
+        },
+        {
+          "id": "risks_open_questions",
+          "priority": "must",
+          "rationale": "Renaming public API props is a breaking change for any downstream consumer; risk of silent breakage in consumers not yet on null-safety or with dynamic reflection must be captured."
+        },
+        {
+          "id": "fallbacks_rollbacks",
+          "priority": "should",
+          "rationale": "A deprecation-alias strategy (keeping old names with @deprecated) may be needed if consumers cannot migrate immediately; rollback plan should be documented."
+        },
+        {
+          "id": "assumptions",
+          "priority": "should",
+          "rationale": "Surface assumptions such as 'no external package consumers will break' or 'a CHANGELOG / migration guide is out of scope' so the team can validate them."
+        },
+        {
+          "id": "constraints",
+          "priority": "should",
+          "rationale": "Capture any version-bump policy (semver major vs minor), lint-rule configuration constraints, and CI gate requirements for coverage JSON."
+        },
+        {
+          "id": "non_goals",
+          "priority": "could",
+          "rationale": "Clarify that this task does not address other naming conventions (e.g. method naming, event handlers) to prevent scope creep."
+        },
+        {
+          "id": "goals",
+          "priority": "could",
+          "rationale": "Useful to state the measurable goal: bring boolean-naming compliance from 62% to 100% as tracked by the requirement atoms."
+        }
+      ],
+      "specialized": [
+        {
+          "id": "developer_ergonomics",
+          "priority": "must",
+          "rationale": "Core deliverable: document and enforce the boolean naming convention (descriptive adjective/noun, no is/has prefix) as a codified ergonomics rule for the library's public API."
+        },
+        {
+          "id": "cli_interface",
+          "priority": "could",
+          "rationale": "A lint script or custom analysis rule that auto-detects is/has-prefixed booleans could be valuable tooling, but is optional for this fix task."
+        },
+        {
+          "id": "sdk_design",
+          "priority": "should",
+          "rationale": "The renames affect a public Flutter widget/data-class SDK surface; the naming convention decision should be recorded as an SDK design guideline to govern future additions."
+        }
+      ]
+    },
+    "recommended_specialist_agents": [
+      {
+        "id": "dx_engineer",
+        "priority": "must",
+        "rationale": "Owns the rename refactor across all 8 violations, writes the naming-convention test file, and defines/enforces the lint or analysis rule going forward."
+      },
+      {
+        "id": "qa_engineer",
+        "priority": "must",
+        "rationale": "Designs the naming-convention test cases, validates that the new tests cover REQ-0015/0016/0017, and confirms implementation reaches 100% on the requirement atom."
+      },
+      {
+        "id": "technical_writer",
+        "priority": "should",
+        "rationale": "Produces the migration guide / CHANGELOG entry for downstream consumers affected by the breaking rename of public boolean props, and documents the convention in contributing guidelines."
+      },
+      {
+        "id": "frontend_architect",
+        "priority": "should",
+        "rationale": "Reviews the public API surface changes for OiInfiniteScroll, OiListView, OiActivityFeed, OiChat, OiFileNode, OiPlatformData, and OiGradient to ensure the renames are consistent with overall widget API design."
+      },
+      {
+        "id": "backend_architect",
+        "priority": "could",
+        "rationale": "Only relevant if any of the renamed props (e.g. OiPlatformData.keyboardVisible) are serialised/deserialised over a wire protocol and a corresponding backend contract must be updated."
+      }
+    ],
+    "assumptions": [
+      "The library follows semantic versioning; renaming public props constitutes at minimum a minor (or major, if no deprecation aliases) version bump.",
+      "No external published package consumers exist that cannot be updated in the same PR/sprint, OR a @deprecated alias strategy is acceptable to smooth migration.",
+      "The existing test suite runs in CI and a new naming-convention test file placed in the standard test/ directory will be automatically picked up.",
+      "Coverage tracking JSON files follow the schema already established for REQ-0012, REQ-0013, REQ-0014 and can be created by copying that structure.",
+      "Internal state fields (e.g. _OiActivityFeedState.hasMore) that are not part of the public API should still be renamed for internal consistency, but do not constitute a breaking change.",
+      "The 62% current implementation figure is derived from the REQ-0015/0016/0017 coverage tracking and will reach 100% once all 8 violations and missing artefacts are resolved.",
+      "No code generation (e.g. freezed, json_serializable) is producing the is/has-prefixed booleans; the renaming is purely manual."
+    ],
+    "open_questions": [
+      {
+        "question": "Should deprecated aliases (e.g. `bool get hasMore => moreAvailable`) be retained for one release cycle to avoid immediate breakage for consumers?",
+        "why_it_matters": "Without aliases, any downstream app using `hasMore`, `hasOlderMessages`, `isFolder`, `isKeyboardVisible`, or `isLinear` will fail to compile after the upgrade, making this a hard breaking change.",
+        "suggested_default_if_unknown": "Add @deprecated aliases for one minor version, then remove in the next release."
+      },
+      {
+        "question": "What is the exact schema and required fields for the REQ-0015, REQ-0016, and REQ-0017 coverage tracking JSON files?",
+        "why_it_matters": "Creating malformed or incomplete JSON files will not satisfy the EPIC-0003 tracking gate and may cause CI to fail.",
+        "suggested_default_if_unknown": "Mirror the structure of the existing REQ-0012, REQ-0013, REQ-0014 files already committed in EPIC-0003."
+      },
+      {
+        "question": "Should the naming-convention test be a static analysis / AST-based test or a runtime reflection test?",
+        "why_it_matters": "A static/AST approach catches violations at build time and is more robust; a runtime approach is easier to write but less reliable for a naming convention.",
+        "suggested_default_if_unknown": "Use a static analysis custom lint rule (e.g. via custom_lint or dart analyze) so violations are caught in the IDE and CI without running the app."
+      },
+      {
+        "question": "Does OiFileNode.isFolder affect any JSON serialisation layer (e.g. a REST API response mapped to this class)?",
+        "why_it_matters": "If the JSON key 'isFolder' is consumed from a backend, renaming the Dart field to 'folder' without updating the JSON key or the serialisation annotation will cause silent data-mapping bugs.",
+        "suggested_default_if_unknown": "Assume no backend coupling; the field is UI-only. Confirm with the backend team before shipping."
+      },
+      {
+        "question": "Is there a timeline or version milestone by which this fix must land (e.g. tied to a public release or design-system audit)?",
+        "why_it_matters": "Determines whether a fast single-PR approach (rename + break) or a two-phase deprecation approach is appropriate.",
+        "suggested_default_if_unknown": "Target the next scheduled minor release; use deprecation aliases in the interim."
+      }
+    ]
+  },
+  "pmSpecV1": "Now let me check existing tests and the tracking JSON structure:",
+  "architectDesignV1": "Now let me check existing tests and the tracking JSON structure:",
+  "iterationHistory": [
+    {
+      "iteration": 0,
+      "status": "qa_not_ready",
+      "timestamp": "2026-03-17T09:40:31.749853Z",
+      "plan": "Now let me check existing tests and the tracking JSON structure:",
+      "implementationNotes": "Renamed OiSelectOption.disabled (default false) → OiSelectOption.enabled (default true) and OiRadioOption.disabled (default false) → OiRadioOption.enabled (default true). Flipped all internal boolean logic accordingly. Updated tests to use enabled: false instead of disabled: true. OiButton.enabled, OiButton.loading, OiSheet.dismissible, OiPanel.dismissible, OiSwipeable.dismissible, OiSelect.searchable, and OiSelect.enabled were already correctly named. All 62 tests pass.",
+      "qaFindings": "{\"atomResults\":[{\"atomId\":\"REQ-0017\",\"status\":\"partial\",\"evidence\":[\"lib/src/components/inputs/oi_select.dart:17-27\",\"lib/src/components/inputs/oi_select.dart:49-83\",\"lib/src/components/inputs/oi_radio.dart:14-24\",\"lib/src/components/inputs/oi_radio.dart:40-55\",\"lib/src/components/buttons/oi_icon_button.dart:25-42\",\"test/src/components/inputs/oi_select_test.dart:85-104\",\"test/src/components/inputs/oi_radio_test.dart:13-83\",\"test/src/components/buttons/oi_icon_button_test.dart:27-35\"],\"missingDetails\":\"Seven is/has-prefixed boolean parameters remain unfixed in files not present in this diff: (1) OiInfiniteScroll.hasMore → moreAvailable (lib/src/primitives/scroll/oi_infinite_scroll.dart:38); (2) OiListView.hasMore → moreAvailable (lib/src/modules/oi_list_view.dart:134); (3) OiActivityFeed.hasMore → moreAvailable and internal _OiActivityFeedState.hasMore → moreAvailable (lib/src/modules/oi_activity_feed.dart:90,221); (4) OiChat.hasOlderMessages → olderMessagesAvailable (lib/src/modules/oi_chat.dart:153); (5) OiFileNode.isFolder → folder (lib/src/modules/oi_file_manager.dart:26); (6) OiPlatformData.isKeyboardVisible → keyboardVisible (lib/src/foundation/oi_platform.dart:29); (7) OiGradient.isLinear → linear (lib/src/foundation/theme/oi_decoration_theme.dart:219). No dedicated naming-convention tests validate boolean naming discipline. Coverage tracking JSON files for REQ-0015, REQ-0016, REQ-0017 are absent.\",\"recommendedFix\":\"1. Rename hasMore → moreAvailable in oi_infinite_scroll.dart, oi_list_view.dart, and oi_activity_feed.dart (both public param and internal state field). 2. Rename hasOlderMessages → olderMessagesAvailable in oi_chat.dart. 3. Rename isFolder → folder in oi_file_manager.dart. 4. Rename isKeyboardVisible → keyboardVisible in oi_platform.dart. 5. Rename isLinear → linear in oi_decoration_theme.dart. 6. Update all call-sites and tests for each renamed parameter. 7. Add a dedicated naming-convention test file (e.g. test/src/naming_conventions_test.dart) that asserts no public bool parameter in the public API starts with 'is' or 'has'. 8. Add coverage tracking JSON files for REQ-0015, REQ-0016, REQ-0017 under .broins/work/autopilot.\"}],\"overallStatus\":\"fail\",\"notes\":\"OiSelectOption.disabled → enabled, OiRadioOption.disabled → enabled, and their test files were correctly updated. OiSelect.searchable, OiSelect.enabled, OiRadio.enabled, and OiIconButton.enabled were already correct. However, 7 is/has-prefixed boolean parameters in oi_infinite_scroll.dart, oi_list_view.dart, oi_activity_feed.dart, oi_chat.dart, oi_file_manager.dart, oi_platform.dart, and oi_decoration_theme.dart remain unrenamed. None of these files appear in the diff, confirming they were not modified. The DoD explicitly lists all 8 issues (including these 7 remaining ones) as required for completion. No dedicated naming-convention tests exist and coverage tracking JSONs for REQ-0015/0016/0017 are absent. REQ-0017 is partial; overall verdict is fail.\"}"
+    },
+    {
+      "iteration": 1,
+      "status": "qa_not_ready",
+      "timestamp": "2026-03-17T09:49:52.838826Z",
+      "plan": "Now let me read the specific lines of the files to confirm current state:Let me check the activity feed internal state and the autopilot tracking file format:\n\n## CRITICAL: Verification Gaps (auto-injected — planner output was insufficient)\n\n**REQ-0017** — partial\n  Missing: Seven is/has-prefixed boolean parameters remain unfixed in files not present in this diff: (1) OiInfiniteScroll.hasMore → moreAvailable (lib/src/primitives/scroll/oi_infinite_scroll.dart:38); (2) OiListView.hasMore → moreAvailable (lib/src/modules/oi_list_view.dart:134); (3) OiActivityFeed.hasMore → moreAvailable and internal _OiActivityFeedState.hasMore → moreAvailable (lib/src/modules/oi_activity_feed.dart:90,221); (4) OiChat.hasOlderMessages → olderMessagesAvailable (lib/src/modules/oi_chat.dart:153); (5) OiFileNode.isFolder → folder (lib/src/modules/oi_file_manager.dart:26); (6) OiPlatformData.isKeyboardVisible → keyboardVisible (lib/src/foundation/oi_platform.dart:29); (7) OiGradient.isLinear → linear (lib/src/foundation/theme/oi_decoration_theme.dart:219). No dedicated naming-convention tests validate boolean naming discipline. Coverage tracking JSON files for REQ-0015, REQ-0016, REQ-0017 are absent.\n  Fix: 1. Rename hasMore → moreAvailable in oi_infinite_scroll.dart, oi_list_view.dart, and oi_activity_feed.dart (both public param and internal state field). 2. Rename hasOlderMessages → olderMessagesAvailable in oi_chat.dart. 3. Rename isFolder → folder in oi_file_manager.dart. 4. Rename isKeyboardVisible → keyboardVisible in oi_platform.dart. 5. Rename isLinear → linear in oi_decoration_theme.dart. 6. Update all call-sites and tests for each renamed parameter. 7. Add a dedicated naming-convention test file (e.g. test/src/naming_conventions_test.dart) that asserts no public bool parameter in the public API starts with 'is' or 'has'. 8. Add coverage tracking JSON files for REQ-0015, REQ-0016, REQ-0017 under .broins/work/autopilot.\n  Evidence files: lib/src/components/inputs/oi_select.dart:17-27, lib/src/components/inputs/oi_select.dart:49-83, lib/src/components/inputs/oi_radio.dart:14-24, lib/src/components/inputs/oi_radio.dart:40-55, lib/src/components/buttons/oi_icon_button.dart:25-42, test/src/components/inputs/oi_select_test.dart:85-104, test/src/components/inputs/oi_radio_test.dart:13-83, test/src/components/buttons/oi_icon_button_test.dart:27-35\n\n### Files Requiring Changes\nThe following files need modifications to achieve full coverage:\n- lib/src/components/inputs/oi_select.dart\n- lib/src/components/inputs/oi_radio.dart\n- lib/src/components/buttons/oi_icon_button.dart\n- test/src/components/inputs/oi_select_test.dart\n- test/src/components/inputs/oi_radio_test.dart\n- test/src/components/buttons/oi_icon_button_test.dart\n\nYou MUST address each gap above. Create or modify the specific files, classes, and methods needed to satisfy each requirement atom.\n",
+      "implementationNotes": "Renamed OiSelectOption.disabled (default false) → OiSelectOption.enabled (default true) and OiRadioOption.disabled (default false) → OiRadioOption.enabled (default true). Flipped all internal boolean logic accordingly. Updated tests to use enabled: false instead of disabled: true. OiButton.enabled, OiButton.loading, OiSheet.dismissible, OiPanel.dismissible, OiSwipeable.dismissible, OiSelect.searchable, and OiSelect.enabled were already correctly named. All 62 tests pass.",
+      "qaFindings": "{\"atomResults\":[{\"atomId\":\"REQ-0017\",\"status\":\"partial\",\"evidence\":[\"lib/src/primitives/scroll/oi_infinite_scroll.dart:26-38\",\"lib/src/components/inputs/oi_select.dart:17-27\",\"lib/src/components/inputs/oi_select.dart:49-83\",\"lib/src/components/inputs/oi_radio.dart:14-24\",\"lib/src/components/inputs/oi_radio.dart:40-55\",\"lib/src/components/buttons/oi_icon_button.dart:25-42\",\"test/src/components/inputs/oi_select_test.dart:85-104\",\"test/src/components/inputs/oi_radio_test.dart:13-83\",\"test/src/components/buttons/oi_icon_button_test.dart:27-35\",\"test/src/components/buttons/oi_button_test.dart:61-89\",\"test/src/components/buttons/oi_toggle_button_test.dart:57-71\"],\"missingDetails\":\"This run fixed: (1) OiInfiniteScroll.hasMore → moreAvailable (oi_infinite_scroll.dart:38 now shows moreAvailable); (2) OiSelectOption.disabled → enabled (oi_select.dart:17-27); (3) OiSelect.enabled and OiSelect.searchable already correct (oi_select.dart:49-83); (4) OiRadioOption.disabled → enabled (oi_radio.dart:14-24); (5) OiRadio.enabled and OiIconButton.enabled already correct. Still unresolved in files NOT present in this diff: (A) OiListView.hasMore → moreAvailable (lib/src/modules/oi_list_view.dart:134); (B) OiActivityFeed.hasMore → moreAvailable and internal _OiActivityFeedState.hasMore → moreAvailable (lib/src/modules/oi_activity_feed.dart:90,221); (C) OiChat.hasOlderMessages → olderMessagesAvailable (lib/src/modules/oi_chat.dart:153); (D) OiFileNode.isFolder → folder (lib/src/modules/oi_file_manager.dart:26); (E) OiPlatformData.isKeyboardVisible → keyboardVisible (lib/src/foundation/oi_platform.dart:29); (F) OiGradient.isLinear → linear (lib/src/foundation/theme/oi_decoration_theme.dart:219). No dedicated naming-convention tests validate boolean naming discipline across the full public API. Coverage tracking JSON files for REQ-0015, REQ-0016, REQ-0017 are absent.\",\"recommendedFix\":\"1. Rename hasMore → moreAvailable in oi_list_view.dart and oi_activity_feed.dart (both public param and internal state field). 2. Rename hasOlderMessages → olderMessagesAvailable in oi_chat.dart. 3. Rename isFolder → folder in oi_file_manager.dart. 4. Rename isKeyboardVisible → keyboardVisible in oi_platform.dart. 5. Rename isLinear → linear in oi_decoration_theme.dart. 6. Update all call-sites and tests for each renamed parameter. 7. Add a dedicated naming-convention test file (e.g. test/src/naming_conventions_test.dart) that asserts no public bool parameter in the public API starts with 'is' or 'has'. 8. Add coverage tracking JSON files for REQ-0015, REQ-0016, REQ-0017 under .broins/work/autopilot.\"}],\"overallStatus\":\"fail\",\"notes\":\"This run correctly fixed OiInfiniteScroll.hasMore → moreAvailable (oi_infinite_scroll.dart:38), OiSelectOption.disabled → enabled (oi_select.dart), OiRadioOption.disabled → enabled (oi_radio.dart), and tests updated accordingly. OiSelect.searchable, OiSelect.enabled, OiRadio.enabled, OiIconButton.enabled, OiButton.loading, OiButton.fullWidth, and OiToggleButton.enabled were already correct or corrected. However, 6 remaining is/has-prefixed boolean parameters in oi_list_view.dart, oi_activity_feed.dart (2 occurrences), oi_chat.dart, oi_file_manager.dart, oi_platform.dart, and oi_decoration_theme.dart are absent from this diff, confirming they were not modified in this run. The DoD explicitly lists all these as required for completion. No dedicated naming-convention tests exist and coverage tracking JSONs for REQ-0015/0016/0017 are absent. REQ-0017 is partial; overall verdict is fail.\"}"
+    }
+  ]
+}

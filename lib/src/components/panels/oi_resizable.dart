@@ -258,9 +258,6 @@ class _OiResizableState extends State<OiResizable> {
 
     final handles = widget.resizeEdges.map(_handle).toList();
 
-    return Stack(
-      clipBehavior: Clip.none,
-      children: [content, ...handles],
-    );
+    return Stack(clipBehavior: Clip.none, children: [content, ...handles]);
   }
 }

@@ -96,9 +96,7 @@ class OiStaggerState extends State<OiStagger>
     final n = widget.children.length;
     if (n == 0) return widget.duration;
     final staggerMs = widget.staggerDelay.inMilliseconds * (n - 1);
-    return Duration(
-      milliseconds: staggerMs + widget.duration.inMilliseconds,
-    );
+    return Duration(milliseconds: staggerMs + widget.duration.inMilliseconds);
   }
 
   /// Starts the stagger animation from the beginning.
@@ -203,7 +201,11 @@ class OiStaggerState extends State<OiStagger>
               parent: _controller,
               curve: Interval(start, end, curve: Curves.easeOut),
             );
-            return _applyTransition(widget.transition, interval, widget.children[i]);
+            return _applyTransition(
+              widget.transition,
+              interval,
+              widget.children[i],
+            );
           }),
         );
       },

@@ -46,10 +46,7 @@ class OiMenuItem {
 // ── Internal menu panel ──────────────────────────────────────────────────────
 
 class _MenuPanel extends StatefulWidget {
-  const _MenuPanel({
-    required this.items,
-    required this.onClose,
-  });
+  const _MenuPanel({required this.items, required this.onClose});
 
   final List<OiMenuItem> items;
   final VoidCallback onClose;
@@ -71,19 +68,17 @@ class _MenuPanelState extends State<_MenuPanel> {
     if (key == LogicalKeyboardKey.arrowDown) {
       final pos = interactable.indexOf(_focusedIndex);
       setState(() {
-        _focusedIndex =
-            interactable[(pos + 1) % interactable.length];
+        _focusedIndex = interactable[(pos + 1) % interactable.length];
       });
     } else if (key == LogicalKeyboardKey.arrowUp) {
       final pos = interactable.indexOf(_focusedIndex);
       setState(() {
-        _focusedIndex = interactable[
-            (pos - 1 + interactable.length) % interactable.length];
+        _focusedIndex =
+            interactable[(pos - 1 + interactable.length) % interactable.length];
       });
     } else if (key == LogicalKeyboardKey.enter ||
         key == LogicalKeyboardKey.space) {
-      if (_focusedIndex >= 0 &&
-          _focusedIndex < widget.items.length) {
+      if (_focusedIndex >= 0 && _focusedIndex < widget.items.length) {
         final item = widget.items[_focusedIndex];
         if (!item.disabled && !item.separator) {
           item.onTap?.call();
@@ -96,9 +91,9 @@ class _MenuPanelState extends State<_MenuPanel> {
   }
 
   List<int> _interactableIndices() => [
-        for (var i = 0; i < widget.items.length; i++)
-          if (!widget.items[i].separator && !widget.items[i].disabled) i,
-      ];
+    for (var i = 0; i < widget.items.length; i++)
+      if (!widget.items[i].separator && !widget.items[i].disabled) i,
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -157,7 +152,11 @@ class _MenuPanelState extends State<_MenuPanel> {
       child: Row(
         children: [
           if (item.icon != null) ...[
-            Icon(item.icon, size: 16, color: item.disabled ? colors.textMuted : colors.textSubtle),
+            Icon(
+              item.icon,
+              size: 16,
+              color: item.disabled ? colors.textMuted : colors.textSubtle,
+            ),
             const SizedBox(width: 8),
           ],
           Expanded(

@@ -12,9 +12,7 @@ void main() {
 
   testWidgets('renders all children', (tester) async {
     await tester.pumpObers(
-      const OiMasonry(
-        children: [Text('A'), Text('B'), Text('C'), Text('D')],
-      ),
+      const OiMasonry(children: [Text('A'), Text('B'), Text('C'), Text('D')]),
     );
     expect(find.text('A'), findsOneWidget);
     expect(find.text('B'), findsOneWidget);
@@ -22,12 +20,11 @@ void main() {
     expect(find.text('D'), findsOneWidget);
   });
 
-  testWidgets('renders outer Row with CrossAxisAlignment.start', (tester) async {
+  testWidgets('renders outer Row with CrossAxisAlignment.start', (
+    tester,
+  ) async {
     await tester.pumpObers(
-      const OiMasonry(
-        columns: 3,
-        children: [Text('X'), Text('Y'), Text('Z')],
-      ),
+      const OiMasonry(columns: 3, children: [Text('X'), Text('Y'), Text('Z')]),
     );
     final row = tester.widget<Row>(find.byType(Row).first);
     expect(row.crossAxisAlignment, CrossAxisAlignment.start);
@@ -48,23 +45,21 @@ void main() {
 
   // ── Gap spacing ────────────────────────────────────────────────────────────
 
-  testWidgets('gap inserts SizedBox with given width between columns',
-      (tester) async {
+  testWidgets('gap inserts SizedBox with given width between columns', (
+    tester,
+  ) async {
     await tester.pumpObers(
-      const OiMasonry(
-        gap: 12,
-        children: [Text('A'), Text('B')],
-      ),
+      const OiMasonry(gap: 12, children: [Text('A'), Text('B')]),
     );
     // One horizontal SizedBox between the two Expanded columns.
-    final boxes =
-        tester.widgetList<SizedBox>(find.byType(SizedBox)).toList();
+    final boxes = tester.widgetList<SizedBox>(find.byType(SizedBox)).toList();
     final widthBoxes = boxes.where((b) => b.width == 12).toList();
     expect(widthBoxes, hasLength(1));
   });
 
-  testWidgets('gap inserts vertical SizedBox between items in same column',
-      (tester) async {
+  testWidgets('gap inserts vertical SizedBox between items in same column', (
+    tester,
+  ) async {
     // 2 columns, 4 items → each column gets 2 items → 1 vertical spacer each.
     await tester.pumpObers(
       const OiMasonry(
@@ -72,8 +67,7 @@ void main() {
         children: [Text('A'), Text('B'), Text('C'), Text('D')],
       ),
     );
-    final boxes =
-        tester.widgetList<SizedBox>(find.byType(SizedBox)).toList();
+    final boxes = tester.widgetList<SizedBox>(find.byType(SizedBox)).toList();
     final heightBoxes = boxes.where((b) => b.height == 8).toList();
     // 2 columns × 1 spacer each = 2 vertical spacers.
     expect(heightBoxes, hasLength(2));

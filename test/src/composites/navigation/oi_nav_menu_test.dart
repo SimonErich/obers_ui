@@ -86,9 +86,7 @@ void main() {
 
     testWidgets('disabled items are not selectable', (tester) async {
       String? selected;
-      await tester.pumpObers(
-        _menu(onSelect: (id) => selected = id),
-      );
+      await tester.pumpObers(_menu(onSelect: (id) => selected = id));
 
       // Tap the disabled Archive item.
       await tester.tap(find.text('Archive'));
@@ -100,9 +98,7 @@ void main() {
 
     testWidgets('onSelect fires when item is tapped', (tester) async {
       String? selected;
-      await tester.pumpObers(
-        _menu(onSelect: (id) => selected = id),
-      );
+      await tester.pumpObers(_menu(onSelect: (id) => selected = id));
 
       await tester.tap(find.text('Notes'));
       await tester.pumpAndSettle();
@@ -110,12 +106,11 @@ void main() {
       expect(selected, 'notes');
     });
 
-    testWidgets('keyboard navigation with arrow keys and enter',
-        (tester) async {
+    testWidgets('keyboard navigation with arrow keys and enter', (
+      tester,
+    ) async {
       String? selected;
-      await tester.pumpObers(
-        _menu(onSelect: (id) => selected = id),
-      );
+      await tester.pumpObers(_menu(onSelect: (id) => selected = id));
 
       // Focus the menu by tapping an item.
       await tester.tap(find.text('Notes'));
@@ -133,17 +128,13 @@ void main() {
     });
 
     testWidgets('header renders', (tester) async {
-      await tester.pumpObers(
-        _menu(header: const Text('Menu Header')),
-      );
+      await tester.pumpObers(_menu(header: const Text('Menu Header')));
 
       expect(find.text('Menu Header'), findsOneWidget);
     });
 
     testWidgets('footer renders', (tester) async {
-      await tester.pumpObers(
-        _menu(footer: const Text('Menu Footer')),
-      );
+      await tester.pumpObers(_menu(footer: const Text('Menu Footer')));
 
       expect(find.text('Menu Footer'), findsOneWidget);
     });

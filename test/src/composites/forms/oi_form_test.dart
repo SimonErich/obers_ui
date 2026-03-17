@@ -10,23 +10,15 @@ import '../../../helpers/pump_app.dart';
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 List<OiFormSection> _simpleSections() => [
-      OiFormSection(
-        title: 'Personal Info',
-        description: 'Enter your details',
-        fields: [
-          const OiFormField(
-            key: 'name',
-            label: 'Name',
-            type: OiFieldType.text,
-          ),
-          const OiFormField(
-            key: 'age',
-            label: 'Age',
-            type: OiFieldType.number,
-          ),
-        ],
-      ),
-    ];
+  OiFormSection(
+    title: 'Personal Info',
+    description: 'Enter your details',
+    fields: [
+      const OiFormField(key: 'name', label: 'Name', type: OiFieldType.text),
+      const OiFormField(key: 'age', label: 'Age', type: OiFieldType.number),
+    ],
+  ),
+];
 
 Widget _form({
   List<OiFormSection>? sections,
@@ -193,26 +185,25 @@ void main() {
       expect(find.text('Enter your details'), findsOneWidget);
     });
 
-    testWidgets('submit button renders when onSubmit is provided',
-        (tester) async {
-      await tester.pumpObers(
-        _form(onSubmit: (_) {}),
-      );
+    testWidgets('submit button renders when onSubmit is provided', (
+      tester,
+    ) async {
+      await tester.pumpObers(_form(onSubmit: (_) {}));
 
       expect(find.text('Submit'), findsOneWidget);
     });
 
-    testWidgets('cancel button renders when onCancel is provided',
-        (tester) async {
-      await tester.pumpObers(
-        _form(onCancel: () {}),
-      );
+    testWidgets('cancel button renders when onCancel is provided', (
+      tester,
+    ) async {
+      await tester.pumpObers(_form(onCancel: () {}));
 
       expect(find.text('Cancel'), findsOneWidget);
     });
 
-    testWidgets('submit collects values with dirtyDetection off',
-        (tester) async {
+    testWidgets('submit collects values with dirtyDetection off', (
+      tester,
+    ) async {
       final ctrl = OiFormController();
       Map<String, dynamic>? submitted;
 
@@ -303,10 +294,7 @@ void main() {
       var cancelled = false;
 
       await tester.pumpObers(
-        _form(
-          controller: ctrl,
-          onCancel: () => cancelled = true,
-        ),
+        _form(controller: ctrl, onCancel: () => cancelled = true),
       );
 
       await tester.tap(find.text('Cancel'));
@@ -388,18 +376,14 @@ void main() {
     });
 
     testWidgets('horizontal layout renders fields in a Row', (tester) async {
-      await tester.pumpObers(
-        _form(layout: OiFormLayout.horizontal),
-      );
+      await tester.pumpObers(_form(layout: OiFormLayout.horizontal));
 
       // Horizontal layout wraps fields in a Row with Expanded children.
       expect(find.byType(Expanded), findsWidgets);
     });
 
     testWidgets('inline layout renders fields in a Wrap', (tester) async {
-      await tester.pumpObers(
-        _form(layout: OiFormLayout.inline),
-      );
+      await tester.pumpObers(_form(layout: OiFormLayout.inline));
 
       expect(find.byType(Wrap), findsOneWidget);
     });

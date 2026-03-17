@@ -12,23 +12,19 @@ import '../../../helpers/pump_app.dart';
 
 List<OiWizardStep> _steps({
   bool Function(Map<String, dynamic>)? step1Validate,
-}) =>
-    [
-      OiWizardStep(
-        title: 'Step One',
-        subtitle: 'First step subtitle',
-        builder: (ctx) => const Text('Content One'),
-        validate: step1Validate,
-      ),
-      OiWizardStep(
-        title: 'Step Two',
-        builder: (ctx) => const Text('Content Two'),
-      ),
-      OiWizardStep(
-        title: 'Step Three',
-        builder: (ctx) => const Text('Content Three'),
-      ),
-    ];
+}) => [
+  OiWizardStep(
+    title: 'Step One',
+    subtitle: 'First step subtitle',
+    builder: (ctx) => const Text('Content One'),
+    validate: step1Validate,
+  ),
+  OiWizardStep(title: 'Step Two', builder: (ctx) => const Text('Content Two')),
+  OiWizardStep(
+    title: 'Step Three',
+    builder: (ctx) => const Text('Content Three'),
+  ),
+];
 
 Widget _wizard({
   List<OiWizardStep>? steps,
@@ -115,10 +111,7 @@ void main() {
   // 6. Validation blocks next
   testWidgets('validation blocks advancing to the next step', (tester) async {
     await tester.pumpObers(
-      _wizard(
-        animated: false,
-        steps: _steps(step1Validate: (_) => false),
-      ),
+      _wizard(animated: false, steps: _steps(step1Validate: (_) => false)),
     );
 
     await tester.tap(find.text('Next'));
@@ -131,10 +124,7 @@ void main() {
   // 7. Passing validation allows advancing
   testWidgets('passing validation allows advancing', (tester) async {
     await tester.pumpObers(
-      _wizard(
-        animated: false,
-        steps: _steps(step1Validate: (_) => true),
-      ),
+      _wizard(animated: false, steps: _steps(step1Validate: (_) => true)),
     );
 
     await tester.tap(find.text('Next'));
@@ -148,10 +138,7 @@ void main() {
     Map<String, dynamic>? completedValues;
 
     await tester.pumpObers(
-      _wizard(
-        animated: false,
-        onComplete: (v) => completedValues = v,
-      ),
+      _wizard(animated: false, onComplete: (v) => completedValues = v),
     );
 
     // Navigate to step 2.
@@ -174,9 +161,7 @@ void main() {
   testWidgets('Cancel button fires onCancel', (tester) async {
     var cancelled = false;
 
-    await tester.pumpObers(
-      _wizard(onCancel: () => cancelled = true),
-    );
+    await tester.pumpObers(_wizard(onCancel: () => cancelled = true));
 
     await tester.tap(find.text('Cancel'));
     await tester.pump();
@@ -189,10 +174,7 @@ void main() {
     int? newStep;
 
     await tester.pumpObers(
-      _wizard(
-        animated: false,
-        onStepChange: (s) => newStep = s,
-      ),
+      _wizard(animated: false, onStepChange: (s) => newStep = s),
     );
 
     await tester.tap(find.text('Next'));
@@ -214,9 +196,7 @@ void main() {
 
   // 12. Non-linear wizard allows jumping via stepper
   testWidgets('non-linear wizard allows jumping to any step', (tester) async {
-    await tester.pumpObers(
-      _wizard(linear: false, animated: false),
-    );
+    await tester.pumpObers(_wizard(linear: false, animated: false));
 
     // In non-linear mode the stepper has onStepTap on the circle.
     // Tap the step circle showing "3" (the third step).
@@ -282,9 +262,7 @@ void main() {
 
   // 15. Compact stepper style works
   testWidgets('compact stepper style shows step count text', (tester) async {
-    await tester.pumpObers(
-      _wizard(stepperStyle: OiStepperStyle.compact),
-    );
+    await tester.pumpObers(_wizard(stepperStyle: OiStepperStyle.compact));
 
     expect(find.text('Step 1 of 3'), findsWidgets);
   });

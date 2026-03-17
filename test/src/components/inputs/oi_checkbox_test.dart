@@ -8,16 +8,12 @@ import '../../../helpers/pump_app.dart';
 
 void main() {
   testWidgets('renders unchecked state', (tester) async {
-    await tester.pumpObers(
-      const OiCheckbox(value: OiCheckboxState.unchecked),
-    );
+    await tester.pumpObers(const OiCheckbox(value: OiCheckboxState.unchecked));
     expect(find.byType(OiCheckbox), findsOneWidget);
   });
 
   testWidgets('renders checked state', (tester) async {
-    await tester.pumpObers(
-      const OiCheckbox(value: OiCheckboxState.checked),
-    );
+    await tester.pumpObers(const OiCheckbox(value: OiCheckboxState.checked));
     expect(find.byType(OiCheckbox), findsOneWidget);
   });
 
@@ -44,17 +40,16 @@ void main() {
   testWidgets('tapping checked fires onChanged with false', (tester) async {
     bool? result;
     await tester.pumpObers(
-      OiCheckbox(
-        value: OiCheckboxState.checked,
-        onChanged: (v) => result = v,
-      ),
+      OiCheckbox(value: OiCheckboxState.checked, onChanged: (v) => result = v),
     );
     await tester.tap(find.byType(OiCheckbox));
     await tester.pump();
     expect(result, isFalse);
   });
 
-  testWidgets('tapping indeterminate fires onChanged with true', (tester) async {
+  testWidgets('tapping indeterminate fires onChanged with true', (
+    tester,
+  ) async {
     bool? result;
     await tester.pumpObers(
       OiCheckbox(
@@ -69,10 +64,7 @@ void main() {
 
   testWidgets('label is shown', (tester) async {
     await tester.pumpObers(
-      const OiCheckbox(
-        value: OiCheckboxState.unchecked,
-        label: 'Accept terms',
-      ),
+      const OiCheckbox(value: OiCheckboxState.unchecked, label: 'Accept terms'),
     );
     expect(find.text('Accept terms'), findsOneWidget);
   });

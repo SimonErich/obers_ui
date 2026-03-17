@@ -114,9 +114,7 @@ void main() {
   // 5. onDateTap fires when a date cell is tapped.
   testWidgets('onDateTap fires when date cell is tapped', (tester) async {
     DateTime? tappedDate;
-    await tester.pumpObers(
-      _calendar(onDateTap: (dt) => tappedDate = dt),
-    );
+    await tester.pumpObers(_calendar(onDateTap: (dt) => tappedDate = dt));
     // Tap on day 20 (June 20th).
     await tester.tap(find.text('20'));
     await tester.pump();
@@ -127,9 +125,7 @@ void main() {
   // 6. onEventTap fires when an event is tapped.
   testWidgets('onEventTap fires when event chip is tapped', (tester) async {
     OiCalendarEvent? tappedEvent;
-    await tester.pumpObers(
-      _calendar(onEventTap: (ev) => tappedEvent = ev),
-    );
+    await tester.pumpObers(_calendar(onEventTap: (ev) => tappedEvent = ev));
     // Tap 'Team Standup' event chip.
     await tester.tap(find.text('Team Standup').first);
     await tester.pump();
@@ -145,8 +141,9 @@ void main() {
   });
 
   // 8. Week numbers show when enabled.
-  testWidgets('week numbers are shown when showWeekNumbers is true',
-      (tester) async {
+  testWidgets('week numbers are shown when showWeekNumbers is true', (
+    tester,
+  ) async {
     await tester.pumpObers(_calendar(showWeekNumbers: true));
     // 'Wk' header should be present.
     expect(find.text('Wk'), findsOneWidget);
@@ -159,8 +156,7 @@ void main() {
   });
 
   // 10. Mode switching from month to week.
-  testWidgets('switching mode from month to week changes view',
-      (tester) async {
+  testWidgets('switching mode from month to week changes view', (tester) async {
     await tester.pumpObers(_calendar());
     // Initially in month mode; day headers like 'Mon', 'Tue' are present.
     expect(find.text('Mon'), findsOneWidget);
@@ -174,8 +170,9 @@ void main() {
   });
 
   // 11. Mode switching from month to day.
-  testWidgets('switching mode from month to day shows hour slots',
-      (tester) async {
+  testWidgets('switching mode from month to day shows hour slots', (
+    tester,
+  ) async {
     await tester.pumpObers(_calendar());
     await tester.tap(find.byKey(const ValueKey('calendar_mode_day')));
     await tester.pump();
@@ -186,9 +183,7 @@ void main() {
 
   // 12. First day of week respected — Sunday start.
   testWidgets('firstDayOfWeek=7 starts week on Sunday', (tester) async {
-    await tester.pumpObers(
-      _calendar(firstDayOfWeek: DateTime.sunday),
-    );
+    await tester.pumpObers(_calendar(firstDayOfWeek: DateTime.sunday));
     // The first day header should be 'Sun'.
     final headers = tester.widgetList<Text>(find.byType(Text));
     final headerTexts = headers.map((t) => t.data).toList();
@@ -203,7 +198,8 @@ void main() {
     await tester.pumpObers(_calendar(label: 'My Schedule'));
     // The Semantics widget wraps the calendar Column.
     final semantics = find.byWidgetPredicate(
-      (widget) => widget is Semantics && widget.properties.label == 'My Schedule',
+      (widget) =>
+          widget is Semantics && widget.properties.label == 'My Schedule',
     );
     expect(semantics, findsOneWidget);
   });
@@ -215,13 +211,11 @@ void main() {
   });
 
   // 15. All-day row hidden when showAllDayRow is false.
-  testWidgets('all-day row is hidden when showAllDayRow is false',
-      (tester) async {
+  testWidgets('all-day row is hidden when showAllDayRow is false', (
+    tester,
+  ) async {
     await tester.pumpObers(_calendar(showAllDayRow: false));
-    expect(
-      find.byKey(const ValueKey('calendar_all_day_row')),
-      findsNothing,
-    );
+    expect(find.byKey(const ValueKey('calendar_all_day_row')), findsNothing);
   });
 
   // 16. Empty events list.
@@ -232,25 +226,29 @@ void main() {
   });
 
   // 17. Navigation in week mode.
-  testWidgets('forward navigation in week mode advances by one week',
-      (tester) async {
+  testWidgets('forward navigation in week mode advances by one week', (
+    tester,
+  ) async {
     await tester.pumpObers(_calendar(mode: OiCalendarMode.week));
-    final headerBefore = tester
-        .widget<Text>(find.byKey(const ValueKey('calendar_header_title')));
+    final headerBefore = tester.widget<Text>(
+      find.byKey(const ValueKey('calendar_header_title')),
+    );
     final titleBefore = headerBefore.data;
 
     await tester.tap(find.byKey(const ValueKey('calendar_forward')));
     await tester.pump();
 
-    final headerAfter = tester
-        .widget<Text>(find.byKey(const ValueKey('calendar_header_title')));
+    final headerAfter = tester.widget<Text>(
+      find.byKey(const ValueKey('calendar_header_title')),
+    );
     final titleAfter = headerAfter.data;
     expect(titleAfter, isNot(equals(titleBefore)));
   });
 
   // 18. Navigation in day mode.
-  testWidgets('forward navigation in day mode advances by one day',
-      (tester) async {
+  testWidgets('forward navigation in day mode advances by one day', (
+    tester,
+  ) async {
     await tester.pumpObers(_calendar(mode: OiCalendarMode.day));
     // Initial: 15 June 2025.
     expect(find.text('15 June 2025'), findsOneWidget);

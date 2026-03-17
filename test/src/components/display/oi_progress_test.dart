@@ -9,9 +9,7 @@ import '../../../helpers/pump_app.dart';
 
 void main() {
   testWidgets('linear style renders', (tester) async {
-    await tester.pumpObers(
-      const OiProgress(value: 0.5),
-    );
+    await tester.pumpObers(const OiProgress(value: 0.5));
     expect(find.byType(CustomPaint), findsAtLeastNWidgets(1));
   });
 
@@ -24,53 +22,38 @@ void main() {
 
   testWidgets('steps style renders step dots', (tester) async {
     await tester.pumpObers(
-      const OiProgress(
-        style: OiProgressStyle.steps,
-        steps: 4,
-        currentStep: 2,
-      ),
+      const OiProgress(style: OiProgressStyle.steps, steps: 4, currentStep: 2),
     );
     // The steps Row contains 4 Container dots.
     expect(find.byType(Container), findsAtLeastNWidgets(4));
   });
 
   testWidgets('label is rendered when provided', (tester) async {
-    await tester.pumpObers(
-      const OiProgress(value: 0.3, label: 'Loading…'),
-    );
+    await tester.pumpObers(const OiProgress(value: 0.3, label: 'Loading…'));
     expect(find.text('Loading…'), findsOneWidget);
   });
 
   testWidgets('indeterminate linear animates', (tester) async {
-    await tester.pumpObers(
-      const OiProgress(indeterminate: true),
-    );
+    await tester.pumpObers(const OiProgress(indeterminate: true));
     expect(find.byType(AnimatedBuilder), findsAtLeastNWidgets(1));
     await tester.pump(const Duration(milliseconds: 600));
   });
 
   testWidgets('indeterminate circular animates', (tester) async {
     await tester.pumpObers(
-      const OiProgress(
-        indeterminate: true,
-        style: OiProgressStyle.circular,
-      ),
+      const OiProgress(indeterminate: true, style: OiProgressStyle.circular),
     );
     expect(find.byType(AnimatedBuilder), findsAtLeastNWidgets(1));
     await tester.pump(const Duration(milliseconds: 600));
   });
 
   testWidgets('value 0.0 renders without error', (tester) async {
-    await tester.pumpObers(
-      const OiProgress(),
-    );
+    await tester.pumpObers(const OiProgress());
     expect(find.byType(CustomPaint), findsAtLeastNWidgets(1));
   });
 
   testWidgets('value 1.0 renders without error', (tester) async {
-    await tester.pumpObers(
-      const OiProgress(value: 1),
-    );
+    await tester.pumpObers(const OiProgress(value: 1));
     expect(find.byType(CustomPaint), findsAtLeastNWidgets(1));
   });
 }

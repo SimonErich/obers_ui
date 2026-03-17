@@ -42,9 +42,7 @@ void main() {
     });
 
     test('fromJson parses dividerPosition from int JSON value', () {
-      final s = OiSplitPaneSettings.fromJson(const {
-        'dividerPosition': 1,
-      });
+      final s = OiSplitPaneSettings.fromJson(const {'dividerPosition': 1});
       expect(s.dividerPosition, 1.0);
     });
 
@@ -97,19 +95,13 @@ void main() {
 
     test('copyWith updates multiple fields at once', () {
       const s = OiSplitPaneSettings();
-      final updated = s.copyWith(
-        dividerPosition: 0.2,
-        paneCollapsed: true,
-      );
+      final updated = s.copyWith(dividerPosition: 0.2, paneCollapsed: true);
       expect(updated.dividerPosition, 0.2);
       expect(updated.paneCollapsed, isTrue);
     });
 
     test('copyWith preserves unspecified fields', () {
-      const s = OiSplitPaneSettings(
-        dividerPosition: 0.7,
-        paneCollapsed: true,
-      );
+      const s = OiSplitPaneSettings(dividerPosition: 0.7, paneCollapsed: true);
       final updated = s.copyWith(dividerPosition: 0.4);
       expect(updated.dividerPosition, 0.4);
       expect(updated.paneCollapsed, isTrue);
@@ -130,14 +122,8 @@ void main() {
     });
 
     test('hashCode is same for equal instances', () {
-      const a = OiSplitPaneSettings(
-        dividerPosition: 0.6,
-        paneCollapsed: true,
-      );
-      const b = OiSplitPaneSettings(
-        dividerPosition: 0.6,
-        paneCollapsed: true,
-      );
+      const a = OiSplitPaneSettings(dividerPosition: 0.6, paneCollapsed: true);
+      const b = OiSplitPaneSettings(dividerPosition: 0.6, paneCollapsed: true);
       expect(a.hashCode, equals(b.hashCode));
     });
 

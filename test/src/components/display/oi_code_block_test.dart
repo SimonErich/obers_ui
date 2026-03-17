@@ -9,16 +9,12 @@ import '../../../helpers/pump_app.dart';
 
 void main() {
   testWidgets('renders code text', (tester) async {
-    await tester.pumpObers(
-      const OiCodeBlock(code: 'void main() {}'),
-    );
+    await tester.pumpObers(const OiCodeBlock(code: 'void main() {}'));
     expect(find.textContaining('main'), findsOneWidget);
   });
 
   testWidgets('copy button present by default', (tester) async {
-    await tester.pumpObers(
-      const OiCodeBlock(code: 'hello'),
-    );
+    await tester.pumpObers(const OiCodeBlock(code: 'hello'));
     expect(find.byType(OiCopyButton), findsOneWidget);
   });
 
@@ -51,10 +47,7 @@ void main() {
 
   testWidgets('multi-line code renders all lines', (tester) async {
     await tester.pumpObers(
-      const OiCodeBlock(
-        code: 'alpha\nbeta\ngamma',
-        showCopyButton: false,
-      ),
+      const OiCodeBlock(code: 'alpha\nbeta\ngamma', showCopyButton: false),
     );
     expect(find.textContaining('alpha'), findsOneWidget);
     expect(find.textContaining('gamma'), findsOneWidget);

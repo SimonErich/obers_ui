@@ -103,17 +103,19 @@ void main() {
   group('OiGradientStyle', () {
     group('.linear', () {
       test('toGradient() returns a LinearGradient', () {
-        final style = OiGradientStyle.linear(
-          const [Color(0xFF000000), Color(0xFFFFFFFF)],
-        );
+        final style = OiGradientStyle.linear(const [
+          Color(0xFF000000),
+          Color(0xFFFFFFFF),
+        ]);
         expect(style.toGradient(), isA<LinearGradient>());
       });
 
-      test('isLinear is true', () {
-        final style = OiGradientStyle.linear(
-          const [Color(0xFF000000), Color(0xFFFFFFFF)],
-        );
-        expect(style.isLinear, isTrue);
+      test('linear is true', () {
+        final style = OiGradientStyle.linear(const [
+          Color(0xFF000000),
+          Color(0xFFFFFFFF),
+        ]);
+        expect(style.linear, isTrue);
       });
 
       test('colors are stored correctly', () {
@@ -133,56 +135,63 @@ void main() {
 
     group('.radial', () {
       test('toGradient() returns a RadialGradient', () {
-        final style = OiGradientStyle.radial(
-          const [Color(0xFF000000), Color(0xFFFFFFFF)],
-        );
+        final style = OiGradientStyle.radial(const [
+          Color(0xFF000000),
+          Color(0xFFFFFFFF),
+        ]);
         expect(style.toGradient(), isA<RadialGradient>());
       });
 
-      test('isLinear is false', () {
-        final style = OiGradientStyle.radial(
-          const [Color(0xFF000000), Color(0xFFFFFFFF)],
-        );
-        expect(style.isLinear, isFalse);
+      test('linear is false', () {
+        final style = OiGradientStyle.radial(const [
+          Color(0xFF000000),
+          Color(0xFFFFFFFF),
+        ]);
+        expect(style.linear, isFalse);
       });
 
       test('radius is stored correctly', () {
-        final style = OiGradientStyle.radial(
-          const [Color(0xFF000000), Color(0xFFFFFFFF)],
-          radius: 0.8,
-        );
+        final style = OiGradientStyle.radial(const [
+          Color(0xFF000000),
+          Color(0xFFFFFFFF),
+        ], radius: 0.8);
         expect(style.radius, equals(0.8));
       });
     });
 
     test('copyWith overrides only specified fields', () {
-      final original = OiGradientStyle.linear(
-        const [Color(0xFF000000), Color(0xFFFFFFFF)],
-      );
+      final original = OiGradientStyle.linear(const [
+        Color(0xFF000000),
+        Color(0xFFFFFFFF),
+      ]);
       final copy = original.copyWith(
         colors: const [Color(0xFFFF0000), Color(0xFF0000FF)],
       );
       expect(copy.colors, equals(const [Color(0xFFFF0000), Color(0xFF0000FF)]));
-      expect(copy.isLinear, equals(original.isLinear));
+      expect(copy.linear, equals(original.linear));
     });
 
     test('equality holds for same values', () {
-      final a = OiGradientStyle.linear(
-        const [Color(0xFF000000), Color(0xFFFFFFFF)],
-      );
-      final b = OiGradientStyle.linear(
-        const [Color(0xFF000000), Color(0xFFFFFFFF)],
-      );
+      final a = OiGradientStyle.linear(const [
+        Color(0xFF000000),
+        Color(0xFFFFFFFF),
+      ]);
+      final b = OiGradientStyle.linear(const [
+        Color(0xFF000000),
+        Color(0xFFFFFFFF),
+      ]);
       expect(a, equals(b));
     });
 
     test('hashCode is consistent', () {
-      final a = OiGradientStyle.linear(
-        const [Color(0xFF000000), Color(0xFFFFFFFF)],
-      );
-      final b = OiGradientStyle.linear(
-        const [Color(0xFF000000), Color(0xFFFFFFFF)],
-      );
+      final a = OiGradientStyle.linear(const [
+        Color(0xFF000000),
+        Color(0xFFFFFFFF),
+      ]);
+      final b = OiGradientStyle.linear(const [
+        Color(0xFF000000),
+        Color(0xFFFFFFFF),
+      ]);
       expect(a.hashCode, equals(b.hashCode));
     });
   });

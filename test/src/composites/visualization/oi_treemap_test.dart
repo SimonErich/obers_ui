@@ -62,25 +62,25 @@ void main() {
 
   // 4. Custom colors applied.
   testWidgets('renders with custom node colors', (tester) async {
-    await tester.pumpObers(_treemap(
-      nodes: const [
-        OiTreemapNode(
-          key: 'x',
-          label: 'X',
-          value: 100,
-          color: Color(0xFFE91E63),
-        ),
-      ],
-    ));
+    await tester.pumpObers(
+      _treemap(
+        nodes: const [
+          OiTreemapNode(
+            key: 'x',
+            label: 'X',
+            value: 100,
+            color: Color(0xFFE91E63),
+          ),
+        ],
+      ),
+    );
     expect(find.text('X'), findsOneWidget);
   });
 
   // 5. onNodeTap fires.
   testWidgets('onNodeTap fires with correct node', (tester) async {
     OiTreemapNode? tappedNode;
-    await tester.pumpObers(_treemap(
-      onNodeTap: (node) => tappedNode = node,
-    ));
+    await tester.pumpObers(_treemap(onNodeTap: (node) => tappedNode = node));
     await tester.tap(find.byKey(const Key('oi_treemap_node_b')));
     await tester.pump();
     expect(tappedNode?.label, 'Beta');
@@ -134,19 +134,21 @@ void main() {
 
   // 12. Hierarchical nodes with children.
   testWidgets('renders nodes with children without error', (tester) async {
-    await tester.pumpObers(_treemap(
-      nodes: const [
-        OiTreemapNode(
-          key: 'parent',
-          label: 'Parent',
-          value: 100,
-          children: [
-            OiTreemapNode(key: 'child1', label: 'Child 1', value: 60),
-            OiTreemapNode(key: 'child2', label: 'Child 2', value: 40),
-          ],
-        ),
-      ],
-    ));
+    await tester.pumpObers(
+      _treemap(
+        nodes: const [
+          OiTreemapNode(
+            key: 'parent',
+            label: 'Parent',
+            value: 100,
+            children: [
+              OiTreemapNode(key: 'child1', label: 'Child 1', value: 60),
+              OiTreemapNode(key: 'child2', label: 'Child 2', value: 40),
+            ],
+          ),
+        ],
+      ),
+    );
     expect(find.text('Parent'), findsOneWidget);
   });
 }

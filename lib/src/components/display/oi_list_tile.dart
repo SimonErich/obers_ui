@@ -86,21 +86,12 @@ class OiListTile extends StatelessWidget {
     }
 
     final row = Padding(
-      padding: EdgeInsets.symmetric(
-        horizontal: 16,
-        vertical: verticalPadding,
-      ),
+      padding: EdgeInsets.symmetric(horizontal: 16, vertical: verticalPadding),
       child: Row(
         children: [
-          if (leading != null) ...[
-            leading!,
-            const SizedBox(width: 12),
-          ],
+          if (leading != null) ...[leading!, const SizedBox(width: 12)],
           Expanded(child: content),
-          if (trailing != null) ...[
-            const SizedBox(width: 12),
-            trailing!,
-          ],
+          if (trailing != null) ...[const SizedBox(width: 12), trailing!],
         ],
       ),
     );
@@ -115,10 +106,6 @@ class OiListTile extends StatelessWidget {
       tile = row;
     }
 
-    return OiTappable(
-      onTap: onTap,
-      enabled: enabled,
-      child: tile,
-    );
+    return OiTappable(onTap: onTap, enabled: enabled, child: tile);
   }
 }

@@ -13,18 +13,16 @@ void main() {
   // ── Renders child ─────────────────────────────────────────────────────────
 
   testWidgets('renders child widget', (tester) async {
-    await tester.pumpObers(
-      const OiSurface(child: Text('hello')),
-    );
+    await tester.pumpObers(const OiSurface(child: Text('hello')));
     expect(find.text('hello'), findsOneWidget);
   });
 
   // ── Color ─────────────────────────────────────────────────────────────────
 
-  testWidgets('applies background color via Container decoration', (tester) async {
-    await tester.pumpObers(
-      const OiSurface(color: Color(0xFFABCDEF)),
-    );
+  testWidgets('applies background color via Container decoration', (
+    tester,
+  ) async {
+    await tester.pumpObers(const OiSurface(color: Color(0xFFABCDEF)));
     final container = tester.widget<Container>(find.byType(Container));
     final decoration = container.decoration! as BoxDecoration;
     expect(decoration.color, const Color(0xFFABCDEF));
@@ -80,7 +78,9 @@ void main() {
     );
   });
 
-  testWidgets('dashed border does not add a BoxDecoration border', (tester) async {
+  testWidgets('dashed border does not add a BoxDecoration border', (
+    tester,
+  ) async {
     await tester.pumpObers(
       OiSurface(
         border: OiBorderStyle.dashed(const Color(0xFF00FF00), 1),
@@ -135,10 +135,7 @@ void main() {
   testWidgets('halo is merged into boxShadow list', (tester) async {
     final halo = OiHaloStyle.from(const Color(0xFF2563EB));
     await tester.pumpObers(
-      OiSurface(
-        halo: halo,
-        child: const SizedBox(width: 100, height: 100),
-      ),
+      OiSurface(halo: halo, child: const SizedBox(width: 100, height: 100)),
     );
     final container = tester.widget<Container>(find.byType(Container));
     final decoration = container.decoration! as BoxDecoration;
@@ -149,7 +146,7 @@ void main() {
 
   testWidgets('gradient applied via BoxDecoration.gradient', (tester) async {
     const gradientStyle = OiGradientStyle(
-      isLinear: true,
+      linear: true,
       colors: [Color(0xFF000000), Color(0xFFFFFFFF)],
     );
     await tester.pumpObers(
@@ -169,19 +166,14 @@ void main() {
 
   testWidgets('glass:true adds BackdropFilter', (tester) async {
     await tester.pumpObers(
-      const OiSurface(
-        glass: true,
-        child: SizedBox(width: 100, height: 100),
-      ),
+      const OiSurface(glass: true, child: SizedBox(width: 100, height: 100)),
     );
     expect(find.byType(BackdropFilter), findsOneWidget);
   });
 
   testWidgets('glass:false does not add BackdropFilter', (tester) async {
     await tester.pumpObers(
-      const OiSurface(
-        child: SizedBox(width: 100, height: 100),
-      ),
+      const OiSurface(child: SizedBox(width: 100, height: 100)),
     );
     expect(find.byType(BackdropFilter), findsNothing);
   });
@@ -190,12 +182,7 @@ void main() {
 
   testWidgets('padding is forwarded to Container', (tester) async {
     const insets = EdgeInsets.all(16);
-    await tester.pumpObers(
-      const OiSurface(
-        padding: insets,
-        child: SizedBox(),
-      ),
-    );
+    await tester.pumpObers(const OiSurface(padding: insets, child: SizedBox()));
     final container = tester.widget<Container>(find.byType(Container));
     expect(container.padding, insets);
   });

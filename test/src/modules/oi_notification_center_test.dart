@@ -123,17 +123,15 @@ void main() {
       const SizedBox(
         width: 400,
         height: 600,
-        child: OiNotificationCenter(
-          notifications: [],
-          label: 'Notifications',
-        ),
+        child: OiNotificationCenter(notifications: [], label: 'Notifications'),
       ),
     );
     expect(find.text('No notifications'), findsOneWidget);
   });
 
-  testWidgets('badge count shows when showBadge is true and unreadCount > 0',
-      (tester) async {
+  testWidgets('badge count shows when showBadge is true and unreadCount > 0', (
+    tester,
+  ) async {
     await tester.pumpObers(
       SizedBox(
         width: 400,
@@ -176,10 +174,7 @@ void main() {
         ),
       ),
     );
-    expect(
-      find.bySemanticsLabel('My Notifications'),
-      findsOneWidget,
-    );
+    expect(find.bySemanticsLabel('My Notifications'), findsOneWidget);
   });
 
   testWidgets('notification body renders when provided', (tester) async {
@@ -188,9 +183,7 @@ void main() {
         width: 400,
         height: 600,
         child: OiNotificationCenter(
-          notifications: [
-            _notif(title: 'Title', body: 'Detailed body text'),
-          ],
+          notifications: [_notif(title: 'Title', body: 'Detailed body text')],
           label: 'Notifications',
         ),
       ),

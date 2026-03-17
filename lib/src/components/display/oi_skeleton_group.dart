@@ -10,11 +10,7 @@ import 'package:obers_ui/src/primitives/animation/oi_shimmer.dart';
 /// {@category Components}
 class OiSkeletonLine extends StatelessWidget {
   /// Creates an [OiSkeletonLine].
-  const OiSkeletonLine({
-    this.width,
-    this.height = 14,
-    super.key,
-  });
+  const OiSkeletonLine({this.width, this.height = 14, super.key});
 
   /// Optional width constraint. Defaults to filling available width.
   final double? width;
@@ -46,11 +42,7 @@ class OiSkeletonLine extends StatelessWidget {
 /// {@category Components}
 class OiSkeletonBox extends StatelessWidget {
   /// Creates an [OiSkeletonBox].
-  const OiSkeletonBox({
-    this.width,
-    this.height,
-    super.key,
-  });
+  const OiSkeletonBox({this.width, this.height, super.key});
 
   /// Optional width constraint. Defaults to filling available width.
   final double? width;

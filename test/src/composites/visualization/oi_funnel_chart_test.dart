@@ -64,24 +64,22 @@ void main() {
 
   // 4. Custom colors applied.
   testWidgets('renders with custom stage colors', (tester) async {
-    await tester.pumpObers(_funnelChart(
-      stages: const [
-        OiFunnelStage(
-          label: 'Custom',
-          value: 100,
-          color: Color(0xFF9C27B0),
-        ),
-      ],
-    ));
+    await tester.pumpObers(
+      _funnelChart(
+        stages: const [
+          OiFunnelStage(label: 'Custom', value: 100, color: Color(0xFF9C27B0)),
+        ],
+      ),
+    );
     expect(find.text('Custom'), findsOneWidget);
   });
 
   // 5. onStageTap fires.
   testWidgets('onStageTap fires with correct index', (tester) async {
     int? tappedIndex;
-    await tester.pumpObers(_funnelChart(
-      onStageTap: (index) => tappedIndex = index,
-    ));
+    await tester.pumpObers(
+      _funnelChart(onStageTap: (index) => tappedIndex = index),
+    );
     await tester.tap(find.text('Leads'));
     await tester.pump();
     expect(tappedIndex, 1);
@@ -111,20 +109,22 @@ void main() {
 
   // 9. formatValue callback is used.
   testWidgets('formatValue callback formats displayed value', (tester) async {
-    await tester.pumpObers(_funnelChart(
-      formatValue: (v) => '${v.toInt()}k',
-    ));
+    await tester.pumpObers(_funnelChart(formatValue: (v) => '${v.toInt()}k'));
     expect(find.text('1000k - 100%'), findsOneWidget);
   });
 
   // 10. showValues false hides values.
   testWidgets('hides values when showValues is false', (tester) async {
-    await tester.pumpObers(_funnelChart(showValues: false, showPercentages: false));
+    await tester.pumpObers(
+      _funnelChart(showValues: false, showPercentages: false),
+    );
     expect(find.text('1000 - 100%'), findsNothing);
   });
 
   // 11. Only percentages shown.
-  testWidgets('shows only percentages when showValues is false', (tester) async {
+  testWidgets('shows only percentages when showValues is false', (
+    tester,
+  ) async {
     await tester.pumpObers(_funnelChart(showValues: false));
     expect(find.text('100%'), findsOneWidget);
     expect(find.text('60%'), findsOneWidget);

@@ -185,10 +185,7 @@ class OiAvatar extends StatelessWidget {
               height: totalD,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                border: Border.all(
-                  color: ringColor,
-                  width: ringWidth,
-                ),
+                border: Border.all(color: ringColor, width: ringWidth),
               ),
             ),
             avatar,
@@ -204,23 +201,20 @@ class OiAvatar extends StatelessWidget {
     );
   }
 
-  Widget _buildContent(
-      BuildContext context, OiColorScheme colors, double d) {
+  Widget _buildContent(BuildContext context, OiColorScheme colors, double d) {
     if (imageUrl != null) {
       return Image.network(
         imageUrl!,
         width: d,
         height: d,
         fit: BoxFit.cover,
-        errorBuilder: (ctx, _, __) =>
-            _buildFallback(context, colors, d),
+        errorBuilder: (ctx, _, __) => _buildFallback(context, colors, d),
       );
     }
     return _buildFallback(context, colors, d);
   }
 
-  Widget _buildFallback(
-      BuildContext context, OiColorScheme colors, double d) {
+  Widget _buildFallback(BuildContext context, OiColorScheme colors, double d) {
     if (initials != null && initials!.isNotEmpty) {
       final text = initials!.length > 2
           ? initials!.substring(0, 2).toUpperCase()

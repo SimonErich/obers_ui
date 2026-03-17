@@ -32,9 +32,7 @@ class _StarPainter extends CustomPainter {
       // Clip horizontally to reveal the active colour.
       canvas
         ..save()
-        ..clipRect(
-          Rect.fromLTWH(0, 0, size.width * fillFraction, size.height),
-        )
+        ..clipRect(Rect.fromLTWH(0, 0, size.width * fillFraction, size.height))
         ..drawPath(path, Paint()..color = activeColor)
         ..restore();
     }

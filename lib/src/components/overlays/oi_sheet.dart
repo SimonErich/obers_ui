@@ -143,8 +143,7 @@ class OiSheet extends StatefulWidget {
   State<OiSheet> createState() => _OiSheetState();
 }
 
-class _OiSheetState extends State<OiSheet>
-    with SingleTickerProviderStateMixin {
+class _OiSheetState extends State<OiSheet> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
 
   // Drag tracking (for snap points).
@@ -152,8 +151,7 @@ class _OiSheetState extends State<OiSheet>
   bool _dragging = false;
 
   bool get _isVertical =>
-      widget.side == OiPanelSide.bottom ||
-      widget.side == OiPanelSide.top;
+      widget.side == OiPanelSide.bottom || widget.side == OiPanelSide.top;
 
   @override
   void initState() {
@@ -218,8 +216,9 @@ class _OiSheetState extends State<OiSheet>
       if (snap != null && snap.isNotEmpty) {
         // Find nearest snap point above current drag.
         final remaining = 1.0 - fraction;
-        final nearest = snap.reduce((a, b) =>
-            (a - remaining).abs() < (b - remaining).abs() ? a : b);
+        final nearest = snap.reduce(
+          (a, b) => (a - remaining).abs() < (b - remaining).abs() ? a : b,
+        );
         if (nearest < snap.first) {
           widget.onClose?.call();
         }
@@ -239,9 +238,7 @@ class _OiSheetState extends State<OiSheet>
     final slideAnim = Tween<Offset>(
       begin: _slideBegin(),
       end: Offset.zero,
-    ).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic),
-    );
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic));
 
     // Build the drag handle pill.
     Widget? handle;
@@ -321,17 +318,15 @@ class _OiSheetState extends State<OiSheet>
               child: AnimatedBuilder(
                 animation: _controller,
                 builder: (_, __) => ColoredBox(
-                  color: colors.overlay
-                      .withValues(alpha: 0.6 * _controller.value),
+                  color: colors.overlay.withValues(
+                    alpha: 0.6 * _controller.value,
+                  ),
                 ),
               ),
             ),
           ),
         // Panel aligned to the correct edge.
-        Align(
-          alignment: _alignment(),
-          child: panel,
-        ),
+        Align(alignment: _alignment(), child: panel),
       ],
     );
   }

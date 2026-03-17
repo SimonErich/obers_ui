@@ -9,10 +9,7 @@ import 'package:obers_ui/src/foundation/oi_accessibility.dart';
 Widget buildDefault(Widget child) {
   return MediaQuery(
     data: const MediaQueryData(),
-    child: Directionality(
-      textDirection: TextDirection.ltr,
-      child: child,
-    ),
+    child: Directionality(textDirection: TextDirection.ltr, child: child),
   );
 }
 

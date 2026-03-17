@@ -30,9 +30,7 @@ void main() {
       List<OiMetadataField>? updatedFields;
       await tester.pumpObers(
         OiMetadataEditor(
-          fields: const [
-            OiMetadataField(key: 'Existing', value: 'val'),
-          ],
+          fields: const [OiMetadataField(key: 'Existing', value: 'val')],
           onChange: (f) => updatedFields = f,
           label: 'Metadata',
         ),
@@ -51,9 +49,7 @@ void main() {
       List<OiMetadataField>? updatedFields;
       await tester.pumpObers(
         OiMetadataEditor(
-          fields: const [
-            OiMetadataField(key: 'ToRemove', value: 'val'),
-          ],
+          fields: const [OiMetadataField(key: 'ToRemove', value: 'val')],
           onChange: (f) => updatedFields = f,
           label: 'Metadata',
           allowRemove: true,
@@ -118,9 +114,7 @@ void main() {
       List<OiMetadataField>? updatedFields;
       await tester.pumpObers(
         OiMetadataEditor(
-          fields: const [
-            OiMetadataField(key: 'Title', value: 'Old'),
-          ],
+          fields: const [OiMetadataField(key: 'Title', value: 'Old')],
           onChange: (f) => updatedFields = f,
           label: 'Metadata',
         ),
@@ -137,9 +131,7 @@ void main() {
     testWidgets('disabled blocks editing', (tester) async {
       await tester.pumpObers(
         OiMetadataEditor(
-          fields: const [
-            OiMetadataField(key: 'Locked', value: 'val'),
-          ],
+          fields: const [OiMetadataField(key: 'Locked', value: 'val')],
           onChange: (_) {},
           label: 'Metadata',
           enabled: false,

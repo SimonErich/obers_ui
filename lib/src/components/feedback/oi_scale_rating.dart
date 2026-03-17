@@ -69,8 +69,7 @@ class OiScaleRating extends StatelessWidget {
             '$n',
             style: textTheme.small.copyWith(
               color: fg,
-              fontWeight:
-                  selected ? FontWeight.w700 : FontWeight.w400,
+              fontWeight: selected ? FontWeight.w700 : FontWeight.w400,
             ),
           ),
         ),

@@ -150,8 +150,11 @@ class _OiProgressState extends State<OiProgress>
 
       case OiProgressStyle.steps:
         final stepCount = widget.steps ?? 5;
-        final filled = (widget.currentStep ?? (widget.value * stepCount).round())
-            .clamp(0, stepCount);
+        final filled =
+            (widget.currentStep ?? (widget.value * stepCount).round()).clamp(
+              0,
+              stepCount,
+            );
         const dotSize = 12.0;
         const dotSpacing = 6.0;
         indicator = Row(

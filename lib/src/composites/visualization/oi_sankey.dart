@@ -9,11 +9,7 @@ import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 /// overrides the default from the theme chart palette.
 class OiSankeyNode {
   /// Creates an [OiSankeyNode].
-  const OiSankeyNode({
-    required this.key,
-    required this.label,
-    this.color,
-  });
+  const OiSankeyNode({required this.key, required this.label, this.color});
 
   /// A unique key identifying this node.
   final Object key;
@@ -100,9 +96,7 @@ class OiSankey extends StatelessWidget {
     if (nodes.isEmpty) {
       return Semantics(
         label: label,
-        child: const SizedBox.shrink(
-          key: Key('oi_sankey_empty'),
-        ),
+        child: const SizedBox.shrink(key: Key('oi_sankey_empty')),
       );
     }
 
@@ -164,8 +158,9 @@ class OiSankey extends StatelessWidget {
                         ),
                         child: showLabels || showValues
                             ? Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 4),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 4,
+                                ),
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -265,8 +260,7 @@ class OiSankey extends StatelessWidget {
       }
     }
 
-    final maxDepth =
-        depth.values.fold<int>(0, math.max);
+    final maxDepth = depth.values.fold<int>(0, math.max);
     final numColumns = maxDepth + 1;
 
     // Group nodes by column.
@@ -286,10 +280,14 @@ class OiSankey extends StatelessWidget {
     // Compute node values (sum of links).
     final nodeValue = <Object, double>{};
     for (final n in nodes) {
-      final outVal = (outLinks[n.key] ?? [])
-          .fold<double>(0, (s, l) => s + l.value);
-      final inVal = (inLinks[n.key] ?? [])
-          .fold<double>(0, (s, l) => s + l.value);
+      final outVal = (outLinks[n.key] ?? []).fold<double>(
+        0,
+        (s, l) => s + l.value,
+      );
+      final inVal = (inLinks[n.key] ?? []).fold<double>(
+        0,
+        (s, l) => s + l.value,
+      );
       nodeValue[n.key] = math.max(outVal, inVal);
     }
 
@@ -299,8 +297,10 @@ class OiSankey extends StatelessWidget {
       final colNodes = columns[col] ?? [];
       if (colNodes.isEmpty) continue;
 
-      final totalValue =
-          colNodes.fold<double>(0, (s, n) => s + (nodeValue[n.key] ?? 1));
+      final totalValue = colNodes.fold<double>(
+        0,
+        (s, n) => s + (nodeValue[n.key] ?? 1),
+      );
       final availHeight = height - (colNodes.length - 1) * nodePadding;
       final x = numColumns > 1 ? col * colSpacing : (width - nodeWidth) / 2;
 
@@ -308,7 +308,9 @@ class OiSankey extends StatelessWidget {
       for (final n in colNodes) {
         final nv = nodeValue[n.key] ?? 1;
         final h = math.max<double>(
-          totalValue > 0 ? availHeight * nv / totalValue : availHeight / colNodes.length,
+          totalValue > 0
+              ? availHeight * nv / totalValue
+              : availHeight / colNodes.length,
           12,
         );
         nodeRects[n.key] = Rect.fromLTWH(x, y, nodeWidth, h);
@@ -319,11 +321,13 @@ class OiSankey extends StatelessWidget {
     // Build layout node list.
     final layoutNodes = <_LayoutNode>[];
     for (final n in nodes) {
-      layoutNodes.add(_LayoutNode(
-        node: n,
-        rect: nodeRects[n.key] ?? Rect.zero,
-        totalValue: nodeValue[n.key] ?? 0,
-      ));
+      layoutNodes.add(
+        _LayoutNode(
+          node: n,
+          rect: nodeRects[n.key] ?? Rect.zero,
+          totalValue: nodeValue[n.key] ?? 0,
+        ),
+      );
     }
 
     // Build layout link list with source/target Y offsets.
@@ -352,15 +356,17 @@ class OiSankey extends StatelessWidget {
       final sy = sourceOffsets[link.source] ?? srcRect.top;
       final ty = targetOffsets[link.target] ?? tgtRect.top;
 
-      layoutLinks.add(_LayoutLink(
-        link: link,
-        sourceX: srcRect.right,
-        sourceY: sy,
-        sourceHeight: srcHeight,
-        targetX: tgtRect.left,
-        targetY: ty,
-        targetHeight: tgtHeight,
-      ));
+      layoutLinks.add(
+        _LayoutLink(
+          link: link,
+          sourceX: srcRect.right,
+          sourceY: sy,
+          sourceHeight: srcHeight,
+          targetX: tgtRect.left,
+          targetY: ty,
+          targetHeight: tgtHeight,
+        ),
+      );
 
       sourceOffsets[link.source] = sy + srcHeight;
       targetOffsets[link.target] = ty + tgtHeight;
@@ -453,7 +459,8 @@ class _OiSankeyLinkPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     for (final ll in layoutLinks) {
-      final color = ll.link.color ??
+      final color =
+          ll.link.color ??
           nodeColorMap[ll.link.source]?.withValues(alpha: 0.3) ??
           defaultLinkColor;
 
@@ -465,14 +472,7 @@ class _OiSankeyLinkPainter extends CustomPainter {
 
       final path = Path()
         ..moveTo(ll.sourceX, ll.sourceY)
-        ..cubicTo(
-          midX,
-          ll.sourceY,
-          midX,
-          ll.targetY,
-          ll.targetX,
-          ll.targetY,
-        )
+        ..cubicTo(midX, ll.sourceY, midX, ll.targetY, ll.targetX, ll.targetY)
         ..lineTo(ll.targetX, ll.targetY + ll.targetHeight)
         ..cubicTo(
           midX,

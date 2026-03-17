@@ -83,19 +83,19 @@ class OiTableSettings with OiSettingsData {
   /// Serializes this settings object to a JSON-encodable map.
   @override
   Map<String, dynamic> toJson() => {
-        'schemaVersion': schemaVersion,
-        'columnOrder': columnOrder,
-        'columnVisibility': columnVisibility,
-        'columnWidths': Map<String, double>.fromEntries(columnWidths.entries),
-        'sortColumnId': sortColumnId,
-        'sortAscending': sortAscending,
-        'activeFilters': activeFilters,
-        'pageSize': pageSize,
-        'pageIndex': pageIndex,
-        'groupByColumnId': groupByColumnId,
-        'frozenColumns': frozenColumns,
-        'showStatusBar': showStatusBar,
-      };
+    'schemaVersion': schemaVersion,
+    'columnOrder': columnOrder,
+    'columnVisibility': columnVisibility,
+    'columnWidths': Map<String, double>.fromEntries(columnWidths.entries),
+    'sortColumnId': sortColumnId,
+    'sortAscending': sortAscending,
+    'activeFilters': activeFilters,
+    'pageSize': pageSize,
+    'pageIndex': pageIndex,
+    'groupByColumnId': groupByColumnId,
+    'frozenColumns': frozenColumns,
+    'showStatusBar': showStatusBar,
+  };
 
   /// Returns new settings, filling in fields from [defaults] where this
   /// instance has empty or null values.
@@ -109,12 +109,12 @@ class OiTableSettings with OiSettingsData {
       columnVisibility: columnVisibility.isEmpty
           ? defaults.columnVisibility
           : columnVisibility,
-      columnWidths:
-          columnWidths.isEmpty ? defaults.columnWidths : columnWidths,
+      columnWidths: columnWidths.isEmpty ? defaults.columnWidths : columnWidths,
       sortColumnId: sortColumnId ?? defaults.sortColumnId,
       sortAscending: sortAscending,
-      activeFilters:
-          activeFilters.isEmpty ? defaults.activeFilters : activeFilters,
+      activeFilters: activeFilters.isEmpty
+          ? defaults.activeFilters
+          : activeFilters,
       pageSize: pageSize,
       pageIndex: pageIndex,
       groupByColumnId: groupByColumnId ?? defaults.groupByColumnId,
@@ -178,25 +178,25 @@ class OiTableSettings with OiSettingsData {
 
   @override
   int get hashCode => Object.hash(
-        schemaVersion,
-        Object.hashAll(columnOrder),
-        Object.hashAll(
-          columnVisibility.entries.map((e) => Object.hash(e.key, e.value)),
-        ),
-        Object.hashAll(
-          columnWidths.entries.map((e) => Object.hash(e.key, e.value)),
-        ),
-        sortColumnId,
-        sortAscending,
-        Object.hashAll(
-          activeFilters.entries.map((e) => Object.hash(e.key, e.value)),
-        ),
-        pageSize,
-        pageIndex,
-        groupByColumnId,
-        frozenColumns,
-        showStatusBar,
-      );
+    schemaVersion,
+    Object.hashAll(columnOrder),
+    Object.hashAll(
+      columnVisibility.entries.map((e) => Object.hash(e.key, e.value)),
+    ),
+    Object.hashAll(
+      columnWidths.entries.map((e) => Object.hash(e.key, e.value)),
+    ),
+    sortColumnId,
+    sortAscending,
+    Object.hashAll(
+      activeFilters.entries.map((e) => Object.hash(e.key, e.value)),
+    ),
+    pageSize,
+    pageIndex,
+    groupByColumnId,
+    frozenColumns,
+    showStatusBar,
+  );
 
   // ── Private helpers ────────────────────────────────────────────────────────
 

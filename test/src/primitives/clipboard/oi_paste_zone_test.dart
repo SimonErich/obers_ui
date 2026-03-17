@@ -11,16 +11,15 @@ import '../../../helpers/pump_app.dart';
 void main() {
   setUp(() {
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-        .setMockMethodCallHandler(
-      SystemChannels.platform,
-      (MethodCall call) async {
-        if (call.method == 'Clipboard.setData') return null;
-        if (call.method == 'Clipboard.getData') {
-          return {'text': 'pasted text'};
-        }
-        return null;
-      },
-    );
+        .setMockMethodCallHandler(SystemChannels.platform, (
+          MethodCall call,
+        ) async {
+          if (call.method == 'Clipboard.setData') return null;
+          if (call.method == 'Clipboard.getData') {
+            return {'text': 'pasted text'};
+          }
+          return null;
+        });
   });
 
   tearDown(() {
@@ -32,10 +31,7 @@ void main() {
 
   testWidgets('renders child widget', (tester) async {
     await tester.pumpObers(
-      OiPasteZone(
-        onPaste: (_) {},
-        child: const Text('paste here'),
-      ),
+      OiPasteZone(onPaste: (_) {}, child: const Text('paste here')),
     );
     expect(find.text('paste here'), findsOneWidget);
   });

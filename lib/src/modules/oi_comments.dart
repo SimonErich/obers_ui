@@ -157,8 +157,7 @@ class _OiCommentsState extends State<OiComments> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Icon(
-                          const IconData(0xe24c,
-                              fontFamily: 'MaterialIcons'),
+                          const IconData(0xe24c, fontFamily: 'MaterialIcons'),
                           size: 48,
                           color: colors.textMuted,
                         ),
@@ -183,9 +182,7 @@ class _OiCommentsState extends State<OiComments> {
             padding: EdgeInsets.all(spacing.sm),
             decoration: BoxDecoration(
               color: colors.surface,
-              border: Border(
-                top: BorderSide(color: colors.borderSubtle),
-              ),
+              border: Border(top: BorderSide(color: colors.borderSubtle)),
             ),
             child: Row(
               children: [
@@ -234,10 +231,7 @@ class _OiCommentsState extends State<OiComments> {
     final spacing = context.spacing;
 
     return Padding(
-      padding: EdgeInsets.only(
-        left: depth * spacing.md,
-        bottom: spacing.sm,
-      ),
+      padding: EdgeInsets.only(left: depth * spacing.md, bottom: spacing.sm),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -281,10 +275,7 @@ class _OiCommentsState extends State<OiComments> {
                   padding: EdgeInsets.only(left: spacing.sm),
                   child: Text(
                     _formatTimestamp(comment.timestamp),
-                    style: TextStyle(
-                      color: colors.textMuted,
-                      fontSize: 11,
-                    ),
+                    style: TextStyle(color: colors.textMuted, fontSize: 11),
                   ),
                 ),
               if (comment.edited)
@@ -310,10 +301,7 @@ class _OiCommentsState extends State<OiComments> {
             ),
             child: Text(
               comment.content,
-              style: TextStyle(
-                color: colors.text,
-                fontSize: 14,
-              ),
+              style: TextStyle(color: colors.text, fontSize: 14),
             ),
           ),
 

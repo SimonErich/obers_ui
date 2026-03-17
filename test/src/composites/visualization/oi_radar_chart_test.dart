@@ -12,10 +12,7 @@ import '../../../helpers/pump_app.dart';
 const _axes = ['Speed', 'Power', 'Range', 'Armor', 'Magic'];
 
 const _series = [
-  OiRadarSeries(
-    label: 'Player A',
-    values: [80, 60, 90, 40, 70],
-  ),
+  OiRadarSeries(label: 'Player A', values: [80, 60, 90, 40, 70]),
   OiRadarSeries(
     label: 'Player B',
     values: [50, 80, 60, 70, 90],
@@ -72,16 +69,18 @@ void main() {
 
   // 4. Custom colors applied — series with custom color renders.
   testWidgets('renders with custom series colors', (tester) async {
-    await tester.pumpObers(_radarChart(
-      series: const [
-        OiRadarSeries(
-          label: 'Custom',
-          values: [10, 20, 30],
-          color: Color(0xFF00BCD4),
-        ),
-      ],
-      axes: const ['A', 'B', 'C'],
-    ));
+    await tester.pumpObers(
+      _radarChart(
+        series: const [
+          OiRadarSeries(
+            label: 'Custom',
+            values: [10, 20, 30],
+            color: Color(0xFF00BCD4),
+          ),
+        ],
+        axes: const ['A', 'B', 'C'],
+      ),
+    );
     expect(find.text('Custom'), findsOneWidget);
   });
 

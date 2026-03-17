@@ -143,8 +143,8 @@ class OiUndoStack extends ChangeNotifier {
   ///
   /// Throws if no [OiUndoStackProvider] is found.
   static OiUndoStack of(BuildContext context) {
-    final provider =
-        context.dependOnInheritedWidgetOfExactType<OiUndoStackProvider>();
+    final provider = context
+        .dependOnInheritedWidgetOfExactType<OiUndoStackProvider>();
     assert(
       provider != null,
       'No OiUndoStackProvider found in the widget tree.',

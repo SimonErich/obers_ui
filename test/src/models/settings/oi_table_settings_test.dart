@@ -106,9 +106,7 @@ void main() {
 
     test('mergeWith: empty columnVisibility filled from defaults', () {
       const saved = OiTableSettings();
-      const defaults = OiTableSettings(
-        columnVisibility: {'a': false},
-      );
+      const defaults = OiTableSettings(columnVisibility: {'a': false});
       final merged = saved.mergeWith(defaults);
       expect(merged.columnVisibility, {'a': false});
     });

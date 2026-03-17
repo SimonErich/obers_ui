@@ -122,10 +122,7 @@ class _OiVideoPlayerState extends State<OiVideoPlayer> {
                 children: [
                   Text(
                     '\u25B6',
-                    style: TextStyle(
-                      fontSize: 32,
-                      color: colors.textInverse,
-                    ),
+                    style: TextStyle(fontSize: 32, color: colors.textInverse),
                   ),
                   const SizedBox(height: 8),
                   Text(

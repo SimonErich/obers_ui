@@ -11,18 +11,14 @@ void main() {
   // ── 1. Renders child ───────────────────────────────────────────────────────
 
   testWidgets('renders child widget', (tester) async {
-    await tester.pumpObers(
-      const OiPinchZoom(child: Text('zoom me')),
-    );
+    await tester.pumpObers(const OiPinchZoom(child: Text('zoom me')));
     expect(find.text('zoom me'), findsOneWidget);
   });
 
   // ── 2. clipBehavior=true wraps in ClipRect ────────────────────────────────
 
   testWidgets('clipBehavior=true inserts ClipRect', (tester) async {
-    await tester.pumpObers(
-      const OiPinchZoom(child: Text('z')),
-    );
+    await tester.pumpObers(const OiPinchZoom(child: Text('z')));
     expect(find.byType(ClipRect), findsOneWidget);
   });
 
@@ -56,10 +52,8 @@ void main() {
     );
 
     final center = tester.getCenter(find.byType(OiPinchZoom));
-    final pointer1 =
-        await tester.startGesture(center + const Offset(-40, 0));
-    final pointer2 =
-        await tester.startGesture(center + const Offset(40, 0));
+    final pointer1 = await tester.startGesture(center + const Offset(-40, 0));
+    final pointer2 = await tester.startGesture(center + const Offset(40, 0));
     await tester.pump();
 
     // Move pointers apart (zoom in).
@@ -139,8 +133,9 @@ void main() {
 
   // ── 8. panEnabled=false: offset does not change on drag ──────────────────
 
-  testWidgets('panEnabled=false: offset unchanged on single-pointer drag',
-      (tester) async {
+  testWidgets('panEnabled=false: offset unchanged on single-pointer drag', (
+    tester,
+  ) async {
     await tester.pumpObers(
       const OiPinchZoom(
         panEnabled: false,

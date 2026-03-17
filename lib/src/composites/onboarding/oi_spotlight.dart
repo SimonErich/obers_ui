@@ -110,8 +110,7 @@ class _OiSpotlightState extends State<OiSpotlight> {
                 key: const Key('oi_spotlight_overlay'),
                 painter: _SpotlightPainter(
                   targetRect: _targetRect!,
-                  overlayColor:
-                      widget.overlayColor ?? const Color(0x8A000000),
+                  overlayColor: widget.overlayColor ?? const Color(0x8A000000),
                   borderRadius: widget.borderRadius,
                 ),
               ),
@@ -151,10 +150,7 @@ class _SpotlightPainter extends CustomPainter {
       cutoutPath,
     );
 
-    canvas.drawPath(
-      overlayPath,
-      Paint()..color = overlayColor,
-    );
+    canvas.drawPath(overlayPath, Paint()..color = overlayColor);
   }
 
   @override

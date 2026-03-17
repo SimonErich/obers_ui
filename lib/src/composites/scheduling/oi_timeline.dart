@@ -74,10 +74,7 @@ class OiTimeline extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (events.isEmpty) {
-      return Semantics(
-        label: label,
-        child: const SizedBox.shrink(),
-      );
+      return Semantics(label: label, child: const SizedBox.shrink());
     }
 
     return Semantics(
@@ -153,10 +150,7 @@ class _OiTimelineEntryState extends State<_OiTimelineEntry> {
       key: const ValueKey('timeline_dot'),
       width: dotSize,
       height: dotSize,
-      decoration: BoxDecoration(
-        color: dotColor,
-        shape: BoxShape.circle,
-      ),
+      decoration: BoxDecoration(color: dotColor, shape: BoxShape.circle),
       child: widget.event.icon != null
           ? Center(
               child: Icon(
@@ -171,10 +165,7 @@ class _OiTimelineEntryState extends State<_OiTimelineEntry> {
     // Vertical connector line.
     final line = widget.last
         ? const SizedBox(width: lineWidth)
-        : Container(
-            width: lineWidth,
-            color: colors.borderSubtle,
-          );
+        : Container(width: lineWidth, color: colors.borderSubtle);
 
     // Card content.
     Widget card = Container(
@@ -199,10 +190,7 @@ class _OiTimelineEntryState extends State<_OiTimelineEntry> {
                     padding: const EdgeInsets.only(right: 8),
                     child: Text(
                       _expanded ? '\u25BC' : '\u25B6',
-                      style: TextStyle(
-                        fontSize: 10,
-                        color: colors.textMuted,
-                      ),
+                      style: TextStyle(fontSize: 10, color: colors.textMuted),
                     ),
                   ),
                 Expanded(
@@ -250,10 +238,7 @@ class _OiTimelineEntryState extends State<_OiTimelineEntry> {
       timestamp = Text(
         _formatTimestamp(widget.event.timestamp),
         key: const ValueKey('timeline_timestamp'),
-        style: TextStyle(
-          fontSize: 12,
-          color: colors.textMuted,
-        ),
+        style: TextStyle(fontSize: 12, color: colors.textMuted),
       );
     }
 
@@ -267,24 +252,21 @@ class _OiTimelineEntryState extends State<_OiTimelineEntry> {
             Expanded(
               child: widget.leftAligned
                   ? Padding(
-                      padding: const EdgeInsets.only(
-                        right: gutter,
-                        bottom: 16,
-                      ),
+                      padding: const EdgeInsets.only(right: gutter, bottom: 16),
                       child: card,
                     )
                   : (timestamp != null
-                      ? Align(
-                          alignment: Alignment.topRight,
-                          child: Padding(
-                            padding: const EdgeInsets.only(
-                              right: gutter,
-                              top: 2,
+                        ? Align(
+                            alignment: Alignment.topRight,
+                            child: Padding(
+                              padding: const EdgeInsets.only(
+                                right: gutter,
+                                top: 2,
+                              ),
+                              child: timestamp,
                             ),
-                            child: timestamp,
-                          ),
-                        )
-                      : const SizedBox.shrink()),
+                          )
+                        : const SizedBox.shrink()),
             ),
             // Center column: dot + line.
             Column(
@@ -297,24 +279,21 @@ class _OiTimelineEntryState extends State<_OiTimelineEntry> {
             Expanded(
               child: !widget.leftAligned
                   ? Padding(
-                      padding: const EdgeInsets.only(
-                        left: gutter,
-                        bottom: 16,
-                      ),
+                      padding: const EdgeInsets.only(left: gutter, bottom: 16),
                       child: card,
                     )
                   : (timestamp != null
-                      ? Align(
-                          alignment: Alignment.topLeft,
-                          child: Padding(
-                            padding: const EdgeInsets.only(
-                              left: gutter,
-                              top: 2,
+                        ? Align(
+                            alignment: Alignment.topLeft,
+                            child: Padding(
+                              padding: const EdgeInsets.only(
+                                left: gutter,
+                                top: 2,
+                              ),
+                              child: timestamp,
                             ),
-                            child: timestamp,
-                          ),
-                        )
-                      : const SizedBox.shrink()),
+                          )
+                        : const SizedBox.shrink()),
             ),
           ],
         ),

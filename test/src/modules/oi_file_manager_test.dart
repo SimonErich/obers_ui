@@ -13,14 +13,11 @@ void main() {
     String name = 'readme.txt',
     int? size = 1024,
   }) {
-    return OiFileNode(key: key, name: name, isFolder: false, size: size);
+    return OiFileNode(key: key, name: name, folder: false, size: size);
   }
 
-  OiFileNode _folder({
-    Object key = 'd1',
-    String name = 'Documents',
-  }) {
-    return OiFileNode(key: key, name: name, isFolder: true);
+  OiFileNode _folder({Object key = 'd1', String name = 'Documents'}) {
+    return OiFileNode(key: key, name: name, folder: true);
   }
 
   testWidgets('files render their names in grid layout', (tester) async {
@@ -151,10 +148,7 @@ void main() {
       const SizedBox(
         width: 500,
         height: 600,
-        child: OiFileManager(
-          items: [],
-          label: 'Files',
-        ),
+        child: OiFileManager(items: [], label: 'Files'),
       ),
     );
     expect(find.text('This folder is empty'), findsOneWidget);
@@ -165,16 +159,10 @@ void main() {
       const SizedBox(
         width: 500,
         height: 600,
-        child: OiFileManager(
-          items: [],
-          label: 'Project Files',
-        ),
+        child: OiFileManager(items: [], label: 'Project Files'),
       ),
     );
-    expect(
-      find.bySemanticsLabel('Project Files'),
-      findsOneWidget,
-    );
+    expect(find.bySemanticsLabel('Project Files'), findsOneWidget);
   });
 
   testWidgets('file size renders in list layout', (tester) async {

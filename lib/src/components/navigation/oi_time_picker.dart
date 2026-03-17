@@ -53,7 +53,9 @@ class _OiTimePickerState extends State<OiTimePicker> {
     _minute = ref.minute;
     _isPm = ref.hour >= 12;
 
-    final hourItem = widget.use24Hour ? _hour : (_hour % 12 == 0 ? 0 : _hour % 12);
+    final hourItem = widget.use24Hour
+        ? _hour
+        : (_hour % 12 == 0 ? 0 : _hour % 12);
     _hourCtrl = FixedExtentScrollController(initialItem: hourItem);
     _minuteCtrl = FixedExtentScrollController(initialItem: _minute);
   }

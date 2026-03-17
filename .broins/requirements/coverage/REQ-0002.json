@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "atomId": "REQ-0002",
+  "atomText": "",
+  "status": "covered",
+  "workItemId": "WI-0066",
+  "history": [
+    {
+      "at": "2026-03-17T10:02:14.760434Z",
+      "event": "covered",
+      "workItemId": "WI-0066",
+      "runId": "run-1773733505170"
+    }
+  ],
+  "evidence": [
+    "lib/obers_ui.dart:1-304",
+    "lib/obers_ui.dart:9-22",
+    "lib/obers_ui.dart:112-188",
+    "lib/obers_ui.dart:266-303"
+  ],
+  "coveredAt": "2026-03-17T10:02:14.760434Z"
+}

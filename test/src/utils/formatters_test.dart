@@ -128,10 +128,7 @@ void main() {
 
       test('formats large file sizes', () {
         // 1.5 TB
-        expect(
-          OiFormatters.fileSize(1649267441664),
-          '1.5 TB',
-        );
+        expect(OiFormatters.fileSize(1649267441664), '1.5 TB');
       });
     });
 
@@ -148,19 +145,13 @@ void main() {
 
       test('formats compact seconds', () {
         expect(
-          OiFormatters.duration(
-            const Duration(seconds: 45),
-            compact: true,
-          ),
+          OiFormatters.duration(const Duration(seconds: 45), compact: true),
           '45s',
         );
       });
 
       test('formats verbose hours', () {
-        expect(
-          OiFormatters.duration(const Duration(hours: 1)),
-          '1 hour',
-        );
+        expect(OiFormatters.duration(const Duration(hours: 1)), '1 hour');
       });
 
       test('formats verbose plural hours and minutes', () {
@@ -171,31 +162,19 @@ void main() {
       });
 
       test('formats verbose single minute', () {
-        expect(
-          OiFormatters.duration(const Duration(minutes: 1)),
-          '1 minute',
-        );
+        expect(OiFormatters.duration(const Duration(minutes: 1)), '1 minute');
       });
 
       test('formats verbose single second', () {
-        expect(
-          OiFormatters.duration(const Duration(seconds: 1)),
-          '1 second',
-        );
+        expect(OiFormatters.duration(const Duration(seconds: 1)), '1 second');
       });
 
       test('formats zero duration compact', () {
-        expect(
-          OiFormatters.duration(Duration.zero, compact: true),
-          '0s',
-        );
+        expect(OiFormatters.duration(Duration.zero, compact: true), '0s');
       });
 
       test('formats zero duration verbose', () {
-        expect(
-          OiFormatters.duration(Duration.zero),
-          '0 seconds',
-        );
+        expect(OiFormatters.duration(Duration.zero), '0 seconds');
       });
 
       test('omits seconds when hours are present', () {

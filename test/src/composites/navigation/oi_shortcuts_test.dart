@@ -18,8 +18,7 @@ void main() {
       debugDefaultTargetPlatformOverride = TargetPlatform.linux;
       addTearDown(() => debugDefaultTargetPlatformOverride = null);
 
-      final activator =
-          OiShortcutActivator.primary(LogicalKeyboardKey.keyZ);
+      final activator = OiShortcutActivator.primary(LogicalKeyboardKey.keyZ);
       expect(activator.control, isTrue);
       expect(activator.meta, isFalse);
     });
@@ -28,8 +27,7 @@ void main() {
       debugDefaultTargetPlatformOverride = TargetPlatform.macOS;
       addTearDown(() => debugDefaultTargetPlatformOverride = null);
 
-      final activator =
-          OiShortcutActivator.primary(LogicalKeyboardKey.keyZ);
+      final activator = OiShortcutActivator.primary(LogicalKeyboardKey.keyZ);
       expect(activator.control, isFalse);
       expect(activator.meta, isTrue);
     });
@@ -51,8 +49,7 @@ void main() {
       debugDefaultTargetPlatformOverride = TargetPlatform.linux;
       addTearDown(() => debugDefaultTargetPlatformOverride = null);
 
-      final activator =
-          OiShortcutActivator.primary(LogicalKeyboardKey.keyZ);
+      final activator = OiShortcutActivator.primary(LogicalKeyboardKey.keyZ);
       expect(activator.displayLabel, 'Ctrl+Z');
     });
 
@@ -60,8 +57,7 @@ void main() {
       debugDefaultTargetPlatformOverride = TargetPlatform.macOS;
       addTearDown(() => debugDefaultTargetPlatformOverride = null);
 
-      final activator =
-          OiShortcutActivator.primary(LogicalKeyboardKey.keyZ);
+      final activator = OiShortcutActivator.primary(LogicalKeyboardKey.keyZ);
       expect(activator.displayLabel, 'Cmd+Z');
     });
 
@@ -100,8 +96,9 @@ void main() {
   });
 
   group('OiShortcuts', () {
-    testWidgets('shortcut fires callback when key combination pressed',
-        (tester) async {
+    testWidgets('shortcut fires callback when key combination pressed', (
+      tester,
+    ) async {
       var fired = false;
       await tester.pumpObers(
         OiShortcuts(
@@ -204,8 +201,9 @@ void main() {
       expect(find.text('File'), findsOneWidget);
     });
 
-    testWidgets('shortcuts listed in help dialog with categories',
-        (tester) async {
+    testWidgets('shortcuts listed in help dialog with categories', (
+      tester,
+    ) async {
       await tester.pumpObers(
         OiShortcuts(
           shortcuts: [
@@ -255,8 +253,7 @@ void main() {
       expect(find.text('Copy'), findsOneWidget);
     });
 
-    testWidgets('uncategorized shortcuts appear under General',
-        (tester) async {
+    testWidgets('uncategorized shortcuts appear under General', (tester) async {
       await tester.pumpObers(
         OiShortcuts(
           shortcuts: [
@@ -283,8 +280,7 @@ void main() {
       expect(find.text('General'), findsOneWidget);
     });
 
-    testWidgets('showHelpOnQuestionMark=false disables help',
-        (tester) async {
+    testWidgets('showHelpOnQuestionMark=false disables help', (tester) async {
       await tester.pumpObers(
         OiShortcuts(
           showHelpOnQuestionMark: false,
@@ -312,8 +308,9 @@ void main() {
       expect(find.text('Keyboard Shortcuts'), findsNothing);
     });
 
-    testWidgets('help dialog can be dismissed by tapping Close',
-        (tester) async {
+    testWidgets('help dialog can be dismissed by tapping Close', (
+      tester,
+    ) async {
       await tester.pumpObers(
         OiShortcuts(
           shortcuts: [

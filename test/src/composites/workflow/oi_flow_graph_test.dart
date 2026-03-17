@@ -115,9 +115,7 @@ void main() {
   // 4. onNodeTap fires with correct node.
   testWidgets('onNodeTap fires with correct node', (tester) async {
     OiFlowNode? tappedNode;
-    await tester.pumpObers(
-      _graph(onNodeTap: (node) => tappedNode = node),
-    );
+    await tester.pumpObers(_graph(onNodeTap: (node) => tappedNode = node));
     await tester.tap(find.text('Process'));
     await tester.pump();
     expect(tappedNode?.key, 'process');
@@ -126,9 +124,7 @@ void main() {
   // 5. onNodeTap fires for different nodes.
   testWidgets('onNodeTap fires for first node', (tester) async {
     OiFlowNode? tappedNode;
-    await tester.pumpObers(
-      _graph(onNodeTap: (node) => tappedNode = node),
-    );
+    await tester.pumpObers(_graph(onNodeTap: (node) => tappedNode = node));
     await tester.tap(find.text('Input'));
     await tester.pump();
     expect(tappedNode?.key, 'input');
@@ -152,19 +148,13 @@ void main() {
   // 7. Grid renders when snapToGrid is true.
   testWidgets('grid is rendered when snapToGrid is true', (tester) async {
     await tester.pumpObers(_graph());
-    expect(
-      find.byKey(const ValueKey('oi_flow_graph_grid')),
-      findsOneWidget,
-    );
+    expect(find.byKey(const ValueKey('oi_flow_graph_grid')), findsOneWidget);
   });
 
   // 8. Grid not rendered when snapToGrid is false.
   testWidgets('grid is not rendered when snapToGrid is false', (tester) async {
     await tester.pumpObers(_graph(snapToGrid: false));
-    expect(
-      find.byKey(const ValueKey('oi_flow_graph_grid')),
-      findsNothing,
-    );
+    expect(find.byKey(const ValueKey('oi_flow_graph_grid')), findsNothing);
   });
 
   // 9. Semantics label is applied.
@@ -182,10 +172,7 @@ void main() {
   testWidgets('editable=false does not wire onNodeMove', (tester) async {
     var moved = false;
     await tester.pumpObers(
-      _graph(
-        editable: false,
-        onNodeMove: (_, __) => moved = true,
-      ),
+      _graph(editable: false, onNodeMove: (_, __) => moved = true),
     );
     // Attempt to drag a node.
     await tester.drag(find.text('Input'), const Offset(50, 0));
@@ -195,9 +182,7 @@ void main() {
 
   // 11. Empty nodes list renders without errors.
   testWidgets('empty nodes list renders without errors', (tester) async {
-    await tester.pumpObers(
-      _graph(nodes: const [], edges: const []),
-    );
+    await tester.pumpObers(_graph(nodes: const [], edges: const []));
     expect(find.byType(SizedBox), findsWidgets);
   });
 
@@ -213,9 +198,7 @@ void main() {
     ];
     await tester.pumpObers(_graph(nodes: iconNodes, edges: const []));
     expect(
-      find.byIcon(
-        const IconData(0xe87c, fontFamily: 'MaterialIcons'),
-      ),
+      find.byIcon(const IconData(0xe87c, fontFamily: 'MaterialIcons')),
       findsOneWidget,
     );
   });
@@ -248,8 +231,9 @@ void main() {
   });
 
   // 14. Port indicators render for inputs and outputs.
-  testWidgets('port indicators render for node inputs and outputs',
-      (tester) async {
+  testWidgets('port indicators render for node inputs and outputs', (
+    tester,
+  ) async {
     await tester.pumpObers(_graph());
     // Input node has 1 output port.
     expect(
@@ -315,10 +299,7 @@ void main() {
   // 19. Grid size is configurable.
   testWidgets('custom gridSize is accepted', (tester) async {
     await tester.pumpObers(_graph(gridSize: 40));
-    expect(
-      find.byKey(const ValueKey('oi_flow_graph_grid')),
-      findsOneWidget,
-    );
+    expect(find.byKey(const ValueKey('oi_flow_graph_grid')), findsOneWidget);
   });
 
   // 20. Node data field is preserved.

@@ -58,8 +58,9 @@ class OiEditableNumber extends StatelessWidget {
           onTap: enabled ? startEdit : null,
           behavior: HitTestBehavior.opaque,
           child: MouseRegion(
-            cursor:
-                enabled ? SystemMouseCursors.click : SystemMouseCursors.basic,
+            cursor: enabled
+                ? SystemMouseCursors.click
+                : SystemMouseCursors.basic,
             child: Text(
               _format(v),
               style: TextStyle(fontSize: 14, color: colors.text),

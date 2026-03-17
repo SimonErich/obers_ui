@@ -172,7 +172,11 @@ class OiFormatters {
   /// If [text] is shorter than or equal to [maxLength], returns it unchanged.
   /// Otherwise, truncates and appends [ellipsis] (default '...').
   /// The total length including the ellipsis will not exceed [maxLength].
-  static String truncate(String text, int maxLength, {String ellipsis = '\u2026'}) {
+  static String truncate(
+    String text,
+    int maxLength, {
+    String ellipsis = '\u2026',
+  }) {
     if (text.length <= maxLength) return text;
     if (maxLength <= ellipsis.length) return ellipsis.substring(0, maxLength);
     return '${text.substring(0, maxLength - ellipsis.length)}$ellipsis';

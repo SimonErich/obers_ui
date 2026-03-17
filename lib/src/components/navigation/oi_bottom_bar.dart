@@ -192,9 +192,7 @@ class OiBottomBar extends StatelessWidget {
     return DecoratedBox(
       decoration: BoxDecoration(
         color: colors.surface,
-        border: Border(
-          top: BorderSide(color: colors.borderSubtle),
-        ),
+        border: Border(top: BorderSide(color: colors.borderSubtle)),
       ),
       child: content,
     );

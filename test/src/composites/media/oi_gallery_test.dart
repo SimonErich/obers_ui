@@ -32,15 +32,27 @@ void _restoreOnError() {
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 final _items = [
-  const OiGalleryItem(key: 'a', src: 'https://example.com/a.png', alt: 'Image A'),
-  const OiGalleryItem(key: 'b', src: 'https://example.com/b.png', alt: 'Image B'),
+  const OiGalleryItem(
+    key: 'a',
+    src: 'https://example.com/a.png',
+    alt: 'Image A',
+  ),
+  const OiGalleryItem(
+    key: 'b',
+    src: 'https://example.com/b.png',
+    alt: 'Image B',
+  ),
   const OiGalleryItem(
     key: 'c',
     src: 'https://example.com/c.png',
     alt: 'Image C',
     thumbnailUrl: 'https://example.com/c_thumb.png',
   ),
-  const OiGalleryItem(key: 'd', src: 'https://example.com/d.png', alt: 'Image D'),
+  const OiGalleryItem(
+    key: 'd',
+    src: 'https://example.com/d.png',
+    alt: 'Image D',
+  ),
 ];
 
 Widget _gallery({
@@ -78,20 +90,14 @@ void main() {
     tearDown(_restoreOnError);
 
     testWidgets('renders the gallery grid', (tester) async {
-      await tester.pumpObers(
-        _gallery(),
-        surfaceSize: const Size(800, 600),
-      );
+      await tester.pumpObers(_gallery(), surfaceSize: const Size(800, 600));
       await tester.pump();
 
       expect(find.byKey(const Key('oi_gallery')), findsOneWidget);
     });
 
     testWidgets('renders correct number of items', (tester) async {
-      await tester.pumpObers(
-        _gallery(),
-        surfaceSize: const Size(800, 600),
-      );
+      await tester.pumpObers(_gallery(), surfaceSize: const Size(800, 600));
       await tester.pump();
 
       for (final item in _items) {
@@ -110,8 +116,11 @@ void main() {
       await tester.pump();
 
       // The GridView should be rendered using the delegate's crossAxisCount.
-      final gridView = tester.widget<GridView>(find.byKey(const Key('oi_gallery')));
-      final delegate = gridView.gridDelegate as SliverGridDelegateWithFixedCrossAxisCount;
+      final gridView = tester.widget<GridView>(
+        find.byKey(const Key('oi_gallery')),
+      );
+      final delegate =
+          gridView.gridDelegate as SliverGridDelegateWithFixedCrossAxisCount;
       expect(delegate.crossAxisCount, 2);
     });
 
@@ -189,8 +198,9 @@ void main() {
       expect(selection, equals({'a', 'b'}));
     });
 
-    testWidgets('multi selection removes already-selected items',
-        (tester) async {
+    testWidgets('multi selection removes already-selected items', (
+      tester,
+    ) async {
       Set<Object>? selection;
       await tester.pumpObers(
         _gallery(
@@ -221,8 +231,7 @@ void main() {
       expect(find.byKey(const Key('oi_gallery')), findsNothing);
     });
 
-    testWidgets('upload tile is shown when showUpload is true',
-        (tester) async {
+    testWidgets('upload tile is shown when showUpload is true', (tester) async {
       await tester.pumpObers(
         _gallery(showUpload: true),
         surfaceSize: const Size(800, 600),
@@ -235,10 +244,7 @@ void main() {
     testWidgets('upload tile calls onUpload when tapped', (tester) async {
       var uploadCalled = false;
       await tester.pumpObers(
-        _gallery(
-          showUpload: true,
-          onUpload: (_) => uploadCalled = true,
-        ),
+        _gallery(showUpload: true, onUpload: (_) => uploadCalled = true),
         surfaceSize: const Size(800, 600),
       );
       await tester.pump();
@@ -250,17 +256,15 @@ void main() {
     });
 
     testWidgets('semantics label is applied', (tester) async {
-      await tester.pumpObers(
-        _gallery(),
-        surfaceSize: const Size(800, 600),
-      );
+      await tester.pumpObers(_gallery(), surfaceSize: const Size(800, 600));
       await tester.pump();
 
       expect(find.bySemanticsLabel('Test gallery'), findsOneWidget);
     });
 
-    testWidgets('empty gallery with showUpload still renders grid',
-        (tester) async {
+    testWidgets('empty gallery with showUpload still renders grid', (
+      tester,
+    ) async {
       await tester.pumpObers(
         _gallery(items: const [], showUpload: true),
         surfaceSize: const Size(800, 600),

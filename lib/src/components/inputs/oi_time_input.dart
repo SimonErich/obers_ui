@@ -191,8 +191,8 @@ class _OiTimeInputState extends State<OiTimeInput> {
                     _pickerHour = widget.use24Hour
                         ? i
                         : (widget.value != null && widget.value!.hour >= 12
-                            ? (i == 0 ? 12 : i)
-                            : (i == 0 ? 0 : i));
+                              ? (i == 0 ? 12 : i)
+                              : (i == 0 ? 0 : i));
                   });
                 },
               ),
@@ -259,8 +259,7 @@ class _OiTimeInputState extends State<OiTimeInput> {
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
-    final displayText =
-        widget.value != null ? _formatTime(widget.value!) : '';
+    final displayText = widget.value != null ? _formatTime(widget.value!) : '';
 
     final clockIcon = Icon(
       const IconData(0xe41e, fontFamily: 'MaterialIcons'),

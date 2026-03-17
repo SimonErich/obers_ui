@@ -41,16 +41,10 @@ abstract class OiSettingsDriver {
   /// Deletes settings for the given [namespace] and optional [key].
   ///
   /// After deletion, [load] returns `null` and [exists] returns `false`.
-  Future<void> delete({
-    required String namespace,
-    String? key,
-  });
+  Future<void> delete({required String namespace, String? key});
 
   /// Returns `true` if settings exist for the given [namespace] and [key].
-  Future<bool> exists({
-    required String namespace,
-    String? key,
-  });
+  Future<bool> exists({required String namespace, String? key});
 
   /// Computes the storage key from [namespace] and optional [key].
   ///

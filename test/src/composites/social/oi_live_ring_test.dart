@@ -13,11 +13,7 @@ import '../../../helpers/pump_app.dart';
 void main() {
   testWidgets('ring renders when active is true', (tester) async {
     await tester.pumpObers(
-      const Center(
-        child: OiLiveRing(
-          child: SizedBox(width: 40, height: 40),
-        ),
-      ),
+      const Center(child: OiLiveRing(child: SizedBox(width: 40, height: 40))),
     );
 
     // The live ring indicator container is present.
@@ -42,11 +38,7 @@ void main() {
 
   testWidgets('child renders when active', (tester) async {
     await tester.pumpObers(
-      const Center(
-        child: OiLiveRing(
-          child: Text('Live'),
-        ),
-      ),
+      const Center(child: OiLiveRing(child: Text('Live'))),
     );
 
     // The child appears twice when active (once as the real child, once as the
@@ -56,12 +48,7 @@ void main() {
 
   testWidgets('child renders when inactive', (tester) async {
     await tester.pumpObers(
-      const Center(
-        child: OiLiveRing(
-          active: false,
-          child: Text('Live'),
-        ),
-      ),
+      const Center(child: OiLiveRing(active: false, child: Text('Live'))),
     );
 
     expect(find.text('Live'), findsOneWidget);
@@ -90,11 +77,7 @@ void main() {
 
   testWidgets('pulse animation runs when active', (tester) async {
     await tester.pumpObers(
-      const Center(
-        child: OiLiveRing(
-          child: SizedBox(width: 40, height: 40),
-        ),
-      ),
+      const Center(child: OiLiveRing(child: SizedBox(width: 40, height: 40))),
     );
 
     // Advance the animation — should not throw.

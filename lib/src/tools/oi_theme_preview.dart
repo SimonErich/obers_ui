@@ -257,10 +257,7 @@ class OiThemePreview extends StatelessWidget {
           SizedBox(height: theme.spacing.sm),
           const SizedBox(
             width: 200,
-            child: OiNumberInput(
-              label: 'Number',
-              value: 42,
-            ),
+            child: OiNumberInput(label: 'Number', value: 42),
           ),
         ],
       ),
@@ -286,8 +283,9 @@ class OiThemePreview extends StatelessWidget {
                 variant: variant,
                 child: Text(
                   variant.name,
-                  style: theme.textTheme.body
-                      .copyWith(color: theme.colors.text),
+                  style: theme.textTheme.body.copyWith(
+                    color: theme.colors.text,
+                  ),
                 ),
               ),
             ),
@@ -323,20 +321,12 @@ class OiThemePreview extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const SizedBox(
-            width: 300,
-            child: OiProgress(
-              value: 0.6,
-            ),
-          ),
+          const SizedBox(width: 300, child: OiProgress(value: 0.6)),
           SizedBox(height: theme.spacing.md),
           const SizedBox(
             width: 60,
             height: 60,
-            child: OiProgress(
-              value: 0.7,
-              style: OiProgressStyle.circular,
-            ),
+            child: OiProgress(value: 0.7, style: OiProgressStyle.circular),
           ),
         ],
       ),
@@ -384,10 +374,7 @@ class _Section extends StatelessWidget {
 
 /// A small square chip that displays a [Color] with its [label].
 class _ColorChip extends StatelessWidget {
-  const _ColorChip({
-    required this.color,
-    required this.label,
-  });
+  const _ColorChip({required this.color, required this.label});
 
   /// The color to display.
   final Color color;
@@ -410,10 +397,7 @@ class _ColorChip extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 2),
-        Text(
-          label,
-          style: const TextStyle(fontSize: 9),
-        ),
+        Text(label, style: const TextStyle(fontSize: 9)),
       ],
     );
   }
@@ -450,10 +434,7 @@ class _SpacingBlock extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 2),
-        Text(
-          label,
-          style: const TextStyle(fontSize: 9),
-        ),
+        Text(label, style: const TextStyle(fontSize: 9)),
       ],
     );
   }

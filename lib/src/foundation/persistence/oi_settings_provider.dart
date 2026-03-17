@@ -35,8 +35,8 @@ class OiSettingsProvider extends InheritedWidget {
   /// Returns the nearest [OiSettingsDriver] in the widget tree, or `null`
   /// when no [OiSettingsProvider] is present.
   static OiSettingsDriver? of(BuildContext context) {
-    final provider =
-        context.dependOnInheritedWidgetOfExactType<OiSettingsProvider>();
+    final provider = context
+        .dependOnInheritedWidgetOfExactType<OiSettingsProvider>();
     return provider?.driver;
   }
 

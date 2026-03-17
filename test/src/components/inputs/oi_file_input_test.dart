@@ -53,10 +53,7 @@ void main() {
   testWidgets('removing a file chip calls onChanged', (tester) async {
     List<String>? result;
     await tester.pumpObers(
-      OiFileInput(
-        value: const ['/tmp/a.txt'],
-        onChanged: (v) => result = v,
-      ),
+      OiFileInput(value: const ['/tmp/a.txt'], onChanged: (v) => result = v),
     );
     await tester.tap(
       find.byIcon(const IconData(0xe5cd, fontFamily: 'MaterialIcons')),

@@ -167,7 +167,7 @@ class OiBorderStyle {
 class OiGradientStyle {
   /// Creates an [OiGradientStyle] with all fields specified explicitly.
   const OiGradientStyle({
-    required this.isLinear,
+    required this.linear,
     required this.colors,
     this.stops,
     this.begin,
@@ -188,7 +188,7 @@ class OiGradientStyle {
     AlignmentGeometry? end,
   }) {
     return OiGradientStyle(
-      isLinear: true,
+      linear: true,
       colors: colors,
       stops: stops,
       begin: begin,
@@ -207,7 +207,7 @@ class OiGradientStyle {
     double? radius,
   }) {
     return OiGradientStyle(
-      isLinear: false,
+      linear: false,
       colors: colors,
       stops: stops,
       center: center,
@@ -216,7 +216,7 @@ class OiGradientStyle {
   }
 
   /// Whether this gradient is linear (`true`) or radial (`false`).
-  final bool isLinear;
+  final bool linear;
 
   /// The list of colors in the gradient.
   final List<Color> colors;
@@ -238,10 +238,10 @@ class OiGradientStyle {
 
   /// Converts this style to a Flutter [Gradient] for rendering.
   ///
-  /// Returns a [LinearGradient] when [isLinear] is `true`, otherwise a
+  /// Returns a [LinearGradient] when [linear] is `true`, otherwise a
   /// [RadialGradient].
   Gradient toGradient() {
-    if (isLinear) {
+    if (linear) {
       return LinearGradient(
         colors: colors,
         stops: stops,
@@ -259,7 +259,7 @@ class OiGradientStyle {
 
   /// Creates a copy with optionally overridden values.
   OiGradientStyle copyWith({
-    bool? isLinear,
+    bool? linear,
     List<Color>? colors,
     List<double>? stops,
     AlignmentGeometry? begin,
@@ -268,7 +268,7 @@ class OiGradientStyle {
     double? radius,
   }) {
     return OiGradientStyle(
-      isLinear: isLinear ?? this.isLinear,
+      linear: linear ?? this.linear,
       colors: colors ?? this.colors,
       stops: stops ?? this.stops,
       begin: begin ?? this.begin,
@@ -294,7 +294,7 @@ class OiGradientStyle {
     } else if (stops != other.stops) {
       return false;
     }
-    return other.isLinear == isLinear &&
+    return other.linear == linear &&
         other.begin == begin &&
         other.end == end &&
         other.center == center &&
@@ -303,14 +303,14 @@ class OiGradientStyle {
 
   @override
   int get hashCode => Object.hash(
-        isLinear,
-        Object.hashAll(colors),
-        Object.hashAll(stops ?? const []),
-        begin,
-        end,
-        center,
-        radius,
-      );
+    linear,
+    Object.hashAll(colors),
+    Object.hashAll(stops ?? const []),
+    begin,
+    end,
+    center,
+    radius,
+  );
 }
 
 /// The complete decoration theme for the design system.
@@ -351,12 +351,14 @@ class OiDecorationTheme {
         borderRadius: BorderRadius.circular(8),
       ),
       gradients: {
-        'primary': OiGradientStyle.linear(
-          [primaryColor, primaryColor.withValues(alpha: 0.7)],
-        ),
-        'error': OiGradientStyle.linear(
-          [errorColor, errorColor.withValues(alpha: 0.7)],
-        ),
+        'primary': OiGradientStyle.linear([
+          primaryColor,
+          primaryColor.withValues(alpha: 0.7),
+        ]),
+        'error': OiGradientStyle.linear([
+          errorColor,
+          errorColor.withValues(alpha: 0.7),
+        ]),
       },
     );
   }
@@ -404,9 +406,9 @@ class OiDecorationTheme {
 
   @override
   int get hashCode => Object.hash(
-        defaultBorder,
-        focusBorder,
-        errorBorder,
-        Object.hashAll(gradients.entries.map((e) => Object.hash(e.key, e.value))),
-      );
+    defaultBorder,
+    focusBorder,
+    errorBorder,
+    Object.hashAll(gradients.entries.map((e) => Object.hash(e.key, e.value))),
+  );
 }

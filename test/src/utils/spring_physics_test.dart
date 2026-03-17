@@ -16,11 +16,7 @@ void main() {
       });
 
       test('creates a SpringDescription with custom values', () {
-        final s = OiSpringPhysics.spring(
-          damping: 30,
-          stiffness: 400,
-          mass: 2,
-        );
+        final s = OiSpringPhysics.spring(damping: 30, stiffness: 400, mass: 2);
         expect(s.mass, 2.0);
         expect(s.stiffness, 400.0);
         expect(s.damping, 30.0);
@@ -94,10 +90,12 @@ void main() {
       });
 
       test('gentle spring takes longer than snappy spring', () {
-        final gentleDuration =
-            OiSpringPhysics.estimateDuration(OiSpringPhysics.gentle);
-        final snappyDuration =
-            OiSpringPhysics.estimateDuration(OiSpringPhysics.snappy);
+        final gentleDuration = OiSpringPhysics.estimateDuration(
+          OiSpringPhysics.gentle,
+        );
+        final snappyDuration = OiSpringPhysics.estimateDuration(
+          OiSpringPhysics.snappy,
+        );
         expect(
           gentleDuration.inMilliseconds,
           greaterThan(snappyDuration.inMilliseconds),
@@ -113,10 +111,7 @@ void main() {
           OiSpringPhysics.standard,
           threshold: 0.0001,
         );
-        expect(
-          long.inMilliseconds,
-          greaterThan(short.inMilliseconds),
-        );
+        expect(long.inMilliseconds, greaterThan(short.inMilliseconds));
       });
 
       test('returns large duration for undamped spring', () {
@@ -130,10 +125,7 @@ void main() {
         final highDamping = OiSpringPhysics.spring(damping: 40);
         final dLow = OiSpringPhysics.estimateDuration(lowDamping);
         final dHigh = OiSpringPhysics.estimateDuration(highDamping);
-        expect(
-          dHigh.inMilliseconds,
-          lessThan(dLow.inMilliseconds),
-        );
+        expect(dHigh.inMilliseconds, lessThan(dLow.inMilliseconds));
       });
 
       test('duration is reasonable for standard spring', () {

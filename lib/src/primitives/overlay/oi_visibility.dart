@@ -56,8 +56,8 @@ class OiVisibility extends StatefulWidget {
     this.transition = OiTransition.fade,
     this.maintainState = true,
     super.key,
-  })  : _compactTransition = null,
-        _expandedTransition = null;
+  }) : _compactTransition = null,
+       _expandedTransition = null;
 
   /// Creates an [OiVisibility] with responsive transitions.
   ///
@@ -70,9 +70,9 @@ class OiVisibility extends StatefulWidget {
     OiTransition expandedTransition = OiTransition.fade,
     this.maintainState = true,
     super.key,
-  })  : transition = expandedTransition,
-        _compactTransition = compactTransition,
-        _expandedTransition = expandedTransition;
+  }) : transition = expandedTransition,
+       _compactTransition = compactTransition,
+       _expandedTransition = expandedTransition;
 
   /// Whether the child is visible.
   final bool visible;
@@ -166,7 +166,8 @@ class _OiVisibilityState extends State<OiVisibility>
   }
 
   OiTransition _resolvedTransition() {
-    if (widget._compactTransition != null && widget._expandedTransition != null) {
+    if (widget._compactTransition != null &&
+        widget._expandedTransition != null) {
       return context.isCompact
           ? widget._compactTransition!
           : widget._expandedTransition!;
@@ -193,8 +194,10 @@ class _OiVisibilityState extends State<OiVisibility>
         );
 
       case OiTransition.slideUp:
-        final slideTween =
-            Tween<Offset>(begin: const Offset(0, 0.1), end: Offset.zero);
+        final slideTween = Tween<Offset>(
+          begin: const Offset(0, 0.1),
+          end: Offset.zero,
+        );
         return FadeTransition(
           opacity: _animation,
           child: SlideTransition(
@@ -204,8 +207,10 @@ class _OiVisibilityState extends State<OiVisibility>
         );
 
       case OiTransition.slideDown:
-        final slideTween =
-            Tween<Offset>(begin: const Offset(0, -0.1), end: Offset.zero);
+        final slideTween = Tween<Offset>(
+          begin: const Offset(0, -0.1),
+          end: Offset.zero,
+        );
         return FadeTransition(
           opacity: _animation,
           child: SlideTransition(
@@ -215,8 +220,10 @@ class _OiVisibilityState extends State<OiVisibility>
         );
 
       case OiTransition.slideLeft:
-        final slideTween =
-            Tween<Offset>(begin: const Offset(0.1, 0), end: Offset.zero);
+        final slideTween = Tween<Offset>(
+          begin: const Offset(0.1, 0),
+          end: Offset.zero,
+        );
         return FadeTransition(
           opacity: _animation,
           child: SlideTransition(
@@ -226,8 +233,10 @@ class _OiVisibilityState extends State<OiVisibility>
         );
 
       case OiTransition.slideRight:
-        final slideTween =
-            Tween<Offset>(begin: const Offset(-0.1, 0), end: Offset.zero);
+        final slideTween = Tween<Offset>(
+          begin: const Offset(-0.1, 0),
+          end: Offset.zero,
+        );
         return FadeTransition(
           opacity: _animation,
           child: SlideTransition(

@@ -49,8 +49,8 @@ class OiInputFrame extends StatelessWidget {
   Widget build(BuildContext context) {
     final border = _resolveBorder(context);
     final colors = context.colors;
-    final effectivePadding = padding ??
-        const EdgeInsets.symmetric(horizontal: 12, vertical: 8);
+    final effectivePadding =
+        padding ?? const EdgeInsets.symmetric(horizontal: 12, vertical: 8);
 
     final row = Row(
       children: [

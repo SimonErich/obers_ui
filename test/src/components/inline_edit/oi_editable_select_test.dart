@@ -15,18 +15,13 @@ void main() {
 
   testWidgets('display mode shows selected label', (tester) async {
     await tester.pumpObers(
-      OiEditableSelect<String>(
-        options: options,
-        value: 'a',
-      ),
+      OiEditableSelect<String>(options: options, value: 'a'),
     );
     expect(find.text('Apple'), findsOneWidget);
   });
 
   testWidgets('display mode shows dash when no value', (tester) async {
-    await tester.pumpObers(
-      OiEditableSelect<String>(options: options),
-    );
+    await tester.pumpObers(OiEditableSelect<String>(options: options));
     expect(find.text('—'), findsOneWidget);
   });
 
@@ -41,27 +36,21 @@ void main() {
 
   testWidgets('edit mode renders OiSelect with current value', (tester) async {
     await tester.pumpObers(
-      OiEditableSelect<String>(
-        options: options,
-        value: 'a',
-        onChanged: (_) {},
-      ),
+      OiEditableSelect<String>(options: options, value: 'a', onChanged: (_) {}),
     );
     await tester.tap(find.text('Apple'));
     await tester.pump();
     // OiSelect should be present and show the current value.
-    final select = tester.widget<OiSelect<String>>(find.byType(OiSelect<String>));
+    final select = tester.widget<OiSelect<String>>(
+      find.byType(OiSelect<String>),
+    );
     expect(select.value, 'a');
     expect(select.options, options);
   });
 
   testWidgets('disabled does not enter edit mode', (tester) async {
     await tester.pumpObers(
-      OiEditableSelect<String>(
-        options: options,
-        value: 'a',
-        enabled: false,
-      ),
+      OiEditableSelect<String>(options: options, value: 'a', enabled: false),
     );
     await tester.tap(find.text('Apple'));
     await tester.pump();

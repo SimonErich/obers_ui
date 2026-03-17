@@ -33,9 +33,17 @@ void _restoreOnError() {
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 const _items = [
-  OiLightboxItem(src: 'https://example.com/a.png', alt: 'Image A', caption: 'Caption A'),
+  OiLightboxItem(
+    src: 'https://example.com/a.png',
+    alt: 'Image A',
+    caption: 'Caption A',
+  ),
   OiLightboxItem(src: 'https://example.com/b.png', alt: 'Image B'),
-  OiLightboxItem(src: 'https://example.com/c.png', alt: 'Image C', caption: 'Caption C'),
+  OiLightboxItem(
+    src: 'https://example.com/c.png',
+    alt: 'Image C',
+    caption: 'Caption C',
+  ),
 ];
 
 Widget _lightbox({
@@ -67,10 +75,7 @@ void main() {
     tearDown(_restoreOnError);
 
     testWidgets('renders the lightbox widget', (tester) async {
-      await tester.pumpObers(
-        _lightbox(),
-        surfaceSize: const Size(800, 600),
-      );
+      await tester.pumpObers(_lightbox(), surfaceSize: const Size(800, 600));
       await tester.pump();
 
       expect(find.byKey(const Key('oi_lightbox')), findsOneWidget);
@@ -84,33 +89,21 @@ void main() {
       await tester.pump();
 
       // The image with key containing index 1 should be rendered.
-      expect(
-        find.byKey(const ValueKey('oi_lightbox_image_1')),
-        findsOneWidget,
-      );
+      expect(find.byKey(const ValueKey('oi_lightbox_image_1')), findsOneWidget);
     });
 
     testWidgets('next arrow navigates to next image', (tester) async {
-      await tester.pumpObers(
-        _lightbox(),
-        surfaceSize: const Size(800, 600),
-      );
+      await tester.pumpObers(_lightbox(), surfaceSize: const Size(800, 600));
       await tester.pump();
 
       // Initially at index 0.
-      expect(
-        find.byKey(const ValueKey('oi_lightbox_image_0')),
-        findsOneWidget,
-      );
+      expect(find.byKey(const ValueKey('oi_lightbox_image_0')), findsOneWidget);
 
       // Tap next.
       await tester.tap(find.byKey(const Key('oi_lightbox_next')));
       await tester.pump();
 
-      expect(
-        find.byKey(const ValueKey('oi_lightbox_image_1')),
-        findsOneWidget,
-      );
+      expect(find.byKey(const ValueKey('oi_lightbox_image_1')), findsOneWidget);
     });
 
     testWidgets('previous arrow navigates to previous image', (tester) async {
@@ -120,18 +113,12 @@ void main() {
       );
       await tester.pump();
 
-      expect(
-        find.byKey(const ValueKey('oi_lightbox_image_2')),
-        findsOneWidget,
-      );
+      expect(find.byKey(const ValueKey('oi_lightbox_image_2')), findsOneWidget);
 
       await tester.tap(find.byKey(const Key('oi_lightbox_previous')));
       await tester.pump();
 
-      expect(
-        find.byKey(const ValueKey('oi_lightbox_image_1')),
-        findsOneWidget,
-      );
+      expect(find.byKey(const ValueKey('oi_lightbox_image_1')), findsOneWidget);
     });
 
     testWidgets('close button calls onDismiss', (tester) async {
@@ -149,10 +136,7 @@ void main() {
     });
 
     testWidgets('caption is displayed when present', (tester) async {
-      await tester.pumpObers(
-        _lightbox(),
-        surfaceSize: const Size(800, 600),
-      );
+      await tester.pumpObers(_lightbox(), surfaceSize: const Size(800, 600));
       await tester.pump();
 
       // First item has caption "Caption A".
@@ -171,10 +155,7 @@ void main() {
     });
 
     testWidgets('keyboard arrow right navigates to next', (tester) async {
-      await tester.pumpObers(
-        _lightbox(),
-        surfaceSize: const Size(800, 600),
-      );
+      await tester.pumpObers(_lightbox(), surfaceSize: const Size(800, 600));
       await tester.pump();
 
       // Wait for focus to be requested.
@@ -183,10 +164,7 @@ void main() {
       await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);
       await tester.pump();
 
-      expect(
-        find.byKey(const ValueKey('oi_lightbox_image_1')),
-        findsOneWidget,
-      );
+      expect(find.byKey(const ValueKey('oi_lightbox_image_1')), findsOneWidget);
     });
 
     testWidgets('keyboard arrow left navigates to previous', (tester) async {
@@ -200,10 +178,7 @@ void main() {
       await tester.sendKeyEvent(LogicalKeyboardKey.arrowLeft);
       await tester.pump();
 
-      expect(
-        find.byKey(const ValueKey('oi_lightbox_image_0')),
-        findsOneWidget,
-      );
+      expect(find.byKey(const ValueKey('oi_lightbox_image_0')), findsOneWidget);
     });
 
     testWidgets('escape key calls onDismiss', (tester) async {
@@ -222,43 +197,29 @@ void main() {
     });
 
     testWidgets('thumbnail strip is shown with multiple items', (tester) async {
-      await tester.pumpObers(
-        _lightbox(),
-        surfaceSize: const Size(800, 600),
-      );
+      await tester.pumpObers(_lightbox(), surfaceSize: const Size(800, 600));
       await tester.pump();
 
-      expect(
-        find.byKey(const Key('oi_lightbox_thumbnails')),
-        findsOneWidget,
-      );
+      expect(find.byKey(const Key('oi_lightbox_thumbnails')), findsOneWidget);
     });
 
-    testWidgets('thumbnail strip is hidden when showThumbnails is false',
-        (tester) async {
+    testWidgets('thumbnail strip is hidden when showThumbnails is false', (
+      tester,
+    ) async {
       await tester.pumpObers(
         _lightbox(showThumbnails: false),
         surfaceSize: const Size(800, 600),
       );
       await tester.pump();
 
-      expect(
-        find.byKey(const Key('oi_lightbox_thumbnails')),
-        findsNothing,
-      );
+      expect(find.byKey(const Key('oi_lightbox_thumbnails')), findsNothing);
     });
 
     testWidgets('semantics label is applied', (tester) async {
-      await tester.pumpObers(
-        _lightbox(),
-        surfaceSize: const Size(800, 600),
-      );
+      await tester.pumpObers(_lightbox(), surfaceSize: const Size(800, 600));
       await tester.pump();
 
-      expect(
-        find.bySemanticsLabel('Test lightbox'),
-        findsOneWidget,
-      );
+      expect(find.bySemanticsLabel('Test lightbox'), findsOneWidget);
     });
 
     testWidgets('renders empty widget for empty items list', (tester) async {
@@ -279,10 +240,7 @@ void main() {
       await tester.pump();
 
       // Should clamp to the last valid index (2).
-      expect(
-        find.byKey(const ValueKey('oi_lightbox_image_2')),
-        findsOneWidget,
-      );
+      expect(find.byKey(const ValueKey('oi_lightbox_image_2')), findsOneWidget);
     });
   });
 }

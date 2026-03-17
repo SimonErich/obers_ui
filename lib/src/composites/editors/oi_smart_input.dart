@@ -40,11 +40,7 @@ class OiPatternRecognizer {
 /// {@category Composites}
 class OiSuggestion {
   /// Creates an [OiSuggestion].
-  const OiSuggestion({
-    required this.value,
-    required this.label,
-    this.leading,
-  });
+  const OiSuggestion({required this.value, required this.label, this.leading});
 
   /// The value to insert when this suggestion is selected.
   final String value;
@@ -127,10 +123,8 @@ class OiSmartInput extends StatefulWidget {
   ///
   /// Receives the trigger character and the current query text after the
   /// trigger. Returns a future that resolves to a list of suggestions.
-  final Future<List<OiSuggestion>> Function(
-    String trigger,
-    String query,
-  )? onSuggestionQuery;
+  final Future<List<OiSuggestion>> Function(String trigger, String query)?
+  onSuggestionQuery;
 
   /// Called when the user taps on a recognized span.
   final ValueChanged<OiRecognizedSpan>? onSpanTap;
@@ -291,7 +285,9 @@ class _OiSmartInputState extends State<OiSmartInput> {
     var cursor = 0;
     for (final m in filtered) {
       if (m.start > cursor) {
-        spans.add(TextSpan(text: text.substring(cursor, m.start), style: baseStyle));
+        spans.add(
+          TextSpan(text: text.substring(cursor, m.start), style: baseStyle),
+        );
       }
 
       final span = OiRecognizedSpan(
@@ -305,11 +301,10 @@ class _OiSmartInputState extends State<OiSmartInput> {
           alignment: PlaceholderAlignment.baseline,
           baseline: TextBaseline.alphabetic,
           child: GestureDetector(
-            onTap: widget.onSpanTap != null ? () => widget.onSpanTap!(span) : null,
-            child: Text(
-              m.value,
-              style: baseStyle.merge(m.style),
-            ),
+            onTap: widget.onSpanTap != null
+                ? () => widget.onSpanTap!(span)
+                : null,
+            child: Text(m.value, style: baseStyle.merge(m.style)),
           ),
         ),
       );
@@ -326,9 +321,11 @@ class _OiSmartInputState extends State<OiSmartInput> {
   @override
   Widget build(BuildContext context) {
     final themeData = OiTheme.maybeOf(context);
-    final baseStyle = themeData?.textTheme.styleFor(OiLabelVariant.body) ??
+    final baseStyle =
+        themeData?.textTheme.styleFor(OiLabelVariant.body) ??
         const TextStyle(fontSize: 16, fontWeight: FontWeight.w400);
-    final cursorColor = themeData?.colors.primary.base ?? const Color(0xFF000000);
+    final cursorColor =
+        themeData?.colors.primary.base ?? const Color(0xFF000000);
 
     final text = _controller.text;
     final showPlaceholder = text.isEmpty && widget.placeholder != null;

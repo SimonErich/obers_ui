@@ -21,21 +21,21 @@ class _Row {
 }
 
 List<OiTableColumn<_Row>> get _cols => [
-      const OiTableColumn(
-        id: 'name',
-        header: 'Name',
-        valueGetter: _nameGetter,
-        filterable: false,
-        resizable: false,
-      ),
-      const OiTableColumn(
-        id: 'value',
-        header: 'Value',
-        valueGetter: _valueGetter,
-        filterable: false,
-        resizable: false,
-      ),
-    ];
+  const OiTableColumn(
+    id: 'name',
+    header: 'Name',
+    valueGetter: _nameGetter,
+    filterable: false,
+    resizable: false,
+  ),
+  const OiTableColumn(
+    id: 'value',
+    header: 'Value',
+    valueGetter: _valueGetter,
+    filterable: false,
+    resizable: false,
+  ),
+];
 
 String _nameGetter(_Row r) => r.name;
 String _valueGetter(_Row r) => r.value.toString();
@@ -190,9 +190,7 @@ void main() {
       ),
     ];
     final ctrl = OiTableController(totalRows: _rows.length);
-    await tester.pumpObers(
-      _table(columns: filterCols, controller: ctrl),
-    );
+    await tester.pumpObers(_table(columns: filterCols, controller: ctrl));
     ctrl.setFilter('name', 'Alice');
     await tester.pump();
     expect(find.text('Alice'), findsOneWidget);
@@ -202,9 +200,7 @@ void main() {
   // 7. Selection — single row
   testWidgets('tapping row with selectable=true selects it', (tester) async {
     final ctrl = OiTableController(totalRows: _rows.length);
-    await tester.pumpObers(
-      _table(controller: ctrl, selectable: true),
-    );
+    await tester.pumpObers(_table(controller: ctrl, selectable: true));
     await tester.pumpAndSettle();
     // Select via controller (tap may be absorbed by KeyboardListener overlay).
     ctrl.selectRow(0);
@@ -249,9 +245,7 @@ void main() {
   testWidgets('onRowDoubleTap fires on double tap', (tester) async {
     _Row? doubleTapped;
     await tester.pumpObers(
-      _table(
-        onRowDoubleTap: (row, _) => doubleTapped = row,
-      ),
+      _table(onRowDoubleTap: (row, _) => doubleTapped = row),
     );
     await tester.pumpAndSettle();
     // Double-tap the cell text to reliably hit the row GestureDetector.
@@ -264,8 +258,7 @@ void main() {
 
   // 11. Pagination: pages mode shows pagination controls
   testWidgets('pages mode shows pagination bar', (tester) async {
-    final manyRows =
-        List.generate(50, (i) => _Row('Row$i', i));
+    final manyRows = List.generate(50, (i) => _Row('Row$i', i));
     await tester.pumpObers(
       _table(
         rows: manyRows,
@@ -279,8 +272,7 @@ void main() {
 
   // 12. Pagination: next/previous page
   testWidgets('pagination next/previous page navigation works', (tester) async {
-    final manyRows =
-        List.generate(50, (i) => _Row('Row$i', i));
+    final manyRows = List.generate(50, (i) => _Row('Row$i', i));
     final ctrl = OiTableController(pageSize: 10, totalRows: 50);
     await tester.pumpObers(
       _table(
@@ -329,8 +321,9 @@ void main() {
   });
 
   // 15. Column resize
-  testWidgets('column resize handle is present for resizable column',
-      (tester) async {
+  testWidgets('column resize handle is present for resizable column', (
+    tester,
+  ) async {
     final resizeCols = [
       const OiTableColumn<_Row>(
         id: 'name',
@@ -354,17 +347,15 @@ void main() {
   // 17. Empty state shows custom widget
   testWidgets('empty rows renders custom emptyState widget', (tester) async {
     await tester.pumpObers(
-      _table(
-        rows: const [],
-        emptyState: const Text('Nothing here'),
-      ),
+      _table(rows: const [], emptyState: const Text('Nothing here')),
     );
     expect(find.text('Nothing here'), findsOneWidget);
   });
 
   // 18. Default empty state
-  testWidgets('empty rows with no emptyState shows default message',
-      (tester) async {
+  testWidgets('empty rows with no emptyState shows default message', (
+    tester,
+  ) async {
     await tester.pumpObers(_table(rows: const []));
     expect(find.byKey(const Key('oi_table_empty')), findsOneWidget);
   });
@@ -389,26 +380,15 @@ void main() {
       const _Row('A', 2),
       const _Row('B', 3),
     ];
-    await tester.pumpObers(
-      _table(rows: groupRows, groupBy: 'name'),
-    );
+    await tester.pumpObers(_table(rows: groupRows, groupBy: 'name'));
     // Group headers for 'A' and 'B'.
-    expect(
-      find.byKey(const ValueKey('group_header_A')),
-      findsOneWidget,
-    );
-    expect(
-      find.byKey(const ValueKey('group_header_B')),
-      findsOneWidget,
-    );
+    expect(find.byKey(const ValueKey('group_header_A')), findsOneWidget);
+    expect(find.byKey(const ValueKey('group_header_B')), findsOneWidget);
   });
 
   // 22. Group expand/collapse
   testWidgets('toggling group shows and hides rows', (tester) async {
-    final groupRows = [
-      const _Row('A', 1),
-      const _Row('A', 2),
-    ];
+    final groupRows = [const _Row('A', 1), const _Row('A', 2)];
     final ctrl = OiTableController(totalRows: groupRows.length);
     await tester.pumpObers(
       _table(rows: groupRows, controller: ctrl, groupBy: 'name'),
@@ -428,8 +408,9 @@ void main() {
   });
 
   // 23. Settings persistence: saves and restores settings
-  testWidgets('settings are persisted to and restored from driver',
-      (tester) async {
+  testWidgets('settings are persisted to and restored from driver', (
+    tester,
+  ) async {
     final driver = OiInMemorySettingsDriver();
     final ctrl = OiTableController(totalRows: _rows.length);
     await tester.pumpObers(
@@ -447,13 +428,10 @@ void main() {
   });
 
   // 24. Cell editing: double-tapping cell enters edit mode
-  testWidgets('double-tapping cell with onCellChanged enters edit mode',
-      (tester) async {
-    await tester.pumpObers(
-      _table(
-        onCellChanged: (_, __, ___, ____) {},
-      ),
-    );
+  testWidgets('double-tapping cell with onCellChanged enters edit mode', (
+    tester,
+  ) async {
+    await tester.pumpObers(_table(onCellChanged: (_, __, ___, ____) {}));
     await tester.pump(); // settle settings load
     // _CellFrame displays content via GestureDetector with key 'cell_display'.
     final cellDisplay = find.byKey(const Key('cell_display')).first;
@@ -475,19 +453,19 @@ void main() {
   });
 
   // 26. Selection count in status bar
-  testWidgets('status bar shows selection count when rows selected',
-      (tester) async {
-    final ctrl = OiTableController(totalRows: _rows.length)
-      ..selectRow(0);
-    await tester.pumpObers(
-      _table(controller: ctrl, selectable: true),
-    );
+  testWidgets('status bar shows selection count when rows selected', (
+    tester,
+  ) async {
+    final ctrl = OiTableController(totalRows: _rows.length)..selectRow(0);
+    await tester.pumpObers(_table(controller: ctrl, selectable: true));
     await tester.pump();
     expect(find.text('1 selected'), findsOneWidget);
   });
 
   // 27. Frozen columns rendered
-  testWidgets('frozen column attribute is accepted without error', (tester) async {
+  testWidgets('frozen column attribute is accepted without error', (
+    tester,
+  ) async {
     final frozenCols = [
       const OiTableColumn<_Row>(
         id: 'name',
@@ -511,7 +489,9 @@ void main() {
   });
 
   // 28. Copy selected rows (Ctrl+C)
-  testWidgets('copyable=true copies selected rows to clipboard', (tester) async {
+  testWidgets('copyable=true copies selected rows to clipboard', (
+    tester,
+  ) async {
     String? capturedText;
     tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
       SystemChannels.platform,
@@ -522,11 +502,8 @@ void main() {
         return null;
       },
     );
-    final ctrl = OiTableController(totalRows: _rows.length)
-      ..selectRow(0);
-    await tester.pumpObers(
-      _table(controller: ctrl, copyable: true),
-    );
+    final ctrl = OiTableController(totalRows: _rows.length)..selectRow(0);
+    await tester.pumpObers(_table(controller: ctrl, copyable: true));
     ctrl.copySelectedRows();
     await tester.pump();
     // copySelectedRows is internal; verify clipboard was set by calling it.
@@ -540,8 +517,9 @@ void main() {
   });
 
   // 29. Server-side pagination: totalRows used
-  testWidgets('server-side pagination uses totalRows for page count',
-      (tester) async {
+  testWidgets('server-side pagination uses totalRows for page count', (
+    tester,
+  ) async {
     final ctrl = OiTableController(pageSize: 10, totalRows: 100);
     await tester.pumpObers(
       _table(
@@ -556,8 +534,9 @@ void main() {
   });
 
   // 30. Infinite scroll pagination: onLoadMore called
-  testWidgets('infinite scroll mode calls onLoadMore when scrolled to end',
-      (tester) async {
+  testWidgets('infinite scroll mode calls onLoadMore when scrolled to end', (
+    tester,
+  ) async {
     var loadMoreCallCount = 0;
     final manyRows = List.generate(20, (i) => _Row('Row$i', i));
     await tester.pumpObers(
@@ -583,7 +562,9 @@ void main() {
   });
 
   // 31. showColumnManager button visible when enabled
-  testWidgets('showColumnManager=true shows the Columns button', (tester) async {
+  testWidgets('showColumnManager=true shows the Columns button', (
+    tester,
+  ) async {
     await tester.pumpObers(_table(showColumnManager: true));
     expect(find.text('Columns'), findsOneWidget);
   });
@@ -621,8 +602,9 @@ void main() {
   });
 
   // 35. toSettings / applySettings via controller round-trips through table
-  testWidgets('applySettings restores column order in rendered table',
-      (tester) async {
+  testWidgets('applySettings restores column order in rendered table', (
+    tester,
+  ) async {
     final ctrl = OiTableController(totalRows: _rows.length);
     const settings = OiTableSettings(columnOrder: ['value', 'name']);
     await tester.pumpObers(_table(controller: ctrl));

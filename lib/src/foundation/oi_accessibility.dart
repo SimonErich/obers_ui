@@ -10,10 +10,7 @@ import 'package:flutter/widgets.dart';
 /// {@category Foundation}
 class OiA11yScope extends InheritedWidget {
   /// Creates an [OiA11yScope].
-  const OiA11yScope({
-    required super.child,
-    super.key,
-  });
+  const OiA11yScope({required super.child, super.key});
 
   @override
   bool updateShouldNotify(OiA11yScope oldWidget) => false;
@@ -49,20 +46,18 @@ abstract final class OiA11y {
 
   /// Announces [message] to screen readers.
   ///
-  /// When [isAssertive] is true, the announcement interrupts the screen
+  /// When [assertive] is true, the announcement interrupts the screen
   /// reader immediately (use for errors and urgent updates).
   static void announce(
     BuildContext context,
     String message, {
-    bool isAssertive = false,
+    bool assertive = false,
   }) {
     SemanticsService.sendAnnouncement(
       View.of(context),
       message,
       TextDirection.ltr,
-      assertiveness: isAssertive
-          ? Assertiveness.assertive
-          : Assertiveness.polite,
+      assertiveness: assertive ? Assertiveness.assertive : Assertiveness.polite,
     );
   }
 

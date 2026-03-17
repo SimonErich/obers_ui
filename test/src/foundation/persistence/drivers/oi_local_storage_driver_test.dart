@@ -35,12 +35,18 @@ void main() {
 
     test('resolveKey prepends default prefix with key', () {
       const driver = OiLocalStorageDriver();
-      expect(driver.resolveKey('oi_table', 'my-key'), equals('obers_ui.oi_table::my-key'));
+      expect(
+        driver.resolveKey('oi_table', 'my-key'),
+        equals('obers_ui.oi_table::my-key'),
+      );
     });
 
     test('resolveKey uses custom prefix', () {
       const driver = OiLocalStorageDriver(prefix: 'myapp');
-      expect(driver.resolveKey('oi_table', 'my-key'), equals('myapp.oi_table::my-key'));
+      expect(
+        driver.resolveKey('oi_table', 'my-key'),
+        equals('myapp.oi_table::my-key'),
+      );
     });
 
     test('load returns null when nothing saved', () async {
@@ -91,7 +97,10 @@ void main() {
       );
       await driver.delete(namespace: 'test');
       expect(await driver.exists(namespace: 'test'), isFalse);
-      expect(await driver.load(namespace: 'test', deserialize: _Prefs.fromJson), isNull);
+      expect(
+        await driver.load(namespace: 'test', deserialize: _Prefs.fromJson),
+        isNull,
+      );
     });
 
     test('corrupted JSON returns null', () async {

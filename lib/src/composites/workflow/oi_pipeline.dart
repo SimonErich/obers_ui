@@ -101,13 +101,22 @@ class OiPipeline extends StatelessWidget {
   static IconData statusIcon(OiPipelineStatus status) {
     switch (status) {
       case OiPipelineStatus.completed:
-        return const IconData(0xe86c, fontFamily: 'MaterialIcons'); // check_circle
+        return const IconData(
+          0xe86c,
+          fontFamily: 'MaterialIcons',
+        ); // check_circle
       case OiPipelineStatus.failed:
         return const IconData(0xe000, fontFamily: 'MaterialIcons'); // error
       case OiPipelineStatus.running:
-        return const IconData(0xe627, fontFamily: 'MaterialIcons'); // play_circle_filled
+        return const IconData(
+          0xe627,
+          fontFamily: 'MaterialIcons',
+        ); // play_circle_filled
       case OiPipelineStatus.pending:
-        return const IconData(0xef4a, fontFamily: 'MaterialIcons'); // radio_button_unchecked
+        return const IconData(
+          0xef4a,
+          fontFamily: 'MaterialIcons',
+        ); // radio_button_unchecked
       case OiPipelineStatus.skipped:
         return const IconData(0xe044, fontFamily: 'MaterialIcons'); // block
     }
@@ -143,11 +152,7 @@ class OiPipeline extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
-            statusIcon(stage.status),
-            color: stageColor,
-            size: 24,
-          ),
+          Icon(statusIcon(stage.status), color: stageColor, size: 24),
           const SizedBox(height: 4),
           Text(
             stage.label,
@@ -162,10 +167,7 @@ class OiPipeline extends StatelessWidget {
             Text(
               _formatDuration(stage.duration!),
               key: ValueKey('oi_pipeline_duration_$index'),
-              style: TextStyle(
-                color: colors.textMuted,
-                fontSize: 11,
-              ),
+              style: TextStyle(color: colors.textMuted, fontSize: 11),
             ),
           ],
           if (stage.content != null) ...[
@@ -198,8 +200,14 @@ class OiPipeline extends StatelessWidget {
       child: Center(
         child: Icon(
           isHorizontal
-              ? const IconData(0xe5cc, fontFamily: 'MaterialIcons') // chevron_right
-              : const IconData(0xe313, fontFamily: 'MaterialIcons'), // expand_more
+              ? const IconData(
+                  0xe5cc,
+                  fontFamily: 'MaterialIcons',
+                ) // chevron_right
+              : const IconData(
+                  0xe313,
+                  fontFamily: 'MaterialIcons',
+                ), // expand_more
           color: colors.textMuted,
           size: arrowSize,
         ),
@@ -220,20 +228,11 @@ class OiPipeline extends StatelessWidget {
 
     Widget pipeline;
     if (direction == Axis.horizontal) {
-      pipeline = Row(
-        mainAxisSize: MainAxisSize.min,
-        children: children,
-      );
+      pipeline = Row(mainAxisSize: MainAxisSize.min, children: children);
     } else {
-      pipeline = Column(
-        mainAxisSize: MainAxisSize.min,
-        children: children,
-      );
+      pipeline = Column(mainAxisSize: MainAxisSize.min, children: children);
     }
 
-    return Semantics(
-      label: label,
-      child: pipeline,
-    );
+    return Semantics(label: label, child: pipeline);
   }
 }

@@ -20,10 +20,7 @@ final _events = [
     title: 'Event B',
     description: 'Description B',
   ),
-  OiTimelineEvent(
-    timestamp: DateTime(2025, 1, 12, 18),
-    title: 'Event C',
-  ),
+  OiTimelineEvent(timestamp: DateTime(2025, 1, 12, 18), title: 'Event C'),
 ];
 
 Widget _timeline({
@@ -92,8 +89,9 @@ void main() {
   });
 
   // 5. Alternating left/right layout.
-  testWidgets('alternating mode places cards on alternating sides',
-      (tester) async {
+  testWidgets('alternating mode places cards on alternating sides', (
+    tester,
+  ) async {
     await tester.pumpObers(_timeline(alternating: true));
     await tester.pumpAndSettle();
 
@@ -107,8 +105,9 @@ void main() {
   });
 
   // 6. Collapsible sections toggle on tap.
-  testWidgets('collapsible events toggle description visibility',
-      (tester) async {
+  testWidgets('collapsible events toggle description visibility', (
+    tester,
+  ) async {
     await tester.pumpObers(_timeline(collapsible: true));
     // Initially expanded — description visible.
     expect(find.text('Description A'), findsOneWidget);
@@ -128,8 +127,9 @@ void main() {
   });
 
   // 7. Custom content renders.
-  testWidgets('custom content widget renders inside event card',
-      (tester) async {
+  testWidgets('custom content widget renders inside event card', (
+    tester,
+  ) async {
     final eventsWithContent = [
       OiTimelineEvent(
         timestamp: DateTime(2025, 1, 10),
@@ -153,18 +153,13 @@ void main() {
   // 9. Semantics label is present.
   testWidgets('semantics label is applied', (tester) async {
     await tester.pumpObers(_timeline(label: 'My Activity Feed'));
-    expect(
-      find.bySemanticsLabel('My Activity Feed'),
-      findsOneWidget,
-    );
+    expect(find.bySemanticsLabel('My Activity Feed'), findsOneWidget);
   });
 
   // 10. onEventTap fires on tap.
   testWidgets('onEventTap fires when event card is tapped', (tester) async {
     OiTimelineEvent? tapped;
-    await tester.pumpObers(
-      _timeline(onEventTap: (event) => tapped = event),
-    );
+    await tester.pumpObers(_timeline(onEventTap: (event) => tapped = event));
     await tester.tap(find.text('Event B'));
     await tester.pump();
     expect(tapped?.title, 'Event B');

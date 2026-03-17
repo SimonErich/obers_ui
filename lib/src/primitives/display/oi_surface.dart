@@ -78,9 +78,7 @@ class OiSurface extends StatelessWidget {
   // ---------------------------------------------------------------------------
 
   BorderRadius _resolvedRadius() {
-    return borderRadius ??
-        border?.borderRadius ??
-        BorderRadius.zero;
+    return borderRadius ?? border?.borderRadius ?? BorderRadius.zero;
   }
 
   List<BoxShadow> _resolvedShadows() {
@@ -103,14 +101,16 @@ class OiSurface extends StatelessWidget {
     final effectiveBorder = border;
 
     // Determine whether to use solid BoxDecoration border or custom painter.
-    final useCustomBorder = effectiveBorder != null &&
+    final useCustomBorder =
+        effectiveBorder != null &&
         effectiveBorder.lineStyle != OiBorderLineStyle.solid;
-    final useSolidBorder = effectiveBorder != null &&
+    final useSolidBorder =
+        effectiveBorder != null &&
         effectiveBorder.lineStyle == OiBorderLineStyle.solid &&
         effectiveBorder.width > 0 &&
         effectiveBorder.gradient == null;
-    final useGradientBorder = effectiveBorder != null &&
-        effectiveBorder.gradient != null;
+    final useGradientBorder =
+        effectiveBorder != null && effectiveBorder.gradient != null;
 
     // Build the BoxDecoration.
     final decoration = BoxDecoration(
@@ -177,10 +177,7 @@ class OiSurface extends StatelessWidget {
 
 /// Paints dashed, dotted, or gradient borders around a rounded rectangle.
 class _OiBorderPainter extends CustomPainter {
-  const _OiBorderPainter({
-    required this.style,
-    required this.radius,
-  });
+  const _OiBorderPainter({required this.style, required this.radius});
 
   final OiBorderStyle style;
   final BorderRadius radius;
@@ -193,8 +190,7 @@ class _OiBorderPainter extends CustomPainter {
 
     if (style.gradient != null) {
       final rect = Offset.zero & size;
-      paint.shader = style.gradient!
-          .createShader(rect);
+      paint.shader = style.gradient!.createShader(rect);
     } else {
       paint.color = style.color;
     }
@@ -214,12 +210,15 @@ class _OiBorderPainter extends CustomPainter {
 
     // Approximate perimeter for dash/dot spacing.
     final perimeter = _rrectPerimeter(rrect);
-    final dashLength =
-        style.lineStyle == OiBorderLineStyle.dashed ? style.width * 4 : 0.0;
-    final dotLength =
-        style.lineStyle == OiBorderLineStyle.dotted ? style.width : 0.0;
-    final segmentLength =
-        style.lineStyle == OiBorderLineStyle.dashed ? dashLength : dotLength;
+    final dashLength = style.lineStyle == OiBorderLineStyle.dashed
+        ? style.width * 4
+        : 0.0;
+    final dotLength = style.lineStyle == OiBorderLineStyle.dotted
+        ? style.width
+        : 0.0;
+    final segmentLength = style.lineStyle == OiBorderLineStyle.dashed
+        ? dashLength
+        : dotLength;
     final gapLength = segmentLength * 1.5;
 
     final path = Path()..addRRect(rrect);
@@ -232,7 +231,10 @@ class _OiBorderPainter extends CustomPainter {
         final length = draw ? segmentLength : gapLength;
         if (draw) {
           canvas.drawPath(
-            metric.extractPath(distance, distance + math.min(length, perimeter)),
+            metric.extractPath(
+              distance,
+              distance + math.min(length, perimeter),
+            ),
             paint,
           );
         }

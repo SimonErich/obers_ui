@@ -71,10 +71,7 @@ class OiDialog extends StatelessWidget {
   /// Uses [OiOverlays.of] when available, otherwise falls back to the
   /// Flutter [Overlay]. Returns an [OiOverlayHandle] that can be used to
   /// dismiss the overlay programmatically.
-  static OiOverlayHandle show(
-    BuildContext context, {
-    required Widget dialog,
-  }) {
+  static OiOverlayHandle show(BuildContext context, {required Widget dialog}) {
     final service = OiOverlays.maybeOf(context);
     if (service != null) {
       return service.show(
@@ -144,8 +141,10 @@ class OiDialog extends StatelessWidget {
               )
             else
               Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 8,
+                ),
                 child: bodyContent,
               ),
 

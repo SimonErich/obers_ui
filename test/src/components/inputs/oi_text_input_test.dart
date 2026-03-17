@@ -34,9 +34,7 @@ void main() {
 
   testWidgets('onChanged fires when text is entered', (tester) async {
     final values = <String>[];
-    await tester.pumpObers(
-      OiTextInput(onChanged: values.add),
-    );
+    await tester.pumpObers(OiTextInput(onChanged: values.add));
     await tester.enterText(find.byType(EditableText), 'hello');
     await tester.pump();
     expect(values, contains('hello'));
@@ -44,9 +42,7 @@ void main() {
 
   testWidgets('enabled=false makes input read-only', (tester) async {
     final values = <String>[];
-    await tester.pumpObers(
-      OiTextInput(enabled: false, onChanged: values.add),
-    );
+    await tester.pumpObers(OiTextInput(enabled: false, onChanged: values.add));
     await tester.enterText(find.byType(EditableText), 'test');
     await tester.pump();
     expect(values, isEmpty);

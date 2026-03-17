@@ -11,16 +11,15 @@ import '../../../helpers/pump_app.dart';
 void main() {
   setUp(() {
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-        .setMockMethodCallHandler(
-      SystemChannels.platform,
-      (MethodCall call) async {
-        if (call.method == 'Clipboard.setData') return null;
-        if (call.method == 'Clipboard.getData') {
-          return {'text': 'mock clipboard'};
-        }
-        return null;
-      },
-    );
+        .setMockMethodCallHandler(SystemChannels.platform, (
+          MethodCall call,
+        ) async {
+          if (call.method == 'Clipboard.setData') return null;
+          if (call.method == 'Clipboard.getData') {
+            return {'text': 'mock clipboard'};
+          }
+          return null;
+        });
   });
 
   tearDown(() {
@@ -32,10 +31,7 @@ void main() {
 
   testWidgets('renders child widget', (tester) async {
     await tester.pumpObers(
-      const OiCopyable(
-        value: 'hello',
-        child: Text('copy me'),
-      ),
+      const OiCopyable(value: 'hello', child: Text('copy me')),
     );
     expect(find.text('copy me'), findsOneWidget);
   });
@@ -45,22 +41,18 @@ void main() {
   testWidgets('tap copies value to clipboard', (tester) async {
     String? written;
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-        .setMockMethodCallHandler(
-      SystemChannels.platform,
-      (MethodCall call) async {
-        if (call.method == 'Clipboard.setData') {
-          written = (call.arguments as Map)['text'] as String?;
+        .setMockMethodCallHandler(SystemChannels.platform, (
+          MethodCall call,
+        ) async {
+          if (call.method == 'Clipboard.setData') {
+            written = (call.arguments as Map)['text'] as String?;
+            return null;
+          }
           return null;
-        }
-        return null;
-      },
-    );
+        });
 
     await tester.pumpObers(
-      const OiCopyable(
-        value: 'copied text',
-        child: Text('tap me'),
-      ),
+      const OiCopyable(value: 'copied text', child: Text('tap me')),
     );
 
     await tester.tap(find.text('tap me'));
@@ -92,23 +84,18 @@ void main() {
   testWidgets('enabled=false: tap does not copy', (tester) async {
     String? written;
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-        .setMockMethodCallHandler(
-      SystemChannels.platform,
-      (MethodCall call) async {
-        if (call.method == 'Clipboard.setData') {
-          written = (call.arguments as Map)['text'] as String?;
+        .setMockMethodCallHandler(SystemChannels.platform, (
+          MethodCall call,
+        ) async {
+          if (call.method == 'Clipboard.setData') {
+            written = (call.arguments as Map)['text'] as String?;
+            return null;
+          }
           return null;
-        }
-        return null;
-      },
-    );
+        });
 
     await tester.pumpObers(
-      const OiCopyable(
-        value: 'secret',
-        enabled: false,
-        child: Text('tap me'),
-      ),
+      const OiCopyable(value: 'secret', enabled: false, child: Text('tap me')),
     );
 
     await tester.tap(find.text('tap me'));
@@ -141,22 +128,18 @@ void main() {
   testWidgets('Ctrl+C copies value to clipboard', (tester) async {
     String? written;
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-        .setMockMethodCallHandler(
-      SystemChannels.platform,
-      (MethodCall call) async {
-        if (call.method == 'Clipboard.setData') {
-          written = (call.arguments as Map)['text'] as String?;
+        .setMockMethodCallHandler(SystemChannels.platform, (
+          MethodCall call,
+        ) async {
+          if (call.method == 'Clipboard.setData') {
+            written = (call.arguments as Map)['text'] as String?;
+            return null;
+          }
           return null;
-        }
-        return null;
-      },
-    );
+        });
 
     await tester.pumpObers(
-      const OiCopyable(
-        value: 'keyboard copy',
-        child: Text('focus me'),
-      ),
+      const OiCopyable(value: 'keyboard copy', child: Text('focus me')),
     );
 
     // Focus the widget so key events are delivered.

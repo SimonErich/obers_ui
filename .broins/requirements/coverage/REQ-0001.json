@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "atomId": "REQ-0001",
+  "atomText": "",
+  "status": "covered",
+  "workItemId": "WI-0066",
+  "history": [
+    {
+      "at": "2026-03-17T10:02:14.760434Z",
+      "event": "covered",
+      "workItemId": "WI-0066",
+      "runId": "run-1773733505170"
+    }
+  ],
+  "evidence": [
+    "test/src/naming_conventions_test.dart:17-79",
+    "test/src/naming_conventions_test.dart:22-25",
+    "test/src/naming_conventions_test.dart:30-32"
+  ],
+  "coveredAt": "2026-03-17T10:02:14.760434Z"
+}

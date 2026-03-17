@@ -17,10 +17,7 @@ void main() {
 
   testWidgets('renders child widget', (tester) async {
     await tester.pumpObers(
-      const OiDraggable<String>(
-        data: 'test',
-        child: Text('drag me'),
-      ),
+      const OiDraggable<String>(data: 'test', child: Text('drag me')),
     );
     expect(find.text('drag me'), findsOneWidget);
   });
@@ -31,10 +28,7 @@ void main() {
     await tester.pumpObers(
       _withDensity(
         OiDensity.compact,
-        const OiDraggable<String>(
-          data: 'value',
-          child: Text('drag me'),
-        ),
+        const OiDraggable<String>(data: 'value', child: Text('drag me')),
       ),
     );
     expect(find.byType(Draggable<String>), findsOneWidget);
@@ -47,10 +41,7 @@ void main() {
     await tester.pumpObers(
       _withDensity(
         OiDensity.comfortable,
-        const OiDraggable<String>(
-          data: 'value',
-          child: Text('drag me'),
-        ),
+        const OiDraggable<String>(data: 'value', child: Text('drag me')),
       ),
     );
     expect(find.byType(LongPressDraggable<String>), findsOneWidget);
@@ -67,17 +58,14 @@ void main() {
         OiDraggable<String>(
           data: 'value',
           onDragStarted: () => started = true,
-          child: const SizedBox(
-            width: 100,
-            height: 100,
-            child: Text('drag'),
-          ),
+          child: const SizedBox(width: 100, height: 100, child: Text('drag')),
         ),
       ),
     );
 
-    final gesture =
-        await tester.startGesture(tester.getCenter(find.text('drag')));
+    final gesture = await tester.startGesture(
+      tester.getCenter(find.text('drag')),
+    );
     await gesture.moveBy(const Offset(20, 20));
     await tester.pump();
     expect(started, isTrue);
@@ -87,8 +75,9 @@ void main() {
 
   // ── 5. onDragCompleted fires when dropped on accepting target ─────────────
 
-  testWidgets('onDragCompleted fires when dropped on DragTarget',
-      (tester) async {
+  testWidgets('onDragCompleted fires when dropped on DragTarget', (
+    tester,
+  ) async {
     var completed = false;
     await tester.pumpObers(
       _withDensity(
@@ -119,8 +108,9 @@ void main() {
       ),
     );
 
-    final gesture = await tester
-        .startGesture(tester.getCenter(find.byKey(const Key('src'))));
+    final gesture = await tester.startGesture(
+      tester.getCenter(find.byKey(const Key('src'))),
+    );
     await gesture.moveBy(const Offset(100, 0));
     await tester.pump();
     await gesture.up();
@@ -137,17 +127,14 @@ void main() {
         const OiDraggable<String>(
           data: 'value',
           feedback: Text('custom feedback'),
-          child: SizedBox(
-            width: 80,
-            height: 80,
-            child: Text('drag me'),
-          ),
+          child: SizedBox(width: 80, height: 80, child: Text('drag me')),
         ),
       ),
     );
 
-    final gesture =
-        await tester.startGesture(tester.getCenter(find.text('drag me')));
+    final gesture = await tester.startGesture(
+      tester.getCenter(find.text('drag me')),
+    );
     await gesture.moveBy(const Offset(20, 20));
     await tester.pump();
     expect(find.text('custom feedback'), findsOneWidget);
@@ -157,25 +144,23 @@ void main() {
 
   // ── 7. childWhenDragging is shown at origin during drag ───────────────────
 
-  testWidgets('childWhenDragging shown at original position during drag',
-      (tester) async {
+  testWidgets('childWhenDragging shown at original position during drag', (
+    tester,
+  ) async {
     await tester.pumpObers(
       _withDensity(
         OiDensity.compact,
         const OiDraggable<String>(
           data: 'value',
           childWhenDragging: Text('placeholder'),
-          child: SizedBox(
-            width: 80,
-            height: 80,
-            child: Text('drag me'),
-          ),
+          child: SizedBox(width: 80, height: 80, child: Text('drag me')),
         ),
       ),
     );
 
-    final gesture =
-        await tester.startGesture(tester.getCenter(find.text('drag me')));
+    final gesture = await tester.startGesture(
+      tester.getCenter(find.text('drag me')),
+    );
     await gesture.moveBy(const Offset(20, 20));
     await tester.pump();
     expect(find.text('placeholder'), findsOneWidget);

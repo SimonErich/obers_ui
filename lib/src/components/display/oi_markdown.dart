@@ -32,8 +32,7 @@ List<_Span> _parseInline(String text) {
 
   while (remaining.isNotEmpty) {
     // Link: [text](url)
-    final linkMatch =
-        RegExp(r'\[([^\]]+)\]\(([^)]+)\)').firstMatch(remaining);
+    final linkMatch = RegExp(r'\[([^\]]+)\]\(([^)]+)\)').firstMatch(remaining);
     if (linkMatch != null && linkMatch.start == 0) {
       spans.add(
         _Span(linkMatch.group(1)!, link: true, href: linkMatch.group(2)),
@@ -124,8 +123,9 @@ List<_Block> _parseBlocks(String data) {
     // Fenced code block.
     final fenceMatch = RegExp(r'^```(\w*)').firstMatch(line);
     if (fenceMatch != null) {
-      final lang =
-          (fenceMatch.group(1)?.isNotEmpty ?? false) ? fenceMatch.group(1) : null;
+      final lang = (fenceMatch.group(1)?.isNotEmpty ?? false)
+          ? fenceMatch.group(1)
+          : null;
       final codeLines = <String>[];
       i++;
       while (i < lines.length && !lines[i].startsWith('```')) {
@@ -262,17 +262,16 @@ class OiMarkdown extends StatelessWidget {
           ),
         );
       } else if (block is _FenceBlock) {
-        Widget codeWidget = OiCodeBlock(
-          code: block.code,
-          language: block.lang,
-        );
+        Widget codeWidget = OiCodeBlock(code: block.code, language: block.lang);
         if (codeBlockMaxWidth != null) {
           codeWidget = SizedBox(width: codeBlockMaxWidth, child: codeWidget);
         }
-        widgets.add(Padding(
-          padding: const EdgeInsets.symmetric(vertical: 6),
-          child: codeWidget,
-        ));
+        widgets.add(
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 6),
+            child: codeWidget,
+          ),
+        );
       } else if (block is _ListItemBlock) {
         widgets.add(
           Padding(
@@ -281,9 +280,7 @@ class OiMarkdown extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('• ', style: baseStyle),
-                Expanded(
-                  child: _buildInline(block.text, baseStyle, colors),
-                ),
+                Expanded(child: _buildInline(block.text, baseStyle, colors)),
               ],
             ),
           ),

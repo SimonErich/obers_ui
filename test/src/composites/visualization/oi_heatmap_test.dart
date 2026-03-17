@@ -66,10 +66,12 @@ void main() {
 
   // 3. Labels render — row and column labels shown.
   testWidgets('displays row and column labels', (tester) async {
-    await tester.pumpObers(_heatmap(
-      rowLabels: const ['Mon', 'Tue'],
-      columnLabels: const ['AM', 'PM'],
-    ));
+    await tester.pumpObers(
+      _heatmap(
+        rowLabels: const ['Mon', 'Tue'],
+        columnLabels: const ['AM', 'PM'],
+      ),
+    );
     expect(find.text('Mon'), findsOneWidget);
     expect(find.text('Tue'), findsOneWidget);
     expect(find.text('AM'), findsOneWidget);
@@ -78,19 +80,19 @@ void main() {
 
   // 4. Custom colors applied.
   testWidgets('renders with custom low and high colors', (tester) async {
-    await tester.pumpObers(_heatmap(
-      lowColor: const Color(0xFF0000FF),
-      highColor: const Color(0xFFFF0000),
-    ));
+    await tester.pumpObers(
+      _heatmap(
+        lowColor: const Color(0xFF0000FF),
+        highColor: const Color(0xFFFF0000),
+      ),
+    );
     expect(find.byType(OiHeatmap), findsOneWidget);
   });
 
   // 5. onCellTap fires.
   testWidgets('onCellTap fires with correct cell', (tester) async {
     OiHeatmapCell? tappedCell;
-    await tester.pumpObers(_heatmap(
-      onCellTap: (cell) => tappedCell = cell,
-    ));
+    await tester.pumpObers(_heatmap(onCellTap: (cell) => tappedCell = cell));
     await tester.tap(find.byKey(const Key('oi_heatmap_cell_1_0')));
     await tester.pump();
     expect(tappedCell?.row, 1);

@@ -11,9 +11,7 @@ void main() {
   // ── Rendering ──────────────────────────────────────────────────────────────
 
   testWidgets('renders month/year header', (tester) async {
-    await tester.pumpObers(
-      OiDatePicker(value: DateTime(2024, 3, 15)),
-    );
+    await tester.pumpObers(OiDatePicker(value: DateTime(2024, 3, 15)));
     expect(find.text('March 2024'), findsOneWidget);
   });
 
@@ -25,9 +23,7 @@ void main() {
   });
 
   testWidgets('renders day numbers in current month', (tester) async {
-    await tester.pumpObers(
-      OiDatePicker(value: DateTime(2024, 1, 15)),
-    );
+    await tester.pumpObers(OiDatePicker(value: DateTime(2024, 1, 15)));
     // January — verify some day numbers appear.
     expect(find.text('15'), findsOneWidget);
     expect(find.text('31'), findsOneWidget);
@@ -36,28 +32,20 @@ void main() {
   // ── Navigation ─────────────────────────────────────────────────────────────
 
   testWidgets('prev arrow navigates to previous month', (tester) async {
-    await tester.pumpObers(
-      OiDatePicker(value: DateTime(2024, 3, 15)),
-    );
+    await tester.pumpObers(OiDatePicker(value: DateTime(2024, 3, 15)));
     // Tap the left chevron icon (codePoint 0xe5cb).
     await tester.tap(
-      find.byWidgetPredicate(
-        (w) => w is Icon && w.icon?.codePoint == 0xe5cb,
-      ),
+      find.byWidgetPredicate((w) => w is Icon && w.icon?.codePoint == 0xe5cb),
     );
     await tester.pump();
     expect(find.text('February 2024'), findsOneWidget);
   });
 
   testWidgets('next arrow navigates to next month', (tester) async {
-    await tester.pumpObers(
-      OiDatePicker(value: DateTime(2024, 3, 15)),
-    );
+    await tester.pumpObers(OiDatePicker(value: DateTime(2024, 3, 15)));
     // Tap the right chevron icon (codePoint 0xe5cc).
     await tester.tap(
-      find.byWidgetPredicate(
-        (w) => w is Icon && w.icon?.codePoint == 0xe5cc,
-      ),
+      find.byWidgetPredicate((w) => w is Icon && w.icon?.codePoint == 0xe5cc),
     );
     await tester.pump();
     expect(find.text('April 2024'), findsOneWidget);
@@ -68,10 +56,7 @@ void main() {
   testWidgets('tapping a day fires onChanged', (tester) async {
     DateTime? picked;
     await tester.pumpObers(
-      OiDatePicker(
-        value: DateTime(2024, 3, 15),
-        onChanged: (d) => picked = d,
-      ),
+      OiDatePicker(value: DateTime(2024, 3, 15), onChanged: (d) => picked = d),
     );
     // Tap day 10.
     await tester.tap(find.text('10'));
@@ -83,8 +68,9 @@ void main() {
 
   // ── Range mode ─────────────────────────────────────────────────────────────
 
-  testWidgets('range mode: tapping two days fires onRangeChanged',
-      (tester) async {
+  testWidgets('range mode: tapping two days fires onRangeChanged', (
+    tester,
+  ) async {
     DateTime? rs;
     DateTime? re;
     await tester.pumpObers(

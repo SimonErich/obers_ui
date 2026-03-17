@@ -62,8 +62,7 @@ class OiDraggable<T extends Object> extends StatelessWidget {
     final density = OiDensityScope.of(context);
     final isTouch = density == OiDensity.comfortable;
 
-    final effectiveFeedback =
-        feedback ?? OiDragGhost(child: child);
+    final effectiveFeedback = feedback ?? OiDragGhost(child: child);
 
     if (isTouch) {
       return LongPressDraggable<T>(

@@ -13,16 +13,8 @@ void main() {
       await tester.pumpObers(
         OiDashboard(
           cards: const [
-            OiDashboardCard(
-              key: 'c1',
-              title: 'Revenue',
-              child: Text('100k'),
-            ),
-            OiDashboardCard(
-              key: 'c2',
-              title: 'Users',
-              child: Text('5k'),
-            ),
+            OiDashboardCard(key: 'c1', title: 'Revenue', child: Text('100k')),
+            OiDashboardCard(key: 'c2', title: 'Users', child: Text('5k')),
           ],
           label: 'Dashboard',
         ),
@@ -94,11 +86,7 @@ void main() {
       await tester.pumpObers(
         OiDashboard(
           cards: const [
-            OiDashboardCard(
-              key: 'e1',
-              title: 'Static',
-              child: Text('Content'),
-            ),
+            OiDashboardCard(key: 'e1', title: 'Static', child: Text('Content')),
           ],
           label: 'Dashboard',
           editable: false,

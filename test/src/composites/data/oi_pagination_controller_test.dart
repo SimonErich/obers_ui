@@ -51,14 +51,20 @@ void main() {
     });
 
     test('startIndex is currentPage * pageSize', () {
-      final ctrl =
-          OiPaginationController(currentPage: 3, pageSize: 10, totalItems: 50);
+      final ctrl = OiPaginationController(
+        currentPage: 3,
+        pageSize: 10,
+        totalItems: 50,
+      );
       expect(ctrl.startIndex, 30);
     });
 
     test('endIndex is min of next page start and totalItems', () {
-      final ctrl =
-          OiPaginationController(currentPage: 3, pageSize: 10, totalItems: 35);
+      final ctrl = OiPaginationController(
+        currentPage: 3,
+        pageSize: 10,
+        totalItems: 35,
+      );
       expect(ctrl.endIndex, 35); // last partial page
     });
 
@@ -68,8 +74,11 @@ void main() {
     });
 
     test('hasNextPage is false on last page', () {
-      final ctrl =
-          OiPaginationController(currentPage: 4, pageSize: 10, totalItems: 50);
+      final ctrl = OiPaginationController(
+        currentPage: 4,
+        pageSize: 10,
+        totalItems: 50,
+      );
       expect(ctrl.hasNextPage, isFalse);
     });
 
@@ -84,20 +93,29 @@ void main() {
     });
 
     test('hasPreviousPage is true beyond first page', () {
-      final ctrl =
-          OiPaginationController(currentPage: 1, pageSize: 10, totalItems: 50);
+      final ctrl = OiPaginationController(
+        currentPage: 1,
+        pageSize: 10,
+        totalItems: 50,
+      );
       expect(ctrl.hasPreviousPage, isTrue);
     });
 
     test('isFirstPage is true only on page 0', () {
-      final ctrl =
-          OiPaginationController(currentPage: 1, pageSize: 10, totalItems: 50);
+      final ctrl = OiPaginationController(
+        currentPage: 1,
+        pageSize: 10,
+        totalItems: 50,
+      );
       expect(ctrl.isFirstPage, isFalse);
     });
 
     test('isLastPage is true on last page', () {
-      final ctrl =
-          OiPaginationController(currentPage: 4, pageSize: 10, totalItems: 50);
+      final ctrl = OiPaginationController(
+        currentPage: 4,
+        pageSize: 10,
+        totalItems: 50,
+      );
       expect(ctrl.isLastPage, isTrue);
     });
 
@@ -116,9 +134,11 @@ void main() {
     });
 
     test('goToPage clamps to 0 when negative', () {
-      final ctrl =
-          OiPaginationController(currentPage: 2, pageSize: 10, totalItems: 50)
-            ..goToPage(-5);
+      final ctrl = OiPaginationController(
+        currentPage: 2,
+        pageSize: 10,
+        totalItems: 50,
+      )..goToPage(-5);
       expect(ctrl.currentPage, 0);
     });
 
@@ -154,9 +174,11 @@ void main() {
     });
 
     test('nextPage does nothing on last page', () {
-      final ctrl =
-          OiPaginationController(currentPage: 4, pageSize: 10, totalItems: 50)
-            ..nextPage();
+      final ctrl = OiPaginationController(
+        currentPage: 4,
+        pageSize: 10,
+        totalItems: 50,
+      )..nextPage();
       expect(ctrl.currentPage, 4);
     });
 
@@ -172,9 +194,11 @@ void main() {
     // ── previousPage ─────────────────────────────────────────────────────────
 
     test('previousPage decrements currentPage', () {
-      final ctrl =
-          OiPaginationController(currentPage: 3, pageSize: 10, totalItems: 50)
-            ..previousPage();
+      final ctrl = OiPaginationController(
+        currentPage: 3,
+        pageSize: 10,
+        totalItems: 50,
+      )..previousPage();
       expect(ctrl.currentPage, 2);
     });
 
@@ -185,8 +209,11 @@ void main() {
     });
 
     test('previousPage notifies listeners', () {
-      final ctrl =
-          OiPaginationController(currentPage: 2, pageSize: 10, totalItems: 50);
+      final ctrl = OiPaginationController(
+        currentPage: 2,
+        pageSize: 10,
+        totalItems: 50,
+      );
       var notified = false;
       ctrl
         ..addListener(() => notified = true)
@@ -197,9 +224,11 @@ void main() {
     // ── firstPage / lastPage ─────────────────────────────────────────────────
 
     test('firstPage jumps to page 0', () {
-      final ctrl =
-          OiPaginationController(currentPage: 4, pageSize: 10, totalItems: 50)
-            ..firstPage();
+      final ctrl = OiPaginationController(
+        currentPage: 4,
+        pageSize: 10,
+        totalItems: 50,
+      )..firstPage();
       expect(ctrl.currentPage, 0);
     });
 
@@ -224,8 +253,11 @@ void main() {
     });
 
     test('lastPage does not notify when already on last page', () {
-      final ctrl =
-          OiPaginationController(currentPage: 4, pageSize: 10, totalItems: 50);
+      final ctrl = OiPaginationController(
+        currentPage: 4,
+        pageSize: 10,
+        totalItems: 50,
+      );
       var count = 0;
       ctrl
         ..addListener(() => count++)
@@ -236,9 +268,11 @@ void main() {
     // ── setPageSize ──────────────────────────────────────────────────────────
 
     test('setPageSize updates pageSize and resets to page 0', () {
-      final ctrl =
-          OiPaginationController(currentPage: 3, pageSize: 10, totalItems: 100)
-            ..setPageSize(25);
+      final ctrl = OiPaginationController(
+        currentPage: 3,
+        pageSize: 10,
+        totalItems: 100,
+      )..setPageSize(25);
       expect(ctrl.pageSize, 25);
       expect(ctrl.currentPage, 0);
     });
@@ -270,16 +304,20 @@ void main() {
     });
 
     test('setTotalItems adjusts currentPage when page goes out of range', () {
-      final ctrl =
-          OiPaginationController(currentPage: 4, pageSize: 10, totalItems: 50)
-            ..setTotalItems(15); // only 2 pages now
+      final ctrl = OiPaginationController(
+        currentPage: 4,
+        pageSize: 10,
+        totalItems: 50,
+      )..setTotalItems(15); // only 2 pages now
       expect(ctrl.currentPage, 1);
     });
 
     test('setTotalItems resets to page 0 when totalItems becomes 0', () {
-      final ctrl =
-          OiPaginationController(currentPage: 2, pageSize: 10, totalItems: 50)
-            ..setTotalItems(0);
+      final ctrl = OiPaginationController(
+        currentPage: 2,
+        pageSize: 10,
+        totalItems: 50,
+      )..setTotalItems(0);
       expect(ctrl.currentPage, 0);
     });
 

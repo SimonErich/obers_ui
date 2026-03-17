@@ -57,13 +57,7 @@ enum OiIconPosition {
 
 // ── Internal discriminator ──────────────────────────────────────────────────
 
-enum _OiButtonKind {
-  standard,
-  icon,
-  split,
-  countdown,
-  confirm,
-}
+enum _OiButtonKind { standard, icon, split, countdown, confirm }
 
 /// A fully-featured button component for the Obers UI design system.
 ///
@@ -125,19 +119,19 @@ class OiButton extends StatefulWidget {
     String? semanticLabel,
     Key? key,
   }) : this._(
-          kind: _OiButtonKind.standard,
-          label: label,
-          icon: icon,
-          iconPosition: iconPosition,
-          variant: OiButtonVariant.primary,
-          size: size,
-          onTap: onTap,
-          enabled: enabled,
-          loading: loading,
-          fullWidth: fullWidth,
-          semanticLabel: semanticLabel,
-          key: key,
-        );
+         kind: _OiButtonKind.standard,
+         label: label,
+         icon: icon,
+         iconPosition: iconPosition,
+         variant: OiButtonVariant.primary,
+         size: size,
+         onTap: onTap,
+         enabled: enabled,
+         loading: loading,
+         fullWidth: fullWidth,
+         semanticLabel: semanticLabel,
+         key: key,
+       );
 
   /// Creates a secondary-variant button with the supplied [label].
   const OiButton.secondary({
@@ -152,19 +146,19 @@ class OiButton extends StatefulWidget {
     String? semanticLabel,
     Key? key,
   }) : this._(
-          kind: _OiButtonKind.standard,
-          label: label,
-          icon: icon,
-          iconPosition: iconPosition,
-          variant: OiButtonVariant.secondary,
-          size: size,
-          onTap: onTap,
-          enabled: enabled,
-          loading: loading,
-          fullWidth: fullWidth,
-          semanticLabel: semanticLabel,
-          key: key,
-        );
+         kind: _OiButtonKind.standard,
+         label: label,
+         icon: icon,
+         iconPosition: iconPosition,
+         variant: OiButtonVariant.secondary,
+         size: size,
+         onTap: onTap,
+         enabled: enabled,
+         loading: loading,
+         fullWidth: fullWidth,
+         semanticLabel: semanticLabel,
+         key: key,
+       );
 
   /// Creates an outline-variant button with the supplied [label].
   const OiButton.outline({
@@ -179,19 +173,19 @@ class OiButton extends StatefulWidget {
     String? semanticLabel,
     Key? key,
   }) : this._(
-          kind: _OiButtonKind.standard,
-          label: label,
-          icon: icon,
-          iconPosition: iconPosition,
-          variant: OiButtonVariant.outline,
-          size: size,
-          onTap: onTap,
-          enabled: enabled,
-          loading: loading,
-          fullWidth: fullWidth,
-          semanticLabel: semanticLabel,
-          key: key,
-        );
+         kind: _OiButtonKind.standard,
+         label: label,
+         icon: icon,
+         iconPosition: iconPosition,
+         variant: OiButtonVariant.outline,
+         size: size,
+         onTap: onTap,
+         enabled: enabled,
+         loading: loading,
+         fullWidth: fullWidth,
+         semanticLabel: semanticLabel,
+         key: key,
+       );
 
   /// Creates a ghost-variant button with the supplied [label].
   const OiButton.ghost({
@@ -206,19 +200,19 @@ class OiButton extends StatefulWidget {
     String? semanticLabel,
     Key? key,
   }) : this._(
-          kind: _OiButtonKind.standard,
-          label: label,
-          icon: icon,
-          iconPosition: iconPosition,
-          variant: OiButtonVariant.ghost,
-          size: size,
-          onTap: onTap,
-          enabled: enabled,
-          loading: loading,
-          fullWidth: fullWidth,
-          semanticLabel: semanticLabel,
-          key: key,
-        );
+         kind: _OiButtonKind.standard,
+         label: label,
+         icon: icon,
+         iconPosition: iconPosition,
+         variant: OiButtonVariant.ghost,
+         size: size,
+         onTap: onTap,
+         enabled: enabled,
+         loading: loading,
+         fullWidth: fullWidth,
+         semanticLabel: semanticLabel,
+         key: key,
+       );
 
   /// Creates a destructive-variant button with the supplied [label].
   const OiButton.destructive({
@@ -233,19 +227,19 @@ class OiButton extends StatefulWidget {
     String? semanticLabel,
     Key? key,
   }) : this._(
-          kind: _OiButtonKind.standard,
-          label: label,
-          icon: icon,
-          iconPosition: iconPosition,
-          variant: OiButtonVariant.destructive,
-          size: size,
-          onTap: onTap,
-          enabled: enabled,
-          loading: loading,
-          fullWidth: fullWidth,
-          semanticLabel: semanticLabel,
-          key: key,
-        );
+         kind: _OiButtonKind.standard,
+         label: label,
+         icon: icon,
+         iconPosition: iconPosition,
+         variant: OiButtonVariant.destructive,
+         size: size,
+         onTap: onTap,
+         enabled: enabled,
+         loading: loading,
+         fullWidth: fullWidth,
+         semanticLabel: semanticLabel,
+         key: key,
+       );
 
   /// Creates a soft-variant button with the supplied [label].
   const OiButton.soft({
@@ -260,19 +254,19 @@ class OiButton extends StatefulWidget {
     String? semanticLabel,
     Key? key,
   }) : this._(
-          kind: _OiButtonKind.standard,
-          label: label,
-          icon: icon,
-          iconPosition: iconPosition,
-          variant: OiButtonVariant.soft,
-          size: size,
-          onTap: onTap,
-          enabled: enabled,
-          loading: loading,
-          fullWidth: fullWidth,
-          semanticLabel: semanticLabel,
-          key: key,
-        );
+         kind: _OiButtonKind.standard,
+         label: label,
+         icon: icon,
+         iconPosition: iconPosition,
+         variant: OiButtonVariant.soft,
+         size: size,
+         onTap: onTap,
+         enabled: enabled,
+         loading: loading,
+         fullWidth: fullWidth,
+         semanticLabel: semanticLabel,
+         key: key,
+       );
 
   // ── Special constructors ────────────────────────────────────────────────────
 
@@ -288,15 +282,15 @@ class OiButton extends StatefulWidget {
     OiButtonVariant variant = OiButtonVariant.ghost,
     Key? key,
   }) : this._(
-          kind: _OiButtonKind.icon,
-          icon: icon,
-          variant: variant,
-          size: size,
-          onTap: onTap,
-          enabled: enabled,
-          semanticLabel: label,
-          key: key,
-        );
+         kind: _OiButtonKind.icon,
+         icon: icon,
+         variant: variant,
+         size: size,
+         onTap: onTap,
+         enabled: enabled,
+         semanticLabel: label,
+         key: key,
+       );
 
   /// Creates a split button combining a main action with a dropdown trigger.
   ///
@@ -310,15 +304,15 @@ class OiButton extends StatefulWidget {
     bool enabled = true,
     Key? key,
   }) : this._(
-          kind: _OiButtonKind.split,
-          label: label,
-          onTap: onTap,
-          dropdown: dropdown,
-          variant: variant,
-          size: size,
-          enabled: enabled,
-          key: key,
-        );
+         kind: _OiButtonKind.split,
+         label: label,
+         onTap: onTap,
+         dropdown: dropdown,
+         variant: variant,
+         size: size,
+         enabled: enabled,
+         key: key,
+       );
 
   /// Creates a countdown button that auto-enables after [seconds] seconds.
   ///
@@ -332,14 +326,14 @@ class OiButton extends StatefulWidget {
     OiButtonSize size = OiButtonSize.medium,
     Key? key,
   }) : this._(
-          kind: _OiButtonKind.countdown,
-          label: label,
-          onTap: onTap,
-          countdownSeconds: seconds,
-          variant: variant,
-          size: size,
-          key: key,
-        );
+         kind: _OiButtonKind.countdown,
+         label: label,
+         onTap: onTap,
+         countdownSeconds: seconds,
+         variant: variant,
+         size: size,
+         key: key,
+       );
 
   /// Creates a confirm button that requires two taps to fire [onConfirm].
   ///
@@ -353,14 +347,14 @@ class OiButton extends StatefulWidget {
     OiButtonSize size = OiButtonSize.medium,
     Key? key,
   }) : this._(
-          kind: _OiButtonKind.confirm,
-          label: label,
-          confirmLabel: confirmLabel,
-          onConfirm: onConfirm,
-          variant: variant,
-          size: size,
-          key: key,
-        );
+         kind: _OiButtonKind.confirm,
+         label: label,
+         confirmLabel: confirmLabel,
+         onConfirm: onConfirm,
+         variant: variant,
+         size: size,
+         key: key,
+       );
 
   // ── Fields ─────────────────────────────────────────────────────────────────
 
@@ -742,8 +736,8 @@ class _OiButtonState extends State<OiButton> {
     final hPad = _hPadding(context);
     final foreground = _foregroundColor(context, widget.variant);
     final bgColor = _backgroundColor(context, widget.variant);
-    final borderRadius = context.components.button?.borderRadius ??
-        context.radius.sm;
+    final borderRadius =
+        context.components.button?.borderRadius ?? context.radius.sm;
 
     final leftRadius = BorderRadius.only(
       topLeft: borderRadius.topLeft,
@@ -760,10 +754,7 @@ class _OiButtonState extends State<OiButton> {
       child: Container(
         height: height,
         padding: EdgeInsets.symmetric(horizontal: hPad),
-        decoration: BoxDecoration(
-          color: bgColor,
-          borderRadius: leftRadius,
-        ),
+        decoration: BoxDecoration(color: bgColor, borderRadius: leftRadius),
         child: Center(
           child: Text(
             widget.label ?? '',
@@ -790,9 +781,7 @@ class _OiButtonState extends State<OiButton> {
           color: bgColor,
           borderRadius: rightRadius,
           border: Border(
-            left: BorderSide(
-              color: foreground.withValues(alpha: 0.3),
-            ),
+            left: BorderSide(color: foreground.withValues(alpha: 0.3)),
           ),
         ),
         child: Center(
@@ -820,8 +809,9 @@ class _OiButtonState extends State<OiButton> {
 
   Widget _buildCountdownButton(BuildContext context) {
     final isExpired = _remaining <= 0;
-    final displayLabel =
-        isExpired ? widget.label ?? '' : '${widget.label ?? ''} ($_remaining)';
+    final displayLabel = isExpired
+        ? widget.label ?? ''
+        : '${widget.label ?? ''} ($_remaining)';
 
     final density = OiDensityScope.of(context);
     final height = _buttonHeight(density);

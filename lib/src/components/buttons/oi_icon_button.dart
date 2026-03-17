@@ -52,7 +52,7 @@ class OiIconButton extends StatelessWidget {
       size: size,
       variant: variant,
       enabled: enabled,
-      semanticLabel: semanticLabel,
+      label: semanticLabel,
     );
   }
 }

@@ -189,10 +189,7 @@ void main() {
 
       test('converts color to hex with alpha', () {
         const color = Color(0x80FF5500);
-        expect(
-          OiColorUtils.toHex(color, includeAlpha: true),
-          '#80FF5500',
-        );
+        expect(OiColorUtils.toHex(color, includeAlpha: true), '#80FF5500');
       });
 
       test('converts black', () {

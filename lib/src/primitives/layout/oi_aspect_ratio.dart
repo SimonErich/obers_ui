@@ -7,11 +7,8 @@ import 'package:flutter/widgets.dart';
 /// {@category Primitives}
 class OiAspectRatio extends StatelessWidget {
   /// Creates an [OiAspectRatio].
-  const OiAspectRatio({
-    required this.ratio,
-    required this.child,
-    super.key,
-  }) : assert(ratio > 0, 'ratio must be positive');
+  const OiAspectRatio({required this.ratio, required this.child, super.key})
+    : assert(ratio > 0, 'ratio must be positive');
 
   /// The width-to-height ratio (e.g. `16 / 9` for widescreen).
   final double ratio;

@@ -51,7 +51,10 @@ void main() {
       });
 
       test('removes only last extension', () {
-        expect(OiFileUtils.nameWithoutExtension('archive.tar.gz'), 'archive.tar');
+        expect(
+          OiFileUtils.nameWithoutExtension('archive.tar.gz'),
+          'archive.tar',
+        );
       });
     });
 

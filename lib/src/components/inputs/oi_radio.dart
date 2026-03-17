@@ -11,7 +11,7 @@ class OiRadioOption<T> {
   const OiRadioOption({
     required this.value,
     required this.label,
-    this.disabled = false,
+    this.enabled = true,
   });
 
   /// The value this option represents.
@@ -20,8 +20,8 @@ class OiRadioOption<T> {
   /// The human-readable label for this option.
   final String label;
 
-  /// When true this option cannot be selected.
-  final bool disabled;
+  /// Whether this option can be selected.
+  final bool enabled;
 }
 
 /// A group of radio-button options rendered in a row or column.
@@ -60,7 +60,7 @@ class OiRadio<T> extends StatelessWidget {
   Widget _buildOption(BuildContext context, OiRadioOption<T> option) {
     final colors = context.colors;
     final isSelected = option.value == value;
-    final isDisabled = !enabled || option.disabled;
+    final isDisabled = !enabled || !option.enabled;
 
     const outerSize = 18.0;
     const innerSize = 8.0;
@@ -103,16 +103,14 @@ class OiRadio<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final children =
-        options.map((o) => _buildOption(context, o)).toList();
+    final children = options.map((o) => _buildOption(context, o)).toList();
 
     if (direction == Axis.horizontal) {
       return Row(
         mainAxisSize: MainAxisSize.min,
-        children: children
-            .expand((w) => [w, const SizedBox(width: 16)])
-            .toList()
-          ..removeLast(),
+        children:
+            children.expand((w) => [w, const SizedBox(width: 16)]).toList()
+              ..removeLast(),
       );
     }
 

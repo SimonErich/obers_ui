@@ -9,18 +9,13 @@ import '../../../helpers/pump_app.dart';
 
 void main() {
   testWidgets('renders message text', (tester) async {
-    await tester.pumpObers(
-      const OiToast(message: 'Saved successfully'),
-    );
+    await tester.pumpObers(const OiToast(message: 'Saved successfully'));
     expect(find.text('Saved successfully'), findsOneWidget);
   });
 
   testWidgets('renders action widget when provided', (tester) async {
     await tester.pumpObers(
-      const OiToast(
-        message: 'Item deleted',
-        action: Text('Undo'),
-      ),
+      const OiToast(message: 'Item deleted', action: Text('Undo')),
     );
     expect(find.text('Undo'), findsOneWidget);
   });
@@ -47,9 +42,7 @@ void main() {
   });
 
   testWidgets('info level renders info icon', (tester) async {
-    await tester.pumpObers(
-      const OiToast(message: 'FYI'),
-    );
+    await tester.pumpObers(const OiToast(message: 'FYI'));
     expect(find.text('ℹ'), findsOneWidget);
   });
 
@@ -67,14 +60,12 @@ void main() {
     expect(dismissed, isTrue);
   });
 
-  testWidgets('pauseOnHover=false: timer is not cancelled on hover',
-      (tester) async {
+  testWidgets('pauseOnHover=false: timer is not cancelled on hover', (
+    tester,
+  ) async {
     // With pauseOnHover=false no MouseRegion wraps the content.
     await tester.pumpObers(
-      const OiToast(
-        message: 'No hover pause',
-        pauseOnHover: false,
-      ),
+      const OiToast(message: 'No hover pause', pauseOnHover: false),
     );
     // Should render without a top-level MouseRegion around content.
     // The content text must still be visible.
@@ -83,9 +74,7 @@ void main() {
 
   testWidgets('different positions all render the message', (tester) async {
     for (final pos in OiToastPosition.values) {
-      await tester.pumpObers(
-        OiToast(message: 'pos test', position: pos),
-      );
+      await tester.pumpObers(OiToast(message: 'pos test', position: pos));
       expect(find.text('pos test'), findsOneWidget);
     }
   });

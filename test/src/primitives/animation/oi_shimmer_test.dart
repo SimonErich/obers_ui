@@ -12,9 +12,7 @@ void main() {
 
   testWidgets('renders child regardless of active state', (tester) async {
     await tester.pumpObers(
-      const OiShimmer(
-        child: SizedBox(width: 100, height: 20),
-      ),
+      const OiShimmer(child: SizedBox(width: 100, height: 20)),
     );
     await tester.pump();
     expect(find.byType(SizedBox), findsWidgets);
@@ -22,13 +20,11 @@ void main() {
 
   // ── 2. active=false: no ShaderMask ────────────────────────────────────────
 
-  testWidgets('active=false: child rendered directly without ShaderMask',
-      (tester) async {
+  testWidgets('active=false: child rendered directly without ShaderMask', (
+    tester,
+  ) async {
     await tester.pumpObers(
-      const OiShimmer(
-        active: false,
-        child: Text('content'),
-      ),
+      const OiShimmer(active: false, child: Text('content')),
     );
     await tester.pump();
 
@@ -40,9 +36,7 @@ void main() {
 
   testWidgets('active=true: ShaderMask wraps the child', (tester) async {
     await tester.pumpObers(
-      const OiShimmer(
-        child: SizedBox(width: 100, height: 20),
-      ),
+      const OiShimmer(child: SizedBox(width: 100, height: 20)),
     );
     await tester.pump();
 
@@ -51,21 +45,21 @@ void main() {
 
   // ── 4. reducedMotion: no ShaderMask, uses ColorFiltered instead ───────────
 
-  testWidgets('reducedMotion + active=true: ColorFiltered instead of ShaderMask',
-      (tester) async {
-    await tester.pumpObers(
-      const MediaQuery(
-        data: MediaQueryData(disableAnimations: true),
-        child: OiShimmer(
-          child: SizedBox(width: 100, height: 20),
+  testWidgets(
+    'reducedMotion + active=true: ColorFiltered instead of ShaderMask',
+    (tester) async {
+      await tester.pumpObers(
+        const MediaQuery(
+          data: MediaQueryData(disableAnimations: true),
+          child: OiShimmer(child: SizedBox(width: 100, height: 20)),
         ),
-      ),
-    );
-    await tester.pump();
+      );
+      await tester.pump();
 
-    expect(find.byType(ShaderMask), findsNothing);
-    expect(find.byType(ColorFiltered), findsOneWidget);
-  });
+      expect(find.byType(ShaderMask), findsNothing);
+      expect(find.byType(ColorFiltered), findsOneWidget);
+    },
+  );
 
   // ── 5. Custom colors are accepted without error ───────────────────────────
 
@@ -83,7 +77,9 @@ void main() {
 
   // ── 6. active toggles ShaderMask on/off ──────────────────────────────────
 
-  testWidgets('toggling active removes and restores ShaderMask', (tester) async {
+  testWidgets('toggling active removes and restores ShaderMask', (
+    tester,
+  ) async {
     final notifier = ValueNotifier<bool>(true);
 
     await tester.pumpObers(

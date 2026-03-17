@@ -120,11 +120,8 @@ class OiComboBox<T> extends StatefulWidget {
   final bool moreAvailable;
 
   /// Custom option builder.
-  final Widget Function(
-    T, {
-    required bool highlighted,
-    required bool selected,
-  })? optionBuilder;
+  final Widget Function(T, {required bool highlighted, required bool selected})?
+  optionBuilder;
 
   @override
   State<OiComboBox<T>> createState() => _OiComboBoxState<T>();
@@ -181,12 +178,10 @@ class _OiComboBoxState<T> extends State<OiComboBox<T>> {
         _filteredItems = List<T>.from(widget.items);
       } else {
         _filteredItems = widget.items
-            .where((item) =>
-                widget.labelOf(item).toLowerCase().contains(lower))
+            .where((item) => widget.labelOf(item).toLowerCase().contains(lower))
             .toList();
       }
-      _highlightedIndex =
-          _filteredItems.isEmpty ? -1 : 0;
+      _highlightedIndex = _filteredItems.isEmpty ? -1 : 0;
     });
   }
 
@@ -199,8 +194,7 @@ class _OiComboBoxState<T> extends State<OiComboBox<T>> {
           _asyncResults = results;
           _filteredItems = results;
           _loading = false;
-          _highlightedIndex =
-              _filteredItems.isEmpty ? -1 : 0;
+          _highlightedIndex = _filteredItems.isEmpty ? -1 : 0;
         });
       }
     } on Exception {
@@ -254,8 +248,7 @@ class _OiComboBoxState<T> extends State<OiComboBox<T>> {
     _applyFilter('');
     setState(() {
       _open = true;
-      _highlightedIndex =
-          _filteredItems.isEmpty ? -1 : 0;
+      _highlightedIndex = _filteredItems.isEmpty ? -1 : 0;
     });
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) _inputFocusNode.requestFocus();
@@ -405,8 +398,7 @@ class _OiComboBoxState<T> extends State<OiComboBox<T>> {
                   children: [
                     Text(
                       'No results',
-                      style:
-                          TextStyle(color: colors.textMuted, fontSize: 14),
+                      style: TextStyle(color: colors.textMuted, fontSize: 14),
                     ),
                     if (widget.onCreate != null &&
                         _textController.text.isNotEmpty)
@@ -518,11 +510,7 @@ class _OiComboBoxState<T> extends State<OiComboBox<T>> {
     );
   }
 
-  Widget _buildOptionTile(
-    BuildContext context,
-    T item,
-    double height,
-  ) {
+  Widget _buildOptionTile(BuildContext context, T item, double height) {
     final colors = context.colors;
     final items = _effectiveItems;
     final index = items.indexOf(item);
@@ -550,8 +538,8 @@ class _OiComboBoxState<T> extends State<OiComboBox<T>> {
         color: isHighlighted
             ? colors.surfaceHover
             : selected
-                ? colors.primary.base.withValues(alpha: 0.08)
-                : null,
+            ? colors.primary.base.withValues(alpha: 0.08)
+            : null,
         child: Row(
           children: [
             if (widget.multiSelect)
@@ -596,8 +584,10 @@ class _OiComboBoxState<T> extends State<OiComboBox<T>> {
               children: [
                 for (final item in visibleItems)
                   Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 6,
+                      vertical: 2,
+                    ),
                     decoration: BoxDecoration(
                       color: colors.surfaceActive,
                       borderRadius: BorderRadius.circular(4),

@@ -45,11 +45,7 @@ class OiHaloStyle {
 
   /// Converts this halo style to a [BoxShadow] for rendering.
   BoxShadow toBoxShadow() {
-    return BoxShadow(
-      color: color,
-      spreadRadius: spread,
-      blurRadius: blur,
-    );
+    return BoxShadow(color: color, spreadRadius: spread, blurRadius: blur);
   }
 
   /// Creates a copy with optionally overridden values.

@@ -280,7 +280,8 @@ class _OiFlowGraphState extends State<OiFlowGraph> {
       portIndicators.add(
         Positioned(
           left: -_portRadius,
-          top: _defaultNodeHeight * (i + 1) / (node.inputs.length + 1) -
+          top:
+              _defaultNodeHeight * (i + 1) / (node.inputs.length + 1) -
               _portRadius,
           child: _PortDot(
             key: ValueKey('oi_flow_port_in_${node.key}_${node.inputs[i]}'),
@@ -293,7 +294,8 @@ class _OiFlowGraphState extends State<OiFlowGraph> {
       portIndicators.add(
         Positioned(
           right: -_portRadius,
-          top: _defaultNodeHeight * (i + 1) / (node.outputs.length + 1) -
+          top:
+              _defaultNodeHeight * (i + 1) / (node.outputs.length + 1) -
               _portRadius,
           child: _PortDot(
             key: ValueKey('oi_flow_port_out_${node.key}_${node.outputs[i]}'),
@@ -309,10 +311,7 @@ class _OiFlowGraphState extends State<OiFlowGraph> {
       height: _defaultNodeHeight,
       child: Stack(
         clipBehavior: Clip.none,
-        children: [
-          content,
-          ...portIndicators,
-        ],
+        children: [content, ...portIndicators],
       ),
     );
 
@@ -349,10 +348,7 @@ class _OiFlowGraphState extends State<OiFlowGraph> {
 
 /// A small circular indicator for a node port.
 class _PortDot extends StatelessWidget {
-  const _PortDot({
-    required this.color,
-    super.key,
-  });
+  const _PortDot({required this.color, super.key});
 
   final Color color;
 
@@ -361,10 +357,7 @@ class _PortDot extends StatelessWidget {
     return Container(
       width: 10,
       height: 10,
-      decoration: BoxDecoration(
-        color: color,
-        shape: BoxShape.circle,
-      ),
+      decoration: BoxDecoration(color: color, shape: BoxShape.circle),
     );
   }
 }
@@ -375,10 +368,7 @@ class _PortDot extends StatelessWidget {
 
 /// Paints a dot grid background for the flow graph canvas.
 class _GridPainter extends CustomPainter {
-  const _GridPainter({
-    required this.gridSize,
-    required this.color,
-  });
+  const _GridPainter({required this.gridSize, required this.color});
 
   /// The distance between grid dots.
   final double gridSize;
@@ -450,12 +440,14 @@ class _EdgePainter extends CustomPainter {
       if (sourcePortIdx < 0 || targetPortIdx < 0) continue;
 
       // Source port exits from the right side of the node.
-      final sourceY = source.position.dy +
+      final sourceY =
+          source.position.dy +
           nodeHeight * (sourcePortIdx + 1) / (source.outputs.length + 1);
       final sourceX = source.position.dx + nodeWidth;
 
       // Target port enters from the left side of the node.
-      final targetY = target.position.dy +
+      final targetY =
+          target.position.dy +
           nodeHeight * (targetPortIdx + 1) / (target.inputs.length + 1);
       final targetX = target.position.dx;
 

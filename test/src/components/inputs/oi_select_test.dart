@@ -10,23 +10,18 @@ import '../../../helpers/pump_app.dart';
 const _kOptions = [
   OiSelectOption(value: 'a', label: 'Apple'),
   OiSelectOption(value: 'b', label: 'Banana'),
-  OiSelectOption(value: 'c', label: 'Cherry', disabled: true),
+  OiSelectOption(value: 'c', label: 'Cherry', enabled: false),
 ];
 
 void main() {
   testWidgets('renders without error', (tester) async {
-    await tester.pumpObers(
-      const OiSelect<String>(options: _kOptions),
-    );
+    await tester.pumpObers(const OiSelect<String>(options: _kOptions));
     expect(find.byType(OiSelect<String>), findsOneWidget);
   });
 
   testWidgets('shows placeholder when no value selected', (tester) async {
     await tester.pumpObers(
-      const OiSelect<String>(
-        options: _kOptions,
-        placeholder: 'Pick one',
-      ),
+      const OiSelect<String>(options: _kOptions, placeholder: 'Pick one'),
     );
     expect(find.text('Pick one'), findsOneWidget);
   });
@@ -39,9 +34,7 @@ void main() {
   });
 
   testWidgets('tapping opens dropdown', (tester) async {
-    await tester.pumpObers(
-      const OiSelect<String>(options: _kOptions),
-    );
+    await tester.pumpObers(const OiSelect<String>(options: _kOptions));
     await tester.tap(find.byType(GestureDetector).first);
     await tester.pumpAndSettle();
     expect(find.text('Apple'), findsOneWidget);
@@ -86,10 +79,7 @@ void main() {
     await tester.pumpObers(
       const OiSelect<String>(options: _kOptions, enabled: false),
     );
-    await tester.tap(
-      find.byType(GestureDetector).first,
-      warnIfMissed: false,
-    );
+    await tester.tap(find.byType(GestureDetector).first, warnIfMissed: false);
     await tester.pump();
     expect(find.text('Apple'), findsNothing);
   });

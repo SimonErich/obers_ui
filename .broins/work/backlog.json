@@ -341,7 +341,7 @@
     "WI-0063": "todo",
     "WI-0064": "done",
     "WI-0065": "todo",
-    "WI-0066": "todo",
+    "WI-0066": "done",
     "WI-0067": "todo",
     "WI-0068": "todo",
     "WI-0069": "todo",
@@ -548,7 +548,8 @@
     "WI-0270": "todo",
     "WI-0271": "todo",
     "WI-0272": "todo",
-    "WI-0273": "todo"
+    "WI-0273": "todo",
+    "FV-1-373": "blocked"
   },
   "epics": [
     {

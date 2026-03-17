@@ -260,16 +260,20 @@ class _OiSearchState extends State<OiSearch> {
 
     if (event.logicalKey == LogicalKeyboardKey.arrowDown) {
       setState(() {
-        _highlightedIndex =
-            (_highlightedIndex + 1).clamp(0, results.length - 1);
+        _highlightedIndex = (_highlightedIndex + 1).clamp(
+          0,
+          results.length - 1,
+        );
       });
       return KeyEventResult.handled;
     }
 
     if (event.logicalKey == LogicalKeyboardKey.arrowUp) {
       setState(() {
-        _highlightedIndex =
-            (_highlightedIndex - 1).clamp(0, results.length - 1);
+        _highlightedIndex = (_highlightedIndex - 1).clamp(
+          0,
+          results.length - 1,
+        );
       });
       return KeyEventResult.handled;
     }
@@ -354,8 +358,8 @@ class _OiSearchState extends State<OiSearch> {
     final colors = context.colors;
     final allResults = _allResults;
     final showEmpty = _textController.text.isEmpty;
-    final highlightedResult = _highlightedIndex >= 0 &&
-            _highlightedIndex < allResults.length
+    final highlightedResult =
+        _highlightedIndex >= 0 && _highlightedIndex < allResults.length
         ? allResults[_highlightedIndex]
         : null;
 
@@ -407,11 +411,7 @@ class _OiSearchState extends State<OiSearch> {
                 children: [
                   // Results list
                   Expanded(
-                    child: _buildResultsList(
-                      context,
-                      allResults,
-                      showEmpty,
-                    ),
+                    child: _buildResultsList(context, allResults, showEmpty),
                   ),
                   // Preview pane
                   if (widget.showPreview && highlightedResult?.preview != null)

@@ -9,10 +9,7 @@ import 'package:obers_ui/src/foundation/theme/oi_theme_data.dart';
 Widget buildWithTheme(Widget child, {OiThemeData? theme}) {
   return OiTheme(
     data: theme ?? OiThemeData.light(),
-    child: Directionality(
-      textDirection: TextDirection.ltr,
-      child: child,
-    ),
+    child: Directionality(textDirection: TextDirection.ltr, child: child),
   );
 }
 
@@ -37,8 +34,9 @@ void main() {
       expect(captured, equals(injected));
     });
 
-    testWidgets('maybeOf(context) returns null when no OiTheme in tree',
-        (tester) async {
+    testWidgets('maybeOf(context) returns null when no OiTheme in tree', (
+      tester,
+    ) async {
       late OiThemeData? captured;
 
       await tester.pumpWidget(
@@ -56,17 +54,15 @@ void main() {
       expect(captured, isNull);
     });
 
-    testWidgets('of(context) throws assertion error when no OiTheme in tree',
-        (tester) async {
+    testWidgets('of(context) throws assertion error when no OiTheme in tree', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         Directionality(
           textDirection: TextDirection.ltr,
           child: Builder(
             builder: (context) {
-              expect(
-                () => OiTheme.of(context),
-                throwsAssertionError,
-              );
+              expect(() => OiTheme.of(context), throwsAssertionError);
               return const SizedBox.shrink();
             },
           ),
@@ -157,8 +153,9 @@ void main() {
       );
     });
 
-    testWidgets('OiThemeScope overrides the theme for its subtree',
-        (tester) async {
+    testWidgets('OiThemeScope overrides the theme for its subtree', (
+      tester,
+    ) async {
       final outer = OiThemeData.light();
       final inner = OiThemeData.dark();
       late OiThemeData outerCaptured;
@@ -193,8 +190,9 @@ void main() {
       expect(innerCaptured, equals(inner));
     });
 
-    testWidgets('Changing OiTheme data triggers updateShouldNotify',
-        (tester) async {
+    testWidgets('Changing OiTheme data triggers updateShouldNotify', (
+      tester,
+    ) async {
       var buildCount = 0;
 
       await tester.pumpWidget(

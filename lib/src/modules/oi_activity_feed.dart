@@ -65,7 +65,7 @@ class OiActivityFeed extends StatelessWidget {
     required this.label,
     this.onEventTap,
     this.onLoadMore,
-    this.hasMore = false,
+    this.moreAvailable = false,
     this.loading = false,
     this.emptyState,
     this.showTimestamps = true,
@@ -87,7 +87,7 @@ class OiActivityFeed extends StatelessWidget {
   final Future<void> Function()? onLoadMore;
 
   /// Whether more events are available to load.
-  final bool hasMore;
+  final bool moreAvailable;
 
   /// Whether the feed is currently loading data.
   final bool loading;
@@ -149,7 +149,9 @@ class OiActivityFeed extends StatelessWidget {
                   onTap: () => onCategoryChange?.call(category),
                   child: Container(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 12, vertical: 6),
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
                     decoration: BoxDecoration(
                       color: activeCategory == category
                           ? colors.primary.base.withValues(alpha: 0.1)
@@ -186,13 +188,12 @@ class OiActivityFeed extends StatelessWidget {
     }
 
     if (events.isEmpty && !loading) {
-      return emptyState ??
-          const OiEmptyState(title: 'No activity');
+      return emptyState ?? const OiEmptyState(title: 'No activity');
     }
 
     return _OiActivityFeedList(
       events: events,
-      hasMore: hasMore,
+      moreAvailable: moreAvailable,
       loading: loading,
       showTimestamps: showTimestamps,
       onEventTap: onEventTap,
@@ -209,7 +210,7 @@ class OiActivityFeed extends StatelessWidget {
 class _OiActivityFeedList extends StatefulWidget {
   const _OiActivityFeedList({
     required this.events,
-    required this.hasMore,
+    required this.moreAvailable,
     required this.loading,
     required this.showTimestamps,
     required this.formatTimestamp,
@@ -218,7 +219,7 @@ class _OiActivityFeedList extends StatefulWidget {
   });
 
   final List<OiActivityEvent> events;
-  final bool hasMore;
+  final bool moreAvailable;
   final bool loading;
   final bool showTimestamps;
   final ValueChanged<OiActivityEvent>? onEventTap;
@@ -246,7 +247,7 @@ class _OiActivityFeedListState extends State<_OiActivityFeedList> {
   }
 
   void _onScroll() {
-    if (!widget.hasMore || widget.loading) return;
+    if (!widget.moreAvailable || widget.loading) return;
     if (widget.onLoadMore == null) return;
     final maxScroll = _scrollController.position.maxScrollExtent;
     final currentScroll = _scrollController.position.pixels;
@@ -259,7 +260,7 @@ class _OiActivityFeedListState extends State<_OiActivityFeedList> {
   Widget build(BuildContext context) {
     return ListView.builder(
       controller: _scrollController,
-      itemCount: widget.events.length + (widget.hasMore ? 1 : 0),
+      itemCount: widget.events.length + (widget.moreAvailable ? 1 : 0),
       itemBuilder: (context, index) {
         if (index >= widget.events.length) {
           return const Padding(
@@ -272,7 +273,7 @@ class _OiActivityFeedListState extends State<_OiActivityFeedList> {
           showTimestamp: widget.showTimestamps,
           onTap: widget.onEventTap,
           formatTimestamp: widget.formatTimestamp,
-          isLast: index == widget.events.length - 1,
+          last: index == widget.events.length - 1,
         );
       },
     );
@@ -288,7 +289,7 @@ class _OiActivityEventTile extends StatelessWidget {
     required this.event,
     required this.showTimestamp,
     required this.formatTimestamp,
-    required this.isLast,
+    required this.last,
     this.onTap,
   });
 
@@ -296,13 +297,14 @@ class _OiActivityEventTile extends StatelessWidget {
   final bool showTimestamp;
   final ValueChanged<OiActivityEvent>? onTap;
   final String Function(DateTime) formatTimestamp;
-  final bool isLast;
+  final bool last;
 
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
 
-    final leading = event.leading ??
+    final leading =
+        event.leading ??
         Container(
           width: 32,
           height: 32,
@@ -312,8 +314,7 @@ class _OiActivityEventTile extends StatelessWidget {
           ),
           child: Center(
             child: Icon(
-              event.icon ??
-                  const IconData(0xe5ca, fontFamily: 'MaterialIcons'),
+              event.icon ?? const IconData(0xe5ca, fontFamily: 'MaterialIcons'),
               size: 16,
               color: colors.primary.base,
             ),
@@ -328,12 +329,8 @@ class _OiActivityEventTile extends StatelessWidget {
           Column(
             children: [
               leading,
-              if (!isLast)
-                Container(
-                  width: 2,
-                  height: 24,
-                  color: colors.borderSubtle,
-                ),
+              if (!last)
+                Container(width: 2, height: 24, color: colors.borderSubtle),
             ],
           ),
           const SizedBox(width: 12),
@@ -371,10 +368,7 @@ class _OiActivityEventTile extends StatelessWidget {
     );
 
     if (onTap != null) {
-      tile = OiTappable(
-        onTap: () => onTap!(event),
-        child: tile,
-      );
+      tile = OiTappable(onTap: () => onTap!(event), child: tile);
     }
 
     return tile;

@@ -23,11 +23,11 @@ void main() {
     expect(find.text('AB'), findsOneWidget);
   });
 
-  testWidgets('renders icon fallback when no image or initials', (tester) async {
+  testWidgets('renders icon fallback when no image or initials', (
+    tester,
+  ) async {
     const icon = IconData(0xe318, fontFamily: 'MaterialIcons');
-    await tester.pumpObers(
-      const OiAvatar(semanticLabel: 'User', icon: icon),
-    );
+    await tester.pumpObers(const OiAvatar(semanticLabel: 'User', icon: icon));
     expect(find.byIcon(icon), findsOneWidget);
   });
 
@@ -40,11 +40,7 @@ void main() {
 
   testWidgets('skeleton hides initials', (tester) async {
     await tester.pumpObers(
-      const OiAvatar(
-        semanticLabel: 'Loading',
-        initials: 'AB',
-        skeleton: true,
-      ),
+      const OiAvatar(semanticLabel: 'Loading', initials: 'AB', skeleton: true),
     );
     expect(find.text('AB'), findsNothing);
   });

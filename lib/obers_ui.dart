@@ -237,6 +237,7 @@ export 'src/composites/onboarding/oi_whats_new.dart';
 
 export 'src/composites/scheduling/oi_calendar.dart';
 export 'src/composites/scheduling/oi_gantt.dart';
+export 'src/composites/scheduling/oi_scheduler.dart';
 export 'src/composites/scheduling/oi_timeline.dart';
 
 // ── Composites: Workflow ─────────────────────────────────────────────────────
@@ -257,6 +258,7 @@ export 'src/composites/visualization/oi_treemap.dart';
 // ── Composites: Media ────────────────────────────────────────────────────────
 
 export 'src/composites/media/oi_gallery.dart' hide OiSelectionMode;
+export 'src/composites/media/oi_image_annotator.dart';
 export 'src/composites/media/oi_image_cropper.dart';
 export 'src/composites/media/oi_lightbox.dart';
 export 'src/composites/media/oi_video_player.dart';
@@ -295,5 +297,7 @@ export 'src/utils/spring_physics.dart';
 
 // ── Tools ────────────────────────────────────────────────────────────────────
 
+export 'src/tools/oi_dynamic_theme.dart';
+export 'src/tools/oi_playground.dart';
 export 'src/tools/oi_theme_exporter.dart';
 export 'src/tools/oi_theme_preview.dart';

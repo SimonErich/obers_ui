@@ -9,30 +9,25 @@ import '../../../helpers/pump_app.dart';
 
 void main() {
   testWidgets('display mode shows formatted value', (tester) async {
-    await tester.pumpObers(
-      const OiEditableNumber(value: 42),
-    );
+    await tester.pumpObers(const OiEditableNumber(value: 42));
     expect(find.text('42'), findsOneWidget);
   });
 
   testWidgets('display mode shows dash when no value', (tester) async {
-    await tester.pumpObers(
-      const OiEditableNumber(),
-    );
+    await tester.pumpObers(const OiEditableNumber());
     expect(find.text('—'), findsOneWidget);
   });
 
   testWidgets('tap enters edit mode showing OiNumberInput', (tester) async {
-    await tester.pumpObers(
-      const OiEditableNumber(value: 42),
-    );
+    await tester.pumpObers(const OiEditableNumber(value: 42));
     await tester.tap(find.text('42'));
     await tester.pump();
     expect(find.byType(OiNumberInput), findsOneWidget);
   });
 
-  testWidgets('edit mode passes value and step to OiNumberInput',
-      (tester) async {
+  testWidgets('edit mode passes value and step to OiNumberInput', (
+    tester,
+  ) async {
     await tester.pumpObers(
       const OiEditableNumber(value: 10, step: 5, min: 0, max: 100),
     );
@@ -46,9 +41,7 @@ void main() {
   });
 
   testWidgets('disabled does not enter edit mode on tap', (tester) async {
-    await tester.pumpObers(
-      const OiEditableNumber(value: 7, enabled: false),
-    );
+    await tester.pumpObers(const OiEditableNumber(value: 7, enabled: false));
     await tester.tap(find.text('7'));
     await tester.pump();
     expect(find.byType(OiNumberInput), findsNothing);

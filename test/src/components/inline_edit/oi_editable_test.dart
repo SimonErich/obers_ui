@@ -61,8 +61,9 @@ void main() {
     expect(find.text('editing'), findsNothing);
   });
 
-  testWidgets('cancel reverts to display without calling onChanged',
-      (tester) async {
+  testWidgets('cancel reverts to display without calling onChanged', (
+    tester,
+  ) async {
     String? committed;
     late VoidCallback doCancel;
 
@@ -103,7 +104,9 @@ void main() {
     expect(find.text('editing'), findsNothing);
   });
 
-  testWidgets('editOnTap=false does not enter edit mode on tap', (tester) async {
+  testWidgets('editOnTap=false does not enter edit mode on tap', (
+    tester,
+  ) async {
     await tester.pumpObers(
       OiEditable<String>(
         value: 'hello',

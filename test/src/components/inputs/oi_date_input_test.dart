@@ -14,9 +14,7 @@ void main() {
   });
 
   testWidgets('displays formatted date when value provided', (tester) async {
-    await tester.pumpObers(
-      OiDateInput(value: DateTime(2024, 6, 15)),
-    );
+    await tester.pumpObers(OiDateInput(value: DateTime(2024, 6, 15)));
     expect(find.text('2024-06-15'), findsOneWidget);
   });
 
@@ -32,10 +30,7 @@ void main() {
 
   testWidgets('custom dateFormat is applied', (tester) async {
     await tester.pumpObers(
-      OiDateInput(
-        value: DateTime(2024, 1, 5),
-        dateFormat: 'dd/MM/yyyy',
-      ),
+      OiDateInput(value: DateTime(2024, 1, 5), dateFormat: 'dd/MM/yyyy'),
     );
     expect(find.text('05/01/2024'), findsOneWidget);
   });
@@ -51,10 +46,7 @@ void main() {
 
   testWidgets('enabled=false prevents picker opening', (tester) async {
     await tester.pumpObers(const OiDateInput(enabled: false));
-    await tester.tap(
-      find.byType(GestureDetector).first,
-      warnIfMissed: false,
-    );
+    await tester.tap(find.byType(GestureDetector).first, warnIfMissed: false);
     await tester.pump();
     expect(find.text('OK'), findsNothing);
   });

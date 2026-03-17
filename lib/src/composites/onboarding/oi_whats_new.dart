@@ -177,11 +177,7 @@ class _OiWhatsNewItemTile extends StatelessWidget {
         if (item.icon != null)
           Padding(
             padding: const EdgeInsets.only(right: 12, top: 2),
-            child: Icon(
-              item.icon,
-              size: 24,
-              color: colors.primary.base,
-            ),
+            child: Icon(item.icon, size: 24, color: colors.primary.base),
           ),
 
         // Text content.
@@ -195,9 +191,7 @@ class _OiWhatsNewItemTile extends StatelessWidget {
                   Flexible(
                     child: Text(
                       item.title,
-                      style: textTheme.bodyStrong.copyWith(
-                        color: colors.text,
-                      ),
+                      style: textTheme.bodyStrong.copyWith(color: colors.text),
                     ),
                   ),
                   if (item.version != null) ...[
@@ -214,9 +208,7 @@ class _OiWhatsNewItemTile extends StatelessWidget {
                       ),
                       child: Text(
                         item.version!,
-                        style: textTheme.tiny.copyWith(
-                          color: colors.textMuted,
-                        ),
+                        style: textTheme.tiny.copyWith(color: colors.textMuted),
                       ),
                     ),
                   ],

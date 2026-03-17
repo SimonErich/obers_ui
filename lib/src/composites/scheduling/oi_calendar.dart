@@ -91,7 +91,7 @@ class OiCalendar extends StatefulWidget {
 
   /// Called when an event is moved to a new time range.
   final void Function(OiCalendarEvent event, DateTime start, DateTime end)?
-      onEventMove;
+  onEventMove;
 
   /// Called when an event is resized to a new end time.
   final void Function(OiCalendarEvent event, DateTime newEnd)? onEventResize;
@@ -130,10 +130,7 @@ class _OiCalendarState extends State<OiCalendar> {
         case OiCalendarMode.week:
           _focusDate = _focusDate.add(const Duration(days: 7));
         case OiCalendarMode.month:
-          _focusDate = DateTime(
-            _focusDate.year,
-            _focusDate.month + 1,
-          );
+          _focusDate = DateTime(_focusDate.year, _focusDate.month + 1);
       }
     });
   }
@@ -146,10 +143,7 @@ class _OiCalendarState extends State<OiCalendar> {
         case OiCalendarMode.week:
           _focusDate = _focusDate.subtract(const Duration(days: 7));
         case OiCalendarMode.month:
-          _focusDate = DateTime(
-            _focusDate.year,
-            _focusDate.month - 1,
-          );
+          _focusDate = DateTime(_focusDate.year, _focusDate.month - 1);
       }
     });
   }
@@ -164,16 +158,13 @@ class _OiCalendarState extends State<OiCalendar> {
   List<String> get _dayHeaders {
     const names = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
     final start = widget.firstDayOfWeek - 1; // 0-based index
-    return [
-      for (var i = 0; i < 7; i++) names[(start + i) % 7],
-    ];
+    return [for (var i = 0; i < 7; i++) names[(start + i) % 7]];
   }
 
   /// Returns the ISO 8601 week number for [date].
   int _weekNumber(DateTime date) {
     // ISO week: week 1 is the week containing the first Thursday of the year.
-    final dayOfYear =
-        date.difference(DateTime(date.year)).inDays + 1;
+    final dayOfYear = date.difference(DateTime(date.year)).inDays + 1;
     final weekday = date.weekday; // 1=Mon, 7=Sun
     final woy = ((dayOfYear - weekday + 10) / 7).floor();
     if (woy < 1) return _weekNumber(DateTime(date.year - 1, 12, 31));
@@ -187,20 +178,14 @@ class _OiCalendarState extends State<OiCalendar> {
   /// Returns the first day visible in the month grid.
   DateTime _monthGridStart() {
     final first = DateTime(_focusDate.year, _focusDate.month);
-    final weekdayOffset =
-        (first.weekday - widget.firstDayOfWeek + 7) % 7;
+    final weekdayOffset = (first.weekday - widget.firstDayOfWeek + 7) % 7;
     return first.subtract(Duration(days: weekdayOffset));
   }
 
   /// Returns the start of the week containing [_focusDate].
   DateTime _weekStart() {
-    final offset =
-        (_focusDate.weekday - widget.firstDayOfWeek + 7) % 7;
-    return DateTime(
-      _focusDate.year,
-      _focusDate.month,
-      _focusDate.day - offset,
-    );
+    final offset = (_focusDate.weekday - widget.firstDayOfWeek + 7) % 7;
+    return DateTime(_focusDate.year, _focusDate.month, _focusDate.day - offset);
   }
 
   /// Whether [a] and [b] fall on the same calendar day.
@@ -283,10 +268,7 @@ class _OiCalendarState extends State<OiCalendar> {
             onTap: _goBackward,
             child: Padding(
               padding: const EdgeInsets.all(8),
-              child: Text(
-                '\u25C0',
-                style: TextStyle(color: colors.text),
-              ),
+              child: Text('\u25C0', style: TextStyle(color: colors.text)),
             ),
           ),
           Expanded(
@@ -306,10 +288,7 @@ class _OiCalendarState extends State<OiCalendar> {
             onTap: _goForward,
             child: Padding(
               padding: const EdgeInsets.all(8),
-              child: Text(
-                '\u25B6',
-                style: TextStyle(color: colors.text),
-              ),
+              child: Text('\u25B6', style: TextStyle(color: colors.text)),
             ),
           ),
         ],
@@ -336,16 +315,13 @@ class _OiCalendarState extends State<OiCalendar> {
                     vertical: 4,
                   ),
                   decoration: BoxDecoration(
-                    color:
-                        _mode == mode ? colors.primary.base : colors.surface,
+                    color: _mode == mode ? colors.primary.base : colors.surface,
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: Text(
                     mode.name[0].toUpperCase() + mode.name.substring(1),
                     style: TextStyle(
-                      color: _mode == mode
-                          ? colors.textOnPrimary
-                          : colors.text,
+                      color: _mode == mode ? colors.textOnPrimary : colors.text,
                       fontSize: 12,
                     ),
                   ),
@@ -368,23 +344,18 @@ class _OiCalendarState extends State<OiCalendar> {
         children: [
           for (final e in _allDayEvents)
             GestureDetector(
-              onTap:
-                  widget.onEventTap != null ? () => widget.onEventTap!(e) : null,
+              onTap: widget.onEventTap != null
+                  ? () => widget.onEventTap!(e)
+                  : null,
               child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 6,
-                  vertical: 2,
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
                   color: e.color ?? colors.primary.base,
                   borderRadius: BorderRadius.circular(3),
                 ),
                 child: Text(
                   e.title,
-                  style: TextStyle(
-                    fontSize: 11,
-                    color: colors.textOnPrimary,
-                  ),
+                  style: TextStyle(fontSize: 11, color: colors.textOnPrimary),
                 ),
               ),
             ),
@@ -521,10 +492,7 @@ class _OiCalendarState extends State<OiCalendar> {
             // Show up to 2 event chips.
             for (final ev in dayEvents.take(2))
               Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 2,
-                  vertical: 1,
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 1),
                 child: GestureDetector(
                   onTap: widget.onEventTap != null
                       ? () => widget.onEventTap!(ev)
@@ -581,8 +549,9 @@ class _OiCalendarState extends State<OiCalendar> {
                         '${_dayHeaders[i]} ${d.day}',
                         style: TextStyle(
                           fontSize: 11,
-                          fontWeight:
-                              today ? FontWeight.bold : FontWeight.normal,
+                          fontWeight: today
+                              ? FontWeight.bold
+                              : FontWeight.normal,
                           color: today ? colors.primary.base : colors.textMuted,
                         ),
                       );
@@ -642,14 +611,13 @@ class _OiCalendarState extends State<OiCalendar> {
 
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
-      onTap:
-          widget.onDateTap != null ? () => widget.onDateTap!(cellTime) : null,
+      onTap: widget.onDateTap != null
+          ? () => widget.onDateTap!(cellTime)
+          : null,
       child: Container(
         margin: const EdgeInsets.all(0.5),
         decoration: BoxDecoration(
-          border: Border.all(
-            color: colors.borderSubtle.withValues(alpha: 0.3),
-          ),
+          border: Border.all(color: colors.borderSubtle.withValues(alpha: 0.3)),
         ),
         child: dayEvents.isEmpty
             ? null
@@ -713,9 +681,7 @@ class _OiCalendarState extends State<OiCalendar> {
           child: Container(
             height: 48,
             decoration: BoxDecoration(
-              border: Border(
-                bottom: BorderSide(color: colors.borderSubtle),
-              ),
+              border: Border(bottom: BorderSide(color: colors.borderSubtle)),
             ),
             child: Row(
               children: [
@@ -724,10 +690,7 @@ class _OiCalendarState extends State<OiCalendar> {
                   child: Center(
                     child: Text(
                       '${hour.toString().padLeft(2, '0')}:00',
-                      style: TextStyle(
-                        fontSize: 10,
-                        color: colors.textMuted,
-                      ),
+                      style: TextStyle(fontSize: 10, color: colors.textMuted),
                     ),
                   ),
                 ),
@@ -747,8 +710,7 @@ class _OiCalendarState extends State<OiCalendar> {
                                     padding: const EdgeInsets.all(4),
                                     margin: const EdgeInsets.all(1),
                                     decoration: BoxDecoration(
-                                      color:
-                                          ev.color ?? colors.primary.base,
+                                      color: ev.color ?? colors.primary.base,
                                       borderRadius: BorderRadius.circular(3),
                                     ),
                                     child: Text(

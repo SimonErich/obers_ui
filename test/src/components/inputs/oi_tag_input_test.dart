@@ -9,39 +9,30 @@ import '../../../helpers/pump_app.dart';
 
 void main() {
   testWidgets('renders without error', (tester) async {
-    await tester.pumpObers(
-      const OiTagInput(tags: []),
-    );
+    await tester.pumpObers(const OiTagInput(tags: []));
     expect(find.byType(OiTagInput), findsOneWidget);
   });
 
   testWidgets('existing tags are shown as chips', (tester) async {
-    await tester.pumpObers(
-      const OiTagInput(tags: ['dart', 'flutter']),
-    );
+    await tester.pumpObers(const OiTagInput(tags: ['dart', 'flutter']));
     expect(find.text('dart'), findsOneWidget);
     expect(find.text('flutter'), findsOneWidget);
   });
 
   testWidgets('label is shown', (tester) async {
-    await tester.pumpObers(
-      const OiTagInput(tags: [], label: 'Skills'),
-    );
+    await tester.pumpObers(const OiTagInput(tags: [], label: 'Skills'));
     expect(find.text('Skills'), findsOneWidget);
   });
 
   testWidgets('removing a tag calls onChanged', (tester) async {
     List<String>? result;
     await tester.pumpObers(
-      OiTagInput(
-        tags: const ['dart', 'flutter'],
-        onChanged: (v) => result = v,
-      ),
+      OiTagInput(tags: const ['dart', 'flutter'], onChanged: (v) => result = v),
     );
     // Tap the first '×' remove icon.
-    await tester.tap(find.byIcon(
-      const IconData(0xe5cd, fontFamily: 'MaterialIcons'),
-    ).first);
+    await tester.tap(
+      find.byIcon(const IconData(0xe5cd, fontFamily: 'MaterialIcons')).first,
+    );
     await tester.pump();
     expect(result, isNotNull);
     expect(result!.length, 1);
@@ -50,10 +41,7 @@ void main() {
   testWidgets('adding a tag via Enter calls onChanged', (tester) async {
     List<String>? result;
     await tester.pumpObers(
-      OiTagInput(
-        tags: const [],
-        onChanged: (v) => result = v,
-      ),
+      OiTagInput(tags: const [], onChanged: (v) => result = v),
     );
     await tester.enterText(find.byType(EditableText), 'newtag');
     await tester.testTextInput.receiveAction(TextInputAction.done);

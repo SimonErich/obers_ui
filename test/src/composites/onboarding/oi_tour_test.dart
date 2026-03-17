@@ -166,34 +166,25 @@ void main() {
           steps: [
             OiTourStep(target: key1, title: 'Step 1', description: 'Desc 1'),
           ],
-          child: Center(
-            child: SizedBox(key: key1, width: 100, height: 50),
-          ),
+          child: Center(child: SizedBox(key: key1, width: 100, height: 50)),
         ),
       );
       await tester.pump();
 
-      expect(
-        find.byKey(const Key('oi_spotlight_overlay')),
-        findsOneWidget,
-      );
+      expect(find.byKey(const Key('oi_spotlight_overlay')), findsOneWidget);
     });
 
     testWidgets('empty steps renders child only', (tester) async {
-      await tester.pumpObers(
-        const OiTour(
-          steps: [],
-          child: Text('No tour'),
-        ),
-      );
+      await tester.pumpObers(const OiTour(steps: [], child: Text('No tour')));
       await tester.pump();
 
       expect(find.text('No tour'), findsOneWidget);
       expect(find.byKey(const Key('oi_tour_tooltip')), findsNothing);
     });
 
-    testWidgets('dismissOnOutsideTap skips tour on outside tap',
-        (tester) async {
+    testWidgets('dismissOnOutsideTap skips tour on outside tap', (
+      tester,
+    ) async {
       final key1 = GlobalKey();
       var skipped = false;
       await tester.pumpObers(
@@ -203,9 +194,7 @@ void main() {
           ],
           dismissOnOutsideTap: true,
           onSkip: () => skipped = true,
-          child: Center(
-            child: SizedBox(key: key1, width: 100, height: 50),
-          ),
+          child: Center(child: SizedBox(key: key1, width: 100, height: 50)),
         ),
       );
       await tester.pump();

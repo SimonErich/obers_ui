@@ -37,12 +37,15 @@ void main() {
       expect(ctrl.sortAscending, isTrue);
     });
 
-    test('sortBy toggles direction when same column called without ascending', () {
-      final ctrl = OiTableController()
-        ..sortBy('name')
-        ..sortBy('name');
-      expect(ctrl.sortAscending, isFalse);
-    });
+    test(
+      'sortBy toggles direction when same column called without ascending',
+      () {
+        final ctrl = OiTableController()
+          ..sortBy('name')
+          ..sortBy('name');
+        expect(ctrl.sortAscending, isFalse);
+      },
+    );
 
     test('sortBy resets to ascending when switching to a new column', () {
       final ctrl = OiTableController()
@@ -210,14 +213,12 @@ void main() {
     // ── Column management ─────────────────────────────────────────────────────
 
     test('setColumnVisible stores visibility flag', () {
-      final ctrl = OiTableController()
-        ..setColumnVisible('col', visible: false);
+      final ctrl = OiTableController()..setColumnVisible('col', visible: false);
       expect(ctrl.columnVisibility['col'], isFalse);
     });
 
     test('setColumnVisible does not notify when value unchanged', () {
-      final ctrl = OiTableController()
-        ..setColumnVisible('col', visible: false);
+      final ctrl = OiTableController()..setColumnVisible('col', visible: false);
       var count = 0;
       ctrl
         ..addListener(() => count++)
@@ -353,8 +354,7 @@ void main() {
         pageIndex: 1,
         groupByColumnId: 'y',
       );
-      final ctrl = OiTableController(totalRows: 100)
-        ..applySettings(settings);
+      final ctrl = OiTableController(totalRows: 100)..applySettings(settings);
       expect(ctrl.columnOrder, ['x', 'y']);
       expect(ctrl.columnVisibility, {'y': false});
       expect(ctrl.columnWidths, {'x': 200});

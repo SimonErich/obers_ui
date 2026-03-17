@@ -71,15 +71,15 @@ void main() {
 
   // 4. Custom colors applied.
   testWidgets('renders with custom node colors', (tester) async {
-    await tester.pumpObers(_sankey(
-      nodes: const [
-        OiSankeyNode(key: 'x', label: 'X', color: Color(0xFF4CAF50)),
-        OiSankeyNode(key: 'y', label: 'Y', color: Color(0xFFF44336)),
-      ],
-      links: const [
-        OiSankeyLink(source: 'x', target: 'y', value: 50),
-      ],
-    ));
+    await tester.pumpObers(
+      _sankey(
+        nodes: const [
+          OiSankeyNode(key: 'x', label: 'X', color: Color(0xFF4CAF50)),
+          OiSankeyNode(key: 'y', label: 'Y', color: Color(0xFFF44336)),
+        ],
+        links: const [OiSankeyLink(source: 'x', target: 'y', value: 50)],
+      ),
+    );
     expect(find.text('X'), findsOneWidget);
     expect(find.text('Y'), findsOneWidget);
   });
@@ -87,9 +87,7 @@ void main() {
   // 5. onNodeTap fires.
   testWidgets('onNodeTap fires with correct node', (tester) async {
     OiSankeyNode? tappedNode;
-    await tester.pumpObers(_sankey(
-      onNodeTap: (node) => tappedNode = node,
-    ));
+    await tester.pumpObers(_sankey(onNodeTap: (node) => tappedNode = node));
     await tester.tap(find.byKey(const Key('oi_sankey_node_b')));
     await tester.pump();
     expect(tappedNode?.label, 'Source B');
@@ -139,17 +137,19 @@ void main() {
 
   // 12. Custom link colors render without error.
   testWidgets('renders with custom link colors', (tester) async {
-    await tester.pumpObers(_sankey(
-      links: const [
-        OiSankeyLink(
-          source: 'a',
-          target: 'c',
-          value: 80,
-          color: Color(0x8800BCD4),
-        ),
-        OiSankeyLink(source: 'b', target: 'c', value: 40),
-      ],
-    ));
+    await tester.pumpObers(
+      _sankey(
+        links: const [
+          OiSankeyLink(
+            source: 'a',
+            target: 'c',
+            value: 80,
+            color: Color(0x8800BCD4),
+          ),
+          OiSankeyLink(source: 'b', target: 'c', value: 40),
+        ],
+      ),
+    );
     expect(find.byType(OiSankey), findsOneWidget);
   });
 }

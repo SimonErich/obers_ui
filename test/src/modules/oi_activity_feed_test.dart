@@ -91,11 +91,7 @@ void main() {
 
     testWidgets('loading state shows progress', (tester) async {
       await tester.pumpObers(
-        const OiActivityFeed(
-          events: [],
-          label: 'Feed',
-          loading: true,
-        ),
+        const OiActivityFeed(events: [], label: 'Feed', loading: true),
         surfaceSize: const Size(400, 600),
       );
 
@@ -115,26 +111,23 @@ void main() {
       expect(find.text('No activity yet'), findsOneWidget);
     });
 
-    testWidgets('default empty state shows when no events and no custom widget',
-        (tester) async {
-      await tester.pumpObers(
-        const OiActivityFeed(
-          events: [],
-          label: 'Feed',
-        ),
-        surfaceSize: const Size(400, 600),
-      );
+    testWidgets(
+      'default empty state shows when no events and no custom widget',
+      (tester) async {
+        await tester.pumpObers(
+          const OiActivityFeed(events: [], label: 'Feed'),
+          surfaceSize: const Size(400, 600),
+        );
 
-      expect(find.text('No activity'), findsOneWidget);
-    });
+        expect(find.text('No activity'), findsOneWidget);
+      },
+    );
 
     testWidgets('onEventTap fires when event is tapped', (tester) async {
       OiActivityEvent? tappedEvent;
       await tester.pumpObers(
         OiActivityFeed(
-          events: const [
-            OiActivityEvent(key: '1', title: 'Tap me'),
-          ],
+          events: const [OiActivityEvent(key: '1', title: 'Tap me')],
           label: 'Feed',
           onEventTap: (e) => tappedEvent = e,
         ),
@@ -167,9 +160,7 @@ void main() {
     testWidgets('semantics label is applied', (tester) async {
       await tester.pumpObers(
         const OiActivityFeed(
-          events: [
-            OiActivityEvent(key: '1', title: 'E1'),
-          ],
+          events: [OiActivityEvent(key: '1', title: 'E1')],
           label: 'Activity Feed',
         ),
         surfaceSize: const Size(400, 600),

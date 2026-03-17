@@ -22,10 +22,7 @@ void main() {
 
   testWidgets('open=false hides content', (tester) async {
     await tester.pumpObers(
-      const OiPopover(
-        anchor: Text('anchor'),
-        content: Text('popover body'),
-      ),
+      const OiPopover(anchor: Text('anchor'), content: Text('popover body')),
     );
     expect(find.text('popover body'), findsNothing);
   });

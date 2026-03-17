@@ -1,6 +1,8 @@
 // Tests do not require documentation comments.
 // ignore_for_file: public_member_api_docs
 
+import 'dart:ui';
+
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui/src/components/buttons/oi_button.dart';
@@ -48,9 +50,7 @@ void main() {
 
   testWidgets('onTap fires when tapped', (tester) async {
     var count = 0;
-    await tester.pumpObers(
-      OiButton.primary(label: 'Go', onTap: () => count++),
-    );
+    await tester.pumpObers(OiButton.primary(label: 'Go', onTap: () => count++));
     await tester.tap(find.text('Go'));
     await tester.pump();
     expect(count, 1);
@@ -88,15 +88,14 @@ void main() {
 
   // ── fullWidth ──────────────────────────────────────────────────────────────
 
-  testWidgets('fullWidth=true adds SizedBox with infinite width', (tester) async {
+  testWidgets('fullWidth=true adds SizedBox with infinite width', (
+    tester,
+  ) async {
     await tester.pumpObers(
       const OiButton.primary(label: 'Wide', fullWidth: true),
     );
     final boxes = tester.widgetList<SizedBox>(find.byType(SizedBox));
-    expect(
-      boxes.any((b) => b.width == double.infinity),
-      isTrue,
-    );
+    expect(boxes.any((b) => b.width == double.infinity), isTrue);
   });
 
   // ── Sizes ──────────────────────────────────────────────────────────────────
@@ -160,9 +159,7 @@ void main() {
   // ── Icon-only button ───────────────────────────────────────────────────────
 
   testWidgets('OiButton.icon renders Icon widget', (tester) async {
-    await tester.pumpObers(
-      const OiButton.icon(icon: _kIcon, label: 'Add'),
-    );
+    await tester.pumpObers(const OiButton.icon(icon: _kIcon, label: 'Add'));
     expect(find.byIcon(_kIcon), findsOneWidget);
   });
 
@@ -176,12 +173,11 @@ void main() {
     expect(count, 1);
   });
 
-  testWidgets('OiButton.icon passes semantic label to accessibility tree',
-      (tester) async {
+  testWidgets('OiButton.icon passes semantic label to accessibility tree', (
+    tester,
+  ) async {
     final handle = tester.ensureSemantics();
-    await tester.pumpObers(
-      const OiButton.icon(icon: _kIcon, label: 'Close'),
-    );
+    await tester.pumpObers(const OiButton.icon(icon: _kIcon, label: 'Close'));
     expect(find.bySemanticsLabel('Close'), findsOneWidget);
     handle.dispose();
   });
@@ -193,7 +189,9 @@ void main() {
     await tester.pumpWidget(
       const OiApp(
         density: OiDensity.compact,
-        home: Align(child: OiButton.icon(icon: _kIcon, label: 'Add')),
+        home: Align(
+          child: OiButton.icon(icon: _kIcon, label: 'Add'),
+        ),
       ),
     );
     await tester.pump();
@@ -203,8 +201,9 @@ void main() {
 
   // ── Semantics ──────────────────────────────────────────────────────────────
 
-  testWidgets('standard button is marked as button in accessibility tree',
-      (tester) async {
+  testWidgets('standard button is marked as button in accessibility tree', (
+    tester,
+  ) async {
     final handle = tester.ensureSemantics();
     await tester.pumpObers(const OiButton.primary(label: 'Save'));
     final node = tester.getSemantics(find.text('Save'));
@@ -212,22 +211,28 @@ void main() {
     handle.dispose();
   });
 
-  testWidgets('semanticLabel overrides label in accessibility tree',
-      (tester) async {
+  testWidgets('semanticLabel overrides label in accessibility tree', (
+    tester,
+  ) async {
     final handle = tester.ensureSemantics();
     await tester.pumpObers(
       const OiButton.primary(label: 'Save', semanticLabel: 'Save document'),
     );
-    expect(find.bySemanticsLabel('Save document'), findsOneWidget);
+    // Verify the Semantics widget has the overridden label.
+    final semanticsWidgets = tester.widgetList<Semantics>(
+      find.byType(Semantics),
+    );
+    final matching = semanticsWidgets
+        .where((s) => s.properties.label == 'Save document')
+        .toList();
+    expect(matching, hasLength(1));
     handle.dispose();
   });
 
   // ── Leading / trailing icon ────────────────────────────────────────────────
 
   testWidgets('leading icon renders before label', (tester) async {
-    await tester.pumpObers(
-      const OiButton.primary(label: 'Add', icon: _kIcon),
-    );
+    await tester.pumpObers(const OiButton.primary(label: 'Add', icon: _kIcon));
     final iconDx = tester.getCenter(find.byIcon(_kIcon)).dx;
     final textDx = tester.getCenter(find.text('Add')).dx;
     expect(iconDx, lessThan(textDx));
@@ -287,11 +292,7 @@ void main() {
   testWidgets('countdown button is disabled initially', (tester) async {
     var count = 0;
     await tester.pumpObers(
-      OiButton.countdown(
-        label: 'Agree',
-        seconds: 3,
-        onTap: () => count++,
-      ),
+      OiButton.countdown(label: 'Agree', seconds: 3, onTap: () => count++),
     );
     expect(find.textContaining('Agree (3)'), findsOneWidget);
     await tester.tap(find.byType(OiButton), warnIfMissed: false);
@@ -299,14 +300,12 @@ void main() {
     expect(count, 0);
   });
 
-  testWidgets('countdown button enables after countdown expires', (tester) async {
+  testWidgets('countdown button enables after countdown expires', (
+    tester,
+  ) async {
     var count = 0;
     await tester.pumpObers(
-      OiButton.countdown(
-        label: 'Agree',
-        seconds: 2,
-        onTap: () => count++,
-      ),
+      OiButton.countdown(label: 'Agree', seconds: 2, onTap: () => count++),
     );
     await tester.pump(const Duration(seconds: 3));
     expect(find.text('Agree'), findsOneWidget);
@@ -342,8 +341,9 @@ void main() {
     expect(find.text('Are you sure?'), findsOneWidget);
   });
 
-  testWidgets('confirm: second tap fires onConfirm and resets label',
-      (tester) async {
+  testWidgets('confirm: second tap fires onConfirm and resets label', (
+    tester,
+  ) async {
     var confirmed = 0;
     await tester.pumpObers(
       OiButton.confirm(
@@ -362,8 +362,9 @@ void main() {
 
   // ── Density-aware sizing ───────────────────────────────────────────────────
 
-  testWidgets('dense density produces smaller height than comfortable',
-      (tester) async {
+  testWidgets('dense density produces smaller height than comfortable', (
+    tester,
+  ) async {
     // Measure the Container that is an ancestor of the label text — that is
     // the button body Container, whose height is set to buttonHeight directly.
     double bodyHeight(WidgetTester t) {

@@ -20,11 +20,7 @@ void main() {
     });
 
     test('toBoxShadow returns BoxShadow with matching values', () {
-      const halo = OiHaloStyle(
-        color: Color(0x402563EB),
-        spread: 3,
-        blur: 10,
-      );
+      const halo = OiHaloStyle(color: Color(0x402563EB), spread: 3, blur: 10);
       final shadow = halo.toBoxShadow();
       expect(shadow.color, equals(halo.color));
       expect(shadow.spreadRadius, equals(halo.spread));

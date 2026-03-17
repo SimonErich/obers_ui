@@ -80,9 +80,7 @@ class _OiSwitchState extends State<OiSwitch> {
     final thumbSize = trackH - padding * 2;
     final travelDistance = trackW - thumbSize - padding * 2;
 
-    final trackColor = widget.value
-        ? colors.primary.base
-        : colors.border;
+    final trackColor = widget.value ? colors.primary.base : colors.border;
 
     final track = AnimatedContainer(
       duration: const Duration(milliseconds: 200),

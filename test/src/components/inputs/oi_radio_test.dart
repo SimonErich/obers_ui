@@ -10,14 +10,12 @@ import '../../../helpers/pump_app.dart';
 const _kOptions = [
   OiRadioOption(value: 'a', label: 'Alpha'),
   OiRadioOption(value: 'b', label: 'Beta'),
-  OiRadioOption(value: 'c', label: 'Gamma', disabled: true),
+  OiRadioOption(value: 'c', label: 'Gamma', enabled: false),
 ];
 
 void main() {
   testWidgets('renders all option labels', (tester) async {
-    await tester.pumpObers(
-      const OiRadio<String>(options: _kOptions),
-    );
+    await tester.pumpObers(const OiRadio<String>(options: _kOptions));
     expect(find.text('Alpha'), findsOneWidget);
     expect(find.text('Beta'), findsOneWidget);
     expect(find.text('Gamma'), findsOneWidget);
@@ -26,23 +24,19 @@ void main() {
   testWidgets('tapping enabled option calls onChanged', (tester) async {
     String? selected;
     await tester.pumpObers(
-      OiRadio<String>(
-        options: _kOptions,
-        onChanged: (v) => selected = v,
-      ),
+      OiRadio<String>(options: _kOptions, onChanged: (v) => selected = v),
     );
     await tester.tap(find.text('Beta'));
     await tester.pump();
     expect(selected, 'b');
   });
 
-  testWidgets('tapping disabled option does not call onChanged', (tester) async {
+  testWidgets('tapping enabled=false option does not call onChanged', (
+    tester,
+  ) async {
     String? selected;
     await tester.pumpObers(
-      OiRadio<String>(
-        options: _kOptions,
-        onChanged: (v) => selected = v,
-      ),
+      OiRadio<String>(options: _kOptions, onChanged: (v) => selected = v),
     );
     await tester.tap(find.text('Gamma'), warnIfMissed: false);
     await tester.pump();
@@ -51,20 +45,13 @@ void main() {
 
   testWidgets('horizontal direction renders row', (tester) async {
     await tester.pumpObers(
-      const OiRadio<String>(
-        options: _kOptions,
-        direction: Axis.horizontal,
-      ),
+      const OiRadio<String>(options: _kOptions, direction: Axis.horizontal),
     );
     expect(find.byType(OiRadio<String>), findsOneWidget);
   });
 
   testWidgets('vertical direction renders column', (tester) async {
-    await tester.pumpObers(
-      const OiRadio<String>(
-        options: _kOptions,
-      ),
-    );
+    await tester.pumpObers(const OiRadio<String>(options: _kOptions));
     expect(find.byType(OiRadio<String>), findsOneWidget);
   });
 

@@ -47,7 +47,8 @@ class OiPasteZone extends StatelessWidget {
     if (!enabled) return KeyEventResult.ignored;
     if (event is! KeyDownEvent) return KeyEventResult.ignored;
 
-    final isCtrlOrMeta = HardwareKeyboard.instance.isControlPressed ||
+    final isCtrlOrMeta =
+        HardwareKeyboard.instance.isControlPressed ||
         HardwareKeyboard.instance.isMetaPressed;
 
     if (isCtrlOrMeta && event.logicalKey == LogicalKeyboardKey.keyV) {

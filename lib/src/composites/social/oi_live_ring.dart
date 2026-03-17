@@ -49,10 +49,7 @@ class OiLiveRing extends StatelessWidget {
             key: const Key('oi_live_ring_indicator'),
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              border: Border.all(
-                color: ringColor,
-                width: 3,
-              ),
+              border: Border.all(color: ringColor, width: 3),
             ),
             child: Opacity(opacity: 0, child: child),
           ),

@@ -61,11 +61,11 @@ class OiSidebarSettings with OiSettingsData {
   /// Serializes this settings object to a JSON-encodable map.
   @override
   Map<String, dynamic> toJson() => {
-        'schemaVersion': schemaVersion,
-        'mode': mode.name,
-        'width': width,
-        'collapsedSectionIds': collapsedSectionIds.toList(),
-      };
+    'schemaVersion': schemaVersion,
+    'mode': mode.name,
+    'width': width,
+    'collapsedSectionIds': collapsedSectionIds.toList(),
+  };
 
   /// Returns new settings, filling in fields from [defaults] where this
   /// instance has empty or default values.
@@ -110,11 +110,11 @@ class OiSidebarSettings with OiSettingsData {
 
   @override
   int get hashCode => Object.hash(
-        schemaVersion,
-        mode,
-        width,
-        Object.hashAll(collapsedSectionIds),
-      );
+    schemaVersion,
+    mode,
+    width,
+    Object.hashAll(collapsedSectionIds),
+  );
 
   // ── Private helpers ────────────────────────────────────────────────────────
 

@@ -38,11 +38,11 @@ class OiDashboardCardPosition {
 
   /// Serializes this position to a JSON-encodable map.
   Map<String, dynamic> toJson() => {
-        'column': column,
-        'row': row,
-        'columnSpan': columnSpan,
-        'rowSpan': rowSpan,
-      };
+    'column': column,
+    'row': row,
+    'columnSpan': columnSpan,
+    'rowSpan': rowSpan,
+  };
 
   @override
   bool operator ==(Object other) {
@@ -90,10 +90,11 @@ class OiDashboardSettings with OiSettingsData {
   /// Serializes this settings object to a JSON-encodable map.
   @override
   Map<String, dynamic> toJson() => {
-        'schemaVersion': schemaVersion,
-        'cardPositions': cardPositions
-            .map((key, value) => MapEntry(key, value.toJson())),
-      };
+    'schemaVersion': schemaVersion,
+    'cardPositions': cardPositions.map(
+      (key, value) => MapEntry(key, value.toJson()),
+    ),
+  };
 
   /// Returns new settings, filling in fields from [defaults] where this
   /// instance has empty or default values.
@@ -103,8 +104,9 @@ class OiDashboardSettings with OiSettingsData {
   OiDashboardSettings mergeWith(OiDashboardSettings defaults) {
     return OiDashboardSettings(
       schemaVersion: schemaVersion,
-      cardPositions:
-          cardPositions.isEmpty ? defaults.cardPositions : cardPositions,
+      cardPositions: cardPositions.isEmpty
+          ? defaults.cardPositions
+          : cardPositions,
     );
   }
 
@@ -129,11 +131,11 @@ class OiDashboardSettings with OiSettingsData {
 
   @override
   int get hashCode => Object.hash(
-        schemaVersion,
-        Object.hashAll(
-          cardPositions.entries.map((e) => Object.hash(e.key, e.value)),
-        ),
-      );
+    schemaVersion,
+    Object.hashAll(
+      cardPositions.entries.map((e) => Object.hash(e.key, e.value)),
+    ),
+  );
 
   // ── Private helpers ────────────────────────────────────────────────────────
 

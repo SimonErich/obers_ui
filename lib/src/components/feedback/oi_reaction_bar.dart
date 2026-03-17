@@ -62,8 +62,18 @@ class _OiReactionBarState extends State<OiReactionBar> {
 
   // Emoji set shown in the quick picker popover.
   static const _quickEmojis = [
-    '👍', '❤️', '😂', '😮', '😢', '😡',
-    '🎉', '🔥', '👏', '🙌', '💯', '✨',
+    '👍',
+    '❤️',
+    '😂',
+    '😮',
+    '😢',
+    '😡',
+    '🎉',
+    '🔥',
+    '👏',
+    '🙌',
+    '💯',
+    '✨',
   ];
 
   void _togglePicker() {
@@ -102,12 +112,8 @@ class _OiReactionBarState extends State<OiReactionBar> {
               Text(
                 '${r.count}',
                 style: textTheme.small.copyWith(
-                  color: r.selected
-                      ? colors.primary.base
-                      : colors.textSubtle,
-                  fontWeight: r.selected
-                      ? FontWeight.w700
-                      : FontWeight.w400,
+                  color: r.selected ? colors.primary.base : colors.textSubtle,
+                  fontWeight: r.selected ? FontWeight.w700 : FontWeight.w400,
                 ),
               ),
             ],

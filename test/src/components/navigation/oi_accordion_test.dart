@@ -68,8 +68,9 @@ void main() {
 
   // ── initiallyExpanded ─────────────────────────────────────────────────────
 
-  testWidgets('initiallyExpanded=true shows content immediately',
-      (tester) async {
+  testWidgets('initiallyExpanded=true shows content immediately', (
+    tester,
+  ) async {
     await tester.pumpObers(
       const OiAccordion(
         sections: [
@@ -86,8 +87,9 @@ void main() {
 
   // ── allowMultiple=false ────────────────────────────────────────────────────
 
-  testWidgets('allowMultiple=false closes other sections when one opens',
-      (tester) async {
+  testWidgets('allowMultiple=false closes other sections when one opens', (
+    tester,
+  ) async {
     await tester.pumpObers(
       const OiAccordion(
         sections: [
@@ -105,7 +107,9 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('allowMultiple=true keeps multiple sections open', (tester) async {
+  testWidgets('allowMultiple=true keeps multiple sections open', (
+    tester,
+  ) async {
     await tester.pumpObers(
       const OiAccordion(
         allowMultiple: true,

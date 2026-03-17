@@ -72,10 +72,7 @@ void main() {
             columnSpan: 2,
             rowSpan: 1,
           ),
-          'card-2': OiDashboardCardPosition(
-            column: 2,
-            row: 1,
-          ),
+          'card-2': OiDashboardCardPosition(column: 2, row: 1),
         },
       );
       final json = original.toJson();
@@ -96,9 +93,7 @@ void main() {
     });
 
     test('fromJson handles null cardPositions gracefully', () {
-      final s = OiDashboardSettings.fromJson(const {
-        'cardPositions': null,
-      });
+      final s = OiDashboardSettings.fromJson(const {'cardPositions': null});
       expect(s.cardPositions, isEmpty);
     });
 
@@ -113,26 +108,22 @@ void main() {
     test('mergeWith: empty cardPositions filled from defaults', () {
       const saved = OiDashboardSettings();
       const defaults = OiDashboardSettings(
-        cardPositions: {
-          'card-1': OiDashboardCardPosition(column: 0, row: 0),
-        },
+        cardPositions: {'card-1': OiDashboardCardPosition(column: 0, row: 0)},
       );
       final merged = saved.mergeWith(defaults);
       expect(merged.cardPositions.length, 1);
-      expect(merged.cardPositions['card-1'],
-          const OiDashboardCardPosition(column: 0, row: 0));
+      expect(
+        merged.cardPositions['card-1'],
+        const OiDashboardCardPosition(column: 0, row: 0),
+      );
     });
 
     test('mergeWith: non-empty cardPositions preserved', () {
       const saved = OiDashboardSettings(
-        cardPositions: {
-          'card-x': OiDashboardCardPosition(column: 1, row: 1),
-        },
+        cardPositions: {'card-x': OiDashboardCardPosition(column: 1, row: 1)},
       );
       const defaults = OiDashboardSettings(
-        cardPositions: {
-          'card-1': OiDashboardCardPosition(column: 0, row: 0),
-        },
+        cardPositions: {'card-1': OiDashboardCardPosition(column: 0, row: 0)},
       );
       final merged = saved.mergeWith(defaults);
       expect(merged.cardPositions.length, 1);
@@ -150,9 +141,7 @@ void main() {
 
     test('copyWith returns identical when no args provided', () {
       const s = OiDashboardSettings(
-        cardPositions: {
-          'c': OiDashboardCardPosition(column: 0, row: 0),
-        },
+        cardPositions: {'c': OiDashboardCardPosition(column: 0, row: 0)},
       );
       expect(s.copyWith(), equals(s));
     });
@@ -165,16 +154,16 @@ void main() {
         },
       );
       expect(updated.cardPositions.length, 1);
-      expect(updated.cardPositions['new'],
-          const OiDashboardCardPosition(column: 1, row: 2));
+      expect(
+        updated.cardPositions['new'],
+        const OiDashboardCardPosition(column: 1, row: 2),
+      );
     });
 
     test('copyWith preserves unspecified fields', () {
       const s = OiDashboardSettings(
         schemaVersion: 3,
-        cardPositions: {
-          'a': OiDashboardCardPosition(column: 0, row: 0),
-        },
+        cardPositions: {'a': OiDashboardCardPosition(column: 0, row: 0)},
       );
       final updated = s.copyWith(schemaVersion: 4);
       expect(updated.schemaVersion, 4);
@@ -185,42 +174,30 @@ void main() {
 
     test('two identical instances are equal', () {
       const a = OiDashboardSettings(
-        cardPositions: {
-          'c1': OiDashboardCardPosition(column: 0, row: 0),
-        },
+        cardPositions: {'c1': OiDashboardCardPosition(column: 0, row: 0)},
       );
       const b = OiDashboardSettings(
-        cardPositions: {
-          'c1': OiDashboardCardPosition(column: 0, row: 0),
-        },
+        cardPositions: {'c1': OiDashboardCardPosition(column: 0, row: 0)},
       );
       expect(a, equals(b));
     });
 
     test('instances with different fields are not equal', () {
       const a = OiDashboardSettings(
-        cardPositions: {
-          'c1': OiDashboardCardPosition(column: 0, row: 0),
-        },
+        cardPositions: {'c1': OiDashboardCardPosition(column: 0, row: 0)},
       );
       const b = OiDashboardSettings(
-        cardPositions: {
-          'c1': OiDashboardCardPosition(column: 1, row: 0),
-        },
+        cardPositions: {'c1': OiDashboardCardPosition(column: 1, row: 0)},
       );
       expect(a, isNot(equals(b)));
     });
 
     test('hashCode is same for equal instances', () {
       const a = OiDashboardSettings(
-        cardPositions: {
-          'c': OiDashboardCardPosition(column: 0, row: 0),
-        },
+        cardPositions: {'c': OiDashboardCardPosition(column: 0, row: 0)},
       );
       const b = OiDashboardSettings(
-        cardPositions: {
-          'c': OiDashboardCardPosition(column: 0, row: 0),
-        },
+        cardPositions: {'c': OiDashboardCardPosition(column: 0, row: 0)},
       );
       expect(a.hashCode, equals(b.hashCode));
     });

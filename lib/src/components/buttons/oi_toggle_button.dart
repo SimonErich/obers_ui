@@ -118,11 +118,8 @@ class OiToggleButton extends StatelessWidget {
 
     final bgColor = selected ? colors.primary.base : const Color(0x00000000);
     final fgColor = selected ? colors.primary.foreground : colors.text;
-    final border = selected
-        ? null
-        : Border.all(color: colors.border);
-    final borderRadius =
-        context.components.button?.borderRadius ?? radius.sm;
+    final border = selected ? null : Border.all(color: colors.border);
+    final borderRadius = context.components.button?.borderRadius ?? radius.sm;
 
     double hPad;
     switch (size) {

@@ -50,11 +50,7 @@ enum OiBlockType {
 @immutable
 class OiContentBlock {
   /// Creates an [OiContentBlock].
-  const OiContentBlock({
-    required this.type,
-    required this.text,
-    this.metadata,
-  });
+  const OiContentBlock({required this.type, required this.text, this.metadata});
 
   /// The type of block.
   final OiBlockType type;
@@ -165,14 +161,10 @@ class OiRichContent {
               '</code></pre>',
             );
           } else {
-            buffer.write(
-              '<pre><code>${_escapeHtml(block.text)}</code></pre>',
-            );
+            buffer.write('<pre><code>${_escapeHtml(block.text)}</code></pre>');
           }
         case OiBlockType.quote:
-          buffer.write(
-            '<blockquote>${_escapeHtml(block.text)}</blockquote>',
-          );
+          buffer.write('<blockquote>${_escapeHtml(block.text)}</blockquote>');
         case OiBlockType.divider:
           buffer.write('<hr/>');
       }
@@ -274,7 +266,7 @@ class OiRichContent {
 class OiRichEditorController extends ChangeNotifier {
   /// Creates an [OiRichEditorController] with optional [initialContent].
   OiRichEditorController({OiRichContent? initialContent})
-      : _content = initialContent ?? OiRichContent.empty();
+    : _content = initialContent ?? OiRichContent.empty();
 
   OiRichContent _content;
 
@@ -353,11 +345,7 @@ enum OiToolbarMode {
 /// {@category Composites}
 class OiMention {
   /// Creates an [OiMention].
-  const OiMention({
-    required this.id,
-    required this.label,
-    this.avatarUrl,
-  });
+  const OiMention({required this.id, required this.label, this.avatarUrl});
 
   /// The unique identifier for this mention.
   final String id;
@@ -500,8 +488,7 @@ class _OiRichEditorState extends State<OiRichEditor> {
   @override
   void initState() {
     super.initState();
-    _focusNode = FocusNode()
-      ..addListener(_handleFocusChange);
+    _focusNode = FocusNode()..addListener(_handleFocusChange);
     widget.controller.addListener(_handleContentChange);
     _syncBlockControllers();
     if (widget.autoFocus) {
@@ -601,10 +588,7 @@ class _OiRichEditorState extends State<OiRichEditor> {
       case OiBlockType.quote:
         return (textTheme?.styleFor(OiLabelVariant.body) ??
                 const TextStyle(fontSize: 16))
-            .copyWith(
-          fontStyle: FontStyle.italic,
-          color: colors?.textMuted,
-        );
+            .copyWith(fontStyle: FontStyle.italic, color: colors?.textMuted);
       case OiBlockType.paragraph:
       case OiBlockType.bulletList:
       case OiBlockType.numberedList:
@@ -614,11 +598,7 @@ class _OiRichEditorState extends State<OiRichEditor> {
     }
   }
 
-  Widget _buildBlock(
-    BuildContext context,
-    int index,
-    OiContentBlock block,
-  ) {
+  Widget _buildBlock(BuildContext context, int index, OiContentBlock block) {
     if (block.type == OiBlockType.divider) {
       final colors = OiTheme.maybeOf(context)?.colors;
       return Padding(
@@ -632,7 +612,8 @@ class _OiRichEditorState extends State<OiRichEditor> {
 
     final style = _styleForBlock(block, context);
     final cursorColor =
-        OiTheme.maybeOf(context)?.colors.primary.base ?? const Color(0xFF000000);
+        OiTheme.maybeOf(context)?.colors.primary.base ??
+        const Color(0xFF000000);
 
     Widget blockWidget = EditableText(
       controller: _blockControllers[index],
@@ -720,43 +701,83 @@ class _OiRichEditorState extends State<OiRichEditor> {
 
     final actions = <Widget>[
       _ToolbarButton(
-        icon: const Text('H1', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 12)),
+        icon: const Text(
+          'H1',
+          style: TextStyle(fontWeight: FontWeight.w700, fontSize: 12),
+        ),
         semanticLabel: 'Heading 1',
-        onPressed: widget.readOnly ? null : () => _insertBlock(OiBlockType.heading1),
+        onPressed: widget.readOnly
+            ? null
+            : () => _insertBlock(OiBlockType.heading1),
       ),
       if (!isMinimal) ...[
         _ToolbarButton(
-          icon: const Text('H2', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 12)),
+          icon: const Text(
+            'H2',
+            style: TextStyle(fontWeight: FontWeight.w700, fontSize: 12),
+          ),
           semanticLabel: 'Heading 2',
-          onPressed: widget.readOnly ? null : () => _insertBlock(OiBlockType.heading2),
+          onPressed: widget.readOnly
+              ? null
+              : () => _insertBlock(OiBlockType.heading2),
         ),
         _ToolbarButton(
-          icon: const Text('H3', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 12)),
+          icon: const Text(
+            'H3',
+            style: TextStyle(fontWeight: FontWeight.w700, fontSize: 12),
+          ),
           semanticLabel: 'Heading 3',
-          onPressed: widget.readOnly ? null : () => _insertBlock(OiBlockType.heading3),
+          onPressed: widget.readOnly
+              ? null
+              : () => _insertBlock(OiBlockType.heading3),
         ),
       ],
       _ToolbarButton(
         icon: Text('\u2022', style: TextStyle(fontSize: 16, color: iconColor)),
         semanticLabel: 'Bullet list',
-        onPressed: widget.readOnly ? null : () => _insertBlock(OiBlockType.bulletList),
+        onPressed: widget.readOnly
+            ? null
+            : () => _insertBlock(OiBlockType.bulletList),
       ),
       _ToolbarButton(
-        icon: Text('1.', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: iconColor)),
+        icon: Text(
+          '1.',
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
+            color: iconColor,
+          ),
+        ),
         semanticLabel: 'Numbered list',
-        onPressed: widget.readOnly ? null : () => _insertBlock(OiBlockType.numberedList),
+        onPressed: widget.readOnly
+            ? null
+            : () => _insertBlock(OiBlockType.numberedList),
       ),
       if (widget.enableCodeBlocks && !isMinimal)
         _ToolbarButton(
-          icon: Text('</>', style: TextStyle(fontSize: 12, fontFamily: 'monospace', color: iconColor)),
+          icon: Text(
+            '</>',
+            style: TextStyle(
+              fontSize: 12,
+              fontFamily: 'monospace',
+              color: iconColor,
+            ),
+          ),
           semanticLabel: 'Code block',
-          onPressed: widget.readOnly ? null : () => _insertBlock(OiBlockType.code),
+          onPressed: widget.readOnly
+              ? null
+              : () => _insertBlock(OiBlockType.code),
         ),
       if (!isMinimal)
         _ToolbarButton(
-          icon: Text('\u275D', style: TextStyle(fontSize: 14, color: iconColor)),
+          icon: Text(
+            '\u275D',
+            style: TextStyle(fontSize: 14, color: iconColor),
+          ),
           semanticLabel: 'Quote',
-          onPressed: widget.readOnly ? null : () => _insertBlock(OiBlockType.quote),
+          onPressed: widget.readOnly
+              ? null
+              : () => _insertBlock(OiBlockType.quote),
         ),
     ];
 
@@ -844,10 +865,7 @@ class _OiRichEditorState extends State<OiRichEditor> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 _buildToolbar(context),
-                Padding(
-                  padding: const EdgeInsets.all(8),
-                  child: editorBody,
-                ),
+                Padding(padding: const EdgeInsets.all(8), child: editorBody),
               ],
             ),
           ),
@@ -897,10 +915,7 @@ class _ToolbarButton extends StatelessWidget {
         onTap: onPressed,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
-          child: Opacity(
-            opacity: onPressed != null ? 1.0 : 0.4,
-            child: icon,
-          ),
+          child: Opacity(opacity: onPressed != null ? 1.0 : 0.4, child: icon),
         ),
       ),
     );

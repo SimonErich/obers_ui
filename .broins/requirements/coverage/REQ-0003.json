@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "atomId": "REQ-0003",
+  "atomText": "",
+  "status": "covered",
+  "workItemId": "WI-0066",
+  "history": [
+    {
+      "at": "2026-03-17T10:02:14.760434Z",
+      "event": "covered",
+      "workItemId": "WI-0066",
+      "runId": "run-1773733505170"
+    }
+  ],
+  "evidence": [
+    "lib/src/foundation/theme/oi_theme_data.dart:25-80",
+    "lib/src/tools/oi_dynamic_theme.dart:10-62",
+    "lib/src/tools/oi_playground.dart:17-37",
+    "test/src/tools/oi_dynamic_theme_test.dart:14-133"
+  ],
+  "coveredAt": "2026-03-17T10:02:14.760434Z"
+}

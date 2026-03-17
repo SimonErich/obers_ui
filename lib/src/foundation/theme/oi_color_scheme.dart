@@ -135,38 +135,37 @@ class OiColorScheme {
   /// [t] must be in the range [0, 1]. At [t] = 0 the result equals [a];
   /// at [t] = 1 the result equals [b].
   OiColorScheme.lerp(OiColorScheme a, OiColorScheme b, double t)
-      : primary = OiColorSwatch.lerp(a.primary, b.primary, t),
-        accent = OiColorSwatch.lerp(a.accent, b.accent, t),
-        success = OiColorSwatch.lerp(a.success, b.success, t),
-        warning = OiColorSwatch.lerp(a.warning, b.warning, t),
-        error = OiColorSwatch.lerp(a.error, b.error, t),
-        info = OiColorSwatch.lerp(a.info, b.info, t),
-        background = Color.lerp(a.background, b.background, t)!,
-        surface = Color.lerp(a.surface, b.surface, t)!,
-        surfaceHover = Color.lerp(a.surfaceHover, b.surfaceHover, t)!,
-        surfaceActive = Color.lerp(a.surfaceActive, b.surfaceActive, t)!,
-        surfaceSubtle = Color.lerp(a.surfaceSubtle, b.surfaceSubtle, t)!,
-        overlay = Color.lerp(a.overlay, b.overlay, t)!,
-        text = Color.lerp(a.text, b.text, t)!,
-        textSubtle = Color.lerp(a.textSubtle, b.textSubtle, t)!,
-        textMuted = Color.lerp(a.textMuted, b.textMuted, t)!,
-        textInverse = Color.lerp(a.textInverse, b.textInverse, t)!,
-        textOnPrimary = Color.lerp(a.textOnPrimary, b.textOnPrimary, t)!,
-        border = Color.lerp(a.border, b.border, t)!,
-        borderSubtle = Color.lerp(a.borderSubtle, b.borderSubtle, t)!,
-        borderFocus = Color.lerp(a.borderFocus, b.borderFocus, t)!,
-        borderError = Color.lerp(a.borderError, b.borderError, t)!,
-        glassBackground =
-            Color.lerp(a.glassBackground, b.glassBackground, t)!,
-        glassBorder = Color.lerp(a.glassBorder, b.glassBorder, t)!,
-        chart = List<Color>.generate(
-          a.chart.length,
-          (i) => Color.lerp(
-            a.chart[i],
-            b.chart[i < b.chart.length ? i : b.chart.length - 1],
-            t,
-          )!,
-        );
+    : primary = OiColorSwatch.lerp(a.primary, b.primary, t),
+      accent = OiColorSwatch.lerp(a.accent, b.accent, t),
+      success = OiColorSwatch.lerp(a.success, b.success, t),
+      warning = OiColorSwatch.lerp(a.warning, b.warning, t),
+      error = OiColorSwatch.lerp(a.error, b.error, t),
+      info = OiColorSwatch.lerp(a.info, b.info, t),
+      background = Color.lerp(a.background, b.background, t)!,
+      surface = Color.lerp(a.surface, b.surface, t)!,
+      surfaceHover = Color.lerp(a.surfaceHover, b.surfaceHover, t)!,
+      surfaceActive = Color.lerp(a.surfaceActive, b.surfaceActive, t)!,
+      surfaceSubtle = Color.lerp(a.surfaceSubtle, b.surfaceSubtle, t)!,
+      overlay = Color.lerp(a.overlay, b.overlay, t)!,
+      text = Color.lerp(a.text, b.text, t)!,
+      textSubtle = Color.lerp(a.textSubtle, b.textSubtle, t)!,
+      textMuted = Color.lerp(a.textMuted, b.textMuted, t)!,
+      textInverse = Color.lerp(a.textInverse, b.textInverse, t)!,
+      textOnPrimary = Color.lerp(a.textOnPrimary, b.textOnPrimary, t)!,
+      border = Color.lerp(a.border, b.border, t)!,
+      borderSubtle = Color.lerp(a.borderSubtle, b.borderSubtle, t)!,
+      borderFocus = Color.lerp(a.borderFocus, b.borderFocus, t)!,
+      borderError = Color.lerp(a.borderError, b.borderError, t)!,
+      glassBackground = Color.lerp(a.glassBackground, b.glassBackground, t)!,
+      glassBorder = Color.lerp(a.glassBorder, b.glassBorder, t)!,
+      chart = List<Color>.generate(
+        a.chart.length,
+        (i) => Color.lerp(
+          a.chart[i],
+          b.chart[i < b.chart.length ? i : b.chart.length - 1],
+          t,
+        )!,
+      );
 
   // ── Semantic swatches ────────────────────────────────────────────────────
 
@@ -345,33 +344,34 @@ class OiColorScheme {
 
   @override
   int get hashCode => Object.hashAll([
-        primary,
-        accent,
-        success,
-        warning,
-        error,
-        info,
-        background,
-        surface,
-        surfaceHover,
-        surfaceActive,
-        surfaceSubtle,
-        overlay,
-        text,
-        textSubtle,
-        textMuted,
-        textInverse,
-        textOnPrimary,
-        border,
-        borderSubtle,
-        borderFocus,
-        borderError,
-        glassBackground,
-        glassBorder,
-        ...chart,
-      ]);
+    primary,
+    accent,
+    success,
+    warning,
+    error,
+    info,
+    background,
+    surface,
+    surfaceHover,
+    surfaceActive,
+    surfaceSubtle,
+    overlay,
+    text,
+    textSubtle,
+    textMuted,
+    textInverse,
+    textOnPrimary,
+    border,
+    borderSubtle,
+    borderFocus,
+    borderError,
+    glassBackground,
+    glassBorder,
+    ...chart,
+  ]);
 
   @override
-  String toString() => 'OiColorScheme(background: $background, '
+  String toString() =>
+      'OiColorScheme(background: $background, '
       'surface: $surface, primary: $primary)';
 }

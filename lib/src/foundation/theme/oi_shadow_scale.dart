@@ -78,12 +78,7 @@ class OiShadowScale {
           blurRadius: 16,
         ),
       ],
-      glass: [
-        BoxShadow(
-          color: Color(0x1A000000),
-          blurRadius: 24,
-        ),
-      ],
+      glass: [BoxShadow(color: Color(0x1A000000), blurRadius: 24)],
     );
   }
 
@@ -144,12 +139,7 @@ class OiShadowScale {
           blurRadius: 16,
         ),
       ],
-      glass: [
-        BoxShadow(
-          color: Color(0x33000000),
-          blurRadius: 24,
-        ),
-      ],
+      glass: [BoxShadow(color: Color(0x33000000), blurRadius: 24)],
     );
   }
 
@@ -232,12 +222,12 @@ class OiShadowScale {
 
   @override
   int get hashCode => Object.hash(
-        Object.hashAll(none),
-        Object.hashAll(xs),
-        Object.hashAll(sm),
-        Object.hashAll(md),
-        Object.hashAll(lg),
-        Object.hashAll(xl),
-        Object.hashAll(glass),
-      );
+    Object.hashAll(none),
+    Object.hashAll(xs),
+    Object.hashAll(sm),
+    Object.hashAll(md),
+    Object.hashAll(lg),
+    Object.hashAll(xl),
+    Object.hashAll(glass),
+  );
 }

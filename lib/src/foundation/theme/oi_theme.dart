@@ -21,11 +21,7 @@ import 'package:obers_ui/src/foundation/theme/oi_theme_data.dart';
 /// {@category Foundation}
 class OiTheme extends InheritedWidget {
   /// Creates an [OiTheme] that provides [data] to all descendants.
-  const OiTheme({
-    required this.data,
-    required super.child,
-    super.key,
-  });
+  const OiTheme({required this.data, required super.child, super.key});
 
   /// The theme data to inject into the subtree.
   final OiThemeData data;
@@ -70,11 +66,7 @@ class OiTheme extends InheritedWidget {
 /// {@category Foundation}
 class OiThemeScope extends StatelessWidget {
   /// Creates an [OiThemeScope] that overrides the theme for [child].
-  const OiThemeScope({
-    required this.data,
-    required this.child,
-    super.key,
-  });
+  const OiThemeScope({required this.data, required this.child, super.key});
 
   /// The overriding theme data.
   final OiThemeData data;

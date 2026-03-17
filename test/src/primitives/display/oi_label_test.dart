@@ -27,11 +27,7 @@ void main() {
 
   testWidgets('applies maxLines and overflow', (tester) async {
     await tester.pumpObers(
-      const OiLabel(
-        'long text',
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
-      ),
+      const OiLabel('long text', maxLines: 1, overflow: TextOverflow.ellipsis),
     );
     final textWidget = tester.widget<Text>(find.byType(Text));
     expect(textWidget.maxLines, 1);
@@ -50,14 +46,16 @@ void main() {
 
   // ── semanticsLabel ────────────────────────────────────────────────────────
 
-  testWidgets('semanticsLabel wraps in Semantics node with correct label',
-      (tester) async {
+  testWidgets('semanticsLabel wraps in Semantics node with correct label', (
+    tester,
+  ) async {
     await tester.pumpObers(
       const OiLabel('visible text', semanticsLabel: 'accessible label'),
     );
     // Filter Semantics widgets to find the one OiLabel inserts.
-    final semanticsWidgets =
-        tester.widgetList<Semantics>(find.byType(Semantics));
+    final semanticsWidgets = tester.widgetList<Semantics>(
+      find.byType(Semantics),
+    );
     final matching = semanticsWidgets
         .where((s) => s.properties.label == 'accessible label')
         .toList();
@@ -67,14 +65,13 @@ void main() {
   // ── selectable ────────────────────────────────────────────────────────────
 
   testWidgets('selectable wraps in SelectableRegion', (tester) async {
-    await tester.pumpObers(
-      const OiLabel('select me', selectable: true),
-    );
+    await tester.pumpObers(const OiLabel('select me', selectable: true));
     expect(find.byType(SelectableRegion), findsOneWidget);
   });
 
-  testWidgets('non-selectable does not wrap in SelectableRegion',
-      (tester) async {
+  testWidgets('non-selectable does not wrap in SelectableRegion', (
+    tester,
+  ) async {
     await tester.pumpObers(const OiLabel('normal text'));
     expect(find.byType(SelectableRegion), findsNothing);
   });
@@ -93,16 +90,16 @@ void main() {
       },
     );
 
-    await tester.pumpObers(
-      const OiLabel('copy me', copyable: true),
-    );
+    await tester.pumpObers(const OiLabel('copy me', copyable: true));
     await tester.tap(find.text('copy me'));
     await tester.pump();
 
     expect(copiedText, 'copy me');
 
-    tester.binding.defaultBinaryMessenger
-        .setMockMethodCallHandler(SystemChannels.platform, null);
+    tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+      SystemChannels.platform,
+      null,
+    );
   });
 
   testWidgets('non-copyable does not copy on tap', (tester) async {
@@ -122,8 +119,10 @@ void main() {
     await tester.pump();
     expect(copiedText, isNull);
 
-    tester.binding.defaultBinaryMessenger
-        .setMockMethodCallHandler(SystemChannels.platform, null);
+    tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+      SystemChannels.platform,
+      null,
+    );
   });
 
   // ── Responsive font scaling ───────────────────────────────────────────────
@@ -179,11 +178,11 @@ void main() {
       });
     }
 
-    testWidgets('body variant does not scale at expanded (900dp)',
-        (tester) async {
+    testWidgets('body variant does not scale at expanded (900dp)', (
+      tester,
+    ) async {
       final theme = OiThemeData.light();
-      final baseSize =
-          theme.textTheme.styleFor(OiLabelVariant.body).fontSize!;
+      final baseSize = theme.textTheme.styleFor(OiLabelVariant.body).fontSize!;
       final size = await resolvedFontSize(tester, OiLabelVariant.body, 900);
       expect(size, closeTo(baseSize, 0.01));
     });

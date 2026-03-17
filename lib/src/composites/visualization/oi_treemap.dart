@@ -73,9 +73,7 @@ class OiTreemap extends StatelessWidget {
     if (nodes.isEmpty) {
       return Semantics(
         label: label,
-        child: const SizedBox.shrink(
-          key: Key('oi_treemap_empty'),
-        ),
+        child: const SizedBox.shrink(key: Key('oi_treemap_empty')),
       );
     }
 
@@ -107,8 +105,8 @@ class OiTreemap extends StatelessWidget {
                     height: rects[i].height,
                     child: _buildNodeWidget(
                       node: nodes[i],
-                      color: nodes[i].color ??
-                          chartColors[i % chartColors.length],
+                      color:
+                          nodes[i].color ?? chartColors[i % chartColors.length],
                       textColor: colors.textOnPrimary,
                       rect: rects[i],
                     ),
@@ -196,13 +194,11 @@ class OiTreemap extends StatelessWidget {
         rects.add(remaining);
       } else if (remaining.width >= remaining.height) {
         // Slice vertically.
-        final w = remaining.width * ratio / _remainingRatio(nodes, i, totalValue);
-        rects.add(Rect.fromLTWH(
-          remaining.left,
-          remaining.top,
-          w,
-          remaining.height,
-        ));
+        final w =
+            remaining.width * ratio / _remainingRatio(nodes, i, totalValue);
+        rects.add(
+          Rect.fromLTWH(remaining.left, remaining.top, w, remaining.height),
+        );
         remaining = Rect.fromLTWH(
           remaining.left + w,
           remaining.top,
@@ -213,12 +209,9 @@ class OiTreemap extends StatelessWidget {
         // Slice horizontally.
         final h =
             remaining.height * ratio / _remainingRatio(nodes, i, totalValue);
-        rects.add(Rect.fromLTWH(
-          remaining.left,
-          remaining.top,
-          remaining.width,
-          h,
-        ));
+        rects.add(
+          Rect.fromLTWH(remaining.left, remaining.top, remaining.width, h),
+        );
         remaining = Rect.fromLTWH(
           remaining.left,
           remaining.top + h,

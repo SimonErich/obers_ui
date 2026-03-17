@@ -107,7 +107,7 @@ class OiGantt extends StatefulWidget {
 
   /// Called when a task is moved to a new time range.
   final void Function(OiGanttTask task, DateTime start, DateTime end)?
-      onTaskMove;
+  onTaskMove;
 
   /// Called when a task is resized to a new end date.
   final void Function(OiGanttTask task, DateTime newEnd)? onTaskResize;
@@ -153,9 +153,7 @@ class _OiGanttState extends State<OiGantt> {
     if (widget.viewStart != null) return _dateOnly(widget.viewStart!);
     if (widget.tasks.isEmpty) return _dateOnly(DateTime.now());
     return _dateOnly(
-      widget.tasks
-          .map((t) => t.start)
-          .reduce((a, b) => a.isBefore(b) ? a : b),
+      widget.tasks.map((t) => t.start).reduce((a, b) => a.isBefore(b) ? a : b),
     );
   }
 
@@ -265,7 +263,8 @@ class _OiGanttState extends State<OiGantt> {
                       child: Stack(
                         children: [
                           // Weekend shading.
-                          if (widget.showWeekends) _buildWeekendShading(context),
+                          if (widget.showWeekends)
+                            _buildWeekendShading(context),
                           // Today line.
                           if (widget.showToday) _buildTodayLine(context),
                           // Task bars.
@@ -398,11 +397,7 @@ class _OiGanttState extends State<OiGantt> {
     );
   }
 
-  Widget _buildTimelineRow(
-    BuildContext context,
-    _GanttRow row,
-    int index,
-  ) {
+  Widget _buildTimelineRow(BuildContext context, _GanttRow row, int index) {
     if (row.isHeader) {
       return const SizedBox(height: _rowHeight);
     }
@@ -639,9 +634,7 @@ class _HeaderPainter extends CustomPainter {
       ..color = lineColor
       ..strokeWidth = 0.5;
 
-    final textPainter = TextPainter(
-      textDirection: TextDirection.ltr,
-    );
+    final textPainter = TextPainter(textDirection: TextDirection.ltr);
 
     // Determine label step based on zoom.
     final step = switch (zoom) {
@@ -656,22 +649,14 @@ class _HeaderPainter extends CustomPainter {
       final x = d * columnWidth;
 
       // Vertical grid line.
-      canvas.drawLine(
-        Offset(x, 0),
-        Offset(x, size.height),
-        linePaint,
-      );
+      canvas.drawLine(Offset(x, 0), Offset(x, size.height), linePaint);
 
       // Date label.
       final label = switch (zoom) {
-        OiGanttZoom.day =>
-          '${date.day}/${date.month}',
-        OiGanttZoom.week =>
-          '${date.day}/${date.month}',
-        OiGanttZoom.month =>
-          '${date.month}/${date.year}',
-        OiGanttZoom.quarter =>
-          'Q${((date.month - 1) ~/ 3) + 1} ${date.year}',
+        OiGanttZoom.day => '${date.day}/${date.month}',
+        OiGanttZoom.week => '${date.day}/${date.month}',
+        OiGanttZoom.month => '${date.month}/${date.year}',
+        OiGanttZoom.quarter => 'Q${((date.month - 1) ~/ 3) + 1} ${date.year}',
       };
 
       textPainter
