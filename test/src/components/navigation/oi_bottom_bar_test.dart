@@ -275,6 +275,70 @@ void main() {
     expect(find.text('Profile'), findsOneWidget);
   });
 
+  // ── showDot ────────────────────────────────────────────────────────────────
+
+  testWidgets('showDot=true renders dot for selected item when label hidden',
+      (tester) async {
+    await tester.pumpObers(
+      _wrapMQ(
+        OiBottomBar(
+          items: _kItems,
+          currentIndex: 0,
+          onTap: (_) {},
+          style: OiBottomBarStyle.iconOnly,
+          showDot: true,
+        ),
+        _kCompact,
+      ),
+    );
+    expect(
+      find.byKey(const Key('oi_bottom_bar_dot')),
+      findsOneWidget,
+      reason: 'showDot=true with iconOnly should render a dot for the selected item',
+    );
+  });
+
+  testWidgets('showDot=false renders no dot even for selected item',
+      (tester) async {
+    await tester.pumpObers(
+      _wrapMQ(
+        OiBottomBar(
+          items: _kItems,
+          currentIndex: 0,
+          onTap: (_) {},
+          style: OiBottomBarStyle.iconOnly,
+        ),
+        _kCompact,
+      ),
+    );
+    expect(
+      find.byKey(const Key('oi_bottom_bar_dot')),
+      findsNothing,
+      reason: 'showDot=false (default) should not render any dot',
+    );
+  });
+
+  testWidgets('showDot=true with labels visible does not render dot',
+      (tester) async {
+    // Dot is only shown when the label is not visible (i.e. iconOnly / showLabels=false).
+    await tester.pumpObers(
+      _wrapMQ(
+        OiBottomBar(
+          items: _kItems,
+          currentIndex: 0,
+          onTap: (_) {},
+          showDot: true,
+        ),
+        _kCompact,
+      ),
+    );
+    expect(
+      find.byKey(const Key('oi_bottom_bar_dot')),
+      findsNothing,
+      reason: 'dot should not appear when labels are already shown',
+    );
+  });
+
   // ── showLabels override ────────────────────────────────────────────────────
 
   testWidgets('showLabels=false hides labels regardless of fixed style',
@@ -470,6 +534,7 @@ void main() {
     );
     await tester.tap(find.text('Search'));
     await tester.pump();
+    await tester.pump(); // drain chained async awaits in HapticFeedback
 
     expect(
       log.any((call) => call.method == 'HapticFeedback.selectionClick'),

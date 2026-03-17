@@ -112,6 +112,7 @@ class OiBottomBar extends StatelessWidget {
     this.floatingAction,
     this.showLabels = true,
     this.haptic = false,
+    this.showDot = false,
     this.showOnMedium = false,
     this.landscapeMode = OiBottomBarLandscapeMode.compact,
     super.key,
@@ -142,6 +143,11 @@ class OiBottomBar extends StatelessWidget {
 
   /// When `true`, triggers a haptic selection feedback on every tap.
   final bool haptic;
+
+  /// When `true`, shows a small dot indicator below the selected item's icon.
+  ///
+  /// Defaults to `false`.
+  final bool showDot;
 
   /// Whether the bar should also appear on medium breakpoints.
   ///
@@ -319,9 +325,27 @@ class OiBottomBar extends StatelessWidget {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
+            ] else if (showDot && isSelected) ...[
+              const SizedBox(height: 4),
+              _buildDot(context),
             ],
           ],
         ),
+      ),
+    );
+  }
+
+  // ── Selection dot indicator ───────────────────────────────────────────────
+
+  Widget _buildDot(BuildContext context) {
+    final colors = context.colors;
+    return Container(
+      key: const Key('oi_bottom_bar_dot'),
+      width: 4,
+      height: 4,
+      decoration: BoxDecoration(
+        color: colors.primary.base,
+        shape: BoxShape.circle,
       ),
     );
   }
