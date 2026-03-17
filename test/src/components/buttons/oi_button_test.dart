@@ -1,5 +1,6 @@
 // Tests do not require documentation comments.
 // ignore_for_file: public_member_api_docs
+// REQ-0019: OiButton accessibility enforcement tests.
 
 import 'dart:ui';
 

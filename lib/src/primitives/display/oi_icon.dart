@@ -7,8 +7,9 @@ import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 /// [OiIcon] wraps an [IconData] with an [Icon] widget and adds a
 /// [Semantics] node so that screen readers can announce the icon's purpose.
 ///
-/// Use [OiIcon.decorative] for purely decorative icons that should be
-/// excluded from the accessibility tree.
+/// **Accessibility (REQ-0020):** [label] is required so every meaningful icon
+/// has an accessible description. Use [OiIcon.decorative] for purely decorative
+/// icons that should be excluded from the accessibility tree.
 ///
 /// The [size] defaults to the body font size from the active theme when not
 /// supplied.

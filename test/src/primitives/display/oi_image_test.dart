@@ -1,5 +1,6 @@
 // Tests do not require documentation comments.
 // ignore_for_file: public_member_api_docs
+// REQ-0018: OiImage accessibility enforcement tests.
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';

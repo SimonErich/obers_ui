@@ -70,6 +70,11 @@ enum _OiButtonKind { standard, icon, split, countdown, confirm }
 /// - [OiButton.countdown] — auto-enables after a timer expires.
 /// - [OiButton.confirm] — requires a second tap to confirm a destructive action.
 ///
+/// **Accessibility (REQ-0019):** Every named constructor (including
+/// [OiButton.icon]) requires a `label` parameter. For [OiButton.icon] the
+/// label is mapped to [Semantics.label] so that icon-only buttons remain
+/// accessible to screen readers.
+///
 /// Uses [OiTappable] as the interaction layer; respects [OiDensityScope] for
 /// size calculations and reads all colours, spacing, and radii from the nearest
 /// [OiTheme].

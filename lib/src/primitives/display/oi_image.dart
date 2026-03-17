@@ -13,7 +13,9 @@ import 'package:flutter/widgets.dart';
 ///   metadata; full viewport-based lazy loading requires additional
 ///   infrastructure that ships in a later phase).
 ///
-/// Use [OiImage.decorative] for purely decorative images that should be
+/// **Accessibility (REQ-0018):** [alt] is required so every meaningful image
+/// has an accessible description announced by screen readers. Use
+/// [OiImage.decorative] for purely decorative images that should be
 /// excluded from the accessibility tree.
 ///
 /// {@category Primitives}

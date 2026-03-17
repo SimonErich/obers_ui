@@ -1,0 +1,672 @@
+{
+  "id": "REQ-0131",
+  "title": "Tier 2 > OiGantt: Gantt chart with drag, dependencies, and zoom",
+  "text": "OiGantt renders tasks as horizontal bars on a timeline axis with a pinned label column. Users can drag-to-move and drag-to-resize bars on pointer devices; on touch, dragging is disabled and tapping a bar opens a detail bottom sheet. Task dependencies are drawn as arrows between bars using CustomPainter. The chart supports zoom levels of day, week, month, and quarter, a today line, weekend shading, and row grouping. On compact breakpoints the label column remains pinned and the chart scrolls horizontally; a vertical layout option stacks the label list above a condensed timeline on compact.",
+  "type": "functional",
+  "priority": "must",
+  "tags": ["gantt", "chart", "timeline", "drag", "dependencies", "zoom", "responsive", "CustomPainter"],
+  "acceptanceHints": [
+    "Drag-to-move and drag-to-resize work on pointer; tap on touch opens detail sheet without moving bar",
+    "Dependency arrows are drawn correctly and update position when a bar is moved",
+    "Switching zoom levels (day/week/month/quarter) re-renders the timeline axis and bar widths correctly",
+    "Label column remains pinned and visible during horizontal scroll on compact breakpoint"
+  ]
+},
+{
+  "id": "REQ-0132",
+  "title": "Tier 2 > OiCalendar: Day/week/month calendar with event management",
+  "text": "OiCalendar renders events on a calendar grid in day, week, or month views, with multi-day events spanning across cells. On pointer devices users can drag-to-move and drag-to-resize events, and drag on an empty cell to create a new event; on touch, event drag is initiated via long-press and drag-to-create is not available. Tapping an event opens a detail callback or overlay. Default view adapts by breakpoint: day on compact, week on medium, full week or month on expanded. All event operations call provided callbacks so the host manages state.",
+  "type": "functional",
+  "priority": "must",
+  "tags": ["calendar", "events", "drag", "responsive", "day-view", "week-view", "month-view"],
+  "acceptanceHints": [
+    "On pointer: drag-to-move, drag-to-resize, and drag-to-create all fire correct callbacks",
+    "On touch: long-press initiates event drag; drag-to-create gesture is absent",
+    "Default view is day on compact, week on medium, and full week/month on expanded",
+    "Multi-day events span the correct number of cells and are visually continuous"
+  ]
+},
+{
+  "id": "REQ-0133",
+  "title": "Tier 2 > OiTimeline: Vertical chronological timeline",
+  "text": "OiTimeline renders a vertical list of events each with a timestamp, title, optional description, icon, and color token. A vertical line and event dots are drawn via CustomPainter to connect entries. Events can be organized into collapsible sections. On compact breakpoints the alternating left-right layout is disabled and all content is rendered in a single left-aligned column. The component is purely presentational; event tap callbacks are forwarded to the host.",
+  "type": "functional",
+  "priority": "must",
+  "tags": ["timeline", "chronological", "CustomPainter", "collapsible", "responsive"],
+  "acceptanceHints": [
+    "Vertical line and dots are rendered by CustomPainter and align correctly with event rows",
+    "Collapsible sections expand and collapse, toggling visibility of child events",
+    "On compact breakpoints the alternating layout is replaced by a single left-aligned column",
+    "Timestamp, title, description, icon, and color are all rendered when provided"
+  ]
+},
+{
+  "id": "REQ-0134",
+  "title": "Tier 2 > OiFlowGraph: Interactive node-edge graph editor",
+  "text": "OiFlowGraph provides a canvas for editing directed graphs: nodes can be dragged on pointer (long-press on touch), ports can be dragged to create edges (long-press port on touch), edges can be deleted, and the canvas supports zoom and pan via OiPinchZoom. Edges and the optional snap-to-grid are rendered with CustomPainter. OiContextMenu is shown on right-click or long-press on nodes. On touch, visible zoom +/- buttons are displayed and a mini-map overlay is shown on compact. The implementation must maintain less than 16 ms frame time with 500 nodes and 1000 edges.",
+  "type": "functional",
+  "priority": "must",
+  "tags": ["graph", "node-edge", "drag", "CustomPainter", "zoom", "pan", "context-menu", "performance"],
+  "acceptanceHints": [
+    "Dragging a node on pointer moves it; long-press initiates drag on touch",
+    "Dragging from a port on pointer or long-press on touch creates a new edge routed by CustomPainter",
+    "OiContextMenu appears on right-click (pointer) and long-press (touch) on nodes",
+    "500-node 1000-edge graph maintains sub-16ms frame time in performance benchmark"
+  ]
+},
+{
+  "id": "REQ-0135",
+  "title": "Tier 2 > OiStateDiagram: State machine visualization",
+  "text": "OiStateDiagram extends OiFlowGraph to visualize finite state machines: states are rendered as rounded rectangular nodes and transitions as labeled curved arrows. The component supports both read-only and editable modes controlled by a prop. The currently active state is highlighted using a distinct color token. All graph editing interactions from OiFlowGraph are available in editable mode and suppressed in read-only mode.",
+  "type": "functional",
+  "priority": "should",
+  "tags": ["state-machine", "diagram", "OiFlowGraph", "read-only", "editable", "highlight"],
+  "acceptanceHints": [
+    "States render as rounded nodes; transitions render as labeled arrows",
+    "currentState prop highlights the matching node with a distinct color token",
+    "In read-only mode all drag and edit interactions are disabled",
+    "In editable mode all OiFlowGraph interactions (move, add edge, context menu) are functional"
+  ]
+},
+{
+  "id": "REQ-0136",
+  "title": "Tier 2 > OiPipeline: Linear pipeline stage visualization",
+  "text": "OiPipeline renders a linear sequence of stage cards connected by directional arrows. Each stage exposes an OiPipelineStatus value from the enum (pending, running, completed, failed, skipped) which drives the card's color and icon. On compact breakpoints the layout switches from horizontal to vertical, and stage cards expand to full width. Stage cards accept a tap callback for drill-down.",
+  "type": "functional",
+  "priority": "must",
+  "tags": ["pipeline", "stages", "status", "responsive", "OiPipelineStatus"],
+  "acceptanceHints": [
+    "OiPipelineStatus enum values (pending/running/completed/failed/skipped) each render a distinct color and icon",
+    "Arrows between stage cards are present and directional",
+    "On compact breakpoint the layout is vertical and stage cards are full-width",
+    "Tapping a stage card fires the provided onTap callback"
+  ]
+},
+{
+  "id": "REQ-0137",
+  "title": "Tier 2 > OiHeatmap: Heatmap grid visualization",
+  "text": "OiHeatmap renders a two-dimensional grid of colored cells where each cell's color encodes a numeric value using a configurable color scale. The grid is drawn via CustomPainter, and cell sizing is computed responsively via LayoutBuilder. Hovering a cell on pointer or tapping on touch shows a tooltip with the cell's value. A legend is displayed below the chart on compact and alongside on expanded. The minimum viable rendering size is 200 by 150 dp; below this size an informational placeholder is shown.",
+  "type": "functional",
+  "priority": "must",
+  "tags": ["heatmap", "CustomPainter", "tooltip", "legend", "responsive", "LayoutBuilder"],
+  "acceptanceHints": [
+    "CustomPainter renders a grid where each cell color corresponds to its value within the color scale",
+    "Hover on pointer and tap on touch both reveal a tooltip showing the cell value",
+    "Legend renders below the chart on compact and alongside on expanded",
+    "Below 200x150dp a placeholder is shown instead of an incomplete grid"
+  ]
+},
+{
+  "id": "REQ-0138",
+  "title": "Tier 2 > OiTreemap: Treemap nested rectangle visualization",
+  "text": "OiTreemap renders hierarchical data as nested labeled rectangles sized proportionally to their value using CustomPainter. Hovering or tapping a rectangle shows a tooltip with the node's label and value. A legend is provided for category differentiation. When the widget's available size falls below a minimum viable threshold, a 'View full screen' button is displayed instead of a partial treemap.",
+  "type": "functional",
+  "priority": "should",
+  "tags": ["treemap", "CustomPainter", "tooltip", "legend", "responsive", "full-screen"],
+  "acceptanceHints": [
+    "Rectangle areas are proportional to data values and nested rectangles are contained within parents",
+    "Hover on pointer and tap on touch show a tooltip with label and value",
+    "Legend correctly maps colors to categories",
+    "Below minimum viable size a 'View full screen' button is displayed"
+  ]
+},
+{
+  "id": "REQ-0139",
+  "title": "Tier 2 > OiSankey: Sankey flow diagram",
+  "text": "OiSankey renders directed flows between source and target nodes using curved bands whose width represents flow magnitude, drawn entirely via CustomPainter. Hovering or tapping a flow band shows the flow value as a tooltip. On mobile, visual detail is reduced (thinner bands, simplified labels) to remain legible at smaller sizes. A minimum viable size is enforced and a placeholder shown if the widget is smaller.",
+  "type": "functional",
+  "priority": "should",
+  "tags": ["sankey", "flow-diagram", "CustomPainter", "tooltip", "responsive"],
+  "acceptanceHints": [
+    "Flow band widths are proportional to flow values and connect correct source-target pairs",
+    "Hover on pointer and tap on touch reveal a tooltip with the flow value",
+    "On mobile breakpoints reduced detail mode reduces band complexity and label density",
+    "Below minimum viable size a placeholder is shown"
+  ]
+},
+{
+  "id": "REQ-0140",
+  "title": "Tier 2 > OiRadarChart: Radar/spider chart",
+  "text": "OiRadarChart draws a multi-axis radar chart using CustomPainter, rendering evenly-spaced axes radiating from the center, polygonal grid lines, and filled data areas. Each data point axis label is shown on hover or tap. Multiple data series are supported with distinct fill colors and a legend. On compact breakpoints the legend moves below the chart. The minimum viable rendering size is 200 dp diameter; below this size a placeholder is shown.",
+  "type": "functional",
+  "priority": "should",
+  "tags": ["radar-chart", "spider-chart", "CustomPainter", "tooltip", "legend", "responsive"],
+  "acceptanceHints": [
+    "CustomPainter draws axes, grid polygon, and filled data area for each series",
+    "Hover on pointer and tap on touch reveal the axis label and value for the nearest data point",
+    "Legend renders below chart on compact and alongside on expanded",
+    "Below 200dp minimum size a placeholder is rendered"
+  ]
+},
+{
+  "id": "REQ-0141",
+  "title": "Tier 2 > OiFunnelChart: Funnel/conversion visualization",
+  "text": "OiFunnelChart renders a funnel with configurable stepped or sloped geometry using CustomPainter, where each segment's width represents a proportional value. Hovering or tapping a segment shows a tooltip with its label and value. A legend maps segment colors to labels. A minimum viable size is enforced and a placeholder shown below it.",
+  "type": "functional",
+  "priority": "should",
+  "tags": ["funnel-chart", "CustomPainter", "tooltip", "legend", "responsive"],
+  "acceptanceHints": [
+    "Segment widths are proportional to their values in both stepped and sloped modes",
+    "Hover on pointer and tap on touch show a tooltip with segment label and value",
+    "Legend renders and correctly maps colors to segment labels",
+    "Below minimum viable size a placeholder is shown"
+  ]
+},
+{
+  "id": "REQ-0142",
+  "title": "Tier 2 > OiGauge: Gauge/dial visualization",
+  "text": "OiGauge renders a circular arc dial using CustomPainter, with colored zone segments defined via a list of OiGaugeSegment objects each specifying start value, end value, and color token. A current value indicator needle or arc fill is drawn within the appropriate zone. An optional target marker line is drawn at the target value. A formatted value label is displayed at the center using a formatValue callback. The minimum rendering size is 120 dp; below this size a placeholder is shown.",
+  "type": "functional",
+  "priority": "should",
+  "tags": ["gauge", "dial", "CustomPainter", "OiGaugeSegment", "responsive"],
+  "acceptanceHints": [
+    "OiGaugeSegment color zones are rendered as distinct arc segments covering the correct angular range",
+    "Current value indicator and formatted center label update reactively when value prop changes",
+    "Target marker is drawn at the correct position when targetValue is provided",
+    "Below 120dp minimum size a placeholder is shown"
+  ]
+},
+{
+  "id": "REQ-0143",
+  "title": "Tier 2 > OiLightbox: Full-screen image viewer",
+  "text": "OiLightbox opens images in a full-screen overlay with OiPinchZoom for zoom/pan. On touch, swiping left or right navigates between images and swiping down dismisses the lightbox. On pointer, left and right arrow buttons navigate between images and ESC closes the overlay. A thumbnail strip is shown at the bottom on expanded; on compact it is hidden and replaced by an N-of-M counter. Image captions are displayed when provided. OiFocusTrap keeps keyboard focus within the lightbox.",
+  "type": "functional",
+  "priority": "must",
+  "tags": ["lightbox", "image-viewer", "OiPinchZoom", "OiFocusTrap", "responsive", "swipe"],
+  "acceptanceHints": [
+    "Swipe left/right navigates; swipe down dismisses on touch",
+    "Arrow buttons navigate and ESC closes on pointer",
+    "Thumbnail strip visible on expanded; N-of-M counter shown on compact",
+    "OiFocusTrap prevents Tab key from leaving the lightbox overlay"
+  ]
+},
+{
+  "id": "REQ-0144",
+  "title": "Tier 2 > OiImageCropper: Image crop tool",
+  "text": "OiImageCropper provides an interactive image cropping interface using OiPinchZoom to reposition and scale the image under a crop mask drawn via CustomPainter. Users can select from preset aspect ratios or free-form crop, and rotate or flip the image. Crop handle touch targets are a minimum of 48 dp. On compact breakpoints the cropper occupies full-screen. The cropper is opened inside an OiDialog and returns the cropped image data via a completion callback.",
+  "type": "functional",
+  "priority": "should",
+  "tags": ["image-cropper", "OiPinchZoom", "CustomPainter", "aspect-ratio", "rotate", "flip", "OiDialog"],
+  "acceptanceHints": [
+    "OiPinchZoom repositions and scales the image under the crop mask correctly",
+    "Aspect-ratio presets constrain the crop mask; free-form allows arbitrary selection",
+    "Crop handles measure at least 48dp on all sides",
+    "On compact the cropper opens full-screen; on expanded it opens inside OiDialog"
+  ]
+},
+{
+  "id": "REQ-0145",
+  "title": "Tier 2 > OiGallery: Media gallery grid with selection and upload",
+  "text": "OiGallery renders media thumbnails in a responsive grid using OiVirtualGrid with OiImage for each thumbnail. Tapping a thumbnail opens OiLightbox. Selection mode is entered via long-press on touch or by hovering to reveal a checkbox on pointer; selected items expose bulk action callbacks. An upload drop zone is integrated and on mobile devices the upload action offers the camera as an option for image types. The number of columns adapts: 2 on compact, 3 on medium, and 4 or more on expanded.",
+  "type": "functional",
+  "priority": "must",
+  "tags": ["gallery", "OiVirtualGrid", "OiImage", "OiLightbox", "selection", "upload", "responsive"],
+  "acceptanceHints": [
+    "Column count is 2 on compact, 3 on medium, 4+ on expanded",
+    "Long-press on touch enters selection mode; hover reveals checkbox on pointer",
+    "Upload action includes camera option on mobile for image MIME types",
+    "Tapping a thumbnail opens OiLightbox at the correct index"
+  ]
+},
+{
+  "id": "REQ-0146",
+  "title": "Tier 2 > OiVideoPlayer: Video player with adaptive controls",
+  "text": "OiVideoPlayer renders a video with an overlay control bar containing play/pause, a progress OiSlider, current and total time labels, volume, and a fullscreen toggle. On touch devices the controls overlay auto-hides after 3 seconds and reappears on tap; on pointer devices the controls show on hover. The default aspect ratio is 16:9 on expanded and fit-to-width on compact. Entering fullscreen on compact switches to landscape orientation. The fullscreen state calls a provided callback to allow the host to manage system UI chrome.",
+  "type": "functional",
+  "priority": "must",
+  "tags": ["video-player", "controls", "OiSlider", "fullscreen", "responsive", "auto-hide"],
+  "acceptanceHints": [
+    "Controls auto-hide after 3s on touch and reappear on tap; controls show on hover on pointer",
+    "Progress OiSlider seek updates playback position correctly",
+    "On compact the video fills the full width; on expanded it maintains 16:9 ratio",
+    "Fullscreen on compact triggers landscape orientation and the onFullscreen callback"
+  ]
+},
+{
+  "id": "REQ-0147",
+  "title": "Tier 3 Module > OiListView: Complete list screen module",
+  "text": "OiListView is a full-featured list screen composite providing search, an OiFilterBar, sort controls, OiSelectionMode with a bulk action bar, and a layout switcher between list, grid, and table views backed by OiVirtualList or OiInfiniteScroll. Empty and loading states are built in, and a headerActions slot is provided. On compact the layout is forced to list, the filter bar collapses to a bottom sheet, selection bulk actions appear in a sticky bottom bar, and pull-to-refresh is enabled via onRefresh.",
+  "type": "functional",
+  "priority": "must",
+  "tags": ["list-module", "OiFilterBar", "OiSelectionMode", "OiVirtualList", "OiInfiniteScroll", "responsive", "pull-to-refresh"],
+  "acceptanceHints": [
+    "Layout switcher cycles between list, grid, and table views; on compact only list is available",
+    "OiFilterBar collapses to a bottom sheet on compact",
+    "Bulk action bar appears in a sticky bottom bar when items are selected on compact",
+    "onRefresh triggers pull-to-refresh on touch; the gesture is absent on pointer"
+  ]
+},
+{
+  "id": "REQ-0148",
+  "title": "Tier 3 Module > OiKanban: Kanban board with cross-column drag",
+  "text": "OiKanban<T> renders a multi-column Kanban board where cards within a column are ordered via OiReorderable and can be moved between columns using OiDraggable and OiDropZone. Columns support WIP limits shown as count badges. Cards support quick inline title editing and columns can be collapsed. New columns and cards can be added via action buttons. On compact a single column is visible at a time with horizontal swipe to navigate between columns. Card drag is initiated via long-press on touch.",
+  "type": "functional",
+  "priority": "must",
+  "tags": ["kanban", "OiDraggable", "OiDropZone", "OiReorderable", "WIP", "responsive", "long-press"],
+  "acceptanceHints": [
+    "Cards can be dragged between columns on pointer; long-press initiates drag on touch",
+    "WIP limit badge is shown on columns; exceeding the limit renders a visual warning state",
+    "On compact, only one column is visible and horizontal swipe navigates between columns",
+    "Inline quick-edit updates the card title and fires the provided onCardUpdate callback"
+  ]
+},
+{
+  "id": "REQ-0149",
+  "title": "Tier 3 Module > OiChat: Chat interface module",
+  "text": "OiChat renders a reverse-scroll message list using OiVirtualList with OiInfiniteScroll loading older messages at the top. Each message renders in a bubble with avatar, timestamp, and an OiReactionBar. An OiTypingIndicator is shown when active. The compose bar supports rich text or plain text input, send, attach, and emoji actions, and is positioned above the keyboard on mobile. On touch, long-pressing a message reveals action options and swiping right initiates a reply.",
+  "type": "functional",
+  "priority": "must",
+  "tags": ["chat", "OiVirtualList", "OiInfiniteScroll", "OiReactionBar", "OiTypingIndicator", "compose-bar", "responsive"],
+  "acceptanceHints": [
+    "OiInfiniteScroll loads older messages when scrolling to the top of the list",
+    "OiTypingIndicator renders and hides correctly based on the isTyping prop",
+    "Long-press on a message reveals action sheet on touch; context menu on pointer",
+    "Compose bar is positioned above the software keyboard on mobile when focused"
+  ]
+},
+{
+  "id": "REQ-0150",
+  "title": "Tier 3 Module > OiNotificationCenter: Notification panel module",
+  "text": "OiNotificationCenter displays notifications grouped by time (today, yesterday, earlier) with unread items styled in bold with a dot indicator. Tapping a notification marks it as read; on touch swiping dismisses or snoozes it, and on pointer hovering reveals dismiss/snooze actions. A mark-all-read action clears all unread states. New notifications are inserted with OiAnimatedList and a badge count reflects the total unread. On compact the panel is full-screen; on expanded it renders as a popover or side panel.",
+  "type": "functional",
+  "priority": "must",
+  "tags": ["notifications", "OiAnimatedList", "badge", "responsive", "swipe-to-dismiss", "grouped"],
+  "acceptanceHints": [
+    "Unread notifications render bold with a dot; tapping marks them as read",
+    "Swipe-to-dismiss fires the onDismiss callback on touch; hover-reveal actions do so on pointer",
+    "OiAnimatedList animates new notification insertion in real time",
+    "On compact the panel is full-screen; on expanded it renders as popover or panel"
+  ]
+},
+{
+  "id": "REQ-0151",
+  "title": "Tier 3 Module > OiDashboard: Draggable/resizable widget grid module",
+  "text": "OiDashboard renders a configurable grid of widget cards using OiGrid, OiResizable, and OiReorderable. Each card exposes columnSpan and rowSpan properties. An edit mode allows users to resize and reorder cards; on touch, long-press enters a jiggle mode analogous to iOS home screen editing. On compact the layout is forced to a single column and drag is disabled; cards use preset sizes determined by their span configuration. Cards animate in using OiStagger.",
+  "type": "functional",
+  "priority": "must",
+  "tags": ["dashboard", "OiGrid", "OiResizable", "OiReorderable", "OiStagger", "responsive", "jiggle-mode"],
+  "acceptanceHints": [
+    "In edit mode on pointer, cards can be dragged to reorder and handles allow resize",
+    "Long-press on touch enters jiggle mode enabling card repositioning",
+    "On compact layout is single-column, drag is disabled, and cards use preset sizes",
+    "OiStagger animates card entry on initial load"
+  ]
+},
+{
+  "id": "REQ-0152",
+  "title": "Tier 3 Module > OiFileManager: File browser module",
+  "text": "OiFileManager provides a file browser with OiBreadcrumbs for path navigation, a search bar, and a list/grid view toggle. OiContextMenu is triggered by right-click on pointer or long-press on touch for file operations. Renaming files uses OiEditableText inline. Files can be dragged to folders on pointer. OiFileInput handles uploads and OiLightbox opens images. Delete shows a confirmation OiDialog. On compact the grid shows 2 columns and breadcrumbs collapse to a back button with the current folder name.",
+  "type": "functional",
+  "priority": "must",
+  "tags": ["file-manager", "OiBreadcrumbs", "OiContextMenu", "OiEditableText", "OiFileInput", "OiLightbox", "responsive"],
+  "acceptanceHints": [
+    "OiContextMenu opens on right-click (pointer) and long-press (touch) with correct file actions",
+    "Inline rename via OiEditableText saves on Enter/confirm and cancels on Escape",
+    "On compact breadcrumbs show only back button + current folder name",
+    "Delete action opens an OiDialog confirmation before calling the onDelete callback"
+  ]
+},
+{
+  "id": "REQ-0153",
+  "title": "Tier 3 Module > OiActivityFeed: Activity feed module",
+  "text": "OiActivityFeed renders a chronological list of activity events using OiVirtualList and OiInfiniteScroll, styled in the manner of OiTimeline. An OiFilterBar allows filtering by event type or date range. Pull-to-refresh is supported on touch via the onRefresh callback. On compact, the filter bar collapses to a bottom sheet triggered by a filter icon button.",
+  "type": "functional",
+  "priority": "should",
+  "tags": ["activity-feed", "OiVirtualList", "OiInfiniteScroll", "OiFilterBar", "OiTimeline", "responsive"],
+  "acceptanceHints": [
+    "OiInfiniteScroll loads additional events when scrolling to the bottom of the list",
+    "OiFilterBar filters the displayed events correctly by type and date range",
+    "Pull-to-refresh triggers onRefresh on touch and is absent on pointer",
+    "On compact the filter bar collapses behind a filter icon opening a bottom sheet"
+  ]
+},
+{
+  "id": "REQ-0154",
+  "title": "Tier 3 Module > OiMetadataEditor: Key-value metadata editor module",
+  "text": "OiMetadataEditor renders an editable list of key-value metadata fields where fields can be added, removed, and reordered via OiReorderable. Each field exposes a type selector using OiSelect (string, number, boolean, date, etc.) and an OiEditable value input appropriate to the selected type. On compact the layout stacks the label and value vertically. On expanded a two-column label:value layout is used. Changes are emitted via an onChange callback with the full updated metadata array.",
+  "type": "functional",
+  "priority": "should",
+  "tags": ["metadata-editor", "OiReorderable", "OiSelect", "OiEditable", "responsive", "key-value"],
+  "acceptanceHints": [
+    "Fields can be added, deleted, and reordered; reorder via OiReorderable fires onChange",
+    "Type selector via OiSelect changes the value input widget to match the selected type",
+    "On compact the layout is vertically stacked; on expanded it is two-column",
+    "onChange is called with the full updated metadata array after any modification"
+  ]
+},
+{
+  "id": "REQ-0155",
+  "title": "Tier 3 Module > OiComments: Threaded comment system module",
+  "text": "OiComments renders a threaded comment list using OiVirtualList with nested reply indentation. Each comment supports OiEditableText for inline editing, OiReactionBar for emoji reactions, and a delete action guarded by an OiDialog confirmation. On compact, indentation is capped at 3 visible nesting levels at 8 dp each, and deeply nested threads show a 'View N more replies' collapse toggle. A compose bar is pinned at the bottom. Long-pressing a comment reveals action options on touch.",
+  "type": "functional",
+  "priority": "should",
+  "tags": ["comments", "threaded", "OiVirtualList", "OiEditableText", "OiReactionBar", "OiDialog", "responsive"],
+  "acceptanceHints": [
+    "Reply indentation renders correctly up to 3 visible levels on compact with collapse toggle beyond",
+    "Inline edit via OiEditableText saves on confirm and fires onEditComment callback",
+    "Delete fires onDeleteComment only after OiDialog confirmation",
+    "Long-press on touch reveals an action sheet; right-click on pointer shows OiContextMenu"
+  ]
+},
+{
+  "id": "REQ-0156",
+  "title": "Tier 3 Module > OiPermissions: Role-based permission matrix editor module",
+  "text": "OiPermissions renders a permission matrix mapping roles to permission flags. On expanded breakpoints the matrix is displayed as an OiTable with OiCheckbox cells at each intersection. On compact breakpoints the layout switches to a card-per-role view with a vertical checkbox list for that role's permissions. Role management (add/rename/delete role) is handled via OiSelect and inline editing. Changes emit callbacks for each permission toggle.",
+  "type": "functional",
+  "priority": "should",
+  "tags": ["permissions", "role-based", "OiTable", "OiCheckbox", "OiSelect", "responsive"],
+  "acceptanceHints": [
+    "On expanded an OiTable renders all roles as columns and permissions as rows with OiCheckbox cells",
+    "On compact each role renders as a card with a vertical checkbox list for its permissions",
+    "Toggling a checkbox fires the onPermissionChange callback with role, permission, and new value",
+    "Role management via OiSelect and inline editing adds, renames, or deletes roles correctly"
+  ]
+},
+{
+  "id": "REQ-0157",
+  "title": "Theme Tooling > OiDynamicTheme: Brand-color theme generation",
+  "text": "OiDynamicTheme exposes OiThemeData.fromBrand which accepts a single brand Color, an optional Brightness, an optional fontFamily string, and an optional OiRadiusPreference. The function derives all color tokens algorithmically from the brand color using luminance, saturation, and contrast rules, selecting appropriate surface, on-surface, primary, secondary, and semantic colors. The returned OiThemeData has every field populated and passes the same validation as a manually authored theme. The algorithm must produce WCAG AA contrast ratios for all foreground-on-background pairs.",
+  "type": "functional",
+  "priority": "must",
+  "tags": ["theme", "dynamic-theme", "OiThemeData", "brand-color", "WCAG", "contrast"],
+  "acceptanceHints": [
+    "OiThemeData.fromBrand returns a fully populated OiThemeData with no null required fields",
+    "Generated theme passes WCAG AA contrast ratio check for all foreground-on-background color pairs",
+    "OiRadiusPreference prop adjusts border radius tokens across the generated theme",
+    "fromBrand output passes OiThemeData field validation without errors"
+  ]
+},
+{
+  "id": "REQ-0158",
+  "title": "Theme Tooling > OiThemePreview: Theme audit gallery widget",
+  "text": "OiThemePreview is a read-only widget that renders a gallery of all Tier 2 component variants using the OiThemeData passed as a prop. It is intended for visual auditing and design review, not for production use within application UIs. Every component variant is rendered in its default state with realistic placeholder content. The gallery is scrollable and organized by component category. No interactions that mutate state are exposed.",
+  "type": "functional",
+  "priority": "should",
+  "tags": ["theme-preview", "OiThemeData", "gallery", "audit", "read-only"],
+  "acceptanceHints": [
+    "All Tier 2 component variants are rendered within the gallery without errors",
+    "Passing a different OiThemeData prop causes the gallery to re-render in the new theme",
+    "No interactive controls that mutate external state are present in the gallery",
+    "The gallery is scrollable and components are grouped by category"
+  ]
+},
+{
+  "id": "REQ-0159",
+  "title": "Theme Tooling > OiThemeExporter: Theme serialization utility",
+  "text": "OiThemeExporter is a static utility class providing three methods: toJson(OiThemeData) returning a JSON string, toDart(OiThemeData) returning a valid Dart source string that reconstructs the theme, and fromJson(String) returning an OiThemeData. A full roundtrip through toJson then fromJson must produce a structurally equal OiThemeData. The generated Dart code from toDart must be valid and compilable.",
+  "type": "functional",
+  "priority": "must",
+  "tags": ["theme-exporter", "serialization", "JSON", "Dart-codegen", "roundtrip", "OiThemeData"],
+  "acceptanceHints": [
+    "toJson then fromJson roundtrip produces a structurally equal OiThemeData",
+    "fromJson throws a descriptive error on malformed or missing required fields",
+    "toDart output is valid Dart source that compiles without errors",
+    "All color, typography, spacing, and radius tokens survive the roundtrip without loss"
+  ]
+},
+{
+  "id": "REQ-0160",
+  "title": "Theme Tooling > OiPlayground: Storybook-like example app",
+  "text": "OiPlayground ships as the example/ application within the repository and is not a library widget. It provides a storybook-like interface to browse every component, toggle all props via generated controls, switch between themes, and view the component's source file. It is the canonical reference for verifying component behavior during development. The playground is not exported from the obers_ui package.",
+  "type": "constraint",
+  "priority": "must",
+  "tags": ["playground", "example-app", "storybook", "dev-tooling", "not-exported"],
+  "acceptanceHints": [
+    "Every library component appears in the playground component list",
+    "Prop controls allow toggling all documented props and the component re-renders reactively",
+    "Theme switcher applies different OiThemeData instances to the component preview",
+    "OiPlayground is not importable from the obers_ui package barrel export"
+  ]
+},
+{
+  "id": "REQ-0161",
+  "title": "Responsive > OiPerformanceConfig: Performance tier system",
+  "text": "OiPerformanceConfig defines a performance tier enum with values auto, full, reduced, and minimal. Each tier controls boolean flags: disableBlur, disableShadows, reduceAnimations, disableHalo, and an animationScale multiplier. In auto mode the system detects available RAM and display refresh rate to select an appropriate tier. This system is distinct from the accessibility reducedMotion setting: animations still play in reduced tier but with shorter durations via animationScale. OiPerformanceConfig is injected by OiApp and accessible via an InheritedWidget.",
+  "type": "functional",
+  "priority": "must",
+  "tags": ["performance", "OiPerformanceConfig", "animation", "blur", "shadow", "responsive", "OiApp"],
+  "acceptanceHints": [
+    "In minimal tier all blur, shadow, and halo effects are disabled across all components",
+    "animationScale in reduced tier shortens animation durations without fully disabling them",
+    "auto tier detects device capability and selects an appropriate tier without crashing on all platforms",
+    "OiPerformanceConfig is accessible via context lookup from any descendant widget"
+  ]
+},
+{
+  "id": "REQ-0162",
+  "title": "Responsive > OiDensity: Comfortable/compact/dense density modes",
+  "text": "OiDensity is an enum with values comfortable, compact, and dense that controls the height and padding of interactive components including button height, input height, list tile height, table row height, icon size, and component padding. The default density is comfortable on touch input devices and compact on pointer input devices. The dense value may further reduce sizes but must never reduce touch targets below 44 dp on any density level. OiDensity is injected via OiApp and readable via context.",
+  "type": "functional",
+  "priority": "must",
+  "tags": ["density", "OiDensity", "touch-target", "spacing", "responsive", "OiApp"],
+  "acceptanceHints": [
+    "Switching OiDensity to dense visibly reduces button height, input height, and list tile height",
+    "Touch targets never fall below 44dp in any density mode",
+    "Default density resolves to comfortable on touch and compact on pointer",
+    "OiDensity value is readable via context from any descendant widget"
+  ]
+},
+{
+  "id": "REQ-0163",
+  "title": "Responsive > Platform-adaptive scrollbar: Global scrollbar behavior rule",
+  "text": "All scrollable widgets in obers_ui use OiScrollbar which applies platform-adaptive rendering: on touch devices a thin 3 dp overlay scrollbar fades out after 1.5 seconds of inactivity; on pointer devices an 8 dp scrollbar with a visible track expands to 12 dp on hover, supports click-to-jump on the track, and supports thumb drag. The native platform scrollbar is suppressed in all cases. This rule applies to every scroll primitive in the library.",
+  "type": "functional",
+  "priority": "must",
+  "tags": ["scrollbar", "OiScrollbar", "responsive", "touch", "pointer", "hover", "global-rule"],
+  "acceptanceHints": [
+    "On touch the scrollbar is 3dp and fades after 1.5s of inactivity",
+    "On pointer the scrollbar is 8dp, expands to 12dp on hover, and supports track-click-to-jump",
+    "Native platform scrollbar is suppressed so only OiScrollbar is visible",
+    "OiScrollbar is applied to every scroll primitive widget in the library"
+  ]
+},
+{
+  "id": "REQ-0164",
+  "title": "Responsive > Pull-to-refresh: Global pull-to-refresh rule",
+  "text": "All scrollable list widgets in obers_ui support an onRefresh callback that activates pull-to-refresh on touch devices when the list is pulled down past a 64 dp threshold. On iOS the refresh indicator uses a bouncing spinner style; on Android it uses a Material circular pull indicator. The refresh indicator respects the top safe area inset. Pull-to-refresh is not available on pointer devices and the gesture is suppressed when onRefresh is null.",
+  "type": "functional",
+  "priority": "must",
+  "tags": ["pull-to-refresh", "scroll", "touch", "iOS", "Android", "safe-area", "global-rule"],
+  "acceptanceHints": [
+    "Pulling down past 64dp on touch triggers the onRefresh callback",
+    "iOS shows a bouncing spinner; Android shows a Material pull indicator",
+    "Refresh indicator is positioned below the top safe area inset",
+    "Pull-to-refresh gesture is absent on pointer devices and when onRefresh is null"
+  ]
+},
+{
+  "id": "REQ-0165",
+  "title": "Responsive > Hover-to-touch fallbacks: Global interaction parity rule",
+  "text": "Every hover interaction in obers_ui must have an equivalent touch interaction. The defined mapping is: tooltip on hover → tooltip on long-press; hover-reveal edit button → always-visible icon; context menu on right-click → context menu on long-press; row highlight on hover → no equivalent; inline copy indicator on hover → always-visible copy button; resize cursor on hover → visible grip indicator; drag on pointer → long-press to drag on touch. Widgets must implement both paths and not assume pointer availability.",
+  "type": "constraint",
+  "priority": "must",
+  "tags": ["hover", "touch", "fallback", "accessibility", "global-rule", "long-press"],
+  "acceptanceHints": [
+    "Tooltips shown on hover are also shown on long-press on touch devices",
+    "Hover-reveal edit actions are replaced by always-visible icons on touch",
+    "Context menus triggered by right-click are also triggered by long-press on touch",
+    "Resize and drag interactions provide visible grip indicators on touch devices"
+  ]
+},
+{
+  "id": "REQ-0166",
+  "title": "Responsive > Virtual keyboard handling: Global keyboard layout rule",
+  "text": "When a text input within any obers_ui widget gains focus on a touch device, Scrollable.ensureVisible scrolls the input into the visible viewport above the software keyboard. OiFloating and OiBottomBar reposition above the keyboard when it is open or hide if there is insufficient space. Bottom toasts move above the keyboard. Full-screen dialogs shrink their content area to the space above the keyboard. The keyboard height is exposed via OiPlatformData for custom layout calculations.",
+  "type": "functional",
+  "priority": "must",
+  "tags": ["keyboard", "layout", "touch", "OiFloating", "OiBottomBar", "OiPlatformData", "global-rule"],
+  "acceptanceHints": [
+    "Focused input is scrolled into view and not obscured by the software keyboard",
+    "OiFloating repositions above the keyboard when open",
+    "Bottom toasts shift upward to remain visible above the keyboard",
+    "OiPlatformData.keyboardHeight reflects the current keyboard inset"
+  ]
+},
+{
+  "id": "REQ-0167",
+  "title": "Responsive > Browser-specific constraints: Web platform rules",
+  "text": "On web, obers_ui enforces the following platform-specific rules: the browser's native context menu is suppressed on OiContextMenu targets; the browser's native drag behavior is suppressed on OiDraggable elements; Clipboard API permission denial is handled gracefully with a fallback UI; OiPinchZoom applies touch-action:none to isolate from browser zoom; URL bar height changes do not cause layout jumps; OiFocusTrap handles browser Tab-out prevention; OiScrollbar suppresses the platform scrollbar overlay.",
+  "type": "constraint",
+  "priority": "must",
+  "tags": ["web", "browser", "context-menu", "drag", "clipboard", "OiPinchZoom", "OiFocusTrap", "global-rule"],
+  "acceptanceHints": [
+    "Right-clicking an OiContextMenu target does not show the browser's native context menu",
+    "Dragging an OiDraggable element does not trigger the browser's native drag ghost",
+    "Clipboard API denial shows a graceful fallback rather than an unhandled exception",
+    "OiPinchZoom pinch gesture does not trigger browser zoom on web"
+  ]
+},
+{
+  "id": "REQ-0168",
+  "title": "Responsive > Navigation paradigm adaptation: Global navigation breakpoint rules",
+  "text": "obers_ui navigation adapts per breakpoint: on compact, OiBottomBar is used for primary navigation and OiSidebar renders as a drawer overlay; on medium, OiSidebar renders in a compact 64 dp icon-only rail; on expanded and above, OiSidebar renders at full 260 dp with labels. Overlay components adapt: popovers become bottom sheets on compact; tooltips become long-press on touch; context menus become long-press sheets; dialogs become full-screen or sheet on compact. These rules are applied consistently across all library components.",
+  "type": "functional",
+  "priority": "must",
+  "tags": ["navigation", "OiBottomBar", "OiSidebar", "OiDrawer", "responsive", "breakpoint", "global-rule"],
+  "acceptanceHints": [
+    "On compact OiSidebar renders as a hidden drawer toggled by a menu button",
+    "On medium OiSidebar renders as a 64dp icon-only rail",
+    "On expanded OiSidebar renders at full 260dp with visible labels",
+    "Popovers and dialogs render as full-screen or bottom sheet on compact"
+  ]
+},
+{
+  "id": "REQ-0169",
+  "title": "Responsive > Responsive spacing and typography scaling: Global scale rules",
+  "text": "OiSpacingScale defines six named values (xs, sm, md, lg, xl, xxl) whose pixel values differ per breakpoint: on compact xs=2, sm=4, md=8, lg=12, xl=16, xxl=24; on expanded xs=4, sm=8, md=16, lg=24, xl=32, xxl=48. Display, h1, and h2 text styles scale their font sizes upward from compact to extraLarge breakpoints; body and smaller text styles do not scale. Shadow elevation values are reduced by 25% on compact and touch devices, and shadow opacity is reduced by 15% at 1x pixel density.",
+  "type": "functional",
+  "priority": "must",
+  "tags": ["spacing", "typography", "OiSpacingScale", "responsive", "shadows", "breakpoint", "global-rule"],
+  "acceptanceHints": [
+    "OiSpacingScale.md resolves to 8dp on compact and 16dp on expanded",
+    "Display and h1 font sizes are larger on expanded than on compact",
+    "Body and caption text sizes remain constant across all breakpoints",
+    "Shadow elevation values are 25% smaller on compact/touch and shadow opacity is -15% at 1x density"
+  ]
+},
+{
+  "id": "REQ-0170",
+  "title": "Responsive > OiScheduler: Scheduling composite placeholder",
+  "text": "OiScheduler is listed in the package structure as a composite at composites/scheduling/oi_scheduler.dart. Its full specification is deferred and must be completed before implementation begins. A placeholder Dart file must exist at the specified path with a documented TODO comment indicating deferred specification. The file must export a class named OiScheduler to preserve the public API surface.",
+  "type": "constraint",
+  "priority": "must",
+  "tags": ["scheduler", "composite", "placeholder", "deferred", "package-structure"],
+  "acceptanceHints": [
+    "File exists at lib/composites/scheduling/oi_scheduler.dart",
+    "File exports a class named OiScheduler",
+    "File contains a documentation comment indicating the specification is deferred",
+    "The file compiles without errors as part of the library build"
+  ]
+},
+{
+  "id": "REQ-0171",
+  "title": "Responsive > OiImageAnnotator: Image annotator composite placeholder",
+  "text": "OiImageAnnotator is listed in the package structure as a composite at composites/media/oi_image_annotator.dart. Its full specification is deferred and must be completed before implementation begins. A placeholder Dart file must exist at the specified path with a documented TODO comment indicating deferred specification. The file must export a class named OiImageAnnotator to preserve the public API surface.",
+  "type": "constraint",
+  "priority": "must",
+  "tags": ["image-annotator", "composite", "placeholder", "deferred", "package-structure"],
+  "acceptanceHints": [
+    "File exists at lib/composites/media/oi_image_annotator.dart",
+    "File exports a class named OiImageAnnotator",
+    "File contains a documentation comment indicating the specification is deferred",
+    "The file compiles without errors as part of the library build"
+  ]
+},
+{
+  "id": "REQ-0172",
+  "title": "Testing > Unit test suite: Pure logic tests",
+  "text": "The unit test suite covers all pure logic modules with no widget rendering: OiColorSwatch generation from a brand color, OiThemeData.fromBrand derivation, OiInteractiveStyle merging, OiBorderStyle dash calculations, OiHaloStyle to BoxShadow conversion, the fuzzy search algorithm, date natural language parsing, all pattern recognizers, OiUndoStack push/undo/redo/clear operations, OiColumnProfile serialization, OiBreakpoint calculations, OiFormController validation logic, and OiTreeNode flattening. Tests must be deterministic and runnable without a device or emulator.",
+  "type": "quality",
+  "priority": "must",
+  "tags": ["testing", "unit-tests", "pure-logic", "OiThemeData", "OiUndoStack", "OiFormController", "fuzzy-search"],
+  "acceptanceHints": [
+    "All listed logic modules have at least one test covering their primary success path",
+    "OiUndoStack tests verify push, undo, redo, and clear in sequence",
+    "OiFormController validation tests cover required, min length, max length, pattern, and custom validators",
+    "All tests pass with flutter test --no-pub without a connected device"
+  ]
+},
+{
+  "id": "REQ-0173",
+  "title": "Testing > Widget test suite: Per-component interaction and semantics tests",
+  "text": "The widget test suite provides tests for every library component verifying that: the component renders in both light and dark OiThemeData without errors; interactive components correctly reflect hover, focus, active, and disabled states; input components handle value entry, validation, and error display; all label-bearing components expose correct Semantics nodes; keyboard interaction flows are verified; animations fall back correctly under reduced-motion; and composite widget composition chains render without errors.",
+  "type": "quality",
+  "priority": "must",
+  "tags": ["testing", "widget-tests", "semantics", "keyboard", "accessibility", "reduced-motion", "dark-mode"],
+  "acceptanceHints": [
+    "Every component has a test that pumps it in both light and dark theme and expects no widget errors",
+    "Interactive components test all four states: hover, focus, active, disabled",
+    "All label-bearing components pass a findsWidgets assertion on their Semantics node",
+    "Keyboard navigation tests verify Tab focus order and Enter/Space activation"
+  ]
+},
+{
+  "id": "REQ-0174",
+  "title": "Testing > Golden/visual regression test suite: Per-component golden images",
+  "text": "The golden test suite generates reference images for every component variant at every breakpoint in both light and dark themes. File names follow the convention {component}_{variant}_{breakpoint}_{theme}.png. Coverage includes all OiButton variants, sizes, and states; all input states; all card variants; halo effects; gradient and dashed borders; the focus ring; dialog, sheet, panel, and toast; table grouped and filtered states; and all responsive layout variants. Golden images are committed to the repository and CI fails on any pixel difference.",
+  "type": "quality",
+  "priority": "must",
+  "tags": ["testing", "golden-tests", "visual-regression", "CI", "breakpoints", "dark-mode"],
+  "acceptanceHints": [
+    "Golden files exist for every component variant at all 6 breakpoints in both themes",
+    "File names conform to the {component}_{variant}_{breakpoint}_{theme}.png convention",
+    "CI pipeline runs golden tests and fails on any pixel difference from committed references",
+    "All OiButton variant/size/state combinations have golden coverage"
+  ]
+},
+{
+  "id": "REQ-0175",
+  "title": "Testing > Integration test suite: End-to-end multi-component flows",
+  "text": "The integration test suite covers complete multi-component user flows driven by flutter_test: form fill to validate to submit to success toast; wizard step 1 to back to step 2 to complete; table sort then filter then select then bulk action then undo; kanban card drag between columns; tree expand then select then drag-reparent; Ctrl+K command bar execute; tour start then next then skip; inline cell edit then save; global search then select then navigate. Each flow must complete without assertion errors.",
+  "type": "quality",
+  "priority": "must",
+  "tags": ["testing", "integration-tests", "e2e", "wizard", "table", "kanban", "command-bar", "tour"],
+  "acceptanceHints": [
+    "Form fill to submit flow ends with a success toast visible in the widget tree",
+    "Kanban drag flow moves the card to the target column and fires the onCardMoved callback",
+    "Ctrl+K command bar opens, accepts a query, and executes the selected command",
+    "All listed flows complete without unhandled exceptions or failed expects"
+  ]
+},
+{
+  "id": "REQ-0176",
+  "title": "Testing > Performance benchmark suite: Frame budget benchmarks",
+  "text": "The performance benchmark suite verifies that critical components meet their frame-time budgets: OiVirtualList with 100 000 items must maintain sub-16 ms frames; OiVirtualGrid with 10 000 images must maintain sub-16 ms frames; OiTable with 10 000 rows must remain responsive during sort and filter; OiTree with 10 000 nodes must maintain sub-16 ms frames; OiFlowGraph with 500 nodes and 1000 edges must maintain sub-16 ms frames; 100 concurrent toasts must not crash; 100 rapid theme switches must not leak memory; OiMasonry with 1000 items must scroll smoothly; OiRichEditor with a 10 000-word document must remain responsive during typing; opening and closing OiOverlays 1000 times must not leak memory.",
+  "type": "nonFunctional",
+  "priority": "must",
+  "tags": ["performance", "benchmarks", "frame-budget", "memory", "OiVirtualList", "OiFlowGraph", "OiRichEditor"],
+  "acceptanceHints": [
+    "OiVirtualList 100k items benchmark reports average frame time below 16ms",
+    "OiFlowGraph 500-node 1000-edge benchmark reports average frame time below 16ms",
+    "1000 OiOverlay open/close cycles show no measurable memory growth in the leak detector",
+    "OiRichEditor 10 000-word document registers keystrokes within one frame"
+  ]
+},
+{
+  "id": "REQ-0177",
+  "title": "Testing > Platform simulation test helpers: Flutter test utilities",
+  "text": "The testing package ships a set of Flutter test utility functions for simulating platform contexts: pumpTouchApp(tester, child, {breakpoint}) wraps child in a touch-input OiApp at the specified width; pumpPointerApp(tester, child, {breakpoint}) does the same for pointer input; pumpAtBreakpoint(tester, child, breakpoint) sets the surface size; showKeyboard(tester, {height: 300}) injects a software keyboard inset; withSafeArea(tester, child, {top, bottom}) wraps in a MediaQuery with the specified insets; withPlatform(tester, child, TargetPlatform) sets the target platform. Defined breakpoint widths are: compact=400, medium=720, expanded=1000, large=1400, extraLarge=1800.",
+  "type": "functional",
+  "priority": "must",
+  "tags": ["testing", "test-helpers", "pumpTouchApp", "pumpPointerApp", "breakpoints", "keyboard-simulation", "safe-area"],
+  "acceptanceHints": [
+    "pumpTouchApp renders the child with touch input device class and the specified breakpoint width",
+    "showKeyboard injects a bottom inset of the specified height into the MediaQuery",
+    "withSafeArea correctly sets MediaQuery padding top and bottom to the provided values",
+    "Breakpoint constants match the specified pixel values: compact=400, medium=720, expanded=1000, large=1400, extraLarge=1800"
+  ]
+},
+{
+  "id": "REQ-0178",
+  "title": "Testing > Responsive and cross-platform test coverage: Coverage requirements",
+  "text": "The test suite enforces the following coverage requirements: golden tests exist for all 6 breakpoints including compact-landscape orientation; every interactive component has both pumpTouchApp and pumpPointerApp test variants; safe area tests exist for OiBottomBar, OiSheet, OiToast, OiDrawer, OiDialog, and OiPanel; virtual keyboard inset tests exist for all overlays containing text inputs; OiPerformanceConfig minimal tier tests confirm all components still render and function; web-specific tests cover clipboard permission denial, context menu suppression, drag suppression, and pinch-zoom isolation.",
+  "type": "quality",
+  "priority": "must",
+  "tags": ["testing", "coverage", "responsive", "cross-platform", "safe-area", "keyboard", "web", "OiPerformanceConfig"],
+  "acceptanceHints": [
+    "Golden tests exist at all 6 breakpoints including compact-landscape for every component",
+    "Every interactive component has a pumpTouchApp test and a pumpPointerApp test",
+    "Safe area tests for OiBottomBar, OiSheet, OiToast, OiDrawer, OiDialog, and OiPanel all pass",
+    "OiPerformanceConfig minimal tier tests confirm all components render without errors"
+  ]
+}

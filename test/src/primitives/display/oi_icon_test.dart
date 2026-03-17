@@ -1,5 +1,6 @@
 // Tests do not require documentation comments.
 // ignore_for_file: public_member_api_docs
+// REQ-0020: OiIcon accessibility enforcement tests.
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';

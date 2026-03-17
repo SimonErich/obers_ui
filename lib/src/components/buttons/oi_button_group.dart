@@ -1,196 +1,378 @@
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/buttons/oi_button.dart';
 import 'package:obers_ui/src/foundation/oi_app.dart';
+import 'package:obers_ui/src/foundation/oi_responsive.dart';
+import 'package:obers_ui/src/foundation/theme/oi_decoration_theme.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
+import 'package:obers_ui/src/primitives/display/oi_surface.dart';
 import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
 
-/// A group of buttons displayed inline with a connected visual appearance.
+/// A single item in an [OiButtonGroup].
 ///
-/// Buttons in a group share their borders so that adjacent buttons appear
-/// joined together. In [segmented] mode exactly one button is active at a time
-/// (the one at [selectedIndex]); tapping any button calls [onSelected] with
-/// its index.
+/// Each item must have a [label] (required for accessibility even when only an
+/// [icon] is displayed). Provide [semanticLabel] to override the accessible
+/// description.
+///
+/// {@category Components}
+class OiButtonGroupItem {
+  /// Creates an [OiButtonGroupItem].
+  const OiButtonGroupItem({
+    required this.label,
+    this.icon,
+    this.enabled = true,
+    this.semanticLabel,
+  });
+
+  /// The text label displayed on the button.
+  final String label;
+
+  /// An optional leading icon displayed alongside the [label].
+  final IconData? icon;
+
+  /// Whether this item can be interacted with.
+  final bool enabled;
+
+  /// Override for the screen-reader accessible label.  Defaults to [label].
+  final String? semanticLabel;
+}
+
+/// A group of buttons displayed inline with a connected or gapped visual
+/// appearance.
+///
+/// Buttons in a group can operate in two modes:
+///
+/// - **Connected** ([spacing] == 0): All items share a single [OiSurface]
+///   container with a shared outer border radius.  The first child gets left
+///   corner radii, the last child gets right corner radii, and middle children
+///   have no corner radii.
+/// - **Gapped** ([spacing] > 0): Each item is rendered with full corner radii
+///   separated by [spacing] logical pixels.
+///
+/// In [exclusive] mode exactly one item is active at a time (the one at
+/// [selectedIndex]).  Tapping any item calls [onSelect] with its index.
+/// Selected items use the *soft* variant; all others use *ghost*.
+///
+/// Arrow-key navigation is supported in [exclusive] mode: horizontal groups
+/// respond to ←/→ and vertical groups respond to ↑/↓.
+///
+/// On compact breakpoints a horizontal group with [wrap] enabled will
+/// automatically re-orient to vertical.
 ///
 /// ```dart
 /// OiButtonGroup(
-///   buttons: [
-///     OiButton.outline(label: 'Day'),
-///     OiButton.outline(label: 'Week'),
-///     OiButton.outline(label: 'Month'),
+///   items: const [
+///     OiButtonGroupItem(label: 'Day'),
+///     OiButtonGroupItem(label: 'Week'),
+///     OiButtonGroupItem(label: 'Month'),
 ///   ],
-///   segmented: true,
+///   exclusive: true,
 ///   selectedIndex: _tab,
-///   onSelected: (i) => setState(() => _tab = i),
+///   onSelect: (i) => setState(() => _tab = i),
 /// )
 /// ```
 ///
 /// {@category Components}
-class OiButtonGroup extends StatelessWidget {
+class OiButtonGroup extends StatefulWidget {
   /// Creates an [OiButtonGroup].
   const OiButtonGroup({
-    required this.buttons,
-    this.orientation = Axis.horizontal,
-    this.segmented = false,
+    required this.items,
+    this.size = OiButtonSize.medium,
+    this.direction = Axis.horizontal,
+    this.spacing = 0,
+    this.exclusive = false,
     this.selectedIndex,
-    this.onSelected,
+    this.onSelect,
+    this.wrap = true,
     super.key,
   });
 
-  /// The buttons to render inside the group.
-  final List<OiButton> buttons;
+  /// The items to render inside the group.
+  final List<OiButtonGroupItem> items;
 
-  /// Whether buttons are arranged horizontally or vertically.
-  final Axis orientation;
+  /// The size applied to every item in the group.
+  final OiButtonSize size;
 
-  /// When `true`, tapping a button marks it as selected and calls [onSelected].
-  final bool segmented;
+  /// Whether items are arranged horizontally or vertically.
+  ///
+  /// Defaults to [Axis.horizontal].  On compact breakpoints, horizontal groups
+  /// with [wrap] enabled will wrap to vertical.
+  final Axis direction;
 
-  /// The index of the currently selected button in [segmented] mode.
+  /// The gap in logical pixels between items.
+  ///
+  /// A value of `0` produces a connected group (items share borders).
+  /// Any positive value produces a gapped group where items have individual
+  /// corner radii.
+  final double spacing;
+
+  /// When `true`, at most one item is selected at a time.
+  ///
+  /// The selected item uses [OiButtonVariant.soft]; others use
+  /// [OiButtonVariant.ghost].  Arrow-key navigation moves focus between items.
+  final bool exclusive;
+
+  /// The index of the currently selected item in [exclusive] mode.
   final int? selectedIndex;
 
-  /// Called with the tapped button's index when [segmented] is `true`.
-  final ValueChanged<int>? onSelected;
+  /// Called with the tapped item's index when [exclusive] is `true`.
+  final ValueChanged<int>? onSelect;
+
+  /// When `true` (the default), a horizontal group automatically wraps to
+  /// vertical on compact breakpoints.
+  final bool wrap;
+
+  @override
+  State<OiButtonGroup> createState() => _OiButtonGroupState();
+}
+
+// ── State ─────────────────────────────────────────────────────────────────────
+
+class _OiButtonGroupState extends State<OiButtonGroup> {
+  int _focusIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _focusIndex = widget.selectedIndex ?? 0;
+  }
+
+  @override
+  void didUpdateWidget(OiButtonGroup oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.selectedIndex != null) {
+      _focusIndex = widget.selectedIndex!;
+    }
+  }
+
+  KeyEventResult _onKeyEvent(FocusNode node, KeyEvent event) {
+    if (!widget.exclusive) return KeyEventResult.ignored;
+    if (event is! KeyDownEvent && event is! KeyRepeatEvent) {
+      return KeyEventResult.ignored;
+    }
+
+    final effectiveDir = _effectiveDirection(context);
+    final isForward = effectiveDir == Axis.horizontal
+        ? event.logicalKey == LogicalKeyboardKey.arrowRight
+        : event.logicalKey == LogicalKeyboardKey.arrowDown;
+    final isBack = effectiveDir == Axis.horizontal
+        ? event.logicalKey == LogicalKeyboardKey.arrowLeft
+        : event.logicalKey == LogicalKeyboardKey.arrowUp;
+
+    if (!isForward && !isBack) return KeyEventResult.ignored;
+
+    final count = widget.items.length;
+    final delta = isForward ? 1 : -1;
+    final next = (_focusIndex + delta + count) % count;
+    setState(() => _focusIndex = next);
+    widget.onSelect?.call(next);
+    return KeyEventResult.handled;
+  }
+
+  Axis _effectiveDirection(BuildContext context) {
+    if (widget.wrap &&
+        context.isCompact &&
+        widget.direction == Axis.horizontal) {
+      return Axis.vertical;
+    }
+    return widget.direction;
+  }
 
   @override
   Widget build(BuildContext context) {
-    final count = buttons.length;
+    final count = widget.items.length;
     if (count == 0) return const SizedBox.shrink();
 
-    final items = List<Widget>.generate(count, (i) {
-      return _GroupButtonItem(
-        button: buttons[i],
-        index: i,
-        count: count,
-        orientation: orientation,
-        segmented: segmented,
-        selected: segmented && selectedIndex == i,
-        onSelected: onSelected,
+    final effectiveDir = _effectiveDirection(context);
+    final radius = context.components.button?.borderRadius ?? context.radius.sm;
+    final connected = widget.spacing == 0;
+
+    return connected
+        ? _buildConnected(context, count, effectiveDir, radius)
+        : _buildGapped(context, count, effectiveDir, radius);
+  }
+
+  // ── Connected layout (shared OiSurface) ─────────────────────────────────
+
+  Widget _buildConnected(
+    BuildContext context,
+    int count,
+    Axis direction,
+    BorderRadius radius,
+  ) {
+    final children = List<Widget>.generate(count, (i) {
+      final itemRadius = _itemRadius(i, count, direction, radius);
+      return _buildItem(
+        context,
+        i,
+        count,
+        direction,
+        itemRadius,
+        connected: true,
       );
     });
 
-    if (orientation == Axis.horizontal) {
-      return Row(mainAxisSize: MainAxisSize.min, children: items);
+    final content = direction == Axis.horizontal
+        ? Row(mainAxisSize: MainAxisSize.min, children: children)
+        : Column(mainAxisSize: MainAxisSize.min, children: children);
+
+    return Focus(
+      onKeyEvent: _onKeyEvent,
+      child: OiSurface(
+        color: const Color(0x00000000),
+        border: OiBorderStyle.solid(context.colors.border, 1,
+            borderRadius: radius),
+        borderRadius: radius,
+        child: ClipRRect(borderRadius: radius, child: content),
+      ),
+    );
+  }
+
+  // ── Gapped layout (individual items) ─────────────────────────────────────
+
+  Widget _buildGapped(
+    BuildContext context,
+    int count,
+    Axis direction,
+    BorderRadius radius,
+  ) {
+    final gap = widget.spacing;
+    final children = List<Widget>.generate(count, (i) {
+      return _buildItem(context, i, count, direction, radius, connected: false);
+    });
+
+    final separated = <Widget>[];
+    for (var i = 0; i < children.length; i++) {
+      separated.add(children[i]);
+      if (i < children.length - 1) {
+        separated.add(direction == Axis.horizontal
+            ? SizedBox(width: gap)
+            : SizedBox(height: gap));
+      }
+    }
+
+    final Widget layout = direction == Axis.horizontal
+        ? Row(mainAxisSize: MainAxisSize.min, children: separated)
+        : Column(mainAxisSize: MainAxisSize.min, children: separated);
+
+    return Focus(onKeyEvent: _onKeyEvent, child: layout);
+  }
+
+  // ── Item border radius ─────────────────────────────────────────────────────
+
+  BorderRadius _itemRadius(
+    int index,
+    int count,
+    Axis direction,
+    BorderRadius radius,
+  ) {
+    if (count == 1) return radius;
+    if (direction == Axis.horizontal) {
+      if (index == 0) {
+        return BorderRadius.only(
+          topLeft: radius.topLeft,
+          bottomLeft: radius.bottomLeft,
+        );
+      } else if (index == count - 1) {
+        return BorderRadius.only(
+          topRight: radius.topRight,
+          bottomRight: radius.bottomRight,
+        );
+      } else {
+        return BorderRadius.zero;
+      }
     } else {
-      return Column(mainAxisSize: MainAxisSize.min, children: items);
+      if (index == 0) {
+        return BorderRadius.only(
+          topLeft: radius.topLeft,
+          topRight: radius.topRight,
+        );
+      } else if (index == count - 1) {
+        return BorderRadius.only(
+          bottomLeft: radius.bottomLeft,
+          bottomRight: radius.bottomRight,
+        );
+      } else {
+        return BorderRadius.zero;
+      }
     }
   }
-}
 
-// ── Internal per-item widget ──────────────────────────────────────────────
+  // ── Single item widget ────────────────────────────────────────────────────
 
-class _GroupButtonItem extends StatelessWidget {
-  const _GroupButtonItem({
-    required this.button,
-    required this.index,
-    required this.count,
-    required this.orientation,
-    required this.segmented,
-    required this.selected,
-    required this.onSelected,
-  });
+  Widget _buildItem(
+    BuildContext context,
+    int index,
+    int count,
+    Axis direction,
+    BorderRadius borderRadius,
+    {required bool connected}
+  ) {
+    final item = widget.items[index];
+    final isSelected = widget.exclusive && widget.selectedIndex == index;
 
-  final OiButton button;
-  final int index;
-  final int count;
-  final Axis orientation;
-  final bool segmented;
-  final bool selected;
-  final ValueChanged<int>? onSelected;
+    final variant = widget.exclusive
+        ? (isSelected ? OiButtonVariant.soft : OiButtonVariant.ghost)
+        : OiButtonVariant.ghost;
 
-  @override
-  Widget build(BuildContext context) {
-    final radius = context.components.button?.borderRadius ?? context.radius.sm;
-
-    // Compute per-corner radii so the group looks connected.
-    final BorderRadius borderRadius;
-    if (count == 1) {
-      borderRadius = radius;
-    } else if (orientation == Axis.horizontal) {
-      if (index == 0) {
-        borderRadius = BorderRadius.only(
-          topLeft: radius.topLeft,
-          bottomLeft: radius.bottomLeft,
-        );
-      } else if (index == count - 1) {
-        borderRadius = BorderRadius.only(
-          topRight: radius.topRight,
-          bottomRight: radius.bottomRight,
-        );
-      } else {
-        borderRadius = BorderRadius.zero;
-      }
-    } else {
-      // vertical
-      if (index == 0) {
-        borderRadius = BorderRadius.only(
-          topLeft: radius.topLeft,
-          topRight: radius.topRight,
-        );
-      } else if (index == count - 1) {
-        borderRadius = BorderRadius.only(
-          bottomLeft: radius.bottomLeft,
-          bottomRight: radius.bottomRight,
-        );
-      } else {
-        borderRadius = BorderRadius.zero;
-      }
-    }
-
-    // In segmented mode, selected = primary fill, others = ghost with border.
-    final OiButtonVariant effectiveVariant;
-    if (segmented) {
-      effectiveVariant = selected
-          ? OiButtonVariant.primary
-          : OiButtonVariant.ghost;
-    } else {
-      effectiveVariant = button.variant;
-    }
-
-    final bgColor = _bgColor(context, effectiveVariant);
-    final fgColor = _fgColor(context, effectiveVariant);
+    final bgColor = _bgColor(context, variant);
+    final fgColor = _fgColor(context, variant);
     final density = OiDensityScope.of(context);
     final height = _buttonHeight(density);
     final hPad = _hPadding(context);
 
-    // Build border: for connected group, share the edge between neighbours.
-    final border = _buildBorder(context, effectiveVariant);
+    Widget content;
+    final textWidget = Text(
+      item.label,
+      style: TextStyle(
+        fontSize: _fontSize(),
+        fontWeight: FontWeight.w500,
+        color: fgColor,
+        height: 1,
+      ),
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+    );
 
-    final content = button.label != null
-        ? Text(
-            button.label!,
-            style: TextStyle(
-              fontSize: _fontSize(),
-              fontWeight: FontWeight.w500,
-              color: fgColor,
-              height: 1,
-            ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          )
-        : (button.icon != null
-              ? Icon(button.icon, size: _iconSize(), color: fgColor)
-              : const SizedBox.shrink());
+    if (item.icon != null) {
+      content = Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(item.icon, size: _iconSize(), color: fgColor),
+          const SizedBox(width: 4),
+          textWidget,
+        ],
+      );
+    } else {
+      content = textWidget;
+    }
 
-    final isEnabled = button.enabled;
-    final tapCallback = segmented
-        ? (isEnabled ? () => onSelected?.call(index) : null)
-        : (isEnabled ? button.onTap : null);
+    final Border? border = connected
+        ? null
+        : Border.all(color: context.colors.border);
 
-    return OiTappable(
-      onTap: tapCallback,
-      enabled: isEnabled,
-      child: Container(
-        height: height,
-        padding: EdgeInsets.symmetric(horizontal: hPad),
-        decoration: BoxDecoration(
-          color: bgColor,
-          borderRadius: borderRadius,
-          border: border,
+    return Semantics(
+      label: item.semanticLabel ?? item.label,
+      button: true,
+      selected: widget.exclusive ? isSelected : null,
+      child: OiTappable(
+        onTap: item.enabled ? () => widget.onSelect?.call(index) : null,
+        enabled: item.enabled,
+        child: Container(
+          height: height,
+          padding: EdgeInsets.symmetric(horizontal: hPad),
+          decoration: BoxDecoration(
+            color: bgColor,
+            borderRadius: connected ? null : borderRadius,
+            border: border,
+          ),
+          child: Center(child: content),
         ),
-        child: Center(child: content),
       ),
     );
   }
+
+  // ── Color helpers ─────────────────────────────────────────────────────────
 
   Color _bgColor(BuildContext context, OiButtonVariant variant) {
     final c = context.colors;
@@ -226,43 +408,10 @@ class _GroupButtonItem extends StatelessWidget {
     }
   }
 
-  Border? _buildBorder(BuildContext context, OiButtonVariant variant) {
-    if (variant != OiButtonVariant.outline &&
-        variant != OiButtonVariant.ghost &&
-        !segmented) {
-      return null;
-    }
-    final borderColor = context.colors.border;
-    final side = BorderSide(color: borderColor);
-
-    if (count == 1) {
-      return Border.all(color: borderColor);
-    }
-
-    if (orientation == Axis.horizontal) {
-      // For horizontal groups: left border only on first, right border on last,
-      // internal items share a border so we only draw left for non-first.
-      if (index == 0) {
-        return Border(top: side, bottom: side, left: side);
-      } else if (index == count - 1) {
-        return Border(top: side, bottom: side, left: side, right: side);
-      } else {
-        return Border(top: side, bottom: side, left: side);
-      }
-    } else {
-      // Vertical: top border only on first, internal share borders.
-      if (index == 0) {
-        return Border(top: side, left: side, right: side);
-      } else if (index == count - 1) {
-        return Border(top: side, left: side, right: side, bottom: side);
-      } else {
-        return Border(top: side, left: side, right: side);
-      }
-    }
-  }
+  // ── Size helpers ──────────────────────────────────────────────────────────
 
   double _buttonHeight(OiDensity density) {
-    switch (button.size) {
+    switch (widget.size) {
       case OiButtonSize.small:
         switch (density) {
           case OiDensity.comfortable:
@@ -294,7 +443,7 @@ class _GroupButtonItem extends StatelessWidget {
   }
 
   double _iconSize() {
-    switch (button.size) {
+    switch (widget.size) {
       case OiButtonSize.small:
         return 14;
       case OiButtonSize.medium:
@@ -305,7 +454,7 @@ class _GroupButtonItem extends StatelessWidget {
   }
 
   double _fontSize() {
-    switch (button.size) {
+    switch (widget.size) {
       case OiButtonSize.small:
         return 12;
       case OiButtonSize.medium:
@@ -317,7 +466,7 @@ class _GroupButtonItem extends StatelessWidget {
 
   double _hPadding(BuildContext context) {
     final sp = context.spacing;
-    switch (button.size) {
+    switch (widget.size) {
       case OiButtonSize.small:
         return sp.sm;
       case OiButtonSize.medium:
