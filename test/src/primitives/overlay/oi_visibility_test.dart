@@ -204,7 +204,36 @@ void main() {
     expect(find.text('animated'), findsOneWidget);
   });
 
-  // ── 12. Responsive constructor uses different transitions per breakpoint ──
+  // ── 12. reducedMotion: transition completes instantly ────────────────────
+
+  testWidgets(
+    'reducedMotion: toggling visible uses Duration.zero — no mid-flight opacity',
+    (tester) async {
+      final notifier = ValueNotifier<bool>(false);
+      addTearDown(notifier.dispose);
+
+      await tester.pumpObers(
+        MediaQuery(
+          data: const MediaQueryData(disableAnimations: true),
+          child: ValueListenableBuilder<bool>(
+            valueListenable: notifier,
+            builder: (_, isVisible, __) =>
+                OiVisibility(visible: isVisible, child: const Text('instant')),
+          ),
+        ),
+      );
+      await tester.pump();
+
+      // Make visible — with Duration.zero the controller jumps to 1.0.
+      notifier.value = true;
+      await tester.pump();
+
+      final fade = tester.widget<FadeTransition>(find.byType(FadeTransition));
+      expect(fade.opacity.value, 1.0);
+    },
+  );
+
+  // ── 13. Responsive constructor uses different transitions per breakpoint ──
 
   testWidgets(
     'OiVisibility.responsive on compact: uses compactTransition (slideUp)',

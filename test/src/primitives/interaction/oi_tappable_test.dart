@@ -5,6 +5,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui/src/foundation/oi_app.dart';
+import 'package:obers_ui/src/foundation/theme/oi_effects_theme.dart';
 import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
 
 import '../../../helpers/pump_app.dart';
@@ -244,5 +245,73 @@ void main() {
       ),
     );
     expect(mouseRegion.cursor, SystemMouseCursors.basic);
+  });
+
+  // ── 12. disableAnimations: AnimatedOpacity uses Duration.zero ─────────────
+
+  testWidgets(
+    'disableAnimations=true: AnimatedOpacity.duration is Duration.zero',
+    (tester) async {
+      await tester.pumpObers(
+        const MediaQuery(
+          data: MediaQueryData(disableAnimations: true),
+          child: OiTappable(child: SizedBox(width: 60, height: 60)),
+        ),
+      );
+      await tester.pump();
+
+      final animOpacity =
+          tester.widget<AnimatedOpacity>(find.byType(AnimatedOpacity));
+      expect(animOpacity.duration, Duration.zero);
+    },
+  );
+
+  // ── 13. Focus ring: DecoratedBox with foreground border when focused ────────
+
+  testWidgets(
+    'focus ring: DecoratedBox with foreground border rendered when widget is focused',
+    (tester) async {
+      await tester.pumpObers(
+        const OiTappable(child: SizedBox(width: 60, height: 60)),
+      );
+      await tester.pump();
+
+      // The GestureDetector is a descendant of the OiTappable-owned Focus
+      // widget, so Focus.of() from that element returns the correct node.
+      final gestureElement = tester.element(find.byType(GestureDetector));
+      Focus.of(gestureElement).requestFocus();
+      // Two pumps: first processes the focus-change notification;
+      // second applies the setState rebuild.
+      await tester.pump();
+      await tester.pump();
+
+      final foregroundBoxes = tester.widgetList<DecoratedBox>(
+        find.byType(DecoratedBox),
+      ).where((b) => b.position == DecorationPosition.foreground);
+      expect(foregroundBoxes, isNotEmpty);
+    },
+  );
+
+  // ── 14. Focus ring enforced: zero-alpha color is clamped to 0.5 ────────────
+
+  test('focus ring enforced: zero-alpha color is clamped to minimum alpha 0.5',
+      () {
+    const ring = OiFocusRingStyle(
+      color: Color(0x00FF0000), // alpha = 0
+      width: 2.0,
+    );
+    final enforced = ring.enforced;
+    expect(enforced.color.a, greaterThanOrEqualTo(0.5));
+  });
+
+  // ── 15. Focus ring enforced: sub-minimum width is clamped to 2.0 ───────────
+
+  test('focus ring enforced: sub-minimum width is clamped to 2.0', () {
+    const ring = OiFocusRingStyle(
+      color: Color(0xFFFF0000),
+      width: 0.5, // below minimum
+    );
+    final enforced = ring.enforced;
+    expect(enforced.width, 2.0);
   });
 }

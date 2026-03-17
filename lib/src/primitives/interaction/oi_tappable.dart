@@ -141,6 +141,8 @@ class _OiTappableState extends State<OiTappable> {
     final effects = context.effects;
     final animations = context.animations;
     final density = OiDensityScope.of(context);
+    final reducedMotion =
+        animations.reducedMotion || MediaQuery.disableAnimationsOf(context);
     final isTouch = density == OiDensity.comfortable;
     final style = _effectiveStyle(effects);
 
@@ -173,6 +175,21 @@ class _OiTappableState extends State<OiTappable> {
         (halo.color.a > 0 || halo.spread > 0 || halo.blur > 0)) {
       content = DecoratedBox(
         decoration: BoxDecoration(boxShadow: [halo.toBoxShadow()]),
+        child: content,
+      );
+    }
+
+    // Focus ring — foreground border rendered on top of content when focused.
+    // Always rendered independently of the halo-based focus style so that no
+    // theme configuration can silence keyboard focus visibility.
+    if (_isFocused && widget.focusable && widget.enabled) {
+      final ring = effects.focusRing.enforced;
+      content = DecoratedBox(
+        position: DecorationPosition.foreground,
+        decoration: BoxDecoration(
+          border: Border.all(color: ring.color, width: ring.width),
+          borderRadius: ring.borderRadius,
+        ),
         child: content,
       );
     }
@@ -245,7 +262,7 @@ class _OiTappableState extends State<OiTappable> {
     // Animated wrapper for smooth state transitions.
     return AnimatedOpacity(
       opacity: 1,
-      duration: animations.fast,
+      duration: reducedMotion ? Duration.zero : animations.fast,
       child: content,
     );
   }

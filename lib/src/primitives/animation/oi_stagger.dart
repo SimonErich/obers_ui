@@ -1,5 +1,5 @@
 import 'package:flutter/widgets.dart';
-import 'package:obers_ui/src/foundation/oi_accessibility.dart';
+import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/primitives/overlay/oi_visibility.dart';
 
 /// Animates a list of [children] in sequence, each one starting after a
@@ -102,7 +102,9 @@ class OiStaggerState extends State<OiStagger>
   /// Starts the stagger animation from the beginning.
   void play() {
     if (!mounted) return;
-    final reduced = OiA11y.reducedMotion(context);
+    final reduced =
+        context.animations.reducedMotion ||
+        MediaQuery.disableAnimationsOf(context);
     if (reduced) {
       _controller.value = 1.0;
     } else {
@@ -177,7 +179,9 @@ class OiStaggerState extends State<OiStagger>
 
   @override
   Widget build(BuildContext context) {
-    final reduced = OiA11y.reducedMotion(context);
+    final reduced =
+        context.animations.reducedMotion ||
+        MediaQuery.disableAnimationsOf(context);
     final n = widget.children.length;
     if (n == 0) return const SizedBox.shrink();
 

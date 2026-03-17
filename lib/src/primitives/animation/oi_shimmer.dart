@@ -1,5 +1,5 @@
 import 'package:flutter/widgets.dart';
-import 'package:obers_ui/src/foundation/oi_accessibility.dart';
+import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 
 /// A shimmer loading-placeholder effect that sweeps a gradient across [child].
 ///
@@ -87,7 +87,9 @@ class _OiShimmerState extends State<OiShimmer>
   }
 
   void _syncAnimation() {
-    final reduced = OiA11y.reducedMotion(context);
+    final reduced =
+        context.animations.reducedMotion ||
+        MediaQuery.disableAnimationsOf(context);
     if (widget.active && !reduced) {
       if (!_controller.isAnimating) _controller.repeat();
     } else {
@@ -107,7 +109,9 @@ class _OiShimmerState extends State<OiShimmer>
 
     final base = widget.baseColor ?? const Color(0xFFE0E0E0);
     final highlight = widget.highlightColor ?? const Color(0xFFF5F5F5);
-    final reduced = OiA11y.reducedMotion(context);
+    final reduced =
+        context.animations.reducedMotion ||
+        MediaQuery.disableAnimationsOf(context);
 
     if (reduced) {
       return ColorFiltered(

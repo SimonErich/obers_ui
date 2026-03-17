@@ -58,6 +58,82 @@ void main() {
     });
   });
 
+  group('OiFocusRingStyle', () {
+    test('standard factory sets color from primaryColor with alpha 0.85', () {
+      const primary = Color(0xFF2563EB);
+      final ring = OiFocusRingStyle.standard(primary);
+      expect(ring.color.a, closeTo(0.85, 0.01));
+      expect(ring.width, equals(2.0));
+    });
+
+    test('enforced clamps zero-alpha color to 0.5', () {
+      const ring = OiFocusRingStyle(color: Color(0x00FF0000), width: 2.0);
+      expect(ring.enforced.color.a, greaterThanOrEqualTo(0.5));
+    });
+
+    test('enforced clamps sub-minimum width to 2.0', () {
+      const ring = OiFocusRingStyle(color: Color(0xFFFF0000), width: 0.5);
+      expect(ring.enforced.width, equals(2.0));
+    });
+
+    test('enforced preserves already-valid values', () {
+      const ring = OiFocusRingStyle(color: Color(0xCCFF0000), width: 3.0);
+      final enforced = ring.enforced;
+      expect(enforced.color.a, closeTo(ring.color.a, 0.01));
+      expect(enforced.width, equals(3.0));
+    });
+
+    test('copyWith overrides only specified fields', () {
+      const ring = OiFocusRingStyle(color: Color(0xFFFF0000), width: 2.0);
+      final copy = ring.copyWith(width: 4.0);
+      expect(copy.width, equals(4.0));
+      expect(copy.color, equals(ring.color));
+    });
+
+    test('hashCode is consistent for equal values', () {
+      const a = OiFocusRingStyle(color: Color(0xFF2563EB), width: 2.0);
+      const b = OiFocusRingStyle(color: Color(0xFF2563EB), width: 2.0);
+      expect(a.hashCode, equals(b.hashCode));
+    });
+
+    test('equality holds for identical values', () {
+      const a = OiFocusRingStyle(color: Color(0xFF2563EB), width: 2.0);
+      const b = OiFocusRingStyle(color: Color(0xFF2563EB), width: 2.0);
+      expect(a, equals(b));
+    });
+  });
+
+  group('OiInteractiveStyle', () {
+    test('copyWith overrides only specified fields', () {
+      const original = OiInteractiveStyle(
+        backgroundOverlay: Color(0x0A000000),
+        halo: OiHaloStyle.none,
+        scale: 0.97,
+      );
+      final copy = original.copyWith(scale: 1.0);
+      expect(copy.scale, equals(1.0));
+      expect(copy.backgroundOverlay, equals(original.backgroundOverlay));
+      expect(copy.halo, equals(original.halo));
+    });
+
+    test('none has zero-alpha overlay and no halo', () {
+      expect(OiInteractiveStyle.none.backgroundOverlay.a, equals(0.0));
+      expect(OiInteractiveStyle.none.halo, equals(OiHaloStyle.none));
+    });
+
+    test('hashCode is consistent for equal values', () {
+      const a = OiInteractiveStyle(
+        backgroundOverlay: Color(0x0A000000),
+        halo: OiHaloStyle.none,
+      );
+      const b = OiInteractiveStyle(
+        backgroundOverlay: Color(0x0A000000),
+        halo: OiHaloStyle.none,
+      );
+      expect(a.hashCode, equals(b.hashCode));
+    });
+  });
+
   group('OiEffectsTheme.standard', () {
     const primary = Color(0xFF2563EB);
     late OiEffectsTheme theme;
@@ -88,6 +164,18 @@ void main() {
 
     test('returns non-null dragging style', () {
       expect(theme.dragging, isNotNull);
+    });
+
+    test('returns non-null focusRing', () {
+      expect(theme.focusRing, isNotNull);
+    });
+
+    test('focusRing width is at least 2.0', () {
+      expect(theme.focusRing.width, greaterThanOrEqualTo(2.0));
+    });
+
+    test('focusRing color has non-zero alpha', () {
+      expect(theme.focusRing.color.a, greaterThan(0.0));
     });
 
     test('focus has a non-zero halo blur', () {

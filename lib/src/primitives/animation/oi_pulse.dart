@@ -1,5 +1,5 @@
 import 'package:flutter/widgets.dart';
-import 'package:obers_ui/src/foundation/oi_accessibility.dart';
+import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 
 /// Applies a looping opacity and/or scale pulse animation to [child].
 ///
@@ -114,7 +114,9 @@ class _OiPulseState extends State<OiPulse> with SingleTickerProviderStateMixin {
   }
 
   void _syncAnimation() {
-    final reduced = OiA11y.reducedMotion(context);
+    final reduced =
+        context.animations.reducedMotion ||
+        MediaQuery.disableAnimationsOf(context);
     if (widget.active && !reduced) {
       if (!_controller.isAnimating) _controller.repeat(reverse: true);
     } else {
@@ -132,7 +134,9 @@ class _OiPulseState extends State<OiPulse> with SingleTickerProviderStateMixin {
   Widget build(BuildContext context) {
     if (!widget.active) return widget.child;
 
-    final reduced = OiA11y.reducedMotion(context);
+    final reduced =
+        context.animations.reducedMotion ||
+        MediaQuery.disableAnimationsOf(context);
     if (reduced) return widget.child;
 
     return AnimatedBuilder(

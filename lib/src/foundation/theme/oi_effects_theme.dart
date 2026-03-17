@@ -1,6 +1,80 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/painting.dart';
 
+/// Defines the focus ring border rendered around a focused widget.
+///
+/// The ring is always rendered independently of the halo/glow effect so that
+/// no theme configuration can remove keyboard focus visibility.
+///
+/// {@category Foundation}
+@immutable
+class OiFocusRingStyle {
+  /// Creates an [OiFocusRingStyle] with explicit values.
+  const OiFocusRingStyle({
+    required this.color,
+    this.width = 2.0,
+    this.borderRadius = BorderRadius.zero,
+  });
+
+  /// Creates a standard focus ring from [primaryColor].
+  factory OiFocusRingStyle.standard(Color primaryColor) {
+    return OiFocusRingStyle(
+      color: primaryColor.withValues(alpha: 0.85),
+      width: 2.0,
+    );
+  }
+
+  /// The border color of the focus ring.
+  final Color color;
+
+  /// The border width in logical pixels.
+  final double width;
+
+  /// The border radius applied to each corner of the ring.
+  final BorderRadius borderRadius;
+
+  /// Returns a copy of this style with minimum alpha and width enforced.
+  ///
+  /// Guarantees that:
+  /// - [color] alpha ≥ 0.5 (ring is always perceptible)
+  /// - [width] ≥ 2.0 (ring is always physically visible)
+  OiFocusRingStyle get enforced {
+    final clampedColor =
+        color.a < 0.5 ? color.withValues(alpha: 0.5) : color;
+    final clampedWidth = width < 2.0 ? 2.0 : width;
+    return OiFocusRingStyle(
+      color: clampedColor,
+      width: clampedWidth,
+      borderRadius: borderRadius,
+    );
+  }
+
+  /// Creates a copy with optionally overridden values.
+  OiFocusRingStyle copyWith({
+    Color? color,
+    double? width,
+    BorderRadius? borderRadius,
+  }) {
+    return OiFocusRingStyle(
+      color: color ?? this.color,
+      width: width ?? this.width,
+      borderRadius: borderRadius ?? this.borderRadius,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is OiFocusRingStyle &&
+        other.color == color &&
+        other.width == width &&
+        other.borderRadius == borderRadius;
+  }
+
+  @override
+  int get hashCode => Object.hash(color, width, borderRadius);
+}
+
 /// Defines a halo/glow effect rendered as a [BoxShadow].
 ///
 /// Halo effects are used to highlight interactive elements (e.g. focused
@@ -102,6 +176,19 @@ class OiInteractiveStyle {
   /// For active/pressed states, this is typically 0.97 or 0.98.
   final double scale;
 
+  /// Creates a copy with optionally overridden values.
+  OiInteractiveStyle copyWith({
+    Color? backgroundOverlay,
+    OiHaloStyle? halo,
+    double? scale,
+  }) {
+    return OiInteractiveStyle(
+      backgroundOverlay: backgroundOverlay ?? this.backgroundOverlay,
+      halo: halo ?? this.halo,
+      scale: scale ?? this.scale,
+    );
+  }
+
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
@@ -131,6 +218,7 @@ class OiEffectsTheme {
     required this.disabled,
     required this.selected,
     required this.dragging,
+    required this.focusRing,
   });
 
   /// Creates the standard effects theme using [primaryColor] for focus/hover halos.
@@ -159,6 +247,7 @@ class OiEffectsTheme {
         halo: OiHaloStyle.from(primaryColor, intensity: 0.15),
         scale: 1.03,
       ),
+      focusRing: OiFocusRingStyle.standard(primaryColor),
     );
   }
 
@@ -180,6 +269,12 @@ class OiEffectsTheme {
   /// Applied when the widget is being dragged.
   final OiInteractiveStyle dragging;
 
+  /// The focus ring border style rendered when the widget has keyboard focus.
+  ///
+  /// This ring is always rendered independently of [focus] so that it cannot
+  /// be suppressed by setting [focus] to [OiInteractiveStyle.none].
+  final OiFocusRingStyle focusRing;
+
   /// Creates a copy with optionally overridden state styles.
   OiEffectsTheme copyWith({
     OiInteractiveStyle? hover,
@@ -188,6 +283,7 @@ class OiEffectsTheme {
     OiInteractiveStyle? disabled,
     OiInteractiveStyle? selected,
     OiInteractiveStyle? dragging,
+    OiFocusRingStyle? focusRing,
   }) {
     return OiEffectsTheme(
       hover: hover ?? this.hover,
@@ -196,6 +292,7 @@ class OiEffectsTheme {
       disabled: disabled ?? this.disabled,
       selected: selected ?? this.selected,
       dragging: dragging ?? this.dragging,
+      focusRing: focusRing ?? this.focusRing,
     );
   }
 
@@ -208,10 +305,11 @@ class OiEffectsTheme {
         other.active == active &&
         other.disabled == disabled &&
         other.selected == selected &&
-        other.dragging == dragging;
+        other.dragging == dragging &&
+        other.focusRing == focusRing;
   }
 
   @override
   int get hashCode =>
-      Object.hash(hover, focus, active, disabled, selected, dragging);
+      Object.hash(hover, focus, active, disabled, selected, dragging, focusRing);
 }

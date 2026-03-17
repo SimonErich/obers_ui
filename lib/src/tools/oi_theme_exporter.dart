@@ -801,6 +801,17 @@ class OiThemeExporter {
     );
   }
 
+  static OiFocusRingStyle _focusRingFromMap(
+    Map<String, dynamic>? map,
+    OiFocusRingStyle fallback,
+  ) {
+    if (map == null) return fallback;
+    return OiFocusRingStyle(
+      color: _hexToColorOr(map['color'] as String?, fallback.color),
+      width: (map['width'] as num?)?.toDouble() ?? fallback.width,
+    );
+  }
+
   /// Serializes an [OiEffectsTheme] to a map.
   static Map<String, dynamic> _effectsToMap(OiEffectsTheme effects) {
     return {
@@ -810,6 +821,10 @@ class OiThemeExporter {
       'disabled': _interactiveStyleToMap(effects.disabled),
       'selected': _interactiveStyleToMap(effects.selected),
       'dragging': _interactiveStyleToMap(effects.dragging),
+      'focusRing': {
+        'color': _colorToHex(effects.focusRing.color),
+        'width': effects.focusRing.width,
+      },
     };
   }
 
@@ -843,6 +858,10 @@ class OiThemeExporter {
       dragging: _interactiveStyleFromMap(
         map['dragging'] as Map<String, dynamic>?,
         fallback.dragging,
+      ),
+      focusRing: _focusRingFromMap(
+        map['focusRing'] as Map<String, dynamic>?,
+        fallback.focusRing,
       ),
     );
   }
@@ -1154,6 +1173,11 @@ class OiThemeExporter {
     writeInteractiveStyle('disabled', effects.disabled);
     writeInteractiveStyle('selected', effects.selected);
     writeInteractiveStyle('dragging', effects.dragging);
+    buf
+      ..writeln('    focusRing: OiFocusRingStyle(')
+      ..writeln('      color: ${_colorToDart(effects.focusRing.color)},')
+      ..writeln('      width: ${effects.focusRing.width},')
+      ..writeln('    ),');
   }
 
   /// Writes decoration theme fields as Dart source code.

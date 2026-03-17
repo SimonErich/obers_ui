@@ -165,6 +165,14 @@ class _OiSheetState extends State<OiSheet> with SingleTickerProviderStateMixin {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _controller.duration = context.animations.reducedMotion
+        ? Duration.zero
+        : const Duration(milliseconds: 260);
+  }
+
+  @override
   void didUpdateWidget(OiSheet oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.open != oldWidget.open) {

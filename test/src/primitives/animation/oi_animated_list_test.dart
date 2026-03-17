@@ -127,7 +127,38 @@ void main() {
     await tester.pumpAndSettle();
   });
 
-  // ── 6. shrinkWrap=true is forwarded ──────────────────────────────────────
+  // ── 6. reducedMotion: insert uses Duration.zero ───────────────────────────
+
+  testWidgets('reducedMotion: insert and remove complete without animation', (
+    tester,
+  ) async {
+    final controller = OiAnimatedListController<String>();
+
+    await tester.pumpObers(
+      MediaQuery(
+        data: const MediaQueryData(disableAnimations: true),
+        child: OiAnimatedList<String>(
+          items: const ['a'],
+          controller: controller,
+          itemBuilder: (_, item, animation, index) =>
+              SizeTransition(sizeFactor: animation, child: Text(item)),
+        ),
+      ),
+    );
+    await tester.pump();
+
+    controller.insert(1, 'b');
+    await tester.pump(); // with Duration.zero the item appears immediately
+
+    expect(find.text('b'), findsOneWidget);
+
+    controller.remove(1);
+    await tester.pump(); // with Duration.zero the item is removed immediately
+
+    expect(find.text('b'), findsNothing);
+  });
+
+  // ── 7. shrinkWrap=true is forwarded ──────────────────────────────────────
 
   testWidgets('shrinkWrap=true does not throw', (tester) async {
     await tester.pumpObers(

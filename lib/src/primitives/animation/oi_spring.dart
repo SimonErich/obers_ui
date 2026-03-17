@@ -1,5 +1,6 @@
 import 'package:flutter/physics.dart';
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 
 /// A widget that drives a [builder] with a spring-physics animation toward a
 /// target [value].
@@ -81,6 +82,16 @@ class _OiSpringState extends State<OiSpring>
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (context.animations.reducedMotion ||
+        MediaQuery.disableAnimationsOf(context)) {
+      _controller.stop();
+      _controller.value = widget.value;
+    }
+  }
+
+  @override
   void didUpdateWidget(OiSpring oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.value != widget.value ||
@@ -100,6 +111,11 @@ class _OiSpringState extends State<OiSpring>
     required double to,
     double velocity = 0,
   }) {
+    if (context.animations.reducedMotion ||
+        MediaQuery.disableAnimationsOf(context)) {
+      _controller.value = to;
+      return;
+    }
     final desc = SpringDescription(
       mass: widget.mass,
       stiffness: widget.stiffness,

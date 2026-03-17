@@ -86,7 +86,37 @@ void main() {
     expect(find.text('1.00'), findsOneWidget);
   });
 
-  // ── 5. custom spring parameters accepted without error ────────────────────
+  // ── 5. reducedMotion: value change snaps instantly ────────────────────────
+
+  testWidgets('reducedMotion: value change snaps to target without animation', (
+    tester,
+  ) async {
+    final notifier = ValueNotifier<double>(0);
+
+    await tester.pumpObers(
+      MediaQuery(
+        data: const MediaQueryData(disableAnimations: true),
+        child: ValueListenableBuilder<double>(
+          valueListenable: notifier,
+          builder: (_, v, __) => OiSpring(
+            value: v,
+            builder: (_, animVal, ___) =>
+                Text(animVal.toStringAsFixed(2), key: const ValueKey('out')),
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+    expect(find.text('0.00'), findsOneWidget);
+
+    notifier.value = 1;
+    await tester.pump(); // rebuild triggers didUpdateWidget → _runSpring
+
+    // With reducedMotion the controller jumps directly to the target.
+    expect(find.text('1.00'), findsOneWidget);
+  });
+
+  // ── 6. custom spring parameters accepted without error ────────────────────
 
   testWidgets('custom stiffness/damping/mass renders without error', (
     tester,

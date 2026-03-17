@@ -1,5 +1,4 @@
 import 'package:flutter/widgets.dart';
-import 'package:obers_ui/src/foundation/oi_accessibility.dart';
 import 'package:obers_ui/src/foundation/oi_responsive.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 
@@ -148,7 +147,9 @@ class _OiVisibilityState extends State<OiVisibility>
   }
 
   void _updateDuration() {
-    final reducedMotion = OiA11y.reducedMotion(context);
+    final reducedMotion =
+        context.animations.reducedMotion ||
+        MediaQuery.disableAnimationsOf(context);
     if (reducedMotion) {
       _controller.duration = Duration.zero;
       _controller.reverseDuration = Duration.zero;

@@ -289,7 +289,13 @@ class _OiAppState extends State<OiApp> {
   /// → [OiTourScope] → [OiOverlaysHost]
   Widget _buildScaffold(BuildContext context, Widget? child) {
     final platformBrightness = MediaQuery.platformBrightnessOf(context);
-    final themeData = _resolveTheme(platformBrightness);
+    var themeData = _resolveTheme(platformBrightness);
+
+    if (MediaQuery.disableAnimationsOf(context)) {
+      themeData = themeData.copyWith(
+        animations: const OiAnimationConfig.standard(reducedMotion: true),
+      );
+    }
 
     Widget result = OiTheme(
       data: themeData,

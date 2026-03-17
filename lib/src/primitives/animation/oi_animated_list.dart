@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 
 /// Controller that allows programmatic insert and remove operations on
 /// an [OiAnimatedList].
@@ -137,15 +138,25 @@ class _OiAnimatedListState<T> extends State<OiAnimatedList<T>> {
 
   void _insert(int index, T item) {
     _items.insert(index, item);
-    _listKey.currentState?.insertItem(index);
+    final reducedMotion =
+        context.animations.reducedMotion ||
+        MediaQuery.disableAnimationsOf(context);
+    _listKey.currentState?.insertItem(
+      index,
+      duration: reducedMotion ? Duration.zero : const Duration(milliseconds: 300),
+    );
   }
 
   void _remove(int index) {
     final removedItem = _items.removeAt(index);
+    final reducedMotion =
+        context.animations.reducedMotion ||
+        MediaQuery.disableAnimationsOf(context);
     _listKey.currentState?.removeItem(
       index,
       (context, animation) =>
           _buildRemoveWidget(context, removedItem, animation),
+      duration: reducedMotion ? Duration.zero : const Duration(milliseconds: 300),
     );
   }
 
@@ -165,6 +176,9 @@ class _OiAnimatedListState<T> extends State<OiAnimatedList<T>> {
 
   @override
   Widget build(BuildContext context) {
+    final reducedMotion =
+        context.animations.reducedMotion ||
+        MediaQuery.disableAnimationsOf(context);
     return AnimatedList(
       key: _listKey,
       initialItemCount: _items.length,
@@ -172,10 +186,9 @@ class _OiAnimatedListState<T> extends State<OiAnimatedList<T>> {
       shrinkWrap: widget.shrinkWrap,
       padding: widget.padding,
       itemBuilder: (context, index, animation) {
-        return SizeTransition(
-          sizeFactor: animation,
-          child: widget.itemBuilder(context, _items[index], animation, index),
-        );
+        final child = widget.itemBuilder(context, _items[index], animation, index);
+        if (reducedMotion) return child;
+        return SizeTransition(sizeFactor: animation, child: child);
       },
     );
   }
