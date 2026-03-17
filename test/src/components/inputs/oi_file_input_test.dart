@@ -20,7 +20,7 @@ void main() {
   });
 
   testWidgets('multiple=true shows choose files button', (tester) async {
-    await tester.pumpObers(const OiFileInput(multiple: true));
+    await tester.pumpObers(const OiFileInput(multipleFiles: true));
     expect(find.text('Choose files…'), findsOneWidget);
   });
 

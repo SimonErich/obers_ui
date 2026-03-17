@@ -117,14 +117,14 @@ void main() {
     expect(find.text('B'), findsOneWidget);
   });
 
-  // ── Exclusive mode ─────────────────────────────────────────────────────────
+  // ── Single-select mode (multiSelect: false) ────────────────────────────────
 
-  testWidgets('exclusive: tapping item calls onSelect with correct index',
+  testWidgets('multiSelect: false — tapping item calls onSelect with correct index',
       (tester) async {
     int? selected;
     await tester.pumpObers(
       OiButtonGroup(
-        exclusive: true,
+        multiSelect: false,
         selectedIndex: 0,
         onSelect: (i) => selected = i,
         items: const [
@@ -139,11 +139,11 @@ void main() {
     expect(selected, 1);
   });
 
-  testWidgets('exclusive: selected item has non-zero background alpha (soft)',
+  testWidgets('multiSelect: false — selected item has non-zero background alpha (soft)',
       (tester) async {
     await tester.pumpObers(
       const OiButtonGroup(
-        exclusive: true,
+        multiSelect: false,
         selectedIndex: 1,
         items: [
           OiButtonGroupItem(label: 'A'),
@@ -163,11 +163,11 @@ void main() {
     expect(filled, isNotEmpty);
   });
 
-  testWidgets('exclusive: arrow key moves selection', (tester) async {
+  testWidgets('multiSelect: false — arrow key moves selection', (tester) async {
     int? selected;
     await tester.pumpObers(
       OiButtonGroup(
-        exclusive: true,
+        multiSelect: false,
         selectedIndex: 0,
         onSelect: (i) => selected = i,
         items: const [
@@ -203,7 +203,7 @@ void main() {
     int? selected;
     await tester.pumpObers(
       OiButtonGroup(
-        exclusive: true,
+        multiSelect: false,
         selectedIndex: 0,
         onSelect: (i) => selected = i,
         items: const [
@@ -222,5 +222,57 @@ void main() {
   testWidgets('empty items list renders nothing crashlessly', (tester) async {
     await tester.pumpObers(const OiButtonGroup(items: []));
     expect(tester.takeException(), isNull);
+  });
+
+  // ── Compact wrap behaviour ─────────────────────────────────────────────────
+
+  testWidgets(
+      'wrap=true: horizontal group becomes vertical on compact breakpoint',
+      (tester) async {
+    await tester.pumpObers(
+      MediaQuery(
+        data: const MediaQueryData(size: Size(375, 812)),
+        child: const OiButtonGroup(
+          direction: Axis.horizontal,
+          wrap: true,
+          items: [
+            OiButtonGroupItem(label: 'A'),
+            OiButtonGroupItem(label: 'B'),
+          ],
+        ),
+      ),
+    );
+    // On compact + wrap=true the effective direction is Axis.vertical:
+    // items share the same x-coordinate and have different y-coordinates.
+    final aCx = tester.getCenter(find.text('A')).dx;
+    final bCx = tester.getCenter(find.text('B')).dx;
+    final aY = tester.getCenter(find.text('A')).dy;
+    final bY = tester.getCenter(find.text('B')).dy;
+    expect((aCx - bCx).abs(), lessThan(4),
+        reason: 'items should share x (vertical layout)');
+    expect((aY - bY).abs(), greaterThan(4),
+        reason: 'items should be stacked vertically');
+  });
+
+  testWidgets('wrap=false: horizontal group stays Row on compact breakpoint',
+      (tester) async {
+    await tester.pumpObers(
+      MediaQuery(
+        data: const MediaQueryData(size: Size(375, 812)),
+        child: const OiButtonGroup(
+          direction: Axis.horizontal,
+          wrap: false,
+          items: [
+            OiButtonGroupItem(label: 'A'),
+            OiButtonGroupItem(label: 'B'),
+          ],
+        ),
+      ),
+    );
+    // wrap=false keeps horizontal layout even on compact.
+    final aY = tester.getCenter(find.text('A')).dy;
+    final bY = tester.getCenter(find.text('B')).dy;
+    expect((aY - bY).abs(), lessThan(4),
+        reason: 'items should share y (horizontal layout)');
   });
 }

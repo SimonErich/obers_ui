@@ -1,5 +1,7 @@
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/src/foundation/oi_responsive.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
+import 'package:obers_ui/src/primitives/gesture/oi_double_tap.dart';
 import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
 
 // ---------------------------------------------------------------------------
@@ -41,6 +43,9 @@ class OiKanbanColumn<T> {
 ///
 /// Supports drag-and-drop between columns, column reordering, WIP limits,
 /// collapsible columns, and quick card editing.
+///
+/// On compact screens, renders a single-column swipe view so users can
+/// navigate between columns with left/right swipe gestures.
 ///
 /// {@category Modules}
 class OiKanban<T> extends StatefulWidget {
@@ -87,7 +92,7 @@ class OiKanban<T> extends StatefulWidget {
   /// Work-in-progress limits per column, keyed by [OiKanbanColumn.key].
   final Map<Object, int>? wipLimits;
 
-  /// Whether quick-edit mode is enabled.
+  /// Whether quick-edit mode is enabled (double-tap column title to edit).
   final bool quickEdit;
 
   /// Whether columns can be collapsed.
@@ -108,6 +113,33 @@ class OiKanban<T> extends StatefulWidget {
 
 class _OiKanbanState<T> extends State<OiKanban<T>> {
   final Set<Object> _collapsedColumns = {};
+  Object? _editingColumnKey;
+  final TextEditingController _editingController = TextEditingController();
+  final FocusNode _editingFocusNode = FocusNode();
+  final PageController _pageController = PageController();
+  int _compactPageIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _editingFocusNode.addListener(_onEditFocusChange);
+  }
+
+  @override
+  void dispose() {
+    _editingController.dispose();
+    _editingFocusNode
+      ..removeListener(_onEditFocusChange)
+      ..dispose();
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  void _onEditFocusChange() {
+    if (!_editingFocusNode.hasFocus && _editingColumnKey != null) {
+      setState(() => _editingColumnKey = null);
+    }
+  }
 
   void _toggleCollapse(Object columnKey) {
     setState(() {
@@ -119,6 +151,19 @@ class _OiKanbanState<T> extends State<OiKanban<T>> {
     });
   }
 
+  void _startEditing(OiKanbanColumn<T> column) {
+    setState(() {
+      _editingColumnKey = column.key;
+      _editingController.text = column.title;
+    });
+    _editingFocusNode.requestFocus();
+  }
+
+  void _commitEdit() {
+    setState(() => _editingColumnKey = null);
+    _editingFocusNode.unfocus();
+  }
+
   bool _isOverWipLimit(OiKanbanColumn<T> column) {
     if (widget.wipLimits == null) return false;
     final limit = widget.wipLimits![column.key];
@@ -126,21 +171,117 @@ class _OiKanbanState<T> extends State<OiKanban<T>> {
     return column.items.length > limit;
   }
 
+  // ── Build ────────────────────────────────────────────────────────────────
+
   @override
   Widget build(BuildContext context) {
+    final isCompact = context.isCompact;
+
     return Semantics(
       label: widget.label,
       container: true,
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            for (final column in widget.columns) _buildColumn(context, column),
-            if (widget.addColumn) _buildAddColumnButton(context),
-          ],
-        ),
+      child: isCompact
+          ? _buildCompactView(context)
+          : _buildExpandedView(context),
+    );
+  }
+
+  Widget _buildExpandedView(BuildContext context) {
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          for (final column in widget.columns) _buildColumn(context, column),
+          if (widget.addColumn) _buildAddColumnButton(context),
+        ],
       ),
+    );
+  }
+
+  Widget _buildCompactView(BuildContext context) {
+    final colors = context.colors;
+    final totalColumns = widget.columns.length;
+
+    if (totalColumns == 0) {
+      return widget.addColumn
+          ? _buildAddColumnButton(context)
+          : const SizedBox.shrink();
+    }
+
+    return Column(
+      children: [
+        // Page indicator with navigation arrows.
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              OiTappable(
+                onTap: _compactPageIndex > 0
+                    ? () {
+                        final next = _compactPageIndex - 1;
+                        _pageController.animateToPage(
+                          next,
+                          duration: const Duration(milliseconds: 300),
+                          curve: Curves.easeInOut,
+                        );
+                      }
+                    : null,
+                child: Icon(
+                  const IconData(0xe5cb, fontFamily: 'MaterialIcons'),
+                  size: 20,
+                  color: _compactPageIndex > 0
+                      ? colors.text
+                      : colors.textMuted,
+                ),
+              ),
+              Text(
+                '${_compactPageIndex + 1} / $totalColumns',
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                  color: colors.textSubtle,
+                ),
+              ),
+              OiTappable(
+                onTap: _compactPageIndex < totalColumns - 1
+                    ? () {
+                        final next = _compactPageIndex + 1;
+                        _pageController.animateToPage(
+                          next,
+                          duration: const Duration(milliseconds: 300),
+                          curve: Curves.easeInOut,
+                        );
+                      }
+                    : null,
+                child: Icon(
+                  const IconData(0xe5cc, fontFamily: 'MaterialIcons'),
+                  size: 20,
+                  color: _compactPageIndex < totalColumns - 1
+                      ? colors.text
+                      : colors.textMuted,
+                ),
+              ),
+            ],
+          ),
+        ),
+        Expanded(
+          child: PageView.builder(
+            controller: _pageController,
+            itemCount: totalColumns,
+            onPageChanged: (index) {
+              setState(() => _compactPageIndex = index);
+            },
+            itemBuilder: (context, index) {
+              return SingleChildScrollView(
+                padding: const EdgeInsets.all(8),
+                child: _buildColumn(context, widget.columns[index]),
+              );
+            },
+          ),
+        ),
+      ],
     );
   }
 
@@ -183,65 +324,89 @@ class _OiKanbanState<T> extends State<OiKanban<T>> {
     }
 
     final wipLimit = widget.wipLimits?[column.key];
+    final isEditing = _editingColumnKey == column.key;
 
-    return OiTappable(
-      onTap: widget.collapsibleColumns
-          ? () => _toggleCollapse(column.key)
-          : null,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-        decoration: BoxDecoration(
-          color: column.color?.withValues(alpha: 0.1),
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
+    Widget titleWidget;
+    if (isEditing) {
+      titleWidget = EditableText(
+        controller: _editingController,
+        focusNode: _editingFocusNode,
+        style: TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.w600,
+          color: colors.text,
         ),
-        child: Row(
-          children: [
-            if (column.color != null)
-              Container(
-                width: 8,
-                height: 8,
-                margin: const EdgeInsets.only(right: 8),
-                decoration: BoxDecoration(
-                  color: column.color,
-                  shape: BoxShape.circle,
+        cursorColor: colors.primary.base,
+        backgroundCursorColor: colors.surfaceHover,
+        onSubmitted: (_) => _commitEdit(),
+        maxLines: 1,
+      );
+    } else {
+      titleWidget = Text(
+        column.title,
+        style: TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.w600,
+          color: colors.text,
+        ),
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+      );
+    }
+
+    final headerContent = OiDoubleTap(
+      enabled: widget.quickEdit && !isEditing,
+      onDoubleTap: () => _startEditing(column),
+      child: OiTappable(
+        onTap: widget.collapsibleColumns && !isEditing
+            ? () => _toggleCollapse(column.key)
+            : null,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          decoration: BoxDecoration(
+            color: column.color?.withValues(alpha: 0.1),
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
+          ),
+          child: Row(
+            children: [
+              if (column.color != null)
+                Container(
+                  width: 8,
+                  height: 8,
+                  margin: const EdgeInsets.only(right: 8),
+                  decoration: BoxDecoration(
+                    color: column.color,
+                    shape: BoxShape.circle,
+                  ),
                 ),
-              ),
-            Expanded(
-              child: Text(
-                column.title,
+              Expanded(child: titleWidget),
+              Text(
+                wipLimit != null
+                    ? '${column.items.length}/$wipLimit'
+                    : '${column.items.length}',
                 style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: colors.text,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w400,
+                  color: overWip ? colors.error.base : colors.textMuted,
                 ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
               ),
-            ),
-            Text(
-              wipLimit != null
-                  ? '${column.items.length}/$wipLimit'
-                  : '${column.items.length}',
-              style: TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w400,
-                color: overWip ? colors.error.base : colors.textMuted,
-              ),
-            ),
-            if (widget.collapsibleColumns) ...[
-              const SizedBox(width: 4),
-              Icon(
-                collapsed
-                    ? const IconData(0xe5cf, fontFamily: 'MaterialIcons')
-                    : const IconData(0xe5ce, fontFamily: 'MaterialIcons'),
-                size: 16,
-                color: colors.textMuted,
-              ),
+              if (widget.collapsibleColumns) ...[
+                const SizedBox(width: 4),
+                Icon(
+                  collapsed
+                      ? const IconData(0xe5cf, fontFamily: 'MaterialIcons')
+                      : const IconData(0xe5ce, fontFamily: 'MaterialIcons'),
+                  size: 16,
+                  color: colors.textMuted,
+                ),
+              ],
             ],
-          ],
+          ),
         ),
       ),
     );
+
+    return headerContent;
   }
 
   Widget _buildColumnBody(BuildContext context, OiKanbanColumn<T> column) {

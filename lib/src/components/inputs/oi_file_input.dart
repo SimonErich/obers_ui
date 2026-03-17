@@ -6,7 +6,7 @@ import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
 
 /// A file-picker input that opens the platform file browser.
 ///
-/// Selected file names are shown as removable chips. When [multiple] is
+/// Selected file names are shown as removable chips. When [multipleFiles] is
 /// `false` only one file may be selected at a time. [allowedExtensions]
 /// restricts which file types are listed. When [dropZone] is `true` a dashed
 /// drop-target area is rendered beneath the chip list (UI only; actual
@@ -22,7 +22,7 @@ class OiFileInput extends StatefulWidget {
     this.hint,
     this.error,
     this.enabled = true,
-    this.multiple = false,
+    this.multipleFiles = false,
     this.allowedExtensions,
     this.dropZone = false,
     super.key,
@@ -47,7 +47,7 @@ class OiFileInput extends StatefulWidget {
   final bool enabled;
 
   /// Whether multiple files may be selected at once.
-  final bool multiple;
+  final bool multipleFiles;
 
   /// Restricts selectable files to these extensions (e.g. `['pdf', 'png']`).
   final List<String>? allowedExtensions;
@@ -67,7 +67,7 @@ class _OiFileInputState extends State<OiFileInput> {
     setState(() => _picking = true);
     try {
       final result = await FilePicker.platform.pickFiles(
-        allowMultiple: widget.multiple,
+        allowMultiple: widget.multipleFiles,
         type: widget.allowedExtensions != null ? FileType.custom : FileType.any,
         allowedExtensions: widget.allowedExtensions,
       );
@@ -186,7 +186,7 @@ class _OiFileInputState extends State<OiFileInput> {
               ),
             const SizedBox(width: 6),
             Text(
-              widget.multiple ? 'Choose files…' : 'Choose file…',
+              widget.multipleFiles ? 'Choose files…' : 'Choose file…',
               style: TextStyle(
                 fontSize: 13,
                 color: colors.primary.base,

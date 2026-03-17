@@ -64,4 +64,15 @@ void main() {
       expect(find.text('XY'), findsOneWidget);
     }
   });
+
+  testWidgets('semanticLabel is exposed in the accessibility tree', (
+    tester,
+  ) async {
+    final handle = tester.ensureSemantics();
+    addTearDown(handle.dispose);
+    await tester.pumpObers(
+      const OiAvatar(semanticLabel: 'Profile picture', initials: 'AB'),
+    );
+    expect(find.bySemanticsLabel('Profile picture'), findsOneWidget);
+  });
 }

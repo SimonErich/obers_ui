@@ -106,6 +106,7 @@ class OiButton extends StatefulWidget {
     this.countdownSeconds,
     this.confirmLabel,
     this.onConfirm,
+    this.borderRadius,
     super.key,
   }) : _kind = kind;
 
@@ -203,6 +204,7 @@ class OiButton extends StatefulWidget {
     IconData? icon,
     OiIconPosition iconPosition = OiIconPosition.leading,
     String? semanticLabel,
+    BorderRadius? borderRadius,
     Key? key,
   }) : this._(
          kind: _OiButtonKind.standard,
@@ -216,6 +218,7 @@ class OiButton extends StatefulWidget {
          loading: loading,
          fullWidth: fullWidth,
          semanticLabel: semanticLabel,
+         borderRadius: borderRadius,
          key: key,
        );
 
@@ -257,6 +260,7 @@ class OiButton extends StatefulWidget {
     IconData? icon,
     OiIconPosition iconPosition = OiIconPosition.leading,
     String? semanticLabel,
+    BorderRadius? borderRadius,
     Key? key,
   }) : this._(
          kind: _OiButtonKind.standard,
@@ -270,6 +274,7 @@ class OiButton extends StatefulWidget {
          loading: loading,
          fullWidth: fullWidth,
          semanticLabel: semanticLabel,
+         borderRadius: borderRadius,
          key: key,
        );
 
@@ -278,6 +283,7 @@ class OiButton extends StatefulWidget {
   /// Creates an icon-only button with a square aspect ratio.
   ///
   /// The button has equal padding on all sides; no label is shown.
+  /// [label] is required and announced by screen readers.
   const OiButton.icon({
     required IconData icon,
     required String label,
@@ -407,6 +413,12 @@ class OiButton extends StatefulWidget {
 
   /// The callback fired on the second tap of a confirm button.
   final VoidCallback? onConfirm;
+
+  /// An optional override for the button's corner border radius.
+  ///
+  /// When `null` (the default), the radius is taken from the component theme
+  /// or falls back to [OiTheme.radius.sm].
+  final BorderRadius? borderRadius;
 
   @override
   State<OiButton> createState() => _OiButtonState();
@@ -683,7 +695,11 @@ class _OiButtonState extends State<OiButton> {
     final height = _buttonHeight(density);
     final hPad = _hPadding(context);
     final foreground = _foregroundColor(context, widget.variant);
-    final decoration = _decoration(context, widget.variant);
+    final decoration = _decoration(
+      context,
+      widget.variant,
+      borderRadius: widget.borderRadius,
+    );
     final isActive = widget.enabled && !widget.loading;
 
     Widget button = OiTappable(

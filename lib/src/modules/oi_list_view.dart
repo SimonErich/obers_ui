@@ -2,6 +2,10 @@ import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/display/oi_empty_state.dart';
 import 'package:obers_ui/src/components/display/oi_progress.dart';
 import 'package:obers_ui/src/components/inputs/oi_text_input.dart';
+import 'package:obers_ui/src/components/overlays/oi_sheet.dart';
+import 'package:obers_ui/src/composites/navigation/oi_filter_bar.dart';
+import 'package:obers_ui/src/foundation/oi_app.dart';
+import 'package:obers_ui/src/foundation/oi_responsive.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
 
@@ -72,6 +76,9 @@ class OiListView<T> extends StatefulWidget {
     required this.label,
     this.searchQuery,
     this.onSearch,
+    this.filters,
+    this.activeFilters = const {},
+    this.onFilterChange,
     this.sortOptions,
     this.activeSort,
     this.onSort,
@@ -105,6 +112,15 @@ class OiListView<T> extends StatefulWidget {
 
   /// Called when the user types in the search field.
   final ValueChanged<String>? onSearch;
+
+  /// Available filter definitions shown as chips in the filter bar.
+  final List<OiFilterDefinition>? filters;
+
+  /// The currently active filters keyed by [OiFilterDefinition.key].
+  final Map<String, OiColumnFilter> activeFilters;
+
+  /// Called when the active filter set changes.
+  final ValueChanged<Map<String, OiColumnFilter>>? onFilterChange;
 
   /// Available sort options displayed in the sort bar.
   final List<OiSortOption>? sortOptions;
@@ -154,6 +170,13 @@ class OiListView<T> extends StatefulWidget {
 
 class _OiListViewState<T> extends State<OiListView<T>> {
   final ScrollController _scrollController = ScrollController();
+  bool _isRefreshing = false;
+  double _overscrollAccumulated = 0;
+  VoidCallback? _dismissFilterSheet;
+
+  bool get _refreshEnabled =>
+      widget.onRefresh != null &&
+      OiDensityScope.of(context) == OiDensity.comfortable;
 
   @override
   void initState() {
@@ -178,6 +201,33 @@ class _OiListViewState<T> extends State<OiListView<T>> {
     }
   }
 
+  Future<void> _triggerRefresh() async {
+    if (_isRefreshing) return;
+    setState(() => _isRefreshing = true);
+    try {
+      await widget.onRefresh!();
+    } finally {
+      if (mounted) setState(() => _isRefreshing = false);
+    }
+  }
+
+  bool _handleScrollNotification(ScrollNotification notification) {
+    if (!_refreshEnabled) return false;
+    if (notification is OverscrollNotification) {
+      if (notification.overscroll < 0) {
+        _overscrollAccumulated += notification.overscroll.abs();
+        if (_overscrollAccumulated >= 60 && !_isRefreshing) {
+          _overscrollAccumulated = 0;
+          _triggerRefresh();
+        }
+      }
+    }
+    if (notification is ScrollEndNotification) {
+      _overscrollAccumulated = 0;
+    }
+    return false;
+  }
+
   void _handleItemTap(T item) {
     if (widget.selectionMode == OiSelectionMode.none) return;
     final key = widget.itemKey(item);
@@ -200,10 +250,51 @@ class _OiListViewState<T> extends State<OiListView<T>> {
     widget.onSelectionChange?.call(selected);
   }
 
+  void _openFilterSheet(BuildContext context) {
+    _dismissFilterSheet?.call();
+    final handle = OiSheet.show(
+      context,
+      side: OiPanelSide.bottom,
+      dragHandle: true,
+      onClose: () => _dismissFilterSheet = null,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'Filters',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: context.colors.text,
+              ),
+            ),
+            const SizedBox(height: 12),
+            OiFilterBar(
+              filters: widget.filters!,
+              activeFilters: widget.activeFilters,
+              onFilterChange: (updated) {
+                widget.onFilterChange?.call(updated);
+              },
+            ),
+            const SizedBox(height: 8),
+          ],
+        ),
+      ),
+    );
+    _dismissFilterSheet = handle.dismiss;
+  }
+
   // ── Build ────────────────────────────────────────────────────────────────
 
   @override
   Widget build(BuildContext context) {
+    final isCompact = context.isCompact;
+    final hasSelectionBar =
+        widget.selectionActions != null && widget.selectedKeys.isNotEmpty;
+
     return Semantics(
       label: widget.label,
       container: true,
@@ -212,9 +303,9 @@ class _OiListViewState<T> extends State<OiListView<T>> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           _buildHeader(context),
-          if (widget.selectionActions != null && widget.selectedKeys.isNotEmpty)
-            _buildSelectionBar(context),
+          if (hasSelectionBar && !isCompact) _buildSelectionBar(context),
           Expanded(child: _buildBody(context)),
+          if (hasSelectionBar && isCompact) _buildSelectionBar(context),
         ],
       ),
     );
@@ -222,6 +313,9 @@ class _OiListViewState<T> extends State<OiListView<T>> {
 
   Widget _buildHeader(BuildContext context) {
     final colors = context.colors;
+    final isCompact = context.isCompact;
+    final hasFilters = widget.filters != null && widget.filters!.isNotEmpty;
+
     return Padding(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -239,6 +333,10 @@ class _OiListViewState<T> extends State<OiListView<T>> {
                   ),
                 ),
               ),
+              if (hasFilters && isCompact) ...[
+                _buildFiltersButton(context),
+                const SizedBox(width: 8),
+              ],
               if (widget.headerActions != null) widget.headerActions!,
             ],
           ),
@@ -250,11 +348,75 @@ class _OiListViewState<T> extends State<OiListView<T>> {
               controller: TextEditingController(text: widget.searchQuery),
             ),
           ],
+          if (hasFilters && !isCompact) ...[
+            const SizedBox(height: 8),
+            OiFilterBar(
+              filters: widget.filters!,
+              activeFilters: widget.activeFilters,
+              onFilterChange: (updated) {
+                widget.onFilterChange?.call(updated);
+              },
+            ),
+          ],
           if (widget.sortOptions != null && widget.sortOptions!.isNotEmpty) ...[
             const SizedBox(height: 8),
             _buildSortBar(context),
           ],
         ],
+      ),
+    );
+  }
+
+  Widget _buildFiltersButton(BuildContext context) {
+    final colors = context.colors;
+    final activeCount = widget.activeFilters.length;
+
+    return OiTappable(
+      onTap: () => _openFilterSheet(context),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        decoration: BoxDecoration(
+          color: activeCount > 0
+              ? colors.primary.base.withValues(alpha: 0.1)
+              : null,
+          borderRadius: BorderRadius.circular(6),
+          border: Border.all(color: colors.borderSubtle),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              const IconData(0xe152, fontFamily: 'MaterialIcons'),
+              size: 16,
+              color: colors.text,
+            ),
+            const SizedBox(width: 4),
+            Text(
+              'Filters',
+              style: TextStyle(fontSize: 13, color: colors.text),
+            ),
+            if (activeCount > 0) ...[
+              const SizedBox(width: 4),
+              Container(
+                width: 16,
+                height: 16,
+                decoration: BoxDecoration(
+                  color: colors.primary.base,
+                  shape: BoxShape.circle,
+                ),
+                child: Center(
+                  child: Text(
+                    '$activeCount',
+                    style: TextStyle(
+                      fontSize: 10,
+                      color: colors.textOnPrimary,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ],
+        ),
       ),
     );
   }
@@ -340,7 +502,7 @@ class _OiListViewState<T> extends State<OiListView<T>> {
       return widget.emptyState ?? const OiEmptyState(title: 'No items');
     }
 
-    return ListView.builder(
+    final list = ListView.builder(
       key: const Key('oi_list_view_scroll'),
       controller: _scrollController,
       itemCount: widget.items.length + (widget.moreAvailable ? 1 : 0),
@@ -371,6 +533,29 @@ class _OiListViewState<T> extends State<OiListView<T>> {
 
         return child;
       },
+    );
+
+    if (widget.onRefresh == null) return list;
+
+    return Stack(
+      children: [
+        NotificationListener<ScrollNotification>(
+          onNotification: _handleScrollNotification,
+          child: list,
+        ),
+        if (_isRefreshing)
+          const Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: Center(
+              child: Padding(
+                padding: EdgeInsets.all(8),
+                child: OiProgress(indeterminate: true),
+              ),
+            ),
+          ),
+      ],
     );
   }
 }

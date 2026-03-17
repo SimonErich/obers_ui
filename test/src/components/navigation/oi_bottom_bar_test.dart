@@ -1,6 +1,7 @@
 // Tests do not require documentation comments.
 // ignore_for_file: public_member_api_docs
 
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui/src/components/navigation/oi_bottom_bar.dart';
@@ -419,5 +420,182 @@ void main() {
     );
     expect(tester.takeException(), isNull);
     expect(find.text('Home'), findsOneWidget);
+  });
+
+  testWidgets('safe-area Padding inside bar matches MediaQuery.padding insets',
+      (tester) async {
+    const safeInsets = EdgeInsets.only(bottom: 34, left: 8, right: 8);
+    await tester.pumpObers(
+      _wrapMQ(
+        OiBottomBar(items: _kItems, currentIndex: 0, onTap: (_) {}),
+        const MediaQueryData(size: Size(375, 812), padding: safeInsets),
+      ),
+    );
+    final paddingWidgets = tester.widgetList<Padding>(find.byType(Padding));
+    final hasSafeAreaPadding = paddingWidgets.any((p) {
+      final insets = p.padding.resolve(TextDirection.ltr);
+      return insets.bottom == 34.0 &&
+          insets.left == 8.0 &&
+          insets.right == 8.0;
+    });
+    expect(hasSafeAreaPadding, isTrue,
+        reason: 'bar should add safe-area padding matching MediaQuery.padding');
+  });
+
+  // ── Haptic feedback ────────────────────────────────────────────────────────
+
+  testWidgets('haptic=true triggers HapticFeedback.selectionClick on tap',
+      (tester) async {
+    final List<MethodCall> log = [];
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(SystemChannels.platform, (call) async {
+      log.add(call);
+      return null;
+    });
+    addTearDown(() {
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(SystemChannels.platform, null);
+    });
+
+    await tester.pumpObers(
+      _wrapMQ(
+        OiBottomBar(
+          items: _kItems,
+          currentIndex: 0,
+          onTap: (_) {},
+          haptic: true,
+        ),
+        _kCompact,
+      ),
+    );
+    await tester.tap(find.text('Search'));
+    await tester.pump();
+
+    expect(
+      log.any((call) => call.method == 'HapticFeedback.selectionClick'),
+      isTrue,
+      reason: 'tapping with haptic=true should invoke HapticFeedback.selectionClick',
+    );
+  });
+
+  testWidgets('haptic=false does not trigger HapticFeedback on tap',
+      (tester) async {
+    final List<MethodCall> log = [];
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(SystemChannels.platform, (call) async {
+      log.add(call);
+      return null;
+    });
+    addTearDown(() {
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(SystemChannels.platform, null);
+    });
+
+    await tester.pumpObers(
+      _wrapMQ(
+        OiBottomBar(
+          items: _kItems,
+          currentIndex: 0,
+          onTap: (_) {},
+        ),
+        _kCompact,
+      ),
+    );
+    await tester.tap(find.text('Search'));
+    await tester.pump();
+
+    expect(
+      log.any((call) => call.method == 'HapticFeedback.selectionClick'),
+      isFalse,
+      reason: 'haptic=false (default) should not invoke HapticFeedback',
+    );
+  });
+
+  // ── floatingAction positional ──────────────────────────────────────────────
+
+  testWidgets('floatingAction is centered between left and right item halves',
+      (tester) async {
+    const fabKey = Key('fab');
+    await tester.pumpObers(
+      _wrapMQ(
+        OiBottomBar(
+          items: const [
+            OiBottomBarItem(icon: _kIcon, label: 'A'),
+            OiBottomBarItem(icon: _kIcon2, label: 'B'),
+            OiBottomBarItem(icon: _kIcon3, label: 'C'),
+            OiBottomBarItem(icon: _kIcon, label: 'D'),
+          ],
+          currentIndex: 0,
+          onTap: (_) {},
+          floatingAction:
+              const SizedBox(key: fabKey, width: 56, height: 56),
+        ),
+        _kCompact,
+      ),
+    );
+    // With 4 items, mid=2: [A, B] | FAB | [C, D].
+    // FAB center x should be between B's center x and C's center x.
+    final fabCx = tester.getCenter(find.byKey(fabKey)).dx;
+    final bCx = tester.getCenter(find.text('B')).dx;
+    final cCx = tester.getCenter(find.text('C')).dx;
+    expect(fabCx, greaterThan(bCx),
+        reason: 'FAB should be right of left-half last item');
+    expect(fabCx, lessThan(cCx),
+        reason: 'FAB should be left of right-half first item');
+  });
+
+  // ── landscapeMode ──────────────────────────────────────────────────────────
+
+  testWidgets('landscapeMode=rail renders vertical Column strip on left edge',
+      (tester) async {
+    await tester.pumpObers(
+      _wrapMQ(
+        OiBottomBar(
+          items: _kItems,
+          currentIndex: 0,
+          onTap: (_) {},
+          landscapeMode: OiBottomBarLandscapeMode.rail,
+        ),
+        const MediaQueryData(size: Size(500, 300)),
+      ),
+    );
+    // Rail: Align(centerLeft) wrapping a Column.
+    expect(find.byType(Align), findsOneWidget);
+    // Icons are stacked vertically (same x, different y).
+    final iconFinder = find.byIcon(_kIcon);
+    final icon2Finder = find.byIcon(_kIcon2);
+    expect(iconFinder, findsOneWidget);
+    expect(icon2Finder, findsOneWidget);
+    final iconCx = tester.getCenter(iconFinder).dx;
+    final icon2Cx = tester.getCenter(icon2Finder).dx;
+    final iconCy = tester.getCenter(iconFinder).dy;
+    final icon2Cy = tester.getCenter(icon2Finder).dy;
+    expect((iconCx - icon2Cx).abs(), lessThan(4),
+        reason: 'rail icons should share the same x (vertical strip)');
+    expect(iconCy, lessThan(icon2Cy),
+        reason: 'rail icons should stack vertically');
+  });
+
+  testWidgets(
+      'landscapeMode=compact applies 4dp vertical padding to bar items',
+      (tester) async {
+    await tester.pumpObers(
+      _wrapMQ(
+        OiBottomBar(
+          items: _kItems,
+          currentIndex: 0,
+          onTap: (_) {},
+          landscapeMode: OiBottomBarLandscapeMode.compact,
+        ),
+        const MediaQueryData(size: Size(500, 300)),
+      ),
+    );
+    final paddingWidgets = tester.widgetList<Padding>(find.byType(Padding));
+    final has4dpVertical = paddingWidgets.any((p) {
+      final insets = p.padding.resolve(TextDirection.ltr);
+      return insets.top == 4.0 && insets.bottom == 4.0;
+    });
+    expect(has4dpVertical, isTrue,
+        reason: 'compact landscape mode should use 4dp vertical item padding');
   });
 }

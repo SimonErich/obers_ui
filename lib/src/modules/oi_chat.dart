@@ -1,5 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
+import 'package:obers_ui/src/primitives/gesture/oi_long_press_menu.dart';
+import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
 
 /// Reaction data for a chat message.
 ///
@@ -107,6 +109,12 @@ class OiChatMessage {
 /// aligned to the right and others' messages aligned to the left. Includes a
 /// text input bar at the bottom for composing new messages.
 ///
+/// On compact screens the interface fills the available space with the compose
+/// bar positioned to stay above the software keyboard.
+///
+/// Long-pressing a message on touch devices shows a reaction picker when
+/// [enableReactions] is `true`.
+///
 /// {@category Modules}
 class OiChat extends StatefulWidget {
   /// Creates an [OiChat].
@@ -174,6 +182,9 @@ class OiChat extends StatefulWidget {
   State<OiChat> createState() => _OiChatState();
 }
 
+// Common emoji reactions for the long-press reaction picker.
+const List<String> _kDefaultReactions = ['👍', '❤️', '😂', '😮', '😢', '🎉'];
+
 class _OiChatState extends State<OiChat> {
   final TextEditingController _controller = TextEditingController();
   final ScrollController _scrollController = ScrollController();
@@ -198,6 +209,12 @@ class _OiChatState extends State<OiChat> {
     return '$h:$m';
   }
 
+  String _formatFileSize(int bytes) {
+    if (bytes < 1024) return '${bytes}B';
+    if (bytes < 1024 * 1024) return '${(bytes / 1024).toStringAsFixed(1)}KB';
+    return '${(bytes / (1024 * 1024)).toStringAsFixed(1)}MB';
+  }
+
   // ---------------------------------------------------------------------------
   // Build
   // ---------------------------------------------------------------------------
@@ -213,7 +230,30 @@ class _OiChatState extends State<OiChat> {
       label: widget.label,
       child: Column(
         children: [
-          // Message list
+          // Load older messages button.
+          if (widget.olderMessagesAvailable && widget.onLoadOlder != null)
+            OiTappable(
+              onTap: widget.onLoadOlder,
+              child: Container(
+                width: double.infinity,
+                padding: EdgeInsets.symmetric(
+                  vertical: spacing.xs,
+                  horizontal: spacing.sm,
+                ),
+                color: colors.surfaceSubtle,
+                child: Text(
+                  'Load older messages',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: colors.primary.base,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ),
+
+          // Message list.
           Expanded(
             child: widget.messages.isEmpty
                 ? Center(
@@ -231,7 +271,7 @@ class _OiChatState extends State<OiChat> {
                   ),
           ),
 
-          // Typing indicator
+          // Typing indicator.
           if (widget.typingUsers != null && widget.typingUsers!.isNotEmpty)
             Padding(
               padding: EdgeInsets.symmetric(
@@ -251,7 +291,7 @@ class _OiChatState extends State<OiChat> {
               ),
             ),
 
-          // Input bar
+          // Input bar.
           Container(
             padding: EdgeInsets.all(spacing.sm),
             decoration: BoxDecoration(
@@ -260,6 +300,23 @@ class _OiChatState extends State<OiChat> {
             ),
             child: Row(
               children: [
+                if (widget.enableAttachments) ...[
+                  Semantics(
+                    button: true,
+                    label: 'Attach file',
+                    child: OiTappable(
+                      onTap: () => widget.onAttach?.call(const []),
+                      child: Padding(
+                        padding: EdgeInsets.only(right: spacing.xs),
+                        child: Icon(
+                          const IconData(0xe226, fontFamily: 'MaterialIcons'),
+                          size: 22,
+                          color: colors.textSubtle,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
                 Expanded(
                   child: EditableText(
                     controller: _controller,
@@ -307,6 +364,55 @@ class _OiChatState extends State<OiChat> {
     final bubbleColor = isOwn ? colors.primary.base : colors.surfaceHover;
     final textColor = isOwn ? colors.textOnPrimary : colors.text;
 
+    final bubbleContent = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        if (!isOwn)
+          Padding(
+            padding: EdgeInsets.only(bottom: spacing.xs),
+            child: Text(
+              message.senderName,
+              style: TextStyle(
+                color: isOwn ? colors.textOnPrimary : colors.primary.base,
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        Text(
+          message.content,
+          style: TextStyle(color: textColor, fontSize: 14),
+        ),
+        // Attachments.
+        if (message.attachments != null && message.attachments!.isNotEmpty)
+          Padding(
+            padding: EdgeInsets.only(top: spacing.xs),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                for (final file in message.attachments!)
+                  _buildAttachmentChip(context, file, isOwn),
+              ],
+            ),
+          ),
+        if (widget.showTimestamps)
+          Padding(
+            padding: EdgeInsets.only(top: spacing.xs),
+            child: Text(
+              _formatTime(message.timestamp),
+              style: TextStyle(
+                color: isOwn
+                    ? colors.textOnPrimary.withValues(alpha: 0.7)
+                    : colors.textMuted,
+                fontSize: 10,
+              ),
+            ),
+          ),
+      ],
+    );
+
     final bubble = Container(
       constraints: const BoxConstraints(maxWidth: 280),
       padding: EdgeInsets.symmetric(
@@ -317,46 +423,51 @@ class _OiChatState extends State<OiChat> {
         color: bubbleColor,
         borderRadius: BorderRadius.circular(12),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          if (!isOwn)
-            Padding(
-              padding: EdgeInsets.only(bottom: spacing.xs),
-              child: Text(
-                message.senderName,
-                style: TextStyle(
-                  color: isOwn ? colors.textOnPrimary : colors.primary.base,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-          Text(
-            message.content,
-            style: TextStyle(color: textColor, fontSize: 14),
-          ),
-          if (widget.showTimestamps)
-            Padding(
-              padding: EdgeInsets.only(top: spacing.xs),
-              child: Text(
-                _formatTime(message.timestamp),
-                style: TextStyle(
-                  color: isOwn
-                      ? colors.textOnPrimary.withValues(alpha: 0.7)
-                      : colors.textMuted,
-                  fontSize: 10,
-                ),
-              ),
-            ),
-        ],
-      ),
+      child: bubbleContent,
     );
 
     final pendingWrapper = message.pending
         ? Opacity(opacity: 0.5, child: bubble)
         : bubble;
+
+    // Reactions row below the bubble.
+    final reactions = message.reactions;
+    final reactionsWidget =
+        widget.enableReactions && reactions != null && reactions.isNotEmpty
+            ? Padding(
+                padding: EdgeInsets.only(
+                  top: spacing.xs,
+                  left: isOwn ? 0 : 4,
+                  right: isOwn ? 4 : 0,
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: isOwn
+                      ? MainAxisAlignment.end
+                      : MainAxisAlignment.start,
+                  children: [
+                    for (final r in reactions) _buildReactionChip(context, r),
+                  ],
+                ),
+              )
+            : null;
+
+    // Wrap bubble with long-press menu for reactions.
+    Widget messageBody;
+    if (widget.enableReactions && widget.onReact != null) {
+      messageBody = OiLongPressMenu(
+        items: [
+          for (final emoji in _kDefaultReactions)
+            OiLongPressMenuItem(
+              label: emoji,
+              onTap: () => widget.onReact!.call(message, emoji),
+            ),
+        ],
+        child: pendingWrapper,
+      );
+    } else {
+      messageBody = pendingWrapper;
+    }
 
     final avatar = widget.showAvatars && !isOwn
         ? Padding(
@@ -393,8 +504,105 @@ class _OiChatState extends State<OiChat> {
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           if (avatar != null) avatar,
-          Flexible(child: pendingWrapper),
+          Flexible(
+            child: Column(
+              crossAxisAlignment: isOwn
+                  ? CrossAxisAlignment.end
+                  : CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                messageBody,
+                if (reactionsWidget != null) reactionsWidget,
+              ],
+            ),
+          ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildReactionChip(BuildContext context, OiReactionData reaction) {
+    final colors = context.colors;
+    return Padding(
+      padding: const EdgeInsets.only(right: 4),
+      child: OiTappable(
+        onTap: () => widget.onReact?.call(
+          widget.messages.firstWhere(
+            (m) => m.reactions?.contains(reaction) == true,
+            orElse: () => widget.messages.first,
+          ),
+          reaction.emoji,
+        ),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+          decoration: BoxDecoration(
+            color: reaction.reacted
+                ? colors.primary.base.withValues(alpha: 0.15)
+                : colors.surfaceHover,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: reaction.reacted
+                  ? colors.primary.base.withValues(alpha: 0.4)
+                  : colors.borderSubtle,
+            ),
+          ),
+          child: Text(
+            '${reaction.emoji} ${reaction.count}',
+            style: TextStyle(fontSize: 11, color: colors.text),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAttachmentChip(
+    BuildContext context,
+    OiFileData file,
+    bool isOwn,
+  ) {
+    final colors = context.colors;
+    return Padding(
+      padding: const EdgeInsets.only(top: 4),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        decoration: BoxDecoration(
+          color: isOwn
+              ? colors.textOnPrimary.withValues(alpha: 0.15)
+              : colors.surfaceHover,
+          borderRadius: BorderRadius.circular(6),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              const IconData(0xe226, fontFamily: 'MaterialIcons'),
+              size: 14,
+              color: isOwn ? colors.textOnPrimary : colors.textSubtle,
+            ),
+            const SizedBox(width: 4),
+            Flexible(
+              child: Text(
+                file.name,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: 11,
+                  color: isOwn ? colors.textOnPrimary : colors.text,
+                ),
+              ),
+            ),
+            const SizedBox(width: 4),
+            Text(
+              _formatFileSize(file.size),
+              style: TextStyle(
+                fontSize: 10,
+                color: isOwn
+                    ? colors.textOnPrimary.withValues(alpha: 0.7)
+                    : colors.textMuted,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

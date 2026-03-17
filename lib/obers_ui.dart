@@ -48,7 +48,7 @@ export 'src/primitives/interaction/oi_tappable.dart';
 
 export 'src/primitives/display/oi_divider.dart';
 export 'src/primitives/display/oi_icon.dart';
-export 'src/primitives/display/oi_image.dart';
+export 'src/components/display/oi_image.dart';
 export 'src/primitives/display/oi_label.dart';
 export 'src/primitives/display/oi_surface.dart';
 

@@ -6,7 +6,6 @@ import 'package:obers_ui/src/foundation/oi_responsive.dart';
 import 'package:obers_ui/src/foundation/theme/oi_decoration_theme.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/primitives/display/oi_surface.dart';
-import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
 
 /// A single item in an [OiButtonGroup].
 ///
@@ -49,11 +48,12 @@ class OiButtonGroupItem {
 /// - **Gapped** ([spacing] > 0): Each item is rendered with full corner radii
 ///   separated by [spacing] logical pixels.
 ///
-/// In [exclusive] mode exactly one item is active at a time (the one at
-/// [selectedIndex]).  Tapping any item calls [onSelect] with its index.
-/// Selected items use the *soft* variant; all others use *ghost*.
+/// In single-select mode ([multiSelect] == `false`) exactly one item is active
+/// at a time (the one at [selectedIndex]).  Tapping any item calls [onSelect]
+/// with its index.  Selected items use the *soft* variant; all others use
+/// *ghost*.
 ///
-/// Arrow-key navigation is supported in [exclusive] mode: horizontal groups
+/// Arrow-key navigation is supported in single-select mode: horizontal groups
 /// respond to ←/→ and vertical groups respond to ↑/↓.
 ///
 /// On compact breakpoints a horizontal group with [wrap] enabled will
@@ -66,7 +66,7 @@ class OiButtonGroupItem {
 ///     OiButtonGroupItem(label: 'Week'),
 ///     OiButtonGroupItem(label: 'Month'),
 ///   ],
-///   exclusive: true,
+///   multiSelect: false,
 ///   selectedIndex: _tab,
 ///   onSelect: (i) => setState(() => _tab = i),
 /// )
@@ -80,8 +80,9 @@ class OiButtonGroup extends StatefulWidget {
     this.size = OiButtonSize.medium,
     this.direction = Axis.horizontal,
     this.spacing = 0,
-    this.exclusive = false,
+    this.multiSelect = true,
     this.selectedIndex,
+    this.selectedIndices,
     this.onSelect,
     this.wrap = true,
     super.key,
@@ -106,16 +107,23 @@ class OiButtonGroup extends StatefulWidget {
   /// corner radii.
   final double spacing;
 
-  /// When `true`, at most one item is selected at a time.
+  /// When `false`, at most one item is selected at a time (single-select mode).
   ///
   /// The selected item uses [OiButtonVariant.soft]; others use
   /// [OiButtonVariant.ghost].  Arrow-key navigation moves focus between items.
-  final bool exclusive;
+  /// Defaults to `true` (multi-select allowed).
+  final bool multiSelect;
 
-  /// The index of the currently selected item in [exclusive] mode.
+  /// The index of the currently selected item when [multiSelect] is `false`.
   final int? selectedIndex;
 
-  /// Called with the tapped item's index when [exclusive] is `true`.
+  /// The indices of the currently selected items when [multiSelect] is `true`.
+  ///
+  /// Items whose index is contained in this set are rendered with the *soft*
+  /// variant; all others use *ghost*.  When `null` no items appear selected.
+  final Set<int>? selectedIndices;
+
+  /// Called with the tapped item's index when [multiSelect] is `false`.
   final ValueChanged<int>? onSelect;
 
   /// When `true` (the default), a horizontal group automatically wraps to
@@ -146,7 +154,7 @@ class _OiButtonGroupState extends State<OiButtonGroup> {
   }
 
   KeyEventResult _onKeyEvent(FocusNode node, KeyEvent event) {
-    if (!widget.exclusive) return KeyEventResult.ignored;
+    if (widget.multiSelect) return KeyEventResult.ignored;
     if (event is! KeyDownEvent && event is! KeyRepeatEvent) {
       return KeyEventResult.ignored;
     }
@@ -201,15 +209,7 @@ class _OiButtonGroupState extends State<OiButtonGroup> {
     BorderRadius radius,
   ) {
     final children = List<Widget>.generate(count, (i) {
-      final itemRadius = _itemRadius(i, count, direction, radius);
-      return _buildItem(
-        context,
-        i,
-        count,
-        direction,
-        itemRadius,
-        connected: true,
-      );
+      return _buildItem(context, i, BorderRadius.zero);
     });
 
     final content = direction == Axis.horizontal
@@ -238,7 +238,7 @@ class _OiButtonGroupState extends State<OiButtonGroup> {
   ) {
     final gap = widget.spacing;
     final children = List<Widget>.generate(count, (i) {
-      return _buildItem(context, i, count, direction, radius, connected: false);
+      return _buildItem(context, i, radius);
     });
 
     final separated = <Widget>[];
@@ -258,221 +258,41 @@ class _OiButtonGroupState extends State<OiButtonGroup> {
     return Focus(onKeyEvent: _onKeyEvent, child: layout);
   }
 
-  // ── Item border radius ─────────────────────────────────────────────────────
-
-  BorderRadius _itemRadius(
-    int index,
-    int count,
-    Axis direction,
-    BorderRadius radius,
-  ) {
-    if (count == 1) return radius;
-    if (direction == Axis.horizontal) {
-      if (index == 0) {
-        return BorderRadius.only(
-          topLeft: radius.topLeft,
-          bottomLeft: radius.bottomLeft,
-        );
-      } else if (index == count - 1) {
-        return BorderRadius.only(
-          topRight: radius.topRight,
-          bottomRight: radius.bottomRight,
-        );
-      } else {
-        return BorderRadius.zero;
-      }
-    } else {
-      if (index == 0) {
-        return BorderRadius.only(
-          topLeft: radius.topLeft,
-          topRight: radius.topRight,
-        );
-      } else if (index == count - 1) {
-        return BorderRadius.only(
-          bottomLeft: radius.bottomLeft,
-          bottomRight: radius.bottomRight,
-        );
-      } else {
-        return BorderRadius.zero;
-      }
-    }
-  }
-
   // ── Single item widget ────────────────────────────────────────────────────
 
   Widget _buildItem(
     BuildContext context,
     int index,
-    int count,
-    Axis direction,
     BorderRadius borderRadius,
-    {required bool connected}
   ) {
     final item = widget.items[index];
-    final isSelected = widget.exclusive && widget.selectedIndex == index;
+    final isSelected = widget.multiSelect
+        ? (widget.selectedIndices?.contains(index) ?? false)
+        : widget.selectedIndex == index;
 
-    final variant = widget.exclusive
-        ? (isSelected ? OiButtonVariant.soft : OiButtonVariant.ghost)
-        : OiButtonVariant.ghost;
-
-    final bgColor = _bgColor(context, variant);
-    final fgColor = _fgColor(context, variant);
-    final density = OiDensityScope.of(context);
-    final height = _buttonHeight(density);
-    final hPad = _hPadding(context);
-
-    Widget content;
-    final textWidget = Text(
-      item.label,
-      style: TextStyle(
-        fontSize: _fontSize(),
-        fontWeight: FontWeight.w500,
-        color: fgColor,
-        height: 1,
-      ),
-      maxLines: 1,
-      overflow: TextOverflow.ellipsis,
-    );
-
-    if (item.icon != null) {
-      content = Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(item.icon, size: _iconSize(), color: fgColor),
-          const SizedBox(width: 4),
-          textWidget,
-        ],
+    final Widget button;
+    if (isSelected) {
+      button = OiButton.soft(
+        label: item.label,
+        icon: item.icon,
+        size: widget.size,
+        enabled: item.enabled,
+        onTap: () => widget.onSelect?.call(index),
+        semanticLabel: item.semanticLabel,
+        borderRadius: borderRadius,
       );
     } else {
-      content = textWidget;
-    }
-
-    final Border? border = connected
-        ? null
-        : Border.all(color: context.colors.border);
-
-    return Semantics(
-      label: item.semanticLabel ?? item.label,
-      button: true,
-      selected: widget.exclusive ? isSelected : null,
-      child: OiTappable(
-        onTap: item.enabled ? () => widget.onSelect?.call(index) : null,
+      button = OiButton.ghost(
+        label: item.label,
+        icon: item.icon,
+        size: widget.size,
         enabled: item.enabled,
-        child: Container(
-          height: height,
-          padding: EdgeInsets.symmetric(horizontal: hPad),
-          decoration: BoxDecoration(
-            color: bgColor,
-            borderRadius: connected ? null : borderRadius,
-            border: border,
-          ),
-          child: Center(child: content),
-        ),
-      ),
-    );
-  }
-
-  // ── Color helpers ─────────────────────────────────────────────────────────
-
-  Color _bgColor(BuildContext context, OiButtonVariant variant) {
-    final c = context.colors;
-    switch (variant) {
-      case OiButtonVariant.primary:
-        return c.primary.base;
-      case OiButtonVariant.secondary:
-        return c.accent.base;
-      case OiButtonVariant.outline:
-      case OiButtonVariant.ghost:
-        return const Color(0x00000000);
-      case OiButtonVariant.destructive:
-        return c.error.base;
-      case OiButtonVariant.soft:
-        return c.primary.muted;
+        onTap: () => widget.onSelect?.call(index),
+        semanticLabel: item.semanticLabel,
+        borderRadius: borderRadius,
+      );
     }
-  }
 
-  Color _fgColor(BuildContext context, OiButtonVariant variant) {
-    final c = context.colors;
-    switch (variant) {
-      case OiButtonVariant.primary:
-        return c.primary.foreground;
-      case OiButtonVariant.secondary:
-        return c.accent.foreground;
-      case OiButtonVariant.outline:
-      case OiButtonVariant.ghost:
-        return c.text;
-      case OiButtonVariant.destructive:
-        return c.error.foreground;
-      case OiButtonVariant.soft:
-        return c.primary.base;
-    }
-  }
-
-  // ── Size helpers ──────────────────────────────────────────────────────────
-
-  double _buttonHeight(OiDensity density) {
-    switch (widget.size) {
-      case OiButtonSize.small:
-        switch (density) {
-          case OiDensity.comfortable:
-            return 28;
-          case OiDensity.compact:
-            return 24;
-          case OiDensity.dense:
-            return 20;
-        }
-      case OiButtonSize.medium:
-        switch (density) {
-          case OiDensity.comfortable:
-            return 36;
-          case OiDensity.compact:
-            return 32;
-          case OiDensity.dense:
-            return 28;
-        }
-      case OiButtonSize.large:
-        switch (density) {
-          case OiDensity.comfortable:
-            return 44;
-          case OiDensity.compact:
-            return 40;
-          case OiDensity.dense:
-            return 36;
-        }
-    }
-  }
-
-  double _iconSize() {
-    switch (widget.size) {
-      case OiButtonSize.small:
-        return 14;
-      case OiButtonSize.medium:
-        return 16;
-      case OiButtonSize.large:
-        return 18;
-    }
-  }
-
-  double _fontSize() {
-    switch (widget.size) {
-      case OiButtonSize.small:
-        return 12;
-      case OiButtonSize.medium:
-        return 14;
-      case OiButtonSize.large:
-        return 16;
-    }
-  }
-
-  double _hPadding(BuildContext context) {
-    final sp = context.spacing;
-    switch (widget.size) {
-      case OiButtonSize.small:
-        return sp.sm;
-      case OiButtonSize.medium:
-        return sp.md;
-      case OiButtonSize.large:
-        return sp.lg;
-    }
+    return Semantics(selected: isSelected, child: button);
   }
 }

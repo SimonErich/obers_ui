@@ -3,6 +3,7 @@
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:obers_ui/src/composites/navigation/oi_filter_bar.dart';
 import 'package:obers_ui/src/components/display/oi_empty_state.dart';
 import 'package:obers_ui/src/components/display/oi_progress.dart';
 import 'package:obers_ui/src/modules/oi_list_view.dart';
@@ -192,5 +193,129 @@ void main() {
       expect(find.text('1 selected'), findsOneWidget);
       expect(find.text('1 chosen'), findsOneWidget);
     });
+
+    testWidgets(
+      'filter bar renders inline on expanded screen',
+      (tester) async {
+        final filters = [
+          const OiFilterDefinition(
+            key: 'status',
+            label: 'Status',
+            type: OiFilterType.select,
+          ),
+        ];
+
+        await tester.pumpObers(
+          OiListView<String>(
+            items: const ['A'],
+            itemBuilder: (item) => Text(item),
+            itemKey: (item) => item,
+            label: 'Filter list',
+            filters: filters,
+          ),
+          // Expanded screen — filter bar should be inline.
+          surfaceSize: const Size(800, 600),
+        );
+
+        expect(find.text('Status'), findsOneWidget);
+        // No "Filters" button on expanded.
+        expect(find.text('Filters'), findsNothing);
+      },
+    );
+
+    testWidgets(
+      'filter button shows on compact screen',
+      (tester) async {
+        final filters = [
+          const OiFilterDefinition(
+            key: 'status',
+            label: 'Status',
+            type: OiFilterType.select,
+          ),
+        ];
+
+        await tester.pumpObers(
+          OiListView<String>(
+            items: const ['A'],
+            itemBuilder: (item) => Text(item),
+            itemKey: (item) => item,
+            label: 'Compact filter list',
+            filters: filters,
+          ),
+          // Compact screen — filter button should appear.
+          surfaceSize: const Size(375, 800),
+        );
+
+        expect(find.text('Filters'), findsOneWidget);
+        // Inline filter chip label should NOT appear in compact mode.
+        expect(find.text('Status'), findsNothing);
+      },
+    );
+
+    testWidgets(
+      'active filter count badge shows on filter button',
+      (tester) async {
+        final filters = [
+          const OiFilterDefinition(
+            key: 'status',
+            label: 'Status',
+            type: OiFilterType.select,
+          ),
+          const OiFilterDefinition(
+            key: 'type',
+            label: 'Type',
+            type: OiFilterType.select,
+          ),
+        ];
+
+        await tester.pumpObers(
+          OiListView<String>(
+            items: const ['A'],
+            itemBuilder: (item) => Text(item),
+            itemKey: (item) => item,
+            label: 'Active filter list',
+            filters: filters,
+            activeFilters: const {
+              'status': OiColumnFilter(value: 'active'),
+              'type': OiColumnFilter(value: 'bug'),
+            },
+          ),
+          surfaceSize: const Size(375, 800),
+        );
+
+        // Badge should show "2" for two active filters.
+        expect(find.text('2'), findsOneWidget);
+      },
+    );
+
+    testWidgets(
+      'selection actions are placed at bottom on compact',
+      (tester) async {
+        await tester.pumpObers(
+          OiListView<String>(
+            items: const ['A', 'B'],
+            itemBuilder: (item) => Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              child: Text(item),
+            ),
+            itemKey: (item) => item,
+            label: 'Compact sel list',
+            selectionMode: OiSelectionMode.multi,
+            selectedKeys: const {'A'},
+            selectionActions: (keys) => [
+              const SizedBox(
+                key: Key('action-btn'),
+                width: 40,
+                height: 32,
+              ),
+            ],
+          ),
+          surfaceSize: const Size(375, 800),
+        );
+
+        expect(find.text('1 selected'), findsOneWidget);
+        expect(find.byKey(const Key('action-btn')), findsOneWidget);
+      },
+    );
   });
 }
