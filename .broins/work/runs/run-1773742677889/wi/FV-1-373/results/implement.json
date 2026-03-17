@@ -1,0 +1,13 @@
+{
+  "filesChanged": [
+    "lib/src/layouts/.gitkeep",
+    "lib/src/theme/.gitkeep",
+    "lib/src/widgets/.gitkeep"
+  ],
+  "commandsRun": [
+    "rm lib/src/layouts/.gitkeep lib/src/theme/.gitkeep lib/src/widgets/.gitkeep",
+    "rmdir lib/src/layouts lib/src/theme lib/src/widgets",
+    "dart analyze lib/"
+  ],
+  "notes": "Deleted three empty placeholder directories (layouts/, theme/, widgets/) that existed only via .gitkeep files and are absent from the spec-defined hierarchy. dart analyze shows 80 pre-existing info-level lint issues, zero errors or warnings introduced by this change. lib/obers_ui.dart has no references to the removed paths."
+}
