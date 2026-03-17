@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/src/components/display/oi_tooltip.dart';
 import 'package:obers_ui/src/foundation/oi_app.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/primitives/animation/oi_pulse.dart';
@@ -102,6 +103,7 @@ class OiButton extends StatefulWidget {
     this.loading = false,
     this.fullWidth = false,
     this.semanticLabel,
+    this.tooltip,
     this.dropdown,
     this.countdownSeconds,
     this.confirmLabel,
@@ -123,6 +125,7 @@ class OiButton extends StatefulWidget {
     IconData? icon,
     OiIconPosition iconPosition = OiIconPosition.leading,
     String? semanticLabel,
+    String? tooltip,
     Key? key,
   }) : this._(
          kind: _OiButtonKind.standard,
@@ -136,6 +139,7 @@ class OiButton extends StatefulWidget {
          loading: loading,
          fullWidth: fullWidth,
          semanticLabel: semanticLabel,
+         tooltip: tooltip,
          key: key,
        );
 
@@ -150,6 +154,7 @@ class OiButton extends StatefulWidget {
     IconData? icon,
     OiIconPosition iconPosition = OiIconPosition.leading,
     String? semanticLabel,
+    String? tooltip,
     Key? key,
   }) : this._(
          kind: _OiButtonKind.standard,
@@ -163,6 +168,7 @@ class OiButton extends StatefulWidget {
          loading: loading,
          fullWidth: fullWidth,
          semanticLabel: semanticLabel,
+         tooltip: tooltip,
          key: key,
        );
 
@@ -177,6 +183,7 @@ class OiButton extends StatefulWidget {
     IconData? icon,
     OiIconPosition iconPosition = OiIconPosition.leading,
     String? semanticLabel,
+    String? tooltip,
     Key? key,
   }) : this._(
          kind: _OiButtonKind.standard,
@@ -190,6 +197,7 @@ class OiButton extends StatefulWidget {
          loading: loading,
          fullWidth: fullWidth,
          semanticLabel: semanticLabel,
+         tooltip: tooltip,
          key: key,
        );
 
@@ -402,6 +410,9 @@ class OiButton extends StatefulWidget {
   /// Accessibility label announced by screen readers.
   final String? semanticLabel;
 
+  /// Optional tooltip message shown on hover or long-press.
+  final String? tooltip;
+
   /// The dropdown widget shown by a split button.
   final Widget? dropdown;
 
@@ -553,7 +564,7 @@ class _OiButtonState extends State<OiButton> {
       case OiButtonVariant.primary:
         return c.primary.base;
       case OiButtonVariant.secondary:
-        return c.accent.base;
+        return c.surfaceSubtle;
       case OiButtonVariant.outline:
         return const Color(0x00000000); // transparent
       case OiButtonVariant.ghost:
@@ -571,7 +582,7 @@ class _OiButtonState extends State<OiButton> {
       case OiButtonVariant.primary:
         return c.primary.foreground;
       case OiButtonVariant.secondary:
-        return c.accent.foreground;
+        return c.text;
       case OiButtonVariant.outline:
         return c.text;
       case OiButtonVariant.ghost:
@@ -725,6 +736,9 @@ class _OiButtonState extends State<OiButton> {
 
     if (widget.fullWidth) {
       button = SizedBox(width: double.infinity, child: button);
+    }
+    if (widget.tooltip != null) {
+      return OiTooltip(message: widget.tooltip!, child: button);
     }
     return button;
   }

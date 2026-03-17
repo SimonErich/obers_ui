@@ -7,7 +7,9 @@ import 'dart:ui';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui/src/components/buttons/oi_button.dart';
+import 'package:obers_ui/src/components/display/oi_tooltip.dart';
 import 'package:obers_ui/src/foundation/oi_app.dart';
+import 'package:obers_ui/src/foundation/theme/oi_theme_data.dart';
 import 'package:obers_ui/src/primitives/animation/oi_pulse.dart';
 
 import '../../../helpers/pump_app.dart';
@@ -359,6 +361,150 @@ void main() {
     await tester.pump();
     expect(confirmed, 1);
     expect(find.text('Delete'), findsOneWidget);
+  });
+
+  // ── REQ-0146: primary variant colors ──────────────────────────────────────
+
+  testWidgets('REQ-0146: primary background uses primary.base color', (
+    tester,
+  ) async {
+    final theme = OiThemeData.light();
+    await tester.pumpObers(
+      const OiButton.primary(label: 'Save'),
+      theme: theme,
+    );
+    final containers = tester.widgetList<Container>(find.byType(Container));
+    final colors = theme.colors;
+    final found = containers.any((c) {
+      final deco = c.decoration;
+      return deco is BoxDecoration && deco.color == colors.primary.base;
+    });
+    expect(found, isTrue);
+  });
+
+  testWidgets('REQ-0146: primary foreground text uses primary.foreground color',
+      (tester) async {
+    final theme = OiThemeData.light();
+    await tester.pumpObers(
+      const OiButton.primary(label: 'Save'),
+      theme: theme,
+    );
+    final texts = tester.widgetList<Text>(find.byType(Text));
+    final expectedColor = theme.colors.primary.foreground;
+    final found = texts.any((t) => t.style?.color == expectedColor);
+    expect(found, isTrue);
+  });
+
+  // ── REQ-0147: secondary variant colors ────────────────────────────────────
+
+  testWidgets('REQ-0147: secondary background uses surfaceSubtle color', (
+    tester,
+  ) async {
+    final theme = OiThemeData.light();
+    await tester.pumpObers(
+      const OiButton.secondary(label: 'Cancel'),
+      theme: theme,
+    );
+    final containers = tester.widgetList<Container>(find.byType(Container));
+    final expectedColor = theme.colors.surfaceSubtle;
+    final found = containers.any((c) {
+      final deco = c.decoration;
+      return deco is BoxDecoration && deco.color == expectedColor;
+    });
+    expect(found, isTrue);
+  });
+
+  testWidgets('REQ-0147: secondary text uses standard text color', (
+    tester,
+  ) async {
+    final theme = OiThemeData.light();
+    await tester.pumpObers(
+      const OiButton.secondary(label: 'Cancel'),
+      theme: theme,
+    );
+    final texts = tester.widgetList<Text>(find.byType(Text));
+    final expectedColor = theme.colors.text;
+    final found = texts.any((t) => t.style?.color == expectedColor);
+    expect(found, isTrue);
+  });
+
+  // ── REQ-0148: outline variant colors ──────────────────────────────────────
+
+  testWidgets('REQ-0148: outline background is transparent', (tester) async {
+    final theme = OiThemeData.light();
+    await tester.pumpObers(
+      const OiButton.outline(label: 'Outline'),
+      theme: theme,
+    );
+    final containers = tester.widgetList<Container>(find.byType(Container));
+    final found = containers.any((c) {
+      final deco = c.decoration;
+      return deco is BoxDecoration &&
+          deco.color == const Color(0x00000000);
+    });
+    expect(found, isTrue);
+  });
+
+  testWidgets('REQ-0148: outline has visible border decoration', (
+    tester,
+  ) async {
+    final theme = OiThemeData.light();
+    await tester.pumpObers(
+      const OiButton.outline(label: 'Outline'),
+      theme: theme,
+    );
+    final containers = tester.widgetList<Container>(find.byType(Container));
+    final found = containers.any((c) {
+      final deco = c.decoration;
+      if (deco is! BoxDecoration) return false;
+      final border = deco.border;
+      if (border is! Border) return false;
+      return border.top.width > 0 && border.top.color != const Color(0x00000000);
+    });
+    expect(found, isTrue);
+  });
+
+  // ── Tooltip ───────────────────────────────────────────────────────────────
+
+  testWidgets('primary shows OiTooltip widget when tooltip provided', (
+    tester,
+  ) async {
+    await tester.pumpObers(
+      const OiButton.primary(label: 'Save', tooltip: 'Save your work'),
+    );
+    expect(find.byType(OiTooltip), findsOneWidget);
+  });
+
+  testWidgets('no OiTooltip widget when tooltip is null', (tester) async {
+    await tester.pumpObers(const OiButton.primary(label: 'Save'));
+    expect(find.byType(OiTooltip), findsNothing);
+  });
+
+  testWidgets('secondary shows OiTooltip when tooltip provided', (
+    tester,
+  ) async {
+    await tester.pumpObers(
+      const OiButton.secondary(label: 'Cancel', tooltip: 'Cancel action'),
+    );
+    expect(find.byType(OiTooltip), findsOneWidget);
+  });
+
+  testWidgets('outline shows OiTooltip when tooltip provided', (tester) async {
+    await tester.pumpObers(
+      const OiButton.outline(label: 'Outline', tooltip: 'Outline button'),
+    );
+    expect(find.byType(OiTooltip), findsOneWidget);
+  });
+
+  testWidgets('tooltip visible on disabled button', (tester) async {
+    await tester.pumpObers(
+      const OiButton.primary(
+        label: 'Save',
+        enabled: false,
+        tooltip: 'Disabled save',
+      ),
+    );
+    expect(find.byType(OiTooltip), findsOneWidget);
   });
 
   // ── Density-aware sizing ───────────────────────────────────────────────────
