@@ -34,3 +34,7 @@ migrate_working_dir/
 
 # Golden test failures
 **/failures/
+
+# dev tools
+.broins
+.history
