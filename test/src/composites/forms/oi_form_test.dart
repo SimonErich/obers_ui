@@ -1,0 +1,407 @@
+// Tests do not require documentation comments.
+// ignore_for_file: public_member_api_docs
+
+import 'package:flutter/widgets.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:obers_ui/src/composites/forms/oi_form.dart';
+
+import '../../../helpers/pump_app.dart';
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+
+List<OiFormSection> _simpleSections() => [
+      OiFormSection(
+        title: 'Personal Info',
+        description: 'Enter your details',
+        fields: [
+          const OiFormField(
+            key: 'name',
+            label: 'Name',
+            type: OiFieldType.text,
+          ),
+          const OiFormField(
+            key: 'age',
+            label: 'Age',
+            type: OiFieldType.number,
+          ),
+        ],
+      ),
+    ];
+
+Widget _form({
+  List<OiFormSection>? sections,
+  OiFormController? controller,
+  ValueChanged<Map<String, dynamic>>? onSubmit,
+  VoidCallback? onCancel,
+  bool autoValidate = false,
+  OiFormLayout layout = OiFormLayout.vertical,
+  bool dirtyDetection = true,
+}) {
+  return SizedBox(
+    width: 400,
+    height: 600,
+    child: OiForm(
+      sections: sections ?? _simpleSections(),
+      controller: controller ?? OiFormController(),
+      onSubmit: onSubmit,
+      onCancel: onCancel,
+      autoValidate: autoValidate,
+      layout: layout,
+      dirtyDetection: dirtyDetection,
+    ),
+  );
+}
+
+// ── OiFormController unit tests ─────────────────────────────────────────────
+
+void main() {
+  group('OiFormController', () {
+    test('setValue and getValue work', () {
+      final ctrl = OiFormController();
+      ctrl.setValue('name', 'Alice');
+      expect(ctrl.getValue<String>('name'), 'Alice');
+    });
+
+    test('values returns all current values', () {
+      final ctrl = OiFormController(initialValues: {'a': 1});
+      ctrl.setValue('b', 2);
+      expect(ctrl.values, {'a': 1, 'b': 2});
+    });
+
+    test('isDirty returns false when no changes are made', () {
+      final ctrl = OiFormController(initialValues: {'x': 10});
+      expect(ctrl.isDirty, isFalse);
+    });
+
+    test('isDirty returns true after setValue changes a value', () {
+      final ctrl = OiFormController(initialValues: {'x': 10});
+      ctrl.setValue('x', 20);
+      expect(ctrl.isDirty, isTrue);
+    });
+
+    test('isDirty returns true when a new key is added', () {
+      final ctrl = OiFormController(initialValues: {'x': 10});
+      ctrl.setValue('y', 5);
+      expect(ctrl.isDirty, isTrue);
+    });
+
+    test('reset reverts to initial values', () {
+      final ctrl = OiFormController(initialValues: {'x': 10});
+      ctrl.setValue('x', 99);
+      ctrl.setValue('y', 5);
+      ctrl.reset();
+      expect(ctrl.getValue<int>('x'), 10);
+      expect(ctrl.getValue<dynamic>('y'), isNull);
+      expect(ctrl.isDirty, isFalse);
+    });
+
+    test('reset clears errors', () {
+      final ctrl = OiFormController();
+      ctrl.setError('name', 'Required');
+      expect(ctrl.isValid, isFalse);
+      ctrl.reset();
+      expect(ctrl.isValid, isTrue);
+    });
+
+    test('setError and getError work', () {
+      final ctrl = OiFormController();
+      ctrl.setError('email', 'Invalid');
+      expect(ctrl.getError('email'), 'Invalid');
+    });
+
+    test('isValid is true when no errors', () {
+      final ctrl = OiFormController();
+      expect(ctrl.isValid, isTrue);
+    });
+
+    test('isValid is false when any error is set', () {
+      final ctrl = OiFormController();
+      ctrl.setError('field', 'bad');
+      expect(ctrl.isValid, isFalse);
+    });
+
+    test('isValid is true when error is cleared with null', () {
+      final ctrl = OiFormController();
+      ctrl.setError('field', 'bad');
+      ctrl.setError('field', null);
+      expect(ctrl.isValid, isTrue);
+    });
+
+    test('validate runs validators and stores errors', () {
+      final ctrl = OiFormController(initialValues: {'name': ''});
+      final valid = ctrl.validate({
+        'name': (v) => (v == null || v == '') ? 'Required' : null,
+      });
+      expect(valid, isFalse);
+      expect(ctrl.getError('name'), 'Required');
+    });
+
+    test('validate returns true when all validators pass', () {
+      final ctrl = OiFormController(initialValues: {'name': 'Alice'});
+      final valid = ctrl.validate({
+        'name': (v) => (v == null || v == '') ? 'Required' : null,
+      });
+      expect(valid, isTrue);
+      expect(ctrl.getError('name'), isNull);
+    });
+
+    test('notifies listeners on setValue', () {
+      final ctrl = OiFormController();
+      var notified = false;
+      ctrl.addListener(() => notified = true);
+      ctrl.setValue('a', 1);
+      expect(notified, isTrue);
+    });
+
+    test('notifies listeners on setError', () {
+      final ctrl = OiFormController();
+      var notified = false;
+      ctrl.addListener(() => notified = true);
+      ctrl.setError('a', 'err');
+      expect(notified, isTrue);
+    });
+
+    test('notifies listeners on reset', () {
+      final ctrl = OiFormController(initialValues: {'a': 1});
+      ctrl.setValue('a', 2);
+      var notified = false;
+      ctrl.addListener(() => notified = true);
+      ctrl.reset();
+      expect(notified, isTrue);
+    });
+  });
+
+  // ── OiForm widget tests ───────────────────────────────────────────────────
+
+  group('OiForm', () {
+    testWidgets('fields render from config', (tester) async {
+      await tester.pumpObers(_form());
+
+      expect(find.text('Name'), findsOneWidget);
+      expect(find.text('Age'), findsOneWidget);
+    });
+
+    testWidgets('section title renders', (tester) async {
+      await tester.pumpObers(_form());
+
+      expect(find.text('Personal Info'), findsOneWidget);
+    });
+
+    testWidgets('section description renders', (tester) async {
+      await tester.pumpObers(_form());
+
+      expect(find.text('Enter your details'), findsOneWidget);
+    });
+
+    testWidgets('submit button renders when onSubmit is provided',
+        (tester) async {
+      await tester.pumpObers(
+        _form(onSubmit: (_) {}),
+      );
+
+      expect(find.text('Submit'), findsOneWidget);
+    });
+
+    testWidgets('cancel button renders when onCancel is provided',
+        (tester) async {
+      await tester.pumpObers(
+        _form(onCancel: () {}),
+      );
+
+      expect(find.text('Cancel'), findsOneWidget);
+    });
+
+    testWidgets('submit collects values with dirtyDetection off',
+        (tester) async {
+      final ctrl = OiFormController();
+      Map<String, dynamic>? submitted;
+
+      await tester.pumpObers(
+        _form(
+          controller: ctrl,
+          onSubmit: (v) => submitted = v,
+          dirtyDetection: false,
+        ),
+      );
+
+      ctrl.setValue('name', 'Bob');
+      await tester.pump();
+
+      await tester.tap(find.text('Submit'));
+      await tester.pump();
+
+      expect(submitted, isNotNull);
+      expect(submitted!['name'], 'Bob');
+    });
+
+    testWidgets('required field validation prevents submit', (tester) async {
+      final ctrl = OiFormController();
+      Map<String, dynamic>? submitted;
+
+      await tester.pumpObers(
+        _form(
+          sections: [
+            OiFormSection(
+              fields: [
+                const OiFormField(
+                  key: 'email',
+                  label: 'Email',
+                  type: OiFieldType.text,
+                  required: true,
+                ),
+              ],
+            ),
+          ],
+          controller: ctrl,
+          onSubmit: (v) => submitted = v,
+          dirtyDetection: false,
+        ),
+      );
+
+      // Submit without filling required field.
+      await tester.tap(find.text('Submit'));
+      await tester.pump();
+
+      // Submit should not have been called because validation fails.
+      expect(submitted, isNull);
+      expect(ctrl.getError('email'), 'Email is required');
+    });
+
+    testWidgets('autoValidate validates on change', (tester) async {
+      final ctrl = OiFormController();
+
+      await tester.pumpObers(
+        _form(
+          sections: [
+            OiFormSection(
+              fields: [
+                OiFormField(
+                  key: 'code',
+                  label: 'Code',
+                  type: OiFieldType.text,
+                  validate: (v) =>
+                      (v == null || v == '') ? 'Code required' : null,
+                ),
+              ],
+            ),
+          ],
+          controller: ctrl,
+          autoValidate: true,
+        ),
+      );
+
+      // Setting empty value should trigger validation via autoValidate.
+      ctrl.setValue('code', '');
+      await tester.pump();
+
+      expect(ctrl.getError('code'), 'Code required');
+    });
+
+    testWidgets('cancel calls onCancel and resets controller', (tester) async {
+      final ctrl = OiFormController(initialValues: {'name': 'Alice'});
+      ctrl.setValue('name', 'Bob');
+      var cancelled = false;
+
+      await tester.pumpObers(
+        _form(
+          controller: ctrl,
+          onCancel: () => cancelled = true,
+        ),
+      );
+
+      await tester.tap(find.text('Cancel'));
+      await tester.pump();
+
+      expect(cancelled, isTrue);
+      expect(ctrl.getValue<String>('name'), 'Alice');
+    });
+
+    testWidgets('checkbox field renders', (tester) async {
+      final ctrl = OiFormController();
+
+      await tester.pumpObers(
+        _form(
+          sections: [
+            OiFormSection(
+              fields: [
+                const OiFormField(
+                  key: 'agree',
+                  label: 'I agree',
+                  type: OiFieldType.checkbox,
+                ),
+              ],
+            ),
+          ],
+          controller: ctrl,
+        ),
+      );
+
+      expect(find.text('I agree'), findsOneWidget);
+    });
+
+    testWidgets('switch field renders', (tester) async {
+      final ctrl = OiFormController();
+
+      await tester.pumpObers(
+        _form(
+          sections: [
+            OiFormSection(
+              fields: [
+                const OiFormField(
+                  key: 'notifications',
+                  label: 'Notifications',
+                  type: OiFieldType.switchField,
+                ),
+              ],
+            ),
+          ],
+          controller: ctrl,
+        ),
+      );
+
+      expect(find.text('Notifications'), findsOneWidget);
+    });
+
+    testWidgets('custom field builder renders', (tester) async {
+      final ctrl = OiFormController();
+
+      await tester.pumpObers(
+        _form(
+          sections: [
+            OiFormSection(
+              fields: [
+                OiFormField(
+                  key: 'custom',
+                  label: 'Custom',
+                  type: OiFieldType.custom,
+                  customBuilder: (value, onChanged) =>
+                      const Text('Custom Widget'),
+                ),
+              ],
+            ),
+          ],
+          controller: ctrl,
+        ),
+      );
+
+      expect(find.text('Custom Widget'), findsOneWidget);
+    });
+
+    testWidgets('horizontal layout renders fields in a Row', (tester) async {
+      await tester.pumpObers(
+        _form(layout: OiFormLayout.horizontal),
+      );
+
+      // Horizontal layout wraps fields in a Row with Expanded children.
+      expect(find.byType(Expanded), findsWidgets);
+    });
+
+    testWidgets('inline layout renders fields in a Wrap', (tester) async {
+      await tester.pumpObers(
+        _form(layout: OiFormLayout.inline),
+      );
+
+      expect(find.byType(Wrap), findsOneWidget);
+    });
+  });
+}

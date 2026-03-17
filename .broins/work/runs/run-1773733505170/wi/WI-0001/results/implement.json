@@ -1,0 +1,11 @@
+{
+  "filesChanged": [
+    "lib/src/components/buttons/oi_button.dart",
+    "test/src/components/buttons/oi_button_test.dart"
+  ],
+  "commandsRun": [
+    "flutter analyze lib/src/components/buttons/oi_button.dart test/src/components/buttons/oi_button_test.dart",
+    "flutter test test/src/components/buttons/oi_button_test.dart test/src/primitives/display/oi_image_test.dart test/src/primitives/display/oi_icon_test.dart"
+  ],
+  "notes": "Changed OiButton.icon() from optional String? semanticLabel to required String label. Updated 3 call sites in tests and added 1 new semantic label test. REQ-0018 (OiImage) and REQ-0020 (OiIcon) were already fully implemented. All 45 tests pass."
+}

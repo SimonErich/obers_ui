@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "atomId": "REQ-0019",
+  "atomText": "",
+  "status": "covered",
+  "workItemId": "WI-0001",
+  "history": [
+    {
+      "at": "2026-03-17T08:04:52.135422Z",
+      "event": "covered",
+      "workItemId": "WI-0001",
+      "runId": "run-1773733505170"
+    }
+  ],
+  "evidence": [
+    "lib/src/components/buttons/oi_button.dart:116-117 (OiButton.primary required String label)",
+    "lib/src/components/buttons/oi_button.dart:143-144 (OiButton.secondary required String label)",
+    "lib/src/components/buttons/oi_button.dart:170-171 (OiButton.outline required String label)",
+    "lib/src/components/buttons/oi_button.dart:197-198 (OiButton.ghost required String label)",
+    "lib/src/components/buttons/oi_button.dart:224-225 (OiButton.destructive required String label)",
+    "lib/src/components/buttons/oi_button.dart:251-252 (OiButton.soft required String label)",
+    "lib/src/components/buttons/oi_button.dart:282-299 (OiButton.icon required String label, delegated to semanticLabel)",
+    "test/src/components/buttons/oi_button_test.dart:162-167 (OiButton.icon renders Icon widget with required label)",
+    "test/src/components/buttons/oi_button_test.dart:169-177 (OiButton.icon fires onTap with required label)",
+    "test/src/components/buttons/oi_button_test.dart:179-187 (OiButton.icon passes semantic label to accessibility tree)",
+    "test/src/components/buttons/oi_button_test.dart:189-202 (OiButton.icon is square with required label)"
+  ],
+  "coveredAt": "2026-03-17T08:04:52.135422Z"
+}

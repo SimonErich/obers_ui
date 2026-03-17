@@ -161,17 +161,29 @@ void main() {
 
   testWidgets('OiButton.icon renders Icon widget', (tester) async {
     await tester.pumpObers(
-      const OiButton.icon(icon: _kIcon, semanticLabel: 'Add'),
+      const OiButton.icon(icon: _kIcon, label: 'Add'),
     );
     expect(find.byIcon(_kIcon), findsOneWidget);
   });
 
   testWidgets('OiButton.icon fires onTap', (tester) async {
     var count = 0;
-    await tester.pumpObers(OiButton.icon(icon: _kIcon, onTap: () => count++));
+    await tester.pumpObers(
+      OiButton.icon(icon: _kIcon, label: 'Add', onTap: () => count++),
+    );
     await tester.tap(find.byIcon(_kIcon));
     await tester.pump();
     expect(count, 1);
+  });
+
+  testWidgets('OiButton.icon passes semantic label to accessibility tree',
+      (tester) async {
+    final handle = tester.ensureSemantics();
+    await tester.pumpObers(
+      const OiButton.icon(icon: _kIcon, label: 'Close'),
+    );
+    expect(find.bySemanticsLabel('Close'), findsOneWidget);
+    handle.dispose();
   });
 
   testWidgets('OiButton.icon is square', (tester) async {
@@ -181,12 +193,33 @@ void main() {
     await tester.pumpWidget(
       const OiApp(
         density: OiDensity.compact,
-        home: Align(child: OiButton.icon(icon: _kIcon)),
+        home: Align(child: OiButton.icon(icon: _kIcon, label: 'Add')),
       ),
     );
     await tester.pump();
     final size = tester.getSize(find.byType(OiButton));
     expect((size.width - size.height).abs(), lessThan(2));
+  });
+
+  // ── Semantics ──────────────────────────────────────────────────────────────
+
+  testWidgets('standard button is marked as button in accessibility tree',
+      (tester) async {
+    final handle = tester.ensureSemantics();
+    await tester.pumpObers(const OiButton.primary(label: 'Save'));
+    final node = tester.getSemantics(find.text('Save'));
+    expect(node.hasFlag(SemanticsFlag.isButton), isTrue);
+    handle.dispose();
+  });
+
+  testWidgets('semanticLabel overrides label in accessibility tree',
+      (tester) async {
+    final handle = tester.ensureSemantics();
+    await tester.pumpObers(
+      const OiButton.primary(label: 'Save', semanticLabel: 'Save document'),
+    );
+    expect(find.bySemanticsLabel('Save document'), findsOneWidget);
+    handle.dispose();
   });
 
   // ── Leading / trailing icon ────────────────────────────────────────────────

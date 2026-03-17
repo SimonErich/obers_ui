@@ -3,16 +3,19 @@
   "requirementsFile": "./concept/base_concept.md",
   "requirementsHash": null,
   "startedAt": "2026-03-17T06:03:53.798774Z",
-  "currentStep": "ingest",
+  "currentStep": "start",
   "completedSteps": [
-    "init"
+    "init",
+    "ingest",
+    "plan",
+    "questions"
   ],
   "skippedSteps": [],
   "failedStep": null,
   "failureReason": null,
   "runId": null,
-  "atomCount": 0,
-  "workItemCount": 0,
+  "atomCount": 809,
+  "workItemCount": 273,
   "completedWorkItems": 0,
   "epicCount": 0,
   "completedEpics": 0,

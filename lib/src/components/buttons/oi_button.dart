@@ -281,11 +281,11 @@ class OiButton extends StatefulWidget {
   /// The button has equal padding on all sides; no label is shown.
   const OiButton.icon({
     required IconData icon,
+    required String label,
     VoidCallback? onTap,
     OiButtonSize size = OiButtonSize.medium,
     bool enabled = true,
     OiButtonVariant variant = OiButtonVariant.ghost,
-    String? semanticLabel,
     Key? key,
   }) : this._(
           kind: _OiButtonKind.icon,
@@ -294,7 +294,7 @@ class OiButton extends StatefulWidget {
           size: size,
           onTap: onTap,
           enabled: enabled,
-          semanticLabel: semanticLabel,
+          semanticLabel: label,
           key: key,
         );
 
@@ -690,7 +690,7 @@ class _OiButtonState extends State<OiButton> {
     Widget button = OiTappable(
       onTap: widget.onTap,
       enabled: isActive,
-      semanticLabel: widget.semanticLabel,
+      semanticLabel: widget.semanticLabel ?? widget.label,
       child: Container(
         height: height,
         padding: EdgeInsets.symmetric(horizontal: hPad),
