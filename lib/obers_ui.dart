@@ -28,6 +28,8 @@ export 'src/foundation/oi_app.dart';
 export 'src/foundation/oi_overlays.dart';
 export 'src/foundation/oi_platform.dart';
 export 'src/foundation/oi_responsive.dart';
+export 'src/foundation/oi_shortcut_scope.dart';
+export 'src/foundation/oi_tour_scope.dart';
 export 'src/foundation/oi_undo_stack.dart';
 
 // ── Foundation: Persistence ──────────────────────────────────────────────────

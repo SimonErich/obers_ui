@@ -202,6 +202,60 @@ void main() {
     expect((size.width - size.height).abs(), lessThan(2));
   });
 
+  // ── OiButton accessibility (REQ-0019) ────────────────────────────────────
+
+  group('OiButton accessibility', () {
+    testWidgets('should expose label as semantics for default constructor',
+        (tester) async {
+      await tester.pumpObers(const OiButton.primary(label: 'Submit'));
+      final semanticsWidgets = tester.widgetList<Semantics>(
+        find.byType(Semantics),
+      );
+      final matching = semanticsWidgets
+          .where((s) => s.properties.label == 'Submit')
+          .toList();
+      expect(matching, isNotEmpty);
+    });
+
+    testWidgets('should expose label as semantics for .icon() constructor',
+        (tester) async {
+      final handle = tester.ensureSemantics();
+      try {
+        await tester.pumpObers(
+          const OiButton.icon(icon: _kIcon, label: 'Close dialog'),
+        );
+        expect(find.bySemanticsLabel('Close dialog'), findsOneWidget);
+      } finally {
+        handle.dispose();
+      }
+    });
+
+    testWidgets('should expose label as semantics for .ghost() constructor',
+        (tester) async {
+      await tester.pumpObers(const OiButton.ghost(label: 'Skip'));
+      final semanticsWidgets = tester.widgetList<Semantics>(
+        find.byType(Semantics),
+      );
+      final matching = semanticsWidgets
+          .where((s) => s.properties.label == 'Skip')
+          .toList();
+      expect(matching, isNotEmpty);
+    });
+
+    testWidgets(
+        'should expose label as semantics for .destructive() constructor',
+        (tester) async {
+      await tester.pumpObers(const OiButton.destructive(label: 'Remove'));
+      final semanticsWidgets = tester.widgetList<Semantics>(
+        find.byType(Semantics),
+      );
+      final matching = semanticsWidgets
+          .where((s) => s.properties.label == 'Remove')
+          .toList();
+      expect(matching, isNotEmpty);
+    });
+  });
+
   // ── Semantics ──────────────────────────────────────────────────────────────
 
   testWidgets('standard button is marked as button in accessibility tree', (

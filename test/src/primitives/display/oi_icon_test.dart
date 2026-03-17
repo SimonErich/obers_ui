@@ -12,6 +12,39 @@ import '../../../helpers/pump_app.dart';
 void main() {
   const testIcon = IconData(0xe000, fontFamily: 'MaterialIcons');
 
+  // ── OiIcon accessibility (REQ-0020) ────────────────────────────────────────
+
+  group('OiIcon accessibility', () {
+    testWidgets('should expose label as semantics label when label is provided',
+        (tester) async {
+      final handle = tester.ensureSemantics();
+      try {
+        await tester.pumpObers(
+          const OiIcon(icon: testIcon, label: 'Search icon'),
+        );
+        expect(find.bySemanticsLabel('Search icon'), findsOneWidget);
+      } finally {
+        handle.dispose();
+      }
+    });
+
+    testWidgets('should exclude semantics when OiIcon.decorative() is used',
+        (tester) async {
+      await tester.pumpObers(const OiIcon.decorative(icon: testIcon));
+      expect(find.byType(ExcludeSemantics), findsAtLeastNWidgets(1));
+      final semanticsWidgets = tester.widgetList<Semantics>(
+        find.byType(Semantics),
+      );
+      final withLabel = semanticsWidgets
+          .where(
+            (s) =>
+                s.properties.label != null && s.properties.label!.isNotEmpty,
+          )
+          .toList();
+      expect(withLabel, isEmpty);
+    });
+  });
+
   // ── Semantic icon ──────────────────────────────────────────────────────────
 
   testWidgets('renders Icon widget', (tester) async {

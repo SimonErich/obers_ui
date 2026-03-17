@@ -3,6 +3,8 @@ import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/foundation/oi_accessibility.dart';
 import 'package:obers_ui/src/foundation/oi_overlays.dart';
 import 'package:obers_ui/src/foundation/oi_platform.dart';
+import 'package:obers_ui/src/foundation/oi_shortcut_scope.dart';
+import 'package:obers_ui/src/foundation/oi_tour_scope.dart';
 import 'package:obers_ui/src/foundation/oi_undo_stack.dart';
 import 'package:obers_ui/src/foundation/persistence/oi_settings_driver.dart';
 import 'package:obers_ui/src/foundation/persistence/oi_settings_provider.dart';
@@ -77,8 +79,12 @@ class OiDensityScope extends InheritedWidget {
 ///
 /// [OiApp] replaces [WidgetsApp] / MaterialApp / CupertinoApp as the
 /// root widget. It injects all design-system services — theme, overlays,
-/// undo stack, accessibility scope, platform data, density, and optional
-/// settings persistence — into the widget tree.
+/// undo stack, accessibility scope, platform data, density, shortcut scope,
+/// tour scope, and optional settings persistence — into the widget tree.
+///
+/// Use the default constructor for simple (non-router) apps, and
+/// [OiApp.router] for apps that use a declarative routing package such as
+/// go_router.
 ///
 /// ```dart
 /// void main() {
@@ -97,7 +103,7 @@ class OiDensityScope extends InheritedWidget {
 class OiApp extends StatefulWidget {
   /// Creates an [OiApp] with a simple [home] widget (no routing).
   const OiApp({
-    required this.home,
+    required Widget this.home,
     this.theme,
     this.darkTheme,
     this.themeMode = ThemeMode.system,
@@ -111,15 +117,51 @@ class OiApp extends StatefulWidget {
     this.title = '',
     this.debugShowCheckedModeBanner = true,
     super.key,
-  });
+  })  : routerConfig = null,
+        _useRouter = false;
+
+  /// Creates an [OiApp] that uses a declarative router.
+  ///
+  /// Pass a [RouterConfig] (e.g. from go_router) as [routerConfig].
+  /// All other parameters behave identically to the default constructor.
+  const OiApp.router({
+    required this.routerConfig,
+    this.theme,
+    this.darkTheme,
+    this.themeMode = ThemeMode.system,
+    this.density,
+    this.performanceConfig,
+    this.settingsDriver,
+    this.undoStackMaxHistory = 50,
+    this.locale,
+    this.localizationsDelegates,
+    this.supportedLocales = const [Locale('en', 'US')],
+    this.title = '',
+    this.debugShowCheckedModeBanner = true,
+    super.key,
+  })  : home = null,
+        _useRouter = true;
 
   /// The root widget displayed when no router is used.
-  final Widget home;
+  ///
+  /// Always `null` when [OiApp.router] constructor is used.
+  final Widget? home;
+
+  /// The router configuration used when [OiApp.router] constructor is used.
+  ///
+  /// Always `null` when the default [OiApp] constructor is used.
+  final RouterConfig<Object>? routerConfig;
+
+  // Whether the router constructor was used.
+  final bool _useRouter;
 
   /// The light theme. Defaults to [OiThemeData.light] if null.
   final OiThemeData? theme;
 
-  /// The dark theme. Defaults to [OiThemeData.dark] if null.
+  /// The dark theme.
+  ///
+  /// When null, [theme] is used for both light and dark modes instead of
+  /// falling back to [OiThemeData.dark].
   final OiThemeData? darkTheme;
 
   /// Determines which theme to use when both [theme] and [darkTheme] are set.
@@ -181,7 +223,8 @@ class _OiAppState extends State<OiApp> {
 
   OiThemeData _resolveTheme(Brightness platformBrightness) {
     final lightTheme = widget.theme ?? OiThemeData.light();
-    final darkTheme = widget.darkTheme ?? OiThemeData.dark();
+    // When darkTheme is null, use the primary (light) theme for both modes.
+    final darkTheme = widget.darkTheme ?? lightTheme;
 
     OiThemeData resolved;
     switch (widget.themeMode) {
@@ -216,8 +259,89 @@ class _OiAppState extends State<OiApp> {
     }
   }
 
+  /// Maps a [Locale] to the appropriate [TextDirection].
+  ///
+  /// RTL is used for Arabic, Hebrew, Persian, Urdu, and related scripts.
+  /// Falls back to [TextDirection.ltr] when [locale] is null.
+  TextDirection _resolveTextDirection(Locale? locale) {
+    if (locale == null) return TextDirection.ltr;
+    const rtlLanguageCodes = {
+      'ar', // Arabic
+      'he', // Hebrew
+      'fa', // Persian / Farsi
+      'ur', // Urdu
+      'ps', // Pashto
+      'sd', // Sindhi
+      'ug', // Uyghur
+      'yi', // Yiddish
+      'dv', // Divehi / Maldivian
+    };
+    return rtlLanguageCodes.contains(locale.languageCode)
+        ? TextDirection.rtl
+        : TextDirection.ltr;
+  }
+
+  /// Builds the full injection scaffold that wraps the navigated content.
+  ///
+  /// Injection order (outermost → innermost):
+  /// [OiTheme] → [Directionality] → [OiDensityScope] → [OiA11yScope]
+  /// → [OiPlatform] → [OiUndoStackProvider] → [OiShortcutScope]
+  /// → [OiTourScope] → [OiOverlaysHost]
+  Widget _buildScaffold(BuildContext context, Widget? child) {
+    final platformBrightness = MediaQuery.platformBrightnessOf(context);
+    final themeData = _resolveTheme(platformBrightness);
+
+    Widget result = OiTheme(
+      data: themeData,
+      child: Directionality(
+        textDirection: _resolveTextDirection(widget.locale),
+        child: OiDensityScope(
+          density: _resolveDensity(),
+          child: OiA11yScope(
+            child: OiPlatform.fromContext(
+              context: context,
+              child: OiUndoStackProvider(
+                stack: _undoStack,
+                child: OiShortcutScope(
+                  child: OiTourScope(
+                    child: buildOiOverlaysHost(
+                      service: _overlaysService,
+                      child: child ?? const SizedBox(),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    if (widget.settingsDriver != null) {
+      result = OiSettingsProvider(
+        driver: widget.settingsDriver!,
+        child: result,
+      );
+    }
+
+    return result;
+  }
+
   @override
   Widget build(BuildContext context) {
+    if (widget._useRouter) {
+      return WidgetsApp.router(
+        color: const Color(0xFF2563EB),
+        locale: widget.locale,
+        localizationsDelegates: widget.localizationsDelegates,
+        supportedLocales: widget.supportedLocales,
+        title: widget.title,
+        debugShowCheckedModeBanner: widget.debugShowCheckedModeBanner,
+        routerConfig: widget.routerConfig,
+        builder: _buildScaffold,
+      );
+    }
+
     return WidgetsApp(
       color: const Color(0xFF2563EB),
       locale: widget.locale,
@@ -232,38 +356,7 @@ class _OiAppState extends State<OiApp> {
               builder(context),
         );
       },
-      builder: (context, child) {
-        final platformBrightness = MediaQuery.platformBrightnessOf(context);
-        final themeData = _resolveTheme(platformBrightness);
-
-        Widget result = OiTheme(
-          data: themeData,
-          child: OiDensityScope(
-            density: _resolveDensity(),
-            child: OiA11yScope(
-              child: OiPlatform.fromContext(
-                context: context,
-                child: OiUndoStackProvider(
-                  stack: _undoStack,
-                  child: buildOiOverlaysHost(
-                    service: _overlaysService,
-                    child: child ?? const SizedBox(),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        );
-
-        if (widget.settingsDriver != null) {
-          result = OiSettingsProvider(
-            driver: widget.settingsDriver!,
-            child: result,
-          );
-        }
-
-        return result;
-      },
+      builder: _buildScaffold,
       home: widget.home,
     );
   }

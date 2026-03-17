@@ -1,0 +1,4 @@
+llm:
+  ollamaApi:
+    baseUrl: https://e38x98s7g92mqf-11434.proxy.runpod.net
+    model: qwen3:14b-q4_K_M

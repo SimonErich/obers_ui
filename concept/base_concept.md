@@ -7403,4 +7403,7243 @@ Components containing inputs must be tested with simulated keyboard:
 
 ---
 
-End of specification.
+# obers_ui — File Explorer Module Specification
+
+> **Date:** 2026-03-16
+> **Extends:** `base_concept.md`
+> **Scope:** Tier 2 additions + Tier 4 module for a full-featured file explorer.
+> **Replaces:** The existing `OiFileManager` stub in `base_concept.md`.
+> **Principle:** Every widget composes from existing obers_ui primitives and components. Zero new rendering primitives.
+
+---
+
+## Table of Contents
+
+- [Overview & Composition Map](#overview--composition-map)
+- [New Tier 2 Components](#new-tier-2-components)
+  - [OiFileIcon](#oifileicon)
+  - [OiFolderIcon](#oifoldericon)
+  - [OiFilePreview](#oifilepreview)
+  - [OiFileTile](#oifiletile)
+  - [OiFileGridCard](#oifilegridcard)
+  - [OiPathBar](#oipathbar)
+  - [OiStorageIndicator](#oistorageindicator)
+  - [OiDropHighlight](#oidrophighlight)
+  - [OiSelectionOverlay](#oiselectionoverlay)
+  - [OiRenameField](#oirenamefield)
+  - [OiFolderTreeItem](#oifoldertreeitem)
+- [New Tier 2 Dialogs](#new-tier-2-dialogs)
+  - [OiNewFolderDialog](#oinewfolderdialog)
+  - [OiRenameDialog](#oirenamedialog)
+  - [OiDeleteDialog](#oideletedialog)
+  - [OiMoveDialog](#oimovedialog)
+  - [OiFileInfoDialog](#oifileinfodialog)
+  - [OiUploadDialog](#oiuploaddialog)
+- [New Tier 3 Composites](#new-tier-3-composites)
+  - [OiFileToolbar](#oifiletoolbar)
+  - [OiFileSidebar](#oifilesidebar)
+  - [OiFileListView](#oifilelistview)
+  - [OiFileGridView](#oifilegridview)
+  - [OiFileDropTarget](#oifiledrop-target)
+- [New Tier 4 Module](#new-tier-4-module)
+  - [OiFileExplorer (replaces OiFileManager)](#oifileexplorer)
+- [Data Models](#data-models)
+- [Theme Extensions](#theme-extensions)
+- [Testing Strategy](#testing-strategy)
+
+---
+
+# Overview & Composition Map
+
+This specification defines a complete file explorer system. The existing `OiFileManager` stub is replaced by `OiFileExplorer` — a full Tier 4 module composed from **11 new Tier 2 components**, **6 dialog widgets**, **5 Tier 3 composites**, and numerous existing obers_ui widgets.
+
+**Design goals:**
+
+1. Feature-complete: navigation, list/grid view, drag-and-drop (within view, within sidebar, between sidebar and view), search-as-you-type, create/rename/delete/move/copy, sort, multi-select, bulk actions, context menus, keyboard shortcuts, file previews, upload, storage indicator.
+2. Compositional: every piece is independently usable. `OiFileTile` can be used outside the explorer. `OiFileSidebar` can power a picker dialog. `OiFileGridCard` can be used in a gallery.
+3. Accessible: full keyboard navigation, screen reader announcements, focus management in dialogs, drag-and-drop keyboard fallbacks.
+
+```
+Composition Tree (new widgets marked with ★)
+
+★ OiFileIcon                       (Tier 2 — display)
+★ OiFolderIcon                     (Tier 2 — display)
+★ OiFilePreview                    (Tier 2 — display)
+★ OiFileTile                       (Tier 2 — display)
+★ OiFileGridCard                   (Tier 2 — display)
+★ OiPathBar                        (Tier 2 — navigation)
+★ OiStorageIndicator               (Tier 2 — display)
+★ OiDropHighlight                  (Tier 2 — feedback)
+★ OiSelectionOverlay               (Tier 2 — interaction)
+★ OiRenameField                    (Tier 2 — input)
+★ OiFolderTreeItem                 (Tier 2 — display)
+
+★ OiNewFolderDialog                (Tier 2 — dialog)
+★ OiRenameDialog                   (Tier 2 — dialog)
+★ OiDeleteDialog                   (Tier 2 — dialog)
+★ OiMoveDialog                     (Tier 2 — dialog)
+★ OiFileInfoDialog                 (Tier 2 — dialog)
+★ OiUploadDialog                   (Tier 2 — dialog)
+
+★ OiFileToolbar                    (Tier 3 — composite)
+★ OiFileSidebar                    (Tier 3 — composite)
+★ OiFileListView                   (Tier 3 — composite)
+★ OiFileGridView                   (Tier 3 — composite)
+★ OiFileDropTarget                 (Tier 3 — composite)
+
+★ OiFileExplorer                   (Tier 4 — module, replaces OiFileManager)
+
+Dependency Graph:
+
+OiFileExplorer (Tier 4)
+ ├── OiSplitPane           (existing — sidebar | content)
+ │    ├── OiFileSidebar     ★ (Tier 3)
+ │    │    ├── OiTree        (existing — folder hierarchy)
+ │    │    │    └── OiFolderTreeItem  ★
+ │    │    │         ├── OiFolderIcon  ★
+ │    │    │         ├── OiLabel       (existing)
+ │    │    │         ├── OiBadge       (existing — item count)
+ │    │    │         └── OiDropZone    (existing — drop target per folder)
+ │    │    ├── OiDraggable   (existing — drag folders to reorder/reparent)
+ │    │    ├── OiDropZone    (existing — drop files onto folders)
+ │    │    ├── OiStorageIndicator ★
+ │    │    ├── OiButton.ghost (existing — "New Folder" quick action)
+ │    │    └── OiContextMenu (existing — right-click folder actions)
+ │    │
+ │    └── OiColumn          (existing — toolbar + content area)
+ │         ├── OiFileToolbar  ★ (Tier 3)
+ │         │    ├── OiPathBar         ★
+ │         │    │    ├── OiBreadcrumbs  (existing)
+ │         │    │    └── OiTextInput.search (existing — inline path edit)
+ │         │    ├── OiTextInput.search (existing — search-as-you-type)
+ │         │    ├── OiButtonGroup     (existing — view toggle: list/grid)
+ │         │    ├── OiSelect          (existing — sort dropdown)
+ │         │    ├── OiButton          (existing — upload, new folder)
+ │         │    └── OiIconButton      (existing — view options)
+ │         │
+ │         └── OiFileDropTarget ★ (Tier 3 — wraps entire content area)
+ │              ├── OiDropZone       (existing — native file drop from OS)
+ │              ├── OiDropHighlight  ★ (visual feedback)
+ │              │
+ │              ├── OiFileListView   ★ (Tier 3 — when layout=list)
+ │              │    ├── OiVirtualList     (existing)
+ │              │    ├── OiFileTile        ★ (each row)
+ │              │    │    ├── OiFileIcon    ★
+ │              │    │    ├── OiLabel       (existing — name, size, date)
+ │              │    │    ├── OiTimestamp   (existing from messaging spec — modified date)
+ │              │    │    ├── OiDraggable   (existing — drag files)
+ │              │    │    ├── OiDropZone    (existing — drop onto folders)
+ │              │    │    ├── OiTappable    (existing — click to open)
+ │              │    │    └── OiRenameField ★ (inline rename)
+ │              │    ├── OiSelectionOverlay ★ (rubber-band selection)
+ │              │    └── _OiFileListHeader (internal — sortable column headers)
+ │              │
+ │              ├── OiFileGridView   ★ (Tier 3 — when layout=grid)
+ │              │    ├── OiVirtualGrid     (existing)
+ │              │    ├── OiFileGridCard    ★ (each card)
+ │              │    │    ├── OiFilePreview ★ (thumbnail or icon)
+ │              │    │    ├── OiLabel       (existing — file name)
+ │              │    │    ├── OiCheckbox    (existing — multi-select overlay)
+ │              │    │    ├── OiDraggable   (existing)
+ │              │    │    ├── OiDropZone    (existing — folders accept drops)
+ │              │    │    └── OiRenameField ★
+ │              │    └── OiSelectionOverlay ★
+ │              │
+ │              └── OiEmptyState     (existing — empty folder)
+ │
+ ├── OiContextMenu          (existing — right-click in content area)
+ ├── OiDialog               (existing — hosts all dialog widgets)
+ ├── OiShortcuts            (existing — keyboard shortcut handler)
+ └── OiToast                (existing — action feedback)
+```
+
+---
+
+# New Tier 2 Components
+
+---
+
+## OiFileIcon
+
+**What it is:** A file type icon that shows different visuals based on file extension, MIME type, or a generic fallback. Not a thumbnail — this is a styled iconographic representation (document icon with extension label overlay, like macOS/Windows file icons).
+
+**Composes:** `OiIcon` (base icon shape), `OiLabel` (extension text overlay), `OiSurface` (icon background tint per file type)
+
+```dart
+OiFileIcon({
+  required String fileName,
+  String? mimeType,
+  OiFileIconSize size = OiFileIconSize.md,
+  Color? colorOverride,
+  String? semanticsLabel,
+})
+
+enum OiFileIconSize { xs, sm, md, lg, xl }
+```
+
+**File type → icon mapping:**
+
+| Category | Extensions | Icon Shape | Color Accent |
+|----------|-----------|------------|-------------|
+| Document | .pdf | Page with "PDF" label | Red (error.s500) |
+| Document | .doc, .docx | Page with "DOC" label | Blue (primary.s500) |
+| Spreadsheet | .xls, .xlsx, .csv | Page with grid lines | Green (success.s500) |
+| Presentation | .ppt, .pptx | Page with chart | Orange (warning.s500) |
+| Image | .png, .jpg, .gif, .svg, .webp | Landscape mountain icon | Teal (accent.s500) |
+| Video | .mp4, .mov, .avi, .webm | Film strip icon | Purple |
+| Audio | .mp3, .wav, .flac, .ogg | Music note icon | Pink |
+| Archive | .zip, .tar, .gz, .rar, .7z | Box with zipper | Brown |
+| Code | .dart, .js, .ts, .py, .rs, .go, .html, .css | Angle brackets `</>` | Cyan |
+| Text | .txt, .md, .log | Lined page | Gray (neutral.s500) |
+| Executable | .exe, .app, .sh, .bat | Gear icon | Dark gray |
+| Font | .ttf, .otf, .woff | "Aa" text | Indigo |
+| 3D | .obj, .fbx, .gltf | Cube icon | Violet |
+| Unknown | * | Blank page | Neutral (neutral.s300) |
+
+**Rendering:**
+
+- Base shape: A rounded-corner page/document outline (not a circle).
+- Top-right corner has a "dog-ear" fold effect.
+- Extension label (e.g., "PDF") is rendered in bold uppercase at the bottom of the icon, over a colored band matching the category.
+- `colorOverride` replaces the category-based accent color.
+- Size scale: xs=16px, sm=24px, md=32px, lg=48px, xl=64px.
+
+**Accessibility:**
+
+- `semanticsLabel` defaults to `"$extension file"` (e.g., "PDF file").
+
+**Tests:**
+
+| Test | What it verifies |
+|------|-----------------|
+| .pdf shows PDF icon with red accent | Correct category mapping |
+| .docx shows DOC icon with blue accent | Correct category mapping |
+| .png shows image icon with teal accent | Correct category mapping |
+| .unknown shows blank page | Fallback |
+| All 5 sizes render correct dimensions | Size scale |
+| colorOverride replaces category color | Custom color |
+| Case-insensitive extension match | .PDF == .pdf |
+| mimeType fallback when extension ambiguous | MIME takes precedence |
+| Semantics label present | Screen reader |
+| Golden: all categories × md size, light + dark | Visual regression |
+| Golden: all sizes for .pdf | Visual regression |
+
+---
+
+## OiFolderIcon
+
+**What it is:** A folder icon with open/closed states, color customization, special folder variants (shared, starred, locked), and optional badge overlay.
+
+**Composes:** `OiIcon` (folder shape), `OiBadge.dot` (status overlay), custom `CustomPainter` (folder shape with tab)
+
+```dart
+OiFolderIcon({
+  OiFolderIconState state = OiFolderIconState.closed,
+  OiFolderIconVariant variant = OiFolderIconVariant.normal,
+  OiFolderIconSize size = OiFolderIconSize.md,
+  Color? color,
+  int? badgeCount,
+  String? semanticsLabel,
+})
+
+enum OiFolderIconState { closed, open, empty }
+enum OiFolderIconVariant { normal, shared, starred, locked, trash }
+enum OiFolderIconSize { xs, sm, md, lg, xl }
+```
+
+**Rendering:**
+
+- **closed:** Classic folder shape — front face with a tab on top-left.
+- **open:** Front face tilted slightly, revealing the interior.
+- **empty:** Same as closed but with lighter fill and dashed outline.
+- Variant overlays: `shared` → small people icon on bottom-right, `starred` → star, `locked` → lock, `trash` → small delete icon.
+- Default color: `colors.warning.s400` (classic folder yellow-amber). `color` overrides.
+- Animated transition between open/closed when state changes (folder "opens" with a 150ms rotation tween).
+
+**Tests:**
+
+| Test | What it verifies |
+|------|-----------------|
+| Closed state renders classic folder | Correct shape |
+| Open state renders tilted folder | Correct shape |
+| Empty state renders dashed folder | Dashed outline, light fill |
+| shared variant shows people overlay | Overlay icon |
+| starred variant shows star overlay | Overlay icon |
+| locked variant shows lock overlay | Overlay icon |
+| trash variant shows delete overlay | Overlay icon |
+| Custom color overrides default | Color applied |
+| badgeCount shows badge | OiBadge overlay |
+| State transition animates | 150ms rotation |
+| Reduced motion: instant swap | No animation |
+| All sizes render correctly | Dimension check |
+| Semantics: "folder" / "shared folder" / etc. | Screen reader |
+| Golden: all states × all variants, light + dark | Visual regression |
+
+---
+
+## OiFilePreview
+
+**What it is:** A thumbnail preview of a file. Shows an actual image thumbnail for image/video files, a rich preview for PDFs/documents (first-page render), and falls back to `OiFileIcon` for unsupported types.
+
+**Composes:** `OiImage` (thumbnails), `OiFileIcon` (fallback), `OiShimmer` (loading state), `OiSurface` (frame), `OiIcon` (play button overlay for video)
+
+```dart
+OiFilePreview({
+  required OiFileNodeData file,
+  double? width,
+  double? height,
+  BoxFit fit = BoxFit.cover,
+  bool showPlayButton = true,
+  bool loading = false,
+  String? semanticsLabel,
+})
+```
+
+**Preview chain:**
+
+1. If `file.thumbnailUrl` is set → load image via `OiImage`.
+2. If file is an image type and `file.url` is set → load `OiImage` with the file URL directly.
+3. If file is a video → load thumbnail (if available) with play button overlay.
+4. Else → render `OiFileIcon` centered in the frame at `lg` size.
+
+**Loading:** When `loading=true` or image is loading, show `OiShimmer` rectangle.
+
+**Error:** If image fails to load, gracefully fall back to `OiFileIcon`.
+
+**Tests:**
+
+| Test | What it verifies |
+|------|-----------------|
+| Image file shows thumbnail | OiImage rendered |
+| Video file shows thumbnail + play button | Play overlay visible |
+| PDF falls back to OiFileIcon | Icon fallback |
+| Unknown file shows OiFileIcon | Icon fallback |
+| Loading shows shimmer | OiShimmer visible |
+| Image error falls back to icon | Graceful degradation |
+| Custom width/height applied | Dimensions correct |
+| fit=cover crops correctly | BoxFit applied |
+| Semantics label present | Screen reader |
+| Golden: image preview, icon fallback, loading | Visual regression |
+
+---
+
+## OiFileTile
+
+**What it is:** A single row in the list view layout of the file explorer. Shows file/folder icon, name (editable), size, modified date, and optional metadata columns. Supports selection, drag-and-drop, hover effects, and context menu.
+
+**Composes:** `OiTappable` (row interaction), `OiDraggable` (drag source), `OiDropZone` (folder rows accept drops), `OiFileIcon` / `OiFolderIcon` (leading icon), `OiLabel` (name, size, date), `OiTimestamp` (modified time), `OiCheckbox` (selection indicator), `OiRenameField` (inline rename), `OiContextMenu` (right-click), `OiSurface` (row background for states)
+
+```dart
+OiFileTile({
+  required OiFileNodeData file,
+  required bool selected,
+  bool renaming = false,
+  bool dropTarget = false,
+  bool dragSource = false,
+  bool showCheckbox = false,
+  // Columns
+  bool showSize = true,
+  bool showModified = true,
+  bool showType = true,
+  List<OiFileColumnDef>? extraColumns,
+  // Callbacks
+  VoidCallback? onTap,
+  VoidCallback? onDoubleTap,
+  ValueChanged<bool>? onSelect,
+  ValueChanged<String>? onRename,
+  VoidCallback? onCancelRename,
+  VoidCallback? onContextMenu,
+  // Drag & drop
+  VoidCallback? onDragStart,
+  ValueChanged<List<OiFileNodeData>>? onDrop,
+  bool Function(List<OiFileNodeData>)? canAcceptDrop,
+  String? semanticsLabel,
+})
+```
+
+**Layout:**
+
+```
+┌────────────────────────────────────────────────────────────────────────┐
+│  ☐  📄 report-q3-final.pdf              2.4 MB    Mar 15, 2026  PDF  │
+│  ☑  📁 Design Assets                     —        Mar 14, 2026  —    │  ← selected, folder
+│     📄 ┌──────────────────────────────┐   —        Mar 14, 2026  —    │  ← renaming mode
+│        │ new-filename.txt          [✓]│                               │
+│        └──────────────────────────────┘                               │
+└────────────────────────────────────────────────────────────────────────┘
+```
+
+**States:**
+
+- **Default:** Normal row.
+- **Hover:** Subtle background tint (`colors.surface.s100`). Row actions (context menu dots) appear on trailing edge.
+- **Selected:** Stronger background tint (`colors.primary.s100`). Checkbox checked.
+- **Focused:** Focus ring around the row.
+- **Drop target (folder):** When files are dragged over a folder row, the row shows `OiDropHighlight` with a border glow and accepts the drop.
+- **Dragging:** Row becomes semi-transparent (0.5 opacity). `OiDragGhost` shows a badge with count when multi-dragging.
+- **Renaming:** Name column switches to `OiRenameField` with the current name selected.
+
+**Double-tap/Enter behavior:**
+
+- Folder → navigates into folder (fires `onTap` or `onDoubleTap` — consumer decides).
+- File → opens the file (fires `onDoubleTap` or `onTap`).
+
+**Size formatting:**
+
+- Bytes: "1.2 KB", "3.4 MB", "1.1 GB", "—" for folders.
+
+**Tests:**
+
+| Test | What it verifies |
+|------|-----------------|
+| File renders with OiFileIcon, name, size, date, type | Core layout |
+| Folder renders with OiFolderIcon, name, no size | Folder layout |
+| Hover shows background tint | Hover state |
+| Hover shows trailing action dots | Action visibility |
+| Selected shows checkbox checked + tint | Selection state |
+| onSelect fires when checkbox toggled | Callback |
+| onTap fires on click | Callback |
+| onDoubleTap fires on double-click | Callback |
+| renaming=true shows OiRenameField | Inline rename |
+| onRename fires with new name | Callback |
+| onCancelRename fires on Escape | Callback |
+| Drag starts on long-press/mouse-drag | OiDraggable activates |
+| Folder row accepts drops when canAcceptDrop returns true | OiDropZone |
+| Folder row shows drop highlight on drag-over | OiDropHighlight |
+| onDrop fires with dropped files | Callback |
+| Non-folder row does not accept drops | No drop zone |
+| Context menu on right-click | OiContextMenu |
+| Extra columns render | Custom columns |
+| Size formatted correctly | "2.4 MB" |
+| Keyboard: Enter opens, F2 renames | Keyboard shortcuts |
+| Keyboard: Space toggles selection | Selection toggle |
+| Semantics: file name and type announced | Screen reader |
+| Golden: default, hover, selected, renaming, drop-target | Visual regression |
+
+---
+
+## OiFileGridCard
+
+**What it is:** A single card in the grid view layout of the file explorer. Shows a thumbnail/preview area on top and the file name below. Supports selection, drag-and-drop, hover effects, and inline rename.
+
+**Composes:** `OiSurface` (card background), `OiTappable` (interaction), `OiFilePreview` (thumbnail area), `OiFolderIcon` (folder variant), `OiLabel` (file name), `OiCheckbox` (selection overlay in top-left corner), `OiDraggable`, `OiDropZone` (folders), `OiRenameField` (inline rename below preview), `OiContextMenu`
+
+```dart
+OiFileGridCard({
+  required OiFileNodeData file,
+  required bool selected,
+  bool renaming = false,
+  bool dropTarget = false,
+  bool showCheckbox = false,
+  // Callbacks (same as OiFileTile)
+  VoidCallback? onTap,
+  VoidCallback? onDoubleTap,
+  ValueChanged<bool>? onSelect,
+  ValueChanged<String>? onRename,
+  VoidCallback? onCancelRename,
+  VoidCallback? onContextMenu,
+  ValueChanged<List<OiFileNodeData>>? onDrop,
+  bool Function(List<OiFileNodeData>)? canAcceptDrop,
+  String? semanticsLabel,
+})
+```
+
+**Layout:**
+
+```
+File card:                    Folder card:
+┌────────────────────┐        ┌────────────────────┐
+│                    │        │                    │
+│  ☑ (select)        │        │                    │
+│     ┌──────────┐   │        │     ┌──────────┐   │
+│     │ Thumbnail│   │        │     │  📁      │   │
+│     │  Preview │   │        │     │  (large) │   │
+│     └──────────┘   │        │     └──────────┘   │
+│                    │        │                    │
+│  report-q3.pdf     │        │  Design Assets     │
+│  2.4 MB            │        │  12 items           │
+└────────────────────┘        └────────────────────┘
+
+Renaming:
+┌────────────────────┐
+│     ┌──────────┐   │
+│     │ Thumbnail│   │
+│     └──────────┘   │
+│  ┌──────────────┐  │
+│  │ new-name  [✓]│  │
+│  └──────────────┘  │
+└────────────────────┘
+```
+
+**States:**
+
+- **Default:** Flat card with subtle border.
+- **Hover:** Elevated shadow (`shadow.sm`), border becomes `primary.s300`.
+- **Selected:** Primary tint background (`primary.s50`), checkbox visible and checked, border becomes `primary.s500`.
+- **Multi-select mode:** All cards show checkboxes (even unselected). Triggered when any card is selected.
+- **Focused:** Focus ring around card.
+- **Drop target (folder):** Border pulses with `primary.s400`, background tints.
+- **Dragging:** 0.5 opacity, ghost shows card thumbnail + count badge.
+
+**Folder cards:**
+
+- Show `OiFolderIcon` (size `xl`) instead of `OiFilePreview`.
+- Subtitle shows item count: "12 items" or "Empty".
+- Accept drops: when files are dragged over, show drop highlight.
+
+**Tests:**
+
+| Test | What it verifies |
+|------|-----------------|
+| File card shows preview and name | Core layout |
+| Folder card shows OiFolderIcon and item count | Folder layout |
+| Hover elevates card | Shadow + border change |
+| Selected shows checkbox and tint | Selection state |
+| showCheckbox in multi-select mode | All checkboxes visible |
+| Double-tap opens | onDoubleTap fires |
+| Rename mode shows OiRenameField | Inline rename |
+| onRename fires | Callback |
+| Drag file card | OiDraggable activates |
+| Drop onto folder card | OiDropZone accepts |
+| Drop highlight on folder hover | Visual feedback |
+| Context menu on right-click | OiContextMenu |
+| Keyboard: Enter opens, F2 renames, Space selects | Shortcuts |
+| Semantics: file name, type, size | Screen reader |
+| Golden: file, folder, hover, selected, renaming, drop-target | Visual regression |
+
+---
+
+## OiPathBar
+
+**What it is:** A dual-mode path navigation bar. In **breadcrumb mode**, shows clickable path segments. In **edit mode** (activated by click or keyboard shortcut), shows a text input where the user can type or paste a path directly. Combines `OiBreadcrumbs` with an inline path editor.
+
+**Composes:** `OiBreadcrumbs` (breadcrumb display), `OiTextInput` (path editing), `OiTappable` (click to switch to edit mode), `OiMorph` (crossfade between modes), `OiIcon` (folder icon prefix)
+
+```dart
+OiPathBar({
+  required List<OiPathSegment> segments,
+  required ValueChanged<OiPathSegment> onNavigate,
+  ValueChanged<String>? onPathSubmit,
+  bool editable = true,
+  bool showIcon = true,
+  String? semanticsLabel,
+})
+
+class OiPathSegment {
+  final String id;
+  final String label;
+  final IconData? icon;
+  final VoidCallback? onTap;
+}
+```
+
+**Behavior:**
+
+- Default: `OiBreadcrumbs` with `OiPathSegment` items. Last segment is current folder (non-clickable, bold).
+- Click on the breadcrumb area (not on a segment) or press `/` or `Ctrl+L` → switches to edit mode.
+- Edit mode: Full path string in a `OiTextInput`, auto-selected. Type a new path and press Enter → fires `onPathSubmit`. Escape → reverts to breadcrumb mode.
+- Deep paths collapse middle segments (via `OiBreadcrumbs.collapsible`).
+- First segment optionally shows a folder/home icon via `showIcon`.
+
+**Tests:**
+
+| Test | What it verifies |
+|------|-----------------|
+| Segments render as breadcrumbs | Correct display |
+| Click on segment fires onNavigate | Callback |
+| Last segment is non-clickable and bold | Current folder |
+| Click on background enters edit mode | OiTextInput visible |
+| Ctrl+L enters edit mode | Keyboard shortcut |
+| Edit mode shows full path | Path string |
+| Enter in edit submits path | onPathSubmit fires |
+| Escape exits edit mode | Breadcrumbs restored |
+| Deep paths collapse middle | "..." menu works |
+| showIcon renders folder icon | Icon visible |
+| Semantics: navigation breadcrumb | Screen reader |
+| Golden: breadcrumb mode, edit mode, collapsed | Visual regression |
+
+---
+
+## OiStorageIndicator
+
+**What it is:** A compact storage usage indicator showing used/total space with a progress bar and breakdown by category.
+
+**Composes:** `OiProgress.linear` (usage bar), `OiLabel` (usage text), `OiTooltip` (breakdown on hover)
+
+```dart
+OiStorageIndicator({
+  required int usedBytes,
+  required int totalBytes,
+  List<OiStorageCategory>? breakdown,
+  bool compact = false,
+  String? semanticsLabel,
+})
+
+class OiStorageCategory {
+  final String label;
+  final int bytes;
+  final Color color;
+}
+```
+
+**Layout:**
+
+```
+Default:
+┌──────────────────────────────────┐
+│  Storage                         │
+│  ████████████░░░░░░ 65% used     │
+│  6.5 GB of 10 GB                 │
+└──────────────────────────────────┘
+
+Compact:
+████████████░░░░░░ 6.5 / 10 GB
+```
+
+- Progress bar color shifts from green → yellow → red as usage increases (< 70% → success, 70-90% → warning, > 90% → error).
+- `breakdown` renders as a segmented/stacked progress bar where each category gets its own color slice.
+- Tooltip (on hover) shows the breakdown: "Documents: 2.1 GB, Images: 3.2 GB, Other: 1.2 GB".
+
+**Tests:**
+
+| Test | What it verifies |
+|------|-----------------|
+| Progress bar at correct percentage | 65% filled |
+| Usage text correct | "6.5 GB of 10 GB" |
+| Color green when < 70% | Success color |
+| Color yellow when 70-90% | Warning color |
+| Color red when > 90% | Error color |
+| Breakdown renders segmented bar | Category colors |
+| Tooltip shows breakdown | Hover detail |
+| Compact mode renders inline | Reduced layout |
+| Zero usage shows empty bar | Edge case |
+| Full usage shows full bar | Edge case |
+| Semantics: usage announced | Screen reader |
+| Golden: low/medium/high usage, with breakdown | Visual regression |
+
+---
+
+## OiDropHighlight
+
+**What it is:** A visual overlay that indicates a valid drop target. Renders a dashed border + background tint + centered label ("Drop files here" / "Move to folder"). Used by `OiFileDropTarget`, `OiFileTile`, `OiFileGridCard`, and `OiFolderTreeItem`.
+
+**Composes:** `OiSurface` (background tint), `CustomPainter` (dashed border), `OiLabel` (message), `OiIcon` (upload/move icon)
+
+```dart
+OiDropHighlight({
+  required bool active,
+  OiDropHighlightStyle style = OiDropHighlightStyle.area,
+  String? message,
+  IconData? icon,
+  Widget? child,
+})
+
+enum OiDropHighlightStyle {
+  /// Full-area overlay with dashed border and centered message.
+  area,
+  /// Subtle border glow around a widget (used on folder rows/cards).
+  border,
+}
+```
+
+**Behavior:**
+
+- `active=true` renders the highlight with a fade-in animation (100ms).
+- `active=false` renders nothing (or child only).
+- `area` style: Dashed border around the entire widget area, semi-transparent background tint (`primary.s50` at 0.5 opacity), centered icon + message.
+- `border` style: Solid glowing border around the child (2px `primary.s500` with `OiHaloStyle`), subtle background tint. No message.
+
+**Tests:**
+
+| Test | What it verifies |
+|------|-----------------|
+| active=true shows overlay | Visible |
+| active=false shows nothing | Hidden |
+| area style has dashed border + message | Full overlay |
+| border style has glow border | Subtle highlight |
+| Fade-in animation | 100ms transition |
+| Custom message displayed | Label text |
+| Custom icon displayed | Icon visible |
+| Reduced motion: instant show | No animation |
+| Golden: area + border styles, light + dark | Visual regression |
+
+---
+
+## OiSelectionOverlay
+
+**What it is:** A rubber-band (lasso) selection overlay that lets users click-and-drag on empty space to select multiple files by drawing a rectangle. Items whose bounds intersect the rectangle get selected.
+
+**Composes:** `GestureDetector` (drag tracking), `CustomPainter` (rubber-band rectangle), callback to parent with selected bounds
+
+```dart
+OiSelectionOverlay({
+  required Widget child,
+  required ValueChanged<Rect> onSelectionRect,
+  required VoidCallback onSelectionStart,
+  required VoidCallback onSelectionEnd,
+  bool enabled = true,
+  Color? selectionColor,
+  Color? borderColor,
+})
+```
+
+**Behavior:**
+
+- User clicks on empty space (not on a file item) and drags → semi-transparent rectangle drawn from start to current mouse position.
+- `onSelectionRect` fires continuously during drag with the current rectangle.
+- Parent widget (OiFileListView/OiFileGridView) calculates which items intersect and updates selection.
+- Selection rectangle: `primary.s200` at 0.3 opacity fill, `primary.s500` at 1.0 border.
+- `enabled=false` disables (e.g., when dragging a file instead of selecting).
+- Does NOT fire when drag starts on a file item — only on empty space.
+
+**Tests:**
+
+| Test | What it verifies |
+|------|-----------------|
+| Click-drag on empty space draws rectangle | Rectangle visible |
+| onSelectionRect fires with correct bounds | Callback data |
+| onSelectionStart fires at drag start | Callback |
+| onSelectionEnd fires at drag end | Callback |
+| Click on file item does not trigger | No false activation |
+| enabled=false prevents selection | Disabled state |
+| Custom colors applied | Color overrides |
+| Golden: selection rectangle | Visual regression |
+
+---
+
+## OiRenameField
+
+**What it is:** A specialized inline text input for renaming files/folders. Auto-selects the filename (without extension) on mount, validates against illegal characters, and fires save/cancel callbacks.
+
+**Composes:** `OiTextInput` (input field), `OiIconButton` (confirm/cancel buttons)
+
+```dart
+OiRenameField({
+  required String currentName,
+  required ValueChanged<String> onRename,
+  required VoidCallback onCancel,
+  bool isFolder = false,
+  String? Function(String)? validate,
+  bool showButtons = false,
+  String? semanticsLabel,
+})
+```
+
+**Behavior:**
+
+- On mount: auto-focus the input. If the file has an extension and `isFolder=false`, select only the name part (e.g., "report" selected in "report.pdf"). If `isFolder=true`, select all.
+- **Enter** → fires `onRename` with the new name (if valid).
+- **Escape** → fires `onCancel`.
+- **Blur** → fires `onRename` (save on blur, consistent with `OiEditable`).
+- Built-in validation: rejects empty names, names with `/`, `\`, `:`, `*`, `?`, `"`, `<`, `>`, `|`. Shows inline error.
+- `validate` callback adds custom validation (e.g., duplicate name check).
+- `showButtons=true` renders small confirm (✓) and cancel (✕) buttons after the input.
+
+**Tests:**
+
+| Test | What it verifies |
+|------|-----------------|
+| Auto-focuses on mount | Input focused |
+| Selects filename without extension | "report" selected in "report.pdf" |
+| Folder mode selects entire name | All text selected |
+| Enter fires onRename | Callback with new name |
+| Escape fires onCancel | Callback |
+| Blur fires onRename | Save on blur |
+| Empty name shows error | Validation |
+| Illegal characters show error | "/" etc. rejected |
+| Custom validate function | Error from callback |
+| showButtons renders confirm/cancel | Buttons visible |
+| Semantics: "Rename file" | Screen reader |
+| Golden: normal, with error | Visual regression |
+
+---
+
+## OiFolderTreeItem
+
+**What it is:** A specialized tree node widget for the folder sidebar. Shows folder icon (with open/closed state), folder name, item count badge, and acts as a drop target. Used inside `OiTree` in the `OiFileSidebar`.
+
+**Composes:** `OiFolderIcon` (leading), `OiLabel` (folder name), `OiBadge` (item count), `OiDropZone` (accept file drops), `OiDropHighlight` (drop feedback), `OiContextMenu` (right-click), `OiRenameField` (inline rename)
+
+```dart
+OiFolderTreeItem({
+  required OiFileNodeData folder,
+  required bool expanded,
+  required bool selected,
+  bool dropTarget = false,
+  bool renaming = false,
+  int? itemCount,
+  // Callbacks
+  VoidCallback? onTap,
+  VoidCallback? onExpand,
+  ValueChanged<String>? onRename,
+  VoidCallback? onCancelRename,
+  ValueChanged<List<OiFileNodeData>>? onDrop,
+  List<OiMenuItem> Function()? contextMenuItems,
+  String? semanticsLabel,
+})
+```
+
+**Layout:**
+
+```
+▶ 📁 Documents (42)
+▼ 📂 Design Assets (12)         ← expanded, open icon
+    ▶ 📁 Logos (5)
+    ▶ 📁 Mockups (7)
+  📁̃ ┌──────────────────┐       ← renaming
+      │ New name      [✓]│
+      └──────────────────┘
+```
+
+**States:**
+
+- **Default:** `OiFolderIcon(state: closed)`, name, optional count.
+- **Expanded:** `OiFolderIcon(state: open)`, children visible.
+- **Selected:** Background tint (`primary.s100`), bold name.
+- **Drop target:** `OiDropHighlight.border` around the item — glowing border.
+- **Renaming:** Name replaced by `OiRenameField`.
+
+**Tests:**
+
+| Test | What it verifies |
+|------|-----------------|
+| Renders folder icon, name, count | Core layout |
+| Expanded shows open folder icon | OiFolderIcon state=open |
+| Selected shows tint and bold | Selection style |
+| Drop target shows glow border | OiDropHighlight |
+| onDrop fires when files dropped | Callback |
+| Renaming shows OiRenameField | Inline rename |
+| Context menu on right-click | Items appear |
+| onTap fires on click | Callback |
+| onExpand fires on chevron click | Callback |
+| Semantics: "Documents folder, 42 items" | Screen reader |
+| Golden: default, expanded, selected, drop-target | Visual regression |
+
+---
+
+# New Tier 2 Dialogs
+
+All dialogs are rendered via `OiOverlays.of(context).dialog(...)`. Each is a self-contained widget that handles its own validation and callbacks. All trap focus, dismiss on ESC (when appropriate), and are fully keyboard-navigable.
+
+---
+
+## OiNewFolderDialog
+
+**What it is:** A dialog for creating a new folder. Contains a single text input for the folder name with validation.
+
+**Composes:** `OiDialog` (shell), `OiTextInput` (name input), `OiButton` (create/cancel), `OiFolderIcon` (visual)
+
+```dart
+OiNewFolderDialog({
+  required ValueChanged<String> onCreate,
+  VoidCallback? onCancel,
+  String defaultName = 'New Folder',
+  String? Function(String)? validate,
+  String? parentFolderName,
+})
+```
+
+**Layout:**
+
+```
+┌────────────────────────────────────┐
+│  📁 New Folder                     │
+│                                    │
+│  Parent: Documents                 │  ← optional context
+│                                    │
+│  Folder name                       │
+│  ┌──────────────────────────────┐  │
+│  │ New Folder                   │  │  ← auto-focused, text selected
+│  └──────────────────────────────┘  │
+│  ⚠ A folder with this name        │  ← validation error
+│    already exists.                 │
+│                                    │
+│              [Cancel]   [Create]   │
+└────────────────────────────────────┘
+```
+
+**Behavior:**
+
+- On open: input auto-focused, `defaultName` pre-filled and fully selected.
+- **Enter** → create (if valid).
+- **Escape** → cancel.
+- Built-in validation: non-empty, no illegal characters. `validate` adds custom checks (e.g., duplicate name).
+- "Create" button disabled when validation fails.
+
+**Tests:**
+
+| Test | What it verifies |
+|------|-----------------|
+| Opens with default name selected | Auto-focus + selection |
+| Create button fires onCreate | Callback with name |
+| Cancel button fires onCancel | Dialog closes |
+| Enter key creates | Keyboard shortcut |
+| Escape key cancels | Keyboard shortcut |
+| Empty name disables Create | Validation |
+| Illegal chars show error | Built-in validation |
+| Custom validate shows error | Custom validation |
+| parentFolderName shown as context | Context label |
+| Focus trapped in dialog | OiFocusTrap |
+| Semantics: dialog role | Screen reader |
+
+---
+
+## OiRenameDialog
+
+**What it is:** A dialog for renaming a file or folder. Pre-fills the current name with the filename portion selected (not extension).
+
+**Composes:** `OiDialog`, `OiTextInput`, `OiButton`, `OiFileIcon` / `OiFolderIcon` (visual of what's being renamed)
+
+```dart
+OiRenameDialog({
+  required OiFileNodeData file,
+  required ValueChanged<String> onRename,
+  VoidCallback? onCancel,
+  String? Function(String)? validate,
+})
+```
+
+**Behavior:**
+
+- Same as `OiRenameField` selection logic (select name, not extension).
+- Shows the file/folder icon next to the current name for context.
+- "Rename" button disabled when invalid or unchanged.
+
+**Tests:**
+
+| Test | What it verifies |
+|------|-----------------|
+| Pre-fills current name | Name in input |
+| Selects name without extension | Partial selection |
+| Folder selects entire name | Full selection |
+| Rename fires onRename | Callback |
+| Unchanged name disables Rename | No-op prevention |
+| Validation errors shown | Error messages |
+| File icon/folder icon shown | Visual context |
+| Keyboard: Enter renames, Escape cancels | Shortcuts |
+
+---
+
+## OiDeleteDialog
+
+**What it is:** A confirmation dialog for deleting files/folders. Shows what will be deleted, warns about folder contents, and has a destructive action button.
+
+**Composes:** `OiDialog`, `OiButton` (delete — destructive, cancel), `OiLabel`, `OiFileIcon` / `OiFolderIcon`, `OiCheckbox` (optional "Don't ask again")
+
+```dart
+OiDeleteDialog({
+  required List<OiFileNodeData> files,
+  required VoidCallback onDelete,
+  VoidCallback? onCancel,
+  bool showDontAskAgain = false,
+  ValueChanged<bool>? onDontAskAgainChange,
+  bool permanent = false,
+})
+```
+
+**Layout:**
+
+```
+┌────────────────────────────────────────────┐
+│  🗑️ Delete 3 items?                        │
+│                                            │
+│  📄 report-q3.pdf                          │
+│  📁 Design Assets (12 items inside)        │  ← warns about contents
+│  📄 notes.txt                              │
+│                                            │
+│  ⚠ This action cannot be undone.           │  ← when permanent=true
+│                                            │
+│  ☐ Don't ask me again                      │  ← optional
+│                                            │
+│              [Cancel]   [Delete]            │  ← Delete is red/destructive
+└────────────────────────────────────────────┘
+```
+
+**Behavior:**
+
+- Single file: "Delete report-q3.pdf?"
+- Multiple files: "Delete 3 items?"
+- Folder: warns about contents — "Design Assets (12 items inside)".
+- `permanent=true` shows a warning that the action is irreversible (vs. "Move to Trash").
+- Delete button is destructive (red).
+- `showDontAskAgain` shows a checkbox that fires `onDontAskAgainChange`.
+
+**Tests:**
+
+| Test | What it verifies |
+|------|-----------------|
+| Single file shows name | Correct title |
+| Multiple files shows count | "Delete 3 items?" |
+| Folder shows content count | "12 items inside" |
+| permanent=true shows warning | Warning label |
+| Delete button fires onDelete | Callback |
+| Cancel button fires onCancel | Callback |
+| Delete button is destructive style | Red color |
+| "Don't ask again" checkbox works | Callback fires |
+| Escape cancels | Keyboard shortcut |
+| Focus on Cancel by default (not Delete) | Safe default |
+| Semantics: alertdialog role | Screen reader |
+
+---
+
+## OiMoveDialog
+
+**What it is:** A dialog for moving/copying files to a different folder. Shows a folder tree for destination selection.
+
+**Composes:** `OiDialog`, `OiTree` (folder tree), `OiFolderTreeItem` (tree nodes), `OiButton` (move/copy/cancel), `OiTextInput.search` (search folders), `OiButton.ghost` ("New Folder" inline)
+
+```dart
+OiMoveDialog({
+  required List<OiFileNodeData> files,
+  required List<OiTreeNode<OiFileNodeData>> folderTree,
+  required void Function(OiFileNodeData destination) onMove,
+  VoidCallback? onCancel,
+  bool copyMode = false,
+  Future<List<OiTreeNode<OiFileNodeData>>> Function(OiTreeNode<OiFileNodeData>)? loadChildren,
+  ValueChanged<String>? onCreateFolder,
+})
+```
+
+**Layout:**
+
+```
+┌──────────────────────────────────────────┐
+│  Move 3 items to...                      │  ← or "Copy 3 items to..."
+│                                          │
+│  ┌──────────────────────────────────┐    │
+│  │ 🔍 Search folders                │    │
+│  └──────────────────────────────────┘    │
+│                                          │
+│  📁 Home                                 │
+│  ▼ 📂 Documents                          │
+│      📁 Reports         ← selected       │  ← highlighted destination
+│      📁 Archive                          │
+│  ▶ 📁 Photos                             │
+│  ▶ 📁 Design Assets                      │
+│                                          │
+│  [+ New Folder]                          │
+│                                          │
+│  Moving to: Documents / Reports          │  ← confirms destination
+│                                          │
+│              [Cancel]      [Move here]   │
+└──────────────────────────────────────────┘
+```
+
+**Behavior:**
+
+- Folder tree with expand/collapse. Lazy loading via `loadChildren`.
+- Search input filters the tree (highlights matching folders, auto-expands parents).
+- Selected folder is highlighted. "Move here" / "Copy here" button shows the destination path.
+- "Move here" disabled until a destination is selected.
+- Prevents moving a folder into itself or its descendants (grayed out + tooltip explaining why).
+- "New Folder" button creates a folder inside the selected destination (inline via tree).
+- `copyMode=true` changes labels to "Copy" instead of "Move".
+
+**Tests:**
+
+| Test | What it verifies |
+|------|-----------------|
+| Folder tree renders | All folders visible |
+| Expand/collapse works | Children shown/hidden |
+| Select folder highlights it | Visual feedback |
+| Move button shows destination | "Moving to: path" |
+| Move fires onMove with destination | Callback |
+| Move disabled when no selection | Button disabled |
+| Self-move prevented | Folder grayed out |
+| Descendant-move prevented | Sub-folders grayed out |
+| Search filters tree | Matching folders visible |
+| Search auto-expands parents | Parents expanded |
+| New Folder button fires onCreateFolder | Callback |
+| Copy mode changes labels | "Copy here" text |
+| Lazy loading via loadChildren | Loading shimmer |
+| Keyboard: arrows navigate tree | Focus management |
+| Semantics: dialog with tree | Screen reader |
+
+---
+
+## OiFileInfoDialog
+
+**What it is:** A dialog showing detailed metadata about a file or folder: name, type, size, location, created/modified dates, dimensions (images), duration (video/audio), and custom metadata.
+
+**Composes:** `OiDialog`, `OiFilePreview` / `OiFileIcon` (header visual), `OiLabel`, `OiTimestamp`, `OiDivider`, `OiCopyable` (copy path)
+
+```dart
+OiFileInfoDialog({
+  required OiFileNodeData file,
+  VoidCallback? onClose,
+  Map<String, String>? extraMetadata,
+})
+```
+
+**Layout:**
+
+```
+┌──────────────────────────────────────────┐
+│  ┌──────────────┐                        │
+│  │              │  report-q3-final.pdf    │
+│  │   Preview    │  PDF Document           │
+│  │              │                        │
+│  └──────────────┘                        │
+│  ─────────────────────────────────────── │
+│  Size          2.4 MB                    │
+│  Location      /Documents/Reports   📋   │  ← copyable
+│  Created       March 10, 2026 at 09:15   │
+│  Modified      March 15, 2026 at 14:32   │
+│  ─────────────────────────────────────── │
+│  Pages         24                        │  ← type-specific
+│  ─────────────────────────────────────── │
+│  Tags          Q3, Finance, Report       │  ← custom metadata
+│                                          │
+│                              [Close]     │
+└──────────────────────────────────────────┘
+```
+
+**Type-specific metadata:**
+
+- **Image:** Dimensions (width × height), color space, DPI.
+- **Video:** Duration, resolution, codec, frame rate.
+- **Audio:** Duration, bitrate, sample rate, channels.
+- **Folder:** Item count, total size of contents.
+- **All:** Name, type, size, location, created, modified.
+
+**Tests:**
+
+| Test | What it verifies |
+|------|-----------------|
+| File info renders all standard fields | Name, type, size, dates |
+| Location is copyable | OiCopyable wraps path |
+| Image shows dimensions | Width × height |
+| Video shows duration | Duration field |
+| Folder shows item count and total size | Folder-specific |
+| extraMetadata renders custom fields | Custom key-value pairs |
+| Preview shows for image files | OiFilePreview |
+| Icon shows for non-image files | OiFileIcon |
+| Close button works | Dialog closes |
+| Semantics: all fields labeled | Screen reader |
+
+---
+
+## OiUploadDialog
+
+**What it is:** A dialog for uploading files with a drop zone, progress tracking per file, conflict resolution (replace/skip/rename), and batch controls.
+
+**Composes:** `OiDialog`, `OiFileInput` (drop zone + file picker), `OiProgress.linear` (per-file progress), `OiLabel`, `OiFileIcon`, `OiIconButton` (cancel per-file), `OiButton` (upload all / cancel all), `OiSelect` (conflict resolution)
+
+```dart
+OiUploadDialog({
+  required void Function(List<OiFileData> files, OiConflictResolution resolution) onUpload,
+  VoidCallback? onCancel,
+  List<String>? allowedExtensions,
+  int? maxFileSize,
+  int? maxFiles,
+  OiConflictResolution defaultResolution = OiConflictResolution.ask,
+  String? destinationPath,
+})
+
+enum OiConflictResolution {
+  /// Ask for each conflict individually.
+  ask,
+  /// Replace existing files silently.
+  replace,
+  /// Skip files that already exist.
+  skip,
+  /// Auto-rename with suffix: "file (1).txt".
+  rename,
+}
+```
+
+**Layout:**
+
+```
+┌──────────────────────────────────────────────┐
+│  Upload to: /Documents/Reports               │
+│                                              │
+│  ┌──────────────────────────────────────┐    │
+│  │                                      │    │
+│  │     📤 Drop files here or browse     │    │  ← OiFileInput drop zone
+│  │                                      │    │
+│  └──────────────────────────────────────┘    │
+│                                              │
+│  Files to upload:                            │
+│  📄 report-q3.pdf     2.4 MB   ████░░ 60%  ✕│  ← per-file progress
+│  📄 notes.txt         12 KB    ██████ Done  ✓│
+│  📄 data.csv          ⚠ Exceeds 10 MB limit  │  ← validation error
+│                                              │
+│  If file exists: [Replace ▾]                 │  ← conflict resolution
+│                                              │
+│              [Cancel]      [Upload 2 files]  │
+└──────────────────────────────────────────────┘
+```
+
+**Behavior:**
+
+- Files added via drop or browse button.
+- Each file shows icon, name, size, progress bar, and cancel (✕) button.
+- Files exceeding `maxFileSize` show an error and are excluded from upload.
+- Files with disallowed extensions show an error and are excluded.
+- `maxFiles` limits the total count — excess files show a warning.
+- Conflict resolution dropdown: ask/replace/skip/rename.
+- "Upload" button shows the count of valid files. Disabled when no valid files.
+- Upload progress is managed by the consumer — the dialog fires `onUpload` and receives progress updates via the file list.
+
+**Tests:**
+
+| Test | What it verifies |
+|------|-----------------|
+| Drop zone accepts files | Files added to list |
+| Browse button opens picker | File picker triggered |
+| Per-file progress renders | Progress bar visible |
+| Cancel per-file removes it | File removed from list |
+| maxFileSize enforced | Error on oversized file |
+| allowedExtensions enforced | Error on wrong extension |
+| maxFiles enforced | Warning on excess |
+| Conflict resolution dropdown works | Value changes |
+| Upload button shows valid count | "Upload 2 files" |
+| Upload disabled when no valid files | Button disabled |
+| onUpload fires with valid files + resolution | Callback |
+| Cancel closes dialog | onCancel fires |
+| Destination path shown | Context label |
+| Semantics: upload dialog | Screen reader |
+
+---
+
+# New Tier 3 Composites
+
+---
+
+## OiFileToolbar
+
+**What it is:** The toolbar above the file content area. Contains the path bar, search input, view toggle (list/grid), sort dropdown, and action buttons (upload, new folder, etc.). Contextually shows selection actions when files are selected.
+
+**Composes:** `OiPathBar` (navigation), `OiTextInput.search` (search-as-you-type), `OiButtonGroup` (list/grid toggle), `OiSelect` (sort), `OiButton` (upload, new folder), `OiIconButton` (refresh, info), `OiDivider` (separator), `OiLabel` (selection count)
+
+```dart
+OiFileToolbar({
+  required List<OiPathSegment> pathSegments,
+  required ValueChanged<OiPathSegment> onNavigate,
+  // Search
+  String? searchQuery,
+  ValueChanged<String>? onSearch,
+  bool searchActive = false,
+  VoidCallback? onSearchToggle,
+  // View
+  OiFileViewMode viewMode = OiFileViewMode.list,
+  ValueChanged<OiFileViewMode>? onViewModeChange,
+  // Sort
+  OiFileSortField sortField = OiFileSortField.name,
+  OiSortDirection sortDirection = OiSortDirection.ascending,
+  ValueChanged<OiFileSortField>? onSortFieldChange,
+  ValueChanged<OiSortDirection>? onSortDirectionChange,
+  // Actions
+  VoidCallback? onNewFolder,
+  VoidCallback? onUpload,
+  VoidCallback? onRefresh,
+  // Selection
+  int selectedCount = 0,
+  VoidCallback? onDeleteSelected,
+  VoidCallback? onMoveSelected,
+  VoidCallback? onCopySelected,
+  VoidCallback? onDownloadSelected,
+  VoidCallback? onClearSelection,
+  // Custom
+  List<Widget>? extraActions,
+  String? semanticsLabel,
+})
+
+enum OiFileViewMode { list, grid }
+enum OiFileSortField { name, size, modified, type }
+enum OiSortDirection { ascending, descending }
+```
+
+**Layout (default):**
+
+```
+┌──────────────────────────────────────────────────────────────────────────┐
+│  📁 Home / Documents / Reports     🔍  │  ≡ ⊞  │  Sort: Name ▴  │ ⬆ + │
+│                                         │ list grid│                │ ↻ 📁│
+└──────────────────────────────────────────────────────────────────────────┘
+     ↑ OiPathBar                    search  view     sort           actions
+```
+
+**Layout (selection active):**
+
+```
+┌──────────────────────────────────────────────────────────────────────────┐
+│  ✓ 3 selected          [Move]  [Copy]  [Download]  [Delete]  [× Clear] │
+└──────────────────────────────────────────────────────────────────────────┘
+```
+
+**Behavior:**
+
+- When `selectedCount > 0`, the toolbar transitions to selection mode: path bar and search are replaced with selection count and bulk action buttons.
+- Search toggle: clicking the search icon expands an `OiTextInput.search` that overlays the path bar with a crossfade animation.
+- Search is debounced (300ms) and fires `onSearch` with the query.
+- Sort dropdown shows `OiFileSortField` options. Clicking the currently-active sort field toggles direction (ascending ↔ descending).
+- View mode toggle: `OiButtonGroup` with list and grid icon buttons.
+
+**Responsive:**
+
+- On narrow screens (< 600px), action buttons collapse into an overflow `OiContextMenu` (dots button).
+- Search is always available via keyboard shortcut (`Ctrl+F` / `Cmd+F`).
+
+**Tests:**
+
+| Test | What it verifies |
+|------|-----------------|
+| Path bar renders segments | OiPathBar visible |
+| Search icon toggles search input | Input expands/collapses |
+| Search fires onSearch after debounce | 300ms debounced callback |
+| View mode toggle switches list/grid | onViewModeChange fires |
+| Sort dropdown shows options | OiSelect opens |
+| Sort field change fires callback | onSortFieldChange |
+| Same sort field click toggles direction | Ascending ↔ descending |
+| Upload button fires onUpload | Callback |
+| New Folder button fires onNewFolder | Callback |
+| Refresh button fires onRefresh | Callback |
+| Selection mode shows count and actions | Bulk actions visible |
+| Delete selected fires onDeleteSelected | Callback |
+| Move selected fires onMoveSelected | Callback |
+| Clear selection fires onClearSelection | Callback |
+| Extra actions render | Custom widgets |
+| Responsive: narrow collapses to overflow | Overflow menu |
+| Keyboard: Ctrl+F focuses search | Shortcut |
+| Semantics: toolbar role | Screen reader |
+| Golden: default, search active, selection active | Visual regression |
+
+---
+
+## OiFileSidebar
+
+**What it is:** The left sidebar panel of the file explorer. Shows a folder tree with drag-and-drop support, quick-access sections (Favorites, Recent), storage indicator, and folder management actions.
+
+**Composes:** `OiTree` (folder hierarchy), `OiFolderTreeItem` (tree nodes), `OiDraggable` (drag folders/files), `OiDropZone` (drop files onto folders), `OiContextMenu` (right-click folder actions), `OiStorageIndicator`, `OiButton.ghost` (new folder), `OiLabel` (section headers), `OiDivider`, `OiTappable` (quick-access items), `OiIcon` (quick-access icons), `OiBadge`
+
+```dart
+OiFileSidebar({
+  required List<OiTreeNode<OiFileNodeData>> folderTree,
+  required String? selectedFolderId,
+  required ValueChanged<OiFileNodeData> onFolderSelect,
+  // Tree behavior
+  Future<List<OiTreeNode<OiFileNodeData>>> Function(OiTreeNode<OiFileNodeData>)? loadChildren,
+  bool draggable = true,
+  void Function(OiFileNodeData folder, OiFileNodeData? newParent, int index)? onFolderMove,
+  void Function(List<OiFileNodeData> files, OiFileNodeData folder)? onFileDrop,
+  // Quick access
+  List<OiQuickAccessItem>? quickAccess,
+  ValueChanged<OiQuickAccessItem>? onQuickAccessTap,
+  // Favorites
+  List<OiFileNodeData>? favorites,
+  ValueChanged<OiFileNodeData>? onFavoriteTap,
+  ValueChanged<OiFileNodeData>? onFavoriteRemove,
+  // Folder actions
+  ValueChanged<OiFileNodeData>? onNewFolder,
+  ValueChanged<OiFileNodeData>? onRenameFolder,
+  ValueChanged<OiFileNodeData>? onDeleteFolder,
+  // Storage
+  OiStorageData? storage,
+  // Display
+  double width = 260,
+  bool resizable = true,
+  bool collapsible = true,
+  String? semanticsLabel,
+})
+
+class OiQuickAccessItem {
+  final String id;
+  final String label;
+  final IconData icon;
+  final int? badgeCount;
+}
+
+class OiStorageData {
+  final int usedBytes;
+  final int totalBytes;
+  final List<OiStorageCategory>? breakdown;
+}
+```
+
+**Layout:**
+
+```
+┌──────────────────────────┐
+│  Quick Access             │
+│  🏠 Home                  │
+│  📥 Downloads             │
+│  🗑️ Trash                 │
+│  ───────────────────────  │
+│  Favorites                │
+│  ⭐ Design Assets         │
+│  ⭐ Q3 Reports            │
+│  ───────────────────────  │
+│  Folders                  │
+│  ▼ 📂 Home                │
+│    ▶ 📁 Documents (42)    │
+│    ▼ 📂 Photos (128)      │  ← selected
+│      ▶ 📁 Vacation        │
+│      ▶ 📁 Work            │
+│    ▶ 📁 Projects (15)     │
+│                           │
+│  [+ New Folder]           │
+│  ───────────────────────  │
+│  ████████░░░ 6.5 / 10 GB │  ← OiStorageIndicator
+└──────────────────────────┘
+```
+
+**Drag-and-drop in sidebar:**
+
+1. **Drag folder within tree:** Reorder or reparent folders. `onFolderMove` fires.
+2. **Drop files from content area onto folder:** `onFileDrop` fires with the files and destination folder. The `OiFolderTreeItem` highlights as a drop target.
+3. **Drop files onto quick-access items:** If the item represents a folder (e.g., "Home"), same behavior.
+4. **Drag folder from tree to content area:** Not supported (folders are navigated-to, not moved via drag in that direction).
+
+**Context menu on folder (right-click):**
+
+- New Folder (inside this folder)
+- Rename
+- Delete
+- Add to Favorites / Remove from Favorites
+- Copy Path
+
+**Favorites:**
+
+- Shown in a separate section above the tree.
+- Each favorite is a tappable row with a star icon + folder name.
+- Right-click → "Remove from Favorites".
+- Can be drag-reordered (via `OiReorderable`).
+
+**Tests:**
+
+| Test | What it verifies |
+|------|-----------------|
+| Folder tree renders hierarchy | Correct nesting |
+| Select folder highlights and fires callback | onFolderSelect |
+| Expand/collapse folders | Children visible/hidden |
+| Lazy loading via loadChildren | Shimmer then children |
+| Drag folder within tree | onFolderMove fires |
+| Drop files onto folder in tree | onFileDrop fires |
+| Drop target highlight on drag-over | OiDropHighlight |
+| Quick access items render | Icons + labels |
+| Quick access tap fires callback | onQuickAccessTap |
+| Favorites render | Star + folder name |
+| Favorite tap navigates | onFavoriteTap |
+| Remove favorite | onFavoriteRemove |
+| Context menu on folder right-click | Menu appears |
+| New Folder from context menu | onNewFolder fires |
+| Rename from context menu | onRenameFolder fires |
+| Delete from context menu | onDeleteFolder fires |
+| Storage indicator renders | Progress bar + text |
+| Resizable sidebar | Drag handle works |
+| Collapsible (compact mode) | Icons only |
+| Keyboard: arrows navigate tree | Focus management |
+| Semantics: navigation landmark | Screen reader |
+| Golden: full sidebar, compact, with drop target | Visual regression |
+
+---
+
+## OiFileListView
+
+**What it is:** The list (table-like) view of files. Renders a sortable column header + virtualized rows of `OiFileTile`. Supports multi-select, rubber-band selection, drag-and-drop, and inline rename.
+
+**Composes:** `OiVirtualList` (virtualized rows), `OiFileTile` (each row), `OiSelectionOverlay` (rubber-band), `_OiFileListHeader` (internal sortable header), `OiArrowNav` (keyboard navigation), `OiContextMenu` (right-click on empty area)
+
+```dart
+OiFileListView({
+  required List<OiFileNodeData> files,
+  required Set<Object> selectedKeys,
+  required ValueChanged<Set<Object>> onSelectionChange,
+  required ValueChanged<OiFileNodeData> onOpen,
+  // Sort
+  OiFileSortField sortField = OiFileSortField.name,
+  OiSortDirection sortDirection = OiSortDirection.ascending,
+  ValueChanged<OiFileSortField>? onSortFieldChange,
+  ValueChanged<OiSortDirection>? onSortDirectionChange,
+  // Columns
+  bool showSize = true,
+  bool showModified = true,
+  bool showType = true,
+  List<OiFileColumnDef>? extraColumns,
+  // Rename
+  Object? renamingKey,
+  ValueChanged<String>? onRename,
+  VoidCallback? onCancelRename,
+  // Drag & drop
+  void Function(List<OiFileNodeData> files, OiFileNodeData folder)? onMoveToFolder,
+  // Context menu
+  List<OiMenuItem> Function(OiFileNodeData)? contextMenu,
+  List<OiMenuItem> Function()? backgroundContextMenu,
+  // States
+  bool loading = false,
+  String? semanticsLabel,
+})
+
+class OiFileColumnDef {
+  final String id;
+  final String label;
+  final double width;
+  final Widget Function(OiFileNodeData) cellBuilder;
+  final bool sortable;
+}
+```
+
+**Column header `_OiFileListHeader`:**
+
+```
+┌────────────────────────────────────────────────────────────────────────┐
+│  ☐  Name ▴               │  Size  │  Modified        │  Type         │
+├────────────────────────────────────────────────────────────────────────┤
+```
+
+- Each column header is tappable → toggles sort.
+- Active sort column shows an arrow (▴/▾).
+- Clicking an inactive column → sort ascending by that column.
+- Clicking the active column → toggle direction.
+- Column widths are resizable by dragging the header dividers (via `OiResizable`).
+
+**Selection behavior:**
+
+- **Click:** Select single file (deselects others).
+- **Ctrl+Click:** Toggle individual file in selection.
+- **Shift+Click:** Range-select from last click to current.
+- **Ctrl+A:** Select all.
+- **Rubber-band:** Click-and-drag on empty space → `OiSelectionOverlay` draws rectangle → files intersecting are selected.
+- **Escape:** Clear selection.
+
+**Drag behavior:**
+
+- Dragging a selected file drags ALL selected files.
+- Dragging an unselected file selects it and drags only that file.
+- `OiDragGhost` shows: first file's icon + name, badge with count if > 1.
+- Dropping onto a folder row fires `onMoveToFolder`.
+
+**Inline rename:**
+
+- When `renamingKey` matches a file's key, that `OiFileTile` enters rename mode.
+- Managed externally (F2 key or double-click on name triggers the parent to set `renamingKey`).
+
+**Context menu:**
+
+- Right-click on a file → `contextMenu(file)`.
+- Right-click on empty area → `backgroundContextMenu()`.
+
+**Tests:**
+
+| Test | What it verifies |
+|------|-----------------|
+| Files render as OiFileTile rows | All files visible |
+| Column header shows sort arrow | Active sort indicator |
+| Click column header sorts | onSortFieldChange fires |
+| Toggle sort direction on same column | Ascending ↔ descending |
+| Column resize by dragging divider | Width changes |
+| Click selects single file | Selection updated |
+| Ctrl+Click toggles file | Multi-selection |
+| Shift+Click range-selects | Range selected |
+| Ctrl+A selects all | All selected |
+| Escape clears selection | Empty selection |
+| Rubber-band draws rectangle | OiSelectionOverlay visible |
+| Rubber-band selects intersecting files | Selection updated |
+| Drag selected files shows ghost with count | OiDragGhost |
+| Drop onto folder fires onMoveToFolder | Callback |
+| Drag unselected file selects and drags it | Single file drag |
+| renamingKey activates inline rename | OiRenameField visible |
+| onRename fires on Enter | Callback |
+| onCancelRename fires on Escape | Callback |
+| Right-click file shows context menu | contextMenu items |
+| Right-click empty area shows background menu | backgroundContextMenu items |
+| Double-click opens file/folder | onOpen fires |
+| loading=true shows skeletons | Shimmer rows |
+| Virtual scroll for large lists | Only visible rows built |
+| Keyboard: arrows move focus, Enter opens | Navigation |
+| Keyboard: F2 starts rename | Shortcut |
+| Keyboard: Delete triggers delete | Shortcut |
+| Semantics: list role with items | Screen reader |
+| Golden: list with files, selection, rename | Visual regression |
+
+---
+
+## OiFileGridView
+
+**What it is:** The grid view of files. Renders a virtualized grid of `OiFileGridCard` cards. Same selection, drag-and-drop, and rename behavior as `OiFileListView`.
+
+**Composes:** `OiVirtualGrid` (virtualized grid), `OiFileGridCard` (each card), `OiSelectionOverlay` (rubber-band), `OiArrowNav` (2D keyboard navigation), `OiContextMenu`
+
+```dart
+OiFileGridView({
+  required List<OiFileNodeData> files,
+  required Set<Object> selectedKeys,
+  required ValueChanged<Set<Object>> onSelectionChange,
+  required ValueChanged<OiFileNodeData> onOpen,
+  // Grid
+  double cardWidth = 160,
+  double cardHeight = 180,
+  double gap = 12,
+  // Rename
+  Object? renamingKey,
+  ValueChanged<String>? onRename,
+  VoidCallback? onCancelRename,
+  // Drag & drop
+  void Function(List<OiFileNodeData> files, OiFileNodeData folder)? onMoveToFolder,
+  // Context menu
+  List<OiMenuItem> Function(OiFileNodeData)? contextMenu,
+  List<OiMenuItem> Function()? backgroundContextMenu,
+  // States
+  bool loading = false,
+  String? semanticsLabel,
+})
+```
+
+**Selection and drag behavior:** Identical to `OiFileListView`. See above.
+
+**Grid navigation (keyboard):**
+
+- Arrow keys navigate in 2D: left/right move within a row, up/down move between rows.
+- Home/End jump to first/last item.
+
+**Tests:**
+
+| Test | What it verifies |
+|------|-----------------|
+| Files render as OiFileGridCard cards | Grid layout |
+| Card dimensions match cardWidth/cardHeight | Size correct |
+| Gap between cards | Spacing correct |
+| Selection behavior (click, Ctrl, Shift, Ctrl+A) | Same as list |
+| Rubber-band selection | OiSelectionOverlay |
+| Drag and drop | Same as list |
+| Inline rename | OiRenameField in card |
+| Context menus | File and background |
+| Loading shows skeleton cards | Shimmer grid |
+| Virtual scroll | Only visible cards built |
+| Keyboard: 2D arrow navigation | Focus moves correctly |
+| Keyboard: F2, Delete, Enter shortcuts | All work |
+| Responsive: fewer columns on narrow | Auto-wrapping |
+| Semantics: grid role | Screen reader |
+| Golden: grid with cards, selection, folders | Visual regression |
+
+---
+
+## OiFileDropTarget
+
+**What it is:** A wrapper composite that makes the entire content area a drop target for both internal file moves (from sidebar to content, from content to content) and external OS-level file drops (native drag from desktop). Shows `OiDropHighlight` overlay when files are dragged over.
+
+**Composes:** `OiDropZone` (internal drops), `OiDropHighlight` (visual overlay), native drag-and-drop listener
+
+```dart
+OiFileDropTarget({
+  required Widget child,
+  required void Function(List<OiFileNodeData> files, OiFileNodeData? targetFolder) onInternalDrop,
+  required ValueChanged<List<OiFileData>> onExternalDrop,
+  bool enabled = true,
+  String? dropMessage,
+})
+```
+
+**Behavior:**
+
+- **Internal drops (from sidebar or other content area):** Typed `OiDropZone<List<OiFileNodeData>>` receives files being dragged. `targetFolder` is null when dropped on empty space (moves to current folder) or the folder card being hovered.
+- **External drops (from OS):** Listens for native file drop events. Converts to `OiFileData` and fires `onExternalDrop`.
+- When any drag is detected over the target, `OiDropHighlight.area` activates with the `dropMessage` ("Drop files here to upload" for external, "Move files here" for internal).
+- `enabled=false` prevents drops and hides highlights.
+
+**Tests:**
+
+| Test | What it verifies |
+|------|-----------------|
+| Internal file drop fires onInternalDrop | Callback with files |
+| Internal drop on folder fires with targetFolder | Correct folder |
+| Internal drop on empty space fires with null folder | Current folder |
+| External file drop fires onExternalDrop | Callback with OiFileData |
+| Drop highlight shows during drag-over | OiDropHighlight visible |
+| Drop highlight hides on drag-leave | OiDropHighlight hidden |
+| enabled=false prevents drops | No callback |
+| Custom dropMessage displayed | Label text |
+| Semantics: drop target announced | Screen reader |
+
+---
+
+# New Tier 4 Module
+
+---
+
+## OiFileExplorer
+
+**What it is:** A complete file explorer module. Replaces the existing `OiFileManager` stub. Combines sidebar folder tree, toolbar with path/search/sort/view-toggle, content area with list/grid views, drag-and-drop everywhere, dialogs for all CRUD operations, keyboard shortcuts, and OS-level drag support.
+
+**Composes:** `OiSplitPane` (sidebar | content), `OiFileSidebar` (left), `OiFileToolbar` (top), `OiFileDropTarget` (content wrapper), `OiFileListView` / `OiFileGridView` (content), `OiContextMenu` (everywhere), `OiShortcuts` (keyboard), `OiToast` (feedback), `OiEmptyState` (empty folder), all dialog widgets.
+
+```dart
+OiFileExplorer({
+  required OiFileExplorerController controller,
+  required String label,
+  // Data callbacks (controller delegates to these)
+  required Future<List<OiFileNodeData>> Function(String folderId) loadFolder,
+  required Future<List<OiTreeNode<OiFileNodeData>>> Function(String parentId) loadFolderTree,
+  // CRUD callbacks
+  required Future<OiFileNodeData> Function(String parentId, String name) onCreateFolder,
+  required Future<void> Function(OiFileNodeData file, String newName) onRename,
+  required Future<void> Function(List<OiFileNodeData> files) onDelete,
+  required Future<void> Function(List<OiFileNodeData> files, OiFileNodeData destination) onMove,
+  Future<void> Function(List<OiFileNodeData> files, OiFileNodeData destination)? onCopy,
+  required Future<void> Function(List<OiFileData> files, String folderId) onUpload,
+  Future<void> Function(OiFileNodeData file)? onDownload,
+  // File actions
+  ValueChanged<OiFileNodeData>? onOpen,
+  ValueChanged<OiFileNodeData>? onPreview,
+  ValueChanged<OiFileNodeData>? onShare,
+  // Display
+  OiFileViewMode defaultViewMode = OiFileViewMode.list,
+  OiFileSortField defaultSortField = OiFileSortField.name,
+  OiSortDirection defaultSortDirection = OiSortDirection.ascending,
+  // Sidebar
+  List<OiQuickAccessItem>? quickAccess,
+  OiStorageData? storage,
+  bool showSidebar = true,
+  double sidebarWidth = 260,
+  // Features
+  bool enableUpload = true,
+  bool enableDelete = true,
+  bool enableRename = true,
+  bool enableMove = true,
+  bool enableCopy = true,
+  bool enableSearch = true,
+  bool enableDragDrop = true,
+  bool enableMultiSelect = true,
+  bool enableFavorites = true,
+  bool enableKeyboardShortcuts = true,
+  // File-type support
+  List<String>? allowedUploadExtensions,
+  int? maxUploadFileSize,
+  // Builders
+  Widget Function(OiFileNodeData)? filePreviewBuilder,
+  List<OiMenuItem> Function(OiFileNodeData)? customContextMenuItems,
+})
+```
+
+**OiFileExplorerController:**
+
+```dart
+class OiFileExplorerController extends ChangeNotifier {
+  /// Current folder being displayed.
+  OiFileNodeData get currentFolder;
+
+  /// Navigation stack for back/forward.
+  List<OiFileNodeData> get navigationHistory;
+  int get historyIndex;
+  bool get canGoBack;
+  bool get canGoForward;
+
+  /// Current view state.
+  OiFileViewMode get viewMode;
+  OiFileSortField get sortField;
+  OiSortDirection get sortDirection;
+  Set<Object> get selectedKeys;
+  String get searchQuery;
+
+  /// Navigation
+  Future<void> navigateTo(String folderId);
+  void goBack();
+  void goForward();
+  void goUp();
+
+  /// Selection
+  void select(Object key);
+  void deselect(Object key);
+  void selectAll();
+  void clearSelection();
+  void toggleSelection(Object key);
+  void rangeSelect(Object fromKey, Object toKey);
+
+  /// View
+  void setViewMode(OiFileViewMode mode);
+  void setSortField(OiFileSortField field);
+  void setSortDirection(OiSortDirection direction);
+  void setSearchQuery(String query);
+
+  /// Actions (triggers dialogs internally)
+  void startRename(Object fileKey);
+  void cancelRename();
+  Future<void> createFolder();
+  Future<void> deleteSelected();
+  Future<void> moveSelected();
+  Future<void> copySelected();
+  Future<void> uploadFiles();
+
+  /// Refresh current folder.
+  Future<void> refresh();
+}
+```
+
+**Full screen layout:**
+
+```
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│  ┌──────────────────┐ ┌─────────────────────────────────────────────────────┐   │
+│  │ Quick Access      │ │ 📁 Home / Documents / Reports   🔍 ≡ ⊞ Sort ▴ ⬆ +│   │
+│  │ 🏠 Home           │ ├─────────────────────────────────────────────────────┤   │
+│  │ 📥 Downloads      │ │ ☐  Name               Size    Modified      Type  │   │
+│  │ 🗑️ Trash          │ │ ─────────────────────────────────────────────────── │   │
+│  │ ─────────────── │ │ ☐  📁 Design Assets    —       Mar 14, 2026  —     │   │
+│  │ Favorites         │ │ ☐  📁 Archive         —       Mar 10, 2026  —     │   │
+│  │ ⭐ Design Assets  │ │ ☐  📄 report-q3.pdf   2.4 MB  Mar 15, 2026  PDF   │   │
+│  │ ─────────────── │ │ ☐  📄 notes.txt       12 KB   Mar 14, 2026  TXT   │   │
+│  │ Folders           │ │ ☐  📄 data.csv        156 KB  Mar 13, 2026  CSV   │   │
+│  │ ▼ 📂 Home         │ │ ☐  🖼️ hero-banner.png  3.1 MB  Mar 12, 2026  PNG  │   │
+│  │   ▶ 📁 Documents  │ │                                                     │   │
+│  │   ▼ 📂 Photos     │ │                                                     │   │
+│  │     ▶ 📁 Vacation  │ │                                                     │   │
+│  │   ▶ 📁 Projects   │ │                                                     │   │
+│  │                    │ │                                                     │   │
+│  │ [+ New Folder]    │ │                                                     │   │
+│  │ ─────────────── │ │                                                     │   │
+│  │ ████████░░ 6/10GB │ │                                                     │   │
+│  └──────────────────┘ └─────────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────────────────────────┘
+```
+
+**Context menu (right-click on file):**
+
+```
+┌────────────────────────┐
+│  Open                  │
+│  Open in Preview       │
+│  ───────────────────── │
+│  Copy            Ctrl+C│
+│  Cut             Ctrl+X│
+│  ───────────────────── │
+│  Rename             F2 │
+│  Move to...            │
+│  Copy to...            │
+│  ───────────────────── │
+│  Add to Favorites      │
+│  Share                 │
+│  Get Info         Ctrl+I│
+│  ───────────────────── │
+│  Delete         Delete │
+└────────────────────────┘
+```
+
+**Context menu (right-click on empty area):**
+
+```
+┌────────────────────────┐
+│  New Folder    Ctrl+N  │
+│  Upload Files  Ctrl+U  │
+│  ───────────────────── │
+│  Paste         Ctrl+V  │
+│  ───────────────────── │
+│  Sort by ▸            │
+│  View as ▸            │
+│  ───────────────────── │
+│  Refresh        F5    │
+│  Select All    Ctrl+A  │
+└────────────────────────┘
+```
+
+**Keyboard shortcuts (via `OiShortcuts`):**
+
+| Shortcut | Action |
+|----------|--------|
+| `Enter` | Open selected file/folder |
+| `Backspace` / `Alt+←` | Go back / go up |
+| `Alt+→` | Go forward |
+| `F2` | Rename selected file |
+| `Delete` / `Backspace` | Delete selected files (with confirmation) |
+| `Ctrl+C` | Copy selected files to clipboard |
+| `Ctrl+X` | Cut selected files |
+| `Ctrl+V` | Paste files from clipboard |
+| `Ctrl+A` | Select all |
+| `Ctrl+N` | New folder |
+| `Ctrl+U` | Upload files |
+| `Ctrl+F` / `Ctrl+L` | Focus search / focus path bar |
+| `Ctrl+I` | File info dialog |
+| `Escape` | Clear selection / cancel rename / close search |
+| `Space` | Toggle selection of focused file |
+| `↑ ↓ ← →` | Navigate files |
+| `Home` / `End` | First / last file |
+
+**Drag-and-drop flows:**
+
+| Source | Target | Result |
+|--------|--------|--------|
+| File(s) in content | Folder in content | Move files into folder |
+| File(s) in content | Folder in sidebar | Move files into folder |
+| Folder in sidebar | Folder in sidebar | Reparent folder |
+| File(s) from OS | Content area | Upload files |
+| File(s) from OS | Folder in sidebar | Upload files into folder |
+| File(s) in content | Empty content area | No-op (stay in current folder) |
+
+**Search-as-you-type:**
+
+- Toolbar search input is debounced (300ms).
+- When active, the file list is filtered client-side: files whose name contains the query (case-insensitive) are shown.
+- Search highlights the matching portion of the file name in `OiFileTile` / `OiFileGridCard`.
+- If the consumer wants server-side search, they re-provide the `files` list filtered by their backend.
+
+**Toast feedback:**
+
+- After rename: "Renamed to 'new-name.pdf'".
+- After delete: "Moved 3 items to Trash" with "Undo" action button.
+- After move: "Moved 3 items to Design Assets" with "Undo".
+- After upload: "Uploaded 3 files".
+- After create folder: "Created folder 'New Folder'".
+- Errors: "Failed to rename: [reason]" with error styling.
+
+**Empty state:**
+
+- When current folder has no files: `OiEmptyState` with folder icon, "This folder is empty", and an "Upload files" button.
+- When search returns no results: `OiEmptyState` with search icon, "No files match '[query]'", and "Clear search" button.
+
+**Loading states:**
+
+- Initial folder load: skeleton list/grid (via `OiShimmer`).
+- Folder navigation: content area shows skeleton while loading.
+- Sidebar folder expand: lazy-loaded children show shimmer.
+
+**Tests:**
+
+| Test | What it verifies |
+|------|-----------------|
+| **Navigation** | |
+| Initial folder loads and renders | loadFolder called, files shown |
+| Click folder in content navigates into it | navigateTo called |
+| Click folder in sidebar navigates | onFolderSelect fires |
+| Breadcrumb click navigates | onNavigate fires |
+| Back button goes to previous folder | goBack works |
+| Forward button goes forward after back | goForward works |
+| Up button navigates to parent | goUp works |
+| Navigation history tracks correctly | Stack is correct |
+| **View** | |
+| List view renders OiFileListView | OiFileTile rows |
+| Grid view renders OiFileGridView | OiFileGridCard cards |
+| View toggle switches list ↔ grid | View changes |
+| Sort by name ascending | Correct order |
+| Sort by size descending | Correct order |
+| Sort by modified date | Correct order |
+| Sort by type | Correct order |
+| **Selection** | |
+| Click selects single | One file selected |
+| Ctrl+Click multi-selects | Multiple selected |
+| Shift+Click range-selects | Range selected |
+| Ctrl+A selects all | All selected |
+| Escape clears selection | None selected |
+| Rubber-band in list view | Files selected |
+| Rubber-band in grid view | Cards selected |
+| Selection toolbar appears | Bulk actions visible |
+| **Search** | |
+| Search icon activates search | Input visible |
+| Typing filters files | Subset shown |
+| Debounce: no filter during typing | 300ms delay |
+| Search match highlighted in names | Bold/highlight on match |
+| Clear search restores full list | All files back |
+| No results shows empty state | "No files match" |
+| Ctrl+F focuses search | Keyboard shortcut |
+| **Create Folder** | |
+| Ctrl+N opens new folder dialog | OiNewFolderDialog |
+| Create button fires onCreateFolder | Callback |
+| Toast confirms creation | Toast visible |
+| New folder appears in list | File list updated |
+| **Rename** | |
+| F2 starts rename on selected file | OiRenameField visible |
+| Enter confirms rename | onRename called |
+| Escape cancels rename | Reverted |
+| Duplicate name from validate | Error shown |
+| Toast confirms rename | Toast visible |
+| **Delete** | |
+| Delete key opens delete dialog | OiDeleteDialog |
+| Confirm fires onDelete | Callback |
+| Undo in toast reverts delete | Undo callback |
+| Folder deletion warns about contents | Warning in dialog |
+| **Move** | |
+| Drag file to folder in content | onMove fires |
+| Drag file to folder in sidebar | onMove fires |
+| "Move to..." from context menu opens dialog | OiMoveDialog |
+| Move dialog shows folder tree | Tree rendered |
+| Confirm move fires onMove | Callback |
+| Toast confirms with undo | Toast visible |
+| **Copy** | |
+| "Copy to..." opens dialog | OiMoveDialog (copy mode) |
+| Ctrl+C copies, Ctrl+V pastes | onCopy fires |
+| **Upload** | |
+| Upload button opens dialog | OiUploadDialog |
+| Drag from OS shows drop highlight | OiDropHighlight |
+| Drop from OS fires onUpload | Callback |
+| Upload progress shown | Progress bars |
+| Toast confirms upload | Toast visible |
+| **File Info** | |
+| Ctrl+I opens info dialog | OiFileInfoDialog |
+| Info dialog shows all metadata | Fields rendered |
+| **Sidebar** | |
+| Folder tree renders | Hierarchy visible |
+| Expand/collapse folders | Children load |
+| Drag folder to reparent | onFolderMove fires |
+| Drop files onto sidebar folder | onFileDrop fires |
+| Favorites section renders | Favorites visible |
+| Add to favorites from context menu | Favorite added |
+| Remove from favorites | Favorite removed |
+| Storage indicator renders | Progress bar |
+| Sidebar resizable | Drag handle |
+| Sidebar collapsible | Compact mode |
+| **Context Menus** | |
+| Right-click file shows full menu | All items present |
+| Right-click empty area shows background menu | All items present |
+| Submenu "Sort by" works | Sort changes |
+| Submenu "View as" works | View changes |
+| **Keyboard Shortcuts** | |
+| All shortcuts in table above work | Each shortcut tested |
+| Shortcuts disabled when dialog open | No conflict |
+| Shortcuts disabled in rename mode | No conflict |
+| **Accessibility** | |
+| All dialogs trap focus | OiFocusTrap |
+| All actions have semantics labels | Screen reader |
+| File list is a semantics list | List role |
+| Navigation is a semantics landmark | Navigation role |
+| Toast announcements are live regions | Announced |
+| **States** | |
+| Loading shows skeletons | Shimmer visible |
+| Empty folder shows empty state | OiEmptyState |
+| Upload button in empty state works | Upload triggered |
+| Error loading folder shows error state | Error message |
+| Retry on error | Refresh triggered |
+| **Drag Ghost** | |
+| Single file drag shows icon + name | Ghost content |
+| Multi-file drag shows icon + count badge | Badge visible |
+| Ghost follows cursor smoothly | Positioned correctly |
+| **Performance** | |
+| 10,000 files in list view: <16ms frame | Virtual scroll |
+| 10,000 files in grid view: <16ms frame | Virtual scroll |
+| 5,000 folders in sidebar tree: <16ms frame | Virtual scroll |
+| Rapid navigation (100 folder changes): responsive | No jank |
+| **Golden Tests** | |
+| Full explorer: list view, light + dark | Visual regression |
+| Full explorer: grid view, light + dark | Visual regression |
+| Selection active, list + grid | Visual regression |
+| Rename active, list + grid | Visual regression |
+| Drop highlight on content area | Visual regression |
+| Drop highlight on sidebar folder | Visual regression |
+| Empty state | Visual regression |
+| Loading state | Visual regression |
+| All 6 dialogs, light + dark | Visual regression (12 goldens) |
+
+---
+
+# Data Models
+
+```dart
+@immutable
+class OiFileNodeData {
+  const OiFileNodeData({
+    required this.id,
+    required this.name,
+    required this.isFolder,
+    this.parentId,
+    this.size,
+    this.mimeType,
+    this.extension,
+    this.created,
+    this.modified,
+    this.thumbnailUrl,
+    this.url,
+    this.itemCount,
+    this.metadata,
+    this.isFavorite = false,
+    this.isShared = false,
+    this.isLocked = false,
+    this.isTrashed = false,
+  });
+
+  /// Unique identifier.
+  final Object id;
+
+  /// File or folder name including extension.
+  final String name;
+
+  /// Whether this node is a folder.
+  final bool isFolder;
+
+  /// Parent folder ID. Null for root.
+  final String? parentId;
+
+  /// File size in bytes. Null for folders (use `itemCount` instead).
+  final int? size;
+
+  /// MIME type (e.g., "application/pdf"). Null for folders.
+  final String? mimeType;
+
+  /// File extension without dot (e.g., "pdf"). Extracted from name if not provided.
+  final String? extension;
+
+  /// When this file was created.
+  final DateTime? created;
+
+  /// When this file was last modified.
+  final DateTime? modified;
+
+  /// URL to a thumbnail image (for image/video/document previews).
+  final String? thumbnailUrl;
+
+  /// URL to the actual file (for download or inline viewing).
+  final String? url;
+
+  /// Number of items inside (folders only).
+  final int? itemCount;
+
+  /// Arbitrary metadata (tags, owner, etc.).
+  final Map<String, dynamic>? metadata;
+
+  /// Whether this item is in the user's favorites.
+  final bool isFavorite;
+
+  /// Whether this item is shared with others.
+  final bool isShared;
+
+  /// Whether this item is locked (read-only).
+  final bool isLocked;
+
+  /// Whether this item is in the trash.
+  final bool isTrashed;
+
+  /// Extracts the file extension from the name.
+  String get resolvedExtension =>
+      extension ?? (isFolder ? '' : name.split('.').length > 1 ? name.split('.').last : '');
+
+  /// Extracts the name without extension.
+  String get nameWithoutExtension {
+    if (isFolder) return name;
+    final parts = name.split('.');
+    return parts.length > 1 ? parts.sublist(0, parts.length - 1).join('.') : name;
+  }
+
+  /// Formatted size string.
+  String get formattedSize {
+    if (size == null) return '—';
+    if (size! < 1024) return '$size B';
+    if (size! < 1024 * 1024) return '${(size! / 1024).toStringAsFixed(1)} KB';
+    if (size! < 1024 * 1024 * 1024) return '${(size! / (1024 * 1024)).toStringAsFixed(1)} MB';
+    return '${(size! / (1024 * 1024 * 1024)).toStringAsFixed(1)} GB';
+  }
+
+  OiFileNodeData copyWith({...});
+}
+```
+
+---
+
+# Theme Extensions
+
+Add to `OiComponentThemes`:
+
+```dart
+class OiComponentThemes {
+  // ... existing fields ...
+
+  final OiFileExplorerThemeData? fileExplorer;
+}
+
+@immutable
+class OiFileExplorerThemeData {
+  const OiFileExplorerThemeData({
+    this.sidebarWidth,
+    this.sidebarBackground,
+    this.contentBackground,
+    this.fileTileHeight,
+    this.fileTileHoverColor,
+    this.fileTileSelectedColor,
+    this.fileGridCardBorderRadius,
+    this.fileGridCardHoverElevation,
+    this.dropHighlightColor,
+    this.dropHighlightBorderColor,
+    this.pathBarBackground,
+    this.toolbarBackground,
+    this.toolbarHeight,
+    this.selectionToolbarColor,
+    this.iconCategoryColors,
+    this.folderIconColor,
+    this.renamingFieldBackground,
+  });
+
+  final double? sidebarWidth;
+  final Color? sidebarBackground;
+  final Color? contentBackground;
+  final double? fileTileHeight;
+  final Color? fileTileHoverColor;
+  final Color? fileTileSelectedColor;
+  final BorderRadius? fileGridCardBorderRadius;
+  final double? fileGridCardHoverElevation;
+  final Color? dropHighlightColor;
+  final Color? dropHighlightBorderColor;
+  final Color? pathBarBackground;
+  final Color? toolbarBackground;
+  final double? toolbarHeight;
+  final Color? selectionToolbarColor;
+
+  /// Override colors for specific file type categories.
+  /// Keys: "document", "spreadsheet", "image", "video", "audio", "archive", "code", "text".
+  final Map<String, Color>? iconCategoryColors;
+
+  /// Override the default folder icon color.
+  final Color? folderIconColor;
+
+  final Color? renamingFieldBackground;
+}
+```
+
+---
+
+# Package Structure Additions
+
+```
+src/
+  components/
+    display/
+      oi_file_icon.dart              ★ NEW
+      oi_folder_icon.dart            ★ NEW
+      oi_file_preview.dart           ★ NEW
+      oi_file_tile.dart              ★ NEW
+      oi_file_grid_card.dart         ★ NEW
+      oi_path_bar.dart               ★ NEW
+      oi_storage_indicator.dart      ★ NEW
+      oi_drop_highlight.dart         ★ NEW
+      oi_rename_field.dart           ★ NEW
+      oi_folder_tree_item.dart       ★ NEW
+    interaction/
+      oi_selection_overlay.dart      ★ NEW
+    dialogs/
+      oi_new_folder_dialog.dart      ★ NEW
+      oi_rename_dialog.dart          ★ NEW
+      oi_delete_dialog.dart          ★ NEW
+      oi_move_dialog.dart            ★ NEW
+      oi_file_info_dialog.dart       ★ NEW
+      oi_upload_dialog.dart          ★ NEW
+
+  composites/
+    files/
+      oi_file_toolbar.dart           ★ NEW
+      oi_file_sidebar.dart           ★ NEW
+      oi_file_list_view.dart         ★ NEW
+      oi_file_grid_view.dart         ★ NEW
+      oi_file_drop_target.dart       ★ NEW
+
+  modules/
+    oi_file_explorer.dart            ★ REPLACED (was OiFileManager)
+
+  models/
+    oi_file_node_data.dart           ★ NEW (replaces OiFileNode)
+    oi_file_explorer_controller.dart ★ NEW
+```
+
+---
+
+# Testing Strategy
+
+## Unit Tests
+
+- `OiFileNodeData.resolvedExtension`: extracts correctly from name, prefers explicit extension field.
+- `OiFileNodeData.nameWithoutExtension`: handles single extension, multiple dots, no extension, folders.
+- `OiFileNodeData.formattedSize`: B, KB, MB, GB boundaries correct.
+- `OiFileIcon` category mapping: all extensions map to correct categories. Case-insensitive. MIME fallback.
+- `OiRenameField` validation: empty name, illegal characters (`/`, `\`, `:`, etc.), whitespace-only.
+- `OiFileExplorerController.navigateTo`: history stack updates. `canGoBack`/`canGoForward` correct.
+- `OiFileExplorerController.goBack`/`goForward`: index changes, folder loads.
+- `OiFileExplorerController.select`/`deselect`/`toggleSelection`/`rangeSelect`: selection set updates correctly.
+- `OiFileExplorerController.sortField`/`sortDirection`: notifyListeners fires.
+- Search debounce: query updates after 300ms, not before.
+- Size formatting: 0 B, 1023 B, 1.0 KB, 1023.9 KB, 1.0 MB, 1.0 GB edge cases.
+- Folder self-containment check (for move): folder cannot be moved into itself or any descendant.
+
+## Widget Tests
+
+Every component section above includes a detailed test table. Summary:
+
+- **Per component:** All visual states (default, hover, focus, selected, drop-target, renaming, loading, disabled, error).
+- **Drag-and-drop:** Every draggable/droppable combination tested with correct callbacks and data.
+- **Selection:** Click, Ctrl+Click, Shift+Click, Ctrl+A, rubber-band, Escape — in both list and grid.
+- **Dialogs:** Open, validate, submit, cancel, keyboard shortcuts (Enter, Escape).
+- **Context menus:** File menu, folder menu, background menu — all items fire correct callbacks.
+- **Keyboard shortcuts:** All shortcuts in the table tested.
+- **Accessibility:** Every component has `Semantics` labels. Dialogs trap focus. Live regions announce actions.
+- **Theming:** Every component renders correctly with default and custom theme overrides.
+- **Reduced motion:** Every animation has instant fallback.
+
+## Golden Tests
+
+| Widget | Variants | Light + Dark | Total |
+|--------|----------|-------------|-------|
+| OiFileIcon | 14 categories × md | ×2 | 28 |
+| OiFolderIcon | 3 states × 5 variants | ×2 | 30 |
+| OiFileTile | default, hover, selected, renaming, drop-target | ×2 | 10 |
+| OiFileGridCard | file, folder, hover, selected, renaming, drop | ×2 | 12 |
+| OiPathBar | breadcrumb, edit, collapsed | ×2 | 6 |
+| OiStorageIndicator | low, medium, high, with breakdown | ×2 | 8 |
+| OiDropHighlight | area, border | ×2 | 4 |
+| OiSelectionOverlay | active rectangle | ×2 | 2 |
+| OiRenameField | normal, error | ×2 | 4 |
+| OiFolderTreeItem | default, expanded, selected, drop-target | ×2 | 8 |
+| OiFileToolbar | default, search active, selection active | ×2 | 6 |
+| OiFileSidebar | full, compact, with drop-target | ×2 | 6 |
+| OiFileListView | with files, selection, rename | ×2 | 6 |
+| OiFileGridView | with cards, selection, rename | ×2 | 6 |
+| OiFileExplorer | full list, full grid, empty, loading | ×2 | 8 |
+| 6 Dialogs | each ×1 | ×2 | 12 |
+| **Total** | | | **156** |
+
+## Integration Tests
+
+- **Navigate flow:** Open root → click folder → breadcrumb updates → click breadcrumb → back button → forward button.
+- **Create folder flow:** Ctrl+N → type name → Enter → folder appears in list + sidebar → toast confirms.
+- **Rename flow:** Select file → F2 → type new name → Enter → name updates → toast confirms.
+- **Rename cancel:** F2 → Escape → name reverts.
+- **Delete flow:** Select 3 files → Delete → dialog confirms → confirm → files removed → toast with undo → undo → files restored.
+- **Move via drag (content → sidebar):** Select files → drag to sidebar folder → drop → files moved → toast with undo.
+- **Move via drag (content → content folder):** Drag file onto folder card → files moved.
+- **Move via dialog:** Right-click → "Move to..." → select destination in tree → confirm → moved.
+- **Copy flow:** Right-click → "Copy to..." → select destination → confirm → copy created.
+- **Upload flow:** Click upload → select files → progress shown → files appear in list → toast.
+- **Upload via drag:** Drag from OS → drop highlight → drop → upload dialog → upload.
+- **Search flow:** Ctrl+F → type query → list filters → clear → full list restored.
+- **Sort flow:** Click "Size" column → sorted ascending → click again → sorted descending.
+- **View toggle:** Click grid icon → grid view → click list icon → list view (selection preserved).
+- **Favorites flow:** Right-click folder → "Add to Favorites" → appears in sidebar → right-click → "Remove" → gone.
+- **Rubber-band selection:** Click empty space → drag → rectangle selects 5 files → bulk delete.
+- **File info:** Select file → Ctrl+I → info dialog shows all metadata → close.
+
+## Performance Tests
+
+- `OiFileListView` with 100,000 files: <16ms frame time (virtual scroll).
+- `OiFileGridView` with 50,000 files: <16ms frame time (virtual grid).
+- `OiFileSidebar` with 10,000 folders: <16ms frame time (virtual tree).
+- Rubber-band selection over 10,000 items: selection calculation <5ms.
+- Search filtering 100,000 files client-side: <50ms filter time.
+- Rapid folder navigation (100 navigations in 10 seconds): no jank, no memory leak.
+- Drag ghost rendering during drag over 10,000-item list: <16ms frame time.
+
+---
+
+# obers_ui — Responsive Layout System Specification
+
+> **Date:** 2026-03-16
+> **Extends:** `base_concept.md`
+> **Scope:** Responsive grid, flex, section, and page layout primitives + extensible breakpoint system.
+> **Tier:** Foundation (breakpoints) + Primitives (layout widgets)
+> **Principle:** Layout is declarative. Responsiveness is a first-class prop, not an afterthought. Every layout widget speaks the same responsive language.
+
+---
+
+## Table of Contents
+
+- [Motivation & Design Goals](#motivation--design-goals)
+- [Part 1: Extensible Breakpoint System](#part-1-extensible-breakpoint-system)
+- [Part 2: The Responsive Value Type](#part-2-the-responsive-value-type)
+- [Part 3: Layout Primitives](#part-3-layout-primitives)
+  - [Enhanced OiRow / OiColumn](#enhanced-oirow--oicolumn)
+  - [Enhanced OiGrid](#enhanced-oigrid)
+  - [OiSection](#oisection)
+  - [OiFlex](#oiflex)
+  - [OiFieldset](#oifieldset)
+  - [OiPage](#oipage)
+  - [Responsive Visibility: OiShow / OiHide](#responsive-visibility-oishow--oihide)
+- [Part 4: The Span System — Universal Child Positioning](#part-4-the-span-system)
+- [Part 5: Container-Relative Layouts](#part-5-container-relative-layouts)
+- [Part 6: Performance Architecture](#part-6-performance-architecture)
+- [Part 7: Theme Integration](#part-7-theme-integration)
+- [Part 8: Package Structure](#part-8-package-structure)
+- [Part 9: Usage Examples](#part-9-usage-examples)
+- [Part 10: Tests](#part-10-tests)
+
+---
+
+# Motivation & Design Goals
+
+Flutter gives you `Row`, `Column`, `Wrap`, `GridView`, and `LayoutBuilder`. These are powerful but low-level. Building a responsive admin form, dashboard, or settings page requires repetitive boilerplate: check breakpoint → pick column count → calculate widths → wrap in `LayoutBuilder` → rebuild everything.
+
+Filament (PHP) solves this beautifully for the web with its grid/section/flex system. Every layout component has `columns()`, and every child has `columnSpan()`, both accepting responsive breakpoint maps. The result: complex responsive layouts in a few lines of declarative code.
+
+We want this power in Flutter — but adapted to be idiomatic, type-safe, and performant.
+
+**Design goals:**
+
+1. **Declarative responsive props.** Any layout property that should vary by screen size accepts an `OiResponsive<T>` value. One type, one pattern, everywhere.
+2. **Extensible breakpoints.** The 5 default breakpoints (`compact`, `medium`, `expanded`, `large`, `extraLarge`) are defined in the theme and can be extended with custom names. No hard-coded enum — a registry.
+3. **Span system.** Every child inside a grid-aware parent can declare `columnSpan`, `columnStart`, and `columnOrder` — all responsive. This is a universal contract, not per-widget.
+4. **Container queries.** Layouts can measure their own width instead of the viewport, so a grid inside a collapsible sidebar adapts to _its_ available space.
+5. **Minimal rebuilds.** Breakpoint changes use `InheritedWidget` + fine-grained `shouldNotify`. Layout calculations use `CustomMultiChildLayout` or `RenderBox` directly — no `setState` chains.
+6. **Nestable.** Grids inside sections inside flex inside pages. Every layout widget composes with every other. No special rules about what can go where.
+7. **Accessible.** `OiSection` has semantic landmarks. Collapsible sections announce state. Visibility changes don't remove from semantics tree unless explicitly told to.
+8. **Zero magic.** No context lookups that fail silently. No implicit inheritance of column counts. Every layout widget is self-contained with explicit props. The responsive value is resolved once at the layout level and passed down as concrete values.
+
+---
+
+# Part 1: Extensible Breakpoint System
+
+## Replacing the Enum
+
+The current `OiBreakpoint` enum is closed — you can't add project-specific breakpoints like `tablet`, `wideDesktop`, or `ultraWide`. We replace it with an open, ordered registry defined in the theme.
+
+```dart
+/// A named breakpoint with a minimum width threshold.
+///
+/// Breakpoints are ordered by [minWidth]. The active breakpoint
+/// is the largest one whose [minWidth] is <= the current width.
+@immutable
+class OiBreakpoint implements Comparable<OiBreakpoint> {
+  const OiBreakpoint(this.name, this.minWidth);
+
+  /// Human-readable name. Used as the key in [OiResponsive] maps.
+  final String name;
+
+  /// Minimum viewport/container width in logical pixels.
+  final double minWidth;
+
+  @override
+  int compareTo(OiBreakpoint other) => minWidth.compareTo(other.minWidth);
+
+  // Standard breakpoints — accessible as constants for convenience.
+  static const compact    = OiBreakpoint('compact', 0);
+  static const medium     = OiBreakpoint('medium', 600);
+  static const expanded   = OiBreakpoint('expanded', 840);
+  static const large      = OiBreakpoint('large', 1200);
+  static const extraLarge = OiBreakpoint('extraLarge', 1600);
+}
+```
+
+## Breakpoint Scale in the Theme
+
+```dart
+/// Defines the breakpoint scale for the entire application.
+///
+/// Stored in [OiThemeData.breakpoints]. Sorted automatically on creation.
+/// The first entry must always have minWidth == 0 (the base/default).
+@immutable
+class OiBreakpointScale {
+  /// Creates a breakpoint scale from an unsorted list.
+  /// Throws if no breakpoint has minWidth == 0.
+  factory OiBreakpointScale(List<OiBreakpoint> breakpoints);
+
+  /// The default 5-tier scale matching Material 3 guidelines.
+  factory OiBreakpointScale.standard();
+
+  /// Extended scale — adds `tablet` (480) and `ultraWide` (1920).
+  factory OiBreakpointScale.extended();
+
+  /// The sorted list of breakpoints, ascending by minWidth.
+  final List<OiBreakpoint> values;
+
+  /// Returns the active breakpoint for the given [width].
+  ///
+  /// Walks the sorted list in reverse, returning the first
+  /// breakpoint whose minWidth <= width.
+  OiBreakpoint resolve(double width);
+
+  /// Returns the index of the active breakpoint.
+  int resolveIndex(double width);
+}
+```
+
+**Theme integration:**
+
+```dart
+class OiThemeData {
+  // ... existing fields ...
+  final OiBreakpointScale breakpoints; // ★ NEW — defaults to OiBreakpointScale.standard()
+}
+```
+
+**Context extension (replaces old `OiResponsiveExt`):**
+
+```dart
+extension OiResponsiveExt on BuildContext {
+  OiBreakpointScale get breakpointScale => theme.breakpoints;
+  OiBreakpoint get breakpoint => breakpointScale.resolve(_viewportWidth);
+  double get viewportWidth => MediaQuery.sizeOf(this).width;
+
+  /// Resolves a responsive value for the current viewport breakpoint.
+  T responsive<T>(OiResponsive<T> values) => values.resolve(breakpoint, breakpointScale);
+
+  // Convenience getters remain:
+  bool get isCompact => breakpoint == OiBreakpoint.compact;
+  bool get isMedium => breakpoint == OiBreakpoint.medium;
+  bool get isExpanded => breakpoint == OiBreakpoint.expanded;
+  bool get isLarge => breakpoint == OiBreakpoint.large;
+  bool get isExtraLarge => breakpoint == OiBreakpoint.extraLarge;
+  bool get isLargeOrWider => breakpoint.minWidth >= OiBreakpoint.large.minWidth;
+}
+```
+
+---
+
+# Part 2: The Responsive Value Type
+
+The core abstraction that makes everything work. A single type that can hold either a static value or a breakpoint-keyed map.
+
+```dart
+/// A value that may vary across breakpoints.
+///
+/// There are two ways to construct it:
+///
+/// 1. **Static** — the same value at all breakpoints:
+///    ```dart
+///    OiResponsive(2)           // always 2 columns
+///    ```
+///
+/// 2. **Per-breakpoint** — different values at different breakpoints:
+///    ```dart
+///    OiResponsive.breakpoints({  // 1 on compact, 2 on medium, 4 on large
+///      OiBreakpoint.compact: 1,
+///      OiBreakpoint.medium: 2,
+///      OiBreakpoint.large: 4,
+///    })
+///    ```
+///
+/// Resolution: when a breakpoint has no explicit value, it inherits
+/// from the nearest smaller breakpoint that does have a value.
+///
+/// This cascading ("mobile-first") rule means you only define the
+/// breakpoints where things *change*.
+@immutable
+class OiResponsive<T> {
+  /// A value that is the same at every breakpoint.
+  const OiResponsive(this._defaultValue) : _map = null;
+
+  /// Values keyed by breakpoint, with mobile-first cascading.
+  ///
+  /// The map MUST contain a key with `minWidth == 0` (typically
+  /// [OiBreakpoint.compact]) or provide a base via [defaultValue].
+  const OiResponsive.breakpoints(Map<OiBreakpoint, T> map, {T? defaultValue})
+      : _map = map,
+        _defaultValue = defaultValue;
+
+  final T? _defaultValue;
+  final Map<OiBreakpoint, T>? _map;
+
+  /// Whether this is a static (non-responsive) value.
+  bool get isStatic => _map == null;
+
+  /// Resolves the value for the given breakpoint.
+  ///
+  /// Walks breakpoints in descending order from [active], returns
+  /// the first mapped value found. Falls back to [_defaultValue].
+  T resolve(OiBreakpoint active, OiBreakpointScale scale) {
+    if (_map == null) return _defaultValue as T;
+
+    // Walk backwards from the active breakpoint's index.
+    final sorted = scale.values;
+    final idx = scale.resolveIndex(active.minWidth);
+    for (var i = idx; i >= 0; i--) {
+      final bp = sorted[i];
+      if (_map!.containsKey(bp)) return _map![bp] as T;
+    }
+
+    return _defaultValue as T;
+  }
+}
+```
+
+**Convenience constructors and typedef:**
+
+```dart
+/// Shorthand — use anywhere a responsive int/double/bool is needed.
+///
+/// ```dart
+/// // Static
+/// columns: 3.responsive,
+///
+/// // Responsive
+/// columns: {compact: 1, medium: 2, large: 4}.responsive,
+/// ```
+extension OiResponsiveIntExt on int {
+  OiResponsive<int> get responsive => OiResponsive(this);
+}
+
+extension OiResponsiveMapExt<T> on Map<OiBreakpoint, T> {
+  OiResponsive<T> get responsive => OiResponsive.breakpoints(this);
+}
+```
+
+This means any layout prop that varies by screen size has the exact same type pattern. A developer never has to think "how does this particular widget handle responsiveness?" — it's always `OiResponsive<T>`.
+
+---
+
+# Part 3: Layout Primitives
+
+All layout widgets live in `src/primitives/layout/`. Every layout widget that acts as a grid parent accepts `columns` as `OiResponsive<int>`. Every child inside a grid parent can use the span system (Part 4).
+
+---
+
+## Enhanced OiRow / OiColumn
+
+The existing `OiRow` and `OiColumn` gain responsive gap and optional wrap behavior, but remain simple.
+
+```dart
+/// A horizontal layout with responsive gap.
+///
+/// This is obers_ui's replacement for [Row] with a built-in gap.
+/// For responsive multi-column grids, use [OiGrid] instead.
+///
+/// ```dart
+/// OiRow(
+///   gap: OiResponsive.breakpoints({
+///     OiBreakpoint.compact: 8,
+///     OiBreakpoint.expanded: 16,
+///   }),
+///   children: [WidgetA(), WidgetB()],
+/// )
+/// ```
+OiRow({
+  required List<Widget> children,
+  OiResponsive<double> gap = const OiResponsive(0),
+  MainAxisAlignment mainAlign = MainAxisAlignment.start,
+  CrossAxisAlignment crossAlign = CrossAxisAlignment.center,
+  MainAxisSize mainSize = MainAxisSize.max,
+})
+```
+
+```dart
+/// A vertical layout with responsive gap.
+OiColumn({
+  required List<Widget> children,
+  OiResponsive<double> gap = const OiResponsive(0),
+  MainAxisAlignment mainAlign = MainAxisAlignment.start,
+  CrossAxisAlignment crossAlign = CrossAxisAlignment.stretch,
+  MainAxisSize mainSize = MainAxisSize.max,
+})
+```
+
+No breaking changes. The `gap` parameter changes from `double` to `OiResponsive<double>`, but `double` implicitly constructs `OiResponsive(double)` via the default constructor, so `gap: 16` still works.
+
+---
+
+## Enhanced OiGrid
+
+The grid is the workhorse. It lays out children in a CSS-Grid-like fashion with responsive column counts, and children can span/start at specific columns.
+
+```dart
+/// A responsive grid that arranges children in rows and columns.
+///
+/// The number of columns can be:
+/// - Fixed: `columns: OiResponsive(3)` — always 3 columns.
+/// - Responsive: `columns: OiResponsive.breakpoints({compact: 1, medium: 2, large: 4})`
+/// - Auto: `minColumnWidth: 200` — calculates columns from available width.
+///
+/// Children can control their placement via [OiSpan] (see Part 4).
+///
+/// ## Simple example
+/// ```dart
+/// OiGrid(
+///   columns: OiResponsive.breakpoints({
+///     OiBreakpoint.compact: 1,
+///     OiBreakpoint.medium: 2,
+///     OiBreakpoint.large: 4,
+///   }),
+///   gap: 16,
+///   children: [
+///     OiTextInput(label: 'First name'),
+///     OiTextInput(label: 'Last name'),
+///     OiTextInput(label: 'Email').span(columnSpan: 2),
+///     OiTextInput(label: 'Phone'),
+///   ],
+/// )
+/// ```
+///
+/// ## Auto-column example
+/// ```dart
+/// OiGrid(
+///   minColumnWidth: 280,
+///   maxColumns: 4,
+///   gap: 16,
+///   children: [...],
+/// )
+/// ```
+OiGrid({
+  required List<Widget> children,
+
+  /// The number of columns at each breakpoint.
+  /// Mutually exclusive with [minColumnWidth].
+  OiResponsive<int>? columns,
+
+  /// When set, columns are calculated automatically:
+  /// `floor(availableWidth / minColumnWidth)`, clamped to [1, maxColumns].
+  /// Mutually exclusive with [columns].
+  double? minColumnWidth,
+
+  /// Maximum columns when using [minColumnWidth]. Default: 12.
+  int maxColumns = 12,
+
+  /// Gap between both columns and rows.
+  OiResponsive<double> gap = const OiResponsive(16),
+
+  /// Separate cross-axis gap. When null, uses [gap] for both.
+  OiResponsive<double>? rowGap,
+
+  /// Removes all spacing between children.
+  bool dense = false,
+
+  /// How to align children when a row is not fully filled.
+  /// Defaults to [WrapAlignment.start] (left-aligned with empty space on right).
+  WrapAlignment runAlignment = WrapAlignment.start,
+})
+```
+
+**Implementation notes:**
+
+- Uses a `CustomMultiChildLayout` delegate (or a custom `RenderBox` with `ContainerRenderObjectMixin`) — NOT `Wrap` or `GridView`, because we need column-start and column-span control.
+- Layout algorithm: classic CSS Grid row-packing. Walk children in order, place each into the first available cell that satisfies its `columnSpan` and `columnStart`. Advance to next row when the current row is full.
+- The resolved column count is calculated once per layout pass using the current width and breakpoint. This value is then passed to the layout delegate — no per-child rebuilds.
+
+---
+
+## OiSection
+
+A visually grouped region with an optional heading, description, icon, collapse, and its own internal grid columns.
+
+This is the Filament `Section` adapted for Flutter. It serves double duty: visual grouping (card-like surface) AND layout container (internal grid).
+
+```dart
+/// A visually distinct region that groups related content.
+///
+/// Sections are the primary tool for organizing complex forms,
+/// settings pages, and detail views into digestible chunks.
+///
+/// ## Basic
+/// ```dart
+/// OiSection(
+///   label: 'Rate limiting',
+///   description: 'Prevent abuse by limiting requests per period',
+///   columns: OiResponsive.breakpoints({compact: 1, expanded: 2}),
+///   children: [
+///     OiNumberInput(label: 'Max requests'),
+///     OiSelect(label: 'Time window', items: [...]),
+///   ],
+/// )
+/// ```
+///
+/// ## Aside layout
+/// ```dart
+/// OiSection(
+///   label: 'Notifications',
+///   description: 'Choose how you want to be notified',
+///   aside: true, // heading left, content right
+///   children: [...],
+/// )
+/// ```
+///
+/// ## Collapsible
+/// ```dart
+/// OiSection(
+///   label: 'Advanced',
+///   collapsible: true,
+///   collapsed: true,
+///   children: [...],
+/// )
+/// ```
+OiSection({
+  required List<Widget> children,
+  required String label,
+
+  /// Subtitle text rendered below the heading.
+  String? description,
+
+  /// Icon displayed next to the heading.
+  IconData? icon,
+
+  /// Internal grid columns for the section's children.
+  /// When null, children are laid out in a single column.
+  OiResponsive<int>? columns,
+
+  /// Gap between children inside the section.
+  OiResponsive<double> gap = const OiResponsive(16),
+
+  /// When true, heading+description are on the left and
+  /// children render in a card on the right. Stacks vertically
+  /// on compact breakpoints.
+  bool aside = false,
+
+  /// The breakpoint below which aside layout stacks vertically.
+  OiBreakpoint asideStackBelow = OiBreakpoint.medium,
+
+  /// Whether the section can be collapsed by the user.
+  bool collapsible = false,
+
+  /// Initial collapsed state (only meaningful when [collapsible] is true).
+  bool collapsed = false,
+
+  /// Fires when collapsed state changes.
+  ValueChanged<bool>? onCollapsedChanged,
+
+  /// When true, collapse state is persisted via the nearest
+  /// [OiSettingsDriver]. Requires a unique [label] or explicit [id].
+  bool persistCollapsed = false,
+
+  /// Explicit ID for persistence (avoids collisions when multiple
+  /// sections share the same label).
+  String? id,
+
+  /// More compact internal padding. Useful for nested sections.
+  bool compact = false,
+
+  /// Removes the card background, leaving just the heading + content.
+  bool contained = true,
+
+  /// Widgets rendered in the header row, after the heading.
+  /// Typically action buttons.
+  List<Widget>? headerActions,
+
+  /// Widgets rendered in a footer row below the content.
+  List<Widget>? footerActions,
+})
+```
+
+**Composes:** `OiSurface` (card background when `contained`), `OiLabel` (heading, description), `OiIcon`, `OiTappable` (collapse toggle), `OiGrid` or `OiColumn` (internal layout), `AnimatedCrossFade` or `SizeTransition` (collapse animation).
+
+**Semantics:** Wraps content in `Semantics(label: label, container: true)`. Collapsible section announces "collapsed" / "expanded" state.
+
+---
+
+## OiFlex
+
+A flexbox-style layout where children can grow or stay fixed. Think of it as `OiRow` but with explicit grow/shrink semantics and a responsive stacking breakpoint.
+
+```dart
+/// A flex layout where children can grow or stay fixed-width.
+///
+/// Unlike [OiRow] (which gives all children equal flex or intrinsic sizing),
+/// [OiFlex] lets each child declare whether it should [grow] to fill
+/// available space.
+///
+/// Below the [stackBelow] breakpoint, children stack vertically.
+///
+/// ## Sidebar + Content pattern
+/// ```dart
+/// OiFlex(
+///   stackBelow: OiBreakpoint.medium,
+///   gap: 24,
+///   children: [
+///     OiSection(label: 'Main', children: [...]).grow(),
+///     OiSection(label: 'Sidebar', children: [...]).fixed(width: 300),
+///   ],
+/// )
+/// ```
+OiFlex({
+  required List<Widget> children,
+
+  /// Gap between children.
+  OiResponsive<double> gap = const OiResponsive(16),
+
+  /// Direction of the flex layout. Default horizontal.
+  Axis direction = Axis.horizontal,
+
+  /// Breakpoint below which children stack vertically
+  /// (direction becomes [Axis.vertical]).
+  /// When null, never stacks.
+  OiBreakpoint? stackBelow,
+
+  /// Cross-axis alignment.
+  CrossAxisAlignment crossAlign = CrossAxisAlignment.start,
+})
+```
+
+**Child modifiers (extensions on Widget):**
+
+```dart
+extension OiFlexChildExt on Widget {
+  /// This child grows to fill available space.
+  /// [flex] controls the grow ratio (default 1).
+  Widget grow({int flex = 1});
+
+  /// This child has a fixed width and does not grow.
+  Widget fixed({double? width});
+}
+```
+
+These wrap the child in an `OiFlexChild` data widget that `OiFlex` reads during layout.
+
+---
+
+## OiFieldset
+
+A labeled group with a border — the HTML `<fieldset>` equivalent. Simpler than `OiSection` (no card surface, no collapse). Primarily for grouping form fields.
+
+```dart
+/// A bordered group with a legend label.
+///
+/// ```dart
+/// OiFieldset(
+///   label: 'Shipping address',
+///   columns: OiResponsive.breakpoints({compact: 1, medium: 2}),
+///   children: [
+///     OiTextInput(label: 'Street'),
+///     OiTextInput(label: 'City'),
+///     OiTextInput(label: 'ZIP'),
+///     OiSelect(label: 'Country', items: [...]),
+///   ],
+/// )
+/// ```
+OiFieldset({
+  required List<Widget> children,
+  required String label,
+
+  /// Internal grid columns.
+  OiResponsive<int>? columns,
+
+  /// Gap between children.
+  OiResponsive<double> gap = const OiResponsive(16),
+
+  /// Removes the border.
+  bool contained = true,
+})
+```
+
+**Composes:** `OiSurface` with border style from theme, `OiLabel` for legend, `OiGrid` or `OiColumn` for internal layout.
+
+---
+
+## OiPage
+
+A page-level layout scaffolding widget that provides max-width centering, responsive gutters, and a structured header/content/footer flow. This is _not_ a scaffold with app bar — it's a content area layout.
+
+```dart
+/// A max-width centered page layout with responsive gutters.
+///
+/// Use as the root of a route's content area.
+///
+/// ```dart
+/// OiPage(
+///   maxWidth: 1200,
+///   children: [
+///     OiSection(label: 'Profile', children: [...]),
+///     OiSection(label: 'Security', children: [...]),
+///   ],
+/// )
+/// ```
+OiPage({
+  required List<Widget> children,
+
+  /// Maximum content width. Content is centered when viewport exceeds this.
+  double maxWidth = 1200,
+
+  /// Responsive horizontal padding (page gutters).
+  /// Defaults to theme-derived values per breakpoint.
+  OiResponsive<double>? padding,
+
+  /// Vertical gap between children.
+  OiResponsive<double> gap = const OiResponsive(24),
+
+  /// Whether the page scrolls. When false, children fill available space.
+  bool scrollable = true,
+
+  /// Scroll controller.
+  ScrollController? scrollController,
+})
+```
+
+**Composes:** `OiContainer` (max-width + centering), `OiColumn` (vertical stacking with gap), `SingleChildScrollView` (when scrollable).
+
+---
+
+## Responsive Visibility: OiShow / OiHide
+
+```dart
+/// Shows its child only at or above the given breakpoint.
+///
+/// ```dart
+/// OiShow(
+///   above: OiBreakpoint.medium,
+///   child: OiLabel(text: 'Desktop only'),
+/// )
+/// ```
+OiShow({
+  required Widget child,
+
+  /// Show when viewport is >= this breakpoint.
+  OiBreakpoint? above,
+
+  /// Show when viewport is <= this breakpoint.
+  OiBreakpoint? below,
+
+  /// When true, hides visually but keeps in semantics tree.
+  /// When false, removes from tree entirely (default).
+  bool maintainSemantics = false,
+
+  /// Optional replacement widget shown when hidden.
+  Widget? replacement,
+})
+
+/// Hides its child at or above the given breakpoint.
+/// Inverse of [OiShow]. Convenience wrapper.
+OiHide({
+  required Widget child,
+  OiBreakpoint? above,
+  OiBreakpoint? below,
+  bool maintainSemantics = false,
+  Widget? replacement,
+})
+```
+
+**Implementation:** Uses `Visibility` (when `maintainSemantics`) or conditional build (when not). Reads breakpoint from context — only rebuilds when the relevant breakpoint threshold is crossed, not on every pixel of resize.
+
+---
+
+# Part 4: The Span System — Universal Child Positioning
+
+Any widget placed inside an `OiGrid`, `OiSection(columns: ...)`, or `OiFieldset(columns: ...)` can control its grid placement via the `.span()` extension.
+
+```dart
+/// Grid placement metadata for a child widget.
+///
+/// Applied via the [OiSpanExt] extension method:
+/// ```dart
+/// OiTextInput(label: 'Bio').span(
+///   columnSpan: OiResponsive.breakpoints({compact: 1, medium: 2}),
+/// )
+/// ```
+@immutable
+class OiSpanData {
+  const OiSpanData({
+    this.columnSpan,
+    this.columnStart,
+    this.columnOrder,
+    this.rowSpan,
+  });
+
+  /// How many columns this child occupies.
+  /// `null` = 1 column (default).
+  /// Use `OiSpanData.full` for full-width.
+  final OiResponsive<int>? columnSpan;
+
+  /// Which column this child starts at (1-indexed).
+  /// `null` = auto-placed (next available slot).
+  final OiResponsive<int>? columnStart;
+
+  /// Visual ordering within the grid row.
+  /// Lower numbers render first. `null` = source order.
+  final OiResponsive<int>? columnOrder;
+
+  /// How many rows this child occupies. Default 1.
+  /// Only useful in advanced dashboards — most layouts ignore this.
+  final OiResponsive<int>? rowSpan;
+
+  /// Full-width span — fills all columns at every breakpoint.
+  static const full = OiSpanData(
+    columnSpan: OiResponsive(_fullSpanSentinel),
+  );
+}
+
+// Sentinel value that the grid interprets as "all columns".
+const _fullSpanSentinel = -1;
+```
+
+**Extension method on Widget:**
+
+```dart
+extension OiSpanExt on Widget {
+  /// Wraps this widget with grid placement metadata.
+  ///
+  /// ```dart
+  /// OiTextInput(label: 'Email').span(
+  ///   columnSpan: OiResponsive.breakpoints({
+  ///     OiBreakpoint.compact: 1,
+  ///     OiBreakpoint.expanded: 2,
+  ///   }),
+  /// )
+  /// ```
+  Widget span({
+    OiResponsive<int>? columnSpan,
+    OiResponsive<int>? columnStart,
+    OiResponsive<int>? columnOrder,
+    OiResponsive<int>? rowSpan,
+  }) {
+    return OiSpan(
+      data: OiSpanData(
+        columnSpan: columnSpan,
+        columnStart: columnStart,
+        columnOrder: columnOrder,
+        rowSpan: rowSpan,
+      ),
+      child: this,
+    );
+  }
+
+  /// Shorthand: span all columns at every breakpoint.
+  Widget spanFull() => OiSpan(data: OiSpanData.full, child: this);
+}
+
+/// An InheritedWidget that carries [OiSpanData] for the nearest
+/// grid parent to read during layout.
+class OiSpan extends SingleChildRenderObjectWidget {
+  const OiSpan({required this.data, required Widget child})
+      : super(child: child);
+
+  final OiSpanData data;
+
+  // The parent grid reads this via parentData during layout.
+}
+```
+
+**How the grid reads spans:**
+
+`OiGrid`'s `RenderObject` iterates children. For each child, it checks if the child is an `OiSpan` and reads its `OiSpanData`. It resolves responsive values against the current breakpoint (determined by the grid's own width — see container queries). Then it runs the row-packing algorithm:
+
+1. Maintain a cursor: `(row, column)` starting at `(0, 0)`.
+2. For each child (sorted by `columnOrder` if specified):
+   - Resolve `columnSpan` (default 1, or `_fullSpanSentinel` → total columns).
+   - If `columnStart` is specified, place at that column (may leave gaps).
+   - Otherwise, find the next slot where `span` consecutive columns are free.
+   - If the child doesn't fit on the current row, advance to next row.
+3. Record each child's `(row, column, columnSpan, rowSpan)`.
+4. Layout each child with width = `(columnSpan / totalColumns) * (availableWidth - gaps)`.
+5. Position children with offsets.
+
+---
+
+# Part 5: Container-Relative Layouts
+
+Sometimes you want a grid to respond to its _own_ width rather than the viewport. For example, a form inside a resizable panel should reflow based on panel width, not window width.
+
+```dart
+/// Makes this grid use its own width to resolve breakpoints,
+/// rather than the viewport width.
+///
+/// ```dart
+/// OiGrid(
+///   containerRelative: true,
+///   columns: OiResponsive.breakpoints({
+///     OiBreakpoint.compact: 1,   // grid < 600px → 1 column
+///     OiBreakpoint.medium: 2,    // grid 600-840px → 2 columns
+///     OiBreakpoint.expanded: 3,  // grid > 840px → 3 columns
+///   }),
+///   children: [...],
+/// )
+/// ```
+```
+
+**Implementation:** When `containerRelative: true`, the grid's `RenderBox.performLayout()` uses its own `constraints.maxWidth` (not `MediaQuery.sizeOf(context).width`) to resolve the breakpoint via `OiBreakpointScale.resolve(ownWidth)`. This means:
+
+- The grid re-layouts when its own constraints change (e.g., panel resized).
+- It does NOT listen to `MediaQuery` at all — no unnecessary rebuilds when the window resizes but the grid's own width doesn't change.
+- Nested grids inside a container-relative grid also use the outer grid's width as their viewport if they're also container-relative, or they fall back to the real viewport if they're not.
+
+This is added as a single `bool` prop on `OiGrid`, `OiSection`, `OiFieldset`, and `OiFlex`:
+
+```dart
+/// When true, responsive values resolve against this widget's own
+/// width instead of the viewport width.
+bool containerRelative = false,
+```
+
+---
+
+# Part 6: Performance Architecture
+
+Layout is the hottest path in any UI framework. Here's how we keep it fast.
+
+## 1. Breakpoint-Gated Rebuilds
+
+The `OiBreakpointProvider` (an `InheritedWidget` injected by `OiApp`) only notifies dependents when the _active breakpoint changes_, not on every pixel of window resize.
+
+```dart
+class OiBreakpointProvider extends InheritedWidget {
+  final OiBreakpoint current;
+
+  @override
+  bool updateShouldNotify(OiBreakpointProvider old) =>
+      current != old.current; // Only fires on breakpoint change
+}
+```
+
+A window resize from 1000px → 1050px (both `expanded`) triggers zero rebuilds. A resize from 1195px → 1205px (crossing `large` threshold) triggers one rebuild.
+
+## 2. RenderObject-Level Layout
+
+`OiGrid` does NOT use `LayoutBuilder` + `setState`. It uses a custom `RenderBox` (`RenderOiGrid`) that:
+
+1. Receives `constraints` in `performLayout()`.
+2. Resolves the breakpoint from constraints (container-relative) or cached viewport breakpoint.
+3. Resolves all responsive values (columns, gaps, per-child spans).
+4. Runs the row-packing algorithm.
+5. Lays out and positions children in a single pass.
+
+This means:
+
+- No widget rebuild on resize — only relayout.
+- No `setState` chains. Changes propagate through the render tree.
+- Parent data (`OiSpanData`) is read directly from `RenderBox.parentData`.
+
+## 3. Static Value Fast Path
+
+When `OiResponsive.isStatic == true` (the common case for simple layouts), the resolve method returns immediately without any breakpoint lookup. No map iteration, no comparison.
+
+## 4. Cached Breakpoint Resolution
+
+Each `OiResponsive<T>` caches its last resolved value + breakpoint. If the breakpoint hasn't changed, it returns the cached value. This avoids re-walking the map on every layout pass for responsive values.
+
+## 5. Collapse Animation
+
+`OiSection` collapse uses `SizeTransition` with `AnimatedBuilder` — the collapsed content is wrapped in `Offstage` when fully collapsed, removing it from layout entirely. During animation, it uses `ClipRect` to avoid overflow. When `reducedMotion` is active, collapse is instant (no animation, just `Offstage` toggle).
+
+---
+
+# Part 7: Theme Integration
+
+## OiLayoutThemeData
+
+```dart
+/// Theme data for all layout primitives.
+///
+/// Added to [OiComponentThemes].
+@immutable
+class OiLayoutThemeData {
+  const OiLayoutThemeData({
+    this.defaultGap = 16,
+    this.denseGap = 8,
+    this.sectionPadding,
+    this.sectionRadius,
+    this.sectionHeaderSpacing = 12,
+    this.fieldsetBorder,
+    this.pageGutters,
+    this.pageMaxWidth = 1200,
+  });
+
+  final double defaultGap;
+  final double denseGap;
+  final EdgeInsets? sectionPadding;
+  final BorderRadius? sectionRadius;
+  final double sectionHeaderSpacing;
+  final OiBorderStyle? fieldsetBorder;
+  final OiResponsive<double>? pageGutters;
+  final double pageMaxWidth;
+}
+```
+
+Added to `OiComponentThemes`:
+
+```dart
+class OiComponentThemes {
+  // ... existing fields ...
+  final OiLayoutThemeData? layout; // ★ NEW
+}
+```
+
+---
+
+# Part 8: Package Structure
+
+```
+src/
+  foundation/
+    theme/
+      oi_breakpoint.dart              ★ NEW — OiBreakpoint, OiBreakpointScale
+      oi_responsive.dart              ★ REPLACED — OiResponsive<T>, extensions
+      oi_breakpoint_provider.dart     ★ NEW — InheritedWidget
+      // ... existing theme files ...
+
+  primitives/
+    layout/
+      oi_row.dart                     ★ ENHANCED — responsive gap
+      oi_column.dart                  ★ ENHANCED — responsive gap
+      oi_grid.dart                    ★ REPLACED — full grid system
+      oi_section.dart                 ★ NEW — visual grouping + grid
+      oi_flex.dart                    ★ NEW — grow/fixed flex layout
+      oi_fieldset.dart                ★ NEW — bordered group
+      oi_page.dart                    ★ NEW — page scaffolding
+      oi_span.dart                    ★ NEW — span data + extension
+      oi_show.dart                    ★ NEW — responsive visibility
+      // existing files unchanged:
+      oi_wrap_layout.dart
+      oi_masonry.dart
+      oi_aspect_ratio.dart
+      oi_spacer.dart
+      oi_container.dart
+```
+
+---
+
+# Part 9: Usage Examples
+
+## Example 1: Simple Responsive Form
+
+```dart
+OiSection(
+  label: 'Personal information',
+  columns: OiResponsive.breakpoints({
+    OiBreakpoint.compact: 1,
+    OiBreakpoint.expanded: 2,
+  }),
+  children: [
+    OiTextInput(label: 'First name'),
+    OiTextInput(label: 'Last name'),
+    OiTextInput(label: 'Email').spanFull(),
+    OiTextInput(label: 'Phone'),
+    OiSelect(label: 'Country', items: countries),
+  ],
+)
+```
+
+On compact: all fields stack. On expanded+: first/last name side by side, email full width, phone/country side by side.
+
+## Example 2: Settings Page with Aside Sections
+
+```dart
+OiPage(
+  children: [
+    OiSection(
+      label: 'Notifications',
+      description: 'Choose how you want to be notified about updates',
+      aside: true,
+      children: [
+        OiSwitch(label: 'Email notifications', value: emailOn, onChanged: ...),
+        OiSwitch(label: 'Push notifications', value: pushOn, onChanged: ...),
+        OiSwitch(label: 'SMS notifications', value: smsOn, onChanged: ...),
+      ],
+    ),
+    OiSection(
+      label: 'Privacy',
+      description: 'Control who can see your profile and activity',
+      aside: true,
+      columns: OiResponsive.breakpoints({
+        OiBreakpoint.compact: 1,
+        OiBreakpoint.expanded: 2,
+      }),
+      children: [
+        OiSelect(label: 'Profile visibility', items: visibilityOptions),
+        OiSelect(label: 'Activity visibility', items: visibilityOptions),
+      ],
+    ),
+  ],
+)
+```
+
+## Example 3: Dashboard-Style Grid
+
+```dart
+OiGrid(
+  columns: OiResponsive.breakpoints({
+    OiBreakpoint.compact: 1,
+    OiBreakpoint.medium: 2,
+    OiBreakpoint.large: 4,
+  }),
+  gap: 16,
+  children: [
+    MetricCard(title: 'Revenue', value: '\$12.4M'),
+    MetricCard(title: 'Users', value: '84.2K'),
+    MetricCard(title: 'Orders', value: '2.1K'),
+    MetricCard(title: 'Conversion', value: '3.2%'),
+    RevenueChart().span(
+      columnSpan: OiResponsive.breakpoints({
+        OiBreakpoint.compact: 1,
+        OiBreakpoint.medium: 2,
+        OiBreakpoint.large: 3,
+      }),
+    ),
+    TopProducts().span(columnSpan: OiResponsive(1)),
+  ],
+)
+```
+
+## Example 4: Flex Layout (Main + Sidebar)
+
+```dart
+OiFlex(
+  stackBelow: OiBreakpoint.expanded,
+  gap: 24,
+  children: [
+    OiColumn(
+      gap: 16,
+      children: [
+        OiSection(label: 'Details', columns: 2.responsive, children: [...]),
+        OiSection(label: 'History', children: [...]),
+      ],
+    ).grow(),
+    OiColumn(
+      gap: 16,
+      children: [
+        OiSection(label: 'Status', children: [...]),
+        OiSection(label: 'Tags', children: [...]),
+      ],
+    ).fixed(width: 320),
+  ],
+)
+```
+
+## Example 5: Container-Relative Form in a Panel
+
+```dart
+// Inside a resizable OiPanel
+OiSection(
+  label: 'Quick edit',
+  containerRelative: true,
+  columns: OiResponsive.breakpoints({
+    OiBreakpoint.compact: 1,   // panel narrow → stack
+    OiBreakpoint.medium: 2,    // panel wide → 2 cols
+  }),
+  children: [
+    OiTextInput(label: 'Name'),
+    OiTextInput(label: 'Email'),
+    OiTextInput(label: 'Notes').spanFull(),
+  ],
+)
+```
+
+## Example 6: Nested Sections
+
+```dart
+OiPage(
+  children: [
+    OiSection(
+      label: 'Billing',
+      columns: OiResponsive.breakpoints({compact: 1, expanded: 2}),
+      children: [
+        OiFieldset(
+          label: 'Card details',
+          children: [
+            OiTextInput(label: 'Card number'),
+            OiRow(gap: 16, children: [
+              Expanded(child: OiTextInput(label: 'Expiry')),
+              Expanded(child: OiTextInput(label: 'CVV')),
+            ]),
+          ],
+        ).spanFull(),
+        OiFieldset(
+          label: 'Billing address',
+          columns: OiResponsive.breakpoints({compact: 1, medium: 2}),
+          children: [
+            OiTextInput(label: 'Street').spanFull(),
+            OiTextInput(label: 'City'),
+            OiTextInput(label: 'ZIP'),
+          ],
+        ).spanFull(),
+      ],
+    ),
+  ],
+)
+```
+
+## Example 7: Custom Breakpoints
+
+```dart
+// In your theme setup
+OiThemeData(
+  breakpoints: OiBreakpointScale([
+    OiBreakpoint.compact,
+    const OiBreakpoint('tablet', 480),
+    OiBreakpoint.medium,
+    OiBreakpoint.expanded,
+    OiBreakpoint.large,
+    const OiBreakpoint('ultraWide', 1920),
+    OiBreakpoint.extraLarge,
+  ]),
+  // ...
+)
+
+// Then use everywhere
+const tablet = OiBreakpoint('tablet', 480);
+const ultraWide = OiBreakpoint('ultraWide', 1920);
+
+OiGrid(
+  columns: OiResponsive.breakpoints({
+    OiBreakpoint.compact: 1,
+    tablet: 2,
+    OiBreakpoint.expanded: 3,
+    ultraWide: 6,
+  }),
+  children: [...],
+)
+```
+
+## Example 8: Responsive Visibility
+
+```dart
+OiGrid(
+  columns: OiResponsive.breakpoints({compact: 1, expanded: 3}),
+  children: [
+    OiTextInput(label: 'Name'),
+    OiTextInput(label: 'Email'),
+    // Only visible on expanded+
+    OiShow(
+      above: OiBreakpoint.expanded,
+      child: OiTextInput(label: 'Department'),
+    ),
+  ],
+)
+```
+
+---
+
+# Part 10: Tests
+
+## Unit Tests
+
+| Test | What it verifies |
+|------|-----------------|
+| `OiBreakpoint.compareTo` sorts by minWidth | Ordering correct |
+| `OiBreakpointScale` rejects scale without minWidth=0 | Validation |
+| `OiBreakpointScale.resolve(500)` returns compact | 500 < 600 |
+| `OiBreakpointScale.resolve(600)` returns medium | Exact boundary |
+| `OiBreakpointScale.resolve(1400)` returns large | 1200–1600 range |
+| `OiBreakpointScale` with custom breakpoints resolves correctly | Extended scale |
+| `OiResponsive(42).resolve(any)` always returns 42 | Static fast path |
+| `OiResponsive.breakpoints({compact: 1, large: 4}).resolve(medium)` returns 1 | Cascading fallback |
+| `OiResponsive.breakpoints({compact: 1, large: 4}).resolve(large)` returns 4 | Exact match |
+| `OiResponsive.breakpoints({compact: 1, large: 4}).resolve(extraLarge)` returns 4 | Cascade up |
+| `OiResponsive.isStatic` returns correctly | Type check |
+| `OiSpanData.full` resolves to total columns | Sentinel value |
+| Grid row-packing: 4 items, 2 columns → 2 rows | Basic packing |
+| Grid row-packing: item with columnSpan=2 in 3-col grid → correct placement | Spanning |
+| Grid row-packing: item with columnStart=2 in 3-col grid → gap left | Start positioning |
+| Grid row-packing: columnOrder reorders visually | Ordering |
+| Grid row-packing: span exceeds remaining → wraps to next row | Overflow wrap |
+
+## Widget Tests
+
+### OiGrid
+
+| Test | What it verifies |
+|------|-----------------|
+| Renders N columns at given width | Column count correct |
+| Responsive columns change at breakpoint boundary | Layout updates |
+| `minColumnWidth: 200` with 500px width → 2 columns | Auto calculation |
+| `maxColumns` caps auto-calculated columns | Cap enforced |
+| `gap` applies between children | Spacing correct |
+| `rowGap` differs from column gap | Separate gaps |
+| `dense: true` reduces gap by 50% | Dense mode |
+| Child `.span(columnSpan: 2)` occupies two columns | Span works |
+| Child `.spanFull()` occupies all columns | Full span |
+| Child `.span(columnStart: 2)` starts at column 2 | Start works |
+| Responsive columnSpan changes at breakpoint | Per-child responsiveness |
+| `containerRelative: true` uses own width, not viewport | Container queries |
+| Container-relative grid inside resizable panel relayouts on resize | Panel integration |
+| Empty children list renders nothing (no crash) | Edge case |
+| Single child fills first column | Minimal case |
+| 100 children render without jank | Performance |
+
+### OiSection
+
+| Test | What it verifies |
+|------|-----------------|
+| Heading renders | Label visible |
+| Description renders | Subtitle visible |
+| Icon renders next to heading | Icon placement |
+| Children render inside surface | Content visible |
+| `columns: 2` creates 2-column grid inside section | Internal grid |
+| `aside: true` puts heading left, content right | Aside layout |
+| Aside stacks on compact breakpoint | Responsive aside |
+| `collapsible: true` shows collapse toggle | Toggle visible |
+| Tap collapse toggle hides content | Collapse works |
+| Tap again shows content | Expand works |
+| `collapsed: true` starts collapsed | Initial state |
+| `onCollapsedChanged` fires | Callback |
+| `persistCollapsed: true` + driver → persists state | Persistence |
+| `compact: true` reduces padding | Compact styling |
+| `contained: false` removes card background | Borderless |
+| `headerActions` render in header row | Actions slot |
+| `footerActions` render below content | Footer slot |
+| Semantics label set | Accessibility |
+| Collapse state announced to screen reader | A11y announcement |
+| Reduced motion: collapse is instant | A11y animation |
+| Nested section inside section renders correctly | Nesting |
+
+### OiFlex
+
+| Test | What it verifies |
+|------|-----------------|
+| Children render horizontally with gap | Basic flex |
+| `.grow()` child fills remaining space | Grow works |
+| `.fixed(width: 300)` child is exactly 300px | Fixed works |
+| Two `.grow()` children share space equally | Equal grow |
+| `.grow(flex: 2)` gets twice the space of `.grow(flex: 1)` | Flex ratio |
+| `stackBelow: medium` stacks vertically on compact | Responsive stacking |
+| Stacked layout has vertical gap | Gap in stacked mode |
+| `direction: Axis.vertical` renders vertically | Vertical mode |
+
+### OiFieldset
+
+| Test | What it verifies |
+|------|-----------------|
+| Border renders around children | Border visible |
+| Label renders as legend | Legend text |
+| `columns` creates internal grid | Grid inside fieldset |
+| `contained: false` removes border | Borderless |
+| Semantics: fieldset has group role | A11y |
+
+### OiPage
+
+| Test | What it verifies |
+|------|-----------------|
+| Content centered when viewport > maxWidth | Centering |
+| Full width when viewport < maxWidth | Full bleed |
+| Responsive gutters apply | Padding |
+| Children stack vertically with gap | Vertical layout |
+| `scrollable: true` enables scrolling | Scroll |
+| `scrollable: false` fills available height | Fill mode |
+
+### OiShow / OiHide
+
+| Test | What it verifies |
+|------|-----------------|
+| `OiShow(above: medium)` visible at expanded, hidden at compact | Threshold |
+| `OiHide(above: large)` hidden at large, visible at expanded | Inverse |
+| `maintainSemantics: true` keeps in semantics tree when hidden | A11y |
+| `replacement` widget shown when hidden | Swap |
+| Breakpoint change toggles visibility | Reactive |
+| Hidden widget not in layout (no space consumed) | No phantom space |
+
+### OiResponsive Context Extension
+
+| Test | What it verifies |
+|------|-----------------|
+| `context.breakpoint` returns correct value | Extension works |
+| `context.responsive(OiResponsive.breakpoints({...}))` resolves | Resolution |
+| `isCompact` / `isLargeOrWider` helpers correct | Boolean helpers |
+
+## Golden Tests
+
+| Golden | Variants |
+|--------|----------|
+| OiGrid: 1-col, 2-col, 4-col layouts | 3 × 2 (light+dark) = 6 |
+| OiGrid: child with columnSpan, columnStart | 1 × 2 = 2 |
+| OiSection: default, aside, compact, collapsed | 4 × 2 = 8 |
+| OiSection: with header/footer actions | 1 × 2 = 2 |
+| OiFlex: horizontal, stacked | 2 × 2 = 4 |
+| OiFieldset: bordered, borderless | 2 × 2 = 4 |
+| OiPage: narrow viewport, wide viewport | 2 × 2 = 4 |
+| **Total** | **30 goldens** |
+
+## Integration Tests
+
+| Test | Scenario |
+|------|----------|
+| **Responsive form reflow** | Set viewport to 500px → all fields stack → resize to 1000px → fields reflow to 2 columns → verify no jank, fields maintain values |
+| **Section collapse + persist** | Collapse section → verify content hidden → navigate away → come back → section still collapsed (driver loaded) |
+| **Flex + resize panel** | Place OiFlex in resizable panel → narrow panel → children stack → widen → children go horizontal → verify smooth |
+| **Container-relative grid** | Grid inside OiSplitPane → drag divider smaller → grid reflows to fewer columns based on own width, not viewport |
+| **Nested grids** | Grid(3-col) > Section(2-col) > children with spans → verify inner grid respects its own column count, not parent's |
+| **Custom breakpoints** | Configure theme with custom breakpoint → use in grid columns → verify layout changes at custom width |
+| **OiShow/OiHide in form** | Form with OiShow(above: medium) wrapping optional field → compact: field hidden, validation skips it → expanded: field visible, validation includes it |
+| **Full page composition** | OiPage > OiFlex > [OiColumn.grow > [OiSection, OiSection], OiColumn.fixed > OiSection] → verify at all 5 breakpoints |
+
+## Performance Tests
+
+| Test | Target |
+|------|--------|
+| OiGrid with 200 children, responsive columns: layout pass | < 4ms |
+| Window resize across breakpoint: rebuild time | < 8ms |
+| Window resize within same breakpoint: zero rebuilds | 0 widget rebuilds verified |
+| OiResponsive.resolve with static value | < 0.001ms (no map lookup) |
+| OiSection collapse animation: frame time | < 16ms (60fps) |
+| Container-relative OiGrid relayout on panel drag | < 16ms per frame |
+| 10 nested OiGrid/OiSection levels: layout pass | < 16ms |
+
+---
+
+# obers_ui — Messaging & Comments Module Specification
+
+> **Date:** 2026-03-16
+> **Extends:** `base_concept.md`
+> **Scope:** Tier 2 additions + Tier 4 modules for chat, comments, threads, and reactions.
+> **Principle:** Every widget below composes from existing obers_ui primitives and components. Zero new rendering primitives.
+
+---
+
+## Table of Contents
+
+- [Overview & Composition Map](#overview--composition-map)
+- [New Tier 2 Components](#new-tier-2-components)
+  - [OiRelativeTime](#oirelativetime)
+  - [OiTimestamp](#oitimestamp)
+  - [OiUnreadIndicator](#oiunreadindicator)
+  - [OiMessageBubble](#oimessagebubble)
+  - [OiReplyPreview](#oireplypreview)
+  - [OiThreadSummary](#oithreadsummary)
+  - [OiReactionPicker](#oireactionpicker)
+  - [OiMessageActions](#oimessageactions)
+  - [OiComposeBar](#oicomposebar)
+- [New Tier 4 Modules](#new-tier-4-modules)
+  - [OiChat (v2 — replaces existing)](#oichat-v2)
+  - [OiThread](#oithread)
+  - [OiComments (v2 — replaces existing)](#oicomments-v2)
+- [Data Models](#data-models)
+- [Theme Extensions](#theme-extensions)
+- [Testing Strategy](#testing-strategy)
+
+---
+
+# Overview & Composition Map
+
+This specification adds **9 Tier 2 components** and **3 Tier 4 modules** to obers_ui. The modules serve two use-cases with the same building blocks:
+
+1. **Chat** — Real-time messaging (Slack, Discord, Teams). Messages flow bottom-to-top, own messages are visually distinct, threads open in a side panel or inline expansion.
+2. **Comments** — Threaded discussion on a document/entity (GitHub, Notion, Figma). Messages flow top-to-bottom, all messages are styled equally, threads are inline-expandable.
+
+Both share the same data model (`OiMessageData`) and compose from the same Tier 2 components. The modules differ only in layout, scroll direction, and styling defaults.
+
+```
+Composition Tree (new widgets marked with ★)
+
+★ OiRelativeTime                   (Tier 2 — display)
+★ OiTimestamp                      (Tier 2 — display, wraps OiRelativeTime)
+★ OiUnreadIndicator                (Tier 2 — display)
+★ OiReplyPreview                   (Tier 2 — display)
+★ OiThreadSummary                  (Tier 2 — display)
+★ OiReactionPicker                 (Tier 2 — feedback)
+★ OiMessageActions                 (Tier 2 — interaction)
+★ OiComposeBar                     (Tier 2 — input)
+★ OiMessageBubble                  (Tier 2 — display)
+   ├── OiAvatar           (existing)
+   ├── OiLabel            (existing)
+   ├── OiTimestamp         ★
+   ├── OiReactionBar      (existing, now delegates picker to ★ OiReactionPicker)
+   ├── OiReplyPreview      ★
+   ├── OiThreadSummary     ★
+   ├── OiMessageActions    ★
+   ├── OiMarkdown         (existing, for rich content)
+   └── OiImage            (existing, for attachments)
+
+OiChat (v2, Tier 4)
+   ├── OiVirtualList       (existing, reverse)
+   ├── OiInfiniteScroll    (existing, top-load)
+   ├── OiMessageBubble     ★
+   ├── OiComposeBar        ★
+   ├── OiTypingIndicator   (existing)
+   ├── OiUnreadIndicator   ★ (separator + badge)
+   ├── OiThread            ★ (side panel or inline)
+   └── OiPanel / OiSheet   (existing, for thread panel)
+
+OiThread (Tier 4)
+   ├── OiVirtualList       (existing)
+   ├── OiMessageBubble     ★ (root message)
+   ├── OiMessageBubble     ★ (replies)
+   ├── OiComposeBar        ★
+   ├── OiTypingIndicator   (existing)
+   └── OiDivider           (existing)
+
+OiComments (v2, Tier 4)
+   ├── OiVirtualList       (existing)
+   ├── OiMessageBubble     ★
+   ├── OiComposeBar        ★
+   ├── OiThread            ★ (inline expansion)
+   ├── OiUnreadIndicator   ★
+   └── OiEmptyState        (existing)
+```
+
+---
+
+# New Tier 2 Components
+
+---
+
+## OiRelativeTime
+
+**What it is:** A text widget that displays a `DateTime` as a human-readable relative string ("just now", "2m ago", "3h ago", "Yesterday at 14:32", "Mar 3, 2026"). Auto-refreshes on a timer so "just now" transitions to "1m ago" without rebuild. This is a pure display primitive — no interactivity.
+
+**Composes:** `OiLabel` (text output)
+
+```dart
+OiRelativeTime({
+  required DateTime dateTime,
+  OiRelativeTimeStyle style = OiRelativeTimeStyle.short,
+  bool capitalize = false,
+  bool live = true,
+  Duration refreshInterval = const Duration(seconds: 30),
+  String Function(DateTime)? formatAbsolute,
+  String? semanticsLabel,
+})
+
+enum OiRelativeTimeStyle {
+  /// "2m", "3h", "1d"
+  narrow,
+  /// "2m ago", "3h ago", "yesterday"
+  short,
+  /// "2 minutes ago", "3 hours ago", "yesterday at 14:32"
+  long,
+}
+```
+
+**Refresh strategy:**
+
+- `live: true` starts an internal `Timer.periodic` that triggers `setState` to recalculate the relative string. Timer is disposed on widget disposal.
+- Refresh interval adapts automatically: every 10s for the first minute, every 30s up to 1 hour, every 5min up to 24h, then stops (date won't change).
+- `live: false` computes once and never updates. Useful for static lists.
+
+**Formatting rules (all localizable):**
+
+| Elapsed | narrow | short | long |
+|---------|--------|-------|------|
+| < 10s | "now" | "just now" | "just now" |
+| < 60s | "30s" | "30s ago" | "30 seconds ago" |
+| < 60m | "5m" | "5m ago" | "5 minutes ago" |
+| < 24h | "3h" | "3h ago" | "3 hours ago" |
+| < 48h | "1d" | "yesterday" | "yesterday at 14:32" |
+| < 7d | "3d" | "3d ago" | "3 days ago" |
+| same year | "Mar 3" | "Mar 3" | "March 3 at 14:32" |
+| other year | "Mar 3 '25" | "Mar 3, 2025" | "March 3, 2025 at 14:32" |
+
+**Accessibility:**
+
+- `semanticsLabel` overrides the announced text. When null, the full `long`-style string is used for semantics regardless of visual style. This ensures screen readers always say "5 minutes ago" even when the visual shows "5m".
+
+**Tests:**
+
+| Test | What it verifies |
+|------|-----------------|
+| Renders "just now" for DateTime.now() | Correct string for < 10s |
+| Renders "5m ago" for 5 minutes past | Short style formatting |
+| Renders "5 minutes ago" for long style | Long style formatting |
+| Renders "5m" for narrow style | Narrow style formatting |
+| Yesterday shows time for long style | "yesterday at 14:32" |
+| Cross-year shows year | "Mar 3, 2025" |
+| live=true auto-updates from "just now" to "1m ago" | Timer triggers rebuild |
+| live=false does not update | No timer created |
+| Timer disposes on widget removal | No leaks, pump(Duration) after dispose |
+| Timer adapts interval | 10s initially, 30s after 1min |
+| capitalize=true uppercases first letter | "Just now" not "just now" |
+| Custom formatAbsolute overrides date format | Callback used for absolute dates |
+| Semantics always uses long form | Screen reader announces "5 minutes ago" even for narrow |
+| Golden: all styles, light + dark | Visual regression |
+
+---
+
+## OiTimestamp
+
+**What it is:** An interactive timestamp that shows relative time by default and reveals absolute time in a tooltip on hover/focus. Intended for messages, comments, and activity feeds.
+
+**Composes:** `OiRelativeTime` (display), `OiTooltip` (absolute time on hover), `OiTappable` (optional tap action)
+
+```dart
+OiTimestamp({
+  required DateTime dateTime,
+  OiRelativeTimeStyle style = OiRelativeTimeStyle.short,
+  bool showTooltip = true,
+  String Function(DateTime)? formatTooltip,
+  VoidCallback? onTap,
+  bool live = true,
+  String? semanticsLabel,
+})
+```
+
+**Behavior:**
+
+- Renders `OiRelativeTime` as visible text.
+- On hover or keyboard focus, an `OiTooltip` appears with the full absolute datetime: `"Monday, March 16, 2026 at 14:32:05"` (or custom via `formatTooltip`).
+- `onTap` is optional — when provided, wraps in `OiTappable` (use-case: jump to message by timestamp in chat).
+- Inherits `live` behavior from `OiRelativeTime`.
+
+**Tests:**
+
+| Test | What it verifies |
+|------|-----------------|
+| Renders relative time text | Correct OiRelativeTime output |
+| Hover shows tooltip with absolute time | Tooltip appears with full date |
+| Focus shows tooltip | Keyboard accessible |
+| onTap fires on click | Callback invoked |
+| No OiTappable wrapper when onTap is null | Clean DOM |
+| Custom formatTooltip used | Callback overrides tooltip text |
+| Semantics: full date announced | Screen reader reads absolute |
+
+---
+
+## OiUnreadIndicator
+
+**What it is:** A visual separator and/or badge indicating unread content. Two modes: (1) as an inline separator in a message list ("3 new messages" divider), (2) as a dot/count badge on an external element (channel name, thread summary).
+
+**Composes:** `OiDivider` (separator mode), `OiLabel` (count text), `OiBadge.count` / `OiBadge.dot` (badge mode), `OiSurface` (separator pill)
+
+```dart
+/// Inline separator — renders as a full-width divider with a centered label.
+OiUnreadIndicator.separator({
+  required int count,
+  String Function(int count)? formatLabel,
+  VoidCallback? onMarkRead,
+  String? semanticsLabel,
+})
+
+/// Badge — renders as a dot or count badge for overlaying on other widgets.
+OiUnreadIndicator.badge({
+  required int count,
+  bool dot = false,
+  bool pulsing = false,
+  OiBadgeColor color = OiBadgeColor.primary,
+})
+```
+
+**Separator behavior:**
+
+- Full-width line (uses `OiDivider`) with a centered pill containing "N new messages" (or `formatLabel(count)`).
+- The pill uses `OiSurface` with the theme's `primary` color (subtle background, bold text).
+- `onMarkRead` renders a small "Mark as read" button on the trailing side.
+- When `count` is 0, the widget renders `SizedBox.shrink()`.
+
+**Badge behavior:**
+
+- Delegates to `OiBadge.count` or `OiBadge.dot` based on `dot` flag.
+- `pulsing` activates `OiPulse` animation on the dot.
+- This is a thin convenience wrapper — consumers who want full badge control can use `OiBadge` directly.
+
+**Accessibility:**
+
+- Separator: `Semantics(liveRegion: true)` so screen readers announce new messages automatically.
+- Badge: `Semantics(label: "$count unread")`.
+
+**Tests:**
+
+| Test | What it verifies |
+|------|-----------------|
+| Separator renders divider with "3 new messages" | Correct layout |
+| count=0 renders nothing | SizedBox.shrink |
+| count=1 says "1 new message" (singular) | Pluralization |
+| Custom formatLabel overrides text | Callback used |
+| onMarkRead shows button | Button renders and fires |
+| Badge shows count | OiBadge.count rendered |
+| Badge dot mode | OiBadge.dot rendered |
+| Pulsing dot animates | OiPulse active |
+| Separator is a live region | Semantics liveRegion=true |
+| Badge announces count | Semantics label present |
+| Golden: separator light + dark | Visual regression |
+| Golden: badge variants | Visual regression |
+
+---
+
+## OiMessageBubble
+
+**What it is:** A single message display widget. The core building block for both chat and comments. Renders sender info, content, timestamp, reactions, reply preview, thread summary, and hover actions. Highly configurable via named constructors for chat vs. comment styling.
+
+**Composes:** `OiAvatar` (sender), `OiLabel` (sender name, content), `OiMarkdown` (when rich content), `OiTimestamp` (time), `OiReactionBar` (reactions), `OiReplyPreview` (quoted reply), `OiThreadSummary` (thread info), `OiMessageActions` (hover toolbar), `OiImage` (attachments), `OiSurface` (bubble background), `OiTappable` (whole message tap)
+
+```dart
+OiMessageBubble({
+  required OiMessageData message,
+  required String currentUserId,
+  OiMessageBubbleStyle style = OiMessageBubbleStyle.bubble,
+  OiMessageBubbleAlignment alignment = OiMessageBubbleAlignment.byAuthor,
+  bool showAvatar = true,
+  bool showSenderName = true,
+  bool showTimestamp = true,
+  bool showReactions = true,
+  bool showThreadSummary = true,
+  OiAvatarSize avatarSize = OiAvatarSize.sm,
+  // Callbacks
+  void Function(OiMessageData message, String emoji)? onReact,
+  void Function(OiMessageData message, String emoji)? onRemoveReact,
+  ValueChanged<OiMessageData>? onReply,
+  ValueChanged<OiMessageData>? onThreadOpen,
+  ValueChanged<OiMessageData>? onEdit,
+  ValueChanged<OiMessageData>? onDelete,
+  ValueChanged<OiMessageData>? onCopy,
+  ValueChanged<OiMessageData>? onReplyPreviewTap,
+  VoidCallback? onTap,
+  // Custom builders
+  Widget Function(OiMessageData)? contentBuilder,
+  List<OiMessageAction>? extraActions,
+  String? semanticsLabel,
+})
+
+/// Chat style: bubbles, own-on-right, others-on-left, colored backgrounds.
+OiMessageBubble.chat({...}) // same params, defaults: style=bubble, alignment=byAuthor
+
+/// Comment style: flat, full-width, no alignment difference, muted background.
+OiMessageBubble.comment({...}) // same params, defaults: style=flat, alignment=start, showAvatar=true
+
+enum OiMessageBubbleStyle {
+  /// Rounded bubble with colored background (chat-like).
+  bubble,
+  /// Flat full-width with subtle border-bottom (comment-like).
+  flat,
+  /// Compact: no background, inline layout (activity-feed-like).
+  compact,
+}
+
+enum OiMessageBubbleAlignment {
+  /// Own messages on end (right in LTR), others on start (left).
+  byAuthor,
+  /// All messages aligned to start.
+  start,
+}
+```
+
+**Layout (bubble style):**
+
+```
+┌─────────────────────────────────────────────────────────┐
+│  ┌──┐  Sender Name · 5m ago                     [···]  │  ← hover shows OiMessageActions
+│  │AV│  ┌──────────────────────────┐                     │
+│  └──┘  │  ▸ Replying to Alice:    │  ← OiReplyPreview   │
+│        │    "Original message..." │                     │
+│        └──────────────────────────┘                     │
+│        Message content goes here.                       │
+│        Could be multiple lines or                       │
+│        rich markdown content.                           │
+│                                                         │
+│        📎 document.pdf (2.4 MB)      ← attachments     │
+│                                                         │
+│        👍 3  ❤️ 1  😂 2  [+]         ← OiReactionBar   │
+│        💬 5 replies · Last reply 2h ago                 │
+│           ┌──┐┌──┐┌──┐              ← OiThreadSummary  │
+│           │A1││A2││A3│                                  │
+│           └──┘└──┘└──┘                                  │
+└─────────────────────────────────────────────────────────┘
+```
+
+**Layout (flat/comment style):**
+
+```
+┌─────────────────────────────────────────────────────────┐
+│  ┌──┐  Sender Name · 5m ago                     [···]  │
+│  │AV│  Message content goes here.                       │
+│  └──┘                                                   │
+│        👍 3  ❤️ 1  [+]                                  │
+│        💬 5 replies                                      │
+├─────────────────────────────────────────────────────────┤  ← OiDivider
+```
+
+**Hover behavior:**
+
+- On mouse hover (desktop), `OiMessageActions` toolbar slides in at the top-right corner of the bubble, overlaying the bubble edge.
+- On long-press (mobile), `OiContextMenu` appears with the same actions.
+- `OiMessageActions` fades in with a 100ms animation. On hover-exit, fades out after 200ms delay (prevents flicker when moving between message and toolbar).
+
+**Own-message styling (when `alignment=byAuthor` and `message.senderId == currentUserId`):**
+
+- Bubble aligned to end (right in LTR).
+- Background uses `colors.primary.s100` (subtle tint).
+- Avatar hidden by default (configurable).
+- Sender name hidden by default (configurable).
+- Actions include "Edit" and "Delete" in addition to standard actions.
+
+**Content rendering:**
+
+- Plain text: `OiLabel` with selectable text.
+- Rich text (`message.richContent != null`): `OiMarkdown` renderer.
+- `contentBuilder` overrides both — full custom rendering.
+- Links are auto-detected and rendered as tappable with underline.
+
+**Accessibility:**
+
+- Each message is a `Semantics` node with: sender name, time, message content.
+- Reactions are announced: "3 thumbs up, 1 heart, 2 laughing".
+- Thread summary: "5 replies, last reply 2 hours ago".
+- Actions accessible via keyboard: Tab focuses the message, Enter opens context menu or first action.
+
+**Tests:**
+
+| Test | What it verifies |
+|------|-----------------|
+| Renders sender name, avatar, content, timestamp | Core layout |
+| Own message aligned right with tinted background | byAuthor alignment |
+| Other message aligned left | byAuthor alignment |
+| Flat style has no bubble, full-width | Comment mode |
+| Compact style has minimal chrome | Activity feed mode |
+| Avatar hidden when showAvatar=false | No OiAvatar rendered |
+| Sender name hidden when showSenderName=false | No name label |
+| Timestamp hidden when showTimestamp=false | No OiTimestamp |
+| Reactions render via OiReactionBar | Reactions visible |
+| onReact fires when reaction tapped | Callback invoked |
+| Reply preview shows when message.replyTo != null | OiReplyPreview visible |
+| onReplyPreviewTap fires on preview tap | Callback invoked |
+| Thread summary shows when message.threadInfo != null | OiThreadSummary visible |
+| onThreadOpen fires on thread summary tap | Callback invoked |
+| Hover shows OiMessageActions toolbar | Desktop hover |
+| Long-press shows context menu | Mobile gesture |
+| onReply fires from action | Callback invoked |
+| onEdit fires from action (own message only) | Callback invoked |
+| onDelete fires from action (own message only) | Callback invoked |
+| onCopy fires from action | Callback invoked |
+| contentBuilder overrides default content | Custom widget rendered |
+| extraActions appear in action menu | Custom actions visible |
+| Rich content renders via OiMarkdown | Markdown parsed |
+| Attachments render with file info | File name + size shown |
+| Image attachments render inline | OiImage displayed |
+| Pending message shows muted style + spinner | Pending state |
+| Failed message shows error style + retry button | Error state |
+| Deleted message shows "[deleted]" placeholder | Deleted state |
+| Edited message shows "(edited)" label | Edited indicator |
+| Links in content are tappable | Auto-link detection |
+| Semantics: full message announced | Screen reader reads all parts |
+| Reduced motion: no hover animation | Instant show/hide |
+| Golden: bubble style, own/other, light + dark | Visual regression |
+| Golden: flat style, light + dark | Visual regression |
+| Golden: compact style, light + dark | Visual regression |
+| Golden: with reactions, thread, reply preview | Visual regression |
+
+---
+
+## OiReplyPreview
+
+**What it is:** A compact preview of a message being replied to. Shows a vertical accent bar, sender name, and a single-line truncation of the original message. Used inside `OiMessageBubble` and inside `OiComposeBar` (when composing a reply).
+
+**Composes:** `OiSurface` (background), `OiLabel` (sender name, content preview), `OiAvatar` (optional small avatar), `OiIconButton` (dismiss in compose mode), `OiTappable` (tap to scroll to original)
+
+```dart
+OiReplyPreview({
+  required String senderName,
+  required String contentPreview,
+  String? senderAvatar,
+  Color? accentColor,
+  bool showAvatar = false,
+  bool dismissible = false,
+  VoidCallback? onDismiss,
+  VoidCallback? onTap,
+  String? semanticsLabel,
+})
+
+/// Convenience: build from an OiMessageData
+OiReplyPreview.fromMessage({
+  required OiMessageData message,
+  bool dismissible = false,
+  VoidCallback? onDismiss,
+  VoidCallback? onTap,
+})
+```
+
+**Layout:**
+
+```
+┌──────────────────────────────────────────┐
+│ ▎ Alice                             [×]  │  ← accent bar (left), dismiss (compose only)
+│ ▎ Original message truncated to one...   │
+└──────────────────────────────────────────┘
+```
+
+- Accent bar is 3px wide, uses `accentColor` or auto-derived from sender name hash.
+- Content preview is single-line with ellipsis overflow.
+- `dismissible=true` shows a close button (used in compose bar to cancel reply).
+- `onTap` scrolls to the original message in the list (handled by parent module).
+
+**Tests:**
+
+| Test | What it verifies |
+|------|-----------------|
+| Renders sender name and truncated content | Core layout |
+| Accent bar visible on left edge | Colored bar |
+| Long content truncates with ellipsis | Overflow handled |
+| onTap fires | Callback invoked |
+| dismissible shows close button | OiIconButton visible |
+| onDismiss fires on close tap | Callback invoked |
+| fromMessage factory extracts data correctly | Convenience constructor |
+| Semantics: "Reply to Alice: message..." | Screen reader |
+| Golden: light + dark, with/without dismiss | Visual regression |
+
+---
+
+## OiThreadSummary
+
+**What it is:** A compact summary of a thread, shown below a root message. Displays reply count, participant avatars (stacked), last reply time, and an unread indicator.
+
+**Composes:** `OiAvatarStack` (participants), `OiLabel` (reply count, last reply time), `OiRelativeTime` (last reply), `OiUnreadIndicator.badge` (unread), `OiTappable` (tap to open thread)
+
+```dart
+OiThreadSummary({
+  required OiThreadInfo threadInfo,
+  VoidCallback? onTap,
+  bool compact = false,
+  String? semanticsLabel,
+})
+
+class OiThreadInfo {
+  final int replyCount;
+  final int unreadCount;
+  final DateTime? lastReplyAt;
+  final List<OiParticipant> participants;
+}
+
+class OiParticipant {
+  final String id;
+  final String name;
+  final String? avatarUrl;
+}
+```
+
+**Layout:**
+
+```
+Default:
+💬 5 replies · ┌──┐┌──┐┌──┐ · Last reply 2h ago  🔵
+               │A1││A2││A3│
+               └──┘└──┘└──┘
+
+Compact:
+💬 5  ┌──┐┌──┐ · 2h ago
+      │A1││A2│
+      └──┘└──┘
+```
+
+- `replyCount` formatted: "1 reply" / "5 replies" / "99+ replies".
+- `participants` shown as `OiAvatarStack` with `maxVisible: 3`, size `xs`.
+- `lastReplyAt` via `OiRelativeTime.short`.
+- `unreadCount > 0` shows `OiUnreadIndicator.badge` at trailing edge.
+- `onTap` opens the thread (callback handled by parent module).
+
+**Tests:**
+
+| Test | What it verifies |
+|------|-----------------|
+| Shows reply count text | "5 replies" |
+| Singular "1 reply" | Pluralization |
+| Shows avatar stack of participants | OiAvatarStack visible |
+| Shows last reply relative time | OiRelativeTime rendered |
+| Unread badge shows when unreadCount > 0 | OiUnreadIndicator.badge visible |
+| No unread badge when unreadCount == 0 | Nothing rendered |
+| onTap fires | Callback invoked |
+| Compact mode renders smaller | Reduced layout |
+| Semantics: "5 replies, 2 unread, last reply 2 hours ago" | Screen reader |
+| Golden: default + compact, light + dark | Visual regression |
+
+---
+
+## OiReactionPicker
+
+**What it is:** A quick-access emoji picker that appears on hover or tap of a reaction "+" button. Shows a row of frequently-used emojis with a "more" button that opens the full `OiEmojiPicker`.
+
+**Composes:** `OiPopover` (container), `OiTappable` (each quick emoji), `OiEmojiPicker` (full picker), `OiLabel` (emoji display), `OiIconButton` (trigger "+" button)
+
+```dart
+OiReactionPicker({
+  required ValueChanged<String> onSelect,
+  List<String> quickEmojis = const ['👍', '❤️', '😂', '😮', '😢', '🎉'],
+  bool showFullPicker = true,
+  Widget? trigger,
+  String? semanticsLabel,
+})
+```
+
+**Behavior:**
+
+- Default trigger is `OiIconButton` with a "+" or smiley icon.
+- On tap/click, a `OiPopover` appears with a single row of `quickEmojis`.
+- Each emoji is an `OiTappable` with hover scale animation (1.0 → 1.3).
+- If `showFullPicker`, a "..." or "more" button at the end opens `OiEmojiPicker` in the same popover.
+- Selecting any emoji fires `onSelect` and closes the popover.
+
+**Tests:**
+
+| Test | What it verifies |
+|------|-----------------|
+| Tap trigger opens popover | Popover visible |
+| Quick emojis render in row | 6 emojis displayed |
+| Tap emoji fires onSelect with emoji string | Callback invoked |
+| Popover closes after selection | Popover hidden |
+| "More" button opens full OiEmojiPicker | Picker visible |
+| Selecting from full picker fires onSelect | Callback invoked |
+| Custom quickEmojis list | Provided emojis shown |
+| Custom trigger widget | Replaces default button |
+| Hover scales emoji up | Animation plays |
+| Keyboard: arrows navigate, Enter selects | Keyboard accessible |
+| Semantics: "Add reaction" on trigger | Screen reader |
+| Golden: popover open, light + dark | Visual regression |
+
+---
+
+## OiMessageActions
+
+**What it is:** A floating toolbar that appears on message hover (desktop) or via long-press (mobile). Contains icon buttons for common message actions: react, reply, thread, edit, delete, copy, and custom actions.
+
+**Composes:** `OiSurface` (toolbar background), `OiIconButton` (each action), `OiTooltip` (action labels), `OiReactionPicker` (inline quick reactions)
+
+```dart
+OiMessageActions({
+  required OiMessageData message,
+  required String currentUserId,
+  void Function(String emoji)? onReact,
+  VoidCallback? onReply,
+  VoidCallback? onThreadOpen,
+  VoidCallback? onEdit,
+  VoidCallback? onDelete,
+  VoidCallback? onCopy,
+  VoidCallback? onPin,
+  VoidCallback? onBookmark,
+  List<OiMessageAction>? extraActions,
+  OiMessageActionsLayout layout = OiMessageActionsLayout.horizontal,
+})
+
+class OiMessageAction {
+  final String label;
+  final IconData icon;
+  final VoidCallback onTap;
+  final bool destructive;
+}
+
+enum OiMessageActionsLayout {
+  /// Icon buttons in a horizontal row (desktop hover toolbar).
+  horizontal,
+  /// Vertical list items (mobile context menu / long-press).
+  vertical,
+}
+```
+
+**Behavior:**
+
+- Horizontal layout: Renders as a compact row of `OiIconButton` widgets inside an `OiSurface` with elevation. Each button has an `OiTooltip`.
+- Vertical layout: Renders as a list of labeled rows (icon + text) for context menu use.
+- **Visibility rules by action:**
+  - React, Reply, Copy, Pin, Bookmark: always shown (when callback provided).
+  - Thread: shown when callback provided.
+  - Edit: shown only when `message.senderId == currentUserId` and `onEdit != null`.
+  - Delete: shown only when `message.senderId == currentUserId` and `onDelete != null`, styled as destructive (red).
+- `onReact` integrates `OiReactionPicker` inline — the first button is a smiley that opens the picker.
+
+**Tests:**
+
+| Test | What it verifies |
+|------|-----------------|
+| Horizontal layout renders icon buttons | Correct layout |
+| Vertical layout renders labeled rows | Context menu style |
+| React button opens OiReactionPicker | Picker appears |
+| Reply button fires onReply | Callback invoked |
+| Edit hidden for non-own messages | Not rendered |
+| Edit shown for own messages | Rendered |
+| Delete styled as destructive | Red color |
+| Extra actions appended | Custom actions visible |
+| Tooltips show on hover | OiTooltip visible |
+| Keyboard: Tab through actions | Focus management |
+| Semantics: actions announced | Screen reader |
+| Golden: horizontal + vertical, light + dark | Visual regression |
+
+---
+
+## OiComposeBar
+
+**What it is:** A message input bar with text input, send button, attachment button, emoji picker, reply preview, and optional rich text. Used in both chat and comments.
+
+**Composes:** `OiTextInput` or `OiRichEditor` (input field), `OiIconButton` (send, attach, emoji), `OiReplyPreview` (when replying), `OiReactionPicker` (emoji insertion), `OiFileInput` (attachment picker), `OiSurface` (bar background)
+
+```dart
+OiComposeBar({
+  required String label,
+  ValueChanged<String>? onSend,
+  ValueChanged<OiComposePayload>? onSendRich,
+  bool enableAttachments = true,
+  bool enableEmoji = true,
+  bool enableRichText = false,
+  bool enableMentions = false,
+  String placeholder = 'Write a message...',
+  int maxLines = 5,
+  OiMessageData? replyingTo,
+  VoidCallback? onCancelReply,
+  ValueChanged<List<OiFileData>>? onAttach,
+  List<String>? allowedFileExtensions,
+  int? maxFileSize,
+  bool autofocus = false,
+  bool disabled = false,
+  Widget? leading,
+  Widget? trailing,
+})
+
+class OiComposePayload {
+  final String text;
+  final String? richContent;
+  final List<OiFileData> attachments;
+  final OiMessageData? replyTo;
+  final List<String> mentionedUserIds;
+}
+```
+
+**Layout:**
+
+```
+┌──────────────────────────────────────────────────────────┐
+│  ▎ Replying to Alice                               [×]  │  ← OiReplyPreview (when replyingTo != null)
+│  ▎ Original message text...                              │
+├──────────────────────────────────────────────────────────┤
+│  📎  😀  │  Type a message...                       ➤   │
+│          │                                               │
+│          │                                          ➤   │
+└──────────────────────────────────────────────────────────┘
+     ↑         ↑                                      ↑
+  attach    emoji                                   send
+```
+
+**Behavior:**
+
+- Send button is disabled when text is empty and no attachments are present.
+- Send button becomes active (primary color) when content is available.
+- **Enter** sends (unless Shift+Enter for newline when `maxLines > 1`).
+- When `replyingTo` is set, `OiReplyPreview` appears above the input with `dismissible: true`.
+- `onCancelReply` fires when the reply preview is dismissed.
+- Emoji button opens `OiReactionPicker` which inserts the emoji at cursor position.
+- Attachment button opens file picker; selected files show as small chips below the input.
+- `enableMentions` activates `@` mention suggestions via `OiSmartInput` patterns.
+- Input auto-grows up to `maxLines`, then scrolls.
+- `onSend` fires with plain text. `onSendRich` fires with full payload including attachments and reply reference.
+
+**Accessibility:**
+
+- Label is required for the input field's semantics.
+- Send button has `Semantics(label: "Send message")`.
+- Attach button: `Semantics(label: "Attach file")`.
+- Emoji button: `Semantics(label: "Insert emoji")`.
+
+**Tests:**
+
+| Test | What it verifies |
+|------|-----------------|
+| Renders input field with placeholder | Core layout |
+| Send button disabled when empty | Disabled state |
+| Send button enabled when text present | Active state |
+| Enter key fires onSend | Keyboard send |
+| Shift+Enter inserts newline | Multiline support |
+| onSend receives trimmed text | Whitespace handling |
+| Input clears after send | Reset state |
+| Reply preview shows when replyingTo set | OiReplyPreview visible |
+| Dismiss reply preview fires onCancelReply | Callback invoked |
+| Emoji button opens picker | OiReactionPicker visible |
+| Emoji inserts at cursor | Text contains emoji |
+| Attach button opens file picker | File picker triggered |
+| Selected files show as chips | Chip list visible |
+| Remove file chip removes attachment | Chip removed |
+| onSendRich includes attachments and replyTo | Full payload |
+| Rich text mode renders OiRichEditor | Editor visible |
+| Mention support shows suggestions | Popover with names |
+| Auto-grow up to maxLines | Height increases |
+| Scrolls after maxLines | Scrollable |
+| disabled=true prevents all input | Disabled state |
+| autofocus=true focuses on mount | Input focused |
+| Semantics: all buttons labeled | Screen reader |
+| Golden: empty, typing, with reply, with attachments | Visual regression |
+
+---
+
+# New Tier 4 Modules
+
+---
+
+## OiChat (v2)
+
+**What it is:** A complete chat/messaging interface. Replaces the existing `OiChat` module from the base concept with full threading, reply-to, reactions, unread indicators, and configurable layout.
+
+**Composes:** `OiVirtualList` (messages, reverse scroll), `OiInfiniteScroll` (load older messages), `OiMessageBubble.chat` (each message), `OiComposeBar` (input), `OiTypingIndicator` (typing status), `OiUnreadIndicator.separator` (new message divider), `OiThread` (thread panel/expansion), `OiPanel` or `OiSheet` (thread container), `OiSurface` (background)
+
+```dart
+OiChat({
+  required List<OiMessageData> messages,
+  required String currentUserId,
+  required String label,
+  // Send
+  ValueChanged<String>? onSend,
+  ValueChanged<OiComposePayload>? onSendRich,
+  // Reactions
+  void Function(OiMessageData, String emoji)? onReact,
+  void Function(OiMessageData, String emoji)? onRemoveReact,
+  // Threading
+  void Function(OiMessageData parent, String reply)? onThreadReply,
+  ValueChanged<OiMessageData>? onThreadOpen,
+  OiChatThreadMode threadMode = OiChatThreadMode.panel,
+  // Message actions
+  ValueChanged<OiMessageData>? onEdit,
+  ValueChanged<OiMessageData>? onDelete,
+  // Loading
+  VoidCallback? onLoadOlder,
+  bool hasOlderMessages = false,
+  bool loadingOlder = false,
+  // Unread
+  int? unreadSeparatorIndex,
+  VoidCallback? onMarkAllRead,
+  // Presence
+  List<String>? typingUsers,
+  List<OiParticipant>? typingUserDetails,
+  // Display options
+  bool showAvatars = true,
+  bool showTimestamps = true,
+  bool enableReactions = true,
+  bool enableAttachments = true,
+  bool enableRichText = false,
+  bool enableThreads = true,
+  bool groupConsecutive = true,
+  Duration consecutiveThreshold = const Duration(minutes: 2),
+  // Attachments
+  ValueChanged<List<OiFileData>>? onAttach,
+  List<String>? allowedFileExtensions,
+  // Compose
+  String composePlaceholder = 'Write a message...',
+  bool composeAutofocus = false,
+  // Builders
+  Widget Function(OiMessageData)? messageBuilder,
+  Widget Function(DateTime)? dateSeparatorBuilder,
+})
+
+enum OiChatThreadMode {
+  /// Thread opens in a side panel (like Slack).
+  panel,
+  /// Thread expands inline below the message (like Discord).
+  inline,
+  /// No threading — replies are flat in the main channel.
+  disabled,
+}
+```
+
+**Layout:**
+
+```
+┌──────────────────────────────────────────────────────────┐
+│  Chat: #general                                          │
+│                                                          │
+│  ─────── March 15, 2026 ───────                          │  ← date separator
+│                                                          │
+│  ┌──┐ Alice · 2:30 PM                                   │
+│  │AV│ Hey everyone!                                      │
+│  └──┘ 👍 2  💬 3 replies                                 │
+│                                                          │
+│       Did you see the new designs?                       │  ← grouped (same sender, < 2min)
+│                                                          │
+│  ─────── 3 new messages ───────                          │  ← OiUnreadIndicator.separator
+│                                                          │
+│  ┌──┐ Bob · 2:45 PM                                     │
+│  │AV│ ▸ Replying to Alice                                │  ← OiReplyPreview
+│  └──┘   "Hey everyone!"                                  │
+│       Looks great!                                       │
+│                                                          │
+│                                    I agree! ┌──┐         │  ← own message (right-aligned)
+│                                             │ME│         │
+│                                             └──┘         │
+│                                                          │
+│  Alice is typing...                                      │  ← OiTypingIndicator
+├──────────────────────────────────────────────────────────┤
+│  📎  😀  │  Write a message...                      ➤   │  ← OiComposeBar
+└──────────────────────────────────────────────────────────┘
+```
+
+**Thread panel mode (Slack-like):**
+
+```
+┌────────────────────────────┬────────────────────────────┐
+│  Main Channel              │  Thread                    │
+│                            │                            │
+│  messages...               │  ┌──┐ Alice · 2:30 PM     │  ← root message
+│                            │  │AV│ Hey everyone!        │
+│                            │  └──┘                      │
+│                            │  ─────────────────         │
+│                            │  ┌──┐ Bob · 2:45 PM       │  ← replies
+│                            │  │AV│ Looks great!         │
+│                            │  └──┘                      │
+│                            │  ┌──┐ Carol · 2:50 PM     │
+│                            │  │AV│ +1                   │
+│                            │  └──┘                      │
+│                            ├────────────────────────────┤
+│                            │  Reply in thread...   ➤   │
+│ ──────────────────         │                            │
+│  📎 😀 │ Message...   ➤   │                            │
+└────────────────────────────┴────────────────────────────┘
+```
+
+**Consecutive message grouping:**
+
+- When `groupConsecutive=true`, consecutive messages from the same sender within `consecutiveThreshold` are grouped.
+- First message in a group shows avatar and sender name.
+- Subsequent messages show only content (no avatar, no name), with reduced top spacing.
+- Timestamp shows on hover for grouped messages.
+
+**Date separators:**
+
+- Automatically inserted between messages on different calendar days.
+- Format: "Today", "Yesterday", "March 15, 2026".
+- `dateSeparatorBuilder` overrides the default.
+
+**Unread separator:**
+
+- When `unreadSeparatorIndex` is set, an `OiUnreadIndicator.separator` is inserted at that position.
+- Count is `messages.length - unreadSeparatorIndex`.
+- `onMarkAllRead` button appears on the separator.
+
+**Scroll behavior:**
+
+- Reverse virtual list — newest messages at bottom, scroll up for history.
+- Auto-scrolls to bottom on new message if user is already at bottom.
+- If user has scrolled up, a "↓ N new messages" floating badge appears at bottom.
+- `onLoadOlder` fires when scrolling to top (via `OiInfiniteScroll`).
+- `loadingOlder` shows a shimmer/spinner at the top.
+
+**Reply flow:**
+
+1. User clicks "Reply" action on a message.
+2. `OiComposeBar` enters reply mode: `OiReplyPreview` appears above input.
+3. User types and sends. `onSendRich` payload includes `replyTo`.
+4. Reply preview dismissible via close button (fires `onCancelReply` internally, clears state).
+
+**Thread flow (panel mode):**
+
+1. User clicks thread summary or "Thread" action.
+2. `OiPanel` slides in from the right with `OiThread` inside.
+3. Thread has its own `OiComposeBar`.
+4. `onThreadReply` fires when user sends a reply in the thread.
+5. Panel can be dismissed (fires no callback — state managed by consumer or internally).
+
+**Thread flow (inline mode):**
+
+1. User clicks thread summary.
+2. Thread expands inline below the root message with indented replies.
+3. A compact `OiComposeBar` appears at the bottom of the expanded thread.
+4. `onThreadReply` fires on send.
+5. Clicking again collapses.
+
+**Tests:**
+
+| Test | What it verifies |
+|------|-----------------|
+| Messages render in order (newest at bottom) | Reverse list |
+| Own messages aligned right | byAuthor alignment |
+| Other messages aligned left | byAuthor alignment |
+| Avatars show when showAvatars=true | OiAvatar visible |
+| Timestamps show when showTimestamps=true | OiTimestamp visible |
+| Consecutive messages from same sender grouped | Reduced chrome on subsequent |
+| Grouped messages show timestamp on hover | Hover reveals time |
+| Date separator between different days | Separator visible |
+| "Today" / "Yesterday" labels correct | Date formatting |
+| Unread separator at correct index | OiUnreadIndicator.separator visible |
+| Unread count correct | "3 new messages" |
+| Mark all read button fires callback | onMarkAllRead invoked |
+| Typing indicator shows typing users | OiTypingIndicator visible |
+| Send button fires onSend | Callback invoked |
+| Reply action puts compose bar in reply mode | OiReplyPreview appears |
+| Cancel reply clears reply state | Preview dismissed |
+| Sent reply includes replyTo in payload | Correct data |
+| Reply preview shows on message with replyTo | OiReplyPreview in bubble |
+| Tap reply preview scrolls to original (if visible) | Scroll animation |
+| Reactions show on messages | OiReactionBar visible |
+| React fires onReact with message + emoji | Callback invoked |
+| Thread summary shows on messages with threads | OiThreadSummary visible |
+| Thread summary tap opens panel (panel mode) | OiPanel slides in |
+| Thread panel renders root message + replies | Full thread |
+| Thread compose bar fires onThreadReply | Callback invoked |
+| Thread inline mode expands below message | Indented replies |
+| Thread inline collapse | Replies hidden |
+| Scroll to bottom on new message (when at bottom) | Auto-scroll |
+| "N new messages" badge when scrolled up | Floating badge |
+| Tap floating badge scrolls to bottom | Scroll animation |
+| onLoadOlder fires when scrolling to top | Callback invoked |
+| loadingOlder shows spinner | Loading state |
+| hasOlderMessages=false hides load trigger | No trigger |
+| Attachments in compose bar | File chips visible |
+| Edit action on own message fires onEdit | Callback invoked |
+| Delete action on own message fires onDelete | Callback invoked |
+| messageBuilder overrides default bubble | Custom widget |
+| dateSeparatorBuilder overrides default | Custom separator |
+| Keyboard: Enter sends, Shift+Enter newline | Keyboard handling |
+| Keyboard: Tab navigates messages | Focus management |
+| Semantics: message list labeled | Screen reader |
+| Semantics: live region for new messages | Announced automatically |
+| Performance: 10,000 messages, <16ms frame | Virtual list perf |
+| Golden: full chat, light + dark | Visual regression |
+
+---
+
+## OiThread
+
+**What it is:** A standalone thread view. Shows a root message, a divider, then a list of reply messages with its own compose bar. Can be embedded in an `OiPanel` (for chat thread panels) or rendered inline (for comment threads).
+
+**Composes:** `OiMessageBubble` (root + replies), `OiVirtualList` (reply list), `OiComposeBar` (reply input), `OiDivider` (separator), `OiTypingIndicator`, `OiLabel` (reply count header)
+
+```dart
+OiThread({
+  required OiMessageData rootMessage,
+  required List<OiMessageData> replies,
+  required String currentUserId,
+  required String label,
+  ValueChanged<String>? onReply,
+  ValueChanged<OiComposePayload>? onReplyRich,
+  void Function(OiMessageData, String emoji)? onReact,
+  void Function(OiMessageData, String emoji)? onRemoveReact,
+  ValueChanged<OiMessageData>? onEdit,
+  ValueChanged<OiMessageData>? onDelete,
+  List<String>? typingUsers,
+  VoidCallback? onClose,
+  bool showCloseButton = true,
+  OiMessageBubbleStyle messageStyle = OiMessageBubbleStyle.flat,
+  bool enableReactions = true,
+  bool enableAttachments = true,
+  String composePlaceholder = 'Reply in thread...',
+  VoidCallback? onLoadOlderReplies,
+  bool hasOlderReplies = false,
+})
+```
+
+**Layout:**
+
+```
+┌──────────────────────────────────────────────┐
+│  Thread                                 [×]  │  ← header with close button
+├──────────────────────────────────────────────┤
+│  ┌──┐ Alice · 2:30 PM                       │  ← root message (emphasized)
+│  │AV│ Hey everyone! Check out the new        │
+│  └──┘ designs for the landing page.          │
+│       👍 3  ❤️ 1                              │
+├──────────────────────────────────────────────┤  ← divider
+│  5 replies                                   │  ← reply count header
+│                                              │
+│  ┌──┐ Bob · 2:45 PM                         │
+│  │AV│ Looks great!                           │
+│  └──┘                                        │
+│                                              │
+│  ┌──┐ Carol · 2:50 PM                       │
+│  │AV│ Love the color palette.                │
+│  └──┘ 👍 1                                    │
+│                                              │
+│  Bob is typing...                            │
+├──────────────────────────────────────────────┤
+│  Reply in thread...                     ➤    │  ← OiComposeBar
+└──────────────────────────────────────────────┘
+```
+
+**Behavior:**
+
+- Root message is rendered with `OiMessageBubble` but with a slightly larger/emphasized style (thicker border or subtle background).
+- Replies are `OiMessageBubble` in flat style by default (no bubble alignment — all start-aligned).
+- Reply count header updates reactively.
+- `onClose` and close button are for panel usage. When embedded inline, set `showCloseButton: false`.
+- Supports all message interactions: reactions, edit (own), delete (own), copy.
+- Does NOT support nested threads (replies to replies). All replies are flat within the thread.
+
+**Tests:**
+
+| Test | What it verifies |
+|------|-----------------|
+| Root message renders with emphasis | Emphasized style |
+| Replies render below divider | Correct order |
+| Reply count header accurate | "5 replies" |
+| onReply fires on compose send | Callback invoked |
+| Reply added to list | New message visible |
+| Close button fires onClose | Callback invoked |
+| showCloseButton=false hides it | Not rendered |
+| Reactions on root and replies | OiReactionBar visible |
+| Edit/delete on own replies | Actions available |
+| Typing indicator in thread | OiTypingIndicator visible |
+| Load older replies | OiInfiniteScroll |
+| Semantics: thread labeled | Screen reader |
+| Golden: thread panel, light + dark | Visual regression |
+
+---
+
+## OiComments (v2)
+
+**What it is:** A threaded comment system for documents, issues, posts, or any entity. Comments flow top-to-bottom. Each top-level comment can have an expandable thread. Replaces the existing `OiComments` stub from the base concept.
+
+**Composes:** `OiVirtualList` (comment list), `OiMessageBubble.comment` (each comment), `OiThread` (inline thread expansion), `OiComposeBar` (new comment input), `OiUnreadIndicator` (unread comments), `OiEmptyState` (no comments)
+
+```dart
+OiComments({
+  required List<OiCommentThread> threads,
+  required String currentUserId,
+  required String label,
+  // Actions
+  ValueChanged<String>? onComment,
+  ValueChanged<OiComposePayload>? onCommentRich,
+  void Function(OiCommentThread thread, String reply)? onReply,
+  void Function(OiMessageData, String emoji)? onReact,
+  void Function(OiMessageData, String emoji)? onRemoveReact,
+  ValueChanged<OiMessageData>? onEdit,
+  ValueChanged<OiMessageData>? onDelete,
+  // Display
+  bool enableReactions = true,
+  bool enableRichText = false,
+  bool enableAttachments = false,
+  bool autoExpandThreads = false,
+  int previewReplyCount = 2,
+  // Sorting
+  OiCommentSort sortBy = OiCommentSort.newest,
+  ValueChanged<OiCommentSort>? onSortChange,
+  // Unread
+  int? unreadCount,
+  VoidCallback? onMarkAllRead,
+  // Loading
+  VoidCallback? onLoadMore,
+  bool hasMore = false,
+  bool loading = false,
+  // Empty
+  String emptyTitle = 'No comments yet',
+  String emptyDescription = 'Be the first to share your thoughts.',
+  // Builders
+  Widget Function(OiMessageData)? commentBuilder,
+  String composePlaceholder = 'Write a comment...',
+})
+
+class OiCommentThread {
+  final OiMessageData rootComment;
+  final List<OiMessageData> replies;
+  final OiThreadInfo threadInfo;
+  final bool expanded;
+}
+
+enum OiCommentSort { newest, oldest, mostReacted }
+```
+
+**Layout:**
+
+```
+┌──────────────────────────────────────────────────────────┐
+│  Comments (12)                    Sort: Newest ▾   🔵 3  │  ← header, sort, unread badge
+├──────────────────────────────────────────────────────────┤
+│                                                          │
+│  ┌──┐ Alice · 5h ago                             [···]  │
+│  │AV│ This looks amazing! Great work on the hover        │
+│  └──┘ states and transitions.                            │
+│       👍 5  ❤️ 2  [+]                                    │
+│       💬 3 replies · ┌──┐┌──┐ · 2h ago                   │  ← OiThreadSummary
+│                      │B ││C │                            │
+│                      └──┘└──┘                            │
+│                                                          │
+│  ┌──┐ Bob · 3h ago                               [···]  │
+│  │AV│ I think the border radius should be smaller        │
+│  └──┘ on the cards. What do you think?                   │
+│       💬 7 replies · ┌──┐┌──┐┌──┐ · 30m ago  🔵          │  ← unread in thread
+│                      │A ││C ││D │                        │
+│                      └──┘└──┘└──┘                        │
+│                                                          │
+│  ┌──┐ Carol · 1h ago                             [···]  │  ← NEW (unread)
+│  │AV│ @Bob Agreed, maybe 8px instead of 12px?            │
+│  └──┘                                                    │
+│                                                          │
+├──────────────────────────────────────────────────────────┤
+│  Write a comment...                                 ➤    │  ← OiComposeBar
+└──────────────────────────────────────────────────────────┘
+```
+
+**Expanded thread (inline):**
+
+```
+│  ┌──┐ Alice · 5h ago                                    │
+│  │AV│ This looks amazing!                                │
+│  └──┘ 👍 5  ❤️ 2  [+]                                    │
+│       ┌ 3 replies ─────────────────── [collapse] ────┐   │
+│       │  ┌──┐ Bob · 4h ago                           │   │
+│       │  │AV│ Thanks! The hover states were tricky.   │   │
+│       │  └──┘                                        │   │
+│       │  ┌──┐ Carol · 3h ago                         │   │
+│       │  │AV│ The transitions are smooth.             │   │
+│       │  └──┘ 👍 1                                    │   │
+│       │  ┌──┐ Alice · 2h ago                         │   │
+│       │  │AV│ Glad you like them!                     │   │
+│       │  └──┘                                        │   │
+│       ├──────────────────────────────────────────────┤   │
+│       │  Reply...                                ➤   │   │
+│       └──────────────────────────────────────────────┘   │
+```
+
+**Thread expansion:**
+
+- Clicking `OiThreadSummary` expands the thread inline.
+- `autoExpandThreads` expands all threads on render.
+- `previewReplyCount` shows the last N replies when collapsed (0 = show only summary, never preview).
+- Expanded thread renders via `OiThread` with `showCloseButton: false` and `messageStyle: flat`.
+- A "Collapse" button appears in the expanded header.
+
+**Sort:**
+
+- `sortBy` controls root-level comment order.
+- `onSortChange` fires when the sort dropdown changes. Consumer re-sorts and provides new `threads` list.
+- Thread replies are always chronological (oldest first).
+
+**Unread indicators:**
+
+- Top-level `unreadCount` badge in the header.
+- Per-thread unread badge on `OiThreadSummary` (via `OiThreadInfo.unreadCount`).
+- New (unread) comments can have a subtle highlight background (via `OiMessageData.unread`).
+- `onMarkAllRead` button in header (when `unreadCount > 0`).
+
+**Empty state:**
+
+- When `threads` is empty, renders `OiEmptyState` with `emptyTitle` and `emptyDescription`.
+- Compose bar still visible below empty state.
+
+**Tests:**
+
+| Test | What it verifies |
+|------|-----------------|
+| Comments render top-to-bottom | Correct order |
+| All comments use flat/comment bubble style | No chat-style alignment |
+| Thread summary shows on comments with replies | OiThreadSummary visible |
+| Thread summary tap expands inline | Thread visible |
+| Expanded thread shows all replies | Replies rendered |
+| Expanded thread has its own compose bar | OiComposeBar visible |
+| onReply fires on thread reply send | Callback invoked |
+| Collapse button hides thread | Thread hidden |
+| autoExpandThreads=true expands all | All threads open |
+| previewReplyCount shows last N collapsed | Preview replies visible |
+| Sort dropdown changes order | onSortChange fires |
+| Newest sort: most recent first | Correct order |
+| Oldest sort: oldest first | Correct order |
+| mostReacted sort: highest reaction count first | Correct order |
+| Unread count badge in header | Badge visible |
+| Per-thread unread badge | OiUnreadIndicator.badge on summary |
+| Unread comment has highlight background | Subtle tint |
+| Mark all read button fires callback | onMarkAllRead invoked |
+| New comment fires onComment | Callback invoked |
+| onCommentRich includes full payload | Rich payload |
+| Reactions on comments | OiReactionBar visible |
+| Edit/delete on own comments | Actions visible |
+| Empty state when no comments | OiEmptyState visible |
+| Compose bar visible below empty state | Input available |
+| loading=true shows skeleton | Loading state |
+| Load more button fires onLoadMore | Callback invoked |
+| commentBuilder overrides default | Custom widget |
+| Keyboard: Tab through comments, actions | Focus management |
+| Semantics: comment list labeled | Screen reader |
+| Semantics: unread announced as live region | Announced |
+| Performance: 5,000 comments with threads, <16ms | Virtual list perf |
+| Golden: comments with threads, light + dark | Visual regression |
+| Golden: empty state, light + dark | Visual regression |
+
+---
+
+# Data Models
+
+All models are immutable (`@immutable` annotation). Constructors use `const` where possible.
+
+```dart
+@immutable
+class OiMessageData {
+  const OiMessageData({
+    required this.id,
+    required this.senderId,
+    required this.senderName,
+    required this.content,
+    required this.timestamp,
+    this.senderAvatar,
+    this.richContent,
+    this.reactions = const [],
+    this.attachments = const [],
+    this.replyTo,
+    this.threadInfo,
+    this.status = OiMessageStatus.sent,
+    this.editedAt,
+    this.unread = false,
+    this.metadata,
+  });
+
+  /// Unique identifier for this message.
+  final Object id;
+
+  /// ID of the sender. Compared with `currentUserId` to determine own messages.
+  final String senderId;
+
+  /// Display name of the sender.
+  final String senderName;
+
+  /// Avatar URL of the sender. Falls back to initials derived from `senderName`.
+  final String? senderAvatar;
+
+  /// Plain text content. Always present even when `richContent` is set (used for
+  /// previews, search, accessibility).
+  final String content;
+
+  /// Optional rich/markdown content. When present, rendered via `OiMarkdown`.
+  /// `content` still holds the plain-text fallback.
+  final String? richContent;
+
+  /// When this message was created.
+  final DateTime timestamp;
+
+  /// When this message was last edited. Shows "(edited)" indicator when non-null.
+  final DateTime? editedAt;
+
+  /// Reactions on this message.
+  final List<OiReactionData> reactions;
+
+  /// File attachments.
+  final List<OiFileData> attachments;
+
+  /// If this message is a reply, the message being replied to.
+  /// Used to render `OiReplyPreview`.
+  final OiReplyToData? replyTo;
+
+  /// Thread info. When non-null, indicates this message is a thread root
+  /// and shows `OiThreadSummary`.
+  final OiThreadInfo? threadInfo;
+
+  /// Message delivery status.
+  final OiMessageStatus status;
+
+  /// Whether this message is unread by the current user.
+  final bool unread;
+
+  /// Arbitrary metadata for consumer use (e.g., message type, custom data).
+  final Map<String, dynamic>? metadata;
+
+  /// Returns true if `senderId` matches the provided `currentUserId`.
+  bool isOwn(String currentUserId) => senderId == currentUserId;
+
+  /// Creates a copy with the specified fields overridden.
+  OiMessageData copyWith({...});
+}
+
+enum OiMessageStatus {
+  /// Message is being sent (optimistic UI).
+  pending,
+  /// Message was sent and confirmed by the server.
+  sent,
+  /// Message failed to send.
+  failed,
+  /// Message was deleted.
+  deleted,
+}
+
+@immutable
+class OiReplyToData {
+  const OiReplyToData({
+    required this.messageId,
+    required this.senderName,
+    required this.contentPreview,
+    this.senderAvatar,
+  });
+
+  final Object messageId;
+  final String senderName;
+  /// Truncated preview of the original message (max ~100 chars).
+  final String contentPreview;
+  final String? senderAvatar;
+}
+
+@immutable
+class OiThreadInfo {
+  const OiThreadInfo({
+    required this.replyCount,
+    this.unreadCount = 0,
+    this.lastReplyAt,
+    this.participants = const [],
+  });
+
+  final int replyCount;
+  final int unreadCount;
+  final DateTime? lastReplyAt;
+  final List<OiParticipant> participants;
+}
+
+@immutable
+class OiParticipant {
+  const OiParticipant({
+    required this.id,
+    required this.name,
+    this.avatarUrl,
+  });
+
+  final String id;
+  final String name;
+  final String? avatarUrl;
+}
+
+@immutable
+class OiComposePayload {
+  const OiComposePayload({
+    required this.text,
+    this.richContent,
+    this.attachments = const [],
+    this.replyTo,
+    this.mentionedUserIds = const [],
+  });
+
+  final String text;
+  final String? richContent;
+  final List<OiFileData> attachments;
+  final OiReplyToData? replyTo;
+  final List<String> mentionedUserIds;
+}
+```
+
+---
+
+# Theme Extensions
+
+Add to `OiComponentThemes`:
+
+```dart
+class OiComponentThemes {
+  // ... existing fields ...
+
+  final OiMessageBubbleThemeData? messageBubble;
+  final OiComposeBarThemeData? composeBar;
+  final OiThreadThemeData? thread;
+  final OiTimestampThemeData? timestamp;
+  final OiUnreadIndicatorThemeData? unreadIndicator;
+}
+
+@immutable
+class OiMessageBubbleThemeData {
+  const OiMessageBubbleThemeData({
+    this.ownBubbleColor,
+    this.otherBubbleColor,
+    this.ownTextColor,
+    this.otherTextColor,
+    this.bubbleRadius,
+    this.bubblePadding,
+    this.senderNameStyle,
+    this.contentTextStyle,
+    this.hoverActionsElevation,
+    this.groupedSpacing,
+    this.ungroupedSpacing,
+  });
+
+  /// Background color for own messages. Defaults to `colors.primary.s100`.
+  final Color? ownBubbleColor;
+  /// Background color for other messages. Defaults to `colors.surface.s200`.
+  final Color? otherBubbleColor;
+  final Color? ownTextColor;
+  final Color? otherTextColor;
+  /// Border radius for bubbles. Defaults to `radius.lg`.
+  final BorderRadius? bubbleRadius;
+  final EdgeInsets? bubblePadding;
+  final TextStyle? senderNameStyle;
+  final TextStyle? contentTextStyle;
+  /// Elevation of the hover actions toolbar. Defaults to `shadow.sm`.
+  final double? hoverActionsElevation;
+  /// Vertical spacing between grouped messages. Defaults to `spacing.xs`.
+  final double? groupedSpacing;
+  /// Vertical spacing between ungrouped messages. Defaults to `spacing.md`.
+  final double? ungroupedSpacing;
+}
+
+@immutable
+class OiComposeBarThemeData {
+  const OiComposeBarThemeData({
+    this.backgroundColor,
+    this.borderColor,
+    this.inputTextStyle,
+    this.placeholderStyle,
+    this.sendButtonColor,
+    this.replyPreviewBackgroundColor,
+    this.replyPreviewAccentColor,
+  });
+
+  final Color? backgroundColor;
+  final Color? borderColor;
+  final TextStyle? inputTextStyle;
+  final TextStyle? placeholderStyle;
+  final Color? sendButtonColor;
+  final Color? replyPreviewBackgroundColor;
+  final Color? replyPreviewAccentColor;
+}
+
+@immutable
+class OiThreadThemeData {
+  const OiThreadThemeData({
+    this.panelWidth,
+    this.rootMessageBackgroundColor,
+    this.dividerColor,
+    this.replyIndent,
+  });
+
+  /// Width of the thread side panel. Defaults to 400.
+  final double? panelWidth;
+  /// Background tint for the root message. Defaults to `colors.surface.s100`.
+  final Color? rootMessageBackgroundColor;
+  final Color? dividerColor;
+  /// Left indent for inline thread replies. Defaults to `spacing.xl`.
+  final double? replyIndent;
+}
+
+@immutable
+class OiTimestampThemeData {
+  const OiTimestampThemeData({
+    this.textStyle,
+    this.hoverTextStyle,
+  });
+
+  final TextStyle? textStyle;
+  final TextStyle? hoverTextStyle;
+}
+
+@immutable
+class OiUnreadIndicatorThemeData {
+  const OiUnreadIndicatorThemeData({
+    this.separatorColor,
+    this.separatorTextStyle,
+    this.highlightColor,
+  });
+
+  /// Color of the separator line and pill. Defaults to `colors.primary`.
+  final Color? separatorColor;
+  final TextStyle? separatorTextStyle;
+  /// Background highlight for unread messages. Defaults to `colors.primary.s50`.
+  final Color? highlightColor;
+}
+```
+
+---
+
+# Package Structure Additions
+
+```
+src/
+  components/
+    display/
+      oi_relative_time.dart          ★ NEW
+      oi_timestamp.dart              ★ NEW
+      oi_unread_indicator.dart       ★ NEW
+      oi_message_bubble.dart         ★ NEW
+      oi_reply_preview.dart          ★ NEW
+      oi_thread_summary.dart         ★ NEW
+    feedback/
+      oi_reaction_picker.dart        ★ NEW
+    interaction/
+      oi_message_actions.dart        ★ NEW
+    inputs/
+      oi_compose_bar.dart            ★ NEW
+
+  modules/
+    oi_chat.dart                     ★ REPLACED (v2)
+    oi_thread.dart                   ★ NEW
+    oi_comments.dart                 ★ REPLACED (v2)
+
+  models/
+    oi_message_data.dart             ★ NEW
+    oi_reply_to_data.dart            ★ NEW
+    oi_thread_info.dart              ★ NEW
+    oi_participant.dart              ★ NEW
+    oi_compose_payload.dart          ★ NEW
+    oi_message_status.dart           ★ NEW
+```
+
+---
+
+# Testing Strategy
+
+## Unit Tests
+
+- `OiRelativeTime` formatting: all elapsed ranges × all styles produce correct strings.
+- `OiRelativeTime` timer: adapts interval from 10s → 30s → 5min.
+- `OiRelativeTime` singular/plural: "1 minute ago" vs "2 minutes ago".
+- `OiMessageData.isOwn()`: returns `true` when senderId matches, `false` otherwise.
+- `OiMessageData.copyWith()`: preserves unmodified fields, overrides specified ones.
+- `OiThreadInfo` participant deduplication: no duplicate IDs.
+- `OiComposePayload` from plain text: richContent null, attachments empty.
+- Unread separator index calculation: correct count from index to end.
+- Consecutive message grouping logic: same sender + within threshold → grouped.
+- Date separator insertion: different calendar days produce separators.
+- Comment sort comparators: newest, oldest, mostReacted produce correct order.
+
+## Widget Tests
+
+Every component section above includes a detailed test table. Summary:
+
+- **Per component:** All visual states (default, hover, focus, active, disabled, loading, error), all variants, all sizes.
+- **Interaction:** Every callback fires with correct arguments. Keyboard navigation works. Touch gestures work.
+- **Accessibility:** Every component has `Semantics` labels. Live regions announce new content. Focus order is logical.
+- **Theming:** Every component renders correctly with both default and custom theme overrides.
+- **Reduced motion:** Every animation respects `MediaQuery.disableAnimations`.
+
+## Golden Tests
+
+- `OiMessageBubble`: bubble/flat/compact × own/other × with-reactions/without × with-reply/without × with-thread/without × light/dark = 48 goldens.
+- `OiReplyPreview`: with/without dismiss × light/dark = 4 goldens.
+- `OiThreadSummary`: default/compact × with-unread/without × light/dark = 8 goldens.
+- `OiUnreadIndicator`: separator/badge × light/dark = 4 goldens.
+- `OiComposeBar`: empty/typing/with-reply/with-attachments × light/dark = 8 goldens.
+- `OiChat`: full chat layout × light/dark = 2 goldens.
+- `OiThread`: thread panel × light/dark = 2 goldens.
+- `OiComments`: comments with threads expanded × light/dark = 2 goldens.
+
+## Integration Tests
+
+- **Chat send flow:** Type message → tap send → message appears at bottom → input clears.
+- **Chat reply flow:** Tap reply action → reply preview appears in compose bar → type → send → message with reply preview appears.
+- **Chat thread flow (panel):** Tap thread summary → panel slides in → type reply → send → reply appears in thread → thread summary count updates in main view.
+- **Chat thread flow (inline):** Tap thread summary → thread expands → reply → collapse.
+- **Chat unread flow:** Receive new messages while scrolled up → floating badge appears → tap badge → scrolls to bottom → unread separator visible.
+- **Chat load history:** Scroll to top → loading spinner → older messages appear above.
+- **Comment thread flow:** Post comment → comment appears → reply to comment → thread expands → reply visible.
+- **Comment sort flow:** Change sort to oldest → comments reorder → change to mostReacted → comments reorder.
+- **Reaction flow:** Hover message → tap reaction → reaction appears on message → tap own reaction → reaction removed.
+- **Edit flow:** Hover own message → tap edit → message becomes editable → modify → save → "(edited)" appears.
+- **Delete flow:** Hover own message → tap delete → confirmation dialog → confirm → "[deleted]" placeholder.
+
+## Performance Tests
+
+- `OiChat` with 100,000 messages: <16ms frame time (virtual list).
+- `OiComments` with 5,000 comment threads (avg 10 replies each): <16ms frame time.
+- `OiRelativeTime` with 1,000 instances (live=true): no timer leak, <1ms total tick overhead.
+- Rapid thread open/close (100 cycles): no memory leak.
+- Rapid reaction add/remove (100 cycles per message, 50 messages): smooth animation.
+
+---
+
+# obers_ui — Advanced Table & Settings Persistence Driver Specification
+
+> **Date:** 2026-03-16
+> **Extends:** `base_concept.md`
+> **Scope:** (1) Foundation-level Settings Persistence Driver system, (2) Enhanced OiTable v2 composite.
+> **Replaces:** Existing `OiTable<T>` in `base_concept.md`.
+> **Principle:** The driver system is a cross-cutting concern at the Foundation tier. The table is the first major consumer, but the system is designed for any widget that has persistable user preferences.
+
+---
+
+## Table of Contents
+
+- [Part 1: Settings Persistence Drivers](#part-1-settings-persistence-drivers)
+  - [Motivation & Design Goals](#motivation--design-goals)
+  - [Architecture Overview](#architecture-overview)
+  - [Core Interfaces](#core-interfaces)
+  - [Built-in Drivers](#built-in-drivers)
+  - [Settings Data Contracts](#settings-data-contracts)
+  - [Widget Integration Pattern](#widget-integration-pattern)
+  - [Provider Integration](#provider-integration)
+  - [Modules That Use Persistence](#modules-that-use-persistence)
+  - [Custom Driver Guide](#custom-driver-guide)
+  - [Driver Tests](#driver-tests)
+- [Part 2: OiTable v2 — Enhanced Data Table](#part-2-oitable-v2)
+  - [What Changed from v1](#what-changed-from-v1)
+  - [Full API](#full-api)
+  - [Pagination System](#pagination-system)
+  - [Inline Editing System](#inline-editing-system)
+  - [Column Management](#column-management)
+  - [Settings Persistence Integration](#settings-persistence-integration)
+  - [Table Controller](#table-controller)
+  - [Table Tests](#table-tests)
+
+---
+
+# Part 1: Settings Persistence Drivers
+
+---
+
+## Motivation & Design Goals
+
+Complex widgets like tables, kanban boards, file explorers, dashboards, and sidebars accumulate user preferences: column widths, sort order, visible columns, collapsed groups, view mode, panel widths, filter presets. These preferences are transient by default — lost on navigation or app restart. Persistence is essential for professional apps.
+
+**Design goals:**
+
+1. **Opt-in.** No persistence by default. Widgets work identically with or without a driver. Pass `null` → no persistence. Pass a driver → preferences auto-save and auto-restore.
+2. **Driver-based.** The library ships one built-in driver (local storage). Consumers implement the `OiSettingsDriver` interface to persist to their own backend: REST API, SQLite, Hive, SharedPreferences, state management (Riverpod/Bloc), or anything else.
+3. **Keyed.** A driver optionally accepts a `key`. Without a key, settings are global (shared by all instances of that widget type). With a key, settings are scoped to a specific view (e.g., `"users-table"` vs. `"orders-table"`).
+4. **Type-safe.** Each widget type defines a strongly-typed settings data class. The driver serializes/deserializes via JSON. No stringly-typed maps.
+5. **Minimal API surface.** The driver interface has exactly 4 methods: `load`, `save`, `delete`, `exists`. Everything else is derived.
+6. **Sync & async.** Drivers can be async (network, database) or sync (in-memory, local storage). The interface uses `Future` for both — sync drivers return `SynchronousFuture`.
+7. **Mergeable.** When settings are loaded, they are merged with widget defaults. Missing keys gracefully fall back to defaults. This prevents breaking changes when adding new settings fields.
+8. **Testable.** An `OiInMemorySettingsDriver` is provided for testing.
+
+---
+
+## Architecture Overview
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                     Widget Layer                         │
+│                                                         │
+│  OiTable         OiFileExplorer    OiKanban    OiSidebar│
+│  ┌─────────┐    ┌─────────────┐   ┌───────┐   ┌──────┐ │
+│  │settings │    │  settings   │   │settings│   │ ... │ │
+│  │driver?  │    │  driver?    │   │driver? │   │      │ │
+│  └────┬────┘    └──────┬──────┘   └───┬────┘   └──┬───┘ │
+│       │                │              │            │     │
+│       ▼                ▼              ▼            ▼     │
+│  ┌─────────────────────────────────────────────────────┐ │
+│  │           OiSettingsDriver (interface)              │ │
+│  │                                                     │ │
+│  │  Future<T?> load<T>(namespace, key?, deserializer)  │ │
+│  │  Future<void> save<T>(namespace, key?, data, ser.)  │ │
+│  │  Future<void> delete(namespace, key?)               │ │
+│  │  Future<bool> exists(namespace, key?)               │ │
+│  └─────────────────────────────────────────────────────┘ │
+│                          │                               │
+└──────────────────────────┼───────────────────────────────┘
+                           │
+              ┌────────────┼────────────┐
+              │            │            │
+              ▼            ▼            ▼
+        ┌──────────┐ ┌──────────┐ ┌──────────────┐
+        │ OiLocal  │ │OiInMemory│ │ Custom       │
+        │ Storage  │ │ Settings │ │ Driver       │
+        │ Driver   │ │ Driver   │ │ (user impl)  │
+        └──────────┘ └──────────┘ └──────────────┘
+         (built-in)   (testing)    (REST, Hive,
+                                    SharedPrefs,
+                                    Riverpod, ...)
+```
+
+**Namespace:** Each widget type has a fixed namespace string. This prevents collisions between different widget types storing settings. For example, `OiTable` uses namespace `"oi_table"`, `OiFileExplorer` uses `"oi_file_explorer"`.
+
+**Key (optional):** When provided, settings are scoped: the storage key becomes `"$namespace::$key"`. When omitted, it's just `"$namespace"` — a global/default setting for all instances.
+
+**Lifecycle:**
+
+1. Widget mounts → calls `driver.load(namespace, key, deserializer)`.
+2. Settings are merged with widget defaults (settings values override, missing fields fall back to defaults).
+3. User changes a setting (e.g., resizes a column) → widget calls `driver.save(namespace, key, newSettings, serializer)` debounced (500ms default).
+4. Widget unmounts → nothing special (save already happened on change).
+5. Widget mounts again → step 1 restores the saved settings.
+
+---
+
+## Core Interfaces
+
+```dart
+/// The core interface that all persistence drivers implement.
+///
+/// A driver is responsible for storing and retrieving serialized settings data.
+/// The interface is intentionally minimal — 4 methods cover all use cases.
+///
+/// Drivers are stateless. They do not cache. Caching is the widget's responsibility
+/// (via the [OiSettingsMixin]).
+abstract class OiSettingsDriver {
+  const OiSettingsDriver();
+
+  /// Loads settings for the given [namespace] and optional [key].
+  ///
+  /// Returns `null` if no settings have been saved yet.
+  /// The [deserialize] function converts the raw stored `Map<String, dynamic>`
+  /// back into the typed settings object.
+  ///
+  /// If the stored data is corrupted or incompatible, implementations should
+  /// return `null` (not throw), allowing the widget to fall back to defaults.
+  Future<T?> load<T>({
+    required String namespace,
+    String? key,
+    required T Function(Map<String, dynamic> json) deserialize,
+  });
+
+  /// Saves settings for the given [namespace] and optional [key].
+  ///
+  /// The [serialize] function converts the typed settings object into a
+  /// JSON-encodable `Map<String, dynamic>`.
+  ///
+  /// Implementations may batch, debounce, or queue writes internally.
+  /// The returned Future completes when the write is confirmed.
+  Future<void> save<T>({
+    required String namespace,
+    String? key,
+    required T data,
+    required Map<String, dynamic> Function(T) serialize,
+  });
+
+  /// Deletes settings for the given [namespace] and optional [key].
+  ///
+  /// After deletion, [load] returns `null` and [exists] returns `false`.
+  Future<void> delete({
+    required String namespace,
+    String? key,
+  });
+
+  /// Checks whether settings exist for the given [namespace] and optional [key].
+  Future<bool> exists({
+    required String namespace,
+    String? key,
+  });
+
+  /// Computes the storage key from namespace and optional key.
+  ///
+  /// Default implementation: `"$namespace"` when key is null,
+  /// `"$namespace::$key"` when key is provided.
+  ///
+  /// Drivers may override this to use different key formats (e.g., path-based
+  /// for REST APIs: `"/settings/$namespace/$key"`).
+  @protected
+  String resolveKey(String namespace, String? key) {
+    if (key == null) return namespace;
+    return '$namespace::$key';
+  }
+}
+```
+
+**The Settings Data Contract:**
+
+```dart
+/// Mixin that all settings data classes must implement.
+///
+/// Provides a standard serialization contract so drivers can store and
+/// retrieve settings without knowing their concrete types.
+mixin OiSettingsData {
+  /// Serializes this settings object to a JSON-encodable map.
+  Map<String, dynamic> toJson();
+
+  /// The schema version. Increment when adding/removing/renaming fields.
+  /// Used by [merge] to handle backwards compatibility.
+  int get schemaVersion;
+}
+```
+
+**The Widget-Side Mixin:**
+
+```dart
+/// Mixin for State classes of widgets that support settings persistence.
+///
+/// Handles the full lifecycle: load on init, save on change (debounced),
+/// merge with defaults.
+///
+/// Usage in a widget's State class:
+/// ```dart
+/// class _OiTableState<T> extends State<OiTable<T>>
+///     with OiSettingsMixin<OiTableSettings> {
+///
+///   @override
+///   String get settingsNamespace => 'oi_table';
+///
+///   @override
+///   String? get settingsKey => widget.settingsKey;
+///
+///   @override
+///   OiSettingsDriver? get settingsDriver => widget.settingsDriver;
+///
+///   @override
+///   OiTableSettings get defaultSettings => OiTableSettings(
+///     columnOrder: widget.columns.map((c) => c.id).toList(),
+///     columnWidths: {},
+///     // ... defaults from widget props ...
+///   );
+///
+///   @override
+///   OiTableSettings deserializeSettings(Map<String, dynamic> json) =>
+///       OiTableSettings.fromJson(json);
+///
+///   @override
+///   OiTableSettings mergeSettings(OiTableSettings saved, OiTableSettings defaults) =>
+///       saved.mergeWith(defaults);
+/// }
+/// ```
+mixin OiSettingsMixin<S extends OiSettingsData> on State {
+  /// The namespace used for storage. Unique per widget type.
+  /// Example: `'oi_table'`, `'oi_file_explorer'`.
+  String get settingsNamespace;
+
+  /// Optional key for view-specific settings. When null, settings are global.
+  String? get settingsKey;
+
+  /// The driver to use. When null, no persistence occurs.
+  OiSettingsDriver? get settingsDriver;
+
+  /// Default settings derived from the widget's props.
+  S get defaultSettings;
+
+  /// Deserializes JSON into a typed settings object.
+  S deserializeSettings(Map<String, dynamic> json);
+
+  /// Merges saved settings with current defaults.
+  /// Saved values take precedence. Missing saved fields fall back to defaults.
+  /// This is critical for backwards compatibility when new fields are added.
+  S mergeSettings(S saved, S defaults);
+
+  /// The currently-active settings (merged result of saved + defaults).
+  /// Available after [initState] completes async loading.
+  late S currentSettings;
+
+  /// Whether settings have been loaded from the driver.
+  bool settingsLoaded = false;
+
+  /// Whether an error occurred during loading (falls back to defaults).
+  bool settingsLoadError = false;
+
+  Timer? _saveDebounce;
+
+  @override
+  void initState() {
+    super.initState();
+    currentSettings = defaultSettings;
+    _loadSettings();
+  }
+
+  @override
+  void dispose() {
+    _saveDebounce?.cancel();
+    super.dispose();
+  }
+
+  @override
+  void didUpdateWidget(covariant oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // If the driver or key changed, reload settings.
+    // Concrete widgets compare old vs new and call _loadSettings() if needed.
+  }
+
+  /// Loads settings from the driver, merges with defaults, and calls setState.
+  Future<void> _loadSettings() async {
+    final driver = settingsDriver;
+    if (driver == null) {
+      settingsLoaded = true;
+      return;
+    }
+
+    try {
+      final saved = await driver.load<S>(
+        namespace: settingsNamespace,
+        key: settingsKey,
+        deserialize: deserializeSettings,
+      );
+
+      if (saved != null) {
+        currentSettings = mergeSettings(saved, defaultSettings);
+      }
+    } catch (e) {
+      // On any error, fall back to defaults silently.
+      settingsLoadError = true;
+    }
+
+    settingsLoaded = true;
+    if (mounted) setState(() {});
+  }
+
+  /// Called by the widget whenever a setting changes.
+  /// Debounces saves to avoid excessive writes during rapid interactions
+  /// (e.g., column resizing).
+  void updateSettings(S newSettings, {Duration debounce = const Duration(milliseconds: 500)}) {
+    currentSettings = newSettings;
+    setState(() {});
+
+    final driver = settingsDriver;
+    if (driver == null) return;
+
+    _saveDebounce?.cancel();
+    _saveDebounce = Timer(debounce, () {
+      driver.save<S>(
+        namespace: settingsNamespace,
+        key: settingsKey,
+        data: newSettings,
+        serialize: (s) => s.toJson(),
+      );
+    });
+  }
+
+  /// Saves immediately without debounce. Use for explicit "Save" actions.
+  Future<void> saveSettingsNow() async {
+    final driver = settingsDriver;
+    if (driver == null) return;
+
+    _saveDebounce?.cancel();
+    await driver.save<S>(
+      namespace: settingsNamespace,
+      key: settingsKey,
+      data: currentSettings,
+      serialize: (s) => s.toJson(),
+    );
+  }
+
+  /// Resets settings to defaults and deletes saved data.
+  Future<void> resetSettings() async {
+    currentSettings = defaultSettings;
+    setState(() {});
+
+    final driver = settingsDriver;
+    if (driver == null) return;
+
+    await driver.delete(
+      namespace: settingsNamespace,
+      key: settingsKey,
+    );
+  }
+}
+```
+
+---
+
+## Built-in Drivers
+
+### OiLocalStorageDriver
+
+Persists settings to the browser's `localStorage` (web) or `SharedPreferences` (mobile/desktop) via a cross-platform abstraction.
+
+```dart
+/// Persists settings to local storage.
+///
+/// On web: uses `window.localStorage`.
+/// On mobile/desktop: uses `SharedPreferences` (or `shared_preferences` package).
+///
+/// Storage format: each key stores a JSON string.
+///
+/// ```dart
+/// OiTable<User>(
+///   settingsDriver: OiLocalStorageDriver(),
+///   settingsKey: 'users-admin-table',
+///   // ...
+/// )
+/// ```
+class OiLocalStorageDriver extends OiSettingsDriver {
+  const OiLocalStorageDriver({
+    this.prefix = 'obers_ui',
+  });
+
+  /// Prefix prepended to all storage keys to avoid collisions with other
+  /// application data. Final key format: `"$prefix.$namespace"` or
+  /// `"$prefix.$namespace::$key"`.
+  final String prefix;
+
+  @override
+  String resolveKey(String namespace, String? key) {
+    final base = super.resolveKey(namespace, key);
+    return '$prefix.$base';
+  }
+
+  @override
+  Future<T?> load<T>({
+    required String namespace,
+    String? key,
+    required T Function(Map<String, dynamic>) deserialize,
+  }) async {
+    final storageKey = resolveKey(namespace, key);
+    final raw = await _platformRead(storageKey);
+    if (raw == null) return null;
+
+    try {
+      final json = jsonDecode(raw) as Map<String, dynamic>;
+      return deserialize(json);
+    } catch (e) {
+      // Corrupted data — return null, widget falls back to defaults.
+      return null;
+    }
+  }
+
+  @override
+  Future<void> save<T>({
+    required String namespace,
+    String? key,
+    required T data,
+    required Map<String, dynamic> Function(T) serialize,
+  }) async {
+    final storageKey = resolveKey(namespace, key);
+    final json = jsonEncode(serialize(data));
+    await _platformWrite(storageKey, json);
+  }
+
+  @override
+  Future<void> delete({required String namespace, String? key}) async {
+    final storageKey = resolveKey(namespace, key);
+    await _platformDelete(storageKey);
+  }
+
+  @override
+  Future<bool> exists({required String namespace, String? key}) async {
+    final storageKey = resolveKey(namespace, key);
+    return await _platformExists(storageKey);
+  }
+
+  // Platform-specific implementations (internal).
+  Future<String?> _platformRead(String key) { /* ... */ }
+  Future<void> _platformWrite(String key, String value) { /* ... */ }
+  Future<void> _platformDelete(String key) { /* ... */ }
+  Future<bool> _platformExists(String key) { /* ... */ }
+}
+```
+
+### OiInMemorySettingsDriver
+
+For testing. Stores settings in a plain `Map`. Also useful for ephemeral session-only persistence.
+
+```dart
+/// In-memory driver for testing and session-only persistence.
+///
+/// Settings are stored in a [Map] and lost when the driver instance is
+/// garbage-collected.
+///
+/// ```dart
+/// final driver = OiInMemorySettingsDriver();
+/// // Pass to widgets for testing. Inspect driver.store for assertions.
+/// ```
+class OiInMemorySettingsDriver extends OiSettingsDriver {
+  OiInMemorySettingsDriver();
+
+  /// The internal store. Exposed for test assertions.
+  final Map<String, Map<String, dynamic>> store = {};
+
+  @override
+  Future<T?> load<T>({
+    required String namespace,
+    String? key,
+    required T Function(Map<String, dynamic>) deserialize,
+  }) async {
+    final storageKey = resolveKey(namespace, key);
+    final data = store[storageKey];
+    if (data == null) return null;
+    return deserialize(Map<String, dynamic>.from(data));
+  }
+
+  @override
+  Future<void> save<T>({
+    required String namespace,
+    String? key,
+    required T data,
+    required Map<String, dynamic> Function(T) serialize,
+  }) async {
+    final storageKey = resolveKey(namespace, key);
+    store[storageKey] = serialize(data);
+  }
+
+  @override
+  Future<void> delete({required String namespace, String? key}) async {
+    final storageKey = resolveKey(namespace, key);
+    store.remove(storageKey);
+  }
+
+  @override
+  Future<bool> exists({required String namespace, String? key}) async {
+    final storageKey = resolveKey(namespace, key);
+    return store.containsKey(storageKey);
+  }
+
+  /// Clears all stored settings. Useful in test tearDown.
+  void clear() => store.clear();
+}
+```
+
+---
+
+## Settings Data Contracts
+
+Each widget type that supports persistence defines its own immutable settings data class. These classes implement `OiSettingsData` and provide `toJson` / `fromJson` / `mergeWith`.
+
+### OiTableSettings
+
+```dart
+@immutable
+class OiTableSettings with OiSettingsData {
+  const OiTableSettings({
+    this.columnOrder = const [],
+    this.columnWidths = const {},
+    this.visibleColumnIds,
+    this.pinnedColumnIds = const {},
+    this.sort,
+    this.filters = const {},
+    this.pageSize,
+    this.expandedGroupKeys = const {},
+    this.columnAlignments = const {},
+  });
+
+  /// Ordered list of column IDs. Defines display order.
+  final List<String> columnOrder;
+
+  /// Map of column ID → width in logical pixels. Missing keys use column defaults.
+  final Map<String, double> columnWidths;
+
+  /// Set of visible column IDs. Null means all columns visible.
+  final Set<String>? visibleColumnIds;
+
+  /// Set of column IDs pinned to the left.
+  final Set<String> pinnedColumnIds;
+
+  /// Active sort configuration.
+  final OiTableSort? sort;
+
+  /// Active filters. Map of column ID → filter.
+  final Map<String, OiColumnFilter> filters;
+
+  /// Number of rows per page. Null means use widget default.
+  final int? pageSize;
+
+  /// Expanded group keys (when grouping is active).
+  final Set<Object> expandedGroupKeys;
+
+  /// Per-column alignment overrides.
+  final Map<String, OiTableColumnAlign> columnAlignments;
+
+  @override
+  int get schemaVersion => 1;
+
+  @override
+  Map<String, dynamic> toJson() => {
+    'schemaVersion': schemaVersion,
+    'columnOrder': columnOrder,
+    'columnWidths': columnWidths.map((k, v) => MapEntry(k, v)),
+    'visibleColumnIds': visibleColumnIds?.toList(),
+    'pinnedColumnIds': pinnedColumnIds.toList(),
+    'sort': sort != null ? {'columnId': sort!.columnId, 'direction': sort!.direction.name} : null,
+    'filters': filters.map((k, v) => MapEntry(k, v.toJson())),
+    'pageSize': pageSize,
+    'expandedGroupKeys': expandedGroupKeys.map((k) => k.toString()).toList(),
+    'columnAlignments': columnAlignments.map((k, v) => MapEntry(k, v.name)),
+  };
+
+  factory OiTableSettings.fromJson(Map<String, dynamic> json) => OiTableSettings(
+    columnOrder: (json['columnOrder'] as List?)?.cast<String>() ?? const [],
+    columnWidths: (json['columnWidths'] as Map?)?.map((k, v) => MapEntry(k as String, (v as num).toDouble())) ?? const {},
+    visibleColumnIds: (json['visibleColumnIds'] as List?)?.cast<String>().toSet(),
+    pinnedColumnIds: (json['pinnedColumnIds'] as List?)?.cast<String>().toSet() ?? const {},
+    sort: json['sort'] != null ? OiTableSort(
+      columnId: json['sort']['columnId'],
+      direction: OiSortDirection.values.byName(json['sort']['direction']),
+    ) : null,
+    filters: (json['filters'] as Map?)?.map((k, v) => MapEntry(k as String, OiColumnFilter.fromJson(v))) ?? const {},
+    pageSize: json['pageSize'] as int?,
+    expandedGroupKeys: (json['expandedGroupKeys'] as List?)?.cast<String>().toSet() ?? const {},
+    columnAlignments: (json['columnAlignments'] as Map?)?.map((k, v) => MapEntry(k as String, OiTableColumnAlign.values.byName(v))) ?? const {},
+  );
+
+  /// Merges saved settings with defaults.
+  /// Saved values win. Missing saved values fall back to defaults.
+  /// Columns that no longer exist in the widget definition are pruned.
+  OiTableSettings mergeWith(OiTableSettings defaults) {
+    // Prune saved column IDs that no longer exist in defaults.
+    final validColumnIds = defaults.columnOrder.toSet();
+
+    return OiTableSettings(
+      columnOrder: columnOrder.isNotEmpty
+          ? [...columnOrder.where(validColumnIds.contains), ...defaults.columnOrder.where((id) => !columnOrder.contains(id))]
+          : defaults.columnOrder,
+      columnWidths: {...defaults.columnWidths, ...Map.fromEntries(columnWidths.entries.where((e) => validColumnIds.contains(e.key)))},
+      visibleColumnIds: visibleColumnIds?.intersection(validColumnIds) ?? defaults.visibleColumnIds,
+      pinnedColumnIds: pinnedColumnIds.intersection(validColumnIds),
+      sort: sort != null && validColumnIds.contains(sort!.columnId) ? sort : defaults.sort,
+      filters: Map.fromEntries(filters.entries.where((e) => validColumnIds.contains(e.key))),
+      pageSize: pageSize ?? defaults.pageSize,
+      expandedGroupKeys: expandedGroupKeys,
+      columnAlignments: Map.fromEntries(columnAlignments.entries.where((e) => validColumnIds.contains(e.key))),
+    );
+  }
+}
+```
+
+---
+
+## Widget Integration Pattern
+
+Here's the exact pattern for how any widget integrates the driver system. Using `OiTable` as the example:
+
+**Step 1: Widget accepts optional driver + key.**
+
+```dart
+OiTable<T>({
+  // ... all existing props ...
+
+  /// Optional persistence driver. When provided, column order, widths,
+  /// visibility, sort, filters, and page size are automatically saved
+  /// and restored.
+  OiSettingsDriver? settingsDriver,
+
+  /// Optional key to scope settings to a specific view instance.
+  /// Without a key, settings are global (shared by all OiTable instances
+  /// using the same driver).
+  /// With a key, each table has independent settings.
+  ///
+  /// Example: `settingsKey: 'admin-users-table'`
+  String? settingsKey,
+
+  /// Debounce duration for auto-saving settings after changes.
+  /// Default: 500ms. Set to Duration.zero for immediate saves.
+  Duration settingsSaveDebounce = const Duration(milliseconds: 500),
+})
+```
+
+**Step 2: State class uses `OiSettingsMixin`.**
+
+```dart
+class _OiTableState<T> extends State<OiTable<T>>
+    with OiSettingsMixin<OiTableSettings> {
+
+  @override
+  String get settingsNamespace => 'oi_table';
+
+  @override
+  String? get settingsKey => widget.settingsKey;
+
+  @override
+  OiSettingsDriver? get settingsDriver => widget.settingsDriver;
+
+  @override
+  OiTableSettings get defaultSettings => OiTableSettings(
+    columnOrder: widget.columns.map((c) => c.id).toList(),
+    columnWidths: Map.fromEntries(
+      widget.columns.where((c) => c.width != null).map((c) => MapEntry(c.id, c.width!)),
+    ),
+    sort: widget.sort,
+    pageSize: widget.pageSize,
+  );
+
+  @override
+  OiTableSettings deserializeSettings(Map<String, dynamic> json) =>
+      OiTableSettings.fromJson(json);
+
+  @override
+  OiTableSettings mergeSettings(OiTableSettings saved, OiTableSettings defaults) =>
+      saved.mergeWith(defaults);
+}
+```
+
+**Step 3: Widget reads from `currentSettings` and writes via `updateSettings`.**
+
+```dart
+// Reading — inside build():
+final columnOrder = currentSettings.columnOrder;
+final columnWidths = currentSettings.columnWidths;
+final visibleColumns = currentSettings.visibleColumnIds;
+
+// Writing — when user resizes a column:
+void _onColumnResize(String columnId, double newWidth) {
+  final newWidths = Map<String, double>.from(currentSettings.columnWidths);
+  newWidths[columnId] = newWidth;
+
+  updateSettings(OiTableSettings(
+    ...currentSettings, // copyWith pattern
+    columnWidths: newWidths,
+  ));
+
+  // Also notify the consumer via callback:
+  widget.onColumnProfileChange?.call(/* ... */);
+}
+```
+
+**Step 4: Reset button in column management UI.**
+
+```dart
+void _onResetSettings() {
+  resetSettings(); // From OiSettingsMixin — clears saved, reverts to defaults.
+}
+```
+
+---
+
+## Provider Integration
+
+For apps that want to inject a driver globally (so every table, kanban, file explorer automatically gets persistence without passing `settingsDriver` to each one), an `InheritedWidget` provider is available.
+
+```dart
+/// Provides a default [OiSettingsDriver] to all descendants.
+///
+/// Widgets with persistence support look up this provider when their own
+/// `settingsDriver` prop is null.
+///
+/// ```dart
+/// OiSettingsProvider(
+///   driver: OiLocalStorageDriver(),
+///   child: MyApp(),
+/// )
+/// ```
+///
+/// Individual widgets can still override with their own driver:
+/// ```dart
+/// OiTable(settingsDriver: myCustomDriver, ...) // Ignores provider
+/// OiTable(...) // Uses provider driver
+/// ```
+class OiSettingsProvider extends InheritedWidget {
+  const OiSettingsProvider({
+    required this.driver,
+    required super.child,
+  });
+
+  final OiSettingsDriver driver;
+
+  static OiSettingsDriver? of(BuildContext context) {
+    return context.dependOnInheritedWidgetOfExactType<OiSettingsProvider>()?.driver;
+  }
+
+  @override
+  bool updateShouldNotify(OiSettingsProvider oldWidget) => driver != oldWidget.driver;
+}
+```
+
+The `OiSettingsMixin` resolution order:
+
+1. `widget.settingsDriver` (explicit prop) — highest priority.
+2. `OiSettingsProvider.of(context)` — inherited fallback.
+3. `null` — no persistence.
+
+Updated mixin getter:
+
+```dart
+@override
+OiSettingsDriver? get settingsDriver =>
+    widget.settingsDriver ?? OiSettingsProvider.of(context);
+```
+
+---
+
+## Modules That Use Persistence
+
+The driver system is designed for reuse. Here's every existing module/composite that has persistable user preferences, what settings it persists, and its namespace:
+
+| Widget | Namespace | Settings Persisted |
+|--------|-----------|-------------------|
+| **OiTable** | `oi_table` | Column order, column widths, column visibility, pinned columns, sort, filters, page size, expanded groups, column alignments |
+| **OiFileExplorer** | `oi_file_explorer` | View mode (list/grid), sort field, sort direction, sidebar width, sidebar collapsed, favorites, recent paths |
+| **OiKanban** | `oi_kanban` | Column order, collapsed columns, WIP limits overrides |
+| **OiListView** | `oi_list_view` | Layout (list/grid/table), active sort, active filters, page size |
+| **OiSidebar** | `oi_sidebar` | Mode (full/compact/hidden), width, collapsed sections, selected item |
+| **OiSplitPane** | `oi_split_pane` | Divider position (ratio or pixels), collapsed pane |
+| **OiDashboard** | `oi_dashboard` | Card positions (column, row, column span, row span) per card key |
+| **OiCalendar** | `oi_calendar` | View type (month/week/day), visible date range, collapsed categories |
+| **OiGantt** | `oi_gantt` | Zoom level, scroll position, collapsed groups |
+| **OiAccordion** | `oi_accordion` | Expanded section indices |
+| **OiTabs** | `oi_tabs` | Tab order (when reorderable), selected tab index |
+| **OiFilterBar** | `oi_filter_bar` | Active filters, filter order |
+
+**Settings data class per module (summary):**
+
+```dart
+// OiFileExplorerSettings
+@immutable
+class OiFileExplorerSettings with OiSettingsData {
+  final OiFileViewMode viewMode;
+  final OiFileSortField sortField;
+  final OiSortDirection sortDirection;
+  final double sidebarWidth;
+  final bool sidebarCollapsed;
+  final List<String> favoriteFolderIds;
+  final List<String> recentPaths;
+  // ... toJson, fromJson, mergeWith, schemaVersion
+}
+
+// OiKanbanSettings
+@immutable
+class OiKanbanSettings with OiSettingsData {
+  final List<Object> columnOrder;
+  final Set<Object> collapsedColumnKeys;
+  // ... toJson, fromJson, mergeWith, schemaVersion
+}
+
+// OiSidebarSettings
+@immutable
+class OiSidebarSettings with OiSettingsData {
+  final OiSidebarMode mode;
+  final double width;
+  final Set<String> collapsedSectionIds;
+  // ... toJson, fromJson, mergeWith, schemaVersion
+}
+
+// OiDashboardSettings
+@immutable
+class OiDashboardSettings with OiSettingsData {
+  final Map<Object, OiDashboardCardPosition> cardPositions;
+  // ... toJson, fromJson, mergeWith, schemaVersion
+}
+
+// OiSplitPaneSettings
+@immutable
+class OiSplitPaneSettings with OiSettingsData {
+  final double dividerPosition;
+  final bool paneCollapsed;
+  // ... toJson, fromJson, mergeWith, schemaVersion
+}
+
+// OiListViewSettings
+@immutable
+class OiListViewSettings with OiSettingsData {
+  final OiListViewLayout layout;
+  final String? activeSortId;
+  final Map<String, OiColumnFilter> activeFilters;
+  // ... toJson, fromJson, mergeWith, schemaVersion
+}
+```
+
+All modules listed above add the same 3 props:
+
+```dart
+OiSettingsDriver? settingsDriver,
+String? settingsKey,
+Duration settingsSaveDebounce = const Duration(milliseconds: 500),
+```
+
+---
+
+## Custom Driver Guide
+
+### Example: REST API Driver
+
+```dart
+/// Persists settings to a remote REST API.
+///
+/// Storage format: JSON body POST/PUT to `/api/settings/{key}`.
+///
+/// ```dart
+/// OiTable<User>(
+///   settingsDriver: RestSettingsDriver(
+///     baseUrl: 'https://api.myapp.com',
+///     authToken: userToken,
+///   ),
+///   settingsKey: 'admin-users-table',
+///   // ...
+/// )
+/// ```
+class RestSettingsDriver extends OiSettingsDriver {
+  RestSettingsDriver({
+    required this.baseUrl,
+    required this.authToken,
+    this.userId,
+  });
+
+  final String baseUrl;
+  final String authToken;
+  final String? userId;
+
+  Map<String, String> get _headers => {
+    'Authorization': 'Bearer $authToken',
+    'Content-Type': 'application/json',
+  };
+
+  String _url(String namespace, String? key) {
+    final storageKey = resolveKey(namespace, key);
+    final userPrefix = userId != null ? '/users/$userId' : '';
+    return '$baseUrl$userPrefix/settings/$storageKey';
+  }
+
+  @override
+  Future<T?> load<T>({
+    required String namespace,
+    String? key,
+    required T Function(Map<String, dynamic>) deserialize,
+  }) async {
+    try {
+      final response = await http.get(Uri.parse(_url(namespace, key)), headers: _headers);
+      if (response.statusCode == 404) return null;
+      if (response.statusCode != 200) return null;
+      final json = jsonDecode(response.body) as Map<String, dynamic>;
+      return deserialize(json);
+    } catch (e) {
+      return null; // Graceful fallback
+    }
+  }
+
+  @override
+  Future<void> save<T>({
+    required String namespace,
+    String? key,
+    required T data,
+    required Map<String, dynamic> Function(T) serialize,
+  }) async {
+    final body = jsonEncode(serialize(data));
+    await http.put(Uri.parse(_url(namespace, key)), headers: _headers, body: body);
+  }
+
+  @override
+  Future<void> delete({required String namespace, String? key}) async {
+    await http.delete(Uri.parse(_url(namespace, key)), headers: _headers);
+  }
+
+  @override
+  Future<bool> exists({required String namespace, String? key}) async {
+    final response = await http.head(Uri.parse(_url(namespace, key)), headers: _headers);
+    return response.statusCode == 200;
+  }
+}
+```
+
+### Example: Hive Driver
+
+```dart
+class HiveSettingsDriver extends OiSettingsDriver {
+  HiveSettingsDriver({required this.box});
+
+  final Box<String> box;
+
+  @override
+  Future<T?> load<T>({
+    required String namespace,
+    String? key,
+    required T Function(Map<String, dynamic>) deserialize,
+  }) async {
+    final storageKey = resolveKey(namespace, key);
+    final raw = box.get(storageKey);
+    if (raw == null) return null;
+    try {
+      return deserialize(jsonDecode(raw) as Map<String, dynamic>);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  @override
+  Future<void> save<T>({
+    required String namespace,
+    String? key,
+    required T data,
+    required Map<String, dynamic> Function(T) serialize,
+  }) async {
+    final storageKey = resolveKey(namespace, key);
+    await box.put(storageKey, jsonEncode(serialize(data)));
+  }
+
+  @override
+  Future<void> delete({required String namespace, String? key}) async {
+    await box.delete(resolveKey(namespace, key));
+  }
+
+  @override
+  Future<bool> exists({required String namespace, String? key}) async {
+    return box.containsKey(resolveKey(namespace, key));
+  }
+}
+```
+
+### Example: Riverpod State Driver
+
+```dart
+/// Persists settings into a Riverpod StateNotifier.
+/// Settings live in memory with reactive updates — combine with another
+/// driver for actual persistence.
+class RiverpodSettingsDriver extends OiSettingsDriver {
+  RiverpodSettingsDriver({required this.ref, this.persistTo});
+
+  final Ref ref;
+  final OiSettingsDriver? persistTo;
+
+  @override
+  Future<T?> load<T>({
+    required String namespace,
+    String? key,
+    required T Function(Map<String, dynamic>) deserialize,
+  }) async {
+    // Try in-memory state first, then fall back to persistent driver.
+    final inMemory = ref.read(_settingsStoreProvider)[resolveKey(namespace, key)];
+    if (inMemory != null) return deserialize(inMemory);
+    return persistTo?.load(namespace: namespace, key: key, deserialize: deserialize);
+  }
+
+  @override
+  Future<void> save<T>({
+    required String namespace,
+    String? key,
+    required T data,
+    required Map<String, dynamic> Function(T) serialize,
+  }) async {
+    final json = serialize(data);
+    ref.read(_settingsStoreProvider.notifier).state = {
+      ...ref.read(_settingsStoreProvider),
+      resolveKey(namespace, key): json,
+    };
+    await persistTo?.save(namespace: namespace, key: key, data: data, serialize: serialize);
+  }
+
+  // ... delete, exists similarly
+}
+```
+
+---
+
+## Driver Tests
+
+### Unit Tests: OiSettingsDriver interface contract
+
+These tests apply to **every** driver implementation. They should be run as a shared test suite that accepts a driver factory.
+
+```dart
+void runDriverContractTests(OiSettingsDriver Function() createDriver) {
+  // Each test gets a fresh driver instance.
+}
+```
+
+| Test | What it verifies |
+|------|-----------------|
+| `load` returns null when nothing saved | Empty state |
+| `save` then `load` returns saved data | Roundtrip |
+| `save` overwrites previous data | Overwrite |
+| `delete` then `load` returns null | Deletion |
+| `exists` returns false when nothing saved | Empty state |
+| `exists` returns true after save | Existence check |
+| `exists` returns false after delete | Deletion check |
+| `save` with key, `load` without key returns null | Key isolation |
+| `save` without key, `load` with key returns null | Key isolation |
+| `save` with key "A", `load` with key "B" returns null | Key isolation |
+| `save` with key "A", `load` with key "A" returns data | Correct key match |
+| `save` without key (global), `load` without key returns data | Global settings |
+| Multiple namespaces don't collide | Namespace isolation |
+| Corrupted data returns null from `load` (not throw) | Graceful degradation |
+| Complex nested data roundtrips correctly | Nested JSON |
+| Concurrent saves don't corrupt | Thread safety |
+| `resolveKey` produces expected format | Key format |
+
+### Unit Tests: OiLocalStorageDriver
+
+| Test | What it verifies |
+|------|-----------------|
+| All contract tests pass | Full contract |
+| Custom prefix applied to keys | `"obers_ui.oi_table::my-key"` |
+| JSON parse error returns null | Corrupted storage |
+| Works on web platform | Platform-specific |
+| Works on mobile platform | Platform-specific |
+
+### Unit Tests: OiInMemorySettingsDriver
+
+| Test | What it verifies |
+|------|-----------------|
+| All contract tests pass | Full contract |
+| `store` map directly inspectable | Test assertion support |
+| `clear()` empties all settings | Reset |
+
+### Unit Tests: OiSettingsMixin
+
+| Test | What it verifies |
+|------|-----------------|
+| No driver: `currentSettings` equals `defaultSettings` | No-persistence mode |
+| Driver with no saved data: `currentSettings` equals `defaultSettings` | First-use |
+| Driver with saved data: `currentSettings` is merged result | Restore |
+| `updateSettings` changes `currentSettings` immediately | Sync update |
+| `updateSettings` saves to driver after debounce | Debounced write |
+| Rapid `updateSettings` calls: only last value saved | Debounce coalescing |
+| `saveSettingsNow` saves immediately | Explicit save |
+| `resetSettings` reverts to defaults and deletes from driver | Reset |
+| Driver change on `didUpdateWidget` reloads settings | Driver swap |
+| Key change on `didUpdateWidget` reloads settings | Key swap |
+| Load error falls back to defaults | Error resilience |
+| Widget disposes cancels pending save timer | No leak |
+| `settingsLoaded` is false before load completes | Loading state |
+| `settingsLoaded` is true after load completes | Loaded state |
+
+### Unit Tests: OiSettingsProvider
+
+| Test | What it verifies |
+|------|-----------------|
+| `OiSettingsProvider.of(context)` returns driver | Lookup works |
+| Widget uses provider driver when own driver is null | Inherited fallback |
+| Widget uses own driver over provider driver | Explicit wins |
+| No provider and no driver: no persistence | Null case |
+| Provider change notifies dependents | `updateShouldNotify` |
+
+### Unit Tests: OiTableSettings
+
+| Test | What it verifies |
+|------|-----------------|
+| `toJson()` produces valid JSON-encodable map | Serialization |
+| `fromJson(toJson())` roundtrips perfectly | Full roundtrip |
+| `mergeWith` preserves saved column order | Saved wins |
+| `mergeWith` appends new columns from defaults | Backwards compat |
+| `mergeWith` prunes removed columns | Forward compat |
+| `mergeWith` falls back to default sort when saved sort column removed | Graceful |
+| `mergeWith` preserves saved widths for existing columns | Width persist |
+| `mergeWith` ignores saved widths for removed columns | Prune |
+| Empty saved settings merges to defaults | Initial state |
+| `schemaVersion` is 1 | Version check |
+
+---
+
+# Part 2: OiTable v2 — Enhanced Data Table
+
+---
+
+## What Changed from v1
+
+| Feature | v1 | v2 |
+|---------|----|----|
+| Pagination | `onLoadMore` + `hasMore` (infinite scroll only) | Full `OiPaginationController` — server-side, client-side, cursor, infinite, with page size selector |
+| Inline editing | `editableCells=true`, click-to-edit | Double-click-to-edit, seamless cell transition (display → edit is pixel-identical), per-cell type-aware editors, validation, async save |
+| Column resize | `resizeColumns=true`, basic drag | Auto-fit (double-click header edge), min/max enforced, resize indicator line, persisted |
+| Column management | `OiColumnProfile` (name, visible, widths, order) | Full column management panel (toggle visibility, reorder via drag, reset), column freeze (left/right), auto-fit all |
+| Settings persistence | None | `OiSettingsDriver` integration — all preferences auto-saved/restored |
+| Column header menu | None | Click header → sort, filter, hide, freeze, auto-fit in a dropdown |
+| Row reordering | None | Drag to reorder rows (manual sort mode) |
+| Copy/paste | None | Copy cells/rows to clipboard, paste into editable cells |
+| Status bar | None | Optional footer bar with row count, selection count, aggregations |
+| Column groups | None | Grouped column headers (spanning headers like "Personal Info" over "Name" + "Email") |
+
+---
+
+## Full API
+
+```dart
+OiTable<T>({
+  // ── Data ──
+  required List<OiTableColumn<T>> columns,
+  required List<T> rows,
+  required Object Function(T) rowKey,
+  required Widget Function(T row, OiTableColumn<T> column) cellBuilder,
+
+  // ── Sorting ──
+  OiTableSort? sort,
+  List<OiTableSort>? multiSortState,
+  ValueChanged<OiTableSort>? onSort,
+  ValueChanged<List<OiTableSort>>? onMultiSort,
+  bool multiSort = false,
+  bool clientSideSort = false,
+  int Function(T a, T b)? defaultComparator,
+
+  // ── Selection ──
+  OiSelectionMode selectionMode = OiSelectionMode.none,
+  Set<Object> selectedKeys = const {},
+  ValueChanged<Set<Object>>? onSelectionChange,
+
+  // ── Column Management ──
+  bool reorderColumns = false,
+  bool resizeColumns = false,
+  bool hideColumns = false,
+  bool freezeColumns = false,
+  bool autoFitColumns = false,
+  List<OiTableColumnGroup>? columnGroups,
+
+  // ── Virtualization ──
+  bool virtualScroll = false,
+  double? rowHeight,
+  int overscan = 5,
+
+  // ── Grouping ──
+  Object Function(T)? groupBy,
+  Widget Function(Object key, List<T> items)? groupHeader,
+  bool collapsibleGroups = true,
+  Set<Object> expandedGroupKeys = const {},
+  ValueChanged<Set<Object>>? onGroupExpansionChange,
+
+  // ── Row Expansion ──
+  Set<Object> expandedRowKeys = const {},
+  Widget Function(T)? rowDetail,
+  ValueChanged<Set<Object>>? onRowExpansionChange,
+
+  // ── Row Reordering ──
+  bool reorderRows = false,
+  void Function(int oldIndex, int newIndex)? onRowReorder,
+
+  // ── Inline Editing ──
+  bool editableCells = false,
+  OiCellEditTrigger editTrigger = OiCellEditTrigger.doubleTap,
+  void Function(T row, OiTableColumn<T> column, dynamic newValue)? onCellEdit,
+  Future<bool> Function(T row, OiTableColumn<T> column, dynamic newValue)? onCellEditAsync,
+  Widget Function(T row, OiTableColumn<T> column, dynamic currentValue, ValueChanged<dynamic> onSave, VoidCallback onCancel)? cellEditorBuilder,
+
+  // ── Column Filters ──
+  Map<String, OiColumnFilter>? filters,
+  ValueChanged<Map<String, OiColumnFilter>>? onFilterChange,
+  bool clientSideFilter = false,
+
+  // ── Sticky / Pinned ──
+  bool stickyHeader = true,
+  Set<String>? frozenLeftColumnIds,
+  Set<String>? frozenRightColumnIds,
+  List<T>? pinnedRows,
+  OiPinnedPosition pinnedPosition = OiPinnedPosition.top,
+
+  // ── Pagination ──
+  OiPaginationConfig? pagination,
+  OiPaginationController? paginationController,
+
+  // ── Export ──
+  VoidCallback? onExport,
+
+  // ── Copy/Paste ──
+  bool enableCopy = false,
+  bool enablePaste = false,
+  void Function(List<T> rows, List<OiTableColumn<T>> columns, String formatted)? onCopy,
+  void Function(String clipboardData)? onPaste,
+
+  // ── Status Bar ──
+  bool showStatusBar = false,
+  List<OiTableAggregation<T>>? aggregations,
+
+  // ── States ──
+  bool loading = false,
+  Widget? emptyState,
+  Widget? loadingState,
+
+  // ── Context Menu ──
+  List<OiMenuItem> Function(T row)? rowContextMenu,
+  List<OiMenuItem> Function(OiTableColumn<T>)? columnContextMenu,
+
+  // ── Callbacks ──
+  ValueChanged<T>? onRowTap,
+  ValueChanged<T>? onRowDoubleTap,
+
+  // ── Settings Persistence ──
+  OiSettingsDriver? settingsDriver,
+  String? settingsKey,
+  Duration settingsSaveDebounce = const Duration(milliseconds: 500),
+
+  // ── A11y ──
+  required String label,
+})
+```
+
+**New classes:**
+
+```dart
+enum OiCellEditTrigger {
+  /// Single click on a cell enters edit mode.
+  tap,
+  /// Double click enters edit mode. Single click selects the row.
+  doubleTap,
+  /// No automatic trigger — editing is only triggered programmatically.
+  none,
+}
+
+class OiTableColumnGroup {
+  final String title;
+  final List<String> columnIds;
+}
+
+class OiTableAggregation<T> {
+  final String columnId;
+  final String label;
+  final String Function(List<T> rows) compute;
+}
+
+class OiPaginationConfig {
+  const OiPaginationConfig({
+    this.mode = OiPaginationMode.pages,
+    this.pageSize = 25,
+    this.pageSizeOptions = const [10, 25, 50, 100],
+    this.showPageSizeSelector = true,
+    this.showPageNumbers = true,
+    this.showTotalCount = true,
+    this.showFirstLast = true,
+    this.maxVisiblePages = 7,
+  });
+
+  final OiPaginationMode mode;
+  final int pageSize;
+  final List<int> pageSizeOptions;
+  final bool showPageSizeSelector;
+  final bool showPageNumbers;
+  final bool showTotalCount;
+  final bool showFirstLast;
+  final int maxVisiblePages;
+}
+
+enum OiPaginationMode {
+  /// Classic page numbers: « 1 2 3 ... 10 »
+  pages,
+  /// Load more button at the bottom.
+  loadMore,
+  /// Infinite scroll — loads next page when near bottom.
+  infinite,
+  /// Cursor-based pagination (for APIs that use cursor tokens).
+  cursor,
+}
+```
+
+---
+
+## Pagination System
+
+### OiPaginationController
+
+A dedicated controller for managing pagination state. Works for both client-side (all data in memory, table slices it) and server-side (table requests data per page).
+
+```dart
+class OiPaginationController extends ChangeNotifier {
+  OiPaginationController({
+    this.initialPage = 1,
+    this.initialPageSize = 25,
+    this.totalRows,
+    this.serverSide = false,
+    this.onPageChange,
+    this.onPageSizeChange,
+    this.cursorToken,
+  });
+
+  /// Whether pagination is server-side (table requests new data per page)
+  /// or client-side (table slices the full rows list).
+  final bool serverSide;
+
+  /// Total number of rows across all pages. Required for page number display.
+  /// For server-side, this is set by the consumer after each fetch.
+  int? totalRows;
+
+  /// Callback when the user navigates to a different page.
+  /// For server-side: consumer fetches new data and updates [rows] + [totalRows].
+  /// For client-side: table slices internally.
+  void Function(int page, int pageSize)? onPageChange;
+
+  /// Callback when the user changes the page size.
+  void Function(int newPageSize)? onPageSizeChange;
+
+  // ── State ──
+  int _currentPage;
+  int _pageSize;
+  String? cursorToken;
+  bool _loading = false;
+  bool _hasNextPage = true;
+
+  int get currentPage => _currentPage;
+  int get pageSize => _pageSize;
+  bool get loading => _loading;
+  bool get hasNextPage => _hasNextPage;
+
+  int get totalPages => totalRows != null ? (totalRows! / _pageSize).ceil() : 0;
+  bool get hasPreviousPage => _currentPage > 1;
+  int get startRow => (_currentPage - 1) * _pageSize;
+  int get endRow => startRow + _pageSize;
+
+  // ── Navigation ──
+  void goToPage(int page) {
+    if (page < 1 || (totalPages > 0 && page > totalPages)) return;
+    _currentPage = page;
+    notifyListeners();
+    onPageChange?.call(_currentPage, _pageSize);
+  }
+
+  void nextPage() => goToPage(_currentPage + 1);
+  void previousPage() => goToPage(_currentPage - 1);
+  void firstPage() => goToPage(1);
+  void lastPage() => goToPage(totalPages);
+
+  void setPageSize(int newSize) {
+    _pageSize = newSize;
+    _currentPage = 1; // Reset to first page on size change.
+    notifyListeners();
+    onPageSizeChange?.call(_pageSize);
+    onPageChange?.call(_currentPage, _pageSize);
+  }
+
+  void setLoading(bool loading) {
+    _loading = loading;
+    notifyListeners();
+  }
+
+  void setHasNextPage(bool has) {
+    _hasNextPage = has;
+    notifyListeners();
+  }
+
+  void setTotalRows(int total) {
+    totalRows = total;
+    notifyListeners();
+  }
+
+  /// For cursor-based pagination.
+  void setCursor(String? cursor) {
+    cursorToken = cursor;
+    _hasNextPage = cursor != null;
+    notifyListeners();
+  }
+}
+```
+
+### Pagination UI (rendered by OiTable)
+
+The pagination footer is rendered below the table body. It adapts based on `OiPaginationMode`:
+
+**Pages mode:**
+
+```
+┌──────────────────────────────────────────────────────────────────────┐
+│ Showing 26-50 of 1,234 rows  │  Rows per page: [25 ▾]  │ « ‹ 1 2 [3] 4 5 ... 50 › » │
+└──────────────────────────────────────────────────────────────────────┘
+```
+
+**Load more mode:**
+
+```
+┌──────────────────────────────────────────────────────────────────────┐
+│                     [Load more] (showing 50 of 1,234)                │
+└──────────────────────────────────────────────────────────────────────┘
+```
+
+**Infinite mode:**
+No footer — `OiInfiniteScroll` triggers `paginationController.nextPage()` at scroll bottom.
+
+**Cursor mode:**
+Same as pages mode visually, but "Previous" may be disabled (cursor-based APIs often don't support backward navigation). Page numbers may be hidden.
+
+### Client-side vs. Server-side
+
+| Aspect | Client-side | Server-side |
+|--------|-------------|-------------|
+| Data | Consumer provides ALL rows | Consumer provides current page's rows |
+| Slicing | Table slices `rows[start:end]` internally | Consumer fetches per-page data |
+| Sort | Table sorts full list locally | Consumer sorts on server |
+| Filter | Table filters locally | Consumer filters on server |
+| Total count | `rows.length` | Consumer sets `controller.totalRows` |
+| `clientSideSort` | `true` | `false` |
+| `clientSideFilter` | `true` | `false` |
+| `paginationController.serverSide` | `false` | `true` |
+
+**Server-side flow:**
+
+1. Table mounts with `paginationController` (serverSide: true).
+2. Consumer listens to `onPageChange(page, pageSize)`, fetches data, updates `rows` and `controller.totalRows`.
+3. During fetch, consumer sets `controller.setLoading(true)` — table shows loading bar.
+4. After fetch, consumer sets `controller.setLoading(false)` and provides new `rows`.
+
+**Client-side flow:**
+
+1. Consumer provides all rows. `paginationController` (serverSide: false).
+2. Table internally slices: `displayedRows = rows.sublist(controller.startRow, min(controller.endRow, rows.length))`.
+3. `controller.totalRows` auto-set to `rows.length`.
+4. Sort + filter applied before slicing.
+
+---
+
+## Inline Editing System
+
+### Design: Seamless Cell Transition
+
+The v2 inline editing system ensures **zero visual jump** when transitioning from display to edit mode. This means:
+
+1. The edit widget must be **pixel-identical** to the display widget in its initial state. Same font, same padding, same alignment, same height.
+2. The transition is not a "replace" — it's an **overlay morph**. The display widget stays in place, and the edit widget fades in on top with a 0ms delay (instant), inheriting the exact position and size.
+3. The cell border/background subtly transitions to indicate edit mode (e.g., a 1px primary border fades in over 100ms).
+
+### How It Works
+
+```dart
+// The table's internal cell rendering logic:
+
+Widget _buildCell(T row, OiTableColumn<T> column) {
+  final isEditing = _editingCell?.rowKey == rowKey(row) &&
+                    _editingCell?.columnId == column.id;
+
+  if (!isEditing) {
+    // Display mode — normal cellBuilder output.
+    return GestureDetector(
+      onDoubleTap: editableCells && column.editable
+          ? () => _startEditing(row, column)
+          : null,
+      child: _CellFrame(
+        column: column,
+        child: cellBuilder(row, column),
+      ),
+    );
+  }
+
+  // Edit mode — seamless editor.
+  return _CellFrame(
+    column: column,
+    editing: true,
+    child: _buildCellEditor(row, column),
+  );
+}
+```
+
+**`_CellFrame`** is an internal widget that provides:
+
+- Identical padding in both display and edit mode.
+- A subtle border that transitions from `transparent` to `primary.s300` in 100ms on edit.
+- A subtle background shift from `transparent` to `surface.s50` in 100ms on edit.
+- Fixed height matching the row height — the cell never grows or shrinks during editing.
+
+### Built-in Cell Editors
+
+When `cellEditorBuilder` is null, the table uses built-in editors based on column type:
+
+| Column type hint | Display | Editor |
+|-----------------|---------|--------|
+| `text` (default) | `OiLabel` with text | `OiTextInput` with identical font/size |
+| `number` | `OiLabel` with formatted number | `OiNumberInput` with same alignment |
+| `date` | `OiLabel` with formatted date | `OiDateInput` (inline, not popup) |
+| `select` | `OiLabel` with selected label | `OiSelect` dropdown |
+| `bool` | `OiCheckbox` or text | `OiCheckbox` (toggles immediately) |
+| `custom` | Custom `cellBuilder` output | Custom `cellEditorBuilder` output |
+
+The column type hint is specified via a new field:
+
+```dart
+class OiTableColumn<T> {
+  // ... existing fields ...
+
+  /// Type hint for the built-in cell editor.
+  /// When [editable] is true and no [cellEditorBuilder] is provided,
+  /// this determines which editor widget is used.
+  final OiCellType cellType;
+
+  /// For select-type columns: the available options.
+  final List<OiSelectOption>? selectOptions;
+
+  /// Validation function for cell editing.
+  /// Returns null if valid, error message if invalid.
+  final String? Function(dynamic value)? validate;
+
+  /// Whether this individual column is editable.
+  /// Only effective when the table's [editableCells] is also true.
+  final bool editable;
+}
+
+enum OiCellType { text, number, date, select, bool, custom }
+```
+
+### Edit Flow
+
+1. **Trigger:** User double-clicks cell (or single-click if `editTrigger=tap`, or programmatic).
+2. **Transition:** Display widget stays, edit widget fades in on top (0ms for the widget, 100ms for the border/background).
+3. **Focus:** Edit widget is auto-focused. For text: cursor placed at end. For select: dropdown opens.
+4. **Navigation:** Tab moves to next editable cell in the row. Shift+Tab moves to previous. Down arrow moves to same column in next row (and enters edit there). Up arrow moves to previous row.
+5. **Save:** Enter or Tab confirms. `onCellEdit(row, column, newValue)` fires. If `onCellEditAsync` is provided, a loading spinner shows in the cell until the Future resolves. If the Future returns `false`, the cell reverts with an error flash (red border for 500ms).
+6. **Cancel:** Escape reverts to original value and exits edit mode.
+7. **Validation:** If `column.validate` returns a non-null string, the error is shown as a tooltip below the cell and save is blocked.
+8. **Blur:** Clicking outside the cell saves (like `OiEditable.saveOnBlur`).
+
+### Async Save
+
+```dart
+void Function(T row, OiTableColumn<T> column, dynamic newValue)? onCellEdit;
+Future<bool> Function(T row, OiTableColumn<T> column, dynamic newValue)? onCellEditAsync;
+```
+
+- `onCellEdit` — synchronous. Fire-and-forget. Cell exits edit mode immediately.
+- `onCellEditAsync` — asynchronous. Cell shows a tiny inline spinner while the Future is pending. Returns `true` → save accepted, cell exits edit. Returns `false` → save rejected, cell shows error flash, stays in edit mode with the value highlighted so the user can correct it.
+- If both are provided, `onCellEditAsync` takes precedence.
+
+---
+
+## Column Management
+
+### Column Header Dropdown Menu
+
+Right-click or click the header "⋮" button opens a context menu per column:
+
+```
+┌────────────────────────┐
+│  Sort Ascending      ▴ │
+│  Sort Descending     ▾ │
+│  ───────────────────── │
+│  Filter...             │
+│  Clear Filter          │
+│  ───────────────────── │
+│  Freeze Left           │
+│  Freeze Right          │
+│  Unfreeze              │
+│  ───────────────────── │
+│  Auto-fit Column       │
+│  Auto-fit All Columns  │
+│  ───────────────────── │
+│  Hide Column           │
+│  ───────────────────── │
+│  Column Settings...    │  ← opens full column management panel
+└────────────────────────┘
+```
+
+### Column Management Panel
+
+A side panel (via `OiPanel`) for managing all columns at once:
+
+```
+┌──────────────────────────────┐
+│  Columns                [×]  │
+│  ───────────────────────     │
+│  🔍 Search columns           │
+│                              │
+│  ☑ ≡ Name          [📌L]    │  ← check=visible, ≡=drag, pin indicator
+│  ☑ ≡ Email                   │
+│  ☐ ≡ Phone      (hidden)     │  ← unchecked=hidden
+│  ☑ ≡ Created                 │
+│  ☑ ≡ Status                  │
+│                              │
+│  [Show All]  [Hide All]      │
+│  [Reset to Default]          │
+└──────────────────────────────┘
+```
+
+- **Checkboxes** toggle column visibility.
+- **Drag handles (≡)** reorder columns via `OiReorderable`.
+- **Pin indicator** shows freeze state (📌L = frozen left, 📌R = frozen right).
+- Click a pin indicator to cycle: none → frozen left → frozen right → none.
+- **Search** filters the column list.
+- **Reset** calls `resetSettings()` from `OiSettingsMixin`.
+- All changes auto-save via the settings driver (if provided).
+
+### Auto-fit Columns
+
+**Double-click** on a column resize handle → auto-fits the column to its content:
+
+1. Measures the rendered width of the header text.
+2. Measures the rendered width of the widest visible cell in that column (scans visible rows only for performance).
+3. Sets the column width to `max(headerWidth, maxCellWidth) + padding`.
+4. Respects `minWidth` and `maxWidth`.
+
+**Auto-fit All Columns** does this for every column.
+
+### Column Resize Indicator
+
+When dragging a column edge to resize:
+
+- A vertical dashed line follows the cursor across the full table height.
+- The new width is shown in a small floating label at the top: `"Width: 180px"`.
+- On mouse-up, the column snaps to the new width and fires `updateSettings`.
+
+---
+
+## Settings Persistence Integration
+
+The table persists the following settings automatically when a driver is provided:
+
+| Setting | When it changes | Debounce |
+|---------|----------------|----------|
+| Column order | Column header drag-reorder | 500ms |
+| Column widths | Column resize drag | 500ms |
+| Column visibility | Toggle in column management panel | 500ms |
+| Frozen columns | Freeze/unfreeze from header menu | 500ms |
+| Sort | Click column header | 500ms |
+| Filters | Apply/clear column filter | 500ms |
+| Page size | Change in pagination selector | 500ms |
+| Expanded groups | Expand/collapse group headers | 500ms |
+
+Settings **not** persisted (ephemeral per session):
+
+- Selected rows (selection is transient)
+- Expanded row details (transient)
+- Current page number (resets to 1)
+- Search query (resets to empty)
+- Edit mode state (always exits)
+
+### Reset Flow
+
+The table's column management panel includes a "Reset to Default" button. This:
+
+1. Calls `resetSettings()` on the mixin.
+2. Deletes stored settings from the driver.
+3. Reverts to `defaultSettings` derived from widget props.
+4. Shows a toast: "Table settings reset to default".
+
+---
+
+## Table Controller
+
+An optional controller for programmatic control:
+
+```dart
+class OiTableController<T> extends ChangeNotifier {
+  /// Programmatically start editing a cell.
+  void startEditing(Object rowKey, String columnId);
+
+  /// Programmatically stop editing.
+  void cancelEditing();
+
+  /// Scroll to a specific row.
+  void scrollToRow(Object rowKey, {bool highlight = true});
+
+  /// Scroll to a specific column.
+  void scrollToColumn(String columnId);
+
+  /// Expand all groups.
+  void expandAllGroups();
+
+  /// Collapse all groups.
+  void collapseAllGroups();
+
+  /// Select a range of rows programmatically.
+  void selectRange(Object fromKey, Object toKey);
+
+  /// Export the current view (visible columns, applied sort/filters) as CSV.
+  String exportCsv({bool includeHeaders = true, bool selectedOnly = false});
+
+  /// Reset column widths, order, visibility to defaults.
+  /// If settings driver is provided, also clears persisted settings.
+  void resetColumnSettings();
+
+  /// Auto-fit a specific column.
+  void autoFitColumn(String columnId);
+
+  /// Auto-fit all columns.
+  void autoFitAllColumns();
+
+  /// Get the current table settings (for manual save/export).
+  OiTableSettings get currentSettings;
+}
+```
+
+---
+
+## Table Tests
+
+### Unit Tests
+
+| Test | What it verifies |
+|------|-----------------|
+| **Pagination Controller** | |
+| `goToPage(3)` sets currentPage to 3 | Navigation |
+| `goToPage(0)` is no-op | Boundary |
+| `goToPage(totalPages + 1)` is no-op | Boundary |
+| `nextPage()` increments | Forward |
+| `previousPage()` decrements | Backward |
+| `firstPage()` goes to 1 | First |
+| `lastPage()` goes to totalPages | Last |
+| `setPageSize(50)` resets to page 1 | Size change |
+| `totalPages` computes correctly (ceil) | Math |
+| `startRow` / `endRow` correct for page 3, size 25 | Slice bounds |
+| `hasPreviousPage` false on page 1 | Boundary |
+| `hasNextPage` false on last page | Boundary |
+| `setCursor(null)` sets hasNextPage false | Cursor mode |
+| `onPageChange` fires with correct args | Callback |
+| **Client-Side Pagination** | |
+| Table with 100 rows, pageSize 25: shows rows 1-25 | Slicing |
+| Navigate to page 3: shows rows 51-75 | Correct slice |
+| Last page with 8 remaining: shows 8 rows | Partial page |
+| Client-side sort applies before slicing | Order correct |
+| Client-side filter applies before slicing (and updates totalRows) | Count correct |
+| **Cell Editor Type Mapping** | |
+| `cellType: text` → OiTextInput editor | Correct editor |
+| `cellType: number` → OiNumberInput editor | Correct editor |
+| `cellType: date` → OiDateInput editor | Correct editor |
+| `cellType: select` → OiSelect editor | Correct editor |
+| `cellType: bool` → OiCheckbox editor | Correct editor |
+| `cellEditorBuilder` overrides built-in | Custom wins |
+| **OiTableSettings Serialization** | |
+| Full roundtrip: toJson → fromJson → equals original | Serialization |
+| mergeWith adds new columns from defaults | Backwards compat |
+| mergeWith prunes removed columns | Forward compat |
+| mergeWith preserves saved sort if column still exists | Valid sort |
+| mergeWith clears saved sort if column removed | Invalid sort |
+| **Auto-Fit Calculation** | |
+| Auto-fit measures header and cells correctly | Width calculation |
+| Auto-fit respects minWidth | Lower bound |
+| Auto-fit respects maxWidth | Upper bound |
+
+### Widget Tests
+
+| Test | What it verifies |
+|------|-----------------|
+| **Core Rendering** | |
+| Columns and rows render | Headers + cells visible |
+| Column groups render spanning headers | Group headers span correctly |
+| Status bar renders aggregations | Footer with computed values |
+| **Sorting** | |
+| Header click fires onSort | Callback |
+| Sort toggle: asc → desc → none | Cycle |
+| Multi-sort: Ctrl+click adds secondary sort | Multiple sort indicators |
+| Client-side sort: rows reorder in view | Visual order change |
+| **Selection** | |
+| Click selects row (single mode) | Single key in set |
+| Click selects row (multi mode) | Key added |
+| Shift+click range selects | Range selected |
+| Ctrl+click toggles | Deselect works |
+| Header checkbox: all/none/indeterminate | Three states |
+| Space bar toggles focused row selection | Keyboard |
+| **Column Resize** | |
+| Drag column edge changes width | Width updates |
+| Resize indicator line shows during drag | Visual feedback |
+| Width label shows during drag | "Width: 180px" |
+| minWidth enforced on drag | Cannot go below |
+| maxWidth enforced on drag | Cannot go above |
+| Double-click header edge auto-fits | Width adjusts to content |
+| Settings driver saves new width after debounce | Persisted |
+| **Column Reorder** | |
+| Drag header to new position | Column moves |
+| Settings driver saves new order | Persisted |
+| **Column Visibility** | |
+| Column management panel opens | Panel visible |
+| Uncheck column hides it | Column gone |
+| Check column shows it | Column appears |
+| "Show All" checks all | All visible |
+| "Hide All" unchecks all | All hidden (except at least 1) |
+| Settings driver saves visibility | Persisted |
+| **Column Freeze** | |
+| Freeze left from header menu | Column pinned to left |
+| Freeze right from header menu | Column pinned to right |
+| Frozen column stays on horizontal scroll | Sticky |
+| Unfreeze from header menu | Column scrolls normally |
+| Settings driver saves freeze state | Persisted |
+| **Column Header Menu** | |
+| Right-click header opens dropdown | Menu visible |
+| Sort ascending/descending from menu | Sort applied |
+| Filter from menu opens filter popover | Filter UI |
+| Hide column from menu | Column hidden |
+| Auto-fit from menu | Column resized |
+| **Inline Editing** | |
+| Double-click cell enters edit mode | Editor visible |
+| Edit widget is pixel-identical to display | No visual jump |
+| Cell border transitions to primary on edit | Subtle indicator |
+| Enter saves and exits edit | onCellEdit fires |
+| Escape cancels and exits edit | Original value restored |
+| Tab moves to next editable cell | Focus advances |
+| Shift+Tab moves to previous editable cell | Focus retreats |
+| Down arrow edits same column in next row | Vertical navigation |
+| Blur saves (saveOnBlur) | Save on focus loss |
+| Validation error shows tooltip | Error message |
+| Validation error blocks save | Cannot save |
+| Async save shows spinner | Loading in cell |
+| Async save returns true: exits edit | Confirmed |
+| Async save returns false: error flash, stays in edit | Rejected |
+| `editTrigger=tap`: single click enters edit | Different trigger |
+| `editTrigger=none`: no automatic trigger | Programmatic only |
+| `cellEditorBuilder` renders custom editor | Custom widget |
+| Bool column toggles immediately on click | No edit mode needed |
+| **Pagination (Pages mode)** | |
+| Page numbers render | Buttons visible |
+| Click page 3 navigates | onPageChange fires |
+| Next/previous buttons work | Navigation |
+| First/last buttons work | Boundary navigation |
+| Page size selector changes page size | Rows per page change |
+| "Showing X-Y of Z" text correct | Count text |
+| Current page highlighted | Active button |
+| Ellipsis for many pages | "1 2 ... 50" |
+| **Pagination (Load More mode)** | |
+| Load more button visible | Button visible |
+| Click fires nextPage | Append rows |
+| "Showing X of Y" text correct | Count text |
+| **Pagination (Infinite mode)** | |
+| Scroll to bottom triggers load | OiInfiniteScroll |
+| Loading spinner at bottom | Visible during load |
+| **Pagination (Cursor mode)** | |
+| Next page uses cursor token | Token passed |
+| Previous disabled when no backward cursor | Button disabled |
+| **Server-Side Pagination** | |
+| onPageChange fires on navigation | Consumer fetches |
+| Loading state during fetch | Loading bar |
+| totalRows from controller updates UI | Count text |
+| **Client-Side Pagination** | |
+| Rows sliced correctly per page | Subset shown |
+| Sort + filter applied before slice | Order correct |
+| Filter reduces totalRows | Count updates |
+| **Row Reorder** | |
+| Drag row to new position | Row moves |
+| onRowReorder fires with old/new index | Callback |
+| **Copy/Paste** | |
+| Ctrl+C copies selected rows | Clipboard content |
+| Copy includes only visible columns | Column filter |
+| Ctrl+V pastes into editable cells | Cells updated |
+| **Grouping** | |
+| Group headers render | Headers visible |
+| Collapse group hides rows | Rows hidden |
+| Expand group shows rows | Rows visible |
+| expandedGroupKeys persisted via settings driver | Saved |
+| **Settings Persistence** | |
+| No driver: no persistence, all features work | Baseline |
+| Driver + no key: global settings | Shared by instances |
+| Driver + key: view-specific settings | Isolated |
+| Settings loaded on mount | Restored |
+| Settings debounce-saved on change | 500ms delay |
+| Rapid resizes: only final width saved | Debounce |
+| Reset button clears driver and reverts to defaults | Full reset |
+| Schema migration: old saved data + new columns → merged | Backwards compat |
+| Driver error on load: falls back to defaults | Graceful |
+| Driver error on save: no crash, silent fail | Resilient |
+| OiSettingsProvider provides driver to table without prop | Inherited |
+| Table prop driver overrides provider driver | Explicit wins |
+| **Keyboard Navigation** | |
+| Arrow keys navigate cells | Focus moves |
+| Enter starts cell edit (when editable) | Edit mode |
+| Escape cancels edit | Exit edit |
+| Tab in edit mode: save + next cell | Chain edit |
+| Shift+Tab: save + previous cell | Reverse chain |
+| Ctrl+A selects all rows | Select all |
+| Ctrl+C copies | Copy |
+| Home/End: first/last cell in row | Horizontal bounds |
+| Ctrl+Home/End: first/last row | Vertical bounds |
+| Page Up/Down: scroll by page | Scroll |
+| **Accessibility** | |
+| Table has semantics role `table` | Announced |
+| Column headers announced with sort state | "Name, sorted ascending" |
+| Cell content announced on navigation | Read aloud |
+| Edit mode announced | "Editing cell" |
+| Pagination controls labeled | "Page 3 of 50" |
+| Status bar announced | "Showing 1,234 rows" |
+| Column management panel labeled | "Column settings" |
+| **Performance** | |
+| 10,000 rows + virtual scroll: <16ms frame | Smooth |
+| 100,000 rows + virtual scroll: <16ms frame | Smooth |
+| Sort 10,000 rows client-side: <100ms | Responsive |
+| Filter 10,000 rows client-side: <100ms | Responsive |
+| 50 columns with horizontal scroll: <16ms frame | Smooth |
+| Rapid column resize (60fps drag): no jank | Smooth |
+| Rapid page navigation (click click click): stable | No race conditions |
+| **Golden Tests** | |
+| Table: default, light + dark | 2 |
+| Table: with selection, grouped, filters active | 3 |
+| Table: inline edit mode (text, number, date, select, bool) | 5 |
+| Table: column resize indicator | 1 |
+| Table: column management panel | 1 |
+| Table: pagination bar (pages, load more) | 2 |
+| Table: status bar with aggregations | 1 |
+| Table: column groups with spanning headers | 1 |
+| Table: frozen columns with horizontal scroll | 1 |
+| Table: loading and empty states | 2 |
+| Total goldens | 19 × 2 (light+dark) = 38 |
+
+### Integration Tests
+
+| Test | Scenario |
+|------|----------|
+| **Full Edit Flow** | Double-click cell → type new value → Enter → cell shows new value → value persisted if async confirms |
+| **Edit + Tab Chain** | Double-click cell → type → Tab → next editable cell in edit mode → type → Tab → next → Enter → all saved |
+| **Edit + Validation** | Double-click → type invalid → Enter → error tooltip shown → fix → Enter → saved |
+| **Edit + Async Reject** | Double-click → type → Enter → spinner → server rejects → error flash → cell stays in edit |
+| **Sort + Paginate** | Click sort → rows reorder → navigate to page 2 → rows on page 2 are correctly sorted |
+| **Filter + Paginate** | Apply filter → total rows reduces → page count reduces → navigate pages within filtered set |
+| **Resize + Persist** | Resize column → switch page → come back → column width still resized |
+| **Reorder + Persist** | Drag column to new position → refresh → column order preserved |
+| **Hide + Persist** | Open column panel → hide column → refresh → column still hidden |
+| **Reset Settings** | Customize everything → Reset to Default → all settings reverted → driver cleared |
+| **Server-Side Pagination** | Mount table → controller fires page 1 → consumer fetches → rows display → click page 2 → loading → new rows |
+| **Cursor Pagination** | Load page → set cursor → click Next → cursor passed to callback → new data + new cursor |
+| **Column Freeze + Scroll** | Freeze Name column → scroll right → Name stays visible, other columns scroll |
+| **Full Keyboard Flow** | Tab into table → arrow keys → Enter edits → type → Tab to next → Escape cancels → arrow to select → Space toggles |
+
+---
+
+# Package Structure Additions
+
+```
+src/
+  foundation/
+    persistence/
+      oi_settings_driver.dart        ★ NEW — abstract interface
+      oi_settings_data.dart          ★ NEW — mixin
+      oi_settings_mixin.dart         ★ NEW — widget integration mixin
+      oi_settings_provider.dart      ★ NEW — InheritedWidget
+      drivers/
+        oi_local_storage_driver.dart ★ NEW — built-in
+        oi_in_memory_driver.dart     ★ NEW — testing
+
+  composites/
+    data/
+      oi_table.dart                  ★ REPLACED (v2)
+      oi_table_controller.dart       ★ NEW
+      oi_pagination_controller.dart  ★ NEW
+
+  models/
+    settings/
+      oi_table_settings.dart         ★ NEW
+      oi_file_explorer_settings.dart ★ NEW
+      oi_kanban_settings.dart        ★ NEW
+      oi_sidebar_settings.dart       ★ NEW
+      oi_dashboard_settings.dart     ★ NEW
+      oi_split_pane_settings.dart    ★ NEW
+      oi_list_view_settings.dart     ★ NEW
+```
+
+---
