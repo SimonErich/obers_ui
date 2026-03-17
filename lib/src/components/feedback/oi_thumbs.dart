@@ -1,6 +1,8 @@
+import 'package:flutter/material.dart' show Icons;
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/src/components/buttons/oi_button.dart';
+import 'package:obers_ui/src/components/buttons/oi_icon_button.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
-import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
 
 /// The possible selection states for [OiThumbs].
 ///
@@ -18,19 +20,29 @@ enum OiThumbsValue {
 
 /// A thumbs-up / thumbs-down feedback widget.
 ///
-/// Renders two thumb buttons. The selected thumb is drawn filled; the other
-/// uses an outline style. Tapping the same thumb twice deselects it (returns
-/// [OiThumbsValue.none]). When [enabled] is `false`, taps are ignored.
+/// Renders two [OiIconButton]s. The selected thumb uses the *soft* variant;
+/// the other uses *ghost*. Tapping the same thumb twice deselects it (returns
+/// [OiThumbsValue.none]). When [showCount] is `true`, [upCount] and [downCount]
+/// are displayed alongside their respective buttons.
+///
+/// When [enabled] is `false`, taps are ignored.
 ///
 /// {@category Components}
 class OiThumbs extends StatelessWidget {
   /// Creates an [OiThumbs] widget.
   const OiThumbs({
+    this.label,
     this.value = OiThumbsValue.none,
     this.onChanged,
     this.enabled = true,
+    this.showCount = false,
+    this.upCount = 0,
+    this.downCount = 0,
     super.key,
   });
+
+  /// Accessible label announced by screen readers for the group.
+  final String? label;
 
   /// The current selection state.
   final OiThumbsValue value;
@@ -41,6 +53,15 @@ class OiThumbs extends StatelessWidget {
   /// Whether the widget is interactive. Defaults to `true`.
   final bool enabled;
 
+  /// Whether to display the up/down counts. Defaults to `false`.
+  final bool showCount;
+
+  /// Number of thumbs-up votes shown when [showCount] is `true`.
+  final int upCount;
+
+  /// Number of thumbs-down votes shown when [showCount] is `true`.
+  final int downCount;
+
   void _handleTap(OiThumbsValue tapped) {
     if (!enabled) return;
     // Tapping the same thumb toggles it off.
@@ -50,59 +71,69 @@ class OiThumbs extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final textTheme = context.textTheme;
     final colors = context.colors;
 
-    Widget thumbButton({
+    Widget buildThumb({
       required OiThumbsValue thumb,
-      required String label,
-      required bool flipped,
+      required String semanticLabel,
+      required bool isUp,
+      required int count,
     }) {
       final selected = value == thumb;
-      final bg = selected ? colors.primary.muted : colors.surface;
-      final fg = selected ? colors.primary.base : colors.textMuted;
-      final border = selected ? colors.primary.base : colors.border;
+      final variant = selected ? OiButtonVariant.soft : OiButtonVariant.ghost;
 
-      return Semantics(
+      Widget button = Semantics(
         button: true,
-        label: label,
         selected: selected,
-        child: OiTappable(
+        child: OiIconButton(
+          icon: isUp ? Icons.thumb_up : Icons.thumb_down,
+          semanticLabel: semanticLabel,
+          onTap: enabled ? () => _handleTap(thumb) : null,
+          variant: variant,
           enabled: enabled,
-          onTap: () => _handleTap(thumb),
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 150),
-            width: 40,
-            height: 40,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              color: bg,
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: border),
-            ),
-            child: Transform.scale(
-              scaleY: flipped ? -1 : 1,
-              child: Text('👍', style: TextStyle(fontSize: 20, color: fg)),
-            ),
-          ),
         ),
       );
+
+      if (showCount) {
+        button = Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            button,
+            const SizedBox(width: 4),
+            Text(
+              '$count',
+              style: textTheme.small.copyWith(color: colors.textMuted),
+            ),
+          ],
+        );
+      }
+
+      return button;
     }
 
-    return Row(
+    final Widget content = Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        thumbButton(
+        buildThumb(
           thumb: OiThumbsValue.up,
-          label: 'Thumbs up',
-          flipped: false,
+          semanticLabel: 'Thumbs up',
+          isUp: true,
+          count: upCount,
         ),
         const SizedBox(width: 8),
-        thumbButton(
+        buildThumb(
           thumb: OiThumbsValue.down,
-          label: 'Thumbs down',
-          flipped: true,
+          semanticLabel: 'Thumbs down',
+          isUp: false,
+          count: downCount,
         ),
       ],
     );
+
+    if (label != null) {
+      return Semantics(label: label, child: content);
+    }
+    return content;
   }
 }

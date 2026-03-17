@@ -148,6 +148,161 @@ void main() {
       expect(content.blocks.first.type, OiBlockType.paragraph);
       expect(content.blocks.first.text, isEmpty);
     });
+
+    test('toDelta encodes paragraphs and headings', () {
+      const content = OiRichContent(
+        blocks: [
+          OiContentBlock(type: OiBlockType.heading1, text: 'Title'),
+          OiContentBlock(type: OiBlockType.paragraph, text: 'Body'),
+        ],
+      );
+
+      final delta = content.toDelta();
+      final ops = delta['ops'] as List<dynamic>;
+
+      // Verify specific insert values and block attributes exist in ops.
+      expect(ops.any((op) => op['insert'] == 'Title'), isTrue);
+      expect(
+        ops.any(
+          (op) =>
+              op['insert'] == '\n' &&
+              (op['attributes'] as Map?)?['header'] == 1,
+        ),
+        isTrue,
+      );
+      expect(ops.any((op) => op['insert'] == 'Body'), isTrue);
+      expect(ops.any((op) => op['insert'] == '\n' && op['attributes'] == null),
+          isTrue);
+    });
+
+    test('toDelta encodes list blocks', () {
+      const content = OiRichContent(
+        blocks: [
+          OiContentBlock(type: OiBlockType.bulletList, text: 'Item'),
+          OiContentBlock(type: OiBlockType.numberedList, text: 'One'),
+        ],
+      );
+
+      final delta = content.toDelta();
+      final ops = delta['ops'] as List<dynamic>;
+
+      expect(
+        ops.any(
+          (op) =>
+              op['insert'] == '\n' &&
+              (op['attributes'] as Map?)?['list'] == 'bullet',
+        ),
+        isTrue,
+      );
+      expect(
+        ops.any(
+          (op) =>
+              op['insert'] == '\n' &&
+              (op['attributes'] as Map?)?['list'] == 'ordered',
+        ),
+        isTrue,
+      );
+    });
+
+    test('toDelta encodes inline formatting', () {
+      const content = OiRichContent(
+        blocks: [
+          OiContentBlock(
+            type: OiBlockType.paragraph,
+            text: 'Bold text',
+            isBold: true,
+          ),
+          OiContentBlock(
+            type: OiBlockType.paragraph,
+            text: 'Italic text',
+            isItalic: true,
+          ),
+          OiContentBlock(
+            type: OiBlockType.paragraph,
+            text: 'Underlined',
+            isUnderline: true,
+          ),
+        ],
+      );
+
+      final delta = content.toDelta();
+      final ops = delta['ops'] as List<dynamic>;
+
+      expect(
+        ops.any(
+          (op) =>
+              op['insert'] == 'Bold text' &&
+              (op['attributes'] as Map?)?['bold'] == true,
+        ),
+        isTrue,
+      );
+      expect(
+        ops.any(
+          (op) =>
+              op['insert'] == 'Italic text' &&
+              (op['attributes'] as Map?)?['italic'] == true,
+        ),
+        isTrue,
+      );
+      expect(
+        ops.any(
+          (op) =>
+              op['insert'] == 'Underlined' &&
+              (op['attributes'] as Map?)?['underline'] == true,
+        ),
+        isTrue,
+      );
+    });
+
+    test('toDelta encodes code and quote blocks', () {
+      const content = OiRichContent(
+        blocks: [
+          OiContentBlock(type: OiBlockType.code, text: 'var x = 1;'),
+          OiContentBlock(type: OiBlockType.quote, text: 'Quoted'),
+        ],
+      );
+
+      final delta = content.toDelta();
+      final ops = delta['ops'] as List<dynamic>;
+
+      expect(
+        ops.any(
+          (op) =>
+              op['insert'] == '\n' &&
+              (op['attributes'] as Map?)?['code-block'] == true,
+        ),
+        isTrue,
+      );
+      expect(
+        ops.any(
+          (op) =>
+              op['insert'] == '\n' &&
+              (op['attributes'] as Map?)?['blockquote'] == true,
+        ),
+        isTrue,
+      );
+    });
+
+    test('OiContentBlock equality includes formatting flags', () {
+      const a = OiContentBlock(
+        type: OiBlockType.paragraph,
+        text: 'Hello',
+        isBold: true,
+      );
+      const b = OiContentBlock(
+        type: OiBlockType.paragraph,
+        text: 'Hello',
+        isBold: false,
+      );
+      const c = OiContentBlock(
+        type: OiBlockType.paragraph,
+        text: 'Hello',
+        isBold: true,
+      );
+
+      expect(a, isNot(equals(b)));
+      expect(a, equals(c));
+    });
   });
 
   // ── OiRichEditorController tests ──────────────────────────────────────────
@@ -264,6 +419,20 @@ void main() {
       expect(controller.toPlainText(), 'Title\nBody');
     });
 
+    test('toDelta delegates to content', () {
+      final controller = OiRichEditorController(
+        initialContent: const OiRichContent(
+          blocks: [
+            OiContentBlock(type: OiBlockType.paragraph, text: 'Hello'),
+          ],
+        ),
+      );
+      addTearDown(controller.dispose);
+
+      final delta = controller.toDelta();
+      expect(delta, containsPair('ops', isA<List>()));
+    });
+
     test('wordCount delegates to content', () {
       final controller = OiRichEditorController(
         initialContent: const OiRichContent(
@@ -361,6 +530,21 @@ void main() {
       }
     });
 
+    testWidgets('toolbar renders bold italic underline buttons', (tester) async {
+      final controller = OiRichEditorController();
+      addTearDown(controller.dispose);
+
+      await tester.pumpObers(
+        Center(
+          child: OiRichEditor(controller: controller, label: 'Editor'),
+        ),
+      );
+
+      expect(find.text('B'), findsOneWidget);
+      expect(find.text('I'), findsOneWidget);
+      expect(find.text('U'), findsOneWidget);
+    });
+
     testWidgets('toolbar renders when mode is fixed', (tester) async {
       final controller = OiRichEditorController();
       addTearDown(controller.dispose);
@@ -392,6 +576,7 @@ void main() {
       );
 
       expect(find.text('H1'), findsNothing);
+      expect(find.text('B'), findsNothing);
     });
 
     testWidgets('minimal toolbar shows fewer buttons', (tester) async {
@@ -412,6 +597,77 @@ void main() {
       expect(find.text('H1'), findsOneWidget);
       expect(find.text('H2'), findsNothing);
       expect(find.text('H3'), findsNothing);
+    });
+
+    testWidgets('bold button toggles isBold on active block', (tester) async {
+      final controller = OiRichEditorController(
+        initialContent: const OiRichContent(
+          blocks: [OiContentBlock(type: OiBlockType.paragraph, text: 'Hello')],
+        ),
+      );
+      addTearDown(controller.dispose);
+
+      await tester.pumpObers(
+        Center(
+          child: OiRichEditor(controller: controller, label: 'Editor'),
+        ),
+      );
+
+      expect(controller.content.blocks.first.isBold, isFalse);
+
+      // Tap the Bold button.
+      await tester.tap(find.text('B'));
+      await tester.pump();
+
+      expect(controller.content.blocks.first.isBold, isTrue);
+
+      // Tap again to toggle off.
+      await tester.tap(find.text('B'));
+      await tester.pump();
+
+      expect(controller.content.blocks.first.isBold, isFalse);
+    });
+
+    testWidgets('italic button toggles isItalic on active block',
+        (tester) async {
+      final controller = OiRichEditorController(
+        initialContent: const OiRichContent(
+          blocks: [OiContentBlock(type: OiBlockType.paragraph, text: 'Hello')],
+        ),
+      );
+      addTearDown(controller.dispose);
+
+      await tester.pumpObers(
+        Center(
+          child: OiRichEditor(controller: controller, label: 'Editor'),
+        ),
+      );
+
+      await tester.tap(find.text('I'));
+      await tester.pump();
+
+      expect(controller.content.blocks.first.isItalic, isTrue);
+    });
+
+    testWidgets('underline button toggles isUnderline on active block',
+        (tester) async {
+      final controller = OiRichEditorController(
+        initialContent: const OiRichContent(
+          blocks: [OiContentBlock(type: OiBlockType.paragraph, text: 'Hello')],
+        ),
+      );
+      addTearDown(controller.dispose);
+
+      await tester.pumpObers(
+        Center(
+          child: OiRichEditor(controller: controller, label: 'Editor'),
+        ),
+      );
+
+      await tester.tap(find.text('U'));
+      await tester.pump();
+
+      expect(controller.content.blocks.first.isUnderline, isTrue);
     });
 
     testWidgets('word count shows when enabled', (tester) async {

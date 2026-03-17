@@ -1,3 +1,4 @@
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/_internal/oi_input_frame.dart';
 import 'package:obers_ui/src/foundation/theme/oi_text_theme.dart';
@@ -161,6 +162,17 @@ class _OiSmartInputState extends State<OiSmartInput> {
   bool _ownsFocusNode = false;
   bool _focused = false;
 
+  // ── Suggestion overlay state ──────────────────────────────────────────────
+
+  final LayerLink _layerLink = LayerLink();
+  OverlayEntry? _overlayEntry;
+  String? _activeTrigger;
+  String _suggestionQuery = '';
+  List<OiSuggestion> _suggestions = const [];
+  int _selectedSuggestionIndex = 0;
+  bool _loadingSuggestions = false;
+  int _suggestionQueryVersion = 0;
+
   @override
   void initState() {
     super.initState();
@@ -217,6 +229,8 @@ class _OiSmartInputState extends State<OiSmartInput> {
   void dispose() {
     _controller.removeListener(_handleTextChange);
     _focusNode.removeListener(_handleFocusChange);
+    _overlayEntry?.remove();
+    _overlayEntry = null;
     if (_ownsController) _controller.dispose();
     if (_ownsFocusNode) _focusNode.dispose();
     super.dispose();
@@ -227,11 +241,15 @@ class _OiSmartInputState extends State<OiSmartInput> {
     if (focused != _focused) {
       setState(() => _focused = focused);
     }
+    if (!focused) {
+      _hideSuggestions();
+    }
   }
 
   void _handleTextChange() {
     setState(() {});
     widget.onChange?.call(_controller.text);
+    _checkForTrigger();
   }
 
   // ── Pattern matching ───────────────────────────────────────────────────────
@@ -316,6 +334,194 @@ class _OiSmartInputState extends State<OiSmartInput> {
     return spans;
   }
 
+  // ── Suggestion popup ───────────────────────────────────────────────────────
+
+  /// Checks whether the cursor is positioned after a trigger character and
+  /// initiates a suggestion query if so.
+  void _checkForTrigger() {
+    if (widget.onSuggestionQuery == null || widget.recognizers.isEmpty) {
+      return;
+    }
+
+    final text = _controller.text;
+    final cursorOffset = _controller.selection.baseOffset;
+    if (cursorOffset <= 0) {
+      _hideSuggestions();
+      return;
+    }
+
+    final textBeforeCursor = text.substring(0, cursorOffset);
+
+    for (final recognizer in widget.recognizers) {
+      if (!recognizer.showSuggestions) continue;
+
+      final trigger = recognizer.trigger;
+      final lastTriggerIdx = textBeforeCursor.lastIndexOf(trigger);
+      if (lastTriggerIdx < 0) continue;
+
+      // Trigger must be at start of text or preceded by whitespace.
+      if (lastTriggerIdx > 0) {
+        final charBefore = textBeforeCursor[lastTriggerIdx - 1];
+        if (charBefore != ' ' && charBefore != '\n' && charBefore != '\t') {
+          continue;
+        }
+      }
+
+      // No whitespace between trigger and cursor.
+      final query =
+          textBeforeCursor.substring(lastTriggerIdx + trigger.length);
+      if (query.contains(' ') || query.contains('\n')) continue;
+
+      // Active trigger found.
+      if (trigger != _activeTrigger || query != _suggestionQuery) {
+        _activeTrigger = trigger;
+        _suggestionQuery = query;
+        _selectedSuggestionIndex = 0;
+        _loadSuggestions(trigger, query);
+      }
+      return;
+    }
+
+    _hideSuggestions();
+  }
+
+  Future<void> _loadSuggestions(String trigger, String query) async {
+    if (!mounted || widget.onSuggestionQuery == null) return;
+    _suggestionQueryVersion++;
+    final version = _suggestionQueryVersion;
+
+    setState(() => _loadingSuggestions = true);
+
+    final results = await widget.onSuggestionQuery!(trigger, query);
+
+    if (!mounted || version != _suggestionQueryVersion) return;
+
+    setState(() {
+      _suggestions = results;
+      _loadingSuggestions = false;
+      _selectedSuggestionIndex = 0;
+    });
+
+    if (results.isNotEmpty) {
+      _showSuggestionsOverlay();
+    } else {
+      _hideSuggestions();
+    }
+  }
+
+  void _showSuggestionsOverlay() {
+    _overlayEntry?.remove();
+    _overlayEntry = null;
+    if (_suggestions.isEmpty) return;
+
+    _overlayEntry = OverlayEntry(builder: (_) => _buildOverlayContent());
+    Overlay.of(context).insert(_overlayEntry!);
+  }
+
+  void _hideSuggestions() {
+    _overlayEntry?.remove();
+    _overlayEntry = null;
+    _activeTrigger = null;
+    _suggestions = const [];
+    _selectedSuggestionIndex = 0;
+    _loadingSuggestions = false;
+    _suggestionQueryVersion++;
+  }
+
+  void _selectSuggestion(OiSuggestion suggestion) {
+    if (_activeTrigger == null) return;
+
+    final text = _controller.text;
+    final cursorOffset = _controller.selection.baseOffset;
+    if (cursorOffset < 0) return;
+
+    final textBeforeCursor = text.substring(0, cursorOffset);
+    final trigger = _activeTrigger!;
+    final triggerLen = trigger.length;
+
+    // Find the trigger position (last occurrence before cursor at word boundary).
+    int triggerIdx = -1;
+    for (var i = textBeforeCursor.length - triggerLen; i >= 0; i--) {
+      if (textBeforeCursor.substring(i, i + triggerLen) == trigger) {
+        if (i == 0 ||
+            textBeforeCursor[i - 1] == ' ' ||
+            textBeforeCursor[i - 1] == '\n' ||
+            textBeforeCursor[i - 1] == '\t') {
+          triggerIdx = i;
+          break;
+        }
+      }
+    }
+
+    if (triggerIdx < 0) {
+      _hideSuggestions();
+      return;
+    }
+
+    final newText =
+        text.substring(0, triggerIdx) +
+        suggestion.value +
+        text.substring(cursorOffset);
+    final newCursorPos = triggerIdx + suggestion.value.length;
+
+    _controller.value = TextEditingValue(
+      text: newText,
+      selection: TextSelection.collapsed(offset: newCursorPos),
+    );
+
+    _hideSuggestions();
+    widget.onChange?.call(newText);
+  }
+
+  Widget _buildOverlayContent() {
+    return Positioned(
+      width: 260,
+      child: CompositedTransformFollower(
+        link: _layerLink,
+        targetAnchor: Alignment.bottomLeft,
+        followerAnchor: Alignment.topLeft,
+        showWhenUnlinked: false,
+        child: _OiSuggestionPopup(
+          suggestions: _suggestions,
+          selectedIndex: _selectedSuggestionIndex,
+          onSelect: _selectSuggestion,
+          isLoading: _loadingSuggestions,
+        ),
+      ),
+    );
+  }
+
+  KeyEventResult _handleSuggestionKeyEvent(FocusNode node, KeyEvent event) {
+    if (_suggestions.isEmpty || event is! KeyDownEvent) {
+      return KeyEventResult.ignored;
+    }
+
+    if (event.logicalKey == LogicalKeyboardKey.arrowDown) {
+      setState(() {
+        _selectedSuggestionIndex =
+            (_selectedSuggestionIndex + 1) % _suggestions.length;
+      });
+      _overlayEntry?.markNeedsBuild();
+      return KeyEventResult.handled;
+    }
+    if (event.logicalKey == LogicalKeyboardKey.arrowUp) {
+      setState(() {
+        _selectedSuggestionIndex =
+            (_selectedSuggestionIndex - 1 + _suggestions.length) %
+            _suggestions.length;
+      });
+      _overlayEntry?.markNeedsBuild();
+      return KeyEventResult.handled;
+    }
+    if (event.logicalKey == LogicalKeyboardKey.escape) {
+      _hideSuggestions();
+      if (mounted) setState(() {});
+      return KeyEventResult.handled;
+    }
+
+    return KeyEventResult.ignored;
+  }
+
   // ── Build ──────────────────────────────────────────────────────────────────
 
   @override
@@ -331,15 +537,18 @@ class _OiSmartInputState extends State<OiSmartInput> {
     final showPlaceholder = text.isEmpty && widget.placeholder != null;
 
     // The rich-text display overlay showing pattern-styled spans.
+    // When onSpanTap is set, the overlay must NOT be IgnorePointer so that
+    // GestureDetector widgets inside WidgetSpans can receive taps.
     Widget richOverlay;
     if (text.isNotEmpty && widget.recognizers.isNotEmpty) {
       final spans = _buildTextSpans(text, baseStyle);
-      richOverlay = IgnorePointer(
-        child: Text.rich(
-          TextSpan(children: spans),
-          maxLines: widget.maxLines == 1 ? 1 : null,
-        ),
+      final richText = Text.rich(
+        TextSpan(children: spans),
+        maxLines: widget.maxLines == 1 ? 1 : null,
       );
+      richOverlay = widget.onSpanTap != null
+          ? richText
+          : IgnorePointer(child: richText);
     } else {
       richOverlay = const SizedBox.shrink();
     }
@@ -423,21 +632,130 @@ class _OiSmartInputState extends State<OiSmartInput> {
       );
     }
 
-    return Semantics(
-      label: widget.label,
-      textField: true,
-      enabled: widget.enabled,
-      child: OiInputFrame(
-        label: widget.label,
-        hint: widget.hint,
-        error: widget.error,
-        focused: _focused,
-        enabled: widget.enabled,
-        child: field,
+    return CompositedTransformTarget(
+      link: _layerLink,
+      child: Focus(
+        onKeyEvent: _handleSuggestionKeyEvent,
+        child: Semantics(
+          label: widget.label,
+          textField: true,
+          enabled: widget.enabled,
+          child: OiInputFrame(
+            label: widget.label,
+            hint: widget.hint,
+            error: widget.error,
+            focused: _focused,
+            enabled: widget.enabled,
+            child: field,
+          ),
+        ),
       ),
     );
   }
 }
+
+// ── Internal suggestion popup ─────────────────────────────────────────────────
+
+class _OiSuggestionPopup extends StatelessWidget {
+  const _OiSuggestionPopup({
+    required this.suggestions,
+    required this.selectedIndex,
+    required this.onSelect,
+    required this.isLoading,
+  });
+
+  final List<OiSuggestion> suggestions;
+  final int selectedIndex;
+  final ValueChanged<OiSuggestion> onSelect;
+  final bool isLoading;
+
+  @override
+  Widget build(BuildContext context) {
+    final decoration = BoxDecoration(
+      color: const Color(0xFFFFFFFF),
+      borderRadius: BorderRadius.circular(8),
+      boxShadow: const [
+        BoxShadow(
+          color: Color(0x1F000000),
+          blurRadius: 8,
+          offset: Offset(0, 2),
+        ),
+      ],
+    );
+
+    if (isLoading) {
+      return Container(
+        padding: const EdgeInsets.all(12),
+        decoration: decoration,
+        child: const Text(
+          'Loading…',
+          style: TextStyle(fontSize: 14, color: Color(0xFF6B7280)),
+        ),
+      );
+    }
+
+    return Container(
+      constraints: const BoxConstraints(maxHeight: 200),
+      decoration: decoration,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(8),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              for (var i = 0; i < suggestions.length; i++)
+                _OiSuggestionItem(
+                  suggestion: suggestions[i],
+                  isSelected: i == selectedIndex,
+                  onTap: () => onSelect(suggestions[i]),
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _OiSuggestionItem extends StatelessWidget {
+  const _OiSuggestionItem({
+    required this.suggestion,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  final OiSuggestion suggestion;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        color: isSelected ? const Color(0xFFEFF6FF) : const Color(0x00000000),
+        child: Row(
+          children: [
+            if (suggestion.leading != null) ...[
+              suggestion.leading!,
+              const SizedBox(width: 8),
+            ],
+            Expanded(
+              child: Text(
+                suggestion.label,
+                style: const TextStyle(fontSize: 14, color: Color(0xFF111827)),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ── Internal helpers ───────────────────────────────────────────────────────────
 
 /// Internal helper to track a regex match with its recognizer style.
 class _MatchEntry {

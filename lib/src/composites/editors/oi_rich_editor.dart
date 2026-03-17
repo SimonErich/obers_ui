@@ -44,13 +44,21 @@ enum OiBlockType {
 /// A block of content in the rich editor.
 ///
 /// Each block has a [type] that determines its rendering, a [text] body,
-/// and optional [metadata] (e.g. `language` for code blocks).
+/// optional [metadata] (e.g. `language` for code blocks), and optional
+/// inline formatting flags ([isBold], [isItalic], [isUnderline]).
 ///
 /// {@category Composites}
 @immutable
 class OiContentBlock {
   /// Creates an [OiContentBlock].
-  const OiContentBlock({required this.type, required this.text, this.metadata});
+  const OiContentBlock({
+    required this.type,
+    required this.text,
+    this.metadata,
+    this.isBold = false,
+    this.isItalic = false,
+    this.isUnderline = false,
+  });
 
   /// The type of block.
   final OiBlockType type;
@@ -61,23 +69,37 @@ class OiContentBlock {
   /// Optional metadata such as `{"language": "dart"}` for code blocks.
   final Map<String, dynamic>? metadata;
 
+  /// Whether the block text is rendered in bold.
+  final bool isBold;
+
+  /// Whether the block text is rendered in italic.
+  final bool isItalic;
+
+  /// Whether the block text is rendered with underline.
+  final bool isUnderline;
+
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
     return other is OiContentBlock &&
         other.type == type &&
         other.text == text &&
+        other.isBold == isBold &&
+        other.isItalic == isItalic &&
+        other.isUnderline == isUnderline &&
         _mapEquals(other.metadata, metadata);
   }
 
   @override
-  int get hashCode => Object.hash(type, text, metadata?.length);
+  int get hashCode =>
+      Object.hash(type, text, isBold, isItalic, isUnderline, metadata?.length);
 }
 
 /// The content of the rich editor.
 ///
 /// Holds a list of [OiContentBlock]s and provides serialisation helpers
-/// ([toHtml], [toMarkdown], [toPlainText]) as well as a [wordCount] getter.
+/// ([toHtml], [toMarkdown], [toPlainText], [toDelta]) as well as a
+/// [wordCount] getter.
 ///
 /// {@category Composites}
 @immutable
@@ -229,6 +251,68 @@ class OiRichContent {
         .join('\n');
   }
 
+  /// Converts the content to a Quill Delta map.
+  ///
+  /// Returns a map with an `"ops"` key containing a list of insert operations
+  /// compatible with the Quill delta format.
+  Map<String, dynamic> toDelta() {
+    final ops = <Map<String, dynamic>>[];
+
+    for (final block in blocks) {
+      if (block.type == OiBlockType.divider) {
+        // Represent divider as a thematic break operation.
+        ops.add({'insert': {'divider': true}});
+        ops.add({'insert': '\n'});
+        continue;
+      }
+
+      // Build inline attributes for text formatting.
+      final inlineAttrs = <String, dynamic>{};
+      if (block.isBold) inlineAttrs['bold'] = true;
+      if (block.isItalic) inlineAttrs['italic'] = true;
+      if (block.isUnderline) inlineAttrs['underline'] = true;
+
+      if (inlineAttrs.isEmpty) {
+        ops.add({'insert': block.text});
+      } else {
+        ops.add({
+          'insert': block.text,
+          'attributes': Map<String, dynamic>.from(inlineAttrs),
+        });
+      }
+
+      // Build line-level attributes for block type.
+      final lineAttrs = <String, dynamic>{};
+      switch (block.type) {
+        case OiBlockType.heading1:
+          lineAttrs['header'] = 1;
+        case OiBlockType.heading2:
+          lineAttrs['header'] = 2;
+        case OiBlockType.heading3:
+          lineAttrs['header'] = 3;
+        case OiBlockType.bulletList:
+          lineAttrs['list'] = 'bullet';
+        case OiBlockType.numberedList:
+          lineAttrs['list'] = 'ordered';
+        case OiBlockType.code:
+          lineAttrs['code-block'] = true;
+        case OiBlockType.quote:
+          lineAttrs['blockquote'] = true;
+        case OiBlockType.paragraph:
+        case OiBlockType.divider:
+          break;
+      }
+
+      if (lineAttrs.isEmpty) {
+        ops.add({'insert': '\n'});
+      } else {
+        ops.add({'insert': '\n', 'attributes': Map<String, dynamic>.from(lineAttrs)});
+      }
+    }
+
+    return {'ops': ops};
+  }
+
   /// Returns the total word count across all blocks.
   int get wordCount {
     var count = 0;
@@ -292,6 +376,9 @@ class OiRichEditorController extends ChangeNotifier {
         type: last.type,
         text: last.text + text,
         metadata: last.metadata,
+        isBold: last.isBold,
+        isItalic: last.isItalic,
+        isUnderline: last.isUnderline,
       );
     }
     _content = OiRichContent(blocks: blocks);
@@ -314,6 +401,9 @@ class OiRichEditorController extends ChangeNotifier {
 
   /// Gets the content as plain text.
   String toPlainText() => _content.toPlainText();
+
+  /// Gets the content as a Quill Delta map.
+  Map<String, dynamic> toDelta() => _content.toDelta();
 
   /// Gets the word count.
   int get wordCount => _content.wordCount;
@@ -389,7 +479,7 @@ class OiSlashCommand {
 
 /// A block-based rich text editor with toolbar and slash commands.
 ///
-/// Supports headings, bold/italic, lists, code blocks, quotes,
+/// Supports headings, bold/italic/underline, lists, code blocks, quotes,
 /// @mentions, and slash commands for block type insertion.
 ///
 /// Each block of content is rendered with appropriate styling. The editor
@@ -485,6 +575,12 @@ class _OiRichEditorState extends State<OiRichEditor> {
   /// One controller per block — kept in sync with the model.
   final List<TextEditingController> _blockControllers = [];
 
+  /// One focus node per block — kept in sync with the model.
+  final List<FocusNode> _blockFocusNodes = [];
+
+  /// Index of the block that most recently had focus.
+  int _activeBlockIndex = 0;
+
   @override
   void initState() {
     super.initState();
@@ -515,6 +611,10 @@ class _OiRichEditorState extends State<OiRichEditor> {
     for (final c in _blockControllers) {
       c.dispose();
     }
+    for (final fn in _blockFocusNodes) {
+      fn.removeListener(_onBlockFocusChange);
+      fn.dispose();
+    }
     super.dispose();
   }
 
@@ -532,6 +632,17 @@ class _OiRichEditorState extends State<OiRichEditor> {
     widget.onChange?.call(widget.controller.content);
   }
 
+  void _onBlockFocusChange() {
+    for (var i = 0; i < _blockFocusNodes.length; i++) {
+      if (_blockFocusNodes[i].hasFocus) {
+        if (_activeBlockIndex != i) {
+          setState(() => _activeBlockIndex = i);
+        }
+        return;
+      }
+    }
+  }
+
   void _syncBlockControllers() {
     final blocks = widget.controller.content.blocks;
 
@@ -540,9 +651,22 @@ class _OiRichEditorState extends State<OiRichEditor> {
       _blockControllers.removeLast().dispose();
     }
 
+    // Dispose excess focus nodes.
+    while (_blockFocusNodes.length > blocks.length) {
+      final fn = _blockFocusNodes.removeLast();
+      fn.removeListener(_onBlockFocusChange);
+      fn.dispose();
+    }
+
     // Add missing controllers.
     while (_blockControllers.length < blocks.length) {
       _blockControllers.add(TextEditingController());
+    }
+
+    // Add missing focus nodes.
+    while (_blockFocusNodes.length < blocks.length) {
+      final fn = FocusNode()..addListener(_onBlockFocusChange);
+      _blockFocusNodes.add(fn);
     }
 
     // Sync text content.
@@ -560,9 +684,32 @@ class _OiRichEditorState extends State<OiRichEditor> {
         type: blocks[index].type,
         text: text,
         metadata: blocks[index].metadata,
+        isBold: blocks[index].isBold,
+        isItalic: blocks[index].isItalic,
+        isUnderline: blocks[index].isUnderline,
       );
       widget.controller.updateContentSilently(OiRichContent(blocks: blocks));
     }
+  }
+
+  void _toggleFormatting(String format) {
+    if (widget.readOnly) return;
+    final blocks = List<OiContentBlock>.from(widget.controller.content.blocks);
+    if (_activeBlockIndex >= blocks.length) return;
+
+    final block = blocks[_activeBlockIndex];
+    final updated = OiContentBlock(
+      type: block.type,
+      text: block.text,
+      metadata: block.metadata,
+      isBold: format == 'bold' ? !block.isBold : block.isBold,
+      isItalic: format == 'italic' ? !block.isItalic : block.isItalic,
+      isUnderline:
+          format == 'underline' ? !block.isUnderline : block.isUnderline,
+    );
+
+    blocks[_activeBlockIndex] = updated;
+    widget.controller.content = OiRichContent(blocks: blocks);
   }
 
   // ── Block rendering ────────────────────────────────────────────────────────
@@ -572,30 +719,44 @@ class _OiRichEditorState extends State<OiRichEditor> {
     final textTheme = themeData?.textTheme;
     final colors = themeData?.colors;
 
+    TextStyle base;
     switch (block.type) {
       case OiBlockType.heading1:
-        return textTheme?.styleFor(OiLabelVariant.h1) ??
+        base = textTheme?.styleFor(OiLabelVariant.h1) ??
             const TextStyle(fontSize: 40, fontWeight: FontWeight.w700);
       case OiBlockType.heading2:
-        return textTheme?.styleFor(OiLabelVariant.h2) ??
+        base = textTheme?.styleFor(OiLabelVariant.h2) ??
             const TextStyle(fontSize: 32, fontWeight: FontWeight.w600);
       case OiBlockType.heading3:
-        return textTheme?.styleFor(OiLabelVariant.h3) ??
+        base = textTheme?.styleFor(OiLabelVariant.h3) ??
             const TextStyle(fontSize: 24, fontWeight: FontWeight.w600);
       case OiBlockType.code:
-        return textTheme?.styleFor(OiLabelVariant.code) ??
+        base = textTheme?.styleFor(OiLabelVariant.code) ??
             const TextStyle(fontSize: 14, fontFamily: 'monospace');
       case OiBlockType.quote:
-        return (textTheme?.styleFor(OiLabelVariant.body) ??
+        base = (textTheme?.styleFor(OiLabelVariant.body) ??
                 const TextStyle(fontSize: 16))
             .copyWith(fontStyle: FontStyle.italic, color: colors?.textMuted);
       case OiBlockType.paragraph:
       case OiBlockType.bulletList:
       case OiBlockType.numberedList:
       case OiBlockType.divider:
-        return textTheme?.styleFor(OiLabelVariant.body) ??
+        base = textTheme?.styleFor(OiLabelVariant.body) ??
             const TextStyle(fontSize: 16, fontWeight: FontWeight.w400);
     }
+
+    // Apply inline formatting overrides.
+    if (block.isBold) {
+      base = base.copyWith(fontWeight: FontWeight.w700);
+    }
+    if (block.isItalic) {
+      base = base.copyWith(fontStyle: FontStyle.italic);
+    }
+    if (block.isUnderline) {
+      base = base.copyWith(decoration: TextDecoration.underline);
+    }
+
+    return base;
   }
 
   Widget _buildBlock(BuildContext context, int index, OiContentBlock block) {
@@ -617,7 +778,7 @@ class _OiRichEditorState extends State<OiRichEditor> {
 
     Widget blockWidget = EditableText(
       controller: _blockControllers[index],
-      focusNode: FocusNode(),
+      focusNode: _blockFocusNodes[index],
       style: style,
       cursorColor: cursorColor,
       backgroundCursorColor: const Color(0xFF000000),
@@ -700,6 +861,37 @@ class _OiRichEditorState extends State<OiRichEditor> {
     final isMinimal = widget.toolbar == OiToolbarMode.minimal;
 
     final actions = <Widget>[
+      // ── Bold / Italic / Underline ─────────────────────────────────────────
+      _ToolbarButton(
+        icon: const Text(
+          'B',
+          style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
+        ),
+        semanticLabel: 'Bold',
+        onPressed: widget.readOnly ? null : () => _toggleFormatting('bold'),
+      ),
+      _ToolbarButton(
+        icon: const Text(
+          'I',
+          style: TextStyle(fontStyle: FontStyle.italic, fontSize: 13),
+        ),
+        semanticLabel: 'Italic',
+        onPressed: widget.readOnly ? null : () => _toggleFormatting('italic'),
+      ),
+      _ToolbarButton(
+        icon: const Text(
+          'U',
+          style: TextStyle(
+            decoration: TextDecoration.underline,
+            fontSize: 13,
+          ),
+        ),
+        semanticLabel: 'Underline',
+        onPressed:
+            widget.readOnly ? null : () => _toggleFormatting('underline'),
+      ),
+
+      // ── Block type buttons ────────────────────────────────────────────────
       _ToolbarButton(
         icon: const Text(
           'H1',
@@ -793,7 +985,10 @@ class _OiRichEditorState extends State<OiRichEditor> {
       ),
       child: Semantics(
         label: 'Editor toolbar',
-        child: Row(children: actions),
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(children: actions),
+        ),
       ),
     );
   }

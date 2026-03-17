@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 
@@ -71,19 +72,22 @@ class _StarPainter extends CustomPainter {
 /// A star-based rating widget that supports half-star values and hover preview.
 ///
 /// Displays [maxStars] stars with the first [value] stars filled. When
-/// [halfStar] is `true`, half-star values (e.g. 3.5) are supported: tapping
+/// [allowHalf] is `true`, half-star values (e.g. 3.5) are supported: tapping
 /// the left half of a star selects a 0.5 increment; the right half selects a
 /// whole-star value. On pointer devices, hovering previews the value before
 /// committing. When [readOnly] is `true`, all gesture and hover detection is
 /// disabled.
 ///
+/// Arrow keys (← / →) adjust the rating by one step when focused.
+///
 /// {@category Components}
 class OiStarRating extends StatefulWidget {
   /// Creates an [OiStarRating].
   const OiStarRating({
+    this.label,
     this.value = 0.0,
     this.maxStars = 5,
-    this.halfStar = false,
+    this.allowHalf = false,
     this.readOnly = false,
     this.onChanged,
     this.size = 32.0,
@@ -92,6 +96,9 @@ class OiStarRating extends StatefulWidget {
     super.key,
   });
 
+  /// Accessible label announced by screen readers.
+  final String? label;
+
   /// The current rating value, from 0.0 to [maxStars].
   final double value;
 
@@ -99,7 +106,7 @@ class OiStarRating extends StatefulWidget {
   final int maxStars;
 
   /// Whether half-star values (e.g. 2.5) are allowed.
-  final bool halfStar;
+  final bool allowHalf;
 
   /// Whether all interaction is disabled.
   final bool readOnly;
@@ -123,8 +130,10 @@ class OiStarRating extends StatefulWidget {
 class _OiStarRatingState extends State<OiStarRating> {
   double? _hoverValue;
 
+  double get _step => widget.allowHalf ? 0.5 : 1.0;
+
   double _candidateValue(int starIndex, double localX) {
-    if (widget.halfStar && localX < widget.size / 2) {
+    if (widget.allowHalf && localX < widget.size / 2) {
       return starIndex + 0.5;
     }
     return (starIndex + 1).toDouble();
@@ -135,6 +144,30 @@ class _OiStarRatingState extends State<OiStarRating> {
     if (diff <= 0) return 0;
     if (diff >= 1) return 1;
     return diff;
+  }
+
+  KeyEventResult _onKeyEvent(FocusNode node, KeyEvent event) {
+    if (widget.readOnly || widget.onChanged == null) {
+      return KeyEventResult.ignored;
+    }
+    if (event is! KeyDownEvent && event is! KeyRepeatEvent) {
+      return KeyEventResult.ignored;
+    }
+
+    if (event.logicalKey == LogicalKeyboardKey.arrowRight) {
+      final next =
+          (widget.value + _step).clamp(0.0, widget.maxStars.toDouble());
+      widget.onChanged?.call(next);
+      return KeyEventResult.handled;
+    }
+    if (event.logicalKey == LogicalKeyboardKey.arrowLeft) {
+      final next =
+          (widget.value - _step).clamp(0.0, widget.maxStars.toDouble());
+      widget.onChanged?.call(next);
+      return KeyEventResult.handled;
+    }
+
+    return KeyEventResult.ignored;
   }
 
   @override
@@ -174,12 +207,30 @@ class _OiStarRatingState extends State<OiStarRating> {
       return star;
     }
 
+    final baseLabel = widget.label != null
+        ? '${widget.label}, '
+        : '';
+    final semanticLabel =
+        '${baseLabel}Rating ${widget.value} out of ${widget.maxStars}';
+
+    final stars = Row(
+      mainAxisSize: MainAxisSize.min,
+      children: List<Widget>.generate(widget.maxStars, buildStar),
+    );
+
     return Semantics(
-      label: 'Rating ${widget.value} out of ${widget.maxStars}',
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: List<Widget>.generate(widget.maxStars, buildStar),
-      ),
+      label: semanticLabel,
+      slider: true,
+      value: '${widget.value}',
+      increasedValue: widget.readOnly
+          ? null
+          : '${(widget.value + _step).clamp(0.0, widget.maxStars.toDouble())}',
+      decreasedValue: widget.readOnly
+          ? null
+          : '${(widget.value - _step).clamp(0.0, widget.maxStars.toDouble())}',
+      child: widget.readOnly
+          ? stars
+          : Focus(onKeyEvent: _onKeyEvent, child: stars),
     );
   }
 }

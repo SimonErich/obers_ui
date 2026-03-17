@@ -56,6 +56,68 @@ void main() {
       expect(find.text('@alice'), findsOneWidget);
     });
 
+    testWidgets('multiple recognizers coexist', (tester) async {
+      final recognizers = [
+        OiPatternRecognizer(
+          trigger: '@',
+          pattern: RegExp(r'@\w+'),
+          style: const TextStyle(color: Color(0xFF2563EB)),
+        ),
+        OiPatternRecognizer(
+          trigger: '#',
+          pattern: RegExp(r'#\w+'),
+          style: const TextStyle(color: Color(0xFF16A34A)),
+        ),
+      ];
+
+      final controller = TextEditingController(text: '@alice #flutter');
+      await tester.pumpObers(
+        Center(
+          child: OiSmartInput(
+            label: 'Message',
+            recognizers: recognizers,
+            controller: controller,
+          ),
+        ),
+      );
+      await tester.pump();
+
+      expect(find.text('@alice'), findsOneWidget);
+      expect(find.text('#flutter'), findsOneWidget);
+    });
+
+    testWidgets('onSpanTap fires when recognized span is tapped',
+        (tester) async {
+      OiRecognizedSpan? tappedSpan;
+      final recognizers = [
+        OiPatternRecognizer(
+          trigger: '@',
+          pattern: RegExp(r'@\w+'),
+          style: const TextStyle(color: Color(0xFF2563EB)),
+        ),
+      ];
+
+      final controller = TextEditingController(text: 'hello @bob');
+      await tester.pumpObers(
+        Center(
+          child: OiSmartInput(
+            label: 'Msg',
+            recognizers: recognizers,
+            controller: controller,
+            onSpanTap: (span) => tappedSpan = span,
+          ),
+        ),
+      );
+      await tester.pump();
+
+      await tester.tap(find.text('@bob'));
+      await tester.pump();
+
+      expect(tappedSpan, isNotNull);
+      expect(tappedSpan!.trigger, '@');
+      expect(tappedSpan!.value, '@bob');
+    });
+
     testWidgets('placeholder shows when empty', (tester) async {
       await tester.pumpObers(
         const Center(
@@ -192,6 +254,126 @@ void main() {
         find.byType(EditableText).first,
       );
       expect(editableText.controller.text, 'initial text');
+    });
+
+    testWidgets('suggestion popup appears with results', (tester) async {
+      final recognizers = [
+        OiPatternRecognizer(
+          trigger: '@',
+          pattern: RegExp(r'@\w+'),
+          style: const TextStyle(color: Color(0xFF2563EB)),
+          showSuggestions: true,
+        ),
+      ];
+
+      Future<List<OiSuggestion>> querySuggestions(
+        String trigger,
+        String query,
+      ) async {
+        return [
+          OiSuggestion(value: '@alice', label: 'Alice'),
+          OiSuggestion(value: '@bob', label: 'Bob'),
+        ];
+      }
+
+      await tester.pumpObers(
+        Center(
+          child: OiSmartInput(
+            label: 'Message',
+            recognizers: recognizers,
+            onSuggestionQuery: querySuggestions,
+          ),
+        ),
+      );
+
+      // Type trigger character to start suggestion query.
+      await tester.enterText(find.byType(EditableText).first, '@a');
+      await tester.pump(); // starts async
+      await tester.pump(); // async completes
+
+      expect(find.text('Alice'), findsOneWidget);
+      expect(find.text('Bob'), findsOneWidget);
+    });
+
+    testWidgets('selecting suggestion inserts text', (tester) async {
+      String? lastChanged;
+      final recognizers = [
+        OiPatternRecognizer(
+          trigger: '@',
+          pattern: RegExp(r'@\w+'),
+          style: const TextStyle(color: Color(0xFF2563EB)),
+          showSuggestions: true,
+        ),
+      ];
+
+      Future<List<OiSuggestion>> querySuggestions(
+        String trigger,
+        String query,
+      ) async {
+        return [OiSuggestion(value: '@alice', label: 'Alice')];
+      }
+
+      await tester.pumpObers(
+        Center(
+          child: OiSmartInput(
+            label: 'Message',
+            recognizers: recognizers,
+            onSuggestionQuery: querySuggestions,
+            onChange: (v) => lastChanged = v,
+          ),
+        ),
+      );
+
+      await tester.enterText(find.byType(EditableText).first, '@a');
+      await tester.pump();
+      await tester.pump();
+
+      // Tap the suggestion.
+      await tester.tap(find.text('Alice'));
+      await tester.pump();
+
+      expect(lastChanged, '@alice');
+    });
+
+    testWidgets('suggestion popup hides when trigger is deleted',
+        (tester) async {
+      final recognizers = [
+        OiPatternRecognizer(
+          trigger: '@',
+          pattern: RegExp(r'@\w+'),
+          style: const TextStyle(color: Color(0xFF2563EB)),
+          showSuggestions: true,
+        ),
+      ];
+
+      Future<List<OiSuggestion>> querySuggestions(
+        String trigger,
+        String query,
+      ) async {
+        return [OiSuggestion(value: '@alice', label: 'Alice')];
+      }
+
+      await tester.pumpObers(
+        Center(
+          child: OiSmartInput(
+            label: 'Message',
+            recognizers: recognizers,
+            onSuggestionQuery: querySuggestions,
+          ),
+        ),
+      );
+
+      // Type trigger to show popup.
+      await tester.enterText(find.byType(EditableText).first, '@a');
+      await tester.pump();
+      await tester.pump();
+      expect(find.text('Alice'), findsOneWidget);
+
+      // Clear text — popup should hide.
+      await tester.enterText(find.byType(EditableText).first, '');
+      await tester.pump();
+
+      expect(find.text('Alice'), findsNothing);
     });
   });
 }

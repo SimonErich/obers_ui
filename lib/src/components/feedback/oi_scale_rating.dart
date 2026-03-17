@@ -1,109 +1,99 @@
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/src/components/buttons/oi_button.dart';
+import 'package:obers_ui/src/components/buttons/oi_button_group.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
-import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
 
-/// A numeric scale rating widget (e.g. NPS 1–10).
+/// A numeric scale rating widget (e.g. NPS 1–10, satisfaction 1–7).
 ///
-/// Renders a [Row] of numbered buttons from 1 to [scale]. The currently
-/// selected button (matching [value]) is highlighted with the primary color.
-/// Optional [startLabel] and [endLabel] strings are shown at the left and right
-/// ends of the scale. When [enabled] is `false` all buttons are non-interactive.
+/// Renders a connected [OiButtonGroup] with numbered buttons from [min] to
+/// [max]. The currently selected button (matching [value]) is highlighted.
+/// Optional [minLabel] and [maxLabel] strings are shown at the left and right
+/// ends below the scale. Arrow-key navigation is provided by [OiButtonGroup]
+/// when the group is focused.
+///
+/// When [enabled] is `false` all buttons are non-interactive.
 ///
 /// {@category Components}
 class OiScaleRating extends StatelessWidget {
   /// Creates an [OiScaleRating].
   const OiScaleRating({
+    this.label,
     this.value,
-    this.scale = 10,
+    this.min = 1,
+    this.max = 10,
     this.onChanged,
-    this.startLabel,
-    this.endLabel,
+    this.minLabel,
+    this.maxLabel,
     this.enabled = true,
     super.key,
-  });
+  }) : assert(min <= max, 'min must be <= max');
 
-  /// The currently selected value (1 to [scale]), or null for no selection.
+  /// Accessible label announced by screen readers.
+  final String? label;
+
+  /// The currently selected value ([min] to [max]), or null for no selection.
   final int? value;
 
+  /// The minimum scale value. Defaults to 1.
+  final int min;
+
   /// The maximum scale value. Defaults to 10.
-  final int scale;
+  final int max;
 
   /// Called when the user selects a number.
   final ValueChanged<int>? onChanged;
 
   /// Label shown to the left of the scale buttons (e.g. "Not likely").
-  final String? startLabel;
+  final String? minLabel;
 
   /// Label shown to the right of the scale buttons (e.g. "Very likely").
-  final String? endLabel;
+  final String? maxLabel;
 
   /// Whether the widget is interactive. Defaults to `true`.
   final bool enabled;
 
   @override
   Widget build(BuildContext context) {
-    final colors = context.colors;
     final textTheme = context.textTheme;
+    final colors = context.colors;
+    final count = max - min + 1;
 
-    final buttons = List<Widget>.generate(scale, (i) {
-      final n = i + 1;
-      final selected = value == n;
-      final bg = selected ? colors.primary.base : colors.surface;
-      final fg = selected ? colors.textOnPrimary : colors.text;
-
-      return OiTappable(
+    final items = List<OiButtonGroupItem>.generate(count, (i) {
+      final n = min + i;
+      return OiButtonGroupItem(
+        label: '$n',
         enabled: enabled,
-        onTap: enabled ? () => onChanged?.call(n) : null,
-        child: Container(
-          width: 36,
-          height: 36,
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-            color: bg,
-            borderRadius: BorderRadius.circular(6),
-            border: Border.all(
-              color: selected ? colors.primary.base : colors.border,
-            ),
-          ),
-          child: Text(
-            '$n',
-            style: textTheme.small.copyWith(
-              color: fg,
-              fontWeight: selected ? FontWeight.w700 : FontWeight.w400,
-            ),
-          ),
-        ),
       );
     });
 
-    Widget row = Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        for (var i = 0; i < buttons.length; i++) ...[
-          if (i > 0) const SizedBox(width: 4),
-          buttons[i],
-        ],
-      ],
+    final selectedIndex = value != null ? value! - min : null;
+
+    Widget group = OiButtonGroup(
+      items: items,
+      exclusive: true,
+      selectedIndex: selectedIndex,
+      onSelect: enabled ? (i) => onChanged?.call(min + i) : null,
+      size: OiButtonSize.small,
     );
 
-    if (startLabel != null || endLabel != null) {
-      row = Column(
+    if (minLabel != null || maxLabel != null) {
+      group = Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          row,
+          group,
           const SizedBox(height: 4),
           Row(
             children: [
-              if (startLabel != null)
+              if (minLabel != null)
                 Text(
-                  startLabel!,
+                  minLabel!,
                   style: textTheme.tiny.copyWith(color: colors.textMuted),
                 ),
               const Spacer(),
-              if (endLabel != null)
+              if (maxLabel != null)
                 Text(
-                  endLabel!,
+                  maxLabel!,
                   style: textTheme.tiny.copyWith(color: colors.textMuted),
                 ),
             ],
@@ -112,9 +102,12 @@ class OiScaleRating extends StatelessWidget {
       );
     }
 
+    final semanticLabel =
+        label ?? 'Scale rating, selected: ${value ?? 'none'} of $max';
+
     return Semantics(
-      label: 'Scale rating, selected: ${value ?? 'none'} of $scale',
-      child: row,
+      label: semanticLabel,
+      child: group,
     );
   }
 }
