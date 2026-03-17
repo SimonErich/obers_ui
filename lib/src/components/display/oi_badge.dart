@@ -200,17 +200,20 @@ class OiBadge extends StatelessWidget {
     final dims = _resolveDimensions();
 
     if (dot) {
-      return Container(
-        width: dims.dotSize,
-        height: dims.dotSize,
-        decoration: BoxDecoration(
-          color: resolved.background == const Color(0x00000000)
-              ? resolved.textColor
-              : resolved.background,
-          shape: BoxShape.circle,
-          border: resolved.borderColor != null
-              ? Border.all(color: resolved.borderColor!)
-              : null,
+      return Semantics(
+        label: label,
+        child: Container(
+          width: dims.dotSize,
+          height: dims.dotSize,
+          decoration: BoxDecoration(
+            color: resolved.background == const Color(0x00000000)
+                ? resolved.textColor
+                : resolved.background,
+            shape: BoxShape.circle,
+            border: resolved.borderColor != null
+                ? Border.all(color: resolved.borderColor!)
+                : null,
+          ),
         ),
       );
     }

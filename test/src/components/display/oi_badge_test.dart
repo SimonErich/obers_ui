@@ -18,6 +18,18 @@ void main() {
     expect(find.text('ignored'), findsNothing);
   });
 
+  testWidgets('dot mode exposes label as semantic text indicator', (
+    tester,
+  ) async {
+    await tester.pumpObers(
+      const OiBadge(label: 'Error status', color: OiBadgeColor.error, dot: true),
+    );
+    expect(
+      tester.getSemantics(find.bySemanticsLabel('Error status')),
+      isNotNull,
+    );
+  });
+
   testWidgets('renders with success color', (tester) async {
     await tester.pumpObers(
       const OiBadge(label: 'OK', color: OiBadgeColor.success),
