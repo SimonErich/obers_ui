@@ -1,11 +1,18 @@
 import 'dart:async';
 
 import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart' show Color;
 import 'package:obers_ui/src/components/inputs/oi_checkbox.dart';
+import 'package:obers_ui/src/components/inputs/oi_color_input.dart';
+import 'package:obers_ui/src/components/inputs/oi_date_input.dart';
+import 'package:obers_ui/src/components/inputs/oi_file_input.dart';
 import 'package:obers_ui/src/components/inputs/oi_number_input.dart';
+import 'package:obers_ui/src/components/inputs/oi_radio.dart';
 import 'package:obers_ui/src/components/inputs/oi_select.dart';
+import 'package:obers_ui/src/components/inputs/oi_slider.dart';
 import 'package:obers_ui/src/components/inputs/oi_switch.dart';
 import 'package:obers_ui/src/components/inputs/oi_text_input.dart';
+import 'package:obers_ui/src/components/inputs/oi_time_input.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 
 // ── Enums ───────────────────────────────────────────────────────────────────
@@ -477,17 +484,59 @@ class _OiFormState extends State<OiForm> {
         return const SizedBox.shrink();
 
       case OiFieldType.date:
-      case OiFieldType.time:
-      case OiFieldType.radio:
-      case OiFieldType.slider:
-      case OiFieldType.color:
-      case OiFieldType.file:
-        // Fallback for field types that are not yet implemented with
-        // dedicated widgets. Render a text input with the field label.
-        return OiTextInput(
+        return OiDateInput(
           key: ValueKey('oi_form_field_${field.key}'),
           label: field.label,
           error: error,
+          value: value as DateTime?,
+          onChanged: (v) => widget.controller.setValue(field.key, v),
+        );
+
+      case OiFieldType.time:
+        return OiTimeInput(
+          key: ValueKey('oi_form_field_${field.key}'),
+          label: field.label,
+          error: error,
+          value: value as OiTimeOfDay?,
+          onChanged: (v) => widget.controller.setValue(field.key, v),
+        );
+
+      case OiFieldType.radio:
+        final radioOptions =
+            (field.config?['options'] as List<OiRadioOption<dynamic>>?) ?? [];
+        return OiRadio<dynamic>(
+          key: ValueKey('oi_form_field_${field.key}'),
+          options: radioOptions,
+          value: value,
+          onChanged: (v) => widget.controller.setValue(field.key, v),
+        );
+
+      case OiFieldType.slider:
+        return OiSlider(
+          key: ValueKey('oi_form_field_${field.key}'),
+          value: (value as double?) ?? 0.0,
+          min: (field.config?['min'] as double?) ?? 0.0,
+          max: (field.config?['max'] as double?) ?? 100.0,
+          divisions: field.config?['divisions'] as int?,
+          label: field.label,
+          onChanged: (v) => widget.controller.setValue(field.key, v),
+        );
+
+      case OiFieldType.color:
+        return OiColorInput(
+          key: ValueKey('oi_form_field_${field.key}'),
+          label: field.label,
+          error: error,
+          value: value as Color?,
+          onChanged: (v) => widget.controller.setValue(field.key, v),
+        );
+
+      case OiFieldType.file:
+        return OiFileInput(
+          key: ValueKey('oi_form_field_${field.key}'),
+          label: field.label,
+          error: error,
+          value: value as List<String>?,
           onChanged: (v) => widget.controller.setValue(field.key, v),
         );
     }

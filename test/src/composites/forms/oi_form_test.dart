@@ -3,6 +3,13 @@
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:obers_ui/src/components/inputs/oi_color_input.dart';
+import 'package:obers_ui/src/components/inputs/oi_date_input.dart';
+import 'package:obers_ui/src/components/inputs/oi_file_input.dart';
+import 'package:obers_ui/src/components/inputs/oi_radio.dart';
+import 'package:obers_ui/src/components/inputs/oi_select.dart';
+import 'package:obers_ui/src/components/inputs/oi_slider.dart';
+import 'package:obers_ui/src/components/inputs/oi_time_input.dart';
 import 'package:obers_ui/src/composites/forms/oi_form.dart';
 
 import '../../../helpers/pump_app.dart';
@@ -386,6 +393,186 @@ void main() {
       await tester.pumpObers(_form(layout: OiFormLayout.inline));
 
       expect(find.byType(Wrap), findsOneWidget);
+    });
+
+    testWidgets('date field renders', (tester) async {
+      final ctrl = OiFormController();
+
+      await tester.pumpObers(
+        _form(
+          sections: [
+            OiFormSection(
+              fields: [
+                const OiFormField(
+                  key: 'dob',
+                  label: 'Date of Birth',
+                  type: OiFieldType.date,
+                ),
+              ],
+            ),
+          ],
+          controller: ctrl,
+        ),
+      );
+
+      expect(find.byType(OiDateInput), findsOneWidget);
+    });
+
+    testWidgets('time field renders', (tester) async {
+      final ctrl = OiFormController();
+
+      await tester.pumpObers(
+        _form(
+          sections: [
+            OiFormSection(
+              fields: [
+                const OiFormField(
+                  key: 'alarm',
+                  label: 'Alarm Time',
+                  type: OiFieldType.time,
+                ),
+              ],
+            ),
+          ],
+          controller: ctrl,
+        ),
+      );
+
+      expect(find.byType(OiTimeInput), findsOneWidget);
+    });
+
+    testWidgets('radio field renders', (tester) async {
+      final ctrl = OiFormController();
+
+      await tester.pumpObers(
+        _form(
+          sections: [
+            OiFormSection(
+              fields: [
+                OiFormField(
+                  key: 'size',
+                  label: 'Size',
+                  type: OiFieldType.radio,
+                  config: {
+                    'options': [
+                      const OiRadioOption<dynamic>(
+                        value: 's',
+                        label: 'Small',
+                      ),
+                      const OiRadioOption<dynamic>(
+                        value: 'l',
+                        label: 'Large',
+                      ),
+                    ],
+                  },
+                ),
+              ],
+            ),
+          ],
+          controller: ctrl,
+        ),
+      );
+
+      expect(find.byType(OiRadio<dynamic>), findsOneWidget);
+    });
+
+    testWidgets('slider field renders', (tester) async {
+      final ctrl = OiFormController();
+
+      await tester.pumpObers(
+        _form(
+          sections: [
+            OiFormSection(
+              fields: [
+                const OiFormField(
+                  key: 'volume',
+                  label: 'Volume',
+                  type: OiFieldType.slider,
+                  config: {'min': 0.0, 'max': 100.0},
+                ),
+              ],
+            ),
+          ],
+          controller: ctrl,
+        ),
+      );
+
+      expect(find.byType(OiSlider), findsOneWidget);
+    });
+
+    testWidgets('color field renders', (tester) async {
+      final ctrl = OiFormController();
+
+      await tester.pumpObers(
+        _form(
+          sections: [
+            OiFormSection(
+              fields: [
+                const OiFormField(
+                  key: 'bg',
+                  label: 'Background Color',
+                  type: OiFieldType.color,
+                ),
+              ],
+            ),
+          ],
+          controller: ctrl,
+        ),
+      );
+
+      expect(find.byType(OiColorInput), findsOneWidget);
+    });
+
+    testWidgets('file field renders', (tester) async {
+      final ctrl = OiFormController();
+
+      await tester.pumpObers(
+        _form(
+          sections: [
+            OiFormSection(
+              fields: [
+                const OiFormField(
+                  key: 'attachment',
+                  label: 'Attachment',
+                  type: OiFieldType.file,
+                ),
+              ],
+            ),
+          ],
+          controller: ctrl,
+        ),
+      );
+
+      expect(find.byType(OiFileInput), findsOneWidget);
+    });
+
+    testWidgets('select field renders', (tester) async {
+      final ctrl = OiFormController();
+
+      await tester.pumpObers(
+        _form(
+          sections: [
+            OiFormSection(
+              fields: [
+                OiFormField(
+                  key: 'country',
+                  label: 'Country',
+                  type: OiFieldType.select,
+                  config: {
+                    'options': [
+                      const OiSelectOption<dynamic>(value: 'us', label: 'US'),
+                      const OiSelectOption<dynamic>(value: 'de', label: 'DE'),
+                    ],
+                  },
+                ),
+              ],
+            ),
+          ],
+          controller: ctrl,
+        ),
+      );
+
+      expect(find.byType(OiSelect<dynamic>), findsOneWidget);
     });
   });
 }
