@@ -13,12 +13,17 @@ import 'package:obers_ui/src/primitives/display/oi_surface.dart';
 /// [icon] is displayed). Provide [semanticLabel] to override the accessible
 /// description.
 ///
+/// In non-exclusive groups, [onTap] is called when the user taps this item.
+/// In exclusive groups, [onTap] is ignored; the group's [OiButtonGroup.onSelect]
+/// is used instead.
+///
 /// {@category Components}
 class OiButtonGroupItem {
   /// Creates an [OiButtonGroupItem].
   const OiButtonGroupItem({
     required this.label,
     this.icon,
+    this.onTap,
     this.enabled = true,
     this.semanticLabel,
   });
@@ -28,6 +33,11 @@ class OiButtonGroupItem {
 
   /// An optional leading icon displayed alongside the [label].
   final IconData? icon;
+
+  /// Called when this item is tapped in non-exclusive mode.
+  ///
+  /// Ignored when [OiButtonGroup.exclusive] is `true`.
+  final VoidCallback? onTap;
 
   /// Whether this item can be interacted with.
   final bool enabled;
@@ -42,31 +52,35 @@ class OiButtonGroupItem {
 /// Buttons in a group can operate in two modes:
 ///
 /// - **Connected** ([spacing] == 0): All items share a single [OiSurface]
-///   container with a shared outer border radius.  The first child gets left
-///   corner radii, the last child gets right corner radii, and middle children
-///   have no corner radii.
+///   container with a shared outer border radius.  The first child gets the
+///   left corner radii, the last child gets the right corner radii, and middle
+///   children have no corner radii.  A 1 logical-pixel divider is drawn between
+///   adjacent items.
 /// - **Gapped** ([spacing] > 0): Each item is rendered with full corner radii
 ///   separated by [spacing] logical pixels.
 ///
-/// In single-select mode ([multiSelect] == `false`) exactly one item is active
-/// at a time (the one at [selectedIndex]).  Tapping any item calls [onSelect]
-/// with its index.  Selected items use the *soft* variant; all others use
-/// *ghost*.
+/// In exclusive mode ([exclusive] == `true`) exactly one item is active at a
+/// time (the one at [selectedIndex]).  Tapping any item calls [onSelect] with
+/// its index.  The selected item uses the *soft* variant; all others use
+/// *ghost*.  Individual item [OiButtonGroupItem.onTap] is ignored in exclusive
+/// mode.  Arrow-key navigation is supported: horizontal groups respond to ←/→
+/// and vertical groups respond to ↑/↓.
 ///
-/// Arrow-key navigation is supported in single-select mode: horizontal groups
-/// respond to ←/→ and vertical groups respond to ↑/↓.
+/// In non-exclusive mode ([exclusive] == `false`, the default), each item
+/// fires its own [OiButtonGroupItem.onTap] independently.  Disabled items
+/// cannot be tapped and show reduced opacity.
 ///
 /// On compact breakpoints a horizontal group with [wrap] enabled will
 /// automatically re-orient to vertical.
 ///
 /// ```dart
 /// OiButtonGroup(
+///   exclusive: true,
 ///   items: const [
 ///     OiButtonGroupItem(label: 'Day'),
 ///     OiButtonGroupItem(label: 'Week'),
 ///     OiButtonGroupItem(label: 'Month'),
 ///   ],
-///   multiSelect: false,
 ///   selectedIndex: _tab,
 ///   onSelect: (i) => setState(() => _tab = i),
 /// )
@@ -80,9 +94,8 @@ class OiButtonGroup extends StatefulWidget {
     this.size = OiButtonSize.medium,
     this.direction = Axis.horizontal,
     this.spacing = 0,
-    this.multiSelect = true,
+    this.exclusive = false,
     this.selectedIndex,
-    this.selectedIndices,
     this.onSelect,
     this.wrap = true,
     super.key,
@@ -102,28 +115,27 @@ class OiButtonGroup extends StatefulWidget {
 
   /// The gap in logical pixels between items.
   ///
-  /// A value of `0` produces a connected group (items share borders).
-  /// Any positive value produces a gapped group where items have individual
-  /// corner radii.
+  /// A value of `0` produces a connected group (items share borders with
+  /// dividers between them).  Any positive value produces a gapped group where
+  /// items have individual corner radii.
   final double spacing;
 
-  /// When `false`, at most one item is selected at a time (single-select mode).
+  /// When `true`, the group acts as a single-select toggle: exactly one item
+  /// is active at a time.
   ///
-  /// The selected item uses [OiButtonVariant.soft]; others use
-  /// [OiButtonVariant.ghost].  Arrow-key navigation moves focus between items.
-  /// Defaults to `true` (multi-select allowed).
-  final bool multiSelect;
+  /// The selected item (identified by [selectedIndex]) uses
+  /// [OiButtonVariant.soft]; all others use [OiButtonVariant.ghost].  Tapping
+  /// an item calls [onSelect] with the item's index.  Individual item
+  /// [OiButtonGroupItem.onTap] callbacks are ignored.  Arrow-key navigation
+  /// moves the selection.
+  ///
+  /// Defaults to `false`.
+  final bool exclusive;
 
-  /// The index of the currently selected item when [multiSelect] is `false`.
+  /// The index of the currently selected item when [exclusive] is `true`.
   final int? selectedIndex;
 
-  /// The indices of the currently selected items when [multiSelect] is `true`.
-  ///
-  /// Items whose index is contained in this set are rendered with the *soft*
-  /// variant; all others use *ghost*.  When `null` no items appear selected.
-  final Set<int>? selectedIndices;
-
-  /// Called with the tapped item's index when [multiSelect] is `false`.
+  /// Called with the tapped item's index when [exclusive] is `true`.
   final ValueChanged<int>? onSelect;
 
   /// When `true` (the default), a horizontal group automatically wraps to
@@ -154,7 +166,7 @@ class _OiButtonGroupState extends State<OiButtonGroup> {
   }
 
   KeyEventResult _onKeyEvent(FocusNode node, KeyEvent event) {
-    if (widget.multiSelect) return KeyEventResult.ignored;
+    if (!widget.exclusive) return KeyEventResult.ignored;
     if (event is! KeyDownEvent && event is! KeyRepeatEvent) {
       return KeyEventResult.ignored;
     }
@@ -208,9 +220,22 @@ class _OiButtonGroupState extends State<OiButtonGroup> {
     Axis direction,
     BorderRadius radius,
   ) {
-    final children = List<Widget>.generate(count, (i) {
-      return _buildItem(context, i, BorderRadius.zero);
-    });
+    final dividerColor = context.colors.border;
+    final children = <Widget>[];
+
+    for (var i = 0; i < count; i++) {
+      children.add(_buildItem(
+        context,
+        i,
+        _connectedItemRadius(i, count, direction, radius),
+      ));
+      if (i < count - 1) {
+        // Divider between adjacent items.
+        children.add(direction == Axis.horizontal
+            ? Container(width: 1, color: dividerColor)
+            : Container(height: 1, color: dividerColor));
+      }
+    }
 
     final content = direction == Axis.horizontal
         ? Row(mainAxisSize: MainAxisSize.min, children: children)
@@ -228,6 +253,52 @@ class _OiButtonGroupState extends State<OiButtonGroup> {
     );
   }
 
+  /// Returns the per-position border radius for a button inside a connected
+  /// group.  The first item gets the leading corners, the last item gets the
+  /// trailing corners, and middle items get no radius.
+  BorderRadius _connectedItemRadius(
+    int index,
+    int count,
+    Axis direction,
+    BorderRadius radius,
+  ) {
+    final isFirst = index == 0;
+    final isLast = index == count - 1;
+
+    if (direction == Axis.horizontal) {
+      if (count == 1) return radius;
+      if (isFirst) {
+        return BorderRadius.only(
+          topLeft: radius.topLeft,
+          bottomLeft: radius.bottomLeft,
+        );
+      }
+      if (isLast) {
+        return BorderRadius.only(
+          topRight: radius.topRight,
+          bottomRight: radius.bottomRight,
+        );
+      }
+      return BorderRadius.zero;
+    } else {
+      // Axis.vertical
+      if (count == 1) return radius;
+      if (isFirst) {
+        return BorderRadius.only(
+          topLeft: radius.topLeft,
+          topRight: radius.topRight,
+        );
+      }
+      if (isLast) {
+        return BorderRadius.only(
+          bottomLeft: radius.bottomLeft,
+          bottomRight: radius.bottomRight,
+        );
+      }
+      return BorderRadius.zero;
+    }
+  }
+
   // ── Gapped layout (individual items) ─────────────────────────────────────
 
   Widget _buildGapped(
@@ -237,14 +308,10 @@ class _OiButtonGroupState extends State<OiButtonGroup> {
     BorderRadius radius,
   ) {
     final gap = widget.spacing;
-    final children = List<Widget>.generate(count, (i) {
-      return _buildItem(context, i, radius);
-    });
-
     final separated = <Widget>[];
-    for (var i = 0; i < children.length; i++) {
-      separated.add(children[i]);
-      if (i < children.length - 1) {
+    for (var i = 0; i < count; i++) {
+      separated.add(_buildItem(context, i, radius));
+      if (i < count - 1) {
         separated.add(direction == Axis.horizontal
             ? SizedBox(width: gap)
             : SizedBox(height: gap));
@@ -266,33 +333,45 @@ class _OiButtonGroupState extends State<OiButtonGroup> {
     BorderRadius borderRadius,
   ) {
     final item = widget.items[index];
-    final isSelected = widget.multiSelect
-        ? (widget.selectedIndices?.contains(index) ?? false)
-        : widget.selectedIndex == index;
 
     final Widget button;
-    if (isSelected) {
-      button = OiButton.soft(
-        label: item.label,
-        icon: item.icon,
-        size: widget.size,
-        enabled: item.enabled,
-        onTap: () => widget.onSelect?.call(index),
-        semanticLabel: item.semanticLabel,
-        borderRadius: borderRadius,
-      );
+    if (widget.exclusive) {
+      // Exclusive mode: group manages selection; item.onTap is ignored.
+      final isSelected = widget.selectedIndex == index;
+      if (isSelected) {
+        button = OiButton.soft(
+          label: item.label,
+          icon: item.icon,
+          size: widget.size,
+          enabled: item.enabled,
+          onTap: () => widget.onSelect?.call(index),
+          semanticLabel: item.semanticLabel,
+          borderRadius: borderRadius,
+        );
+      } else {
+        button = OiButton.ghost(
+          label: item.label,
+          icon: item.icon,
+          size: widget.size,
+          enabled: item.enabled,
+          onTap: () => widget.onSelect?.call(index),
+          semanticLabel: item.semanticLabel,
+          borderRadius: borderRadius,
+        );
+      }
+      return Semantics(selected: isSelected, child: button);
     } else {
+      // Non-exclusive mode: each item fires its own onTap.
       button = OiButton.ghost(
         label: item.label,
         icon: item.icon,
         size: widget.size,
         enabled: item.enabled,
-        onTap: () => widget.onSelect?.call(index),
+        onTap: item.onTap,
         semanticLabel: item.semanticLabel,
         borderRadius: borderRadius,
       );
+      return button;
     }
-
-    return Semantics(selected: isSelected, child: button);
   }
 }
