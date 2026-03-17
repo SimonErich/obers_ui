@@ -1,0 +1,371 @@
+// Tests do not require documentation comments.
+// ignore_for_file: public_member_api_docs
+
+import 'package:flutter/widgets.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:obers_ui/src/components/buttons/oi_button.dart';
+import 'package:obers_ui/src/foundation/oi_app.dart';
+import 'package:obers_ui/src/primitives/animation/oi_pulse.dart';
+
+import '../../../helpers/pump_app.dart';
+
+const _kIcon = IconData(0xe318, fontFamily: 'MaterialIcons');
+
+void main() {
+  // ── Variant rendering ──────────────────────────────────────────────────────
+
+  testWidgets('primary variant renders label', (tester) async {
+    await tester.pumpObers(const OiButton.primary(label: 'Save'));
+    expect(find.text('Save'), findsOneWidget);
+  });
+
+  testWidgets('secondary variant renders label', (tester) async {
+    await tester.pumpObers(const OiButton.secondary(label: 'Cancel'));
+    expect(find.text('Cancel'), findsOneWidget);
+  });
+
+  testWidgets('outline variant renders label', (tester) async {
+    await tester.pumpObers(const OiButton.outline(label: 'Outline'));
+    expect(find.text('Outline'), findsOneWidget);
+  });
+
+  testWidgets('ghost variant renders label', (tester) async {
+    await tester.pumpObers(const OiButton.ghost(label: 'Ghost'));
+    expect(find.text('Ghost'), findsOneWidget);
+  });
+
+  testWidgets('destructive variant renders label', (tester) async {
+    await tester.pumpObers(const OiButton.destructive(label: 'Delete'));
+    expect(find.text('Delete'), findsOneWidget);
+  });
+
+  testWidgets('soft variant renders label', (tester) async {
+    await tester.pumpObers(const OiButton.soft(label: 'Soft'));
+    expect(find.text('Soft'), findsOneWidget);
+  });
+
+  // ── onTap ──────────────────────────────────────────────────────────────────
+
+  testWidgets('onTap fires when tapped', (tester) async {
+    var count = 0;
+    await tester.pumpObers(
+      OiButton.primary(label: 'Go', onTap: () => count++),
+    );
+    await tester.tap(find.text('Go'));
+    await tester.pump();
+    expect(count, 1);
+  });
+
+  testWidgets('onTap not called when enabled=false', (tester) async {
+    var count = 0;
+    await tester.pumpObers(
+      OiButton.primary(label: 'Go', enabled: false, onTap: () => count++),
+    );
+    await tester.tap(find.text('Go'), warnIfMissed: false);
+    await tester.pump();
+    expect(count, 0);
+  });
+
+  // ── Loading ────────────────────────────────────────────────────────────────
+
+  testWidgets('loading=true shows OiPulse and hides label', (tester) async {
+    await tester.pumpObers(
+      const OiButton.primary(label: 'Save', loading: true),
+    );
+    expect(find.byType(OiPulse), findsOneWidget);
+    expect(find.text('Save'), findsNothing);
+  });
+
+  testWidgets('loading=true prevents onTap from firing', (tester) async {
+    var count = 0;
+    await tester.pumpObers(
+      OiButton.primary(label: 'Save', loading: true, onTap: () => count++),
+    );
+    await tester.tap(find.byType(OiPulse), warnIfMissed: false);
+    await tester.pump();
+    expect(count, 0);
+  });
+
+  // ── fullWidth ──────────────────────────────────────────────────────────────
+
+  testWidgets('fullWidth=true adds SizedBox with infinite width', (tester) async {
+    await tester.pumpObers(
+      const OiButton.primary(label: 'Wide', fullWidth: true),
+    );
+    final boxes = tester.widgetList<SizedBox>(find.byType(SizedBox));
+    expect(
+      boxes.any((b) => b.width == double.infinity),
+      isTrue,
+    );
+  });
+
+  // ── Sizes ──────────────────────────────────────────────────────────────────
+  // Use compact density so OiTappable does NOT add the 48 dp touch-target
+  // floor, letting us observe raw button heights.
+
+  testWidgets('small height < medium height', (tester) async {
+    // Align loosens the height constraint so each button gets its natural
+    // height. compact density removes the 48 dp touch-target floor.
+    await tester.pumpWidget(
+      const OiApp(
+        density: OiDensity.compact,
+        home: Align(
+          alignment: Alignment.topLeft,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              OiButton.primary(
+                key: Key('sm'),
+                label: 'S',
+                size: OiButtonSize.small,
+              ),
+              OiButton.primary(key: Key('md'), label: 'M'),
+            ],
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+    final smH = tester.getSize(find.byKey(const Key('sm'))).height;
+    final mdH = tester.getSize(find.byKey(const Key('md'))).height;
+    expect(smH, lessThan(mdH));
+  });
+
+  testWidgets('large height > medium height', (tester) async {
+    await tester.pumpWidget(
+      const OiApp(
+        density: OiDensity.compact,
+        home: Align(
+          alignment: Alignment.topLeft,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              OiButton.primary(key: Key('md'), label: 'M'),
+              OiButton.primary(
+                key: Key('lg'),
+                label: 'L',
+                size: OiButtonSize.large,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+    final mdH = tester.getSize(find.byKey(const Key('md'))).height;
+    final lgH = tester.getSize(find.byKey(const Key('lg'))).height;
+    expect(lgH, greaterThan(mdH));
+  });
+
+  // ── Icon-only button ───────────────────────────────────────────────────────
+
+  testWidgets('OiButton.icon renders Icon widget', (tester) async {
+    await tester.pumpObers(
+      const OiButton.icon(icon: _kIcon, semanticLabel: 'Add'),
+    );
+    expect(find.byIcon(_kIcon), findsOneWidget);
+  });
+
+  testWidgets('OiButton.icon fires onTap', (tester) async {
+    var count = 0;
+    await tester.pumpObers(OiButton.icon(icon: _kIcon, onTap: () => count++));
+    await tester.tap(find.byIcon(_kIcon));
+    await tester.pump();
+    expect(count, 1);
+  });
+
+  testWidgets('OiButton.icon is square', (tester) async {
+    // Align loosens constraints so the icon button gets its natural size
+    // (width == height == buttonHeight). compact density removes the 48 dp
+    // touch-target floor, so the OiTappable also renders at natural size.
+    await tester.pumpWidget(
+      const OiApp(
+        density: OiDensity.compact,
+        home: Align(child: OiButton.icon(icon: _kIcon)),
+      ),
+    );
+    await tester.pump();
+    final size = tester.getSize(find.byType(OiButton));
+    expect((size.width - size.height).abs(), lessThan(2));
+  });
+
+  // ── Leading / trailing icon ────────────────────────────────────────────────
+
+  testWidgets('leading icon renders before label', (tester) async {
+    await tester.pumpObers(
+      const OiButton.primary(label: 'Add', icon: _kIcon),
+    );
+    final iconDx = tester.getCenter(find.byIcon(_kIcon)).dx;
+    final textDx = tester.getCenter(find.text('Add')).dx;
+    expect(iconDx, lessThan(textDx));
+  });
+
+  testWidgets('trailing icon renders after label', (tester) async {
+    await tester.pumpObers(
+      const OiButton.primary(
+        label: 'Next',
+        icon: _kIcon,
+        iconPosition: OiIconPosition.trailing,
+      ),
+    );
+    final iconDx = tester.getCenter(find.byIcon(_kIcon)).dx;
+    final textDx = tester.getCenter(find.text('Next')).dx;
+    expect(iconDx, greaterThan(textDx));
+  });
+
+  // ── Split button ───────────────────────────────────────────────────────────
+
+  testWidgets('split button main tap fires onTap', (tester) async {
+    var count = 0;
+    await tester.pumpObers(
+      OiButton.split(
+        label: 'Export',
+        onTap: () => count++,
+        dropdown: const Text('CSV'),
+      ),
+    );
+    await tester.tap(find.text('Export'));
+    await tester.pump();
+    expect(count, 1);
+  });
+
+  testWidgets('split button chevron tap shows dropdown', (tester) async {
+    await tester.pumpObers(
+      OiButton.split(
+        label: 'Export',
+        onTap: () {},
+        dropdown: const Text('CSV option'),
+      ),
+    );
+    expect(find.text('CSV option'), findsNothing);
+    // The chevron is the Icon widget inside the second OiTappable.
+    // Find it by its IconData codepoint (expand_more / keyboard_arrow_down).
+    // Since its exact codepoint is an implementation detail, find all icons
+    // and tap the one that is NOT the test icon (there is exactly one chevron).
+    final icons = find.byType(Icon);
+    expect(icons, findsOneWidget); // only the chevron — no label icon
+    await tester.tap(icons);
+    await tester.pump();
+    expect(find.text('CSV option'), findsOneWidget);
+  });
+
+  // ── Countdown button ───────────────────────────────────────────────────────
+
+  testWidgets('countdown button is disabled initially', (tester) async {
+    var count = 0;
+    await tester.pumpObers(
+      OiButton.countdown(
+        label: 'Agree',
+        seconds: 3,
+        onTap: () => count++,
+      ),
+    );
+    expect(find.textContaining('Agree (3)'), findsOneWidget);
+    await tester.tap(find.byType(OiButton), warnIfMissed: false);
+    await tester.pump();
+    expect(count, 0);
+  });
+
+  testWidgets('countdown button enables after countdown expires', (tester) async {
+    var count = 0;
+    await tester.pumpObers(
+      OiButton.countdown(
+        label: 'Agree',
+        seconds: 2,
+        onTap: () => count++,
+      ),
+    );
+    await tester.pump(const Duration(seconds: 3));
+    expect(find.text('Agree'), findsOneWidget);
+    await tester.tap(find.text('Agree'));
+    await tester.pump();
+    expect(count, 1);
+  });
+
+  // ── Confirm button ─────────────────────────────────────────────────────────
+
+  testWidgets('confirm button shows label initially', (tester) async {
+    await tester.pumpObers(
+      OiButton.confirm(
+        label: 'Delete',
+        confirmLabel: 'Are you sure?',
+        onConfirm: () {},
+      ),
+    );
+    expect(find.text('Delete'), findsOneWidget);
+    expect(find.text('Are you sure?'), findsNothing);
+  });
+
+  testWidgets('confirm: first tap shows confirmLabel', (tester) async {
+    await tester.pumpObers(
+      OiButton.confirm(
+        label: 'Delete',
+        confirmLabel: 'Are you sure?',
+        onConfirm: () {},
+      ),
+    );
+    await tester.tap(find.text('Delete'));
+    await tester.pump();
+    expect(find.text('Are you sure?'), findsOneWidget);
+  });
+
+  testWidgets('confirm: second tap fires onConfirm and resets label',
+      (tester) async {
+    var confirmed = 0;
+    await tester.pumpObers(
+      OiButton.confirm(
+        label: 'Delete',
+        confirmLabel: 'Are you sure?',
+        onConfirm: () => confirmed++,
+      ),
+    );
+    await tester.tap(find.text('Delete'));
+    await tester.pump();
+    await tester.tap(find.text('Are you sure?'));
+    await tester.pump();
+    expect(confirmed, 1);
+    expect(find.text('Delete'), findsOneWidget);
+  });
+
+  // ── Density-aware sizing ───────────────────────────────────────────────────
+
+  testWidgets('dense density produces smaller height than comfortable',
+      (tester) async {
+    // Measure the Container that is an ancestor of the label text — that is
+    // the button body Container, whose height is set to buttonHeight directly.
+    double bodyHeight(WidgetTester t) {
+      final containerFinder = find.ancestor(
+        of: find.text('X'),
+        matching: find.byType(Container),
+      );
+      // .last is the innermost ancestor — the button body Container.
+      return t.getSize(containerFinder.last).height;
+    }
+
+    await tester.pumpWidget(
+      const OiApp(
+        density: OiDensity.comfortable,
+        home: Align(
+          alignment: Alignment.topLeft,
+          child: OiButton.primary(label: 'X'),
+        ),
+      ),
+    );
+    await tester.pump();
+    final comfortableH = bodyHeight(tester);
+
+    await tester.pumpWidget(
+      const OiApp(
+        density: OiDensity.dense,
+        home: Align(
+          alignment: Alignment.topLeft,
+          child: OiButton.primary(label: 'X'),
+        ),
+      ),
+    );
+    await tester.pump();
+    final denseH = bodyHeight(tester);
+
+    expect(denseH, lessThan(comfortableH));
+  });
+}

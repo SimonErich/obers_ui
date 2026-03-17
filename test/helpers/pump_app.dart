@@ -1,23 +1,14 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:obers_ui/src/foundation/oi_app.dart';
+import 'package:obers_ui/src/foundation/theme/oi_theme_data.dart';
 
-/// Test helper extension to wrap widgets with the required app scaffold.
-///
-/// Usage:
-/// ```dart
-/// testWidgets('my widget test', (tester) async {
-///   await tester.pumpObers(const MyWidget());
-///   expect(find.byType(MyWidget), findsOneWidget);
-/// });
-/// ```
+/// Test helper extension to wrap widgets with [OiApp].
 extension PumpObers on WidgetTester {
-  /// Wraps [widget] in a [MaterialApp] with optional theme configuration.
-  ///
-  /// When the obers_ui theme system is implemented, this will automatically
-  /// inject [FlubluTheme] into the widget tree.
+  /// Wraps [widget] in [OiApp] with an optional [theme] and [surfaceSize].
   Future<void> pumpObers(
     Widget widget, {
-    ThemeData? theme,
+    OiThemeData? theme,
     Size? surfaceSize,
   }) async {
     if (surfaceSize != null) {
@@ -26,9 +17,9 @@ extension PumpObers on WidgetTester {
     }
 
     await pumpWidget(
-      MaterialApp(
-        theme: theme ?? ThemeData.light(),
-        home: Scaffold(body: widget),
+      OiApp(
+        theme: theme ?? OiThemeData.light(),
+        home: widget,
       ),
     );
   }

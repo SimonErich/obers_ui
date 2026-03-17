@@ -1,0 +1,298 @@
+import 'dart:math' as math;
+
+import 'package:flutter/rendering.dart';
+import 'package:flutter/widgets.dart';
+import 'package:obers_ui/src/foundation/oi_app.dart';
+import 'package:obers_ui/src/foundation/theme/oi_effects_theme.dart';
+import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
+
+/// The minimum touch target size in logical pixels for touch devices.
+///
+/// Based on WCAG 2.5.5 and Material Design guidelines.
+const double _kMinTouchTarget = 48;
+
+/// A foundational interactive widget that handles tap, double-tap, long-press,
+/// hover, focus, and disabled states with animated visual feedback.
+///
+/// [OiTappable] reads interactive state effects from [OiEffectsTheme] and
+/// applies background overlay, halo/glow, and scale transforms according to
+/// the current state:
+///
+/// - **Pressed / active**: [OiEffectsTheme.active] (highest priority)
+/// - **Hovered**: [OiEffectsTheme.hover] (pointer devices only)
+/// - **Focused**: [OiEffectsTheme.focus]
+/// - **Disabled**: 0.4 opacity, all interaction suppressed
+///
+/// On touch devices ([OiDensity.comfortable]) a transparent padding region
+/// ensures a minimum 48 × 48 dp tap target.  On pointer devices no extra
+/// padding is added.
+///
+/// {@category Primitives}
+class OiTappable extends StatefulWidget {
+  /// Creates an [OiTappable].
+  const OiTappable({
+    required this.child,
+    this.onTap,
+    this.onDoubleTap,
+    this.onLongPress,
+    this.onHover,
+    this.onFocusChange,
+    this.enabled = true,
+    this.focusable = true,
+    this.semanticLabel,
+    this.cursor,
+    super.key,
+  });
+
+  /// The widget to render inside the tappable area.
+  final Widget child;
+
+  /// Called when the widget is tapped.
+  final VoidCallback? onTap;
+
+  /// Called when the widget is double-tapped.
+  final VoidCallback? onDoubleTap;
+
+  /// Called when the widget is long-pressed.
+  final VoidCallback? onLongPress;
+
+  /// Called when the hover state changes (pointer devices only).
+  final ValueChanged<bool>? onHover;
+
+  /// Called when the focus state changes.
+  final ValueChanged<bool>? onFocusChange;
+
+  /// Whether the widget responds to interactions.
+  ///
+  /// When `false`, callbacks are suppressed and the widget renders at 0.4
+  /// opacity to indicate its disabled state.
+  final bool enabled;
+
+  /// Whether the widget participates in keyboard focus traversal.
+  ///
+  /// When `false`, the [Focus] node cannot receive focus.
+  final bool focusable;
+
+  /// An optional label announced by screen readers in place of the child's
+  /// semantic content.
+  final String? semanticLabel;
+
+  /// The mouse cursor to display when hovering over this widget.
+  ///
+  /// Defaults to [SystemMouseCursors.click] when [enabled] is true and
+  /// [SystemMouseCursors.basic] when disabled.
+  final MouseCursor? cursor;
+
+  @override
+  State<OiTappable> createState() => _OiTappableState();
+}
+
+class _OiTappableState extends State<OiTappable> {
+  bool _isHovered = false;
+  bool _isPressed = false;
+  bool _isFocused = false;
+
+  // ── State helpers ──────────────────────────────────────────────────────────
+
+  void _setHovered(bool value) {
+    if (_isHovered != value) setState(() => _isHovered = value);
+  }
+
+  void _setPressed(bool value) {
+    if (_isPressed != value) setState(() => _isPressed = value);
+  }
+
+  void _setFocused(bool value) {
+    if (_isFocused != value) setState(() => _isFocused = value);
+  }
+
+  // ── Effective style ────────────────────────────────────────────────────────
+
+  OiInteractiveStyle _effectiveStyle(OiEffectsTheme effects) {
+    if (!widget.enabled) return OiInteractiveStyle.none;
+    if (_isPressed) return effects.active;
+    if (_isHovered) return effects.hover;
+    if (_isFocused) return effects.focus;
+    return OiInteractiveStyle.none;
+  }
+
+  // ── Gesture callbacks ──────────────────────────────────────────────────────
+
+  void _handleTapDown(TapDownDetails _) => _setPressed(true);
+  void _handleTapUp(TapUpDetails _) => _setPressed(false);
+  void _handleTapCancel() => _setPressed(false);
+
+  void _handleTap() {
+    if (widget.enabled) widget.onTap?.call();
+  }
+
+  void _handleDoubleTap() {
+    if (widget.enabled) widget.onDoubleTap?.call();
+  }
+
+  void _handleLongPress() {
+    if (widget.enabled) widget.onLongPress?.call();
+  }
+
+  // ── Build ──────────────────────────────────────────────────────────────────
+
+  @override
+  Widget build(BuildContext context) {
+    final effects = context.effects;
+    final animations = context.animations;
+    final density = OiDensityScope.of(context);
+    final isTouch = density == OiDensity.comfortable;
+    final style = _effectiveStyle(effects);
+
+    final effectiveCursor = widget.cursor ??
+        (widget.enabled ? SystemMouseCursors.click : SystemMouseCursors.basic);
+
+    // ── Build inner content with state overlay ───────────────────────────────
+    // ignore: omit_local_variable_types
+    Widget content = widget.child;
+
+    // Background overlay for the current state.
+    if (style.backgroundOverlay.a > 0) {
+      content = Stack(
+        fit: StackFit.passthrough,
+        children: [
+          content,
+          Positioned.fill(
+            child: IgnorePointer(
+              child: ColoredBox(color: style.backgroundOverlay),
+            ),
+          ),
+        ],
+      );
+    }
+
+    // Halo / glow rendered as a DecoratedBox behind the content.
+    final halo = style.halo; // ignore: omit_local_variable_types
+    if (halo != OiHaloStyle.none &&
+        (halo.color.a > 0 || halo.spread > 0 || halo.blur > 0)) {
+      content = DecoratedBox(
+        decoration: BoxDecoration(
+          boxShadow: [halo.toBoxShadow()],
+        ),
+        child: content,
+      );
+    }
+
+    // Scale transform for pressed states.
+    if (style.scale != 1) {
+      content = Transform.scale(
+        scale: style.scale,
+        child: content,
+      );
+    }
+
+    // Reduced opacity when disabled.
+    if (!widget.enabled) {
+      content = Opacity(opacity: 0.4, child: content);
+    }
+
+    // Enforce minimum 48 dp touch target on touch devices.
+    if (isTouch) {
+      content = _TouchTargetPadding(child: content);
+    }
+
+    // Gesture detection.
+    content = GestureDetector(
+      onTap: _handleTap,
+      onDoubleTap: widget.onDoubleTap != null ? _handleDoubleTap : null,
+      onLongPress: widget.onLongPress != null ? _handleLongPress : null,
+      onTapDown: _handleTapDown,
+      onTapUp: _handleTapUp,
+      onTapCancel: _handleTapCancel,
+      behavior: HitTestBehavior.opaque,
+      child: content,
+    );
+
+    // Hover region — only active on pointer devices.
+    if (!isTouch) {
+      content = MouseRegion(
+        cursor: effectiveCursor,
+        onEnter: (_) {
+          if (widget.enabled) {
+            _setHovered(true);
+            widget.onHover?.call(true);
+          }
+        },
+        onExit: (_) {
+          _setHovered(false);
+          widget.onHover?.call(false);
+        },
+        child: content,
+      );
+    }
+
+    // Keyboard focus.
+    content = Focus(
+      canRequestFocus: widget.focusable && widget.enabled,
+      onFocusChange: (focused) {
+        _setFocused(focused);
+        widget.onFocusChange?.call(focused);
+      },
+      child: content,
+    );
+
+    // Semantics label.
+    if (widget.semanticLabel != null) {
+      content = Semantics(
+        label: widget.semanticLabel,
+        button: true,
+        enabled: widget.enabled,
+        child: content,
+      );
+    }
+
+    // Animated wrapper for smooth state transitions.
+    return AnimatedOpacity(
+      opacity: 1,
+      duration: animations.fast,
+      child: content,
+    );
+  }
+}
+
+// ── Internal render object ─────────────────────────────────────────────────
+
+/// Wraps its child and enforces a minimum size of 48 × 48 dp.
+///
+/// Used internally by [OiTappable] on touch-input devices to satisfy WCAG
+/// minimum tap-target requirements.
+class _TouchTargetPadding extends SingleChildRenderObjectWidget {
+  const _TouchTargetPadding({required super.child});
+
+  @override
+  RenderObject createRenderObject(BuildContext context) =>
+      _RenderTouchTargetPadding();
+}
+
+class _RenderTouchTargetPadding extends RenderProxyBox {
+  @override
+  double computeMinIntrinsicWidth(double height) =>
+      math.max(super.computeMinIntrinsicWidth(height), _kMinTouchTarget);
+
+  @override
+  double computeMinIntrinsicHeight(double width) =>
+      math.max(super.computeMinIntrinsicHeight(width), _kMinTouchTarget);
+
+  @override
+  Size computeDryLayout(BoxConstraints constraints) {
+    final childSize = super.computeDryLayout(constraints);
+    return Size(
+      math.max(childSize.width, _kMinTouchTarget),
+      math.max(childSize.height, _kMinTouchTarget),
+    );
+  }
+
+  @override
+  void performLayout() {
+    super.performLayout();
+    size = Size(
+      math.max(size.width, _kMinTouchTarget),
+      math.max(size.height, _kMinTouchTarget),
+    );
+  }
+}
