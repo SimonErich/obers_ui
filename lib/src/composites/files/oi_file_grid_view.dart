@@ -1,11 +1,15 @@
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/display/oi_file_icon.dart';
 import 'package:obers_ui/src/components/display/oi_file_preview.dart';
 import 'package:obers_ui/src/components/display/oi_folder_icon.dart';
 import 'package:obers_ui/src/components/display/oi_rename_field.dart';
 import 'package:obers_ui/src/components/interaction/oi_selection_overlay.dart';
+import 'package:obers_ui/src/components/overlays/oi_context_menu.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/models/oi_file_node_data.dart';
+import 'package:obers_ui/src/primitives/drag_drop/oi_draggable.dart';
+import 'package:obers_ui/src/primitives/drag_drop/oi_drop_zone.dart';
 
 /// The grid view of files.
 ///
@@ -29,6 +33,10 @@ class OiFileGridView extends StatefulWidget {
     this.onMoveToFolder,
     this.contextMenu,
     this.backgroundContextMenu,
+    this.contextMenuBuilder,
+    this.enableDragDrop = true,
+    this.enableMultiSelect = true,
+    this.searchQuery,
     this.loading = false,
     this.semanticsLabel,
     super.key,
@@ -68,11 +76,23 @@ class OiFileGridView extends StatefulWidget {
   final void Function(List<OiFileNodeData> files, OiFileNodeData folder)?
       onMoveToFolder;
 
-  /// Context menu builder for individual files.
+  /// Context menu builder for individual files (legacy widget-based).
   final List<Widget> Function(OiFileNodeData)? contextMenu;
 
-  /// Context menu builder for background (empty area).
-  final List<Widget> Function()? backgroundContextMenu;
+  /// Context menu items builder for individual files (OiMenuItem-based).
+  final List<OiMenuItem> Function(OiFileNodeData)? contextMenuBuilder;
+
+  /// Context menu items builder for background (empty area).
+  final List<OiMenuItem> Function()? backgroundContextMenu;
+
+  /// Whether drag-and-drop is enabled.
+  final bool enableDragDrop;
+
+  /// Whether multi-select (Ctrl/Shift click) is enabled.
+  final bool enableMultiSelect;
+
+  /// Current search query for highlighting.
+  final String? searchQuery;
 
   /// Whether the view is in a loading state.
   final bool loading;
@@ -85,13 +105,146 @@ class OiFileGridView extends StatefulWidget {
 }
 
 class _OiFileGridViewState extends State<OiFileGridView> {
-  void _onTap(OiFileNodeData file) {
-    final newSelection = <Object>{file.id};
-    widget.onSelectionChange(newSelection);
+  int? _lastTappedIndex;
+  final FocusNode _focusNode = FocusNode();
+  int _focusedIndex = -1;
+
+  @override
+  void dispose() {
+    _focusNode.dispose();
+    super.dispose();
+  }
+
+  void _onTap(OiFileNodeData file, int index) {
+    if (!widget.enableMultiSelect) {
+      widget.onSelectionChange({file.id});
+      _lastTappedIndex = index;
+      return;
+    }
+
+    final isShift = HardwareKeyboard.instance.logicalKeysPressed
+        .any((k) =>
+            k == LogicalKeyboardKey.shiftLeft ||
+            k == LogicalKeyboardKey.shiftRight);
+    final isCtrl = HardwareKeyboard.instance.logicalKeysPressed.any((k) =>
+        k == LogicalKeyboardKey.controlLeft ||
+        k == LogicalKeyboardKey.controlRight ||
+        k == LogicalKeyboardKey.metaLeft ||
+        k == LogicalKeyboardKey.metaRight);
+
+    if (isShift && _lastTappedIndex != null) {
+      final start =
+          _lastTappedIndex! < index ? _lastTappedIndex! : index;
+      final end = _lastTappedIndex! < index ? index : _lastTappedIndex!;
+      final newSelection = Set<Object>.from(widget.selectedKeys);
+      for (var i = start; i <= end; i++) {
+        newSelection.add(widget.files[i].id);
+      }
+      widget.onSelectionChange(newSelection);
+    } else if (isCtrl) {
+      final newSelection = Set<Object>.from(widget.selectedKeys);
+      if (newSelection.contains(file.id)) {
+        newSelection.remove(file.id);
+      } else {
+        newSelection.add(file.id);
+      }
+      widget.onSelectionChange(newSelection);
+      _lastTappedIndex = index;
+    } else {
+      widget.onSelectionChange({file.id});
+      _lastTappedIndex = index;
+    }
+
+    setState(() => _focusedIndex = index);
   }
 
   void _onDoubleTap(OiFileNodeData file) {
     widget.onOpen(file);
+  }
+
+  void _handleKeyEvent(KeyEvent event) {
+    if (event is! KeyDownEvent) return;
+    final key = event.logicalKey;
+
+    if (key == LogicalKeyboardKey.arrowRight) {
+      _moveFocus(1);
+    } else if (key == LogicalKeyboardKey.arrowLeft) {
+      _moveFocus(-1);
+    } else if (key == LogicalKeyboardKey.arrowDown) {
+      // Move to next row (estimate columns from layout)
+      _moveFocus(_estimateColumns());
+    } else if (key == LogicalKeyboardKey.arrowUp) {
+      _moveFocus(-_estimateColumns());
+    } else if (key == LogicalKeyboardKey.enter ||
+        key == LogicalKeyboardKey.space) {
+      if (_focusedIndex >= 0 && _focusedIndex < widget.files.length) {
+        _onDoubleTap(widget.files[_focusedIndex]);
+      }
+    } else if (key == LogicalKeyboardKey.home) {
+      _moveFocusTo(0);
+    } else if (key == LogicalKeyboardKey.end) {
+      _moveFocusTo(widget.files.length - 1);
+    }
+  }
+
+  int _estimateColumns() {
+    final viewWidth =
+        (context.findRenderObject() as RenderBox?)?.size.width ?? 800;
+    return (viewWidth / (widget.cardWidth + widget.gap)).floor().clamp(1, 20);
+  }
+
+  void _moveFocus(int delta) {
+    if (widget.files.isEmpty) return;
+    final next = (_focusedIndex + delta).clamp(0, widget.files.length - 1);
+    setState(() => _focusedIndex = next);
+
+    final isShift = HardwareKeyboard.instance.logicalKeysPressed
+        .any((k) =>
+            k == LogicalKeyboardKey.shiftLeft ||
+            k == LogicalKeyboardKey.shiftRight);
+
+    if (isShift && widget.enableMultiSelect) {
+      final newSelection = Set<Object>.from(widget.selectedKeys);
+      newSelection.add(widget.files[next].id);
+      widget.onSelectionChange(newSelection);
+    } else {
+      widget.onSelectionChange({widget.files[next].id});
+    }
+    _lastTappedIndex = next;
+  }
+
+  void _handleRubberBandSelection(Rect rect) {
+    if (widget.files.isEmpty) return;
+
+    final spacing = context.spacing;
+    final padding = (spacing as dynamic).md as double;
+    final cols = _estimateColumns();
+    final cellWidth = widget.cardWidth + widget.gap;
+    final cellHeight = widget.cardHeight + widget.gap;
+
+    final selected = <Object>{};
+    for (var i = 0; i < widget.files.length; i++) {
+      final row = i ~/ cols;
+      final col = i % cols;
+      final itemRect = Rect.fromLTWH(
+        padding + col * cellWidth,
+        padding + row * cellHeight,
+        widget.cardWidth,
+        widget.cardHeight,
+      );
+      if (rect.overlaps(itemRect)) {
+        selected.add(widget.files[i].id);
+      }
+    }
+    widget.onSelectionChange(selected);
+  }
+
+  void _moveFocusTo(int index) {
+    if (widget.files.isEmpty) return;
+    final clamped = index.clamp(0, widget.files.length - 1);
+    setState(() => _focusedIndex = clamped);
+    widget.onSelectionChange({widget.files[clamped].id});
+    _lastTappedIndex = clamped;
   }
 
   @override
@@ -105,113 +258,263 @@ class _OiFileGridViewState extends State<OiFileGridView> {
 
     return Semantics(
       label: widget.semanticsLabel ?? 'File grid',
-      child: OiSelectionOverlay(
-        onSelectionRect: (rect) {
-          // Calculate which items intersect and update selection
-        },
-        onSelectionStart: () {},
-        onSelectionEnd: () {},
-        child: GridView.builder(
-          padding: EdgeInsets.all(spacing.md),
-          gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-            maxCrossAxisExtent: widget.cardWidth,
-            mainAxisSpacing: widget.gap,
-            crossAxisSpacing: widget.gap,
-            mainAxisExtent: widget.cardHeight,
-          ),
-          itemCount: widget.files.length,
-          itemBuilder: (context, index) {
-            final file = widget.files[index];
-            final isSelected = widget.selectedKeys.contains(file.id);
-            final isRenaming = widget.renamingKey == file.id;
-
-            return _buildCard(file, isSelected, isRenaming, colors, spacing);
+      child: KeyboardListener(
+        focusNode: _focusNode,
+        onKeyEvent: _handleKeyEvent,
+        child: OiSelectionOverlay(
+          onSelectionRect: (rect) {
+            _handleRubberBandSelection(rect);
           },
+          onSelectionStart: () {},
+          onSelectionEnd: () {},
+          child: OiContextMenu(
+            label: 'File grid background menu',
+            items: widget.backgroundContextMenu?.call() ?? [],
+            enabled: widget.backgroundContextMenu != null,
+            child: GridView.builder(
+              padding: EdgeInsets.all(spacing.md),
+              gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+                maxCrossAxisExtent: widget.cardWidth,
+                mainAxisSpacing: widget.gap,
+                crossAxisSpacing: widget.gap,
+                mainAxisExtent: widget.cardHeight,
+              ),
+              itemCount: widget.files.length,
+              itemBuilder: (context, index) {
+                final file = widget.files[index];
+                final isSelected =
+                    widget.selectedKeys.contains(file.id);
+                final isRenaming = widget.renamingKey == file.id;
+
+                return _buildCard(
+                    file, index, isSelected, isRenaming, colors, spacing);
+              },
+            ),
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildCard(OiFileNodeData file, bool isSelected, bool isRenaming,
-      dynamic colors, dynamic spacing) {
-    return GestureDetector(
-      onTap: () => _onTap(file),
-      onDoubleTap: () => _onDoubleTap(file),
-      child: Container(
-        padding: EdgeInsets.all((spacing as dynamic).sm as double),
-        decoration: BoxDecoration(
-          color: isSelected
-              ? ((colors as dynamic).primary.muted as Color)
-                  .withValues(alpha: 0.15)
-              : null,
-          borderRadius: BorderRadius.circular(8),
-          border: isSelected
-              ? Border.all(color: (colors as dynamic).primary.base as Color)
-              : Border.all(
-                  color: (colors as dynamic).borderSubtle as Color),
+  Widget _buildCard(OiFileNodeData file, int index, bool isSelected,
+      bool isRenaming, dynamic colors, dynamic spacing) {
+    final fileType = file.isFolder ? 'folder' : file.resolvedExtension;
+    final semanticLabel =
+        '${file.name}, $fileType${isSelected ? ', selected' : ''}';
+
+    Widget card = Semantics(
+      label: semanticLabel,
+      selected: isSelected,
+      child: GestureDetector(
+        onTap: () => _onTap(file, index),
+        onDoubleTap: () => _onDoubleTap(file),
+        child: Container(
+          padding: EdgeInsets.all((spacing as dynamic).sm as double),
+          decoration: BoxDecoration(
+            color: isSelected
+                ? ((colors as dynamic).primary.muted as Color)
+                    .withValues(alpha: 0.15)
+                : null,
+            borderRadius: BorderRadius.circular(8),
+            border: isSelected
+                ? Border.all(
+                    color: (colors as dynamic).primary.base as Color)
+                : Border.all(
+                    color: (colors as dynamic).borderSubtle as Color),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // Preview area
+              Expanded(
+                child: Center(
+                  child: file.isFolder
+                      ? const OiFolderIcon(size: OiFolderIconSize.xl)
+                      : (file.thumbnailUrl != null
+                          ? OiFilePreview(
+                              file: file,
+                              width: widget.cardWidth - 24,
+                              height: widget.cardHeight - 60,
+                            )
+                          : OiFileIcon(
+                              fileName: file.name,
+                              mimeType: file.mimeType,
+                              size: OiFileIconSize.lg,
+                            )),
+                ),
+              ),
+              SizedBox(height: (spacing as dynamic).xs as double),
+              // Name or rename field
+              if (isRenaming)
+                OiRenameField(
+                  currentName: file.name,
+                  isFolder: file.isFolder,
+                  onRename: widget.onRename ?? (_) {},
+                  onCancel: widget.onCancelRename ?? () {},
+                  semanticsLabel: 'Rename ${file.name}',
+                )
+              else
+                _buildName(file, colors),
+              // Subtitle
+              if (file.isFolder)
+                Text(
+                  file.itemCount != null
+                      ? '${file.itemCount} items'
+                      : 'Empty',
+                  style: TextStyle(
+                    fontSize: 10,
+                    color: (colors as dynamic).textMuted as Color,
+                  ),
+                )
+              else if (!isRenaming)
+                Text(
+                  file.formattedSize,
+                  style: TextStyle(
+                    fontSize: 10,
+                    color: (colors as dynamic).textMuted as Color,
+                  ),
+                ),
+            ],
+          ),
         ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // Preview area
-            Expanded(
-              child: Center(
-                child: file.isFolder
-                    ? const OiFolderIcon(size: OiFolderIconSize.xl)
-                    : (file.thumbnailUrl != null
-                        ? OiFilePreview(
-                            file: file,
-                            width: widget.cardWidth - 24,
-                            height: widget.cardHeight - 60,
-                          )
-                        : OiFileIcon(
-                            fileName: file.name,
-                            mimeType: file.mimeType,
-                            size: OiFileIconSize.lg,
-                          )),
+      ),
+    );
+
+    // Wrap with context menu
+    if (widget.contextMenuBuilder != null) {
+      card = OiContextMenu(
+        label: 'Context menu for ${file.name}',
+        items: widget.contextMenuBuilder!(file),
+        child: card,
+      );
+    }
+
+    // Wrap with drag-and-drop
+    if (widget.enableDragDrop) {
+      // If folder, make it a drop target
+      if (file.isFolder && widget.onMoveToFolder != null) {
+        card = OiDropZone<List<OiFileNodeData>>(
+          onWillAccept: (data) {
+            if (data == null) return false;
+            return !data.any((f) => f.id == file.id);
+          },
+          onAccept: (droppedFiles) {
+            widget.onMoveToFolder!(droppedFiles, file);
+          },
+          builder: (context, state) {
+            return Container(
+              decoration: state == OiDropState.hovering
+                  ? BoxDecoration(
+                      border: Border.all(
+                        color: (colors as dynamic).primary.base as Color,
+                        width: 2,
+                      ),
+                      borderRadius: BorderRadius.circular(8),
+                    )
+                  : null,
+              child: card,
+            );
+          },
+        );
+      }
+
+      final dragData = isSelected
+          ? widget.files
+              .where((f) => widget.selectedKeys.contains(f.id))
+              .toList()
+          : [file];
+
+      card = OiDraggable<List<OiFileNodeData>>(
+        data: dragData,
+        feedback: _buildDragFeedback(dragData, colors),
+        child: card,
+      );
+    }
+
+    return card;
+  }
+
+  Widget _buildName(OiFileNodeData file, dynamic colors) {
+    final normalStyle = TextStyle(
+      fontSize: 12,
+      color: (colors as dynamic).text as Color,
+    );
+
+    final query = widget.searchQuery;
+    if (query == null || query.isEmpty) {
+      return Text(
+        file.name,
+        style: normalStyle,
+        maxLines: 2,
+        overflow: TextOverflow.ellipsis,
+        textAlign: TextAlign.center,
+      );
+    }
+
+    final spans = _highlightSpans(
+      file.name,
+      query,
+      normalStyle,
+      normalStyle.copyWith(
+        fontWeight: FontWeight.w700,
+        color: (colors as dynamic).primary.base as Color,
+      ),
+    );
+
+    return RichText(
+      text: TextSpan(children: spans),
+      maxLines: 2,
+      overflow: TextOverflow.ellipsis,
+      textAlign: TextAlign.center,
+    );
+  }
+
+  Widget _buildDragFeedback(List<OiFileNodeData> files, dynamic colors) {
+    final label = files.length == 1
+        ? files.first.name
+        : '${files.length} items';
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: (colors as dynamic).surface as Color,
+        borderRadius: BorderRadius.circular(8),
+        boxShadow: [
+          BoxShadow(
+            color: ((colors as dynamic).overlay as Color)
+                .withValues(alpha: 0.2),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (files.length == 1 && files.first.isFolder)
+            const OiFolderIcon(size: OiFolderIconSize.sm)
+          else if (files.length == 1)
+            OiFileIcon(
+              fileName: files.first.name,
+              size: OiFileIconSize.sm,
+            )
+          else
+            Text(
+              '${files.length}',
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w700,
+                color: (colors as dynamic).primary.base as Color,
               ),
             ),
-            SizedBox(height: (spacing as dynamic).xs as double),
-            // Name or rename field
-            if (isRenaming)
-              OiRenameField(
-                currentName: file.name,
-                isFolder: file.isFolder,
-                onRename: widget.onRename ?? (_) {},
-                onCancel: widget.onCancelRename ?? () {},
-              )
-            else
-              Text(
-                file.name,
-                style: TextStyle(
-                  fontSize: 12,
-                  color: (colors as dynamic).text as Color,
-                ),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                textAlign: TextAlign.center,
-              ),
-            // Subtitle
-            if (file.isFolder)
-              Text(
-                file.itemCount != null
-                    ? '${file.itemCount} items'
-                    : 'Empty',
-                style: TextStyle(
-                  fontSize: 10,
-                  color: (colors as dynamic).textMuted as Color,
-                ),
-              )
-            else if (!isRenaming)
-              Text(
-                file.formattedSize,
-                style: TextStyle(
-                  fontSize: 10,
-                  color: (colors as dynamic).textMuted as Color,
-                ),
-              ),
-          ],
-        ),
+          const SizedBox(width: 8),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 13,
+              color: (colors as dynamic).text as Color,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -236,4 +539,29 @@ class _OiFileGridViewState extends State<OiFileGridView> {
       },
     );
   }
+}
+
+List<TextSpan> _highlightSpans(
+  String text,
+  String query,
+  TextStyle normal,
+  TextStyle highlighted,
+) {
+  final lowerText = text.toLowerCase();
+  final lowerQuery = query.toLowerCase();
+  final index = lowerText.indexOf(lowerQuery);
+
+  if (index < 0) {
+    return [TextSpan(text: text, style: normal)];
+  }
+
+  final before = text.substring(0, index);
+  final match = text.substring(index, index + query.length);
+  final after = text.substring(index + query.length);
+
+  return [
+    if (before.isNotEmpty) TextSpan(text: before, style: normal),
+    TextSpan(text: match, style: highlighted),
+    if (after.isNotEmpty) TextSpan(text: after, style: normal),
+  ];
 }

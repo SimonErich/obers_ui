@@ -60,7 +60,6 @@ class _W extends StatefulWidget {
 }
 
 class _WState extends State<_W> with OiSettingsMixin<_W, _S> {
-
   @override
   String get settingsNamespace => 'test';
 
@@ -175,9 +174,18 @@ void main() {
       await t.pumpWidget(wrap(_W(driver: driver)));
       final state = t.state<_WState>(find.byType(_W));
       // Fire multiple rapid updates — only the last should be persisted.
-      state.runUpdate(const _S(n: 1), debounce: const Duration(milliseconds: 200));
-      state.runUpdate(const _S(n: 2), debounce: const Duration(milliseconds: 200));
-      state.runUpdate(const _S(n: 3), debounce: const Duration(milliseconds: 200));
+      state.runUpdate(
+        const _S(n: 1),
+        debounce: const Duration(milliseconds: 200),
+      );
+      state.runUpdate(
+        const _S(n: 2),
+        debounce: const Duration(milliseconds: 200),
+      );
+      state.runUpdate(
+        const _S(n: 3),
+        debounce: const Duration(milliseconds: 200),
+      );
       // Nothing saved yet.
       expect(driver.store.isEmpty, isTrue);
       await t.pump(const Duration(milliseconds: 250));
@@ -210,9 +218,7 @@ void main() {
       expect(await driver.exists(namespace: 'test'), isFalse);
     });
 
-    testWidgets('driver change on didUpdateWidget reloads settings', (
-      t,
-    ) async {
+    testWidgets('driver change on didUpdateWidget reloads settings', (t) async {
       final driver1 = OiInMemorySettingsDriver();
       await driver1.save(
         namespace: 'test',
@@ -238,9 +244,7 @@ void main() {
       expect(state.currentSettings.n, equals(20));
     });
 
-    testWidgets('key change on didUpdateWidget reloads settings', (
-      t,
-    ) async {
+    testWidgets('key change on didUpdateWidget reloads settings', (t) async {
       final driver = OiInMemorySettingsDriver();
       await driver.save(
         namespace: 'test',

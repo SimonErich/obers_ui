@@ -68,10 +68,8 @@ class OiAccordionSettings with OiSettingsData {
   }
 
   @override
-  int get hashCode => Object.hash(
-    schemaVersion,
-    Object.hashAll(expandedIndices),
-  );
+  int get hashCode =>
+      Object.hash(schemaVersion, Object.hashAll(expandedIndices));
 
   // ── Private helpers ────────────────────────────────────────────────────────
 

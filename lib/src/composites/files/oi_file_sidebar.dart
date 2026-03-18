@@ -6,6 +6,7 @@ import 'package:obers_ui/src/components/overlays/oi_context_menu.dart';
 import 'package:obers_ui/src/composites/data/oi_tree.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/models/oi_file_node_data.dart';
+import 'package:obers_ui/src/primitives/drag_drop/oi_drop_zone.dart';
 
 /// A quick-access item for the sidebar.
 ///
@@ -243,6 +244,7 @@ class _OiFileSidebarState extends State<OiFileSidebar> {
                   _FavoriteRow(
                     folder: fav,
                     onTap: () => widget.onFavoriteTap?.call(fav),
+                    onFileDrop: widget.onFileDrop,
                     colors: colors,
                     spacing: spacing,
                   ),
@@ -258,29 +260,90 @@ class _OiFileSidebarState extends State<OiFileSidebar> {
               _SectionHeader(label: 'Folders', colors: colors),
               Expanded(
                 child: OiTree<OiFileNodeData>(
+                  label: 'Folder tree',
                   nodes: widget.folderTree,
                   controller: _treeController,
-                  onSelect: _onFolderSelect,
-                  nodeBuilder: (context, node, isExpanded, isSelected) {
-                    return OiFolderTreeItem(
-                      folder: node.data ??
-                          OiFileNodeData(
-                            id: node.id,
-                            name: node.label,
-                            isFolder: true,
-                          ),
-                      expanded: isExpanded,
-                      selected: isSelected,
+                  selectable: true,
+                  onNodeTap: (node) => _onFolderSelect(node.id),
+                  nodeBuilder: (context, node, depth, {required bool expanded, required bool selected}) {
+                    final folder = node.data ??
+                        OiFileNodeData(
+                          id: node.id,
+                          name: node.label,
+                          isFolder: true,
+                        );
+
+                    Widget treeItem = OiFolderTreeItem(
+                      folder: folder,
+                      expanded: expanded,
+                      selected: selected,
                       itemCount: node.data?.itemCount,
                       onTap: () => _onFolderSelect(node.id),
                       onExpand: () {
-                        if (isExpanded) {
+                        if (expanded) {
                           _treeController.collapse(node.id);
                         } else {
                           _treeController.expand(node.id);
                         }
                       },
                     );
+
+                    // Wrap with drop target if file drops are enabled
+                    if (widget.onFileDrop != null) {
+                      treeItem = OiDropZone<List<OiFileNodeData>>(
+                        onWillAccept: (_) => true,
+                        onAccept: (files) {
+                          widget.onFileDrop!(files, folder);
+                        },
+                        builder: (ctx, state) {
+                          return Container(
+                            decoration: state == OiDropState.hovering
+                                ? BoxDecoration(
+                                    color: context.colors.primary.muted
+                                        .withValues(alpha: 0.15),
+                                    borderRadius: BorderRadius.circular(4),
+                                  )
+                                : null,
+                            child: treeItem,
+                          );
+                        },
+                      );
+                    }
+
+                    // Wrap with context menu if folder management is enabled
+                    if (widget.onRenameFolder != null ||
+                        widget.onDeleteFolder != null ||
+                        widget.onNewFolder != null) {
+                      treeItem = OiContextMenu(
+                        label: 'Folder ${folder.name} context menu',
+                        items: [
+                          if (widget.onNewFolder != null)
+                            OiMenuItem(
+                              label: 'New subfolder',
+                              icon: const IconData(0xe2cc,
+                                  fontFamily: 'MaterialIcons'),
+                              onTap: () => widget.onNewFolder!(folder),
+                            ),
+                          if (widget.onRenameFolder != null)
+                            OiMenuItem(
+                              label: 'Rename',
+                              icon: const IconData(0xe3c9,
+                                  fontFamily: 'MaterialIcons'),
+                              onTap: () => widget.onRenameFolder!(folder),
+                            ),
+                          if (widget.onDeleteFolder != null)
+                            OiMenuItem(
+                              label: 'Delete',
+                              icon: const IconData(0xe872,
+                                  fontFamily: 'MaterialIcons'),
+                              onTap: () => widget.onDeleteFolder!(folder),
+                            ),
+                        ],
+                        child: treeItem,
+                      );
+                    }
+
+                    return treeItem;
                   },
                 ),
               ),
@@ -337,18 +400,21 @@ class _SectionHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final spacing = context.spacing;
-    return Padding(
-      padding: EdgeInsets.symmetric(
-        horizontal: spacing.md,
-        vertical: spacing.xs,
-      ),
-      child: Text(
-        label,
-        style: TextStyle(
-          fontSize: 11,
-          fontWeight: FontWeight.w600,
-          color: (colors as dynamic).textMuted as Color,
-          letterSpacing: 0.5,
+    return Semantics(
+      header: true,
+      child: Padding(
+        padding: EdgeInsets.symmetric(
+          horizontal: spacing.md,
+          vertical: spacing.xs,
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            fontSize: 11,
+            fontWeight: FontWeight.w600,
+            color: (colors as dynamic).textMuted as Color,
+            letterSpacing: 0.5,
+          ),
         ),
       ),
     );
@@ -370,48 +436,53 @@ class _QuickAccessRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      behavior: HitTestBehavior.opaque,
-      child: Padding(
-        padding: EdgeInsets.symmetric(
-          horizontal: (spacing as dynamic).md as double,
-          vertical: (spacing as dynamic).xs as double,
-        ),
-        child: Row(
-          children: [
-            Icon(
-              item.icon,
-              size: 16,
-              color: (colors as dynamic).textSubtle as Color,
-            ),
-            SizedBox(width: (spacing as dynamic).sm as double),
-            Expanded(
-              child: Text(
-                item.label,
-                style: TextStyle(
-                  fontSize: 13,
-                  color: (colors as dynamic).text as Color,
-                ),
+    return Semantics(
+      button: true,
+      label: item.label,
+      child: GestureDetector(
+        onTap: onTap,
+        behavior: HitTestBehavior.opaque,
+        child: Padding(
+          padding: EdgeInsets.symmetric(
+            horizontal: (spacing as dynamic).md as double,
+            vertical: (spacing as dynamic).xs as double,
+          ),
+          child: Row(
+            children: [
+              Icon(
+                item.icon,
+                size: 16,
+                color: (colors as dynamic).textSubtle as Color,
               ),
-            ),
-            if (item.badgeCount != null && item.badgeCount! > 0)
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
-                decoration: BoxDecoration(
-                  color: (colors as dynamic).primary.muted as Color,
-                  borderRadius: BorderRadius.circular(8),
-                ),
+              SizedBox(width: (spacing as dynamic).sm as double),
+              Expanded(
                 child: Text(
-                  '${item.badgeCount}',
+                  item.label,
                   style: TextStyle(
-                    fontSize: 10,
-                    color: (colors as dynamic).primary.base as Color,
-                    fontWeight: FontWeight.w600,
+                    fontSize: 13,
+                    color: (colors as dynamic).text as Color,
                   ),
                 ),
               ),
-          ],
+              if (item.badgeCount != null && item.badgeCount! > 0)
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+                  decoration: BoxDecoration(
+                    color: (colors as dynamic).primary.muted as Color,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    '${item.badgeCount}',
+                    style: TextStyle(
+                      fontSize: 10,
+                      color: (colors as dynamic).primary.base as Color,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+            ],
+          ),
         ),
       ),
     );
@@ -424,45 +495,76 @@ class _FavoriteRow extends StatelessWidget {
     required this.onTap,
     required this.colors,
     required this.spacing,
+    this.onFileDrop,
   });
 
   final OiFileNodeData folder;
   final VoidCallback onTap;
   final dynamic colors;
   final dynamic spacing;
+  final void Function(List<OiFileNodeData> files, OiFileNodeData folder)?
+      onFileDrop;
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      behavior: HitTestBehavior.opaque,
-      child: Padding(
-        padding: EdgeInsets.symmetric(
-          horizontal: (spacing as dynamic).md as double,
-          vertical: (spacing as dynamic).xs as double,
-        ),
-        child: Row(
-          children: [
-            Icon(
-              const IconData(0xe838, fontFamily: 'MaterialIcons'), // star
-              size: 14,
-              color: (colors as dynamic).warning.base as Color,
-            ),
-            SizedBox(width: (spacing as dynamic).sm as double),
-            Expanded(
-              child: Text(
-                folder.name,
-                style: TextStyle(
-                  fontSize: 13,
-                  color: (colors as dynamic).text as Color,
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+    Widget row = Semantics(
+      button: true,
+      label: 'Favorite: ${folder.name}',
+      child: GestureDetector(
+        onTap: onTap,
+        behavior: HitTestBehavior.opaque,
+        child: Padding(
+          padding: EdgeInsets.symmetric(
+            horizontal: (spacing as dynamic).md as double,
+            vertical: (spacing as dynamic).xs as double,
+          ),
+          child: Row(
+            children: [
+              Icon(
+                const IconData(0xe838, fontFamily: 'MaterialIcons'),
+                size: 14,
+                color: (colors as dynamic).warning.base as Color,
               ),
-            ),
-          ],
+              SizedBox(width: (spacing as dynamic).sm as double),
+              Expanded(
+                child: Text(
+                  folder.name,
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: (colors as dynamic).text as Color,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
+
+    // Wrap favorites with drop target
+    if (onFileDrop != null) {
+      row = OiDropZone<List<OiFileNodeData>>(
+        onWillAccept: (_) => true,
+        onAccept: (files) => onFileDrop!(files, folder),
+        builder: (ctx, state) {
+          return Container(
+            decoration: state == OiDropState.hovering
+                ? BoxDecoration(
+                    color: (colors as dynamic)
+                        .primary
+                        .muted
+                        .withValues(alpha: 0.15) as Color,
+                    borderRadius: BorderRadius.circular(4),
+                  )
+                : null,
+            child: row,
+          );
+        },
+      );
+    }
+
+    return row;
   }
 }

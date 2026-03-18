@@ -76,11 +76,8 @@ class OiTabsSettings with OiSettingsData {
   }
 
   @override
-  int get hashCode => Object.hash(
-    schemaVersion,
-    selectedIndex,
-    Object.hashAll(tabOrder),
-  );
+  int get hashCode =>
+      Object.hash(schemaVersion, selectedIndex, Object.hashAll(tabOrder));
 
   // ── Private helpers ────────────────────────────────────────────────────────
 

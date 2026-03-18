@@ -126,8 +126,9 @@ class OiTableSettings with OiSettingsData {
       groupByColumnId: groupByColumnId ?? defaults.groupByColumnId,
       frozenColumns: frozenColumns,
       showStatusBar: showStatusBar,
-      expandedGroups:
-          expandedGroups.isEmpty ? defaults.expandedGroups : expandedGroups,
+      expandedGroups: expandedGroups.isEmpty
+          ? defaults.expandedGroups
+          : expandedGroups,
     );
   }
 

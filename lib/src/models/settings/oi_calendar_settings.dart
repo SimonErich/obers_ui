@@ -96,11 +96,8 @@ class OiCalendarSettings with OiSettingsData {
   }
 
   @override
-  int get hashCode => Object.hash(
-    schemaVersion,
-    viewType,
-    Object.hashAll(collapsedCategories),
-  );
+  int get hashCode =>
+      Object.hash(schemaVersion, viewType, Object.hashAll(collapsedCategories));
 
   // ── Private helpers ────────────────────────────────────────────────────────
 

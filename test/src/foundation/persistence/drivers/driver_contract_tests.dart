@@ -43,9 +43,11 @@ class ContractNestedSettings with OiSettingsData {
   factory ContractNestedSettings.fromJson(Map<String, dynamic> json) =>
       ContractNestedSettings(
         items: (json['items'] as List?)?.cast<String>() ?? const [],
-        metadata: (json['metadata'] as Map?)?.map(
-          (k, v) => MapEntry(k as String, (v as num).toDouble()),
-        ) ?? const {},
+        metadata:
+            (json['metadata'] as Map?)?.map(
+              (k, v) => MapEntry(k as String, (v as num).toDouble()),
+            ) ??
+            const {},
       );
 
   final List<String> items;

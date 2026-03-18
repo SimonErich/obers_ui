@@ -45,6 +45,7 @@ export 'src/foundation/persistence/oi_settings_provider.dart';
 
 // ── Primitives: Interaction ──────────────────────────────────────────────────
 
+export 'src/components/interaction/oi_selection_overlay.dart';
 export 'src/primitives/interaction/oi_focus_trap.dart';
 export 'src/primitives/interaction/oi_tappable.dart';
 
@@ -161,6 +162,9 @@ export 'src/components/display/oi_file_tile.dart';
 export 'src/components/display/oi_folder_icon.dart';
 export 'src/components/display/oi_folder_tree_item.dart';
 export 'src/components/display/oi_list_tile.dart';
+export 'src/components/display/oi_path_bar.dart';
+export 'src/components/display/oi_rename_field.dart';
+export 'src/components/display/oi_storage_indicator.dart';
 export 'src/components/display/oi_markdown.dart';
 export 'src/components/display/oi_metric.dart';
 export 'src/components/display/oi_popover.dart';
@@ -208,6 +212,13 @@ export 'src/composites/data/oi_pagination_controller.dart';
 export 'src/composites/data/oi_table.dart';
 export 'src/composites/data/oi_table_controller.dart';
 export 'src/composites/data/oi_tree.dart';
+
+// ── Composites: Files ────────────────────────────────────────────────────────
+
+export 'src/composites/files/oi_file_drop_target.dart';
+export 'src/composites/files/oi_file_grid_view.dart';
+export 'src/composites/files/oi_file_list_view.dart';
+export 'src/composites/files/oi_file_sidebar.dart';
 
 // ── Composites: Navigation ───────────────────────────────────────────────────
 
@@ -303,7 +314,13 @@ export 'src/modules/oi_kanban.dart';
 export 'src/modules/oi_list_view.dart' hide OiSelectionMode;
 export 'src/modules/oi_metadata_editor.dart';
 export 'src/modules/oi_notification_center.dart';
+export 'src/modules/oi_file_explorer.dart';
 export 'src/modules/oi_permissions.dart';
+
+// ── Models ───────────────────────────────────────────────────────────────────
+
+export 'src/models/oi_file_explorer_controller.dart';
+export 'src/models/oi_file_node_data.dart';
 
 // ── Models: Settings ─────────────────────────────────────────────────────────
 
