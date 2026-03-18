@@ -440,7 +440,261 @@ void main() {
             '(reads as English)',
       );
     });
-  });
+
+    test('no constructor parameter uses cryptic abbreviations', () {
+      // Common abbreviations that harm readability. Parameters should use
+      // full English words (e.g. "label" not "lbl", "background" not "bg").
+      final abbreviations = <String, String>{
+        'lbl': 'label',
+        'bg': 'background',
+        'sz': 'size',
+        'idx': 'index',
+        'val': 'value',
+        'cb': 'callback',
+        'fn': 'function',
+        'txt': 'text',
+        'btn': 'button',
+        'mgr': 'manager',
+        'cfg': 'config',
+        'img': 'image',
+        'msg': 'message',
+        'num': 'number',
+        'str': 'string',
+        'ptr': 'pointer',
+        'hdr': 'header',
+        'cnt': 'count',
+        'fmt': 'format',
+        'dlg': 'dialog',
+        'evt': 'event',
+        'fld': 'field',
+        'grp': 'group',
+        'itm': 'item',
+        'obj': 'object',
+        'pos': 'position',
+        'prg': 'progress',
+        'sel': 'selected',
+        'tmp': 'temporary',
+        'usr': 'user',
+        'wgt': 'widget',
+      };
+
+      // Regex: matches `this.xxx` inside constructor parameter lists.
+      final ctorParamPattern = RegExp(r'\bthis\.([a-z][a-zA-Z0-9]*)\b');
+
+      final violations = <String>[];
+
+      for (final file in allFiles) {
+        if (file.path.contains('/_internal/')) continue;
+
+        final content = _stripComments(file.readAsStringSync());
+        final matches = ctorParamPattern.allMatches(content);
+        for (final m in matches) {
+          final paramName = m.group(1)!;
+          // Only flag exact matches against abbreviation list (case-sensitive).
+          if (abbreviations.containsKey(paramName)) {
+            final line = content.substring(0, m.start).split('\n').length;
+            violations.add(
+              '${file.path}:$line — this.$paramName '
+              '(use "${abbreviations[paramName]}" instead)',
+            );
+          }
+        }
+      }
+
+      expect(
+        violations,
+        isEmpty,
+        reason:
+            'Constructor parameters must use full English words, not cryptic '
+            'abbreviations. Violations:\n${violations.join('\n')}',
+      );
+    });
+
+    test('no constructor parameter uses single-character names', () {
+      // Single-character parameter names are not readable.
+      // Exception: framework-standard names like `key` are fine (but those
+      // use super.key, not this.key in most cases).
+      final ctorParamPattern = RegExp(r'\bthis\.([a-z])\b');
+
+      final violations = <String>[];
+
+      for (final file in allFiles) {
+        if (file.path.contains('/_internal/')) continue;
+
+        final content = _stripComments(file.readAsStringSync());
+        final matches = ctorParamPattern.allMatches(content);
+        for (final m in matches) {
+          final paramName = m.group(1)!;
+          final line = content.substring(0, m.start).split('\n').length;
+          violations.add(
+            '${file.path}:$line — this.$paramName '
+            '(use a descriptive name)',
+          );
+        }
+      }
+
+      expect(
+        violations,
+        isEmpty,
+        reason:
+            'Constructor parameters must have descriptive names that read '
+            'like English. Single-character names are not allowed. '
+            'Violations:\n${violations.join('\n')}',
+      );
+    });
+
+    test('callback parameters follow the on* naming convention', () {
+      // Callback (Function/VoidCallback) parameters should use on* names
+      // that describe WHEN the callback fires. Exceptions: builder callbacks,
+      // comparators, getters, and search functions which describe WHAT they
+      // produce.
+      final callbackFieldPattern = RegExp(
+        r'final\s+(?:VoidCallback|ValueChanged<[^>]*>|void\s+Function\([^)]*\))\??\s+([a-z][a-zA-Z0-9]*)\b',
+        multiLine: true,
+      );
+
+      // These are acceptable non-on* callback names: builders, getters,
+      // comparators, search functions, factory functions, and imperative
+      // action callbacks on context/command objects (e.g. goNext, execute).
+      final allowedPatterns = RegExp(
+        r'^(on[A-Z]|.*[Bb]uilder$|.*[Cc]omparator$|.*[Gg]etter$|search$|.*[Ff]actory$|go[A-Z]|set[A-Z]|execute$|undo$|redo$|merge$)',
+      );
+
+      final violations = <String>[];
+
+      for (final file in allFiles) {
+        if (file.path.contains('/_internal/')) continue;
+
+        final content = _stripComments(file.readAsStringSync());
+        final matches = callbackFieldPattern.allMatches(content);
+        for (final m in matches) {
+          final name = m.group(1)!;
+          if (name.startsWith('_')) continue;
+          if (!allowedPatterns.hasMatch(name)) {
+            final line = content.substring(0, m.start).split('\n').length;
+            violations.add(
+              '${file.path}:$line — $name '
+              '(callbacks should use on* naming, e.g. onTap, onChange)',
+            );
+          }
+        }
+      }
+
+      expect(
+        violations,
+        isEmpty,
+        reason:
+            'Callback parameters (VoidCallback, ValueChanged, void Function) '
+            'must use on* naming that describes when the callback fires. '
+            'Violations:\n${violations.join('\n')}',
+      );
+    });
+
+    test('non-boolean props read like English across key widgets', () {
+      // Expanded spot-checks beyond the original 4 widgets. Verifies that
+      // non-boolean parameters (strings, enums, callbacks, custom types) use
+      // full English names that read naturally at the call site.
+
+      // OiSelect — options, value, onChanged, placeholder, searchable
+      final selectFile = File('lib/src/components/inputs/oi_select.dart');
+      final selectContent = selectFile.readAsStringSync();
+      expect(selectContent, contains('this.options'));
+      expect(selectContent, contains('this.onChanged'));
+      expect(selectContent, contains('this.placeholder'));
+      expect(selectContent, contains('this.searchable'));
+
+      // OiDialog — label, title, content, actions, onClose, dismissible
+      final dialogFile = File('lib/src/components/overlays/oi_dialog.dart');
+      final dialogContent = dialogFile.readAsStringSync();
+      expect(dialogContent, contains('this.label'));
+      expect(dialogContent, contains('this.title'));
+      expect(dialogContent, contains('this.content'));
+      expect(dialogContent, contains('this.actions'));
+      expect(dialogContent, contains('this.onClose'));
+      expect(dialogContent, contains('this.dismissible'));
+
+      // OiTabs — tabs, selectedIndex, onSelected, indicatorStyle, scrollable
+      final tabsFile = File('lib/src/components/navigation/oi_tabs.dart');
+      final tabsContent = tabsFile.readAsStringSync();
+      expect(tabsContent, contains('this.tabs'));
+      expect(tabsContent, contains('this.selectedIndex'));
+      expect(tabsContent, contains('this.onSelected'));
+      expect(tabsContent, contains('this.indicatorStyle'));
+      expect(tabsContent, contains('this.scrollable'));
+
+      // OiCalendar — events, label, mode, initialDate, onEventTap
+      final calendarFile = File(
+        'lib/src/composites/scheduling/oi_calendar.dart',
+      );
+      final calendarContent = calendarFile.readAsStringSync();
+      expect(calendarContent, contains('this.events'));
+      expect(calendarContent, contains('this.label'));
+      expect(calendarContent, contains('this.mode'));
+      expect(calendarContent, contains('this.initialDate'));
+      expect(calendarContent, contains('this.onEventTap'));
+
+      // OiSplitPane — leading, trailing, direction, initialRatio, onRatioChanged
+      final splitPaneFile = File(
+        'lib/src/components/panels/oi_split_pane.dart',
+      );
+      final splitPaneContent = splitPaneFile.readAsStringSync();
+      expect(splitPaneContent, contains('this.leading'));
+      expect(splitPaneContent, contains('this.trailing'));
+      expect(splitPaneContent, contains('this.direction'));
+      expect(splitPaneContent, contains('this.initialRatio'));
+      expect(splitPaneContent, contains('this.onRatioChanged'));
+
+      // OiInfiniteScroll — moreAvailable, onLoadMore, loadingWidget, threshold
+      final infiniteScrollFile = File(
+        'lib/src/primitives/scroll/oi_infinite_scroll.dart',
+      );
+      final infiniteScrollContent = infiniteScrollFile.readAsStringSync();
+      expect(infiniteScrollContent, contains('this.moreAvailable'));
+      expect(infiniteScrollContent, contains('this.onLoadMore'));
+      expect(infiniteScrollContent, contains('this.loadingWidget'));
+      expect(infiniteScrollContent, contains('this.threshold'));
+
+      // OiGallery — items, columns, selectionMode, onSelectionChange
+      final galleryFile = File('lib/src/composites/media/oi_gallery.dart');
+      final galleryContent = galleryFile.readAsStringSync();
+      expect(galleryContent, contains('this.items'));
+      expect(galleryContent, contains('this.columns'));
+      expect(galleryContent, contains('this.selectionMode'));
+
+      // OiVirtualList — itemCount, itemBuilder, cacheExtent, onRefresh
+      final virtualListFile = File(
+        'lib/src/primitives/scroll/oi_virtual_list.dart',
+      );
+      final virtualListContent = virtualListFile.readAsStringSync();
+      expect(virtualListContent, contains('this.itemCount'));
+      expect(virtualListContent, contains('this.itemBuilder'));
+      expect(virtualListContent, contains('this.onRefresh'));
+
+      // OiCard — child, title, subtitle, leading, trailing, footer, collapsible
+      final cardFile = File('lib/src/components/display/oi_card.dart');
+      final cardContent = cardFile.readAsStringSync();
+      expect(cardContent, contains('this.child'));
+      expect(cardContent, contains('this.title'));
+      expect(cardContent, contains('this.subtitle'));
+      expect(cardContent, contains('this.footer'));
+      expect(cardContent, contains('this.collapsible'));
+
+      // OiSearch — sources, onSelect, onDismiss, showRecent, debounce
+      final searchFile = File('lib/src/composites/search/oi_search.dart');
+      final searchContent = searchFile.readAsStringSync();
+      expect(searchContent, contains('this.sources'));
+      expect(searchContent, contains('this.onSelect'));
+      expect(searchContent, contains('this.debounce'));
+
+      // OiSwipeable — onSwipeLeft, onSwipeRight, dismissible, threshold
+      final swipeableFile = File(
+        'lib/src/primitives/gesture/oi_swipeable.dart',
+      );
+      final swipeableContent = swipeableFile.readAsStringSync();
+      expect(swipeableContent, contains('this.dismissible'));
+      expect(swipeableContent, contains('this.threshold'));
+    });
+  });  // end REQ-0013
 
   // ── REQ-0017: Booleans are descriptive ──────────────────────────────────────
 
