@@ -3,6 +3,7 @@
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:obers_ui/src/components/display/oi_empty_state.dart';
 import 'package:obers_ui/src/modules/oi_comments.dart';
 
 import '../../helpers/pump_app.dart';
@@ -176,7 +177,7 @@ void main() {
     expect(find.text('Level 3'), findsNothing);
   });
 
-  testWidgets('empty comments show empty state', (tester) async {
+  testWidgets('empty comments show OiEmptyState with default title and description', (tester) async {
     await tester.pumpObers(
       SizedBox(
         width: 400,
@@ -188,7 +189,28 @@ void main() {
         ),
       ),
     );
+    expect(find.byType(OiEmptyState), findsOneWidget);
     expect(find.text('No comments yet'), findsOneWidget);
+    expect(find.text('Be the first to share your thoughts.'), findsOneWidget);
+  });
+
+  testWidgets('empty comments show OiEmptyState with custom emptyTitle and emptyDescription', (tester) async {
+    await tester.pumpObers(
+      SizedBox(
+        width: 400,
+        height: 600,
+        child: OiComments(
+          comments: const [],
+          currentUserId: 'me',
+          label: 'Comments',
+          emptyTitle: 'Nothing here',
+          emptyDescription: 'Start the conversation.',
+        ),
+      ),
+    );
+    expect(find.byType(OiEmptyState), findsOneWidget);
+    expect(find.text('Nothing here'), findsOneWidget);
+    expect(find.text('Start the conversation.'), findsOneWidget);
   });
 
   testWidgets('has semantics label', (tester) async {

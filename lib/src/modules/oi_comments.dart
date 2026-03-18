@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/src/components/display/oi_empty_state.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/modules/oi_chat.dart';
 
@@ -69,6 +70,8 @@ class OiComments extends StatefulWidget {
     this.maxDepth = 5,
     this.showAvatars = true,
     this.showTimestamps = true,
+    this.emptyTitle = 'No comments yet',
+    this.emptyDescription = 'Be the first to share your thoughts.',
   });
 
   /// The top-level comments to display.
@@ -103,6 +106,12 @@ class OiComments extends StatefulWidget {
 
   /// Whether to show comment timestamps.
   final bool showTimestamps;
+
+  /// Title shown in the empty state when there are no comments.
+  final String emptyTitle;
+
+  /// Description shown in the empty state when there are no comments.
+  final String emptyDescription;
 
   @override
   State<OiComments> createState() => _OiCommentsState();
@@ -152,22 +161,10 @@ class _OiCommentsState extends State<OiComments> {
           // Comment list
           Expanded(
             child: widget.comments.isEmpty
-                ? Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          const IconData(0xe24c, fontFamily: 'MaterialIcons'),
-                          size: 48,
-                          color: colors.textMuted,
-                        ),
-                        SizedBox(height: spacing.sm),
-                        Text(
-                          'No comments yet',
-                          style: TextStyle(color: colors.textMuted),
-                        ),
-                      ],
-                    ),
+                ? OiEmptyState(
+                    icon: const IconData(0xe24c, fontFamily: 'MaterialIcons'),
+                    title: widget.emptyTitle,
+                    description: widget.emptyDescription,
                   )
                 : ListView.builder(
                     padding: EdgeInsets.all(spacing.md),
