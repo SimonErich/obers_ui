@@ -153,13 +153,18 @@ export 'src/components/display/oi_card.dart';
 export 'src/components/display/oi_code_block.dart';
 export 'src/components/display/oi_diff_view.dart';
 export 'src/components/display/oi_empty_state.dart';
+export 'src/components/display/oi_drop_highlight.dart';
 export 'src/components/display/oi_file_grid_card.dart';
 export 'src/components/display/oi_file_icon.dart';
+export 'src/components/display/oi_file_preview.dart';
 export 'src/components/display/oi_file_tile.dart';
+export 'src/components/display/oi_folder_icon.dart';
+export 'src/components/display/oi_folder_tree_item.dart';
 export 'src/components/display/oi_list_tile.dart';
 export 'src/components/display/oi_markdown.dart';
 export 'src/components/display/oi_metric.dart';
 export 'src/components/display/oi_popover.dart';
+export 'src/components/display/oi_relative_time.dart';
 export 'src/components/display/oi_progress.dart';
 export 'src/components/display/oi_skeleton_group.dart';
 export 'src/components/display/oi_tooltip.dart';
@@ -223,6 +228,15 @@ export 'src/composites/forms/oi_wizard.dart';
 export 'src/composites/search/oi_combo_box.dart';
 export 'src/composites/search/oi_command_bar.dart';
 export 'src/composites/search/oi_search.dart';
+
+// ── Components: Dialogs ─────────────────────────────────────────────────
+
+export 'src/components/dialogs/oi_delete_dialog.dart';
+export 'src/components/dialogs/oi_file_info_dialog.dart';
+export 'src/components/dialogs/oi_move_dialog.dart';
+export 'src/components/dialogs/oi_new_folder_dialog.dart';
+export 'src/components/dialogs/oi_rename_dialog.dart';
+export 'src/components/dialogs/oi_upload_dialog.dart';
 
 // ── Composites: Dialogs ──────────────────────────────────────────────────
 

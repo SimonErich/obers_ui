@@ -1,12 +1,13 @@
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/foundation/theme/oi_color_scheme.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
+import 'package:obers_ui/src/utils/file_utils.dart';
 
 /// The file category, which determines the color of the extension band.
 ///
 /// {@category Components}
 enum OiFileCategory {
-  /// Documents such as PDF, DOC, DOCX, TXT, RTF.
+  /// Documents such as PDF, DOC, DOCX, RTF.
   document,
 
   /// Spreadsheets such as XLS, XLSX, CSV.
@@ -32,6 +33,18 @@ enum OiFileCategory {
 
   /// Data files such as JSON, XML, YAML, SQL.
   data,
+
+  /// Plain text files such as TXT, MD, LOG.
+  text,
+
+  /// Executable files such as EXE, APP, SH, BAT.
+  executable,
+
+  /// Font files such as TTF, OTF, WOFF.
+  font,
+
+  /// 3D model files such as OBJ, FBX, GLTF.
+  threeD,
 
   /// Fallback for unrecognised file types.
   generic,
@@ -64,40 +77,181 @@ enum OiFileIconSize {
 /// corners, a triangular fold in the top-right corner, and a colored band
 /// at the bottom displaying the file extension in bold uppercase.
 ///
-/// The band color is determined by the [category] of the file.
+/// The band color is determined automatically from the file extension, or can
+/// be overridden with [colorOverride].
 ///
 /// ```dart
-/// OiFileIcon(extension: 'PDF', category: OiFileCategory.document)
-/// OiFileIcon(extension: 'XLSX', category: OiFileCategory.spreadsheet)
-/// OiFileIcon(extension: 'MP4', category: OiFileCategory.video, size: OiFileIconSize.xl)
+/// OiFileIcon(fileName: 'report.pdf')
+/// OiFileIcon(fileName: 'data.xlsx', size: OiFileIconSize.lg)
+/// OiFileIcon(fileName: 'photo.png', colorOverride: Color(0xFF00BCD4))
 /// ```
 ///
 /// {@category Components}
 class OiFileIcon extends StatelessWidget {
-  /// Creates an [OiFileIcon].
+  /// Creates an [OiFileIcon] from a file name.
+  ///
+  /// The extension and category are auto-detected from [fileName].
+  /// When [mimeType] is provided it takes precedence over the extension
+  /// for category detection when the extension is ambiguous or unknown.
   const OiFileIcon({
-    required this.extension,
-    this.category = OiFileCategory.generic,
+    required this.fileName,
+    this.mimeType,
     this.size = OiFileIconSize.md,
-    this.semanticLabel,
+    this.colorOverride,
+    this.semanticsLabel,
     super.key,
   });
 
-  /// The file extension label (e.g. `'PDF'`, `'DOCX'`).
+  /// The file name (e.g. `'report.pdf'`, `'photo.PNG'`).
   ///
-  /// Rendered in bold uppercase on the colored band at the bottom.
-  final String extension;
+  /// The extension is extracted and used to determine the category and
+  /// the label rendered on the colored band.
+  final String fileName;
 
-  /// The file category, which determines the band color.
-  final OiFileCategory category;
+  /// Optional MIME type used as a fallback for category detection when the
+  /// extension is ambiguous or unrecognised.
+  final String? mimeType;
 
   /// The icon size.
   final OiFileIconSize size;
 
+  /// Overrides the category-based accent color for the band.
+  final Color? colorOverride;
+
   /// Accessibility label announced by screen readers.
   ///
   /// When `null`, defaults to `'$extension file'`.
-  final String? semanticLabel;
+  final String? semanticsLabel;
+
+  // ---------------------------------------------------------------------------
+  // Extension & category helpers
+  // ---------------------------------------------------------------------------
+
+  /// Extracts the file extension from [fileName] (lowercase, without dot).
+  String get _extension => OiFileUtils.extension(fileName);
+
+  /// The uppercase extension label shown on the band.
+  String get _label => _extension.isEmpty ? '?' : _extension.toUpperCase();
+
+  /// Maps a file extension to an [OiFileCategory].
+  static OiFileCategory categoryForExtension(String ext) {
+    final normalized = ext.toLowerCase().replaceFirst('.', '');
+    return switch (normalized) {
+      'pdf' || 'doc' || 'docx' || 'rtf' || 'odt' || 'pages' => OiFileCategory
+          .document,
+      'xls' || 'xlsx' || 'csv' || 'ods' || 'numbers' => OiFileCategory
+          .spreadsheet,
+      'ppt' || 'pptx' || 'odp' || 'key' || 'keynote' => OiFileCategory
+          .presentation,
+      'png' ||
+      'jpg' ||
+      'jpeg' ||
+      'gif' ||
+      'svg' ||
+      'webp' ||
+      'bmp' ||
+      'ico' ||
+      'tiff' ||
+      'tif' =>
+        OiFileCategory.image,
+      'mp4' || 'mov' || 'avi' || 'mkv' || 'webm' || 'flv' || 'm4v' =>
+        OiFileCategory.video,
+      'mp3' ||
+      'wav' ||
+      'flac' ||
+      'aac' ||
+      'ogg' ||
+      'wma' ||
+      'm4a' =>
+        OiFileCategory.audio,
+      'zip' || 'rar' || '7z' || 'tar' || 'gz' || 'bz2' || 'xz' =>
+        OiFileCategory.archive,
+      'dart' ||
+      'js' ||
+      'ts' ||
+      'tsx' ||
+      'jsx' ||
+      'py' ||
+      'rs' ||
+      'go' ||
+      'html' ||
+      'css' ||
+      'scss' ||
+      'java' ||
+      'kt' ||
+      'swift' ||
+      'c' ||
+      'cpp' ||
+      'h' ||
+      'rb' ||
+      'php' ||
+      'lua' ||
+      'r' =>
+        OiFileCategory.code,
+      'json' || 'xml' || 'yaml' || 'yml' || 'sql' || 'toml' =>
+        OiFileCategory.data,
+      'txt' || 'md' || 'log' || 'ini' || 'cfg' => OiFileCategory.text,
+      'exe' || 'app' || 'sh' || 'bat' || 'cmd' || 'msi' || 'dmg' =>
+        OiFileCategory.executable,
+      'ttf' || 'otf' || 'woff' || 'woff2' || 'eot' => OiFileCategory.font,
+      'obj' || 'fbx' || 'gltf' || 'glb' || 'stl' || '3ds' =>
+        OiFileCategory.threeD,
+      _ => OiFileCategory.generic,
+    };
+  }
+
+  /// Maps a MIME type to an [OiFileCategory].
+  static OiFileCategory categoryForMimeType(String mime) {
+    final normalized = mime.toLowerCase().trim();
+    if (normalized.startsWith('image/')) return OiFileCategory.image;
+    if (normalized.startsWith('video/')) return OiFileCategory.video;
+    if (normalized.startsWith('audio/')) return OiFileCategory.audio;
+    if (normalized.startsWith('font/')) return OiFileCategory.font;
+    if (normalized.startsWith('model/')) return OiFileCategory.threeD;
+    return switch (normalized) {
+      'application/pdf' => OiFileCategory.document,
+      'application/msword' ||
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document' =>
+        OiFileCategory.document,
+      'application/vnd.ms-excel' ||
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' ||
+      'text/csv' =>
+        OiFileCategory.spreadsheet,
+      'application/vnd.ms-powerpoint' ||
+      'application/vnd.openxmlformats-officedocument.presentationml.presentation' =>
+        OiFileCategory.presentation,
+      'application/zip' ||
+      'application/x-rar-compressed' ||
+      'application/vnd.rar' ||
+      'application/x-tar' ||
+      'application/gzip' ||
+      'application/x-7z-compressed' =>
+        OiFileCategory.archive,
+      'application/json' || 'application/xml' || 'text/xml' =>
+        OiFileCategory.data,
+      'text/plain' => OiFileCategory.text,
+      'text/html' ||
+      'text/css' ||
+      'application/javascript' ||
+      'text/javascript' =>
+        OiFileCategory.code,
+      'application/x-executable' ||
+      'application/x-sh' ||
+      'application/x-msdos-program' =>
+        OiFileCategory.executable,
+      _ => OiFileCategory.generic,
+    };
+  }
+
+  /// Resolves the [OiFileCategory] for this icon.
+  ///
+  /// Uses the extension first. Falls back to [mimeType] when the extension
+  /// yields [OiFileCategory.generic] and a MIME type is available.
+  OiFileCategory get category {
+    final fromExt = categoryForExtension(_extension);
+    if (fromExt != OiFileCategory.generic || mimeType == null) return fromExt;
+    return categoryForMimeType(mimeType!);
+  }
 
   // ---------------------------------------------------------------------------
   // Dimension helpers
@@ -166,25 +320,38 @@ class OiFileIcon extends StatelessWidget {
   // ---------------------------------------------------------------------------
 
   Color _bandColor(OiColorScheme colors) {
+    if (colorOverride != null) return colorOverride!;
+
     switch (category) {
       case OiFileCategory.document:
-        return colors.error.base;
+        // .pdf → red, .doc/.docx → blue (primary)
+        final ext = _extension;
+        if (ext == 'pdf') return colors.error.base;
+        return colors.primary.base;
       case OiFileCategory.spreadsheet:
         return colors.success.base;
       case OiFileCategory.presentation:
         return colors.warning.base;
       case OiFileCategory.image:
-        return const Color(0xFF7C3AED);
-      case OiFileCategory.video:
-        return const Color(0xFFDB2777);
-      case OiFileCategory.audio:
         return colors.accent.base;
+      case OiFileCategory.video:
+        return const Color(0xFF7C3AED); // Purple
+      case OiFileCategory.audio:
+        return const Color(0xFFDB2777); // Pink
       case OiFileCategory.archive:
         return colors.warning.dark;
       case OiFileCategory.code:
-        return colors.primary.base;
+        return const Color(0xFF06B6D4); // Cyan
       case OiFileCategory.data:
         return colors.info.base;
+      case OiFileCategory.text:
+        return colors.textMuted;
+      case OiFileCategory.executable:
+        return const Color(0xFF374151); // Dark gray
+      case OiFileCategory.font:
+        return const Color(0xFF4F46E5); // Indigo
+      case OiFileCategory.threeD:
+        return const Color(0xFF8B5CF6); // Violet
       case OiFileCategory.generic:
         return colors.textMuted;
     }
@@ -199,7 +366,7 @@ class OiFileIcon extends StatelessWidget {
     final colors = context.colors;
     final dims = _dimensions();
     final band = _bandColor(colors);
-    final label = semanticLabel ?? '${extension.toUpperCase()} file';
+    final label = semanticsLabel ?? '$_label file';
 
     return Semantics(
       label: label,
@@ -224,7 +391,7 @@ class OiFileIcon extends StatelessWidget {
                 height: dims.bandHeight,
                 child: Center(
                   child: Text(
-                    extension.toUpperCase(),
+                    _label,
                     style: TextStyle(
                       fontSize: dims.fontSize,
                       fontWeight: FontWeight.w700,
