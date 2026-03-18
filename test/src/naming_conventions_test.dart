@@ -1395,6 +1395,41 @@ void main() {
       );
     });
 
+    test('OiLabel provides named constructors for each variant', () {
+      final file = File('lib/src/primitives/display/oi_label.dart');
+      final content = file.readAsStringSync();
+
+      expect(
+        content,
+        contains('OiLabel._({'),
+        reason: 'OiLabel must use a private base constructor',
+      );
+
+      const variants = [
+        'display',
+        'h1',
+        'h2',
+        'h3',
+        'h4',
+        'body',
+        'bodyStrong',
+        'small',
+        'smallStrong',
+        'tiny',
+        'caption',
+        'code',
+        'overline',
+        'link',
+      ];
+      for (final variant in variants) {
+        expect(
+          content,
+          contains('OiLabel.$variant('),
+          reason: 'OiLabel must provide .$variant() named constructor',
+        );
+      }
+    });
+
     test('OiButton provides factory constructors for each variant', () {
       final file = File('lib/src/components/buttons/oi_button.dart');
       final content = file.readAsStringSync();

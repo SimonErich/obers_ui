@@ -15,19 +15,82 @@ void main() {
   // ── Variant rendering ──────────────────────────────────────────────────────
 
   group('OiLabel variant rendering', () {
-    for (final variant in OiLabelVariant.values) {
-      testWidgets('renders $variant variant', (tester) async {
-        await tester.pumpObers(OiLabel('Hello', variant: variant));
-        expect(find.text('Hello'), findsOneWidget);
-      });
-    }
+    testWidgets('renders display variant', (tester) async {
+      await tester.pumpObers(const OiLabel.display('Hello'));
+      expect(find.text('Hello'), findsOneWidget);
+    });
+
+    testWidgets('renders h1 variant', (tester) async {
+      await tester.pumpObers(const OiLabel.h1('Hello'));
+      expect(find.text('Hello'), findsOneWidget);
+    });
+
+    testWidgets('renders h2 variant', (tester) async {
+      await tester.pumpObers(const OiLabel.h2('Hello'));
+      expect(find.text('Hello'), findsOneWidget);
+    });
+
+    testWidgets('renders h3 variant', (tester) async {
+      await tester.pumpObers(const OiLabel.h3('Hello'));
+      expect(find.text('Hello'), findsOneWidget);
+    });
+
+    testWidgets('renders h4 variant', (tester) async {
+      await tester.pumpObers(const OiLabel.h4('Hello'));
+      expect(find.text('Hello'), findsOneWidget);
+    });
+
+    testWidgets('renders body variant', (tester) async {
+      await tester.pumpObers(const OiLabel.body('Hello'));
+      expect(find.text('Hello'), findsOneWidget);
+    });
+
+    testWidgets('renders bodyStrong variant', (tester) async {
+      await tester.pumpObers(const OiLabel.bodyStrong('Hello'));
+      expect(find.text('Hello'), findsOneWidget);
+    });
+
+    testWidgets('renders small variant', (tester) async {
+      await tester.pumpObers(const OiLabel.small('Hello'));
+      expect(find.text('Hello'), findsOneWidget);
+    });
+
+    testWidgets('renders smallStrong variant', (tester) async {
+      await tester.pumpObers(const OiLabel.smallStrong('Hello'));
+      expect(find.text('Hello'), findsOneWidget);
+    });
+
+    testWidgets('renders tiny variant', (tester) async {
+      await tester.pumpObers(const OiLabel.tiny('Hello'));
+      expect(find.text('Hello'), findsOneWidget);
+    });
+
+    testWidgets('renders caption variant', (tester) async {
+      await tester.pumpObers(const OiLabel.caption('Hello'));
+      expect(find.text('Hello'), findsOneWidget);
+    });
+
+    testWidgets('renders code variant', (tester) async {
+      await tester.pumpObers(const OiLabel.code('Hello'));
+      expect(find.text('Hello'), findsOneWidget);
+    });
+
+    testWidgets('renders overline variant', (tester) async {
+      await tester.pumpObers(const OiLabel.overline('Hello'));
+      expect(find.text('Hello'), findsOneWidget);
+    });
+
+    testWidgets('renders link variant', (tester) async {
+      await tester.pumpObers(const OiLabel.link('Hello'));
+      expect(find.text('Hello'), findsOneWidget);
+    });
   });
 
   // ── maxLines / overflow ────────────────────────────────────────────────────
 
   testWidgets('applies maxLines and overflow', (tester) async {
     await tester.pumpObers(
-      const OiLabel('long text', maxLines: 1, overflow: TextOverflow.ellipsis),
+      const OiLabel.body('long text', maxLines: 1, overflow: TextOverflow.ellipsis),
     );
     final textWidget = tester.widget<Text>(find.byType(Text));
     expect(textWidget.maxLines, 1);
@@ -38,7 +101,7 @@ void main() {
 
   testWidgets('applies textAlign', (tester) async {
     await tester.pumpObers(
-      const OiLabel('aligned', textAlign: TextAlign.center),
+      const OiLabel.body('aligned', textAlign: TextAlign.center),
     );
     final textWidget = tester.widget<Text>(find.byType(Text));
     expect(textWidget.textAlign, TextAlign.center);
@@ -50,7 +113,7 @@ void main() {
     tester,
   ) async {
     await tester.pumpObers(
-      const OiLabel('visible text', semanticsLabel: 'accessible label'),
+      const OiLabel.body('visible text', semanticsLabel: 'accessible label'),
     );
     // Filter Semantics widgets to find the one OiLabel inserts.
     final semanticsWidgets = tester.widgetList<Semantics>(
@@ -65,14 +128,14 @@ void main() {
   // ── selectable ────────────────────────────────────────────────────────────
 
   testWidgets('selectable wraps in SelectableRegion', (tester) async {
-    await tester.pumpObers(const OiLabel('select me', selectable: true));
+    await tester.pumpObers(const OiLabel.body('select me', selectable: true));
     expect(find.byType(SelectableRegion), findsOneWidget);
   });
 
   testWidgets('non-selectable does not wrap in SelectableRegion', (
     tester,
   ) async {
-    await tester.pumpObers(const OiLabel('normal text'));
+    await tester.pumpObers(const OiLabel.body('normal text'));
     expect(find.byType(SelectableRegion), findsNothing);
   });
 
@@ -90,7 +153,7 @@ void main() {
       },
     );
 
-    await tester.pumpObers(const OiLabel('copy me', copyable: true));
+    await tester.pumpObers(const OiLabel.body('copy me', copyable: true));
     await tester.tap(find.text('copy me'));
     await tester.pump();
 
@@ -114,7 +177,7 @@ void main() {
       },
     );
 
-    await tester.pumpObers(const OiLabel('no copy'));
+    await tester.pumpObers(const OiLabel.body('no copy'));
     await tester.tap(find.text('no copy'));
     await tester.pump();
     expect(copiedText, isNull);
@@ -134,6 +197,7 @@ void main() {
     Future<double> resolvedFontSize(
       WidgetTester tester,
       OiLabelVariant variant,
+      Widget label,
       double width,
     ) async {
       final theme = OiThemeData.light();
@@ -144,7 +208,7 @@ void main() {
             textDirection: TextDirection.ltr,
             child: OiTheme(
               data: theme,
-              child: OiLabel('scale test', variant: variant),
+              child: label,
             ),
           ),
         ),
@@ -154,26 +218,28 @@ void main() {
           theme.textTheme.styleFor(variant).fontSize!;
     }
 
-    for (final variant in [
-      OiLabelVariant.display,
-      OiLabelVariant.h1,
-      OiLabelVariant.h2,
-    ]) {
+    for (final entry in <OiLabelVariant, Widget>{
+      OiLabelVariant.display: const OiLabel.display('scale test'),
+      OiLabelVariant.h1: const OiLabel.h1('scale test'),
+      OiLabelVariant.h2: const OiLabel.h2('scale test'),
+    }.entries) {
+      final variant = entry.key;
+      final label = entry.value;
       final theme = OiThemeData.light();
       final baseSize = theme.textTheme.styleFor(variant).fontSize!;
 
       testWidgets('$variant compact (400dp) → ×1.0', (tester) async {
-        final size = await resolvedFontSize(tester, variant, 400);
+        final size = await resolvedFontSize(tester, variant, label, 400);
         expect(size, closeTo(baseSize * 1.0, 0.01));
       });
 
       testWidgets('$variant medium (700dp) → ×1.1', (tester) async {
-        final size = await resolvedFontSize(tester, variant, 700);
+        final size = await resolvedFontSize(tester, variant, label, 700);
         expect(size, closeTo(baseSize * 1.1, 0.01));
       });
 
       testWidgets('$variant expanded (900dp) → ×1.2', (tester) async {
-        final size = await resolvedFontSize(tester, variant, 900);
+        final size = await resolvedFontSize(tester, variant, label, 900);
         expect(size, closeTo(baseSize * 1.2, 0.01));
       });
     }
@@ -183,7 +249,12 @@ void main() {
     ) async {
       final theme = OiThemeData.light();
       final baseSize = theme.textTheme.styleFor(OiLabelVariant.body).fontSize!;
-      final size = await resolvedFontSize(tester, OiLabelVariant.body, 900);
+      final size = await resolvedFontSize(
+        tester,
+        OiLabelVariant.body,
+        const OiLabel.body('scale test'),
+        900,
+      );
       expect(size, closeTo(baseSize, 0.01));
     });
   });

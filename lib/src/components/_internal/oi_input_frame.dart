@@ -3,7 +3,6 @@
 
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/foundation/theme/oi_decoration_theme.dart';
-import 'package:obers_ui/src/foundation/theme/oi_text_theme.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/primitives/display/oi_label.dart';
 import 'package:obers_ui/src/primitives/display/oi_surface.dart';
@@ -78,7 +77,7 @@ class OiInputFrame extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (label != null) ...[
-          OiLabel(label!, variant: OiLabelVariant.small),
+          OiLabel.small(label!),
           const SizedBox(height: 4),
         ],
         frame,

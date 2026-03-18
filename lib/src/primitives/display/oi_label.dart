@@ -15,12 +15,35 @@ import 'package:obers_ui/src/primitives/clipboard/oi_copyable.dart';
 ///   [OiLabelVariant.h1], and [OiLabelVariant.h2] variants:
 ///   × 1.0 on compact, × 1.1 on medium, × 1.2 on expanded+.
 ///
+/// Use the named constructors to select a typographic variant:
+/// - [OiLabel.display]: hero / marketing display text.
+/// - [OiLabel.h1]: top-level heading.
+/// - [OiLabel.h2]: second-level heading.
+/// - [OiLabel.h3]: third-level heading.
+/// - [OiLabel.h4]: fourth-level heading.
+/// - [OiLabel.body]: standard paragraph body text.
+/// - [OiLabel.bodyStrong]: bold / emphasized body text.
+/// - [OiLabel.small]: small body text for secondary information.
+/// - [OiLabel.smallStrong]: bold small body text.
+/// - [OiLabel.tiny]: extra-small text for dense UI elements.
+/// - [OiLabel.caption]: caption text below images or media.
+/// - [OiLabel.code]: monospace code / preformatted text.
+/// - [OiLabel.overline]: all-caps label with letter-spacing.
+/// - [OiLabel.link]: inline hyperlink text.
+///
+/// ```dart
+/// OiLabel.body('Hello world')
+/// OiLabel.display('Hero text')
+/// OiLabel.small('Secondary info')
+/// ```
+///
 /// {@category Primitives}
 class OiLabel extends StatelessWidget {
-  /// Creates an [OiLabel] with the given [variant] and [text].
-  const OiLabel(
-    this.text, {
-    this.variant = OiLabelVariant.body,
+  // ── Private base constructor ──────────────────────────────────────────────
+
+  const OiLabel._({
+    required this.variant,
+    required this.text,
     this.maxLines,
     this.overflow,
     this.textAlign,
@@ -29,6 +52,316 @@ class OiLabel extends StatelessWidget {
     this.semanticsLabel,
     super.key,
   });
+
+  // ── Named variant constructors ────────────────────────────────────────────
+
+  /// Creates a display label — hero / marketing display text.
+  const OiLabel.display(
+    String text, {
+    int? maxLines,
+    TextOverflow? overflow,
+    TextAlign? textAlign,
+    bool copyable = false,
+    bool selectable = false,
+    String? semanticsLabel,
+    Key? key,
+  }) : this._(
+         variant: OiLabelVariant.display,
+         text: text,
+         maxLines: maxLines,
+         overflow: overflow,
+         textAlign: textAlign,
+         copyable: copyable,
+         selectable: selectable,
+         semanticsLabel: semanticsLabel,
+         key: key,
+       );
+
+  /// Creates an h1 label — top-level heading.
+  const OiLabel.h1(
+    String text, {
+    int? maxLines,
+    TextOverflow? overflow,
+    TextAlign? textAlign,
+    bool copyable = false,
+    bool selectable = false,
+    String? semanticsLabel,
+    Key? key,
+  }) : this._(
+         variant: OiLabelVariant.h1,
+         text: text,
+         maxLines: maxLines,
+         overflow: overflow,
+         textAlign: textAlign,
+         copyable: copyable,
+         selectable: selectable,
+         semanticsLabel: semanticsLabel,
+         key: key,
+       );
+
+  /// Creates an h2 label — second-level heading.
+  const OiLabel.h2(
+    String text, {
+    int? maxLines,
+    TextOverflow? overflow,
+    TextAlign? textAlign,
+    bool copyable = false,
+    bool selectable = false,
+    String? semanticsLabel,
+    Key? key,
+  }) : this._(
+         variant: OiLabelVariant.h2,
+         text: text,
+         maxLines: maxLines,
+         overflow: overflow,
+         textAlign: textAlign,
+         copyable: copyable,
+         selectable: selectable,
+         semanticsLabel: semanticsLabel,
+         key: key,
+       );
+
+  /// Creates an h3 label — third-level heading.
+  const OiLabel.h3(
+    String text, {
+    int? maxLines,
+    TextOverflow? overflow,
+    TextAlign? textAlign,
+    bool copyable = false,
+    bool selectable = false,
+    String? semanticsLabel,
+    Key? key,
+  }) : this._(
+         variant: OiLabelVariant.h3,
+         text: text,
+         maxLines: maxLines,
+         overflow: overflow,
+         textAlign: textAlign,
+         copyable: copyable,
+         selectable: selectable,
+         semanticsLabel: semanticsLabel,
+         key: key,
+       );
+
+  /// Creates an h4 label — fourth-level heading.
+  const OiLabel.h4(
+    String text, {
+    int? maxLines,
+    TextOverflow? overflow,
+    TextAlign? textAlign,
+    bool copyable = false,
+    bool selectable = false,
+    String? semanticsLabel,
+    Key? key,
+  }) : this._(
+         variant: OiLabelVariant.h4,
+         text: text,
+         maxLines: maxLines,
+         overflow: overflow,
+         textAlign: textAlign,
+         copyable: copyable,
+         selectable: selectable,
+         semanticsLabel: semanticsLabel,
+         key: key,
+       );
+
+  /// Creates a body label — standard paragraph body text.
+  const OiLabel.body(
+    String text, {
+    int? maxLines,
+    TextOverflow? overflow,
+    TextAlign? textAlign,
+    bool copyable = false,
+    bool selectable = false,
+    String? semanticsLabel,
+    Key? key,
+  }) : this._(
+         variant: OiLabelVariant.body,
+         text: text,
+         maxLines: maxLines,
+         overflow: overflow,
+         textAlign: textAlign,
+         copyable: copyable,
+         selectable: selectable,
+         semanticsLabel: semanticsLabel,
+         key: key,
+       );
+
+  /// Creates a bodyStrong label — bold / emphasized body text.
+  const OiLabel.bodyStrong(
+    String text, {
+    int? maxLines,
+    TextOverflow? overflow,
+    TextAlign? textAlign,
+    bool copyable = false,
+    bool selectable = false,
+    String? semanticsLabel,
+    Key? key,
+  }) : this._(
+         variant: OiLabelVariant.bodyStrong,
+         text: text,
+         maxLines: maxLines,
+         overflow: overflow,
+         textAlign: textAlign,
+         copyable: copyable,
+         selectable: selectable,
+         semanticsLabel: semanticsLabel,
+         key: key,
+       );
+
+  /// Creates a small label — small body text for secondary information.
+  const OiLabel.small(
+    String text, {
+    int? maxLines,
+    TextOverflow? overflow,
+    TextAlign? textAlign,
+    bool copyable = false,
+    bool selectable = false,
+    String? semanticsLabel,
+    Key? key,
+  }) : this._(
+         variant: OiLabelVariant.small,
+         text: text,
+         maxLines: maxLines,
+         overflow: overflow,
+         textAlign: textAlign,
+         copyable: copyable,
+         selectable: selectable,
+         semanticsLabel: semanticsLabel,
+         key: key,
+       );
+
+  /// Creates a smallStrong label — bold small body text.
+  const OiLabel.smallStrong(
+    String text, {
+    int? maxLines,
+    TextOverflow? overflow,
+    TextAlign? textAlign,
+    bool copyable = false,
+    bool selectable = false,
+    String? semanticsLabel,
+    Key? key,
+  }) : this._(
+         variant: OiLabelVariant.smallStrong,
+         text: text,
+         maxLines: maxLines,
+         overflow: overflow,
+         textAlign: textAlign,
+         copyable: copyable,
+         selectable: selectable,
+         semanticsLabel: semanticsLabel,
+         key: key,
+       );
+
+  /// Creates a tiny label — extra-small text for dense UI elements.
+  const OiLabel.tiny(
+    String text, {
+    int? maxLines,
+    TextOverflow? overflow,
+    TextAlign? textAlign,
+    bool copyable = false,
+    bool selectable = false,
+    String? semanticsLabel,
+    Key? key,
+  }) : this._(
+         variant: OiLabelVariant.tiny,
+         text: text,
+         maxLines: maxLines,
+         overflow: overflow,
+         textAlign: textAlign,
+         copyable: copyable,
+         selectable: selectable,
+         semanticsLabel: semanticsLabel,
+         key: key,
+       );
+
+  /// Creates a caption label — caption text below images or media.
+  const OiLabel.caption(
+    String text, {
+    int? maxLines,
+    TextOverflow? overflow,
+    TextAlign? textAlign,
+    bool copyable = false,
+    bool selectable = false,
+    String? semanticsLabel,
+    Key? key,
+  }) : this._(
+         variant: OiLabelVariant.caption,
+         text: text,
+         maxLines: maxLines,
+         overflow: overflow,
+         textAlign: textAlign,
+         copyable: copyable,
+         selectable: selectable,
+         semanticsLabel: semanticsLabel,
+         key: key,
+       );
+
+  /// Creates a code label — monospace code / preformatted text.
+  const OiLabel.code(
+    String text, {
+    int? maxLines,
+    TextOverflow? overflow,
+    TextAlign? textAlign,
+    bool copyable = false,
+    bool selectable = false,
+    String? semanticsLabel,
+    Key? key,
+  }) : this._(
+         variant: OiLabelVariant.code,
+         text: text,
+         maxLines: maxLines,
+         overflow: overflow,
+         textAlign: textAlign,
+         copyable: copyable,
+         selectable: selectable,
+         semanticsLabel: semanticsLabel,
+         key: key,
+       );
+
+  /// Creates an overline label — all-caps label with letter-spacing.
+  const OiLabel.overline(
+    String text, {
+    int? maxLines,
+    TextOverflow? overflow,
+    TextAlign? textAlign,
+    bool copyable = false,
+    bool selectable = false,
+    String? semanticsLabel,
+    Key? key,
+  }) : this._(
+         variant: OiLabelVariant.overline,
+         text: text,
+         maxLines: maxLines,
+         overflow: overflow,
+         textAlign: textAlign,
+         copyable: copyable,
+         selectable: selectable,
+         semanticsLabel: semanticsLabel,
+         key: key,
+       );
+
+  /// Creates a link label — inline hyperlink text.
+  const OiLabel.link(
+    String text, {
+    int? maxLines,
+    TextOverflow? overflow,
+    TextAlign? textAlign,
+    bool copyable = false,
+    bool selectable = false,
+    String? semanticsLabel,
+    Key? key,
+  }) : this._(
+         variant: OiLabelVariant.link,
+         text: text,
+         maxLines: maxLines,
+         overflow: overflow,
+         textAlign: textAlign,
+         copyable: copyable,
+         selectable: selectable,
+         semanticsLabel: semanticsLabel,
+         key: key,
+       );
 
   /// The text content to render.
   final String text;
