@@ -161,6 +161,36 @@ class OiTableController extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Toggles the selection state of the row at [index] without clearing
+  /// existing selections.
+  ///
+  /// If the row is already selected, it is deselected. Otherwise it is added
+  /// to the current selection. This is the expected behavior for Ctrl+click.
+  void toggleRow(int index) {
+    if (selectedRows.contains(index)) {
+      selectedRows.remove(index);
+    } else {
+      selectedRows.add(index);
+    }
+    selectAll = false;
+    notifyListeners();
+  }
+
+  /// Selects all rows in the range from [start] to [end] (inclusive).
+  ///
+  /// Previous selection is cleared first. This is the expected behavior for
+  /// Shift+click range selection.
+  void selectRange(int start, int end) {
+    selectedRows.clear();
+    final lo = start < end ? start : end;
+    final hi = start < end ? end : start;
+    for (var i = lo; i <= hi; i++) {
+      selectedRows.add(i);
+    }
+    selectAll = false;
+    notifyListeners();
+  }
+
   /// Removes [index] from the current selection.
   void deselectRow(int index) {
     if (!selectedRows.remove(index)) return;

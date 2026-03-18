@@ -599,9 +599,26 @@ class _OiTableState<T> extends State<OiTable<T>>
     widget.onSort?.call(col.id, ascending: _ctrl.sortAscending);
   }
 
+  /// Tracks the last row index selected by a single click, used for
+  /// Shift+click range selection.
+  int? _lastSelectedIndex;
+
   void _handleRowTap(T row, int index) {
     if (widget.selectable) {
-      _ctrl.selectRow(index, multi: widget.multiSelect);
+      final isShift = HardwareKeyboard.instance.isShiftPressed;
+      final isCtrlOrMeta = HardwareKeyboard.instance.isControlPressed ||
+          HardwareKeyboard.instance.isMetaPressed;
+
+      if (widget.multiSelect && isShift && _lastSelectedIndex != null) {
+        // Shift+click: select range from last selected to current.
+        _ctrl.selectRange(_lastSelectedIndex!, index);
+      } else if (widget.multiSelect && isCtrlOrMeta) {
+        // Ctrl/Cmd+click: toggle this row without clearing others.
+        _ctrl.toggleRow(index);
+      } else {
+        _ctrl.selectRow(index, multi: widget.multiSelect);
+      }
+      _lastSelectedIndex = index;
       widget.onSelectionChanged?.call(_ctrl.selectedRows.toList()..sort());
     }
     widget.onRowTap?.call(row, index);
@@ -729,10 +746,84 @@ class _OiTableState<T> extends State<OiTable<T>>
       child: Row(
         children: [
           if (widget.selectable) _buildSelectAllCheckbox(),
-          for (final col in cols) _buildColumnHeader(col),
+          for (var i = 0; i < cols.length; i++)
+            _buildDraggableColumnHeader(cols[i], i, cols.length),
         ],
       ),
     );
+  }
+
+  /// Wraps a column header with drag-to-reorder when [OiTableColumn.reorderable]
+  /// is `true`.
+  Widget _buildDraggableColumnHeader(
+    OiTableColumn<T> col,
+    int displayIndex,
+    int totalColumns,
+  ) {
+    final header = _buildColumnHeader(col);
+    if (!col.reorderable) return header;
+    return DragTarget<String>(
+      key: ValueKey('drop_${col.id}'),
+      onWillAcceptWithDetails: (details) => details.data != col.id,
+      onAcceptWithDetails: (details) {
+        final draggedId = details.data;
+        _ensureColumnOrder();
+        final oldIdx = _ctrl.columnOrder.indexOf(draggedId);
+        final newIdx = _ctrl.columnOrder.indexOf(col.id);
+        if (oldIdx >= 0 && newIdx >= 0) {
+          _ctrl.reorderColumns(
+            oldIdx,
+            newIdx > oldIdx ? newIdx + 1 : newIdx,
+          );
+        }
+      },
+      builder: (context, candidateData, rejectedData) {
+        final isOver = candidateData.isNotEmpty;
+        return Draggable<String>(
+          data: col.id,
+          axis: Axis.horizontal,
+          feedback: Opacity(
+            opacity: 0.7,
+            child: ColoredBox(
+              color: const Color(0xFFE2E8F0),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 8,
+                  vertical: 4,
+                ),
+                child: Text(
+                  col.header,
+                  textDirection: TextDirection.ltr,
+                ),
+              ),
+            ),
+          ),
+          childWhenDragging: Opacity(opacity: 0.3, child: header),
+          child: isOver
+              ? DecoratedBox(
+                  decoration: const BoxDecoration(
+                    border: Border(
+                      left: BorderSide(
+                        color: Color(0xFF2563EB),
+                        width: 2,
+                      ),
+                    ),
+                  ),
+                  child: header,
+                )
+              : header,
+        );
+      },
+    );
+  }
+
+  /// Ensures [_ctrl.columnOrder] is populated with visible column IDs.
+  void _ensureColumnOrder() {
+    if (_ctrl.columnOrder.isEmpty) {
+      _ctrl.columnOrder.addAll(
+        _visibleColumns.map((c) => c.id),
+      );
+    }
   }
 
   Widget _buildSelectAllCheckbox() {
