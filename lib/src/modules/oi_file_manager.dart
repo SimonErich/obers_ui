@@ -1,9 +1,8 @@
-import 'dart:async';
-
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/display/oi_file_grid_card.dart';
 import 'package:obers_ui/src/components/display/oi_file_tile.dart';
 import 'package:obers_ui/src/components/inputs/oi_text_input.dart';
+import 'package:obers_ui/src/foundation/oi_search_debounce.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/modules/oi_chat.dart';
 
@@ -123,14 +122,26 @@ class OiFileManager extends StatefulWidget {
   /// Called when the user navigates to a different path.
   final ValueChanged<List<String>>? onNavigate;
 
-  /// Active search query. When non-null and non-empty, the item list is
-  /// filtered to files whose name contains the query (case-insensitive) and
-  /// the matching portion is highlighted in each tile.
+  /// Active search query used for highlighting matched text in tiles.
+  ///
+  /// When [onSearch] is **null** (client-side search) a non-empty value also
+  /// filters [items] to those whose name contains the query
+  /// (case-insensitive).
+  ///
+  /// When [onSearch] is provided (server-side search) the consumer is
+  /// responsible for filtering: re-provide the [items] list with the
+  /// backend-filtered results and set [searchQuery] only for highlighting.
+  /// No client-side filtering is applied.
   final String? searchQuery;
 
   /// Called when the user types in the search field. Non-empty values are
   /// debounced by 300 ms; an empty value fires immediately so the parent can
   /// clear the filter without delay. When non-null a search input is rendered.
+  ///
+  /// Providing this callback signals that the consumer handles filtering
+  /// (server-side search). Re-provide the [items] list with the filtered
+  /// results from the backend; [searchQuery] is then used only for
+  /// highlighting matched portions.
   final ValueChanged<String>? onSearch;
 
   @override
@@ -140,7 +151,7 @@ class OiFileManager extends StatefulWidget {
 class _OiFileManagerState extends State<OiFileManager> {
   final Set<Object> _selected = {};
   TextEditingController? _searchController;
-  Timer? _debounceTimer;
+  final OiSearchDebounce _debounce = OiSearchDebounce();
 
   @override
   void initState() {
@@ -156,7 +167,7 @@ class _OiFileManagerState extends State<OiFileManager> {
     if (widget.onSearch != null && _searchController == null) {
       _searchController = TextEditingController(text: widget.searchQuery ?? '');
     } else if (widget.onSearch == null && _searchController != null) {
-      _debounceTimer?.cancel();
+      _debounce.cancel();
       _searchController!.dispose();
       _searchController = null;
     }
@@ -164,20 +175,15 @@ class _OiFileManagerState extends State<OiFileManager> {
 
   @override
   void dispose() {
-    _debounceTimer?.cancel();
+    _debounce.dispose();
     _searchController?.dispose();
     super.dispose();
   }
 
   void _onSearchChanged(String query) {
-    _debounceTimer?.cancel();
-    if (query.isEmpty) {
-      widget.onSearch?.call(query);
-      return;
-    }
-    _debounceTimer = Timer(const Duration(milliseconds: 300), () {
-      widget.onSearch?.call(query);
-    });
+    final callback = widget.onSearch;
+    if (callback == null) return;
+    _debounce.call(query, callback);
   }
 
   void _handleTap(OiFileNode node) {
@@ -205,6 +211,9 @@ class _OiFileManagerState extends State<OiFileManager> {
   // ---------------------------------------------------------------------------
 
   List<OiFileNode> get _filteredItems {
+    // When onSearch is provided the consumer handles filtering externally
+    // (server-side search) by re-providing the items list.
+    if (widget.onSearch != null) return widget.items;
     final query = widget.searchQuery;
     if (query == null || query.isEmpty) return widget.items;
     final lowerQuery = query.toLowerCase();

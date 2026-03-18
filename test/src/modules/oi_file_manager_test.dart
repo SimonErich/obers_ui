@@ -512,4 +512,132 @@ void main() {
       },
     );
   });
+
+  // ── Server-side search (REQ-0992) ─────────────────────────────────────
+
+  group('Server-side search (REQ-0992)', () {
+    testWidgets(
+      'does not client-side filter when onSearch is provided',
+      (tester) async {
+        // Simulate a backend that returns a result whose name does NOT
+        // contain the query (e.g. fuzzy / semantic match).
+        await tester.pumpObers(
+          SizedBox(
+            width: 500,
+            height: 600,
+            child: OiFileManager(
+              items: [
+                _file(key: 'a', name: 'annual_summary.pdf'),
+              ],
+              label: 'Files',
+              layout: OiFileManagerLayout.list,
+              onSearch: (_) {},
+              searchQuery: 'report',
+            ),
+          ),
+        );
+
+        // Item is visible even though its name does not contain the query,
+        // because the consumer (server) already filtered the list.
+        expect(find.text('annual_summary.pdf'), findsOneWidget);
+      },
+    );
+
+    testWidgets(
+      'still highlights searchQuery in tiles for server-side search',
+      (tester) async {
+        await tester.pumpObers(
+          SizedBox(
+            width: 500,
+            height: 600,
+            child: OiFileManager(
+              items: [
+                _file(key: 'a', name: 'report.pdf'),
+              ],
+              label: 'Files',
+              layout: OiFileManagerLayout.list,
+              onSearch: (_) {},
+              searchQuery: 'port',
+            ),
+          ),
+        );
+
+        final tile = tester.widget<OiFileTile>(find.byType(OiFileTile));
+        expect(tile.searchQuery, 'port');
+      },
+    );
+
+    testWidgets(
+      'consumer re-provides filtered items after onSearch callback',
+      (tester) async {
+        final allFiles = [
+          _file(key: 'a', name: 'report.pdf'),
+          _file(key: 'b', name: 'notes.txt'),
+          _file(key: 'c', name: 'image.png'),
+        ];
+
+        // Initial state: all items, no query.
+        await tester.pumpObers(
+          SizedBox(
+            width: 500,
+            height: 600,
+            child: OiFileManager(
+              items: allFiles,
+              label: 'Files',
+              layout: OiFileManagerLayout.list,
+              onSearch: (_) {},
+            ),
+          ),
+        );
+
+        expect(find.text('report.pdf'), findsOneWidget);
+        expect(find.text('notes.txt'), findsOneWidget);
+        expect(find.text('image.png'), findsOneWidget);
+
+        // Consumer re-provides filtered list (simulating backend response).
+        final filtered = [_file(key: 'a', name: 'report.pdf')];
+        await tester.pumpObers(
+          SizedBox(
+            width: 500,
+            height: 600,
+            child: OiFileManager(
+              items: filtered,
+              label: 'Files',
+              layout: OiFileManagerLayout.list,
+              onSearch: (_) {},
+              searchQuery: 'report',
+            ),
+          ),
+        );
+
+        expect(find.text('report.pdf'), findsOneWidget);
+        expect(find.text('notes.txt'), findsNothing);
+        expect(find.text('image.png'), findsNothing);
+      },
+    );
+
+    testWidgets(
+      'client-side filtering still works when onSearch is null',
+      (tester) async {
+        await tester.pumpObers(
+          SizedBox(
+            width: 500,
+            height: 600,
+            child: OiFileManager(
+              items: [
+                _file(key: 'a', name: 'report.pdf'),
+                _file(key: 'b', name: 'notes.txt'),
+              ],
+              label: 'Files',
+              layout: OiFileManagerLayout.list,
+              searchQuery: 'report',
+            ),
+          ),
+        );
+
+        expect(find.text('report.pdf'), findsOneWidget);
+        expect(find.text('notes.txt'), findsNothing);
+      },
+    );
+  });
 }

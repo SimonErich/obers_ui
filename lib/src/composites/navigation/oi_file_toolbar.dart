@@ -1,9 +1,8 @@
-import 'dart:async';
-
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/buttons/oi_icon_button.dart';
 import 'package:obers_ui/src/components/inputs/oi_text_input.dart';
 import 'package:obers_ui/src/components/navigation/oi_breadcrumbs.dart';
+import 'package:obers_ui/src/foundation/oi_search_debounce.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/primitives/animation/oi_morph.dart';
 import 'package:obers_ui/src/primitives/overlay/oi_visibility.dart';
@@ -49,7 +48,7 @@ class OiFileToolbar extends StatefulWidget {
 
 class _OiFileToolbarState extends State<OiFileToolbar> {
   bool _searchOpen = false;
-  Timer? _debounceTimer;
+  final OiSearchDebounce _debounce = OiSearchDebounce();
   late final TextEditingController _searchController;
 
   @override
@@ -69,13 +68,13 @@ class _OiFileToolbarState extends State<OiFileToolbar> {
 
   @override
   void dispose() {
-    _debounceTimer?.cancel();
+    _debounce.dispose();
     _searchController.dispose();
     super.dispose();
   }
 
   void _resetSearch() {
-    _debounceTimer?.cancel();
+    _debounce.cancel();
     _searchOpen = false;
     _searchController.clear();
   }
@@ -84,18 +83,16 @@ class _OiFileToolbarState extends State<OiFileToolbar> {
     setState(() {
       _searchOpen = !_searchOpen;
       if (!_searchOpen) {
-        _debounceTimer?.cancel();
+        _debounce.cancel();
         _searchController.clear();
       }
     });
   }
 
   void _onQueryChanged(String query) {
-    _debounceTimer?.cancel();
-    if (query.isEmpty) return;
-    _debounceTimer = Timer(const Duration(milliseconds: 300), () {
-      widget.onSearch?.call(query);
-    });
+    final callback = widget.onSearch;
+    if (callback == null) return;
+    _debounce.call(query, callback);
   }
 
   // ── Build helpers ──────────────────────────────────────────────────────────

@@ -214,7 +214,7 @@ void main() {
       expect(calls, ['ab']);
     });
 
-    testWidgets('clearing text does not fire onSearch', (tester) async {
+    testWidgets('clearing text fires onSearch immediately', (tester) async {
       final calls = <String>[];
       await tester.pumpObers(_toolbar(onSearch: calls.add));
 
@@ -226,9 +226,10 @@ void main() {
       calls.clear();
 
       await tester.enterText(find.byType(EditableText), '');
-      await tester.pump(const Duration(milliseconds: 300));
+      await tester.pump();
 
-      expect(calls, isEmpty);
+      // Empty query fires immediately, no debounce wait needed.
+      expect(calls, ['']);
     });
   });
 
