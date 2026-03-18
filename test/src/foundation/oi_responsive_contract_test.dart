@@ -1,5 +1,6 @@
 // Tests are internal; doc comments on local helpers are not required.
 // ignore_for_file: public_member_api_docs
+// ignore_for_file: deprecated_member_use_from_same_package
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -566,10 +567,10 @@ void main() {
   });
 
   // ─────────────────────────────────────────────────────────────────────────
-  // Contract: resolveFor(context) works as shorthand
+  // Contract: resolveFor(context) still works but is deprecated
   // ─────────────────────────────────────────────────────────────────────────
 
-  group('resolveFor(context)', () {
+  group('resolveFor(context) — deprecated shorthand', () {
     testWidgets('static value resolves without reading widget tree', (
       tester,
     ) async {
@@ -598,6 +599,257 @@ void main() {
       );
       // Default pumpObers uses 800x600 → compact breakpoint → 'small'.
       expect(find.text('small'), findsOneWidget);
+    });
+  });
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // Contract: zero magic — no silent context lookups
+  // ─────────────────────────────────────────────────────────────────────────
+
+  group('zero magic — layout widgets work without OiTheme', () {
+    // All layout widgets must render without an OiTheme ancestor.
+    // This proves they never silently look up the breakpoint from context.
+    // They take an explicit breakpoint parameter and resolve locally.
+
+    Widget noThemeHarness(Widget child) {
+      return MediaQuery(
+        data: const MediaQueryData(size: Size(800, 600)),
+        child: Directionality(
+          textDirection: TextDirection.ltr,
+          child: child,
+        ),
+      );
+    }
+
+    testWidgets('OiRow renders without OiTheme', (tester) async {
+      await tester.pumpWidget(
+        noThemeHarness(
+          OiRow(
+            breakpoint: OiBreakpoint.compact,
+            gap: const OiResponsive<double>(8),
+            children: children,
+          ),
+        ),
+      );
+      expect(find.text('A'), findsOneWidget);
+      expect(find.text('B'), findsOneWidget);
+    });
+
+    testWidgets('OiColumn renders without OiTheme', (tester) async {
+      await tester.pumpWidget(
+        noThemeHarness(
+          OiColumn(
+            breakpoint: OiBreakpoint.compact,
+            gap: const OiResponsive<double>(8),
+            children: children,
+          ),
+        ),
+      );
+      expect(find.text('A'), findsOneWidget);
+      expect(find.text('B'), findsOneWidget);
+    });
+
+    testWidgets('OiGrid renders without OiTheme', (tester) async {
+      await tester.pumpWidget(
+        noThemeHarness(
+          OiGrid(
+            breakpoint: OiBreakpoint.compact,
+            columns: const OiResponsive<int>(2),
+            gap: const OiResponsive<double>(8),
+            children: children,
+          ),
+        ),
+      );
+      expect(find.text('A'), findsOneWidget);
+      expect(find.text('B'), findsOneWidget);
+    });
+
+    testWidgets('OiSection renders without OiTheme', (tester) async {
+      await tester.pumpWidget(
+        noThemeHarness(
+          OiSection(
+            breakpoint: OiBreakpoint.compact,
+            gap: const OiResponsive<double>(8),
+            children: children,
+          ),
+        ),
+      );
+      expect(find.text('A'), findsOneWidget);
+      expect(find.text('B'), findsOneWidget);
+    });
+
+    testWidgets('OiPage renders without OiTheme', (tester) async {
+      await tester.pumpWidget(
+        noThemeHarness(
+          OiPage(
+            breakpoint: OiBreakpoint.compact,
+            mainAxisSize: MainAxisSize.min,
+            gap: const OiResponsive<double>(8),
+            children: children,
+          ),
+        ),
+      );
+      expect(find.text('A'), findsOneWidget);
+      expect(find.text('B'), findsOneWidget);
+    });
+
+    testWidgets('OiMasonry renders without OiTheme', (tester) async {
+      await tester.pumpWidget(
+        noThemeHarness(
+          OiMasonry(
+            breakpoint: OiBreakpoint.compact,
+            columns: const OiResponsive<int>(2),
+            gap: const OiResponsive<double>(8),
+            children: children,
+          ),
+        ),
+      );
+      expect(find.text('A'), findsOneWidget);
+      expect(find.text('B'), findsOneWidget);
+    });
+
+    testWidgets('OiContainer renders without OiTheme', (tester) async {
+      await tester.pumpWidget(
+        noThemeHarness(
+          OiContainer(
+            breakpoint: OiBreakpoint.compact,
+            child: child,
+          ),
+        ),
+      );
+      expect(find.text('content'), findsOneWidget);
+    });
+
+    testWidgets('OiWrapLayout renders without OiTheme', (tester) async {
+      await tester.pumpWidget(
+        noThemeHarness(
+          OiWrapLayout(
+            breakpoint: OiBreakpoint.compact,
+            spacing: const OiResponsive<double>(8),
+            children: children,
+          ),
+        ),
+      );
+      expect(find.text('A'), findsOneWidget);
+      expect(find.text('B'), findsOneWidget);
+    });
+
+    testWidgets('OiSpacer renders without OiTheme', (tester) async {
+      await tester.pumpWidget(
+        noThemeHarness(
+          Column(children: [
+            OiSpacer(
+              breakpoint: OiBreakpoint.compact,
+              size: const OiResponsive<double>(16),
+            ),
+          ]),
+        ),
+      );
+      final box = tester.widget<SizedBox>(find.byType(SizedBox));
+      expect(box.height, 16);
+    });
+
+    testWidgets('OiAspectRatio renders without OiTheme', (tester) async {
+      await tester.pumpWidget(
+        noThemeHarness(
+          OiAspectRatio(
+            breakpoint: OiBreakpoint.compact,
+            ratio: const OiResponsive<double>(16 / 9),
+            child: const ColoredBox(color: Color(0xFF000000)),
+          ),
+        ),
+      );
+      final ar = tester.widget<AspectRatio>(find.byType(AspectRatio));
+      expect(ar.aspectRatio, closeTo(16 / 9, 0.001));
+    });
+
+    testWidgets('OiGrid with spans renders without OiTheme', (tester) async {
+      await tester.pumpWidget(
+        noThemeHarness(
+          OiGrid(
+            breakpoint: OiBreakpoint.compact,
+            columns: const OiResponsive<int>(3),
+            children: [
+              const Text('full').spanFull(),
+              const Text('two').span(
+                columnSpan: const OiResponsive<int>(2),
+              ),
+              const Text('one'),
+            ],
+          ),
+        ),
+      );
+      expect(find.text('full'), findsOneWidget);
+      expect(find.text('two'), findsOneWidget);
+      expect(find.text('one'), findsOneWidget);
+    });
+  });
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // Contract: explicit resolution — resolve(breakpoint, scale) is canonical
+  // ─────────────────────────────────────────────────────────────────────────
+
+  group('explicit resolution — resolve(breakpoint, scale) is canonical', () {
+    const scale = OiBreakpointScale.defaultScale;
+
+    test('resolve returns correct value for each breakpoint tier', () {
+      final r = OiResponsive<int>.breakpoints({
+        OiBreakpoint.compact: 1,
+        OiBreakpoint.medium: 2,
+        OiBreakpoint.expanded: 3,
+        OiBreakpoint.large: 4,
+        OiBreakpoint.extraLarge: 6,
+      });
+
+      expect(r.resolve(OiBreakpoint.compact, scale), 1);
+      expect(r.resolve(OiBreakpoint.medium, scale), 2);
+      expect(r.resolve(OiBreakpoint.expanded, scale), 3);
+      expect(r.resolve(OiBreakpoint.large, scale), 4);
+      expect(r.resolve(OiBreakpoint.extraLarge, scale), 6);
+    });
+
+    test('resolve cascades from smaller breakpoints when value not set', () {
+      final r = OiResponsive<int>.breakpoints({
+        OiBreakpoint.compact: 1,
+        OiBreakpoint.large: 4,
+      });
+
+      expect(r.resolve(OiBreakpoint.compact, scale), 1);
+      // medium and expanded cascade from compact.
+      expect(r.resolve(OiBreakpoint.medium, scale), 1);
+      expect(r.resolve(OiBreakpoint.expanded, scale), 1);
+      // large has its own value.
+      expect(r.resolve(OiBreakpoint.large, scale), 4);
+      // extraLarge cascades from large.
+      expect(r.resolve(OiBreakpoint.extraLarge, scale), 4);
+    });
+
+    test('static value resolves identically at all breakpoints', () {
+      const r = OiResponsive<double>(42);
+      for (final bp in OiBreakpoint.values) {
+        expect(r.resolve(bp, scale), 42);
+      }
+    });
+
+    test('resolve works with custom scale', () {
+      final customScale = OiBreakpointScale([
+        OiBreakpoint.compact,
+        const OiBreakpoint('tablet', 480),
+        OiBreakpoint.medium,
+      ]);
+
+      final r = OiResponsive<String>.breakpoints({
+        OiBreakpoint.compact: 'phone',
+        const OiBreakpoint('tablet', 480): 'tablet',
+      });
+
+      expect(r.resolve(OiBreakpoint.compact, customScale), 'phone');
+      expect(
+        r.resolve(const OiBreakpoint('tablet', 480), customScale),
+        'tablet',
+      );
+      // medium cascades from tablet.
+      expect(r.resolve(OiBreakpoint.medium, customScale), 'tablet');
     });
   });
 }

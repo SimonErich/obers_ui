@@ -476,6 +476,19 @@ class OiResponsive<T> {
   /// For static values, returns the value directly without reading the
   /// widget tree. For per-breakpoint maps, reads the active breakpoint
   /// and scale from the nearest [OiTheme].
+  ///
+  /// **Deprecated:** Prefer [resolve] with an explicit breakpoint and scale.
+  /// Resolve once at the page/layout level and pass concrete values down:
+  ///
+  /// ```dart
+  /// final bp = context.breakpoint;
+  /// final scale = context.breakpointScale;
+  /// final cols = columns.resolve(bp, scale);
+  /// ```
+  @Deprecated(
+    'Use resolve(breakpoint, scale) with explicit parameters instead. '
+    'Resolve the breakpoint once at the layout level and pass it down.',
+  )
   T resolveFor(BuildContext context) {
     if (_map == null) return _defaultValue as T;
     return resolve(context.breakpoint, context.breakpointScale);
@@ -574,8 +587,12 @@ extension OiResponsiveMapExt<T> on Map<OiBreakpoint, T> {
 /// **Deprecated:** Use [OiResponsive] instead for new code.
 ///
 /// {@category Foundation}
+@Deprecated('Use OiResponsive<T> instead. '
+    'OiResponsive supports mobile-first cascading and explicit resolution '
+    'via resolve(breakpoint, scale).')
 class OiResponsiveValue<T> {
   /// Creates an [OiResponsiveValue] with per-breakpoint values.
+  @Deprecated('Use OiResponsive<T> instead.')
   const OiResponsiveValue({
     this.compact,
     this.medium,
@@ -717,10 +734,19 @@ extension OiResponsiveExt on BuildContext {
   bool isAtLeast(OiBreakpoint bp) => breakpoint.minWidth >= bp.minWidth;
 
   /// Resolves an [OiResponsive] for the current screen width.
+  ///
+  /// **Deprecated:** Prefer [OiResponsive.resolve] with an explicit breakpoint
+  /// and scale. Resolve the breakpoint once at the layout level and pass
+  /// concrete values down.
+  @Deprecated(
+    'Use value.resolve(breakpoint, scale) with explicit parameters instead.',
+  )
   T resolveResponsive<T>(OiResponsive<T> value) =>
       value.resolve(breakpoint, breakpointScale);
 
   /// Resolves an [OiResponsiveValue] for the current screen width.
+  @Deprecated('Use OiResponsive<T> with resolve(breakpoint, scale) instead.')
+  // ignore: deprecated_member_use_from_same_package
   T? responsive<T>(OiResponsiveValue<T> value) => value.resolve(_width);
 
   /// Returns one of two values based on the current breakpoint.
