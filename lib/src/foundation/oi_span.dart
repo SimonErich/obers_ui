@@ -28,12 +28,7 @@ const int fullSpanSentinel = -1;
 @immutable
 class OiSpanData {
   /// Creates span metadata with optional responsive placement values.
-  const OiSpanData({
-    this.columnSpan,
-    this.columnStart,
-    this.columnOrder,
-    this.rowSpan,
-  });
+  const OiSpanData({this.columnSpan, this.columnStart, this.columnOrder});
 
   /// Full-width span — fills all columns at every breakpoint.
   static const OiSpanData full = OiSpanData(
@@ -55,9 +50,6 @@ class OiSpanData {
   ///
   /// Lower numbers render first. `null` means source order.
   final OiResponsive<int>? columnOrder;
-
-  /// How many rows this child occupies. Default 1.
-  final OiResponsive<int>? rowSpan;
 
   /// Resolves the column span for the given breakpoint and scale.
   ///
@@ -84,34 +76,24 @@ class OiSpanData {
     return columnOrder!.resolve(bp, scale);
   }
 
-  /// Resolves the row span for the given breakpoint and scale.
-  ///
-  /// Returns 1 when [rowSpan] is null.
-  int resolveRowSpan(OiBreakpoint bp, OiBreakpointScale scale) {
-    if (rowSpan == null) return 1;
-    return rowSpan!.resolve(bp, scale);
-  }
-
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
     return other is OiSpanData &&
         other.columnSpan == columnSpan &&
         other.columnStart == columnStart &&
-        other.columnOrder == columnOrder &&
-        other.rowSpan == rowSpan;
+        other.columnOrder == columnOrder;
   }
 
   @override
-  int get hashCode =>
-      Object.hash(columnSpan, columnStart, columnOrder, rowSpan);
+  int get hashCode => Object.hash(columnSpan, columnStart, columnOrder);
 
   @override
-  String toString() => 'OiSpanData('
+  String toString() =>
+      'OiSpanData('
       'columnSpan: $columnSpan, '
       'columnStart: $columnStart, '
-      'columnOrder: $columnOrder, '
-      'rowSpan: $rowSpan)';
+      'columnOrder: $columnOrder)';
 }
 
 // ---------------------------------------------------------------------------
@@ -168,14 +150,12 @@ extension OiSpanExt on Widget {
     OiResponsive<int>? columnSpan,
     OiResponsive<int>? columnStart,
     OiResponsive<int>? columnOrder,
-    OiResponsive<int>? rowSpan,
   }) {
     return OiSpan(
       data: OiSpanData(
         columnSpan: columnSpan,
         columnStart: columnStart,
         columnOrder: columnOrder,
-        rowSpan: rowSpan,
       ),
       child: this,
     );

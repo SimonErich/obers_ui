@@ -14,12 +14,11 @@ void main() {
   // ─────────────────────────────────────────────────────────────────────────
 
   group('OiSpanData', () {
-    test('default values resolve to 1 span, null start/order, 1 row', () {
+    test('default values resolve to 1 span, null start/order', () {
       const data = OiSpanData();
       expect(data.resolveColumnSpan(OiBreakpoint.compact, scale), 1);
       expect(data.resolveColumnStart(OiBreakpoint.compact, scale), isNull);
       expect(data.resolveColumnOrder(OiBreakpoint.compact, scale), isNull);
-      expect(data.resolveRowSpan(OiBreakpoint.compact, scale), 1);
     });
 
     test('static columnSpan resolves to same value at all breakpoints', () {
@@ -65,17 +64,6 @@ void main() {
       expect(data.resolveColumnOrder(OiBreakpoint.compact, scale), 2);
       expect(data.resolveColumnOrder(OiBreakpoint.medium, scale), 2);
       expect(data.resolveColumnOrder(OiBreakpoint.large, scale), 1);
-    });
-
-    test('rowSpan resolves responsively', () {
-      final data = OiSpanData(
-        rowSpan: OiResponsive<int>.breakpoints({
-          OiBreakpoint.compact: 1,
-          OiBreakpoint.large: 2,
-        }),
-      );
-      expect(data.resolveRowSpan(OiBreakpoint.compact, scale), 1);
-      expect(data.resolveRowSpan(OiBreakpoint.large, scale), 2);
     });
 
     test('full constant uses sentinel value', () {
@@ -147,7 +135,6 @@ void main() {
       expect(span.data.columnSpan, const OiResponsive<int>(2));
       expect(span.data.columnStart, const OiResponsive<int>(3));
       expect(span.data.columnOrder, isNull);
-      expect(span.data.rowSpan, isNull);
     });
 
     testWidgets('.spanFull() wraps widget with full span', (tester) async {
@@ -161,9 +148,9 @@ void main() {
       await tester.pumpWidget(
         Directionality(
           textDirection: TextDirection.ltr,
-          child: const Text('spanned').span(
-            columnSpan: const OiResponsive<int>(2),
-          ),
+          child: const Text(
+            'spanned',
+          ).span(columnSpan: const OiResponsive<int>(2)),
         ),
       );
       expect(find.text('spanned'), findsOneWidget);
