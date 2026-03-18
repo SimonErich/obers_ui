@@ -234,6 +234,19 @@ class _OiToastState extends State<OiToast> with SingleTickerProviderStateMixin {
     }
   }
 
+  String _iconSemanticLabel() {
+    switch (widget.level) {
+      case OiToastLevel.info:
+        return 'Info';
+      case OiToastLevel.success:
+        return 'Success';
+      case OiToastLevel.warning:
+        return 'Warning';
+      case OiToastLevel.error:
+        return 'Error';
+    }
+  }
+
   AlignmentGeometry _alignment() {
     switch (widget.position) {
       case OiToastPosition.topLeft:
@@ -301,12 +314,16 @@ class _OiToastState extends State<OiToast> with SingleTickerProviderStateMixin {
                   ),
                   child: Row(
                     children: [
-                      Text(
-                        _icon(),
-                        style: TextStyle(
-                          color: accent,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w700,
+                      Semantics(
+                        label: _iconSemanticLabel(),
+                        excludeSemantics: true,
+                        child: Text(
+                          _icon(),
+                          style: TextStyle(
+                            color: accent,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                          ),
                         ),
                       ),
                       const SizedBox(width: 8),

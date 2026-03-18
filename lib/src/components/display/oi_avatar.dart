@@ -136,6 +136,19 @@ class OiAvatar extends StatelessWidget {
     }
   }
 
+  String _presenceLabel(OiPresenceStatus status) {
+    switch (status) {
+      case OiPresenceStatus.online:
+        return 'online';
+      case OiPresenceStatus.offline:
+        return 'offline';
+      case OiPresenceStatus.away:
+        return 'away';
+      case OiPresenceStatus.busy:
+        return 'busy';
+    }
+  }
+
   // ---------------------------------------------------------------------------
   // Build
   // ---------------------------------------------------------------------------
@@ -194,10 +207,14 @@ class OiAvatar extends StatelessWidget {
       );
     }
 
+    final fullLabel = presence != null && !skeleton
+        ? '$semanticLabel, ${_presenceLabel(presence!)}'
+        : semanticLabel;
+
     return Semantics(
-      label: semanticLabel,
+      label: fullLabel,
       image: imageUrl != null,
-      child: avatar,
+      child: ExcludeSemantics(child: avatar),
     );
   }
 

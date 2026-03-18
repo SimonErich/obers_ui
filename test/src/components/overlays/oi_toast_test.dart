@@ -48,6 +48,54 @@ void main() {
     expect(find.text('ℹ'), findsOneWidget);
   });
 
+  testWidgets('info level icon has semantic label', (tester) async {
+    final handle = tester.ensureSemantics();
+    addTearDown(handle.dispose);
+    await tester.pumpObers(
+      MediaQuery(
+        data: const MediaQueryData(disableAnimations: true),
+        child: const OiToast(message: 'FYI'),
+      ),
+    );
+    expect(find.bySemanticsLabel('Info'), findsOneWidget);
+  });
+
+  testWidgets('success level icon has semantic label', (tester) async {
+    final handle = tester.ensureSemantics();
+    addTearDown(handle.dispose);
+    await tester.pumpObers(
+      MediaQuery(
+        data: const MediaQueryData(disableAnimations: true),
+        child: const OiToast(message: 'Done', level: OiToastLevel.success),
+      ),
+    );
+    expect(find.bySemanticsLabel('Success'), findsOneWidget);
+  });
+
+  testWidgets('warning level icon has semantic label', (tester) async {
+    final handle = tester.ensureSemantics();
+    addTearDown(handle.dispose);
+    await tester.pumpObers(
+      MediaQuery(
+        data: const MediaQueryData(disableAnimations: true),
+        child: const OiToast(message: 'Careful', level: OiToastLevel.warning),
+      ),
+    );
+    expect(find.bySemanticsLabel('Warning'), findsOneWidget);
+  });
+
+  testWidgets('error level icon has semantic label', (tester) async {
+    final handle = tester.ensureSemantics();
+    addTearDown(handle.dispose);
+    await tester.pumpObers(
+      MediaQuery(
+        data: const MediaQueryData(disableAnimations: true),
+        child: const OiToast(message: 'Failed', level: OiToastLevel.error),
+      ),
+    );
+    expect(find.bySemanticsLabel('Error'), findsOneWidget);
+  });
+
   testWidgets('onDismiss fires after duration elapses', (tester) async {
     var dismissed = false;
     await tester.pumpObers(

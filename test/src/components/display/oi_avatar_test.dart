@@ -69,10 +69,104 @@ void main() {
     tester,
   ) async {
     final handle = tester.ensureSemantics();
-    addTearDown(handle.dispose);
-    await tester.pumpObers(
-      const OiAvatar(semanticLabel: 'Profile picture', initials: 'AB'),
-    );
-    expect(find.bySemanticsLabel('Profile picture'), findsOneWidget);
+    try {
+      await tester.pumpObers(
+        const OiAvatar(semanticLabel: 'Profile picture', initials: 'AB'),
+      );
+      expect(find.bySemanticsLabel('Profile picture'), findsOneWidget);
+    } finally {
+      handle.dispose();
+    }
+  });
+
+  testWidgets('presence online status is included in semantic label', (
+    tester,
+  ) async {
+    final handle = tester.ensureSemantics();
+    try {
+      await tester.pumpObers(
+        const OiAvatar(
+          semanticLabel: 'Alice',
+          initials: 'A',
+          presence: OiPresenceStatus.online,
+        ),
+      );
+      expect(find.bySemanticsLabel('Alice, online'), findsOneWidget);
+    } finally {
+      handle.dispose();
+    }
+  });
+
+  testWidgets('presence away status is included in semantic label', (
+    tester,
+  ) async {
+    final handle = tester.ensureSemantics();
+    try {
+      await tester.pumpObers(
+        const OiAvatar(
+          semanticLabel: 'Bob',
+          initials: 'B',
+          presence: OiPresenceStatus.away,
+        ),
+      );
+      expect(find.bySemanticsLabel('Bob, away'), findsOneWidget);
+    } finally {
+      handle.dispose();
+    }
+  });
+
+  testWidgets('presence busy status is included in semantic label', (
+    tester,
+  ) async {
+    final handle = tester.ensureSemantics();
+    try {
+      await tester.pumpObers(
+        const OiAvatar(
+          semanticLabel: 'Carol',
+          initials: 'C',
+          presence: OiPresenceStatus.busy,
+        ),
+      );
+      expect(find.bySemanticsLabel('Carol, busy'), findsOneWidget);
+    } finally {
+      handle.dispose();
+    }
+  });
+
+  testWidgets('presence offline status is included in semantic label', (
+    tester,
+  ) async {
+    final handle = tester.ensureSemantics();
+    try {
+      await tester.pumpObers(
+        const OiAvatar(
+          semanticLabel: 'Dave',
+          initials: 'D',
+          presence: OiPresenceStatus.offline,
+        ),
+      );
+      expect(find.bySemanticsLabel('Dave, offline'), findsOneWidget);
+    } finally {
+      handle.dispose();
+    }
+  });
+
+  testWidgets('skeleton presence does not append status to semantic label', (
+    tester,
+  ) async {
+    final handle = tester.ensureSemantics();
+    try {
+      await tester.pumpObers(
+        const OiAvatar(
+          semanticLabel: 'Loading',
+          skeleton: true,
+          presence: OiPresenceStatus.online,
+        ),
+      );
+      expect(find.bySemanticsLabel('Loading'), findsOneWidget);
+      expect(find.bySemanticsLabel('Loading, online'), findsNothing);
+    } finally {
+      handle.dispose();
+    }
   });
 }
