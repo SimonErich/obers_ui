@@ -5,6 +5,7 @@ import 'package:obers_ui/src/components/display/oi_tooltip.dart';
 import 'package:obers_ui/src/foundation/oi_app.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/primitives/animation/oi_pulse.dart';
+import 'package:obers_ui/src/primitives/display/oi_icon.dart';
 import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
 import 'package:obers_ui/src/primitives/overlay/oi_floating.dart';
 
@@ -650,7 +651,8 @@ class _OiButtonState extends State<OiButton> {
                   ? context.spacing.xs
                   : 0,
             ),
-            child: Icon(icon, size: _iconSize(), color: foreground),
+            child: OiIcon.decorative(
+                icon: icon, size: _iconSize(), color: foreground),
           )
         : null;
 

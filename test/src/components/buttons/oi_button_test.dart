@@ -11,6 +11,7 @@ import 'package:obers_ui/src/components/display/oi_tooltip.dart';
 import 'package:obers_ui/src/foundation/oi_app.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme_data.dart';
 import 'package:obers_ui/src/primitives/animation/oi_pulse.dart';
+import 'package:obers_ui/src/primitives/display/oi_icon.dart';
 
 import '../../../helpers/pump_app.dart';
 
@@ -297,6 +298,11 @@ void main() {
     final iconDx = tester.getCenter(find.byIcon(_kIcon)).dx;
     final textDx = tester.getCenter(find.text('Add')).dx;
     expect(iconDx, lessThan(textDx));
+  });
+
+  testWidgets('leading/trailing icon uses OiIcon.decorative', (tester) async {
+    await tester.pumpObers(const OiButton.primary(label: 'Add', icon: _kIcon));
+    expect(find.byType(OiIcon), findsOneWidget);
   });
 
   testWidgets('trailing icon renders after label', (tester) async {
