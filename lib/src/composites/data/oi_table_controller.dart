@@ -14,13 +14,54 @@ import 'package:obers_ui/src/models/settings/oi_table_settings.dart';
 /// {@category Composites}
 class OiTableController extends ChangeNotifier {
   /// Creates an [OiTableController].
-  OiTableController({int pageSize = 25, int totalRows = 0})
-    : pagination = OiPaginationController(
-        pageSize: pageSize,
-        totalItems: totalRows,
-      ) {
+  ///
+  /// When [serverSidePagination] is `true` the composed
+  /// [OiPaginationController] is created with [OiPaginationController.serverSide]
+  /// set to `true`, indicating that the consumer manages pagination externally.
+  OiTableController({
+    int pageSize = 25,
+    int totalRows = 0,
+    bool serverSidePagination = false,
+  }) : pagination = OiPaginationController(
+         pageSize: pageSize,
+         totalItems: totalRows,
+         serverSide: serverSidePagination,
+       ) {
     pagination.addListener(notifyListeners);
   }
+
+  // ── Loading ──────────────────────────────────────────────────────────────
+
+  bool _loading = false;
+
+  /// Whether the table is in a loading state (e.g. fetching a page of data).
+  ///
+  /// When `true` the table shows an indeterminate loading bar across its top.
+  bool get loading => _loading;
+
+  /// Sets the loading state.
+  ///
+  /// Typically called by the consumer around an async data fetch:
+  /// ```dart
+  /// controller.setLoading(true);
+  /// final page = await api.fetch(page: p);
+  /// controller
+  ///   ..setLoading(false)
+  ///   ..totalRows = page.total;
+  /// ```
+  void setLoading({required bool loading}) {
+    if (_loading == loading) return;
+    _loading = loading;
+    notifyListeners();
+  }
+
+  // ── Total rows ──────────────────────────────────────────────────────────
+
+  /// Convenience getter for the total number of rows across all pages.
+  int get totalRows => pagination.totalItems;
+
+  /// Updates the total number of rows, delegating to [pagination].
+  set totalRows(int value) => pagination.setTotalItems(value);
 
   // ── Sort ──────────────────────────────────────────────────────────────────
 

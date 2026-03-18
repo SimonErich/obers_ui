@@ -82,6 +82,7 @@ Widget _table({
   Duration settingsSaveDebounce = const Duration(milliseconds: 500),
   List<int> pageSizeOptions = const [10, 25, 50, 100],
   void Function(int)? onPageSizeChanged,
+  void Function(int page, int pageSize)? onPageChange,
 }) {
   return SizedBox(
     width: 800,
@@ -120,6 +121,7 @@ Widget _table({
       settingsKey: settingsKey,
       settingsNamespace: settingsNamespace,
       settingsSaveDebounce: settingsSaveDebounce,
+      onPageChange: onPageChange,
     ),
   );
 }
@@ -2671,7 +2673,7 @@ void main() {
         (w) => w is Semantics && w.properties.label == 'Test table',
       ),
     );
-    expect(semantics.properties.explicitChildNodes, isTrue);
+    expect(semantics.explicitChildNodes, isTrue);
   });
 
   // ══════════════════════════════════════════════════════════════════════════
@@ -2946,6 +2948,56 @@ void main() {
     await tester.pumpAndSettle();
     // Column order should be restored from settings.
     expect(ctrl2.columnOrder, isNotEmpty);
+  });
+
+  // REQ-1313: onPageChange fires with correct (page, pageSize)
+  testWidgets('onPageChange fires with correct page and pageSize', (
+    tester,
+  ) async {
+    final calls = <(int, int)>[];
+    // 30 rows total, page size 10 → 3 pages.
+    final ctrl = OiTableController(
+      pageSize: 10,
+      totalRows: 30,
+      serverSidePagination: true,
+    );
+    final rows = List.generate(10, (i) => _Row('R$i', i));
+    await tester.pumpObers(
+      _table(
+        rows: rows,
+        controller: ctrl,
+        paginationMode: OiTablePaginationMode.pages,
+        totalRows: 30,
+        onPageChange: (page, pageSize) => calls.add((page, pageSize)),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    // Navigate to page 1 via the controller.
+    ctrl.pagination.goToPage(1);
+    await tester.pumpAndSettle();
+
+    expect(calls, contains((1, 10)));
+  });
+
+  // REQ-1314: controller.setLoading shows loading bar overlay
+  testWidgets('controller.setLoading(true) renders loading bar', (
+    tester,
+  ) async {
+    final ctrl = OiTableController(totalRows: _rows.length);
+    await tester.pumpObers(_table(controller: ctrl));
+    await tester.pump();
+
+    // No loading bar initially.
+    expect(find.byKey(const Key('oi_table_loading_bar')), findsNothing);
+
+    // Set loading via controller.
+    ctrl.setLoading(loading: true);
+    // Use pump() instead of pumpAndSettle() because the loading bar
+    // runs a continuous animation that never settles.
+    await tester.pump();
+
+    expect(find.byKey(const Key('oi_table_loading_bar')), findsOneWidget);
   });
 }
 

@@ -25,12 +25,19 @@ class OiPaginationController extends ChangeNotifier {
     int currentPage = 0,
     int pageSize = 25,
     int totalItems = 0,
+    this.serverSide = false,
   }) : assert(currentPage >= 0, 'currentPage must be >= 0'),
        assert(pageSize >= 1, 'pageSize must be >= 1'),
        assert(totalItems >= 0, 'totalItems must be >= 0'),
        _currentPage = currentPage,
        _pageSize = pageSize,
        _totalItems = totalItems;
+
+  /// Whether pagination is managed server-side.
+  ///
+  /// When `true` the table skips client-side slicing and relies on the
+  /// consumer to provide the correct page of rows.
+  final bool serverSide;
 
   int _currentPage;
   int _pageSize;

@@ -155,6 +155,7 @@ class OiTable<T> extends StatefulWidget {
     this.onLoadMore,
     this.pageSizeOptions = const [10, 25, 50, 100],
     this.onPageSizeChanged,
+    this.onPageChange,
     this.showColumnManager = false,
     this.onCellChanged,
     this.reorderable = false,
@@ -249,6 +250,13 @@ class OiTable<T> extends StatefulWidget {
   /// Called when the user selects a different page size.
   final ValueChanged<int>? onPageSizeChanged;
 
+  /// Called when the current page or page size changes.
+  ///
+  /// Typically used with server-side pagination: the consumer fetches the
+  /// requested page from a remote source, then updates [rows] and
+  /// [OiTableController.totalRows].
+  final void Function(int page, int pageSize)? onPageChange;
+
   // ── Column management ─────────────────────────────────────────────────────
 
   /// Whether to show a column manager button in the header bar.
@@ -334,6 +342,8 @@ class _OiTableState<T> extends State<OiTable<T>>
   bool _ownsController = false;
   bool _loadingMore = false;
   final ScrollController _scrollController = ScrollController();
+  int _prevPage = 0;
+  int _prevPageSize = 25;
 
   /// Resolved driver: explicit widget prop → OiSettingsProvider → null.
   OiSettingsDriver? _resolvedDriver;
@@ -415,6 +425,7 @@ class _OiTableState<T> extends State<OiTable<T>>
 
   @override
   void dispose() {
+    _closeColumnManager();
     _scrollController
       ..removeListener(_onScroll)
       ..dispose();
@@ -436,6 +447,8 @@ class _OiTableState<T> extends State<OiTable<T>>
       _ownsController = true;
     }
     _ctrl.addListener(_onControllerChanged);
+    _prevPage = _ctrl.pagination.currentPage;
+    _prevPageSize = _ctrl.pagination.pageSize;
   }
 
   void _disposeControllerIfOwned() {
@@ -445,6 +458,15 @@ class _OiTableState<T> extends State<OiTable<T>>
 
   void _onControllerChanged() {
     if (!mounted) return;
+    // Fire onPageChange when the current page or page size changes.
+    final curPage = _ctrl.pagination.currentPage;
+    final curPageSize = _ctrl.pagination.pageSize;
+    if (widget.onPageChange != null &&
+        (curPage != _prevPage || curPageSize != _prevPageSize)) {
+      _prevPage = curPage;
+      _prevPageSize = curPageSize;
+      widget.onPageChange!(curPage, curPageSize);
+    }
     // Persist settings on every controller change (debounced by the mixin).
     updateSettings(_ctrl.toSettings(), debounce: widget.settingsSaveDebounce);
     setState(() {});
@@ -531,8 +553,12 @@ class _OiTableState<T> extends State<OiTable<T>>
   }
 
   /// Applies pagination to [rows] in [OiTablePaginationMode.pages] mode.
+  ///
+  /// When [OiPaginationController.serverSide] is `true` the rows are returned
+  /// as-is because the consumer already provides the correct page of data.
   List<T> _paginatedRows(List<T> rows) {
     if (widget.paginationMode != OiTablePaginationMode.pages) return rows;
+    if (_ctrl.pagination.serverSide) return rows;
     final start = _ctrl.pagination.startIndex;
     final end = math.min(_ctrl.pagination.endIndex, rows.length);
     if (start >= rows.length) return const [];
@@ -548,6 +574,7 @@ class _OiTableState<T> extends State<OiTable<T>>
     if (!widget.serverSideSort &&
         !widget.serverSideFilter &&
         widget.totalRows == null &&
+        !_ctrl.pagination.serverSide &&
         widget.paginationMode == OiTablePaginationMode.pages) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!mounted) return;
@@ -649,9 +676,47 @@ class _OiTableState<T> extends State<OiTable<T>>
     );
   }
 
+  OverlayEntry? _columnManagerOverlay;
+
   void _showColumnManager() {
-    // Column manager panel — toggles visibility per column.
-    // Implemented as an overlay; for test purposes the button is present.
+    if (_columnManagerOverlay != null) {
+      _closeColumnManager();
+      return;
+    }
+    final box = context.findRenderObject()! as RenderBox;
+    final offset = box.localToGlobal(Offset.zero);
+
+    _columnManagerOverlay = OverlayEntry(
+      builder: (_) => Stack(
+        children: [
+          Positioned.fill(
+            child: GestureDetector(
+              behavior: HitTestBehavior.translucent,
+              onTap: _closeColumnManager,
+            ),
+          ),
+          Positioned(
+            right: 8,
+            top: offset.dy + 32,
+            child: _ColumnManagerPanel<T>(
+              columns: widget.columns,
+              visibility: _ctrl.columnVisibility,
+              onToggle: (columnId, visible) {
+                _ctrl.setColumnVisible(columnId, visible: visible);
+                _columnManagerOverlay?.markNeedsBuild();
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+    Overlay.of(context).insert(_columnManagerOverlay!);
+  }
+
+  void _closeColumnManager() {
+    _columnManagerOverlay?.remove();
+    _columnManagerOverlay?.dispose();
+    _columnManagerOverlay = null;
   }
 
   // ── Header row ────────────────────────────────────────────────────────────
@@ -775,13 +840,31 @@ class _OiTableState<T> extends State<OiTable<T>>
   Widget _buildBody() {
     if (widget.loading) return _buildLoadingState();
     final rows = _displayRows;
-    if (rows.isEmpty) {
-      return widget.emptyState ?? _buildDefaultEmptyState();
+
+    Widget body;
+    if (rows.isEmpty && !_ctrl.loading) {
+      body = widget.emptyState ?? _buildDefaultEmptyState();
+    } else if (widget.groupBy != null || _ctrl.groupByColumnId != null) {
+      body = _buildGroupedBody(rows);
+    } else {
+      body = _buildFlatBody(rows);
     }
-    if (widget.groupBy != null || _ctrl.groupByColumnId != null) {
-      return _buildGroupedBody(rows);
+
+    if (_ctrl.loading) {
+      return Stack(
+        children: [
+          body,
+          const Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: _OiTableLoadingBar(),
+          ),
+        ],
+      );
     }
-    return _buildFlatBody(rows);
+
+    return body;
   }
 
   Widget _buildLoadingState() {
@@ -1427,6 +1510,76 @@ class _PageSizeSelectorState extends State<_PageSizeSelector> {
   }
 }
 
+// ── _OiTableLoadingBar ────────────────────────────────────────────────────
+
+/// An indeterminate loading bar shown when [OiTableController.loading] is
+/// `true`. Renders a thin animated bar across the top of the table body.
+class _OiTableLoadingBar extends StatefulWidget {
+  const _OiTableLoadingBar();
+
+  @override
+  State<_OiTableLoadingBar> createState() => _OiTableLoadingBarState();
+}
+
+class _OiTableLoadingBarState extends State<_OiTableLoadingBar>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _ctrl;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1500),
+    )..repeat();
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _ctrl,
+      builder: (context, _) {
+        return CustomPaint(
+          key: const Key('oi_table_loading_bar'),
+          painter: _LoadingBarPainter(progress: _ctrl.value),
+          size: const Size(double.infinity, 3),
+        );
+      },
+    );
+  }
+}
+
+class _LoadingBarPainter extends CustomPainter {
+  const _LoadingBarPainter({required this.progress});
+
+  final double progress;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    // Background track.
+    canvas.drawRect(
+      Rect.fromLTWH(0, 0, size.width, size.height),
+      Paint()..color = const Color(0xFFE5E7EB),
+    );
+    // Animated bar segment.
+    final barWidth = size.width * 0.3;
+    final start = (size.width + barWidth) * progress - barWidth;
+    canvas.drawRect(
+      Rect.fromLTWH(start, 0, barWidth, size.height),
+      Paint()..color = const Color(0xFF2563EB),
+    );
+  }
+
+  @override
+  bool shouldRepaint(_LoadingBarPainter old) => old.progress != progress;
+}
+
 // ── _OiTableSpinner ───────────────────────────────────────────────────────────
 
 class _OiTableSpinner extends StatefulWidget {
@@ -1488,4 +1641,72 @@ class _SpinnerPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(_SpinnerPainter old) => false;
+}
+
+// ── _ColumnManagerPanel ────────────────────────────────────────────────────────
+
+/// Overlay panel that lets the user toggle column visibility.
+class _ColumnManagerPanel<T> extends StatelessWidget {
+  const _ColumnManagerPanel({
+    required this.columns,
+    required this.visibility,
+    required this.onToggle,
+  });
+
+  final List<OiTableColumn<T>> columns;
+  final Map<String, bool> visibility;
+  final void Function(String columnId, bool visible) onToggle;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      key: const Key('oi_table_column_manager'),
+      constraints: const BoxConstraints(maxWidth: 240),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFFFFFF),
+        border: Border.all(color: const Color(0xFFD1D5DB)),
+        borderRadius: BorderRadius.circular(4),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x1A000000),
+            blurRadius: 8,
+            offset: Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          const Padding(
+            padding: EdgeInsets.fromLTRB(12, 8, 12, 4),
+            child: Text(
+              'Columns',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+            ),
+          ),
+          for (final col in columns)
+            GestureDetector(
+              key: Key('col_manager_${col.id}'),
+              behavior: HitTestBehavior.opaque,
+              onTap: () {
+                final currentlyVisible = visibility[col.id] ?? true;
+                onToggle(col.id, !currentlyVisible);
+              },
+              child: Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                child: Row(
+                  children: [
+                    Text((visibility[col.id] ?? true) ? '☑' : '☐'),
+                    const SizedBox(width: 8),
+                    Expanded(child: Text(col.header)),
+                  ],
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
 }
