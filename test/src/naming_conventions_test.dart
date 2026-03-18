@@ -546,6 +546,139 @@ void main() {
         contains('this.dismissible'),
         reason: 'OiSheet should use "dismissible" (descriptive adjective)',
       );
+
+      // OiTextInput — enabled, readOnly, obscureText, autofocus
+      final textInputFile = File(
+        'lib/src/components/inputs/oi_text_input.dart',
+      );
+      final textInputContent = textInputFile.readAsStringSync();
+      expect(
+        textInputContent,
+        contains('this.enabled'),
+        reason: 'OiTextInput should use "enabled" (descriptive adjective)',
+      );
+      expect(
+        textInputContent,
+        contains('this.readOnly'),
+        reason: 'OiTextInput should use "readOnly" (descriptive adjective)',
+      );
+      expect(
+        textInputContent,
+        contains('this.obscureText'),
+        reason: 'OiTextInput should use "obscureText" (descriptive adjective)',
+      );
+      expect(
+        textInputContent,
+        contains('this.autofocus'),
+        reason: 'OiTextInput should use "autofocus" (descriptive adjective)',
+      );
+
+      // OiSwitch — enabled
+      final switchFile = File('lib/src/components/inputs/oi_switch.dart');
+      final switchContent = switchFile.readAsStringSync();
+      expect(
+        switchContent,
+        contains('this.enabled'),
+        reason: 'OiSwitch should use "enabled" (descriptive adjective)',
+      );
+
+      // OiCheckbox — enabled
+      final checkboxFile = File('lib/src/components/inputs/oi_checkbox.dart');
+      final checkboxContent = checkboxFile.readAsStringSync();
+      expect(
+        checkboxContent,
+        contains('this.enabled'),
+        reason: 'OiCheckbox should use "enabled" (descriptive adjective)',
+      );
+
+      // OiPanel — dismissible
+      final panelFile = File('lib/src/components/panels/oi_panel.dart');
+      final panelContent = panelFile.readAsStringSync();
+      expect(
+        panelContent,
+        contains('this.dismissible'),
+        reason: 'OiPanel should use "dismissible" (descriptive adjective)',
+      );
+
+      // OiCard — collapsible
+      final cardFile = File('lib/src/components/display/oi_card.dart');
+      final cardContent = cardFile.readAsStringSync();
+      expect(
+        cardContent,
+        contains('this.collapsible'),
+        reason: 'OiCard should use "collapsible" (descriptive adjective)',
+      );
+
+      // OiTree — selectable, multiSelect
+      final treeFile = File('lib/src/composites/data/oi_tree.dart');
+      final treeContent = treeFile.readAsStringSync();
+      expect(
+        treeContent,
+        contains('this.selectable'),
+        reason: 'OiTree should use "selectable" (descriptive adjective)',
+      );
+      expect(
+        treeContent,
+        contains('this.multiSelect'),
+        reason: 'OiTree should use "multiSelect" (descriptive adjective)',
+      );
+
+      // OiSwipeable — dismissible
+      final swipeableFile = File(
+        'lib/src/primitives/gesture/oi_swipeable.dart',
+      );
+      final swipeableContent = swipeableFile.readAsStringSync();
+      expect(
+        swipeableContent,
+        contains('this.dismissible'),
+        reason: 'OiSwipeable should use "dismissible" (descriptive adjective)',
+      );
+
+      // OiTabs — scrollable
+      final tabsFile = File('lib/src/components/navigation/oi_tabs.dart');
+      final tabsContent = tabsFile.readAsStringSync();
+      expect(
+        tabsContent,
+        contains('this.scrollable'),
+        reason: 'OiTabs should use "scrollable" (descriptive adjective)',
+      );
+
+      // OiRichEditor — readOnly
+      final richEditorFile = File(
+        'lib/src/composites/editors/oi_rich_editor.dart',
+      );
+      final richEditorContent = richEditorFile.readAsStringSync();
+      expect(
+        richEditorContent,
+        contains('this.readOnly'),
+        reason: 'OiRichEditor should use "readOnly" (descriptive adjective)',
+      );
+
+      // OiRawInput — enabled, readOnly, obscureText, autofocus
+      final rawInputFile = File(
+        'lib/src/primitives/input/oi_raw_input.dart',
+      );
+      final rawInputContent = rawInputFile.readAsStringSync();
+      expect(
+        rawInputContent,
+        contains('this.enabled'),
+        reason: 'OiRawInput should use "enabled" (descriptive adjective)',
+      );
+      expect(
+        rawInputContent,
+        contains('this.readOnly'),
+        reason: 'OiRawInput should use "readOnly" (descriptive adjective)',
+      );
+      expect(
+        rawInputContent,
+        contains('this.obscureText'),
+        reason: 'OiRawInput should use "obscureText" (descriptive adjective)',
+      );
+      expect(
+        rawInputContent,
+        contains('this.autofocus'),
+        reason: 'OiRawInput should use "autofocus" (descriptive adjective)',
+      );
     });
 
     test('boolean fields use consistent adjective form', () {
