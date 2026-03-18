@@ -153,6 +153,8 @@ class OiTable<T> extends StatefulWidget {
     this.paginationMode = OiTablePaginationMode.none,
     this.totalRows,
     this.onLoadMore,
+    this.pageSizeOptions = const [10, 25, 50, 100],
+    this.onPageSizeChanged,
     this.showColumnManager = false,
     this.onCellChanged,
     this.reorderable = false,
@@ -239,6 +241,12 @@ class OiTable<T> extends StatefulWidget {
   /// Called when the user reaches the end of the list in [OiTablePaginationMode.infinite]
   /// or [OiTablePaginationMode.virtual] mode.
   final Future<void> Function()? onLoadMore;
+
+  /// The page size options displayed in the pagination page size selector.
+  final List<int> pageSizeOptions;
+
+  /// Called when the user selects a different page size.
+  final ValueChanged<int>? onPageSizeChanged;
 
   // ── Column management ─────────────────────────────────────────────────────
 
@@ -915,6 +923,8 @@ class _OiTableState<T> extends State<OiTable<T>>
     return _PaginationBar(
       key: const Key('oi_table_pagination'),
       pagination: _ctrl.pagination,
+      pageSizeOptions: widget.pageSizeOptions,
+      onPageSizeChanged: widget.onPageSizeChanged,
     );
   }
 
@@ -1077,52 +1087,304 @@ class _FilterFieldState extends State<_FilterField> {
 // ── _PaginationBar ────────────────────────────────────────────────────────────
 
 class _PaginationBar extends StatelessWidget {
-  const _PaginationBar({required this.pagination, super.key});
+  const _PaginationBar({
+    required this.pagination,
+    this.pageSizeOptions = const [10, 25, 50, 100],
+    this.onPageSizeChanged,
+    super.key,
+  });
 
   final OiPaginationController pagination;
+  final List<int> pageSizeOptions;
+  final ValueChanged<int>? onPageSizeChanged;
+
+  /// Computes which page numbers to display, using `null` for ellipsis gaps.
+  ///
+  /// Pages are zero-based. When [totalPages] <= 7 all pages are shown.
+  /// Otherwise first, last, current, and immediate neighbors are shown
+  /// with ellipsis for gaps.
+  static List<int?> computeVisiblePages(int currentPage, int totalPages) {
+    const maxVisible = 7;
+    if (totalPages <= maxVisible) {
+      return List<int>.generate(totalPages, (i) => i);
+    }
+
+    final pages = <int>{0, totalPages - 1};
+    for (var i = currentPage - 1; i <= currentPage + 1; i++) {
+      if (i >= 0 && i < totalPages) pages.add(i);
+    }
+
+    final sorted = pages.toList()..sort();
+    final result = <int?>[];
+
+    for (var i = 0; i < sorted.length; i++) {
+      if (i > 0 && sorted[i] - sorted[i - 1] > 1) {
+        result.add(null); // ellipsis
+      }
+      result.add(sorted[i]);
+    }
+
+    return result;
+  }
 
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
       listenable: pagination,
       builder: (_, __) {
+        final total = pagination.totalItems;
+        final start = total == 0 ? 0 : pagination.startIndex + 1;
+        final end = pagination.endIndex;
+        final visiblePages = computeVisiblePages(
+          pagination.currentPage,
+          pagination.totalPages,
+        );
+
         return Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              GestureDetector(
+              // Left: row range text
+              Flexible(
+                child: Text(
+                  key: const Key('pagination_showing'),
+                  'Showing $start\u2013$end of $total rows',
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              const SizedBox(width: 12),
+              // Middle: page size selector
+              const Text('Rows per page: '),
+              _PageSizeSelector(
+                currentSize: pagination.pageSize,
+                options: pageSizeOptions,
+                onChanged: (size) {
+                  pagination.setPageSize(size);
+                  onPageSizeChanged?.call(size);
+                },
+              ),
+              const SizedBox(width: 16),
+              // Right: navigation controls
+              _navButton(
                 key: const Key('pagination_first'),
+                label: '«',
+                enabled: pagination.hasPreviousPage,
                 onTap: pagination.firstPage,
-                child: const Text('«'),
               ),
-              const SizedBox(width: 8),
-              GestureDetector(
+              _navButton(
                 key: const Key('pagination_prev'),
+                label: '‹',
+                enabled: pagination.hasPreviousPage,
                 onTap: pagination.previousPage,
-                child: const Text('‹'),
               ),
-              const SizedBox(width: 8),
-              Text(
-                'Page ${pagination.currentPage + 1} of '
-                '${math.max(1, pagination.totalPages)}',
-              ),
-              const SizedBox(width: 8),
-              GestureDetector(
+              for (final page in visiblePages)
+                if (page == null)
+                  const Padding(
+                    key: Key('pagination_ellipsis'),
+                    padding: EdgeInsets.symmetric(horizontal: 2),
+                    child: Text('\u2026'),
+                  )
+                else
+                  _pageButton(page),
+              _navButton(
                 key: const Key('pagination_next'),
+                label: '›',
+                enabled: pagination.hasNextPage,
                 onTap: pagination.nextPage,
-                child: const Text('›'),
               ),
-              const SizedBox(width: 8),
-              GestureDetector(
+              _navButton(
                 key: const Key('pagination_last'),
+                label: '»',
+                enabled: pagination.hasNextPage,
                 onTap: pagination.lastPage,
-                child: const Text('»'),
               ),
             ],
           ),
         );
       },
+    );
+  }
+
+  Widget _navButton({
+    required Key key,
+    required String label,
+    required bool enabled,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      key: key,
+      onTap: enabled ? onTap : null,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 4),
+        child: Text(
+          label,
+          style: TextStyle(
+            color: enabled
+                ? const Color(0xFF1F2937)
+                : const Color(0xFF9CA3AF),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _pageButton(int page) {
+    final isCurrent = page == pagination.currentPage;
+    return GestureDetector(
+      key: Key('pagination_page_$page'),
+      onTap: isCurrent ? null : () => pagination.goToPage(page),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+        margin: const EdgeInsets.symmetric(horizontal: 1),
+        decoration: isCurrent
+            ? BoxDecoration(
+                color: const Color(0xFF2563EB),
+                borderRadius: BorderRadius.circular(4),
+              )
+            : null,
+        child: Text(
+          '${page + 1}',
+          style: TextStyle(
+            color: isCurrent
+                ? const Color(0xFFFFFFFF)
+                : const Color(0xFF1F2937),
+            fontWeight: isCurrent ? FontWeight.bold : null,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ── _PageSizeSelector ─────────────────────────────────────────────────────────
+
+class _PageSizeSelector extends StatefulWidget {
+  const _PageSizeSelector({
+    required this.currentSize,
+    required this.options,
+    required this.onChanged,
+  });
+
+  final int currentSize;
+  final List<int> options;
+  final ValueChanged<int> onChanged;
+
+  @override
+  State<_PageSizeSelector> createState() => _PageSizeSelectorState();
+}
+
+class _PageSizeSelectorState extends State<_PageSizeSelector> {
+  final LayerLink _layerLink = LayerLink();
+  OverlayEntry? _overlayEntry;
+
+  void _toggle() {
+    if (_overlayEntry != null) {
+      _closeOverlay();
+    } else {
+      _openOverlay();
+    }
+  }
+
+  void _openOverlay() {
+    final entry = OverlayEntry(
+      builder: (_) => Stack(
+        children: [
+          Positioned.fill(
+            child: GestureDetector(
+              behavior: HitTestBehavior.translucent,
+              onTap: _closeOverlay,
+            ),
+          ),
+          CompositedTransformFollower(
+            link: _layerLink,
+            targetAnchor: Alignment.topLeft,
+            followerAnchor: Alignment.bottomLeft,
+            child: Container(
+              key: const Key('pagination_page_size_dropdown'),
+              decoration: BoxDecoration(
+                color: const Color(0xFFFFFFFF),
+                border: Border.all(color: const Color(0xFFD1D5DB)),
+                borderRadius: BorderRadius.circular(4),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Color(0x1A000000),
+                    blurRadius: 8,
+                    offset: Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  for (final size in widget.options)
+                    GestureDetector(
+                      key: Key('page_size_option_$size'),
+                      onTap: () {
+                        widget.onChanged(size);
+                        _closeOverlay();
+                      },
+                      behavior: HitTestBehavior.opaque,
+                      child: ColoredBox(
+                        color: size == widget.currentSize
+                            ? const Color(0xFFEFF6FF)
+                            : const Color(0x00000000),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 8,
+                          ),
+                          child: Text('$size'),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+    _overlayEntry = entry;
+    Overlay.of(context).insert(entry);
+  }
+
+  void _closeOverlay() {
+    _overlayEntry?.remove();
+    _overlayEntry?.dispose();
+    _overlayEntry = null;
+  }
+
+  @override
+  void dispose() {
+    _closeOverlay();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return CompositedTransformTarget(
+      link: _layerLink,
+      child: GestureDetector(
+        key: const Key('pagination_page_size'),
+        onTap: _toggle,
+        behavior: HitTestBehavior.opaque,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            border: Border.all(color: const Color(0xFFD1D5DB)),
+            borderRadius: BorderRadius.circular(4),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text('${widget.currentSize}'),
+              const SizedBox(width: 4),
+              const Text('\u25be', style: TextStyle(fontSize: 10)),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
