@@ -3,6 +3,9 @@
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:obers_ui/src/components/display/oi_file_grid_card.dart';
+import 'package:obers_ui/src/components/display/oi_file_tile.dart';
+import 'package:obers_ui/src/components/inputs/oi_text_input.dart';
 import 'package:obers_ui/src/modules/oi_file_manager.dart';
 
 import '../../helpers/pump_app.dart';
@@ -178,5 +181,335 @@ void main() {
       ),
     );
     expect(find.text('2.0 KB'), findsOneWidget);
+  });
+
+  // ── Search filtering (REQ-0990) ─────────────────────────────────────────
+
+  group('Search filtering (REQ-0990)', () {
+    testWidgets('filters items by name case-insensitively in list layout', (
+      tester,
+    ) async {
+      await tester.pumpObers(
+        SizedBox(
+          width: 500,
+          height: 600,
+          child: OiFileManager(
+            items: [
+              _file(key: 'a', name: 'report.pdf'),
+              _file(key: 'b', name: 'notes.txt'),
+              _folder(key: 'c', name: 'Reports'),
+            ],
+            label: 'Files',
+            layout: OiFileManagerLayout.list,
+            searchQuery: 'report',
+          ),
+        ),
+      );
+
+      expect(find.text('report.pdf'), findsOneWidget);
+      expect(find.text('Reports'), findsOneWidget);
+      expect(find.text('notes.txt'), findsNothing);
+    });
+
+    testWidgets('filters items by name case-insensitively in grid layout', (
+      tester,
+    ) async {
+      await tester.pumpObers(
+        SizedBox(
+          width: 500,
+          height: 600,
+          child: OiFileManager(
+            items: [
+              _file(key: 'a', name: 'photo.jpg'),
+              _file(key: 'b', name: 'image.png'),
+              _file(key: 'c', name: 'PHOTO_2.jpg'),
+            ],
+            label: 'Files',
+            layout: OiFileManagerLayout.grid,
+            searchQuery: 'photo',
+          ),
+        ),
+      );
+
+      expect(find.text('photo.jpg'), findsOneWidget);
+      expect(find.text('PHOTO_2.jpg'), findsOneWidget);
+      expect(find.text('image.png'), findsNothing);
+    });
+
+    testWidgets('shows all items when searchQuery is null', (tester) async {
+      await tester.pumpObers(
+        SizedBox(
+          width: 500,
+          height: 600,
+          child: OiFileManager(
+            items: [
+              _file(key: 'a', name: 'one.txt'),
+              _file(key: 'b', name: 'two.txt'),
+            ],
+            label: 'Files',
+            layout: OiFileManagerLayout.list,
+          ),
+        ),
+      );
+
+      expect(find.text('one.txt'), findsOneWidget);
+      expect(find.text('two.txt'), findsOneWidget);
+    });
+
+    testWidgets('shows all items when searchQuery is empty', (tester) async {
+      await tester.pumpObers(
+        SizedBox(
+          width: 500,
+          height: 600,
+          child: OiFileManager(
+            items: [
+              _file(key: 'a', name: 'one.txt'),
+              _file(key: 'b', name: 'two.txt'),
+            ],
+            label: 'Files',
+            layout: OiFileManagerLayout.list,
+            searchQuery: '',
+          ),
+        ),
+      );
+
+      expect(find.text('one.txt'), findsOneWidget);
+      expect(find.text('two.txt'), findsOneWidget);
+    });
+
+    testWidgets('shows empty state when no items match search', (
+      tester,
+    ) async {
+      await tester.pumpObers(
+        SizedBox(
+          width: 500,
+          height: 600,
+          child: OiFileManager(
+            items: [
+              _file(key: 'a', name: 'report.pdf'),
+            ],
+            label: 'Files',
+            layout: OiFileManagerLayout.list,
+            searchQuery: 'xyz',
+          ),
+        ),
+      );
+
+      expect(find.text('report.pdf'), findsNothing);
+      expect(find.text('This folder is empty'), findsOneWidget);
+    });
+  });
+
+  // ── Uses OiFileTile and OiFileGridCard ──────────────────────────────────
+
+  group('Uses new tile components', () {
+    testWidgets('list layout renders OiFileTile widgets', (tester) async {
+      await tester.pumpObers(
+        SizedBox(
+          width: 500,
+          height: 600,
+          child: OiFileManager(
+            items: [_file(name: 'data.csv')],
+            label: 'Files',
+            layout: OiFileManagerLayout.list,
+          ),
+        ),
+      );
+
+      expect(find.byType(OiFileTile), findsOneWidget);
+    });
+
+    testWidgets('grid layout renders OiFileGridCard widgets', (tester) async {
+      await tester.pumpObers(
+        SizedBox(
+          width: 500,
+          height: 600,
+          child: OiFileManager(
+            items: [_file(name: 'data.csv')],
+            label: 'Files',
+            layout: OiFileManagerLayout.grid,
+          ),
+        ),
+      );
+
+      expect(find.byType(OiFileGridCard), findsOneWidget);
+    });
+
+    testWidgets('searchQuery is passed to OiFileTile for highlighting', (
+      tester,
+    ) async {
+      await tester.pumpObers(
+        SizedBox(
+          width: 500,
+          height: 600,
+          child: OiFileManager(
+            items: [_file(name: 'report.pdf')],
+            label: 'Files',
+            layout: OiFileManagerLayout.list,
+            searchQuery: 'port',
+          ),
+        ),
+      );
+
+      final tile = tester.widget<OiFileTile>(find.byType(OiFileTile));
+      expect(tile.searchQuery, 'port');
+    });
+
+    testWidgets('searchQuery is passed to OiFileGridCard for highlighting', (
+      tester,
+    ) async {
+      await tester.pumpObers(
+        SizedBox(
+          width: 500,
+          height: 600,
+          child: OiFileManager(
+            items: [_file(name: 'report.pdf')],
+            label: 'Files',
+            layout: OiFileManagerLayout.grid,
+            searchQuery: 'port',
+          ),
+        ),
+      );
+
+      final card = tester.widget<OiFileGridCard>(
+        find.byType(OiFileGridCard),
+      );
+      expect(card.searchQuery, 'port');
+    });
+  });
+
+  // ── Search input & debounce (REQ-0989) ──────────────────────────────────
+
+  group('Search input and debounce (REQ-0989)', () {
+    testWidgets('renders search input when onSearch is provided', (
+      tester,
+    ) async {
+      await tester.pumpObers(
+        SizedBox(
+          width: 500,
+          height: 600,
+          child: OiFileManager(
+            items: [_file()],
+            label: 'Files',
+            onSearch: (_) {},
+          ),
+        ),
+      );
+
+      expect(find.byType(OiTextInput), findsOneWidget);
+    });
+
+    testWidgets('does not render search input when onSearch is null', (
+      tester,
+    ) async {
+      await tester.pumpObers(
+        SizedBox(
+          width: 500,
+          height: 600,
+          child: OiFileManager(
+            items: [_file()],
+            label: 'Files',
+          ),
+        ),
+      );
+
+      expect(find.byType(OiTextInput), findsNothing);
+    });
+
+    testWidgets('debounces non-empty keystrokes for 300ms', (tester) async {
+      final calls = <String>[];
+
+      await tester.pumpObers(
+        SizedBox(
+          width: 500,
+          height: 600,
+          child: OiFileManager(
+            items: [_file()],
+            label: 'Files',
+            onSearch: calls.add,
+          ),
+        ),
+      );
+
+      // Type rapidly — each character within the debounce window.
+      await tester.enterText(find.byType(OiTextInput), 'a');
+      await tester.pump(const Duration(milliseconds: 100));
+      await tester.enterText(find.byType(OiTextInput), 'ab');
+      await tester.pump(const Duration(milliseconds: 100));
+      await tester.enterText(find.byType(OiTextInput), 'abc');
+      await tester.pump(const Duration(milliseconds: 100));
+
+      // Still within the 300 ms window — callback should not have fired for
+      // non-empty queries.
+      expect(calls.where((q) => q.isNotEmpty), isEmpty);
+
+      // Wait for debounce to elapse.
+      await tester.pump(const Duration(milliseconds: 300));
+
+      expect(calls.where((q) => q.isNotEmpty).toList(), ['abc']);
+    });
+
+    testWidgets('fires immediately when query is cleared', (tester) async {
+      final calls = <String>[];
+
+      await tester.pumpObers(
+        SizedBox(
+          width: 500,
+          height: 600,
+          child: OiFileManager(
+            items: [_file()],
+            label: 'Files',
+            onSearch: calls.add,
+          ),
+        ),
+      );
+
+      // Type then clear.
+      await tester.enterText(find.byType(OiTextInput), 'abc');
+      await tester.pump(const Duration(milliseconds: 300));
+      calls.clear();
+
+      await tester.enterText(find.byType(OiTextInput), '');
+      await tester.pump();
+
+      // Empty query fires immediately, no debounce wait needed.
+      expect(calls, ['']);
+    });
+
+    testWidgets(
+      'rapid keystrokes trigger only one callback after debounce',
+      (tester) async {
+        final calls = <String>[];
+
+        await tester.pumpObers(
+          SizedBox(
+            width: 500,
+            height: 600,
+            child: OiFileManager(
+              items: [_file()],
+              label: 'Files',
+              onSearch: calls.add,
+            ),
+          ),
+        );
+
+        // Simulate rapid typing.
+        await tester.enterText(find.byType(OiTextInput), 'r');
+        await tester.pump(const Duration(milliseconds: 50));
+        await tester.enterText(find.byType(OiTextInput), 're');
+        await tester.pump(const Duration(milliseconds: 50));
+        await tester.enterText(find.byType(OiTextInput), 'rep');
+        await tester.pump(const Duration(milliseconds: 50));
+        await tester.enterText(find.byType(OiTextInput), 'repo');
+        await tester.pump(const Duration(milliseconds: 50));
+        await tester.enterText(find.byType(OiTextInput), 'repor');
+        await tester.pump(const Duration(milliseconds: 50));
+        await tester.enterText(find.byType(OiTextInput), 'report');
+        await tester.pump(const Duration(milliseconds: 300));
+
+        // Only the final value should have been emitted.
+        expect(calls.where((q) => q.isNotEmpty).toList(), ['report']);
+      },
+    );
   });
 }

@@ -1,4 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/src/components/display/oi_file_grid_card.dart';
+import 'package:obers_ui/src/components/display/oi_file_tile.dart';
+import 'package:obers_ui/src/components/inputs/oi_text_input.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/modules/oi_chat.dart';
 
@@ -81,6 +86,8 @@ class OiFileManager extends StatefulWidget {
     this.selectionMode = OiFileManagerSelectionMode.multi,
     this.currentPath,
     this.onNavigate,
+    this.searchQuery,
+    this.onSearch,
   });
 
   /// The list of files and folders to display.
@@ -116,12 +123,62 @@ class OiFileManager extends StatefulWidget {
   /// Called when the user navigates to a different path.
   final ValueChanged<List<String>>? onNavigate;
 
+  /// Active search query. When non-null and non-empty, the item list is
+  /// filtered to files whose name contains the query (case-insensitive) and
+  /// the matching portion is highlighted in each tile.
+  final String? searchQuery;
+
+  /// Called when the user types in the search field. Non-empty values are
+  /// debounced by 300 ms; an empty value fires immediately so the parent can
+  /// clear the filter without delay. When non-null a search input is rendered.
+  final ValueChanged<String>? onSearch;
+
   @override
   State<OiFileManager> createState() => _OiFileManagerState();
 }
 
 class _OiFileManagerState extends State<OiFileManager> {
   final Set<Object> _selected = {};
+  TextEditingController? _searchController;
+  Timer? _debounceTimer;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.onSearch != null) {
+      _searchController = TextEditingController(text: widget.searchQuery ?? '');
+    }
+  }
+
+  @override
+  void didUpdateWidget(OiFileManager oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.onSearch != null && _searchController == null) {
+      _searchController = TextEditingController(text: widget.searchQuery ?? '');
+    } else if (widget.onSearch == null && _searchController != null) {
+      _debounceTimer?.cancel();
+      _searchController!.dispose();
+      _searchController = null;
+    }
+  }
+
+  @override
+  void dispose() {
+    _debounceTimer?.cancel();
+    _searchController?.dispose();
+    super.dispose();
+  }
+
+  void _onSearchChanged(String query) {
+    _debounceTimer?.cancel();
+    if (query.isEmpty) {
+      widget.onSearch?.call(query);
+      return;
+    }
+    _debounceTimer = Timer(const Duration(milliseconds: 300), () {
+      widget.onSearch?.call(query);
+    });
+  }
 
   void _handleTap(OiFileNode node) {
     if (widget.selectionMode == OiFileManagerSelectionMode.none) return;
@@ -143,20 +200,24 @@ class _OiFileManagerState extends State<OiFileManager> {
     widget.onOpen?.call(node);
   }
 
-  String _formatSize(int bytes) {
-    if (bytes < 1024) return '$bytes B';
-    if (bytes < 1024 * 1024) return '${(bytes / 1024).toStringAsFixed(1)} KB';
-    return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
-  }
-
   // ---------------------------------------------------------------------------
   // Build
   // ---------------------------------------------------------------------------
+
+  List<OiFileNode> get _filteredItems {
+    final query = widget.searchQuery;
+    if (query == null || query.isEmpty) return widget.items;
+    final lowerQuery = query.toLowerCase();
+    return widget.items
+        .where((item) => item.name.toLowerCase().contains(lowerQuery))
+        .toList();
+  }
 
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
     final spacing = context.spacing;
+    final items = _filteredItems;
 
     return Semantics(
       container: true,
@@ -165,13 +226,26 @@ class _OiFileManagerState extends State<OiFileManager> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          // Search input
+          if (widget.onSearch != null)
+            Padding(
+              padding: EdgeInsets.symmetric(
+                horizontal: spacing.md,
+                vertical: spacing.sm,
+              ),
+              child: OiTextInput.search(
+                controller: _searchController,
+                onChanged: _onSearchChanged,
+              ),
+            ),
+
           // Breadcrumb navigation
           if (widget.currentPath != null && widget.currentPath!.isNotEmpty)
             _buildBreadcrumbs(context),
 
           // Content area
           Expanded(
-            child: widget.items.isEmpty
+            child: items.isEmpty
                 ? Center(
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
@@ -190,8 +264,8 @@ class _OiFileManagerState extends State<OiFileManager> {
                     ),
                   )
                 : widget.layout == OiFileManagerLayout.grid
-                ? _buildGrid(context)
-                : _buildList(context),
+                ? _buildGrid(context, items)
+                : _buildList(context, items),
           ),
         ],
       ),
@@ -246,7 +320,7 @@ class _OiFileManagerState extends State<OiFileManager> {
     );
   }
 
-  Widget _buildGrid(BuildContext context) {
+  Widget _buildGrid(BuildContext context, List<OiFileNode> items) {
     final spacing = context.spacing;
 
     return GridView.builder(
@@ -257,108 +331,34 @@ class _OiFileManagerState extends State<OiFileManager> {
         crossAxisSpacing: spacing.sm,
         childAspectRatio: 0.85,
       ),
-      itemCount: widget.items.length,
-      itemBuilder: (context, index) =>
-          _buildGridTile(context, widget.items[index]),
+      itemCount: items.length,
+      itemBuilder: (context, index) {
+        final node = items[index];
+        return OiFileGridCard(
+          file: node,
+          selected: _selected.contains(node.key),
+          onTap: () => _handleTap(node),
+          onDoubleTap: () => _handleDoubleTap(node),
+          searchQuery: widget.searchQuery,
+        );
+      },
     );
   }
 
-  Widget _buildGridTile(BuildContext context, OiFileNode node) {
-    final colors = context.colors;
-    final spacing = context.spacing;
-    final isSelected = _selected.contains(node.key);
-
-    return GestureDetector(
-      onTap: () => _handleTap(node),
-      onDoubleTap: () => _handleDoubleTap(node),
-      child: Container(
-        padding: EdgeInsets.all(spacing.sm),
-        decoration: BoxDecoration(
-          color: isSelected
-              ? colors.primary.muted.withValues(alpha: 0.15)
-              : null,
-          borderRadius: BorderRadius.circular(8),
-          border: isSelected ? Border.all(color: colors.primary.base) : null,
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              node.folder
-                  ? const IconData(0xe2c7, fontFamily: 'MaterialIcons')
-                  : const IconData(0xe24d, fontFamily: 'MaterialIcons'),
-              size: 40,
-              color: node.folder ? colors.warning.base : colors.textSubtle,
-            ),
-            SizedBox(height: spacing.xs),
-            Text(
-              node.name,
-              style: TextStyle(color: colors.text, fontSize: 12),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildList(BuildContext context) {
+  Widget _buildList(BuildContext context, List<OiFileNode> items) {
     return ListView.builder(
       padding: EdgeInsets.zero,
-      itemCount: widget.items.length,
-      itemBuilder: (context, index) =>
-          _buildListRow(context, widget.items[index]),
-    );
-  }
-
-  Widget _buildListRow(BuildContext context, OiFileNode node) {
-    final colors = context.colors;
-    final spacing = context.spacing;
-    final isSelected = _selected.contains(node.key);
-
-    return GestureDetector(
-      onTap: () => _handleTap(node),
-      onDoubleTap: () => _handleDoubleTap(node),
-      behavior: HitTestBehavior.opaque,
-      child: Container(
-        padding: EdgeInsets.symmetric(
-          horizontal: spacing.md,
-          vertical: spacing.sm,
-        ),
-        decoration: BoxDecoration(
-          color: isSelected
-              ? colors.primary.muted.withValues(alpha: 0.15)
-              : null,
-          border: Border(bottom: BorderSide(color: colors.borderSubtle)),
-        ),
-        child: Row(
-          children: [
-            Icon(
-              node.folder
-                  ? const IconData(0xe2c7, fontFamily: 'MaterialIcons')
-                  : const IconData(0xe24d, fontFamily: 'MaterialIcons'),
-              size: 24,
-              color: node.folder ? colors.warning.base : colors.textSubtle,
-            ),
-            SizedBox(width: spacing.sm),
-            Expanded(
-              child: Text(
-                node.name,
-                style: TextStyle(color: colors.text, fontSize: 14),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-            if (node.size != null)
-              Text(
-                _formatSize(node.size!),
-                style: TextStyle(color: colors.textMuted, fontSize: 12),
-              ),
-          ],
-        ),
-      ),
+      itemCount: items.length,
+      itemBuilder: (context, index) {
+        final node = items[index];
+        return OiFileTile(
+          file: node,
+          selected: _selected.contains(node.key),
+          onTap: () => _handleTap(node),
+          onDoubleTap: () => _handleDoubleTap(node),
+          searchQuery: widget.searchQuery,
+        );
+      },
     );
   }
 }
