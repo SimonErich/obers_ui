@@ -13,8 +13,12 @@ import 'package:obers_ui/src/components/overlays/oi_dialog.dart';
 /// - **Enter** — calls [onCreate] with the current value (when valid).
 /// - **Escape** — calls [onCancel].
 ///
-/// An optional [validate] function controls whether the create action is
-/// enabled and displays an inline error message when the input is invalid.
+/// **Built-in validation:**
+/// - The name must not be empty.
+/// - The name must not contain any of the characters `/ \ < > : " | ? *`.
+///
+/// An optional [validate] function adds custom checks on top of the built-in
+/// rules and displays an inline error message when the input is invalid.
 ///
 /// ```dart
 /// OiNameDialog(
@@ -73,6 +77,9 @@ class OiNameDialog extends StatefulWidget {
 }
 
 class _OiNameDialogState extends State<OiNameDialog> {
+  static final _illegalCharsPattern = RegExp(r'[/\\<>:"|?*]');
+  static const _illegalCharsError = r'Name cannot contain: / \ < > : " | ? *';
+
   late final TextEditingController _controller;
   late final FocusNode _focusNode;
   String? _error;
@@ -104,15 +111,24 @@ class _OiNameDialogState extends State<OiNameDialog> {
 
   // ── Validation ──────────────────────────────────────────────────────────────
 
+  String? _builtInError(String value) {
+    if (_illegalCharsPattern.hasMatch(value)) return _illegalCharsError;
+    return null;
+  }
+
   void _handleChanged(String value) {
-    if (widget.validate != null) {
-      setState(() => _error = widget.validate!(value));
+    final builtIn = _builtInError(value);
+    if (builtIn != null) {
+      setState(() => _error = builtIn);
+      return;
     }
+    setState(() => _error = widget.validate?.call(value));
   }
 
   bool get _isValid {
     final text = _controller.text;
     if (text.isEmpty) return false;
+    if (_builtInError(text) != null) return false;
     if (widget.validate != null) return widget.validate!(text) == null;
     return true;
   }
@@ -143,10 +159,7 @@ class _OiNameDialogState extends State<OiNameDialog> {
         onSubmitted: (_) => _handleCreate(),
       ),
       actions: [
-        OiButton.ghost(
-          label: widget.cancelLabel,
-          onTap: widget.onCancel,
-        ),
+        OiButton.ghost(label: widget.cancelLabel, onTap: widget.onCancel),
         OiButton.primary(
           label: widget.createLabel,
           onTap: _isValid ? _handleCreate : null,

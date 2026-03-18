@@ -36,11 +36,7 @@ void main() {
 
     testWidgets('auto-focuses the input on open', (tester) async {
       await tester.pumpObers(
-        OiNameDialog(
-          title: 'New item',
-          defaultName: 'Item',
-          onCreate: (_) {},
-        ),
+        OiNameDialog(title: 'New item', defaultName: 'Item', onCreate: (_) {}),
       );
       await tester.pumpAndSettle();
 
@@ -88,10 +84,7 @@ void main() {
     ) async {
       String? createdName;
       await tester.pumpObers(
-        OiNameDialog(
-          title: 'Create',
-          onCreate: (name) => createdName = name,
-        ),
+        OiNameDialog(title: 'Create', onCreate: (name) => createdName = name),
       );
       await tester.pumpAndSettle();
 
@@ -211,10 +204,7 @@ void main() {
     ) async {
       String? createdName;
       await tester.pumpObers(
-        OiNameDialog(
-          title: 'New item',
-          onCreate: (name) => createdName = name,
-        ),
+        OiNameDialog(title: 'New item', onCreate: (name) => createdName = name),
       );
       await tester.pumpAndSettle();
 
@@ -224,26 +214,25 @@ void main() {
       expect(createdName, isNull);
     });
 
-    testWidgets(
-      'Create button does not fire onCreate when validation fails',
-      (tester) async {
-        String? createdName;
-        await tester.pumpObers(
-          OiNameDialog(
-            title: 'New item',
-            defaultName: 'bad',
-            onCreate: (name) => createdName = name,
-            validate: (v) => v == 'bad' ? 'Name is reserved' : null,
-          ),
-        );
-        await tester.pumpAndSettle();
+    testWidgets('Create button does not fire onCreate when validation fails', (
+      tester,
+    ) async {
+      String? createdName;
+      await tester.pumpObers(
+        OiNameDialog(
+          title: 'New item',
+          defaultName: 'bad',
+          onCreate: (name) => createdName = name,
+          validate: (v) => v == 'bad' ? 'Name is reserved' : null,
+        ),
+      );
+      await tester.pumpAndSettle();
 
-        await tester.tap(find.text('Create'), warnIfMissed: false);
-        await tester.pumpAndSettle();
+      await tester.tap(find.text('Create'), warnIfMissed: false);
+      await tester.pumpAndSettle();
 
-        expect(createdName, isNull);
-      },
-    );
+      expect(createdName, isNull);
+    });
 
     testWidgets('Create button re-enables after fixing validation error', (
       tester,
@@ -268,6 +257,134 @@ void main() {
 
       expect(createdName, 'good');
     });
+
+    // ── REQ-0913 ──────────────────────────────────────────────────────────
+
+    testWidgets('rejects name containing illegal characters', (tester) async {
+      await tester.pumpObers(
+        OiNameDialog(title: 'Create', defaultName: 'good', onCreate: (_) {}),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.enterText(find.byType(EditableText), 'my/file');
+      await tester.pumpAndSettle();
+
+      expect(
+        find.text(r'Name cannot contain: / \ < > : " | ? *'),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets(
+      'Create button is disabled when name contains illegal characters',
+      (tester) async {
+        String? createdName;
+        await tester.pumpObers(
+          OiNameDialog(
+            title: 'New item',
+            defaultName: 'good',
+            onCreate: (name) => createdName = name,
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        await tester.enterText(find.byType(EditableText), 'file<name>');
+        await tester.pumpAndSettle();
+
+        await tester.tap(find.text('Create'), warnIfMissed: false);
+        await tester.pumpAndSettle();
+
+        expect(createdName, isNull);
+      },
+    );
+
+    testWidgets(
+      'Enter key does not fire onCreate when name contains illegal characters',
+      (tester) async {
+        String? createdName;
+        await tester.pumpObers(
+          OiNameDialog(
+            title: 'Create',
+            defaultName: 'good',
+            onCreate: (name) => createdName = name,
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        await tester.enterText(find.byType(EditableText), 'file:name');
+        await tester.pumpAndSettle();
+
+        await tester.testTextInput.receiveAction(TextInputAction.done);
+        await tester.pumpAndSettle();
+
+        expect(createdName, isNull);
+      },
+    );
+
+    testWidgets('Create button re-enables after removing illegal characters', (
+      tester,
+    ) async {
+      String? createdName;
+      await tester.pumpObers(
+        OiNameDialog(
+          title: 'New item',
+          defaultName: 'good',
+          onCreate: (name) => createdName = name,
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.enterText(find.byType(EditableText), 'my|file');
+      await tester.pumpAndSettle();
+
+      // Fix the name.
+      await tester.enterText(find.byType(EditableText), 'myfile');
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Create'));
+      await tester.pumpAndSettle();
+
+      expect(createdName, 'myfile');
+    });
+
+    testWidgets('built-in check runs before custom validate', (tester) async {
+      await tester.pumpObers(
+        OiNameDialog(
+          title: 'Create',
+          defaultName: 'good',
+          onCreate: (_) {},
+          validate: (_) => 'Custom error',
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.enterText(find.byType(EditableText), 'bad/name');
+      await tester.pumpAndSettle();
+
+      // Built-in error should be shown, not the custom one.
+      expect(
+        find.text(r'Name cannot contain: / \ < > : " | ? *'),
+        findsOneWidget,
+      );
+      expect(find.text('Custom error'), findsNothing);
+    });
+
+    for (final ch in [r'/', r'\', '<', '>', ':', '"', '|', '?', '*']) {
+      testWidgets('rejects illegal character: $ch', (tester) async {
+        await tester.pumpObers(
+          OiNameDialog(title: 'Create', defaultName: 'good', onCreate: (_) {}),
+        );
+        await tester.pumpAndSettle();
+
+        await tester.enterText(find.byType(EditableText), 'name${ch}here');
+        await tester.pumpAndSettle();
+
+        expect(
+          find.text(r'Name cannot contain: / \ < > : " | ? *'),
+          findsOneWidget,
+        );
+      });
+    }
 
     // ── General behaviour ─────────────────────────────────────────────────
 
