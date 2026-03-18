@@ -111,11 +111,16 @@ class OiMorph extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final animConfig = OiTheme.maybeOf(context)?.animations;
     final reduced =
-        context.animations.reducedMotion ||
+        (animConfig?.reducedMotion ?? false) ||
         MediaQuery.disableAnimationsOf(context);
     final dur =
-        reduced ? Duration.zero : (duration ?? context.animations.normal);
+        reduced
+            ? Duration.zero
+            : (duration ??
+                animConfig?.normal ??
+                const Duration(milliseconds: 250));
     return AnimatedSwitcher(
       duration: dur,
       transitionBuilder: (child, animation) =>

@@ -361,6 +361,34 @@ void main() {
       expect(widgetsApp.supportedLocales, equals(locales));
     });
 
+    // ── REQ-0024: MediaQuery.disableAnimationsOf → OiAnimationConfig ─────
+
+    // TC-18
+    testWidgets(
+      'MediaQuery.disableAnimationsOf flows to OiAnimationConfig.reducedMotion',
+      (tester) async {
+        tester.platformDispatcher.accessibilityFeaturesTestValue =
+            const FakeAccessibilityFeatures(disableAnimations: true);
+        addTearDown(
+          tester.platformDispatcher.clearAccessibilityFeaturesTestValue,
+        );
+
+        late OiThemeData? captured;
+        await tester.pumpWidget(
+          OiApp(
+            home: Builder(
+              builder: (ctx) {
+                captured = OiTheme.maybeOf(ctx);
+                return const SizedBox();
+              },
+            ),
+          ),
+        );
+
+        expect(captured?.animations.reducedMotion, isTrue);
+      },
+    );
+
     // ── Existing density test (kept) ───────────────────────────────────────
 
     testWidgets('OiDensityScope is provided', (tester) async {

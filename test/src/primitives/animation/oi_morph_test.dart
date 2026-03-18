@@ -135,6 +135,39 @@ void main() {
 
   // ── 7. reducedMotion: child switch completes instantly ────────────────────
 
+  testWidgets(
+    'reducedMotion outside OiApp: MediaQuery.disableAnimationsOf disables animation',
+    (tester) async {
+      final notifier = ValueNotifier<bool>(false);
+
+      await tester.pumpWidget(
+        Directionality(
+          textDirection: TextDirection.ltr,
+          child: MediaQuery(
+            data: const MediaQueryData(disableAnimations: true),
+            child: ValueListenableBuilder<bool>(
+              valueListenable: notifier,
+              builder: (_, flag, __) => OiMorph(
+                child: flag
+                    ? const Text('B', key: ValueKey('b'))
+                    : const Text('A', key: ValueKey('a')),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pump();
+      expect(find.text('A'), findsOneWidget);
+
+      notifier.value = true;
+      await tester.pump(); // trigger switch
+
+      // With disableAnimations=true and no OiApp, switch completes instantly.
+      expect(find.text('B'), findsOneWidget);
+      expect(find.text('A'), findsNothing);
+    },
+  );
+
   testWidgets('reducedMotion: child switch completes instantly without animation', (
     tester,
   ) async {
