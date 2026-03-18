@@ -22,6 +22,7 @@ void main() {
       expect(s.groupByColumnId, isNull);
       expect(s.frozenColumns, 0);
       expect(s.showStatusBar, isTrue);
+      expect(s.expandedGroups, isEmpty);
     });
 
     // ── toJson / fromJson round-trip ────────────────────────────────────────
@@ -40,6 +41,7 @@ void main() {
         groupByColumnId: 'c',
         frozenColumns: 2,
         showStatusBar: false,
+        expandedGroups: {'G1', 'G2'},
       );
       final json = original.toJson();
       final restored = OiTableSettings.fromJson(json);
@@ -75,11 +77,13 @@ void main() {
         'columnWidths': null,
         'activeFilters': null,
         'columnOrder': null,
+        'expandedGroups': null,
       });
       expect(s.columnVisibility, isEmpty);
       expect(s.columnWidths, isEmpty);
       expect(s.activeFilters, isEmpty);
       expect(s.columnOrder, isEmpty);
+      expect(s.expandedGroups, isEmpty);
     });
 
     test('schemaVersion is preserved across round-trip', () {
@@ -139,6 +143,20 @@ void main() {
       expect(merged.columnWidths, {'col': 120.0});
     });
 
+    test('mergeWith: empty expandedGroups filled from defaults', () {
+      const saved = OiTableSettings();
+      const defaults = OiTableSettings(expandedGroups: {'G1', 'G2'});
+      final merged = saved.mergeWith(defaults);
+      expect(merged.expandedGroups, {'G1', 'G2'});
+    });
+
+    test('mergeWith: non-empty expandedGroups preserved', () {
+      const saved = OiTableSettings(expandedGroups: {'X'});
+      const defaults = OiTableSettings(expandedGroups: {'G1', 'G2'});
+      final merged = saved.mergeWith(defaults);
+      expect(merged.expandedGroups, {'X'});
+    });
+
     test('mergeWith: schemaVersion comes from saved, not defaults', () {
       const saved = OiTableSettings(schemaVersion: 2);
       const defaults = OiTableSettings();
@@ -176,6 +194,18 @@ void main() {
       const s = OiTableSettings(sortColumnId: 'name');
       final updated = s.copyWith(pageSize: 10);
       expect(updated.sortColumnId, 'name');
+    });
+
+    test('copyWith updates expandedGroups', () {
+      const s = OiTableSettings(expandedGroups: {'A'});
+      final updated = s.copyWith(expandedGroups: {'B', 'C'});
+      expect(updated.expandedGroups, {'B', 'C'});
+    });
+
+    test('copyWith preserves expandedGroups when not specified', () {
+      const s = OiTableSettings(expandedGroups: {'A'});
+      final updated = s.copyWith(pageSize: 10);
+      expect(updated.expandedGroups, {'A'});
     });
 
     test('copyWith updates multiple fields at once', () {

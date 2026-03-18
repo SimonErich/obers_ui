@@ -23,6 +23,7 @@ class OiTableSettings with OiSettingsData {
     this.groupByColumnId,
     this.frozenColumns = 0,
     this.showStatusBar = true,
+    this.expandedGroups = const {},
   });
 
   /// Deserializes an [OiTableSettings] from a JSON map.
@@ -40,6 +41,7 @@ class OiTableSettings with OiSettingsData {
       groupByColumnId: json['groupByColumnId'] as String?,
       frozenColumns: (json['frozenColumns'] as int?) ?? 0,
       showStatusBar: (json['showStatusBar'] as bool?) ?? true,
+      expandedGroups: _parseStringSet(json['expandedGroups']),
     );
   }
 
@@ -80,6 +82,9 @@ class OiTableSettings with OiSettingsData {
   /// Whether to show the status bar at the bottom of the table.
   final bool showStatusBar;
 
+  /// The set of currently expanded group keys.
+  final Set<String> expandedGroups;
+
   /// Serializes this settings object to a JSON-encodable map.
   @override
   Map<String, dynamic> toJson() => {
@@ -95,6 +100,7 @@ class OiTableSettings with OiSettingsData {
     'groupByColumnId': groupByColumnId,
     'frozenColumns': frozenColumns,
     'showStatusBar': showStatusBar,
+    'expandedGroups': expandedGroups.toList(),
   };
 
   /// Returns new settings, filling in fields from [defaults] where this
@@ -120,6 +126,8 @@ class OiTableSettings with OiSettingsData {
       groupByColumnId: groupByColumnId ?? defaults.groupByColumnId,
       frozenColumns: frozenColumns,
       showStatusBar: showStatusBar,
+      expandedGroups:
+          expandedGroups.isEmpty ? defaults.expandedGroups : expandedGroups,
     );
   }
 
@@ -137,6 +145,7 @@ class OiTableSettings with OiSettingsData {
     Object? groupByColumnId = _sentinel,
     int? frozenColumns,
     bool? showStatusBar,
+    Set<String>? expandedGroups,
   }) {
     return OiTableSettings(
       schemaVersion: schemaVersion ?? this.schemaVersion,
@@ -155,6 +164,7 @@ class OiTableSettings with OiSettingsData {
           : groupByColumnId as String?,
       frozenColumns: frozenColumns ?? this.frozenColumns,
       showStatusBar: showStatusBar ?? this.showStatusBar,
+      expandedGroups: expandedGroups ?? this.expandedGroups,
     );
   }
 
@@ -173,7 +183,8 @@ class OiTableSettings with OiSettingsData {
         pageIndex == other.pageIndex &&
         groupByColumnId == other.groupByColumnId &&
         frozenColumns == other.frozenColumns &&
-        showStatusBar == other.showStatusBar;
+        showStatusBar == other.showStatusBar &&
+        _setEquals(expandedGroups, other.expandedGroups);
   }
 
   @override
@@ -196,6 +207,7 @@ class OiTableSettings with OiSettingsData {
     groupByColumnId,
     frozenColumns,
     showStatusBar,
+    Object.hashAll(expandedGroups),
   );
 
   // ── Private helpers ────────────────────────────────────────────────────────
@@ -258,6 +270,19 @@ class OiTableSettings with OiSettingsData {
       if (!b.containsKey(key) || b[key] != a[key]) return false;
     }
     return true;
+  }
+
+  static bool _setEquals<T>(Set<T> a, Set<T> b) {
+    if (a.length != b.length) return false;
+    return a.containsAll(b);
+  }
+
+  static Set<String> _parseStringSet(dynamic value) {
+    if (value == null) return const {};
+    if (value is List) {
+      return Set<String>.from(value.whereType<String>());
+    }
+    return const {};
   }
 }
 

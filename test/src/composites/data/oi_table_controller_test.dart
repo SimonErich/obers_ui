@@ -21,6 +21,8 @@ void main() {
       expect(ctrl.columnOrder, isEmpty);
       expect(ctrl.groupByColumnId, isNull);
       expect(ctrl.expandedGroups, isEmpty);
+      expect(ctrl.frozenColumns, 0);
+      expect(ctrl.showStatusBar, isTrue);
     });
 
     test('pageSize and totalRows are forwarded to pagination', () {
@@ -319,6 +321,56 @@ void main() {
       expect(count, 1);
     });
 
+    // ── Frozen columns ──────────────────────────────────────────────────────
+
+    test('setFrozenColumns stores the count', () {
+      final ctrl = OiTableController()..setFrozenColumns(3);
+      expect(ctrl.frozenColumns, 3);
+    });
+
+    test('setFrozenColumns notifies listeners', () {
+      final ctrl = OiTableController();
+      var count = 0;
+      ctrl
+        ..addListener(() => count++)
+        ..setFrozenColumns(2);
+      expect(count, 1);
+    });
+
+    test('setFrozenColumns does not notify when value unchanged', () {
+      final ctrl = OiTableController()..setFrozenColumns(1);
+      var count = 0;
+      ctrl
+        ..addListener(() => count++)
+        ..setFrozenColumns(1);
+      expect(count, 0);
+    });
+
+    // ── Status bar ────────────────────────────────────────────────────────
+
+    test('setShowStatusBar stores the flag', () {
+      final ctrl = OiTableController()..setShowStatusBar(visible: false);
+      expect(ctrl.showStatusBar, isFalse);
+    });
+
+    test('setShowStatusBar notifies listeners', () {
+      final ctrl = OiTableController();
+      var count = 0;
+      ctrl
+        ..addListener(() => count++)
+        ..setShowStatusBar(visible: false);
+      expect(count, 1);
+    });
+
+    test('setShowStatusBar does not notify when value unchanged', () {
+      final ctrl = OiTableController();
+      var count = 0;
+      ctrl
+        ..addListener(() => count++)
+        ..setShowStatusBar(visible: true); // default is true
+      expect(count, 0);
+    });
+
     // ── toSettings / applySettings round-trip ─────────────────────────────────
 
     test('toSettings captures current controller state', () {
@@ -329,6 +381,10 @@ void main() {
         ..sortBy('a', ascending: false)
         ..setFilter('b', 'foo')
         ..groupBy('a')
+        ..toggleGroup('G1')
+        ..toggleGroup('G2')
+        ..setFrozenColumns(2)
+        ..setShowStatusBar(visible: false)
         ..pagination.goToPage(2);
       final settings = ctrl.toSettings();
       expect(settings.columnOrder, ['a', 'b']);
@@ -340,6 +396,9 @@ void main() {
       expect(settings.groupByColumnId, 'a');
       expect(settings.pageSize, 10);
       expect(settings.pageIndex, 2);
+      expect(settings.frozenColumns, 2);
+      expect(settings.showStatusBar, isFalse);
+      expect(settings.expandedGroups, {'G1', 'G2'});
     });
 
     test('applySettings restores controller state', () {
@@ -353,6 +412,9 @@ void main() {
         pageSize: 20,
         pageIndex: 1,
         groupByColumnId: 'y',
+        frozenColumns: 3,
+        showStatusBar: false,
+        expandedGroups: {'G1', 'G2'},
       );
       final ctrl = OiTableController(totalRows: 100)..applySettings(settings);
       expect(ctrl.columnOrder, ['x', 'y']);
@@ -364,13 +426,21 @@ void main() {
       expect(ctrl.groupByColumnId, 'y');
       expect(ctrl.pagination.pageSize, 20);
       expect(ctrl.pagination.currentPage, 1);
+      expect(ctrl.frozenColumns, 3);
+      expect(ctrl.showStatusBar, isFalse);
+      expect(ctrl.expandedGroups, {'G1', 'G2'});
     });
 
     test('toSettings / applySettings round-trip is lossless', () {
       final original = OiTableController(pageSize: 5, totalRows: 50)
         ..columnOrder.addAll(['id', 'name'])
         ..sortBy('name')
-        ..setFilter('id', '42');
+        ..setFilter('id', '42')
+        ..setFrozenColumns(1)
+        ..setShowStatusBar(visible: false)
+        ..groupBy('name')
+        ..toggleGroup('A')
+        ..toggleGroup('B');
       final settings = original.toSettings();
 
       final restored = OiTableController(totalRows: 50)

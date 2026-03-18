@@ -62,6 +62,16 @@ class OiTableController extends ChangeNotifier {
   /// The set of currently expanded group keys.
   final Set<String> expandedGroups = {};
 
+  // ── Frozen columns ──────────────────────────────────────────────────────
+
+  /// Number of columns frozen to the left side of the table.
+  int frozenColumns = 0;
+
+  // ── Status bar ──────────────────────────────────────────────────────────
+
+  /// Whether to show the status bar at the bottom of the table.
+  bool showStatusBar = true;
+
   // ── Pagination ────────────────────────────────────────────────────────────
 
   /// The pagination controller used by this table.
@@ -213,6 +223,24 @@ class OiTableController extends ChangeNotifier {
     notifyListeners();
   }
 
+  // ── Frozen columns API ──────────────────────────────────────────────────
+
+  /// Sets the number of columns frozen to the left side of the table.
+  void setFrozenColumns(int count) {
+    if (frozenColumns == count) return;
+    frozenColumns = count;
+    notifyListeners();
+  }
+
+  // ── Status bar API ─────────────────────────────────────────────────────
+
+  /// Shows or hides the status bar at the bottom of the table.
+  void setShowStatusBar({required bool visible}) {
+    if (showStatusBar == visible) return;
+    showStatusBar = visible;
+    notifyListeners();
+  }
+
   // ── Settings persistence ──────────────────────────────────────────────────
 
   /// Returns a snapshot of the current controller state as [OiTableSettings].
@@ -227,6 +255,9 @@ class OiTableController extends ChangeNotifier {
       pageSize: pagination.pageSize,
       pageIndex: pagination.currentPage,
       groupByColumnId: groupByColumnId,
+      frozenColumns: frozenColumns,
+      showStatusBar: showStatusBar,
+      expandedGroups: Set<String>.from(expandedGroups),
     );
   }
 
@@ -247,6 +278,11 @@ class OiTableController extends ChangeNotifier {
       ..clear()
       ..addAll(settings.activeFilters);
     groupByColumnId = settings.groupByColumnId;
+    frozenColumns = settings.frozenColumns;
+    showStatusBar = settings.showStatusBar;
+    expandedGroups
+      ..clear()
+      ..addAll(settings.expandedGroups);
     pagination
       ..setPageSize(settings.pageSize)
       ..goToPage(settings.pageIndex);
