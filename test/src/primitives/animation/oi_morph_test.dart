@@ -132,4 +132,35 @@ void main() {
 
     expect(find.text('dur'), findsOneWidget);
   });
+
+  // ── 7. reducedMotion: child switch completes instantly ────────────────────
+
+  testWidgets('reducedMotion: child switch completes instantly without animation', (
+    tester,
+  ) async {
+    final notifier = ValueNotifier<bool>(false);
+
+    await tester.pumpObers(
+      MediaQuery(
+        data: const MediaQueryData(disableAnimations: true),
+        child: ValueListenableBuilder<bool>(
+          valueListenable: notifier,
+          builder: (_, flag, __) => OiMorph(
+            child: flag
+                ? const Text('B', key: ValueKey('b'))
+                : const Text('A', key: ValueKey('a')),
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+    expect(find.text('A'), findsOneWidget);
+
+    notifier.value = true;
+    await tester.pump(); // trigger switch
+
+    // With reducedMotion the switch completes instantly: B visible, A gone.
+    expect(find.text('B'), findsOneWidget);
+    expect(find.text('A'), findsNothing);
+  });
 }

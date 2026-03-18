@@ -154,17 +154,29 @@ class _OiToastState extends State<OiToast> with SingleTickerProviderStateMixin {
   late Animation<double> _opacity;
   Timer? _timer;
   bool _hovered = false;
+  bool _animationStarted = false;
+
+  static const Duration _animDuration = Duration(milliseconds: 220);
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 220),
-    );
+    _controller = AnimationController(vsync: this);
     _opacity = CurvedAnimation(parent: _controller, curve: Curves.easeOut);
-    _controller.forward();
     _scheduleTimer();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final reduced =
+        context.animations.reducedMotion ||
+        MediaQuery.disableAnimationsOf(context);
+    _controller.duration = reduced ? Duration.zero : _animDuration;
+    if (!_animationStarted) {
+      _animationStarted = true;
+      _controller.forward();
+    }
   }
 
   void _scheduleTimer() {

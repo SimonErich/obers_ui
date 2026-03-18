@@ -6,6 +6,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui/src/components/overlays/oi_toast.dart';
 
 import '../../../helpers/pump_app.dart';
+import 'package:obers_ui/src/foundation/oi_app.dart';
+import 'package:obers_ui/src/foundation/theme/oi_theme_data.dart';
 
 void main() {
   testWidgets('renders message text', (tester) async {
@@ -77,5 +79,21 @@ void main() {
       await tester.pumpObers(OiToast(message: 'pos test', position: pos));
       expect(find.text('pos test'), findsOneWidget);
     }
+  });
+
+  testWidgets('reducedMotion: fade-in is instant when disableAnimations=true', (
+    tester,
+  ) async {
+    await tester.pumpObers(
+      MediaQuery(
+        data: const MediaQueryData(disableAnimations: true),
+        child: const OiToast(message: 'Instant'),
+      ),
+    );
+    // Duration.zero controller completes in the first frame — no pumpAndSettle needed.
+    final fadeTransition = tester.widget<FadeTransition>(
+      find.byType(FadeTransition).first,
+    );
+    expect(fadeTransition.opacity.value, 1.0);
   });
 }
