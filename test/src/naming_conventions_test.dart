@@ -933,6 +933,149 @@ void main() {
         contains('this.autofocus'),
         reason: 'OiRawInput should use "autofocus" (descriptive adjective)',
       );
+
+      // OiTable — selectable, loading, striped, dense
+      final tableFile = File('lib/src/composites/data/oi_table.dart');
+      final tableContent = tableFile.readAsStringSync();
+      expect(
+        tableContent,
+        contains('this.selectable'),
+        reason: 'OiTable should use "selectable" (descriptive adjective)',
+      );
+      expect(
+        tableContent,
+        contains('this.loading'),
+        reason: 'OiTable should use "loading" (descriptive adjective)',
+      );
+      expect(
+        tableContent,
+        contains('this.striped'),
+        reason: 'OiTable should use "striped" (descriptive adjective)',
+      );
+      expect(
+        tableContent,
+        contains('this.dense'),
+        reason: 'OiTable should use "dense" (descriptive adjective)',
+      );
+
+      // OiComboBox — clearable, enabled, multiSelect
+      final comboBoxFile = File(
+        'lib/src/composites/search/oi_combo_box.dart',
+      );
+      final comboBoxContent = comboBoxFile.readAsStringSync();
+      expect(
+        comboBoxContent,
+        contains('this.clearable'),
+        reason: 'OiComboBox should use "clearable" (descriptive adjective)',
+      );
+      expect(
+        comboBoxContent,
+        contains('this.enabled'),
+        reason: 'OiComboBox should use "enabled" (descriptive adjective)',
+      );
+      expect(
+        comboBoxContent,
+        contains('this.multiSelect'),
+        reason: 'OiComboBox should use "multiSelect" (descriptive adjective)',
+      );
+
+      // OiFlowGraph — editable, zoomable, pannable
+      final flowGraphFile = File(
+        'lib/src/composites/workflow/oi_flow_graph.dart',
+      );
+      final flowGraphContent = flowGraphFile.readAsStringSync();
+      expect(
+        flowGraphContent,
+        contains('this.editable'),
+        reason: 'OiFlowGraph should use "editable" (descriptive adjective)',
+      );
+      expect(
+        flowGraphContent,
+        contains('this.zoomable'),
+        reason: 'OiFlowGraph should use "zoomable" (descriptive adjective)',
+      );
+      expect(
+        flowGraphContent,
+        contains('this.pannable'),
+        reason: 'OiFlowGraph should use "pannable" (descriptive adjective)',
+      );
+
+      // OiTimeline — collapsible, alternating
+      final timelineFile = File(
+        'lib/src/composites/scheduling/oi_timeline.dart',
+      );
+      final timelineContent = timelineFile.readAsStringSync();
+      expect(
+        timelineContent,
+        contains('this.collapsible'),
+        reason: 'OiTimeline should use "collapsible" (descriptive adjective)',
+      );
+      expect(
+        timelineContent,
+        contains('this.alternating'),
+        reason: 'OiTimeline should use "alternating" (descriptive adjective)',
+      );
+
+      // OiProgress — indeterminate
+      final progressFile = File(
+        'lib/src/components/display/oi_progress.dart',
+      );
+      final progressContent = progressFile.readAsStringSync();
+      expect(
+        progressContent,
+        contains('this.indeterminate'),
+        reason: 'OiProgress should use "indeterminate" (descriptive adjective)',
+      );
+
+      // OiAccordion — initiallyExpanded, allowMultiple
+      final accordionFile = File(
+        'lib/src/components/navigation/oi_accordion.dart',
+      );
+      final accordionContent = accordionFile.readAsStringSync();
+      expect(
+        accordionContent,
+        contains('this.initiallyExpanded'),
+        reason:
+            'OiAccordion should use "initiallyExpanded" '
+            '(descriptive adjective)',
+      );
+      expect(
+        accordionContent,
+        contains('this.allowMultiple'),
+        reason:
+            'OiAccordion should use "allowMultiple" (descriptive adjective)',
+      );
+
+      // OiVideoPlayer — autoPlay, showControls
+      final videoPlayerFile = File(
+        'lib/src/composites/media/oi_video_player.dart',
+      );
+      final videoPlayerContent = videoPlayerFile.readAsStringSync();
+      expect(
+        videoPlayerContent,
+        contains('this.autoPlay'),
+        reason:
+            'OiVideoPlayer should use "autoPlay" (descriptive adjective)',
+      );
+      expect(
+        videoPlayerContent,
+        contains('this.showControls'),
+        reason:
+            'OiVideoPlayer should use "showControls" (descriptive adjective)',
+      );
+
+      // OiSurface — frosted (descriptive adjective, not noun "glass")
+      final surfaceFile = File(
+        'lib/src/primitives/display/oi_surface.dart',
+      );
+      final surfaceContent = surfaceFile.readAsStringSync();
+      expect(
+        surfaceContent,
+        contains('this.frosted'),
+        reason:
+            'OiSurface should use "frosted" (descriptive adjective) '
+            'instead of the noun "glass"',
+      );
     });
 
     test('boolean fields use consistent adjective form', () {
@@ -940,7 +1083,7 @@ void main() {
       // e.g. `bool doX`, `bool canX`, `bool shouldX` in public API.
       // These are procedural, not descriptive.
       final proceduralBoolPattern = RegExp(
-        r'^\s*(?:final\s+)?bool\s+(do[A-Z]\w*|should[A-Z]\w*)(?=\s*[;,=)\]])',
+        r'^\s*(?:final\s+)?bool\s+(do[A-Z]\w*|should[A-Z]\w*|can[A-Z]\w*)(?=\s*[;,=)\]])',
         multiLine: true,
       );
 
@@ -965,7 +1108,7 @@ void main() {
         reason:
             'Boolean fields should use adjective form (e.g. "enabled", '
             '"dismissible", "loading") instead of procedural prefixes like '
-            '"do" or "should". Violations:\n${violations.join('\n')}',
+            '"do", "should", or "can". Violations:\n${violations.join('\n')}',
       );
     });
   });

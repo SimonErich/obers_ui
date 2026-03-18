@@ -18,7 +18,7 @@ import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 ///   [OiBorderLineStyle.dashed] or [OiBorderLineStyle.dotted].
 /// - Drop shadows via [shadow].
 /// - A glow/halo effect via [halo] ([OiHaloStyle]).
-/// - A frosted-glass backdrop blur via [glass] (guarded by the active theme's
+/// - A frosted-glass backdrop blur via [frosted] (guarded by the active theme's
 ///   [OiPerformanceConfig.disableBlur]).
 ///
 /// {@category Primitives}
@@ -31,7 +31,7 @@ class OiSurface extends StatelessWidget {
     this.shadow,
     this.padding,
     this.halo,
-    this.glass = false,
+    this.frosted = false,
     this.gradient,
     this.child,
     super.key,
@@ -63,7 +63,7 @@ class OiSurface extends StatelessWidget {
   ///
   /// Ignored when [OiPerformanceConfig.disableBlur] is `true` in the active
   /// theme.
-  final bool glass;
+  final bool frosted;
 
   /// An optional gradient painted as the background.
   ///
@@ -154,7 +154,7 @@ class OiSurface extends StatelessWidget {
       );
     }
 
-    if (glass) {
+    if (frosted) {
       // Guard: read performance config from theme; fall back to rendering blur.
       // OiThemeData does not yet expose OiPerformanceConfig publicly so we
       // always apply the blur here, matching high-performance default.

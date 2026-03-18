@@ -162,16 +162,19 @@ void main() {
     expect(decoration.color, isNull);
   });
 
-  // ── Glass effect ──────────────────────────────────────────────────────────
+  // ── Frosted-glass effect ─────────────────────────────────────────────────
 
-  testWidgets('glass:true adds BackdropFilter', (tester) async {
+  testWidgets('frosted:true adds BackdropFilter', (tester) async {
     await tester.pumpObers(
-      const OiSurface(glass: true, child: SizedBox(width: 100, height: 100)),
+      const OiSurface(
+        frosted: true,
+        child: SizedBox(width: 100, height: 100),
+      ),
     );
     expect(find.byType(BackdropFilter), findsOneWidget);
   });
 
-  testWidgets('glass:false does not add BackdropFilter', (tester) async {
+  testWidgets('frosted:false does not add BackdropFilter', (tester) async {
     await tester.pumpObers(
       const OiSurface(child: SizedBox(width: 100, height: 100)),
     );
