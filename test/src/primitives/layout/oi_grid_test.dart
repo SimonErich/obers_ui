@@ -1007,6 +1007,297 @@ void main() {
     });
   });
 
+  // ── Cursor tracking (REQ-1078) ──────────────────────────────────────────
+
+  group('cursor tracking (REQ-1078)', () {
+    testWidgets('cursor starts at (0, 0) — first item placed at top-left', (
+      tester,
+    ) async {
+      // REQ-1078: cursor (row, column) starts at (0, 0).
+      await tester.pumpObers(
+        const OiGrid(
+          breakpoint: OiBreakpoint.compact,
+          columns: OiResponsive<int>(3),
+          children: [Text('A')],
+        ),
+        surfaceSize: const Size(900, 600),
+      );
+
+      final rectA = tester.getRect(find.text('A'));
+      expect(rectA.left, closeTo(0, 1));
+      expect(rectA.top, closeTo(0, 1));
+    });
+
+    testWidgets('cursor advances column after each auto-placed child', (
+      tester,
+    ) async {
+      // 3 cols: A at (0,0), cursor → (0,1). B at (0,1), cursor → (0,2).
+      await tester.pumpObers(
+        const OiGrid(
+          breakpoint: OiBreakpoint.compact,
+          columns: OiResponsive<int>(3),
+          children: [Text('A'), Text('B'), Text('C')],
+        ),
+        surfaceSize: const Size(900, 600),
+      );
+
+      final rectA = tester.getRect(find.text('A'));
+      final rectB = tester.getRect(find.text('B'));
+      final rectC = tester.getRect(find.text('C'));
+
+      // Sequential left-to-right placement on row 0.
+      expect(rectA.left, closeTo(0, 1));
+      expect(rectB.left, closeTo(300, 1));
+      expect(rectC.left, closeTo(600, 1));
+      expect(rectA.top, closeTo(rectB.top, 1));
+      expect(rectB.top, closeTo(rectC.top, 1));
+    });
+
+    testWidgets('cursor wraps to next row when row is full', (tester) async {
+      // 2 cols: after 2 items, cursor wraps to (1, 0).
+      await tester.pumpObers(
+        const OiGrid(
+          breakpoint: OiBreakpoint.compact,
+          columns: OiResponsive<int>(2),
+          children: [Text('A'), Text('B'), Text('C')],
+        ),
+        surfaceSize: const Size(800, 600),
+      );
+
+      final rectA = tester.getRect(find.text('A'));
+      final rectB = tester.getRect(find.text('B'));
+      final rectC = tester.getRect(find.text('C'));
+
+      // Row 0: A, B. Row 1: C.
+      expect(rectA.top, closeTo(rectB.top, 1));
+      expect(rectC.top, greaterThan(rectA.bottom - 1));
+      expect(rectC.left, closeTo(0, 1));
+    });
+
+    testWidgets('cursor advances past multi-column span', (tester) async {
+      // 4 cols: A spans 2 → cursor advances from (0,0) to (0,2).
+      // B placed at (0,2).
+      await tester.pumpObers(
+        OiGrid(
+          breakpoint: OiBreakpoint.compact,
+          columns: 4.responsive,
+          children: [
+            const Text('A').span(columnSpan: const OiResponsive<int>(2)),
+            const Text('B'),
+          ],
+        ),
+        surfaceSize: const Size(800, 600),
+      );
+
+      final rectA = tester.getRect(find.text('A'));
+      final rectB = tester.getRect(find.text('B'));
+
+      expect(rectA.left, closeTo(0, 1));
+      expect(rectA.width, closeTo(400, 1));
+      expect(rectB.left, closeTo(400, 1));
+      expect(rectA.top, closeTo(rectB.top, 1));
+    });
+
+    testWidgets('cursor skips occupied cells from explicit-start items', (
+      tester,
+    ) async {
+      // 3 cols: B has explicit col 1, A is auto-placed.
+      // Sorted: B (order 1) first, A (order 2) second.
+      // B explicit at col 0 → placed (0,0). Cursor still (0,0).
+      // A auto: cursor (0,0), occupied → skip to (0,1), free → placed.
+      await tester.pumpObers(
+        OiGrid(
+          breakpoint: OiBreakpoint.compact,
+          columns: 3.responsive,
+          children: [
+            const Text('A').span(columnOrder: const OiResponsive<int>(2)),
+            const Text('B').span(
+              columnOrder: const OiResponsive<int>(1),
+              columnStart: const OiResponsive<int>(1),
+            ),
+          ],
+        ),
+        surfaceSize: const Size(900, 600),
+      );
+
+      final rectB = tester.getRect(find.text('B'));
+      final rectA = tester.getRect(find.text('A'));
+
+      expect(rectB.left, closeTo(0, 1));
+      expect(rectA.left, closeTo(300, 1));
+      expect(rectA.top, closeTo(rectB.top, 1));
+    });
+  });
+
+  // ── Column order sorting (REQ-1079) ────────────────────────────────────
+
+  group('columnOrder sorting (REQ-1079)', () {
+    testWidgets('children sorted by columnOrder before placement', (
+      tester,
+    ) async {
+      // REQ-1079: Source order A, B, C. Order: A=3, B=1, C=2.
+      // Placement order: B, C, A → visual order: B at col 0, C at col 1, A at 2.
+      await tester.pumpObers(
+        OiGrid(
+          breakpoint: OiBreakpoint.compact,
+          columns: 3.responsive,
+          children: [
+            const Text('A').span(columnOrder: const OiResponsive<int>(3)),
+            const Text('B').span(columnOrder: const OiResponsive<int>(1)),
+            const Text('C').span(columnOrder: const OiResponsive<int>(2)),
+          ],
+        ),
+        surfaceSize: const Size(900, 600),
+      );
+
+      final leftB = tester.getRect(find.text('B')).left;
+      final leftC = tester.getRect(find.text('C')).left;
+      final leftA = tester.getRect(find.text('A')).left;
+
+      expect(leftB, lessThan(leftC));
+      expect(leftC, lessThan(leftA));
+    });
+
+    testWidgets('null columnOrder treated as 0 in sort', (tester) async {
+      // REQ-1079: Items without order treated as 0, sorted before positive.
+      await tester.pumpObers(
+        OiGrid(
+          breakpoint: OiBreakpoint.compact,
+          columns: 3.responsive,
+          children: [
+            const Text('X').span(columnOrder: const OiResponsive<int>(1)),
+            const Text('Y'), // null order → 0
+            const Text('Z').span(columnOrder: const OiResponsive<int>(2)),
+          ],
+        ),
+        surfaceSize: const Size(900, 600),
+      );
+
+      final leftY = tester.getRect(find.text('Y')).left;
+      final leftX = tester.getRect(find.text('X')).left;
+      final leftZ = tester.getRect(find.text('Z')).left;
+
+      expect(leftY, lessThan(leftX));
+      expect(leftX, lessThan(leftZ));
+    });
+
+    testWidgets('stable sort preserves source order for equal columnOrder', (
+      tester,
+    ) async {
+      // REQ-1079: Equal order → source index breaks tie.
+      await tester.pumpObers(
+        OiGrid(
+          breakpoint: OiBreakpoint.compact,
+          columns: 3.responsive,
+          children: [
+            const Text('First'), // order 0, index 0
+            const Text('Second'), // order 0, index 1
+            const Text('Third'), // order 0, index 2
+          ],
+        ),
+        surfaceSize: const Size(900, 600),
+      );
+
+      final leftFirst = tester.getRect(find.text('First')).left;
+      final leftSecond = tester.getRect(find.text('Second')).left;
+      final leftThird = tester.getRect(find.text('Third')).left;
+
+      expect(leftFirst, lessThan(leftSecond));
+      expect(leftSecond, lessThan(leftThird));
+    });
+  });
+
+  // ── columnSpan resolution (REQ-1080) ───────────────────────────────────
+
+  group('columnSpan resolution (REQ-1080)', () {
+    testWidgets('default columnSpan is 1', (tester) async {
+      // REQ-1080: No span metadata → columnSpan defaults to 1.
+      await tester.pumpObers(
+        OiGrid(
+          breakpoint: OiBreakpoint.compact,
+          columns: 4.responsive,
+          children: const [Text('plain')],
+        ),
+        surfaceSize: const Size(800, 600),
+      );
+
+      final rect = tester.getRect(find.text('plain'));
+      // 4 cols, 800px → unitWidth = 200.
+      expect(rect.width, closeTo(200, 1));
+    });
+
+    testWidgets('fullSpanSentinel resolves to total columns', (tester) async {
+      // REQ-1080: _fullSpanSentinel (-1) → total column count.
+      await tester.pumpObers(
+        OiGrid(
+          breakpoint: OiBreakpoint.compact,
+          columns: 4.responsive,
+          gap: 8.0.responsive,
+          children: [const Text('full').spanFull()],
+        ),
+        surfaceSize: const Size(800, 600),
+      );
+
+      final rect = tester.getRect(find.text('full'));
+      // Full span = all 4 columns = full width.
+      expect(rect.width, closeTo(800, 1));
+    });
+
+    testWidgets('explicit columnSpan is used as-is', (tester) async {
+      // REQ-1080: Explicit span 3 → child occupies 3 columns.
+      await tester.pumpObers(
+        OiGrid(
+          breakpoint: OiBreakpoint.compact,
+          columns: 4.responsive,
+          children: [
+            const Text('wide').span(columnSpan: const OiResponsive<int>(3)),
+          ],
+        ),
+        surfaceSize: const Size(800, 600),
+      );
+
+      final rect = tester.getRect(find.text('wide'));
+      // 4 cols, 800px → unit 200. Span 3 → 600.
+      expect(rect.width, closeTo(600, 1));
+    });
+
+    testWidgets('columnSpan clamped to column count', (tester) async {
+      // REQ-1080: Span 10 in 3-col grid → clamped to 3.
+      await tester.pumpObers(
+        OiGrid(
+          breakpoint: OiBreakpoint.compact,
+          columns: 3.responsive,
+          children: [
+            const Text('big').span(columnSpan: const OiResponsive<int>(10)),
+          ],
+        ),
+        surfaceSize: const Size(900, 600),
+      );
+
+      final rect = tester.getRect(find.text('big'));
+      // Clamped to 3 → full row width.
+      expect(rect.width, closeTo(900, 1));
+    });
+
+    testWidgets('columnSpan clamped to minimum 1', (tester) async {
+      // REQ-1080: Span 0 → clamped to 1.
+      await tester.pumpObers(
+        OiGrid(
+          breakpoint: OiBreakpoint.compact,
+          columns: 3.responsive,
+          children: [
+            const Text('small').span(columnSpan: const OiResponsive<int>(0)),
+          ],
+        ),
+        surfaceSize: const Size(900, 600),
+      );
+
+      final rect = tester.getRect(find.text('small'));
+      // Clamped to 1 → unit width 300.
+      expect(rect.width, closeTo(300, 1));
+    });
+  });
+
   // ── Column count resolution (REQ-1077) ──────────────────────────────────
 
   group('column count resolution', () {

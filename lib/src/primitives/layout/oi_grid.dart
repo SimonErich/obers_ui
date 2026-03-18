@@ -359,8 +359,7 @@ class _RenderOiGrid extends RenderBox
         ? availableWidth
         : (availableWidth - _gap * (cols - 1)) / cols;
 
-    // Collect children with resolved span data from parentData.
-    // Stable sort by columnOrder (null → 0, matching CSS Grid convention).
+    // REQ-1079: Collect children and sort by columnOrder (null → 0).
     final entries = _collectChildren(cols)..sort(_compareByOrder);
 
     // REQ-1076: CSS Grid row-packing algorithm.
@@ -482,12 +481,15 @@ class _RenderOiGrid extends RenderBox
   // ── Child collection ────────────────────────────────────────────────────
 
   /// Collects all children into a list with clamped span values.
+  ///
+  /// REQ-1080: Resolves columnSpan — default 1, [fullSpanSentinel] → [cols].
   List<_ChildEntry> _collectChildren(int cols) {
     final entries = <_ChildEntry>[];
     var child = firstChild;
     while (child != null) {
       final pd = child.parentData! as _OiGridParentData;
 
+      // REQ-1080: Resolve columnSpan (default 1, fullSpanSentinel → cols).
       var colSpan = pd.columnSpan;
       if (colSpan == fullSpanSentinel) colSpan = cols;
       colSpan = colSpan.clamp(1, cols);
@@ -506,7 +508,7 @@ class _RenderOiGrid extends RenderBox
     return entries;
   }
 
-  /// Comparison for stable sort by columnOrder (null → 0).
+  /// REQ-1079: Comparison for stable sort by columnOrder (null → 0).
   static int _compareByOrder(_ChildEntry a, _ChildEntry b) {
     final oa = a.columnOrder ?? 0;
     final ob = b.columnOrder ?? 0;
@@ -516,15 +518,23 @@ class _RenderOiGrid extends RenderBox
 
   // ── CSS Grid row-packing ────────────────────────────────────────────────
 
-  /// Classic CSS Grid row-packing algorithm.
+  /// CSS Grid row-packing algorithm with explicit cursor tracking.
   ///
-  /// Walk children in order. For each child, find the first available cell
-  /// that satisfies its [columnSpan] and [columnStart]. Advance to the next
-  /// row when the current row is full.
+  /// REQ-1078: Maintains a cursor `(row, column)` starting at `(0, 0)`.
+  /// REQ-1079: Processes children sorted by [columnOrder].
+  /// REQ-1080: Uses resolved [columnSpan] (default 1, sentinel → all cols).
+  ///
+  /// For each child, find the first available cell that satisfies its
+  /// [columnSpan] and [columnStart]. The cursor advances forward after each
+  /// auto-placed child and never scans backward.
   List<_Placement> _packRows(List<_ChildEntry> entries, int cols) {
     final placements = <_Placement>[];
     // Track occupied cells: row index → set of occupied column indices.
     final occupied = <int, Set<int>>{};
+
+    // REQ-1078: Maintain a cursor (row, column) starting at (0, 0).
+    var cursorRow = 0;
+    var cursorCol = 0;
 
     bool canFit(int row, int startCol, int span) {
       if (startCol + span > cols) return false;
@@ -543,7 +553,9 @@ class _RenderOiGrid extends RenderBox
       }
     }
 
+    // REQ-1079: For each child (sorted by columnOrder if specified).
     for (final entry in entries) {
+      // REQ-1080: columnSpan already resolved (default 1, sentinel → cols).
       final span = entry.columnSpan;
       final requestedStart = entry.columnStart;
 
@@ -568,23 +580,37 @@ class _RenderOiGrid extends RenderBox
           }
         }
       } else {
-        // Auto-placement: scan rows top-to-bottom, columns left-to-right.
-        var placed = false;
-        for (var row = 0; !placed; row++) {
-          for (var col = 0; col <= cols - span; col++) {
-            if (canFit(row, col, span)) {
-              occupy(row, col, span);
-              placements.add(
-                _Placement(
-                  renderBox: entry.renderBox,
-                  row: row,
-                  column: col,
-                  effectiveSpan: span,
-                ),
-              );
-              placed = true;
-              break;
+        // Auto-placement: scan forward from cursor position.
+        var row = cursorRow;
+        var col = cursorCol;
+
+        while (true) {
+          if (col + span > cols) {
+            // Span doesn't fit in remaining columns — advance to next row.
+            row++;
+            col = 0;
+            continue;
+          }
+          if (canFit(row, col, span)) {
+            occupy(row, col, span);
+            placements.add(
+              _Placement(
+                renderBox: entry.renderBox,
+                row: row,
+                column: col,
+                effectiveSpan: span,
+              ),
+            );
+            // Advance cursor past this placement.
+            cursorCol = col + span;
+            cursorRow = row;
+            if (cursorCol >= cols) {
+              cursorRow++;
+              cursorCol = 0;
             }
+            break;
+          } else {
+            col++;
           }
         }
       }
