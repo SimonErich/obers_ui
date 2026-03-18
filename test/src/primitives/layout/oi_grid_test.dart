@@ -136,9 +136,7 @@ void main() {
       expect(rectB.width, closeTo(200, 1));
     });
 
-    testWidgets('columnSpan with gap includes internal gaps', (
-      tester,
-    ) async {
+    testWidgets('columnSpan with gap includes internal gaps', (tester) async {
       // 4 columns, gap 8, 800px → unitWidth = (800 - 3*8) / 4 = 194.
       // Item A spans 2 → width = 2 * 194 + 1 * 8 = 396.
       await tester.pumpObers(
@@ -181,10 +179,7 @@ void main() {
         OiGrid(
           columns: 4.responsive,
           gap: 8.0.responsive,
-          children: [
-            const Text('full').spanFull(),
-            const Text('B'),
-          ],
+          children: [const Text('full').spanFull(), const Text('B')],
         ),
         surfaceSize: const Size(800, 600),
       );
@@ -240,9 +235,7 @@ void main() {
       expect(rectA.left, closeTo(400, 1));
     });
 
-    testWidgets('columnStart with gap accounts for gap pixels', (
-      tester,
-    ) async {
+    testWidgets('columnStart with gap accounts for gap pixels', (tester) async {
       // 4 columns, gap 8, 800px → unitWidth = (800 - 24) / 4 = 194.
       // Start col 3 → spacer(2 cols) = 2*194 + 1*8 = 396, then gap = 8.
       // Item A.left = 396 + 8 = 404.
@@ -383,6 +376,149 @@ void main() {
       final rectAMedium = tester.getRect(find.text('A'));
       expect(rectAMedium.width, closeTo(800, 1));
     });
+
+    testWidgets('columnStart changes with breakpoint', (tester) async {
+      // 4 columns, gap 0, 800px → unitWidth = 200.
+      // Compact: start col 1 → x = 0.
+      // Expanded: start col 3 → x = 400.
+      final startValue = OiResponsive<int>.breakpoints({
+        OiBreakpoint.compact: 1,
+        OiBreakpoint.expanded: 3,
+      });
+
+      await tester.pumpObers(
+        OiGrid(
+          columns: 4.responsive,
+          breakpoint: OiBreakpoint.compact,
+          children: [const Text('A').span(columnStart: startValue)],
+        ),
+        surfaceSize: const Size(800, 600),
+      );
+
+      final rectACompact = tester.getRect(find.text('A'));
+      expect(rectACompact.left, closeTo(0, 1));
+
+      await tester.pumpObers(
+        OiGrid(
+          columns: 4.responsive,
+          breakpoint: OiBreakpoint.expanded,
+          children: [const Text('A').span(columnStart: startValue)],
+        ),
+        surfaceSize: const Size(800, 600),
+      );
+
+      final rectAExpanded = tester.getRect(find.text('A'));
+      expect(rectAExpanded.left, closeTo(400, 1));
+    });
+
+    testWidgets('columnOrder changes with breakpoint', (tester) async {
+      // 3 columns, 900px → unitWidth = 300.
+      // Compact: A order=1, B order=2 → visual: A, B, C.
+      // Large: A order=3, B order=1 → visual: B, C, A.
+      final orderA = OiResponsive<int>.breakpoints({
+        OiBreakpoint.compact: 1,
+        OiBreakpoint.large: 3,
+      });
+      final orderB = OiResponsive<int>.breakpoints({
+        OiBreakpoint.compact: 2,
+        OiBreakpoint.large: 1,
+      });
+
+      await tester.pumpObers(
+        OiGrid(
+          columns: 3.responsive,
+          breakpoint: OiBreakpoint.compact,
+          children: [
+            const Text('A').span(columnOrder: orderA),
+            const Text('B').span(columnOrder: orderB),
+            const Text('C'),
+          ],
+        ),
+        surfaceSize: const Size(900, 600),
+      );
+
+      // Compact: C (order 0) first, then A (1), then B (2).
+      var leftC = tester.getRect(find.text('C')).left;
+      var leftA = tester.getRect(find.text('A')).left;
+      var leftB = tester.getRect(find.text('B')).left;
+      expect(leftC, lessThan(leftA));
+      expect(leftA, lessThan(leftB));
+
+      await tester.pumpObers(
+        OiGrid(
+          columns: 3.responsive,
+          breakpoint: OiBreakpoint.large,
+          children: [
+            const Text('A').span(columnOrder: orderA),
+            const Text('B').span(columnOrder: orderB),
+            const Text('C'),
+          ],
+        ),
+        surfaceSize: const Size(900, 600),
+      );
+
+      // Large: C (order 0) first, then B (1), then A (3).
+      leftC = tester.getRect(find.text('C')).left;
+      leftB = tester.getRect(find.text('B')).left;
+      leftA = tester.getRect(find.text('A')).left;
+      expect(leftC, lessThan(leftB));
+      expect(leftB, lessThan(leftA));
+    });
+
+    testWidgets('all span properties responsive simultaneously', (
+      tester,
+    ) async {
+      // 4 columns, gap 0, 800px → unitWidth = 200.
+      // Compact: span 1, start 1, order 0 → A at col 0, width 200.
+      // Large: span 2, start 3, order 0 → A at col 2, width 400.
+      await tester.pumpObers(
+        OiGrid(
+          columns: 4.responsive,
+          breakpoint: OiBreakpoint.compact,
+          children: [
+            const Text('A').span(
+              columnSpan: OiResponsive<int>.breakpoints({
+                OiBreakpoint.compact: 1,
+                OiBreakpoint.large: 2,
+              }),
+              columnStart: OiResponsive<int>.breakpoints({
+                OiBreakpoint.compact: 1,
+                OiBreakpoint.large: 3,
+              }),
+            ),
+          ],
+        ),
+        surfaceSize: const Size(800, 600),
+      );
+
+      final rectCompact = tester.getRect(find.text('A'));
+      expect(rectCompact.left, closeTo(0, 1));
+      expect(rectCompact.width, closeTo(200, 1));
+
+      await tester.pumpObers(
+        OiGrid(
+          columns: 4.responsive,
+          breakpoint: OiBreakpoint.large,
+          children: [
+            const Text('A').span(
+              columnSpan: OiResponsive<int>.breakpoints({
+                OiBreakpoint.compact: 1,
+                OiBreakpoint.large: 2,
+              }),
+              columnStart: OiResponsive<int>.breakpoints({
+                OiBreakpoint.compact: 1,
+                OiBreakpoint.large: 3,
+              }),
+            ),
+          ],
+        ),
+        surfaceSize: const Size(800, 600),
+      );
+
+      final rectLarge = tester.getRect(find.text('A'));
+      expect(rectLarge.left, closeTo(400, 1));
+      expect(rectLarge.width, closeTo(400, 1));
+    });
   });
 
   // ── Span: combined properties ─────────────────────────────────────────────
@@ -443,9 +579,7 @@ void main() {
           columns: 3.responsive,
           children: [
             const Text('plain'),
-            const Text('spanned').span(
-              columnSpan: const OiResponsive<int>(2),
-            ),
+            const Text('spanned').span(columnSpan: const OiResponsive<int>(2)),
           ],
         ),
         surfaceSize: const Size(900, 600),
@@ -483,6 +617,65 @@ void main() {
 
       final rectA = tester.getRect(find.text('A'));
       expect(rectA.width, closeTo(400, 1));
+    });
+  });
+
+  // ── Universal contract ───────────────────────────────────────────────────
+
+  group('universal span contract', () {
+    testWidgets('span works on any widget type — not per-widget', (
+      tester,
+    ) async {
+      // Container, SizedBox, and DecoratedBox all use the same .span() API.
+      // The grid reads span metadata identically regardless of child type.
+      await tester.pumpObers(
+        OiGrid(
+          columns: 4.responsive,
+          children: [
+            Container(
+              key: const Key('c'),
+            ).span(columnSpan: const OiResponsive<int>(2)),
+            const SizedBox(
+              key: Key('s'),
+            ).span(columnStart: const OiResponsive<int>(3)),
+          ],
+        ),
+        surfaceSize: const Size(800, 600),
+      );
+
+      final rectC = tester.getRect(find.byKey(const Key('c')));
+      final rectS = tester.getRect(find.byKey(const Key('s')));
+
+      // Container spans 2 cols → 400px.
+      expect(rectC.width, closeTo(400, 1));
+      // SizedBox starts at col 3 → left at 400.
+      expect(rectS.left, closeTo(400, 1));
+    });
+
+    testWidgets('OiSpan.maybeOf returns null for non-span widget', (
+      tester,
+    ) async {
+      expect(OiSpan.maybeOf(const SizedBox.shrink()), isNull);
+    });
+
+    testWidgets('OiSpan.maybeOf extracts data from span-wrapped widget', (
+      tester,
+    ) async {
+      const data = OiSpanData(
+        columnSpan: OiResponsive<int>(3),
+        columnStart: OiResponsive<int>(2),
+        columnOrder: OiResponsive<int>(1),
+      );
+      final widget = const Text('test').span(
+        columnSpan: data.columnSpan,
+        columnStart: data.columnStart,
+        columnOrder: data.columnOrder,
+      );
+      final extracted = OiSpan.maybeOf(widget);
+      expect(extracted, isNotNull);
+      expect(extracted!.columnSpan, data.columnSpan);
+      expect(extracted.columnStart, data.columnStart);
+      expect(extracted.columnOrder, data.columnOrder);
     });
   });
 

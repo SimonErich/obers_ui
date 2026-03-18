@@ -177,7 +177,7 @@ class OiGrid extends StatelessWidget {
 
           if (rawStart != null) {
             // Explicit start (1-indexed → 0-indexed).
-            var targetCol = (rawStart - 1).clamp(0, cols - 1);
+            final targetCol = (rawStart - 1).clamp(0, cols - 1);
             colSpan = math.min(colSpan, cols - targetCol);
 
             if (targetCol < cursor) {
