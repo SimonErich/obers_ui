@@ -196,6 +196,180 @@ void main() {
       final bp = scale.resolve(2000);
       expect(bp.name, 'ultraWide');
     });
+
+    // ── Registry utility methods ──────────────────────────────────────────
+
+    test('contains returns true for present breakpoint', () {
+      final scale = OiBreakpointScale.standard();
+      expect(scale.contains(OiBreakpoint.compact), isTrue);
+      expect(scale.contains(OiBreakpoint.medium), isTrue);
+      expect(scale.contains(OiBreakpoint.extraLarge), isTrue);
+    });
+
+    test('contains returns false for absent breakpoint', () {
+      final scale = OiBreakpointScale.standard();
+      expect(scale.contains(const OiBreakpoint('tablet', 480)), isFalse);
+    });
+
+    test('byName returns breakpoint for known name', () {
+      final scale = OiBreakpointScale.standard();
+      expect(scale.byName('compact'), OiBreakpoint.compact);
+      expect(scale.byName('extraLarge'), OiBreakpoint.extraLarge);
+    });
+
+    test('byName returns null for unknown name', () {
+      final scale = OiBreakpointScale.standard();
+      expect(scale.byName('tablet'), isNull);
+    });
+
+    test('indexOf returns correct index', () {
+      final scale = OiBreakpointScale.standard();
+      expect(scale.indexOf(OiBreakpoint.compact), 0);
+      expect(scale.indexOf(OiBreakpoint.medium), 1);
+      expect(scale.indexOf(OiBreakpoint.expanded), 2);
+      expect(scale.indexOf(OiBreakpoint.large), 3);
+      expect(scale.indexOf(OiBreakpoint.extraLarge), 4);
+    });
+
+    test('indexOf returns -1 for absent breakpoint', () {
+      final scale = OiBreakpointScale.standard();
+      expect(scale.indexOf(const OiBreakpoint('tablet', 480)), -1);
+    });
+
+    // ── Page gutter resolution ────────────────────────────────────────────
+
+    test('resolvePageGutter returns standard values', () {
+      final scale = OiBreakpointScale.standard();
+      expect(scale.resolvePageGutter(OiBreakpoint.compact), 16);
+      expect(scale.resolvePageGutter(OiBreakpoint.medium), 24);
+      expect(scale.resolvePageGutter(OiBreakpoint.expanded), 32);
+      expect(scale.resolvePageGutter(OiBreakpoint.large), 40);
+      expect(scale.resolvePageGutter(OiBreakpoint.extraLarge), 48);
+    });
+
+    test('resolvePageGutter cascades for custom breakpoints', () {
+      final scale = OiBreakpointScale.extended();
+      // tablet (480) has no entry in standard gutters if not explicitly set.
+      // The extended scale provides tablet: 16.
+      expect(scale.resolvePageGutter(const OiBreakpoint('tablet', 480)), 16);
+    });
+
+    test('resolvePageGutter with custom gutters', () {
+      final scale = OiBreakpointScale(
+        [
+          OiBreakpoint.compact,
+          const OiBreakpoint('custom', 500),
+          OiBreakpoint.medium,
+        ],
+        pageGutters: {'compact': 12, 'custom': 20, 'medium': 28},
+      );
+      expect(scale.resolvePageGutter(const OiBreakpoint('custom', 500)), 20);
+      expect(scale.resolvePageGutter(OiBreakpoint.compact), 12);
+      expect(scale.resolvePageGutter(OiBreakpoint.medium), 28);
+    });
+
+    test('resolvePageGutter cascades to nearest smaller', () {
+      final scale = OiBreakpointScale(
+        [
+          OiBreakpoint.compact,
+          const OiBreakpoint('mid', 500),
+          OiBreakpoint.medium,
+        ],
+        pageGutters: {'compact': 10},
+      );
+      // 'mid' has no entry, should cascade to 'compact'
+      expect(scale.resolvePageGutter(const OiBreakpoint('mid', 500)), 10);
+    });
+
+    // ── Content max-width resolution ──────────────────────────────────────
+
+    test('resolveContentMaxWidth returns standard values', () {
+      final scale = OiBreakpointScale.standard();
+      expect(scale.resolveContentMaxWidth(OiBreakpoint.compact), double.infinity);
+      expect(scale.resolveContentMaxWidth(OiBreakpoint.medium), 720);
+      expect(scale.resolveContentMaxWidth(OiBreakpoint.expanded), 960);
+      expect(scale.resolveContentMaxWidth(OiBreakpoint.large), 1200);
+      expect(scale.resolveContentMaxWidth(OiBreakpoint.extraLarge), 1400);
+    });
+
+    test('resolveContentMaxWidth cascades for custom breakpoints', () {
+      final scale = OiBreakpointScale(
+        [
+          OiBreakpoint.compact,
+          const OiBreakpoint('mid', 500),
+          OiBreakpoint.medium,
+        ],
+        contentMaxWidths: {'compact': double.infinity, 'medium': 720},
+      );
+      // 'mid' cascades to 'compact'
+      expect(
+        scale.resolveContentMaxWidth(const OiBreakpoint('mid', 500)),
+        double.infinity,
+      );
+    });
+
+    // ── Custom scale with custom page gutters ─────────────────────────────
+
+    test('custom scale accepts page gutters and content max widths', () {
+      final scale = OiBreakpointScale(
+        [
+          OiBreakpoint.compact,
+          const OiBreakpoint('tablet', 480),
+          OiBreakpoint.medium,
+        ],
+        pageGutters: {'compact': 8, 'tablet': 12, 'medium': 20},
+        contentMaxWidths: {
+          'compact': double.infinity,
+          'tablet': double.infinity,
+          'medium': 600,
+        },
+      );
+      expect(scale.resolvePageGutter(const OiBreakpoint('tablet', 480)), 12);
+      expect(
+        scale.resolveContentMaxWidth(const OiBreakpoint('tablet', 480)),
+        double.infinity,
+      );
+      expect(scale.resolveContentMaxWidth(OiBreakpoint.medium), 600);
+    });
+
+    // ── Equality with maps ────────────────────────────────────────────────
+
+    test('equality includes pageGutters and contentMaxWidths', () {
+      final a = OiBreakpointScale(
+        [OiBreakpoint.compact, OiBreakpoint.medium],
+        pageGutters: {'compact': 10},
+      );
+      final b = OiBreakpointScale(
+        [OiBreakpoint.compact, OiBreakpoint.medium],
+        pageGutters: {'compact': 10},
+      );
+      expect(a, equals(b));
+    });
+
+    test('inequality when pageGutters differ', () {
+      final a = OiBreakpointScale(
+        [OiBreakpoint.compact, OiBreakpoint.medium],
+        pageGutters: {'compact': 10},
+      );
+      final b = OiBreakpointScale(
+        [OiBreakpoint.compact, OiBreakpoint.medium],
+        pageGutters: {'compact': 20},
+      );
+      expect(a, isNot(equals(b)));
+    });
+
+    test('extended scale has page gutters for all breakpoints', () {
+      final scale = OiBreakpointScale.extended();
+      expect(scale.pageGutters.containsKey('tablet'), isTrue);
+      expect(scale.pageGutters.containsKey('ultraWide'), isTrue);
+      expect(scale.pageGutters.containsKey('compact'), isTrue);
+    });
+
+    test('extended scale has content max widths for all breakpoints', () {
+      final scale = OiBreakpointScale.extended();
+      expect(scale.contentMaxWidths.containsKey('tablet'), isTrue);
+      expect(scale.contentMaxWidths.containsKey('ultraWide'), isTrue);
+    });
   });
 
   // ─────────────────────────────────────────────────────────────────────────
@@ -680,6 +854,171 @@ void main() {
         ),
       );
       expect(captured.values.length, 5);
+    });
+
+    // ── Generic breakpoint helpers ──────────────────────────────────────
+
+    testWidgets('isBreakpointActive returns true for active breakpoint',
+        (tester) async {
+      late bool result;
+      await tester.pumpWidget(
+        buildWithWidth(
+          700,
+          Builder(
+            builder: (ctx) {
+              result = ctx.isBreakpointActive(OiBreakpoint.medium);
+              return const SizedBox.shrink();
+            },
+          ),
+        ),
+      );
+      expect(result, isTrue);
+    });
+
+    testWidgets('isBreakpointActive returns false for inactive breakpoint',
+        (tester) async {
+      late bool result;
+      await tester.pumpWidget(
+        buildWithWidth(
+          700,
+          Builder(
+            builder: (ctx) {
+              result = ctx.isBreakpointActive(OiBreakpoint.compact);
+              return const SizedBox.shrink();
+            },
+          ),
+        ),
+      );
+      expect(result, isFalse);
+    });
+
+    testWidgets('isAtLeast returns true when at breakpoint', (tester) async {
+      late bool result;
+      await tester.pumpWidget(
+        buildWithWidth(
+          600,
+          Builder(
+            builder: (ctx) {
+              result = ctx.isAtLeast(OiBreakpoint.medium);
+              return const SizedBox.shrink();
+            },
+          ),
+        ),
+      );
+      expect(result, isTrue);
+    });
+
+    testWidgets('isAtLeast returns true when above breakpoint', (tester) async {
+      late bool result;
+      await tester.pumpWidget(
+        buildWithWidth(
+          1200,
+          Builder(
+            builder: (ctx) {
+              result = ctx.isAtLeast(OiBreakpoint.medium);
+              return const SizedBox.shrink();
+            },
+          ),
+        ),
+      );
+      expect(result, isTrue);
+    });
+
+    testWidgets('isAtLeast returns false when below breakpoint',
+        (tester) async {
+      late bool result;
+      await tester.pumpWidget(
+        buildWithWidth(
+          400,
+          Builder(
+            builder: (ctx) {
+              result = ctx.isAtLeast(OiBreakpoint.medium);
+              return const SizedBox.shrink();
+            },
+          ),
+        ),
+      );
+      expect(result, isFalse);
+    });
+
+    testWidgets('pageGutter is 40 at large width', (tester) async {
+      late double result;
+      await tester.pumpWidget(
+        buildWithWidth(
+          1200,
+          Builder(
+            builder: (ctx) {
+              result = ctx.pageGutter;
+              return const SizedBox.shrink();
+            },
+          ),
+        ),
+      );
+      expect(result, 40);
+    });
+
+    testWidgets('pageGutter is 48 at extraLarge width', (tester) async {
+      late double result;
+      await tester.pumpWidget(
+        buildWithWidth(
+          1600,
+          Builder(
+            builder: (ctx) {
+              result = ctx.pageGutter;
+              return const SizedBox.shrink();
+            },
+          ),
+        ),
+      );
+      expect(result, 48);
+    });
+
+    testWidgets('contentMaxWidth is 960 at expanded width', (tester) async {
+      late double result;
+      await tester.pumpWidget(
+        buildWithWidth(
+          840,
+          Builder(
+            builder: (ctx) {
+              result = ctx.contentMaxWidth;
+              return const SizedBox.shrink();
+            },
+          ),
+        ),
+      );
+      expect(result, 960);
+    });
+
+    testWidgets('contentMaxWidth is 1200 at large width', (tester) async {
+      late double result;
+      await tester.pumpWidget(
+        buildWithWidth(
+          1200,
+          Builder(
+            builder: (ctx) {
+              result = ctx.contentMaxWidth;
+              return const SizedBox.shrink();
+            },
+          ),
+        ),
+      );
+      expect(result, 1200);
+    });
+
+    testWidgets('contentMaxWidth is 1400 at extraLarge width', (tester) async {
+      late double result;
+      await tester.pumpWidget(
+        buildWithWidth(
+          1600,
+          Builder(
+            builder: (ctx) {
+              result = ctx.contentMaxWidth;
+              return const SizedBox.shrink();
+            },
+          ),
+        ),
+      );
+      expect(result, 1400);
     });
   });
 }
