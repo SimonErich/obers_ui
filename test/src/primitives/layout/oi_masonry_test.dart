@@ -31,7 +31,10 @@ void main() {
 
   testWidgets('renders all children', (tester) async {
     await tester.pumpObers(
-      const OiMasonry(children: [Text('A'), Text('B'), Text('C'), Text('D')]),
+      const OiMasonry(
+        breakpoint: OiBreakpoint.compact,
+        children: [Text('A'), Text('B'), Text('C'), Text('D')],
+      ),
     );
     expect(find.text('A'), findsOneWidget);
     expect(find.text('B'), findsOneWidget);
@@ -44,6 +47,7 @@ void main() {
   ) async {
     await tester.pumpObers(
       const OiMasonry(
+        breakpoint: OiBreakpoint.compact,
         columns: OiResponsive<int>(3),
         children: [Text('X'), Text('Y'), Text('Z')],
       ),
@@ -57,6 +61,7 @@ void main() {
   testWidgets('creates one Column per masonry column', (tester) async {
     await tester.pumpObers(
       const OiMasonry(
+        breakpoint: OiBreakpoint.compact,
         columns: OiResponsive<int>(3),
         children: [Text('1'), Text('2'), Text('3'), Text('4'), Text('5')],
       ),
@@ -72,6 +77,7 @@ void main() {
   ) async {
     await tester.pumpObers(
       const OiMasonry(
+        breakpoint: OiBreakpoint.compact,
         gap: OiResponsive<double>(12),
         children: [Text('A'), Text('B')],
       ),
@@ -88,6 +94,7 @@ void main() {
     // 2 columns, 4 items → each column gets 2 items → 1 vertical spacer each.
     await tester.pumpObers(
       const OiMasonry(
+        breakpoint: OiBreakpoint.compact,
         gap: OiResponsive<double>(8),
         children: [Text('A'), Text('B'), Text('C'), Text('D')],
       ),
@@ -152,6 +159,7 @@ void main() {
       await pumpAtWidth(
         tester,
         OiMasonry(
+          breakpoint: OiBreakpoint.compact,
           gap: responsiveGap,
           children: const [Text('A'), Text('B')],
         ),
@@ -164,6 +172,7 @@ void main() {
       await pumpAtWidth(
         tester,
         OiMasonry(
+          breakpoint: OiBreakpoint.expanded,
           gap: responsiveGap,
           children: const [Text('A'), Text('B')],
         ),
@@ -171,6 +180,32 @@ void main() {
       );
       boxes = tester.widgetList<SizedBox>(find.byType(SizedBox)).toList();
       expect(boxes.where((b) => b.width == 16), hasLength(1));
+    });
+  });
+
+  // ── Explicit breakpoint parameter ─────────────────────────────────────────
+
+  group('explicit breakpoint parameter', () {
+    testWidgets('breakpoint param overrides context for column count', (
+      tester,
+    ) async {
+      final responsiveCols = OiResponsive<int>.breakpoints({
+        OiBreakpoint.compact: 2,
+        OiBreakpoint.expanded: 4,
+      });
+
+      // Screen is compact-width (400), but breakpoint is explicitly expanded.
+      await pumpAtWidth(
+        tester,
+        OiMasonry(
+          columns: responsiveCols,
+          breakpoint: OiBreakpoint.expanded,
+          children: const [Text('1'), Text('2'), Text('3'), Text('4')],
+        ),
+        400,
+      );
+      // Expanded → 4 columns, despite narrow viewport.
+      expect(find.byType(Column), findsNWidgets(4));
     });
   });
 }

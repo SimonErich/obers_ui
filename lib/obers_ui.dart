@@ -66,7 +66,9 @@ export 'src/primitives/layout/oi_column.dart';
 export 'src/primitives/layout/oi_container.dart';
 export 'src/primitives/layout/oi_grid.dart';
 export 'src/primitives/layout/oi_masonry.dart';
+export 'src/primitives/layout/oi_page.dart';
 export 'src/primitives/layout/oi_row.dart';
+export 'src/primitives/layout/oi_section.dart';
 export 'src/primitives/layout/oi_spacer.dart';
 export 'src/primitives/layout/oi_wrap_layout.dart';
 

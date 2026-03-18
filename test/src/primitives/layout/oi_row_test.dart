@@ -31,7 +31,12 @@ void main() {
   // ── Basic rendering ────────────────────────────────────────────────────────
 
   testWidgets('renders as Row by default', (tester) async {
-    await tester.pumpObers(const OiRow(children: [Text('A'), Text('B')]));
+    await tester.pumpObers(
+      const OiRow(
+        breakpoint: OiBreakpoint.compact,
+        children: [Text('A'), Text('B')],
+      ),
+    );
     expect(find.byType(Row), findsOneWidget);
     expect(find.text('A'), findsOneWidget);
     expect(find.text('B'), findsOneWidget);
@@ -42,6 +47,7 @@ void main() {
   testWidgets('inserts SizedBox with correct width for gap', (tester) async {
     await tester.pumpObers(
       const OiRow(
+        breakpoint: OiBreakpoint.compact,
         gap: OiResponsive<double>(12),
         children: [Text('A'), Text('B'), Text('C')],
       ),
@@ -53,7 +59,12 @@ void main() {
   });
 
   testWidgets('no SizedBox spacers when gap is 0', (tester) async {
-    await tester.pumpObers(const OiRow(children: [Text('A'), Text('B')]));
+    await tester.pumpObers(
+      const OiRow(
+        breakpoint: OiBreakpoint.compact,
+        children: [Text('A'), Text('B')],
+      ),
+    );
     final boxes = tester.widgetList<SizedBox>(find.byType(SizedBox)).toList();
     expect(boxes.where((b) => b.width != null && b.width! > 0), isEmpty);
   });
@@ -61,11 +72,12 @@ void main() {
   // ── Collapse ───────────────────────────────────────────────────────────────
 
   testWidgets('collapses to Column at compact breakpoint', (tester) async {
-    // Compact width = 400dp, collapse threshold = medium (600dp).
-    // 400 <= 600 → should collapse.
+    // Compact breakpoint, collapse threshold = medium (600dp).
+    // compact.minWidth (0) <= medium.minWidth (600) → should collapse.
     await pumpAtWidth(
       tester,
       const OiRow(
+        breakpoint: OiBreakpoint.compact,
         collapse: OiBreakpoint.medium,
         children: [Text('A'), Text('B')],
       ),
@@ -76,11 +88,12 @@ void main() {
   });
 
   testWidgets('does not collapse above collapse breakpoint', (tester) async {
-    // Wide width = 900dp, breakpoint = expanded (840), collapse = medium (600).
+    // Expanded breakpoint, collapse = medium (600).
     // expanded.minWidth (840) > medium.minWidth (600) → should NOT collapse.
     await pumpAtWidth(
       tester,
       const OiRow(
+        breakpoint: OiBreakpoint.expanded,
         collapse: OiBreakpoint.medium,
         children: [Text('A'), Text('B')],
       ),
@@ -94,6 +107,7 @@ void main() {
     await pumpAtWidth(
       tester,
       const OiRow(
+        breakpoint: OiBreakpoint.compact,
         gap: OiResponsive<double>(8),
         collapse: OiBreakpoint.medium,
         children: [Text('A'), Text('B')],
@@ -150,7 +164,11 @@ void main() {
       // Compact → gap 4.
       await pumpAtWidth(
         tester,
-        OiRow(gap: responsiveGap, children: const [Text('A'), Text('B')]),
+        OiRow(
+          breakpoint: OiBreakpoint.compact,
+          gap: responsiveGap,
+          children: const [Text('A'), Text('B')],
+        ),
         400,
       );
       var boxes = tester.widgetList<SizedBox>(find.byType(SizedBox)).toList();
@@ -159,7 +177,11 @@ void main() {
       // Expanded → gap 16.
       await pumpAtWidth(
         tester,
-        OiRow(gap: responsiveGap, children: const [Text('A'), Text('B')]),
+        OiRow(
+          breakpoint: OiBreakpoint.expanded,
+          gap: responsiveGap,
+          children: const [Text('A'), Text('B')],
+        ),
         900,
       );
       boxes = tester.widgetList<SizedBox>(find.byType(SizedBox)).toList();

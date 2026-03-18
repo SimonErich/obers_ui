@@ -8,6 +8,7 @@ import 'package:obers_ui/src/foundation/oi_responsive.dart';
 ///
 /// ```dart
 /// OiWrapLayout(
+///   breakpoint: context.breakpoint,
 ///   spacing: OiResponsive.breakpoints({
 ///     OiBreakpoint.compact: 8,
 ///     OiBreakpoint.expanded: 16,
@@ -16,15 +17,16 @@ import 'package:obers_ui/src/foundation/oi_responsive.dart';
 /// )
 /// ```
 ///
-/// The active breakpoint can be supplied explicitly via [breakpoint] so that
-/// responsive values are resolved once at the layout level and passed down as
-/// concrete values. When [breakpoint] is null the widget reads the breakpoint
-/// from the nearest [OiTheme] via `context.breakpoint`.
+/// **Zero magic:** [breakpoint] is required so every wrap layout is
+/// self-contained with explicit props. Resolve the breakpoint once at the
+/// page/layout level (e.g. `context.breakpoint`) and pass it down as a
+/// concrete value.
 ///
 /// {@category Primitives}
 class OiWrapLayout extends StatelessWidget {
   /// Creates an [OiWrapLayout].
   const OiWrapLayout({
+    required this.breakpoint,
     required this.children,
     this.spacing = const OiResponsive<double>(0),
     this.runSpacing = const OiResponsive<double>(0),
@@ -32,7 +34,7 @@ class OiWrapLayout extends StatelessWidget {
     this.runAlignment = WrapAlignment.start,
     this.crossAxisAlignment = WrapCrossAlignment.start,
     this.direction = Axis.horizontal,
-    this.breakpoint,
+    this.scale,
     super.key,
   });
 
@@ -57,18 +59,21 @@ class OiWrapLayout extends StatelessWidget {
   /// The child widgets to wrap.
   final List<Widget> children;
 
-  /// The active breakpoint, resolved at the layout level.
+  /// The active breakpoint. Required — resolve once at the layout level
+  /// and pass down explicitly.
+  final OiBreakpoint breakpoint;
+
+  /// The breakpoint scale used to resolve responsive values.
   ///
-  /// When null, falls back to `context.breakpoint` (implicit context lookup).
-  /// Prefer passing an explicit value so the widget is self-contained.
-  final OiBreakpoint? breakpoint;
+  /// When null, read from the nearest [OiTheme] via `context.breakpointScale`.
+  final OiBreakpointScale? scale;
 
   @override
   Widget build(BuildContext context) {
-    final active = breakpoint ?? context.breakpoint;
-    final scale = context.breakpointScale;
-    final resolvedSpacing = spacing.resolve(active, scale);
-    final resolvedRunSpacing = runSpacing.resolve(active, scale);
+    final active = breakpoint;
+    final resolvedScale = scale ?? context.breakpointScale;
+    final resolvedSpacing = spacing.resolve(active, resolvedScale);
+    final resolvedRunSpacing = runSpacing.resolve(active, resolvedScale);
 
     return Wrap(
       spacing: resolvedSpacing,

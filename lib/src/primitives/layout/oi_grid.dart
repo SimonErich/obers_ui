@@ -16,6 +16,7 @@ import 'package:obers_ui/src/foundation/oi_span.dart';
 ///
 /// ```dart
 /// OiGrid(
+///   breakpoint: context.breakpoint,
 ///   columns: OiResponsive.breakpoints({
 ///     OiBreakpoint.compact: 1,
 ///     OiBreakpoint.medium: 2,
@@ -28,6 +29,10 @@ import 'package:obers_ui/src/foundation/oi_span.dart';
 ///   children: [...],
 /// )
 /// ```
+///
+/// **Zero magic:** [breakpoint] is required so every grid is self-contained
+/// with explicit props. Resolve the breakpoint once at the page/layout level
+/// (e.g. `context.breakpoint`) and pass it down as a concrete value.
 ///
 /// Children wrapped with [OiSpan] (via the `.span()` extension) are placed
 /// according to their [OiSpanData]:
@@ -42,12 +47,13 @@ import 'package:obers_ui/src/foundation/oi_span.dart';
 class OiGrid extends StatelessWidget {
   /// Creates an [OiGrid].
   const OiGrid({
+    required this.breakpoint,
     required this.children,
     this.columns,
     this.minColumnWidth,
     this.gap = const OiResponsive<double>(0),
     this.rowGap,
-    this.breakpoint,
+    this.scale,
     super.key,
   }) : assert(
          columns == null || minColumnWidth == null,
@@ -68,11 +74,14 @@ class OiGrid extends StatelessWidget {
   /// Vertical gap between rows. When null, [gap] is used for both axes.
   final OiResponsive<double>? rowGap;
 
-  /// The active breakpoint, resolved at the layout level.
+  /// The active breakpoint. Required — resolve once at the layout level
+  /// and pass down explicitly.
+  final OiBreakpoint breakpoint;
+
+  /// The breakpoint scale used to resolve responsive values.
   ///
-  /// When null, falls back to `context.breakpoint` (implicit context lookup).
-  /// Only accessed when at least one child carries [OiSpan] metadata.
-  final OiBreakpoint? breakpoint;
+  /// When null, read from the nearest [OiTheme] via `context.breakpointScale`.
+  final OiBreakpointScale? scale;
 
   /// The child widgets to place in the grid.
   final List<Widget> children;
@@ -81,12 +90,13 @@ class OiGrid extends StatelessWidget {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        // Resolve responsive values.
-        final active = breakpoint ?? context.breakpoint;
-        final scale = context.breakpointScale;
+        // Resolve responsive values — breakpoint is explicit, no context
+        // lookup for it.
+        final active = breakpoint;
+        final resolvedScale = scale ?? context.breakpointScale;
 
-        final resolvedGap = gap.resolve(active, scale);
-        final effectiveRowGap = rowGap?.resolve(active, scale) ?? resolvedGap;
+        final resolvedGap = gap.resolve(active, resolvedScale);
+        final effectiveRowGap = rowGap?.resolve(active, resolvedScale) ?? resolvedGap;
 
         // When placed inside an unconstrained-width parent (e.g. a Row),
         // fall back to a single-column vertical layout so the widget
@@ -108,8 +118,8 @@ class OiGrid extends StatelessWidget {
         final availableWidth = constraints.maxWidth;
 
         // Compute column count.
-        final resolvedColumns = columns?.resolve(active, scale);
-        final resolvedMinColumnWidth = minColumnWidth?.resolve(active, scale);
+        final resolvedColumns = columns?.resolve(active, resolvedScale);
+        final resolvedMinColumnWidth = minColumnWidth?.resolve(active, resolvedScale);
 
         int cols;
         if (resolvedColumns != null) {
@@ -145,7 +155,7 @@ class OiGrid extends StatelessWidget {
           final child = children[i];
           final spanData = OiSpan.maybeOf(child);
 
-          var colSpan = spanData?.resolveColumnSpan(active, scale) ?? 1;
+          var colSpan = spanData?.resolveColumnSpan(active, resolvedScale) ?? 1;
           if (colSpan == fullSpanSentinel) colSpan = cols;
           colSpan = colSpan.clamp(1, cols);
 
@@ -153,8 +163,8 @@ class OiGrid extends StatelessWidget {
             index: i,
             child: child,
             columnSpan: colSpan,
-            columnStart: spanData?.resolveColumnStart(active, scale),
-            columnOrder: spanData?.resolveColumnOrder(active, scale),
+            columnStart: spanData?.resolveColumnStart(active, resolvedScale),
+            columnOrder: spanData?.resolveColumnOrder(active, resolvedScale),
           ));
         }
 

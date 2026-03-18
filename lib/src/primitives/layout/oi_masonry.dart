@@ -12,6 +12,7 @@ import 'package:obers_ui/src/foundation/oi_responsive.dart';
 ///
 /// ```dart
 /// OiMasonry(
+///   breakpoint: context.breakpoint,
 ///   columns: OiResponsive.breakpoints({
 ///     OiBreakpoint.compact: 2,
 ///     OiBreakpoint.expanded: 4,
@@ -24,14 +25,20 @@ import 'package:obers_ui/src/foundation/oi_responsive.dart';
 /// )
 /// ```
 ///
+/// **Zero magic:** [breakpoint] is required so every masonry layout is
+/// self-contained with explicit props. Resolve the breakpoint once at the
+/// page/layout level (e.g. `context.breakpoint`) and pass it down as a
+/// concrete value.
+///
 /// {@category Primitives}
 class OiMasonry extends StatelessWidget {
   /// Creates an [OiMasonry].
   const OiMasonry({
+    required this.breakpoint,
     required this.children,
     this.columns = const OiResponsive<int>(2),
     this.gap = const OiResponsive<double>(0),
-    this.breakpoint,
+    this.scale,
     super.key,
   });
 
@@ -41,10 +48,14 @@ class OiMasonry extends StatelessWidget {
   /// Horizontal and vertical gap between columns / items in logical pixels.
   final OiResponsive<double> gap;
 
-  /// The active breakpoint, resolved at the layout level.
+  /// The active breakpoint. Required — resolve once at the layout level
+  /// and pass down explicitly.
+  final OiBreakpoint breakpoint;
+
+  /// The breakpoint scale used to resolve responsive values.
   ///
-  /// When null, falls back to `context.breakpoint` (implicit context lookup).
-  final OiBreakpoint? breakpoint;
+  /// When null, read from the nearest [OiTheme] via `context.breakpointScale`.
+  final OiBreakpointScale? scale;
 
   /// The child widgets to distribute across columns.
   final List<Widget> children;
@@ -53,11 +64,13 @@ class OiMasonry extends StatelessWidget {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        // Resolve responsive values.
-        final active = breakpoint ?? context.breakpoint;
-        final scale = context.breakpointScale;
-        final resolvedColumns = math.max(1, columns.resolve(active, scale));
-        final resolvedGap = gap.resolve(active, scale);
+        // Resolve responsive values — breakpoint is explicit, no context
+        // lookup for it.
+        final active = breakpoint;
+        final resolvedScale = scale ?? context.breakpointScale;
+        final resolvedColumns =
+            math.max(1, columns.resolve(active, resolvedScale));
+        final resolvedGap = gap.resolve(active, resolvedScale);
 
         final hasBoundedWidth = constraints.hasBoundedWidth;
 

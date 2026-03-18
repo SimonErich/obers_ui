@@ -8,6 +8,7 @@ import 'package:obers_ui/src/foundation/oi_responsive.dart';
 ///
 /// ```dart
 /// OiColumn(
+///   breakpoint: context.breakpoint,
 ///   gap: OiResponsive.breakpoints({
 ///     OiBreakpoint.compact: 8,
 ///     OiBreakpoint.expanded: 16,
@@ -20,22 +21,22 @@ import 'package:obers_ui/src/foundation/oi_responsive.dart';
 /// is greater than or equal to [collapse.minWidth], the widget renders as a
 /// [Row] instead, with the same [gap] applied as horizontal spacing.
 ///
-/// The active breakpoint can be supplied explicitly via [breakpoint] so that
-/// responsive values are resolved once at the layout level and passed down as
-/// concrete values. When [breakpoint] is null the widget reads the breakpoint
-/// from the nearest [OiTheme] via `context.breakpoint`.
+/// **Zero magic:** [breakpoint] is required so every column is self-contained
+/// with explicit props. Resolve the breakpoint once at the page/layout level
+/// (e.g. `context.breakpoint`) and pass it down as a concrete value.
 ///
 /// {@category Primitives}
 class OiColumn extends StatelessWidget {
   /// Creates an [OiColumn].
   const OiColumn({
+    required this.breakpoint,
     required this.children,
     this.gap = const OiResponsive<double>(0),
     this.mainAxisAlignment = MainAxisAlignment.start,
     this.crossAxisAlignment = CrossAxisAlignment.center,
     this.mainAxisSize = MainAxisSize.min,
     this.collapse,
-    this.breakpoint,
+    this.scale,
     super.key,
   });
 
@@ -62,17 +63,20 @@ class OiColumn extends StatelessWidget {
   /// the layout expands from a [Column] into a [Row].
   final OiBreakpoint? collapse;
 
-  /// The active breakpoint, resolved at the layout level.
+  /// The active breakpoint. Required — resolve once at the layout level
+  /// and pass down explicitly.
+  final OiBreakpoint breakpoint;
+
+  /// The breakpoint scale used to resolve responsive values.
   ///
-  /// When null, falls back to `context.breakpoint` (implicit context lookup).
-  /// Prefer passing an explicit value so the widget is self-contained.
-  final OiBreakpoint? breakpoint;
+  /// When null, read from the nearest [OiTheme] via `context.breakpointScale`.
+  final OiBreakpointScale? scale;
 
   @override
   Widget build(BuildContext context) {
-    final active = breakpoint ?? context.breakpoint;
-    final scale = context.breakpointScale;
-    final resolvedGap = gap.resolve(active, scale);
+    final active = breakpoint;
+    final resolvedScale = scale ?? context.breakpointScale;
+    final resolvedGap = gap.resolve(active, resolvedScale);
     final shouldExpand =
         collapse != null && active.minWidth >= collapse!.minWidth;
 

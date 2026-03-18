@@ -30,12 +30,19 @@ void main() {
   // ── Rendering ──────────────────────────────────────────────────────────────
 
   testWidgets('renders child', (tester) async {
-    await tester.pumpObers(const OiContainer(child: Text('hello')));
+    await tester.pumpObers(
+      const OiContainer(
+        breakpoint: OiBreakpoint.compact,
+        child: Text('hello'),
+      ),
+    );
     expect(find.text('hello'), findsOneWidget);
   });
 
   testWidgets('renders without child', (tester) async {
-    await tester.pumpObers(const OiContainer());
+    await tester.pumpObers(
+      const OiContainer(breakpoint: OiBreakpoint.compact),
+    );
     expect(find.byType(OiContainer), findsOneWidget);
   });
 
@@ -44,6 +51,7 @@ void main() {
   testWidgets('applies maxWidth via ConstrainedBox', (tester) async {
     await tester.pumpObers(
       const OiContainer(
+        breakpoint: OiBreakpoint.compact,
         maxWidth: OiResponsive<double>(300),
         child: Text('x'),
       ),
@@ -56,7 +64,12 @@ void main() {
   });
 
   testWidgets('maxWidth defaults to infinity when not set', (tester) async {
-    await tester.pumpObers(const OiContainer(child: Text('x')));
+    await tester.pumpObers(
+      const OiContainer(
+        breakpoint: OiBreakpoint.compact,
+        child: Text('x'),
+      ),
+    );
     final boxes = tester
         .widgetList<ConstrainedBox>(find.byType(ConstrainedBox))
         .where((b) => b.constraints.maxWidth == double.infinity)
@@ -69,6 +82,7 @@ void main() {
   testWidgets('applies padding when provided', (tester) async {
     await tester.pumpObers(
       const OiContainer(
+        breakpoint: OiBreakpoint.compact,
         padding: OiResponsive<EdgeInsetsGeometry>(EdgeInsets.all(16)),
         child: Text('padded'),
       ),
@@ -78,20 +92,34 @@ void main() {
   });
 
   testWidgets('no Padding widget when padding is null', (tester) async {
-    await tester.pumpObers(const OiContainer(child: Text('no pad')));
+    await tester.pumpObers(
+      const OiContainer(
+        breakpoint: OiBreakpoint.compact,
+        child: Text('no pad'),
+      ),
+    );
     expect(find.byType(Padding), findsNothing);
   });
 
   // ── Centering ─────────────────────────────────────────────────────────────
 
   testWidgets('centered=true wraps in Center', (tester) async {
-    await tester.pumpObers(const OiContainer(child: Text('centered')));
+    await tester.pumpObers(
+      const OiContainer(
+        breakpoint: OiBreakpoint.compact,
+        child: Text('centered'),
+      ),
+    );
     expect(find.byType(Center), findsOneWidget);
   });
 
   testWidgets('centered=false does not wrap in Center', (tester) async {
     await tester.pumpObers(
-      const OiContainer(centered: false, child: Text('not centered')),
+      const OiContainer(
+        breakpoint: OiBreakpoint.compact,
+        centered: false,
+        child: Text('not centered'),
+      ),
     );
     expect(find.byType(Center), findsNothing);
   });
@@ -109,7 +137,11 @@ void main() {
       // Compact → maxWidth infinity.
       await pumpAtWidth(
         tester,
-        OiContainer(maxWidth: responsiveMaxWidth, child: const Text('x')),
+        OiContainer(
+          breakpoint: OiBreakpoint.compact,
+          maxWidth: responsiveMaxWidth,
+          child: const Text('x'),
+        ),
         400,
       );
       var boxes = tester
@@ -120,7 +152,11 @@ void main() {
       // Expanded → maxWidth 960.
       await pumpAtWidth(
         tester,
-        OiContainer(maxWidth: responsiveMaxWidth, child: const Text('x')),
+        OiContainer(
+          breakpoint: OiBreakpoint.expanded,
+          maxWidth: responsiveMaxWidth,
+          child: const Text('x'),
+        ),
         900,
       );
       boxes = tester
@@ -131,7 +167,11 @@ void main() {
       // Large → maxWidth 1200.
       await pumpAtWidth(
         tester,
-        OiContainer(maxWidth: responsiveMaxWidth, child: const Text('x')),
+        OiContainer(
+          breakpoint: OiBreakpoint.large,
+          maxWidth: responsiveMaxWidth,
+          child: const Text('x'),
+        ),
         1300,
       );
       boxes = tester
@@ -151,6 +191,7 @@ void main() {
       await pumpAtWidth(
         tester,
         OiContainer(
+          breakpoint: OiBreakpoint.compact,
           padding: responsivePadding,
           child: const Text('padded'),
         ),
@@ -163,6 +204,7 @@ void main() {
       await pumpAtWidth(
         tester,
         OiContainer(
+          breakpoint: OiBreakpoint.expanded,
           padding: responsivePadding,
           child: const Text('padded'),
         ),

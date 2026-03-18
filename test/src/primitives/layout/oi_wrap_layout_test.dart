@@ -29,7 +29,10 @@ Future<void> pumpAtWidth(
 void main() {
   testWidgets('renders children inside a Wrap', (tester) async {
     await tester.pumpObers(
-      const OiWrapLayout(children: [Text('A'), Text('B'), Text('C')]),
+      const OiWrapLayout(
+        breakpoint: OiBreakpoint.compact,
+        children: [Text('A'), Text('B'), Text('C')],
+      ),
     );
     expect(find.byType(Wrap), findsOneWidget);
     expect(find.text('A'), findsOneWidget);
@@ -40,6 +43,7 @@ void main() {
   testWidgets('passes spacing and runSpacing to Wrap', (tester) async {
     await tester.pumpObers(
       const OiWrapLayout(
+        breakpoint: OiBreakpoint.compact,
         spacing: OiResponsive<double>(8),
         runSpacing: OiResponsive<double>(16),
         children: [Text('X')],
@@ -53,6 +57,7 @@ void main() {
   testWidgets('passes alignment to Wrap', (tester) async {
     await tester.pumpObers(
       const OiWrapLayout(
+        breakpoint: OiBreakpoint.compact,
         alignment: WrapAlignment.center,
         children: [Text('X')],
       ),
@@ -63,7 +68,11 @@ void main() {
 
   testWidgets('passes direction to Wrap', (tester) async {
     await tester.pumpObers(
-      const OiWrapLayout(direction: Axis.vertical, children: [Text('X')]),
+      const OiWrapLayout(
+        breakpoint: OiBreakpoint.compact,
+        direction: Axis.vertical,
+        children: [Text('X')],
+      ),
     );
     final wrap = tester.widget<Wrap>(find.byType(Wrap));
     expect(wrap.direction, Axis.vertical);
@@ -82,6 +91,7 @@ void main() {
       await pumpAtWidth(
         tester,
         OiWrapLayout(
+          breakpoint: OiBreakpoint.compact,
           spacing: responsiveSpacing,
           children: const [Text('A'), Text('B')],
         ),
@@ -94,6 +104,7 @@ void main() {
       await pumpAtWidth(
         tester,
         OiWrapLayout(
+          breakpoint: OiBreakpoint.expanded,
           spacing: responsiveSpacing,
           children: const [Text('A'), Text('B')],
         ),
@@ -113,6 +124,7 @@ void main() {
       await pumpAtWidth(
         tester,
         OiWrapLayout(
+          breakpoint: OiBreakpoint.compact,
           runSpacing: responsiveRunSpacing,
           children: const [Text('A')],
         ),
@@ -125,6 +137,7 @@ void main() {
       await pumpAtWidth(
         tester,
         OiWrapLayout(
+          breakpoint: OiBreakpoint.large,
           runSpacing: responsiveRunSpacing,
           children: const [Text('A')],
         ),

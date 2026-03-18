@@ -15,6 +15,7 @@ void main() {
   testWidgets('renders children with fixed columns', (tester) async {
     await tester.pumpObers(
       const OiGrid(
+        breakpoint: OiBreakpoint.compact,
         columns: OiResponsive<int>(3),
         children: [Text('A'), Text('B'), Text('C'), Text('D')],
       ),
@@ -28,6 +29,7 @@ void main() {
   testWidgets('uses LayoutBuilder and Wrap internally', (tester) async {
     await tester.pumpObers(
       const OiGrid(
+        breakpoint: OiBreakpoint.compact,
         columns: OiResponsive<int>(2),
         children: [Text('X'), Text('Y')],
       ),
@@ -42,6 +44,7 @@ void main() {
     // Surface 800px wide, 2 columns, gap 0 → each item = 400px.
     await tester.pumpObers(
       const OiGrid(
+        breakpoint: OiBreakpoint.compact,
         columns: OiResponsive<int>(2),
         children: [Text('A'), Text('B')],
       ),
@@ -63,6 +66,7 @@ void main() {
   testWidgets('gap is applied to Wrap spacing', (tester) async {
     await tester.pumpObers(
       const OiGrid(
+        breakpoint: OiBreakpoint.compact,
         columns: OiResponsive<int>(2),
         gap: OiResponsive<double>(8),
         children: [Text('A'), Text('B')],
@@ -76,6 +80,7 @@ void main() {
   testWidgets('rowGap overrides run spacing', (tester) async {
     await tester.pumpObers(
       const OiGrid(
+        breakpoint: OiBreakpoint.compact,
         columns: OiResponsive<int>(2),
         gap: OiResponsive<double>(8),
         rowGap: OiResponsive<double>(24),
@@ -93,6 +98,7 @@ void main() {
     // Surface 800px, minColumnWidth=200 → 4 columns, each ~200px wide (gap=0).
     await tester.pumpObers(
       const OiGrid(
+        breakpoint: OiBreakpoint.compact,
         minColumnWidth: OiResponsive<double>(200),
         children: [Text('A'), Text('B'), Text('C'), Text('D')],
       ),
@@ -118,6 +124,7 @@ void main() {
       // Item A spans 2 cols → width = 2 * 200 = 400.
       await tester.pumpObers(
         OiGrid(
+          breakpoint: OiBreakpoint.compact,
           columns: 4.responsive,
           children: [
             const Text('A').span(columnSpan: const OiResponsive<int>(2)),
@@ -141,6 +148,7 @@ void main() {
       // Item A spans 2 → width = 2 * 194 + 1 * 8 = 396.
       await tester.pumpObers(
         OiGrid(
+          breakpoint: OiBreakpoint.compact,
           columns: 4.responsive,
           gap: 8.0.responsive,
           children: [
@@ -160,6 +168,7 @@ void main() {
       // 3 columns, item requests span 5 → clamped to 3 (full row).
       await tester.pumpObers(
         OiGrid(
+          breakpoint: OiBreakpoint.compact,
           columns: 3.responsive,
           children: [
             const Text('A').span(columnSpan: const OiResponsive<int>(5)),
@@ -177,6 +186,7 @@ void main() {
     testWidgets('spanFull fills entire row', (tester) async {
       await tester.pumpObers(
         OiGrid(
+          breakpoint: OiBreakpoint.compact,
           columns: 4.responsive,
           gap: 8.0.responsive,
           children: [const Text('full').spanFull(), const Text('B')],
@@ -196,6 +206,7 @@ void main() {
       // Row 2: C (span 2).
       await tester.pumpObers(
         OiGrid(
+          breakpoint: OiBreakpoint.compact,
           columns: 3.responsive,
           children: [
             const Text('A'),
@@ -223,6 +234,7 @@ void main() {
       // Item A at columnStart 3 (1-indexed) → x = 2 * 200 = 400.
       await tester.pumpObers(
         OiGrid(
+          breakpoint: OiBreakpoint.compact,
           columns: 4.responsive,
           children: [
             const Text('A').span(columnStart: const OiResponsive<int>(3)),
@@ -241,6 +253,7 @@ void main() {
       // Item A.left = 396 + 8 = 404.
       await tester.pumpObers(
         OiGrid(
+          breakpoint: OiBreakpoint.compact,
           columns: 4.responsive,
           gap: 8.0.responsive,
           children: [
@@ -257,6 +270,7 @@ void main() {
     testWidgets('columnStart behind cursor starts new row', (tester) async {
       await tester.pumpObers(
         OiGrid(
+          breakpoint: OiBreakpoint.compact,
           columns: 4.responsive,
           children: [
             const Text('A').span(columnSpan: const OiResponsive<int>(2)),
@@ -282,6 +296,7 @@ void main() {
       // Visual order: B, C, A.
       await tester.pumpObers(
         OiGrid(
+          breakpoint: OiBreakpoint.compact,
           columns: 3.responsive,
           children: [
             const Text('A').span(columnOrder: const OiResponsive<int>(3)),
@@ -303,6 +318,7 @@ void main() {
     testWidgets('items without order treated as order 0', (tester) async {
       await tester.pumpObers(
         OiGrid(
+          breakpoint: OiBreakpoint.compact,
           columns: 2.responsive,
           children: [
             const Text('A').span(columnSpan: const OiResponsive<int>(1)),
@@ -320,6 +336,7 @@ void main() {
     testWidgets('negative order sorts before default', (tester) async {
       await tester.pumpObers(
         OiGrid(
+          breakpoint: OiBreakpoint.compact,
           columns: 2.responsive,
           children: [
             const Text('B').span(columnSpan: const OiResponsive<int>(1)),
@@ -529,6 +546,7 @@ void main() {
     ) async {
       await tester.pumpObers(
         OiGrid(
+          breakpoint: OiBreakpoint.compact,
           columns: 4.responsive,
           children: [
             const Text('A').span(
@@ -548,6 +566,7 @@ void main() {
     testWidgets('order + span + start work together', (tester) async {
       await tester.pumpObers(
         OiGrid(
+          breakpoint: OiBreakpoint.compact,
           columns: 4.responsive,
           children: [
             const Text('A').span(columnOrder: const OiResponsive<int>(2)),
@@ -576,6 +595,7 @@ void main() {
     testWidgets('non-OiSpan children get default span 1', (tester) async {
       await tester.pumpObers(
         OiGrid(
+          breakpoint: OiBreakpoint.compact,
           columns: 3.responsive,
           children: [
             const Text('plain'),
@@ -630,6 +650,7 @@ void main() {
       // The grid reads span metadata identically regardless of child type.
       await tester.pumpObers(
         OiGrid(
+          breakpoint: OiBreakpoint.compact,
           columns: 4.responsive,
           children: [
             Container(
@@ -685,6 +706,7 @@ void main() {
     testWidgets('grid without span children uses Wrap', (tester) async {
       await tester.pumpObers(
         const OiGrid(
+          breakpoint: OiBreakpoint.compact,
           columns: OiResponsive<int>(2),
           children: [Text('X'), Text('Y')],
         ),
@@ -698,6 +720,7 @@ void main() {
     ) async {
       await tester.pumpObers(
         OiGrid(
+          breakpoint: OiBreakpoint.compact,
           columns: 2.responsive,
           children: [
             const Text('X').span(columnSpan: const OiResponsive<int>(1)),
@@ -796,6 +819,34 @@ void main() {
 
       wrap = tester.widget<Wrap>(find.byType(Wrap));
       expect(wrap.spacing, 16);
+    });
+  });
+
+  // ── Zero magic: explicit scale parameter ───────────────────────────────
+
+  group('explicit scale parameter', () {
+    testWidgets('scale param bypasses context for responsive resolution', (
+      tester,
+    ) async {
+      final customScale = OiBreakpointScale.standard();
+
+      await tester.pumpObers(
+        OiGrid(
+          breakpoint: OiBreakpoint.medium,
+          scale: customScale,
+          columns: OiResponsive<int>.breakpoints({
+            OiBreakpoint.compact: 1,
+            OiBreakpoint.medium: 3,
+          }),
+          children: const [Text('A'), Text('B'), Text('C')],
+        ),
+        surfaceSize: const Size(900, 600),
+      );
+
+      // Medium breakpoint with standard scale → 3 columns.
+      final wrap = tester.widget<Wrap>(find.byType(Wrap));
+      final children = wrap.children;
+      expect(children, hasLength(3));
     });
   });
 }

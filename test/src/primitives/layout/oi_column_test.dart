@@ -30,7 +30,12 @@ void main() {
   // ── Basic rendering ────────────────────────────────────────────────────────
 
   testWidgets('renders as Column by default', (tester) async {
-    await tester.pumpObers(const OiColumn(children: [Text('A'), Text('B')]));
+    await tester.pumpObers(
+      const OiColumn(
+        breakpoint: OiBreakpoint.compact,
+        children: [Text('A'), Text('B')],
+      ),
+    );
     expect(find.byType(Column), findsOneWidget);
     expect(find.text('A'), findsOneWidget);
     expect(find.text('B'), findsOneWidget);
@@ -41,6 +46,7 @@ void main() {
   testWidgets('inserts SizedBox with correct height for gap', (tester) async {
     await tester.pumpObers(
       const OiColumn(
+        breakpoint: OiBreakpoint.compact,
         gap: OiResponsive<double>(16),
         children: [Text('A'), Text('B'), Text('C')],
       ),
@@ -51,7 +57,12 @@ void main() {
   });
 
   testWidgets('no SizedBox spacers when gap is 0', (tester) async {
-    await tester.pumpObers(const OiColumn(children: [Text('A'), Text('B')]));
+    await tester.pumpObers(
+      const OiColumn(
+        breakpoint: OiBreakpoint.compact,
+        children: [Text('A'), Text('B')],
+      ),
+    );
     final boxes = tester.widgetList<SizedBox>(find.byType(SizedBox)).toList();
     expect(boxes.where((b) => b.height != null && b.height! > 0), isEmpty);
   });
@@ -63,6 +74,7 @@ void main() {
     await pumpAtWidth(
       tester,
       const OiColumn(
+        breakpoint: OiBreakpoint.expanded,
         collapse: OiBreakpoint.medium,
         children: [Text('A'), Text('B')],
       ),
@@ -77,6 +89,7 @@ void main() {
     await pumpAtWidth(
       tester,
       const OiColumn(
+        breakpoint: OiBreakpoint.compact,
         collapse: OiBreakpoint.medium,
         children: [Text('A'), Text('B')],
       ),
@@ -90,6 +103,7 @@ void main() {
     await pumpAtWidth(
       tester,
       const OiColumn(
+        breakpoint: OiBreakpoint.expanded,
         gap: OiResponsive<double>(10),
         collapse: OiBreakpoint.medium,
         children: [Text('A'), Text('B')],
@@ -146,7 +160,7 @@ void main() {
       // Compact → gap 4.
       await pumpAtWidth(
         tester,
-        OiColumn(gap: responsiveGap, children: const [Text('A'), Text('B')]),
+        OiColumn(breakpoint: OiBreakpoint.compact, gap: responsiveGap, children: const [Text('A'), Text('B')]),
         400,
       );
       var boxes = tester.widgetList<SizedBox>(find.byType(SizedBox)).toList();
@@ -155,11 +169,33 @@ void main() {
       // Expanded → gap 16.
       await pumpAtWidth(
         tester,
-        OiColumn(gap: responsiveGap, children: const [Text('A'), Text('B')]),
+        OiColumn(breakpoint: OiBreakpoint.expanded, gap: responsiveGap, children: const [Text('A'), Text('B')]),
         900,
       );
       boxes = tester.widgetList<SizedBox>(find.byType(SizedBox)).toList();
       expect(boxes.where((b) => b.height == 16), hasLength(1));
     });
+  });
+
+  // ── Scale context fallback ──────────────────────────────────────────────
+
+  testWidgets('scale fallback throws when OiTheme is missing', (tester) async {
+    // Pump without OiTheme — context.breakpointScale should assert.
+    await tester.pumpWidget(
+      MediaQuery(
+        data: const MediaQueryData(size: Size(400, 800)),
+        child: Directionality(
+          textDirection: TextDirection.ltr,
+          child: OiColumn(
+            breakpoint: OiBreakpoint.compact,
+            gap: OiResponsive<double>.breakpoints({
+              OiBreakpoint.compact: 8,
+            }),
+            children: const [Text('A')],
+          ),
+        ),
+      ),
+    );
+    expect(tester.takeException(), isNotNull);
   });
 }

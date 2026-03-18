@@ -8,6 +8,7 @@ import 'package:obers_ui/src/foundation/oi_responsive.dart';
 ///
 /// ```dart
 /// OiContainer(
+///   breakpoint: context.breakpoint,
 ///   maxWidth: OiResponsive.breakpoints({
 ///     OiBreakpoint.compact: double.infinity,
 ///     OiBreakpoint.expanded: 960,
@@ -21,20 +22,21 @@ import 'package:obers_ui/src/foundation/oi_responsive.dart';
 /// )
 /// ```
 ///
-/// The active breakpoint can be supplied explicitly via [breakpoint] so that
-/// responsive values are resolved once at the layout level and passed down as
-/// concrete values. When [breakpoint] is null the widget reads the breakpoint
-/// from the nearest [OiTheme] via `context.breakpoint`.
+/// **Zero magic:** [breakpoint] is required so every container is
+/// self-contained with explicit props. Resolve the breakpoint once at the
+/// page/layout level (e.g. `context.breakpoint`) and pass it down as a
+/// concrete value.
 ///
 /// {@category Primitives}
 class OiContainer extends StatelessWidget {
   /// Creates an [OiContainer].
   const OiContainer({
+    required this.breakpoint,
     this.child,
     this.maxWidth,
     this.padding,
     this.centered = true,
-    this.breakpoint,
+    this.scale,
     super.key,
   });
 
@@ -50,18 +52,21 @@ class OiContainer extends StatelessWidget {
   /// Whether to center [child] horizontally. Defaults to `true`.
   final bool centered;
 
-  /// The active breakpoint, resolved at the layout level.
+  /// The active breakpoint. Required — resolve once at the layout level
+  /// and pass down explicitly.
+  final OiBreakpoint breakpoint;
+
+  /// The breakpoint scale used to resolve responsive values.
   ///
-  /// When null, falls back to `context.breakpoint` (implicit context lookup).
-  /// Prefer passing an explicit value so the widget is self-contained.
-  final OiBreakpoint? breakpoint;
+  /// When null, read from the nearest [OiTheme] via `context.breakpointScale`.
+  final OiBreakpointScale? scale;
 
   @override
   Widget build(BuildContext context) {
-    final active = breakpoint ?? context.breakpoint;
-    final scale = context.breakpointScale;
-    final resolvedMaxWidth = maxWidth?.resolve(active, scale);
-    final resolvedPadding = padding?.resolve(active, scale);
+    final active = breakpoint;
+    final resolvedScale = scale ?? context.breakpointScale;
+    final resolvedMaxWidth = maxWidth?.resolve(active, resolvedScale);
+    final resolvedPadding = padding?.resolve(active, resolvedScale);
 
     var content = child ?? const SizedBox.shrink() as Widget;
 
