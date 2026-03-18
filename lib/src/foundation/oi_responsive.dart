@@ -739,13 +739,13 @@ extension OiResponsiveExt on BuildContext {
   /// Whether the active breakpoint equals [bp].
   ///
   /// Use this for custom breakpoints that don't have a dedicated getter.
-  bool isBreakpointActive(OiBreakpoint bp) => breakpoint == bp;
+  bool breakpointActive(OiBreakpoint bp) => breakpoint == bp;
 
   /// Whether the active breakpoint's tier is at least as wide as [bp].
   ///
   /// Compares the active breakpoint's [OiBreakpoint.minWidth] against
   /// [bp.minWidth].
-  bool isAtLeast(OiBreakpoint bp) => breakpoint.minWidth >= bp.minWidth;
+  bool atLeast(OiBreakpoint bp) => breakpoint.minWidth >= bp.minWidth;
 
   /// Resolves an [OiResponsive] for the current screen width.
   ///

@@ -404,6 +404,155 @@ void main() {
     });
   });
 
+  // ── REQ-0017: Booleans are descriptive ──────────────────────────────────────
+
+  group('REQ-0017 – Booleans are descriptive', () {
+    // Matches public bool-returning methods (non-getters) with is/has prefix.
+    // e.g. `bool isBreakpointActive(…)` or `bool hasPermission(…)`.
+    // Excludes: getters (bool get isXxx), private methods (bool _isXxx),
+    // and static utility methods in utils/ files.
+    final badBoolMethodPattern = RegExp(
+      r'^\s*bool\s+(is[A-Z]\w*|has[A-Z]\w*)\s*\(',
+      multiLine: true,
+    );
+
+    test(
+      'no public bool method uses is/has prefix (except utils)',
+      () {
+        final violations = <String>[];
+
+        for (final file in allFiles) {
+          // Static utility methods (isImage, isToday, etc.) are acceptable
+          // in utils/ files — these are pure classification helpers, not
+          // widget API surface.
+          if (file.path.contains('/utils/')) continue;
+          // Skip _internal directory — private implementation.
+          if (file.path.contains('/_internal/')) continue;
+
+          final content = _stripComments(file.readAsStringSync());
+          final matches = badBoolMethodPattern.allMatches(content);
+          for (final m in matches) {
+            final name = m.group(1)!;
+            // Private methods are fine.
+            if (name.startsWith('_')) continue;
+            final line =
+                content.substring(0, m.start).split('\n').length;
+            violations.add('${file.path}:$line — $name()');
+          }
+        }
+
+        expect(
+          violations,
+          isEmpty,
+          reason:
+              'Public bool-returning methods must use descriptive names '
+              '(e.g. "breakpointActive", "atLeast") instead of is/has-prefixed '
+              'names. Violations:\n${violations.join('\n')}',
+        );
+      },
+    );
+
+    test('key widgets use descriptive single-word boolean adjectives', () {
+      // Spot-check that core widgets use descriptive adjective-form booleans
+      // as specified by REQ-0017: enabled, dismissible, searchable, loading.
+
+      // OiButton — enabled, loading
+      final buttonFile =
+          File('lib/src/components/buttons/oi_button.dart');
+      final buttonContent = buttonFile.readAsStringSync();
+      expect(
+        buttonContent,
+        contains('this.enabled'),
+        reason: 'OiButton should use "enabled" (descriptive adjective)',
+      );
+      expect(
+        buttonContent,
+        contains('this.loading'),
+        reason: 'OiButton should use "loading" (descriptive adjective)',
+      );
+
+      // OiDialog — dismissible
+      final dialogFile =
+          File('lib/src/components/overlays/oi_dialog.dart');
+      final dialogContent = dialogFile.readAsStringSync();
+      expect(
+        dialogContent,
+        contains('this.dismissible'),
+        reason: 'OiDialog should use "dismissible" (descriptive adjective)',
+      );
+
+      // OiSelect — searchable
+      final selectFile =
+          File('lib/src/components/inputs/oi_select.dart');
+      final selectContent = selectFile.readAsStringSync();
+      expect(
+        selectContent,
+        contains('this.searchable'),
+        reason: 'OiSelect should use "searchable" (descriptive adjective)',
+      );
+
+      // OiTappable — enabled, focusable
+      final tappableFile =
+          File('lib/src/primitives/interaction/oi_tappable.dart');
+      final tappableContent = tappableFile.readAsStringSync();
+      expect(
+        tappableContent,
+        contains('this.enabled'),
+        reason: 'OiTappable should use "enabled" (descriptive adjective)',
+      );
+      expect(
+        tappableContent,
+        contains('this.focusable'),
+        reason: 'OiTappable should use "focusable" (descriptive adjective)',
+      );
+
+      // OiSheet — dismissible
+      final sheetFile =
+          File('lib/src/components/overlays/oi_sheet.dart');
+      final sheetContent = sheetFile.readAsStringSync();
+      expect(
+        sheetContent,
+        contains('this.dismissible'),
+        reason: 'OiSheet should use "dismissible" (descriptive adjective)',
+      );
+    });
+
+    test('boolean fields use consistent adjective form', () {
+      // Verify no common non-adjective patterns exist as bool fields.
+      // e.g. `bool doX`, `bool canX`, `bool shouldX` in public API.
+      // These are procedural, not descriptive.
+      final proceduralBoolPattern = RegExp(
+        r'^\s*(?:final\s+)?bool\s+(do[A-Z]\w*|should[A-Z]\w*)(?=\s*[;,=)\]])',
+        multiLine: true,
+      );
+
+      final violations = <String>[];
+
+      for (final file in allFiles) {
+        if (file.path.contains('/_internal/')) continue;
+
+        final content = _stripComments(file.readAsStringSync());
+        final matches = proceduralBoolPattern.allMatches(content);
+        for (final m in matches) {
+          final name = m.group(1)!;
+          if (name.startsWith('_')) continue;
+          final line =
+              content.substring(0, m.start).split('\n').length;
+          violations.add('${file.path}:$line — $name');
+        }
+      }
+
+      expect(
+        violations,
+        isEmpty,
+        reason:
+            'Boolean fields should use adjective form (e.g. "enabled", '
+            '"dismissible", "loading") instead of procedural prefixes like '
+            '"do" or "should". Violations:\n${violations.join('\n')}',
+      );
+    });
+  });
+
   // ── REQ-0014: Required props enforce correctness ───────────────────────────
 
   group('REQ-0014 – Required props enforce correctness', () {

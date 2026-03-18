@@ -1295,7 +1295,7 @@ void main() {
 
     // ── Generic breakpoint helpers ──────────────────────────────────────
 
-    testWidgets('isBreakpointActive returns true for active breakpoint',
+    testWidgets('breakpointActive returns true for active breakpoint',
         (tester) async {
       late bool result;
       await tester.pumpWidget(
@@ -1303,7 +1303,7 @@ void main() {
           700,
           Builder(
             builder: (ctx) {
-              result = ctx.isBreakpointActive(OiBreakpoint.medium);
+              result = ctx.breakpointActive(OiBreakpoint.medium);
               return const SizedBox.shrink();
             },
           ),
@@ -1312,7 +1312,7 @@ void main() {
       expect(result, isTrue);
     });
 
-    testWidgets('isBreakpointActive returns false for inactive breakpoint',
+    testWidgets('breakpointActive returns false for inactive breakpoint',
         (tester) async {
       late bool result;
       await tester.pumpWidget(
@@ -1320,7 +1320,7 @@ void main() {
           700,
           Builder(
             builder: (ctx) {
-              result = ctx.isBreakpointActive(OiBreakpoint.compact);
+              result = ctx.breakpointActive(OiBreakpoint.compact);
               return const SizedBox.shrink();
             },
           ),
@@ -1329,14 +1329,14 @@ void main() {
       expect(result, isFalse);
     });
 
-    testWidgets('isAtLeast returns true when at breakpoint', (tester) async {
+    testWidgets('atLeast returns true when at breakpoint', (tester) async {
       late bool result;
       await tester.pumpWidget(
         buildWithWidth(
           600,
           Builder(
             builder: (ctx) {
-              result = ctx.isAtLeast(OiBreakpoint.medium);
+              result = ctx.atLeast(OiBreakpoint.medium);
               return const SizedBox.shrink();
             },
           ),
@@ -1345,14 +1345,14 @@ void main() {
       expect(result, isTrue);
     });
 
-    testWidgets('isAtLeast returns true when above breakpoint', (tester) async {
+    testWidgets('atLeast returns true when above breakpoint', (tester) async {
       late bool result;
       await tester.pumpWidget(
         buildWithWidth(
           1200,
           Builder(
             builder: (ctx) {
-              result = ctx.isAtLeast(OiBreakpoint.medium);
+              result = ctx.atLeast(OiBreakpoint.medium);
               return const SizedBox.shrink();
             },
           ),
@@ -1361,7 +1361,7 @@ void main() {
       expect(result, isTrue);
     });
 
-    testWidgets('isAtLeast returns false when below breakpoint',
+    testWidgets('atLeast returns false when below breakpoint',
         (tester) async {
       late bool result;
       await tester.pumpWidget(
@@ -1369,7 +1369,7 @@ void main() {
           400,
           Builder(
             builder: (ctx) {
-              result = ctx.isAtLeast(OiBreakpoint.medium);
+              result = ctx.atLeast(OiBreakpoint.medium);
               return const SizedBox.shrink();
             },
           ),
@@ -1493,7 +1493,7 @@ void main() {
         expect(captured.minWidth, 480);
       });
 
-      testWidgets('isBreakpointActive works for custom breakpoint', (
+      testWidgets('breakpointActive works for custom breakpoint', (
         tester,
       ) async {
         late bool result;
@@ -1503,7 +1503,7 @@ void main() {
             500,
             Builder(
               builder: (ctx) {
-                result = ctx.isBreakpointActive(tablet);
+                result = ctx.breakpointActive(tablet);
                 return const SizedBox.shrink();
               },
             ),
@@ -1512,7 +1512,7 @@ void main() {
         expect(result, isTrue);
       });
 
-      testWidgets('isAtLeast works with custom breakpoint', (tester) async {
+      testWidgets('atLeast works with custom breakpoint', (tester) async {
         late bool result;
         const tablet = OiBreakpoint('tablet', 480);
         await tester.pumpWidget(
@@ -1520,7 +1520,7 @@ void main() {
             700,
             Builder(
               builder: (ctx) {
-                result = ctx.isAtLeast(tablet);
+                result = ctx.atLeast(tablet);
                 return const SizedBox.shrink();
               },
             ),
