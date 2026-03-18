@@ -661,9 +661,14 @@ class _OiTableState<T> extends State<StatefulWidget>
     );
   }
 
+  /// Arrow-up icon for ascending sort indicator.
+  static const _arrowUp = IconData(0xe5c7, fontFamily: 'MaterialIcons');
+
+  /// Arrow-down icon for descending sort indicator.
+  static const _arrowDown = IconData(0xe5c5, fontFamily: 'MaterialIcons');
+
   Widget _buildColumnHeader(OiTableColumn<T> col) {
     final isSorted = _ctrl.sortColumnId == col.id;
-    final sortIcon = isSorted ? (_ctrl.sortAscending ? ' ▲' : ' ▼') : '';
     final width = _ctrl.columnWidths[col.id] ?? col.width;
     final innerContent = Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -672,11 +677,16 @@ class _OiTableState<T> extends State<StatefulWidget>
         children: [
           Flexible(
             child: Text(
-              '${col.header}$sortIcon',
+              col.header,
               textAlign: col.textAlign,
               overflow: TextOverflow.ellipsis,
             ),
           ),
+          if (isSorted)
+            Icon(
+              _ctrl.sortAscending ? _arrowUp : _arrowDown,
+              size: 16,
+            ),
         ],
       ),
     );

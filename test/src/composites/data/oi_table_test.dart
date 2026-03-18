@@ -731,8 +731,8 @@ void main() {
     expect(aliceIdx, lessThan(charlieIdx));
 
     // Second tap – toggles to descending (Charlie, Bob, Alice).
-    // Header now reads 'Name ▲'.
-    await tester.tap(find.text('Name ▲'));
+    // Header still reads 'Name'; the arrow is a separate Icon widget.
+    await tester.tap(find.text('Name'));
     await tester.pump();
     texts = tester
         .widgetList<Text>(find.byType(Text))
@@ -763,7 +763,7 @@ void main() {
       expect(calls, [true]);
 
       // Second tap – toggles to descending.
-      await tester.tap(find.text('Name ▲'));
+      await tester.tap(find.text('Name'));
       await tester.pump();
       expect(calls, [true, false]);
     },
@@ -775,7 +775,7 @@ void main() {
     // Sort by Name ascending, then toggle to descending.
     await tester.tap(find.text('Name'));
     await tester.pump();
-    await tester.tap(find.text('Name ▲'));
+    await tester.tap(find.text('Name'));
     await tester.pump();
     // Name is now sorted descending (Charlie, Bob, Alice).
     var texts = tester
@@ -797,13 +797,42 @@ void main() {
     final aliceIdx = texts.indexOf('Alice');
     final charlieIdx = texts.indexOf('Charlie');
     expect(aliceIdx, lessThan(charlieIdx));
-    // Value header should show ascending indicator.
-    expect(find.text('Value ▲'), findsOneWidget);
+    // Value header should show ascending arrow indicator.
+    expect(find.byType(Icon), findsOneWidget);
     // Name header should no longer show a sort indicator.
     expect(find.text('Name'), findsOneWidget);
   });
 
-  // 38. toSettings / applySettings via controller round-trips through table
+  // 38. Active sort column shows arrow indicator (REQ-0965)
+  testWidgets('active sort column shows arrow indicator', (tester) async {
+    await tester.pumpObers(_table());
+
+    // No icon before sorting.
+    expect(find.byType(Icon), findsNothing);
+
+    // Tap Name to sort ascending – an up-arrow Icon should appear.
+    await tester.tap(find.text('Name'));
+    await tester.pump();
+    expect(find.byType(Icon), findsOneWidget);
+
+    // Tap again to sort descending – still one Icon, but direction changed.
+    await tester.tap(find.text('Name'));
+    await tester.pump();
+    expect(find.byType(Icon), findsOneWidget);
+
+    // Sort a different column – icon moves to Value header.
+    await tester.tap(find.text('Value'));
+    await tester.pump();
+    expect(find.byType(Icon), findsOneWidget);
+    // Name header has no icon; Value header has the icon.
+    final header = find.byKey(const Key('oi_table_header'));
+    expect(
+      find.descendant(of: header, matching: find.byType(Icon)),
+      findsOneWidget,
+    );
+  });
+
+  // 39. toSettings / applySettings via controller round-trips through table
   testWidgets('applySettings restores column order in rendered table', (
     tester,
   ) async {
