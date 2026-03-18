@@ -832,7 +832,49 @@ void main() {
     );
   });
 
-  // 39. toSettings / applySettings via controller round-trips through table
+  // 39. Clicking active column toggles direction (REQ-0967)
+  testWidgets('clicking active column toggles direction', (tester) async {
+    final ctrl = OiTableController(totalRows: _rows.length);
+    await tester.pumpObers(_table(controller: ctrl));
+
+    // Tap Name to sort ascending.
+    await tester.tap(find.text('Name'));
+    await tester.pump();
+    expect(ctrl.sortColumnId, 'name');
+    expect(ctrl.sortAscending, isTrue);
+    var texts = tester
+        .widgetList<Text>(find.byType(Text))
+        .map((t) => t.data)
+        .whereType<String>()
+        .toList();
+    expect(texts.indexOf('Alice'), lessThan(texts.indexOf('Charlie')));
+
+    // Tap Name again – should toggle to descending.
+    await tester.tap(find.text('Name'));
+    await tester.pump();
+    expect(ctrl.sortColumnId, 'name');
+    expect(ctrl.sortAscending, isFalse);
+    texts = tester
+        .widgetList<Text>(find.byType(Text))
+        .map((t) => t.data)
+        .whereType<String>()
+        .toList();
+    expect(texts.indexOf('Charlie'), lessThan(texts.indexOf('Alice')));
+
+    // Tap Name a third time – should toggle back to ascending.
+    await tester.tap(find.text('Name'));
+    await tester.pump();
+    expect(ctrl.sortColumnId, 'name');
+    expect(ctrl.sortAscending, isTrue);
+    texts = tester
+        .widgetList<Text>(find.byType(Text))
+        .map((t) => t.data)
+        .whereType<String>()
+        .toList();
+    expect(texts.indexOf('Alice'), lessThan(texts.indexOf('Charlie')));
+  });
+
+  // 40. toSettings / applySettings via controller round-trips through table
   testWidgets('applySettings restores column order in rendered table', (
     tester,
   ) async {
