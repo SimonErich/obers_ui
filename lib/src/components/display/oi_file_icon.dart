@@ -41,14 +41,20 @@ enum OiFileCategory {
 ///
 /// {@category Components}
 enum OiFileIconSize {
+  /// 16 × 20 dp.
+  xs,
+
+  /// 24 × 30 dp.
+  sm,
+
   /// 32 × 40 dp.
-  small,
+  md,
 
   /// 48 × 60 dp.
-  medium,
+  lg,
 
   /// 64 × 80 dp.
-  large,
+  xl,
 }
 
 /// A file-type icon with a rounded page outline, dog-ear fold, and extension
@@ -63,7 +69,7 @@ enum OiFileIconSize {
 /// ```dart
 /// OiFileIcon(extension: 'PDF', category: OiFileCategory.document)
 /// OiFileIcon(extension: 'XLSX', category: OiFileCategory.spreadsheet)
-/// OiFileIcon(extension: 'MP4', category: OiFileCategory.video, size: OiFileIconSize.large)
+/// OiFileIcon(extension: 'MP4', category: OiFileCategory.video, size: OiFileIconSize.xl)
 /// ```
 ///
 /// {@category Components}
@@ -72,7 +78,7 @@ class OiFileIcon extends StatelessWidget {
   const OiFileIcon({
     required this.extension,
     this.category = OiFileCategory.generic,
-    this.size = OiFileIconSize.medium,
+    this.size = OiFileIconSize.md,
     this.semanticLabel,
     super.key,
   });
@@ -107,7 +113,25 @@ class OiFileIcon extends StatelessWidget {
   })
   _dimensions() {
     switch (size) {
-      case OiFileIconSize.small:
+      case OiFileIconSize.xs:
+        return (
+          width: 16,
+          height: 20,
+          foldSize: 4,
+          bandHeight: 7,
+          fontSize: 5,
+          radius: 2,
+        );
+      case OiFileIconSize.sm:
+        return (
+          width: 24,
+          height: 30,
+          foldSize: 6,
+          bandHeight: 10,
+          fontSize: 6,
+          radius: 2,
+        );
+      case OiFileIconSize.md:
         return (
           width: 32,
           height: 40,
@@ -116,7 +140,7 @@ class OiFileIcon extends StatelessWidget {
           fontSize: 8,
           radius: 3,
         );
-      case OiFileIconSize.medium:
+      case OiFileIconSize.lg:
         return (
           width: 48,
           height: 60,
@@ -125,7 +149,7 @@ class OiFileIcon extends StatelessWidget {
           fontSize: 11,
           radius: 4,
         );
-      case OiFileIconSize.large:
+      case OiFileIconSize.xl:
         return (
           width: 64,
           height: 80,
