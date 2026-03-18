@@ -26,7 +26,9 @@ void main() {
     expect(find.text('D'), findsOneWidget);
   });
 
-  testWidgets('uses LayoutBuilder and Wrap internally', (tester) async {
+  testWidgets('uses custom RenderBox internally — no Wrap or GridView', (
+    tester,
+  ) async {
     await tester.pumpObers(
       const OiGrid(
         breakpoint: OiBreakpoint.compact,
@@ -34,11 +36,15 @@ void main() {
         children: [Text('X'), Text('Y')],
       ),
     );
-    expect(find.byType(LayoutBuilder), findsOneWidget);
-    expect(find.byType(Wrap), findsOneWidget);
+    // REQ-1075: must NOT use Wrap or GridView.
+    expect(find.byType(Wrap), findsNothing);
+    expect(find.byType(GridView), findsNothing);
+    // Should still render children.
+    expect(find.text('X'), findsOneWidget);
+    expect(find.text('Y'), findsOneWidget);
   });
 
-  testWidgets('each child wrapped in SizedBox with computed width', (
+  testWidgets('each child gets computed width from column count', (
     tester,
   ) async {
     // Surface 800px wide, 2 columns, gap 0 → each item = 400px.
@@ -50,20 +56,17 @@ void main() {
       ),
       surfaceSize: const Size(800, 600),
     );
-    final boxes = tester
-        .widgetList<SizedBox>(find.byType(SizedBox))
-        .where((b) => b.width != null && b.width! > 0)
-        .toList();
-    expect(boxes, isNotEmpty);
-    // Each box should be half the available width.
-    for (final box in boxes) {
-      expect(box.width, closeTo(400, 1));
-    }
+    final rectA = tester.getRect(find.text('A'));
+    final rectB = tester.getRect(find.text('B'));
+    expect(rectA.width, closeTo(400, 1));
+    expect(rectB.width, closeTo(400, 1));
   });
 
   // ── Gap ───────────────────────────────────────────────────────────────────
 
-  testWidgets('gap is applied to Wrap spacing', (tester) async {
+  testWidgets('gap is applied between columns', (tester) async {
+    // 2 columns, gap 8, 800px → unitWidth = (800-8)/2 = 396.
+    // A at col 0 → left = 0.  B at col 1 → left = 396 + 8 = 404.
     await tester.pumpObers(
       const OiGrid(
         breakpoint: OiBreakpoint.compact,
@@ -71,25 +74,30 @@ void main() {
         gap: OiResponsive<double>(8),
         children: [Text('A'), Text('B')],
       ),
+      surfaceSize: const Size(800, 600),
     );
-    final wrap = tester.widget<Wrap>(find.byType(Wrap));
-    expect(wrap.spacing, 8);
-    expect(wrap.runSpacing, 8);
+    final rectA = tester.getRect(find.text('A'));
+    final rectB = tester.getRect(find.text('B'));
+    // Gap of 8px between A and B.
+    expect(rectB.left - rectA.right, closeTo(8, 1));
   });
 
-  testWidgets('rowGap overrides run spacing', (tester) async {
+  testWidgets('rowGap overrides vertical gap between rows', (tester) async {
+    // 1 column, gap=8, rowGap=24 → vertical gap should be 24.
     await tester.pumpObers(
       const OiGrid(
         breakpoint: OiBreakpoint.compact,
-        columns: OiResponsive<int>(2),
+        columns: OiResponsive<int>(1),
         gap: OiResponsive<double>(8),
         rowGap: OiResponsive<double>(24),
         children: [Text('A'), Text('B')],
       ),
+      surfaceSize: const Size(800, 600),
     );
-    final wrap = tester.widget<Wrap>(find.byType(Wrap));
-    expect(wrap.spacing, 8);
-    expect(wrap.runSpacing, 24);
+    final rectA = tester.getRect(find.text('A'));
+    final rectB = tester.getRect(find.text('B'));
+    // Row gap = 24.
+    expect(rectB.top - rectA.bottom, closeTo(24, 1));
   });
 
   // ── minColumnWidth ────────────────────────────────────────────────────────
@@ -104,20 +112,23 @@ void main() {
       ),
       surfaceSize: const Size(800, 600),
     );
-    final boxes = tester
-        .widgetList<SizedBox>(find.byType(SizedBox))
-        .where((b) => b.width != null && b.width! > 0)
-        .toList();
-    expect(boxes, isNotEmpty);
-    for (final box in boxes) {
-      expect(box.width, closeTo(200, 1));
-    }
+    final rectA = tester.getRect(find.text('A'));
+    final rectB = tester.getRect(find.text('B'));
+    final rectC = tester.getRect(find.text('C'));
+    final rectD = tester.getRect(find.text('D'));
+    // 4 items should all fit on one row.
+    expect(rectA.width, closeTo(200, 1));
+    expect(rectB.width, closeTo(200, 1));
+    expect(rectC.width, closeTo(200, 1));
+    expect(rectD.width, closeTo(200, 1));
+    // All on the same row.
+    expect(rectA.top, closeTo(rectD.top, 1));
   });
 
   // ── Span: columnSpan ──────────────────────────────────────────────────────
 
   group('columnSpan', () {
-    testWidgets('child with columnSpan 2 gets double-wide SizedBox', (
+    testWidgets('child with columnSpan 2 gets double-wide cell', (
       tester,
     ) async {
       // 4 columns, gap 0, 800px → unitWidth = 200.
@@ -202,8 +213,8 @@ void main() {
       tester,
     ) async {
       // 3 columns, items: A(1), B(1), C(span 2).
-      // Row 1: A, B → cursor at 2; C needs 2 but only 1 left → new row.
-      // Row 2: C (span 2).
+      // Row 0: A, B → cursor at 2; C needs 2 but only 1 left → new row.
+      // Row 1: C (span 2).
       await tester.pumpObers(
         OiGrid(
           breakpoint: OiBreakpoint.compact,
@@ -249,8 +260,7 @@ void main() {
 
     testWidgets('columnStart with gap accounts for gap pixels', (tester) async {
       // 4 columns, gap 8, 800px → unitWidth = (800 - 24) / 4 = 194.
-      // Start col 3 → spacer(2 cols) = 2*194 + 1*8 = 396, then gap = 8.
-      // Item A.left = 396 + 8 = 404.
+      // Start col 3 (0-indexed col 2) → x = 2 * (194 + 8) = 404.
       await tester.pumpObers(
         OiGrid(
           breakpoint: OiBreakpoint.compact,
@@ -282,7 +292,9 @@ void main() {
 
       final rectA = tester.getRect(find.text('A'));
       final rectB = tester.getRect(find.text('B'));
-      // B should be on a different row since col 0 is behind cursor 2.
+      // B should be on a different row since col 0 is occupied by A.
+      // With CSS Grid packing, B requests col 0, which is taken on row 0,
+      // so B goes to row 1.
       expect(rectB.top, greaterThan(rectA.bottom - 1));
       expect(rectB.left, closeTo(0, 1));
     });
@@ -700,10 +712,12 @@ void main() {
     });
   });
 
-  // ── Backward compatibility ────────────────────────────────────────────────
+  // ── Render object verification (REQ-1075) ───────────────────────────────
 
-  group('backward compatibility', () {
-    testWidgets('grid without span children uses Wrap', (tester) async {
+  group('render object verification', () {
+    testWidgets('grid uses custom RenderBox, not Wrap or GridView', (
+      tester,
+    ) async {
       await tester.pumpObers(
         const OiGrid(
           breakpoint: OiBreakpoint.compact,
@@ -711,11 +725,14 @@ void main() {
           children: [Text('X'), Text('Y')],
         ),
       );
-      // Fast path: should still use Wrap.
-      expect(find.byType(Wrap), findsOneWidget);
+      // REQ-1075: must NOT use Wrap or GridView.
+      expect(find.byType(Wrap), findsNothing);
+      expect(find.byType(GridView), findsNothing);
+      // Must NOT use LayoutBuilder (column count resolved inside RenderBox).
+      expect(find.byType(LayoutBuilder), findsNothing);
     });
 
-    testWidgets('grid with span children uses Row-based layout', (
+    testWidgets('grid with span children also uses custom RenderBox', (
       tester,
     ) async {
       await tester.pumpObers(
@@ -728,9 +745,8 @@ void main() {
           ],
         ),
       );
-      // Span path: should use Row, not Wrap.
       expect(find.byType(Wrap), findsNothing);
-      expect(find.byType(Row), findsOneWidget);
+      expect(find.byType(GridView), findsNothing);
     });
   });
 
@@ -802,10 +818,12 @@ void main() {
           breakpoint: OiBreakpoint.compact,
           children: const [Text('A'), Text('B')],
         ),
+        surfaceSize: const Size(800, 600),
       );
 
-      var wrap = tester.widget<Wrap>(find.byType(Wrap));
-      expect(wrap.spacing, 4);
+      var rectA = tester.getRect(find.text('A'));
+      var rectB = tester.getRect(find.text('B'));
+      expect(rectB.left - rectA.right, closeTo(4, 1));
 
       // Expanded → gap 16.
       await tester.pumpObers(
@@ -815,10 +833,12 @@ void main() {
           breakpoint: OiBreakpoint.expanded,
           children: const [Text('A'), Text('B')],
         ),
+        surfaceSize: const Size(800, 600),
       );
 
-      wrap = tester.widget<Wrap>(find.byType(Wrap));
-      expect(wrap.spacing, 16);
+      rectA = tester.getRect(find.text('A'));
+      rectB = tester.getRect(find.text('B'));
+      expect(rectB.left - rectA.right, closeTo(16, 1));
     });
   });
 
@@ -843,10 +863,13 @@ void main() {
         surfaceSize: const Size(900, 600),
       );
 
-      // Medium breakpoint with standard scale → 3 columns.
-      final wrap = tester.widget<Wrap>(find.byType(Wrap));
-      final children = wrap.children;
-      expect(children, hasLength(3));
+      // Medium breakpoint with standard scale → 3 columns, each 300px.
+      final rectA = tester.getRect(find.text('A'));
+      final rectB = tester.getRect(find.text('B'));
+      final rectC = tester.getRect(find.text('C'));
+      expect(rectA.width, closeTo(300, 1));
+      expect(rectB.width, closeTo(300, 1));
+      expect(rectC.width, closeTo(300, 1));
     });
   });
 
@@ -876,9 +899,7 @@ void main() {
       expect(find.text('B'), findsOneWidget);
     });
 
-    testWidgets('responsive values resolve with default scale', (
-      tester,
-    ) async {
+    testWidgets('responsive values resolve with default scale', (tester) async {
       await tester.pumpWidget(
         Directionality(
           textDirection: TextDirection.ltr,
@@ -900,6 +921,150 @@ void main() {
       expect(find.text('A'), findsOneWidget);
       expect(find.text('B'), findsOneWidget);
       expect(find.text('C'), findsOneWidget);
+    });
+  });
+
+  // ── CSS Grid row-packing algorithm (REQ-1076) ───────────────────────────
+
+  group('CSS Grid row-packing', () {
+    testWidgets('auto-places items into first available cell', (tester) async {
+      // 3 cols, 900px → unit = 300.
+      // A(1), B(1), C(1) → all on row 0.
+      await tester.pumpObers(
+        const OiGrid(
+          breakpoint: OiBreakpoint.compact,
+          columns: OiResponsive<int>(3),
+          children: [Text('A'), Text('B'), Text('C')],
+        ),
+        surfaceSize: const Size(900, 600),
+      );
+
+      final rectA = tester.getRect(find.text('A'));
+      final rectB = tester.getRect(find.text('B'));
+      final rectC = tester.getRect(find.text('C'));
+
+      // All on the same row.
+      expect(rectA.top, closeTo(rectB.top, 1));
+      expect(rectB.top, closeTo(rectC.top, 1));
+      // Ordered left to right.
+      expect(rectA.left, lessThan(rectB.left));
+      expect(rectB.left, lessThan(rectC.left));
+    });
+
+    testWidgets('advances to next row when current row is full', (
+      tester,
+    ) async {
+      // 2 cols, items: A, B, C, D → Row 0: A, B. Row 1: C, D.
+      await tester.pumpObers(
+        const OiGrid(
+          breakpoint: OiBreakpoint.compact,
+          columns: OiResponsive<int>(2),
+          children: [Text('A'), Text('B'), Text('C'), Text('D')],
+        ),
+        surfaceSize: const Size(800, 600),
+      );
+
+      final rectA = tester.getRect(find.text('A'));
+      final rectB = tester.getRect(find.text('B'));
+      final rectC = tester.getRect(find.text('C'));
+      final rectD = tester.getRect(find.text('D'));
+
+      // Row 0: A and B.
+      expect(rectA.top, closeTo(rectB.top, 1));
+      // Row 1: C and D.
+      expect(rectC.top, closeTo(rectD.top, 1));
+      // Row 1 is below row 0.
+      expect(rectC.top, greaterThan(rectA.bottom - 1));
+    });
+
+    testWidgets('columnStart items placed in first available row at that col', (
+      tester,
+    ) async {
+      // 4 cols, A at col 1 (span 2), B at col 1 (span 1).
+      // Row 0: A occupies cols 0-1. B requests col 0, occupied → row 1.
+      await tester.pumpObers(
+        OiGrid(
+          breakpoint: OiBreakpoint.compact,
+          columns: 4.responsive,
+          children: [
+            const Text('A').span(
+              columnStart: const OiResponsive<int>(1),
+              columnSpan: const OiResponsive<int>(2),
+            ),
+            const Text('B').span(columnStart: const OiResponsive<int>(1)),
+          ],
+        ),
+        surfaceSize: const Size(800, 600),
+      );
+
+      final rectA = tester.getRect(find.text('A'));
+      final rectB = tester.getRect(find.text('B'));
+
+      // B should be on row below A (both start at col 0).
+      expect(rectB.top, greaterThan(rectA.bottom - 1));
+      expect(rectB.left, closeTo(0, 1));
+      expect(rectA.left, closeTo(0, 1));
+    });
+  });
+
+  // ── Column count resolution (REQ-1077) ──────────────────────────────────
+
+  group('column count resolution', () {
+    testWidgets(
+      'column count computed once from width — no per-child rebuilds',
+      (tester) async {
+        // Verify the grid computes the correct column count from width.
+        // 800px / minColumnWidth 200 = 4 cols → 4 items on one row.
+        await tester.pumpObers(
+          const OiGrid(
+            breakpoint: OiBreakpoint.compact,
+            minColumnWidth: OiResponsive<double>(200),
+            children: [Text('A'), Text('B'), Text('C'), Text('D')],
+          ),
+          surfaceSize: const Size(800, 600),
+        );
+
+        final rectA = tester.getRect(find.text('A'));
+        final rectD = tester.getRect(find.text('D'));
+
+        // All 4 items should be on the same row.
+        expect(rectA.top, closeTo(rectD.top, 1));
+        // Each should be ~200px wide.
+        expect(rectA.width, closeTo(200, 1));
+
+        // Resize to 400px → 2 cols → A,B on row 0, C,D on row 1.
+        await tester.pumpObers(
+          const OiGrid(
+            breakpoint: OiBreakpoint.compact,
+            minColumnWidth: OiResponsive<double>(200),
+            children: [Text('A'), Text('B'), Text('C'), Text('D')],
+          ),
+          surfaceSize: const Size(400, 600),
+        );
+
+        final rectA2 = tester.getRect(find.text('A'));
+        final rectC2 = tester.getRect(find.text('C'));
+
+        // C should be on a row below A.
+        expect(rectC2.top, greaterThan(rectA2.bottom - 1));
+      },
+    );
+
+    testWidgets('no LayoutBuilder used — RenderBox resolves cols directly', (
+      tester,
+    ) async {
+      await tester.pumpObers(
+        const OiGrid(
+          breakpoint: OiBreakpoint.compact,
+          minColumnWidth: OiResponsive<double>(200),
+          children: [Text('A')],
+        ),
+        surfaceSize: const Size(800, 600),
+      );
+
+      // REQ-1077: column count resolved inside the render object, not via
+      // LayoutBuilder.
+      expect(find.byType(LayoutBuilder), findsNothing);
     });
   });
 }
