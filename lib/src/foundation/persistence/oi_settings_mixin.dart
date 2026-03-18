@@ -9,9 +9,13 @@ import 'package:obers_ui/src/foundation/persistence/oi_settings_driver.dart';
 ///
 /// Handles debounced saves, load-on-init, and graceful defaults.
 ///
+/// The widget type parameter [W] follows Flutter's own mixin convention
+/// (cf. [TickerProviderStateMixin]) so concrete states can extend
+/// `State<MyWidget>` directly — no return-type workaround in `createState`.
+///
 /// ```dart
 /// class _MyWidgetState extends State<MyWidget>
-///     with OiSettingsMixin<MySettings> {
+///     with OiSettingsMixin<MyWidget, MySettings> {
 ///   @override String get settingsNamespace => 'my_feature';
 ///   @override OiSettingsDriver? get settingsDriver => widget.driver;
 ///   @override MySettings get defaultSettings => const MySettings();
@@ -26,7 +30,8 @@ import 'package:obers_ui/src/foundation/persistence/oi_settings_driver.dart';
 /// ```
 ///
 /// {@category Foundation}
-mixin OiSettingsMixin<T extends OiSettingsData> on State<StatefulWidget> {
+mixin OiSettingsMixin<W extends StatefulWidget, T extends OiSettingsData>
+    on State<W> {
   /// The namespace used as the primary storage key.
   String get settingsNamespace;
 

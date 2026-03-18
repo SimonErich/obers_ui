@@ -308,17 +308,13 @@ class OiTable<T> extends StatefulWidget {
   final String settingsNamespace;
 
   @override
-  // OiSettingsMixin is `on State<StatefulWidget>` (exact type), so the return
-  // type must be widened; the state casts `widget` to `OiTable<T>` internally.
-  // ignore: no_logic_in_create_state
-  State<StatefulWidget> createState() => _OiTableState<T>();
+  State<OiTable<T>> createState() => _OiTableState<T>();
 }
 
 // ── State ─────────────────────────────────────────────────────────────────────
 
-class _OiTableState<T> extends State<StatefulWidget>
-    with OiSettingsMixin<OiTableSettings> {
-  OiTable<T> get _widget => widget as OiTable<T>;
+class _OiTableState<T> extends State<OiTable<T>>
+    with OiSettingsMixin<OiTable<T>, OiTableSettings> {
   late OiTableController _ctrl;
   bool _ownsController = false;
   bool _loadingMore = false;
@@ -327,13 +323,13 @@ class _OiTableState<T> extends State<StatefulWidget>
   // ── OiSettingsMixin contract ───────────────────────────────────────────────
 
   @override
-  String get settingsNamespace => _widget.settingsNamespace;
+  String get settingsNamespace => widget.settingsNamespace;
 
   @override
-  String? get settingsKey => _widget.settingsKey;
+  String? get settingsKey => widget.settingsKey;
 
   @override
-  OiSettingsDriver? get settingsDriver => _widget.settingsDriver;
+  OiSettingsDriver? get settingsDriver => widget.settingsDriver;
 
   @override
   OiTableSettings get defaultSettings => const OiTableSettings();
@@ -354,22 +350,21 @@ class _OiTableState<T> extends State<StatefulWidget>
   void initState() {
     super.initState();
     _initController();
-    if (_widget.groupBy != null) {
-      _ctrl.groupByColumnId = _widget.groupBy;
+    if (widget.groupBy != null) {
+      _ctrl.groupByColumnId = widget.groupBy;
     }
     _scrollController.addListener(_onScroll);
   }
 
   @override
-  void didUpdateWidget(StatefulWidget oldWidget) {
+  void didUpdateWidget(OiTable<T> oldWidget) {
     super.didUpdateWidget(oldWidget);
-    final old = oldWidget as OiTable<T>;
-    if (_widget.controller != old.controller) {
+    if (widget.controller != oldWidget.controller) {
       _disposeControllerIfOwned();
       _initController();
     }
     // Sync totalRows for server-side pagination.
-    final total = _widget.totalRows ?? _widget.rows.length;
+    final total = widget.totalRows ?? widget.rows.length;
     if (_ctrl.pagination.totalItems != total) {
       _ctrl.pagination.setTotalItems(total);
     }
@@ -396,15 +391,15 @@ class _OiTableState<T> extends State<StatefulWidget>
   }
 
   void _initController() {
-    if (_widget.controller != null) {
-      _ctrl = _widget.controller!;
+    if (widget.controller != null) {
+      _ctrl = widget.controller!;
       _ownsController = false;
       // Sync explicit totalRows into the external controller's pagination.
-      if (_widget.totalRows != null) {
-        _ctrl.pagination.setTotalItems(_widget.totalRows!);
+      if (widget.totalRows != null) {
+        _ctrl.pagination.setTotalItems(widget.totalRows!);
       }
     } else {
-      final total = _widget.totalRows ?? _widget.rows.length;
+      final total = widget.totalRows ?? widget.rows.length;
       _ctrl = OiTableController(totalRows: total);
       _ownsController = true;
     }
@@ -425,7 +420,7 @@ class _OiTableState<T> extends State<StatefulWidget>
 
   void _onScroll() {
     if (!mounted) return;
-    if (_widget.paginationMode != OiTablePaginationMode.infinite) return;
+    if (widget.paginationMode != OiTablePaginationMode.infinite) return;
     if (_loadingMore) return;
     if (_scrollController.position.pixels >=
         _scrollController.position.maxScrollExtent - 100) {
@@ -434,10 +429,10 @@ class _OiTableState<T> extends State<StatefulWidget>
   }
 
   Future<void> _triggerLoadMore() async {
-    if (_loadingMore || _widget.onLoadMore == null) return;
+    if (_loadingMore || widget.onLoadMore == null) return;
     setState(() => _loadingMore = true);
     try {
-      await _widget.onLoadMore!();
+      await widget.onLoadMore!();
     } finally {
       if (mounted) setState(() => _loadingMore = false);
     }
@@ -451,14 +446,14 @@ class _OiTableState<T> extends State<StatefulWidget>
     final order = _ctrl.columnOrder;
     final List<OiTableColumn<T>> cols;
     if (order.isEmpty) {
-      cols = List<OiTableColumn<T>>.from(_widget.columns);
+      cols = List<OiTableColumn<T>>.from(widget.columns);
     } else {
-      final byId = {for (final c in _widget.columns) c.id: c};
+      final byId = {for (final c in widget.columns) c.id: c};
       cols = [
         for (final id in order)
           if (byId.containsKey(id)) byId[id]!,
         // Append any columns not mentioned in order.
-        for (final c in _widget.columns)
+        for (final c in widget.columns)
           if (!order.contains(c.id)) c,
       ];
     }
@@ -469,10 +464,10 @@ class _OiTableState<T> extends State<StatefulWidget>
 
   /// Applies client-side filter to [rows].
   List<T> get _filteredRows {
-    if (_widget.serverSideFilter || _ctrl.activeFilters.isEmpty) {
-      return _widget.rows;
+    if (widget.serverSideFilter || _ctrl.activeFilters.isEmpty) {
+      return widget.rows;
     }
-    return _widget.rows.where((row) {
+    return widget.rows.where((row) {
       for (final entry in _ctrl.activeFilters.entries) {
         final col = _columnById(entry.key);
         if (col == null) continue;
@@ -488,7 +483,7 @@ class _OiTableState<T> extends State<StatefulWidget>
   /// Applies client-side sort to [rows].
   List<T> _sortedRows(List<T> rows) {
     final colId = _ctrl.sortColumnId;
-    if (_widget.serverSideSort || colId == null) return rows;
+    if (widget.serverSideSort || colId == null) return rows;
     final col = _columnById(colId);
     if (col == null) return rows;
     final sorted = List<T>.from(rows)
@@ -505,7 +500,7 @@ class _OiTableState<T> extends State<StatefulWidget>
 
   /// Applies pagination to [rows] in [OiTablePaginationMode.pages] mode.
   List<T> _paginatedRows(List<T> rows) {
-    if (_widget.paginationMode != OiTablePaginationMode.pages) return rows;
+    if (widget.paginationMode != OiTablePaginationMode.pages) return rows;
     final start = _ctrl.pagination.startIndex;
     final end = math.min(_ctrl.pagination.endIndex, rows.length);
     if (start >= rows.length) return const [];
@@ -518,10 +513,10 @@ class _OiTableState<T> extends State<StatefulWidget>
     final sorted = _sortedRows(filtered);
     // Update pagination total after filter — only for fully client-side tables
     // that do not supply an explicit totalRows override.
-    if (!_widget.serverSideSort &&
-        !_widget.serverSideFilter &&
-        _widget.totalRows == null &&
-        _widget.paginationMode == OiTablePaginationMode.pages) {
+    if (!widget.serverSideSort &&
+        !widget.serverSideFilter &&
+        widget.totalRows == null &&
+        widget.paginationMode == OiTablePaginationMode.pages) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!mounted) return;
         _ctrl.pagination.setTotalItems(sorted.length);
@@ -531,7 +526,7 @@ class _OiTableState<T> extends State<StatefulWidget>
   }
 
   OiTableColumn<T>? _columnById(String id) {
-    for (final c in _widget.columns) {
+    for (final c in widget.columns) {
       if (c.id == id) return c;
     }
     return null;
@@ -542,28 +537,28 @@ class _OiTableState<T> extends State<StatefulWidget>
   void _handleHeaderTap(OiTableColumn<T> col) {
     if (!col.sortable) return;
     _ctrl.sortBy(col.id);
-    _widget.onSort?.call(col.id, ascending: _ctrl.sortAscending);
+    widget.onSort?.call(col.id, ascending: _ctrl.sortAscending);
   }
 
   void _handleRowTap(T row, int index) {
-    if (_widget.selectable) {
-      _ctrl.selectRow(index, multi: _widget.multiSelect);
-      _widget.onSelectionChanged?.call(_ctrl.selectedRows.toList()..sort());
+    if (widget.selectable) {
+      _ctrl.selectRow(index, multi: widget.multiSelect);
+      widget.onSelectionChanged?.call(_ctrl.selectedRows.toList()..sort());
     }
-    _widget.onRowTap?.call(row, index);
+    widget.onRowTap?.call(row, index);
   }
 
   void _handleRowDoubleTap(T row, int index) {
-    _widget.onRowDoubleTap?.call(row, index);
+    widget.onRowDoubleTap?.call(row, index);
   }
 
   void _copySelectedRows() {
-    if (!_widget.copyable) return;
+    if (!widget.copyable) return;
     final cols = _visibleColumns;
     final buffer = StringBuffer();
     for (final idx in _ctrl.selectedRows.toList()..sort()) {
-      if (idx < _widget.rows.length) {
-        final row = _widget.rows[idx];
+      if (idx < widget.rows.length) {
+        final row = widget.rows[idx];
         final cells = cols
             .map((c) => c.valueGetter?.call(row) ?? '')
             .join('\t');
@@ -578,12 +573,12 @@ class _OiTableState<T> extends State<StatefulWidget>
   @override
   Widget build(BuildContext context) {
     return Semantics(
-      label: _widget.label,
+      label: widget.label,
       explicitChildNodes: true,
       child: KeyboardListener(
         focusNode: FocusNode(),
         onKeyEvent: (event) {
-          if (!_widget.copyable) return;
+          if (!widget.copyable) return;
           if (event is! KeyDownEvent) return;
           final isCtrlOrMeta =
               HardwareKeyboard.instance.isControlPressed ||
@@ -595,12 +590,12 @@ class _OiTableState<T> extends State<StatefulWidget>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            if (_widget.showColumnManager) _buildColumnManagerBar(),
+            if (widget.showColumnManager) _buildColumnManagerBar(),
             _buildHeaderRow(),
             Expanded(child: _buildBody()),
-            if (_widget.paginationMode == OiTablePaginationMode.pages)
+            if (widget.paginationMode == OiTablePaginationMode.pages)
               _buildPaginationFooter(),
-            if (_widget.showStatusBar) _buildStatusBar(),
+            if (widget.showStatusBar) _buildStatusBar(),
           ],
         ),
       ),
@@ -636,7 +631,7 @@ class _OiTableState<T> extends State<StatefulWidget>
       color: const Color(0xFFF1F5F9),
       child: Row(
         children: [
-          if (_widget.selectable) _buildSelectAllCheckbox(),
+          if (widget.selectable) _buildSelectAllCheckbox(),
           for (final col in cols) _buildColumnHeader(col),
         ],
       ),
@@ -649,9 +644,9 @@ class _OiTableState<T> extends State<StatefulWidget>
         if (_ctrl.selectAll) {
           _ctrl.clearSelection();
         } else {
-          _ctrl.selectAllRows(_widget.rows.length);
+          _ctrl.selectAllRows(widget.rows.length);
         }
-        _widget.onSelectionChanged?.call(_ctrl.selectedRows.toList()..sort());
+        widget.onSelectionChanged?.call(_ctrl.selectedRows.toList()..sort());
       },
       child: SizedBox(
         width: 40,
@@ -737,7 +732,7 @@ class _OiTableState<T> extends State<StatefulWidget>
           } else {
             _ctrl.setFilter(col.id, v);
           }
-          _widget.onFilter?.call(Map.unmodifiable(_ctrl.activeFilters));
+          widget.onFilter?.call(Map.unmodifiable(_ctrl.activeFilters));
         },
       ),
     );
@@ -746,12 +741,12 @@ class _OiTableState<T> extends State<StatefulWidget>
   // ── Body ──────────────────────────────────────────────────────────────────
 
   Widget _buildBody() {
-    if (_widget.loading) return _buildLoadingState();
+    if (widget.loading) return _buildLoadingState();
     final rows = _displayRows;
     if (rows.isEmpty) {
-      return _widget.emptyState ?? _buildDefaultEmptyState();
+      return widget.emptyState ?? _buildDefaultEmptyState();
     }
-    if (_widget.groupBy != null || _ctrl.groupByColumnId != null) {
+    if (widget.groupBy != null || _ctrl.groupByColumnId != null) {
       return _buildGroupedBody(rows);
     }
     return _buildFlatBody(rows);
@@ -783,7 +778,7 @@ class _OiTableState<T> extends State<StatefulWidget>
 
   Widget _buildGroupedBody(List<T> rows) {
     final groupColId =
-        _ctrl.groupByColumnId ?? _widget.groupBy ?? _widget.columns.first.id;
+        _ctrl.groupByColumnId ?? widget.groupBy ?? widget.columns.first.id;
     final col = _columnById(groupColId);
     // Group rows by their valueGetter value.
     final groups = <String, List<T>>{};
@@ -797,8 +792,8 @@ class _OiTableState<T> extends State<StatefulWidget>
       final groupRows = entry.value;
       final expanded = _ctrl.expandedGroups.contains(groupKey);
       // Group header.
-      final header = _widget.groupHeaderBuilder != null
-          ? _widget.groupHeaderBuilder!(context, groupKey, groupRows)
+      final header = widget.groupHeaderBuilder != null
+          ? widget.groupHeaderBuilder!(context, groupKey, groupRows)
           : _buildDefaultGroupHeader(groupKey, groupRows.length, expanded);
       items.add(
         GestureDetector(
@@ -839,12 +834,12 @@ class _OiTableState<T> extends State<StatefulWidget>
     Color? bg;
     if (isSelected) {
       bg = const Color(0xFFDBEAFE);
-    } else if (_widget.striped && isEven) {
+    } else if (widget.striped && isEven) {
       bg = const Color(0xFFF8FAFC);
     }
     final rowContent = Row(
       children: [
-        if (_widget.selectable)
+        if (widget.selectable)
           SizedBox(
             width: 40,
             height: _effectiveRowHeight,
@@ -871,14 +866,14 @@ class _OiTableState<T> extends State<StatefulWidget>
       final text = col.valueGetter?.call(row) ?? '';
       content = Text(text, textAlign: col.textAlign);
     }
-    if (_widget.onCellChanged != null) {
+    if (widget.onCellChanged != null) {
       content = _CellFrame<T>(
         row: row,
         rowIndex: rowIndex,
         columnId: col.id,
         child: content,
         onChanged: (value) =>
-            _widget.onCellChanged!(row, rowIndex, col.id, value),
+            widget.onCellChanged!(row, rowIndex, col.id, value),
       );
     }
     final resolvedWidth =
@@ -931,7 +926,7 @@ class _OiTableState<T> extends State<StatefulWidget>
   // ── Helpers ───────────────────────────────────────────────────────────────
 
   double get _effectiveRowHeight =>
-      _widget.rowHeight ?? (_widget.dense ? 32 : 48);
+      widget.rowHeight ?? (widget.dense ? 32 : 48);
 
   static AlignmentGeometry _alignmentFromTextAlign(TextAlign align) {
     return switch (align) {

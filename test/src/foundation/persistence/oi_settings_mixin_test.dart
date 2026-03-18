@@ -49,10 +49,6 @@ class _ThrowingDriver extends OiSettingsDriver {
   Future<bool> exists({required String namespace, String? key}) async => false;
 }
 
-// OiSettingsMixin is `on State<StatefulWidget>` (exact type). To satisfy this
-// constraint, _WState must extend State<StatefulWidget>, which requires _W to
-// also be typed as StatefulWidget in the createState return. We achieve this
-// by overriding createState with return type State<StatefulWidget>.
 class _W extends StatefulWidget {
   const _W({this.driver, this.settingsKey, super.key});
 
@@ -60,23 +56,19 @@ class _W extends StatefulWidget {
   final String? settingsKey;
 
   @override
-  // The return type must be State<StatefulWidget> so _WState (which mixes in
-  // OiSettingsMixin that is `on State<StatefulWidget>`) satisfies the constraint.
-  // ignore: no_logic_in_create_state
-  State<StatefulWidget> createState() => _WState();
+  State<_W> createState() => _WState();
 }
 
-class _WState extends State<StatefulWidget> with OiSettingsMixin<_S> {
-  _W get _w => widget as _W;
+class _WState extends State<_W> with OiSettingsMixin<_W, _S> {
 
   @override
   String get settingsNamespace => 'test';
 
   @override
-  String? get settingsKey => _w.settingsKey;
+  String? get settingsKey => widget.settingsKey;
 
   @override
-  OiSettingsDriver? get settingsDriver => _w.driver;
+  OiSettingsDriver? get settingsDriver => widget.driver;
 
   @override
   _S get defaultSettings => const _S();
@@ -99,10 +91,10 @@ class _WState extends State<StatefulWidget> with OiSettingsMixin<_S> {
   Future<void> runReload() => reloadSettings();
 
   @override
-  void didUpdateWidget(covariant StatefulWidget oldWidget) {
+  void didUpdateWidget(_W oldWidget) {
     super.didUpdateWidget(oldWidget);
-    final old = oldWidget as _W;
-    if (old.driver != _w.driver || old.settingsKey != _w.settingsKey) {
+    if (oldWidget.driver != widget.driver ||
+        oldWidget.settingsKey != widget.settingsKey) {
       reloadSettings();
     }
   }
