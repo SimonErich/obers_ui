@@ -5,6 +5,47 @@ import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/foundation/oi_responsive.dart';
 import 'package:obers_ui/src/foundation/oi_span.dart';
 
+// ---------------------------------------------------------------------------
+// OiContainerBreakpoint — InheritedWidget for container-relative grids
+// ---------------------------------------------------------------------------
+
+/// An [InheritedWidget] that propagates a container's width for
+/// container-relative breakpoint resolution.
+///
+/// Published by the outermost [OiGrid.containerRelative] so that nested
+/// container-relative grids use the same width for breakpoint resolution
+/// (REQ-1089).
+///
+/// {@category Primitives}
+class OiContainerBreakpoint extends InheritedWidget {
+  /// Creates an [OiContainerBreakpoint] with the given container [width].
+  const OiContainerBreakpoint({
+    required this.width,
+    required super.child,
+    super.key,
+  });
+
+  /// The container width used for breakpoint resolution.
+  final double width;
+
+  /// Returns the container width from the nearest [OiContainerBreakpoint]
+  /// ancestor, or null if none exists.
+  static double? maybeOf(BuildContext context) {
+    return context
+        .dependOnInheritedWidgetOfExactType<OiContainerBreakpoint>()
+        ?.width;
+  }
+
+  @override
+  bool updateShouldNotify(OiContainerBreakpoint oldWidget) {
+    return width != oldWidget.width;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// OiGrid
+// ---------------------------------------------------------------------------
+
 /// A non-scrolling grid layout that arranges [children] into a fixed number
 /// of equal-width columns.
 ///
@@ -35,6 +76,11 @@ import 'package:obers_ui/src/foundation/oi_span.dart';
 /// with explicit props. Resolve the breakpoint once at the page/layout level
 /// (e.g. `context.breakpoint`) and pass it down as a concrete value.
 ///
+/// For container-relative grids, use [OiGrid.containerRelative] instead.
+/// These grids resolve their breakpoint from layout constraints rather than
+/// an explicit value, re-layout when their container resizes (REQ-1087),
+/// and do not listen to [MediaQuery] (REQ-1088).
+///
 /// Children wrapped with [OiSpan] (via the `.span()` extension) are placed
 /// according to their [OiSpanData]:
 ///
@@ -50,9 +96,9 @@ import 'package:obers_ui/src/foundation/oi_span.dart';
 ///
 /// {@category Primitives}
 class OiGrid extends StatelessWidget {
-  /// Creates an [OiGrid].
+  /// Creates an [OiGrid] with an explicit [breakpoint].
   const OiGrid({
-    required this.breakpoint,
+    required OiBreakpoint this.breakpoint,
     required this.children,
     this.columns,
     this.minColumnWidth,
@@ -60,7 +106,34 @@ class OiGrid extends StatelessWidget {
     this.rowGap,
     this.scale = OiBreakpointScale.defaultScale,
     super.key,
-  }) : assert(
+  }) : _containerRelative = false,
+       assert(
+         columns == null || minColumnWidth == null,
+         'Provide either columns or minColumnWidth, not both.',
+       );
+
+  /// Creates a container-relative [OiGrid] that resolves its breakpoint
+  /// from layout constraints instead of an explicit value.
+  ///
+  /// The grid re-layouts when its own constraints change (REQ-1087) and
+  /// does **not** listen to [MediaQuery] — no unnecessary rebuilds when
+  /// the window resizes but the grid's own width stays the same (REQ-1088).
+  ///
+  /// Nested container-relative grids use the outermost container-relative
+  /// grid's width as their viewport for breakpoint resolution (REQ-1089).
+  /// Non-container-relative grids inside a container-relative grid fall
+  /// back to the real viewport via their explicit [breakpoint] parameter.
+  const OiGrid.containerRelative({
+    required this.children,
+    this.columns,
+    this.minColumnWidth,
+    this.gap = const OiResponsive<double>(0),
+    this.rowGap,
+    this.scale = OiBreakpointScale.defaultScale,
+    super.key,
+  }) : breakpoint = null,
+       _containerRelative = true,
+       assert(
          columns == null || minColumnWidth == null,
          'Provide either columns or minColumnWidth, not both.',
        );
@@ -79,9 +152,14 @@ class OiGrid extends StatelessWidget {
   /// Vertical gap between rows. When null, [gap] is used for both axes.
   final OiResponsive<double>? rowGap;
 
-  /// The active breakpoint. Required — resolve once at the layout level
-  /// and pass down explicitly.
-  final OiBreakpoint breakpoint;
+  /// The active breakpoint. Null when [_containerRelative] is true.
+  ///
+  /// For the default constructor this is required — resolve once at the
+  /// layout level and pass down explicitly.
+  final OiBreakpoint? breakpoint;
+
+  /// Whether this grid resolves its breakpoint from layout constraints.
+  final bool _containerRelative;
 
   /// The breakpoint scale used to resolve responsive values.
   ///
@@ -93,11 +171,48 @@ class OiGrid extends StatelessWidget {
   /// The child widgets to place in the grid.
   final List<Widget> children;
 
+  /// Whether this grid is container-relative.
+  bool get containerRelative => _containerRelative;
+
   @override
   Widget build(BuildContext context) {
-    // Resolve responsive values once — breakpoint is explicit, no context
-    // lookup for it.
-    final active = breakpoint;
+    if (_containerRelative) {
+      return _buildContainerRelative(context);
+    }
+    return _buildWithBreakpoint(breakpoint!);
+  }
+
+  /// Builds a container-relative grid using [LayoutBuilder] to obtain
+  /// constraints. Does not depend on [MediaQuery] (REQ-1088).
+  Widget _buildContainerRelative(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        // REQ-1089: Check for an ancestor container-relative grid.
+        final ancestorWidth = OiContainerBreakpoint.maybeOf(context);
+
+        // The width used for breakpoint resolution:
+        // - nested container-relative → outer grid's width (REQ-1089)
+        // - root container-relative → own constraints width (REQ-1087)
+        final effectiveWidth = ancestorWidth ?? constraints.maxWidth;
+        final resolvedBreakpoint = scale.resolve(effectiveWidth);
+
+        final grid = _buildWithBreakpoint(resolvedBreakpoint);
+
+        // Only the outermost container-relative grid publishes its width
+        // via OiContainerBreakpoint so nested grids share the same viewport.
+        if (ancestorWidth == null) {
+          return OiContainerBreakpoint(
+            width: constraints.maxWidth,
+            child: grid,
+          );
+        }
+        return grid;
+      },
+    );
+  }
+
+  /// Builds the grid internals with a resolved [active] breakpoint.
+  Widget _buildWithBreakpoint(OiBreakpoint active) {
     final resolvedScale = scale;
 
     final resolvedGap = gap.resolve(active, resolvedScale);

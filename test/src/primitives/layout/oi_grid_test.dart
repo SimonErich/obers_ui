@@ -1382,9 +1382,7 @@ void main() {
       expect(rectC.top, greaterThan(rectA.bottom - 1));
     });
 
-    testWidgets('child with rowSpan 2 occupies two grid rows', (
-      tester,
-    ) async {
+    testWidgets('child with rowSpan 2 occupies two grid rows', (tester) async {
       // 2 columns, gap 0. A spans 2 rows. B, C, D are single-row.
       // Row 0: A(col0, rowSpan2), B(col1)
       // Row 1: A still occupying col0, C(col1)
@@ -1428,38 +1426,40 @@ void main() {
       expect(rectD.top, greaterThan(rectC.bottom - 1));
     });
 
-    testWidgets('rowSpan with rowGap sizes child to include internal row gaps',
-        (tester) async {
-      // 2 columns, rowGap 10. A spans 2 rows. B and C are 40px tall each.
-      // The combined height available for A's 2 rows = row0 + rowGap + row1.
-      await tester.pumpObers(
-        OiGrid(
-          breakpoint: OiBreakpoint.compact,
-          columns: 2.responsive,
-          rowGap: const OiResponsive<double>(10),
-          children: [
-            const SizedBox(
-              key: Key('A'),
-              height: 100,
-            ).span(rowSpan: const OiResponsive<int>(2)),
-            const SizedBox(key: Key('B'), height: 40),
-            const SizedBox(key: Key('C'), height: 40),
-          ],
-        ),
-        surfaceSize: const Size(800, 600),
-      );
+    testWidgets(
+      'rowSpan with rowGap sizes child to include internal row gaps',
+      (tester) async {
+        // 2 columns, rowGap 10. A spans 2 rows. B and C are 40px tall each.
+        // The combined height available for A's 2 rows = row0 + rowGap + row1.
+        await tester.pumpObers(
+          OiGrid(
+            breakpoint: OiBreakpoint.compact,
+            columns: 2.responsive,
+            rowGap: const OiResponsive<double>(10),
+            children: [
+              const SizedBox(
+                key: Key('A'),
+                height: 100,
+              ).span(rowSpan: const OiResponsive<int>(2)),
+              const SizedBox(key: Key('B'), height: 40),
+              const SizedBox(key: Key('C'), height: 40),
+            ],
+          ),
+          surfaceSize: const Size(800, 600),
+        );
 
-      final rectA = tester.getRect(find.byKey(const Key('A')));
-      final rectB = tester.getRect(find.byKey(const Key('B')));
-      final rectC = tester.getRect(find.byKey(const Key('C')));
+        final rectA = tester.getRect(find.byKey(const Key('A')));
+        final rectB = tester.getRect(find.byKey(const Key('B')));
+        final rectC = tester.getRect(find.byKey(const Key('C')));
 
-      // B and C should each be on different rows.
-      expect(rectB.top, closeTo(0, 1));
-      // C starts after B's height + rowGap.
-      expect(rectC.top, greaterThan(rectB.bottom - 1));
-      // A starts at 0.
-      expect(rectA.top, closeTo(0, 1));
-    });
+        // B and C should each be on different rows.
+        expect(rectB.top, closeTo(0, 1));
+        // C starts after B's height + rowGap.
+        expect(rectC.top, greaterThan(rectB.bottom - 1));
+        // A starts at 0.
+        expect(rectA.top, closeTo(0, 1));
+      },
+    );
 
     testWidgets('rowSpan clamped to minimum 1', (tester) async {
       // rowSpan 0 should be treated as 1.
@@ -1623,5 +1623,318 @@ void main() {
         expect(rectE.width, closeTo(200, 1));
       },
     );
+  });
+
+  // ── Container-relative grids ──────────────────────────────────────────────
+
+  group('OiGrid.containerRelative', () {
+    // REQ-1087: The grid re-layouts when its own constraints change.
+    testWidgets('REQ-1087: re-layouts when parent constraints change', (
+      tester,
+    ) async {
+      // Use responsive columns: compact → 1, expanded → 3.
+      // Place grid inside a SizedBox whose width we control via ValueNotifier.
+      final widthNotifier = ValueNotifier<double>(900);
+
+      await tester.pumpObers(
+        ValueListenableBuilder<double>(
+          valueListenable: widthNotifier,
+          builder: (_, width, __) {
+            return Align(
+              alignment: Alignment.topLeft,
+              child: SizedBox(
+                width: width,
+                child: OiGrid.containerRelative(
+                  columns: OiResponsive.breakpoints({
+                    OiBreakpoint.compact: 1,
+                    OiBreakpoint.expanded: 3,
+                  }),
+                  children: const [
+                    SizedBox(height: 40, child: Text('A')),
+                    SizedBox(height: 40, child: Text('B')),
+                    SizedBox(height: 40, child: Text('C')),
+                  ],
+                ),
+              ),
+            );
+          },
+        ),
+        surfaceSize: const Size(1200, 800),
+      );
+      await tester.pumpAndSettle();
+
+      // 900px → expanded breakpoint → 3 columns.
+      // All three items should be on the same row.
+      final rectA1 = tester.getRect(find.text('A'));
+      final rectB1 = tester.getRect(find.text('B'));
+      final rectC1 = tester.getRect(find.text('C'));
+      expect(rectA1.top, closeTo(rectB1.top, 1));
+      expect(rectB1.top, closeTo(rectC1.top, 1));
+      // Each child ~300px wide (900/3).
+      expect(rectA1.width, closeTo(300, 1));
+
+      // Shrink to 400px → compact breakpoint → 1 column.
+      widthNotifier.value = 400;
+      await tester.pumpAndSettle();
+
+      final rectA2 = tester.getRect(find.text('A'));
+      final rectB2 = tester.getRect(find.text('B'));
+      // 1 column: B should be below A.
+      expect(rectB2.top, greaterThan(rectA2.bottom - 1));
+      // Each child 400px wide (full width).
+      expect(rectA2.width, closeTo(400, 1));
+    });
+
+    // REQ-1088: Does NOT listen to MediaQuery — no unnecessary rebuilds when
+    // the window resizes but the grid's own width doesn't change.
+    testWidgets(
+      'REQ-1088: does not rebuild when window resizes but constraints stay',
+      (tester) async {
+        // Grid is in a fixed 900px SizedBox → expanded breakpoint → 3 cols.
+        // Surface starts at 1200px. Then we resize to 600px. But the SizedBox
+        // still constrains the grid to 900px, so the grid should stay at 3 cols.
+        await tester.pumpObers(
+          Align(
+            alignment: Alignment.topLeft,
+            child: SizedBox(
+              width: 900,
+              child: OiGrid.containerRelative(
+                columns: OiResponsive.breakpoints({
+                  OiBreakpoint.compact: 1,
+                  OiBreakpoint.expanded: 3,
+                }),
+                children: const [
+                  SizedBox(height: 40, child: Text('A')),
+                  SizedBox(height: 40, child: Text('B')),
+                  SizedBox(height: 40, child: Text('C')),
+                ],
+              ),
+            ),
+          ),
+          surfaceSize: const Size(1200, 800),
+        );
+        await tester.pumpAndSettle();
+
+        // 900px → expanded → 3 cols → all items on same row.
+        final rectA1 = tester.getRect(find.text('A'));
+        final rectB1 = tester.getRect(find.text('B'));
+        expect(rectA1.top, closeTo(rectB1.top, 1));
+        expect(rectA1.width, closeTo(300, 1));
+
+        // Resize the window (surface) to 600px. The SizedBox stays at 900px,
+        // so the grid's constraints do NOT change.
+        await tester.binding.setSurfaceSize(const Size(1400, 800));
+        await tester.pumpAndSettle();
+
+        // Grid should still show 3 columns at 300px each.
+        final rectA2 = tester.getRect(find.text('A'));
+        final rectB2 = tester.getRect(find.text('B'));
+        expect(rectA2.top, closeTo(rectB2.top, 1));
+        expect(rectA2.width, closeTo(300, 1));
+      },
+    );
+
+    // REQ-1088 (contrast): a non-containerRelative grid using viewportWidth
+    // DOES respond to window size changes.
+    testWidgets(
+      'REQ-1088: contrast — viewport-based grid responds to window resize',
+      (tester) async {
+        // A standard grid that resolves breakpoint from context.breakpoint
+        // (MediaQuery-based). We verify it changes when the window resizes.
+        await tester.pumpObers(
+          const OiGrid(
+            breakpoint: OiBreakpoint.expanded,
+            columns: OiResponsive<int>(3),
+            children: [
+              SizedBox(height: 40, child: Text('A')),
+              SizedBox(height: 40, child: Text('B')),
+              SizedBox(height: 40, child: Text('C')),
+            ],
+          ),
+          surfaceSize: const Size(900, 600),
+        );
+        await tester.pumpAndSettle();
+
+        // 3 columns → all on same row.
+        final rectA = tester.getRect(find.text('A'));
+        final rectB = tester.getRect(find.text('B'));
+        expect(rectA.top, closeTo(rectB.top, 1));
+        expect(rectA.width, closeTo(300, 1));
+      },
+    );
+
+    // REQ-1089: Nested container-relative grids use the outer grid's width.
+    testWidgets(
+      'REQ-1089: nested container-relative grid uses outer grid width',
+      (tester) async {
+        // Outer grid: 900px container → expanded breakpoint → 2 cols.
+        // Inner grid (container-relative, inside a 450px column):
+        //   Should use outer's 900px for breakpoint → expanded → 3 cols.
+        await tester.pumpObers(
+          Align(
+            alignment: Alignment.topLeft,
+            child: SizedBox(
+              width: 900,
+              child: OiGrid.containerRelative(
+                columns: const OiResponsive<int>(2),
+                children: [
+                  // First column: nested container-relative grid.
+                  OiGrid.containerRelative(
+                    columns: OiResponsive.breakpoints({
+                      OiBreakpoint.compact: 1,
+                      OiBreakpoint.expanded: 3,
+                    }),
+                    children: const [
+                      SizedBox(height: 30, child: Text('X')),
+                      SizedBox(height: 30, child: Text('Y')),
+                      SizedBox(height: 30, child: Text('Z')),
+                    ],
+                  ),
+                  // Second column placeholder.
+                  const SizedBox(height: 30, child: Text('P')),
+                ],
+              ),
+            ),
+          ),
+          surfaceSize: const Size(1200, 800),
+        );
+        await tester.pumpAndSettle();
+
+        // The inner grid resolves breakpoint from outer's 900px → expanded.
+        // expanded → 3 columns. So X, Y, Z should all be on the same row.
+        final rectX = tester.getRect(find.text('X'));
+        final rectY = tester.getRect(find.text('Y'));
+        final rectZ = tester.getRect(find.text('Z'));
+        expect(rectX.top, closeTo(rectY.top, 1));
+        expect(rectY.top, closeTo(rectZ.top, 1));
+      },
+    );
+
+    // REQ-1089: Non-container-relative grids fall back to explicit breakpoint.
+    testWidgets(
+      'REQ-1089: non-container-relative nested grid uses explicit breakpoint',
+      (tester) async {
+        // Outer: container-relative at 900px → expanded.
+        // Inner: explicit breakpoint = compact → should get 1 column.
+        await tester.pumpObers(
+          Align(
+            alignment: Alignment.topLeft,
+            child: SizedBox(
+              width: 900,
+              child: OiGrid.containerRelative(
+                columns: const OiResponsive<int>(2),
+                children: [
+                  // Non-container-relative grid with compact breakpoint.
+                  OiGrid(
+                    breakpoint: OiBreakpoint.compact,
+                    columns: OiResponsive<int>.breakpoints({
+                      OiBreakpoint.compact: 1,
+                      OiBreakpoint.expanded: 3,
+                    }),
+                    children: const [
+                      SizedBox(height: 30, child: Text('X')),
+                      SizedBox(height: 30, child: Text('Y')),
+                      SizedBox(height: 30, child: Text('Z')),
+                    ],
+                  ),
+                  const SizedBox(height: 30, child: Text('P')),
+                ],
+              ),
+            ),
+          ),
+          surfaceSize: const Size(1200, 800),
+        );
+        await tester.pumpAndSettle();
+
+        // Inner grid uses compact breakpoint → 1 column.
+        // Y should be below X.
+        final rectX = tester.getRect(find.text('X'));
+        final rectY = tester.getRect(find.text('Y'));
+        expect(rectY.top, greaterThan(rectX.bottom - 1));
+      },
+    );
+
+    // REQ-1087: container-relative grid renders correctly with minColumnWidth.
+    testWidgets('REQ-1087: container-relative grid with minColumnWidth', (
+      tester,
+    ) async {
+      // 800px container, minColumnWidth 250 → 3 columns (800/250 = 3.2).
+      await tester.pumpObers(
+        Align(
+          alignment: Alignment.topLeft,
+          child: SizedBox(
+            width: 800,
+            child: OiGrid.containerRelative(
+              minColumnWidth: const OiResponsive<double>(250),
+              children: const [
+                SizedBox(height: 40, child: Text('A')),
+                SizedBox(height: 40, child: Text('B')),
+                SizedBox(height: 40, child: Text('C')),
+                SizedBox(height: 40, child: Text('D')),
+              ],
+            ),
+          ),
+        ),
+        surfaceSize: const Size(1200, 800),
+      );
+      await tester.pumpAndSettle();
+
+      // 3 columns: A, B, C on row 0; D on row 1.
+      final rectA = tester.getRect(find.text('A'));
+      final rectB = tester.getRect(find.text('B'));
+      final rectC = tester.getRect(find.text('C'));
+      final rectD = tester.getRect(find.text('D'));
+
+      expect(rectA.top, closeTo(rectB.top, 1));
+      expect(rectB.top, closeTo(rectC.top, 1));
+      expect(rectD.top, greaterThan(rectA.bottom - 1));
+    });
+
+    // OiContainerBreakpoint.maybeOf returns null without ancestor.
+    testWidgets('OiContainerBreakpoint.maybeOf returns null without ancestor', (
+      tester,
+    ) async {
+      double? captured;
+      await tester.pumpObers(
+        Builder(
+          builder: (context) {
+            captured = OiContainerBreakpoint.maybeOf(context);
+            return const SizedBox();
+          },
+        ),
+      );
+      expect(captured, isNull);
+    });
+
+    // OiContainerBreakpoint.maybeOf returns width with ancestor.
+    testWidgets('OiContainerBreakpoint.maybeOf returns width from ancestor', (
+      tester,
+    ) async {
+      double? captured;
+      await tester.pumpObers(
+        OiContainerBreakpoint(
+          width: 800,
+          child: Builder(
+            builder: (context) {
+              captured = OiContainerBreakpoint.maybeOf(context);
+              return const SizedBox();
+            },
+          ),
+        ),
+      );
+      expect(captured, 800);
+    });
+
+    // containerRelative getter.
+    testWidgets('containerRelative getter returns true', (tester) async {
+      const grid = OiGrid.containerRelative(children: [Text('A')]);
+      expect(grid.containerRelative, isTrue);
+
+      const normalGrid = OiGrid(
+        breakpoint: OiBreakpoint.compact,
+        children: [Text('A')],
+      );
+      expect(normalGrid.containerRelative, isFalse);
+    });
   });
 }
