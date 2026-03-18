@@ -88,6 +88,26 @@ class _OiTappableState extends State<OiTappable> {
   bool _isHovered = false;
   bool _isPressed = false;
   bool _isFocused = false;
+  FocusHighlightMode _highlightMode = FocusHighlightMode.touch;
+
+  @override
+  void initState() {
+    super.initState();
+    _highlightMode = FocusManager.instance.highlightMode;
+    FocusManager.instance.addHighlightModeListener(_handleHighlightModeChange);
+  }
+
+  @override
+  void dispose() {
+    FocusManager.instance.removeHighlightModeListener(
+      _handleHighlightModeChange,
+    );
+    super.dispose();
+  }
+
+  void _handleHighlightModeChange(FocusHighlightMode mode) {
+    if (_highlightMode != mode) setState(() => _highlightMode = mode);
+  }
 
   // ── State helpers ──────────────────────────────────────────────────────────
 
@@ -200,10 +220,13 @@ class _OiTappableState extends State<OiTappable> {
       );
     }
 
-    // Focus ring — foreground border rendered on top of content when focused.
-    // Always rendered independently of the halo-based focus style so that no
-    // theme configuration can silence keyboard focus visibility.
-    if (_isFocused && widget.focusable && widget.enabled) {
+    // Focus ring — foreground border rendered on top of content when keyboard
+    // navigation is active. Suppressed on touch-only interaction to reduce
+    // visual noise; reappears immediately on any keyboard event.
+    if (_isFocused &&
+        widget.focusable &&
+        widget.enabled &&
+        _highlightMode == FocusHighlightMode.traditional) {
       final ring = effects.focusRing.enforced;
       content = DecoratedBox(
         position: DecorationPosition.foreground,

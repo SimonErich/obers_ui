@@ -314,6 +314,16 @@ void main() {
   testWidgets(
     'focus ring: DecoratedBox with foreground border rendered when widget is focused',
     (tester) async {
+      // Force keyboard highlight mode so the focus ring is always rendered
+      // during keyboard-navigation tests regardless of the platform default.
+      FocusManager.instance.highlightStrategy =
+          FocusHighlightStrategy.alwaysTraditional;
+      addTearDown(
+        () =>
+            FocusManager.instance.highlightStrategy =
+                FocusHighlightStrategy.automatic,
+      );
+
       await tester.pumpObers(
         const OiTappable(child: SizedBox(width: 60, height: 60)),
       );
@@ -332,6 +342,78 @@ void main() {
         find.byType(DecoratedBox),
       ).where((b) => b.position == DecorationPosition.foreground);
       expect(foregroundBoxes, isNotEmpty);
+    },
+  );
+
+  // ── TC-focus-ring-touch-hidden: focus ring absent in touch modality ─────────
+
+  testWidgets(
+    'TC-focus-ring-touch-hidden: focus ring absent when touch highlight mode is active',
+    (tester) async {
+      FocusManager.instance.highlightStrategy =
+          FocusHighlightStrategy.alwaysTouch;
+      addTearDown(
+        () =>
+            FocusManager.instance.highlightStrategy =
+                FocusHighlightStrategy.automatic,
+      );
+
+      await tester.pumpObers(
+        const OiTappable(child: SizedBox(width: 60, height: 60)),
+      );
+      await tester.pump();
+
+      final gestureElement = tester.element(find.byType(GestureDetector));
+      Focus.of(gestureElement).requestFocus();
+      await tester.pump();
+      await tester.pump();
+
+      final foregroundBoxes = tester.widgetList<DecoratedBox>(
+        find.byType(DecoratedBox),
+      ).where((b) => b.position == DecorationPosition.foreground);
+      expect(foregroundBoxes, isEmpty);
+    },
+  );
+
+  // ── TC-focus-ring-reappear-keyboard: focus ring reappears on keyboard ────────
+
+  testWidgets(
+    'TC-focus-ring-reappear-keyboard: focus ring reappears when mode switches from touch to traditional',
+    (tester) async {
+      FocusManager.instance.highlightStrategy =
+          FocusHighlightStrategy.alwaysTouch;
+      addTearDown(
+        () =>
+            FocusManager.instance.highlightStrategy =
+                FocusHighlightStrategy.automatic,
+      );
+
+      await tester.pumpObers(
+        const OiTappable(child: SizedBox(width: 60, height: 60)),
+      );
+      await tester.pump();
+
+      final gestureElement = tester.element(find.byType(GestureDetector));
+      Focus.of(gestureElement).requestFocus();
+      await tester.pump();
+      await tester.pump();
+
+      // Confirm focus ring is absent in touch mode.
+      final touchForegroundBoxes = tester.widgetList<DecoratedBox>(
+        find.byType(DecoratedBox),
+      ).where((b) => b.position == DecorationPosition.foreground);
+      expect(touchForegroundBoxes, isEmpty);
+
+      // Switch to keyboard modality.
+      FocusManager.instance.highlightStrategy =
+          FocusHighlightStrategy.alwaysTraditional;
+      await tester.pump();
+
+      // Focus ring must now be present.
+      final keyboardForegroundBoxes = tester.widgetList<DecoratedBox>(
+        find.byType(DecoratedBox),
+      ).where((b) => b.position == DecorationPosition.foreground);
+      expect(keyboardForegroundBoxes, isNotEmpty);
     },
   );
 
