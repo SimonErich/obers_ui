@@ -1140,5 +1140,91 @@ void main() {
       );
       expect(result, 1400);
     });
+
+    // ── Standard helpers with custom-named scale ──────────────────────────
+
+    group('Standard helpers with custom-named scale', () {
+      /// A custom scale that uses non-standard names at standard thresholds.
+      final customTheme = OiThemeData.light().copyWith(
+        breakpoints: OiBreakpointScale([
+          const OiBreakpoint('phone', 0),
+          const OiBreakpoint('mid', 600),
+          const OiBreakpoint('wide', 840),
+          const OiBreakpoint('desk', 1200),
+          const OiBreakpoint('ultra', 1600),
+        ]),
+      );
+
+      Widget buildCustom(double width, Widget child) =>
+          buildWithWidth(width, child, theme: customTheme);
+
+      testWidgets('isCompact is true with custom name "phone" at width 400',
+          (tester) async {
+        late bool result;
+        await tester.pumpWidget(
+          buildCustom(
+            400,
+            Builder(
+              builder: (ctx) {
+                result = ctx.isCompact;
+                return const SizedBox.shrink();
+              },
+            ),
+          ),
+        );
+        expect(result, isTrue);
+      });
+
+      testWidgets('isMedium is true with custom name "mid" at width 700',
+          (tester) async {
+        late bool result;
+        await tester.pumpWidget(
+          buildCustom(
+            700,
+            Builder(
+              builder: (ctx) {
+                result = ctx.isMedium;
+                return const SizedBox.shrink();
+              },
+            ),
+          ),
+        );
+        expect(result, isTrue);
+      });
+
+      testWidgets('isCompact is false at width 600 with custom names',
+          (tester) async {
+        late bool result;
+        await tester.pumpWidget(
+          buildCustom(
+            600,
+            Builder(
+              builder: (ctx) {
+                result = ctx.isCompact;
+                return const SizedBox.shrink();
+              },
+            ),
+          ),
+        );
+        expect(result, isFalse);
+      });
+
+      testWidgets('isMediumOrWider is true at width 600 with custom names',
+          (tester) async {
+        late bool result;
+        await tester.pumpWidget(
+          buildCustom(
+            600,
+            Builder(
+              builder: (ctx) {
+                result = ctx.isMediumOrWider;
+                return const SizedBox.shrink();
+              },
+            ),
+          ),
+        );
+        expect(result, isTrue);
+      });
+    });
   });
 }

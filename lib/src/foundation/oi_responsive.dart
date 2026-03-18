@@ -536,23 +536,44 @@ extension OiResponsiveExt on BuildContext {
   OiBreakpoint get breakpoint => breakpointScale.resolve(_width);
 
   // ── Standard breakpoint checks ──────────────────────────────────────────
-  // These delegate to the theme's breakpoint scale so they honour custom
-  // breakpoints inserted between the standard five.
+  // These compare by minWidth threshold so they work with custom-named
+  // breakpoints that occupy the same tier as a standard breakpoint.
 
-  /// Whether the active breakpoint is [OiBreakpoint.compact].
-  bool get isCompact => breakpoint == OiBreakpoint.compact;
+  /// Whether the active breakpoint occupies the compact tier (minWidth 0).
+  ///
+  /// Matches any breakpoint whose [OiBreakpoint.minWidth] equals
+  /// [OiBreakpoint.compact]'s minWidth, regardless of its name.
+  bool get isCompact =>
+      breakpoint.minWidth == OiBreakpoint.compact.minWidth;
 
-  /// Whether the active breakpoint is [OiBreakpoint.medium].
-  bool get isMedium => breakpoint == OiBreakpoint.medium;
+  /// Whether the active breakpoint occupies the medium tier (minWidth 600).
+  ///
+  /// Matches any breakpoint whose [OiBreakpoint.minWidth] equals
+  /// [OiBreakpoint.medium]'s minWidth, regardless of its name.
+  bool get isMedium =>
+      breakpoint.minWidth == OiBreakpoint.medium.minWidth;
 
-  /// Whether the active breakpoint is [OiBreakpoint.expanded].
-  bool get isExpanded => breakpoint == OiBreakpoint.expanded;
+  /// Whether the active breakpoint occupies the expanded tier (minWidth 840).
+  ///
+  /// Matches any breakpoint whose [OiBreakpoint.minWidth] equals
+  /// [OiBreakpoint.expanded]'s minWidth, regardless of its name.
+  bool get isExpanded =>
+      breakpoint.minWidth == OiBreakpoint.expanded.minWidth;
 
-  /// Whether the active breakpoint is [OiBreakpoint.large].
-  bool get isLarge => breakpoint == OiBreakpoint.large;
+  /// Whether the active breakpoint occupies the large tier (minWidth 1200).
+  ///
+  /// Matches any breakpoint whose [OiBreakpoint.minWidth] equals
+  /// [OiBreakpoint.large]'s minWidth, regardless of its name.
+  bool get isLarge =>
+      breakpoint.minWidth == OiBreakpoint.large.minWidth;
 
-  /// Whether the active breakpoint is [OiBreakpoint.extraLarge].
-  bool get isExtraLarge => breakpoint == OiBreakpoint.extraLarge;
+  /// Whether the active breakpoint occupies the extraLarge tier
+  /// (minWidth 1600).
+  ///
+  /// Matches any breakpoint whose [OiBreakpoint.minWidth] equals
+  /// [OiBreakpoint.extraLarge]'s minWidth, regardless of its name.
+  bool get isExtraLarge =>
+      breakpoint.minWidth == OiBreakpoint.extraLarge.minWidth;
 
   /// Whether the active breakpoint is at least as wide as
   /// [OiBreakpoint.medium] (≥600dp tier).
