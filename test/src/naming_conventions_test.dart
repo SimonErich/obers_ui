@@ -57,8 +57,7 @@ void main() {
           // Private classes (starting with _) are fine.
           if (className.startsWith('_')) continue;
           if (!className.startsWith('Oi')) {
-            final line =
-                content.substring(0, m.start).split('\n').length;
+            final line = content.substring(0, m.start).split('\n').length;
             violations.add('${file.path}:$line — $className');
           }
         }
@@ -103,8 +102,7 @@ void main() {
             continue;
           }
           if (!className.startsWith('Oi')) {
-            final line =
-                content.substring(0, m.start).split('\n').length;
+            final line = content.substring(0, m.start).split('\n').length;
             violations.add('${file.path}:$line — $className');
           }
         }
@@ -134,8 +132,7 @@ void main() {
           final className = m.group(1)!;
           final suffix = className.substring(2); // after "Oi"
           if (suffix.length < 2 || !RegExp(r'^[A-Z]').hasMatch(suffix)) {
-            final line =
-                content.substring(0, m.start).split('\n').length;
+            final line = content.substring(0, m.start).split('\n').length;
             violations.add(
               '${file.path}:$line — $className '
               '(name after Oi must be ≥2 chars and start with uppercase)',
@@ -165,8 +162,7 @@ void main() {
 
         if (matches.isEmpty) continue;
 
-        final fileName =
-            file.path.split('/').last.replaceAll('.dart', '');
+        final fileName = file.path.split('/').last.replaceAll('.dart', '');
 
         // Convert PascalCase class name to expected snake_case file name.
         // OiButton → oi_button, OiRichEditor → oi_rich_editor
@@ -180,13 +176,10 @@ void main() {
         }
 
         // The file name must match at least one of the widget class names.
-        final matchesAny = matches.any(
-          (m) => toSnake(m.group(1)!) == fileName,
-        );
+        final matchesAny = matches.any((m) => toSnake(m.group(1)!) == fileName);
 
         if (!matchesAny) {
-          final classNames =
-              matches.map((m) => m.group(1)!).join(', ');
+          final classNames = matches.map((m) => m.group(1)!).join(', ');
           violations.add(
             '${file.path} — contains [$classNames] but file name '
             '"$fileName.dart" does not match any of them',
@@ -205,9 +198,7 @@ void main() {
     });
 
     test('all public enums use the Oi prefix', () {
-      final nonOiEnumPattern = RegExp(
-        r'enum\s+([A-Z]\w+)\s*\{',
-      );
+      final nonOiEnumPattern = RegExp(r'enum\s+([A-Z]\w+)\s*\{');
 
       final violations = <String>[];
 
@@ -238,9 +229,7 @@ void main() {
     });
 
     test('all public extensions use the Oi prefix', () {
-      final nonOiExtensionPattern = RegExp(
-        r'extension\s+([A-Z]\w+)\s+on\s+',
-      );
+      final nonOiExtensionPattern = RegExp(r'extension\s+([A-Z]\w+)\s+on\s+');
 
       final violations = <String>[];
 
@@ -396,8 +385,7 @@ void main() {
       );
 
       // OiButton
-      final buttonFile =
-          File('lib/src/components/buttons/oi_button.dart');
+      final buttonFile = File('lib/src/components/buttons/oi_button.dart');
       final buttonContent = buttonFile.readAsStringSync();
       expect(
         buttonContent,
@@ -416,8 +404,7 @@ void main() {
       );
 
       // OiSidebar
-      final sidebarFile =
-          File('lib/src/composites/navigation/oi_sidebar.dart');
+      final sidebarFile = File('lib/src/composites/navigation/oi_sidebar.dart');
       final sidebarContent = sidebarFile.readAsStringSync();
       expect(
         sidebarContent,
@@ -429,16 +416,14 @@ void main() {
       expect(
         sidebarContent,
         contains('this.disabled'),
-        reason:
-            'OiSidebarItem should use "disabled" (reads as English)',
+        reason: 'OiSidebarItem should use "disabled" (reads as English)',
       );
 
       // OiTableColumn
       expect(
         tableContent,
         contains('this.sortable'),
-        reason:
-            'OiTableColumn should use "sortable" (reads as English)',
+        reason: 'OiTableColumn should use "sortable" (reads as English)',
       );
       expect(
         tableContent,
@@ -469,49 +454,44 @@ void main() {
       multiLine: true,
     );
 
-    test(
-      'no public bool method uses is/has prefix (except utils)',
-      () {
-        final violations = <String>[];
+    test('no public bool method uses is/has prefix (except utils)', () {
+      final violations = <String>[];
 
-        for (final file in allFiles) {
-          // Static utility methods (isImage, isToday, etc.) are acceptable
-          // in utils/ files — these are pure classification helpers, not
-          // widget API surface.
-          if (file.path.contains('/utils/')) continue;
-          // Skip _internal directory — private implementation.
-          if (file.path.contains('/_internal/')) continue;
+      for (final file in allFiles) {
+        // Static utility methods (isImage, isToday, etc.) are acceptable
+        // in utils/ files — these are pure classification helpers, not
+        // widget API surface.
+        if (file.path.contains('/utils/')) continue;
+        // Skip _internal directory — private implementation.
+        if (file.path.contains('/_internal/')) continue;
 
-          final content = _stripComments(file.readAsStringSync());
-          final matches = badBoolMethodPattern.allMatches(content);
-          for (final m in matches) {
-            final name = m.group(1)!;
-            // Private methods are fine.
-            if (name.startsWith('_')) continue;
-            final line =
-                content.substring(0, m.start).split('\n').length;
-            violations.add('${file.path}:$line — $name()');
-          }
+        final content = _stripComments(file.readAsStringSync());
+        final matches = badBoolMethodPattern.allMatches(content);
+        for (final m in matches) {
+          final name = m.group(1)!;
+          // Private methods are fine.
+          if (name.startsWith('_')) continue;
+          final line = content.substring(0, m.start).split('\n').length;
+          violations.add('${file.path}:$line — $name()');
         }
+      }
 
-        expect(
-          violations,
-          isEmpty,
-          reason:
-              'Public bool-returning methods must use descriptive names '
-              '(e.g. "breakpointActive", "atLeast") instead of is/has-prefixed '
-              'names. Violations:\n${violations.join('\n')}',
-        );
-      },
-    );
+      expect(
+        violations,
+        isEmpty,
+        reason:
+            'Public bool-returning methods must use descriptive names '
+            '(e.g. "breakpointActive", "atLeast") instead of is/has-prefixed '
+            'names. Violations:\n${violations.join('\n')}',
+      );
+    });
 
     test('key widgets use descriptive single-word boolean adjectives', () {
       // Spot-check that core widgets use descriptive adjective-form booleans
       // as specified by REQ-0017: enabled, dismissible, searchable, loading.
 
       // OiButton — enabled, loading
-      final buttonFile =
-          File('lib/src/components/buttons/oi_button.dart');
+      final buttonFile = File('lib/src/components/buttons/oi_button.dart');
       final buttonContent = buttonFile.readAsStringSync();
       expect(
         buttonContent,
@@ -525,8 +505,7 @@ void main() {
       );
 
       // OiDialog — dismissible
-      final dialogFile =
-          File('lib/src/components/overlays/oi_dialog.dart');
+      final dialogFile = File('lib/src/components/overlays/oi_dialog.dart');
       final dialogContent = dialogFile.readAsStringSync();
       expect(
         dialogContent,
@@ -535,8 +514,7 @@ void main() {
       );
 
       // OiSelect — searchable
-      final selectFile =
-          File('lib/src/components/inputs/oi_select.dart');
+      final selectFile = File('lib/src/components/inputs/oi_select.dart');
       final selectContent = selectFile.readAsStringSync();
       expect(
         selectContent,
@@ -545,8 +523,9 @@ void main() {
       );
 
       // OiTappable — enabled, focusable
-      final tappableFile =
-          File('lib/src/primitives/interaction/oi_tappable.dart');
+      final tappableFile = File(
+        'lib/src/primitives/interaction/oi_tappable.dart',
+      );
       final tappableContent = tappableFile.readAsStringSync();
       expect(
         tappableContent,
@@ -560,8 +539,7 @@ void main() {
       );
 
       // OiSheet — dismissible
-      final sheetFile =
-          File('lib/src/components/overlays/oi_sheet.dart');
+      final sheetFile = File('lib/src/components/overlays/oi_sheet.dart');
       final sheetContent = sheetFile.readAsStringSync();
       expect(
         sheetContent,
@@ -589,8 +567,7 @@ void main() {
         for (final m in matches) {
           final name = m.group(1)!;
           if (name.startsWith('_')) continue;
-          final line =
-              content.substring(0, m.start).split('\n').length;
+          final line = content.substring(0, m.start).split('\n').length;
           violations.add('${file.path}:$line — $name');
         }
       }
@@ -616,8 +593,7 @@ void main() {
       expect(
         content,
         contains('required this.alt'),
-        reason:
-            'OiImage (primitives) must require "alt" for accessibility',
+        reason: 'OiImage (primitives) must require "alt" for accessibility',
       );
     });
 
@@ -628,14 +604,12 @@ void main() {
       expect(
         content,
         contains('required this.alt'),
-        reason:
-            'OiImage (components) must require "alt" for accessibility',
+        reason: 'OiImage (components) must require "alt" for accessibility',
       );
     });
 
     test('OiImage.decorative does not require alt', () {
-      final primitivesFile =
-          File('lib/src/primitives/display/oi_image.dart');
+      final primitivesFile = File('lib/src/primitives/display/oi_image.dart');
       final primitivesContent = primitivesFile.readAsStringSync();
 
       // The decorative constructor should exist and NOT require alt.
@@ -649,7 +623,8 @@ void main() {
 
       // Verify decorative constructor sets alt to empty.
       final decorativeCtorRegex = RegExp(
-        r'OiImage\.decorative\(\{[^}]*\}\)\s*:\s*alt\s*=\s*' "''",
+        r'OiImage\.decorative\(\{[^}]*\}\)\s*:\s*alt\s*=\s*'
+        "''",
         dotAll: true,
       );
       expect(
@@ -683,11 +658,7 @@ void main() {
         // Search for the actual constructor declaration (not doc comments).
         final ctorPattern = RegExp(RegExp.escape(variant) + r'\s*\(\{');
         final ctorMatch = ctorPattern.firstMatch(content);
-        expect(
-          ctorMatch,
-          isNotNull,
-          reason: '$variant constructor must exist',
-        );
+        expect(ctorMatch, isNotNull, reason: '$variant constructor must exist');
         final ctorStart = ctorMatch!.start;
 
         // Find the closing parenthesis of the constructor parameter list.
@@ -698,8 +669,7 @@ void main() {
         // Every variant must require either `label` or (for icon-only)
         // map it to semanticLabel.
         final requiresLabel = paramBlock.contains('required String label');
-        final requiresIcon =
-            paramBlock.contains('required IconData icon');
+        final requiresIcon = paramBlock.contains('required IconData icon');
 
         expect(
           requiresLabel || requiresIcon,
@@ -713,8 +683,7 @@ void main() {
           expect(
             paramBlock.contains('required String label'),
             isTrue,
-            reason:
-                '$variant must mark label as required at compile time',
+            reason: '$variant must mark label as required at compile time',
           );
         }
       }
@@ -740,94 +709,87 @@ void main() {
       expect(
         content,
         contains('required this.alt'),
-        reason:
-            'OiGalleryItem must require "alt" for image accessibility',
+        reason: 'OiGalleryItem must require "alt" for image accessibility',
       );
     });
 
-    test(
-      'all image-bearing widgets require alt or exclude from a11y tree',
-      () {
-        // Any class with an `alt` field should mark it as `required`.
-        // This prevents accidentally making alt text optional.
-        final altFieldPattern = RegExp(
-          r'final\s+String\s+alt\b',
-          multiLine: true,
-        );
+    test('all image-bearing widgets require alt or exclude from a11y tree', () {
+      // Any class with an `alt` field should mark it as `required`.
+      // This prevents accidentally making alt text optional.
+      final altFieldPattern = RegExp(
+        r'final\s+String\s+alt\b',
+        multiLine: true,
+      );
 
-        final violations = <String>[];
+      final violations = <String>[];
 
-        for (final file in allFiles) {
-          final content = file.readAsStringSync();
-          if (!altFieldPattern.hasMatch(content)) continue;
+      for (final file in allFiles) {
+        final content = file.readAsStringSync();
+        if (!altFieldPattern.hasMatch(content)) continue;
 
-          // This file has an `alt` field. Verify it's required in
-          // at least one constructor (the default/primary one).
-          // Decorative constructors may skip alt.
-          final hasRequiredAlt =
-              content.contains('required this.alt') ||
-              content.contains('required String alt');
+        // This file has an `alt` field. Verify it's required in
+        // at least one constructor (the default/primary one).
+        // Decorative constructors may skip alt.
+        final hasRequiredAlt =
+            content.contains('required this.alt') ||
+            content.contains('required String alt');
 
-          if (!hasRequiredAlt) {
+        if (!hasRequiredAlt) {
+          violations.add(
+            '${file.path} — has "alt" field but never requires it',
+          );
+        }
+      }
+
+      expect(
+        violations,
+        isEmpty,
+        reason:
+            'Widgets with an "alt" field must require it in their '
+            'primary constructor. Violations:\n'
+            '${violations.join('\n')}',
+      );
+    });
+
+    test('all button-like widgets require label or semanticLabel', () {
+      // Any class whose name contains "Button" should require a label
+      // or semanticLabel for accessibility.
+      final buttonClassPattern = RegExp(
+        r'class\s+(Oi\w*Button\w*)\s+extends\s+State(?:ful|less)Widget',
+      );
+
+      final violations = <String>[];
+
+      for (final file in allFiles) {
+        final content = file.readAsStringSync();
+        final matches = buttonClassPattern.allMatches(content);
+
+        for (final m in matches) {
+          final className = m.group(1)!;
+          final hasRequiredLabel =
+              content.contains('required this.label') ||
+              content.contains('required String label') ||
+              content.contains('required this.semanticLabel') ||
+              content.contains('required String semanticLabel');
+
+          if (!hasRequiredLabel) {
             violations.add(
-              '${file.path} — has "alt" field but never requires it',
+              '${file.path} — $className must require "label" '
+              'or "semanticLabel"',
             );
           }
         }
+      }
 
-        expect(
-          violations,
-          isEmpty,
-          reason:
-              'Widgets with an "alt" field must require it in their '
-              'primary constructor. Violations:\n'
-              '${violations.join('\n')}',
-        );
-      },
-    );
-
-    test(
-      'all button-like widgets require label or semanticLabel',
-      () {
-        // Any class whose name contains "Button" should require a label
-        // or semanticLabel for accessibility.
-        final buttonClassPattern = RegExp(
-          r'class\s+(Oi\w*Button\w*)\s+extends\s+State(?:ful|less)Widget',
-        );
-
-        final violations = <String>[];
-
-        for (final file in allFiles) {
-          final content = file.readAsStringSync();
-          final matches = buttonClassPattern.allMatches(content);
-
-          for (final m in matches) {
-            final className = m.group(1)!;
-            final hasRequiredLabel =
-                content.contains('required this.label') ||
-                content.contains('required String label') ||
-                content.contains('required this.semanticLabel') ||
-                content.contains('required String semanticLabel');
-
-            if (!hasRequiredLabel) {
-              violations.add(
-                '${file.path} — $className must require "label" '
-                'or "semanticLabel"',
-              );
-            }
-          }
-        }
-
-        expect(
-          violations,
-          isEmpty,
-          reason:
-              'All button widgets must require "label" or '
-              '"semanticLabel" for accessibility. '
-              'Violations:\n${violations.join('\n')}',
-        );
-      },
-    );
+      expect(
+        violations,
+        isEmpty,
+        reason:
+            'All button widgets must require "label" or '
+            '"semanticLabel" for accessibility. '
+            'Violations:\n${violations.join('\n')}',
+      );
+    });
   });
 
   // ── REQ-0015: Factories for variants ──────────────────────────────────────
@@ -862,9 +824,7 @@ void main() {
             final widgetName = enumName.replaceFirst('Style', '');
 
             // Only check widgets that opted into the factory pattern.
-            final privateCtor = RegExp(
-              RegExp.escape(widgetName) + r'\._\s*\(',
-            );
+            final privateCtor = RegExp(RegExp.escape(widgetName) + r'\._\s*\(');
             if (!privateCtor.hasMatch(content)) continue;
 
             // Extract enum value names.
@@ -932,6 +892,53 @@ void main() {
           reason: 'OiProgress must provide .$variant() named constructor',
         );
       }
+    });
+
+    test('OiSpacer.flex() named constructor exists', () {
+      final file = File('lib/src/primitives/layout/oi_spacer.dart');
+      final content = file.readAsStringSync();
+
+      expect(
+        content,
+        contains('OiSpacer.flex('),
+        reason: 'OiSpacer must provide a .flex() named constructor',
+      );
+    });
+
+    test('OiCard provides factory constructors for each variant', () {
+      final file = File('lib/src/components/display/oi_card.dart');
+      final content = file.readAsStringSync();
+
+      expect(
+        content,
+        contains('OiCard._({'),
+        reason: 'OiCard must use a private base constructor',
+      );
+
+      const variants = ['flat', 'outlined', 'interactive', 'compact'];
+      for (final variant in variants) {
+        expect(
+          content,
+          contains('OiCard.$variant('),
+          reason: 'OiCard must provide .$variant() named constructor',
+        );
+      }
+    });
+
+    test('OiDivider provides named constructors for content variants', () {
+      final file = File('lib/src/primitives/display/oi_divider.dart');
+      final content = file.readAsStringSync();
+
+      expect(
+        content,
+        contains('OiDivider.withLabel('),
+        reason: 'OiDivider must provide a .withLabel() named constructor',
+      );
+      expect(
+        content,
+        contains('OiDivider.withContent('),
+        reason: 'OiDivider must provide a .withContent() named constructor',
+      );
     });
 
     test('OiButton provides factory constructors for each variant', () {
