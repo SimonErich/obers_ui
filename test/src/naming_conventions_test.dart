@@ -150,6 +150,72 @@ void main() {
             'Violations:\n${violations.join('\n')}',
       );
     });
+
+    test('all public enums use the Oi prefix', () {
+      final nonOiEnumPattern = RegExp(
+        r'enum\s+([A-Z]\w+)\s*\{',
+      );
+
+      final violations = <String>[];
+
+      for (final file in allFiles) {
+        if (file.path.contains('/_internal/')) continue;
+
+        final content = _stripComments(file.readAsStringSync());
+        final matches = nonOiEnumPattern.allMatches(content);
+
+        for (final m in matches) {
+          final enumName = m.group(1)!;
+          if (enumName.startsWith('_')) continue;
+          if (!enumName.startsWith('Oi')) {
+            final line = content.substring(0, m.start).split('\n').length;
+            violations.add('${file.path}:$line — $enumName');
+          }
+        }
+      }
+
+      expect(
+        violations,
+        isEmpty,
+        reason:
+            'All public enum types must start with the Oi prefix '
+            '(e.g. OiThemeMode, OiDensity). '
+            'Violations:\n${violations.join('\n')}',
+      );
+    });
+
+    test('all public extensions use the Oi prefix', () {
+      final nonOiExtensionPattern = RegExp(
+        r'extension\s+([A-Z]\w+)\s+on\s+',
+      );
+
+      final violations = <String>[];
+
+      for (final file in allFiles) {
+        if (file.path.contains('/_internal/')) continue;
+
+        final content = _stripComments(file.readAsStringSync());
+        final matches = nonOiExtensionPattern.allMatches(content);
+
+        for (final m in matches) {
+          final extensionName = m.group(1)!;
+          if (extensionName.startsWith('_')) continue;
+          if (!extensionName.startsWith('Oi')) {
+            final line = content.substring(0, m.start).split('\n').length;
+            violations.add('${file.path}:$line — $extensionName');
+          }
+        }
+      }
+
+      expect(
+        violations,
+        isEmpty,
+        reason:
+            'All public extension types must start with the Oi prefix '
+            '(e.g. OiBuildContextThemeExt, OiThemeExt). '
+            'Violations:\n${violations.join('\n')}',
+      );
+    });
   });
 
   // ── REQ-0013: Props read like English ──────────────────────────────────────

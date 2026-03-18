@@ -15,7 +15,7 @@ import 'package:obers_ui/src/foundation/theme/oi_theme_data.dart';
 /// Controls which theme is used by [OiApp].
 ///
 /// {@category Foundation}
-enum ThemeMode {
+enum OiThemeMode {
   /// Always use the light theme.
   light,
 
@@ -98,7 +98,7 @@ class OiDensityScope extends InheritedWidget {
 ///     OiApp(
 ///       theme: OiThemeData.light(),
 ///       darkTheme: OiThemeData.dark(),
-///       themeMode: ThemeMode.system,
+///       themeMode: OiThemeMode.system,
 ///       home: const MyHomePage(),
 ///     ),
 ///   );
@@ -112,7 +112,7 @@ class OiApp extends StatefulWidget {
     required Widget this.home,
     this.theme,
     this.darkTheme,
-    this.themeMode = ThemeMode.system,
+    this.themeMode = OiThemeMode.system,
     this.density,
     this.performanceConfig,
     this.settingsDriver,
@@ -134,7 +134,7 @@ class OiApp extends StatefulWidget {
     required this.routerConfig,
     this.theme,
     this.darkTheme,
-    this.themeMode = ThemeMode.system,
+    this.themeMode = OiThemeMode.system,
     this.density,
     this.performanceConfig,
     this.settingsDriver,
@@ -171,7 +171,7 @@ class OiApp extends StatefulWidget {
   final OiThemeData? darkTheme;
 
   /// Determines which theme to use when both [theme] and [darkTheme] are set.
-  final ThemeMode themeMode;
+  final OiThemeMode themeMode;
 
   /// The information density. When null, auto-detected from the platform.
   final OiDensity? density;
@@ -234,11 +234,11 @@ class _OiAppState extends State<OiApp> {
 
     OiThemeData resolved;
     switch (widget.themeMode) {
-      case ThemeMode.light:
+      case OiThemeMode.light:
         resolved = lightTheme;
-      case ThemeMode.dark:
+      case OiThemeMode.dark:
         resolved = darkTheme;
-      case ThemeMode.system:
+      case OiThemeMode.system:
         resolved = platformBrightness == Brightness.dark
             ? darkTheme
             : lightTheme;

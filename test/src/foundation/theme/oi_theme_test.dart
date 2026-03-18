@@ -5,6 +5,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme_data.dart';
+import 'package:obers_ui/src/foundation/theme/oi_theme_scope.dart';
 
 Widget buildWithTheme(Widget child, {OiThemeData? theme}) {
   return OiTheme(

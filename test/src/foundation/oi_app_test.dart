@@ -191,7 +191,7 @@ void main() {
       await tester.pumpWidget(
         OiApp(
           theme: lightTheme,
-          themeMode: ThemeMode.light,
+          themeMode: OiThemeMode.light,
           home: Builder(
             builder: (ctx) {
               captured = OiTheme.maybeOf(ctx);
@@ -210,7 +210,7 @@ void main() {
       await tester.pumpWidget(
         OiApp(
           darkTheme: darkTheme,
-          themeMode: ThemeMode.dark,
+          themeMode: OiThemeMode.dark,
           home: Builder(
             builder: (ctx) {
               captured = OiTheme.maybeOf(ctx);
@@ -232,7 +232,7 @@ void main() {
         OiApp(
           theme: lightTheme,
           // darkTheme intentionally omitted (null)
-          themeMode: ThemeMode.dark,
+          themeMode: OiThemeMode.dark,
           home: Builder(
             builder: (ctx) {
               captured = OiTheme.maybeOf(ctx);
@@ -256,7 +256,7 @@ void main() {
       await tester.pumpWidget(
         OiApp(
           darkTheme: darkTheme,
-          themeMode: ThemeMode.system,
+          themeMode: OiThemeMode.system,
           home: Builder(
             builder: (ctx) {
               captured = OiTheme.maybeOf(ctx);
@@ -280,7 +280,7 @@ void main() {
       await tester.pumpWidget(
         OiApp(
           theme: lightTheme,
-          themeMode: ThemeMode.system,
+          themeMode: OiThemeMode.system,
           home: Builder(
             builder: (ctx) {
               captured = OiTheme.maybeOf(ctx);

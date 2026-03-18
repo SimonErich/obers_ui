@@ -20,6 +20,7 @@ export 'src/foundation/theme/oi_spacing_scale.dart';
 export 'src/foundation/theme/oi_text_theme.dart';
 export 'src/foundation/theme/oi_theme.dart';
 export 'src/foundation/theme/oi_theme_data.dart';
+export 'src/foundation/theme/oi_theme_scope.dart';
 
 // ── Foundation: Core Services ────────────────────────────────────────────────
 

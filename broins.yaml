@@ -2,3 +2,15 @@ llm:
   ollamaApi:
     baseUrl: https://e38x98s7g92mqf-11434.proxy.runpod.net
     model: qwen3:14b-q4_K_M
+
+workflow:
+  # Keep iteration budgets tight for throughput on large projects.
+  # The final full-verification pass catches remaining gaps.
+  maxIterationsPerWorkItem: 2
+  maxIterationsSimple: 1
+  maxIterationsMedium: 2
+  maxIterationsComplex: 2
+  stuckLoopThreshold: 1
+  maxStabilizationRounds: 3
+  maxChecksFixRounds: 2
+  autoFixChecksWithClaude: true
