@@ -116,13 +116,19 @@ class OiBreakpointScale {
     this.contentMaxWidths,
   );
 
+  /// The default 5-tier scale matching Material 3 guidelines, as a const.
+  ///
+  /// This is the default value used by all layout widgets when no explicit
+  /// [scale] is provided. Zero magic: no context lookup needed.
+  static const OiBreakpointScale defaultScale = OiBreakpointScale._(
+    OiBreakpoint.values,
+    _standardPageGutters,
+    _standardContentMaxWidths,
+  );
+
   /// The default 5-tier scale matching Material 3 guidelines.
   factory OiBreakpointScale.standard() {
-    return OiBreakpointScale._(
-      OiBreakpoint.values,
-      _standardPageGutters,
-      _standardContentMaxWidths,
-    );
+    return defaultScale;
   }
 
   /// Extended scale — adds `tablet` (480) and `ultraWide` (1920).

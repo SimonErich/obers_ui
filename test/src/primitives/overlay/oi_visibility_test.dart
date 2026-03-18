@@ -3,6 +3,7 @@
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:obers_ui/src/foundation/oi_responsive.dart';
 import 'package:obers_ui/src/primitives/overlay/oi_visibility.dart';
 
 import '../../../helpers/pump_app.dart';
@@ -238,14 +239,12 @@ void main() {
   testWidgets(
     'OiVisibility.responsive on compact: uses compactTransition (slideUp)',
     (tester) async {
-      // Inject a compact-width MediaQuery directly so context.isCompact = true.
+      // Zero magic: breakpoint is passed explicitly — no context lookup.
       await tester.pumpObers(
-        const MediaQuery(
-          data: MediaQueryData(size: Size(400, 800)),
-          child: OiVisibility.responsive(
-            visible: true,
-            child: Text('responsive'),
-          ),
+        const OiVisibility.responsive(
+          visible: true,
+          breakpoint: OiBreakpoint.compact,
+          child: Text('responsive'),
         ),
       );
       await tester.pump();
@@ -257,14 +256,12 @@ void main() {
   testWidgets(
     'OiVisibility.responsive on expanded: uses expandedTransition (fade)',
     (tester) async {
-      // Inject an expanded-width MediaQuery directly so context.isCompact = false.
+      // Zero magic: breakpoint is passed explicitly — no context lookup.
       await tester.pumpObers(
-        const MediaQuery(
-          data: MediaQueryData(size: Size(900, 800)),
-          child: OiVisibility.responsive(
-            visible: true,
-            child: Text('responsive'),
-          ),
+        const OiVisibility.responsive(
+          visible: true,
+          breakpoint: OiBreakpoint.expanded,
+          child: Text('responsive'),
         ),
       );
       await tester.pump();

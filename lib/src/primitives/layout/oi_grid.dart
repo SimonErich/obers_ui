@@ -53,7 +53,7 @@ class OiGrid extends StatelessWidget {
     this.minColumnWidth,
     this.gap = const OiResponsive<double>(0),
     this.rowGap,
-    this.scale,
+    this.scale = OiBreakpointScale.defaultScale,
     super.key,
   }) : assert(
          columns == null || minColumnWidth == null,
@@ -80,8 +80,10 @@ class OiGrid extends StatelessWidget {
 
   /// The breakpoint scale used to resolve responsive values.
   ///
-  /// When null, read from the nearest [OiTheme] via `context.breakpointScale`.
-  final OiBreakpointScale? scale;
+  /// Defaults to [OiBreakpointScale.defaultScale] (the standard 5-tier scale).
+  /// Zero magic: no context lookup — pass an explicit scale if you use a
+  /// custom breakpoint configuration.
+  final OiBreakpointScale scale;
 
   /// The child widgets to place in the grid.
   final List<Widget> children;
@@ -93,7 +95,7 @@ class OiGrid extends StatelessWidget {
         // Resolve responsive values — breakpoint is explicit, no context
         // lookup for it.
         final active = breakpoint;
-        final resolvedScale = scale ?? context.breakpointScale;
+        final resolvedScale = scale;
 
         final resolvedGap = gap.resolve(active, resolvedScale);
         final effectiveRowGap =

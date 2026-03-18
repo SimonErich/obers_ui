@@ -30,7 +30,7 @@ class OiAspectRatio extends StatelessWidget {
     required this.breakpoint,
     required this.ratio,
     required this.child,
-    this.scale,
+    this.scale = OiBreakpointScale.defaultScale,
     super.key,
   });
 
@@ -48,13 +48,15 @@ class OiAspectRatio extends StatelessWidget {
 
   /// The breakpoint scale used to resolve responsive values.
   ///
-  /// When null, read from the nearest [OiTheme] via `context.breakpointScale`.
-  final OiBreakpointScale? scale;
+  /// Defaults to [OiBreakpointScale.defaultScale] (the standard 5-tier scale).
+  /// Zero magic: no context lookup — pass an explicit scale if you use a
+  /// custom breakpoint configuration.
+  final OiBreakpointScale scale;
 
   @override
   Widget build(BuildContext context) {
     final active = breakpoint;
-    final resolvedScale = scale ?? context.breakpointScale;
+    final resolvedScale = scale;
     final resolvedRatio = ratio.resolve(active, resolvedScale);
     return AspectRatio(aspectRatio: resolvedRatio, child: child);
   }

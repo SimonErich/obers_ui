@@ -41,7 +41,7 @@ class OiSection extends StatelessWidget {
     this.crossAxisAlignment = CrossAxisAlignment.start,
     this.mainAxisSize = MainAxisSize.min,
     this.semanticLabel,
-    this.scale,
+    this.scale = OiBreakpointScale.defaultScale,
     super.key,
   });
 
@@ -73,13 +73,15 @@ class OiSection extends StatelessWidget {
 
   /// The breakpoint scale used to resolve responsive values.
   ///
-  /// When null, read from the nearest [OiTheme] via `context.breakpointScale`.
-  final OiBreakpointScale? scale;
+  /// Defaults to [OiBreakpointScale.defaultScale] (the standard 5-tier scale).
+  /// Zero magic: no context lookup — pass an explicit scale if you use a
+  /// custom breakpoint configuration.
+  final OiBreakpointScale scale;
 
   @override
   Widget build(BuildContext context) {
     final active = breakpoint;
-    final resolvedScale = scale ?? context.breakpointScale;
+    final resolvedScale = scale;
     final resolvedGap = gap.resolve(active, resolvedScale);
     final resolvedPadding = padding?.resolve(active, resolvedScale);
 

@@ -177,10 +177,12 @@ void main() {
     });
   });
 
-  // ── Scale context fallback ──────────────────────────────────────────────
+  // ── Zero magic: no context dependency ────────────────────────────────────
 
-  testWidgets('scale fallback throws when OiTheme is missing', (tester) async {
-    // Pump without OiTheme — context.breakpointScale should assert.
+  testWidgets('works without OiTheme — scale defaults to standard', (
+    tester,
+  ) async {
+    // Zero magic: no OiTheme needed — scale defaults to defaultScale.
     await tester.pumpWidget(
       MediaQuery(
         data: const MediaQueryData(size: Size(400, 800)),
@@ -196,6 +198,8 @@ void main() {
         ),
       ),
     );
-    expect(tester.takeException(), isNotNull);
+    // Should not throw — self-contained with explicit defaults.
+    expect(tester.takeException(), isNull);
+    expect(find.text('A'), findsOneWidget);
   });
 }

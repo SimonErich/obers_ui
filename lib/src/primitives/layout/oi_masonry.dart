@@ -38,7 +38,7 @@ class OiMasonry extends StatelessWidget {
     required this.children,
     this.columns = const OiResponsive<int>(2),
     this.gap = const OiResponsive<double>(0),
-    this.scale,
+    this.scale = OiBreakpointScale.defaultScale,
     super.key,
   });
 
@@ -54,8 +54,10 @@ class OiMasonry extends StatelessWidget {
 
   /// The breakpoint scale used to resolve responsive values.
   ///
-  /// When null, read from the nearest [OiTheme] via `context.breakpointScale`.
-  final OiBreakpointScale? scale;
+  /// Defaults to [OiBreakpointScale.defaultScale] (the standard 5-tier scale).
+  /// Zero magic: no context lookup — pass an explicit scale if you use a
+  /// custom breakpoint configuration.
+  final OiBreakpointScale scale;
 
   /// The child widgets to distribute across columns.
   final List<Widget> children;
@@ -67,7 +69,7 @@ class OiMasonry extends StatelessWidget {
         // Resolve responsive values — breakpoint is explicit, no context
         // lookup for it.
         final active = breakpoint;
-        final resolvedScale = scale ?? context.breakpointScale;
+        final resolvedScale = scale;
         final resolvedColumns =
             math.max(1, columns.resolve(active, resolvedScale));
         final resolvedGap = gap.resolve(active, resolvedScale);

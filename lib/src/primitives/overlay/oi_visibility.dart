@@ -56,22 +56,28 @@ class OiVisibility extends StatefulWidget {
     this.maintainState = true,
     super.key,
   }) : _compactTransition = null,
-       _expandedTransition = null;
+       _expandedTransition = null,
+       _breakpoint = null;
 
   /// Creates an [OiVisibility] with responsive transitions.
   ///
-  /// Uses [compactTransition] on compact breakpoints (width < 600dp) and
-  /// [expandedTransition] on all wider breakpoints.
+  /// Uses [compactTransition] when [breakpoint] occupies the compact tier
+  /// (minWidth 0) and [expandedTransition] on all wider breakpoints.
+  ///
+  /// **Zero magic:** [breakpoint] is required — no implicit context lookup
+  /// for breakpoint detection.
   const OiVisibility.responsive({
     required this.visible,
     required this.child,
+    required OiBreakpoint breakpoint,
     OiTransition compactTransition = OiTransition.slideUp,
     OiTransition expandedTransition = OiTransition.fade,
     this.maintainState = true,
     super.key,
   }) : transition = expandedTransition,
        _compactTransition = compactTransition,
-       _expandedTransition = expandedTransition;
+       _expandedTransition = expandedTransition,
+       _breakpoint = breakpoint;
 
   /// Whether the child is visible.
   final bool visible;
@@ -93,6 +99,7 @@ class OiVisibility extends StatefulWidget {
   // Internal fields for the responsive constructor.
   final OiTransition? _compactTransition;
   final OiTransition? _expandedTransition;
+  final OiBreakpoint? _breakpoint;
 
   @override
   State<OiVisibility> createState() => _OiVisibilityState();
@@ -169,7 +176,9 @@ class _OiVisibilityState extends State<OiVisibility>
   OiTransition _resolvedTransition() {
     if (widget._compactTransition != null &&
         widget._expandedTransition != null) {
-      return context.isCompact
+      final isCompact =
+          widget._breakpoint!.minWidth == OiBreakpoint.compact.minWidth;
+      return isCompact
           ? widget._compactTransition!
           : widget._expandedTransition!;
     }

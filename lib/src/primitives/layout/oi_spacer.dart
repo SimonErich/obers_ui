@@ -31,7 +31,7 @@ class OiSpacer extends StatelessWidget {
     this.size,
     this.flex,
     this.axis = Axis.vertical,
-    this.scale,
+    this.scale = OiBreakpointScale.defaultScale,
     super.key,
   });
 
@@ -54,8 +54,10 @@ class OiSpacer extends StatelessWidget {
 
   /// The breakpoint scale used to resolve responsive values.
   ///
-  /// When null, read from the nearest [OiTheme] via `context.breakpointScale`.
-  final OiBreakpointScale? scale;
+  /// Defaults to [OiBreakpointScale.defaultScale] (the standard 5-tier scale).
+  /// Zero magic: no context lookup — pass an explicit scale if you use a
+  /// custom breakpoint configuration.
+  final OiBreakpointScale scale;
 
   @override
   Widget build(BuildContext context) {
@@ -65,7 +67,7 @@ class OiSpacer extends StatelessWidget {
 
     if (size != null) {
       final active = breakpoint;
-      final resolvedScale = scale ?? context.breakpointScale;
+      final resolvedScale = scale;
       final resolvedSize = size!.resolve(active, resolvedScale);
       return axis == Axis.horizontal
           ? SizedBox(width: resolvedSize)

@@ -849,4 +849,57 @@ void main() {
       expect(children, hasLength(3));
     });
   });
+
+  // ── Zero magic: works without OiTheme ───────────────────────────────────
+
+  group('zero magic — no context dependency', () {
+    testWidgets('grid works without OiTheme — scale defaults to standard', (
+      tester,
+    ) async {
+      // No OiApp/OiTheme wrapper — proves the widget is self-contained.
+      await tester.pumpWidget(
+        const Directionality(
+          textDirection: TextDirection.ltr,
+          child: SizedBox(
+            width: 800,
+            height: 600,
+            child: OiGrid(
+              breakpoint: OiBreakpoint.compact,
+              columns: OiResponsive<int>(2),
+              children: [Text('A'), Text('B')],
+            ),
+          ),
+        ),
+      );
+      // Should not throw — scale defaults to OiBreakpointScale.defaultScale.
+      expect(find.text('A'), findsOneWidget);
+      expect(find.text('B'), findsOneWidget);
+    });
+
+    testWidgets('responsive values resolve with default scale', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        Directionality(
+          textDirection: TextDirection.ltr,
+          child: SizedBox(
+            width: 800,
+            height: 600,
+            child: OiGrid(
+              breakpoint: OiBreakpoint.medium,
+              columns: OiResponsive<int>.breakpoints({
+                OiBreakpoint.compact: 1,
+                OiBreakpoint.medium: 3,
+              }),
+              children: const [Text('A'), Text('B'), Text('C')],
+            ),
+          ),
+        ),
+      );
+      // Medium breakpoint → 3 columns, each rendered.
+      expect(find.text('A'), findsOneWidget);
+      expect(find.text('B'), findsOneWidget);
+      expect(find.text('C'), findsOneWidget);
+    });
+  });
 }
