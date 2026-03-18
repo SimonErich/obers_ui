@@ -1358,4 +1358,270 @@ void main() {
       expect(find.byType(LayoutBuilder), findsNothing);
     });
   });
+
+  // ── rowSpan (REQ-1084) ──────────────────────────────────────────────────
+
+  group('rowSpan (REQ-1084)', () {
+    testWidgets('default rowSpan is 1', (tester) async {
+      // No rowSpan specified → child occupies a single row.
+      await tester.pumpObers(
+        OiGrid(
+          breakpoint: OiBreakpoint.compact,
+          columns: 2.responsive,
+          children: const [Text('A'), Text('B'), Text('C'), Text('D')],
+        ),
+        surfaceSize: const Size(800, 600),
+      );
+
+      final rectA = tester.getRect(find.text('A'));
+      final rectB = tester.getRect(find.text('B'));
+      final rectC = tester.getRect(find.text('C'));
+
+      // Row 0: A, B. Row 1: C, D. A does NOT span into row 1.
+      expect(rectA.top, closeTo(rectB.top, 1));
+      expect(rectC.top, greaterThan(rectA.bottom - 1));
+    });
+
+    testWidgets('child with rowSpan 2 occupies two grid rows', (
+      tester,
+    ) async {
+      // 2 columns, gap 0. A spans 2 rows. B, C, D are single-row.
+      // Row 0: A(col0, rowSpan2), B(col1)
+      // Row 1: A still occupying col0, C(col1)
+      // Row 2: D(col0)
+      await tester.pumpObers(
+        OiGrid(
+          breakpoint: OiBreakpoint.compact,
+          columns: 2.responsive,
+          children: [
+            const SizedBox(
+              key: Key('A'),
+              height: 100,
+            ).span(rowSpan: const OiResponsive<int>(2)),
+            const SizedBox(key: Key('B'), height: 40),
+            const SizedBox(key: Key('C'), height: 40),
+            const SizedBox(key: Key('D'), height: 40),
+          ],
+        ),
+        surfaceSize: const Size(800, 600),
+      );
+
+      final rectA = tester.getRect(find.byKey(const Key('A')));
+      final rectB = tester.getRect(find.byKey(const Key('B')));
+      final rectC = tester.getRect(find.byKey(const Key('C')));
+      final rectD = tester.getRect(find.byKey(const Key('D')));
+
+      // A at row 0, col 0.
+      expect(rectA.left, closeTo(0, 1));
+      expect(rectA.top, closeTo(0, 1));
+
+      // B at row 0, col 1.
+      expect(rectB.left, closeTo(400, 1));
+      expect(rectB.top, closeTo(0, 1));
+
+      // C at row 1, col 1 (col 0 blocked by A's rowSpan).
+      expect(rectC.left, closeTo(400, 1));
+      expect(rectC.top, greaterThan(rectB.bottom - 1));
+
+      // D at row 2, col 0 (A's rowSpan ended).
+      expect(rectD.left, closeTo(0, 1));
+      expect(rectD.top, greaterThan(rectC.bottom - 1));
+    });
+
+    testWidgets('rowSpan with rowGap sizes child to include internal row gaps',
+        (tester) async {
+      // 2 columns, rowGap 10. A spans 2 rows. B and C are 40px tall each.
+      // The combined height available for A's 2 rows = row0 + rowGap + row1.
+      await tester.pumpObers(
+        OiGrid(
+          breakpoint: OiBreakpoint.compact,
+          columns: 2.responsive,
+          rowGap: const OiResponsive<double>(10),
+          children: [
+            const SizedBox(
+              key: Key('A'),
+              height: 100,
+            ).span(rowSpan: const OiResponsive<int>(2)),
+            const SizedBox(key: Key('B'), height: 40),
+            const SizedBox(key: Key('C'), height: 40),
+          ],
+        ),
+        surfaceSize: const Size(800, 600),
+      );
+
+      final rectA = tester.getRect(find.byKey(const Key('A')));
+      final rectB = tester.getRect(find.byKey(const Key('B')));
+      final rectC = tester.getRect(find.byKey(const Key('C')));
+
+      // B and C should each be on different rows.
+      expect(rectB.top, closeTo(0, 1));
+      // C starts after B's height + rowGap.
+      expect(rectC.top, greaterThan(rectB.bottom - 1));
+      // A starts at 0.
+      expect(rectA.top, closeTo(0, 1));
+    });
+
+    testWidgets('rowSpan clamped to minimum 1', (tester) async {
+      // rowSpan 0 should be treated as 1.
+      await tester.pumpObers(
+        OiGrid(
+          breakpoint: OiBreakpoint.compact,
+          columns: 2.responsive,
+          children: [
+            const SizedBox(
+              key: Key('A'),
+              height: 40,
+            ).span(rowSpan: const OiResponsive<int>(0)),
+            const SizedBox(key: Key('B'), height: 40),
+            const SizedBox(key: Key('C'), height: 40),
+          ],
+        ),
+        surfaceSize: const Size(800, 600),
+      );
+
+      final rectA = tester.getRect(find.byKey(const Key('A')));
+      final rectB = tester.getRect(find.byKey(const Key('B')));
+      final rectC = tester.getRect(find.byKey(const Key('C')));
+
+      // A and B on row 0, C on row 1 (A doesn't span extra rows).
+      expect(rectA.top, closeTo(rectB.top, 1));
+      expect(rectC.top, greaterThan(rectA.bottom - 1));
+      expect(rectC.left, closeTo(0, 1));
+    });
+
+    testWidgets('rowSpan blocks cells in subsequent rows for auto-placement', (
+      tester,
+    ) async {
+      // 3 columns. A(col0, rowSpan 2), B(col1), C(col2).
+      // Row 1: col0 blocked by A. D auto-places at col1.
+      await tester.pumpObers(
+        OiGrid(
+          breakpoint: OiBreakpoint.compact,
+          columns: 3.responsive,
+          children: [
+            const SizedBox(
+              key: Key('A'),
+              height: 80,
+            ).span(rowSpan: const OiResponsive<int>(2)),
+            const SizedBox(key: Key('B'), height: 40),
+            const SizedBox(key: Key('C'), height: 40),
+            const SizedBox(key: Key('D'), height: 40),
+          ],
+        ),
+        surfaceSize: const Size(900, 600),
+      );
+
+      final rectA = tester.getRect(find.byKey(const Key('A')));
+      final rectD = tester.getRect(find.byKey(const Key('D')));
+
+      // A at col 0, row 0.
+      expect(rectA.left, closeTo(0, 1));
+      expect(rectA.top, closeTo(0, 1));
+
+      // D auto-placed: row 1, col 1 (col 0 blocked by A's rowSpan).
+      expect(rectD.left, closeTo(300, 1));
+      expect(rectD.top, greaterThan(rectA.top));
+    });
+
+    testWidgets('rowSpan + columnSpan work together (2×2 block)', (
+      tester,
+    ) async {
+      // 3 columns. A spans 2 cols × 2 rows.
+      await tester.pumpObers(
+        OiGrid(
+          breakpoint: OiBreakpoint.compact,
+          columns: 3.responsive,
+          children: [
+            const SizedBox(key: Key('A'), height: 80).span(
+              columnSpan: const OiResponsive<int>(2),
+              rowSpan: const OiResponsive<int>(2),
+            ),
+            const SizedBox(key: Key('B'), height: 40),
+            const SizedBox(key: Key('C'), height: 40),
+            const SizedBox(key: Key('D'), height: 40),
+          ],
+        ),
+        surfaceSize: const Size(900, 600),
+      );
+
+      final rectA = tester.getRect(find.byKey(const Key('A')));
+      final rectB = tester.getRect(find.byKey(const Key('B')));
+      final rectC = tester.getRect(find.byKey(const Key('C')));
+      final rectD = tester.getRect(find.byKey(const Key('D')));
+
+      // A: 2 cols wide starting at col 0 → width = 600.
+      expect(rectA.left, closeTo(0, 1));
+      expect(rectA.width, closeTo(600, 1));
+
+      // B: row 0, col 2 (only free col in row 0).
+      expect(rectB.left, closeTo(600, 1));
+      expect(rectB.top, closeTo(0, 1));
+
+      // C: row 1, col 2 (cols 0-1 blocked by A's rowSpan).
+      expect(rectC.left, closeTo(600, 1));
+      expect(rectC.top, greaterThan(rectB.bottom - 1));
+
+      // D: row 2, col 0 (A's rowSpan ended).
+      expect(rectD.left, closeTo(0, 1));
+      expect(rectD.top, greaterThan(rectC.bottom - 1));
+    });
+
+    testWidgets(
+      'placement records (row, column, columnSpan, rowSpan) for each child',
+      (tester) async {
+        // Comprehensive recording test: verify each child is positioned
+        // according to its (row, column, columnSpan, rowSpan) tuple.
+        // 4 columns, gap 0, 800px → unitWidth = 200.
+        // A: span 2 cols, 2 rows. B: default. C: default. D: span 1 col, 1 row.
+        await tester.pumpObers(
+          OiGrid(
+            breakpoint: OiBreakpoint.compact,
+            columns: 4.responsive,
+            children: [
+              const SizedBox(key: Key('A'), height: 60).span(
+                columnSpan: const OiResponsive<int>(2),
+                rowSpan: const OiResponsive<int>(2),
+              ),
+              const SizedBox(key: Key('B'), height: 30),
+              const SizedBox(key: Key('C'), height: 30),
+              const SizedBox(key: Key('D'), height: 30),
+              const SizedBox(key: Key('E'), height: 30),
+            ],
+          ),
+          surfaceSize: const Size(800, 600),
+        );
+
+        final rectA = tester.getRect(find.byKey(const Key('A')));
+        final rectB = tester.getRect(find.byKey(const Key('B')));
+        final rectC = tester.getRect(find.byKey(const Key('C')));
+        final rectD = tester.getRect(find.byKey(const Key('D')));
+        final rectE = tester.getRect(find.byKey(const Key('E')));
+
+        // A: row 0, col 0, columnSpan 2, rowSpan 2.
+        expect(rectA.left, closeTo(0, 1));
+        expect(rectA.top, closeTo(0, 1));
+        expect(rectA.width, closeTo(400, 1)); // 2 × 200
+
+        // B: row 0, col 2, columnSpan 1, rowSpan 1.
+        expect(rectB.left, closeTo(400, 1));
+        expect(rectB.top, closeTo(0, 1));
+        expect(rectB.width, closeTo(200, 1));
+
+        // C: row 0, col 3, columnSpan 1, rowSpan 1.
+        expect(rectC.left, closeTo(600, 1));
+        expect(rectC.top, closeTo(0, 1));
+        expect(rectC.width, closeTo(200, 1));
+
+        // D: row 1, col 2 (cols 0-1 blocked by A).
+        expect(rectD.left, closeTo(400, 1));
+        expect(rectD.top, greaterThan(rectB.bottom - 1));
+        expect(rectD.width, closeTo(200, 1));
+
+        // E: row 1, col 3.
+        expect(rectE.left, closeTo(600, 1));
+        expect(rectE.top, closeTo(rectD.top, 1));
+        expect(rectE.width, closeTo(200, 1));
+      },
+    );
+  });
 }

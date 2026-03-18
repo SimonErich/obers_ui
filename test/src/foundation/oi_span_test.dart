@@ -88,6 +88,50 @@ void main() {
       const b = OiSpanData(columnSpan: OiResponsive<int>(3));
       expect(a, isNot(equals(b)));
     });
+
+    test('default rowSpan resolves to 1', () {
+      const data = OiSpanData();
+      expect(data.resolveRowSpan(OiBreakpoint.compact, scale), 1);
+      expect(data.resolveRowSpan(OiBreakpoint.large, scale), 1);
+    });
+
+    test('static rowSpan resolves to same value at all breakpoints', () {
+      const data = OiSpanData(rowSpan: OiResponsive<int>(3));
+      expect(data.resolveRowSpan(OiBreakpoint.compact, scale), 3);
+      expect(data.resolveRowSpan(OiBreakpoint.large, scale), 3);
+    });
+
+    test('responsive rowSpan resolves per breakpoint', () {
+      final data = OiSpanData(
+        rowSpan: OiResponsive<int>.breakpoints({
+          OiBreakpoint.compact: 1,
+          OiBreakpoint.medium: 2,
+          OiBreakpoint.large: 3,
+        }),
+      );
+      expect(data.resolveRowSpan(OiBreakpoint.compact, scale), 1);
+      expect(data.resolveRowSpan(OiBreakpoint.medium, scale), 2);
+      // expanded cascades to medium
+      expect(data.resolveRowSpan(OiBreakpoint.expanded, scale), 2);
+      expect(data.resolveRowSpan(OiBreakpoint.large, scale), 3);
+    });
+
+    test('equality includes rowSpan', () {
+      const a = OiSpanData(
+        columnSpan: OiResponsive<int>(2),
+        rowSpan: OiResponsive<int>(3),
+      );
+      const b = OiSpanData(
+        columnSpan: OiResponsive<int>(2),
+        rowSpan: OiResponsive<int>(3),
+      );
+      const c = OiSpanData(
+        columnSpan: OiResponsive<int>(2),
+        rowSpan: OiResponsive<int>(1),
+      );
+      expect(a, equals(b));
+      expect(a, isNot(equals(c)));
+    });
   });
 
   // ─────────────────────────────────────────────────────────────────────────
@@ -135,6 +179,19 @@ void main() {
       expect(span.data.columnSpan, const OiResponsive<int>(2));
       expect(span.data.columnStart, const OiResponsive<int>(3));
       expect(span.data.columnOrder, isNull);
+    });
+
+    testWidgets('.span() passes rowSpan through to OiSpanData', (
+      tester,
+    ) async {
+      final widget = const Text('test').span(
+        columnSpan: const OiResponsive<int>(2),
+        rowSpan: const OiResponsive<int>(3),
+      );
+      expect(widget, isA<OiSpan>());
+      final span = widget as OiSpan;
+      expect(span.data.columnSpan, const OiResponsive<int>(2));
+      expect(span.data.rowSpan, const OiResponsive<int>(3));
     });
 
     testWidgets('.spanFull() wraps widget with full span', (tester) async {

@@ -121,6 +121,7 @@ class OiGrid extends StatelessWidget {
       final colSpan = spanData?.resolveColumnSpan(active, resolvedScale) ?? 1;
       final colStart = spanData?.resolveColumnStart(active, resolvedScale);
       final colOrder = spanData?.resolveColumnOrder(active, resolvedScale);
+      final rSpan = spanData?.resolveRowSpan(active, resolvedScale) ?? 1;
 
       wrappedChildren.add(
         _OiGridSlot(
@@ -128,6 +129,7 @@ class OiGrid extends StatelessWidget {
           columnSpan: colSpan,
           columnStart: colStart,
           columnOrder: colOrder,
+          rowSpan: rSpan,
           child: child,
         ),
       );
@@ -160,6 +162,9 @@ class _OiGridParentData extends ContainerBoxParentData<RenderBox> {
 
   /// Visual ordering key; lower renders first, null = source order (0).
   int? columnOrder;
+
+  /// How many rows this child spans (default 1).
+  int rowSpan = 1;
 }
 
 // ---------------------------------------------------------------------------
@@ -173,6 +178,7 @@ class _OiGridSlot extends ParentDataWidget<_OiGridParentData> {
     required this.columnSpan,
     required this.columnStart,
     required this.columnOrder,
+    required this.rowSpan,
     required super.child,
   });
 
@@ -180,6 +186,7 @@ class _OiGridSlot extends ParentDataWidget<_OiGridParentData> {
   final int columnSpan;
   final int? columnStart;
   final int? columnOrder;
+  final int rowSpan;
 
   @override
   void applyParentData(RenderObject renderObject) {
@@ -200,6 +207,10 @@ class _OiGridSlot extends ParentDataWidget<_OiGridParentData> {
     }
     if (parentData.columnOrder != columnOrder) {
       parentData.columnOrder = columnOrder;
+      needsLayout = true;
+    }
+    if (parentData.rowSpan != rowSpan) {
+      parentData.rowSpan = rowSpan;
       needsLayout = true;
     }
 
@@ -365,16 +376,15 @@ class _RenderOiGrid extends RenderBox
     // REQ-1076: CSS Grid row-packing algorithm.
     final placements = _packRows(entries, cols);
 
-    // Determine row count.
+    // Determine row count (accounts for rowSpan).
     var rowCount = 0;
     for (final p in placements) {
-      if (p.row >= rowCount) rowCount = p.row + 1;
+      final lastRow = p.row + p.rowSpan;
+      if (lastRow > rowCount) rowCount = lastRow;
     }
     if (rowCount == 0) rowCount = 1;
 
-    // Layout each child with its computed width.
-    final rowHeights = List<double>.filled(rowCount, 0);
-
+    // First pass: layout each child with its computed width.
     for (final p in placements) {
       final childWidth =
           p.effectiveSpan * unitWidth + math.max(0, p.effectiveSpan - 1) * _gap;
@@ -383,10 +393,37 @@ class _RenderOiGrid extends RenderBox
         BoxConstraints.tightFor(width: childWidth),
         parentUsesSize: true,
       );
+    }
 
+    // Compute row heights — single-row children contribute directly;
+    // multi-row children are distributed after single-row heights are known.
+    final rowHeights = List<double>.filled(rowCount, 0);
+
+    // Pass 1: single-row children set initial row heights.
+    for (final p in placements) {
+      if (p.rowSpan == 1) {
+        final h = p.renderBox.size.height;
+        if (h > rowHeights[p.row]) rowHeights[p.row] = h;
+      }
+    }
+
+    // Pass 2: multi-row children — ensure the spanned rows can accommodate.
+    for (final p in placements) {
+      if (p.rowSpan <= 1) continue;
       final childHeight = p.renderBox.size.height;
-      if (childHeight > rowHeights[p.row]) {
-        rowHeights[p.row] = childHeight;
+      // Sum of the rows this child spans + intermediate row gaps.
+      var spannedHeight = 0.0;
+      for (var r = p.row; r < p.row + p.rowSpan; r++) {
+        spannedHeight += rowHeights[r];
+        if (r < p.row + p.rowSpan - 1) spannedHeight += _rowGap;
+      }
+      if (childHeight > spannedHeight) {
+        // Distribute extra height evenly across spanned rows.
+        final extra = childHeight - spannedHeight;
+        final perRow = extra / p.rowSpan;
+        for (var r = p.row; r < p.row + p.rowSpan; r++) {
+          rowHeights[r] += perRow;
+        }
       }
     }
 
@@ -435,17 +472,36 @@ class _RenderOiGrid extends RenderBox
       }
     }
 
-    // Compute row heights.
+    // Compute row heights (rowSpan-aware).
     var rowCount = 0;
     for (final p in placements) {
-      if (p.row >= rowCount) rowCount = p.row + 1;
+      final lastRow = p.row + p.rowSpan;
+      if (lastRow > rowCount) rowCount = lastRow;
     }
     if (rowCount == 0) rowCount = 1;
 
     final rowHeights = List<double>.filled(rowCount, 0);
     for (final p in placements) {
-      final h = p.renderBox.size.height;
-      if (h > rowHeights[p.row]) rowHeights[p.row] = h;
+      if (p.rowSpan == 1) {
+        final h = p.renderBox.size.height;
+        if (h > rowHeights[p.row]) rowHeights[p.row] = h;
+      }
+    }
+    for (final p in placements) {
+      if (p.rowSpan <= 1) continue;
+      final childHeight = p.renderBox.size.height;
+      var spannedHeight = 0.0;
+      for (var r = p.row; r < p.row + p.rowSpan; r++) {
+        spannedHeight += rowHeights[r];
+        if (r < p.row + p.rowSpan - 1) spannedHeight += _rowGap;
+      }
+      if (childHeight > spannedHeight) {
+        final extra = childHeight - spannedHeight;
+        final perRow = extra / p.rowSpan;
+        for (var r = p.row; r < p.row + p.rowSpan; r++) {
+          rowHeights[r] += perRow;
+        }
+      }
     }
 
     // Position children.
@@ -494,11 +550,15 @@ class _RenderOiGrid extends RenderBox
       if (colSpan == fullSpanSentinel) colSpan = cols;
       colSpan = colSpan.clamp(1, cols);
 
+      // REQ-1084: Resolve rowSpan (default 1, minimum 1).
+      final rSpan = math.max(1, pd.rowSpan);
+
       entries.add(
         _ChildEntry(
           renderBox: child,
           index: pd.index,
           columnSpan: colSpan,
+          rowSpan: rSpan,
           columnStart: pd.columnStart,
           columnOrder: pd.columnOrder,
         ),
@@ -536,20 +596,24 @@ class _RenderOiGrid extends RenderBox
     var cursorRow = 0;
     var cursorCol = 0;
 
-    bool canFit(int row, int startCol, int span) {
-      if (startCol + span > cols) return false;
-      final rowSet = occupied[row];
-      if (rowSet == null) return true;
-      for (var c = startCol; c < startCol + span; c++) {
-        if (rowSet.contains(c)) return false;
+    bool canFit(int row, int startCol, int colSpan, int rowSpan) {
+      if (startCol + colSpan > cols) return false;
+      for (var r = row; r < row + rowSpan; r++) {
+        final rowSet = occupied[r];
+        if (rowSet == null) continue;
+        for (var c = startCol; c < startCol + colSpan; c++) {
+          if (rowSet.contains(c)) return false;
+        }
       }
       return true;
     }
 
-    void occupy(int row, int startCol, int span) {
-      final rowSet = occupied.putIfAbsent(row, () => <int>{});
-      for (var c = startCol; c < startCol + span; c++) {
-        rowSet.add(c);
+    void occupy(int row, int startCol, int colSpan, int rowSpan) {
+      for (var r = row; r < row + rowSpan; r++) {
+        final rowSet = occupied.putIfAbsent(r, () => <int>{});
+        for (var c = startCol; c < startCol + colSpan; c++) {
+          rowSet.add(c);
+        }
       }
     }
 
@@ -557,6 +621,8 @@ class _RenderOiGrid extends RenderBox
     for (final entry in entries) {
       // REQ-1080: columnSpan already resolved (default 1, sentinel → cols).
       final span = entry.columnSpan;
+      // REQ-1084: rowSpan already resolved (default 1, minimum 1).
+      final rSpan = entry.rowSpan;
       final requestedStart = entry.columnStart;
 
       if (requestedStart != null) {
@@ -566,14 +632,15 @@ class _RenderOiGrid extends RenderBox
 
         // Find the first row where those cells are free.
         for (var row = 0; ; row++) {
-          if (canFit(row, startCol, effectiveSpan)) {
-            occupy(row, startCol, effectiveSpan);
+          if (canFit(row, startCol, effectiveSpan, rSpan)) {
+            occupy(row, startCol, effectiveSpan, rSpan);
             placements.add(
               _Placement(
                 renderBox: entry.renderBox,
                 row: row,
                 column: startCol,
                 effectiveSpan: effectiveSpan,
+                rowSpan: rSpan,
               ),
             );
             break;
@@ -591,14 +658,15 @@ class _RenderOiGrid extends RenderBox
             col = 0;
             continue;
           }
-          if (canFit(row, col, span)) {
-            occupy(row, col, span);
+          if (canFit(row, col, span, rSpan)) {
+            occupy(row, col, span, rSpan);
             placements.add(
               _Placement(
                 renderBox: entry.renderBox,
                 row: row,
                 column: col,
                 effectiveSpan: span,
+                rowSpan: rSpan,
               ),
             );
             // Advance cursor past this placement.
@@ -671,12 +739,15 @@ class _RenderOiGrid extends RenderBox
 
     var rowCount = 0;
     for (final p in placements) {
-      if (p.row >= rowCount) rowCount = p.row + 1;
+      final lastRow = p.row + p.rowSpan;
+      if (lastRow > rowCount) rowCount = lastRow;
     }
     if (rowCount == 0) return 0;
 
     final rowHeights = List<double>.filled(rowCount, 0);
+    // Pass 1: single-row children.
     for (final p in placements) {
+      if (p.rowSpan != 1) continue;
       final childWidth =
           p.effectiveSpan * unitWidth + math.max(0, p.effectiveSpan - 1) * _gap;
 
@@ -685,6 +756,29 @@ class _RenderOiGrid extends RenderBox
           : p.renderBox.getMaxIntrinsicHeight(childWidth);
 
       if (h > rowHeights[p.row]) rowHeights[p.row] = h;
+    }
+    // Pass 2: multi-row children.
+    for (final p in placements) {
+      if (p.rowSpan <= 1) continue;
+      final childWidth =
+          p.effectiveSpan * unitWidth + math.max(0, p.effectiveSpan - 1) * _gap;
+
+      final h = useMin
+          ? p.renderBox.getMinIntrinsicHeight(childWidth)
+          : p.renderBox.getMaxIntrinsicHeight(childWidth);
+
+      var spannedHeight = 0.0;
+      for (var r = p.row; r < p.row + p.rowSpan; r++) {
+        spannedHeight += rowHeights[r];
+        if (r < p.row + p.rowSpan - 1) spannedHeight += _rowGap;
+      }
+      if (h > spannedHeight) {
+        final extra = h - spannedHeight;
+        final perRow = extra / p.rowSpan;
+        for (var r = p.row; r < p.row + p.rowSpan; r++) {
+          rowHeights[r] += perRow;
+        }
+      }
     }
 
     var totalHeight = 0.0;
@@ -717,12 +811,15 @@ class _RenderOiGrid extends RenderBox
 
     var rowCount = 0;
     for (final p in placements) {
-      if (p.row >= rowCount) rowCount = p.row + 1;
+      final lastRow = p.row + p.rowSpan;
+      if (lastRow > rowCount) rowCount = lastRow;
     }
     if (rowCount == 0) return constraints.constrain(Size(availableWidth, 0));
 
     final rowHeights = List<double>.filled(rowCount, 0);
+    // Pass 1: single-row children.
     for (final p in placements) {
+      if (p.rowSpan != 1) continue;
       final childWidth =
           p.effectiveSpan * unitWidth + math.max(0, p.effectiveSpan - 1) * _gap;
 
@@ -731,6 +828,28 @@ class _RenderOiGrid extends RenderBox
       );
       if (childSize.height > rowHeights[p.row]) {
         rowHeights[p.row] = childSize.height;
+      }
+    }
+    // Pass 2: multi-row children.
+    for (final p in placements) {
+      if (p.rowSpan <= 1) continue;
+      final childWidth =
+          p.effectiveSpan * unitWidth + math.max(0, p.effectiveSpan - 1) * _gap;
+
+      final childSize = p.renderBox.getDryLayout(
+        BoxConstraints.tightFor(width: childWidth),
+      );
+      var spannedHeight = 0.0;
+      for (var r = p.row; r < p.row + p.rowSpan; r++) {
+        spannedHeight += rowHeights[r];
+        if (r < p.row + p.rowSpan - 1) spannedHeight += _rowGap;
+      }
+      if (childSize.height > spannedHeight) {
+        final extra = childSize.height - spannedHeight;
+        final perRow = extra / p.rowSpan;
+        for (var r = p.row; r < p.row + p.rowSpan; r++) {
+          rowHeights[r] += perRow;
+        }
       }
     }
 
@@ -766,6 +885,7 @@ class _ChildEntry {
     required this.renderBox,
     required this.index,
     required this.columnSpan,
+    required this.rowSpan,
     this.columnStart,
     this.columnOrder,
   });
@@ -773,6 +893,7 @@ class _ChildEntry {
   final RenderBox renderBox;
   final int index;
   final int columnSpan;
+  final int rowSpan;
   final int? columnStart;
   final int? columnOrder;
 }
@@ -784,10 +905,12 @@ class _Placement {
     required this.row,
     required this.column,
     required this.effectiveSpan,
+    required this.rowSpan,
   });
 
   final RenderBox renderBox;
   final int row;
   final int column;
   final int effectiveSpan;
+  final int rowSpan;
 }
