@@ -171,6 +171,7 @@ class OiTable<T> extends StatefulWidget {
     this.settingsDriver,
     this.settingsKey,
     this.settingsNamespace = 'oi_table',
+    this.settingsSaveDebounce = const Duration(milliseconds: 500),
     super.key,
   });
 
@@ -316,6 +317,11 @@ class OiTable<T> extends StatefulWidget {
   /// Top-level namespace for settings storage.
   final String settingsNamespace;
 
+  /// Debounce duration for auto-saving settings after changes.
+  ///
+  /// Default: 500ms. Set to [Duration.zero] for immediate saves.
+  final Duration settingsSaveDebounce;
+
   @override
   State<OiTable<T>> createState() => _OiTableState<T>();
 }
@@ -440,7 +446,7 @@ class _OiTableState<T> extends State<OiTable<T>>
   void _onControllerChanged() {
     if (!mounted) return;
     // Persist settings on every controller change (debounced by the mixin).
-    updateSettings(_ctrl.toSettings());
+    updateSettings(_ctrl.toSettings(), debounce: widget.settingsSaveDebounce);
     setState(() {});
   }
 

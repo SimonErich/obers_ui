@@ -77,6 +77,7 @@ Widget _table({
   OiSettingsDriver? settingsDriver,
   String? settingsKey,
   String settingsNamespace = 'oi_table',
+  Duration settingsSaveDebounce = const Duration(milliseconds: 500),
   List<int> pageSizeOptions = const [10, 25, 50, 100],
   void Function(int)? onPageSizeChanged,
 }) {
@@ -116,6 +117,7 @@ Widget _table({
       settingsDriver: settingsDriver,
       settingsKey: settingsKey,
       settingsNamespace: settingsNamespace,
+      settingsSaveDebounce: settingsSaveDebounce,
     ),
   );
 }
@@ -540,6 +542,28 @@ void main() {
     ctrl.sortBy('name');
     await tester.pump(const Duration(milliseconds: 600)); // let debounce fire
     expect(await driver.exists(namespace: 'test_table'), isTrue);
+  });
+
+  // 23b. Settings persistence: custom debounce duration is respected
+  testWidgets('settingsSaveDebounce controls save delay', (tester) async {
+    final driver = OiInMemorySettingsDriver();
+    final ctrl = OiTableController(totalRows: _rows.length);
+    await tester.pumpObers(
+      _table(
+        controller: ctrl,
+        settingsDriver: driver,
+        settingsNamespace: 'debounce_test',
+        settingsSaveDebounce: const Duration(milliseconds: 200),
+      ),
+    );
+    await tester.pump(); // settle initial settings load
+    ctrl.sortBy('name');
+    // After 150ms (less than 200ms debounce) — not yet persisted.
+    await tester.pump(const Duration(milliseconds: 150));
+    expect(await driver.exists(namespace: 'debounce_test'), isFalse);
+    // After another 100ms (total 250ms > 200ms debounce) — persisted.
+    await tester.pump(const Duration(milliseconds: 100));
+    expect(await driver.exists(namespace: 'debounce_test'), isTrue);
   });
 
   // 24. Cell editing: double-tapping cell enters edit mode
