@@ -134,6 +134,8 @@ class OiChat extends StatefulWidget {
     this.enableReactions = true,
     this.enableAttachments = true,
     this.enableRichText = false,
+    this.groupConsecutive = true,
+    this.consecutiveThreshold = const Duration(minutes: 2),
   });
 
   /// The list of chat messages to display.
@@ -178,6 +180,19 @@ class OiChat extends StatefulWidget {
   /// Whether rich text formatting is enabled.
   final bool enableRichText;
 
+  /// Whether to group consecutive messages from the same sender.
+  ///
+  /// When `true`, consecutive messages from the same sender within
+  /// [consecutiveThreshold] are visually grouped: only the first message
+  /// in a group shows the avatar and sender name, while subsequent messages
+  /// show only their content with reduced top spacing.
+  final bool groupConsecutive;
+
+  /// The maximum time gap between consecutive messages for them to be grouped.
+  ///
+  /// Only applies when [groupConsecutive] is `true`. Defaults to 2 minutes.
+  final Duration consecutiveThreshold;
+
   @override
   State<OiChat> createState() => _OiChatState();
 }
@@ -207,6 +222,17 @@ class _OiChatState extends State<OiChat> {
     final h = dt.hour.toString().padLeft(2, '0');
     final m = dt.minute.toString().padLeft(2, '0');
     return '$h:$m';
+  }
+
+  /// Whether the message at [index] is a continuation of a group started by
+  /// a previous message (same sender, within the consecutive threshold).
+  bool _isContinuation(int index) {
+    if (!widget.groupConsecutive || index == 0) return false;
+    final current = widget.messages[index];
+    final previous = widget.messages[index - 1];
+    if (current.senderId != previous.senderId) return false;
+    return current.timestamp.difference(previous.timestamp).abs() <=
+        widget.consecutiveThreshold;
   }
 
   String _formatFileSize(int bytes) {
@@ -266,8 +292,11 @@ class _OiChatState extends State<OiChat> {
                     controller: _scrollController,
                     padding: EdgeInsets.all(spacing.sm),
                     itemCount: widget.messages.length,
-                    itemBuilder: (context, index) =>
-                        _buildMessage(context, widget.messages[index]),
+                    itemBuilder: (context, index) => _buildMessage(
+                      context,
+                      widget.messages[index],
+                      isContinuation: _isContinuation(index),
+                    ),
                   ),
           ),
 
@@ -356,7 +385,11 @@ class _OiChatState extends State<OiChat> {
     );
   }
 
-  Widget _buildMessage(BuildContext context, OiChatMessage message) {
+  Widget _buildMessage(
+    BuildContext context,
+    OiChatMessage message, {
+    bool isContinuation = false,
+  }) {
     final colors = context.colors;
     final spacing = context.spacing;
     final ownMessage = message.senderId == widget.currentUserId;
@@ -368,7 +401,7 @@ class _OiChatState extends State<OiChat> {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        if (!ownMessage)
+        if (!ownMessage && !isContinuation)
           Padding(
             padding: EdgeInsets.only(bottom: spacing.xs),
             child: Text(
@@ -466,7 +499,9 @@ class _OiChatState extends State<OiChat> {
       messageBody = pendingWrapper;
     }
 
-    final avatar = widget.showAvatars && !ownMessage
+    final showAvatar = widget.showAvatars && !ownMessage && !isContinuation;
+
+    final avatar = showAvatar
         ? Padding(
             padding: EdgeInsets.only(right: spacing.sm),
             child: Container(
@@ -492,8 +527,18 @@ class _OiChatState extends State<OiChat> {
           )
         : null;
 
+    // Use reduced spacing for continuation messages within a group.
+    final bottomSpacing = isContinuation ? spacing.xs : spacing.sm;
+
     return Padding(
-      padding: EdgeInsets.only(bottom: spacing.sm),
+      padding: EdgeInsets.only(
+        bottom: bottomSpacing,
+        // Indent continuation messages to align with the bubble above the
+        // avatar column (avatar 32 + right padding spacing.sm).
+        left: isContinuation && widget.showAvatars && !ownMessage
+            ? 32 + spacing.sm
+            : 0,
+      ),
       child: Row(
         mainAxisAlignment: ownMessage
             ? MainAxisAlignment.end

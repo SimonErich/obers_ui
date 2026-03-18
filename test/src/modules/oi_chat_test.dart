@@ -16,13 +16,14 @@ void main() {
     String senderName = 'Alice',
     String content = 'Hello!',
     bool pending = false,
+    DateTime? timestamp,
   }) {
     return OiChatMessage(
       key: key,
       senderId: senderId,
       senderName: senderName,
       content: content,
-      timestamp: now,
+      timestamp: timestamp ?? now,
       pending: pending,
     );
   }
@@ -212,5 +213,271 @@ void main() {
       ),
     );
     expect(find.bySemanticsLabel('Team Chat'), findsOneWidget);
+  });
+
+  // -------------------------------------------------------------------------
+  // Consecutive message grouping
+  // -------------------------------------------------------------------------
+
+  group('consecutive message grouping', () {
+    testWidgets(
+      'consecutive messages from same sender within threshold are grouped',
+      (tester) async {
+        final messages = [
+          _msg(
+            key: '1',
+            senderId: 'bob',
+            senderName: 'Bob',
+            content: 'First message',
+            timestamp: now,
+          ),
+          _msg(
+            key: '2',
+            senderId: 'bob',
+            senderName: 'Bob',
+            content: 'Second message',
+            timestamp: now.add(const Duration(seconds: 30)),
+          ),
+        ];
+
+        await tester.pumpObers(
+          SizedBox(
+            width: 400,
+            height: 600,
+            child: OiChat(
+              messages: messages,
+              currentUserId: 'me',
+              label: 'Chat',
+              showAvatars: true,
+              groupConsecutive: true,
+            ),
+          ),
+        );
+
+        // Both messages render their content.
+        expect(find.text('First message'), findsOneWidget);
+        expect(find.text('Second message'), findsOneWidget);
+
+        // Only the first message shows the sender name; the continuation
+        // message does not repeat it.
+        expect(find.text('Bob'), findsOneWidget);
+
+        // Only one avatar initial (first message in group).
+        expect(find.text('B'), findsOneWidget);
+      },
+    );
+
+    testWidgets(
+      'first message in group shows avatar and sender name',
+      (tester) async {
+        final messages = [
+          _msg(
+            key: '1',
+            senderId: 'bob',
+            senderName: 'Bob',
+            content: 'Hello',
+            timestamp: now,
+          ),
+        ];
+
+        await tester.pumpObers(
+          SizedBox(
+            width: 400,
+            height: 600,
+            child: OiChat(
+              messages: messages,
+              currentUserId: 'me',
+              label: 'Chat',
+              showAvatars: true,
+              groupConsecutive: true,
+            ),
+          ),
+        );
+
+        // Avatar initial and sender name are both visible.
+        expect(find.text('B'), findsOneWidget);
+        expect(find.text('Bob'), findsOneWidget);
+      },
+    );
+
+    testWidgets(
+      'continuation messages show reduced spacing (no avatar, no name)',
+      (tester) async {
+        final messages = [
+          _msg(
+            key: '1',
+            senderId: 'bob',
+            senderName: 'Bob',
+            content: 'First',
+            timestamp: now,
+          ),
+          _msg(
+            key: '2',
+            senderId: 'bob',
+            senderName: 'Bob',
+            content: 'Second',
+            timestamp: now.add(const Duration(seconds: 30)),
+          ),
+          _msg(
+            key: '3',
+            senderId: 'bob',
+            senderName: 'Bob',
+            content: 'Third',
+            timestamp: now.add(const Duration(minutes: 1)),
+          ),
+        ];
+
+        await tester.pumpObers(
+          SizedBox(
+            width: 400,
+            height: 600,
+            child: OiChat(
+              messages: messages,
+              currentUserId: 'me',
+              label: 'Chat',
+              showAvatars: true,
+              groupConsecutive: true,
+            ),
+          ),
+        );
+
+        // All three messages render.
+        expect(find.text('First'), findsOneWidget);
+        expect(find.text('Second'), findsOneWidget);
+        expect(find.text('Third'), findsOneWidget);
+
+        // Sender name appears only once (first message).
+        expect(find.text('Bob'), findsOneWidget);
+
+        // Avatar initial appears only once (first message).
+        expect(find.text('B'), findsOneWidget);
+      },
+    );
+
+    testWidgets(
+      'messages beyond consecutiveThreshold are not grouped',
+      (tester) async {
+        final messages = [
+          _msg(
+            key: '1',
+            senderId: 'bob',
+            senderName: 'Bob',
+            content: 'Before',
+            timestamp: now,
+          ),
+          _msg(
+            key: '2',
+            senderId: 'bob',
+            senderName: 'Bob',
+            content: 'After',
+            timestamp: now.add(const Duration(minutes: 5)),
+          ),
+        ];
+
+        await tester.pumpObers(
+          SizedBox(
+            width: 400,
+            height: 600,
+            child: OiChat(
+              messages: messages,
+              currentUserId: 'me',
+              label: 'Chat',
+              showAvatars: true,
+              groupConsecutive: true,
+              consecutiveThreshold: const Duration(minutes: 2),
+            ),
+          ),
+        );
+
+        // Both messages show sender name because the gap exceeds the
+        // threshold — they are not grouped.
+        expect(find.text('Bob'), findsNWidgets(2));
+        // Both show avatar initial.
+        expect(find.text('B'), findsNWidgets(2));
+      },
+    );
+
+    testWidgets(
+      'different senders are never grouped',
+      (tester) async {
+        final messages = [
+          _msg(
+            key: '1',
+            senderId: 'bob',
+            senderName: 'Bob',
+            content: 'Hi',
+            timestamp: now,
+          ),
+          _msg(
+            key: '2',
+            senderId: 'carol',
+            senderName: 'Carol',
+            content: 'Hey',
+            timestamp: now.add(const Duration(seconds: 10)),
+          ),
+        ];
+
+        await tester.pumpObers(
+          SizedBox(
+            width: 400,
+            height: 600,
+            child: OiChat(
+              messages: messages,
+              currentUserId: 'me',
+              label: 'Chat',
+              showAvatars: true,
+              groupConsecutive: true,
+            ),
+          ),
+        );
+
+        // Both sender names appear.
+        expect(find.text('Bob'), findsOneWidget);
+        expect(find.text('Carol'), findsOneWidget);
+        // Both avatars appear.
+        expect(find.text('B'), findsOneWidget);
+        expect(find.text('C'), findsOneWidget);
+      },
+    );
+
+    testWidgets(
+      'groupConsecutive=false disables grouping',
+      (tester) async {
+        final messages = [
+          _msg(
+            key: '1',
+            senderId: 'bob',
+            senderName: 'Bob',
+            content: 'One',
+            timestamp: now,
+          ),
+          _msg(
+            key: '2',
+            senderId: 'bob',
+            senderName: 'Bob',
+            content: 'Two',
+            timestamp: now.add(const Duration(seconds: 10)),
+          ),
+        ];
+
+        await tester.pumpObers(
+          SizedBox(
+            width: 400,
+            height: 600,
+            child: OiChat(
+              messages: messages,
+              currentUserId: 'me',
+              label: 'Chat',
+              showAvatars: true,
+              groupConsecutive: false,
+            ),
+          ),
+        );
+
+        // With grouping disabled both messages show name and avatar.
+        expect(find.text('Bob'), findsNWidgets(2));
+        expect(find.text('B'), findsNWidgets(2));
+      },
+    );
   });
 }
