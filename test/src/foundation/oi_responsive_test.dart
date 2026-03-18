@@ -378,6 +378,210 @@ void main() {
       expect(scale.contentMaxWidths.containsKey('tablet'), isTrue);
       expect(scale.contentMaxWidths.containsKey('ultraWide'), isTrue);
     });
+
+    // ── Registry API ──────────────────────────────────────────────────────
+
+    group('registry API', () {
+      test('names returns all breakpoint names in order', () {
+        final scale = OiBreakpointScale.standard();
+        expect(
+          scale.names,
+          ['compact', 'medium', 'expanded', 'large', 'extraLarge'],
+        );
+      });
+
+      test('length returns count of breakpoints', () {
+        final scale = OiBreakpointScale.standard();
+        expect(scale.length, 5);
+      });
+
+      test('operator [] returns breakpoint by name', () {
+        final scale = OiBreakpointScale.standard();
+        expect(scale['compact'], OiBreakpoint.compact);
+        expect(scale['extraLarge'], OiBreakpoint.extraLarge);
+      });
+
+      test('operator [] throws StateError for unknown name', () {
+        final scale = OiBreakpointScale.standard();
+        expect(() => scale['tablet'], throwsA(isA<StateError>()));
+      });
+
+      test('register adds a new breakpoint', () {
+        final scale = OiBreakpointScale.standard();
+        const tablet = OiBreakpoint('tablet', 480);
+        final extended = scale.register(tablet);
+        expect(extended.length, 6);
+        expect(extended.contains(tablet), isTrue);
+        expect(extended['tablet'], tablet);
+      });
+
+      test('register with pageGutter and contentMaxWidth', () {
+        final scale = OiBreakpointScale.standard();
+        const tablet = OiBreakpoint('tablet', 480);
+        final extended = scale.register(
+          tablet,
+          pageGutter: 20,
+          contentMaxWidth: 700,
+        );
+        expect(extended.resolvePageGutter(tablet), 20);
+        expect(extended.resolveContentMaxWidth(tablet), 700);
+      });
+
+      test('register replaces existing breakpoint with same name', () {
+        final scale = OiBreakpointScale.standard();
+        // Replace medium (600) with a wider medium (650)
+        const newMedium = OiBreakpoint('medium', 650);
+        final updated = scale.register(newMedium);
+        expect(updated.length, 5); // still 5, not 6
+        expect(updated['medium'].minWidth, 650);
+      });
+
+      test('register preserves existing page gutters', () {
+        final scale = OiBreakpointScale.standard();
+        const tablet = OiBreakpoint('tablet', 480);
+        final extended = scale.register(tablet, pageGutter: 18);
+        // Original gutters still present
+        expect(extended.resolvePageGutter(OiBreakpoint.compact), 16);
+        expect(extended.resolvePageGutter(OiBreakpoint.medium), 24);
+        // New gutter added
+        expect(extended.resolvePageGutter(tablet), 18);
+      });
+
+      test('register maintains sort order', () {
+        final scale = OiBreakpointScale.standard();
+        const tablet = OiBreakpoint('tablet', 480);
+        final extended = scale.register(tablet);
+        // Should be: compact(0), tablet(480), medium(600), ...
+        expect(extended.values[0].name, 'compact');
+        expect(extended.values[1].name, 'tablet');
+        expect(extended.values[2].name, 'medium');
+      });
+
+      test('registerAll adds multiple breakpoints', () {
+        final scale = OiBreakpointScale.standard();
+        const tablet = OiBreakpoint('tablet', 480);
+        const ultraWide = OiBreakpoint('ultraWide', 1920);
+        final extended = scale.registerAll(
+          [tablet, ultraWide],
+          pageGutters: {'tablet': 16, 'ultraWide': 56},
+          contentMaxWidths: {'tablet': double.infinity, 'ultraWide': 1600},
+        );
+        expect(extended.length, 7);
+        expect(extended.contains(tablet), isTrue);
+        expect(extended.contains(ultraWide), isTrue);
+        expect(extended.resolvePageGutter(tablet), 16);
+        expect(extended.resolvePageGutter(ultraWide), 56);
+      });
+
+      test('registerAll replaces existing breakpoints with same names', () {
+        final scale = OiBreakpointScale.standard();
+        const newMedium = OiBreakpoint('medium', 650);
+        const newLarge = OiBreakpoint('large', 1300);
+        final updated = scale.registerAll([newMedium, newLarge]);
+        expect(updated.length, 5); // still 5
+        expect(updated['medium'].minWidth, 650);
+        expect(updated['large'].minWidth, 1300);
+      });
+
+      test('registerAll merges page gutters and content max widths', () {
+        final scale = OiBreakpointScale.standard();
+        const tablet = OiBreakpoint('tablet', 480);
+        final extended = scale.registerAll(
+          [tablet],
+          pageGutters: {'tablet': 18},
+        );
+        // Original gutters preserved
+        expect(extended.resolvePageGutter(OiBreakpoint.compact), 16);
+        // New gutter added
+        expect(extended.resolvePageGutter(tablet), 18);
+      });
+
+      test('unregister removes a breakpoint', () {
+        final scale = OiBreakpointScale.standard();
+        final reduced = scale.unregister('extraLarge');
+        expect(reduced.length, 4);
+        expect(reduced.byName('extraLarge'), isNull);
+      });
+
+      test('unregister removes associated page gutters and max widths', () {
+        final scale = OiBreakpointScale.standard();
+        final reduced = scale.unregister('extraLarge');
+        expect(reduced.pageGutters.containsKey('extraLarge'), isFalse);
+        expect(reduced.contentMaxWidths.containsKey('extraLarge'), isFalse);
+      });
+
+      test('unregister throws StateError for unknown name', () {
+        final scale = OiBreakpointScale.standard();
+        expect(
+          () => scale.unregister('tablet'),
+          throwsA(isA<StateError>()),
+        );
+      });
+
+      test('unregister throws ArgumentError for base breakpoint', () {
+        final scale = OiBreakpointScale.standard();
+        expect(
+          () => scale.unregister('compact'),
+          throwsA(isA<ArgumentError>()),
+        );
+      });
+
+      test('copyWith replaces page gutters', () {
+        final scale = OiBreakpointScale.standard();
+        final updated = scale.copyWith(
+          pageGutters: {'compact': 8, 'medium': 16},
+        );
+        expect(updated.resolvePageGutter(OiBreakpoint.compact), 8);
+        expect(updated.resolvePageGutter(OiBreakpoint.medium), 16);
+        // Breakpoints unchanged
+        expect(updated.length, 5);
+        expect(updated.values, scale.values);
+      });
+
+      test('copyWith replaces content max widths', () {
+        final scale = OiBreakpointScale.standard();
+        final updated = scale.copyWith(
+          contentMaxWidths: {'compact': 500, 'medium': 800},
+        );
+        expect(updated.resolveContentMaxWidth(OiBreakpoint.compact), 500);
+        expect(updated.resolveContentMaxWidth(OiBreakpoint.medium), 800);
+      });
+
+      test('chaining register calls builds up a custom scale', () {
+        final scale = OiBreakpointScale.standard()
+            .register(
+              const OiBreakpoint('tablet', 480),
+              pageGutter: 16,
+              contentMaxWidth: double.infinity,
+            )
+            .register(
+              const OiBreakpoint('ultraWide', 1920),
+              pageGutter: 56,
+              contentMaxWidth: 1600,
+            );
+        expect(scale.length, 7);
+        expect(scale.names, [
+          'compact',
+          'tablet',
+          'medium',
+          'expanded',
+          'large',
+          'extraLarge',
+          'ultraWide',
+        ]);
+      });
+
+      test('register then unregister round-trips', () {
+        final original = OiBreakpointScale.standard();
+        final withTablet = original.register(
+          const OiBreakpoint('tablet', 480),
+          pageGutter: 18,
+        );
+        final restored = withTablet.unregister('tablet');
+        expect(restored.length, original.length);
+        expect(restored.names, original.names);
+      });
+    });
   });
 
   // ─────────────────────────────────────────────────────────────────────────

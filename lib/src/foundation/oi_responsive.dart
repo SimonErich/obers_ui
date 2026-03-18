@@ -248,6 +248,113 @@ class OiBreakpointScale {
     return double.infinity;
   }
 
+  // ── Registry API ──────────────────────────────────────────────────────
+
+  /// All registered breakpoint names in ascending order of minWidth.
+  List<String> get names =>
+      List.unmodifiable(values.map((b) => b.name));
+
+  /// The number of registered breakpoints.
+  int get length => values.length;
+
+  /// Looks up a breakpoint by [name].
+  ///
+  /// Throws a [StateError] if no breakpoint with the given name exists.
+  /// For a nullable variant, use [byName].
+  OiBreakpoint operator [](String name) {
+    final bp = byName(name);
+    if (bp == null) {
+      throw StateError(
+        'No breakpoint named "$name" in this scale. '
+        'Registered: ${names.join(", ")}.',
+      );
+    }
+    return bp;
+  }
+
+  /// Creates a new scale with an additional [breakpoint] registered.
+  ///
+  /// If a breakpoint with the same name already exists, it is replaced.
+  /// Optionally provide a [pageGutter] and/or [contentMaxWidth] for the
+  /// new breakpoint.
+  OiBreakpointScale register(
+    OiBreakpoint breakpoint, {
+    double? pageGutter,
+    double? contentMaxWidth,
+  }) {
+    final newValues = values
+        .where((b) => b.name != breakpoint.name)
+        .toList()
+      ..add(breakpoint)
+      ..sort();
+    final newGutters = Map<String, double>.of(pageGutters);
+    if (pageGutter != null) newGutters[breakpoint.name] = pageGutter;
+    final newMaxWidths = Map<String, double>.of(contentMaxWidths);
+    if (contentMaxWidth != null) {
+      newMaxWidths[breakpoint.name] = contentMaxWidth;
+    }
+    return OiBreakpointScale._(newValues, newGutters, newMaxWidths);
+  }
+
+  /// Creates a new scale with multiple additional breakpoints registered.
+  ///
+  /// Breakpoints with names that already exist in the scale are replaced.
+  OiBreakpointScale registerAll(
+    List<OiBreakpoint> breakpoints, {
+    Map<String, double> pageGutters = const {},
+    Map<String, double> contentMaxWidths = const {},
+  }) {
+    final nameSet = breakpoints.map((b) => b.name).toSet();
+    final newValues = values
+        .where((b) => !nameSet.contains(b.name))
+        .toList()
+      ..addAll(breakpoints)
+      ..sort();
+    return OiBreakpointScale._(
+      newValues,
+      {...this.pageGutters, ...pageGutters},
+      {...this.contentMaxWidths, ...contentMaxWidths},
+    );
+  }
+
+  /// Creates a new scale without the breakpoint named [name].
+  ///
+  /// The base breakpoint (minWidth == 0) cannot be removed. Throws an
+  /// [ArgumentError] if you attempt to remove it, or a [StateError] if
+  /// no breakpoint with [name] exists.
+  OiBreakpointScale unregister(String name) {
+    final bp = byName(name);
+    if (bp == null) {
+      throw StateError(
+        'Cannot unregister "$name": no such breakpoint in this scale.',
+      );
+    }
+    if (bp.minWidth == 0) {
+      throw ArgumentError(
+        'Cannot unregister the base breakpoint (minWidth == 0).',
+      );
+    }
+    final newValues = values.where((b) => b.name != name).toList();
+    final newGutters = Map<String, double>.of(pageGutters)..remove(name);
+    final newMaxWidths = Map<String, double>.of(contentMaxWidths)..remove(name);
+    return OiBreakpointScale._(newValues, newGutters, newMaxWidths);
+  }
+
+  /// Creates a copy of this scale with optionally overridden layout maps.
+  ///
+  /// The breakpoint list itself is not changed. Use [register],
+  /// [unregister], or [registerAll] to modify breakpoints.
+  OiBreakpointScale copyWith({
+    Map<String, double>? pageGutters,
+    Map<String, double>? contentMaxWidths,
+  }) {
+    return OiBreakpointScale._(
+      values,
+      pageGutters ?? this.pageGutters,
+      contentMaxWidths ?? this.contentMaxWidths,
+    );
+  }
+
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
