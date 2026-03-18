@@ -7,6 +7,7 @@ import 'package:obers_ui/src/composites/data/oi_pagination_controller.dart';
 import 'package:obers_ui/src/composites/data/oi_table_controller.dart';
 import 'package:obers_ui/src/foundation/persistence/oi_settings_driver.dart';
 import 'package:obers_ui/src/foundation/persistence/oi_settings_mixin.dart';
+import 'package:obers_ui/src/foundation/persistence/oi_settings_provider.dart';
 import 'package:obers_ui/src/models/settings/oi_table_settings.dart';
 
 // ── Column definition ─────────────────────────────────────────────────────────
@@ -320,6 +321,9 @@ class _OiTableState<T> extends State<OiTable<T>>
   bool _loadingMore = false;
   final ScrollController _scrollController = ScrollController();
 
+  /// Resolved driver: explicit widget prop → OiSettingsProvider → null.
+  OiSettingsDriver? _resolvedDriver;
+
   // ── OiSettingsMixin contract ───────────────────────────────────────────────
 
   @override
@@ -329,7 +333,7 @@ class _OiTableState<T> extends State<OiTable<T>>
   String? get settingsKey => widget.settingsKey;
 
   @override
-  OiSettingsDriver? get settingsDriver => widget.settingsDriver;
+  OiSettingsDriver? get settingsDriver => _resolvedDriver;
 
   @override
   OiTableSettings get defaultSettings => const OiTableSettings();
@@ -348,6 +352,10 @@ class _OiTableState<T> extends State<OiTable<T>>
 
   @override
   void initState() {
+    // Seed _resolvedDriver from the widget prop so that the mixin's initState
+    // can start loading immediately when an explicit driver is provided.
+    // Provider fallback is resolved later in didChangeDependencies.
+    _resolvedDriver = widget.settingsDriver;
     super.initState();
     _initController();
     if (widget.groupBy != null) {
@@ -373,6 +381,16 @@ class _OiTableState<T> extends State<OiTable<T>>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    // Resolve driver: widget prop → OiSettingsProvider → null.
+    final newDriver =
+        widget.settingsDriver ?? OiSettingsProvider.of(context);
+    if (newDriver != _resolvedDriver) {
+      _resolvedDriver = newDriver;
+      // Driver changed (e.g. provider now available) — reload settings.
+      if (settingsLoaded) {
+        reloadSettings();
+      }
+    }
     // Apply persisted settings once they load, but only when a driver is
     // configured — without a driver, currentSettings is just defaultSettings
     // and applying it would overwrite the external controller's own state.

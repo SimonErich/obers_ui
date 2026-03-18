@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui/src/foundation/persistence/drivers/oi_in_memory_driver.dart';
 import 'package:obers_ui/src/foundation/persistence/oi_settings_data.dart';
@@ -76,6 +77,35 @@ void main() {
       );
       driver.clear();
       expect(driver.store, isEmpty);
+    });
+
+    // ── Goal 6: sync driver returns SynchronousFuture ─────────────────────
+
+    test('load returns SynchronousFuture', () {
+      final future = driver.load<_TestSettings>(
+        namespace: 'ns',
+        deserialize: _TestSettings.fromJson,
+      );
+      expect(future, isA<SynchronousFuture<_TestSettings?>>());
+    });
+
+    test('save returns SynchronousFuture', () {
+      final future = driver.save<_TestSettings>(
+        namespace: 'ns',
+        data: const _TestSettings(count: 1),
+        serialize: (d) => d.toJson(),
+      );
+      expect(future, isA<SynchronousFuture<void>>());
+    });
+
+    test('delete returns SynchronousFuture', () {
+      final future = driver.delete(namespace: 'ns');
+      expect(future, isA<SynchronousFuture<void>>());
+    });
+
+    test('exists returns SynchronousFuture', () {
+      final future = driver.exists(namespace: 'ns');
+      expect(future, isA<SynchronousFuture<bool>>());
     });
   });
 }

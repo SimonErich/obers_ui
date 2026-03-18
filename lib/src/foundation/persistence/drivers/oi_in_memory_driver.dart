@@ -1,5 +1,4 @@
-import 'dart:async';
-
+import 'package:flutter/foundation.dart';
 import 'package:obers_ui/src/foundation/persistence/oi_settings_data.dart';
 import 'package:obers_ui/src/foundation/persistence/oi_settings_driver.dart';
 
@@ -26,42 +25,46 @@ class OiInMemorySettingsDriver extends OiSettingsDriver {
   final Map<String, Map<String, dynamic>> store = {};
 
   @override
-  Future<T?> load<T extends OiSettingsData>({
+  SynchronousFuture<T?> load<T extends OiSettingsData>({
     required String namespace,
     required T Function(Map<String, dynamic> json) deserialize,
     String? key,
-  }) async {
+  }) {
     final storageKey = resolveKey(namespace, key);
     final data = store[storageKey];
-    if (data == null) return null;
+    if (data == null) return SynchronousFuture<T?>(null);
     try {
-      return deserialize(Map<String, dynamic>.from(data));
+      return SynchronousFuture<T?>(
+        deserialize(Map<String, dynamic>.from(data)),
+      );
     } on Exception {
-      return null;
+      return SynchronousFuture<T?>(null);
     }
   }
 
   @override
-  Future<void> save<T extends OiSettingsData>({
+  SynchronousFuture<void> save<T extends OiSettingsData>({
     required String namespace,
     required T data,
     required Map<String, dynamic> Function(T data) serialize,
     String? key,
-  }) async {
+  }) {
     final storageKey = resolveKey(namespace, key);
     store[storageKey] = serialize(data);
+    return SynchronousFuture<void>(null);
   }
 
   @override
-  Future<void> delete({required String namespace, String? key}) async {
+  SynchronousFuture<void> delete({required String namespace, String? key}) {
     final storageKey = resolveKey(namespace, key);
     store.remove(storageKey);
+    return SynchronousFuture<void>(null);
   }
 
   @override
-  Future<bool> exists({required String namespace, String? key}) async {
+  SynchronousFuture<bool> exists({required String namespace, String? key}) {
     final storageKey = resolveKey(namespace, key);
-    return store.containsKey(storageKey);
+    return SynchronousFuture<bool>(store.containsKey(storageKey));
   }
 
   /// Clears all stored settings.
