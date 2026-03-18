@@ -444,12 +444,9 @@ class _OiFormState extends State<OiForm> {
         );
 
       case OiFieldType.checkbox:
-        final boolValue = value as bool? ?? false;
         return OiCheckbox(
           key: ValueKey('oi_form_field_${field.key}'),
-          value: boolValue
-              ? OiCheckboxState.checked
-              : OiCheckboxState.unchecked,
+          value: value as bool?,
           label: field.label,
           onChanged: (v) => widget.controller.setValue(field.key, v),
         );

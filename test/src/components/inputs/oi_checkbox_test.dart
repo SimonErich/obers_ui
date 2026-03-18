@@ -8,29 +8,24 @@ import '../../../helpers/pump_app.dart';
 
 void main() {
   testWidgets('renders unchecked state', (tester) async {
-    await tester.pumpObers(const OiCheckbox(value: OiCheckboxState.unchecked));
+    await tester.pumpObers(const OiCheckbox(value: false));
     expect(find.byType(OiCheckbox), findsOneWidget);
   });
 
   testWidgets('renders checked state', (tester) async {
-    await tester.pumpObers(const OiCheckbox(value: OiCheckboxState.checked));
+    await tester.pumpObers(const OiCheckbox(value: true));
     expect(find.byType(OiCheckbox), findsOneWidget);
   });
 
   testWidgets('renders indeterminate state', (tester) async {
-    await tester.pumpObers(
-      const OiCheckbox(value: OiCheckboxState.indeterminate),
-    );
+    await tester.pumpObers(const OiCheckbox(value: null));
     expect(find.byType(OiCheckbox), findsOneWidget);
   });
 
   testWidgets('tapping unchecked fires onChanged with true', (tester) async {
     bool? result;
     await tester.pumpObers(
-      OiCheckbox(
-        value: OiCheckboxState.unchecked,
-        onChanged: (v) => result = v,
-      ),
+      OiCheckbox(value: false, onChanged: (v) => result = v),
     );
     await tester.tap(find.byType(OiCheckbox));
     await tester.pump();
@@ -40,7 +35,7 @@ void main() {
   testWidgets('tapping checked fires onChanged with false', (tester) async {
     bool? result;
     await tester.pumpObers(
-      OiCheckbox(value: OiCheckboxState.checked, onChanged: (v) => result = v),
+      OiCheckbox(value: true, onChanged: (v) => result = v),
     );
     await tester.tap(find.byType(OiCheckbox));
     await tester.pump();
@@ -52,10 +47,7 @@ void main() {
   ) async {
     bool? result;
     await tester.pumpObers(
-      OiCheckbox(
-        value: OiCheckboxState.indeterminate,
-        onChanged: (v) => result = v,
-      ),
+      OiCheckbox(value: null, onChanged: (v) => result = v),
     );
     await tester.tap(find.byType(OiCheckbox));
     await tester.pump();
@@ -64,7 +56,7 @@ void main() {
 
   testWidgets('label is shown', (tester) async {
     await tester.pumpObers(
-      const OiCheckbox(value: OiCheckboxState.unchecked, label: 'Accept terms'),
+      const OiCheckbox(value: false, label: 'Accept terms'),
     );
     expect(find.text('Accept terms'), findsOneWidget);
   });
@@ -73,7 +65,7 @@ void main() {
     bool? result;
     await tester.pumpObers(
       OiCheckbox(
-        value: OiCheckboxState.unchecked,
+        value: false,
         enabled: false,
         onChanged: (v) => result = v,
       ),

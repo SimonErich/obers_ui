@@ -2,25 +2,14 @@ import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
 
-/// The tri-state value for an [OiCheckbox].
-///
-/// {@category Components}
-enum OiCheckboxState {
-  /// The checkbox is checked.
-  checked,
-
-  /// The checkbox is unchecked.
-  unchecked,
-
-  /// The checkbox is in an indeterminate state (e.g. partial selection).
-  indeterminate,
-}
-
 /// A custom-painted checkbox with checked, unchecked, and indeterminate states.
+///
+/// The [value] is `bool?`: `false` = unchecked, `true` = checked,
+/// `null` = indeterminate (shows a dash).
 ///
 /// Tapping cycles: unchecked → checked, indeterminate → checked,
 /// checked → unchecked. The [onChanged] callback receives `true` when the
-/// new state is [OiCheckboxState.checked] and `false` otherwise.
+/// new state is checked and `false` otherwise.
 ///
 /// Colors and size are resolved from the nearest [OiTheme].
 ///
@@ -36,7 +25,9 @@ class OiCheckbox extends StatelessWidget {
   });
 
   /// The current checkbox state.
-  final OiCheckboxState value;
+  ///
+  /// `true` = checked, `false` = unchecked, `null` = indeterminate.
+  final bool? value;
 
   /// Called when the user taps the checkbox.
   ///
@@ -51,7 +42,7 @@ class OiCheckbox extends StatelessWidget {
 
   void _handleTap() {
     if (onChanged == null) return;
-    if (value == OiCheckboxState.checked) {
+    if (value == true) {
       onChanged!(false);
     } else {
       onChanged!(true);
@@ -66,8 +57,8 @@ class OiCheckbox extends StatelessWidget {
     final borderRadius =
         themeData.components.checkbox?.borderRadius ?? BorderRadius.circular(4);
 
-    final isChecked = value == OiCheckboxState.checked;
-    final isIndeterminate = value == OiCheckboxState.indeterminate;
+    final isChecked = value == true;
+    final isIndeterminate = value == null;
 
     final fillColor = (isChecked || isIndeterminate)
         ? colors.primary.base
@@ -119,7 +110,7 @@ class _OiCheckboxPainter extends CustomPainter {
     required this.borderRadius,
   });
 
-  final OiCheckboxState state;
+  final bool? state;
   final Color fillColor;
   final Color borderColor;
   final Color checkColor;
@@ -148,15 +139,15 @@ class _OiCheckboxPainter extends CustomPainter {
       ..strokeCap = StrokeCap.round
       ..strokeJoin = StrokeJoin.round;
 
-    if (state == OiCheckboxState.checked) {
+    if (state == true) {
       // Draw checkmark.
       final path = Path()
         ..moveTo(size.width * 0.2, size.height * 0.5)
         ..lineTo(size.width * 0.43, size.height * 0.72)
         ..lineTo(size.width * 0.8, size.height * 0.28);
       canvas.drawPath(path, paint);
-    } else if (state == OiCheckboxState.indeterminate) {
-      // Draw dash.
+    } else if (state == null) {
+      // Draw dash (indeterminate).
       canvas.drawLine(
         Offset(size.width * 0.25, size.height * 0.5),
         Offset(size.width * 0.75, size.height * 0.5),
