@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
+import 'package:obers_ui/src/foundation/oi_responsive.dart';
 import 'package:obers_ui/src/foundation/theme/oi_animation_config.dart';
 import 'package:obers_ui/src/foundation/theme/oi_color_scheme.dart';
 import 'package:obers_ui/src/foundation/theme/oi_color_swatch.dart';
@@ -24,7 +25,7 @@ import 'package:obers_ui/src/foundation/theme/oi_text_theme.dart';
 @immutable
 class OiThemeData {
   /// Creates an [OiThemeData] with explicit values for all design tokens.
-  const OiThemeData({
+  OiThemeData({
     required this.brightness,
     required this.colors,
     required this.textTheme,
@@ -35,10 +36,11 @@ class OiThemeData {
     required this.effects,
     required this.decoration,
     required this.components,
+    OiBreakpointScale? breakpoints,
     this.performanceConfig = const OiPerformanceConfig.high(),
     this.fontFamily,
     this.monoFontFamily,
-  });
+  }) : breakpoints = breakpoints ?? OiBreakpointScale.standard();
 
   /// Creates the standard light theme.
   factory OiThemeData.light({
@@ -47,6 +49,7 @@ class OiThemeData {
     OiRadiusPreference radiusPreference = OiRadiusPreference.medium,
     OiComponentThemes? components,
     OiPerformanceConfig? performanceConfig,
+    OiBreakpointScale? breakpoints,
   }) {
     final colors = OiColorScheme.light();
     return OiThemeData(
@@ -66,6 +69,7 @@ class OiThemeData {
         errorColor: colors.error.base,
       ),
       components: components ?? const OiComponentThemes.empty(),
+      breakpoints: breakpoints,
       performanceConfig: performanceConfig ?? const OiPerformanceConfig.high(),
       fontFamily: fontFamily,
       monoFontFamily: monoFontFamily,
@@ -79,6 +83,7 @@ class OiThemeData {
     OiRadiusPreference radiusPreference = OiRadiusPreference.medium,
     OiComponentThemes? components,
     OiPerformanceConfig? performanceConfig,
+    OiBreakpointScale? breakpoints,
   }) {
     final colors = OiColorScheme.dark();
     return OiThemeData(
@@ -98,6 +103,7 @@ class OiThemeData {
         errorColor: colors.error.base,
       ),
       components: components ?? const OiComponentThemes.empty(),
+      breakpoints: breakpoints,
       performanceConfig: performanceConfig ?? const OiPerformanceConfig.high(),
       fontFamily: fontFamily,
       monoFontFamily: monoFontFamily,
@@ -116,6 +122,7 @@ class OiThemeData {
     OiRadiusPreference radiusPreference = OiRadiusPreference.medium,
     OiComponentThemes? components,
     OiPerformanceConfig? performanceConfig,
+    OiBreakpointScale? breakpoints,
   }) {
     final base = brightness == Brightness.light
         ? OiThemeData.light(
@@ -124,6 +131,7 @@ class OiThemeData {
             radiusPreference: radiusPreference,
             components: components,
             performanceConfig: performanceConfig,
+            breakpoints: breakpoints,
           )
         : OiThemeData.dark(
             fontFamily: fontFamily,
@@ -131,6 +139,7 @@ class OiThemeData {
             radiusPreference: radiusPreference,
             components: components,
             performanceConfig: performanceConfig,
+            breakpoints: breakpoints,
           );
 
     // Override primary color with the brand color
@@ -148,6 +157,13 @@ class OiThemeData {
       ),
     );
   }
+
+  /// The breakpoint scale defining responsive breakpoints.
+  ///
+  /// Defaults to [OiBreakpointScale.standard] (5-tier: compact, medium,
+  /// expanded, large, extraLarge). Override with custom breakpoints to
+  /// extend the responsive system.
+  final OiBreakpointScale breakpoints;
 
   /// Whether this is a light or dark theme.
   final Brightness brightness;
@@ -208,6 +224,7 @@ class OiThemeData {
     OiEffectsTheme? effects,
     OiDecorationTheme? decoration,
     OiComponentThemes? components,
+    OiBreakpointScale? breakpoints,
     OiPerformanceConfig? performanceConfig,
     String? fontFamily,
     String? monoFontFamily,
@@ -223,6 +240,7 @@ class OiThemeData {
       effects: effects ?? this.effects,
       decoration: decoration ?? this.decoration,
       components: components ?? this.components,
+      breakpoints: breakpoints ?? this.breakpoints,
       performanceConfig: performanceConfig ?? this.performanceConfig,
       fontFamily: fontFamily ?? this.fontFamily,
       monoFontFamily: monoFontFamily ?? this.monoFontFamily,
@@ -243,6 +261,7 @@ class OiThemeData {
       effects: other.effects,
       decoration: other.decoration,
       components: other.components,
+      breakpoints: other.breakpoints,
       performanceConfig: other.performanceConfig,
       fontFamily: other.fontFamily,
       monoFontFamily: other.monoFontFamily,
@@ -266,6 +285,7 @@ class OiThemeData {
       effects: t < 0.5 ? a.effects : b.effects,
       decoration: t < 0.5 ? a.decoration : b.decoration,
       components: t < 0.5 ? a.components : b.components,
+      breakpoints: t < 0.5 ? a.breakpoints : b.breakpoints,
       performanceConfig: t < 0.5 ? a.performanceConfig : b.performanceConfig,
       fontFamily: t < 0.5 ? a.fontFamily : b.fontFamily,
       monoFontFamily: t < 0.5 ? a.monoFontFamily : b.monoFontFamily,
@@ -286,6 +306,7 @@ class OiThemeData {
         other.effects == effects &&
         other.decoration == decoration &&
         other.components == components &&
+        other.breakpoints == breakpoints &&
         other.performanceConfig == performanceConfig &&
         other.fontFamily == fontFamily &&
         other.monoFontFamily == monoFontFamily;
@@ -303,6 +324,7 @@ class OiThemeData {
     effects,
     decoration,
     components,
+    breakpoints,
     performanceConfig,
     fontFamily,
     monoFontFamily,

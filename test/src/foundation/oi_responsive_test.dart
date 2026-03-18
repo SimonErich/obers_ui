@@ -14,6 +14,10 @@ Widget buildWithWidth(double width, Widget child) {
 }
 
 void main() {
+  // ─────────────────────────────────────────────────────────────────────────
+  // OiBreakpoint
+  // ─────────────────────────────────────────────────────────────────────────
+
   group('OiBreakpoint constants', () {
     test('compact has minWidth 0', () {
       expect(OiBreakpoint.compact.minWidth, 0);
@@ -81,6 +85,243 @@ void main() {
       expect(OiBreakpoint.medium, equals(OiBreakpoint.medium));
     });
   });
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // OiBreakpointScale
+  // ─────────────────────────────────────────────────────────────────────────
+
+  group('OiBreakpointScale', () {
+    test('standard has 5 breakpoints', () {
+      final scale = OiBreakpointScale.standard();
+      expect(scale.values.length, 5);
+    });
+
+    test('standard breakpoints are in ascending order', () {
+      final scale = OiBreakpointScale.standard();
+      for (var i = 1; i < scale.values.length; i++) {
+        expect(scale.values[i].minWidth,
+            greaterThan(scale.values[i - 1].minWidth));
+      }
+    });
+
+    test('extended has 7 breakpoints', () {
+      final scale = OiBreakpointScale.extended();
+      expect(scale.values.length, 7);
+    });
+
+    test('extended includes tablet and ultraWide', () {
+      final scale = OiBreakpointScale.extended();
+      expect(scale.values.any((b) => b.name == 'tablet'), isTrue);
+      expect(scale.values.any((b) => b.name == 'ultraWide'), isTrue);
+    });
+
+    test('custom scale sorts automatically', () {
+      final scale = OiBreakpointScale([
+        OiBreakpoint.large,
+        OiBreakpoint.compact,
+        OiBreakpoint.medium,
+      ]);
+      expect(scale.values[0], OiBreakpoint.compact);
+      expect(scale.values[1], OiBreakpoint.medium);
+      expect(scale.values[2], OiBreakpoint.large);
+    });
+
+    test('throws when no breakpoint has minWidth 0', () {
+      expect(
+        () => OiBreakpointScale([OiBreakpoint.medium, OiBreakpoint.large]),
+        throwsA(isA<ArgumentError>()),
+      );
+    });
+
+    test('resolve returns compact at width 0', () {
+      final scale = OiBreakpointScale.standard();
+      expect(scale.resolve(0), OiBreakpoint.compact);
+    });
+
+    test('resolve returns medium at width 600', () {
+      final scale = OiBreakpointScale.standard();
+      expect(scale.resolve(600), OiBreakpoint.medium);
+    });
+
+    test('resolve returns expanded at width 840', () {
+      final scale = OiBreakpointScale.standard();
+      expect(scale.resolve(840), OiBreakpoint.expanded);
+    });
+
+    test('resolve returns large at width 1200', () {
+      final scale = OiBreakpointScale.standard();
+      expect(scale.resolve(1200), OiBreakpoint.large);
+    });
+
+    test('resolve returns extraLarge at width 1600', () {
+      final scale = OiBreakpointScale.standard();
+      expect(scale.resolve(1600), OiBreakpoint.extraLarge);
+    });
+
+    test('resolve returns compact at width 599', () {
+      final scale = OiBreakpointScale.standard();
+      expect(scale.resolve(599), OiBreakpoint.compact);
+    });
+
+    test('resolveIndex returns correct indices', () {
+      final scale = OiBreakpointScale.standard();
+      expect(scale.resolveIndex(0), 0);
+      expect(scale.resolveIndex(599), 0);
+      expect(scale.resolveIndex(600), 1);
+      expect(scale.resolveIndex(840), 2);
+      expect(scale.resolveIndex(1200), 3);
+      expect(scale.resolveIndex(1600), 4);
+    });
+
+    test('equality works', () {
+      final a = OiBreakpointScale.standard();
+      final b = OiBreakpointScale.standard();
+      expect(a, equals(b));
+    });
+
+    test('inequality works', () {
+      final a = OiBreakpointScale.standard();
+      final b = OiBreakpointScale.extended();
+      expect(a, isNot(equals(b)));
+    });
+
+    test('resolve with extended scale includes tablet', () {
+      final scale = OiBreakpointScale.extended();
+      final bp = scale.resolve(500);
+      expect(bp.name, 'tablet');
+    });
+
+    test('resolve with extended scale includes ultraWide', () {
+      final scale = OiBreakpointScale.extended();
+      final bp = scale.resolve(2000);
+      expect(bp.name, 'ultraWide');
+    });
+  });
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // OiResponsive<T>
+  // ─────────────────────────────────────────────────────────────────────────
+
+  group('OiResponsive', () {
+    final scale = OiBreakpointScale.standard();
+
+    test('static value returns same at every breakpoint', () {
+      const r = OiResponsive<int>(3);
+      expect(r.isStatic, isTrue);
+      expect(r.resolve(OiBreakpoint.compact, scale), 3);
+      expect(r.resolve(OiBreakpoint.large, scale), 3);
+      expect(r.resolve(OiBreakpoint.extraLarge, scale), 3);
+    });
+
+    test('breakpoints map returns value for exact breakpoint', () {
+      final r = OiResponsive<int>.breakpoints({
+        OiBreakpoint.compact: 1,
+        OiBreakpoint.medium: 2,
+        OiBreakpoint.large: 4,
+      });
+      expect(r.isStatic, isFalse);
+      expect(r.resolve(OiBreakpoint.compact, scale), 1);
+      expect(r.resolve(OiBreakpoint.medium, scale), 2);
+      expect(r.resolve(OiBreakpoint.large, scale), 4);
+    });
+
+    test('cascades to nearest smaller breakpoint', () {
+      final r = OiResponsive<int>.breakpoints({
+        OiBreakpoint.compact: 1,
+        OiBreakpoint.large: 4,
+      });
+      // expanded (index 2) should cascade down to compact (index 0)
+      expect(r.resolve(OiBreakpoint.expanded, scale), 1);
+      // extraLarge (index 4) should cascade down to large (index 3)
+      expect(r.resolve(OiBreakpoint.extraLarge, scale), 4);
+    });
+
+    test('falls back to defaultValue when no breakpoint matches', () {
+      final r = OiResponsive<int>.breakpoints(
+        {OiBreakpoint.medium: 2},
+        defaultValue: 99,
+      );
+      // compact (index 0) has no entry, should use defaultValue
+      expect(r.resolve(OiBreakpoint.compact, scale), 99);
+    });
+
+    test('works with extended scale', () {
+      final extended = OiBreakpointScale.extended();
+      const tablet = OiBreakpoint('tablet', 480);
+      final r = OiResponsive<String>.breakpoints({
+        OiBreakpoint.compact: 'phone',
+        tablet: 'tablet',
+        OiBreakpoint.large: 'desktop',
+      });
+      expect(r.resolve(OiBreakpoint.compact, extended), 'phone');
+      expect(r.resolve(tablet, extended), 'tablet');
+      expect(r.resolve(OiBreakpoint.medium, extended), 'tablet');
+      expect(r.resolve(OiBreakpoint.large, extended), 'desktop');
+    });
+
+    test('equality for static values', () {
+      const a = OiResponsive<int>(3);
+      const b = OiResponsive<int>(3);
+      expect(a, equals(b));
+    });
+
+    test('inequality for different static values', () {
+      const a = OiResponsive<int>(3);
+      const b = OiResponsive<int>(4);
+      expect(a, isNot(equals(b)));
+    });
+
+    test('equality for breakpoint maps', () {
+      final a = OiResponsive<int>.breakpoints({OiBreakpoint.compact: 1});
+      final b = OiResponsive<int>.breakpoints({OiBreakpoint.compact: 1});
+      expect(a, equals(b));
+    });
+  });
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // Convenience extensions
+  // ─────────────────────────────────────────────────────────────────────────
+
+  group('Convenience extensions', () {
+    test('int.responsive creates static OiResponsive<int>', () {
+      final r = 3.responsive;
+      expect(r.isStatic, isTrue);
+      expect(
+        r.resolve(OiBreakpoint.compact, OiBreakpointScale.standard()),
+        3,
+      );
+    });
+
+    test('double.responsive creates static OiResponsive<double>', () {
+      final r = 16.0.responsive;
+      expect(r.isStatic, isTrue);
+      expect(
+        r.resolve(OiBreakpoint.compact, OiBreakpointScale.standard()),
+        16.0,
+      );
+    });
+
+    test('bool.responsive creates static OiResponsive<bool>', () {
+      final r = true.responsive;
+      expect(r.isStatic, isTrue);
+      expect(
+        r.resolve(OiBreakpoint.compact, OiBreakpointScale.standard()),
+        isTrue,
+      );
+    });
+
+    test('Map.responsive creates breakpoint OiResponsive', () {
+      final r = {OiBreakpoint.compact: 1, OiBreakpoint.large: 4}.responsive;
+      expect(r.isStatic, isFalse);
+      final scale = OiBreakpointScale.standard();
+      expect(r.resolve(OiBreakpoint.compact, scale), 1);
+      expect(r.resolve(OiBreakpoint.large, scale), 4);
+    });
+  });
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // OiResponsiveValue<T> (backward compatibility)
+  // ─────────────────────────────────────────────────────────────────────────
 
   group('OiResponsiveValue.resolve', () {
     test('returns compact value at width 0', () {
@@ -156,6 +397,10 @@ void main() {
       expect(rv.resolve(500), isNull);
     });
   });
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // BuildContext responsive extensions
+  // ─────────────────────────────────────────────────────────────────────────
 
   group('BuildContext responsive extensions', () {
     testWidgets('breakpoint is compact at width 400', (tester) async {
@@ -396,6 +641,45 @@ void main() {
         ),
       );
       expect(result, 720);
+    });
+
+    testWidgets('resolveResponsive resolves OiResponsive value',
+        (tester) async {
+      late int result;
+      final responsive = OiResponsive<int>.breakpoints({
+        OiBreakpoint.compact: 1,
+        OiBreakpoint.medium: 2,
+        OiBreakpoint.large: 4,
+      });
+      await tester.pumpWidget(
+        buildWithWidth(
+          600,
+          Builder(
+            builder: (ctx) {
+              result = ctx.resolveResponsive(responsive);
+              return const SizedBox.shrink();
+            },
+          ),
+        ),
+      );
+      expect(result, 2);
+    });
+
+    testWidgets('breakpointScale defaults to standard without theme',
+        (tester) async {
+      late OiBreakpointScale captured;
+      await tester.pumpWidget(
+        buildWithWidth(
+          400,
+          Builder(
+            builder: (ctx) {
+              captured = ctx.breakpointScale;
+              return const SizedBox.shrink();
+            },
+          ),
+        ),
+      );
+      expect(captured.values.length, 5);
     });
   });
 }
