@@ -221,6 +221,10 @@ export 'src/composites/search/oi_combo_box.dart';
 export 'src/composites/search/oi_command_bar.dart';
 export 'src/composites/search/oi_search.dart';
 
+// ── Composites: Dialogs ──────────────────────────────────────────────────
+
+export 'src/composites/dialogs/oi_name_dialog.dart';
+
 // ── Composites: Editors ──────────────────────────────────────────────────────
 
 export 'src/composites/editors/oi_rich_editor.dart';
