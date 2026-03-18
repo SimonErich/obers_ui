@@ -391,10 +391,7 @@ class _OiListViewState<T> extends State<OiListView<T>> {
               color: colors.text,
             ),
             const SizedBox(width: 4),
-            Text(
-              'Filters',
-              style: TextStyle(fontSize: 13, color: colors.text),
-            ),
+            Text('Filters', style: TextStyle(fontSize: 13, color: colors.text)),
             if (activeCount > 0) ...[
               const SizedBox(width: 4),
               Container(
@@ -407,10 +404,7 @@ class _OiListViewState<T> extends State<OiListView<T>> {
                 child: Center(
                   child: Text(
                     '$activeCount',
-                    style: TextStyle(
-                      fontSize: 10,
-                      color: colors.textOnPrimary,
-                    ),
+                    style: TextStyle(fontSize: 10, color: colors.textOnPrimary),
                   ),
                 ),
               ),

@@ -117,8 +117,8 @@ class OiApp extends StatefulWidget {
     this.title = '',
     this.debugShowCheckedModeBanner = true,
     super.key,
-  })  : routerConfig = null,
-        _useRouter = false;
+  }) : routerConfig = null,
+       _useRouter = false;
 
   /// Creates an [OiApp] that uses a declarative router.
   ///
@@ -139,8 +139,8 @@ class OiApp extends StatefulWidget {
     this.title = '',
     this.debugShowCheckedModeBanner = true,
     super.key,
-  })  : home = null,
-        _useRouter = true;
+  }) : home = null,
+       _useRouter = true;
 
   /// The root widget displayed when no router is used.
   ///
@@ -233,8 +233,9 @@ class _OiAppState extends State<OiApp> {
       case ThemeMode.dark:
         resolved = darkTheme;
       case ThemeMode.system:
-        resolved =
-            platformBrightness == Brightness.dark ? darkTheme : lightTheme;
+        resolved = platformBrightness == Brightness.dark
+            ? darkTheme
+            : lightTheme;
     }
 
     if (widget.performanceConfig != null) {

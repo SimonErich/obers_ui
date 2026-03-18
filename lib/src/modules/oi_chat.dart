@@ -380,10 +380,7 @@ class _OiChatState extends State<OiChat> {
               ),
             ),
           ),
-        Text(
-          message.content,
-          style: TextStyle(color: textColor, fontSize: 14),
-        ),
+        Text(message.content, style: TextStyle(color: textColor, fontSize: 14)),
         // Attachments.
         if (message.attachments != null && message.attachments!.isNotEmpty)
           Padding(
@@ -434,23 +431,23 @@ class _OiChatState extends State<OiChat> {
     final reactions = message.reactions;
     final reactionsWidget =
         widget.enableReactions && reactions != null && reactions.isNotEmpty
-            ? Padding(
-                padding: EdgeInsets.only(
-                  top: spacing.xs,
-                  left: isOwn ? 0 : 4,
-                  right: isOwn ? 4 : 0,
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: isOwn
-                      ? MainAxisAlignment.end
-                      : MainAxisAlignment.start,
-                  children: [
-                    for (final r in reactions) _buildReactionChip(context, r),
-                  ],
-                ),
-              )
-            : null;
+        ? Padding(
+            padding: EdgeInsets.only(
+              top: spacing.xs,
+              left: isOwn ? 0 : 4,
+              right: isOwn ? 4 : 0,
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: isOwn
+                  ? MainAxisAlignment.end
+                  : MainAxisAlignment.start,
+              children: [
+                for (final r in reactions) _buildReactionChip(context, r),
+              ],
+            ),
+          )
+        : null;
 
     // Wrap bubble with long-press menu for reactions.
     Widget messageBody;

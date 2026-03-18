@@ -86,8 +86,9 @@ void main() {
       expect(find.text('#flutter'), findsOneWidget);
     });
 
-    testWidgets('onSpanTap fires when recognized span is tapped',
-        (tester) async {
+    testWidgets('onSpanTap fires when recognized span is tapped', (
+      tester,
+    ) async {
       OiRecognizedSpan? tappedSpan;
       final recognizers = [
         OiPatternRecognizer(
@@ -335,8 +336,9 @@ void main() {
       expect(lastChanged, '@alice');
     });
 
-    testWidgets('suggestion popup hides when trigger is deleted',
-        (tester) async {
+    testWidgets('suggestion popup hides when trigger is deleted', (
+      tester,
+    ) async {
       final recognizers = [
         OiPatternRecognizer(
           trigger: '@',

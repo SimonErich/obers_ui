@@ -29,9 +29,8 @@ class _TestRouterDelegate extends RouterDelegate<Object>
   Widget build(BuildContext context) {
     return Navigator(
       key: navigatorKey,
-      onGenerateRoute: (_) => PageRouteBuilder<void>(
-        pageBuilder: (_, __, ___) => _child,
-      ),
+      onGenerateRoute: (_) =>
+          PageRouteBuilder<void>(pageBuilder: (_, __, ___) => _child),
     );
   }
 
@@ -40,9 +39,7 @@ class _TestRouterDelegate extends RouterDelegate<Object>
 }
 
 RouterConfig<Object> _testRouterConfig(Widget child) {
-  return RouterConfig<Object>(
-    routerDelegate: _TestRouterDelegate(child),
-  );
+  return RouterConfig<Object>(routerDelegate: _TestRouterDelegate(child));
 }
 
 // ---------------------------------------------------------------------------
@@ -150,8 +147,9 @@ void main() {
     });
 
     // TC-07
-    testWidgets('OiApp.router() provides OiTheme to descendants',
-        (tester) async {
+    testWidgets('OiApp.router() provides OiTheme to descendants', (
+      tester,
+    ) async {
       late OiThemeData? capturedTheme;
       final child = Builder(
         builder: (ctx) {
@@ -167,8 +165,9 @@ void main() {
     });
 
     // TC-08
-    testWidgets('OiApp.router() provides OiUndoStack to descendants',
-        (tester) async {
+    testWidgets('OiApp.router() provides OiUndoStack to descendants', (
+      tester,
+    ) async {
       late OiUndoStack? captured;
       final child = Builder(
         builder: (ctx) {
@@ -224,8 +223,9 @@ void main() {
     });
 
     // TC-11
-    testWidgets('darkTheme=null + themeMode=dark uses light theme',
-        (tester) async {
+    testWidgets('darkTheme=null + themeMode=dark uses light theme', (
+      tester,
+    ) async {
       final lightTheme = OiThemeData.light();
       late OiThemeData? captured;
       await tester.pumpWidget(
@@ -245,12 +245,11 @@ void main() {
     });
 
     // TC-12
-    testWidgets('themeMode=system + dark platform uses dark theme',
-        (tester) async {
+    testWidgets('themeMode=system + dark platform uses dark theme', (
+      tester,
+    ) async {
       tester.platformDispatcher.platformBrightnessTestValue = Brightness.dark;
-      addTearDown(
-        tester.platformDispatcher.clearPlatformBrightnessTestValue,
-      );
+      addTearDown(tester.platformDispatcher.clearPlatformBrightnessTestValue);
 
       final darkTheme = OiThemeData.dark();
       late OiThemeData? captured;
@@ -270,12 +269,11 @@ void main() {
     });
 
     // TC-13
-    testWidgets('themeMode=system + light platform uses light theme',
-        (tester) async {
+    testWidgets('themeMode=system + light platform uses light theme', (
+      tester,
+    ) async {
       tester.platformDispatcher.platformBrightnessTestValue = Brightness.light;
-      addTearDown(
-        tester.platformDispatcher.clearPlatformBrightnessTestValue,
-      );
+      addTearDown(tester.platformDispatcher.clearPlatformBrightnessTestValue);
 
       final lightTheme = OiThemeData.light();
       late OiThemeData? captured;

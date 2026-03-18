@@ -20,9 +20,7 @@ void main() {
 
   testWidgets('renders all item labels', (tester) async {
     await tester.pumpObers(
-      const OiButtonGroup(
-        items: [_kItemDay, _kItemWeek, _kItemMonth],
-      ),
+      const OiButtonGroup(items: [_kItemDay, _kItemWeek, _kItemMonth]),
     );
     expect(find.text('Day'), findsOneWidget);
     expect(find.text('Week'), findsOneWidget);
@@ -32,7 +30,10 @@ void main() {
   testWidgets('horizontal direction uses Row layout', (tester) async {
     await tester.pumpObers(
       const OiButtonGroup(
-        items: [OiButtonGroupItem(label: 'A'), OiButtonGroupItem(label: 'B')],
+        items: [
+          OiButtonGroupItem(label: 'A'),
+          OiButtonGroupItem(label: 'B'),
+        ],
       ),
     );
     expect(find.byType(Row), findsWidgets);
@@ -45,7 +46,10 @@ void main() {
     await tester.pumpObers(
       const OiButtonGroup(
         direction: Axis.vertical,
-        items: [OiButtonGroupItem(label: 'A'), OiButtonGroupItem(label: 'B')],
+        items: [
+          OiButtonGroupItem(label: 'A'),
+          OiButtonGroupItem(label: 'B'),
+        ],
       ),
     );
     expect(find.byType(Column), findsWidgets);
@@ -57,34 +61,38 @@ void main() {
   // ── Connected border radii ─────────────────────────────────────────────────
 
   testWidgets(
-      'connected: middle button has zero border radius in horizontal group',
-      (tester) async {
+    'connected: middle button has zero border radius in horizontal group',
+    (tester) async {
+      await tester.pumpObers(
+        const OiButtonGroup(
+          items: [
+            OiButtonGroupItem(label: 'A'),
+            OiButtonGroupItem(label: 'B'),
+            OiButtonGroupItem(label: 'C'),
+          ],
+        ),
+      );
+      final containers = tester.widgetList<Container>(find.byType(Container));
+      final decorations = containers
+          .map((c) => c.decoration)
+          .whereType<BoxDecoration>()
+          .toList();
+      // In connected mode the Container has borderRadius: null (the OiSurface
+      // provides the outer radius and ClipRRect clips the children).
+      final nullOrZeroRadius = decorations.any(
+        (d) => d.borderRadius == null || d.borderRadius == BorderRadius.zero,
+      );
+      expect(nullOrZeroRadius, isTrue);
+    },
+  );
+
+  testWidgets('connected: group is wrapped in OiSurface', (tester) async {
     await tester.pumpObers(
       const OiButtonGroup(
         items: [
           OiButtonGroupItem(label: 'A'),
           OiButtonGroupItem(label: 'B'),
-          OiButtonGroupItem(label: 'C'),
         ],
-      ),
-    );
-    final containers = tester.widgetList<Container>(find.byType(Container));
-    final decorations = containers
-        .map((c) => c.decoration)
-        .whereType<BoxDecoration>()
-        .toList();
-    // In connected mode the Container has borderRadius: null (the OiSurface
-    // provides the outer radius and ClipRRect clips the children).
-    final nullOrZeroRadius = decorations.any(
-      (d) => d.borderRadius == null || d.borderRadius == BorderRadius.zero,
-    );
-    expect(nullOrZeroRadius, isTrue);
-  });
-
-  testWidgets('connected: group is wrapped in OiSurface', (tester) async {
-    await tester.pumpObers(
-      const OiButtonGroup(
-        items: [OiButtonGroupItem(label: 'A'), OiButtonGroupItem(label: 'B')],
       ),
     );
     // There must be exactly one OiSurface that is a descendant of OiButtonGroup.
@@ -97,8 +105,9 @@ void main() {
     );
   });
 
-  testWidgets('connected: horizontal group has dividers between items',
-      (tester) async {
+  testWidgets('connected: horizontal group has dividers between items', (
+    tester,
+  ) async {
     await tester.pumpObers(
       const OiButtonGroup(
         items: [
@@ -114,12 +123,16 @@ void main() {
         .widgetList<Container>(find.byType(Container))
         .where((c) => c.constraints?.maxWidth == 1.0)
         .toList();
-    expect(dividers.length, greaterThanOrEqualTo(2),
-        reason: 'expect 2 dividers for 3 items');
+    expect(
+      dividers.length,
+      greaterThanOrEqualTo(2),
+      reason: 'expect 2 dividers for 3 items',
+    );
   });
 
-  testWidgets('connected: vertical group has dividers between items',
-      (tester) async {
+  testWidgets('connected: vertical group has dividers between items', (
+    tester,
+  ) async {
     await tester.pumpObers(
       const OiButtonGroup(
         direction: Axis.vertical,
@@ -134,17 +147,24 @@ void main() {
         .widgetList<Container>(find.byType(Container))
         .where((c) => c.constraints?.maxHeight == 1.0)
         .toList();
-    expect(dividers.length, greaterThanOrEqualTo(1),
-        reason: 'expect 1 divider for 2 items');
+    expect(
+      dividers.length,
+      greaterThanOrEqualTo(1),
+      reason: 'expect 1 divider for 2 items',
+    );
   });
 
   // ── Gapped layout ──────────────────────────────────────────────────────────
 
-  testWidgets('gapped: items are separated and have individual border radii',
-      (tester) async {
+  testWidgets('gapped: items are separated and have individual border radii', (
+    tester,
+  ) async {
     await tester.pumpObers(
       const OiButtonGroup(
-        items: [OiButtonGroupItem(label: 'A'), OiButtonGroupItem(label: 'B')],
+        items: [
+          OiButtonGroupItem(label: 'A'),
+          OiButtonGroupItem(label: 'B'),
+        ],
         spacing: 8,
       ),
     );
@@ -162,8 +182,9 @@ void main() {
 
   // ── Exclusive mode (exclusive: true) ──────────────────────────────────────
 
-  testWidgets('exclusive: tapping item calls onSelect with correct index',
-      (tester) async {
+  testWidgets('exclusive: tapping item calls onSelect with correct index', (
+    tester,
+  ) async {
     int? selected;
     await tester.pumpObers(
       OiButtonGroup(
@@ -182,8 +203,9 @@ void main() {
     expect(selected, 1);
   });
 
-  testWidgets('exclusive: selected item has non-zero background alpha (soft)',
-      (tester) async {
+  testWidgets('exclusive: selected item has non-zero background alpha (soft)', (
+    tester,
+  ) async {
     await tester.pumpObers(
       const OiButtonGroup(
         exclusive: true,
@@ -228,8 +250,9 @@ void main() {
     expect(selected, 1);
   });
 
-  testWidgets('exclusive: vertical group responds to arrow down/up',
-      (tester) async {
+  testWidgets('exclusive: vertical group responds to arrow down/up', (
+    tester,
+  ) async {
     int? selected;
     await tester.pumpObers(
       OiButtonGroup(
@@ -250,38 +273,40 @@ void main() {
     expect(selected, 1);
   });
 
-  testWidgets('exclusive: only one item selected — deselects previous on new tap',
-      (tester) async {
-    int? lastSelected;
-    var selectedIndex = 0;
-    await tester.pumpWidget(
-      OiApp(
-        theme: OiThemeData.light(),
-        home: _TestControlled(
-          builder: (setState) => OiButtonGroup(
-            exclusive: true,
-            selectedIndex: selectedIndex,
-            onSelect: (i) {
-              setState(() {
-                lastSelected = i;
-                selectedIndex = i;
-              });
-            },
-            items: const [
-              OiButtonGroupItem(label: 'A'),
-              OiButtonGroupItem(label: 'B'),
-            ],
+  testWidgets(
+    'exclusive: only one item selected — deselects previous on new tap',
+    (tester) async {
+      int? lastSelected;
+      var selectedIndex = 0;
+      await tester.pumpWidget(
+        OiApp(
+          theme: OiThemeData.light(),
+          home: _TestControlled(
+            builder: (setState) => OiButtonGroup(
+              exclusive: true,
+              selectedIndex: selectedIndex,
+              onSelect: (i) {
+                setState(() {
+                  lastSelected = i;
+                  selectedIndex = i;
+                });
+              },
+              items: const [
+                OiButtonGroupItem(label: 'A'),
+                OiButtonGroupItem(label: 'B'),
+              ],
+            ),
           ),
         ),
-      ),
-    );
-    await tester.tap(find.text('B'));
-    await tester.pump();
-    expect(lastSelected, 1);
-    await tester.tap(find.text('A'));
-    await tester.pump();
-    expect(lastSelected, 0);
-  });
+      );
+      await tester.tap(find.text('B'));
+      await tester.pump();
+      expect(lastSelected, 1);
+      await tester.tap(find.text('A'));
+      await tester.pump();
+      expect(lastSelected, 0);
+    },
+  );
 
   // ── Non-exclusive mode (exclusive: false / default) ────────────────────────
 
@@ -339,8 +364,9 @@ void main() {
 
   // ── Disabled items ─────────────────────────────────────────────────────────
 
-  testWidgets('disabled item does not call onSelect in exclusive mode',
-      (tester) async {
+  testWidgets('disabled item does not call onSelect in exclusive mode', (
+    tester,
+  ) async {
     int? selected;
     await tester.pumpObers(
       OiButtonGroup(
@@ -358,13 +384,18 @@ void main() {
     expect(selected, isNull);
   });
 
-  testWidgets('disabled item does not call onTap in non-exclusive mode',
-      (tester) async {
+  testWidgets('disabled item does not call onTap in non-exclusive mode', (
+    tester,
+  ) async {
     var tapped = false;
     await tester.pumpObers(
       OiButtonGroup(
         items: [
-          OiButtonGroupItem(label: 'A', onTap: () => tapped = true, enabled: false),
+          OiButtonGroupItem(
+            label: 'A',
+            onTap: () => tapped = true,
+            enabled: false,
+          ),
         ],
       ),
     );
@@ -383,35 +414,43 @@ void main() {
   // ── Compact wrap behaviour ─────────────────────────────────────────────────
 
   testWidgets(
-      'wrap=true: horizontal group becomes vertical on compact breakpoint',
-      (tester) async {
-    await tester.pumpObers(
-      MediaQuery(
-        data: const MediaQueryData(size: Size(375, 812)),
-        child: const OiButtonGroup(
-          direction: Axis.horizontal,
-          wrap: true,
-          items: [
-            OiButtonGroupItem(label: 'A'),
-            OiButtonGroupItem(label: 'B'),
-          ],
+    'wrap=true: horizontal group becomes vertical on compact breakpoint',
+    (tester) async {
+      await tester.pumpObers(
+        MediaQuery(
+          data: const MediaQueryData(size: Size(375, 812)),
+          child: const OiButtonGroup(
+            direction: Axis.horizontal,
+            wrap: true,
+            items: [
+              OiButtonGroupItem(label: 'A'),
+              OiButtonGroupItem(label: 'B'),
+            ],
+          ),
         ),
-      ),
-    );
-    // On compact + wrap=true the effective direction is Axis.vertical:
-    // items share the same x-coordinate and have different y-coordinates.
-    final aCx = tester.getCenter(find.text('A')).dx;
-    final bCx = tester.getCenter(find.text('B')).dx;
-    final aY = tester.getCenter(find.text('A')).dy;
-    final bY = tester.getCenter(find.text('B')).dy;
-    expect((aCx - bCx).abs(), lessThan(4),
-        reason: 'items should share x (vertical layout)');
-    expect((aY - bY).abs(), greaterThan(4),
-        reason: 'items should be stacked vertically');
-  });
+      );
+      // On compact + wrap=true the effective direction is Axis.vertical:
+      // items share the same x-coordinate and have different y-coordinates.
+      final aCx = tester.getCenter(find.text('A')).dx;
+      final bCx = tester.getCenter(find.text('B')).dx;
+      final aY = tester.getCenter(find.text('A')).dy;
+      final bY = tester.getCenter(find.text('B')).dy;
+      expect(
+        (aCx - bCx).abs(),
+        lessThan(4),
+        reason: 'items should share x (vertical layout)',
+      );
+      expect(
+        (aY - bY).abs(),
+        greaterThan(4),
+        reason: 'items should be stacked vertically',
+      );
+    },
+  );
 
-  testWidgets('wrap=false: horizontal group stays Row on compact breakpoint',
-      (tester) async {
+  testWidgets('wrap=false: horizontal group stays Row on compact breakpoint', (
+    tester,
+  ) async {
     await tester.pumpObers(
       MediaQuery(
         data: const MediaQueryData(size: Size(375, 812)),
@@ -428,8 +467,11 @@ void main() {
     // wrap=false keeps horizontal layout even on compact.
     final aY = tester.getCenter(find.text('A')).dy;
     final bY = tester.getCenter(find.text('B')).dy;
-    expect((aY - bY).abs(), lessThan(4),
-        reason: 'items should share y (horizontal layout)');
+    expect(
+      (aY - bY).abs(),
+      lessThan(4),
+      reason: 'items should share y (horizontal layout)',
+    );
   });
 }
 

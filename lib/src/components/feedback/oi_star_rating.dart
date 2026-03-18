@@ -155,14 +155,18 @@ class _OiStarRatingState extends State<OiStarRating> {
     }
 
     if (event.logicalKey == LogicalKeyboardKey.arrowRight) {
-      final next =
-          (widget.value + _step).clamp(0.0, widget.maxStars.toDouble());
+      final next = (widget.value + _step).clamp(
+        0.0,
+        widget.maxStars.toDouble(),
+      );
       widget.onChanged?.call(next);
       return KeyEventResult.handled;
     }
     if (event.logicalKey == LogicalKeyboardKey.arrowLeft) {
-      final next =
-          (widget.value - _step).clamp(0.0, widget.maxStars.toDouble());
+      final next = (widget.value - _step).clamp(
+        0.0,
+        widget.maxStars.toDouble(),
+      );
       widget.onChanged?.call(next);
       return KeyEventResult.handled;
     }
@@ -207,9 +211,7 @@ class _OiStarRatingState extends State<OiStarRating> {
       return star;
     }
 
-    final baseLabel = widget.label != null
-        ? '${widget.label}, '
-        : '';
+    final baseLabel = widget.label != null ? '${widget.label}, ' : '';
     final semanticLabel =
         '${baseLabel}Rating ${widget.value} out of ${widget.maxStars}';
 

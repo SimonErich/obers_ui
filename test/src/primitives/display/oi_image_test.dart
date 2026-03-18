@@ -36,28 +36,34 @@ void main() {
   // ── OiImage accessibility (REQ-0018) ──────────────────────────────────────
 
   group('OiImage accessibility', () {
-    testWidgets('should expose alt text as semantics label when alt is provided',
-        (tester) async {
-      _ignoreImageErrors();
-      addTearDown(_restoreOnError);
-      final handle = tester.ensureSemantics();
-      try {
-        await tester.pumpObers(
-          const OiImage(
-            src: 'https://example.com/alt-test.png',
-            alt: 'A descriptive alt text',
-            errorWidget: SizedBox(),
-          ),
-        );
-        await tester.pump();
-        expect(find.bySemanticsLabel('A descriptive alt text'), findsOneWidget);
-      } finally {
-        handle.dispose();
-      }
-    });
+    testWidgets(
+      'should expose alt text as semantics label when alt is provided',
+      (tester) async {
+        _ignoreImageErrors();
+        addTearDown(_restoreOnError);
+        final handle = tester.ensureSemantics();
+        try {
+          await tester.pumpObers(
+            const OiImage(
+              src: 'https://example.com/alt-test.png',
+              alt: 'A descriptive alt text',
+              errorWidget: SizedBox(),
+            ),
+          );
+          await tester.pump();
+          expect(
+            find.bySemanticsLabel('A descriptive alt text'),
+            findsOneWidget,
+          );
+        } finally {
+          handle.dispose();
+        }
+      },
+    );
 
-    testWidgets('should exclude semantics when OiImage.decorative() is used',
-        (tester) async {
+    testWidgets('should exclude semantics when OiImage.decorative() is used', (
+      tester,
+    ) async {
       _ignoreImageErrors();
       addTearDown(_restoreOnError);
       await tester.pumpObers(
@@ -73,8 +79,7 @@ void main() {
       );
       final withLabel = semanticsWidgets
           .where(
-            (s) =>
-                s.properties.label != null && s.properties.label!.isNotEmpty,
+            (s) => s.properties.label != null && s.properties.label!.isNotEmpty,
           )
           .toList();
       expect(withLabel, isEmpty);

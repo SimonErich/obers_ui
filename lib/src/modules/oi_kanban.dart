@@ -231,9 +231,7 @@ class _OiKanbanState<T> extends State<OiKanban<T>> {
                 child: Icon(
                   const IconData(0xe5cb, fontFamily: 'MaterialIcons'),
                   size: 20,
-                  color: _compactPageIndex > 0
-                      ? colors.text
-                      : colors.textMuted,
+                  color: _compactPageIndex > 0 ? colors.text : colors.textMuted,
                 ),
               ),
               Text(

@@ -58,20 +58,13 @@ void main() {
   });
 
   testWidgets('showCount=false hides counts', (tester) async {
-    await tester.pumpObers(
-      const OiThumbs(upCount: 12, downCount: 3),
-    );
+    await tester.pumpObers(const OiThumbs(upCount: 12, downCount: 3));
     expect(find.text('12'), findsNothing);
     expect(find.text('3'), findsNothing);
   });
 
   testWidgets('label is included in semantics', (tester) async {
-    await tester.pumpObers(
-      const OiThumbs(label: 'Was this helpful?'),
-    );
-    expect(
-      find.bySemanticsLabel(RegExp('Was this helpful')),
-      findsOneWidget,
-    );
+    await tester.pumpObers(const OiThumbs(label: 'Was this helpful?'));
+    expect(find.bySemanticsLabel(RegExp('Was this helpful')), findsOneWidget);
   });
 }

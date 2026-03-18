@@ -368,8 +368,7 @@ class _OiSmartInputState extends State<OiSmartInput> {
       }
 
       // No whitespace between trigger and cursor.
-      final query =
-          textBeforeCursor.substring(lastTriggerIdx + trigger.length);
+      final query = textBeforeCursor.substring(lastTriggerIdx + trigger.length);
       if (query.contains(' ') || query.contains('\n')) continue;
 
       // Active trigger found.

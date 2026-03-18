@@ -102,8 +102,7 @@ void main() {
               ),
             ),
           );
-          final widget =
-              tester.widget<Semantics>(find.byType(Semantics).first);
+          final widget = tester.widget<Semantics>(find.byType(Semantics).first);
           expect(widget.properties.button, isTrue);
           expect(widget.properties.label, 'submit');
           expect(
@@ -175,15 +174,13 @@ void main() {
               ),
             ),
           );
-          final widget =
-              tester.widget<Semantics>(find.byType(Semantics).first);
+          final widget = tester.widget<Semantics>(find.byType(Semantics).first);
           expect(widget.properties.button, isTrue);
           expect(widget.properties.label, 'confirm');
           expect(
             widget.properties.onTap,
             isNotNull,
-            reason:
-                'TalkBack maps SemanticsAction.tap to a double-tap gesture',
+            reason: 'TalkBack maps SemanticsAction.tap to a double-tap gesture',
           );
         },
         variant: TargetPlatformVariant.only(TargetPlatform.android),
@@ -202,8 +199,7 @@ void main() {
               ),
             ),
           );
-          final widget =
-              tester.widget<Semantics>(find.byType(Semantics).first);
+          final widget = tester.widget<Semantics>(find.byType(Semantics).first);
           expect(
             widget.properties.onLongPress,
             isNotNull,
@@ -228,9 +224,7 @@ void main() {
           );
           final widget = tester.widget<Semantics>(
             find.byWidgetPredicate(
-              (w) =>
-                  w is Semantics &&
-                  w.properties.label == 'android action',
+              (w) => w is Semantics && w.properties.label == 'android action',
             ),
           );
           expect(widget.properties.button, isTrue);
@@ -257,14 +251,15 @@ void main() {
           // Retrieve the merged semantics node via getSemantics and verify
           // the action bit is set.
           final node = tester.getSemantics(
-            find.descendant(
-              of: find.byType(OiTappable),
-              matching: find.byType(GestureDetector),
-            ).first,
+            find
+                .descendant(
+                  of: find.byType(OiTappable),
+                  matching: find.byType(GestureDetector),
+                )
+                .first,
           );
           expect(
-            node.getSemanticsData().actions &
-                SemanticsAction.longPress.index,
+            node.getSemanticsData().actions & SemanticsAction.longPress.index,
             isNot(0),
             reason:
                 'TalkBack maps SemanticsAction.longPress to double-tap-and-hold',
@@ -360,8 +355,7 @@ void main() {
               ),
             ),
           );
-          final widget =
-              tester.widget<Semantics>(find.byType(Semantics).first);
+          final widget = tester.widget<Semantics>(find.byType(Semantics).first);
           expect(
             widget.properties.button,
             isTrue,
@@ -420,28 +414,27 @@ void main() {
       //     SemanticsService.sendAnnouncement fires in the test environment,
       //     then assert that the call completes without error — confirming the
       //     announce path is exercised with the semantics layer active.
-      testWidgets(
-        'OiA11y.announce sends polite live region announcement',
-        (tester) async {
-          final handle = tester.ensureSemantics();
-          late BuildContext capturedContext;
-          await tester.pumpWidget(
-            buildDefault(
-              Builder(
-                builder: (ctx) {
-                  capturedContext = ctx;
-                  return const SizedBox.shrink();
-                },
-              ),
+      testWidgets('OiA11y.announce sends polite live region announcement', (
+        tester,
+      ) async {
+        final handle = tester.ensureSemantics();
+        late BuildContext capturedContext;
+        await tester.pumpWidget(
+          buildDefault(
+            Builder(
+              builder: (ctx) {
+                capturedContext = ctx;
+                return const SizedBox.shrink();
+              },
             ),
-          );
-          // SemanticsService.sendAnnouncement with Assertiveness.polite maps
-          // to aria-live="polite" on web.  Must complete without error.
-          OiA11y.announce(capturedContext, 'upload complete');
-          await tester.pump();
-          handle.dispose();
-        },
-      );
+          ),
+        );
+        // SemanticsService.sendAnnouncement with Assertiveness.polite maps
+        // to aria-live="polite" on web.  Must complete without error.
+        OiA11y.announce(capturedContext, 'upload complete');
+        await tester.pump();
+        handle.dispose();
+      });
 
       testWidgets(
         'OiA11y.announce with assertive=true sends assertive live region',
@@ -460,8 +453,11 @@ void main() {
           );
           // SemanticsService.sendAnnouncement with Assertiveness.assertive
           // maps to aria-live="assertive" on web.  Must complete without error.
-          OiA11y.announce(capturedContext, 'error: save failed',
-              assertive: true);
+          OiA11y.announce(
+            capturedContext,
+            'error: save failed',
+            assertive: true,
+          );
           await tester.pump();
           handle.dispose();
         },

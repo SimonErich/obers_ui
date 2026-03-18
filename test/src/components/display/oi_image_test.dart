@@ -38,10 +38,7 @@ void main() {
       ),
     );
     final semanticsWidgets = tester.widgetList<Semantics>(
-      find.ancestor(
-        of: find.byType(Image),
-        matching: find.byType(Semantics),
-      ),
+      find.ancestor(of: find.byType(Image), matching: find.byType(Semantics)),
     );
     final ours = semanticsWidgets.first;
     expect(ours.properties.label, 'A dog');

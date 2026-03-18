@@ -224,16 +224,20 @@ class _OiButtonGroupState extends State<OiButtonGroup> {
     final children = <Widget>[];
 
     for (var i = 0; i < count; i++) {
-      children.add(_buildItem(
-        context,
-        i,
-        _connectedItemRadius(i, count, direction, radius),
-      ));
+      children.add(
+        _buildItem(
+          context,
+          i,
+          _connectedItemRadius(i, count, direction, radius),
+        ),
+      );
       if (i < count - 1) {
         // Divider between adjacent items.
-        children.add(direction == Axis.horizontal
-            ? Container(width: 1, color: dividerColor)
-            : Container(height: 1, color: dividerColor));
+        children.add(
+          direction == Axis.horizontal
+              ? Container(width: 1, color: dividerColor)
+              : Container(height: 1, color: dividerColor),
+        );
       }
     }
 
@@ -245,8 +249,11 @@ class _OiButtonGroupState extends State<OiButtonGroup> {
       onKeyEvent: _onKeyEvent,
       child: OiSurface(
         color: const Color(0x00000000),
-        border: OiBorderStyle.solid(context.colors.border, 1,
-            borderRadius: radius),
+        border: OiBorderStyle.solid(
+          context.colors.border,
+          1,
+          borderRadius: radius,
+        ),
         borderRadius: radius,
         child: ClipRRect(borderRadius: radius, child: content),
       ),
@@ -312,9 +319,11 @@ class _OiButtonGroupState extends State<OiButtonGroup> {
     for (var i = 0; i < count; i++) {
       separated.add(_buildItem(context, i, radius));
       if (i < count - 1) {
-        separated.add(direction == Axis.horizontal
-            ? SizedBox(width: gap)
-            : SizedBox(height: gap));
+        separated.add(
+          direction == Axis.horizontal
+              ? SizedBox(width: gap)
+              : SizedBox(height: gap),
+        );
       }
     }
 

@@ -455,14 +455,8 @@ void main() {
                   type: OiFieldType.radio,
                   config: {
                     'options': [
-                      const OiRadioOption<dynamic>(
-                        value: 's',
-                        label: 'Small',
-                      ),
-                      const OiRadioOption<dynamic>(
-                        value: 'l',
-                        label: 'Large',
-                      ),
+                      const OiRadioOption<dynamic>(value: 's', label: 'Small'),
+                      const OiRadioOption<dynamic>(value: 'l', label: 'Large'),
                     ],
                   },
                 ),

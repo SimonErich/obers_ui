@@ -168,32 +168,33 @@ void main() {
     },
   );
 
-  testWidgets('reducedMotion: child switch completes instantly without animation', (
-    tester,
-  ) async {
-    final notifier = ValueNotifier<bool>(false);
+  testWidgets(
+    'reducedMotion: child switch completes instantly without animation',
+    (tester) async {
+      final notifier = ValueNotifier<bool>(false);
 
-    await tester.pumpObers(
-      MediaQuery(
-        data: const MediaQueryData(disableAnimations: true),
-        child: ValueListenableBuilder<bool>(
-          valueListenable: notifier,
-          builder: (_, flag, __) => OiMorph(
-            child: flag
-                ? const Text('B', key: ValueKey('b'))
-                : const Text('A', key: ValueKey('a')),
+      await tester.pumpObers(
+        MediaQuery(
+          data: const MediaQueryData(disableAnimations: true),
+          child: ValueListenableBuilder<bool>(
+            valueListenable: notifier,
+            builder: (_, flag, __) => OiMorph(
+              child: flag
+                  ? const Text('B', key: ValueKey('b'))
+                  : const Text('A', key: ValueKey('a')),
+            ),
           ),
         ),
-      ),
-    );
-    await tester.pump();
-    expect(find.text('A'), findsOneWidget);
+      );
+      await tester.pump();
+      expect(find.text('A'), findsOneWidget);
 
-    notifier.value = true;
-    await tester.pump(); // trigger switch
+      notifier.value = true;
+      await tester.pump(); // trigger switch
 
-    // With reducedMotion the switch completes instantly: B visible, A gone.
-    expect(find.text('B'), findsOneWidget);
-    expect(find.text('A'), findsNothing);
-  });
+      // With reducedMotion the switch completes instantly: B visible, A gone.
+      expect(find.text('B'), findsOneWidget);
+      expect(find.text('A'), findsNothing);
+    },
+  );
 }

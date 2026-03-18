@@ -60,10 +60,7 @@ class OiScaleRating extends StatelessWidget {
 
     final items = List<OiButtonGroupItem>.generate(count, (i) {
       final n = min + i;
-      return OiButtonGroupItem(
-        label: '$n',
-        enabled: enabled,
-      );
+      return OiButtonGroupItem(label: '$n', enabled: enabled);
     });
 
     final selectedIndex = value != null ? value! - min : null;
@@ -105,9 +102,6 @@ class OiScaleRating extends StatelessWidget {
     final semanticLabel =
         label ?? 'Scale rating, selected: ${value ?? 'none'} of $max';
 
-    return Semantics(
-      label: semanticLabel,
-      child: group,
-    );
+    return Semantics(label: semanticLabel, child: group);
   }
 }

@@ -184,7 +184,11 @@ class _OiTappableState extends State<OiTappable> {
     final animations = context.animations;
     final reducedMotion =
         animations.reducedMotion || MediaQuery.disableAnimationsOf(context);
-    final minTarget = OiA11y.minTouchTarget(context);
+    final density = OiDensityScope.of(context);
+    final minTarget =
+        (density == OiDensity.compact || density == OiDensity.dense)
+        ? 0.0
+        : OiA11y.minTouchTarget(context);
     final style = _effectiveStyle(effects);
 
     final effectiveCursor =

@@ -247,8 +247,9 @@ class OiBottomBar extends StatelessWidget {
       final item = items[i];
       final isSelected = i == currentIndex;
       final iconColor = isSelected ? colors.primary.base : colors.textMuted;
-      final iconData =
-          isSelected && item.activeIcon != null ? item.activeIcon! : item.icon;
+      final iconData = isSelected && item.activeIcon != null
+          ? item.activeIcon!
+          : item.icon;
 
       return OiTappable(
         onTap: () => _handleTap(i),
@@ -268,9 +269,7 @@ class OiBottomBar extends StatelessWidget {
       child: DecoratedBox(
         decoration: BoxDecoration(
           color: colors.surface,
-          border: Border(
-            right: BorderSide(color: colors.borderSubtle),
-          ),
+          border: Border(right: BorderSide(color: colors.borderSubtle)),
         ),
         child: Padding(
           padding: EdgeInsets.only(
@@ -278,10 +277,7 @@ class OiBottomBar extends StatelessWidget {
             bottom: safeBottom,
             left: safeLeft,
           ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: railItems,
-          ),
+          child: Column(mainAxisSize: MainAxisSize.min, children: railItems),
         ),
       ),
     );
@@ -295,8 +291,9 @@ class OiBottomBar extends StatelessWidget {
     final isSelected = index == currentIndex;
     final iconColor = isSelected ? colors.primary.base : colors.textMuted;
     final labelColor = isSelected ? colors.primary.base : colors.textMuted;
-    final iconData =
-        isSelected && item.activeIcon != null ? item.activeIcon! : item.icon;
+    final iconData = isSelected && item.activeIcon != null
+        ? item.activeIcon!
+        : item.icon;
 
     final showItemLabel = _shouldShowLabel(index);
 

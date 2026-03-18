@@ -171,8 +171,10 @@ void main() {
         isTrue,
       );
       expect(ops.any((op) => op['insert'] == 'Body'), isTrue);
-      expect(ops.any((op) => op['insert'] == '\n' && op['attributes'] == null),
-          isTrue);
+      expect(
+        ops.any((op) => op['insert'] == '\n' && op['attributes'] == null),
+        isTrue,
+      );
     });
 
     test('toDelta encodes list blocks', () {
@@ -422,9 +424,7 @@ void main() {
     test('toDelta delegates to content', () {
       final controller = OiRichEditorController(
         initialContent: const OiRichContent(
-          blocks: [
-            OiContentBlock(type: OiBlockType.paragraph, text: 'Hello'),
-          ],
+          blocks: [OiContentBlock(type: OiBlockType.paragraph, text: 'Hello')],
         ),
       );
       addTearDown(controller.dispose);
@@ -530,7 +530,9 @@ void main() {
       }
     });
 
-    testWidgets('toolbar renders bold italic underline buttons', (tester) async {
+    testWidgets('toolbar renders bold italic underline buttons', (
+      tester,
+    ) async {
       final controller = OiRichEditorController();
       addTearDown(controller.dispose);
 
@@ -628,8 +630,9 @@ void main() {
       expect(controller.content.blocks.first.isBold, isFalse);
     });
 
-    testWidgets('italic button toggles isItalic on active block',
-        (tester) async {
+    testWidgets('italic button toggles isItalic on active block', (
+      tester,
+    ) async {
       final controller = OiRichEditorController(
         initialContent: const OiRichContent(
           blocks: [OiContentBlock(type: OiBlockType.paragraph, text: 'Hello')],
@@ -649,8 +652,9 @@ void main() {
       expect(controller.content.blocks.first.isItalic, isTrue);
     });
 
-    testWidgets('underline button toggles isUnderline on active block',
-        (tester) async {
+    testWidgets('underline button toggles isUnderline on active block', (
+      tester,
+    ) async {
       final controller = OiRichEditorController(
         initialContent: const OiRichContent(
           blocks: [OiContentBlock(type: OiBlockType.paragraph, text: 'Hello')],

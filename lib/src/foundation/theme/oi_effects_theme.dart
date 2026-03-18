@@ -39,8 +39,7 @@ class OiFocusRingStyle {
   /// - [color] alpha ≥ 0.5 (ring is always perceptible)
   /// - [width] ≥ 2.0 (ring is always physically visible)
   OiFocusRingStyle get enforced {
-    final clampedColor =
-        color.a < 0.5 ? color.withValues(alpha: 0.5) : color;
+    final clampedColor = color.a < 0.5 ? color.withValues(alpha: 0.5) : color;
     final clampedWidth = width < 2.0 ? 2.0 : width;
     return OiFocusRingStyle(
       color: clampedColor,
@@ -310,6 +309,13 @@ class OiEffectsTheme {
   }
 
   @override
-  int get hashCode =>
-      Object.hash(hover, focus, active, disabled, selected, dragging, focusRing);
+  int get hashCode => Object.hash(
+    hover,
+    focus,
+    active,
+    disabled,
+    selected,
+    dragging,
+    focusRing,
+  );
 }

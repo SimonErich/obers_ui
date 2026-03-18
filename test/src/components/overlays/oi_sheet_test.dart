@@ -136,33 +136,29 @@ void main() {
     expect(find.text('Toggled'), findsOneWidget);
   });
 
-  testWidgets(
-    'disableAnimations=true: toggling open completes instantly — '
-    'SlideTransition position is Offset.zero after one pump',
-    (tester) async {
-      final notifier = ValueNotifier<bool>(false);
-      addTearDown(notifier.dispose);
+  testWidgets('disableAnimations=true: toggling open completes instantly — '
+      'SlideTransition position is Offset.zero after one pump', (tester) async {
+    final notifier = ValueNotifier<bool>(false);
+    addTearDown(notifier.dispose);
 
-      await tester.pumpObers(
-        MediaQuery(
-          data: const MediaQueryData(disableAnimations: true),
-          child: ValueListenableBuilder<bool>(
-            valueListenable: notifier,
-            builder: (_, isOpen, __) =>
-                OiSheet(open: isOpen, child: const Text('instant')),
-          ),
+    await tester.pumpObers(
+      MediaQuery(
+        data: const MediaQueryData(disableAnimations: true),
+        child: ValueListenableBuilder<bool>(
+          valueListenable: notifier,
+          builder: (_, isOpen, __) =>
+              OiSheet(open: isOpen, child: const Text('instant')),
         ),
-      );
-      await tester.pump();
+      ),
+    );
+    await tester.pump();
 
-      // Open the sheet — with Duration.zero the controller jumps to 1.0
-      // immediately without needing pumpAndSettle.
-      notifier.value = true;
-      await tester.pump();
+    // Open the sheet — with Duration.zero the controller jumps to 1.0
+    // immediately without needing pumpAndSettle.
+    notifier.value = true;
+    await tester.pump();
 
-      final slide =
-          tester.widget<SlideTransition>(find.byType(SlideTransition));
-      expect(slide.position.value, Offset.zero);
-    },
-  );
+    final slide = tester.widget<SlideTransition>(find.byType(SlideTransition));
+    expect(slide.position.value, Offset.zero);
+  });
 }

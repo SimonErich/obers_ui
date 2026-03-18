@@ -210,9 +210,7 @@ void main() {
 
   group('OiButtonThemeScope', () {
     testWidgets('provides OiButtonThemeData to descendants', (tester) async {
-      const buttonTheme = OiButtonThemeData(
-        borderRadius: BorderRadius.zero,
-      );
+      const buttonTheme = OiButtonThemeData(borderRadius: BorderRadius.zero);
       OiButtonThemeData? captured;
 
       await tester.pumpWidget(
@@ -271,8 +269,9 @@ void main() {
       expect(captured, equals(innerTheme));
     });
 
-    testWidgets('updateShouldNotify triggers rebuild on theme change',
-        (tester) async {
+    testWidgets('updateShouldNotify triggers rebuild on theme change', (
+      tester,
+    ) async {
       int buildCount = 0;
 
       Widget build(OiButtonThemeData theme) {

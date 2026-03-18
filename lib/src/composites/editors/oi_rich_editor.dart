@@ -261,7 +261,9 @@ class OiRichContent {
     for (final block in blocks) {
       if (block.type == OiBlockType.divider) {
         // Represent divider as a thematic break operation.
-        ops.add({'insert': {'divider': true}});
+        ops.add({
+          'insert': {'divider': true},
+        });
         ops.add({'insert': '\n'});
         continue;
       }
@@ -306,7 +308,10 @@ class OiRichContent {
       if (lineAttrs.isEmpty) {
         ops.add({'insert': '\n'});
       } else {
-        ops.add({'insert': '\n', 'attributes': Map<String, dynamic>.from(lineAttrs)});
+        ops.add({
+          'insert': '\n',
+          'attributes': Map<String, dynamic>.from(lineAttrs),
+        });
       }
     }
 
@@ -704,8 +709,9 @@ class _OiRichEditorState extends State<OiRichEditor> {
       metadata: block.metadata,
       isBold: format == 'bold' ? !block.isBold : block.isBold,
       isItalic: format == 'italic' ? !block.isItalic : block.isItalic,
-      isUnderline:
-          format == 'underline' ? !block.isUnderline : block.isUnderline,
+      isUnderline: format == 'underline'
+          ? !block.isUnderline
+          : block.isUnderline,
     );
 
     blocks[_activeBlockIndex] = updated;
@@ -722,26 +728,35 @@ class _OiRichEditorState extends State<OiRichEditor> {
     TextStyle base;
     switch (block.type) {
       case OiBlockType.heading1:
-        base = textTheme?.styleFor(OiLabelVariant.h1) ??
+        base =
+            textTheme?.styleFor(OiLabelVariant.h1) ??
             const TextStyle(fontSize: 40, fontWeight: FontWeight.w700);
       case OiBlockType.heading2:
-        base = textTheme?.styleFor(OiLabelVariant.h2) ??
+        base =
+            textTheme?.styleFor(OiLabelVariant.h2) ??
             const TextStyle(fontSize: 32, fontWeight: FontWeight.w600);
       case OiBlockType.heading3:
-        base = textTheme?.styleFor(OiLabelVariant.h3) ??
+        base =
+            textTheme?.styleFor(OiLabelVariant.h3) ??
             const TextStyle(fontSize: 24, fontWeight: FontWeight.w600);
       case OiBlockType.code:
-        base = textTheme?.styleFor(OiLabelVariant.code) ??
+        base =
+            textTheme?.styleFor(OiLabelVariant.code) ??
             const TextStyle(fontSize: 14, fontFamily: 'monospace');
       case OiBlockType.quote:
-        base = (textTheme?.styleFor(OiLabelVariant.body) ??
-                const TextStyle(fontSize: 16))
-            .copyWith(fontStyle: FontStyle.italic, color: colors?.textMuted);
+        base =
+            (textTheme?.styleFor(OiLabelVariant.body) ??
+                    const TextStyle(fontSize: 16))
+                .copyWith(
+                  fontStyle: FontStyle.italic,
+                  color: colors?.textMuted,
+                );
       case OiBlockType.paragraph:
       case OiBlockType.bulletList:
       case OiBlockType.numberedList:
       case OiBlockType.divider:
-        base = textTheme?.styleFor(OiLabelVariant.body) ??
+        base =
+            textTheme?.styleFor(OiLabelVariant.body) ??
             const TextStyle(fontSize: 16, fontWeight: FontWeight.w400);
     }
 
@@ -881,14 +896,12 @@ class _OiRichEditorState extends State<OiRichEditor> {
       _ToolbarButton(
         icon: const Text(
           'U',
-          style: TextStyle(
-            decoration: TextDecoration.underline,
-            fontSize: 13,
-          ),
+          style: TextStyle(decoration: TextDecoration.underline, fontSize: 13),
         ),
         semanticLabel: 'Underline',
-        onPressed:
-            widget.readOnly ? null : () => _toggleFormatting('underline'),
+        onPressed: widget.readOnly
+            ? null
+            : () => _toggleFormatting('underline'),
       ),
 
       // ── Block type buttons ────────────────────────────────────────────────

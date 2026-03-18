@@ -143,7 +143,9 @@ class _OiAnimatedListState<T> extends State<OiAnimatedList<T>> {
         MediaQuery.disableAnimationsOf(context);
     _listKey.currentState?.insertItem(
       index,
-      duration: reducedMotion ? Duration.zero : const Duration(milliseconds: 300),
+      duration: reducedMotion
+          ? Duration.zero
+          : const Duration(milliseconds: 300),
     );
   }
 
@@ -156,7 +158,9 @@ class _OiAnimatedListState<T> extends State<OiAnimatedList<T>> {
       index,
       (context, animation) =>
           _buildRemoveWidget(context, removedItem, animation),
-      duration: reducedMotion ? Duration.zero : const Duration(milliseconds: 300),
+      duration: reducedMotion
+          ? Duration.zero
+          : const Duration(milliseconds: 300),
     );
   }
 
@@ -186,7 +190,12 @@ class _OiAnimatedListState<T> extends State<OiAnimatedList<T>> {
       shrinkWrap: widget.shrinkWrap,
       padding: widget.padding,
       itemBuilder: (context, index, animation) {
-        final child = widget.itemBuilder(context, _items[index], animation, index);
+        final child = widget.itemBuilder(
+          context,
+          _items[index],
+          animation,
+          index,
+        );
         if (reducedMotion) return child;
         return SizeTransition(sizeFactor: animation, child: child);
       },

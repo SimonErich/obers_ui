@@ -49,10 +49,7 @@ class OiShortcutScopeState {
 
 // Internal InheritedWidget used to provide [OiShortcutScopeState] to the tree.
 class _OiShortcutScopeInherited extends InheritedWidget {
-  const _OiShortcutScopeInherited({
-    required this.state,
-    required super.child,
-  });
+  const _OiShortcutScopeInherited({required this.state, required super.child});
 
   final OiShortcutScopeState state;
 
@@ -144,9 +141,7 @@ class _OiShortcutScopeState extends State<OiShortcutScope> {
                 return null;
               },
             ),
-            OiHelpIntent: CallbackAction<OiHelpIntent>(
-              onInvoke: (_) => null,
-            ),
+            OiHelpIntent: CallbackAction<OiHelpIntent>(onInvoke: (_) => null),
           },
           child: widget.child,
         ),

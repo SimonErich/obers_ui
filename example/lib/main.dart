@@ -28,9 +28,7 @@ class CatalogHome extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('obers_ui Catalog')),
-      body: const Center(
-        child: Text('Components coming soon.'),
-      ),
+      body: const Center(child: Text('Components coming soon.')),
     );
   }
 }

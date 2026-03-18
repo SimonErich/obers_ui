@@ -405,10 +405,7 @@ class _OiCardState extends State<OiCard> with SingleTickerProviderStateMixin {
     final content = Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       mainAxisSize: MainAxisSize.min,
-      children: [
-        if (hasHeader) _buildHeader(context),
-        collapsibleContent,
-      ],
+      children: [if (hasHeader) _buildHeader(context), collapsibleContent],
     );
 
     final surface = OiSurface(

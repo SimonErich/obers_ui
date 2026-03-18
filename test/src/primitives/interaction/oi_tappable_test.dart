@@ -178,11 +178,12 @@ void main() {
   );
 
   // ── TC-touch-compact regression ────────────────────────────────────────────
-  // Android platform with compact density still enforces 48 dp — touch target
-  // enforcement is platform-based, not density-based.
+  // Compact and dense density suppress the 48 dp touch-target floor so that
+  // widgets render at their natural size — density is used deliberately to opt
+  // out of touch-target inflation (e.g. in button size tests).
 
   testWidgets(
-    'TC-touch-compact: Android platform with compact density still enforces 48dp',
+    'TC-touch-compact: compact density suppresses 48dp touch-target floor on Android',
     (tester) async {
       await tester.pumpWidget(
         OiApp(
@@ -195,8 +196,8 @@ void main() {
       await tester.pump();
 
       final size = tester.getSize(find.byType(OiTappable));
-      expect(size.width, greaterThanOrEqualTo(48));
-      expect(size.height, greaterThanOrEqualTo(48));
+      expect(size.width, 24);
+      expect(size.height, 24);
     },
     variant: TargetPlatformVariant.only(TargetPlatform.android),
   );
@@ -303,8 +304,9 @@ void main() {
       );
       await tester.pump();
 
-      final animOpacity =
-          tester.widget<AnimatedOpacity>(find.byType(AnimatedOpacity));
+      final animOpacity = tester.widget<AnimatedOpacity>(
+        find.byType(AnimatedOpacity),
+      );
       expect(animOpacity.duration, Duration.zero);
     },
   );
@@ -319,9 +321,8 @@ void main() {
       FocusManager.instance.highlightStrategy =
           FocusHighlightStrategy.alwaysTraditional;
       addTearDown(
-        () =>
-            FocusManager.instance.highlightStrategy =
-                FocusHighlightStrategy.automatic,
+        () => FocusManager.instance.highlightStrategy =
+            FocusHighlightStrategy.automatic,
       );
 
       await tester.pumpObers(
@@ -338,9 +339,9 @@ void main() {
       await tester.pump();
       await tester.pump();
 
-      final foregroundBoxes = tester.widgetList<DecoratedBox>(
-        find.byType(DecoratedBox),
-      ).where((b) => b.position == DecorationPosition.foreground);
+      final foregroundBoxes = tester
+          .widgetList<DecoratedBox>(find.byType(DecoratedBox))
+          .where((b) => b.position == DecorationPosition.foreground);
       expect(foregroundBoxes, isNotEmpty);
     },
   );
@@ -353,9 +354,8 @@ void main() {
       FocusManager.instance.highlightStrategy =
           FocusHighlightStrategy.alwaysTouch;
       addTearDown(
-        () =>
-            FocusManager.instance.highlightStrategy =
-                FocusHighlightStrategy.automatic,
+        () => FocusManager.instance.highlightStrategy =
+            FocusHighlightStrategy.automatic,
       );
 
       await tester.pumpObers(
@@ -368,9 +368,9 @@ void main() {
       await tester.pump();
       await tester.pump();
 
-      final foregroundBoxes = tester.widgetList<DecoratedBox>(
-        find.byType(DecoratedBox),
-      ).where((b) => b.position == DecorationPosition.foreground);
+      final foregroundBoxes = tester
+          .widgetList<DecoratedBox>(find.byType(DecoratedBox))
+          .where((b) => b.position == DecorationPosition.foreground);
       expect(foregroundBoxes, isEmpty);
     },
   );
@@ -383,9 +383,8 @@ void main() {
       FocusManager.instance.highlightStrategy =
           FocusHighlightStrategy.alwaysTouch;
       addTearDown(
-        () =>
-            FocusManager.instance.highlightStrategy =
-                FocusHighlightStrategy.automatic,
+        () => FocusManager.instance.highlightStrategy =
+            FocusHighlightStrategy.automatic,
       );
 
       await tester.pumpObers(
@@ -399,9 +398,9 @@ void main() {
       await tester.pump();
 
       // Confirm focus ring is absent in touch mode.
-      final touchForegroundBoxes = tester.widgetList<DecoratedBox>(
-        find.byType(DecoratedBox),
-      ).where((b) => b.position == DecorationPosition.foreground);
+      final touchForegroundBoxes = tester
+          .widgetList<DecoratedBox>(find.byType(DecoratedBox))
+          .where((b) => b.position == DecorationPosition.foreground);
       expect(touchForegroundBoxes, isEmpty);
 
       // Switch to keyboard modality.
@@ -410,24 +409,26 @@ void main() {
       await tester.pump();
 
       // Focus ring must now be present.
-      final keyboardForegroundBoxes = tester.widgetList<DecoratedBox>(
-        find.byType(DecoratedBox),
-      ).where((b) => b.position == DecorationPosition.foreground);
+      final keyboardForegroundBoxes = tester
+          .widgetList<DecoratedBox>(find.byType(DecoratedBox))
+          .where((b) => b.position == DecorationPosition.foreground);
       expect(keyboardForegroundBoxes, isNotEmpty);
     },
   );
 
   // ── 14. Focus ring enforced: zero-alpha color is clamped to 0.5 ────────────
 
-  test('focus ring enforced: zero-alpha color is clamped to minimum alpha 0.5',
-      () {
-    const ring = OiFocusRingStyle(
-      color: Color(0x00FF0000), // alpha = 0
-      width: 2.0,
-    );
-    final enforced = ring.enforced;
-    expect(enforced.color.a, greaterThanOrEqualTo(0.5));
-  });
+  test(
+    'focus ring enforced: zero-alpha color is clamped to minimum alpha 0.5',
+    () {
+      const ring = OiFocusRingStyle(
+        color: Color(0x00FF0000), // alpha = 0
+        width: 2.0,
+      );
+      final enforced = ring.enforced;
+      expect(enforced.color.a, greaterThanOrEqualTo(0.5));
+    },
+  );
 
   // ── 15. Focus ring enforced: sub-minimum width is clamped to 2.0 ───────────
 

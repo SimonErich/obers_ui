@@ -22,7 +22,11 @@ void main() {
     tester,
   ) async {
     await tester.pumpObers(
-      const OiBadge(label: 'Error status', color: OiBadgeColor.error, dot: true),
+      const OiBadge(
+        label: 'Error status',
+        color: OiBadgeColor.error,
+        dot: true,
+      ),
     );
     expect(
       tester.getSemantics(find.bySemanticsLabel('Error status')),

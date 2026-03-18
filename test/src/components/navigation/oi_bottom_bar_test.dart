@@ -64,11 +64,7 @@ void main() {
     int? tapped;
     await tester.pumpObers(
       _wrapMQ(
-        OiBottomBar(
-          items: _kItems,
-          currentIndex: 0,
-          onTap: (i) => tapped = i,
-        ),
+        OiBottomBar(items: _kItems, currentIndex: 0, onTap: (i) => tapped = i),
         _kCompact,
       ),
     );
@@ -81,11 +77,7 @@ void main() {
     int? tapped;
     await tester.pumpObers(
       _wrapMQ(
-        OiBottomBar(
-          items: _kItems,
-          currentIndex: 0,
-          onTap: (i) => tapped = i,
-        ),
+        OiBottomBar(items: _kItems, currentIndex: 0, onTap: (i) => tapped = i),
         _kCompact,
       ),
     );
@@ -112,12 +104,18 @@ void main() {
 
   // ── Active icon ────────────────────────────────────────────────────────────
 
-  testWidgets('uses activeIcon for selected item when provided', (tester) async {
+  testWidgets('uses activeIcon for selected item when provided', (
+    tester,
+  ) async {
     await tester.pumpObers(
       _wrapMQ(
         OiBottomBar(
           items: const [
-            OiBottomBarItem(icon: _kIcon, label: 'Home', activeIcon: _kActiveIcon),
+            OiBottomBarItem(
+              icon: _kIcon,
+              label: 'Home',
+              activeIcon: _kActiveIcon,
+            ),
             OiBottomBarItem(icon: _kIcon2, label: 'Search'),
           ],
           currentIndex: 0,
@@ -182,8 +180,9 @@ void main() {
     expect(find.text('0'), findsNothing);
   });
 
-  testWidgets('showBadge=false hides badge even when badgeCount > 0',
-      (tester) async {
+  testWidgets('showBadge=false hides badge even when badgeCount > 0', (
+    tester,
+  ) async {
     await tester.pumpObers(
       _wrapMQ(
         OiBottomBar(
@@ -223,8 +222,9 @@ void main() {
     expect(find.text('Profile'), findsOneWidget);
   });
 
-  testWidgets('shifting style shows label only for selected item',
-      (tester) async {
+  testWidgets('shifting style shows label only for selected item', (
+    tester,
+  ) async {
     await tester.pumpObers(
       _wrapMQ(
         OiBottomBar(
@@ -277,8 +277,9 @@ void main() {
 
   // ── showDot ────────────────────────────────────────────────────────────────
 
-  testWidgets('showDot=true renders dot for selected item when label hidden',
-      (tester) async {
+  testWidgets('showDot=true renders dot for selected item when label hidden', (
+    tester,
+  ) async {
     await tester.pumpObers(
       _wrapMQ(
         OiBottomBar(
@@ -294,12 +295,14 @@ void main() {
     expect(
       find.byKey(const Key('oi_bottom_bar_dot')),
       findsOneWidget,
-      reason: 'showDot=true with iconOnly should render a dot for the selected item',
+      reason:
+          'showDot=true with iconOnly should render a dot for the selected item',
     );
   });
 
-  testWidgets('showDot=false renders no dot even for selected item',
-      (tester) async {
+  testWidgets('showDot=false renders no dot even for selected item', (
+    tester,
+  ) async {
     await tester.pumpObers(
       _wrapMQ(
         OiBottomBar(
@@ -318,8 +321,9 @@ void main() {
     );
   });
 
-  testWidgets('showDot=true with labels visible does not render dot',
-      (tester) async {
+  testWidgets('showDot=true with labels visible does not render dot', (
+    tester,
+  ) async {
     // Dot is only shown when the label is not visible (i.e. iconOnly / showLabels=false).
     await tester.pumpObers(
       _wrapMQ(
@@ -341,8 +345,9 @@ void main() {
 
   // ── showLabels override ────────────────────────────────────────────────────
 
-  testWidgets('showLabels=false hides labels regardless of fixed style',
-      (tester) async {
+  testWidgets('showLabels=false hides labels regardless of fixed style', (
+    tester,
+  ) async {
     await tester.pumpObers(
       _wrapMQ(
         OiBottomBar(
@@ -392,8 +397,9 @@ void main() {
     expect(find.text('Search'), findsNothing);
   });
 
-  testWidgets('hidden on medium when showOnMedium=false (default)',
-      (tester) async {
+  testWidgets('hidden on medium when showOnMedium=false (default)', (
+    tester,
+  ) async {
     await tester.pumpObers(
       _wrapMQ(
         OiBottomBar(items: _kItems, currentIndex: 0, onTap: (_) {}),
@@ -471,8 +477,9 @@ void main() {
 
   // ── Safe area ─────────────────────────────────────────────────────────────
 
-  testWidgets('bar renders without error with non-zero safe area insets',
-      (tester) async {
+  testWidgets('bar renders without error with non-zero safe area insets', (
+    tester,
+  ) async {
     await tester.pumpObers(
       _wrapMQ(
         OiBottomBar(items: _kItems, currentIndex: 0, onTap: (_) {}),
@@ -486,36 +493,42 @@ void main() {
     expect(find.text('Home'), findsOneWidget);
   });
 
-  testWidgets('safe-area Padding inside bar matches MediaQuery.padding insets',
-      (tester) async {
-    const safeInsets = EdgeInsets.only(bottom: 34, left: 8, right: 8);
-    await tester.pumpObers(
-      _wrapMQ(
-        OiBottomBar(items: _kItems, currentIndex: 0, onTap: (_) {}),
-        const MediaQueryData(size: Size(375, 812), padding: safeInsets),
-      ),
-    );
-    final paddingWidgets = tester.widgetList<Padding>(find.byType(Padding));
-    final hasSafeAreaPadding = paddingWidgets.any((p) {
-      final insets = p.padding.resolve(TextDirection.ltr);
-      return insets.bottom == 34.0 &&
-          insets.left == 8.0 &&
-          insets.right == 8.0;
-    });
-    expect(hasSafeAreaPadding, isTrue,
-        reason: 'bar should add safe-area padding matching MediaQuery.padding');
-  });
+  testWidgets(
+    'safe-area Padding inside bar matches MediaQuery.padding insets',
+    (tester) async {
+      const safeInsets = EdgeInsets.only(bottom: 34, left: 8, right: 8);
+      await tester.pumpObers(
+        _wrapMQ(
+          OiBottomBar(items: _kItems, currentIndex: 0, onTap: (_) {}),
+          const MediaQueryData(size: Size(375, 812), padding: safeInsets),
+        ),
+      );
+      final paddingWidgets = tester.widgetList<Padding>(find.byType(Padding));
+      final hasSafeAreaPadding = paddingWidgets.any((p) {
+        final insets = p.padding.resolve(TextDirection.ltr);
+        return insets.bottom == 34.0 &&
+            insets.left == 8.0 &&
+            insets.right == 8.0;
+      });
+      expect(
+        hasSafeAreaPadding,
+        isTrue,
+        reason: 'bar should add safe-area padding matching MediaQuery.padding',
+      );
+    },
+  );
 
   // ── Haptic feedback ────────────────────────────────────────────────────────
 
-  testWidgets('haptic=true triggers HapticFeedback.selectionClick on tap',
-      (tester) async {
+  testWidgets('haptic=true triggers HapticFeedback.selectionClick on tap', (
+    tester,
+  ) async {
     final List<MethodCall> log = [];
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(SystemChannels.platform, (call) async {
-      log.add(call);
-      return null;
-    });
+          log.add(call);
+          return null;
+        });
     addTearDown(() {
       TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
           .setMockMethodCallHandler(SystemChannels.platform, null);
@@ -539,18 +552,20 @@ void main() {
     expect(
       log.any((call) => call.method == 'HapticFeedback.selectionClick'),
       isTrue,
-      reason: 'tapping with haptic=true should invoke HapticFeedback.selectionClick',
+      reason:
+          'tapping with haptic=true should invoke HapticFeedback.selectionClick',
     );
   });
 
-  testWidgets('haptic=false does not trigger HapticFeedback on tap',
-      (tester) async {
+  testWidgets('haptic=false does not trigger HapticFeedback on tap', (
+    tester,
+  ) async {
     final List<MethodCall> log = [];
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(SystemChannels.platform, (call) async {
-      log.add(call);
-      return null;
-    });
+          log.add(call);
+          return null;
+        });
     addTearDown(() {
       TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
           .setMockMethodCallHandler(SystemChannels.platform, null);
@@ -558,11 +573,7 @@ void main() {
 
     await tester.pumpObers(
       _wrapMQ(
-        OiBottomBar(
-          items: _kItems,
-          currentIndex: 0,
-          onTap: (_) {},
-        ),
+        OiBottomBar(items: _kItems, currentIndex: 0, onTap: (_) {}),
         _kCompact,
       ),
     );
@@ -578,8 +589,9 @@ void main() {
 
   // ── floatingAction positional ──────────────────────────────────────────────
 
-  testWidgets('floatingAction is centered between left and right item halves',
-      (tester) async {
+  testWidgets('floatingAction is centered between left and right item halves', (
+    tester,
+  ) async {
     const fabKey = Key('fab');
     await tester.pumpObers(
       _wrapMQ(
@@ -592,8 +604,7 @@ void main() {
           ],
           currentIndex: 0,
           onTap: (_) {},
-          floatingAction:
-              const SizedBox(key: fabKey, width: 56, height: 56),
+          floatingAction: const SizedBox(key: fabKey, width: 56, height: 56),
         ),
         _kCompact,
       ),
@@ -603,16 +614,23 @@ void main() {
     final fabCx = tester.getCenter(find.byKey(fabKey)).dx;
     final bCx = tester.getCenter(find.text('B')).dx;
     final cCx = tester.getCenter(find.text('C')).dx;
-    expect(fabCx, greaterThan(bCx),
-        reason: 'FAB should be right of left-half last item');
-    expect(fabCx, lessThan(cCx),
-        reason: 'FAB should be left of right-half first item');
+    expect(
+      fabCx,
+      greaterThan(bCx),
+      reason: 'FAB should be right of left-half last item',
+    );
+    expect(
+      fabCx,
+      lessThan(cCx),
+      reason: 'FAB should be left of right-half first item',
+    );
   });
 
   // ── landscapeMode ──────────────────────────────────────────────────────────
 
-  testWidgets('landscapeMode=rail renders vertical Column strip on left edge',
-      (tester) async {
+  testWidgets('landscapeMode=rail renders vertical Column strip on left edge', (
+    tester,
+  ) async {
     await tester.pumpObers(
       _wrapMQ(
         OiBottomBar(
@@ -635,32 +653,42 @@ void main() {
     final icon2Cx = tester.getCenter(icon2Finder).dx;
     final iconCy = tester.getCenter(iconFinder).dy;
     final icon2Cy = tester.getCenter(icon2Finder).dy;
-    expect((iconCx - icon2Cx).abs(), lessThan(4),
-        reason: 'rail icons should share the same x (vertical strip)');
-    expect(iconCy, lessThan(icon2Cy),
-        reason: 'rail icons should stack vertically');
+    expect(
+      (iconCx - icon2Cx).abs(),
+      lessThan(4),
+      reason: 'rail icons should share the same x (vertical strip)',
+    );
+    expect(
+      iconCy,
+      lessThan(icon2Cy),
+      reason: 'rail icons should stack vertically',
+    );
   });
 
   testWidgets(
-      'landscapeMode=compact applies 4dp vertical padding to bar items',
-      (tester) async {
-    await tester.pumpObers(
-      _wrapMQ(
-        OiBottomBar(
-          items: _kItems,
-          currentIndex: 0,
-          onTap: (_) {},
-          landscapeMode: OiBottomBarLandscapeMode.compact,
+    'landscapeMode=compact applies 4dp vertical padding to bar items',
+    (tester) async {
+      await tester.pumpObers(
+        _wrapMQ(
+          OiBottomBar(
+            items: _kItems,
+            currentIndex: 0,
+            onTap: (_) {},
+            landscapeMode: OiBottomBarLandscapeMode.compact,
+          ),
+          const MediaQueryData(size: Size(500, 300)),
         ),
-        const MediaQueryData(size: Size(500, 300)),
-      ),
-    );
-    final paddingWidgets = tester.widgetList<Padding>(find.byType(Padding));
-    final has4dpVertical = paddingWidgets.any((p) {
-      final insets = p.padding.resolve(TextDirection.ltr);
-      return insets.top == 4.0 && insets.bottom == 4.0;
-    });
-    expect(has4dpVertical, isTrue,
-        reason: 'compact landscape mode should use 4dp vertical item padding');
-  });
+      );
+      final paddingWidgets = tester.widgetList<Padding>(find.byType(Padding));
+      final has4dpVertical = paddingWidgets.any((p) {
+        final insets = p.padding.resolve(TextDirection.ltr);
+        return insets.top == 4.0 && insets.bottom == 4.0;
+      });
+      expect(
+        has4dpVertical,
+        isTrue,
+        reason: 'compact landscape mode should use 4dp vertical item padding',
+      );
+    },
+  );
 }

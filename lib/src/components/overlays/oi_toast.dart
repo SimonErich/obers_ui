@@ -288,67 +288,67 @@ class _OiToastState extends State<OiToast> with SingleTickerProviderStateMixin {
       liveRegion: true,
       child: Container(
         constraints: const BoxConstraints(minWidth: 240, maxWidth: 400),
-      decoration: BoxDecoration(
-        color: colors.surface,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: colors.border),
-        boxShadow: [
-          BoxShadow(
-            color: colors.overlay.withValues(alpha: 0.12),
-            blurRadius: 16,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(8),
-        child: IntrinsicHeight(
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              // Colored left-border accent strip.
-              Container(width: 4, color: accent),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 12,
-                  ),
-                  child: Row(
-                    children: [
-                      Semantics(
-                        label: _iconSemanticLabel(),
-                        excludeSemantics: true,
-                        child: Text(
-                          _icon(),
-                          style: TextStyle(
-                            color: accent,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w700,
+        decoration: BoxDecoration(
+          color: colors.surface,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: colors.border),
+          boxShadow: [
+            BoxShadow(
+              color: colors.overlay.withValues(alpha: 0.12),
+              blurRadius: 16,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(8),
+          child: IntrinsicHeight(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // Colored left-border accent strip.
+                Container(width: 4, color: accent),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 12,
+                    ),
+                    child: Row(
+                      children: [
+                        Semantics(
+                          label: _iconSemanticLabel(),
+                          excludeSemantics: true,
+                          child: Text(
+                            _icon(),
+                            style: TextStyle(
+                              color: accent,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
+                            ),
                           ),
                         ),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          widget.message,
-                          style: textTheme.small.copyWith(color: colors.text),
-                        ),
-                      ),
-                      if (widget.action != null) ...[
                         const SizedBox(width: 8),
-                        widget.action!,
+                        Expanded(
+                          child: Text(
+                            widget.message,
+                            style: textTheme.small.copyWith(color: colors.text),
+                          ),
+                        ),
+                        if (widget.action != null) ...[
+                          const SizedBox(width: 8),
+                          widget.action!,
+                        ],
                       ],
-                    ],
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
-    ),
-  );
+    );
 
     if (widget.pauseOnHover) {
       toast = MouseRegion(

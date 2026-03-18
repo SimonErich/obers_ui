@@ -205,8 +205,9 @@ void main() {
   // ── OiButton accessibility (REQ-0019) ────────────────────────────────────
 
   group('OiButton accessibility', () {
-    testWidgets('should expose label as semantics for default constructor',
-        (tester) async {
+    testWidgets('should expose label as semantics for default constructor', (
+      tester,
+    ) async {
       await tester.pumpObers(const OiButton.primary(label: 'Submit'));
       final semanticsWidgets = tester.widgetList<Semantics>(
         find.byType(Semantics),
@@ -217,8 +218,9 @@ void main() {
       expect(matching, isNotEmpty);
     });
 
-    testWidgets('should expose label as semantics for .icon() constructor',
-        (tester) async {
+    testWidgets('should expose label as semantics for .icon() constructor', (
+      tester,
+    ) async {
       final handle = tester.ensureSemantics();
       try {
         await tester.pumpObers(
@@ -230,8 +232,9 @@ void main() {
       }
     });
 
-    testWidgets('should expose label as semantics for .ghost() constructor',
-        (tester) async {
+    testWidgets('should expose label as semantics for .ghost() constructor', (
+      tester,
+    ) async {
       await tester.pumpObers(const OiButton.ghost(label: 'Skip'));
       final semanticsWidgets = tester.widgetList<Semantics>(
         find.byType(Semantics),
@@ -243,17 +246,18 @@ void main() {
     });
 
     testWidgets(
-        'should expose label as semantics for .destructive() constructor',
-        (tester) async {
-      await tester.pumpObers(const OiButton.destructive(label: 'Remove'));
-      final semanticsWidgets = tester.widgetList<Semantics>(
-        find.byType(Semantics),
-      );
-      final matching = semanticsWidgets
-          .where((s) => s.properties.label == 'Remove')
-          .toList();
-      expect(matching, isNotEmpty);
-    });
+      'should expose label as semantics for .destructive() constructor',
+      (tester) async {
+        await tester.pumpObers(const OiButton.destructive(label: 'Remove'));
+        final semanticsWidgets = tester.widgetList<Semantics>(
+          find.byType(Semantics),
+        );
+        final matching = semanticsWidgets
+            .where((s) => s.properties.label == 'Remove')
+            .toList();
+        expect(matching, isNotEmpty);
+      },
+    );
   });
 
   // ── Semantics ──────────────────────────────────────────────────────────────
@@ -423,10 +427,7 @@ void main() {
     tester,
   ) async {
     final theme = OiThemeData.light();
-    await tester.pumpObers(
-      const OiButton.primary(label: 'Save'),
-      theme: theme,
-    );
+    await tester.pumpObers(const OiButton.primary(label: 'Save'), theme: theme);
     final containers = tester.widgetList<Container>(find.byType(Container));
     final colors = theme.colors;
     final found = containers.any((c) {
@@ -436,18 +437,20 @@ void main() {
     expect(found, isTrue);
   });
 
-  testWidgets('REQ-0146: primary foreground text uses primary.foreground color',
-      (tester) async {
-    final theme = OiThemeData.light();
-    await tester.pumpObers(
-      const OiButton.primary(label: 'Save'),
-      theme: theme,
-    );
-    final texts = tester.widgetList<Text>(find.byType(Text));
-    final expectedColor = theme.colors.primary.foreground;
-    final found = texts.any((t) => t.style?.color == expectedColor);
-    expect(found, isTrue);
-  });
+  testWidgets(
+    'REQ-0146: primary foreground text uses primary.foreground color',
+    (tester) async {
+      final theme = OiThemeData.light();
+      await tester.pumpObers(
+        const OiButton.primary(label: 'Save'),
+        theme: theme,
+      );
+      final texts = tester.widgetList<Text>(find.byType(Text));
+      final expectedColor = theme.colors.primary.foreground;
+      final found = texts.any((t) => t.style?.color == expectedColor);
+      expect(found, isTrue);
+    },
+  );
 
   // ── REQ-0147: secondary variant colors ────────────────────────────────────
 
@@ -482,6 +485,64 @@ void main() {
     expect(found, isTrue);
   });
 
+  // ── REQ-0149: destructive variant colors ──────────────────────────────────
+
+  testWidgets('REQ-0149: destructive background uses error.base color', (
+    tester,
+  ) async {
+    final theme = OiThemeData.light();
+    await tester.pumpObers(
+      const OiButton.destructive(label: 'Delete'),
+      theme: theme,
+    );
+    final containers = tester.widgetList<Container>(find.byType(Container));
+    final found = containers.any((c) {
+      final deco = c.decoration;
+      return deco is BoxDecoration && deco.color == theme.colors.error.base;
+    });
+    expect(found, isTrue);
+  });
+
+  testWidgets('REQ-0149: destructive foreground uses error.foreground color', (
+    tester,
+  ) async {
+    final theme = OiThemeData.light();
+    await tester.pumpObers(
+      const OiButton.destructive(label: 'Delete'),
+      theme: theme,
+    );
+    final texts = tester.widgetList<Text>(find.byType(Text));
+    final found = texts.any(
+      (t) => t.style?.color == theme.colors.error.foreground,
+    );
+    expect(found, isTrue);
+  });
+
+  // ── REQ-0150: soft variant colors ─────────────────────────────────────────
+
+  testWidgets('REQ-0150: soft background uses primary.muted color', (
+    tester,
+  ) async {
+    final theme = OiThemeData.light();
+    await tester.pumpObers(const OiButton.soft(label: 'Soft'), theme: theme);
+    final containers = tester.widgetList<Container>(find.byType(Container));
+    final found = containers.any((c) {
+      final deco = c.decoration;
+      return deco is BoxDecoration && deco.color == theme.colors.primary.muted;
+    });
+    expect(found, isTrue);
+  });
+
+  testWidgets('REQ-0150: soft foreground uses primary.base color', (
+    tester,
+  ) async {
+    final theme = OiThemeData.light();
+    await tester.pumpObers(const OiButton.soft(label: 'Soft'), theme: theme);
+    final texts = tester.widgetList<Text>(find.byType(Text));
+    final found = texts.any((t) => t.style?.color == theme.colors.primary.base);
+    expect(found, isTrue);
+  });
+
   // ── REQ-0148: outline variant colors ──────────────────────────────────────
 
   testWidgets('REQ-0148: outline background is transparent', (tester) async {
@@ -493,8 +554,7 @@ void main() {
     final containers = tester.widgetList<Container>(find.byType(Container));
     final found = containers.any((c) {
       final deco = c.decoration;
-      return deco is BoxDecoration &&
-          deco.color == const Color(0x00000000);
+      return deco is BoxDecoration && deco.color == const Color(0x00000000);
     });
     expect(found, isTrue);
   });
@@ -513,7 +573,8 @@ void main() {
       if (deco is! BoxDecoration) return false;
       final border = deco.border;
       if (border is! Border) return false;
-      return border.top.width > 0 && border.top.color != const Color(0x00000000);
+      return border.top.width > 0 &&
+          border.top.color != const Color(0x00000000);
     });
     expect(found, isTrue);
   });

@@ -69,10 +69,7 @@ void main() {
       tester,
     ) async {
       await tester.pumpObers(
-        const OiCard(
-          child: Text('body'),
-          footer: Text('footer content'),
-        ),
+        const OiCard(child: Text('body'), footer: Text('footer content')),
       );
       expect(find.text('footer content'), findsOneWidget);
       expect(find.byKey(_kDividerKey), findsOneWidget);
@@ -92,17 +89,16 @@ void main() {
       expect(find.byKey(_kDividerKey), findsNothing);
     });
 
-    testWidgets('footer renders with separator even when body is empty widget',
-        (tester) async {
-      await tester.pumpObers(
-        const OiCard(
-          child: SizedBox.shrink(),
-          footer: Text('footer only'),
-        ),
-      );
-      expect(find.text('footer only'), findsOneWidget);
-      expect(find.byKey(_kDividerKey), findsOneWidget);
-    });
+    testWidgets(
+      'footer renders with separator even when body is empty widget',
+      (tester) async {
+        await tester.pumpObers(
+          const OiCard(child: SizedBox.shrink(), footer: Text('footer only')),
+        );
+        expect(find.text('footer only'), findsOneWidget);
+        expect(find.byKey(_kDividerKey), findsOneWidget);
+      },
+    );
 
     testWidgets('padding parameter is forwarded to OiSurface', (tester) async {
       const customPadding = EdgeInsets.all(32);
@@ -114,9 +110,10 @@ void main() {
     });
 
     testWidgets('gradient parameter is forwarded to OiSurface', (tester) async {
-      final gradient = OiGradientStyle.linear(
-        const [Color(0xFF000000), Color(0xFFFFFFFF)],
-      );
+      final gradient = OiGradientStyle.linear(const [
+        Color(0xFF000000),
+        Color(0xFFFFFFFF),
+      ]);
       await tester.pumpObers(
         OiCard(gradient: gradient, child: const Text('body')),
       );
@@ -125,14 +122,8 @@ void main() {
     });
 
     testWidgets('halo parameter is forwarded to OiSurface', (tester) async {
-      const halo = OiHaloStyle(
-        color: Color(0x330000FF),
-        blur: 12,
-        spread: 4,
-      );
-      await tester.pumpObers(
-        const OiCard(halo: halo, child: Text('body')),
-      );
+      const halo = OiHaloStyle(color: Color(0x330000FF), blur: 12, spread: 4);
+      await tester.pumpObers(const OiCard(halo: halo, child: Text('body')));
       final surface = tester.widget<OiSurface>(find.byType(OiSurface));
       expect(surface.halo, equals(halo));
     });
@@ -159,11 +150,7 @@ void main() {
 
     testWidgets('label is set as semanticLabel on OiTappable', (tester) async {
       await tester.pumpObers(
-        OiCard(
-          onTap: () {},
-          label: 'My Card',
-          child: const Text('content'),
-        ),
+        OiCard(onTap: () {}, label: 'My Card', child: const Text('content')),
       );
       final tappable = tester.widget<OiTappable>(find.byType(OiTappable));
       expect(tappable.semanticLabel, equals('My Card'));
@@ -267,10 +254,7 @@ void main() {
 
     testWidgets('collapsible=false shows no chevron', (tester) async {
       await tester.pumpObers(
-        const OiCard(
-          title: Text('Title'),
-          child: Text('body'),
-        ),
+        const OiCard(title: Text('Title'), child: Text('body')),
       );
       expect(find.byType(Icon), findsNothing);
     });
@@ -341,24 +325,27 @@ void main() {
       expect(surface.padding, equals(const EdgeInsets.all(16)));
     });
 
-    testWidgets('explicit border overrides theme default for outlined variant',
-        (tester) async {
-      final customBorder = OiBorderStyle.solid(
-        const Color(0xFFFF0000),
-        2,
-        borderRadius: BorderRadius.circular(4),
-      );
-      await tester.pumpObers(
-        OiCard.outlined(border: customBorder, child: const Text('outlined')),
-      );
-      final surface = tester.widget<OiSurface>(find.byType(OiSurface));
-      expect(surface.border, equals(customBorder));
-    });
+    testWidgets(
+      'explicit border overrides theme default for outlined variant',
+      (tester) async {
+        final customBorder = OiBorderStyle.solid(
+          const Color(0xFFFF0000),
+          2,
+          borderRadius: BorderRadius.circular(4),
+        );
+        await tester.pumpObers(
+          OiCard.outlined(border: customBorder, child: const Text('outlined')),
+        );
+        final surface = tester.widget<OiSurface>(find.byType(OiSurface));
+        expect(surface.border, equals(customBorder));
+      },
+    );
 
     testWidgets('explicit gradient overrides null default', (tester) async {
-      final gradient = OiGradientStyle.linear(
-        const [Color(0xFF000000), Color(0xFFFFFFFF)],
-      );
+      final gradient = OiGradientStyle.linear(const [
+        Color(0xFF000000),
+        Color(0xFFFFFFFF),
+      ]);
       await tester.pumpObers(
         OiCard.flat(gradient: gradient, child: const Text('flat')),
       );
@@ -388,12 +375,13 @@ void main() {
     });
 
     testWidgets(
-        'OiCard.outlined uses theme defaultBorder when no explicit border set',
-        (tester) async {
-      await tester.pumpObers(OiCard.outlined(child: const Text('outlined')));
-      final surface = tester.widget<OiSurface>(find.byType(OiSurface));
-      expect(surface.border, isNotNull);
-    });
+      'OiCard.outlined uses theme defaultBorder when no explicit border set',
+      (tester) async {
+        await tester.pumpObers(OiCard.outlined(child: const Text('outlined')));
+        final surface = tester.widget<OiSurface>(find.byType(OiSurface));
+        expect(surface.border, isNotNull);
+      },
+    );
 
     testWidgets('halo is forwarded to OiSurface via OiCard.flat', (
       tester,

@@ -73,10 +73,7 @@ void main() {
     await tester.pumpObers(
       const OiStarRating(label: 'Overall rating', value: 3),
     );
-    expect(
-      find.bySemanticsLabel(RegExp('Overall rating')),
-      findsOneWidget,
-    );
+    expect(find.bySemanticsLabel(RegExp('Overall rating')), findsOneWidget);
   });
 
   testWidgets('arrow right increments value', (tester) async {
@@ -116,16 +113,10 @@ void main() {
     expect(received, 2.5);
   });
 
-  testWidgets('readOnly=true arrow keys do not fire onChanged', (
-    tester,
-  ) async {
+  testWidgets('readOnly=true arrow keys do not fire onChanged', (tester) async {
     double? received;
     await tester.pumpObers(
-      OiStarRating(
-        value: 3,
-        readOnly: true,
-        onChanged: (v) => received = v,
-      ),
+      OiStarRating(value: 3, readOnly: true, onChanged: (v) => received = v),
     );
     // No Focus widget in readOnly mode — key events should not fire onChanged.
     await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);
