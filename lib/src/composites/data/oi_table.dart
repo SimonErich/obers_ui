@@ -1177,15 +1177,15 @@ class _PaginationBar extends StatelessWidget {
                 enabled: pagination.hasPreviousPage,
                 onTap: pagination.previousPage,
               ),
-              for (final page in visiblePages)
-                if (page == null)
-                  const Padding(
-                    key: Key('pagination_ellipsis'),
-                    padding: EdgeInsets.symmetric(horizontal: 2),
-                    child: Text('\u2026'),
+              for (var i = 0; i < visiblePages.length; i++)
+                if (visiblePages[i] == null)
+                  Padding(
+                    key: Key('pagination_ellipsis_$i'),
+                    padding: const EdgeInsets.symmetric(horizontal: 2),
+                    child: const Text('\u2026'),
                   )
                 else
-                  _pageButton(page),
+                  _pageButton(visiblePages[i]!),
               _navButton(
                 key: const Key('pagination_next'),
                 label: '›',
@@ -1274,7 +1274,6 @@ class _PageSizeSelector extends StatefulWidget {
 }
 
 class _PageSizeSelectorState extends State<_PageSizeSelector> {
-  final LayerLink _layerLink = LayerLink();
   OverlayEntry? _overlayEntry;
 
   void _toggle() {
@@ -1286,6 +1285,9 @@ class _PageSizeSelectorState extends State<_PageSizeSelector> {
   }
 
   void _openOverlay() {
+    final box = context.findRenderObject()! as RenderBox;
+    final offset = box.localToGlobal(Offset.zero);
+
     final entry = OverlayEntry(
       builder: (_) => Stack(
         children: [
@@ -1295,50 +1297,55 @@ class _PageSizeSelectorState extends State<_PageSizeSelector> {
               onTap: _closeOverlay,
             ),
           ),
-          CompositedTransformFollower(
-            link: _layerLink,
-            targetAnchor: Alignment.topLeft,
-            followerAnchor: Alignment.bottomLeft,
-            child: Container(
-              key: const Key('pagination_page_size_dropdown'),
-              decoration: BoxDecoration(
-                color: const Color(0xFFFFFFFF),
-                border: Border.all(color: const Color(0xFFD1D5DB)),
-                borderRadius: BorderRadius.circular(4),
-                boxShadow: const [
-                  BoxShadow(
-                    color: Color(0x1A000000),
-                    blurRadius: 8,
-                    offset: Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  for (final size in widget.options)
-                    GestureDetector(
-                      key: Key('page_size_option_$size'),
-                      onTap: () {
-                        widget.onChanged(size);
-                        _closeOverlay();
-                      },
-                      behavior: HitTestBehavior.opaque,
-                      child: ColoredBox(
-                        color: size == widget.currentSize
-                            ? const Color(0xFFEFF6FF)
-                            : const Color(0x00000000),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 8,
-                          ),
-                          child: Text('$size'),
-                        ),
+          Positioned(
+            left: offset.dx,
+            top: 0,
+            height: offset.dy,
+            child: Align(
+              alignment: Alignment.bottomLeft,
+              child: IntrinsicWidth(
+                child: Container(
+                  key: const Key('pagination_page_size_dropdown'),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFFFFFF),
+                    border: Border.all(color: const Color(0xFFD1D5DB)),
+                    borderRadius: BorderRadius.circular(4),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Color(0x1A000000),
+                        blurRadius: 8,
+                        offset: Offset(0, 2),
                       ),
-                    ),
-                ],
+                    ],
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      for (final size in widget.options)
+                        GestureDetector(
+                          key: Key('page_size_option_$size'),
+                          onTap: () {
+                            widget.onChanged(size);
+                            _closeOverlay();
+                          },
+                          behavior: HitTestBehavior.opaque,
+                          child: ColoredBox(
+                            color: size == widget.currentSize
+                                ? const Color(0xFFEFF6FF)
+                                : const Color(0x00000000),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 8,
+                              ),
+                              child: Text('$size'),
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
               ),
             ),
           ),
@@ -1363,26 +1370,23 @@ class _PageSizeSelectorState extends State<_PageSizeSelector> {
 
   @override
   Widget build(BuildContext context) {
-    return CompositedTransformTarget(
-      link: _layerLink,
-      child: GestureDetector(
-        key: const Key('pagination_page_size'),
-        onTap: _toggle,
-        behavior: HitTestBehavior.opaque,
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-          decoration: BoxDecoration(
-            border: Border.all(color: const Color(0xFFD1D5DB)),
-            borderRadius: BorderRadius.circular(4),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text('${widget.currentSize}'),
-              const SizedBox(width: 4),
-              const Text('\u25be', style: TextStyle(fontSize: 10)),
-            ],
-          ),
+    return GestureDetector(
+      key: const Key('pagination_page_size'),
+      onTap: _toggle,
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        decoration: BoxDecoration(
+          border: Border.all(color: const Color(0xFFD1D5DB)),
+          borderRadius: BorderRadius.circular(4),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text('${widget.currentSize}'),
+            const SizedBox(width: 4),
+            const Text('\u25be', style: TextStyle(fontSize: 10)),
+          ],
         ),
       ),
     );
