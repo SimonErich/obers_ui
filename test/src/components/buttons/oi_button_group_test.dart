@@ -4,6 +4,7 @@
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:obers_ui/src/components/buttons/oi_button.dart';
 import 'package:obers_ui/src/components/buttons/oi_button_group.dart';
 import 'package:obers_ui/src/foundation/oi_app.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme_data.dart';
@@ -445,6 +446,96 @@ void main() {
         greaterThan(4),
         reason: 'items should be stacked vertically',
       );
+    },
+  );
+
+  testWidgets(
+    'wrap: connected group — each button stretches to full available width on compact',
+    (tester) async {
+      const groupWidth = 375.0;
+      await tester.pumpObers(
+        MediaQuery(
+          data: const MediaQueryData(size: Size(groupWidth, 812)),
+          child: Center(
+            child: SizedBox(
+              width: groupWidth,
+              child: const OiButtonGroup(
+                direction: Axis.horizontal,
+                wrap: true,
+                items: [
+                  OiButtonGroupItem(label: 'A'),
+                  OiButtonGroupItem(label: 'B'),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+      // Find all OiButton widgets inside the group.
+      final buttonFinder = find.descendant(
+        of: find.byType(OiButtonGroup),
+        matching: find.byType(OiButton),
+      );
+      expect(buttonFinder, findsNWidgets(2));
+
+      // The group is wrapped in OiSurface with a 1px border on each side,
+      // so the available width for buttons is groupWidth - 2.
+      final groupBox =
+          tester.renderObject<RenderBox>(find.byType(OiButtonGroup));
+      final groupRenderedWidth = groupBox.size.width;
+
+      for (final element in tester.elementList(buttonFinder)) {
+        final box = element.renderObject! as RenderBox;
+        expect(
+          box.size.width,
+          closeTo(groupRenderedWidth - 2, 1),
+          reason: 'Each button should stretch to full width minus border',
+        );
+      }
+    },
+  );
+
+  testWidgets(
+    'wrap: gapped group — each button stretches to full available width on compact',
+    (tester) async {
+      const groupWidth = 375.0;
+      await tester.pumpObers(
+        MediaQuery(
+          data: const MediaQueryData(size: Size(groupWidth, 812)),
+          child: Center(
+            child: SizedBox(
+              width: groupWidth,
+              child: const OiButtonGroup(
+                direction: Axis.horizontal,
+                wrap: true,
+                spacing: 8,
+                items: [
+                  OiButtonGroupItem(label: 'A'),
+                  OiButtonGroupItem(label: 'B'),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+      final buttonFinder = find.descendant(
+        of: find.byType(OiButtonGroup),
+        matching: find.byType(OiButton),
+      );
+      expect(buttonFinder, findsNWidgets(2));
+
+      final groupBox =
+          tester.renderObject<RenderBox>(find.byType(OiButtonGroup));
+      final groupRenderedWidth = groupBox.size.width;
+
+      for (final element in tester.elementList(buttonFinder)) {
+        final box = element.renderObject! as RenderBox;
+        expect(
+          box.size.width,
+          closeTo(groupRenderedWidth, 1),
+          reason: 'Each gapped button should stretch to full available width',
+        );
+      }
     },
   );
 

@@ -241,9 +241,16 @@ class _OiButtonGroupState extends State<OiButtonGroup> {
       }
     }
 
+    final isWrapping = direction != widget.direction;
     final content = direction == Axis.horizontal
         ? Row(mainAxisSize: MainAxisSize.min, children: children)
-        : Column(mainAxisSize: MainAxisSize.min, children: children);
+        : Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: isWrapping
+                ? CrossAxisAlignment.stretch
+                : CrossAxisAlignment.center,
+            children: children,
+          );
 
     return Focus(
       onKeyEvent: _onKeyEvent,
@@ -327,9 +334,16 @@ class _OiButtonGroupState extends State<OiButtonGroup> {
       }
     }
 
+    final isWrapping = direction != widget.direction;
     final Widget layout = direction == Axis.horizontal
         ? Row(mainAxisSize: MainAxisSize.min, children: separated)
-        : Column(mainAxisSize: MainAxisSize.min, children: separated);
+        : Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: isWrapping
+                ? CrossAxisAlignment.stretch
+                : CrossAxisAlignment.center,
+            children: separated,
+          );
 
     return Focus(onKeyEvent: _onKeyEvent, child: layout);
   }
