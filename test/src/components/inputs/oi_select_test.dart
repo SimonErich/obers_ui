@@ -33,6 +33,41 @@ void main() {
     expect(find.text('Banana'), findsOneWidget);
   });
 
+  testWidgets('closed trigger updates when value changes', (tester) async {
+    await tester.pumpObers(
+      const OiSelect<String>(options: _kOptions, value: 'a'),
+    );
+    expect(find.text('Apple'), findsOneWidget);
+
+    // Rebuild with a different value.
+    await tester.pumpObers(
+      const OiSelect<String>(options: _kOptions, value: 'b'),
+    );
+    expect(find.text('Banana'), findsOneWidget);
+    expect(find.text('Apple'), findsNothing);
+  });
+
+  testWidgets('closed trigger falls back to empty when no value and no placeholder', (tester) async {
+    await tester.pumpObers(
+      const OiSelect<String>(options: _kOptions),
+    );
+    // No placeholder text, no selected value — trigger should show empty string.
+    expect(find.text('Apple'), findsNothing);
+    expect(find.text('Banana'), findsNothing);
+  });
+
+  testWidgets('closed trigger shows placeholder when value does not match any option', (tester) async {
+    await tester.pumpObers(
+      const OiSelect<String>(
+        options: _kOptions,
+        value: 'nonexistent',
+        placeholder: 'Pick one',
+      ),
+    );
+    // Value 'nonexistent' doesn't match any option, so placeholder is shown.
+    expect(find.text('Pick one'), findsOneWidget);
+  });
+
   testWidgets('tapping opens dropdown', (tester) async {
     await tester.pumpObers(const OiSelect<String>(options: _kOptions));
     await tester.tap(find.byType(GestureDetector).first);
