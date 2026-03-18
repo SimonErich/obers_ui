@@ -1,5 +1,9 @@
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/src/foundation/persistence/oi_settings_driver.dart';
+import 'package:obers_ui/src/foundation/persistence/oi_settings_mixin.dart';
+import 'package:obers_ui/src/foundation/persistence/oi_settings_provider.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
+import 'package:obers_ui/src/models/settings/oi_accordion_settings.dart';
 import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
 
 /// A single section within an [OiAccordion].
@@ -40,6 +44,10 @@ class OiAccordion extends StatefulWidget {
   const OiAccordion({
     required this.sections,
     this.allowMultiple = false,
+    this.settingsDriver,
+    this.settingsKey,
+    this.settingsNamespace = 'oi_accordion',
+    this.settingsSaveDebounce = const Duration(milliseconds: 500),
     super.key,
   });
 
@@ -51,17 +59,61 @@ class OiAccordion extends StatefulWidget {
   /// Defaults to `false`.
   final bool allowMultiple;
 
+  // ── Settings persistence ──────────────────────────────────────────────────
+
+  /// Driver used to persist settings. When `null` settings are not persisted.
+  final OiSettingsDriver? settingsDriver;
+
+  /// Sub-key scoping this accordion's settings within [settingsNamespace].
+  final String? settingsKey;
+
+  /// Top-level namespace for settings storage.
+  final String settingsNamespace;
+
+  /// Debounce duration for auto-saving settings after changes.
+  final Duration settingsSaveDebounce;
+
   @override
   State<OiAccordion> createState() => _OiAccordionState();
 }
 
 class _OiAccordionState extends State<OiAccordion>
-    with TickerProviderStateMixin {
+    with TickerProviderStateMixin, OiSettingsMixin<OiAccordion, OiAccordionSettings> {
   late List<AnimationController> _controllers;
   late List<Animation<double>> _animations;
 
+  /// Resolved driver: explicit widget prop → OiSettingsProvider → null.
+  OiSettingsDriver? _resolvedDriver;
+
+  // ── OiSettingsMixin contract ───────────────────────────────────────────────
+
+  @override
+  String get settingsNamespace => widget.settingsNamespace;
+
+  @override
+  String? get settingsKey => widget.settingsKey;
+
+  @override
+  OiSettingsDriver? get settingsDriver => _resolvedDriver;
+
+  @override
+  OiAccordionSettings get defaultSettings => const OiAccordionSettings();
+
+  @override
+  OiAccordionSettings deserializeSettings(Map<String, dynamic> json) =>
+      OiAccordionSettings.fromJson(json);
+
+  @override
+  OiAccordionSettings mergeSettings(
+    OiAccordionSettings saved,
+    OiAccordionSettings defaults,
+  ) => saved.mergeWith(defaults);
+
+  // ── Lifecycle ──────────────────────────────────────────────────────────────
+
   @override
   void initState() {
+    _resolvedDriver = widget.settingsDriver;
     super.initState();
     _controllers = List.generate(widget.sections.length, (i) {
       final section = widget.sections[i];
@@ -74,6 +126,43 @@ class _OiAccordionState extends State<OiAccordion>
     _animations = _controllers.map((c) {
       return CurvedAnimation(parent: c, curve: Curves.easeInOut);
     }).toList();
+    if (settingsLoaded && settingsDriver != null) {
+      _applySettings(currentSettings);
+    }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final newDriver =
+        widget.settingsDriver ?? OiSettingsProvider.of(context);
+    if (newDriver != _resolvedDriver) {
+      _resolvedDriver = newDriver;
+      if (settingsLoaded) {
+        reloadSettings();
+      }
+    }
+    if (settingsLoaded && settingsDriver != null) {
+      _applySettings(currentSettings);
+    }
+  }
+
+  void _applySettings(OiAccordionSettings settings) {
+    for (var i = 0; i < _controllers.length; i++) {
+      if (settings.expandedIndices.contains(i)) {
+        _controllers[i].value = 1.0;
+      }
+    }
+  }
+
+  OiAccordionSettings _toSettings() {
+    final expanded = <int>{};
+    for (var i = 0; i < _controllers.length; i++) {
+      if (_controllers[i].value > 0) {
+        expanded.add(i);
+      }
+    }
+    return OiAccordionSettings(expandedIndices: expanded);
   }
 
   @override
@@ -101,6 +190,7 @@ class _OiAccordionState extends State<OiAccordion>
     } else {
       _controllers[index].forward();
     }
+    updateSettings(_toSettings(), debounce: widget.settingsSaveDebounce);
   }
 
   @override

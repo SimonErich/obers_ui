@@ -1,6 +1,10 @@
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/src/foundation/persistence/oi_settings_driver.dart';
+import 'package:obers_ui/src/foundation/persistence/oi_settings_mixin.dart';
+import 'package:obers_ui/src/foundation/persistence/oi_settings_provider.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
+import 'package:obers_ui/src/models/settings/oi_tabs_settings.dart';
 import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
 
 /// A single tab entry in an [OiTabs] bar.
@@ -62,6 +66,10 @@ class OiTabs extends StatefulWidget {
     this.indicatorStyle = OiTabIndicatorStyle.underline,
     this.scrollable = false,
     this.content,
+    this.settingsDriver,
+    this.settingsKey,
+    this.settingsNamespace = 'oi_tabs',
+    this.settingsSaveDebounce = const Duration(milliseconds: 500),
     super.key,
   });
 
@@ -83,18 +91,78 @@ class OiTabs extends StatefulWidget {
   /// Optional content widget rendered below the tab bar.
   final Widget? content;
 
+  // ── Settings persistence ──────────────────────────────────────────────────
+
+  /// Driver used to persist settings. When `null` settings are not persisted.
+  final OiSettingsDriver? settingsDriver;
+
+  /// Sub-key scoping this tabs' settings within [settingsNamespace].
+  final String? settingsKey;
+
+  /// Top-level namespace for settings storage.
+  final String settingsNamespace;
+
+  /// Debounce duration for auto-saving settings after changes.
+  final Duration settingsSaveDebounce;
+
   @override
   State<OiTabs> createState() => _OiTabsState();
 }
 
-class _OiTabsState extends State<OiTabs> {
+class _OiTabsState extends State<OiTabs>
+    with OiSettingsMixin<OiTabs, OiTabsSettings> {
   // Track each tab's key so we can measure positions for the pill indicator.
   late List<GlobalKey> _tabKeys;
 
+  /// Resolved driver: explicit widget prop → OiSettingsProvider → null.
+  OiSettingsDriver? _resolvedDriver;
+
+  // ── OiSettingsMixin contract ───────────────────────────────────────────────
+
+  @override
+  String get settingsNamespace => widget.settingsNamespace;
+
+  @override
+  String? get settingsKey => widget.settingsKey;
+
+  @override
+  OiSettingsDriver? get settingsDriver => _resolvedDriver;
+
+  @override
+  OiTabsSettings get defaultSettings => OiTabsSettings(
+    selectedIndex: widget.selectedIndex,
+  );
+
+  @override
+  OiTabsSettings deserializeSettings(Map<String, dynamic> json) =>
+      OiTabsSettings.fromJson(json);
+
+  @override
+  OiTabsSettings mergeSettings(
+    OiTabsSettings saved,
+    OiTabsSettings defaults,
+  ) => saved.mergeWith(defaults);
+
+  // ── Lifecycle ──────────────────────────────────────────────────────────────
+
   @override
   void initState() {
+    _resolvedDriver = widget.settingsDriver;
     super.initState();
     _tabKeys = List.generate(widget.tabs.length, (_) => GlobalKey());
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final newDriver =
+        widget.settingsDriver ?? OiSettingsProvider.of(context);
+    if (newDriver != _resolvedDriver) {
+      _resolvedDriver = newDriver;
+      if (settingsLoaded) {
+        reloadSettings();
+      }
+    }
   }
 
   @override
@@ -102,6 +170,12 @@ class _OiTabsState extends State<OiTabs> {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.tabs.length != widget.tabs.length) {
       _tabKeys = List.generate(widget.tabs.length, (_) => GlobalKey());
+    }
+    if (oldWidget.selectedIndex != widget.selectedIndex) {
+      updateSettings(
+        OiTabsSettings(selectedIndex: widget.selectedIndex),
+        debounce: widget.settingsSaveDebounce,
+      );
     }
   }
 

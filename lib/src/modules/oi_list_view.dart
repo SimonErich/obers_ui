@@ -6,7 +6,12 @@ import 'package:obers_ui/src/components/overlays/oi_sheet.dart';
 import 'package:obers_ui/src/composites/navigation/oi_filter_bar.dart';
 import 'package:obers_ui/src/foundation/oi_app.dart';
 import 'package:obers_ui/src/foundation/oi_responsive.dart';
+import 'package:obers_ui/src/foundation/persistence/oi_settings_driver.dart';
+import 'package:obers_ui/src/foundation/persistence/oi_settings_mixin.dart';
+import 'package:obers_ui/src/foundation/persistence/oi_settings_provider.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
+import 'package:obers_ui/src/models/settings/oi_list_view_settings.dart'
+    hide OiListViewLayout;
 import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
 
 // ---------------------------------------------------------------------------
@@ -93,6 +98,10 @@ class OiListView<T> extends StatefulWidget {
     this.layout = OiListViewLayout.list,
     this.headerActions,
     this.onRefresh,
+    this.settingsDriver,
+    this.settingsKey,
+    this.settingsNamespace = 'oi_list_view',
+    this.settingsSaveDebounce = const Duration(milliseconds: 500),
   });
 
   /// The data items to display.
@@ -164,24 +173,82 @@ class OiListView<T> extends StatefulWidget {
   /// Called when the user triggers a pull-to-refresh.
   final Future<void> Function()? onRefresh;
 
+  // ── Settings persistence ──────────────────────────────────────────────────
+
+  /// Driver used to persist settings. When `null` settings are not persisted.
+  final OiSettingsDriver? settingsDriver;
+
+  /// Sub-key scoping this list view's settings within [settingsNamespace].
+  final String? settingsKey;
+
+  /// Top-level namespace for settings storage.
+  final String settingsNamespace;
+
+  /// Debounce duration for auto-saving settings after changes.
+  final Duration settingsSaveDebounce;
+
   @override
   State<OiListView<T>> createState() => _OiListViewState<T>();
 }
 
-class _OiListViewState<T> extends State<OiListView<T>> {
+class _OiListViewState<T> extends State<OiListView<T>>
+    with OiSettingsMixin<OiListView<T>, OiListViewSettings> {
   final ScrollController _scrollController = ScrollController();
   bool _isRefreshing = false;
   double _overscrollAccumulated = 0;
   VoidCallback? _dismissFilterSheet;
 
+  /// Resolved driver: explicit widget prop → OiSettingsProvider → null.
+  OiSettingsDriver? _resolvedDriver;
+
+  // ── OiSettingsMixin contract ───────────────────────────────────────────────
+
+  @override
+  String get settingsNamespace => widget.settingsNamespace;
+
+  @override
+  String? get settingsKey => widget.settingsKey;
+
+  @override
+  OiSettingsDriver? get settingsDriver => _resolvedDriver;
+
+  @override
+  OiListViewSettings get defaultSettings => const OiListViewSettings();
+
+  @override
+  OiListViewSettings deserializeSettings(Map<String, dynamic> json) =>
+      OiListViewSettings.fromJson(json);
+
+  @override
+  OiListViewSettings mergeSettings(
+    OiListViewSettings saved,
+    OiListViewSettings defaults,
+  ) => saved.mergeWith(defaults);
+
   bool get _refreshEnabled =>
       widget.onRefresh != null &&
       OiDensityScope.of(context) == OiDensity.comfortable;
 
+  // ── Lifecycle ──────────────────────────────────────────────────────────────
+
   @override
   void initState() {
+    _resolvedDriver = widget.settingsDriver;
     super.initState();
     _scrollController.addListener(_onScroll);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final newDriver =
+        widget.settingsDriver ?? OiSettingsProvider.of(context);
+    if (newDriver != _resolvedDriver) {
+      _resolvedDriver = newDriver;
+      if (settingsLoaded) {
+        reloadSettings();
+      }
+    }
   }
 
   @override

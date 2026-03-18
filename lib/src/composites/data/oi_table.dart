@@ -793,6 +793,9 @@ class _OiTableState<T> extends State<OiTable<T>>
   }
 
   Widget _buildFlatBody(List<T> rows) {
+    if (widget.reorderable) {
+      return _buildReorderableBody(rows);
+    }
     return ListView.builder(
       controller: _scrollController,
       itemCount: rows.length + (_loadingMore ? 1 : 0),
@@ -805,6 +808,31 @@ class _OiTableState<T> extends State<OiTable<T>>
         }
         return _buildRow(rows[i], i);
       },
+    );
+  }
+
+  Widget _buildReorderableBody(List<T> rows) {
+    return CustomScrollView(
+      controller: _scrollController,
+      slivers: [
+        SliverReorderableList(
+          itemCount: rows.length,
+          onReorder: (oldIndex, newIndex) {
+            widget.onRowReordered?.call(oldIndex, newIndex);
+          },
+          itemBuilder: (context, index) {
+            return ReorderableDragStartListener(
+              key: ValueKey('reorderable_row_$index'),
+              index: index,
+              child: _buildRow(
+                rows[index],
+                index,
+                key: ValueKey('reorderable_row_$index'),
+              ),
+            );
+          },
+        ),
+      ],
     );
   }
 

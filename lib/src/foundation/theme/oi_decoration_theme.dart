@@ -13,6 +13,16 @@ enum OiBorderLineStyle {
 
   /// A repeating dot pattern.
   dotted,
+
+  /// A double-line border.
+  // ignore: constant_identifier_names
+  double_,
+
+  /// A gradient-stroked border.
+  gradient,
+
+  /// No visible border.
+  none,
 }
 
 /// Describes the visual style of a border used in the design system.
@@ -30,6 +40,8 @@ class OiBorderStyle {
     required this.width,
     this.gradient,
     this.borderRadius,
+    this.dashLength,
+    this.dashGap,
   });
 
   /// Creates a solid border with the given [color] and [width].
@@ -124,6 +136,16 @@ class OiBorderStyle {
   /// Optional corner radius applied to the border.
   final BorderRadius? borderRadius;
 
+  /// The length of each dash in a dashed border, in logical pixels.
+  ///
+  /// Only applicable when [lineStyle] is [OiBorderLineStyle.dashed].
+  final double? dashLength;
+
+  /// The gap between dashes in a dashed border, in logical pixels.
+  ///
+  /// Only applicable when [lineStyle] is [OiBorderLineStyle.dashed].
+  final double? dashGap;
+
   /// Creates a copy with optionally overridden values.
   OiBorderStyle copyWith({
     OiBorderLineStyle? lineStyle,
@@ -131,6 +153,8 @@ class OiBorderStyle {
     double? width,
     Gradient? gradient,
     BorderRadius? borderRadius,
+    double? dashLength,
+    double? dashGap,
   }) {
     return OiBorderStyle(
       lineStyle: lineStyle ?? this.lineStyle,
@@ -138,6 +162,8 @@ class OiBorderStyle {
       width: width ?? this.width,
       gradient: gradient ?? this.gradient,
       borderRadius: borderRadius ?? this.borderRadius,
+      dashLength: dashLength ?? this.dashLength,
+      dashGap: dashGap ?? this.dashGap,
     );
   }
 
@@ -149,12 +175,21 @@ class OiBorderStyle {
         other.color == color &&
         other.width == width &&
         other.gradient == gradient &&
-        other.borderRadius == borderRadius;
+        other.borderRadius == borderRadius &&
+        other.dashLength == dashLength &&
+        other.dashGap == dashGap;
   }
 
   @override
-  int get hashCode =>
-      Object.hash(lineStyle, color, width, gradient, borderRadius);
+  int get hashCode => Object.hash(
+    lineStyle,
+    color,
+    width,
+    gradient,
+    borderRadius,
+    dashLength,
+    dashGap,
+  );
 }
 
 /// Describes a gradient used for backgrounds, borders, or overlays.
@@ -327,6 +362,14 @@ class OiDecorationTheme {
     required this.focusBorder,
     required this.errorBorder,
     required this.gradients,
+    this.surfaceGradient,
+    this.cardGradient,
+    this.pageGradient,
+    this.surfaceBorder,
+    this.cardBorder,
+    this.inputBorder,
+    this.componentGradients,
+    this.componentBorders,
   });
 
   /// Creates the standard decoration theme from [primaryColor] and [errorColor].
@@ -375,18 +418,58 @@ class OiDecorationTheme {
   /// A named map of gradient styles available to components.
   final Map<String, OiGradientStyle> gradients;
 
+  /// An optional gradient applied to surface widgets.
+  final OiGradientStyle? surfaceGradient;
+
+  /// An optional gradient applied to card widgets.
+  final OiGradientStyle? cardGradient;
+
+  /// An optional gradient applied to page-level backgrounds.
+  final OiGradientStyle? pageGradient;
+
+  /// An optional border style for surface widgets.
+  final OiBorderStyle? surfaceBorder;
+
+  /// An optional border style for card widgets.
+  final OiBorderStyle? cardBorder;
+
+  /// An optional border style for input widgets.
+  final OiBorderStyle? inputBorder;
+
+  /// Per-component gradient overrides keyed by component [Type].
+  final Map<Type, OiGradientStyle>? componentGradients;
+
+  /// Per-component border overrides keyed by component [Type].
+  final Map<Type, OiBorderStyle>? componentBorders;
+
   /// Creates a copy with optionally overridden values.
   OiDecorationTheme copyWith({
     OiBorderStyle? defaultBorder,
     OiBorderStyle? focusBorder,
     OiBorderStyle? errorBorder,
     Map<String, OiGradientStyle>? gradients,
+    OiGradientStyle? surfaceGradient,
+    OiGradientStyle? cardGradient,
+    OiGradientStyle? pageGradient,
+    OiBorderStyle? surfaceBorder,
+    OiBorderStyle? cardBorder,
+    OiBorderStyle? inputBorder,
+    Map<Type, OiGradientStyle>? componentGradients,
+    Map<Type, OiBorderStyle>? componentBorders,
   }) {
     return OiDecorationTheme(
       defaultBorder: defaultBorder ?? this.defaultBorder,
       focusBorder: focusBorder ?? this.focusBorder,
       errorBorder: errorBorder ?? this.errorBorder,
       gradients: gradients ?? this.gradients,
+      surfaceGradient: surfaceGradient ?? this.surfaceGradient,
+      cardGradient: cardGradient ?? this.cardGradient,
+      pageGradient: pageGradient ?? this.pageGradient,
+      surfaceBorder: surfaceBorder ?? this.surfaceBorder,
+      cardBorder: cardBorder ?? this.cardBorder,
+      inputBorder: inputBorder ?? this.inputBorder,
+      componentGradients: componentGradients ?? this.componentGradients,
+      componentBorders: componentBorders ?? this.componentBorders,
     );
   }
 
@@ -401,14 +484,30 @@ class OiDecorationTheme {
     for (final key in gradients.keys) {
       if (gradients[key] != other.gradients[key]) return false;
     }
+    if (other.surfaceGradient != surfaceGradient) return false;
+    if (other.cardGradient != cardGradient) return false;
+    if (other.pageGradient != pageGradient) return false;
+    if (other.surfaceBorder != surfaceBorder) return false;
+    if (other.cardBorder != cardBorder) return false;
+    if (other.inputBorder != inputBorder) return false;
+    if (other.componentGradients != componentGradients) return false;
+    if (other.componentBorders != componentBorders) return false;
     return true;
   }
 
   @override
-  int get hashCode => Object.hash(
+  int get hashCode => Object.hashAll([
     defaultBorder,
     focusBorder,
     errorBorder,
     Object.hashAll(gradients.entries.map((e) => Object.hash(e.key, e.value))),
-  );
+    surfaceGradient,
+    cardGradient,
+    pageGradient,
+    surfaceBorder,
+    cardBorder,
+    inputBorder,
+    componentGradients,
+    componentBorders,
+  ]);
 }

@@ -296,12 +296,14 @@ export 'src/models/settings/oi_accordion_settings.dart';
 export 'src/models/settings/oi_calendar_settings.dart';
 export 'src/models/settings/oi_dashboard_settings.dart';
 export 'src/models/settings/oi_file_explorer_settings.dart';
+export 'src/models/settings/oi_filter_bar_settings.dart';
 export 'src/models/settings/oi_gantt_settings.dart';
 export 'src/models/settings/oi_kanban_settings.dart';
 export 'src/models/settings/oi_list_view_settings.dart' hide OiListViewLayout;
 export 'src/models/settings/oi_sidebar_settings.dart' hide OiSidebarMode;
 export 'src/models/settings/oi_split_pane_settings.dart';
 export 'src/models/settings/oi_table_settings.dart';
+export 'src/models/settings/oi_tabs_settings.dart';
 
 // ── Utils ────────────────────────────────────────────────────────────────────
 

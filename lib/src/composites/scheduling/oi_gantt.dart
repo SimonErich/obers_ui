@@ -1,7 +1,11 @@
 import 'dart:math' as math;
 
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/src/foundation/persistence/oi_settings_driver.dart';
+import 'package:obers_ui/src/foundation/persistence/oi_settings_mixin.dart';
+import 'package:obers_ui/src/foundation/persistence/oi_settings_provider.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
+import 'package:obers_ui/src/models/settings/oi_gantt_settings.dart';
 
 /// A task in the Gantt chart.
 ///
@@ -85,6 +89,10 @@ class OiGantt extends StatefulWidget {
     this.showWeekends = true,
     this.groupBy,
     this.groupHeader,
+    this.settingsDriver,
+    this.settingsKey,
+    this.settingsNamespace = 'oi_gantt',
+    this.settingsSaveDebounce = const Duration(milliseconds: 500),
   });
 
   /// The list of tasks to display.
@@ -127,17 +135,100 @@ class OiGantt extends StatefulWidget {
   /// A builder for group header widgets.
   final Widget Function(Object key)? groupHeader;
 
+  // ── Settings persistence ──────────────────────────────────────────────────
+
+  /// Driver used to persist settings. When `null` settings are not persisted.
+  final OiSettingsDriver? settingsDriver;
+
+  /// Sub-key scoping this gantt's settings within [settingsNamespace].
+  final String? settingsKey;
+
+  /// Top-level namespace for settings storage.
+  final String settingsNamespace;
+
+  /// Debounce duration for auto-saving settings after changes.
+  final Duration settingsSaveDebounce;
+
   @override
   State<OiGantt> createState() => _OiGanttState();
 }
 
-class _OiGanttState extends State<OiGantt> {
+class _OiGanttState extends State<OiGantt>
+    with OiSettingsMixin<OiGantt, OiGanttSettings> {
   late ScrollController _horizontalScroll;
+
+  /// Resolved driver: explicit widget prop → OiSettingsProvider → null.
+  OiSettingsDriver? _resolvedDriver;
+
+  // ── OiSettingsMixin contract ───────────────────────────────────────────────
+
+  @override
+  String get settingsNamespace => widget.settingsNamespace;
+
+  @override
+  String? get settingsKey => widget.settingsKey;
+
+  @override
+  OiSettingsDriver? get settingsDriver => _resolvedDriver;
+
+  @override
+  OiGanttSettings get defaultSettings => const OiGanttSettings();
+
+  @override
+  OiGanttSettings deserializeSettings(Map<String, dynamic> json) =>
+      OiGanttSettings.fromJson(json);
+
+  @override
+  OiGanttSettings mergeSettings(
+    OiGanttSettings saved,
+    OiGanttSettings defaults,
+  ) => saved.mergeWith(defaults);
+
+  // ── Lifecycle ──────────────────────────────────────────────────────────────
 
   @override
   void initState() {
+    _resolvedDriver = widget.settingsDriver;
     super.initState();
     _horizontalScroll = ScrollController();
+    _horizontalScroll.addListener(_onScroll);
+    if (settingsLoaded && settingsDriver != null) {
+      _applySettings(currentSettings);
+    }
+  }
+
+  void _onScroll() {
+    updateSettings(_toSettings(), debounce: widget.settingsSaveDebounce);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final newDriver =
+        widget.settingsDriver ?? OiSettingsProvider.of(context);
+    if (newDriver != _resolvedDriver) {
+      _resolvedDriver = newDriver;
+      if (settingsLoaded) {
+        reloadSettings();
+      }
+    }
+    if (settingsLoaded && settingsDriver != null) {
+      _applySettings(currentSettings);
+    }
+  }
+
+  void _applySettings(OiGanttSettings settings) {
+    if (settings.scrollPosition > 0 && _horizontalScroll.hasClients) {
+      _horizontalScroll.jumpTo(settings.scrollPosition);
+    }
+  }
+
+  OiGanttSettings _toSettings() {
+    return OiGanttSettings(
+      scrollPosition: _horizontalScroll.hasClients
+          ? _horizontalScroll.offset
+          : 0.0,
+    );
   }
 
   @override

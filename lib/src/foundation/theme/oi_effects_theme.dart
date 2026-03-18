@@ -1,5 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/painting.dart';
+import 'package:flutter/services.dart';
+
+import 'package:obers_ui/src/foundation/theme/oi_decoration_theme.dart';
 
 /// Defines the focus ring border rendered around a focused widget.
 ///
@@ -87,6 +90,8 @@ class OiHaloStyle {
     required this.color,
     required this.spread,
     required this.blur,
+    this.opacity,
+    this.offset = Offset.zero,
   });
 
   /// Creates a halo from [color] with default intensity.
@@ -97,6 +102,7 @@ class OiHaloStyle {
       color: color.withValues(alpha: intensity),
       spread: 2,
       blur: 8,
+      opacity: intensity,
     );
   }
 
@@ -105,6 +111,7 @@ class OiHaloStyle {
     color: Color(0x00000000),
     spread: 0,
     blur: 0,
+    opacity: 0,
   );
 
   /// The glow color (including alpha for intensity).
@@ -116,17 +123,42 @@ class OiHaloStyle {
   /// The shadow blur radius in logical pixels.
   final double blur;
 
+  /// The opacity of the halo effect (0.0–1.0).
+  ///
+  /// When provided, this value overrides the alpha channel of [color].
+  final double? opacity;
+
+  /// The offset of the halo from the widget center.
+  ///
+  /// Defaults to [Offset.zero].
+  final Offset offset;
+
   /// Converts this halo style to a [BoxShadow] for rendering.
   BoxShadow toBoxShadow() {
-    return BoxShadow(color: color, spreadRadius: spread, blurRadius: blur);
+    final effectiveColor =
+        opacity != null ? color.withValues(alpha: opacity!) : color;
+    return BoxShadow(
+      color: effectiveColor,
+      spreadRadius: spread,
+      blurRadius: blur,
+      offset: offset,
+    );
   }
 
   /// Creates a copy with optionally overridden values.
-  OiHaloStyle copyWith({Color? color, double? spread, double? blur}) {
+  OiHaloStyle copyWith({
+    Color? color,
+    double? spread,
+    double? blur,
+    double? opacity,
+    Offset? offset,
+  }) {
     return OiHaloStyle(
       color: color ?? this.color,
       spread: spread ?? this.spread,
       blur: blur ?? this.blur,
+      opacity: opacity ?? this.opacity,
+      offset: offset ?? this.offset,
     );
   }
 
@@ -136,11 +168,13 @@ class OiHaloStyle {
     return other is OiHaloStyle &&
         other.color == color &&
         other.spread == spread &&
-        other.blur == blur;
+        other.blur == blur &&
+        other.opacity == opacity &&
+        other.offset == offset;
   }
 
   @override
-  int get hashCode => Object.hash(color, spread, blur);
+  int get hashCode => Object.hash(color, spread, blur, opacity, offset);
 }
 
 /// Visual styling for a single interactive state (hover, focus, etc.).
@@ -156,6 +190,15 @@ class OiInteractiveStyle {
     required this.backgroundOverlay,
     required this.halo,
     this.scale = 1.0,
+    this.backgroundOverride,
+    this.borderColor,
+    this.textColor,
+    this.opacity,
+    this.translate,
+    this.elevationDelta,
+    this.border,
+    this.gradient,
+    this.cursor,
   });
 
   /// No visual change — transparent background, no halo.
@@ -164,27 +207,92 @@ class OiInteractiveStyle {
     halo: OiHaloStyle.none,
   );
 
+  /// An optional background color that replaces the widget's background
+  /// entirely when this state is active.
+  final Color? backgroundOverride;
+
   /// Semi-transparent overlay tinted over the widget background.
   final Color backgroundOverlay;
 
-  /// The halo/glow rendered around the widget in this state.
-  final OiHaloStyle halo;
+  /// An optional border color applied when this state is active.
+  final Color? borderColor;
+
+  /// An optional text color applied when this state is active.
+  final Color? textColor;
+
+  /// An optional opacity applied to the widget (0.0–1.0).
+  final double? opacity;
 
   /// Scale transform applied to the widget in this state. Default is 1.0.
   ///
   /// For active/pressed states, this is typically 0.97 or 0.98.
   final double scale;
 
+  /// An optional translation offset applied to the widget.
+  final Offset? translate;
+
+  /// An optional elevation change applied in this state.
+  final double? elevationDelta;
+
+  /// The halo/glow rendered around the widget in this state.
+  final OiHaloStyle halo;
+
+  /// An optional border style applied when this state is active.
+  final OiBorderStyle? border;
+
+  /// An optional gradient applied when this state is active.
+  final OiGradientStyle? gradient;
+
+  /// An optional mouse cursor applied when this state is active.
+  final MouseCursor? cursor;
+
+  /// Merges this style with a [base] style. Non-null values in this style
+  /// take precedence over values in [base].
+  OiInteractiveStyle merge(OiInteractiveStyle base) {
+    return OiInteractiveStyle(
+      backgroundOverride: backgroundOverride ?? base.backgroundOverride,
+      backgroundOverlay: backgroundOverlay,
+      borderColor: borderColor ?? base.borderColor,
+      textColor: textColor ?? base.textColor,
+      opacity: opacity ?? base.opacity,
+      scale: scale != 1.0 ? scale : base.scale,
+      translate: translate ?? base.translate,
+      elevationDelta: elevationDelta ?? base.elevationDelta,
+      halo: halo,
+      border: border ?? base.border,
+      gradient: gradient ?? base.gradient,
+      cursor: cursor ?? base.cursor,
+    );
+  }
+
   /// Creates a copy with optionally overridden values.
   OiInteractiveStyle copyWith({
+    Color? backgroundOverride,
     Color? backgroundOverlay,
-    OiHaloStyle? halo,
+    Color? borderColor,
+    Color? textColor,
+    double? opacity,
     double? scale,
+    Offset? translate,
+    double? elevationDelta,
+    OiHaloStyle? halo,
+    OiBorderStyle? border,
+    OiGradientStyle? gradient,
+    MouseCursor? cursor,
   }) {
     return OiInteractiveStyle(
+      backgroundOverride: backgroundOverride ?? this.backgroundOverride,
       backgroundOverlay: backgroundOverlay ?? this.backgroundOverlay,
-      halo: halo ?? this.halo,
+      borderColor: borderColor ?? this.borderColor,
+      textColor: textColor ?? this.textColor,
+      opacity: opacity ?? this.opacity,
       scale: scale ?? this.scale,
+      translate: translate ?? this.translate,
+      elevationDelta: elevationDelta ?? this.elevationDelta,
+      halo: halo ?? this.halo,
+      border: border ?? this.border,
+      gradient: gradient ?? this.gradient,
+      cursor: cursor ?? this.cursor,
     );
   }
 
@@ -192,13 +300,35 @@ class OiInteractiveStyle {
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
     return other is OiInteractiveStyle &&
+        other.backgroundOverride == backgroundOverride &&
         other.backgroundOverlay == backgroundOverlay &&
+        other.borderColor == borderColor &&
+        other.textColor == textColor &&
+        other.opacity == opacity &&
+        other.scale == scale &&
+        other.translate == translate &&
+        other.elevationDelta == elevationDelta &&
         other.halo == halo &&
-        other.scale == scale;
+        other.border == border &&
+        other.gradient == gradient &&
+        other.cursor == cursor;
   }
 
   @override
-  int get hashCode => Object.hash(backgroundOverlay, halo, scale);
+  int get hashCode => Object.hashAll([
+    backgroundOverride,
+    backgroundOverlay,
+    borderColor,
+    textColor,
+    opacity,
+    scale,
+    translate,
+    elevationDelta,
+    halo,
+    border,
+    gradient,
+    cursor,
+  ]);
 }
 
 /// The complete set of interactive state effects for the design system.
@@ -218,6 +348,11 @@ class OiEffectsTheme {
     required this.selected,
     required this.dragging,
     required this.focusRing,
+    this.halo,
+    this.haloFocus,
+    this.haloError,
+    this.stateTransition = const Duration(milliseconds: 150),
+    this.stateTransitionCurve = Curves.easeInOut,
   });
 
   /// Creates the standard effects theme using [primaryColor] for focus/hover halos.
@@ -247,6 +382,9 @@ class OiEffectsTheme {
         scale: 1.03,
       ),
       focusRing: OiFocusRingStyle.standard(primaryColor),
+      halo: OiHaloStyle.from(primaryColor),
+      haloFocus: OiHaloStyle.from(primaryColor, intensity: 0.25),
+      haloError: null,
     );
   }
 
@@ -274,6 +412,21 @@ class OiEffectsTheme {
   /// be suppressed by setting [focus] to [OiInteractiveStyle.none].
   final OiFocusRingStyle focusRing;
 
+  /// The default halo effect applied to interactive elements.
+  final OiHaloStyle? halo;
+
+  /// The halo effect applied when an element has keyboard focus.
+  final OiHaloStyle? haloFocus;
+
+  /// The halo effect applied when an element has a validation error.
+  final OiHaloStyle? haloError;
+
+  /// The duration of state transitions between interactive states.
+  final Duration stateTransition;
+
+  /// The curve used for state transition animations.
+  final Curve stateTransitionCurve;
+
   /// Creates a copy with optionally overridden state styles.
   OiEffectsTheme copyWith({
     OiInteractiveStyle? hover,
@@ -283,6 +436,11 @@ class OiEffectsTheme {
     OiInteractiveStyle? selected,
     OiInteractiveStyle? dragging,
     OiFocusRingStyle? focusRing,
+    OiHaloStyle? halo,
+    OiHaloStyle? haloFocus,
+    OiHaloStyle? haloError,
+    Duration? stateTransition,
+    Curve? stateTransitionCurve,
   }) {
     return OiEffectsTheme(
       hover: hover ?? this.hover,
@@ -292,6 +450,11 @@ class OiEffectsTheme {
       selected: selected ?? this.selected,
       dragging: dragging ?? this.dragging,
       focusRing: focusRing ?? this.focusRing,
+      halo: halo ?? this.halo,
+      haloFocus: haloFocus ?? this.haloFocus,
+      haloError: haloError ?? this.haloError,
+      stateTransition: stateTransition ?? this.stateTransition,
+      stateTransitionCurve: stateTransitionCurve ?? this.stateTransitionCurve,
     );
   }
 
@@ -305,11 +468,16 @@ class OiEffectsTheme {
         other.disabled == disabled &&
         other.selected == selected &&
         other.dragging == dragging &&
-        other.focusRing == focusRing;
+        other.focusRing == focusRing &&
+        other.halo == halo &&
+        other.haloFocus == haloFocus &&
+        other.haloError == haloError &&
+        other.stateTransition == stateTransition &&
+        other.stateTransitionCurve == stateTransitionCurve;
   }
 
   @override
-  int get hashCode => Object.hash(
+  int get hashCode => Object.hashAll([
     hover,
     focus,
     active,
@@ -317,5 +485,10 @@ class OiEffectsTheme {
     selected,
     dragging,
     focusRing,
-  );
+    halo,
+    haloFocus,
+    haloError,
+    stateTransition,
+    stateTransitionCurve,
+  ]);
 }

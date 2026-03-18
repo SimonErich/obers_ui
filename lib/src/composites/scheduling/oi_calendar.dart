@@ -1,5 +1,9 @@
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/src/foundation/persistence/oi_settings_driver.dart';
+import 'package:obers_ui/src/foundation/persistence/oi_settings_mixin.dart';
+import 'package:obers_ui/src/foundation/persistence/oi_settings_provider.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
+import 'package:obers_ui/src/models/settings/oi_calendar_settings.dart';
 
 /// A calendar event.
 ///
@@ -69,6 +73,10 @@ class OiCalendar extends StatefulWidget {
     this.showWeekNumbers = false,
     this.showAllDayRow = true,
     this.firstDayOfWeek = DateTime.monday,
+    this.settingsDriver,
+    this.settingsKey,
+    this.settingsNamespace = 'oi_calendar',
+    this.settingsSaveDebounce = const Duration(milliseconds: 500),
   });
 
   /// The list of events to display.
@@ -105,19 +113,111 @@ class OiCalendar extends StatefulWidget {
   /// The first day of the week (1 = Monday, 7 = Sunday).
   final int firstDayOfWeek;
 
+  // ── Settings persistence ──────────────────────────────────────────────────
+
+  /// Driver used to persist settings. When `null` settings are not persisted.
+  final OiSettingsDriver? settingsDriver;
+
+  /// Sub-key scoping this calendar's settings within [settingsNamespace].
+  final String? settingsKey;
+
+  /// Top-level namespace for settings storage.
+  final String settingsNamespace;
+
+  /// Debounce duration for auto-saving settings after changes.
+  final Duration settingsSaveDebounce;
+
   @override
   State<OiCalendar> createState() => _OiCalendarState();
 }
 
-class _OiCalendarState extends State<OiCalendar> {
+class _OiCalendarState extends State<OiCalendar>
+    with OiSettingsMixin<OiCalendar, OiCalendarSettings> {
   late DateTime _focusDate;
   late OiCalendarMode _mode;
 
+  /// Resolved driver: explicit widget prop → OiSettingsProvider → null.
+  OiSettingsDriver? _resolvedDriver;
+
+  // ── OiSettingsMixin contract ───────────────────────────────────────────────
+
+  @override
+  String get settingsNamespace => widget.settingsNamespace;
+
+  @override
+  String? get settingsKey => widget.settingsKey;
+
+  @override
+  OiSettingsDriver? get settingsDriver => _resolvedDriver;
+
+  @override
+  OiCalendarSettings get defaultSettings => OiCalendarSettings(
+    viewType: _calendarModeToViewType(widget.mode),
+  );
+
+  @override
+  OiCalendarSettings deserializeSettings(Map<String, dynamic> json) =>
+      OiCalendarSettings.fromJson(json);
+
+  @override
+  OiCalendarSettings mergeSettings(
+    OiCalendarSettings saved,
+    OiCalendarSettings defaults,
+  ) => saved.mergeWith(defaults);
+
+  // ── Lifecycle ──────────────────────────────────────────────────────────────
+
   @override
   void initState() {
+    _resolvedDriver = widget.settingsDriver;
     super.initState();
     _focusDate = widget.initialDate ?? DateTime.now();
     _mode = widget.mode;
+    if (settingsLoaded && settingsDriver != null) {
+      _applySettings(currentSettings);
+    }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final newDriver =
+        widget.settingsDriver ?? OiSettingsProvider.of(context);
+    if (newDriver != _resolvedDriver) {
+      _resolvedDriver = newDriver;
+      if (settingsLoaded) {
+        reloadSettings();
+      }
+    }
+    if (settingsLoaded && settingsDriver != null) {
+      _applySettings(currentSettings);
+    }
+  }
+
+  void _applySettings(OiCalendarSettings settings) {
+    _mode = _viewTypeToCalendarMode(settings.viewType);
+  }
+
+  OiCalendarSettings _toSettings() {
+    return OiCalendarSettings(
+      viewType: _calendarModeToViewType(_mode),
+    );
+  }
+
+  static OiCalendarViewType _calendarModeToViewType(OiCalendarMode mode) {
+    return switch (mode) {
+      OiCalendarMode.day => OiCalendarViewType.day,
+      OiCalendarMode.week => OiCalendarViewType.week,
+      OiCalendarMode.month => OiCalendarViewType.month,
+    };
+  }
+
+  static OiCalendarMode _viewTypeToCalendarMode(OiCalendarViewType type) {
+    return switch (type) {
+      OiCalendarViewType.day => OiCalendarMode.day,
+      OiCalendarViewType.week => OiCalendarMode.week,
+      OiCalendarViewType.month => OiCalendarMode.month,
+    };
   }
 
   // ── Navigation ────────────────────────────────────────────────────────────
@@ -150,6 +250,7 @@ class _OiCalendarState extends State<OiCalendar> {
 
   void _setMode(OiCalendarMode mode) {
     setState(() => _mode = mode);
+    updateSettings(_toSettings(), debounce: widget.settingsSaveDebounce);
   }
 
   // ── Helpers ───────────────────────────────────────────────────────────────

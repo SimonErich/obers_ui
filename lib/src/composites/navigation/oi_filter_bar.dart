@@ -1,6 +1,10 @@
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/inputs/oi_select.dart';
+import 'package:obers_ui/src/foundation/persistence/oi_settings_driver.dart';
+import 'package:obers_ui/src/foundation/persistence/oi_settings_mixin.dart';
+import 'package:obers_ui/src/foundation/persistence/oi_settings_provider.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
+import 'package:obers_ui/src/models/settings/oi_filter_bar_settings.dart';
 import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
 
 // ── Filter types ─────────────────────────────────────────────────────────────
@@ -132,13 +136,17 @@ class OiFilterDefinition {
 /// after the last chip.
 ///
 /// {@category Composites}
-class OiFilterBar extends StatelessWidget {
+class OiFilterBar extends StatefulWidget {
   /// Creates an [OiFilterBar].
   const OiFilterBar({
     required this.filters,
     required this.activeFilters,
     required this.onFilterChange,
     this.trailing,
+    this.settingsDriver,
+    this.settingsKey,
+    this.settingsNamespace = 'oi_filter_bar',
+    this.settingsSaveDebounce = const Duration(milliseconds: 500),
     super.key,
   });
 
@@ -154,24 +162,103 @@ class OiFilterBar extends StatelessWidget {
   /// An optional widget rendered after the filter chips (e.g. "Clear all").
   final Widget? trailing;
 
+  // ── Settings persistence ──────────────────────────────────────────────────
+
+  /// Driver used to persist settings. When `null` settings are not persisted.
+  final OiSettingsDriver? settingsDriver;
+
+  /// Sub-key scoping this filter bar's settings within [settingsNamespace].
+  final String? settingsKey;
+
+  /// Top-level namespace for settings storage.
+  final String settingsNamespace;
+
+  /// Debounce duration for auto-saving settings after changes.
+  final Duration settingsSaveDebounce;
+
+  @override
+  State<OiFilterBar> createState() => _OiFilterBarState();
+}
+
+class _OiFilterBarState extends State<OiFilterBar>
+    with OiSettingsMixin<OiFilterBar, OiFilterBarSettings> {
+  /// Resolved driver: explicit widget prop → OiSettingsProvider → null.
+  OiSettingsDriver? _resolvedDriver;
+
+  // ── OiSettingsMixin contract ───────────────────────────────────────────────
+
+  @override
+  String get settingsNamespace => widget.settingsNamespace;
+
+  @override
+  String? get settingsKey => widget.settingsKey;
+
+  @override
+  OiSettingsDriver? get settingsDriver => _resolvedDriver;
+
+  @override
+  OiFilterBarSettings get defaultSettings => const OiFilterBarSettings();
+
+  @override
+  OiFilterBarSettings deserializeSettings(Map<String, dynamic> json) =>
+      OiFilterBarSettings.fromJson(json);
+
+  @override
+  OiFilterBarSettings mergeSettings(
+    OiFilterBarSettings saved,
+    OiFilterBarSettings defaults,
+  ) => saved.mergeWith(defaults);
+
+  // ── Lifecycle ──────────────────────────────────────────────────────────────
+
+  @override
+  void initState() {
+    _resolvedDriver = widget.settingsDriver;
+    super.initState();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final newDriver =
+        widget.settingsDriver ?? OiSettingsProvider.of(context);
+    if (newDriver != _resolvedDriver) {
+      _resolvedDriver = newDriver;
+      if (settingsLoaded) {
+        reloadSettings();
+      }
+    }
+  }
+
+  OiFilterBarSettings _toSettings() {
+    return OiFilterBarSettings(
+      activeFilters: widget.activeFilters.map(
+        (key, filter) => MapEntry(key, filter.value),
+      ),
+      filterOrder: widget.activeFilters.keys.toList(),
+    );
+  }
+
+  // ── Build ─────────────────────────────────────────────────────────────────
+
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Row(
         children: [
-          for (final filter in filters)
+          for (final filter in widget.filters)
             Padding(
               padding: const EdgeInsets.only(right: 8),
               child: _FilterChip(
                 definition: filter,
-                active: activeFilters.containsKey(filter.key),
-                activeFilter: activeFilters[filter.key],
+                active: widget.activeFilters.containsKey(filter.key),
+                activeFilter: widget.activeFilters[filter.key],
                 onActivate: () => _openFilter(context, filter),
                 onRemove: () => _removeFilter(filter.key),
               ),
             ),
-          if (trailing != null) trailing!,
+          if (widget.trailing != null) widget.trailing!,
         ],
       ),
     );
@@ -185,11 +272,16 @@ class OiFilterBar extends StatelessWidget {
     entry = OverlayEntry(
       builder: (ctx) => _FilterPopover(
         definition: filter,
-        currentFilter: activeFilters[filter.key],
+        currentFilter: widget.activeFilters[filter.key],
         onApply: (value) {
-          final updated = Map<String, OiColumnFilter>.from(activeFilters)
-            ..[filter.key] = value;
-          onFilterChange(updated);
+          final updated =
+              Map<String, OiColumnFilter>.from(widget.activeFilters)
+                ..[filter.key] = value;
+          widget.onFilterChange(updated);
+          updateSettings(
+            _toSettings(),
+            debounce: widget.settingsSaveDebounce,
+          );
           entry
             ..remove()
             ..dispose();
@@ -205,9 +297,10 @@ class OiFilterBar extends StatelessWidget {
   }
 
   void _removeFilter(String key) {
-    final updated = Map<String, OiColumnFilter>.from(activeFilters)
+    final updated = Map<String, OiColumnFilter>.from(widget.activeFilters)
       ..remove(key);
-    onFilterChange(updated);
+    widget.onFilterChange(updated);
+    updateSettings(_toSettings(), debounce: widget.settingsSaveDebounce);
   }
 }
 

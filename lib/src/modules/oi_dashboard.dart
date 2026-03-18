@@ -1,5 +1,9 @@
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/src/foundation/persistence/oi_settings_driver.dart';
+import 'package:obers_ui/src/foundation/persistence/oi_settings_mixin.dart';
+import 'package:obers_ui/src/foundation/persistence/oi_settings_provider.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
+import 'package:obers_ui/src/models/settings/oi_dashboard_settings.dart';
 
 // ---------------------------------------------------------------------------
 // Supporting types
@@ -65,6 +69,10 @@ class OiDashboard extends StatefulWidget {
     this.gap = 16,
     this.editable = false,
     this.onLayoutChange,
+    this.settingsDriver,
+    this.settingsKey,
+    this.settingsNamespace = 'oi_dashboard',
+    this.settingsSaveDebounce = const Duration(milliseconds: 500),
   });
 
   /// The dashboard cards to display.
@@ -85,11 +93,92 @@ class OiDashboard extends StatefulWidget {
   /// Called when the card layout changes during edit mode.
   final ValueChanged<List<OiDashboardCard>>? onLayoutChange;
 
+  // ── Settings persistence ──────────────────────────────────────────────────
+
+  /// Driver used to persist settings. When `null` settings are not persisted.
+  final OiSettingsDriver? settingsDriver;
+
+  /// Sub-key scoping this dashboard's settings within [settingsNamespace].
+  final String? settingsKey;
+
+  /// Top-level namespace for settings storage.
+  final String settingsNamespace;
+
+  /// Debounce duration for auto-saving settings after changes.
+  final Duration settingsSaveDebounce;
+
   @override
   State<OiDashboard> createState() => _OiDashboardState();
 }
 
-class _OiDashboardState extends State<OiDashboard> {
+class _OiDashboardState extends State<OiDashboard>
+    with OiSettingsMixin<OiDashboard, OiDashboardSettings> {
+  /// Resolved driver: explicit widget prop → OiSettingsProvider → null.
+  OiSettingsDriver? _resolvedDriver;
+
+  // ── OiSettingsMixin contract ───────────────────────────────────────────────
+
+  @override
+  String get settingsNamespace => widget.settingsNamespace;
+
+  @override
+  String? get settingsKey => widget.settingsKey;
+
+  @override
+  OiSettingsDriver? get settingsDriver => _resolvedDriver;
+
+  @override
+  OiDashboardSettings get defaultSettings => const OiDashboardSettings();
+
+  @override
+  OiDashboardSettings deserializeSettings(Map<String, dynamic> json) =>
+      OiDashboardSettings.fromJson(json);
+
+  @override
+  OiDashboardSettings mergeSettings(
+    OiDashboardSettings saved,
+    OiDashboardSettings defaults,
+  ) => saved.mergeWith(defaults);
+
+  // ── Lifecycle ──────────────────────────────────────────────────────────────
+
+  @override
+  void initState() {
+    _resolvedDriver = widget.settingsDriver;
+    super.initState();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final newDriver =
+        widget.settingsDriver ?? OiSettingsProvider.of(context);
+    if (newDriver != _resolvedDriver) {
+      _resolvedDriver = newDriver;
+      if (settingsLoaded) {
+        reloadSettings();
+      }
+    }
+  }
+
+  OiDashboardSettings _toSettings() {
+    final positions = <String, OiDashboardCardPosition>{};
+    for (final card in widget.cards) {
+      positions[card.key.toString()] = OiDashboardCardPosition(
+        column: card.column ?? 0,
+        row: card.row ?? 0,
+        columnSpan: card.columnSpan,
+        rowSpan: card.rowSpan,
+      );
+    }
+    return OiDashboardSettings(cardPositions: positions);
+  }
+
+  void _handleLayoutChange(List<OiDashboardCard> cards) {
+    widget.onLayoutChange?.call(cards);
+    updateSettings(_toSettings(), debounce: widget.settingsSaveDebounce);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Semantics(
