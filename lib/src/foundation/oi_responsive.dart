@@ -499,20 +499,20 @@ class OiResponsiveValue<T> {
 /// Extensions on [BuildContext] for responsive layout helpers.
 ///
 /// All getters read the current [MediaQueryData.size] width. The breakpoint
-/// scale is resolved from the nearest [OiTheme] if present, otherwise
-/// the standard 5-tier scale is used.
+/// scale is resolved from the nearest [OiTheme]. A [FlutterError] is thrown
+/// if no [OiTheme] ancestor is found — wrap your widget tree with [OiApp]
+/// or [OiTheme] to provide one.
 ///
 /// {@category Foundation}
 extension OiResponsiveExt on BuildContext {
   double get _width => MediaQuery.sizeOf(this).width;
   double get _height => MediaQuery.sizeOf(this).height;
 
-  /// The [OiBreakpointScale] from the theme, or the standard scale if no
-  /// theme is present.
-  OiBreakpointScale get breakpointScale {
-    final theme = OiTheme.maybeOf(this);
-    return theme?.breakpoints ?? OiBreakpointScale.standard();
-  }
+  /// The [OiBreakpointScale] from the nearest [OiTheme].
+  ///
+  /// Throws a [FlutterError] if no [OiTheme] ancestor is found.
+  /// Wrap your widget tree with [OiApp] or [OiTheme] to provide a theme.
+  OiBreakpointScale get breakpointScale => OiTheme.of(this).breakpoints;
 
   /// The active [OiBreakpoint] for the current screen width.
   OiBreakpoint get breakpoint => breakpointScale.resolve(_width);

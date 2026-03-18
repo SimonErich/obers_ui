@@ -32,15 +32,15 @@ void main() {
 
   // ── Column count ───────────────────────────────────────────────────────────
 
-  testWidgets('uses correct number of Expanded column widgets', (tester) async {
+  testWidgets('creates one Column per masonry column', (tester) async {
     await tester.pumpObers(
       const OiMasonry(
         columns: 3,
         children: [Text('1'), Text('2'), Text('3'), Text('4'), Text('5')],
       ),
     );
-    // One Expanded per column.
-    expect(find.byType(Expanded), findsNWidgets(3));
+    // One Column per masonry column.
+    expect(find.byType(Column), findsNWidgets(3));
   });
 
   // ── Gap spacing ────────────────────────────────────────────────────────────

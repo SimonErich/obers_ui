@@ -404,5 +404,30 @@ void main() {
       );
       expect(captured, equals(OiDensity.dense));
     });
+
+    testWidgets('OiDensityScope.of throws FlutterError without ancestor', (
+      tester,
+    ) async {
+      late Object error;
+      await tester.pumpWidget(
+        MediaQuery(
+          data: const MediaQueryData(size: Size(400, 800)),
+          child: Directionality(
+            textDirection: TextDirection.ltr,
+            child: Builder(
+              builder: (ctx) {
+                try {
+                  OiDensityScope.of(ctx);
+                } catch (e) {
+                  error = e;
+                }
+                return const SizedBox();
+              },
+            ),
+          ),
+        ),
+      );
+      expect(error, isA<FlutterError>());
+    });
   });
 }

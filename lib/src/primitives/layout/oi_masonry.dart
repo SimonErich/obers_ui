@@ -27,39 +27,62 @@ class OiMasonry extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Build per-column child lists.
-    final cols = List.generate(columns, (_) => <Widget>[]);
-    for (var i = 0; i < children.length; i++) {
-      cols[i % columns].add(children[i]);
-    }
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final hasBoundedWidth = constraints.hasBoundedWidth;
 
-    // Build column widgets with vertical gap between items.
-    final columnWidgets = <Widget>[];
-    for (var c = 0; c < columns; c++) {
-      final items = cols[c];
-      final spacedItems = <Widget>[];
-      for (var i = 0; i < items.length; i++) {
-        spacedItems.add(items[i]);
-        if (i < items.length - 1 && gap > 0) {
-          spacedItems.add(SizedBox(height: gap));
+        // Build per-column child lists.
+        final cols = List.generate(columns, (_) => <Widget>[]);
+        for (var i = 0; i < children.length; i++) {
+          cols[i % columns].add(children[i]);
         }
-      }
-      columnWidgets.add(
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: spacedItems,
-          ),
-        ),
-      );
-      if (c < columns - 1 && gap > 0) {
-        columnWidgets.add(SizedBox(width: gap));
-      }
-    }
 
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: columnWidgets,
+        // When width is bounded, compute equal column widths explicitly so
+        // the widget composes inside any parent (no Expanded needed).
+        double? columnWidth;
+        if (hasBoundedWidth) {
+          final availableWidth = constraints.maxWidth;
+          columnWidth = columns <= 1
+              ? availableWidth
+              : (availableWidth - gap * (columns - 1)) / columns;
+        }
+
+        // Build column widgets with vertical gap between items.
+        final columnWidgets = <Widget>[];
+        for (var c = 0; c < columns; c++) {
+          final items = cols[c];
+          final spacedItems = <Widget>[];
+          for (var i = 0; i < items.length; i++) {
+            spacedItems.add(items[i]);
+            if (i < items.length - 1 && gap > 0) {
+              spacedItems.add(SizedBox(height: gap));
+            }
+          }
+
+          Widget col = Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: hasBoundedWidth
+                ? CrossAxisAlignment.stretch
+                : CrossAxisAlignment.start,
+            children: spacedItems,
+          );
+
+          if (columnWidth != null) {
+            col = SizedBox(width: columnWidth, child: col);
+          }
+
+          columnWidgets.add(col);
+          if (c < columns - 1 && gap > 0) {
+            columnWidgets.add(SizedBox(width: gap));
+          }
+        }
+
+        return Row(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: columnWidgets,
+        );
+      },
     );
   }
 }

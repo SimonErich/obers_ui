@@ -4,9 +4,14 @@ import 'package:obers_ui/src/foundation/oi_responsive.dart';
 /// A horizontal layout widget that places [children] in a [Row] with uniform
 /// [gap] spacing between them.
 ///
-/// When [collapse] is set and the current breakpoint's [OiBreakpoint.minWidth]
+/// When [collapse] is set and the active breakpoint's [OiBreakpoint.minWidth]
 /// is less than or equal to [collapse.minWidth], the widget renders as a
 /// [Column] instead, with the same [gap] applied as vertical spacing.
+///
+/// The active breakpoint can be supplied explicitly via [breakpoint] so that
+/// responsive values are resolved once at the layout level and passed down as
+/// concrete values. When [breakpoint] is null the widget reads the breakpoint
+/// from the nearest [OiTheme] via `context.breakpoint`.
 ///
 /// {@category Primitives}
 class OiRow extends StatelessWidget {
@@ -16,7 +21,9 @@ class OiRow extends StatelessWidget {
     this.gap = 0,
     this.mainAxisAlignment = MainAxisAlignment.start,
     this.crossAxisAlignment = CrossAxisAlignment.center,
+    this.mainAxisSize = MainAxisSize.min,
     this.collapse,
+    this.breakpoint,
     super.key,
   });
 
@@ -32,14 +39,28 @@ class OiRow extends StatelessWidget {
   /// How children are aligned along the cross axis.
   final CrossAxisAlignment crossAxisAlignment;
 
-  /// When non-null and the current breakpoint is at or below this breakpoint,
+  /// How much space the layout occupies along its main axis.
+  ///
+  /// Defaults to [MainAxisSize.min] so the widget shrink-wraps its children,
+  /// allowing it to nest freely inside other layout widgets without causing
+  /// unbounded-constraint errors.
+  final MainAxisSize mainAxisSize;
+
+  /// When non-null and the active breakpoint is at or below this breakpoint,
   /// the layout collapses from a [Row] into a [Column].
   final OiBreakpoint? collapse;
 
+  /// The active breakpoint, resolved at the layout level.
+  ///
+  /// When null, falls back to `context.breakpoint` (implicit context lookup).
+  /// Prefer passing an explicit value so the widget is self-contained.
+  final OiBreakpoint? breakpoint;
+
   @override
   Widget build(BuildContext context) {
+    final active = breakpoint ?? context.breakpoint;
     final shouldCollapse =
-        collapse != null && context.breakpoint.minWidth <= collapse!.minWidth;
+        collapse != null && active.minWidth <= collapse!.minWidth;
 
     // Build the interspersed children list.
     final spaced = <Widget>[];
@@ -56,6 +77,7 @@ class OiRow extends StatelessWidget {
 
     if (shouldCollapse) {
       return Column(
+        mainAxisSize: mainAxisSize,
         mainAxisAlignment: mainAxisAlignment,
         crossAxisAlignment: crossAxisAlignment,
         children: spaced,
@@ -63,6 +85,7 @@ class OiRow extends StatelessWidget {
     }
 
     return Row(
+      mainAxisSize: mainAxisSize,
       mainAxisAlignment: mainAxisAlignment,
       crossAxisAlignment: crossAxisAlignment,
       children: spaced,

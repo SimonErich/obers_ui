@@ -4,12 +4,20 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui/src/foundation/oi_responsive.dart';
+import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
+import 'package:obers_ui/src/foundation/theme/oi_theme_data.dart';
 
-/// Wraps [child] in a [MediaQuery] with the given [width].
-Widget buildWithWidth(double width, Widget child) {
+/// Wraps [child] in a [MediaQuery] + [OiTheme] with the given [width].
+///
+/// Every layout widget requires an explicit [OiTheme] ancestor — there is no
+/// silent fallback.  An optional [theme] can be passed to override the default.
+Widget buildWithWidth(double width, Widget child, {OiThemeData? theme}) {
   return MediaQuery(
     data: MediaQueryData(size: Size(width, 800)),
-    child: Directionality(textDirection: TextDirection.ltr, child: child),
+    child: OiTheme(
+      data: theme ?? OiThemeData.light(),
+      child: Directionality(textDirection: TextDirection.ltr, child: child),
+    ),
   );
 }
 
@@ -839,7 +847,31 @@ void main() {
       expect(result, 2);
     });
 
-    testWidgets('breakpointScale defaults to standard without theme',
+    testWidgets('breakpointScale throws without OiTheme ancestor',
+        (tester) async {
+      late Object error;
+      await tester.pumpWidget(
+        MediaQuery(
+          data: const MediaQueryData(size: Size(400, 800)),
+          child: Directionality(
+            textDirection: TextDirection.ltr,
+            child: Builder(
+              builder: (ctx) {
+                try {
+                  ctx.breakpointScale;
+                } catch (e) {
+                  error = e;
+                }
+                return const SizedBox.shrink();
+              },
+            ),
+          ),
+        ),
+      );
+      expect(error, isA<AssertionError>());
+    });
+
+    testWidgets('breakpointScale uses theme breakpoints when present',
         (tester) async {
       late OiBreakpointScale captured;
       await tester.pumpWidget(

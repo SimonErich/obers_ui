@@ -101,4 +101,37 @@ void main() {
     final heightBoxes = boxes.where((b) => b.height == 8).toList();
     expect(heightBoxes, hasLength(1));
   });
+
+  // ── Explicit breakpoint prop ──────────────────────────────────────────────
+
+  testWidgets('collapses when explicit breakpoint is at or below collapse',
+      (tester) async {
+    // Pass breakpoint explicitly — no context lookup needed for collapse check.
+    await pumpAtWidth(
+      tester,
+      const OiRow(
+        collapse: OiBreakpoint.medium,
+        breakpoint: OiBreakpoint.compact,
+        children: [Text('A'), Text('B')],
+      ),
+      900, // wide viewport, but explicit breakpoint overrides
+    );
+    expect(find.byType(Column), findsOneWidget);
+    expect(find.byType(Row), findsNothing);
+  });
+
+  testWidgets('does not collapse when explicit breakpoint is above collapse',
+      (tester) async {
+    await pumpAtWidth(
+      tester,
+      const OiRow(
+        collapse: OiBreakpoint.medium,
+        breakpoint: OiBreakpoint.expanded,
+        children: [Text('A'), Text('B')],
+      ),
+      400, // narrow viewport, but explicit breakpoint overrides
+    );
+    expect(find.byType(Row), findsOneWidget);
+    expect(find.byType(Column), findsNothing);
+  });
 }

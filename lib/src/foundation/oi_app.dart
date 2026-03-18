@@ -62,12 +62,18 @@ class OiDensityScope extends InheritedWidget {
 
   /// Returns the [OiDensity] from the nearest [OiDensityScope].
   ///
-  /// Defaults to [OiDensity.compact] if no scope is found.
+  /// Throws a [FlutterError] if no [OiDensityScope] ancestor is found.
+  /// Wrap your widget tree with [OiApp] to provide a density scope.
   static OiDensity of(BuildContext context) {
-    return context
-            .dependOnInheritedWidgetOfExactType<OiDensityScope>()
-            ?.density ??
-        OiDensity.compact;
+    final scope =
+        context.dependOnInheritedWidgetOfExactType<OiDensityScope>();
+    if (scope == null) {
+      throw FlutterError.fromParts(<DiagnosticsNode>[
+        ErrorSummary('No OiDensityScope found in the widget tree.'),
+        ErrorHint('Ensure that OiApp wraps your widget.'),
+      ]);
+    }
+    return scope.density;
   }
 
   @override
