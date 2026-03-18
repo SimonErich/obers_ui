@@ -603,7 +603,64 @@ void main() {
     ctrl.dispose();
   });
 
-  // 35. toSettings / applySettings via controller round-trips through table
+  // 35. Tapping same header twice toggles sort direction (client-side)
+  testWidgets('tapping same header twice toggles sort direction', (
+    tester,
+  ) async {
+    await tester.pumpObers(_table());
+    // First tap – sorts ascending (Alice, Bob, Charlie).
+    await tester.tap(find.text('Name'));
+    await tester.pump();
+    var texts = tester
+        .widgetList<Text>(find.byType(Text))
+        .map((t) => t.data)
+        .whereType<String>()
+        .toList();
+    var aliceIdx = texts.indexOf('Alice');
+    var charlieIdx = texts.indexOf('Charlie');
+    expect(aliceIdx, lessThan(charlieIdx));
+
+    // Second tap – toggles to descending (Charlie, Bob, Alice).
+    // Header now reads 'Name ▲'.
+    await tester.tap(find.text('Name ▲'));
+    await tester.pump();
+    texts = tester
+        .widgetList<Text>(find.byType(Text))
+        .map((t) => t.data)
+        .whereType<String>()
+        .toList();
+    aliceIdx = texts.indexOf('Alice');
+    charlieIdx = texts.indexOf('Charlie');
+    expect(charlieIdx, lessThan(aliceIdx));
+  });
+
+  // 36. onSort callback reports toggled ascending on repeated taps
+  testWidgets(
+    'onSort callback reports toggled ascending on repeated taps',
+    (tester) async {
+      final calls = <bool>[];
+      final ctrl = OiTableController(totalRows: _rows.length);
+      await tester.pumpObers(
+        _table(
+          controller: ctrl,
+          serverSideSort: true,
+          onSort: (col, {required bool ascending}) => calls.add(ascending),
+        ),
+      );
+      // First tap – ascending.
+      await tester.tap(find.text('Name'));
+      await tester.pump();
+      expect(calls, [true]);
+
+      // Second tap – toggles to descending.
+      await tester.tap(find.text('Name ▲'));
+      await tester.pump();
+      expect(calls, [true, false]);
+    },
+  );
+
+  // 37. toSettings / applySettings via controller round-trips through table
+  //     (was test 35)
   testWidgets('applySettings restores column order in rendered table', (
     tester,
   ) async {
