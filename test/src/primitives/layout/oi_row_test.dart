@@ -187,5 +187,51 @@ void main() {
       boxes = tester.widgetList<SizedBox>(find.byType(SizedBox)).toList();
       expect(boxes.where((b) => b.width == 16), hasLength(1));
     });
+
+    testWidgets('gap cascades to nearest smaller breakpoint', (tester) async {
+      final responsiveGap = OiResponsive<double>.breakpoints({
+        OiBreakpoint.compact: 6,
+        OiBreakpoint.large: 20,
+      });
+
+      // medium has no explicit value → cascades to compact → 6.
+      await pumpAtWidth(
+        tester,
+        OiRow(
+          breakpoint: OiBreakpoint.medium,
+          gap: responsiveGap,
+          children: const [Text('A'), Text('B')],
+        ),
+        700,
+      );
+      final boxes =
+          tester.widgetList<SizedBox>(find.byType(SizedBox)).toList();
+      expect(boxes.where((b) => b.width == 6), hasLength(1));
+    });
+  });
+
+  // ── Zero magic: no context dependency ─────────────────────────────────
+
+  testWidgets('works without OiTheme — scale defaults to standard', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      MediaQuery(
+        data: const MediaQueryData(size: Size(400, 800)),
+        child: Directionality(
+          textDirection: TextDirection.ltr,
+          child: OiRow(
+            breakpoint: OiBreakpoint.compact,
+            gap: OiResponsive<double>.breakpoints({
+              OiBreakpoint.compact: 8,
+            }),
+            children: const [Text('A'), Text('B')],
+          ),
+        ),
+      ),
+    );
+    expect(tester.takeException(), isNull);
+    expect(find.text('A'), findsOneWidget);
+    expect(find.text('B'), findsOneWidget);
   });
 }
