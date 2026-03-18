@@ -16,6 +16,11 @@ import 'package:obers_ui/src/foundation/oi_responsive.dart';
 /// )
 /// ```
 ///
+/// The active breakpoint can be supplied explicitly via [breakpoint] so that
+/// responsive values are resolved once at the layout level and passed down as
+/// concrete values. When [breakpoint] is null the widget reads the breakpoint
+/// from the nearest [OiTheme] via `context.breakpoint`.
+///
 /// {@category Primitives}
 class OiWrapLayout extends StatelessWidget {
   /// Creates an [OiWrapLayout].
@@ -27,6 +32,7 @@ class OiWrapLayout extends StatelessWidget {
     this.runAlignment = WrapAlignment.start,
     this.crossAxisAlignment = WrapCrossAlignment.start,
     this.direction = Axis.horizontal,
+    this.breakpoint,
     super.key,
   });
 
@@ -51,10 +57,18 @@ class OiWrapLayout extends StatelessWidget {
   /// The child widgets to wrap.
   final List<Widget> children;
 
+  /// The active breakpoint, resolved at the layout level.
+  ///
+  /// When null, falls back to `context.breakpoint` (implicit context lookup).
+  /// Prefer passing an explicit value so the widget is self-contained.
+  final OiBreakpoint? breakpoint;
+
   @override
   Widget build(BuildContext context) {
-    final resolvedSpacing = spacing.resolveFor(context);
-    final resolvedRunSpacing = runSpacing.resolveFor(context);
+    final active = breakpoint ?? context.breakpoint;
+    final scale = context.breakpointScale;
+    final resolvedSpacing = spacing.resolve(active, scale);
+    final resolvedRunSpacing = runSpacing.resolve(active, scale);
 
     return Wrap(
       spacing: resolvedSpacing,

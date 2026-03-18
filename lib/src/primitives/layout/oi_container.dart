@@ -21,6 +21,11 @@ import 'package:obers_ui/src/foundation/oi_responsive.dart';
 /// )
 /// ```
 ///
+/// The active breakpoint can be supplied explicitly via [breakpoint] so that
+/// responsive values are resolved once at the layout level and passed down as
+/// concrete values. When [breakpoint] is null the widget reads the breakpoint
+/// from the nearest [OiTheme] via `context.breakpoint`.
+///
 /// {@category Primitives}
 class OiContainer extends StatelessWidget {
   /// Creates an [OiContainer].
@@ -29,6 +34,7 @@ class OiContainer extends StatelessWidget {
     this.maxWidth,
     this.padding,
     this.centered = true,
+    this.breakpoint,
     super.key,
   });
 
@@ -44,10 +50,18 @@ class OiContainer extends StatelessWidget {
   /// Whether to center [child] horizontally. Defaults to `true`.
   final bool centered;
 
+  /// The active breakpoint, resolved at the layout level.
+  ///
+  /// When null, falls back to `context.breakpoint` (implicit context lookup).
+  /// Prefer passing an explicit value so the widget is self-contained.
+  final OiBreakpoint? breakpoint;
+
   @override
   Widget build(BuildContext context) {
-    final resolvedMaxWidth = maxWidth?.resolveFor(context);
-    final resolvedPadding = padding?.resolveFor(context);
+    final active = breakpoint ?? context.breakpoint;
+    final scale = context.breakpointScale;
+    final resolvedMaxWidth = maxWidth?.resolve(active, scale);
+    final resolvedPadding = padding?.resolve(active, scale);
 
     var content = child ?? const SizedBox.shrink() as Widget;
 

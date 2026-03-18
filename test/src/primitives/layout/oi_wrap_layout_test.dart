@@ -134,4 +134,52 @@ void main() {
       expect(wrap.runSpacing, 24);
     });
   });
+
+  // ── Explicit breakpoint parameter ─────────────────────────────────────────
+
+  group('explicit breakpoint parameter', () {
+    testWidgets('breakpoint param overrides context for spacing', (
+      tester,
+    ) async {
+      final responsiveSpacing = OiResponsive<double>.breakpoints({
+        OiBreakpoint.compact: 4,
+        OiBreakpoint.expanded: 16,
+      });
+
+      // Screen is compact-width (400), but breakpoint is explicitly expanded.
+      await pumpAtWidth(
+        tester,
+        OiWrapLayout(
+          spacing: responsiveSpacing,
+          breakpoint: OiBreakpoint.expanded,
+          children: const [Text('A'), Text('B')],
+        ),
+        400,
+      );
+      final wrap = tester.widget<Wrap>(find.byType(Wrap));
+      expect(wrap.spacing, 16);
+    });
+
+    testWidgets('breakpoint param overrides context for runSpacing', (
+      tester,
+    ) async {
+      final responsiveRunSpacing = OiResponsive<double>.breakpoints({
+        OiBreakpoint.compact: 8,
+        OiBreakpoint.large: 24,
+      });
+
+      // Screen is compact-width (400), but breakpoint is explicitly large.
+      await pumpAtWidth(
+        tester,
+        OiWrapLayout(
+          runSpacing: responsiveRunSpacing,
+          breakpoint: OiBreakpoint.large,
+          children: const [Text('A')],
+        ),
+        400,
+      );
+      final wrap = tester.widget<Wrap>(find.byType(Wrap));
+      expect(wrap.runSpacing, 24);
+    });
+  });
 }

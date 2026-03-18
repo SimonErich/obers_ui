@@ -172,4 +172,55 @@ void main() {
       expect(padding.padding, const EdgeInsets.all(24));
     });
   });
+
+  // ── Explicit breakpoint parameter ─────────────────────────────────────────
+
+  group('explicit breakpoint parameter', () {
+    testWidgets('breakpoint param overrides context breakpoint for maxWidth', (
+      tester,
+    ) async {
+      final responsiveMaxWidth = OiResponsive<double>.breakpoints({
+        OiBreakpoint.compact: double.infinity,
+        OiBreakpoint.large: 1200,
+      });
+
+      // Screen is compact-width (400), but breakpoint is explicitly large.
+      await pumpAtWidth(
+        tester,
+        OiContainer(
+          maxWidth: responsiveMaxWidth,
+          breakpoint: OiBreakpoint.large,
+          child: const Text('x'),
+        ),
+        400,
+      );
+      final boxes = tester
+          .widgetList<ConstrainedBox>(find.byType(ConstrainedBox))
+          .toList();
+      expect(boxes.any((b) => b.constraints.maxWidth == 1200), isTrue);
+    });
+
+    testWidgets('breakpoint param resolves padding correctly', (
+      tester,
+    ) async {
+      final responsivePadding =
+          OiResponsive<EdgeInsetsGeometry>.breakpoints({
+        OiBreakpoint.compact: const EdgeInsets.all(8),
+        OiBreakpoint.expanded: const EdgeInsets.all(32),
+      });
+
+      // Screen is compact-width (400), but breakpoint is explicitly expanded.
+      await pumpAtWidth(
+        tester,
+        OiContainer(
+          padding: responsivePadding,
+          breakpoint: OiBreakpoint.expanded,
+          child: const Text('padded'),
+        ),
+        400,
+      );
+      final padding = tester.widget<Padding>(find.byType(Padding));
+      expect(padding.padding, const EdgeInsets.all(32));
+    });
+  });
 }
