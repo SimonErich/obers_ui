@@ -36,6 +36,7 @@ class OiTappable extends StatefulWidget {
     this.onFocusChange,
     this.enabled = true,
     this.focusable = true,
+    this.isDragging = false,
     this.semanticLabel,
     this.cursor,
     super.key,
@@ -69,6 +70,13 @@ class OiTappable extends StatefulWidget {
   ///
   /// When `false`, the [Focus] node cannot receive focus.
   final bool focusable;
+
+  /// Whether the widget is currently being dragged.
+  ///
+  /// This state is managed externally (e.g. by a parent [Draggable] or
+  /// [LongPressDraggable]) and causes [OiEffectsTheme.dragging] to be applied.
+  /// Dragging takes the highest visual priority among all interactive states.
+  final bool isDragging;
 
   /// An optional label announced by screen readers in place of the child's
   /// semantic content.
@@ -127,6 +135,7 @@ class _OiTappableState extends State<OiTappable> {
 
   OiInteractiveStyle _effectiveStyle(OiEffectsTheme effects) {
     if (!widget.enabled) return OiInteractiveStyle.none;
+    if (widget.isDragging) return effects.dragging;
     if (_isPressed) return effects.active;
     if (_isHovered) return effects.hover;
     if (_isFocused) return effects.focus;

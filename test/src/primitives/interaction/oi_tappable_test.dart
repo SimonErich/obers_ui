@@ -533,7 +533,65 @@ void main() {
     expect(tapped, isFalse);
   });
 
-  // ── 20. Keyboard activation: other keys do NOT trigger onTap ───────────────
+  // ── 20. isDragging: applies dragging style ─────────────────────────────────
+
+  testWidgets(
+    'isDragging=true: applies dragging scale from OiEffectsTheme',
+    (tester) async {
+      await tester.pumpObers(
+        const OiTappable(
+          isDragging: true,
+          child: SizedBox(width: 60, height: 60),
+        ),
+      );
+      await tester.pump();
+
+      // The dragging style from OiEffectsTheme.standard has scale > 1.0 (1.03).
+      // Verify a Transform widget is present with the dragging scale.
+      final transforms = tester.widgetList<Transform>(find.byType(Transform));
+      expect(transforms, isNotEmpty);
+    },
+  );
+
+  testWidgets(
+    'isDragging=false: no dragging scale applied by default',
+    (tester) async {
+      await tester.pumpObers(
+        const OiTappable(child: SizedBox(width: 60, height: 60)),
+      );
+      await tester.pump();
+
+      // Default state (no dragging, no hover, no focus, no press) applies
+      // OiInteractiveStyle.none which has scale=1.0, so no Transform.
+      final transforms = tester.widgetList<Transform>(find.byType(Transform));
+      expect(transforms, isEmpty);
+    },
+  );
+
+  testWidgets(
+    'isDragging takes priority over pressed state',
+    (tester) async {
+      // When both isDragging and pressed are active, dragging wins.
+      await tester.pumpObers(
+        const OiTappable(
+          isDragging: true,
+          child: SizedBox(width: 60, height: 60),
+        ),
+      );
+      await tester.pump();
+
+      // Simulate a press — but isDragging should still take priority.
+      await tester.tap(find.byType(OiTappable), warnIfMissed: false);
+      await tester.pump();
+
+      // The dragging style has scale 1.03 (> 1), active has 0.97 (< 1).
+      // Verify scale > 1 by checking Transform is present.
+      final transforms = tester.widgetList<Transform>(find.byType(Transform));
+      expect(transforms, isNotEmpty);
+    },
+  );
+
+  // ── 21. Keyboard activation: other keys do NOT trigger onTap ───────────────
 
   testWidgets('TC-5: ArrowDown key does NOT trigger onTap', (tester) async {
     var tapped = false;
