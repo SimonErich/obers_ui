@@ -659,8 +659,41 @@ void main() {
     },
   );
 
-  // 37. toSettings / applySettings via controller round-trips through table
-  //     (was test 35)
+  // 37. Clicking an inactive column sorts ascending (REQ-0966)
+  testWidgets('clicking inactive column sorts ascending', (tester) async {
+    await tester.pumpObers(_table());
+    // Sort by Name ascending, then toggle to descending.
+    await tester.tap(find.text('Name'));
+    await tester.pump();
+    await tester.tap(find.text('Name ▲'));
+    await tester.pump();
+    // Name is now sorted descending (Charlie, Bob, Alice).
+    var texts = tester
+        .widgetList<Text>(find.byType(Text))
+        .map((t) => t.data)
+        .whereType<String>()
+        .toList();
+    expect(texts.indexOf('Charlie'), lessThan(texts.indexOf('Alice')));
+
+    // Tap 'Value' – an inactive column – should sort ascending by Value.
+    await tester.tap(find.text('Value'));
+    await tester.pump();
+    texts = tester
+        .widgetList<Text>(find.byType(Text))
+        .map((t) => t.data)
+        .whereType<String>()
+        .toList();
+    // Values 10 < 20 < 30, so ascending order is Alice, Bob, Charlie.
+    final aliceIdx = texts.indexOf('Alice');
+    final charlieIdx = texts.indexOf('Charlie');
+    expect(aliceIdx, lessThan(charlieIdx));
+    // Value header should show ascending indicator.
+    expect(find.text('Value ▲'), findsOneWidget);
+    // Name header should no longer show a sort indicator.
+    expect(find.text('Name'), findsOneWidget);
+  });
+
+  // 38. toSettings / applySettings via controller round-trips through table
   testWidgets('applySettings restores column order in rendered table', (
     tester,
   ) async {
