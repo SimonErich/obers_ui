@@ -136,117 +136,159 @@ void main() {
 
   // ── 8. Touch device: 48 dp minimum touch target ────────────────────────────
 
-  testWidgets('touch device: small child gets minimum 48dp touch target', (
-    tester,
-  ) async {
-    await tester.pumpWidget(
-      touchApp(
-        const Center(child: OiTappable(child: SizedBox(width: 24, height: 24))),
-      ),
-    );
-    await tester.pump();
+  testWidgets(
+    'touch device: small child gets minimum 48dp touch target',
+    (tester) async {
+      await tester.pumpWidget(
+        touchApp(
+          const Center(
+            child: OiTappable(child: SizedBox(width: 24, height: 24)),
+          ),
+        ),
+      );
+      await tester.pump();
 
-    final size = tester.getSize(find.byType(OiTappable));
-    expect(size.width, greaterThanOrEqualTo(48));
-    expect(size.height, greaterThanOrEqualTo(48));
-  });
+      final size = tester.getSize(find.byType(OiTappable));
+      expect(size.width, greaterThanOrEqualTo(48));
+      expect(size.height, greaterThanOrEqualTo(48));
+    },
+    variant: TargetPlatformVariant.only(TargetPlatform.android),
+  );
 
   // ── 9. Pointer device: no extra padding ────────────────────────────────────
 
-  testWidgets('pointer device: child size is not padded to 48dp', (
-    tester,
-  ) async {
-    await tester.pumpWidget(
-      pointerApp(
-        const Center(child: OiTappable(child: SizedBox(width: 24, height: 24))),
-      ),
-    );
-    await tester.pump();
+  testWidgets(
+    'pointer device: child size is not padded to 48dp',
+    (tester) async {
+      await tester.pumpWidget(
+        pointerApp(
+          const Center(
+            child: OiTappable(child: SizedBox(width: 24, height: 24)),
+          ),
+        ),
+      );
+      await tester.pump();
 
-    final size = tester.getSize(find.byType(OiTappable));
-    // On pointer devices the tappable does not inflate the size to 48dp.
-    expect(size.width, lessThan(48));
-    expect(size.height, lessThan(48));
-  });
+      final size = tester.getSize(find.byType(OiTappable));
+      // On pointer platforms the tappable does not inflate the size to 48dp.
+      expect(size.width, lessThan(48));
+      expect(size.height, lessThan(48));
+    },
+    variant: TargetPlatformVariant.only(TargetPlatform.linux),
+  );
+
+  // ── TC-touch-compact regression ────────────────────────────────────────────
+  // Android platform with compact density still enforces 48 dp — touch target
+  // enforcement is platform-based, not density-based.
+
+  testWidgets(
+    'TC-touch-compact: Android platform with compact density still enforces 48dp',
+    (tester) async {
+      await tester.pumpWidget(
+        OiApp(
+          density: OiDensity.compact,
+          home: const Center(
+            child: OiTappable(child: SizedBox(width: 24, height: 24)),
+          ),
+        ),
+      );
+      await tester.pump();
+
+      final size = tester.getSize(find.byType(OiTappable));
+      expect(size.width, greaterThanOrEqualTo(48));
+      expect(size.height, greaterThanOrEqualTo(48));
+    },
+    variant: TargetPlatformVariant.only(TargetPlatform.android),
+  );
 
   // ── 10. Hover state on pointer device ─────────────────────────────────────
 
-  testWidgets('pointer device: onHover called on MouseRegion enter/exit', (
-    tester,
-  ) async {
-    final hoverStates = <bool>[];
-    await tester.pumpWidget(
-      pointerApp(
-        Center(
-          child: OiTappable(
-            onHover: hoverStates.add,
-            child: const SizedBox(width: 60, height: 60),
+  testWidgets(
+    'pointer device: onHover called on MouseRegion enter/exit',
+    (tester) async {
+      final hoverStates = <bool>[];
+      await tester.pumpWidget(
+        pointerApp(
+          Center(
+            child: OiTappable(
+              onHover: hoverStates.add,
+              child: const SizedBox(width: 60, height: 60),
+            ),
           ),
         ),
-      ),
-    );
-    await tester.pump();
+      );
+      await tester.pump();
 
-    final gesture = await tester.createGesture(kind: PointerDeviceKind.mouse);
-    await gesture.addPointer(location: Offset.zero);
-    addTearDown(gesture.removePointer);
-    await tester.pump();
+      final gesture = await tester.createGesture(kind: PointerDeviceKind.mouse);
+      await gesture.addPointer(location: Offset.zero);
+      addTearDown(gesture.removePointer);
+      await tester.pump();
 
-    await gesture.moveTo(tester.getCenter(find.byType(OiTappable)));
-    await tester.pump();
-    expect(hoverStates, contains(true));
+      await gesture.moveTo(tester.getCenter(find.byType(OiTappable)));
+      await tester.pump();
+      expect(hoverStates, contains(true));
 
-    await gesture.moveTo(const Offset(500, 500));
-    await tester.pump();
-    expect(hoverStates.last, isFalse);
-  });
+      await gesture.moveTo(const Offset(500, 500));
+      await tester.pump();
+      expect(hoverStates.last, isFalse);
+    },
+    variant: TargetPlatformVariant.only(TargetPlatform.linux),
+  );
 
   // ── 11. cursor ─────────────────────────────────────────────────────────────
 
-  testWidgets('pointer device: cursor is click when enabled', (tester) async {
-    await tester.pumpWidget(
-      pointerApp(
-        const Center(
-          child: OiTappable(
-            key: ValueKey('t'),
-            child: SizedBox(width: 60, height: 60),
+  testWidgets(
+    'pointer device: cursor is click when enabled',
+    (tester) async {
+      await tester.pumpWidget(
+        pointerApp(
+          const Center(
+            child: OiTappable(
+              key: ValueKey('t'),
+              child: SizedBox(width: 60, height: 60),
+            ),
           ),
         ),
-      ),
-    );
-    await tester.pump();
+      );
+      await tester.pump();
 
-    final mouseRegion = tester.widget<MouseRegion>(
-      find.descendant(
-        of: find.byKey(const ValueKey('t')),
-        matching: find.byType(MouseRegion),
-      ),
-    );
-    expect(mouseRegion.cursor, SystemMouseCursors.click);
-  });
+      final mouseRegion = tester.widget<MouseRegion>(
+        find.descendant(
+          of: find.byKey(const ValueKey('t')),
+          matching: find.byType(MouseRegion),
+        ),
+      );
+      expect(mouseRegion.cursor, SystemMouseCursors.click);
+    },
+    variant: TargetPlatformVariant.only(TargetPlatform.linux),
+  );
 
-  testWidgets('pointer device: cursor is basic when disabled', (tester) async {
-    await tester.pumpWidget(
-      pointerApp(
-        const Center(
-          child: OiTappable(
-            key: ValueKey('t'),
-            enabled: false,
-            child: SizedBox(width: 60, height: 60),
+  testWidgets(
+    'pointer device: cursor is basic when disabled',
+    (tester) async {
+      await tester.pumpWidget(
+        pointerApp(
+          const Center(
+            child: OiTappable(
+              key: ValueKey('t'),
+              enabled: false,
+              child: SizedBox(width: 60, height: 60),
+            ),
           ),
         ),
-      ),
-    );
-    await tester.pump();
+      );
+      await tester.pump();
 
-    final mouseRegion = tester.widget<MouseRegion>(
-      find.descendant(
-        of: find.byKey(const ValueKey('t')),
-        matching: find.byType(MouseRegion),
-      ),
-    );
-    expect(mouseRegion.cursor, SystemMouseCursors.basic);
-  });
+      final mouseRegion = tester.widget<MouseRegion>(
+        find.descendant(
+          of: find.byKey(const ValueKey('t')),
+          matching: find.byType(MouseRegion),
+        ),
+      );
+      expect(mouseRegion.cursor, SystemMouseCursors.basic);
+    },
+    variant: TargetPlatformVariant.only(TargetPlatform.linux),
+  );
 
   // ── 12. disableAnimations: AnimatedOpacity uses Duration.zero ─────────────
 

@@ -29,9 +29,11 @@ abstract final class OiA11y {
 
   /// The minimum touch target size in logical pixels on touch devices.
   ///
-  /// Returns 48.0 on touch/mobile, 0.0 on pointer/desktop (no enforcement).
+  /// Returns 48.0 on touch/mobile platforms (Android, iOS), 0.0 on
+  /// pointer/desktop platforms (no enforcement). The web deployment target
+  /// is intentionally ignored so that Android/iOS browsers running on touch
+  /// devices still receive 48 dp enforcement.
   static double minTouchTarget(BuildContext context) {
-    if (kIsWeb) return 0;
     switch (defaultTargetPlatform) {
       case TargetPlatform.iOS:
       case TargetPlatform.android:

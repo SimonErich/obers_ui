@@ -294,6 +294,48 @@ void main() {
       );
     });
 
+    // ── Pointer platforms ─────────────────────────────────────────────────────
+
+    group('Pointer platforms', () {
+      testWidgets(
+        'minTouchTarget returns 0 on macOS',
+        (tester) async {
+          late double result;
+          await tester.pumpWidget(
+            buildDefault(
+              Builder(
+                builder: (ctx) {
+                  result = OiA11y.minTouchTarget(ctx);
+                  return const SizedBox.shrink();
+                },
+              ),
+            ),
+          );
+          expect(result, 0.0);
+        },
+        variant: TargetPlatformVariant.only(TargetPlatform.macOS),
+      );
+
+      testWidgets(
+        'minTouchTarget returns 0 on linux',
+        (tester) async {
+          late double result;
+          await tester.pumpWidget(
+            buildDefault(
+              Builder(
+                builder: (ctx) {
+                  result = OiA11y.minTouchTarget(ctx);
+                  return const SizedBox.shrink();
+                },
+              ),
+            ),
+          );
+          expect(result, 0.0);
+        },
+        variant: TargetPlatformVariant.only(TargetPlatform.linux),
+      );
+    });
+
     // ── Web (ARIA roles and live regions) ────────────────────────────────────
     //
     // kIsWeb is a compile-time constant and cannot be overridden in unit
