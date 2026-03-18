@@ -90,6 +90,11 @@ class OiContainerBreakpoint extends InheritedWidget {
 /// * **columnOrder** — visual ordering; lower values render first (default
 ///   source order, treated as 0).
 ///
+/// **Performance Architecture (REQ-1090/1091/1092):** Responsive values are
+/// resolved inside the [RenderBox] during `performLayout`, not at the widget
+/// level. This means a constraint change triggers only a relayout — not a
+/// full widget-tree rebuild.
+///
 /// Internally uses a custom [RenderBox] with [ContainerRenderObjectMixin] for
 /// column-start and column-span control without relying on [Wrap] or
 /// [GridView].
@@ -179,82 +184,74 @@ class OiGrid extends StatelessWidget {
     if (_containerRelative) {
       return _buildContainerRelative(context);
     }
-    return _buildWithBreakpoint(breakpoint!);
+    return _buildGrid(breakpoint: breakpoint);
   }
 
-  /// Builds a container-relative grid using [LayoutBuilder] to obtain
-  /// constraints. Does not depend on [MediaQuery] (REQ-1088).
+  /// Builds a container-relative grid.
+  ///
+  /// Responsive value resolution is deferred to the render object's
+  /// `performLayout` (REQ-1090/1091/1092). The widget layer only handles
+  /// [OiContainerBreakpoint] propagation for nested grids (REQ-1089).
   Widget _buildContainerRelative(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        // REQ-1089: Check for an ancestor container-relative grid.
-        final ancestorWidth = OiContainerBreakpoint.maybeOf(context);
+    // REQ-1089: Check for an ancestor container-relative grid.
+    final ancestorWidth = OiContainerBreakpoint.maybeOf(context);
 
-        // The width used for breakpoint resolution:
-        // - nested container-relative → outer grid's width (REQ-1089)
-        // - root container-relative → own constraints width (REQ-1087)
-        final effectiveWidth = ancestorWidth ?? constraints.maxWidth;
-        final resolvedBreakpoint = scale.resolve(effectiveWidth);
+    final grid = _buildGrid(
+      containerRelative: true,
+      ancestorContainerWidth: ancestorWidth,
+    );
 
-        final grid = _buildWithBreakpoint(resolvedBreakpoint);
-
-        // Only the outermost container-relative grid publishes its width
-        // via OiContainerBreakpoint so nested grids share the same viewport.
-        if (ancestorWidth == null) {
+    // Only the outermost container-relative grid publishes its width
+    // via OiContainerBreakpoint so nested grids share the same viewport.
+    if (ancestorWidth == null) {
+      return LayoutBuilder(
+        builder: (context, constraints) {
           return OiContainerBreakpoint(
             width: constraints.maxWidth,
             child: grid,
           );
-        }
-        return grid;
-      },
-    );
+        },
+      );
+    }
+    return grid;
   }
 
-  /// Builds the grid internals with a resolved [active] breakpoint.
-  Widget _buildWithBreakpoint(OiBreakpoint active) {
-    final resolvedScale = scale;
-
-    final resolvedGap = gap.resolve(active, resolvedScale);
-    final effectiveRowGap =
-        rowGap?.resolve(active, resolvedScale) ?? resolvedGap;
-
-    final resolvedColumns = columns?.resolve(active, resolvedScale);
-    final resolvedMinColumnWidth = minColumnWidth?.resolve(
-      active,
-      resolvedScale,
-    );
-
+  /// Builds the grid internals, passing responsive values through to the
+  /// render object for resolution during layout (REQ-1090/1091/1092).
+  Widget _buildGrid({
+    OiBreakpoint? breakpoint,
+    bool containerRelative = false,
+    double? ancestorContainerWidth,
+  }) {
     // Wrap each child in a _OiGridSlot ParentDataWidget carrying the
-    // resolved span metadata. This avoids per-child rebuilds — the render
-    // object reads span data from parentData during layout.
+    // responsive span metadata. The render object resolves these during
+    // performLayout — no per-child widget rebuilds on breakpoint change.
     final wrappedChildren = <Widget>[];
     for (var i = 0; i < children.length; i++) {
       final child = children[i];
       final spanData = OiSpan.maybeOf(child);
 
-      final colSpan = spanData?.resolveColumnSpan(active, resolvedScale) ?? 1;
-      final colStart = spanData?.resolveColumnStart(active, resolvedScale);
-      final colOrder = spanData?.resolveColumnOrder(active, resolvedScale);
-      final rSpan = spanData?.resolveRowSpan(active, resolvedScale) ?? 1;
-
       wrappedChildren.add(
         _OiGridSlot(
           index: i,
-          columnSpan: colSpan,
-          columnStart: colStart,
-          columnOrder: colOrder,
-          rowSpan: rSpan,
+          responsiveColumnSpan: spanData?.columnSpan,
+          responsiveColumnStart: spanData?.columnStart,
+          responsiveColumnOrder: spanData?.columnOrder,
+          responsiveRowSpan: spanData?.rowSpan,
           child: child,
         ),
       );
     }
 
     return _OiGridLayout(
-      columns: resolvedColumns,
-      minColumnWidth: resolvedMinColumnWidth,
-      gap: resolvedGap,
-      rowGap: effectiveRowGap,
+      columns: columns,
+      minColumnWidth: minColumnWidth,
+      gap: gap,
+      rowGap: rowGap,
+      scale: scale,
+      breakpoint: breakpoint,
+      containerRelative: containerRelative,
+      ancestorContainerWidth: ancestorContainerWidth,
       children: wrappedChildren,
     );
   }
@@ -269,39 +266,43 @@ class _OiGridParentData extends ContainerBoxParentData<RenderBox> {
   /// Source index, used for stable sort tie-breaking.
   int index = 0;
 
-  /// How many columns this child spans (1-based, sentinel -1 = full row).
-  int columnSpan = 1;
+  /// Responsive column span. Resolved during `performLayout`.
+  OiResponsive<int>? responsiveColumnSpan;
 
-  /// Explicit column start (1-indexed), or null for auto-placement.
-  int? columnStart;
+  /// Responsive column start. Resolved during `performLayout`.
+  OiResponsive<int>? responsiveColumnStart;
 
-  /// Visual ordering key; lower renders first, null = source order (0).
-  int? columnOrder;
+  /// Responsive column order. Resolved during `performLayout`.
+  OiResponsive<int>? responsiveColumnOrder;
 
-  /// How many rows this child spans (default 1).
-  int rowSpan = 1;
+  /// Responsive row span. Resolved during `performLayout`.
+  OiResponsive<int>? responsiveRowSpan;
 }
 
 // ---------------------------------------------------------------------------
 // ParentDataWidget — sets span metadata on each child
 // ---------------------------------------------------------------------------
 
-/// Applies resolved [OiSpanData] to the child's [_OiGridParentData].
+/// Applies responsive [OiSpanData] to the child's [_OiGridParentData].
+///
+/// Span values are stored as [OiResponsive] objects and resolved by the
+/// render object during layout (REQ-1092), eliminating widget-level
+/// resolution overhead.
 class _OiGridSlot extends ParentDataWidget<_OiGridParentData> {
   const _OiGridSlot({
     required this.index,
-    required this.columnSpan,
-    required this.columnStart,
-    required this.columnOrder,
-    required this.rowSpan,
+    required this.responsiveColumnSpan,
+    required this.responsiveColumnStart,
+    required this.responsiveColumnOrder,
+    required this.responsiveRowSpan,
     required super.child,
   });
 
   final int index;
-  final int columnSpan;
-  final int? columnStart;
-  final int? columnOrder;
-  final int rowSpan;
+  final OiResponsive<int>? responsiveColumnSpan;
+  final OiResponsive<int>? responsiveColumnStart;
+  final OiResponsive<int>? responsiveColumnOrder;
+  final OiResponsive<int>? responsiveRowSpan;
 
   @override
   void applyParentData(RenderObject renderObject) {
@@ -312,20 +313,20 @@ class _OiGridSlot extends ParentDataWidget<_OiGridParentData> {
       parentData.index = index;
       needsLayout = true;
     }
-    if (parentData.columnSpan != columnSpan) {
-      parentData.columnSpan = columnSpan;
+    if (parentData.responsiveColumnSpan != responsiveColumnSpan) {
+      parentData.responsiveColumnSpan = responsiveColumnSpan;
       needsLayout = true;
     }
-    if (parentData.columnStart != columnStart) {
-      parentData.columnStart = columnStart;
+    if (parentData.responsiveColumnStart != responsiveColumnStart) {
+      parentData.responsiveColumnStart = responsiveColumnStart;
       needsLayout = true;
     }
-    if (parentData.columnOrder != columnOrder) {
-      parentData.columnOrder = columnOrder;
+    if (parentData.responsiveColumnOrder != responsiveColumnOrder) {
+      parentData.responsiveColumnOrder = responsiveColumnOrder;
       needsLayout = true;
     }
-    if (parentData.rowSpan != rowSpan) {
-      parentData.rowSpan = rowSpan;
+    if (parentData.responsiveRowSpan != responsiveRowSpan) {
+      parentData.responsiveRowSpan = responsiveRowSpan;
       needsLayout = true;
     }
 
@@ -346,19 +347,30 @@ class _OiGridSlot extends ParentDataWidget<_OiGridParentData> {
 // ---------------------------------------------------------------------------
 
 /// The widget that creates and configures [_RenderOiGrid].
+///
+/// Passes responsive values through to the render object for resolution
+/// during layout (REQ-1090/1091/1092).
 class _OiGridLayout extends MultiChildRenderObjectWidget {
   const _OiGridLayout({
     required this.columns,
     required this.minColumnWidth,
     required this.gap,
     required this.rowGap,
+    required this.scale,
+    required this.breakpoint,
+    required this.containerRelative,
+    required this.ancestorContainerWidth,
     required super.children,
   });
 
-  final int? columns;
-  final double? minColumnWidth;
-  final double gap;
-  final double rowGap;
+  final OiResponsive<int>? columns;
+  final OiResponsive<double>? minColumnWidth;
+  final OiResponsive<double> gap;
+  final OiResponsive<double>? rowGap;
+  final OiBreakpointScale scale;
+  final OiBreakpoint? breakpoint;
+  final bool containerRelative;
+  final double? ancestorContainerWidth;
 
   @override
   RenderObject createRenderObject(BuildContext context) {
@@ -367,6 +379,10 @@ class _OiGridLayout extends MultiChildRenderObjectWidget {
       minColumnWidth: minColumnWidth,
       gap: gap,
       rowGap: rowGap,
+      scale: scale,
+      breakpoint: breakpoint,
+      containerRelative: containerRelative,
+      ancestorContainerWidth: ancestorContainerWidth,
     );
   }
 
@@ -376,7 +392,11 @@ class _OiGridLayout extends MultiChildRenderObjectWidget {
       ..columns = columns
       ..minColumnWidth = minColumnWidth
       ..gap = gap
-      ..rowGap = rowGap;
+      ..rowGap = rowGap
+      ..scale = scale
+      ..breakpoint = breakpoint
+      ..containerRelative = containerRelative
+      ..ancestorContainerWidth = ancestorContainerWidth;
   }
 }
 
@@ -386,56 +406,105 @@ class _OiGridLayout extends MultiChildRenderObjectWidget {
 
 /// Custom render object that implements CSS Grid–style row-packing.
 ///
-/// The resolved column count is calculated **once per layout pass** from
-/// [constraints.maxWidth] and the [columns] / [minColumnWidth] configuration.
-/// Children are placed into the first available cell that satisfies their
-/// `columnSpan` and `columnStart` constraints, advancing to the next row
-/// when the current row is full.
+/// **Performance Architecture (REQ-1090/1091/1092):**
+///
+/// 1. **REQ-1090** — Receives `constraints` in `performLayout()`.
+/// 2. **REQ-1091** — Resolves the breakpoint from constraints
+///    (container-relative) or uses the cached viewport breakpoint.
+/// 3. **REQ-1092** — Resolves all responsive values (columns, gaps, and
+///    per-child spans) during layout, not at the widget level.
+///
+/// This architecture means a constraint change triggers only a relayout —
+/// not a full widget-tree rebuild. Widget-level code passes responsive
+/// [OiResponsive] objects through; the render object resolves them using
+/// the active breakpoint computed from its own constraints.
 class _RenderOiGrid extends RenderBox
     with
         ContainerRenderObjectMixin<RenderBox, _OiGridParentData>,
         RenderBoxContainerDefaultsMixin<RenderBox, _OiGridParentData> {
   _RenderOiGrid({
-    required int? columns,
-    required double? minColumnWidth,
-    required double gap,
-    required double rowGap,
+    required OiResponsive<int>? columns,
+    required OiResponsive<double>? minColumnWidth,
+    required OiResponsive<double> gap,
+    required OiResponsive<double>? rowGap,
+    required OiBreakpointScale scale,
+    required OiBreakpoint? breakpoint,
+    required bool containerRelative,
+    required double? ancestorContainerWidth,
   }) : _columns = columns,
        _minColumnWidth = minColumnWidth,
        _gap = gap,
-       _rowGap = rowGap;
+       _rowGap = rowGap,
+       _scale = scale,
+       _breakpoint = breakpoint,
+       _containerRelative = containerRelative,
+       _ancestorContainerWidth = ancestorContainerWidth;
 
-  // ── Properties ──────────────────────────────────────────────────────────
+  // ── Responsive properties ─────────────────────────────────────────────
 
-  int? get columns => _columns;
-  int? _columns;
-  set columns(int? value) {
+  OiResponsive<int>? get columns => _columns;
+  OiResponsive<int>? _columns;
+  set columns(OiResponsive<int>? value) {
     if (_columns == value) return;
     _columns = value;
     markNeedsLayout();
   }
 
-  double? get minColumnWidth => _minColumnWidth;
-  double? _minColumnWidth;
-  set minColumnWidth(double? value) {
+  OiResponsive<double>? get minColumnWidth => _minColumnWidth;
+  OiResponsive<double>? _minColumnWidth;
+  set minColumnWidth(OiResponsive<double>? value) {
     if (_minColumnWidth == value) return;
     _minColumnWidth = value;
     markNeedsLayout();
   }
 
-  double get gap => _gap;
-  double _gap;
-  set gap(double value) {
+  OiResponsive<double> get gap => _gap;
+  OiResponsive<double> _gap;
+  set gap(OiResponsive<double> value) {
     if (_gap == value) return;
     _gap = value;
     markNeedsLayout();
   }
 
-  double get rowGap => _rowGap;
-  double _rowGap;
-  set rowGap(double value) {
+  OiResponsive<double>? get rowGap => _rowGap;
+  OiResponsive<double>? _rowGap;
+  set rowGap(OiResponsive<double>? value) {
     if (_rowGap == value) return;
     _rowGap = value;
+    markNeedsLayout();
+  }
+
+  // ── Breakpoint properties ─────────────────────────────────────────────
+
+  OiBreakpointScale get scale => _scale;
+  OiBreakpointScale _scale;
+  set scale(OiBreakpointScale value) {
+    if (_scale == value) return;
+    _scale = value;
+    markNeedsLayout();
+  }
+
+  OiBreakpoint? get breakpoint => _breakpoint;
+  OiBreakpoint? _breakpoint;
+  set breakpoint(OiBreakpoint? value) {
+    if (_breakpoint == value) return;
+    _breakpoint = value;
+    markNeedsLayout();
+  }
+
+  bool get containerRelative => _containerRelative;
+  bool _containerRelative;
+  set containerRelative(bool value) {
+    if (_containerRelative == value) return;
+    _containerRelative = value;
+    markNeedsLayout();
+  }
+
+  double? get ancestorContainerWidth => _ancestorContainerWidth;
+  double? _ancestorContainerWidth;
+  set ancestorContainerWidth(double? value) {
+    if (_ancestorContainerWidth == value) return;
+    _ancestorContainerWidth = value;
     markNeedsLayout();
   }
 
@@ -446,20 +515,39 @@ class _RenderOiGrid extends RenderBox
     }
   }
 
+  // ── Breakpoint resolution (REQ-1091) ──────────────────────────────────
+
+  /// Resolves the active breakpoint from [width].
+  ///
+  /// REQ-1091: For container-relative grids, uses [ancestorContainerWidth]
+  /// (if available) or the given [width] from constraints. For viewport-based
+  /// grids, returns the cached [breakpoint].
+  OiBreakpoint _resolveActiveBreakpoint(double width) {
+    if (!_containerRelative) return _breakpoint!;
+    final effectiveWidth = _ancestorContainerWidth ?? width;
+    if (!effectiveWidth.isFinite) return _scale.values.first;
+    return _scale.resolve(effectiveWidth);
+  }
+
   // ── Column count resolution ─────────────────────────────────────────────
 
-  /// Resolves the column count from the available [width].
+  /// Resolves the column count from the available [width] and resolved layout
+  /// values.
   ///
   /// Called **once** at the start of each layout pass (REQ-1077).
-  int _resolveColumnCount(double width) {
-    if (_columns != null) return math.max(1, _columns!);
-    if (_minColumnWidth != null && _minColumnWidth! > 0) {
-      return math.max(1, (width / _minColumnWidth!).floor());
+  static int _resolveColumnCount(
+    double width,
+    int? resolvedColumns,
+    double? resolvedMinColumnWidth,
+  ) {
+    if (resolvedColumns != null) return math.max(1, resolvedColumns);
+    if (resolvedMinColumnWidth != null && resolvedMinColumnWidth > 0) {
+      return math.max(1, (width / resolvedMinColumnWidth).floor());
     }
     return 1;
   }
 
-  // ── Layout ──────────────────────────────────────────────────────────────
+  // ── Layout (REQ-1090) ─────────────────────────────────────────────────
 
   @override
   void performLayout() {
@@ -475,18 +563,34 @@ class _RenderOiGrid extends RenderBox
       return;
     }
 
+    // REQ-1090: Receives constraints in performLayout().
     final availableWidth = constraints.maxWidth;
 
+    // REQ-1091: Resolve the breakpoint from constraints (container-relative)
+    // or cached viewport breakpoint.
+    final active = _resolveActiveBreakpoint(availableWidth);
+
+    // REQ-1092: Resolve all responsive values (columns, gaps).
+    final resolvedGap = _gap.resolve(active, _scale);
+    final effectiveRowGap = _rowGap?.resolve(active, _scale) ?? resolvedGap;
+    final resolvedColumns = _columns?.resolve(active, _scale);
+    final resolvedMinColumnWidth = _minColumnWidth?.resolve(active, _scale);
+
     // REQ-1077: column count resolved once per layout pass.
-    final cols = _resolveColumnCount(availableWidth);
+    final cols = _resolveColumnCount(
+      availableWidth,
+      resolvedColumns,
+      resolvedMinColumnWidth,
+    );
 
     // Unit column width = (total − gaps) / cols.
     final unitWidth = cols <= 1
         ? availableWidth
-        : (availableWidth - _gap * (cols - 1)) / cols;
+        : (availableWidth - resolvedGap * (cols - 1)) / cols;
 
-    // REQ-1079: Collect children and sort by columnOrder (null → 0).
-    final entries = _collectChildren(cols)..sort(_compareByOrder);
+    // REQ-1092 + REQ-1079: Collect children (resolving per-child spans)
+    // and sort by columnOrder (null → 0).
+    final entries = _collectChildren(cols, active)..sort(_compareByOrder);
 
     // REQ-1076: CSS Grid row-packing algorithm.
     final placements = _packRows(entries, cols);
@@ -502,7 +606,8 @@ class _RenderOiGrid extends RenderBox
     // First pass: layout each child with its computed width.
     for (final p in placements) {
       final childWidth =
-          p.effectiveSpan * unitWidth + math.max(0, p.effectiveSpan - 1) * _gap;
+          p.effectiveSpan * unitWidth +
+          math.max(0, p.effectiveSpan - 1) * resolvedGap;
 
       p.renderBox.layout(
         BoxConstraints.tightFor(width: childWidth),
@@ -530,7 +635,7 @@ class _RenderOiGrid extends RenderBox
       var spannedHeight = 0.0;
       for (var r = p.row; r < p.row + p.rowSpan; r++) {
         spannedHeight += rowHeights[r];
-        if (r < p.row + p.rowSpan - 1) spannedHeight += _rowGap;
+        if (r < p.row + p.rowSpan - 1) spannedHeight += effectiveRowGap;
       }
       if (childHeight > spannedHeight) {
         // Distribute extra height evenly across spanned rows.
@@ -545,10 +650,10 @@ class _RenderOiGrid extends RenderBox
     // Position children.
     for (final p in placements) {
       final pd = p.renderBox.parentData! as _OiGridParentData;
-      final x = p.column * (unitWidth + _gap);
+      final x = p.column * (unitWidth + resolvedGap);
       var y = 0.0;
       for (var r = 0; r < p.row; r++) {
-        y += rowHeights[r] + _rowGap;
+        y += rowHeights[r] + effectiveRowGap;
       }
       pd.offset = Offset(x, y);
     }
@@ -557,7 +662,7 @@ class _RenderOiGrid extends RenderBox
     var totalHeight = 0.0;
     for (var r = 0; r < rowCount; r++) {
       totalHeight += rowHeights[r];
-      if (r < rowCount - 1) totalHeight += _rowGap;
+      if (r < rowCount - 1) totalHeight += effectiveRowGap;
     }
 
     size = constraints.constrain(Size(availableWidth, totalHeight));
@@ -568,9 +673,18 @@ class _RenderOiGrid extends RenderBox
   /// Lays out children at their natural width and positions them using
   /// the same grid packing algorithm.
   void _performUnboundedLayout() {
-    final cols = _columns != null ? math.max(1, _columns!) : 1;
+    // REQ-1091: Resolve breakpoint.
+    final active = _resolveActiveBreakpoint(double.infinity);
 
-    final entries = _collectChildren(cols)..sort(_compareByOrder);
+    // REQ-1092: Resolve responsive values.
+    final resolvedGap = _gap.resolve(active, _scale);
+    final effectiveRowGap = _rowGap?.resolve(active, _scale) ?? resolvedGap;
+    final resolvedColumns = _columns?.resolve(active, _scale);
+
+    final cols = resolvedColumns != null ? math.max(1, resolvedColumns) : 1;
+
+    // REQ-1092: Collect children with resolved per-child spans.
+    final entries = _collectChildren(cols, active)..sort(_compareByOrder);
     final placements = _packRows(entries, cols);
 
     // First pass: layout children unconstrained to get natural sizes.
@@ -608,7 +722,7 @@ class _RenderOiGrid extends RenderBox
       var spannedHeight = 0.0;
       for (var r = p.row; r < p.row + p.rowSpan; r++) {
         spannedHeight += rowHeights[r];
-        if (r < p.row + p.rowSpan - 1) spannedHeight += _rowGap;
+        if (r < p.row + p.rowSpan - 1) spannedHeight += effectiveRowGap;
       }
       if (childHeight > spannedHeight) {
         final extra = childHeight - spannedHeight;
@@ -626,12 +740,12 @@ class _RenderOiGrid extends RenderBox
 
       var x = 0.0;
       for (var c = 0; c < p.column; c++) {
-        x += colWidths[c] + _gap;
+        x += colWidths[c] + resolvedGap;
       }
 
       var y = 0.0;
       for (var r = 0; r < p.row; r++) {
-        y += rowHeights[r] + _rowGap;
+        y += rowHeights[r] + effectiveRowGap;
       }
 
       pd.offset = Offset(x, y);
@@ -643,30 +757,37 @@ class _RenderOiGrid extends RenderBox
     var totalHeight = 0.0;
     for (var r = 0; r < rowCount; r++) {
       totalHeight += rowHeights[r];
-      if (r < rowCount - 1) totalHeight += _rowGap;
+      if (r < rowCount - 1) totalHeight += effectiveRowGap;
     }
 
     size = constraints.constrain(Size(totalWidth, totalHeight));
   }
 
-  // ── Child collection ────────────────────────────────────────────────────
+  // ── Child collection (REQ-1092) ───────────────────────────────────────
 
-  /// Collects all children into a list with clamped span values.
+  /// Collects all children into a list, resolving responsive span values
+  /// inline using the [active] breakpoint.
   ///
+  /// REQ-1092: Per-child responsive spans are resolved here during layout,
+  /// not at the widget level. This method has no side effects on parentData.
   /// REQ-1080: Resolves columnSpan — default 1, [fullSpanSentinel] → [cols].
-  List<_ChildEntry> _collectChildren(int cols) {
+  List<_ChildEntry> _collectChildren(int cols, OiBreakpoint active) {
     final entries = <_ChildEntry>[];
     var child = firstChild;
     while (child != null) {
       final pd = child.parentData! as _OiGridParentData;
 
-      // REQ-1080: Resolve columnSpan (default 1, fullSpanSentinel → cols).
-      var colSpan = pd.columnSpan;
+      // REQ-1092 + REQ-1080: Resolve responsive columnSpan.
+      var colSpan =
+          pd.responsiveColumnSpan?.resolve(active, _scale) ?? 1;
       if (colSpan == fullSpanSentinel) colSpan = cols;
       colSpan = colSpan.clamp(1, cols);
 
-      // REQ-1084: Resolve rowSpan (default 1, minimum 1).
-      final rSpan = math.max(1, pd.rowSpan);
+      // REQ-1092 + REQ-1084: Resolve responsive rowSpan.
+      final rSpan = math.max(
+        1,
+        pd.responsiveRowSpan?.resolve(active, _scale) ?? 1,
+      );
 
       entries.add(
         _ChildEntry(
@@ -674,8 +795,8 @@ class _RenderOiGrid extends RenderBox
           index: pd.index,
           columnSpan: colSpan,
           rowSpan: rSpan,
-          columnStart: pd.columnStart,
-          columnOrder: pd.columnOrder,
+          columnStart: pd.responsiveColumnStart?.resolve(active, _scale),
+          columnOrder: pd.responsiveColumnOrder?.resolve(active, _scale),
         ),
       );
       child = pd.nextSibling;
@@ -819,7 +940,11 @@ class _RenderOiGrid extends RenderBox
 
   @override
   double computeMaxIntrinsicWidth(double height) {
-    // The grid wants to expand to fill available width.
+    // Resolve responsive column count for intrinsic computation.
+    final active = _resolveActiveBreakpoint(double.infinity);
+    final resolvedCols = _columns?.resolve(active, _scale) ?? 1;
+    final resolvedGap = _gap.resolve(active, _scale);
+
     var maxChildWidth = 0.0;
     var child = firstChild;
     while (child != null) {
@@ -827,8 +952,8 @@ class _RenderOiGrid extends RenderBox
       if (w > maxChildWidth) maxChildWidth = w;
       child = (child.parentData! as _OiGridParentData).nextSibling;
     }
-    final cols = _columns ?? 1;
-    return maxChildWidth * cols + _gap * math.max(0, cols - 1);
+    return maxChildWidth * resolvedCols +
+        resolvedGap * math.max(0, resolvedCols - 1);
   }
 
   @override
@@ -844,12 +969,21 @@ class _RenderOiGrid extends RenderBox
   double _computeIntrinsicHeight(double width, {required bool useMin}) {
     if (firstChild == null) return 0;
 
-    final cols = width.isFinite ? _resolveColumnCount(width) : 1;
+    // REQ-1091/1092: Resolve breakpoint and responsive values for intrinsics.
+    final active = _resolveActiveBreakpoint(width);
+    final resolvedGap = _gap.resolve(active, _scale);
+    final effectiveRowGap = _rowGap?.resolve(active, _scale) ?? resolvedGap;
+    final resolvedColumns = _columns?.resolve(active, _scale);
+    final resolvedMinColumnWidth = _minColumnWidth?.resolve(active, _scale);
+
+    final cols = width.isFinite
+        ? _resolveColumnCount(width, resolvedColumns, resolvedMinColumnWidth)
+        : 1;
     final unitWidth = (cols <= 1 || !width.isFinite)
         ? width
-        : (width - _gap * (cols - 1)) / cols;
+        : (width - resolvedGap * (cols - 1)) / cols;
 
-    final entries = _collectChildren(cols)..sort(_compareByOrder);
+    final entries = _collectChildren(cols, active)..sort(_compareByOrder);
     final placements = _packRows(entries, cols);
 
     var rowCount = 0;
@@ -864,7 +998,8 @@ class _RenderOiGrid extends RenderBox
     for (final p in placements) {
       if (p.rowSpan != 1) continue;
       final childWidth =
-          p.effectiveSpan * unitWidth + math.max(0, p.effectiveSpan - 1) * _gap;
+          p.effectiveSpan * unitWidth +
+          math.max(0, p.effectiveSpan - 1) * resolvedGap;
 
       final h = useMin
           ? p.renderBox.getMinIntrinsicHeight(childWidth)
@@ -876,7 +1011,8 @@ class _RenderOiGrid extends RenderBox
     for (final p in placements) {
       if (p.rowSpan <= 1) continue;
       final childWidth =
-          p.effectiveSpan * unitWidth + math.max(0, p.effectiveSpan - 1) * _gap;
+          p.effectiveSpan * unitWidth +
+          math.max(0, p.effectiveSpan - 1) * resolvedGap;
 
       final h = useMin
           ? p.renderBox.getMinIntrinsicHeight(childWidth)
@@ -885,7 +1021,7 @@ class _RenderOiGrid extends RenderBox
       var spannedHeight = 0.0;
       for (var r = p.row; r < p.row + p.rowSpan; r++) {
         spannedHeight += rowHeights[r];
-        if (r < p.row + p.rowSpan - 1) spannedHeight += _rowGap;
+        if (r < p.row + p.rowSpan - 1) spannedHeight += effectiveRowGap;
       }
       if (h > spannedHeight) {
         final extra = h - spannedHeight;
@@ -899,7 +1035,7 @@ class _RenderOiGrid extends RenderBox
     var totalHeight = 0.0;
     for (var r = 0; r < rowCount; r++) {
       totalHeight += rowHeights[r];
-      if (r < rowCount - 1) totalHeight += _rowGap;
+      if (r < rowCount - 1) totalHeight += effectiveRowGap;
     }
     return totalHeight;
   }
@@ -916,12 +1052,24 @@ class _RenderOiGrid extends RenderBox
     }
 
     final availableWidth = constraints.maxWidth;
-    final cols = _resolveColumnCount(availableWidth);
+
+    // REQ-1091/1092: Resolve breakpoint and responsive values for dry layout.
+    final active = _resolveActiveBreakpoint(availableWidth);
+    final resolvedGap = _gap.resolve(active, _scale);
+    final effectiveRowGap = _rowGap?.resolve(active, _scale) ?? resolvedGap;
+    final resolvedColumns = _columns?.resolve(active, _scale);
+    final resolvedMinColumnWidth = _minColumnWidth?.resolve(active, _scale);
+
+    final cols = _resolveColumnCount(
+      availableWidth,
+      resolvedColumns,
+      resolvedMinColumnWidth,
+    );
     final unitWidth = cols <= 1
         ? availableWidth
-        : (availableWidth - _gap * (cols - 1)) / cols;
+        : (availableWidth - resolvedGap * (cols - 1)) / cols;
 
-    final entries = _collectChildren(cols)..sort(_compareByOrder);
+    final entries = _collectChildren(cols, active)..sort(_compareByOrder);
     final placements = _packRows(entries, cols);
 
     var rowCount = 0;
@@ -936,7 +1084,8 @@ class _RenderOiGrid extends RenderBox
     for (final p in placements) {
       if (p.rowSpan != 1) continue;
       final childWidth =
-          p.effectiveSpan * unitWidth + math.max(0, p.effectiveSpan - 1) * _gap;
+          p.effectiveSpan * unitWidth +
+          math.max(0, p.effectiveSpan - 1) * resolvedGap;
 
       final childSize = p.renderBox.getDryLayout(
         BoxConstraints.tightFor(width: childWidth),
@@ -949,7 +1098,8 @@ class _RenderOiGrid extends RenderBox
     for (final p in placements) {
       if (p.rowSpan <= 1) continue;
       final childWidth =
-          p.effectiveSpan * unitWidth + math.max(0, p.effectiveSpan - 1) * _gap;
+          p.effectiveSpan * unitWidth +
+          math.max(0, p.effectiveSpan - 1) * resolvedGap;
 
       final childSize = p.renderBox.getDryLayout(
         BoxConstraints.tightFor(width: childWidth),
@@ -957,7 +1107,7 @@ class _RenderOiGrid extends RenderBox
       var spannedHeight = 0.0;
       for (var r = p.row; r < p.row + p.rowSpan; r++) {
         spannedHeight += rowHeights[r];
-        if (r < p.row + p.rowSpan - 1) spannedHeight += _rowGap;
+        if (r < p.row + p.rowSpan - 1) spannedHeight += effectiveRowGap;
       }
       if (childSize.height > spannedHeight) {
         final extra = childSize.height - spannedHeight;
@@ -971,7 +1121,7 @@ class _RenderOiGrid extends RenderBox
     var totalHeight = 0.0;
     for (var r = 0; r < rowCount; r++) {
       totalHeight += rowHeights[r];
-      if (r < rowCount - 1) totalHeight += _rowGap;
+      if (r < rowCount - 1) totalHeight += effectiveRowGap;
     }
 
     return constraints.constrain(Size(availableWidth, totalHeight));
