@@ -26,10 +26,17 @@ enum OiDialogVariant {
 /// A modal dialog overlay.
 ///
 /// [OiDialog] renders a modal panel centred on screen (or full-screen when
-/// [variant] is [OiDialogVariant.fullScreen]). A semi-transparent scrim sits
-/// behind the panel. [OiFocusTrap] keeps keyboard focus inside the dialog.
-/// Pressing Escape calls [onClose]; tapping the scrim also calls [onClose]
-/// when [dismissible] is `true`.
+/// using [OiDialog.fullScreen]). A semi-transparent scrim sits behind the
+/// panel. [OiFocusTrap] keeps keyboard focus inside the dialog. Pressing
+/// Escape calls [onClose]; tapping the scrim also calls [onClose] when
+/// [dismissible] is `true`.
+///
+/// Use the named constructors for each dialog variant:
+/// - [OiDialog.standard]: a general-purpose dialog with arbitrary actions.
+/// - [OiDialog.alert]: a simple informational dialog with a single action.
+/// - [OiDialog.confirm]: a dialog with "Cancel" / "Confirm" actions.
+/// - [OiDialog.form]: a dialog with scrollable content for form inputs.
+/// - [OiDialog.fullScreen]: a dialog that fills the entire screen.
 ///
 /// Use the static [OiDialog.show] helper to push a dialog onto the widget
 /// tree via the nearest [OiOverlays] service or, as a fallback, via the raw
@@ -37,17 +44,120 @@ enum OiDialogVariant {
 ///
 /// {@category Components}
 class OiDialog extends StatelessWidget {
-  /// Creates an [OiDialog].
-  const OiDialog({
+  // ── Private base constructor ──────────────────────────────────────────────
+
+  const OiDialog._({
     required this.label,
+    required OiDialogVariant variant,
     this.title,
     this.content,
     this.actions,
-    this.variant = OiDialogVariant.standard,
     this.onClose,
     this.dismissible = true,
     super.key,
-  });
+  }) : variant = variant;
+
+  // ── Named variant constructors ────────────────────────────────────────────
+
+  /// Creates a standard dialog with title, content, and arbitrary actions.
+  const OiDialog.standard({
+    required String label,
+    String? title,
+    Widget? content,
+    List<Widget>? actions,
+    VoidCallback? onClose,
+    bool dismissible = true,
+    Key? key,
+  }) : this._(
+         label: label,
+         variant: OiDialogVariant.standard,
+         title: title,
+         content: content,
+         actions: actions,
+         onClose: onClose,
+         dismissible: dismissible,
+         key: key,
+       );
+
+  /// Creates an alert dialog for simple informational messages.
+  const OiDialog.alert({
+    required String label,
+    String? title,
+    Widget? content,
+    List<Widget>? actions,
+    VoidCallback? onClose,
+    bool dismissible = true,
+    Key? key,
+  }) : this._(
+         label: label,
+         variant: OiDialogVariant.alert,
+         title: title,
+         content: content,
+         actions: actions,
+         onClose: onClose,
+         dismissible: dismissible,
+         key: key,
+       );
+
+  /// Creates a confirmation dialog with cancel/confirm semantics.
+  const OiDialog.confirm({
+    required String label,
+    String? title,
+    Widget? content,
+    List<Widget>? actions,
+    VoidCallback? onClose,
+    bool dismissible = true,
+    Key? key,
+  }) : this._(
+         label: label,
+         variant: OiDialogVariant.confirm,
+         title: title,
+         content: content,
+         actions: actions,
+         onClose: onClose,
+         dismissible: dismissible,
+         key: key,
+       );
+
+  /// Creates a form dialog with scrollable content.
+  const OiDialog.form({
+    required String label,
+    String? title,
+    Widget? content,
+    List<Widget>? actions,
+    VoidCallback? onClose,
+    bool dismissible = true,
+    Key? key,
+  }) : this._(
+         label: label,
+         variant: OiDialogVariant.form,
+         title: title,
+         content: content,
+         actions: actions,
+         onClose: onClose,
+         dismissible: dismissible,
+         key: key,
+       );
+
+  /// Creates a full-screen dialog.
+  const OiDialog.fullScreen({
+    required String label,
+    String? title,
+    Widget? content,
+    List<Widget>? actions,
+    VoidCallback? onClose,
+    bool dismissible = true,
+    Key? key,
+  }) : this._(
+         label: label,
+         variant: OiDialogVariant.fullScreen,
+         title: title,
+         content: content,
+         actions: actions,
+         onClose: onClose,
+         dismissible: dismissible,
+         key: key,
+       );
 
   /// Accessible label describing the dialog for screen readers.
   final String label;

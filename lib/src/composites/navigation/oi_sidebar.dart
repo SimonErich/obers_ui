@@ -437,7 +437,7 @@ class _OiSidebarState extends State<OiSidebar> {
             ),
           ),
           if (item.badgeCount != null && item.badgeCount! > 0)
-            OiBadge(label: item.badgeCount.toString(), size: OiBadgeSize.small),
+            OiBadge.filled(label: item.badgeCount.toString(), size: OiBadgeSize.small),
           if (hasKids)
             Padding(
               padding: const EdgeInsets.only(left: 4),
@@ -483,7 +483,7 @@ class _OiSidebarState extends State<OiSidebar> {
             Positioned(
               top: -4,
               right: -8,
-              child: OiBadge(
+              child: OiBadge.filled(
                 label: item.badgeCount.toString(),
                 size: OiBadgeSize.small,
               ),

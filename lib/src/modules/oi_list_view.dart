@@ -489,7 +489,7 @@ class _OiListViewState<T> extends State<OiListView<T>> {
 
   Widget _buildBody(BuildContext context) {
     if (widget.loading && widget.items.isEmpty) {
-      return const Center(child: OiProgress(indeterminate: true));
+      return const Center(child: OiProgress.linear(indeterminate: true));
     }
 
     if (widget.items.isEmpty && !widget.loading) {
@@ -504,7 +504,7 @@ class _OiListViewState<T> extends State<OiListView<T>> {
         if (index >= widget.items.length) {
           return const Padding(
             padding: EdgeInsets.all(16),
-            child: Center(child: OiProgress(indeterminate: true)),
+            child: Center(child: OiProgress.linear(indeterminate: true)),
           );
         }
         final item = widget.items[index];
@@ -545,7 +545,7 @@ class _OiListViewState<T> extends State<OiListView<T>> {
             child: Center(
               child: Padding(
                 padding: EdgeInsets.all(8),
-                child: OiProgress(indeterminate: true),
+                child: OiProgress.linear(indeterminate: true),
               ),
             ),
           ),

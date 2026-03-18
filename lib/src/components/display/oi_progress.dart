@@ -22,16 +22,24 @@ enum OiProgressStyle {
 /// [value] must be in the range [0.0, 1.0]. When [indeterminate] is `true`
 /// the widget animates regardless of [value].
 ///
-/// - [OiProgressStyle.linear]: horizontal track + fill via [CustomPaint].
-/// - [OiProgressStyle.circular]: arc via [CustomPaint].
-/// - [OiProgressStyle.steps]: a row of [steps] dots filled to [currentStep].
+/// Use the named constructors for each visual style:
+/// - [OiProgress.linear]: horizontal track + fill via [CustomPaint].
+/// - [OiProgress.circular]: arc via [CustomPaint].
+/// - [OiProgress.steps]: a row of step dots filled to [currentStep].
+///
+/// ```dart
+/// OiProgress.linear(value: 0.6)
+/// OiProgress.circular(indeterminate: true)
+/// OiProgress.steps(steps: 5, currentStep: 3)
+/// ```
 ///
 /// {@category Components}
 class OiProgress extends StatefulWidget {
-  /// Creates an [OiProgress].
-  const OiProgress({
+  // ── Private base constructor ──────────────────────────────────────────────
+
+  const OiProgress._({
+    required OiProgressStyle style,
     this.value = 0,
-    this.style = OiProgressStyle.linear,
     this.steps,
     this.currentStep,
     this.label,
@@ -40,7 +48,67 @@ class OiProgress extends StatefulWidget {
     this.strokeWidth = 4,
     this.size,
     super.key,
-  });
+  }) : style = style;
+
+  // ── Named variant constructors ────────────────────────────────────────────
+
+  /// Creates a linear progress indicator (horizontal bar).
+  const OiProgress.linear({
+    double value = 0,
+    String? label,
+    bool indeterminate = false,
+    Color? color,
+    double strokeWidth = 4,
+    double? size,
+    Key? key,
+  }) : this._(
+         style: OiProgressStyle.linear,
+         value: value,
+         label: label,
+         indeterminate: indeterminate,
+         color: color,
+         strokeWidth: strokeWidth,
+         size: size,
+         key: key,
+       );
+
+  /// Creates a circular progress indicator (arc).
+  const OiProgress.circular({
+    double value = 0,
+    String? label,
+    bool indeterminate = false,
+    Color? color,
+    double strokeWidth = 4,
+    double? size,
+    Key? key,
+  }) : this._(
+         style: OiProgressStyle.circular,
+         value: value,
+         label: label,
+         indeterminate: indeterminate,
+         color: color,
+         strokeWidth: strokeWidth,
+         size: size,
+         key: key,
+       );
+
+  /// Creates a step-based progress indicator (row of dots).
+  const OiProgress.steps({
+    int? steps,
+    int? currentStep,
+    double value = 0,
+    String? label,
+    Color? color,
+    Key? key,
+  }) : this._(
+         style: OiProgressStyle.steps,
+         steps: steps,
+         currentStep: currentStep,
+         value: value,
+         label: label,
+         color: color,
+         key: key,
+       );
 
   /// Progress from 0.0 to 1.0.
   final double value;

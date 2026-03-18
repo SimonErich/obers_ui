@@ -277,7 +277,7 @@ class _OiNavMenuBodyState extends State<_OiNavMenuBody> {
             ),
           ),
           if (item.badgeCount != null && item.badgeCount! > 0)
-            OiBadge(label: item.badgeCount.toString(), size: OiBadgeSize.small),
+            OiBadge.filled(label: item.badgeCount.toString(), size: OiBadgeSize.small),
         ],
       ),
     );

@@ -184,7 +184,7 @@ class OiActivityFeed extends StatelessWidget {
 
   Widget _buildBody(BuildContext context) {
     if (loading && events.isEmpty) {
-      return const Center(child: OiProgress(indeterminate: true));
+      return const Center(child: OiProgress.linear(indeterminate: true));
     }
 
     if (events.isEmpty && !loading) {
@@ -265,7 +265,7 @@ class _OiActivityFeedListState extends State<_OiActivityFeedList> {
         if (index >= widget.events.length) {
           return const Padding(
             padding: EdgeInsets.all(16),
-            child: Center(child: OiProgress(indeterminate: true)),
+            child: Center(child: OiProgress.linear(indeterminate: true)),
           );
         }
         return _OiActivityEventTile(

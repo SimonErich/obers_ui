@@ -58,22 +58,89 @@ enum OiBadgeStyle {
 
 /// A small label chip used to communicate status, category, or metadata.
 ///
-/// Supports three rendering [style]s ([OiBadgeStyle.filled],
-/// [OiBadgeStyle.soft], [OiBadgeStyle.outline]) and seven semantic [color]s.
+/// Supports three rendering styles and seven semantic [color]s.
 /// When [dot] is `true` a small circle is shown with no text.
+///
+/// Use the named constructors for each visual style:
+/// - [OiBadge.filled]: solid coloured background with contrasting text.
+/// - [OiBadge.soft]: muted tinted background with coloured text.
+/// - [OiBadge.outline]: transparent with a coloured border and text.
+///
+/// ```dart
+/// OiBadge.filled(label: 'New')
+/// OiBadge.soft(label: 'Draft', color: OiBadgeColor.warning)
+/// OiBadge.outline(label: 'v2.1')
+/// ```
 ///
 /// {@category Components}
 class OiBadge extends StatelessWidget {
-  /// Creates an [OiBadge].
-  const OiBadge({
+  // ── Private base constructor ──────────────────────────────────────────────
+
+  const OiBadge._({
     required this.label,
+    required OiBadgeStyle style,
     this.color = OiBadgeColor.primary,
     this.size = OiBadgeSize.medium,
-    this.style = OiBadgeStyle.filled,
     this.icon,
     this.dot = false,
     super.key,
-  });
+  }) : style = style;
+
+  // ── Named variant constructors ────────────────────────────────────────────
+
+  /// Creates a filled badge with a solid coloured background.
+  const OiBadge.filled({
+    required String label,
+    OiBadgeColor color = OiBadgeColor.primary,
+    OiBadgeSize size = OiBadgeSize.medium,
+    IconData? icon,
+    bool dot = false,
+    Key? key,
+  }) : this._(
+         label: label,
+         style: OiBadgeStyle.filled,
+         color: color,
+         size: size,
+         icon: icon,
+         dot: dot,
+         key: key,
+       );
+
+  /// Creates a soft badge with a muted tinted background.
+  const OiBadge.soft({
+    required String label,
+    OiBadgeColor color = OiBadgeColor.primary,
+    OiBadgeSize size = OiBadgeSize.medium,
+    IconData? icon,
+    bool dot = false,
+    Key? key,
+  }) : this._(
+         label: label,
+         style: OiBadgeStyle.soft,
+         color: color,
+         size: size,
+         icon: icon,
+         dot: dot,
+         key: key,
+       );
+
+  /// Creates an outline badge with a coloured border and no fill.
+  const OiBadge.outline({
+    required String label,
+    OiBadgeColor color = OiBadgeColor.primary,
+    OiBadgeSize size = OiBadgeSize.medium,
+    IconData? icon,
+    bool dot = false,
+    Key? key,
+  }) : this._(
+         label: label,
+         style: OiBadgeStyle.outline,
+         color: color,
+         size: size,
+         icon: icon,
+         dot: dot,
+         key: key,
+       );
 
   /// The text label. Ignored when [dot] is `true`.
   final String label;

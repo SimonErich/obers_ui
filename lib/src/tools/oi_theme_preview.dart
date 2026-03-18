@@ -304,11 +304,20 @@ class OiThemePreview extends StatelessWidget {
         children: [
           for (final color in OiBadgeColor.values)
             for (final style in OiBadgeStyle.values)
-              OiBadge(
-                label: '${color.name} ${style.name}',
-                color: color,
-                style: style,
-              ),
+              switch (style) {
+                OiBadgeStyle.filled => OiBadge.filled(
+                  label: '${color.name} ${style.name}',
+                  color: color,
+                ),
+                OiBadgeStyle.soft => OiBadge.soft(
+                  label: '${color.name} ${style.name}',
+                  color: color,
+                ),
+                OiBadgeStyle.outline => OiBadge.outline(
+                  label: '${color.name} ${style.name}',
+                  color: color,
+                ),
+              },
         ],
       ),
     );
@@ -321,12 +330,12 @@ class OiThemePreview extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const SizedBox(width: 300, child: OiProgress(value: 0.6)),
+          const SizedBox(width: 300, child: OiProgress.linear(value: 0.6)),
           SizedBox(height: theme.spacing.md),
           const SizedBox(
             width: 60,
             height: 60,
-            child: OiProgress(value: 0.7, style: OiProgressStyle.circular),
+            child: OiProgress.circular(value: 0.7),
           ),
         ],
       ),

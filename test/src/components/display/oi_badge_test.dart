@@ -8,13 +8,37 @@ import 'package:obers_ui/src/components/display/oi_badge.dart';
 import '../../../helpers/pump_app.dart';
 
 void main() {
+  // ── Factory constructor style assignment ──────────────────────────────────
+
+  group('factory constructors produce the correct OiBadgeStyle', () {
+    testWidgets('OiBadge.filled sets style to filled', (tester) async {
+      await tester.pumpObers(const OiBadge.filled(label: 'Tag'));
+      final badge = tester.widget<OiBadge>(find.byType(OiBadge));
+      expect(badge.style, OiBadgeStyle.filled);
+    });
+
+    testWidgets('OiBadge.soft sets style to soft', (tester) async {
+      await tester.pumpObers(const OiBadge.soft(label: 'Tag'));
+      final badge = tester.widget<OiBadge>(find.byType(OiBadge));
+      expect(badge.style, OiBadgeStyle.soft);
+    });
+
+    testWidgets('OiBadge.outline sets style to outline', (tester) async {
+      await tester.pumpObers(const OiBadge.outline(label: 'Tag'));
+      final badge = tester.widget<OiBadge>(find.byType(OiBadge));
+      expect(badge.style, OiBadgeStyle.outline);
+    });
+  });
+
+  // ── Rendering ─────────────────────────────────────────────────────────────
+
   testWidgets('renders label text', (tester) async {
-    await tester.pumpObers(const OiBadge(label: 'New'));
+    await tester.pumpObers(const OiBadge.filled(label: 'New'));
     expect(find.text('New'), findsOneWidget);
   });
 
   testWidgets('dot mode renders no text', (tester) async {
-    await tester.pumpObers(const OiBadge(label: 'ignored', dot: true));
+    await tester.pumpObers(const OiBadge.filled(label: 'ignored', dot: true));
     expect(find.text('ignored'), findsNothing);
   });
 
@@ -22,7 +46,7 @@ void main() {
     tester,
   ) async {
     await tester.pumpObers(
-      const OiBadge(
+      const OiBadge.filled(
         label: 'Error status',
         color: OiBadgeColor.error,
         dot: true,
@@ -36,45 +60,45 @@ void main() {
 
   testWidgets('renders with success color', (tester) async {
     await tester.pumpObers(
-      const OiBadge(label: 'OK', color: OiBadgeColor.success),
+      const OiBadge.filled(label: 'OK', color: OiBadgeColor.success),
     );
     expect(find.text('OK'), findsOneWidget);
   });
 
   testWidgets('renders with error color', (tester) async {
     await tester.pumpObers(
-      const OiBadge(label: 'Error', color: OiBadgeColor.error),
+      const OiBadge.filled(label: 'Error', color: OiBadgeColor.error),
     );
     expect(find.text('Error'), findsOneWidget);
   });
 
   testWidgets('renders small size', (tester) async {
-    await tester.pumpObers(const OiBadge(label: 'sm', size: OiBadgeSize.small));
+    await tester.pumpObers(
+      const OiBadge.filled(label: 'sm', size: OiBadgeSize.small),
+    );
     expect(find.text('sm'), findsOneWidget);
   });
 
   testWidgets('renders large size', (tester) async {
-    await tester.pumpObers(const OiBadge(label: 'lg', size: OiBadgeSize.large));
+    await tester.pumpObers(
+      const OiBadge.filled(label: 'lg', size: OiBadgeSize.large),
+    );
     expect(find.text('lg'), findsOneWidget);
   });
 
   testWidgets('renders soft style', (tester) async {
-    await tester.pumpObers(
-      const OiBadge(label: 'soft', style: OiBadgeStyle.soft),
-    );
+    await tester.pumpObers(const OiBadge.soft(label: 'soft'));
     expect(find.text('soft'), findsOneWidget);
   });
 
   testWidgets('renders outline style', (tester) async {
-    await tester.pumpObers(
-      const OiBadge(label: 'out', style: OiBadgeStyle.outline),
-    );
+    await tester.pumpObers(const OiBadge.outline(label: 'out'));
     expect(find.text('out'), findsOneWidget);
   });
 
   testWidgets('renders with icon', (tester) async {
     const icon = IconData(0xe318, fontFamily: 'MaterialIcons');
-    await tester.pumpObers(const OiBadge(label: 'with icon', icon: icon));
+    await tester.pumpObers(const OiBadge.filled(label: 'with icon', icon: icon));
     expect(find.text('with icon'), findsOneWidget);
     expect(find.byType(Icon), findsOneWidget);
   });

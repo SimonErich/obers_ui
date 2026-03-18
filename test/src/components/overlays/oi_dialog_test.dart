@@ -10,18 +10,28 @@ import '../../../helpers/pump_app.dart';
 
 void main() {
   testWidgets('renders title text', (tester) async {
-    await tester.pumpObers(const OiDialog(title: 'Confirm delete'));
+    await tester.pumpObers(
+      const OiDialog.standard(label: 'dialog', title: 'Confirm delete'),
+    );
     expect(find.text('Confirm delete'), findsOneWidget);
   });
 
   testWidgets('renders content widget', (tester) async {
-    await tester.pumpObers(const OiDialog(content: Text('Are you sure?')));
+    await tester.pumpObers(
+      const OiDialog.standard(
+        label: 'dialog',
+        content: Text('Are you sure?'),
+      ),
+    );
     expect(find.text('Are you sure?'), findsOneWidget);
   });
 
   testWidgets('renders action widgets', (tester) async {
     await tester.pumpObers(
-      const OiDialog(actions: [Text('Cancel'), Text('OK')]),
+      const OiDialog.standard(
+        label: 'dialog',
+        actions: [Text('Cancel'), Text('OK')],
+      ),
     );
     expect(find.text('Cancel'), findsOneWidget);
     expect(find.text('OK'), findsOneWidget);
@@ -30,7 +40,11 @@ void main() {
   testWidgets('Escape key calls onClose', (tester) async {
     var closed = false;
     await tester.pumpObers(
-      OiDialog(title: 'Alert', onClose: () => closed = true),
+      OiDialog.standard(
+        label: 'alert',
+        title: 'Alert',
+        onClose: () => closed = true,
+      ),
     );
     await tester.sendKeyEvent(LogicalKeyboardKey.escape);
     await tester.pump();
@@ -40,7 +54,11 @@ void main() {
   testWidgets('dismissible=true: tapping scrim calls onClose', (tester) async {
     var closed = false;
     await tester.pumpObers(
-      OiDialog(title: 'Dismissible', onClose: () => closed = true),
+      OiDialog.standard(
+        label: 'dismissible',
+        title: 'Dismissible',
+        onClose: () => closed = true,
+      ),
     );
     // Tap far corner — outside the centered panel, on the scrim.
     await tester.tapAt(const Offset(5, 5));
@@ -53,7 +71,8 @@ void main() {
   ) async {
     var closed = false;
     await tester.pumpObers(
-      OiDialog(
+      OiDialog.standard(
+        label: 'non-dismissible',
         title: 'Non-dismissible',
         dismissible: false,
         onClose: () => closed = true,
@@ -66,8 +85,8 @@ void main() {
 
   testWidgets('fullScreen variant builds without error', (tester) async {
     await tester.pumpObers(
-      const OiDialog(
-        variant: OiDialogVariant.fullScreen,
+      const OiDialog.fullScreen(
+        label: 'full-screen',
         title: 'Full screen',
         content: Text('Content'),
       ),
@@ -78,8 +97,8 @@ void main() {
 
   testWidgets('form variant wraps content in scroll view', (tester) async {
     await tester.pumpObers(
-      const OiDialog(
-        variant: OiDialogVariant.form,
+      const OiDialog.form(
+        label: 'form',
         title: 'Form',
         content: Text('Form content'),
       ),
@@ -92,8 +111,13 @@ void main() {
     await tester.pumpObers(
       Builder(
         builder: (ctx) => GestureDetector(
-          onTap: () =>
-              OiDialog.show(ctx, dialog: const OiDialog(title: 'Shown')),
+          onTap: () => OiDialog.show(
+            ctx,
+            dialog: const OiDialog.standard(
+              label: 'shown',
+              title: 'Shown',
+            ),
+          ),
           child: const Text('tap'),
         ),
       ),

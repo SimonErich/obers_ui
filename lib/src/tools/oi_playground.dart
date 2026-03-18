@@ -249,9 +249,9 @@ class _OiPlaygroundState extends State<OiPlayground> {
       children: [
         const OiCard(child: Text('Sample card')),
         const SizedBox(height: 12),
-        const OiBadge(label: 'Badge'),
+        const OiBadge.filled(label: 'Badge'),
         const SizedBox(height: 12),
-        const OiProgress(value: 0.6, label: 'Progress'),
+        const OiProgress.linear(value: 0.6, label: 'Progress'),
       ],
     );
   }

@@ -776,4 +776,140 @@ void main() {
       },
     );
   });
+
+  // ── REQ-0015: Factories for variants ──────────────────────────────────────
+
+  group('REQ-0015 – Widgets with variants use factory/named constructors', () {
+    // General: any widget file that defines an OiXxxStyle enum must use a
+    // private base constructor and provide a named constructor for each
+    // enum value.
+    test(
+      'widgets with private base constructors cover all style enum values',
+      () {
+        // If a widget uses the factory/named-constructor pattern (private
+        // base constructor + OiXxxStyle enum), every enum value must have a
+        // corresponding named constructor.
+        final styleEnumPattern = RegExp(
+          r'enum\s+(Oi\w+Style)\s*\{([^}]*)\}',
+          dotAll: true,
+        );
+        final enumValuePattern = RegExp(r'^\s*([a-z]\w*)', multiLine: true);
+
+        final violations = <String>[];
+
+        for (final file in allFiles) {
+          final content = _stripComments(file.readAsStringSync());
+          final styleMatches = styleEnumPattern.allMatches(content);
+
+          for (final styleMatch in styleMatches) {
+            final enumName = styleMatch.group(1)!;
+            final enumBody = styleMatch.group(2)!;
+
+            // Derive widget class name: OiBadgeStyle → OiBadge.
+            final widgetName = enumName.replaceFirst('Style', '');
+
+            // Only check widgets that opted into the factory pattern.
+            final privateCtor = RegExp(
+              RegExp.escape(widgetName) + r'\._\s*\(',
+            );
+            if (!privateCtor.hasMatch(content)) continue;
+
+            // Extract enum value names.
+            final values = enumValuePattern
+                .allMatches(enumBody)
+                .map((m) => m.group(1)!)
+                .toList();
+
+            // Verify a named constructor exists for each style value.
+            for (final value in values) {
+              if (!content.contains('$widgetName.$value(')) {
+                violations.add(
+                  '${file.path} — $widgetName missing named constructor '
+                  '.$value() for $enumName.$value',
+                );
+              }
+            }
+          }
+        }
+
+        expect(
+          violations,
+          isEmpty,
+          reason:
+              'Widgets using the factory pattern (private base constructor) '
+              'must provide named constructors for every style enum value. '
+              'Violations:\n${violations.join('\n')}',
+        );
+      },
+    );
+
+    test('OiBadge provides factory constructors for each style', () {
+      final file = File('lib/src/components/display/oi_badge.dart');
+      final content = file.readAsStringSync();
+
+      expect(
+        content,
+        contains('OiBadge._({'),
+        reason: 'OiBadge must use a private base constructor',
+      );
+
+      for (final variant in ['filled', 'soft', 'outline']) {
+        expect(
+          content,
+          contains('OiBadge.$variant({'),
+          reason: 'OiBadge must provide .$variant() named constructor',
+        );
+      }
+    });
+
+    test('OiProgress provides factory constructors for each style', () {
+      final file = File('lib/src/components/display/oi_progress.dart');
+      final content = file.readAsStringSync();
+
+      expect(
+        content,
+        contains('OiProgress._({'),
+        reason: 'OiProgress must use a private base constructor',
+      );
+
+      for (final variant in ['linear', 'circular', 'steps']) {
+        expect(
+          content,
+          contains('OiProgress.$variant('),
+          reason: 'OiProgress must provide .$variant() named constructor',
+        );
+      }
+    });
+
+    test('OiButton provides factory constructors for each variant', () {
+      final file = File('lib/src/components/buttons/oi_button.dart');
+      final content = file.readAsStringSync();
+
+      expect(
+        content,
+        contains('OiButton._({'),
+        reason: 'OiButton must use a private base constructor',
+      );
+
+      const variants = [
+        'primary',
+        'secondary',
+        'outline',
+        'ghost',
+        'destructive',
+        'soft',
+        'icon',
+        'split',
+        'countdown',
+        'confirm',
+      ];
+      for (final variant in variants) {
+        expect(
+          content,
+          contains('OiButton.$variant('),
+          reason: 'OiButton must provide .$variant() named constructor',
+        );
+      }
+    });
+  });
 }

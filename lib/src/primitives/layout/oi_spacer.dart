@@ -35,6 +35,23 @@ class OiSpacer extends StatelessWidget {
     super.key,
   });
 
+  /// Creates a flex spacer that fills available space proportionally.
+  ///
+  /// The [flex] factor determines how much space this spacer takes
+  /// relative to other flex children. Defaults to `1`.
+  ///
+  /// ```dart
+  /// OiSpacer.flex()           // flex: 1
+  /// OiSpacer.flex(flex: 2)    // twice the space
+  /// ```
+  const OiSpacer.flex({
+    this.flex = 1,
+    super.key,
+  })  : size = null,
+       axis = Axis.vertical,
+       breakpoint = OiBreakpoint.compact,
+       scale = OiBreakpointScale.defaultScale;
+
   /// Fixed size in logical pixels. Used when [flex] is null.
   ///
   /// Accepts an [OiResponsive] value so size can vary across breakpoints.
