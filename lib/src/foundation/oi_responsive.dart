@@ -143,11 +143,7 @@ class OiBreakpointScale with Iterable<OiBreakpoint> {
         OiBreakpoint.extraLarge,
         const OiBreakpoint('ultraWide', 1920),
       ],
-      {
-        ..._standardPageGutters,
-        'tablet': 16,
-        'ultraWide': 56,
-      },
+      {..._standardPageGutters, 'tablet': 16, 'ultraWide': 56},
       {
         ..._standardContentMaxWidths,
         'tablet': double.infinity,
@@ -262,8 +258,7 @@ class OiBreakpointScale with Iterable<OiBreakpoint> {
   // ── Registry API ──────────────────────────────────────────────────────
 
   /// All registered breakpoint names in ascending order of minWidth.
-  List<String> get names =>
-      List.unmodifiable(values.map((b) => b.name));
+  List<String> get names => List.unmodifiable(values.map((b) => b.name));
 
   @override
   int get length => values.length;
@@ -302,9 +297,7 @@ class OiBreakpointScale with Iterable<OiBreakpoint> {
     double? pageGutter,
     double? contentMaxWidth,
   }) {
-    final newValues = values
-        .where((b) => b.name != breakpoint.name)
-        .toList()
+    final newValues = values.where((b) => b.name != breakpoint.name).toList()
       ..add(breakpoint)
       ..sort();
     final newGutters = Map<String, double>.of(pageGutters);
@@ -325,9 +318,7 @@ class OiBreakpointScale with Iterable<OiBreakpoint> {
     Map<String, double> contentMaxWidths = const {},
   }) {
     final nameSet = breakpoints.map((b) => b.name).toSet();
-    final newValues = values
-        .where((b) => !nameSet.contains(b.name))
-        .toList()
+    final newValues = values.where((b) => !nameSet.contains(b.name)).toList()
       ..addAll(breakpoints)
       ..sort();
     return OiBreakpointScale._(
@@ -389,12 +380,12 @@ class OiBreakpointScale with Iterable<OiBreakpoint> {
 
   @override
   int get hashCode => Object.hashAll([
-        ...values,
-        ...pageGutters.keys,
-        ...pageGutters.values,
-        ...contentMaxWidths.keys,
-        ...contentMaxWidths.values,
-      ]);
+    ...values,
+    ...pageGutters.keys,
+    ...pageGutters.values,
+    ...contentMaxWidths.keys,
+    ...contentMaxWidths.values,
+  ]);
 
   @override
   String toString() =>
@@ -455,11 +446,9 @@ class OiResponsive<T> {
   ///
   /// The map should ideally contain a key with `minWidth == 0` (typically
   /// [OiBreakpoint.compact]) or provide a base via [defaultValue].
-  const OiResponsive.breakpoints(
-    Map<OiBreakpoint, T> map, {
-    T? defaultValue,
-  }) : _map = map,
-       _defaultValue = defaultValue;
+  const OiResponsive.breakpoints(Map<OiBreakpoint, T> map, {T? defaultValue})
+    : _map = map,
+      _defaultValue = defaultValue;
 
   final T? _defaultValue;
   final Map<OiBreakpoint, T>? _map;
@@ -601,9 +590,11 @@ extension OiResponsiveMapExt<T> on Map<OiBreakpoint, T> {
 /// **Deprecated:** Use [OiResponsive] instead for new code.
 ///
 /// {@category Foundation}
-@Deprecated('Use OiResponsive<T> instead. '
-    'OiResponsive supports mobile-first cascading and explicit resolution '
-    'via resolve(breakpoint, scale).')
+@Deprecated(
+  'Use OiResponsive<T> instead. '
+  'OiResponsive supports mobile-first cascading and explicit resolution '
+  'via resolve(breakpoint, scale).',
+)
 class OiResponsiveValue<T> {
   /// Creates an [OiResponsiveValue] with per-breakpoint values.
   @Deprecated('Use OiResponsive<T> instead.')
@@ -667,8 +658,13 @@ class OiResponsiveValue<T> {
 ///
 /// {@category Foundation}
 extension OiResponsiveExt on BuildContext {
-  double get _width => MediaQuery.sizeOf(this).width;
   double get _height => MediaQuery.sizeOf(this).height;
+
+  /// The current viewport width in logical pixels.
+  ///
+  /// This is the raw width from [MediaQuery.sizeOf]. Use [breakpoint] for
+  /// the resolved breakpoint at this width.
+  double get viewportWidth => MediaQuery.sizeOf(this).width;
 
   /// The [OiBreakpointScale] from the nearest [OiTheme].
   ///
@@ -677,7 +673,7 @@ extension OiResponsiveExt on BuildContext {
   OiBreakpointScale get breakpointScale => OiTheme.of(this).breakpoints;
 
   /// The active [OiBreakpoint] for the current screen width.
-  OiBreakpoint get breakpoint => breakpointScale.resolve(_width);
+  OiBreakpoint get breakpoint => breakpointScale.resolve(viewportWidth);
 
   // ── Standard breakpoint checks ──────────────────────────────────────────
   // These compare by minWidth threshold so they work with custom-named
@@ -687,29 +683,25 @@ extension OiResponsiveExt on BuildContext {
   ///
   /// Matches any breakpoint whose [OiBreakpoint.minWidth] equals
   /// [OiBreakpoint.compact]'s minWidth, regardless of its name.
-  bool get isCompact =>
-      breakpoint.minWidth == OiBreakpoint.compact.minWidth;
+  bool get isCompact => breakpoint.minWidth == OiBreakpoint.compact.minWidth;
 
   /// Whether the active breakpoint occupies the medium tier (minWidth 600).
   ///
   /// Matches any breakpoint whose [OiBreakpoint.minWidth] equals
   /// [OiBreakpoint.medium]'s minWidth, regardless of its name.
-  bool get isMedium =>
-      breakpoint.minWidth == OiBreakpoint.medium.minWidth;
+  bool get isMedium => breakpoint.minWidth == OiBreakpoint.medium.minWidth;
 
   /// Whether the active breakpoint occupies the expanded tier (minWidth 840).
   ///
   /// Matches any breakpoint whose [OiBreakpoint.minWidth] equals
   /// [OiBreakpoint.expanded]'s minWidth, regardless of its name.
-  bool get isExpanded =>
-      breakpoint.minWidth == OiBreakpoint.expanded.minWidth;
+  bool get isExpanded => breakpoint.minWidth == OiBreakpoint.expanded.minWidth;
 
   /// Whether the active breakpoint occupies the large tier (minWidth 1200).
   ///
   /// Matches any breakpoint whose [OiBreakpoint.minWidth] equals
   /// [OiBreakpoint.large]'s minWidth, regardless of its name.
-  bool get isLarge =>
-      breakpoint.minWidth == OiBreakpoint.large.minWidth;
+  bool get isLarge => breakpoint.minWidth == OiBreakpoint.large.minWidth;
 
   /// Whether the active breakpoint occupies the extraLarge tier
   /// (minWidth 1600).
@@ -731,8 +723,7 @@ extension OiResponsiveExt on BuildContext {
 
   /// Whether the active breakpoint is at least as wide as
   /// [OiBreakpoint.large] (≥1200dp tier).
-  bool get isLargeOrWider =>
-      breakpoint.minWidth >= OiBreakpoint.large.minWidth;
+  bool get isLargeOrWider => breakpoint.minWidth >= OiBreakpoint.large.minWidth;
 
   // ── Generic breakpoint checks ───────────────────────────────────────────
 
@@ -758,10 +749,28 @@ extension OiResponsiveExt on BuildContext {
   T resolveResponsive<T>(OiResponsive<T> value) =>
       value.resolve(breakpoint, breakpointScale);
 
+  /// Resolves a responsive value for the current viewport breakpoint.
+  ///
+  /// Convenience for `values.resolve(breakpoint, breakpointScale)`.
+  ///
+  /// ```dart
+  /// final cols = context.responsive(OiResponsive.breakpoints({
+  ///   OiBreakpoint.compact: 1,
+  ///   OiBreakpoint.medium: 2,
+  ///   OiBreakpoint.large: 4,
+  /// }));
+  /// ```
+  T responsive<T>(OiResponsive<T> values) =>
+      values.resolve(breakpoint, breakpointScale);
+
   /// Resolves an [OiResponsiveValue] for the current screen width.
-  @Deprecated('Use OiResponsive<T> with resolve(breakpoint, scale) instead.')
+  @Deprecated(
+    'Use responsive<T>(OiResponsive<T>) or '
+    'OiResponsive<T>.resolve(breakpoint, scale) instead.',
+  )
   // ignore: deprecated_member_use_from_same_package
-  T? responsive<T>(OiResponsiveValue<T> value) => value.resolve(_width);
+  T? responsiveValue<T>(OiResponsiveValue<T> value) =>
+      value.resolve(viewportWidth);
 
   /// Returns one of two values based on the current breakpoint.
   ///

@@ -108,8 +108,10 @@ void main() {
     test('standard breakpoints are in ascending order', () {
       final scale = OiBreakpointScale.standard();
       for (var i = 1; i < scale.values.length; i++) {
-        expect(scale.values[i].minWidth,
-            greaterThan(scale.values[i - 1].minWidth));
+        expect(
+          scale.values[i].minWidth,
+          greaterThan(scale.values[i - 1].minWidth),
+        );
       }
     });
 
@@ -294,7 +296,10 @@ void main() {
 
     test('resolveContentMaxWidth returns standard values', () {
       final scale = OiBreakpointScale.standard();
-      expect(scale.resolveContentMaxWidth(OiBreakpoint.compact), double.infinity);
+      expect(
+        scale.resolveContentMaxWidth(OiBreakpoint.compact),
+        double.infinity,
+      );
       expect(scale.resolveContentMaxWidth(OiBreakpoint.medium), 720);
       expect(scale.resolveContentMaxWidth(OiBreakpoint.expanded), 960);
       expect(scale.resolveContentMaxWidth(OiBreakpoint.large), 1200);
@@ -389,10 +394,13 @@ void main() {
     group('registry API', () {
       test('names returns all breakpoint names in order', () {
         final scale = OiBreakpointScale.standard();
-        expect(
-          scale.names,
-          ['compact', 'medium', 'expanded', 'large', 'extraLarge'],
-        );
+        expect(scale.names, [
+          'compact',
+          'medium',
+          'expanded',
+          'large',
+          'extraLarge',
+        ]);
       });
 
       test('length returns count of breakpoints', () {
@@ -517,10 +525,7 @@ void main() {
 
       test('unregister throws StateError for unknown name', () {
         final scale = OiBreakpointScale.standard();
-        expect(
-          () => scale.unregister('tablet'),
-          throwsA(isA<StateError>()),
-        );
+        expect(() => scale.unregister('tablet'), throwsA(isA<StateError>()));
       });
 
       test('unregister throws ArgumentError for base breakpoint', () {
@@ -597,10 +602,7 @@ void main() {
       test('for-in iterates breakpoints in ascending order', () {
         final scale = OiBreakpointScale.standard();
         final names = [for (final bp in scale) bp.name];
-        expect(
-          names,
-          ['compact', 'medium', 'expanded', 'large', 'extraLarge'],
-        );
+        expect(names, ['compact', 'medium', 'expanded', 'large', 'extraLarge']);
       });
 
       test('Iterable methods (map, where, any) work', () {
@@ -648,8 +650,9 @@ void main() {
       });
 
       test('containsName returns true after registering custom breakpoint', () {
-        final scale = OiBreakpointScale.standard()
-            .register(const OiBreakpoint('tablet', 480));
+        final scale = OiBreakpointScale.standard().register(
+          const OiBreakpoint('tablet', 480),
+        );
         expect(scale.containsName('tablet'), isTrue);
       });
 
@@ -666,15 +669,13 @@ void main() {
       test('entries preserves ascending order', () {
         final scale = OiBreakpointScale.standard();
         final keys = scale.entries.keys.toList();
-        expect(
-          keys,
-          ['compact', 'medium', 'expanded', 'large', 'extraLarge'],
-        );
+        expect(keys, ['compact', 'medium', 'expanded', 'large', 'extraLarge']);
       });
 
       test('entries includes custom breakpoints after register', () {
-        final scale = OiBreakpointScale.standard()
-            .register(const OiBreakpoint('tablet', 480));
+        final scale = OiBreakpointScale.standard().register(
+          const OiBreakpoint('tablet', 480),
+        );
         final map = scale.entries;
         expect(map.length, 6);
         expect(map.containsKey('tablet'), isTrue);
@@ -689,8 +690,10 @@ void main() {
         final scale = OiBreakpointScale.standard();
         final map = scale.entries;
         expect(
-          () => (map as Map<String, OiBreakpoint>)['new'] =
-              const OiBreakpoint('new', 999),
+          () => (map as Map<String, OiBreakpoint>)['new'] = const OiBreakpoint(
+            'new',
+            999,
+          ),
           throwsA(isA<UnsupportedError>()),
         );
       });
@@ -736,10 +739,9 @@ void main() {
     });
 
     test('falls back to defaultValue when no breakpoint matches', () {
-      final r = OiResponsive<int>.breakpoints(
-        {OiBreakpoint.medium: 2},
-        defaultValue: 99,
-      );
+      final r = OiResponsive<int>.breakpoints({
+        OiBreakpoint.medium: 2,
+      }, defaultValue: 99);
       // compact (index 0) has no entry, should use defaultValue
       expect(r.resolve(OiBreakpoint.compact, scale), 99);
     });
@@ -785,10 +787,7 @@ void main() {
     test('int.responsive creates static OiResponsive<int>', () {
       final r = 3.responsive;
       expect(r.isStatic, isTrue);
-      expect(
-        r.resolve(OiBreakpoint.compact, OiBreakpointScale.standard()),
-        3,
-      );
+      expect(r.resolve(OiBreakpoint.compact, OiBreakpointScale.standard()), 3);
     });
 
     test('double.responsive creates static OiResponsive<double>', () {
@@ -990,6 +989,176 @@ void main() {
   // ─────────────────────────────────────────────────────────────────────────
 
   group('BuildContext responsive extensions', () {
+    // ── viewportWidth ──────────────────────────────────────────────────────
+
+    testWidgets('viewportWidth returns the MediaQuery width', (tester) async {
+      late double result;
+      await tester.pumpWidget(
+        buildWithWidth(
+          1024,
+          Builder(
+            builder: (ctx) {
+              result = ctx.viewportWidth;
+              return const SizedBox.shrink();
+            },
+          ),
+        ),
+      );
+      expect(result, 1024);
+    });
+
+    testWidgets('viewportWidth matches MediaQuery.sizeOf at various widths', (
+      tester,
+    ) async {
+      for (final width in [320.0, 600.0, 840.0, 1200.0, 1600.0, 1920.0]) {
+        late double result;
+        await tester.pumpWidget(
+          buildWithWidth(
+            width,
+            Builder(
+              builder: (ctx) {
+                result = ctx.viewportWidth;
+                return const SizedBox.shrink();
+              },
+            ),
+          ),
+        );
+        expect(
+          result,
+          width,
+          reason: 'viewportWidth at MediaQuery width $width',
+        );
+      }
+    });
+
+    // ── responsive<T> ──────────────────────────────────────────────────────
+
+    testWidgets('responsive resolves OiResponsive for current breakpoint', (
+      tester,
+    ) async {
+      late int result;
+      final values = OiResponsive<int>.breakpoints({
+        OiBreakpoint.compact: 1,
+        OiBreakpoint.medium: 2,
+        OiBreakpoint.large: 4,
+      });
+
+      // Width 400 → compact → 1
+      await tester.pumpWidget(
+        buildWithWidth(
+          400,
+          Builder(
+            builder: (ctx) {
+              result = ctx.responsive(values);
+              return const SizedBox.shrink();
+            },
+          ),
+        ),
+      );
+      expect(result, 1);
+
+      // Width 600 → medium → 2
+      await tester.pumpWidget(
+        buildWithWidth(
+          600,
+          Builder(
+            builder: (ctx) {
+              result = ctx.responsive(values);
+              return const SizedBox.shrink();
+            },
+          ),
+        ),
+      );
+      expect(result, 2);
+
+      // Width 1200 → large → 4
+      await tester.pumpWidget(
+        buildWithWidth(
+          1200,
+          Builder(
+            builder: (ctx) {
+              result = ctx.responsive(values);
+              return const SizedBox.shrink();
+            },
+          ),
+        ),
+      );
+      expect(result, 4);
+    });
+
+    testWidgets('responsive with static value returns same at all widths', (
+      tester,
+    ) async {
+      const values = OiResponsive<int>(42);
+      for (final width in [400.0, 600.0, 1200.0]) {
+        late int result;
+        await tester.pumpWidget(
+          buildWithWidth(
+            width,
+            Builder(
+              builder: (ctx) {
+                result = ctx.responsive(values);
+                return const SizedBox.shrink();
+              },
+            ),
+          ),
+        );
+        expect(result, 42, reason: 'static value at width $width');
+      }
+    });
+
+    testWidgets('responsive cascades to nearest smaller breakpoint', (
+      tester,
+    ) async {
+      // Only compact and large defined — expanded should cascade to compact.
+      final values = OiResponsive<String>.breakpoints({
+        OiBreakpoint.compact: 'small',
+        OiBreakpoint.large: 'big',
+      });
+      late String result;
+      await tester.pumpWidget(
+        buildWithWidth(
+          900,
+          Builder(
+            builder: (ctx) {
+              result = ctx.responsive(values);
+              return const SizedBox.shrink();
+            },
+          ),
+        ),
+      );
+      expect(result, 'small');
+    });
+
+    testWidgets('responsive uses theme breakpoints for custom scales', (
+      tester,
+    ) async {
+      final customTheme = OiThemeData.light(
+        breakpoints: OiBreakpointScale.standard().register(
+          const OiBreakpoint('tablet', 480),
+        ),
+      );
+      final values = OiResponsive<String>.breakpoints({
+        OiBreakpoint.compact: 'phone',
+        const OiBreakpoint('tablet', 480): 'tablet',
+        OiBreakpoint.large: 'desktop',
+      });
+      late String result;
+      await tester.pumpWidget(
+        buildWithWidth(
+          500,
+          Builder(
+            builder: (ctx) {
+              result = ctx.responsive(values);
+              return const SizedBox.shrink();
+            },
+          ),
+          theme: customTheme,
+        ),
+      );
+      expect(result, 'tablet');
+    });
+
     testWidgets('breakpoint is compact at width 400', (tester) async {
       late OiBreakpoint captured;
       await tester.pumpWidget(
@@ -1230,8 +1399,9 @@ void main() {
       expect(result, 720);
     });
 
-    testWidgets('resolveResponsive resolves OiResponsive value',
-        (tester) async {
+    testWidgets('resolveResponsive resolves OiResponsive value', (
+      tester,
+    ) async {
       late int result;
       final responsive = OiResponsive<int>.breakpoints({
         OiBreakpoint.compact: 1,
@@ -1252,8 +1422,9 @@ void main() {
       expect(result, 2);
     });
 
-    testWidgets('breakpointScale throws without OiTheme ancestor',
-        (tester) async {
+    testWidgets('breakpointScale throws without OiTheme ancestor', (
+      tester,
+    ) async {
       late Object error;
       await tester.pumpWidget(
         MediaQuery(
@@ -1276,8 +1447,9 @@ void main() {
       expect(error, isA<AssertionError>());
     });
 
-    testWidgets('breakpointScale uses theme breakpoints when present',
-        (tester) async {
+    testWidgets('breakpointScale uses theme breakpoints when present', (
+      tester,
+    ) async {
       late OiBreakpointScale captured;
       await tester.pumpWidget(
         buildWithWidth(
@@ -1295,8 +1467,9 @@ void main() {
 
     // ── Generic breakpoint helpers ──────────────────────────────────────
 
-    testWidgets('breakpointActive returns true for active breakpoint',
-        (tester) async {
+    testWidgets('breakpointActive returns true for active breakpoint', (
+      tester,
+    ) async {
       late bool result;
       await tester.pumpWidget(
         buildWithWidth(
@@ -1312,8 +1485,9 @@ void main() {
       expect(result, isTrue);
     });
 
-    testWidgets('breakpointActive returns false for inactive breakpoint',
-        (tester) async {
+    testWidgets('breakpointActive returns false for inactive breakpoint', (
+      tester,
+    ) async {
       late bool result;
       await tester.pumpWidget(
         buildWithWidth(
@@ -1361,8 +1535,7 @@ void main() {
       expect(result, isTrue);
     });
 
-    testWidgets('atLeast returns false when below breakpoint',
-        (tester) async {
+    testWidgets('atLeast returns false when below breakpoint', (tester) async {
       late bool result;
       await tester.pumpWidget(
         buildWithWidth(
@@ -1584,8 +1757,9 @@ void main() {
       Widget buildCustom(double width, Widget child) =>
           buildWithWidth(width, child, theme: customTheme);
 
-      testWidgets('isCompact is true with custom name "phone" at width 400',
-          (tester) async {
+      testWidgets('isCompact is true with custom name "phone" at width 400', (
+        tester,
+      ) async {
         late bool result;
         await tester.pumpWidget(
           buildCustom(
@@ -1601,8 +1775,9 @@ void main() {
         expect(result, isTrue);
       });
 
-      testWidgets('isMedium is true with custom name "mid" at width 700',
-          (tester) async {
+      testWidgets('isMedium is true with custom name "mid" at width 700', (
+        tester,
+      ) async {
         late bool result;
         await tester.pumpWidget(
           buildCustom(
@@ -1618,8 +1793,9 @@ void main() {
         expect(result, isTrue);
       });
 
-      testWidgets('isCompact is false at width 600 with custom names',
-          (tester) async {
+      testWidgets('isCompact is false at width 600 with custom names', (
+        tester,
+      ) async {
         late bool result;
         await tester.pumpWidget(
           buildCustom(
@@ -1635,8 +1811,9 @@ void main() {
         expect(result, isFalse);
       });
 
-      testWidgets('isMediumOrWider is true at width 600 with custom names',
-          (tester) async {
+      testWidgets('isMediumOrWider is true at width 600 with custom names', (
+        tester,
+      ) async {
         late bool result;
         await tester.pumpWidget(
           buildCustom(
