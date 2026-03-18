@@ -353,6 +353,46 @@ void main() {
       expect(ar.aspectRatio, closeTo(16 / 9, 0.001));
     });
 
+    testWidgets(
+      'OiMasonry: responsive span values resolve per breakpoint',
+      (tester) async {
+        final responsiveSpan = OiResponsive<int>.breakpoints({
+          OiBreakpoint.compact: 1,
+          OiBreakpoint.expanded: 2,
+        });
+
+        // Compact → span 1 → masonry column item, columnWidth.
+        await tester.pumpObers(
+          OiMasonry(
+            breakpoint: OiBreakpoint.compact,
+            columns: 2.responsive,
+            children: [
+              const Text('A').span(columnSpan: responsiveSpan),
+              const Text('B'),
+            ],
+          ),
+          surfaceSize: const Size(800, 600),
+        );
+        final rectCompact = tester.getRect(find.text('A'));
+        expect(rectCompact.width, closeTo(400, 1));
+
+        // Expanded → span 2 → spanning breaker, full width.
+        await tester.pumpObers(
+          OiMasonry(
+            breakpoint: OiBreakpoint.expanded,
+            columns: 2.responsive,
+            children: [
+              const Text('A').span(columnSpan: responsiveSpan),
+              const Text('B'),
+            ],
+          ),
+          surfaceSize: const Size(800, 600),
+        );
+        final rectExpanded = tester.getRect(find.text('A'));
+        expect(rectExpanded.width, closeTo(800, 1));
+      },
+    );
+
     testWidgets('OiSpan: responsive span values resolve per breakpoint', (
       tester,
     ) async {
