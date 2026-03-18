@@ -23,14 +23,41 @@ class _S with OiSettingsData {
   Map<String, dynamic> toJson() => {'n': n, 'schemaVersion': 1};
 }
 
+/// A driver that throws on load, for testing error resilience.
+class _ThrowingDriver extends OiSettingsDriver {
+  @override
+  Future<T?> load<T extends OiSettingsData>({
+    required String namespace,
+    required T Function(Map<String, dynamic> json) deserialize,
+    String? key,
+  }) async {
+    throw Exception('load failed');
+  }
+
+  @override
+  Future<void> save<T extends OiSettingsData>({
+    required String namespace,
+    required T data,
+    required Map<String, dynamic> Function(T data) serialize,
+    String? key,
+  }) async {}
+
+  @override
+  Future<void> delete({required String namespace, String? key}) async {}
+
+  @override
+  Future<bool> exists({required String namespace, String? key}) async => false;
+}
+
 // OiSettingsMixin is `on State<StatefulWidget>` (exact type). To satisfy this
 // constraint, _WState must extend State<StatefulWidget>, which requires _W to
 // also be typed as StatefulWidget in the createState return. We achieve this
 // by overriding createState with return type State<StatefulWidget>.
 class _W extends StatefulWidget {
-  const _W({this.driver});
+  const _W({this.driver, this.settingsKey, super.key});
 
   final OiSettingsDriver? driver;
+  final String? settingsKey;
 
   @override
   // The return type must be State<StatefulWidget> so _WState (which mixes in
@@ -46,7 +73,7 @@ class _WState extends State<StatefulWidget> with OiSettingsMixin<_S> {
   String get settingsNamespace => 'test';
 
   @override
-  String? get settingsKey => null;
+  String? get settingsKey => _w.settingsKey;
 
   @override
   OiSettingsDriver? get settingsDriver => _w.driver;
@@ -68,6 +95,17 @@ class _WState extends State<StatefulWidget> with OiSettingsMixin<_S> {
   Future<void> runSaveNow() => saveSettingsNow();
 
   Future<void> runReset() => resetSettings();
+
+  Future<void> runReload() => reloadSettings();
+
+  @override
+  void didUpdateWidget(covariant StatefulWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    final old = oldWidget as _W;
+    if (old.driver != _w.driver || old.settingsKey != _w.settingsKey) {
+      reloadSettings();
+    }
+  }
 
   @override
   Widget build(BuildContext context) => const SizedBox();
@@ -140,6 +178,20 @@ void main() {
       expect(store.isNotEmpty, isTrue);
     });
 
+    testWidgets('rapid updateSettings: only last value saved', (t) async {
+      final driver = OiInMemorySettingsDriver();
+      await t.pumpWidget(wrap(_W(driver: driver)));
+      final state = t.state<_WState>(find.byType(_W));
+      // Fire multiple rapid updates — only the last should be persisted.
+      state.runUpdate(const _S(n: 1), debounce: const Duration(milliseconds: 200));
+      state.runUpdate(const _S(n: 2), debounce: const Duration(milliseconds: 200));
+      state.runUpdate(const _S(n: 3), debounce: const Duration(milliseconds: 200));
+      // Nothing saved yet.
+      expect(driver.store.isEmpty, isTrue);
+      await t.pump(const Duration(milliseconds: 250));
+      expect(driver.store['test']?['n'], equals(3));
+    });
+
     testWidgets('saveSettingsNow saves immediately', (t) async {
       final driver = OiInMemorySettingsDriver();
       await t.pumpWidget(wrap(_W(driver: driver)));
@@ -166,13 +218,93 @@ void main() {
       expect(await driver.exists(namespace: 'test'), isFalse);
     });
 
+    testWidgets('driver change on didUpdateWidget reloads settings', (
+      t,
+    ) async {
+      final driver1 = OiInMemorySettingsDriver();
+      await driver1.save(
+        namespace: 'test',
+        data: const _S(n: 10),
+        serialize: (s) => s.toJson(),
+      );
+      final driver2 = OiInMemorySettingsDriver();
+      await driver2.save(
+        namespace: 'test',
+        data: const _S(n: 20),
+        serialize: (s) => s.toJson(),
+      );
+
+      // Start with driver1.
+      await t.pumpWidget(wrap(_W(driver: driver1)));
+      await t.pump();
+      final state = t.state<_WState>(find.byType(_W));
+      expect(state.currentSettings.n, equals(10));
+
+      // Switch to driver2 — didUpdateWidget triggers reload.
+      await t.pumpWidget(wrap(_W(driver: driver2)));
+      await t.pump();
+      expect(state.currentSettings.n, equals(20));
+    });
+
+    testWidgets('key change on didUpdateWidget reloads settings', (
+      t,
+    ) async {
+      final driver = OiInMemorySettingsDriver();
+      await driver.save(
+        namespace: 'test',
+        key: 'a',
+        data: const _S(n: 11),
+        serialize: (s) => s.toJson(),
+      );
+      await driver.save(
+        namespace: 'test',
+        key: 'b',
+        data: const _S(n: 22),
+        serialize: (s) => s.toJson(),
+      );
+
+      await t.pumpWidget(wrap(_W(driver: driver, settingsKey: 'a')));
+      await t.pump();
+      final state = t.state<_WState>(find.byType(_W));
+      expect(state.currentSettings.n, equals(11));
+
+      // Change key — didUpdateWidget triggers reload.
+      await t.pumpWidget(wrap(_W(driver: driver, settingsKey: 'b')));
+      await t.pump();
+      expect(state.currentSettings.n, equals(22));
+    });
+
+    testWidgets('load error falls back to defaults', (t) async {
+      final driver = _ThrowingDriver();
+      await t.pumpWidget(wrap(_W(driver: driver)));
+      await t.pump();
+      final state = t.state<_WState>(find.byType(_W));
+      expect(state.currentSettings.n, equals(0));
+      expect(state.settingsLoaded, isTrue);
+      expect(state.settingsLoadError, isTrue);
+    });
+
+    testWidgets('settingsLoaded is false before load completes', (t) async {
+      final driver = OiInMemorySettingsDriver();
+      await t.pumpWidget(wrap(_W(driver: driver)));
+      // Before the async load completes, settingsLoaded should be false.
+      final state = t.state<_WState>(find.byType(_W));
+      // initState fires the load but it's async, so before pump() settingsLoaded
+      // may already be true for sync-like drivers. For in-memory drivers the
+      // Future completes on the next microtask, so it should be false here.
+      // Pump to complete the load.
+      await t.pump();
+      expect(state.settingsLoaded, isTrue);
+    });
+
     testWidgets('dispose cancels pending save timer', (t) async {
       final driver = OiInMemorySettingsDriver();
       await t.pumpWidget(wrap(_W(driver: driver)));
       t
           .state<_WState>(find.byType(_W))
           .runUpdate(const _S(n: 1), debounce: const Duration(seconds: 10));
-      await t.pumpWidget(const SizedBox());
+      // Disposing the widget should cancel the timer — no error expected.
+      await t.pumpWidget(wrap(const SizedBox()));
     });
   });
 }

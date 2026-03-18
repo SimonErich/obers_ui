@@ -59,6 +59,12 @@ mixin OiSettingsMixin<T extends OiSettingsData> on State<StatefulWidget> {
   bool get settingsLoaded => _loaded;
   bool _loaded = false;
 
+  /// Whether an error occurred during the last load attempt.
+  ///
+  /// When `true`, [currentSettings] contains [defaultSettings] as a fallback.
+  bool get settingsLoadError => _loadError;
+  bool _loadError = false;
+
   Timer? _debounceTimer;
 
   // ── Lifecycle ─────────────────────────────────────────────────────────────
@@ -114,11 +120,23 @@ mixin OiSettingsMixin<T extends OiSettingsData> on State<StatefulWidget> {
     if (mounted) setState(() {});
   }
 
+  /// Reloads settings from the driver.
+  ///
+  /// Call this from [didUpdateWidget] when the driver or key changes.
+  @protected
+  Future<void> reloadSettings() => _loadSettings();
+
   // ── Private helpers ────────────────────────────────────────────────────────
 
   Future<void> _loadSettings() async {
     final driver = settingsDriver;
-    if (driver != null) {
+    if (driver == null) {
+      _loaded = true;
+      if (mounted) setState(() {});
+      return;
+    }
+
+    try {
       final saved = await driver.load<T>(
         namespace: settingsNamespace,
         key: settingsKey,
@@ -127,6 +145,9 @@ mixin OiSettingsMixin<T extends OiSettingsData> on State<StatefulWidget> {
       if (saved != null) {
         _settings = mergeSettings(saved, defaultSettings);
       }
+    } on Exception {
+      // On any error, fall back to defaults silently.
+      _loadError = true;
     }
     _loaded = true;
     if (mounted) setState(() {});
