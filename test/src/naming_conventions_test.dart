@@ -74,6 +74,52 @@ void main() {
       );
     });
 
+    test('all public classes use the Oi prefix', () {
+      // Matches any public class declaration: class, abstract class,
+      // sealed class, base class, final class, mixin class, abstract
+      // mixin class — that extends or implements something.
+      final publicClassPattern = RegExp(
+        r'(?:abstract\s+|sealed\s+|base\s+|final\s+|mixin\s+)*'
+        r'class\s+([A-Z]\w+)',
+      );
+
+      final violations = <String>[];
+
+      for (final file in allFiles) {
+        // Skip _internal directory — private implementation classes.
+        if (file.path.contains('/_internal/')) continue;
+
+        final content = _stripComments(file.readAsStringSync());
+        final matches = publicClassPattern.allMatches(content);
+
+        for (final m in matches) {
+          final className = m.group(1)!;
+          // Private classes (starting with _) are fine.
+          if (className.startsWith('_')) continue;
+          // State<X> subclasses are widget implementation details.
+          // Check if the class extends State<...>.
+          final afterClass = content.substring(m.end);
+          if (RegExp(r'^\s+extends\s+State\s*<').hasMatch(afterClass)) {
+            continue;
+          }
+          if (!className.startsWith('Oi')) {
+            final line =
+                content.substring(0, m.start).split('\n').length;
+            violations.add('${file.path}:$line — $className');
+          }
+        }
+      }
+
+      expect(
+        violations,
+        isEmpty,
+        reason:
+            'All public classes must start with the Oi prefix '
+            '(e.g. OiButton, OiTable, OiSidebar). '
+            'Violations:\n${violations.join('\n')}',
+      );
+    });
+
     test('Oi-prefixed widget names are descriptive nouns', () {
       // After the Oi prefix, the remaining name should start with an
       // uppercase letter and be at least 2 characters (e.g. OiButton,
@@ -109,34 +155,41 @@ void main() {
     });
 
     test('file names match their primary Oi widget class', () {
-      // For each file containing a single primary Oi widget class, the
-      // file should be named oi_<snake_case>.dart matching the class name.
+      // For each file containing Oi widget classes, the file name should
+      // match (at least one of) the class names in snake_case.
       final violations = <String>[];
 
       for (final file in allFiles) {
         final content = _stripComments(file.readAsStringSync());
         final matches = widgetClassPattern.allMatches(content).toList();
 
-        // Only check files that contain exactly one primary widget class.
-        // Files with multiple widgets (e.g. skeleton_group) are valid.
-        if (matches.length != 1) continue;
+        if (matches.isEmpty) continue;
 
-        final className = matches.first.group(1)!;
         final fileName =
             file.path.split('/').last.replaceAll('.dart', '');
 
         // Convert PascalCase class name to expected snake_case file name.
         // OiButton → oi_button, OiRichEditor → oi_rich_editor
-        final expected = className
-            .replaceAllMapped(
-              RegExp(r'[A-Z]'),
-              (m) => '_${m.group(0)!.toLowerCase()}',
-            )
-            .substring(1); // remove leading underscore
+        String toSnake(String className) {
+          return className
+              .replaceAllMapped(
+                RegExp(r'[A-Z]'),
+                (m) => '_${m.group(0)!.toLowerCase()}',
+              )
+              .substring(1); // remove leading underscore
+        }
 
-        if (fileName != expected) {
+        // The file name must match at least one of the widget class names.
+        final matchesAny = matches.any(
+          (m) => toSnake(m.group(1)!) == fileName,
+        );
+
+        if (!matchesAny) {
+          final classNames =
+              matches.map((m) => m.group(1)!).join(', ');
           violations.add(
-            '${file.path} — class $className expected file $expected.dart',
+            '${file.path} — contains [$classNames] but file name '
+            '"$fileName.dart" does not match any of them',
           );
         }
       }
