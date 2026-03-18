@@ -141,8 +141,6 @@ void main() {
       expect(cancelled, isTrue);
     });
 
-    // ── General behaviour ─────────────────────────────────────────────────
-
     testWidgets('renders title', (tester) async {
       await tester.pumpObers(
         OiNameDialog(
@@ -205,6 +203,73 @@ void main() {
 
       expect(find.text('Name is reserved'), findsOneWidget);
     });
+
+    // ── REQ-0914 ──────────────────────────────────────────────────────────
+
+    testWidgets('Create button does not fire onCreate when input is empty', (
+      tester,
+    ) async {
+      String? createdName;
+      await tester.pumpObers(
+        OiNameDialog(
+          title: 'New item',
+          onCreate: (name) => createdName = name,
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Create'), warnIfMissed: false);
+      await tester.pumpAndSettle();
+
+      expect(createdName, isNull);
+    });
+
+    testWidgets(
+      'Create button does not fire onCreate when validation fails',
+      (tester) async {
+        String? createdName;
+        await tester.pumpObers(
+          OiNameDialog(
+            title: 'New item',
+            defaultName: 'bad',
+            onCreate: (name) => createdName = name,
+            validate: (v) => v == 'bad' ? 'Name is reserved' : null,
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        await tester.tap(find.text('Create'), warnIfMissed: false);
+        await tester.pumpAndSettle();
+
+        expect(createdName, isNull);
+      },
+    );
+
+    testWidgets('Create button re-enables after fixing validation error', (
+      tester,
+    ) async {
+      String? createdName;
+      await tester.pumpObers(
+        OiNameDialog(
+          title: 'New item',
+          defaultName: 'bad',
+          onCreate: (name) => createdName = name,
+          validate: (v) => v == 'bad' ? 'Name is reserved' : null,
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // Fix the invalid name.
+      await tester.enterText(find.byType(EditableText), 'good');
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Create'));
+      await tester.pumpAndSettle();
+
+      expect(createdName, 'good');
+    });
+
+    // ── General behaviour ─────────────────────────────────────────────────
 
     testWidgets('Cancel button calls onCancel', (tester) async {
       var cancelled = false;
