@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/foundation/oi_app.dart';
 import 'package:obers_ui/src/foundation/theme/oi_effects_theme.dart';
@@ -134,6 +135,31 @@ class _OiTappableState extends State<OiTappable> {
     if (widget.enabled) widget.onLongPress?.call();
   }
 
+  // ── Keyboard callbacks ─────────────────────────────────────────────────────
+
+  KeyEventResult _handleKeyEvent(FocusNode node, KeyEvent event) {
+    if (!widget.enabled) return KeyEventResult.ignored;
+
+    final isActivationKey =
+        event.logicalKey == LogicalKeyboardKey.enter ||
+        event.logicalKey == LogicalKeyboardKey.space;
+
+    if (!isActivationKey) return KeyEventResult.ignored;
+
+    if (event is KeyDownEvent) {
+      _setPressed(true);
+      return KeyEventResult.handled;
+    }
+
+    if (event is KeyUpEvent) {
+      _setPressed(false);
+      _handleTap();
+      return KeyEventResult.handled;
+    }
+
+    return KeyEventResult.ignored;
+  }
+
   // ── Build ──────────────────────────────────────────────────────────────────
 
   @override
@@ -246,6 +272,7 @@ class _OiTappableState extends State<OiTappable> {
         _setFocused(focused);
         widget.onFocusChange?.call(focused);
       },
+      onKeyEvent: _handleKeyEvent,
       child: content,
     );
 

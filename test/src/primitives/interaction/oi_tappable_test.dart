@@ -2,6 +2,7 @@
 // ignore_for_file: public_member_api_docs
 
 import 'package:flutter/gestures.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui/src/foundation/oi_app.dart';
@@ -313,5 +314,120 @@ void main() {
     );
     final enforced = ring.enforced;
     expect(enforced.width, 2.0);
+  });
+
+  // ── 16. Keyboard activation: Enter triggers onTap ──────────────────────────
+
+  testWidgets('TC-1: Enter key triggers onTap when focused and enabled', (
+    tester,
+  ) async {
+    var tapped = false;
+    await tester.pumpObers(
+      OiTappable(
+        onTap: () => tapped = true,
+        child: const SizedBox(width: 60, height: 60, child: Text('x')),
+      ),
+    );
+    await tester.pump();
+
+    final gestureElement = tester.element(find.byType(GestureDetector));
+    Focus.of(gestureElement).requestFocus();
+    await tester.pump();
+    await tester.pump();
+
+    await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+    await tester.pump();
+
+    expect(tapped, isTrue);
+  });
+
+  // ── 17. Keyboard activation: Space triggers onTap ──────────────────────────
+
+  testWidgets('TC-2: Space key triggers onTap when focused and enabled', (
+    tester,
+  ) async {
+    var tapped = false;
+    await tester.pumpObers(
+      OiTappable(
+        onTap: () => tapped = true,
+        child: const SizedBox(width: 60, height: 60, child: Text('x')),
+      ),
+    );
+    await tester.pump();
+
+    final gestureElement = tester.element(find.byType(GestureDetector));
+    Focus.of(gestureElement).requestFocus();
+    await tester.pump();
+    await tester.pump();
+
+    await tester.sendKeyEvent(LogicalKeyboardKey.space);
+    await tester.pump();
+
+    expect(tapped, isTrue);
+  });
+
+  // ── 18. Keyboard activation: Enter suppressed when disabled ────────────────
+
+  testWidgets('TC-3: Enter key does NOT trigger onTap when disabled', (
+    tester,
+  ) async {
+    var tapped = false;
+    await tester.pumpObers(
+      OiTappable(
+        enabled: false,
+        onTap: () => tapped = true,
+        child: const SizedBox(width: 60, height: 60, child: Text('x')),
+      ),
+    );
+    await tester.pump();
+
+    await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+    await tester.pump();
+
+    expect(tapped, isFalse);
+  });
+
+  // ── 19. Keyboard activation: Space suppressed when disabled ────────────────
+
+  testWidgets('TC-4: Space key does NOT trigger onTap when disabled', (
+    tester,
+  ) async {
+    var tapped = false;
+    await tester.pumpObers(
+      OiTappable(
+        enabled: false,
+        onTap: () => tapped = true,
+        child: const SizedBox(width: 60, height: 60, child: Text('x')),
+      ),
+    );
+    await tester.pump();
+
+    await tester.sendKeyEvent(LogicalKeyboardKey.space);
+    await tester.pump();
+
+    expect(tapped, isFalse);
+  });
+
+  // ── 20. Keyboard activation: other keys do NOT trigger onTap ───────────────
+
+  testWidgets('TC-5: ArrowDown key does NOT trigger onTap', (tester) async {
+    var tapped = false;
+    await tester.pumpObers(
+      OiTappable(
+        onTap: () => tapped = true,
+        child: const SizedBox(width: 60, height: 60, child: Text('x')),
+      ),
+    );
+    await tester.pump();
+
+    final gestureElement = tester.element(find.byType(GestureDetector));
+    Focus.of(gestureElement).requestFocus();
+    await tester.pump();
+    await tester.pump();
+
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+    await tester.pump();
+
+    expect(tapped, isFalse);
   });
 }
