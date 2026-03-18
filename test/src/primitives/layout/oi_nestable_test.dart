@@ -931,4 +931,286 @@ void main() {
     expect(find.text('m2'), findsOneWidget);
     expect(find.text('m3'), findsOneWidget);
   });
+
+  // ── Missing 2-level nesting combinations ────────────────────────────────
+
+  testWidgets('OiContainer inside OiGrid cell renders without error', (
+    tester,
+  ) async {
+    await tester.pumpObers(
+      const OiGrid(
+        breakpoint: _bp,
+        columns: OiResponsive<int>(2),
+        children: [
+          OiContainer(
+            breakpoint: _bp,
+            maxWidth: OiResponsive<double>(200),
+            child: Text('contained'),
+          ),
+          Text('plain'),
+        ],
+      ),
+    );
+    expect(find.text('contained'), findsOneWidget);
+    expect(find.text('plain'), findsOneWidget);
+  });
+
+  testWidgets('OiWrapLayout inside OiContainer renders without error', (
+    tester,
+  ) async {
+    await tester.pumpObers(
+      const OiContainer(
+        breakpoint: _bp,
+        maxWidth: OiResponsive<double>(400),
+        child: OiWrapLayout(
+          breakpoint: _bp,
+          children: [Text('w1'), Text('w2'), Text('w3')],
+        ),
+      ),
+    );
+    expect(find.text('w1'), findsOneWidget);
+    expect(find.text('w2'), findsOneWidget);
+    expect(find.text('w3'), findsOneWidget);
+  });
+
+  testWidgets('OiMasonry inside OiSection renders without error', (
+    tester,
+  ) async {
+    await tester.pumpObers(
+      const OiSection(
+        breakpoint: _bp,
+        children: [
+          Text('section-title'),
+          OiMasonry(
+            breakpoint: _bp,
+            columns: OiResponsive<int>(2),
+            children: [Text('m1'), Text('m2'), Text('m3')],
+          ),
+        ],
+      ),
+    );
+    expect(find.text('section-title'), findsOneWidget);
+    expect(find.text('m1'), findsOneWidget);
+    expect(find.text('m3'), findsOneWidget);
+  });
+
+  testWidgets('OiContainer inside OiSection renders without error', (
+    tester,
+  ) async {
+    await tester.pumpObers(
+      const OiSection(
+        breakpoint: _bp,
+        children: [
+          Text('section-header'),
+          OiContainer(
+            breakpoint: _bp,
+            maxWidth: OiResponsive<double>(300),
+            child: Text('contained'),
+          ),
+        ],
+      ),
+    );
+    expect(find.text('section-header'), findsOneWidget);
+    expect(find.text('contained'), findsOneWidget);
+  });
+
+  testWidgets('OiWrapLayout inside OiSection renders without error', (
+    tester,
+  ) async {
+    await tester.pumpObers(
+      const OiSection(
+        breakpoint: _bp,
+        children: [
+          Text('section-header'),
+          OiWrapLayout(
+            breakpoint: _bp,
+            children: [Text('w1'), Text('w2'), Text('w3')],
+          ),
+        ],
+      ),
+    );
+    expect(find.text('section-header'), findsOneWidget);
+    expect(find.text('w1'), findsOneWidget);
+    expect(find.text('w3'), findsOneWidget);
+  });
+
+  // ── Deep nesting (10+ levels) ──────────────────────────────────────────
+
+  testWidgets('10-level same-type nesting: Column × 10', (tester) async {
+    await tester.pumpObers(_buildDeepSameType(10, isColumn: true));
+    expect(find.text('leaf'), findsOneWidget);
+  });
+
+  testWidgets('10-level same-type nesting: Row × 10', (tester) async {
+    await tester.pumpObers(_buildDeepSameType(10, isColumn: false));
+    expect(find.text('leaf'), findsOneWidget);
+  });
+
+  testWidgets('10-level alternating Row/Column nesting', (tester) async {
+    await tester.pumpObers(
+      _buildDeepNesting(10, const Text('leaf')),
+    );
+    expect(find.text('leaf'), findsOneWidget);
+  });
+
+  testWidgets(
+    '10-level mixed-widget nesting: '
+    'Page > Section > Row > Column > Container > '
+    'Grid > Column > Row > Section > Column',
+    (tester) async {
+      await tester.pumpObers(
+        const OiPage(
+          breakpoint: _bp,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            OiSection(
+              breakpoint: _bp,
+              children: [
+                OiRow(
+                  breakpoint: _bp,
+                  children: [
+                    OiColumn(
+                      breakpoint: _bp,
+                      children: [
+                        OiContainer(
+                          breakpoint: _bp,
+                          maxWidth: OiResponsive<double>(400),
+                          child: OiGrid(
+                            breakpoint: _bp,
+                            columns: OiResponsive<int>(1),
+                            children: [
+                              OiColumn(
+                                breakpoint: _bp,
+                                children: [
+                                  OiRow(
+                                    breakpoint: _bp,
+                                    children: [
+                                      OiSection(
+                                        breakpoint: _bp,
+                                        children: [
+                                          OiColumn(
+                                            breakpoint: _bp,
+                                            children: [Text('deep-leaf')],
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ],
+        ),
+      );
+      expect(find.text('deep-leaf'), findsOneWidget);
+    },
+  );
+
+  testWidgets('12-level nesting with Grid at deepest level', (tester) async {
+    await tester.pumpObers(
+      _buildDeepNesting(
+        11,
+        const OiGrid(
+          breakpoint: _bp,
+          columns: OiResponsive<int>(2),
+          children: [Text('grid-A'), Text('grid-B')],
+        ),
+      ),
+    );
+    expect(find.text('grid-A'), findsOneWidget);
+    expect(find.text('grid-B'), findsOneWidget);
+  });
+
+  testWidgets('12-level nesting with Masonry at deepest level', (
+    tester,
+  ) async {
+    await tester.pumpObers(
+      _buildDeepNesting(
+        11,
+        const OiMasonry(
+          breakpoint: _bp,
+          columns: OiResponsive<int>(2),
+          children: [Text('mas-A'), Text('mas-B')],
+        ),
+      ),
+    );
+    expect(find.text('mas-A'), findsOneWidget);
+    expect(find.text('mas-B'), findsOneWidget);
+  });
+
+  testWidgets('15-level programmatic nesting renders without error', (
+    tester,
+  ) async {
+    await tester.pumpObers(
+      _buildDeepMixedNesting(15, const Text('stress-leaf')),
+    );
+    expect(find.text('stress-leaf'), findsOneWidget);
+  });
+}
+
+// ── Helper functions for deep nesting tests ───────────────────────────────
+
+/// Builds [depth] levels of alternating Row/Column wrappers around [leaf].
+///
+/// Level 0 (even) → OiColumn, Level 1 (odd) → OiRow, etc.
+Widget _buildDeepNesting(int depth, Widget leaf) {
+  var current = leaf;
+  for (var i = depth - 1; i >= 0; i--) {
+    current =
+        i.isEven
+            ? OiColumn(breakpoint: _bp, children: [current])
+            : OiRow(breakpoint: _bp, children: [current]);
+  }
+  return current;
+}
+
+/// Builds [depth] levels of the same flex type around a Text('leaf') widget.
+Widget _buildDeepSameType(int depth, {required bool isColumn}) {
+  Widget current = const Text('leaf');
+  for (var i = 0; i < depth; i++) {
+    current =
+        isColumn
+            ? OiColumn(breakpoint: _bp, children: [current])
+            : OiRow(breakpoint: _bp, children: [current]);
+  }
+  return current;
+}
+
+/// Builds [depth] levels cycling through Page, Section, Row, Column,
+/// Container around [leaf].
+///
+/// Cycle: 0→Page, 1→Section, 2→Row, 3→Column, 4→Container, 5→Page, …
+Widget _buildDeepMixedNesting(int depth, Widget leaf) {
+  var current = leaf;
+  for (var i = depth - 1; i >= 0; i--) {
+    switch (i % 5) {
+      case 0:
+        current = OiPage(
+          breakpoint: _bp,
+          mainAxisSize: MainAxisSize.min,
+          children: [current],
+        );
+      case 1:
+        current = OiSection(breakpoint: _bp, children: [current]);
+      case 2:
+        current = OiRow(breakpoint: _bp, children: [current]);
+      case 3:
+        current = OiColumn(breakpoint: _bp, children: [current]);
+      case 4:
+        current = OiContainer(
+          breakpoint: _bp,
+          maxWidth: const OiResponsive<double>(400),
+          child: current,
+        );
+    }
+  }
+  return current;
 }
