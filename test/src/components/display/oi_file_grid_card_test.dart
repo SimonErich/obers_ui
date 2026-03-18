@@ -122,7 +122,7 @@ void main() {
         _card(file: _file(name: 'photo.jpg'), searchQuery: 'hot'),
       );
 
-      final richText = tester.widget<RichText>(find.byType(RichText).first);
+      final richText = tester.widget<RichText>(find.byType(RichText).at(1));
       final span = richText.text as TextSpan;
 
       // "p", "hot", "o.jpg"
@@ -143,7 +143,7 @@ void main() {
         _card(file: _file(name: 'Photo.JPG'), searchQuery: 'PHOTO'),
       );
 
-      final richText = tester.widget<RichText>(find.byType(RichText).first);
+      final richText = tester.widget<RichText>(find.byType(RichText).at(1));
       final span = richText.text as TextSpan;
 
       expect(span.children, hasLength(2));
@@ -157,7 +157,7 @@ void main() {
         _card(file: _file(name: 'photo.jpg'), searchQuery: 'xyz'),
       );
 
-      final richText = tester.widget<RichText>(find.byType(RichText).first);
+      final richText = tester.widget<RichText>(find.byType(RichText).at(1));
       final span = richText.text as TextSpan;
 
       expect(span.children, hasLength(1));

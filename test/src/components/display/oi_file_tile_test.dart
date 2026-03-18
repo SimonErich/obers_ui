@@ -129,7 +129,7 @@ void main() {
       );
 
       // The full name is still rendered (via RichText).
-      final richText = tester.widget<RichText>(find.byType(RichText).first);
+      final richText = tester.widget<RichText>(find.byType(RichText).at(1));
       final span = richText.text as TextSpan;
 
       // Should have 3 spans: "re", "port", ".pdf"
@@ -150,7 +150,7 @@ void main() {
         _tile(file: _file(name: 'Report.PDF'), searchQuery: 'report'),
       );
 
-      final richText = tester.widget<RichText>(find.byType(RichText).first);
+      final richText = tester.widget<RichText>(find.byType(RichText).at(1));
       final span = richText.text as TextSpan;
 
       // "Report" highlighted, ".PDF" after
@@ -165,7 +165,7 @@ void main() {
         _tile(file: _file(name: 'report.pdf'), searchQuery: 'xyz'),
       );
 
-      final richText = tester.widget<RichText>(find.byType(RichText).first);
+      final richText = tester.widget<RichText>(find.byType(RichText).at(1));
       final span = richText.text as TextSpan;
 
       // Single span with full text, no highlight.

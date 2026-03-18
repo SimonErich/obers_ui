@@ -47,6 +47,7 @@ class OiFileTile extends StatelessWidget {
 
     return Semantics(
       label: semanticsLabel ?? file.name,
+      excludeSemantics: true,
       child: GestureDetector(
         onTap: onTap,
         onDoubleTap: onDoubleTap,
@@ -110,8 +111,8 @@ class OiFileTile extends StatelessWidget {
       ),
     );
 
-    return Text.rich(
-      TextSpan(children: spans),
+    return RichText(
+      text: TextSpan(children: spans),
       maxLines: 1,
       overflow: TextOverflow.ellipsis,
     );

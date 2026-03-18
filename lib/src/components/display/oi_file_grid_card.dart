@@ -45,6 +45,7 @@ class OiFileGridCard extends StatelessWidget {
 
     return Semantics(
       label: semanticsLabel ?? file.name,
+      excludeSemantics: true,
       child: GestureDetector(
         onTap: onTap,
         onDoubleTap: onDoubleTap,
@@ -100,8 +101,8 @@ class OiFileGridCard extends StatelessWidget {
       ),
     );
 
-    return Text.rich(
-      TextSpan(children: spans),
+    return RichText(
+      text: TextSpan(children: spans),
       maxLines: 2,
       overflow: TextOverflow.ellipsis,
       textAlign: TextAlign.center,
