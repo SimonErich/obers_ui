@@ -10,11 +10,15 @@ import 'package:flutter/widgets.dart';
 ///
 /// Provide a custom [icon] to override the default copy symbol ("⎘").
 ///
+/// **Accessibility (REQ-0014):** [semanticLabel] is required so the button
+/// has an accessible description announced by screen readers.
+///
 /// {@category Primitives}
 class OiCopyButton extends StatefulWidget {
   /// Creates an [OiCopyButton].
   const OiCopyButton({
     required this.value,
+    required this.semanticLabel,
     this.feedbackDuration = const Duration(milliseconds: 1500),
     this.icon,
     this.copiedWidget,
@@ -23,6 +27,9 @@ class OiCopyButton extends StatefulWidget {
 
   /// The text written to the clipboard when the button is tapped.
   final String value;
+
+  /// Accessibility label announced by screen readers.
+  final String semanticLabel;
 
   /// How long to show the "copied" feedback before reverting to the icon.
   ///
@@ -71,6 +78,10 @@ class _OiCopyButtonState extends State<OiCopyButton> {
         ? (widget.copiedWidget ?? const Text('✓'))
         : (widget.icon ?? const Text('⎘'));
 
-    return GestureDetector(onTap: _handleTap, child: displayWidget);
+    return Semantics(
+      label: widget.semanticLabel,
+      button: true,
+      child: GestureDetector(onTap: _handleTap, child: displayWidget),
+    );
   }
 }

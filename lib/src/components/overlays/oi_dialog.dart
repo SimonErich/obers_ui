@@ -39,6 +39,7 @@ enum OiDialogVariant {
 class OiDialog extends StatelessWidget {
   /// Creates an [OiDialog].
   const OiDialog({
+    required this.label,
     this.title,
     this.content,
     this.actions,
@@ -47,6 +48,9 @@ class OiDialog extends StatelessWidget {
     this.dismissible = true,
     super.key,
   });
+
+  /// Accessible label describing the dialog for screen readers.
+  final String label;
 
   /// Optional heading text displayed at the top of the dialog.
   final String? title;
@@ -174,19 +178,24 @@ class OiDialog extends StatelessWidget {
       panel = Center(child: panel);
     }
 
-    return Stack(
-      children: [
-        // ── Scrim ─────────────────────────────────────────────────────────────
-        Positioned.fill(
-          child: GestureDetector(
-            behavior: HitTestBehavior.opaque,
-            onTap: dismissible ? onClose : null,
-            child: ColoredBox(color: colors.overlay),
+    return Semantics(
+      label: label,
+      scopesRoute: true,
+      explicitChildNodes: true,
+      child: Stack(
+        children: [
+          // ── Scrim ───────────────────────────────────────────────────────────
+          Positioned.fill(
+            child: GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: dismissible ? onClose : null,
+              child: ColoredBox(color: colors.overlay),
+            ),
           ),
-        ),
-        // ── Panel ─────────────────────────────────────────────────────────────
-        panel,
-      ],
+          // ── Panel ───────────────────────────────────────────────────────────
+          panel,
+        ],
+      ),
     );
   }
 }

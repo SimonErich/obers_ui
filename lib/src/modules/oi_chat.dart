@@ -359,22 +359,22 @@ class _OiChatState extends State<OiChat> {
   Widget _buildMessage(BuildContext context, OiChatMessage message) {
     final colors = context.colors;
     final spacing = context.spacing;
-    final isOwn = message.senderId == widget.currentUserId;
+    final ownMessage = message.senderId == widget.currentUserId;
 
-    final bubbleColor = isOwn ? colors.primary.base : colors.surfaceHover;
-    final textColor = isOwn ? colors.textOnPrimary : colors.text;
+    final bubbleColor = ownMessage ? colors.primary.base : colors.surfaceHover;
+    final textColor = ownMessage ? colors.textOnPrimary : colors.text;
 
     final bubbleContent = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        if (!isOwn)
+        if (!ownMessage)
           Padding(
             padding: EdgeInsets.only(bottom: spacing.xs),
             child: Text(
               message.senderName,
               style: TextStyle(
-                color: isOwn ? colors.textOnPrimary : colors.primary.base,
+                color: ownMessage ? colors.textOnPrimary : colors.primary.base,
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
               ),
@@ -390,7 +390,7 @@ class _OiChatState extends State<OiChat> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 for (final file in message.attachments!)
-                  _buildAttachmentChip(context, file, isOwn),
+                  _buildAttachmentChip(context, file, ownMessage),
               ],
             ),
           ),
@@ -400,7 +400,7 @@ class _OiChatState extends State<OiChat> {
             child: Text(
               _formatTime(message.timestamp),
               style: TextStyle(
-                color: isOwn
+                color: ownMessage
                     ? colors.textOnPrimary.withValues(alpha: 0.7)
                     : colors.textMuted,
                 fontSize: 10,
@@ -434,12 +434,12 @@ class _OiChatState extends State<OiChat> {
         ? Padding(
             padding: EdgeInsets.only(
               top: spacing.xs,
-              left: isOwn ? 0 : 4,
-              right: isOwn ? 4 : 0,
+              left: ownMessage ? 0 : 4,
+              right: ownMessage ? 4 : 0,
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: isOwn
+              mainAxisAlignment: ownMessage
                   ? MainAxisAlignment.end
                   : MainAxisAlignment.start,
               children: [
@@ -466,7 +466,7 @@ class _OiChatState extends State<OiChat> {
       messageBody = pendingWrapper;
     }
 
-    final avatar = widget.showAvatars && !isOwn
+    final avatar = widget.showAvatars && !ownMessage
         ? Padding(
             padding: EdgeInsets.only(right: spacing.sm),
             child: Container(
@@ -495,7 +495,7 @@ class _OiChatState extends State<OiChat> {
     return Padding(
       padding: EdgeInsets.only(bottom: spacing.sm),
       child: Row(
-        mainAxisAlignment: isOwn
+        mainAxisAlignment: ownMessage
             ? MainAxisAlignment.end
             : MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.end,
@@ -503,7 +503,7 @@ class _OiChatState extends State<OiChat> {
           if (avatar != null) avatar,
           Flexible(
             child: Column(
-              crossAxisAlignment: isOwn
+              crossAxisAlignment: ownMessage
                   ? CrossAxisAlignment.end
                   : CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
@@ -555,7 +555,7 @@ class _OiChatState extends State<OiChat> {
   Widget _buildAttachmentChip(
     BuildContext context,
     OiFileData file,
-    bool isOwn,
+    bool ownMessage,
   ) {
     final colors = context.colors;
     return Padding(
@@ -563,7 +563,7 @@ class _OiChatState extends State<OiChat> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         decoration: BoxDecoration(
-          color: isOwn
+          color: ownMessage
               ? colors.textOnPrimary.withValues(alpha: 0.15)
               : colors.surfaceHover,
           borderRadius: BorderRadius.circular(6),
@@ -574,7 +574,7 @@ class _OiChatState extends State<OiChat> {
             Icon(
               const IconData(0xe226, fontFamily: 'MaterialIcons'),
               size: 14,
-              color: isOwn ? colors.textOnPrimary : colors.textSubtle,
+              color: ownMessage ? colors.textOnPrimary : colors.textSubtle,
             ),
             const SizedBox(width: 4),
             Flexible(
@@ -584,7 +584,7 @@ class _OiChatState extends State<OiChat> {
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
                   fontSize: 11,
-                  color: isOwn ? colors.textOnPrimary : colors.text,
+                  color: ownMessage ? colors.textOnPrimary : colors.text,
                 ),
               ),
             ),
@@ -593,7 +593,7 @@ class _OiChatState extends State<OiChat> {
               _formatFileSize(file.size),
               style: TextStyle(
                 fontSize: 10,
-                color: isOwn
+                color: ownMessage
                     ? colors.textOnPrimary.withValues(alpha: 0.7)
                     : colors.textMuted,
               ),

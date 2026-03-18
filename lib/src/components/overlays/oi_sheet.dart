@@ -40,6 +40,7 @@ enum OiPanelSide {
 class OiSheet extends StatefulWidget {
   /// Creates an [OiSheet].
   const OiSheet({
+    required this.label,
     required this.child,
     required this.open,
     this.onClose,
@@ -50,6 +51,9 @@ class OiSheet extends StatefulWidget {
     this.snapPoints,
     super.key,
   });
+
+  /// Accessible label describing the sheet for screen readers.
+  final String label;
 
   /// The content displayed inside the sheet.
   final Widget child;
@@ -85,6 +89,7 @@ class OiSheet extends StatefulWidget {
   /// Flutter [Overlay]. Returns an [OiOverlayHandle] for programmatic control.
   static OiOverlayHandle show(
     BuildContext context, {
+    required String label,
     required Widget child,
     OiPanelSide side = OiPanelSide.bottom,
     double? size,
@@ -101,6 +106,7 @@ class OiSheet extends StatefulWidget {
       // (the caller dismisses via the returned handle).
       return service.show(
         builder: (_) => OiSheet(
+          label: label,
           open: true,
           side: side,
           size: size,
@@ -120,6 +126,7 @@ class OiSheet extends StatefulWidget {
     late final OverlayEntry entry;
     entry = OverlayEntry(
       builder: (_) => OiSheet(
+        label: label,
         open: true,
         side: side,
         size: size,
@@ -315,27 +322,32 @@ class _OiSheetState extends State<OiSheet> with SingleTickerProviderStateMixin {
       child: SlideTransition(position: slideAnim, child: panel),
     );
 
-    return Stack(
-      children: [
-        // Scrim.
-        if (widget.open)
-          Positioned.fill(
-            child: GestureDetector(
-              behavior: HitTestBehavior.opaque,
-              onTap: widget.dismissible ? widget.onClose : null,
-              child: AnimatedBuilder(
-                animation: _controller,
-                builder: (_, __) => ColoredBox(
-                  color: colors.overlay.withValues(
-                    alpha: 0.6 * _controller.value,
+    return Semantics(
+      label: widget.label,
+      scopesRoute: true,
+      explicitChildNodes: true,
+      child: Stack(
+        children: [
+          // Scrim.
+          if (widget.open)
+            Positioned.fill(
+              child: GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTap: widget.dismissible ? widget.onClose : null,
+                child: AnimatedBuilder(
+                  animation: _controller,
+                  builder: (_, __) => ColoredBox(
+                    color: colors.overlay.withValues(
+                      alpha: 0.6 * _controller.value,
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
-        // Panel aligned to the correct edge.
-        Align(alignment: _alignment(), child: panel),
-      ],
+          // Panel aligned to the correct edge.
+          Align(alignment: _alignment(), child: panel),
+        ],
+      ),
     );
   }
 

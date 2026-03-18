@@ -154,7 +154,7 @@ class OiDiffView extends StatelessWidget {
         ? removed.length
         : added.length;
 
-    Widget column(List<OiDiffLine> colLines, {required bool isAddedSide}) {
+    Widget column(List<OiDiffLine> colLines, {required bool addedSide}) {
       return Expanded(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -162,14 +162,14 @@ class OiDiffView extends StatelessWidget {
           children: List.generate(maxLen, (i) {
             if (i >= colLines.length) return const SizedBox(height: 22);
             final line = colLines[i];
-            final bg = isAddedSide && line.added
+            final bg = addedSide && line.added
                 ? colors.success.base.withValues(alpha: 0.12)
-                : !isAddedSide && line.removed
+                : !addedSide && line.removed
                 ? colors.error.base.withValues(alpha: 0.12)
                 : null;
-            final textColor = isAddedSide && line.added
+            final textColor = addedSide && line.added
                 ? colors.success.base
-                : !isAddedSide && line.removed
+                : !addedSide && line.removed
                 ? colors.error.base
                 : colors.text;
 
@@ -196,9 +196,9 @@ class OiDiffView extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          column(removed, isAddedSide: false),
+          column(removed, addedSide: false),
           Container(width: 1, color: colors.border),
-          column(added, isAddedSide: true),
+          column(added, addedSide: true),
         ],
       ),
     );

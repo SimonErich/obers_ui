@@ -1,5 +1,6 @@
 // Tests do not require documentation comments.
 // ignore_for_file: public_member_api_docs
+// REQ-0014: OiCopyButton required-prop enforcement tests.
 
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
@@ -27,10 +28,50 @@ void main() {
         .setMockMethodCallHandler(SystemChannels.platform, null);
   });
 
+  // ── REQ-0014: Required props enforce correctness ──────────────────────────
+
+  group('OiCopyButton accessibility (REQ-0014)', () {
+    testWidgets('semanticLabel is exposed in the accessibility tree', (
+      tester,
+    ) async {
+      await tester.pumpObers(
+        const OiCopyButton(value: 'text', semanticLabel: 'Copy to clipboard'),
+      );
+      final semanticsWidgets = tester.widgetList<Semantics>(
+        find.byType(Semantics),
+      );
+      final matching = semanticsWidgets
+          .where((s) => s.properties.label == 'Copy to clipboard')
+          .toList();
+      expect(matching, isNotEmpty);
+    });
+
+    testWidgets('semanticLabel is marked as button in accessibility tree', (
+      tester,
+    ) async {
+      await tester.pumpObers(
+        const OiCopyButton(value: 'text', semanticLabel: 'Copy'),
+      );
+      final semanticsWidgets = tester.widgetList<Semantics>(
+        find.byType(Semantics),
+      );
+      final matching = semanticsWidgets
+          .where(
+            (s) =>
+                s.properties.label == 'Copy' &&
+                (s.properties.button ?? false),
+          )
+          .toList();
+      expect(matching, isNotEmpty);
+    });
+  });
+
   // ── 1. Shows default copy icon initially ──────────────────────────────────
 
   testWidgets('shows default copy icon initially', (tester) async {
-    await tester.pumpObers(const OiCopyButton(value: 'text'));
+    await tester.pumpObers(
+      const OiCopyButton(value: 'text', semanticLabel: 'Copy'),
+    );
     // Default icon is "⎘".
     expect(find.text('⎘'), findsOneWidget);
     expect(find.text('✓'), findsNothing);
@@ -39,7 +80,9 @@ void main() {
   // ── 2. Shows copied widget after tap ──────────────────────────────────────
 
   testWidgets('shows copied widget after tap', (tester) async {
-    await tester.pumpObers(const OiCopyButton(value: 'text'));
+    await tester.pumpObers(
+      const OiCopyButton(value: 'text', semanticLabel: 'Copy'),
+    );
 
     await tester.tap(find.byType(OiCopyButton));
     await tester.pump();
@@ -54,6 +97,7 @@ void main() {
     await tester.pumpObers(
       const OiCopyButton(
         value: 'text',
+        semanticLabel: 'Copy',
         feedbackDuration: Duration(milliseconds: 200),
       ),
     );
@@ -82,7 +126,9 @@ void main() {
           return null;
         });
 
-    await tester.pumpObers(const OiCopyButton(value: 'my value'));
+    await tester.pumpObers(
+      const OiCopyButton(value: 'my value', semanticLabel: 'Copy'),
+    );
 
     await tester.tap(find.byType(OiCopyButton));
     await tester.pump();
@@ -93,13 +139,23 @@ void main() {
   // ── 5. Custom icon and copiedWidget are shown ─────────────────────────────
 
   testWidgets('custom icon is shown by default', (tester) async {
-    await tester.pumpObers(const OiCopyButton(value: 'x', icon: Text('COPY')));
+    await tester.pumpObers(
+      const OiCopyButton(
+        value: 'x',
+        semanticLabel: 'Copy',
+        icon: Text('COPY'),
+      ),
+    );
     expect(find.text('COPY'), findsOneWidget);
   });
 
   testWidgets('custom copiedWidget shown after tap', (tester) async {
     await tester.pumpObers(
-      const OiCopyButton(value: 'x', copiedWidget: Text('DONE')),
+      const OiCopyButton(
+        value: 'x',
+        semanticLabel: 'Copy',
+        copiedWidget: Text('DONE'),
+      ),
     );
 
     await tester.tap(find.byType(OiCopyButton));

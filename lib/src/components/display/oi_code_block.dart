@@ -200,6 +200,7 @@ class OiCodeBlock extends StatelessWidget {
           right: 8,
           child: OiCopyButton(
             value: code,
+            semanticLabel: 'Copy code',
             icon: Text(
               '⎘',
               style: TextStyle(fontSize: 14, color: colors.textMuted),

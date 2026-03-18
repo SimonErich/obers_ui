@@ -10,10 +10,14 @@ import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
 /// When [selected] is `false` it renders as a ghost/outline button. Tapping
 /// calls [onChanged] with the opposite of [selected].
 ///
+/// **Accessibility (REQ-0014):** [semanticLabel] is required so every toggle
+/// button has an accessible description announced by screen readers.
+///
 /// ```dart
 /// OiToggleButton(
 ///   label: 'Bold',
 ///   selected: _bold,
+///   semanticLabel: 'Bold',
 ///   onChanged: (v) => setState(() => _bold = v),
 /// )
 /// ```
@@ -168,6 +172,7 @@ class OiToggleButton extends StatelessWidget {
     return OiTappable(
       onTap: enabled ? () => onChanged?.call(!selected) : null,
       enabled: enabled,
+      semanticLabel: semanticLabel,
       child: Container(
         height: height,
         padding: EdgeInsets.symmetric(horizontal: hPad),

@@ -1,5 +1,6 @@
 // Tests do not require documentation comments.
 // ignore_for_file: public_member_api_docs
+// REQ-0014: OiToggleButton required-prop enforcement tests.
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -10,6 +11,54 @@ import '../../../helpers/pump_app.dart';
 const _kIcon = IconData(0xe318, fontFamily: 'MaterialIcons');
 
 void main() {
+  // ── REQ-0014: Required props enforce correctness ──────────────────────────
+
+  group('OiToggleButton accessibility (REQ-0014)', () {
+    testWidgets('semanticLabel is exposed in the accessibility tree', (
+      tester,
+    ) async {
+      await tester.pumpObers(
+        const OiToggleButton(
+          selected: false,
+          label: 'Bold',
+          semanticLabel: 'Toggle bold formatting',
+        ),
+      );
+      final semanticsWidgets = tester.widgetList<Semantics>(
+        find.byType(Semantics),
+      );
+      final matching = semanticsWidgets
+          .where((s) => s.properties.label == 'Toggle bold formatting')
+          .toList();
+      expect(matching, isNotEmpty);
+    });
+
+    testWidgets('semanticLabel is marked as button in accessibility tree', (
+      tester,
+    ) async {
+      await tester.pumpObers(
+        const OiToggleButton(
+          selected: false,
+          label: 'Bold',
+          semanticLabel: 'Toggle bold',
+        ),
+      );
+      final semanticsWidgets = tester.widgetList<Semantics>(
+        find.byType(Semantics),
+      );
+      final matching = semanticsWidgets
+          .where(
+            (s) =>
+                s.properties.label == 'Toggle bold' &&
+                (s.properties.button ?? false),
+          )
+          .toList();
+      expect(matching, isNotEmpty);
+    });
+  });
+
+  // ── Basic rendering ───────────────────────────────────────────────────────
+
   testWidgets('renders label', (tester) async {
     await tester.pumpObers(
       const OiToggleButton(

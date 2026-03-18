@@ -18,6 +18,7 @@ import 'package:obers_ui/src/primitives/interaction/oi_focus_trap.dart';
 class OiPanel extends StatefulWidget {
   /// Creates an [OiPanel].
   const OiPanel({
+    required this.label,
     required this.child,
     required this.open,
     this.onClose,
@@ -27,6 +28,9 @@ class OiPanel extends StatefulWidget {
     this.showScrim = false,
     super.key,
   });
+
+  /// Accessible label describing the panel for screen readers.
+  final String label;
 
   /// The content displayed inside the panel.
   final Widget child;
@@ -166,25 +170,30 @@ class _OiPanelState extends State<OiPanel> with SingleTickerProviderStateMixin {
       child: SlideTransition(position: slideAnim, child: panel),
     );
 
-    return Stack(
-      children: [
-        if (widget.showScrim && widget.open)
-          Positioned.fill(
-            child: GestureDetector(
-              behavior: HitTestBehavior.opaque,
-              onTap: widget.dismissible ? widget.onClose : null,
-              child: AnimatedBuilder(
-                animation: _controller,
-                builder: (_, __) => ColoredBox(
-                  color: colors.overlay.withValues(
-                    alpha: 0.5 * _controller.value,
+    return Semantics(
+      label: widget.label,
+      scopesRoute: true,
+      explicitChildNodes: true,
+      child: Stack(
+        children: [
+          if (widget.showScrim && widget.open)
+            Positioned.fill(
+              child: GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTap: widget.dismissible ? widget.onClose : null,
+                child: AnimatedBuilder(
+                  animation: _controller,
+                  builder: (_, __) => ColoredBox(
+                    color: colors.overlay.withValues(
+                      alpha: 0.5 * _controller.value,
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
-        Align(alignment: _alignment(), child: panel),
-      ],
+          Align(alignment: _alignment(), child: panel),
+        ],
+      ),
     );
   }
 }

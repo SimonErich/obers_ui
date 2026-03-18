@@ -222,10 +222,12 @@ void main() {
 
   group('REQ-0013 – Boolean props read like English', () {
     // Matches public `final bool isXxx` or `final bool hasXxx` field
-    // declarations in class bodies (also catches required named params that
+    // declarations and parameters (also catches required named params that
     // appear as field declarations).
+    // Excludes method declarations (where bool is a return type) by
+    // requiring the identifier to be followed by [;,=)] — not `(`.
     final badBoolPattern = RegExp(
-      r'^\s*(?:required\s+)?(?:final\s+)?bool\s+(is[A-Z]|has[A-Z])',
+      r'^\s*(?:required\s+)?(?:final\s+)?bool\s+((?:is|has)[A-Z]\w*)(?=\s*[;,=)\]])',
       multiLine: true,
     );
 
@@ -476,13 +478,15 @@ void main() {
       ];
 
       for (final variant in variants) {
-        // Extract the constructor body for this variant.
-        final ctorStart = content.indexOf(variant);
+        // Search for the actual constructor declaration (not doc comments).
+        final ctorPattern = RegExp(RegExp.escape(variant) + r'\s*\(\{');
+        final ctorMatch = ctorPattern.firstMatch(content);
         expect(
-          ctorStart,
-          isNot(-1),
+          ctorMatch,
+          isNotNull,
           reason: '$variant constructor must exist',
         );
+        final ctorStart = ctorMatch!.start;
 
         // Find the closing parenthesis of the constructor parameter list.
         final paramStart = content.indexOf('({', ctorStart);

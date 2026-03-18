@@ -1,5 +1,6 @@
 // Tests do not require documentation comments.
 // ignore_for_file: public_member_api_docs
+// REQ-0014: OiImage required-prop enforcement tests.
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -11,7 +12,11 @@ void main() {
   // Asset paths below do not need to exist — errorWidget suppresses the load
   // error so tests focus on semantics, not image rendering.
 
-  testWidgets('alt is exposed in the accessibility tree', (tester) async {
+  // ── REQ-0014: Required props enforce correctness ──────────────────────────
+
+  testWidgets('REQ-0014: alt is exposed in the accessibility tree', (
+    tester,
+  ) async {
     final handle = tester.ensureSemantics();
     try {
       await tester.pumpObers(
