@@ -34,6 +34,7 @@ void main() {
         platform: TargetPlatform.android,
         keyboardHeight: 0,
         keyboardVisible: false,
+        inputModality: OiInputModality.pointer,
       );
       late OiPlatformData captured;
 
@@ -151,6 +152,7 @@ void main() {
         platform: TargetPlatform.iOS,
         keyboardHeight: 0,
         keyboardVisible: false,
+        inputModality: OiInputModality.pointer,
       );
       late OiPlatformData captured;
 
@@ -168,6 +170,30 @@ void main() {
 
       expect(captured, equals(data));
       expect(captured.platform, TargetPlatform.iOS);
+    });
+
+    testWidgets('context.inputModality returns the modality', (tester) async {
+      const data = OiPlatformData(
+        platform: TargetPlatform.iOS,
+        keyboardHeight: 0,
+        keyboardVisible: false,
+        inputModality: OiInputModality.touch,
+      );
+      late OiInputModality captured;
+
+      await tester.pumpWidget(
+        buildWithPlatform(
+          data,
+          Builder(
+            builder: (ctx) {
+              captured = ctx.inputModality;
+              return const SizedBox.shrink();
+            },
+          ),
+        ),
+      );
+
+      expect(captured, OiInputModality.touch);
     });
   });
 
@@ -197,6 +223,7 @@ void main() {
         platform: TargetPlatform.android,
         keyboardHeight: 0,
         keyboardVisible: false,
+        inputModality: OiInputModality.pointer,
       );
       const child = SizedBox.shrink();
       const oldWidget = OiPlatform(data: data, child: child);
@@ -210,15 +237,76 @@ void main() {
         platform: TargetPlatform.android,
         keyboardHeight: 0,
         keyboardVisible: false,
+        inputModality: OiInputModality.pointer,
       );
       const newData = OiPlatformData(
         platform: TargetPlatform.android,
         keyboardHeight: 300,
         keyboardVisible: true,
+        inputModality: OiInputModality.pointer,
       );
       const oldWidget = OiPlatform(data: oldData, child: child);
       const newWidget = OiPlatform(data: newData, child: child);
       expect(newWidget.updateShouldNotify(oldWidget), isTrue);
+    });
+  });
+
+  group('OiInputModality in OiPlatformData', () {
+    test('equality includes inputModality', () {
+      const a = OiPlatformData(
+        platform: TargetPlatform.android,
+        keyboardHeight: 0,
+        keyboardVisible: false,
+        inputModality: OiInputModality.pointer,
+      );
+      const b = OiPlatformData(
+        platform: TargetPlatform.android,
+        keyboardHeight: 0,
+        keyboardVisible: false,
+        inputModality: OiInputModality.touch,
+      );
+      expect(a, isNot(equals(b)));
+    });
+
+    test('toString includes inputModality', () {
+      const data = OiPlatformData(
+        platform: TargetPlatform.android,
+        keyboardHeight: 0,
+        keyboardVisible: false,
+        inputModality: OiInputModality.touch,
+      );
+      expect(data.toString(), contains('inputModality'));
+      expect(data.toString(), contains('touch'));
+    });
+
+    testWidgets('fromContext defaults inputModality to pointer', (
+      tester,
+    ) async {
+      late OiPlatformData captured;
+
+      await tester.pumpWidget(
+        MediaQuery(
+          data: const MediaQueryData(),
+          child: Directionality(
+            textDirection: TextDirection.ltr,
+            child: Builder(
+              builder: (ctx) {
+                return OiPlatform.fromContext(
+                  context: ctx,
+                  child: Builder(
+                    builder: (innerCtx) {
+                      captured = OiPlatform.of(innerCtx);
+                      return const SizedBox.shrink();
+                    },
+                  ),
+                );
+              },
+            ),
+          ),
+        ),
+      );
+
+      expect(captured.inputModality, OiInputModality.pointer);
     });
   });
 }

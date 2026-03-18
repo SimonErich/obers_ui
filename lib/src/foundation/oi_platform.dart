@@ -1,6 +1,19 @@
 import 'package:flutter/foundation.dart' show defaultTargetPlatform;
 import 'package:flutter/widgets.dart';
 
+/// The input modality currently in use.
+///
+/// Determined by the most recent [PointerDeviceKind] event.
+///
+/// {@category Foundation}
+enum OiInputModality {
+  /// Touch or stylus input.
+  touch,
+
+  /// Mouse or trackpad input.
+  pointer,
+}
+
 /// Immutable snapshot of platform and device context.
 ///
 /// Provided to the widget tree by [OiPlatform].
@@ -13,6 +26,7 @@ class OiPlatformData {
     required this.platform,
     required this.keyboardHeight,
     required this.keyboardVisible,
+    required this.inputModality,
   });
 
   /// The host platform.
@@ -28,22 +42,27 @@ class OiPlatformData {
   /// True when [keyboardHeight] is greater than zero.
   final bool keyboardVisible;
 
+  /// The current input modality.
+  final OiInputModality inputModality;
+
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
     return other is OiPlatformData &&
         other.platform == platform &&
         other.keyboardHeight == keyboardHeight &&
-        other.keyboardVisible == keyboardVisible;
+        other.keyboardVisible == keyboardVisible &&
+        other.inputModality == inputModality;
   }
 
   @override
-  int get hashCode => Object.hash(platform, keyboardHeight, keyboardVisible);
+  int get hashCode =>
+      Object.hash(platform, keyboardHeight, keyboardVisible, inputModality);
 
   @override
   String toString() =>
       'OiPlatformData(platform: $platform, keyboardHeight: $keyboardHeight, '
-      'keyboardVisible: $keyboardVisible)';
+      'keyboardVisible: $keyboardVisible, inputModality: $inputModality)';
 }
 
 /// An [InheritedWidget] that provides [OiPlatformData] to its descendants.
@@ -59,10 +78,12 @@ class OiPlatform extends InheritedWidget {
   /// Creates an [OiPlatform] that derives its data from [MediaQuery].
   ///
   /// [platform] defaults to [defaultTargetPlatform].
+  /// [inputModality] defaults to [OiInputModality.pointer].
   factory OiPlatform.fromContext({
     required BuildContext context,
     required Widget child,
     TargetPlatform? platform,
+    OiInputModality inputModality = OiInputModality.pointer,
     Key? key,
   }) {
     final insets = MediaQuery.viewInsetsOf(context);
@@ -73,6 +94,7 @@ class OiPlatform extends InheritedWidget {
         platform: platform ?? defaultTargetPlatform,
         keyboardHeight: keyboardHeight,
         keyboardVisible: keyboardHeight > 0,
+        inputModality: inputModality,
       ),
       child: child,
     );
@@ -107,4 +129,7 @@ extension OiPlatformExt on BuildContext {
   ///
   /// Asserts that an [OiPlatform] exists in the widget tree.
   OiPlatformData get platform => OiPlatform.of(this);
+
+  /// The current [OiInputModality] from the nearest [OiPlatform].
+  OiInputModality get inputModality => OiPlatform.of(this).inputModality;
 }

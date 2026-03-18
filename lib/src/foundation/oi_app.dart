@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/foundation/oi_accessibility.dart';
+import 'package:obers_ui/src/foundation/oi_input_modality.dart';
 import 'package:obers_ui/src/foundation/oi_overlays.dart';
 import 'package:obers_ui/src/foundation/oi_platform.dart';
 import 'package:obers_ui/src/foundation/oi_shortcut_scope.dart';
@@ -65,8 +66,7 @@ class OiDensityScope extends InheritedWidget {
   /// Throws a [FlutterError] if no [OiDensityScope] ancestor is found.
   /// Wrap your widget tree with [OiApp] to provide a density scope.
   static OiDensity of(BuildContext context) {
-    final scope =
-        context.dependOnInheritedWidgetOfExactType<OiDensityScope>();
+    final scope = context.dependOnInheritedWidgetOfExactType<OiDensityScope>();
     if (scope == null) {
       throw FlutterError.fromParts(<DiagnosticsNode>[
         ErrorSummary('No OiDensityScope found in the widget tree.'),
@@ -292,7 +292,8 @@ class _OiAppState extends State<OiApp> {
   ///
   /// Injection order (outermost → innermost):
   /// [OiTheme] → [Directionality] → [OiDensityScope] → [OiA11yScope]
-  /// → [OiPlatform] → [OiUndoStackProvider] → [OiShortcutScope]
+  /// → [OiInputModalityDetector] (provides [OiPlatform])
+  /// → [OiUndoStackProvider] → [OiShortcutScope]
   /// → [OiTourScope] → [OiOverlaysHost]
   Widget _buildScaffold(BuildContext context, Widget? child) {
     final platformBrightness = MediaQuery.platformBrightnessOf(context);
@@ -311,8 +312,7 @@ class _OiAppState extends State<OiApp> {
         child: OiDensityScope(
           density: _resolveDensity(),
           child: OiA11yScope(
-            child: OiPlatform.fromContext(
-              context: context,
+            child: OiInputModalityDetector(
               child: OiUndoStackProvider(
                 stack: _undoStack,
                 child: OiShortcutScope(

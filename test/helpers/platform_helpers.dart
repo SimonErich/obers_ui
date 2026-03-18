@@ -3,6 +3,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:obers_ui/src/foundation/oi_platform.dart';
 
 /// Pumps [child] wrapped in a touch-modality app at the given screen width.
 Future<void> pumpTouchApp(
@@ -16,7 +17,18 @@ Future<void> pumpTouchApp(
   await tester.pumpWidget(
     MediaQuery(
       data: MediaQueryData(size: Size(width, height)),
-      child: Directionality(textDirection: TextDirection.ltr, child: child),
+      child: Directionality(
+        textDirection: TextDirection.ltr,
+        child: OiPlatform(
+          data: OiPlatformData(
+            platform: TargetPlatform.android,
+            keyboardHeight: 0,
+            keyboardVisible: false,
+            inputModality: OiInputModality.touch,
+          ),
+          child: child,
+        ),
+      ),
     ),
   );
 }
@@ -33,7 +45,18 @@ Future<void> pumpPointerApp(
   await tester.pumpWidget(
     MediaQuery(
       data: MediaQueryData(size: Size(width, height)),
-      child: Directionality(textDirection: TextDirection.ltr, child: child),
+      child: Directionality(
+        textDirection: TextDirection.ltr,
+        child: OiPlatform(
+          data: OiPlatformData(
+            platform: TargetPlatform.linux,
+            keyboardHeight: 0,
+            keyboardVisible: false,
+            inputModality: OiInputModality.pointer,
+          ),
+          child: child,
+        ),
+      ),
     ),
   );
 }

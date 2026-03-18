@@ -26,6 +26,7 @@ export 'src/foundation/theme/oi_theme_scope.dart';
 
 export 'src/foundation/oi_accessibility.dart';
 export 'src/foundation/oi_app.dart';
+export 'src/foundation/oi_input_modality.dart';
 export 'src/foundation/oi_overlays.dart';
 export 'src/foundation/oi_platform.dart';
 export 'src/foundation/oi_responsive.dart';
