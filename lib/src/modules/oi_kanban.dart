@@ -1,6 +1,10 @@
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/foundation/oi_responsive.dart';
+import 'package:obers_ui/src/foundation/persistence/oi_settings_driver.dart';
+import 'package:obers_ui/src/foundation/persistence/oi_settings_mixin.dart';
+import 'package:obers_ui/src/foundation/persistence/oi_settings_provider.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
+import 'package:obers_ui/src/models/settings/oi_kanban_settings.dart';
 import 'package:obers_ui/src/primitives/gesture/oi_double_tap.dart';
 import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
 
@@ -65,6 +69,9 @@ class OiKanban<T> extends StatefulWidget {
     this.addColumn = false,
     this.onAddColumn,
     this.cardKey,
+    this.settingsDriver,
+    this.settingsKey,
+    this.settingsNamespace = 'oi_kanban',
   });
 
   /// The columns displayed on the board.
@@ -107,11 +114,23 @@ class OiKanban<T> extends StatefulWidget {
   /// Extracts a unique key from each card item.
   final Object Function(T)? cardKey;
 
+  // ── Settings persistence ──────────────────────────────────────────────────
+
+  /// Driver used to persist settings. When `null` settings are not persisted.
+  final OiSettingsDriver? settingsDriver;
+
+  /// Sub-key scoping this kanban's settings within [settingsNamespace].
+  final String? settingsKey;
+
+  /// Top-level namespace for settings storage.
+  final String settingsNamespace;
+
   @override
   State<OiKanban<T>> createState() => _OiKanbanState<T>();
 }
 
-class _OiKanbanState<T> extends State<OiKanban<T>> {
+class _OiKanbanState<T> extends State<OiKanban<T>>
+    with OiSettingsMixin<OiKanban<T>, OiKanbanSettings> {
   final Set<Object> _collapsedColumns = {};
   Object? _editingColumnKey;
   final TextEditingController _editingController = TextEditingController();
@@ -119,10 +138,56 @@ class _OiKanbanState<T> extends State<OiKanban<T>> {
   final PageController _pageController = PageController();
   int _compactPageIndex = 0;
 
+  /// Resolved driver: explicit widget prop → OiSettingsProvider → null.
+  OiSettingsDriver? _resolvedDriver;
+
+  // ── OiSettingsMixin contract ───────────────────────────────────────────────
+
+  @override
+  String get settingsNamespace => widget.settingsNamespace;
+
+  @override
+  String? get settingsKey => widget.settingsKey;
+
+  @override
+  OiSettingsDriver? get settingsDriver => _resolvedDriver;
+
+  @override
+  OiKanbanSettings get defaultSettings => const OiKanbanSettings();
+
+  @override
+  OiKanbanSettings deserializeSettings(Map<String, dynamic> json) =>
+      OiKanbanSettings.fromJson(json);
+
+  @override
+  OiKanbanSettings mergeSettings(
+    OiKanbanSettings saved,
+    OiKanbanSettings defaults,
+  ) => saved.mergeWith(defaults);
+
+  // ── Lifecycle ──────────────────────────────────────────────────────────────
+
   @override
   void initState() {
+    _resolvedDriver = widget.settingsDriver;
     super.initState();
     _editingFocusNode.addListener(_onEditFocusChange);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final newDriver =
+        widget.settingsDriver ?? OiSettingsProvider.of(context);
+    if (newDriver != _resolvedDriver) {
+      _resolvedDriver = newDriver;
+      if (settingsLoaded) {
+        reloadSettings();
+      }
+    }
+    if (settingsLoaded && settingsDriver != null) {
+      _applySettings(currentSettings);
+    }
   }
 
   @override
@@ -133,6 +198,18 @@ class _OiKanbanState<T> extends State<OiKanban<T>> {
       ..dispose();
     _pageController.dispose();
     super.dispose();
+  }
+
+  void _applySettings(OiKanbanSettings settings) {
+    _collapsedColumns
+      ..clear()
+      ..addAll(settings.collapsedColumnKeys);
+  }
+
+  OiKanbanSettings _toSettings() {
+    return OiKanbanSettings(
+      collapsedColumnKeys: Set<Object>.from(_collapsedColumns),
+    );
   }
 
   void _onEditFocusChange() {
@@ -149,6 +226,7 @@ class _OiKanbanState<T> extends State<OiKanban<T>> {
         _collapsedColumns.add(columnKey);
       }
     });
+    updateSettings(_toSettings());
   }
 
   void _startEditing(OiKanbanColumn<T> column) {

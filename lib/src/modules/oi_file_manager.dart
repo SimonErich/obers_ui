@@ -5,7 +5,11 @@ import 'package:obers_ui/src/components/display/oi_file_grid_card.dart';
 import 'package:obers_ui/src/components/display/oi_file_tile.dart';
 import 'package:obers_ui/src/components/inputs/oi_text_input.dart';
 import 'package:obers_ui/src/foundation/oi_search_debounce.dart';
+import 'package:obers_ui/src/foundation/persistence/oi_settings_driver.dart';
+import 'package:obers_ui/src/foundation/persistence/oi_settings_mixin.dart';
+import 'package:obers_ui/src/foundation/persistence/oi_settings_provider.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
+import 'package:obers_ui/src/models/settings/oi_file_explorer_settings.dart';
 import 'package:obers_ui/src/modules/oi_chat.dart';
 
 /// A file or folder node in the [OiFileManager].
@@ -89,6 +93,9 @@ class OiFileManager extends StatefulWidget {
     this.onNavigate,
     this.searchQuery,
     this.onSearch,
+    this.settingsDriver,
+    this.settingsKey,
+    this.settingsNamespace = 'oi_file_explorer',
   });
 
   /// The list of files and folders to display.
@@ -146,17 +153,60 @@ class OiFileManager extends StatefulWidget {
   /// highlighting matched portions.
   final ValueChanged<String>? onSearch;
 
+  // ── Settings persistence ──────────────────────────────────────────────────
+
+  /// Driver used to persist settings. When `null` settings are not persisted.
+  final OiSettingsDriver? settingsDriver;
+
+  /// Sub-key scoping this file manager's settings within [settingsNamespace].
+  final String? settingsKey;
+
+  /// Top-level namespace for settings storage.
+  final String settingsNamespace;
+
   @override
   State<OiFileManager> createState() => _OiFileManagerState();
 }
 
-class _OiFileManagerState extends State<OiFileManager> {
+class _OiFileManagerState extends State<OiFileManager>
+    with OiSettingsMixin<OiFileManager, OiFileExplorerSettings> {
   final Set<Object> _selected = {};
   TextEditingController? _searchController;
   final OiSearchDebounce _debounce = OiSearchDebounce();
 
+  /// Resolved driver: explicit widget prop → OiSettingsProvider → null.
+  OiSettingsDriver? _resolvedDriver;
+
+  // ── OiSettingsMixin contract ───────────────────────────────────────────────
+
+  @override
+  String get settingsNamespace => widget.settingsNamespace;
+
+  @override
+  String? get settingsKey => widget.settingsKey;
+
+  @override
+  OiSettingsDriver? get settingsDriver => _resolvedDriver;
+
+  @override
+  OiFileExplorerSettings get defaultSettings =>
+      const OiFileExplorerSettings();
+
+  @override
+  OiFileExplorerSettings deserializeSettings(Map<String, dynamic> json) =>
+      OiFileExplorerSettings.fromJson(json);
+
+  @override
+  OiFileExplorerSettings mergeSettings(
+    OiFileExplorerSettings saved,
+    OiFileExplorerSettings defaults,
+  ) => saved.mergeWith(defaults);
+
+  // ── Lifecycle ──────────────────────────────────────────────────────────────
+
   @override
   void initState() {
+    _resolvedDriver = widget.settingsDriver;
     super.initState();
     if (widget.onSearch != null) {
       _searchController = TextEditingController(text: widget.searchQuery ?? '');
@@ -172,6 +222,19 @@ class _OiFileManagerState extends State<OiFileManager> {
       _debounce.cancel();
       _searchController!.dispose();
       _searchController = null;
+    }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final newDriver =
+        widget.settingsDriver ?? OiSettingsProvider.of(context);
+    if (newDriver != _resolvedDriver) {
+      _resolvedDriver = newDriver;
+      if (settingsLoaded) {
+        reloadSettings();
+      }
     }
   }
 

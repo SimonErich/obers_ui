@@ -2,7 +2,12 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/display/oi_badge.dart';
 import 'package:obers_ui/src/components/display/oi_tooltip.dart';
+import 'package:obers_ui/src/foundation/persistence/oi_settings_driver.dart';
+import 'package:obers_ui/src/foundation/persistence/oi_settings_mixin.dart';
+import 'package:obers_ui/src/foundation/persistence/oi_settings_provider.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
+import 'package:obers_ui/src/models/settings/oi_sidebar_settings.dart'
+    hide OiSidebarMode;
 import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
 
 // ── Data models ──────────────────────────────────────────────────────────────
@@ -125,6 +130,9 @@ class OiSidebar extends StatefulWidget {
     this.resizable = false,
     this.header,
     this.footer,
+    this.settingsDriver,
+    this.settingsKey,
+    this.settingsNamespace = 'oi_sidebar',
     super.key,
   });
 
@@ -160,11 +168,23 @@ class OiSidebar extends StatefulWidget {
   /// An optional widget rendered below the navigation items.
   final Widget? footer;
 
+  // ── Settings persistence ──────────────────────────────────────────────────
+
+  /// Driver used to persist settings. When `null` settings are not persisted.
+  final OiSettingsDriver? settingsDriver;
+
+  /// Sub-key scoping this sidebar's settings within [settingsNamespace].
+  final String? settingsKey;
+
+  /// Top-level namespace for settings storage.
+  final String settingsNamespace;
+
   @override
   State<OiSidebar> createState() => _OiSidebarState();
 }
 
-class _OiSidebarState extends State<OiSidebar> {
+class _OiSidebarState extends State<OiSidebar>
+    with OiSettingsMixin<OiSidebar, OiSidebarSettings> {
   final Set<String> _collapsedSections = {};
   final Set<String> _expandedParents = {};
   int _focusedIndex = -1;
@@ -173,8 +193,38 @@ class _OiSidebarState extends State<OiSidebar> {
   /// Flattened list of all visible item ids for keyboard navigation.
   List<_FlatItem> _flatItems = [];
 
+  /// Resolved driver: explicit widget prop → OiSettingsProvider → null.
+  OiSettingsDriver? _resolvedDriver;
+
+  // ── OiSettingsMixin contract ───────────────────────────────────────────────
+
+  @override
+  String get settingsNamespace => widget.settingsNamespace;
+
+  @override
+  String? get settingsKey => widget.settingsKey;
+
+  @override
+  OiSettingsDriver? get settingsDriver => _resolvedDriver;
+
+  @override
+  OiSidebarSettings get defaultSettings => const OiSidebarSettings();
+
+  @override
+  OiSidebarSettings deserializeSettings(Map<String, dynamic> json) =>
+      OiSidebarSettings.fromJson(json);
+
+  @override
+  OiSidebarSettings mergeSettings(
+    OiSidebarSettings saved,
+    OiSidebarSettings defaults,
+  ) => saved.mergeWith(defaults);
+
+  // ── Lifecycle ──────────────────────────────────────────────────────────────
+
   @override
   void initState() {
+    _resolvedDriver = widget.settingsDriver;
     super.initState();
     _focusNode = FocusNode();
     _rebuildFlatItems();
@@ -187,9 +237,38 @@ class _OiSidebarState extends State<OiSidebar> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final newDriver =
+        widget.settingsDriver ?? OiSettingsProvider.of(context);
+    if (newDriver != _resolvedDriver) {
+      _resolvedDriver = newDriver;
+      if (settingsLoaded) {
+        reloadSettings();
+      }
+    }
+    if (settingsLoaded && settingsDriver != null) {
+      _applySettings(currentSettings);
+    }
+  }
+
+  @override
   void dispose() {
     _focusNode.dispose();
     super.dispose();
+  }
+
+  void _applySettings(OiSidebarSettings settings) {
+    _collapsedSections
+      ..clear()
+      ..addAll(settings.collapsedSectionIds);
+    _rebuildFlatItems();
+  }
+
+  OiSidebarSettings _toSettings() {
+    return OiSidebarSettings(
+      collapsedSectionIds: Set<String>.from(_collapsedSections),
+    );
   }
 
   void _rebuildFlatItems() {
@@ -262,6 +341,7 @@ class _OiSidebarState extends State<OiSidebar> {
       }
       _rebuildFlatItems();
     });
+    updateSettings(_toSettings());
   }
 
   void _toggleParent(String parentId) {
