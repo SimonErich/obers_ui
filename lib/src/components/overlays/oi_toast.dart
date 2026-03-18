@@ -59,6 +59,7 @@ enum OiToastPosition {
 class OiToast extends StatefulWidget {
   /// Creates an [OiToast].
   const OiToast({
+    required this.label,
     required this.message,
     this.level = OiToastLevel.info,
     this.position = OiToastPosition.bottomRight,
@@ -68,6 +69,9 @@ class OiToast extends StatefulWidget {
     this.onDismiss,
     super.key,
   });
+
+  /// The accessible label describing this toast for screen readers.
+  final String label;
 
   /// The text message displayed in the toast.
   final String message;
@@ -114,6 +118,7 @@ class OiToast extends StatefulWidget {
       // Service manages the entry lifetime; pass onDismiss straight through.
       return service.show(
         builder: (_) => OiToast(
+          label: message,
           message: message,
           level: level,
           position: position,
@@ -132,6 +137,7 @@ class OiToast extends StatefulWidget {
     // the entry is created.
     final entry = OverlayEntry(
       builder: (_) => OiToast(
+        label: message,
         message: message,
         level: level,
         position: position,
@@ -285,6 +291,7 @@ class _OiToastState extends State<OiToast> with SingleTickerProviderStateMixin {
     final accent = _accentColor(colors);
 
     Widget toast = Semantics(
+      label: widget.label,
       liveRegion: true,
       child: Container(
         constraints: const BoxConstraints(minWidth: 240, maxWidth: 400),

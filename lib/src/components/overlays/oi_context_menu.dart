@@ -224,11 +224,15 @@ class _MenuPanelState extends State<_MenuPanel> {
 class OiContextMenu extends StatefulWidget {
   /// Creates an [OiContextMenu].
   const OiContextMenu({
+    required this.label,
     required this.child,
     required this.items,
     this.enabled = true,
     super.key,
   });
+
+  /// The accessible label describing this context menu for screen readers.
+  final String label;
 
   /// The widget that triggers the context menu.
   final Widget child;
@@ -252,6 +256,7 @@ class _OiContextMenuState extends State<OiContextMenu> {
 
     _entry = OverlayEntry(
       builder: (ctx) => _OiContextMenuOverlay(
+        label: widget.label,
         position: globalPosition,
         items: widget.items,
         onClose: _close,
@@ -294,34 +299,39 @@ class _OiContextMenuState extends State<OiContextMenu> {
 /// Overlay content: full-screen barrier + positioned menu panel.
 class _OiContextMenuOverlay extends StatelessWidget {
   const _OiContextMenuOverlay({
+    required this.label,
     required this.position,
     required this.items,
     required this.onClose,
   });
 
+  final String label;
   final Offset position;
   final List<OiMenuItem> items;
   final VoidCallback onClose;
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        // Full-screen barrier — tap outside closes.
-        Positioned.fill(
-          child: GestureDetector(
-            behavior: HitTestBehavior.opaque,
-            onTap: onClose,
-            child: const SizedBox.expand(),
+    return Semantics(
+      label: label,
+      child: Stack(
+        children: [
+          // Full-screen barrier — tap outside closes.
+          Positioned.fill(
+            child: GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: onClose,
+              child: const SizedBox.expand(),
+            ),
           ),
-        ),
-        // Menu panel at cursor position.
-        Positioned(
+          // Menu panel at cursor position.
+          Positioned(
           left: position.dx,
-          top: position.dy,
-          child: _MenuPanel(items: items, onClose: onClose),
-        ),
-      ],
+            top: position.dy,
+            child: _MenuPanel(items: items, onClose: onClose),
+          ),
+        ],
+      ),
     );
   }
 }

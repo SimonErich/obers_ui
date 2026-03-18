@@ -740,7 +740,7 @@ class _OiButtonState extends State<OiButton> {
       button = SizedBox(width: double.infinity, child: button);
     }
     if (widget.tooltip != null) {
-      return OiTooltip(message: widget.tooltip!, child: button);
+      return OiTooltip(label: widget.tooltip!, message: widget.tooltip!, child: button);
     }
     return button;
   }

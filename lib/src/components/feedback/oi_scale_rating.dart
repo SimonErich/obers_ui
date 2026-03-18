@@ -66,6 +66,7 @@ class OiScaleRating extends StatelessWidget {
     final selectedIndex = value != null ? value! - min : null;
 
     Widget group = OiButtonGroup(
+      label: label ?? 'Scale rating',
       items: items,
       exclusive: true,
       selectedIndex: selectedIndex,

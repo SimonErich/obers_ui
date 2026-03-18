@@ -11,7 +11,7 @@ import '../../../helpers/pump_app.dart';
 void main() {
   testWidgets('tooltip hidden by default', (tester) async {
     await tester.pumpObers(
-      const OiTooltip(message: 'Tip text', child: Text('hover me')),
+      const OiTooltip(label: 'Tip', message: 'Tip text', child: Text('hover me')),
     );
     expect(find.text('Tip text'), findsNothing);
   });
@@ -19,6 +19,7 @@ void main() {
   testWidgets('long-press shows tooltip', (tester) async {
     await tester.pumpObers(
       const OiTooltip(
+        label: 'Tip',
         message: 'Tip text',
         showDelay: Duration.zero,
         child: Text('hold me'),
@@ -32,6 +33,7 @@ void main() {
   testWidgets('tooltip auto-dismisses after 2s on long-press', (tester) async {
     await tester.pumpObers(
       const OiTooltip(
+        label: 'Tip',
         message: 'Gone soon',
         showDelay: Duration.zero,
         child: Text('hold me'),
@@ -48,6 +50,7 @@ void main() {
   testWidgets('hover shows tooltip after delay', (tester) async {
     await tester.pumpObers(
       const OiTooltip(
+        label: 'Tip',
         message: 'Hover tip',
         showDelay: Duration(milliseconds: 100),
         child: Text('hover me'),
@@ -70,6 +73,7 @@ void main() {
   testWidgets('rich content overrides message', (tester) async {
     await tester.pumpObers(
       const OiTooltip(
+        label: 'Tip',
         message: 'plain',
         showDelay: Duration.zero,
         content: Text('rich content'),

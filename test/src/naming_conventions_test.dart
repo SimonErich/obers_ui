@@ -24,6 +24,16 @@ String _stripComments(String source) {
   return result;
 }
 
+/// Maps file basenames to imperative callback names that are exempted from the
+/// on* naming convention in that specific file only.
+const _imperativeCallbackAllowlist = <String, Set<String>>{
+  'oi_undo_stack.dart': {'execute', 'undo', 'merge'},
+  'oi_wizard.dart': {'goNext', 'goPrevious', 'goToStep', 'setValue'},
+};
+
+/// Short parameter names (< 3 characters) that are acceptable.
+const _shortNameAllowlist = <String>{'id', 'to'};
+
 void main() {
   final libDir = Directory('lib/src');
   final allFiles = _dartFiles(libDir);
@@ -557,7 +567,7 @@ void main() {
       // comparators, search functions, factory functions, and imperative
       // action callbacks on context/command objects (e.g. goNext, execute).
       final allowedPatterns = RegExp(
-        r'^(on[A-Z]|.*[Bb]uilder$|.*[Cc]omparator$|.*[Gg]etter$|search$|.*[Ff]actory$|go[A-Z]|set[A-Z]|execute$|undo$|redo$|merge$)',
+        r'^(on[A-Z]|.*[Bb]uilder$|.*[Cc]omparator$|.*[Gg]etter$|search$|.*[Ff]actory$)',
       );
 
       final violations = <String>[];
@@ -571,6 +581,9 @@ void main() {
           final name = m.group(1)!;
           if (name.startsWith('_')) continue;
           if (!allowedPatterns.hasMatch(name)) {
+            final basename = file.uri.pathSegments.last;
+            final fileAllowlist = _imperativeCallbackAllowlist[basename];
+            if (fileAllowlist != null && fileAllowlist.contains(name)) continue;
             final line = content.substring(0, m.start).split('\n').length;
             violations.add(
               '${file.path}:$line — $name '
@@ -590,6 +603,67 @@ void main() {
       );
     });
 
+    test('all constructor params across all widgets meet readability standards',
+        () {
+      final ctorParamPattern = RegExp(r'\bthis\.([a-zA-Z]\w*)\b');
+      final singleCharPrefixPattern = RegExp(r'^[a-z][A-Z]');
+      final widgetClassPattern = RegExp(
+        r'class\s+\w+\s+extends\s+State(?:ful|less)Widget',
+      );
+
+      final violations = <String>[];
+      var filesScanned = 0;
+
+      for (final file in allFiles) {
+        if (file.path.contains('/_internal/')) continue;
+
+        final content = _stripComments(file.readAsStringSync());
+        if (!widgetClassPattern.hasMatch(content)) continue;
+        filesScanned++;
+
+        final matches = ctorParamPattern.allMatches(content);
+        for (final m in matches) {
+          final paramName = m.group(1)!;
+          if (paramName.startsWith('_')) continue;
+
+          if (paramName.length < 3 &&
+              !_shortNameAllowlist.contains(paramName)) {
+            final line = content.substring(0, m.start).split('\n').length;
+            violations.add(
+              '${file.path}:$line — this.$paramName '
+              '(name too short, use ≥ 3 characters)',
+            );
+          }
+
+          if (singleCharPrefixPattern.hasMatch(paramName)) {
+            final line = content.substring(0, m.start).split('\n').length;
+            violations.add(
+              '${file.path}:$line — this.$paramName '
+              '(single-character camelCase prefix, use a full word)',
+            );
+          }
+        }
+      }
+
+      expect(
+        filesScanned,
+        greaterThan(100),
+        reason:
+            'Expected to scan more than 100 widget files, but only found '
+            '$filesScanned. Check that lib/src contains the expected widgets.',
+      );
+
+      expect(
+        violations,
+        isEmpty,
+        reason:
+            'All constructor parameters across all widgets must meet '
+            'readability standards: ≥ 3 characters (except allowlisted names) '
+            'and no single-character camelCase prefixes. '
+            'Violations:\n${violations.join('\n')}',
+      );
+    });
+
     test('non-boolean props read like English across key widgets', () {
       // Expanded spot-checks beyond the original 4 widgets. Verifies that
       // non-boolean parameters (strings, enums, callbacks, custom types) use
@@ -602,6 +676,7 @@ void main() {
       expect(selectContent, contains('this.onChanged'));
       expect(selectContent, contains('this.placeholder'));
       expect(selectContent, contains('this.searchable'));
+      expect(selectContent, contains('this.bottomSheetOnCompact'));
 
       // OiDialog — label, title, content, actions, onClose, dismissible
       final dialogFile = File('lib/src/components/overlays/oi_dialog.dart');
@@ -693,6 +768,97 @@ void main() {
       final swipeableContent = swipeableFile.readAsStringSync();
       expect(swipeableContent, contains('this.dismissible'));
       expect(swipeableContent, contains('this.threshold'));
+
+      // OiTextInput — controller, label, hint, placeholder, onChanged
+      final textInputFile = File(
+        'lib/src/components/inputs/oi_text_input.dart',
+      );
+      final textInputContent = textInputFile.readAsStringSync();
+      expect(textInputContent, contains('this.controller'));
+      expect(textInputContent, contains('this.label'));
+      expect(textInputContent, contains('this.hint'));
+      expect(textInputContent, contains('this.placeholder'));
+      expect(textInputContent, contains('this.onChanged'));
+
+      // OiCheckbox — value, onChanged, label
+      final checkboxFile = File('lib/src/components/inputs/oi_checkbox.dart');
+      final checkboxContent = checkboxFile.readAsStringSync();
+      expect(checkboxContent, contains('this.value'));
+      expect(checkboxContent, contains('this.onChanged'));
+      expect(checkboxContent, contains('this.label'));
+
+      // OiAccordion — sections, allowMultiple
+      final accordionFile = File(
+        'lib/src/components/navigation/oi_accordion.dart',
+      );
+      final accordionContent = accordionFile.readAsStringSync();
+      expect(accordionContent, contains('this.sections'));
+      expect(accordionContent, contains('this.allowMultiple'));
+
+      // OiDrawer — child, open, width, onClose
+      final drawerFile = File('lib/src/components/navigation/oi_drawer.dart');
+      final drawerContent = drawerFile.readAsStringSync();
+      expect(drawerContent, contains('this.child'));
+      expect(drawerContent, contains('this.open'));
+      expect(drawerContent, contains('this.width'));
+      expect(drawerContent, contains('this.onClose'));
+
+      // OiProgress — value, label, indeterminate, strokeWidth
+      final progressFile = File('lib/src/components/display/oi_progress.dart');
+      final progressContent = progressFile.readAsStringSync();
+      expect(progressContent, contains('this.value'));
+      expect(progressContent, contains('this.label'));
+      expect(progressContent, contains('this.indeterminate'));
+      expect(progressContent, contains('this.strokeWidth'));
+
+      // OiForm — sections, controller, onSubmit, autoValidate, layout
+      final formFile = File('lib/src/composites/forms/oi_form.dart');
+      final formContent = formFile.readAsStringSync();
+      expect(formContent, contains('this.sections'));
+      expect(formContent, contains('this.controller'));
+      expect(formContent, contains('this.onSubmit'));
+      expect(formContent, contains('this.autoValidate'));
+      expect(formContent, contains('this.layout'));
+
+      // OiTimeline — events, label, showTimestamps, onEventTap
+      final timelineFile = File(
+        'lib/src/composites/scheduling/oi_timeline.dart',
+      );
+      final timelineContent = timelineFile.readAsStringSync();
+      expect(timelineContent, contains('this.events'));
+      expect(timelineContent, contains('this.label'));
+      expect(timelineContent, contains('this.showTimestamps'));
+      expect(timelineContent, contains('this.onEventTap'));
+
+      // OiFloating — anchor, child, visible, alignment, bottomSheetOnCompact
+      final floatingFile = File(
+        'lib/src/primitives/overlay/oi_floating.dart',
+      );
+      final floatingContent = floatingFile.readAsStringSync();
+      expect(floatingContent, contains('this.anchor'));
+      expect(floatingContent, contains('this.child'));
+      expect(floatingContent, contains('this.visible'));
+      expect(floatingContent, contains('this.alignment'));
+      expect(floatingContent, contains('this.bottomSheetOnCompact'));
+
+      // OiGrid — breakpoint, children, columns, gap
+      final gridFile = File('lib/src/primitives/layout/oi_grid.dart');
+      final gridContent = gridFile.readAsStringSync();
+      expect(gridContent, contains('this.breakpoint'));
+      expect(gridContent, contains('this.children'));
+      expect(gridContent, contains('this.columns'));
+      expect(gridContent, contains('this.gap'));
+
+      // OiDraggable — data, child, feedback, onDragStarted, axis
+      final draggableFile = File(
+        'lib/src/primitives/drag_drop/oi_draggable.dart',
+      );
+      final draggableContent = draggableFile.readAsStringSync();
+      expect(draggableContent, contains('this.data'));
+      expect(draggableContent, contains('this.child'));
+      expect(draggableContent, contains('this.feedback'));
+      expect(draggableContent, contains('this.onDragStarted'));
+      expect(draggableContent, contains('this.axis'));
     });
   });  // end REQ-0013
 

@@ -254,6 +254,7 @@ class _OiListViewState<T> extends State<OiListView<T>> {
     _dismissFilterSheet?.call();
     final handle = OiSheet.show(
       context,
+      label: 'Filters',
       side: OiPanelSide.bottom,
       dragHandle: true,
       onClose: () => _dismissFilterSheet = null,

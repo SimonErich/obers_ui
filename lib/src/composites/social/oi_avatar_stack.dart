@@ -113,6 +113,7 @@ class OiAvatarStack extends StatelessWidget {
         Positioned(
           left: left,
           child: OiTooltip(
+            label: user.label,
             message: user.label,
             child: Container(
               decoration: BoxDecoration(
@@ -132,6 +133,7 @@ class OiAvatarStack extends StatelessWidget {
         Positioned(
           left: left,
           child: OiTooltip(
+            label: 'More users',
             message: users.skip(maxVisible).map((u) => u.label).join(', '),
             child: Container(
               width: d,

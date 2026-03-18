@@ -11,40 +11,40 @@ import 'package:obers_ui/src/foundation/theme/oi_theme_data.dart';
 
 void main() {
   testWidgets('renders message text', (tester) async {
-    await tester.pumpObers(const OiToast(message: 'Saved successfully'));
+    await tester.pumpObers(const OiToast(label: 'Toast', message: 'Saved successfully'));
     expect(find.text('Saved successfully'), findsOneWidget);
   });
 
   testWidgets('renders action widget when provided', (tester) async {
     await tester.pumpObers(
-      const OiToast(message: 'Item deleted', action: Text('Undo')),
+      const OiToast(label: 'Toast', message: 'Item deleted', action: Text('Undo')),
     );
     expect(find.text('Undo'), findsOneWidget);
   });
 
   testWidgets('success level renders success icon', (tester) async {
     await tester.pumpObers(
-      const OiToast(message: 'Done', level: OiToastLevel.success),
+      const OiToast(label: 'Toast', message: 'Done', level: OiToastLevel.success),
     );
     expect(find.text('✓'), findsOneWidget);
   });
 
   testWidgets('warning level renders warning icon', (tester) async {
     await tester.pumpObers(
-      const OiToast(message: 'Careful', level: OiToastLevel.warning),
+      const OiToast(label: 'Toast', message: 'Careful', level: OiToastLevel.warning),
     );
     expect(find.text('⚠'), findsOneWidget);
   });
 
   testWidgets('error level renders error icon', (tester) async {
     await tester.pumpObers(
-      const OiToast(message: 'Failed', level: OiToastLevel.error),
+      const OiToast(label: 'Toast', message: 'Failed', level: OiToastLevel.error),
     );
     expect(find.text('✕'), findsOneWidget);
   });
 
   testWidgets('info level renders info icon', (tester) async {
-    await tester.pumpObers(const OiToast(message: 'FYI'));
+    await tester.pumpObers(const OiToast(label: 'Toast', message: 'FYI'));
     expect(find.text('ℹ'), findsOneWidget);
   });
 
@@ -54,7 +54,7 @@ void main() {
     await tester.pumpObers(
       MediaQuery(
         data: const MediaQueryData(disableAnimations: true),
-        child: const OiToast(message: 'FYI'),
+        child: const OiToast(label: 'Toast', message: 'FYI'),
       ),
     );
     expect(find.bySemanticsLabel('Info'), findsOneWidget);
@@ -66,7 +66,7 @@ void main() {
     await tester.pumpObers(
       MediaQuery(
         data: const MediaQueryData(disableAnimations: true),
-        child: const OiToast(message: 'Done', level: OiToastLevel.success),
+        child: const OiToast(label: 'Toast', message: 'Done', level: OiToastLevel.success),
       ),
     );
     expect(find.bySemanticsLabel('Success'), findsOneWidget);
@@ -78,7 +78,7 @@ void main() {
     await tester.pumpObers(
       MediaQuery(
         data: const MediaQueryData(disableAnimations: true),
-        child: const OiToast(message: 'Careful', level: OiToastLevel.warning),
+        child: const OiToast(label: 'Toast', message: 'Careful', level: OiToastLevel.warning),
       ),
     );
     expect(find.bySemanticsLabel('Warning'), findsOneWidget);
@@ -90,7 +90,7 @@ void main() {
     await tester.pumpObers(
       MediaQuery(
         data: const MediaQueryData(disableAnimations: true),
-        child: const OiToast(message: 'Failed', level: OiToastLevel.error),
+        child: const OiToast(label: 'Toast', message: 'Failed', level: OiToastLevel.error),
       ),
     );
     expect(find.bySemanticsLabel('Error'), findsOneWidget);
@@ -100,6 +100,7 @@ void main() {
     var dismissed = false;
     await tester.pumpObers(
       OiToast(
+        label: 'Toast',
         message: 'Auto-dismiss',
         duration: const Duration(milliseconds: 100),
         onDismiss: () => dismissed = true,
@@ -115,7 +116,7 @@ void main() {
   ) async {
     // With pauseOnHover=false no MouseRegion wraps the content.
     await tester.pumpObers(
-      const OiToast(message: 'No hover pause', pauseOnHover: false),
+      const OiToast(label: 'Toast', message: 'No hover pause', pauseOnHover: false),
     );
     // Should render without a top-level MouseRegion around content.
     // The content text must still be visible.
@@ -124,7 +125,7 @@ void main() {
 
   testWidgets('different positions all render the message', (tester) async {
     for (final pos in OiToastPosition.values) {
-      await tester.pumpObers(OiToast(message: 'pos test', position: pos));
+      await tester.pumpObers(OiToast(label: 'Toast', message: 'pos test', position: pos));
       expect(find.text('pos test'), findsOneWidget);
     }
   });
@@ -135,7 +136,7 @@ void main() {
     await tester.pumpObers(
       MediaQuery(
         data: const MediaQueryData(disableAnimations: true),
-        child: const OiToast(message: 'Instant'),
+        child: const OiToast(label: 'Toast', message: 'Instant'),
       ),
     );
     // Duration.zero controller completes in the first frame — no pumpAndSettle needed.

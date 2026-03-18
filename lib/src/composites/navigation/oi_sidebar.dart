@@ -493,6 +493,7 @@ class _OiSidebarState extends State<OiSidebar> {
     );
 
     return OiTooltip(
+      label: item.label,
       message: item.label,
       child: OiTappable(
         enabled: !item.disabled,

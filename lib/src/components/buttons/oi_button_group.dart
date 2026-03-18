@@ -75,6 +75,7 @@ class OiButtonGroupItem {
 ///
 /// ```dart
 /// OiButtonGroup(
+///   label: 'View mode',
 ///   exclusive: true,
 ///   items: const [
 ///     OiButtonGroupItem(label: 'Day'),
@@ -86,10 +87,14 @@ class OiButtonGroupItem {
 /// )
 /// ```
 ///
+/// **Accessibility (REQ-0014):** [label] is required so the button group has
+/// an accessible description announced by screen readers.
+///
 /// {@category Components}
 class OiButtonGroup extends StatefulWidget {
   /// Creates an [OiButtonGroup].
   const OiButtonGroup({
+    required this.label,
     required this.items,
     this.size = OiButtonSize.medium,
     this.direction = Axis.horizontal,
@@ -100,6 +105,9 @@ class OiButtonGroup extends StatefulWidget {
     this.wrap = true,
     super.key,
   });
+
+  /// Accessible label describing the button group for screen readers.
+  final String label;
 
   /// The items to render inside the group.
   final List<OiButtonGroupItem> items;
@@ -207,9 +215,15 @@ class _OiButtonGroupState extends State<OiButtonGroup> {
     final radius = context.components.button?.borderRadius ?? context.radius.sm;
     final connected = widget.spacing == 0;
 
-    return connected
+    final child = connected
         ? _buildConnected(context, count, effectiveDir, radius)
         : _buildGapped(context, count, effectiveDir, radius);
+
+    return Semantics(
+      label: widget.label,
+      explicitChildNodes: true,
+      child: child,
+    );
   }
 
   // ── Connected layout (shared OiSurface) ─────────────────────────────────

@@ -21,7 +21,10 @@ void main() {
 
   testWidgets('renders all item labels', (tester) async {
     await tester.pumpObers(
-      const OiButtonGroup(items: [_kItemDay, _kItemWeek, _kItemMonth]),
+      const OiButtonGroup(
+        label: 'Test group',
+        items: [_kItemDay, _kItemWeek, _kItemMonth],
+      ),
     );
     expect(find.text('Day'), findsOneWidget);
     expect(find.text('Week'), findsOneWidget);
@@ -31,6 +34,7 @@ void main() {
   testWidgets('horizontal direction uses Row layout', (tester) async {
     await tester.pumpObers(
       const OiButtonGroup(
+        label: 'Test group',
         items: [
           OiButtonGroupItem(label: 'A'),
           OiButtonGroupItem(label: 'B'),
@@ -46,6 +50,7 @@ void main() {
   testWidgets('vertical direction uses Column layout', (tester) async {
     await tester.pumpObers(
       const OiButtonGroup(
+        label: 'Test group',
         direction: Axis.vertical,
         items: [
           OiButtonGroupItem(label: 'A'),
@@ -66,6 +71,7 @@ void main() {
     (tester) async {
       await tester.pumpObers(
         const OiButtonGroup(
+          label: 'Test group',
           items: [
             OiButtonGroupItem(label: 'A'),
             OiButtonGroupItem(label: 'B'),
@@ -90,6 +96,7 @@ void main() {
   testWidgets('connected: group is wrapped in OiSurface', (tester) async {
     await tester.pumpObers(
       const OiButtonGroup(
+        label: 'Test group',
         items: [
           OiButtonGroupItem(label: 'A'),
           OiButtonGroupItem(label: 'B'),
@@ -111,6 +118,7 @@ void main() {
   ) async {
     await tester.pumpObers(
       const OiButtonGroup(
+        label: 'Test group',
         items: [
           OiButtonGroupItem(label: 'A'),
           OiButtonGroupItem(label: 'B'),
@@ -136,6 +144,7 @@ void main() {
   ) async {
     await tester.pumpObers(
       const OiButtonGroup(
+        label: 'Test group',
         direction: Axis.vertical,
         items: [
           OiButtonGroupItem(label: 'A'),
@@ -162,6 +171,7 @@ void main() {
   ) async {
     await tester.pumpObers(
       const OiButtonGroup(
+        label: 'Test group',
         items: [
           OiButtonGroupItem(label: 'A'),
           OiButtonGroupItem(label: 'B'),
@@ -189,6 +199,7 @@ void main() {
     int? selected;
     await tester.pumpObers(
       OiButtonGroup(
+        label: 'Test group',
         exclusive: true,
         selectedIndex: 0,
         onSelect: (i) => selected = i,
@@ -209,6 +220,7 @@ void main() {
   ) async {
     await tester.pumpObers(
       const OiButtonGroup(
+        label: 'Test group',
         exclusive: true,
         selectedIndex: 1,
         items: [
@@ -233,6 +245,7 @@ void main() {
     int? selected;
     await tester.pumpObers(
       OiButtonGroup(
+        label: 'Test group',
         exclusive: true,
         selectedIndex: 0,
         onSelect: (i) => selected = i,
@@ -257,6 +270,7 @@ void main() {
     int? selected;
     await tester.pumpObers(
       OiButtonGroup(
+        label: 'Test group',
         exclusive: true,
         direction: Axis.vertical,
         selectedIndex: 0,
@@ -284,6 +298,7 @@ void main() {
           theme: OiThemeData.light(),
           home: _TestControlled(
             builder: (setState) => OiButtonGroup(
+              label: 'Test group',
               exclusive: true,
               selectedIndex: selectedIndex,
               onSelect: (i) {
@@ -316,6 +331,7 @@ void main() {
     var tappedB = false;
     await tester.pumpObers(
       OiButtonGroup(
+        label: 'Test group',
         items: [
           OiButtonGroupItem(label: 'A', onTap: () => tappedA = true),
           OiButtonGroupItem(label: 'B', onTap: () => tappedB = true),
@@ -336,6 +352,7 @@ void main() {
     int? selected;
     await tester.pumpObers(
       OiButtonGroup(
+        label: 'Test group',
         exclusive: false,
         onSelect: (i) => selected = i,
         items: const [
@@ -357,6 +374,7 @@ void main() {
     const icon = IconData(0xe318, fontFamily: 'MaterialIcons');
     await tester.pumpObers(
       const OiButtonGroup(
+        label: 'Test group',
         items: [OiButtonGroupItem(label: 'Home', icon: icon)],
       ),
     );
@@ -371,6 +389,7 @@ void main() {
     int? selected;
     await tester.pumpObers(
       OiButtonGroup(
+        label: 'Test group',
         exclusive: true,
         selectedIndex: 0,
         onSelect: (i) => selected = i,
@@ -391,6 +410,7 @@ void main() {
     var tapped = false;
     await tester.pumpObers(
       OiButtonGroup(
+        label: 'Test group',
         items: [
           OiButtonGroupItem(
             label: 'A',
@@ -408,7 +428,9 @@ void main() {
   // ── Empty list ─────────────────────────────────────────────────────────────
 
   testWidgets('empty items list renders nothing crashlessly', (tester) async {
-    await tester.pumpObers(const OiButtonGroup(items: []));
+    await tester.pumpObers(
+      const OiButtonGroup(label: 'Test group', items: []),
+    );
     expect(tester.takeException(), isNull);
   });
 
@@ -421,6 +443,7 @@ void main() {
         MediaQuery(
           data: const MediaQueryData(size: Size(375, 812)),
           child: const OiButtonGroup(
+            label: 'Test group',
             direction: Axis.horizontal,
             wrap: true,
             items: [
@@ -460,6 +483,7 @@ void main() {
             child: SizedBox(
               width: groupWidth,
               child: const OiButtonGroup(
+                label: 'Test group',
                 direction: Axis.horizontal,
                 wrap: true,
                 items: [
@@ -506,6 +530,7 @@ void main() {
             child: SizedBox(
               width: groupWidth,
               child: const OiButtonGroup(
+                label: 'Test group',
                 direction: Axis.horizontal,
                 wrap: true,
                 spacing: 8,
@@ -546,6 +571,7 @@ void main() {
       MediaQuery(
         data: const MediaQueryData(size: Size(375, 812)),
         child: const OiButtonGroup(
+          label: 'Test group',
           direction: Axis.horizontal,
           wrap: false,
           items: [

@@ -14,6 +14,7 @@ import 'package:obers_ui/src/primitives/overlay/oi_floating.dart';
 class OiPopover extends StatefulWidget {
   /// Creates an [OiPopover].
   const OiPopover({
+    required this.label,
     required this.anchor,
     required this.content,
     this.open = false,
@@ -21,6 +22,9 @@ class OiPopover extends StatefulWidget {
     this.alignment = OiFloatingAlignment.bottomStart,
     super.key,
   });
+
+  /// The accessible label describing this popover for screen readers.
+  final String label;
 
   /// The widget that serves as the anchor for positioning.
   final Widget anchor;
@@ -81,11 +85,14 @@ class _OiPopoverState extends State<OiPopover> {
       );
     }
 
-    return OiFloating(
-      visible: widget.open,
-      alignment: widget.alignment,
-      anchor: widget.anchor,
-      child: popoverContent,
+    return Semantics(
+      label: widget.label,
+      child: OiFloating(
+        visible: widget.open,
+        alignment: widget.alignment,
+        anchor: widget.anchor,
+        child: popoverContent,
+      ),
     );
   }
 }

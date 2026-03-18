@@ -12,6 +12,7 @@ void main() {
   testWidgets('open=true shows content', (tester) async {
     await tester.pumpObers(
       const OiPopover(
+        label: 'Test popover',
         open: true,
         anchor: Text('anchor'),
         content: Text('popover body'),
@@ -22,7 +23,7 @@ void main() {
 
   testWidgets('open=false hides content', (tester) async {
     await tester.pumpObers(
-      const OiPopover(anchor: Text('anchor'), content: Text('popover body')),
+      const OiPopover(label: 'Test popover', anchor: Text('anchor'), content: Text('popover body')),
     );
     expect(find.text('popover body'), findsNothing);
   });
@@ -31,6 +32,7 @@ void main() {
     var closed = false;
     await tester.pumpObers(
       OiPopover(
+        label: 'Test popover',
         open: true,
         onClose: () => closed = true,
         anchor: const Text('anchor'),

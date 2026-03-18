@@ -14,6 +14,7 @@ import 'package:obers_ui/src/primitives/overlay/oi_floating.dart';
 class OiTooltip extends StatefulWidget {
   /// Creates an [OiTooltip].
   const OiTooltip({
+    required this.label,
     required this.message,
     required this.child,
     this.content,
@@ -21,6 +22,9 @@ class OiTooltip extends StatefulWidget {
     this.alignment = OiFloatingAlignment.topCenter,
     super.key,
   });
+
+  /// The accessible label describing this tooltip for screen readers.
+  final String label;
 
   /// The text message shown in the tooltip.
   ///
@@ -120,11 +124,14 @@ class _OiTooltipState extends State<OiTooltip> {
       ),
     );
 
-    return OiFloating(
-      visible: _visible,
-      alignment: widget.alignment,
-      anchor: anchor,
-      child: _buildTooltipContent(context),
+    return Semantics(
+      label: widget.label,
+      child: OiFloating(
+        visible: _visible,
+        alignment: widget.alignment,
+        anchor: anchor,
+        child: _buildTooltipContent(context),
+      ),
     );
   }
 }

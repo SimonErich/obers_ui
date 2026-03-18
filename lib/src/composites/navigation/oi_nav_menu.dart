@@ -290,7 +290,7 @@ class _OiNavMenuBodyState extends State<_OiNavMenuBody> {
     );
 
     if (widget.contextMenu != null) {
-      row = OiContextMenu(items: widget.contextMenu!(item), child: row);
+      row = OiContextMenu(label: item.label, items: widget.contextMenu!(item), child: row);
     }
 
     return row;
