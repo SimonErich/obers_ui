@@ -165,6 +165,7 @@ export 'src/components/display/oi_markdown.dart';
 export 'src/components/display/oi_metric.dart';
 export 'src/components/display/oi_popover.dart';
 export 'src/components/display/oi_relative_time.dart';
+export 'src/components/display/oi_reply_preview.dart';
 export 'src/components/display/oi_progress.dart';
 export 'src/components/display/oi_skeleton_group.dart';
 export 'src/components/display/oi_tooltip.dart';
