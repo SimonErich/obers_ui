@@ -320,66 +320,67 @@ class _OiChatState extends State<OiChat> {
               ),
             ),
 
-          // Input bar.
-          Container(
-            padding: EdgeInsets.all(spacing.sm),
-            decoration: BoxDecoration(
-              color: colors.surface,
-              border: Border(top: BorderSide(color: colors.borderSubtle)),
-            ),
-            child: Row(
-              children: [
-                if (widget.enableAttachments) ...[
-                  Semantics(
-                    button: true,
-                    label: 'Attach file',
-                    child: OiTappable(
-                      onTap: () => widget.onAttach?.call(const []),
-                      child: Padding(
-                        padding: EdgeInsets.only(right: spacing.xs),
+          // Input bar – hidden when the empty state is displayed.
+          if (widget.messages.isNotEmpty)
+            Container(
+              padding: EdgeInsets.all(spacing.sm),
+              decoration: BoxDecoration(
+                color: colors.surface,
+                border: Border(top: BorderSide(color: colors.borderSubtle)),
+              ),
+              child: Row(
+                children: [
+                  if (widget.enableAttachments) ...[
+                    Semantics(
+                      button: true,
+                      label: 'Attach file',
+                      child: OiTappable(
+                        onTap: () => widget.onAttach?.call(const []),
+                        child: Padding(
+                          padding: EdgeInsets.only(right: spacing.xs),
+                          child: Icon(
+                            const IconData(0xe226, fontFamily: 'MaterialIcons'),
+                            size: 22,
+                            color: colors.textSubtle,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                  Expanded(
+                    child: EditableText(
+                      controller: _controller,
+                      focusNode: FocusNode(),
+                      style: TextStyle(color: colors.text, fontSize: 14),
+                      cursorColor: colors.primary.base,
+                      backgroundCursorColor: colors.surfaceHover,
+                    ),
+                  ),
+                  SizedBox(width: spacing.sm),
+                  GestureDetector(
+                    onTap: _handleSend,
+                    child: Semantics(
+                      container: true,
+                      explicitChildNodes: true,
+                      label: 'Send message',
+                      button: true,
+                      child: Container(
+                        padding: EdgeInsets.all(spacing.sm),
+                        decoration: BoxDecoration(
+                          color: colors.primary.base,
+                          shape: BoxShape.circle,
+                        ),
                         child: Icon(
-                          const IconData(0xe226, fontFamily: 'MaterialIcons'),
-                          size: 22,
-                          color: colors.textSubtle,
+                          const IconData(0xe571, fontFamily: 'MaterialIcons'),
+                          size: 20,
+                          color: colors.textOnPrimary,
                         ),
                       ),
                     ),
                   ),
                 ],
-                Expanded(
-                  child: EditableText(
-                    controller: _controller,
-                    focusNode: FocusNode(),
-                    style: TextStyle(color: colors.text, fontSize: 14),
-                    cursorColor: colors.primary.base,
-                    backgroundCursorColor: colors.surfaceHover,
-                  ),
-                ),
-                SizedBox(width: spacing.sm),
-                GestureDetector(
-                  onTap: _handleSend,
-                  child: Semantics(
-                    container: true,
-                    explicitChildNodes: true,
-                    label: 'Send message',
-                    button: true,
-                    child: Container(
-                      padding: EdgeInsets.all(spacing.sm),
-                      decoration: BoxDecoration(
-                        color: colors.primary.base,
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
-                        const IconData(0xe571, fontFamily: 'MaterialIcons'),
-                        size: 20,
-                        color: colors.textOnPrimary,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
+              ),
             ),
-          ),
         ],
       ),
     );

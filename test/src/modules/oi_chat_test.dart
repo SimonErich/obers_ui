@@ -153,7 +153,7 @@ void main() {
         width: 400,
         height: 600,
         child: OiChat(
-          messages: const [],
+          messages: [_msg()],
           currentUserId: 'me',
           label: 'Chat',
           onSend: (text) => sent = text,
@@ -198,6 +198,36 @@ void main() {
       ),
     );
     expect(find.text('No messages yet'), findsOneWidget);
+  });
+
+  testWidgets('compose bar is hidden when messages list is empty', (
+    tester,
+  ) async {
+    await tester.pumpObers(
+      SizedBox(
+        width: 400,
+        height: 600,
+        child: OiChat(messages: const [], currentUserId: 'me', label: 'Chat'),
+      ),
+    );
+    expect(find.bySemanticsLabel('Send message'), findsNothing);
+    expect(find.byType(EditableText), findsNothing);
+  });
+
+  testWidgets('compose bar is visible when messages exist', (tester) async {
+    await tester.pumpObers(
+      SizedBox(
+        width: 400,
+        height: 600,
+        child: OiChat(
+          messages: [_msg()],
+          currentUserId: 'user-b',
+          label: 'Chat',
+        ),
+      ),
+    );
+    expect(find.bySemanticsLabel('Send message'), findsOneWidget);
+    expect(find.byType(EditableText), findsOneWidget);
   });
 
   testWidgets('has semantics label', (tester) async {
