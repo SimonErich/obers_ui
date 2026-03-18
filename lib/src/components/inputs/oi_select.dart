@@ -119,6 +119,11 @@ class _OiSelectState<T> extends State<OiSelect<T>> {
     _query = '';
     _searchCtrl.clear();
     setState(() => _open = true);
+    if (widget.searchable) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _searchFocus.requestFocus();
+      });
+    }
   }
 
   void _close() => setState(() => _open = false);

@@ -47,26 +47,30 @@ void main() {
     expect(find.text('Apple'), findsNothing);
   });
 
-  testWidgets('closed trigger falls back to empty when no value and no placeholder', (tester) async {
-    await tester.pumpObers(
-      const OiSelect<String>(options: _kOptions),
-    );
-    // No placeholder text, no selected value — trigger should show empty string.
-    expect(find.text('Apple'), findsNothing);
-    expect(find.text('Banana'), findsNothing);
-  });
+  testWidgets(
+    'closed trigger falls back to empty when no value and no placeholder',
+    (tester) async {
+      await tester.pumpObers(const OiSelect<String>(options: _kOptions));
+      // No placeholder text, no selected value — trigger should show empty string.
+      expect(find.text('Apple'), findsNothing);
+      expect(find.text('Banana'), findsNothing);
+    },
+  );
 
-  testWidgets('closed trigger shows placeholder when value does not match any option', (tester) async {
-    await tester.pumpObers(
-      const OiSelect<String>(
-        options: _kOptions,
-        value: 'nonexistent',
-        placeholder: 'Pick one',
-      ),
-    );
-    // Value 'nonexistent' doesn't match any option, so placeholder is shown.
-    expect(find.text('Pick one'), findsOneWidget);
-  });
+  testWidgets(
+    'closed trigger shows placeholder when value does not match any option',
+    (tester) async {
+      await tester.pumpObers(
+        const OiSelect<String>(
+          options: _kOptions,
+          value: 'nonexistent',
+          placeholder: 'Pick one',
+        ),
+      );
+      // Value 'nonexistent' doesn't match any option, so placeholder is shown.
+      expect(find.text('Pick one'), findsOneWidget);
+    },
+  );
 
   testWidgets('tapping opens dropdown', (tester) async {
     await tester.pumpObers(const OiSelect<String>(options: _kOptions));
@@ -126,5 +130,47 @@ void main() {
     await tester.tap(find.byType(GestureDetector).first);
     await tester.pumpAndSettle();
     expect(find.byType(EditableText), findsWidgets);
+  });
+
+  testWidgets('searchable filters options by typed query', (tester) async {
+    await tester.pumpObers(
+      const OiSelect<String>(options: _kOptions, searchable: true),
+    );
+    await tester.tap(find.byType(GestureDetector).first);
+    await tester.pumpAndSettle();
+
+    // All enabled options visible before filtering.
+    expect(find.text('Apple'), findsOneWidget);
+    expect(find.text('Banana'), findsOneWidget);
+
+    // Type a query that matches only 'Apple'.
+    await tester.enterText(find.byType(EditableText).first, 'app');
+    await tester.pumpAndSettle();
+
+    expect(find.text('Apple'), findsOneWidget);
+    expect(find.text('Banana'), findsNothing);
+  });
+
+  testWidgets('searchable resets query on reopen', (tester) async {
+    await tester.pumpObers(
+      const OiSelect<String>(options: _kOptions, searchable: true),
+    );
+
+    // Open and type a filter query.
+    await tester.tap(find.byType(GestureDetector).first);
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(EditableText).first, 'ban');
+    await tester.pumpAndSettle();
+    expect(find.text('Apple'), findsNothing);
+
+    // Close by tapping the anchor again (toggles overlay via OiFloating).
+    await tester.tap(find.byType(GestureDetector).first);
+    await tester.pumpAndSettle();
+
+    // Reopen — all options should be visible (query cleared).
+    await tester.tap(find.byType(GestureDetector).first);
+    await tester.pumpAndSettle();
+    expect(find.text('Apple'), findsOneWidget);
+    expect(find.text('Banana'), findsOneWidget);
   });
 }
