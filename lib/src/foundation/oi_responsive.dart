@@ -86,7 +86,7 @@ class OiBreakpoint implements Comparable<OiBreakpoint> {
 ///
 /// {@category Foundation}
 @immutable
-class OiBreakpointScale {
+class OiBreakpointScale with Iterable<OiBreakpoint> {
   /// Creates a breakpoint scale from an unsorted list.
   ///
   /// Optionally provide [pageGutters] and [contentMaxWidths] keyed by
@@ -206,8 +206,8 @@ class OiBreakpointScale {
     return 0;
   }
 
-  /// Whether the scale contains a breakpoint equal to [bp].
-  bool contains(OiBreakpoint bp) => values.contains(bp);
+  @override
+  bool contains(Object? element) => values.contains(element);
 
   /// Looks up a breakpoint by [name], or `null` if not found.
   OiBreakpoint? byName(String name) {
@@ -254,13 +254,18 @@ class OiBreakpointScale {
     return double.infinity;
   }
 
+  // ── Iterable<OiBreakpoint> ───────────────────────────────────────────
+
+  @override
+  Iterator<OiBreakpoint> get iterator => values.iterator;
+
   // ── Registry API ──────────────────────────────────────────────────────
 
   /// All registered breakpoint names in ascending order of minWidth.
   List<String> get names =>
       List.unmodifiable(values.map((b) => b.name));
 
-  /// The number of registered breakpoints.
+  @override
   int get length => values.length;
 
   /// Looks up a breakpoint by [name].
@@ -277,6 +282,15 @@ class OiBreakpointScale {
     }
     return bp;
   }
+
+  /// Whether the scale contains a breakpoint with the given [name].
+  bool containsName(String name) => byName(name) != null;
+
+  /// Returns a name → breakpoint map of all registered breakpoints.
+  ///
+  /// The map preserves ascending minWidth order via insertion order.
+  Map<String, OiBreakpoint> get entries =>
+      Map.unmodifiable({for (final bp in values) bp.name: bp});
 
   /// Creates a new scale with an additional [breakpoint] registered.
   ///

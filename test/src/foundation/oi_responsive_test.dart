@@ -352,7 +352,11 @@ void main() {
         [OiBreakpoint.compact, OiBreakpoint.medium],
         pageGutters: {'compact': 10},
       );
-      expect(a, equals(b));
+      // Use operator == directly; the `equals()` matcher treats Iterable
+      // objects as collections and compares element-by-element, which would
+      // miss the pageGutters/contentMaxWidths maps.
+      expect(a == b, isTrue);
+      expect(a.hashCode, b.hashCode);
     });
 
     test('inequality when pageGutters differ', () {
@@ -364,7 +368,7 @@ void main() {
         [OiBreakpoint.compact, OiBreakpoint.medium],
         pageGutters: {'compact': 20},
       );
-      expect(a, isNot(equals(b)));
+      expect(a == b, isFalse);
     });
 
     test('extended scale has page gutters for all breakpoints', () {
@@ -581,6 +585,114 @@ void main() {
         final restored = withTablet.unregister('tablet');
         expect(restored.length, original.length);
         expect(restored.names, original.names);
+      });
+
+      // ── Iterable<OiBreakpoint> ────────────────────────────────────────
+
+      test('scale is Iterable<OiBreakpoint>', () {
+        final scale = OiBreakpointScale.standard();
+        expect(scale, isA<Iterable<OiBreakpoint>>());
+      });
+
+      test('for-in iterates breakpoints in ascending order', () {
+        final scale = OiBreakpointScale.standard();
+        final names = [for (final bp in scale) bp.name];
+        expect(
+          names,
+          ['compact', 'medium', 'expanded', 'large', 'extraLarge'],
+        );
+      });
+
+      test('Iterable methods (map, where, any) work', () {
+        final scale = OiBreakpointScale.standard();
+        final wide = scale.where((bp) => bp.minWidth >= 840).toList();
+        expect(wide.length, 3);
+        expect(wide.first.name, 'expanded');
+
+        expect(scale.any((bp) => bp.name == 'compact'), isTrue);
+        expect(scale.any((bp) => bp.name == 'tablet'), isFalse);
+
+        final widths = scale.map((bp) => bp.minWidth).toList();
+        expect(widths, [0, 600, 840, 1200, 1600]);
+      });
+
+      test('first and last return expected breakpoints', () {
+        final scale = OiBreakpointScale.standard();
+        expect(scale.first, OiBreakpoint.compact);
+        expect(scale.last, OiBreakpoint.extraLarge);
+      });
+
+      test('toList returns copy of breakpoints', () {
+        final scale = OiBreakpointScale.standard();
+        final list = scale.toList();
+        expect(list.length, 5);
+        expect(list, equals(OiBreakpoint.values));
+      });
+
+      // ── containsName ──────────────────────────────────────────────────
+
+      test('containsName returns true for registered names', () {
+        final scale = OiBreakpointScale.standard();
+        expect(scale.containsName('compact'), isTrue);
+        expect(scale.containsName('medium'), isTrue);
+        expect(scale.containsName('expanded'), isTrue);
+        expect(scale.containsName('large'), isTrue);
+        expect(scale.containsName('extraLarge'), isTrue);
+      });
+
+      test('containsName returns false for unregistered names', () {
+        final scale = OiBreakpointScale.standard();
+        expect(scale.containsName('tablet'), isFalse);
+        expect(scale.containsName('ultraWide'), isFalse);
+        expect(scale.containsName(''), isFalse);
+      });
+
+      test('containsName returns true after registering custom breakpoint', () {
+        final scale = OiBreakpointScale.standard()
+            .register(const OiBreakpoint('tablet', 480));
+        expect(scale.containsName('tablet'), isTrue);
+      });
+
+      // ── entries ────────────────────────────────────────────────────────
+
+      test('entries returns name → breakpoint map', () {
+        final scale = OiBreakpointScale.standard();
+        final map = scale.entries;
+        expect(map.length, 5);
+        expect(map['compact'], OiBreakpoint.compact);
+        expect(map['extraLarge'], OiBreakpoint.extraLarge);
+      });
+
+      test('entries preserves ascending order', () {
+        final scale = OiBreakpointScale.standard();
+        final keys = scale.entries.keys.toList();
+        expect(
+          keys,
+          ['compact', 'medium', 'expanded', 'large', 'extraLarge'],
+        );
+      });
+
+      test('entries includes custom breakpoints after register', () {
+        final scale = OiBreakpointScale.standard()
+            .register(const OiBreakpoint('tablet', 480));
+        final map = scale.entries;
+        expect(map.length, 6);
+        expect(map.containsKey('tablet'), isTrue);
+        expect(map['tablet']!.minWidth, 480);
+        // Verify order: tablet (480) is between compact (0) and medium (600)
+        final keys = map.keys.toList();
+        expect(keys.indexOf('tablet'), 1);
+        expect(keys.indexOf('medium'), 2);
+      });
+
+      test('entries map is unmodifiable', () {
+        final scale = OiBreakpointScale.standard();
+        final map = scale.entries;
+        expect(
+          () => (map as Map<String, OiBreakpoint>)['new'] =
+              const OiBreakpoint('new', 999),
+          throwsA(isA<UnsupportedError>()),
+        );
       });
     });
   });
@@ -1344,6 +1456,115 @@ void main() {
         ),
       );
       expect(result, 1400);
+    });
+
+    // ── Custom breakpoints through theme to context extensions ────────────
+
+    group('custom breakpoints in theme resolve via context extensions', () {
+      // A custom scale with an extra "tablet" breakpoint between compact and
+      // medium, provided via OiThemeData — proving the full extension story.
+      final extendedTheme = OiThemeData.light(
+        breakpoints: OiBreakpointScale.standard().register(
+          const OiBreakpoint('tablet', 480),
+          pageGutter: 20,
+          contentMaxWidth: double.infinity,
+        ),
+      );
+
+      Widget buildExtended(double width, Widget child) =>
+          buildWithWidth(width, child, theme: extendedTheme);
+
+      testWidgets('breakpoint resolves to custom "tablet" at width 500', (
+        tester,
+      ) async {
+        late OiBreakpoint captured;
+        await tester.pumpWidget(
+          buildExtended(
+            500,
+            Builder(
+              builder: (ctx) {
+                captured = ctx.breakpoint;
+                return const SizedBox.shrink();
+              },
+            ),
+          ),
+        );
+        expect(captured.name, 'tablet');
+        expect(captured.minWidth, 480);
+      });
+
+      testWidgets('isBreakpointActive works for custom breakpoint', (
+        tester,
+      ) async {
+        late bool result;
+        const tablet = OiBreakpoint('tablet', 480);
+        await tester.pumpWidget(
+          buildExtended(
+            500,
+            Builder(
+              builder: (ctx) {
+                result = ctx.isBreakpointActive(tablet);
+                return const SizedBox.shrink();
+              },
+            ),
+          ),
+        );
+        expect(result, isTrue);
+      });
+
+      testWidgets('isAtLeast works with custom breakpoint', (tester) async {
+        late bool result;
+        const tablet = OiBreakpoint('tablet', 480);
+        await tester.pumpWidget(
+          buildExtended(
+            700,
+            Builder(
+              builder: (ctx) {
+                result = ctx.isAtLeast(tablet);
+                return const SizedBox.shrink();
+              },
+            ),
+          ),
+        );
+        expect(result, isTrue);
+      });
+
+      testWidgets('pageGutter resolves custom breakpoint value', (
+        tester,
+      ) async {
+        late double result;
+        await tester.pumpWidget(
+          buildExtended(
+            500,
+            Builder(
+              builder: (ctx) {
+                result = ctx.pageGutter;
+                return const SizedBox.shrink();
+              },
+            ),
+          ),
+        );
+        expect(result, 20);
+      });
+
+      testWidgets('breakpointScale has 6 entries with custom breakpoint', (
+        tester,
+      ) async {
+        late OiBreakpointScale captured;
+        await tester.pumpWidget(
+          buildExtended(
+            400,
+            Builder(
+              builder: (ctx) {
+                captured = ctx.breakpointScale;
+                return const SizedBox.shrink();
+              },
+            ),
+          ),
+        );
+        expect(captured.length, 6);
+        expect(captured.containsName('tablet'), isTrue);
+      });
     });
 
     // ── Standard helpers with custom-named scale ──────────────────────────
