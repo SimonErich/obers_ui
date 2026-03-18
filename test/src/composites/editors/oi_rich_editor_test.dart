@@ -212,17 +212,17 @@ void main() {
           OiContentBlock(
             type: OiBlockType.paragraph,
             text: 'Bold text',
-            isBold: true,
+            bold: true,
           ),
           OiContentBlock(
             type: OiBlockType.paragraph,
             text: 'Italic text',
-            isItalic: true,
+            italic: true,
           ),
           OiContentBlock(
             type: OiBlockType.paragraph,
             text: 'Underlined',
-            isUnderline: true,
+            underline: true,
           ),
         ],
       );
@@ -289,17 +289,17 @@ void main() {
       const a = OiContentBlock(
         type: OiBlockType.paragraph,
         text: 'Hello',
-        isBold: true,
+        bold: true,
       );
       const b = OiContentBlock(
         type: OiBlockType.paragraph,
         text: 'Hello',
-        isBold: false,
+        bold: false,
       );
       const c = OiContentBlock(
         type: OiBlockType.paragraph,
         text: 'Hello',
-        isBold: true,
+        bold: true,
       );
 
       expect(a, isNot(equals(b)));
@@ -601,7 +601,7 @@ void main() {
       expect(find.text('H3'), findsNothing);
     });
 
-    testWidgets('bold button toggles isBold on active block', (tester) async {
+    testWidgets('bold button toggles bold on active block', (tester) async {
       final controller = OiRichEditorController(
         initialContent: const OiRichContent(
           blocks: [OiContentBlock(type: OiBlockType.paragraph, text: 'Hello')],
@@ -615,22 +615,22 @@ void main() {
         ),
       );
 
-      expect(controller.content.blocks.first.isBold, isFalse);
+      expect(controller.content.blocks.first.bold, isFalse);
 
       // Tap the Bold button.
       await tester.tap(find.text('B'));
       await tester.pump();
 
-      expect(controller.content.blocks.first.isBold, isTrue);
+      expect(controller.content.blocks.first.bold, isTrue);
 
       // Tap again to toggle off.
       await tester.tap(find.text('B'));
       await tester.pump();
 
-      expect(controller.content.blocks.first.isBold, isFalse);
+      expect(controller.content.blocks.first.bold, isFalse);
     });
 
-    testWidgets('italic button toggles isItalic on active block', (
+    testWidgets('italic button toggles italic on active block', (
       tester,
     ) async {
       final controller = OiRichEditorController(
@@ -649,10 +649,10 @@ void main() {
       await tester.tap(find.text('I'));
       await tester.pump();
 
-      expect(controller.content.blocks.first.isItalic, isTrue);
+      expect(controller.content.blocks.first.italic, isTrue);
     });
 
-    testWidgets('underline button toggles isUnderline on active block', (
+    testWidgets('underline button toggles underline on active block', (
       tester,
     ) async {
       final controller = OiRichEditorController(
@@ -671,7 +671,7 @@ void main() {
       await tester.tap(find.text('U'));
       await tester.pump();
 
-      expect(controller.content.blocks.first.isUnderline, isTrue);
+      expect(controller.content.blocks.first.underline, isTrue);
     });
 
     testWidgets('word count shows when enabled', (tester) async {

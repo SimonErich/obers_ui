@@ -77,7 +77,7 @@ class OiThumbs extends StatelessWidget {
     Widget buildThumb({
       required OiThumbsValue thumb,
       required String semanticLabel,
-      required bool isUp,
+      required bool up,
       required int count,
     }) {
       final selected = value == thumb;
@@ -87,7 +87,7 @@ class OiThumbs extends StatelessWidget {
         button: true,
         selected: selected,
         child: OiIconButton(
-          icon: isUp ? Icons.thumb_up : Icons.thumb_down,
+          icon: up ? Icons.thumb_up : Icons.thumb_down,
           semanticLabel: semanticLabel,
           onTap: enabled ? () => _handleTap(thumb) : null,
           variant: variant,
@@ -118,14 +118,14 @@ class OiThumbs extends StatelessWidget {
         buildThumb(
           thumb: OiThumbsValue.up,
           semanticLabel: 'Thumbs up',
-          isUp: true,
+          up: true,
           count: upCount,
         ),
         const SizedBox(width: 8),
         buildThumb(
           thumb: OiThumbsValue.down,
           semanticLabel: 'Thumbs down',
-          isUp: false,
+          up: false,
           count: downCount,
         ),
       ],

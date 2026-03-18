@@ -345,7 +345,7 @@ class OiGrid extends StatelessWidget {
                 placed.columnSpan * unitWidth +
                 math.max(0, placed.columnSpan - 1) * resolvedGap;
 
-            if (placed.isSpacer) {
+            if (placed.spacer) {
               cells.add(SizedBox(width: width));
             } else {
               cells.add(SizedBox(width: width, child: placed.child));
@@ -392,10 +392,10 @@ class _GridItem {
 }
 
 class _PlacedItem {
-  _PlacedItem(this.child, this.columnSpan) : isSpacer = false;
-  _PlacedItem.spacer(this.columnSpan) : child = null, isSpacer = true;
+  _PlacedItem(this.child, this.columnSpan) : spacer = false;
+  _PlacedItem.spacer(this.columnSpan) : child = null, spacer = true;
 
   final Widget? child;
   final int columnSpan;
-  final bool isSpacer;
+  final bool spacer;
 }

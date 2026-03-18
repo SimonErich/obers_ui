@@ -45,7 +45,7 @@ enum OiBlockType {
 ///
 /// Each block has a [type] that determines its rendering, a [text] body,
 /// optional [metadata] (e.g. `language` for code blocks), and optional
-/// inline formatting flags ([isBold], [isItalic], [isUnderline]).
+/// inline formatting flags ([bold], [italic], [underline]).
 ///
 /// {@category Composites}
 @immutable
@@ -55,9 +55,9 @@ class OiContentBlock {
     required this.type,
     required this.text,
     this.metadata,
-    this.isBold = false,
-    this.isItalic = false,
-    this.isUnderline = false,
+    this.bold = false,
+    this.italic = false,
+    this.underline = false,
   });
 
   /// The type of block.
@@ -70,13 +70,13 @@ class OiContentBlock {
   final Map<String, dynamic>? metadata;
 
   /// Whether the block text is rendered in bold.
-  final bool isBold;
+  final bool bold;
 
   /// Whether the block text is rendered in italic.
-  final bool isItalic;
+  final bool italic;
 
   /// Whether the block text is rendered with underline.
-  final bool isUnderline;
+  final bool underline;
 
   @override
   bool operator ==(Object other) {
@@ -84,15 +84,15 @@ class OiContentBlock {
     return other is OiContentBlock &&
         other.type == type &&
         other.text == text &&
-        other.isBold == isBold &&
-        other.isItalic == isItalic &&
-        other.isUnderline == isUnderline &&
+        other.bold == bold &&
+        other.italic == italic &&
+        other.underline == underline &&
         _mapEquals(other.metadata, metadata);
   }
 
   @override
   int get hashCode =>
-      Object.hash(type, text, isBold, isItalic, isUnderline, metadata?.length);
+      Object.hash(type, text, bold, italic, underline, metadata?.length);
 }
 
 /// The content of the rich editor.
@@ -270,9 +270,9 @@ class OiRichContent {
 
       // Build inline attributes for text formatting.
       final inlineAttrs = <String, dynamic>{};
-      if (block.isBold) inlineAttrs['bold'] = true;
-      if (block.isItalic) inlineAttrs['italic'] = true;
-      if (block.isUnderline) inlineAttrs['underline'] = true;
+      if (block.bold) inlineAttrs['bold'] = true;
+      if (block.italic) inlineAttrs['italic'] = true;
+      if (block.underline) inlineAttrs['underline'] = true;
 
       if (inlineAttrs.isEmpty) {
         ops.add({'insert': block.text});
@@ -381,9 +381,9 @@ class OiRichEditorController extends ChangeNotifier {
         type: last.type,
         text: last.text + text,
         metadata: last.metadata,
-        isBold: last.isBold,
-        isItalic: last.isItalic,
-        isUnderline: last.isUnderline,
+        bold: last.bold,
+        italic: last.italic,
+        underline: last.underline,
       );
     }
     _content = OiRichContent(blocks: blocks);
@@ -689,9 +689,9 @@ class _OiRichEditorState extends State<OiRichEditor> {
         type: blocks[index].type,
         text: text,
         metadata: blocks[index].metadata,
-        isBold: blocks[index].isBold,
-        isItalic: blocks[index].isItalic,
-        isUnderline: blocks[index].isUnderline,
+        bold: blocks[index].bold,
+        italic: blocks[index].italic,
+        underline: blocks[index].underline,
       );
       widget.controller.updateContentSilently(OiRichContent(blocks: blocks));
     }
@@ -707,11 +707,11 @@ class _OiRichEditorState extends State<OiRichEditor> {
       type: block.type,
       text: block.text,
       metadata: block.metadata,
-      isBold: format == 'bold' ? !block.isBold : block.isBold,
-      isItalic: format == 'italic' ? !block.isItalic : block.isItalic,
-      isUnderline: format == 'underline'
-          ? !block.isUnderline
-          : block.isUnderline,
+      bold: format == 'bold' ? !block.bold : block.bold,
+      italic: format == 'italic' ? !block.italic : block.italic,
+      underline: format == 'underline'
+          ? !block.underline
+          : block.underline,
     );
 
     blocks[_activeBlockIndex] = updated;
@@ -761,13 +761,13 @@ class _OiRichEditorState extends State<OiRichEditor> {
     }
 
     // Apply inline formatting overrides.
-    if (block.isBold) {
+    if (block.bold) {
       base = base.copyWith(fontWeight: FontWeight.w700);
     }
-    if (block.isItalic) {
+    if (block.italic) {
       base = base.copyWith(fontStyle: FontStyle.italic);
     }
-    if (block.isUnderline) {
+    if (block.underline) {
       base = base.copyWith(decoration: TextDecoration.underline);
     }
 

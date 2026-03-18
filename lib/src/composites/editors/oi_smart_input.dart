@@ -484,7 +484,7 @@ class _OiSmartInputState extends State<OiSmartInput> {
           suggestions: _suggestions,
           selectedIndex: _selectedSuggestionIndex,
           onSelect: _selectSuggestion,
-          isLoading: _loadingSuggestions,
+          loading: _loadingSuggestions,
         ),
       ),
     );
@@ -660,13 +660,13 @@ class _OiSuggestionPopup extends StatelessWidget {
     required this.suggestions,
     required this.selectedIndex,
     required this.onSelect,
-    required this.isLoading,
+    required this.loading,
   });
 
   final List<OiSuggestion> suggestions;
   final int selectedIndex;
   final ValueChanged<OiSuggestion> onSelect;
-  final bool isLoading;
+  final bool loading;
 
   @override
   Widget build(BuildContext context) {
@@ -682,7 +682,7 @@ class _OiSuggestionPopup extends StatelessWidget {
       ],
     );
 
-    if (isLoading) {
+    if (loading) {
       return Container(
         padding: const EdgeInsets.all(12),
         decoration: decoration,
@@ -705,7 +705,7 @@ class _OiSuggestionPopup extends StatelessWidget {
               for (var i = 0; i < suggestions.length; i++)
                 _OiSuggestionItem(
                   suggestion: suggestions[i],
-                  isSelected: i == selectedIndex,
+                  selected: i == selectedIndex,
                   onTap: () => onSelect(suggestions[i]),
                 ),
             ],
@@ -719,12 +719,12 @@ class _OiSuggestionPopup extends StatelessWidget {
 class _OiSuggestionItem extends StatelessWidget {
   const _OiSuggestionItem({
     required this.suggestion,
-    required this.isSelected,
+    required this.selected,
     required this.onTap,
   });
 
   final OiSuggestion suggestion;
-  final bool isSelected;
+  final bool selected;
   final VoidCallback onTap;
 
   @override
@@ -733,7 +733,7 @@ class _OiSuggestionItem extends StatelessWidget {
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        color: isSelected ? const Color(0xFFEFF6FF) : const Color(0x00000000),
+        color: selected ? const Color(0xFFEFF6FF) : const Color(0x00000000),
         child: Row(
           children: [
             if (suggestion.leading != null) ...[
