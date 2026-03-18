@@ -82,31 +82,49 @@ void main() {
   // ── REQ-0845: Dog-ear fold effect ───────────────────────────────────────
 
   group('dog-ear fold (REQ-0845)', () {
-    testWidgets('CustomPaint renders without errors', (tester) async {
+    testWidgets('golden: small size fold geometry', (tester) async {
       await tester.pumpObers(
-        const OiFileIcon(extension: 'PDF', category: OiFileCategory.document),
-      );
-      // No error during painting means the fold path is valid.
-      expect(
-        find.descendant(
-          of: find.byType(OiFileIcon),
-          matching: find.byType(CustomPaint),
+        const OiFileIcon(
+          extension: 'PDF',
+          category: OiFileCategory.document,
+          size: OiFileIconSize.small,
         ),
-        findsWidgets,
+        surfaceSize: const Size(64, 72),
+      );
+      await expectLater(
+        find.byType(OiFileIcon),
+        matchesGoldenFile('goldens/oi_file_icon_fold_small.png'),
       );
     });
 
-    testWidgets('all sizes render without errors', (tester) async {
-      for (final size in OiFileIconSize.values) {
-        await tester.pumpObers(
-          OiFileIcon(
-            extension: 'PDF',
-            category: OiFileCategory.document,
-            size: size,
-          ),
-        );
-        expect(find.byType(OiFileIcon), findsOneWidget);
-      }
+    testWidgets('golden: medium size fold geometry', (tester) async {
+      await tester.pumpObers(
+        const OiFileIcon(
+          extension: 'PDF',
+          category: OiFileCategory.document,
+          size: OiFileIconSize.medium,
+        ),
+        surfaceSize: const Size(80, 92),
+      );
+      await expectLater(
+        find.byType(OiFileIcon),
+        matchesGoldenFile('goldens/oi_file_icon_fold_medium.png'),
+      );
+    });
+
+    testWidgets('golden: large size fold geometry', (tester) async {
+      await tester.pumpObers(
+        const OiFileIcon(
+          extension: 'PDF',
+          category: OiFileCategory.document,
+          size: OiFileIconSize.large,
+        ),
+        surfaceSize: const Size(96, 112),
+      );
+      await expectLater(
+        find.byType(OiFileIcon),
+        matchesGoldenFile('goldens/oi_file_icon_fold_large.png'),
+      );
     });
   });
 
