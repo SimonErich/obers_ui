@@ -115,8 +115,12 @@ enum OiTablePaginationMode {
 /// Provide a typed [rows] list and a set of [columns] describing how each
 /// field should be displayed and interacted with.
 ///
+/// **Accessibility (REQ-0014):** [label] is required so every data table has
+/// an accessible description announced by screen readers.
+///
 /// ```dart
 /// OiTable<Person>(
+///   label: 'Employee directory',
 ///   rows: people,
 ///   columns: [
 ///     OiTableColumn(id: 'name', header: 'Name',
@@ -131,6 +135,7 @@ enum OiTablePaginationMode {
 class OiTable<T> extends StatefulWidget {
   /// Creates an [OiTable].
   const OiTable({
+    required this.label,
     required this.rows,
     required this.columns,
     this.controller,
@@ -164,6 +169,11 @@ class OiTable<T> extends StatefulWidget {
     this.settingsNamespace = 'oi_table',
     super.key,
   });
+
+  // ── Accessibility ────────────────────────────────────────────────────────
+
+  /// Accessible label describing the table for screen readers.
+  final String label;
 
   // ── Data ──────────────────────────────────────────────────────────────────
 
@@ -566,28 +576,32 @@ class _OiTableState<T> extends State<StatefulWidget>
 
   @override
   Widget build(BuildContext context) {
-    return KeyboardListener(
-      focusNode: FocusNode(),
-      onKeyEvent: (event) {
-        if (!_widget.copyable) return;
-        if (event is! KeyDownEvent) return;
-        final isCtrlOrMeta =
-            HardwareKeyboard.instance.isControlPressed ||
-            HardwareKeyboard.instance.isMetaPressed;
-        if (isCtrlOrMeta && event.logicalKey == LogicalKeyboardKey.keyC) {
-          _copySelectedRows();
-        }
-      },
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          if (_widget.showColumnManager) _buildColumnManagerBar(),
-          _buildHeaderRow(),
-          Expanded(child: _buildBody()),
-          if (_widget.paginationMode == OiTablePaginationMode.pages)
-            _buildPaginationFooter(),
-          if (_widget.showStatusBar) _buildStatusBar(),
-        ],
+    return Semantics(
+      label: _widget.label,
+      explicitChildNodes: true,
+      child: KeyboardListener(
+        focusNode: FocusNode(),
+        onKeyEvent: (event) {
+          if (!_widget.copyable) return;
+          if (event is! KeyDownEvent) return;
+          final isCtrlOrMeta =
+              HardwareKeyboard.instance.isControlPressed ||
+              HardwareKeyboard.instance.isMetaPressed;
+          if (isCtrlOrMeta && event.logicalKey == LogicalKeyboardKey.keyC) {
+            _copySelectedRows();
+          }
+        },
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            if (_widget.showColumnManager) _buildColumnManagerBar(),
+            _buildHeaderRow(),
+            Expanded(child: _buildBody()),
+            if (_widget.paginationMode == OiTablePaginationMode.pages)
+              _buildPaginationFooter(),
+            if (_widget.showStatusBar) _buildStatusBar(),
+          ],
+        ),
       ),
     );
   }

@@ -81,6 +81,7 @@ Widget _table({
     width: 800,
     height: 600,
     child: OiTable<_Row>(
+      label: 'Test table',
       rows: rows ?? _rows,
       columns: columns ?? _cols,
       controller: controller,
@@ -544,6 +545,7 @@ void main() {
         width: 400,
         height: 200,
         child: OiTable<_Row>(
+          label: 'Infinite scroll table',
           rows: manyRows,
           columns: _cols,
           paginationMode: OiTablePaginationMode.infinite,

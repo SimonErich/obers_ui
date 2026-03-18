@@ -923,6 +923,73 @@ void main() {
             'Violations:\n${violations.join('\n')}',
       );
     });
+
+    test('overlay widgets (OiDialog, OiSheet, OiPanel) require label', () {
+      final overlayFiles = <String, String>{
+        'OiDialog': 'lib/src/components/overlays/oi_dialog.dart',
+        'OiSheet': 'lib/src/components/overlays/oi_sheet.dart',
+        'OiPanel': 'lib/src/components/panels/oi_panel.dart',
+      };
+
+      final violations = <String>[];
+
+      for (final entry in overlayFiles.entries) {
+        final file = File(entry.value);
+        final content = file.readAsStringSync();
+
+        final hasRequiredLabel =
+            content.contains('required this.label') ||
+            content.contains('required String label');
+
+        if (!hasRequiredLabel) {
+          violations.add(
+            '${entry.value} — ${entry.key} must require "label" '
+            'for accessibility',
+          );
+        }
+      }
+
+      expect(
+        violations,
+        isEmpty,
+        reason:
+            'Overlay widgets must require "label" for screen-reader '
+            'accessibility. Violations:\n${violations.join('\n')}',
+      );
+    });
+
+    test('data widgets (OiTable, OiTree) require label', () {
+      final dataFiles = <String, String>{
+        'OiTable': 'lib/src/composites/data/oi_table.dart',
+        'OiTree': 'lib/src/composites/data/oi_tree.dart',
+      };
+
+      final violations = <String>[];
+
+      for (final entry in dataFiles.entries) {
+        final file = File(entry.value);
+        final content = file.readAsStringSync();
+
+        final hasRequiredLabel =
+            content.contains('required this.label') ||
+            content.contains('required String label');
+
+        if (!hasRequiredLabel) {
+          violations.add(
+            '${entry.value} — ${entry.key} must require "label" '
+            'for accessibility',
+          );
+        }
+      }
+
+      expect(
+        violations,
+        isEmpty,
+        reason:
+            'Data widgets must require "label" for screen-reader '
+            'accessibility. Violations:\n${violations.join('\n')}',
+      );
+    });
   });
 
   // ── REQ-0015: Factories for variants ──────────────────────────────────────

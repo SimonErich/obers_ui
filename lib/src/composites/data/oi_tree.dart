@@ -153,8 +153,12 @@ class OiTreeController extends ChangeNotifier {
 /// single or multi-node selection, lazy-loading children, and custom
 /// node builders.
 ///
+/// **Accessibility (REQ-0014):** [label] is required so every tree widget has
+/// an accessible description announced by screen readers.
+///
 /// ```dart
 /// OiTree<MyData>(
+///   label: 'File browser',
 ///   nodes: [
 ///     OiTreeNode(id: 'root', label: 'Root', children: [
 ///       OiTreeNode(id: 'child1', label: 'Child 1'),
@@ -167,6 +171,7 @@ class OiTreeController extends ChangeNotifier {
 class OiTree<T> extends StatefulWidget {
   /// Creates an [OiTree].
   const OiTree({
+    required this.label,
     required this.nodes,
     this.controller,
     this.onNodeTap,
@@ -181,6 +186,9 @@ class OiTree<T> extends StatefulWidget {
     this.showLines = false,
     super.key,
   });
+
+  /// Accessible label describing the tree for screen readers.
+  final String label;
 
   /// The root nodes of the tree.
   final List<OiTreeNode<T>> nodes;
@@ -333,13 +341,17 @@ class _OiTreeState<T> extends State<OiTree<T>> {
   @override
   Widget build(BuildContext context) {
     final items = _visibleItems;
-    return ListView.builder(
-      itemCount: items.length,
-      itemExtent: widget.rowHeight,
-      itemBuilder: (ctx, i) {
-        final item = items[i];
-        return _buildNodeRow(ctx, item.node, item.depth);
-      },
+    return Semantics(
+      label: widget.label,
+      explicitChildNodes: true,
+      child: ListView.builder(
+        itemCount: items.length,
+        itemExtent: widget.rowHeight,
+        itemBuilder: (ctx, i) {
+          final item = items[i];
+          return _buildNodeRow(ctx, item.node, item.depth);
+        },
+      ),
     );
   }
 
