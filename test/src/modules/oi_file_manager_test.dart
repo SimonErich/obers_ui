@@ -3,6 +3,8 @@
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:obers_ui/src/components/buttons/oi_button.dart';
+import 'package:obers_ui/src/components/display/oi_empty_state.dart';
 import 'package:obers_ui/src/components/display/oi_file_grid_card.dart';
 import 'package:obers_ui/src/components/display/oi_file_tile.dart';
 import 'package:obers_ui/src/components/inputs/oi_text_input.dart';
@@ -146,7 +148,9 @@ void main() {
     expect(find.text('Work'), findsOneWidget);
   });
 
-  testWidgets('empty folder shows empty state', (tester) async {
+  testWidgets('empty folder shows OiEmptyState with folder icon', (
+    tester,
+  ) async {
     await tester.pumpObers(
       const SizedBox(
         width: 500,
@@ -154,7 +158,50 @@ void main() {
         child: OiFileManager(items: [], label: 'Files'),
       ),
     );
+    expect(find.byType(OiEmptyState), findsOneWidget);
     expect(find.text('This folder is empty'), findsOneWidget);
+    expect(
+      find.byIcon(const IconData(0xe2c7, fontFamily: 'MaterialIcons')),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets('empty folder shows Upload button when onUpload is set', (
+    tester,
+  ) async {
+    var uploadCalled = false;
+    await tester.pumpObers(
+      SizedBox(
+        width: 500,
+        height: 600,
+        child: OiFileManager(
+          items: const [],
+          label: 'Files',
+          onUpload: (_) => uploadCalled = true,
+        ),
+      ),
+    );
+    expect(find.byType(OiEmptyState), findsOneWidget);
+    expect(find.text('Upload files'), findsOneWidget);
+    expect(find.byType(OiButton), findsOneWidget);
+
+    await tester.tap(find.text('Upload files'));
+    await tester.pumpAndSettle();
+    expect(uploadCalled, isTrue);
+  });
+
+  testWidgets('empty folder hides Upload button when onUpload is null', (
+    tester,
+  ) async {
+    await tester.pumpObers(
+      const SizedBox(
+        width: 500,
+        height: 600,
+        child: OiFileManager(items: [], label: 'Files'),
+      ),
+    );
+    expect(find.byType(OiEmptyState), findsOneWidget);
+    expect(find.text('Upload files'), findsNothing);
   });
 
   testWidgets('has semantics label', (tester) async {

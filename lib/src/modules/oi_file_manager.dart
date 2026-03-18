@@ -1,4 +1,6 @@
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/src/components/buttons/oi_button.dart';
+import 'package:obers_ui/src/components/display/oi_empty_state.dart';
 import 'package:obers_ui/src/components/display/oi_file_grid_card.dart';
 import 'package:obers_ui/src/components/display/oi_file_tile.dart';
 import 'package:obers_ui/src/components/inputs/oi_text_input.dart';
@@ -224,7 +226,6 @@ class _OiFileManagerState extends State<OiFileManager> {
 
   @override
   Widget build(BuildContext context) {
-    final colors = context.colors;
     final spacing = context.spacing;
     final items = _filteredItems;
 
@@ -255,22 +256,17 @@ class _OiFileManagerState extends State<OiFileManager> {
           // Content area
           Expanded(
             child: items.isEmpty
-                ? Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          const IconData(0xe2c7, fontFamily: 'MaterialIcons'),
-                          size: 48,
-                          color: colors.textMuted,
-                        ),
-                        SizedBox(height: spacing.sm),
-                        Text(
-                          'This folder is empty',
-                          style: TextStyle(color: colors.textMuted),
-                        ),
-                      ],
-                    ),
+                ? OiEmptyState(
+                    icon: const IconData(0xe2c7, fontFamily: 'MaterialIcons'),
+                    title: 'This folder is empty',
+                    action: widget.onUpload != null
+                        ? OiButton.primary(
+                            label: 'Upload files',
+                            icon: const IconData(0xe9e4,
+                                fontFamily: 'MaterialIcons'),
+                            onTap: () => widget.onUpload?.call(const []),
+                          )
+                        : null,
                   )
                 : widget.layout == OiFileManagerLayout.grid
                 ? _buildGrid(context, items)
