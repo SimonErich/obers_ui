@@ -358,6 +358,16 @@ class OiResponsive<T> {
     return _defaultValue as T;
   }
 
+  /// Resolves the value for the current screen breakpoint.
+  ///
+  /// For static values, returns the value directly without reading the
+  /// widget tree. For per-breakpoint maps, reads the active breakpoint
+  /// and scale from the nearest [OiTheme].
+  T resolveFor(BuildContext context) {
+    if (_map == null) return _defaultValue as T;
+    return resolve(context.breakpoint, context.breakpointScale);
+  }
+
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
@@ -416,6 +426,14 @@ extension OiResponsiveDoubleExt on double {
 extension OiResponsiveBoolExt on bool {
   /// Wraps this [bool] in a static [OiResponsive].
   OiResponsive<bool> get responsive => OiResponsive(this);
+}
+
+/// Convenience to create a static [OiResponsive] from an [EdgeInsetsGeometry].
+///
+/// {@category Foundation}
+extension OiResponsiveEdgeInsetsExt on EdgeInsetsGeometry {
+  /// Wraps this [EdgeInsetsGeometry] in a static [OiResponsive].
+  OiResponsive<EdgeInsetsGeometry> get responsive => OiResponsive(this);
 }
 
 /// Convenience to create a breakpoint-keyed [OiResponsive] from a [Map].

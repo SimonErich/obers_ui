@@ -499,6 +499,94 @@ void main() {
       expect(r.resolve(OiBreakpoint.compact, scale), 1);
       expect(r.resolve(OiBreakpoint.large, scale), 4);
     });
+
+    test('EdgeInsetsGeometry.responsive creates static OiResponsive', () {
+      const insets = EdgeInsets.all(16);
+      final r = insets.responsive;
+      expect(r.isStatic, isTrue);
+      expect(
+        r.resolve(OiBreakpoint.compact, OiBreakpointScale.standard()),
+        insets,
+      );
+    });
+  });
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // OiResponsive.resolveFor
+  // ─────────────────────────────────────────────────────────────────────────
+
+  group('OiResponsive.resolveFor', () {
+    testWidgets('static value resolves without needing OiTheme', (
+      tester,
+    ) async {
+      const r = OiResponsive<int>(42);
+      late int result;
+      await tester.pumpWidget(
+        buildWithWidth(
+          400,
+          Builder(
+            builder: (ctx) {
+              result = r.resolveFor(ctx);
+              return const SizedBox.shrink();
+            },
+          ),
+        ),
+      );
+      expect(result, 42);
+    });
+
+    testWidgets('breakpoint map resolves using context breakpoint', (
+      tester,
+    ) async {
+      final r = OiResponsive<int>.breakpoints({
+        OiBreakpoint.compact: 1,
+        OiBreakpoint.medium: 2,
+        OiBreakpoint.large: 4,
+      });
+
+      // Width 400 → compact → 1.
+      late int result;
+      await tester.pumpWidget(
+        buildWithWidth(
+          400,
+          Builder(
+            builder: (ctx) {
+              result = r.resolveFor(ctx);
+              return const SizedBox.shrink();
+            },
+          ),
+        ),
+      );
+      expect(result, 1);
+
+      // Width 600 → medium → 2.
+      await tester.pumpWidget(
+        buildWithWidth(
+          600,
+          Builder(
+            builder: (ctx) {
+              result = r.resolveFor(ctx);
+              return const SizedBox.shrink();
+            },
+          ),
+        ),
+      );
+      expect(result, 2);
+
+      // Width 1200 → large → 4.
+      await tester.pumpWidget(
+        buildWithWidth(
+          1200,
+          Builder(
+            builder: (ctx) {
+              result = r.resolveFor(ctx);
+              return const SizedBox.shrink();
+            },
+          ),
+        ),
+      );
+      expect(result, 4);
+    });
   });
 
   // ─────────────────────────────────────────────────────────────────────────

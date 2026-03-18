@@ -41,7 +41,10 @@ void main() {
 
   testWidgets('inserts SizedBox with correct width for gap', (tester) async {
     await tester.pumpObers(
-      const OiRow(gap: 12, children: [Text('A'), Text('B'), Text('C')]),
+      const OiRow(
+        gap: OiResponsive<double>(12),
+        children: [Text('A'), Text('B'), Text('C')],
+      ),
     );
     // Two gaps for three children.
     final boxes = tester.widgetList<SizedBox>(find.byType(SizedBox)).toList();
@@ -91,7 +94,7 @@ void main() {
     await pumpAtWidth(
       tester,
       const OiRow(
-        gap: 8,
+        gap: OiResponsive<double>(8),
         collapse: OiBreakpoint.medium,
         children: [Text('A'), Text('B')],
       ),
@@ -133,5 +136,34 @@ void main() {
     );
     expect(find.byType(Row), findsOneWidget);
     expect(find.byType(Column), findsNothing);
+  });
+
+  // ── Responsive gap ────────────────────────────────────────────────────────
+
+  group('responsive gap', () {
+    testWidgets('gap varies with breakpoint', (tester) async {
+      final responsiveGap = OiResponsive<double>.breakpoints({
+        OiBreakpoint.compact: 4,
+        OiBreakpoint.expanded: 16,
+      });
+
+      // Compact → gap 4.
+      await pumpAtWidth(
+        tester,
+        OiRow(gap: responsiveGap, children: const [Text('A'), Text('B')]),
+        400,
+      );
+      var boxes = tester.widgetList<SizedBox>(find.byType(SizedBox)).toList();
+      expect(boxes.where((b) => b.width == 4), hasLength(1));
+
+      // Expanded → gap 16.
+      await pumpAtWidth(
+        tester,
+        OiRow(gap: responsiveGap, children: const [Text('A'), Text('B')]),
+        900,
+      );
+      boxes = tester.widgetList<SizedBox>(find.byType(SizedBox)).toList();
+      expect(boxes.where((b) => b.width == 16), hasLength(1));
+    });
   });
 }

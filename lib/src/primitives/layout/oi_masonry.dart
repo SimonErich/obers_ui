@@ -1,26 +1,50 @@
+import 'dart:math' as math;
+
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/src/foundation/oi_responsive.dart';
 
 /// A masonry-style layout that distributes [children] across [columns] vertical
 /// columns, interleaving items by index (item 0 → column 0, item 1 → column 1,
 /// …, item n → column n % columns).
 ///
-/// Columns are separated by [gap] logical pixels of horizontal space.
+/// [columns] and [gap] accept [OiResponsive] values so they can vary across
+/// breakpoints:
+///
+/// ```dart
+/// OiMasonry(
+///   columns: OiResponsive.breakpoints({
+///     OiBreakpoint.compact: 2,
+///     OiBreakpoint.expanded: 4,
+///   }),
+///   gap: OiResponsive.breakpoints({
+///     OiBreakpoint.compact: 8,
+///     OiBreakpoint.expanded: 16,
+///   }),
+///   children: [...],
+/// )
+/// ```
 ///
 /// {@category Primitives}
 class OiMasonry extends StatelessWidget {
   /// Creates an [OiMasonry].
   const OiMasonry({
     required this.children,
-    this.columns = 2,
-    this.gap = 0,
+    this.columns = const OiResponsive<int>(2),
+    this.gap = const OiResponsive<double>(0),
+    this.breakpoint,
     super.key,
-  }) : assert(columns >= 1, 'columns must be at least 1');
+  });
 
   /// Number of vertical columns.
-  final int columns;
+  final OiResponsive<int> columns;
 
   /// Horizontal and vertical gap between columns / items in logical pixels.
-  final double gap;
+  final OiResponsive<double> gap;
+
+  /// The active breakpoint, resolved at the layout level.
+  ///
+  /// When null, falls back to `context.breakpoint` (implicit context lookup).
+  final OiBreakpoint? breakpoint;
 
   /// The child widgets to distribute across columns.
   final List<Widget> children;
@@ -29,12 +53,18 @@ class OiMasonry extends StatelessWidget {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
+        // Resolve responsive values.
+        final active = breakpoint ?? context.breakpoint;
+        final scale = context.breakpointScale;
+        final resolvedColumns = math.max(1, columns.resolve(active, scale));
+        final resolvedGap = gap.resolve(active, scale);
+
         final hasBoundedWidth = constraints.hasBoundedWidth;
 
         // Build per-column child lists.
-        final cols = List.generate(columns, (_) => <Widget>[]);
+        final cols = List.generate(resolvedColumns, (_) => <Widget>[]);
         for (var i = 0; i < children.length; i++) {
-          cols[i % columns].add(children[i]);
+          cols[i % resolvedColumns].add(children[i]);
         }
 
         // When width is bounded, compute equal column widths explicitly so
@@ -42,20 +72,21 @@ class OiMasonry extends StatelessWidget {
         double? columnWidth;
         if (hasBoundedWidth) {
           final availableWidth = constraints.maxWidth;
-          columnWidth = columns <= 1
+          columnWidth = resolvedColumns <= 1
               ? availableWidth
-              : (availableWidth - gap * (columns - 1)) / columns;
+              : (availableWidth - resolvedGap * (resolvedColumns - 1)) /
+                  resolvedColumns;
         }
 
         // Build column widgets with vertical gap between items.
         final columnWidgets = <Widget>[];
-        for (var c = 0; c < columns; c++) {
+        for (var c = 0; c < resolvedColumns; c++) {
           final items = cols[c];
           final spacedItems = <Widget>[];
           for (var i = 0; i < items.length; i++) {
             spacedItems.add(items[i]);
-            if (i < items.length - 1 && gap > 0) {
-              spacedItems.add(SizedBox(height: gap));
+            if (i < items.length - 1 && resolvedGap > 0) {
+              spacedItems.add(SizedBox(height: resolvedGap));
             }
           }
 
@@ -72,8 +103,8 @@ class OiMasonry extends StatelessWidget {
           }
 
           columnWidgets.add(col);
-          if (c < columns - 1 && gap > 0) {
-            columnWidgets.add(SizedBox(width: gap));
+          if (c < resolvedColumns - 1 && resolvedGap > 0) {
+            columnWidgets.add(SizedBox(width: resolvedGap));
           }
         }
 

@@ -3,6 +3,7 @@
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:obers_ui/src/foundation/oi_responsive.dart';
 import 'package:obers_ui/src/primitives/layout/oi_column.dart';
 import 'package:obers_ui/src/primitives/layout/oi_container.dart';
 import 'package:obers_ui/src/primitives/layout/oi_grid.dart';
@@ -18,11 +19,11 @@ void main() {
   testWidgets('OiColumn inside OiColumn renders without error', (tester) async {
     await tester.pumpObers(
       const OiColumn(
-        gap: 8,
+        gap: OiResponsive<double>(8),
         children: [
           Text('outer-A'),
           OiColumn(
-            gap: 4,
+            gap: OiResponsive<double>(4),
             children: [Text('inner-A'), Text('inner-B')],
           ),
           Text('outer-B'),
@@ -40,10 +41,13 @@ void main() {
   testWidgets('OiRow inside OiRow renders without error', (tester) async {
     await tester.pumpObers(
       const OiRow(
-        gap: 8,
+        gap: OiResponsive<double>(8),
         children: [
           Text('outer-A'),
-          OiRow(gap: 4, children: [Text('inner-A'), Text('inner-B')]),
+          OiRow(
+            gap: OiResponsive<double>(4),
+            children: [Text('inner-A'), Text('inner-B')],
+          ),
           Text('outer-B'),
         ],
       ),
@@ -59,10 +63,13 @@ void main() {
   testWidgets('OiRow inside OiColumn renders without error', (tester) async {
     await tester.pumpObers(
       const OiColumn(
-        gap: 8,
+        gap: OiResponsive<double>(8),
         children: [
           Text('col-A'),
-          OiRow(gap: 4, children: [Text('row-A'), Text('row-B')]),
+          OiRow(
+            gap: OiResponsive<double>(4),
+            children: [Text('row-A'), Text('row-B')],
+          ),
           Text('col-B'),
         ],
       ),
@@ -76,10 +83,13 @@ void main() {
   testWidgets('OiColumn inside OiRow renders without error', (tester) async {
     await tester.pumpObers(
       const OiRow(
-        gap: 8,
+        gap: OiResponsive<double>(8),
         children: [
           Text('row-A'),
-          OiColumn(gap: 4, children: [Text('col-A'), Text('col-B')]),
+          OiColumn(
+            gap: OiResponsive<double>(4),
+            children: [Text('col-A'), Text('col-B')],
+          ),
           Text('row-B'),
         ],
       ),
@@ -98,8 +108,8 @@ void main() {
         children: [
           Text('header'),
           OiGrid(
-            columns: 2,
-            gap: 4,
+            columns: OiResponsive<int>(2),
+            gap: OiResponsive<double>(4),
             children: [Text('g1'), Text('g2'), Text('g3'), Text('g4')],
           ),
           Text('footer'),
@@ -121,7 +131,7 @@ void main() {
         children: [
           Text('left'),
           OiGrid(
-            columns: 2,
+            columns: OiResponsive<int>(2),
             children: [Text('g1'), Text('g2')],
           ),
           Text('right'),
@@ -144,8 +154,8 @@ void main() {
         children: [
           Text('above'),
           OiMasonry(
-            columns: 2,
-            gap: 4,
+            columns: OiResponsive<int>(2),
+            gap: OiResponsive<double>(4),
             children: [Text('m1'), Text('m2'), Text('m3')],
           ),
           Text('below'),
@@ -165,7 +175,7 @@ void main() {
         children: [
           Text('left'),
           OiMasonry(
-            columns: 2,
+            columns: OiResponsive<int>(2),
             children: [Text('m1'), Text('m2')],
           ),
           Text('right'),
@@ -186,7 +196,10 @@ void main() {
     await tester.pumpObers(
       const OiColumn(
         children: [
-          OiContainer(maxWidth: 200, child: Text('contained')),
+          OiContainer(
+            maxWidth: OiResponsive<double>(200),
+            child: Text('contained'),
+          ),
           Text('after'),
         ],
       ),
@@ -201,7 +214,10 @@ void main() {
     await tester.pumpObers(
       const OiRow(
         children: [
-          OiContainer(maxWidth: 200, child: Text('contained')),
+          OiContainer(
+            maxWidth: OiResponsive<double>(200),
+            child: Text('contained'),
+          ),
           Text('after'),
         ],
       ),
@@ -251,9 +267,9 @@ void main() {
   ) async {
     await tester.pumpObers(
       const OiContainer(
-        maxWidth: 400,
+        maxWidth: OiResponsive<double>(400),
         child: OiGrid(
-          columns: 2,
+          columns: OiResponsive<int>(2),
           children: [Text('a'), Text('b'), Text('c'), Text('d')],
         ),
       ),
@@ -269,7 +285,7 @@ void main() {
   ) async {
     await tester.pumpObers(
       const OiGrid(
-        columns: 2,
+        columns: OiResponsive<int>(2),
         children: [
           OiRow(children: [Text('r1'), Text('r2')]),
           Text('plain'),
@@ -288,7 +304,7 @@ void main() {
   ) async {
     await tester.pumpObers(
       const OiGrid(
-        columns: 2,
+        columns: OiResponsive<int>(2),
         children: [
           OiColumn(children: [Text('c1'), Text('c2')]),
           Text('plain'),
@@ -305,15 +321,15 @@ void main() {
   testWidgets('three-level nesting: Row > Column > Grid', (tester) async {
     await tester.pumpObers(
       const OiRow(
-        gap: 8,
+        gap: OiResponsive<double>(8),
         children: [
           Text('sidebar'),
           OiColumn(
-            gap: 4,
+            gap: OiResponsive<double>(4),
             children: [
               Text('section-title'),
               OiGrid(
-                columns: 2,
+                columns: OiResponsive<int>(2),
                 children: [Text('g1'), Text('g2'), Text('g3'), Text('g4')],
               ),
             ],
@@ -335,10 +351,10 @@ void main() {
         children: [
           Text('page-header'),
           OiContainer(
-            maxWidth: 600,
+            maxWidth: OiResponsive<double>(600),
             child: OiMasonry(
-              columns: 2,
-              gap: 8,
+              columns: OiResponsive<int>(2),
+              gap: OiResponsive<double>(8),
               children: [Text('m1'), Text('m2'), Text('m3'), Text('m4')],
             ),
           ),
@@ -357,17 +373,17 @@ void main() {
   ) async {
     await tester.pumpObers(
       const OiColumn(
-        gap: 8,
+        gap: OiResponsive<double>(8),
         children: [
           Text('page-top'),
           OiRow(
-            gap: 4,
+            gap: OiResponsive<double>(4),
             children: [
               Text('left-nav'),
               OiContainer(
-                maxWidth: 400,
+                maxWidth: OiResponsive<double>(400),
                 child: OiGrid(
-                  columns: 2,
+                  columns: OiResponsive<int>(2),
                   children: [Text('g1'), Text('g2')],
                 ),
               ),
@@ -391,10 +407,10 @@ void main() {
   ) async {
     await tester.pumpObers(
       const OiGrid(
-        columns: 2,
+        columns: OiResponsive<int>(2),
         children: [
           OiMasonry(
-            columns: 2,
+            columns: OiResponsive<int>(2),
             children: [Text('m1'), Text('m2')],
           ),
           Text('plain'),
@@ -411,10 +427,10 @@ void main() {
   testWidgets('OiGrid inside OiGrid renders without error', (tester) async {
     await tester.pumpObers(
       const OiGrid(
-        columns: 2,
+        columns: OiResponsive<int>(2),
         children: [
           OiGrid(
-            columns: 2,
+            columns: OiResponsive<int>(2),
             children: [Text('inner1'), Text('inner2')],
           ),
           Text('outer-cell'),
@@ -433,7 +449,7 @@ void main() {
   ) async {
     await tester.pumpObers(
       const OiGrid(
-        columns: 2,
+        columns: OiResponsive<int>(2),
         children: [
           OiWrapLayout(children: [Text('w1'), Text('w2')]),
           Text('plain'),

@@ -4,6 +4,18 @@ import 'package:obers_ui/src/foundation/oi_responsive.dart';
 /// A vertical layout widget that places [children] in a [Column] with uniform
 /// [gap] spacing between them.
 ///
+/// [gap] accepts an [OiResponsive] value so it can vary across breakpoints:
+///
+/// ```dart
+/// OiColumn(
+///   gap: OiResponsive.breakpoints({
+///     OiBreakpoint.compact: 8,
+///     OiBreakpoint.expanded: 16,
+///   }),
+///   children: [...],
+/// )
+/// ```
+///
 /// When [collapse] is set and the active breakpoint's [OiBreakpoint.minWidth]
 /// is greater than or equal to [collapse.minWidth], the widget renders as a
 /// [Row] instead, with the same [gap] applied as horizontal spacing.
@@ -18,7 +30,7 @@ class OiColumn extends StatelessWidget {
   /// Creates an [OiColumn].
   const OiColumn({
     required this.children,
-    this.gap = 0,
+    this.gap = const OiResponsive<double>(0),
     this.mainAxisAlignment = MainAxisAlignment.start,
     this.crossAxisAlignment = CrossAxisAlignment.center,
     this.mainAxisSize = MainAxisSize.min,
@@ -28,7 +40,7 @@ class OiColumn extends StatelessWidget {
   });
 
   /// The spacing between children in logical pixels.
-  final double gap;
+  final OiResponsive<double> gap;
 
   /// The child widgets to lay out.
   final List<Widget> children;
@@ -59,6 +71,8 @@ class OiColumn extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final active = breakpoint ?? context.breakpoint;
+    final scale = context.breakpointScale;
+    final resolvedGap = gap.resolve(active, scale);
     final shouldExpand =
         collapse != null && active.minWidth >= collapse!.minWidth;
 
@@ -66,11 +80,11 @@ class OiColumn extends StatelessWidget {
     final spaced = <Widget>[];
     for (var i = 0; i < children.length; i++) {
       spaced.add(children[i]);
-      if (i < children.length - 1 && gap > 0) {
+      if (i < children.length - 1 && resolvedGap > 0) {
         if (shouldExpand) {
-          spaced.add(SizedBox(width: gap));
+          spaced.add(SizedBox(width: resolvedGap));
         } else {
-          spaced.add(SizedBox(height: gap));
+          spaced.add(SizedBox(height: resolvedGap));
         }
       }
     }

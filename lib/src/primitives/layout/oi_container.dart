@@ -1,10 +1,25 @@
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/src/foundation/oi_responsive.dart';
 
 /// A content-width constraining wrapper with optional padding and centering.
 ///
-/// Use [maxWidth] to cap the layout width, [padding] to add insets around
-/// [child], and [centered] (default `true`) to center the content
-/// horizontally.
+/// [maxWidth] and [padding] accept [OiResponsive] values so they can vary
+/// across breakpoints:
+///
+/// ```dart
+/// OiContainer(
+///   maxWidth: OiResponsive.breakpoints({
+///     OiBreakpoint.compact: double.infinity,
+///     OiBreakpoint.expanded: 960,
+///     OiBreakpoint.large: 1200,
+///   }),
+///   padding: OiResponsive.breakpoints({
+///     OiBreakpoint.compact: EdgeInsets.all(16),
+///     OiBreakpoint.expanded: EdgeInsets.all(32),
+///   }),
+///   child: content,
+/// )
+/// ```
 ///
 /// {@category Primitives}
 class OiContainer extends StatelessWidget {
@@ -18,10 +33,10 @@ class OiContainer extends StatelessWidget {
   });
 
   /// Optional maximum width for the content area in logical pixels.
-  final double? maxWidth;
+  final OiResponsive<double>? maxWidth;
 
   /// Optional padding around [child].
-  final EdgeInsetsGeometry? padding;
+  final OiResponsive<EdgeInsetsGeometry>? padding;
 
   /// The widget to display inside the container.
   final Widget? child;
@@ -31,14 +46,17 @@ class OiContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final resolvedMaxWidth = maxWidth?.resolveFor(context);
+    final resolvedPadding = padding?.resolveFor(context);
+
     var content = child ?? const SizedBox.shrink() as Widget;
 
-    if (padding != null) {
-      content = Padding(padding: padding!, child: content);
+    if (resolvedPadding != null) {
+      content = Padding(padding: resolvedPadding, child: content);
     }
 
     content = ConstrainedBox(
-      constraints: BoxConstraints(maxWidth: maxWidth ?? double.infinity),
+      constraints: BoxConstraints(maxWidth: resolvedMaxWidth ?? double.infinity),
       child: content,
     );
 

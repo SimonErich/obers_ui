@@ -11,6 +11,24 @@ import 'package:obers_ui/src/foundation/oi_span.dart';
 /// compute the column count automatically from the available width. If both
 /// are omitted, a single column is used.
 ///
+/// All layout properties ([columns], [minColumnWidth], [gap], [rowGap]) accept
+/// [OiResponsive] values so they can vary across breakpoints:
+///
+/// ```dart
+/// OiGrid(
+///   columns: OiResponsive.breakpoints({
+///     OiBreakpoint.compact: 1,
+///     OiBreakpoint.medium: 2,
+///     OiBreakpoint.large: 4,
+///   }),
+///   gap: OiResponsive.breakpoints({
+///     OiBreakpoint.compact: 8,
+///     OiBreakpoint.expanded: 16,
+///   }),
+///   children: [...],
+/// )
+/// ```
+///
 /// Children wrapped with [OiSpan] (via the `.span()` extension) are placed
 /// according to their [OiSpanData]:
 ///
@@ -20,9 +38,6 @@ import 'package:obers_ui/src/foundation/oi_span.dart';
 /// * **columnOrder** — visual ordering; lower values render first (default
 ///   source order, treated as 0).
 ///
-/// When no children carry span metadata the grid uses a simple [Wrap]-based
-/// layout that does not require an [OiTheme] ancestor.
-///
 /// {@category Primitives}
 class OiGrid extends StatelessWidget {
   /// Creates an [OiGrid].
@@ -30,7 +45,7 @@ class OiGrid extends StatelessWidget {
     required this.children,
     this.columns,
     this.minColumnWidth,
-    this.gap = 0,
+    this.gap = const OiResponsive<double>(0),
     this.rowGap,
     this.breakpoint,
     super.key,
@@ -40,18 +55,18 @@ class OiGrid extends StatelessWidget {
        );
 
   /// Fixed number of columns. Mutually exclusive with [minColumnWidth].
-  final int? columns;
+  final OiResponsive<int>? columns;
 
   /// Minimum column width in logical pixels used to auto-compute the column
   /// count. Mutually exclusive with [columns].
-  final double? minColumnWidth;
+  final OiResponsive<double>? minColumnWidth;
 
   /// Horizontal gap between columns and (when [rowGap] is null) the vertical
   /// gap between rows, in logical pixels.
-  final double gap;
+  final OiResponsive<double> gap;
 
   /// Vertical gap between rows. When null, [gap] is used for both axes.
-  final double? rowGap;
+  final OiResponsive<double>? rowGap;
 
   /// The active breakpoint, resolved at the layout level.
   ///
@@ -66,11 +81,17 @@ class OiGrid extends StatelessWidget {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
+        // Resolve responsive values.
+        final active = breakpoint ?? context.breakpoint;
+        final scale = context.breakpointScale;
+
+        final resolvedGap = gap.resolve(active, scale);
+        final effectiveRowGap = rowGap?.resolve(active, scale) ?? resolvedGap;
+
         // When placed inside an unconstrained-width parent (e.g. a Row),
         // fall back to a single-column vertical layout so the widget
         // composes without overflow.
         if (!constraints.hasBoundedWidth) {
-          final effectiveRowGap = rowGap ?? gap;
           final spaced = <Widget>[];
           for (var i = 0; i < children.length; i++) {
             spaced.add(children[i]);
@@ -85,14 +106,17 @@ class OiGrid extends StatelessWidget {
         }
 
         final availableWidth = constraints.maxWidth;
-        final effectiveRowGap = rowGap ?? gap;
 
         // Compute column count.
+        final resolvedColumns = columns?.resolve(active, scale);
+        final resolvedMinColumnWidth = minColumnWidth?.resolve(active, scale);
+
         int cols;
-        if (columns != null) {
-          cols = columns!;
-        } else if (minColumnWidth != null && minColumnWidth! > 0) {
-          cols = math.max(1, (availableWidth / minColumnWidth!).floor());
+        if (resolvedColumns != null) {
+          cols = resolvedColumns;
+        } else if (resolvedMinColumnWidth != null &&
+            resolvedMinColumnWidth > 0) {
+          cols = math.max(1, (availableWidth / resolvedMinColumnWidth).floor());
         } else {
           cols = 1;
         }
@@ -100,12 +124,12 @@ class OiGrid extends StatelessWidget {
         // Unit column width = (total width − gap × (cols − 1)) / cols.
         final unitWidth = cols <= 1
             ? availableWidth
-            : (availableWidth - gap * (cols - 1)) / cols;
+            : (availableWidth - resolvedGap * (cols - 1)) / cols;
 
         // Fast path: no span children → simple Wrap (no context needed).
         if (!children.any((c) => c is OiSpan)) {
           return Wrap(
-            spacing: gap,
+            spacing: resolvedGap,
             runSpacing: effectiveRowGap,
             children: children
                 .map((child) => SizedBox(width: unitWidth, child: child))
@@ -114,8 +138,6 @@ class OiGrid extends StatelessWidget {
         }
 
         // ── Span-aware placement ────────────────────────────────────────
-        final active = breakpoint ?? context.breakpoint;
-        final scale = context.breakpointScale;
 
         // Build item list with resolved span data.
         final items = <_GridItem>[];
@@ -206,13 +228,13 @@ class OiGrid extends StatelessWidget {
           var isFirst = true;
 
           for (final placed in row) {
-            if (!isFirst && gap > 0) {
-              cells.add(SizedBox(width: gap));
+            if (!isFirst && resolvedGap > 0) {
+              cells.add(SizedBox(width: resolvedGap));
             }
             isFirst = false;
 
             final width = placed.columnSpan * unitWidth +
-                math.max(0, placed.columnSpan - 1) * gap;
+                math.max(0, placed.columnSpan - 1) * resolvedGap;
 
             if (placed.isSpacer) {
               cells.add(SizedBox(width: width));
