@@ -35,6 +35,34 @@ class OiTextInput extends StatefulWidget {
     super.key,
   });
 
+  /// Creates a search-style [OiTextInput] with a leading search icon,
+  /// "Search\u2026" placeholder, and [TextInputAction.search].
+  const OiTextInput.search({
+    this.controller,
+    this.onChanged,
+    this.onSubmitted,
+    this.autofocus = false,
+    this.enabled = true,
+    this.focusNode,
+    super.key,
+  }) : label = null,
+       hint = null,
+       placeholder = 'Search\u2026',
+       error = null,
+       leading = const Icon(
+         IconData(0xe8b6, fontFamily: 'MaterialIcons'),
+         size: 18,
+       ),
+       trailing = null,
+       maxLines = 1,
+       maxLength = null,
+       keyboardType = null,
+       textInputAction = TextInputAction.search,
+       onEditingComplete = null,
+       readOnly = false,
+       obscureText = false,
+       inputFormatters = null;
+
   /// An optional controller for the text field.
   ///
   /// When null an internal controller is created and managed automatically.

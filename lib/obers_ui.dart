@@ -204,6 +204,7 @@ export 'src/composites/data/oi_tree.dart';
 // ── Composites: Navigation ───────────────────────────────────────────────────
 
 export 'src/composites/navigation/oi_arrow_nav.dart';
+export 'src/composites/navigation/oi_file_toolbar.dart';
 export 'src/composites/navigation/oi_filter_bar.dart';
 export 'src/composites/navigation/oi_nav_menu.dart';
 export 'src/composites/navigation/oi_shortcuts.dart';
