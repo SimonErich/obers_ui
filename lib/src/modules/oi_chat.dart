@@ -1,7 +1,9 @@
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/src/foundation/theme/oi_spacing_scale.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/primitives/gesture/oi_long_press_menu.dart';
 import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
+import 'package:obers_ui/src/primitives/scroll/oi_infinite_scroll.dart';
 
 /// Reaction data for a chat message.
 ///
@@ -157,7 +159,7 @@ class OiChat extends StatefulWidget {
   final void Function(OiChatMessage, String emoji)? onReact;
 
   /// Called when the user scrolls to load older messages.
-  final VoidCallback? onLoadOlder;
+  final Future<void> Function()? onLoadOlder;
 
   /// Whether there are older messages available to load.
   final bool olderMessagesAvailable;
@@ -256,29 +258,6 @@ class _OiChatState extends State<OiChat> {
       label: widget.label,
       child: Column(
         children: [
-          // Load older messages button.
-          if (widget.olderMessagesAvailable && widget.onLoadOlder != null)
-            OiTappable(
-              onTap: widget.onLoadOlder,
-              child: Container(
-                width: double.infinity,
-                padding: EdgeInsets.symmetric(
-                  vertical: spacing.xs,
-                  horizontal: spacing.sm,
-                ),
-                color: colors.surfaceSubtle,
-                child: Text(
-                  'Load older messages',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: colors.primary.base,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
-            ),
-
           // Message list.
           Expanded(
             child: widget.messages.isEmpty
@@ -288,16 +267,7 @@ class _OiChatState extends State<OiChat> {
                       style: TextStyle(color: colors.textMuted),
                     ),
                   )
-                : ListView.builder(
-                    controller: _scrollController,
-                    padding: EdgeInsets.all(spacing.sm),
-                    itemCount: widget.messages.length,
-                    itemBuilder: (context, index) => _buildMessage(
-                      context,
-                      widget.messages[index],
-                      isContinuation: _isContinuation(index),
-                    ),
-                  ),
+                : _buildMessageList(spacing),
           ),
 
           // Typing indicator.
@@ -384,6 +354,33 @@ class _OiChatState extends State<OiChat> {
         ],
       ),
     );
+  }
+
+  Widget _buildMessageList(OiSpacingScale spacing) {
+    final listView = ListView.builder(
+      controller: _scrollController,
+      reverse: true,
+      padding: EdgeInsets.all(spacing.sm),
+      itemCount: widget.messages.length,
+      itemBuilder: (context, index) {
+        final msgIndex = widget.messages.length - 1 - index;
+        return _buildMessage(
+          context,
+          widget.messages[msgIndex],
+          isContinuation: _isContinuation(msgIndex),
+        );
+      },
+    );
+
+    if (widget.onLoadOlder != null) {
+      return OiInfiniteScroll(
+        moreAvailable: widget.olderMessagesAvailable,
+        onLoadMore: widget.onLoadOlder!,
+        child: listView,
+      );
+    }
+
+    return listView;
   }
 
   Widget _buildMessage(

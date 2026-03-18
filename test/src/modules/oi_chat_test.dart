@@ -510,4 +510,107 @@ void main() {
       },
     );
   });
+
+  // -------------------------------------------------------------------------
+  // onLoadOlder via scroll
+  // -------------------------------------------------------------------------
+
+  group('onLoadOlder via scroll', () {
+    testWidgets('onLoadOlder fires when scrolling to top', (tester) async {
+      var called = false;
+      final messages = List.generate(
+        30,
+        (i) => _msg(
+          key: 'msg-$i',
+          senderId: 'user-a',
+          senderName: 'Alice',
+          content: 'Message $i',
+          timestamp: now.add(Duration(minutes: i)),
+        ),
+      );
+
+      await tester.pumpObers(
+        SizedBox(
+          width: 400,
+          height: 600,
+          child: OiChat(
+            messages: messages,
+            currentUserId: 'user-b',
+            label: 'Chat',
+            olderMessagesAvailable: true,
+            onLoadOlder: () async {
+              called = true;
+            },
+          ),
+        ),
+      );
+
+      // The list is reversed, so scrolling "up" means dragging down visually
+      // but increasing scroll offset toward maxScrollExtent (older messages).
+      // Fling toward older messages (upward visually = toward maxScrollExtent
+      // in a reversed list).
+      await tester.fling(find.byType(ListView), const Offset(0, 600), 1000);
+      await tester.pumpAndSettle();
+
+      expect(called, isTrue);
+    });
+
+    testWidgets(
+      'onLoadOlder does not fire when olderMessagesAvailable is false',
+      (tester) async {
+        var called = false;
+        final messages = List.generate(
+          30,
+          (i) => _msg(
+            key: 'msg-$i',
+            senderId: 'user-a',
+            senderName: 'Alice',
+            content: 'Message $i',
+            timestamp: now.add(Duration(minutes: i)),
+          ),
+        );
+
+        await tester.pumpObers(
+          SizedBox(
+            width: 400,
+            height: 600,
+            child: OiChat(
+              messages: messages,
+              currentUserId: 'user-b',
+              label: 'Chat',
+              olderMessagesAvailable: false,
+              onLoadOlder: () async {
+                called = true;
+              },
+            ),
+          ),
+        );
+
+        await tester.fling(find.byType(ListView), const Offset(0, 600), 1000);
+        await tester.pumpAndSettle();
+
+        expect(called, isFalse);
+      },
+    );
+
+    testWidgets('manual Load older messages button is removed', (
+      tester,
+    ) async {
+      await tester.pumpObers(
+        SizedBox(
+          width: 400,
+          height: 600,
+          child: OiChat(
+            messages: [_msg()],
+            currentUserId: 'user-b',
+            label: 'Chat',
+            olderMessagesAvailable: true,
+            onLoadOlder: () async {},
+          ),
+        ),
+      );
+
+      expect(find.text('Load older messages'), findsNothing);
+    });
+  });
 }
