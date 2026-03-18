@@ -284,8 +284,10 @@ class _OiToastState extends State<OiToast> with SingleTickerProviderStateMixin {
     final textTheme = context.textTheme;
     final accent = _accentColor(colors);
 
-    Widget toast = Container(
-      constraints: const BoxConstraints(minWidth: 240, maxWidth: 400),
+    Widget toast = Semantics(
+      liveRegion: true,
+      child: Container(
+        constraints: const BoxConstraints(minWidth: 240, maxWidth: 400),
       decoration: BoxDecoration(
         color: colors.surface,
         borderRadius: BorderRadius.circular(8),
@@ -345,7 +347,8 @@ class _OiToastState extends State<OiToast> with SingleTickerProviderStateMixin {
           ),
         ),
       ),
-    );
+    ),
+  );
 
     if (widget.pauseOnHover) {
       toast = MouseRegion(
