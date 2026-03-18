@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/src/components/panels/oi_resizable.dart';
 import 'package:obers_ui/src/composites/data/oi_pagination_controller.dart';
 import 'package:obers_ui/src/composites/data/oi_table_controller.dart';
 import 'package:obers_ui/src/foundation/persistence/oi_settings_driver.dart';
@@ -676,17 +677,6 @@ class _OiTableState<T> extends State<StatefulWidget>
               overflow: TextOverflow.ellipsis,
             ),
           ),
-          if (col.resizable)
-            _ColumnResizeHandle(
-              onResize: (delta) {
-                final current = _ctrl.columnWidths[col.id] ?? col.width ?? 120;
-                final next = (current + delta).clamp(
-                  col.minWidth,
-                  col.maxWidth,
-                );
-                _ctrl.setColumnWidth(col.id, next);
-              },
-            ),
         ],
       ),
     );
@@ -694,15 +684,27 @@ class _OiTableState<T> extends State<StatefulWidget>
     // fills available space rather than collapsing to zero.
     final resolvedWidth =
         width ?? col.minWidth.clamp(col.minWidth, col.maxWidth);
-    final headerChild = GestureDetector(
+    final headerContent = GestureDetector(
       onTap: () => _handleHeaderTap(col),
       child: SizedBox(
-        width: resolvedWidth,
         height: _effectiveRowHeight,
         child: innerContent,
       ),
     );
-    var header = headerChild as Widget;
+    Widget header;
+    if (col.resizable) {
+      header = OiResizable(
+        key: ValueKey('resize_${col.id}'),
+        initialWidth: resolvedWidth,
+        minWidth: col.minWidth,
+        maxWidth: col.maxWidth,
+        resizeEdges: const {OiResizeEdge.right},
+        onResized: (w, _) => _ctrl.setColumnWidth(col.id, w),
+        child: headerContent,
+      );
+    } else {
+      header = SizedBox(width: resolvedWidth, child: headerContent);
+    }
     if (col.filterable) {
       header = Column(
         mainAxisSize: MainAxisSize.min,
@@ -1001,25 +1003,6 @@ class _CellFrameState<T> extends State<_CellFrame<T>> {
       key: const Key('cell_display'),
       onDoubleTap: _startEdit,
       child: widget.child,
-    );
-  }
-}
-
-// ── _ColumnResizeHandle ───────────────────────────────────────────────────────
-
-class _ColumnResizeHandle extends StatelessWidget {
-  const _ColumnResizeHandle({required this.onResize});
-
-  final void Function(double delta) onResize;
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onHorizontalDragUpdate: (details) => onResize(details.delta.dx),
-      child: MouseRegion(
-        cursor: SystemMouseCursors.resizeColumn,
-        child: Container(width: 6, color: const Color(0x00000000)),
-      ),
     );
   }
 }

@@ -4,6 +4,7 @@
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:obers_ui/src/components/panels/oi_resizable.dart';
 import 'package:obers_ui/src/composites/data/oi_table.dart';
 import 'package:obers_ui/src/composites/data/oi_table_controller.dart';
 import 'package:obers_ui/src/foundation/persistence/drivers/oi_in_memory_driver.dart';
@@ -321,7 +322,7 @@ void main() {
     expect(valuePos.dx, lessThan(namePos.dx));
   });
 
-  // 15. Column resize
+  // 15. Column resize via OiResizable
   testWidgets('column resize handle is present for resizable column', (
     tester,
   ) async {
@@ -334,8 +335,117 @@ void main() {
       ),
     ];
     await tester.pumpObers(_table(columns: resizeCols));
-    // Resize handle widget exists (drag target).
-    expect(find.byType(GestureDetector), findsWidgets);
+    // OiResizable wraps the resizable column header.
+    expect(find.byType(OiResizable), findsOneWidget);
+  });
+
+  testWidgets('non-resizable column has no OiResizable', (tester) async {
+    final cols = [
+      const OiTableColumn<_Row>(
+        id: 'name',
+        header: 'Name',
+        valueGetter: _nameGetter,
+        filterable: false,
+        resizable: false,
+      ),
+    ];
+    await tester.pumpObers(_table(columns: cols));
+    expect(find.byType(OiResizable), findsNothing);
+  });
+
+  testWidgets('dragging column header divider updates column width', (
+    tester,
+  ) async {
+    final ctrl = OiTableController();
+    final resizeCols = [
+      const OiTableColumn<_Row>(
+        id: 'name',
+        header: 'Name',
+        width: 150,
+        valueGetter: _nameGetter,
+        filterable: false,
+      ),
+    ];
+    await tester.pumpObers(
+      _table(columns: resizeCols, controller: ctrl),
+    );
+
+    // Find the OiResizable's right-edge handle (last GestureDetector in the
+    // OiResizable subtree).
+    final resizable = find.byType(OiResizable);
+    expect(resizable, findsOneWidget);
+
+    // Drag the right edge to widen the column.
+    final handleFinder = find.descendant(
+      of: resizable,
+      matching: find.byType(GestureDetector),
+    );
+    await tester.drag(handleFinder.last, const Offset(30, 0));
+    await tester.pump();
+
+    expect(ctrl.columnWidths['name'], closeTo(180, 1));
+  });
+
+  testWidgets('column resize respects minWidth constraint', (tester) async {
+    final ctrl = OiTableController();
+    final resizeCols = [
+      const OiTableColumn<_Row>(
+        id: 'name',
+        header: 'Name',
+        width: 150,
+        minWidth: 80,
+        valueGetter: _nameGetter,
+        filterable: false,
+      ),
+    ];
+    await tester.pumpObers(
+      _table(columns: resizeCols, controller: ctrl),
+    );
+
+    final resizable = find.byType(OiResizable);
+    final handleFinder = find.descendant(
+      of: resizable,
+      matching: find.byType(GestureDetector),
+    );
+    // Drag far left to try to go below minWidth.
+    await tester.drag(handleFinder.last, const Offset(-300, 0));
+    await tester.pump();
+
+    expect(
+      ctrl.columnWidths['name'],
+      greaterThanOrEqualTo(80),
+    );
+  });
+
+  testWidgets('column resize respects maxWidth constraint', (tester) async {
+    final ctrl = OiTableController();
+    final resizeCols = [
+      const OiTableColumn<_Row>(
+        id: 'name',
+        header: 'Name',
+        width: 150,
+        maxWidth: 250,
+        valueGetter: _nameGetter,
+        filterable: false,
+      ),
+    ];
+    await tester.pumpObers(
+      _table(columns: resizeCols, controller: ctrl),
+    );
+
+    final resizable = find.byType(OiResizable);
+    final handleFinder = find.descendant(
+      of: resizable,
+      matching: find.byType(GestureDetector),
+    );
+    // Drag far right to try to exceed maxWidth.
+    await tester.drag(handleFinder.last, const Offset(500, 0));
+    await tester.pump();
+
+    expect(
+      ctrl.columnWidths['name'],
+      lessThanOrEqualTo(250),
+    );
   });
 
   // 16. Loading state shows loading indicator
