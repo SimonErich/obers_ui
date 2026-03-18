@@ -2,6 +2,7 @@
 // ignore_for_file: public_member_api_docs
 
 import 'package:flutter/painting.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui/src/foundation/theme/oi_effects_theme.dart';
 
@@ -131,6 +132,165 @@ void main() {
         halo: OiHaloStyle.none,
       );
       expect(a.hashCode, equals(b.hashCode));
+    });
+
+    group('merge', () {
+      test('non-null fields in this style take precedence over base', () {
+        const hover = OiInteractiveStyle(
+          backgroundOverlay: Color(0x0A000000),
+          halo: OiHaloStyle.none,
+          borderColor: Color(0xFFFF0000),
+        );
+        const focus = OiInteractiveStyle(
+          backgroundOverlay: Color(0x00000000),
+          halo: OiHaloStyle(color: Color(0x402563EB), spread: 2, blur: 8),
+          borderColor: Color(0xFF00FF00),
+          textColor: Color(0xFF0000FF),
+        );
+        final merged = hover.merge(focus);
+        // hover's borderColor takes precedence (non-null)
+        expect(merged.borderColor, equals(const Color(0xFFFF0000)));
+        // hover's textColor is null, so focus's textColor is used
+        expect(merged.textColor, equals(const Color(0xFF0000FF)));
+      });
+
+      test('backgroundOverlay from this style always takes precedence', () {
+        const thisStyle = OiInteractiveStyle(
+          backgroundOverlay: Color(0x0A000000),
+          halo: OiHaloStyle.none,
+        );
+        const baseStyle = OiInteractiveStyle(
+          backgroundOverlay: Color(0x1A000000),
+          halo: OiHaloStyle(color: Color(0x402563EB), spread: 2, blur: 8),
+        );
+        final merged = thisStyle.merge(baseStyle);
+        expect(merged.backgroundOverlay, equals(const Color(0x0A000000)));
+      });
+
+      test('halo from this style always takes precedence', () {
+        const thisHalo =
+            OiHaloStyle(color: Color(0xFFFF0000), spread: 4, blur: 12);
+        const thisStyle = OiInteractiveStyle(
+          backgroundOverlay: Color(0x0A000000),
+          halo: thisHalo,
+        );
+        const baseStyle = OiInteractiveStyle(
+          backgroundOverlay: Color(0x1A000000),
+          halo: OiHaloStyle(color: Color(0xFF00FF00), spread: 2, blur: 8),
+        );
+        final merged = thisStyle.merge(baseStyle);
+        expect(merged.halo, equals(thisHalo));
+      });
+
+      test('scale falls back to base when this scale is 1.0', () {
+        const thisStyle = OiInteractiveStyle(
+          backgroundOverlay: Color(0x0A000000),
+          halo: OiHaloStyle.none,
+          scale: 1.0,
+        );
+        const baseStyle = OiInteractiveStyle(
+          backgroundOverlay: Color(0x1A000000),
+          halo: OiHaloStyle.none,
+          scale: 0.97,
+        );
+        final merged = thisStyle.merge(baseStyle);
+        expect(merged.scale, equals(0.97));
+      });
+
+      test('scale from this style wins when not 1.0', () {
+        const thisStyle = OiInteractiveStyle(
+          backgroundOverlay: Color(0x0A000000),
+          halo: OiHaloStyle.none,
+          scale: 1.03,
+        );
+        const baseStyle = OiInteractiveStyle(
+          backgroundOverlay: Color(0x1A000000),
+          halo: OiHaloStyle.none,
+          scale: 0.97,
+        );
+        final merged = thisStyle.merge(baseStyle);
+        expect(merged.scale, equals(1.03));
+      });
+
+      test('null optional fields fall through to base', () {
+        const thisStyle = OiInteractiveStyle(
+          backgroundOverlay: Color(0x0A000000),
+          halo: OiHaloStyle.none,
+        );
+        const baseStyle = OiInteractiveStyle(
+          backgroundOverlay: Color(0x1A000000),
+          halo: OiHaloStyle.none,
+          backgroundOverride: Color(0xFFAAAAAA),
+          opacity: 0.5,
+          translate: Offset(2, 2),
+          elevationDelta: 4.0,
+          cursor: SystemMouseCursors.click,
+        );
+        final merged = thisStyle.merge(baseStyle);
+        expect(merged.backgroundOverride, equals(const Color(0xFFAAAAAA)));
+        expect(merged.opacity, equals(0.5));
+        expect(merged.translate, equals(const Offset(2, 2)));
+        expect(merged.elevationDelta, equals(4.0));
+        expect(merged.cursor, equals(SystemMouseCursors.click));
+      });
+
+      test('hover + focus merge produces combined style', () {
+        const hover = OiInteractiveStyle(
+          backgroundOverlay: Color(0x0A000000),
+          halo: OiHaloStyle.none,
+          borderColor: Color(0xFFCCCCCC),
+        );
+        final focus = OiInteractiveStyle(
+          backgroundOverlay: const Color(0x00000000),
+          halo: OiHaloStyle.from(const Color(0xFF2563EB), intensity: 0.25),
+          textColor: const Color(0xFF2563EB),
+        );
+        final combined = hover.merge(focus);
+        // hover's overlay wins
+        expect(combined.backgroundOverlay, equals(const Color(0x0A000000)));
+        // hover's halo wins (OiHaloStyle.none)
+        expect(combined.halo, equals(OiHaloStyle.none));
+        // hover's borderColor wins
+        expect(combined.borderColor, equals(const Color(0xFFCCCCCC)));
+        // focus's textColor fills in (hover has null)
+        expect(combined.textColor, equals(const Color(0xFF2563EB)));
+      });
+
+      test('merging with none preserves all non-null fields from this', () {
+        const style = OiInteractiveStyle(
+          backgroundOverlay: Color(0x0A000000),
+          halo: OiHaloStyle.none,
+          borderColor: Color(0xFFFF0000),
+          textColor: Color(0xFF00FF00),
+          opacity: 0.8,
+          scale: 0.95,
+        );
+        final merged = style.merge(OiInteractiveStyle.none);
+        expect(merged.backgroundOverlay, equals(const Color(0x0A000000)));
+        expect(merged.borderColor, equals(const Color(0xFFFF0000)));
+        expect(merged.textColor, equals(const Color(0xFF00FF00)));
+        expect(merged.opacity, equals(0.8));
+        expect(merged.scale, equals(0.95));
+      });
+
+      test('merging none with a base returns base nullable fields', () {
+        const base = OiInteractiveStyle(
+          backgroundOverlay: Color(0x1A000000),
+          halo: OiHaloStyle(color: Color(0x402563EB), spread: 2, blur: 8),
+          borderColor: Color(0xFFFF0000),
+          textColor: Color(0xFF00FF00),
+        );
+        final merged = OiInteractiveStyle.none.merge(base);
+        // none's overlay and halo take precedence
+        expect(
+          merged.backgroundOverlay,
+          equals(const Color(0x00000000)),
+        );
+        expect(merged.halo, equals(OiHaloStyle.none));
+        // none's nullable fields are null, so base's values fill in
+        expect(merged.borderColor, equals(const Color(0xFFFF0000)));
+        expect(merged.textColor, equals(const Color(0xFF00FF00)));
+      });
     });
   });
 

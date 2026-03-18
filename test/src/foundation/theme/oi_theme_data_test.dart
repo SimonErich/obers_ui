@@ -5,6 +5,10 @@ import 'dart:ui';
 
 import 'package:flutter/painting.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:obers_ui/src/foundation/theme/oi_color_swatch.dart';
+import 'package:obers_ui/src/foundation/theme/oi_component_themes.dart';
+import 'package:obers_ui/src/foundation/theme/oi_decoration_theme.dart';
+import 'package:obers_ui/src/foundation/theme/oi_effects_theme.dart';
 import 'package:obers_ui/src/foundation/theme/oi_radius_scale.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme_data.dart';
 
@@ -65,10 +69,56 @@ void main() {
     });
 
     group('fromBrand() factory', () {
+      const brandColor = Color(0xFFE11D48); // rose-600
+
       test('primary color is set to brand color', () {
-        const brandColor = Color(0xFFE11D48); // rose-600
         final theme = OiThemeData.fromBrand(color: brandColor);
         expect(theme.colors.primary.base, equals(brandColor));
+      });
+
+      test('primary swatch is derived from brand color via OiColorSwatch.from',
+          () {
+        final theme = OiThemeData.fromBrand(color: brandColor);
+        final expectedSwatch = OiColorSwatch.from(brandColor);
+        expect(theme.colors.primary, equals(expectedSwatch));
+      });
+
+      test('borderFocus is set to brand color', () {
+        final theme = OiThemeData.fromBrand(color: brandColor);
+        expect(theme.colors.borderFocus, equals(brandColor));
+      });
+
+      test('non-primary semantic colors are preserved from base light theme',
+          () {
+        final theme = OiThemeData.fromBrand(color: brandColor);
+        final baseLight = OiThemeData.light();
+        expect(theme.colors.success, equals(baseLight.colors.success));
+        expect(theme.colors.warning, equals(baseLight.colors.warning));
+        expect(theme.colors.error, equals(baseLight.colors.error));
+        expect(theme.colors.info, equals(baseLight.colors.info));
+      });
+
+      test('effects are rebuilt with brand color', () {
+        final theme = OiThemeData.fromBrand(color: brandColor);
+        final expectedEffects =
+            OiEffectsTheme.standard(primaryColor: brandColor);
+        expect(theme.effects, equals(expectedEffects));
+      });
+
+      test('decoration is rebuilt with brand and error colors', () {
+        final theme = OiThemeData.fromBrand(color: brandColor);
+        final baseLight = OiThemeData.light();
+        final expectedDecoration = OiDecorationTheme.standard(
+          primaryColor: brandColor,
+          errorColor: baseLight.colors.error.base,
+        );
+        expect(theme.decoration, equals(expectedDecoration));
+      });
+
+      test('defaults to light brightness', () {
+        final theme = OiThemeData.fromBrand(color: brandColor);
+        expect(theme.brightness, Brightness.light);
+        expect(theme.isLight, isTrue);
       });
 
       test('dark brand theme has dark brightness', () {
@@ -77,6 +127,49 @@ void main() {
           brightness: Brightness.dark,
         );
         expect(theme.isDark, isTrue);
+      });
+
+      test('dark brand theme uses dark base colors except primary', () {
+        final theme = OiThemeData.fromBrand(
+          color: brandColor,
+          brightness: Brightness.dark,
+        );
+        final baseDark = OiThemeData.dark();
+        expect(theme.colors.background, equals(baseDark.colors.background));
+        expect(theme.colors.surface, equals(baseDark.colors.surface));
+      });
+
+      test('fontFamily is forwarded', () {
+        final theme = OiThemeData.fromBrand(
+          color: brandColor,
+          fontFamily: 'Roboto',
+        );
+        expect(theme.fontFamily, equals('Roboto'));
+      });
+
+      test('monoFontFamily is forwarded', () {
+        final theme = OiThemeData.fromBrand(
+          color: brandColor,
+          monoFontFamily: 'Fira Code',
+        );
+        expect(theme.monoFontFamily, equals('Fira Code'));
+      });
+
+      test('radiusPreference sharp is forwarded', () {
+        final theme = OiThemeData.fromBrand(
+          color: brandColor,
+          radiusPreference: OiRadiusPreference.sharp,
+        );
+        expect(theme.radius.md, equals(BorderRadius.zero));
+      });
+
+      test('components override is forwarded', () {
+        const customComponents = OiComponentThemes.empty();
+        final theme = OiThemeData.fromBrand(
+          color: brandColor,
+          components: customComponents,
+        );
+        expect(theme.components, equals(customComponents));
       });
     });
 
