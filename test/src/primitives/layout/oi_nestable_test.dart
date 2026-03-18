@@ -6,6 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui/src/foundation/oi_responsive.dart';
 import 'package:obers_ui/src/primitives/layout/oi_column.dart';
 import 'package:obers_ui/src/primitives/layout/oi_container.dart';
+import 'package:obers_ui/src/foundation/oi_span.dart';
 import 'package:obers_ui/src/primitives/layout/oi_grid.dart';
 import 'package:obers_ui/src/primitives/layout/oi_masonry.dart';
 import 'package:obers_ui/src/primitives/layout/oi_page.dart';
@@ -136,10 +137,9 @@ void main() {
     expect(find.text('footer'), findsOneWidget);
   });
 
-  testWidgets('OiGrid inside OiRow degrades to single column', (
-    tester,
-  ) async {
-    // Row gives unbounded width → Grid falls back to single-column layout.
+  testWidgets('OiGrid inside OiRow renders multi-column', (tester) async {
+    // Row gives unbounded width → Grid with explicit columns renders
+    // multi-column using intrinsic sizing.
     await tester.pumpObers(
       const OiRow(
         breakpoint: _bp,
@@ -158,6 +158,69 @@ void main() {
     expect(find.text('g1'), findsOneWidget);
     expect(find.text('g2'), findsOneWidget);
     expect(find.text('right'), findsOneWidget);
+
+    // Verify g1 and g2 are on the same row (same top coordinate).
+    final g1Top = tester.getTopLeft(find.text('g1')).dy;
+    final g2Top = tester.getTopLeft(find.text('g2')).dy;
+    expect(g1Top, equals(g2Top));
+  });
+
+  testWidgets(
+    'OiGrid with minColumnWidth inside OiRow falls back to single column',
+    (tester) async {
+      // minColumnWidth can't compute column count without available width,
+      // so single-column fallback is expected.
+      await tester.pumpObers(
+        const OiRow(
+          breakpoint: _bp,
+          children: [
+            Text('left'),
+            OiGrid(
+              breakpoint: _bp,
+              minColumnWidth: OiResponsive<double>(100),
+              children: [Text('g1'), Text('g2')],
+            ),
+            Text('right'),
+          ],
+        ),
+      );
+      expect(find.text('left'), findsOneWidget);
+      expect(find.text('g1'), findsOneWidget);
+      expect(find.text('g2'), findsOneWidget);
+      expect(find.text('right'), findsOneWidget);
+
+      // Verify g1 and g2 are stacked vertically (different top coordinates).
+      final g1Top = tester.getTopLeft(find.text('g1')).dy;
+      final g2Top = tester.getTopLeft(find.text('g2')).dy;
+      expect(g1Top, lessThan(g2Top));
+    },
+  );
+
+  testWidgets('OiGrid in unbounded width respects columnOrder', (tester) async {
+    await tester.pumpObers(
+      OiRow(
+        breakpoint: _bp,
+        children: [
+          OiGrid(
+            breakpoint: _bp,
+            columns: const OiResponsive<int>(2),
+            children: [
+              const Text(
+                'second',
+              ).span(columnOrder: const OiResponsive<int>(2)),
+              const Text('first').span(columnOrder: const OiResponsive<int>(1)),
+            ],
+          ),
+        ],
+      ),
+    );
+    expect(find.text('first'), findsOneWidget);
+    expect(find.text('second'), findsOneWidget);
+
+    // 'first' (order=1) should appear to the left of 'second' (order=2).
+    final firstLeft = tester.getTopLeft(find.text('first')).dx;
+    final secondLeft = tester.getTopLeft(find.text('second')).dx;
+    expect(firstLeft, lessThan(secondLeft));
   });
 
   // ── Masonry inside flex layouts ──────────────────────────────────────────
@@ -230,9 +293,7 @@ void main() {
     expect(find.text('after'), findsOneWidget);
   });
 
-  testWidgets('OiContainer inside OiRow renders without error', (
-    tester,
-  ) async {
+  testWidgets('OiContainer inside OiRow renders without error', (tester) async {
     await tester.pumpObers(
       const OiRow(
         breakpoint: _bp,
@@ -279,10 +340,7 @@ void main() {
       const OiRow(
         breakpoint: _bp,
         children: [
-          OiWrapLayout(
-            breakpoint: _bp,
-            children: [Text('w1'), Text('w2')],
-          ),
+          OiWrapLayout(breakpoint: _bp, children: [Text('w1'), Text('w2')]),
           Text('after'),
         ],
       ),
@@ -314,9 +372,7 @@ void main() {
 
   // ── Row inside Grid ──────────────────────────────────────────────────────
 
-  testWidgets('OiRow inside OiGrid cell renders without error', (
-    tester,
-  ) async {
+  testWidgets('OiRow inside OiGrid cell renders without error', (tester) async {
     await tester.pumpObers(
       const OiGrid(
         breakpoint: _bp,
@@ -502,10 +558,7 @@ void main() {
         breakpoint: _bp,
         columns: OiResponsive<int>(2),
         children: [
-          OiWrapLayout(
-            breakpoint: _bp,
-            children: [Text('w1'), Text('w2')],
-          ),
+          OiWrapLayout(breakpoint: _bp, children: [Text('w1'), Text('w2')]),
           Text('plain'),
         ],
       ),
@@ -526,9 +579,7 @@ void main() {
   });
 
   testWidgets('OiRow defaults to MainAxisSize.min', (tester) async {
-    await tester.pumpObers(
-      const OiRow(breakpoint: _bp, children: [Text('A')]),
-    );
+    await tester.pumpObers(const OiRow(breakpoint: _bp, children: [Text('A')]));
     final row = tester.widget<Row>(find.byType(Row));
     expect(row.mainAxisSize, MainAxisSize.min);
   });
@@ -588,10 +639,7 @@ void main() {
         breakpoint: _bp,
         children: [
           Text('left'),
-          OiSection(
-            breakpoint: _bp,
-            children: [Text('sec-A'), Text('sec-B')],
-          ),
+          OiSection(breakpoint: _bp, children: [Text('sec-A'), Text('sec-B')]),
           Text('right'),
         ],
       ),
@@ -602,9 +650,7 @@ void main() {
     expect(find.text('right'), findsOneWidget);
   });
 
-  testWidgets('OiGrid inside OiSection renders without error', (
-    tester,
-  ) async {
+  testWidgets('OiGrid inside OiSection renders without error', (tester) async {
     await tester.pumpObers(
       const OiSection(
         breakpoint: _bp,
@@ -624,9 +670,7 @@ void main() {
     expect(find.text('g4'), findsOneWidget);
   });
 
-  testWidgets('OiSection inside OiSection (nested sections)', (
-    tester,
-  ) async {
+  testWidgets('OiSection inside OiSection (nested sections)', (tester) async {
     await tester.pumpObers(
       const OiSection(
         breakpoint: _bp,
@@ -652,10 +696,7 @@ void main() {
         breakpoint: _bp,
         columns: OiResponsive<int>(2),
         children: [
-          OiSection(
-            breakpoint: _bp,
-            children: [Text('sec-A'), Text('sec-B')],
-          ),
+          OiSection(breakpoint: _bp, children: [Text('sec-A'), Text('sec-B')]),
           Text('plain'),
         ],
       ),
@@ -687,9 +728,7 @@ void main() {
     expect(find.text('page-B'), findsOneWidget);
   });
 
-  testWidgets('OiSection inside OiPage renders without error', (
-    tester,
-  ) async {
+  testWidgets('OiSection inside OiPage renders without error', (tester) async {
     await tester.pumpObers(
       const OiPage(
         breakpoint: _bp,
@@ -745,35 +784,35 @@ void main() {
     expect(find.text('page-footer'), findsOneWidget);
   });
 
-  testWidgets('OiRow inside OiSection inside OiPage (flex in section in page)',
-      (tester) async {
-    await tester.pumpObers(
-      const OiPage(
-        breakpoint: _bp,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          OiSection(
-            breakpoint: _bp,
-            children: [
-              Text('section-header'),
-              OiRow(
-                breakpoint: _bp,
-                gap: OiResponsive<double>(4),
-                children: [Text('left'), Text('right')],
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-    expect(find.text('section-header'), findsOneWidget);
-    expect(find.text('left'), findsOneWidget);
-    expect(find.text('right'), findsOneWidget);
-  });
+  testWidgets(
+    'OiRow inside OiSection inside OiPage (flex in section in page)',
+    (tester) async {
+      await tester.pumpObers(
+        const OiPage(
+          breakpoint: _bp,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            OiSection(
+              breakpoint: _bp,
+              children: [
+                Text('section-header'),
+                OiRow(
+                  breakpoint: _bp,
+                  gap: OiResponsive<double>(4),
+                  children: [Text('left'), Text('right')],
+                ),
+              ],
+            ),
+          ],
+        ),
+      );
+      expect(find.text('section-header'), findsOneWidget);
+      expect(find.text('left'), findsOneWidget);
+      expect(find.text('right'), findsOneWidget);
+    },
+  );
 
-  testWidgets('OiPage inside OiColumn (page nested in flex)', (
-    tester,
-  ) async {
+  testWidgets('OiPage inside OiColumn (page nested in flex)', (tester) async {
     await tester.pumpObers(
       const OiColumn(
         breakpoint: _bp,
@@ -813,85 +852,83 @@ void main() {
 
   // ── Full hierarchy: Page > Section > Flex > Grid ────────────────────────
 
-  testWidgets(
-    'full hierarchy: Page > Section > Row > Container > Grid',
-    (tester) async {
-      await tester.pumpObers(
-        const OiPage(
-          breakpoint: _bp,
-          mainAxisSize: MainAxisSize.min,
-          gap: OiResponsive<double>(16),
-          children: [
-            Text('page-title'),
-            OiSection(
-              breakpoint: _bp,
-              gap: OiResponsive<double>(8),
-              children: [
-                Text('section-heading'),
-                OiRow(
-                  breakpoint: _bp,
-                  gap: OiResponsive<double>(4),
-                  children: [
-                    Text('sidebar'),
-                    OiContainer(
+  testWidgets('full hierarchy: Page > Section > Row > Container > Grid', (
+    tester,
+  ) async {
+    await tester.pumpObers(
+      const OiPage(
+        breakpoint: _bp,
+        mainAxisSize: MainAxisSize.min,
+        gap: OiResponsive<double>(16),
+        children: [
+          Text('page-title'),
+          OiSection(
+            breakpoint: _bp,
+            gap: OiResponsive<double>(8),
+            children: [
+              Text('section-heading'),
+              OiRow(
+                breakpoint: _bp,
+                gap: OiResponsive<double>(4),
+                children: [
+                  Text('sidebar'),
+                  OiContainer(
+                    breakpoint: _bp,
+                    maxWidth: OiResponsive<double>(400),
+                    child: OiGrid(
                       breakpoint: _bp,
-                      maxWidth: OiResponsive<double>(400),
-                      child: OiGrid(
-                        breakpoint: _bp,
-                        columns: OiResponsive<int>(2),
-                        children: [Text('g1'), Text('g2')],
-                      ),
+                      columns: OiResponsive<int>(2),
+                      children: [Text('g1'), Text('g2')],
                     ),
-                  ],
-                ),
-              ],
-            ),
-            Text('page-footer'),
-          ],
-        ),
-      );
-      expect(find.text('page-title'), findsOneWidget);
-      expect(find.text('section-heading'), findsOneWidget);
-      expect(find.text('sidebar'), findsOneWidget);
-      expect(find.text('g1'), findsOneWidget);
-      expect(find.text('g2'), findsOneWidget);
-      expect(find.text('page-footer'), findsOneWidget);
-    },
-  );
+                  ),
+                ],
+              ),
+            ],
+          ),
+          Text('page-footer'),
+        ],
+      ),
+    );
+    expect(find.text('page-title'), findsOneWidget);
+    expect(find.text('section-heading'), findsOneWidget);
+    expect(find.text('sidebar'), findsOneWidget);
+    expect(find.text('g1'), findsOneWidget);
+    expect(find.text('g2'), findsOneWidget);
+    expect(find.text('page-footer'), findsOneWidget);
+  });
 
-  testWidgets(
-    'full hierarchy: Page > Section > Column > Masonry (5 levels)',
-    (tester) async {
-      await tester.pumpObers(
-        const OiPage(
-          breakpoint: _bp,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            OiSection(
-              breakpoint: _bp,
-              children: [
-                OiColumn(
-                  breakpoint: _bp,
-                  children: [
-                    OiContainer(
+  testWidgets('full hierarchy: Page > Section > Column > Masonry (5 levels)', (
+    tester,
+  ) async {
+    await tester.pumpObers(
+      const OiPage(
+        breakpoint: _bp,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          OiSection(
+            breakpoint: _bp,
+            children: [
+              OiColumn(
+                breakpoint: _bp,
+                children: [
+                  OiContainer(
+                    breakpoint: _bp,
+                    maxWidth: OiResponsive<double>(500),
+                    child: OiMasonry(
                       breakpoint: _bp,
-                      maxWidth: OiResponsive<double>(500),
-                      child: OiMasonry(
-                        breakpoint: _bp,
-                        columns: OiResponsive<int>(2),
-                        children: [Text('m1'), Text('m2'), Text('m3')],
-                      ),
+                      columns: OiResponsive<int>(2),
+                      children: [Text('m1'), Text('m2'), Text('m3')],
                     ),
-                  ],
-                ),
-              ],
-            ),
-          ],
-        ),
-      );
-      expect(find.text('m1'), findsOneWidget);
-      expect(find.text('m2'), findsOneWidget);
-      expect(find.text('m3'), findsOneWidget);
-    },
-  );
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+    expect(find.text('m1'), findsOneWidget);
+    expect(find.text('m2'), findsOneWidget);
+    expect(find.text('m3'), findsOneWidget);
+  });
 }

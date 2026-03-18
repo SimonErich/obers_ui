@@ -96,22 +96,113 @@ class OiGrid extends StatelessWidget {
         final resolvedScale = scale ?? context.breakpointScale;
 
         final resolvedGap = gap.resolve(active, resolvedScale);
-        final effectiveRowGap = rowGap?.resolve(active, resolvedScale) ?? resolvedGap;
+        final effectiveRowGap =
+            rowGap?.resolve(active, resolvedScale) ?? resolvedGap;
 
         // When placed inside an unconstrained-width parent (e.g. a Row),
-        // fall back to a single-column vertical layout so the widget
-        // composes without overflow.
+        // use intrinsic sizing if an explicit column count is provided.
+        // Fall back to single-column only for minColumnWidth (can't compute
+        // column count without available width).
         if (!constraints.hasBoundedWidth) {
-          final spaced = <Widget>[];
+          final resolvedCols = columns?.resolve(active, resolvedScale);
+
+          if (resolvedCols == null || resolvedCols <= 0) {
+            // minColumnWidth or no column spec — single-column fallback.
+            final spaced = <Widget>[];
+            for (var i = 0; i < children.length; i++) {
+              spaced.add(children[i]);
+              if (i < children.length - 1 && effectiveRowGap > 0) {
+                spaced.add(SizedBox(height: effectiveRowGap));
+              }
+            }
+            return Column(mainAxisSize: MainAxisSize.min, children: spaced);
+          }
+
+          // Explicit columns — render multi-column with intrinsic sizing.
+          final cols = resolvedCols;
+
+          // Build item list with span data for ordering.
+          final items = <_GridItem>[];
           for (var i = 0; i < children.length; i++) {
-            spaced.add(children[i]);
-            if (i < children.length - 1 && effectiveRowGap > 0) {
-              spaced.add(SizedBox(height: effectiveRowGap));
+            final child = children[i];
+            final spanData = OiSpan.maybeOf(child);
+
+            var colSpan =
+                spanData?.resolveColumnSpan(active, resolvedScale) ?? 1;
+            if (colSpan == fullSpanSentinel) colSpan = cols;
+            colSpan = colSpan.clamp(1, cols);
+
+            items.add(
+              _GridItem(
+                index: i,
+                child: child,
+                columnSpan: colSpan,
+                columnStart: spanData?.resolveColumnStart(
+                  active,
+                  resolvedScale,
+                ),
+                columnOrder: spanData?.resolveColumnOrder(
+                  active,
+                  resolvedScale,
+                ),
+              ),
+            );
+          }
+
+          // Stable sort by columnOrder (null → 0).
+          items.sort((a, b) {
+            final oa = a.columnOrder ?? 0;
+            final ob = b.columnOrder ?? 0;
+            if (oa != ob) return oa.compareTo(ob);
+            return a.index.compareTo(b.index);
+          });
+
+          // Place items into rows (capacity = cols).
+          final rows = <List<_GridItem>>[];
+          var currentRow = <_GridItem>[];
+          var cursor = 0;
+
+          for (final item in items) {
+            final colSpan = item.columnSpan;
+            if (cursor + colSpan > cols) {
+              if (currentRow.isNotEmpty) {
+                rows.add(currentRow);
+                currentRow = [];
+              }
+              cursor = 0;
+            }
+            currentRow.add(item);
+            cursor += colSpan;
+          }
+          if (currentRow.isNotEmpty) rows.add(currentRow);
+
+          // Render rows with intrinsic child sizing.
+          final rowWidgets = <Widget>[];
+          for (var r = 0; r < rows.length; r++) {
+            final row = rows[r];
+            final cells = <Widget>[];
+            for (var i = 0; i < row.length; i++) {
+              if (i > 0 && resolvedGap > 0) {
+                cells.add(SizedBox(width: resolvedGap));
+              }
+              cells.add(row[i].child);
+            }
+            rowWidgets.add(
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: cells,
+              ),
+            );
+            if (r < rows.length - 1 && effectiveRowGap > 0) {
+              rowWidgets.add(SizedBox(height: effectiveRowGap));
             }
           }
+
           return Column(
             mainAxisSize: MainAxisSize.min,
-            children: spaced,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: rowWidgets,
           );
         }
 
@@ -119,7 +210,10 @@ class OiGrid extends StatelessWidget {
 
         // Compute column count.
         final resolvedColumns = columns?.resolve(active, resolvedScale);
-        final resolvedMinColumnWidth = minColumnWidth?.resolve(active, resolvedScale);
+        final resolvedMinColumnWidth = minColumnWidth?.resolve(
+          active,
+          resolvedScale,
+        );
 
         int cols;
         if (resolvedColumns != null) {
@@ -159,13 +253,15 @@ class OiGrid extends StatelessWidget {
           if (colSpan == fullSpanSentinel) colSpan = cols;
           colSpan = colSpan.clamp(1, cols);
 
-          items.add(_GridItem(
-            index: i,
-            child: child,
-            columnSpan: colSpan,
-            columnStart: spanData?.resolveColumnStart(active, resolvedScale),
-            columnOrder: spanData?.resolveColumnOrder(active, resolvedScale),
-          ));
+          items.add(
+            _GridItem(
+              index: i,
+              child: child,
+              columnSpan: colSpan,
+              columnStart: spanData?.resolveColumnStart(active, resolvedScale),
+              columnOrder: spanData?.resolveColumnOrder(active, resolvedScale),
+            ),
+          );
         }
 
         // Stable sort by columnOrder (null → 0, matching CSS Grid convention).
@@ -243,7 +339,8 @@ class OiGrid extends StatelessWidget {
             }
             isFirst = false;
 
-            final width = placed.columnSpan * unitWidth +
+            final width =
+                placed.columnSpan * unitWidth +
                 math.max(0, placed.columnSpan - 1) * resolvedGap;
 
             if (placed.isSpacer) {
@@ -253,10 +350,9 @@ class OiGrid extends StatelessWidget {
             }
           }
 
-          rowWidgets.add(Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: cells,
-          ));
+          rowWidgets.add(
+            Row(crossAxisAlignment: CrossAxisAlignment.start, children: cells),
+          );
 
           if (r < rows.length - 1 && effectiveRowGap > 0) {
             rowWidgets.add(SizedBox(height: effectiveRowGap));
