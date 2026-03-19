@@ -114,8 +114,8 @@ enum OiTablePaginationMode {
 /// Supports sorting, filtering, column management, selection, inline editing,
 /// row reordering, grouping, pagination, and settings persistence.
 ///
-/// Provide a typed [rows] list and a set of [columns] describing how each
-/// field should be displayed and interacted with.
+/// **(REQ-0438):** Provide a typed [rows] list and a set of [columns]
+/// describing how each field should be displayed and interacted with.
 ///
 /// **Accessibility (REQ-0014):** [label] is required so every data table has
 /// an accessible description announced by screen readers.

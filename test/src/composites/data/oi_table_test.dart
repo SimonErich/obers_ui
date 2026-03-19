@@ -131,14 +131,14 @@ Widget _table({
 // ── Tests ─────────────────────────────────────────────────────────────────────
 
 void main() {
-  // 1. Renders column headers
+  // 1. Renders column headers (REQ-0438)
   testWidgets('renders column headers', (tester) async {
     await tester.pumpObers(_table());
     expect(find.text('Name'), findsOneWidget);
     expect(find.text('Value'), findsOneWidget);
   });
 
-  // 2. Renders row data
+  // 2. Renders row data (REQ-0438)
   testWidgets('renders row data', (tester) async {
     await tester.pumpObers(_table());
     expect(find.text('Alice'), findsOneWidget);
