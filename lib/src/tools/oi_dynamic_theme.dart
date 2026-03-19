@@ -38,7 +38,6 @@ class OiDynamicTheme {
     return (
       light: OiThemeData.fromBrand(
         color: color,
-        brightness: Brightness.light,
         fontFamily: fontFamily,
         radiusPreference: radiusPreference,
       ),

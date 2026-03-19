@@ -342,7 +342,7 @@ void main() {
 
     testWidgets('golden: md size fold geometry', (tester) async {
       await tester.pumpObers(
-        const OiFileIcon(fileName: 'file.pdf', size: OiFileIconSize.md),
+        const OiFileIcon(fileName: 'file.pdf'),
         surfaceSize: const Size(64, 72),
       );
       await expectLater(
@@ -466,7 +466,7 @@ void main() {
 
     testWidgets('md', (tester) async {
       await tester.pumpObers(
-        const OiFileIcon(fileName: 'song.mp3', size: OiFileIconSize.md),
+        const OiFileIcon(fileName: 'song.mp3'),
       );
       expect(find.text('MP3'), findsOneWidget);
     });

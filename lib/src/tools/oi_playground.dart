@@ -246,12 +246,12 @@ class _OiPlaygroundState extends State<OiPlayground> {
 
   Widget _buildDisplaySamples(BuildContext context) {
     return ListView(
-      children: [
-        const OiCard(child: Text('Sample card')),
-        const SizedBox(height: 12),
-        const OiBadge.filled(label: 'Badge'),
-        const SizedBox(height: 12),
-        const OiProgress.linear(value: 0.6, label: 'Progress'),
+      children: const [
+        OiCard(child: Text('Sample card')),
+        SizedBox(height: 12),
+        OiBadge.filled(label: 'Badge'),
+        SizedBox(height: 12),
+        OiProgress.linear(value: 0.6, label: 'Progress'),
       ],
     );
   }

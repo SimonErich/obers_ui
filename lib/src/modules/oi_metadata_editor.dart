@@ -61,10 +61,7 @@ class OiMetadataField {
 class OiMetadataEditor extends StatefulWidget {
   /// Creates an [OiMetadataEditor].
   const OiMetadataEditor({
-    super.key,
-    required this.fields,
-    required this.onChange,
-    required this.label,
+    required this.fields, required this.onChange, required this.label, super.key,
     this.enabled = true,
     this.allowAdd = true,
     this.allowRemove = true,

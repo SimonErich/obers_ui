@@ -57,9 +57,8 @@ class OiWizardStep {
   /// Creates an [OiWizardStep].
   const OiWizardStep({
     required this.title,
-    this.subtitle,
+    required this.builder, this.subtitle,
     this.icon,
-    required this.builder,
     this.validate,
     this.optional = false,
   });
@@ -96,8 +95,7 @@ class OiWizardStep {
 class OiWizard extends StatefulWidget {
   /// Creates an [OiWizard].
   const OiWizard({
-    super.key,
-    required this.steps,
+    required this.steps, super.key,
     this.onComplete,
     this.onCancel,
     this.onStepChange,

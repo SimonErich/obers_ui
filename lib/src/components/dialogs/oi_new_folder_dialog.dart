@@ -5,7 +5,7 @@ import 'package:obers_ui/src/components/display/oi_folder_icon.dart';
 import 'package:obers_ui/src/components/inputs/oi_text_input.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 
-const _illegalChars = <String>['/', '\\', ':', '*', '?', '"', '<', '>', '|'];
+const _illegalChars = <String>['/', r'\', ':', '*', '?', '"', '<', '>', '|'];
 
 /// A dialog for creating a new folder.
 ///
@@ -112,7 +112,7 @@ class _OiNewFolderDialogState extends State<OiNewFolderDialog> {
               // Header
               Row(
                 children: [
-                  const OiFolderIcon(size: OiFolderIconSize.md),
+                  const OiFolderIcon(),
                   SizedBox(width: spacing.sm),
                   Text(
                     'New Folder',

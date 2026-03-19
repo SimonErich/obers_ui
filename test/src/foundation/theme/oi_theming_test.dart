@@ -1,4 +1,3 @@
-import 'package:flutter/painting.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui/obers_ui.dart';
@@ -40,14 +39,14 @@ void main() {
     test('lerp at t=0 equals a chart', () {
       final a = OiColorScheme.light();
       final b = OiColorScheme.dark();
-      final lerped = OiColorScheme.lerp(a, b, 0.0);
+      final lerped = OiColorScheme.lerp(a, b, 0);
       expect(lerped.chart, equals(a.chart));
     });
 
     test('lerp at t=1 equals b chart', () {
       final a = OiColorScheme.light();
       final b = OiColorScheme.dark();
-      final lerped = OiColorScheme.lerp(a, b, 1.0);
+      final lerped = OiColorScheme.lerp(a, b, 1);
       expect(lerped.chart, equals(b.chart));
     });
   });
@@ -154,7 +153,7 @@ void main() {
       const configB = OiPerformanceConfig.low();
       final a = OiThemeData.light(performanceConfig: configA);
       final b = OiThemeData.light(performanceConfig: configB);
-      final lerped = OiThemeData.lerp(a, b, 0.0);
+      final lerped = OiThemeData.lerp(a, b, 0);
       expect(lerped.performanceConfig, equals(configA));
     });
 
@@ -163,7 +162,7 @@ void main() {
       const configB = OiPerformanceConfig.low();
       final a = OiThemeData.light(performanceConfig: configA);
       final b = OiThemeData.light(performanceConfig: configB);
-      final lerped = OiThemeData.lerp(a, b, 1.0);
+      final lerped = OiThemeData.lerp(a, b, 1);
       expect(lerped.performanceConfig, equals(configB));
     });
 
@@ -272,7 +271,7 @@ void main() {
     testWidgets('updateShouldNotify triggers rebuild on theme change', (
       tester,
     ) async {
-      int buildCount = 0;
+      var buildCount = 0;
 
       Widget build(OiButtonThemeData theme) {
         return OiButtonThemeScope(

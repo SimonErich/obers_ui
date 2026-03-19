@@ -74,11 +74,7 @@ enum OiSelectionMode {
 class OiListView<T> extends StatefulWidget {
   /// Creates an [OiListView].
   const OiListView({
-    super.key,
-    required this.items,
-    required this.itemBuilder,
-    required this.itemKey,
-    required this.label,
+    required this.items, required this.itemBuilder, required this.itemKey, required this.label, super.key,
     this.searchQuery,
     this.onSearch,
     this.filters,
@@ -322,7 +318,6 @@ class _OiListViewState<T> extends State<OiListView<T>>
     final handle = OiSheet.show(
       context,
       label: 'Filters',
-      side: OiPanelSide.bottom,
       dragHandle: true,
       onClose: () => _dismissFilterSheet = null,
       child: Padding(
@@ -579,7 +574,7 @@ class _OiListViewState<T> extends State<OiListView<T>>
         final key = widget.itemKey(item);
         final isSelected = widget.selectedKeys.contains(key);
 
-        Widget child = widget.itemBuilder(item);
+        var child = widget.itemBuilder(item);
 
         if (widget.selectionMode != OiSelectionMode.none) {
           child = OiTappable(

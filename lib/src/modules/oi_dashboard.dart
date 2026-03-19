@@ -62,9 +62,7 @@ class OiDashboardCard {
 class OiDashboard extends StatefulWidget {
   /// Creates an [OiDashboard].
   const OiDashboard({
-    super.key,
-    required this.cards,
-    required this.label,
+    required this.cards, required this.label, super.key,
     this.columns = 4,
     this.gap = 16,
     this.editable = false,

@@ -48,14 +48,14 @@ class OiDialog extends StatelessWidget {
 
   const OiDialog._({
     required this.label,
-    required OiDialogVariant variant,
+    required this.variant,
     this.title,
     this.content,
     this.actions,
     this.onClose,
     this.dismissible = true,
     super.key,
-  }) : variant = variant;
+  });
 
   // ── Named variant constructors ────────────────────────────────────────────
 

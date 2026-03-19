@@ -10,7 +10,7 @@ import '../../helpers/pump_app.dart';
 void main() {
   final now = DateTime.now();
 
-  OiNotification _notif({
+  OiNotification notif({
     Object key = '1',
     String title = 'Test notification',
     String? body,
@@ -33,7 +33,7 @@ void main() {
         width: 400,
         height: 600,
         child: OiNotificationCenter(
-          notifications: [_notif(title: 'Build passed')],
+          notifications: [notif(title: 'Build passed')],
           label: 'Notifications',
         ),
       ),
@@ -47,7 +47,7 @@ void main() {
         width: 400,
         height: 600,
         child: OiNotificationCenter(
-          notifications: [_notif(read: false, title: 'Unread')],
+          notifications: [notif(title: 'Unread')],
           label: 'Notifications',
         ),
       ),
@@ -63,7 +63,7 @@ void main() {
         width: 400,
         height: 600,
         child: OiNotificationCenter(
-          notifications: [_notif(read: true, title: 'Read')],
+          notifications: [notif(read: true, title: 'Read')],
           label: 'Notifications',
         ),
       ),
@@ -75,7 +75,7 @@ void main() {
 
   testWidgets('onNotificationTap fires when tapped', (tester) async {
     OiNotification? tapped;
-    final notification = _notif(title: 'Tappable');
+    final notification = notif(title: 'Tappable');
 
     await tester.pumpObers(
       SizedBox(
@@ -103,7 +103,7 @@ void main() {
         width: 400,
         height: 600,
         child: OiNotificationCenter(
-          notifications: [_notif()],
+          notifications: [notif()],
           label: 'Notifications',
           onMarkAllRead: () => called = true,
         ),
@@ -137,10 +137,9 @@ void main() {
         width: 400,
         height: 600,
         child: OiNotificationCenter(
-          notifications: [_notif()],
+          notifications: [notif()],
           label: 'Notifications',
           unreadCount: 5,
-          showBadge: true,
         ),
       ),
     );
@@ -153,7 +152,7 @@ void main() {
         width: 400,
         height: 600,
         child: OiNotificationCenter(
-          notifications: [_notif()],
+          notifications: [notif()],
           label: 'Notifications',
           unreadCount: 5,
           showBadge: false,
@@ -183,7 +182,7 @@ void main() {
         width: 400,
         height: 600,
         child: OiNotificationCenter(
-          notifications: [_notif(title: 'Title', body: 'Detailed body text')],
+          notifications: [notif(title: 'Title', body: 'Detailed body text')],
           label: 'Notifications',
         ),
       ),

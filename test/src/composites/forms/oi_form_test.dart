@@ -18,12 +18,12 @@ import '../../../helpers/pump_app.dart';
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 List<OiFormSection> _simpleSections() => [
-  OiFormSection(
+  const OiFormSection(
     title: 'Personal Info',
     description: 'Enter your details',
     fields: [
-      const OiFormField(key: 'name', label: 'Name', type: OiFieldType.text),
-      const OiFormField(key: 'age', label: 'Age', type: OiFieldType.number),
+      OiFormField(key: 'name', label: 'Name', type: OiFieldType.text),
+      OiFormField(key: 'age', label: 'Age', type: OiFieldType.number),
     ],
   ),
 ];
@@ -240,9 +240,9 @@ void main() {
       await tester.pumpObers(
         _form(
           sections: [
-            OiFormSection(
+            const OiFormSection(
               fields: [
-                const OiFormField(
+                OiFormField(
                   key: 'email',
                   label: 'Email',
                   type: OiFieldType.text,
@@ -318,9 +318,9 @@ void main() {
       await tester.pumpObers(
         _form(
           sections: [
-            OiFormSection(
+            const OiFormSection(
               fields: [
-                const OiFormField(
+                OiFormField(
                   key: 'agree',
                   label: 'I agree',
                   type: OiFieldType.checkbox,
@@ -341,9 +341,9 @@ void main() {
       await tester.pumpObers(
         _form(
           sections: [
-            OiFormSection(
+            const OiFormSection(
               fields: [
-                const OiFormField(
+                OiFormField(
                   key: 'notifications',
                   label: 'Notifications',
                   type: OiFieldType.switchField,
@@ -402,9 +402,9 @@ void main() {
       await tester.pumpObers(
         _form(
           sections: [
-            OiFormSection(
+            const OiFormSection(
               fields: [
-                const OiFormField(
+                OiFormField(
                   key: 'dob',
                   label: 'Date of Birth',
                   type: OiFieldType.date,
@@ -425,9 +425,9 @@ void main() {
       await tester.pumpObers(
         _form(
           sections: [
-            OiFormSection(
+            const OiFormSection(
               fields: [
-                const OiFormField(
+                OiFormField(
                   key: 'alarm',
                   label: 'Alarm Time',
                   type: OiFieldType.time,
@@ -448,7 +448,7 @@ void main() {
       await tester.pumpObers(
         _form(
           sections: [
-            OiFormSection(
+            const OiFormSection(
               fields: [
                 OiFormField(
                   key: 'size',
@@ -456,8 +456,8 @@ void main() {
                   type: OiFieldType.radio,
                   config: {
                     'options': [
-                      const OiRadioOption<dynamic>(value: 's', label: 'Small'),
-                      const OiRadioOption<dynamic>(value: 'l', label: 'Large'),
+                      OiRadioOption<dynamic>(value: 's', label: 'Small'),
+                      OiRadioOption<dynamic>(value: 'l', label: 'Large'),
                     ],
                   },
                 ),
@@ -477,9 +477,9 @@ void main() {
       await tester.pumpObers(
         _form(
           sections: [
-            OiFormSection(
+            const OiFormSection(
               fields: [
-                const OiFormField(
+                OiFormField(
                   key: 'volume',
                   label: 'Volume',
                   type: OiFieldType.slider,
@@ -501,9 +501,9 @@ void main() {
       await tester.pumpObers(
         _form(
           sections: [
-            OiFormSection(
+            const OiFormSection(
               fields: [
-                const OiFormField(
+                OiFormField(
                   key: 'bg',
                   label: 'Background Color',
                   type: OiFieldType.color,
@@ -524,9 +524,9 @@ void main() {
       await tester.pumpObers(
         _form(
           sections: [
-            OiFormSection(
+            const OiFormSection(
               fields: [
-                const OiFormField(
+                OiFormField(
                   key: 'attachment',
                   label: 'Attachment',
                   type: OiFieldType.file,
@@ -547,9 +547,9 @@ void main() {
       await tester.pumpObers(
         _form(
           sections: [
-            OiFormSection(
+            const OiFormSection(
               fields: [
-                const OiFormField(
+                OiFormField(
                   key: 'tags',
                   label: 'Tags',
                   type: OiFieldType.tag,
@@ -573,9 +573,9 @@ void main() {
       await tester.pumpObers(
         _form(
           sections: [
-            OiFormSection(
+            const OiFormSection(
               fields: [
-                const OiFormField(
+                OiFormField(
                   key: 'tags',
                   label: 'Tags',
                   type: OiFieldType.tag,
@@ -603,7 +603,7 @@ void main() {
       await tester.pumpObers(
         _form(
           sections: [
-            OiFormSection(
+            const OiFormSection(
               fields: [
                 OiFormField(
                   key: 'country',
@@ -611,8 +611,8 @@ void main() {
                   type: OiFieldType.select,
                   config: {
                     'options': [
-                      const OiSelectOption<dynamic>(value: 'us', label: 'US'),
-                      const OiSelectOption<dynamic>(value: 'de', label: 'DE'),
+                      OiSelectOption<dynamic>(value: 'us', label: 'US'),
+                      OiSelectOption<dynamic>(value: 'de', label: 'DE'),
                     ],
                   },
                 ),

@@ -57,12 +57,7 @@ class OiRole {
 class OiPermissions extends StatelessWidget {
   /// Creates an [OiPermissions].
   const OiPermissions({
-    super.key,
-    required this.permissions,
-    required this.roles,
-    required this.matrix,
-    required this.onChange,
-    required this.label,
+    required this.permissions, required this.roles, required this.matrix, required this.onChange, required this.label, super.key,
     this.enabled = true,
   });
 
@@ -219,7 +214,7 @@ class OiPermissions extends StatelessWidget {
                   ),
                   if (permission.description != null)
                     Padding(
-                      padding: EdgeInsets.only(top: 2),
+                      padding: const EdgeInsets.only(top: 2),
                       child: Text(
                         permission.description!,
                         style: TextStyle(color: colors.textMuted, fontSize: 11),

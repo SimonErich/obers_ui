@@ -1,7 +1,6 @@
 // Tests for OiEffectsTheme — no public API docs needed in test files.
 // ignore_for_file: public_member_api_docs
 
-import 'package:flutter/painting.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui/src/foundation/theme/oi_effects_theme.dart';
@@ -68,7 +67,7 @@ void main() {
     });
 
     test('enforced clamps zero-alpha color to 0.5', () {
-      const ring = OiFocusRingStyle(color: Color(0x00FF0000), width: 2.0);
+      const ring = OiFocusRingStyle(color: Color(0x00FF0000));
       expect(ring.enforced.color.a, greaterThanOrEqualTo(0.5));
     });
 
@@ -78,28 +77,28 @@ void main() {
     });
 
     test('enforced preserves already-valid values', () {
-      const ring = OiFocusRingStyle(color: Color(0xCCFF0000), width: 3.0);
+      const ring = OiFocusRingStyle(color: Color(0xCCFF0000), width: 3);
       final enforced = ring.enforced;
       expect(enforced.color.a, closeTo(ring.color.a, 0.01));
       expect(enforced.width, equals(3.0));
     });
 
     test('copyWith overrides only specified fields', () {
-      const ring = OiFocusRingStyle(color: Color(0xFFFF0000), width: 2.0);
-      final copy = ring.copyWith(width: 4.0);
+      const ring = OiFocusRingStyle(color: Color(0xFFFF0000));
+      final copy = ring.copyWith(width: 4);
       expect(copy.width, equals(4.0));
       expect(copy.color, equals(ring.color));
     });
 
     test('hashCode is consistent for equal values', () {
-      const a = OiFocusRingStyle(color: Color(0xFF2563EB), width: 2.0);
-      const b = OiFocusRingStyle(color: Color(0xFF2563EB), width: 2.0);
+      const a = OiFocusRingStyle(color: Color(0xFF2563EB));
+      const b = OiFocusRingStyle(color: Color(0xFF2563EB));
       expect(a.hashCode, equals(b.hashCode));
     });
 
     test('equality holds for identical values', () {
-      const a = OiFocusRingStyle(color: Color(0xFF2563EB), width: 2.0);
-      const b = OiFocusRingStyle(color: Color(0xFF2563EB), width: 2.0);
+      const a = OiFocusRingStyle(color: Color(0xFF2563EB));
+      const b = OiFocusRingStyle(color: Color(0xFF2563EB));
       expect(a, equals(b));
     });
   });
@@ -111,7 +110,7 @@ void main() {
         halo: OiHaloStyle.none,
         scale: 0.97,
       );
-      final copy = original.copyWith(scale: 1.0);
+      final copy = original.copyWith(scale: 1);
       expect(copy.scale, equals(1.0));
       expect(copy.backgroundOverlay, equals(original.backgroundOverlay));
       expect(copy.halo, equals(original.halo));
@@ -186,7 +185,6 @@ void main() {
         const thisStyle = OiInteractiveStyle(
           backgroundOverlay: Color(0x0A000000),
           halo: OiHaloStyle.none,
-          scale: 1.0,
         );
         const baseStyle = OiInteractiveStyle(
           backgroundOverlay: Color(0x1A000000),
@@ -223,7 +221,7 @@ void main() {
           backgroundOverride: Color(0xFFAAAAAA),
           opacity: 0.5,
           translate: Offset(2, 2),
-          elevationDelta: 4.0,
+          elevationDelta: 4,
           cursor: SystemMouseCursors.click,
         );
         final merged = thisStyle.merge(baseStyle);

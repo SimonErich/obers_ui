@@ -144,7 +144,7 @@ void main() {
     });
 
     test('instances with different fields are not equal', () {
-      const a = OiSidebarSettings(width: 260);
+      const a = OiSidebarSettings();
       const b = OiSidebarSettings(width: 300);
       expect(a, isNot(equals(b)));
     });

@@ -11,7 +11,7 @@ import '../../helpers/pump_app.dart';
 void main() {
   final now = DateTime(2025, 1, 15, 10, 30);
 
-  OiComment _comment({
+  OiComment comment({
     Object key = '1',
     String authorId = 'a1',
     String authorName = 'Alice',
@@ -36,7 +36,7 @@ void main() {
         width: 400,
         height: 600,
         child: OiComments(
-          comments: [_comment(content: 'Nice work!')],
+          comments: [comment(content: 'Nice work!')],
           currentUserId: 'me',
           label: 'Comments',
         ),
@@ -46,10 +46,10 @@ void main() {
   });
 
   testWidgets('replies are indented', (tester) async {
-    final parent = _comment(
+    final parent = comment(
       key: 'p1',
       content: 'Parent',
-      replies: [_comment(key: 'r1', content: 'Reply')],
+      replies: [comment(key: 'r1', content: 'Reply')],
     );
 
     await tester.pumpObers(
@@ -91,10 +91,9 @@ void main() {
         width: 400,
         height: 600,
         child: OiComments(
-          comments: [_comment(authorName: 'Dave')],
+          comments: [comment(authorName: 'Dave')],
           currentUserId: 'me',
           label: 'Comments',
-          showAvatars: true,
         ),
       ),
     );
@@ -108,25 +107,24 @@ void main() {
         width: 400,
         height: 600,
         child: OiComments(
-          comments: [_comment()],
+          comments: [comment()],
           currentUserId: 'me',
           label: 'Comments',
-          showTimestamps: true,
         ),
       ),
     );
     // The timestamp text is relative (e.g. "Xd ago"), so just confirm
     // a text with 'ago' exists or 'Just now'
-    expect(find.textContaining(RegExp(r'ago|Just now')), findsOneWidget);
+    expect(find.textContaining(RegExp('ago|Just now')), findsOneWidget);
   });
 
   testWidgets('comment input is visible', (tester) async {
     await tester.pumpObers(
-      SizedBox(
+      const SizedBox(
         width: 400,
         height: 600,
         child: OiComments(
-          comments: const [],
+          comments: [],
           currentUserId: 'me',
           label: 'Comments',
         ),
@@ -138,18 +136,18 @@ void main() {
 
   testWidgets('nested replies respect maxDepth', (tester) async {
     // Create deeply nested: depth 0 -> depth 1 -> depth 2
-    final deepComment = _comment(
+    final deepComment = comment(
       key: 'c0',
       content: 'Level 0',
       replies: [
-        _comment(
+        comment(
           key: 'c1',
           content: 'Level 1',
           replies: [
-            _comment(
+            comment(
               key: 'c2',
               content: 'Level 2',
-              replies: [_comment(key: 'c3', content: 'Level 3')],
+              replies: [comment(key: 'c3', content: 'Level 3')],
             ),
           ],
         ),
@@ -179,11 +177,11 @@ void main() {
 
   testWidgets('empty comments show OiEmptyState with default title and description', (tester) async {
     await tester.pumpObers(
-      SizedBox(
+      const SizedBox(
         width: 400,
         height: 600,
         child: OiComments(
-          comments: const [],
+          comments: [],
           currentUserId: 'me',
           label: 'Comments',
         ),
@@ -196,11 +194,11 @@ void main() {
 
   testWidgets('empty comments show OiEmptyState with custom emptyTitle and emptyDescription', (tester) async {
     await tester.pumpObers(
-      SizedBox(
+      const SizedBox(
         width: 400,
         height: 600,
         child: OiComments(
-          comments: const [],
+          comments: [],
           currentUserId: 'me',
           label: 'Comments',
           emptyTitle: 'Nothing here',
@@ -215,11 +213,11 @@ void main() {
 
   testWidgets('has semantics label', (tester) async {
     await tester.pumpObers(
-      SizedBox(
+      const SizedBox(
         width: 400,
         height: 600,
         child: OiComments(
-          comments: const [],
+          comments: [],
           currentUserId: 'me',
           label: 'Post Comments',
         ),
@@ -234,7 +232,7 @@ void main() {
         width: 400,
         height: 600,
         child: OiComments(
-          comments: [_comment(edited: true)],
+          comments: [comment(edited: true)],
           currentUserId: 'me',
           label: 'Comments',
         ),

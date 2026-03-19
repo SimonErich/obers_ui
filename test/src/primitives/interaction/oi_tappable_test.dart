@@ -211,9 +211,9 @@ void main() {
     'TC-touch-compact: compact density suppresses 48dp touch-target floor on Android',
     (tester) async {
       await tester.pumpWidget(
-        OiApp(
+        const OiApp(
           density: OiDensity.compact,
-          home: const Center(
+          home: Center(
             child: OiTappable(child: SizedBox(width: 24, height: 24)),
           ),
         ),
@@ -448,7 +448,6 @@ void main() {
     () {
       const ring = OiFocusRingStyle(
         color: Color(0x00FF0000), // alpha = 0
-        width: 2.0,
       );
       final enforced = ring.enforced;
       expect(enforced.color.a, greaterThanOrEqualTo(0.5));

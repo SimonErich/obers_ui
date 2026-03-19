@@ -314,9 +314,7 @@ class _OiFileListViewState extends State<OiFileListView> {
         focusNode: _focusNode,
         onKeyEvent: _handleKeyEvent,
         child: OiSelectionOverlay(
-          onSelectionRect: (rect) {
-            _handleRubberBandSelection(rect);
-          },
+          onSelectionRect: _handleRubberBandSelection,
           onSelectionStart: () {},
           onSelectionEnd: () {},
           child: OiContextMenu(

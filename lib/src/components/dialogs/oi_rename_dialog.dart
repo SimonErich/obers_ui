@@ -7,7 +7,7 @@ import 'package:obers_ui/src/components/inputs/oi_text_input.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/models/oi_file_node_data.dart';
 
-const _illegalChars = <String>['/', '\\', ':', '*', '?', '"', '<', '>', '|'];
+const _illegalChars = <String>['/', r'\', ':', '*', '?', '"', '<', '>', '|'];
 
 /// A dialog for renaming a file or folder.
 ///
@@ -133,7 +133,7 @@ class _OiRenameDialogState extends State<OiRenameDialog> {
               Row(
                 children: [
                   if (widget.file.isFolder)
-                    const OiFolderIcon(size: OiFolderIconSize.md)
+                    const OiFolderIcon()
                   else
                     OiFileIcon(
                       fileName: widget.file.name,

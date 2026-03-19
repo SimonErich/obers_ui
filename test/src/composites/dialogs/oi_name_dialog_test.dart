@@ -369,7 +369,7 @@ void main() {
       expect(find.text('Custom error'), findsNothing);
     });
 
-    for (final ch in [r'/', r'\', '<', '>', ':', '"', '|', '?', '*']) {
+    for (final ch in ['/', r'\', '<', '>', ':', '"', '|', '?', '*']) {
       testWidgets('rejects illegal character: $ch', (tester) async {
         await tester.pumpObers(
           OiNameDialog(title: 'Create', defaultName: 'good', onCreate: (_) {}),

@@ -38,7 +38,7 @@ class OiProgress extends StatefulWidget {
   // ── Private base constructor ──────────────────────────────────────────────
 
   const OiProgress._({
-    required OiProgressStyle style,
+    required this.style,
     this.value = 0,
     this.steps,
     this.currentStep,
@@ -48,7 +48,7 @@ class OiProgress extends StatefulWidget {
     this.strokeWidth = 4,
     this.size,
     super.key,
-  }) : style = style;
+  });
 
   // ── Named variant constructors ────────────────────────────────────────────
 

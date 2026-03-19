@@ -272,22 +272,39 @@ class OiThemePreview extends StatelessWidget {
         spacing: theme.spacing.md,
         runSpacing: theme.spacing.md,
         children: [
-          for (final variant in [
-            OiCardVariant.elevated,
-            OiCardVariant.flat,
-            OiCardVariant.outlined,
+          for (final entry in const [
+            ('elevated', false, false),
+            ('flat', true, false),
+            ('outlined', false, true),
           ])
             SizedBox(
               width: 180,
-              child: OiCard(
-                variant: variant,
-                child: Text(
-                  variant.name,
-                  style: theme.textTheme.body.copyWith(
-                    color: theme.colors.text,
-                  ),
-                ),
-              ),
+              child: entry.$2
+                  ? OiCard.flat(
+                      child: Text(
+                        entry.$1,
+                        style: theme.textTheme.body.copyWith(
+                          color: theme.colors.text,
+                        ),
+                      ),
+                    )
+                  : entry.$3
+                      ? OiCard.outlined(
+                          child: Text(
+                            entry.$1,
+                            style: theme.textTheme.body.copyWith(
+                              color: theme.colors.text,
+                            ),
+                          ),
+                        )
+                      : OiCard(
+                          child: Text(
+                            entry.$1,
+                            style: theme.textTheme.body.copyWith(
+                              color: theme.colors.text,
+                            ),
+                          ),
+                        ),
             ),
         ],
       ),

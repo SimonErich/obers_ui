@@ -79,9 +79,7 @@ enum OiFileManagerSelectionMode {
 class OiFileManager extends StatefulWidget {
   /// Creates an [OiFileManager].
   const OiFileManager({
-    super.key,
-    required this.items,
-    required this.label,
+    required this.items, required this.label, super.key,
     this.onOpen,
     this.onRename,
     this.onDelete,

@@ -121,7 +121,7 @@ class _OiSelectionOverlayState extends State<OiSelectionOverlay> {
                 child: Container(
                   decoration: BoxDecoration(
                     color: fillColor,
-                    border: Border.all(color: stroke, width: 1),
+                    border: Border.all(color: stroke),
                   ),
                 ),
               ),

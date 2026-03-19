@@ -8,20 +8,20 @@ import 'package:obers_ui/src/composites/scheduling/oi_scheduler.dart';
 import '../../../helpers/pump_app.dart';
 
 void main() {
-  final baseDate = DateTime(2025, 6, 10, 0, 0); // Tuesday
+  final baseDate = DateTime(2025, 6, 10); // Tuesday
 
   List<OiScheduleSlot> sampleSlots() => [
     OiScheduleSlot(
       key: 'slot1',
       title: 'Standup',
-      start: DateTime(2025, 6, 10, 9, 0),
-      end: DateTime(2025, 6, 10, 10, 0),
+      start: DateTime(2025, 6, 10, 9),
+      end: DateTime(2025, 6, 10, 10),
     ),
     OiScheduleSlot(
       key: 'slot2',
       title: 'Lunch',
-      start: DateTime(2025, 6, 10, 12, 0),
-      end: DateTime(2025, 6, 10, 13, 0),
+      start: DateTime(2025, 6, 10, 12),
+      end: DateTime(2025, 6, 10, 13),
     ),
   ];
 
@@ -35,7 +35,6 @@ void main() {
             slots: sampleSlots(),
             label: 'Test scheduler',
             date: baseDate,
-            mode: OiSchedulerMode.day,
           ),
         ),
       );
@@ -78,7 +77,6 @@ void main() {
             slots: sampleSlots(),
             label: 'Test scheduler',
             date: baseDate,
-            mode: OiSchedulerMode.day,
           ),
         ),
       );
@@ -95,7 +93,6 @@ void main() {
             slots: const [],
             label: 'Test scheduler',
             date: baseDate,
-            mode: OiSchedulerMode.day,
           ),
         ),
       );
@@ -117,7 +114,6 @@ void main() {
             slots: const [],
             label: 'Test scheduler',
             date: baseDate,
-            mode: OiSchedulerMode.day,
           ),
         ),
       );
@@ -137,7 +133,6 @@ void main() {
             slots: const [],
             label: 'Test scheduler',
             date: baseDate,
-            mode: OiSchedulerMode.day,
           ),
         ),
       );
@@ -161,7 +156,6 @@ void main() {
             slots: sampleSlots(),
             label: 'Test scheduler',
             date: baseDate,
-            mode: OiSchedulerMode.day,
             onSlotTap: (slot) => tappedSlot = slot,
           ),
         ),
@@ -186,9 +180,6 @@ void main() {
             slots: const [],
             label: 'Test scheduler',
             date: baseDate,
-            mode: OiSchedulerMode.day,
-            startHour: 8,
-            endHour: 18,
             onTimeSlotTap: (dt) => tappedTime = dt,
           ),
         ),
@@ -211,7 +202,6 @@ void main() {
             slots: const [],
             label: 'Test scheduler',
             date: baseDate,
-            mode: OiSchedulerMode.day,
             startHour: 10,
             endHour: 14,
           ),
@@ -250,8 +240,8 @@ void main() {
         OiScheduleSlot(
           key: 'colored',
           title: 'Colored slot',
-          start: DateTime(2025, 6, 10, 9, 0),
-          end: DateTime(2025, 6, 10, 10, 0),
+          start: DateTime(2025, 6, 10, 9),
+          end: DateTime(2025, 6, 10, 10),
           color: const Color(0xFFFF0000),
         ),
       ];
@@ -264,7 +254,6 @@ void main() {
             slots: slots,
             label: 'Test scheduler',
             date: baseDate,
-            mode: OiSchedulerMode.day,
           ),
         ),
       );

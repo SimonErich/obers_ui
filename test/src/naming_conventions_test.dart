@@ -18,10 +18,9 @@ List<File> _dartFiles(Directory dir) {
 /// [source] so that naming-convention checks do not flag commented-out code.
 String _stripComments(String source) {
   // Remove multi-line comments (non-greedy).
-  var result = source.replaceAll(RegExp(r'/\*.*?\*/', dotAll: true), '');
+  final result = source.replaceAll(RegExp(r'/\*.*?\*/', dotAll: true), '');
   // Remove single-line comments.
-  result = result.replaceAll(RegExp(r'//[^\n]*'), '');
-  return result;
+  return result.replaceAll(RegExp(r'//[^\n]*'), '');
 }
 
 /// Maps file basenames to imperative callback names that are exempted from the
@@ -141,7 +140,7 @@ void main() {
         for (final m in matches) {
           final className = m.group(1)!;
           final suffix = className.substring(2); // after "Oi"
-          if (suffix.length < 2 || !RegExp(r'^[A-Z]').hasMatch(suffix)) {
+          if (suffix.length < 2 || !RegExp('^[A-Z]').hasMatch(suffix)) {
             final line = content.substring(0, m.start).split('\n').length;
             violations.add(
               '${file.path}:$line — $className '
@@ -179,7 +178,7 @@ void main() {
         String toSnake(String className) {
           return className
               .replaceAllMapped(
-                RegExp(r'[A-Z]'),
+                RegExp('[A-Z]'),
                 (m) => '_${m.group(0)!.toLowerCase()}',
               )
               .substring(1); // remove leading underscore
@@ -606,7 +605,7 @@ void main() {
     test('all constructor params across all widgets meet readability standards',
         () {
       final ctorParamPattern = RegExp(r'\bthis\.([a-zA-Z]\w*)\b');
-      final singleCharPrefixPattern = RegExp(r'^[a-z][A-Z]');
+      final singleCharPrefixPattern = RegExp('^[a-z][A-Z]');
       final widgetClassPattern = RegExp(
         r'class\s+\w+\s+extends\s+State(?:ful|less)Widget',
       );

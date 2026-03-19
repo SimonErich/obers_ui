@@ -1189,10 +1189,10 @@ void main() {
         OiGrid(
           breakpoint: OiBreakpoint.compact,
           columns: 3.responsive,
-          children: [
-            const Text('First'), // order 0, index 0
-            const Text('Second'), // order 0, index 1
-            const Text('Third'), // order 0, index 2
+          children: const [
+            Text('First'), // order 0, index 0
+            Text('Second'), // order 0, index 1
+            Text('Third'), // order 0, index 2
           ],
         ),
         surfaceSize: const Size(900, 600),
@@ -1860,13 +1860,13 @@ void main() {
     ) async {
       // 800px container, minColumnWidth 250 → 3 columns (800/250 = 3.2).
       await tester.pumpObers(
-        Align(
+        const Align(
           alignment: Alignment.topLeft,
           child: SizedBox(
             width: 800,
             child: OiGrid.containerRelative(
-              minColumnWidth: const OiResponsive<double>(250),
-              children: const [
+              minColumnWidth: OiResponsive<double>(250),
+              children: [
                 SizedBox(height: 40, child: Text('A')),
                 SizedBox(height: 40, child: Text('B')),
                 SizedBox(height: 40, child: Text('C')),
@@ -2314,7 +2314,7 @@ void main() {
           surfaceSize: const Size(800, 600),
         );
         var rectA = tester.getRect(find.text('A'));
-        var rectC = tester.getRect(find.text('C'));
+        final rectC = tester.getRect(find.text('C'));
         // 2 cols: A on row 0, C on row 1.
         expect(rectA.width, closeTo(400, 1));
         expect(rectC.top, greaterThan(rectA.bottom - 1));

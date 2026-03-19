@@ -11,10 +11,10 @@ import '../../../helpers/pump_app.dart';
 void main() {
   testWidgets('renders child', (tester) async {
     await tester.pumpObers(
-      OiAspectRatio(
+      const OiAspectRatio(
         breakpoint: OiBreakpoint.compact,
-        ratio: const OiResponsive<double>(16 / 9),
-        child: const ColoredBox(color: Color(0xFF000000)),
+        ratio: OiResponsive<double>(16 / 9),
+        child: ColoredBox(color: Color(0xFF000000)),
       ),
     );
     expect(find.byType(AspectRatio), findsOneWidget);
@@ -23,10 +23,10 @@ void main() {
 
   testWidgets('passes ratio to AspectRatio', (tester) async {
     await tester.pumpObers(
-      OiAspectRatio(
+      const OiAspectRatio(
         breakpoint: OiBreakpoint.compact,
-        ratio: const OiResponsive<double>(4 / 3),
-        child: const ColoredBox(color: Color(0xFF000000)),
+        ratio: OiResponsive<double>(4 / 3),
+        child: ColoredBox(color: Color(0xFF000000)),
       ),
     );
     final ar = tester.widget<AspectRatio>(find.byType(AspectRatio));
@@ -35,10 +35,10 @@ void main() {
 
   testWidgets('1:1 ratio passes through correctly', (tester) async {
     await tester.pumpObers(
-      OiAspectRatio(
+      const OiAspectRatio(
         breakpoint: OiBreakpoint.compact,
-        ratio: const OiResponsive<double>(1),
-        child: const ColoredBox(color: Color(0xFF000000)),
+        ratio: OiResponsive<double>(1),
+        child: ColoredBox(color: Color(0xFF000000)),
       ),
     );
     final ar = tester.widget<AspectRatio>(find.byType(AspectRatio));

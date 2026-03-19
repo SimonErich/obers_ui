@@ -253,7 +253,7 @@ class _FolderIconPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final w = size.width;
     final h = size.height;
-    final r = 2.0;
+    const r = 2.0;
 
     final fillPaint = Paint()
       ..color = state == OiFolderIconState.empty
@@ -274,30 +274,30 @@ class _FolderIconPainter extends CustomPainter {
     // Tab on top-left
     final tabPath = Path()
       ..moveTo(0, tabHeight + r)
-      ..arcToPoint(Offset(r, tabHeight), radius: Radius.circular(r))
+      ..arcToPoint(Offset(r, tabHeight), radius: const Radius.circular(r))
       ..lineTo(tabWidth - r, tabHeight)
       ..lineTo(tabWidth + 2, tabHeight + tabHeight * 0.5)
       ..lineTo(w - r, tabHeight + tabHeight * 0.5)
       ..arcToPoint(
         Offset(w, tabHeight + tabHeight * 0.5 + r),
-        radius: Radius.circular(r),
+        radius: const Radius.circular(r),
       )
       ..lineTo(w, h - r)
-      ..arcToPoint(Offset(w - r, h), radius: Radius.circular(r))
+      ..arcToPoint(Offset(w - r, h), radius: const Radius.circular(r))
       ..lineTo(r, h)
-      ..arcToPoint(Offset(0, h - r), radius: Radius.circular(r))
+      ..arcToPoint(Offset(0, h - r), radius: const Radius.circular(r))
       ..close();
 
     // Tab top
     final tabTopPath = Path()
       ..moveTo(0, tabHeight + r)
-      ..arcToPoint(Offset(r, tabHeight), radius: Radius.circular(r))
+      ..arcToPoint(Offset(r, tabHeight), radius: const Radius.circular(r))
       ..lineTo(r, r)
-      ..arcToPoint(Offset(r + r, 0), radius: Radius.circular(r))
+      ..arcToPoint(const Offset(r + r, 0), radius: const Radius.circular(r))
       ..lineTo(tabWidth - r, 0)
       ..arcToPoint(
         Offset(tabWidth, r),
-        radius: Radius.circular(r),
+        radius: const Radius.circular(r),
       )
       ..lineTo(tabWidth, tabHeight)
       ..close();
@@ -313,9 +313,9 @@ class _FolderIconPainter extends CustomPainter {
         ..moveTo(0, tabHeight + tabHeight * 0.5 + openOffset)
         ..lineTo(w, tabHeight + tabHeight * 0.5)
         ..lineTo(w, h - r)
-        ..arcToPoint(Offset(w - r, h), radius: Radius.circular(r))
+        ..arcToPoint(Offset(w - r, h), radius: const Radius.circular(r))
         ..lineTo(r, h)
-        ..arcToPoint(Offset(0, h - r), radius: Radius.circular(r))
+        ..arcToPoint(Offset(0, h - r), radius: const Radius.circular(r))
         ..close();
 
       canvas.drawPath(openPath, fillPaint);

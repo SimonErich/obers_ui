@@ -110,6 +110,32 @@ class OiBreakpointScale with Iterable<OiBreakpoint> {
     return OiBreakpointScale._(sorted, pageGutters, contentMaxWidths);
   }
 
+  /// The default 5-tier scale matching Material 3 guidelines.
+  factory OiBreakpointScale.standard() {
+    return defaultScale;
+  }
+
+  /// Extended scale — adds `tablet` (480) and `ultraWide` (1920).
+  factory OiBreakpointScale.extended() {
+    return const OiBreakpointScale._(
+      [
+        OiBreakpoint.compact,
+        OiBreakpoint('tablet', 480),
+        OiBreakpoint.medium,
+        OiBreakpoint.expanded,
+        OiBreakpoint.large,
+        OiBreakpoint.extraLarge,
+        OiBreakpoint('ultraWide', 1920),
+      ],
+      {..._standardPageGutters, 'tablet': 16, 'ultraWide': 56},
+      {
+        ..._standardContentMaxWidths,
+        'tablet': double.infinity,
+        'ultraWide': 1600,
+      },
+    );
+  }
+
   const OiBreakpointScale._(
     this.values,
     this.pageGutters,
@@ -125,32 +151,6 @@ class OiBreakpointScale with Iterable<OiBreakpoint> {
     _standardPageGutters,
     _standardContentMaxWidths,
   );
-
-  /// The default 5-tier scale matching Material 3 guidelines.
-  factory OiBreakpointScale.standard() {
-    return defaultScale;
-  }
-
-  /// Extended scale — adds `tablet` (480) and `ultraWide` (1920).
-  factory OiBreakpointScale.extended() {
-    return OiBreakpointScale._(
-      [
-        OiBreakpoint.compact,
-        const OiBreakpoint('tablet', 480),
-        OiBreakpoint.medium,
-        OiBreakpoint.expanded,
-        OiBreakpoint.large,
-        OiBreakpoint.extraLarge,
-        const OiBreakpoint('ultraWide', 1920),
-      ],
-      {..._standardPageGutters, 'tablet': 16, 'ultraWide': 56},
-      {
-        ..._standardContentMaxWidths,
-        'tablet': double.infinity,
-        'ultraWide': 1600,
-      },
-    );
-  }
 
   // Default page gutter values for the standard 5-tier scale.
   static const Map<String, double> _standardPageGutters = {

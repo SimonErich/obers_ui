@@ -1,7 +1,6 @@
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/buttons/oi_button.dart';
-import 'package:obers_ui/src/foundation/oi_app.dart';
 import 'package:obers_ui/src/foundation/oi_responsive.dart';
 import 'package:obers_ui/src/foundation/theme/oi_decoration_theme.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
@@ -399,7 +398,7 @@ class _OiButtonGroupState extends State<OiButtonGroup> {
       return Semantics(selected: isSelected, child: button);
     } else {
       // Non-exclusive mode: each item fires its own onTap.
-      button = OiButton.ghost(
+      return OiButton.ghost(
         label: item.label,
         icon: item.icon,
         size: widget.size,
@@ -408,7 +407,6 @@ class _OiButtonGroupState extends State<OiButtonGroup> {
         semanticLabel: item.semanticLabel,
         borderRadius: borderRadius,
       );
-      return button;
     }
   }
 }

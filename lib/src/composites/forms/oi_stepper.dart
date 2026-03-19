@@ -27,9 +27,7 @@ enum OiStepperStyle {
 class OiStepper extends StatelessWidget {
   /// Creates an [OiStepper].
   const OiStepper({
-    super.key,
-    required this.totalSteps,
-    required this.currentStep,
+    required this.totalSteps, required this.currentStep, super.key,
     this.stepLabels,
     this.stepIcons,
     this.style = OiStepperStyle.horizontal,
@@ -227,7 +225,6 @@ class OiStepper extends StatelessWidget {
 
     return Row(
       mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.center,
       children: children,
     );
   }

@@ -262,9 +262,7 @@ class _OiFileGridViewState extends State<OiFileGridView> {
         focusNode: _focusNode,
         onKeyEvent: _handleKeyEvent,
         child: OiSelectionOverlay(
-          onSelectionRect: (rect) {
-            _handleRubberBandSelection(rect);
-          },
+          onSelectionRect: _handleRubberBandSelection,
           onSelectionStart: () {},
           onSelectionEnd: () {},
           child: OiContextMenu(

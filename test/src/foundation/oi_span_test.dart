@@ -141,11 +141,11 @@ void main() {
   group('OiSpan', () {
     testWidgets('renders its child', (tester) async {
       await tester.pumpWidget(
-        Directionality(
+        const Directionality(
           textDirection: TextDirection.ltr,
           child: OiSpan(
-            data: const OiSpanData(columnSpan: OiResponsive<int>(2)),
-            child: const Text('hello'),
+            data: OiSpanData(columnSpan: OiResponsive<int>(2)),
+            child: Text('hello'),
           ),
         ),
       );

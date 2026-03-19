@@ -714,7 +714,6 @@ void main() {
       await tester.pumpObers(
         const OiMasonry(
           breakpoint: OiBreakpoint.compact,
-          columns: OiResponsive<int>(2),
           children: [Text('X'), Text('Y')],
         ),
       );

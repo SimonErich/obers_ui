@@ -55,9 +55,7 @@ class OiKanbanColumn<T> {
 class OiKanban<T> extends StatefulWidget {
   /// Creates an [OiKanban].
   const OiKanban({
-    super.key,
-    required this.columns,
-    required this.label,
+    required this.columns, required this.label, super.key,
     this.onCardMove,
     this.onColumnReorder,
     this.cardBuilder,
@@ -415,7 +413,6 @@ class _OiKanbanState<T> extends State<OiKanban<T>>
         cursorColor: colors.primary.base,
         backgroundCursorColor: colors.surfaceHover,
         onSubmitted: (_) => _commitEdit(),
-        maxLines: 1,
       );
     } else {
       titleWidget = Text(

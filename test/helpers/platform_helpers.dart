@@ -20,7 +20,7 @@ Future<void> pumpTouchApp(
       child: Directionality(
         textDirection: TextDirection.ltr,
         child: OiPlatform(
-          data: OiPlatformData(
+          data: const OiPlatformData(
             platform: TargetPlatform.android,
             keyboardHeight: 0,
             keyboardVisible: false,
@@ -48,7 +48,7 @@ Future<void> pumpPointerApp(
       child: Directionality(
         textDirection: TextDirection.ltr,
         child: OiPlatform(
-          data: OiPlatformData(
+          data: const OiPlatformData(
             platform: TargetPlatform.linux,
             keyboardHeight: 0,
             keyboardVisible: false,

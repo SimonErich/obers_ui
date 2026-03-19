@@ -78,7 +78,7 @@ void main() {
   });
 
   testWidgets('label is included in semantics', (tester) async {
-    await tester.pumpObers(const OiScaleRating(label: 'NPS score', max: 10));
+    await tester.pumpObers(const OiScaleRating(label: 'NPS score'));
     expect(find.bySemanticsLabel(RegExp('NPS score')), findsOneWidget);
   });
 }

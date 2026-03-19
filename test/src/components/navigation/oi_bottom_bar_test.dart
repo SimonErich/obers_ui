@@ -212,7 +212,6 @@ void main() {
           items: _kItems,
           currentIndex: 0,
           onTap: (_) {},
-          style: OiBottomBarStyle.fixed,
         ),
         _kCompact,
       ),
@@ -523,7 +522,7 @@ void main() {
   testWidgets('haptic=true triggers HapticFeedback.selectionClick on tap', (
     tester,
   ) async {
-    final List<MethodCall> log = [];
+    final log = <MethodCall>[];
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(SystemChannels.platform, (call) async {
           log.add(call);
@@ -560,7 +559,7 @@ void main() {
   testWidgets('haptic=false does not trigger HapticFeedback on tap', (
     tester,
   ) async {
-    final List<MethodCall> log = [];
+    final log = <MethodCall>[];
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(SystemChannels.platform, (call) async {
           log.add(call);
@@ -674,7 +673,6 @@ void main() {
             items: _kItems,
             currentIndex: 0,
             onTap: (_) {},
-            landscapeMode: OiBottomBarLandscapeMode.compact,
           ),
           const MediaQueryData(size: Size(500, 300)),
         ),

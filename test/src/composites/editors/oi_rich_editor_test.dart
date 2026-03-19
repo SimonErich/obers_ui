@@ -294,7 +294,6 @@ void main() {
       const b = OiContentBlock(
         type: OiBlockType.paragraph,
         text: 'Hello',
-        bold: false,
       );
       const c = OiContentBlock(
         type: OiBlockType.paragraph,

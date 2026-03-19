@@ -4,9 +4,9 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui/src/foundation/oi_responsive.dart';
+import 'package:obers_ui/src/foundation/oi_span.dart';
 import 'package:obers_ui/src/primitives/layout/oi_column.dart';
 import 'package:obers_ui/src/primitives/layout/oi_container.dart';
-import 'package:obers_ui/src/foundation/oi_span.dart';
 import 'package:obers_ui/src/primitives/layout/oi_grid.dart';
 import 'package:obers_ui/src/primitives/layout/oi_masonry.dart';
 import 'package:obers_ui/src/primitives/layout/oi_page.dart';
@@ -235,7 +235,6 @@ void main() {
           Text('above'),
           OiMasonry(
             breakpoint: _bp,
-            columns: OiResponsive<int>(2),
             gap: OiResponsive<double>(4),
             children: [Text('m1'), Text('m2'), Text('m3')],
           ),
@@ -258,7 +257,6 @@ void main() {
           Text('left'),
           OiMasonry(
             breakpoint: _bp,
-            columns: OiResponsive<int>(2),
             children: [Text('m1'), Text('m2')],
           ),
           Text('right'),
@@ -451,7 +449,6 @@ void main() {
             maxWidth: OiResponsive<double>(600),
             child: OiMasonry(
               breakpoint: _bp,
-              columns: OiResponsive<int>(2),
               gap: OiResponsive<double>(8),
               children: [Text('m1'), Text('m2'), Text('m3'), Text('m4')],
             ),
@@ -514,7 +511,6 @@ void main() {
         children: [
           OiMasonry(
             breakpoint: _bp,
-            columns: OiResponsive<int>(2),
             children: [Text('m1'), Text('m2')],
           ),
           Text('plain'),
@@ -916,7 +912,6 @@ void main() {
                     maxWidth: OiResponsive<double>(500),
                     child: OiMasonry(
                       breakpoint: _bp,
-                      columns: OiResponsive<int>(2),
                       children: [Text('m1'), Text('m2'), Text('m3')],
                     ),
                   ),
@@ -983,7 +978,6 @@ void main() {
           Text('section-title'),
           OiMasonry(
             breakpoint: _bp,
-            columns: OiResponsive<int>(2),
             children: [Text('m1'), Text('m2'), Text('m3')],
           ),
         ],
@@ -1137,7 +1131,6 @@ void main() {
         11,
         const OiMasonry(
           breakpoint: _bp,
-          columns: OiResponsive<int>(2),
           children: [Text('mas-A'), Text('mas-B')],
         ),
       ),

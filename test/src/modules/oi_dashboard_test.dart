@@ -11,8 +11,8 @@ void main() {
   group('OiDashboard', () {
     testWidgets('cards render in grid', (tester) async {
       await tester.pumpObers(
-        OiDashboard(
-          cards: const [
+        const OiDashboard(
+          cards: [
             OiDashboardCard(key: 'c1', title: 'Revenue', child: Text('100k')),
             OiDashboardCard(key: 'c2', title: 'Users', child: Text('5k')),
           ],
@@ -29,8 +29,8 @@ void main() {
 
     testWidgets('column/row spans respected', (tester) async {
       await tester.pumpObers(
-        OiDashboard(
-          cards: const [
+        const OiDashboard(
+          cards: [
             OiDashboardCard(
               key: 'wide',
               title: 'Wide Card',
@@ -45,7 +45,6 @@ void main() {
             ),
           ],
           label: 'Dashboard',
-          columns: 4,
         ),
         surfaceSize: const Size(800, 600),
       );
@@ -64,8 +63,8 @@ void main() {
 
     testWidgets('editable mode shows drag icon', (tester) async {
       await tester.pumpObers(
-        OiDashboard(
-          cards: const [
+        const OiDashboard(
+          cards: [
             OiDashboardCard(
               key: 'e1',
               title: 'Editable',
@@ -84,12 +83,11 @@ void main() {
 
     testWidgets('non-editable mode hides drag icon', (tester) async {
       await tester.pumpObers(
-        OiDashboard(
-          cards: const [
+        const OiDashboard(
+          cards: [
             OiDashboardCard(key: 'e1', title: 'Static', child: Text('Content')),
           ],
           label: 'Dashboard',
-          editable: false,
         ),
         surfaceSize: const Size(800, 600),
       );
@@ -100,8 +98,8 @@ void main() {
 
     testWidgets('titles show on cards', (tester) async {
       await tester.pumpObers(
-        OiDashboard(
-          cards: const [
+        const OiDashboard(
+          cards: [
             OiDashboardCard(
               key: 'titled',
               title: 'My Title',
@@ -118,8 +116,8 @@ void main() {
 
     testWidgets('gap is applied between cards', (tester) async {
       await tester.pumpObers(
-        OiDashboard(
-          cards: const [
+        const OiDashboard(
+          cards: [
             OiDashboardCard(key: 'a', title: 'A', child: Text('a')),
             OiDashboardCard(key: 'b', title: 'B', child: Text('b')),
           ],
@@ -141,8 +139,8 @@ void main() {
 
     testWidgets('responsive column count works', (tester) async {
       await tester.pumpObers(
-        OiDashboard(
-          cards: const [
+        const OiDashboard(
+          cards: [
             OiDashboardCard(key: 'r1', title: 'R1', child: Text('r1')),
           ],
           label: 'Dashboard',
@@ -156,8 +154,8 @@ void main() {
 
     testWidgets('semantics label is applied', (tester) async {
       await tester.pumpObers(
-        OiDashboard(
-          cards: const [
+        const OiDashboard(
+          cards: [
             OiDashboardCard(key: 's1', title: 'S1', child: Text('s1')),
           ],
           label: 'Analytics Dashboard',

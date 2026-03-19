@@ -13,7 +13,7 @@ import 'package:obers_ui/src/modules/oi_file_manager.dart';
 import '../../helpers/pump_app.dart';
 
 void main() {
-  OiFileNode _file({
+  OiFileNode file0({
     Object key = 'f1',
     String name = 'readme.txt',
     int? size = 1024,
@@ -21,7 +21,7 @@ void main() {
     return OiFileNode(key: key, name: name, folder: false, size: size);
   }
 
-  OiFileNode _folder({Object key = 'd1', String name = 'Documents'}) {
+  OiFileNode folder({Object key = 'd1', String name = 'Documents'}) {
     return OiFileNode(key: key, name: name, folder: true);
   }
 
@@ -31,9 +31,8 @@ void main() {
         width: 500,
         height: 600,
         child: OiFileManager(
-          items: [_file(name: 'report.pdf')],
+          items: [file0(name: 'report.pdf')],
           label: 'Files',
-          layout: OiFileManagerLayout.grid,
         ),
       ),
     );
@@ -46,7 +45,7 @@ void main() {
         width: 500,
         height: 600,
         child: OiFileManager(
-          items: [_file(name: 'data.csv')],
+          items: [file0(name: 'data.csv')],
           label: 'Files',
           layout: OiFileManagerLayout.list,
         ),
@@ -61,9 +60,8 @@ void main() {
         width: 500,
         height: 600,
         child: OiFileManager(
-          items: [_folder(name: 'Photos')],
+          items: [folder(name: 'Photos')],
           label: 'Files',
-          layout: OiFileManagerLayout.grid,
         ),
       ),
     );
@@ -77,7 +75,7 @@ void main() {
 
   testWidgets('onOpen fires on double-tap', (tester) async {
     OiFileNode? opened;
-    final file = _file(name: 'notes.txt');
+    final file = file0(name: 'notes.txt');
 
     await tester.pumpObers(
       SizedBox(
@@ -86,7 +84,6 @@ void main() {
         child: OiFileManager(
           items: [file],
           label: 'Files',
-          layout: OiFileManagerLayout.grid,
           onOpen: (node) => opened = node,
         ),
       ),
@@ -106,9 +103,8 @@ void main() {
         width: 500,
         height: 600,
         child: OiFileManager(
-          items: [_file()],
+          items: [file0()],
           label: 'Files',
-          layout: OiFileManagerLayout.grid,
         ),
       ),
     );
@@ -121,7 +117,7 @@ void main() {
         width: 500,
         height: 600,
         child: OiFileManager(
-          items: [_file()],
+          items: [file0()],
           label: 'Files',
           layout: OiFileManagerLayout.list,
         ),
@@ -133,13 +129,13 @@ void main() {
 
   testWidgets('current path shows as breadcrumbs', (tester) async {
     await tester.pumpObers(
-      SizedBox(
+      const SizedBox(
         width: 500,
         height: 600,
         child: OiFileManager(
-          items: const [],
+          items: [],
           label: 'Files',
-          currentPath: const ['Documents', 'Work'],
+          currentPath: ['Documents', 'Work'],
         ),
       ),
     );
@@ -221,7 +217,7 @@ void main() {
         width: 500,
         height: 600,
         child: OiFileManager(
-          items: [_file(name: 'big.zip', size: 2048)],
+          items: [file0(name: 'big.zip', size: 2048)],
           label: 'Files',
           layout: OiFileManagerLayout.list,
         ),
@@ -242,9 +238,9 @@ void main() {
           height: 600,
           child: OiFileManager(
             items: [
-              _file(key: 'a', name: 'report.pdf'),
-              _file(key: 'b', name: 'notes.txt'),
-              _folder(key: 'c', name: 'Reports'),
+              file0(key: 'a', name: 'report.pdf'),
+              file0(key: 'b', name: 'notes.txt'),
+              folder(key: 'c', name: 'Reports'),
             ],
             label: 'Files',
             layout: OiFileManagerLayout.list,
@@ -267,12 +263,11 @@ void main() {
           height: 600,
           child: OiFileManager(
             items: [
-              _file(key: 'a', name: 'photo.jpg'),
-              _file(key: 'b', name: 'image.png'),
-              _file(key: 'c', name: 'PHOTO_2.jpg'),
+              file0(key: 'a', name: 'photo.jpg'),
+              file0(key: 'b', name: 'image.png'),
+              file0(key: 'c', name: 'PHOTO_2.jpg'),
             ],
             label: 'Files',
-            layout: OiFileManagerLayout.grid,
             searchQuery: 'photo',
           ),
         ),
@@ -290,8 +285,8 @@ void main() {
           height: 600,
           child: OiFileManager(
             items: [
-              _file(key: 'a', name: 'one.txt'),
-              _file(key: 'b', name: 'two.txt'),
+              file0(key: 'a', name: 'one.txt'),
+              file0(key: 'b', name: 'two.txt'),
             ],
             label: 'Files',
             layout: OiFileManagerLayout.list,
@@ -310,8 +305,8 @@ void main() {
           height: 600,
           child: OiFileManager(
             items: [
-              _file(key: 'a', name: 'one.txt'),
-              _file(key: 'b', name: 'two.txt'),
+              file0(key: 'a', name: 'one.txt'),
+              file0(key: 'b', name: 'two.txt'),
             ],
             label: 'Files',
             layout: OiFileManagerLayout.list,
@@ -333,7 +328,7 @@ void main() {
           height: 600,
           child: OiFileManager(
             items: [
-              _file(key: 'a', name: 'report.pdf'),
+              file0(key: 'a', name: 'report.pdf'),
             ],
             label: 'Files',
             layout: OiFileManagerLayout.list,
@@ -356,7 +351,7 @@ void main() {
           width: 500,
           height: 600,
           child: OiFileManager(
-            items: [_file(name: 'data.csv')],
+            items: [file0(name: 'data.csv')],
             label: 'Files',
             layout: OiFileManagerLayout.list,
           ),
@@ -372,9 +367,8 @@ void main() {
           width: 500,
           height: 600,
           child: OiFileManager(
-            items: [_file(name: 'data.csv')],
+            items: [file0(name: 'data.csv')],
             label: 'Files',
-            layout: OiFileManagerLayout.grid,
           ),
         ),
       );
@@ -390,7 +384,7 @@ void main() {
           width: 500,
           height: 600,
           child: OiFileManager(
-            items: [_file(name: 'report.pdf')],
+            items: [file0(name: 'report.pdf')],
             label: 'Files',
             layout: OiFileManagerLayout.list,
             searchQuery: 'port',
@@ -410,9 +404,8 @@ void main() {
           width: 500,
           height: 600,
           child: OiFileManager(
-            items: [_file(name: 'report.pdf')],
+            items: [file0(name: 'report.pdf')],
             label: 'Files',
-            layout: OiFileManagerLayout.grid,
             searchQuery: 'port',
           ),
         ),
@@ -436,7 +429,7 @@ void main() {
           width: 500,
           height: 600,
           child: OiFileManager(
-            items: [_file()],
+            items: [file0()],
             label: 'Files',
             onSearch: (_) {},
           ),
@@ -454,7 +447,7 @@ void main() {
           width: 500,
           height: 600,
           child: OiFileManager(
-            items: [_file()],
+            items: [file0()],
             label: 'Files',
           ),
         ),
@@ -471,7 +464,7 @@ void main() {
           width: 500,
           height: 600,
           child: OiFileManager(
-            items: [_file()],
+            items: [file0()],
             label: 'Files',
             onSearch: calls.add,
           ),
@@ -504,7 +497,7 @@ void main() {
           width: 500,
           height: 600,
           child: OiFileManager(
-            items: [_file()],
+            items: [file0()],
             label: 'Files',
             onSearch: calls.add,
           ),
@@ -533,7 +526,7 @@ void main() {
             width: 500,
             height: 600,
             child: OiFileManager(
-              items: [_file()],
+              items: [file0()],
               label: 'Files',
               onSearch: calls.add,
             ),
@@ -574,7 +567,7 @@ void main() {
             height: 600,
             child: OiFileManager(
               items: [
-                _file(key: 'a', name: 'annual_summary.pdf'),
+                file0(key: 'a', name: 'annual_summary.pdf'),
               ],
               label: 'Files',
               layout: OiFileManagerLayout.list,
@@ -599,7 +592,7 @@ void main() {
             height: 600,
             child: OiFileManager(
               items: [
-                _file(key: 'a', name: 'report.pdf'),
+                file0(key: 'a', name: 'report.pdf'),
               ],
               label: 'Files',
               layout: OiFileManagerLayout.list,
@@ -618,9 +611,9 @@ void main() {
       'consumer re-provides filtered items after onSearch callback',
       (tester) async {
         final allFiles = [
-          _file(key: 'a', name: 'report.pdf'),
-          _file(key: 'b', name: 'notes.txt'),
-          _file(key: 'c', name: 'image.png'),
+          file0(key: 'a', name: 'report.pdf'),
+          file0(key: 'b', name: 'notes.txt'),
+          file0(key: 'c', name: 'image.png'),
         ];
 
         // Initial state: all items, no query.
@@ -642,7 +635,7 @@ void main() {
         expect(find.text('image.png'), findsOneWidget);
 
         // Consumer re-provides filtered list (simulating backend response).
-        final filtered = [_file(key: 'a', name: 'report.pdf')];
+        final filtered = [file0(key: 'a', name: 'report.pdf')];
         await tester.pumpObers(
           SizedBox(
             width: 500,
@@ -672,8 +665,8 @@ void main() {
             height: 600,
             child: OiFileManager(
               items: [
-                _file(key: 'a', name: 'report.pdf'),
-                _file(key: 'b', name: 'notes.txt'),
+                file0(key: 'a', name: 'report.pdf'),
+                file0(key: 'b', name: 'notes.txt'),
               ],
               label: 'Files',
               layout: OiFileManagerLayout.list,

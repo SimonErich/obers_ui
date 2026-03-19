@@ -42,7 +42,7 @@ class OiCheckbox extends StatelessWidget {
 
   void _handleTap() {
     if (onChanged == null) return;
-    if (value == true) {
+    if (value ?? false) {
       onChanged!(false);
     } else {
       onChanged!(true);
@@ -57,7 +57,7 @@ class OiCheckbox extends StatelessWidget {
     final borderRadius =
         themeData.components.checkbox?.borderRadius ?? BorderRadius.circular(4);
 
-    final isChecked = value == true;
+    final isChecked = value ?? false;
     final isIndeterminate = value == null;
 
     final fillColor = (isChecked || isIndeterminate)
@@ -139,7 +139,7 @@ class _OiCheckboxPainter extends CustomPainter {
       ..strokeCap = StrokeCap.round
       ..strokeJoin = StrokeJoin.round;
 
-    if (state == true) {
+    if (state ?? false) {
       // Draw checkmark.
       final path = Path()
         ..moveTo(size.width * 0.2, size.height * 0.5)

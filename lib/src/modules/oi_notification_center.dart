@@ -10,8 +10,7 @@ class OiNotification {
   const OiNotification({
     required this.key,
     required this.title,
-    this.body,
-    required this.timestamp,
+    required this.timestamp, this.body,
     this.read = false,
     this.icon,
     this.leading,
@@ -57,9 +56,7 @@ class OiNotification {
 class OiNotificationCenter extends StatelessWidget {
   /// Creates an [OiNotificationCenter].
   const OiNotificationCenter({
-    super.key,
-    required this.notifications,
-    required this.label,
+    required this.notifications, required this.label, super.key,
     this.onNotificationTap,
     this.onMarkRead,
     this.onMarkAllRead,
@@ -252,13 +249,13 @@ class OiNotificationCenter extends StatelessWidget {
             if (notification.leading != null)
               Padding(
                 padding: EdgeInsets.only(right: spacing.sm),
-                child: notification.leading!,
+                child: notification.leading,
               )
             else if (notification.icon != null)
               Padding(
                 padding: EdgeInsets.only(right: spacing.sm),
                 child: Icon(
-                  notification.icon!,
+                  notification.icon,
                   size: 24,
                   color: colors.textSubtle,
                 ),

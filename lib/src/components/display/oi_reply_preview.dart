@@ -15,9 +15,7 @@ import 'package:obers_ui/src/utils/color_utils.dart';
 class OiReplyPreview extends StatelessWidget {
   /// Creates an [OiReplyPreview].
   const OiReplyPreview({
-    super.key,
-    required this.senderName,
-    required this.content,
+    required this.senderName, required this.content, super.key,
     this.accentColor,
     this.dismissible = false,
     this.onDismiss,
@@ -116,7 +114,6 @@ class OiReplyPreview extends StatelessWidget {
                   semanticLabel: 'Cancel reply',
                   onTap: onDismiss,
                   size: OiButtonSize.small,
-                  variant: OiButtonVariant.ghost,
                 ),
               ),
           ],

@@ -256,7 +256,6 @@ void main() {
       await tester.pumpWidget(
         OiApp(
           darkTheme: darkTheme,
-          themeMode: OiThemeMode.system,
           home: Builder(
             builder: (ctx) {
               captured = OiTheme.maybeOf(ctx);
@@ -280,7 +279,6 @@ void main() {
       await tester.pumpWidget(
         OiApp(
           theme: lightTheme,
-          themeMode: OiThemeMode.system,
           home: Builder(
             builder: (ctx) {
               captured = OiTheme.maybeOf(ctx);
@@ -349,10 +347,10 @@ void main() {
     testWidgets('supportedLocales are forwarded to WidgetsApp', (tester) async {
       const locales = [Locale('fr'), Locale('de')];
       await tester.pumpWidget(
-        OiApp(
-          locale: const Locale('fr'),
+        const OiApp(
+          locale: Locale('fr'),
           supportedLocales: locales,
-          home: const SizedBox(),
+          home: SizedBox(),
         ),
       );
       final widgetsApp = tester.widget<WidgetsApp>(find.byType(WidgetsApp));

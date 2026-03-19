@@ -3,9 +3,9 @@
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:obers_ui/src/composites/navigation/oi_filter_bar.dart';
 import 'package:obers_ui/src/components/display/oi_empty_state.dart';
 import 'package:obers_ui/src/components/display/oi_progress.dart';
+import 'package:obers_ui/src/composites/navigation/oi_filter_bar.dart';
 import 'package:obers_ui/src/modules/oi_list_view.dart';
 
 import '../../helpers/pump_app.dart';
@@ -16,7 +16,7 @@ void main() {
       await tester.pumpObers(
         OiListView<String>(
           items: const ['Alpha', 'Beta', 'Gamma'],
-          itemBuilder: (item) => Text(item),
+          itemBuilder: Text.new,
           itemKey: (item) => item,
           label: 'Test list',
         ),
@@ -33,7 +33,7 @@ void main() {
       await tester.pumpObers(
         OiListView<String>(
           items: const ['One', 'Two'],
-          itemBuilder: (item) => Text(item),
+          itemBuilder: Text.new,
           itemKey: (item) => item,
           label: 'Search list',
           onSearch: (q) {
@@ -58,7 +58,7 @@ void main() {
       await tester.pumpObers(
         OiListView<String>(
           items: const ['A'],
-          itemBuilder: (item) => Text(item),
+          itemBuilder: Text.new,
           itemKey: (item) => item,
           label: 'Sort list',
           sortOptions: options,
@@ -80,7 +80,7 @@ void main() {
       await tester.pumpObers(
         OiListView<String>(
           items: const ['X', 'Y'],
-          itemBuilder: (item) => Text(item),
+          itemBuilder: Text.new,
           itemKey: (item) => item,
           label: 'Select list',
           selectionMode: OiSelectionMode.multi,
@@ -98,7 +98,7 @@ void main() {
       await tester.pumpObers(
         OiListView<String>(
           items: const [],
-          itemBuilder: (item) => Text(item),
+          itemBuilder: Text.new,
           itemKey: (item) => item,
           label: 'Loading list',
           loading: true,
@@ -113,7 +113,7 @@ void main() {
       await tester.pumpObers(
         OiListView<String>(
           items: const [],
-          itemBuilder: (item) => Text(item),
+          itemBuilder: Text.new,
           itemKey: (item) => item,
           label: 'Empty list',
           emptyState: const OiEmptyState(title: 'Nothing here'),
@@ -130,7 +130,7 @@ void main() {
         await tester.pumpObers(
           OiListView<String>(
             items: const [],
-            itemBuilder: (item) => Text(item),
+            itemBuilder: Text.new,
             itemKey: (item) => item,
             label: 'Empty list default',
           ),
@@ -145,7 +145,7 @@ void main() {
       await tester.pumpObers(
         OiListView<String>(
           items: const ['A'],
-          itemBuilder: (item) => Text(item),
+          itemBuilder: Text.new,
           itemKey: (item) => item,
           label: 'Actions list',
           headerActions: const SizedBox(
@@ -164,7 +164,7 @@ void main() {
       await tester.pumpObers(
         OiListView<String>(
           items: const ['A'],
-          itemBuilder: (item) => Text(item),
+          itemBuilder: Text.new,
           itemKey: (item) => item,
           label: 'My List',
         ),
@@ -180,7 +180,7 @@ void main() {
       await tester.pumpObers(
         OiListView<String>(
           items: const ['A', 'B'],
-          itemBuilder: (item) => Text(item),
+          itemBuilder: Text.new,
           itemKey: (item) => item,
           label: 'Sel list',
           selectionMode: OiSelectionMode.multi,
@@ -206,7 +206,7 @@ void main() {
       await tester.pumpObers(
         OiListView<String>(
           items: const ['A'],
-          itemBuilder: (item) => Text(item),
+          itemBuilder: Text.new,
           itemKey: (item) => item,
           label: 'Filter list',
           filters: filters,
@@ -232,7 +232,7 @@ void main() {
       await tester.pumpObers(
         OiListView<String>(
           items: const ['A'],
-          itemBuilder: (item) => Text(item),
+          itemBuilder: Text.new,
           itemKey: (item) => item,
           label: 'Compact filter list',
           filters: filters,
@@ -265,7 +265,7 @@ void main() {
       await tester.pumpObers(
         OiListView<String>(
           items: const ['A'],
-          itemBuilder: (item) => Text(item),
+          itemBuilder: Text.new,
           itemKey: (item) => item,
           label: 'Active filter list',
           filters: filters,

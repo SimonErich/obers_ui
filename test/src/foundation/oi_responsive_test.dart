@@ -127,7 +127,7 @@ void main() {
     });
 
     test('custom scale sorts automatically', () {
-      final scale = OiBreakpointScale([
+      final scale = OiBreakpointScale(const [
         OiBreakpoint.large,
         OiBreakpoint.compact,
         OiBreakpoint.medium,
@@ -139,7 +139,7 @@ void main() {
 
     test('throws when no breakpoint has minWidth 0', () {
       expect(
-        () => OiBreakpointScale([OiBreakpoint.medium, OiBreakpoint.large]),
+        () => OiBreakpointScale(const [OiBreakpoint.medium, OiBreakpoint.large]),
         throwsA(isA<ArgumentError>()),
       );
     });
@@ -267,12 +267,12 @@ void main() {
 
     test('resolvePageGutter with custom gutters', () {
       final scale = OiBreakpointScale(
-        [
+        const [
           OiBreakpoint.compact,
-          const OiBreakpoint('custom', 500),
+          OiBreakpoint('custom', 500),
           OiBreakpoint.medium,
         ],
-        pageGutters: {'compact': 12, 'custom': 20, 'medium': 28},
+        pageGutters: const {'compact': 12, 'custom': 20, 'medium': 28},
       );
       expect(scale.resolvePageGutter(const OiBreakpoint('custom', 500)), 20);
       expect(scale.resolvePageGutter(OiBreakpoint.compact), 12);
@@ -281,12 +281,12 @@ void main() {
 
     test('resolvePageGutter cascades to nearest smaller', () {
       final scale = OiBreakpointScale(
-        [
+        const [
           OiBreakpoint.compact,
-          const OiBreakpoint('mid', 500),
+          OiBreakpoint('mid', 500),
           OiBreakpoint.medium,
         ],
-        pageGutters: {'compact': 10},
+        pageGutters: const {'compact': 10},
       );
       // 'mid' has no entry, should cascade to 'compact'
       expect(scale.resolvePageGutter(const OiBreakpoint('mid', 500)), 10);
@@ -308,12 +308,12 @@ void main() {
 
     test('resolveContentMaxWidth cascades for custom breakpoints', () {
       final scale = OiBreakpointScale(
-        [
+        const [
           OiBreakpoint.compact,
-          const OiBreakpoint('mid', 500),
+          OiBreakpoint('mid', 500),
           OiBreakpoint.medium,
         ],
-        contentMaxWidths: {'compact': double.infinity, 'medium': 720},
+        contentMaxWidths: const {'compact': double.infinity, 'medium': 720},
       );
       // 'mid' cascades to 'compact'
       expect(
@@ -326,13 +326,13 @@ void main() {
 
     test('custom scale accepts page gutters and content max widths', () {
       final scale = OiBreakpointScale(
-        [
+        const [
           OiBreakpoint.compact,
-          const OiBreakpoint('tablet', 480),
+          OiBreakpoint('tablet', 480),
           OiBreakpoint.medium,
         ],
-        pageGutters: {'compact': 8, 'tablet': 12, 'medium': 20},
-        contentMaxWidths: {
+        pageGutters: const {'compact': 8, 'tablet': 12, 'medium': 20},
+        contentMaxWidths: const {
           'compact': double.infinity,
           'tablet': double.infinity,
           'medium': 600,
@@ -350,12 +350,12 @@ void main() {
 
     test('equality includes pageGutters and contentMaxWidths', () {
       final a = OiBreakpointScale(
-        [OiBreakpoint.compact, OiBreakpoint.medium],
-        pageGutters: {'compact': 10},
+        const [OiBreakpoint.compact, OiBreakpoint.medium],
+        pageGutters: const {'compact': 10},
       );
       final b = OiBreakpointScale(
-        [OiBreakpoint.compact, OiBreakpoint.medium],
-        pageGutters: {'compact': 10},
+        const [OiBreakpoint.compact, OiBreakpoint.medium],
+        pageGutters: const {'compact': 10},
       );
       // Use operator == directly; the `equals()` matcher treats Iterable
       // objects as collections and compares element-by-element, which would
@@ -366,12 +366,12 @@ void main() {
 
     test('inequality when pageGutters differ', () {
       final a = OiBreakpointScale(
-        [OiBreakpoint.compact, OiBreakpoint.medium],
-        pageGutters: {'compact': 10},
+        const [OiBreakpoint.compact, OiBreakpoint.medium],
+        pageGutters: const {'compact': 10},
       );
       final b = OiBreakpointScale(
-        [OiBreakpoint.compact, OiBreakpoint.medium],
-        pageGutters: {'compact': 20},
+        const [OiBreakpoint.compact, OiBreakpoint.medium],
+        pageGutters: const {'compact': 20},
       );
       expect(a == b, isFalse);
     });
@@ -690,7 +690,7 @@ void main() {
         final scale = OiBreakpointScale.standard();
         final map = scale.entries;
         expect(
-          () => (map as Map<String, OiBreakpoint>)['new'] = const OiBreakpoint(
+          () => map['new'] = const OiBreakpoint(
             'new',
             999,
           ),
@@ -1745,12 +1745,12 @@ void main() {
     group('Standard helpers with custom-named scale', () {
       /// A custom scale that uses non-standard names at standard thresholds.
       final customTheme = OiThemeData.light().copyWith(
-        breakpoints: OiBreakpointScale([
-          const OiBreakpoint('phone', 0),
-          const OiBreakpoint('mid', 600),
-          const OiBreakpoint('wide', 840),
-          const OiBreakpoint('desk', 1200),
-          const OiBreakpoint('ultra', 1600),
+        breakpoints: OiBreakpointScale(const [
+          OiBreakpoint('phone', 0),
+          OiBreakpoint('mid', 600),
+          OiBreakpoint('wide', 840),
+          OiBreakpoint('desk', 1200),
+          OiBreakpoint('ultra', 1600),
         ]),
       );
 

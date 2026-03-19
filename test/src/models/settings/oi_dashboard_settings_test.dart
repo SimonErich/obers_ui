@@ -11,7 +11,6 @@ void main() {
         column: 2,
         row: 3,
         columnSpan: 2,
-        rowSpan: 1,
       );
       final json = pos.toJson();
       final restored = OiDashboardCardPosition.fromJson(json);
@@ -70,7 +69,6 @@ void main() {
             column: 0,
             row: 0,
             columnSpan: 2,
-            rowSpan: 1,
           ),
           'card-2': OiDashboardCardPosition(column: 2, row: 1),
         },

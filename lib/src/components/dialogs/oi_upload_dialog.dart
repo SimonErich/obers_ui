@@ -3,6 +3,8 @@ import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/buttons/oi_button.dart';
 import 'package:obers_ui/src/components/display/oi_file_icon.dart';
 import 'package:obers_ui/src/components/inputs/oi_select.dart';
+import 'package:obers_ui/src/foundation/theme/oi_color_scheme.dart';
+import 'package:obers_ui/src/foundation/theme/oi_spacing_scale.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/modules/oi_chat.dart';
 import 'package:obers_ui/src/utils/file_utils.dart';
@@ -173,7 +175,6 @@ class _OiUploadDialogState extends State<OiUploadDialog> {
                   decoration: BoxDecoration(
                     border: Border.all(
                       color: colors.borderSubtle,
-                      width: 1,
                     ),
                     borderRadius: BorderRadius.circular(8),
                     color: colors.surfaceSubtle,
@@ -248,8 +249,8 @@ class _OiUploadDialogState extends State<OiUploadDialog> {
                   Expanded(
                     child: OiSelect<OiConflictResolution>(
                       value: _resolution,
-                      items: OiConflictResolution.values
-                          .map((r) => OiSelectItem(
+                      options: OiConflictResolution.values
+                          .map((r) => OiSelectOption(
                                 value: r,
                                 label: r.name[0].toUpperCase() +
                                     r.name.substring(1),
@@ -291,18 +292,18 @@ class _OiUploadDialogState extends State<OiUploadDialog> {
     BuildContext context,
     _UploadEntry entry,
     int index,
-    dynamic colors,
-    dynamic spacing,
+    OiColorScheme colors,
+    OiSpacingScale spacing,
   ) {
     return Padding(
-      padding: EdgeInsets.only(bottom: (spacing as dynamic).xs as double),
+      padding: EdgeInsets.only(bottom: spacing.xs),
       child: Row(
         children: [
           OiFileIcon(
             fileName: entry.file.name,
             size: OiFileIconSize.sm,
           ),
-          SizedBox(width: (spacing as dynamic).xs as double),
+          SizedBox(width: spacing.xs),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -312,7 +313,7 @@ class _OiUploadDialogState extends State<OiUploadDialog> {
                   entry.file.name,
                   style: TextStyle(
                     fontSize: 12,
-                    color: (colors as dynamic).text as Color,
+                    color: colors.text,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -322,27 +323,27 @@ class _OiUploadDialogState extends State<OiUploadDialog> {
                     entry.error!,
                     style: TextStyle(
                       fontSize: 10,
-                      color: (colors as dynamic).error.base as Color,
+                      color: colors.error.base,
                     ),
                   ),
               ],
             ),
           ),
-          SizedBox(width: (spacing as dynamic).xs as double),
+          SizedBox(width: spacing.xs),
           Text(
             OiFileUtils.formatSize(entry.file.size),
             style: TextStyle(
               fontSize: 11,
-              color: (colors as dynamic).textMuted as Color,
+              color: colors.textMuted,
             ),
           ),
-          SizedBox(width: (spacing as dynamic).xs as double),
+          SizedBox(width: spacing.xs),
           GestureDetector(
             onTap: () => _removeEntry(index),
             child: Icon(
               const IconData(0xe5cd, fontFamily: 'MaterialIcons'), // close
               size: 14,
-              color: (colors as dynamic).textMuted as Color,
+              color: colors.textMuted,
             ),
           ),
         ],

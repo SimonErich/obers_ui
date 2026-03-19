@@ -111,6 +111,15 @@ void main() {
   // Semantics widget abstracts the platform mapping; these tests verify
   // that the correct semantic properties are declared so each platform's
   // screen reader can interpret them.
+  //
+  // INTEGRATION TEST GAP: These unit tests verify semantic properties at the
+  // widget level.  Full screen reader verification requires device-level
+  // integration tests on real hardware:
+  //   - iOS: VoiceOver with a physical or Simulator device
+  //   - Android: TalkBack with an emulator or physical device
+  //   - Web: Browser-based test inspecting ARIA attributes in the DOM
+  // Such tests are out of scope for this unit test suite but are required
+  // for complete REQ-0034 verification.
   group('REQ-0034: Screen reader platform differences', () {
     // ── iOS (VoiceOver) ──────────────────────────────────────────────────────
 
@@ -455,7 +464,7 @@ void main() {
       // ── Proxy tests for OiA11y.announce ────────────────────────────────────
       //
       // (a) The assertiveness parameter is verified at the implementation
-      //     level in oi_accessibility.dart:58–61 where OiA11y.announce passes
+      //     level in oi_accessibility.dart:56–61 where OiA11y.announce passes
       //     Assertiveness.polite or Assertiveness.assertive to
       //     SemanticsService.sendAnnouncement.
       // (b) SemanticsService.sendAnnouncement is a native call routed through
@@ -467,6 +476,13 @@ void main() {
       //     SemanticsService.sendAnnouncement fires in the test environment,
       //     then assert that the call completes without error — confirming the
       //     announce path is exercised with the semantics layer active.
+      //
+      // LIMITATION: These proxy tests verify that the correct parameters reach
+      // SemanticsService.sendAnnouncement, but they cannot confirm the actual
+      // ARIA attributes (aria-live, role) rendered in the browser DOM.  Full
+      // verification of ARIA output requires a browser-based integration test
+      // (e.g. Flutter integration_test running on Chrome) that inspects the
+      // generated HTML semantics tree.
       testWidgets('OiA11y.announce sends polite live region announcement', (
         tester,
       ) async {
@@ -511,6 +527,34 @@ void main() {
             'error: save failed',
             assertive: true,
           );
+          await tester.pump();
+          handle.dispose();
+        },
+      );
+
+      testWidgets(
+        'OiA11y.announce respects RTL directionality from context',
+        (tester) async {
+          final handle = tester.ensureSemantics();
+          late BuildContext capturedContext;
+          await tester.pumpWidget(
+            MediaQuery(
+              data: const MediaQueryData(),
+              child: Directionality(
+                textDirection: TextDirection.rtl,
+                child: Builder(
+                  builder: (ctx) {
+                    capturedContext = ctx;
+                    return const SizedBox.shrink();
+                  },
+                ),
+              ),
+            ),
+          );
+          // OiA11y.announce uses Directionality.of(context), so under an RTL
+          // ancestor it forwards TextDirection.rtl to
+          // SemanticsService.sendAnnouncement.  Must complete without error.
+          OiA11y.announce(capturedContext, 'تم الحفظ');
           await tester.pump();
           handle.dispose();
         },

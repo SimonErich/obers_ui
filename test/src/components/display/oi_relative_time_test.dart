@@ -1,7 +1,6 @@
 // Tests do not require documentation comments.
 // ignore_for_file: public_member_api_docs
 
-import 'dart:async';
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -15,7 +14,7 @@ void main() {
   // ── Static format() — narrow style ────────────────────────────────────
 
   group('format — narrow style', () {
-    final now = DateTime(2026, 3, 18, 14, 32, 0);
+    final now = DateTime(2026, 3, 18, 14, 32);
 
     test('< 10s renders "now"', () {
       final dt = now.subtract(const Duration(seconds: 5));
@@ -117,7 +116,7 @@ void main() {
   // ── Static format() — short style ─────────────────────────────────────
 
   group('format — short style', () {
-    final now = DateTime(2026, 3, 18, 14, 32, 0);
+    final now = DateTime(2026, 3, 18, 14, 32);
 
     test('< 10s renders "just now"', () {
       final dt = now.subtract(const Duration(seconds: 5));
@@ -163,7 +162,7 @@ void main() {
   // ── Static format() — long style ──────────────────────────────────────
 
   group('format — long style', () {
-    final now = DateTime(2026, 3, 18, 14, 32, 0);
+    final now = DateTime(2026, 3, 18, 14, 32);
 
     test('< 10s renders "just now"', () {
       final dt = now.subtract(const Duration(seconds: 5));
@@ -314,7 +313,7 @@ void main() {
 
   group('capitalize', () {
     test('capitalize=true uppercases first letter', () {
-      final now = DateTime(2026, 3, 18, 14, 32, 0);
+      final now = DateTime(2026, 3, 18, 14, 32);
       final dt = now.subtract(const Duration(seconds: 5));
       expect(
         OiRelativeTime.format(dt, capitalize: true, now: now),
@@ -323,13 +322,13 @@ void main() {
     });
 
     test('capitalize=false leaves as is', () {
-      final now = DateTime(2026, 3, 18, 14, 32, 0);
+      final now = DateTime(2026, 3, 18, 14, 32);
       final dt = now.subtract(const Duration(seconds: 5));
       expect(OiRelativeTime.format(dt, now: now), 'just now');
     });
 
     test('capitalize works with narrow style', () {
-      final now = DateTime(2026, 3, 18, 14, 32, 0);
+      final now = DateTime(2026, 3, 18, 14, 32);
       final dt = now.subtract(const Duration(seconds: 5));
       expect(
         OiRelativeTime.format(
@@ -347,8 +346,8 @@ void main() {
 
   group('formatAbsolute override', () {
     test('custom formatAbsolute overrides date format', () {
-      final now = DateTime(2026, 3, 18, 14, 32, 0);
-      final dt = DateTime(2026, 1, 5, 10, 0);
+      final now = DateTime(2026, 3, 18, 14, 32);
+      final dt = DateTime(2026, 1, 5, 10);
       expect(
         OiRelativeTime.format(
           dt,
@@ -360,7 +359,7 @@ void main() {
     });
 
     test('formatAbsolute is not used for recent times', () {
-      final now = DateTime(2026, 3, 18, 14, 32, 0);
+      final now = DateTime(2026, 3, 18, 14, 32);
       final dt = now.subtract(const Duration(minutes: 5));
       expect(
         OiRelativeTime.format(
@@ -376,7 +375,7 @@ void main() {
   // ── Adaptive interval ─────────────────────────────────────────────────
 
   group('adaptiveInterval', () {
-    final now = DateTime(2026, 3, 18, 14, 32, 0);
+    final now = DateTime(2026, 3, 18, 14, 32);
 
     test('< 1 minute returns 10s', () {
       final dt = now.subtract(const Duration(seconds: 30));
@@ -538,7 +537,7 @@ void main() {
   // ── Singular/plural edge cases ────────────────────────────────────────
 
   group('singular/plural', () {
-    final now = DateTime(2026, 3, 18, 14, 32, 0);
+    final now = DateTime(2026, 3, 18, 14, 32);
 
     test('"1 minute ago" vs "2 minutes ago"', () {
       expect(

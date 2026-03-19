@@ -11,15 +11,15 @@ import '../../../helpers/pump_app.dart';
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 final _nodes = <OiTreeNode<String>>[
-  OiTreeNode(
+  const OiTreeNode(
     id: 'root1',
     label: 'Root 1',
     children: [
-      const OiTreeNode(id: 'child1', label: 'Child 1'),
+      OiTreeNode(id: 'child1', label: 'Child 1'),
       OiTreeNode(
         id: 'child2',
         label: 'Child 2',
-        children: const [
+        children: [
           OiTreeNode(id: 'grandchild1', label: 'Grandchild 1'),
         ],
       ),

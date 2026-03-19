@@ -439,7 +439,7 @@ class _OiSmartInputState extends State<OiSmartInput> {
     final triggerLen = trigger.length;
 
     // Find the trigger position (last occurrence before cursor at word boundary).
-    int triggerIdx = -1;
+    var triggerIdx = -1;
     for (var i = textBeforeCursor.length - triggerLen; i >= 0; i--) {
       if (textBeforeCursor.substring(i, i + triggerLen) == trigger) {
         if (i == 0 ||
@@ -478,7 +478,6 @@ class _OiSmartInputState extends State<OiSmartInput> {
       child: CompositedTransformFollower(
         link: _layerLink,
         targetAnchor: Alignment.bottomLeft,
-        followerAnchor: Alignment.topLeft,
         showWhenUnlinked: false,
         child: _OiSuggestionPopup(
           suggestions: _suggestions,

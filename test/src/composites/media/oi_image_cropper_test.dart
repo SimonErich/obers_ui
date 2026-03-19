@@ -31,7 +31,7 @@ class _TestImageProvider extends ImageProvider<_TestImageProvider> {
 
   Future<ImageInfo> _createImage() async {
     final recorder = ui.PictureRecorder();
-    Canvas(recorder)..drawRect(
+    Canvas(recorder).drawRect(
       const Rect.fromLTWH(0, 0, 100, 100),
       Paint()..color = const Color(0xFFFF0000),
     );

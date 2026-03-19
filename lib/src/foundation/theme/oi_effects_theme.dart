@@ -24,7 +24,6 @@ class OiFocusRingStyle {
   factory OiFocusRingStyle.standard(Color primaryColor) {
     return OiFocusRingStyle(
       color: primaryColor.withValues(alpha: 0.85),
-      width: 2.0,
     );
   }
 
@@ -137,7 +136,7 @@ class OiHaloStyle {
   /// Converts this halo style to a [BoxShadow] for rendering.
   BoxShadow toBoxShadow() {
     final effectiveColor =
-        opacity != null ? color.withValues(alpha: opacity!) : color;
+        opacity != null ? color.withValues(alpha: opacity) : color;
     return BoxShadow(
       color: effectiveColor,
       spreadRadius: spread,
@@ -385,7 +384,6 @@ class OiEffectsTheme {
       focusRing: OiFocusRingStyle.standard(primaryColor),
       halo: OiHaloStyle.from(primaryColor),
       haloFocus: OiHaloStyle.from(primaryColor, intensity: 0.25),
-      haloError: null,
     );
   }
 

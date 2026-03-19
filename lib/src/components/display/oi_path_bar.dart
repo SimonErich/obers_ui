@@ -1,9 +1,8 @@
 import 'package:flutter/widgets.dart';
-import 'package:obers_ui/src/components/navigation/oi_breadcrumbs.dart';
 import 'package:obers_ui/src/components/inputs/oi_text_input.dart';
+import 'package:obers_ui/src/components/navigation/oi_breadcrumbs.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/primitives/animation/oi_morph.dart';
-import 'package:obers_ui/src/primitives/overlay/oi_visibility.dart';
 
 /// A path segment for the [OiPathBar].
 ///
@@ -137,7 +136,6 @@ class _OiPathBarState extends State<OiPathBar> {
     return Semantics(
       label: widget.semanticsLabel ?? 'Path navigation',
       child: OiMorph(
-        transition: OiTransition.fade,
         child: _editing ? _buildEditMode(colors) : _buildBreadcrumbMode(colors),
       ),
     );

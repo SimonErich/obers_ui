@@ -10,7 +10,7 @@ import '../../../helpers/pump_app.dart';
 void main() {
   testWidgets('open=true shows child content', (tester) async {
     await tester.pumpObers(
-      const OiSheet(open: true, child: Text('Sheet content')),
+      const OiSheet(label: 'sheet', open: true, child: Text('Sheet content')),
     );
     await tester.pump(); // let animation settle
     expect(find.text('Sheet content'), findsOneWidget);
@@ -20,7 +20,11 @@ void main() {
     tester,
   ) async {
     await tester.pumpObers(
-      const OiSheet(open: false, child: Text('Hidden content')),
+      const OiSheet(
+        label: 'sheet',
+        open: false,
+        child: Text('Hidden content'),
+      ),
     );
     // The SlideTransition keeps the child in tree but translated off-screen;
     // the text widget is still found but visually off-screen.
@@ -34,6 +38,7 @@ void main() {
     var closed = false;
     await tester.pumpObers(
       OiSheet(
+        label: 'sheet',
         open: true,
         onClose: () => closed = true,
         child: const SizedBox(height: 200, child: Text('Panel')),
@@ -52,6 +57,7 @@ void main() {
     var closed = false;
     await tester.pumpObers(
       OiSheet(
+        label: 'sheet',
         open: true,
         dismissible: false,
         onClose: () => closed = true,
@@ -66,7 +72,12 @@ void main() {
 
   testWidgets('dragHandle=true renders drag handle widget', (tester) async {
     await tester.pumpObers(
-      const OiSheet(open: true, dragHandle: true, child: Text('With handle')),
+      const OiSheet(
+        label: 'sheet',
+        open: true,
+        dragHandle: true,
+        child: Text('With handle'),
+      ),
     );
     await tester.pump();
     // The handle is a small Container; the sheet child text must be visible.
@@ -76,6 +87,7 @@ void main() {
   testWidgets('side=right slides in from the right', (tester) async {
     await tester.pumpObers(
       const OiSheet(
+        label: 'sheet',
         open: true,
         side: OiPanelSide.right,
         child: Text('Right panel'),
@@ -88,6 +100,7 @@ void main() {
   testWidgets('side=top slides in from the top', (tester) async {
     await tester.pumpObers(
       const OiSheet(
+        label: 'sheet',
         open: true,
         side: OiPanelSide.top,
         child: Text('Top panel'),
@@ -100,6 +113,7 @@ void main() {
   testWidgets('side=left slides in from the left', (tester) async {
     await tester.pumpObers(
       const OiSheet(
+        label: 'sheet',
         open: true,
         side: OiPanelSide.left,
         child: Text('Left panel'),
@@ -122,7 +136,7 @@ void main() {
               onTap: () => setState(() => open = true),
               child: const Text('open'),
             ),
-            OiSheet(open: open, child: const Text('Toggled')),
+            OiSheet(label: 'sheet', open: open, child: const Text('Toggled')),
           ],
         ),
       ),
@@ -147,7 +161,7 @@ void main() {
         child: ValueListenableBuilder<bool>(
           valueListenable: notifier,
           builder: (_, isOpen, __) =>
-              OiSheet(open: isOpen, child: const Text('instant')),
+              OiSheet(label: 'sheet', open: isOpen, child: const Text('instant')),
         ),
       ),
     );

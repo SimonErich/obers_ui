@@ -13,7 +13,7 @@ final _tasks = [
   OiGanttTask(
     key: 't1',
     label: 'Design',
-    start: DateTime(2025, 6, 1),
+    start: DateTime(2025, 6),
     end: DateTime(2025, 6, 10),
     progress: 0.8,
   ),
@@ -213,7 +213,7 @@ void main() {
       OiGanttTask(
         key: 'g1',
         label: 'Task 1',
-        start: DateTime(2025, 6, 1),
+        start: DateTime(2025, 6),
         end: DateTime(2025, 6, 5),
         group: 'Phase 1',
       ),
@@ -246,7 +246,7 @@ void main() {
       OiGanttTask(
         key: 'g1',
         label: 'Task 1',
-        start: DateTime(2025, 6, 1),
+        start: DateTime(2025, 6),
         end: DateTime(2025, 6, 5),
         group: 'Alpha',
       ),
@@ -285,7 +285,7 @@ void main() {
       OiGanttTask(
         key: 'c1',
         label: 'Red Task',
-        start: DateTime(2025, 6, 1),
+        start: DateTime(2025, 6),
         end: DateTime(2025, 6, 10),
         color: const Color(0xFFFF0000),
       ),

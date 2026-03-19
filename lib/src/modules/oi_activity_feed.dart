@@ -60,9 +60,7 @@ class OiActivityEvent {
 class OiActivityFeed extends StatelessWidget {
   /// Creates an [OiActivityFeed].
   const OiActivityFeed({
-    super.key,
-    required this.events,
-    required this.label,
+    required this.events, required this.label, super.key,
     this.onEventTap,
     this.onLoadMore,
     this.moreAvailable = false,

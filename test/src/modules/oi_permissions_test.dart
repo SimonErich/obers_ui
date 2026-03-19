@@ -117,8 +117,8 @@ void main() {
         width: 800,
         height: 600,
         child: OiPermissions(
-          permissions: [const OiPermissionItem(key: 'read', label: 'Read')],
-          roles: [const OiRole(key: 'admin', label: 'Admin')],
+          permissions: const [OiPermissionItem(key: 'read', label: 'Read')],
+          roles: const [OiRole(key: 'admin', label: 'Admin')],
           matrix: const {},
           onChange: (m) => result = m,
           label: 'Permissions',
@@ -142,8 +142,8 @@ void main() {
         width: 800,
         height: 600,
         child: OiPermissions(
-          permissions: [const OiPermissionItem(key: 'read', label: 'Read')],
-          roles: [const OiRole(key: 'admin', label: 'Admin')],
+          permissions: const [OiPermissionItem(key: 'read', label: 'Read')],
+          roles: const [OiRole(key: 'admin', label: 'Admin')],
           matrix: const {},
           onChange: (m) => result = m,
           label: 'Permissions',
@@ -226,14 +226,14 @@ void main() {
         width: 800,
         height: 600,
         child: OiPermissions(
-          permissions: [
-            const OiPermissionItem(
+          permissions: const [
+            OiPermissionItem(
               key: 'write',
               label: 'Write',
               description: 'Create and edit',
             ),
           ],
-          roles: [const OiRole(key: 'admin', label: 'Admin')],
+          roles: const [OiRole(key: 'admin', label: 'Admin')],
           matrix: const {},
           onChange: (_) {},
           label: 'Permissions',

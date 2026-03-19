@@ -50,7 +50,7 @@ class _ThrowingDriver extends OiSettingsDriver {
 }
 
 class _W extends StatefulWidget {
-  const _W({this.driver, this.settingsKey, super.key});
+  const _W({this.driver, this.settingsKey});
 
   final OiSettingsDriver? driver;
   final String? settingsKey;

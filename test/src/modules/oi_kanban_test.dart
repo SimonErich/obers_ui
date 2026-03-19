@@ -11,8 +11,8 @@ void main() {
   group('OiKanban', () {
     testWidgets('columns render', (tester) async {
       await tester.pumpObers(
-        OiKanban<String>(
-          columns: const [
+        const OiKanban<String>(
+          columns: [
             OiKanbanColumn(key: 'todo', title: 'To Do', items: []),
             OiKanbanColumn(key: 'done', title: 'Done', items: []),
           ],
@@ -27,8 +27,8 @@ void main() {
 
     testWidgets('cards in columns render', (tester) async {
       await tester.pumpObers(
-        OiKanban<String>(
-          columns: const [
+        const OiKanban<String>(
+          columns: [
             OiKanbanColumn(
               key: 'col1',
               title: 'Column',
@@ -46,8 +46,8 @@ void main() {
 
     testWidgets('column titles show', (tester) async {
       await tester.pumpObers(
-        OiKanban<String>(
-          columns: const [
+        const OiKanban<String>(
+          columns: [
             OiKanbanColumn(key: 'a', title: 'Alpha Column', items: []),
           ],
           label: 'Board',
@@ -75,12 +75,11 @@ void main() {
 
     testWidgets('collapsible columns toggle', (tester) async {
       await tester.pumpObers(
-        OiKanban<String>(
-          columns: const [
+        const OiKanban<String>(
+          columns: [
             OiKanbanColumn(key: 'c', title: 'Col', items: ['Visible']),
           ],
           label: 'Board',
-          collapsibleColumns: true,
         ),
         surfaceSize: const Size(800, 600),
       );
@@ -123,8 +122,8 @@ void main() {
 
     testWidgets('WIP limit warning shows count', (tester) async {
       await tester.pumpObers(
-        OiKanban<String>(
-          columns: const [
+        const OiKanban<String>(
+          columns: [
             OiKanbanColumn(
               key: 'wip',
               title: 'WIP Col',
@@ -132,7 +131,7 @@ void main() {
             ),
           ],
           label: 'Board',
-          wipLimits: const {'wip': 2},
+          wipLimits: {'wip': 2},
         ),
         surfaceSize: const Size(800, 600),
       );
@@ -143,8 +142,8 @@ void main() {
 
     testWidgets('semantics label is applied', (tester) async {
       await tester.pumpObers(
-        OiKanban<String>(
-          columns: const [OiKanbanColumn(key: 'a', title: 'A', items: [])],
+        const OiKanban<String>(
+          columns: [OiKanbanColumn(key: 'a', title: 'A', items: [])],
           label: 'My Board',
         ),
         surfaceSize: const Size(800, 600),

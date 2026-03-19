@@ -47,7 +47,7 @@ void main() {
 
   // 2. Current step is highlighted (its number text is present)
   testWidgets('current step circle is present', (tester) async {
-    await tester.pumpObers(_stepper(totalSteps: 3, currentStep: 1));
+    await tester.pumpObers(_stepper(currentStep: 1));
 
     // Step numbers 1, 2, 3 should all be rendered.
     expect(find.text('1'), findsOneWidget);
@@ -58,7 +58,7 @@ void main() {
   // 3. Completed steps show checkmark icon
   testWidgets('completed steps show checkmark icon', (tester) async {
     await tester.pumpObers(
-      _stepper(totalSteps: 3, currentStep: 2, completedSteps: {0, 1}),
+      _stepper(currentStep: 2, completedSteps: {0, 1}),
     );
 
     // Completed steps render an Icon widget with the check icon.
@@ -71,7 +71,7 @@ void main() {
   // 4. Error steps show error icon
   testWidgets('error steps show error icon', (tester) async {
     await tester.pumpObers(
-      _stepper(totalSteps: 3, currentStep: 1, errorSteps: {0}),
+      _stepper(currentStep: 1, errorSteps: {0}),
     );
 
     final icons = tester.widgetList<Icon>(find.byType(Icon)).toList();
@@ -85,8 +85,6 @@ void main() {
     int? tappedIndex;
     await tester.pumpObers(
       _stepper(
-        totalSteps: 3,
-        currentStep: 0,
         onStepTap: (i) => tappedIndex = i,
       ),
     );
@@ -101,7 +99,7 @@ void main() {
   // 6. Horizontal layout renders a Row
   testWidgets('horizontal style renders a Row', (tester) async {
     await tester.pumpObers(
-      _stepper(style: OiStepperStyle.horizontal, totalSteps: 2),
+      _stepper(totalSteps: 2),
     );
 
     // The horizontal layout uses a Row widget.
@@ -130,7 +128,7 @@ void main() {
   // 9. Step labels render
   testWidgets('step labels render below step circles', (tester) async {
     await tester.pumpObers(
-      _stepper(totalSteps: 3, stepLabels: ['Account', 'Profile', 'Confirm']),
+      _stepper(stepLabels: ['Account', 'Profile', 'Confirm']),
     );
 
     expect(find.text('Account'), findsOneWidget);
@@ -164,7 +162,7 @@ void main() {
 
   // 12. No onStepTap means tapping does nothing (no crash)
   testWidgets('tapping step without onStepTap does not crash', (tester) async {
-    await tester.pumpObers(_stepper(totalSteps: 3, currentStep: 0));
+    await tester.pumpObers(_stepper());
 
     // Should not throw.
     await tester.tap(find.text('2'));

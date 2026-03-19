@@ -6,8 +6,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui/src/components/overlays/oi_toast.dart';
 
 import '../../../helpers/pump_app.dart';
-import 'package:obers_ui/src/foundation/oi_app.dart';
-import 'package:obers_ui/src/foundation/theme/oi_theme_data.dart';
 
 void main() {
   testWidgets('renders message text', (tester) async {
@@ -52,9 +50,9 @@ void main() {
     final handle = tester.ensureSemantics();
     addTearDown(handle.dispose);
     await tester.pumpObers(
-      MediaQuery(
-        data: const MediaQueryData(disableAnimations: true),
-        child: const OiToast(label: 'Toast', message: 'FYI'),
+      const MediaQuery(
+        data: MediaQueryData(disableAnimations: true),
+        child: OiToast(label: 'Toast', message: 'FYI'),
       ),
     );
     expect(find.bySemanticsLabel('Info'), findsOneWidget);
@@ -64,9 +62,9 @@ void main() {
     final handle = tester.ensureSemantics();
     addTearDown(handle.dispose);
     await tester.pumpObers(
-      MediaQuery(
-        data: const MediaQueryData(disableAnimations: true),
-        child: const OiToast(label: 'Toast', message: 'Done', level: OiToastLevel.success),
+      const MediaQuery(
+        data: MediaQueryData(disableAnimations: true),
+        child: OiToast(label: 'Toast', message: 'Done', level: OiToastLevel.success),
       ),
     );
     expect(find.bySemanticsLabel('Success'), findsOneWidget);
@@ -76,9 +74,9 @@ void main() {
     final handle = tester.ensureSemantics();
     addTearDown(handle.dispose);
     await tester.pumpObers(
-      MediaQuery(
-        data: const MediaQueryData(disableAnimations: true),
-        child: const OiToast(label: 'Toast', message: 'Careful', level: OiToastLevel.warning),
+      const MediaQuery(
+        data: MediaQueryData(disableAnimations: true),
+        child: OiToast(label: 'Toast', message: 'Careful', level: OiToastLevel.warning),
       ),
     );
     expect(find.bySemanticsLabel('Warning'), findsOneWidget);
@@ -88,9 +86,9 @@ void main() {
     final handle = tester.ensureSemantics();
     addTearDown(handle.dispose);
     await tester.pumpObers(
-      MediaQuery(
-        data: const MediaQueryData(disableAnimations: true),
-        child: const OiToast(label: 'Toast', message: 'Failed', level: OiToastLevel.error),
+      const MediaQuery(
+        data: MediaQueryData(disableAnimations: true),
+        child: OiToast(label: 'Toast', message: 'Failed', level: OiToastLevel.error),
       ),
     );
     expect(find.bySemanticsLabel('Error'), findsOneWidget);
@@ -134,9 +132,9 @@ void main() {
     tester,
   ) async {
     await tester.pumpObers(
-      MediaQuery(
-        data: const MediaQueryData(disableAnimations: true),
-        child: const OiToast(label: 'Toast', message: 'Instant'),
+      const MediaQuery(
+        data: MediaQueryData(disableAnimations: true),
+        child: OiToast(label: 'Toast', message: 'Instant'),
       ),
     );
     // Duration.zero controller completes in the first frame — no pumpAndSettle needed.

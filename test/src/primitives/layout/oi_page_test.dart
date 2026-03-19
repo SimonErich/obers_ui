@@ -60,7 +60,6 @@ void main() {
     await tester.pumpObers(
       const OiPage(
         breakpoint: OiBreakpoint.compact,
-        gap: OiResponsive<double>(0),
         children: [Text('A'), Text('B')],
       ),
     );

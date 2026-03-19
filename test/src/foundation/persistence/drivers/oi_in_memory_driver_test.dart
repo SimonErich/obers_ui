@@ -37,7 +37,7 @@ void main() {
     // ── Shared contract tests ───────────────────────────────────────────────
 
     group('contract', () {
-      runDriverContractTests(() => OiInMemorySettingsDriver());
+      runDriverContractTests(OiInMemorySettingsDriver.new);
     });
 
     // ── Driver-specific tests ───────────────────────────────────────────────

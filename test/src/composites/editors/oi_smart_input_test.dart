@@ -238,7 +238,7 @@ void main() {
           (w) =>
               w is Semantics &&
               w.properties.label == 'Username' &&
-              w.properties.textField == true,
+              (w.properties.textField ?? false),
         ),
       );
       expect(semanticsWidgets, isNotEmpty);
@@ -272,8 +272,8 @@ void main() {
         String query,
       ) async {
         return [
-          OiSuggestion(value: '@alice', label: 'Alice'),
-          OiSuggestion(value: '@bob', label: 'Bob'),
+          const OiSuggestion(value: '@alice', label: 'Alice'),
+          const OiSuggestion(value: '@bob', label: 'Bob'),
         ];
       }
 
@@ -311,7 +311,7 @@ void main() {
         String trigger,
         String query,
       ) async {
-        return [OiSuggestion(value: '@alice', label: 'Alice')];
+        return [const OiSuggestion(value: '@alice', label: 'Alice')];
       }
 
       await tester.pumpObers(
@@ -352,7 +352,7 @@ void main() {
         String trigger,
         String query,
       ) async {
-        return [OiSuggestion(value: '@alice', label: 'Alice')];
+        return [const OiSuggestion(value: '@alice', label: 'Alice')];
       }
 
       await tester.pumpObers(

@@ -945,7 +945,7 @@ void main() {
   // 41. Pagination bar shows row range text
   testWidgets('pagination bar shows row range text', (tester) async {
     final manyRows = List.generate(50, (i) => _Row('Row$i', i));
-    final ctrl = OiTableController(pageSize: 25, totalRows: 50);
+    final ctrl = OiTableController(totalRows: 50);
     await tester.pumpObers(
       _table(
         rows: manyRows,
@@ -978,7 +978,7 @@ void main() {
   // 43. Page size selector shows current page size
   testWidgets('page size selector shows current page size', (tester) async {
     final manyRows = List.generate(50, (i) => _Row('Row$i', i));
-    final ctrl = OiTableController(pageSize: 25, totalRows: 50);
+    final ctrl = OiTableController(totalRows: 50);
     await tester.pumpObers(
       _table(
         rows: manyRows,
@@ -998,7 +998,7 @@ void main() {
   // 44. Page size selector changes page size
   testWidgets('page size selector changes page size', (tester) async {
     final manyRows = List.generate(100, (i) => _Row('Row$i', i));
-    final ctrl = OiTableController(pageSize: 25, totalRows: 100);
+    final ctrl = OiTableController(totalRows: 100);
     int? changedTo;
     await tester.pumpObers(
       _table(
@@ -1289,7 +1289,7 @@ void main() {
     });
 
     test('totalPages is 0 for 0 items', () {
-      final c = OiPaginationController(pageSize: 10, totalItems: 0);
+      final c = OiPaginationController(pageSize: 10);
       expect(c.totalPages, 0);
     });
 
@@ -1844,7 +1844,7 @@ void main() {
       c.dispose();
       // After dispose, interacting with pagination should not throw
       // since we removed our listener first.
-      expect(() => c.pagination.nextPage(), returnsNormally);
+      expect(c.pagination.nextPage, returnsNormally);
     });
   });
 
@@ -1898,7 +1898,7 @@ void main() {
     });
 
     test('fromJson deserializes all fields', () {
-      final s = OiTableSettings.fromJson({
+      final s = OiTableSettings.fromJson(const {
         'schemaVersion': 1,
         'columnOrder': ['a', 'b'],
         'columnVisibility': {'a': false},
@@ -1947,7 +1947,7 @@ void main() {
     });
 
     test('fromJson handles missing/null fields gracefully', () {
-      final s = OiTableSettings.fromJson({});
+      final s = OiTableSettings.fromJson(const {});
       expect(s.schemaVersion, 1);
       expect(s.columnOrder, isEmpty);
       expect(s.sortColumnId, isNull);
@@ -2482,7 +2482,7 @@ void main() {
   // 75. Page size persisted
   testWidgets('page size is persisted and restored', (tester) async {
     final driver = OiInMemorySettingsDriver();
-    final ctrl1 = OiTableController(pageSize: 25, totalRows: 100);
+    final ctrl1 = OiTableController(totalRows: 100);
     await tester.pumpObers(
       _table(
         rows: List.generate(100, (i) => _Row('R$i', i)),

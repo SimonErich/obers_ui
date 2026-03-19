@@ -18,9 +18,7 @@ import 'package:obers_ui/src/primitives/overlay/oi_floating.dart';
 class OiComboBox<T> extends StatefulWidget {
   /// Creates an [OiComboBox].
   const OiComboBox({
-    super.key,
-    required this.label,
-    required this.labelOf,
+    required this.label, required this.labelOf, super.key,
     this.items = const [],
     this.value,
     this.onSelect,

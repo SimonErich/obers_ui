@@ -112,7 +112,7 @@ void main() {
   // 8. Size adapts to container.
   testWidgets('adapts to custom size', (tester) async {
     await tester.pumpObers(
-      Center(child: OiGauge(value: 50, label: 'Size Test', size: 150)),
+      const Center(child: OiGauge(value: 50, label: 'Size Test', size: 150)),
     );
     final painter = find.byKey(const Key('oi_gauge_painter'));
     final painterSize = tester.getSize(painter);

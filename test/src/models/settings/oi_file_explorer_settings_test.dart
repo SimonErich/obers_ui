@@ -195,7 +195,7 @@ void main() {
     });
 
     test('instances with different fields are not equal', () {
-      const a = OiFileExplorerSettings(sidebarWidth: 240);
+      const a = OiFileExplorerSettings();
       const b = OiFileExplorerSettings(sidebarWidth: 300);
       expect(a, isNot(equals(b)));
     });

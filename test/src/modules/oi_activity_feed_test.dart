@@ -13,8 +13,8 @@ void main() {
   group('OiActivityFeed', () {
     testWidgets('events render in order', (tester) async {
       await tester.pumpObers(
-        OiActivityFeed(
-          events: const [
+        const OiActivityFeed(
+          events: [
             OiActivityEvent(key: '1', title: 'First event'),
             OiActivityEvent(key: '2', title: 'Second event'),
             OiActivityEvent(key: '3', title: 'Third event'),
@@ -40,7 +40,6 @@ void main() {
             ),
           ],
           label: 'Feed',
-          showTimestamps: true,
         ),
         surfaceSize: const Size(400, 600),
       );

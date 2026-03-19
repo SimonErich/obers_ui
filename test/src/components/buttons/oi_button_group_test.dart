@@ -353,7 +353,6 @@ void main() {
     await tester.pumpObers(
       OiButtonGroup(
         label: 'Test group',
-        exclusive: false,
         onSelect: (i) => selected = i,
         items: const [
           OiButtonGroupItem(label: 'A'),
@@ -440,12 +439,10 @@ void main() {
     'wrap=true: horizontal group becomes vertical on compact breakpoint',
     (tester) async {
       await tester.pumpObers(
-        MediaQuery(
-          data: const MediaQueryData(size: Size(375, 812)),
-          child: const OiButtonGroup(
+        const MediaQuery(
+          data: MediaQueryData(size: Size(375, 812)),
+          child: OiButtonGroup(
             label: 'Test group',
-            direction: Axis.horizontal,
-            wrap: true,
             items: [
               OiButtonGroupItem(label: 'A'),
               OiButtonGroupItem(label: 'B'),
@@ -477,15 +474,13 @@ void main() {
     (tester) async {
       const groupWidth = 375.0;
       await tester.pumpObers(
-        MediaQuery(
-          data: const MediaQueryData(size: Size(groupWidth, 812)),
+        const MediaQuery(
+          data: MediaQueryData(size: Size(groupWidth, 812)),
           child: Center(
             child: SizedBox(
               width: groupWidth,
-              child: const OiButtonGroup(
+              child: OiButtonGroup(
                 label: 'Test group',
-                direction: Axis.horizontal,
-                wrap: true,
                 items: [
                   OiButtonGroupItem(label: 'A'),
                   OiButtonGroupItem(label: 'B'),
@@ -524,15 +519,13 @@ void main() {
     (tester) async {
       const groupWidth = 375.0;
       await tester.pumpObers(
-        MediaQuery(
-          data: const MediaQueryData(size: Size(groupWidth, 812)),
+        const MediaQuery(
+          data: MediaQueryData(size: Size(groupWidth, 812)),
           child: Center(
             child: SizedBox(
               width: groupWidth,
-              child: const OiButtonGroup(
+              child: OiButtonGroup(
                 label: 'Test group',
-                direction: Axis.horizontal,
-                wrap: true,
                 spacing: 8,
                 items: [
                   OiButtonGroupItem(label: 'A'),
@@ -568,11 +561,10 @@ void main() {
     tester,
   ) async {
     await tester.pumpObers(
-      MediaQuery(
-        data: const MediaQueryData(size: Size(375, 812)),
-        child: const OiButtonGroup(
+      const MediaQuery(
+        data: MediaQueryData(size: Size(375, 812)),
+        child: OiButtonGroup(
           label: 'Test group',
-          direction: Axis.horizontal,
           wrap: false,
           items: [
             OiButtonGroupItem(label: 'A'),

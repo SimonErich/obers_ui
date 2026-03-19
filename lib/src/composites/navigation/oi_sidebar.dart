@@ -550,7 +550,7 @@ class _OiSidebarState extends State<OiSidebar>
     Color iconColor,
     bool selected,
   ) {
-    Widget icon = Container(
+    final Widget icon = Container(
       color: bg,
       width: widget.compactWidth,
       height: 48,

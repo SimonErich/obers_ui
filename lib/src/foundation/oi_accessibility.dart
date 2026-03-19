@@ -56,7 +56,7 @@ abstract final class OiA11y {
     SemanticsService.sendAnnouncement(
       View.of(context),
       message,
-      TextDirection.ltr,
+      Directionality.of(context),
       assertiveness: assertive ? Assertiveness.assertive : Assertiveness.polite,
     );
   }

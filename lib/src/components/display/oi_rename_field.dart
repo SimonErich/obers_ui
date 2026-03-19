@@ -4,7 +4,7 @@ import 'package:obers_ui/src/components/inputs/oi_text_input.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 
 /// Illegal characters in file/folder names.
-const _illegalChars = <String>['/', '\\', ':', '*', '?', '"', '<', '>', '|'];
+const _illegalChars = <String>['/', r'\', ':', '*', '?', '"', '<', '>', '|'];
 
 /// A specialized inline text input for renaming files/folders.
 ///

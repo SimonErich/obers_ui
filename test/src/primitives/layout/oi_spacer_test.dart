@@ -13,11 +13,11 @@ void main() {
 
   testWidgets('size renders a vertical SizedBox by default', (tester) async {
     await tester.pumpObers(
-      Column(
+      const Column(
         children: [
           OiSpacer(
             breakpoint: OiBreakpoint.compact,
-            size: const OiResponsive<double>(24),
+            size: OiResponsive<double>(24),
           ),
         ],
       ),
@@ -31,11 +31,11 @@ void main() {
     tester,
   ) async {
     await tester.pumpObers(
-      Row(
+      const Row(
         children: [
           OiSpacer(
             breakpoint: OiBreakpoint.compact,
-            size: const OiResponsive<double>(16),
+            size: OiResponsive<double>(16),
             axis: Axis.horizontal,
           ),
         ],
@@ -50,7 +50,7 @@ void main() {
 
   testWidgets('flex renders a Spacer with given flex', (tester) async {
     await tester.pumpObers(
-      Row(
+      const Row(
         children: [OiSpacer(breakpoint: OiBreakpoint.compact, flex: 2)],
       ),
     );
@@ -62,7 +62,7 @@ void main() {
     tester,
   ) async {
     await tester.pumpObers(
-      Row(children: [OiSpacer(breakpoint: OiBreakpoint.compact)]),
+      const Row(children: [OiSpacer(breakpoint: OiBreakpoint.compact)]),
     );
     final spacer = tester.widget<Spacer>(find.byType(Spacer));
     expect(spacer.flex, 1);
@@ -70,11 +70,11 @@ void main() {
 
   testWidgets('flex takes precedence over size', (tester) async {
     await tester.pumpObers(
-      Row(
+      const Row(
         children: [
           OiSpacer(
             breakpoint: OiBreakpoint.compact,
-            size: const OiResponsive<double>(10),
+            size: OiResponsive<double>(10),
             flex: 3,
           ),
         ],

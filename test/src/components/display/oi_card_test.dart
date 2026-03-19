@@ -69,7 +69,7 @@ void main() {
       tester,
     ) async {
       await tester.pumpObers(
-        const OiCard(child: Text('body'), footer: Text('footer content')),
+        const OiCard(footer: Text('footer content'), child: Text('body')),
       );
       expect(find.text('footer content'), findsOneWidget);
       expect(find.byKey(_kDividerKey), findsOneWidget);
@@ -93,7 +93,7 @@ void main() {
       'footer renders with separator even when body is empty widget',
       (tester) async {
         await tester.pumpObers(
-          const OiCard(child: SizedBox.shrink(), footer: Text('footer only')),
+          const OiCard(footer: Text('footer only'), child: SizedBox.shrink()),
         );
         expect(find.text('footer only'), findsOneWidget);
         expect(find.byKey(_kDividerKey), findsOneWidget);
@@ -207,7 +207,7 @@ void main() {
       );
       await tester.pump();
 
-      SizeTransition sizeTransition = tester.widget<SizeTransition>(
+      var sizeTransition = tester.widget<SizeTransition>(
         find.byType(SizeTransition),
       );
       expect(sizeTransition.sizeFactor.value, equals(0.0));
@@ -237,7 +237,7 @@ void main() {
       await tester.tap(find.byType(Icon));
       await tester.pumpAndSettle();
 
-      SizeTransition sizeTransition = tester.widget<SizeTransition>(
+      var sizeTransition = tester.widget<SizeTransition>(
         find.byType(SizeTransition),
       );
       expect(sizeTransition.sizeFactor.value, equals(0.0));

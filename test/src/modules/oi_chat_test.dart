@@ -10,7 +10,7 @@ import '../../helpers/pump_app.dart';
 void main() {
   final now = DateTime(2025, 1, 15, 10, 30);
 
-  OiChatMessage _msg({
+  OiChatMessage msg({
     String key = '1',
     String senderId = 'user-a',
     String senderName = 'Alice',
@@ -34,7 +34,7 @@ void main() {
         width: 400,
         height: 600,
         child: OiChat(
-          messages: [_msg(content: 'Hello world')],
+          messages: [msg(content: 'Hello world')],
           currentUserId: 'user-b',
           label: 'Chat',
         ),
@@ -49,7 +49,7 @@ void main() {
         width: 400,
         height: 600,
         child: OiChat(
-          messages: [_msg(senderId: 'me')],
+          messages: [msg(senderId: 'me')],
           currentUserId: 'me',
           label: 'Chat',
         ),
@@ -66,7 +66,7 @@ void main() {
         width: 400,
         height: 600,
         child: OiChat(
-          messages: [_msg(senderId: 'other')],
+          messages: [msg(senderId: 'other')],
           currentUserId: 'me',
           label: 'Chat',
         ),
@@ -85,10 +85,9 @@ void main() {
         width: 400,
         height: 600,
         child: OiChat(
-          messages: [_msg(senderId: 'other', senderName: 'Bob')],
+          messages: [msg(senderId: 'other', senderName: 'Bob')],
           currentUserId: 'me',
           label: 'Chat',
-          showAvatars: true,
         ),
       ),
     );
@@ -102,10 +101,9 @@ void main() {
         width: 400,
         height: 600,
         child: OiChat(
-          messages: [_msg()],
+          messages: [msg()],
           currentUserId: 'user-b',
           label: 'Chat',
-          showTimestamps: true,
         ),
       ),
     );
@@ -116,14 +114,14 @@ void main() {
     tester,
   ) async {
     await tester.pumpObers(
-      SizedBox(
+      const SizedBox(
         width: 400,
         height: 600,
         child: OiChat(
-          messages: const [],
+          messages: [],
           currentUserId: 'me',
           label: 'Chat',
-          typingUsers: const ['Alice'],
+          typingUsers: ['Alice'],
         ),
       ),
     );
@@ -132,14 +130,14 @@ void main() {
 
   testWidgets('typing indicator for multiple users', (tester) async {
     await tester.pumpObers(
-      SizedBox(
+      const SizedBox(
         width: 400,
         height: 600,
         child: OiChat(
-          messages: const [],
+          messages: [],
           currentUserId: 'me',
           label: 'Chat',
-          typingUsers: const ['Alice', 'Bob'],
+          typingUsers: ['Alice', 'Bob'],
         ),
       ),
     );
@@ -153,7 +151,7 @@ void main() {
         width: 400,
         height: 600,
         child: OiChat(
-          messages: [_msg()],
+          messages: [msg()],
           currentUserId: 'me',
           label: 'Chat',
           onSend: (text) => sent = text,
@@ -178,7 +176,7 @@ void main() {
         width: 400,
         height: 600,
         child: OiChat(
-          messages: [_msg(senderId: 'me', pending: true)],
+          messages: [msg(senderId: 'me', pending: true)],
           currentUserId: 'me',
           label: 'Chat',
         ),
@@ -191,10 +189,10 @@ void main() {
 
   testWidgets('empty chat shows empty message', (tester) async {
     await tester.pumpObers(
-      SizedBox(
+      const SizedBox(
         width: 400,
         height: 600,
-        child: OiChat(messages: const [], currentUserId: 'me', label: 'Chat'),
+        child: OiChat(messages: [], currentUserId: 'me', label: 'Chat'),
       ),
     );
     expect(find.text('No messages yet'), findsOneWidget);
@@ -204,10 +202,10 @@ void main() {
     tester,
   ) async {
     await tester.pumpObers(
-      SizedBox(
+      const SizedBox(
         width: 400,
         height: 600,
-        child: OiChat(messages: const [], currentUserId: 'me', label: 'Chat'),
+        child: OiChat(messages: [], currentUserId: 'me', label: 'Chat'),
       ),
     );
     expect(find.bySemanticsLabel('Send message'), findsNothing);
@@ -220,7 +218,7 @@ void main() {
         width: 400,
         height: 600,
         child: OiChat(
-          messages: [_msg()],
+          messages: [msg()],
           currentUserId: 'user-b',
           label: 'Chat',
         ),
@@ -232,11 +230,11 @@ void main() {
 
   testWidgets('has semantics label', (tester) async {
     await tester.pumpObers(
-      SizedBox(
+      const SizedBox(
         width: 400,
         height: 600,
         child: OiChat(
-          messages: const [],
+          messages: [],
           currentUserId: 'me',
           label: 'Team Chat',
         ),
@@ -254,14 +252,13 @@ void main() {
       'consecutive messages from same sender within threshold are grouped',
       (tester) async {
         final messages = [
-          _msg(
-            key: '1',
+          msg(
             senderId: 'bob',
             senderName: 'Bob',
             content: 'First message',
             timestamp: now,
           ),
-          _msg(
+          msg(
             key: '2',
             senderId: 'bob',
             senderName: 'Bob',
@@ -278,8 +275,6 @@ void main() {
               messages: messages,
               currentUserId: 'me',
               label: 'Chat',
-              showAvatars: true,
-              groupConsecutive: true,
             ),
           ),
         );
@@ -301,8 +296,7 @@ void main() {
       'first message in group shows avatar and sender name',
       (tester) async {
         final messages = [
-          _msg(
-            key: '1',
+          msg(
             senderId: 'bob',
             senderName: 'Bob',
             content: 'Hello',
@@ -318,8 +312,6 @@ void main() {
               messages: messages,
               currentUserId: 'me',
               label: 'Chat',
-              showAvatars: true,
-              groupConsecutive: true,
             ),
           ),
         );
@@ -334,21 +326,20 @@ void main() {
       'continuation messages show reduced spacing (no avatar, no name)',
       (tester) async {
         final messages = [
-          _msg(
-            key: '1',
+          msg(
             senderId: 'bob',
             senderName: 'Bob',
             content: 'First',
             timestamp: now,
           ),
-          _msg(
+          msg(
             key: '2',
             senderId: 'bob',
             senderName: 'Bob',
             content: 'Second',
             timestamp: now.add(const Duration(seconds: 30)),
           ),
-          _msg(
+          msg(
             key: '3',
             senderId: 'bob',
             senderName: 'Bob',
@@ -365,8 +356,6 @@ void main() {
               messages: messages,
               currentUserId: 'me',
               label: 'Chat',
-              showAvatars: true,
-              groupConsecutive: true,
             ),
           ),
         );
@@ -388,14 +377,13 @@ void main() {
       'messages beyond consecutiveThreshold are not grouped',
       (tester) async {
         final messages = [
-          _msg(
-            key: '1',
+          msg(
             senderId: 'bob',
             senderName: 'Bob',
             content: 'Before',
             timestamp: now,
           ),
-          _msg(
+          msg(
             key: '2',
             senderId: 'bob',
             senderName: 'Bob',
@@ -412,9 +400,6 @@ void main() {
               messages: messages,
               currentUserId: 'me',
               label: 'Chat',
-              showAvatars: true,
-              groupConsecutive: true,
-              consecutiveThreshold: const Duration(minutes: 2),
             ),
           ),
         );
@@ -431,14 +416,13 @@ void main() {
       'different senders are never grouped',
       (tester) async {
         final messages = [
-          _msg(
-            key: '1',
+          msg(
             senderId: 'bob',
             senderName: 'Bob',
             content: 'Hi',
             timestamp: now,
           ),
-          _msg(
+          msg(
             key: '2',
             senderId: 'carol',
             senderName: 'Carol',
@@ -455,8 +439,6 @@ void main() {
               messages: messages,
               currentUserId: 'me',
               label: 'Chat',
-              showAvatars: true,
-              groupConsecutive: true,
             ),
           ),
         );
@@ -474,14 +456,13 @@ void main() {
       'groupConsecutive=false disables grouping',
       (tester) async {
         final messages = [
-          _msg(
-            key: '1',
+          msg(
             senderId: 'bob',
             senderName: 'Bob',
             content: 'One',
             timestamp: now,
           ),
-          _msg(
+          msg(
             key: '2',
             senderId: 'bob',
             senderName: 'Bob',
@@ -498,7 +479,6 @@ void main() {
               messages: messages,
               currentUserId: 'me',
               label: 'Chat',
-              showAvatars: true,
               groupConsecutive: false,
             ),
           ),
@@ -520,10 +500,8 @@ void main() {
       var called = false;
       final messages = List.generate(
         30,
-        (i) => _msg(
+        (i) => msg(
           key: 'msg-$i',
-          senderId: 'user-a',
-          senderName: 'Alice',
           content: 'Message $i',
           timestamp: now.add(Duration(minutes: i)),
         ),
@@ -561,10 +539,8 @@ void main() {
         var called = false;
         final messages = List.generate(
           30,
-          (i) => _msg(
+          (i) => msg(
             key: 'msg-$i',
-            senderId: 'user-a',
-            senderName: 'Alice',
             content: 'Message $i',
             timestamp: now.add(Duration(minutes: i)),
           ),
@@ -578,7 +554,6 @@ void main() {
               messages: messages,
               currentUserId: 'user-b',
               label: 'Chat',
-              olderMessagesAvailable: false,
               onLoadOlder: () async {
                 called = true;
               },
@@ -601,7 +576,7 @@ void main() {
           width: 400,
           height: 600,
           child: OiChat(
-            messages: [_msg()],
+            messages: [msg()],
             currentUserId: 'user-b',
             label: 'Chat',
             olderMessagesAvailable: true,

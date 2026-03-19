@@ -193,7 +193,7 @@ void main() {
     });
 
     test('instances with different fields are not equal', () {
-      const a = OiListViewSettings(layout: OiListViewLayout.list);
+      const a = OiListViewSettings();
       const b = OiListViewSettings(layout: OiListViewLayout.grid);
       expect(a, isNot(equals(b)));
     });

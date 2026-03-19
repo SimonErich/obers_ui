@@ -52,7 +52,6 @@ void main() {
           fields: const [OiMetadataField(key: 'ToRemove', value: 'val')],
           onChange: (f) => updatedFields = f,
           label: 'Metadata',
-          allowRemove: true,
         ),
         surfaceSize: const Size(400, 600),
       );

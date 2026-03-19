@@ -140,7 +140,7 @@ class OiFormField {
 @immutable
 class OiFormSection {
   /// Creates an [OiFormSection].
-  const OiFormSection({this.title, this.description, required this.fields});
+  const OiFormSection({required this.fields, this.title, this.description});
 
   /// An optional heading rendered above the section's fields.
   final String? title;
@@ -239,9 +239,7 @@ class OiFormController extends ChangeNotifier {
 class OiForm extends StatefulWidget {
   /// Creates an [OiForm].
   const OiForm({
-    super.key,
-    required this.sections,
-    required this.controller,
+    required this.sections, required this.controller, super.key,
     this.onSubmit,
     this.onCancel,
     this.autoValidate = false,

@@ -664,9 +664,9 @@ void main() {
     testWidgets('OiRow renders without OiTheme', (tester) async {
       await tester.pumpWidget(
         noThemeHarness(
-          OiRow(
+          const OiRow(
             breakpoint: OiBreakpoint.compact,
-            gap: const OiResponsive<double>(8),
+            gap: OiResponsive<double>(8),
             children: children,
           ),
         ),
@@ -678,9 +678,9 @@ void main() {
     testWidgets('OiColumn renders without OiTheme', (tester) async {
       await tester.pumpWidget(
         noThemeHarness(
-          OiColumn(
+          const OiColumn(
             breakpoint: OiBreakpoint.compact,
-            gap: const OiResponsive<double>(8),
+            gap: OiResponsive<double>(8),
             children: children,
           ),
         ),
@@ -692,10 +692,10 @@ void main() {
     testWidgets('OiGrid renders without OiTheme', (tester) async {
       await tester.pumpWidget(
         noThemeHarness(
-          OiGrid(
+          const OiGrid(
             breakpoint: OiBreakpoint.compact,
-            columns: const OiResponsive<int>(2),
-            gap: const OiResponsive<double>(8),
+            columns: OiResponsive<int>(2),
+            gap: OiResponsive<double>(8),
             children: children,
           ),
         ),
@@ -707,9 +707,9 @@ void main() {
     testWidgets('OiSection renders without OiTheme', (tester) async {
       await tester.pumpWidget(
         noThemeHarness(
-          OiSection(
+          const OiSection(
             breakpoint: OiBreakpoint.compact,
-            gap: const OiResponsive<double>(8),
+            gap: OiResponsive<double>(8),
             children: children,
           ),
         ),
@@ -721,10 +721,10 @@ void main() {
     testWidgets('OiPage renders without OiTheme', (tester) async {
       await tester.pumpWidget(
         noThemeHarness(
-          OiPage(
+          const OiPage(
             breakpoint: OiBreakpoint.compact,
             mainAxisSize: MainAxisSize.min,
-            gap: const OiResponsive<double>(8),
+            gap: OiResponsive<double>(8),
             children: children,
           ),
         ),
@@ -736,10 +736,9 @@ void main() {
     testWidgets('OiMasonry renders without OiTheme', (tester) async {
       await tester.pumpWidget(
         noThemeHarness(
-          OiMasonry(
+          const OiMasonry(
             breakpoint: OiBreakpoint.compact,
-            columns: const OiResponsive<int>(2),
-            gap: const OiResponsive<double>(8),
+            gap: OiResponsive<double>(8),
             children: children,
           ),
         ),
@@ -751,7 +750,7 @@ void main() {
     testWidgets('OiContainer renders without OiTheme', (tester) async {
       await tester.pumpWidget(
         noThemeHarness(
-          OiContainer(
+          const OiContainer(
             breakpoint: OiBreakpoint.compact,
             child: child,
           ),
@@ -763,9 +762,9 @@ void main() {
     testWidgets('OiWrapLayout renders without OiTheme', (tester) async {
       await tester.pumpWidget(
         noThemeHarness(
-          OiWrapLayout(
+          const OiWrapLayout(
             breakpoint: OiBreakpoint.compact,
-            spacing: const OiResponsive<double>(8),
+            spacing: OiResponsive<double>(8),
             children: children,
           ),
         ),
@@ -777,10 +776,10 @@ void main() {
     testWidgets('OiSpacer renders without OiTheme', (tester) async {
       await tester.pumpWidget(
         noThemeHarness(
-          Column(children: [
+          const Column(children: [
             OiSpacer(
               breakpoint: OiBreakpoint.compact,
-              size: const OiResponsive<double>(16),
+              size: OiResponsive<double>(16),
             ),
           ]),
         ),
@@ -792,10 +791,10 @@ void main() {
     testWidgets('OiAspectRatio renders without OiTheme', (tester) async {
       await tester.pumpWidget(
         noThemeHarness(
-          OiAspectRatio(
+          const OiAspectRatio(
             breakpoint: OiBreakpoint.compact,
-            ratio: const OiResponsive<double>(16 / 9),
-            child: const ColoredBox(color: Color(0xFF000000)),
+            ratio: OiResponsive<double>(16 / 9),
+            child: ColoredBox(color: Color(0xFF000000)),
           ),
         ),
       );
@@ -872,9 +871,9 @@ void main() {
     });
 
     test('resolve works with custom scale', () {
-      final customScale = OiBreakpointScale([
+      final customScale = OiBreakpointScale(const [
         OiBreakpoint.compact,
-        const OiBreakpoint('tablet', 480),
+        OiBreakpoint('tablet', 480),
         OiBreakpoint.medium,
       ]);
 

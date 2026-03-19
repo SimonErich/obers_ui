@@ -78,13 +78,13 @@ class OiBadge extends StatelessWidget {
 
   const OiBadge._({
     required this.label,
-    required OiBadgeStyle style,
+    required this.style,
     this.color = OiBadgeColor.primary,
     this.size = OiBadgeSize.medium,
     this.icon,
     this.dot = false,
     super.key,
-  }) : style = style;
+  });
 
   // ── Named variant constructors ────────────────────────────────────────────
 

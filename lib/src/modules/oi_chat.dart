@@ -68,9 +68,7 @@ class OiChatMessage {
     required this.key,
     required this.senderId,
     required this.senderName,
-    this.senderAvatar,
-    required this.content,
-    required this.timestamp,
+    required this.content, required this.timestamp, this.senderAvatar,
     this.reactions,
     this.attachments,
     this.pending = false,
@@ -121,10 +119,7 @@ class OiChatMessage {
 class OiChat extends StatefulWidget {
   /// Creates an [OiChat].
   const OiChat({
-    super.key,
-    required this.messages,
-    required this.currentUserId,
-    required this.label,
+    required this.messages, required this.currentUserId, required this.label, super.key,
     this.onSend,
     this.onAttach,
     this.onReact,
@@ -568,7 +563,7 @@ class _OiChatState extends State<OiChat> {
       child: OiTappable(
         onTap: () => widget.onReact?.call(
           widget.messages.firstWhere(
-            (m) => m.reactions?.contains(reaction) == true,
+            (m) => m.reactions?.contains(reaction) ?? false,
             orElse: () => widget.messages.first,
           ),
           reaction.emoji,

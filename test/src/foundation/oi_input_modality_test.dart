@@ -43,7 +43,6 @@ void main() {
       final center = tester.getCenter(find.byType(SizedBox));
       final gesture = await tester.startGesture(
         center,
-        kind: PointerDeviceKind.touch,
       );
       await tester.pump();
 
@@ -76,7 +75,6 @@ void main() {
       final center = tester.getCenter(find.byType(SizedBox));
       final touchGesture = await tester.startGesture(
         center,
-        kind: PointerDeviceKind.touch,
       );
       await tester.pump();
       expect(modality, OiInputModality.touch);
@@ -101,7 +99,6 @@ void main() {
       final center = tester.getCenter(find.byType(SizedBox));
       final touchGesture = await tester.startGesture(
         center,
-        kind: PointerDeviceKind.touch,
       );
       await tester.pump();
       expect(modality, OiInputModality.touch);
@@ -126,7 +123,6 @@ void main() {
       // Touch
       final touch = await tester.startGesture(
         center,
-        kind: PointerDeviceKind.touch,
       );
       await tester.pump();
       expect(modality, OiInputModality.touch);
@@ -155,7 +151,6 @@ void main() {
       // Touch
       final touch = await tester.startGesture(
         center,
-        kind: PointerDeviceKind.touch,
       );
       await tester.pump();
       expect(modality, OiInputModality.touch);
@@ -171,7 +166,6 @@ void main() {
       // Switch to touch first
       final touch = await tester.startGesture(
         center,
-        kind: PointerDeviceKind.touch,
       );
       await tester.pump();
       expect(modality, OiInputModality.touch);

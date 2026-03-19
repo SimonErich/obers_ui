@@ -14,7 +14,7 @@ void main() {
 
   testWidgets('open=true shows panel content', (tester) async {
     await tester.pumpObers(
-      const OiPanel(open: true, child: Text('panel content')),
+      const OiPanel(label: 'panel', open: true, child: Text('panel content')),
     );
     await tester.pumpAndSettle();
     expect(find.text('panel content'), findsOneWidget);
@@ -22,7 +22,11 @@ void main() {
 
   testWidgets('open=false panel is still in tree but slid out', (tester) async {
     await tester.pumpObers(
-      const OiPanel(open: false, child: Text('hidden panel')),
+      const OiPanel(
+        label: 'panel',
+        open: false,
+        child: Text('hidden panel'),
+      ),
     );
     await tester.pumpAndSettle();
     // Widget is in the tree (SlideTransition doesn't remove it).
@@ -38,7 +42,7 @@ void main() {
       StatefulBuilder(
         builder: (context, setState) => Column(
           children: [
-            OiPanel(open: open, child: const Text('panel')),
+            OiPanel(label: 'panel', open: open, child: const Text('panel')),
             GestureDetector(
               onTap: () => setState(() => open = true),
               child: const Text('toggle'),
@@ -57,6 +61,7 @@ void main() {
   testWidgets('side=right renders without error', (tester) async {
     await tester.pumpObers(
       const OiPanel(
+        label: 'panel',
         open: true,
         side: OiPanelSide.right,
         child: Text('right panel'),
@@ -69,6 +74,7 @@ void main() {
   testWidgets('side=top renders without error', (tester) async {
     await tester.pumpObers(
       const OiPanel(
+        label: 'panel',
         open: true,
         side: OiPanelSide.top,
         child: Text('top panel'),
@@ -81,6 +87,7 @@ void main() {
   testWidgets('side=bottom renders without error', (tester) async {
     await tester.pumpObers(
       const OiPanel(
+        label: 'panel',
         open: true,
         side: OiPanelSide.bottom,
         child: Text('bottom panel'),
@@ -98,6 +105,7 @@ void main() {
     var closed = false;
     await tester.pumpObers(
       OiPanel(
+        label: 'panel',
         open: true,
         showScrim: true,
         onClose: () => closed = true,
@@ -119,6 +127,7 @@ void main() {
     var closed = false;
     await tester.pumpObers(
       OiPanel(
+        label: 'panel',
         open: true,
         showScrim: true,
         dismissible: false,
@@ -137,7 +146,12 @@ void main() {
 
   testWidgets('explicit size renders without error', (tester) async {
     await tester.pumpObers(
-      const OiPanel(open: true, size: 300, child: Text('sized panel')),
+      const OiPanel(
+        label: 'panel',
+        open: true,
+        size: 300,
+        child: Text('sized panel'),
+      ),
     );
     await tester.pumpAndSettle();
     expect(find.text('sized panel'), findsOneWidget);
