@@ -153,8 +153,8 @@ class OiTreeController extends ChangeNotifier {
 /// single or multi-node selection, lazy-loading children, and custom
 /// node builders.
 ///
-/// **Accessibility (REQ-0014):** [label] is required so every tree widget has
-/// an accessible description announced by screen readers.
+/// **Accessibility (REQ-0014, REQ-0022):** [label] is required so every tree
+/// widget has an accessible description announced by screen readers.
 ///
 /// ```dart
 /// OiTree<MyData>(

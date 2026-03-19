@@ -1,4 +1,4 @@
-name: Documentation
+name: Documentation & Widgetbook
 
 on:
   push:
@@ -16,7 +16,7 @@ concurrency:
 
 jobs:
   build:
-    name: Build Documentation
+    name: Build Documentation & Widgetbook
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -24,11 +24,30 @@ jobs:
         with:
           flutter-version: '3.41.2'
           channel: stable
+
+      # Build API documentation
       - run: flutter pub get
       - run: dart doc
+
+      # Build Widgetbook
+      - name: Install Widgetbook dependencies
+        working-directory: widgetbook
+        run: flutter pub get
+      - name: Build Widgetbook for web
+        working-directory: widgetbook
+        run: flutter build web --release --base-href /obers_ui/widgetbook/
+
+      # Combine outputs into a single site
+      - name: Assemble site
+        run: |
+          mkdir -p _site
+          cp -r doc/api/* _site/
+          mkdir -p _site/widgetbook
+          cp -r widgetbook/build/web/* _site/widgetbook/
+
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: doc/api
+          path: _site
 
   deploy:
     name: Deploy to Pages
@@ -36,6 +55,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: github-pages
-      url: ${{ github.event.deployment.payload.web_url }}
+      url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - uses: actions/deploy-pages@v4
+      - id: deployment
+        uses: actions/deploy-pages@v4
