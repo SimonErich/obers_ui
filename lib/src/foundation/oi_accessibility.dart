@@ -35,10 +35,6 @@ abstract final class OiA11y {
   /// modality detected by [OiPlatform] rather than [defaultTargetPlatform], so
   /// web-on-touch-device scenarios (where the host platform reports desktop but
   /// the user interacts via touch) correctly receive 48 dp enforcement.
-  ///
-  /// Note: [OiTappable] intentionally overrides this to 0.0 when density is
-  /// [OiDensity.compact] or [OiDensity.dense], allowing widgets to opt out of
-  /// touch-target inflation for dense layouts.
   static double minTouchTarget(BuildContext context) {
     final modality = OiPlatform.of(context).inputModality;
     return modality == OiInputModality.touch ? 48 : 0;

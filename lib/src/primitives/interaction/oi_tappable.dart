@@ -1,12 +1,10 @@
-import 'dart:math' as math;
-
-import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/foundation/oi_accessibility.dart';
 import 'package:obers_ui/src/foundation/oi_app.dart';
 import 'package:obers_ui/src/foundation/theme/oi_effects_theme.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
+import 'package:obers_ui/src/primitives/interaction/oi_touch_target.dart';
 
 /// A foundational interactive widget that handles tap, double-tap, long-press,
 /// hover, focus, and disabled states with animated visual feedback.
@@ -193,15 +191,7 @@ class _OiTappableState extends State<OiTappable> {
     final animations = context.animations;
     final reducedMotion =
         animations.reducedMotion || MediaQuery.disableAnimationsOf(context);
-    final density = OiDensityScope.of(context);
-    // Compact and dense densities intentionally suppress the 48 dp touch-target
-    // floor so that widgets render at their natural size. This allows callers to
-    // opt out of touch-target inflation for information-dense layouts where the
-    // WCAG minimum would waste too much space.
-    final minTarget =
-        (density == OiDensity.compact || density == OiDensity.dense)
-        ? 0.0
-        : OiA11y.minTouchTarget(context);
+    final minTarget = OiA11y.minTouchTarget(context);
     final style = _effectiveStyle(effects);
 
     final effectiveCursor =
@@ -267,7 +257,7 @@ class _OiTappableState extends State<OiTappable> {
 
     // Enforce minimum touch target on touch platforms.
     if (minTarget > 0) {
-      content = _TouchTargetPadding(minSize: minTarget, child: content);
+      content = OiTouchTarget.custom(minSize: minTarget, child: content);
     }
 
     // Gesture detection.
@@ -330,64 +320,3 @@ class _OiTappableState extends State<OiTappable> {
   }
 }
 
-// ── Internal render object ─────────────────────────────────────────────────
-
-/// Wraps its child and enforces a minimum hit area of [minSize] × [minSize] dp.
-///
-/// Used internally by [OiTappable] on touch platforms to satisfy WCAG
-/// minimum tap-target requirements.
-class _TouchTargetPadding extends SingleChildRenderObjectWidget {
-  const _TouchTargetPadding({required super.child, required this.minSize});
-
-  final double minSize;
-
-  @override
-  RenderObject createRenderObject(BuildContext context) =>
-      _RenderTouchTargetPadding(minSize: minSize);
-
-  @override
-  void updateRenderObject(
-    BuildContext context,
-    _RenderTouchTargetPadding renderObject,
-  ) {
-    renderObject.minSize = minSize;
-  }
-}
-
-class _RenderTouchTargetPadding extends RenderProxyBox {
-  _RenderTouchTargetPadding({required double minSize}) : _minSize = minSize;
-
-  double _minSize;
-
-  set minSize(double value) {
-    if (_minSize == value) return;
-    _minSize = value;
-    markNeedsLayout();
-  }
-
-  @override
-  double computeMinIntrinsicWidth(double height) =>
-      math.max(super.computeMinIntrinsicWidth(height), _minSize);
-
-  @override
-  double computeMinIntrinsicHeight(double width) =>
-      math.max(super.computeMinIntrinsicHeight(width), _minSize);
-
-  @override
-  Size computeDryLayout(BoxConstraints constraints) {
-    final childSize = super.computeDryLayout(constraints);
-    return Size(
-      math.max(childSize.width, _minSize),
-      math.max(childSize.height, _minSize),
-    );
-  }
-
-  @override
-  void performLayout() {
-    super.performLayout();
-    size = Size(
-      math.max(size.width, _minSize),
-      math.max(size.height, _minSize),
-    );
-  }
-}

@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/src/primitives/interaction/oi_touch_target.dart';
 
 /// A tappable button that copies [value] to the system clipboard.
 ///
@@ -78,10 +79,12 @@ class _OiCopyButtonState extends State<OiCopyButton> {
         ? (widget.copiedWidget ?? const Text('✓'))
         : (widget.icon ?? const Text('⎘'));
 
-    return Semantics(
-      label: widget.semanticLabel,
-      button: true,
-      child: GestureDetector(onTap: _handleTap, child: displayWidget),
+    return OiTouchTarget(
+      child: Semantics(
+        label: widget.semanticLabel,
+        button: true,
+        child: GestureDetector(onTap: _handleTap, child: displayWidget),
+      ),
     );
   }
 }

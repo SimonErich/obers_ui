@@ -202,18 +202,16 @@ void main() {
     variant: TargetPlatformVariant.only(TargetPlatform.linux),
   );
 
-  // ── TC-touch-compact regression ────────────────────────────────────────────
-  // Compact and dense density suppress the 48 dp touch-target floor so that
-  // widgets render at their natural size — density is used deliberately to opt
-  // out of touch-target inflation (e.g. in button size tests).
+  // ── TC-touch-compact: compact density still enforces 48dp on touch ────────
+  // Density no longer suppresses the 48 dp touch-target floor — touch
+  // targets are always enforced on touch devices regardless of density.
 
   testWidgets(
-    'TC-touch-compact: compact density suppresses 48dp touch-target floor on Android',
+    'TC-touch-compact: compact density on touch device still enforces 48dp target',
     (tester) async {
       await tester.pumpWidget(
-        const OiApp(
-          density: OiDensity.compact,
-          home: Center(
+        touchApp(
+          const Center(
             child: OiTappable(child: SizedBox(width: 24, height: 24)),
           ),
         ),
@@ -221,8 +219,8 @@ void main() {
       await tester.pump();
 
       final size = tester.getSize(find.byType(OiTappable));
-      expect(size.width, 24);
-      expect(size.height, 24);
+      expect(size.width, greaterThanOrEqualTo(48));
+      expect(size.height, greaterThanOrEqualTo(48));
     },
     variant: TargetPlatformVariant.only(TargetPlatform.android),
   );

@@ -278,6 +278,7 @@ export 'src/primitives/gesture/oi_swipeable.dart';
 export 'src/primitives/input/oi_raw_input.dart';
 export 'src/primitives/interaction/oi_focus_trap.dart';
 export 'src/primitives/interaction/oi_tappable.dart';
+export 'src/primitives/interaction/oi_touch_target.dart';
 // ── Primitives: Layout ───────────────────────────────────────────────────────
 
 export 'src/primitives/layout/oi_aspect_ratio.dart';

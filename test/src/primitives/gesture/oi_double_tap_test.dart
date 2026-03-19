@@ -1,11 +1,26 @@
 // Tests do not require documentation comments.
 // ignore_for_file: public_member_api_docs
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:obers_ui/src/foundation/oi_app.dart';
+import 'package:obers_ui/src/foundation/oi_platform.dart';
 import 'package:obers_ui/src/primitives/gesture/oi_double_tap.dart';
 
 import '../../../helpers/pump_app.dart';
+
+Widget _touchApp(Widget child) => OiApp(
+  home: OiPlatform(
+    data: OiPlatformData(
+      platform: defaultTargetPlatform,
+      keyboardHeight: 0,
+      keyboardVisible: false,
+      inputModality: OiInputModality.touch,
+    ),
+    child: child,
+  ),
+);
 
 void main() {
   // ── 1. Renders child ───────────────────────────────────────────────────────
@@ -80,4 +95,25 @@ void main() {
     await tester.pumpAndSettle();
     expect(tapped, isFalse);
   });
+
+  // ── 6. Touch target: enforces 48dp on touch device ──────────────────────
+
+  testWidgets(
+    'OiDoubleTap enforces 48dp touch target on touch device',
+    (tester) async {
+      await tester.pumpWidget(
+        _touchApp(
+          const Center(
+            child: OiDoubleTap(child: SizedBox(width: 24, height: 24)),
+          ),
+        ),
+      );
+      await tester.pump();
+
+      final size = tester.getSize(find.byType(OiDoubleTap));
+      expect(size.width, greaterThanOrEqualTo(48));
+      expect(size.height, greaterThanOrEqualTo(48));
+    },
+    variant: TargetPlatformVariant.only(TargetPlatform.android),
+  );
 }

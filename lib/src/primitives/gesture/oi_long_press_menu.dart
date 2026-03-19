@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/src/primitives/interaction/oi_touch_target.dart';
 
 /// A menu item for the long-press context menu.
 ///
@@ -96,14 +97,16 @@ class _OiLongPressMenuState extends State<OiLongPressMenu> {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onLongPress: widget.enabled ? _showMenu : null,
-      onLongPressStart: widget.enabled
-          ? (details) {
-              _pressPosition = details.globalPosition;
-            }
-          : null,
-      child: widget.child,
+    return OiTouchTarget(
+      child: GestureDetector(
+        onLongPress: widget.enabled ? _showMenu : null,
+        onLongPressStart: widget.enabled
+            ? (details) {
+                _pressPosition = details.globalPosition;
+              }
+            : null,
+        child: widget.child,
+      ),
     );
   }
 }

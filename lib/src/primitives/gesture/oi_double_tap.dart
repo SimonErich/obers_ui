@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/src/primitives/interaction/oi_touch_target.dart';
 
 /// A widget that listens for double-tap and single-tap gestures on its child.
 ///
@@ -44,10 +45,12 @@ class OiDoubleTap extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onDoubleTap: enabled ? onDoubleTap : null,
-      onTap: enabled ? onTap : null,
-      child: child,
+    return OiTouchTarget(
+      child: GestureDetector(
+        onDoubleTap: enabled ? onDoubleTap : null,
+        onTap: enabled ? onTap : null,
+        child: child,
+      ),
     );
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/src/primitives/interaction/oi_touch_target.dart';
 
 /// Wraps [child] so that the [value] is copied to the system clipboard when
 /// the user taps or presses Ctrl+C / Cmd+C.
@@ -62,9 +63,11 @@ class OiCopyable extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Focus(
-      onKeyEvent: _handleKeyEvent,
-      child: GestureDetector(onTap: enabled ? _copy : null, child: child),
+    return OiTouchTarget(
+      child: Focus(
+        onKeyEvent: _handleKeyEvent,
+        child: GestureDetector(onTap: enabled ? _copy : null, child: child),
+      ),
     );
   }
 }
