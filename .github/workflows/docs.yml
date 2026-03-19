@@ -20,14 +20,32 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      # Flutter setup
       - uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.41.2'
           channel: stable
 
+      # Python + MkDocs setup
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install MkDocs and plugins
+        run: pip install mkdocs-material mkdocs-minify-plugin
+
+      # Build MkDocs documentation (becomes the site root)
+      - name: Build MkDocs
+        working-directory: doc/documentation
+        run: mkdocs build --strict --site-dir ../../_site
+
       # Build API documentation
       - run: flutter pub get
       - run: dart doc
+      - name: Copy API docs to _site/api/
+        run: |
+          mkdir -p _site/api
+          cp -r doc/api/* _site/api/
 
       # Build Widgetbook
       - name: Install Widgetbook dependencies
@@ -36,12 +54,8 @@ jobs:
       - name: Build Widgetbook for web
         working-directory: widgetbook
         run: flutter build web --release --base-href /obers_ui/widgetbook/
-
-      # Combine outputs into a single site
-      - name: Assemble site
+      - name: Copy Widgetbook to _site/widgetbook/
         run: |
-          mkdir -p _site
-          cp -r doc/api/* _site/
           mkdir -p _site/widgetbook
           cp -r widgetbook/build/web/* _site/widgetbook/
 

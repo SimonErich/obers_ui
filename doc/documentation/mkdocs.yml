@@ -1,0 +1,118 @@
+site_name: ObersUI
+site_description: "The creamiest Flutter UI kit — 100+ accessible, themeable, responsive components."
+site_url: https://simonerich.github.io/obers_ui/
+repo_url: https://github.com/simonerich/obers_ui
+repo_name: simonerich/obers_ui
+
+theme:
+  name: material
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  font:
+    text: Inter
+    code: JetBrains Mono
+  features:
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.sections
+    - navigation.indexes
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.tabs.link
+    - toc.follow
+  icon:
+    repo: fontawesome/brands/github
+
+extra_css:
+  - assets/extra.css
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - attr_list
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+
+plugins:
+  - search
+  - minify:
+      minify_html: true
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/simonerich/obers_ui
+
+nav:
+  - Home: index.md
+  - Getting Started:
+      - getting-started/index.md
+      - Installation: getting-started/installation.md
+      - Quick Start: getting-started/quick-start.md
+      - Project Structure: getting-started/project-structure.md
+  - Core Concepts:
+      - core-concepts/index.md
+      - Component Tiers: core-concepts/component-tiers.md
+      - Theming: core-concepts/theming.md
+      - Responsive Design: core-concepts/responsive.md
+      - Accessibility: core-concepts/accessibility.md
+      - Density: core-concepts/density.md
+  - Components:
+      - components/index.md
+      - Primitives: components/primitives.md
+      - Components: components/components.md
+      - Composites: components/composites.md
+      - Modules: components/modules.md
+  - Theming:
+      - theming/index.md
+      - Quick Brand Setup: theming/quick-brand.md
+      - Color System: theming/color-system.md
+      - Typography: theming/typography.md
+      - Tokens: theming/tokens.md
+      - Component Themes: theming/component-themes.md
+      - Dark Mode: theming/dark-mode.md
+  - Layout:
+      - layout/index.md
+      - Grid System: layout/grid.md
+      - Page & Section: layout/page-and-section.md
+      - Flex Layouts: layout/flex.md
+  - Settings:
+      - settings/index.md
+  - Advanced:
+      - advanced/index.md
+      - Custom Modules: advanced/custom-modules.md
+      - Extending Themes: advanced/extending-themes.md
+      - Performance: advanced/performance.md
+      - Contributing: advanced/contributing.md
+  - Widgetbook: widgetbook.md

@@ -1,0 +1,16 @@
+/* ObersUI cream palette */
+:root {
+  --md-primary-fg-color: #8B6914;
+  --md-primary-fg-color--light: #D4A574;
+  --md-primary-fg-color--dark: #6B4F10;
+  --md-accent-fg-color: #D97706;
+  --md-accent-fg-color--transparent: rgba(217, 119, 6, 0.1);
+}
+
+[data-md-color-scheme="slate"] {
+  --md-primary-fg-color: #D4A574;
+  --md-primary-fg-color--light: #E8C9A0;
+  --md-primary-fg-color--dark: #8B6914;
+  --md-accent-fg-color: #F59E0B;
+  --md-accent-fg-color--transparent: rgba(245, 158, 11, 0.1);
+}
