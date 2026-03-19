@@ -76,9 +76,12 @@ class OiOverlaysService {
 
   /// Shows a custom overlay widget above all content.
   ///
+  /// The [label] is announced by screen readers when the overlay appears.
+  ///
   /// Returns an [OiOverlayHandle] that can be used to dismiss or update
   /// the overlay.
   OiOverlayHandle show({
+    required String label,
     required WidgetBuilder builder,
     OiOverlayZOrder zOrder = OiOverlayZOrder.base,
     bool dismissible = true,
@@ -91,8 +94,9 @@ class OiOverlaysService {
 
     entry = OverlayEntry(
       builder: (context) {
+        Widget content;
         if (dismissible) {
-          return Stack(
+          content = Stack(
             children: [
               // Invisible dismiss barrier
               Positioned.fill(
@@ -108,8 +112,15 @@ class OiOverlaysService {
               builder(context),
             ],
           );
+        } else {
+          content = builder(context);
         }
-        return builder(context);
+        return Semantics(
+          label: label,
+          scopesRoute: true,
+          explicitChildNodes: true,
+          child: content,
+        );
       },
     );
 

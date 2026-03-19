@@ -185,10 +185,15 @@ class OiDialog extends StatelessWidget {
   /// Uses [OiOverlays.of] when available, otherwise falls back to the
   /// Flutter [Overlay]. Returns an [OiOverlayHandle] that can be used to
   /// dismiss the overlay programmatically.
-  static OiOverlayHandle show(BuildContext context, {required Widget dialog}) {
+  static OiOverlayHandle show(
+    BuildContext context, {
+    required String label,
+    required Widget dialog,
+  }) {
     final service = OiOverlays.maybeOf(context);
     if (service != null) {
       return service.show(
+        label: label,
         builder: (_) => dialog,
         zOrder: OiOverlayZOrder.dialog,
         dismissible: false,

@@ -113,6 +113,7 @@ void main() {
         builder: (ctx) => GestureDetector(
           onTap: () => OiDialog.show(
             ctx,
+            label: 'shown',
             dialog: const OiDialog.standard(
               label: 'shown',
               title: 'Shown',

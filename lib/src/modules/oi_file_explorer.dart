@@ -266,6 +266,7 @@ class _OiFileExplorerState extends State<OiFileExplorer> {
     _dismissDialog();
     _dialogHandle = OiDialog.show(
       context,
+      label: 'Delete confirmation',
       dialog: OiDialog.confirm(
         label: 'Delete confirmation',
         content: OiDeleteDialog(
@@ -291,6 +292,7 @@ class _OiFileExplorerState extends State<OiFileExplorer> {
     _dismissDialog();
     _dialogHandle = OiDialog.show(
       context,
+      label: copyMode ? 'Copy dialog' : 'Move dialog',
       dialog: OiDialog.form(
         label: copyMode ? 'Copy dialog' : 'Move dialog',
         content: OiMoveDialog(
@@ -324,6 +326,7 @@ class _OiFileExplorerState extends State<OiFileExplorer> {
         widget.controller.currentFolder?.id.toString() ?? 'root';
     _dialogHandle = OiDialog.show(
       context,
+      label: 'Upload dialog',
       dialog: OiDialog.form(
         label: 'Upload dialog',
         content: OiUploadDialog(

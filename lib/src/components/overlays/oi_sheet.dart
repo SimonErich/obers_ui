@@ -105,6 +105,7 @@ class OiSheet extends StatefulWidget {
       // callback notifies the caller but does not need to dismiss the entry
       // (the caller dismisses via the returned handle).
       return service.show(
+        label: label,
         builder: (_) => OiSheet(
           label: label,
           open: true,

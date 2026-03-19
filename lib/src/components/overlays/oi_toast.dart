@@ -117,6 +117,7 @@ class OiToast extends StatefulWidget {
     if (service != null) {
       // Service manages the entry lifetime; pass onDismiss straight through.
       return service.show(
+        label: message,
         builder: (_) => OiToast(
           label: message,
           message: message,

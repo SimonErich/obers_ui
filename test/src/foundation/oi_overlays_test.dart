@@ -65,7 +65,7 @@ void main() {
       );
       await tester.pump(); // let post-frame callback attach overlay state
 
-      final handle = service.show(builder: (_) => const SizedBox.shrink());
+      final handle = service.show(label: 'test', builder: (_) => const SizedBox.shrink());
       expect(handle.isDismissed, isFalse);
     });
 
@@ -77,7 +77,7 @@ void main() {
       );
       await tester.pump();
 
-      final handle = service.show(builder: (_) => const SizedBox.shrink())
+      final handle = service.show(label: 'test', builder: (_) => const SizedBox.shrink())
         ..dismiss();
       expect(handle.isDismissed, isTrue);
     });
@@ -90,7 +90,7 @@ void main() {
       );
       await tester.pump();
 
-      final handle = service.show(builder: (_) => const SizedBox.shrink())
+      final handle = service.show(label: 'test', builder: (_) => const SizedBox.shrink())
         ..dismiss();
       // Second dismiss must not throw
       expect(handle.dismiss, returnsNormally);
@@ -105,7 +105,7 @@ void main() {
       );
       await tester.pump();
 
-      final handle = service.show(builder: (_) => const SizedBox.shrink());
+      final handle = service.show(label: 'test', builder: (_) => const SizedBox.shrink());
       expect(handle.update, returnsNormally);
     });
 
@@ -117,7 +117,7 @@ void main() {
       );
       await tester.pump();
 
-      final handle = service.show(builder: (_) => const SizedBox.shrink())
+      final handle = service.show(label: 'test', builder: (_) => const SizedBox.shrink())
         ..dismiss();
       expect(handle.update, returnsNormally);
     });
@@ -132,10 +132,25 @@ void main() {
       );
       await tester.pump();
 
-      service.show(builder: (_) => const Text('overlay content'));
+      service.show(label: 'overlay', builder: (_) => const Text('overlay content'));
       await tester.pump();
 
       expect(find.text('overlay content'), findsOneWidget);
+    });
+
+    testWidgets('show wraps content in Semantics with label', (tester) async {
+      final service = createOiOverlaysService();
+
+      await tester.pumpWidget(
+        buildHost(service: service, child: const SizedBox.shrink()),
+      );
+      await tester.pump();
+
+      service.show(label: 'My overlay', builder: (_) => const Text('content'));
+      await tester.pump();
+
+      final semantics = find.bySemanticsLabel('My overlay');
+      expect(semantics, findsOneWidget);
     });
 
     testWidgets('show with dismissible adds a barrier', (tester) async {
@@ -148,6 +163,7 @@ void main() {
       await tester.pump();
 
       service.show(
+        label: 'overlay',
         builder: (_) => const Text('overlay'),
         onDismiss: () => dismissed = true,
       );
@@ -172,6 +188,7 @@ void main() {
       await tester.pump();
 
       final handle = service.show(
+        label: 'overlay',
         builder: (_) => const Text('overlay'),
         dismissible: false,
         onDismiss: () => dismissCalled = true,
@@ -196,9 +213,9 @@ void main() {
       );
       await tester.pump();
 
-      final h1 = service.show(builder: (_) => const SizedBox.shrink());
-      final h2 = service.show(builder: (_) => const SizedBox.shrink());
-      final h3 = service.show(builder: (_) => const SizedBox.shrink());
+      final h1 = service.show(label: 'test', builder: (_) => const SizedBox.shrink());
+      final h2 = service.show(label: 'test', builder: (_) => const SizedBox.shrink());
+      final h3 = service.show(label: 'test', builder: (_) => const SizedBox.shrink());
 
       service.dismissAll();
 
@@ -230,8 +247,8 @@ void main() {
       );
       await tester.pump();
 
-      service.show(builder: (_) => const Text('first'));
-      final h2 = service.show(builder: (_) => const Text('second'));
+      service.show(label: 'first', builder: (_) => const Text('first'));
+      final h2 = service.show(label: 'second', builder: (_) => const Text('second'));
       await tester.pump();
 
       h2.dismiss();
@@ -341,7 +358,7 @@ void main() {
 
       // After attachment, show() must not assert
       expect(
-        () => service.show(builder: (_) => const SizedBox.shrink()),
+        () => service.show(label: 'test', builder: (_) => const SizedBox.shrink()),
         returnsNormally,
       );
     });
