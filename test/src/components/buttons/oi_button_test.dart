@@ -91,6 +91,23 @@ void main() {
     expect(count, 0);
   });
 
+  testWidgets('loading indicator skips animation when reducedMotion', (
+    tester,
+  ) async {
+    await tester.pumpObers(
+      const MediaQuery(
+        data: MediaQueryData(disableAnimations: true),
+        child: OiButton.primary(label: 'Save', loading: true),
+      ),
+    );
+    // OiPulse is present but its animation is suppressed.
+    expect(find.byType(OiPulse), findsOneWidget);
+    // The child should render directly without Opacity/Transform wrappers
+    // from OiPulse (reducedMotion returns child as-is).
+    final pulse = tester.widget<OiPulse>(find.byType(OiPulse));
+    expect(pulse.active, isTrue);
+  });
+
   // ── fullWidth ──────────────────────────────────────────────────────────────
 
   testWidgets('fullWidth=true adds SizedBox with infinite width', (

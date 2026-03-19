@@ -70,6 +70,30 @@ void main() {
     expect(find.text('Hover tip'), findsOneWidget);
   });
 
+  testWidgets('hover shows tooltip immediately when reducedMotion', (
+    tester,
+  ) async {
+    await tester.pumpObers(
+      const MediaQuery(
+        data: MediaQueryData(disableAnimations: true),
+        child: OiTooltip(
+          label: 'Tip',
+          message: 'Instant tip',
+          showDelay: Duration(milliseconds: 600),
+          child: Text('hover me'),
+        ),
+      ),
+    );
+
+    final gesture = await tester.createGesture(kind: PointerDeviceKind.mouse);
+    await gesture.addPointer(location: tester.getCenter(find.text('hover me')));
+    addTearDown(gesture.removePointer);
+    await tester.pump();
+
+    // With reducedMotion, the tooltip should appear immediately — no delay.
+    expect(find.text('Instant tip'), findsOneWidget);
+  });
+
   testWidgets('rich content overrides message', (tester) async {
     await tester.pumpObers(
       const OiTooltip(

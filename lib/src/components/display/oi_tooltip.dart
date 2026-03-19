@@ -61,9 +61,16 @@ class _OiTooltipState extends State<OiTooltip> {
 
   void _scheduleShow() {
     _showTimer?.cancel();
-    _showTimer = Timer(widget.showDelay, () {
+    final reduced =
+        context.animations.reducedMotion ||
+        MediaQuery.disableAnimationsOf(context);
+    if (reduced) {
       if (mounted) setState(() => _visible = true);
-    });
+    } else {
+      _showTimer = Timer(widget.showDelay, () {
+        if (mounted) setState(() => _visible = true);
+      });
+    }
   }
 
   void _hide() {
@@ -76,7 +83,13 @@ class _OiTooltipState extends State<OiTooltip> {
     _showTimer?.cancel();
     if (mounted) setState(() => _visible = true);
     _dismissTimer?.cancel();
-    _dismissTimer = Timer(const Duration(seconds: 2), _hide);
+    final reduced =
+        context.animations.reducedMotion ||
+        MediaQuery.disableAnimationsOf(context);
+    _dismissTimer = Timer(
+      reduced ? Duration.zero : const Duration(seconds: 2),
+      _hide,
+    );
   }
 
   Widget _buildTooltipContent(BuildContext context) {

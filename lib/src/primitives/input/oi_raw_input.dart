@@ -175,11 +175,16 @@ class _OiRawInputState extends State<OiRawInput> {
       // Scroll this widget into view after the frame is laid out.
       SchedulerBinding.instance.addPostFrameCallback((_) {
         if (mounted) {
+          final reduced =
+              context.animations.reducedMotion ||
+              MediaQuery.disableAnimationsOf(context);
           Scrollable.maybeOf(context)?.position; // trigger dependency
           Scrollable.ensureVisible(
             context,
             alignment: 0.5,
-            duration: const Duration(milliseconds: 200),
+            duration: reduced
+                ? Duration.zero
+                : const Duration(milliseconds: 200),
           );
         }
       });

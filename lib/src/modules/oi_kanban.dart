@@ -296,12 +296,19 @@ class _OiKanbanState<T> extends State<OiKanban<T>>
               OiTappable(
                 onTap: _compactPageIndex > 0
                     ? () {
+                        final reduced =
+                            context.animations.reducedMotion ||
+                            MediaQuery.disableAnimationsOf(context);
                         final next = _compactPageIndex - 1;
-                        _pageController.animateToPage(
-                          next,
-                          duration: const Duration(milliseconds: 300),
-                          curve: Curves.easeInOut,
-                        );
+                        if (reduced) {
+                          _pageController.jumpToPage(next);
+                        } else {
+                          _pageController.animateToPage(
+                            next,
+                            duration: const Duration(milliseconds: 300),
+                            curve: Curves.easeInOut,
+                          );
+                        }
                       }
                     : null,
                 child: Icon(
@@ -321,12 +328,19 @@ class _OiKanbanState<T> extends State<OiKanban<T>>
               OiTappable(
                 onTap: _compactPageIndex < totalColumns - 1
                     ? () {
+                        final reduced =
+                            context.animations.reducedMotion ||
+                            MediaQuery.disableAnimationsOf(context);
                         final next = _compactPageIndex + 1;
-                        _pageController.animateToPage(
-                          next,
-                          duration: const Duration(milliseconds: 300),
-                          curve: Curves.easeInOut,
-                        );
+                        if (reduced) {
+                          _pageController.jumpToPage(next);
+                        } else {
+                          _pageController.animateToPage(
+                            next,
+                            duration: const Duration(milliseconds: 300),
+                            curve: Curves.easeInOut,
+                          );
+                        }
                       }
                     : null,
                 child: Icon(

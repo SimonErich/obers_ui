@@ -151,5 +151,79 @@ void main() {
 
       expect(find.bySemanticsLabel('My Board'), findsOneWidget);
     });
+
+    testWidgets(
+        'compact forward navigation uses jumpToPage when reducedMotion',
+        (tester) async {
+      await tester.pumpObers(
+        const MediaQuery(
+          data: MediaQueryData(
+            disableAnimations: true,
+            size: Size(400, 600),
+          ),
+          child: OiKanban<String>(
+            columns: [
+              OiKanbanColumn(key: 'a', title: 'Col A', items: ['A1']),
+              OiKanbanColumn(key: 'b', title: 'Col B', items: ['B1']),
+            ],
+            label: 'Board',
+          ),
+        ),
+        surfaceSize: const Size(400, 600),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('1 / 2'), findsOneWidget);
+
+      // Tap the forward arrow to navigate to the next column.
+      final forwardArrow = find.byIcon(
+        const IconData(0xe5cc, fontFamily: 'MaterialIcons'),
+      );
+      await tester.tap(forwardArrow);
+      // A single pump is sufficient — jumpToPage completes synchronously.
+      await tester.pump();
+
+      expect(find.text('2 / 2'), findsOneWidget);
+    });
+
+    testWidgets(
+        'compact backward navigation uses jumpToPage when reducedMotion',
+        (tester) async {
+      await tester.pumpObers(
+        const MediaQuery(
+          data: MediaQueryData(
+            disableAnimations: true,
+            size: Size(400, 600),
+          ),
+          child: OiKanban<String>(
+            columns: [
+              OiKanbanColumn(key: 'a', title: 'Col A', items: ['A1']),
+              OiKanbanColumn(key: 'b', title: 'Col B', items: ['B1']),
+            ],
+            label: 'Board',
+          ),
+        ),
+        surfaceSize: const Size(400, 600),
+      );
+      await tester.pumpAndSettle();
+
+      // Navigate forward first.
+      final forwardArrow = find.byIcon(
+        const IconData(0xe5cc, fontFamily: 'MaterialIcons'),
+      );
+      await tester.tap(forwardArrow);
+      await tester.pump();
+      expect(find.text('2 / 2'), findsOneWidget);
+
+      // Tap the backward arrow to navigate back.
+      final backwardArrow = find.byIcon(
+        const IconData(0xe5cb, fontFamily: 'MaterialIcons'),
+      );
+      await tester.tap(backwardArrow);
+      // A single pump is sufficient — jumpToPage completes synchronously.
+      await tester.pump();
+
+      expect(find.text('1 / 2'), findsOneWidget);
+    });
   });
 }

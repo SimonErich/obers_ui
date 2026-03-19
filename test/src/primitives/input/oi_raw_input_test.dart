@@ -166,4 +166,46 @@ void main() {
     final et = tester.widget<EditableText>(find.byType(EditableText));
     expect(et.maxLines, isNull);
   });
+
+  // ── reducedMotion ─────────────────────────────────────────────────────────
+
+  testWidgets('ensureVisible uses Duration.zero when reducedMotion',
+      (tester) async {
+    final focusNode = FocusNode();
+    final scrollController = ScrollController();
+    await tester.pumpObers(
+      MediaQuery(
+        data: const MediaQueryData(disableAnimations: true),
+        child: SizedBox(
+          height: 200,
+          child: SingleChildScrollView(
+            controller: scrollController,
+            child: Column(
+              children: [
+                const SizedBox(height: 800),
+                buildInput(focusNode: focusNode, placeholder: 'input'),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+
+    // Scroll position starts at 0 — the input is off-screen.
+    expect(scrollController.offset, 0.0);
+
+    // Focus the input, which triggers ensureVisible.
+    focusNode.requestFocus();
+    // One pump to process the focus change, one for the post-frame callback.
+    await tester.pump();
+    await tester.pump();
+
+    // With Duration.zero, the scroll should have jumped instantly —
+    // no animation frames needed. The offset must be non-zero.
+    expect(scrollController.offset, greaterThan(0));
+    expect(find.byType(EditableText), findsOneWidget);
+
+    scrollController.dispose();
+  });
 }
