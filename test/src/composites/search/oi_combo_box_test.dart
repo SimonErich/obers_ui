@@ -6,6 +6,7 @@ import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:obers_ui/src/components/display/oi_badge.dart';
 import 'package:obers_ui/src/composites/search/oi_combo_box.dart';
 
 import '../../../helpers/pump_app.dart';
@@ -281,9 +282,10 @@ void main() {
       _comboBox(multiSelect: true, selectedValues: const ['Apple', 'Banana']),
     );
 
-    // Both selected items should show as chips.
+    // Both selected items should show as OiBadge chips.
     expect(find.text('Apple'), findsOneWidget);
     expect(find.text('Banana'), findsOneWidget);
+    expect(find.byType(OiBadge), findsNWidgets(2));
   });
 
   testWidgets('maxChipsVisible limits visible chips', (tester) async {

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/_internal/oi_input_frame.dart';
+import 'package:obers_ui/src/components/display/oi_badge.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/primitives/input/oi_raw_input.dart';
 import 'package:obers_ui/src/primitives/overlay/oi_floating.dart';
@@ -583,19 +584,10 @@ class _OiComboBoxState<T> extends State<OiComboBox<T>> {
               runSpacing: 2,
               children: [
                 for (final item in visibleItems)
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 6,
-                      vertical: 2,
-                    ),
-                    decoration: BoxDecoration(
-                      color: colors.surfaceActive,
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    child: Text(
-                      widget.labelOf(item),
-                      style: TextStyle(fontSize: 12, color: colors.text),
-                    ),
+                  OiBadge.soft(
+                    label: widget.labelOf(item),
+                    size: OiBadgeSize.small,
+                    color: OiBadgeColor.neutral,
                   ),
                 if (remaining > 0)
                   Text(
