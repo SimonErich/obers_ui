@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:obers_ui/obers_ui.dart';
+import 'package:obers_ui_widgetbook/helpers/knob_helpers.dart';
 import 'package:widgetbook/widgetbook.dart';
-
-import '../helpers/knob_helpers.dart';
 
 final _sampleEvents = [
   OiActivityEvent(
@@ -62,14 +61,8 @@ final oiActivityFeedComponent = WidgetbookComponent(
           label: 'Show Categories',
           initialValue: true,
         );
-        final loading = context.knobs.boolean(
-          label: 'Loading',
-          initialValue: false,
-        );
-        final moreAvailable = context.knobs.boolean(
-          label: 'More Available',
-          initialValue: false,
-        );
+        final loading = context.knobs.boolean(label: 'Loading');
+        final moreAvailable = context.knobs.boolean(label: 'More Available');
 
         return useCaseWrapper(
           SizedBox(
@@ -95,13 +88,10 @@ final oiActivityFeedComponent = WidgetbookComponent(
       name: 'Empty State',
       builder: (context) {
         return useCaseWrapper(
-          SizedBox(
+          const SizedBox(
             height: 400,
             width: 400,
-            child: OiActivityFeed(
-              events: const [],
-              label: 'Empty activity feed',
-            ),
+            child: OiActivityFeed(events: [], label: 'Empty activity feed'),
           ),
         );
       },

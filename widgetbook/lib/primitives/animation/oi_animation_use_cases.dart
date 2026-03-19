@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:obers_ui/obers_ui.dart';
+import 'package:obers_ui_widgetbook/helpers/knob_helpers.dart';
 import 'package:widgetbook/widgetbook.dart';
-
-import '../../helpers/knob_helpers.dart';
 
 Widget _coloredBox(Color color, String label, {double size = 60}) {
   return Container(
     width: size,
     height: size,
     color: color,
-    child: Center(child: Text(label, style: const TextStyle(color: Color(0xFFFFFFFF)))),
+    child: Center(
+      child: Text(label, style: const TextStyle(color: Color(0xFFFFFFFF))),
+    ),
   );
 }
 
@@ -62,7 +63,10 @@ class _SpringDemoState extends State<_SpringDemo> {
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             color: const Color(0xFF2196F3),
-            child: const Text('Toggle', style: TextStyle(color: Color(0xFFFFFFFF))),
+            child: const Text(
+              'Toggle',
+              style: TextStyle(color: Color(0xFFFFFFFF)),
+            ),
           ),
         ),
         const SizedBox(height: 24),
@@ -98,11 +102,23 @@ final oiShimmerComponent = WidgetbookComponent(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Container(width: 200, height: 20, color: const Color(0xFFFFFFFF)),
+                Container(
+                  width: 200,
+                  height: 20,
+                  color: const Color(0xFFFFFFFF),
+                ),
                 const SizedBox(height: 8),
-                Container(width: 200, height: 20, color: const Color(0xFFFFFFFF)),
+                Container(
+                  width: 200,
+                  height: 20,
+                  color: const Color(0xFFFFFFFF),
+                ),
                 const SizedBox(height: 8),
-                Container(width: 140, height: 20, color: const Color(0xFFFFFFFF)),
+                Container(
+                  width: 140,
+                  height: 20,
+                  color: const Color(0xFFFFFFFF),
+                ),
               ],
             ),
           ),
@@ -125,7 +141,6 @@ final oiPulseComponent = WidgetbookComponent(
         final minOpacity = context.knobs.double.slider(
           label: 'Min Opacity',
           initialValue: 0.4,
-          min: 0,
           max: 1,
         );
 
@@ -156,13 +171,12 @@ final oiStaggerComponent = WidgetbookComponent(
         return useCaseWrapper(
           OiStagger(
             transition: transition,
-            staggerDelay: const Duration(milliseconds: 80),
             children: List.generate(
               5,
               (i) => Padding(
                 padding: const EdgeInsets.only(bottom: 8),
                 child: _coloredBox(
-                  Color(0xFF2196F3).withValues(alpha: 0.4 + i * 0.12),
+                  const Color(0xFF2196F3).withValues(alpha: 0.4 + i * 0.12),
                   'Item ${i + 1}',
                   size: 40,
                 ),
@@ -187,9 +201,7 @@ final oiMorphComponent = WidgetbookComponent(
           initialValue: OiTransition.fade,
         );
 
-        return useCaseWrapper(
-          _MorphDemo(transition: transition),
-        );
+        return useCaseWrapper(_MorphDemo(transition: transition));
       },
     ),
   ],
@@ -216,7 +228,10 @@ class _MorphDemoState extends State<_MorphDemo> {
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             color: const Color(0xFF2196F3),
-            child: const Text('Toggle', style: TextStyle(color: Color(0xFFFFFFFF))),
+            child: const Text(
+              'Toggle',
+              style: TextStyle(color: Color(0xFFFFFFFF)),
+            ),
           ),
         ),
         const SizedBox(height: 24),
@@ -237,9 +252,7 @@ final oiAnimatedListComponent = WidgetbookComponent(
     WidgetbookUseCase(
       name: 'Default',
       builder: (context) {
-        return useCaseWrapper(
-          const _AnimatedListDemo(),
-        );
+        return useCaseWrapper(const _AnimatedListDemo());
       },
     ),
   ],
@@ -270,9 +283,15 @@ class _AnimatedListDemoState extends State<_AnimatedListDemo> {
                 setState(() => _counter++);
               },
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
                 color: const Color(0xFF4CAF50),
-                child: const Text('Add', style: TextStyle(color: Color(0xFFFFFFFF))),
+                child: const Text(
+                  'Add',
+                  style: TextStyle(color: Color(0xFFFFFFFF)),
+                ),
               ),
             ),
             const SizedBox(width: 8),
@@ -283,9 +302,15 @@ class _AnimatedListDemoState extends State<_AnimatedListDemo> {
                 }
               },
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
                 color: const Color(0xFFF44336),
-                child: const Text('Remove', style: TextStyle(color: Color(0xFFFFFFFF))),
+                child: const Text(
+                  'Remove',
+                  style: TextStyle(color: Color(0xFFFFFFFF)),
+                ),
               ),
             ),
           ],

@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:obers_ui/obers_ui.dart';
+import 'package:obers_ui_widgetbook/helpers/knob_helpers.dart';
 import 'package:widgetbook/widgetbook.dart';
-
-import '../../helpers/knob_helpers.dart';
 
 final oiReplyPreviewComponent = WidgetbookComponent(
   name: 'OiReplyPreview',
@@ -16,7 +15,8 @@ final oiReplyPreviewComponent = WidgetbookComponent(
         );
         final content = context.knobs.string(
           label: 'Content',
-          initialValue: 'Sure, let me check the latest build and get back to you.',
+          initialValue:
+              'Sure, let me check the latest build and get back to you.',
         );
         final dismissible = context.knobs.boolean(
           label: 'Dismissible',

@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:obers_ui/obers_ui.dart';
 import 'package:widgetbook/widgetbook.dart';
 
-import '../../helpers/knob_helpers.dart';
-
 final oiDrawerComponent = WidgetbookComponent(
   name: 'OiDrawer',
   useCases: [
@@ -40,9 +38,13 @@ final oiDrawerComponent = WidgetbookComponent(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text('Drawer Content',
-                              style: TextStyle(
-                                  fontSize: 18, fontWeight: FontWeight.w600)),
+                          const Text(
+                            'Drawer Content',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
                           const SizedBox(height: 16),
                           OiListTile(
                             title: 'Home',

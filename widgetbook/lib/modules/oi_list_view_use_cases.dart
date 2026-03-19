@@ -1,23 +1,45 @@
 import 'package:flutter/material.dart';
 import 'package:obers_ui/obers_ui.dart';
-import 'package:obers_ui/src/modules/oi_list_view.dart' show OiSelectionMode;
+import 'package:obers_ui_widgetbook/helpers/knob_helpers.dart';
 import 'package:widgetbook/widgetbook.dart';
 
-import '../helpers/knob_helpers.dart';
-
 class _SampleItem {
-  const _SampleItem({required this.id, required this.title, required this.subtitle});
+  const _SampleItem({
+    required this.id,
+    required this.title,
+    required this.subtitle,
+  });
   final String id;
   final String title;
   final String subtitle;
 }
 
 const _sampleItems = [
-  _SampleItem(id: '1', title: 'Design System Tokens', subtitle: 'Define color, spacing, and typography tokens'),
-  _SampleItem(id: '2', title: 'Button Component', subtitle: 'Primary, secondary, ghost, and destructive variants'),
-  _SampleItem(id: '3', title: 'Input Fields', subtitle: 'Text input, search, and textarea components'),
-  _SampleItem(id: '4', title: 'Modal Dialogs', subtitle: 'Confirmation, form, and alert dialog patterns'),
-  _SampleItem(id: '5', title: 'Navigation Bar', subtitle: 'Top bar with breadcrumbs and actions'),
+  _SampleItem(
+    id: '1',
+    title: 'Design System Tokens',
+    subtitle: 'Define color, spacing, and typography tokens',
+  ),
+  _SampleItem(
+    id: '2',
+    title: 'Button Component',
+    subtitle: 'Primary, secondary, ghost, and destructive variants',
+  ),
+  _SampleItem(
+    id: '3',
+    title: 'Input Fields',
+    subtitle: 'Text input, search, and textarea components',
+  ),
+  _SampleItem(
+    id: '4',
+    title: 'Modal Dialogs',
+    subtitle: 'Confirmation, form, and alert dialog patterns',
+  ),
+  _SampleItem(
+    id: '5',
+    title: 'Navigation Bar',
+    subtitle: 'Top bar with breadcrumbs and actions',
+  ),
 ];
 
 const _sortOptions = [
@@ -52,14 +74,7 @@ final oiListViewComponent = WidgetbookComponent(
     WidgetbookUseCase(
       name: 'Playground',
       builder: (context) {
-        final selectionMode = context.knobs.enumKnob<OiSelectionMode>(
-          label: 'Selection Mode',
-          values: OiSelectionMode.values,
-        );
-        final loading = context.knobs.boolean(
-          label: 'Loading',
-          initialValue: false,
-        );
+        final loading = context.knobs.boolean(label: 'Loading');
         final showSearch = context.knobs.boolean(
           label: 'Show Search',
           initialValue: true,
@@ -68,10 +83,7 @@ final oiListViewComponent = WidgetbookComponent(
           label: 'Show Sort Options',
           initialValue: true,
         );
-        final moreAvailable = context.knobs.boolean(
-          label: 'More Available',
-          initialValue: false,
-        );
+        final moreAvailable = context.knobs.boolean(label: 'More Available');
 
         return useCaseWrapper(
           SizedBox(
@@ -82,7 +94,6 @@ final oiListViewComponent = WidgetbookComponent(
               itemBuilder: _buildItem,
               itemKey: (item) => item.id,
               label: 'Components',
-              selectionMode: selectionMode,
               onSelectionChange: (_) {},
               loading: loading,
               onSearch: showSearch ? (_) {} : null,

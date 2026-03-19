@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:obers_ui/obers_ui.dart';
+import 'package:obers_ui_widgetbook/helpers/knob_helpers.dart';
 import 'package:widgetbook/widgetbook.dart';
-
-import '../../helpers/knob_helpers.dart';
 
 final oiMediaComponent = WidgetbookComponent(
   name: 'Media',
@@ -11,12 +10,12 @@ final oiMediaComponent = WidgetbookComponent(
       name: 'OiLightbox',
       builder: (context) {
         return useCaseWrapper(
-          SizedBox(
+          const SizedBox(
             width: 600,
             height: 500,
             child: OiLightbox(
               label: 'Image lightbox',
-              items: const [
+              items: [
                 OiLightboxItem(
                   src:
                       'https://placehold.co/800x600/EBF5FF/2563EB?text=Photo+1',
@@ -40,7 +39,7 @@ final oiMediaComponent = WidgetbookComponent(
       name: 'OiVideoPlayer',
       builder: (context) {
         return useCaseWrapper(
-          SizedBox(
+          const SizedBox(
             width: 400,
             height: 260,
             child: OiVideoPlayer(
@@ -57,11 +56,11 @@ final oiMediaComponent = WidgetbookComponent(
       name: 'OiImageCropper',
       builder: (context) {
         return useCaseWrapper(
-          SizedBox(
+          const SizedBox(
             width: 400,
             height: 400,
             child: OiImageCropper(
-              image: const NetworkImage(
+              image: NetworkImage(
                 'https://placehold.co/400x400/EBF5FF/2563EB?text=Crop+Me',
               ),
               label: 'Image cropper',
@@ -74,11 +73,11 @@ final oiMediaComponent = WidgetbookComponent(
       name: 'OiImageAnnotator',
       builder: (context) {
         return useCaseWrapper(
-          SizedBox(
+          const SizedBox(
             width: 400,
             height: 400,
             child: OiImageAnnotator(
-              image: const NetworkImage(
+              image: NetworkImage(
                 'https://placehold.co/400x400/F0FDF4/16A34A?text=Annotate',
               ),
               label: 'Image annotator',

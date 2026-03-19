@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:obers_ui/obers_ui.dart';
-import 'package:widgetbook/widgetbook.dart';
-
 import 'package:obers_ui_widgetbook/helpers/knob_helpers.dart';
+import 'package:widgetbook/widgetbook.dart';
 
 final responsiveComponent = WidgetbookComponent(
   name: 'OiBreakpoint / OiResponsive',
@@ -25,27 +24,45 @@ final responsiveComponent = WidgetbookComponent(
               const SizedBox(height: 8),
               Text(
                 'Current viewport: ${width.toInt()}dp',
-                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
               Text(
                 'Active breakpoint: ${currentBp.name} (>=${currentBp.minWidth.toInt()}dp)',
-                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
               Text(
                 'Page gutter: ${context.pageGutter.toInt()}dp',
-                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
               Text(
                 'Content max width: ${context.contentMaxWidth == double.infinity ? "unlimited" : "${context.contentMaxWidth.toInt()}dp"}',
-                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
               Text(
                 'Height breakpoint: ${context.heightBreakpoint.name}',
-                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
               Text(
                 'Orientation: ${context.orientation.name}',
-                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
               const SizedBox(height: 24),
               const Text(
@@ -88,9 +105,7 @@ Widget _breakpointRow(OiBreakpoint bp, bool isActive) {
           height: 12,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: isActive
-                ? const Color(0xFF16A34A)
-                : const Color(0xFFD1D5DB),
+            color: isActive ? const Color(0xFF16A34A) : const Color(0xFFD1D5DB),
           ),
         ),
         const SizedBox(width: 8),
@@ -121,15 +136,10 @@ Widget _checkRow(String label, bool value) {
         Icon(
           value ? Icons.check_circle : Icons.cancel,
           size: 16,
-          color: value
-              ? const Color(0xFF16A34A)
-              : const Color(0xFFD1D5DB),
+          color: value ? const Color(0xFF16A34A) : const Color(0xFFD1D5DB),
         ),
         const SizedBox(width: 8),
-        Text(
-          label,
-          style: const TextStyle(fontSize: 13),
-        ),
+        Text(label, style: const TextStyle(fontSize: 13)),
       ],
     ),
   );

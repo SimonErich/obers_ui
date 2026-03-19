@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:obers_ui/obers_ui.dart';
+import 'package:obers_ui_widgetbook/helpers/knob_helpers.dart';
 import 'package:widgetbook/widgetbook.dart';
-
-import '../../helpers/knob_helpers.dart';
 
 final oiListTileComponent = WidgetbookComponent(
   name: 'OiListTile',
@@ -18,18 +17,12 @@ final oiListTileComponent = WidgetbookComponent(
           label: 'Subtitle',
           initialValue: 'Supporting text',
         );
-        final selected = context.knobs.boolean(
-          label: 'Selected',
-          initialValue: false,
-        );
+        final selected = context.knobs.boolean(label: 'Selected');
         final enabled = context.knobs.boolean(
           label: 'Enabled',
           initialValue: true,
         );
-        final dense = context.knobs.boolean(
-          label: 'Dense',
-          initialValue: false,
-        );
+        final dense = context.knobs.boolean(label: 'Dense');
 
         return useCaseWrapper(
           SizedBox(

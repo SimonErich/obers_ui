@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:obers_ui/obers_ui.dart';
+import 'package:obers_ui_widgetbook/helpers/knob_helpers.dart';
 import 'package:widgetbook/widgetbook.dart';
-
-import '../../helpers/knob_helpers.dart';
 
 final oiTappableComponent = WidgetbookComponent(
   name: 'OiTappable',
@@ -70,9 +69,7 @@ final oiFocusTrapComponent = WidgetbookComponent(
     WidgetbookUseCase(
       name: 'Default',
       builder: (context) {
-        return useCaseWrapper(
-          const _FocusTrapDemo(),
-        );
+        return useCaseWrapper(const _FocusTrapDemo());
       },
     ),
   ],
@@ -113,12 +110,16 @@ class _FocusTrapDemoState extends State<_FocusTrapDemo> {
                       SizedBox(height: 8),
                       SizedBox(
                         width: 200,
-                        child: TextField(decoration: InputDecoration(hintText: 'Field 1')),
+                        child: TextField(
+                          decoration: InputDecoration(hintText: 'Field 1'),
+                        ),
                       ),
                       SizedBox(height: 8),
                       SizedBox(
                         width: 200,
-                        child: TextField(decoration: InputDecoration(hintText: 'Field 2')),
+                        child: TextField(
+                          decoration: InputDecoration(hintText: 'Field 2'),
+                        ),
                       ),
                     ],
                   ),

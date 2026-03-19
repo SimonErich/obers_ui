@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:obers_ui/obers_ui.dart';
+import 'package:obers_ui_widgetbook/helpers/knob_helpers.dart';
 import 'package:widgetbook/widgetbook.dart';
-
-import '../../helpers/knob_helpers.dart';
 
 final oiSheetComponent = WidgetbookComponent(
   name: 'OiSheet',
@@ -42,9 +41,13 @@ final oiSheetComponent = WidgetbookComponent(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text('Sheet Content',
-                          style: TextStyle(
-                              fontSize: 18, fontWeight: FontWeight.w600)),
+                      const Text(
+                        'Sheet Content',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
                       const SizedBox(height: 12),
                       const Text('This is a slide-in sheet panel.'),
                       const SizedBox(height: 24),

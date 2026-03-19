@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:obers_ui/obers_ui.dart';
+import 'package:obers_ui_widgetbook/helpers/knob_helpers.dart';
 import 'package:widgetbook/widgetbook.dart';
-
-import '../../helpers/knob_helpers.dart';
 
 final oiWorkflowComponent = WidgetbookComponent(
   name: 'Workflow',
@@ -10,12 +9,12 @@ final oiWorkflowComponent = WidgetbookComponent(
     WidgetbookUseCase(
       name: 'OiFlowGraph',
       builder: (context) {
-        return SizedBox(
+        return const SizedBox(
           width: 600,
           height: 400,
           child: OiFlowGraph(
             label: 'Flow graph',
-            nodes: const [
+            nodes: [
               OiFlowNode(
                 key: 'start',
                 position: Offset(50, 100),
@@ -36,7 +35,7 @@ final oiWorkflowComponent = WidgetbookComponent(
                 inputs: ['in'],
               ),
             ],
-            edges: const [
+            edges: [
               OiFlowEdge(
                 sourceNode: 'start',
                 sourcePort: 'out',
@@ -58,9 +57,9 @@ final oiWorkflowComponent = WidgetbookComponent(
       name: 'OiPipeline',
       builder: (context) {
         return useCaseWrapper(
-          OiPipeline(
+          const OiPipeline(
             label: 'CI/CD Pipeline',
-            stages: const [
+            stages: [
               OiPipelineStage(
                 label: 'Build',
                 status: OiPipelineStatus.completed,
@@ -83,13 +82,13 @@ final oiWorkflowComponent = WidgetbookComponent(
     WidgetbookUseCase(
       name: 'OiStateDiagram',
       builder: (context) {
-        return SizedBox(
+        return const SizedBox(
           width: 500,
           height: 300,
           child: OiStateDiagram(
             label: 'State machine',
             currentState: 'active',
-            states: const [
+            states: [
               OiStateNode(
                 key: 'idle',
                 label: 'Idle',
@@ -108,7 +107,7 @@ final oiWorkflowComponent = WidgetbookComponent(
                 terminal: true,
               ),
             ],
-            transitions: const [
+            transitions: [
               OiStateTransition(from: 'idle', to: 'active', label: 'start'),
               OiStateTransition(from: 'active', to: 'done', label: 'finish'),
               OiStateTransition(from: 'active', to: 'idle', label: 'reset'),

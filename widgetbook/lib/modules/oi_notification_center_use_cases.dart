@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:obers_ui/obers_ui.dart';
+import 'package:obers_ui_widgetbook/helpers/knob_helpers.dart';
 import 'package:widgetbook/widgetbook.dart';
-
-import '../helpers/knob_helpers.dart';
 
 final _sampleNotifications = [
   OiNotification(
@@ -61,8 +60,6 @@ final oiNotificationCenterComponent = WidgetbookComponent(
         final unreadCount = context.knobs.int.slider(
           label: 'Unread Count',
           initialValue: 3,
-          min: 0,
-          max: 20,
         );
 
         return useCaseWrapper(
@@ -87,11 +84,11 @@ final oiNotificationCenterComponent = WidgetbookComponent(
       name: 'Empty State',
       builder: (context) {
         return useCaseWrapper(
-          SizedBox(
+          const SizedBox(
             height: 400,
             width: 400,
             child: OiNotificationCenter(
-              notifications: const [],
+              notifications: [],
               label: 'Empty notification center',
             ),
           ),

@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:obers_ui/obers_ui.dart';
+import 'package:obers_ui_widgetbook/helpers/knob_helpers.dart';
 import 'package:widgetbook/widgetbook.dart';
-
-import '../../helpers/knob_helpers.dart';
 
 final oiTextInputComponent = WidgetbookComponent(
   name: 'OiTextInput',
@@ -22,22 +21,13 @@ final oiTextInputComponent = WidgetbookComponent(
           label: 'Placeholder',
           initialValue: 'John Doe',
         );
-        final error = context.knobs.string(
-          label: 'Error',
-          initialValue: '',
-        );
+        final error = context.knobs.string(label: 'Error');
         final enabled = context.knobs.boolean(
           label: 'Enabled',
           initialValue: true,
         );
-        final readOnly = context.knobs.boolean(
-          label: 'Read Only',
-          initialValue: false,
-        );
-        final obscureText = context.knobs.boolean(
-          label: 'Obscure Text',
-          initialValue: false,
-        );
+        final readOnly = context.knobs.boolean(label: 'Read Only');
+        final obscureText = context.knobs.boolean(label: 'Obscure Text');
 
         return useCaseWrapper(
           SizedBox(
@@ -64,10 +54,7 @@ final oiTextInputComponent = WidgetbookComponent(
         );
 
         return useCaseWrapper(
-          SizedBox(
-            width: 300,
-            child: OiTextInput.search(enabled: enabled),
-          ),
+          SizedBox(width: 300, child: OiTextInput.search(enabled: enabled)),
         );
       },
     ),

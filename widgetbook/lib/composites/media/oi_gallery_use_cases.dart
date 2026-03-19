@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:obers_ui/obers_ui.dart';
 import 'package:widgetbook/widgetbook.dart';
 
-import '../../helpers/knob_helpers.dart';
-
 const _sampleItems = [
   OiGalleryItem(
     key: 'img1',
@@ -33,7 +31,7 @@ final oiGalleryComponent = WidgetbookComponent(
     WidgetbookUseCase(
       name: 'Playground',
       builder: (context) {
-        return SizedBox(
+        return const SizedBox(
           height: 400,
           child: OiGallery(
             label: 'Image gallery',

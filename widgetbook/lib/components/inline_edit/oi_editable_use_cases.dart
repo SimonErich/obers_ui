@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:obers_ui/obers_ui.dart';
+import 'package:obers_ui_widgetbook/helpers/knob_helpers.dart';
 import 'package:widgetbook/widgetbook.dart';
-
-import '../../helpers/knob_helpers.dart';
 
 final oiEditableComponent = WidgetbookComponent(
   name: 'OiEditable',
@@ -15,9 +14,7 @@ final oiEditableComponent = WidgetbookComponent(
           initialValue: true,
         );
 
-        return useCaseWrapper(
-          _EditableTextDemo(enabled: enabled),
-        );
+        return useCaseWrapper(_EditableTextDemo(enabled: enabled));
       },
     ),
     WidgetbookUseCase(
@@ -29,7 +26,6 @@ final oiEditableComponent = WidgetbookComponent(
         );
         final min = context.knobs.double.slider(
           label: 'Min',
-          initialValue: 0,
           min: -100,
           max: 0,
         );
@@ -47,12 +43,7 @@ final oiEditableComponent = WidgetbookComponent(
         );
 
         return useCaseWrapper(
-          _EditableNumberDemo(
-            enabled: enabled,
-            min: min,
-            max: max,
-            step: step,
-          ),
+          _EditableNumberDemo(enabled: enabled, min: min, max: max, step: step),
         );
       },
     ),
@@ -64,9 +55,7 @@ final oiEditableComponent = WidgetbookComponent(
           initialValue: true,
         );
 
-        return useCaseWrapper(
-          _EditableDateDemo(enabled: enabled),
-        );
+        return useCaseWrapper(_EditableDateDemo(enabled: enabled));
       },
     ),
     WidgetbookUseCase(
@@ -77,9 +66,7 @@ final oiEditableComponent = WidgetbookComponent(
           initialValue: true,
         );
 
-        return useCaseWrapper(
-          _EditableSelectDemo(enabled: enabled),
-        );
+        return useCaseWrapper(_EditableSelectDemo(enabled: enabled));
       },
     ),
   ],

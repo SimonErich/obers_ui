@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:obers_ui/obers_ui.dart';
+import 'package:obers_ui_widgetbook/helpers/knob_helpers.dart';
 import 'package:widgetbook/widgetbook.dart';
-
-import '../../helpers/knob_helpers.dart';
 
 final oiFileInputComponent = WidgetbookComponent(
   name: 'OiFileInput',
@@ -10,14 +9,8 @@ final oiFileInputComponent = WidgetbookComponent(
     WidgetbookUseCase(
       name: 'Playground',
       builder: (context) {
-        final multipleFiles = context.knobs.boolean(
-          label: 'Multiple Files',
-          initialValue: false,
-        );
-        final dropZone = context.knobs.boolean(
-          label: 'Drop Zone',
-          initialValue: false,
-        );
+        final multipleFiles = context.knobs.boolean(label: 'Multiple Files');
+        final dropZone = context.knobs.boolean(label: 'Drop Zone');
         final enabled = context.knobs.boolean(
           label: 'Enabled',
           initialValue: true,

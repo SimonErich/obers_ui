@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:obers_ui/obers_ui.dart';
+import 'package:obers_ui_widgetbook/helpers/knob_helpers.dart';
 import 'package:widgetbook/widgetbook.dart';
-
-import '../../helpers/knob_helpers.dart';
 
 final oiContainerComponent = WidgetbookComponent(
   name: 'OiContainer',
@@ -23,7 +22,6 @@ final oiContainerComponent = WidgetbookComponent(
         final padding = context.knobs.double.slider(
           label: 'Padding',
           initialValue: 16,
-          min: 0,
           max: 64,
         );
 
@@ -31,16 +29,12 @@ final oiContainerComponent = WidgetbookComponent(
           OiContainer(
             breakpoint: OiBreakpoint.expanded,
             maxWidth: OiResponsive<double>(maxWidth),
-            padding: OiResponsive<EdgeInsetsGeometry>(
-              EdgeInsets.all(padding),
-            ),
+            padding: OiResponsive<EdgeInsetsGeometry>(EdgeInsets.all(padding)),
             centered: centered,
             child: Container(
               height: 100,
               color: const Color(0xFFBBDEFB),
-              child: const Center(
-                child: Text('OiContainer content'),
-              ),
+              child: const Center(child: Text('OiContainer content')),
             ),
           ),
         );

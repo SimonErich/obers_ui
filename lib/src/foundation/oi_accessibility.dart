@@ -1,6 +1,7 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/semantics.dart';
 import 'package:flutter/widgets.dart';
+
+import 'package:obers_ui/src/foundation/oi_platform.dart';
 
 /// Scope that provides accessibility-related context to descendants.
 ///
@@ -29,21 +30,18 @@ abstract final class OiA11y {
 
   /// The minimum touch target size in logical pixels on touch devices.
   ///
-  /// Returns 48.0 on touch/mobile platforms (Android, iOS), 0.0 on
-  /// pointer/desktop platforms (no enforcement). The web deployment target
-  /// is intentionally ignored so that Android/iOS browsers running on touch
-  /// devices still receive 48 dp enforcement.
+  /// Returns 48.0 when the current [OiInputModality] is [OiInputModality.touch]
+  /// and 0.0 when it is [OiInputModality.pointer]. This uses the actual input
+  /// modality detected by [OiPlatform] rather than [defaultTargetPlatform], so
+  /// web-on-touch-device scenarios (where the host platform reports desktop but
+  /// the user interacts via touch) correctly receive 48 dp enforcement.
+  ///
+  /// Note: [OiTappable] intentionally overrides this to 0.0 when density is
+  /// [OiDensity.compact] or [OiDensity.dense], allowing widgets to opt out of
+  /// touch-target inflation for dense layouts.
   static double minTouchTarget(BuildContext context) {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.iOS:
-      case TargetPlatform.android:
-        return 48;
-      case TargetPlatform.macOS:
-      case TargetPlatform.windows:
-      case TargetPlatform.linux:
-      case TargetPlatform.fuchsia:
-        return 0;
-    }
+    final modality = OiPlatform.of(context).inputModality;
+    return modality == OiInputModality.touch ? 48 : 0;
   }
 
   /// Announces [message] to screen readers.

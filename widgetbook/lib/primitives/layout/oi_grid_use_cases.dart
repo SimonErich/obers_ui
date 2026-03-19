@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:obers_ui/obers_ui.dart';
+import 'package:obers_ui_widgetbook/helpers/knob_helpers.dart';
 import 'package:widgetbook/widgetbook.dart';
-
-import '../../helpers/knob_helpers.dart';
 
 final oiGridComponent = WidgetbookComponent(
   name: 'OiGrid',
@@ -19,7 +18,6 @@ final oiGridComponent = WidgetbookComponent(
         final gap = context.knobs.double.slider(
           label: 'Gap',
           initialValue: 8,
-          min: 0,
           max: 32,
         );
 
@@ -34,9 +32,9 @@ final oiGridComponent = WidgetbookComponent(
                 9,
                 (i) => Container(
                   height: 60,
-                  color: Color(0xFF2196F3).withValues(
-                    alpha: 0.3 + (i * 0.07),
-                  ),
+                  color: const Color(
+                    0xFF2196F3,
+                  ).withValues(alpha: 0.3 + (i * 0.07)),
                   child: Center(child: Text('${i + 1}')),
                 ),
               ),

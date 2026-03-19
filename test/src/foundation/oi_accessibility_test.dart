@@ -1,11 +1,13 @@
 // Tests are internal; doc comments on local helpers are not required.
 // ignore_for_file: public_member_api_docs
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/semantics.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui/src/foundation/oi_accessibility.dart';
 import 'package:obers_ui/src/foundation/oi_app.dart';
+import 'package:obers_ui/src/foundation/oi_platform.dart';
 import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
 
 /// Wraps [child] in a default [MediaQuery] and [Directionality].
@@ -13,6 +15,30 @@ Widget buildDefault(Widget child) {
   return MediaQuery(
     data: const MediaQueryData(),
     child: Directionality(textDirection: TextDirection.ltr, child: child),
+  );
+}
+
+/// Wraps [child] with [OiPlatform] providing the given [modality] and
+/// optionally a [platform] override, plus [MediaQuery] and [Directionality].
+Widget buildWithModality(
+  Widget child, {
+  required OiInputModality modality,
+  TargetPlatform? platform,
+}) {
+  return MediaQuery(
+    data: const MediaQueryData(),
+    child: Directionality(
+      textDirection: TextDirection.ltr,
+      child: OiPlatform(
+        data: OiPlatformData(
+          platform: platform ?? defaultTargetPlatform,
+          keyboardHeight: 0,
+          keyboardVisible: false,
+          inputModality: modality,
+        ),
+        child: child,
+      ),
+    ),
   );
 }
 
@@ -138,24 +164,23 @@ void main() {
         variant: TargetPlatformVariant.only(TargetPlatform.iOS),
       );
 
-      testWidgets(
-        'minTouchTarget returns 48dp on iOS',
-        (tester) async {
-          late double result;
-          await tester.pumpWidget(
-            buildDefault(
-              Builder(
-                builder: (ctx) {
-                  result = OiA11y.minTouchTarget(ctx);
-                  return const SizedBox.shrink();
-                },
-              ),
+      testWidgets('minTouchTarget returns 48dp on touch modality', (
+        tester,
+      ) async {
+        late double result;
+        await tester.pumpWidget(
+          buildWithModality(
+            Builder(
+              builder: (ctx) {
+                result = OiA11y.minTouchTarget(ctx);
+                return const SizedBox.shrink();
+              },
             ),
-          );
-          expect(result, 48.0);
-        },
-        variant: TargetPlatformVariant.only(TargetPlatform.iOS),
-      );
+            modality: OiInputModality.touch,
+          ),
+        );
+        expect(result, 48.0);
+      });
     });
 
     // ── Android (TalkBack) ───────────────────────────────────────────────────
@@ -269,65 +294,93 @@ void main() {
         variant: TargetPlatformVariant.only(TargetPlatform.android),
       );
 
-      testWidgets(
-        'minTouchTarget returns 48dp on Android',
-        (tester) async {
-          late double result;
-          await tester.pumpWidget(
-            buildDefault(
-              Builder(
-                builder: (ctx) {
-                  result = OiA11y.minTouchTarget(ctx);
-                  return const SizedBox.shrink();
-                },
-              ),
+      testWidgets('minTouchTarget returns 48dp on Android touch modality', (
+        tester,
+      ) async {
+        late double result;
+        await tester.pumpWidget(
+          buildWithModality(
+            Builder(
+              builder: (ctx) {
+                result = OiA11y.minTouchTarget(ctx);
+                return const SizedBox.shrink();
+              },
             ),
-          );
-          expect(result, 48.0);
-        },
-        variant: TargetPlatformVariant.only(TargetPlatform.android),
-      );
+            modality: OiInputModality.touch,
+            platform: TargetPlatform.android,
+          ),
+        );
+        expect(result, 48.0);
+      });
     });
 
     // ── Pointer platforms ─────────────────────────────────────────────────────
 
     group('Pointer platforms', () {
-      testWidgets(
-        'minTouchTarget returns 0 on macOS',
-        (tester) async {
-          late double result;
-          await tester.pumpWidget(
-            buildDefault(
-              Builder(
-                builder: (ctx) {
-                  result = OiA11y.minTouchTarget(ctx);
-                  return const SizedBox.shrink();
-                },
-              ),
+      testWidgets('minTouchTarget returns 0 on pointer modality (macOS)', (
+        tester,
+      ) async {
+        late double result;
+        await tester.pumpWidget(
+          buildWithModality(
+            Builder(
+              builder: (ctx) {
+                result = OiA11y.minTouchTarget(ctx);
+                return const SizedBox.shrink();
+              },
             ),
-          );
-          expect(result, 0.0);
-        },
-        variant: TargetPlatformVariant.only(TargetPlatform.macOS),
-      );
+            modality: OiInputModality.pointer,
+            platform: TargetPlatform.macOS,
+          ),
+        );
+        expect(result, 0.0);
+      });
 
+      testWidgets('minTouchTarget returns 0 on pointer modality (linux)', (
+        tester,
+      ) async {
+        late double result;
+        await tester.pumpWidget(
+          buildWithModality(
+            Builder(
+              builder: (ctx) {
+                result = OiA11y.minTouchTarget(ctx);
+                return const SizedBox.shrink();
+              },
+            ),
+            modality: OiInputModality.pointer,
+            platform: TargetPlatform.linux,
+          ),
+        );
+        expect(result, 0.0);
+      });
+    });
+
+    // ── Web-on-touch-device ─────────────────────────────────────────────────
+    //
+    // TC-web-touch-device: Desktop TargetPlatform + OiInputModality.touch
+    // must return 48 — this is the scenario where web reports a desktop
+    // platform but the user interacts via touchscreen.
+
+    group('Web-on-touch-device', () {
       testWidgets(
-        'minTouchTarget returns 0 on linux',
+        'minTouchTarget returns 48dp when desktop platform has touch modality',
         (tester) async {
           late double result;
           await tester.pumpWidget(
-            buildDefault(
+            buildWithModality(
               Builder(
                 builder: (ctx) {
                   result = OiA11y.minTouchTarget(ctx);
                   return const SizedBox.shrink();
                 },
               ),
+              modality: OiInputModality.touch,
+              platform: TargetPlatform.linux,
             ),
           );
-          expect(result, 0.0);
+          expect(result, 48.0);
         },
-        variant: TargetPlatformVariant.only(TargetPlatform.linux),
       );
     });
 

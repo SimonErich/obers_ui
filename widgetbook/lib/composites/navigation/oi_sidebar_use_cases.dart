@@ -1,36 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:obers_ui/obers_ui.dart';
+import 'package:obers_ui_widgetbook/helpers/knob_helpers.dart';
 import 'package:widgetbook/widgetbook.dart';
 
-import '../../helpers/knob_helpers.dart';
-
 final _sampleSections = [
-  OiSidebarSection(
+  const OiSidebarSection(
     title: 'MAIN',
     items: [
-      const OiSidebarItem(id: 'home', label: 'Home', icon: Icons.home),
-      const OiSidebarItem(
+      OiSidebarItem(id: 'home', label: 'Home', icon: Icons.home),
+      OiSidebarItem(
         id: 'inbox',
         label: 'Inbox',
         icon: Icons.inbox,
         badgeCount: 3,
       ),
-      const OiSidebarItem(
-        id: 'settings',
-        label: 'Settings',
-        icon: Icons.settings,
-      ),
+      OiSidebarItem(id: 'settings', label: 'Settings', icon: Icons.settings),
     ],
   ),
-  OiSidebarSection(
+  const OiSidebarSection(
     title: 'PROJECTS',
     items: [
-      const OiSidebarItem(
-        id: 'proj1',
-        label: 'Project Alpha',
-        icon: Icons.folder,
-      ),
-      const OiSidebarItem(
+      OiSidebarItem(id: 'proj1', label: 'Project Alpha', icon: Icons.folder),
+      OiSidebarItem(
         id: 'proj2',
         label: 'Project Beta',
         icon: Icons.folder,
@@ -50,10 +41,7 @@ final oiSidebarComponent = WidgetbookComponent(
           label: 'Mode',
           values: OiSidebarMode.values,
         );
-        final resizable = context.knobs.boolean(
-          label: 'Resizable',
-          initialValue: false,
-        );
+        final resizable = context.knobs.boolean(label: 'Resizable');
 
         return StatefulBuilder(
           builder: (context, setState) {

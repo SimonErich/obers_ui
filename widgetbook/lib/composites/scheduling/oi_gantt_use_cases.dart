@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:obers_ui/obers_ui.dart';
+import 'package:obers_ui_widgetbook/helpers/knob_helpers.dart';
 import 'package:widgetbook/widgetbook.dart';
-
-import '../../helpers/knob_helpers.dart';
 
 final _now = DateTime.now();
 
@@ -12,7 +11,7 @@ final _sampleTasks = [
     label: 'Design',
     start: _now,
     end: _now.add(const Duration(days: 5)),
-    progress: 1.0,
+    progress: 1,
   ),
   OiGanttTask(
     key: 't2',
@@ -27,7 +26,6 @@ final _sampleTasks = [
     label: 'Testing',
     start: _now.add(const Duration(days: 15)),
     end: _now.add(const Duration(days: 20)),
-    progress: 0.0,
     dependsOn: const ['t2'],
   ),
 ];

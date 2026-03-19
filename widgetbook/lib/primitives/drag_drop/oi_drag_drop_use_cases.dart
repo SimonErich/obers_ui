@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:obers_ui/obers_ui.dart';
+import 'package:obers_ui_widgetbook/helpers/knob_helpers.dart';
 import 'package:widgetbook/widgetbook.dart';
-
-import '../../helpers/knob_helpers.dart';
 
 final oiDraggableComponent = WidgetbookComponent(
   name: 'OiDraggable',
@@ -10,9 +9,7 @@ final oiDraggableComponent = WidgetbookComponent(
     WidgetbookUseCase(
       name: 'Default',
       builder: (context) {
-        return useCaseWrapper(
-          const _DragDropDemo(),
-        );
+        return useCaseWrapper(const _DragDropDemo());
       },
     ),
   ],
@@ -40,7 +37,10 @@ class _DragDropDemoState extends State<_DragDropDemo> {
             height: 50,
             color: const Color(0xFF2196F3),
             child: const Center(
-              child: Text('Drag me', style: TextStyle(color: Color(0xFFFFFFFF))),
+              child: Text(
+                'Drag me',
+                style: TextStyle(color: Color(0xFFFFFFFF)),
+              ),
             ),
           ),
         ),
@@ -122,9 +122,9 @@ class _ReorderableDemoState extends State<_ReorderableDemo> {
     return OiReorderable(
       onReorder: (oldIndex, newIndex) {
         setState(() {
-          if (newIndex > oldIndex) newIndex--;
+          final insertIndex = newIndex > oldIndex ? newIndex - 1 : newIndex;
           final item = _items.removeAt(oldIndex);
-          _items.insert(newIndex, item);
+          _items.insert(insertIndex, item);
         });
       },
       children: _items
@@ -163,7 +163,10 @@ final oiDragGhostComponent = WidgetbookComponent(
               height: 60,
               color: const Color(0xFF2196F3),
               child: const Center(
-                child: Text('Ghost', style: TextStyle(color: Color(0xFFFFFFFF))),
+                child: Text(
+                  'Ghost',
+                  style: TextStyle(color: Color(0xFFFFFFFF)),
+                ),
               ),
             ),
           ),

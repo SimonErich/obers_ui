@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:obers_ui/obers_ui.dart';
+import 'package:obers_ui_widgetbook/helpers/knob_helpers.dart';
 import 'package:widgetbook/widgetbook.dart';
-
-import '../../helpers/knob_helpers.dart';
 
 final oiEmojiPickerComponent = WidgetbookComponent(
   name: 'OiEmojiPicker',
@@ -19,10 +18,7 @@ final oiEmojiPickerComponent = WidgetbookComponent(
           SizedBox(
             width: 320,
             height: 400,
-            child: OiEmojiPicker(
-              showSearch: showSearch,
-              onSelected: (_) {},
-            ),
+            child: OiEmojiPicker(showSearch: showSearch, onSelected: (_) {}),
           ),
         );
       },

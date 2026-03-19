@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:obers_ui/obers_ui.dart';
+import 'package:obers_ui_widgetbook/helpers/knob_helpers.dart';
 import 'package:widgetbook/widgetbook.dart';
 
-import '../helpers/knob_helpers.dart';
-
 const _sampleFields = [
-  OiMetadataField(key: 'Title', value: 'Project Alpha', type: OiMetadataType.text),
+  OiMetadataField(key: 'Title', value: 'Project Alpha'),
   OiMetadataField(key: 'Version', value: 2, type: OiMetadataType.number),
-  OiMetadataField(key: 'Release Date', value: '2025-06-15', type: OiMetadataType.date),
+  OiMetadataField(
+    key: 'Release Date',
+    value: '2025-06-15',
+    type: OiMetadataType.date,
+  ),
   OiMetadataField(key: 'Published', value: true, type: OiMetadataType.boolean),
   OiMetadataField(key: 'Status', value: 'Active', type: OiMetadataType.select),
 ];

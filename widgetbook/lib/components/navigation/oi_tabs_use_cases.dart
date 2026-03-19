@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:obers_ui/obers_ui.dart';
+import 'package:obers_ui_widgetbook/helpers/knob_helpers.dart';
 import 'package:widgetbook/widgetbook.dart';
-
-import '../../helpers/knob_helpers.dart';
 
 final oiTabsComponent = WidgetbookComponent(
   name: 'OiTabs',
@@ -14,10 +13,7 @@ final oiTabsComponent = WidgetbookComponent(
           label: 'Indicator Style',
           values: OiTabIndicatorStyle.values,
         );
-        final scrollable = context.knobs.boolean(
-          label: 'Scrollable',
-          initialValue: false,
-        );
+        final scrollable = context.knobs.boolean(label: 'Scrollable');
 
         return useCaseWrapper(
           StatefulBuilder(

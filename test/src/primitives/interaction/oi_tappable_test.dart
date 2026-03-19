@@ -1,11 +1,13 @@
 // Tests do not require documentation comments.
 // ignore_for_file: public_member_api_docs
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui/src/foundation/oi_app.dart';
+import 'package:obers_ui/src/foundation/oi_platform.dart';
 import 'package:obers_ui/src/foundation/theme/oi_effects_theme.dart';
 import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
 
@@ -13,13 +15,36 @@ import '../../../helpers/pump_app.dart';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-/// Wraps [child] with [OiApp] in touch (comfortable) density.
-Widget touchApp(Widget child) =>
-    OiApp(density: OiDensity.comfortable, home: child);
+/// Wraps [child] with [OiApp] in touch (comfortable) density, overriding
+/// [OiPlatform] to [OiInputModality.touch] so that [OiA11y.minTouchTarget]
+/// returns 48 dp.
+Widget touchApp(Widget child) => OiApp(
+  density: OiDensity.comfortable,
+  home: OiPlatform(
+    data: OiPlatformData(
+      platform: defaultTargetPlatform,
+      keyboardHeight: 0,
+      keyboardVisible: false,
+      inputModality: OiInputModality.touch,
+    ),
+    child: child,
+  ),
+);
 
-/// Wraps [child] with [OiApp] in pointer (compact) density.
-Widget pointerApp(Widget child) =>
-    OiApp(density: OiDensity.compact, home: child);
+/// Wraps [child] with [OiApp] in pointer (compact) density, overriding
+/// [OiPlatform] to [OiInputModality.pointer].
+Widget pointerApp(Widget child) => OiApp(
+  density: OiDensity.compact,
+  home: OiPlatform(
+    data: OiPlatformData(
+      platform: defaultTargetPlatform,
+      keyboardHeight: 0,
+      keyboardVisible: false,
+      inputModality: OiInputModality.pointer,
+    ),
+    child: child,
+  ),
+);
 
 void main() {
   // ── 1. Renders child ───────────────────────────────────────────────────────
@@ -535,61 +560,56 @@ void main() {
 
   // ── 20. isDragging: applies dragging style ─────────────────────────────────
 
-  testWidgets(
-    'isDragging=true: applies dragging scale from OiEffectsTheme',
-    (tester) async {
-      await tester.pumpObers(
-        const OiTappable(
-          isDragging: true,
-          child: SizedBox(width: 60, height: 60),
-        ),
-      );
-      await tester.pump();
+  testWidgets('isDragging=true: applies dragging scale from OiEffectsTheme', (
+    tester,
+  ) async {
+    await tester.pumpObers(
+      const OiTappable(
+        isDragging: true,
+        child: SizedBox(width: 60, height: 60),
+      ),
+    );
+    await tester.pump();
 
-      // The dragging style from OiEffectsTheme.standard has scale > 1.0 (1.03).
-      // Verify a Transform widget is present with the dragging scale.
-      final transforms = tester.widgetList<Transform>(find.byType(Transform));
-      expect(transforms, isNotEmpty);
-    },
-  );
+    // The dragging style from OiEffectsTheme.standard has scale > 1.0 (1.03).
+    // Verify a Transform widget is present with the dragging scale.
+    final transforms = tester.widgetList<Transform>(find.byType(Transform));
+    expect(transforms, isNotEmpty);
+  });
 
-  testWidgets(
-    'isDragging=false: no dragging scale applied by default',
-    (tester) async {
-      await tester.pumpObers(
-        const OiTappable(child: SizedBox(width: 60, height: 60)),
-      );
-      await tester.pump();
+  testWidgets('isDragging=false: no dragging scale applied by default', (
+    tester,
+  ) async {
+    await tester.pumpObers(
+      const OiTappable(child: SizedBox(width: 60, height: 60)),
+    );
+    await tester.pump();
 
-      // Default state (no dragging, no hover, no focus, no press) applies
-      // OiInteractiveStyle.none which has scale=1.0, so no Transform.
-      final transforms = tester.widgetList<Transform>(find.byType(Transform));
-      expect(transforms, isEmpty);
-    },
-  );
+    // Default state (no dragging, no hover, no focus, no press) applies
+    // OiInteractiveStyle.none which has scale=1.0, so no Transform.
+    final transforms = tester.widgetList<Transform>(find.byType(Transform));
+    expect(transforms, isEmpty);
+  });
 
-  testWidgets(
-    'isDragging takes priority over pressed state',
-    (tester) async {
-      // When both isDragging and pressed are active, dragging wins.
-      await tester.pumpObers(
-        const OiTappable(
-          isDragging: true,
-          child: SizedBox(width: 60, height: 60),
-        ),
-      );
-      await tester.pump();
+  testWidgets('isDragging takes priority over pressed state', (tester) async {
+    // When both isDragging and pressed are active, dragging wins.
+    await tester.pumpObers(
+      const OiTappable(
+        isDragging: true,
+        child: SizedBox(width: 60, height: 60),
+      ),
+    );
+    await tester.pump();
 
-      // Simulate a press — but isDragging should still take priority.
-      await tester.tap(find.byType(OiTappable), warnIfMissed: false);
-      await tester.pump();
+    // Simulate a press — but isDragging should still take priority.
+    await tester.tap(find.byType(OiTappable), warnIfMissed: false);
+    await tester.pump();
 
-      // The dragging style has scale 1.03 (> 1), active has 0.97 (< 1).
-      // Verify scale > 1 by checking Transform is present.
-      final transforms = tester.widgetList<Transform>(find.byType(Transform));
-      expect(transforms, isNotEmpty);
-    },
-  );
+    // The dragging style has scale 1.03 (> 1), active has 0.97 (< 1).
+    // Verify scale > 1 by checking Transform is present.
+    final transforms = tester.widgetList<Transform>(find.byType(Transform));
+    expect(transforms, isNotEmpty);
+  });
 
   // ── 21. Keyboard activation: other keys do NOT trigger onTap ───────────────
 

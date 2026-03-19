@@ -1,8 +1,6 @@
-import 'package:flutter/material.dart';
 import 'package:obers_ui/obers_ui.dart';
+import 'package:obers_ui_widgetbook/helpers/knob_helpers.dart';
 import 'package:widgetbook/widgetbook.dart';
-
-import '../../helpers/knob_helpers.dart';
 
 final oiIconComponent = WidgetbookComponent(
   name: 'OiIcon',
@@ -22,13 +20,7 @@ final oiIconComponent = WidgetbookComponent(
           initialValue: 'Home icon',
         );
 
-        return useCaseWrapper(
-          OiIcon(
-            icon: icon,
-            label: label,
-            size: size,
-          ),
-        );
+        return useCaseWrapper(OiIcon(icon: icon, label: label, size: size));
       },
     ),
     WidgetbookUseCase(
@@ -42,12 +34,7 @@ final oiIconComponent = WidgetbookComponent(
           max: 64,
         );
 
-        return useCaseWrapper(
-          OiIcon.decorative(
-            icon: icon,
-            size: size,
-          ),
-        );
+        return useCaseWrapper(OiIcon.decorative(icon: icon, size: size));
       },
     ),
   ],

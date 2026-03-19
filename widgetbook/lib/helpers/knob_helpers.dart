@@ -8,18 +8,15 @@ extension OiKnobs on KnobsBuilder {
     required String label,
     required List<T> values,
     T? initialValue,
-  }) =>
-      object.dropdown(
-        label: label,
-        options: values,
-        initialOption: initialValue ?? values.first,
-        labelBuilder: (T v) => v.name,
-      );
+  }) => object.dropdown(
+    label: label,
+    options: values,
+    initialOption: initialValue ?? values.first,
+    labelBuilder: (T v) => v.name,
+  );
 
   /// Icon selection knob with common Material icons.
-  IconData iconKnob({
-    String label = 'Icon',
-  }) {
+  IconData iconKnob({String label = 'Icon'}) {
     final options = <IconData>[
       Icons.home,
       Icons.search,
@@ -41,7 +38,7 @@ extension OiKnobs on KnobsBuilder {
       label: label,
       options: options,
       initialOption: options.first,
-      labelBuilder: (IconData v) => _iconName(v),
+      labelBuilder: _iconName,
     );
   }
 }
@@ -70,17 +67,11 @@ String _iconName(IconData icon) {
 /// Wraps a use case child in a centered, padded container.
 Widget useCaseWrapper(Widget child) {
   return Center(
-    child: Padding(
-      padding: const EdgeInsets.all(24),
-      child: child,
-    ),
+    child: Padding(padding: const EdgeInsets.all(24), child: child),
   );
 }
 
 /// Wraps a use case child in a scrollable column for token catalogs.
 Widget catalogWrapper(Widget child) {
-  return SingleChildScrollView(
-    padding: const EdgeInsets.all(24),
-    child: child,
-  );
+  return SingleChildScrollView(padding: const EdgeInsets.all(24), child: child);
 }

@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:obers_ui/obers_ui.dart';
+import 'package:obers_ui_widgetbook/helpers/knob_helpers.dart';
 import 'package:widgetbook/widgetbook.dart';
-
-import '../../helpers/knob_helpers.dart';
 
 final oiSurfaceComponent = WidgetbookComponent(
   name: 'OiSurface',
@@ -10,33 +9,23 @@ final oiSurfaceComponent = WidgetbookComponent(
     WidgetbookUseCase(
       name: 'Default',
       builder: (context) {
-        final frosted = context.knobs.boolean(
-          label: 'Frosted',
-          initialValue: false,
-        );
+        final frosted = context.knobs.boolean(label: 'Frosted');
         final borderRadius = context.knobs.double.slider(
           label: 'Border Radius',
           initialValue: 8,
-          min: 0,
           max: 32,
         );
         final hasBorder = context.knobs.boolean(
           label: 'Show Border',
           initialValue: true,
         );
-        final hasShadow = context.knobs.boolean(
-          label: 'Show Shadow',
-          initialValue: false,
-        );
+        final hasShadow = context.knobs.boolean(label: 'Show Shadow');
 
         return useCaseWrapper(
           OiSurface(
             borderRadius: BorderRadius.circular(borderRadius),
             border: hasBorder
-                ? OiBorderStyle.solid(
-                    const Color(0xFFBDBDBD),
-                    1,
-                  )
+                ? OiBorderStyle.solid(const Color(0xFFBDBDBD), 1)
                 : null,
             shadow: hasShadow
                 ? const [

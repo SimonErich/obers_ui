@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:obers_ui/obers_ui.dart';
+import 'package:obers_ui_widgetbook/helpers/knob_helpers.dart';
 import 'package:widgetbook/widgetbook.dart';
-
-import '../../helpers/knob_helpers.dart';
 
 final oiFileDisplayComponent = WidgetbookComponent(
   name: 'File Display Widgets',
@@ -20,9 +19,7 @@ final oiFileDisplayComponent = WidgetbookComponent(
           initialValue: OiFileIconSize.md,
         );
 
-        return useCaseWrapper(
-          OiFileIcon(fileName: fileName, size: size),
-        );
+        return useCaseWrapper(OiFileIcon(fileName: fileName, size: size));
       },
     ),
     WidgetbookUseCase(
@@ -51,7 +48,7 @@ final oiFileDisplayComponent = WidgetbookComponent(
       name: 'OiStorageIndicator',
       builder: (context) {
         return useCaseWrapper(
-          SizedBox(
+          const SizedBox(
             width: 260,
             child: OiStorageIndicator(
               usedBytes: 6500000000,

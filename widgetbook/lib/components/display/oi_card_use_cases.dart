@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:obers_ui/obers_ui.dart';
+import 'package:obers_ui_widgetbook/helpers/knob_helpers.dart';
 import 'package:widgetbook/widgetbook.dart';
-
-import '../../helpers/knob_helpers.dart';
 
 final oiCardComponent = WidgetbookComponent(
   name: 'OiCard',
@@ -10,10 +9,7 @@ final oiCardComponent = WidgetbookComponent(
     WidgetbookUseCase(
       name: 'Default (Elevated)',
       builder: (context) {
-        final collapsible = context.knobs.boolean(
-          label: 'Collapsible',
-          initialValue: false,
-        );
+        final collapsible = context.knobs.boolean(label: 'Collapsible');
         final titleText = context.knobs.string(
           label: 'Title',
           initialValue: 'Card Title',

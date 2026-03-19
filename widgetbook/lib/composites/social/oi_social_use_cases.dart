@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:obers_ui/obers_ui.dart';
+import 'package:obers_ui_widgetbook/helpers/knob_helpers.dart';
 import 'package:widgetbook/widgetbook.dart';
-
-import '../../helpers/knob_helpers.dart';
 
 final oiSocialComponent = WidgetbookComponent(
   name: 'Social',
@@ -17,9 +16,7 @@ final oiSocialComponent = WidgetbookComponent(
           OiAvatarStackItem(label: 'Diana', initials: 'DI'),
           OiAvatarStackItem(label: 'Eve', initials: 'EV'),
         ];
-        return useCaseWrapper(
-          const OiAvatarStack(users: users, maxVisible: 3),
-        );
+        return useCaseWrapper(const OiAvatarStack(users: users, maxVisible: 3));
       },
     ),
     WidgetbookUseCase(
@@ -80,16 +77,16 @@ final oiSocialComponent = WidgetbookComponent(
       name: 'OiSelectionPresence',
       builder: (context) {
         return useCaseWrapper(
-          OiSelectionPresence(
+          const OiSelectionPresence(
             selections: [
               OiRemoteSelection(
                 userId: 'u1',
                 name: 'Alice',
-                color: const Color(0xFF2563EB),
-                selectedKeys: const {'item1'},
+                color: Color(0xFF2563EB),
+                selectedKeys: {'item1'},
               ),
             ],
-            child: const Text('Selection presence wrapper'),
+            child: Text('Selection presence wrapper'),
           ),
         );
       },

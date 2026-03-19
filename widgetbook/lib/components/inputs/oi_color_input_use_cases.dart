@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:obers_ui/obers_ui.dart';
+import 'package:obers_ui_widgetbook/helpers/knob_helpers.dart';
 import 'package:widgetbook/widgetbook.dart';
-
-import '../../helpers/knob_helpers.dart';
 
 final oiColorInputComponent = WidgetbookComponent(
   name: 'OiColorInput',
@@ -14,10 +13,7 @@ final oiColorInputComponent = WidgetbookComponent(
           label: 'Show Hex',
           initialValue: true,
         );
-        final showOpacity = context.knobs.boolean(
-          label: 'Show Opacity',
-          initialValue: false,
-        );
+        final showOpacity = context.knobs.boolean(label: 'Show Opacity');
         final enabled = context.knobs.boolean(
           label: 'Enabled',
           initialValue: true,

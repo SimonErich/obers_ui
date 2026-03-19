@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:obers_ui/obers_ui.dart';
+import 'package:obers_ui_widgetbook/helpers/knob_helpers.dart';
 import 'package:widgetbook/widgetbook.dart';
-
-import '../../helpers/knob_helpers.dart';
 
 final oiCopyableComponent = WidgetbookComponent(
   name: 'OiCopyable',
@@ -19,9 +18,7 @@ final oiCopyableComponent = WidgetbookComponent(
           initialValue: true,
         );
 
-        return useCaseWrapper(
-          _CopyableDemo(value: value, enabled: enabled),
-        );
+        return useCaseWrapper(_CopyableDemo(value: value, enabled: enabled));
       },
     ),
   ],
@@ -80,10 +77,7 @@ final oiCopyButtonComponent = WidgetbookComponent(
         );
 
         return useCaseWrapper(
-          OiCopyButton(
-            value: value,
-            semanticLabel: semanticLabel,
-          ),
+          OiCopyButton(value: value, semanticLabel: semanticLabel),
         );
       },
     ),
@@ -96,9 +90,7 @@ final oiPasteZoneComponent = WidgetbookComponent(
     WidgetbookUseCase(
       name: 'Default',
       builder: (context) {
-        return useCaseWrapper(
-          const _PasteZoneDemo(),
-        );
+        return useCaseWrapper(const _PasteZoneDemo());
       },
     ),
   ],
@@ -131,7 +123,11 @@ class _PasteZoneDemoState extends State<_PasteZoneDemo> {
           children: [
             const Text('Focus here, then Ctrl+V'),
             const SizedBox(height: 8),
-            Text('Pasted: $_pasted', maxLines: 2, overflow: TextOverflow.ellipsis),
+            Text(
+              'Pasted: $_pasted',
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
           ],
         ),
       ),

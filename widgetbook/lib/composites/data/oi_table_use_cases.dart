@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:obers_ui/obers_ui.dart';
+import 'package:obers_ui_widgetbook/helpers/knob_helpers.dart';
 import 'package:widgetbook/widgetbook.dart';
-
-import '../../helpers/knob_helpers.dart';
 
 class _Person {
   const _Person(this.name, this.age, this.role, this.city);
@@ -21,26 +20,10 @@ const _sampleRows = [
 ];
 
 final _columns = <OiTableColumn<_Person>>[
-  OiTableColumn(
-    id: 'name',
-    header: 'Name',
-    valueGetter: (p) => p.name,
-  ),
-  OiTableColumn(
-    id: 'age',
-    header: 'Age',
-    valueGetter: (p) => p.age.toString(),
-  ),
-  OiTableColumn(
-    id: 'role',
-    header: 'Role',
-    valueGetter: (p) => p.role,
-  ),
-  OiTableColumn(
-    id: 'city',
-    header: 'City',
-    valueGetter: (p) => p.city,
-  ),
+  OiTableColumn(id: 'name', header: 'Name', valueGetter: (p) => p.name),
+  OiTableColumn(id: 'age', header: 'Age', valueGetter: (p) => p.age.toString()),
+  OiTableColumn(id: 'role', header: 'Role', valueGetter: (p) => p.role),
+  OiTableColumn(id: 'city', header: 'City', valueGetter: (p) => p.city),
 ];
 
 final oiTableComponent = WidgetbookComponent(
@@ -57,30 +40,17 @@ final oiTableComponent = WidgetbookComponent(
           label: 'Selectable',
           initialValue: true,
         );
-        final multiSelect = context.knobs.boolean(
-          label: 'Multi Select',
-          initialValue: false,
-        );
-        final striped = context.knobs.boolean(
-          label: 'Striped',
-          initialValue: false,
-        );
-        final dense = context.knobs.boolean(
-          label: 'Dense',
-          initialValue: false,
-        );
+        final multiSelect = context.knobs.boolean(label: 'Multi Select');
+        final striped = context.knobs.boolean(label: 'Striped');
+        final dense = context.knobs.boolean(label: 'Dense');
         final showColumnManager = context.knobs.boolean(
           label: 'Show Column Manager',
-          initialValue: false,
         );
         final showStatusBar = context.knobs.boolean(
           label: 'Show Status Bar',
           initialValue: true,
         );
-        final loading = context.knobs.boolean(
-          label: 'Loading',
-          initialValue: false,
-        );
+        final loading = context.knobs.boolean(label: 'Loading');
 
         return SizedBox(
           height: 400,

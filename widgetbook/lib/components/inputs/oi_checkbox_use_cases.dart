@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:obers_ui/obers_ui.dart';
+import 'package:obers_ui_widgetbook/helpers/knob_helpers.dart';
 import 'package:widgetbook/widgetbook.dart';
-
-import '../../helpers/knob_helpers.dart';
 
 final oiCheckboxComponent = WidgetbookComponent(
   name: 'OiCheckbox',
@@ -19,9 +18,7 @@ final oiCheckboxComponent = WidgetbookComponent(
           initialValue: true,
         );
 
-        return useCaseWrapper(
-          _CheckboxDemo(label: label, enabled: enabled),
-        );
+        return useCaseWrapper(_CheckboxDemo(label: label, enabled: enabled));
       },
     ),
     WidgetbookUseCase(
@@ -32,9 +29,7 @@ final oiCheckboxComponent = WidgetbookComponent(
           initialValue: true,
         );
 
-        return useCaseWrapper(
-          _TriStateCheckboxDemo(enabled: enabled),
-        );
+        return useCaseWrapper(_TriStateCheckboxDemo(enabled: enabled));
       },
     ),
   ],
@@ -81,7 +76,7 @@ class _TriStateCheckboxDemoState extends State<_TriStateCheckboxDemo> {
     setState(() {
       if (_value == false) {
         _value = true;
-      } else if (_value == true) {
+      } else if (_value ?? false) {
         _value = null; // indeterminate
       } else {
         _value = false;
@@ -103,7 +98,11 @@ class _TriStateCheckboxDemoState extends State<_TriStateCheckboxDemo> {
         ),
         const SizedBox(height: 8),
         Text(
-          'State: ${_value == null ? "indeterminate" : _value == true ? "checked" : "unchecked"}',
+          'State: ${_value == null
+              ? "indeterminate"
+              : _value ?? false
+              ? "checked"
+              : "unchecked"}',
           style: const TextStyle(fontSize: 12),
         ),
       ],

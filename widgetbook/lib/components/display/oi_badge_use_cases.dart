@@ -1,8 +1,6 @@
-import 'package:flutter/material.dart';
 import 'package:obers_ui/obers_ui.dart';
+import 'package:obers_ui_widgetbook/helpers/knob_helpers.dart';
 import 'package:widgetbook/widgetbook.dart';
-
-import '../../helpers/knob_helpers.dart';
 
 final oiBadgeComponent = WidgetbookComponent(
   name: 'OiBadge',
@@ -10,10 +8,7 @@ final oiBadgeComponent = WidgetbookComponent(
     WidgetbookUseCase(
       name: 'Filled',
       builder: (context) {
-        final label = context.knobs.string(
-          label: 'Label',
-          initialValue: 'New',
-        );
+        final label = context.knobs.string(label: 'Label', initialValue: 'New');
         final color = context.knobs.enumKnob<OiBadgeColor>(
           label: 'Color',
           values: OiBadgeColor.values,
@@ -23,14 +18,8 @@ final oiBadgeComponent = WidgetbookComponent(
           values: OiBadgeSize.values,
           initialValue: OiBadgeSize.medium,
         );
-        final showIcon = context.knobs.boolean(
-          label: 'Show Icon',
-          initialValue: false,
-        );
-        final dot = context.knobs.boolean(
-          label: 'Dot',
-          initialValue: false,
-        );
+        final showIcon = context.knobs.boolean(label: 'Show Icon');
+        final dot = context.knobs.boolean(label: 'Dot');
         final icon = showIcon ? context.knobs.iconKnob() : null;
 
         return useCaseWrapper(

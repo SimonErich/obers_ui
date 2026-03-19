@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:obers_ui/obers_ui.dart';
+import 'package:obers_ui_widgetbook/helpers/knob_helpers.dart';
 import 'package:widgetbook/widgetbook.dart';
-
-import '../../helpers/knob_helpers.dart';
 
 final oiRowComponent = WidgetbookComponent(
   name: 'OiRow',
@@ -13,7 +12,6 @@ final oiRowComponent = WidgetbookComponent(
         final gap = context.knobs.double.slider(
           label: 'Gap',
           initialValue: 8,
-          min: 0,
           max: 64,
         );
         final mainAxisAlignment = context.knobs.enumKnob(

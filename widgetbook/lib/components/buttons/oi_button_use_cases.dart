@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:obers_ui/obers_ui.dart';
+import 'package:obers_ui_widgetbook/helpers/knob_helpers.dart';
 import 'package:widgetbook/widgetbook.dart';
-
-import '../../helpers/knob_helpers.dart';
 
 final oiButtonComponent = WidgetbookComponent(
   name: 'OiButton',
@@ -27,18 +26,9 @@ final oiButtonComponent = WidgetbookComponent(
           label: 'Enabled',
           initialValue: true,
         );
-        final loading = context.knobs.boolean(
-          label: 'Loading',
-          initialValue: false,
-        );
-        final fullWidth = context.knobs.boolean(
-          label: 'Full Width',
-          initialValue: false,
-        );
-        final showIcon = context.knobs.boolean(
-          label: 'Show Icon',
-          initialValue: false,
-        );
+        final loading = context.knobs.boolean(label: 'Loading');
+        final fullWidth = context.knobs.boolean(label: 'Full Width');
+        final showIcon = context.knobs.boolean(label: 'Show Icon');
         final icon = showIcon ? context.knobs.iconKnob() : null;
 
         Widget button;
@@ -111,9 +101,7 @@ final oiButtonComponent = WidgetbookComponent(
     WidgetbookUseCase(
       name: 'Primary',
       builder: (context) {
-        return useCaseWrapper(
-          OiButton.primary(label: 'Primary', onTap: () {}),
-        );
+        return useCaseWrapper(OiButton.primary(label: 'Primary', onTap: () {}));
       },
     ),
     WidgetbookUseCase(
@@ -127,17 +115,13 @@ final oiButtonComponent = WidgetbookComponent(
     WidgetbookUseCase(
       name: 'Outline',
       builder: (context) {
-        return useCaseWrapper(
-          OiButton.outline(label: 'Outline', onTap: () {}),
-        );
+        return useCaseWrapper(OiButton.outline(label: 'Outline', onTap: () {}));
       },
     ),
     WidgetbookUseCase(
       name: 'Ghost',
       builder: (context) {
-        return useCaseWrapper(
-          OiButton.ghost(label: 'Ghost', onTap: () {}),
-        );
+        return useCaseWrapper(OiButton.ghost(label: 'Ghost', onTap: () {}));
       },
     ),
     WidgetbookUseCase(
@@ -151,9 +135,7 @@ final oiButtonComponent = WidgetbookComponent(
     WidgetbookUseCase(
       name: 'Soft',
       builder: (context) {
-        return useCaseWrapper(
-          OiButton.soft(label: 'Soft', onTap: () {}),
-        );
+        return useCaseWrapper(OiButton.soft(label: 'Soft', onTap: () {}));
       },
     ),
     WidgetbookUseCase(

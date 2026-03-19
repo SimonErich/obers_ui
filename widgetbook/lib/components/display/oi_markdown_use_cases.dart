@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:obers_ui/obers_ui.dart';
+import 'package:obers_ui_widgetbook/helpers/knob_helpers.dart';
 import 'package:widgetbook/widgetbook.dart';
 
-import '../../helpers/knob_helpers.dart';
-
-const _sampleMarkdown = '''# Heading 1
+const _sampleMarkdown = '''
+# Heading 1
 
 ## Heading 2
 
@@ -35,10 +35,7 @@ final oiMarkdownComponent = WidgetbookComponent(
         );
 
         return catalogWrapper(
-          SizedBox(
-            width: 500,
-            child: OiMarkdown(data: data),
-          ),
+          SizedBox(width: 500, child: OiMarkdown(data: data)),
         );
       },
     ),

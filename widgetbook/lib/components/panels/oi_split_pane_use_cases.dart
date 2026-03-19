@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:obers_ui/obers_ui.dart';
+import 'package:obers_ui_widgetbook/helpers/knob_helpers.dart';
 import 'package:widgetbook/widgetbook.dart';
-
-import '../../helpers/knob_helpers.dart';
 
 final oiSplitPaneComponent = WidgetbookComponent(
   name: 'OiSplitPane',
@@ -28,11 +27,11 @@ final oiSplitPaneComponent = WidgetbookComponent(
           child: OiSplitPane(
             direction: direction,
             initialRatio: initialRatio,
-            leading: Container(
+            leading: ColoredBox(
               color: Colors.blue.withValues(alpha: 0.1),
               child: const Center(child: Text('Leading Pane')),
             ),
-            trailing: Container(
+            trailing: ColoredBox(
               color: Colors.green.withValues(alpha: 0.1),
               child: const Center(child: Text('Trailing Pane')),
             ),

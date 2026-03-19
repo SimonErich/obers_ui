@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:obers_ui/obers_ui.dart';
+import 'package:obers_ui_widgetbook/helpers/knob_helpers.dart';
 import 'package:widgetbook/widgetbook.dart';
-
-import '../helpers/knob_helpers.dart';
 
 final _sampleComments = [
   OiComment(
@@ -17,14 +16,18 @@ final _sampleComments = [
         authorId: 'user-2',
         authorName: 'Bob',
         content: 'Agreed, the contrast is much better now.',
-        timestamp: DateTime.now().subtract(const Duration(hours: 1, minutes: 45)),
+        timestamp: DateTime.now().subtract(
+          const Duration(hours: 1, minutes: 45),
+        ),
       ),
       OiComment(
         key: '1-2',
         authorId: 'current-user',
         authorName: 'You',
         content: 'Thanks! Took a while to get the palette right.',
-        timestamp: DateTime.now().subtract(const Duration(hours: 1, minutes: 30)),
+        timestamp: DateTime.now().subtract(
+          const Duration(hours: 1, minutes: 30),
+        ),
         edited: true,
       ),
     ],

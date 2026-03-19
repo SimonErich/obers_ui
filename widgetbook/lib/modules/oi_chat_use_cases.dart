@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:obers_ui/obers_ui.dart';
-import 'package:obers_ui/src/modules/oi_chat.dart' show OiFileData;
+import 'package:obers_ui_widgetbook/helpers/knob_helpers.dart';
 import 'package:widgetbook/widgetbook.dart';
-
-import '../helpers/knob_helpers.dart';
 
 final _sampleMessages = [
   OiChatMessage(
@@ -33,9 +31,6 @@ final _sampleMessages = [
     senderName: 'Bob',
     content: 'Let me know if you need help with the API changes.',
     timestamp: DateTime.now().subtract(const Duration(minutes: 20)),
-    attachments: const [
-      OiFileData(name: 'api-spec.pdf', size: 245000),
-    ],
   ),
   OiChatMessage(
     key: '5',
@@ -74,7 +69,6 @@ final oiChatComponent = WidgetbookComponent(
         );
         final showTyping = context.knobs.boolean(
           label: 'Show Typing Indicator',
-          initialValue: false,
         );
 
         return useCaseWrapper(

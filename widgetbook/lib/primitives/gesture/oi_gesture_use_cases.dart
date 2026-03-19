@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:obers_ui/obers_ui.dart';
+import 'package:obers_ui_widgetbook/helpers/knob_helpers.dart';
 import 'package:widgetbook/widgetbook.dart';
-
-import '../../helpers/knob_helpers.dart';
 
 final oiDoubleTapComponent = WidgetbookComponent(
   name: 'OiDoubleTap',
@@ -15,9 +14,7 @@ final oiDoubleTapComponent = WidgetbookComponent(
           initialValue: true,
         );
 
-        return useCaseWrapper(
-          _DoubleTapDemo(enabled: enabled),
-        );
+        return useCaseWrapper(_DoubleTapDemo(enabled: enabled));
       },
     ),
   ],
@@ -48,7 +45,10 @@ class _DoubleTapDemoState extends State<_DoubleTapDemo> {
             height: 80,
             color: const Color(0xFF2196F3),
             child: const Center(
-              child: Text('Tap / Double tap', style: TextStyle(color: Color(0xFFFFFFFF))),
+              child: Text(
+                'Tap / Double tap',
+                style: TextStyle(color: Color(0xFFFFFFFF)),
+              ),
             ),
           ),
         ),
@@ -65,9 +65,7 @@ final oiLongPressMenuComponent = WidgetbookComponent(
     WidgetbookUseCase(
       name: 'Default',
       builder: (context) {
-        return useCaseWrapper(
-          const _LongPressMenuDemo(),
-        );
+        return useCaseWrapper(const _LongPressMenuDemo());
       },
     ),
   ],
@@ -108,7 +106,10 @@ class _LongPressMenuDemoState extends State<_LongPressMenuDemo> {
             height: 80,
             color: const Color(0xFF9C27B0),
             child: const Center(
-              child: Text('Long press me', style: TextStyle(color: Color(0xFFFFFFFF))),
+              child: Text(
+                'Long press me',
+                style: TextStyle(color: Color(0xFFFFFFFF)),
+              ),
             ),
           ),
         ),
@@ -125,10 +126,7 @@ final oiSwipeableComponent = WidgetbookComponent(
     WidgetbookUseCase(
       name: 'Default',
       builder: (context) {
-        final dismissible = context.knobs.boolean(
-          label: 'Dismissible',
-          initialValue: false,
-        );
+        final dismissible = context.knobs.boolean(label: 'Dismissible');
 
         return useCaseWrapper(
           SizedBox(
@@ -193,9 +191,9 @@ final oiPinchZoomComponent = WidgetbookComponent(
               minScale: minScale,
               maxScale: maxScale,
               panEnabled: panEnabled,
-              child: Container(
-                color: const Color(0xFFFF9800),
-                child: const Center(
+              child: const ColoredBox(
+                color: Color(0xFFFF9800),
+                child: Center(
                   child: Text(
                     'Pinch to zoom',
                     style: TextStyle(color: Color(0xFFFFFFFF)),

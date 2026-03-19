@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:obers_ui/obers_ui.dart';
+import 'package:obers_ui_widgetbook/helpers/knob_helpers.dart';
 import 'package:widgetbook/widgetbook.dart';
-
-import '../../helpers/knob_helpers.dart';
 
 final oiOnboardingComponent = WidgetbookComponent(
   name: 'Onboarding',
@@ -79,11 +78,11 @@ final oiOnboardingComponent = WidgetbookComponent(
       name: 'OiWhatsNew',
       builder: (context) {
         return useCaseWrapper(
-          SizedBox(
+          const SizedBox(
             width: 480,
             height: 400,
             child: OiWhatsNew(
-              items: const [
+              items: [
                 OiWhatsNewItem(
                   title: 'Dark Mode',
                   description: 'Full dark mode support across all components.',
@@ -98,7 +97,8 @@ final oiOnboardingComponent = WidgetbookComponent(
                 ),
                 OiWhatsNewItem(
                   title: 'Performance',
-                  description: 'Improved rendering performance for large lists.',
+                  description:
+                      'Improved rendering performance for large lists.',
                   icon: Icons.speed,
                 ),
               ],

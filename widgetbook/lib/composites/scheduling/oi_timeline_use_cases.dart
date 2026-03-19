@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:obers_ui/obers_ui.dart';
 import 'package:widgetbook/widgetbook.dart';
 
-import '../../helpers/knob_helpers.dart';
-
 final _sampleEvents = [
   OiTimelineEvent(
     timestamp: DateTime(2024, 1, 15, 9, 30),
@@ -12,7 +10,7 @@ final _sampleEvents = [
     icon: Icons.create_new_folder,
   ),
   OiTimelineEvent(
-    timestamp: DateTime(2024, 2, 1, 14, 0),
+    timestamp: DateTime(2024, 2, 1, 14),
     title: 'First Release',
     description: 'Version 1.0 released to production.',
     icon: Icons.rocket_launch,
@@ -35,10 +33,7 @@ final oiTimelineComponent = WidgetbookComponent(
       builder: (context) {
         return SizedBox(
           height: 500,
-          child: OiTimeline(
-            label: 'Project timeline',
-            events: _sampleEvents,
-          ),
+          child: OiTimeline(label: 'Project timeline', events: _sampleEvents),
         );
       },
     ),

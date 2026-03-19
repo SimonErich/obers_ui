@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:obers_ui/obers_ui.dart';
-import 'package:widgetbook/widgetbook.dart';
-
 import 'package:obers_ui_widgetbook/helpers/knob_helpers.dart';
+import 'package:widgetbook/widgetbook.dart';
 
 final shadowComponent = WidgetbookComponent(
   name: 'OiShadowScale',
@@ -43,11 +42,7 @@ final shadowComponent = WidgetbookComponent(
   ],
 );
 
-Widget _shadowCard(
-  String label,
-  List<BoxShadow> shadow,
-  OiColorScheme colors,
-) {
+Widget _shadowCard(String label, List<BoxShadow> shadow, OiColorScheme colors) {
   return Column(
     mainAxisSize: MainAxisSize.min,
     children: [
@@ -58,9 +53,7 @@ Widget _shadowCard(
           color: colors.surface,
           borderRadius: BorderRadius.circular(8),
           boxShadow: shadow,
-          border: Border.all(
-            color: colors.borderSubtle,
-          ),
+          border: Border.all(color: colors.borderSubtle),
         ),
         alignment: Alignment.center,
         child: Text(

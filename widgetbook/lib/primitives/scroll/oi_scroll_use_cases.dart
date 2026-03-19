@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:obers_ui/obers_ui.dart';
 import 'package:widgetbook/widgetbook.dart';
 
-import '../../helpers/knob_helpers.dart';
-
 final oiVirtualListComponent = WidgetbookComponent(
   name: 'OiVirtualList',
   useCases: [
@@ -58,7 +56,6 @@ final oiVirtualGridComponent = WidgetbookComponent(
         final spacing = context.knobs.double.slider(
           label: 'Spacing',
           initialValue: 4,
-          min: 0,
           max: 16,
         );
 
@@ -70,10 +67,10 @@ final oiVirtualGridComponent = WidgetbookComponent(
             crossAxisCount: crossAxisCount,
             mainAxisSpacing: spacing,
             crossAxisSpacing: spacing,
-            itemBuilder: (context, index) => Container(
-              color: Color(0xFF9C27B0).withValues(
-                alpha: 0.2 + (index % 5) * 0.15,
-              ),
+            itemBuilder: (context, index) => ColoredBox(
+              color: const Color(
+                0xFF9C27B0,
+              ).withValues(alpha: 0.2 + (index % 5) * 0.15),
               child: Center(child: Text('$index')),
             ),
           ),

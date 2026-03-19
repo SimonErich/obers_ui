@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:obers_ui/obers_ui.dart';
+import 'package:obers_ui_widgetbook/helpers/knob_helpers.dart';
 import 'package:widgetbook/widgetbook.dart';
-
-import '../../helpers/knob_helpers.dart';
 
 final oiDividerComponent = WidgetbookComponent(
   name: 'OiDivider',
@@ -26,12 +25,7 @@ final oiDividerComponent = WidgetbookComponent(
           values: OiBorderLineStyle.values,
           initialValue: OiBorderLineStyle.solid,
         );
-        final spacing = context.knobs.double.slider(
-          label: 'Spacing',
-          initialValue: 0,
-          min: 0,
-          max: 32,
-        );
+        final spacing = context.knobs.double.slider(label: 'Spacing', max: 32);
 
         final divider = OiDivider(
           axis: axis,
@@ -50,16 +44,10 @@ final oiDividerComponent = WidgetbookComponent(
     WidgetbookUseCase(
       name: 'With Label',
       builder: (context) {
-        final label = context.knobs.string(
-          label: 'Label',
-          initialValue: 'OR',
-        );
+        final label = context.knobs.string(label: 'Label', initialValue: 'OR');
 
         return useCaseWrapper(
-          SizedBox(
-            width: 300,
-            child: OiDivider.withLabel(label),
-          ),
+          SizedBox(width: 300, child: OiDivider.withLabel(label)),
         );
       },
     ),

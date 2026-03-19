@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:obers_ui/obers_ui.dart';
+import 'package:obers_ui_widgetbook/helpers/knob_helpers.dart';
 import 'package:widgetbook/widgetbook.dart';
-
-import '../../helpers/knob_helpers.dart';
 
 final oiButtonGroupComponent = WidgetbookComponent(
   name: 'OiButtonGroup',
@@ -19,12 +18,7 @@ final oiButtonGroupComponent = WidgetbookComponent(
           values: Axis.values,
           initialValue: Axis.horizontal,
         );
-        final spacing = context.knobs.double.slider(
-          label: 'Spacing',
-          initialValue: 0,
-          min: 0,
-          max: 16,
-        );
+        final spacing = context.knobs.double.slider(label: 'Spacing', max: 16);
 
         return useCaseWrapper(
           OiButtonGroup(
@@ -49,9 +43,7 @@ final oiButtonGroupComponent = WidgetbookComponent(
           values: OiButtonSize.values,
         );
 
-        return useCaseWrapper(
-          _ExclusiveGroupDemo(size: size),
-        );
+        return useCaseWrapper(_ExclusiveGroupDemo(size: size));
       },
     ),
   ],

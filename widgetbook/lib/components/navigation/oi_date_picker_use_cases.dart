@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:obers_ui/obers_ui.dart';
+import 'package:obers_ui_widgetbook/helpers/knob_helpers.dart';
 import 'package:widgetbook/widgetbook.dart';
-
-import '../../helpers/knob_helpers.dart';
 
 final oiDatePickerComponent = WidgetbookComponent(
   name: 'OiDatePicker',
@@ -10,10 +9,7 @@ final oiDatePickerComponent = WidgetbookComponent(
     WidgetbookUseCase(
       name: 'Playground',
       builder: (context) {
-        final rangeMode = context.knobs.boolean(
-          label: 'Range Mode',
-          initialValue: false,
-        );
+        final rangeMode = context.knobs.boolean(label: 'Range Mode');
 
         return useCaseWrapper(
           SizedBox(

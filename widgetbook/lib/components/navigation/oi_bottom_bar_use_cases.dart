@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:obers_ui/obers_ui.dart';
+import 'package:obers_ui_widgetbook/helpers/knob_helpers.dart';
 import 'package:widgetbook/widgetbook.dart';
-
-import '../../helpers/knob_helpers.dart';
 
 final oiBottomBarComponent = WidgetbookComponent(
   name: 'OiBottomBar',
@@ -27,9 +26,7 @@ final oiBottomBarComponent = WidgetbookComponent(
               height: 300,
               child: Column(
                 children: [
-                  const Expanded(
-                    child: Center(child: Text('Page content')),
-                  ),
+                  const Expanded(child: Center(child: Text('Page content'))),
                   OiBottomBar(
                     items: const [
                       OiBottomBarItem(icon: Icons.home, label: 'Home'),

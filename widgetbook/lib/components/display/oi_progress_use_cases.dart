@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:obers_ui/obers_ui.dart';
+import 'package:obers_ui_widgetbook/helpers/knob_helpers.dart';
 import 'package:widgetbook/widgetbook.dart';
-
-import '../../helpers/knob_helpers.dart';
 
 final oiProgressComponent = WidgetbookComponent(
   name: 'OiProgress',
@@ -13,13 +12,9 @@ final oiProgressComponent = WidgetbookComponent(
         final value = context.knobs.double.slider(
           label: 'Value',
           initialValue: 0.6,
-          min: 0,
           max: 1,
         );
-        final indeterminate = context.knobs.boolean(
-          label: 'Indeterminate',
-          initialValue: false,
-        );
+        final indeterminate = context.knobs.boolean(label: 'Indeterminate');
 
         return useCaseWrapper(
           SizedBox(
@@ -39,19 +34,12 @@ final oiProgressComponent = WidgetbookComponent(
         final value = context.knobs.double.slider(
           label: 'Value',
           initialValue: 0.6,
-          min: 0,
           max: 1,
         );
-        final indeterminate = context.knobs.boolean(
-          label: 'Indeterminate',
-          initialValue: false,
-        );
+        final indeterminate = context.knobs.boolean(label: 'Indeterminate');
 
         return useCaseWrapper(
-          OiProgress.circular(
-            value: value,
-            indeterminate: indeterminate,
-          ),
+          OiProgress.circular(value: value, indeterminate: indeterminate),
         );
       },
     ),
@@ -67,15 +55,11 @@ final oiProgressComponent = WidgetbookComponent(
         final currentStep = context.knobs.int.slider(
           label: 'Current Step',
           initialValue: 3,
-          min: 0,
           max: 10,
         );
 
         return useCaseWrapper(
-          OiProgress.steps(
-            steps: steps,
-            currentStep: currentStep,
-          ),
+          OiProgress.steps(steps: steps, currentStep: currentStep),
         );
       },
     ),

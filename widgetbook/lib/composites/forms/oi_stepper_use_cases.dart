@@ -1,8 +1,6 @@
-import 'package:flutter/material.dart';
 import 'package:obers_ui/obers_ui.dart';
+import 'package:obers_ui_widgetbook/helpers/knob_helpers.dart';
 import 'package:widgetbook/widgetbook.dart';
-
-import '../../helpers/knob_helpers.dart';
 
 final oiStepperComponent = WidgetbookComponent(
   name: 'OiStepper',
@@ -23,7 +21,6 @@ final oiStepperComponent = WidgetbookComponent(
         final currentStep = context.knobs.int.slider(
           label: 'Current Step',
           initialValue: 1,
-          min: 0,
           max: 7,
         );
 

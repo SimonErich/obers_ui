@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:obers_ui/obers_ui.dart';
+import 'package:obers_ui_widgetbook/helpers/knob_helpers.dart';
 import 'package:widgetbook/widgetbook.dart';
-
-import '../../helpers/knob_helpers.dart';
 
 final oiPageComponent = WidgetbookComponent(
   name: 'OiPage',
@@ -13,7 +12,6 @@ final oiPageComponent = WidgetbookComponent(
         final gap = context.knobs.double.slider(
           label: 'Gap',
           initialValue: 16,
-          min: 0,
           max: 64,
         );
 
@@ -58,7 +56,6 @@ final oiSectionComponent = WidgetbookComponent(
         final gap = context.knobs.double.slider(
           label: 'Gap',
           initialValue: 8,
-          min: 0,
           max: 32,
         );
         final semanticLabel = context.knobs.string(
@@ -113,7 +110,6 @@ final oiMasonryComponent = WidgetbookComponent(
         final gap = context.knobs.double.slider(
           label: 'Gap',
           initialValue: 8,
-          min: 0,
           max: 32,
         );
 
@@ -130,9 +126,9 @@ final oiMasonryComponent = WidgetbookComponent(
                 8,
                 (i) => Container(
                   height: heights[i],
-                  color: Color(0xFF4CAF50).withValues(
-                    alpha: 0.3 + (i * 0.08),
-                  ),
+                  color: const Color(
+                    0xFF4CAF50,
+                  ).withValues(alpha: 0.3 + (i * 0.08)),
                   child: Center(child: Text('${i + 1}')),
                 ),
               ),
@@ -153,13 +149,11 @@ final oiWrapLayoutComponent = WidgetbookComponent(
         final spacing = context.knobs.double.slider(
           label: 'Spacing',
           initialValue: 8,
-          min: 0,
           max: 32,
         );
         final runSpacing = context.knobs.double.slider(
           label: 'Run Spacing',
           initialValue: 8,
-          min: 0,
           max: 32,
         );
 
@@ -197,7 +191,7 @@ final oiAspectRatioComponent = WidgetbookComponent(
           label: 'Ratio',
           initialValue: 1.78,
           min: 0.5,
-          max: 3.0,
+          max: 3,
         );
 
         return useCaseWrapper(
@@ -206,7 +200,7 @@ final oiAspectRatioComponent = WidgetbookComponent(
             child: OiAspectRatio(
               breakpoint: OiBreakpoint.expanded,
               ratio: OiResponsive<double>(ratio),
-              child: Container(
+              child: ColoredBox(
                 color: const Color(0xFFFF9800).withValues(alpha: 0.3),
                 child: Center(
                   child: Text('Ratio: ${ratio.toStringAsFixed(2)}'),
@@ -229,7 +223,6 @@ final oiSpacerComponent = WidgetbookComponent(
         final size = context.knobs.double.slider(
           label: 'Size',
           initialValue: 24,
-          min: 0,
           max: 100,
         );
 

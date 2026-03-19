@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:obers_ui/obers_ui.dart';
+import 'package:obers_ui_widgetbook/helpers/knob_helpers.dart';
 import 'package:widgetbook/widgetbook.dart';
-
-import '../../helpers/knob_helpers.dart';
 
 final oiFeedbackComponent = WidgetbookComponent(
   name: 'Feedback Widgets',
@@ -16,14 +15,8 @@ final oiFeedbackComponent = WidgetbookComponent(
           min: 3,
           max: 10,
         );
-        final allowHalf = context.knobs.boolean(
-          label: 'Allow Half',
-          initialValue: false,
-        );
-        final readOnly = context.knobs.boolean(
-          label: 'Read Only',
-          initialValue: false,
-        );
+        final allowHalf = context.knobs.boolean(label: 'Allow Half');
+        final readOnly = context.knobs.boolean(label: 'Read Only');
 
         return useCaseWrapper(
           StatefulBuilder(
@@ -47,7 +40,6 @@ final oiFeedbackComponent = WidgetbookComponent(
         final min = context.knobs.int.slider(
           label: 'Min',
           initialValue: 1,
-          min: 0,
           max: 5,
         );
         final max = context.knobs.int.slider(

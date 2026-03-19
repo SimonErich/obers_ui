@@ -194,6 +194,10 @@ class _OiTappableState extends State<OiTappable> {
     final reducedMotion =
         animations.reducedMotion || MediaQuery.disableAnimationsOf(context);
     final density = OiDensityScope.of(context);
+    // Compact and dense densities intentionally suppress the 48 dp touch-target
+    // floor so that widgets render at their natural size. This allows callers to
+    // opt out of touch-target inflation for information-dense layouts where the
+    // WCAG minimum would waste too much space.
     final minTarget =
         (density == OiDensity.compact || density == OiDensity.dense)
         ? 0.0

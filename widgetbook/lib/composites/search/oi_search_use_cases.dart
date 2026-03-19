@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:obers_ui/obers_ui.dart';
+import 'package:obers_ui_widgetbook/helpers/knob_helpers.dart';
 import 'package:widgetbook/widgetbook.dart';
-
-import '../../helpers/knob_helpers.dart';
 
 final _sampleSources = [
   OiSearchSource(
@@ -40,10 +39,7 @@ final oiSearchComponent = WidgetbookComponent(
           SizedBox(
             width: 500,
             height: 400,
-            child: OiSearch(
-              label: 'Global search',
-              sources: _sampleSources,
-            ),
+            child: OiSearch(label: 'Global search', sources: _sampleSources),
           ),
         );
       },

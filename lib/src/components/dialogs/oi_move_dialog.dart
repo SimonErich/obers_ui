@@ -149,10 +149,13 @@ class _OiMoveDialogState extends State<OiMoveDialog> {
               ConstrainedBox(
                 constraints: const BoxConstraints(maxHeight: 300),
                 child: OiTree<OiFileNodeData>(
+                  label: 'Folder tree',
                   nodes: widget.folderTree,
                   controller: _treeController,
-                  onSelect: _onFolderSelect,
-                  nodeBuilder: (context, node, isExpanded, isSelected) {
+                  onSelectionChanged: (ids) {
+                    if (ids.isNotEmpty) _onFolderSelect(ids.first);
+                  },
+                  nodeBuilder: (context, node, depth, {required bool expanded, required bool selected}) {
                     final disabled = _isSelfOrDescendant(node);
                     final isMatch = _searchQuery.isEmpty ||
                         node.label

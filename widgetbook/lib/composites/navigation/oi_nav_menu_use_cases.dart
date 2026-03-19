@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:obers_ui/obers_ui.dart';
 import 'package:widgetbook/widgetbook.dart';
 
-import '../../helpers/knob_helpers.dart';
-
 const _sampleItems = [
   OiNavMenuItem(id: 'all', label: 'All Files', icon: Icons.folder),
   OiNavMenuItem(id: 'recent', label: 'Recent', icon: Icons.access_time),
@@ -27,10 +25,7 @@ final oiNavMenuComponent = WidgetbookComponent(
     WidgetbookUseCase(
       name: 'Playground',
       builder: (context) {
-        final reorderable = context.knobs.boolean(
-          label: 'Reorderable',
-          initialValue: false,
-        );
+        final reorderable = context.knobs.boolean(label: 'Reorderable');
 
         return StatefulBuilder(
           builder: (context, setState) {

@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:obers_ui/obers_ui.dart';
+import 'package:obers_ui_widgetbook/helpers/knob_helpers.dart';
 import 'package:widgetbook/widgetbook.dart';
-
-import '../../helpers/knob_helpers.dart';
 
 final oiFloatingComponent = WidgetbookComponent(
   name: 'OiFloating',
@@ -18,13 +17,10 @@ final oiFloatingComponent = WidgetbookComponent(
         final gap = context.knobs.double.slider(
           label: 'Gap',
           initialValue: 4,
-          min: 0,
           max: 24,
         );
 
-        return useCaseWrapper(
-          _FloatingDemo(alignment: alignment, gap: gap),
-        );
+        return useCaseWrapper(_FloatingDemo(alignment: alignment, gap: gap));
       },
     ),
   ],
@@ -74,9 +70,7 @@ final oiPortalComponent = WidgetbookComponent(
     WidgetbookUseCase(
       name: 'Default',
       builder: (context) {
-        return useCaseWrapper(
-          const _PortalDemo(),
-        );
+        return useCaseWrapper(const _PortalDemo());
       },
     ),
   ],
@@ -162,7 +156,10 @@ final oiVisibilityComponent = WidgetbookComponent(
 );
 
 class _VisibilityDemo extends StatefulWidget {
-  const _VisibilityDemo({required this.transition, required this.maintainState});
+  const _VisibilityDemo({
+    required this.transition,
+    required this.maintainState,
+  });
   final OiTransition transition;
   final bool maintainState;
 

@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:obers_ui/obers_ui.dart';
+import 'package:obers_ui_widgetbook/helpers/knob_helpers.dart';
 import 'package:widgetbook/widgetbook.dart';
-
-import '../../helpers/knob_helpers.dart';
 
 final oiToggleButtonComponent = WidgetbookComponent(
   name: 'OiToggleButton',
@@ -22,10 +21,7 @@ final oiToggleButtonComponent = WidgetbookComponent(
           label: 'Enabled',
           initialValue: true,
         );
-        final showIcon = context.knobs.boolean(
-          label: 'Show Icon',
-          initialValue: false,
-        );
+        final showIcon = context.knobs.boolean(label: 'Show Icon');
         final icon = showIcon ? context.knobs.iconKnob() : null;
 
         return useCaseWrapper(

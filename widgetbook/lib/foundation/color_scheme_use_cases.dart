@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:obers_ui/obers_ui.dart';
-import 'package:widgetbook/widgetbook.dart';
-
 import 'package:obers_ui_widgetbook/helpers/knob_helpers.dart';
+import 'package:widgetbook/widgetbook.dart';
 
 final colorSchemeComponent = WidgetbookComponent(
   name: 'OiColorScheme',
@@ -102,10 +101,7 @@ Widget _sectionTitle(String title) {
     padding: const EdgeInsets.only(bottom: 4),
     child: Text(
       title,
-      style: const TextStyle(
-        fontSize: 18,
-        fontWeight: FontWeight.w700,
-      ),
+      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
     ),
   );
 }
@@ -151,9 +147,7 @@ Widget _colorTile(String label, Color color, {bool compact = false}) {
         decoration: BoxDecoration(
           color: color,
           borderRadius: BorderRadius.circular(6),
-          border: Border.all(
-            color: const Color(0x33000000),
-          ),
+          border: Border.all(color: const Color(0x33000000)),
         ),
       ),
       const SizedBox(height: 4),

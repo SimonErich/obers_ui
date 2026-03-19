@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:obers_ui/obers_ui.dart';
+import 'package:obers_ui_widgetbook/helpers/knob_helpers.dart';
 import 'package:widgetbook/widgetbook.dart';
-
-import '../../helpers/knob_helpers.dart';
 
 final oiEmptyStateComponent = WidgetbookComponent(
   name: 'OiEmptyState',
@@ -18,7 +17,7 @@ final oiEmptyStateComponent = WidgetbookComponent(
           label: 'Description',
           initialValue: 'Try adjusting your search or filter criteria.',
         );
-        final icon = context.knobs.iconKnob(label: 'Icon');
+        final icon = context.knobs.iconKnob();
 
         return useCaseWrapper(
           SizedBox(

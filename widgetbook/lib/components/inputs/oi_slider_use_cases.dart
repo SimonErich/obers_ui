@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:obers_ui/obers_ui.dart';
+import 'package:obers_ui_widgetbook/helpers/knob_helpers.dart';
 import 'package:widgetbook/widgetbook.dart';
-
-import '../../helpers/knob_helpers.dart';
 
 final oiSliderComponent = WidgetbookComponent(
   name: 'OiSlider',
@@ -10,32 +9,16 @@ final oiSliderComponent = WidgetbookComponent(
     WidgetbookUseCase(
       name: 'Playground',
       builder: (context) {
-        final min = context.knobs.double.slider(
-          label: 'Min',
-          initialValue: 0,
-          min: 0,
-          max: 50,
-        );
+        final min = context.knobs.double.slider(label: 'Min', max: 50);
         final max = context.knobs.double.slider(
           label: 'Max',
           initialValue: 100,
           min: 50,
           max: 200,
         );
-        final divisions = context.knobs.int.slider(
-          label: 'Divisions',
-          initialValue: 0,
-          min: 0,
-          max: 20,
-        );
-        final showLabels = context.knobs.boolean(
-          label: 'Show Labels',
-          initialValue: false,
-        );
-        final showTicks = context.knobs.boolean(
-          label: 'Show Ticks',
-          initialValue: false,
-        );
+        final divisions = context.knobs.int.slider(label: 'Divisions');
+        final showLabels = context.knobs.boolean(label: 'Show Labels');
+        final showTicks = context.knobs.boolean(label: 'Show Ticks');
         final enabled = context.knobs.boolean(
           label: 'Enabled',
           initialValue: true,
@@ -64,12 +47,7 @@ final oiSliderComponent = WidgetbookComponent(
     WidgetbookUseCase(
       name: 'Range',
       builder: (context) {
-        return useCaseWrapper(
-          SizedBox(
-            width: 300,
-            child: _RangeSliderDemo(),
-          ),
-        );
+        return useCaseWrapper(SizedBox(width: 300, child: _RangeSliderDemo()));
       },
     ),
   ],
