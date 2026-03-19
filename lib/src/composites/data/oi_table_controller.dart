@@ -73,8 +73,12 @@ class OiTableController extends ChangeNotifier {
 
   // ── Selection ─────────────────────────────────────────────────────────────
 
-  /// The set of currently selected row indices.
-  final Set<int> selectedRows = {};
+  /// The set of currently selected row keys.
+  ///
+  /// Each key is a stable identifier for a row, independent of visual ordering.
+  /// This ensures selection remains valid across sort, filter, and pagination
+  /// changes (REQ-0478).
+  final Set<String> selectedRows = {};
 
   /// Whether all rows are selected (driven externally, not computed).
   bool selectAll = false;
@@ -150,59 +154,57 @@ class OiTableController extends ChangeNotifier {
 
   // ── Selection API ─────────────────────────────────────────────────────────
 
-  /// Selects the row at [index].
+  /// Selects the row identified by [key].
   ///
   /// When [multi] is `false` (the default), any previous selection is cleared
   /// first. When [multi] is `true`, the row is added to the existing selection.
-  void selectRow(int index, {bool multi = false}) {
+  void selectRow(String key, {bool multi = false}) {
     if (!multi) selectedRows.clear();
-    selectedRows.add(index);
+    selectedRows.add(key);
     selectAll = false;
     notifyListeners();
   }
 
-  /// Toggles the selection state of the row at [index] without clearing
-  /// existing selections.
+  /// Toggles the selection state of the row identified by [key] without
+  /// clearing existing selections.
   ///
   /// If the row is already selected, it is deselected. Otherwise it is added
   /// to the current selection. This is the expected behavior for Ctrl+click.
-  void toggleRow(int index) {
-    if (selectedRows.contains(index)) {
-      selectedRows.remove(index);
+  void toggleRow(String key) {
+    if (selectedRows.contains(key)) {
+      selectedRows.remove(key);
     } else {
-      selectedRows.add(index);
+      selectedRows.add(key);
     }
     selectAll = false;
     notifyListeners();
   }
 
-  /// Selects all rows in the range from [start] to [end] (inclusive).
+  /// Selects all rows identified by [keys].
   ///
   /// Previous selection is cleared first. This is the expected behavior for
-  /// Shift+click range selection.
-  void selectRange(int start, int end) {
-    selectedRows.clear();
-    final lo = start < end ? start : end;
-    final hi = start < end ? end : start;
-    for (var i = lo; i <= hi; i++) {
-      selectedRows.add(i);
-    }
-    selectAll = false;
-    notifyListeners();
-  }
-
-  /// Removes [index] from the current selection.
-  void deselectRow(int index) {
-    if (!selectedRows.remove(index)) return;
-    selectAll = false;
-    notifyListeners();
-  }
-
-  /// Selects all rows up to [totalCount].
-  void selectAllRows(int totalCount) {
+  /// Shift+click range selection where the widget resolves the visual range
+  /// to a set of stable row keys.
+  void selectRange(Set<String> keys) {
     selectedRows
       ..clear()
-      ..addAll(Iterable<int>.generate(totalCount));
+      ..addAll(keys);
+    selectAll = false;
+    notifyListeners();
+  }
+
+  /// Removes [key] from the current selection.
+  void deselectRow(String key) {
+    if (!selectedRows.remove(key)) return;
+    selectAll = false;
+    notifyListeners();
+  }
+
+  /// Selects all rows identified by [allKeys].
+  void selectAllRows(Set<String> allKeys) {
+    selectedRows
+      ..clear()
+      ..addAll(allKeys);
     selectAll = true;
     notifyListeners();
   }

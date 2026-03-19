@@ -91,24 +91,24 @@ void main() {
 
     // ── Selection ─────────────────────────────────────────────────────────────
 
-    test('selectRow adds index to selectedRows', () {
-      final ctrl = OiTableController()..selectRow(3);
-      expect(ctrl.selectedRows, contains(3));
+    test('selectRow adds key to selectedRows', () {
+      final ctrl = OiTableController()..selectRow('k3');
+      expect(ctrl.selectedRows, contains('k3'));
     });
 
     test('selectRow without multi clears previous selection', () {
       final ctrl = OiTableController()
-        ..selectRow(1)
-        ..selectRow(2);
-      expect(ctrl.selectedRows, {2});
+        ..selectRow('k1')
+        ..selectRow('k2');
+      expect(ctrl.selectedRows, {'k2'});
     });
 
     test('selectRow with multi=true appends to selection', () {
       final ctrl = OiTableController()
-        ..selectRow(1)
-        ..selectRow(2, multi: true)
-        ..selectRow(3, multi: true);
-      expect(ctrl.selectedRows, {1, 2, 3});
+        ..selectRow('k1')
+        ..selectRow('k2', multi: true)
+        ..selectRow('k3', multi: true);
+      expect(ctrl.selectedRows, {'k1', 'k2', 'k3'});
     });
 
     test('selectRow notifies listeners', () {
@@ -116,36 +116,37 @@ void main() {
       var count = 0;
       ctrl
         ..addListener(() => count++)
-        ..selectRow(0);
+        ..selectRow('k0');
       expect(count, 1);
     });
 
-    test('deselectRow removes the index', () {
+    test('deselectRow removes the key', () {
       final ctrl = OiTableController()
-        ..selectRow(5, multi: true)
-        ..selectRow(6, multi: true)
-        ..deselectRow(5);
-      expect(ctrl.selectedRows, {6});
+        ..selectRow('k5', multi: true)
+        ..selectRow('k6', multi: true)
+        ..deselectRow('k5');
+      expect(ctrl.selectedRows, {'k6'});
     });
 
-    test('deselectRow does not notify when index not selected', () {
+    test('deselectRow does not notify when key not selected', () {
       final ctrl = OiTableController();
       var count = 0;
       ctrl
         ..addListener(() => count++)
-        ..deselectRow(99);
+        ..deselectRow('k99');
       expect(count, 0);
     });
 
-    test('selectAllRows fills selectedRows with 0..totalCount-1', () {
-      final ctrl = OiTableController()..selectAllRows(5);
-      expect(ctrl.selectedRows, {0, 1, 2, 3, 4});
+    test('selectAllRows fills selectedRows with all provided keys', () {
+      final ctrl = OiTableController()
+        ..selectAllRows({'k0', 'k1', 'k2', 'k3', 'k4'});
+      expect(ctrl.selectedRows, {'k0', 'k1', 'k2', 'k3', 'k4'});
       expect(ctrl.selectAll, isTrue);
     });
 
     test('clearSelection empties selectedRows', () {
       final ctrl = OiTableController()
-        ..selectAllRows(3)
+        ..selectAllRows({'k0', 'k1', 'k2'})
         ..clearSelection();
       expect(ctrl.selectedRows, isEmpty);
       expect(ctrl.selectAll, isFalse);
@@ -158,6 +159,52 @@ void main() {
         ..addListener(() => count++)
         ..clearSelection();
       expect(count, 0);
+    });
+
+    test('toggleRow adds unselected row to selection', () {
+      final ctrl = OiTableController()
+        ..selectRow('k0')
+        ..toggleRow('k1');
+      expect(ctrl.selectedRows, {'k0', 'k1'});
+    });
+
+    test('toggleRow removes already-selected row', () {
+      final ctrl = OiTableController()
+        ..selectRow('k0', multi: true)
+        ..selectRow('k1', multi: true)
+        ..toggleRow('k0');
+      expect(ctrl.selectedRows, {'k1'});
+    });
+
+    test('toggleRow notifies listeners', () {
+      final ctrl = OiTableController();
+      var count = 0;
+      ctrl
+        ..addListener(() => count++)
+        ..toggleRow('k0');
+      expect(count, 1);
+    });
+
+    test('selectRange selects exact key set', () {
+      final ctrl = OiTableController()
+        ..selectRange({'k1', 'k2', 'k3', 'k4'});
+      expect(ctrl.selectedRows, {'k1', 'k2', 'k3', 'k4'});
+    });
+
+    test('selectRange clears previous selection', () {
+      final ctrl = OiTableController()
+        ..selectRow('k10', multi: true)
+        ..selectRange({'k0', 'k1', 'k2'});
+      expect(ctrl.selectedRows, {'k0', 'k1', 'k2'});
+    });
+
+    test('selectRange notifies listeners', () {
+      final ctrl = OiTableController();
+      var count = 0;
+      ctrl
+        ..addListener(() => count++)
+        ..selectRange({'k0', 'k1', 'k2'});
+      expect(count, 1);
     });
 
     // ── Filters ───────────────────────────────────────────────────────────────

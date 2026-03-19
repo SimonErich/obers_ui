@@ -55,7 +55,8 @@ Widget _table({
   OiTableController? controller,
   bool selectable = false,
   bool multiSelect = false,
-  void Function(List<int>)? onSelectionChanged,
+  String Function(_Row)? rowKey,
+  void Function(Set<String>)? onSelectionChanged,
   void Function(_Row, int)? onRowTap,
   void Function(_Row, int)? onRowDoubleTap,
   bool serverSideSort = false,
@@ -94,6 +95,7 @@ Widget _table({
       controller: controller,
       selectable: selectable,
       multiSelect: multiSelect,
+      rowKey: rowKey,
       onSelectionChanged: onSelectionChanged,
       onRowTap: onRowTap,
       onRowDoubleTap: onRowDoubleTap,
@@ -212,24 +214,31 @@ void main() {
   // 7. Selection — single row
   testWidgets('tapping row with selectable=true selects it', (tester) async {
     final ctrl = OiTableController(totalRows: _rows.length);
-    await tester.pumpObers(_table(controller: ctrl, selectable: true));
+    await tester.pumpObers(
+      _table(controller: ctrl, selectable: true, rowKey: (r) => r.name),
+    );
     await tester.pumpAndSettle();
     // Select via controller (tap may be absorbed by KeyboardListener overlay).
-    ctrl.selectRow(0);
+    ctrl.selectRow('Alice');
     await tester.pump();
-    expect(ctrl.selectedRows, contains(0));
+    expect(ctrl.selectedRows, contains('Alice'));
   });
 
   // 8. Multi-select
   testWidgets('multi-select accumulates selections', (tester) async {
     final ctrl = OiTableController(totalRows: _rows.length);
     await tester.pumpObers(
-      _table(controller: ctrl, selectable: true, multiSelect: true),
+      _table(
+        controller: ctrl,
+        selectable: true,
+        multiSelect: true,
+        rowKey: (r) => r.name,
+      ),
     );
     ctrl
-      ..selectRow(0, multi: true)
-      ..selectRow(1, multi: true);
-    expect(ctrl.selectedRows, containsAll([0, 1]));
+      ..selectRow('Alice', multi: true)
+      ..selectRow('Bob', multi: true);
+    expect(ctrl.selectedRows, containsAll(['Alice', 'Bob']));
   });
 
   // 9. onRowTap fires
@@ -599,8 +608,11 @@ void main() {
   testWidgets('status bar shows selection count when rows selected', (
     tester,
   ) async {
-    final ctrl = OiTableController(totalRows: _rows.length)..selectRow(0);
-    await tester.pumpObers(_table(controller: ctrl, selectable: true));
+    final ctrl = OiTableController(totalRows: _rows.length)
+      ..selectRow('Alice');
+    await tester.pumpObers(
+      _table(controller: ctrl, selectable: true, rowKey: (r) => r.name),
+    );
     await tester.pump();
     expect(find.text('1 selected'), findsOneWidget);
   });
@@ -645,8 +657,11 @@ void main() {
         return null;
       },
     );
-    final ctrl = OiTableController(totalRows: _rows.length)..selectRow(0);
-    await tester.pumpObers(_table(controller: ctrl, copyable: true));
+    final ctrl = OiTableController(totalRows: _rows.length)
+      ..selectRow('Alice');
+    await tester.pumpObers(
+      _table(controller: ctrl, copyable: true, rowKey: (r) => r.name),
+    );
     ctrl.copySelectedRows();
     await tester.pump();
     // copySelectedRows is internal; verify clipboard was set by calling it.
@@ -1550,42 +1565,43 @@ void main() {
 
     test('selectRow single clears previous selection', () {
       final c = OiTableController()
-        ..selectRow(0)
-        ..selectRow(1);
-      expect(c.selectedRows, {1});
+        ..selectRow('k0')
+        ..selectRow('k1');
+      expect(c.selectedRows, {'k1'});
     });
 
     test('selectRow multi preserves previous selection', () {
       final c = OiTableController()
-        ..selectRow(0, multi: true)
-        ..selectRow(1, multi: true);
-      expect(c.selectedRows, containsAll([0, 1]));
+        ..selectRow('k0', multi: true)
+        ..selectRow('k1', multi: true);
+      expect(c.selectedRows, containsAll(['k0', 'k1']));
     });
 
     test('deselectRow removes from selection', () {
       final c = OiTableController()
-        ..selectRow(0, multi: true)
-        ..selectRow(1, multi: true)
-        ..deselectRow(0);
-      expect(c.selectedRows, {1});
+        ..selectRow('k0', multi: true)
+        ..selectRow('k1', multi: true)
+        ..deselectRow('k0');
+      expect(c.selectedRows, {'k1'});
     });
 
-    test('deselectRow is no-op for absent index', () {
+    test('deselectRow is no-op for absent key', () {
       var notified = 0;
       final c = OiTableController()..addListener(() => notified++);
-      c.deselectRow(99);
+      c.deselectRow('k99');
       expect(notified, 0);
     });
 
-    test('selectAllRows fills set with all indices', () {
-      final c = OiTableController()..selectAllRows(5);
-      expect(c.selectedRows, {0, 1, 2, 3, 4});
+    test('selectAllRows fills set with all provided keys', () {
+      final c = OiTableController()
+        ..selectAllRows({'k0', 'k1', 'k2', 'k3', 'k4'});
+      expect(c.selectedRows, {'k0', 'k1', 'k2', 'k3', 'k4'});
       expect(c.selectAll, isTrue);
     });
 
     test('clearSelection empties set', () {
       final c = OiTableController()
-        ..selectRow(0)
+        ..selectRow('k0')
         ..clearSelection();
       expect(c.selectedRows, isEmpty);
       expect(c.selectAll, isFalse);
@@ -2023,7 +2039,12 @@ void main() {
   testWidgets('selectAll checkbox toggles all row selection', (tester) async {
     final ctrl = OiTableController(totalRows: _rows.length);
     await tester.pumpObers(
-      _table(controller: ctrl, selectable: true, multiSelect: true),
+      _table(
+        controller: ctrl,
+        selectable: true,
+        multiSelect: true,
+        rowKey: (r) => r.name,
+      ),
     );
     await tester.pumpAndSettle();
     // Tap the header checkbox (☐)
@@ -2048,22 +2069,23 @@ void main() {
     expect(ctrl.selectedRows, isEmpty);
   });
 
-  // 57. onSelectionChanged fires with correct indices
+  // 57. onSelectionChanged fires with correct keys
   testWidgets('onSelectionChanged fires when selection changes via row tap', (
     tester,
   ) async {
-    List<int>? reported;
+    Set<String>? reported;
     final ctrl = OiTableController(totalRows: _rows.length);
     await tester.pumpObers(
       _table(
         controller: ctrl,
         selectable: true,
-        onSelectionChanged: (indices) => reported = indices,
+        rowKey: (r) => r.name,
+        onSelectionChanged: (keys) => reported = keys,
       ),
     );
     await tester.pumpAndSettle();
     // Select via controller to reliably trigger callback path.
-    ctrl.selectRow(1);
+    ctrl.selectRow('Bob');
     // Tap a row text to trigger _handleRowTap which calls onSelectionChanged.
     await tester.tap(find.text('Alice'));
     await tester.pump(const Duration(milliseconds: 500));
@@ -2075,22 +2097,32 @@ void main() {
     tester,
   ) async {
     final ctrl = OiTableController(totalRows: _rows.length)
-      ..selectRow(0, multi: true)
-      ..selectRow(1, multi: true);
+      ..selectRow('Alice', multi: true)
+      ..selectRow('Bob', multi: true);
     await tester.pumpObers(
-      _table(controller: ctrl, selectable: true, multiSelect: true),
+      _table(
+        controller: ctrl,
+        selectable: true,
+        multiSelect: true,
+        rowKey: (r) => r.name,
+      ),
     );
-    ctrl.deselectRow(0);
+    ctrl.deselectRow('Alice');
     await tester.pump();
-    expect(ctrl.selectedRows, {1});
+    expect(ctrl.selectedRows, {'Bob'});
   });
 
   // 59. clearSelection empties selection
   testWidgets('clearSelection via controller clears all', (tester) async {
     final ctrl = OiTableController(totalRows: _rows.length)
-      ..selectAllRows(_rows.length);
+      ..selectAllRows({'Alice', 'Bob', 'Charlie'});
     await tester.pumpObers(
-      _table(controller: ctrl, selectable: true, multiSelect: true),
+      _table(
+        controller: ctrl,
+        selectable: true,
+        multiSelect: true,
+        rowKey: (r) => r.name,
+      ),
     );
     ctrl.clearSelection();
     await tester.pump();
@@ -2280,14 +2312,15 @@ void main() {
       },
     );
     final ctrl = OiTableController(totalRows: _rows.length)
-      ..selectRow(0, multi: true)
-      ..selectRow(2, multi: true);
+      ..selectRow('Alice', multi: true)
+      ..selectRow('Charlie', multi: true);
     await tester.pumpObers(
       _table(
         controller: ctrl,
         copyable: true,
         selectable: true,
         multiSelect: true,
+        rowKey: (r) => r.name,
       ),
     );
     await tester.sendKeyDownEvent(LogicalKeyboardKey.controlLeft);
@@ -2724,14 +2757,19 @@ void main() {
   ) async {
     final ctrl = OiTableController(totalRows: _rows.length);
     await tester.pumpObers(
-      _table(controller: ctrl, selectable: true, multiSelect: true),
+      _table(
+        controller: ctrl,
+        selectable: true,
+        multiSelect: true,
+        rowKey: (r) => r.name,
+      ),
     );
     await tester.pump();
     expect(find.text('1 selected'), findsNothing);
-    ctrl.selectRow(0, multi: true);
+    ctrl.selectRow('Alice', multi: true);
     await tester.pump();
     expect(find.text('1 selected'), findsOneWidget);
-    ctrl.selectRow(1, multi: true);
+    ctrl.selectRow('Bob', multi: true);
     await tester.pump();
     expect(find.text('2 selected'), findsOneWidget);
     ctrl.clearSelection();
@@ -2998,6 +3036,133 @@ void main() {
     await tester.pump();
 
     expect(find.byKey(const Key('oi_table_loading_bar')), findsOneWidget);
+  });
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // ── Shift+click and Ctrl+click selection ────────────────────────────────
+  // ══════════════════════════════════════════════════════════════════════════
+
+  // 95. Plain click in multiSelect mode selects only the clicked row
+  testWidgets('plain click in multiSelect clears previous selection', (
+    tester,
+  ) async {
+    final ctrl = OiTableController(totalRows: _rows.length);
+    await tester.pumpObers(
+      _table(
+        controller: ctrl,
+        selectable: true,
+        multiSelect: true,
+        rowKey: (r) => r.name,
+      ),
+    );
+    await tester.pumpAndSettle();
+    // Select row 0 first, then plain-click row 1.
+    ctrl.selectRow('Alice');
+    await tester.pump();
+    await tester.tap(find.text('Bob'));
+    await tester.pump(const Duration(milliseconds: 500));
+    // Only Bob should be selected — Alice should have been cleared.
+    expect(ctrl.selectedRows, {'Bob'});
+  });
+
+  // 96. Ctrl+click toggles individual rows without clearing
+  testWidgets('Ctrl+click toggles row selection', (tester) async {
+    final ctrl = OiTableController(totalRows: _rows.length);
+    await tester.pumpObers(
+      _table(
+        controller: ctrl,
+        selectable: true,
+        multiSelect: true,
+        rowKey: (r) => r.name,
+      ),
+    );
+    await tester.pumpAndSettle();
+    // First select row 0 via tap.
+    await tester.tap(find.text('Alice'));
+    await tester.pump(const Duration(milliseconds: 500));
+    expect(ctrl.selectedRows, contains('Alice'));
+
+    // Ctrl+click row 1 to add it.
+    await tester.sendKeyDownEvent(LogicalKeyboardKey.controlLeft);
+    await tester.tap(find.text('Bob'));
+    await tester.pump(const Duration(milliseconds: 500));
+    await tester.sendKeyUpEvent(LogicalKeyboardKey.controlLeft);
+    expect(ctrl.selectedRows, containsAll(['Alice', 'Bob']));
+
+    // Ctrl+click row 0 again to deselect it.
+    await tester.sendKeyDownEvent(LogicalKeyboardKey.controlLeft);
+    await tester.tap(find.text('Alice'));
+    await tester.pump(const Duration(milliseconds: 500));
+    await tester.sendKeyUpEvent(LogicalKeyboardKey.controlLeft);
+    expect(ctrl.selectedRows, {'Bob'});
+  });
+
+  // 97. Shift+click selects a range from last selected row
+  testWidgets('Shift+click selects range from anchor', (tester) async {
+    final ctrl = OiTableController(totalRows: _rows.length);
+    await tester.pumpObers(
+      _table(
+        controller: ctrl,
+        selectable: true,
+        multiSelect: true,
+        rowKey: (r) => r.name,
+      ),
+    );
+    await tester.pumpAndSettle();
+    // Click row 0 to set anchor.
+    await tester.tap(find.text('Alice'));
+    await tester.pump(const Duration(milliseconds: 500));
+    expect(ctrl.selectedRows, {'Alice'});
+
+    // Shift+click row 2 to select range 0..2.
+    await tester.sendKeyDownEvent(LogicalKeyboardKey.shiftLeft);
+    await tester.tap(find.text('Charlie'));
+    await tester.pump(const Duration(milliseconds: 500));
+    await tester.sendKeyUpEvent(LogicalKeyboardKey.shiftLeft);
+    expect(ctrl.selectedRows, {'Alice', 'Bob', 'Charlie'});
+  });
+
+  // 98. Shift+click without multiSelect does not range-select
+  testWidgets('Shift+click in single-select mode selects only clicked row', (
+    tester,
+  ) async {
+    final ctrl = OiTableController(totalRows: _rows.length);
+    await tester.pumpObers(
+      _table(controller: ctrl, selectable: true, rowKey: (r) => r.name),
+    );
+    await tester.pumpAndSettle();
+    // Click row 0.
+    await tester.tap(find.text('Alice'));
+    await tester.pump(const Duration(milliseconds: 500));
+
+    // Shift+click row 2 — should not range-select because multiSelect=false.
+    await tester.sendKeyDownEvent(LogicalKeyboardKey.shiftLeft);
+    await tester.tap(find.text('Charlie'));
+    await tester.pump(const Duration(milliseconds: 500));
+    await tester.sendKeyUpEvent(LogicalKeyboardKey.shiftLeft);
+    // Only the clicked row should be selected.
+    expect(ctrl.selectedRows, {'Charlie'});
+  });
+
+  // 99. Ctrl+click without multiSelect does not toggle
+  testWidgets('Ctrl+click in single-select mode selects only clicked row', (
+    tester,
+  ) async {
+    final ctrl = OiTableController(totalRows: _rows.length);
+    await tester.pumpObers(
+      _table(controller: ctrl, selectable: true, rowKey: (r) => r.name),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Alice'));
+    await tester.pump(const Duration(milliseconds: 500));
+
+    // Ctrl+click row 1 — should not toggle because multiSelect=false.
+    await tester.sendKeyDownEvent(LogicalKeyboardKey.controlLeft);
+    await tester.tap(find.text('Bob'));
+    await tester.pump(const Duration(milliseconds: 500));
+    await tester.sendKeyUpEvent(LogicalKeyboardKey.controlLeft);
+    // Only the last clicked row should be selected.
+    expect(ctrl.selectedRows, {'Bob'});
   });
 }
 

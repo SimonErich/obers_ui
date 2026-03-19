@@ -143,6 +143,7 @@ class OiTable<T> extends StatefulWidget {
     this.controller,
     this.selectable = false,
     this.multiSelect = false,
+    this.rowKey,
     this.onSelectionChanged,
     this.onRowTap,
     this.onRowDoubleTap,
@@ -202,8 +203,15 @@ class OiTable<T> extends StatefulWidget {
   /// Whether multiple rows can be selected simultaneously.
   final bool multiSelect;
 
-  /// Called when the selection changes.
-  final void Function(List<int> selectedIndices)? onSelectionChanged;
+  /// Extracts a stable, unique key from a row.
+  ///
+  /// Required when [selectable] is `true`. The key must be unique across all
+  /// rows and remain stable across sort, filter, and pagination changes so
+  /// that selection tracks the correct domain objects (REQ-0478).
+  final String Function(T row)? rowKey;
+
+  /// Called when the selection changes with the set of selected row keys.
+  final void Function(Set<String> selectedKeys)? onSelectionChanged;
 
   // ── Row interaction ───────────────────────────────────────────────────────
 
@@ -599,6 +607,12 @@ class _OiTableState<T> extends State<OiTable<T>>
     widget.onSort?.call(col.id, ascending: _ctrl.sortAscending);
   }
 
+  /// Returns the stable key for [row] at [index], using the [OiTable.rowKey]
+  /// callback when provided, falling back to [index.toString()].
+  String _rowKeyAt(T row, int index) {
+    return widget.rowKey?.call(row) ?? index.toString();
+  }
+
   /// Tracks the last row index selected by a single click, used for
   /// Shift+click range selection.
   int? _lastSelectedIndex;
@@ -608,18 +622,28 @@ class _OiTableState<T> extends State<OiTable<T>>
       final isShift = HardwareKeyboard.instance.isShiftPressed;
       final isCtrlOrMeta = HardwareKeyboard.instance.isControlPressed ||
           HardwareKeyboard.instance.isMetaPressed;
+      final key = _rowKeyAt(row, index);
 
       if (widget.multiSelect && isShift && _lastSelectedIndex != null) {
         // Shift+click: select range from last selected to current.
-        _ctrl.selectRange(_lastSelectedIndex!, index);
+        final start = math.min(_lastSelectedIndex!, index);
+        final end = math.max(_lastSelectedIndex!, index);
+        final keys = <String>{};
+        for (var i = start; i <= end; i++) {
+          keys.add(_rowKeyAt(widget.rows[i], i));
+        }
+        _ctrl.selectRange(keys);
       } else if (widget.multiSelect && isCtrlOrMeta) {
         // Ctrl/Cmd+click: toggle this row without clearing others.
-        _ctrl.toggleRow(index);
+        _ctrl.toggleRow(key);
       } else {
-        _ctrl.selectRow(index, multi: widget.multiSelect);
+        // Plain click always selects only the clicked row, even when
+        // multiSelect is enabled. Multi-select accumulation is handled
+        // by Ctrl+click (toggleRow) and Shift+click (selectRange).
+        _ctrl.selectRow(key);
       }
       _lastSelectedIndex = index;
-      widget.onSelectionChanged?.call(_ctrl.selectedRows.toList()..sort());
+      widget.onSelectionChanged?.call(Set<String>.from(_ctrl.selectedRows));
     }
     widget.onRowTap?.call(row, index);
   }
@@ -631,10 +655,15 @@ class _OiTableState<T> extends State<OiTable<T>>
   void _copySelectedRows() {
     if (!widget.copyable) return;
     final cols = _visibleColumns;
+    // Build a key→row map for O(n) lookup.
+    final keyToRow = <String, T>{};
+    for (var i = 0; i < widget.rows.length; i++) {
+      keyToRow[_rowKeyAt(widget.rows[i], i)] = widget.rows[i];
+    }
     final buffer = StringBuffer();
-    for (final idx in _ctrl.selectedRows.toList()..sort()) {
-      if (idx < widget.rows.length) {
-        final row = widget.rows[idx];
+    for (final key in _ctrl.selectedRows) {
+      final row = keyToRow[key];
+      if (row != null) {
         final cells = cols
             .map((c) => c.valueGetter?.call(row) ?? '')
             .join('\t');
@@ -832,9 +861,13 @@ class _OiTableState<T> extends State<OiTable<T>>
         if (_ctrl.selectAll) {
           _ctrl.clearSelection();
         } else {
-          _ctrl.selectAllRows(widget.rows.length);
+          final allKeys = <String>{};
+          for (var i = 0; i < widget.rows.length; i++) {
+            allKeys.add(_rowKeyAt(widget.rows[i], i));
+          }
+          _ctrl.selectAllRows(allKeys);
         }
-        widget.onSelectionChanged?.call(_ctrl.selectedRows.toList()..sort());
+        widget.onSelectionChanged?.call(Set<String>.from(_ctrl.selectedRows));
       },
       child: SizedBox(
         width: 40,
@@ -1063,7 +1096,7 @@ class _OiTableState<T> extends State<OiTable<T>>
   }
 
   Widget _buildRow(T row, int index, {Key? key}) {
-    final isSelected = _ctrl.selectedRows.contains(index);
+    final isSelected = _ctrl.selectedRows.contains(_rowKeyAt(row, index));
     final isEven = index.isEven;
     Color? bg;
     if (isSelected) {
