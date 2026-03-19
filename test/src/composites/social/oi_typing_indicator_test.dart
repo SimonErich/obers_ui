@@ -70,4 +70,34 @@ void main() {
     await tester.pump(const Duration(milliseconds: 300));
     expect(find.text('.'), findsNWidgets(3));
   });
+
+  // ── Reduced motion ────────────────────────────────────────────────────────
+
+  testWidgets('reducedMotion: animation controller stops', (tester) async {
+    await tester.pumpObers(
+      const MediaQuery(
+        data: MediaQueryData(disableAnimations: true),
+        child: Center(child: OiTypingIndicator(typingUsers: ['Alice'])),
+      ),
+    );
+    await tester.pump();
+
+    expect(find.text('Alice is typing'), findsOneWidget);
+    // Dots still render (static) but no AnimationController is running.
+    // Verify by pumping frames — no errors and dots remain visible.
+    await tester.pump(const Duration(milliseconds: 600));
+    expect(find.text('.'), findsNWidgets(3));
+
+    // With reducedMotion, AnimatedBuilder is present but the controller
+    // is stopped, so there should be no animation-driven rebuilds.
+    final builders = tester.widgetList<AnimatedBuilder>(
+      find.byType(AnimatedBuilder),
+    );
+    for (final b in builders) {
+      if (b.listenable is AnimationController) {
+        final ctrl = b.listenable as AnimationController;
+        expect(ctrl.isAnimating, isFalse);
+      }
+    }
+  });
 }

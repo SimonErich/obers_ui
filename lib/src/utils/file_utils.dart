@@ -266,4 +266,19 @@ class OiFileUtils {
     if (unitIndex == 0) return '$bytes B';
     return '${value.toStringAsFixed(decimals)} ${units[unitIndex]}';
   }
+
+  /// Characters that are illegal in file and folder names across platforms.
+  ///
+  /// Includes `/`, `\`, `:`, `*`, `?`, `"`, `<`, `>`, and `|`.
+  static const illegalNameChars = <String>[
+    '/',
+    r'\',
+    ':',
+    '*',
+    '?',
+    '"',
+    '<',
+    '>',
+    '|',
+  ];
 }

@@ -6,8 +6,7 @@ import 'package:obers_ui/src/components/display/oi_folder_icon.dart';
 import 'package:obers_ui/src/components/inputs/oi_text_input.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/models/oi_file_node_data.dart';
-
-const _illegalChars = <String>['/', r'\', ':', '*', '?', '"', '<', '>', '|'];
+import 'package:obers_ui/src/utils/file_utils.dart';
 
 /// A dialog for renaming a file or folder.
 ///
@@ -43,6 +42,7 @@ class OiRenameDialog extends StatefulWidget {
 class _OiRenameDialogState extends State<OiRenameDialog> {
   late TextEditingController _controller;
   late FocusNode _focusNode;
+  late final FocusNode _escapeFocusNode;
   String? _error;
 
   @override
@@ -50,6 +50,7 @@ class _OiRenameDialogState extends State<OiRenameDialog> {
     super.initState();
     _controller = TextEditingController(text: widget.file.name);
     _focusNode = FocusNode();
+    _escapeFocusNode = FocusNode();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _focusNode.requestFocus();
       _selectNamePart();
@@ -83,12 +84,13 @@ class _OiRenameDialogState extends State<OiRenameDialog> {
   void dispose() {
     _controller.dispose();
     _focusNode.dispose();
+    _escapeFocusNode.dispose();
     super.dispose();
   }
 
   String? _validate(String value) {
     if (value.trim().isEmpty) return 'Name cannot be empty';
-    for (final char in _illegalChars) {
+    for (final char in OiFileUtils.illegalNameChars) {
       if (value.contains(char)) return 'Name cannot contain "$char"';
     }
     return widget.validate?.call(value);
@@ -116,7 +118,7 @@ class _OiRenameDialogState extends State<OiRenameDialog> {
     return Semantics(
       label: 'Rename dialog',
       child: KeyboardListener(
-        focusNode: FocusNode(),
+        focusNode: _escapeFocusNode,
         onKeyEvent: (event) {
           if (event is KeyDownEvent &&
               event.logicalKey == LogicalKeyboardKey.escape) {

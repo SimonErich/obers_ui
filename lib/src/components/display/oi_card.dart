@@ -321,7 +321,8 @@ class _OiCardState extends State<OiCard> with SingleTickerProviderStateMixin {
   }
 
   void _toggleCollapsed() {
-    final reducedMotion = context.animations.reducedMotion;
+    final reducedMotion = context.animations.reducedMotion ||
+        MediaQuery.disableAnimationsOf(context);
     setState(() => _collapsed = !_collapsed);
     if (reducedMotion) {
       _controller.value = _collapsed ? 0.0 : 1.0;

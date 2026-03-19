@@ -4,8 +4,7 @@ import 'package:obers_ui/src/components/buttons/oi_button.dart';
 import 'package:obers_ui/src/components/display/oi_folder_icon.dart';
 import 'package:obers_ui/src/components/inputs/oi_text_input.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
-
-const _illegalChars = <String>['/', r'\', ':', '*', '?', '"', '<', '>', '|'];
+import 'package:obers_ui/src/utils/file_utils.dart';
 
 /// A dialog for creating a new folder.
 ///
@@ -45,6 +44,7 @@ class OiNewFolderDialog extends StatefulWidget {
 class _OiNewFolderDialogState extends State<OiNewFolderDialog> {
   late TextEditingController _controller;
   late FocusNode _focusNode;
+  late final FocusNode _escapeFocusNode;
   String? _error;
 
   @override
@@ -52,6 +52,7 @@ class _OiNewFolderDialogState extends State<OiNewFolderDialog> {
     super.initState();
     _controller = TextEditingController(text: widget.defaultName);
     _focusNode = FocusNode();
+    _escapeFocusNode = FocusNode();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _focusNode.requestFocus();
       _controller.selection = TextSelection(
@@ -65,12 +66,13 @@ class _OiNewFolderDialogState extends State<OiNewFolderDialog> {
   void dispose() {
     _controller.dispose();
     _focusNode.dispose();
+    _escapeFocusNode.dispose();
     super.dispose();
   }
 
   String? _validate(String value) {
     if (value.trim().isEmpty) return 'Name cannot be empty';
-    for (final char in _illegalChars) {
+    for (final char in OiFileUtils.illegalNameChars) {
       if (value.contains(char)) return 'Name cannot contain "$char"';
     }
     return widget.validate?.call(value);
@@ -96,7 +98,7 @@ class _OiNewFolderDialogState extends State<OiNewFolderDialog> {
     return Semantics(
       label: 'New folder dialog',
       child: KeyboardListener(
-        focusNode: FocusNode(),
+        focusNode: _escapeFocusNode,
         onKeyEvent: (event) {
           if (event is KeyDownEvent &&
               event.logicalKey == LogicalKeyboardKey.escape) {

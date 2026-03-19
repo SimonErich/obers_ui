@@ -2,6 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/buttons/oi_button.dart';
 import 'package:obers_ui/src/components/display/oi_file_icon.dart';
 import 'package:obers_ui/src/components/display/oi_file_preview.dart';
+import 'package:obers_ui/src/foundation/theme/oi_color_scheme.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/models/oi_file_node_data.dart';
 import 'package:obers_ui/src/utils/file_utils.dart';
@@ -175,7 +176,7 @@ class _InfoRow extends StatelessWidget {
 
   final String label;
   final String value;
-  final dynamic colors;
+  final OiColorScheme colors;
   final bool copyable;
 
   @override
@@ -192,7 +193,7 @@ class _InfoRow extends StatelessWidget {
               label,
               style: TextStyle(
                 fontSize: 12,
-                color: (colors as dynamic).textMuted as Color,
+                color: colors.textMuted,
               ),
             ),
           ),
@@ -201,7 +202,7 @@ class _InfoRow extends StatelessWidget {
               value,
               style: TextStyle(
                 fontSize: 12,
-                color: (colors as dynamic).text as Color,
+                color: colors.text,
               ),
             ),
           ),

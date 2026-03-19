@@ -56,7 +56,8 @@ class _OiTypingIndicatorState extends State<OiTypingIndicator>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final reduced = context.animations.reducedMotion;
+    final reduced = context.animations.reducedMotion ||
+        MediaQuery.disableAnimationsOf(context);
     _controller.duration = reduced
         ? Duration.zero
         : const Duration(milliseconds: 600);

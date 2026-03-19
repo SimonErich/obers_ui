@@ -55,16 +55,19 @@ class _OiMoveDialogState extends State<OiMoveDialog> {
   OiFileNodeData? _selectedFolder;
   String _searchQuery = '';
   late OiTreeController _treeController;
+  late final FocusNode _escapeFocusNode;
 
   @override
   void initState() {
     super.initState();
     _treeController = OiTreeController();
+    _escapeFocusNode = FocusNode();
   }
 
   @override
   void dispose() {
     _treeController.dispose();
+    _escapeFocusNode.dispose();
     super.dispose();
   }
 
@@ -117,7 +120,7 @@ class _OiMoveDialogState extends State<OiMoveDialog> {
     return Semantics(
       label: '${widget.copyMode ? "Copy" : "Move"} dialog',
       child: KeyboardListener(
-        focusNode: FocusNode(),
+        focusNode: _escapeFocusNode,
         onKeyEvent: (event) {
           if (event is KeyDownEvent &&
               event.logicalKey == LogicalKeyboardKey.escape) {

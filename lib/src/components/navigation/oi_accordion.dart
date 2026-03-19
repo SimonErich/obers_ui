@@ -134,7 +134,8 @@ class _OiAccordionState extends State<OiAccordion>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final reduced = context.animations.reducedMotion;
+    final reduced = context.animations.reducedMotion ||
+        MediaQuery.disableAnimationsOf(context);
     final dur = reduced ? Duration.zero : const Duration(milliseconds: 200);
     for (final c in _controllers) {
       c.duration = dur;
@@ -244,7 +245,8 @@ class _OiAccordionState extends State<OiAccordion>
                           ),
                           AnimatedRotation(
                             turns: open ? 0.5 : 0.0,
-                            duration: context.animations.reducedMotion
+                            duration: context.animations.reducedMotion ||
+                                    MediaQuery.disableAnimationsOf(context)
                                 ? Duration.zero
                                 : const Duration(milliseconds: 200),
                             curve: Curves.easeInOut,

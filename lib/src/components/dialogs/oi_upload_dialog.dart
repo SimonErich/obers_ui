@@ -72,11 +72,19 @@ class OiUploadDialog extends StatefulWidget {
 class _OiUploadDialogState extends State<OiUploadDialog> {
   final List<_UploadEntry> _entries = [];
   late OiConflictResolution _resolution;
+  late final FocusNode _escapeFocusNode;
 
   @override
   void initState() {
     super.initState();
     _resolution = widget.defaultResolution;
+    _escapeFocusNode = FocusNode();
+  }
+
+  @override
+  void dispose() {
+    _escapeFocusNode.dispose();
+    super.dispose();
   }
 
   List<OiFileData> get _validFiles => _entries
@@ -131,7 +139,7 @@ class _OiUploadDialogState extends State<OiUploadDialog> {
     return Semantics(
       label: 'Upload dialog',
       child: KeyboardListener(
-        focusNode: FocusNode(),
+        focusNode: _escapeFocusNode,
         onKeyEvent: (event) {
           if (event is KeyDownEvent &&
               event.logicalKey == LogicalKeyboardKey.escape) {

@@ -78,7 +78,9 @@ class _OiPanelState extends State<OiPanel> with SingleTickerProviderStateMixin {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _controller.duration = context.animations.reducedMotion
+    _controller.duration =
+        context.animations.reducedMotion ||
+            MediaQuery.disableAnimationsOf(context)
         ? Duration.zero
         : const Duration(milliseconds: 240);
   }

@@ -49,6 +49,19 @@ class OiDeleteDialog extends StatefulWidget {
 
 class _OiDeleteDialogState extends State<OiDeleteDialog> {
   bool _dontAskAgain = false;
+  late final FocusNode _escapeFocusNode;
+
+  @override
+  void initState() {
+    super.initState();
+    _escapeFocusNode = FocusNode();
+  }
+
+  @override
+  void dispose() {
+    _escapeFocusNode.dispose();
+    super.dispose();
+  }
 
   String get _title {
     if (widget.files.length == 1) {
@@ -65,7 +78,7 @@ class _OiDeleteDialogState extends State<OiDeleteDialog> {
     return Semantics(
       label: 'Delete confirmation dialog',
       child: KeyboardListener(
-        focusNode: FocusNode(),
+        focusNode: _escapeFocusNode,
         onKeyEvent: (event) {
           if (event is KeyDownEvent &&
               event.logicalKey == LogicalKeyboardKey.escape) {

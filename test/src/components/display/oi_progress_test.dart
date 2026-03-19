@@ -56,4 +56,40 @@ void main() {
     await tester.pumpObers(const OiProgress.linear(value: 1));
     expect(find.byType(CustomPaint), findsAtLeastNWidgets(1));
   });
+
+  // ── Reduced motion ────────────────────────────────────────────────────────
+
+  testWidgets(
+    'reducedMotion: indeterminate linear does not animate',
+    (tester) async {
+      await tester.pumpObers(
+        const MediaQuery(
+          data: MediaQueryData(disableAnimations: true),
+          child: OiProgress.linear(indeterminate: true),
+        ),
+      );
+      await tester.pump();
+
+      // With reducedMotion, duration is Duration.zero — the controller
+      // completes instantly. Pumping extra frames should not throw.
+      await tester.pump(const Duration(milliseconds: 600));
+      expect(find.byType(CustomPaint), findsAtLeastNWidgets(1));
+    },
+  );
+
+  testWidgets(
+    'reducedMotion: indeterminate circular does not animate',
+    (tester) async {
+      await tester.pumpObers(
+        const MediaQuery(
+          data: MediaQueryData(disableAnimations: true),
+          child: OiProgress.circular(indeterminate: true),
+        ),
+      );
+      await tester.pump();
+
+      await tester.pump(const Duration(milliseconds: 600));
+      expect(find.byType(CustomPaint), findsAtLeastNWidgets(1));
+    },
+  );
 }

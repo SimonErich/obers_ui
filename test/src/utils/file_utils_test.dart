@@ -1,8 +1,8 @@
 // Tests are internal; doc comments on local helpers are not required.
 // ignore_for_file: public_member_api_docs
 
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/utils/file_utils.dart';
 
 void main() {
@@ -240,51 +240,51 @@ void main() {
 
     group('iconForExtension', () {
       test('returns image icon for png', () {
-        expect(OiFileUtils.iconForExtension('png'), Icons.image);
+        expect(OiFileUtils.iconForExtension('png'), OiIcons.image);
       });
 
       test('returns video icon for mp4', () {
-        expect(OiFileUtils.iconForExtension('mp4'), Icons.video_file);
+        expect(OiFileUtils.iconForExtension('mp4'), OiIcons.videoFile);
       });
 
       test('returns audio icon for mp3', () {
-        expect(OiFileUtils.iconForExtension('mp3'), Icons.audio_file);
+        expect(OiFileUtils.iconForExtension('mp3'), OiIcons.audioFile);
       });
 
       test('returns pdf icon for pdf', () {
-        expect(OiFileUtils.iconForExtension('pdf'), Icons.picture_as_pdf);
+        expect(OiFileUtils.iconForExtension('pdf'), OiIcons.pictureAsPdf);
       });
 
       test('returns description icon for docx', () {
-        expect(OiFileUtils.iconForExtension('docx'), Icons.description);
+        expect(OiFileUtils.iconForExtension('docx'), OiIcons.description);
       });
 
       test('returns table icon for xlsx', () {
-        expect(OiFileUtils.iconForExtension('xlsx'), Icons.table_chart);
+        expect(OiFileUtils.iconForExtension('xlsx'), OiIcons.tableChart);
       });
 
       test('returns slideshow icon for pptx', () {
-        expect(OiFileUtils.iconForExtension('pptx'), Icons.slideshow);
+        expect(OiFileUtils.iconForExtension('pptx'), OiIcons.slideshow);
       });
 
       test('returns zip icon for zip', () {
-        expect(OiFileUtils.iconForExtension('zip'), Icons.folder_zip);
+        expect(OiFileUtils.iconForExtension('zip'), OiIcons.folderZip);
       });
 
       test('returns code icon for dart', () {
-        expect(OiFileUtils.iconForExtension('dart'), Icons.code);
+        expect(OiFileUtils.iconForExtension('dart'), OiIcons.code);
       });
 
       test('returns data icon for json', () {
-        expect(OiFileUtils.iconForExtension('json'), Icons.data_object);
+        expect(OiFileUtils.iconForExtension('json'), OiIcons.dataObject);
       });
 
       test('returns text icon for txt', () {
-        expect(OiFileUtils.iconForExtension('txt'), Icons.text_snippet);
+        expect(OiFileUtils.iconForExtension('txt'), OiIcons.textSnippet);
       });
 
       test('returns generic icon for unknown extension', () {
-        expect(OiFileUtils.iconForExtension('xyz'), Icons.insert_drive_file);
+        expect(OiFileUtils.iconForExtension('xyz'), OiIcons.insertDriveFile);
       });
     });
 

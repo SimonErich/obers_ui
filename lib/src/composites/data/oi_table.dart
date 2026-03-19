@@ -1662,7 +1662,8 @@ class _OiTableLoadingBarState extends State<_OiTableLoadingBar>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final reduced = context.animations.reducedMotion;
+    final reduced = context.animations.reducedMotion ||
+        MediaQuery.disableAnimationsOf(context);
     _ctrl.duration = reduced
         ? Duration.zero
         : const Duration(milliseconds: 1500);
@@ -1745,7 +1746,8 @@ class _OiTableSpinnerState extends State<_OiTableSpinner>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final reduced = context.animations.reducedMotion;
+    final reduced = context.animations.reducedMotion ||
+        MediaQuery.disableAnimationsOf(context);
     _ctrl.duration = reduced
         ? Duration.zero
         : const Duration(milliseconds: 800);

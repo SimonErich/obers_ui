@@ -267,6 +267,48 @@ void main() {
       );
       expect(find.byType(Icon), findsOneWidget);
     });
+
+    testWidgets(
+      'reducedMotion: collapsing completes instantly without animation',
+      (tester) async {
+        await tester.pumpObers(
+          const MediaQuery(
+            data: MediaQueryData(disableAnimations: true),
+            child: OiCard(
+              collapsible: true,
+              title: Text('Title'),
+              child: Text('body content'),
+            ),
+          ),
+        );
+        await tester.pump();
+
+        // Initially expanded — sizeFactor is 1.0.
+        var sizeTransition = tester.widget<SizeTransition>(
+          find.byType(SizeTransition),
+        );
+        expect(sizeTransition.sizeFactor.value, equals(1.0));
+
+        // Tap chevron to collapse.
+        await tester.tap(find.byType(Icon));
+        await tester.pump();
+
+        // With reducedMotion the controller snaps to 0.0 instantly.
+        sizeTransition = tester.widget<SizeTransition>(
+          find.byType(SizeTransition),
+        );
+        expect(sizeTransition.sizeFactor.value, equals(0.0));
+
+        // Tap again to expand — should snap to 1.0.
+        await tester.tap(find.byType(Icon));
+        await tester.pump();
+
+        sizeTransition = tester.widget<SizeTransition>(
+          find.byType(SizeTransition),
+        );
+        expect(sizeTransition.sizeFactor.value, equals(1.0));
+      },
+    );
   });
 
   // ---------------------------------------------------------------------------
