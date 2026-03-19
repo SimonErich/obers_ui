@@ -9,6 +9,7 @@ import 'package:obers_ui/src/components/inputs/oi_file_input.dart';
 import 'package:obers_ui/src/components/inputs/oi_radio.dart';
 import 'package:obers_ui/src/components/inputs/oi_select.dart';
 import 'package:obers_ui/src/components/inputs/oi_slider.dart';
+import 'package:obers_ui/src/components/inputs/oi_tag_input.dart';
 import 'package:obers_ui/src/components/inputs/oi_time_input.dart';
 import 'package:obers_ui/src/composites/forms/oi_form.dart';
 
@@ -538,6 +539,62 @@ void main() {
       );
 
       expect(find.byType(OiFileInput), findsOneWidget);
+    });
+
+    testWidgets('tag field renders', (tester) async {
+      final ctrl = OiFormController();
+
+      await tester.pumpObers(
+        _form(
+          sections: [
+            OiFormSection(
+              fields: [
+                const OiFormField(
+                  key: 'tags',
+                  label: 'Tags',
+                  type: OiFieldType.tag,
+                ),
+              ],
+            ),
+          ],
+          controller: ctrl,
+        ),
+      );
+
+      expect(find.byType(OiTagInput), findsOneWidget);
+    });
+
+    testWidgets('tag field required validation fails for empty list', (
+      tester,
+    ) async {
+      final ctrl = OiFormController(initialValues: {'tags': <String>[]});
+      Map<String, dynamic>? submitted;
+
+      await tester.pumpObers(
+        _form(
+          sections: [
+            OiFormSection(
+              fields: [
+                const OiFormField(
+                  key: 'tags',
+                  label: 'Tags',
+                  type: OiFieldType.tag,
+                  required: true,
+                ),
+              ],
+            ),
+          ],
+          controller: ctrl,
+          onSubmit: (v) => submitted = v,
+          dirtyDetection: false,
+        ),
+      );
+
+      await tester.tap(find.text('Submit'));
+      await tester.pump();
+
+      expect(submitted, isNull);
+      expect(ctrl.getError('tags'), 'Tags is required');
     });
 
     testWidgets('select field renders', (tester) async {

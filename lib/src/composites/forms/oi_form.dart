@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/widgets.dart';
-import 'package:flutter/widgets.dart' show Color;
 import 'package:obers_ui/src/components/inputs/oi_checkbox.dart';
 import 'package:obers_ui/src/components/inputs/oi_color_input.dart';
 import 'package:obers_ui/src/components/inputs/oi_date_input.dart';
@@ -11,6 +10,7 @@ import 'package:obers_ui/src/components/inputs/oi_radio.dart';
 import 'package:obers_ui/src/components/inputs/oi_select.dart';
 import 'package:obers_ui/src/components/inputs/oi_slider.dart';
 import 'package:obers_ui/src/components/inputs/oi_switch.dart';
+import 'package:obers_ui/src/components/inputs/oi_tag_input.dart';
 import 'package:obers_ui/src/components/inputs/oi_text_input.dart';
 import 'package:obers_ui/src/components/inputs/oi_time_input.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
@@ -55,6 +55,9 @@ enum OiFieldType {
 
   /// A file picker field.
   file,
+
+  /// A tag/chip input for entering multiple string values.
+  tag,
 
   /// A custom widget supplied via [OiFormField.customBuilder].
   custom,
@@ -378,7 +381,9 @@ class _OiFormState extends State<OiForm> {
 
     // Required check.
     if (field.required) {
-      if (value == null || (value is String && value.isEmpty)) {
+      if (value == null ||
+          (value is String && value.isEmpty) ||
+          (value is List && value.isEmpty)) {
         widget.controller.setError(field.key, '${field.label} is required');
         return;
       }
@@ -534,6 +539,17 @@ class _OiFormState extends State<OiForm> {
           label: field.label,
           error: error,
           value: value as List<String>?,
+          onChanged: (v) => widget.controller.setValue(field.key, v),
+        );
+
+      case OiFieldType.tag:
+        return OiTagInput(
+          key: ValueKey('oi_form_field_${field.key}'),
+          tags: (value as List<String>?) ?? <String>[],
+          label: field.label,
+          error: error,
+          placeholder: field.config?['placeholder'] as String?,
+          maxTags: field.config?['maxTags'] as int?,
           onChanged: (v) => widget.controller.setValue(field.key, v),
         );
     }
