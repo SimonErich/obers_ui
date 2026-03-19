@@ -45,6 +45,7 @@ class _PaginationBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
     return ListenableBuilder(
       listenable: pagination,
       builder: (_, __) {
@@ -86,12 +87,14 @@ class _PaginationBar extends StatelessWidget {
                 label: '«',
                 enabled: pagination.hasPreviousPage,
                 onTap: pagination.firstPage,
+                colors: colors,
               ),
               _navButton(
                 key: const Key('pagination_prev'),
                 label: '‹',
                 enabled: pagination.hasPreviousPage,
                 onTap: pagination.previousPage,
+                colors: colors,
               ),
               for (var i = 0; i < visiblePages.length; i++)
                 if (visiblePages[i] == null)
@@ -101,18 +104,20 @@ class _PaginationBar extends StatelessWidget {
                     child: const Text('\u2026'),
                   )
                 else
-                  _pageButton(visiblePages[i]!),
+                  _pageButton(visiblePages[i]!, colors),
               _navButton(
                 key: const Key('pagination_next'),
                 label: '›',
                 enabled: pagination.hasNextPage,
                 onTap: pagination.nextPage,
+                colors: colors,
               ),
               _navButton(
                 key: const Key('pagination_last'),
                 label: '»',
                 enabled: pagination.hasNextPage,
                 onTap: pagination.lastPage,
+                colors: colors,
               ),
             ],
           ),
@@ -126,6 +131,7 @@ class _PaginationBar extends StatelessWidget {
     required String label,
     required bool enabled,
     required VoidCallback onTap,
+    required dynamic colors,
   }) {
     return GestureDetector(
       key: key,
@@ -135,16 +141,14 @@ class _PaginationBar extends StatelessWidget {
         child: Text(
           label,
           style: TextStyle(
-            color: enabled
-                ? const Color(0xFF1F2937)
-                : const Color(0xFF9CA3AF),
+            color: enabled ? colors.text as Color : colors.textMuted as Color,
           ),
         ),
       ),
     );
   }
 
-  Widget _pageButton(int page) {
+  Widget _pageButton(int page, dynamic colors) {
     final isCurrent = page == pagination.currentPage;
     return GestureDetector(
       key: Key('pagination_page_$page'),
@@ -154,7 +158,7 @@ class _PaginationBar extends StatelessWidget {
         margin: const EdgeInsets.symmetric(horizontal: 1),
         decoration: isCurrent
             ? BoxDecoration(
-                color: const Color(0xFF2563EB),
+                color: colors.primary.base as Color,
                 borderRadius: BorderRadius.circular(4),
               )
             : null,
@@ -162,8 +166,8 @@ class _PaginationBar extends StatelessWidget {
           '${page + 1}',
           style: TextStyle(
             color: isCurrent
-                ? const Color(0xFFFFFFFF)
-                : const Color(0xFF1F2937),
+                ? colors.primary.foreground as Color
+                : colors.text as Color,
             fontWeight: isCurrent ? FontWeight.bold : null,
           ),
         ),
@@ -203,6 +207,7 @@ class _PageSizeSelectorState extends State<_PageSizeSelector> {
   void _openOverlay() {
     final box = context.findRenderObject()! as RenderBox;
     final offset = box.localToGlobal(Offset.zero);
+    final colors = context.colors;
 
     final entry = OverlayEntry(
       builder: (_) => Stack(
@@ -223,8 +228,8 @@ class _PageSizeSelectorState extends State<_PageSizeSelector> {
                 child: Container(
                   key: const Key('pagination_page_size_dropdown'),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFFFFFFF),
-                    border: Border.all(color: const Color(0xFFD1D5DB)),
+                    color: colors.surface,
+                    border: Border.all(color: colors.borderSubtle),
                     borderRadius: BorderRadius.circular(4),
                     boxShadow: const [
                       BoxShadow(
@@ -248,7 +253,8 @@ class _PageSizeSelectorState extends State<_PageSizeSelector> {
                           behavior: HitTestBehavior.opaque,
                           child: ColoredBox(
                             color: size == widget.currentSize
-                                ? const Color(0xFFEFF6FF)
+                                ? colors.primary.muted
+                                    .withValues(alpha: 0.15)
                                 : const Color(0x00000000),
                             child: Padding(
                               padding: const EdgeInsets.symmetric(
@@ -286,6 +292,7 @@ class _PageSizeSelectorState extends State<_PageSizeSelector> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
     return GestureDetector(
       key: const Key('pagination_page_size'),
       onTap: _toggle,
@@ -293,7 +300,7 @@ class _PageSizeSelectorState extends State<_PageSizeSelector> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         decoration: BoxDecoration(
-          border: Border.all(color: const Color(0xFFD1D5DB)),
+          border: Border.all(color: colors.borderSubtle),
           borderRadius: BorderRadius.circular(4),
         ),
         child: Row(
@@ -304,6 +311,75 @@ class _PageSizeSelectorState extends State<_PageSizeSelector> {
             const Text('\u25be', style: TextStyle(fontSize: 10)),
           ],
         ),
+      ),
+    );
+  }
+}
+
+// ── _ColumnManagerPanel ────────────────────────────────────────────────────────
+
+/// Overlay panel that lets the user toggle column visibility.
+class _ColumnManagerPanel<T> extends StatelessWidget {
+  const _ColumnManagerPanel({
+    required this.columns,
+    required this.visibility,
+    required this.onToggle,
+  });
+
+  final List<OiTableColumn<T>> columns;
+  final Map<String, bool> visibility;
+  final void Function(String columnId, bool visible) onToggle;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    return Container(
+      key: const Key('oi_table_column_manager'),
+      constraints: const BoxConstraints(maxWidth: 240),
+      decoration: BoxDecoration(
+        color: colors.surface,
+        border: Border.all(color: colors.borderSubtle),
+        borderRadius: BorderRadius.circular(4),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x1A000000),
+            blurRadius: 8,
+            offset: Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          const Padding(
+            padding: EdgeInsets.fromLTRB(12, 8, 12, 4),
+            child: Text(
+              'Columns',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+            ),
+          ),
+          for (final col in columns)
+            GestureDetector(
+              key: Key('col_manager_${col.id}'),
+              behavior: HitTestBehavior.opaque,
+              onTap: () {
+                final currentlyVisible = visibility[col.id] ?? true;
+                onToggle(col.id, !currentlyVisible);
+              },
+              child: Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                child: Row(
+                  children: [
+                    Text((visibility[col.id] ?? true) ? '☑' : '☐'),
+                    const SizedBox(width: 8),
+                    Expanded(child: Text(col.header)),
+                  ],
+                ),
+              ),
+            ),
+        ],
       ),
     );
   }

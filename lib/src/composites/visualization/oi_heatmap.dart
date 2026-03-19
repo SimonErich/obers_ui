@@ -47,7 +47,7 @@ class OiHeatmap extends StatelessWidget {
     this.maxValue,
     this.lowColor,
     this.highColor,
-    this.showValues = false,
+    this.showValues = true,
     this.onCellTap,
   });
 
@@ -78,6 +78,9 @@ class OiHeatmap extends StatelessWidget {
   final Color? highColor;
 
   /// Whether to render the numeric value inside each cell.
+  ///
+  /// Defaults to `true` so that color is never the sole indicator of the
+  /// cell's magnitude (REQ-0025).
   final bool showValues;
 
   /// Called when a cell is tapped, with the tapped cell data.

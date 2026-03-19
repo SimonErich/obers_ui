@@ -129,3 +129,38 @@ Future<void> withPlatform(
     ),
   );
 }
+
+// ── Named breakpoint constants & helper (REQ-0177) ──────────────────────────
+
+/// Standard breakpoint widths for testing (REQ-0177).
+const kCompactWidth = 400.0;
+
+/// Medium breakpoint width for testing (REQ-0177).
+const kMediumWidth = 720.0;
+
+/// Expanded breakpoint width for testing (REQ-0177).
+const kExpandedWidth = 1000.0;
+
+/// Large breakpoint width for testing (REQ-0177).
+const kLargeWidth = 1400.0;
+
+/// Extra-large breakpoint width for testing (REQ-0177).
+const kExtraLargeWidth = 1800.0;
+
+/// Pumps [child] at a named breakpoint width.
+Future<void> pumpAtNamedBreakpoint(
+  WidgetTester tester,
+  Widget child,
+  String breakpoint, {
+  double height = 800,
+}) async {
+  final width = switch (breakpoint) {
+    'compact' => kCompactWidth,
+    'medium' => kMediumWidth,
+    'expanded' => kExpandedWidth,
+    'large' => kLargeWidth,
+    'extraLarge' => kExtraLargeWidth,
+    _ => throw ArgumentError('Unknown breakpoint: $breakpoint'),
+  };
+  await pumpAtBreakpoint(tester, child, width, height: height);
+}

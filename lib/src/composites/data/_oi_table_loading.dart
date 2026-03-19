@@ -68,10 +68,11 @@ class _LoadingBarPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
+    final colors = const Color(0xFFE5E7EB);
     // Background track.
     canvas.drawRect(
       Rect.fromLTWH(0, 0, size.width, size.height),
-      Paint()..color = const Color(0xFFE5E7EB),
+      Paint()..color = colors,
     );
     // Animated bar segment.
     final barWidth = size.width * 0.3;

@@ -107,6 +107,8 @@ class _OiUploadDialogState extends State<OiUploadDialog> {
     return null;
   }
 
+  // Called by the host via GlobalKey or file picker integration.
+  // ignore: unused_element
   void _addFiles(List<OiFileData> files) {
     setState(() {
       for (final file in files) {

@@ -25,7 +25,7 @@ Widget _heatmap({
   double? maxValue,
   Color? lowColor,
   Color? highColor,
-  bool showValues = false,
+  bool showValues = true,
   ValueChanged<OiHeatmapCell>? onCellTap,
 }) {
   return SizedBox(
@@ -131,7 +131,7 @@ void main() {
 
   // 10. showValues false hides values.
   testWidgets('hides values when showValues is false', (tester) async {
-    await tester.pumpObers(_heatmap());
+    await tester.pumpObers(_heatmap(showValues: false));
     expect(find.text('10'), findsNothing);
     expect(find.text('50'), findsNothing);
   });
@@ -148,5 +148,22 @@ void main() {
     await tester.tap(find.byKey(const Key('oi_heatmap_cell_0_0')));
     await tester.pump();
     expect(find.byType(OiHeatmap), findsOneWidget);
+  });
+
+  // REQ-0025: color is never the sole indicator — showValues defaults to true.
+  testWidgets('REQ-0025: showValues defaults to true', (tester) async {
+    await tester.pumpObers(
+      SizedBox(
+        width: 400,
+        height: 300,
+        child: OiHeatmap(
+          cells: _cells,
+          label: 'Default values',
+        ),
+      ),
+    );
+    // Values should be visible by default.
+    expect(find.text('10'), findsOneWidget);
+    expect(find.text('90'), findsOneWidget);
   });
 }

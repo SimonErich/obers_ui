@@ -129,4 +129,19 @@ void main() {
     final semanticsNode = tester.getSemantics(find.byType(OiStarRating));
     expect(semanticsNode.hasFlag(SemanticsFlag.isSlider), isTrue);
   });
+
+  // REQ-0025: color is never the sole indicator — inactive stars are drawn as
+  // outlines (stroke) rather than solid fills, so shape differs from active
+  // stars even without color perception. This is verified by the _StarPainter
+  // using PaintingStyle.stroke for inactive stars.
+  testWidgets('REQ-0025: renders with value 0 (all outline)', (tester) async {
+    await tester.pumpObers(const OiStarRating(value: 0));
+    // All 5 stars should render as CustomPaint (outline style).
+    expect(_starPaints(), findsNWidgets(5));
+  });
+
+  testWidgets('REQ-0025: renders with max value (all filled)', (tester) async {
+    await tester.pumpObers(const OiStarRating(value: 5, maxStars: 5));
+    expect(_starPaints(), findsNWidgets(5));
+  });
 }

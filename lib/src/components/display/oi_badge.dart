@@ -164,6 +164,25 @@ class OiBadge extends StatelessWidget {
   // Helpers
   // ---------------------------------------------------------------------------
 
+  /// Returns a distinct icon per semantic color so color is never the sole
+  /// visual indicator when [dot] is `true` (REQ-0025).
+  IconData? _dotIcon() {
+    switch (color) {
+      case OiBadgeColor.success:
+        return const IconData(0xe5ca, fontFamily: 'MaterialIcons'); // check
+      case OiBadgeColor.warning:
+        return const IconData(0xe002, fontFamily: 'MaterialIcons'); // warning
+      case OiBadgeColor.error:
+        return const IconData(0xe5cd, fontFamily: 'MaterialIcons'); // close
+      case OiBadgeColor.info:
+        return const IconData(0xe88e, fontFamily: 'MaterialIcons'); // info
+      case OiBadgeColor.primary:
+      case OiBadgeColor.accent:
+      case OiBadgeColor.neutral:
+        return null;
+    }
+  }
+
   Color _baseColor(OiColorScheme colors) {
     switch (color) {
       case OiBadgeColor.primary:
@@ -267,20 +286,33 @@ class OiBadge extends StatelessWidget {
     final dims = _resolveDimensions();
 
     if (dot) {
+      final dotColor = resolved.background == const Color(0x00000000)
+          ? resolved.textColor
+          : resolved.background;
+      // REQ-0025: semantic badge colors include a distinct icon so color is
+      // never the sole indicator.
+      final dotIconData = _dotIcon();
       return Semantics(
         label: label,
         child: Container(
           width: dims.dotSize,
           height: dims.dotSize,
           decoration: BoxDecoration(
-            color: resolved.background == const Color(0x00000000)
-                ? resolved.textColor
-                : resolved.background,
+            color: dotColor,
             shape: BoxShape.circle,
             border: resolved.borderColor != null
                 ? Border.all(color: resolved.borderColor!)
                 : null,
           ),
+          child: dotIconData != null
+              ? Center(
+                  child: Icon(
+                    dotIconData,
+                    size: dims.dotSize * 0.7,
+                    color: colors.textOnPrimary,
+                  ),
+                )
+              : null,
         ),
       );
     }

@@ -49,6 +49,7 @@ class _CellFrameState<T> extends State<_CellFrame<T>> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
     if (_editing) {
       return Row(
         mainAxisSize: MainAxisSize.min,
@@ -58,8 +59,8 @@ class _CellFrameState<T> extends State<_CellFrame<T>> {
               controller: _textCtrl,
               focusNode: FocusNode()..requestFocus(),
               style: const TextStyle(fontSize: 14),
-              cursorColor: const Color(0xFF2563EB),
-              backgroundCursorColor: const Color(0xFFD1D5DB),
+              cursorColor: colors.primary.base,
+              backgroundCursorColor: colors.borderSubtle,
             ),
           ),
           GestureDetector(onTap: _commit, child: const Text('✓')),
@@ -93,27 +94,31 @@ class _FilterField extends StatefulWidget {
 
 class _FilterFieldState extends State<_FilterField> {
   late final TextEditingController _ctrl;
+  late final FocusNode _focusNode;
 
   @override
   void initState() {
     super.initState();
     _ctrl = TextEditingController(text: widget.initialValue);
+    _focusNode = FocusNode();
   }
 
   @override
   void dispose() {
     _ctrl.dispose();
+    _focusNode.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
     return EditableText(
       controller: _ctrl,
-      focusNode: FocusNode(),
+      focusNode: _focusNode,
       style: const TextStyle(fontSize: 12),
-      cursorColor: const Color(0xFF2563EB),
-      backgroundCursorColor: const Color(0xFFD1D5DB),
+      cursorColor: colors.primary.base,
+      backgroundCursorColor: colors.borderSubtle,
       onChanged: widget.onChanged,
     );
   }

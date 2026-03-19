@@ -26,11 +26,19 @@ class _StarPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final path = _starPath(size);
 
-    // Background (inactive) star.
-    canvas.drawPath(path, Paint()..color = inactiveColor);
+    // REQ-0025: inactive stars are drawn as outlines (stroke only) so that
+    // the shape difference — not just color — distinguishes rated from
+    // unrated stars.
+    canvas.drawPath(
+      path,
+      Paint()
+        ..color = inactiveColor
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1.5,
+    );
 
     if (fillFraction > 0) {
-      // Clip horizontally to reveal the active colour.
+      // Clip horizontally to reveal the active colour as a solid fill.
       canvas
         ..save()
         ..clipRect(Rect.fromLTWH(0, 0, size.width * fillFraction, size.height))

@@ -176,8 +176,8 @@ class _OiDeleteDialogState extends State<OiDeleteDialog> {
                       OiCheckbox(
                         value: _dontAskAgain,
                         onChanged: (v) {
-                          setState(() => _dontAskAgain = v ?? false);
-                          widget.onDontAskAgainChange?.call(v ?? false);
+                          setState(() => _dontAskAgain = v);
+                          widget.onDontAskAgainChange?.call(v);
                         },
                       ),
                       SizedBox(width: spacing.xs),

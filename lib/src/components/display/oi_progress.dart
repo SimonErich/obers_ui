@@ -235,6 +235,8 @@ class _OiProgressState extends State<OiProgress>
             );
         const dotSize = 12.0;
         const dotSpacing = 6.0;
+        // REQ-0025: completed steps show a check icon so color is never the
+        // sole indicator.
         indicator = Row(
           mainAxisSize: MainAxisSize.min,
           children: List.generate(stepCount, (i) {
@@ -248,6 +250,18 @@ class _OiProgressState extends State<OiProgress>
                   color: isActive ? effectiveColor : trackColor,
                   borderRadius: BorderRadius.circular(3),
                 ),
+                child: isActive
+                    ? Center(
+                        child: Icon(
+                          const IconData(
+                            0xe5ca,
+                            fontFamily: 'MaterialIcons',
+                          ), // check
+                          size: dotSize * 0.7,
+                          color: colors.textOnPrimary,
+                        ),
+                      )
+                    : null,
               ),
             );
           }),

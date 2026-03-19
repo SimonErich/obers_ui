@@ -102,4 +102,64 @@ void main() {
     expect(find.text('with icon'), findsOneWidget);
     expect(find.byType(Icon), findsOneWidget);
   });
+
+  // REQ-0025: color is never the sole indicator — dot mode includes an icon
+  // for semantic badge colors.
+
+  testWidgets('REQ-0025: dot mode with error color renders an Icon', (
+    tester,
+  ) async {
+    await tester.pumpObers(
+      const OiBadge.filled(label: 'err', color: OiBadgeColor.error, dot: true),
+    );
+    expect(find.byType(Icon), findsOneWidget);
+  });
+
+  testWidgets('REQ-0025: dot mode with success color renders an Icon', (
+    tester,
+  ) async {
+    await tester.pumpObers(
+      const OiBadge.filled(
+        label: 'ok',
+        color: OiBadgeColor.success,
+        dot: true,
+      ),
+    );
+    expect(find.byType(Icon), findsOneWidget);
+  });
+
+  testWidgets('REQ-0025: dot mode with warning color renders an Icon', (
+    tester,
+  ) async {
+    await tester.pumpObers(
+      const OiBadge.filled(
+        label: 'warn',
+        color: OiBadgeColor.warning,
+        dot: true,
+      ),
+    );
+    expect(find.byType(Icon), findsOneWidget);
+  });
+
+  testWidgets('REQ-0025: dot mode with info color renders an Icon', (
+    tester,
+  ) async {
+    await tester.pumpObers(
+      const OiBadge.filled(label: 'info', color: OiBadgeColor.info, dot: true),
+    );
+    expect(find.byType(Icon), findsOneWidget);
+  });
+
+  testWidgets('REQ-0025: dot mode with primary color renders no Icon', (
+    tester,
+  ) async {
+    await tester.pumpObers(
+      const OiBadge.filled(
+        label: 'tag',
+        color: OiBadgeColor.primary,
+        dot: true,
+      ),
+    );
+    expect(find.byType(Icon), findsNothing);
+  });
 }

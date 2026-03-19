@@ -57,6 +57,23 @@ void main() {
     expect(find.byType(CustomPaint), findsAtLeastNWidgets(1));
   });
 
+  // ── REQ-0025: color is never the sole indicator ──────────────────────────
+
+  testWidgets('REQ-0025: completed steps show Icon checkmark', (tester) async {
+    await tester.pumpObers(
+      const OiProgress.steps(steps: 3, currentStep: 2),
+    );
+    // 2 completed steps should each render an Icon (check).
+    expect(find.byType(Icon), findsNWidgets(2));
+  });
+
+  testWidgets('REQ-0025: incomplete steps show no Icon', (tester) async {
+    await tester.pumpObers(
+      const OiProgress.steps(steps: 3, currentStep: 0),
+    );
+    expect(find.byType(Icon), findsNothing);
+  });
+
   // ── Reduced motion ────────────────────────────────────────────────────────
 
   testWidgets(

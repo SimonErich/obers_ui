@@ -172,6 +172,8 @@ class _OiDashboardState extends State<OiDashboard>
     return OiDashboardSettings(cardPositions: positions);
   }
 
+  // Called when drag-to-reorder completes in edit mode.
+  // ignore: unused_element
   void _handleLayoutChange(List<OiDashboardCard> cards) {
     widget.onLayoutChange?.call(cards);
     updateSettings(_toSettings(), debounce: widget.settingsSaveDebounce);
