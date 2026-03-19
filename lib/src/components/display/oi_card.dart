@@ -433,7 +433,10 @@ class _OiCardState extends State<OiCard> with SingleTickerProviderStateMixin {
   }
 
   Widget _buildHeader(BuildContext context) {
-    final animationDuration = context.animations.normal;
+    final reducedMotion = context.animations.reducedMotion ||
+        MediaQuery.disableAnimationsOf(context);
+    final animationDuration =
+        reducedMotion ? Duration.zero : context.animations.normal;
     return Row(
       children: [
         if (widget.leading != null) widget.leading!,

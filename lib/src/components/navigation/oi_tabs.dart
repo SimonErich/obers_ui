@@ -252,7 +252,8 @@ class _OiTabsState extends State<OiTabs>
       );
     }
 
-    final animDuration = context.animations.reducedMotion
+    final animDuration = context.animations.reducedMotion ||
+            MediaQuery.disableAnimationsOf(context)
         ? Duration.zero
         : const Duration(milliseconds: 200);
 
@@ -427,7 +428,8 @@ class _PillTabRowState extends State<_PillTabRow> {
                 key: _keys[i],
                 onTap: () => widget.onSelected(i),
                 child: AnimatedContainer(
-                  duration: context.animations.reducedMotion
+                  duration: context.animations.reducedMotion ||
+                          MediaQuery.disableAnimationsOf(context)
                       ? Duration.zero
                       : const Duration(milliseconds: 200),
                   padding: const EdgeInsets.symmetric(

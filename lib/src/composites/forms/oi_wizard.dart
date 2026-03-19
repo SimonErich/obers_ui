@@ -283,7 +283,8 @@ class _OiWizardState extends State<OiWizard> {
     Widget body;
     if (widget.animated) {
       body = AnimatedSwitcher(
-        duration: context.animations.reducedMotion
+        duration: context.animations.reducedMotion ||
+                MediaQuery.disableAnimationsOf(context)
             ? Duration.zero
             : const Duration(milliseconds: 250),
         child: KeyedSubtree(key: ValueKey(_currentStep), child: stepContent),
