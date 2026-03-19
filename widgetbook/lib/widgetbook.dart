@@ -119,20 +119,52 @@ import 'package:widgetbook/widgetbook.dart';
 /// Launch with:
 ///   flutter run -d chrome   (web)
 ///   flutter run -d linux    (desktop)
-class OiWidgetbook extends StatelessWidget {
+class OiWidgetbook extends StatefulWidget {
   const OiWidgetbook({super.key});
 
   @override
+  State<OiWidgetbook> createState() => _OiWidgetbookState();
+}
+
+class _OiWidgetbookState extends State<OiWidgetbook> {
+  late final OiOverlaysService _overlaysService;
+
+  @override
+  void initState() {
+    super.initState();
+    _overlaysService = createOiOverlaysService();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Widgetbook(
+    return Widgetbook.material(
       addons: [
         ThemeAddon<OiThemeData>(
           themes: [
             WidgetbookTheme(name: 'Light', data: OiThemeData.light()),
             WidgetbookTheme(name: 'Dark', data: OiThemeData.dark()),
           ],
-          themeBuilder: (context, theme, child) =>
-              OiApp(theme: theme, home: child),
+          themeBuilder: (context, theme, child) => OiTheme(
+            data: theme,
+            child: Directionality(
+              textDirection: TextDirection.ltr,
+              child: OiDensityScope(
+                density: OiDensity.compact,
+                child: OiA11yScope(
+                  child: OiInputModalityDetector(
+                    child: OiShortcutScope(
+                      child: OiTourScope(
+                        child: buildOiOverlaysHost(
+                          service: _overlaysService,
+                          child: child,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
         ),
         ViewportAddon([
           ...IosViewports.phones,

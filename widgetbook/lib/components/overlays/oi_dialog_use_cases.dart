@@ -25,6 +25,7 @@ final oiDialogComponent = WidgetbookComponent(
               late OiOverlayHandle handle;
               handle = OiDialog.show(
                 context,
+                label: 'Standard dialog',
                 dialog: OiDialog.standard(
                   label: 'Standard dialog',
                   title: title,
@@ -58,6 +59,7 @@ final oiDialogComponent = WidgetbookComponent(
               late OiOverlayHandle handle;
               handle = OiDialog.show(
                 context,
+                label: 'Alert dialog',
                 dialog: OiDialog.alert(
                   label: 'Alert dialog',
                   title: 'Alert',
@@ -86,6 +88,7 @@ final oiDialogComponent = WidgetbookComponent(
               late OiOverlayHandle handle;
               handle = OiDialog.show(
                 context,
+                label: 'Confirm dialog',
                 dialog: OiDialog.confirm(
                   label: 'Confirm dialog',
                   title: 'Delete item?',
