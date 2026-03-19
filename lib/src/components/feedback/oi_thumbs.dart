@@ -1,7 +1,7 @@
-import 'package:flutter/material.dart' show Icons;
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/buttons/oi_button.dart';
 import 'package:obers_ui/src/components/buttons/oi_icon_button.dart';
+import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 
 /// The possible selection states for [OiThumbs].
@@ -87,7 +87,7 @@ class OiThumbs extends StatelessWidget {
         button: true,
         selected: selected,
         child: OiIconButton(
-          icon: up ? Icons.thumb_up : Icons.thumb_down,
+          icon: up ? OiIcons.thumbUp : OiIcons.thumbDown,
           semanticLabel: semanticLabel,
           onTap: enabled ? () => _handleTap(thumb) : null,
           variant: variant,

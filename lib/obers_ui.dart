@@ -178,6 +178,7 @@ export 'src/composites/workflow/oi_state_diagram.dart';
 // ── Foundation: Core Services ────────────────────────────────────────────────
 
 export 'src/foundation/oi_accessibility.dart';
+export 'src/foundation/oi_icons.dart';
 export 'src/foundation/oi_app.dart';
 export 'src/foundation/oi_input_modality.dart';
 export 'src/foundation/oi_overlays.dart';

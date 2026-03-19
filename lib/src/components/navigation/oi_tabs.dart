@@ -252,9 +252,13 @@ class _OiTabsState extends State<OiTabs>
       );
     }
 
+    final animDuration = context.animations.reducedMotion
+        ? Duration.zero
+        : const Duration(milliseconds: 200);
+
     Widget tabContent = AnimatedContainer(
       key: _tabKeys[index],
-      duration: const Duration(milliseconds: 200),
+      duration: animDuration,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       decoration: BoxDecoration(
         color: bgColor,
@@ -271,7 +275,7 @@ class _OiTabsState extends State<OiTabs>
         children: [
           tabContent,
           AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
+            duration: animDuration,
             height: 2,
             decoration: BoxDecoration(
               color: isSelected ? colors.primary.base : const Color(0x00000000),
@@ -423,7 +427,9 @@ class _PillTabRowState extends State<_PillTabRow> {
                 key: _keys[i],
                 onTap: () => widget.onSelected(i),
                 child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 200),
+                  duration: context.animations.reducedMotion
+                      ? Duration.zero
+                      : const Duration(milliseconds: 200),
                   padding: const EdgeInsets.symmetric(
                     horizontal: 16,
                     vertical: 10,

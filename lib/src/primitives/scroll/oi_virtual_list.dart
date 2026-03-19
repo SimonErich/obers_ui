@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/foundation/oi_app.dart';
+import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 
 /// The overscroll distance required to trigger a pull-to-refresh.
 const double _kRefreshTriggerDistance = 60;
@@ -178,6 +179,21 @@ class _OiSpinnerState extends State<_OiSpinner>
       vsync: this,
       duration: const Duration(milliseconds: 800),
     )..repeat();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final reduced = context.animations.reducedMotion;
+    _controller.duration = reduced
+        ? Duration.zero
+        : const Duration(milliseconds: 800);
+    if (reduced && _controller.isAnimating) {
+      _controller.stop();
+      _controller.value = 0;
+    } else if (!reduced && !_controller.isAnimating) {
+      _controller.repeat();
+    }
   }
 
   @override

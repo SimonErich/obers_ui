@@ -76,7 +76,9 @@ class OiDropHighlight extends StatelessWidget {
         Positioned.fill(
           child: AnimatedOpacity(
             opacity: active ? 1.0 : 0.0,
-            duration: const Duration(milliseconds: 100),
+            duration: context.animations.reducedMotion
+                ? Duration.zero
+                : const Duration(milliseconds: 100),
             child: Container(
               decoration: BoxDecoration(
                 color: colors.primary.muted.withValues(alpha: 0.12),

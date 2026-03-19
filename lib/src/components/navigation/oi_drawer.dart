@@ -56,7 +56,9 @@ class OiDrawer extends StatelessWidget {
           Positioned.fill(
             child: AnimatedOpacity(
               opacity: 1,
-              duration: const Duration(milliseconds: 220),
+              duration: context.animations.reducedMotion
+                  ? Duration.zero
+                  : const Duration(milliseconds: 220),
               curve: Curves.easeInOut,
               child: GestureDetector(
                 onTap: onClose,
@@ -70,7 +72,9 @@ class OiDrawer extends StatelessWidget {
         // ── Drawer panel ─────────────────────────────────────────────────────
         AnimatedSlide(
           offset: Offset(slideOffset, 0),
-          duration: const Duration(milliseconds: 220),
+          duration: context.animations.reducedMotion
+              ? Duration.zero
+              : const Duration(milliseconds: 220),
           curve: Curves.easeInOut,
           child: Align(
             alignment: Alignment.centerLeft,

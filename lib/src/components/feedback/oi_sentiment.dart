@@ -54,7 +54,9 @@ class OiSentiment extends StatelessWidget {
           enabled: enabled,
           onTap: () => onChanged?.call(emoji),
           child: AnimatedContainer(
-            duration: const Duration(milliseconds: 150),
+            duration: context.animations.reducedMotion
+                ? Duration.zero
+                : const Duration(milliseconds: 150),
             width: 44,
             height: 44,
             alignment: Alignment.center,

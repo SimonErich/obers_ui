@@ -1,4 +1,6 @@
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/src/foundation/theme/oi_color_scheme.dart';
+import 'package:obers_ui/src/foundation/theme/oi_spacing_scale.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/utils/file_utils.dart';
 
@@ -64,11 +66,11 @@ class OiStorageIndicator extends StatelessWidget {
   double get _percentage =>
       totalBytes > 0 ? (usedBytes / totalBytes).clamp(0.0, 1.0) : 0.0;
 
-  Color _barColor(dynamic colors) {
+  Color _barColor(OiColorScheme colors) {
     final pct = _percentage * 100;
-    if (pct > 90) return (colors as dynamic).error.base as Color;
-    if (pct > 70) return (colors as dynamic).warning.base as Color;
-    return (colors as dynamic).success.base as Color;
+    if (pct > 90) return colors.error.base;
+    if (pct > 70) return colors.warning.base;
+    return colors.success.base;
   }
 
   @override
@@ -90,7 +92,7 @@ class OiStorageIndicator extends StatelessWidget {
     );
   }
 
-  Widget _buildCompact(dynamic colors, String used, String total) {
+  Widget _buildCompact(OiColorScheme colors, String used, String total) {
     return Row(
       children: [
         Expanded(child: _buildProgressBar(colors, 4)),
@@ -99,14 +101,14 @@ class OiStorageIndicator extends StatelessWidget {
           '$used / $total',
           style: TextStyle(
             fontSize: 11,
-            color: (colors as dynamic).textMuted as Color,
+            color: colors.textMuted,
           ),
         ),
       ],
     );
   }
 
-  Widget _buildFull(dynamic colors, dynamic spacing, String used, String total) {
+  Widget _buildFull(OiColorScheme colors, OiSpacingScale spacing, String used, String total) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
@@ -116,24 +118,24 @@ class OiStorageIndicator extends StatelessWidget {
           style: TextStyle(
             fontSize: 12,
             fontWeight: FontWeight.w600,
-            color: (colors as dynamic).text as Color,
+            color: colors.text,
           ),
         ),
-        SizedBox(height: (spacing as dynamic).xs as double),
+        SizedBox(height: spacing.xs),
         _buildProgressBar(colors, 6),
-        SizedBox(height: (spacing as dynamic).xs as double),
+        SizedBox(height: spacing.xs),
         Text(
           '$used of $total',
           style: TextStyle(
             fontSize: 11,
-            color: (colors as dynamic).textMuted as Color,
+            color: colors.textMuted,
           ),
         ),
       ],
     );
   }
 
-  Widget _buildProgressBar(dynamic colors, double height) {
+  Widget _buildProgressBar(OiColorScheme colors, double height) {
     if (breakdown != null && breakdown!.isNotEmpty) {
       return _buildSegmentedBar(colors, height);
     }
@@ -141,7 +143,7 @@ class OiStorageIndicator extends StatelessWidget {
     return Container(
       height: height,
       decoration: BoxDecoration(
-        color: (colors as dynamic).surfaceHover as Color,
+        color: colors.surfaceHover,
         borderRadius: BorderRadius.circular(height / 2),
       ),
       child: FractionallySizedBox(
@@ -157,12 +159,12 @@ class OiStorageIndicator extends StatelessWidget {
     );
   }
 
-  Widget _buildSegmentedBar(dynamic colors, double height) {
+  Widget _buildSegmentedBar(OiColorScheme colors, double height) {
     final total = totalBytes > 0 ? totalBytes : 1;
     return Container(
       height: height,
       decoration: BoxDecoration(
-        color: (colors as dynamic).surfaceHover as Color,
+        color: colors.surfaceHover,
         borderRadius: BorderRadius.circular(height / 2),
       ),
       clipBehavior: Clip.antiAlias,

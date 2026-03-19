@@ -1,5 +1,6 @@
-import 'package:flutter/material.dart';
-
+import 'package:flutter/widgets.dart';
+import 'package:obers_ui/src/foundation/oi_app.dart';
+import 'package:obers_ui/src/foundation/theme/oi_theme_data.dart';
 /// Builds a golden test scenario with light and dark theme variants.
 ///
 /// Usage:
@@ -20,33 +21,25 @@ import 'package:flutter/material.dart';
 Widget obersGoldenBuilder({
   required Map<String, Widget> children,
   int columns = 2,
+  OiThemeData? theme,
 }) {
-  return MaterialApp(
-    debugShowCheckedModeBanner: false,
-    theme: ThemeData.light(),
-    home: Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Wrap(
-          spacing: 16,
-          runSpacing: 16,
-          children: children.entries.map((entry) {
-            return Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  entry.key,
-                  style: const TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                entry.value,
-              ],
-            );
-          }).toList(),
-        ),
+  return OiApp(
+    theme: theme ?? OiThemeData.light(),
+    home: Padding(
+      padding: const EdgeInsets.all(16),
+      child: Wrap(
+        spacing: 16,
+        runSpacing: 16,
+        children: children.entries.map((entry) {
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(entry.key, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 8),
+              entry.value,
+            ],
+          );
+        }).toList(),
       ),
     ),
   );

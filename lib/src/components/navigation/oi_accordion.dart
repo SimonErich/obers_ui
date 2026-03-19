@@ -134,6 +134,11 @@ class _OiAccordionState extends State<OiAccordion>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    final reduced = context.animations.reducedMotion;
+    final dur = reduced ? Duration.zero : const Duration(milliseconds: 200);
+    for (final c in _controllers) {
+      c.duration = dur;
+    }
     final newDriver =
         widget.settingsDriver ?? OiSettingsProvider.of(context);
     if (newDriver != _resolvedDriver) {
@@ -239,7 +244,9 @@ class _OiAccordionState extends State<OiAccordion>
                           ),
                           AnimatedRotation(
                             turns: open ? 0.5 : 0.0,
-                            duration: const Duration(milliseconds: 200),
+                            duration: context.animations.reducedMotion
+                                ? Duration.zero
+                                : const Duration(milliseconds: 200),
                             curve: Curves.easeInOut,
                             child: Icon(
                               // chevron_down icon from MaterialIcons

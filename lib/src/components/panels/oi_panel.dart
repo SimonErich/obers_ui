@@ -76,6 +76,14 @@ class _OiPanelState extends State<OiPanel> with SingleTickerProviderStateMixin {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _controller.duration = context.animations.reducedMotion
+        ? Duration.zero
+        : const Duration(milliseconds: 240);
+  }
+
+  @override
   void didUpdateWidget(OiPanel oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.open != oldWidget.open) {

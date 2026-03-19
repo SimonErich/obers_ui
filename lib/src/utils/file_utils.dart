@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+import 'package:obers_ui/src/foundation/oi_icons.dart';
 
 /// Utility class for file-related operations.
 ///
@@ -216,16 +217,16 @@ class OiFileUtils {
   static IconData iconForExtension(String ext) {
     final normalized = ext.toLowerCase().replaceFirst('.', '');
 
-    if (isImage(normalized)) return Icons.image;
-    if (isVideo(normalized)) return Icons.video_file;
-    if (isAudio(normalized)) return Icons.audio_file;
+    if (isImage(normalized)) return OiIcons.image;
+    if (isVideo(normalized)) return OiIcons.videoFile;
+    if (isAudio(normalized)) return OiIcons.audioFile;
 
     return switch (normalized) {
-      'pdf' => Icons.picture_as_pdf,
-      'doc' || 'docx' || 'odt' || 'rtf' => Icons.description,
-      'xls' || 'xlsx' || 'ods' || 'csv' => Icons.table_chart,
-      'ppt' || 'pptx' || 'odp' => Icons.slideshow,
-      'zip' || 'rar' || 'tar' || 'gz' || '7z' => Icons.folder_zip,
+      'pdf' => OiIcons.pictureAsPdf,
+      'doc' || 'docx' || 'odt' || 'rtf' => OiIcons.description,
+      'xls' || 'xlsx' || 'ods' || 'csv' => OiIcons.tableChart,
+      'ppt' || 'pptx' || 'odp' => OiIcons.slideshow,
+      'zip' || 'rar' || 'tar' || 'gz' || '7z' => OiIcons.folderZip,
       'html' ||
       'css' ||
       'js' ||
@@ -239,10 +240,10 @@ class OiFileUtils {
       'rs' ||
       'c' ||
       'cpp' ||
-      'rb' => Icons.code,
-      'json' || 'xml' || 'yaml' || 'yml' => Icons.data_object,
-      'txt' || 'md' => Icons.text_snippet,
-      _ => Icons.insert_drive_file,
+      'rb' => OiIcons.code,
+      'json' || 'xml' || 'yaml' || 'yml' => OiIcons.dataObject,
+      'txt' || 'md' => OiIcons.textSnippet,
+      _ => OiIcons.insertDriveFile,
     };
   }
 

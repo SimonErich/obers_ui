@@ -1,7 +1,7 @@
 // Public API docs are intentionally omitted for test helpers.
 // ignore_for_file: public_member_api_docs
 
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui/src/foundation/oi_platform.dart';
 
@@ -115,8 +115,16 @@ Future<void> withPlatform(
   TargetPlatform platform,
 ) async {
   await tester.pumpWidget(
-    Theme(
-      data: ThemeData(platform: platform),
+    OiPlatform(
+      data: OiPlatformData(
+        platform: platform,
+        keyboardHeight: 0,
+        keyboardVisible: false,
+        inputModality: platform == TargetPlatform.android ||
+                platform == TargetPlatform.iOS
+            ? OiInputModality.touch
+            : OiInputModality.pointer,
+      ),
       child: Directionality(textDirection: TextDirection.ltr, child: child),
     ),
   );

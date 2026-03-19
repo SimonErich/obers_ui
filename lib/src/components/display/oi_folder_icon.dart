@@ -302,8 +302,9 @@ class _FolderIconPainter extends CustomPainter {
       ..lineTo(tabWidth, tabHeight)
       ..close();
 
-    canvas.drawPath(tabTopPath, fillPaint);
-    canvas.drawPath(tabTopPath, strokePaint);
+    canvas
+      ..drawPath(tabTopPath, fillPaint)
+      ..drawPath(tabTopPath, strokePaint);
 
     // Folder body: slightly different for open state
     if (state == OiFolderIconState.open) {
@@ -318,11 +319,13 @@ class _FolderIconPainter extends CustomPainter {
         ..arcToPoint(Offset(0, h - r), radius: const Radius.circular(r))
         ..close();
 
-      canvas.drawPath(openPath, fillPaint);
-      canvas.drawPath(openPath, strokePaint);
+      canvas
+        ..drawPath(openPath, fillPaint)
+        ..drawPath(openPath, strokePaint);
     } else {
-      canvas.drawPath(tabPath, fillPaint);
-      canvas.drawPath(tabPath, strokePaint);
+      canvas
+        ..drawPath(tabPath, fillPaint)
+        ..drawPath(tabPath, strokePaint);
     }
   }
 

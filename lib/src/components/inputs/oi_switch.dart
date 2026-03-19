@@ -82,8 +82,12 @@ class _OiSwitchState extends State<OiSwitch> {
 
     final trackColor = widget.value ? colors.primary.base : colors.border;
 
+    final animDuration = context.animations.reducedMotion
+        ? Duration.zero
+        : const Duration(milliseconds: 200);
+
     final track = AnimatedContainer(
-      duration: const Duration(milliseconds: 200),
+      duration: animDuration,
       curve: Curves.easeInOut,
       width: trackW,
       height: trackH,
@@ -94,7 +98,7 @@ class _OiSwitchState extends State<OiSwitch> {
       child: Stack(
         children: [
           AnimatedPositioned(
-            duration: const Duration(milliseconds: 200),
+            duration: animDuration,
             curve: Curves.easeInOut,
             top: padding,
             left: widget.value ? padding + travelDistance : padding,

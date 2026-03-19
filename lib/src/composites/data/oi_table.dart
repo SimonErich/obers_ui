@@ -8,6 +8,7 @@ import 'package:obers_ui/src/composites/data/oi_table_controller.dart';
 import 'package:obers_ui/src/foundation/persistence/oi_settings_driver.dart';
 import 'package:obers_ui/src/foundation/persistence/oi_settings_mixin.dart';
 import 'package:obers_ui/src/foundation/persistence/oi_settings_provider.dart';
+import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/models/settings/oi_table_settings.dart';
 
 // ── Column definition ─────────────────────────────────────────────────────────
@@ -1659,6 +1660,21 @@ class _OiTableLoadingBarState extends State<_OiTableLoadingBar>
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final reduced = context.animations.reducedMotion;
+    _ctrl.duration = reduced
+        ? Duration.zero
+        : const Duration(milliseconds: 1500);
+    if (reduced && _ctrl.isAnimating) {
+      _ctrl.stop();
+      _ctrl.value = 0;
+    } else if (!reduced && !_ctrl.isAnimating) {
+      _ctrl.repeat();
+    }
+  }
+
+  @override
   void dispose() {
     _ctrl.dispose();
     super.dispose();
@@ -1724,6 +1740,21 @@ class _OiTableSpinnerState extends State<_OiTableSpinner>
       vsync: this,
       duration: const Duration(milliseconds: 800),
     )..repeat();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final reduced = context.animations.reducedMotion;
+    _ctrl.duration = reduced
+        ? Duration.zero
+        : const Duration(milliseconds: 800);
+    if (reduced && _ctrl.isAnimating) {
+      _ctrl.stop();
+      _ctrl.value = 0;
+    } else if (!reduced && !_ctrl.isAnimating) {
+      _ctrl.repeat();
+    }
   }
 
   @override

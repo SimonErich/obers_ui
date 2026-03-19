@@ -156,6 +156,14 @@ class _OiProgressState extends State<OiProgress>
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _controller.duration = context.animations.reducedMotion
+        ? Duration.zero
+        : const Duration(milliseconds: 1200);
+  }
+
+  @override
   void didUpdateWidget(OiProgress oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.indeterminate && !_controller.isAnimating) {

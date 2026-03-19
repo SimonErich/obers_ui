@@ -260,10 +260,11 @@ class OiRichContent {
     for (final block in blocks) {
       if (block.type == OiBlockType.divider) {
         // Represent divider as a thematic break operation.
-        ops.add({
-          'insert': {'divider': true},
-        });
-        ops.add({'insert': '\n'});
+        ops
+          ..add({
+            'insert': {'divider': true},
+          })
+          ..add({'insert': '\n'});
         continue;
       }
 
@@ -616,8 +617,9 @@ class _OiRichEditorState extends State<OiRichEditor> {
       c.dispose();
     }
     for (final fn in _blockFocusNodes) {
-      fn.removeListener(_onBlockFocusChange);
-      fn.dispose();
+      fn
+        ..removeListener(_onBlockFocusChange)
+        ..dispose();
     }
     super.dispose();
   }
@@ -657,9 +659,9 @@ class _OiRichEditorState extends State<OiRichEditor> {
 
     // Dispose excess focus nodes.
     while (_blockFocusNodes.length > blocks.length) {
-      final fn = _blockFocusNodes.removeLast();
-      fn.removeListener(_onBlockFocusChange);
-      fn.dispose();
+      _blockFocusNodes.removeLast()
+        ..removeListener(_onBlockFocusChange)
+        ..dispose();
     }
 
     // Add missing controllers.
@@ -1006,8 +1008,8 @@ class _OiRichEditorState extends State<OiRichEditor> {
   }
 
   void _insertBlock(OiBlockType type) {
-    final blocks = List<OiContentBlock>.from(widget.controller.content.blocks);
-    blocks.add(OiContentBlock(type: type, text: ''));
+    final blocks = List<OiContentBlock>.from(widget.controller.content.blocks)
+      ..add(OiContentBlock(type: type, text: ''));
     widget.controller.content = OiRichContent(blocks: blocks);
   }
 

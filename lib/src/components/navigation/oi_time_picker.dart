@@ -208,7 +208,9 @@ class _AmPmButton extends StatelessWidget {
     return OiTappable(
       onTap: onTap,
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 150),
+        duration: context.animations.reducedMotion
+            ? Duration.zero
+            : const Duration(milliseconds: 150),
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
         decoration: BoxDecoration(
           color: selected ? colors.primary.base : colors.surfaceSubtle,
