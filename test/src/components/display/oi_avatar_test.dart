@@ -151,6 +151,53 @@ void main() {
     }
   });
 
+  // REQ-0025: color is never the sole indicator — presence shows a distinct
+  // icon per status in addition to the colored ring.
+  testWidgets('presence online shows an icon indicator', (tester) async {
+    await tester.pumpObers(
+      const OiAvatar(
+        semanticLabel: 'User',
+        initials: 'AB',
+        presence: OiPresenceStatus.online,
+      ),
+    );
+    // The presence indicator renders an Icon widget inside the stack.
+    expect(find.byType(Icon), findsOneWidget);
+  });
+
+  testWidgets('presence busy shows an icon indicator', (tester) async {
+    await tester.pumpObers(
+      const OiAvatar(
+        semanticLabel: 'User',
+        initials: 'AB',
+        presence: OiPresenceStatus.busy,
+      ),
+    );
+    expect(find.byType(Icon), findsOneWidget);
+  });
+
+  testWidgets('presence away shows an icon indicator', (tester) async {
+    await tester.pumpObers(
+      const OiAvatar(
+        semanticLabel: 'User',
+        initials: 'AB',
+        presence: OiPresenceStatus.away,
+      ),
+    );
+    expect(find.byType(Icon), findsOneWidget);
+  });
+
+  testWidgets('presence offline shows an icon indicator', (tester) async {
+    await tester.pumpObers(
+      const OiAvatar(
+        semanticLabel: 'User',
+        initials: 'AB',
+        presence: OiPresenceStatus.offline,
+      ),
+    );
+    expect(find.byType(Icon), findsOneWidget);
+  });
+
   testWidgets('skeleton presence does not append status to semantic label', (
     tester,
   ) async {

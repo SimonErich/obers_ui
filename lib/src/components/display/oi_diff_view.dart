@@ -173,10 +173,17 @@ class OiDiffView extends StatelessWidget {
                 ? colors.error.base
                 : colors.text;
 
+            // REQ-0025: prefix ensures color is not the sole indicator.
+            final prefix = addedSide && line.added
+                ? '+ '
+                : !addedSide && line.removed
+                    ? '- '
+                    : '  ';
+
             Widget cell = Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 1),
               child: Text(
-                line.content,
+                '$prefix${line.content}',
                 style: monoStyle.copyWith(color: textColor),
               ),
             );

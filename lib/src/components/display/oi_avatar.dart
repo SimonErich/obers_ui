@@ -149,6 +149,34 @@ class OiAvatar extends StatelessWidget {
     }
   }
 
+  /// Returns a distinct icon per presence status so color is never the sole
+  /// indicator (REQ-0025).
+  IconData _presenceIcon(OiPresenceStatus status) {
+    switch (status) {
+      case OiPresenceStatus.online:
+        // Filled circle — distinct from the hollow offline circle.
+        return const IconData(0xe061, fontFamily: 'MaterialIcons'); // circle
+      case OiPresenceStatus.offline:
+        // Outlined (hollow) circle.
+        return const IconData(
+          0xef52,
+          fontFamily: 'MaterialIcons',
+        ); // circle_outlined
+      case OiPresenceStatus.away:
+        // Clock/schedule icon.
+        return const IconData(
+          0xe8b5,
+          fontFamily: 'MaterialIcons',
+        ); // schedule
+      case OiPresenceStatus.busy:
+        // "Do not disturb" / remove-circle icon.
+        return const IconData(
+          0xe15b,
+          fontFamily: 'MaterialIcons',
+        ); // remove_circle
+    }
+  }
+
   // ---------------------------------------------------------------------------
   // Build
   // ---------------------------------------------------------------------------
@@ -186,6 +214,9 @@ class OiAvatar extends StatelessWidget {
       const ringWidth = 2.5;
       const ringGap = 1.5;
       final totalD = d + (ringWidth + ringGap) * 2;
+      // REQ-0025: icon size scales with avatar so the indicator is visible
+      // but proportional.
+      final indicatorSize = (d * 0.35).clamp(10.0, 20.0);
 
       avatar = SizedBox(
         width: totalD,
@@ -202,6 +233,27 @@ class OiAvatar extends StatelessWidget {
               ),
             ),
             avatar,
+            // REQ-0025: distinct icon per status so color is not the sole
+            // indicator.
+            Positioned(
+              right: 0,
+              bottom: 0,
+              child: Container(
+                width: indicatorSize,
+                height: indicatorSize,
+                decoration: BoxDecoration(
+                  color: colors.surface,
+                  shape: BoxShape.circle,
+                ),
+                child: Center(
+                  child: Icon(
+                    _presenceIcon(presence!),
+                    size: indicatorSize * 0.7,
+                    color: ringColor,
+                  ),
+                ),
+              ),
+            ),
           ],
         ),
       );

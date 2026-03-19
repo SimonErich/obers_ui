@@ -83,13 +83,26 @@ class OiInputFrame extends StatelessWidget {
         frame,
         if (error != null && error!.isNotEmpty) ...[
           const SizedBox(height: 4),
-          Text(
-            error!,
-            style: TextStyle(
-              fontSize: 12,
-              color: colors.error.base,
-              height: 1.3,
-            ),
+          Row(
+            children: [
+              // REQ-0025: error icon so color is never the sole indicator.
+              Icon(
+                const IconData(0xe000, fontFamily: 'MaterialIcons'), // error
+                size: 14,
+                color: colors.error.base,
+              ),
+              const SizedBox(width: 4),
+              Flexible(
+                child: Text(
+                  error!,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: colors.error.base,
+                    height: 1.3,
+                  ),
+                ),
+              ),
+            ],
           ),
         ] else if (hint != null) ...[
           const SizedBox(height: 4),

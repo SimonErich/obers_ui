@@ -39,6 +39,22 @@ void main() {
     expect(find.textContaining('added line'), findsOneWidget);
   });
 
+  // REQ-0025: color is never the sole indicator — side-by-side also uses
+  // +/- text prefixes.
+  testWidgets('side-by-side added lines get plus prefix', (tester) async {
+    await tester.pumpObers(
+      const OiDiffView(lines: _lines, mode: OiDiffMode.sideBySide),
+    );
+    expect(find.textContaining('+ added line'), findsOneWidget);
+  });
+
+  testWidgets('side-by-side removed lines get minus prefix', (tester) async {
+    await tester.pumpObers(
+      const OiDiffView(lines: _lines, mode: OiDiffMode.sideBySide),
+    );
+    expect(find.textContaining('- removed line'), findsOneWidget);
+  });
+
   testWidgets('line numbers shown when enabled', (tester) async {
     await tester.pumpObers(const OiDiffView(lines: _lines));
     expect(find.textContaining('1'), findsAtLeastNWidgets(1));

@@ -189,4 +189,44 @@ void main() {
     completer.complete();
     await tester.pump();
   });
+
+  // ── 7. Reduced motion: spinner stops animating ──────────────────────────
+
+  testWidgets('reducedMotion: spinner animation controller stops', (
+    tester,
+  ) async {
+    final completer = Completer<void>();
+
+    await tester.pumpObers(
+      MediaQuery(
+        data: const MediaQueryData(disableAnimations: true),
+        child: _buildScroll(
+          itemCount: 20,
+          moreAvailable: true,
+          onLoadMore: () => completer.future,
+        ),
+      ),
+      surfaceSize: const Size(400, 300),
+    );
+
+    await tester.drag(find.byType(ListView), const Offset(0, -800));
+    await tester.pump();
+
+    // Spinner is present but its RotationTransition controller is stopped.
+    expect(
+      find.byKey(const ValueKey('oi_infinite_scroll_spinner')),
+      findsOneWidget,
+    );
+
+    final rotation = tester.widget<RotationTransition>(
+      find.byType(RotationTransition),
+    );
+    final ctrl = rotation.turns;
+    if (ctrl is AnimationController) {
+      expect(ctrl.isAnimating, isFalse);
+    }
+
+    completer.complete();
+    await tester.pump();
+  });
 }

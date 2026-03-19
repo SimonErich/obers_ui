@@ -73,6 +73,15 @@ class OiStorageIndicator extends StatelessWidget {
     return colors.success.base;
   }
 
+  /// Returns a text status label so color is never the sole indicator
+  /// of storage urgency (REQ-0025).
+  String _statusLabel() {
+    final pct = _percentage * 100;
+    if (pct > 90) return 'Critical';
+    if (pct > 70) return 'Warning';
+    return '';
+  }
+
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
@@ -93,6 +102,7 @@ class OiStorageIndicator extends StatelessWidget {
   }
 
   Widget _buildCompact(OiColorScheme colors, String used, String total) {
+    final status = _statusLabel();
     return Row(
       children: [
         Expanded(child: _buildProgressBar(colors, 4)),
@@ -104,11 +114,23 @@ class OiStorageIndicator extends StatelessWidget {
             color: colors.textMuted,
           ),
         ),
+        if (status.isNotEmpty) ...[
+          const SizedBox(width: 6),
+          Text(
+            status,
+            style: TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+              color: _barColor(colors),
+            ),
+          ),
+        ],
       ],
     );
   }
 
   Widget _buildFull(OiColorScheme colors, OiSpacingScale spacing, String used, String total) {
+    final status = _statusLabel();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
@@ -124,12 +146,28 @@ class OiStorageIndicator extends StatelessWidget {
         SizedBox(height: spacing.xs),
         _buildProgressBar(colors, 6),
         SizedBox(height: spacing.xs),
-        Text(
-          '$used of $total',
-          style: TextStyle(
-            fontSize: 11,
-            color: colors.textMuted,
-          ),
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              '$used of $total',
+              style: TextStyle(
+                fontSize: 11,
+                color: colors.textMuted,
+              ),
+            ),
+            if (status.isNotEmpty) ...[
+              const SizedBox(width: 6),
+              Text(
+                status,
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
+                  color: _barColor(colors),
+                ),
+              ),
+            ],
+          ],
         ),
       ],
     );
