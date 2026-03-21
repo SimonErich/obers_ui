@@ -2,7 +2,7 @@ import 'package:flutter/foundation.dart';
 
 /// A single item in the shopping cart.
 ///
-/// Coverage: REQ-0024
+/// Coverage: REQ-0021
 ///
 /// All data flows in via props — no direct coupling to any backend.
 ///

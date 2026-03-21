@@ -709,11 +709,15 @@ class _OiTableState<T> extends State<OiTable<T>>
               allKeys.add(_rowKeyAt(widget.rows[i], i));
             }
             _ctrl.selectAllRows(allKeys);
-            widget.onSelectionChanged?.call(Set<String>.from(_ctrl.selectedRows));
+            widget.onSelectionChanged?.call(
+              Set<String>.from(_ctrl.selectedRows),
+            );
           },
           onDeselectAll: () {
             _ctrl.clearSelection();
-            widget.onSelectionChanged?.call(Set<String>.from(_ctrl.selectedRows));
+            widget.onSelectionChanged?.call(
+              Set<String>.from(_ctrl.selectedRows),
+            );
           },
         ),
       ),
@@ -724,8 +728,8 @@ class _OiTableState<T> extends State<OiTable<T>>
 
   @override
   Widget build(BuildContext context) {
-    final hasBulkActions = widget.bulkActions != null &&
-        widget.bulkActions!.isNotEmpty;
+    final hasBulkActions =
+        widget.bulkActions != null && widget.bulkActions!.isNotEmpty;
 
     final tableContent = Semantics(
       label: widget.label,
@@ -758,12 +762,7 @@ class _OiTableState<T> extends State<OiTable<T>>
 
     if (!hasBulkActions) return tableContent;
 
-    return Stack(
-      children: [
-        tableContent,
-        _buildBulkBar(),
-      ],
-    );
+    return Stack(children: [tableContent, _buildBulkBar()]);
   }
 
   // ── Column manager bar ────────────────────────────────────────────────────

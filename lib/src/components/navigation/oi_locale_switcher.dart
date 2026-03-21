@@ -6,7 +6,6 @@ import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/primitives/display/oi_icon.dart';
 
-
 /// A locale option for the [OiLocaleSwitcher].
 ///
 /// {@category Components}

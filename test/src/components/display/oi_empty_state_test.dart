@@ -146,10 +146,7 @@ void main() {
     testWidgets('renders action button and fires callback', (tester) async {
       var tapped = false;
       await tester.pumpObers(
-        OiEmptyState.error(
-          actionLabel: 'Retry',
-          onAction: () => tapped = true,
-        ),
+        OiEmptyState.error(actionLabel: 'Retry', onAction: () => tapped = true),
       );
       expect(find.byType(OiButton), findsOneWidget);
       await tester.tap(find.text('Retry'));

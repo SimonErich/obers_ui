@@ -3020,7 +3020,7 @@ Controls how forms render inputs and how `OiFieldDisplay` formats values.
 ### OiCartSummary
 **Tags:** `cart`, `total`, `summary`, `checkout`
 
-**Fields:** `subtotal`, `tax`, `shipping`, `discount`, `total`, `itemCount`
+**Fields:** `subtotal` (double, default: 0), `discount` (double, default: 0), `discountLabel` (String?, e.g. "SUMMER20 (-20%)"), `shipping` (double, default: 0), `shippingLabel` (String?, e.g. "Express Shipping"), `tax` (double, default: 0), `taxLabel` (String?, e.g. "VAT 20%"), `total` (double, required), `currencyCode` (String, default: 'USD')
 
 ### OiFileNodeData
 **Tags:** `file`, `node`, `path`, `metadata`

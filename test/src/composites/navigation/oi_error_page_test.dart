@@ -160,10 +160,7 @@ void main() {
       // The title renders as OiLabel.h4 but no OiLabel.display (error code)
       // should be present.
       final labels = tester.widgetList<OiLabel>(find.byType(OiLabel));
-      expect(
-        labels.where((l) => l.variant == OiLabelVariant.display),
-        isEmpty,
-      );
+      expect(labels.where((l) => l.variant == OiLabelVariant.display), isEmpty);
     });
   });
 }

@@ -107,10 +107,7 @@ void main() {
 
     testWidgets('suggestions filtered by query', (tester) async {
       await tester.pumpObers(
-        const OiTagInput(
-          tags: [],
-          suggestions: ['apple', 'banana', 'avocado'],
-        ),
+        const OiTagInput(tags: [], suggestions: ['apple', 'banana', 'avocado']),
       );
       await tester.enterText(find.byType(EditableText), 'a');
       await tester.pump();
@@ -156,9 +153,7 @@ void main() {
       expect(result, contains('dart'));
     });
 
-    testWidgets('async suggestions show shimmer while loading', (
-      tester,
-    ) async {
+    testWidgets('async suggestions show shimmer while loading', (tester) async {
       final completer = Completer<List<String>>();
       await tester.pumpObers(
         OiTagInput(
@@ -212,10 +207,7 @@ void main() {
 
     testWidgets('empty query hides dropdown', (tester) async {
       await tester.pumpObers(
-        const OiTagInput(
-          tags: [],
-          suggestions: ['dart', 'flutter'],
-        ),
+        const OiTagInput(tags: [], suggestions: ['dart', 'flutter']),
       );
       // Type something to show dropdown.
       await tester.enterText(find.byType(EditableText), 'da');

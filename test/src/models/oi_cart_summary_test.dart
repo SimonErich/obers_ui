@@ -89,6 +89,18 @@ void main() {
       expect(a, isNot(equals(b)));
     });
 
+    test('toString includes key fields', () {
+      const s = OiCartSummary(
+        subtotal: 100.0,
+        total: 90.0,
+        currencyCode: 'EUR',
+      );
+      expect(
+        s.toString(),
+        'OiCartSummary(subtotal: 100.0, total: 90.0, currencyCode: EUR)',
+      );
+    });
+
     test('equal instances have the same hashCode', () {
       const a = OiCartSummary(
         subtotal: 50.0,

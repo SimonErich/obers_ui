@@ -178,8 +178,7 @@ class _OiTagInputState extends State<OiTagInput> {
     return source
         .where(
           (s) =>
-              s.toLowerCase().contains(lowerQuery) &&
-              !widget.tags.contains(s),
+              s.toLowerCase().contains(lowerQuery) && !widget.tags.contains(s),
         )
         .toList();
   }
@@ -246,9 +245,7 @@ class _OiTagInputState extends State<OiTagInput> {
   bool _isInSuggestions(String tag) {
     final source = widget.suggestions ?? const <String>[];
     if (source.any((s) => s.toLowerCase() == tag.toLowerCase())) return true;
-    if (_filteredSuggestions.any(
-      (s) => s.toLowerCase() == tag.toLowerCase(),
-    )) {
+    if (_filteredSuggestions.any((s) => s.toLowerCase() == tag.toLowerCase())) {
       return true;
     }
     return false;
@@ -318,36 +315,33 @@ class _OiTagInputState extends State<OiTagInput> {
       child: _suggestionsLoading && items.isEmpty
           ? _buildShimmerPlaceholder()
           : items.isEmpty
-              ? const SizedBox.shrink()
-              : ListView.builder(
-                  shrinkWrap: true,
-                  padding: const EdgeInsets.symmetric(vertical: 4),
-                  itemCount: items.length + (_suggestionsLoading ? 1 : 0),
-                  itemBuilder: (context, index) {
-                    if (index == items.length) {
-                      return _buildShimmerPlaceholder();
-                    }
-                    final suggestion = items[index];
-                    return OiTappable(
-                      key: ValueKey('suggestion_$suggestion'),
-                      onTap: () => _selectSuggestion(suggestion),
-                      child: Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 8,
-                        ),
-                        child: Text(
-                          suggestion,
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: colors.text,
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                ),
+          ? const SizedBox.shrink()
+          : ListView.builder(
+              shrinkWrap: true,
+              padding: const EdgeInsets.symmetric(vertical: 4),
+              itemCount: items.length + (_suggestionsLoading ? 1 : 0),
+              itemBuilder: (context, index) {
+                if (index == items.length) {
+                  return _buildShimmerPlaceholder();
+                }
+                final suggestion = items[index];
+                return OiTappable(
+                  key: ValueKey('suggestion_$suggestion'),
+                  onTap: () => _selectSuggestion(suggestion),
+                  child: Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 8,
+                    ),
+                    child: Text(
+                      suggestion,
+                      style: TextStyle(fontSize: 13, color: colors.text),
+                    ),
+                  ),
+                );
+              },
+            ),
     );
   }
 
@@ -418,7 +412,8 @@ class _OiTagInputState extends State<OiTagInput> {
     if (!widget._hasSuggestions) return frame;
 
     return OiFloating(
-      visible: _showSuggestions &&
+      visible:
+          _showSuggestions &&
           (_filteredSuggestions.isNotEmpty || _suggestionsLoading),
       alignment: OiFloatingAlignment.bottomStart,
       anchor: frame,

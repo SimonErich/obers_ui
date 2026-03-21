@@ -2,6 +2,8 @@ import 'package:flutter/foundation.dart';
 
 /// A summary of cart totals for display in checkout UIs.
 ///
+/// Coverage: REQ-0022
+///
 /// All data flows in via props — no direct coupling to any backend.
 ///
 /// {@category Models}
@@ -92,6 +94,11 @@ class OiCartSummary {
         total == other.total &&
         currencyCode == other.currencyCode;
   }
+
+  @override
+  String toString() =>
+      'OiCartSummary(subtotal: $subtotal, total: $total, '
+      'currencyCode: $currencyCode)';
 
   @override
   int get hashCode => Object.hash(
