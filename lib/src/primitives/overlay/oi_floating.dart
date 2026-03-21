@@ -341,7 +341,18 @@ class _OiFloatingState extends State<OiFloating> {
       clipBehavior: Clip.none,
       children: [
         anchorWidget,
-        Positioned(width: 0, height: 0, child: follower),
+        Positioned(
+          width: 0,
+          height: 0,
+          child: OverflowBox(
+            alignment: Alignment.topLeft,
+            minWidth: 0,
+            maxWidth: double.infinity,
+            minHeight: 0,
+            maxHeight: double.infinity,
+            child: follower,
+          ),
+        ),
       ],
     );
   }

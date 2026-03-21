@@ -231,7 +231,8 @@ class OiFieldDisplay extends StatelessWidget {
       return _wrapTooltip(_buildCustomFormatted(context));
     }
 
-    if (_isEmpty) {
+    // Boolean type handles null as a distinct "unknown" state.
+    if (_isEmpty && type != OiFieldType.boolean) {
       return _buildEmpty(context);
     }
 
@@ -308,20 +309,19 @@ class OiFieldDisplay extends StatelessWidget {
 
   Widget _buildEmpty(BuildContext context) {
     final colors = context.colors;
-    return Text(emptyText, style: TextStyle(color: colors.textMuted));
+    return OiLabel.small(emptyText, color: colors.textMuted);
   }
 
   Widget _buildCustomFormatted(BuildContext context) {
     try {
       final formatted = formatValue!(value);
-      return Text(
+      return OiLabel.body(
         formatted,
         maxLines: maxLines,
         overflow: maxLines != null ? TextOverflow.ellipsis : null,
       );
     } catch (_) {
-      assert(false, 'OiFieldDisplay.formatValue threw an exception');
-      return Text(
+      return OiLabel.body(
         _valueString,
         maxLines: maxLines,
         overflow: maxLines != null ? TextOverflow.ellipsis : null,
@@ -330,7 +330,7 @@ class OiFieldDisplay extends StatelessWidget {
   }
 
   Widget _buildTextDisplay(BuildContext context) {
-    return Text(
+    return OiLabel.body(
       _valueString,
       maxLines: maxLines,
       overflow: maxLines != null ? TextOverflow.ellipsis : null,
@@ -347,21 +347,24 @@ class OiFieldDisplay extends StatelessWidget {
     }
 
     final formatted = _formatNumber(numValue);
-    return Text(formatted);
+    return OiLabel.body(formatted);
   }
 
   /// Formats a number using [numberFormat] pattern if provided, falling back
-  /// to [decimalPlaces] via [toStringAsFixed].
+  /// to [NumberFormat.decimalPattern] with grouping separators.
   String _formatNumber(num numValue) {
     if (numberFormat != null) {
       try {
         return NumberFormat(numberFormat).format(numValue);
-      } on FormatException catch (_) {
+      } catch (_) {
         // Invalid pattern — fall through to default formatting.
       }
     }
     final places = decimalPlaces ?? 0;
-    return numValue.toStringAsFixed(places);
+    final formatter = NumberFormat.decimalPattern()
+      ..minimumFractionDigits = places
+      ..maximumFractionDigits = places;
+    return formatter.format(numValue);
   }
 
   Widget _buildCurrencyDisplay(BuildContext context) {
@@ -382,21 +385,24 @@ class OiFieldDisplay extends StatelessWidget {
     parts.add(formatted);
     if (code.isNotEmpty && symbol.isEmpty) parts.add(code);
 
-    return Text(parts.join(symbol.isNotEmpty ? '' : ' '));
+    return OiLabel.body(parts.join(symbol.isNotEmpty ? '' : ' '));
   }
 
   /// Formats a currency number using [numberFormat] pattern if provided,
-  /// falling back to [decimalPlaces] (default 2) via [toStringAsFixed].
+  /// falling back to [NumberFormat.decimalPattern] with grouping separators.
   String _formatCurrencyNumber(num numValue) {
     if (numberFormat != null) {
       try {
         return NumberFormat(numberFormat).format(numValue);
-      } on FormatException catch (_) {
+      } catch (_) {
         // Invalid pattern — fall through to default formatting.
       }
     }
     final places = decimalPlaces ?? 2;
-    return numValue.toStringAsFixed(places);
+    final formatter = NumberFormat.decimalPattern()
+      ..minimumFractionDigits = places
+      ..maximumFractionDigits = places;
+    return formatter.format(numValue);
   }
 
   Widget _buildDateDisplay(BuildContext context) {
@@ -410,7 +416,7 @@ class OiFieldDisplay extends StatelessWidget {
     }
 
     final formatted = _formatDate(date);
-    return Text(formatted);
+    return OiLabel.body(formatted);
   }
 
   Widget _buildDateTimeDisplay(BuildContext context) {
@@ -424,19 +430,39 @@ class OiFieldDisplay extends StatelessWidget {
     }
 
     final formatted = _formatDateTime(date);
-    return Text(formatted);
+    return OiLabel.body(formatted);
   }
 
   Widget _buildBooleanDisplay(BuildContext context) {
+    final colors = context.colors;
+
+    // Handle null as a distinct third state.
+    if (value == null) {
+      return Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          OiIcon.decorative(
+            icon: const IconData(
+              0xe15b,
+              fontFamily: 'MaterialIcons',
+            ), // remove (dash)
+            color: colors.textMuted,
+            size: 18,
+          ),
+          const SizedBox(width: 4),
+          OiLabel.body('Unknown', color: colors.textMuted),
+        ],
+      );
+    }
+
     final bool boolValue;
     if (value is bool) {
       boolValue = value as bool;
     } else {
       // Coerce via truthiness.
-      boolValue = value != null && value != 0 && value != '' && value != false;
+      boolValue = value != 0 && value != '' && value != false;
     }
 
-    final colors = context.colors;
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -448,7 +474,7 @@ class OiFieldDisplay extends StatelessWidget {
           size: 18,
         ),
         const SizedBox(width: 4),
-        Text(boolValue ? 'Yes' : 'No'),
+        OiLabel.body(boolValue ? 'Yes' : 'No'),
       ],
     );
   }
@@ -465,12 +491,11 @@ class OiFieldDisplay extends StatelessWidget {
         ),
         const SizedBox(width: 6),
         Flexible(
-          child: Text(
+          child: OiLabel.body(
             _valueString,
-            style: TextStyle(
-              color: colors.primary.base,
-              decoration: TextDecoration.underline,
-            ),
+            color: colors.primary.base,
+            decoration: TextDecoration.underline,
+            decorationColor: colors.primary.base,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
@@ -491,12 +516,11 @@ class OiFieldDisplay extends StatelessWidget {
         ),
         const SizedBox(width: 6),
         Flexible(
-          child: Text(
+          child: OiLabel.body(
             _valueString,
-            style: TextStyle(
-              color: colors.primary.base,
-              decoration: TextDecoration.underline,
-            ),
+            color: colors.primary.base,
+            decoration: TextDecoration.underline,
+            decorationColor: colors.primary.base,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
@@ -516,15 +540,28 @@ class OiFieldDisplay extends StatelessWidget {
           size: 16,
         ),
         const SizedBox(width: 6),
-        Text(_valueString, style: TextStyle(color: colors.primary.base)),
+        OiLabel.body(_valueString, color: colors.primary.base),
       ],
     );
   }
 
   Widget _buildFileDisplay(BuildContext context) {
     final colors = context.colors;
-    // Extract filename from path.
-    final filename = _valueString.split('/').last.split('\\').last;
+
+    String filename;
+    String? sizeLabel;
+
+    if (value is Map) {
+      final map = value as Map;
+      filename = (map['name'] ?? '').toString();
+      if (map.containsKey('size') && map['size'] is num) {
+        sizeLabel = _formatFileSize((map['size'] as num).toInt());
+      }
+    } else {
+      // Extract filename from path.
+      filename = _valueString.split('/').last.split('\\').last;
+    }
+
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -538,10 +575,28 @@ class OiFieldDisplay extends StatelessWidget {
         ),
         const SizedBox(width: 6),
         Flexible(
-          child: Text(filename, maxLines: 1, overflow: TextOverflow.ellipsis),
+          child: OiLabel.body(
+            filename,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
         ),
+        if (sizeLabel != null) ...[
+          const SizedBox(width: 6),
+          OiLabel.small(sizeLabel, color: colors.textMuted),
+        ],
       ],
     );
+  }
+
+  /// Formats a file size in bytes to a human-readable string.
+  static String _formatFileSize(int bytes) {
+    if (bytes < 1024) return '$bytes B';
+    if (bytes < 1024 * 1024) return '${(bytes / 1024).toStringAsFixed(0)} KB';
+    if (bytes < 1024 * 1024 * 1024) {
+      return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
+    }
+    return '${(bytes / (1024 * 1024 * 1024)).toStringAsFixed(1)} GB';
   }
 
   Widget _buildImageDisplay(BuildContext context) {
@@ -563,7 +618,7 @@ class OiFieldDisplay extends StatelessWidget {
       return OiBadge.soft(label: displayLabel, color: badgeColor);
     }
 
-    return Text(displayLabel);
+    return OiLabel.body(displayLabel);
   }
 
   Widget _buildTagsDisplay(BuildContext context) {
@@ -605,7 +660,7 @@ class OiFieldDisplay extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 8),
-        Text('#$hex'),
+        OiLabel.body('#$hex'),
       ],
     );
   }

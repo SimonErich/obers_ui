@@ -257,7 +257,7 @@ class OiPagination extends StatelessWidget {
               Padding(
                 key: Key('oi_pagination_ellipsis_$i'),
                 padding: const EdgeInsets.symmetric(horizontal: 2),
-                child: const Text('\u2026'),
+                child: const OiLabel.small('\u2026'),
               )
             else
               _buildPageButton(visiblePages[i]!, colors),
@@ -311,7 +311,7 @@ class OiPagination extends StatelessWidget {
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8),
-            child: Text(
+            child: OiLabel.body(
               '$displayPage / $_totalPages',
               key: const Key('oi_pagination_compact_label'),
             ),
@@ -393,13 +393,12 @@ class OiPagination extends StatelessWidget {
                 borderRadius: BorderRadius.circular(4),
               )
             : null,
-        child: Text(
-          '${page + 1}',
-          style: TextStyle(
-            color: isCurrent ? colors.primary.foreground : colors.text,
-            fontWeight: isCurrent ? FontWeight.bold : null,
-          ),
-        ),
+        child: isCurrent
+            ? OiLabel.bodyStrong(
+                '${page + 1}',
+                color: colors.primary.foreground,
+              )
+            : OiLabel.body('${page + 1}', color: colors.text),
       ),
     );
   }
@@ -432,18 +431,18 @@ class OiPagination extends StatelessWidget {
   Widget _buildTotalLabel() {
     final itemLabel = label ?? 'items';
     if (totalItems == 0) {
-      return Text(
-        key: const Key('oi_pagination_total'),
+      return OiLabel.small(
         '0 $itemLabel',
+        key: const Key('oi_pagination_total'),
         overflow: TextOverflow.ellipsis,
       );
     }
 
     final start = _clampedPage * _effectivePerPage + 1;
     final end = math.min((_clampedPage + 1) * _effectivePerPage, totalItems);
-    return Text(
-      key: const Key('oi_pagination_total'),
+    return OiLabel.small(
       '$start\u2013$end of $totalItems $itemLabel',
+      key: const Key('oi_pagination_total'),
       overflow: TextOverflow.ellipsis,
     );
   }

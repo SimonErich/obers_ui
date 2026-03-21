@@ -35,8 +35,9 @@ class OiCouponResult {
   }) {
     return OiCouponResult(
       valid: valid ?? this.valid,
-      message:
-          identical(message, _sentinel) ? this.message : message as String?,
+      message: identical(message, _sentinel)
+          ? this.message
+          : message as String?,
       discountAmount: identical(discountAmount, _sentinel)
           ? this.discountAmount
           : discountAmount as double?,

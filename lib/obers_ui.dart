@@ -170,6 +170,11 @@ export 'src/composites/scheduling/oi_calendar.dart';
 export 'src/composites/scheduling/oi_gantt.dart';
 export 'src/composites/scheduling/oi_scheduler.dart';
 export 'src/composites/scheduling/oi_timeline.dart';
+// ── Composites: Shop ────────────────────────────────────────────────────────
+
+export 'src/composites/shop/oi_cart_panel.dart';
+export 'src/composites/shop/oi_mini_cart.dart';
+export 'src/composites/shop/oi_order_summary.dart';
 // ── Composites: Search ───────────────────────────────────────────────────────
 
 export 'src/composites/search/oi_combo_box.dart';

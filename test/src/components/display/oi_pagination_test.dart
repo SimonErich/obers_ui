@@ -8,6 +8,10 @@ import 'package:obers_ui/src/components/display/oi_pagination.dart';
 import '../../../helpers/pump_app.dart';
 
 void main() {
+  // Pages variant uses a wide Row (total label, per-page selector, nav
+  // buttons, page buttons) that needs a wide surface to avoid overflow.
+  const _wide = Size(1200, 600);
+
   group('OiPagination - pages variant', () {
     testWidgets('renders page numbers for multi-page data', (tester) async {
       await tester.pumpObers(
@@ -17,6 +21,7 @@ void main() {
           perPage: 25,
           onPageChange: (_) {},
         ),
+        surfaceSize: _wide,
       );
 
       // 3 pages: 1, 2, 3
@@ -33,6 +38,7 @@ void main() {
           perPage: 25,
           onPageChange: (_) {},
         ),
+        surfaceSize: _wide,
       );
 
       // Page 2 (index 1) should be displayed as "2" and decorated
@@ -53,6 +59,7 @@ void main() {
           perPage: 25,
           onPageChange: (_) {},
         ),
+        surfaceSize: _wide,
       );
 
       // prev and first buttons exist but are disabled (enabled: false)
@@ -68,6 +75,7 @@ void main() {
           perPage: 25,
           onPageChange: (_) {},
         ),
+        surfaceSize: _wide,
       );
 
       expect(find.byKey(const Key('oi_pagination_next')), findsOneWidget);
@@ -83,6 +91,7 @@ void main() {
           perPage: 25,
           onPageChange: (p) => tappedPage = p,
         ),
+        surfaceSize: _wide,
       );
 
       await tester.tap(find.byKey(const Key('oi_pagination_page_1')));
@@ -101,6 +110,7 @@ void main() {
     testWidgets('showTotal false hides total count label', (tester) async {
       await tester.pumpObers(
         const OiPagination(totalItems: 100, currentPage: 0, showTotal: false),
+        surfaceSize: _wide,
       );
 
       expect(find.byKey(const Key('oi_pagination_total')), findsNothing);
@@ -120,7 +130,10 @@ void main() {
     });
 
     testWidgets('zero items shows empty state', (tester) async {
-      await tester.pumpObers(const OiPagination(totalItems: 0, currentPage: 0));
+      await tester.pumpObers(
+        const OiPagination(totalItems: 0, currentPage: 0),
+        surfaceSize: _wide,
+      );
 
       expect(find.text('0 items'), findsOneWidget);
     });
@@ -128,6 +141,7 @@ void main() {
     testWidgets('single page hides page numbers navigation', (tester) async {
       await tester.pumpObers(
         const OiPagination(totalItems: 10, currentPage: 0, perPage: 25),
+        surfaceSize: _wide,
       );
 
       // Only page "1" shown, no page "2"

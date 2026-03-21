@@ -14,7 +14,7 @@ import 'package:obers_ui/src/primitives/layout/oi_column.dart';
 ///
 /// {@category Composites}
 ///
-/// Coverage: REQ-0015
+/// Coverage: REQ-0015, REQ-0026
 @immutable
 class OiDetailField {
   /// Creates an [OiDetailField].
@@ -90,7 +90,7 @@ class OiDetailField {
 ///
 /// {@category Composites}
 ///
-/// Coverage: REQ-0015
+/// Coverage: REQ-0015, REQ-0026
 @immutable
 class OiDetailSection {
   /// Creates an [OiDetailSection].
@@ -112,11 +112,12 @@ class OiDetailSection {
 ///
 /// {@category Composites}
 ///
-/// Coverage: REQ-0015
+/// Coverage: REQ-0015, REQ-0026
 class OiDetailView extends StatelessWidget {
   /// Creates an [OiDetailView].
   const OiDetailView({
     required this.sections,
+    this.label,
     this.columns = 1,
     this.columnGap = 16.0,
     this.rowGap = 12.0,
@@ -131,6 +132,9 @@ class OiDetailView extends StatelessWidget {
 
   /// The sections of fields to render.
   final List<OiDetailSection> sections;
+
+  /// Semantic label for the detail view.
+  final String? label;
 
   /// Number of columns in the grid layout.
   final int columns;
@@ -195,6 +199,10 @@ class OiDetailView extends StatelessWidget {
 
     if (wrapInCard) {
       content = OiCard(child: content);
+    }
+
+    if (label != null) {
+      content = Semantics(label: label, child: content);
     }
 
     return content;
