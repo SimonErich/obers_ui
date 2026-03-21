@@ -5,6 +5,7 @@ import 'package:obers_ui/src/foundation/theme/component_themes/oi_button_theme_d
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_card_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_checkbox_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_dialog_theme_data.dart';
+import 'package:obers_ui/src/foundation/theme/component_themes/oi_field_display_theme.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_file_explorer_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_progress_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_select_theme_data.dart';
@@ -23,6 +24,7 @@ export 'component_themes/oi_button_theme_data.dart';
 export 'component_themes/oi_card_theme_data.dart';
 export 'component_themes/oi_checkbox_theme_data.dart';
 export 'component_themes/oi_dialog_theme_data.dart';
+export 'component_themes/oi_field_display_theme.dart';
 export 'component_themes/oi_file_explorer_theme_data.dart';
 export 'component_themes/oi_progress_theme_data.dart';
 export 'component_themes/oi_select_theme_data.dart';
@@ -63,6 +65,7 @@ class OiComponentThemes {
     this.progress,
     this.sidebar,
     this.fileExplorer,
+    this.fieldDisplay,
   });
 
   /// Creates an [OiComponentThemes] with all fields set to `null`.
@@ -85,7 +88,8 @@ class OiComponentThemes {
       avatar = null,
       progress = null,
       sidebar = null,
-      fileExplorer = null;
+      fileExplorer = null,
+      fieldDisplay = null;
 
   /// Theme overrides for button components.
   final OiButtonThemeData? button;
@@ -138,6 +142,9 @@ class OiComponentThemes {
   /// Theme overrides for file explorer components.
   final OiFileExplorerThemeData? fileExplorer;
 
+  /// Theme overrides for field display components.
+  final OiFieldDisplayThemeData? fieldDisplay;
+
   /// Creates a copy with optionally overridden component theme fields.
   OiComponentThemes copyWith({
     OiButtonThemeData? button,
@@ -157,6 +164,7 @@ class OiComponentThemes {
     OiProgressThemeData? progress,
     OiSidebarThemeData? sidebar,
     OiFileExplorerThemeData? fileExplorer,
+    OiFieldDisplayThemeData? fieldDisplay,
   }) {
     return OiComponentThemes(
       button: button ?? this.button,
@@ -176,6 +184,7 @@ class OiComponentThemes {
       progress: progress ?? this.progress,
       sidebar: sidebar ?? this.sidebar,
       fileExplorer: fileExplorer ?? this.fileExplorer,
+      fieldDisplay: fieldDisplay ?? this.fieldDisplay,
     );
   }
 
@@ -199,7 +208,8 @@ class OiComponentThemes {
         other.avatar == avatar &&
         other.progress == progress &&
         other.sidebar == sidebar &&
-        other.fileExplorer == fileExplorer;
+        other.fileExplorer == fileExplorer &&
+        other.fieldDisplay == fieldDisplay;
   }
 
   @override
@@ -219,7 +229,7 @@ class OiComponentThemes {
     sheet,
     avatar,
     progress,
-    Object.hash(sidebar, fileExplorer),
+    Object.hash(sidebar, fileExplorer, fieldDisplay),
   );
 }
 

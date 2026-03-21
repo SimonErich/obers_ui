@@ -14,54 +14,9 @@ import 'package:obers_ui/src/components/inputs/oi_tag_input.dart';
 import 'package:obers_ui/src/components/inputs/oi_text_input.dart';
 import 'package:obers_ui/src/components/inputs/oi_time_input.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
+import 'package:obers_ui/src/models/oi_field_type.dart';
 
-// ── Enums ───────────────────────────────────────────────────────────────────
-
-/// The type of a form field.
-///
-/// Determines which input widget is rendered by [OiForm].
-///
-/// {@category Composites}
-enum OiFieldType {
-  /// A single- or multi-line text input.
-  text,
-
-  /// A numeric input with stepper buttons.
-  number,
-
-  /// A date picker field.
-  date,
-
-  /// A time picker field.
-  time,
-
-  /// A dropdown select input.
-  select,
-
-  /// A checkbox toggle.
-  checkbox,
-
-  /// A switch toggle.
-  switchField,
-
-  /// A radio button group.
-  radio,
-
-  /// A slider input.
-  slider,
-
-  /// A color picker field.
-  color,
-
-  /// A file picker field.
-  file,
-
-  /// A tag/chip input for entering multiple string values.
-  tag,
-
-  /// A custom widget supplied via [OiFormField.customBuilder].
-  custom,
-}
+export 'package:obers_ui/src/models/oi_field_type.dart';
 
 /// The layout direction of form fields.
 ///
@@ -552,6 +507,18 @@ class _OiFormState extends State<OiForm> {
           maxTags: field.config?['maxTags'] as int?,
           onChanged: (v) => widget.controller.setValue(field.key, v),
         );
+
+      // Display-only field types — no form input available.
+      case OiFieldType.currency:
+      case OiFieldType.dateTime:
+      case OiFieldType.boolean:
+      case OiFieldType.email:
+      case OiFieldType.url:
+      case OiFieldType.phone:
+      case OiFieldType.image:
+      case OiFieldType.tags:
+      case OiFieldType.json:
+        return const SizedBox.shrink();
     }
   }
 

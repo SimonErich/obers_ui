@@ -29,6 +29,7 @@ export 'src/components/display/oi_code_block.dart';
 export 'src/components/display/oi_diff_view.dart';
 export 'src/components/display/oi_drop_highlight.dart';
 export 'src/components/display/oi_empty_state.dart';
+export 'src/components/display/oi_field_display.dart';
 export 'src/components/display/oi_file_grid_card.dart';
 export 'src/components/display/oi_file_icon.dart';
 export 'src/components/display/oi_file_preview.dart';
@@ -102,6 +103,7 @@ export 'src/components/panels/oi_resizable.dart';
 export 'src/components/panels/oi_split_pane.dart';
 // ── Composites: Data ─────────────────────────────────────────────────────────
 
+export 'src/composites/data/oi_detail_view.dart';
 export 'src/composites/data/oi_pagination_controller.dart';
 export 'src/composites/data/oi_table.dart';
 export 'src/composites/data/oi_table_controller.dart';
@@ -214,6 +216,7 @@ export 'src/foundation/theme/oi_theme_scope.dart';
 // ── Models ───────────────────────────────────────────────────────────────────
 
 export 'src/models/oi_cart_item.dart';
+export 'src/models/oi_field_type.dart';
 export 'src/models/oi_cart_summary.dart';
 export 'src/models/oi_file_explorer_controller.dart';
 export 'src/models/oi_file_node_data.dart';

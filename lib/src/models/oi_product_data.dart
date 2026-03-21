@@ -2,6 +2,8 @@ import 'package:flutter/foundation.dart';
 
 /// An individual product variant (e.g. "Red / Large").
 ///
+/// Coverage: REQ-0023
+///
 /// When [price] is `null` the parent [OiProductData.price] applies.
 /// When [stockCount] is `null` no stock tracking is implied at variant level.
 ///
@@ -88,9 +90,16 @@ class OiProductVariant {
     stockCount,
     Object.hashAll(attributes.entries.map((e) => Object.hash(e.key, e.value))),
   );
+
+  @override
+  String toString() =>
+      'OiProductVariant(key: $key, label: $label, price: $price, '
+      'inStock: $inStock)';
 }
 
 /// A product in the shop catalog.
+///
+/// Coverage: REQ-0022
 ///
 /// All data flows in via props — no direct coupling to any backend.
 ///
@@ -255,6 +264,11 @@ class OiProductData {
     Object.hashAll(tags),
     sku,
   );
+
+  @override
+  String toString() =>
+      'OiProductData(key: $key, name: $name, price: $price, '
+      'currencyCode: $currencyCode, inStock: $inStock)';
 }
 
 // ── Private helpers ──────────────────────────────────────────────────────────

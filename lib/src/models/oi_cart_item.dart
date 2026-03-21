@@ -2,6 +2,8 @@ import 'package:flutter/foundation.dart';
 
 /// A single item in the shopping cart.
 ///
+/// Coverage: REQ-0024
+///
 /// All data flows in via props — no direct coupling to any backend.
 ///
 /// {@category Models}
@@ -110,6 +112,11 @@ class OiCartItem {
     maxQuantity,
     Object.hashAll(attributes.entries.map((e) => Object.hash(e.key, e.value))),
   );
+
+  @override
+  String toString() =>
+      'OiCartItem(productKey: $productKey, name: $name, '
+      'unitPrice: $unitPrice, quantity: $quantity, lineTotal: $lineTotal)';
 }
 
 // ── Private helpers ──────────────────────────────────────────────────────────
