@@ -94,8 +94,11 @@ export 'src/components/navigation/oi_breadcrumbs.dart';
 export 'src/components/navigation/oi_date_picker.dart';
 export 'src/components/navigation/oi_drawer.dart';
 export 'src/components/navigation/oi_emoji_picker.dart';
+export 'src/components/navigation/oi_locale_switcher.dart';
 export 'src/components/navigation/oi_tabs.dart';
+export 'src/components/navigation/oi_theme_toggle.dart';
 export 'src/components/navigation/oi_time_picker.dart';
+export 'src/components/navigation/oi_user_menu.dart';
 // ── Components: Overlays ─────────────────────────────────────────────────────
 
 export 'src/components/overlays/oi_context_menu.dart';

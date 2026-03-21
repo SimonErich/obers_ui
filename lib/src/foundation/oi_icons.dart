@@ -193,6 +193,29 @@ class OiIcons {
   /// Star / favourite icon.
   static const star = IconData(0xe838, fontFamily: 'MaterialIcons');
 
+  // ── Settings & Appearance ──────────────────────────────────────────
+
+  /// Sun icon for light mode.
+  static const lightMode = IconData(0xe518, fontFamily: 'MaterialIcons');
+
+  /// Moon icon for dark mode.
+  static const darkMode = IconData(0xe1ad, fontFamily: 'MaterialIcons');
+
+  /// Monitor / desktop icon for system theme mode.
+  static const monitor = IconData(0xe30b, fontFamily: 'MaterialIcons');
+
+  /// Globe icon for language / locale selection.
+  static const language = IconData(0xe894, fontFamily: 'MaterialIcons');
+
+  /// Logout / sign-out icon.
+  static const logout = IconData(0xe9ba, fontFamily: 'MaterialIcons');
+
+  /// Settings / gear icon.
+  static const settings = IconData(0xe8b8, fontFamily: 'MaterialIcons');
+
+  /// Account circle icon for user profile.
+  static const accountCircle = IconData(0xe853, fontFamily: 'MaterialIcons');
+
   // ── People & Identity ───────────────────────────────────────────────
 
   /// Single person icon.

@@ -1,4 +1,6 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/src/components/buttons/oi_button.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 
 /// A centered empty-state layout with an icon or illustration, title,
@@ -17,6 +19,93 @@ class OiEmptyState extends StatelessWidget {
     this.action,
     super.key,
   });
+
+  /// Creates a "Page not found" empty state (404).
+  ///
+  /// Accepts optional [title] override (defaults to "Page not found"),
+  /// [description], [actionLabel] and [onAction] for a primary action button.
+  factory OiEmptyState.notFound({
+    String? title,
+    String? description,
+    String? actionLabel,
+    VoidCallback? onAction,
+    Key? key,
+  }) {
+    return OiEmptyState(
+      key: key,
+      title: title ?? 'Page not found',
+      icon: const IconData(0xe894, fontFamily: 'MaterialIcons'), // search_off
+      description: description,
+      action: actionLabel != null && onAction != null
+          ? OiButton.primary(
+              label: actionLabel,
+              onTap: onAction,
+              semanticLabel: actionLabel,
+            )
+          : null,
+    );
+  }
+
+  /// Creates an "Access denied" empty state (403).
+  ///
+  /// Accepts optional [title] override (defaults to "Access denied"),
+  /// [description], [actionLabel] and [onAction] for a primary action button.
+  factory OiEmptyState.forbidden({
+    String? title,
+    String? description,
+    String? actionLabel,
+    VoidCallback? onAction,
+    Key? key,
+  }) {
+    return OiEmptyState(
+      key: key,
+      title: title ?? 'Access denied',
+      icon: const IconData(0xe897, fontFamily: 'MaterialIcons'), // lock
+      description: description,
+      action: actionLabel != null && onAction != null
+          ? OiButton.primary(
+              label: actionLabel,
+              onTap: onAction,
+              semanticLabel: actionLabel,
+            )
+          : null,
+    );
+  }
+
+  /// Creates a "Something went wrong" empty state (500).
+  ///
+  /// Accepts optional [title] override (defaults to "Something went wrong"),
+  /// [description], [actionLabel], [onAction], and an optional [error] object
+  /// whose `.toString()` is shown in debug mode only.
+  factory OiEmptyState.error({
+    String? title,
+    String? description,
+    String? actionLabel,
+    VoidCallback? onAction,
+    Object? error,
+    Key? key,
+  }) {
+    String? resolvedDescription = description;
+    if (error != null && kDebugMode) {
+      final errorStr = error.toString();
+      resolvedDescription = resolvedDescription != null
+          ? '$resolvedDescription\n$errorStr'
+          : errorStr;
+    }
+    return OiEmptyState(
+      key: key,
+      title: title ?? 'Something went wrong',
+      icon: const IconData(0xe002, fontFamily: 'MaterialIcons'), // error
+      description: resolvedDescription,
+      action: actionLabel != null && onAction != null
+          ? OiButton.primary(
+              label: actionLabel,
+              onTap: onAction,
+              semanticLabel: actionLabel,
+            )
+          : null,
+    );
+  }
 
   /// An optional icon shown above the title.
   ///

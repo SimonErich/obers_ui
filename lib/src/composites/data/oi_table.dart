@@ -9,6 +9,7 @@ import 'package:obers_ui/src/foundation/persistence/oi_settings_driver.dart';
 import 'package:obers_ui/src/foundation/persistence/oi_settings_mixin.dart';
 import 'package:obers_ui/src/foundation/persistence/oi_settings_provider.dart';
 import 'package:obers_ui/src/components/display/oi_pagination.dart';
+import 'package:obers_ui/src/components/feedback/oi_bulk_bar.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/models/settings/oi_table_settings.dart';
 
@@ -179,6 +180,7 @@ class OiTable<T> extends StatefulWidget {
     this.settingsDriver,
     this.settingsKey,
     this.settingsNamespace = 'oi_table',
+    this.bulkActions,
     this.settingsSaveDebounce = const Duration(milliseconds: 500),
     super.key,
   });
@@ -322,6 +324,12 @@ class OiTable<T> extends StatefulWidget {
 
   /// Fixed row height. When `null` rows size to their content.
   final double? rowHeight;
+
+  // ── Bulk actions ─────────────────────────────────────────────────────────
+
+  /// Bulk action definitions. When provided and rows are selected, an
+  /// [OiBulkBar] automatically appears at the bottom of the table.
+  final List<OiBulkAction>? bulkActions;
 
   // ── Status bar ────────────────────────────────────────────────────────────
 
@@ -679,11 +687,47 @@ class _OiTableState<T> extends State<OiTable<T>>
     Clipboard.setData(ClipboardData(text: buffer.toString()));
   }
 
+  // ── Bulk bar ──────────────────────────────────────────────────────────────
+
+  Widget _buildBulkBar() {
+    final selectedCount = _ctrl.selectedRows.length;
+    final totalCount = widget.rows.length;
+    return Positioned(
+      left: 0,
+      right: 0,
+      bottom: 0,
+      child: Center(
+        child: OiBulkBar(
+          selectedCount: selectedCount,
+          totalCount: totalCount,
+          label: 'rows',
+          actions: widget.bulkActions!,
+          allSelected: _ctrl.selectAll,
+          onSelectAll: () {
+            final allKeys = <String>{};
+            for (var i = 0; i < widget.rows.length; i++) {
+              allKeys.add(_rowKeyAt(widget.rows[i], i));
+            }
+            _ctrl.selectAllRows(allKeys);
+            widget.onSelectionChanged?.call(Set<String>.from(_ctrl.selectedRows));
+          },
+          onDeselectAll: () {
+            _ctrl.clearSelection();
+            widget.onSelectionChanged?.call(Set<String>.from(_ctrl.selectedRows));
+          },
+        ),
+      ),
+    );
+  }
+
   // ── Build ─────────────────────────────────────────────────────────────────
 
   @override
   Widget build(BuildContext context) {
-    return Semantics(
+    final hasBulkActions = widget.bulkActions != null &&
+        widget.bulkActions!.isNotEmpty;
+
+    final tableContent = Semantics(
       label: widget.label,
       explicitChildNodes: true,
       child: KeyboardListener(
@@ -710,6 +754,15 @@ class _OiTableState<T> extends State<OiTable<T>>
           ],
         ),
       ),
+    );
+
+    if (!hasBulkActions) return tableContent;
+
+    return Stack(
+      children: [
+        tableContent,
+        _buildBulkBar(),
+      ],
     );
   }
 
