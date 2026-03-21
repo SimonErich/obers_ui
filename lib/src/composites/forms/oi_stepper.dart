@@ -1,4 +1,6 @@
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/obers_ui.dart' show OiWizard;
+import 'package:obers_ui/src/composites/forms/oi_wizard.dart' show OiWizard;
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 
 /// The style of the stepper.
@@ -27,7 +29,9 @@ enum OiStepperStyle {
 class OiStepper extends StatelessWidget {
   /// Creates an [OiStepper].
   const OiStepper({
-    required this.totalSteps, required this.currentStep, super.key,
+    required this.totalSteps,
+    required this.currentStep,
+    super.key,
     this.stepLabels,
     this.stepIcons,
     this.style = OiStepperStyle.horizontal,
@@ -223,10 +227,7 @@ class OiStepper extends StatelessWidget {
       }
     }
 
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: children,
-    );
+    return Row(mainAxisSize: MainAxisSize.min, children: children);
   }
 
   /// Builds the vertical layout.

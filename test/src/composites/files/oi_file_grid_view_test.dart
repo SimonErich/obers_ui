@@ -1,3 +1,4 @@
+// Tests do not require documentation comments.
 // ignore_for_file: public_member_api_docs
 
 import 'package:flutter/gestures.dart';
@@ -137,7 +138,9 @@ void main() {
     // ── Loading state ─────────────────────────────────────────────────────
     // ══════════════════════════════════════════════════════════════════════════
 
-    testWidgets('renders loading skeleton when loading is true', (tester) async {
+    testWidgets('renders loading skeleton when loading is true', (
+      tester,
+    ) async {
       await tester.pumpObers(_gridView(loading: true));
       // Loading state shows 8 placeholder containers, not actual file names
       expect(find.text('document.pdf'), findsNothing);
@@ -155,33 +158,27 @@ void main() {
 
     testWidgets('tapping a file calls onSelectionChange', (tester) async {
       Set<Object>? selected;
-      await tester.pumpObers(
-        _gridView(onSelectionChange: (s) => selected = s),
-      );
+      await tester.pumpObers(_gridView(onSelectionChange: (s) => selected = s));
       await _tapAndSettle(tester, find.text('document.pdf'));
       expect(selected, {'file1'});
     });
 
     testWidgets('tapping another file changes selection', (tester) async {
       Set<Object>? selected;
-      await tester.pumpObers(
-        _gridView(onSelectionChange: (s) => selected = s),
-      );
+      await tester.pumpObers(_gridView(onSelectionChange: (s) => selected = s));
       await _tapAndSettle(tester, find.text('image.png'));
       expect(selected, {'file2'});
     });
 
     testWidgets('selected keys are visually indicated', (tester) async {
-      await tester.pumpObers(
-        _gridView(selectedKeys: {'file1'}),
-      );
+      await tester.pumpObers(_gridView(selectedKeys: {'file1'}));
       // The widget should render with the selected file highlighted.
       // We verify through Semantics that the selected flag is set.
       final semantics = tester.widget<Semantics>(
         find.byWidgetPredicate(
           (w) =>
               w is Semantics &&
-              w.properties.selected == true &&
+              (w.properties.selected ?? false) &&
               (w.properties.label?.contains('document.pdf') ?? false),
         ),
       );
@@ -194,9 +191,7 @@ void main() {
 
     testWidgets('double tapping a file calls onOpen', (tester) async {
       OiFileNodeData? opened;
-      await tester.pumpObers(
-        _gridView(onOpen: (f) => opened = f),
-      );
+      await tester.pumpObers(_gridView(onOpen: (f) => opened = f));
       await tester.tap(find.text('document.pdf'));
       await tester.pump(const Duration(milliseconds: 50));
       await tester.tap(find.text('document.pdf'));
@@ -206,9 +201,7 @@ void main() {
 
     testWidgets('double tapping a folder calls onOpen', (tester) async {
       OiFileNodeData? opened;
-      await tester.pumpObers(
-        _gridView(onOpen: (f) => opened = f),
-      );
+      await tester.pumpObers(_gridView(onOpen: (f) => opened = f));
       await tester.tap(find.text('Documents'));
       await tester.pump(const Duration(milliseconds: 50));
       await tester.tap(find.text('Documents'));
@@ -232,9 +225,7 @@ void main() {
     });
 
     testWidgets('custom semantics label is applied', (tester) async {
-      await tester.pumpObers(
-        _gridView(semanticsLabel: 'Project files grid'),
-      );
+      await tester.pumpObers(_gridView(semanticsLabel: 'Project files grid'));
       expect(
         find.byWidgetPredicate(
           (w) => w is Semantics && w.properties.label == 'Project files grid',
@@ -243,8 +234,9 @@ void main() {
       );
     });
 
-    testWidgets('file cards have semantic labels with type info',
-        (tester) async {
+    testWidgets('file cards have semantic labels with type info', (
+      tester,
+    ) async {
       await tester.pumpObers(_gridView());
       expect(
         find.byWidgetPredicate(
@@ -257,8 +249,9 @@ void main() {
       );
     });
 
-    testWidgets('folder cards have semantic label with "folder" type',
-        (tester) async {
+    testWidgets('folder cards have semantic label with "folder" type', (
+      tester,
+    ) async {
       await tester.pumpObers(_gridView());
       expect(
         find.byWidgetPredicate(
@@ -276,18 +269,14 @@ void main() {
     // ══════════════════════════════════════════════════════════════════════════
 
     testWidgets('renders with search query without errors', (tester) async {
-      await tester.pumpObers(
-        _gridView(searchQuery: 'doc'),
-      );
+      await tester.pumpObers(_gridView(searchQuery: 'doc'));
       // When search query matches, RichText with TextSpan is used for
       // highlighting instead of plain Text. Verify the widget renders.
       expect(find.byType(OiFileGridView), findsOneWidget);
     });
 
     testWidgets('empty search query shows plain text', (tester) async {
-      await tester.pumpObers(
-        _gridView(searchQuery: ''),
-      );
+      await tester.pumpObers(_gridView(searchQuery: ''));
       expect(find.text('document.pdf'), findsOneWidget);
     });
 

@@ -1,5 +1,10 @@
+import 'dart:ui' show PointerDeviceKind;
+
 import 'package:flutter/foundation.dart' show defaultTargetPlatform;
+import 'package:flutter/gestures.dart' show PointerDeviceKind;
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/obers_ui.dart' show OiApp;
+import 'package:obers_ui/src/foundation/oi_app.dart' show OiApp;
 
 /// The input modality currently in use.
 ///
@@ -34,7 +39,7 @@ class OiPlatformData {
 
   /// The height of the on-screen keyboard in logical pixels.
   ///
-  /// Sourced from [MediaQueryData.viewInsets.bottom].
+  /// Sourced from `MediaQueryData.viewInsets.bottom`.
   final double keyboardHeight;
 
   /// Whether the on-screen keyboard is currently visible.

@@ -1,5 +1,7 @@
 import 'package:flutter/foundation.dart';
+import 'package:obers_ui/obers_ui.dart' show OiTable;
 import 'package:obers_ui/src/composites/data/oi_pagination_controller.dart';
+import 'package:obers_ui/src/composites/data/oi_table.dart' show OiTable;
 import 'package:obers_ui/src/models/settings/oi_table_settings.dart';
 
 /// Controls the interactive state of an [OiTable].

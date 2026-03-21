@@ -56,7 +56,8 @@ class OiDrawer extends StatelessWidget {
           Positioned.fill(
             child: AnimatedOpacity(
               opacity: 1,
-              duration: context.animations.reducedMotion ||
+              duration:
+                  context.animations.reducedMotion ||
                       MediaQuery.disableAnimationsOf(context)
                   ? Duration.zero
                   : const Duration(milliseconds: 220),
@@ -73,7 +74,8 @@ class OiDrawer extends StatelessWidget {
         // ── Drawer panel ─────────────────────────────────────────────────────
         AnimatedSlide(
           offset: Offset(slideOffset, 0),
-          duration: context.animations.reducedMotion ||
+          duration:
+              context.animations.reducedMotion ||
                   MediaQuery.disableAnimationsOf(context)
               ? Duration.zero
               : const Duration(milliseconds: 220),

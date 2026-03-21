@@ -164,10 +164,7 @@ class OiAvatar extends StatelessWidget {
         ); // circle_outlined
       case OiPresenceStatus.away:
         // Clock/schedule icon.
-        return const IconData(
-          0xe8b5,
-          fontFamily: 'MaterialIcons',
-        ); // schedule
+        return const IconData(0xe8b5, fontFamily: 'MaterialIcons'); // schedule
       case OiPresenceStatus.busy:
         // "Do not disturb" / remove-circle icon.
         return const IconData(

@@ -14,58 +14,56 @@ List<OiCommand> _commands({
   VoidCallback? onOpen,
   VoidCallback? onSave,
   VoidCallback? onFormat,
-}) =>
-    [
+}) => [
+  OiCommand(
+    id: 'open',
+    label: 'Open File',
+    description: 'Open a file from the workspace',
+    category: 'File',
+    shortcut: const SingleActivator(LogicalKeyboardKey.keyO, control: true),
+    keywords: const ['open', 'file', 'browse'],
+    priority: 10,
+    onExecute: onOpen,
+  ),
+  OiCommand(
+    id: 'save',
+    label: 'Save',
+    description: 'Save the current file',
+    category: 'File',
+    priority: 9,
+    onExecute: onSave,
+  ),
+  const OiCommand(
+    id: 'toggle-terminal',
+    label: 'Toggle Terminal',
+    category: 'View',
+    priority: 5,
+  ),
+  OiCommand(
+    id: 'format',
+    label: 'Format Document',
+    category: 'Edit',
+    keywords: const ['prettier', 'beautify'],
+    onExecute: onFormat,
+  ),
+  const OiCommand(
+    id: 'git',
+    label: 'Git',
+    category: 'Source Control',
+    children: [
       OiCommand(
-        id: 'open',
-        label: 'Open File',
-        description: 'Open a file from the workspace',
-        category: 'File',
-        shortcut:
-            const SingleActivator(LogicalKeyboardKey.keyO, control: true),
-        keywords: const ['open', 'file', 'browse'],
-        priority: 10,
-        onExecute: onOpen,
+        id: 'git-commit',
+        label: 'Commit',
+        description: 'Commit staged changes',
       ),
       OiCommand(
-        id: 'save',
-        label: 'Save',
-        description: 'Save the current file',
-        category: 'File',
-        priority: 9,
-        onExecute: onSave,
+        id: 'git-push',
+        label: 'Push',
+        description: 'Push commits to remote',
       ),
-      const OiCommand(
-        id: 'toggle-terminal',
-        label: 'Toggle Terminal',
-        category: 'View',
-        priority: 5,
-      ),
-      OiCommand(
-        id: 'format',
-        label: 'Format Document',
-        category: 'Edit',
-        keywords: const ['prettier', 'beautify'],
-        onExecute: onFormat,
-      ),
-      const OiCommand(
-        id: 'git',
-        label: 'Git',
-        category: 'Source Control',
-        children: [
-          OiCommand(
-            id: 'git-commit',
-            label: 'Commit',
-            description: 'Commit staged changes',
-          ),
-          OiCommand(
-            id: 'git-push',
-            label: 'Push',
-            description: 'Push commits to remote',
-          ),
-        ],
-      ),
-    ];
+    ],
+  ),
+];
 
 Widget _commandBar({
   List<OiCommand>? commands,
@@ -89,10 +87,7 @@ Widget _commandBar({
 void main() {
   group('Command bar search → execute flow', () {
     testWidgets('all commands render initially', (tester) async {
-      await tester.pumpObers(
-        _commandBar(),
-        surfaceSize: const Size(700, 600),
-      );
+      await tester.pumpObers(_commandBar(), surfaceSize: const Size(700, 600));
 
       expect(find.text('Open File'), findsOneWidget);
       expect(find.text('Save'), findsOneWidget);
@@ -101,10 +96,7 @@ void main() {
     });
 
     testWidgets('type query to filter commands', (tester) async {
-      await tester.pumpObers(
-        _commandBar(),
-        surfaceSize: const Size(700, 600),
-      );
+      await tester.pumpObers(_commandBar(), surfaceSize: const Size(700, 600));
 
       final input = find.byType(EditableText);
       await tester.enterText(input.first, 'save');
@@ -116,10 +108,7 @@ void main() {
     });
 
     testWidgets('fuzzy search matches keywords', (tester) async {
-      await tester.pumpObers(
-        _commandBar(),
-        surfaceSize: const Size(700, 600),
-      );
+      await tester.pumpObers(_commandBar(), surfaceSize: const Size(700, 600));
 
       final input = find.byType(EditableText);
       await tester.enterText(input.first, 'prettier');
@@ -130,10 +119,7 @@ void main() {
     });
 
     testWidgets('clear search restores all commands', (tester) async {
-      await tester.pumpObers(
-        _commandBar(),
-        surfaceSize: const Size(700, 600),
-      );
+      await tester.pumpObers(_commandBar(), surfaceSize: const Size(700, 600));
 
       final input = find.byType(EditableText);
 
@@ -212,9 +198,7 @@ void main() {
       var saveExecuted = false;
 
       await tester.pumpObers(
-        _commandBar(
-          commands: _commands(onSave: () => saveExecuted = true),
-        ),
+        _commandBar(commands: _commands(onSave: () => saveExecuted = true)),
         surfaceSize: const Size(700, 600),
       );
 
@@ -245,10 +229,7 @@ void main() {
     });
 
     testWidgets('drill into nested commands', (tester) async {
-      await tester.pumpObers(
-        _commandBar(),
-        surfaceSize: const Size(700, 600),
-      );
+      await tester.pumpObers(_commandBar(), surfaceSize: const Size(700, 600));
 
       // Search for the parent "Git" command.
       final input = find.byType(EditableText);

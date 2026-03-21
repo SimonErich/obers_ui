@@ -239,7 +239,9 @@ class OiFormController extends ChangeNotifier {
 class OiForm extends StatefulWidget {
   /// Creates an [OiForm].
   const OiForm({
-    required this.sections, required this.controller, super.key,
+    required this.sections,
+    required this.controller,
+    super.key,
     this.onSubmit,
     this.onCancel,
     this.autoValidate = false,

@@ -31,18 +31,13 @@ void main() {
 
   testWidgets('renders child', (tester) async {
     await tester.pumpObers(
-      const OiContainer(
-        breakpoint: OiBreakpoint.compact,
-        child: Text('hello'),
-      ),
+      const OiContainer(breakpoint: OiBreakpoint.compact, child: Text('hello')),
     );
     expect(find.text('hello'), findsOneWidget);
   });
 
   testWidgets('renders without child', (tester) async {
-    await tester.pumpObers(
-      const OiContainer(breakpoint: OiBreakpoint.compact),
-    );
+    await tester.pumpObers(const OiContainer(breakpoint: OiBreakpoint.compact));
     expect(find.byType(OiContainer), findsOneWidget);
   });
 
@@ -65,10 +60,7 @@ void main() {
 
   testWidgets('maxWidth defaults to infinity when not set', (tester) async {
     await tester.pumpObers(
-      const OiContainer(
-        breakpoint: OiBreakpoint.compact,
-        child: Text('x'),
-      ),
+      const OiContainer(breakpoint: OiBreakpoint.compact, child: Text('x')),
     );
     final boxes = tester
         .widgetList<ConstrainedBox>(find.byType(ConstrainedBox))
@@ -147,7 +139,10 @@ void main() {
       var boxes = tester
           .widgetList<ConstrainedBox>(find.byType(ConstrainedBox))
           .toList();
-      expect(boxes.any((b) => b.constraints.maxWidth == double.infinity), isTrue);
+      expect(
+        boxes.any((b) => b.constraints.maxWidth == double.infinity),
+        isTrue,
+      );
 
       // Expanded → maxWidth 960.
       await pumpAtWidth(
@@ -181,8 +176,7 @@ void main() {
     });
 
     testWidgets('responsive padding varies with breakpoint', (tester) async {
-      final responsivePadding =
-          OiResponsive<EdgeInsetsGeometry>.breakpoints({
+      final responsivePadding = OiResponsive<EdgeInsetsGeometry>.breakpoints({
         OiBreakpoint.compact: const EdgeInsets.all(8),
         OiBreakpoint.expanded: const EdgeInsets.all(24),
       });
@@ -242,11 +236,8 @@ void main() {
       expect(boxes.any((b) => b.constraints.maxWidth == 1200), isTrue);
     });
 
-    testWidgets('breakpoint param resolves padding correctly', (
-      tester,
-    ) async {
-      final responsivePadding =
-          OiResponsive<EdgeInsetsGeometry>.breakpoints({
+    testWidgets('breakpoint param resolves padding correctly', (tester) async {
+      final responsivePadding = OiResponsive<EdgeInsetsGeometry>.breakpoints({
         OiBreakpoint.compact: const EdgeInsets.all(8),
         OiBreakpoint.expanded: const EdgeInsets.all(32),
       });

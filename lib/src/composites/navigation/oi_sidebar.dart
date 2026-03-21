@@ -239,8 +239,7 @@ class _OiSidebarState extends State<OiSidebar>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final newDriver =
-        widget.settingsDriver ?? OiSettingsProvider.of(context);
+    final newDriver = widget.settingsDriver ?? OiSettingsProvider.of(context);
     if (newDriver != _resolvedDriver) {
       _resolvedDriver = newDriver;
       if (settingsLoaded) {
@@ -517,7 +516,10 @@ class _OiSidebarState extends State<OiSidebar>
             ),
           ),
           if (item.badgeCount != null && item.badgeCount! > 0)
-            OiBadge.filled(label: item.badgeCount.toString(), size: OiBadgeSize.small),
+            OiBadge.filled(
+              label: item.badgeCount.toString(),
+              size: OiBadgeSize.small,
+            ),
           if (hasKids)
             Padding(
               padding: const EdgeInsets.only(left: 4),

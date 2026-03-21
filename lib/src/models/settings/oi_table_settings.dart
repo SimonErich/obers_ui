@@ -1,4 +1,6 @@
 import 'package:flutter/foundation.dart';
+import 'package:obers_ui/obers_ui.dart' show OiTable;
+import 'package:obers_ui/src/composites/data/oi_table.dart' show OiTable;
 import 'package:obers_ui/src/foundation/persistence/oi_settings_data.dart';
 
 /// Settings for [OiTable] that can be persisted.

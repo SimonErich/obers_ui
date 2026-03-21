@@ -41,8 +41,7 @@ void main() {
         final swatch = OiColorSwatch.from(blue);
         final baseHsl = HSLColor.fromColor(blue);
         final lightHsl = HSLColor.fromColor(swatch.light);
-        final expectedLightness =
-            (baseHsl.lightness + 0.20).clamp(0.0, 1.0);
+        final expectedLightness = (baseHsl.lightness + 0.20).clamp(0.0, 1.0);
         expect(lightHsl.lightness, closeTo(expectedLightness, 0.01));
       });
 
@@ -58,8 +57,7 @@ void main() {
         final swatch = OiColorSwatch.from(blue);
         final baseHsl = HSLColor.fromColor(blue);
         final darkHsl = HSLColor.fromColor(swatch.dark);
-        final expectedLightness =
-            (baseHsl.lightness - 0.20).clamp(0.0, 1.0);
+        final expectedLightness = (baseHsl.lightness - 0.20).clamp(0.0, 1.0);
         expect(darkHsl.lightness, closeTo(expectedLightness, 0.01));
       });
 
@@ -74,8 +72,7 @@ void main() {
         final swatch = OiColorSwatch.from(blue);
         final baseHsl = HSLColor.fromColor(blue);
         final mutedHsl = HSLColor.fromColor(swatch.muted);
-        final expectedSaturation =
-            (baseHsl.saturation * 0.4).clamp(0.0, 1.0);
+        final expectedSaturation = (baseHsl.saturation * 0.4).clamp(0.0, 1.0);
         expect(mutedHsl.saturation, closeTo(expectedSaturation, 0.01));
       });
 
@@ -83,8 +80,7 @@ void main() {
         final swatch = OiColorSwatch.from(blue);
         final baseHsl = HSLColor.fromColor(blue);
         final mutedHsl = HSLColor.fromColor(swatch.muted);
-        final expectedLightness =
-            (baseHsl.lightness + 0.30).clamp(0.0, 1.0);
+        final expectedLightness = (baseHsl.lightness + 0.30).clamp(0.0, 1.0);
         expect(mutedHsl.lightness, closeTo(expectedLightness, 0.01));
       });
 

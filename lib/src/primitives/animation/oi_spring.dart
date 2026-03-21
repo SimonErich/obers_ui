@@ -86,8 +86,9 @@ class _OiSpringState extends State<OiSpring>
     super.didChangeDependencies();
     if (context.animations.reducedMotion ||
         MediaQuery.disableAnimationsOf(context)) {
-      _controller.stop();
-      _controller.value = widget.value;
+      _controller
+        ..stop()
+        ..value = widget.value;
     }
   }
 

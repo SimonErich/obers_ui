@@ -2,8 +2,8 @@ import 'package:flutter/widgets.dart';
 
 /// A widget that wraps its [child] with pinch-to-zoom and optional pan support.
 ///
-/// Uses [GestureDetector] scale callbacks to track the current [_scale] and
-/// [_offset]. The transform is applied via [Transform] so the child renders at
+/// Uses [GestureDetector] scale callbacks to track the current scale and
+/// offset. The transform is applied via [Transform] so the child renders at
 /// the correct scale and position. When [clipBehavior] is `true` overflow is
 /// hidden with a [ClipRect].
 ///

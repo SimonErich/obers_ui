@@ -30,6 +30,6 @@ mixin OiSettingsData {
   /// The schema version of this settings class.
   ///
   /// Increment when adding, removing, or renaming fields to enable
-  /// backwards-compatibility detection in [mergeWith] implementations.
+  /// backwards-compatibility detection in mergeWith implementations.
   int get schemaVersion;
 }

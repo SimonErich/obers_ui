@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart' show Icons;
 import 'package:flutter/widgets.dart';
 
 /// Centralized icon constants for obers\_ui.
@@ -86,8 +87,10 @@ class OiIcons {
   static const attachFile = IconData(0xe226, fontFamily: 'MaterialIcons');
 
   /// Bulleted list icon.
-  static const formatListBulleted =
-      IconData(0xe152, fontFamily: 'MaterialIcons');
+  static const formatListBulleted = IconData(
+    0xe152,
+    fontFamily: 'MaterialIcons',
+  );
 
   // ── Files & Folders ─────────────────────────────────────────────────
 
@@ -150,8 +153,10 @@ class OiIcons {
   static const gridView = IconData(0xe3ea, fontFamily: 'MaterialIcons');
 
   /// Dashboard / drag indicator icon.
-  static const dashboardCustomize =
-      IconData(0xe945, fontFamily: 'MaterialIcons');
+  static const dashboardCustomize = IconData(
+    0xe945,
+    fontFamily: 'MaterialIcons',
+  );
 
   // ── Feedback & Status ───────────────────────────────────────────────
 
@@ -177,8 +182,10 @@ class OiIcons {
   static const playCircleFilled = IconData(0xe627, fontFamily: 'MaterialIcons');
 
   /// Radio button unchecked (empty circle for pending state).
-  static const radioButtonUnchecked =
-      IconData(0xef4a, fontFamily: 'MaterialIcons');
+  static const radioButtonUnchecked = IconData(
+    0xef4a,
+    fontFamily: 'MaterialIcons',
+  );
 
   /// Block / prohibited icon.
   static const block = IconData(0xe044, fontFamily: 'MaterialIcons');

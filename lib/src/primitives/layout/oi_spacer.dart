@@ -44,13 +44,11 @@ class OiSpacer extends StatelessWidget {
   /// OiSpacer.flex()           // flex: 1
   /// OiSpacer.flex(flex: 2)    // twice the space
   /// ```
-  const OiSpacer.flex({
-    this.flex = 1,
-    super.key,
-  })  : size = null,
-       axis = Axis.vertical,
-       breakpoint = OiBreakpoint.compact,
-       scale = OiBreakpointScale.defaultScale;
+  const OiSpacer.flex({this.flex = 1, super.key})
+    : size = null,
+      axis = Axis.vertical,
+      breakpoint = OiBreakpoint.compact,
+      scale = OiBreakpointScale.defaultScale;
 
   /// Fixed size in logical pixels. Used when [flex] is null.
   ///

@@ -57,7 +57,12 @@ class OiRole {
 class OiPermissions extends StatelessWidget {
   /// Creates an [OiPermissions].
   const OiPermissions({
-    required this.permissions, required this.roles, required this.matrix, required this.onChange, required this.label, super.key,
+    required this.permissions,
+    required this.roles,
+    required this.matrix,
+    required this.onChange,
+    required this.label,
+    super.key,
     this.enabled = true,
   });
 

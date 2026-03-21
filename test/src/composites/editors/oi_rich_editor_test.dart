@@ -158,7 +158,7 @@ void main() {
       );
 
       final delta = content.toDelta();
-      final ops = delta['ops'] as List<dynamic>;
+      final ops = delta['ops'] as List<Map<String, dynamic>>;
 
       // Verify specific insert values and block attributes exist in ops.
       expect(ops.any((op) => op['insert'] == 'Title'), isTrue);
@@ -186,7 +186,7 @@ void main() {
       );
 
       final delta = content.toDelta();
-      final ops = delta['ops'] as List<dynamic>;
+      final ops = delta['ops'] as List<Map<String, dynamic>>;
 
       expect(
         ops.any(
@@ -228,7 +228,7 @@ void main() {
       );
 
       final delta = content.toDelta();
-      final ops = delta['ops'] as List<dynamic>;
+      final ops = delta['ops'] as List<Map<String, dynamic>>;
 
       expect(
         ops.any(
@@ -265,7 +265,7 @@ void main() {
       );
 
       final delta = content.toDelta();
-      final ops = delta['ops'] as List<dynamic>;
+      final ops = delta['ops'] as List<Map<String, dynamic>>;
 
       expect(
         ops.any(
@@ -291,10 +291,7 @@ void main() {
         text: 'Hello',
         bold: true,
       );
-      const b = OiContentBlock(
-        type: OiBlockType.paragraph,
-        text: 'Hello',
-      );
+      const b = OiContentBlock(type: OiBlockType.paragraph, text: 'Hello');
       const c = OiContentBlock(
         type: OiBlockType.paragraph,
         text: 'Hello',
@@ -429,7 +426,7 @@ void main() {
       addTearDown(controller.dispose);
 
       final delta = controller.toDelta();
-      expect(delta, containsPair('ops', isA<List>()));
+      expect(delta, containsPair('ops', isA<List<dynamic>>()));
     });
 
     test('wordCount delegates to content', () {
@@ -629,9 +626,7 @@ void main() {
       expect(controller.content.blocks.first.bold, isFalse);
     });
 
-    testWidgets('italic button toggles italic on active block', (
-      tester,
-    ) async {
+    testWidgets('italic button toggles italic on active block', (tester) async {
       final controller = OiRichEditorController(
         initialContent: const OiRichContent(
           blocks: [OiContentBlock(type: OiBlockType.paragraph, text: 'Hello')],

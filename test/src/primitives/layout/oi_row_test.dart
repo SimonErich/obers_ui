@@ -121,8 +121,9 @@ void main() {
 
   // ── Explicit breakpoint prop ──────────────────────────────────────────────
 
-  testWidgets('collapses when explicit breakpoint is at or below collapse',
-      (tester) async {
+  testWidgets('collapses when explicit breakpoint is at or below collapse', (
+    tester,
+  ) async {
     // Pass breakpoint explicitly — no context lookup needed for collapse check.
     await pumpAtWidth(
       tester,
@@ -137,8 +138,9 @@ void main() {
     expect(find.byType(Row), findsNothing);
   });
 
-  testWidgets('does not collapse when explicit breakpoint is above collapse',
-      (tester) async {
+  testWidgets('does not collapse when explicit breakpoint is above collapse', (
+    tester,
+  ) async {
     await pumpAtWidth(
       tester,
       const OiRow(
@@ -204,8 +206,7 @@ void main() {
         ),
         700,
       );
-      final boxes =
-          tester.widgetList<SizedBox>(find.byType(SizedBox)).toList();
+      final boxes = tester.widgetList<SizedBox>(find.byType(SizedBox)).toList();
       expect(boxes.where((b) => b.width == 6), hasLength(1));
     });
   });
@@ -222,9 +223,7 @@ void main() {
           textDirection: TextDirection.ltr,
           child: OiRow(
             breakpoint: OiBreakpoint.compact,
-            gap: OiResponsive<double>.breakpoints({
-              OiBreakpoint.compact: 8,
-            }),
+            gap: OiResponsive<double>.breakpoints({OiBreakpoint.compact: 8}),
             children: const [Text('A'), Text('B')],
           ),
         ),

@@ -21,23 +21,17 @@ void main() {
   });
 
   testWidgets('closed state renders CustomPaint', (tester) async {
-    await tester.pumpObers(
-      const OiFolderIcon(state: OiFolderIconState.closed),
-    );
+    await tester.pumpObers(const OiFolderIcon());
     expect(find.byType(CustomPaint), findsWidgets);
   });
 
   testWidgets('open state renders CustomPaint', (tester) async {
-    await tester.pumpObers(
-      const OiFolderIcon(state: OiFolderIconState.open),
-    );
+    await tester.pumpObers(const OiFolderIcon(state: OiFolderIconState.open));
     expect(find.byType(CustomPaint), findsWidgets);
   });
 
   testWidgets('empty state renders CustomPaint', (tester) async {
-    await tester.pumpObers(
-      const OiFolderIcon(state: OiFolderIconState.empty),
-    );
+    await tester.pumpObers(const OiFolderIcon(state: OiFolderIconState.empty));
     expect(find.byType(CustomPaint), findsWidgets);
   });
 
@@ -70,37 +64,27 @@ void main() {
   });
 
   testWidgets('normal variant shows no overlay icon', (tester) async {
-    await tester.pumpObers(
-      const OiFolderIcon(variant: OiFolderIconVariant.normal),
-    );
+    await tester.pumpObers(const OiFolderIcon());
     expect(find.byType(Icon), findsNothing);
   });
 
   testWidgets('badge count renders text', (tester) async {
-    await tester.pumpObers(
-      const OiFolderIcon(badgeCount: 5),
-    );
+    await tester.pumpObers(const OiFolderIcon(badgeCount: 5));
     expect(find.text('5'), findsOneWidget);
   });
 
   testWidgets('badge count over 99 shows 99+', (tester) async {
-    await tester.pumpObers(
-      const OiFolderIcon(badgeCount: 150),
-    );
+    await tester.pumpObers(const OiFolderIcon(badgeCount: 150));
     expect(find.text('99+'), findsOneWidget);
   });
 
   testWidgets('badge count of zero is not rendered', (tester) async {
-    await tester.pumpObers(
-      const OiFolderIcon(badgeCount: 0),
-    );
+    await tester.pumpObers(const OiFolderIcon(badgeCount: 0));
     expect(find.text('0'), findsNothing);
   });
 
   testWidgets('null badge count is not rendered', (tester) async {
-    await tester.pumpObers(
-      const OiFolderIcon(),
-    );
+    await tester.pumpObers(const OiFolderIcon());
     // No badge text should be present
     expect(find.byType(Text), findsNothing);
   });
@@ -115,8 +99,9 @@ void main() {
     }
   });
 
-  testWidgets('shared variant default label is "shared folder"',
-      (tester) async {
+  testWidgets('shared variant default label is "shared folder"', (
+    tester,
+  ) async {
     final handle = tester.ensureSemantics();
     try {
       await tester.pumpObers(
@@ -128,8 +113,9 @@ void main() {
     }
   });
 
-  testWidgets('starred variant default label is "starred folder"',
-      (tester) async {
+  testWidgets('starred variant default label is "starred folder"', (
+    tester,
+  ) async {
     final handle = tester.ensureSemantics();
     try {
       await tester.pumpObers(
@@ -141,8 +127,9 @@ void main() {
     }
   });
 
-  testWidgets('locked variant default label is "locked folder"',
-      (tester) async {
+  testWidgets('locked variant default label is "locked folder"', (
+    tester,
+  ) async {
     final handle = tester.ensureSemantics();
     try {
       await tester.pumpObers(
@@ -169,9 +156,7 @@ void main() {
   testWidgets('custom semanticsLabel overrides default', (tester) async {
     final handle = tester.ensureSemantics();
     try {
-      await tester.pumpObers(
-        const OiFolderIcon(semanticsLabel: 'My folder'),
-      );
+      await tester.pumpObers(const OiFolderIcon(semanticsLabel: 'My folder'));
       expect(find.bySemanticsLabel('My folder'), findsOneWidget);
     } finally {
       handle.dispose();
@@ -179,25 +164,19 @@ void main() {
   });
 
   testWidgets('custom color is applied', (tester) async {
-    await tester.pumpObers(
-      const OiFolderIcon(color: Color(0xFFFF0000)),
-    );
+    await tester.pumpObers(const OiFolderIcon(color: Color(0xFFFF0000)));
     expect(find.byType(OiFolderIcon), findsOneWidget);
   });
 
   testWidgets('xs size renders correct SizedBox dimensions', (tester) async {
-    await tester.pumpObers(
-      const OiFolderIcon(size: OiFolderIconSize.xs),
-    );
+    await tester.pumpObers(const OiFolderIcon(size: OiFolderIconSize.xs));
     final sizedBox = tester.widget<SizedBox>(find.byType(SizedBox).first);
     expect(sizedBox.width, 16);
     expect(sizedBox.height, 14);
   });
 
   testWidgets('xl size renders correct SizedBox dimensions', (tester) async {
-    await tester.pumpObers(
-      const OiFolderIcon(size: OiFolderIconSize.xl),
-    );
+    await tester.pumpObers(const OiFolderIcon(size: OiFolderIconSize.xl));
     final sizedBox = tester.widget<SizedBox>(find.byType(SizedBox).first);
     expect(sizedBox.width, 64);
     expect(sizedBox.height, 54);

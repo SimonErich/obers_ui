@@ -1,4 +1,7 @@
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/obers_ui.dart' show OiRichEditor;
+import 'package:obers_ui/src/composites/editors/oi_rich_editor.dart'
+    show OiRichEditor;
 
 // ── Data models ──────────────────────────────────────────────────────────────
 

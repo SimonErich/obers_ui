@@ -326,7 +326,7 @@ class _OiContextMenuOverlay extends StatelessWidget {
           ),
           // Menu panel at cursor position.
           Positioned(
-          left: position.dx,
+            left: position.dx,
             top: position.dy,
             child: _MenuPanel(items: items, onClose: onClose),
           ),

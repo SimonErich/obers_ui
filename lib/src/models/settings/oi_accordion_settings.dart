@@ -1,4 +1,7 @@
 import 'package:flutter/foundation.dart';
+import 'package:obers_ui/obers_ui.dart' show OiAccordion;
+import 'package:obers_ui/src/components/navigation/oi_accordion.dart'
+    show OiAccordion;
 import 'package:obers_ui/src/foundation/persistence/oi_settings_data.dart';
 
 /// Settings for [OiAccordion] that can be persisted.

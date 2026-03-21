@@ -69,6 +69,6 @@ class OiInMemorySettingsDriver extends OiSettingsDriver {
 
   /// Clears all stored settings.
   ///
-  /// Call in [tearDown] to reset state between tests.
+  /// Call in tearDown to reset state between tests.
   void clear() => store.clear();
 }

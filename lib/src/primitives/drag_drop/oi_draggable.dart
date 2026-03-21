@@ -1,6 +1,9 @@
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/obers_ui.dart' show OiDropZone;
 import 'package:obers_ui/src/foundation/oi_app.dart';
 import 'package:obers_ui/src/primitives/drag_drop/oi_drag_ghost.dart';
+import 'package:obers_ui/src/primitives/drag_drop/oi_drop_zone.dart'
+    show OiDropZone;
 
 /// A widget that makes its [child] draggable, carrying [data] to any
 /// compatible [OiDropZone].

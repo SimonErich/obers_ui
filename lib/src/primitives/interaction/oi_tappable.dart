@@ -318,4 +318,3 @@ class _OiTappableState extends State<OiTappable> {
     );
   }
 }
-

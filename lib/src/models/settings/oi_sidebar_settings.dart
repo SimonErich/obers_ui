@@ -1,4 +1,7 @@
 import 'package:flutter/foundation.dart';
+import 'package:obers_ui/obers_ui.dart' show OiSidebar;
+import 'package:obers_ui/src/composites/navigation/oi_sidebar.dart'
+    show OiSidebar;
 import 'package:obers_ui/src/foundation/persistence/oi_settings_data.dart';
 
 /// Display mode for the sidebar.

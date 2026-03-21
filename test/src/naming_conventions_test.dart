@@ -602,66 +602,68 @@ void main() {
       );
     });
 
-    test('all constructor params across all widgets meet readability standards',
-        () {
-      final ctorParamPattern = RegExp(r'\bthis\.([a-zA-Z]\w*)\b');
-      final singleCharPrefixPattern = RegExp('^[a-z][A-Z]');
-      final widgetClassPattern = RegExp(
-        r'class\s+\w+\s+extends\s+State(?:ful|less)Widget',
-      );
+    test(
+      'all constructor params across all widgets meet readability standards',
+      () {
+        final ctorParamPattern = RegExp(r'\bthis\.([a-zA-Z]\w*)\b');
+        final singleCharPrefixPattern = RegExp('^[a-z][A-Z]');
+        final widgetClassPattern = RegExp(
+          r'class\s+\w+\s+extends\s+State(?:ful|less)Widget',
+        );
 
-      final violations = <String>[];
-      var filesScanned = 0;
+        final violations = <String>[];
+        var filesScanned = 0;
 
-      for (final file in allFiles) {
-        if (file.path.contains('/_internal/')) continue;
+        for (final file in allFiles) {
+          if (file.path.contains('/_internal/')) continue;
 
-        final content = _stripComments(file.readAsStringSync());
-        if (!widgetClassPattern.hasMatch(content)) continue;
-        filesScanned++;
+          final content = _stripComments(file.readAsStringSync());
+          if (!widgetClassPattern.hasMatch(content)) continue;
+          filesScanned++;
 
-        final matches = ctorParamPattern.allMatches(content);
-        for (final m in matches) {
-          final paramName = m.group(1)!;
-          if (paramName.startsWith('_')) continue;
+          final matches = ctorParamPattern.allMatches(content);
+          for (final m in matches) {
+            final paramName = m.group(1)!;
+            if (paramName.startsWith('_')) continue;
 
-          if (paramName.length < 3 &&
-              !_shortNameAllowlist.contains(paramName)) {
-            final line = content.substring(0, m.start).split('\n').length;
-            violations.add(
-              '${file.path}:$line — this.$paramName '
-              '(name too short, use ≥ 3 characters)',
-            );
-          }
+            if (paramName.length < 3 &&
+                !_shortNameAllowlist.contains(paramName)) {
+              final line = content.substring(0, m.start).split('\n').length;
+              violations.add(
+                '${file.path}:$line — this.$paramName '
+                '(name too short, use ≥ 3 characters)',
+              );
+            }
 
-          if (singleCharPrefixPattern.hasMatch(paramName)) {
-            final line = content.substring(0, m.start).split('\n').length;
-            violations.add(
-              '${file.path}:$line — this.$paramName '
-              '(single-character camelCase prefix, use a full word)',
-            );
+            if (singleCharPrefixPattern.hasMatch(paramName)) {
+              final line = content.substring(0, m.start).split('\n').length;
+              violations.add(
+                '${file.path}:$line — this.$paramName '
+                '(single-character camelCase prefix, use a full word)',
+              );
+            }
           }
         }
-      }
 
-      expect(
-        filesScanned,
-        greaterThan(100),
-        reason:
-            'Expected to scan more than 100 widget files, but only found '
-            '$filesScanned. Check that lib/src contains the expected widgets.',
-      );
+        expect(
+          filesScanned,
+          greaterThan(100),
+          reason:
+              'Expected to scan more than 100 widget files, but only found '
+              '$filesScanned. Check that lib/src contains the expected widgets.',
+        );
 
-      expect(
-        violations,
-        isEmpty,
-        reason:
-            'All constructor parameters across all widgets must meet '
-            'readability standards: ≥ 3 characters (except allowlisted names) '
-            'and no single-character camelCase prefixes. '
-            'Violations:\n${violations.join('\n')}',
-      );
-    });
+        expect(
+          violations,
+          isEmpty,
+          reason:
+              'All constructor parameters across all widgets must meet '
+              'readability standards: ≥ 3 characters (except allowlisted names) '
+              'and no single-character camelCase prefixes. '
+              'Violations:\n${violations.join('\n')}',
+        );
+      },
+    );
 
     test('non-boolean props read like English across key widgets', () {
       // Expanded spot-checks beyond the original 4 widgets. Verifies that
@@ -830,9 +832,7 @@ void main() {
       expect(timelineContent, contains('this.onEventTap'));
 
       // OiFloating — anchor, child, visible, alignment, bottomSheetOnCompact
-      final floatingFile = File(
-        'lib/src/primitives/overlay/oi_floating.dart',
-      );
+      final floatingFile = File('lib/src/primitives/overlay/oi_floating.dart');
       final floatingContent = floatingFile.readAsStringSync();
       expect(floatingContent, contains('this.anchor'));
       expect(floatingContent, contains('this.child'));
@@ -859,7 +859,7 @@ void main() {
       expect(draggableContent, contains('this.onDragStarted'));
       expect(draggableContent, contains('this.axis'));
     });
-  });  // end REQ-0013
+  }); // end REQ-0013
 
   // ── REQ-0017: Booleans are descriptive ──────────────────────────────────────
 
@@ -1074,9 +1074,7 @@ void main() {
       );
 
       // OiRawInput — enabled, readOnly, obscureText, autofocus
-      final rawInputFile = File(
-        'lib/src/primitives/input/oi_raw_input.dart',
-      );
+      final rawInputFile = File('lib/src/primitives/input/oi_raw_input.dart');
       final rawInputContent = rawInputFile.readAsStringSync();
       expect(
         rawInputContent,
@@ -1124,9 +1122,7 @@ void main() {
       );
 
       // OiComboBox — clearable, enabled, multiSelect
-      final comboBoxFile = File(
-        'lib/src/composites/search/oi_combo_box.dart',
-      );
+      final comboBoxFile = File('lib/src/composites/search/oi_combo_box.dart');
       final comboBoxContent = comboBoxFile.readAsStringSync();
       expect(
         comboBoxContent,
@@ -1182,9 +1178,7 @@ void main() {
       );
 
       // OiProgress — indeterminate
-      final progressFile = File(
-        'lib/src/components/display/oi_progress.dart',
-      );
+      final progressFile = File('lib/src/components/display/oi_progress.dart');
       final progressContent = progressFile.readAsStringSync();
       expect(
         progressContent,
@@ -1219,8 +1213,7 @@ void main() {
       expect(
         videoPlayerContent,
         contains('this.autoPlay'),
-        reason:
-            'OiVideoPlayer should use "autoPlay" (descriptive adjective)',
+        reason: 'OiVideoPlayer should use "autoPlay" (descriptive adjective)',
       );
       expect(
         videoPlayerContent,
@@ -1230,9 +1223,7 @@ void main() {
       );
 
       // OiSurface — frosted (descriptive adjective, not noun "glass")
-      final surfaceFile = File(
-        'lib/src/primitives/display/oi_surface.dart',
-      );
+      final surfaceFile = File('lib/src/primitives/display/oi_surface.dart');
       final surfaceContent = surfaceFile.readAsStringSync();
       expect(
         surfaceContent,

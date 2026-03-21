@@ -1,4 +1,5 @@
-import 'package:flutter/rendering.dart' show SemanticsService;
+import 'dart:async';
+
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/buttons/oi_button.dart';
@@ -19,6 +20,7 @@ import 'package:obers_ui/src/composites/files/oi_file_grid_view.dart';
 import 'package:obers_ui/src/composites/files/oi_file_list_view.dart';
 import 'package:obers_ui/src/composites/files/oi_file_sidebar.dart';
 import 'package:obers_ui/src/composites/navigation/oi_shortcuts.dart';
+import 'package:obers_ui/src/foundation/oi_accessibility.dart';
 import 'package:obers_ui/src/foundation/oi_overlays.dart';
 import 'package:obers_ui/src/foundation/oi_search_debounce.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
@@ -45,7 +47,8 @@ class OiFileExplorer extends StatefulWidget {
     required this.onRename,
     required this.onDelete,
     required this.onMove,
-    required this.onUpload, this.onCopy,
+    required this.onUpload,
+    this.onCopy,
     this.onDownload,
     this.onOpen,
     this.onPreview,
@@ -85,11 +88,11 @@ class OiFileExplorer extends StatefulWidget {
 
   /// Loads the folder tree for a given parent ID.
   final Future<List<OiTreeNode<OiFileNodeData>>> Function(String parentId)
-      loadFolderTree;
+  loadFolderTree;
 
   /// Creates a new folder.
   final Future<OiFileNodeData> Function(String parentId, String name)
-      onCreateFolder;
+  onCreateFolder;
 
   /// Renames a file/folder.
   final Future<void> Function(OiFileNodeData file, String newName) onRename;
@@ -99,15 +102,20 @@ class OiFileExplorer extends StatefulWidget {
 
   /// Moves files/folders to a destination.
   final Future<void> Function(
-      List<OiFileNodeData> files, OiFileNodeData destination) onMove;
+    List<OiFileNodeData> files,
+    OiFileNodeData destination,
+  )
+  onMove;
 
   /// Copies files/folders to a destination.
   final Future<void> Function(
-      List<OiFileNodeData> files, OiFileNodeData destination)? onCopy;
+    List<OiFileNodeData> files,
+    OiFileNodeData destination,
+  )?
+  onCopy;
 
   /// Uploads files to a folder.
-  final Future<void> Function(List<OiFileData> files, String folderId)
-      onUpload;
+  final Future<void> Function(List<OiFileData> files, String folderId) onUpload;
 
   /// Downloads a file.
   final Future<void> Function(OiFileNodeData file)? onDownload;
@@ -226,7 +234,7 @@ class _OiFileExplorerState extends State<OiFileExplorer> {
       if (mounted) {
         setState(() => _folderTree = tree);
       }
-    } catch (_) {
+    } on Exception catch (_) {
       // Tree loading error handled silently
     }
   }
@@ -275,8 +283,10 @@ class _OiFileExplorerState extends State<OiFileExplorer> {
             _dismissDialog();
             await widget.onDelete(files);
             widget.controller.clearSelection();
-            widget.controller.refresh();
-            _announce('${files.length} item${files.length == 1 ? '' : 's'} deleted');
+            unawaited(widget.controller.refresh());
+            _announce(
+              '${files.length} item${files.length == 1 ? '' : 's'} deleted',
+            );
           },
           onCancel: _dismissDialog,
           permanent: true,
@@ -307,7 +317,7 @@ class _OiFileExplorerState extends State<OiFileExplorer> {
               await widget.onMove(files, destination);
             }
             widget.controller.clearSelection();
-            widget.controller.refresh();
+            unawaited(widget.controller.refresh());
             final action = copyMode ? 'copied' : 'moved';
             _announce(
               '${files.length} item${files.length == 1 ? '' : 's'} $action to ${destination.name}',
@@ -322,8 +332,7 @@ class _OiFileExplorerState extends State<OiFileExplorer> {
 
   void _showUploadDialog() {
     _dismissDialog();
-    final folderId =
-        widget.controller.currentFolder?.id.toString() ?? 'root';
+    final folderId = widget.controller.currentFolder?.id.toString() ?? 'root';
     _dialogHandle = OiDialog.show(
       context,
       label: 'Upload dialog',
@@ -336,8 +345,10 @@ class _OiFileExplorerState extends State<OiFileExplorer> {
           onUpload: (files, _) async {
             _dismissDialog();
             await widget.onUpload(files, folderId);
-            widget.controller.refresh();
-            _announce('${files.length} file${files.length == 1 ? '' : 's'} uploaded');
+            unawaited(widget.controller.refresh());
+            _announce(
+              '${files.length} file${files.length == 1 ? '' : 's'} uploaded',
+            );
           },
           onCancel: _dismissDialog,
         ),
@@ -349,181 +360,185 @@ class _OiFileExplorerState extends State<OiFileExplorer> {
   // ── Accessibility announcements ───────────────────────────────────────────
 
   void _announce(String message) {
-    SemanticsService.announce(message, TextDirection.ltr);
+    OiA11y.announce(context, message);
   }
 
   // ── Keyboard shortcut bindings ────────────────────────────────────────────
 
   List<OiShortcutBinding> get _shortcuts => [
-        OiShortcutBinding(
-          activator: OiShortcutActivator.primary(LogicalKeyboardKey.keyA),
-          label: 'Select all',
-          category: 'Selection',
-          onInvoke: () {
-            if (!widget.enableMultiSelect) return;
-            widget.controller.selectAll();
-            _announce('All items selected');
-          },
-        ),
-        OiShortcutBinding(
-          activator: const SingleActivator(LogicalKeyboardKey.delete),
-          label: 'Delete',
-          category: 'Actions',
-          onInvoke: () {
-            if (!widget.enableDelete) return;
-            final selected = widget.controller.selectedFiles;
-            if (selected.isEmpty) return;
-            _showDeleteDialog(selected);
-          },
-        ),
-        OiShortcutBinding(
-          activator: const SingleActivator(LogicalKeyboardKey.backspace),
-          label: 'Delete',
-          category: 'Actions',
-          onInvoke: () {
-            if (!widget.enableDelete) return;
-            final selected = widget.controller.selectedFiles;
-            if (selected.isEmpty) return;
-            _showDeleteDialog(selected);
-          },
-        ),
-        OiShortcutBinding(
-          activator: const SingleActivator(LogicalKeyboardKey.f2),
-          label: 'Rename',
-          category: 'Actions',
-          onInvoke: () {
-            if (!widget.enableRename) return;
-            final selected = widget.controller.selectedFiles;
-            if (selected.length != 1) return;
-            widget.controller.startRename(selected.first.id);
-          },
-        ),
-        OiShortcutBinding(
-          activator: OiShortcutActivator.primary(LogicalKeyboardKey.keyF),
-          label: 'Search',
-          category: 'Navigation',
-          onInvoke: () {
-            if (!widget.enableSearch) return;
-            setState(() => _searchActive = true);
-          },
-        ),
-        OiShortcutBinding(
-          activator: const SingleActivator(LogicalKeyboardKey.escape),
-          label: 'Cancel / close search',
-          category: 'Navigation',
-          onInvoke: () {
-            if (_searchActive) {
-              setState(() {
-                _searchActive = false;
-                widget.controller.setSearchQuery('');
-              });
-            } else if (widget.controller.renamingKey != null) {
-              widget.controller.cancelRename();
-            } else if (widget.controller.selectedKeys.isNotEmpty) {
-              widget.controller.clearSelection();
-              _announce('Selection cleared');
-            }
-          },
-        ),
-        OiShortcutBinding(
-          activator: OiShortcutActivator.primary(LogicalKeyboardKey.keyX),
-          label: 'Cut (for keyboard move)',
-          category: 'Clipboard',
-          onInvoke: () {
-            final selected = widget.controller.selectedFiles;
-            if (selected.isEmpty) return;
-            _clipboard = List.of(selected);
-            _clipboardIsCut = true;
-            _announce(
-              '${selected.length} item${selected.length == 1 ? '' : 's'} cut',
-            );
-          },
-        ),
-        OiShortcutBinding(
-          activator: OiShortcutActivator.primary(LogicalKeyboardKey.keyC),
-          label: 'Copy (for keyboard copy)',
-          category: 'Clipboard',
-          onInvoke: () {
-            if (widget.onCopy == null) return;
-            final selected = widget.controller.selectedFiles;
-            if (selected.isEmpty) return;
-            _clipboard = List.of(selected);
-            _clipboardIsCut = false;
-            _announce(
-              '${selected.length} item${selected.length == 1 ? '' : 's'} copied to clipboard',
-            );
-          },
-        ),
-        OiShortcutBinding(
-          activator: OiShortcutActivator.primary(LogicalKeyboardKey.keyV),
-          label: 'Paste (move/copy here)',
-          category: 'Clipboard',
-          onInvoke: () async {
-            if (_clipboard.isEmpty) return;
-            final folder = widget.controller.currentFolder;
-            if (folder == null) return;
-            if (_clipboardIsCut) {
-              await widget.onMove(_clipboard, folder);
-              _announce(
-                '${_clipboard.length} item${_clipboard.length == 1 ? '' : 's'} moved here',
-              );
-            } else {
-              await widget.onCopy?.call(_clipboard, folder);
-              _announce(
-                '${_clipboard.length} item${_clipboard.length == 1 ? '' : 's'} copied here',
-              );
-            }
-            _clipboard = [];
-            _clipboardIsCut = false;
-            widget.controller.clearSelection();
-            widget.controller.refresh();
-          },
-        ),
-        OiShortcutBinding(
-          activator: OiShortcutActivator.primary(LogicalKeyboardKey.keyU),
-          label: 'Upload',
-          category: 'Actions',
-          onInvoke: () {
-            if (!widget.enableUpload) return;
-            _showUploadDialog();
-          },
-        ),
-        OiShortcutBinding(
-          activator: OiShortcutActivator.primary(LogicalKeyboardKey.keyN,
-              shift: true),
-          label: 'New folder',
-          category: 'Actions',
-          onInvoke: () async {
-            final folderId =
-                widget.controller.currentFolder?.id.toString() ?? 'root';
-            await widget.onCreateFolder(folderId, 'New Folder');
-            widget.controller.refresh();
-            _announce('New folder created');
-          },
-        ),
-        OiShortcutBinding(
-          activator: const SingleActivator(LogicalKeyboardKey.backspace,
-              alt: true),
-          label: 'Go back',
-          category: 'Navigation',
-          onInvoke: () {
-            if (widget.controller.canGoBack) {
-              widget.controller.goBack();
-            }
-          },
-        ),
-        OiShortcutBinding(
-          activator: const SingleActivator(LogicalKeyboardKey.backspace,
-              alt: true, shift: true),
-          label: 'Go forward',
-          category: 'Navigation',
-          onInvoke: () {
-            if (widget.controller.canGoForward) {
-              widget.controller.goForward();
-            }
-          },
-        ),
-      ];
+    OiShortcutBinding(
+      activator: OiShortcutActivator.primary(LogicalKeyboardKey.keyA),
+      label: 'Select all',
+      category: 'Selection',
+      onInvoke: () {
+        if (!widget.enableMultiSelect) return;
+        widget.controller.selectAll();
+        _announce('All items selected');
+      },
+    ),
+    OiShortcutBinding(
+      activator: const SingleActivator(LogicalKeyboardKey.delete),
+      label: 'Delete',
+      category: 'Actions',
+      onInvoke: () {
+        if (!widget.enableDelete) return;
+        final selected = widget.controller.selectedFiles;
+        if (selected.isEmpty) return;
+        _showDeleteDialog(selected);
+      },
+    ),
+    OiShortcutBinding(
+      activator: const SingleActivator(LogicalKeyboardKey.backspace),
+      label: 'Delete',
+      category: 'Actions',
+      onInvoke: () {
+        if (!widget.enableDelete) return;
+        final selected = widget.controller.selectedFiles;
+        if (selected.isEmpty) return;
+        _showDeleteDialog(selected);
+      },
+    ),
+    OiShortcutBinding(
+      activator: const SingleActivator(LogicalKeyboardKey.f2),
+      label: 'Rename',
+      category: 'Actions',
+      onInvoke: () {
+        if (!widget.enableRename) return;
+        final selected = widget.controller.selectedFiles;
+        if (selected.length != 1) return;
+        widget.controller.startRename(selected.first.id);
+      },
+    ),
+    OiShortcutBinding(
+      activator: OiShortcutActivator.primary(LogicalKeyboardKey.keyF),
+      label: 'Search',
+      category: 'Navigation',
+      onInvoke: () {
+        if (!widget.enableSearch) return;
+        setState(() => _searchActive = true);
+      },
+    ),
+    OiShortcutBinding(
+      activator: const SingleActivator(LogicalKeyboardKey.escape),
+      label: 'Cancel / close search',
+      category: 'Navigation',
+      onInvoke: () {
+        if (_searchActive) {
+          setState(() {
+            _searchActive = false;
+            widget.controller.setSearchQuery('');
+          });
+        } else if (widget.controller.renamingKey != null) {
+          widget.controller.cancelRename();
+        } else if (widget.controller.selectedKeys.isNotEmpty) {
+          widget.controller.clearSelection();
+          _announce('Selection cleared');
+        }
+      },
+    ),
+    OiShortcutBinding(
+      activator: OiShortcutActivator.primary(LogicalKeyboardKey.keyX),
+      label: 'Cut (for keyboard move)',
+      category: 'Clipboard',
+      onInvoke: () {
+        final selected = widget.controller.selectedFiles;
+        if (selected.isEmpty) return;
+        _clipboard = List.of(selected);
+        _clipboardIsCut = true;
+        _announce(
+          '${selected.length} item${selected.length == 1 ? '' : 's'} cut',
+        );
+      },
+    ),
+    OiShortcutBinding(
+      activator: OiShortcutActivator.primary(LogicalKeyboardKey.keyC),
+      label: 'Copy (for keyboard copy)',
+      category: 'Clipboard',
+      onInvoke: () {
+        if (widget.onCopy == null) return;
+        final selected = widget.controller.selectedFiles;
+        if (selected.isEmpty) return;
+        _clipboard = List.of(selected);
+        _clipboardIsCut = false;
+        _announce(
+          '${selected.length} item${selected.length == 1 ? '' : 's'} copied to clipboard',
+        );
+      },
+    ),
+    OiShortcutBinding(
+      activator: OiShortcutActivator.primary(LogicalKeyboardKey.keyV),
+      label: 'Paste (move/copy here)',
+      category: 'Clipboard',
+      onInvoke: () async {
+        if (_clipboard.isEmpty) return;
+        final folder = widget.controller.currentFolder;
+        if (folder == null) return;
+        if (_clipboardIsCut) {
+          await widget.onMove(_clipboard, folder);
+          _announce(
+            '${_clipboard.length} item${_clipboard.length == 1 ? '' : 's'} moved here',
+          );
+        } else {
+          await widget.onCopy?.call(_clipboard, folder);
+          _announce(
+            '${_clipboard.length} item${_clipboard.length == 1 ? '' : 's'} copied here',
+          );
+        }
+        _clipboard = [];
+        _clipboardIsCut = false;
+        widget.controller.clearSelection();
+        unawaited(widget.controller.refresh());
+      },
+    ),
+    OiShortcutBinding(
+      activator: OiShortcutActivator.primary(LogicalKeyboardKey.keyU),
+      label: 'Upload',
+      category: 'Actions',
+      onInvoke: () {
+        if (!widget.enableUpload) return;
+        _showUploadDialog();
+      },
+    ),
+    OiShortcutBinding(
+      activator: OiShortcutActivator.primary(
+        LogicalKeyboardKey.keyN,
+        shift: true,
+      ),
+      label: 'New folder',
+      category: 'Actions',
+      onInvoke: () async {
+        final folderId =
+            widget.controller.currentFolder?.id.toString() ?? 'root';
+        await widget.onCreateFolder(folderId, 'New Folder');
+        unawaited(widget.controller.refresh());
+        _announce('New folder created');
+      },
+    ),
+    OiShortcutBinding(
+      activator: const SingleActivator(LogicalKeyboardKey.backspace, alt: true),
+      label: 'Go back',
+      category: 'Navigation',
+      onInvoke: () {
+        if (widget.controller.canGoBack) {
+          widget.controller.goBack();
+        }
+      },
+    ),
+    OiShortcutBinding(
+      activator: const SingleActivator(
+        LogicalKeyboardKey.backspace,
+        alt: true,
+        shift: true,
+      ),
+      label: 'Go forward',
+      category: 'Navigation',
+      onInvoke: () {
+        if (widget.controller.canGoForward) {
+          widget.controller.goForward();
+        }
+      },
+    ),
+  ];
 
   // ── Context menu builders ─────────────────────────────────────────────────
 
@@ -534,8 +549,8 @@ class _OiFileExplorerState extends State<OiFileExplorer> {
         OiMenuItem(
           label: 'Open',
           icon: const IconData(0xe89e, fontFamily: 'MaterialIcons'),
-          onTap: () => widget.controller
-              .navigateTo(file.id.toString(), folder: file),
+          onTap: () =>
+              widget.controller.navigateTo(file.id.toString(), folder: file),
         )
       else ...[
         if (widget.onOpen != null)
@@ -605,7 +620,7 @@ class _OiFileExplorerState extends State<OiFileExplorer> {
           final folderId =
               widget.controller.currentFolder?.id.toString() ?? 'root';
           await widget.onCreateFolder(folderId, 'New Folder');
-          widget.controller.refresh();
+          unawaited(widget.controller.refresh());
         },
       ),
       if (widget.enableUpload)
@@ -652,10 +667,7 @@ class _OiFileExplorerState extends State<OiFileExplorer> {
     );
 
     if (widget.enableKeyboardShortcuts) {
-      body = OiShortcuts(
-        shortcuts: _shortcuts,
-        child: body,
-      );
+      body = OiShortcuts(shortcuts: _shortcuts, child: body);
     }
 
     return body;
@@ -673,13 +685,13 @@ class _OiFileExplorerState extends State<OiFileExplorer> {
       width: widget.sidebarWidth,
       onNewFolder: (parent) async {
         await widget.onCreateFolder(parent.id.toString(), 'New Folder');
-        widget.controller.refresh();
+        unawaited(widget.controller.refresh());
       },
       onFileDrop: widget.enableDragDrop
           ? (files, folder) async {
               await widget.onMove(files, folder);
               widget.controller.clearSelection();
-              widget.controller.refresh();
+              unawaited(widget.controller.refresh());
               _announce(
                 '${files.length} item${files.length == 1 ? '' : 's'} moved to ${folder.name}',
               );
@@ -689,8 +701,12 @@ class _OiFileExplorerState extends State<OiFileExplorer> {
     );
   }
 
-  Widget _buildMainContent(dynamic colors, dynamic spacing,
-      List<OiFileNodeData> files, OiFileExplorerController controller) {
+  Widget _buildMainContent(
+    dynamic colors,
+    dynamic spacing,
+    List<OiFileNodeData> files,
+    OiFileExplorerController controller,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -702,7 +718,7 @@ class _OiFileExplorerState extends State<OiFileExplorer> {
             onInternalDrop: (droppedFiles, targetFolder) async {
               if (targetFolder != null) {
                 await widget.onMove(droppedFiles, targetFolder);
-                controller.refresh();
+                unawaited(controller.refresh());
                 _announce(
                   '${droppedFiles.length} item${droppedFiles.length == 1 ? '' : 's'} moved to ${targetFolder.name}',
                 );
@@ -712,7 +728,7 @@ class _OiFileExplorerState extends State<OiFileExplorer> {
               final folderId =
                   controller.currentFolder?.id.toString() ?? 'root';
               await widget.onUpload(externalFiles, folderId);
-              controller.refresh();
+              unawaited(controller.refresh());
               _announce(
                 '${externalFiles.length} file${externalFiles.length == 1 ? '' : 's'} uploaded',
               );
@@ -725,8 +741,11 @@ class _OiFileExplorerState extends State<OiFileExplorer> {
     );
   }
 
-  Widget _buildToolbar(dynamic colors, dynamic spacing,
-      OiFileExplorerController controller) {
+  Widget _buildToolbar(
+    dynamic colors,
+    dynamic spacing,
+    OiFileExplorerController controller,
+  ) {
     final isSelectionMode = controller.selectedKeys.isNotEmpty;
 
     return Semantics(
@@ -738,8 +757,9 @@ class _OiFileExplorerState extends State<OiFileExplorer> {
         ),
         decoration: BoxDecoration(
           border: Border(
-            bottom:
-                BorderSide(color: (colors as dynamic).borderSubtle as Color),
+            bottom: BorderSide(
+              color: (colors as dynamic).borderSubtle as Color,
+            ),
           ),
         ),
         child: isSelectionMode
@@ -749,8 +769,11 @@ class _OiFileExplorerState extends State<OiFileExplorer> {
     );
   }
 
-  Widget _buildNormalToolbar(dynamic colors, dynamic spacing,
-      OiFileExplorerController controller) {
+  Widget _buildNormalToolbar(
+    dynamic colors,
+    dynamic spacing,
+    OiFileExplorerController controller,
+  ) {
     return Row(
       children: [
         // Back/Forward buttons
@@ -801,11 +824,11 @@ class _OiFileExplorerState extends State<OiFileExplorer> {
         OiButtonGroup(
           label: 'View mode',
           exclusive: true,
-          selectedIndex:
-              controller.viewMode == OiFileViewMode.list ? 0 : 1,
+          selectedIndex: controller.viewMode == OiFileViewMode.list ? 0 : 1,
           onSelect: (int index) {
             controller.setViewMode(
-                index == 0 ? OiFileViewMode.list : OiFileViewMode.grid);
+              index == 0 ? OiFileViewMode.list : OiFileViewMode.grid,
+            );
           },
           items: const [
             OiButtonGroupItem(
@@ -830,10 +853,9 @@ class _OiFileExplorerState extends State<OiFileExplorer> {
           icon: const IconData(0xe2cc, fontFamily: 'MaterialIcons'),
           semanticLabel: 'New folder',
           onTap: () async {
-            final folderId =
-                controller.currentFolder?.id.toString() ?? 'root';
+            final folderId = controller.currentFolder?.id.toString() ?? 'root';
             await widget.onCreateFolder(folderId, 'New Folder');
-            controller.refresh();
+            unawaited(controller.refresh());
             _announce('New folder created');
           },
         ),
@@ -841,8 +863,11 @@ class _OiFileExplorerState extends State<OiFileExplorer> {
     );
   }
 
-  Widget _buildSelectionToolbar(dynamic colors, dynamic spacing,
-      OiFileExplorerController controller) {
+  Widget _buildSelectionToolbar(
+    dynamic colors,
+    dynamic spacing,
+    OiFileExplorerController controller,
+  ) {
     final count = controller.selectedKeys.length;
     return Row(
       children: [
@@ -886,8 +911,12 @@ class _OiFileExplorerState extends State<OiFileExplorer> {
     );
   }
 
-  Widget _buildContentArea(dynamic colors, dynamic spacing,
-      List<OiFileNodeData> files, OiFileExplorerController controller) {
+  Widget _buildContentArea(
+    dynamic colors,
+    dynamic spacing,
+    List<OiFileNodeData> files,
+    OiFileExplorerController controller,
+  ) {
     if (controller.loading) {
       if (controller.viewMode == OiFileViewMode.list) {
         return OiFileListView(
@@ -962,7 +991,7 @@ class _OiFileExplorerState extends State<OiFileExplorer> {
           if (renamingFile != null) {
             await widget.onRename(renamingFile, newName);
             controller.cancelRename();
-            controller.refresh();
+            await controller.refresh();
             _announce('Renamed to $newName');
           }
         },
@@ -971,7 +1000,7 @@ class _OiFileExplorerState extends State<OiFileExplorer> {
             ? (movedFiles, folder) async {
                 await widget.onMove(movedFiles, folder);
                 controller.clearSelection();
-                controller.refresh();
+                await controller.refresh();
                 _announce(
                   '${movedFiles.length} item${movedFiles.length == 1 ? '' : 's'} moved to ${folder.name}',
                 );
@@ -1005,7 +1034,7 @@ class _OiFileExplorerState extends State<OiFileExplorer> {
         if (renamingFile != null) {
           await widget.onRename(renamingFile, newName);
           controller.cancelRename();
-          controller.refresh();
+          await controller.refresh();
           _announce('Renamed to $newName');
         }
       },
@@ -1014,7 +1043,7 @@ class _OiFileExplorerState extends State<OiFileExplorer> {
           ? (movedFiles, folder) async {
               await widget.onMove(movedFiles, folder);
               controller.clearSelection();
-              controller.refresh();
+              await controller.refresh();
               _announce(
                 '${movedFiles.length} item${movedFiles.length == 1 ? '' : 's'} moved to ${folder.name}',
               );

@@ -37,7 +37,7 @@ class OiWizardContext {
   /// Returns to the previous step.
   final VoidCallback goPrevious;
 
-  /// Jumps to a specific step by [index].
+  /// Jumps to a specific step by index.
   final ValueChanged<int> goToStep;
 
   /// Sets a value in the shared values map.
@@ -57,7 +57,8 @@ class OiWizardStep {
   /// Creates an [OiWizardStep].
   const OiWizardStep({
     required this.title,
-    required this.builder, this.subtitle,
+    required this.builder,
+    this.subtitle,
     this.icon,
     this.validate,
     this.optional = false,
@@ -95,7 +96,8 @@ class OiWizardStep {
 class OiWizard extends StatefulWidget {
   /// Creates an [OiWizard].
   const OiWizard({
-    required this.steps, super.key,
+    required this.steps,
+    super.key,
     this.onComplete,
     this.onCancel,
     this.onStepChange,
@@ -283,7 +285,8 @@ class _OiWizardState extends State<OiWizard> {
     Widget body;
     if (widget.animated) {
       body = AnimatedSwitcher(
-        duration: context.animations.reducedMotion ||
+        duration:
+            context.animations.reducedMotion ||
                 MediaQuery.disableAnimationsOf(context)
             ? Duration.zero
             : const Duration(milliseconds: 250),

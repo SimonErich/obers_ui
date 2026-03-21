@@ -79,7 +79,9 @@ class OiSearchFilter {
   /// Creates an [OiSearchFilter].
   const OiSearchFilter({
     required this.label,
-    required this.key, required this.options, this.icon,
+    required this.key,
+    required this.options,
+    this.icon,
   });
 
   /// The display label for this filter.
@@ -104,7 +106,9 @@ class OiSearchFilter {
 class OiSearch extends StatefulWidget {
   /// Creates an [OiSearch].
   const OiSearch({
-    required this.sources, required this.label, super.key,
+    required this.sources,
+    required this.label,
+    super.key,
     this.onSelect,
     this.onDismiss,
     this.showRecent = true,

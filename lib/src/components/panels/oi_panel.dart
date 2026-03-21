@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/overlays/oi_sheet.dart'
-    show OiPanelSide;
+    show OiPanelSide, OiSheet;
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/primitives/interaction/oi_focus_trap.dart';
 

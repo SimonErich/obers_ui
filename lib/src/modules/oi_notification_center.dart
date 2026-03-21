@@ -10,7 +10,8 @@ class OiNotification {
   const OiNotification({
     required this.key,
     required this.title,
-    required this.timestamp, this.body,
+    required this.timestamp,
+    this.body,
     this.read = false,
     this.icon,
     this.leading,
@@ -56,7 +57,9 @@ class OiNotification {
 class OiNotificationCenter extends StatelessWidget {
   /// Creates an [OiNotificationCenter].
   const OiNotificationCenter({
-    required this.notifications, required this.label, super.key,
+    required this.notifications,
+    required this.label,
+    super.key,
     this.onNotificationTap,
     this.onMarkRead,
     this.onMarkAllRead,

@@ -10,7 +10,7 @@ import 'package:obers_ui/src/primitives/overlay/oi_visibility.dart';
 /// The transition style is controlled by [transition].
 ///
 /// When [autoPlay] is true (the default) the stagger animation starts
-/// automatically on mount. Set it to false and call [OiStaggerController.play]
+/// automatically on mount. Set it to false and call [OiStaggerState.play]
 /// to trigger the animation externally.
 ///
 /// Respects `MediaQuery.disableAnimations`: when the user has requested reduced

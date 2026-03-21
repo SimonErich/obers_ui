@@ -101,18 +101,12 @@ void main() {
           label: 'Click',
           enabled: false,
         ),
-        'Ghost disabled': const OiButton.ghost(
-          label: 'Click',
-          enabled: false,
-        ),
+        'Ghost disabled': const OiButton.ghost(label: 'Click', enabled: false),
         'Destructive disabled': const OiButton.destructive(
           label: 'Click',
           enabled: false,
         ),
-        'Soft disabled': const OiButton.soft(
-          label: 'Click',
-          enabled: false,
-        ),
+        'Soft disabled': const OiButton.soft(label: 'Click', enabled: false),
       },
     );
     await tester.pumpWidgetBuilder(builder);
@@ -136,18 +130,12 @@ void main() {
           label: 'Click',
           enabled: false,
         ),
-        'Ghost disabled': const OiButton.ghost(
-          label: 'Click',
-          enabled: false,
-        ),
+        'Ghost disabled': const OiButton.ghost(label: 'Click', enabled: false),
         'Destructive disabled': const OiButton.destructive(
           label: 'Click',
           enabled: false,
         ),
-        'Soft disabled': const OiButton.soft(
-          label: 'Click',
-          enabled: false,
-        ),
+        'Soft disabled': const OiButton.soft(label: 'Click', enabled: false),
       },
     );
     await tester.pumpWidgetBuilder(builder);

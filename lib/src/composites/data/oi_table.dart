@@ -8,6 +8,7 @@ import 'package:obers_ui/src/composites/data/oi_table_controller.dart';
 import 'package:obers_ui/src/foundation/persistence/oi_settings_driver.dart';
 import 'package:obers_ui/src/foundation/persistence/oi_settings_mixin.dart';
 import 'package:obers_ui/src/foundation/persistence/oi_settings_provider.dart';
+import 'package:obers_ui/src/foundation/theme/oi_color_scheme.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/models/settings/oi_table_settings.dart';
 
@@ -419,8 +420,7 @@ class _OiTableState<T> extends State<OiTable<T>>
   void didChangeDependencies() {
     super.didChangeDependencies();
     // Resolve driver: widget prop → OiSettingsProvider → null.
-    final newDriver =
-        widget.settingsDriver ?? OiSettingsProvider.of(context);
+    final newDriver = widget.settingsDriver ?? OiSettingsProvider.of(context);
     if (newDriver != _resolvedDriver) {
       _resolvedDriver = newDriver;
       // Driver changed (e.g. provider now available) — reload settings.
@@ -529,7 +529,7 @@ class _OiTableState<T> extends State<OiTable<T>>
         .toList();
   }
 
-  /// Applies client-side filter to [rows].
+  /// Applies client-side filter to rows.
   List<T> get _filteredRows {
     if (widget.serverSideFilter || _ctrl.activeFilters.isEmpty) {
       return widget.rows;
@@ -578,7 +578,7 @@ class _OiTableState<T> extends State<OiTable<T>>
     return rows.sublist(start, end);
   }
 
-  /// Returns [rows] after filter → sort → paginate pipeline.
+  /// Returns rows after filter → sort → paginate pipeline.
   List<T> get _displayRows {
     final filtered = _filteredRows;
     final sorted = _sortedRows(filtered);
@@ -625,7 +625,8 @@ class _OiTableState<T> extends State<OiTable<T>>
   void _handleRowTap(T row, int index) {
     if (widget.selectable) {
       final isShift = HardwareKeyboard.instance.isShiftPressed;
-      final isCtrlOrMeta = HardwareKeyboard.instance.isControlPressed ||
+      final isCtrlOrMeta =
+          HardwareKeyboard.instance.isControlPressed ||
           HardwareKeyboard.instance.isMetaPressed;
       final key = _rowKeyAt(row, index);
 
@@ -752,7 +753,7 @@ class _OiTableState<T> extends State<OiTable<T>>
             child: _ColumnManagerPanel<T>(
               columns: widget.columns,
               visibility: _ctrl.columnVisibility,
-              onToggle: (columnId, visible) {
+              onToggle: (columnId, {required bool visible}) {
                 _ctrl.setColumnVisible(columnId, visible: visible);
                 _columnManagerOverlay?.markNeedsBuild();
               },
@@ -805,10 +806,7 @@ class _OiTableState<T> extends State<OiTable<T>>
         final oldIdx = _ctrl.columnOrder.indexOf(draggedId);
         final newIdx = _ctrl.columnOrder.indexOf(col.id);
         if (oldIdx >= 0 && newIdx >= 0) {
-          _ctrl.reorderColumns(
-            oldIdx,
-            newIdx > oldIdx ? newIdx + 1 : newIdx,
-          );
+          _ctrl.reorderColumns(oldIdx, newIdx > oldIdx ? newIdx + 1 : newIdx);
         }
       },
       builder: (context, candidateData, rejectedData) {
@@ -821,14 +819,8 @@ class _OiTableState<T> extends State<OiTable<T>>
             child: ColoredBox(
               color: const Color(0xFFE2E8F0),
               child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 8,
-                  vertical: 4,
-                ),
-                child: Text(
-                  col.header,
-                  textDirection: TextDirection.ltr,
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                child: Text(col.header, textDirection: TextDirection.ltr),
               ),
             ),
           ),
@@ -837,10 +829,7 @@ class _OiTableState<T> extends State<OiTable<T>>
               ? DecoratedBox(
                   decoration: const BoxDecoration(
                     border: Border(
-                      left: BorderSide(
-                        color: Color(0xFF2563EB),
-                        width: 2,
-                      ),
+                      left: BorderSide(color: Color(0xFF2563EB), width: 2),
                     ),
                   ),
                   child: header,
@@ -851,12 +840,10 @@ class _OiTableState<T> extends State<OiTable<T>>
     );
   }
 
-  /// Ensures [_ctrl.columnOrder] is populated with visible column IDs.
+  /// Ensures `_ctrl.columnOrder` is populated with visible column IDs.
   void _ensureColumnOrder() {
     if (_ctrl.columnOrder.isEmpty) {
-      _ctrl.columnOrder.addAll(
-        _visibleColumns.map((c) => c.id),
-      );
+      _ctrl.columnOrder.addAll(_visibleColumns.map((c) => c.id));
     }
   }
 
@@ -904,10 +891,7 @@ class _OiTableState<T> extends State<OiTable<T>>
             ),
           ),
           if (isSorted)
-            Icon(
-              _ctrl.sortAscending ? _arrowUp : _arrowDown,
-              size: 16,
-            ),
+            Icon(_ctrl.sortAscending ? _arrowUp : _arrowDown, size: 16),
         ],
       ),
     );
@@ -917,10 +901,7 @@ class _OiTableState<T> extends State<OiTable<T>>
         width ?? col.minWidth.clamp(col.minWidth, col.maxWidth);
     final headerContent = GestureDetector(
       onTap: () => _handleHeaderTap(col),
-      child: SizedBox(
-        height: _effectiveRowHeight,
-        child: innerContent,
-      ),
+      child: SizedBox(height: _effectiveRowHeight, child: innerContent),
     );
     Widget header;
     if (col.resizable) {

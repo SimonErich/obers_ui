@@ -62,7 +62,9 @@ class OiDashboardCard {
 class OiDashboard extends StatefulWidget {
   /// Creates an [OiDashboard].
   const OiDashboard({
-    required this.cards, required this.label, super.key,
+    required this.cards,
+    required this.label,
+    super.key,
     this.columns = 4,
     this.gap = 16,
     this.editable = false,
@@ -149,8 +151,7 @@ class _OiDashboardState extends State<OiDashboard>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final newDriver =
-        widget.settingsDriver ?? OiSettingsProvider.of(context);
+    final newDriver = widget.settingsDriver ?? OiSettingsProvider.of(context);
     if (newDriver != _resolvedDriver) {
       _resolvedDriver = newDriver;
       if (settingsLoaded) {

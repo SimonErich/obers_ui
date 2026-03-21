@@ -12,7 +12,9 @@ class OiComment {
     required this.key,
     required this.authorId,
     required this.authorName,
-    required this.content, required this.timestamp, this.authorAvatar,
+    required this.content,
+    required this.timestamp,
+    this.authorAvatar,
     this.reactions,
     this.replies,
     this.edited = false,
@@ -56,7 +58,10 @@ class OiComment {
 class OiComments extends StatefulWidget {
   /// Creates an [OiComments].
   const OiComments({
-    required this.comments, required this.currentUserId, required this.label, super.key,
+    required this.comments,
+    required this.currentUserId,
+    required this.label,
+    super.key,
     this.onComment,
     this.onReply,
     this.onEdit,

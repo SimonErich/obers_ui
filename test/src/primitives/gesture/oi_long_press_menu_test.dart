@@ -1,26 +1,11 @@
 // Tests do not require documentation comments.
 // ignore_for_file: public_member_api_docs
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:obers_ui/src/foundation/oi_app.dart';
-import 'package:obers_ui/src/foundation/oi_platform.dart';
 import 'package:obers_ui/src/primitives/gesture/oi_long_press_menu.dart';
 
 import '../../../helpers/pump_app.dart';
-
-Widget _touchApp(Widget child) => OiApp(
-  home: OiPlatform(
-    data: OiPlatformData(
-      platform: defaultTargetPlatform,
-      keyboardHeight: 0,
-      keyboardVisible: false,
-      inputModality: OiInputModality.touch,
-    ),
-    child: child,
-  ),
-);
 
 void main() {
   // ── 1. Renders child ───────────────────────────────────────────────────────

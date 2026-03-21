@@ -23,207 +23,202 @@ void main() {
   // ── OiCard ────────────────────────────────────────────────────────────────
 
   group('REQ-0032 OiCard reduced motion', () {
-    testWidgets(
-      'collapsible card collapses instantly with disableAnimations',
-      (tester) async {
-        await tester.pumpObers(
-          const MediaQuery(
-            data: MediaQueryData(disableAnimations: true),
-            child: OiCard(
-              collapsible: true,
-              title: Text('Title'),
-              child: Text('body content'),
-            ),
+    testWidgets('collapsible card collapses instantly with disableAnimations', (
+      tester,
+    ) async {
+      await tester.pumpObers(
+        const MediaQuery(
+          data: MediaQueryData(disableAnimations: true),
+          child: OiCard(
+            collapsible: true,
+            title: Text('Title'),
+            child: Text('body content'),
           ),
-        );
+        ),
+      );
 
-        // Find the chevron and tap it to collapse.
-        final chevronFinder = find.byType(GestureDetector).last;
-        await tester.tap(chevronFinder);
-        await tester.pump();
+      // Find the chevron and tap it to collapse.
+      final chevronFinder = find.byType(GestureDetector).last;
+      await tester.tap(chevronFinder);
+      await tester.pump();
 
-        // SizeTransition should snap to 0 instantly — no intermediate frames.
-        final st = tester.widget<SizeTransition>(find.byType(SizeTransition));
-        expect(st.sizeFactor.value, 0.0);
-      },
-    );
+      // SizeTransition should snap to 0 instantly — no intermediate frames.
+      final st = tester.widget<SizeTransition>(find.byType(SizeTransition));
+      expect(st.sizeFactor.value, 0.0);
+    });
 
-    testWidgets(
-      'AnimatedRotation uses Duration.zero with disableAnimations',
-      (tester) async {
-        await tester.pumpObers(
-          const MediaQuery(
-            data: MediaQueryData(disableAnimations: true),
-            child: OiCard(
-              collapsible: true,
-              title: Text('Title'),
-              child: Text('body content'),
-            ),
+    testWidgets('AnimatedRotation uses Duration.zero with disableAnimations', (
+      tester,
+    ) async {
+      await tester.pumpObers(
+        const MediaQuery(
+          data: MediaQueryData(disableAnimations: true),
+          child: OiCard(
+            collapsible: true,
+            title: Text('Title'),
+            child: Text('body content'),
           ),
-        );
+        ),
+      );
 
-        final rotation = tester.widget<AnimatedRotation>(
-          find.byType(AnimatedRotation),
-        );
-        expect(rotation.duration, Duration.zero);
-      },
-    );
+      final rotation = tester.widget<AnimatedRotation>(
+        find.byType(AnimatedRotation),
+      );
+      expect(rotation.duration, Duration.zero);
+    });
   });
 
   // ── OiAccordion ───────────────────────────────────────────────────────────
 
   group('REQ-0032 OiAccordion reduced motion', () {
-    testWidgets(
-      'section expand completes instantly with disableAnimations',
-      (tester) async {
-        await tester.pumpObers(
-          MediaQuery(
-            data: const MediaQueryData(disableAnimations: true),
-            child: OiAccordion(
-              sections: [
-                OiAccordionSection(
-                  title: 'Section A',
-                  content: const Text('Content A'),
-                ),
-              ],
-            ),
+    testWidgets('section expand completes instantly with disableAnimations', (
+      tester,
+    ) async {
+      await tester.pumpObers(
+        const MediaQuery(
+          data: MediaQueryData(disableAnimations: true),
+          child: OiAccordion(
+            sections: [
+              OiAccordionSection(
+                title: 'Section A',
+                content: Text('Content A'),
+              ),
+            ],
           ),
-        );
+        ),
+      );
 
-        // Section starts collapsed (initiallyExpanded defaults to false).
-        // Tap header to expand.
-        await tester.tap(find.text('Section A'));
-        await tester.pump();
+      // Section starts collapsed (initiallyExpanded defaults to false).
+      // Tap header to expand.
+      await tester.tap(find.text('Section A'));
+      await tester.pump();
 
-        // SizeTransition should snap to 1.0 instantly.
-        final st = tester.widget<SizeTransition>(find.byType(SizeTransition));
-        expect(st.sizeFactor.value, 1.0);
-      },
-    );
+      // SizeTransition should snap to 1.0 instantly.
+      final st = tester.widget<SizeTransition>(find.byType(SizeTransition));
+      expect(st.sizeFactor.value, 1.0);
+    });
 
-    testWidgets(
-      'AnimatedRotation uses Duration.zero with disableAnimations',
-      (tester) async {
-        await tester.pumpObers(
-          MediaQuery(
-            data: const MediaQueryData(disableAnimations: true),
-            child: OiAccordion(
-              sections: [
-                OiAccordionSection(
-                  title: 'Section A',
-                  content: const Text('Content A'),
-                ),
-              ],
-            ),
+    testWidgets('AnimatedRotation uses Duration.zero with disableAnimations', (
+      tester,
+    ) async {
+      await tester.pumpObers(
+        const MediaQuery(
+          data: MediaQueryData(disableAnimations: true),
+          child: OiAccordion(
+            sections: [
+              OiAccordionSection(
+                title: 'Section A',
+                content: Text('Content A'),
+              ),
+            ],
           ),
-        );
+        ),
+      );
 
-        final rotation = tester.widget<AnimatedRotation>(
-          find.byType(AnimatedRotation),
-        );
-        expect(rotation.duration, Duration.zero);
-      },
-    );
+      final rotation = tester.widget<AnimatedRotation>(
+        find.byType(AnimatedRotation),
+      );
+      expect(rotation.duration, Duration.zero);
+    });
   });
 
   // ── OiSwitch ──────────────────────────────────────────────────────────────
 
   group('REQ-0032 OiSwitch reduced motion', () {
-    testWidgets(
-      'toggle uses Duration.zero with disableAnimations',
-      (tester) async {
-        await tester.pumpObers(
-          MediaQuery(
-            data: const MediaQueryData(disableAnimations: true),
-            child: OiSwitch(value: false, onChanged: (_) {}),
-          ),
-        );
+    testWidgets('toggle uses Duration.zero with disableAnimations', (
+      tester,
+    ) async {
+      await tester.pumpObers(
+        MediaQuery(
+          data: const MediaQueryData(disableAnimations: true),
+          child: OiSwitch(value: false, onChanged: (_) {}),
+        ),
+      );
 
-        final containers = tester.widgetList<AnimatedContainer>(
-          find.byType(AnimatedContainer),
-        );
-        for (final c in containers) {
-          expect(c.duration, Duration.zero);
-        }
-      },
-    );
+      final containers = tester.widgetList<AnimatedContainer>(
+        find.byType(AnimatedContainer),
+      );
+      for (final c in containers) {
+        expect(c.duration, Duration.zero);
+      }
+    });
   });
 
   // ── OiSentiment ───────────────────────────────────────────────────────────
 
   group('REQ-0032 OiSentiment reduced motion', () {
-    testWidgets(
-      'AnimatedContainer uses Duration.zero with disableAnimations',
-      (tester) async {
-        await tester.pumpObers(
-          MediaQuery(
-            data: const MediaQueryData(disableAnimations: true),
-            child: OiSentiment(
-              emojis: const ['😊', '😐', '😢'],
-              onChanged: (_) {},
-            ),
+    testWidgets('AnimatedContainer uses Duration.zero with disableAnimations', (
+      tester,
+    ) async {
+      await tester.pumpObers(
+        MediaQuery(
+          data: const MediaQueryData(disableAnimations: true),
+          child: OiSentiment(
+            emojis: const ['😊', '😐', '😢'],
+            onChanged: (_) {},
           ),
-        );
+        ),
+      );
 
-        final containers = tester.widgetList<AnimatedContainer>(
-          find.byType(AnimatedContainer),
-        );
-        for (final c in containers) {
-          expect(c.duration, Duration.zero);
-        }
-      },
-    );
+      final containers = tester.widgetList<AnimatedContainer>(
+        find.byType(AnimatedContainer),
+      );
+      for (final c in containers) {
+        expect(c.duration, Duration.zero);
+      }
+    });
   });
 
   // ── OiDropHighlight ───────────────────────────────────────────────────────
 
   group('REQ-0032 OiDropHighlight reduced motion', () {
-    testWidgets(
-      'AnimatedOpacity uses Duration.zero with disableAnimations',
-      (tester) async {
-        await tester.pumpObers(
-          const MediaQuery(
-            data: MediaQueryData(disableAnimations: true),
-            child: OiDropHighlight(active: true, child: SizedBox(width: 100, height: 100)),
+    testWidgets('AnimatedOpacity uses Duration.zero with disableAnimations', (
+      tester,
+    ) async {
+      await tester.pumpObers(
+        const MediaQuery(
+          data: MediaQueryData(disableAnimations: true),
+          child: OiDropHighlight(
+            active: true,
+            child: SizedBox(width: 100, height: 100),
           ),
-        );
+        ),
+      );
 
-        final opacity = tester.widget<AnimatedOpacity>(
-          find.byType(AnimatedOpacity),
-        );
-        expect(opacity.duration, Duration.zero);
-      },
-    );
+      final opacity = tester.widget<AnimatedOpacity>(
+        find.byType(AnimatedOpacity),
+      );
+      expect(opacity.duration, Duration.zero);
+    });
   });
 
   // ── OiTabs ────────────────────────────────────────────────────────────────
 
   group('REQ-0032 OiTabs reduced motion', () {
-    testWidgets(
-      'tab animations use Duration.zero with disableAnimations',
-      (tester) async {
-        await tester.pumpObers(
-          MediaQuery(
-            data: const MediaQueryData(disableAnimations: true),
-            child: OiTabs(
-              selectedIndex: 0,
-              onSelected: (_) {},
-              tabs: const [
-                OiTabItem(label: 'Tab 1'),
-                OiTabItem(label: 'Tab 2'),
-              ],
-            ),
+    testWidgets('tab animations use Duration.zero with disableAnimations', (
+      tester,
+    ) async {
+      await tester.pumpObers(
+        MediaQuery(
+          data: const MediaQueryData(disableAnimations: true),
+          child: OiTabs(
+            selectedIndex: 0,
+            onSelected: (_) {},
+            tabs: const [
+              OiTabItem(label: 'Tab 1'),
+              OiTabItem(label: 'Tab 2'),
+            ],
           ),
-        );
+        ),
+      );
 
-        final containers = tester.widgetList<AnimatedContainer>(
-          find.byType(AnimatedContainer),
-        );
-        for (final c in containers) {
-          expect(c.duration, Duration.zero);
-        }
-      },
-    );
+      final containers = tester.widgetList<AnimatedContainer>(
+        find.byType(AnimatedContainer),
+      );
+      for (final c in containers) {
+        expect(c.duration, Duration.zero);
+      }
+    });
   });
 
   // ── OiDrawer ──────────────────────────────────────────────────────────────
@@ -235,10 +230,7 @@ void main() {
         await tester.pumpObers(
           const MediaQuery(
             data: MediaQueryData(disableAnimations: true),
-            child: OiDrawer(
-              open: true,
-              child: Text('Drawer content'),
-            ),
+            child: OiDrawer(open: true, child: Text('Drawer content')),
           ),
         );
 
@@ -247,9 +239,7 @@ void main() {
         );
         expect(opacity.duration, Duration.zero);
 
-        final slide = tester.widget<AnimatedSlide>(
-          find.byType(AnimatedSlide),
-        );
+        final slide = tester.widget<AnimatedSlide>(find.byType(AnimatedSlide));
         expect(slide.duration, Duration.zero);
       },
     );
@@ -281,110 +271,101 @@ void main() {
   // ── OiSheet ───────────────────────────────────────────────────────────────
 
   group('REQ-0032 OiSheet reduced motion', () {
-    testWidgets(
-      'slide animation completes instantly with disableAnimations',
-      (tester) async {
-        await tester.pumpObers(
-          const MediaQuery(
-            data: MediaQueryData(disableAnimations: true),
-            child: OiSheet(
-              label: 'Test sheet',
-              open: true,
-              child: Text('Sheet content'),
-            ),
+    testWidgets('slide animation completes instantly with disableAnimations', (
+      tester,
+    ) async {
+      await tester.pumpObers(
+        const MediaQuery(
+          data: MediaQueryData(disableAnimations: true),
+          child: OiSheet(
+            label: 'Test sheet',
+            open: true,
+            child: Text('Sheet content'),
           ),
-        );
-        await tester.pump();
+        ),
+      );
+      await tester.pump();
 
-        // SlideTransition should be at final position immediately.
-        final slide = tester.widget<SlideTransition>(
-          find.byType(SlideTransition),
-        );
-        expect(slide.position.value, Offset.zero);
-      },
-    );
+      // SlideTransition should be at final position immediately.
+      final slide = tester.widget<SlideTransition>(
+        find.byType(SlideTransition),
+      );
+      expect(slide.position.value, Offset.zero);
+    });
   });
 
   // ── OiToast ───────────────────────────────────────────────────────────────
 
   group('REQ-0032 OiToast reduced motion', () {
-    testWidgets(
-      'fade-in completes instantly with disableAnimations',
-      (tester) async {
-        await tester.pumpObers(
-          const MediaQuery(
-            data: MediaQueryData(disableAnimations: true),
-            child: OiToast(
-              label: 'Test toast',
-              message: 'Hello',
-            ),
-          ),
-        );
-        await tester.pump();
+    testWidgets('fade-in completes instantly with disableAnimations', (
+      tester,
+    ) async {
+      await tester.pumpObers(
+        const MediaQuery(
+          data: MediaQueryData(disableAnimations: true),
+          child: OiToast(label: 'Test toast', message: 'Hello'),
+        ),
+      );
+      await tester.pump();
 
-        final fade = tester.widget<FadeTransition>(
-          find.byType(FadeTransition),
-        );
-        expect(fade.opacity.value, 1.0);
-      },
-    );
+      final fade = tester.widget<FadeTransition>(find.byType(FadeTransition));
+      expect(fade.opacity.value, 1.0);
+    });
   });
 
   // ── OiPanel ───────────────────────────────────────────────────────────────
 
   group('REQ-0032 OiPanel reduced motion', () {
-    testWidgets(
-      'slide animation completes instantly with disableAnimations',
-      (tester) async {
-        await tester.pumpObers(
-          const MediaQuery(
-            data: MediaQueryData(disableAnimations: true),
-            child: OiPanel(
-              label: 'Test panel',
-              open: true,
-              child: Text('Panel content'),
-            ),
+    testWidgets('slide animation completes instantly with disableAnimations', (
+      tester,
+    ) async {
+      await tester.pumpObers(
+        const MediaQuery(
+          data: MediaQueryData(disableAnimations: true),
+          child: OiPanel(
+            label: 'Test panel',
+            open: true,
+            child: Text('Panel content'),
           ),
-        );
-        await tester.pump();
+        ),
+      );
+      await tester.pump();
 
-        final slide = tester.widget<SlideTransition>(
-          find.byType(SlideTransition),
-        );
-        expect(slide.position.value, Offset.zero);
-      },
-    );
+      final slide = tester.widget<SlideTransition>(
+        find.byType(SlideTransition),
+      );
+      expect(slide.position.value, Offset.zero);
+    });
   });
 
   // ── OiWizard ──────────────────────────────────────────────────────────────
 
   group('REQ-0032 OiWizard reduced motion', () {
-    testWidgets(
-      'AnimatedSwitcher uses Duration.zero with disableAnimations',
-      (tester) async {
-        await tester.pumpObers(
-          MediaQuery(
-            data: const MediaQueryData(disableAnimations: true),
-            child: OiWizard(
-              steps: [
-                OiWizardStep(
-                  title: 'Step 1',
-                  builder: (_) => const Text('Step 1 content'),
-                ),
-                OiWizardStep(
-                  title: 'Step 2',
-                  builder: (_) => const Text('Step 2 content'),
-                ),
-              ],
-            ),
+    testWidgets('AnimatedSwitcher uses Duration.zero with disableAnimations', (
+      tester,
+    ) async {
+      await tester.pumpObers(
+        MediaQuery(
+          data: const MediaQueryData(disableAnimations: true),
+          child: OiWizard(
+            steps: [
+              OiWizardStep(
+                title: 'Step 1',
+                builder: (_) => const Text('Step 1 content'),
+              ),
+              OiWizardStep(
+                title: 'Step 2',
+                builder: (_) => const Text('Step 2 content'),
+              ),
+            ],
           ),
-        );
+        ),
+      );
 
-        final switcher = tester.widget<AnimatedSwitcher>(
-          find.byType(AnimatedSwitcher),
-        );
-        expect(switcher.duration, Duration.zero);
-      },
-    );
+      final switcher = tester.widget<AnimatedSwitcher>(
+        find.byType(AnimatedSwitcher),
+      );
+      expect(switcher.duration, Duration.zero);
+    });
   });
 }

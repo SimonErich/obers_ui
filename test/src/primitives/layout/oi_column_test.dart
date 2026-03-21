@@ -117,8 +117,9 @@ void main() {
 
   // ── Explicit breakpoint prop ──────────────────────────────────────────────
 
-  testWidgets('expands when explicit breakpoint is at or above collapse',
-      (tester) async {
+  testWidgets('expands when explicit breakpoint is at or above collapse', (
+    tester,
+  ) async {
     // Pass breakpoint explicitly — no context lookup needed for collapse check.
     await pumpAtWidth(
       tester,
@@ -133,8 +134,9 @@ void main() {
     expect(find.byType(Column), findsNothing);
   });
 
-  testWidgets('stays as Column when explicit breakpoint is below collapse',
-      (tester) async {
+  testWidgets('stays as Column when explicit breakpoint is below collapse', (
+    tester,
+  ) async {
     await pumpAtWidth(
       tester,
       const OiColumn(
@@ -160,7 +162,11 @@ void main() {
       // Compact → gap 4.
       await pumpAtWidth(
         tester,
-        OiColumn(breakpoint: OiBreakpoint.compact, gap: responsiveGap, children: const [Text('A'), Text('B')]),
+        OiColumn(
+          breakpoint: OiBreakpoint.compact,
+          gap: responsiveGap,
+          children: const [Text('A'), Text('B')],
+        ),
         400,
       );
       var boxes = tester.widgetList<SizedBox>(find.byType(SizedBox)).toList();
@@ -169,7 +175,11 @@ void main() {
       // Expanded → gap 16.
       await pumpAtWidth(
         tester,
-        OiColumn(breakpoint: OiBreakpoint.expanded, gap: responsiveGap, children: const [Text('A'), Text('B')]),
+        OiColumn(
+          breakpoint: OiBreakpoint.expanded,
+          gap: responsiveGap,
+          children: const [Text('A'), Text('B')],
+        ),
         900,
       );
       boxes = tester.widgetList<SizedBox>(find.byType(SizedBox)).toList();
@@ -190,9 +200,7 @@ void main() {
           textDirection: TextDirection.ltr,
           child: OiColumn(
             breakpoint: OiBreakpoint.compact,
-            gap: OiResponsive<double>.breakpoints({
-              OiBreakpoint.compact: 8,
-            }),
+            gap: OiResponsive<double>.breakpoints({OiBreakpoint.compact: 8}),
             children: const [Text('A')],
           ),
         ),

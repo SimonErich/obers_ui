@@ -137,12 +137,22 @@ class OiFileIcon extends StatelessWidget {
   static OiFileCategory categoryForExtension(String ext) {
     final normalized = ext.toLowerCase().replaceFirst('.', '');
     return switch (normalized) {
-      'pdf' || 'doc' || 'docx' || 'rtf' || 'odt' || 'pages' => OiFileCategory
-          .document,
-      'xls' || 'xlsx' || 'csv' || 'ods' || 'numbers' => OiFileCategory
-          .spreadsheet,
-      'ppt' || 'pptx' || 'odp' || 'key' || 'keynote' => OiFileCategory
-          .presentation,
+      'pdf' ||
+      'doc' ||
+      'docx' ||
+      'rtf' ||
+      'odt' ||
+      'pages' => OiFileCategory.document,
+      'xls' ||
+      'xlsx' ||
+      'csv' ||
+      'ods' ||
+      'numbers' => OiFileCategory.spreadsheet,
+      'ppt' ||
+      'pptx' ||
+      'odp' ||
+      'key' ||
+      'keynote' => OiFileCategory.presentation,
       'png' ||
       'jpg' ||
       'jpeg' ||
@@ -152,20 +162,28 @@ class OiFileIcon extends StatelessWidget {
       'bmp' ||
       'ico' ||
       'tiff' ||
-      'tif' =>
-        OiFileCategory.image,
-      'mp4' || 'mov' || 'avi' || 'mkv' || 'webm' || 'flv' || 'm4v' =>
-        OiFileCategory.video,
+      'tif' => OiFileCategory.image,
+      'mp4' ||
+      'mov' ||
+      'avi' ||
+      'mkv' ||
+      'webm' ||
+      'flv' ||
+      'm4v' => OiFileCategory.video,
       'mp3' ||
       'wav' ||
       'flac' ||
       'aac' ||
       'ogg' ||
       'wma' ||
-      'm4a' =>
-        OiFileCategory.audio,
-      'zip' || 'rar' || '7z' || 'tar' || 'gz' || 'bz2' || 'xz' =>
-        OiFileCategory.archive,
+      'm4a' => OiFileCategory.audio,
+      'zip' ||
+      'rar' ||
+      '7z' ||
+      'tar' ||
+      'gz' ||
+      'bz2' ||
+      'xz' => OiFileCategory.archive,
       'dart' ||
       'js' ||
       'ts' ||
@@ -186,16 +204,28 @@ class OiFileIcon extends StatelessWidget {
       'rb' ||
       'php' ||
       'lua' ||
-      'r' =>
-        OiFileCategory.code,
-      'json' || 'xml' || 'yaml' || 'yml' || 'sql' || 'toml' =>
-        OiFileCategory.data,
+      'r' => OiFileCategory.code,
+      'json' ||
+      'xml' ||
+      'yaml' ||
+      'yml' ||
+      'sql' ||
+      'toml' => OiFileCategory.data,
       'txt' || 'md' || 'log' || 'ini' || 'cfg' => OiFileCategory.text,
-      'exe' || 'app' || 'sh' || 'bat' || 'cmd' || 'msi' || 'dmg' =>
-        OiFileCategory.executable,
+      'exe' ||
+      'app' ||
+      'sh' ||
+      'bat' ||
+      'cmd' ||
+      'msi' ||
+      'dmg' => OiFileCategory.executable,
       'ttf' || 'otf' || 'woff' || 'woff2' || 'eot' => OiFileCategory.font,
-      'obj' || 'fbx' || 'gltf' || 'glb' || 'stl' || '3ds' =>
-        OiFileCategory.threeD,
+      'obj' ||
+      'fbx' ||
+      'gltf' ||
+      'glb' ||
+      'stl' ||
+      '3ds' => OiFileCategory.threeD,
       _ => OiFileCategory.generic,
     };
   }
@@ -215,8 +245,7 @@ class OiFileIcon extends StatelessWidget {
         OiFileCategory.document,
       'application/vnd.ms-excel' ||
       'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' ||
-      'text/csv' =>
-        OiFileCategory.spreadsheet,
+      'text/csv' => OiFileCategory.spreadsheet,
       'application/vnd.ms-powerpoint' ||
       'application/vnd.openxmlformats-officedocument.presentationml.presentation' =>
         OiFileCategory.presentation,
@@ -225,20 +254,18 @@ class OiFileIcon extends StatelessWidget {
       'application/vnd.rar' ||
       'application/x-tar' ||
       'application/gzip' ||
-      'application/x-7z-compressed' =>
-        OiFileCategory.archive,
-      'application/json' || 'application/xml' || 'text/xml' =>
-        OiFileCategory.data,
+      'application/x-7z-compressed' => OiFileCategory.archive,
+      'application/json' ||
+      'application/xml' ||
+      'text/xml' => OiFileCategory.data,
       'text/plain' => OiFileCategory.text,
       'text/html' ||
       'text/css' ||
       'application/javascript' ||
-      'text/javascript' =>
-        OiFileCategory.code,
+      'text/javascript' => OiFileCategory.code,
       'application/x-executable' ||
       'application/x-sh' ||
-      'application/x-msdos-program' =>
-        OiFileCategory.executable,
+      'application/x-msdos-program' => OiFileCategory.executable,
       _ => OiFileCategory.generic,
     };
   }

@@ -13,27 +13,20 @@ import '../../../helpers/pump_app.dart';
 void main() {
   group('OiNewFolderDialog', () {
     testWidgets('renders without errors', (tester) async {
-      await tester.pumpObers(
-        OiNewFolderDialog(onCreate: (_) {}),
-      );
+      await tester.pumpObers(OiNewFolderDialog(onCreate: (_) {}));
       expect(find.byType(OiNewFolderDialog), findsOneWidget);
     });
 
     testWidgets('shows New Folder heading', (tester) async {
       await tester.pumpObers(
-        OiNewFolderDialog(
-          onCreate: (_) {},
-          defaultName: 'Untitled',
-        ),
+        OiNewFolderDialog(onCreate: (_) {}, defaultName: 'Untitled'),
       );
       // Use a custom default name so the heading is the only 'New Folder' text
       expect(find.text('New Folder'), findsOneWidget);
     });
 
     testWidgets('pre-fills default name in text input', (tester) async {
-      await tester.pumpObers(
-        OiNewFolderDialog(onCreate: (_) {}),
-      );
+      await tester.pumpObers(OiNewFolderDialog(onCreate: (_) {}));
       expect(find.byType(OiTextInput), findsOneWidget);
       // The default name 'New Folder' appears in both the heading and input
       expect(find.text('New Folder'), findsAtLeast(1));
@@ -41,44 +34,32 @@ void main() {
 
     testWidgets('pre-fills custom default name', (tester) async {
       await tester.pumpObers(
-        OiNewFolderDialog(
-          onCreate: (_) {},
-          defaultName: 'My Folder',
-        ),
+        OiNewFolderDialog(onCreate: (_) {}, defaultName: 'My Folder'),
       );
       expect(find.text('My Folder'), findsOneWidget);
     });
 
     testWidgets('shows parent folder name when provided', (tester) async {
       await tester.pumpObers(
-        OiNewFolderDialog(
-          onCreate: (_) {},
-          parentFolderName: 'Documents',
-        ),
+        OiNewFolderDialog(onCreate: (_) {}, parentFolderName: 'Documents'),
       );
       expect(find.text('Parent: Documents'), findsOneWidget);
     });
 
     testWidgets('shows Folder name label', (tester) async {
-      await tester.pumpObers(
-        OiNewFolderDialog(onCreate: (_) {}),
-      );
+      await tester.pumpObers(OiNewFolderDialog(onCreate: (_) {}));
       expect(find.text('Folder name'), findsOneWidget);
     });
 
     testWidgets('validates empty name', (tester) async {
-      await tester.pumpObers(
-        OiNewFolderDialog(onCreate: (_) {}),
-      );
+      await tester.pumpObers(OiNewFolderDialog(onCreate: (_) {}));
       await tester.enterText(find.byType(OiTextInput), '');
       await tester.pump();
       expect(find.text('Name cannot be empty'), findsOneWidget);
     });
 
     testWidgets('validates illegal characters', (tester) async {
-      await tester.pumpObers(
-        OiNewFolderDialog(onCreate: (_) {}),
-      );
+      await tester.pumpObers(OiNewFolderDialog(onCreate: (_) {}));
       await tester.enterText(find.byType(OiTextInput), 'my/folder');
       await tester.pump();
       expect(find.text('Name cannot contain "/"'), findsOneWidget);
@@ -88,8 +69,7 @@ void main() {
       await tester.pumpObers(
         OiNewFolderDialog(
           onCreate: (_) {},
-          validate: (name) =>
-              name == 'taken' ? 'Name already exists' : null,
+          validate: (name) => name == 'taken' ? 'Name already exists' : null,
         ),
       );
       await tester.enterText(find.byType(OiTextInput), 'taken');
@@ -112,10 +92,7 @@ void main() {
     testWidgets('tapping Cancel fires onCancel', (tester) async {
       var cancelled = false;
       await tester.pumpObers(
-        OiNewFolderDialog(
-          onCreate: (_) {},
-          onCancel: () => cancelled = true,
-        ),
+        OiNewFolderDialog(onCreate: (_) {}, onCancel: () => cancelled = true),
       );
       await tester.tap(find.widgetWithText(OiButton, 'Cancel'));
       await tester.pump();
@@ -125,15 +102,11 @@ void main() {
     testWidgets('ESC key fires onCancel', (tester) async {
       var cancelled = false;
       await tester.pumpObers(
-        OiNewFolderDialog(
-          onCreate: (_) {},
-          onCancel: () => cancelled = true,
-        ),
+        OiNewFolderDialog(onCreate: (_) {}, onCancel: () => cancelled = true),
       );
       // The KeyboardListener wraps the dialog; focus its node so it
       // receives key events.
-      final kl =
-          tester.widget<KeyboardListener>(find.byType(KeyboardListener));
+      final kl = tester.widget<KeyboardListener>(find.byType(KeyboardListener));
       kl.focusNode.requestFocus();
       await tester.pump();
       await tester.sendKeyEvent(LogicalKeyboardKey.escape);
@@ -142,9 +115,7 @@ void main() {
     });
 
     testWidgets('has correct semantics label', (tester) async {
-      await tester.pumpObers(
-        OiNewFolderDialog(onCreate: (_) {}),
-      );
+      await tester.pumpObers(OiNewFolderDialog(onCreate: (_) {}));
       expect(
         find.bySemanticsLabel(RegExp('New folder dialog')),
         findsOneWidget,
@@ -152,9 +123,7 @@ void main() {
     });
 
     testWidgets('Create button disabled for empty name', (tester) async {
-      await tester.pumpObers(
-        OiNewFolderDialog(onCreate: (_) {}),
-      );
+      await tester.pumpObers(OiNewFolderDialog(onCreate: (_) {}));
       await tester.enterText(find.byType(OiTextInput), '');
       await tester.pump();
       expect(find.widgetWithText(OiButton, 'Create'), findsOneWidget);

@@ -104,10 +104,6 @@ class OiSection extends StatelessWidget {
       content = Padding(padding: resolvedPadding, child: content);
     }
 
-    return Semantics(
-      container: true,
-      label: semanticLabel,
-      child: content,
-    );
+    return Semantics(container: true, label: semanticLabel, child: content);
   }
 }

@@ -19,13 +19,13 @@ import 'package:obers_ui/src/primitives/layout/oi_wrap_layout.dart';
 
 import '../../helpers/pump_app.dart';
 
-/// Cross-cutting tests that verify the OiResponsive<T> contract:
+/// Cross-cutting tests that verify the `OiResponsive<T>` contract:
 ///
 /// > Any layout property that should vary by screen size accepts an
-/// > OiResponsive<T> value. One type, one pattern, everywhere.
+/// > `OiResponsive<T>` value. One type, one pattern, everywhere.
 ///
 /// Every widget must:
-/// 1. Accept OiResponsive<T> for all sizing/spacing/layout properties.
+/// 1. Accept `OiResponsive<T>` for all sizing/spacing/layout properties.
 /// 2. Resolve responsive values via explicit breakpoint + scale (zero magic).
 /// 3. Support mobile-first cascading (values inherit from smaller breakpoints).
 /// 4. Work without OiTheme — scale defaults to OiBreakpointScale.defaultScale.
@@ -137,35 +137,36 @@ void main() {
       expect(rectExpanded.width, closeTo(284, 1));
     });
 
-    testWidgets('OiSection: responsive gap and padding resolve per breakpoint', (
-      tester,
-    ) async {
-      await tester.pumpObers(
-        OiSection(
-          breakpoint: OiBreakpoint.compact,
-          gap: responsiveGap,
-          padding: responsivePadding,
-          children: children,
-        ),
-      );
-      var boxes = tester.widgetList<SizedBox>(find.byType(SizedBox)).toList();
-      expect(boxes.where((b) => b.height == 8), hasLength(1));
-      var padding = tester.widget<Padding>(find.byType(Padding));
-      expect(padding.padding, const EdgeInsets.all(16));
+    testWidgets(
+      'OiSection: responsive gap and padding resolve per breakpoint',
+      (tester) async {
+        await tester.pumpObers(
+          OiSection(
+            breakpoint: OiBreakpoint.compact,
+            gap: responsiveGap,
+            padding: responsivePadding,
+            children: children,
+          ),
+        );
+        var boxes = tester.widgetList<SizedBox>(find.byType(SizedBox)).toList();
+        expect(boxes.where((b) => b.height == 8), hasLength(1));
+        var padding = tester.widget<Padding>(find.byType(Padding));
+        expect(padding.padding, const EdgeInsets.all(16));
 
-      await tester.pumpObers(
-        OiSection(
-          breakpoint: OiBreakpoint.expanded,
-          gap: responsiveGap,
-          padding: responsivePadding,
-          children: children,
-        ),
-      );
-      boxes = tester.widgetList<SizedBox>(find.byType(SizedBox)).toList();
-      expect(boxes.where((b) => b.height == 24), hasLength(1));
-      padding = tester.widget<Padding>(find.byType(Padding));
-      expect(padding.padding, const EdgeInsets.all(40));
-    });
+        await tester.pumpObers(
+          OiSection(
+            breakpoint: OiBreakpoint.expanded,
+            gap: responsiveGap,
+            padding: responsivePadding,
+            children: children,
+          ),
+        );
+        boxes = tester.widgetList<SizedBox>(find.byType(SizedBox)).toList();
+        expect(boxes.where((b) => b.height == 24), hasLength(1));
+        padding = tester.widget<Padding>(find.byType(Padding));
+        expect(padding.padding, const EdgeInsets.all(40));
+      },
+    );
 
     testWidgets('OiPage: responsive gap and padding resolve per breakpoint', (
       tester,
@@ -199,34 +200,35 @@ void main() {
       expect(padding.padding, const EdgeInsets.all(40));
     });
 
-    testWidgets('OiMasonry: responsive columns and gap resolve per breakpoint', (
-      tester,
-    ) async {
-      final responsiveCols = OiResponsive<int>.breakpoints({
-        OiBreakpoint.compact: 2,
-        OiBreakpoint.expanded: 4,
-      });
+    testWidgets(
+      'OiMasonry: responsive columns and gap resolve per breakpoint',
+      (tester) async {
+        final responsiveCols = OiResponsive<int>.breakpoints({
+          OiBreakpoint.compact: 2,
+          OiBreakpoint.expanded: 4,
+        });
 
-      await tester.pumpObers(
-        OiMasonry(
-          breakpoint: OiBreakpoint.compact,
-          columns: responsiveCols,
-          gap: responsiveGap,
-          children: const [Text('1'), Text('2'), Text('3'), Text('4')],
-        ),
-      );
-      expect(find.byType(Column), findsNWidgets(2));
+        await tester.pumpObers(
+          OiMasonry(
+            breakpoint: OiBreakpoint.compact,
+            columns: responsiveCols,
+            gap: responsiveGap,
+            children: const [Text('1'), Text('2'), Text('3'), Text('4')],
+          ),
+        );
+        expect(find.byType(Column), findsNWidgets(2));
 
-      await tester.pumpObers(
-        OiMasonry(
-          breakpoint: OiBreakpoint.expanded,
-          columns: responsiveCols,
-          gap: responsiveGap,
-          children: const [Text('1'), Text('2'), Text('3'), Text('4')],
-        ),
-      );
-      expect(find.byType(Column), findsNWidgets(4));
-    });
+        await tester.pumpObers(
+          OiMasonry(
+            breakpoint: OiBreakpoint.expanded,
+            columns: responsiveCols,
+            gap: responsiveGap,
+            children: const [Text('1'), Text('2'), Text('3'), Text('4')],
+          ),
+        );
+        expect(find.byType(Column), findsNWidgets(4));
+      },
+    );
 
     testWidgets(
       'OiContainer: responsive maxWidth and padding resolve per breakpoint',
@@ -308,17 +310,21 @@ void main() {
       });
 
       await tester.pumpObers(
-        Column(children: [
-          OiSpacer(breakpoint: OiBreakpoint.compact, size: responsiveSize),
-        ]),
+        Column(
+          children: [
+            OiSpacer(breakpoint: OiBreakpoint.compact, size: responsiveSize),
+          ],
+        ),
       );
       var box = tester.widget<SizedBox>(find.byType(SizedBox));
       expect(box.height, 8);
 
       await tester.pumpObers(
-        Column(children: [
-          OiSpacer(breakpoint: OiBreakpoint.expanded, size: responsiveSize),
-        ]),
+        Column(
+          children: [
+            OiSpacer(breakpoint: OiBreakpoint.expanded, size: responsiveSize),
+          ],
+        ),
       );
       box = tester.widget<SizedBox>(find.byType(SizedBox));
       expect(box.height, 24);
@@ -353,45 +359,44 @@ void main() {
       expect(ar.aspectRatio, closeTo(16 / 9, 0.001));
     });
 
-    testWidgets(
-      'OiMasonry: responsive span values resolve per breakpoint',
-      (tester) async {
-        final responsiveSpan = OiResponsive<int>.breakpoints({
-          OiBreakpoint.compact: 1,
-          OiBreakpoint.expanded: 2,
-        });
+    testWidgets('OiMasonry: responsive span values resolve per breakpoint', (
+      tester,
+    ) async {
+      final responsiveSpan = OiResponsive<int>.breakpoints({
+        OiBreakpoint.compact: 1,
+        OiBreakpoint.expanded: 2,
+      });
 
-        // Compact → span 1 → masonry column item, columnWidth.
-        await tester.pumpObers(
-          OiMasonry(
-            breakpoint: OiBreakpoint.compact,
-            columns: 2.responsive,
-            children: [
-              const Text('A').span(columnSpan: responsiveSpan),
-              const Text('B'),
-            ],
-          ),
-          surfaceSize: const Size(800, 600),
-        );
-        final rectCompact = tester.getRect(find.text('A'));
-        expect(rectCompact.width, closeTo(400, 1));
+      // Compact → span 1 → masonry column item, columnWidth.
+      await tester.pumpObers(
+        OiMasonry(
+          breakpoint: OiBreakpoint.compact,
+          columns: 2.responsive,
+          children: [
+            const Text('A').span(columnSpan: responsiveSpan),
+            const Text('B'),
+          ],
+        ),
+        surfaceSize: const Size(800, 600),
+      );
+      final rectCompact = tester.getRect(find.text('A'));
+      expect(rectCompact.width, closeTo(400, 1));
 
-        // Expanded → span 2 → spanning breaker, full width.
-        await tester.pumpObers(
-          OiMasonry(
-            breakpoint: OiBreakpoint.expanded,
-            columns: 2.responsive,
-            children: [
-              const Text('A').span(columnSpan: responsiveSpan),
-              const Text('B'),
-            ],
-          ),
-          surfaceSize: const Size(800, 600),
-        );
-        final rectExpanded = tester.getRect(find.text('A'));
-        expect(rectExpanded.width, closeTo(800, 1));
-      },
-    );
+      // Expanded → span 2 → spanning breaker, full width.
+      await tester.pumpObers(
+        OiMasonry(
+          breakpoint: OiBreakpoint.expanded,
+          columns: 2.responsive,
+          children: [
+            const Text('A').span(columnSpan: responsiveSpan),
+            const Text('B'),
+          ],
+        ),
+        surfaceSize: const Size(800, 600),
+      );
+      final rectExpanded = tester.getRect(find.text('A'));
+      expect(rectExpanded.width, closeTo(800, 1));
+    });
 
     testWidgets('OiSpan: responsive span values resolve per breakpoint', (
       tester,
@@ -451,8 +456,7 @@ void main() {
           children: children,
         ),
       );
-      final boxes =
-          tester.widgetList<SizedBox>(find.byType(SizedBox)).toList();
+      final boxes = tester.widgetList<SizedBox>(find.byType(SizedBox)).toList();
       expect(boxes.where((b) => b.width == 10), hasLength(1));
     });
 
@@ -466,14 +470,11 @@ void main() {
           children: children,
         ),
       );
-      final boxes =
-          tester.widgetList<SizedBox>(find.byType(SizedBox)).toList();
+      final boxes = tester.widgetList<SizedBox>(find.byType(SizedBox)).toList();
       expect(boxes.where((b) => b.height == 10), hasLength(1));
     });
 
-    testWidgets('OiSection cascades gap from compact to large', (
-      tester,
-    ) async {
+    testWidgets('OiSection cascades gap from compact to large', (tester) async {
       await tester.pumpObers(
         OiSection(
           breakpoint: OiBreakpoint.large,
@@ -481,8 +482,7 @@ void main() {
           children: children,
         ),
       );
-      final boxes =
-          tester.widgetList<SizedBox>(find.byType(SizedBox)).toList();
+      final boxes = tester.widgetList<SizedBox>(find.byType(SizedBox)).toList();
       expect(boxes.where((b) => b.height == 10), hasLength(1));
     });
 
@@ -497,8 +497,7 @@ void main() {
           children: children,
         ),
       );
-      final boxes =
-          tester.widgetList<SizedBox>(find.byType(SizedBox)).toList();
+      final boxes = tester.widgetList<SizedBox>(find.byType(SizedBox)).toList();
       expect(boxes.where((b) => b.height == 10), hasLength(1));
     });
 
@@ -516,9 +515,7 @@ void main() {
       expect(wrap.spacing, 10);
     });
 
-    testWidgets('OiGrid cascades gap from compact to expanded', (
-      tester,
-    ) async {
+    testWidgets('OiGrid cascades gap from compact to expanded', (tester) async {
       await tester.pumpObers(
         OiGrid(
           breakpoint: OiBreakpoint.expanded,
@@ -531,16 +528,16 @@ void main() {
       expect(wrap.spacing, 10);
     });
 
-    testWidgets('OiSpacer cascades size from compact to large', (
-      tester,
-    ) async {
+    testWidgets('OiSpacer cascades size from compact to large', (tester) async {
       final cascadingSize = OiResponsive<double>.breakpoints({
         OiBreakpoint.compact: 10,
       });
       await tester.pumpObers(
-        Column(children: [
-          OiSpacer(breakpoint: OiBreakpoint.large, size: cascadingSize),
-        ]),
+        Column(
+          children: [
+            OiSpacer(breakpoint: OiBreakpoint.large, size: cascadingSize),
+          ],
+        ),
       );
       final box = tester.widget<SizedBox>(find.byType(SizedBox));
       expect(box.height, 10);
@@ -590,11 +587,14 @@ void main() {
       expect(r.resolve(OiBreakpoint.compact, scale), isTrue);
     });
 
-    test('EdgeInsets.responsive creates static OiResponsive<EdgeInsetsGeometry>', () {
-      final r = const EdgeInsets.all(8).responsive;
-      expect(r.isStatic, isTrue);
-      expect(r.resolve(OiBreakpoint.compact, scale), const EdgeInsets.all(8));
-    });
+    test(
+      'EdgeInsets.responsive creates static OiResponsive<EdgeInsetsGeometry>',
+      () {
+        final r = const EdgeInsets.all(8).responsive;
+        expect(r.isStatic, isTrue);
+        expect(r.resolve(OiBreakpoint.compact, scale), const EdgeInsets.all(8));
+      },
+    );
 
     test('Map.responsive creates breakpoint-keyed OiResponsive', () {
       final r = {OiBreakpoint.compact: 1, OiBreakpoint.large: 4}.responsive;
@@ -616,10 +616,12 @@ void main() {
     ) async {
       const r = OiResponsive<int>(42);
       await tester.pumpObers(
-        Builder(builder: (context) {
-          final value = r.resolveFor(context);
-          return Text('$value');
-        }),
+        Builder(
+          builder: (context) {
+            final value = r.resolveFor(context);
+            return Text('$value');
+          },
+        ),
       );
       expect(find.text('42'), findsOneWidget);
     });
@@ -632,10 +634,12 @@ void main() {
         OiBreakpoint.expanded: 'wide',
       });
       await tester.pumpObers(
-        Builder(builder: (context) {
-          final value = r.resolveFor(context);
-          return Text(value);
-        }),
+        Builder(
+          builder: (context) {
+            final value = r.resolveFor(context);
+            return Text(value);
+          },
+        ),
       );
       // Default pumpObers uses 800x600 → compact breakpoint → 'small'.
       expect(find.text('small'), findsOneWidget);
@@ -654,10 +658,7 @@ void main() {
     Widget noThemeHarness(Widget child) {
       return MediaQuery(
         data: const MediaQueryData(size: Size(800, 600)),
-        child: Directionality(
-          textDirection: TextDirection.ltr,
-          child: child,
-        ),
+        child: Directionality(textDirection: TextDirection.ltr, child: child),
       );
     }
 
@@ -750,10 +751,7 @@ void main() {
     testWidgets('OiContainer renders without OiTheme', (tester) async {
       await tester.pumpWidget(
         noThemeHarness(
-          const OiContainer(
-            breakpoint: OiBreakpoint.compact,
-            child: child,
-          ),
+          const OiContainer(breakpoint: OiBreakpoint.compact, child: child),
         ),
       );
       expect(find.text('content'), findsOneWidget);
@@ -776,12 +774,14 @@ void main() {
     testWidgets('OiSpacer renders without OiTheme', (tester) async {
       await tester.pumpWidget(
         noThemeHarness(
-          const Column(children: [
-            OiSpacer(
-              breakpoint: OiBreakpoint.compact,
-              size: OiResponsive<double>(16),
-            ),
-          ]),
+          const Column(
+            children: [
+              OiSpacer(
+                breakpoint: OiBreakpoint.compact,
+                size: OiResponsive<double>(16),
+              ),
+            ],
+          ),
         ),
       );
       final box = tester.widget<SizedBox>(find.byType(SizedBox));
@@ -810,9 +810,7 @@ void main() {
             columns: const OiResponsive<int>(3),
             children: [
               const Text('full').spanFull(),
-              const Text('two').span(
-                columnSpan: const OiResponsive<int>(2),
-              ),
+              const Text('two').span(columnSpan: const OiResponsive<int>(2)),
               const Text('one'),
             ],
           ),

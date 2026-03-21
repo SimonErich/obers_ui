@@ -41,7 +41,9 @@ class OiMoveDialog extends StatefulWidget {
 
   /// Lazy loader for child folders.
   final Future<List<OiTreeNode<OiFileNodeData>>> Function(
-      OiTreeNode<OiFileNodeData>)? loadChildren;
+    OiTreeNode<OiFileNodeData>,
+  )?
+  loadChildren;
 
   /// Called when the user creates a new folder in the dialog.
   final ValueChanged<String>? onCreateFolder;
@@ -97,7 +99,9 @@ class _OiMoveDialogState extends State<OiMoveDialog> {
   }
 
   OiFileNodeData? _findFolder(
-      List<OiTreeNode<OiFileNodeData>> nodes, String id) {
+    List<OiTreeNode<OiFileNodeData>> nodes,
+    String id,
+  ) {
     for (final node in nodes) {
       if (node.id == id) return node.data;
       final found = _findFolder(node.children, id);
@@ -158,59 +162,71 @@ class _OiMoveDialogState extends State<OiMoveDialog> {
                   onSelectionChanged: (ids) {
                     if (ids.isNotEmpty) _onFolderSelect(ids.first);
                   },
-                  nodeBuilder: (context, node, depth, {required bool expanded, required bool selected}) {
-                    final disabled = _isSelfOrDescendant(node);
-                    final isMatch = _searchQuery.isEmpty ||
-                        node.label
-                            .toLowerCase()
-                            .contains(_searchQuery.toLowerCase());
-                    if (!isMatch && _searchQuery.isNotEmpty) {
-                      return const SizedBox.shrink();
-                    }
-                    return Opacity(
-                      opacity: disabled ? 0.4 : 1.0,
-                      child: GestureDetector(
-                        onTap: disabled
-                            ? null
-                            : () => _onFolderSelect(node.id),
-                        child: Container(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: spacing.sm,
-                            vertical: spacing.xs,
-                          ),
-                          decoration: BoxDecoration(
-                            color: _selectedFolderId == node.id
-                                ? colors.primary.muted.withValues(alpha: 0.15)
-                                : null,
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                          child: Row(
-                            children: [
-                              Icon(
-                                const IconData(0xe2c7,
-                                    fontFamily: 'MaterialIcons'),
-                                size: 16,
-                                color: colors.warning.base,
+                  nodeBuilder:
+                      (
+                        context,
+                        node,
+                        depth, {
+                        required bool expanded,
+                        required bool selected,
+                      }) {
+                        final disabled = _isSelfOrDescendant(node);
+                        final isMatch =
+                            _searchQuery.isEmpty ||
+                            node.label.toLowerCase().contains(
+                              _searchQuery.toLowerCase(),
+                            );
+                        if (!isMatch && _searchQuery.isNotEmpty) {
+                          return const SizedBox.shrink();
+                        }
+                        return Opacity(
+                          opacity: disabled ? 0.4 : 1.0,
+                          child: GestureDetector(
+                            onTap: disabled
+                                ? null
+                                : () => _onFolderSelect(node.id),
+                            child: Container(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: spacing.sm,
+                                vertical: spacing.xs,
                               ),
-                              SizedBox(width: spacing.xs),
-                              Expanded(
-                                child: Text(
-                                  node.label,
-                                  style: TextStyle(
-                                    fontSize: 13,
-                                    color: colors.text,
-                                    fontWeight: _selectedFolderId == node.id
-                                        ? FontWeight.w600
-                                        : FontWeight.w400,
+                              decoration: BoxDecoration(
+                                color: _selectedFolderId == node.id
+                                    ? colors.primary.muted.withValues(
+                                        alpha: 0.15,
+                                      )
+                                    : null,
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    const IconData(
+                                      0xe2c7,
+                                      fontFamily: 'MaterialIcons',
+                                    ),
+                                    size: 16,
+                                    color: colors.warning.base,
                                   ),
-                                ),
+                                  SizedBox(width: spacing.xs),
+                                  Expanded(
+                                    child: Text(
+                                      node.label,
+                                      style: TextStyle(
+                                        fontSize: 13,
+                                        color: colors.text,
+                                        fontWeight: _selectedFolderId == node.id
+                                            ? FontWeight.w600
+                                            : FontWeight.w400,
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ],
+                            ),
                           ),
-                        ),
-                      ),
-                    );
-                  },
+                        );
+                      },
                 ),
               ),
               // New Folder button
@@ -218,8 +234,8 @@ class _OiMoveDialogState extends State<OiMoveDialog> {
                 SizedBox(height: spacing.sm),
                 OiButton.ghost(
                   label: '+ New Folder',
-                  onTap: () => widget.onCreateFolder?.call(
-                      _selectedFolderId ?? ''),
+                  onTap: () =>
+                      widget.onCreateFolder?.call(_selectedFolderId ?? ''),
                 ),
               ],
               // Destination label
@@ -235,10 +251,7 @@ class _OiMoveDialogState extends State<OiMoveDialog> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  OiButton.ghost(
-                    label: 'Cancel',
-                    onTap: widget.onCancel,
-                  ),
+                  OiButton.ghost(label: 'Cancel', onTap: widget.onCancel),
                   SizedBox(width: spacing.sm),
                   OiButton.primary(
                     label: _actionLabel,

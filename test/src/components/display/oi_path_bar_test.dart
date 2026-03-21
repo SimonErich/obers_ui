@@ -11,55 +11,35 @@ import '../../../helpers/pump_app.dart';
 
 void main() {
   final segments = [
-    OiPathSegment(id: 'root', label: 'Home'),
-    OiPathSegment(id: 'docs', label: 'Documents'),
-    OiPathSegment(id: 'work', label: 'Work'),
+    const OiPathSegment(id: 'root', label: 'Home'),
+    const OiPathSegment(id: 'docs', label: 'Documents'),
+    const OiPathSegment(id: 'work', label: 'Work'),
   ];
 
   testWidgets('renders breadcrumbs in default mode', (tester) async {
-    await tester.pumpObers(
-      OiPathBar(
-        segments: segments,
-        onNavigate: (_) {},
-      ),
-    );
+    await tester.pumpObers(OiPathBar(segments: segments, onNavigate: (_) {}));
     expect(find.byType(OiBreadcrumbs), findsOneWidget);
   });
 
   testWidgets('shows folder icon when showIcon is true', (tester) async {
-    await tester.pumpObers(
-      OiPathBar(
-        segments: segments,
-        onNavigate: (_) {},
-        showIcon: true,
-      ),
-    );
+    await tester.pumpObers(OiPathBar(segments: segments, onNavigate: (_) {}));
     // folder icon code point 0xe2c7
-    final folderIcon = const IconData(0xe2c7, fontFamily: 'MaterialIcons');
+    const folderIcon = IconData(0xe2c7, fontFamily: 'MaterialIcons');
     expect(find.byIcon(folderIcon), findsOneWidget);
   });
 
   testWidgets('hides folder icon when showIcon is false', (tester) async {
     await tester.pumpObers(
-      OiPathBar(
-        segments: segments,
-        onNavigate: (_) {},
-        showIcon: false,
-      ),
+      OiPathBar(segments: segments, onNavigate: (_) {}, showIcon: false),
     );
-    final folderIcon = const IconData(0xe2c7, fontFamily: 'MaterialIcons');
+    const folderIcon = IconData(0xe2c7, fontFamily: 'MaterialIcons');
     expect(find.byIcon(folderIcon), findsNothing);
   });
 
-  testWidgets('tapping breadcrumb area enters edit mode when editable',
-      (tester) async {
-    await tester.pumpObers(
-      OiPathBar(
-        segments: segments,
-        onNavigate: (_) {},
-        editable: true,
-      ),
-    );
+  testWidgets('tapping breadcrumb area enters edit mode when editable', (
+    tester,
+  ) async {
+    await tester.pumpObers(OiPathBar(segments: segments, onNavigate: (_) {}));
 
     // Tap on the breadcrumb area to enter edit mode
     await tester.tap(find.byType(GestureDetector).first);
@@ -68,14 +48,11 @@ void main() {
     expect(find.byType(OiTextInput), findsOneWidget);
   });
 
-  testWidgets('edit mode does not activate when editable is false',
-      (tester) async {
+  testWidgets('edit mode does not activate when editable is false', (
+    tester,
+  ) async {
     await tester.pumpObers(
-      OiPathBar(
-        segments: segments,
-        onNavigate: (_) {},
-        editable: false,
-      ),
+      OiPathBar(segments: segments, onNavigate: (_) {}, editable: false),
     );
 
     await tester.tap(find.byType(GestureDetector).first);
@@ -87,13 +64,7 @@ void main() {
   });
 
   testWidgets('edit mode text input contains full path', (tester) async {
-    await tester.pumpObers(
-      OiPathBar(
-        segments: segments,
-        onNavigate: (_) {},
-        editable: true,
-      ),
-    );
+    await tester.pumpObers(OiPathBar(segments: segments, onNavigate: (_) {}));
 
     await tester.tap(find.byType(GestureDetector).first);
     await tester.pumpAndSettle();
@@ -108,7 +79,6 @@ void main() {
       OiPathBar(
         segments: segments,
         onNavigate: (_) {},
-        editable: true,
         onPathSubmit: (path) => submittedPath = path,
       ),
     );
@@ -126,12 +96,7 @@ void main() {
 
   testWidgets('returns to breadcrumb mode after submit', (tester) async {
     await tester.pumpObers(
-      OiPathBar(
-        segments: segments,
-        onNavigate: (_) {},
-        editable: true,
-        onPathSubmit: (_) {},
-      ),
+      OiPathBar(segments: segments, onNavigate: (_) {}, onPathSubmit: (_) {}),
     );
 
     // Enter edit mode
@@ -146,13 +111,9 @@ void main() {
   });
 
   testWidgets('default semantics label is "Path navigation"', (tester) async {
-    await tester.pumpObers(
-      OiPathBar(
-        segments: segments,
-        onNavigate: (_) {},
-      ),
-    );
-    final semantics = tester.widgetList<Semantics>(find.byType(Semantics))
+    await tester.pumpObers(OiPathBar(segments: segments, onNavigate: (_) {}));
+    final semantics = tester
+        .widgetList<Semantics>(find.byType(Semantics))
         .where((s) => s.properties.label == 'Path navigation')
         .toList();
     expect(semantics, isNotEmpty);
@@ -166,32 +127,23 @@ void main() {
         semanticsLabel: 'File path',
       ),
     );
-    final semantics = tester.widgetList<Semantics>(find.byType(Semantics))
+    final semantics = tester
+        .widgetList<Semantics>(find.byType(Semantics))
         .where((s) => s.properties.label == 'File path')
         .toList();
     expect(semantics, isNotEmpty);
   });
 
   testWidgets('empty segments renders without error', (tester) async {
-    await tester.pumpObers(
-      OiPathBar(
-        segments: const [],
-        onNavigate: (_) {},
-      ),
-    );
+    await tester.pumpObers(OiPathBar(segments: const [], onNavigate: (_) {}));
     expect(find.byType(OiPathBar), findsOneWidget);
   });
 
-  testWidgets('does not show folder icon when segments are empty',
-      (tester) async {
-    await tester.pumpObers(
-      OiPathBar(
-        segments: const [],
-        onNavigate: (_) {},
-        showIcon: true,
-      ),
-    );
-    final folderIcon = const IconData(0xe2c7, fontFamily: 'MaterialIcons');
+  testWidgets('does not show folder icon when segments are empty', (
+    tester,
+  ) async {
+    await tester.pumpObers(OiPathBar(segments: const [], onNavigate: (_) {}));
+    const folderIcon = IconData(0xe2c7, fontFamily: 'MaterialIcons');
     expect(find.byIcon(folderIcon), findsNothing);
   });
 }

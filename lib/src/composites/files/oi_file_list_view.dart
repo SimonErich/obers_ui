@@ -5,6 +5,8 @@ import 'package:obers_ui/src/components/display/oi_folder_icon.dart';
 import 'package:obers_ui/src/components/display/oi_rename_field.dart';
 import 'package:obers_ui/src/components/interaction/oi_selection_overlay.dart';
 import 'package:obers_ui/src/components/overlays/oi_context_menu.dart';
+import 'package:obers_ui/src/foundation/theme/oi_color_scheme.dart';
+import 'package:obers_ui/src/foundation/theme/oi_spacing_scale.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/models/oi_file_node_data.dart';
 import 'package:obers_ui/src/models/settings/oi_file_explorer_settings.dart';
@@ -125,7 +127,7 @@ class OiFileListView extends StatefulWidget {
 
   /// Called when files are moved to a folder.
   final void Function(List<OiFileNodeData> files, OiFileNodeData folder)?
-      onMoveToFolder;
+  onMoveToFolder;
 
   /// Context menu builder for individual files (legacy widget-based).
   final List<Widget> Function(OiFileNodeData)? contextMenu;
@@ -176,20 +178,22 @@ class _OiFileListViewState extends State<OiFileListView> {
       return;
     }
 
-    final isShift = HardwareKeyboard.instance.logicalKeysPressed
-        .any((k) =>
-            k == LogicalKeyboardKey.shiftLeft ||
-            k == LogicalKeyboardKey.shiftRight);
-    final isCtrl = HardwareKeyboard.instance.logicalKeysPressed.any((k) =>
-        k == LogicalKeyboardKey.controlLeft ||
-        k == LogicalKeyboardKey.controlRight ||
-        k == LogicalKeyboardKey.metaLeft ||
-        k == LogicalKeyboardKey.metaRight);
+    final isShift = HardwareKeyboard.instance.logicalKeysPressed.any(
+      (k) =>
+          k == LogicalKeyboardKey.shiftLeft ||
+          k == LogicalKeyboardKey.shiftRight,
+    );
+    final isCtrl = HardwareKeyboard.instance.logicalKeysPressed.any(
+      (k) =>
+          k == LogicalKeyboardKey.controlLeft ||
+          k == LogicalKeyboardKey.controlRight ||
+          k == LogicalKeyboardKey.metaLeft ||
+          k == LogicalKeyboardKey.metaRight,
+    );
 
     if (isShift && _lastTappedIndex != null) {
       // Range select
-      final start =
-          _lastTappedIndex! < index ? _lastTappedIndex! : index;
+      final start = _lastTappedIndex! < index ? _lastTappedIndex! : index;
       final end = _lastTappedIndex! < index ? index : _lastTappedIndex!;
       final newSelection = Set<Object>.from(widget.selectedKeys);
       for (var i = start; i <= end; i++) {
@@ -256,14 +260,15 @@ class _OiFileListViewState extends State<OiFileListView> {
     final next = (_focusedIndex + delta).clamp(0, widget.files.length - 1);
     setState(() => _focusedIndex = next);
 
-    final isShift = HardwareKeyboard.instance.logicalKeysPressed
-        .any((k) =>
-            k == LogicalKeyboardKey.shiftLeft ||
-            k == LogicalKeyboardKey.shiftRight);
+    final isShift = HardwareKeyboard.instance.logicalKeysPressed.any(
+      (k) =>
+          k == LogicalKeyboardKey.shiftLeft ||
+          k == LogicalKeyboardKey.shiftRight,
+    );
 
     if (isShift && widget.enableMultiSelect) {
-      final newSelection = Set<Object>.from(widget.selectedKeys);
-      newSelection.add(widget.files[next].id);
+      final newSelection = Set<Object>.from(widget.selectedKeys)
+        ..add(widget.files[next].id);
       widget.onSelectionChange(newSelection);
     } else {
       widget.onSelectionChange({widget.files[next].id});
@@ -331,8 +336,7 @@ class _OiFileListViewState extends State<OiFileListView> {
                     itemCount: widget.files.length,
                     itemBuilder: (context, index) {
                       final file = widget.files[index];
-                      final isSelected =
-                          widget.selectedKeys.contains(file.id);
+                      final isSelected = widget.selectedKeys.contains(file.id);
                       final isRenaming = widget.renamingKey == file.id;
                       final isFocused = _focusedIndex == index;
 
@@ -453,8 +457,8 @@ class _OiFileListViewState extends State<OiFileListView> {
     bool isSelected,
     bool isRenaming,
     bool isFocused,
-    dynamic colors,
-    dynamic spacing,
+    OiColorScheme colors,
+    OiSpacingScale spacing,
   ) {
     final fileType = file.isFolder ? 'folder' : file.resolvedExtension;
     final semanticLabel =
@@ -469,19 +473,14 @@ class _OiFileListViewState extends State<OiFileListView> {
         behavior: HitTestBehavior.opaque,
         child: Container(
           padding: EdgeInsets.symmetric(
-            horizontal: (spacing as dynamic).md as double,
-            vertical: (spacing as dynamic).sm as double,
+            horizontal: spacing.md,
+            vertical: spacing.sm,
           ),
           decoration: BoxDecoration(
             color: isSelected
-                ? ((colors as dynamic).primary.muted as Color)
-                    .withValues(alpha: 0.15)
+                ? colors.primary.muted.withValues(alpha: 0.15)
                 : null,
-            border: Border(
-              bottom: BorderSide(
-                color: (colors as dynamic).borderSubtle as Color,
-              ),
-            ),
+            border: Border(bottom: BorderSide(color: colors.borderSubtle)),
           ),
           child: Row(
             children: [
@@ -537,9 +536,7 @@ class _OiFileListViewState extends State<OiFileListView> {
               if (widget.showType)
                 Expanded(
                   child: Text(
-                    file.isFolder
-                        ? '—'
-                        : file.resolvedExtension.toUpperCase(),
+                    file.isFolder ? '—' : file.resolvedExtension.toUpperCase(),
                     style: TextStyle(
                       fontSize: 12,
                       color: (colors as dynamic).textMuted as Color,
@@ -578,10 +575,7 @@ class _OiFileListViewState extends State<OiFileListView> {
             return Container(
               decoration: state == OiDropState.hovering
                   ? BoxDecoration(
-                      border: Border.all(
-                        color: (colors as dynamic).primary.base as Color,
-                        width: 2,
-                      ),
+                      border: Border.all(color: colors.primary.base, width: 2),
                       borderRadius: BorderRadius.circular(4),
                     )
                   : null,
@@ -594,8 +588,8 @@ class _OiFileListViewState extends State<OiFileListView> {
       // Make selected items draggable
       final dragData = isSelected
           ? widget.files
-              .where((f) => widget.selectedKeys.contains(f.id))
-              .toList()
+                .where((f) => widget.selectedKeys.contains(f.id))
+                .toList()
           : [file];
 
       row = OiDraggable<List<OiFileNodeData>>(
@@ -608,11 +602,8 @@ class _OiFileListViewState extends State<OiFileListView> {
     return row;
   }
 
-  Widget _buildName(OiFileNodeData file, dynamic colors) {
-    final normalStyle = TextStyle(
-      fontSize: 13,
-      color: (colors as dynamic).text as Color,
-    );
+  Widget _buildName(OiFileNodeData file, OiColorScheme colors) {
+    final normalStyle = TextStyle(fontSize: 13, color: colors.text);
 
     final query = widget.searchQuery;
     if (query == null || query.isEmpty) {
@@ -630,7 +621,7 @@ class _OiFileListViewState extends State<OiFileListView> {
       normalStyle,
       normalStyle.copyWith(
         fontWeight: FontWeight.w700,
-        color: (colors as dynamic).primary.base as Color,
+        color: colors.primary.base,
       ),
     );
 
@@ -641,19 +632,18 @@ class _OiFileListViewState extends State<OiFileListView> {
     );
   }
 
-  Widget _buildDragFeedback(List<OiFileNodeData> files, dynamic colors) {
+  Widget _buildDragFeedback(List<OiFileNodeData> files, OiColorScheme colors) {
     final label = files.length == 1
         ? files.first.name
         : '${files.length} items';
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: (colors as dynamic).surface as Color,
+        color: colors.surface,
         borderRadius: BorderRadius.circular(8),
         boxShadow: [
           BoxShadow(
-            color: ((colors as dynamic).overlay as Color)
-                .withValues(alpha: 0.2),
+            color: colors.overlay.withValues(alpha: 0.2),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -665,27 +655,18 @@ class _OiFileListViewState extends State<OiFileListView> {
           if (files.length == 1 && files.first.isFolder)
             const OiFolderIcon(size: OiFolderIconSize.sm)
           else if (files.length == 1)
-            OiFileIcon(
-              fileName: files.first.name,
-              size: OiFileIconSize.sm,
-            )
+            OiFileIcon(fileName: files.first.name, size: OiFileIconSize.sm)
           else
             Text(
               '${files.length}',
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w700,
-                color: (colors as dynamic).primary.base as Color,
+                color: colors.primary.base,
               ),
             ),
           const SizedBox(width: 8),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 13,
-              color: (colors as dynamic).text as Color,
-            ),
-          ),
+          Text(label, style: TextStyle(fontSize: 13, color: colors.text)),
         ],
       ),
     );
@@ -736,8 +717,18 @@ class _OiFileListViewState extends State<OiFileListView> {
 
   static String _formatShortDate(DateTime date) {
     const months = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
     ];
     return '${months[date.month - 1]} ${date.day}, ${date.year}';
   }

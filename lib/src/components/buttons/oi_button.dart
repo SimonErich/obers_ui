@@ -74,7 +74,7 @@ enum _OiButtonKind { standard, icon, split, countdown, confirm }
 ///
 /// **Accessibility (REQ-0019):** Every named constructor (including
 /// [OiButton.icon]) requires a `label` parameter. For [OiButton.icon] the
-/// label is mapped to [Semantics.label] so that icon-only buttons remain
+/// label is mapped to `Semantics.label` so that icon-only buttons remain
 /// accessible to screen readers.
 ///
 /// Uses [OiTappable] as the interaction layer; respects [OiDensityScope] for
@@ -429,7 +429,7 @@ class OiButton extends StatefulWidget {
   /// An optional override for the button's corner border radius.
   ///
   /// When `null` (the default), the radius is taken from the component theme
-  /// or falls back to [OiTheme.radius.sm].
+  /// or falls back to `OiTheme.radius.sm`.
   final BorderRadius? borderRadius;
 
   @override
@@ -652,7 +652,10 @@ class _OiButtonState extends State<OiButton> {
                   : 0,
             ),
             child: OiIcon.decorative(
-                icon: icon, size: _iconSize(), color: foreground),
+              icon: icon,
+              size: _iconSize(),
+              color: foreground,
+            ),
           )
         : null;
 
@@ -740,7 +743,11 @@ class _OiButtonState extends State<OiButton> {
       button = SizedBox(width: double.infinity, child: button);
     }
     if (widget.tooltip != null) {
-      return OiTooltip(label: widget.tooltip!, message: widget.tooltip!, child: button);
+      return OiTooltip(
+        label: widget.tooltip!,
+        message: widget.tooltip!,
+        child: button,
+      );
     }
     return button;
   }

@@ -102,10 +102,7 @@ void main() {
       SizedBox(
         width: 500,
         height: 600,
-        child: OiFileManager(
-          items: [file0()],
-          label: 'Files',
-        ),
+        child: OiFileManager(items: [file0()], label: 'Files'),
       ),
     );
     expect(find.byType(GridView), findsOneWidget);
@@ -319,17 +316,13 @@ void main() {
       expect(find.text('two.txt'), findsOneWidget);
     });
 
-    testWidgets('shows empty state when no items match search', (
-      tester,
-    ) async {
+    testWidgets('shows empty state when no items match search', (tester) async {
       await tester.pumpObers(
         SizedBox(
           width: 500,
           height: 600,
           child: OiFileManager(
-            items: [
-              file0(key: 'a', name: 'report.pdf'),
-            ],
+            items: [file0(key: 'a', name: 'report.pdf')],
             label: 'Files',
             layout: OiFileManagerLayout.list,
             searchQuery: 'xyz',
@@ -411,9 +404,7 @@ void main() {
         ),
       );
 
-      final card = tester.widget<OiFileGridCard>(
-        find.byType(OiFileGridCard),
-      );
+      final card = tester.widget<OiFileGridCard>(find.byType(OiFileGridCard));
       expect(card.searchQuery, 'port');
     });
   });
@@ -446,10 +437,7 @@ void main() {
         SizedBox(
           width: 500,
           height: 600,
-          child: OiFileManager(
-            items: [file0()],
-            label: 'Files',
-          ),
+          child: OiFileManager(items: [file0()], label: 'Files'),
         ),
       );
 
@@ -516,72 +504,68 @@ void main() {
       expect(calls, ['']);
     });
 
-    testWidgets(
-      'rapid keystrokes trigger only one callback after debounce',
-      (tester) async {
-        final calls = <String>[];
+    testWidgets('rapid keystrokes trigger only one callback after debounce', (
+      tester,
+    ) async {
+      final calls = <String>[];
 
-        await tester.pumpObers(
-          SizedBox(
-            width: 500,
-            height: 600,
-            child: OiFileManager(
-              items: [file0()],
-              label: 'Files',
-              onSearch: calls.add,
-            ),
+      await tester.pumpObers(
+        SizedBox(
+          width: 500,
+          height: 600,
+          child: OiFileManager(
+            items: [file0()],
+            label: 'Files',
+            onSearch: calls.add,
           ),
-        );
+        ),
+      );
 
-        // Simulate rapid typing.
-        await tester.enterText(find.byType(OiTextInput), 'r');
-        await tester.pump(const Duration(milliseconds: 50));
-        await tester.enterText(find.byType(OiTextInput), 're');
-        await tester.pump(const Duration(milliseconds: 50));
-        await tester.enterText(find.byType(OiTextInput), 'rep');
-        await tester.pump(const Duration(milliseconds: 50));
-        await tester.enterText(find.byType(OiTextInput), 'repo');
-        await tester.pump(const Duration(milliseconds: 50));
-        await tester.enterText(find.byType(OiTextInput), 'repor');
-        await tester.pump(const Duration(milliseconds: 50));
-        await tester.enterText(find.byType(OiTextInput), 'report');
-        await tester.pump(const Duration(milliseconds: 300));
+      // Simulate rapid typing.
+      await tester.enterText(find.byType(OiTextInput), 'r');
+      await tester.pump(const Duration(milliseconds: 50));
+      await tester.enterText(find.byType(OiTextInput), 're');
+      await tester.pump(const Duration(milliseconds: 50));
+      await tester.enterText(find.byType(OiTextInput), 'rep');
+      await tester.pump(const Duration(milliseconds: 50));
+      await tester.enterText(find.byType(OiTextInput), 'repo');
+      await tester.pump(const Duration(milliseconds: 50));
+      await tester.enterText(find.byType(OiTextInput), 'repor');
+      await tester.pump(const Duration(milliseconds: 50));
+      await tester.enterText(find.byType(OiTextInput), 'report');
+      await tester.pump(const Duration(milliseconds: 300));
 
-        // Only the final value should have been emitted.
-        expect(calls.where((q) => q.isNotEmpty).toList(), ['report']);
-      },
-    );
+      // Only the final value should have been emitted.
+      expect(calls.where((q) => q.isNotEmpty).toList(), ['report']);
+    });
   });
 
   // ── Server-side search (REQ-0992) ─────────────────────────────────────
 
   group('Server-side search (REQ-0992)', () {
-    testWidgets(
-      'does not client-side filter when onSearch is provided',
-      (tester) async {
-        // Simulate a backend that returns a result whose name does NOT
-        // contain the query (e.g. fuzzy / semantic match).
-        await tester.pumpObers(
-          SizedBox(
-            width: 500,
-            height: 600,
-            child: OiFileManager(
-              items: [
-                file0(key: 'a', name: 'annual_summary.pdf'),
-              ],
-              label: 'Files',
-              layout: OiFileManagerLayout.list,
-              onSearch: (_) {},
-              searchQuery: 'report',
-            ),
+    testWidgets('does not client-side filter when onSearch is provided', (
+      tester,
+    ) async {
+      // Simulate a backend that returns a result whose name does NOT
+      // contain the query (e.g. fuzzy / semantic match).
+      await tester.pumpObers(
+        SizedBox(
+          width: 500,
+          height: 600,
+          child: OiFileManager(
+            items: [file0(key: 'a', name: 'annual_summary.pdf')],
+            label: 'Files',
+            layout: OiFileManagerLayout.list,
+            onSearch: (_) {},
+            searchQuery: 'report',
           ),
-        );
+        ),
+      );
 
-        // Item is visible even though its name does not contain the query,
-        // because the consumer (server) already filtered the list.
-        expect(find.text('annual_summary.pdf'), findsOneWidget);
-      },
-    );
+      // Item is visible even though its name does not contain the query,
+      // because the consumer (server) already filtered the list.
+      expect(find.text('annual_summary.pdf'), findsOneWidget);
+    });
 
     testWidgets(
       'still highlights searchQuery in tiles for server-side search',
@@ -591,9 +575,7 @@ void main() {
             width: 500,
             height: 600,
             child: OiFileManager(
-              items: [
-                file0(key: 'a', name: 'report.pdf'),
-              ],
+              items: [file0(key: 'a', name: 'report.pdf')],
               label: 'Files',
               layout: OiFileManagerLayout.list,
               onSearch: (_) {},
@@ -607,77 +589,75 @@ void main() {
       },
     );
 
-    testWidgets(
-      'consumer re-provides filtered items after onSearch callback',
-      (tester) async {
-        final allFiles = [
-          file0(key: 'a', name: 'report.pdf'),
-          file0(key: 'b', name: 'notes.txt'),
-          file0(key: 'c', name: 'image.png'),
-        ];
+    testWidgets('consumer re-provides filtered items after onSearch callback', (
+      tester,
+    ) async {
+      final allFiles = [
+        file0(key: 'a', name: 'report.pdf'),
+        file0(key: 'b', name: 'notes.txt'),
+        file0(key: 'c', name: 'image.png'),
+      ];
 
-        // Initial state: all items, no query.
-        await tester.pumpObers(
-          SizedBox(
-            width: 500,
-            height: 600,
-            child: OiFileManager(
-              items: allFiles,
-              label: 'Files',
-              layout: OiFileManagerLayout.list,
-              onSearch: (_) {},
-            ),
+      // Initial state: all items, no query.
+      await tester.pumpObers(
+        SizedBox(
+          width: 500,
+          height: 600,
+          child: OiFileManager(
+            items: allFiles,
+            label: 'Files',
+            layout: OiFileManagerLayout.list,
+            onSearch: (_) {},
           ),
-        );
+        ),
+      );
 
-        expect(find.text('report.pdf'), findsOneWidget);
-        expect(find.text('notes.txt'), findsOneWidget);
-        expect(find.text('image.png'), findsOneWidget);
+      expect(find.text('report.pdf'), findsOneWidget);
+      expect(find.text('notes.txt'), findsOneWidget);
+      expect(find.text('image.png'), findsOneWidget);
 
-        // Consumer re-provides filtered list (simulating backend response).
-        final filtered = [file0(key: 'a', name: 'report.pdf')];
-        await tester.pumpObers(
-          SizedBox(
-            width: 500,
-            height: 600,
-            child: OiFileManager(
-              items: filtered,
-              label: 'Files',
-              layout: OiFileManagerLayout.list,
-              onSearch: (_) {},
-              searchQuery: 'report',
-            ),
+      // Consumer re-provides filtered list (simulating backend response).
+      final filtered = [file0(key: 'a', name: 'report.pdf')];
+      await tester.pumpObers(
+        SizedBox(
+          width: 500,
+          height: 600,
+          child: OiFileManager(
+            items: filtered,
+            label: 'Files',
+            layout: OiFileManagerLayout.list,
+            onSearch: (_) {},
+            searchQuery: 'report',
           ),
-        );
+        ),
+      );
 
-        expect(find.text('report.pdf'), findsOneWidget);
-        expect(find.text('notes.txt'), findsNothing);
-        expect(find.text('image.png'), findsNothing);
-      },
-    );
+      expect(find.text('report.pdf'), findsOneWidget);
+      expect(find.text('notes.txt'), findsNothing);
+      expect(find.text('image.png'), findsNothing);
+    });
 
-    testWidgets(
-      'client-side filtering still works when onSearch is null',
-      (tester) async {
-        await tester.pumpObers(
-          SizedBox(
-            width: 500,
-            height: 600,
-            child: OiFileManager(
-              items: [
-                file0(key: 'a', name: 'report.pdf'),
-                file0(key: 'b', name: 'notes.txt'),
-              ],
-              label: 'Files',
-              layout: OiFileManagerLayout.list,
-              searchQuery: 'report',
-            ),
+    testWidgets('client-side filtering still works when onSearch is null', (
+      tester,
+    ) async {
+      await tester.pumpObers(
+        SizedBox(
+          width: 500,
+          height: 600,
+          child: OiFileManager(
+            items: [
+              file0(key: 'a', name: 'report.pdf'),
+              file0(key: 'b', name: 'notes.txt'),
+            ],
+            label: 'Files',
+            layout: OiFileManagerLayout.list,
+            searchQuery: 'report',
           ),
-        );
+        ),
+      );
 
-        expect(find.text('report.pdf'), findsOneWidget);
-        expect(find.text('notes.txt'), findsNothing);
-      },
-    );
+      expect(find.text('report.pdf'), findsOneWidget);
+      expect(find.text('notes.txt'), findsNothing);
+    });
   });
 }

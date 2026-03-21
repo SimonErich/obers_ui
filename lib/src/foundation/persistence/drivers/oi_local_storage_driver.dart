@@ -5,6 +5,8 @@ import 'package:obers_ui/src/foundation/persistence/drivers/_platform_storage_st
     if (dart.library.io) 'package:obers_ui/src/foundation/persistence/drivers/_platform_storage_io.dart';
 import 'package:obers_ui/src/foundation/persistence/oi_settings_data.dart';
 import 'package:obers_ui/src/foundation/persistence/oi_settings_driver.dart';
+import 'package:shared_preferences/shared_preferences.dart'
+    show SharedPreferences;
 
 /// A settings driver that persists to platform-native local storage.
 ///

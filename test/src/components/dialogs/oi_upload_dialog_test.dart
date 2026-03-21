@@ -27,13 +27,11 @@ void main() {
       expect(find.text('Upload Files'), findsOneWidget);
     });
 
-    testWidgets('shows destination path in title when provided',
-        (tester) async {
+    testWidgets('shows destination path in title when provided', (
+      tester,
+    ) async {
       await tester.pumpObers(
-        OiUploadDialog(
-          onUpload: (_, __) {},
-          destinationPath: '/Documents',
-        ),
+        OiUploadDialog(onUpload: (_, __) {}, destinationPath: '/Documents'),
         surfaceSize: const Size(600, 800),
       );
       expect(find.text('Upload to: /Documents'), findsOneWidget);
@@ -64,8 +62,9 @@ void main() {
       expect(find.widgetWithText(OiButton, 'Upload'), findsOneWidget);
     });
 
-    testWidgets('Upload button does not fire callback when no files',
-        (tester) async {
+    testWidgets('Upload button does not fire callback when no files', (
+      tester,
+    ) async {
       var called = false;
       await tester.pumpObers(
         OiUploadDialog(onUpload: (_, __) => called = true),
@@ -82,10 +81,7 @@ void main() {
     testWidgets('tapping Cancel fires onCancel', (tester) async {
       var cancelled = false;
       await tester.pumpObers(
-        OiUploadDialog(
-          onUpload: (_, __) {},
-          onCancel: () => cancelled = true,
-        ),
+        OiUploadDialog(onUpload: (_, __) {}, onCancel: () => cancelled = true),
         surfaceSize: const Size(600, 800),
       );
       await tester.tap(find.widgetWithText(OiButton, 'Cancel'));
@@ -96,14 +92,10 @@ void main() {
     testWidgets('ESC key fires onCancel', (tester) async {
       var cancelled = false;
       await tester.pumpObers(
-        OiUploadDialog(
-          onUpload: (_, __) {},
-          onCancel: () => cancelled = true,
-        ),
+        OiUploadDialog(onUpload: (_, __) {}, onCancel: () => cancelled = true),
         surfaceSize: const Size(600, 800),
       );
-      final kl =
-          tester.widget<KeyboardListener>(find.byType(KeyboardListener));
+      final kl = tester.widget<KeyboardListener>(find.byType(KeyboardListener));
       kl.focusNode.requestFocus();
       await tester.pump();
       await tester.sendKeyEvent(LogicalKeyboardKey.escape);
@@ -116,10 +108,7 @@ void main() {
         OiUploadDialog(onUpload: (_, __) {}),
         surfaceSize: const Size(600, 800),
       );
-      expect(
-        find.bySemanticsLabel(RegExp('Upload dialog')),
-        findsOneWidget,
-      );
+      expect(find.bySemanticsLabel(RegExp('Upload dialog')), findsOneWidget);
     });
 
     testWidgets('does not show file list when no files added', (tester) async {
@@ -162,10 +151,7 @@ void main() {
 
     testWidgets('renders with max file size constraint', (tester) async {
       await tester.pumpObers(
-        OiUploadDialog(
-          onUpload: (_, __) {},
-          maxFileSize: 1024 * 1024,
-        ),
+        OiUploadDialog(onUpload: (_, __) {}, maxFileSize: 1024 * 1024),
         surfaceSize: const Size(600, 800),
       );
       expect(find.byType(OiUploadDialog), findsOneWidget);
@@ -173,10 +159,7 @@ void main() {
 
     testWidgets('renders with max files constraint', (tester) async {
       await tester.pumpObers(
-        OiUploadDialog(
-          onUpload: (_, __) {},
-          maxFiles: 5,
-        ),
+        OiUploadDialog(onUpload: (_, __) {}, maxFiles: 5),
         surfaceSize: const Size(600, 800),
       );
       expect(find.byType(OiUploadDialog), findsOneWidget);

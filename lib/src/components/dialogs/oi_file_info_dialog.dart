@@ -57,11 +57,7 @@ class OiFileInfoDialog extends StatelessWidget {
                   SizedBox(
                     width: 80,
                     height: 80,
-                    child: OiFilePreview(
-                      file: file,
-                      width: 80,
-                      height: 80,
-                    ),
+                    child: OiFilePreview(file: file, width: 80, height: 80),
                   )
                 else
                   OiFileIcon(
@@ -86,8 +82,7 @@ class OiFileInfoDialog extends StatelessWidget {
                       Text(
                         file.isFolder
                             ? 'Folder'
-                            : OiFileUtils.fileTypeName(
-                                file.resolvedExtension),
+                            : OiFileUtils.fileTypeName(file.resolvedExtension),
                         style: TextStyle(
                           fontSize: 13,
                           color: colors.textSubtle,
@@ -104,7 +99,11 @@ class OiFileInfoDialog extends StatelessWidget {
             SizedBox(height: spacing.md),
             // Info rows
             if (!file.isFolder && file.size != null)
-              _InfoRow(label: 'Size', value: file.formattedSize, colors: colors),
+              _InfoRow(
+                label: 'Size',
+                value: file.formattedSize,
+                colors: colors,
+              ),
             if (file.parentId != null)
               _InfoRow(
                 label: 'Location',
@@ -136,19 +135,13 @@ class OiFileInfoDialog extends StatelessWidget {
               Container(height: 1, color: colors.borderSubtle),
               SizedBox(height: spacing.sm),
               for (final entry in extraMetadata!.entries)
-                _InfoRow(
-                  label: entry.key,
-                  value: entry.value,
-                  colors: colors,
-                ),
+                _InfoRow(label: entry.key, value: entry.value, colors: colors),
             ],
             SizedBox(height: spacing.lg),
             // Close button
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                OiButton.ghost(label: 'Close', onTap: onClose),
-              ],
+              children: [OiButton.ghost(label: 'Close', onTap: onClose)],
             ),
           ],
         ),
@@ -158,8 +151,18 @@ class OiFileInfoDialog extends StatelessWidget {
 
   static String _formatDate(DateTime date) {
     final months = [
-      'January', 'February', 'March', 'April', 'May', 'June',
-      'July', 'August', 'September', 'October', 'November', 'December',
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December',
     ];
     return '${months[date.month - 1]} ${date.day}, ${date.year} at '
         '${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}';
@@ -191,19 +194,13 @@ class _InfoRow extends StatelessWidget {
             width: 80,
             child: Text(
               label,
-              style: TextStyle(
-                fontSize: 12,
-                color: colors.textMuted,
-              ),
+              style: TextStyle(fontSize: 12, color: colors.textMuted),
             ),
           ),
           Expanded(
             child: Text(
               value,
-              style: TextStyle(
-                fontSize: 12,
-                color: colors.text,
-              ),
+              style: TextStyle(fontSize: 12, color: colors.text),
             ),
           ),
         ],

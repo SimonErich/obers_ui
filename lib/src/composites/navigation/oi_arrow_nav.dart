@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/obers_ui.dart'
+    show OiComboBox, OiCommandBar, OiContextMenu, OiSelect, OiTable, OiTree;
 
 /// Wraps a list of focusable children and enables arrow key navigation.
 ///
@@ -92,7 +94,7 @@ class OiArrowNav extends StatefulWidget {
   /// Requires [itemLabel] to be set.
   final bool typeAhead;
 
-  /// Returns the label for the item at [index].
+  /// Returns the label for the item at index.
   ///
   /// Required when [typeAhead] is `true`. Used to match typed characters
   /// against item labels (case-insensitive).
@@ -175,7 +177,9 @@ class _OiArrowNavState extends State<OiArrowNav> {
     // ── Type-ahead ─────────────────────────────────────────────────────────
     if (widget.typeAhead && widget.itemLabel != null) {
       final character = event.character;
-      if (character != null && character.length == 1 && !character.contains(RegExp(r'[\x00-\x1F]'))) {
+      if (character != null &&
+          character.length == 1 &&
+          !character.contains(RegExp(r'[\x00-\x1F]'))) {
         _handleTypeAhead(character);
         return KeyEventResult.handled;
       }

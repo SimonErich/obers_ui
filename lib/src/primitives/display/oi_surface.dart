@@ -2,6 +2,9 @@ import 'dart:math' as math;
 import 'dart:ui' as ui;
 
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/obers_ui.dart' show OiPerformanceConfig;
+import 'package:obers_ui/src/foundation/theme/oi_animation_config.dart'
+    show OiPerformanceConfig;
 import 'package:obers_ui/src/foundation/theme/oi_decoration_theme.dart';
 import 'package:obers_ui/src/foundation/theme/oi_effects_theme.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';

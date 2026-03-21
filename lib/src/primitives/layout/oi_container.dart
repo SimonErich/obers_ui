@@ -77,7 +77,9 @@ class OiContainer extends StatelessWidget {
     }
 
     content = ConstrainedBox(
-      constraints: BoxConstraints(maxWidth: resolvedMaxWidth ?? double.infinity),
+      constraints: BoxConstraints(
+        maxWidth: resolvedMaxWidth ?? double.infinity,
+      ),
       child: content,
     );
 

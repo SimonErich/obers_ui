@@ -15,7 +15,9 @@ import 'package:obers_ui/src/utils/color_utils.dart';
 class OiReplyPreview extends StatelessWidget {
   /// Creates an [OiReplyPreview].
   const OiReplyPreview({
-    required this.senderName, required this.content, super.key,
+    required this.senderName,
+    required this.content,
+    super.key,
     this.accentColor,
     this.dismissible = false,
     this.onDismiss,
@@ -52,8 +54,7 @@ class OiReplyPreview extends StatelessWidget {
     final colors = context.colors;
     final spacing = context.spacing;
 
-    final resolvedAccent =
-        accentColor ?? OiColorUtils.fromString(senderName);
+    final resolvedAccent = accentColor ?? OiColorUtils.fromString(senderName);
 
     return Semantics(
       container: true,
@@ -94,10 +95,7 @@ class OiReplyPreview extends StatelessWidget {
                   ),
                   Text(
                     content,
-                    style: TextStyle(
-                      color: colors.textSubtle,
-                      fontSize: 13,
-                    ),
+                    style: TextStyle(color: colors.textSubtle, fontSize: 13),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),

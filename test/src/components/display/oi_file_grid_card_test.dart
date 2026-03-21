@@ -93,9 +93,7 @@ void main() {
 
     testWidgets('onDoubleTap fires on double-tap', (tester) async {
       var doubleTapped = false;
-      await tester.pumpObers(
-        _card(onDoubleTap: () => doubleTapped = true),
-      );
+      await tester.pumpObers(_card(onDoubleTap: () => doubleTapped = true));
 
       await tester.tap(find.byType(OiFileGridCard));
       await tester.pump(const Duration(milliseconds: 50));
@@ -110,16 +108,17 @@ void main() {
 
   group('Search highlight (REQ-0991)', () {
     testWidgets('no highlight when searchQuery is null', (tester) async {
-      await tester.pumpObers(
-        _card(file: _file(name: 'photo.jpg')),
-      );
+      await tester.pumpObers(_card(file: _file(name: 'photo.jpg')));
 
       expect(find.text('photo.jpg'), findsOneWidget);
     });
 
     testWidgets('highlights matching portion of file name', (tester) async {
       await tester.pumpObers(
-        _card(file: _file(name: 'photo.jpg'), searchQuery: 'hot'),
+        _card(
+          file: _file(name: 'photo.jpg'),
+          searchQuery: 'hot',
+        ),
       );
 
       final richText = tester.widget<RichText>(find.byType(RichText).at(1));
@@ -140,7 +139,10 @@ void main() {
 
     testWidgets('highlight is case-insensitive', (tester) async {
       await tester.pumpObers(
-        _card(file: _file(name: 'Photo.JPG'), searchQuery: 'PHOTO'),
+        _card(
+          file: _file(name: 'Photo.JPG'),
+          searchQuery: 'PHOTO',
+        ),
       );
 
       final richText = tester.widget<RichText>(find.byType(RichText).at(1));
@@ -154,7 +156,10 @@ void main() {
 
     testWidgets('no highlight when query does not match', (tester) async {
       await tester.pumpObers(
-        _card(file: _file(name: 'photo.jpg'), searchQuery: 'xyz'),
+        _card(
+          file: _file(name: 'photo.jpg'),
+          searchQuery: 'xyz',
+        ),
       );
 
       final richText = tester.widget<RichText>(find.byType(RichText).at(1));
@@ -166,7 +171,10 @@ void main() {
 
     testWidgets('empty searchQuery renders plain text', (tester) async {
       await tester.pumpObers(
-        _card(file: _file(name: 'photo.jpg'), searchQuery: ''),
+        _card(
+          file: _file(name: 'photo.jpg'),
+          searchQuery: '',
+        ),
       );
 
       expect(find.text('photo.jpg'), findsOneWidget);

@@ -1,4 +1,6 @@
 import 'package:flutter/foundation.dart';
+import 'package:obers_ui/obers_ui.dart' show OiGantt;
+import 'package:obers_ui/src/composites/scheduling/oi_gantt.dart' show OiGantt;
 import 'package:obers_ui/src/foundation/persistence/oi_settings_data.dart';
 
 /// Settings for [OiGantt] that can be persisted.

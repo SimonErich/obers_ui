@@ -166,10 +166,7 @@ void main() {
 
   testWidgets('frosted:true adds BackdropFilter', (tester) async {
     await tester.pumpObers(
-      const OiSurface(
-        frosted: true,
-        child: SizedBox(width: 100, height: 100),
-      ),
+      const OiSurface(frosted: true, child: SizedBox(width: 100, height: 100)),
     );
     expect(find.byType(BackdropFilter), findsOneWidget);
   });

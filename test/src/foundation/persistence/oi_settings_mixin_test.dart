@@ -172,20 +172,14 @@ void main() {
     testWidgets('rapid updateSettings: only last value saved', (t) async {
       final driver = OiInMemorySettingsDriver();
       await t.pumpWidget(wrap(_W(driver: driver)));
-      final state = t.state<_WState>(find.byType(_W));
       // Fire multiple rapid updates — only the last should be persisted.
-      state.runUpdate(
-        const _S(n: 1),
-        debounce: const Duration(milliseconds: 200),
-      );
-      state.runUpdate(
-        const _S(n: 2),
-        debounce: const Duration(milliseconds: 200),
-      );
-      state.runUpdate(
-        const _S(n: 3),
-        debounce: const Duration(milliseconds: 200),
-      );
+      t.state<_WState>(find.byType(_W))
+        ..runUpdate(const _S(n: 1), debounce: const Duration(milliseconds: 200))
+        ..runUpdate(const _S(n: 2), debounce: const Duration(milliseconds: 200))
+        ..runUpdate(
+          const _S(n: 3),
+          debounce: const Duration(milliseconds: 200),
+        );
       // Nothing saved yet.
       expect(driver.store.isEmpty, isTrue);
       await t.pump(const Duration(milliseconds: 250));

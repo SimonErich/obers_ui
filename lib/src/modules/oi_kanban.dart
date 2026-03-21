@@ -55,7 +55,9 @@ class OiKanbanColumn<T> {
 class OiKanban<T> extends StatefulWidget {
   /// Creates an [OiKanban].
   const OiKanban({
-    required this.columns, required this.label, super.key,
+    required this.columns,
+    required this.label,
+    super.key,
     this.onCardMove,
     this.onColumnReorder,
     this.cardBuilder,
@@ -175,8 +177,7 @@ class _OiKanbanState<T> extends State<OiKanban<T>>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final newDriver =
-        widget.settingsDriver ?? OiSettingsProvider.of(context);
+    final newDriver = widget.settingsDriver ?? OiSettingsProvider.of(context);
     if (newDriver != _resolvedDriver) {
       _resolvedDriver = newDriver;
       if (settingsLoaded) {

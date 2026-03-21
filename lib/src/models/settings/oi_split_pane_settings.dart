@@ -1,4 +1,7 @@
 import 'package:flutter/foundation.dart';
+import 'package:obers_ui/obers_ui.dart' show OiSplitPane;
+import 'package:obers_ui/src/components/panels/oi_split_pane.dart'
+    show OiSplitPane;
 import 'package:obers_ui/src/foundation/persistence/oi_settings_data.dart';
 
 /// Settings for [OiSplitPane] that can be persisted.

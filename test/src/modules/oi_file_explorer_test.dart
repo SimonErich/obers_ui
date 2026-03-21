@@ -1,13 +1,14 @@
+// Tests do not require documentation comments.
 // ignore_for_file: public_member_api_docs
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui/src/composites/data/oi_tree.dart';
+import 'package:obers_ui/src/composites/files/oi_file_list_view.dart';
 import 'package:obers_ui/src/composites/files/oi_file_sidebar.dart';
 import 'package:obers_ui/src/models/oi_file_explorer_controller.dart';
 import 'package:obers_ui/src/models/oi_file_node_data.dart';
 import 'package:obers_ui/src/models/settings/oi_file_explorer_settings.dart';
-import 'package:obers_ui/src/composites/files/oi_file_list_view.dart';
 import 'package:obers_ui/src/modules/oi_file_explorer.dart';
 
 import '../../helpers/pump_app.dart';
@@ -29,28 +30,19 @@ const _testFiles = [
     size: 2048000,
     mimeType: 'image/jpeg',
   ),
-  OiFileNodeData(
-    id: 'folder1',
-    name: 'Archive',
-    isFolder: true,
-    itemCount: 8,
-  ),
+  OiFileNodeData(id: 'folder1', name: 'Archive', isFolder: true, itemCount: 8),
 ];
 
 final _folderTree = <OiTreeNode<OiFileNodeData>>[
-  OiTreeNode<OiFileNodeData>(
+  const OiTreeNode<OiFileNodeData>(
     id: 'root',
     label: 'Home',
-    data: const OiFileNodeData(id: 'root', name: 'Home', isFolder: true),
+    data: OiFileNodeData(id: 'root', name: 'Home', isFolder: true),
     children: [
       OiTreeNode<OiFileNodeData>(
         id: 'docs',
         label: 'Documents',
-        data: const OiFileNodeData(
-          id: 'docs',
-          name: 'Documents',
-          isFolder: true,
-        ),
+        data: OiFileNodeData(id: 'docs', name: 'Documents', isFolder: true),
       ),
     ],
   ),
@@ -91,12 +83,10 @@ Widget _explorer({
       label: label,
       loadFolder: loadFolder ?? (_) async => _testFiles,
       loadFolderTree: loadFolderTree ?? (_) async => _folderTree,
-      onCreateFolder: onCreateFolder ??
-          (parentId, name) async => OiFileNodeData(
-                id: 'new_folder',
-                name: name,
-                isFolder: true,
-              ),
+      onCreateFolder:
+          onCreateFolder ??
+          (parentId, name) async =>
+              OiFileNodeData(id: 'new_folder', name: name, isFolder: true),
       onRename: onRename ?? (_, __) async {},
       onDelete: onDelete ?? (_) async {},
       onMove: onMove ?? (_, __) async {},
@@ -117,10 +107,7 @@ Widget _explorer({
 }
 
 /// Pumps the explorer with a large surface to avoid overflow.
-Future<void> _pumpExplorer(
-  WidgetTester tester,
-  Widget widget,
-) async {
+Future<void> _pumpExplorer(WidgetTester tester, Widget widget) async {
   await tester.pumpObers(widget, surfaceSize: _surfaceSize);
 }
 
@@ -144,15 +131,13 @@ void main() {
       expect(
         find.byWidgetPredicate(
           (w) =>
-              w is Semantics &&
-              w.properties.label == 'File explorer toolbar',
+              w is Semantics && w.properties.label == 'File explorer toolbar',
         ),
         findsOneWidget,
       );
     });
 
-    testWidgets('renders empty state when no folder is loaded',
-        (tester) async {
+    testWidgets('renders empty state when no folder is loaded', (tester) async {
       await _pumpExplorer(tester, _explorer());
       await tester.pumpAndSettle();
       expect(find.text('This folder is empty'), findsOneWidget);
@@ -163,13 +148,12 @@ void main() {
     // ══════════════════════════════════════════════════════════════════════════
 
     testWidgets('renders sidebar when showSidebar is true', (tester) async {
-      await _pumpExplorer(tester, _explorer(showSidebar: true));
+      await _pumpExplorer(tester, _explorer());
       await tester.pumpAndSettle();
       expect(
         find.byWidgetPredicate(
           (w) =>
-              w is Semantics &&
-              w.properties.label == 'File explorer sidebar',
+              w is Semantics && w.properties.label == 'File explorer sidebar',
         ),
         findsOneWidget,
       );
@@ -181,8 +165,7 @@ void main() {
       expect(
         find.byWidgetPredicate(
           (w) =>
-              w is Semantics &&
-              w.properties.label == 'File explorer sidebar',
+              w is Semantics && w.properties.label == 'File explorer sidebar',
         ),
         findsNothing,
       );
@@ -196,21 +179,16 @@ void main() {
       final controller = OiFileExplorerController();
       addTearDown(controller.dispose);
 
-      await _pumpExplorer(tester, _explorer(
-          controller: controller,
-          loadFolder: (_) async => _testFiles,
-        ),
+      await _pumpExplorer(
+        tester,
+        _explorer(controller: controller, loadFolder: (_) async => _testFiles),
       );
       await tester.pumpAndSettle();
 
       // Navigate to root folder
       await controller.navigateTo(
         'root',
-        folder: const OiFileNodeData(
-          id: 'root',
-          name: 'Home',
-          isFolder: true,
-        ),
+        folder: const OiFileNodeData(id: 'root', name: 'Home', isFolder: true),
       );
       await tester.pumpAndSettle();
 
@@ -223,20 +201,12 @@ void main() {
       final controller = OiFileExplorerController();
       addTearDown(controller.dispose);
 
-      await _pumpExplorer(tester, _explorer(
-          controller: controller,
-          defaultViewMode: OiFileViewMode.list,
-        ),
-      );
+      await _pumpExplorer(tester, _explorer(controller: controller));
       await tester.pumpAndSettle();
 
       await controller.navigateTo(
         'root',
-        folder: const OiFileNodeData(
-          id: 'root',
-          name: 'Home',
-          isFolder: true,
-        ),
+        folder: const OiFileNodeData(id: 'root', name: 'Home', isFolder: true),
       );
       await tester.pumpAndSettle();
 
@@ -252,17 +222,12 @@ void main() {
       final controller = OiFileExplorerController();
       addTearDown(controller.dispose);
 
-      await _pumpExplorer(tester, _explorer(controller: controller),
-      );
+      await _pumpExplorer(tester, _explorer(controller: controller));
       await tester.pumpAndSettle();
 
       await controller.navigateTo(
         'root',
-        folder: const OiFileNodeData(
-          id: 'root',
-          name: 'Home',
-          isFolder: true,
-        ),
+        folder: const OiFileNodeData(id: 'root', name: 'Home', isFolder: true),
       );
       await tester.pumpAndSettle();
 
@@ -280,22 +245,18 @@ void main() {
     // ── Selection ─────────────────────────────────────────────────────────
     // ══════════════════════════════════════════════════════════════════════════
 
-    testWidgets('controller selection changes are reflected in UI',
-        (tester) async {
+    testWidgets('controller selection changes are reflected in UI', (
+      tester,
+    ) async {
       final controller = OiFileExplorerController();
       addTearDown(controller.dispose);
 
-      await _pumpExplorer(tester, _explorer(controller: controller),
-      );
+      await _pumpExplorer(tester, _explorer(controller: controller));
       await tester.pumpAndSettle();
 
       await controller.navigateTo(
         'root',
-        folder: const OiFileNodeData(
-          id: 'root',
-          name: 'Home',
-          isFolder: true,
-        ),
+        folder: const OiFileNodeData(id: 'root', name: 'Home', isFolder: true),
       );
       await tester.pumpAndSettle();
 
@@ -306,22 +267,18 @@ void main() {
       expect(controller.selectedKeys, {'file1'});
     });
 
-    testWidgets('selection toolbar appears when items are selected',
-        (tester) async {
+    testWidgets('selection toolbar appears when items are selected', (
+      tester,
+    ) async {
       final controller = OiFileExplorerController();
       addTearDown(controller.dispose);
 
-      await _pumpExplorer(tester, _explorer(controller: controller),
-      );
+      await _pumpExplorer(tester, _explorer(controller: controller));
       await tester.pumpAndSettle();
 
       await controller.navigateTo(
         'root',
-        folder: const OiFileNodeData(
-          id: 'root',
-          name: 'Home',
-          isFolder: true,
-        ),
+        folder: const OiFileNodeData(id: 'root', name: 'Home', isFolder: true),
       );
       await tester.pumpAndSettle();
 
@@ -335,17 +292,12 @@ void main() {
       final controller = OiFileExplorerController();
       addTearDown(controller.dispose);
 
-      await _pumpExplorer(tester, _explorer(controller: controller),
-      );
+      await _pumpExplorer(tester, _explorer(controller: controller));
       await tester.pumpAndSettle();
 
       await controller.navigateTo(
         'root',
-        folder: const OiFileNodeData(
-          id: 'root',
-          name: 'Home',
-          isFolder: true,
-        ),
+        folder: const OiFileNodeData(id: 'root', name: 'Home', isFolder: true),
       );
       await tester.pumpAndSettle();
 
@@ -363,9 +315,10 @@ void main() {
     // ── Upload button ─────────────────────────────────────────────────────
     // ══════════════════════════════════════════════════════════════════════════
 
-    testWidgets('upload button is shown when enableUpload is true',
-        (tester) async {
-      await _pumpExplorer(tester, _explorer(enableUpload: true));
+    testWidgets('upload button is shown when enableUpload is true', (
+      tester,
+    ) async {
+      await _pumpExplorer(tester, _explorer());
       await tester.pumpAndSettle();
       // May appear both in toolbar and in empty state action
       expect(
@@ -376,8 +329,9 @@ void main() {
       );
     });
 
-    testWidgets('upload button is hidden when enableUpload is false',
-        (tester) async {
+    testWidgets('upload button is hidden when enableUpload is false', (
+      tester,
+    ) async {
       await _pumpExplorer(tester, _explorer(enableUpload: false));
       await tester.pumpAndSettle();
       expect(
@@ -428,9 +382,10 @@ void main() {
     // ── Search ────────────────────────────────────────────────────────────
     // ══════════════════════════════════════════════════════════════════════════
 
-    testWidgets('search button is shown when enableSearch is true',
-        (tester) async {
-      await _pumpExplorer(tester, _explorer(enableSearch: true));
+    testWidgets('search button is shown when enableSearch is true', (
+      tester,
+    ) async {
+      await _pumpExplorer(tester, _explorer());
       await tester.pumpAndSettle();
       expect(
         find.byWidgetPredicate(
@@ -440,8 +395,9 @@ void main() {
       );
     });
 
-    testWidgets('search button is hidden when enableSearch is false',
-        (tester) async {
+    testWidgets('search button is hidden when enableSearch is false', (
+      tester,
+    ) async {
       await _pumpExplorer(tester, _explorer(enableSearch: false));
       await tester.pumpAndSettle();
       expect(
@@ -456,17 +412,12 @@ void main() {
       final controller = OiFileExplorerController();
       addTearDown(controller.dispose);
 
-      await _pumpExplorer(tester, _explorer(controller: controller),
-      );
+      await _pumpExplorer(tester, _explorer(controller: controller));
       await tester.pumpAndSettle();
 
       await controller.navigateTo(
         'root',
-        folder: const OiFileNodeData(
-          id: 'root',
-          name: 'Home',
-          isFolder: true,
-        ),
+        folder: const OiFileNodeData(id: 'root', name: 'Home', isFolder: true),
       );
       await tester.pumpAndSettle();
 
@@ -481,17 +432,12 @@ void main() {
       final controller = OiFileExplorerController();
       addTearDown(controller.dispose);
 
-      await _pumpExplorer(tester, _explorer(controller: controller),
-      );
+      await _pumpExplorer(tester, _explorer(controller: controller));
       await tester.pumpAndSettle();
 
       await controller.navigateTo(
         'root',
-        folder: const OiFileNodeData(
-          id: 'root',
-          name: 'Home',
-          isFolder: true,
-        ),
+        folder: const OiFileNodeData(id: 'root', name: 'Home', isFolder: true),
       );
       await tester.pumpAndSettle();
 
@@ -510,13 +456,10 @@ void main() {
     // ── Empty folder with upload action ───────────────────────────────────
     // ══════════════════════════════════════════════════════════════════════════
 
-    testWidgets('empty folder shows upload action when enabled',
-        (tester) async {
-      await _pumpExplorer(tester, _explorer(
-          enableUpload: true,
-          loadFolder: (_) async => [],
-        ),
-      );
+    testWidgets('empty folder shows upload action when enabled', (
+      tester,
+    ) async {
+      await _pumpExplorer(tester, _explorer(loadFolder: (_) async => []));
       await tester.pumpAndSettle();
 
       expect(find.text('This folder is empty'), findsOneWidget);
@@ -534,39 +477,31 @@ void main() {
       await tester.pumpAndSettle();
 
       // Rebuild with a different widget to dispose the explorer
-      await tester.pumpObers(
-        const SizedBox(width: 100, height: 100),
-      );
+      await tester.pumpObers(const SizedBox(width: 100, height: 100));
       await tester.pumpAndSettle();
 
       // Controller operations should not throw after explorer is disposed
-      controller.setViewMode(OiFileViewMode.grid);
-      controller.dispose();
+      controller
+        ..setViewMode(OiFileViewMode.grid)
+        ..dispose();
     });
 
     // ══════════════════════════════════════════════════════════════════════════
     // ── Selection toolbar actions ─────────────────────────────────────────
     // ══════════════════════════════════════════════════════════════════════════
 
-    testWidgets('selection toolbar shows Move and Delete buttons',
-        (tester) async {
+    testWidgets('selection toolbar shows Move and Delete buttons', (
+      tester,
+    ) async {
       final controller = OiFileExplorerController();
       addTearDown(controller.dispose);
 
-      await _pumpExplorer(tester, _explorer(
-          controller: controller,
-          enableDelete: true,
-        ),
-      );
+      await _pumpExplorer(tester, _explorer(controller: controller));
       await tester.pumpAndSettle();
 
       await controller.navigateTo(
         'root',
-        folder: const OiFileNodeData(
-          id: 'root',
-          name: 'Home',
-          isFolder: true,
-        ),
+        folder: const OiFileNodeData(id: 'root', name: 'Home', isFolder: true),
       );
       await tester.pumpAndSettle();
 
@@ -616,7 +551,9 @@ void main() {
     // ══════════════════════════════════════════════════════════════════════════
 
     testWidgets('renders even when folder tree loading fails', (tester) async {
-      await _pumpExplorer(tester, _explorer(
+      await _pumpExplorer(
+        tester,
+        _explorer(
           loadFolderTree: (_) async => throw Exception('Network error'),
         ),
       );
@@ -625,8 +562,7 @@ void main() {
       expect(
         find.byWidgetPredicate(
           (w) =>
-              w is Semantics &&
-              w.properties.label == 'File explorer toolbar',
+              w is Semantics && w.properties.label == 'File explorer toolbar',
         ),
         findsOneWidget,
       );

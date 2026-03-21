@@ -1,4 +1,6 @@
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/obers_ui.dart' show OiApp;
+import 'package:obers_ui/src/foundation/oi_app.dart' show OiApp;
 
 /// Immutable data provided by [OiTourScope].
 ///

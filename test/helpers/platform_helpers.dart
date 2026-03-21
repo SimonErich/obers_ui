@@ -120,8 +120,8 @@ Future<void> withPlatform(
         platform: platform,
         keyboardHeight: 0,
         keyboardVisible: false,
-        inputModality: platform == TargetPlatform.android ||
-                platform == TargetPlatform.iOS
+        inputModality:
+            platform == TargetPlatform.android || platform == TargetPlatform.iOS
             ? OiInputModality.touch
             : OiInputModality.pointer,
       ),

@@ -1,6 +1,8 @@
 import 'package:flutter/foundation.dart';
+import 'package:obers_ui/obers_ui.dart' show OiFileExplorer;
 import 'package:obers_ui/src/models/oi_file_node_data.dart';
 import 'package:obers_ui/src/models/settings/oi_file_explorer_settings.dart';
+import 'package:obers_ui/src/modules/oi_file_explorer.dart' show OiFileExplorer;
 
 /// Controls the interactive state of an [OiFileExplorer].
 ///
@@ -13,9 +15,9 @@ class OiFileExplorerController extends ChangeNotifier {
     OiFileViewMode viewMode = OiFileViewMode.list,
     OiFileSortField sortField = OiFileSortField.name,
     OiSortDirection sortDirection = OiSortDirection.ascending,
-  })  : _viewMode = viewMode,
-        _sortField = sortField,
-        _sortDirection = sortDirection;
+  }) : _viewMode = viewMode,
+       _sortField = sortField,
+       _sortDirection = sortDirection;
 
   // ── State ──────────────────────────────────────────────────────────────────
 
@@ -103,7 +105,9 @@ class OiFileExplorerController extends ChangeNotifier {
       // Update history
       if (_historyIndex < _navigationHistory.length - 1) {
         _navigationHistory.removeRange(
-            _historyIndex + 1, _navigationHistory.length);
+          _historyIndex + 1,
+          _navigationHistory.length,
+        );
       }
       if (_currentFolder != null) {
         _navigationHistory.add(_currentFolder!);
@@ -115,7 +119,7 @@ class OiFileExplorerController extends ChangeNotifier {
       _renamingKey = null;
       _loading = false;
       notifyListeners();
-    } catch (e) {
+    } on Exception catch (e) {
       _error = e.toString();
       _loading = false;
       notifyListeners();
@@ -149,8 +153,9 @@ class OiFileExplorerController extends ChangeNotifier {
 
   /// Selects a single file.
   void select(Object key) {
-    _selectedKeys.clear();
-    _selectedKeys.add(key);
+    _selectedKeys
+      ..clear()
+      ..add(key);
     notifyListeners();
   }
 
@@ -251,10 +256,7 @@ class OiFileExplorerController extends ChangeNotifier {
   /// Refreshes the current folder.
   Future<void> refresh() async {
     if (_currentFolder != null) {
-      await navigateTo(
-        _currentFolder!.id.toString(),
-        folder: _currentFolder,
-      );
+      await navigateTo(_currentFolder!.id.toString(), folder: _currentFolder);
     }
   }
 

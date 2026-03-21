@@ -20,11 +20,7 @@ void main() {
     tester,
   ) async {
     await tester.pumpObers(
-      const OiSheet(
-        label: 'sheet',
-        open: false,
-        child: Text('Hidden content'),
-      ),
+      const OiSheet(label: 'sheet', open: false, child: Text('Hidden content')),
     );
     // The SlideTransition keeps the child in tree but translated off-screen;
     // the text widget is still found but visually off-screen.
@@ -160,8 +156,11 @@ void main() {
         data: const MediaQueryData(disableAnimations: true),
         child: ValueListenableBuilder<bool>(
           valueListenable: notifier,
-          builder: (_, isOpen, __) =>
-              OiSheet(label: 'sheet', open: isOpen, child: const Text('instant')),
+          builder: (_, isOpen, __) => OiSheet(
+            label: 'sheet',
+            open: isOpen,
+            child: const Text('instant'),
+          ),
         ),
       ),
     );

@@ -427,9 +427,7 @@ void main() {
   // ── Empty list ─────────────────────────────────────────────────────────────
 
   testWidgets('empty items list renders nothing crashlessly', (tester) async {
-    await tester.pumpObers(
-      const OiButtonGroup(label: 'Test group', items: []),
-    );
+    await tester.pumpObers(const OiButtonGroup(label: 'Test group', items: []));
     expect(tester.takeException(), isNull);
   });
 
@@ -499,8 +497,9 @@ void main() {
 
       // The group is wrapped in OiSurface with a 1px border on each side,
       // so the available width for buttons is groupWidth - 2.
-      final groupBox =
-          tester.renderObject<RenderBox>(find.byType(OiButtonGroup));
+      final groupBox = tester.renderObject<RenderBox>(
+        find.byType(OiButtonGroup),
+      );
       final groupRenderedWidth = groupBox.size.width;
 
       for (final element in tester.elementList(buttonFinder)) {
@@ -542,8 +541,9 @@ void main() {
       );
       expect(buttonFinder, findsNWidgets(2));
 
-      final groupBox =
-          tester.renderObject<RenderBox>(find.byType(OiButtonGroup));
+      final groupBox = tester.renderObject<RenderBox>(
+        find.byType(OiButtonGroup),
+      );
       final groupRenderedWidth = groupBox.size.width;
 
       for (final element in tester.elementList(buttonFinder)) {
@@ -587,7 +587,7 @@ void main() {
 // ── Test helper ───────────────────────────────────────────────────────────────
 
 /// A minimal StatefulWidget wrapper so tests can simulate controlled behaviour
-/// without requiring a full [pumpObers] context (which doesn't expose setState).
+/// without requiring a full pumpObers context (which doesn't expose setState).
 class _TestControlled extends StatefulWidget {
   const _TestControlled({required this.builder});
 

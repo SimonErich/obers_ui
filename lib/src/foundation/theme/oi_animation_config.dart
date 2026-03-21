@@ -1,4 +1,10 @@
+import 'package:flutter/cupertino.dart'
+    show BackdropFilter, BoxShadow, MediaQueryData;
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart'
+    show BackdropFilter, BoxShadow, MediaQueryData;
+import 'package:flutter/widgets.dart'
+    show BackdropFilter, BoxShadow, MediaQueryData;
 
 /// Configuration for animation durations and motion preferences.
 ///

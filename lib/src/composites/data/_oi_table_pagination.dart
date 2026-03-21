@@ -131,7 +131,7 @@ class _PaginationBar extends StatelessWidget {
     required String label,
     required bool enabled,
     required VoidCallback onTap,
-    required dynamic colors,
+    required OiColorScheme colors,
   }) {
     return GestureDetector(
       key: key,
@@ -140,15 +140,13 @@ class _PaginationBar extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 4),
         child: Text(
           label,
-          style: TextStyle(
-            color: enabled ? colors.text as Color : colors.textMuted as Color,
-          ),
+          style: TextStyle(color: enabled ? colors.text : colors.textMuted),
         ),
       ),
     );
   }
 
-  Widget _pageButton(int page, dynamic colors) {
+  Widget _pageButton(int page, OiColorScheme colors) {
     final isCurrent = page == pagination.currentPage;
     return GestureDetector(
       key: Key('pagination_page_$page'),
@@ -158,16 +156,14 @@ class _PaginationBar extends StatelessWidget {
         margin: const EdgeInsets.symmetric(horizontal: 1),
         decoration: isCurrent
             ? BoxDecoration(
-                color: colors.primary.base as Color,
+                color: colors.primary.base,
                 borderRadius: BorderRadius.circular(4),
               )
             : null,
         child: Text(
           '${page + 1}',
           style: TextStyle(
-            color: isCurrent
-                ? colors.primary.foreground as Color
-                : colors.text as Color,
+            color: isCurrent ? colors.primary.foreground : colors.text,
             fontWeight: isCurrent ? FontWeight.bold : null,
           ),
         ),
@@ -253,8 +249,7 @@ class _PageSizeSelectorState extends State<_PageSizeSelector> {
                           behavior: HitTestBehavior.opaque,
                           child: ColoredBox(
                             color: size == widget.currentSize
-                                ? colors.primary.muted
-                                    .withValues(alpha: 0.15)
+                                ? colors.primary.muted.withValues(alpha: 0.15)
                                 : const Color(0x00000000),
                             child: Padding(
                               padding: const EdgeInsets.symmetric(
@@ -328,7 +323,7 @@ class _ColumnManagerPanel<T> extends StatelessWidget {
 
   final List<OiTableColumn<T>> columns;
   final Map<String, bool> visibility;
-  final void Function(String columnId, bool visible) onToggle;
+  final void Function(String columnId, {required bool visible}) onToggle;
 
   @override
   Widget build(BuildContext context) {
@@ -365,11 +360,13 @@ class _ColumnManagerPanel<T> extends StatelessWidget {
               behavior: HitTestBehavior.opaque,
               onTap: () {
                 final currentlyVisible = visibility[col.id] ?? true;
-                onToggle(col.id, !currentlyVisible);
+                onToggle(col.id, visible: !currentlyVisible);
               },
               child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
                 child: Row(
                   children: [
                     Text((visibility[col.id] ?? true) ? '☑' : '☐'),

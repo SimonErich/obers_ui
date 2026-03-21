@@ -57,9 +57,7 @@ void main() {
 
   // 3. Completed steps show checkmark icon
   testWidgets('completed steps show checkmark icon', (tester) async {
-    await tester.pumpObers(
-      _stepper(currentStep: 2, completedSteps: {0, 1}),
-    );
+    await tester.pumpObers(_stepper(currentStep: 2, completedSteps: {0, 1}));
 
     // Completed steps render an Icon widget with the check icon.
     final icons = tester.widgetList<Icon>(find.byType(Icon)).toList();
@@ -70,9 +68,7 @@ void main() {
 
   // 4. Error steps show error icon
   testWidgets('error steps show error icon', (tester) async {
-    await tester.pumpObers(
-      _stepper(currentStep: 1, errorSteps: {0}),
-    );
+    await tester.pumpObers(_stepper(currentStep: 1, errorSteps: {0}));
 
     final icons = tester.widgetList<Icon>(find.byType(Icon)).toList();
     // One error step should have the error icon (0xe000).
@@ -83,11 +79,7 @@ void main() {
   // 5. onStepTap fires with step index
   testWidgets('onStepTap fires with correct step index', (tester) async {
     int? tappedIndex;
-    await tester.pumpObers(
-      _stepper(
-        onStepTap: (i) => tappedIndex = i,
-      ),
-    );
+    await tester.pumpObers(_stepper(onStepTap: (i) => tappedIndex = i));
 
     // Tap the second step circle (shows "2").
     await tester.tap(find.text('2'));
@@ -98,9 +90,7 @@ void main() {
 
   // 6. Horizontal layout renders a Row
   testWidgets('horizontal style renders a Row', (tester) async {
-    await tester.pumpObers(
-      _stepper(totalSteps: 2),
-    );
+    await tester.pumpObers(_stepper(totalSteps: 2));
 
     // The horizontal layout uses a Row widget.
     expect(find.byType(Row), findsWidgets);

@@ -58,8 +58,7 @@ void main() {
       final matching = semanticsWidgets
           .where(
             (s) =>
-                s.properties.label == 'Copy' &&
-                (s.properties.button ?? false),
+                s.properties.label == 'Copy' && (s.properties.button ?? false),
           )
           .toList();
       expect(matching, isNotEmpty);
@@ -140,11 +139,7 @@ void main() {
 
   testWidgets('custom icon is shown by default', (tester) async {
     await tester.pumpObers(
-      const OiCopyButton(
-        value: 'x',
-        semanticLabel: 'Copy',
-        icon: Text('COPY'),
-      ),
+      const OiCopyButton(value: 'x', semanticLabel: 'Copy', icon: Text('COPY')),
     );
     expect(find.text('COPY'), findsOneWidget);
   });

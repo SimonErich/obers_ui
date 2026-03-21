@@ -52,14 +52,30 @@ class OiFilePreview extends StatelessWidget {
   bool get _isImage {
     final ext = file.resolvedExtension.toLowerCase();
     return const {
-      'png', 'jpg', 'jpeg', 'gif', 'svg', 'webp', 'bmp', 'ico', 'tiff', 'tif',
+      'png',
+      'jpg',
+      'jpeg',
+      'gif',
+      'svg',
+      'webp',
+      'bmp',
+      'ico',
+      'tiff',
+      'tif',
     }.contains(ext);
   }
 
   bool get _isVideo {
     final ext = file.resolvedExtension.toLowerCase();
-    return const {'mp4', 'mov', 'avi', 'mkv', 'webm', 'flv', 'm4v'}
-        .contains(ext);
+    return const {
+      'mp4',
+      'mov',
+      'avi',
+      'mkv',
+      'webm',
+      'flv',
+      'm4v',
+    }.contains(ext);
   }
 
   bool get _hasThumbnail =>
@@ -91,9 +107,7 @@ class OiFilePreview extends StatelessWidget {
   }
 
   Widget _buildShimmer(dynamic colors) {
-    return Container(
-      color: (colors as dynamic).surfaceHover as Color,
-    );
+    return Container(color: (colors as dynamic).surfaceHover as Color);
   }
 
   Widget _buildContent(dynamic colors) {

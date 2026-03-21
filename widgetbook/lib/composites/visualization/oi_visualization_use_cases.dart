@@ -86,7 +86,6 @@ final oiVisualizationComponent = WidgetbookComponent(
                 OiHeatmapCell(row: 2, column: 2, value: 4),
                 OiHeatmapCell(row: 2, column: 3, value: 7),
               ],
-              showValues: true,
             ),
           ),
         );

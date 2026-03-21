@@ -25,8 +25,8 @@ class OiFileDropTarget extends StatefulWidget {
   final Widget child;
 
   /// Called when files are dropped internally (from sidebar or content area).
-  final void Function(
-      List<OiFileNodeData> files, OiFileNodeData? targetFolder) onInternalDrop;
+  final void Function(List<OiFileNodeData> files, OiFileNodeData? targetFolder)
+  onInternalDrop;
 
   /// Called when files are dropped from the OS.
   final ValueChanged<List<OiFileData>> onExternalDrop;

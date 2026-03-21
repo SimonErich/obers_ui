@@ -12,7 +12,7 @@ import '../../../helpers/pump_app.dart';
 /// Suppresses [FlutterErrorDetails] whose exception is an image-load error.
 ///
 /// Image resource exceptions are benign in tests where we supply an
-/// [errorWidget]; we don't want them to fail the test.
+/// errorWidget; we don't want them to fail the test.
 FlutterExceptionHandler? _originalOnError;
 
 void _ignoreImageErrors() {

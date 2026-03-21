@@ -61,7 +61,10 @@ class OiMetadataField {
 class OiMetadataEditor extends StatefulWidget {
   /// Creates an [OiMetadataEditor].
   const OiMetadataEditor({
-    required this.fields, required this.onChange, required this.label, super.key,
+    required this.fields,
+    required this.onChange,
+    required this.label,
+    super.key,
     this.enabled = true,
     this.allowAdd = true,
     this.allowRemove = true,
@@ -101,8 +104,7 @@ class _OiMetadataEditorState extends State<OiMetadataEditor> {
   }
 
   void _removeField(int index) {
-    final fields = List<OiMetadataField>.from(widget.fields);
-    fields.removeAt(index);
+    final fields = List<OiMetadataField>.from(widget.fields)..removeAt(index);
     widget.onChange(fields);
   }
 

@@ -82,7 +82,8 @@ class _OiSwitchState extends State<OiSwitch> {
 
     final trackColor = widget.value ? colors.primary.base : colors.border;
 
-    final animDuration = context.animations.reducedMotion ||
+    final animDuration =
+        context.animations.reducedMotion ||
             MediaQuery.disableAnimationsOf(context)
         ? Duration.zero
         : const Duration(milliseconds: 200);

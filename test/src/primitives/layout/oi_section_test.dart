@@ -122,10 +122,7 @@ void main() {
 
   testWidgets('defaults to MainAxisSize.min', (tester) async {
     await tester.pumpObers(
-      const OiSection(
-        breakpoint: OiBreakpoint.compact,
-        children: [Text('A')],
-      ),
+      const OiSection(breakpoint: OiBreakpoint.compact, children: [Text('A')]),
     );
     final col = tester.widget<Column>(find.byType(Column));
     expect(col.mainAxisSize, MainAxisSize.min);
@@ -147,10 +144,7 @@ void main() {
 
   testWidgets('defaults to CrossAxisAlignment.start', (tester) async {
     await tester.pumpObers(
-      const OiSection(
-        breakpoint: OiBreakpoint.compact,
-        children: [Text('A')],
-      ),
+      const OiSection(breakpoint: OiBreakpoint.compact, children: [Text('A')]),
     );
     final col = tester.widget<Column>(find.byType(Column));
     expect(col.crossAxisAlignment, CrossAxisAlignment.start);
@@ -208,8 +202,7 @@ void main() {
         ),
         700,
       );
-      final boxes =
-          tester.widgetList<SizedBox>(find.byType(SizedBox)).toList();
+      final boxes = tester.widgetList<SizedBox>(find.byType(SizedBox)).toList();
       expect(boxes.where((b) => b.height == 8), hasLength(1));
     });
   });
@@ -218,8 +211,7 @@ void main() {
 
   group('responsive padding', () {
     testWidgets('padding varies with breakpoint', (tester) async {
-      final responsivePadding =
-          OiResponsive<EdgeInsetsGeometry>.breakpoints({
+      final responsivePadding = OiResponsive<EdgeInsetsGeometry>.breakpoints({
         OiBreakpoint.compact: const EdgeInsets.all(8),
         OiBreakpoint.expanded: const EdgeInsets.all(32),
       });
@@ -254,8 +246,7 @@ void main() {
     testWidgets('padding cascades to nearest smaller breakpoint', (
       tester,
     ) async {
-      final responsivePadding =
-          OiResponsive<EdgeInsetsGeometry>.breakpoints({
+      final responsivePadding = OiResponsive<EdgeInsetsGeometry>.breakpoints({
         OiBreakpoint.compact: const EdgeInsets.all(8),
         OiBreakpoint.large: const EdgeInsets.all(40),
       });
@@ -294,16 +285,14 @@ void main() {
         ),
         400,
       );
-      final boxes =
-          tester.widgetList<SizedBox>(find.byType(SizedBox)).toList();
+      final boxes = tester.widgetList<SizedBox>(find.byType(SizedBox)).toList();
       expect(boxes.where((b) => b.height == 24), hasLength(1));
     });
 
     testWidgets('breakpoint param overrides context for padding', (
       tester,
     ) async {
-      final responsivePadding =
-          OiResponsive<EdgeInsetsGeometry>.breakpoints({
+      final responsivePadding = OiResponsive<EdgeInsetsGeometry>.breakpoints({
         OiBreakpoint.compact: const EdgeInsets.all(8),
         OiBreakpoint.expanded: const EdgeInsets.all(32),
       });
@@ -345,8 +334,7 @@ void main() {
         700,
       );
 
-      final boxes =
-          tester.widgetList<SizedBox>(find.byType(SizedBox)).toList();
+      final boxes = tester.widgetList<SizedBox>(find.byType(SizedBox)).toList();
       expect(boxes.where((b) => b.height == 12), hasLength(1));
     });
   });
@@ -363,9 +351,7 @@ void main() {
           textDirection: TextDirection.ltr,
           child: OiSection(
             breakpoint: OiBreakpoint.compact,
-            gap: OiResponsive<double>.breakpoints({
-              OiBreakpoint.compact: 8,
-            }),
+            gap: OiResponsive<double>.breakpoints({OiBreakpoint.compact: 8}),
             children: const [Text('A'), Text('B')],
           ),
         ),

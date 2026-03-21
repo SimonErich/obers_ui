@@ -68,7 +68,9 @@ class OiChatMessage {
     required this.key,
     required this.senderId,
     required this.senderName,
-    required this.content, required this.timestamp, this.senderAvatar,
+    required this.content,
+    required this.timestamp,
+    this.senderAvatar,
     this.reactions,
     this.attachments,
     this.pending = false,
@@ -119,7 +121,10 @@ class OiChatMessage {
 class OiChat extends StatefulWidget {
   /// Creates an [OiChat].
   const OiChat({
-    required this.messages, required this.currentUserId, required this.label, super.key,
+    required this.messages,
+    required this.currentUserId,
+    required this.label,
+    super.key,
     this.onSend,
     this.onAttach,
     this.onReact,

@@ -141,7 +141,7 @@ class _OiShortcutIntent extends Intent {
   final int index;
 }
 
-/// An [Action] that looks up the binding by index and calls [onInvoke].
+/// An [Action] that looks up the binding by index and calls onInvoke.
 class _OiShortcutAction extends Action<_OiShortcutIntent> {
   /// Creates an [_OiShortcutAction] with the given [bindings].
   _OiShortcutAction(this.bindings);

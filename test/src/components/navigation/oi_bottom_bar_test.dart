@@ -208,11 +208,7 @@ void main() {
   testWidgets('fixed style renders labels for all items', (tester) async {
     await tester.pumpObers(
       _wrapMQ(
-        OiBottomBar(
-          items: _kItems,
-          currentIndex: 0,
-          onTap: (_) {},
-        ),
+        OiBottomBar(items: _kItems, currentIndex: 0, onTap: (_) {}),
         _kCompact,
       ),
     );
@@ -669,11 +665,7 @@ void main() {
     (tester) async {
       await tester.pumpObers(
         _wrapMQ(
-          OiBottomBar(
-            items: _kItems,
-            currentIndex: 0,
-            onTap: (_) {},
-          ),
+          OiBottomBar(items: _kItems, currentIndex: 0, onTap: (_) {}),
           const MediaQueryData(size: Size(500, 300)),
         ),
       );

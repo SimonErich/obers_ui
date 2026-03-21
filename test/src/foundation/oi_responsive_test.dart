@@ -139,7 +139,8 @@ void main() {
 
     test('throws when no breakpoint has minWidth 0', () {
       expect(
-        () => OiBreakpointScale(const [OiBreakpoint.medium, OiBreakpoint.large]),
+        () =>
+            OiBreakpointScale(const [OiBreakpoint.medium, OiBreakpoint.large]),
         throwsA(isA<ArgumentError>()),
       );
     });
@@ -690,10 +691,7 @@ void main() {
         final scale = OiBreakpointScale.standard();
         final map = scale.entries;
         expect(
-          () => map['new'] = const OiBreakpoint(
-            'new',
-            999,
-          ),
+          () => map['new'] = const OiBreakpoint('new', 999),
           throwsA(isA<UnsupportedError>()),
         );
       });
@@ -1435,7 +1433,7 @@ void main() {
               builder: (ctx) {
                 try {
                   ctx.breakpointScale;
-                } catch (e) {
+                } on Object catch (e) {
                   error = e;
                 }
                 return const SizedBox.shrink();

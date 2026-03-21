@@ -1,4 +1,7 @@
 import 'package:flutter/foundation.dart';
+import 'package:obers_ui/obers_ui.dart' show OiCalendar;
+import 'package:obers_ui/src/composites/scheduling/oi_calendar.dart'
+    show OiCalendar;
 import 'package:obers_ui/src/foundation/persistence/oi_settings_data.dart';
 
 /// View mode for the calendar.

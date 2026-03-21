@@ -1,6 +1,9 @@
 import 'dart:math' as math;
 
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/obers_ui.dart' show OiColorScheme;
+import 'package:obers_ui/src/foundation/theme/oi_color_scheme.dart'
+    show OiColorScheme;
 import 'package:obers_ui/src/foundation/theme/oi_decoration_theme.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 

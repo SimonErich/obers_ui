@@ -132,14 +132,16 @@ class _InfiniteScrollSpinnerState extends State<_InfiniteScrollSpinner>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final reduced = context.animations.reducedMotion ||
+    final reduced =
+        context.animations.reducedMotion ||
         MediaQuery.disableAnimationsOf(context);
     _controller.duration = reduced
         ? Duration.zero
         : const Duration(milliseconds: 800);
     if (reduced && _controller.isAnimating) {
-      _controller.stop();
-      _controller.value = 0;
+      _controller
+        ..stop()
+        ..value = 0;
     } else if (!reduced && !_controller.isAnimating) {
       _controller.repeat();
     }

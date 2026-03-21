@@ -109,10 +109,7 @@ class OiStorageIndicator extends StatelessWidget {
         const SizedBox(width: 8),
         Text(
           '$used / $total',
-          style: TextStyle(
-            fontSize: 11,
-            color: colors.textMuted,
-          ),
+          style: TextStyle(fontSize: 11, color: colors.textMuted),
         ),
         if (status.isNotEmpty) ...[
           const SizedBox(width: 6),
@@ -129,7 +126,12 @@ class OiStorageIndicator extends StatelessWidget {
     );
   }
 
-  Widget _buildFull(OiColorScheme colors, OiSpacingScale spacing, String used, String total) {
+  Widget _buildFull(
+    OiColorScheme colors,
+    OiSpacingScale spacing,
+    String used,
+    String total,
+  ) {
     final status = _statusLabel();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -151,10 +153,7 @@ class OiStorageIndicator extends StatelessWidget {
           children: [
             Text(
               '$used of $total',
-              style: TextStyle(
-                fontSize: 11,
-                color: colors.textMuted,
-              ),
+              style: TextStyle(fontSize: 11, color: colors.textMuted),
             ),
             if (status.isNotEmpty) ...[
               const SizedBox(width: 6),
@@ -215,9 +214,10 @@ class OiStorageIndicator extends StatelessWidget {
             ),
           // Remaining empty space
           Flexible(
-            flex: (((totalBytes - usedBytes).clamp(0, totalBytes) / total) * 1000)
-                .round()
-                .clamp(0, 1000),
+            flex:
+                (((totalBytes - usedBytes).clamp(0, totalBytes) / total) * 1000)
+                    .round()
+                    .clamp(0, 1000),
             child: const SizedBox.shrink(),
           ),
         ],

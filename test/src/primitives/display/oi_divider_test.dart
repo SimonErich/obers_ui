@@ -13,7 +13,7 @@ import '../../../helpers/pump_app.dart';
 // ── helpers ──────────────────────────────────────────────────────────────────
 
 /// Returns the first [Container] that is a direct product of OiDivider's solid
-/// line — identifiable by having a non-null [color] and being very thin.
+/// line — identifiable by having a non-null color and being very thin.
 Container? _solidLineContainer(WidgetTester tester) {
   final containers = tester.widgetList<Container>(find.byType(Container));
   for (final c in containers) {

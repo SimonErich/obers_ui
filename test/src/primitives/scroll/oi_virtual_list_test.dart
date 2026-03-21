@@ -171,11 +171,12 @@ void main() {
     // reducedMotion is active. We need to trigger refresh first.
     // Since the spinner is internal and only shown during refresh, we verify
     // via the ValueKey.
-    final spinnerFinder = find.byKey(
-      const ValueKey('oi_virtual_list_refresh_indicator'),
-    );
     // Spinner only appears during refresh — verify the list renders
     // successfully with disableAnimations.
+    expect(
+      find.byKey(const ValueKey('oi_virtual_list_refresh_indicator')),
+      findsNothing,
+    );
     expect(find.text('r0'), findsOneWidget);
   });
 }

@@ -1,3 +1,4 @@
+// Tests do not require documentation comments.
 // ignore_for_file: public_member_api_docs
 
 import 'package:flutter/widgets.dart';
@@ -11,15 +12,15 @@ import '../../../helpers/pump_app.dart';
 // ── Test data ─────────────────────────────────────────────────────────────────
 
 final _folderTree = <OiTreeNode<OiFileNodeData>>[
-  OiTreeNode<OiFileNodeData>(
+  const OiTreeNode<OiFileNodeData>(
     id: 'root',
     label: 'Root',
-    data: const OiFileNodeData(id: 'root', name: 'Root', isFolder: true),
+    data: OiFileNodeData(id: 'root', name: 'Root', isFolder: true),
     children: [
       OiTreeNode<OiFileNodeData>(
         id: 'docs',
         label: 'Documents',
-        data: const OiFileNodeData(
+        data: OiFileNodeData(
           id: 'docs',
           name: 'Documents',
           isFolder: true,
@@ -29,7 +30,7 @@ final _folderTree = <OiTreeNode<OiFileNodeData>>[
       OiTreeNode<OiFileNodeData>(
         id: 'photos',
         label: 'Photos',
-        data: const OiFileNodeData(
+        data: OiFileNodeData(
           id: 'photos',
           name: 'Photos',
           isFolder: true,
@@ -138,30 +139,28 @@ void main() {
     // ══════════════════════════════════════════════════════════════════════════
 
     testWidgets('renders quick access section when provided', (tester) async {
-      await tester.pumpObers(
-        _sidebar(quickAccess: _quickAccess),
-      );
+      await tester.pumpObers(_sidebar(quickAccess: _quickAccess));
       expect(find.text('Quick Access'), findsOneWidget);
       expect(find.text('Home'), findsOneWidget);
       expect(find.text('Downloads'), findsOneWidget);
       expect(find.text('Trash'), findsOneWidget);
     });
 
-    testWidgets('does not render quick access when not provided',
-        (tester) async {
+    testWidgets('does not render quick access when not provided', (
+      tester,
+    ) async {
       await tester.pumpObers(_sidebar());
       expect(find.text('Quick Access'), findsNothing);
     });
 
     testWidgets('renders badge count on quick access items', (tester) async {
-      await tester.pumpObers(
-        _sidebar(quickAccess: _quickAccess),
-      );
+      await tester.pumpObers(_sidebar(quickAccess: _quickAccess));
       expect(find.text('3'), findsOneWidget);
     });
 
-    testWidgets('tapping quick access item calls onQuickAccessTap',
-        (tester) async {
+    testWidgets('tapping quick access item calls onQuickAccessTap', (
+      tester,
+    ) async {
       OiQuickAccessItem? tapped;
       await tester.pumpObers(
         _sidebar(
@@ -174,8 +173,9 @@ void main() {
       expect(tapped?.id, 'home');
     });
 
-    testWidgets('tapping Downloads quick access fires callback',
-        (tester) async {
+    testWidgets('tapping Downloads quick access fires callback', (
+      tester,
+    ) async {
       OiQuickAccessItem? tapped;
       await tester.pumpObers(
         _sidebar(
@@ -193,9 +193,7 @@ void main() {
     // ══════════════════════════════════════════════════════════════════════════
 
     testWidgets('renders favorites section when provided', (tester) async {
-      await tester.pumpObers(
-        _sidebar(favorites: _favorites),
-      );
+      await tester.pumpObers(_sidebar(favorites: _favorites));
       expect(find.text('Favorites'), findsOneWidget);
       expect(find.text('Important Docs'), findsOneWidget);
       expect(find.text('Work Projects'), findsOneWidget);
@@ -209,10 +207,7 @@ void main() {
     testWidgets('tapping favorite calls onFavoriteTap', (tester) async {
       OiFileNodeData? tapped;
       await tester.pumpObers(
-        _sidebar(
-          favorites: _favorites,
-          onFavoriteTap: (f) => tapped = f,
-        ),
+        _sidebar(favorites: _favorites, onFavoriteTap: (f) => tapped = f),
       );
       await tester.tap(find.text('Important Docs'));
       await tester.pump();
@@ -220,9 +215,7 @@ void main() {
     });
 
     testWidgets('favorites have semantic labels', (tester) async {
-      await tester.pumpObers(
-        _sidebar(favorites: _favorites),
-      );
+      await tester.pumpObers(_sidebar(favorites: _favorites));
       expect(
         find.byWidgetPredicate(
           (w) =>
@@ -260,16 +253,16 @@ void main() {
     // ── New folder button ─────────────────────────────────────────────────
     // ══════════════════════════════════════════════════════════════════════════
 
-    testWidgets('renders New Folder button when onNewFolder is provided',
-        (tester) async {
-      await tester.pumpObers(
-        _sidebar(onNewFolder: (_) {}),
-      );
+    testWidgets('renders New Folder button when onNewFolder is provided', (
+      tester,
+    ) async {
+      await tester.pumpObers(_sidebar(onNewFolder: (_) {}));
       expect(find.text('+ New Folder'), findsOneWidget);
     });
 
-    testWidgets('does not render New Folder button when onNewFolder is null',
-        (tester) async {
+    testWidgets('does not render New Folder button when onNewFolder is null', (
+      tester,
+    ) async {
       await tester.pumpObers(_sidebar());
       expect(find.text('+ New Folder'), findsNothing);
     });
@@ -289,9 +282,7 @@ void main() {
     });
 
     testWidgets('custom semantics label is applied', (tester) async {
-      await tester.pumpObers(
-        _sidebar(semanticsLabel: 'Project navigation'),
-      );
+      await tester.pumpObers(_sidebar(semanticsLabel: 'Project navigation'));
       expect(
         find.byWidgetPredicate(
           (w) => w is Semantics && w.properties.label == 'Project navigation',
@@ -307,7 +298,7 @@ void main() {
       // Section headers should have header: true in semantics
       expect(
         find.byWidgetPredicate(
-          (w) => w is Semantics && w.properties.header == true,
+          (w) => w is Semantics && (w.properties.header ?? false),
         ),
         findsWidgets,
       );
@@ -330,9 +321,7 @@ void main() {
     testWidgets('respects custom width', (tester) async {
       await tester.pumpObers(_sidebar(width: 300));
       final sizedBox = tester.widget<SizedBox>(
-        find.byWidgetPredicate(
-          (w) => w is SizedBox && w.width == 300,
-        ),
+        find.byWidgetPredicate((w) => w is SizedBox && w.width == 300),
       );
       expect(sizedBox.width, 300);
     });

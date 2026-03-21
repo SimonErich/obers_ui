@@ -19,9 +19,7 @@ final _nodes = <OiTreeNode<String>>[
       OiTreeNode(
         id: 'child2',
         label: 'Child 2',
-        children: [
-          OiTreeNode(id: 'grandchild1', label: 'Grandchild 1'),
-        ],
+        children: [OiTreeNode(id: 'grandchild1', label: 'Grandchild 1')],
       ),
     ],
   ),
@@ -37,7 +35,7 @@ Widget _tree({
   void Function(OiTreeNode<String>)? onNodeTap,
   void Function(OiTreeNode<String>)? onNodeDoubleTap,
   void Function(OiTreeNode<String>, {required bool expanded})?
-      onExpansionChanged,
+  onExpansionChanged,
   void Function(Set<String>)? onSelectionChanged,
   Widget Function(
     BuildContext,
@@ -45,7 +43,8 @@ Widget _tree({
     int, {
     required bool expanded,
     required bool selected,
-  })? nodeBuilder,
+  })?
+  nodeBuilder,
   double indentWidth = 24,
   double rowHeight = 40,
   bool showLines = false,
@@ -145,42 +144,28 @@ void main() {
     // 6. Tapping expand toggle shows children
     testWidgets('tapping expand toggle shows children', (tester) async {
       await tester.pumpObers(_tree());
-      await _tapAndSettle(
-        tester,
-        find.byKey(const ValueKey('toggle_root1')),
-      );
+      await _tapAndSettle(tester, find.byKey(const ValueKey('toggle_root1')));
       expect(find.text('Child 1'), findsOneWidget);
       expect(find.text('Child 2'), findsOneWidget);
     });
 
     // 7. Tapping expand toggle again collapses children
-    testWidgets('tapping expand toggle again collapses children',
-        (tester) async {
+    testWidgets('tapping expand toggle again collapses children', (
+      tester,
+    ) async {
       await tester.pumpObers(_tree());
-      await _tapAndSettle(
-        tester,
-        find.byKey(const ValueKey('toggle_root1')),
-      );
+      await _tapAndSettle(tester, find.byKey(const ValueKey('toggle_root1')));
       expect(find.text('Child 1'), findsOneWidget);
 
-      await _tapAndSettle(
-        tester,
-        find.byKey(const ValueKey('toggle_root1')),
-      );
+      await _tapAndSettle(tester, find.byKey(const ValueKey('toggle_root1')));
       expect(find.text('Child 1'), findsNothing);
     });
 
     // 8. Expanding nested children
     testWidgets('expanding nested children works', (tester) async {
       await tester.pumpObers(_tree());
-      await _tapAndSettle(
-        tester,
-        find.byKey(const ValueKey('toggle_root1')),
-      );
-      await _tapAndSettle(
-        tester,
-        find.byKey(const ValueKey('toggle_child2')),
-      );
+      await _tapAndSettle(tester, find.byKey(const ValueKey('toggle_root1')));
+      await _tapAndSettle(tester, find.byKey(const ValueKey('toggle_child2')));
       expect(find.text('Grandchild 1'), findsOneWidget);
     });
 
@@ -229,10 +214,7 @@ void main() {
     testWidgets('single selection works when selectable', (tester) async {
       Set<String>? selected;
       await tester.pumpObers(
-        _tree(
-          selectable: true,
-          onSelectionChanged: (ids) => selected = ids,
-        ),
+        _tree(selectable: true, onSelectionChanged: (ids) => selected = ids),
       );
       await _tapAndSettle(tester, find.text('Root 1'));
       expect(selected, {'root1'});
@@ -251,16 +233,10 @@ void main() {
           },
         ),
       );
-      await _tapAndSettle(
-        tester,
-        find.byKey(const ValueKey('toggle_root1')),
-      );
+      await _tapAndSettle(tester, find.byKey(const ValueKey('toggle_root1')));
       expect(events, [('root1', true)]);
 
-      await _tapAndSettle(
-        tester,
-        find.byKey(const ValueKey('toggle_root1')),
-      );
+      await _tapAndSettle(tester, find.byKey(const ValueKey('toggle_root1')));
       expect(events, [('root1', true), ('root1', false)]);
     });
 
@@ -273,9 +249,7 @@ void main() {
     // 15. Double tap fires onNodeDoubleTap
     testWidgets('double tap fires onNodeDoubleTap', (tester) async {
       OiTreeNode<String>? doubleTapped;
-      await tester.pumpObers(
-        _tree(onNodeDoubleTap: (n) => doubleTapped = n),
-      );
+      await tester.pumpObers(_tree(onNodeDoubleTap: (n) => doubleTapped = n));
       final nodeFinder = find.byKey(const ValueKey('node_root2'));
       await tester.tap(nodeFinder);
       await tester.pump(const Duration(milliseconds: 50));

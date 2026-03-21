@@ -167,8 +167,11 @@ void main() {
       });
 
       test('halo from this style always takes precedence', () {
-        const thisHalo =
-            OiHaloStyle(color: Color(0xFFFF0000), spread: 4, blur: 12);
+        const thisHalo = OiHaloStyle(
+          color: Color(0xFFFF0000),
+          spread: 4,
+          blur: 12,
+        );
         const thisStyle = OiInteractiveStyle(
           backgroundOverlay: Color(0x0A000000),
           halo: thisHalo,
@@ -280,10 +283,7 @@ void main() {
         );
         final merged = OiInteractiveStyle.none.merge(base);
         // none's overlay and halo take precedence
-        expect(
-          merged.backgroundOverlay,
-          equals(const Color(0x00000000)),
-        );
+        expect(merged.backgroundOverlay, equals(const Color(0x00000000)));
         expect(merged.halo, equals(OiHaloStyle.none));
         // none's nullable fields are null, so base's values fill in
         expect(merged.borderColor, equals(const Color(0xFFFF0000)));

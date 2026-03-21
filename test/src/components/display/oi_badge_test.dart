@@ -98,7 +98,9 @@ void main() {
 
   testWidgets('renders with icon', (tester) async {
     const icon = IconData(0xe318, fontFamily: 'MaterialIcons');
-    await tester.pumpObers(const OiBadge.filled(label: 'with icon', icon: icon));
+    await tester.pumpObers(
+      const OiBadge.filled(label: 'with icon', icon: icon),
+    );
     expect(find.text('with icon'), findsOneWidget);
     expect(find.byType(Icon), findsOneWidget);
   });
@@ -119,11 +121,7 @@ void main() {
     tester,
   ) async {
     await tester.pumpObers(
-      const OiBadge.filled(
-        label: 'ok',
-        color: OiBadgeColor.success,
-        dot: true,
-      ),
+      const OiBadge.filled(label: 'ok', color: OiBadgeColor.success, dot: true),
     );
     expect(find.byType(Icon), findsOneWidget);
   });
@@ -153,13 +151,7 @@ void main() {
   testWidgets('REQ-0025: dot mode with primary color renders no Icon', (
     tester,
   ) async {
-    await tester.pumpObers(
-      const OiBadge.filled(
-        label: 'tag',
-        color: OiBadgeColor.primary,
-        dot: true,
-      ),
-    );
+    await tester.pumpObers(const OiBadge.filled(label: 'tag', dot: true));
     expect(find.byType(Icon), findsNothing);
   });
 }

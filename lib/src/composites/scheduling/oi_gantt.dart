@@ -204,8 +204,7 @@ class _OiGanttState extends State<OiGantt>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final newDriver =
-        widget.settingsDriver ?? OiSettingsProvider.of(context);
+    final newDriver = widget.settingsDriver ?? OiSettingsProvider.of(context);
     if (newDriver != _resolvedDriver) {
       _resolvedDriver = newDriver;
       if (settingsLoaded) {

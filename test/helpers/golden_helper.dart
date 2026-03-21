@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/foundation/oi_app.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme_data.dart';
+
 /// Builds a golden test scenario with light and dark theme variants.
 ///
 /// Usage:
@@ -34,7 +35,13 @@ Widget obersGoldenBuilder({
           return Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(entry.key, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+              Text(
+                entry.key,
+                style: const TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
               const SizedBox(height: 8),
               entry.value,
             ],

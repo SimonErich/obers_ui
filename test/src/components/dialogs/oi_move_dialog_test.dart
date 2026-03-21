@@ -17,30 +17,14 @@ const _docFolder = OiFileNodeData(
   isFolder: true,
 );
 
-const _picFolder = OiFileNodeData(
-  id: 'pics',
-  name: 'Pictures',
-  isFolder: true,
-);
+const _picFolder = OiFileNodeData(id: 'pics', name: 'Pictures', isFolder: true);
 
 const _folderTree = <OiTreeNode<OiFileNodeData>>[
-  OiTreeNode<OiFileNodeData>(
-    id: 'docs',
-    label: 'Documents',
-    data: _docFolder,
-  ),
-  OiTreeNode<OiFileNodeData>(
-    id: 'pics',
-    label: 'Pictures',
-    data: _picFolder,
-  ),
+  OiTreeNode<OiFileNodeData>(id: 'docs', label: 'Documents', data: _docFolder),
+  OiTreeNode<OiFileNodeData>(id: 'pics', label: 'Pictures', data: _picFolder),
 ];
 
-const _file = OiFileNodeData(
-  id: 'f1',
-  name: 'report.pdf',
-  isFolder: false,
-);
+const _file = OiFileNodeData(id: 'f1', name: 'report.pdf', isFolder: false);
 
 void main() {
   group('OiMoveDialog', () {
@@ -111,8 +95,9 @@ void main() {
       expect(find.text('Pictures'), findsOneWidget);
     });
 
-    testWidgets('Move here button is disabled until folder is selected',
-        (tester) async {
+    testWidgets('Move here button is disabled until folder is selected', (
+      tester,
+    ) async {
       await tester.pumpObers(
         OiMoveDialog(
           files: const [_file],
@@ -165,8 +150,7 @@ void main() {
         ),
         surfaceSize: const Size(600, 800),
       );
-      final kl =
-          tester.widget<KeyboardListener>(find.byType(KeyboardListener));
+      final kl = tester.widget<KeyboardListener>(find.byType(KeyboardListener));
       kl.focusNode.requestFocus();
       await tester.pump();
       await tester.sendKeyEvent(LogicalKeyboardKey.escape);
@@ -187,8 +171,9 @@ void main() {
       expect(find.byType(OiMoveDialog), findsOneWidget);
     });
 
-    testWidgets('shows New Folder button when onCreateFolder is provided',
-        (tester) async {
+    testWidgets('shows New Folder button when onCreateFolder is provided', (
+      tester,
+    ) async {
       await tester.pumpObers(
         OiMoveDialog(
           files: const [_file],
@@ -201,8 +186,9 @@ void main() {
       expect(find.widgetWithText(OiButton, '+ New Folder'), findsOneWidget);
     });
 
-    testWidgets('hides New Folder button when onCreateFolder is null',
-        (tester) async {
+    testWidgets('hides New Folder button when onCreateFolder is null', (
+      tester,
+    ) async {
       await tester.pumpObers(
         OiMoveDialog(
           files: const [_file],
@@ -223,10 +209,7 @@ void main() {
         ),
         surfaceSize: const Size(600, 800),
       );
-      expect(
-        find.bySemanticsLabel(RegExp('Move dialog')),
-        findsOneWidget,
-      );
+      expect(find.bySemanticsLabel(RegExp('Move dialog')), findsOneWidget);
     });
 
     testWidgets('has correct semantics label for copy mode', (tester) async {
@@ -239,10 +222,7 @@ void main() {
         ),
         surfaceSize: const Size(600, 800),
       );
-      expect(
-        find.bySemanticsLabel(RegExp('Copy dialog')),
-        findsOneWidget,
-      );
+      expect(find.bySemanticsLabel(RegExp('Copy dialog')), findsOneWidget);
     });
   });
 }

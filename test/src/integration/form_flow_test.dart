@@ -10,37 +10,37 @@ import '../../helpers/pump_app.dart';
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 List<OiFormSection> _sections({bool withValidation = false}) => [
-      OiFormSection(
-        title: 'Contact',
-        fields: [
-          OiFormField(
-            key: 'firstName',
-            label: 'First Name',
-            type: OiFieldType.text,
-            required: withValidation,
-          ),
-          OiFormField(
-            key: 'lastName',
-            label: 'Last Name',
-            type: OiFieldType.text,
-            required: withValidation,
-          ),
-          OiFormField(
-            key: 'email',
-            label: 'Email',
-            type: OiFieldType.text,
-            required: withValidation,
-            validate: withValidation
-                ? (v) {
-                    if (v == null || v == '') return 'Email is required';
-                    if (!(v as String).contains('@')) return 'Invalid email';
-                    return null;
-                  }
-                : null,
-          ),
-        ],
+  OiFormSection(
+    title: 'Contact',
+    fields: [
+      OiFormField(
+        key: 'firstName',
+        label: 'First Name',
+        type: OiFieldType.text,
+        required: withValidation,
       ),
-    ];
+      OiFormField(
+        key: 'lastName',
+        label: 'Last Name',
+        type: OiFieldType.text,
+        required: withValidation,
+      ),
+      OiFormField(
+        key: 'email',
+        label: 'Email',
+        type: OiFieldType.text,
+        required: withValidation,
+        validate: withValidation
+            ? (v) {
+                if (v == null || v == '') return 'Email is required';
+                if (!(v as String).contains('@')) return 'Invalid email';
+                return null;
+              }
+            : null,
+      ),
+    ],
+  ),
+];
 
 Widget _form({
   OiFormController? controller,
@@ -71,10 +71,7 @@ void main() {
       Map<String, dynamic>? submitted;
 
       await tester.pumpObers(
-        _form(
-          controller: ctrl,
-          onSubmit: (v) => submitted = v,
-        ),
+        _form(controller: ctrl, onSubmit: (v) => submitted = v),
         surfaceSize: const Size(600, 800),
       );
 

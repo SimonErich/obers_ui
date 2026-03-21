@@ -105,7 +105,8 @@ class OiSpanData {
   }
 
   @override
-  int get hashCode => Object.hash(columnSpan, columnStart, columnOrder, rowSpan);
+  int get hashCode =>
+      Object.hash(columnSpan, columnStart, columnOrder, rowSpan);
 
   @override
   String toString() =>

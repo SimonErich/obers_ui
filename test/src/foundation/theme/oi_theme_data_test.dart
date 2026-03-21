@@ -76,32 +76,37 @@ void main() {
         expect(theme.colors.primary.base, equals(brandColor));
       });
 
-      test('primary swatch is derived from brand color via OiColorSwatch.from',
-          () {
-        final theme = OiThemeData.fromBrand(color: brandColor);
-        final expectedSwatch = OiColorSwatch.from(brandColor);
-        expect(theme.colors.primary, equals(expectedSwatch));
-      });
+      test(
+        'primary swatch is derived from brand color via OiColorSwatch.from',
+        () {
+          final theme = OiThemeData.fromBrand(color: brandColor);
+          final expectedSwatch = OiColorSwatch.from(brandColor);
+          expect(theme.colors.primary, equals(expectedSwatch));
+        },
+      );
 
       test('borderFocus is set to brand color', () {
         final theme = OiThemeData.fromBrand(color: brandColor);
         expect(theme.colors.borderFocus, equals(brandColor));
       });
 
-      test('non-primary semantic colors are preserved from base light theme',
-          () {
-        final theme = OiThemeData.fromBrand(color: brandColor);
-        final baseLight = OiThemeData.light();
-        expect(theme.colors.success, equals(baseLight.colors.success));
-        expect(theme.colors.warning, equals(baseLight.colors.warning));
-        expect(theme.colors.error, equals(baseLight.colors.error));
-        expect(theme.colors.info, equals(baseLight.colors.info));
-      });
+      test(
+        'non-primary semantic colors are preserved from base light theme',
+        () {
+          final theme = OiThemeData.fromBrand(color: brandColor);
+          final baseLight = OiThemeData.light();
+          expect(theme.colors.success, equals(baseLight.colors.success));
+          expect(theme.colors.warning, equals(baseLight.colors.warning));
+          expect(theme.colors.error, equals(baseLight.colors.error));
+          expect(theme.colors.info, equals(baseLight.colors.info));
+        },
+      );
 
       test('effects are rebuilt with brand color', () {
         final theme = OiThemeData.fromBrand(color: brandColor);
-        final expectedEffects =
-            OiEffectsTheme.standard(primaryColor: brandColor);
+        final expectedEffects = OiEffectsTheme.standard(
+          primaryColor: brandColor,
+        );
         expect(theme.effects, equals(expectedEffects));
       });
 

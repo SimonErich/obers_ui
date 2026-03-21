@@ -238,9 +238,7 @@ class _OiRichEditorState extends State<OiRichEditor> {
       metadata: block.metadata,
       bold: format == 'bold' ? !block.bold : block.bold,
       italic: format == 'italic' ? !block.italic : block.italic,
-      underline: format == 'underline'
-          ? !block.underline
-          : block.underline,
+      underline: format == 'underline' ? !block.underline : block.underline,
     );
 
     blocks[_activeBlockIndex] = updated;

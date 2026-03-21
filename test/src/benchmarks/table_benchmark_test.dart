@@ -9,7 +9,11 @@ import '../../helpers/pump_app.dart';
 
 /// Simple row model for benchmark tests.
 class _BenchmarkRow {
-  const _BenchmarkRow({required this.id, required this.name, required this.value});
+  const _BenchmarkRow({
+    required this.id,
+    required this.name,
+    required this.value,
+  });
 
   final int id;
   final String name;
@@ -22,11 +26,7 @@ void main() {
 
     final rows = List<_BenchmarkRow>.generate(
       rowCount,
-      (i) => _BenchmarkRow(
-        id: i,
-        name: 'Row $i',
-        value: 'Value ${i % 100}',
-      ),
+      (i) => _BenchmarkRow(id: i, name: 'Row $i', value: 'Value ${i % 100}'),
     );
 
     final columns = <OiTableColumn<_BenchmarkRow>>[

@@ -13,16 +13,16 @@ environment:
   flutter: '>=3.41.0'
 
 dependencies:
+  file_picker: ^8.1.0
   flutter:
     sdk: flutter
-  shared_preferences: ^2.3.0
   intl: ^0.20.0
-  file_picker: ^8.1.0
+  shared_preferences: ^2.3.0
   web: ^1.1.1
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  very_good_analysis: ^7.0.0
   golden_toolkit: ^0.15.0
   mocktail: ^1.0.4
+  very_good_analysis: ^7.0.0

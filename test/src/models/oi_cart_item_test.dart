@@ -1,0 +1,123 @@
+// Tests do not require documentation comments.
+// ignore_for_file: public_member_api_docs
+
+import 'package:flutter_test/flutter_test.dart';
+import 'package:obers_ui/src/models/oi_cart_item.dart';
+
+void main() {
+  group('OiCartItem', () {
+    test('default construction has expected defaults', () {
+      const item = OiCartItem(
+        productKey: 'p1',
+        name: 'Widget',
+        unitPrice: 19.99,
+      );
+      expect(item.productKey, 'p1');
+      expect(item.variantKey, isNull);
+      expect(item.name, 'Widget');
+      expect(item.variantLabel, isNull);
+      expect(item.unitPrice, 19.99);
+      expect(item.quantity, 1);
+      expect(item.imageUrl, isNull);
+      expect(item.maxQuantity, isNull);
+      expect(item.attributes, isEmpty);
+    });
+
+    test('lineTotal is unitPrice * quantity', () {
+      const item = OiCartItem(
+        productKey: 'p1',
+        name: 'Widget',
+        unitPrice: 10.0,
+        quantity: 3,
+      );
+      expect(item.lineTotal, 30.0);
+    });
+
+    test('lineTotal with default quantity is unitPrice', () {
+      const item = OiCartItem(
+        productKey: 'p1',
+        name: 'Widget',
+        unitPrice: 7.50,
+      );
+      expect(item.lineTotal, 7.50);
+    });
+
+    test('copyWith replaces fields', () {
+      const item = OiCartItem(
+        productKey: 'p1',
+        name: 'Widget',
+        unitPrice: 10.0,
+        quantity: 2,
+      );
+      final updated = item.copyWith(quantity: 5, unitPrice: 12.0);
+      expect(updated.quantity, 5);
+      expect(updated.unitPrice, 12.0);
+      expect(updated.productKey, 'p1');
+      expect(updated.name, 'Widget');
+    });
+
+    test('copyWith can set nullable fields to null via sentinel', () {
+      const item = OiCartItem(
+        productKey: 'p1',
+        variantKey: 'v1',
+        name: 'Widget',
+        variantLabel: 'Red / Large',
+        unitPrice: 10.0,
+        imageUrl: 'http://img.png',
+        maxQuantity: 5,
+      );
+      final cleared = item.copyWith(
+        variantKey: null,
+        variantLabel: null,
+        imageUrl: null,
+        maxQuantity: null,
+      );
+      expect(cleared.variantKey, isNull);
+      expect(cleared.variantLabel, isNull);
+      expect(cleared.imageUrl, isNull);
+      expect(cleared.maxQuantity, isNull);
+    });
+
+    test('equal instances are ==', () {
+      const a = OiCartItem(
+        productKey: 'p1',
+        variantKey: 'v1',
+        name: 'Widget',
+        unitPrice: 10.0,
+        quantity: 2,
+        attributes: {'Color': 'Red'},
+      );
+      const b = OiCartItem(
+        productKey: 'p1',
+        variantKey: 'v1',
+        name: 'Widget',
+        unitPrice: 10.0,
+        quantity: 2,
+        attributes: {'Color': 'Red'},
+      );
+      expect(a, equals(b));
+    });
+
+    test('different instances are not ==', () {
+      const a = OiCartItem(productKey: 'p1', name: 'Widget', unitPrice: 10.0);
+      const b = OiCartItem(productKey: 'p1', name: 'Widget', unitPrice: 11.0);
+      expect(a, isNot(equals(b)));
+    });
+
+    test('equal instances have the same hashCode', () {
+      const a = OiCartItem(
+        productKey: 'p1',
+        name: 'Widget',
+        unitPrice: 10.0,
+        quantity: 3,
+      );
+      const b = OiCartItem(
+        productKey: 'p1',
+        name: 'Widget',
+        unitPrice: 10.0,
+        quantity: 3,
+      );
+      expect(a.hashCode, equals(b.hashCode));
+    });
+  });
+}

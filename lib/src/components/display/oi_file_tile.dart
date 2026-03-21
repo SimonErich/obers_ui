@@ -73,9 +73,7 @@ class OiFileTile extends StatelessWidget {
                 color: file.folder ? colors.warning.base : colors.textSubtle,
               ),
               SizedBox(width: spacing.sm),
-              Expanded(
-                child: _buildName(context),
-              ),
+              Expanded(child: _buildName(context)),
               if (file.size != null)
                 Text(
                   OiFileUtils.formatSize(file.size!),

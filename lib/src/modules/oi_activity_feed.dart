@@ -60,7 +60,9 @@ class OiActivityEvent {
 class OiActivityFeed extends StatelessWidget {
   /// Creates an [OiActivityFeed].
   const OiActivityFeed({
-    required this.events, required this.label, super.key,
+    required this.events,
+    required this.label,
+    super.key,
     this.onEventTap,
     this.onLoadMore,
     this.moreAvailable = false,
@@ -239,8 +241,9 @@ class _OiActivityFeedListState extends State<_OiActivityFeedList> {
 
   @override
   void dispose() {
-    _scrollController.removeListener(_onScroll);
-    _scrollController.dispose();
+    _scrollController
+      ..removeListener(_onScroll)
+      ..dispose();
     super.dispose();
   }
 

@@ -18,7 +18,9 @@ import 'package:obers_ui/src/primitives/overlay/oi_floating.dart';
 class OiComboBox<T> extends StatefulWidget {
   /// Creates an [OiComboBox].
   const OiComboBox({
-    required this.label, required this.labelOf, super.key,
+    required this.label,
+    required this.labelOf,
+    super.key,
     this.items = const [],
     this.value,
     this.onSelect,
@@ -216,7 +218,7 @@ class _OiComboBoxState<T> extends State<OiComboBox<T>> {
 
   // ── Grouped items ─────────────────────────────────────────────────────────
 
-  /// Returns items organized into groups (with headers) if [groupBy] is set.
+  /// Returns items organized into groups (with headers) if groupBy is set.
   List<_GroupedSection<T>> _buildGroupedSections() {
     final items = _effectiveItems;
     if (widget.groupBy == null) {

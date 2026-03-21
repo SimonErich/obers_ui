@@ -169,8 +169,9 @@ void main() {
 
   // ── reducedMotion ─────────────────────────────────────────────────────────
 
-  testWidgets('ensureVisible uses Duration.zero when reducedMotion',
-      (tester) async {
+  testWidgets('ensureVisible uses Duration.zero when reducedMotion', (
+    tester,
+  ) async {
     final focusNode = FocusNode();
     final scrollController = ScrollController();
     await tester.pumpObers(

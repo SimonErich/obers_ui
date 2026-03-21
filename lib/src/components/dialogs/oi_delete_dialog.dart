@@ -102,35 +102,39 @@ class _OiDeleteDialogState extends State<OiDeleteDialog> {
               ),
               SizedBox(height: spacing.md),
               // File list
-              ...widget.files.take(5).map((file) => Padding(
-                    padding: EdgeInsets.only(bottom: spacing.xs),
-                    child: Row(
-                      children: [
-                        if (file.isFolder)
-                          const OiFolderIcon(size: OiFolderIconSize.sm)
-                        else
-                          OiFileIcon(
-                            fileName: file.name,
-                            size: OiFileIconSize.sm,
-                          ),
-                        SizedBox(width: spacing.sm),
-                        Expanded(
-                          child: Text(
-                            file.name +
-                                (file.isFolder && file.itemCount != null
-                                    ? ' (${file.itemCount} items inside)'
-                                    : ''),
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: colors.text,
+              ...widget.files
+                  .take(5)
+                  .map(
+                    (file) => Padding(
+                      padding: EdgeInsets.only(bottom: spacing.xs),
+                      child: Row(
+                        children: [
+                          if (file.isFolder)
+                            const OiFolderIcon(size: OiFolderIconSize.sm)
+                          else
+                            OiFileIcon(
+                              fileName: file.name,
+                              size: OiFileIconSize.sm,
                             ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
+                          SizedBox(width: spacing.sm),
+                          Expanded(
+                            child: Text(
+                              file.name +
+                                  (file.isFolder && file.itemCount != null
+                                      ? ' (${file.itemCount} items inside)'
+                                      : ''),
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: colors.text,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  )),
+                  ),
               if (widget.files.length > 5)
                 Padding(
                   padding: EdgeInsets.only(bottom: spacing.xs),
@@ -145,7 +149,10 @@ class _OiDeleteDialogState extends State<OiDeleteDialog> {
                 Row(
                   children: [
                     Icon(
-                      const IconData(0xe002, fontFamily: 'MaterialIcons'), // warning
+                      const IconData(
+                        0xe002,
+                        fontFamily: 'MaterialIcons',
+                      ), // warning
                       size: 16,
                       color: colors.warning.base,
                     ),
@@ -194,15 +201,9 @@ class _OiDeleteDialogState extends State<OiDeleteDialog> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  OiButton.ghost(
-                    label: 'Cancel',
-                    onTap: widget.onCancel,
-                  ),
+                  OiButton.ghost(label: 'Cancel', onTap: widget.onCancel),
                   SizedBox(width: spacing.sm),
-                  OiButton.destructive(
-                    label: 'Delete',
-                    onTap: widget.onDelete,
-                  ),
+                  OiButton.destructive(label: 'Delete', onTap: widget.onDelete),
                 ],
               ),
             ],

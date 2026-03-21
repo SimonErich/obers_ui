@@ -27,7 +27,7 @@ class OiBreadcrumbItem {
 /// Renders [items] separated by [separator] (default `/`). The last item is
 /// always non-interactive — it represents the current page.
 ///
-/// When [maxVisible] is set and [items.length] exceeds it, the middle items
+/// When [maxVisible] is set and items.length exceeds it, the middle items
 /// are collapsed into a `…` button that shows the hidden crumbs in an
 /// overlay popover when tapped.
 ///
@@ -47,7 +47,7 @@ class OiBreadcrumbs extends StatefulWidget {
   /// The separator string rendered between items. Defaults to `'/'`.
   final String separator;
 
-  /// When set, collapses middle items into `…` when [items.length] exceeds
+  /// When set, collapses middle items into `…` when items.length exceeds
   /// this value.
   final int? maxVisible;
 

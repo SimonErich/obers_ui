@@ -208,10 +208,7 @@ void main() {
 
     testWidgets('mimeType application/pdf maps to document', (tester) async {
       await tester.pumpObers(
-        const OiFileIcon(
-          fileName: 'file.xyz',
-          mimeType: 'application/pdf',
-        ),
+        const OiFileIcon(fileName: 'file.xyz', mimeType: 'application/pdf'),
       );
       final icon = tester.widget<OiFileIcon>(find.byType(OiFileIcon));
       expect(icon.category, OiFileCategory.document);
@@ -427,10 +424,7 @@ void main() {
   group('accessibility', () {
     testWidgets('provides default semantic label', (tester) async {
       await tester.pumpObers(const OiFileIcon(fileName: 'report.pdf'));
-      expect(
-        tester.getSemantics(find.bySemanticsLabel('PDF file')),
-        isNotNull,
-      );
+      expect(tester.getSemantics(find.bySemanticsLabel('PDF file')), isNotNull);
     });
 
     testWidgets('uses custom semantic label when provided', (tester) async {
@@ -465,9 +459,7 @@ void main() {
     });
 
     testWidgets('md', (tester) async {
-      await tester.pumpObers(
-        const OiFileIcon(fileName: 'song.mp3'),
-      );
+      await tester.pumpObers(const OiFileIcon(fileName: 'song.mp3'));
       expect(find.text('MP3'), findsOneWidget);
     });
 
@@ -490,10 +482,7 @@ void main() {
 
   group('categoryForExtension', () {
     test('maps known extensions correctly', () {
-      expect(
-        OiFileIcon.categoryForExtension('pdf'),
-        OiFileCategory.document,
-      );
+      expect(OiFileIcon.categoryForExtension('pdf'), OiFileCategory.document);
       expect(
         OiFileIcon.categoryForExtension('xlsx'),
         OiFileCategory.spreadsheet,
@@ -502,89 +491,38 @@ void main() {
         OiFileIcon.categoryForExtension('ppt'),
         OiFileCategory.presentation,
       );
-      expect(
-        OiFileIcon.categoryForExtension('svg'),
-        OiFileCategory.image,
-      );
-      expect(
-        OiFileIcon.categoryForExtension('webm'),
-        OiFileCategory.video,
-      );
-      expect(
-        OiFileIcon.categoryForExtension('flac'),
-        OiFileCategory.audio,
-      );
-      expect(
-        OiFileIcon.categoryForExtension('7z'),
-        OiFileCategory.archive,
-      );
-      expect(
-        OiFileIcon.categoryForExtension('ts'),
-        OiFileCategory.code,
-      );
-      expect(
-        OiFileIcon.categoryForExtension('yaml'),
-        OiFileCategory.data,
-      );
-      expect(
-        OiFileIcon.categoryForExtension('log'),
-        OiFileCategory.text,
-      );
-      expect(
-        OiFileIcon.categoryForExtension('bat'),
-        OiFileCategory.executable,
-      );
-      expect(
-        OiFileIcon.categoryForExtension('woff'),
-        OiFileCategory.font,
-      );
-      expect(
-        OiFileIcon.categoryForExtension('fbx'),
-        OiFileCategory.threeD,
-      );
-      expect(
-        OiFileIcon.categoryForExtension('nope'),
-        OiFileCategory.generic,
-      );
+      expect(OiFileIcon.categoryForExtension('svg'), OiFileCategory.image);
+      expect(OiFileIcon.categoryForExtension('webm'), OiFileCategory.video);
+      expect(OiFileIcon.categoryForExtension('flac'), OiFileCategory.audio);
+      expect(OiFileIcon.categoryForExtension('7z'), OiFileCategory.archive);
+      expect(OiFileIcon.categoryForExtension('ts'), OiFileCategory.code);
+      expect(OiFileIcon.categoryForExtension('yaml'), OiFileCategory.data);
+      expect(OiFileIcon.categoryForExtension('log'), OiFileCategory.text);
+      expect(OiFileIcon.categoryForExtension('bat'), OiFileCategory.executable);
+      expect(OiFileIcon.categoryForExtension('woff'), OiFileCategory.font);
+      expect(OiFileIcon.categoryForExtension('fbx'), OiFileCategory.threeD);
+      expect(OiFileIcon.categoryForExtension('nope'), OiFileCategory.generic);
     });
 
     test('is case-insensitive', () {
-      expect(
-        OiFileIcon.categoryForExtension('PDF'),
-        OiFileCategory.document,
-      );
-      expect(
-        OiFileIcon.categoryForExtension('Png'),
-        OiFileCategory.image,
-      );
+      expect(OiFileIcon.categoryForExtension('PDF'), OiFileCategory.document);
+      expect(OiFileIcon.categoryForExtension('Png'), OiFileCategory.image);
     });
 
     test('handles leading dot', () {
-      expect(
-        OiFileIcon.categoryForExtension('.pdf'),
-        OiFileCategory.document,
-      );
+      expect(OiFileIcon.categoryForExtension('.pdf'), OiFileCategory.document);
     });
   });
 
   group('categoryForMimeType', () {
     test('maps MIME type prefixes correctly', () {
-      expect(
-        OiFileIcon.categoryForMimeType('image/png'),
-        OiFileCategory.image,
-      );
-      expect(
-        OiFileIcon.categoryForMimeType('video/mp4'),
-        OiFileCategory.video,
-      );
+      expect(OiFileIcon.categoryForMimeType('image/png'), OiFileCategory.image);
+      expect(OiFileIcon.categoryForMimeType('video/mp4'), OiFileCategory.video);
       expect(
         OiFileIcon.categoryForMimeType('audio/mpeg'),
         OiFileCategory.audio,
       );
-      expect(
-        OiFileIcon.categoryForMimeType('font/ttf'),
-        OiFileCategory.font,
-      );
+      expect(OiFileIcon.categoryForMimeType('font/ttf'), OiFileCategory.font);
       expect(
         OiFileIcon.categoryForMimeType('model/gltf+json'),
         OiFileCategory.threeD,
@@ -608,14 +546,8 @@ void main() {
         OiFileIcon.categoryForMimeType('application/json'),
         OiFileCategory.data,
       );
-      expect(
-        OiFileIcon.categoryForMimeType('text/plain'),
-        OiFileCategory.text,
-      );
-      expect(
-        OiFileIcon.categoryForMimeType('text/html'),
-        OiFileCategory.code,
-      );
+      expect(OiFileIcon.categoryForMimeType('text/plain'), OiFileCategory.text);
+      expect(OiFileIcon.categoryForMimeType('text/html'), OiFileCategory.code);
     });
 
     test('unknown MIME type returns generic', () {

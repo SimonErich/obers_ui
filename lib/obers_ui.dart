@@ -178,8 +178,8 @@ export 'src/composites/workflow/oi_state_diagram.dart';
 // ── Foundation: Core Services ────────────────────────────────────────────────
 
 export 'src/foundation/oi_accessibility.dart';
-export 'src/foundation/oi_icons.dart';
 export 'src/foundation/oi_app.dart';
+export 'src/foundation/oi_icons.dart';
 export 'src/foundation/oi_input_modality.dart';
 export 'src/foundation/oi_overlays.dart';
 export 'src/foundation/oi_platform.dart';
@@ -213,8 +213,11 @@ export 'src/foundation/theme/oi_theme_data.dart';
 export 'src/foundation/theme/oi_theme_scope.dart';
 // ── Models ───────────────────────────────────────────────────────────────────
 
+export 'src/models/oi_cart_item.dart';
+export 'src/models/oi_cart_summary.dart';
 export 'src/models/oi_file_explorer_controller.dart';
 export 'src/models/oi_file_node_data.dart';
+export 'src/models/oi_product_data.dart';
 // ── Models: Settings ─────────────────────────────────────────────────────────
 
 export 'src/models/settings/oi_accordion_settings.dart';

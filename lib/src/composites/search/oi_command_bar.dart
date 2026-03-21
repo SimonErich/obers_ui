@@ -68,7 +68,9 @@ class OiCommand {
 class OiCommandBar extends StatefulWidget {
   /// Creates an [OiCommandBar].
   const OiCommandBar({
-    required this.commands, required this.label, super.key,
+    required this.commands,
+    required this.label,
+    super.key,
     this.onDismiss,
     this.showRecent = true,
     this.fuzzySearch = true,

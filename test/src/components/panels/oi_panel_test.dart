@@ -22,11 +22,7 @@ void main() {
 
   testWidgets('open=false panel is still in tree but slid out', (tester) async {
     await tester.pumpObers(
-      const OiPanel(
-        label: 'panel',
-        open: false,
-        child: Text('hidden panel'),
-      ),
+      const OiPanel(label: 'panel', open: false, child: Text('hidden panel')),
     );
     await tester.pumpAndSettle();
     // Widget is in the tree (SlideTransition doesn't remove it).
@@ -159,35 +155,32 @@ void main() {
 
   // ── Reduced motion ────────────────────────────────────────────────────────
 
-  testWidgets(
-    'reducedMotion: toggling open completes instantly',
-    (tester) async {
-      final notifier = ValueNotifier<bool>(false);
-      addTearDown(notifier.dispose);
+  testWidgets('reducedMotion: toggling open completes instantly', (
+    tester,
+  ) async {
+    final notifier = ValueNotifier<bool>(false);
+    addTearDown(notifier.dispose);
 
-      await tester.pumpObers(
-        MediaQuery(
-          data: const MediaQueryData(disableAnimations: true),
-          child: ValueListenableBuilder<bool>(
-            valueListenable: notifier,
-            builder: (_, isOpen, __) => OiPanel(
-              label: 'panel',
-              open: isOpen,
-              child: const Text('instant panel'),
-            ),
+    await tester.pumpObers(
+      MediaQuery(
+        data: const MediaQueryData(disableAnimations: true),
+        child: ValueListenableBuilder<bool>(
+          valueListenable: notifier,
+          builder: (_, isOpen, __) => OiPanel(
+            label: 'panel',
+            open: isOpen,
+            child: const Text('instant panel'),
           ),
         ),
-      );
-      await tester.pump();
+      ),
+    );
+    await tester.pump();
 
-      // Open — controller jumps to 1.0 with Duration.zero.
-      notifier.value = true;
-      await tester.pump();
+    // Open — controller jumps to 1.0 with Duration.zero.
+    notifier.value = true;
+    await tester.pump();
 
-      final slide = tester.widget<SlideTransition>(
-        find.byType(SlideTransition),
-      );
-      expect(slide.position.value, Offset.zero);
-    },
-  );
+    final slide = tester.widget<SlideTransition>(find.byType(SlideTransition));
+    expect(slide.position.value, Offset.zero);
+  });
 }

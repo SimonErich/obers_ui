@@ -1,5 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/painting.dart';
+import 'package:obers_ui/obers_ui.dart' show OiColorScheme;
+import 'package:obers_ui/src/foundation/theme/oi_color_scheme.dart'
+    show OiColorScheme;
 
 /// A color token with five semantic shade variants.
 ///

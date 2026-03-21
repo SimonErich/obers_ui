@@ -6,6 +6,8 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:obers_ui/obers_ui.dart' show OiA11y;
+import 'package:obers_ui/src/foundation/oi_accessibility.dart' show OiA11y;
 import 'package:obers_ui/src/foundation/oi_app.dart';
 import 'package:obers_ui/src/foundation/oi_platform.dart';
 import 'package:obers_ui/src/foundation/theme/oi_effects_theme.dart';

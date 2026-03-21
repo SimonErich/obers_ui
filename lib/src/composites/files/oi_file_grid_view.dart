@@ -1,11 +1,16 @@
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/obers_ui.dart' show OiFileListView;
 import 'package:obers_ui/src/components/display/oi_file_icon.dart';
 import 'package:obers_ui/src/components/display/oi_file_preview.dart';
 import 'package:obers_ui/src/components/display/oi_folder_icon.dart';
 import 'package:obers_ui/src/components/display/oi_rename_field.dart';
 import 'package:obers_ui/src/components/interaction/oi_selection_overlay.dart';
 import 'package:obers_ui/src/components/overlays/oi_context_menu.dart';
+import 'package:obers_ui/src/composites/files/oi_file_list_view.dart'
+    show OiFileListView;
+import 'package:obers_ui/src/foundation/theme/oi_color_scheme.dart';
+import 'package:obers_ui/src/foundation/theme/oi_spacing_scale.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/models/oi_file_node_data.dart';
 import 'package:obers_ui/src/primitives/drag_drop/oi_draggable.dart';
@@ -74,7 +79,7 @@ class OiFileGridView extends StatefulWidget {
 
   /// Called when files are moved to a folder.
   final void Function(List<OiFileNodeData> files, OiFileNodeData folder)?
-      onMoveToFolder;
+  onMoveToFolder;
 
   /// Context menu builder for individual files (legacy widget-based).
   final List<Widget> Function(OiFileNodeData)? contextMenu;
@@ -122,19 +127,21 @@ class _OiFileGridViewState extends State<OiFileGridView> {
       return;
     }
 
-    final isShift = HardwareKeyboard.instance.logicalKeysPressed
-        .any((k) =>
-            k == LogicalKeyboardKey.shiftLeft ||
-            k == LogicalKeyboardKey.shiftRight);
-    final isCtrl = HardwareKeyboard.instance.logicalKeysPressed.any((k) =>
-        k == LogicalKeyboardKey.controlLeft ||
-        k == LogicalKeyboardKey.controlRight ||
-        k == LogicalKeyboardKey.metaLeft ||
-        k == LogicalKeyboardKey.metaRight);
+    final isShift = HardwareKeyboard.instance.logicalKeysPressed.any(
+      (k) =>
+          k == LogicalKeyboardKey.shiftLeft ||
+          k == LogicalKeyboardKey.shiftRight,
+    );
+    final isCtrl = HardwareKeyboard.instance.logicalKeysPressed.any(
+      (k) =>
+          k == LogicalKeyboardKey.controlLeft ||
+          k == LogicalKeyboardKey.controlRight ||
+          k == LogicalKeyboardKey.metaLeft ||
+          k == LogicalKeyboardKey.metaRight,
+    );
 
     if (isShift && _lastTappedIndex != null) {
-      final start =
-          _lastTappedIndex! < index ? _lastTappedIndex! : index;
+      final start = _lastTappedIndex! < index ? _lastTappedIndex! : index;
       final end = _lastTappedIndex! < index ? index : _lastTappedIndex!;
       final newSelection = Set<Object>.from(widget.selectedKeys);
       for (var i = start; i <= end; i++) {
@@ -198,14 +205,15 @@ class _OiFileGridViewState extends State<OiFileGridView> {
     final next = (_focusedIndex + delta).clamp(0, widget.files.length - 1);
     setState(() => _focusedIndex = next);
 
-    final isShift = HardwareKeyboard.instance.logicalKeysPressed
-        .any((k) =>
-            k == LogicalKeyboardKey.shiftLeft ||
-            k == LogicalKeyboardKey.shiftRight);
+    final isShift = HardwareKeyboard.instance.logicalKeysPressed.any(
+      (k) =>
+          k == LogicalKeyboardKey.shiftLeft ||
+          k == LogicalKeyboardKey.shiftRight,
+    );
 
     if (isShift && widget.enableMultiSelect) {
-      final newSelection = Set<Object>.from(widget.selectedKeys);
-      newSelection.add(widget.files[next].id);
+      final newSelection = Set<Object>.from(widget.selectedKeys)
+        ..add(widget.files[next].id);
       widget.onSelectionChange(newSelection);
     } else {
       widget.onSelectionChange({widget.files[next].id});
@@ -280,12 +288,17 @@ class _OiFileGridViewState extends State<OiFileGridView> {
               itemCount: widget.files.length,
               itemBuilder: (context, index) {
                 final file = widget.files[index];
-                final isSelected =
-                    widget.selectedKeys.contains(file.id);
+                final isSelected = widget.selectedKeys.contains(file.id);
                 final isRenaming = widget.renamingKey == file.id;
 
                 return _buildCard(
-                    file, index, isSelected, isRenaming, colors, spacing);
+                  file,
+                  index,
+                  isSelected,
+                  isRenaming,
+                  colors,
+                  spacing,
+                );
               },
             ),
           ),
@@ -294,8 +307,14 @@ class _OiFileGridViewState extends State<OiFileGridView> {
     );
   }
 
-  Widget _buildCard(OiFileNodeData file, int index, bool isSelected,
-      bool isRenaming, dynamic colors, dynamic spacing) {
+  Widget _buildCard(
+    OiFileNodeData file,
+    int index,
+    bool isSelected,
+    bool isRenaming,
+    OiColorScheme colors,
+    OiSpacingScale spacing,
+  ) {
     final fileType = file.isFolder ? 'folder' : file.resolvedExtension;
     final semanticLabel =
         '${file.name}, $fileType${isSelected ? ', selected' : ''}';
@@ -307,18 +326,15 @@ class _OiFileGridViewState extends State<OiFileGridView> {
         onTap: () => _onTap(file, index),
         onDoubleTap: () => _onDoubleTap(file),
         child: Container(
-          padding: EdgeInsets.all((spacing as dynamic).sm as double),
+          padding: EdgeInsets.all(spacing.sm),
           decoration: BoxDecoration(
             color: isSelected
-                ? ((colors as dynamic).primary.muted as Color)
-                    .withValues(alpha: 0.15)
+                ? colors.primary.muted.withValues(alpha: 0.15)
                 : null,
             borderRadius: BorderRadius.circular(8),
             border: isSelected
-                ? Border.all(
-                    color: (colors as dynamic).primary.base as Color)
-                : Border.all(
-                    color: (colors as dynamic).borderSubtle as Color),
+                ? Border.all(color: colors.primary.base)
+                : Border.all(color: colors.borderSubtle),
           ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -329,19 +345,19 @@ class _OiFileGridViewState extends State<OiFileGridView> {
                   child: file.isFolder
                       ? const OiFolderIcon(size: OiFolderIconSize.xl)
                       : (file.thumbnailUrl != null
-                          ? OiFilePreview(
-                              file: file,
-                              width: widget.cardWidth - 24,
-                              height: widget.cardHeight - 60,
-                            )
-                          : OiFileIcon(
-                              fileName: file.name,
-                              mimeType: file.mimeType,
-                              size: OiFileIconSize.lg,
-                            )),
+                            ? OiFilePreview(
+                                file: file,
+                                width: widget.cardWidth - 24,
+                                height: widget.cardHeight - 60,
+                              )
+                            : OiFileIcon(
+                                fileName: file.name,
+                                mimeType: file.mimeType,
+                                size: OiFileIconSize.lg,
+                              )),
                 ),
               ),
-              SizedBox(height: (spacing as dynamic).xs as double),
+              SizedBox(height: spacing.xs),
               // Name or rename field
               if (isRenaming)
                 OiRenameField(
@@ -356,21 +372,13 @@ class _OiFileGridViewState extends State<OiFileGridView> {
               // Subtitle
               if (file.isFolder)
                 Text(
-                  file.itemCount != null
-                      ? '${file.itemCount} items'
-                      : 'Empty',
-                  style: TextStyle(
-                    fontSize: 10,
-                    color: (colors as dynamic).textMuted as Color,
-                  ),
+                  file.itemCount != null ? '${file.itemCount} items' : 'Empty',
+                  style: TextStyle(fontSize: 10, color: colors.textMuted),
                 )
               else if (!isRenaming)
                 Text(
                   file.formattedSize,
-                  style: TextStyle(
-                    fontSize: 10,
-                    color: (colors as dynamic).textMuted as Color,
-                  ),
+                  style: TextStyle(fontSize: 10, color: colors.textMuted),
                 ),
             ],
           ),
@@ -403,10 +411,7 @@ class _OiFileGridViewState extends State<OiFileGridView> {
             return Container(
               decoration: state == OiDropState.hovering
                   ? BoxDecoration(
-                      border: Border.all(
-                        color: (colors as dynamic).primary.base as Color,
-                        width: 2,
-                      ),
+                      border: Border.all(color: colors.primary.base, width: 2),
                       borderRadius: BorderRadius.circular(8),
                     )
                   : null,
@@ -418,8 +423,8 @@ class _OiFileGridViewState extends State<OiFileGridView> {
 
       final dragData = isSelected
           ? widget.files
-              .where((f) => widget.selectedKeys.contains(f.id))
-              .toList()
+                .where((f) => widget.selectedKeys.contains(f.id))
+                .toList()
           : [file];
 
       card = OiDraggable<List<OiFileNodeData>>(
@@ -432,11 +437,8 @@ class _OiFileGridViewState extends State<OiFileGridView> {
     return card;
   }
 
-  Widget _buildName(OiFileNodeData file, dynamic colors) {
-    final normalStyle = TextStyle(
-      fontSize: 12,
-      color: (colors as dynamic).text as Color,
-    );
+  Widget _buildName(OiFileNodeData file, OiColorScheme colors) {
+    final normalStyle = TextStyle(fontSize: 12, color: colors.text);
 
     final query = widget.searchQuery;
     if (query == null || query.isEmpty) {
@@ -455,7 +457,7 @@ class _OiFileGridViewState extends State<OiFileGridView> {
       normalStyle,
       normalStyle.copyWith(
         fontWeight: FontWeight.w700,
-        color: (colors as dynamic).primary.base as Color,
+        color: colors.primary.base,
       ),
     );
 
@@ -467,19 +469,18 @@ class _OiFileGridViewState extends State<OiFileGridView> {
     );
   }
 
-  Widget _buildDragFeedback(List<OiFileNodeData> files, dynamic colors) {
+  Widget _buildDragFeedback(List<OiFileNodeData> files, OiColorScheme colors) {
     final label = files.length == 1
         ? files.first.name
         : '${files.length} items';
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: (colors as dynamic).surface as Color,
+        color: colors.surface,
         borderRadius: BorderRadius.circular(8),
         boxShadow: [
           BoxShadow(
-            color: ((colors as dynamic).overlay as Color)
-                .withValues(alpha: 0.2),
+            color: colors.overlay.withValues(alpha: 0.2),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -491,35 +492,26 @@ class _OiFileGridViewState extends State<OiFileGridView> {
           if (files.length == 1 && files.first.isFolder)
             const OiFolderIcon(size: OiFolderIconSize.sm)
           else if (files.length == 1)
-            OiFileIcon(
-              fileName: files.first.name,
-              size: OiFileIconSize.sm,
-            )
+            OiFileIcon(fileName: files.first.name, size: OiFileIconSize.sm)
           else
             Text(
               '${files.length}',
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w700,
-                color: (colors as dynamic).primary.base as Color,
+                color: colors.primary.base,
               ),
             ),
           const SizedBox(width: 8),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 13,
-              color: (colors as dynamic).text as Color,
-            ),
-          ),
+          Text(label, style: TextStyle(fontSize: 13, color: colors.text)),
         ],
       ),
     );
   }
 
-  Widget _buildLoading(dynamic colors, dynamic spacing) {
+  Widget _buildLoading(OiColorScheme colors, OiSpacingScale spacing) {
     return GridView.builder(
-      padding: EdgeInsets.all((spacing as dynamic).md as double),
+      padding: EdgeInsets.all(spacing.md),
       gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
         maxCrossAxisExtent: widget.cardWidth,
         mainAxisSpacing: widget.gap,
@@ -530,7 +522,7 @@ class _OiFileGridViewState extends State<OiFileGridView> {
       itemBuilder: (context, index) {
         return Container(
           decoration: BoxDecoration(
-            color: (colors as dynamic).surfaceHover as Color,
+            color: colors.surfaceHover,
             borderRadius: BorderRadius.circular(8),
           ),
         );

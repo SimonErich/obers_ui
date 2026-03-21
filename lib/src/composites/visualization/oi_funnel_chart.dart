@@ -23,7 +23,7 @@ class OiFunnelStage {
 /// A funnel chart showing conversion through stages.
 ///
 /// Stages are rendered as progressively narrowing trapezoids from top to
-/// bottom. Each stage can optionally display its [value] and the percentage
+/// bottom. Each stage can optionally display its value and the percentage
 /// relative to the first stage.
 ///
 /// An [onStageTap] callback is invoked when a stage is tapped.

@@ -44,8 +44,8 @@ class OiUploadDialog extends StatefulWidget {
   });
 
   /// Called when the user confirms upload with valid files and resolution.
-  final void Function(
-      List<OiFileData> files, OiConflictResolution resolution) onUpload;
+  final void Function(List<OiFileData> files, OiConflictResolution resolution)
+  onUpload;
 
   /// Called when the user cancels.
   final VoidCallback? onCancel;
@@ -87,10 +87,8 @@ class _OiUploadDialogState extends State<OiUploadDialog> {
     super.dispose();
   }
 
-  List<OiFileData> get _validFiles => _entries
-      .where((e) => e.error == null)
-      .map((e) => e.file)
-      .toList();
+  List<OiFileData> get _validFiles =>
+      _entries.where((e) => e.error == null).map((e) => e.file).toList();
 
   String? _validateFile(OiFileData file) {
     // Extension check
@@ -112,14 +110,10 @@ class _OiUploadDialogState extends State<OiUploadDialog> {
   void _addFiles(List<OiFileData> files) {
     setState(() {
       for (final file in files) {
-        if (widget.maxFiles != null &&
-            _entries.length >= widget.maxFiles!) {
+        if (widget.maxFiles != null && _entries.length >= widget.maxFiles!) {
           break;
         }
-        _entries.add(_UploadEntry(
-          file: file,
-          error: _validateFile(file),
-        ));
+        _entries.add(_UploadEntry(file: file, error: _validateFile(file)));
       }
     });
   }
@@ -183,9 +177,7 @@ class _OiUploadDialogState extends State<OiUploadDialog> {
                 child: Container(
                   height: 100,
                   decoration: BoxDecoration(
-                    border: Border.all(
-                      color: colors.borderSubtle,
-                    ),
+                    border: Border.all(color: colors.borderSubtle),
                     borderRadius: BorderRadius.circular(8),
                     color: colors.surfaceSubtle,
                   ),
@@ -194,8 +186,10 @@ class _OiUploadDialogState extends State<OiUploadDialog> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Icon(
-                          const IconData(0xe9e4,
-                              fontFamily: 'MaterialIcons'), // upload
+                          const IconData(
+                            0xe9e4,
+                            fontFamily: 'MaterialIcons',
+                          ), // upload
                           size: 28,
                           color: colors.textMuted,
                         ),
@@ -232,7 +226,12 @@ class _OiUploadDialogState extends State<OiUploadDialog> {
                     itemBuilder: (context, index) {
                       final entry = _entries[index];
                       return _buildFileEntry(
-                          context, entry, index, colors, spacing);
+                        context,
+                        entry,
+                        index,
+                        colors,
+                        spacing,
+                      );
                     },
                   ),
                 ),
@@ -260,11 +259,13 @@ class _OiUploadDialogState extends State<OiUploadDialog> {
                     child: OiSelect<OiConflictResolution>(
                       value: _resolution,
                       options: OiConflictResolution.values
-                          .map((r) => OiSelectOption(
-                                value: r,
-                                label: r.name[0].toUpperCase() +
-                                    r.name.substring(1),
-                              ))
+                          .map(
+                            (r) => OiSelectOption(
+                              value: r,
+                              label:
+                                  r.name[0].toUpperCase() + r.name.substring(1),
+                            ),
+                          )
                           .toList(),
                       onChanged: (v) {
                         if (v != null) setState(() => _resolution = v);
@@ -278,10 +279,7 @@ class _OiUploadDialogState extends State<OiUploadDialog> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  OiButton.ghost(
-                    label: 'Cancel',
-                    onTap: widget.onCancel,
-                  ),
+                  OiButton.ghost(label: 'Cancel', onTap: widget.onCancel),
                   SizedBox(width: spacing.sm),
                   OiButton.primary(
                     label: _validFiles.isEmpty
@@ -309,10 +307,7 @@ class _OiUploadDialogState extends State<OiUploadDialog> {
       padding: EdgeInsets.only(bottom: spacing.xs),
       child: Row(
         children: [
-          OiFileIcon(
-            fileName: entry.file.name,
-            size: OiFileIconSize.sm,
-          ),
+          OiFileIcon(fileName: entry.file.name, size: OiFileIconSize.sm),
           SizedBox(width: spacing.xs),
           Expanded(
             child: Column(
@@ -321,20 +316,14 @@ class _OiUploadDialogState extends State<OiUploadDialog> {
               children: [
                 Text(
                   entry.file.name,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: colors.text,
-                  ),
+                  style: TextStyle(fontSize: 12, color: colors.text),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
                 if (entry.error != null)
                   Text(
                     entry.error!,
-                    style: TextStyle(
-                      fontSize: 10,
-                      color: colors.error.base,
-                    ),
+                    style: TextStyle(fontSize: 10, color: colors.error.base),
                   ),
               ],
             ),
@@ -342,10 +331,7 @@ class _OiUploadDialogState extends State<OiUploadDialog> {
           SizedBox(width: spacing.xs),
           Text(
             OiFileUtils.formatSize(entry.file.size),
-            style: TextStyle(
-              fontSize: 11,
-              color: colors.textMuted,
-            ),
+            style: TextStyle(fontSize: 11, color: colors.textMuted),
           ),
           SizedBox(width: spacing.xs),
           GestureDetector(

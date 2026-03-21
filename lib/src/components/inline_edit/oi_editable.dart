@@ -26,15 +26,15 @@ class OiEditable<T> extends StatefulWidget {
 
   /// Builds the display (read-only) widget.
   ///
-  /// Receives the current [BuildContext], the [value], and a [startEdit]
+  /// Receives the current [BuildContext], the [value], and a startEdit
   /// callback that transitions to edit mode when called.
   final Widget Function(BuildContext context, T value, VoidCallback startEdit)
   displayBuilder;
 
   /// Builds the edit widget.
   ///
-  /// Receives the current [BuildContext], the [value], a [commit] callback
-  /// to save the new value, and a [cancel] callback to discard changes.
+  /// Receives the current [BuildContext], the [value], a commit callback
+  /// to save the new value, and a cancel callback to discard changes.
   final Widget Function(
     BuildContext context,
     T value,

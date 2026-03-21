@@ -233,11 +233,7 @@ void main() {
       const SizedBox(
         width: 400,
         height: 600,
-        child: OiChat(
-          messages: [],
-          currentUserId: 'me',
-          label: 'Team Chat',
-        ),
+        child: OiChat(messages: [], currentUserId: 'me', label: 'Team Chat'),
       ),
     );
     expect(find.bySemanticsLabel('Team Chat'), findsOneWidget);
@@ -292,35 +288,30 @@ void main() {
       },
     );
 
-    testWidgets(
-      'first message in group shows avatar and sender name',
-      (tester) async {
-        final messages = [
-          msg(
-            senderId: 'bob',
-            senderName: 'Bob',
-            content: 'Hello',
-            timestamp: now,
-          ),
-        ];
+    testWidgets('first message in group shows avatar and sender name', (
+      tester,
+    ) async {
+      final messages = [
+        msg(
+          senderId: 'bob',
+          senderName: 'Bob',
+          content: 'Hello',
+          timestamp: now,
+        ),
+      ];
 
-        await tester.pumpObers(
-          SizedBox(
-            width: 400,
-            height: 600,
-            child: OiChat(
-              messages: messages,
-              currentUserId: 'me',
-              label: 'Chat',
-            ),
-          ),
-        );
+      await tester.pumpObers(
+        SizedBox(
+          width: 400,
+          height: 600,
+          child: OiChat(messages: messages, currentUserId: 'me', label: 'Chat'),
+        ),
+      );
 
-        // Avatar initial and sender name are both visible.
-        expect(find.text('B'), findsOneWidget);
-        expect(find.text('Bob'), findsOneWidget);
-      },
-    );
+      // Avatar initial and sender name are both visible.
+      expect(find.text('B'), findsOneWidget);
+      expect(find.text('Bob'), findsOneWidget);
+    });
 
     testWidgets(
       'continuation messages show reduced spacing (no avatar, no name)',
@@ -373,122 +364,97 @@ void main() {
       },
     );
 
-    testWidgets(
-      'messages beyond consecutiveThreshold are not grouped',
-      (tester) async {
-        final messages = [
-          msg(
-            senderId: 'bob',
-            senderName: 'Bob',
-            content: 'Before',
-            timestamp: now,
-          ),
-          msg(
-            key: '2',
-            senderId: 'bob',
-            senderName: 'Bob',
-            content: 'After',
-            timestamp: now.add(const Duration(minutes: 5)),
-          ),
-        ];
+    testWidgets('messages beyond consecutiveThreshold are not grouped', (
+      tester,
+    ) async {
+      final messages = [
+        msg(
+          senderId: 'bob',
+          senderName: 'Bob',
+          content: 'Before',
+          timestamp: now,
+        ),
+        msg(
+          key: '2',
+          senderId: 'bob',
+          senderName: 'Bob',
+          content: 'After',
+          timestamp: now.add(const Duration(minutes: 5)),
+        ),
+      ];
 
-        await tester.pumpObers(
-          SizedBox(
-            width: 400,
-            height: 600,
-            child: OiChat(
-              messages: messages,
-              currentUserId: 'me',
-              label: 'Chat',
-            ),
-          ),
-        );
+      await tester.pumpObers(
+        SizedBox(
+          width: 400,
+          height: 600,
+          child: OiChat(messages: messages, currentUserId: 'me', label: 'Chat'),
+        ),
+      );
 
-        // Both messages show sender name because the gap exceeds the
-        // threshold — they are not grouped.
-        expect(find.text('Bob'), findsNWidgets(2));
-        // Both show avatar initial.
-        expect(find.text('B'), findsNWidgets(2));
-      },
-    );
+      // Both messages show sender name because the gap exceeds the
+      // threshold — they are not grouped.
+      expect(find.text('Bob'), findsNWidgets(2));
+      // Both show avatar initial.
+      expect(find.text('B'), findsNWidgets(2));
+    });
 
-    testWidgets(
-      'different senders are never grouped',
-      (tester) async {
-        final messages = [
-          msg(
-            senderId: 'bob',
-            senderName: 'Bob',
-            content: 'Hi',
-            timestamp: now,
-          ),
-          msg(
-            key: '2',
-            senderId: 'carol',
-            senderName: 'Carol',
-            content: 'Hey',
-            timestamp: now.add(const Duration(seconds: 10)),
-          ),
-        ];
+    testWidgets('different senders are never grouped', (tester) async {
+      final messages = [
+        msg(senderId: 'bob', senderName: 'Bob', content: 'Hi', timestamp: now),
+        msg(
+          key: '2',
+          senderId: 'carol',
+          senderName: 'Carol',
+          content: 'Hey',
+          timestamp: now.add(const Duration(seconds: 10)),
+        ),
+      ];
 
-        await tester.pumpObers(
-          SizedBox(
-            width: 400,
-            height: 600,
-            child: OiChat(
-              messages: messages,
-              currentUserId: 'me',
-              label: 'Chat',
-            ),
-          ),
-        );
+      await tester.pumpObers(
+        SizedBox(
+          width: 400,
+          height: 600,
+          child: OiChat(messages: messages, currentUserId: 'me', label: 'Chat'),
+        ),
+      );
 
-        // Both sender names appear.
-        expect(find.text('Bob'), findsOneWidget);
-        expect(find.text('Carol'), findsOneWidget);
-        // Both avatars appear.
-        expect(find.text('B'), findsOneWidget);
-        expect(find.text('C'), findsOneWidget);
-      },
-    );
+      // Both sender names appear.
+      expect(find.text('Bob'), findsOneWidget);
+      expect(find.text('Carol'), findsOneWidget);
+      // Both avatars appear.
+      expect(find.text('B'), findsOneWidget);
+      expect(find.text('C'), findsOneWidget);
+    });
 
-    testWidgets(
-      'groupConsecutive=false disables grouping',
-      (tester) async {
-        final messages = [
-          msg(
-            senderId: 'bob',
-            senderName: 'Bob',
-            content: 'One',
-            timestamp: now,
-          ),
-          msg(
-            key: '2',
-            senderId: 'bob',
-            senderName: 'Bob',
-            content: 'Two',
-            timestamp: now.add(const Duration(seconds: 10)),
-          ),
-        ];
+    testWidgets('groupConsecutive=false disables grouping', (tester) async {
+      final messages = [
+        msg(senderId: 'bob', senderName: 'Bob', content: 'One', timestamp: now),
+        msg(
+          key: '2',
+          senderId: 'bob',
+          senderName: 'Bob',
+          content: 'Two',
+          timestamp: now.add(const Duration(seconds: 10)),
+        ),
+      ];
 
-        await tester.pumpObers(
-          SizedBox(
-            width: 400,
-            height: 600,
-            child: OiChat(
-              messages: messages,
-              currentUserId: 'me',
-              label: 'Chat',
-              groupConsecutive: false,
-            ),
+      await tester.pumpObers(
+        SizedBox(
+          width: 400,
+          height: 600,
+          child: OiChat(
+            messages: messages,
+            currentUserId: 'me',
+            label: 'Chat',
+            groupConsecutive: false,
           ),
-        );
+        ),
+      );
 
-        // With grouping disabled both messages show name and avatar.
-        expect(find.text('Bob'), findsNWidgets(2));
-        expect(find.text('B'), findsNWidgets(2));
-      },
-    );
+      // With grouping disabled both messages show name and avatar.
+      expect(find.text('Bob'), findsNWidgets(2));
+      expect(find.text('B'), findsNWidgets(2));
+    });
   });
 
   // -------------------------------------------------------------------------
@@ -568,9 +534,7 @@ void main() {
       },
     );
 
-    testWidgets('manual Load older messages button is removed', (
-      tester,
-    ) async {
+    testWidgets('manual Load older messages button is removed', (tester) async {
       await tester.pumpObers(
         SizedBox(
           width: 400,

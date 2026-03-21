@@ -13,20 +13,14 @@ void main() {
 
   testWidgets('renders without error', (tester) async {
     await tester.pumpObers(
-      const OiStorageIndicator(
-        usedBytes: 5000000000,
-        totalBytes: 10000000000,
-      ),
+      const OiStorageIndicator(usedBytes: 5000000000, totalBytes: 10000000000),
     );
     expect(find.byType(OiStorageIndicator), findsOneWidget);
   });
 
   testWidgets('full layout shows "Storage" label', (tester) async {
     await tester.pumpObers(
-      const OiStorageIndicator(
-        usedBytes: 5000000000,
-        totalBytes: 10000000000,
-      ),
+      const OiStorageIndicator(usedBytes: 5000000000, totalBytes: 10000000000),
     );
     expect(find.text('Storage'), findsOneWidget);
   });
@@ -93,9 +87,7 @@ void main() {
     expect(find.text('Warning'), findsOneWidget);
   });
 
-  testWidgets('compact mode no status label when usage <= 70%', (
-    tester,
-  ) async {
+  testWidgets('compact mode no status label when usage <= 70%', (tester) async {
     await tester.pumpObers(
       const OiStorageIndicator(
         usedBytes: 5000,
@@ -109,10 +101,7 @@ void main() {
 
   testWidgets('renders FractionallySizedBox for progress bar', (tester) async {
     await tester.pumpObers(
-      const OiStorageIndicator(
-        usedBytes: 5000,
-        totalBytes: 10000,
-      ),
+      const OiStorageIndicator(usedBytes: 5000, totalBytes: 10000),
     );
     final fractionBox = tester.widget<FractionallySizedBox>(
       find.byType(FractionallySizedBox),
@@ -122,10 +111,7 @@ void main() {
 
   testWidgets('zero totalBytes shows 0% progress', (tester) async {
     await tester.pumpObers(
-      const OiStorageIndicator(
-        usedBytes: 0,
-        totalBytes: 0,
-      ),
+      const OiStorageIndicator(usedBytes: 0, totalBytes: 0),
     );
     final fractionBox = tester.widget<FractionallySizedBox>(
       find.byType(FractionallySizedBox),
@@ -135,10 +121,7 @@ void main() {
 
   testWidgets('usedBytes exceeding totalBytes clamps to 100%', (tester) async {
     await tester.pumpObers(
-      const OiStorageIndicator(
-        usedBytes: 15000,
-        totalBytes: 10000,
-      ),
+      const OiStorageIndicator(usedBytes: 15000, totalBytes: 10000),
     );
     final fractionBox = tester.widget<FractionallySizedBox>(
       find.byType(FractionallySizedBox),
@@ -162,8 +145,9 @@ void main() {
     }
   });
 
-  testWidgets('segmented bar renders when breakdown is provided',
-      (tester) async {
+  testWidgets('segmented bar renders when breakdown is provided', (
+    tester,
+  ) async {
     await tester.pumpObers(
       const SizedBox(
         width: 300,

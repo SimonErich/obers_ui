@@ -98,9 +98,7 @@ void main() {
 
     testWidgets('onDoubleTap fires on double-tap', (tester) async {
       var doubleTapped = false;
-      await tester.pumpObers(
-        _tile(onDoubleTap: () => doubleTapped = true),
-      );
+      await tester.pumpObers(_tile(onDoubleTap: () => doubleTapped = true));
 
       await tester.tap(find.byType(OiFileTile));
       await tester.pump(const Duration(milliseconds: 50));
@@ -115,9 +113,7 @@ void main() {
 
   group('Search highlight (REQ-0991)', () {
     testWidgets('no highlight when searchQuery is null', (tester) async {
-      await tester.pumpObers(
-        _tile(file: _file(name: 'report.pdf')),
-      );
+      await tester.pumpObers(_tile(file: _file(name: 'report.pdf')));
 
       // Plain Text widget, not RichText with spans.
       expect(find.text('report.pdf'), findsOneWidget);
@@ -125,7 +121,10 @@ void main() {
 
     testWidgets('highlights matching portion of file name', (tester) async {
       await tester.pumpObers(
-        _tile(file: _file(name: 'report.pdf'), searchQuery: 'port'),
+        _tile(
+          file: _file(name: 'report.pdf'),
+          searchQuery: 'port',
+        ),
       );
 
       // The full name is still rendered (via RichText).
@@ -147,7 +146,10 @@ void main() {
 
     testWidgets('highlight is case-insensitive', (tester) async {
       await tester.pumpObers(
-        _tile(file: _file(name: 'Report.PDF'), searchQuery: 'report'),
+        _tile(
+          file: _file(name: 'Report.PDF'),
+          searchQuery: 'report',
+        ),
       );
 
       final richText = tester.widget<RichText>(find.byType(RichText).at(1));
@@ -162,7 +164,10 @@ void main() {
 
     testWidgets('no highlight when query does not match', (tester) async {
       await tester.pumpObers(
-        _tile(file: _file(name: 'report.pdf'), searchQuery: 'xyz'),
+        _tile(
+          file: _file(name: 'report.pdf'),
+          searchQuery: 'xyz',
+        ),
       );
 
       final richText = tester.widget<RichText>(find.byType(RichText).at(1));
@@ -175,7 +180,10 @@ void main() {
 
     testWidgets('empty searchQuery renders plain text', (tester) async {
       await tester.pumpObers(
-        _tile(file: _file(name: 'report.pdf'), searchQuery: ''),
+        _tile(
+          file: _file(name: 'report.pdf'),
+          searchQuery: '',
+        ),
       );
 
       expect(find.text('report.pdf'), findsOneWidget);

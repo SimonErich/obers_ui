@@ -95,8 +95,15 @@ class OiFolderIcon extends StatelessWidget {
   /// Accessibility label announced by screen readers.
   final String? semanticsLabel;
 
-  ({double width, double height, double tabWidth, double tabHeight, double overlaySize, double fontSize})
-      _dimensions() {
+  ({
+    double width,
+    double height,
+    double tabWidth,
+    double tabHeight,
+    double overlaySize,
+    double fontSize,
+  })
+  _dimensions() {
     return switch (size) {
       OiFolderIconSize.xs => (
         width: 16,
@@ -155,14 +162,22 @@ class OiFolderIcon extends StatelessWidget {
   IconData? get _variantOverlayIcon {
     return switch (variant) {
       OiFolderIconVariant.normal => null,
-      OiFolderIconVariant.shared =>
-        const IconData(0xe7fb, fontFamily: 'MaterialIcons'), // people
-      OiFolderIconVariant.starred =>
-        const IconData(0xe838, fontFamily: 'MaterialIcons'), // star
-      OiFolderIconVariant.locked =>
-        const IconData(0xe897, fontFamily: 'MaterialIcons'), // lock
-      OiFolderIconVariant.trash =>
-        const IconData(0xe872, fontFamily: 'MaterialIcons'), // delete
+      OiFolderIconVariant.shared => const IconData(
+        0xe7fb,
+        fontFamily: 'MaterialIcons',
+      ), // people
+      OiFolderIconVariant.starred => const IconData(
+        0xe838,
+        fontFamily: 'MaterialIcons',
+      ), // star
+      OiFolderIconVariant.locked => const IconData(
+        0xe897,
+        fontFamily: 'MaterialIcons',
+      ), // lock
+      OiFolderIconVariant.trash => const IconData(
+        0xe872,
+        fontFamily: 'MaterialIcons',
+      ), // delete
     };
   }
 
@@ -295,10 +310,7 @@ class _FolderIconPainter extends CustomPainter {
       ..lineTo(r, r)
       ..arcToPoint(const Offset(r + r, 0), radius: const Radius.circular(r))
       ..lineTo(tabWidth - r, 0)
-      ..arcToPoint(
-        Offset(tabWidth, r),
-        radius: const Radius.circular(r),
-      )
+      ..arcToPoint(Offset(tabWidth, r), radius: const Radius.circular(r))
       ..lineTo(tabWidth, tabHeight)
       ..close();
 

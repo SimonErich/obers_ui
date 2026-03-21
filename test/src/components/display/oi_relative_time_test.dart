@@ -1,7 +1,6 @@
 // Tests do not require documentation comments.
 // ignore_for_file: public_member_api_docs
 
-
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui/src/components/display/oi_relative_time.dart';
@@ -19,11 +18,7 @@ void main() {
     test('< 10s renders "now"', () {
       final dt = now.subtract(const Duration(seconds: 5));
       expect(
-        OiRelativeTime.format(
-          dt,
-          style: OiRelativeTimeStyle.narrow,
-          now: now,
-        ),
+        OiRelativeTime.format(dt, style: OiRelativeTimeStyle.narrow, now: now),
         'now',
       );
     });
@@ -31,11 +26,7 @@ void main() {
     test('< 60s renders seconds', () {
       final dt = now.subtract(const Duration(seconds: 30));
       expect(
-        OiRelativeTime.format(
-          dt,
-          style: OiRelativeTimeStyle.narrow,
-          now: now,
-        ),
+        OiRelativeTime.format(dt, style: OiRelativeTimeStyle.narrow, now: now),
         '30s',
       );
     });
@@ -43,11 +34,7 @@ void main() {
     test('< 60m renders minutes', () {
       final dt = now.subtract(const Duration(minutes: 5));
       expect(
-        OiRelativeTime.format(
-          dt,
-          style: OiRelativeTimeStyle.narrow,
-          now: now,
-        ),
+        OiRelativeTime.format(dt, style: OiRelativeTimeStyle.narrow, now: now),
         '5m',
       );
     });
@@ -55,11 +42,7 @@ void main() {
     test('< 24h renders hours', () {
       final dt = now.subtract(const Duration(hours: 3));
       expect(
-        OiRelativeTime.format(
-          dt,
-          style: OiRelativeTimeStyle.narrow,
-          now: now,
-        ),
+        OiRelativeTime.format(dt, style: OiRelativeTimeStyle.narrow, now: now),
         '3h',
       );
     });
@@ -67,11 +50,7 @@ void main() {
     test('< 48h renders "1d"', () {
       final dt = now.subtract(const Duration(hours: 30));
       expect(
-        OiRelativeTime.format(
-          dt,
-          style: OiRelativeTimeStyle.narrow,
-          now: now,
-        ),
+        OiRelativeTime.format(dt, style: OiRelativeTimeStyle.narrow, now: now),
         '1d',
       );
     });
@@ -79,11 +58,7 @@ void main() {
     test('< 7d renders days', () {
       final dt = now.subtract(const Duration(days: 3));
       expect(
-        OiRelativeTime.format(
-          dt,
-          style: OiRelativeTimeStyle.narrow,
-          now: now,
-        ),
+        OiRelativeTime.format(dt, style: OiRelativeTimeStyle.narrow, now: now),
         '3d',
       );
     });
@@ -91,11 +66,7 @@ void main() {
     test('same year renders short month + day', () {
       final dt = DateTime(2026, 3, 3, 14, 32);
       expect(
-        OiRelativeTime.format(
-          dt,
-          style: OiRelativeTimeStyle.narrow,
-          now: now,
-        ),
+        OiRelativeTime.format(dt, style: OiRelativeTimeStyle.narrow, now: now),
         'Mar 3',
       );
     });
@@ -103,11 +74,7 @@ void main() {
     test('other year renders short month + day + year', () {
       final dt = DateTime(2025, 3, 3, 14, 32);
       expect(
-        OiRelativeTime.format(
-          dt,
-          style: OiRelativeTimeStyle.narrow,
-          now: now,
-        ),
+        OiRelativeTime.format(dt, style: OiRelativeTimeStyle.narrow, now: now),
         "Mar 3 '25",
       );
     });
@@ -167,11 +134,7 @@ void main() {
     test('< 10s renders "just now"', () {
       final dt = now.subtract(const Duration(seconds: 5));
       expect(
-        OiRelativeTime.format(
-          dt,
-          style: OiRelativeTimeStyle.long,
-          now: now,
-        ),
+        OiRelativeTime.format(dt, style: OiRelativeTimeStyle.long, now: now),
         'just now',
       );
     });
@@ -179,11 +142,7 @@ void main() {
     test('< 60s renders full seconds', () {
       final dt = now.subtract(const Duration(seconds: 30));
       expect(
-        OiRelativeTime.format(
-          dt,
-          style: OiRelativeTimeStyle.long,
-          now: now,
-        ),
+        OiRelativeTime.format(dt, style: OiRelativeTimeStyle.long, now: now),
         '30 seconds ago',
       );
     });
@@ -191,11 +150,7 @@ void main() {
     test('1 second singular', () {
       final dt = now.subtract(const Duration(seconds: 11));
       expect(
-        OiRelativeTime.format(
-          dt,
-          style: OiRelativeTimeStyle.long,
-          now: now,
-        ),
+        OiRelativeTime.format(dt, style: OiRelativeTimeStyle.long, now: now),
         '11 seconds ago',
       );
     });
@@ -203,11 +158,7 @@ void main() {
     test('< 60m renders full minutes', () {
       final dt = now.subtract(const Duration(minutes: 5));
       expect(
-        OiRelativeTime.format(
-          dt,
-          style: OiRelativeTimeStyle.long,
-          now: now,
-        ),
+        OiRelativeTime.format(dt, style: OiRelativeTimeStyle.long, now: now),
         '5 minutes ago',
       );
     });
@@ -215,11 +166,7 @@ void main() {
     test('1 minute singular', () {
       final dt = now.subtract(const Duration(minutes: 1));
       expect(
-        OiRelativeTime.format(
-          dt,
-          style: OiRelativeTimeStyle.long,
-          now: now,
-        ),
+        OiRelativeTime.format(dt, style: OiRelativeTimeStyle.long, now: now),
         '1 minute ago',
       );
     });
@@ -227,11 +174,7 @@ void main() {
     test('< 24h renders full hours', () {
       final dt = now.subtract(const Duration(hours: 3));
       expect(
-        OiRelativeTime.format(
-          dt,
-          style: OiRelativeTimeStyle.long,
-          now: now,
-        ),
+        OiRelativeTime.format(dt, style: OiRelativeTimeStyle.long, now: now),
         '3 hours ago',
       );
     });
@@ -239,11 +182,7 @@ void main() {
     test('1 hour singular', () {
       final dt = now.subtract(const Duration(hours: 1));
       expect(
-        OiRelativeTime.format(
-          dt,
-          style: OiRelativeTimeStyle.long,
-          now: now,
-        ),
+        OiRelativeTime.format(dt, style: OiRelativeTimeStyle.long, now: now),
         '1 hour ago',
       );
     });
@@ -251,11 +190,7 @@ void main() {
     test('< 48h renders "yesterday at HH:MM"', () {
       final dt = DateTime(2026, 3, 17, 14, 32);
       expect(
-        OiRelativeTime.format(
-          dt,
-          style: OiRelativeTimeStyle.long,
-          now: now,
-        ),
+        OiRelativeTime.format(dt, style: OiRelativeTimeStyle.long, now: now),
         'yesterday at 14:32',
       );
     });
@@ -263,11 +198,7 @@ void main() {
     test('yesterday at with leading zero', () {
       final dt = DateTime(2026, 3, 17, 9, 5);
       expect(
-        OiRelativeTime.format(
-          dt,
-          style: OiRelativeTimeStyle.long,
-          now: now,
-        ),
+        OiRelativeTime.format(dt, style: OiRelativeTimeStyle.long, now: now),
         'yesterday at 09:05',
       );
     });
@@ -275,11 +206,7 @@ void main() {
     test('< 7d renders full days', () {
       final dt = now.subtract(const Duration(days: 3));
       expect(
-        OiRelativeTime.format(
-          dt,
-          style: OiRelativeTimeStyle.long,
-          now: now,
-        ),
+        OiRelativeTime.format(dt, style: OiRelativeTimeStyle.long, now: now),
         '3 days ago',
       );
     });
@@ -287,11 +214,7 @@ void main() {
     test('same year renders full month + day + time', () {
       final dt = DateTime(2026, 3, 3, 14, 32);
       expect(
-        OiRelativeTime.format(
-          dt,
-          style: OiRelativeTimeStyle.long,
-          now: now,
-        ),
+        OiRelativeTime.format(dt, style: OiRelativeTimeStyle.long, now: now),
         'March 3 at 14:32',
       );
     });
@@ -299,11 +222,7 @@ void main() {
     test('other year renders full month + day + year + time', () {
       final dt = DateTime(2025, 3, 3, 14, 32);
       expect(
-        OiRelativeTime.format(
-          dt,
-          style: OiRelativeTimeStyle.long,
-          now: now,
-        ),
+        OiRelativeTime.format(dt, style: OiRelativeTimeStyle.long, now: now),
         'March 3, 2025 at 14:32',
       );
     });
@@ -315,10 +234,7 @@ void main() {
     test('capitalize=true uppercases first letter', () {
       final now = DateTime(2026, 3, 18, 14, 32);
       final dt = now.subtract(const Duration(seconds: 5));
-      expect(
-        OiRelativeTime.format(dt, capitalize: true, now: now),
-        'Just now',
-      );
+      expect(OiRelativeTime.format(dt, capitalize: true, now: now), 'Just now');
     });
 
     test('capitalize=false leaves as is', () {
@@ -362,11 +278,7 @@ void main() {
       final now = DateTime(2026, 3, 18, 14, 32);
       final dt = now.subtract(const Duration(minutes: 5));
       expect(
-        OiRelativeTime.format(
-          dt,
-          now: now,
-          formatAbsolute: (d) => 'CUSTOM',
-        ),
+        OiRelativeTime.format(dt, now: now, formatAbsolute: (d) => 'CUSTOM'),
         '5m ago',
       );
     });
@@ -448,8 +360,9 @@ void main() {
   // ── live=true auto-updates ────────────────────────────────────────────
 
   group('live timer', () {
-    testWidgets('live=true auto-updates from "just now" to seconds',
-        (tester) async {
+    testWidgets('live=true auto-updates from "just now" to seconds', (
+      tester,
+    ) async {
       await tester.runAsync(() async {
         final dt = DateTime.now();
         await tester.pumpObers(OiRelativeTime(dateTime: dt));

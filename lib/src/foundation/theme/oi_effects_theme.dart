@@ -2,8 +2,11 @@ import 'package:flutter/animation.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter/services.dart';
+import 'package:obers_ui/obers_ui.dart' show OiTappable;
 
 import 'package:obers_ui/src/foundation/theme/oi_decoration_theme.dart';
+import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart'
+    show OiTappable;
 
 /// Defines the focus ring border rendered around a focused widget.
 ///
@@ -22,9 +25,7 @@ class OiFocusRingStyle {
 
   /// Creates a standard focus ring from [primaryColor].
   factory OiFocusRingStyle.standard(Color primaryColor) {
-    return OiFocusRingStyle(
-      color: primaryColor.withValues(alpha: 0.85),
-    );
+    return OiFocusRingStyle(color: primaryColor.withValues(alpha: 0.85));
   }
 
   /// The border color of the focus ring.
@@ -135,8 +136,9 @@ class OiHaloStyle {
 
   /// Converts this halo style to a [BoxShadow] for rendering.
   BoxShadow toBoxShadow() {
-    final effectiveColor =
-        opacity != null ? color.withValues(alpha: opacity) : color;
+    final effectiveColor = opacity != null
+        ? color.withValues(alpha: opacity)
+        : color;
     return BoxShadow(
       color: effectiveColor,
       spreadRadius: spread,

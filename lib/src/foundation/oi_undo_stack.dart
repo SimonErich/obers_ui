@@ -1,4 +1,6 @@
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/obers_ui.dart' show OiApp;
+import 'package:obers_ui/src/foundation/oi_app.dart' show OiApp;
 
 /// A single undoable action.
 ///
@@ -43,7 +45,7 @@ class OiUndoAction {
 ///
 /// Push [OiUndoAction]s when the user performs undoable operations.
 /// The stack automatically handles merging of adjacent actions with the
-/// same [OiUndoAction.groupId] when a [merge] function is provided.
+/// same [OiUndoAction.groupId] when a merge function is provided.
 ///
 /// Access the stack from the widget tree via [OiUndoStackProvider] and
 /// [OiUndoStack.of].
@@ -78,7 +80,7 @@ class OiUndoStack extends ChangeNotifier {
   /// Pushes [action] onto the history stack and executes it.
   ///
   /// Clears the redo stack. If the new action can be merged with the
-  /// previous one (same [groupId] and a [merge] function), they are
+  /// previous one (same groupId and a merge function), they are
   /// coalesced into one entry.
   void push(OiUndoAction action) {
     // Attempt merge with the most recent history entry

@@ -289,22 +289,22 @@ class OiThemePreview extends StatelessWidget {
                       ),
                     )
                   : entry.$3
-                      ? OiCard.outlined(
-                          child: Text(
-                            entry.$1,
-                            style: theme.textTheme.body.copyWith(
-                              color: theme.colors.text,
-                            ),
-                          ),
-                        )
-                      : OiCard(
-                          child: Text(
-                            entry.$1,
-                            style: theme.textTheme.body.copyWith(
-                              color: theme.colors.text,
-                            ),
-                          ),
+                  ? OiCard.outlined(
+                      child: Text(
+                        entry.$1,
+                        style: theme.textTheme.body.copyWith(
+                          color: theme.colors.text,
                         ),
+                      ),
+                    )
+                  : OiCard(
+                      child: Text(
+                        entry.$1,
+                        style: theme.textTheme.body.copyWith(
+                          color: theme.colors.text,
+                        ),
+                      ),
+                    ),
             ),
         ],
       ),

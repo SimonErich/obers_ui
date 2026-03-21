@@ -111,8 +111,14 @@ class OiFolderTreeItem extends StatelessWidget {
                   height: 16,
                   child: Icon(
                     expanded
-                        ? const IconData(0xe5cf, fontFamily: 'MaterialIcons') // expand_more
-                        : const IconData(0xe5cc, fontFamily: 'MaterialIcons'), // chevron_right
+                        ? const IconData(
+                            0xe5cf,
+                            fontFamily: 'MaterialIcons',
+                          ) // expand_more
+                        : const IconData(
+                            0xe5cc,
+                            fontFamily: 'MaterialIcons',
+                          ), // chevron_right
                     size: 14,
                     color: colors.textSubtle,
                   ),
@@ -142,8 +148,9 @@ class OiFolderTreeItem extends StatelessWidget {
                         folder.name,
                         style: TextStyle(
                           fontSize: 13,
-                          fontWeight:
-                              selected ? FontWeight.w600 : FontWeight.w400,
+                          fontWeight: selected
+                              ? FontWeight.w600
+                              : FontWeight.w400,
                           color: colors.text,
                         ),
                         maxLines: 1,
@@ -156,10 +163,7 @@ class OiFolderTreeItem extends StatelessWidget {
                   padding: const EdgeInsets.only(left: 4),
                   child: Text(
                     '$itemCount',
-                    style: TextStyle(
-                      fontSize: 11,
-                      color: colors.textMuted,
-                    ),
+                    style: TextStyle(fontSize: 11, color: colors.textMuted),
                   ),
                 ),
             ],
@@ -169,7 +173,8 @@ class OiFolderTreeItem extends StatelessWidget {
     );
 
     final widget = Semantics(
-      label: semanticsLabel ??
+      label:
+          semanticsLabel ??
           '${folder.name} folder${itemCount != null ? ', $itemCount items' : ''}',
       child: content,
     );

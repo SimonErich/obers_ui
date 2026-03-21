@@ -90,7 +90,11 @@ void main() {
 
   testWidgets('applies maxLines and overflow', (tester) async {
     await tester.pumpObers(
-      const OiLabel.body('long text', maxLines: 1, overflow: TextOverflow.ellipsis),
+      const OiLabel.body(
+        'long text',
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+      ),
     );
     final textWidget = tester.widget<Text>(find.byType(Text));
     expect(textWidget.maxLines, 1);
@@ -206,10 +210,7 @@ void main() {
           data: MediaQueryData(size: Size(width, 800)),
           child: Directionality(
             textDirection: TextDirection.ltr,
-            child: OiTheme(
-              data: theme,
-              child: label,
-            ),
+            child: OiTheme(data: theme, child: label),
           ),
         ),
       );

@@ -122,12 +122,7 @@ void main() {
         OiMasonry(
           columns: responsiveCols,
           breakpoint: OiBreakpoint.compact,
-          children: const [
-            Text('1'),
-            Text('2'),
-            Text('3'),
-            Text('4'),
-          ],
+          children: const [Text('1'), Text('2'), Text('3'), Text('4')],
         ),
       );
       expect(find.byType(Column), findsNWidgets(2));
@@ -137,12 +132,7 @@ void main() {
         OiMasonry(
           columns: responsiveCols,
           breakpoint: OiBreakpoint.expanded,
-          children: const [
-            Text('1'),
-            Text('2'),
-            Text('3'),
-            Text('4'),
-          ],
+          children: const [Text('1'), Text('2'), Text('3'), Text('4')],
         ),
       );
       expect(find.byType(Column), findsNWidgets(4));
@@ -359,9 +349,7 @@ void main() {
       expect(leftB, closeTo(600, 1));
     });
 
-    testWidgets('columnStart with gap accounts for gap pixels', (
-      tester,
-    ) async {
+    testWidgets('columnStart with gap accounts for gap pixels', (tester) async {
       // 3 columns, gap 12, 900px → columnWidth = (900 - 24) / 3 = 292.
       // B: columnStart 3 → col 2 → left = 292 + 12 + 292 + 12 = 608.
       await tester.pumpObers(
@@ -618,9 +606,7 @@ void main() {
       expect(rectA.top, greaterThan(rectB.top));
     });
 
-    testWidgets('columnStart + columnOrder for masonry items', (
-      tester,
-    ) async {
+    testWidgets('columnStart + columnOrder for masonry items', (tester) async {
       // 3 columns, gap 0, 900px → columnWidth = 300.
       // Items: A(order 2), B(order 1, start 3), C(order 0)
       // Sorted: C(0), B(1), A(2).
@@ -691,9 +677,7 @@ void main() {
           columns: 3.responsive,
           children: [
             const Text('plain'),
-            const Text('spanned').span(
-              columnSpan: const OiResponsive<int>(2),
-            ),
+            const Text('spanned').span(columnSpan: const OiResponsive<int>(2)),
           ],
         ),
         surfaceSize: const Size(900, 600),

@@ -140,9 +140,7 @@ void main() {
     testWidgets('responsive column count works', (tester) async {
       await tester.pumpObers(
         const OiDashboard(
-          cards: [
-            OiDashboardCard(key: 'r1', title: 'R1', child: Text('r1')),
-          ],
+          cards: [OiDashboardCard(key: 'r1', title: 'R1', child: Text('r1'))],
           label: 'Dashboard',
           columns: 2,
         ),
@@ -155,9 +153,7 @@ void main() {
     testWidgets('semantics label is applied', (tester) async {
       await tester.pumpObers(
         const OiDashboard(
-          cards: [
-            OiDashboardCard(key: 's1', title: 'S1', child: Text('s1')),
-          ],
+          cards: [OiDashboardCard(key: 's1', title: 'S1', child: Text('s1'))],
           label: 'Analytics Dashboard',
         ),
         surfaceSize: const Size(800, 600),

@@ -10,20 +10,16 @@ import '../../../helpers/pump_app.dart';
 void main() {
   testWidgets('renders child when inactive', (tester) async {
     await tester.pumpObers(
-      const OiDropHighlight(
-        active: false,
-        child: Text('content'),
-      ),
+      const OiDropHighlight(active: false, child: Text('content')),
     );
     expect(find.text('content'), findsOneWidget);
     expect(find.byType(AnimatedOpacity), findsNothing);
   });
 
-  testWidgets('renders SizedBox.shrink when inactive and no child',
-      (tester) async {
-    await tester.pumpObers(
-      const OiDropHighlight(active: false),
-    );
+  testWidgets('renders SizedBox.shrink when inactive and no child', (
+    tester,
+  ) async {
+    await tester.pumpObers(const OiDropHighlight(active: false));
     expect(find.byType(SizedBox), findsOneWidget);
   });
 
@@ -31,7 +27,6 @@ void main() {
     await tester.pumpObers(
       const OiDropHighlight(
         active: true,
-        style: OiDropHighlightStyle.area,
         message: 'Drop files here',
         child: SizedBox(width: 200, height: 200),
       ),
@@ -44,7 +39,6 @@ void main() {
     await tester.pumpObers(
       const OiDropHighlight(
         active: true,
-        style: OiDropHighlightStyle.area,
         icon: icon,
         child: SizedBox(width: 200, height: 200),
       ),
@@ -52,12 +46,12 @@ void main() {
     expect(find.byIcon(icon), findsOneWidget);
   });
 
-  testWidgets('area style renders Stack and AnimatedOpacity when active',
-      (tester) async {
+  testWidgets('area style renders Stack and AnimatedOpacity when active', (
+    tester,
+  ) async {
     await tester.pumpObers(
       const OiDropHighlight(
         active: true,
-        style: OiDropHighlightStyle.area,
         message: 'Drop here',
         child: SizedBox(width: 200, height: 200),
       ),
@@ -66,12 +60,12 @@ void main() {
     expect(find.byType(AnimatedOpacity), findsOneWidget);
   });
 
-  testWidgets('area style AnimatedOpacity has full opacity when active',
-      (tester) async {
+  testWidgets('area style AnimatedOpacity has full opacity when active', (
+    tester,
+  ) async {
     await tester.pumpObers(
       const OiDropHighlight(
         active: true,
-        style: OiDropHighlightStyle.area,
         child: SizedBox(width: 200, height: 200),
       ),
     );
@@ -81,8 +75,9 @@ void main() {
     expect(opacity.opacity, 1.0);
   });
 
-  testWidgets('border style renders Container with border when active',
-      (tester) async {
+  testWidgets('border style renders Container with border when active', (
+    tester,
+  ) async {
     await tester.pumpObers(
       const OiDropHighlight(
         active: true,
@@ -110,12 +105,12 @@ void main() {
     expect(find.text('Should not appear'), findsNothing);
   });
 
-  testWidgets('area style without message or icon renders no text/icon',
-      (tester) async {
+  testWidgets('area style without message or icon renders no text/icon', (
+    tester,
+  ) async {
     await tester.pumpObers(
       const OiDropHighlight(
         active: true,
-        style: OiDropHighlightStyle.area,
         child: SizedBox(width: 100, height: 100),
       ),
     );
@@ -123,12 +118,12 @@ void main() {
     expect(find.byType(Icon), findsNothing);
   });
 
-  testWidgets('area style renders CustomPaint for dashed border',
-      (tester) async {
+  testWidgets('area style renders CustomPaint for dashed border', (
+    tester,
+  ) async {
     await tester.pumpObers(
       const OiDropHighlight(
         active: true,
-        style: OiDropHighlightStyle.area,
         child: SizedBox(width: 100, height: 100),
       ),
     );

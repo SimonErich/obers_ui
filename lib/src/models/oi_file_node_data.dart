@@ -1,4 +1,6 @@
 import 'package:flutter/foundation.dart';
+import 'package:obers_ui/obers_ui.dart' show OiFileNode;
+import 'package:obers_ui/src/modules/oi_file_manager.dart' show OiFileNode;
 
 /// A file or folder node with rich metadata for the file explorer.
 ///
@@ -87,8 +89,8 @@ class OiFileNodeData {
       (isFolder
           ? ''
           : name.split('.').length > 1
-              ? name.split('.').last
-              : '');
+          ? name.split('.').last
+          : '');
 
   /// Extracts the name without extension.
   String get nameWithoutExtension {
@@ -157,9 +159,7 @@ class OiFileNodeData {
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
     if (other is! OiFileNodeData) return false;
-    return id == other.id &&
-        name == other.name &&
-        isFolder == other.isFolder;
+    return id == other.id && name == other.name && isFolder == other.isFolder;
   }
 
   @override

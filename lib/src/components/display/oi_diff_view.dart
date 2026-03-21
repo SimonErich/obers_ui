@@ -177,8 +177,8 @@ class OiDiffView extends StatelessWidget {
             final prefix = addedSide && line.added
                 ? '+ '
                 : !addedSide && line.removed
-                    ? '- '
-                    : '  ';
+                ? '- '
+                : '  ';
 
             Widget cell = Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 1),

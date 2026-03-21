@@ -1,5 +1,7 @@
 import 'package:flutter/foundation.dart';
+import 'package:obers_ui/obers_ui.dart' show OiDashboard;
 import 'package:obers_ui/src/foundation/persistence/oi_settings_data.dart';
+import 'package:obers_ui/src/modules/oi_dashboard.dart' show OiDashboard;
 
 /// Position and span of a card on a dashboard grid.
 ///

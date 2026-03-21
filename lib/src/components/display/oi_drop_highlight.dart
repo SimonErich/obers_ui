@@ -76,7 +76,8 @@ class OiDropHighlight extends StatelessWidget {
         Positioned.fill(
           child: AnimatedOpacity(
             opacity: active ? 1.0 : 0.0,
-            duration: context.animations.reducedMotion ||
+            duration:
+                context.animations.reducedMotion ||
                     MediaQuery.disableAnimationsOf(context)
                 ? Duration.zero
                 : const Duration(milliseconds: 100),
@@ -163,6 +164,5 @@ class _DashedBorderPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(_DashedBorderPainter oldDelegate) =>
-      color != oldDelegate.color ||
-      borderRadius != oldDelegate.borderRadius;
+      color != oldDelegate.color || borderRadius != oldDelegate.borderRadius;
 }

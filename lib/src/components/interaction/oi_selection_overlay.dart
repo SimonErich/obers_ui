@@ -98,10 +98,9 @@ class _OiSelectionOverlayState extends State<OiSelectionOverlay> {
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
-    final fillColor = widget.selectionColor ??
-        colors.primary.muted.withValues(alpha: 0.2);
-    final stroke =
-        widget.borderColor ?? colors.primary.base;
+    final fillColor =
+        widget.selectionColor ?? colors.primary.muted.withValues(alpha: 0.2);
+    final stroke = widget.borderColor ?? colors.primary.base;
 
     return GestureDetector(
       onPanStart: _onPanStart,

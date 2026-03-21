@@ -255,10 +255,7 @@ void main() {
         breakpoint: _bp,
         children: [
           Text('left'),
-          OiMasonry(
-            breakpoint: _bp,
-            children: [Text('m1'), Text('m2')],
-          ),
+          OiMasonry(breakpoint: _bp, children: [Text('m1'), Text('m2')]),
           Text('right'),
         ],
       ),
@@ -509,10 +506,7 @@ void main() {
         breakpoint: _bp,
         columns: OiResponsive<int>(2),
         children: [
-          OiMasonry(
-            breakpoint: _bp,
-            children: [Text('m1'), Text('m2')],
-          ),
+          OiMasonry(breakpoint: _bp, children: [Text('m1'), Text('m2')]),
           Text('plain'),
         ],
       ),
@@ -1041,72 +1035,67 @@ void main() {
   });
 
   testWidgets('10-level alternating Row/Column nesting', (tester) async {
-    await tester.pumpObers(
-      _buildDeepNesting(10, const Text('leaf')),
-    );
+    await tester.pumpObers(_buildDeepNesting(10, const Text('leaf')));
     expect(find.text('leaf'), findsOneWidget);
   });
 
-  testWidgets(
-    '10-level mixed-widget nesting: '
-    'Page > Section > Row > Column > Container > '
-    'Grid > Column > Row > Section > Column',
-    (tester) async {
-      await tester.pumpObers(
-        const OiPage(
-          breakpoint: _bp,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            OiSection(
-              breakpoint: _bp,
-              children: [
-                OiRow(
-                  breakpoint: _bp,
-                  children: [
-                    OiColumn(
-                      breakpoint: _bp,
-                      children: [
-                        OiContainer(
+  testWidgets('10-level mixed-widget nesting: '
+      'Page > Section > Row > Column > Container > '
+      'Grid > Column > Row > Section > Column', (tester) async {
+    await tester.pumpObers(
+      const OiPage(
+        breakpoint: _bp,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          OiSection(
+            breakpoint: _bp,
+            children: [
+              OiRow(
+                breakpoint: _bp,
+                children: [
+                  OiColumn(
+                    breakpoint: _bp,
+                    children: [
+                      OiContainer(
+                        breakpoint: _bp,
+                        maxWidth: OiResponsive<double>(400),
+                        child: OiGrid(
                           breakpoint: _bp,
-                          maxWidth: OiResponsive<double>(400),
-                          child: OiGrid(
-                            breakpoint: _bp,
-                            columns: OiResponsive<int>(1),
-                            children: [
-                              OiColumn(
-                                breakpoint: _bp,
-                                children: [
-                                  OiRow(
-                                    breakpoint: _bp,
-                                    children: [
-                                      OiSection(
-                                        breakpoint: _bp,
-                                        children: [
-                                          OiColumn(
-                                            breakpoint: _bp,
-                                            children: [Text('deep-leaf')],
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
+                          columns: OiResponsive<int>(1),
+                          children: [
+                            OiColumn(
+                              breakpoint: _bp,
+                              children: [
+                                OiRow(
+                                  breakpoint: _bp,
+                                  children: [
+                                    OiSection(
+                                      breakpoint: _bp,
+                                      children: [
+                                        OiColumn(
+                                          breakpoint: _bp,
+                                          children: [Text('deep-leaf')],
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ],
-        ),
-      );
-      expect(find.text('deep-leaf'), findsOneWidget);
-    },
-  );
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+    expect(find.text('deep-leaf'), findsOneWidget);
+  });
 
   testWidgets('12-level nesting with Grid at deepest level', (tester) async {
     await tester.pumpObers(
@@ -1123,9 +1112,7 @@ void main() {
     expect(find.text('grid-B'), findsOneWidget);
   });
 
-  testWidgets('12-level nesting with Masonry at deepest level', (
-    tester,
-  ) async {
+  testWidgets('12-level nesting with Masonry at deepest level', (tester) async {
     await tester.pumpObers(
       _buildDeepNesting(
         11,
@@ -1157,10 +1144,9 @@ void main() {
 Widget _buildDeepNesting(int depth, Widget leaf) {
   var current = leaf;
   for (var i = depth - 1; i >= 0; i--) {
-    current =
-        i.isEven
-            ? OiColumn(breakpoint: _bp, children: [current])
-            : OiRow(breakpoint: _bp, children: [current]);
+    current = i.isEven
+        ? OiColumn(breakpoint: _bp, children: [current])
+        : OiRow(breakpoint: _bp, children: [current]);
   }
   return current;
 }
@@ -1169,10 +1155,9 @@ Widget _buildDeepNesting(int depth, Widget leaf) {
 Widget _buildDeepSameType(int depth, {required bool isColumn}) {
   Widget current = const Text('leaf');
   for (var i = 0; i < depth; i++) {
-    current =
-        isColumn
-            ? OiColumn(breakpoint: _bp, children: [current])
-            : OiRow(breakpoint: _bp, children: [current]);
+    current = isColumn
+        ? OiColumn(breakpoint: _bp, children: [current])
+        : OiRow(breakpoint: _bp, children: [current]);
   }
   return current;
 }

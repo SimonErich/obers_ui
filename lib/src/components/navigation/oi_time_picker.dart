@@ -208,7 +208,8 @@ class _AmPmButton extends StatelessWidget {
     return OiTappable(
       onTap: onTap,
       child: AnimatedContainer(
-        duration: context.animations.reducedMotion ||
+        duration:
+            context.animations.reducedMotion ||
                 MediaQuery.disableAnimationsOf(context)
             ? Duration.zero
             : const Duration(milliseconds: 150),

@@ -235,7 +235,7 @@ void main() {
       const annotation = OiAnnotation(
         key: 'test',
         type: OiAnnotationType.freehand,
-        points: [Offset(0, 0), Offset(10, 10)],
+        points: [Offset.zero, Offset(10, 10)],
       );
 
       expect(annotation.key, 'test');

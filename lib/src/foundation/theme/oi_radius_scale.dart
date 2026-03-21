@@ -1,5 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/painting.dart';
+import 'package:obers_ui/obers_ui.dart' show OiThemeData;
+import 'package:obers_ui/src/foundation/theme/oi_theme_data.dart'
+    show OiThemeData;
 
 /// Controls the global corner-rounding preference.
 ///

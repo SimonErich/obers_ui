@@ -57,14 +57,12 @@ Widget _form({
 void main() {
   group('OiFormController', () {
     test('setValue and getValue work', () {
-      final ctrl = OiFormController();
-      ctrl.setValue('name', 'Alice');
+      final ctrl = OiFormController()..setValue('name', 'Alice');
       expect(ctrl.getValue<String>('name'), 'Alice');
     });
 
     test('values returns all current values', () {
-      final ctrl = OiFormController(initialValues: {'a': 1});
-      ctrl.setValue('b', 2);
+      final ctrl = OiFormController(initialValues: {'a': 1})..setValue('b', 2);
       expect(ctrl.values, {'a': 1, 'b': 2});
     });
 
@@ -74,38 +72,35 @@ void main() {
     });
 
     test('isDirty returns true after setValue changes a value', () {
-      final ctrl = OiFormController(initialValues: {'x': 10});
-      ctrl.setValue('x', 20);
+      final ctrl = OiFormController(initialValues: {'x': 10})
+        ..setValue('x', 20);
       expect(ctrl.isDirty, isTrue);
     });
 
     test('isDirty returns true when a new key is added', () {
-      final ctrl = OiFormController(initialValues: {'x': 10});
-      ctrl.setValue('y', 5);
+      final ctrl = OiFormController(initialValues: {'x': 10})..setValue('y', 5);
       expect(ctrl.isDirty, isTrue);
     });
 
     test('reset reverts to initial values', () {
-      final ctrl = OiFormController(initialValues: {'x': 10});
-      ctrl.setValue('x', 99);
-      ctrl.setValue('y', 5);
-      ctrl.reset();
+      final ctrl = OiFormController(initialValues: {'x': 10})
+        ..setValue('x', 99)
+        ..setValue('y', 5)
+        ..reset();
       expect(ctrl.getValue<int>('x'), 10);
       expect(ctrl.getValue<dynamic>('y'), isNull);
       expect(ctrl.isDirty, isFalse);
     });
 
     test('reset clears errors', () {
-      final ctrl = OiFormController();
-      ctrl.setError('name', 'Required');
+      final ctrl = OiFormController()..setError('name', 'Required');
       expect(ctrl.isValid, isFalse);
       ctrl.reset();
       expect(ctrl.isValid, isTrue);
     });
 
     test('setError and getError work', () {
-      final ctrl = OiFormController();
-      ctrl.setError('email', 'Invalid');
+      final ctrl = OiFormController()..setError('email', 'Invalid');
       expect(ctrl.getError('email'), 'Invalid');
     });
 
@@ -115,15 +110,14 @@ void main() {
     });
 
     test('isValid is false when any error is set', () {
-      final ctrl = OiFormController();
-      ctrl.setError('field', 'bad');
+      final ctrl = OiFormController()..setError('field', 'bad');
       expect(ctrl.isValid, isFalse);
     });
 
     test('isValid is true when error is cleared with null', () {
-      final ctrl = OiFormController();
-      ctrl.setError('field', 'bad');
-      ctrl.setError('field', null);
+      final ctrl = OiFormController()
+        ..setError('field', 'bad')
+        ..setError('field', null);
       expect(ctrl.isValid, isTrue);
     });
 
@@ -146,27 +140,27 @@ void main() {
     });
 
     test('notifies listeners on setValue', () {
-      final ctrl = OiFormController();
       var notified = false;
-      ctrl.addListener(() => notified = true);
-      ctrl.setValue('a', 1);
+      OiFormController()
+        ..addListener(() => notified = true)
+        ..setValue('a', 1);
       expect(notified, isTrue);
     });
 
     test('notifies listeners on setError', () {
-      final ctrl = OiFormController();
       var notified = false;
-      ctrl.addListener(() => notified = true);
-      ctrl.setError('a', 'err');
+      OiFormController()
+        ..addListener(() => notified = true)
+        ..setError('a', 'err');
       expect(notified, isTrue);
     });
 
     test('notifies listeners on reset', () {
-      final ctrl = OiFormController(initialValues: {'a': 1});
-      ctrl.setValue('a', 2);
       var notified = false;
-      ctrl.addListener(() => notified = true);
-      ctrl.reset();
+      OiFormController(initialValues: {'a': 1})
+        ..setValue('a', 2)
+        ..addListener(() => notified = true)
+        ..reset();
       expect(notified, isTrue);
     });
   });
@@ -297,8 +291,8 @@ void main() {
     });
 
     testWidgets('cancel calls onCancel and resets controller', (tester) async {
-      final ctrl = OiFormController(initialValues: {'name': 'Alice'});
-      ctrl.setValue('name', 'Bob');
+      final ctrl = OiFormController(initialValues: {'name': 'Alice'})
+        ..setValue('name', 'Bob');
       var cancelled = false;
 
       await tester.pumpObers(
@@ -549,11 +543,7 @@ void main() {
           sections: [
             const OiFormSection(
               fields: [
-                OiFormField(
-                  key: 'tags',
-                  label: 'Tags',
-                  type: OiFieldType.tag,
-                ),
+                OiFormField(key: 'tags', label: 'Tags', type: OiFieldType.tag),
               ],
             ),
           ],

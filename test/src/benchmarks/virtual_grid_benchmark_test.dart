@@ -16,9 +16,7 @@ void main() {
         OiVirtualGrid(
           itemCount: itemCount,
           crossAxisCount: 4,
-          itemBuilder: (context, index) => SizedBox(
-            child: Text('Cell $index'),
-          ),
+          itemBuilder: (context, index) => SizedBox(child: Text('Cell $index')),
         ),
         surfaceSize: const Size(800, 800),
       );
@@ -27,8 +25,9 @@ void main() {
       expect(find.byType(OiVirtualGrid), findsOneWidget);
     });
 
-    testWidgets('scrolls through 10k grid items without exceptions',
-        (tester) async {
+    testWidgets('scrolls through 10k grid items without exceptions', (
+      tester,
+    ) async {
       final controller = ScrollController();
       addTearDown(controller.dispose);
 
@@ -37,9 +36,7 @@ void main() {
           itemCount: itemCount,
           crossAxisCount: 4,
           controller: controller,
-          itemBuilder: (context, index) => SizedBox(
-            child: Text('Cell $index'),
-          ),
+          itemBuilder: (context, index) => SizedBox(child: Text('Cell $index')),
         ),
         surfaceSize: const Size(800, 800),
       );
@@ -66,9 +63,7 @@ void main() {
           itemCount: itemCount,
           crossAxisCount: 4,
           controller: controller,
-          itemBuilder: (context, index) => SizedBox(
-            child: Text('Cell $index'),
-          ),
+          itemBuilder: (context, index) => SizedBox(child: Text('Cell $index')),
         ),
         surfaceSize: const Size(800, 800),
       );

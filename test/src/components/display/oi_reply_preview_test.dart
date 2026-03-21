@@ -69,8 +69,9 @@ void main() {
       );
     });
 
-    testWidgets('auto-derives accent color from sender name hash',
-        (tester) async {
+    testWidgets('auto-derives accent color from sender name hash', (
+      tester,
+    ) async {
       await tester.pumpObers(
         const OiReplyPreview(senderName: sender, content: content),
       );
@@ -114,15 +115,14 @@ void main() {
         const OiReplyPreview(senderName: sender, content: content),
       );
 
-      final senderText = tester.widgetList<Text>(
-        find.text(sender),
-      ).first;
+      final senderText = tester.widgetList<Text>(find.text(sender)).first;
       expect(senderText.maxLines, equals(1));
       expect(senderText.overflow, equals(TextOverflow.ellipsis));
     });
 
-    testWidgets('does not show close button when dismissible is false',
-        (tester) async {
+    testWidgets('does not show close button when dismissible is false', (
+      tester,
+    ) async {
       await tester.pumpObers(
         const OiReplyPreview(senderName: sender, content: content),
       );
@@ -130,8 +130,7 @@ void main() {
       expect(find.byType(OiIconButton), findsNothing);
     });
 
-    testWidgets('shows close button when dismissible is true',
-        (tester) async {
+    testWidgets('shows close button when dismissible is true', (tester) async {
       await tester.pumpObers(
         const OiReplyPreview(
           senderName: sender,
@@ -141,9 +140,7 @@ void main() {
       );
 
       expect(find.byType(OiIconButton), findsOneWidget);
-      final button = tester.widget<OiIconButton>(
-        find.byType(OiIconButton),
-      );
+      final button = tester.widget<OiIconButton>(find.byType(OiIconButton));
       expect(button.semanticLabel, equals('Cancel reply'));
     });
 
@@ -163,8 +160,7 @@ void main() {
       expect(dismissed, isTrue);
     });
 
-    testWidgets('default semantic label includes sender name',
-        (tester) async {
+    testWidgets('default semantic label includes sender name', (tester) async {
       await tester.pumpObers(
         const OiReplyPreview(senderName: sender, content: content),
       );
@@ -177,8 +173,9 @@ void main() {
       expect(semantics, isNotNull);
     });
 
-    testWidgets('custom label overrides default semantic label',
-        (tester) async {
+    testWidgets('custom label overrides default semantic label', (
+      tester,
+    ) async {
       await tester.pumpObers(
         const OiReplyPreview(
           senderName: sender,

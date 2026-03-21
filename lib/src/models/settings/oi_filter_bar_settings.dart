@@ -1,4 +1,7 @@
 import 'package:flutter/foundation.dart';
+import 'package:obers_ui/obers_ui.dart' show OiFilterBar;
+import 'package:obers_ui/src/composites/navigation/oi_filter_bar.dart'
+    show OiFilterBar;
 import 'package:obers_ui/src/foundation/persistence/oi_settings_data.dart';
 
 /// Settings for [OiFilterBar] that can be persisted.

@@ -74,7 +74,11 @@ enum OiSelectionMode {
 class OiListView<T> extends StatefulWidget {
   /// Creates an [OiListView].
   const OiListView({
-    required this.items, required this.itemBuilder, required this.itemKey, required this.label, super.key,
+    required this.items,
+    required this.itemBuilder,
+    required this.itemKey,
+    required this.label,
+    super.key,
     this.searchQuery,
     this.onSearch,
     this.filters,
@@ -237,8 +241,7 @@ class _OiListViewState<T> extends State<OiListView<T>>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final newDriver =
-        widget.settingsDriver ?? OiSettingsProvider.of(context);
+    final newDriver = widget.settingsDriver ?? OiSettingsProvider.of(context);
     if (newDriver != _resolvedDriver) {
       _resolvedDriver = newDriver;
       if (settingsLoaded) {
@@ -249,8 +252,9 @@ class _OiListViewState<T> extends State<OiListView<T>>
 
   @override
   void dispose() {
-    _scrollController.removeListener(_onScroll);
-    _scrollController.dispose();
+    _scrollController
+      ..removeListener(_onScroll)
+      ..dispose();
     super.dispose();
   }
 

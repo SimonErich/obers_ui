@@ -19,9 +19,7 @@ void main() {
   });
 
   testWidgets('steps style renders step dots', (tester) async {
-    await tester.pumpObers(
-      const OiProgress.steps(steps: 4, currentStep: 2),
-    );
+    await tester.pumpObers(const OiProgress.steps(steps: 4, currentStep: 2));
     // The steps Row contains 4 Container dots.
     expect(find.byType(Container), findsAtLeastNWidgets(4));
   });
@@ -40,9 +38,7 @@ void main() {
   });
 
   testWidgets('indeterminate circular animates', (tester) async {
-    await tester.pumpObers(
-      const OiProgress.circular(indeterminate: true),
-    );
+    await tester.pumpObers(const OiProgress.circular(indeterminate: true));
     expect(find.byType(AnimatedBuilder), findsAtLeastNWidgets(1));
     await tester.pump(const Duration(milliseconds: 600));
   });
@@ -60,53 +56,47 @@ void main() {
   // ── REQ-0025: color is never the sole indicator ──────────────────────────
 
   testWidgets('REQ-0025: completed steps show Icon checkmark', (tester) async {
-    await tester.pumpObers(
-      const OiProgress.steps(steps: 3, currentStep: 2),
-    );
+    await tester.pumpObers(const OiProgress.steps(steps: 3, currentStep: 2));
     // 2 completed steps should each render an Icon (check).
     expect(find.byType(Icon), findsNWidgets(2));
   });
 
   testWidgets('REQ-0025: incomplete steps show no Icon', (tester) async {
-    await tester.pumpObers(
-      const OiProgress.steps(steps: 3, currentStep: 0),
-    );
+    await tester.pumpObers(const OiProgress.steps(steps: 3, currentStep: 0));
     expect(find.byType(Icon), findsNothing);
   });
 
   // ── Reduced motion ────────────────────────────────────────────────────────
 
-  testWidgets(
-    'reducedMotion: indeterminate linear does not animate',
-    (tester) async {
-      await tester.pumpObers(
-        const MediaQuery(
-          data: MediaQueryData(disableAnimations: true),
-          child: OiProgress.linear(indeterminate: true),
-        ),
-      );
-      await tester.pump();
+  testWidgets('reducedMotion: indeterminate linear does not animate', (
+    tester,
+  ) async {
+    await tester.pumpObers(
+      const MediaQuery(
+        data: MediaQueryData(disableAnimations: true),
+        child: OiProgress.linear(indeterminate: true),
+      ),
+    );
+    await tester.pump();
 
-      // With reducedMotion, duration is Duration.zero — the controller
-      // completes instantly. Pumping extra frames should not throw.
-      await tester.pump(const Duration(milliseconds: 600));
-      expect(find.byType(CustomPaint), findsAtLeastNWidgets(1));
-    },
-  );
+    // With reducedMotion, duration is Duration.zero — the controller
+    // completes instantly. Pumping extra frames should not throw.
+    await tester.pump(const Duration(milliseconds: 600));
+    expect(find.byType(CustomPaint), findsAtLeastNWidgets(1));
+  });
 
-  testWidgets(
-    'reducedMotion: indeterminate circular does not animate',
-    (tester) async {
-      await tester.pumpObers(
-        const MediaQuery(
-          data: MediaQueryData(disableAnimations: true),
-          child: OiProgress.circular(indeterminate: true),
-        ),
-      );
-      await tester.pump();
+  testWidgets('reducedMotion: indeterminate circular does not animate', (
+    tester,
+  ) async {
+    await tester.pumpObers(
+      const MediaQuery(
+        data: MediaQueryData(disableAnimations: true),
+        child: OiProgress.circular(indeterminate: true),
+      ),
+    );
+    await tester.pump();
 
-      await tester.pump(const Duration(milliseconds: 600));
-      expect(find.byType(CustomPaint), findsAtLeastNWidgets(1));
-    },
-  );
+    await tester.pump(const Duration(milliseconds: 600));
+    expect(find.byType(CustomPaint), findsAtLeastNWidgets(1));
+  });
 }

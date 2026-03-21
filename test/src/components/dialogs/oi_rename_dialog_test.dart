@@ -176,8 +176,7 @@ void main() {
           onCancel: () => cancelled = true,
         ),
       );
-      final kl =
-          tester.widget<KeyboardListener>(find.byType(KeyboardListener));
+      final kl = tester.widget<KeyboardListener>(find.byType(KeyboardListener));
       kl.focusNode.requestFocus();
       await tester.pump();
       await tester.sendKeyEvent(LogicalKeyboardKey.escape);
@@ -196,10 +195,7 @@ void main() {
           onRename: (_) {},
         ),
       );
-      expect(
-        find.bySemanticsLabel(RegExp('Rename dialog')),
-        findsOneWidget,
-      );
+      expect(find.bySemanticsLabel(RegExp('Rename dialog')), findsOneWidget);
     });
 
     testWidgets('renders for folder files', (tester) async {

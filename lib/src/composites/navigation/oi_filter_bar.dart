@@ -220,8 +220,7 @@ class _OiFilterBarState extends State<OiFilterBar>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final newDriver =
-        widget.settingsDriver ?? OiSettingsProvider.of(context);
+    final newDriver = widget.settingsDriver ?? OiSettingsProvider.of(context);
     if (newDriver != _resolvedDriver) {
       _resolvedDriver = newDriver;
       if (settingsLoaded) {
@@ -274,14 +273,10 @@ class _OiFilterBarState extends State<OiFilterBar>
         definition: filter,
         currentFilter: widget.activeFilters[filter.key],
         onApply: (value) {
-          final updated =
-              Map<String, OiColumnFilter>.from(widget.activeFilters)
-                ..[filter.key] = value;
+          final updated = Map<String, OiColumnFilter>.from(widget.activeFilters)
+            ..[filter.key] = value;
           widget.onFilterChange(updated);
-          updateSettings(
-            _toSettings(),
-            debounce: widget.settingsSaveDebounce,
-          );
+          updateSettings(_toSettings(), debounce: widget.settingsSaveDebounce);
           entry
             ..remove()
             ..dispose();

@@ -12,7 +12,8 @@ import '../../../helpers/pump_app.dart';
 void main() {
   testWidgets('long-press shows menu items', (tester) async {
     await tester.pumpObers(
-      const OiContextMenu(label: 'Test menu',
+      const OiContextMenu(
+        label: 'Test menu',
         items: [
           OiMenuItem(label: 'Copy'),
           OiMenuItem(label: 'Paste'),
@@ -68,7 +69,8 @@ void main() {
 
   testWidgets('Escape key dismisses the menu', (tester) async {
     await tester.pumpObers(
-      const OiContextMenu(label: 'Test menu',
+      const OiContextMenu(
+        label: 'Test menu',
         items: [OiMenuItem(label: 'Item')],
         child: Text('target'),
       ),
@@ -86,7 +88,8 @@ void main() {
     tester,
   ) async {
     await tester.pumpObers(
-      const OiContextMenu(label: 'Test menu',
+      const OiContextMenu(
+        label: 'Test menu',
         items: [OiMenuItem(label: 'Right-click item')],
         child: Text('target'),
       ),
@@ -104,7 +107,8 @@ void main() {
 
   testWidgets('tapping barrier closes the menu', (tester) async {
     await tester.pumpObers(
-      const OiContextMenu(label: 'Test menu',
+      const OiContextMenu(
+        label: 'Test menu',
         items: [OiMenuItem(label: 'CloseMe')],
         child: Text('target'),
       ),
@@ -121,7 +125,8 @@ void main() {
 
   testWidgets('enabled=false suppresses context menu', (tester) async {
     await tester.pumpObers(
-      const OiContextMenu(label: 'Test menu',
+      const OiContextMenu(
+        label: 'Test menu',
         items: [OiMenuItem(label: 'Hidden')],
         enabled: false,
         child: Text('target'),
@@ -134,7 +139,8 @@ void main() {
 
   testWidgets('separator renders as divider (no text)', (tester) async {
     await tester.pumpObers(
-      const OiContextMenu(label: 'Test menu',
+      const OiContextMenu(
+        label: 'Test menu',
         items: [
           OiMenuItem(label: 'Above'),
           OiMenuItem(label: '', separator: true),

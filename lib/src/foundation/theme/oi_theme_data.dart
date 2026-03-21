@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
+import 'package:obers_ui/obers_ui.dart' show OiApp, OiTheme;
 import 'package:obers_ui/src/foundation/oi_responsive.dart';
 import 'package:obers_ui/src/foundation/theme/oi_animation_config.dart';
 import 'package:obers_ui/src/foundation/theme/oi_color_scheme.dart';

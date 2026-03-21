@@ -532,33 +532,32 @@ void main() {
         },
       );
 
-      testWidgets(
-        'OiA11y.announce respects RTL directionality from context',
-        (tester) async {
-          final handle = tester.ensureSemantics();
-          late BuildContext capturedContext;
-          await tester.pumpWidget(
-            MediaQuery(
-              data: const MediaQueryData(),
-              child: Directionality(
-                textDirection: TextDirection.rtl,
-                child: Builder(
-                  builder: (ctx) {
-                    capturedContext = ctx;
-                    return const SizedBox.shrink();
-                  },
-                ),
+      testWidgets('OiA11y.announce respects RTL directionality from context', (
+        tester,
+      ) async {
+        final handle = tester.ensureSemantics();
+        late BuildContext capturedContext;
+        await tester.pumpWidget(
+          MediaQuery(
+            data: const MediaQueryData(),
+            child: Directionality(
+              textDirection: TextDirection.rtl,
+              child: Builder(
+                builder: (ctx) {
+                  capturedContext = ctx;
+                  return const SizedBox.shrink();
+                },
               ),
             ),
-          );
-          // OiA11y.announce uses Directionality.of(context), so under an RTL
-          // ancestor it forwards TextDirection.rtl to
-          // SemanticsService.sendAnnouncement.  Must complete without error.
-          OiA11y.announce(capturedContext, 'تم الحفظ');
-          await tester.pump();
-          handle.dispose();
-        },
-      );
+          ),
+        );
+        // OiA11y.announce uses Directionality.of(context), so under an RTL
+        // ancestor it forwards TextDirection.rtl to
+        // SemanticsService.sendAnnouncement.  Must complete without error.
+        OiA11y.announce(capturedContext, 'تم الحفظ');
+        await tester.pump();
+        handle.dispose();
+      });
     });
   });
 }

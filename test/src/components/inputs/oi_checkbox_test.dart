@@ -64,11 +64,7 @@ void main() {
   testWidgets('enabled=false suppresses onChanged', (tester) async {
     bool? result;
     await tester.pumpObers(
-      OiCheckbox(
-        value: false,
-        enabled: false,
-        onChanged: (v) => result = v,
-      ),
+      OiCheckbox(value: false, enabled: false, onChanged: (v) => result = v),
     );
     await tester.tap(find.byType(OiCheckbox), warnIfMissed: false);
     await tester.pump();

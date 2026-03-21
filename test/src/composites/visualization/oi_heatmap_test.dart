@@ -122,7 +122,7 @@ void main() {
 
   // 9. showValues displays cell values.
   testWidgets('shows values when showValues is true', (tester) async {
-    await tester.pumpObers(_heatmap(showValues: true));
+    await tester.pumpObers(_heatmap());
     expect(find.text('10'), findsOneWidget);
     expect(find.text('50'), findsOneWidget);
     expect(find.text('30'), findsOneWidget);
@@ -153,13 +153,10 @@ void main() {
   // REQ-0025: color is never the sole indicator — showValues defaults to true.
   testWidgets('REQ-0025: showValues defaults to true', (tester) async {
     await tester.pumpObers(
-      SizedBox(
+      const SizedBox(
         width: 400,
         height: 300,
-        child: OiHeatmap(
-          cells: _cells,
-          label: 'Default values',
-        ),
+        child: OiHeatmap(cells: _cells, label: 'Default values'),
       ),
     );
     // Values should be visible by default.

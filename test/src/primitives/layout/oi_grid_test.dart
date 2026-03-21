@@ -1968,42 +1968,39 @@ void main() {
 
     // REQ-1091: Resolves breakpoint from constraints for container-relative
     // grids; from cached viewport breakpoint for non-container-relative.
-    testWidgets(
-      'REQ-1091: container-relative grid resolves breakpoint from '
-      'constraints.maxWidth in render object',
-      (tester) async {
-        // 900px container → expanded breakpoint → 3 columns.
-        await tester.pumpObers(
-          Align(
-            alignment: Alignment.topLeft,
-            child: SizedBox(
-              width: 900,
-              child: OiGrid.containerRelative(
-                columns: OiResponsive.breakpoints({
-                  OiBreakpoint.compact: 1,
-                  OiBreakpoint.expanded: 3,
-                }),
-                children: const [
-                  SizedBox(height: 40, child: Text('A')),
-                  SizedBox(height: 40, child: Text('B')),
-                  SizedBox(height: 40, child: Text('C')),
-                ],
-              ),
+    testWidgets('REQ-1091: container-relative grid resolves breakpoint from '
+        'constraints.maxWidth in render object', (tester) async {
+      // 900px container → expanded breakpoint → 3 columns.
+      await tester.pumpObers(
+        Align(
+          alignment: Alignment.topLeft,
+          child: SizedBox(
+            width: 900,
+            child: OiGrid.containerRelative(
+              columns: OiResponsive.breakpoints({
+                OiBreakpoint.compact: 1,
+                OiBreakpoint.expanded: 3,
+              }),
+              children: const [
+                SizedBox(height: 40, child: Text('A')),
+                SizedBox(height: 40, child: Text('B')),
+                SizedBox(height: 40, child: Text('C')),
+              ],
             ),
           ),
-          surfaceSize: const Size(1200, 800),
-        );
-        await tester.pumpAndSettle();
+        ),
+        surfaceSize: const Size(1200, 800),
+      );
+      await tester.pumpAndSettle();
 
-        // Breakpoint resolved from 900px (expanded) → 3 columns.
-        final rectA = tester.getRect(find.text('A'));
-        final rectB = tester.getRect(find.text('B'));
-        final rectC = tester.getRect(find.text('C'));
-        expect(rectA.top, closeTo(rectB.top, 1));
-        expect(rectB.top, closeTo(rectC.top, 1));
-        expect(rectA.width, closeTo(300, 1));
-      },
-    );
+      // Breakpoint resolved from 900px (expanded) → 3 columns.
+      final rectA = tester.getRect(find.text('A'));
+      final rectB = tester.getRect(find.text('B'));
+      final rectC = tester.getRect(find.text('C'));
+      expect(rectA.top, closeTo(rectB.top, 1));
+      expect(rectB.top, closeTo(rectC.top, 1));
+      expect(rectA.width, closeTo(300, 1));
+    });
 
     testWidgets(
       'REQ-1091: non-container-relative grid uses explicit breakpoint '
@@ -2031,115 +2028,110 @@ void main() {
     );
 
     // REQ-1092: Resolves all responsive values in the render object.
-    testWidgets(
-      'REQ-1092: responsive columns resolved in render object — '
-      'different breakpoints yield different column counts',
-      (tester) async {
-        final responsiveCols = OiResponsive<int>.breakpoints({
-          OiBreakpoint.compact: 1,
-          OiBreakpoint.medium: 2,
-          OiBreakpoint.large: 4,
-        });
+    testWidgets('REQ-1092: responsive columns resolved in render object — '
+        'different breakpoints yield different column counts', (tester) async {
+      final responsiveCols = OiResponsive<int>.breakpoints({
+        OiBreakpoint.compact: 1,
+        OiBreakpoint.medium: 2,
+        OiBreakpoint.large: 4,
+      });
 
-        // Compact breakpoint → 1 column.
-        await tester.pumpObers(
-          OiGrid(
-            breakpoint: OiBreakpoint.compact,
-            columns: responsiveCols,
-            children: const [Text('A'), Text('B')],
-          ),
-          surfaceSize: const Size(800, 600),
-        );
-        expect(tester.getRect(find.text('A')).width, closeTo(800, 1));
+      // Compact breakpoint → 1 column.
+      await tester.pumpObers(
+        OiGrid(
+          breakpoint: OiBreakpoint.compact,
+          columns: responsiveCols,
+          children: const [Text('A'), Text('B')],
+        ),
+        surfaceSize: const Size(800, 600),
+      );
+      expect(tester.getRect(find.text('A')).width, closeTo(800, 1));
 
-        // Large breakpoint → 4 columns.
-        await tester.pumpObers(
-          OiGrid(
-            breakpoint: OiBreakpoint.large,
-            columns: responsiveCols,
-            children: const [Text('A'), Text('B')],
-          ),
-          surfaceSize: const Size(800, 600),
-        );
-        expect(tester.getRect(find.text('A')).width, closeTo(200, 1));
-      },
-    );
+      // Large breakpoint → 4 columns.
+      await tester.pumpObers(
+        OiGrid(
+          breakpoint: OiBreakpoint.large,
+          columns: responsiveCols,
+          children: const [Text('A'), Text('B')],
+        ),
+        surfaceSize: const Size(800, 600),
+      );
+      expect(tester.getRect(find.text('A')).width, closeTo(200, 1));
+    });
 
-    testWidgets(
-      'REQ-1092: responsive gap resolved in render object',
-      (tester) async {
-        final responsiveGap = OiResponsive<double>.breakpoints({
-          OiBreakpoint.compact: 0,
-          OiBreakpoint.expanded: 20,
-        });
+    testWidgets('REQ-1092: responsive gap resolved in render object', (
+      tester,
+    ) async {
+      final responsiveGap = OiResponsive<double>.breakpoints({
+        OiBreakpoint.compact: 0,
+        OiBreakpoint.expanded: 20,
+      });
 
-        // Compact → gap 0.
-        await tester.pumpObers(
-          OiGrid(
-            breakpoint: OiBreakpoint.compact,
-            columns: const OiResponsive<int>(2),
-            gap: responsiveGap,
-            children: const [Text('A'), Text('B')],
-          ),
-          surfaceSize: const Size(800, 600),
-        );
-        var rectA = tester.getRect(find.text('A'));
-        var rectB = tester.getRect(find.text('B'));
-        expect(rectB.left - rectA.right, closeTo(0, 1));
+      // Compact → gap 0.
+      await tester.pumpObers(
+        OiGrid(
+          breakpoint: OiBreakpoint.compact,
+          columns: const OiResponsive<int>(2),
+          gap: responsiveGap,
+          children: const [Text('A'), Text('B')],
+        ),
+        surfaceSize: const Size(800, 600),
+      );
+      var rectA = tester.getRect(find.text('A'));
+      var rectB = tester.getRect(find.text('B'));
+      expect(rectB.left - rectA.right, closeTo(0, 1));
 
-        // Expanded → gap 20.
-        await tester.pumpObers(
-          OiGrid(
-            breakpoint: OiBreakpoint.expanded,
-            columns: const OiResponsive<int>(2),
-            gap: responsiveGap,
-            children: const [Text('A'), Text('B')],
-          ),
-          surfaceSize: const Size(800, 600),
-        );
-        rectA = tester.getRect(find.text('A'));
-        rectB = tester.getRect(find.text('B'));
-        expect(rectB.left - rectA.right, closeTo(20, 1));
-      },
-    );
+      // Expanded → gap 20.
+      await tester.pumpObers(
+        OiGrid(
+          breakpoint: OiBreakpoint.expanded,
+          columns: const OiResponsive<int>(2),
+          gap: responsiveGap,
+          children: const [Text('A'), Text('B')],
+        ),
+        surfaceSize: const Size(800, 600),
+      );
+      rectA = tester.getRect(find.text('A'));
+      rectB = tester.getRect(find.text('B'));
+      expect(rectB.left - rectA.right, closeTo(20, 1));
+    });
 
-    testWidgets(
-      'REQ-1092: responsive rowGap resolved in render object',
-      (tester) async {
-        final responsiveRowGap = OiResponsive<double>.breakpoints({
-          OiBreakpoint.compact: 4,
-          OiBreakpoint.expanded: 32,
-        });
+    testWidgets('REQ-1092: responsive rowGap resolved in render object', (
+      tester,
+    ) async {
+      final responsiveRowGap = OiResponsive<double>.breakpoints({
+        OiBreakpoint.compact: 4,
+        OiBreakpoint.expanded: 32,
+      });
 
-        // Compact → rowGap 4.
-        await tester.pumpObers(
-          OiGrid(
-            breakpoint: OiBreakpoint.compact,
-            columns: const OiResponsive<int>(1),
-            rowGap: responsiveRowGap,
-            children: const [Text('A'), Text('B')],
-          ),
-          surfaceSize: const Size(800, 600),
-        );
-        var rectA = tester.getRect(find.text('A'));
-        var rectB = tester.getRect(find.text('B'));
-        expect(rectB.top - rectA.bottom, closeTo(4, 1));
+      // Compact → rowGap 4.
+      await tester.pumpObers(
+        OiGrid(
+          breakpoint: OiBreakpoint.compact,
+          columns: const OiResponsive<int>(1),
+          rowGap: responsiveRowGap,
+          children: const [Text('A'), Text('B')],
+        ),
+        surfaceSize: const Size(800, 600),
+      );
+      var rectA = tester.getRect(find.text('A'));
+      var rectB = tester.getRect(find.text('B'));
+      expect(rectB.top - rectA.bottom, closeTo(4, 1));
 
-        // Expanded → rowGap 32.
-        await tester.pumpObers(
-          OiGrid(
-            breakpoint: OiBreakpoint.expanded,
-            columns: const OiResponsive<int>(1),
-            rowGap: responsiveRowGap,
-            children: const [Text('A'), Text('B')],
-          ),
-          surfaceSize: const Size(800, 600),
-        );
-        rectA = tester.getRect(find.text('A'));
-        rectB = tester.getRect(find.text('B'));
-        expect(rectB.top - rectA.bottom, closeTo(32, 1));
-      },
-    );
+      // Expanded → rowGap 32.
+      await tester.pumpObers(
+        OiGrid(
+          breakpoint: OiBreakpoint.expanded,
+          columns: const OiResponsive<int>(1),
+          rowGap: responsiveRowGap,
+          children: const [Text('A'), Text('B')],
+        ),
+        surfaceSize: const Size(800, 600),
+      );
+      rectA = tester.getRect(find.text('A'));
+      rectB = tester.getRect(find.text('B'));
+      expect(rectB.top - rectA.bottom, closeTo(32, 1));
+    });
 
     testWidgets(
       'REQ-1092: per-child responsive spans resolved in render object',
@@ -2180,48 +2172,45 @@ void main() {
       },
     );
 
-    testWidgets(
-      'REQ-1092: container-relative grid resolves responsive values '
-      'from constraint-derived breakpoint',
-      (tester) async {
-        // Container width 900px → expanded breakpoint.
-        // Responsive columns: compact → 1, expanded → 3.
-        // Responsive gap: compact → 0, expanded → 9.
-        await tester.pumpObers(
-          Align(
-            alignment: Alignment.topLeft,
-            child: SizedBox(
-              width: 900,
-              child: OiGrid.containerRelative(
-                columns: OiResponsive.breakpoints({
-                  OiBreakpoint.compact: 1,
-                  OiBreakpoint.expanded: 3,
-                }),
-                gap: OiResponsive<double>.breakpoints({
-                  OiBreakpoint.compact: 0,
-                  OiBreakpoint.expanded: 9,
-                }),
-                children: const [
-                  SizedBox(height: 40, child: Text('A')),
-                  SizedBox(height: 40, child: Text('B')),
-                  SizedBox(height: 40, child: Text('C')),
-                ],
-              ),
+    testWidgets('REQ-1092: container-relative grid resolves responsive values '
+        'from constraint-derived breakpoint', (tester) async {
+      // Container width 900px → expanded breakpoint.
+      // Responsive columns: compact → 1, expanded → 3.
+      // Responsive gap: compact → 0, expanded → 9.
+      await tester.pumpObers(
+        Align(
+          alignment: Alignment.topLeft,
+          child: SizedBox(
+            width: 900,
+            child: OiGrid.containerRelative(
+              columns: OiResponsive.breakpoints({
+                OiBreakpoint.compact: 1,
+                OiBreakpoint.expanded: 3,
+              }),
+              gap: OiResponsive<double>.breakpoints({
+                OiBreakpoint.compact: 0,
+                OiBreakpoint.expanded: 9,
+              }),
+              children: const [
+                SizedBox(height: 40, child: Text('A')),
+                SizedBox(height: 40, child: Text('B')),
+                SizedBox(height: 40, child: Text('C')),
+              ],
             ),
           ),
-          surfaceSize: const Size(1200, 800),
-        );
-        await tester.pumpAndSettle();
+        ),
+        surfaceSize: const Size(1200, 800),
+      );
+      await tester.pumpAndSettle();
 
-        // 900px → expanded → 3 cols, gap 9.
-        // unitWidth = (900 - 2*9) / 3 = 294.
-        final rectA = tester.getRect(find.text('A'));
-        final rectB = tester.getRect(find.text('B'));
-        expect(rectA.width, closeTo(294, 1));
-        // Gap between A and B = 9.
-        expect(rectB.left - rectA.right, closeTo(9, 1));
-      },
-    );
+      // 900px → expanded → 3 cols, gap 9.
+      // unitWidth = (900 - 2*9) / 3 = 294.
+      final rectA = tester.getRect(find.text('A'));
+      final rectB = tester.getRect(find.text('B'));
+      expect(rectA.width, closeTo(294, 1));
+      // Gap between A and B = 9.
+      expect(rectB.left - rectA.right, closeTo(9, 1));
+    });
 
     testWidgets(
       'REQ-1090: constraint change triggers relayout, not widget rebuild',

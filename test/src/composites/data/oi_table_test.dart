@@ -385,9 +385,7 @@ void main() {
         filterable: false,
       ),
     ];
-    await tester.pumpObers(
-      _table(columns: resizeCols, controller: ctrl),
-    );
+    await tester.pumpObers(_table(columns: resizeCols, controller: ctrl));
 
     // Find the OiResizable's right-edge handle (last GestureDetector in the
     // OiResizable subtree).
@@ -417,9 +415,7 @@ void main() {
         filterable: false,
       ),
     ];
-    await tester.pumpObers(
-      _table(columns: resizeCols, controller: ctrl),
-    );
+    await tester.pumpObers(_table(columns: resizeCols, controller: ctrl));
 
     final resizable = find.byType(OiResizable);
     final handleFinder = find.descendant(
@@ -430,10 +426,7 @@ void main() {
     await tester.drag(handleFinder.last, const Offset(-300, 0));
     await tester.pump();
 
-    expect(
-      ctrl.columnWidths['name'],
-      greaterThanOrEqualTo(80),
-    );
+    expect(ctrl.columnWidths['name'], greaterThanOrEqualTo(80));
   });
 
   testWidgets('column resize respects maxWidth constraint', (tester) async {
@@ -448,9 +441,7 @@ void main() {
         filterable: false,
       ),
     ];
-    await tester.pumpObers(
-      _table(columns: resizeCols, controller: ctrl),
-    );
+    await tester.pumpObers(_table(columns: resizeCols, controller: ctrl));
 
     final resizable = find.byType(OiResizable);
     final handleFinder = find.descendant(
@@ -461,10 +452,7 @@ void main() {
     await tester.drag(handleFinder.last, const Offset(500, 0));
     await tester.pump();
 
-    expect(
-      ctrl.columnWidths['name'],
-      lessThanOrEqualTo(250),
-    );
+    expect(ctrl.columnWidths['name'], lessThanOrEqualTo(250));
   });
 
   // 16. Loading state shows loading indicator
@@ -608,8 +596,7 @@ void main() {
   testWidgets('status bar shows selection count when rows selected', (
     tester,
   ) async {
-    final ctrl = OiTableController(totalRows: _rows.length)
-      ..selectRow('Alice');
+    final ctrl = OiTableController(totalRows: _rows.length)..selectRow('Alice');
     await tester.pumpObers(
       _table(controller: ctrl, selectable: true, rowKey: (r) => r.name),
     );
@@ -657,8 +644,7 @@ void main() {
         return null;
       },
     );
-    final ctrl = OiTableController(totalRows: _rows.length)
-      ..selectRow('Alice');
+    final ctrl = OiTableController(totalRows: _rows.length)..selectRow('Alice');
     await tester.pumpObers(
       _table(controller: ctrl, copyable: true, rowKey: (r) => r.name),
     );
@@ -792,29 +778,28 @@ void main() {
   });
 
   // 36. onSort callback reports toggled ascending on repeated taps
-  testWidgets(
-    'onSort callback reports toggled ascending on repeated taps',
-    (tester) async {
-      final calls = <bool>[];
-      final ctrl = OiTableController(totalRows: _rows.length);
-      await tester.pumpObers(
-        _table(
-          controller: ctrl,
-          serverSideSort: true,
-          onSort: (col, {required bool ascending}) => calls.add(ascending),
-        ),
-      );
-      // First tap – ascending.
-      await tester.tap(find.text('Name'));
-      await tester.pump();
-      expect(calls, [true]);
+  testWidgets('onSort callback reports toggled ascending on repeated taps', (
+    tester,
+  ) async {
+    final calls = <bool>[];
+    final ctrl = OiTableController(totalRows: _rows.length);
+    await tester.pumpObers(
+      _table(
+        controller: ctrl,
+        serverSideSort: true,
+        onSort: (col, {required bool ascending}) => calls.add(ascending),
+      ),
+    );
+    // First tap – ascending.
+    await tester.tap(find.text('Name'));
+    await tester.pump();
+    expect(calls, [true]);
 
-      // Second tap – toggles to descending.
-      await tester.tap(find.text('Name'));
-      await tester.pump();
-      expect(calls, [true, false]);
-    },
-  );
+    // Second tap – toggles to descending.
+    await tester.tap(find.text('Name'));
+    await tester.pump();
+    expect(calls, [true, false]);
+  });
 
   // 37. Clicking an inactive column sorts ascending (REQ-0966)
   testWidgets('clicking inactive column sorts ascending', (tester) async {
@@ -1198,6 +1183,8 @@ void main() {
     await tester.pumpAndSettle();
     // The callback should have been invoked (or no crash occurred).
     // Depending on the exact drag distance, indices may or may not trigger.
+    expect(oldIdx, anyOf(isNull, isA<int>()));
+    expect(newIdx, anyOf(isNull, isA<int>()));
     expect(find.byType(ReorderableDragStartListener), findsNWidgets(3));
   });
 
@@ -1351,8 +1338,8 @@ void main() {
     });
 
     test('goToPage clamps to valid range', () {
-      final c = OiPaginationController(pageSize: 10, totalItems: 30);
-      c.goToPage(99);
+      final c = OiPaginationController(pageSize: 10, totalItems: 30)
+        ..goToPage(99);
       expect(c.currentPage, 2); // last valid page
       c.goToPage(-5);
       expect(c.currentPage, 0);
@@ -1360,24 +1347,24 @@ void main() {
 
     test('goToPage is no-op for same page', () {
       var notified = 0;
-      final c = OiPaginationController(pageSize: 10, totalItems: 30);
-      c.addListener(() => notified++);
-      c.goToPage(0);
+      OiPaginationController(pageSize: 10, totalItems: 30)
+        ..addListener(() => notified++)
+        ..goToPage(0);
       expect(notified, 0);
     });
 
     test('goToPage is no-op for zero totalItems', () {
       var notified = 0;
-      final c = OiPaginationController();
-      c.addListener(() => notified++);
-      c.goToPage(5);
+      final c = OiPaginationController()
+        ..addListener(() => notified++)
+        ..goToPage(5);
       expect(c.currentPage, 0);
       expect(notified, 0);
     });
 
     test('nextPage advances', () {
-      final c = OiPaginationController(pageSize: 10, totalItems: 30);
-      c.nextPage();
+      final c = OiPaginationController(pageSize: 10, totalItems: 30)
+        ..nextPage();
       expect(c.currentPage, 1);
     });
 
@@ -1386,8 +1373,7 @@ void main() {
         pageSize: 10,
         totalItems: 30,
         currentPage: 2,
-      );
-      c.nextPage();
+      )..nextPage();
       expect(c.currentPage, 2);
     });
 
@@ -1396,14 +1382,13 @@ void main() {
         pageSize: 10,
         totalItems: 30,
         currentPage: 1,
-      );
-      c.previousPage();
+      )..previousPage();
       expect(c.currentPage, 0);
     });
 
     test('previousPage is no-op on first page', () {
-      final c = OiPaginationController(pageSize: 10, totalItems: 30);
-      c.previousPage();
+      final c = OiPaginationController(pageSize: 10, totalItems: 30)
+        ..previousPage();
       expect(c.currentPage, 0);
     });
 
@@ -1412,42 +1397,37 @@ void main() {
         pageSize: 10,
         totalItems: 30,
         currentPage: 2,
-      );
-      c.firstPage();
+      )..firstPage();
       expect(c.currentPage, 0);
     });
 
     test('firstPage is no-op when already on first page', () {
       var notified = 0;
-      final c = OiPaginationController(pageSize: 10, totalItems: 30);
-      c.addListener(() => notified++);
-      c.firstPage();
+      OiPaginationController(pageSize: 10, totalItems: 30)
+        ..addListener(() => notified++)
+        ..firstPage();
       expect(notified, 0);
     });
 
     test('lastPage navigates to final page', () {
-      final c = OiPaginationController(pageSize: 10, totalItems: 30);
-      c.lastPage();
+      final c = OiPaginationController(pageSize: 10, totalItems: 30)
+        ..lastPage();
       expect(c.currentPage, 2);
     });
 
     test('lastPage is no-op for zero totalItems', () {
       var notified = 0;
-      final c = OiPaginationController();
-      c.addListener(() => notified++);
-      c.lastPage();
+      OiPaginationController()
+        ..addListener(() => notified++)
+        ..lastPage();
       expect(notified, 0);
     });
 
     test('lastPage is no-op when already on last page', () {
       var notified = 0;
-      final c = OiPaginationController(
-        pageSize: 10,
-        totalItems: 30,
-        currentPage: 2,
-      );
-      c.addListener(() => notified++);
-      c.lastPage();
+      OiPaginationController(pageSize: 10, totalItems: 30, currentPage: 2)
+        ..addListener(() => notified++)
+        ..lastPage();
       expect(notified, 0);
     });
 
@@ -1456,17 +1436,16 @@ void main() {
         pageSize: 10,
         totalItems: 100,
         currentPage: 5,
-      );
-      c.setPageSize(25);
+      )..setPageSize(25);
       expect(c.pageSize, 25);
       expect(c.currentPage, 0);
     });
 
     test('setPageSize is no-op for same size', () {
       var notified = 0;
-      final c = OiPaginationController(pageSize: 10, totalItems: 30);
-      c.addListener(() => notified++);
-      c.setPageSize(10);
+      OiPaginationController(pageSize: 10, totalItems: 30)
+        ..addListener(() => notified++)
+        ..setPageSize(10);
       expect(notified, 0);
     });
 
@@ -1475,8 +1454,7 @@ void main() {
         pageSize: 10,
         totalItems: 100,
         currentPage: 9,
-      );
-      c.setTotalItems(50); // 5 pages, max page = 4
+      )..setTotalItems(50); // 5 pages, max page = 4
       expect(c.currentPage, 4);
     });
 
@@ -1485,25 +1463,24 @@ void main() {
         pageSize: 10,
         totalItems: 30,
         currentPage: 2,
-      );
-      c.setTotalItems(0);
+      )..setTotalItems(0);
       expect(c.currentPage, 0);
       expect(c.totalPages, 0);
     });
 
     test('setTotalItems is no-op for same value', () {
       var notified = 0;
-      final c = OiPaginationController(pageSize: 10, totalItems: 30);
-      c.addListener(() => notified++);
-      c.setTotalItems(30);
+      OiPaginationController(pageSize: 10, totalItems: 30)
+        ..addListener(() => notified++)
+        ..setTotalItems(30);
       expect(notified, 0);
     });
 
     test('notifies listeners on navigation', () {
       var notified = 0;
-      final c = OiPaginationController(pageSize: 10, totalItems: 30);
-      c.addListener(() => notified++);
-      c.nextPage();
+      final c = OiPaginationController(pageSize: 10, totalItems: 30)
+        ..addListener(() => notified++)
+        ..nextPage();
       expect(notified, 1);
       c.previousPage();
       expect(notified, 2);
@@ -1516,15 +1493,13 @@ void main() {
 
   group('OiTableController', () {
     test('sortBy sets column and defaults ascending', () {
-      final c = OiTableController();
-      c.sortBy('name');
+      final c = OiTableController()..sortBy('name');
       expect(c.sortColumnId, 'name');
       expect(c.sortAscending, isTrue);
     });
 
     test('sortBy toggles direction on same column without explicit flag', () {
-      final c = OiTableController();
-      c.sortBy('name');
+      final c = OiTableController()..sortBy('name');
       expect(c.sortAscending, isTrue);
       c.sortBy('name');
       expect(c.sortAscending, isFalse);
@@ -1533,16 +1508,16 @@ void main() {
     });
 
     test('sortBy with explicit ascending overrides toggle', () {
-      final c = OiTableController();
-      c.sortBy('name');
-      c.sortBy('name', ascending: true);
+      final c = OiTableController()
+        ..sortBy('name')
+        ..sortBy('name', ascending: true);
       expect(c.sortAscending, isTrue);
     });
 
     test('sortBy on different column resets to ascending', () {
-      final c = OiTableController();
-      c.sortBy('name');
-      c.sortBy('name'); // descending
+      final c = OiTableController()
+        ..sortBy('name')
+        ..sortBy('name'); // descending
       expect(c.sortAscending, isFalse);
       c.sortBy('value'); // new column → ascending
       expect(c.sortColumnId, 'value');
@@ -1550,16 +1525,18 @@ void main() {
     });
 
     test('clearSort resets sort state', () {
-      final c = OiTableController()..sortBy('name');
-      c.clearSort();
+      final c = OiTableController()
+        ..sortBy('name')
+        ..clearSort();
       expect(c.sortColumnId, isNull);
       expect(c.sortAscending, isTrue);
     });
 
     test('clearSort is no-op when no sort active', () {
       var notified = 0;
-      final c = OiTableController()..addListener(() => notified++);
-      c.clearSort();
+      OiTableController()
+        ..addListener(() => notified++)
+        ..clearSort();
       expect(notified, 0);
     });
 
@@ -1587,8 +1564,9 @@ void main() {
 
     test('deselectRow is no-op for absent key', () {
       var notified = 0;
-      final c = OiTableController()..addListener(() => notified++);
-      c.deselectRow('k99');
+      OiTableController()
+        ..addListener(() => notified++)
+        ..deselectRow('k99');
       expect(notified, 0);
     });
 
@@ -1609,8 +1587,9 @@ void main() {
 
     test('clearSelection is no-op when empty', () {
       var notified = 0;
-      final c = OiTableController()..addListener(() => notified++);
-      c.clearSelection();
+      OiTableController()
+        ..addListener(() => notified++)
+        ..clearSelection();
       expect(notified, 0);
     });
 
@@ -1633,8 +1612,9 @@ void main() {
 
     test('clearFilter is no-op for absent key', () {
       var notified = 0;
-      final c = OiTableController()..addListener(() => notified++);
-      c.clearFilter('nonexistent');
+      OiTableController()
+        ..addListener(() => notified++)
+        ..clearFilter('nonexistent');
       expect(notified, 0);
     });
 
@@ -1648,23 +1628,23 @@ void main() {
 
     test('clearAllFilters is no-op when empty', () {
       var notified = 0;
-      final c = OiTableController()..addListener(() => notified++);
-      c.clearAllFilters();
+      OiTableController()
+        ..addListener(() => notified++)
+        ..clearAllFilters();
       expect(notified, 0);
     });
 
     test('setColumnVisible sets visibility', () {
-      final c = OiTableController()
-        ..setColumnVisible('name', visible: false);
+      final c = OiTableController()..setColumnVisible('name', visible: false);
       expect(c.columnVisibility['name'], isFalse);
     });
 
     test('setColumnVisible is no-op for same value', () {
       var notified = 0;
-      final c = OiTableController()
+      OiTableController()
         ..setColumnVisible('name', visible: false)
-        ..addListener(() => notified++);
-      c.setColumnVisible('name', visible: false);
+        ..addListener(() => notified++)
+        ..setColumnVisible('name', visible: false);
       expect(notified, 0);
     });
 
@@ -1675,10 +1655,10 @@ void main() {
 
     test('setColumnWidth is no-op for same value', () {
       var notified = 0;
-      final c = OiTableController()
+      OiTableController()
         ..setColumnWidth('name', 200)
-        ..addListener(() => notified++);
-      c.setColumnWidth('name', 200);
+        ..addListener(() => notified++)
+        ..setColumnWidth('name', 200);
       expect(notified, 0);
     });
 
@@ -1691,10 +1671,10 @@ void main() {
 
     test('reorderColumns is no-op for same index', () {
       var notified = 0;
-      final c = OiTableController()
+      OiTableController()
         ..columnOrder.addAll(['a', 'b', 'c'])
-        ..addListener(() => notified++);
-      c.reorderColumns(1, 1);
+        ..addListener(() => notified++)
+        ..reorderColumns(1, 1);
       expect(notified, 0);
     });
 
@@ -1702,8 +1682,8 @@ void main() {
       var notified = 0;
       final c = OiTableController()
         ..columnOrder.addAll(['a', 'b'])
-        ..addListener(() => notified++);
-      c.reorderColumns(-1, 0);
+        ..addListener(() => notified++)
+        ..reorderColumns(-1, 0);
       expect(notified, 0);
       c.reorderColumns(5, 0);
       expect(notified, 0);
@@ -1733,10 +1713,10 @@ void main() {
 
     test('groupBy is no-op for same column', () {
       var notified = 0;
-      final c = OiTableController()
+      OiTableController()
         ..groupBy('name')
-        ..addListener(() => notified++);
-      c.groupBy('name');
+        ..addListener(() => notified++)
+        ..groupBy('name');
       expect(notified, 0);
     });
 
@@ -1754,10 +1734,10 @@ void main() {
 
     test('setFrozenColumns is no-op for same count', () {
       var notified = 0;
-      final c = OiTableController()
+      OiTableController()
         ..setFrozenColumns(2)
-        ..addListener(() => notified++);
-      c.setFrozenColumns(2);
+        ..addListener(() => notified++)
+        ..setFrozenColumns(2);
       expect(notified, 0);
     });
 
@@ -1768,8 +1748,9 @@ void main() {
 
     test('setShowStatusBar is no-op for same value', () {
       var notified = 0;
-      final c = OiTableController()..addListener(() => notified++);
-      c.setShowStatusBar(visible: true); // already true
+      OiTableController()
+        ..addListener(() => notified++)
+        ..setShowStatusBar(visible: true); // already true
       expect(notified, 0);
     });
 
@@ -1840,8 +1821,7 @@ void main() {
     });
 
     test('dispose removes pagination listener', () {
-      final c = OiTableController();
-      c.dispose();
+      final c = OiTableController()..dispose();
       // After dispose, interacting with pagination should not throw
       // since we removed our listener first.
       expect(c.pagination.nextPage, returnsNormally);
@@ -1971,10 +1951,7 @@ void main() {
     });
 
     test('mergeWith preserves non-empty fields over defaults', () {
-      const saved = OiTableSettings(
-        columnOrder: ['x'],
-        sortColumnId: 'x',
-      );
+      const saved = OiTableSettings(columnOrder: ['x'], sortColumnId: 'x');
       const defaults = OiTableSettings(
         columnOrder: ['a', 'b'],
         sortColumnId: 'a',
@@ -2019,14 +1996,8 @@ void main() {
     });
 
     test('hashCode is consistent with equality', () {
-      const a = OiTableSettings(
-        columnOrder: ['a'],
-        sortColumnId: 'x',
-      );
-      const b = OiTableSettings(
-        columnOrder: ['a'],
-        sortColumnId: 'x',
-      );
+      const a = OiTableSettings(columnOrder: ['a'], sortColumnId: 'x');
+      const b = OiTableSettings(columnOrder: ['a'], sortColumnId: 'x');
       expect(a.hashCode, b.hashCode);
     });
   });
@@ -2246,9 +2217,7 @@ void main() {
   });
 
   // 66. Frozen columns persisted in settings
-  testWidgets('frozen columns persisted in settings roundtrip', (
-    tester,
-  ) async {
+  testWidgets('frozen columns persisted in settings roundtrip', (tester) async {
     final ctrl = OiTableController(totalRows: _rows.length)
       ..setFrozenColumns(2);
     final settings = ctrl.toSettings();
@@ -2355,9 +2324,10 @@ void main() {
           rows: groupRows,
           columns: _cols,
           groupBy: 'name',
-          groupHeaderBuilder: (ctx, key, rows) =>
-              Text('Custom: $key (${rows.length})',
-                  key: ValueKey('custom_group_$key')),
+          groupHeaderBuilder: (ctx, key, rows) => Text(
+            'Custom: $key (${rows.length})',
+            key: ValueKey('custom_group_$key'),
+          ),
         ),
       ),
     );
@@ -2653,9 +2623,7 @@ void main() {
   });
 
   // 81. Commit edit via ✓ fires onCellChanged callback
-  testWidgets('commit edit via ✓ fires onCellChanged callback', (
-    tester,
-  ) async {
+  testWidgets('commit edit via ✓ fires onCellChanged callback', (tester) async {
     String? changedColumnId;
     dynamic changedValue;
     await tester.pumpObers(
@@ -2752,9 +2720,7 @@ void main() {
   });
 
   // 85. Selection count updates in status bar
-  testWidgets('status bar updates selection count dynamically', (
-    tester,
-  ) async {
+  testWidgets('status bar updates selection count dynamically', (tester) async {
     final ctrl = OiTableController(totalRows: _rows.length);
     await tester.pumpObers(
       _table(
@@ -2928,6 +2894,10 @@ void main() {
     expect(ctrl.activeFilters['name'], 'test');
     // Server-side means rows are NOT filtered locally.
     await tester.pump();
+    expect(
+      reportedFilters,
+      isNull,
+    ); // onFilter is not called via controller mutation
     expect(find.text('Alice'), findsOneWidget);
     expect(find.text('Bob'), findsOneWidget);
   });
@@ -2966,12 +2936,12 @@ void main() {
       ),
     );
     await tester.pumpAndSettle();
+    // Force a notify to trigger settings save.
     ctrl1
       ..columnOrder.addAll(['value', 'name'])
-      ..reorderColumns(0, 2); // no-op if already ['value', 'name']
-    // Force a notify to trigger settings save.
-    ctrl1.sortBy('name');
-    ctrl1.clearSort();
+      ..reorderColumns(0, 2) // no-op if already ['value', 'name']
+      ..sortBy('name')
+      ..clearSort();
     await tester.pump(const Duration(milliseconds: 200));
     await tester.pumpWidget(const SizedBox());
 

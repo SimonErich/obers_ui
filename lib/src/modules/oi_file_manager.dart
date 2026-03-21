@@ -79,7 +79,9 @@ enum OiFileManagerSelectionMode {
 class OiFileManager extends StatefulWidget {
   /// Creates an [OiFileManager].
   const OiFileManager({
-    required this.items, required this.label, super.key,
+    required this.items,
+    required this.label,
+    super.key,
     this.onOpen,
     this.onRename,
     this.onDelete,
@@ -187,8 +189,7 @@ class _OiFileManagerState extends State<OiFileManager>
   OiSettingsDriver? get settingsDriver => _resolvedDriver;
 
   @override
-  OiFileExplorerSettings get defaultSettings =>
-      const OiFileExplorerSettings();
+  OiFileExplorerSettings get defaultSettings => const OiFileExplorerSettings();
 
   @override
   OiFileExplorerSettings deserializeSettings(Map<String, dynamic> json) =>
@@ -226,8 +227,7 @@ class _OiFileManagerState extends State<OiFileManager>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final newDriver =
-        widget.settingsDriver ?? OiSettingsProvider.of(context);
+    final newDriver = widget.settingsDriver ?? OiSettingsProvider.of(context);
     if (newDriver != _resolvedDriver) {
       _resolvedDriver = newDriver;
       if (settingsLoaded) {
@@ -253,8 +253,9 @@ class _OiFileManagerState extends State<OiFileManager>
     if (widget.selectionMode == OiFileManagerSelectionMode.none) return;
     setState(() {
       if (widget.selectionMode == OiFileManagerSelectionMode.single) {
-        _selected.clear();
-        _selected.add(node.key);
+        _selected
+          ..clear()
+          ..add(node.key);
       } else {
         if (_selected.contains(node.key)) {
           _selected.remove(node.key);
@@ -323,8 +324,10 @@ class _OiFileManagerState extends State<OiFileManager>
                     action: widget.onUpload != null
                         ? OiButton.primary(
                             label: 'Upload files',
-                            icon: const IconData(0xe9e4,
-                                fontFamily: 'MaterialIcons'),
+                            icon: const IconData(
+                              0xe9e4,
+                              fontFamily: 'MaterialIcons',
+                            ),
                             onTap: () => widget.onUpload?.call(const []),
                           )
                         : null,

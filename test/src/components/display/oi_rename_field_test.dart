@@ -34,8 +34,9 @@ void main() {
     expect(textInput.autofocus, isTrue);
   });
 
-  testWidgets('shows confirm and cancel buttons when showButtons is true',
-      (tester) async {
+  testWidgets('shows confirm and cancel buttons when showButtons is true', (
+    tester,
+  ) async {
     await tester.pumpObers(
       OiRenameField(
         currentName: 'file.txt',
@@ -45,22 +46,18 @@ void main() {
       ),
     );
     // check icon (confirm) and close icon (cancel)
-    final checkIcon = const IconData(0xe5ca, fontFamily: 'MaterialIcons');
-    final closeIcon = const IconData(0xe5cd, fontFamily: 'MaterialIcons');
+    const checkIcon = IconData(0xe5ca, fontFamily: 'MaterialIcons');
+    const closeIcon = IconData(0xe5cd, fontFamily: 'MaterialIcons');
     expect(find.byIcon(checkIcon), findsOneWidget);
     expect(find.byIcon(closeIcon), findsOneWidget);
   });
 
   testWidgets('hides buttons when showButtons is false', (tester) async {
     await tester.pumpObers(
-      OiRenameField(
-        currentName: 'file.txt',
-        onRename: (_) {},
-        onCancel: () {},
-      ),
+      OiRenameField(currentName: 'file.txt', onRename: (_) {}, onCancel: () {}),
     );
-    final checkIcon = const IconData(0xe5ca, fontFamily: 'MaterialIcons');
-    final closeIcon = const IconData(0xe5cd, fontFamily: 'MaterialIcons');
+    const checkIcon = IconData(0xe5ca, fontFamily: 'MaterialIcons');
+    const closeIcon = IconData(0xe5cd, fontFamily: 'MaterialIcons');
     expect(find.byIcon(checkIcon), findsNothing);
     expect(find.byIcon(closeIcon), findsNothing);
   });
@@ -95,7 +92,7 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    final closeIcon = const IconData(0xe5cd, fontFamily: 'MaterialIcons');
+    const closeIcon = IconData(0xe5cd, fontFamily: 'MaterialIcons');
     await tester.tap(find.byIcon(closeIcon));
     expect(cancelled, isTrue);
   });
@@ -112,7 +109,7 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    final checkIcon = const IconData(0xe5ca, fontFamily: 'MaterialIcons');
+    const checkIcon = IconData(0xe5ca, fontFamily: 'MaterialIcons');
     await tester.tap(find.byIcon(checkIcon));
     await tester.pumpAndSettle();
 
@@ -136,7 +133,7 @@ void main() {
     await tester.pumpAndSettle();
 
     // Tap confirm
-    final checkIcon = const IconData(0xe5ca, fontFamily: 'MaterialIcons');
+    const checkIcon = IconData(0xe5ca, fontFamily: 'MaterialIcons');
     await tester.tap(find.byIcon(checkIcon));
     await tester.pumpAndSettle();
 
@@ -161,7 +158,7 @@ void main() {
     await tester.pumpAndSettle();
 
     // Tap confirm
-    final checkIcon = const IconData(0xe5ca, fontFamily: 'MaterialIcons');
+    const checkIcon = IconData(0xe5ca, fontFamily: 'MaterialIcons');
     await tester.tap(find.byIcon(checkIcon));
     await tester.pumpAndSettle();
 
@@ -176,8 +173,7 @@ void main() {
         onRename: (_) {},
         onCancel: () {},
         showButtons: true,
-        validate: (name) =>
-            name == 'taken' ? 'Name already exists' : null,
+        validate: (name) => name == 'taken' ? 'Name already exists' : null,
       ),
     );
     await tester.pumpAndSettle();
@@ -185,7 +181,7 @@ void main() {
     await tester.enterText(find.byType(EditableText), 'taken');
     await tester.pumpAndSettle();
 
-    final checkIcon = const IconData(0xe5ca, fontFamily: 'MaterialIcons');
+    const checkIcon = IconData(0xe5ca, fontFamily: 'MaterialIcons');
     await tester.tap(find.byIcon(checkIcon));
     await tester.pumpAndSettle();
 
@@ -194,13 +190,10 @@ void main() {
 
   testWidgets('default semantic label is "Rename file"', (tester) async {
     await tester.pumpObers(
-      OiRenameField(
-        currentName: 'file.txt',
-        onRename: (_) {},
-        onCancel: () {},
-      ),
+      OiRenameField(currentName: 'file.txt', onRename: (_) {}, onCancel: () {}),
     );
-    final semantics = tester.widgetList<Semantics>(find.byType(Semantics))
+    final semantics = tester
+        .widgetList<Semantics>(find.byType(Semantics))
         .where((s) => s.properties.label == 'Rename file')
         .toList();
     expect(semantics, isNotEmpty);
@@ -215,7 +208,8 @@ void main() {
         semanticsLabel: 'Rename document',
       ),
     );
-    final semantics = tester.widgetList<Semantics>(find.byType(Semantics))
+    final semantics = tester
+        .widgetList<Semantics>(find.byType(Semantics))
         .where((s) => s.properties.label == 'Rename document')
         .toList();
     expect(semantics, isNotEmpty);
@@ -227,7 +221,6 @@ void main() {
     await tester.pumpObers(
       OiRenameField(
         currentName: 'report.pdf',
-        isFolder: false,
         onRename: (_) {},
         onCancel: () {},
       ),
@@ -235,9 +228,7 @@ void main() {
     await tester.pumpAndSettle();
 
     // The text input should contain the full name
-    final editableText = tester.widget<EditableText>(
-      find.byType(EditableText),
-    );
+    final editableText = tester.widget<EditableText>(find.byType(EditableText));
     expect(editableText.controller.text, 'report.pdf');
   });
 
@@ -252,9 +243,7 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    final editableText = tester.widget<EditableText>(
-      find.byType(EditableText),
-    );
+    final editableText = tester.widget<EditableText>(find.byType(EditableText));
     expect(editableText.controller.text, 'My Folder');
   });
 }

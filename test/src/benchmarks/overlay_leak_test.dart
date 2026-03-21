@@ -9,12 +9,11 @@ import '../../helpers/pump_app.dart';
 
 void main() {
   group('OiOverlays lifecycle benchmark (REQ-0176)', () {
-    testWidgets('show and dismiss toast 100 times without leaks',
-        (tester) async {
+    testWidgets('show and dismiss toast 100 times without leaks', (
+      tester,
+    ) async {
       await tester.pumpObers(
-        Builder(
-          builder: (context) => const SizedBox.expand(),
-        ),
+        Builder(builder: (context) => const SizedBox.expand()),
       );
 
       // Grab a BuildContext that has OiOverlays in scope.
@@ -24,7 +23,9 @@ void main() {
         final handle = OiToast.show(
           context,
           message: 'Toast #$i',
-          duration: const Duration(seconds: 30), // long enough not to auto-dismiss
+          duration: const Duration(
+            seconds: 30,
+          ), // long enough not to auto-dismiss
         );
         await tester.pump();
 
@@ -39,9 +40,7 @@ void main() {
 
     testWidgets('rapid show/dismiss cycle does not throw', (tester) async {
       await tester.pumpObers(
-        Builder(
-          builder: (context) => const SizedBox.expand(),
-        ),
+        Builder(builder: (context) => const SizedBox.expand()),
       );
 
       final context = tester.element(find.byType(SizedBox).last);

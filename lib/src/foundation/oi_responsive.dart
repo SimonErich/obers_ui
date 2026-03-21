@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart' show mapEquals;
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/obers_ui.dart' show OiApp, OiThemeData;
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 
 // ---------------------------------------------------------------------------
@@ -145,7 +146,7 @@ class OiBreakpointScale with Iterable<OiBreakpoint> {
   /// The default 5-tier scale matching Material 3 guidelines, as a const.
   ///
   /// This is the default value used by all layout widgets when no explicit
-  /// [scale] is provided. Zero magic: no context lookup needed.
+  /// scale is provided. Zero magic: no context lookup needed.
   static const OiBreakpointScale defaultScale = OiBreakpointScale._(
     OiBreakpoint.values,
     _standardPageGutters,
@@ -584,7 +585,7 @@ extension OiResponsiveMapExt<T> on Map<OiBreakpoint, T> {
 /// A value that resolves differently at different breakpoints.
 ///
 /// Provide values for any subset of breakpoints. When resolving, the largest
-/// breakpoint that does not exceed [width] and has a provided value is used.
+/// breakpoint that does not exceed width and has a provided value is used.
 /// If no value is found, [fallback] is returned.
 ///
 /// **Deprecated:** Use [OiResponsive] instead for new code.
@@ -735,7 +736,7 @@ extension OiResponsiveExt on BuildContext {
   /// Whether the active breakpoint's tier is at least as wide as [bp].
   ///
   /// Compares the active breakpoint's [OiBreakpoint.minWidth] against
-  /// [bp.minWidth].
+  /// bp.minWidth.
   bool atLeast(OiBreakpoint bp) => breakpoint.minWidth >= bp.minWidth;
 
   /// Resolves an [OiResponsive] for the current screen width.
@@ -768,6 +769,8 @@ extension OiResponsiveExt on BuildContext {
     'Use responsive<T>(OiResponsive<T>) or '
     'OiResponsive<T>.resolve(breakpoint, scale) instead.',
   )
+  // The deprecated method calls another deprecated API from within this package;
+  // the ignore suppresses the warning on this self-referential usage.
   // ignore: deprecated_member_use_from_same_package
   T? responsiveValue<T>(OiResponsiveValue<T> value) =>
       value.resolve(viewportWidth);

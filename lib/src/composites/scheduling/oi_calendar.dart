@@ -151,9 +151,8 @@ class _OiCalendarState extends State<OiCalendar>
   OiSettingsDriver? get settingsDriver => _resolvedDriver;
 
   @override
-  OiCalendarSettings get defaultSettings => OiCalendarSettings(
-    viewType: _calendarModeToViewType(widget.mode),
-  );
+  OiCalendarSettings get defaultSettings =>
+      OiCalendarSettings(viewType: _calendarModeToViewType(widget.mode));
 
   @override
   OiCalendarSettings deserializeSettings(Map<String, dynamic> json) =>
@@ -181,8 +180,7 @@ class _OiCalendarState extends State<OiCalendar>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final newDriver =
-        widget.settingsDriver ?? OiSettingsProvider.of(context);
+    final newDriver = widget.settingsDriver ?? OiSettingsProvider.of(context);
     if (newDriver != _resolvedDriver) {
       _resolvedDriver = newDriver;
       if (settingsLoaded) {
@@ -199,9 +197,7 @@ class _OiCalendarState extends State<OiCalendar>
   }
 
   OiCalendarSettings _toSettings() {
-    return OiCalendarSettings(
-      viewType: _calendarModeToViewType(_mode),
-    );
+    return OiCalendarSettings(viewType: _calendarModeToViewType(_mode));
   }
 
   static OiCalendarViewType _calendarModeToViewType(OiCalendarMode mode) {
@@ -255,7 +251,7 @@ class _OiCalendarState extends State<OiCalendar>
 
   // ── Helpers ───────────────────────────────────────────────────────────────
 
-  /// Returns the ordered day-of-week headers starting from [firstDayOfWeek].
+  /// Returns the ordered day-of-week headers starting from firstDayOfWeek.
   List<String> get _dayHeaders {
     const names = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
     final start = widget.firstDayOfWeek - 1; // 0-based index

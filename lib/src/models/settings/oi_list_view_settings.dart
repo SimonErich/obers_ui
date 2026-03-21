@@ -1,5 +1,7 @@
 import 'package:flutter/foundation.dart';
+import 'package:obers_ui/obers_ui.dart' show OiListView;
 import 'package:obers_ui/src/foundation/persistence/oi_settings_data.dart';
+import 'package:obers_ui/src/modules/oi_list_view.dart' show OiListView;
 
 /// Layout mode for list views.
 ///

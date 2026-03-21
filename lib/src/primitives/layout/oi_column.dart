@@ -18,7 +18,7 @@ import 'package:obers_ui/src/foundation/oi_responsive.dart';
 /// ```
 ///
 /// When [collapse] is set and the active breakpoint's [OiBreakpoint.minWidth]
-/// is greater than or equal to [collapse.minWidth], the widget renders as a
+/// is greater than or equal to collapse.minWidth, the widget renders as a
 /// [Row] instead, with the same [gap] applied as horizontal spacing.
 ///
 /// **Zero magic:** [breakpoint] is required so every column is self-contained

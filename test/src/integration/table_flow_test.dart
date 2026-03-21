@@ -22,27 +22,27 @@ String _ageGetter(_Person p) => p.age.toString();
 String _cityGetter(_Person p) => p.city;
 
 List<OiTableColumn<_Person>> get _cols => [
-      const OiTableColumn<_Person>(
-        id: 'name',
-        header: 'Name',
-        valueGetter: _nameGetter,
-        filterable: false,
-        resizable: false,
-      ),
-      const OiTableColumn<_Person>(
-        id: 'age',
-        header: 'Age',
-        valueGetter: _ageGetter,
-        filterable: false,
-        resizable: false,
-      ),
-      const OiTableColumn<_Person>(
-        id: 'city',
-        header: 'City',
-        valueGetter: _cityGetter,
-        resizable: false,
-      ),
-    ];
+  const OiTableColumn<_Person>(
+    id: 'name',
+    header: 'Name',
+    valueGetter: _nameGetter,
+    filterable: false,
+    resizable: false,
+  ),
+  const OiTableColumn<_Person>(
+    id: 'age',
+    header: 'Age',
+    valueGetter: _ageGetter,
+    filterable: false,
+    resizable: false,
+  ),
+  const OiTableColumn<_Person>(
+    id: 'city',
+    header: 'City',
+    valueGetter: _cityGetter,
+    resizable: false,
+  ),
+];
 
 final _rows = [
   const _Person('Charlie', 30, 'Berlin'),
@@ -136,8 +136,9 @@ void main() {
       expect(dianaIdx, lessThan(aliceIdx));
     });
 
-    testWidgets('filter then sort produces correct subset order',
-        (tester) async {
+    testWidgets('filter then sort produces correct subset order', (
+      tester,
+    ) async {
       final filterableCols = [
         const OiTableColumn<_Person>(
           id: 'name',
@@ -174,11 +175,7 @@ void main() {
       final ctrl = OiTableController(totalRows: _rows.length);
 
       await tester.pumpObers(
-        _table(
-          controller: ctrl,
-          selectable: true,
-          rowKey: (p) => p.name,
-        ),
+        _table(controller: ctrl, selectable: true, rowKey: (p) => p.name),
         surfaceSize: const Size(900, 700),
       );
       await tester.pumpAndSettle();
@@ -215,11 +212,7 @@ void main() {
       final ctrl = OiTableController(totalRows: _rows.length);
 
       await tester.pumpObers(
-        _table(
-          controller: ctrl,
-          selectable: true,
-          rowKey: (p) => p.name,
-        ),
+        _table(controller: ctrl, selectable: true, rowKey: (p) => p.name),
         surfaceSize: const Size(900, 700),
       );
       await tester.pumpAndSettle();
@@ -258,8 +251,9 @@ void main() {
       expect(tappedIdx, isNotNull);
     });
 
-    testWidgets('server-side sort callback fires on header tap',
-        (tester) async {
+    testWidgets('server-side sort callback fires on header tap', (
+      tester,
+    ) async {
       String? sortedCol;
       final ctrl = OiTableController(totalRows: _rows.length);
 

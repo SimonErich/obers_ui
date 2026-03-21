@@ -1,5 +1,7 @@
 import 'package:flutter/semantics.dart';
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/obers_ui.dart' show OiApp;
+import 'package:obers_ui/src/foundation/oi_app.dart' show OiApp;
 
 import 'package:obers_ui/src/foundation/oi_platform.dart';
 
@@ -32,7 +34,7 @@ abstract final class OiA11y {
   ///
   /// Returns 48.0 when the current [OiInputModality] is [OiInputModality.touch]
   /// and 0.0 when it is [OiInputModality.pointer]. This uses the actual input
-  /// modality detected by [OiPlatform] rather than [defaultTargetPlatform], so
+  /// modality detected by [OiPlatform] rather than `defaultTargetPlatform`, so
   /// web-on-touch-device scenarios (where the host platform reports desktop but
   /// the user interacts via touch) correctly receive 48 dp enforcement.
   static double minTouchTarget(BuildContext context) {

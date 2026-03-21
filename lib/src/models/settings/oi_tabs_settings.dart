@@ -1,4 +1,6 @@
 import 'package:flutter/foundation.dart';
+import 'package:obers_ui/obers_ui.dart' show OiTabs;
+import 'package:obers_ui/src/components/navigation/oi_tabs.dart' show OiTabs;
 import 'package:obers_ui/src/foundation/persistence/oi_settings_data.dart';
 
 /// Settings for [OiTabs] that can be persisted.

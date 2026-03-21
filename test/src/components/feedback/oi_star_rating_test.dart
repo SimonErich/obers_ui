@@ -1,7 +1,6 @@
 // Tests do not require documentation comments.
 // ignore_for_file: public_member_api_docs
 
-import 'package:flutter/semantics.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -127,7 +126,7 @@ void main() {
   testWidgets('slider semantics role is set', (tester) async {
     await tester.pumpObers(const OiStarRating(value: 2));
     final semanticsNode = tester.getSemantics(find.byType(OiStarRating));
-    expect(semanticsNode.hasFlag(SemanticsFlag.isSlider), isTrue);
+    expect(semanticsNode.flagsCollection.isSlider, isTrue);
   });
 
   // REQ-0025: color is never the sole indicator — inactive stars are drawn as
@@ -135,13 +134,13 @@ void main() {
   // stars even without color perception. This is verified by the _StarPainter
   // using PaintingStyle.stroke for inactive stars.
   testWidgets('REQ-0025: renders with value 0 (all outline)', (tester) async {
-    await tester.pumpObers(const OiStarRating(value: 0));
+    await tester.pumpObers(const OiStarRating());
     // All 5 stars should render as CustomPaint (outline style).
     expect(_starPaints(), findsNWidgets(5));
   });
 
   testWidgets('REQ-0025: renders with max value (all filled)', (tester) async {
-    await tester.pumpObers(const OiStarRating(value: 5, maxStars: 5));
+    await tester.pumpObers(const OiStarRating(value: 5));
     expect(_starPaints(), findsNWidgets(5));
   });
 }

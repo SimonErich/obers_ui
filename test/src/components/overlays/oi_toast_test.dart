@@ -9,34 +9,52 @@ import '../../../helpers/pump_app.dart';
 
 void main() {
   testWidgets('renders message text', (tester) async {
-    await tester.pumpObers(const OiToast(label: 'Toast', message: 'Saved successfully'));
+    await tester.pumpObers(
+      const OiToast(label: 'Toast', message: 'Saved successfully'),
+    );
     expect(find.text('Saved successfully'), findsOneWidget);
   });
 
   testWidgets('renders action widget when provided', (tester) async {
     await tester.pumpObers(
-      const OiToast(label: 'Toast', message: 'Item deleted', action: Text('Undo')),
+      const OiToast(
+        label: 'Toast',
+        message: 'Item deleted',
+        action: Text('Undo'),
+      ),
     );
     expect(find.text('Undo'), findsOneWidget);
   });
 
   testWidgets('success level renders success icon', (tester) async {
     await tester.pumpObers(
-      const OiToast(label: 'Toast', message: 'Done', level: OiToastLevel.success),
+      const OiToast(
+        label: 'Toast',
+        message: 'Done',
+        level: OiToastLevel.success,
+      ),
     );
     expect(find.text('✓'), findsOneWidget);
   });
 
   testWidgets('warning level renders warning icon', (tester) async {
     await tester.pumpObers(
-      const OiToast(label: 'Toast', message: 'Careful', level: OiToastLevel.warning),
+      const OiToast(
+        label: 'Toast',
+        message: 'Careful',
+        level: OiToastLevel.warning,
+      ),
     );
     expect(find.text('⚠'), findsOneWidget);
   });
 
   testWidgets('error level renders error icon', (tester) async {
     await tester.pumpObers(
-      const OiToast(label: 'Toast', message: 'Failed', level: OiToastLevel.error),
+      const OiToast(
+        label: 'Toast',
+        message: 'Failed',
+        level: OiToastLevel.error,
+      ),
     );
     expect(find.text('✕'), findsOneWidget);
   });
@@ -64,7 +82,11 @@ void main() {
     await tester.pumpObers(
       const MediaQuery(
         data: MediaQueryData(disableAnimations: true),
-        child: OiToast(label: 'Toast', message: 'Done', level: OiToastLevel.success),
+        child: OiToast(
+          label: 'Toast',
+          message: 'Done',
+          level: OiToastLevel.success,
+        ),
       ),
     );
     expect(find.bySemanticsLabel('Success'), findsOneWidget);
@@ -76,7 +98,11 @@ void main() {
     await tester.pumpObers(
       const MediaQuery(
         data: MediaQueryData(disableAnimations: true),
-        child: OiToast(label: 'Toast', message: 'Careful', level: OiToastLevel.warning),
+        child: OiToast(
+          label: 'Toast',
+          message: 'Careful',
+          level: OiToastLevel.warning,
+        ),
       ),
     );
     expect(find.bySemanticsLabel('Warning'), findsOneWidget);
@@ -88,7 +114,11 @@ void main() {
     await tester.pumpObers(
       const MediaQuery(
         data: MediaQueryData(disableAnimations: true),
-        child: OiToast(label: 'Toast', message: 'Failed', level: OiToastLevel.error),
+        child: OiToast(
+          label: 'Toast',
+          message: 'Failed',
+          level: OiToastLevel.error,
+        ),
       ),
     );
     expect(find.bySemanticsLabel('Error'), findsOneWidget);
@@ -114,7 +144,11 @@ void main() {
   ) async {
     // With pauseOnHover=false no MouseRegion wraps the content.
     await tester.pumpObers(
-      const OiToast(label: 'Toast', message: 'No hover pause', pauseOnHover: false),
+      const OiToast(
+        label: 'Toast',
+        message: 'No hover pause',
+        pauseOnHover: false,
+      ),
     );
     // Should render without a top-level MouseRegion around content.
     // The content text must still be visible.
@@ -123,7 +157,9 @@ void main() {
 
   testWidgets('different positions all render the message', (tester) async {
     for (final pos in OiToastPosition.values) {
-      await tester.pumpObers(OiToast(label: 'Toast', message: 'pos test', position: pos));
+      await tester.pumpObers(
+        OiToast(label: 'Toast', message: 'pos test', position: pos),
+      );
       expect(find.text('pos test'), findsOneWidget);
     }
   });

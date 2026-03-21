@@ -97,8 +97,7 @@ class _OiPathBarState extends State<OiPathBar> {
     super.dispose();
   }
 
-  String get _fullPath =>
-      widget.segments.map((s) => s.label).join(' / ');
+  String get _fullPath => widget.segments.map((s) => s.label).join(' / ');
 
   void _enterEditMode() {
     if (!widget.editable) return;
@@ -147,10 +146,12 @@ class _OiPathBarState extends State<OiPathBar> {
     for (var i = 0; i < widget.segments.length; i++) {
       final segment = widget.segments[i];
       final isLast = i == widget.segments.length - 1;
-      items.add(OiBreadcrumbItem(
-        label: segment.label,
-        onTap: isLast ? null : () => widget.onNavigate(segment),
-      ));
+      items.add(
+        OiBreadcrumbItem(
+          label: segment.label,
+          onTap: isLast ? null : () => widget.onNavigate(segment),
+        ),
+      );
     }
 
     return GestureDetector(
@@ -168,9 +169,7 @@ class _OiPathBarState extends State<OiPathBar> {
                 color: (colors as dynamic).textSubtle as Color,
               ),
             ),
-          Expanded(
-            child: OiBreadcrumbs(items: items),
-          ),
+          Expanded(child: OiBreadcrumbs(items: items)),
         ],
       ),
     );

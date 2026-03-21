@@ -1,5 +1,7 @@
 import 'package:flutter/foundation.dart';
+import 'package:obers_ui/obers_ui.dart' show OiKanban;
 import 'package:obers_ui/src/foundation/persistence/oi_settings_data.dart';
+import 'package:obers_ui/src/modules/oi_kanban.dart' show OiKanban;
 
 /// Settings for [OiKanban] that can be persisted.
 ///

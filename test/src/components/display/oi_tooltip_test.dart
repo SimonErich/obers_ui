@@ -11,7 +11,11 @@ import '../../../helpers/pump_app.dart';
 void main() {
   testWidgets('tooltip hidden by default', (tester) async {
     await tester.pumpObers(
-      const OiTooltip(label: 'Tip', message: 'Tip text', child: Text('hover me')),
+      const OiTooltip(
+        label: 'Tip',
+        message: 'Tip text',
+        child: Text('hover me'),
+      ),
     );
     expect(find.text('Tip text'), findsNothing);
   });
@@ -79,7 +83,6 @@ void main() {
         child: OiTooltip(
           label: 'Tip',
           message: 'Instant tip',
-          showDelay: Duration(milliseconds: 600),
           child: Text('hover me'),
         ),
       ),

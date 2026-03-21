@@ -3,8 +3,6 @@
 // REQ-0014: Required props enforce correctness — buttons require label.
 // REQ-0019: OiButton accessibility enforcement tests.
 
-import 'dart:ui';
-
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui/src/components/buttons/oi_button.dart';
@@ -287,7 +285,7 @@ void main() {
     final handle = tester.ensureSemantics();
     await tester.pumpObers(const OiButton.primary(label: 'Save'));
     final node = tester.getSemantics(find.text('Save'));
-    expect(node.hasFlag(SemanticsFlag.isButton), isTrue);
+    expect(node.flagsCollection.isButton, isTrue);
     handle.dispose();
   });
 

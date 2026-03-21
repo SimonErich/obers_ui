@@ -129,19 +129,16 @@ class _OiTabsState extends State<OiTabs>
   OiSettingsDriver? get settingsDriver => _resolvedDriver;
 
   @override
-  OiTabsSettings get defaultSettings => OiTabsSettings(
-    selectedIndex: widget.selectedIndex,
-  );
+  OiTabsSettings get defaultSettings =>
+      OiTabsSettings(selectedIndex: widget.selectedIndex);
 
   @override
   OiTabsSettings deserializeSettings(Map<String, dynamic> json) =>
       OiTabsSettings.fromJson(json);
 
   @override
-  OiTabsSettings mergeSettings(
-    OiTabsSettings saved,
-    OiTabsSettings defaults,
-  ) => saved.mergeWith(defaults);
+  OiTabsSettings mergeSettings(OiTabsSettings saved, OiTabsSettings defaults) =>
+      saved.mergeWith(defaults);
 
   // ── Lifecycle ──────────────────────────────────────────────────────────────
 
@@ -155,8 +152,7 @@ class _OiTabsState extends State<OiTabs>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final newDriver =
-        widget.settingsDriver ?? OiSettingsProvider.of(context);
+    final newDriver = widget.settingsDriver ?? OiSettingsProvider.of(context);
     if (newDriver != _resolvedDriver) {
       _resolvedDriver = newDriver;
       if (settingsLoaded) {
@@ -252,7 +248,8 @@ class _OiTabsState extends State<OiTabs>
       );
     }
 
-    final animDuration = context.animations.reducedMotion ||
+    final animDuration =
+        context.animations.reducedMotion ||
             MediaQuery.disableAnimationsOf(context)
         ? Duration.zero
         : const Duration(milliseconds: 200);
@@ -428,7 +425,8 @@ class _PillTabRowState extends State<_PillTabRow> {
                 key: _keys[i],
                 onTap: () => widget.onSelected(i),
                 child: AnimatedContainer(
-                  duration: context.animations.reducedMotion ||
+                  duration:
+                      context.animations.reducedMotion ||
                           MediaQuery.disableAnimationsOf(context)
                       ? Duration.zero
                       : const Duration(milliseconds: 200),

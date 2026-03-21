@@ -7,11 +7,7 @@ import 'package:obers_ui/src/models/settings/oi_dashboard_settings.dart';
 void main() {
   group('OiDashboardCardPosition', () {
     test('toJson / fromJson round-trips', () {
-      const pos = OiDashboardCardPosition(
-        column: 2,
-        row: 3,
-        columnSpan: 2,
-      );
+      const pos = OiDashboardCardPosition(column: 2, row: 3, columnSpan: 2);
       final json = pos.toJson();
       final restored = OiDashboardCardPosition.fromJson(json);
       expect(restored, equals(pos));
@@ -65,11 +61,7 @@ void main() {
       const original = OiDashboardSettings(
         schemaVersion: 2,
         cardPositions: {
-          'card-1': OiDashboardCardPosition(
-            column: 0,
-            row: 0,
-            columnSpan: 2,
-          ),
+          'card-1': OiDashboardCardPosition(column: 0, row: 0, columnSpan: 2),
           'card-2': OiDashboardCardPosition(column: 2, row: 1),
         },
       );

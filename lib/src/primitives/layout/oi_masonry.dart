@@ -81,8 +81,10 @@ class OiMasonry extends StatelessWidget {
         // lookup for it.
         final active = breakpoint;
         final resolvedScale = scale;
-        final resolvedColumns =
-            math.max(1, columns.resolve(active, resolvedScale));
+        final resolvedColumns = math.max(
+          1,
+          columns.resolve(active, resolvedScale),
+        );
         final resolvedGap = gap.resolve(active, resolvedScale);
 
         final hasBoundedWidth = constraints.hasBoundedWidth;
@@ -94,7 +96,7 @@ class OiMasonry extends StatelessWidget {
           columnWidth = resolvedColumns <= 1
               ? availableWidth
               : (availableWidth - resolvedGap * (resolvedColumns - 1)) /
-                  resolvedColumns;
+                    resolvedColumns;
         }
 
         // Fast path: no span children → original round-robin distribution.
@@ -116,8 +118,7 @@ class OiMasonry extends StatelessWidget {
           final child = children[i];
           final spanData = OiSpan.maybeOf(child);
 
-          var colSpan =
-              spanData?.resolveColumnSpan(active, resolvedScale) ?? 1;
+          var colSpan = spanData?.resolveColumnSpan(active, resolvedScale) ?? 1;
           if (colSpan == fullSpanSentinel) colSpan = resolvedColumns;
           colSpan = colSpan.clamp(1, resolvedColumns);
 
@@ -126,10 +127,8 @@ class OiMasonry extends StatelessWidget {
               index: i,
               child: child,
               columnSpan: colSpan,
-              columnStart:
-                  spanData?.resolveColumnStart(active, resolvedScale),
-              columnOrder:
-                  spanData?.resolveColumnOrder(active, resolvedScale),
+              columnStart: spanData?.resolveColumnStart(active, resolvedScale),
+              columnOrder: spanData?.resolveColumnOrder(active, resolvedScale),
             ),
           );
         }
@@ -175,7 +174,8 @@ class OiMasonry extends StatelessWidget {
 
             // Render spanning breaker.
             if (columnWidth != null) {
-              final spanW = item.columnSpan * columnWidth +
+              final spanW =
+                  item.columnSpan * columnWidth +
                   math.max(0, item.columnSpan - 1) * resolvedGap;
               output.add(SizedBox(width: spanW, child: item.child));
             } else {

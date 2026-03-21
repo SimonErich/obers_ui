@@ -148,7 +148,7 @@ class _OiFloatingState extends State<OiFloating> {
     _bottomSheetEntry = null;
   }
 
-  /// Returns the [targetAnchor], [followerAnchor], and [linkedOffset] for the
+  /// Returns the targetAnchor, followerAnchor, and linkedOffset for the
   /// given [alignment] and [gap].
   ({Alignment targetAnchor, Alignment followerAnchor, Offset linkedOffset})
   _anchorsFor(OiFloatingAlignment alignment, double gap) {

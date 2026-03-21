@@ -135,9 +135,7 @@ void main() {
 
     // During drag, there should be an IgnorePointer(ignoring: true) for the rect
     expect(
-      find.byWidgetPredicate(
-        (w) => w is IgnorePointer && w.ignoring,
-      ),
+      find.byWidgetPredicate((w) => w is IgnorePointer && w.ignoring),
       findsOneWidget,
     );
 
@@ -169,9 +167,7 @@ void main() {
     // After drag ends, the IgnorePointer(ignoring: true) selection rect
     // should be gone
     expect(
-      find.byWidgetPredicate(
-        (w) => w is IgnorePointer && w.ignoring,
-      ),
+      find.byWidgetPredicate((w) => w is IgnorePointer && w.ignoring),
       findsNothing,
     );
   });
@@ -206,8 +202,9 @@ void main() {
     expect(started, isFalse);
   });
 
-  testWidgets('uses GestureDetector with translucent hit behavior',
-      (tester) async {
+  testWidgets('uses GestureDetector with translucent hit behavior', (
+    tester,
+  ) async {
     await tester.pumpObers(
       OiSelectionOverlay(
         onSelectionRect: (_) {},

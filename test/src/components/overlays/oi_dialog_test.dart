@@ -18,10 +18,7 @@ void main() {
 
   testWidgets('renders content widget', (tester) async {
     await tester.pumpObers(
-      const OiDialog.standard(
-        label: 'dialog',
-        content: Text('Are you sure?'),
-      ),
+      const OiDialog.standard(label: 'dialog', content: Text('Are you sure?')),
     );
     expect(find.text('Are you sure?'), findsOneWidget);
   });
@@ -114,10 +111,7 @@ void main() {
           onTap: () => OiDialog.show(
             ctx,
             label: 'shown',
-            dialog: const OiDialog.standard(
-              label: 'shown',
-              title: 'Shown',
-            ),
+            dialog: const OiDialog.standard(label: 'shown', title: 'Shown'),
           ),
           child: const Text('tap'),
         ),

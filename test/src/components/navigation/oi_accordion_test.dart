@@ -133,56 +133,54 @@ void main() {
 
   // ── Reduced motion ────────────────────────────────────────────────────────
 
-  testWidgets(
-    'reducedMotion: tapping header expands section instantly',
-    (tester) async {
-      await tester.pumpObers(
-        const MediaQuery(
-          data: MediaQueryData(disableAnimations: true),
-          child: OiAccordion(
-            sections: [
-              OiAccordionSection(title: 'FAQ', content: Text('Answer text')),
-            ],
-          ),
+  testWidgets('reducedMotion: tapping header expands section instantly', (
+    tester,
+  ) async {
+    await tester.pumpObers(
+      const MediaQuery(
+        data: MediaQueryData(disableAnimations: true),
+        child: OiAccordion(
+          sections: [
+            OiAccordionSection(title: 'FAQ', content: Text('Answer text')),
+          ],
         ),
-      );
+      ),
+    );
 
-      await tester.tap(find.text('FAQ'));
-      // Single pump — no pumpAndSettle needed with Duration.zero.
-      await tester.pump();
+    await tester.tap(find.text('FAQ'));
+    // Single pump — no pumpAndSettle needed with Duration.zero.
+    await tester.pump();
 
-      final sizeTransition = tester.widget<SizeTransition>(
-        find.byType(SizeTransition),
-      );
-      expect(sizeTransition.sizeFactor.value, equals(1.0));
-    },
-  );
+    final sizeTransition = tester.widget<SizeTransition>(
+      find.byType(SizeTransition),
+    );
+    expect(sizeTransition.sizeFactor.value, equals(1.0));
+  });
 
-  testWidgets(
-    'reducedMotion: collapsing section completes instantly',
-    (tester) async {
-      await tester.pumpObers(
-        const MediaQuery(
-          data: MediaQueryData(disableAnimations: true),
-          child: OiAccordion(
-            sections: [
-              OiAccordionSection(
-                title: 'Open',
-                content: Text('Content'),
-                initiallyExpanded: true,
-              ),
-            ],
-          ),
+  testWidgets('reducedMotion: collapsing section completes instantly', (
+    tester,
+  ) async {
+    await tester.pumpObers(
+      const MediaQuery(
+        data: MediaQueryData(disableAnimations: true),
+        child: OiAccordion(
+          sections: [
+            OiAccordionSection(
+              title: 'Open',
+              content: Text('Content'),
+              initiallyExpanded: true,
+            ),
+          ],
         ),
-      );
+      ),
+    );
 
-      await tester.tap(find.text('Open'));
-      await tester.pump();
+    await tester.tap(find.text('Open'));
+    await tester.pump();
 
-      final sizeTransition = tester.widget<SizeTransition>(
-        find.byType(SizeTransition),
-      );
-      expect(sizeTransition.sizeFactor.value, equals(0.0));
-    },
-  );
+    final sizeTransition = tester.widget<SizeTransition>(
+      find.byType(SizeTransition),
+    );
+    expect(sizeTransition.sizeFactor.value, equals(0.0));
+  });
 }

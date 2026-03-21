@@ -12,39 +12,38 @@ import '../../helpers/pump_app.dart';
 List<OiWizardStep> _steps({
   bool Function(Map<String, dynamic>)? step1Validate,
   bool Function(Map<String, dynamic>)? step2Validate,
-}) =>
-    [
-      OiWizardStep(
-        title: 'Account',
-        subtitle: 'Create your account',
-        builder: (ctx) {
-          // Simulate setting a value when the step is built.
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (ctx.values['account_visited'] != true) {
-              ctx.setValue('account_visited', true);
-            }
-          });
-          return const Text('Account Content');
-        },
-        validate: step1Validate,
-      ),
-      OiWizardStep(
-        title: 'Profile',
-        builder: (ctx) {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (ctx.values['profile_visited'] != true) {
-              ctx.setValue('profile_visited', true);
-            }
-          });
-          return const Text('Profile Content');
-        },
-        validate: step2Validate,
-      ),
-      OiWizardStep(
-        title: 'Confirmation',
-        builder: (ctx) => const Text('Confirmation Content'),
-      ),
-    ];
+}) => [
+  OiWizardStep(
+    title: 'Account',
+    subtitle: 'Create your account',
+    builder: (ctx) {
+      // Simulate setting a value when the step is built.
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (ctx.values['account_visited'] != true) {
+          ctx.setValue('account_visited', true);
+        }
+      });
+      return const Text('Account Content');
+    },
+    validate: step1Validate,
+  ),
+  OiWizardStep(
+    title: 'Profile',
+    builder: (ctx) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (ctx.values['profile_visited'] != true) {
+          ctx.setValue('profile_visited', true);
+        }
+      });
+      return const Text('Profile Content');
+    },
+    validate: step2Validate,
+  ),
+  OiWizardStep(
+    title: 'Confirmation',
+    builder: (ctx) => const Text('Confirmation Content'),
+  ),
+];
 
 Widget _wizard({
   List<OiWizardStep>? steps,
@@ -103,10 +102,7 @@ void main() {
     });
 
     testWidgets('navigate backward with Previous', (tester) async {
-      await tester.pumpObers(
-        _wizard(),
-        surfaceSize: const Size(600, 800),
-      );
+      await tester.pumpObers(_wizard(), surfaceSize: const Size(600, 800));
 
       // Go to step 2.
       await tester.tap(find.text('Next'));
@@ -120,17 +116,12 @@ void main() {
     });
 
     testWidgets('Previous is hidden on first step', (tester) async {
-      await tester.pumpObers(
-        _wizard(),
-        surfaceSize: const Size(600, 800),
-      );
+      await tester.pumpObers(_wizard(), surfaceSize: const Size(600, 800));
 
       expect(find.text('Previous'), findsNothing);
     });
 
-    testWidgets('complete wizard fires onComplete with values', (
-      tester,
-    ) async {
+    testWidgets('complete wizard fires onComplete with values', (tester) async {
       Map<String, dynamic>? completedValues;
 
       await tester.pumpObers(
@@ -159,9 +150,7 @@ void main() {
 
     testWidgets('validation blocks forward navigation', (tester) async {
       await tester.pumpObers(
-        _wizard(
-          steps: _steps(step1Validate: (_) => false),
-        ),
+        _wizard(steps: _steps(step1Validate: (_) => false)),
         surfaceSize: const Size(600, 800),
       );
 
@@ -175,9 +164,7 @@ void main() {
 
     testWidgets('passing validation then advancing works', (tester) async {
       await tester.pumpObers(
-        _wizard(
-          steps: _steps(step1Validate: (_) => true),
-        ),
+        _wizard(steps: _steps(step1Validate: (_) => true)),
         surfaceSize: const Size(600, 800),
       );
 

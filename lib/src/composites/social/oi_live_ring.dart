@@ -1,4 +1,7 @@
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/obers_ui.dart' show OiColorScheme;
+import 'package:obers_ui/src/foundation/theme/oi_color_scheme.dart'
+    show OiColorScheme;
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/primitives/animation/oi_pulse.dart';
 

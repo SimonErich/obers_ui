@@ -11,11 +11,7 @@ import 'package:obers_ui/src/models/oi_file_node_data.dart';
 import '../../../helpers/pump_app.dart';
 
 void main() {
-  const folder = OiFileNodeData(
-    id: 'f1',
-    name: 'Documents',
-    isFolder: true,
-  );
+  const folder = OiFileNodeData(id: 'f1', name: 'Documents', isFolder: true);
 
   const sharedFolder = OiFileNodeData(
     id: 'f2',
@@ -33,22 +29,14 @@ void main() {
 
   testWidgets('renders folder name', (tester) async {
     await tester.pumpObers(
-      const OiFolderTreeItem(
-        folder: folder,
-        expanded: false,
-        selected: false,
-      ),
+      const OiFolderTreeItem(folder: folder, expanded: false, selected: false),
     );
     expect(find.text('Documents'), findsOneWidget);
   });
 
   testWidgets('renders OiFolderIcon', (tester) async {
     await tester.pumpObers(
-      const OiFolderTreeItem(
-        folder: folder,
-        expanded: false,
-        selected: false,
-      ),
+      const OiFolderTreeItem(folder: folder, expanded: false, selected: false),
     );
     expect(find.byType(OiFolderIcon), findsOneWidget);
   });
@@ -67,11 +55,7 @@ void main() {
 
   testWidgets('hides item count when null', (tester) async {
     await tester.pumpObers(
-      const OiFolderTreeItem(
-        folder: folder,
-        expanded: false,
-        selected: false,
-      ),
+      const OiFolderTreeItem(folder: folder, expanded: false, selected: false),
     );
     // Only the folder name text should be present
     expect(find.text('Documents'), findsOneWidget);
@@ -108,34 +92,23 @@ void main() {
 
   testWidgets('expanded state shows open folder icon', (tester) async {
     await tester.pumpObers(
-      const OiFolderTreeItem(
-        folder: folder,
-        expanded: true,
-        selected: false,
-      ),
+      const OiFolderTreeItem(folder: folder, expanded: true, selected: false),
     );
-    final folderIcon = tester.widget<OiFolderIcon>(
-      find.byType(OiFolderIcon),
-    );
+    final folderIcon = tester.widget<OiFolderIcon>(find.byType(OiFolderIcon));
     expect(folderIcon.state, OiFolderIconState.open);
   });
 
   testWidgets('collapsed state shows closed folder icon', (tester) async {
     await tester.pumpObers(
-      const OiFolderTreeItem(
-        folder: folder,
-        expanded: false,
-        selected: false,
-      ),
+      const OiFolderTreeItem(folder: folder, expanded: false, selected: false),
     );
-    final folderIcon = tester.widget<OiFolderIcon>(
-      find.byType(OiFolderIcon),
-    );
+    final folderIcon = tester.widget<OiFolderIcon>(find.byType(OiFolderIcon));
     expect(folderIcon.state, OiFolderIconState.closed);
   });
 
-  testWidgets('renaming mode shows OiRenameField instead of text',
-      (tester) async {
+  testWidgets('renaming mode shows OiRenameField instead of text', (
+    tester,
+  ) async {
     await tester.pumpObers(
       OiFolderTreeItem(
         folder: folder,
@@ -176,9 +149,7 @@ void main() {
         selected: false,
       ),
     );
-    final folderIcon = tester.widget<OiFolderIcon>(
-      find.byType(OiFolderIcon),
-    );
+    final folderIcon = tester.widget<OiFolderIcon>(find.byType(OiFolderIcon));
     expect(folderIcon.variant, OiFolderIconVariant.shared);
   });
 
@@ -190,24 +161,22 @@ void main() {
         selected: false,
       ),
     );
-    final folderIcon = tester.widget<OiFolderIcon>(
-      find.byType(OiFolderIcon),
-    );
+    final folderIcon = tester.widget<OiFolderIcon>(find.byType(OiFolderIcon));
     expect(folderIcon.variant, OiFolderIconVariant.trash);
   });
 
   testWidgets('default semantics label includes folder name', (tester) async {
     await tester.pumpObers(
-      const OiFolderTreeItem(
-        folder: folder,
-        expanded: false,
-        selected: false,
-      ),
+      const OiFolderTreeItem(folder: folder, expanded: false, selected: false),
     );
     // Find the Semantics widget with a non-null label matching the folder name
-    final semantics = tester.widgetList<Semantics>(find.byType(Semantics))
-        .where((s) => s.properties.label != null &&
-            s.properties.label!.contains('Documents'))
+    final semantics = tester
+        .widgetList<Semantics>(find.byType(Semantics))
+        .where(
+          (s) =>
+              s.properties.label != null &&
+              s.properties.label!.contains('Documents'),
+        )
         .first;
     expect(semantics.properties.label, 'Documents folder');
   });
@@ -221,9 +190,13 @@ void main() {
         itemCount: 7,
       ),
     );
-    final semantics = tester.widgetList<Semantics>(find.byType(Semantics))
-        .where((s) => s.properties.label != null &&
-            s.properties.label!.contains('Documents'))
+    final semantics = tester
+        .widgetList<Semantics>(find.byType(Semantics))
+        .where(
+          (s) =>
+              s.properties.label != null &&
+              s.properties.label!.contains('Documents'),
+        )
         .first;
     expect(semantics.properties.label, 'Documents folder, 7 items');
   });
@@ -237,9 +210,13 @@ void main() {
         semanticsLabel: 'Custom label',
       ),
     );
-    final semantics = tester.widgetList<Semantics>(find.byType(Semantics))
-        .where((s) => s.properties.label != null &&
-            s.properties.label!.contains('Custom'))
+    final semantics = tester
+        .widgetList<Semantics>(find.byType(Semantics))
+        .where(
+          (s) =>
+              s.properties.label != null &&
+              s.properties.label!.contains('Custom'),
+        )
         .first;
     expect(semantics.properties.label, 'Custom label');
   });

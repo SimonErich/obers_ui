@@ -277,7 +277,10 @@ class _OiNavMenuBodyState extends State<_OiNavMenuBody> {
             ),
           ),
           if (item.badgeCount != null && item.badgeCount! > 0)
-            OiBadge.filled(label: item.badgeCount.toString(), size: OiBadgeSize.small),
+            OiBadge.filled(
+              label: item.badgeCount.toString(),
+              size: OiBadgeSize.small,
+            ),
         ],
       ),
     );
@@ -290,7 +293,11 @@ class _OiNavMenuBodyState extends State<_OiNavMenuBody> {
     );
 
     if (widget.contextMenu != null) {
-      row = OiContextMenu(label: item.label, items: widget.contextMenu!(item), child: row);
+      row = OiContextMenu(
+        label: item.label,
+        items: widget.contextMenu!(item),
+        child: row,
+      );
     }
 
     return row;

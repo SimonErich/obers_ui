@@ -41,9 +41,7 @@ void main() {
       expect(modality, OiInputModality.pointer);
 
       final center = tester.getCenter(find.byType(SizedBox));
-      final gesture = await tester.startGesture(
-        center,
-      );
+      final gesture = await tester.startGesture(center);
       await tester.pump();
 
       expect(modality, OiInputModality.touch);
@@ -73,9 +71,7 @@ void main() {
 
       // Start with touch first to verify mouse switches back
       final center = tester.getCenter(find.byType(SizedBox));
-      final touchGesture = await tester.startGesture(
-        center,
-      );
+      final touchGesture = await tester.startGesture(center);
       await tester.pump();
       expect(modality, OiInputModality.touch);
       await touchGesture.up();
@@ -97,9 +93,7 @@ void main() {
 
       // Start with touch
       final center = tester.getCenter(find.byType(SizedBox));
-      final touchGesture = await tester.startGesture(
-        center,
-      );
+      final touchGesture = await tester.startGesture(center);
       await tester.pump();
       expect(modality, OiInputModality.touch);
       await touchGesture.up();
@@ -121,9 +115,7 @@ void main() {
       final center = tester.getCenter(find.byType(SizedBox));
 
       // Touch
-      final touch = await tester.startGesture(
-        center,
-      );
+      final touch = await tester.startGesture(center);
       await tester.pump();
       expect(modality, OiInputModality.touch);
       await touch.up();
@@ -149,9 +141,7 @@ void main() {
       expect(modality, OiInputModality.pointer);
 
       // Touch
-      final touch = await tester.startGesture(
-        center,
-      );
+      final touch = await tester.startGesture(center);
       await tester.pump();
       expect(modality, OiInputModality.touch);
       await touch.up();
@@ -164,9 +154,7 @@ void main() {
       final center = tester.getCenter(find.byType(SizedBox));
 
       // Switch to touch first
-      final touch = await tester.startGesture(
-        center,
-      );
+      final touch = await tester.startGesture(center);
       await tester.pump();
       expect(modality, OiInputModality.touch);
       await touch.up();

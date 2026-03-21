@@ -13,11 +13,7 @@ void main() {
     testWidgets('renders without errors', (tester) async {
       await tester.pumpObers(
         const OiFileInfoDialog(
-          file: OiFileNodeData(
-            id: '1',
-            name: 'report.pdf',
-            isFolder: false,
-          ),
+          file: OiFileNodeData(id: '1', name: 'report.pdf', isFolder: false),
         ),
       );
       expect(find.byType(OiFileInfoDialog), findsOneWidget);
@@ -26,11 +22,7 @@ void main() {
     testWidgets('displays file name', (tester) async {
       await tester.pumpObers(
         const OiFileInfoDialog(
-          file: OiFileNodeData(
-            id: '1',
-            name: 'report.pdf',
-            isFolder: false,
-          ),
+          file: OiFileNodeData(id: '1', name: 'report.pdf', isFolder: false),
         ),
       );
       expect(find.text('report.pdf'), findsOneWidget);
@@ -39,11 +31,7 @@ void main() {
     testWidgets('displays Folder type for folders', (tester) async {
       await tester.pumpObers(
         const OiFileInfoDialog(
-          file: OiFileNodeData(
-            id: '1',
-            name: 'Documents',
-            isFolder: true,
-          ),
+          file: OiFileNodeData(id: '1', name: 'Documents', isFolder: true),
         ),
       );
       expect(find.text('Folder'), findsOneWidget);
@@ -112,11 +100,7 @@ void main() {
     testWidgets('displays extra metadata when provided', (tester) async {
       await tester.pumpObers(
         const OiFileInfoDialog(
-          file: OiFileNodeData(
-            id: '1',
-            name: 'doc.pdf',
-            isFolder: false,
-          ),
+          file: OiFileNodeData(id: '1', name: 'doc.pdf', isFolder: false),
           extraMetadata: {'Author': 'Jane', 'Version': '2.1'},
         ),
       );
@@ -129,11 +113,7 @@ void main() {
     testWidgets('hides extra metadata section when null', (tester) async {
       await tester.pumpObers(
         const OiFileInfoDialog(
-          file: OiFileNodeData(
-            id: '1',
-            name: 'doc.pdf',
-            isFolder: false,
-          ),
+          file: OiFileNodeData(id: '1', name: 'doc.pdf', isFolder: false),
         ),
       );
       expect(find.text('Author'), findsNothing);
@@ -143,11 +123,7 @@ void main() {
       var closed = false;
       await tester.pumpObers(
         OiFileInfoDialog(
-          file: const OiFileNodeData(
-            id: '1',
-            name: 'doc.pdf',
-            isFolder: false,
-          ),
+          file: const OiFileNodeData(id: '1', name: 'doc.pdf', isFolder: false),
           onClose: () => closed = true,
         ),
       );
@@ -159,17 +135,10 @@ void main() {
     testWidgets('has correct semantics label', (tester) async {
       await tester.pumpObers(
         const OiFileInfoDialog(
-          file: OiFileNodeData(
-            id: '1',
-            name: 'doc.pdf',
-            isFolder: false,
-          ),
+          file: OiFileNodeData(id: '1', name: 'doc.pdf', isFolder: false),
         ),
       );
-      expect(
-        find.bySemanticsLabel(RegExp('File info dialog')),
-        findsOneWidget,
-      );
+      expect(find.bySemanticsLabel(RegExp('File info dialog')), findsOneWidget);
     });
 
     testWidgets('hides size row for folders', (tester) async {

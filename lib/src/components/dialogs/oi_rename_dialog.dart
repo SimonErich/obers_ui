@@ -174,10 +174,7 @@ class _OiRenameDialogState extends State<OiRenameDialog> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  OiButton.ghost(
-                    label: 'Cancel',
-                    onTap: widget.onCancel,
-                  ),
+                  OiButton.ghost(label: 'Cancel', onTap: widget.onCancel),
                   SizedBox(width: spacing.sm),
                   OiButton.primary(
                     label: 'Rename',

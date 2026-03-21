@@ -778,8 +778,7 @@ class _RenderOiGrid extends RenderBox
       final pd = child.parentData! as _OiGridParentData;
 
       // REQ-1092 + REQ-1080: Resolve responsive columnSpan.
-      var colSpan =
-          pd.responsiveColumnSpan?.resolve(active, _scale) ?? 1;
+      var colSpan = pd.responsiveColumnSpan?.resolve(active, _scale) ?? 1;
       if (colSpan == fullSpanSentinel) colSpan = cols;
       colSpan = colSpan.clamp(1, cols);
 
@@ -817,11 +816,11 @@ class _RenderOiGrid extends RenderBox
   /// CSS Grid row-packing algorithm with explicit cursor tracking.
   ///
   /// REQ-1078: Maintains a cursor `(row, column)` starting at `(0, 0)`.
-  /// REQ-1079: Processes children sorted by [columnOrder].
-  /// REQ-1080: Uses resolved [columnSpan] (default 1, sentinel → all cols).
+  /// REQ-1079: Processes children sorted by columnOrder.
+  /// REQ-1080: Uses resolved columnSpan (default 1, sentinel → all cols).
   ///
   /// For each child, find the first available cell that satisfies its
-  /// [columnSpan] and [columnStart]. The cursor advances forward after each
+  /// columnSpan and columnStart. The cursor advances forward after each
   /// auto-placed child and never scans backward.
   List<_Placement> _packRows(List<_ChildEntry> entries, int cols) {
     final placements = <_Placement>[];

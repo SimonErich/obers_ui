@@ -110,15 +110,15 @@ void main() {
     'OiTouchTarget on desktop platform with touch modality returns 48dp',
     (tester) async {
       await tester.pumpWidget(
-        OiApp(
+        const OiApp(
           home: OiPlatform(
-            data: const OiPlatformData(
+            data: OiPlatformData(
               platform: TargetPlatform.linux,
               keyboardHeight: 0,
               keyboardVisible: false,
               inputModality: OiInputModality.touch,
             ),
-            child: const Center(
+            child: Center(
               child: OiTouchTarget(child: SizedBox(width: 24, height: 24)),
             ),
           ),

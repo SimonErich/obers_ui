@@ -1,4 +1,6 @@
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/obers_ui.dart' show OiTour;
+import 'package:obers_ui/src/composites/onboarding/oi_tour.dart' show OiTour;
 
 /// Highlights a single widget by dimming everything else.
 ///

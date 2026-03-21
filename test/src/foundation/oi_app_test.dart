@@ -416,7 +416,7 @@ void main() {
               builder: (ctx) {
                 try {
                   OiDensityScope.of(ctx);
-                } catch (e) {
+                } on Object catch (e) {
                   error = e;
                 }
                 return const SizedBox();

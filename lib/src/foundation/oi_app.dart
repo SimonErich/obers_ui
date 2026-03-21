@@ -294,7 +294,7 @@ class _OiAppState extends State<OiApp> {
   /// [OiTheme] → [Directionality] → [OiDensityScope] → [OiA11yScope]
   /// → [OiInputModalityDetector] (provides [OiPlatform])
   /// → [OiUndoStackProvider] → [OiShortcutScope]
-  /// → [OiTourScope] → [OiOverlaysHost]
+  /// → [OiTourScope] → OiOverlaysHost
   Widget _buildScaffold(BuildContext context, Widget? child) {
     final platformBrightness = MediaQuery.platformBrightnessOf(context);
     var themeData = _resolveTheme(platformBrightness);

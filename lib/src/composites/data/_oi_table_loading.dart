@@ -27,14 +27,16 @@ class _OiTableLoadingBarState extends State<_OiTableLoadingBar>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final reduced = context.animations.reducedMotion ||
+    final reduced =
+        context.animations.reducedMotion ||
         MediaQuery.disableAnimationsOf(context);
     _ctrl.duration = reduced
         ? Duration.zero
         : const Duration(milliseconds: 1500);
     if (reduced && _ctrl.isAnimating) {
-      _ctrl.stop();
-      _ctrl.value = 0;
+      _ctrl
+        ..stop()
+        ..value = 0;
     } else if (!reduced && !_ctrl.isAnimating) {
       _ctrl.repeat();
     }
@@ -68,7 +70,7 @@ class _LoadingBarPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final colors = const Color(0xFFE5E7EB);
+    const colors = Color(0xFFE5E7EB);
     // Background track.
     canvas.drawRect(
       Rect.fromLTWH(0, 0, size.width, size.height),
@@ -112,14 +114,16 @@ class _OiTableSpinnerState extends State<_OiTableSpinner>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final reduced = context.animations.reducedMotion ||
+    final reduced =
+        context.animations.reducedMotion ||
         MediaQuery.disableAnimationsOf(context);
     _ctrl.duration = reduced
         ? Duration.zero
         : const Duration(milliseconds: 800);
     if (reduced && _ctrl.isAnimating) {
-      _ctrl.stop();
-      _ctrl.value = 0;
+      _ctrl
+        ..stop()
+        ..value = 0;
     } else if (!reduced && !_ctrl.isAnimating) {
       _ctrl.repeat();
     }

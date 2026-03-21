@@ -1,4 +1,7 @@
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/obers_ui.dart' show OiDraggable;
+import 'package:obers_ui/src/primitives/drag_drop/oi_draggable.dart'
+    show OiDraggable;
 
 /// The state of a [OiDropZone] with respect to an active drag.
 ///
@@ -34,7 +37,7 @@ class OiDropZone<T extends Object> extends StatefulWidget {
     super.key,
   });
 
-  /// Called to determine whether incoming [data] is accepted by this zone.
+  /// Called to determine whether incoming data is accepted by this zone.
   ///
   /// Return `true` to accept the drag (state becomes [OiDropState.hovering]);
   /// return `false` to reject it (state becomes [OiDropState.rejected]).

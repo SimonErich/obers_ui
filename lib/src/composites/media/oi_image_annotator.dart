@@ -328,8 +328,9 @@ class _AnnotationPainter extends CustomPainter {
                   unit.dx * headLength + unit.dy * headLength * 0.5,
                   unit.dy * headLength - unit.dx * headLength * 0.5,
                 );
-            canvas.drawLine(end, p1, paint);
-            canvas.drawLine(end, p2, paint);
+            canvas
+              ..drawLine(end, p1, paint)
+              ..drawLine(end, p2, paint);
           }
 
         case OiAnnotationType.text:

@@ -30,20 +30,14 @@ void main() {
   group('OiDeleteDialog', () {
     testWidgets('renders without errors', (tester) async {
       await tester.pumpObers(
-        OiDeleteDialog(
-          files: [_file('readme.txt')],
-          onDelete: () {},
-        ),
+        OiDeleteDialog(files: [_file('readme.txt')], onDelete: () {}),
       );
       expect(find.byType(OiDeleteDialog), findsOneWidget);
     });
 
     testWidgets('shows singular title for one file', (tester) async {
       await tester.pumpObers(
-        OiDeleteDialog(
-          files: [_file('readme.txt')],
-          onDelete: () {},
-        ),
+        OiDeleteDialog(files: [_file('readme.txt')], onDelete: () {}),
       );
       expect(find.text('Delete readme.txt?'), findsOneWidget);
     });
@@ -81,17 +75,16 @@ void main() {
 
     testWidgets('truncates list beyond 5 items', (tester) async {
       final files = List.generate(7, (i) => _file('file_$i.txt'));
-      await tester.pumpObers(
-        OiDeleteDialog(files: files, onDelete: () {}),
-      );
+      await tester.pumpObers(OiDeleteDialog(files: files, onDelete: () {}));
       expect(find.text('file_0.txt'), findsOneWidget);
       expect(find.text('file_4.txt'), findsOneWidget);
       expect(find.text('file_5.txt'), findsNothing);
       expect(find.text('and 2 more...'), findsOneWidget);
     });
 
-    testWidgets('shows permanent warning when permanent is true',
-        (tester) async {
+    testWidgets('shows permanent warning when permanent is true', (
+      tester,
+    ) async {
       await tester.pumpObers(
         OiDeleteDialog(
           files: [_file('data.csv')],
@@ -102,13 +95,11 @@ void main() {
       expect(find.text('This action cannot be undone.'), findsOneWidget);
     });
 
-    testWidgets('hides permanent warning when permanent is false',
-        (tester) async {
+    testWidgets('hides permanent warning when permanent is false', (
+      tester,
+    ) async {
       await tester.pumpObers(
-        OiDeleteDialog(
-          files: [_file('data.csv')],
-          onDelete: () {},
-        ),
+        OiDeleteDialog(files: [_file('data.csv')], onDelete: () {}),
       );
       expect(find.text('This action cannot be undone.'), findsNothing);
     });
@@ -127,10 +118,7 @@ void main() {
 
     testWidgets('hides dont ask again checkbox when disabled', (tester) async {
       await tester.pumpObers(
-        OiDeleteDialog(
-          files: [_file('a.txt')],
-          onDelete: () {},
-        ),
+        OiDeleteDialog(files: [_file('a.txt')], onDelete: () {}),
       );
       expect(find.text("Don't ask me again"), findsNothing);
     });
@@ -138,10 +126,7 @@ void main() {
     testWidgets('tapping Delete fires onDelete', (tester) async {
       var deleted = false;
       await tester.pumpObers(
-        OiDeleteDialog(
-          files: [_file('a.txt')],
-          onDelete: () => deleted = true,
-        ),
+        OiDeleteDialog(files: [_file('a.txt')], onDelete: () => deleted = true),
       );
       await tester.tap(find.widgetWithText(OiButton, 'Delete'));
       await tester.pump();
@@ -178,8 +163,9 @@ void main() {
       expect(cancelled, isTrue);
     });
 
-    testWidgets('tapping dont ask again checkbox fires callback',
-        (tester) async {
+    testWidgets('tapping dont ask again checkbox fires callback', (
+      tester,
+    ) async {
       bool? received;
       await tester.pumpObers(
         OiDeleteDialog(
@@ -196,10 +182,7 @@ void main() {
 
     testWidgets('has correct semantics label', (tester) async {
       await tester.pumpObers(
-        OiDeleteDialog(
-          files: [_file('a.txt')],
-          onDelete: () {},
-        ),
+        OiDeleteDialog(files: [_file('a.txt')], onDelete: () {}),
       );
       expect(
         find.bySemanticsLabel(RegExp('Delete confirmation dialog')),

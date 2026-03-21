@@ -6,9 +6,9 @@ import 'package:obers_ui/src/foundation/oi_accessibility.dart';
 
 /// Wraps [child] and enforces a minimum hit area on touch platforms.
 ///
-/// By default reads [OiA11y.minTouchTarget] from [context] (48 dp on touch,
+/// By default reads [OiA11y.minTouchTarget] from context (48 dp on touch,
 /// 0 dp on pointer). Use [OiTouchTarget.custom] to supply an explicit
-/// [minSize] instead.
+/// minSize instead.
 ///
 /// This widget only inflates the layout size — the child's visual appearance
 /// is unchanged. The extra area is transparent and responds to hit-testing,
@@ -66,6 +66,8 @@ class _RenderTouchTargetPadding extends RenderProxyBox {
   _RenderTouchTargetPadding({required double minSize}) : _minSize = minSize;
 
   double _minSize;
+
+  double get minSize => _minSize;
 
   set minSize(double value) {
     if (_minSize == value) return;

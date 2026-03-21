@@ -181,9 +181,7 @@ void main() {
       expect(span.data.columnOrder, isNull);
     });
 
-    testWidgets('.span() passes rowSpan through to OiSpanData', (
-      tester,
-    ) async {
+    testWidgets('.span() passes rowSpan through to OiSpanData', (tester) async {
       final widget = const Text('test').span(
         columnSpan: const OiResponsive<int>(2),
         rowSpan: const OiResponsive<int>(3),

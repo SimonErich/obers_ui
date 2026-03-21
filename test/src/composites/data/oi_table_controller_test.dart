@@ -186,8 +186,7 @@ void main() {
     });
 
     test('selectRange selects exact key set', () {
-      final ctrl = OiTableController()
-        ..selectRange({'k1', 'k2', 'k3', 'k4'});
+      final ctrl = OiTableController()..selectRange({'k1', 'k2', 'k3', 'k4'});
       expect(ctrl.selectedRows, {'k1', 'k2', 'k3', 'k4'});
     });
 

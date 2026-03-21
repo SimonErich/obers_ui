@@ -1,5 +1,7 @@
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/obers_ui.dart' show OiApp;
+import 'package:obers_ui/src/foundation/oi_app.dart' show OiApp;
 import 'package:obers_ui/src/foundation/oi_undo_stack.dart';
 
 /// Intent fired when the user presses Ctrl+Z (or Cmd+Z on macOS).

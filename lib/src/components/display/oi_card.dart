@@ -321,7 +321,8 @@ class _OiCardState extends State<OiCard> with SingleTickerProviderStateMixin {
   }
 
   void _toggleCollapsed() {
-    final reducedMotion = context.animations.reducedMotion ||
+    final reducedMotion =
+        context.animations.reducedMotion ||
         MediaQuery.disableAnimationsOf(context);
     setState(() => _collapsed = !_collapsed);
     if (reducedMotion) {
@@ -433,10 +434,12 @@ class _OiCardState extends State<OiCard> with SingleTickerProviderStateMixin {
   }
 
   Widget _buildHeader(BuildContext context) {
-    final reducedMotion = context.animations.reducedMotion ||
+    final reducedMotion =
+        context.animations.reducedMotion ||
         MediaQuery.disableAnimationsOf(context);
-    final animationDuration =
-        reducedMotion ? Duration.zero : context.animations.normal;
+    final animationDuration = reducedMotion
+        ? Duration.zero
+        : context.animations.normal;
     return Row(
       children: [
         if (widget.leading != null) widget.leading!,

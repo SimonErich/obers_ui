@@ -1,3 +1,4 @@
+// Tests do not require documentation comments.
 // ignore_for_file: public_member_api_docs
 
 import 'package:flutter/widgets.dart';
@@ -42,9 +43,7 @@ void main() {
     });
 
     testWidgets('renders child widget', (tester) async {
-      await tester.pumpObers(
-        _dropTarget(child: const Text('Custom child')),
-      );
+      await tester.pumpObers(_dropTarget(child: const Text('Custom child')));
       expect(find.text('Custom child'), findsOneWidget);
     });
 
@@ -57,15 +56,16 @@ void main() {
     // ── Enabled/disabled behavior ──────────────────────────────────────────
     // ══════════════════════════════════════════════════════════════════════════
 
-    testWidgets('when disabled, child is rendered directly without drop zone',
-        (tester) async {
+    testWidgets('when disabled, child is rendered directly without drop zone', (
+      tester,
+    ) async {
       await tester.pumpObers(_dropTarget(enabled: false));
       // The child should be rendered but there should be no OiDropZone wrapping
       expect(find.text('Content area'), findsOneWidget);
     });
 
     testWidgets('when enabled, wraps child in drop zone', (tester) async {
-      await tester.pumpObers(_dropTarget(enabled: true));
+      await tester.pumpObers(_dropTarget());
       expect(find.text('Content area'), findsOneWidget);
     });
 
@@ -118,7 +118,7 @@ void main() {
     // ══════════════════════════════════════════════════════════════════════════
 
     testWidgets('toggling enabled rebuilds correctly', (tester) async {
-      await tester.pumpObers(_dropTarget(enabled: true));
+      await tester.pumpObers(_dropTarget());
       expect(find.text('Content area'), findsOneWidget);
 
       await tester.pumpObers(_dropTarget(enabled: false));
@@ -126,14 +126,10 @@ void main() {
     });
 
     testWidgets('changing child rebuilds correctly', (tester) async {
-      await tester.pumpObers(
-        _dropTarget(child: const Text('Version 1')),
-      );
+      await tester.pumpObers(_dropTarget(child: const Text('Version 1')));
       expect(find.text('Version 1'), findsOneWidget);
 
-      await tester.pumpObers(
-        _dropTarget(child: const Text('Version 2')),
-      );
+      await tester.pumpObers(_dropTarget(child: const Text('Version 2')));
       expect(find.text('Version 2'), findsOneWidget);
     });
   });
