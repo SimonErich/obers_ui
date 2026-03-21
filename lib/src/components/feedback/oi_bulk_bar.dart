@@ -270,6 +270,8 @@ class _OiBulkBarState extends State<OiBulkBar>
       position: _slideAnimation,
       child: Semantics(
         label: '${widget.label} bulk actions',
+        container: true,
+        explicitChildNodes: true,
         child: OiSurface(
           color: colors.surface,
           shadow: shadows.lg,

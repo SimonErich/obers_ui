@@ -1,6 +1,7 @@
 // Tests do not require documentation comments.
 // ignore_for_file: public_member_api_docs
 
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui/src/components/display/oi_pagination.dart';
@@ -255,6 +256,174 @@ void main() {
       await tester.tap(find.byKey(const Key('oi_pagination_load_more')));
       await tester.pumpAndSettle();
       expect(called, isTrue);
+    });
+  });
+
+  group('OiPagination - keyboard navigation', () {
+    /// Finds the pagination's own [Focus] widget and requests focus on it.
+    Future<void> focusPagination(WidgetTester tester) async {
+      final paginationElement = tester.element(find.byType(OiPagination));
+      // Walk down to find the Focus node owned by _OiPaginationState.
+      Focus? paginationFocus;
+      paginationElement.visitChildElements((element) {
+        if (element.widget is Semantics) {
+          element.visitChildElements((child) {
+            if (child.widget is Focus) {
+              paginationFocus = child.widget as Focus;
+            }
+          });
+        }
+      });
+      paginationFocus!.focusNode!.requestFocus();
+      await tester.pumpAndSettle();
+    }
+
+    testWidgets('keyboard left arrow navigates to previous page', (
+      tester,
+    ) async {
+      int? navigatedTo;
+      await tester.pumpObers(
+        OiPagination(
+          totalItems: 75,
+          currentPage: 2,
+          perPage: 25,
+          onPageChange: (p) => navigatedTo = p,
+        ),
+        surfaceSize: _wide,
+      );
+
+      await focusPagination(tester);
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowLeft);
+      await tester.pumpAndSettle();
+
+      expect(navigatedTo, 1);
+    });
+
+    testWidgets('keyboard right arrow navigates to next page', (tester) async {
+      int? navigatedTo;
+      await tester.pumpObers(
+        OiPagination(
+          totalItems: 75,
+          currentPage: 0,
+          perPage: 25,
+          onPageChange: (p) => navigatedTo = p,
+        ),
+        surfaceSize: _wide,
+      );
+
+      await focusPagination(tester);
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);
+      await tester.pumpAndSettle();
+
+      expect(navigatedTo, 1);
+    });
+
+    testWidgets('keyboard left arrow does nothing on first page', (
+      tester,
+    ) async {
+      int? navigatedTo;
+      await tester.pumpObers(
+        OiPagination(
+          totalItems: 75,
+          currentPage: 0,
+          perPage: 25,
+          onPageChange: (p) => navigatedTo = p,
+        ),
+        surfaceSize: _wide,
+      );
+
+      await focusPagination(tester);
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowLeft);
+      await tester.pumpAndSettle();
+
+      expect(navigatedTo, isNull);
+    });
+
+    testWidgets('keyboard right arrow does nothing on last page', (
+      tester,
+    ) async {
+      int? navigatedTo;
+      await tester.pumpObers(
+        OiPagination(
+          totalItems: 75,
+          currentPage: 2,
+          perPage: 25,
+          onPageChange: (p) => navigatedTo = p,
+        ),
+        surfaceSize: _wide,
+      );
+
+      await focusPagination(tester);
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);
+      await tester.pumpAndSettle();
+
+      expect(navigatedTo, isNull);
+    });
+  });
+
+  group('OiPagination - accessibility', () {
+    testWidgets('has navigation semantics landmark', (tester) async {
+      final handle = tester.ensureSemantics();
+
+      await tester.pumpObers(
+        OiPagination(
+          totalItems: 75,
+          currentPage: 0,
+          perPage: 25,
+          onPageChange: (_) {},
+        ),
+        surfaceSize: _wide,
+      );
+
+      expect(
+        find.bySemanticsLabel(RegExp('Pagination navigation')),
+        findsOneWidget,
+      );
+
+      handle.dispose();
+    });
+
+    testWidgets('compact variant has navigation semantics landmark', (
+      tester,
+    ) async {
+      final handle = tester.ensureSemantics();
+
+      await tester.pumpObers(
+        OiPagination.compact(
+          totalItems: 100,
+          currentPage: 0,
+          perPage: 25,
+          onPageChange: (_) {},
+        ),
+      );
+
+      expect(
+        find.bySemanticsLabel(RegExp('Pagination navigation')),
+        findsOneWidget,
+      );
+
+      handle.dispose();
+    });
+
+    testWidgets('loadMore variant has navigation semantics landmark', (
+      tester,
+    ) async {
+      final handle = tester.ensureSemantics();
+
+      await tester.pumpObers(
+        OiPagination.loadMore(
+          loadedCount: 25,
+          totalItems: 100,
+          onLoadMore: () {},
+        ),
+      );
+
+      expect(
+        find.bySemanticsLabel(RegExp('Pagination navigation')),
+        findsOneWidget,
+      );
+
+      handle.dispose();
     });
   });
 }

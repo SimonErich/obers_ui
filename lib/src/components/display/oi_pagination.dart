@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/buttons/oi_button.dart';
 import 'package:obers_ui/src/components/inputs/oi_select.dart';
@@ -29,8 +30,8 @@ enum OiPaginationVariant {
 ///
 /// {@category Components}
 ///
-/// Coverage: REQ-0002
-class OiPagination extends StatelessWidget {
+/// Coverage: REQ-0003
+class OiPagination extends StatefulWidget {
   /// Creates an [OiPagination] with the [pages] variant by default.
   ///
   /// [currentPage] is zero-based. [totalItems] is the total data count.
@@ -141,27 +142,6 @@ class OiPagination extends StatelessWidget {
   final VoidCallback? _onLoadMore;
   final bool _loading;
 
-  // ── Computed ────────────────────────────────────────────────────────────────
-
-  int get _totalPages => totalItems == 0 ? 0 : (totalItems / perPage).ceil();
-
-  int get _effectivePerPage {
-    final options = _effectivePerPageOptions;
-    if (options.contains(perPage)) return perPage;
-    return options.first;
-  }
-
-  List<int> get _effectivePerPageOptions =>
-      perPageOptions.isEmpty ? const [25] : perPageOptions;
-
-  int get _clampedPage {
-    if (_totalPages == 0) return 0;
-    return currentPage.clamp(0, _totalPages - 1);
-  }
-
-  bool get _hasPrev => _clampedPage > 0;
-  bool get _hasNext => _totalPages > 0 && _clampedPage < _totalPages - 1;
-
   // ── Page computation ───────────────────────────────────────────────────────
 
   /// Computes which page numbers to display, using `null` for ellipsis gaps.
@@ -203,13 +183,65 @@ class OiPagination extends StatelessWidget {
     return result;
   }
 
-  // ── Build ──────────────────────────────────────────────────────────────────
+  @override
+  State<OiPagination> createState() => _OiPaginationState();
+}
+
+class _OiPaginationState extends State<OiPagination> {
+  final FocusNode _focusNode = FocusNode();
+
+  // ── Computed ──────────────────────────────────────────────────────────────
+
+  int get _totalPages =>
+      widget.totalItems == 0 ? 0 : (widget.totalItems / widget.perPage).ceil();
+
+  int get _effectivePerPage {
+    final options = _effectivePerPageOptions;
+    if (options.contains(widget.perPage)) return widget.perPage;
+    return options.first;
+  }
+
+  List<int> get _effectivePerPageOptions =>
+      widget.perPageOptions.isEmpty ? const [25] : widget.perPageOptions;
+
+  int get _clampedPage {
+    if (_totalPages == 0) return 0;
+    return widget.currentPage.clamp(0, _totalPages - 1);
+  }
+
+  bool get _hasPrev => _clampedPage > 0;
+  bool get _hasNext => _totalPages > 0 && _clampedPage < _totalPages - 1;
+
+  // ── Keyboard ──────────────────────────────────────────────────────────────
+
+  KeyEventResult _handleKeyEvent(FocusNode node, KeyEvent event) {
+    if (event is! KeyDownEvent) return KeyEventResult.ignored;
+
+    if (event.logicalKey == LogicalKeyboardKey.arrowLeft && _hasPrev) {
+      widget.onPageChange?.call(_clampedPage - 1);
+      return KeyEventResult.handled;
+    }
+    if (event.logicalKey == LogicalKeyboardKey.arrowRight && _hasNext) {
+      widget.onPageChange?.call(_clampedPage + 1);
+      return KeyEventResult.handled;
+    }
+
+    return KeyEventResult.ignored;
+  }
+
+  @override
+  void dispose() {
+    _focusNode.dispose();
+    super.dispose();
+  }
+
+  // ── Build ─────────────────────────────────────────────────────────────────
 
   @override
   Widget build(BuildContext context) {
-    if (_isLoadMore) return _buildLoadMore(context);
+    if (widget._isLoadMore) return _buildLoadMore(context);
 
-    switch (variant) {
+    switch (widget.variant) {
       case OiPaginationVariant.pages:
         return _buildPagesVariant(context);
       case OiPaginationVariant.compact:
@@ -219,66 +251,74 @@ class OiPagination extends StatelessWidget {
 
   Widget _buildPagesVariant(BuildContext context) {
     final colors = context.colors;
-    final visiblePages = computeVisiblePages(
+    final visiblePages = OiPagination.computeVisiblePages(
       _clampedPage,
       _totalPages,
-      siblingCount,
+      widget.siblingCount,
     );
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      child: Row(
-        children: [
-          if (showTotal) Flexible(child: _buildTotalLabel()),
-          if (showTotal) const SizedBox(width: 12),
-          if (showPerPage) ...[
-            _buildPerPageSelector(context),
-            const SizedBox(width: 16),
-          ],
-          if (showFirstLast)
-            _buildNavButton(
-              key: const Key('oi_pagination_first'),
-              icon: const IconData(0xe5dc, fontFamily: 'MaterialIcons'),
-              label: 'First page',
-              enabled: _hasPrev,
-              onTap: () => onPageChange?.call(0),
-              colors: colors,
-            ),
-          _buildNavButton(
-            key: const Key('oi_pagination_prev'),
-            icon: const IconData(0xe5cb, fontFamily: 'MaterialIcons'),
-            label: 'Previous page',
-            enabled: _hasPrev,
-            onTap: () => onPageChange?.call(_clampedPage - 1),
-            colors: colors,
+    return Semantics(
+      label: 'Pagination navigation',
+      container: true,
+      child: Focus(
+        focusNode: _focusNode,
+        onKeyEvent: _handleKeyEvent,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          child: Row(
+            children: [
+              if (widget.showTotal) Flexible(child: _buildTotalLabel()),
+              if (widget.showTotal) const SizedBox(width: 12),
+              if (widget.showPerPage) ...[
+                _buildPerPageSelector(context),
+                const SizedBox(width: 16),
+              ],
+              if (widget.showFirstLast)
+                _buildNavButton(
+                  key: const Key('oi_pagination_first'),
+                  icon: const IconData(0xe5dc, fontFamily: 'MaterialIcons'),
+                  label: 'First page',
+                  enabled: _hasPrev,
+                  onTap: () => widget.onPageChange?.call(0),
+                  colors: colors,
+                ),
+              _buildNavButton(
+                key: const Key('oi_pagination_prev'),
+                icon: const IconData(0xe5cb, fontFamily: 'MaterialIcons'),
+                label: 'Previous page',
+                enabled: _hasPrev,
+                onTap: () => widget.onPageChange?.call(_clampedPage - 1),
+                colors: colors,
+              ),
+              for (var i = 0; i < visiblePages.length; i++)
+                if (visiblePages[i] == null)
+                  Padding(
+                    key: Key('oi_pagination_ellipsis_$i'),
+                    padding: const EdgeInsets.symmetric(horizontal: 2),
+                    child: const OiLabel.small('\u2026'),
+                  )
+                else
+                  _buildPageButton(visiblePages[i]!, colors),
+              _buildNavButton(
+                key: const Key('oi_pagination_next'),
+                icon: const IconData(0xe5cc, fontFamily: 'MaterialIcons'),
+                label: 'Next page',
+                enabled: _hasNext,
+                onTap: () => widget.onPageChange?.call(_clampedPage + 1),
+                colors: colors,
+              ),
+              if (widget.showFirstLast)
+                _buildNavButton(
+                  key: const Key('oi_pagination_last'),
+                  icon: const IconData(0xe5dd, fontFamily: 'MaterialIcons'),
+                  label: 'Last page',
+                  enabled: _hasNext,
+                  onTap: () => widget.onPageChange?.call(_totalPages - 1),
+                  colors: colors,
+                ),
+            ],
           ),
-          for (var i = 0; i < visiblePages.length; i++)
-            if (visiblePages[i] == null)
-              Padding(
-                key: Key('oi_pagination_ellipsis_$i'),
-                padding: const EdgeInsets.symmetric(horizontal: 2),
-                child: const OiLabel.small('\u2026'),
-              )
-            else
-              _buildPageButton(visiblePages[i]!, colors),
-          _buildNavButton(
-            key: const Key('oi_pagination_next'),
-            icon: const IconData(0xe5cc, fontFamily: 'MaterialIcons'),
-            label: 'Next page',
-            enabled: _hasNext,
-            onTap: () => onPageChange?.call(_clampedPage + 1),
-            colors: colors,
-          ),
-          if (showFirstLast)
-            _buildNavButton(
-              key: const Key('oi_pagination_last'),
-              icon: const IconData(0xe5dd, fontFamily: 'MaterialIcons'),
-              label: 'Last page',
-              enabled: _hasNext,
-              onTap: () => onPageChange?.call(_totalPages - 1),
-              colors: colors,
-            ),
-        ],
+        ),
       ),
     );
   }
@@ -287,79 +327,95 @@ class OiPagination extends StatelessWidget {
     final colors = context.colors;
     final displayPage = _totalPages == 0 ? 0 : _clampedPage + 1;
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          if (showFirstLast)
-            _buildNavButton(
-              key: const Key('oi_pagination_first'),
-              icon: const IconData(0xe5dc, fontFamily: 'MaterialIcons'),
-              label: 'First page',
-              enabled: _hasPrev,
-              onTap: () => onPageChange?.call(0),
-              colors: colors,
-            ),
-          _buildNavButton(
-            key: const Key('oi_pagination_prev'),
-            icon: const IconData(0xe5cb, fontFamily: 'MaterialIcons'),
-            label: 'Previous page',
-            enabled: _hasPrev,
-            onTap: () => onPageChange?.call(_clampedPage - 1),
-            colors: colors,
+    return Semantics(
+      label: 'Pagination navigation',
+      container: true,
+      child: Focus(
+        focusNode: _focusNode,
+        onKeyEvent: _handleKeyEvent,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (widget.showFirstLast)
+                _buildNavButton(
+                  key: const Key('oi_pagination_first'),
+                  icon: const IconData(0xe5dc, fontFamily: 'MaterialIcons'),
+                  label: 'First page',
+                  enabled: _hasPrev,
+                  onTap: () => widget.onPageChange?.call(0),
+                  colors: colors,
+                ),
+              _buildNavButton(
+                key: const Key('oi_pagination_prev'),
+                icon: const IconData(0xe5cb, fontFamily: 'MaterialIcons'),
+                label: 'Previous page',
+                enabled: _hasPrev,
+                onTap: () => widget.onPageChange?.call(_clampedPage - 1),
+                colors: colors,
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                child: OiLabel.body(
+                  '$displayPage / $_totalPages',
+                  key: const Key('oi_pagination_compact_label'),
+                ),
+              ),
+              _buildNavButton(
+                key: const Key('oi_pagination_next'),
+                icon: const IconData(0xe5cc, fontFamily: 'MaterialIcons'),
+                label: 'Next page',
+                enabled: _hasNext,
+                onTap: () => widget.onPageChange?.call(_clampedPage + 1),
+                colors: colors,
+              ),
+              if (widget.showFirstLast)
+                _buildNavButton(
+                  key: const Key('oi_pagination_last'),
+                  icon: const IconData(0xe5dd, fontFamily: 'MaterialIcons'),
+                  label: 'Last page',
+                  enabled: _hasNext,
+                  onTap: () => widget.onPageChange?.call(_totalPages - 1),
+                  colors: colors,
+                ),
+            ],
           ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8),
-            child: OiLabel.body(
-              '$displayPage / $_totalPages',
-              key: const Key('oi_pagination_compact_label'),
-            ),
-          ),
-          _buildNavButton(
-            key: const Key('oi_pagination_next'),
-            icon: const IconData(0xe5cc, fontFamily: 'MaterialIcons'),
-            label: 'Next page',
-            enabled: _hasNext,
-            onTap: () => onPageChange?.call(_clampedPage + 1),
-            colors: colors,
-          ),
-          if (showFirstLast)
-            _buildNavButton(
-              key: const Key('oi_pagination_last'),
-              icon: const IconData(0xe5dd, fontFamily: 'MaterialIcons'),
-              label: 'Last page',
-              enabled: _hasNext,
-              onTap: () => onPageChange?.call(_totalPages - 1),
-              colors: colors,
-            ),
-        ],
+        ),
       ),
     );
   }
 
   Widget _buildLoadMore(BuildContext context) {
-    if (_loadedCount >= totalItems) return const SizedBox.shrink();
+    if (widget._loadedCount >= widget.totalItems) {
+      return const SizedBox.shrink();
+    }
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          OiLabel.small('$_loadedCount of $totalItems loaded'),
-          const SizedBox(height: 8),
-          OiButton.ghost(
-            key: const Key('oi_pagination_load_more'),
-            label: 'Load more',
-            loading: _loading,
-            onTap: _loading ? null : _onLoadMore,
-          ),
-        ],
+    return Semantics(
+      label: 'Pagination navigation',
+      container: true,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            OiLabel.small(
+              '${widget._loadedCount} of ${widget.totalItems} loaded',
+            ),
+            const SizedBox(height: 8),
+            OiButton.ghost(
+              key: const Key('oi_pagination_load_more'),
+              label: 'Load more',
+              loading: widget._loading,
+              onTap: widget._loading ? null : widget._onLoadMore,
+            ),
+          ],
+        ),
       ),
     );
   }
 
-  // ── Sub-builders ───────────────────────────────────────────────────────────
+  // ── Sub-builders ─────────────────────────────────────────────────────────
 
   Widget _buildNavButton({
     required Key key,
@@ -381,24 +437,31 @@ class OiPagination extends StatelessWidget {
 
   Widget _buildPageButton(int page, OiColorScheme colors) {
     final isCurrent = page == _clampedPage;
-    return GestureDetector(
-      key: Key('oi_pagination_page_$page'),
-      onTap: isCurrent ? null : () => onPageChange?.call(page),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-        margin: const EdgeInsets.symmetric(horizontal: 1),
-        decoration: isCurrent
-            ? BoxDecoration(
-                color: colors.primary.base,
-                borderRadius: BorderRadius.circular(4),
-              )
-            : null,
-        child: isCurrent
-            ? OiLabel.bodyStrong(
-                '${page + 1}',
-                color: colors.primary.foreground,
-              )
-            : OiLabel.body('${page + 1}', color: colors.text),
+    return Semantics(
+      button: true,
+      label: 'Page ${page + 1}',
+      selected: isCurrent,
+      child: Focus(
+        child: GestureDetector(
+          key: Key('oi_pagination_page_$page'),
+          onTap: isCurrent ? null : () => widget.onPageChange?.call(page),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+            margin: const EdgeInsets.symmetric(horizontal: 1),
+            decoration: isCurrent
+                ? BoxDecoration(
+                    color: colors.primary.base,
+                    borderRadius: BorderRadius.circular(4),
+                  )
+                : null,
+            child: isCurrent
+                ? OiLabel.bodyStrong(
+                    '${page + 1}',
+                    color: colors.primary.foreground,
+                  )
+                : OiLabel.body('${page + 1}', color: colors.text),
+          ),
+        ),
       ),
     );
   }
@@ -420,7 +483,7 @@ class OiPagination extends StatelessWidget {
             ],
             value: _effectivePerPage,
             onChanged: (val) {
-              if (val != null) onPerPageChange?.call(val);
+              if (val != null) widget.onPerPageChange?.call(val);
             },
           ),
         ),
@@ -429,8 +492,8 @@ class OiPagination extends StatelessWidget {
   }
 
   Widget _buildTotalLabel() {
-    final itemLabel = label ?? 'items';
-    if (totalItems == 0) {
+    final itemLabel = widget.label ?? 'items';
+    if (widget.totalItems == 0) {
       return OiLabel.small(
         '0 $itemLabel',
         key: const Key('oi_pagination_total'),
@@ -439,9 +502,12 @@ class OiPagination extends StatelessWidget {
     }
 
     final start = _clampedPage * _effectivePerPage + 1;
-    final end = math.min((_clampedPage + 1) * _effectivePerPage, totalItems);
+    final end = math.min(
+      (_clampedPage + 1) * _effectivePerPage,
+      widget.totalItems,
+    );
     return OiLabel.small(
-      '$start\u2013$end of $totalItems $itemLabel',
+      '$start\u2013$end of ${widget.totalItems} $itemLabel',
       key: const Key('oi_pagination_total'),
       overflow: TextOverflow.ellipsis,
     );
