@@ -11,6 +11,8 @@ import 'package:obers_ui/src/primitives/clipboard/oi_copyable.dart';
 /// - Semantic labelling via [semanticsLabel].
 /// - Clipboard copy on tap via [copyable] (backed by [OiCopyable]).
 /// - Text selection via [selectable].
+/// - Color and decoration overrides via [color], [decoration],
+///   and [decorationColor].
 /// - Responsive font scaling for the [OiLabelVariant.display],
 ///   [OiLabelVariant.h1], and [OiLabelVariant.h2] variants:
 ///   × 1.0 on compact, × 1.1 on medium, × 1.2 on expanded+.
@@ -50,6 +52,9 @@ class OiLabel extends StatelessWidget {
     this.copyable = false,
     this.selectable = false,
     this.semanticsLabel,
+    this.color,
+    this.decoration,
+    this.decorationColor,
     super.key,
   });
 
@@ -64,6 +69,9 @@ class OiLabel extends StatelessWidget {
     bool copyable = false,
     bool selectable = false,
     String? semanticsLabel,
+    Color? color,
+    TextDecoration? decoration,
+    Color? decorationColor,
     Key? key,
   }) : this._(
          variant: OiLabelVariant.display,
@@ -74,6 +82,9 @@ class OiLabel extends StatelessWidget {
          copyable: copyable,
          selectable: selectable,
          semanticsLabel: semanticsLabel,
+         color: color,
+         decoration: decoration,
+         decorationColor: decorationColor,
          key: key,
        );
 
@@ -86,6 +97,9 @@ class OiLabel extends StatelessWidget {
     bool copyable = false,
     bool selectable = false,
     String? semanticsLabel,
+    Color? color,
+    TextDecoration? decoration,
+    Color? decorationColor,
     Key? key,
   }) : this._(
          variant: OiLabelVariant.h1,
@@ -96,6 +110,9 @@ class OiLabel extends StatelessWidget {
          copyable: copyable,
          selectable: selectable,
          semanticsLabel: semanticsLabel,
+         color: color,
+         decoration: decoration,
+         decorationColor: decorationColor,
          key: key,
        );
 
@@ -108,6 +125,9 @@ class OiLabel extends StatelessWidget {
     bool copyable = false,
     bool selectable = false,
     String? semanticsLabel,
+    Color? color,
+    TextDecoration? decoration,
+    Color? decorationColor,
     Key? key,
   }) : this._(
          variant: OiLabelVariant.h2,
@@ -118,6 +138,9 @@ class OiLabel extends StatelessWidget {
          copyable: copyable,
          selectable: selectable,
          semanticsLabel: semanticsLabel,
+         color: color,
+         decoration: decoration,
+         decorationColor: decorationColor,
          key: key,
        );
 
@@ -130,6 +153,9 @@ class OiLabel extends StatelessWidget {
     bool copyable = false,
     bool selectable = false,
     String? semanticsLabel,
+    Color? color,
+    TextDecoration? decoration,
+    Color? decorationColor,
     Key? key,
   }) : this._(
          variant: OiLabelVariant.h3,
@@ -140,6 +166,9 @@ class OiLabel extends StatelessWidget {
          copyable: copyable,
          selectable: selectable,
          semanticsLabel: semanticsLabel,
+         color: color,
+         decoration: decoration,
+         decorationColor: decorationColor,
          key: key,
        );
 
@@ -152,6 +181,9 @@ class OiLabel extends StatelessWidget {
     bool copyable = false,
     bool selectable = false,
     String? semanticsLabel,
+    Color? color,
+    TextDecoration? decoration,
+    Color? decorationColor,
     Key? key,
   }) : this._(
          variant: OiLabelVariant.h4,
@@ -162,6 +194,9 @@ class OiLabel extends StatelessWidget {
          copyable: copyable,
          selectable: selectable,
          semanticsLabel: semanticsLabel,
+         color: color,
+         decoration: decoration,
+         decorationColor: decorationColor,
          key: key,
        );
 
@@ -174,6 +209,9 @@ class OiLabel extends StatelessWidget {
     bool copyable = false,
     bool selectable = false,
     String? semanticsLabel,
+    Color? color,
+    TextDecoration? decoration,
+    Color? decorationColor,
     Key? key,
   }) : this._(
          variant: OiLabelVariant.body,
@@ -184,6 +222,9 @@ class OiLabel extends StatelessWidget {
          copyable: copyable,
          selectable: selectable,
          semanticsLabel: semanticsLabel,
+         color: color,
+         decoration: decoration,
+         decorationColor: decorationColor,
          key: key,
        );
 
@@ -196,6 +237,9 @@ class OiLabel extends StatelessWidget {
     bool copyable = false,
     bool selectable = false,
     String? semanticsLabel,
+    Color? color,
+    TextDecoration? decoration,
+    Color? decorationColor,
     Key? key,
   }) : this._(
          variant: OiLabelVariant.bodyStrong,
@@ -206,6 +250,9 @@ class OiLabel extends StatelessWidget {
          copyable: copyable,
          selectable: selectable,
          semanticsLabel: semanticsLabel,
+         color: color,
+         decoration: decoration,
+         decorationColor: decorationColor,
          key: key,
        );
 
@@ -218,6 +265,9 @@ class OiLabel extends StatelessWidget {
     bool copyable = false,
     bool selectable = false,
     String? semanticsLabel,
+    Color? color,
+    TextDecoration? decoration,
+    Color? decorationColor,
     Key? key,
   }) : this._(
          variant: OiLabelVariant.small,
@@ -228,6 +278,9 @@ class OiLabel extends StatelessWidget {
          copyable: copyable,
          selectable: selectable,
          semanticsLabel: semanticsLabel,
+         color: color,
+         decoration: decoration,
+         decorationColor: decorationColor,
          key: key,
        );
 
@@ -240,6 +293,9 @@ class OiLabel extends StatelessWidget {
     bool copyable = false,
     bool selectable = false,
     String? semanticsLabel,
+    Color? color,
+    TextDecoration? decoration,
+    Color? decorationColor,
     Key? key,
   }) : this._(
          variant: OiLabelVariant.smallStrong,
@@ -250,6 +306,9 @@ class OiLabel extends StatelessWidget {
          copyable: copyable,
          selectable: selectable,
          semanticsLabel: semanticsLabel,
+         color: color,
+         decoration: decoration,
+         decorationColor: decorationColor,
          key: key,
        );
 
@@ -262,6 +321,9 @@ class OiLabel extends StatelessWidget {
     bool copyable = false,
     bool selectable = false,
     String? semanticsLabel,
+    Color? color,
+    TextDecoration? decoration,
+    Color? decorationColor,
     Key? key,
   }) : this._(
          variant: OiLabelVariant.tiny,
@@ -272,6 +334,9 @@ class OiLabel extends StatelessWidget {
          copyable: copyable,
          selectable: selectable,
          semanticsLabel: semanticsLabel,
+         color: color,
+         decoration: decoration,
+         decorationColor: decorationColor,
          key: key,
        );
 
@@ -284,6 +349,9 @@ class OiLabel extends StatelessWidget {
     bool copyable = false,
     bool selectable = false,
     String? semanticsLabel,
+    Color? color,
+    TextDecoration? decoration,
+    Color? decorationColor,
     Key? key,
   }) : this._(
          variant: OiLabelVariant.caption,
@@ -294,6 +362,9 @@ class OiLabel extends StatelessWidget {
          copyable: copyable,
          selectable: selectable,
          semanticsLabel: semanticsLabel,
+         color: color,
+         decoration: decoration,
+         decorationColor: decorationColor,
          key: key,
        );
 
@@ -306,6 +377,9 @@ class OiLabel extends StatelessWidget {
     bool copyable = false,
     bool selectable = false,
     String? semanticsLabel,
+    Color? color,
+    TextDecoration? decoration,
+    Color? decorationColor,
     Key? key,
   }) : this._(
          variant: OiLabelVariant.code,
@@ -316,6 +390,9 @@ class OiLabel extends StatelessWidget {
          copyable: copyable,
          selectable: selectable,
          semanticsLabel: semanticsLabel,
+         color: color,
+         decoration: decoration,
+         decorationColor: decorationColor,
          key: key,
        );
 
@@ -328,6 +405,9 @@ class OiLabel extends StatelessWidget {
     bool copyable = false,
     bool selectable = false,
     String? semanticsLabel,
+    Color? color,
+    TextDecoration? decoration,
+    Color? decorationColor,
     Key? key,
   }) : this._(
          variant: OiLabelVariant.overline,
@@ -338,6 +418,9 @@ class OiLabel extends StatelessWidget {
          copyable: copyable,
          selectable: selectable,
          semanticsLabel: semanticsLabel,
+         color: color,
+         decoration: decoration,
+         decorationColor: decorationColor,
          key: key,
        );
 
@@ -350,6 +433,9 @@ class OiLabel extends StatelessWidget {
     bool copyable = false,
     bool selectable = false,
     String? semanticsLabel,
+    Color? color,
+    TextDecoration? decoration,
+    Color? decorationColor,
     Key? key,
   }) : this._(
          variant: OiLabelVariant.link,
@@ -360,6 +446,9 @@ class OiLabel extends StatelessWidget {
          copyable: copyable,
          selectable: selectable,
          semanticsLabel: semanticsLabel,
+         color: color,
+         decoration: decoration,
+         decorationColor: decorationColor,
          key: key,
        );
 
@@ -391,6 +480,16 @@ class OiLabel extends StatelessWidget {
   /// readers.  When null the value of [text] is used.
   final String? semanticsLabel;
 
+  /// Optional color override. When non-null, takes priority over the
+  /// variant's default text color.
+  final Color? color;
+
+  /// Optional text decoration override (e.g. [TextDecoration.lineThrough]).
+  final TextDecoration? decoration;
+
+  /// Color of the text decoration. Only used when [decoration] is set.
+  final Color? decorationColor;
+
   // ---------------------------------------------------------------------------
   // Responsive scale helpers
   // ---------------------------------------------------------------------------
@@ -418,11 +517,17 @@ class OiLabel extends StatelessWidget {
     final baseStyle = context.textTheme.styleFor(variant);
     final scale = _scaleFactor(context);
 
-    final TextStyle style;
+    var style = baseStyle;
     if (scale != 1 && baseStyle.fontSize != null) {
-      style = baseStyle.copyWith(fontSize: baseStyle.fontSize! * scale);
-    } else {
-      style = baseStyle;
+      style = style.copyWith(fontSize: baseStyle.fontSize! * scale);
+    }
+
+    if (color != null || decoration != null || decorationColor != null) {
+      style = style.copyWith(
+        color: color,
+        decoration: decoration,
+        decorationColor: decorationColor,
+      );
     }
 
     Widget textWidget = Text(

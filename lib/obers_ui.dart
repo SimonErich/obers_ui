@@ -110,6 +110,14 @@ export 'src/components/overlays/oi_toast.dart';
 export 'src/components/panels/oi_panel.dart';
 export 'src/components/panels/oi_resizable.dart';
 export 'src/components/panels/oi_split_pane.dart';
+// ── Components: Shop ────────────────────────────────────────────────────────
+
+export 'src/components/shop/oi_cart_item_row.dart';
+export 'src/components/shop/oi_coupon_input.dart';
+export 'src/components/shop/oi_order_summary_line.dart';
+export 'src/components/shop/oi_price_tag.dart';
+export 'src/components/shop/oi_product_card.dart';
+export 'src/components/shop/oi_quantity_selector.dart';
 // ── Composites: Data ─────────────────────────────────────────────────────────
 
 export 'src/composites/data/oi_detail_view.dart';
@@ -226,8 +234,9 @@ export 'src/foundation/theme/oi_theme_scope.dart';
 // ── Models ───────────────────────────────────────────────────────────────────
 
 export 'src/models/oi_cart_item.dart';
-export 'src/models/oi_field_type.dart';
 export 'src/models/oi_cart_summary.dart';
+export 'src/models/oi_coupon_result.dart';
+export 'src/models/oi_field_type.dart';
 export 'src/models/oi_file_explorer_controller.dart';
 export 'src/models/oi_file_node_data.dart';
 export 'src/models/oi_product_data.dart';
