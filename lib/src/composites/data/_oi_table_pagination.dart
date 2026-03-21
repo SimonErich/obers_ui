@@ -2,6 +2,8 @@ part of 'oi_table.dart';
 
 // ── _PaginationBar ────────────────────────────────────────────────────────────
 
+/// Thin adapter that maps [OiPaginationController] state to [OiPagination]
+/// props, keeping OiTable's public API unchanged.
 class _PaginationBar extends StatelessWidget {
   const _PaginationBar({
     required this.pagination,
@@ -14,160 +16,24 @@ class _PaginationBar extends StatelessWidget {
   final List<int> pageSizeOptions;
   final ValueChanged<int>? onPageSizeChanged;
 
-  /// Computes which page numbers to display, using `null` for ellipsis gaps.
-  ///
-  /// Pages are zero-based. When [totalPages] <= 7 all pages are shown.
-  /// Otherwise first, last, current, and immediate neighbors are shown
-  /// with ellipsis for gaps.
-  static List<int?> computeVisiblePages(int currentPage, int totalPages) {
-    const maxVisible = 7;
-    if (totalPages <= maxVisible) {
-      return List<int>.generate(totalPages, (i) => i);
-    }
-
-    final pages = <int>{0, totalPages - 1};
-    for (var i = currentPage - 1; i <= currentPage + 1; i++) {
-      if (i >= 0 && i < totalPages) pages.add(i);
-    }
-
-    final sorted = pages.toList()..sort();
-    final result = <int?>[];
-
-    for (var i = 0; i < sorted.length; i++) {
-      if (i > 0 && sorted[i] - sorted[i - 1] > 1) {
-        result.add(null); // ellipsis
-      }
-      result.add(sorted[i]);
-    }
-
-    return result;
-  }
-
   @override
   Widget build(BuildContext context) {
-    final colors = context.colors;
     return ListenableBuilder(
       listenable: pagination,
       builder: (_, __) {
-        final total = pagination.totalItems;
-        final start = total == 0 ? 0 : pagination.startIndex + 1;
-        final end = pagination.endIndex;
-        final visiblePages = computeVisiblePages(
-          pagination.currentPage,
-          pagination.totalPages,
-        );
-
-        return Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-          child: Row(
-            children: [
-              // Left: row range text
-              Flexible(
-                child: Text(
-                  key: const Key('pagination_showing'),
-                  'Showing $start\u2013$end of $total rows',
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-              const SizedBox(width: 12),
-              // Middle: page size selector
-              const Text('Rows per page: '),
-              _PageSizeSelector(
-                currentSize: pagination.pageSize,
-                options: pageSizeOptions,
-                onChanged: (size) {
-                  pagination.setPageSize(size);
-                  onPageSizeChanged?.call(size);
-                },
-              ),
-              const SizedBox(width: 16),
-              // Right: navigation controls
-              _navButton(
-                key: const Key('pagination_first'),
-                label: '«',
-                enabled: pagination.hasPreviousPage,
-                onTap: pagination.firstPage,
-                colors: colors,
-              ),
-              _navButton(
-                key: const Key('pagination_prev'),
-                label: '‹',
-                enabled: pagination.hasPreviousPage,
-                onTap: pagination.previousPage,
-                colors: colors,
-              ),
-              for (var i = 0; i < visiblePages.length; i++)
-                if (visiblePages[i] == null)
-                  Padding(
-                    key: Key('pagination_ellipsis_$i'),
-                    padding: const EdgeInsets.symmetric(horizontal: 2),
-                    child: const Text('\u2026'),
-                  )
-                else
-                  _pageButton(visiblePages[i]!, colors),
-              _navButton(
-                key: const Key('pagination_next'),
-                label: '›',
-                enabled: pagination.hasNextPage,
-                onTap: pagination.nextPage,
-                colors: colors,
-              ),
-              _navButton(
-                key: const Key('pagination_last'),
-                label: '»',
-                enabled: pagination.hasNextPage,
-                onTap: pagination.lastPage,
-                colors: colors,
-              ),
-            ],
-          ),
+        return OiPagination(
+          totalItems: pagination.totalItems,
+          currentPage: pagination.currentPage,
+          label: 'rows',
+          perPage: pagination.pageSize,
+          perPageOptions: pageSizeOptions,
+          onPageChange: (page) => pagination.goToPage(page),
+          onPerPageChange: (size) {
+            pagination.setPageSize(size);
+            onPageSizeChanged?.call(size);
+          },
         );
       },
-    );
-  }
-
-  Widget _navButton({
-    required Key key,
-    required String label,
-    required bool enabled,
-    required VoidCallback onTap,
-    required OiColorScheme colors,
-  }) {
-    return GestureDetector(
-      key: key,
-      onTap: enabled ? onTap : null,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 4),
-        child: Text(
-          label,
-          style: TextStyle(color: enabled ? colors.text : colors.textMuted),
-        ),
-      ),
-    );
-  }
-
-  Widget _pageButton(int page, OiColorScheme colors) {
-    final isCurrent = page == pagination.currentPage;
-    return GestureDetector(
-      key: Key('pagination_page_$page'),
-      onTap: isCurrent ? null : () => pagination.goToPage(page),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-        margin: const EdgeInsets.symmetric(horizontal: 1),
-        decoration: isCurrent
-            ? BoxDecoration(
-                color: colors.primary.base,
-                borderRadius: BorderRadius.circular(4),
-              )
-            : null,
-        child: Text(
-          '${page + 1}',
-          style: TextStyle(
-            color: isCurrent ? colors.primary.foreground : colors.text,
-            fontWeight: isCurrent ? FontWeight.bold : null,
-          ),
-        ),
-      ),
     );
   }
 }

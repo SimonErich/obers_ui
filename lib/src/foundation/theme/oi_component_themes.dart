@@ -16,6 +16,7 @@ import 'package:obers_ui/src/foundation/theme/component_themes/oi_table_theme_da
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_tabs_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_text_input_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_toast_theme_data.dart';
+import 'package:obers_ui/src/foundation/theme/component_themes/oi_pagination_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_tooltip_theme_data.dart';
 
 export 'component_themes/oi_avatar_theme_data.dart';
@@ -35,6 +36,7 @@ export 'component_themes/oi_table_theme_data.dart';
 export 'component_themes/oi_tabs_theme_data.dart';
 export 'component_themes/oi_text_input_theme_data.dart';
 export 'component_themes/oi_toast_theme_data.dart';
+export 'component_themes/oi_pagination_theme_data.dart';
 export 'component_themes/oi_tooltip_theme_data.dart';
 
 /// Aggregates per-component theme overrides for the design system.
@@ -66,6 +68,7 @@ class OiComponentThemes {
     this.sidebar,
     this.fileExplorer,
     this.fieldDisplay,
+    this.pagination,
   });
 
   /// Creates an [OiComponentThemes] with all fields set to `null`.
@@ -89,7 +92,8 @@ class OiComponentThemes {
       progress = null,
       sidebar = null,
       fileExplorer = null,
-      fieldDisplay = null;
+      fieldDisplay = null,
+      pagination = null;
 
   /// Theme overrides for button components.
   final OiButtonThemeData? button;
@@ -145,6 +149,9 @@ class OiComponentThemes {
   /// Theme overrides for field display components.
   final OiFieldDisplayThemeData? fieldDisplay;
 
+  /// Theme overrides for pagination components.
+  final OiPaginationThemeData? pagination;
+
   /// Creates a copy with optionally overridden component theme fields.
   OiComponentThemes copyWith({
     OiButtonThemeData? button,
@@ -165,6 +172,7 @@ class OiComponentThemes {
     OiSidebarThemeData? sidebar,
     OiFileExplorerThemeData? fileExplorer,
     OiFieldDisplayThemeData? fieldDisplay,
+    OiPaginationThemeData? pagination,
   }) {
     return OiComponentThemes(
       button: button ?? this.button,
@@ -185,6 +193,7 @@ class OiComponentThemes {
       sidebar: sidebar ?? this.sidebar,
       fileExplorer: fileExplorer ?? this.fileExplorer,
       fieldDisplay: fieldDisplay ?? this.fieldDisplay,
+      pagination: pagination ?? this.pagination,
     );
   }
 
@@ -209,7 +218,8 @@ class OiComponentThemes {
         other.progress == progress &&
         other.sidebar == sidebar &&
         other.fileExplorer == fileExplorer &&
-        other.fieldDisplay == fieldDisplay;
+        other.fieldDisplay == fieldDisplay &&
+        other.pagination == pagination;
   }
 
   @override
@@ -229,7 +239,7 @@ class OiComponentThemes {
     sheet,
     avatar,
     progress,
-    Object.hash(sidebar, fileExplorer, fieldDisplay),
+    Object.hash(sidebar, fileExplorer, fieldDisplay, pagination),
   );
 }
 

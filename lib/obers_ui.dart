@@ -30,6 +30,7 @@ export 'src/components/display/oi_diff_view.dart';
 export 'src/components/display/oi_drop_highlight.dart';
 export 'src/components/display/oi_empty_state.dart';
 export 'src/components/display/oi_field_display.dart';
+export 'src/components/display/oi_pagination.dart';
 export 'src/components/display/oi_file_grid_card.dart';
 export 'src/components/display/oi_file_icon.dart';
 export 'src/components/display/oi_file_preview.dart';
