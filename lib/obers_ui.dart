@@ -10,7 +10,9 @@ library;
 
 export 'src/components/buttons/oi_button.dart';
 export 'src/components/buttons/oi_button_group.dart';
+export 'src/components/buttons/oi_export_button.dart';
 export 'src/components/buttons/oi_icon_button.dart';
+export 'src/components/buttons/oi_sort_button.dart';
 export 'src/components/buttons/oi_toggle_button.dart';
 // ── Components: Dialogs ─────────────────────────────────────────────────
 
@@ -52,6 +54,7 @@ export 'src/components/display/oi_storage_indicator.dart';
 export 'src/components/display/oi_tooltip.dart';
 // ── Components: Feedback ─────────────────────────────────────────────────────
 
+export 'src/components/feedback/oi_bulk_bar.dart';
 export 'src/components/feedback/oi_reaction_bar.dart';
 export 'src/components/feedback/oi_scale_rating.dart';
 export 'src/components/feedback/oi_sentiment.dart';
@@ -66,9 +69,11 @@ export 'src/components/inline_edit/oi_editable_select.dart';
 export 'src/components/inline_edit/oi_editable_text.dart';
 // ── Components: Inputs ───────────────────────────────────────────────────────
 
+export 'src/components/inputs/oi_array_input.dart';
 export 'src/components/inputs/oi_checkbox.dart';
 export 'src/components/inputs/oi_color_input.dart';
 export 'src/components/inputs/oi_date_input.dart';
+export 'src/components/inputs/oi_date_time_input.dart';
 export 'src/components/inputs/oi_file_input.dart';
 export 'src/components/inputs/oi_number_input.dart';
 export 'src/components/inputs/oi_radio.dart';
@@ -227,7 +232,8 @@ export 'src/models/oi_product_data.dart';
 export 'src/models/settings/oi_accordion_settings.dart';
 export 'src/models/settings/oi_calendar_settings.dart';
 export 'src/models/settings/oi_dashboard_settings.dart';
-export 'src/models/settings/oi_file_explorer_settings.dart';
+export 'src/models/settings/oi_file_explorer_settings.dart'
+    hide OiSortDirection;
 export 'src/models/settings/oi_filter_bar_settings.dart';
 export 'src/models/settings/oi_gantt_settings.dart';
 export 'src/models/settings/oi_kanban_settings.dart';
@@ -245,7 +251,7 @@ export 'src/modules/oi_dashboard.dart';
 export 'src/modules/oi_file_explorer.dart';
 export 'src/modules/oi_file_manager.dart';
 export 'src/modules/oi_kanban.dart';
-export 'src/modules/oi_list_view.dart' hide OiSelectionMode;
+export 'src/modules/oi_list_view.dart' hide OiSelectionMode, OiSortOption;
 export 'src/modules/oi_metadata_editor.dart';
 export 'src/modules/oi_notification_center.dart';
 export 'src/modules/oi_permissions.dart';

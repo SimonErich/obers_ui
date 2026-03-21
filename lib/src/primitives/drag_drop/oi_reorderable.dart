@@ -18,6 +18,7 @@ class OiReorderable extends StatelessWidget {
     required this.onReorder,
     this.scrollDirection = Axis.vertical,
     this.itemsAreFixed = false,
+    this.shrinkWrap = false,
     this.padding,
     super.key,
   });
@@ -37,6 +38,12 @@ class OiReorderable extends StatelessWidget {
   ///
   /// Setting this to `true` improves rendering performance.
   final bool itemsAreFixed;
+
+  /// Whether the list should wrap its content tightly.
+  ///
+  /// When `true`, the [CustomScrollView] uses `shrinkWrap: true` so the list
+  /// can be placed inside unbounded-height containers such as [Column].
+  final bool shrinkWrap;
 
   /// Optional padding around the list.
   final EdgeInsetsGeometry? padding;
@@ -63,7 +70,6 @@ class OiReorderable extends StatelessWidget {
 
     final sliver = SliverReorderableList(
       itemCount: children.length,
-      itemExtent: itemsAreFixed ? null : null,
       onReorder: onReorder,
       itemBuilder: (context, index) => wrapItem(index, children[index]),
     );
@@ -74,6 +80,8 @@ class OiReorderable extends StatelessWidget {
 
     return CustomScrollView(
       scrollDirection: scrollDirection,
+      shrinkWrap: shrinkWrap,
+      physics: shrinkWrap ? const NeverScrollableScrollPhysics() : null,
       slivers: [sliverPadding],
     );
   }
