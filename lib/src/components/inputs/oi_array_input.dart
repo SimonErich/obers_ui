@@ -259,7 +259,11 @@ class _OiArrayInputState<T> extends State<OiArrayInput<T>> {
       );
     }
 
-    return OiReorderable(onReorder: _handleReorder, children: rowWidgets);
+    return OiReorderable(
+      onReorder: _handleReorder,
+      shrinkWrap: true,
+      children: rowWidgets,
+    );
   }
 
   @override
@@ -268,51 +272,51 @@ class _OiArrayInputState<T> extends State<OiArrayInput<T>> {
     final hasError = widget.error != null && widget.error!.isNotEmpty;
     final showAdd = widget.addable && _canAdd && widget.onChanged != null;
 
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        if (widget.label != null) ...[
-          OiLabel.small(widget.label!),
-          const SizedBox(height: 4),
-        ],
-        if (widget.items.isNotEmpty)
-          widget.reorderable ? _buildReorderableList() : _buildAnimatedList(),
-        if (showAdd)
-          Padding(
-            padding: const EdgeInsets.only(top: 8),
-            child: OiButton.ghost(
-              label: widget.addLabel,
-              icon: OiIcons.add,
-              size: OiButtonSize.small,
-              onTap: _handleAdd,
-              semanticLabel: widget.addLabel,
-            ),
-          ),
-        if (hasError) ...[
-          const SizedBox(height: 4),
-          Row(
-            children: [
-              Icon(
-                const IconData(0xe000, fontFamily: 'MaterialIcons'),
-                size: 14,
-                color: colors.error.base,
+    return Semantics(
+      label: widget.label,
+      container: true,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (widget.label != null) ...[
+            OiLabel.small(widget.label!),
+            const SizedBox(height: 4),
+          ],
+          if (widget.items.isNotEmpty)
+            widget.reorderable ? _buildReorderableList() : _buildAnimatedList(),
+          if (showAdd)
+            Padding(
+              padding: const EdgeInsets.only(top: 8),
+              child: OiButton.ghost(
+                label: widget.addLabel,
+                icon: OiIcons.add,
+                size: OiButtonSize.small,
+                onTap: _handleAdd,
+                semanticLabel: widget.addLabel,
               ),
-              const SizedBox(width: 4),
-              Flexible(
-                child: Text(
-                  widget.error!,
-                  style: TextStyle(
-                    fontSize: 12,
+            ),
+          if (hasError) ...[
+            const SizedBox(height: 4),
+            Row(
+              children: [
+                Icon(
+                  const IconData(0xe000, fontFamily: 'MaterialIcons'),
+                  size: 14,
+                  color: colors.error.base,
+                ),
+                const SizedBox(width: 4),
+                Flexible(
+                  child: OiLabel.small(
+                    widget.error!,
                     color: colors.error.base,
-                    height: 1.3,
                   ),
                 ),
-              ),
-            ],
-          ),
+              ],
+            ),
+          ],
         ],
-      ],
+      ),
     );
   }
 }

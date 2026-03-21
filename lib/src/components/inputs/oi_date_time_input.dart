@@ -115,82 +115,78 @@ class _OiDateTimeInputState extends State<OiDateTimeInput> {
     final hasError = widget.error != null && widget.error!.isNotEmpty;
     final effectiveEnabled = widget.enabled && !widget.readOnly;
 
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        if (widget.label != null) ...[
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              OiLabel.small(widget.label!),
-              if (widget.required)
-                Padding(
-                  padding: const EdgeInsets.only(left: 2),
-                  child: Text(
-                    '*',
-                    style: TextStyle(fontSize: 12, color: colors.error.base),
+    return Semantics(
+      label: widget.label,
+      container: true,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (widget.label != null) ...[
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                OiLabel.small(widget.label!),
+                if (widget.required)
+                  Padding(
+                    padding: const EdgeInsets.only(left: 2),
+                    child: OiLabel.small(
+                      '*',
+                      color: colors.error.base,
+                    ),
                   ),
+              ],
+            ),
+            const SizedBox(height: 4),
+          ],
+          Row(
+            children: [
+              Expanded(
+                child: OiDateInput(
+                  value: _extractDate(widget.value),
+                  onChanged: _handleDateChanged,
+                  firstDate: widget.min,
+                  lastDate: widget.max,
+                  enabled: effectiveEnabled,
                 ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: OiTimeInput(
+                  value: _extractTime(widget.value),
+                  onChanged: _handleTimeChanged,
+                  enabled: effectiveEnabled,
+                ),
+              ),
             ],
           ),
-          const SizedBox(height: 4),
-        ],
-        Row(
-          children: [
-            Expanded(
-              child: OiDateInput(
-                value: _extractDate(widget.value),
-                onChanged: _handleDateChanged,
-                firstDate: widget.min,
-                lastDate: widget.max,
-                enabled: effectiveEnabled,
-              ),
+          if (hasError) ...[
+            const SizedBox(height: 4),
+            Row(
+              children: [
+                Icon(
+                  const IconData(0xe000, fontFamily: 'MaterialIcons'),
+                  size: 14,
+                  color: colors.error.base,
+                ),
+                const SizedBox(width: 4),
+                Flexible(
+                  child: OiLabel.small(
+                    widget.error!,
+                    color: colors.error.base,
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(width: 8),
-            Expanded(
-              child: OiTimeInput(
-                value: _extractTime(widget.value),
-                onChanged: _handleTimeChanged,
-                enabled: effectiveEnabled,
-              ),
+          ] else if (widget.hint != null) ...[
+            const SizedBox(height: 4),
+            OiLabel.small(
+              widget.hint!,
+              color: colors.textMuted,
             ),
           ],
-        ),
-        if (hasError) ...[
-          const SizedBox(height: 4),
-          Row(
-            children: [
-              Icon(
-                const IconData(0xe000, fontFamily: 'MaterialIcons'),
-                size: 14,
-                color: colors.error.base,
-              ),
-              const SizedBox(width: 4),
-              Flexible(
-                child: Text(
-                  widget.error!,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: colors.error.base,
-                    height: 1.3,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ] else if (widget.hint != null) ...[
-          const SizedBox(height: 4),
-          Text(
-            widget.hint!,
-            style: TextStyle(
-              fontSize: 12,
-              color: colors.textMuted,
-              height: 1.3,
-            ),
-          ),
         ],
-      ],
+      ),
     );
   }
 }

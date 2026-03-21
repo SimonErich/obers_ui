@@ -187,8 +187,28 @@ void main() {
 
     expect(find.text('Item: a'), findsOneWidget);
     expect(find.text('Item: b'), findsOneWidget);
-    // Drag handle icons should be present
-    expect(find.text('Drag to reorder'), findsNWidgets(2));
+    // Drag handle icons should be present (OiIcon renders label via Semantics)
+    expect(find.bySemanticsLabel('Drag to reorder'), findsNWidgets(2));
+  });
+
+  testWidgets('wraps content in Semantics with label for a11y', (tester) async {
+    await tester.pumpObers(
+      buildArrayInput(items: ['a'], label: 'Tags', onChanged: (_) {}),
+    );
+
+    final semanticsFinder = find.byWidgetPredicate(
+      (w) =>
+          w is Semantics &&
+          w.container == true &&
+          w.properties.label == 'Tags',
+    );
+    expect(semanticsFinder, findsOneWidget);
+
+    // Verify the Semantics widget is an ancestor of the array input content
+    expect(
+      find.descendant(of: semanticsFinder, matching: find.text('Item: a')),
+      findsOneWidget,
+    );
   });
 
   testWidgets('drag handles not shown when reorderable=false', (tester) async {
@@ -196,6 +216,6 @@ void main() {
       buildArrayInput(items: ['a', 'b'], reorderable: false, onChanged: (_) {}),
     );
 
-    expect(find.text('Drag to reorder'), findsNothing);
+    expect(find.bySemanticsLabel('Drag to reorder'), findsNothing);
   });
 }

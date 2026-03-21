@@ -216,6 +216,40 @@ void main() {
     expect(dateInput.lastDate, maxDate);
   });
 
+  testWidgets(
+    'wraps date and time inputs in a single Semantics group with label',
+    (tester) async {
+      await tester.pumpObers(const OiDateTimeInput(label: 'Event date'));
+
+      // Find the Semantics container wrapping the OiDateTimeInput
+      final semantics = find.byWidgetPredicate(
+        (w) => w is Semantics && w.container == true,
+      );
+      expect(semantics, findsWidgets);
+
+      // Check that the semantics node carries the label
+      final dateTimeInputFinder = find.byType(OiDateTimeInput);
+      final semanticsData = tester.getSemantics(dateTimeInputFinder);
+      expect(semanticsData.label, contains('Event date'));
+
+      // The Semantics widget should be an ancestor of both sub-inputs
+      final containerSemantics = find.ancestor(
+        of: find.byType(OiDateInput),
+        matching: find.byWidgetPredicate(
+          (w) => w is Semantics && w.container == true,
+        ),
+      );
+      expect(containerSemantics, findsWidgets);
+      expect(
+        find.descendant(
+          of: containerSemantics.first,
+          matching: find.byType(OiTimeInput),
+        ),
+        findsOneWidget,
+      );
+    },
+  );
+
   testWidgets('displays formatted date and time when value provided', (
     tester,
   ) async {
