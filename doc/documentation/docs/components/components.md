@@ -95,8 +95,10 @@ OiExportButton(
 | `OiNumberInput` | Number input with increment/decrement |
 | `OiDateInput` | Date picker input |
 | `OiTimeInput` | Time picker input |
+| `OiDateTimeInput` | Combined date + time input |
 | `OiColorInput` | Color picker input |
 | `OiTagInput` | Multi-value tag input |
+| `OiArrayInput` | Repeatable form field group with add/remove/reorder |
 | `OiFileInput` | File selection input |
 
 ### OiTextInput
@@ -191,6 +193,8 @@ OiBadge(count: 5, child: OiIconButton(icon: Icons.notifications, onPressed: () {
 | `OiDatePicker` | Calendar date picker |
 | `OiTimePicker` | Time selector |
 | `OiEmojiPicker` | Emoji selector |
+| `OiThemeToggle` | Light/dark/system theme mode toggle |
+| `OiUserMenu` | Avatar-triggered dropdown with user info and actions |
 
 ### OiTabs
 
@@ -200,6 +204,39 @@ OiTabs(
     OiTab(label: 'Overview', child: OverviewPanel()),
     OiTab(label: 'Details', child: DetailsPanel()),
     OiTab(label: 'History', child: HistoryPanel()),
+  ],
+)
+```
+
+### OiThemeToggle
+
+```dart
+// Three-way toggle (light / dark / system) via popover
+OiThemeToggle(
+  currentMode: OiThemeMode.light,
+  onModeChange: (mode) => setState(() => _mode = mode),
+)
+
+// Two-way toggle (light ↔ dark) — cycles on tap
+OiThemeToggle(
+  currentMode: _mode,
+  onModeChange: (mode) => setState(() => _mode = mode),
+  showSystemOption: false,
+)
+```
+
+### OiUserMenu
+
+```dart
+OiUserMenu(
+  label: 'Account menu',
+  userName: 'Jane Smith',
+  userEmail: 'jane@example.com',
+  avatarInitials: 'JS',
+  items: [
+    OiMenuItem(label: 'Profile', icon: OiIcons.person, onTap: () {}),
+    OiMenuItem(label: 'Settings', icon: OiIcons.settings, onTap: () {}),
+    OiMenuItem(label: 'Logout', icon: OiIcons.logout, onTap: () {}),
   ],
 )
 ```

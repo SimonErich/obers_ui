@@ -1649,6 +1649,54 @@ Time picker input with hour/minute/second selection.
 
 ---
 
+#### OiDateTimeInput
+**Tags:** `input`, `date`, `time`, `datetime`, `combined`, `picker`
+**Tier:** Component
+
+Combined date + time input that renders `OiDateInput` and `OiTimeInput` side by side within a single form field sharing one label and one error message. Changing the date portion updates the date part of the `DateTime` value; changing the time portion updates the time part. When `value` is `null` and one half is set, the other half defaults to today / 00:00.
+
+**Key Parameters:**
+- `value` (DateTime?) — Currently selected date and time
+- `onChanged` (ValueChanged<DateTime?>?) — Called when date or time changes
+- `label` (String?) — Label above the input pair
+- `hint` (String?) — Hint below inputs when no error
+- `error` (String?) — Validation error message
+- `min` (DateTime?) — Earliest selectable date-time
+- `max` (DateTime?) — Latest selectable date-time
+- `required` (bool, default: false) — Renders asterisk next to label
+- `readOnly` (bool, default: false) — Read-only state
+- `enabled` (bool, default: true) — Whether field accepts interaction
+
+**Use When:** Collecting a full date + time value in one field.
+**Avoid When:** Date-only — use `OiDateInput`. Time-only — use `OiTimeInput`.
+
+---
+
+#### OiArrayInput
+**Tags:** `input`, `array`, `repeatable`, `list`, `dynamic`, `reorder`, `form-group`
+**Tier:** Component
+
+A repeatable form field group where each row contains a set of form inputs with add, remove, and reorder controls. Rows are built via `itemBuilder` and new blank rows via `createEmpty`. Supports drag-to-reorder via `OiReorderable` and animated insert/remove via `OiAnimatedList`.
+
+**Key Parameters:**
+- `items` (List<T>, required) — Current list of items
+- `itemBuilder` (Widget Function(BuildContext, int, T, ValueChanged<T>), required) — Builds each row
+- `createEmpty` (T Function(), required) — Factory for new blank items
+- `onChanged` (ValueChanged<List<T>>?) — Called after add/remove/reorder/edit
+- `label` (String?) — Label above the list
+- `error` (String?) — Validation error below the list
+- `reorderable` (bool, default: true) — Enable drag-to-reorder
+- `addable` (bool, default: true) — Show Add button
+- `removable` (bool, default: true) — Show Remove buttons
+- `minItems` (int?) — Minimum items; hides Remove at this count
+- `maxItems` (int?) — Maximum items; hides Add at this count
+- `addLabel` (String, default: 'Add') — Label for Add button
+
+**Use When:** Dynamic-length form sections (line items, tags, addresses, schedule entries).
+**Avoid When:** Static field lists — use regular form layout instead.
+
+---
+
 #### OiSelect
 **Tags:** `input`, `select`, `dropdown`, `picker`, `option`, `choice`
 **Tier:** Component
@@ -1928,6 +1976,47 @@ Side drawer (left/right).
 **Tier:** Component
 
 Emoji selector with search and category tabs.
+
+---
+
+#### OiThemeToggle
+**Tags:** `theme-toggle`, `dark-mode`, `light-mode`, `system-mode`, `appearance`
+**Tier:** Component
+
+Toggle button that switches between light, dark, and system theme modes. Shows sun (light), moon (dark), or monitor (system) icons. Three-way popover when `showSystemOption` is true; two-way cycle when false.
+
+**Key Parameters:**
+- `currentMode` (OiThemeMode, required) — The active theme mode
+- `onModeChange` (ValueChanged<OiThemeMode>?, required) — Called when user selects a mode
+- `label` (String, default: 'Toggle theme') — Accessibility label
+- `showSystemOption` (bool, default: true) — When true, opens popover with three options; when false, cycles light↔dark
+
+**Composes:** OiIconButton, OiIcon, OiPopover, OiTooltip, OiListTile
+
+**Use When:** App header or settings page for theme switching.
+**Avoid When:** You need a full theme editor — build a custom settings panel instead.
+
+---
+
+#### OiUserMenu
+**Tags:** `user-menu`, `avatar-menu`, `account`, `profile`, `dropdown`
+**Tier:** Component
+
+Avatar-triggered dropdown menu showing user info and account actions. Tapping the avatar opens a popover with a header (user name and email) followed by grouped menu items separated by OiDivider.
+
+**Key Parameters:**
+- `label` (String, required) — Accessibility label
+- `userName` (String, required) — Display name in header
+- `userEmail` (String?) — Email below name
+- `avatarUrl` (String?) — URL for avatar image
+- `avatarInitials` (String?) — Fallback initials when no image
+- `items` (List<OiMenuItem>, required) — Menu items (reuses OiMenuItem from OiContextMenu)
+- `header` (Widget?) — Custom widget replacing default header
+
+**Composes:** OiAvatar, OiTappable, OiPopover, OiLabel, OiDivider, OiListTile, OiIcon
+
+**Use When:** App header user account dropdown with profile, settings, logout.
+**Avoid When:** Simple icon menus — use OiContextMenu or OiPopover directly.
 
 ---
 
@@ -3377,6 +3466,7 @@ Searchable keyword → widget mapping for quick lookup.
 | `tag` | OiTagInput, OiBadge |
 | `text` | OiLabel, OiTextInput |
 | `theme` | OiThemeData, OiColorScheme, OiDynamicTheme, OiThemePreview |
+| `theme-toggle` | OiThemeToggle |
 | `thumbs` | OiThumbs |
 | `time` | OiTimeInput, OiTimePicker, OiRelativeTime |
 | `timeline` | OiTimeline, OiGantt |
@@ -3390,7 +3480,8 @@ Searchable keyword → widget mapping for quick lookup.
 | `typography` | OiLabel, OiTextTheme |
 | `upload` | OiUploadDialog, OiFileInput, OiFileExplorer |
 | `url` | OiFieldDisplay(url) |
-| `user` | OiAvatar, OiAvatarStack |
+| `user` | OiAvatar, OiAvatarStack, OiUserMenu |
+| `user-menu` | OiUserMenu |
 | `validation` | OiForm, OiFormField |
 | `video` | OiVideoPlayer |
 | `virtual-scroll` | OiVirtualList, OiVirtualGrid |
@@ -3407,10 +3498,6 @@ Searchable keyword → widget mapping for quick lookup.
 
 ### Planned Components
 
-- **OiArrayInput** — Repeatable form field group (add/remove/reorder rows)
-- **OiThemeToggle** — Light/dark/system mode toggle button
-- **OiUserMenu** — Avatar dropdown with user info, settings, logout
-- **OiLocaleSwitcher** — Locale dropdown with flag and language name
 - **OiBulkBar** — Floating toolbar on row selection with bulk actions
 - **OiSortButton** — Dropdown sort control for non-table lists
 - **OiExportButton** — Export data button (single or multi-format)

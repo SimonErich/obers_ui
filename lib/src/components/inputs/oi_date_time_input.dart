@@ -130,10 +130,7 @@ class _OiDateTimeInputState extends State<OiDateTimeInput> {
                 if (widget.required)
                   Padding(
                     padding: const EdgeInsets.only(left: 2),
-                    child: OiLabel.small(
-                      '*',
-                      color: colors.error.base,
-                    ),
+                    child: OiLabel.small('*', color: colors.error.base),
                   ),
               ],
             ),
@@ -171,19 +168,13 @@ class _OiDateTimeInputState extends State<OiDateTimeInput> {
                 ),
                 const SizedBox(width: 4),
                 Flexible(
-                  child: OiLabel.small(
-                    widget.error!,
-                    color: colors.error.base,
-                  ),
+                  child: OiLabel.small(widget.error!, color: colors.error.base),
                 ),
               ],
             ),
           ] else if (widget.hint != null) ...[
             const SizedBox(height: 4),
-            OiLabel.small(
-              widget.hint!,
-              color: colors.textMuted,
-            ),
+            OiLabel.small(widget.hint!, color: colors.textMuted),
           ],
         ],
       ),

@@ -198,9 +198,7 @@ void main() {
 
     final semanticsFinder = find.byWidgetPredicate(
       (w) =>
-          w is Semantics &&
-          w.container == true &&
-          w.properties.label == 'Tags',
+          w is Semantics && w.container == true && w.properties.label == 'Tags',
     );
     expect(semanticsFinder, findsOneWidget);
 

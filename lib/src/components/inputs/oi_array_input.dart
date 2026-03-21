@@ -307,10 +307,7 @@ class _OiArrayInputState<T> extends State<OiArrayInput<T>> {
                 ),
                 const SizedBox(width: 4),
                 Flexible(
-                  child: OiLabel.small(
-                    widget.error!,
-                    color: colors.error.base,
-                  ),
+                  child: OiLabel.small(widget.error!, color: colors.error.base),
                 ),
               ],
             ),
