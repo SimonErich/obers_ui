@@ -14,7 +14,7 @@ import 'package:obers_ui/src/primitives/layout/oi_column.dart';
 ///
 /// {@category Composites}
 ///
-/// Coverage: REQ-0017
+/// Coverage: REQ-0015
 @immutable
 class OiDetailField {
   /// Creates an [OiDetailField].
@@ -90,7 +90,7 @@ class OiDetailField {
 ///
 /// {@category Composites}
 ///
-/// Coverage: REQ-0017
+/// Coverage: REQ-0015
 @immutable
 class OiDetailSection {
   /// Creates an [OiDetailSection].
@@ -112,7 +112,7 @@ class OiDetailSection {
 ///
 /// {@category Composites}
 ///
-/// Coverage: REQ-0017
+/// Coverage: REQ-0015
 class OiDetailView extends StatelessWidget {
   /// Creates an [OiDetailView].
   const OiDetailView({

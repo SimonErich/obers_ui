@@ -149,6 +149,7 @@ export 'src/composites/navigation/oi_file_toolbar.dart';
 export 'src/composites/navigation/oi_filter_bar.dart';
 export 'src/composites/navigation/oi_nav_menu.dart';
 export 'src/composites/navigation/oi_shortcuts.dart';
+export 'src/composites/navigation/oi_error_page.dart';
 export 'src/composites/navigation/oi_sidebar.dart';
 // ── Composites: Onboarding ───────────────────────────────────────────────────
 
@@ -241,6 +242,7 @@ export 'src/models/settings/oi_filter_bar_settings.dart';
 export 'src/models/settings/oi_gantt_settings.dart';
 export 'src/models/settings/oi_kanban_settings.dart';
 export 'src/models/settings/oi_list_view_settings.dart' hide OiListViewLayout;
+export 'src/models/settings/oi_app_shell_settings.dart';
 export 'src/models/settings/oi_sidebar_settings.dart' hide OiSidebarMode;
 export 'src/models/settings/oi_split_pane_settings.dart';
 export 'src/models/settings/oi_table_settings.dart';
@@ -257,6 +259,7 @@ export 'src/modules/oi_kanban.dart';
 export 'src/modules/oi_list_view.dart' hide OiSelectionMode, OiSortOption;
 export 'src/modules/oi_metadata_editor.dart';
 export 'src/modules/oi_notification_center.dart';
+export 'src/modules/oi_app_shell.dart';
 export 'src/modules/oi_permissions.dart';
 // ── Primitives: Animation ────────────────────────────────────────────────────
 
