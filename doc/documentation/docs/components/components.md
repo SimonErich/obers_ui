@@ -10,6 +10,8 @@ Components are the standard UI widgets you'll use every day. They're built from 
 | `OiIconButton` | Icon-only button |
 | `OiToggleButton` | Toggle/switch button |
 | `OiButtonGroup` | Multi-button toolbar |
+| `OiSortButton` | Dropdown button for sorting non-table lists (card grids, feeds) |
+| `OiExportButton` | Export data in various formats (CSV, XLSX, JSON, PDF) |
 
 ### OiButton
 
@@ -43,6 +45,42 @@ OiButton(label: 'Continue', fullWidth: true, onPressed: () {})
 - `OiButton.split()` — Button with dropdown arrow
 - `OiButton.countdown()` — Countdown before enabling
 - `OiButton.confirm()` — Double-click to confirm
+
+### OiSortButton
+
+A dropdown button for sorting non-table lists such as card grids and activity feeds. Shows the current sort field and direction, with a popover for field selection and direction toggle.
+
+```dart
+OiSortButton(
+  label: 'Sort by',
+  options: [
+    OiSortOption(field: 'name', label: 'Name'),
+    OiSortOption(field: 'date', label: 'Date'),
+    OiSortOption(field: 'size', label: 'Size'),
+  ],
+  currentSort: OiSortOption(field: 'name', label: 'Name'),
+  onSortChange: (option) => setState(() => _sort = option),
+)
+```
+
+### OiExportButton
+
+A button that exports data in various formats. Renders as a plain outline button for a single format, or a split button with a dropdown for multiple formats.
+
+```dart
+// Single format — direct action
+OiExportButton(
+  label: 'Export',
+  onExport: (format) async => downloadFile(format),
+)
+
+// Multiple formats — split button with dropdown
+OiExportButton(
+  label: 'Export',
+  onExport: (format) async => downloadFile(format),
+  formats: [OiExportFormat.csv, OiExportFormat.xlsx, OiExportFormat.json],
+)
+```
 
 ## Inputs
 

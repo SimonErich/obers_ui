@@ -146,7 +146,13 @@ void main() {
       ),
     );
 
-    expect(find.bySemanticsLabel('Sort by'), findsWidgets);
+    // Verify Semantics widgets with the correct label exist in the tree.
+    // find.bySemanticsLabel checks merged semantics nodes which may combine
+    // the button label with child text, so we check the widget tree directly.
+    final semanticsFinder = find.byWidgetPredicate(
+      (widget) => widget is Semantics && widget.properties.label == 'Sort by',
+    );
+    expect(semanticsFinder, findsWidgets);
     handle.dispose();
   });
 
