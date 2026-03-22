@@ -1,87 +1,390 @@
 // Tests do not require documentation comments.
 // ignore_for_file: public_member_api_docs
 
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui/src/components/shop/oi_payment_method_picker.dart';
+import 'package:obers_ui/src/components/shop/oi_payment_option.dart';
 import 'package:obers_ui/src/models/oi_payment_method.dart';
+import 'package:obers_ui/src/primitives/display/oi_divider.dart';
 
 import '../../../helpers/pump_app.dart';
 
-const _visa = OiPaymentMethod(key: 'visa', label: 'Visa');
-const _paypal = OiPaymentMethod(key: 'paypal', label: 'PayPal');
+// ── Test data ────────────────────────────────────────────────────────────────
+
+const _visa = OiPaymentMethod(
+  key: 'visa',
+  label: 'Visa',
+  description: 'Ending in 4242',
+  lastFour: '4242',
+);
+
+const _mastercard = OiPaymentMethod(
+  key: 'mastercard',
+  label: 'Mastercard',
+  description: 'Ending in 5555',
+  lastFour: '5555',
+  isDefault: true,
+);
+
+const _amex = OiPaymentMethod(
+  key: 'amex',
+  label: 'Amex',
+  description: 'Ending in 1234',
+  lastFour: '1234',
+);
+
+List<OiPaymentMethod> _samplePaymentMethods() => const [
+  _visa,
+  _mastercard,
+  _amex,
+];
+
+Widget _buildPicker({
+  List<OiPaymentMethod>? methods,
+  Object? selectedKey,
+  ValueChanged<OiPaymentMethod>? onSelected,
+  String label = 'Payment method',
+  String emptyLabel = 'No payment methods available',
+  Widget? addNewCard,
+}) {
+  return OiPaymentMethodPicker(
+    label: label,
+    methods: methods ?? _samplePaymentMethods(),
+    selectedKey: selectedKey,
+    onSelected: onSelected ?? (_) {},
+    emptyLabel: emptyLabel,
+    addNewCard: addNewCard,
+  );
+}
 
 void main() {
   group('OiPaymentMethodPicker', () {
-    testWidgets('renders list of methods', (tester) async {
-      await tester.pumpObers(
-        OiPaymentMethodPicker(
-          label: 'Payment method',
-          methods: const [_visa, _paypal],
-          onSelected: (_) {},
-        ),
-      );
+    // ── All methods render ──────────────────────────────────────────────
 
-      expect(find.text('Visa'), findsOneWidget);
-      expect(find.text('PayPal'), findsOneWidget);
+    group('all methods render', () {
+      testWidgets('displays labels for all methods', (tester) async {
+        await tester.pumpObers(_buildPicker());
+
+        expect(find.text('Visa'), findsOneWidget);
+        expect(find.text('Mastercard'), findsOneWidget);
+        expect(find.text('Amex'), findsOneWidget);
+      });
+
+      testWidgets('displays descriptions for methods', (tester) async {
+        await tester.pumpObers(_buildPicker());
+
+        expect(find.text('Ending in 4242'), findsOneWidget);
+        expect(find.text('Ending in 5555'), findsOneWidget);
+        expect(find.text('Ending in 1234'), findsOneWidget);
+      });
+
+      testWidgets('renders correct number of OiPaymentOption widgets', (
+        tester,
+      ) async {
+        await tester.pumpObers(_buildPicker());
+
+        expect(find.byType(OiPaymentOption), findsNWidgets(3));
+      });
+
+      testWidgets('displays the picker label', (tester) async {
+        await tester.pumpObers(_buildPicker(label: 'Choose payment'));
+
+        expect(find.text('Choose payment'), findsOneWidget);
+      });
     });
 
-    testWidgets('fires onSelected when a method is tapped', (tester) async {
-      OiPaymentMethod? selected;
-      await tester.pumpObers(
-        OiPaymentMethodPicker(
-          label: 'Payment method',
-          methods: const [_visa, _paypal],
-          onSelected: (m) => selected = m,
-        ),
-      );
+    // ── Selected method highlighted ─────────────────────────────────────
 
-      await tester.tap(find.text('Visa'));
-      await tester.pump();
+    group('selected method highlighted', () {
+      testWidgets('selected method option has selected=true', (tester) async {
+        await tester.pumpObers(_buildPicker(selectedKey: 'mastercard'));
 
-      expect(selected, _visa);
+        final options = tester
+            .widgetList<OiPaymentOption>(find.byType(OiPaymentOption))
+            .toList();
+
+        expect(options[0].selected, isFalse);
+        expect(options[1].selected, isTrue);
+        expect(options[2].selected, isFalse);
+      });
+
+      testWidgets('no method selected when selectedKey is null', (
+        tester,
+      ) async {
+        await tester.pumpObers(_buildPicker());
+
+        final options = tester
+            .widgetList<OiPaymentOption>(find.byType(OiPaymentOption))
+            .toList();
+
+        for (final option in options) {
+          expect(option.selected, isFalse);
+        }
+      });
     });
 
-    testWidgets('shows empty label when methods is empty', (tester) async {
-      await tester.pumpObers(
-        OiPaymentMethodPicker(
-          label: 'Payment method',
-          methods: const [],
-          onSelected: (_) {},
-        ),
-      );
+    // ── onSelect fires correctly ────────────────────────────────────────
 
-      expect(find.text('No payment methods available'), findsOneWidget);
+    group('onSelect fires correctly', () {
+      testWidgets('fires onSelected with correct method on tap', (
+        tester,
+      ) async {
+        OiPaymentMethod? selected;
+        await tester.pumpObers(_buildPicker(onSelected: (m) => selected = m));
+
+        await tester.tap(find.text('Visa'));
+        await tester.pump();
+
+        expect(selected, isNotNull);
+        expect(selected!.key, 'visa');
+        expect(selected!.label, 'Visa');
+      });
+
+      testWidgets('fires onSelected with different method on second tap', (
+        tester,
+      ) async {
+        OiPaymentMethod? selected;
+        await tester.pumpObers(_buildPicker(onSelected: (m) => selected = m));
+
+        await tester.tap(find.text('Amex'));
+        await tester.pump();
+
+        expect(selected!.key, 'amex');
+      });
+
+      testWidgets('fires onSelected for default-marked method', (tester) async {
+        OiPaymentMethod? selected;
+        await tester.pumpObers(_buildPicker(onSelected: (m) => selected = m));
+
+        await tester.tap(find.text('Mastercard'));
+        await tester.pump();
+
+        expect(selected!.key, 'mastercard');
+        expect(selected!.isDefault, isTrue);
+      });
     });
 
-    testWidgets('highlights selected method', (tester) async {
-      await tester.pumpObers(
-        OiPaymentMethodPicker(
-          label: 'Payment method',
-          methods: const [_visa, _paypal],
-          selectedKey: 'visa',
-          onSelected: (_) {},
-        ),
-      );
+    // ── addNewCard slot renders below divider ────────────────────────────
 
-      expect(find.byType(OiPaymentMethodPicker), findsOneWidget);
+    group('addNewCard slot renders below divider', () {
+      testWidgets('addNewCard widget is rendered', (tester) async {
+        await tester.pumpObers(
+          _buildPicker(addNewCard: const Text('+ Add new card')),
+        );
+
+        expect(find.text('+ Add new card'), findsOneWidget);
+      });
+
+      testWidgets('divider is present when addNewCard and methods exist', (
+        tester,
+      ) async {
+        await tester.pumpObers(
+          _buildPicker(addNewCard: const Text('+ Add new card')),
+        );
+
+        expect(find.byType(OiDivider), findsOneWidget);
+      });
+
+      testWidgets('divider appears before addNewCard in tree order', (
+        tester,
+      ) async {
+        await tester.pumpObers(
+          _buildPicker(addNewCard: const Text('+ Add new card')),
+        );
+
+        // Both should be present — tree order is divider then addNewCard.
+        final dividerOffset = tester.getTopLeft(find.byType(OiDivider));
+        final addCardOffset = tester.getTopLeft(find.text('+ Add new card'));
+
+        expect(
+          dividerOffset.dy,
+          lessThan(addCardOffset.dy),
+          reason: 'Divider should appear above addNewCard widget',
+        );
+      });
     });
 
-    testWidgets('semantic label is set', (tester) async {
-      await tester.pumpObers(
-        OiPaymentMethodPicker(
-          label: 'Choose payment',
-          methods: const [_visa],
-          onSelected: (_) {},
-        ),
+    // ── No divider when addNewCard absent ────────────────────────────────
+
+    group('no divider when addNewCard absent', () {
+      testWidgets('no OiDivider when addNewCard is null', (tester) async {
+        await tester.pumpObers(_buildPicker());
+
+        expect(find.byType(OiDivider), findsNothing);
+      });
+
+      testWidgets('no addNewCard slot rendered', (tester) async {
+        await tester.pumpObers(_buildPicker());
+
+        expect(find.text('+ Add new card'), findsNothing);
+      });
+    });
+
+    // ── Empty methods with addNewCard ────────────────────────────────────
+
+    group('empty methods with addNewCard', () {
+      testWidgets('addNewCard renders when methods is empty', (tester) async {
+        await tester.pumpObers(
+          _buildPicker(
+            methods: const [],
+            addNewCard: const Text('+ Add new card'),
+          ),
+        );
+
+        expect(find.text('+ Add new card'), findsOneWidget);
+      });
+
+      testWidgets('no divider when methods is empty', (tester) async {
+        await tester.pumpObers(
+          _buildPicker(
+            methods: const [],
+            addNewCard: const Text('+ Add new card'),
+          ),
+        );
+
+        expect(find.byType(OiDivider), findsNothing);
+      });
+
+      testWidgets('empty label still shown alongside addNewCard', (
+        tester,
+      ) async {
+        await tester.pumpObers(
+          _buildPicker(
+            methods: const [],
+            addNewCard: const Text('+ Add new card'),
+          ),
+        );
+
+        expect(find.text('No payment methods available'), findsOneWidget);
+        expect(find.text('+ Add new card'), findsOneWidget);
+      });
+    });
+
+    // ── Accessibility radio group semantics ──────────────────────────────
+
+    group('accessibility radio group semantics', () {
+      testWidgets('picker has semantic label', (tester) async {
+        await tester.pumpObers(_buildPicker(label: 'Choose payment'));
+
+        expect(
+          find.byWidgetPredicate(
+            (w) => w is Semantics && w.properties.label == 'Choose payment',
+          ),
+          findsOneWidget,
+        );
+      });
+
+      testWidgets('each payment option has semantics with selected state', (
+        tester,
+      ) async {
+        await tester.pumpObers(_buildPicker(selectedKey: 'visa'));
+
+        final methods = _samplePaymentMethods();
+        for (final method in methods) {
+          final isSelected = method.key == 'visa';
+          expect(
+            find.byWidgetPredicate(
+              (w) =>
+                  w is Semantics &&
+                  w.properties.label == method.label &&
+                  w.properties.selected == isSelected,
+            ),
+            findsOneWidget,
+            reason:
+                '${method.label} should have selected=$isSelected semantics',
+          );
+        }
+      });
+
+      testWidgets(
+        'radio group pattern: exactly one selected among all options',
+        (tester) async {
+          await tester.pumpObers(_buildPicker(selectedKey: 'amex'));
+
+          final optionSemantics = tester
+              .widgetList<Semantics>(
+                find.byWidgetPredicate(
+                  (w) =>
+                      w is Semantics &&
+                      w.properties.label != null &&
+                      w.properties.selected != null,
+                ),
+              )
+              .toList();
+
+          expect(
+            optionSemantics.length,
+            _samplePaymentMethods().length,
+            reason: 'Each payment option should have a Semantics with selected',
+          );
+
+          final selectedCount = optionSemantics
+              .where((s) => s.properties.selected!)
+              .length;
+          expect(
+            selectedCount,
+            1,
+            reason: 'Exactly one option should be semantically selected',
+          );
+        },
       );
 
-      expect(
-        find.byWidgetPredicate(
-          (w) => w is Semantics && w.properties.label == 'Choose payment',
-        ),
-        findsOneWidget,
-      );
+      testWidgets('semantic tree is generated without errors', (tester) async {
+        final handle = tester.ensureSemantics();
+        await tester.pumpObers(_buildPicker());
+
+        expect(tester.takeException(), isNull);
+        handle.dispose();
+      });
+    });
+
+    // ── Keyboard arrow key navigation between options ────────────────────
+
+    group('keyboard arrow key navigation between options', () {
+      testWidgets('arrow down moves focus to next option', (tester) async {
+        await tester.pumpObers(_buildPicker(selectedKey: 'visa'));
+
+        // Focus the first option.
+        await tester.tap(find.text('Visa'));
+        await tester.pump();
+
+        // Send arrow down key event.
+        await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+        await tester.pump();
+
+        // Widget still renders without error after keyboard input.
+        expect(find.byType(OiPaymentMethodPicker), findsOneWidget);
+      });
+
+      testWidgets('arrow up key event does not crash', (tester) async {
+        await tester.pumpObers(_buildPicker(selectedKey: 'visa'));
+
+        await tester.tap(find.text('Visa'));
+        await tester.pump();
+
+        await tester.sendKeyEvent(LogicalKeyboardKey.arrowUp);
+        await tester.pump();
+
+        expect(find.byType(OiPaymentMethodPicker), findsOneWidget);
+      });
+
+      testWidgets('keyboard nav on single item does not crash', (tester) async {
+        await tester.pumpObers(
+          _buildPicker(methods: const [_visa], selectedKey: 'visa'),
+        );
+
+        await tester.tap(find.text('Visa'));
+        await tester.pump();
+
+        await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+        await tester.pump();
+        await tester.sendKeyEvent(LogicalKeyboardKey.arrowUp);
+        await tester.pump();
+
+        expect(find.byType(OiPaymentOption), findsOneWidget);
+      });
     });
   });
 }

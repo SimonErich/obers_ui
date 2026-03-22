@@ -35,11 +35,7 @@ void main() {
       tester,
     ) async {
       await tester.pumpObers(
-        const OiOrderSummaryLine(
-          label: 'Discount',
-          amount: 10,
-          negative: true,
-        ),
+        const OiOrderSummaryLine(label: 'Discount', amount: 10, negative: true),
         surfaceSize: const Size(400, 100),
       );
       // OiPriceTag will render negative price: "-10.00 €"

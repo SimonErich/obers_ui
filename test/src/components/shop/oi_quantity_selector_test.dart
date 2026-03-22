@@ -163,12 +163,7 @@ void main() {
     ) async {
       final handle = tester.ensureSemantics();
       await tester.pumpObers(
-        OiQuantitySelector(
-          value: 3,
-          label: 'Qty',
-          max: 10,
-          onChange: (_) {},
-        ),
+        OiQuantitySelector(value: 3, label: 'Qty', max: 10, onChange: (_) {}),
       );
       expect(
         find.bySemanticsLabel(

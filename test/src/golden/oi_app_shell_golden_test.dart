@@ -84,7 +84,10 @@ void main() {
 
     // Verify collapsed state before snapshot.
     final sidebar = tester.widget<OiSidebar>(find.byType(OiSidebar));
-    assert(sidebar.mode == OiSidebarMode.compact, 'sidebar should be in compact mode after collapse');
+    assert(
+      sidebar.mode == OiSidebarMode.compact,
+      'sidebar should be in compact mode after collapse',
+    );
 
     await screenMatchesGolden(tester, 'oi_app_shell_desktop_collapsed');
 

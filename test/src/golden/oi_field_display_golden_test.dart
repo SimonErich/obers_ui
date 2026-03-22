@@ -123,10 +123,7 @@ void main() {
     final builder = obersGoldenBuilder(
       columns: 3,
       children: {
-        'Text': const OiFieldDisplay(
-          label: _l,
-          value: 'Hello World',
-        ),
+        'Text': const OiFieldDisplay(label: _l, value: 'Hello World'),
         'Number': const OiFieldDisplay(
           label: _l,
           value: 1234567,
@@ -164,10 +161,7 @@ void main() {
       columns: 3,
       theme: OiThemeData.dark(),
       children: {
-        'Text': const OiFieldDisplay(
-          label: _l,
-          value: 'Hello World',
-        ),
+        'Text': const OiFieldDisplay(label: _l, value: 'Hello World'),
         'Number': const OiFieldDisplay(
           label: _l,
           value: 1234567,
@@ -382,10 +376,7 @@ void main() {
     final builder = obersGoldenBuilder(
       columns: 3,
       children: {
-        'Empty (null)': const OiFieldDisplay(
-          label: _l,
-          value: null,
-        ),
+        'Empty (null)': const OiFieldDisplay(label: _l, value: null),
         'Custom emptyText': const OiFieldDisplay(
           label: _l,
           value: null,
@@ -422,10 +413,7 @@ void main() {
       columns: 3,
       theme: OiThemeData.dark(),
       children: {
-        'Empty (null)': const OiFieldDisplay(
-          label: _l,
-          value: null,
-        ),
+        'Empty (null)': const OiFieldDisplay(label: _l, value: null),
         'Custom emptyText': const OiFieldDisplay(
           label: _l,
           value: null,

@@ -14,10 +14,7 @@ void main() {
     tester,
   ) async {
     await tester.pumpObers(
-      OiExportButton(
-        label: 'Export',
-        onExport: (_) async {},
-      ),
+      OiExportButton(label: 'Export', onExport: (_) async {}),
     );
 
     expect(find.text('Export'), findsOneWidget);
@@ -126,10 +123,7 @@ void main() {
     final completer = Completer<void>();
 
     await tester.pumpObers(
-      OiExportButton(
-        label: 'Export',
-        onExport: (_) => completer.future,
-      ),
+      OiExportButton(label: 'Export', onExport: (_) => completer.future),
     );
 
     await tester.tap(find.text('Export'));

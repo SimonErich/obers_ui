@@ -47,10 +47,7 @@ void main() {
     });
 
     test('copyWith replaces fields', () {
-      const method = OiPaymentMethod(
-        key: 'cc',
-        label: 'Credit Card',
-      );
+      const method = OiPaymentMethod(key: 'cc', label: 'Credit Card');
       final updated = method.copyWith(
         key: 'visa',
         label: 'Visa',

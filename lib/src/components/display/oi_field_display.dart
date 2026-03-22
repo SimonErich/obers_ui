@@ -337,9 +337,7 @@ class OiFieldDisplay extends StatelessWidget {
   }
 
   Widget _buildNumberDisplay(BuildContext context) {
-    final numValue = value is num
-        ? value as num
-        : num.tryParse(_valueString);
+    final numValue = value is num ? value as num : num.tryParse(_valueString);
 
     if (numValue == null) {
       return _buildTextDisplay(context);
@@ -367,9 +365,7 @@ class OiFieldDisplay extends StatelessWidget {
   }
 
   Widget _buildCurrencyDisplay(BuildContext context) {
-    final numValue = value is num
-        ? value as num
-        : num.tryParse(_valueString);
+    final numValue = value is num ? value as num : num.tryParse(_valueString);
 
     if (numValue == null) {
       return _buildTextDisplay(context);

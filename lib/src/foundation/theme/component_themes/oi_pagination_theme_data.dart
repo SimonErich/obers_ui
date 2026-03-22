@@ -2,7 +2,8 @@ import 'dart:ui';
 
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/obers_ui.dart' show OiPagination;
-import 'package:obers_ui/src/components/display/oi_pagination.dart' show OiPagination;
+import 'package:obers_ui/src/components/display/oi_pagination.dart'
+    show OiPagination;
 
 /// Theme data for [OiPagination] components.
 ///
@@ -26,11 +27,11 @@ class OiPaginationThemeData {
     OiPaginationThemeData a,
     OiPaginationThemeData b,
     double t,
-  )   : labelStyle = TextStyle.lerp(a.labelStyle, b.labelStyle, t),
-        activePageStyle = TextStyle.lerp(a.activePageStyle, b.activePageStyle, t),
-        pageStyle = TextStyle.lerp(a.pageStyle, b.pageStyle, t),
-        buttonSpacing = lerpDouble(a.buttonSpacing, b.buttonSpacing, t),
-        padding = EdgeInsetsGeometry.lerp(a.padding, b.padding, t);
+  ) : labelStyle = TextStyle.lerp(a.labelStyle, b.labelStyle, t),
+      activePageStyle = TextStyle.lerp(a.activePageStyle, b.activePageStyle, t),
+      pageStyle = TextStyle.lerp(a.pageStyle, b.pageStyle, t),
+      buttonSpacing = lerpDouble(a.buttonSpacing, b.buttonSpacing, t),
+      padding = EdgeInsetsGeometry.lerp(a.padding, b.padding, t);
 
   /// Text style for informational labels (e.g. total count, range text).
   final TextStyle? labelStyle;

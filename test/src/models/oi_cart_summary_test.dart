@@ -109,11 +109,7 @@ void main() {
     });
 
     test('toString includes key fields', () {
-      const s = OiCartSummary(
-        subtotal: 100,
-        total: 90,
-        currencyCode: 'EUR',
-      );
+      const s = OiCartSummary(subtotal: 100, total: 90, currencyCode: 'EUR');
       expect(
         s.toString(),
         'OiCartSummary(subtotal: 100.0, total: 90.0, currencyCode: EUR)',

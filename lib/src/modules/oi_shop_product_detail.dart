@@ -524,7 +524,8 @@ class _OiProductGallery extends StatelessWidget {
   const _OiProductGallery({
     required this.imageUrls,
     required this.selectedIndex,
-    required this.label, this.onIndexChange,
+    required this.label,
+    this.onIndexChange,
   });
 
   /// The list of image URLs to display.

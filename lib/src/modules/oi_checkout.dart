@@ -512,7 +512,10 @@ class _OiCheckoutState extends State<OiCheckout> {
     required TextEditingController cityCtrl,
     required TextEditingController stateCtrl,
     required TextEditingController postalCodeCtrl,
-    required String? selectedCountry, required ValueChanged<String?> onCountryChanged, required String errorPrefix, TextEditingController? phoneCtrl,
+    required String? selectedCountry,
+    required ValueChanged<String?> onCountryChanged,
+    required String errorPrefix,
+    TextEditingController? phoneCtrl,
     TextEditingController? emailCtrl,
     bool showContactFields = false,
   }) {

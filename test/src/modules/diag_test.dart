@@ -68,7 +68,8 @@ void main() {
     );
 
     // Check all semantics nodes
-    final semanticsOwner = tester.binding.renderViews.first.owner!.semanticsOwner!;
+    final semanticsOwner =
+        tester.binding.renderViews.first.owner!.semanticsOwner!;
     void walkSemantics(SemanticsNode node, int depth) {
       final indent = '  ' * depth;
       // Why: Diagnostic walk of the semantics tree intentionally prints every non-empty node label to stdout so the developer can inspect the full accessibility hierarchy.

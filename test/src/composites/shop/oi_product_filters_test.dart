@@ -102,10 +102,7 @@ void main() {
     testWidgets('displays currency formatted price labels', (tester) async {
       await tester.pumpObers(
         const SingleChildScrollView(
-          child: OiProductFilters(
-            label: 'Filters',
-            priceRangeMax: 500,
-          ),
+          child: OiProductFilters(label: 'Filters', priceRangeMax: 500),
         ),
       );
 

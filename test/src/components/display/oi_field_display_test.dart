@@ -134,10 +134,7 @@ void main() {
 
     testWidgets('does not wrap when maxLines is null', (tester) async {
       await tester.pumpObers(
-        const OiFieldDisplay(
-          label: _l,
-          value: 'Short text',
-        ),
+        const OiFieldDisplay(label: _l, value: 'Short text'),
       );
 
       expect(find.byType(OiTooltip), findsNothing);
@@ -234,10 +231,7 @@ void main() {
   group('field type rendering', () {
     testWidgets('text type renders plain text', (tester) async {
       await tester.pumpObers(
-        const OiFieldDisplay(
-          label: _l,
-          value: 'Hello World',
-        ),
+        const OiFieldDisplay(label: _l, value: 'Hello World'),
       );
       expect(find.text('Hello World'), findsOneWidget);
     });
@@ -444,19 +438,13 @@ void main() {
 
   group('empty value', () {
     testWidgets('null value shows emptyText', (tester) async {
-      await tester.pumpObers(
-        const OiFieldDisplay(label: _l, value: null),
-      );
+      await tester.pumpObers(const OiFieldDisplay(label: _l, value: null));
       expect(find.text('\u2014'), findsOneWidget);
     });
 
     testWidgets('empty string shows emptyText', (tester) async {
       await tester.pumpObers(
-        const OiFieldDisplay(
-          label: _l,
-          value: '',
-          emptyText: 'N/A',
-        ),
+        const OiFieldDisplay(label: _l, value: '', emptyText: 'N/A'),
       );
       expect(find.text('N/A'), findsOneWidget);
     });
@@ -467,22 +455,14 @@ void main() {
   group('interaction wrappers', () {
     testWidgets('copyable true wraps with OiCopyable', (tester) async {
       await tester.pumpObers(
-        const OiFieldDisplay(
-          label: _l,
-          value: 'Copy me',
-          copyable: true,
-        ),
+        const OiFieldDisplay(label: _l, value: 'Copy me', copyable: true),
       );
       expect(find.byType(OiCopyable), findsOneWidget);
     });
 
     testWidgets('onTap wraps with OiTappable', (tester) async {
       await tester.pumpObers(
-        OiFieldDisplay(
-          label: _l,
-          value: 'Tap me',
-          onTap: () {},
-        ),
+        OiFieldDisplay(label: _l, value: 'Tap me', onTap: () {}),
       );
       expect(find.byType(OiTappable), findsOneWidget);
     });
@@ -506,10 +486,7 @@ void main() {
       tester,
     ) async {
       await tester.pumpObers(
-        const OiFieldDisplay.pair(
-          label: 'Name',
-          value: 'Alice',
-        ),
+        const OiFieldDisplay.pair(label: 'Name', value: 'Alice'),
       );
 
       // Should have a Row ancestor containing both label and value
@@ -783,9 +760,7 @@ void main() {
 
   group('OiLabel convention', () {
     testWidgets('text type renders via OiLabel', (tester) async {
-      await tester.pumpObers(
-        const OiFieldDisplay(label: _l, value: 'Hello'),
-      );
+      await tester.pumpObers(const OiFieldDisplay(label: _l, value: 'Hello'));
       expect(find.byType(OiLabel), findsOneWidget);
     });
 
@@ -797,9 +772,7 @@ void main() {
     });
 
     testWidgets('empty value renders via OiLabel', (tester) async {
-      await tester.pumpObers(
-        const OiFieldDisplay(label: _l, value: null),
-      );
+      await tester.pumpObers(const OiFieldDisplay(label: _l, value: null));
       expect(find.byType(OiLabel), findsOneWidget);
     });
 
@@ -916,11 +889,7 @@ void main() {
 
     testWidgets('onTap provides semantic label', (tester) async {
       await tester.pumpObers(
-        OiFieldDisplay(
-          value: 'Click me',
-          label: 'Action Field',
-          onTap: () {},
-        ),
+        OiFieldDisplay(value: 'Click me', label: 'Action Field', onTap: () {}),
       );
 
       final tappable = tester.widget<OiTappable>(find.byType(OiTappable));
@@ -931,10 +900,7 @@ void main() {
       tester,
     ) async {
       await tester.pumpObers(
-        const OiFieldDisplay(
-          label: _l,
-          value: 'test value',
-        ),
+        const OiFieldDisplay(label: _l, value: 'test value'),
       );
 
       // Find the Semantics widget whose label matches the provided label.
@@ -1015,10 +981,7 @@ void main() {
       final builder = obersGoldenBuilder(
         columns: 3,
         children: {
-          'Text': const OiFieldDisplay(
-            label: _l,
-            value: 'Hello World',
-          ),
+          'Text': const OiFieldDisplay(label: _l, value: 'Hello World'),
           'Number': const OiFieldDisplay(
             label: _l,
             value: 1234567,
@@ -1135,10 +1098,7 @@ void main() {
       final builder = obersGoldenBuilder(
         columns: 3,
         children: {
-          'Empty (null)': const OiFieldDisplay(
-            label: _l,
-            value: null,
-          ),
+          'Empty (null)': const OiFieldDisplay(label: _l, value: null),
           'Custom format': OiFieldDisplay(
             label: _l,
             value: 42,

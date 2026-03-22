@@ -95,12 +95,7 @@ void main() {
     });
 
     testWidgets('renders medium size with appropriate font', (tester) async {
-      await tester.pumpObers(
-        const OiPriceTag(
-          price: 10,
-          label: 'Price',
-        ),
-      );
+      await tester.pumpObers(const OiPriceTag(price: 10, label: 'Price'));
       final textWidget = tester.widget<Text>(find.text(r'$10.00'));
       expect(textWidget.style?.fontSize, 14);
     });

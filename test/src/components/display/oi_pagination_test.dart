@@ -152,11 +152,7 @@ void main() {
 
     testWidgets('single page hides page numbers navigation', (tester) async {
       await tester.pumpObers(
-        const OiPagination(
-          totalItems: 10,
-          currentPage: 0,
-          label: 'items',
-        ),
+        const OiPagination(totalItems: 10, currentPage: 0, label: 'items'),
         surfaceSize: wide,
       );
 

@@ -25,11 +25,7 @@ void main() {
     });
 
     test('default quantity is 1', () {
-      const item = OiCartItem(
-        productKey: 'p1',
-        name: 'Widget',
-        unitPrice: 10,
-      );
+      const item = OiCartItem(productKey: 'p1', name: 'Widget', unitPrice: 10);
       expect(item.quantity, 1);
     });
 
@@ -44,11 +40,7 @@ void main() {
     });
 
     test('copyWith replaces specified fields', () {
-      const item = OiCartItem(
-        productKey: 'p1',
-        name: 'Widget',
-        unitPrice: 10,
-      );
+      const item = OiCartItem(productKey: 'p1', name: 'Widget', unitPrice: 10);
       final copy = item.copyWith(quantity: 5, name: 'Gadget');
       expect(copy.quantity, 5);
       expect(copy.name, 'Gadget');

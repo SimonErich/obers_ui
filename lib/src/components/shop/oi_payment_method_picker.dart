@@ -3,6 +3,7 @@ import 'package:obers_ui/src/components/shop/oi_payment_option.dart';
 import 'package:obers_ui/src/foundation/oi_responsive.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/models/oi_payment_method.dart';
+import 'package:obers_ui/src/primitives/display/oi_divider.dart';
 import 'package:obers_ui/src/primitives/display/oi_label.dart';
 import 'package:obers_ui/src/primitives/layout/oi_column.dart';
 
@@ -24,6 +25,7 @@ class OiPaymentMethodPicker extends StatelessWidget {
     required this.onSelected,
     this.selectedKey,
     this.emptyLabel = 'No payment methods available',
+    this.addNewCard,
     super.key,
   });
 
@@ -41,6 +43,12 @@ class OiPaymentMethodPicker extends StatelessWidget {
 
   /// Text shown when [methods] is empty.
   final String emptyLabel;
+
+  /// Optional widget rendered below the method list, separated by a divider.
+  ///
+  /// Typically used to offer an "Add new card" action. When [methods] is empty,
+  /// the slot renders without a divider.
+  final Widget? addNewCard;
 
   @override
   Widget build(BuildContext context) {
@@ -77,6 +85,8 @@ class OiPaymentMethodPicker extends StatelessWidget {
         children: [
           OiLabel.bodyStrong(label),
           ExcludeSemantics(child: content),
+          if (addNewCard != null && methods.isNotEmpty) const OiDivider(),
+          if (addNewCard != null) addNewCard!,
         ],
       ),
     );
