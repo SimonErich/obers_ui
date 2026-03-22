@@ -391,6 +391,11 @@ void main() {
     });
 
     // ── Timeline event ordering and content ─────────────────────────────
+    //
+    // Note: OiOrderTracker composes OiTimeline (not OiAccordion) for the
+    // event list. OiTimeline renders events in the order they are passed —
+    // it does not sort internally. The caller is responsible for providing
+    // events in the desired display order.
 
     group('timeline event ordering', () {
       testWidgets('timeline renders correct number of events', (tester) async {
@@ -431,7 +436,59 @@ void main() {
         expect(timeline.events[2].title, 'Processing');
       });
 
-      testWidgets('timeline event content is rendered', (tester) async {
+      testWidgets('timeline events sorted newest-first render correctly', (
+        tester,
+      ) async {
+        // When caller passes events in newest-first (descending) order,
+        // OiTimeline renders them in that same order. Sorting is the
+        // caller's responsibility — OiOrderTracker passes events through
+        // to OiTimeline without re-ordering.
+        final newestFirstEvents = [
+          OiOrderEvent(
+            timestamp: DateTime(2024, 1, 3, 14),
+            title: 'Shipped',
+            status: OiOrderStatus.shipped,
+            description: 'Package left the warehouse.',
+          ),
+          OiOrderEvent(
+            timestamp: DateTime(2024, 1, 2, 9),
+            title: 'Processing',
+            status: OiOrderStatus.processing,
+          ),
+          OiOrderEvent(
+            timestamp: DateTime(2024, 1, 1, 10),
+            title: 'Order Placed',
+            status: OiOrderStatus.pending,
+          ),
+        ];
+
+        await tester.pumpObers(
+          SingleChildScrollView(
+            child: OiOrderTracker(
+              currentStatus: OiOrderStatus.shipped,
+              label: 'Order tracker',
+              timeline: newestFirstEvents,
+              showTimeline: true,
+            ),
+          ),
+          surfaceSize: const Size(800, 800),
+        );
+        await tester.pumpAndSettle();
+
+        final timeline = tester.widget<OiTimeline>(find.byType(OiTimeline));
+        // Verify newest-first ordering is preserved in the OiTimeline widget.
+        expect(timeline.events[0].title, 'Shipped');
+        expect(timeline.events[1].title, 'Processing');
+        expect(timeline.events[2].title, 'Order Placed');
+
+        // Verify all titles are rendered in the widget tree.
+        final titleWidgets = tester.widgetList<Text>(find.text('Shipped'));
+        expect(titleWidgets, isNotEmpty);
+        expect(find.text('Processing'), findsAtLeastNWidgets(1));
+        expect(find.text('Order Placed'), findsOneWidget);
+      });
+
+      testWidgets('timeline event titles are rendered', (tester) async {
         await tester.pumpObers(
           SingleChildScrollView(
             child: OiOrderTracker(
@@ -448,6 +505,98 @@ void main() {
         // Event titles should be visible.
         expect(find.text('Order Placed'), findsOneWidget);
         expect(find.text('Order Confirmed'), findsOneWidget);
+        expect(find.text('Processing'), findsAtLeastNWidgets(1));
+      });
+
+      testWidgets('timeline event descriptions are rendered', (tester) async {
+        await tester.pumpObers(
+          SingleChildScrollView(
+            child: OiOrderTracker(
+              currentStatus: OiOrderStatus.processing,
+              label: 'Order tracker',
+              timeline: _sampleTimeline(),
+              showTimeline: true,
+            ),
+          ),
+          surfaceSize: const Size(800, 800),
+        );
+        await tester.pumpAndSettle();
+
+        // Descriptions from _sampleTimeline() that are non-null should be
+        // rendered as Text widgets within OiTimeline entries.
+        expect(find.text('Your order has been received.'), findsOneWidget);
+        expect(find.text('Your order is being prepared.'), findsOneWidget);
+
+        // The second event has no description — verify it does not
+        // produce a spurious text widget.
+        expect(find.textContaining('Order Confirmed'), findsOneWidget);
+      });
+
+      testWidgets('timeline handles event with empty description', (
+        tester,
+      ) async {
+        final eventsWithEmpty = [
+          OiOrderEvent(
+            timestamp: DateTime(2024, 1, 1, 10),
+            title: 'Order Placed',
+            status: OiOrderStatus.pending,
+            description: '',
+          ),
+          OiOrderEvent(
+            timestamp: DateTime(2024, 1, 2, 9),
+            title: 'Confirmed',
+            status: OiOrderStatus.confirmed,
+          ),
+        ];
+
+        await tester.pumpObers(
+          SingleChildScrollView(
+            child: OiOrderTracker(
+              currentStatus: OiOrderStatus.confirmed,
+              label: 'Order tracker',
+              timeline: eventsWithEmpty,
+              showTimeline: true,
+            ),
+          ),
+          surfaceSize: const Size(800, 800),
+        );
+        await tester.pumpAndSettle();
+
+        // Widget renders without error.
+        expect(find.byType(OiTimeline), findsOneWidget);
+        expect(find.text('Order Placed'), findsOneWidget);
+        expect(find.text('Confirmed'), findsAtLeastNWidgets(1));
+      });
+
+      testWidgets('single event timeline renders without issues', (
+        tester,
+      ) async {
+        final singleEvent = [
+          OiOrderEvent(
+            timestamp: DateTime(2024, 1, 1, 10),
+            title: 'Order Placed',
+            status: OiOrderStatus.pending,
+            description: 'Your order has been received.',
+          ),
+        ];
+
+        await tester.pumpObers(
+          SingleChildScrollView(
+            child: OiOrderTracker(
+              currentStatus: OiOrderStatus.pending,
+              label: 'Order tracker',
+              timeline: singleEvent,
+              showTimeline: true,
+            ),
+          ),
+          surfaceSize: const Size(800, 800),
+        );
+        await tester.pumpAndSettle();
+
+        final timeline = tester.widget<OiTimeline>(find.byType(OiTimeline));
+        expect(timeline.events.length, 1);
+        expect(find.text('Order Placed'), findsOneWidget);
+        expect(find.text('Your order has been received.'), findsOneWidget);
       });
     });
 
