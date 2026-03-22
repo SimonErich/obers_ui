@@ -837,7 +837,7 @@ List<OiChatMessage> _dmAnnaMessages() => [
 // ── Auto-response pools ──────────────────────────────────────────────────────
 
 const kFoodResponses = [
-  'That reminds me, has anyone tried the new Beisl on Neubaugasse?',
+  'That reminds me, has anyone tried the Kaiserschmarrn at the new place on Mariahilfer Strasse?',
   'Nothing a good Melange and a slice of Sachertorte cannot fix.',
   'Controversial opinion: Bosna from a Wuerstelstand beats any restaurant.',
   'I once had a Schnitzel so big it needed its own postcode.',
@@ -848,9 +848,9 @@ const kFoodResponses = [
 ];
 
 const kWorkResponses = [
-  'LGTM, but have you checked the edge cases with umlauts?',
+  'LGTM, but I would rename that variable. You know which one.',
   'That PR needs more tests. I can feel the bugs from here.',
-  'Deploying on a Friday? Bold strategy, let us see how it plays out.',
+  'Deploying to staging now. Everyone hold your Schnitzel.',
   'I refactored that module last week. It sparks joy now.',
   'The CI pipeline is green. I repeat: the CI pipeline is GREEN.',
   'Can we add that to the backlog? The backlog where dreams go to retire.',
@@ -865,7 +865,7 @@ const kGeneralResponses = [
   'I am convinced the office plant is judging our code quality.',
   'The wifi password is still "Kaiserschmarrn2024" and I think that is beautiful.',
   'Can we get a standing desk? My back has filed a formal complaint.',
-  'Another day, another chance to accidentally reply-all.',
+  'Noted. Adding it to my growing collection of things to remember.',
   'The printer is jammed. This is not news. This is a lifestyle.',
 ];
 

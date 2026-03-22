@@ -8,7 +8,7 @@ final kFileTree = <OiFileNodeData>[
   // Root folders
   OiFileNodeData(
     id: 'f-docs',
-    name: 'Documents',
+    name: 'Dokumente',
     isFolder: true,
     parentId: 'root',
     itemCount: 4,
@@ -16,7 +16,7 @@ final kFileTree = <OiFileNodeData>[
   ),
   OiFileNodeData(
     id: 'f-images',
-    name: 'Product Photos',
+    name: 'Produktbilder',
     isFolder: true,
     parentId: 'root',
     itemCount: 24,
@@ -24,7 +24,7 @@ final kFileTree = <OiFileNodeData>[
   ),
   OiFileNodeData(
     id: 'f-recipes',
-    name: 'Secret Recipes',
+    name: 'Geheime Rezepte',
     isFolder: true,
     parentId: 'root',
     itemCount: 3,
@@ -33,7 +33,7 @@ final kFileTree = <OiFileNodeData>[
   ),
   OiFileNodeData(
     id: 'f-reports',
-    name: 'Reports',
+    name: 'Berichte',
     isFolder: true,
     parentId: 'root',
     itemCount: 3,
@@ -49,7 +49,7 @@ final kFileTree = <OiFileNodeData>[
     isShared: true,
   ),
 
-  // ── Documents ─────────────────────────────────────────────────────────────
+  // ── Dokumente ─────────────────────────────────────────────────────────────
   OiFileNodeData(
     id: 'doc-1',
     name: 'Business_Plan_2026.pdf',
@@ -81,7 +81,7 @@ final kFileTree = <OiFileNodeData>[
   ),
   OiFileNodeData(
     id: 'doc-4',
-    name: 'Coffee_Break_Policy.md',
+    name: 'Kaffeepausen-Regelwerk.md',
     isFolder: false,
     parentId: 'f-docs',
     size: 3200,
@@ -90,7 +90,7 @@ final kFileTree = <OiFileNodeData>[
     isFavorite: true,
   ),
 
-  // ── Product Photos ────────────────────────────────────────────────────────
+  // ── Produktbilder ─────────────────────────────────────────────────────────
   OiFileNodeData(
     id: 'img-1',
     name: 'sachertorte_hero.jpg',
@@ -308,7 +308,7 @@ final kFileTree = <OiFileNodeData>[
     modified: DateTime(2026, 3, 13),
   ),
 
-  // ── Secret Recipes ────────────────────────────────────────────────────────
+  // ── Geheime Rezepte ──────────────────────────────────────────────────────
   OiFileNodeData(
     id: 'rec-1',
     name: 'Sachertorte_Original.pdf',
@@ -340,7 +340,7 @@ final kFileTree = <OiFileNodeData>[
     isLocked: true,
   ),
 
-  // ── Reports ───────────────────────────────────────────────────────────────
+  // ── Berichte ──────────────────────────────────────────────────────────────
   OiFileNodeData(
     id: 'rep-1',
     name: 'Q1_2026_Revenue_Report.xlsx',
@@ -362,7 +362,7 @@ final kFileTree = <OiFileNodeData>[
   ),
   OiFileNodeData(
     id: 'rep-3',
-    name: 'Schnitzel_Consumption_Stats.csv',
+    name: 'Schnitzel-Verbrauchsstatistik.csv',
     isFolder: false,
     parentId: 'f-reports',
     size: 45000,

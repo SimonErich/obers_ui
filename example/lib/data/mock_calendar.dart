@@ -195,7 +195,7 @@ List<OiGanttTask> buildGanttTasks() {
     ),
     OiGanttTask(
       key: 'gantt-2',
-      label: 'UI/UX Design',
+      label: 'UI/UX Redesign',
       start: DateTime(2026, 1, 20),
       end: DateTime(2026, 2, 13),
       progress: 1.0,
@@ -205,7 +205,7 @@ List<OiGanttTask> buildGanttTasks() {
     ),
     OiGanttTask(
       key: 'gantt-3',
-      label: 'Backend API Development',
+      label: 'Backend API v2',
       start: DateTime(2026, 2, 2),
       end: DateTime(2026, 3, 6),
       progress: 0.85,
@@ -234,6 +234,16 @@ List<OiGanttTask> buildGanttTasks() {
       dependsOn: ['gantt-3'],
     ),
     OiGanttTask(
+      key: 'gantt-klarna',
+      label: 'Klarna Integration',
+      start: DateTime(2026, 2, 23),
+      end: DateTime(2026, 3, 13),
+      progress: 0.40,
+      color: const Color(0xFFEC407A),
+      group: 'Development',
+      dependsOn: ['gantt-3'],
+    ),
+    OiGanttTask(
       key: 'gantt-6',
       label: 'QA & Testing',
       start: DateTime(2026, 3, 9),
@@ -241,11 +251,11 @@ List<OiGanttTask> buildGanttTasks() {
       progress: 0.20,
       color: Color(0xFFEF5350),
       group: 'Launch',
-      dependsOn: ['gantt-4', 'gantt-5'],
+      dependsOn: ['gantt-4', 'gantt-5', 'gantt-klarna'],
     ),
     OiGanttTask(
       key: 'gantt-7',
-      label: 'Go-Live & Monitoring',
+      label: 'Launch',
       start: DateTime(2026, 3, 26),
       end: DateTime(2026, 3, 31),
       progress: 0.0,
@@ -263,7 +273,7 @@ List<OiTimelineEvent> buildTimelineEvents() {
   return [
     OiTimelineEvent(
       timestamp: DateTime(2026, 1, 6),
-      title: 'Project Kickoff',
+      title: 'Project kickoff',
       description:
           'Q1 Relaunch project started. Team assembled, goals defined, '
           'and initial roadmap approved by Leopold.',
@@ -272,7 +282,7 @@ List<OiTimelineEvent> buildTimelineEvents() {
     ),
     OiTimelineEvent(
       timestamp: DateTime(2026, 1, 23),
-      title: 'Requirements Signed Off',
+      title: 'Design system approved',
       description:
           'All product requirements finalized. 42 user stories created '
           'covering the full Alpenglueck shop relaunch scope.',
@@ -281,7 +291,7 @@ List<OiTimelineEvent> buildTimelineEvents() {
     ),
     OiTimelineEvent(
       timestamp: DateTime(2026, 2, 13),
-      title: 'Design Review Complete',
+      title: 'Backend API done',
       description:
           'Maria presented the new Alpine-inspired design system. '
           'Stakeholder feedback incorporated, all screens approved.',
@@ -290,7 +300,7 @@ List<OiTimelineEvent> buildTimelineEvents() {
     ),
     OiTimelineEvent(
       timestamp: DateTime(2026, 3, 6),
-      title: 'Backend API v1 Deployed',
+      title: 'Beta launch',
       description:
           'Core API endpoints live on staging. Product catalog, orders, '
           'and user authentication fully functional.',
@@ -299,7 +309,7 @@ List<OiTimelineEvent> buildTimelineEvents() {
     ),
     OiTimelineEvent(
       timestamp: DateTime(2026, 3, 22),
-      title: 'Frontend Beta Ready',
+      title: 'Public launch',
       description:
           'First beta build deployed for internal testing. '
           'Schnitzel-themed onboarding flow getting great feedback from the team.',

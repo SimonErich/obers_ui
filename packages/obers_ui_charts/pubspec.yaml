@@ -1,0 +1,17 @@
+name: obers_ui_charts
+description: Chart widgets for the ObersUI design system. Line, bar, and pie charts with separated rendering, interaction, and data processing.
+version: 0.1.0
+publish_to: 'none'
+
+environment:
+  sdk: '>=3.11.0 <4.0.0'
+  flutter: '>=3.41.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  very_good_analysis: ^7.0.0

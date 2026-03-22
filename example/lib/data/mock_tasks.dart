@@ -58,7 +58,7 @@ List<OiKanbanColumn<MockTask>> buildKanbanColumns() {
         ),
         MockTask(
           id: 'task-03',
-          title: 'Research eco-friendly shipping materials',
+          title: 'Implement Kaffeepause reminder feature',
           priority: 'low',
           labels: ['sustainability'],
         ),
@@ -138,7 +138,7 @@ List<OiKanbanColumn<MockTask>> buildKanbanColumns() {
         ),
         MockTask(
           id: 'task-15',
-          title: 'Optimize Alpine product image CDN delivery',
+          title: 'Fix Sachertorte image not loading on mobile',
           assignee: kElisabeth,
           priority: 'medium',
           labels: ['performance', 'infrastructure'],

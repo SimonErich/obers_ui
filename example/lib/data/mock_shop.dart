@@ -11,9 +11,7 @@ const kProducts = <OiProductData>[
     price: 39.90,
     currencyCode: 'EUR',
     description:
-        'The legendary chocolate cake that launched a thousand lawsuits. '
-        'Hand-glazed with apricot jam and dark chocolate — because '
-        'Viennese bakers do not compromise.',
+        'Dense, chocolatey, and legally distinct from that other hotel\u2019s version',
     sku: 'SAC-001',
     rating: 4.9,
     reviewCount: 1842,
@@ -54,9 +52,7 @@ const kProducts = <OiProductData>[
     price: 34.50,
     currencyCode: 'EUR',
     description:
-        'Everything you need to pound, bread, and fry your way to '
-        'Schnitzel perfection. Comes with a tiny Austrian flag to '
-        'plant in the finished masterpiece.',
+        'Includes a tiny wooden mallet for when you need to take out your feelings on the meat',
     sku: 'SCH-001',
     rating: 4.7,
     reviewCount: 623,
@@ -96,9 +92,7 @@ const kProducts = <OiProductData>[
     price: 289,
     currencyCode: 'EUR',
     description:
-        'Conquers peaks so you can post summit selfies. Waterproof '
-        'leather, Vibram sole, and an attitude that says "I was hiking '
-        'before it was cool." Made in Tyrol.',
+        'Conquer the Grossglockner or just look ruggedly Austrian at the office',
     sku: 'HIK-001',
     rating: 4.8,
     reviewCount: 347,
@@ -166,9 +160,7 @@ const kProducts = <OiProductData>[
     price: 89,
     currencyCode: 'EUR',
     description:
-        'Two porcelain cups, a silver tray, a glass of water on the side, '
-        'and a small existential crisis — just like in a real Kaffeehaus. '
-        'Newspaper and judgmental waiter not included.',
+        'Includes a laminated card explaining the 27 types of Viennese coffee',
     sku: 'KAF-001',
     rating: 4.6,
     reviewCount: 215,
@@ -188,9 +180,7 @@ const kProducts = <OiProductData>[
     price: 28.50,
     currencyCode: 'EUR',
     description:
-        'Spheres of marzipan, nougat, and dark chocolate named after a '
-        'man who never tasted them. Mozart would have approved — he was '
-        'famously fond of sweets and dramatic packaging.',
+        'The perfect gift for anyone you want to impress or apologize to',
     sku: 'MOZ-001',
     rating: 4.5,
     reviewCount: 982,
@@ -212,9 +202,7 @@ const kProducts = <OiProductData>[
     compareAtPrice: 329,
     currencyCode: 'EUR',
     description:
-        'Traditional meets Instagram-ready. Hand-stitched bodice, '
-        'swishy apron, and a neckline that has launched a thousand '
-        'Oktoberfest debates. Available in alpine-meadow green.',
+        'Says \u2018I appreciate folk traditions but also have a design degree\u2019',
     sku: 'DIR-001',
     rating: 4.7,
     reviewCount: 178,
@@ -228,21 +216,9 @@ const kProducts = <OiProductData>[
       '/images/products/dirndl_meadow.jpg',
     ],
     variants: [
-      OiProductVariant(
-        key: 'dirndl-s',
-        label: 'S',
-        attributes: {'Size': 'S'},
-      ),
-      OiProductVariant(
-        key: 'dirndl-m',
-        label: 'M',
-        attributes: {'Size': 'M'},
-      ),
-      OiProductVariant(
-        key: 'dirndl-l',
-        label: 'L',
-        attributes: {'Size': 'L'},
-      ),
+      OiProductVariant(key: 'dirndl-s', label: 'S', attributes: {'Size': 'S'}),
+      OiProductVariant(key: 'dirndl-m', label: 'M', attributes: {'Size': 'M'}),
+      OiProductVariant(key: 'dirndl-l', label: 'L', attributes: {'Size': 'L'}),
       OiProductVariant(
         key: 'dirndl-xl',
         label: 'XL',
@@ -257,10 +233,7 @@ const kProducts = <OiProductData>[
     name: 'Lederhosen "Bergkönig"',
     price: 389,
     currencyCode: 'EUR',
-    description:
-        'Genuine deer leather, hand-embroidered edelweiss motif, and '
-        'suspenders strong enough to survive a Schuhplattler competition. '
-        'Your thighs will thank you — eventually.',
+    description: 'Break-in period: approximately one Heuriger visit',
     sku: 'LED-001',
     rating: 4.8,
     reviewCount: 134,
@@ -280,9 +253,7 @@ const kProducts = <OiProductData>[
     price: 14.90,
     currencyCode: 'EUR',
     description:
-        'The cheese that clears a room — and wins your heart. This low-fat '
-        'sour-milk cheese from the Zillertal Valley is an acquired taste '
-        'that separates cheese tourists from cheese connoisseurs.',
+        'The cheese that smells like a gym locker and tastes like heaven',
     sku: 'GRK-001',
     rating: 4.2,
     reviewCount: 89,
@@ -302,9 +273,7 @@ const kProducts = <OiProductData>[
     price: 18.90,
     currencyCode: 'EUR',
     description:
-        'Austria\u2019s answer to everything that is not beer. This herbal '
-        'lemonade has fuelled Alpine hikes and Heurigen evenings since 1957. '
-        'Mix with white wine for a Almspritzer and unlock peak Austrian energy.',
+        'Austria\u2019s answer to the question nobody asked: what if lemonade tasted like Alpine herbs?',
     sku: 'ALM-001',
     rating: 4.4,
     reviewCount: 456,
@@ -323,10 +292,7 @@ const kProducts = <OiProductData>[
     name: 'Manner Schnitten Tower 12 packs',
     price: 24.90,
     currencyCode: 'EUR',
-    description:
-        'The pink wafer towers of Vienna — stacked, snapped, and devoured '
-        'at an alarming rate since 1898. Currently sold out because someone '
-        'ordered the entire warehouse. We are looking at you, Franz.',
+    description: 'The pink wafers that built a nation',
     sku: 'MAN-001',
     inStock: false,
     stockCount: 0,
@@ -347,11 +313,7 @@ const kProducts = <OiProductData>[
 
 /// Product-key to a set of related product keys.
 const _kRelatedMap = <String, List<String>>{
-  'prod-sachertorte': [
-    'prod-mozartkugeln',
-    'prod-coffee-set',
-    'prod-manner',
-  ],
+  'prod-sachertorte': ['prod-mozartkugeln', 'prod-coffee-set', 'prod-manner'],
   'prod-schnitzel-kit': [
     'prod-graukaese',
     'prod-almdudler',
@@ -363,36 +325,16 @@ const _kRelatedMap = <String, List<String>>{
     'prod-almdudler',
     'prod-graukaese',
   ],
-  'prod-coffee-set': [
-    'prod-sachertorte',
-    'prod-mozartkugeln',
-    'prod-manner',
-  ],
-  'prod-mozartkugeln': [
-    'prod-sachertorte',
-    'prod-manner',
-    'prod-coffee-set',
-  ],
-  'prod-dirndl': [
-    'prod-lederhosen',
-    'prod-hiking-boot',
-    'prod-coffee-set',
-  ],
-  'prod-lederhosen': [
-    'prod-dirndl',
-    'prod-hiking-boot',
-    'prod-almdudler',
-  ],
+  'prod-coffee-set': ['prod-sachertorte', 'prod-mozartkugeln', 'prod-manner'],
+  'prod-mozartkugeln': ['prod-sachertorte', 'prod-manner', 'prod-coffee-set'],
+  'prod-dirndl': ['prod-lederhosen', 'prod-hiking-boot', 'prod-coffee-set'],
+  'prod-lederhosen': ['prod-dirndl', 'prod-hiking-boot', 'prod-almdudler'],
   'prod-graukaese': [
     'prod-schnitzel-kit',
     'prod-almdudler',
     'prod-sachertorte',
   ],
-  'prod-almdudler': [
-    'prod-schnitzel-kit',
-    'prod-graukaese',
-    'prod-manner',
-  ],
+  'prod-almdudler': ['prod-schnitzel-kit', 'prod-graukaese', 'prod-manner'],
   'prod-manner': [
     'prod-sachertorte',
     'prod-mozartkugeln',
@@ -406,9 +348,7 @@ List<OiProductData> getRelatedProducts(String productKey) {
   final keys = _kRelatedMap[productKey];
   if (keys == null) return [];
   return keys
-      .map(
-        (k) => kProducts.where((p) => p.key == k).firstOrNull,
-      )
+      .map((k) => kProducts.where((p) => p.key == k).firstOrNull)
       .whereType<OiProductData>()
       .toList();
 }
@@ -452,7 +392,8 @@ final kProductReviews = <String, List<MockReview>>{
     MockReview(
       reviewerName: 'Margarethe Gruber',
       rating: 5,
-      text: 'Absolutely divine. The apricot jam layer is perfection. '
+      text:
+          'Absolutely divine. The apricot jam layer is perfection. '
           'My Oma would approve, and she approves of nothing.',
       date: DateTime(2026, 3, 10, 14, 30),
       helpfulCount: 42,
@@ -461,7 +402,8 @@ final kProductReviews = <String, List<MockReview>>{
     MockReview(
       reviewerName: 'Johann Steinbauer',
       rating: 5,
-      text: 'Ordered the Kaiserlich for a family gathering. It arrived '
+      text:
+          'Ordered the Kaiserlich for a family gathering. It arrived '
           'perfectly packaged and disappeared in under an hour.',
       date: DateTime(2026, 3, 5, 9, 15),
       helpfulCount: 28,
@@ -470,7 +412,8 @@ final kProductReviews = <String, List<MockReview>>{
     MockReview(
       reviewerName: 'Franz Hofer',
       rating: 4,
-      text: 'Very good, but I still think my Tante Helga makes a better one. '
+      text:
+          'Very good, but I still think my Tante Helga makes a better one. '
           'Do not tell Hotel Sacher I said that.',
       date: DateTime(2026, 2, 20, 18, 45),
       helpfulCount: 15,
@@ -481,7 +424,8 @@ final kProductReviews = <String, List<MockReview>>{
     MockReview(
       reviewerName: 'Katharina Lechner',
       rating: 5,
-      text: 'Wore these up the Grossglockner. My feet were dry, my soul '
+      text:
+          'Wore these up the Grossglockner. My feet were dry, my soul '
           'was at peace. Worth every cent.',
       date: DateTime(2026, 3, 15, 11, 0),
       helpfulCount: 37,
@@ -490,7 +434,8 @@ final kProductReviews = <String, List<MockReview>>{
     MockReview(
       reviewerName: 'Helmut Winkler',
       rating: 4,
-      text: 'Excellent grip on wet rock. Took a week to break in, but '
+      text:
+          'Excellent grip on wet rock. Took a week to break in, but '
           'now they feel like slippers — very sturdy slippers.',
       date: DateTime(2026, 2, 28, 16, 20),
       helpfulCount: 21,
@@ -501,7 +446,8 @@ final kProductReviews = <String, List<MockReview>>{
     MockReview(
       reviewerName: 'Anneliese Moser',
       rating: 5,
-      text: 'The fabric quality is outstanding. I wore it to the Villacher '
+      text:
+          'The fabric quality is outstanding. I wore it to the Villacher '
           'Fasching and received compliments all evening.',
       date: DateTime(2026, 3, 1, 20, 0),
       helpfulCount: 19,
@@ -510,7 +456,8 @@ final kProductReviews = <String, List<MockReview>>{
     MockReview(
       reviewerName: 'Renate Berger',
       rating: 4,
-      text: 'Beautiful stitching and the green is gorgeous. Runs slightly '
+      text:
+          'Beautiful stitching and the green is gorgeous. Runs slightly '
           'small — order one size up.',
       date: DateTime(2026, 2, 14, 12, 30),
       helpfulCount: 33,
@@ -521,7 +468,8 @@ final kProductReviews = <String, List<MockReview>>{
     MockReview(
       reviewerName: 'Leopold Brandauer',
       rating: 5,
-      text: 'Finally, a proper Kaffeehaus experience at home. The porcelain '
+      text:
+          'Finally, a proper Kaffeehaus experience at home. The porcelain '
           'is thin and elegant. I now judge my own guests.',
       date: DateTime(2026, 3, 18, 8, 0),
       helpfulCount: 12,
@@ -532,7 +480,8 @@ final kProductReviews = <String, List<MockReview>>{
     MockReview(
       reviewerName: 'Waltraud Pichler',
       rating: 3,
-      text: 'Tasty, but they melted a bit during shipping. Packaging '
+      text:
+          'Tasty, but they melted a bit during shipping. Packaging '
           'could use more insulation for summer orders.',
       date: DateTime(2026, 3, 12, 15, 45),
       helpfulCount: 8,
@@ -541,7 +490,8 @@ final kProductReviews = <String, List<MockReview>>{
     MockReview(
       reviewerName: 'Stefan Huber',
       rating: 5,
-      text: 'Brought these to a dinner party in Berlin. The Germans were '
+      text:
+          'Brought these to a dinner party in Berlin. The Germans were '
           'impressed, which is the highest praise you can get.',
       date: DateTime(2026, 2, 25, 19, 30),
       helpfulCount: 24,
@@ -579,8 +529,7 @@ OiCartSummary computeCartSummary(
   String? discountLabel,
   double? discountAmount,
 }) {
-  final subtotal =
-      items.fold<double>(0, (sum, item) => sum + item.totalPrice);
+  final subtotal = items.fold<double>(0, (sum, item) => sum + item.totalPrice);
 
   final afterDiscount = subtotal - (discountAmount ?? 0);
   final taxableAmount = afterDiscount + (shippingCost ?? 0);
@@ -690,10 +639,7 @@ const kValidCoupons = <String, ({double discount, String message})>{
     discount: 0.15,
     message: '15 % off — Alpine happiness delivered!',
   ),
-  'SCHNITZEL': (
-    discount: 0.05,
-    message: '5 % off — a crispy little saving.',
-  ),
+  'SCHNITZEL': (discount: 0.05, message: '5 % off — a crispy little saving.'),
 };
 
 /// Validates a coupon code against [kValidCoupons] and returns a result.
