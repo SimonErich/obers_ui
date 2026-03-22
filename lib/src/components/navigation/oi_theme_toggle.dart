@@ -12,12 +12,15 @@ import 'package:obers_ui/src/primitives/display/oi_icon.dart';
 ///
 /// Displays sun (light), moon (dark), or monitor (system) icons.
 ///
-/// When [showSystemOption] is `true`, tapping opens a popover with three
-/// options. When `false`, tapping cycles between light and dark only.
+/// When [showSystemOption] is `true` (the default), tapping opens a popover
+/// with three options (light, dark, system). When `false`, tapping cycles
+/// between light and dark only.
 ///
-/// Includes a tooltip showing the current mode.
+/// Includes a tooltip showing the current mode label.
 ///
-/// {@category Components}
+/// Composes [OiIconButton], [OiIcon], [OiPopover], and [OiTooltip].
+///
+/// {@category Navigation}
 class OiThemeToggle extends StatefulWidget {
   /// Creates an [OiThemeToggle].
   const OiThemeToggle({

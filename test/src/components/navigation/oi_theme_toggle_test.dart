@@ -1,4 +1,4 @@
-// Tests do not require documentation comments.
+// Tests for OiThemeToggle — REQ-0014.
 // ignore_for_file: public_member_api_docs
 
 import 'package:flutter/widgets.dart';

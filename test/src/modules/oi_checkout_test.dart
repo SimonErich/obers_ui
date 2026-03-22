@@ -64,7 +64,7 @@ List<OiSelectOption<String>> _sampleCountries() => const [
 OiAddressData _sampleAddress() => const OiAddressData(
   firstName: 'Jane',
   lastName: 'Doe',
-  address1: '123 Main St',
+  line1: '123 Main St',
   city: 'Springfield',
   state: 'IL',
   postalCode: '62701',
@@ -423,6 +423,10 @@ void main() {
           onPlaceOrder: () async {
             orderPlaced = true;
             return OiOrderData(
+              key: 'order-1',
+              orderNumber: 'ORD-2024-001',
+              createdAt: DateTime(2024),
+              status: OiOrderStatus.pending,
               shippingAddress: _sampleAddress(),
               shippingMethod: _sampleShippingMethods().first,
               paymentMethod: _samplePaymentMethods().first,
@@ -466,6 +470,10 @@ void main() {
       // Complete the future to avoid pending timers.
       completer.complete(
         OiOrderData(
+          key: 'order-2',
+          orderNumber: 'ORD-2024-002',
+          createdAt: DateTime(2024),
+          status: OiOrderStatus.pending,
           shippingAddress: _sampleAddress(),
           shippingMethod: _sampleShippingMethods().first,
           paymentMethod: _samplePaymentMethods().first,

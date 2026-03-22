@@ -12,9 +12,12 @@ import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
 /// An avatar-triggered dropdown menu showing user info and account actions.
 ///
 /// Tapping the avatar opens a popover with a header section (user name and
-/// email) followed by grouped menu items separated by [OiDivider].
+/// optional email) followed by grouped menu items separated by [OiDivider].
 ///
-/// {@category Components}
+/// Composes [OiAvatar], [OiTappable], [OiPopover], [OiLabel], [OiDivider],
+/// [OiListTile], and [OiIcon].
+///
+/// {@category Navigation}
 class OiUserMenu extends StatefulWidget {
   /// Creates an [OiUserMenu].
   const OiUserMenu({

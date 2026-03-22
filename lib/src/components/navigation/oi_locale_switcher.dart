@@ -34,7 +34,10 @@ class OiLocaleOption {
 /// The dropdown displays all available locales with the active locale
 /// highlighted by a check icon.
 ///
-/// {@category Components}
+/// Composes [OiButton.ghost], [OiPopover], [OiListTile], [OiLabel],
+/// and [OiIcon].
+///
+/// {@category Navigation}
 class OiLocaleSwitcher extends StatefulWidget {
   /// Creates an [OiLocaleSwitcher].
   const OiLocaleSwitcher({
@@ -43,7 +46,7 @@ class OiLocaleSwitcher extends StatefulWidget {
     required this.onLocaleChange,
     this.label = 'Language',
     this.showFlag = true,
-    this.showCode = true,
+    this.showCode = false,
     this.showName = true,
     super.key,
   });

@@ -98,7 +98,7 @@ class _OiProductGalleryState extends State<OiProductGallery> {
     }
 
     return ClipRRect(
-      borderRadius: BorderRadius.circular(context.radius.md),
+      borderRadius: context.radius.md,
       child: AspectRatio(
         aspectRatio: 1,
         child: OiImage(
@@ -136,7 +136,7 @@ class _OiProductGalleryState extends State<OiProductGallery> {
               borderRadius: context.radius.sm,
               border: OiBorderStyle.solid(borderColor, isSelected ? 2 : 1),
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(context.radius.sm),
+                borderRadius: context.radius.sm,
                 child: SizedBox(
                   width: 64,
                   height: 64,

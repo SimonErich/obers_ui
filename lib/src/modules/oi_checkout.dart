@@ -202,10 +202,10 @@ class _OiCheckoutState extends State<OiCheckout> {
       text: _shippingAddress.lastName ?? '',
     );
     _shipAddress1 = TextEditingController(
-      text: _shippingAddress.address1 ?? '',
+      text: _shippingAddress.line1 ?? '',
     );
     _shipAddress2 = TextEditingController(
-      text: _shippingAddress.address2 ?? '',
+      text: _shippingAddress.line2 ?? '',
     );
     _shipCity = TextEditingController(text: _shippingAddress.city ?? '');
     _shipState = TextEditingController(text: _shippingAddress.state ?? '');
@@ -219,8 +219,8 @@ class _OiCheckoutState extends State<OiCheckout> {
       text: _billingAddress.firstName ?? '',
     );
     _billLastName = TextEditingController(text: _billingAddress.lastName ?? '');
-    _billAddress1 = TextEditingController(text: _billingAddress.address1 ?? '');
-    _billAddress2 = TextEditingController(text: _billingAddress.address2 ?? '');
+    _billAddress1 = TextEditingController(text: _billingAddress.line1 ?? '');
+    _billAddress2 = TextEditingController(text: _billingAddress.line2 ?? '');
     _billCity = TextEditingController(text: _billingAddress.city ?? '');
     _billState = TextEditingController(text: _billingAddress.state ?? '');
     _billPostalCode = TextEditingController(
@@ -257,8 +257,8 @@ class _OiCheckoutState extends State<OiCheckout> {
     _shippingAddress = OiAddressData(
       firstName: _shipFirstName.text.isEmpty ? null : _shipFirstName.text,
       lastName: _shipLastName.text.isEmpty ? null : _shipLastName.text,
-      address1: _shipAddress1.text.isEmpty ? null : _shipAddress1.text,
-      address2: _shipAddress2.text.isEmpty ? null : _shipAddress2.text,
+      line1: _shipAddress1.text.isEmpty ? null : _shipAddress1.text,
+      line2: _shipAddress2.text.isEmpty ? null : _shipAddress2.text,
       city: _shipCity.text.isEmpty ? null : _shipCity.text,
       state: _shipState.text.isEmpty ? null : _shipState.text,
       postalCode: _shipPostalCode.text.isEmpty ? null : _shipPostalCode.text,
@@ -273,8 +273,8 @@ class _OiCheckoutState extends State<OiCheckout> {
     _billingAddress = OiAddressData(
       firstName: _billFirstName.text.isEmpty ? null : _billFirstName.text,
       lastName: _billLastName.text.isEmpty ? null : _billLastName.text,
-      address1: _billAddress1.text.isEmpty ? null : _billAddress1.text,
-      address2: _billAddress2.text.isEmpty ? null : _billAddress2.text,
+      line1: _billAddress1.text.isEmpty ? null : _billAddress1.text,
+      line2: _billAddress2.text.isEmpty ? null : _billAddress2.text,
       city: _billCity.text.isEmpty ? null : _billCity.text,
       state: _billState.text.isEmpty ? null : _billState.text,
       postalCode: _billPostalCode.text.isEmpty ? null : _billPostalCode.text,
@@ -809,8 +809,8 @@ class _OiCheckoutState extends State<OiCheckout> {
       final parts = <String>[
         if (addr.firstName != null || addr.lastName != null)
           [addr.firstName ?? '', addr.lastName ?? ''].join(' ').trim(),
-        if (addr.address1 != null) addr.address1!,
-        if (addr.address2 != null && addr.address2!.isNotEmpty) addr.address2!,
+        if (addr.line1 != null) addr.line1!,
+        if (addr.line2 != null && addr.line2!.isNotEmpty) addr.line2!,
         [
           addr.city ?? '',
           addr.state ?? '',
