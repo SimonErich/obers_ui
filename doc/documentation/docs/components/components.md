@@ -310,6 +310,76 @@ OiEditableText(
 | `OiUploadDialog` | Upload progress dialog |
 | `OiFileInfoDialog` | File details display |
 
+## Shop
+
+| Widget | Description |
+|---|---|
+| `OiPriceTag` | Formatted price display with optional compare-at strikethrough and currency symbol |
+| `OiQuantitySelector` | Number stepper with minus/plus buttons for product quantities |
+
+### OiPriceTag
+
+Formatted price display with optional compare-at (strikethrough) price and currency symbol. Supports size variants and locale-aware currency placement.
+
+```dart
+// Basic price
+OiPriceTag(price: 42.99, label: 'Product price')
+
+// With currency
+OiPriceTag(price: 42.99, label: 'Price', currencyCode: 'EUR')
+
+// Sale price with compare-at
+OiPriceTag(
+  price: 29.99,
+  label: 'Sale price',
+  compareAtPrice: 59.99,
+  currencyCode: 'USD',
+)
+
+// Large size, zero decimal places
+OiPriceTag(
+  price: 100,
+  label: 'Price',
+  size: OiPriceTagSize.large,
+  decimalPlaces: 0,
+)
+```
+
+**Special states:**
+- Zero price shows "Free" in success color
+- Negative prices shown in success color
+- Compare-at price shown with strikethrough when greater than current price
+
+### OiQuantitySelector
+
+A compact number stepper for product quantities with minus/plus buttons, display value, and keyboard support.
+
+```dart
+// Basic quantity selector
+OiQuantitySelector(
+  value: 1,
+  label: 'Quantity',
+  onChange: (newValue) => setState(() => _qty = newValue),
+)
+
+// With custom min/max
+OiQuantitySelector(
+  value: 3,
+  label: 'Quantity',
+  min: 1,
+  max: 10,
+  onChange: (newValue) => setState(() => _qty = newValue),
+)
+
+// Compact mode for cart rows
+OiQuantitySelector(
+  value: 2,
+  label: 'Quantity',
+  compact: true,
+  onChange: (newValue) => setState(() => _qty = newValue),
+)
+```
+
 ## Interaction
 
 | Widget | Description |

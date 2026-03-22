@@ -2206,6 +2206,62 @@ Two-pane split layout with draggable divider.
 
 ---
 
+### COMPONENTS — Shop
+
+---
+
+#### OiPriceTag
+**Tags:** `shop`, `price`, `currency`, `money`, `sale`, `discount`, `strikethrough`, `e-commerce`
+**Tier:** Component
+
+Formatted price display with optional compare-at (strikethrough) price and currency symbol. Composes `OiRow` and `OiLabel`.
+
+**Props:**
+- `price` (double, required) — current price
+- `label` (String, required) — accessibility label
+- `compareAtPrice` (double?) — original price; shown with strikethrough when > `price`
+- `currencyCode` (String?, default 'USD') — ISO 4217 currency code
+- `currencySymbol` (String?) — explicit symbol override (takes priority over `currencyCode`)
+- `decimalPlaces` (int, default 2) — number of decimal places
+- `size` (OiPriceTagSize, default medium) — small / medium / large
+
+**Behavior:**
+- Zero price shows "Free" in success color
+- Negative price shown in success color
+- `compareAtPrice <= price` → ignored, no strikethrough
+- Currency symbol positioned per locale convention ($ before for USD, € after for EUR)
+- Unknown currency code falls back to code string after amount
+
+**Use When:** Product prices, cart line items, order summaries.
+**Combine With:** `OiQuantitySelector`, `OiCard`, `OiListTile`
+
+---
+
+#### OiQuantitySelector
+**Tags:** `shop`, `quantity`, `stepper`, `counter`, `cart`, `e-commerce`, `number`
+**Tier:** Component
+
+Number stepper for product quantities with minus/plus buttons and display value. Composes `OiRow`, `OiIconButton`, `OiLabel`, `OiSurface`.
+
+**Props:**
+- `value` (int, required) — current quantity
+- `label` (String, required) — accessibility label
+- `onChange` (ValueChanged<int>?) — callback; null disables interaction
+- `min` (int, default 1) — minimum allowed value
+- `max` (int, default 99) — maximum allowed value
+- `compact` (bool, default false) — reduced padding for dense layouts
+- `disabled` (bool, default false) — disables all controls (opacity 0.4)
+
+**Behavior:**
+- Min boundary disables minus button; max boundary disables plus button
+- Keyboard arrow up/down support for accessibility
+- Semantics announces label, value, min, and max
+
+**Use When:** Cart quantity adjustment, inventory counts.
+**Combine With:** `OiPriceTag`, `OiCard`, `OiListTile`
+
+---
+
 ### COMPOSITES — Data
 
 ---
@@ -3449,7 +3505,7 @@ Searchable keyword → widget mapping for quick lookup.
 | `select` | OiSelect, OiComboBox, OiRadio |
 | `settings` | OiSettingsDriver, OiAccordionSettings, etc. |
 | `sheet` | OiSheet |
-| `shop` | OiProductData, OiCartItem, OiCartSummary |
+| `shop` | OiPriceTag, OiQuantitySelector, OiProductData, OiCartItem, OiCartSummary |
 | `sidebar` | OiSidebar, OiFileSidebar |
 | `skeleton` | OiSkeletonGroup, OiShimmer |
 | `slider` | OiSlider |

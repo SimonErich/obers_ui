@@ -26,8 +26,9 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    final allTypes =
-        tester.allWidgets.map((w) => w.runtimeType.toString()).toSet();
+    final allTypes = tester.allWidgets
+        .map((w) => w.runtimeType.toString())
+        .toSet();
     // ignore: avoid_print
     print('Has OiDrawer: ${allTypes.contains("OiDrawer")}');
 
@@ -72,6 +73,7 @@ void main() {
         return true;
       });
     }
+
     walkSemantics(semanticsOwner.rootSemanticsNode!, 0);
 
     handle.dispose();

@@ -23,7 +23,7 @@ enum _CurrencyPosition { before, after }
 
 /// Known currency symbols and their placement conventions.
 ///
-/// Coverage: REQ-0027
+/// Coverage: REQ-0043
 const Map<String, ({String symbol, _CurrencyPosition position})> _currencyMap =
     {
       'USD': (symbol: r'$', position: _CurrencyPosition.before),
@@ -49,7 +49,7 @@ const Map<String, ({String symbol, _CurrencyPosition position})> _currencyMap =
 /// A formatted price display with optional compare-at (strikethrough) price
 /// and currency symbol.
 ///
-/// Coverage: REQ-0027
+/// Coverage: REQ-0043
 ///
 /// When [compareAtPrice] is provided and greater than [price], shows the
 /// compare-at price with strikethrough in a muted color and the current

@@ -15,7 +15,7 @@ const IconData _kAddIcon = IconData(0xe145, fontFamily: 'MaterialIcons');
 
 /// A compact, touch-friendly number stepper for product quantities.
 ///
-/// Coverage: REQ-0028
+/// Coverage: REQ-0045
 ///
 /// Minus button, display value, plus button. Boundary buttons are disabled at
 /// [min] / [max]. Supports [compact] mode for dense layouts, [disabled] state,
