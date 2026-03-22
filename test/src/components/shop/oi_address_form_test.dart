@@ -3,11 +3,13 @@
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:obers_ui/src/components/inputs/oi_select.dart';
 import 'package:obers_ui/src/components/inputs/oi_text_input.dart';
 import 'package:obers_ui/src/components/shop/oi_address_form.dart';
 import 'package:obers_ui/src/foundation/oi_app.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme_data.dart';
 import 'package:obers_ui/src/models/oi_address_data.dart';
+import 'package:obers_ui/src/models/oi_country_option.dart';
 
 import '../../../helpers/platform_helpers.dart';
 import '../../../helpers/pump_app.dart';
@@ -30,18 +32,48 @@ OiAddressData _sampleAddress() => const OiAddressData(
   email: 'jane@example.com',
 );
 
+List<OiCountryOption> _sampleCountries() => const [
+  OiCountryOption(
+    code: 'US',
+    name: 'United States',
+    states: ['California', 'New York', 'Texas'],
+  ),
+  OiCountryOption(code: 'CH', name: 'Switzerland'),
+  OiCountryOption(
+    code: 'DE',
+    name: 'Germany',
+    states: ['Bavaria', 'Berlin', 'Hamburg'],
+  ),
+];
+
 Widget _buildAddressForm({
   String label = 'Shipping address',
   OiAddressData initialData = const OiAddressData(),
   ValueChanged<OiAddressData>? onChanged,
   bool enabled = true,
+  bool showName = true,
+  bool showCompany = true,
+  bool showPhone = true,
+  List<OiCountryOption>? countries,
+  bool readOnly = false,
+  ValueChanged<OiAddressData>? onSubmit,
+  Map<String, String>? error,
+  GlobalKey<State>? formKey,
 }) {
   return SingleChildScrollView(
     child: OiAddressForm(
+      key: formKey,
       label: label,
       initialData: initialData,
       onChanged: onChanged,
       enabled: enabled,
+      showName: showName,
+      showCompany: showCompany,
+      showPhone: showPhone,
+      countries: countries,
+      readOnly: readOnly,
+      onSubmit: onSubmit,
+      error: error,
     ),
   );
 }
@@ -366,6 +398,43 @@ void main() {
       });
     });
 
+    // ── readOnly mode ────────────────────────────────────────────────────
+
+    group('readOnly mode', () {
+      testWidgets('readOnly=true makes all text inputs read-only', (
+        tester,
+      ) async {
+        await tester.pumpObers(
+          _buildAddressForm(readOnly: true, initialData: _sampleAddress()),
+          surfaceSize: _surfaceSize,
+        );
+
+        final textInputs = tester.widgetList<OiTextInput>(
+          find.byType(OiTextInput),
+        );
+        for (final input in textInputs) {
+          expect(input.readOnly, isTrue);
+        }
+      });
+
+      testWidgets('readOnly takes precedence over enabled', (tester) async {
+        await tester.pumpObers(
+          // Explicitly passing enabled:true to test precedence of readOnly.
+          // ignore: avoid_redundant_argument_values
+          _buildAddressForm(readOnly: true, enabled: true),
+          surfaceSize: _surfaceSize,
+        );
+
+        final textInputs = tester.widgetList<OiTextInput>(
+          find.byType(OiTextInput),
+        );
+        for (final input in textInputs) {
+          // readOnly=true + enabled=true → _isInteractive is false
+          expect(input.enabled, isFalse);
+        }
+      });
+    });
+
     // ── Responsive layout ────────────────────────────────────────────────
 
     group('responsive layout', () {
@@ -493,6 +562,28 @@ void main() {
         expect(tester.takeException(), isNull);
         handle.dispose();
       });
+
+      testWidgets('all interactive fields have semantic labels', (
+        tester,
+      ) async {
+        final handle = tester.ensureSemantics();
+        await tester.pumpObers(
+          _buildAddressForm(countries: _sampleCountries()),
+          surfaceSize: _surfaceSize,
+        );
+
+        // OiSelect fields also have labels.
+        final selects = tester.widgetList<OiSelect<String>>(
+          find.byType(OiSelect<String>),
+        );
+        for (final select in selects) {
+          expect(select.label, isNotNull);
+          expect(select.label, isNotEmpty);
+        }
+
+        expect(tester.takeException(), isNull);
+        handle.dispose();
+      });
     });
 
     // ── Field labels ─────────────────────────────────────────────────────
@@ -520,92 +611,346 @@ void main() {
 
     // ── showName / showCompany / showPhone toggles ─────────────────────
 
-    // Skip: OiAddressForm API does not expose showName/showCompany/showPhone
-    // toggles — all 11 fields are always visible.
     group('showName/showCompany/showPhone toggles', () {
-      testWidgets(
-        'showName toggle controls name field visibility',
-        skip: true,
-        (tester) async {},
-      );
+      testWidgets('hides name fields when showName is false', (tester) async {
+        await tester.pumpObers(
+          _buildAddressForm(showName: false),
+          surfaceSize: _surfaceSize,
+        );
 
-      testWidgets(
-        'showCompany toggle controls company field visibility',
-        skip: true,
-        (tester) async {},
-      );
+        // Without name fields, we lose 2 text inputs (first name, last name).
+        // Default has 11 → should be 9.
+        expect(find.byType(OiTextInput), findsNWidgets(9));
+        // First name / Last name labels should not be present.
+        expect(
+          find.byWidgetPredicate(
+            (w) => w is OiTextInput && w.label == 'First name',
+          ),
+          findsNothing,
+        );
+        expect(
+          find.byWidgetPredicate(
+            (w) => w is OiTextInput && w.label == 'Last name',
+          ),
+          findsNothing,
+        );
+      });
 
-      testWidgets(
-        'showPhone toggle controls phone field visibility',
-        skip: true,
-        (tester) async {},
-      );
+      testWidgets('shows name fields when showName is true', (tester) async {
+        await tester.pumpObers(
+          // Explicitly testing default true value shows name fields.
+          // ignore: avoid_redundant_argument_values
+          _buildAddressForm(showName: true),
+          surfaceSize: _surfaceSize,
+        );
+
+        expect(
+          find.byWidgetPredicate(
+            (w) => w is OiTextInput && w.label == 'First name',
+          ),
+          findsOneWidget,
+        );
+        expect(
+          find.byWidgetPredicate(
+            (w) => w is OiTextInput && w.label == 'Last name',
+          ),
+          findsOneWidget,
+        );
+      });
+
+      testWidgets('hides company field when showCompany is false', (
+        tester,
+      ) async {
+        await tester.pumpObers(
+          _buildAddressForm(showCompany: false),
+          surfaceSize: _surfaceSize,
+        );
+
+        // Without company, we lose 1 text input. Default 11 → 10.
+        expect(find.byType(OiTextInput), findsNWidgets(10));
+        expect(
+          find.byWidgetPredicate(
+            (w) => w is OiTextInput && w.label == 'Company',
+          ),
+          findsNothing,
+        );
+      });
+
+      testWidgets('hides phone field when showPhone is false', (tester) async {
+        await tester.pumpObers(
+          _buildAddressForm(showPhone: false),
+          surfaceSize: _surfaceSize,
+        );
+
+        // Without phone, we lose 1 text input. Default 11 → 10.
+        expect(find.byType(OiTextInput), findsNWidgets(10));
+        expect(
+          find.byWidgetPredicate((w) => w is OiTextInput && w.label == 'Phone'),
+          findsNothing,
+        );
+      });
+
+      testWidgets('multiple toggles can be combined', (tester) async {
+        await tester.pumpObers(
+          _buildAddressForm(
+            showName: false,
+            showCompany: false,
+            showPhone: false,
+          ),
+          surfaceSize: _surfaceSize,
+        );
+
+        // Without name (2), company (1), phone (1) → 11 - 4 = 7.
+        expect(find.byType(OiTextInput), findsNWidgets(7));
+      });
     });
 
     // ── Country select ────────────────────────────────────────────────
 
-    // Skip: OiAddressForm uses a plain OiTextInput for country —
-    // no dropdown/select with predefined country options.
     group('country select', () {
-      testWidgets(
-        'country select renders with country options',
-        skip: true,
-        (tester) async {},
-      );
+      testWidgets('renders OiSelect for country when countries list provided', (
+        tester,
+      ) async {
+        await tester.pumpObers(
+          _buildAddressForm(countries: _sampleCountries()),
+          surfaceSize: _surfaceSize,
+        );
+
+        // Should have an OiSelect for country.
+        expect(find.byType(OiSelect<String>), findsOneWidget);
+        // One fewer OiTextInput (country replaced by select). 11 - 1 = 10.
+        expect(find.byType(OiTextInput), findsNWidgets(10));
+      });
+
+      testWidgets('renders text input for country when no countries list', (
+        tester,
+      ) async {
+        await tester.pumpObers(_buildAddressForm(), surfaceSize: _surfaceSize);
+
+        expect(find.byType(OiSelect<String>), findsNothing);
+        expect(find.byType(OiTextInput), findsNWidgets(11));
+      });
+
+      testWidgets('country OiSelect has correct label', (tester) async {
+        await tester.pumpObers(
+          _buildAddressForm(countries: _sampleCountries()),
+          surfaceSize: _surfaceSize,
+        );
+
+        final select = tester.widget<OiSelect<String>>(
+          find.byType(OiSelect<String>),
+        );
+        expect(select.label, 'Country');
+      });
     });
 
     // ── State field switching ─────────────────────────────────────────
 
-    // Skip: OiAddressForm uses a plain OiTextInput for state —
-    // no dynamic switching between dropdown and text input per country.
     group('state field switching', () {
-      testWidgets(
-        'selecting country with states shows state dropdown',
-        skip: true,
-        (tester) async {},
-      );
+      testWidgets('renders state as text input when no countries provided', (
+        tester,
+      ) async {
+        await tester.pumpObers(_buildAddressForm(), surfaceSize: _surfaceSize);
 
-      testWidgets(
-        'selecting country without states shows state text input',
-        skip: true,
-        (tester) async {},
-      );
+        expect(
+          find.byWidgetPredicate(
+            (w) => w is OiTextInput && w.label == 'State / Province',
+          ),
+          findsOneWidget,
+        );
+      });
+
+      testWidgets('renders state as text input when country has no states', (
+        tester,
+      ) async {
+        // Pre-select Switzerland (no states).
+        await tester.pumpObers(
+          _buildAddressForm(
+            countries: _sampleCountries(),
+            initialData: const OiAddressData(country: 'CH'),
+          ),
+          surfaceSize: _surfaceSize,
+        );
+
+        // State should be a text input, not a select.
+        expect(
+          find.byWidgetPredicate(
+            (w) => w is OiTextInput && w.label == 'State / Province',
+          ),
+          findsOneWidget,
+        );
+      });
+
+      testWidgets('renders state as dropdown when country has states', (
+        tester,
+      ) async {
+        // Pre-select US (has states).
+        await tester.pumpObers(
+          _buildAddressForm(
+            countries: _sampleCountries(),
+            initialData: const OiAddressData(country: 'US'),
+          ),
+          surfaceSize: _surfaceSize,
+        );
+
+        // State should be an OiSelect. Country is also OiSelect → 2 total.
+        expect(find.byType(OiSelect<String>), findsNWidgets(2));
+      });
     });
 
     // ── Validation errors ─────────────────────────────────────────────
 
-    // Skip: OiAddressForm has no built-in validation — it delegates
-    // validation to the consumer via onChanged and OiAddressData.isComplete.
     group('validation errors', () {
-      testWidgets(
-        'validation shows error on empty required street field',
-        skip: true,
-        (tester) async {},
-      );
+      testWidgets('validation shows errors on empty required fields', (
+        tester,
+      ) async {
+        final formKey = GlobalKey<State>();
+        await tester.pumpObers(
+          _buildAddressForm(formKey: formKey, onSubmit: (_) {}),
+          surfaceSize: _surfaceSize,
+        );
 
-      testWidgets(
-        'validation shows error on empty required city field',
-        skip: true,
-        (tester) async {},
-      );
+        // Trigger submit via the state's submit method.
+        final state = formKey.currentState!;
+        // Calling submit() via dynamic because it's not on the public API.
+        // ignore: avoid_dynamic_calls
+        (state as dynamic).submit();
+        await tester.pump();
 
-      testWidgets(
-        'validation shows error on empty required zip field',
-        skip: true,
-        (tester) async {},
-      );
+        // Validation errors should appear for required fields.
+        expect(find.text('Street address is required'), findsOneWidget);
+        expect(find.text('City is required'), findsOneWidget);
+        expect(find.text('Postal code is required'), findsOneWidget);
+        expect(find.text('Country is required'), findsOneWidget);
+      });
+
+      testWidgets('validation clears errors when fields are filled', (
+        tester,
+      ) async {
+        final formKey = GlobalKey<State>();
+        OiAddressData? submitted;
+        await tester.pumpObers(
+          _buildAddressForm(
+            formKey: formKey,
+            onSubmit: (data) => submitted = data,
+          ),
+          surfaceSize: _surfaceSize,
+        );
+
+        // First trigger with empty fields to show errors.
+        // Calling submit() via dynamic because it's not on the public API.
+        // ignore: avoid_dynamic_calls
+        (formKey.currentState! as dynamic).submit();
+        await tester.pump();
+        expect(find.text('Street address is required'), findsOneWidget);
+
+        // Now fill the required fields.
+        final inputs = find.byType(OiTextInput);
+        await tester.enterText(inputs.at(3), '123 Main St'); // line1
+        await tester.enterText(inputs.at(5), 'Zürich'); // city
+        await tester.enterText(inputs.at(7), '8001'); // postalCode
+        await tester.enterText(inputs.at(8), 'Switzerland'); // country
+        await tester.pump();
+
+        // Submit again — should succeed.
+        // Calling submit() via dynamic because it's not on the public API.
+        // ignore: avoid_dynamic_calls
+        (formKey.currentState! as dynamic).submit();
+        await tester.pump();
+
+        expect(submitted, isNotNull);
+        expect(find.text('Street address is required'), findsNothing);
+      });
+
+      testWidgets('does not fire onSubmit when validation fails', (
+        tester,
+      ) async {
+        final formKey = GlobalKey<State>();
+        var submitCount = 0;
+        await tester.pumpObers(
+          _buildAddressForm(formKey: formKey, onSubmit: (_) => submitCount++),
+          surfaceSize: _surfaceSize,
+        );
+
+        // Calling submit() via dynamic because it's not on the public API.
+        // ignore: avoid_dynamic_calls
+        (formKey.currentState! as dynamic).submit();
+        await tester.pump();
+
+        expect(submitCount, 0);
+      });
+
+      testWidgets('fires onSubmit with valid data', (tester) async {
+        final formKey = GlobalKey<State>();
+        OiAddressData? submitted;
+        await tester.pumpObers(
+          _buildAddressForm(
+            formKey: formKey,
+            initialData: const OiAddressData(
+              line1: '123 Main St',
+              city: 'Zürich',
+              postalCode: '8001',
+              country: 'Switzerland',
+            ),
+            onSubmit: (data) => submitted = data,
+          ),
+          surfaceSize: _surfaceSize,
+        );
+
+        // Calling submit() via dynamic because it's not on the public API.
+        // ignore: avoid_dynamic_calls
+        (formKey.currentState! as dynamic).submit();
+        await tester.pump();
+
+        expect(submitted, isNotNull);
+        expect(submitted!.line1, '123 Main St');
+        expect(submitted!.city, 'Zürich');
+        expect(submitted!.postalCode, '8001');
+        expect(submitted!.country, 'Switzerland');
+      });
     });
 
     // ── Error message display ─────────────────────────────────────────
 
-    // Skip: OiAddressForm has no error message display — it does not
-    // accept error text or show inline validation messages.
     group('error message display', () {
-      testWidgets(
-        'error messages display below respective fields',
-        skip: true,
-        (tester) async {},
-      );
+      testWidgets('displays external error messages from error parameter', (
+        tester,
+      ) async {
+        await tester.pumpObers(
+          _buildAddressForm(
+            error: {'line1': 'Address is invalid', 'city': 'City not found'},
+          ),
+          surfaceSize: _surfaceSize,
+        );
+
+        expect(find.text('Address is invalid'), findsOneWidget);
+        expect(find.text('City not found'), findsOneWidget);
+      });
+
+      testWidgets('empty error map shows no error messages', (tester) async {
+        await tester.pumpObers(
+          _buildAddressForm(error: {}),
+          surfaceSize: _surfaceSize,
+        );
+
+        expect(find.text('Address is invalid'), findsNothing);
+      });
+
+      testWidgets('error messages render on correct fields', (tester) async {
+        await tester.pumpObers(
+          _buildAddressForm(error: {'postalCode': 'Invalid ZIP'}),
+          surfaceSize: _surfaceSize,
+        );
+
+        expect(find.text('Invalid ZIP'), findsOneWidget);
+
+        // The postal code OiTextInput should have the error.
+        final textInputs = tester
+            .widgetList<OiTextInput>(find.byType(OiTextInput))
+            .toList();
+        // postalCode is at index 7.
+        expect(textInputs[7].error, 'Invalid ZIP');
+      });
     });
 
     // ── Multiple field edits ─────────────────────────────────────────────

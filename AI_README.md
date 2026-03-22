@@ -2479,28 +2479,31 @@ A standardized, reusable address form with fields for name, company, address lin
 
 **Props:**
 - `label` (String, required) — accessibility label
-- `initialValue` (OiAddressData?) — initial address to pre-fill fields
-- `onChange` (ValueChanged<OiAddressData>?) — called on any field change with updated address
-- `onSubmit` (ValueChanged<OiAddressData>?) — called when form is submitted
+- `initialData` (OiAddressData) — initial address to pre-fill fields (default: empty)
+- `onChanged` (ValueChanged<OiAddressData>?) — called on any field change with updated address
+- `onSubmit` (ValueChanged<OiAddressData>?) — called when form is submitted with valid data; validation runs first
 - `countries` (List<OiCountryOption>?) — country options for dropdown; when a selected country has `states`, a state dropdown appears automatically
 - `showCompany` (bool, default true) — whether to show company field
 - `showPhone` (bool, default true) — whether to show phone field
 - `showName` (bool, default true) — whether to show first/last name fields
-- `readOnly` (bool, default false) — whether all fields are read-only
-- `error` (String?) — error message displayed below the form
+- `readOnly` (bool, default false) — whether all fields are read-only; takes precedence over `enabled`
+- `enabled` (bool, default true) — whether form inputs are enabled
+- `error` (Map<String, String>?) — per-field error messages keyed by field name (e.g. `{'line1': 'Required'}`)
 
 **Behavior:**
 - Responsive: first name + last name side by side on wide (≥ md), stacked on narrow
 - Country dropdown from `OiCountryOption` list; state becomes dropdown when country has states
 - Field order: first name, last name, company, line 1, line 2, city, state, postal code, country, phone
 - Read-only mode disables all fields
-- `onChange` fires on every field change with a new `OiAddressData`
+- `onChanged` fires on every field change with a new `OiAddressData`
+- Built-in validation on submit: line1, city, postalCode, country are required
+- `error` map renders per-field inline error messages
 
 **Usage Example:**
 ```dart
 OiAddressForm(
   label: 'Shipping address',
-  initialValue: const OiAddressData(
+  initialData: const OiAddressData(
     firstName: 'Jane',
     lastName: 'Doe',
     line1: '123 Main St',
@@ -2510,7 +2513,7 @@ OiAddressForm(
   ),
   countries: myCountryOptions, // List<OiCountryOption>
   showCompany: false,
-  onChange: (address) => setState(() => _address = address),
+  onChanged: (address) => setState(() => _address = address),
   onSubmit: (address) => _checkout(address),
 )
 ```
