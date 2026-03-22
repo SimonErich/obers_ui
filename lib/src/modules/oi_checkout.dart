@@ -201,12 +201,8 @@ class _OiCheckoutState extends State<OiCheckout> {
     _shipLastName = TextEditingController(
       text: _shippingAddress.lastName ?? '',
     );
-    _shipAddress1 = TextEditingController(
-      text: _shippingAddress.line1 ?? '',
-    );
-    _shipAddress2 = TextEditingController(
-      text: _shippingAddress.line2 ?? '',
-    );
+    _shipAddress1 = TextEditingController(text: _shippingAddress.line1 ?? '');
+    _shipAddress2 = TextEditingController(text: _shippingAddress.line2 ?? '');
     _shipCity = TextEditingController(text: _shippingAddress.city ?? '');
     _shipState = TextEditingController(text: _shippingAddress.state ?? '');
     _shipPostalCode = TextEditingController(

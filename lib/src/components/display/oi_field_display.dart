@@ -208,11 +208,7 @@ class OiFieldDisplay extends StatelessWidget {
     }
 
     if (onTap != null) {
-      result = OiTappable(
-        onTap: onTap,
-        semanticLabel: label,
-        child: result,
-      );
+      result = OiTappable(onTap: onTap, semanticLabel: label, child: result);
     }
 
     if (leading != null) {

@@ -177,7 +177,8 @@ class _OiTagInputState extends State<OiTagInput> {
     return source
         .where(
           (s) =>
-              s.toLowerCase().startsWith(lowerQuery) && !widget.tags.contains(s),
+              s.toLowerCase().startsWith(lowerQuery) &&
+              !widget.tags.contains(s),
         )
         .toList();
   }
@@ -410,16 +411,14 @@ class _OiTagInputState extends State<OiTagInput> {
 
     if (!widget._hasSuggestions) return frame;
 
-    final showDropdown = _showSuggestions &&
+    final showDropdown =
+        _showSuggestions &&
         (_filteredSuggestions.isNotEmpty || _suggestionsLoading);
 
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        frame,
-        if (showDropdown) _buildSuggestionsDropdown(context),
-      ],
+      children: [frame, if (showDropdown) _buildSuggestionsDropdown(context)],
     );
   }
 }

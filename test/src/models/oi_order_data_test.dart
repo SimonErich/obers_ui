@@ -22,9 +22,7 @@ OiOrderData _makeOrder({
     orderNumber: orderNumber,
     createdAt: createdAt ?? DateTime(2026, 1, 15),
     status: status,
-    items: const [
-      OiCartItem(productKey: 'p1', name: 'Widget', unitPrice: 10),
-    ],
+    items: const [OiCartItem(productKey: 'p1', name: 'Widget', unitPrice: 10)],
     summary: const OiCartSummary(total: 10),
     shippingAddress: const OiAddressData(firstName: 'Jane', lastName: 'Doe'),
     billingAddress: billingAddress,

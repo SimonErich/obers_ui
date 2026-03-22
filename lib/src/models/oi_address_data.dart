@@ -96,12 +96,8 @@ class OiAddressData {
       company: identical(company, _sentinel)
           ? this.company
           : company as String?,
-      line1: identical(line1, _sentinel)
-          ? this.line1
-          : line1 as String?,
-      line2: identical(line2, _sentinel)
-          ? this.line2
-          : line2 as String?,
+      line1: identical(line1, _sentinel) ? this.line1 : line1 as String?,
+      line2: identical(line2, _sentinel) ? this.line2 : line2 as String?,
       city: identical(city, _sentinel) ? this.city : city as String?,
       state: identical(state, _sentinel) ? this.state : state as String?,
       postalCode: identical(postalCode, _sentinel)
