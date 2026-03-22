@@ -1,3 +1,4 @@
+// Why: Test files are not part of the public API surface; requiring doc comments on every test group and helper closure would add noise without value.
 // ignore_for_file: public_member_api_docs
 
 import 'package:flutter_test/flutter_test.dart';
@@ -27,7 +28,7 @@ void main() {
       const item = OiCartItem(
         productKey: 'p1',
         name: 'Widget',
-        unitPrice: 10.0,
+        unitPrice: 10,
       );
       expect(item.quantity, 1);
     });
@@ -36,7 +37,7 @@ void main() {
       const item = OiCartItem(
         productKey: 'p1',
         name: 'Widget',
-        unitPrice: 10.0,
+        unitPrice: 10,
         quantity: 3,
       );
       expect(item.totalPrice, 30.0);
@@ -46,7 +47,7 @@ void main() {
       const item = OiCartItem(
         productKey: 'p1',
         name: 'Widget',
-        unitPrice: 10.0,
+        unitPrice: 10,
       );
       final copy = item.copyWith(quantity: 5, name: 'Gadget');
       expect(copy.quantity, 5);
@@ -58,7 +59,7 @@ void main() {
       const item = OiCartItem(
         productKey: 'p1',
         name: 'Widget',
-        unitPrice: 10.0,
+        unitPrice: 10,
         variantKey: 'v1',
         imageUrl: 'https://example.com/img.png',
         maxQuantity: 10,
@@ -77,8 +78,8 @@ void main() {
     });
 
     test('equality works', () {
-      const a = OiCartItem(productKey: 'p1', name: 'Widget', unitPrice: 10.0);
-      const b = OiCartItem(productKey: 'p1', name: 'Widget', unitPrice: 10.0);
+      const a = OiCartItem(productKey: 'p1', name: 'Widget', unitPrice: 10);
+      const b = OiCartItem(productKey: 'p1', name: 'Widget', unitPrice: 10);
       expect(a, equals(b));
       expect(a.hashCode, b.hashCode);
     });
@@ -87,13 +88,13 @@ void main() {
       const a = OiCartItem(
         productKey: 'p1',
         name: 'Widget',
-        unitPrice: 10.0,
+        unitPrice: 10,
         attributes: {'Color': 'Red'},
       );
       const b = OiCartItem(
         productKey: 'p1',
         name: 'Widget',
-        unitPrice: 10.0,
+        unitPrice: 10,
         attributes: {'Color': 'Blue'},
       );
       expect(a, isNot(equals(b)));
@@ -103,7 +104,7 @@ void main() {
       const item = OiCartItem(
         productKey: 'p1',
         name: 'Widget',
-        unitPrice: 10.0,
+        unitPrice: 10,
         quantity: 3,
       );
       final str = item.toString();

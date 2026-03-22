@@ -33,7 +33,7 @@ const _summaryNoDiscount = OiCartSummary(
 );
 
 const _items = [
-  OiCartItem(productKey: 'p1', name: 'Widget A', unitPrice: 50, quantity: 1),
+  OiCartItem(productKey: 'p1', name: 'Widget A', unitPrice: 50),
   OiCartItem(productKey: 'p2', name: 'Widget B', unitPrice: 25, quantity: 2),
 ];
 

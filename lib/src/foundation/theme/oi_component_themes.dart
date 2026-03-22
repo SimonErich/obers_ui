@@ -7,6 +7,7 @@ import 'package:obers_ui/src/foundation/theme/component_themes/oi_checkbox_theme
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_dialog_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_field_display_theme.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_file_explorer_theme_data.dart';
+import 'package:obers_ui/src/foundation/theme/component_themes/oi_pagination_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_progress_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_select_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_sheet_theme_data.dart';
@@ -16,7 +17,6 @@ import 'package:obers_ui/src/foundation/theme/component_themes/oi_table_theme_da
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_tabs_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_text_input_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_toast_theme_data.dart';
-import 'package:obers_ui/src/foundation/theme/component_themes/oi_pagination_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_tooltip_theme_data.dart';
 
 export 'component_themes/oi_avatar_theme_data.dart';
@@ -27,6 +27,7 @@ export 'component_themes/oi_checkbox_theme_data.dart';
 export 'component_themes/oi_dialog_theme_data.dart';
 export 'component_themes/oi_field_display_theme.dart';
 export 'component_themes/oi_file_explorer_theme_data.dart';
+export 'component_themes/oi_pagination_theme_data.dart';
 export 'component_themes/oi_progress_theme_data.dart';
 export 'component_themes/oi_select_theme_data.dart';
 export 'component_themes/oi_sheet_theme_data.dart';
@@ -36,7 +37,6 @@ export 'component_themes/oi_table_theme_data.dart';
 export 'component_themes/oi_tabs_theme_data.dart';
 export 'component_themes/oi_text_input_theme_data.dart';
 export 'component_themes/oi_toast_theme_data.dart';
-export 'component_themes/oi_pagination_theme_data.dart';
 export 'component_themes/oi_tooltip_theme_data.dart';
 
 /// Aggregates per-component theme overrides for the design system.

@@ -104,8 +104,6 @@ void main() {
         const SingleChildScrollView(
           child: OiProductFilters(
             label: 'Filters',
-            currencyCode: 'EUR',
-            priceRangeMin: 0,
             priceRangeMax: 500,
           ),
         ),

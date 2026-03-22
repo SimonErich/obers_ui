@@ -59,7 +59,7 @@ class OiWishlistButton extends StatelessWidget {
     }
 
     if (_interactive) {
-      content = OiTappable(onTap: onToggle!, child: content);
+      content = OiTappable(onTap: onToggle, child: content);
     }
 
     return Semantics(

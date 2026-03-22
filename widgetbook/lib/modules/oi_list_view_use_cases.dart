@@ -42,10 +42,10 @@ const _sampleItems = [
   ),
 ];
 
-const _sortOptions = [
-  OiSortOption(id: 'name', label: 'Name'),
-  OiSortOption(id: 'date', label: 'Date'),
-  OiSortOption(id: 'status', label: 'Status'),
+final _sortOptions = [
+  const OiListSortOption(id: 'name', label: 'Name'),
+  const OiListSortOption(id: 'date', label: 'Date'),
+  const OiListSortOption(id: 'status', label: 'Status'),
 ];
 
 Widget _buildItem(_SampleItem item) {

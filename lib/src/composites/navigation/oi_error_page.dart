@@ -193,7 +193,7 @@ class OiErrorPage extends StatelessWidget {
           OiButton.primary(
             label: actionLabel!,
             onTap: onAction,
-            semanticLabel: actionLabel!,
+            semanticLabel: actionLabel,
           ),
         ],
       ],

@@ -21,12 +21,12 @@ void main() {
 
     test('full construction with all fields', () {
       const s = OiCartSummary(
-        subtotal: 100.0,
-        discount: 20.0,
+        subtotal: 100,
+        discount: 20,
         discountLabel: 'SUMMER20 (-20%)',
         shipping: 5.99,
         shippingLabel: 'Express Shipping',
-        tax: 16.0,
+        tax: 16,
         taxLabel: 'VAT 20%',
         total: 101.99,
         currencyCode: 'EUR',
@@ -43,8 +43,8 @@ void main() {
     });
 
     test('copyWith replaces fields', () {
-      const s = OiCartSummary(subtotal: 100.0, total: 100.0);
-      final updated = s.copyWith(discount: 10.0, total: 90.0);
+      const s = OiCartSummary(subtotal: 100, total: 100);
+      final updated = s.copyWith(discount: 10.0, total: 90);
       expect(updated.subtotal, 100.0);
       expect(updated.discount, 10.0);
       expect(updated.total, 90.0);
@@ -52,13 +52,13 @@ void main() {
 
     test('copyWith can set nullable fields to null via sentinel', () {
       const s = OiCartSummary(
-        subtotal: 100.0,
-        total: 100.0,
-        discount: 10.0,
+        subtotal: 100,
+        total: 100,
+        discount: 10,
         discountLabel: 'SAVE10',
-        shipping: 5.0,
+        shipping: 5,
         shippingLabel: 'Standard',
-        tax: 8.0,
+        tax: 8,
         taxLabel: 'VAT 20%',
       );
       final cleared = s.copyWith(
@@ -78,8 +78,8 @@ void main() {
     });
 
     test('copyWith preserves null when not specified', () {
-      const s = OiCartSummary(subtotal: 50.0, total: 50.0);
-      final updated = s.copyWith(total: 60.0);
+      const s = OiCartSummary(subtotal: 50, total: 50);
+      final updated = s.copyWith(total: 60);
       expect(updated.discount, isNull);
       expect(updated.shipping, isNull);
       expect(updated.tax, isNull);
@@ -88,30 +88,30 @@ void main() {
 
     test('equal instances are ==', () {
       const a = OiCartSummary(
-        subtotal: 100.0,
-        discount: 10.0,
+        subtotal: 100,
+        discount: 10,
         discountLabel: 'SAVE10',
-        total: 90.0,
+        total: 90,
       );
       const b = OiCartSummary(
-        subtotal: 100.0,
-        discount: 10.0,
+        subtotal: 100,
+        discount: 10,
         discountLabel: 'SAVE10',
-        total: 90.0,
+        total: 90,
       );
       expect(a, equals(b));
     });
 
     test('different instances are not ==', () {
-      const a = OiCartSummary(subtotal: 100.0, total: 100.0);
-      const b = OiCartSummary(subtotal: 100.0, total: 90.0);
+      const a = OiCartSummary(subtotal: 100, total: 100);
+      const b = OiCartSummary(subtotal: 100, total: 90);
       expect(a, isNot(equals(b)));
     });
 
     test('toString includes key fields', () {
       const s = OiCartSummary(
-        subtotal: 100.0,
-        total: 90.0,
+        subtotal: 100,
+        total: 90,
         currencyCode: 'EUR',
       );
       expect(
@@ -122,17 +122,17 @@ void main() {
 
     test('equal instances have the same hashCode', () {
       const a = OiCartSummary(
-        subtotal: 50.0,
-        tax: 10.0,
+        subtotal: 50,
+        tax: 10,
         taxLabel: 'Tax',
-        total: 60.0,
+        total: 60,
         currencyCode: 'GBP',
       );
       const b = OiCartSummary(
-        subtotal: 50.0,
-        tax: 10.0,
+        subtotal: 50,
+        tax: 10,
         taxLabel: 'Tax',
-        total: 60.0,
+        total: 60,
         currencyCode: 'GBP',
       );
       expect(a.hashCode, equals(b.hashCode));

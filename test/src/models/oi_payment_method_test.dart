@@ -50,7 +50,6 @@ void main() {
       const method = OiPaymentMethod(
         key: 'cc',
         label: 'Credit Card',
-        isDefault: false,
       );
       final updated = method.copyWith(
         key: 'visa',

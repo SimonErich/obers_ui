@@ -1,3 +1,4 @@
+// Why: Test files are not part of the public API surface; requiring doc comments on every test group and helper closure would add noise without value.
 // ignore_for_file: public_member_api_docs
 
 import 'package:flutter_test/flutter_test.dart';
@@ -28,7 +29,7 @@ const _payment = OiPaymentMethod(key: 'visa', label: 'Visa');
 const _shipping = OiShippingMethod(
   key: 'standard',
   label: 'Standard',
-  price: 5.0,
+  price: 5,
 );
 
 void main() {

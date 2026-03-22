@@ -1,4 +1,7 @@
 import 'package:flutter/foundation.dart';
+import 'package:obers_ui/obers_ui.dart' show OiCouponInput;
+import 'package:obers_ui/src/components/shop/oi_coupon_input.dart' show OiCouponInput;
+import 'package:obers_ui/src/components/shop/shop.dart' show OiCouponInput;
 
 /// The result of applying a coupon code.
 ///

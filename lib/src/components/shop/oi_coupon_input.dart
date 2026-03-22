@@ -70,8 +70,9 @@ class _OiCouponInputState extends State<OiCouponInput> {
 
   @override
   void dispose() {
-    _controller.removeListener(_onTextChanged);
-    _controller.dispose();
+    _controller
+      ..removeListener(_onTextChanged)
+      ..dispose();
     super.dispose();
   }
 
@@ -185,7 +186,6 @@ class _OiCouponInputState extends State<OiCouponInput> {
     return OiRow(
       breakpoint: breakpoint,
       gap: OiResponsive(sp.sm),
-      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         OiIcon(
           icon: _kCheckIcon,

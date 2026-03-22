@@ -1,3 +1,4 @@
+// Why: Test files are not part of the public API surface; requiring doc comments on every test group and helper closure would add noise without value.
 // ignore_for_file: public_member_api_docs
 
 import 'package:flutter_test/flutter_test.dart';
@@ -10,7 +11,6 @@ void main() {
         key: 'v1',
         label: 'Red / Large',
         price: 34.99,
-        inStock: true,
         stockCount: 5,
         attributes: {'Color': 'Red', 'Size': 'Large'},
       );
@@ -42,7 +42,7 @@ void main() {
       const variant = OiProductVariant(
         key: 'v1',
         label: 'Red',
-        price: 10.0,
+        price: 10,
         imageUrl: 'https://example.com/img.png',
         stockCount: 5,
       );
@@ -78,7 +78,6 @@ void main() {
         price: 29.99,
         description: 'A fine widget',
         currencyCode: 'EUR',
-        inStock: true,
         rating: 4.5,
         reviewCount: 42,
       );
@@ -92,7 +91,7 @@ void main() {
     });
 
     test('defaults: currency USD, inStock true, empty lists/maps', () {
-      const product = OiProductData(key: 'p1', name: 'W', price: 10.0);
+      const product = OiProductData(key: 'p1', name: 'W', price: 10);
       expect(product.currencyCode, 'USD');
       expect(product.inStock, isTrue);
       expect(product.imageUrls, isEmpty);
@@ -105,7 +104,7 @@ void main() {
     });
 
     test('copyWith replaces fields', () {
-      const product = OiProductData(key: 'p1', name: 'Widget', price: 10.0);
+      const product = OiProductData(key: 'p1', name: 'Widget', price: 10);
       final copy = product.copyWith(price: 19.99, name: 'Gadget');
       expect(copy.price, 19.99);
       expect(copy.name, 'Gadget');
@@ -116,10 +115,10 @@ void main() {
       const product = OiProductData(
         key: 'p1',
         name: 'Widget',
-        price: 10.0,
+        price: 10,
         description: 'Desc',
-        compareAtPrice: 20.0,
-        rating: 4.0,
+        compareAtPrice: 20,
+        rating: 4,
         reviewCount: 10,
         sku: 'SKU-001',
       );
@@ -138,20 +137,20 @@ void main() {
     });
 
     test('equality works', () {
-      const a = OiProductData(key: 'p1', name: 'Widget', price: 10.0);
-      const b = OiProductData(key: 'p1', name: 'Widget', price: 10.0);
+      const a = OiProductData(key: 'p1', name: 'Widget', price: 10);
+      const b = OiProductData(key: 'p1', name: 'Widget', price: 10);
       expect(a, equals(b));
       expect(a.hashCode, b.hashCode);
     });
 
     test('inequality for different products', () {
-      const a = OiProductData(key: 'p1', name: 'Widget', price: 10.0);
-      const b = OiProductData(key: 'p2', name: 'Gadget', price: 20.0);
+      const a = OiProductData(key: 'p1', name: 'Widget', price: 10);
+      const b = OiProductData(key: 'p2', name: 'Gadget', price: 20);
       expect(a, isNot(equals(b)));
     });
 
     test('toString includes key fields', () {
-      const product = OiProductData(key: 'p1', name: 'Widget', price: 10.0);
+      const product = OiProductData(key: 'p1', name: 'Widget', price: 10);
       final str = product.toString();
       expect(str, contains('p1'));
       expect(str, contains('Widget'));

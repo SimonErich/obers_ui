@@ -20,7 +20,6 @@ import 'package:obers_ui/src/models/oi_shipping_method.dart';
 import 'package:obers_ui/src/primitives/display/oi_divider.dart';
 import 'package:obers_ui/src/primitives/display/oi_label.dart';
 import 'package:obers_ui/src/primitives/layout/oi_column.dart';
-import 'package:obers_ui/src/primitives/layout/oi_row.dart';
 
 /// The steps available in an [OiCheckout] flow.
 ///
@@ -400,7 +399,7 @@ class _OiCheckoutState extends State<OiCheckout> {
         paymentMethod: _selectedPayment!,
       );
       await widget.onPlaceOrder!(checkoutData);
-    } catch (e) {
+    } on Exception catch (e) {
       if (mounted) {
         setState(() {
           _orderError = e.toString();
@@ -513,11 +512,8 @@ class _OiCheckoutState extends State<OiCheckout> {
     required TextEditingController cityCtrl,
     required TextEditingController stateCtrl,
     required TextEditingController postalCodeCtrl,
-    TextEditingController? phoneCtrl,
+    required String? selectedCountry, required ValueChanged<String?> onCountryChanged, required String errorPrefix, TextEditingController? phoneCtrl,
     TextEditingController? emailCtrl,
-    required String? selectedCountry,
-    required ValueChanged<String?> onCountryChanged,
-    required String errorPrefix,
     bool showContactFields = false,
   }) {
     final sp = context.spacing;
@@ -985,7 +981,6 @@ class _OiCheckoutState extends State<OiCheckout> {
               items: widget.items,
               label: 'Order summary',
               currencyCode: widget.currencyCode,
-              showItems: true,
               expandedByDefault: true,
             ),
           ),
@@ -1013,7 +1008,6 @@ class _OiCheckoutState extends State<OiCheckout> {
                   items: widget.items,
                   label: 'Order summary',
                   currencyCode: widget.currencyCode,
-                  showItems: true,
                 ),
               ),
             ],

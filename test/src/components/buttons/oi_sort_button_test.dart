@@ -74,7 +74,7 @@ void main() {
     expect(find.text('Name'), findsOneWidget);
 
     // Rebuild with a different currentSort to simulate selection.
-    final dateSort = const OiSortOption(field: 'date', label: 'Date');
+    const dateSort = OiSortOption(field: 'date', label: 'Date');
     await tester.pumpObers(
       OiSortButton(
         options: options,

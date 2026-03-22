@@ -76,7 +76,7 @@ void main() {
           (w) =>
               w is Semantics &&
               w.properties.label == 'Add to wishlist' &&
-              w.properties.toggled == true,
+              (w.properties.toggled ?? false),
         ),
         findsOneWidget,
       );

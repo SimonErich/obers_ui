@@ -126,7 +126,6 @@ void main() {
         'Text': const OiFieldDisplay(
           label: _l,
           value: 'Hello World',
-          type: OiFieldType.text,
         ),
         'Number': const OiFieldDisplay(
           label: _l,
@@ -168,7 +167,6 @@ void main() {
         'Text': const OiFieldDisplay(
           label: _l,
           value: 'Hello World',
-          type: OiFieldType.text,
         ),
         'Number': const OiFieldDisplay(
           label: _l,
@@ -387,12 +385,10 @@ void main() {
         'Empty (null)': const OiFieldDisplay(
           label: _l,
           value: null,
-          type: OiFieldType.text,
         ),
         'Custom emptyText': const OiFieldDisplay(
           label: _l,
           value: null,
-          type: OiFieldType.text,
           emptyText: 'N/A',
         ),
         'Custom format': OiFieldDisplay(
@@ -429,12 +425,10 @@ void main() {
         'Empty (null)': const OiFieldDisplay(
           label: _l,
           value: null,
-          type: OiFieldType.text,
         ),
         'Custom emptyText': const OiFieldDisplay(
           label: _l,
           value: null,
-          type: OiFieldType.text,
           emptyText: 'N/A',
         ),
         'Custom format': OiFieldDisplay(

@@ -1,3 +1,4 @@
+// Why: Test files are not part of the public API surface; requiring doc comments on every test group and helper closure would add noise without value.
 // ignore_for_file: public_member_api_docs
 
 import 'package:flutter_test/flutter_test.dart';
@@ -7,13 +8,13 @@ void main() {
   group('OiCartSummary', () {
     test('constructor and field access', () {
       const summary = OiCartSummary(
-        subtotal: 100.0,
-        total: 95.0,
-        discount: 5.0,
+        subtotal: 100,
+        total: 95,
+        discount: 5,
         discountLabel: 'SAVE5',
-        shipping: 10.0,
+        shipping: 10,
         shippingLabel: 'Standard',
-        tax: 8.0,
+        tax: 8,
         taxLabel: 'VAT 8%',
       );
       expect(summary.subtotal, 100.0);
@@ -28,7 +29,7 @@ void main() {
     });
 
     test('defaults: nullable fields null, currency USD', () {
-      const summary = OiCartSummary(subtotal: 50.0, total: 50.0);
+      const summary = OiCartSummary(subtotal: 50, total: 50);
       expect(summary.discount, isNull);
       expect(summary.discountLabel, isNull);
       expect(summary.shipping, isNull);
@@ -39,8 +40,8 @@ void main() {
     });
 
     test('copyWith replaces specified fields', () {
-      const summary = OiCartSummary(subtotal: 100.0, total: 100.0);
-      final copy = summary.copyWith(total: 90.0, discount: 10.0);
+      const summary = OiCartSummary(subtotal: 100, total: 100);
+      final copy = summary.copyWith(total: 90, discount: 10.0);
       expect(copy.total, 90.0);
       expect(copy.discount, 10.0);
       expect(copy.subtotal, 100.0);
@@ -48,11 +49,11 @@ void main() {
 
     test('copyWith can set nullable fields to null', () {
       const summary = OiCartSummary(
-        subtotal: 100.0,
-        total: 100.0,
-        discount: 5.0,
-        shipping: 10.0,
-        tax: 8.0,
+        subtotal: 100,
+        total: 100,
+        discount: 5,
+        shipping: 10,
+        tax: 8,
       );
       final copy = summary.copyWith(discount: null, shipping: null, tax: null);
       expect(copy.discount, isNull);
@@ -61,20 +62,20 @@ void main() {
     });
 
     test('equality works', () {
-      const a = OiCartSummary(subtotal: 100.0, total: 100.0);
-      const b = OiCartSummary(subtotal: 100.0, total: 100.0);
+      const a = OiCartSummary(subtotal: 100, total: 100);
+      const b = OiCartSummary(subtotal: 100, total: 100);
       expect(a, equals(b));
       expect(a.hashCode, b.hashCode);
     });
 
     test('inequality for different totals', () {
-      const a = OiCartSummary(subtotal: 100.0, total: 100.0);
-      const b = OiCartSummary(subtotal: 100.0, total: 90.0);
+      const a = OiCartSummary(subtotal: 100, total: 100);
+      const b = OiCartSummary(subtotal: 100, total: 90);
       expect(a, isNot(equals(b)));
     });
 
     test('toString includes key fields', () {
-      const summary = OiCartSummary(subtotal: 100.0, total: 100.0);
+      const summary = OiCartSummary(subtotal: 100, total: 100);
       expect(summary.toString(), contains('100.0'));
     });
   });

@@ -202,7 +202,10 @@ class _OiOrderTrackerState extends State<OiOrderTracker> {
         case OiOrderStatus.refunded:
           dotColor = colors.textMuted;
           icon = _kRefundIcon;
-        default:
+        case OiOrderStatus.pending:
+        case OiOrderStatus.confirmed:
+        case OiOrderStatus.processing:
+        case OiOrderStatus.shipped:
           dotColor = colors.primary.base;
       }
 
@@ -235,7 +238,7 @@ class _OiOrderTrackerState extends State<OiOrderTracker> {
                   style: TextStyle(fontSize: 10, color: colors.textMuted),
                 ),
                 const SizedBox(width: 8),
-                OiLabel.bodyStrong('Order Timeline'),
+                const OiLabel.bodyStrong('Order Timeline'),
               ],
             ),
           ),

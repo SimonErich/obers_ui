@@ -1,7 +1,6 @@
 // Tests for OiLocaleSwitcher — REQ-0016.
 // ignore_for_file: public_member_api_docs
 
-import 'dart:ui';
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -141,7 +140,6 @@ void main() {
         currentLocale: const Locale('en'),
         locales: locales,
         onLocaleChange: (_) {},
-        showCode: false,
       ),
     );
 

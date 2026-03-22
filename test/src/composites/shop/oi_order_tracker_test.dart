@@ -5,8 +5,8 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui/src/components/shop/oi_order_status_badge.dart';
 import 'package:obers_ui/src/composites/forms/oi_stepper.dart';
-import 'package:obers_ui/src/composites/shop/oi_order_tracker.dart';
 import 'package:obers_ui/src/composites/scheduling/oi_timeline.dart';
+import 'package:obers_ui/src/composites/shop/oi_order_tracker.dart';
 import 'package:obers_ui/src/models/oi_address_data.dart';
 import 'package:obers_ui/src/models/oi_cart_item.dart';
 import 'package:obers_ui/src/models/oi_cart_summary.dart';
@@ -247,15 +247,15 @@ void main() {
         createdAt: DateTime(2024),
         status: OiOrderStatus.shipped,
         items: const [
-          OiCartItem(productKey: 'p1', name: 'Item', unitPrice: 10.0),
+          OiCartItem(productKey: 'p1', name: 'Item', unitPrice: 10),
         ],
-        summary: const OiCartSummary(subtotal: 10.0, total: 10.0),
+        summary: const OiCartSummary(subtotal: 10, total: 10),
         shippingAddress: const OiAddressData(firstName: 'Jane'),
         paymentMethod: const OiPaymentMethod(key: 'visa', label: 'Visa'),
         shippingMethod: const OiShippingMethod(
           key: 'std',
           label: 'Standard',
-          price: 5.0,
+          price: 5,
         ),
       );
 
@@ -278,15 +278,15 @@ void main() {
         createdAt: DateTime(2024),
         status: OiOrderStatus.processing,
         items: const [
-          OiCartItem(productKey: 'p1', name: 'Item', unitPrice: 10.0),
+          OiCartItem(productKey: 'p1', name: 'Item', unitPrice: 10),
         ],
-        summary: const OiCartSummary(subtotal: 10.0, total: 10.0),
+        summary: const OiCartSummary(subtotal: 10, total: 10),
         shippingAddress: const OiAddressData(firstName: 'Jane'),
         paymentMethod: const OiPaymentMethod(key: 'visa', label: 'Visa'),
         shippingMethod: const OiShippingMethod(
           key: 'std',
           label: 'Standard',
-          price: 5.0,
+          price: 5,
         ),
         timeline: _sampleTimeline(),
       );

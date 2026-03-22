@@ -137,15 +137,15 @@ void main() {
         createdAt: DateTime(2024),
         status: OiOrderStatus.shipped,
         items: const [
-          OiCartItem(productKey: 'p1', name: 'Item', unitPrice: 10.0),
+          OiCartItem(productKey: 'p1', name: 'Item', unitPrice: 10),
         ],
-        summary: const OiCartSummary(subtotal: 10.0, total: 10.0),
+        summary: const OiCartSummary(subtotal: 10, total: 10),
         shippingAddress: const OiAddressData(firstName: 'Jane'),
         paymentMethod: const OiPaymentMethod(key: 'visa', label: 'Visa'),
         shippingMethod: const OiShippingMethod(
           key: 'std',
           label: 'Standard',
-          price: 5.0,
+          price: 5,
         ),
       );
 

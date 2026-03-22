@@ -3,7 +3,6 @@
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:obers_ui/src/components/buttons/oi_button.dart';
 import 'package:obers_ui/src/components/display/oi_card.dart';
 import 'package:obers_ui/src/components/display/oi_pagination.dart';
 import 'package:obers_ui/src/components/navigation/oi_breadcrumbs.dart';
@@ -17,15 +16,15 @@ void main() {
       tester,
     ) async {
       await tester.pumpObers(
-        OiResourcePage(
+        const OiResourcePage(
           label: 'Users',
           title: 'Users',
-          child: const Text('User list'),
           pagination: OiPagination(
             totalItems: 100,
             currentPage: 1,
             label: 'Pagination',
           ),
+          child: Text('User list'),
         ),
         surfaceSize: const Size(1200, 800),
       );
@@ -107,11 +106,11 @@ void main() {
 
     testWidgets('filters render for list variant only', (tester) async {
       await tester.pumpObers(
-        OiResourcePage(
+        const OiResourcePage(
           label: 'Users',
           title: 'Users',
-          filters: const Text('FilterWidget'),
-          child: const Text('Content'),
+          filters: Text('FilterWidget'),
+          child: Text('Content'),
         ),
         surfaceSize: const Size(1200, 800),
       );
@@ -271,7 +270,7 @@ void main() {
 
     testWidgets('pagination not rendered for non-list variant', (tester) async {
       await tester.pumpObers(
-        OiResourcePage(
+        const OiResourcePage(
           label: 'User',
           title: 'User',
           variant: OiResourcePageVariant.show,
@@ -280,7 +279,7 @@ void main() {
             currentPage: 1,
             label: 'Pagination',
           ),
-          child: const Text('Content'),
+          child: Text('Content'),
         ),
         surfaceSize: const Size(1200, 800),
       );

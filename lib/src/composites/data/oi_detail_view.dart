@@ -3,7 +3,6 @@ import 'package:obers_ui/src/components/display/oi_badge.dart';
 import 'package:obers_ui/src/components/display/oi_card.dart';
 import 'package:obers_ui/src/components/display/oi_field_display.dart';
 import 'package:obers_ui/src/foundation/oi_responsive.dart';
-import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/models/oi_field_type.dart';
 import 'package:obers_ui/src/primitives/display/oi_divider.dart';
 import 'package:obers_ui/src/primitives/display/oi_label.dart';
@@ -178,7 +177,6 @@ class OiDetailView extends StatelessWidget {
     Widget content = OiColumn(
       breakpoint: bp,
       crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
       children: [
         for (var i = 0; i < nonEmptySections.length; i++) ...[
           _buildSection(context, nonEmptySections[i], i, bp),
@@ -218,7 +216,6 @@ class OiDetailView extends StatelessWidget {
       child: OiColumn(
         breakpoint: bp,
         crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
         children: [
           if (section.title != null)
             Padding(
@@ -240,7 +237,6 @@ class OiDetailView extends StatelessWidget {
       return OiColumn(
         breakpoint: bp,
         crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
         children: [
           for (var i = 0; i < section.fields.length; i++) ...[
             _buildField(context, section.fields[i]),

@@ -82,20 +82,20 @@ void main() {
       const a = OiProductVariant(
         key: 'v1',
         label: 'Red',
-        price: 5.0,
+        price: 5,
         attributes: {'Size': 'L'},
       );
       const b = OiProductVariant(
         key: 'v1',
         label: 'Red',
-        price: 5.0,
+        price: 5,
         attributes: {'Size': 'L'},
       );
       expect(a.hashCode, equals(b.hashCode));
     });
 
     test('toString includes key fields', () {
-      const v = OiProductVariant(key: 'v1', label: 'Red', price: 5.0);
+      const v = OiProductVariant(key: 'v1', label: 'Red', price: 5);
       expect(v.toString(), contains('v1'));
       expect(v.toString(), contains('Red'));
     });
@@ -174,7 +174,7 @@ void main() {
         compareAtPrice: 29.99,
         imageUrl: 'http://img.png',
         stockCount: 10,
-        rating: 4.0,
+        rating: 4,
         reviewCount: 50,
         sku: 'SKU-1',
       );

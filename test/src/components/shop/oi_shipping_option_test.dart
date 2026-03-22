@@ -5,7 +5,6 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui/src/components/shop/oi_shipping_option.dart';
 import 'package:obers_ui/src/models/oi_shipping_method.dart';
-import 'package:obers_ui/src/primitives/display/oi_label.dart';
 
 import '../../../helpers/pump_app.dart';
 

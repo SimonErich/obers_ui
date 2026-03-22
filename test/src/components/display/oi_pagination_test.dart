@@ -11,7 +11,7 @@ import '../../../helpers/pump_app.dart';
 void main() {
   // Pages variant uses a wide Row (total label, per-page selector, nav
   // buttons, page buttons) that needs a wide surface to avoid overflow.
-  const _wide = Size(1200, 600);
+  const wide = Size(1200, 600);
 
   group('OiPagination - pages variant', () {
     testWidgets('renders page numbers for multi-page data', (tester) async {
@@ -20,10 +20,9 @@ void main() {
           totalItems: 75,
           currentPage: 0,
           label: 'items',
-          perPage: 25,
           onPageChange: (_) {},
         ),
-        surfaceSize: _wide,
+        surfaceSize: wide,
       );
 
       // 3 pages: 1, 2, 3
@@ -38,10 +37,9 @@ void main() {
           totalItems: 75,
           currentPage: 1,
           label: 'items',
-          perPage: 25,
           onPageChange: (_) {},
         ),
-        surfaceSize: _wide,
+        surfaceSize: wide,
       );
 
       // Page 2 (index 1) should be displayed as "2" and decorated
@@ -60,10 +58,9 @@ void main() {
           totalItems: 50,
           currentPage: 0,
           label: 'items',
-          perPage: 25,
           onPageChange: (_) {},
         ),
-        surfaceSize: _wide,
+        surfaceSize: wide,
       );
 
       // prev and first buttons exist but are disabled (enabled: false)
@@ -77,10 +74,9 @@ void main() {
           totalItems: 50,
           currentPage: 1,
           label: 'items',
-          perPage: 25,
           onPageChange: (_) {},
         ),
-        surfaceSize: _wide,
+        surfaceSize: wide,
       );
 
       expect(find.byKey(const Key('oi_pagination_next')), findsOneWidget);
@@ -94,10 +90,9 @@ void main() {
           totalItems: 75,
           currentPage: 0,
           label: 'items',
-          perPage: 25,
           onPageChange: (p) => tappedPage = p,
         ),
-        surfaceSize: _wide,
+        surfaceSize: wide,
       );
 
       await tester.tap(find.byKey(const Key('oi_pagination_page_1')));
@@ -126,7 +121,7 @@ void main() {
           label: 'items',
           showTotal: false,
         ),
-        surfaceSize: _wide,
+        surfaceSize: wide,
       );
 
       expect(find.byKey(const Key('oi_pagination_total')), findsNothing);
@@ -149,7 +144,7 @@ void main() {
     testWidgets('zero items shows empty state', (tester) async {
       await tester.pumpObers(
         const OiPagination(totalItems: 0, currentPage: 0, label: 'items'),
-        surfaceSize: _wide,
+        surfaceSize: wide,
       );
 
       expect(find.text('0 items'), findsOneWidget);
@@ -161,9 +156,8 @@ void main() {
           totalItems: 10,
           currentPage: 0,
           label: 'items',
-          perPage: 25,
         ),
-        surfaceSize: _wide,
+        surfaceSize: wide,
       );
 
       // Only page "1" shown, no page "2"
@@ -180,10 +174,9 @@ void main() {
           totalItems: 75,
           currentPage: 2,
           label: 'items',
-          perPage: 25,
           onPageChange: (p) => navigatedTo = p,
         ),
-        surfaceSize: _wide,
+        surfaceSize: wide,
       );
 
       await tester.tap(find.byKey(const Key('oi_pagination_prev')));
@@ -200,10 +193,9 @@ void main() {
           totalItems: 75,
           currentPage: 0,
           label: 'items',
-          perPage: 25,
           onPageChange: (p) => navigatedTo = p,
         ),
-        surfaceSize: _wide,
+        surfaceSize: wide,
       );
 
       await tester.tap(find.byKey(const Key('oi_pagination_next')));
@@ -218,10 +210,9 @@ void main() {
           totalItems: 75,
           currentPage: 2,
           label: 'items',
-          perPage: 25,
           onPageChange: (p) => navigatedTo = p,
         ),
-        surfaceSize: _wide,
+        surfaceSize: wide,
       );
 
       await tester.tap(find.byKey(const Key('oi_pagination_first')));
@@ -236,10 +227,9 @@ void main() {
           totalItems: 100,
           currentPage: 0,
           label: 'items',
-          perPage: 25,
           onPageChange: (p) => navigatedTo = p,
         ),
-        surfaceSize: _wide,
+        surfaceSize: wide,
       );
 
       await tester.tap(find.byKey(const Key('oi_pagination_last')));
@@ -248,18 +238,15 @@ void main() {
     });
 
     testWidgets('per-page selector calls onPerPageChange', (tester) async {
-      int? newPerPage;
       await tester.pumpObers(
         OiPagination(
           totalItems: 100,
           currentPage: 0,
           label: 'items',
-          perPage: 25,
           onPageChange: (_) {},
-          onPerPageChange: (val) => newPerPage = val,
-          showPerPage: true,
+          onPerPageChange: (_) {},
         ),
-        surfaceSize: _wide,
+        surfaceSize: wide,
       );
 
       // Per-page selector is rendered
@@ -277,10 +264,9 @@ void main() {
           label: 'items',
           perPage: 50,
           onPageChange: (_) {},
-          onPerPageChange: (val) => newPerPage = val,
-          showPerPage: true,
+          onPerPageChange: (_) {},
         ),
-        surfaceSize: _wide,
+        surfaceSize: wide,
       );
 
       // With perPage=50, total label should show "1–50 of 100 items"
@@ -319,11 +305,10 @@ void main() {
   group('OiPagination - compact variant', () {
     testWidgets('shows X / Y format', (tester) async {
       await tester.pumpObers(
-        OiPagination.compact(
+        const OiPagination.compact(
           totalItems: 100,
           currentPage: 2,
           label: 'items',
-          perPage: 25,
         ),
       );
 
@@ -338,7 +323,6 @@ void main() {
           totalItems: 100,
           currentPage: 1,
           label: 'items',
-          perPage: 25,
           onPageChange: (p) => navigatedTo = p,
         ),
       );
@@ -395,7 +379,7 @@ void main() {
     });
 
     testWidgets('calls onLoadMore when button tapped', (tester) async {
-      bool called = false;
+      var called = false;
       await tester.pumpObers(
         OiPagination.loadMore(
           loadedCount: 25,
@@ -439,10 +423,9 @@ void main() {
           totalItems: 75,
           currentPage: 2,
           label: 'items',
-          perPage: 25,
           onPageChange: (p) => navigatedTo = p,
         ),
-        surfaceSize: _wide,
+        surfaceSize: wide,
       );
 
       await focusPagination(tester);
@@ -459,10 +442,9 @@ void main() {
           totalItems: 75,
           currentPage: 0,
           label: 'items',
-          perPage: 25,
           onPageChange: (p) => navigatedTo = p,
         ),
-        surfaceSize: _wide,
+        surfaceSize: wide,
       );
 
       await focusPagination(tester);
@@ -481,10 +463,9 @@ void main() {
           totalItems: 75,
           currentPage: 0,
           label: 'items',
-          perPage: 25,
           onPageChange: (p) => navigatedTo = p,
         ),
-        surfaceSize: _wide,
+        surfaceSize: wide,
       );
 
       await focusPagination(tester);
@@ -503,10 +484,9 @@ void main() {
           totalItems: 75,
           currentPage: 2,
           label: 'items',
-          perPage: 25,
           onPageChange: (p) => navigatedTo = p,
         ),
-        surfaceSize: _wide,
+        surfaceSize: wide,
       );
 
       await focusPagination(tester);
@@ -526,10 +506,9 @@ void main() {
           totalItems: 75,
           currentPage: 0,
           label: 'items',
-          perPage: 25,
           onPageChange: (_) {},
         ),
-        surfaceSize: _wide,
+        surfaceSize: wide,
       );
 
       expect(
@@ -550,7 +529,6 @@ void main() {
           totalItems: 100,
           currentPage: 0,
           label: 'items',
-          perPage: 25,
           onPageChange: (_) {},
         ),
       );

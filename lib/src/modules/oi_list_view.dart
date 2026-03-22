@@ -23,9 +23,9 @@ import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
 /// Each option has a unique [id] and a human-readable [label].
 /// An optional [icon] may be displayed alongside the label in sort menus.
 @immutable
-class OiSortOption {
-  /// Creates an [OiSortOption].
-  const OiSortOption({required this.id, required this.label, this.icon});
+class OiListSortOption {
+  /// Creates an [OiListSortOption].
+  const OiListSortOption({required this.id, required this.label, this.icon});
 
   /// Unique identifier for this sort option.
   final String id;
@@ -132,13 +132,13 @@ class OiListView<T> extends StatefulWidget {
   final ValueChanged<Map<String, OiColumnFilter>>? onFilterChange;
 
   /// Available sort options displayed in the sort bar.
-  final List<OiSortOption>? sortOptions;
+  final List<OiListSortOption>? sortOptions;
 
   /// The currently active sort option.
-  final OiSortOption? activeSort;
+  final OiListSortOption? activeSort;
 
   /// Called when the user selects a sort option.
-  final ValueChanged<OiSortOption>? onSort;
+  final ValueChanged<OiListSortOption>? onSort;
 
   /// The selection mode for the list.
   final OiSelectionMode selectionMode;

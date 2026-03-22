@@ -8,9 +8,9 @@ import '../../helpers/pump_app.dart';
 
 void main() {
   final testNav = [
-    OiNavItem(
+    const OiNavItem(
       label: 'Dashboard',
-      icon: const IconData(0xe1b1, fontFamily: 'MaterialIcons'),
+      icon: IconData(0xe1b1, fontFamily: 'MaterialIcons'),
       route: '/dashboard',
     ),
   ];
@@ -29,14 +29,17 @@ void main() {
     final allTypes = tester.allWidgets
         .map((w) => w.runtimeType.toString())
         .toSet();
+    // Why: Diagnostic test intentionally prints widget-tree presence info to stdout for manual inspection during development; no assertion replaces this output.
     // ignore: avoid_print
     print('Has OiDrawer: ${allTypes.contains("OiDrawer")}');
 
     final context = tester.element(find.text('Content'));
     final size = MediaQuery.sizeOf(context);
+    // Why: Diagnostic test intentionally prints the resolved MediaQuery size to stdout so the developer can confirm breakpoint behaviour during manual inspection.
     // ignore: avoid_print
     print('MediaQuery size: $size');
 
+    // Why: Diagnostic test intentionally prints the OiDrawer finder count to stdout so the developer can see whether the drawer is rendered at the given viewport size.
     // ignore: avoid_print
     print('OiDrawer finder: ${find.byType(OiDrawer).evaluate().length}');
   });
@@ -53,19 +56,22 @@ void main() {
     );
     await tester.pumpAndSettle();
 
+    // Why: Diagnostic test intentionally prints the semantics-label match count to stdout for manual inspection of the accessibility tree; no automated assertion captures this detail.
     // ignore: avoid_print
     print(
       'bySemanticsLabel Admin: ${find.bySemanticsLabel('Admin').evaluate().length}',
     );
+    // Why: Diagnostic test intentionally prints the semantics-label match count to stdout so the developer can verify the collapse-sidebar button is exposed to the accessibility tree.
     // ignore: avoid_print
     print(
       'bySemanticsLabel Collapse sidebar: ${find.bySemanticsLabel('Collapse sidebar').evaluate().length}',
     );
 
     // Check all semantics nodes
-    final semanticsOwner = tester.binding.renderView.owner!.semanticsOwner!;
+    final semanticsOwner = tester.binding.renderViews.first.owner!.semanticsOwner!;
     void walkSemantics(SemanticsNode node, int depth) {
       final indent = '  ' * depth;
+      // Why: Diagnostic walk of the semantics tree intentionally prints every non-empty node label to stdout so the developer can inspect the full accessibility hierarchy.
       // ignore: avoid_print
       if (node.label.isNotEmpty) print('${indent}label: "${node.label}"');
       node.visitChildren((child) {
@@ -90,6 +96,7 @@ void main() {
     );
     await tester.pumpAndSettle();
 
+    // Why: Diagnostic test intentionally prints the semantics-label match count without an active semantics handle to stdout, contrasting the result against the ensureSemantics variant above.
     // ignore: avoid_print
     print(
       'bySemanticsLabel Admin (no handle): ${find.bySemanticsLabel('Admin').evaluate().length}',

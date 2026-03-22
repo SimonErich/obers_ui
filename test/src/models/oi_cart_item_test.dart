@@ -27,7 +27,7 @@ void main() {
       const item = OiCartItem(
         productKey: 'p1',
         name: 'Widget',
-        unitPrice: 10.0,
+        unitPrice: 10,
         quantity: 3,
       );
       expect(item.totalPrice, 30.0);
@@ -46,10 +46,10 @@ void main() {
       const item = OiCartItem(
         productKey: 'p1',
         name: 'Widget',
-        unitPrice: 10.0,
+        unitPrice: 10,
         quantity: 2,
       );
-      final updated = item.copyWith(quantity: 5, unitPrice: 12.0);
+      final updated = item.copyWith(quantity: 5, unitPrice: 12);
       expect(updated.quantity, 5);
       expect(updated.unitPrice, 12.0);
       expect(updated.productKey, 'p1');
@@ -62,7 +62,7 @@ void main() {
         variantKey: 'v1',
         name: 'Widget',
         variantLabel: 'Red / Large',
-        unitPrice: 10.0,
+        unitPrice: 10,
         imageUrl: 'http://img.png',
         maxQuantity: 5,
       );
@@ -84,7 +84,7 @@ void main() {
         variantKey: 'v1',
         name: 'Widget',
         variantLabel: 'Red',
-        unitPrice: 10.0,
+        unitPrice: 10,
         quantity: 2,
         imageUrl: 'http://img.png',
         maxQuantity: 5,
@@ -105,7 +105,7 @@ void main() {
         productKey: 'p1',
         variantKey: 'v1',
         name: 'Widget',
-        unitPrice: 10.0,
+        unitPrice: 10,
         quantity: 2,
         attributes: {'Color': 'Red'},
       );
@@ -113,7 +113,7 @@ void main() {
         productKey: 'p1',
         variantKey: 'v1',
         name: 'Widget',
-        unitPrice: 10.0,
+        unitPrice: 10,
         quantity: 2,
         attributes: {'Color': 'Red'},
       );
@@ -121,8 +121,8 @@ void main() {
     });
 
     test('different instances are not ==', () {
-      const a = OiCartItem(productKey: 'p1', name: 'Widget', unitPrice: 10.0);
-      const b = OiCartItem(productKey: 'p1', name: 'Widget', unitPrice: 11.0);
+      const a = OiCartItem(productKey: 'p1', name: 'Widget', unitPrice: 10);
+      const b = OiCartItem(productKey: 'p1', name: 'Widget', unitPrice: 11);
       expect(a, isNot(equals(b)));
     });
 
@@ -130,13 +130,13 @@ void main() {
       const a = OiCartItem(
         productKey: 'p1',
         name: 'Widget',
-        unitPrice: 10.0,
+        unitPrice: 10,
         quantity: 3,
       );
       const b = OiCartItem(
         productKey: 'p1',
         name: 'Widget',
-        unitPrice: 10.0,
+        unitPrice: 10,
         quantity: 3,
       );
       expect(a.hashCode, equals(b.hashCode));
@@ -146,7 +146,7 @@ void main() {
       const item = OiCartItem(
         productKey: 'p1',
         name: 'Widget',
-        unitPrice: 10.0,
+        unitPrice: 10,
         quantity: 3,
       );
       expect(item.toString(), contains('totalPrice: 30.0'));

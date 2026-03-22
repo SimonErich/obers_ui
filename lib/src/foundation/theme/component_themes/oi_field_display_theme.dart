@@ -1,6 +1,8 @@
 import 'dart:ui';
 
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/obers_ui.dart' show OiFieldDisplay;
+import 'package:obers_ui/src/components/display/oi_field_display.dart' show OiFieldDisplay;
 
 /// Theme data for [OiFieldDisplay] components.
 ///
@@ -20,6 +22,19 @@ class OiFieldDisplayThemeData {
     this.pairGap,
     this.padding,
   });
+
+  /// Linearly interpolates between two [OiFieldDisplayThemeData] instances.
+  OiFieldDisplayThemeData.lerp(
+    OiFieldDisplayThemeData a,
+    OiFieldDisplayThemeData b,
+    double t,
+  )   : labelStyle = TextStyle.lerp(a.labelStyle, b.labelStyle, t),
+        valueStyle = TextStyle.lerp(a.valueStyle, b.valueStyle, t),
+        emptyStyle = TextStyle.lerp(a.emptyStyle, b.emptyStyle, t),
+        linkStyle = TextStyle.lerp(a.linkStyle, b.linkStyle, t),
+        labelWidth = lerpDouble(a.labelWidth, b.labelWidth, t),
+        pairGap = lerpDouble(a.pairGap, b.pairGap, t),
+        padding = EdgeInsetsGeometry.lerp(a.padding, b.padding, t);
 
   /// Text style for labels in pair mode.
   final TextStyle? labelStyle;
@@ -60,23 +75,6 @@ class OiFieldDisplayThemeData {
       labelWidth: labelWidth ?? this.labelWidth,
       pairGap: pairGap ?? this.pairGap,
       padding: padding ?? this.padding,
-    );
-  }
-
-  /// Linearly interpolates between two [OiFieldDisplayThemeData] instances.
-  static OiFieldDisplayThemeData lerp(
-    OiFieldDisplayThemeData a,
-    OiFieldDisplayThemeData b,
-    double t,
-  ) {
-    return OiFieldDisplayThemeData(
-      labelStyle: TextStyle.lerp(a.labelStyle, b.labelStyle, t),
-      valueStyle: TextStyle.lerp(a.valueStyle, b.valueStyle, t),
-      emptyStyle: TextStyle.lerp(a.emptyStyle, b.emptyStyle, t),
-      linkStyle: TextStyle.lerp(a.linkStyle, b.linkStyle, t),
-      labelWidth: lerpDouble(a.labelWidth, b.labelWidth, t),
-      pairGap: lerpDouble(a.pairGap, b.pairGap, t),
-      padding: EdgeInsetsGeometry.lerp(a.padding, b.padding, t),
     );
   }
 

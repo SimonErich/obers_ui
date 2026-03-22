@@ -20,7 +20,7 @@ void main() {
           compareAtPrice: 59.99,
         ),
         'Free': const OiPriceTag(price: 0, label: 'Free item'),
-        'Negative': const OiPriceTag(price: -5.00, label: 'Discount'),
+        'Negative': const OiPriceTag(price: -5, label: 'Discount'),
         'EUR after': const OiPriceTag(
           price: 19.99,
           label: 'Euro price',
@@ -59,7 +59,7 @@ void main() {
           compareAtPrice: 59.99,
         ),
         'Free': const OiPriceTag(price: 0, label: 'Free item'),
-        'Negative': const OiPriceTag(price: -5.00, label: 'Discount'),
+        'Negative': const OiPriceTag(price: -5, label: 'Discount'),
         'EUR after': const OiPriceTag(
           price: 19.99,
           label: 'Euro price',

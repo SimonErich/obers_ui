@@ -3,7 +3,6 @@
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:obers_ui/src/components/buttons/oi_button.dart';
 import 'package:obers_ui/src/components/buttons/oi_icon_button.dart';
 import 'package:obers_ui/src/components/display/oi_empty_state.dart';
 import 'package:obers_ui/src/components/shop/oi_cart_item_row.dart';
@@ -19,7 +18,7 @@ import '../../../helpers/pump_app.dart';
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
 const _items = [
-  OiCartItem(productKey: 'p1', name: 'Widget A', unitPrice: 50, quantity: 1),
+  OiCartItem(productKey: 'p1', name: 'Widget A', unitPrice: 50),
   OiCartItem(productKey: 'p2', name: 'Widget B', unitPrice: 25, quantity: 2),
 ];
 

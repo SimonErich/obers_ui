@@ -1,8 +1,8 @@
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/foundation/oi_responsive.dart';
+import 'package:obers_ui/src/foundation/theme/oi_decoration_theme.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/models/oi_shipping_method.dart';
-import 'package:obers_ui/src/foundation/theme/oi_decoration_theme.dart';
 import 'package:obers_ui/src/primitives/display/oi_label.dart';
 import 'package:obers_ui/src/primitives/display/oi_surface.dart';
 import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
@@ -107,7 +107,7 @@ class OiShippingOption extends StatelessWidget {
         Expanded(
           child: OiColumn(
             breakpoint: breakpoint,
-            gap: OiResponsive(2),
+            gap: const OiResponsive(2),
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               OiRow(

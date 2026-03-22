@@ -11,30 +11,30 @@ import '../../helpers/pump_app.dart';
 
 void main() {
   final testNav = [
-    OiNavItem(
+    const OiNavItem(
       label: 'Dashboard',
-      icon: const IconData(0xe1b1, fontFamily: 'MaterialIcons'),
+      icon: IconData(0xe1b1, fontFamily: 'MaterialIcons'),
       route: '/dashboard',
     ),
-    OiNavItem(
+    const OiNavItem(
       label: 'Users',
-      icon: const IconData(0xe491, fontFamily: 'MaterialIcons'),
+      icon: IconData(0xe491, fontFamily: 'MaterialIcons'),
       route: '/users',
       badge: '5',
     ),
-    OiNavItem(
+    const OiNavItem(
       label: 'Settings',
-      icon: const IconData(0xe8b8, fontFamily: 'MaterialIcons'),
+      icon: IconData(0xe8b8, fontFamily: 'MaterialIcons'),
       route: '/settings',
       children: [
         OiNavItem(
           label: 'General',
-          icon: const IconData(0xe8b8, fontFamily: 'MaterialIcons'),
+          icon: IconData(0xe8b8, fontFamily: 'MaterialIcons'),
           route: '/settings/general',
         ),
         OiNavItem(
           label: 'Security',
-          icon: const IconData(0xe8b8, fontFamily: 'MaterialIcons'),
+          icon: IconData(0xe8b8, fontFamily: 'MaterialIcons'),
           route: '/settings/security',
         ),
       ],
@@ -84,7 +84,7 @@ void main() {
 
     // Verify collapsed state before snapshot.
     final sidebar = tester.widget<OiSidebar>(find.byType(OiSidebar));
-    assert(sidebar.mode == OiSidebarMode.compact);
+    assert(sidebar.mode == OiSidebarMode.compact, 'sidebar should be in compact mode after collapse');
 
     await screenMatchesGolden(tester, 'oi_app_shell_desktop_collapsed');
 

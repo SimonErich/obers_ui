@@ -1,8 +1,10 @@
 import 'package:flutter/foundation.dart';
+import 'package:obers_ui/obers_ui.dart' show OiCheckout;
 
 import 'package:obers_ui/src/models/oi_address_data.dart';
 import 'package:obers_ui/src/models/oi_payment_method.dart';
 import 'package:obers_ui/src/models/oi_shipping_method.dart';
+import 'package:obers_ui/src/modules/oi_checkout.dart' show OiCheckout;
 
 /// Aggregated checkout selections collected during the checkout flow.
 ///

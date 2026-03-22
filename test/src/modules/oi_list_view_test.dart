@@ -49,10 +49,10 @@ void main() {
     });
 
     testWidgets('sort options render', (tester) async {
-      OiSortOption? sortedBy;
+      OiListSortOption? sortedBy;
       final options = [
-        const OiSortOption(id: 'name', label: 'Name'),
-        const OiSortOption(id: 'date', label: 'Date'),
+        const OiListSortOption(id: 'name', label: 'Name'),
+        const OiListSortOption(id: 'date', label: 'Date'),
       ];
 
       await tester.pumpObers(

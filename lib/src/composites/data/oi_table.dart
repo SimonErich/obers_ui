@@ -2,20 +2,20 @@ import 'dart:math' as math;
 
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/src/components/display/oi_pagination.dart';
+import 'package:obers_ui/src/components/feedback/oi_bulk_bar.dart';
 import 'package:obers_ui/src/components/panels/oi_resizable.dart';
 import 'package:obers_ui/src/composites/data/oi_pagination_controller.dart';
 import 'package:obers_ui/src/composites/data/oi_table_controller.dart';
 import 'package:obers_ui/src/foundation/persistence/oi_settings_driver.dart';
 import 'package:obers_ui/src/foundation/persistence/oi_settings_mixin.dart';
 import 'package:obers_ui/src/foundation/persistence/oi_settings_provider.dart';
-import 'package:obers_ui/src/components/display/oi_pagination.dart';
-import 'package:obers_ui/src/components/feedback/oi_bulk_bar.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/models/settings/oi_table_settings.dart';
 
 part '_oi_table_cell.dart';
-part '_oi_table_pagination.dart';
 part '_oi_table_loading.dart';
+part '_oi_table_pagination.dart';
 
 // ── Column definition ─────────────────────────────────────────────────────────
 

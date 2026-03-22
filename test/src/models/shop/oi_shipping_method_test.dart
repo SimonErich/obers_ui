@@ -1,3 +1,4 @@
+// Why: Test files are not part of the public API surface; requiring doc comments on every test group and helper closure would add noise without value.
 // ignore_for_file: public_member_api_docs
 
 import 'package:flutter/widgets.dart';
@@ -70,8 +71,8 @@ void main() {
     });
 
     test('inequality for different methods', () {
-      const a = OiShippingMethod(key: 'a', label: 'A', price: 5.0);
-      const b = OiShippingMethod(key: 'b', label: 'B', price: 10.0);
+      const a = OiShippingMethod(key: 'a', label: 'A', price: 5);
+      const b = OiShippingMethod(key: 'b', label: 'B', price: 10);
       expect(a, isNot(equals(b)));
     });
 

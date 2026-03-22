@@ -14,30 +14,30 @@ import '../../helpers/pump_app.dart';
 void main() {
   group('OiAppShell', () {
     final testNav = [
-      OiNavItem(
+      const OiNavItem(
         label: 'Dashboard',
-        icon: const IconData(0xe1b1, fontFamily: 'MaterialIcons'),
+        icon: IconData(0xe1b1, fontFamily: 'MaterialIcons'),
         route: '/dashboard',
       ),
-      OiNavItem(
+      const OiNavItem(
         label: 'Users',
-        icon: const IconData(0xe491, fontFamily: 'MaterialIcons'),
+        icon: IconData(0xe491, fontFamily: 'MaterialIcons'),
         route: '/users',
         badge: '5',
       ),
-      OiNavItem(
+      const OiNavItem(
         label: 'Settings',
-        icon: const IconData(0xe8b8, fontFamily: 'MaterialIcons'),
+        icon: IconData(0xe8b8, fontFamily: 'MaterialIcons'),
         route: '/settings',
         children: [
           OiNavItem(
             label: 'General',
-            icon: const IconData(0xe8b8, fontFamily: 'MaterialIcons'),
+            icon: IconData(0xe8b8, fontFamily: 'MaterialIcons'),
             route: '/settings/general',
           ),
           OiNavItem(
             label: 'Security',
-            icon: const IconData(0xe8b8, fontFamily: 'MaterialIcons'),
+            icon: IconData(0xe8b8, fontFamily: 'MaterialIcons'),
             route: '/settings/security',
           ),
         ],
@@ -111,21 +111,21 @@ void main() {
       tester,
     ) async {
       final sectionNav = [
-        OiNavItem(
+        const OiNavItem(
           label: 'Home',
-          icon: const IconData(0xe1b1, fontFamily: 'MaterialIcons'),
+          icon: IconData(0xe1b1, fontFamily: 'MaterialIcons'),
           route: '/home',
           section: 'Main',
         ),
-        OiNavItem(
+        const OiNavItem(
           label: 'About',
-          icon: const IconData(0xe491, fontFamily: 'MaterialIcons'),
+          icon: IconData(0xe491, fontFamily: 'MaterialIcons'),
           route: '/about',
           section: 'Main',
         ),
-        OiNavItem(
+        const OiNavItem(
           label: 'Config',
-          icon: const IconData(0xe8b8, fontFamily: 'MaterialIcons'),
+          icon: IconData(0xe8b8, fontFamily: 'MaterialIcons'),
           route: '/config',
           section: 'Admin',
         ),
@@ -396,15 +396,15 @@ void main() {
 
     testWidgets('section labels render in sidebar', (tester) async {
       final sectionNav = [
-        OiNavItem(
+        const OiNavItem(
           label: 'Home',
-          icon: const IconData(0xe1b1, fontFamily: 'MaterialIcons'),
+          icon: IconData(0xe1b1, fontFamily: 'MaterialIcons'),
           route: '/home',
           section: 'Main',
         ),
-        OiNavItem(
+        const OiNavItem(
           label: 'Config',
-          icon: const IconData(0xe8b8, fontFamily: 'MaterialIcons'),
+          icon: IconData(0xe8b8, fontFamily: 'MaterialIcons'),
           route: '/config',
           section: 'Admin',
         ),

@@ -15,11 +15,11 @@ void main() {
 
   testWidgets('renders avatar with initials when no imageUrl', (tester) async {
     await tester.pumpObers(
-      OiUserMenu(
+      const OiUserMenu(
         label: 'User menu',
         userName: 'John Doe',
         avatarInitials: 'JD',
-        items: const [],
+        items: [],
       ),
     );
     expect(find.byType(OiAvatar), findsOneWidget);
@@ -28,11 +28,11 @@ void main() {
 
   testWidgets('renders avatar with imageUrl', (tester) async {
     await tester.pumpObers(
-      OiUserMenu(
+      const OiUserMenu(
         label: 'User menu',
         userName: 'John Doe',
         avatarUrl: 'https://example.com/avatar.png',
-        items: const [],
+        items: [],
       ),
     );
     expect(find.byType(OiAvatar), findsOneWidget);
@@ -42,12 +42,12 @@ void main() {
 
   testWidgets('tapping avatar opens popover', (tester) async {
     await tester.pumpObers(
-      OiUserMenu(
+      const OiUserMenu(
         label: 'User menu',
         userName: 'Jane Smith',
         userEmail: 'jane@example.com',
         avatarInitials: 'JS',
-        items: const [OiMenuItem(label: 'Profile')],
+        items: [OiMenuItem(label: 'Profile')],
       ),
     );
 
@@ -60,12 +60,12 @@ void main() {
 
   testWidgets('popover header shows userName and userEmail', (tester) async {
     await tester.pumpObers(
-      OiUserMenu(
+      const OiUserMenu(
         label: 'User menu',
         userName: 'Alice',
         userEmail: 'alice@test.org',
         avatarInitials: 'A',
-        items: const [],
+        items: [],
       ),
     );
 
@@ -120,12 +120,12 @@ void main() {
 
   testWidgets('custom header replaces default header', (tester) async {
     await tester.pumpObers(
-      OiUserMenu(
+      const OiUserMenu(
         label: 'User menu',
         userName: 'Bob',
         avatarInitials: 'B',
-        header: const Text('Custom Header'),
-        items: const [],
+        header: Text('Custom Header'),
+        items: [],
       ),
     );
 
@@ -139,11 +139,11 @@ void main() {
 
   testWidgets('empty items list renders header only', (tester) async {
     await tester.pumpObers(
-      OiUserMenu(
+      const OiUserMenu(
         label: 'User menu',
         userName: 'Alice',
         avatarInitials: 'A',
-        items: const [],
+        items: [],
       ),
     );
 
@@ -157,11 +157,11 @@ void main() {
 
   testWidgets('semantic label is present', (tester) async {
     await tester.pumpObers(
-      OiUserMenu(
+      const OiUserMenu(
         label: 'Account menu',
         userName: 'Test User',
         avatarInitials: 'TU',
-        items: const [],
+        items: [],
       ),
     );
 

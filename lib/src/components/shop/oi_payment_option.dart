@@ -1,8 +1,8 @@
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/foundation/oi_responsive.dart';
+import 'package:obers_ui/src/foundation/theme/oi_decoration_theme.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/models/oi_payment_method.dart';
-import 'package:obers_ui/src/foundation/theme/oi_decoration_theme.dart';
 import 'package:obers_ui/src/primitives/display/oi_label.dart';
 import 'package:obers_ui/src/primitives/display/oi_surface.dart';
 import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
@@ -10,7 +10,6 @@ import 'package:obers_ui/src/primitives/layout/oi_column.dart';
 import 'package:obers_ui/src/primitives/layout/oi_row.dart';
 
 // Material Icons codepoints.
-const IconData _kCreditCardIcon = IconData(0xe870, fontFamily: 'MaterialIcons');
 const IconData _kPaymentIcon = IconData(0xe8a1, fontFamily: 'MaterialIcons');
 
 /// A selectable row that represents a single payment method.
@@ -85,14 +84,13 @@ class OiPaymentOption extends StatelessWidget {
     Widget content = OiRow(
       breakpoint: breakpoint,
       gap: OiResponsive(sp.sm),
-      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         _buildRadioIndicator(context),
         _buildIcon(context),
         Expanded(
           child: OiColumn(
             breakpoint: breakpoint,
-            gap: OiResponsive(2),
+            gap: const OiResponsive(2),
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               OiLabel.bodyStrong(method.label),

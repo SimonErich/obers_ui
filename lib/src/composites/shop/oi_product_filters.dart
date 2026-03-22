@@ -288,7 +288,7 @@ class _OiProductFiltersState extends State<OiProductFilters> {
       breakpoint: context.breakpoint,
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        OiLabel.body('In Stock Only'),
+        const OiLabel.body('In Stock Only'),
         OiSwitch(
           value: _data.inStockOnly,
           label: 'In stock only',

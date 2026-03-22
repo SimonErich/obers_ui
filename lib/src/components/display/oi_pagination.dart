@@ -23,8 +23,9 @@ enum OiPaginationVariant {
 /// A standalone pagination control for navigating paged data.
 ///
 /// Renders page numbers, prev/next arrows, an items-per-page selector,
-/// and a total count. Supports [pages] and [compact] variants, plus a
-/// [loadMore] factory for infinite-scroll patterns.
+/// and a total count. Supports [OiPaginationVariant.pages] and
+/// [OiPaginationVariant.compact] variants, plus a
+/// [OiPagination.loadMore] factory for infinite-scroll patterns.
 ///
 /// Composes [OiButton.ghost], [OiSelect], [OiLabel], and [OiIcon].
 ///
@@ -32,7 +33,7 @@ enum OiPaginationVariant {
 ///
 /// Coverage: REQ-0004, REQ-0005, REQ-0006
 class OiPagination extends StatefulWidget {
-  /// Creates an [OiPagination] with the [pages] variant by default.
+  /// Creates an [OiPagination] with the [OiPaginationVariant.pages] variant by default.
   ///
   /// [currentPage] is zero-based. [totalItems] is the total data count.
   const OiPagination({

@@ -33,7 +33,7 @@ void _restoreOnError() {
 const _item = OiCartItem(
   productKey: 'p1',
   name: 'Test Product',
-  unitPrice: 25.00,
+  unitPrice: 25,
   quantity: 2,
   variantLabel: 'Red / Large',
   imageUrl: 'https://example.com/img.png',
@@ -42,14 +42,13 @@ const _item = OiCartItem(
 const _itemNoImage = OiCartItem(
   productKey: 'p2',
   name: 'No Image Product',
-  unitPrice: 10.00,
-  quantity: 1,
+  unitPrice: 10,
 );
 
 const _itemNoVariant = OiCartItem(
   productKey: 'p3',
   name: 'Plain Product',
-  unitPrice: 15.00,
+  unitPrice: 15,
   quantity: 3,
   imageUrl: 'https://example.com/img2.png',
 );
@@ -96,12 +95,11 @@ void main() {
     testWidgets('fires onQuantityChange when quantity adjusted', (
       tester,
     ) async {
-      int? received;
       await tester.pumpObers(
         OiCartItemRow(
           item: _item,
           label: 'Cart item',
-          onQuantityChange: (v) => received = v,
+          onQuantityChange: (_) {},
         ),
         surfaceSize: const Size(600, 200),
       );

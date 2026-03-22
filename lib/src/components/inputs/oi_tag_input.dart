@@ -198,7 +198,7 @@ class _OiTagInputState extends State<OiTagInput> {
               .toList();
           _suggestionsLoading = false;
         });
-      } catch (_) {
+      } on Exception catch (_) {
         if (!mounted) return;
         setState(() => _suggestionsLoading = false);
       }
@@ -304,11 +304,11 @@ class _OiTagInputState extends State<OiTagInput> {
         color: colors.surface,
         border: Border.all(color: colors.border),
         borderRadius: BorderRadius.circular(8),
-        boxShadow: [
+        boxShadow: const [
           BoxShadow(
-            color: const Color(0x1A000000),
+            color: Color(0x1A000000),
             blurRadius: 8,
-            offset: const Offset(0, 4),
+            offset: Offset(0, 4),
           ),
         ],
       ),

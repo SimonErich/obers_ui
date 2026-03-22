@@ -1,6 +1,8 @@
 import 'dart:ui';
 
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/obers_ui.dart' show OiPagination;
+import 'package:obers_ui/src/components/display/oi_pagination.dart' show OiPagination;
 
 /// Theme data for [OiPagination] components.
 ///
@@ -18,6 +20,17 @@ class OiPaginationThemeData {
     this.buttonSpacing,
     this.padding,
   });
+
+  /// Linearly interpolates between two [OiPaginationThemeData] instances.
+  OiPaginationThemeData.lerp(
+    OiPaginationThemeData a,
+    OiPaginationThemeData b,
+    double t,
+  )   : labelStyle = TextStyle.lerp(a.labelStyle, b.labelStyle, t),
+        activePageStyle = TextStyle.lerp(a.activePageStyle, b.activePageStyle, t),
+        pageStyle = TextStyle.lerp(a.pageStyle, b.pageStyle, t),
+        buttonSpacing = lerpDouble(a.buttonSpacing, b.buttonSpacing, t),
+        padding = EdgeInsetsGeometry.lerp(a.padding, b.padding, t);
 
   /// Text style for informational labels (e.g. total count, range text).
   final TextStyle? labelStyle;
@@ -48,21 +61,6 @@ class OiPaginationThemeData {
       pageStyle: pageStyle ?? this.pageStyle,
       buttonSpacing: buttonSpacing ?? this.buttonSpacing,
       padding: padding ?? this.padding,
-    );
-  }
-
-  /// Linearly interpolates between two [OiPaginationThemeData] instances.
-  static OiPaginationThemeData lerp(
-    OiPaginationThemeData a,
-    OiPaginationThemeData b,
-    double t,
-  ) {
-    return OiPaginationThemeData(
-      labelStyle: TextStyle.lerp(a.labelStyle, b.labelStyle, t),
-      activePageStyle: TextStyle.lerp(a.activePageStyle, b.activePageStyle, t),
-      pageStyle: TextStyle.lerp(a.pageStyle, b.pageStyle, t),
-      buttonSpacing: lerpDouble(a.buttonSpacing, b.buttonSpacing, t),
-      padding: EdgeInsetsGeometry.lerp(a.padding, b.padding, t),
     );
   }
 

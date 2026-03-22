@@ -25,7 +25,7 @@ void main() {
       tester,
     ) async {
       await tester.pumpObers(
-        const OiOrderSummaryLine(label: 'Total', amount: 120.00, bold: true),
+        const OiOrderSummaryLine(label: 'Total', amount: 120, bold: true),
         surfaceSize: const Size(400, 100),
       );
       expect(find.text('Total'), findsOneWidget);
@@ -37,7 +37,7 @@ void main() {
       await tester.pumpObers(
         const OiOrderSummaryLine(
           label: 'Discount',
-          amount: 10.00,
+          amount: 10,
           negative: true,
         ),
         surfaceSize: const Size(400, 100),
@@ -65,7 +65,7 @@ void main() {
       await tester.pumpObers(
         const OiOrderSummaryLine(
           label: 'Discount',
-          amount: 20.00,
+          amount: 20,
           subtitle: 'SUMMER20',
         ),
         surfaceSize: const Size(400, 100),
@@ -76,7 +76,7 @@ void main() {
 
     testWidgets('default currencyCode is EUR', (tester) async {
       await tester.pumpObers(
-        const OiOrderSummaryLine(label: 'Tax', amount: 5.00),
+        const OiOrderSummaryLine(label: 'Tax', amount: 5),
         surfaceSize: const Size(400, 100),
       );
       // EUR format: amount then €
@@ -87,7 +87,7 @@ void main() {
       await tester.pumpObers(
         const OiOrderSummaryLine(
           label: 'Total',
-          amount: 100.00,
+          amount: 100,
           currencyCode: 'USD',
         ),
         surfaceSize: const Size(400, 100),
@@ -97,7 +97,7 @@ void main() {
 
     testWidgets('accessibility label present', (tester) async {
       await tester.pumpObers(
-        const OiOrderSummaryLine(label: 'Subtotal', amount: 50.00),
+        const OiOrderSummaryLine(label: 'Subtotal', amount: 50),
         surfaceSize: const Size(400, 100),
       );
       expect(
@@ -108,7 +108,7 @@ void main() {
 
     testWidgets('non-bold mode renders label without bold', (tester) async {
       await tester.pumpObers(
-        const OiOrderSummaryLine(label: 'Shipping', amount: 5.00),
+        const OiOrderSummaryLine(label: 'Shipping', amount: 5),
         surfaceSize: const Size(400, 100),
       );
       expect(find.text('Shipping'), findsOneWidget);
@@ -118,7 +118,7 @@ void main() {
       await tester.pumpObers(
         const OiOrderSummaryLine(
           label: 'Discount',
-          amount: 10.00,
+          amount: 10,
           negative: true,
           loading: true,
         ),

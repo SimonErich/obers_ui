@@ -16,10 +16,8 @@ const _product = OiProductData(
   key: 'test-1',
   name: 'Test Widget',
   price: 42.99,
-  currencyCode: 'USD',
   rating: 4.5,
   reviewCount: 128,
-  inStock: true,
 );
 
 /// Test product that is on sale.
@@ -28,8 +26,6 @@ const _saleProduct = OiProductData(
   name: 'Sale Widget',
   price: 29.99,
   compareAtPrice: 59.99,
-  currencyCode: 'USD',
-  inStock: true,
 );
 
 /// Test product that is out of stock.
@@ -37,7 +33,6 @@ const _oosProduct = OiProductData(
   key: 'test-3',
   name: 'Unavailable Widget',
   price: 19.99,
-  currencyCode: 'USD',
   inStock: false,
 );
 
@@ -45,9 +40,7 @@ const _oosProduct = OiProductData(
 const _noImageProduct = OiProductData(
   key: 'test-4',
   name: 'No Image Widget',
-  price: 10.00,
-  currencyCode: 'USD',
-  inStock: true,
+  price: 10,
 );
 
 void main() {

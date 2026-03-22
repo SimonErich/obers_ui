@@ -123,7 +123,7 @@ class OiResourcePage extends StatelessWidget {
             if (variant == OiResourcePageVariant.list && filters != null)
               Padding(
                 padding: EdgeInsets.only(top: spacing.sm),
-                child: filters!,
+                child: filters,
               ),
             SizedBox(height: spacing.md),
             Expanded(child: _buildContent(context)),
@@ -206,7 +206,7 @@ class OiResourcePage extends StatelessWidget {
     final spacing = context.spacing;
     return Padding(
       padding: EdgeInsets.only(top: spacing.md),
-      child: pagination!,
+      child: pagination,
     );
   }
 

@@ -59,7 +59,6 @@ void main() {
         OiQuantitySelector(
           value: 1,
           label: 'Qty',
-          min: 1,
           onChange: (v) => received = v,
         ),
       );
@@ -76,7 +75,6 @@ void main() {
         OiQuantitySelector(
           value: 99,
           label: 'Qty',
-          max: 99,
           onChange: (v) => received = v,
         ),
       );
@@ -168,7 +166,6 @@ void main() {
         OiQuantitySelector(
           value: 3,
           label: 'Qty',
-          min: 1,
           max: 10,
           onChange: (_) {},
         ),

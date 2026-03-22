@@ -1,10 +1,12 @@
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/obers_ui.dart' show OiLabel;
 import 'package:obers_ui/src/components/buttons/oi_button.dart';
 import 'package:obers_ui/src/components/display/oi_list_tile.dart';
 import 'package:obers_ui/src/components/display/oi_popover.dart';
 import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/primitives/display/oi_icon.dart';
+import 'package:obers_ui/src/primitives/display/oi_label.dart' show OiLabel;
 
 /// A locale option for the [OiLocaleSwitcher].
 ///

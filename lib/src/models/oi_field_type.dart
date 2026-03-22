@@ -1,3 +1,5 @@
+import 'package:obers_ui/obers_ui.dart' show OiFieldDisplay, OiForm, OiFormField;
+
 /// The type of a field, shared by form inputs and read-only display widgets.
 ///
 /// Determines which input widget [OiForm] renders and how [OiFieldDisplay]

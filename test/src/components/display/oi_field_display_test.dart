@@ -125,7 +125,6 @@ void main() {
         const OiFieldDisplay(
           label: _l,
           value: 'A very long text value that should be truncated',
-          type: OiFieldType.text,
           maxLines: 1,
         ),
       );
@@ -138,7 +137,6 @@ void main() {
         const OiFieldDisplay(
           label: _l,
           value: 'Short text',
-          type: OiFieldType.text,
         ),
       );
 
@@ -208,11 +206,11 @@ void main() {
           value: 1234.5,
           type: OiFieldType.currency,
           numberFormat: '#,##0.00',
-          currencySymbol: '\$',
+          currencySymbol: r'$',
         ),
       );
 
-      expect(find.text('\$1,234.50'), findsOneWidget);
+      expect(find.text(r'$1,234.50'), findsOneWidget);
     });
 
     testWidgets('invalid numberFormat falls back gracefully', (tester) async {
@@ -239,7 +237,6 @@ void main() {
         const OiFieldDisplay(
           label: _l,
           value: 'Hello World',
-          type: OiFieldType.text,
         ),
       );
       expect(find.text('Hello World'), findsOneWidget);
@@ -448,7 +445,7 @@ void main() {
   group('empty value', () {
     testWidgets('null value shows emptyText', (tester) async {
       await tester.pumpObers(
-        const OiFieldDisplay(label: _l, value: null, type: OiFieldType.text),
+        const OiFieldDisplay(label: _l, value: null),
       );
       expect(find.text('\u2014'), findsOneWidget);
     });
@@ -458,7 +455,6 @@ void main() {
         const OiFieldDisplay(
           label: _l,
           value: '',
-          type: OiFieldType.text,
           emptyText: 'N/A',
         ),
       );
@@ -474,7 +470,6 @@ void main() {
         const OiFieldDisplay(
           label: _l,
           value: 'Copy me',
-          type: OiFieldType.text,
           copyable: true,
         ),
       );
@@ -486,7 +481,6 @@ void main() {
         OiFieldDisplay(
           label: _l,
           value: 'Tap me',
-          type: OiFieldType.text,
           onTap: () {},
         ),
       );
@@ -498,7 +492,6 @@ void main() {
         const OiFieldDisplay(
           label: _l,
           value: 'With icon',
-          type: OiFieldType.text,
           leading: SizedBox(key: Key('leading_icon'), width: 16, height: 16),
         ),
       );
@@ -516,7 +509,6 @@ void main() {
         const OiFieldDisplay.pair(
           label: 'Name',
           value: 'Alice',
-          direction: Axis.horizontal,
         ),
       );
 
@@ -612,7 +604,6 @@ void main() {
         OiFieldDisplay(
           label: _l,
           value: 'test',
-          type: OiFieldType.text,
           formatValue: (_) => throw Exception('boom'),
         ),
       );
@@ -703,10 +694,10 @@ void main() {
           label: _l,
           value: 42.5,
           type: OiFieldType.currency,
-          currencySymbol: '\$',
+          currencySymbol: r'$',
         ),
       );
-      expect(find.text('\$42.50'), findsOneWidget);
+      expect(find.text(r'$42.50'), findsOneWidget);
     });
 
     testWidgets('large currency formats with grouping', (tester) async {
@@ -715,11 +706,11 @@ void main() {
           label: _l,
           value: 1234567.89,
           type: OiFieldType.currency,
-          currencySymbol: '\$',
+          currencySymbol: r'$',
           decimalPlaces: 2,
         ),
       );
-      expect(find.text('\$1,234,567.89'), findsOneWidget);
+      expect(find.text(r'$1,234,567.89'), findsOneWidget);
     });
   });
 
@@ -793,7 +784,7 @@ void main() {
   group('OiLabel convention', () {
     testWidgets('text type renders via OiLabel', (tester) async {
       await tester.pumpObers(
-        const OiFieldDisplay(label: _l, value: 'Hello', type: OiFieldType.text),
+        const OiFieldDisplay(label: _l, value: 'Hello'),
       );
       expect(find.byType(OiLabel), findsOneWidget);
     });
@@ -807,7 +798,7 @@ void main() {
 
     testWidgets('empty value renders via OiLabel', (tester) async {
       await tester.pumpObers(
-        const OiFieldDisplay(label: _l, value: null, type: OiFieldType.text),
+        const OiFieldDisplay(label: _l, value: null),
       );
       expect(find.byType(OiLabel), findsOneWidget);
     });
@@ -927,7 +918,6 @@ void main() {
       await tester.pumpObers(
         OiFieldDisplay(
           value: 'Click me',
-          type: OiFieldType.text,
           label: 'Action Field',
           onTap: () {},
         ),
@@ -944,7 +934,6 @@ void main() {
         const OiFieldDisplay(
           label: _l,
           value: 'test value',
-          type: OiFieldType.text,
         ),
       );
 
@@ -997,7 +986,6 @@ void main() {
         const OiFieldDisplay(
           label: _l,
           value: 'Line 1\nLine 2\nLine 3\nLine 4',
-          type: OiFieldType.text,
           maxLines: 2,
         ),
       );
@@ -1030,7 +1018,6 @@ void main() {
           'Text': const OiFieldDisplay(
             label: _l,
             value: 'Hello World',
-            type: OiFieldType.text,
           ),
           'Number': const OiFieldDisplay(
             label: _l,
@@ -1151,7 +1138,6 @@ void main() {
           'Empty (null)': const OiFieldDisplay(
             label: _l,
             value: null,
-            type: OiFieldType.text,
           ),
           'Custom format': OiFieldDisplay(
             label: _l,

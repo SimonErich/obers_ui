@@ -27,7 +27,7 @@ class _PaginationBar extends StatelessWidget {
           label: 'rows',
           perPage: pagination.pageSize,
           perPageOptions: pageSizeOptions,
-          onPageChange: (page) => pagination.goToPage(page),
+          onPageChange: pagination.goToPage,
           onPerPageChange: (size) {
             pagination.setPageSize(size);
             onPageSizeChanged?.call(size);

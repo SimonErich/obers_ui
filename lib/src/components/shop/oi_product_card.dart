@@ -230,7 +230,6 @@ class OiProductCard extends StatelessWidget {
         OiRow(
           breakpoint: breakpoint,
           gap: OiResponsive(sp.xs),
-          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             OiStarRating(
               value: product.rating!,
@@ -391,7 +390,6 @@ class OiProductCard extends StatelessWidget {
         child: OiRow(
           breakpoint: breakpoint,
           gap: OiResponsive(sp.sm),
-          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             ClipRRect(
               borderRadius: BorderRadius.circular(4),

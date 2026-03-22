@@ -1,6 +1,5 @@
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/display/oi_badge.dart';
-import 'package:obers_ui/src/primitives/display/oi_label.dart';
 
 /// The stock availability status of a product.
 ///

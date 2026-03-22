@@ -56,7 +56,7 @@ class OiFieldDisplay extends StatelessWidget {
   /// in [Axis.vertical] mode the label sits above. Use [labelWidth] in
   /// horizontal mode to align multiple pairs in a column.
   const OiFieldDisplay.pair({
-    required String label,
+    required this.label,
     required this.value,
     this.type = OiFieldType.text,
     Axis direction = Axis.horizontal,
@@ -77,8 +77,7 @@ class OiFieldDisplay extends StatelessWidget {
     super.key,
   }) : _isPair = true,
        _direction = direction,
-       _labelWidth = labelWidth ?? 120.0,
-       label = label;
+       _labelWidth = labelWidth ?? 120.0;
 
   /// The value to display. May be any type; the widget coerces it based on
   /// [type].
@@ -201,7 +200,7 @@ class OiFieldDisplay extends StatelessWidget {
   }
 
   Widget _wrapInteraction(BuildContext context, Widget child) {
-    Widget result = child;
+    var result = child;
 
     if (copyable && !_isEmpty) {
       result = OiCopyable(value: _valueString, child: result);
@@ -320,7 +319,7 @@ class OiFieldDisplay extends StatelessWidget {
         maxLines: maxLines,
         overflow: maxLines != null ? TextOverflow.ellipsis : null,
       );
-    } catch (_) {
+    } on Exception catch (_) {
       return OiLabel.body(
         _valueString,
         maxLines: maxLines,
@@ -338,7 +337,7 @@ class OiFieldDisplay extends StatelessWidget {
   }
 
   Widget _buildNumberDisplay(BuildContext context) {
-    final num? numValue = value is num
+    final numValue = value is num
         ? value as num
         : num.tryParse(_valueString);
 
@@ -356,7 +355,7 @@ class OiFieldDisplay extends StatelessWidget {
     if (numberFormat != null) {
       try {
         return NumberFormat(numberFormat).format(numValue);
-      } catch (_) {
+      } on Exception catch (_) {
         // Invalid pattern — fall through to default formatting.
       }
     }
@@ -368,7 +367,7 @@ class OiFieldDisplay extends StatelessWidget {
   }
 
   Widget _buildCurrencyDisplay(BuildContext context) {
-    final num? numValue = value is num
+    final numValue = value is num
         ? value as num
         : num.tryParse(_valueString);
 
@@ -394,7 +393,7 @@ class OiFieldDisplay extends StatelessWidget {
     if (numberFormat != null) {
       try {
         return NumberFormat(numberFormat).format(numValue);
-      } catch (_) {
+      } on Exception catch (_) {
         // Invalid pattern — fall through to default formatting.
       }
     }
@@ -406,7 +405,7 @@ class OiFieldDisplay extends StatelessWidget {
   }
 
   Widget _buildDateDisplay(BuildContext context) {
-    final DateTime? date = _parseDate();
+    final date = _parseDate();
     if (date == null) {
       assert(
         false,
@@ -420,7 +419,7 @@ class OiFieldDisplay extends StatelessWidget {
   }
 
   Widget _buildDateTimeDisplay(BuildContext context) {
-    final DateTime? date = _parseDate();
+    final date = _parseDate();
     if (date == null) {
       assert(
         false,
@@ -559,7 +558,7 @@ class OiFieldDisplay extends StatelessWidget {
       }
     } else {
       // Extract filename from path.
-      filename = _valueString.split('/').last.split('\\').last;
+      filename = _valueString.split('/').last.split(r'\').last;
     }
 
     return Row(
@@ -670,7 +669,7 @@ class OiFieldDisplay extends StatelessWidget {
     try {
       final encoded = value is String ? jsonDecode(value as String) : value;
       formatted = const JsonEncoder.withIndent('  ').convert(encoded);
-    } catch (_) {
+    } on Exception catch (_) {
       formatted = _valueString;
     }
 

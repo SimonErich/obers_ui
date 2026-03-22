@@ -3,11 +3,11 @@ import 'package:obers_ui/src/components/buttons/oi_button.dart';
 import 'package:obers_ui/src/components/display/oi_badge.dart';
 import 'package:obers_ui/src/components/display/oi_card.dart';
 import 'package:obers_ui/src/components/feedback/oi_star_rating.dart';
+import 'package:obers_ui/src/components/inputs/oi_select.dart';
 import 'package:obers_ui/src/components/navigation/oi_accordion.dart';
 import 'package:obers_ui/src/components/navigation/oi_tabs.dart';
 import 'package:obers_ui/src/components/shop/oi_price_tag.dart';
 import 'package:obers_ui/src/components/shop/oi_quantity_selector.dart';
-import 'package:obers_ui/src/components/inputs/oi_select.dart';
 import 'package:obers_ui/src/foundation/oi_responsive.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/models/oi_cart_item.dart';
@@ -132,7 +132,7 @@ class _OiShopProductDetailState extends State<OiShopProductDetail> {
     images.addAll(widget.product.imageUrls);
     // Deduplicate while preserving order.
     final seen = <String>{};
-    return images.where((url) => seen.add(url)).toList();
+    return images.where(seen.add).toList();
   }
 
   // ---------------------------------------------------------------------------
@@ -243,7 +243,7 @@ class _OiShopProductDetailState extends State<OiShopProductDetail> {
         OiQuantitySelector(
           value: _quantity,
           label: 'Quantity',
-          onChange: _handleAddToCart == null ? null : _handleQuantityChange,
+          onChange: _handleQuantityChange,
           max: _selectedVariant?.stockCount ?? 99,
           disabled: !_isInStock,
         ),
@@ -524,8 +524,7 @@ class _OiProductGallery extends StatelessWidget {
   const _OiProductGallery({
     required this.imageUrls,
     required this.selectedIndex,
-    this.onIndexChange,
-    required this.label,
+    required this.label, this.onIndexChange,
   });
 
   /// The list of image URLs to display.

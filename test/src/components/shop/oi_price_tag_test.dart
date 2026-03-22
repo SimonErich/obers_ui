@@ -64,7 +64,7 @@ void main() {
     });
 
     testWidgets('shows negative price in success color', (tester) async {
-      await tester.pumpObers(const OiPriceTag(price: -5.00, label: 'Discount'));
+      await tester.pumpObers(const OiPriceTag(price: -5, label: 'Discount'));
       final context = tester.element(find.byType(OiPriceTag));
       final successColor = OiTheme.of(context).colors.success.base;
       final textWidget = tester.widget<Text>(find.text(r'-$5.00'));
@@ -99,7 +99,6 @@ void main() {
         const OiPriceTag(
           price: 10,
           label: 'Price',
-          size: OiPriceTagSize.medium,
         ),
       );
       final textWidget = tester.widget<Text>(find.text(r'$10.00'));
@@ -123,7 +122,7 @@ void main() {
           currencyCode: 'USD',
         ),
       );
-      expect(find.text(r'!!99.99'), findsOneWidget);
+      expect(find.text('!!99.99'), findsOneWidget);
     });
 
     testWidgets('compare-at price uses textMuted color', (tester) async {

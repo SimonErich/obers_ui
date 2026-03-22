@@ -18,9 +18,9 @@ import '../../../helpers/pump_app.dart';
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
 const _items = [
-  OiCartItem(productKey: 'p1', name: 'Widget A', unitPrice: 50, quantity: 1),
+  OiCartItem(productKey: 'p1', name: 'Widget A', unitPrice: 50),
   OiCartItem(productKey: 'p2', name: 'Widget B', unitPrice: 25, quantity: 2),
-  OiCartItem(productKey: 'p3', name: 'Widget C', unitPrice: 10, quantity: 1),
+  OiCartItem(productKey: 'p3', name: 'Widget C', unitPrice: 10),
   OiCartItem(productKey: 'p4', name: 'Widget D', unitPrice: 15, quantity: 3),
 ];
 

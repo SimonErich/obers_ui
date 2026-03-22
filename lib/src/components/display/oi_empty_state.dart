@@ -85,7 +85,7 @@ class OiEmptyState extends StatelessWidget {
     Object? error,
     Key? key,
   }) {
-    String? resolvedDescription = description;
+    var resolvedDescription = description;
     if (error != null && kDebugMode) {
       final errorStr = error.toString();
       resolvedDescription = resolvedDescription != null

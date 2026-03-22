@@ -1,3 +1,4 @@
+// Why: Test files are not part of the public API surface; requiring doc comments on every test group and helper closure would add noise without value.
 // ignore_for_file: public_member_api_docs
 
 import 'package:flutter_test/flutter_test.dart';
@@ -9,7 +10,7 @@ void main() {
       const result = OiCouponResult(
         valid: true,
         message: '20% off applied!',
-        discountAmount: 10.0,
+        discountAmount: 10,
       );
       expect(result.valid, isTrue);
       expect(result.message, '20% off applied!');
@@ -33,7 +34,7 @@ void main() {
       const result = OiCouponResult(
         valid: true,
         message: 'OK',
-        discountAmount: 5.0,
+        discountAmount: 5,
       );
       final copy = result.copyWith(message: null, discountAmount: null);
       expect(copy.message, isNull);

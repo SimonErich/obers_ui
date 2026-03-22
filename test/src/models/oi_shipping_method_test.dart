@@ -100,14 +100,12 @@ void main() {
         label: 'Standard',
         price: 5.99,
         description: 'Normal',
-        currencyCode: 'USD',
       );
       const b = OiShippingMethod(
         key: 'standard',
         label: 'Standard',
         price: 5.99,
         description: 'Normal',
-        currencyCode: 'USD',
       );
       expect(a, equals(b));
     });

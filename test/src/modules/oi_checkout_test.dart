@@ -126,35 +126,6 @@ Widget _buildCheckout({
   );
 }
 
-/// Fills the shipping address form fields with valid data and pumps.
-Future<void> _fillShippingAddress(WidgetTester tester) async {
-  // Find text inputs by their label text. OiTextInput renders labels.
-  await tester.enterText(find.widgetWithText(EditableText, '').first, 'Jane');
-  await tester.pump();
-
-  // Use the text controllers — enter text into each OiTextInput field.
-  final editables = find.byType(EditableText);
-  // The shipping address fields appear in order:
-  // 0: First Name, 1: Last Name, 2: Address, 3: Apt, 4: City,
-  // 5: State, 6: Postal Code, 7: Country (may be select), 8: Phone, 9: Email
-  final fieldValues = [
-    'Jane', // First Name
-    'Doe', // Last Name
-    '123 Main St', // Address
-    '', // Apt (optional)
-    'Springfield', // City
-    'IL', // State
-    '62701', // Postal Code
-  ];
-
-  for (var i = 0; i < fieldValues.length; i++) {
-    if (fieldValues[i].isNotEmpty) {
-      await tester.enterText(editables.at(i), fieldValues[i]);
-      await tester.pump();
-    }
-  }
-}
-
 // ── Tests ────────────────────────────────────────────────────────────────────
 
 void main() {
@@ -317,7 +288,7 @@ void main() {
       tester,
     ) async {
       await tester.pumpObers(
-        _buildCheckout(sameBillingDefault: true),
+        _buildCheckout(),
         surfaceSize: const Size(1200, 900),
       );
       await tester.pumpAndSettle();

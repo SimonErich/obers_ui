@@ -17,7 +17,6 @@ void main() {
       OiExportButton(
         label: 'Export',
         onExport: (_) async {},
-        formats: const [OiExportFormat.csv],
       ),
     );
 
@@ -110,7 +109,6 @@ void main() {
       OiExportButton(
         label: 'Export',
         onExport: (format) async => received = format,
-        formats: const [OiExportFormat.csv],
         loading: true,
       ),
     );
@@ -131,7 +129,6 @@ void main() {
       OiExportButton(
         label: 'Export',
         onExport: (_) => completer.future,
-        formats: const [OiExportFormat.csv],
       ),
     );
 
@@ -150,7 +147,6 @@ void main() {
       OiExportButton(
         label: 'Export',
         onExport: (format) async => received = format,
-        formats: const [OiExportFormat.csv],
       ),
     );
 

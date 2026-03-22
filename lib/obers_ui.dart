@@ -32,7 +32,6 @@ export 'src/components/display/oi_diff_view.dart';
 export 'src/components/display/oi_drop_highlight.dart';
 export 'src/components/display/oi_empty_state.dart';
 export 'src/components/display/oi_field_display.dart';
-export 'src/components/display/oi_pagination.dart';
 export 'src/components/display/oi_file_grid_card.dart';
 export 'src/components/display/oi_file_icon.dart';
 export 'src/components/display/oi_file_preview.dart';
@@ -43,6 +42,7 @@ export 'src/components/display/oi_image.dart';
 export 'src/components/display/oi_list_tile.dart';
 export 'src/components/display/oi_markdown.dart';
 export 'src/components/display/oi_metric.dart';
+export 'src/components/display/oi_pagination.dart';
 export 'src/components/display/oi_path_bar.dart';
 export 'src/components/display/oi_popover.dart';
 export 'src/components/display/oi_progress.dart';
@@ -161,11 +161,11 @@ export 'src/composites/media/oi_video_player.dart';
 // ── Composites: Navigation ───────────────────────────────────────────────────
 
 export 'src/composites/navigation/oi_arrow_nav.dart';
+export 'src/composites/navigation/oi_error_page.dart';
 export 'src/composites/navigation/oi_file_toolbar.dart';
 export 'src/composites/navigation/oi_filter_bar.dart';
 export 'src/composites/navigation/oi_nav_menu.dart';
 export 'src/composites/navigation/oi_shortcuts.dart';
-export 'src/composites/navigation/oi_error_page.dart';
 export 'src/composites/navigation/oi_sidebar.dart';
 // ── Composites: Onboarding ───────────────────────────────────────────────────
 
@@ -178,6 +178,11 @@ export 'src/composites/scheduling/oi_calendar.dart';
 export 'src/composites/scheduling/oi_gantt.dart';
 export 'src/composites/scheduling/oi_scheduler.dart';
 export 'src/composites/scheduling/oi_timeline.dart';
+// ── Composites: Search ───────────────────────────────────────────────────────
+
+export 'src/composites/search/oi_combo_box.dart';
+export 'src/composites/search/oi_command_bar.dart';
+export 'src/composites/search/oi_search.dart';
 // ── Composites: Shop ────────────────────────────────────────────────────────
 
 export 'src/composites/shop/oi_cart_panel.dart';
@@ -186,11 +191,6 @@ export 'src/composites/shop/oi_order_summary.dart';
 export 'src/composites/shop/oi_order_tracker.dart';
 export 'src/composites/shop/oi_product_filters.dart';
 export 'src/composites/shop/oi_product_gallery.dart';
-// ── Composites: Search ───────────────────────────────────────────────────────
-
-export 'src/composites/search/oi_combo_box.dart';
-export 'src/composites/search/oi_command_bar.dart';
-export 'src/composites/search/oi_search.dart';
 // ── Composites: Social ───────────────────────────────────────────────────────
 
 export 'src/composites/social/oi_avatar_stack.dart';
@@ -265,6 +265,7 @@ export 'src/models/oi_shipping_method.dart';
 // ── Models: Settings ─────────────────────────────────────────────────────────
 
 export 'src/models/settings/oi_accordion_settings.dart';
+export 'src/models/settings/oi_app_shell_settings.dart';
 export 'src/models/settings/oi_calendar_settings.dart';
 export 'src/models/settings/oi_dashboard_settings.dart';
 export 'src/models/settings/oi_file_explorer_settings.dart'
@@ -273,7 +274,6 @@ export 'src/models/settings/oi_filter_bar_settings.dart';
 export 'src/models/settings/oi_gantt_settings.dart';
 export 'src/models/settings/oi_kanban_settings.dart';
 export 'src/models/settings/oi_list_view_settings.dart' hide OiListViewLayout;
-export 'src/models/settings/oi_app_shell_settings.dart';
 export 'src/models/settings/oi_sidebar_settings.dart' hide OiSidebarMode;
 export 'src/models/settings/oi_split_pane_settings.dart';
 export 'src/models/settings/oi_table_settings.dart';
@@ -281,19 +281,19 @@ export 'src/models/settings/oi_tabs_settings.dart';
 // ── Modules ──────────────────────────────────────────────────────────────────
 
 export 'src/modules/oi_activity_feed.dart';
+export 'src/modules/oi_app_shell.dart';
+export 'src/modules/oi_auth_page.dart';
 export 'src/modules/oi_chat.dart' hide OiFileData, OiReactionData;
+export 'src/modules/oi_checkout.dart';
 export 'src/modules/oi_comments.dart';
 export 'src/modules/oi_dashboard.dart';
 export 'src/modules/oi_file_explorer.dart';
 export 'src/modules/oi_file_manager.dart';
 export 'src/modules/oi_kanban.dart';
-export 'src/modules/oi_list_view.dart' hide OiSelectionMode, OiSortOption;
+export 'src/modules/oi_list_view.dart' hide OiSelectionMode;
 export 'src/modules/oi_metadata_editor.dart';
 export 'src/modules/oi_notification_center.dart';
-export 'src/modules/oi_app_shell.dart';
-export 'src/modules/oi_auth_page.dart';
 export 'src/modules/oi_permissions.dart';
-export 'src/modules/oi_checkout.dart';
 export 'src/modules/oi_resource_page.dart';
 export 'src/modules/oi_shop_product_detail.dart';
 // ── Primitives: Animation ────────────────────────────────────────────────────
