@@ -45,15 +45,7 @@ class OiPaymentOption extends StatelessWidget {
   final ValueChanged<OiPaymentMethod>? onSelect;
 
   IconData _resolveIcon() {
-    if (method.icon == null) return _kPaymentIcon;
-    switch (method.icon!.toLowerCase()) {
-      case 'credit_card':
-      case 'visa':
-      case 'mastercard':
-        return _kCreditCardIcon;
-      default:
-        return _kPaymentIcon;
-    }
+    return method.icon ?? _kPaymentIcon;
   }
 
   Widget _buildRadioIndicator(BuildContext context) {

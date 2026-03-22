@@ -1,8 +1,8 @@
-import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
 
 /// A payment method option displayed during checkout.
 ///
-/// Coverage: REQ-0067
+/// Coverage: REQ-0005
 ///
 /// {@category Models}
 @immutable
@@ -14,10 +14,13 @@ class OiPaymentMethod {
     this.description,
     this.icon,
     this.isDefault = false,
+    this.lastFour,
+    this.expiryDate,
+    this.logo,
   });
 
   /// Unique identifier for this payment method.
-  final String key;
+  final Object key;
 
   /// Human-readable label (e.g. "Credit Card").
   final String label;
@@ -25,19 +28,31 @@ class OiPaymentMethod {
   /// Optional description (e.g. "Visa ending in 4242").
   final String? description;
 
-  /// Optional icon identifier (e.g. a card brand name).
-  final String? icon;
+  /// Optional icon for this payment method.
+  final IconData? icon;
 
   /// Whether this is the default / pre-selected payment method.
   final bool isDefault;
 
+  /// Last four digits of the card (e.g. '•••• 4242' for saved cards).
+  final String? lastFour;
+
+  /// Card expiry date (e.g. '12/25').
+  final String? expiryDate;
+
+  /// Optional logo widget (e.g. a card brand image).
+  final Widget? logo;
+
   /// Returns a copy with the specified fields replaced.
   OiPaymentMethod copyWith({
-    String? key,
+    Object? key,
     String? label,
     Object? description = _sentinel,
     Object? icon = _sentinel,
     bool? isDefault,
+    Object? lastFour = _sentinel,
+    Object? expiryDate = _sentinel,
+    Object? logo = _sentinel,
   }) {
     return OiPaymentMethod(
       key: key ?? this.key,
@@ -45,8 +60,15 @@ class OiPaymentMethod {
       description: identical(description, _sentinel)
           ? this.description
           : description as String?,
-      icon: identical(icon, _sentinel) ? this.icon : icon as String?,
+      icon: identical(icon, _sentinel) ? this.icon : icon as IconData?,
       isDefault: isDefault ?? this.isDefault,
+      lastFour: identical(lastFour, _sentinel)
+          ? this.lastFour
+          : lastFour as String?,
+      expiryDate: identical(expiryDate, _sentinel)
+          ? this.expiryDate
+          : expiryDate as String?,
+      logo: identical(logo, _sentinel) ? this.logo : logo as Widget?,
     );
   }
 
@@ -58,11 +80,23 @@ class OiPaymentMethod {
         label == other.label &&
         description == other.description &&
         icon == other.icon &&
-        isDefault == other.isDefault;
+        isDefault == other.isDefault &&
+        lastFour == other.lastFour &&
+        expiryDate == other.expiryDate &&
+        logo == other.logo;
   }
 
   @override
-  int get hashCode => Object.hash(key, label, description, icon, isDefault);
+  int get hashCode => Object.hash(
+    key,
+    label,
+    description,
+    icon,
+    isDefault,
+    lastFour,
+    expiryDate,
+    logo,
+  );
 
   @override
   String toString() =>

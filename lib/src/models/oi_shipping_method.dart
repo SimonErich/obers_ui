@@ -1,8 +1,8 @@
-import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
 
 /// A shipping method option displayed during checkout.
 ///
-/// Coverage: REQ-0067
+/// Coverage: REQ-0004
 ///
 /// {@category Models}
 @immutable
@@ -15,10 +15,11 @@ class OiShippingMethod {
     this.description,
     this.estimatedDelivery,
     this.currencyCode = 'USD',
+    this.icon,
   });
 
   /// Unique identifier for this shipping method.
-  final String key;
+  final Object key;
 
   /// Human-readable label (e.g. "Standard Shipping").
   final String label;
@@ -35,14 +36,18 @@ class OiShippingMethod {
   /// ISO 4217 currency code. Defaults to `'USD'`.
   final String currencyCode;
 
+  /// Optional icon for this shipping method.
+  final IconData? icon;
+
   /// Returns a copy with the specified fields replaced.
   OiShippingMethod copyWith({
-    String? key,
+    Object? key,
     String? label,
     double? price,
     Object? description = _sentinel,
     Object? estimatedDelivery = _sentinel,
     String? currencyCode,
+    Object? icon = _sentinel,
   }) {
     return OiShippingMethod(
       key: key ?? this.key,
@@ -55,6 +60,7 @@ class OiShippingMethod {
           ? this.estimatedDelivery
           : estimatedDelivery as String?,
       currencyCode: currencyCode ?? this.currencyCode,
+      icon: identical(icon, _sentinel) ? this.icon : icon as IconData?,
     );
   }
 
@@ -67,7 +73,8 @@ class OiShippingMethod {
         price == other.price &&
         description == other.description &&
         estimatedDelivery == other.estimatedDelivery &&
-        currencyCode == other.currencyCode;
+        currencyCode == other.currencyCode &&
+        icon == other.icon;
   }
 
   @override
@@ -78,6 +85,7 @@ class OiShippingMethod {
     description,
     estimatedDelivery,
     currencyCode,
+    icon,
   );
 
   @override

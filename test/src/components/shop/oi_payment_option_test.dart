@@ -12,7 +12,7 @@ const _visa = OiPaymentMethod(
   key: 'visa',
   label: 'Visa',
   description: 'Ending in 4242',
-  icon: 'credit_card',
+  icon: IconData(0xe870, fontFamily: 'MaterialIcons'),
 );
 
 const _paypal = OiPaymentMethod(

@@ -2,7 +2,7 @@ import 'package:flutter/foundation.dart';
 
 /// A postal / shipping address.
 ///
-/// Coverage: REQ-0067
+/// Coverage: REQ-0006
 ///
 /// All fields are nullable to support partial entry during checkout flows.
 ///
@@ -14,8 +14,8 @@ class OiAddressData {
     this.firstName,
     this.lastName,
     this.company,
-    this.address1,
-    this.address2,
+    this.line1,
+    this.line2,
     this.city,
     this.state,
     this.postalCode,
@@ -34,10 +34,10 @@ class OiAddressData {
   final String? company;
 
   /// Primary street address line.
-  final String? address1;
+  final String? line1;
 
   /// Secondary street address line (apt, suite, etc.).
-  final String? address2;
+  final String? line2;
 
   /// City or locality.
   final String? city;
@@ -63,8 +63,8 @@ class OiAddressData {
       firstName!.isNotEmpty &&
       lastName != null &&
       lastName!.isNotEmpty &&
-      address1 != null &&
-      address1!.isNotEmpty &&
+      line1 != null &&
+      line1!.isNotEmpty &&
       city != null &&
       city!.isNotEmpty &&
       postalCode != null &&
@@ -77,8 +77,8 @@ class OiAddressData {
     Object? firstName = _sentinel,
     Object? lastName = _sentinel,
     Object? company = _sentinel,
-    Object? address1 = _sentinel,
-    Object? address2 = _sentinel,
+    Object? line1 = _sentinel,
+    Object? line2 = _sentinel,
     Object? city = _sentinel,
     Object? state = _sentinel,
     Object? postalCode = _sentinel,
@@ -96,12 +96,12 @@ class OiAddressData {
       company: identical(company, _sentinel)
           ? this.company
           : company as String?,
-      address1: identical(address1, _sentinel)
-          ? this.address1
-          : address1 as String?,
-      address2: identical(address2, _sentinel)
-          ? this.address2
-          : address2 as String?,
+      line1: identical(line1, _sentinel)
+          ? this.line1
+          : line1 as String?,
+      line2: identical(line2, _sentinel)
+          ? this.line2
+          : line2 as String?,
       city: identical(city, _sentinel) ? this.city : city as String?,
       state: identical(state, _sentinel) ? this.state : state as String?,
       postalCode: identical(postalCode, _sentinel)
@@ -122,8 +122,8 @@ class OiAddressData {
     return firstName == other.firstName &&
         lastName == other.lastName &&
         company == other.company &&
-        address1 == other.address1 &&
-        address2 == other.address2 &&
+        line1 == other.line1 &&
+        line2 == other.line2 &&
         city == other.city &&
         state == other.state &&
         postalCode == other.postalCode &&
@@ -137,8 +137,8 @@ class OiAddressData {
     firstName,
     lastName,
     company,
-    address1,
-    address2,
+    line1,
+    line2,
     city,
     state,
     postalCode,
