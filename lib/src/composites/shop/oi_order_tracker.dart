@@ -244,11 +244,7 @@ class OiOrderTracker extends StatelessWidget {
               ),
             ),
             if (!isLast)
-              Container(
-                width: 2,
-                height: 40,
-                color: context.colors.textMuted,
-              ),
+              Container(width: 2, height: 40, color: context.colors.textMuted),
           ],
         ),
         SizedBox(width: sp.sm),
@@ -261,8 +257,7 @@ class OiOrderTracker extends StatelessWidget {
               children: [
                 OiLabel.small(formattedTime),
                 OiLabel.bodyStrong(event.title),
-                if (event.description != null &&
-                    event.description!.isNotEmpty)
+                if (event.description != null && event.description!.isNotEmpty)
                   OiLabel.small(event.description!),
               ],
             ),

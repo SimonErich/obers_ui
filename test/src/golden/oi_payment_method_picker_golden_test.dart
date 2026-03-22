@@ -39,7 +39,7 @@ Widget _buildPaymentPickerGolden() {
         label: 'Payment method',
         methods: _methods,
         selectedKey: 'visa',
-        onSelected: _noop,
+        onSelect: _noop,
         addNewCard: Text('+ Add new card'),
       ),
     ),

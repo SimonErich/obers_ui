@@ -283,7 +283,10 @@ class _OiAddressFormState extends State<OiAddressForm> {
     return OiRow(
       breakpoint: context.breakpoint,
       gap: OiResponsive(context.spacing.sm),
-      children: [Expanded(child: firstName), Expanded(child: lastName)],
+      children: [
+        Expanded(child: firstName),
+        Expanded(child: lastName),
+      ],
     );
   }
 
@@ -365,7 +368,10 @@ class _OiAddressFormState extends State<OiAddressForm> {
     return OiRow(
       breakpoint: context.breakpoint,
       gap: OiResponsive(context.spacing.sm),
-      children: [Expanded(child: city), Expanded(child: state)],
+      children: [
+        Expanded(child: city),
+        Expanded(child: state),
+      ],
     );
   }
 
@@ -426,7 +432,10 @@ class _OiAddressFormState extends State<OiAddressForm> {
     return OiRow(
       breakpoint: context.breakpoint,
       gap: OiResponsive(context.spacing.sm),
-      children: [Expanded(child: postalCode), Expanded(child: country)],
+      children: [
+        Expanded(child: postalCode),
+        Expanded(child: country),
+      ],
     );
   }
 

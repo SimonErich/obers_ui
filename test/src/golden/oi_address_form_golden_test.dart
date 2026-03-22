@@ -23,7 +23,7 @@ void main() {
       children: {
         'Pre-filled': const OiAddressForm(
           label: 'Shipping address',
-          initialData: OiAddressData(
+          initialValue: OiAddressData(
             firstName: 'Jane',
             lastName: 'Doe',
             company: 'Acme Inc.',

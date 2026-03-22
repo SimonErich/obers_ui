@@ -162,9 +162,7 @@ void main() {
         expect(find.text('Alice'), findsOneWidget);
       });
 
-      testWidgets('billing constructor pre-fills initialValue', (
-        tester,
-      ) async {
+      testWidgets('billing constructor pre-fills initialValue', (tester) async {
         await tester.pumpObers(
           const SingleChildScrollView(
             child: OiAddressForm.billing(
@@ -762,6 +760,7 @@ void main() {
 
         // Trigger submit via the state's submit method.
         final state = formKey.currentState!;
+        // `submit()` is an internal method not exposed through the public interface.
         // ignore: avoid_dynamic_calls
         (state as dynamic).submit();
         await tester.pump();
@@ -824,6 +823,7 @@ void main() {
           surfaceSize: _surfaceSize,
         );
 
+        // `submit()` is an internal method not exposed through the public interface.
         // ignore: avoid_dynamic_calls
         (formKey.currentState! as dynamic).submit();
         await tester.pump();
@@ -848,6 +848,7 @@ void main() {
           surfaceSize: _surfaceSize,
         );
 
+        // `submit()` is an internal method not exposed through the public interface.
         // ignore: avoid_dynamic_calls
         (formKey.currentState! as dynamic).submit();
         await tester.pump();
@@ -875,10 +876,7 @@ void main() {
       });
 
       testWidgets('no error shown when error is null', (tester) async {
-        await tester.pumpObers(
-          _buildAddressForm(),
-          surfaceSize: _surfaceSize,
-        );
+        await tester.pumpObers(_buildAddressForm(), surfaceSize: _surfaceSize);
 
         expect(find.text('Address is invalid'), findsNothing);
       });

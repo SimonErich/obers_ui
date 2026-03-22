@@ -47,6 +47,7 @@ void main() {
         message: 'Applied',
         discountAmount: 5,
       );
+      // 15.0 is intentionally a double literal to test double precision handling.
       // ignore: prefer_int_literals
       final updated = result.copyWith(discountAmount: 15.0);
       expect(updated.valid, true);
@@ -86,10 +87,7 @@ void main() {
         message: 'Applied',
         discountAmount: 5,
       );
-      const b = OiCouponResult(
-        valid: false,
-        message: 'Invalid code',
-      );
+      const b = OiCouponResult(valid: false, message: 'Invalid code');
       expect(a, isNot(equals(b)));
     });
 

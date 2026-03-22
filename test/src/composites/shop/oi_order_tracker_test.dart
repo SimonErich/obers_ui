@@ -7,13 +7,13 @@ import 'package:obers_ui/src/components/navigation/oi_accordion.dart';
 import 'package:obers_ui/src/components/shop/oi_order_status_badge.dart';
 import 'package:obers_ui/src/composites/forms/oi_stepper.dart';
 import 'package:obers_ui/src/composites/shop/oi_order_tracker.dart';
+import 'package:obers_ui/src/foundation/theme/oi_text_theme.dart';
 import 'package:obers_ui/src/models/oi_address_data.dart';
 import 'package:obers_ui/src/models/oi_cart_item.dart';
 import 'package:obers_ui/src/models/oi_cart_summary.dart';
 import 'package:obers_ui/src/models/oi_order_data.dart';
 import 'package:obers_ui/src/models/oi_payment_method.dart';
 import 'package:obers_ui/src/models/oi_shipping_method.dart';
-import 'package:obers_ui/src/foundation/theme/oi_text_theme.dart';
 import 'package:obers_ui/src/primitives/display/oi_label.dart';
 
 import '../../../helpers/pump_app.dart';
