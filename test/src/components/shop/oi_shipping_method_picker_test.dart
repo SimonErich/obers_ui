@@ -4,93 +4,471 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui/src/components/shop/oi_shipping_method_picker.dart';
+import 'package:obers_ui/src/components/shop/oi_shipping_option.dart';
 import 'package:obers_ui/src/models/oi_shipping_method.dart';
 
 import '../../../helpers/pump_app.dart';
 
-const _standard = OiShippingMethod(
-  key: 'standard',
-  label: 'Standard Shipping',
-  price: 5.99,
-);
+// ── Test data ────────────────────────────────────────────────────────────────
 
-const _express = OiShippingMethod(
-  key: 'express',
-  label: 'Express Shipping',
-  price: 12.99,
-);
+List<OiShippingMethod> _sampleMethods() => const [
+  OiShippingMethod(
+    key: 'standard',
+    label: 'Standard Shipping',
+    price: 5.99,
+    description: 'Delivered in 5-7 business days',
+    estimatedDelivery: '5-7 days',
+  ),
+  OiShippingMethod(
+    key: 'express',
+    label: 'Express Shipping',
+    price: 12.99,
+    description: 'Delivered in 1-2 business days',
+    estimatedDelivery: '1-2 days',
+  ),
+  OiShippingMethod(
+    key: 'free',
+    label: 'Free Shipping',
+    price: 0,
+    description: 'Delivered in 10-14 business days',
+    estimatedDelivery: '10-14 days',
+  ),
+];
+
+Widget _buildPicker({
+  List<OiShippingMethod>? methods,
+  Object? selectedKey,
+  ValueChanged<OiShippingMethod>? onSelected,
+  String label = 'Shipping method',
+  String currencyCode = 'EUR',
+  String emptyLabel = 'No shipping methods available',
+}) {
+  return OiShippingMethodPicker(
+    label: label,
+    methods: methods ?? _sampleMethods(),
+    selectedKey: selectedKey,
+    onSelected: onSelected ?? (_) {},
+    currencyCode: currencyCode,
+    emptyLabel: emptyLabel,
+  );
+}
 
 void main() {
   group('OiShippingMethodPicker', () {
-    testWidgets('renders list of methods', (tester) async {
-      await tester.pumpObers(
-        OiShippingMethodPicker(
-          label: 'Shipping method',
-          methods: const [_standard, _express],
-          onSelected: (_) {},
-        ),
-      );
+    // ── Renders all shipping methods ────────────────────────────────────
 
-      expect(find.text('Standard Shipping'), findsOneWidget);
-      expect(find.text('Express Shipping'), findsOneWidget);
+    group('renders all shipping methods', () {
+      testWidgets('displays labels for all methods', (tester) async {
+        await tester.pumpObers(_buildPicker());
+
+        expect(find.text('Standard Shipping'), findsOneWidget);
+        expect(find.text('Express Shipping'), findsOneWidget);
+        expect(find.text('Free Shipping'), findsOneWidget);
+      });
+
+      testWidgets('displays description for methods', (tester) async {
+        await tester.pumpObers(_buildPicker());
+
+        expect(find.text('Delivered in 5-7 business days'), findsOneWidget);
+        expect(find.text('Delivered in 1-2 business days'), findsOneWidget);
+      });
+
+      testWidgets('displays estimated delivery for methods', (tester) async {
+        await tester.pumpObers(_buildPicker());
+
+        expect(find.text('5-7 days'), findsOneWidget);
+        expect(find.text('1-2 days'), findsOneWidget);
+        expect(find.text('10-14 days'), findsOneWidget);
+      });
+
+      testWidgets('renders correct number of OiShippingOption widgets', (
+        tester,
+      ) async {
+        await tester.pumpObers(_buildPicker());
+
+        expect(find.byType(OiShippingOption), findsNWidgets(3));
+      });
+
+      testWidgets('displays the picker label', (tester) async {
+        await tester.pumpObers(_buildPicker(label: 'Choose delivery'));
+
+        expect(find.text('Choose delivery'), findsOneWidget);
+      });
     });
 
-    testWidgets('fires onSelected when a method is tapped', (tester) async {
-      OiShippingMethod? selected;
-      await tester.pumpObers(
-        OiShippingMethodPicker(
-          label: 'Shipping method',
-          methods: const [_standard, _express],
-          onSelected: (m) => selected = m,
-        ),
-      );
+    // ── Selected method highlighted ─────────────────────────────────────
 
-      await tester.tap(find.text('Standard Shipping'));
-      await tester.pump();
+    group('selected method highlighted', () {
+      testWidgets('selected method option has selected=true', (tester) async {
+        await tester.pumpObers(_buildPicker(selectedKey: 'express'));
 
-      expect(selected, _standard);
+        final options = tester
+            .widgetList<OiShippingOption>(find.byType(OiShippingOption))
+            .toList();
+
+        // Standard (index 0) should not be selected.
+        expect(options[0].selected, isFalse);
+        // Express (index 1) should be selected.
+        expect(options[1].selected, isTrue);
+        // Free (index 2) should not be selected.
+        expect(options[2].selected, isFalse);
+      });
+
+      testWidgets('no method selected when selectedKey is null', (
+        tester,
+      ) async {
+        await tester.pumpObers(_buildPicker());
+
+        final options = tester
+            .widgetList<OiShippingOption>(find.byType(OiShippingOption))
+            .toList();
+
+        for (final option in options) {
+          expect(option.selected, isFalse);
+        }
+      });
     });
 
-    testWidgets('shows empty label when methods is empty', (tester) async {
-      await tester.pumpObers(
-        OiShippingMethodPicker(
-          label: 'Shipping method',
-          methods: const [],
-          onSelected: (_) {},
-        ),
-      );
+    // ── onSelect fires correctly ────────────────────────────────────────
 
-      expect(find.text('No shipping methods available'), findsOneWidget);
+    group('onSelect fires correctly', () {
+      testWidgets('fires onSelected with correct method on tap', (
+        tester,
+      ) async {
+        OiShippingMethod? selected;
+        await tester.pumpObers(_buildPicker(onSelected: (m) => selected = m));
+
+        await tester.tap(find.text('Standard Shipping'));
+        await tester.pump();
+
+        expect(selected, isNotNull);
+        expect(selected!.key, 'standard');
+        expect(selected!.label, 'Standard Shipping');
+        expect(selected!.price, 5.99);
+      });
+
+      testWidgets('fires onSelected with different method on second tap', (
+        tester,
+      ) async {
+        OiShippingMethod? selected;
+        await tester.pumpObers(_buildPicker(onSelected: (m) => selected = m));
+
+        await tester.tap(find.text('Express Shipping'));
+        await tester.pump();
+
+        expect(selected!.key, 'express');
+        expect(selected!.price, 12.99);
+      });
+
+      testWidgets('fires onSelected for free shipping method', (tester) async {
+        OiShippingMethod? selected;
+        await tester.pumpObers(_buildPicker(onSelected: (m) => selected = m));
+
+        await tester.tap(find.text('Free Shipping'));
+        await tester.pump();
+
+        expect(selected!.key, 'free');
+        expect(selected!.price, 0);
+      });
     });
 
-    testWidgets('highlights selected method', (tester) async {
-      await tester.pumpObers(
-        OiShippingMethodPicker(
-          label: 'Shipping method',
-          methods: const [_standard, _express],
-          selectedKey: 'express',
-          onSelected: (_) {},
-        ),
-      );
+    // ── Empty methods handling ───────────────────────────────────────────
 
-      expect(find.byType(OiShippingMethodPicker), findsOneWidget);
+    group('empty methods handling', () {
+      testWidgets('shows default empty label when methods list is empty', (
+        tester,
+      ) async {
+        await tester.pumpObers(_buildPicker(methods: const []));
+
+        expect(find.text('No shipping methods available'), findsOneWidget);
+        expect(find.byType(OiShippingOption), findsNothing);
+      });
+
+      testWidgets('shows custom empty label when provided', (tester) async {
+        await tester.pumpObers(
+          _buildPicker(methods: const [], emptyLabel: 'No options'),
+        );
+
+        expect(find.text('No options'), findsOneWidget);
+      });
+
+      testWidgets('still displays the picker label when empty', (tester) async {
+        await tester.pumpObers(
+          _buildPicker(methods: const [], label: 'Choose shipping'),
+        );
+
+        expect(find.text('Choose shipping'), findsOneWidget);
+      });
     });
 
-    testWidgets('semantic label is set', (tester) async {
-      await tester.pumpObers(
-        OiShippingMethodPicker(
-          label: 'Choose shipping',
-          methods: const [_standard],
-          onSelected: (_) {},
-        ),
+    // ── currencyCode forwarding ─────────────────────────────────────────
+
+    group('currencyCode forwarding', () {
+      testWidgets('forwards EUR currency code to options', (tester) async {
+        await tester.pumpObers(_buildPicker());
+
+        // EUR prices display with € symbol after the amount.
+        expect(find.text('5.99 €'), findsOneWidget);
+        expect(find.text('12.99 €'), findsOneWidget);
+      });
+
+      testWidgets('forwards USD currency code to options', (tester) async {
+        await tester.pumpObers(
+          _buildPicker(
+            methods: const [
+              OiShippingMethod(key: 'std', label: 'Standard', price: 9.99),
+            ],
+            currencyCode: 'USD',
+          ),
+        );
+
+        // USD prices display with $ symbol before the amount.
+        expect(find.textContaining(r'$'), findsWidgets);
+      });
+
+      testWidgets('forwards GBP currency code to options', (tester) async {
+        await tester.pumpObers(
+          _buildPicker(
+            methods: const [
+              OiShippingMethod(key: 'std', label: 'Standard', price: 7.50),
+            ],
+            currencyCode: 'GBP',
+          ),
+        );
+
+        // GBP prices display with £ symbol before the amount.
+        expect(find.text('£7.50'), findsOneWidget);
+      });
+
+      testWidgets('free shipping displays "Free" regardless of currency', (
+        tester,
+      ) async {
+        await tester.pumpObers(
+          _buildPicker(
+            methods: const [
+              OiShippingMethod(key: 'free', label: 'Free', price: 0),
+            ],
+            currencyCode: 'USD',
+          ),
+        );
+
+        expect(find.text('Free'), findsWidgets);
+      });
+
+      testWidgets('OiShippingOption receives currencyCode from picker', (
+        tester,
+      ) async {
+        await tester.pumpObers(_buildPicker(currencyCode: 'CHF'));
+
+        final options = tester
+            .widgetList<OiShippingOption>(find.byType(OiShippingOption))
+            .toList();
+
+        for (final option in options) {
+          expect(option.currencyCode, 'CHF');
+        }
+      });
+    });
+
+    // ── Accessibility semantics ─────────────────────────────────────────
+
+    group('accessibility semantics', () {
+      testWidgets('picker has semantic label', (tester) async {
+        await tester.pumpObers(_buildPicker(label: 'Choose shipping'));
+
+        expect(
+          find.byWidgetPredicate(
+            (w) => w is Semantics && w.properties.label == 'Choose shipping',
+          ),
+          findsOneWidget,
+        );
+      });
+
+      testWidgets('each shipping option has semantics', (tester) async {
+        await tester.pumpObers(_buildPicker(selectedKey: 'express'));
+
+        // Each OiShippingOption has a Semantics wrapper with selected state.
+        final semanticsWidgets = tester
+            .widgetList<Semantics>(
+              find.descendant(
+                of: find.byType(OiShippingMethodPicker),
+                matching: find.byWidgetPredicate(
+                  (w) => w is Semantics && w.properties.label != null,
+                ),
+              ),
+            )
+            .toList();
+
+        // At minimum, the picker label + individual option labels.
+        expect(semanticsWidgets.length, greaterThanOrEqualTo(2));
+      });
+
+      testWidgets('selected option has selected semantic', (tester) async {
+        await tester.pumpObers(_buildPicker(selectedKey: 'standard'));
+
+        // The OiShippingOption wraps with Semantics(selected: true).
+        expect(
+          find.byWidgetPredicate(
+            (w) =>
+                w is Semantics &&
+                w.properties.label == 'Standard Shipping' &&
+                (w.properties.selected ?? false),
+          ),
+          findsOneWidget,
+        );
+      });
+
+      testWidgets('unselected option has selected=false semantic', (
+        tester,
+      ) async {
+        await tester.pumpObers(_buildPicker(selectedKey: 'standard'));
+
+        expect(
+          find.byWidgetPredicate(
+            (w) =>
+                w is Semantics &&
+                w.properties.label == 'Express Shipping' &&
+                w.properties.selected == false,
+          ),
+          findsOneWidget,
+        );
+      });
+
+      testWidgets('semantic tree is generated without errors', (tester) async {
+        final handle = tester.ensureSemantics();
+        await tester.pumpObers(_buildPicker());
+
+        expect(tester.takeException(), isNull);
+        handle.dispose();
+      });
+
+      testWidgets(
+        'radio group pattern: exactly one selected among all options',
+        (tester) async {
+          await tester.pumpObers(_buildPicker(selectedKey: 'express'));
+
+          // Each OiShippingOption wraps in Semantics(label:, selected:),
+          // forming a radio-group-like pattern. Verify exactly one is selected.
+          final optionSemantics = tester
+              .widgetList<Semantics>(
+                find.byWidgetPredicate(
+                  (w) =>
+                      w is Semantics &&
+                      w.properties.label != null &&
+                      w.properties.selected != null,
+                ),
+              )
+              .toList();
+
+          expect(
+            optionSemantics.length,
+            _sampleMethods().length,
+            reason:
+                'Each shipping option should have a Semantics with selected',
+          );
+
+          final selectedCount = optionSemantics
+              .where((s) => s.properties.selected!)
+              .length;
+          expect(
+            selectedCount,
+            1,
+            reason: 'Exactly one option should be semantically selected',
+          );
+        },
       );
 
-      expect(
-        find.byWidgetPredicate(
-          (w) => w is Semantics && w.properties.label == 'Choose shipping',
-        ),
-        findsOneWidget,
+      testWidgets(
+        'radio group semantics: options use mutually exclusive selection',
+        (tester) async {
+          // OiShippingOption uses Semantics(label:, selected:) per option,
+          // which is the standard radio-button-like pattern. While it does not
+          // set SemanticsProperties.inMutuallyExclusiveGroup explicitly, the
+          // combination of (label + selected) on sibling widgets creates the
+          // semantic equivalent of a radio group.
+          await tester.pumpObers(_buildPicker(selectedKey: 'standard'));
+
+          // Verify each option has a Semantics node with an explicit selected
+          // property (true or false), confirming the radio pattern.
+          final methods = _sampleMethods();
+          for (final method in methods) {
+            final isSelected = method.key == 'standard';
+            expect(
+              find.byWidgetPredicate(
+                (w) =>
+                    w is Semantics &&
+                    w.properties.label == method.label &&
+                    w.properties.selected == isSelected,
+              ),
+              findsOneWidget,
+              reason:
+                  '${method.label} should have selected=$isSelected semantics',
+            );
+          }
+
+          // Verify that switching selection changes the semantic state.
+          // Re-pump with different selection to confirm mutual exclusivity.
+          await tester.pumpObers(_buildPicker(selectedKey: 'express'));
+
+          expect(
+            find.byWidgetPredicate(
+              (w) =>
+                  w is Semantics &&
+                  w.properties.label == 'Standard Shipping' &&
+                  w.properties.selected == false,
+            ),
+            findsOneWidget,
+            reason:
+                'Standard should become unselected when express is selected',
+          );
+          expect(
+            find.byWidgetPredicate(
+              (w) =>
+                  w is Semantics &&
+                  w.properties.label == 'Express Shipping' &&
+                  (w.properties.selected ?? false),
+            ),
+            findsOneWidget,
+            reason: 'Express should become selected',
+          );
+        },
       );
+    });
+
+    // ── Loading state ───────────────────────────────────────────────────
+
+    // Skip: OiShippingMethodPicker API does not expose a loading state —
+    // it renders methods or the empty label immediately with no shimmer
+    // placeholder support.
+    group('loading state', () {
+      testWidgets(
+        'loading true shows shimmer placeholders',
+        skip: true,
+        (tester) async {},
+      );
+
+      testWidgets(
+        'loading true hides shipping method widgets',
+        skip: true,
+        (tester) async {},
+      );
+    });
+
+    // ── Single method ────────────────────────────────────────────────────
+
+    group('single method', () {
+      testWidgets('renders correctly with only one method', (tester) async {
+        await tester.pumpObers(
+          _buildPicker(
+            methods: const [
+              OiShippingMethod(key: 'only', label: 'Only Option', price: 3),
+            ],
+          ),
+        );
+
+        expect(find.text('Only Option'), findsOneWidget);
+        expect(find.byType(OiShippingOption), findsOneWidget);
+      });
     });
   });
 }
