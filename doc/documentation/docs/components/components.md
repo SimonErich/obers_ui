@@ -156,6 +156,7 @@ OiSelect<String>(
 | `OiSkeletonGroup` | Loading skeleton placeholders |
 | `OiStorageIndicator` | Storage usage bar |
 | `OiTooltip` | Hover/focus tooltip |
+| `OiPagination` | Standalone pagination control with pages, compact, and load-more variants |
 
 ### OiCard
 
@@ -195,6 +196,7 @@ OiBadge(count: 5, child: OiIconButton(icon: Icons.notifications, onPressed: () {
 | `OiEmojiPicker` | Emoji selector |
 | `OiThemeToggle` | Light/dark/system theme mode toggle |
 | `OiUserMenu` | Avatar-triggered dropdown with user info and actions |
+| `OiLocaleSwitcher` | Locale/language dropdown selector with optional flag emoji |
 
 ### OiTabs
 
@@ -277,6 +279,7 @@ OiToast.show(
 | `OiSentiment` | Mood/emoji selector |
 | `OiThumbs` | Thumbs up/down |
 | `OiReactionBar` | Emoji reaction bar |
+| `OiBulkBar` | Floating toolbar for bulk actions on selected items |
 
 ## Inline Edit
 
@@ -320,6 +323,10 @@ OiEditableText(
 | `OiCouponInput` | Coupon/promo code input with apply button and success/error states |
 | `OiOrderSummaryLine` | Single summary row (subtotal, discount, shipping, tax, total) |
 | `OiProductCard` | Product display card with image, price, rating, and quick actions |
+| `OiPaymentOption` | Selectable payment method row with radio indicator |
+| `OiShippingOption` | Selectable shipping method row with price and radio indicator |
+| `OiStockBadge` | Stock status badge (in stock / low stock / out of stock) |
+| `OiWishlistButton` | Heart toggle button for wishlist/favorite functionality |
 
 ### OiPriceTag
 
@@ -509,6 +516,112 @@ OiProductCard(product: emptyProduct, label: 'Loading', isLoading: true)
 - "Out of Stock" badge when `inStock` is false (disables add-to-cart)
 - Star rating with review count
 - Skeleton loading state via `OiShimmer`
+
+### OiPaymentOption
+
+Selectable payment method row with radio indicator for checkout flows.
+
+```dart
+OiPaymentOption(
+  method: OiPaymentMethod(label: 'Credit Card', description: 'Visa ending in 4242'),
+  label: 'Payment method',
+  selected: true,
+  onSelect: (method) => setState(() => _payment = method),
+)
+```
+
+### OiShippingOption
+
+Selectable shipping method row with price display and radio indicator.
+
+```dart
+OiShippingOption(
+  method: OiShippingMethod(label: 'Express', price: 9.99, estimatedDays: '1-2 days'),
+  label: 'Shipping method',
+  selected: false,
+  onSelect: (method) => setState(() => _shipping = method),
+  currencyCode: 'EUR',
+)
+```
+
+### OiStockBadge
+
+Stock status badge showing availability with color coding: green (in stock), amber (low stock), red (out of stock).
+
+```dart
+// Explicit status
+OiStockBadge(status: OiStockStatus.inStock, label: 'Availability')
+
+// Auto-determine from count
+OiStockBadge.fromCount(stockCount: 3, label: 'Availability', lowStockThreshold: 5)
+```
+
+### OiWishlistButton
+
+Heart toggle button for wishlist/favorite functionality with spring animation.
+
+```dart
+OiWishlistButton(
+  label: 'Add to wishlist',
+  active: isWishlisted,
+  onToggle: () => toggleWishlist(productId),
+)
+```
+
+### OiBulkBar
+
+Floating toolbar that appears when items are selected, showing selection count and bulk action buttons.
+
+```dart
+OiBulkBar(
+  selectedCount: 5,
+  totalCount: 100,
+  label: 'Bulk actions',
+  actions: [
+    OiBulkAction(label: 'Export', icon: OiIcons.download, onTap: () => export()),
+    OiBulkAction(label: 'Delete', icon: OiIcons.trash, onTap: () => delete(), variant: OiBulkActionVariant.destructive),
+  ],
+  onSelectAll: () => selectAll(),
+  onDeselectAll: () => deselectAll(),
+)
+```
+
+### OiPagination
+
+Standalone pagination control with three variants: full pages, compact, and load-more.
+
+```dart
+// Full pagination
+OiPagination(
+  totalItems: 250,
+  currentPage: 3,
+  perPage: 25,
+  onPageChange: (page) => setState(() => _page = page),
+  onPerPageChange: (perPage) => setState(() => _perPage = perPage),
+)
+
+// Compact
+OiPagination.compact(totalItems: 250, currentPage: 3, perPage: 25, onPageChange: (p) {})
+
+// Load more
+OiPagination.loadMore(loadedCount: 50, totalItems: 250, onLoadMore: () async => loadMore())
+```
+
+### OiLocaleSwitcher
+
+Locale/language dropdown selector with optional flag emoji support.
+
+```dart
+OiLocaleSwitcher(
+  currentLocale: Locale('en'),
+  locales: [
+    OiLocaleOption(locale: Locale('en'), name: 'English', flagEmoji: '🇬🇧'),
+    OiLocaleOption(locale: Locale('de'), name: 'Deutsch', flagEmoji: '🇩🇪'),
+    OiLocaleOption(locale: Locale('fr'), name: 'Français', flagEmoji: '🇫🇷'),
+  ],
+  onLocaleChange: (locale) => setLocale(locale),
+)
+```
 
 ## Interaction
 

@@ -89,6 +89,7 @@ OiForm(
 | `OiFileToolbar` | File actions toolbar |
 | `OiArrowNav` | Previous/next navigation |
 | `OiShortcuts` | Keyboard shortcut hint display |
+| `OiErrorPage` | Full-page error display for 404, 403, 500 states |
 
 ## Search
 
@@ -268,6 +269,53 @@ OiOrderSummary(
 - Read-only `OiCartItemRow` widgets (no quantity/remove controls)
 - Conditional discount, shipping, tax lines
 - Bold total row
+
+### OiProductFilters
+
+A filter panel for product listings with price range, category checkboxes, rating slider, and in-stock toggle.
+
+```dart
+OiProductFilters(
+  value: currentFilters,
+  onChanged: (filters) => setState(() => currentFilters = filters),
+  label: 'Product filters',
+  categories: [
+    OiFilterCategory(key: 'electronics', label: 'Electronics'),
+    OiFilterCategory(key: 'clothing', label: 'Clothing'),
+  ],
+  priceRange: OiPriceRange(min: 0, max: 500),
+)
+```
+
+**Key features:**
+
+- Price range with `OiSlider` for min/max
+- Category checkboxes for multi-select filtering
+- Rating slider for minimum rating filter
+- In-stock toggle with `OiSwitch`
+- Immutable `OiProductFilterData` model with `copyWith`
+
+### OiProductGallery
+
+An image gallery with a main image display and optional horizontal thumbnail strip for product detail pages.
+
+```dart
+OiProductGallery(
+  imageUrls: ['https://example.com/img1.jpg', 'https://example.com/img2.jpg'],
+  label: 'Product gallery',
+  initialIndex: 0,
+  onIndexChanged: (index) => handleGalleryChange(index),
+  showThumbnails: true,
+)
+```
+
+**Key features:**
+
+- Large main image with `OiImage` component
+- Horizontal thumbnail strip with selected state highlighting
+- Placeholder icon when no images are available
+- Clamped index to prevent out-of-bounds
+- Responsive layout via `OiColumn`
 
 ## Workflow
 

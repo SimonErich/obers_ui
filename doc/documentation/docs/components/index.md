@@ -18,7 +18,7 @@ Each tier page includes:
 | [**Primitives**](primitives.md) | ~30 | Low-level rendering, layout, animation, gesture, scroll |
 | [**Components**](components.md) | ~60 | Standard UI: buttons, inputs, display, navigation, overlays |
 | [**Composites**](composites.md) | ~50 | Multi-component: tables, forms, charts, search, media |
-| [**Modules**](modules.md) | ~11 | Full screens: file explorer, chat, dashboard, kanban |
+| [**Modules**](modules.md) | ~16 | Full screens: file explorer, chat, dashboard, kanban, checkout, auth |
 
 ## Finding what you need
 

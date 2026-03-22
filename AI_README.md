@@ -2374,6 +2374,266 @@ Product display card for grid/list layouts. Shows image, name, price, rating, an
 
 ---
 
+### COMPONENTS — Shop (continued)
+
+---
+
+#### OiPaymentOption
+**Tags:** `shop`, `payment`, `radio`, `select`, `e-commerce`, `checkout`
+**Tier:** Component
+
+Selectable payment method row with radio indicator. Displays payment method label and optional description with a radio-style selection circle.
+
+**Props:**
+- `method` (OiPaymentMethod, required) — payment method data
+- `label` (String, required) — accessibility label
+- `selected` (bool, default false) — whether this option is selected
+- `onSelect` (ValueChanged<OiPaymentMethod>?) — callback when selected
+
+**Behavior:**
+- Shows filled radio dot when selected, empty circle when not
+- Tapping anywhere on the row selects it
+- Description shown below label in subtle text when available
+
+**Use When:** Payment method selection in checkout flows.
+**Combine With:** `OiCheckout`, `OiCard`
+
+---
+
+#### OiShippingOption
+**Tags:** `shop`, `shipping`, `radio`, `select`, `e-commerce`, `checkout`, `delivery`
+**Tier:** Component
+
+Selectable shipping method row with price display and radio indicator. Shows method name, estimated delivery, and price with locale-aware currency formatting.
+
+**Props:**
+- `method` (OiShippingMethod, required) — shipping method data
+- `label` (String, required) — accessibility label
+- `selected` (bool, default false) — whether this option is selected
+- `onSelect` (ValueChanged<OiShippingMethod>?) — callback when selected
+- `currencyCode` (String, default 'EUR') — ISO 4217 currency code
+
+**Behavior:**
+- Shows filled radio dot when selected, empty circle when not
+- Price displayed on the right with locale-aware currency positioning
+- Estimated delivery shown as subtitle when available
+- Zero price shows "Free" in success color
+
+**Use When:** Shipping method selection in checkout flows.
+**Combine With:** `OiCheckout`, `OiCard`
+
+---
+
+#### OiStockBadge
+**Tags:** `shop`, `stock`, `inventory`, `availability`, `badge`, `e-commerce`
+**Tier:** Component
+
+Stock status badge showing in stock, low stock, or out of stock with optional count. Color-coded: success for in stock, warning for low stock, error for out of stock.
+
+**Props:**
+- `status` (OiStockStatus, required) — inStock / lowStock / outOfStock
+- `label` (String, required) — accessibility label
+- `count` (int?) — optional stock count to display
+
+**Named Constructors:**
+- `OiStockBadge.fromCount(stockCount:, label:, lowStockThreshold:)` — Auto-determines status from count. `null` or `> threshold` → inStock, `1..threshold` → lowStock, `0` → outOfStock. Default `lowStockThreshold: 5`.
+
+**Behavior:**
+- In stock: green dot + "In Stock" (or "N in stock")
+- Low stock: amber dot + "Low Stock" (or "Only N left")
+- Out of stock: red dot + "Out of Stock"
+
+**Use When:** Product detail pages, product cards, inventory displays.
+**Combine With:** `OiProductCard`, `OiShopProductDetail`
+
+---
+
+#### OiWishlistButton
+**Tags:** `shop`, `wishlist`, `favorite`, `heart`, `toggle`, `e-commerce`
+**Tier:** Component
+
+Heart toggle button for wishlist/favorite functionality. Shows filled heart when active, outline when inactive.
+
+**Props:**
+- `label` (String, required) — accessibility label
+- `active` (bool, default false) — whether item is in wishlist
+- `onToggle` (VoidCallback?) — callback when toggled
+- `loading` (bool, default false) — loading state
+
+**Behavior:**
+- Filled heart icon in error color when active
+- Outline heart when inactive
+- Spring animation on toggle
+- Loading spinner replaces icon when loading
+
+**Use When:** Product cards, product detail pages, catalog listings.
+**Combine With:** `OiProductCard`, `OiShopProductDetail`
+
+---
+
+### COMPONENTS — Buttons (continued)
+
+---
+
+#### OiExportButton
+**Tags:** `button`, `export`, `download`, `csv`, `xlsx`, `json`, `pdf`, `data`
+**Tier:** Component
+
+Export data button supporting CSV, XLSX, JSON, PDF formats. Renders as a plain outline button for a single format, or a split button with dropdown for multiple formats.
+
+**Props:**
+- `label` (String, required) — accessibility label
+- `onExport` (Future<void> Function(OiExportFormat), required) — export callback receiving selected format
+- `formats` (List<OiExportFormat>, default [OiExportFormat.csv]) — available formats
+- `loading` (bool, default false) — loading state during export
+
+**Companion: `OiExportFormat` enum** — `csv`, `xlsx`, `json`, `pdf` (each has a `label` getter)
+
+**Behavior:**
+- Single format: renders OiButton.outline with direct action
+- Multiple formats: renders OiButton.split with dropdown menu
+- Loading state shows spinner and disables button
+- Format labels: "CSV", "Excel", "JSON", "PDF"
+
+**Use When:** Data export from tables, lists, reports.
+**Combine With:** `OiTable`, `OiListView`, `OiFilterBar`
+
+---
+
+#### OiSortButton
+**Tags:** `button`, `sort`, `dropdown`, `order`, `ascending`, `descending`, `list`
+**Tier:** Component
+
+Dropdown button for sorting non-table lists (card grids, feeds). Shows current sort field and direction, with popover for field selection and direction toggle.
+
+**Props:**
+- `options` (List<OiSortOption>, required) — available sort fields
+- `currentSort` (OiSortOption, required) — currently active sort
+- `label` (String, required) — accessibility label
+- `onSortChange` (ValueChanged<OiSortOption>, required) — callback when sort changes
+
+**Companion: `OiSortOption`** — `field` (String), `label` (String), `direction` (OiSortDirection, default asc). Methods: `toggleDirection()`, `withDirection(OiSortDirection)`.
+
+**Companion: `OiSortDirection` enum** — `asc`, `desc`
+
+**Behavior:**
+- Shows current sort label and direction arrow in button
+- Popover lists all options with checkmark on current
+- Tapping same option toggles direction
+- Tapping different option selects it with its current direction
+
+**Use When:** Non-table list sorting (card grids, activity feeds, search results).
+**Combine With:** `OiListView`, `OiGrid`, `OiProductCard`
+
+---
+
+### COMPONENTS — Feedback (continued)
+
+---
+
+#### OiBulkBar
+**Tags:** `bulk`, `selection`, `toolbar`, `actions`, `batch`, `feedback`
+**Tier:** Component
+
+Floating toolbar that appears when items are selected, showing selection count and bulk action buttons. Supports select all, deselect all, and custom actions.
+
+**Props:**
+- `selectedCount` (int, required) — number of selected items
+- `totalCount` (int, required) — total number of items
+- `label` (String, required) — accessibility label
+- `actions` (List<OiBulkAction>, required) — available bulk actions
+- `onSelectAll` (VoidCallback?) — select all callback
+- `onDeselectAll` (VoidCallback?) — deselect all callback
+- `allSelected` (bool, default false) — whether all items are selected
+
+**Companion: `OiBulkAction`** — `label` (String), `icon` (IconData), `onTap` (VoidCallback), `variant` (OiBulkActionVariant, default ghost), `loading` (bool), `confirm` (bool), `confirmLabel` (String?)
+
+**Companion: `OiBulkActionVariant` enum** — `ghost`, `destructive`
+
+**Behavior:**
+- Floats at bottom of screen with slide-up animation
+- Shows "N of M selected" with select/deselect all toggle
+- Actions render as icon buttons; destructive variant shows in error color
+- Confirm mode requires double-tap for destructive actions
+
+**Use When:** Multi-select lists, tables, file explorers with bulk operations.
+**Combine With:** `OiTable`, `OiListView`, `OiFileExplorer`
+
+---
+
+### COMPONENTS — Display (continued)
+
+---
+
+#### OiPagination
+**Tags:** `pagination`, `paging`, `page`, `navigation`, `display`, `load-more`
+**Tier:** Component
+
+Standalone pagination control with three variants: full pages, compact, and load-more. Supports per-page selector and total count display.
+
+**Props:**
+- `totalItems` (int, required) — total number of items
+- `currentPage` (int, required) — current page (1-based)
+- `label` (String?) — accessibility label
+- `perPage` (int, default 25) — items per page
+- `perPageOptions` (List<int>, default [10, 25, 50, 100]) — per-page dropdown options
+- `onPageChange` (ValueChanged<int>?) — page change callback
+- `onPerPageChange` (ValueChanged<int>?) — per-page change callback
+- `showPerPage` (bool, default true) — show per-page selector
+- `showTotal` (bool, default true) — show total count
+- `showFirstLast` (bool, default true) — show first/last page buttons
+- `siblingCount` (int, default 1) — visible page buttons around current
+- `variant` (OiPaginationVariant, default pages) — pages / compact
+
+**Named Constructors:**
+- `OiPagination.compact(totalItems:, currentPage:, label:, perPage:, onPageChange:, showFirstLast:)` — Compact variant showing "Page X of Y" with prev/next arrows only.
+- `OiPagination.loadMore(loadedCount:, totalItems:, onLoadMore:, loading:)` — Load-more button with "Showing X of Y" count.
+
+**Static Method:** `computeVisiblePages(currentPage, totalPages, siblingCount)` — Returns list of page numbers with null gaps for ellipsis rendering.
+
+**Behavior:**
+- Pages variant: numbered page buttons with ellipsis for large ranges
+- Compact variant: "Page X of Y" with prev/next arrows
+- Load-more variant: single button with progress text
+- First/last page buttons disabled at boundaries
+- Per-page selector shown as dropdown
+
+**Use When:** Paginated data lists, search results, table pagination.
+**Combine With:** `OiTable`, `OiListView`, `OiGrid`
+
+---
+
+### COMPONENTS — Navigation (continued)
+
+---
+
+#### OiLocaleSwitcher
+**Tags:** `locale`, `language`, `i18n`, `internationalization`, `dropdown`, `navigation`
+**Tier:** Component
+
+Locale/language dropdown selector with optional flag emoji support. Renders as a dropdown showing the current locale with flag and name.
+
+**Props:**
+- `currentLocale` (Locale, required) — currently selected locale
+- `locales` (List<OiLocaleOption>, required) — available locales
+- `onLocaleChange` (ValueChanged<Locale>?) — locale change callback
+- `label` (String, default 'Language') — accessibility label
+- `showFlag` (bool, default true) — show flag emoji
+- `showCode` (bool, default true) — show locale code (e.g. "EN")
+- `showName` (bool, default true) — show locale name (e.g. "English")
+
+**Companion: `OiLocaleOption`** — `locale` (Locale), `name` (String), `flagEmoji` (String?)
+
+**Behavior:**
+- Dropdown trigger shows current locale with flag + code/name
+- Popover lists all locales with flag, code, and full name
+- Selected locale highlighted with checkmark
+
+**Use When:** App header, settings page, footer language selection.
+**Combine With:** `OiAppShell`, `OiUserMenu`, `OiBottomBar`
+
+---
+
 ### COMPOSITES — Shop
 
 ---
@@ -2468,6 +2728,63 @@ Complete order summary card showing all summary lines with optional expandable i
 
 **Use When:** Checkout page, order confirmation, order detail view.
 **Combine With:** `OiCartPanel`, `OiWizard`, `OiDetailView`
+
+---
+
+#### OiProductFilters
+**Tags:** `shop`, `filter`, `price`, `category`, `rating`, `stock`, `e-commerce`, `composite`
+**Tier:** Composite
+
+Filter panel for product listings with price range slider, category checkboxes, minimum rating selector, and in-stock-only toggle.
+
+**Props:**
+- `label` (String, required) — accessibility label
+- `value` (OiProductFilterData?) — current filter state
+- `onChanged` (ValueChanged<OiProductFilterData>?) — filter change callback
+- `availableCategories` (List<String>, default []) — available categories for checkbox list
+- `currencyCode` (String, default 'EUR') — ISO 4217 currency code for price labels
+- `priceRangeMin` (double, default 0) — minimum price slider bound
+- `priceRangeMax` (double, default 1000) — maximum price slider bound
+
+**Companion: `OiProductFilterData`** — `minPrice` (double?), `maxPrice` (double?), `categories` (List<String>), `minRating` (double?), `inStockOnly` (bool). Has `copyWith()` method.
+
+**Composition:** OiCard, OiColumn, OiLabel, OiSlider (range), OiCheckbox, OiStarRating, OiSwitch, OiButton.
+
+**Behavior:**
+- Price range shown as dual slider with currency-formatted labels
+- Categories shown as checkbox list
+- Rating shown as interactive star row
+- "In Stock Only" toggle at bottom
+- Clear all filters button when any filter is active
+
+**Use When:** Product catalog filtering, shop search refinement.
+**Combine With:** `OiProductCard`, `OiGrid`, `OiListView`, `OiSplitPane`
+
+---
+
+#### OiProductGallery
+**Tags:** `shop`, `gallery`, `image`, `product`, `thumbnail`, `carousel`, `e-commerce`, `composite`
+**Tier:** Composite
+
+Image gallery with large main image and thumbnail strip for product images. Supports click-to-select thumbnails and index change callback.
+
+**Props:**
+- `imageUrls` (List<String>, required) — list of image URLs
+- `label` (String, required) — accessibility label
+- `initialIndex` (int, default 0) — initially selected image index
+- `onIndexChanged` (ValueChanged<int>?) — index change callback
+- `showThumbnails` (bool, default true) — show thumbnail strip below main image
+
+**Composition:** OiColumn, OiImage, OiRow, OiTappable, OiSurface.
+
+**Behavior:**
+- Main image fills available width with aspect ratio maintained
+- Thumbnail strip shows all images as small clickable squares
+- Selected thumbnail highlighted with primary border
+- Handles empty imageUrls gracefully with placeholder
+
+**Use When:** Product detail pages, any multi-image display.
+**Combine With:** `OiShopProductDetail`, `OiLightbox`
 
 ---
 
@@ -2889,6 +3206,40 @@ Top toolbar for file explorer.
 **Tier:** Composite
 
 Keyboard shortcut display and help dialog.
+
+---
+
+#### OiErrorPage
+**Tags:** `error`, `404`, `403`, `500`, `not-found`, `forbidden`, `server-error`, `navigation`, `composite`
+**Tier:** Composite
+
+Full-page error display for HTTP error states. Shows error code, title, description, optional illustration, and action button. Three factory constructors for common HTTP errors.
+
+**Props:**
+- `title` (String, required) — error title
+- `label` (String, required) — accessibility label
+- `description` (String?) — descriptive text
+- `errorCode` (String?) — error code display (e.g. "404")
+- `illustration` (Widget?) — custom illustration widget
+- `icon` (IconData?) — icon shown when no illustration
+- `actionLabel` (String?) — action button label
+- `onAction` (VoidCallback?) — action button callback
+
+**Named Constructors:**
+- `OiErrorPage.notFound(label:, onAction:, actionLabel:)` — 404 page with "Page Not Found" defaults
+- `OiErrorPage.forbidden(label:, onAction:, actionLabel:)` — 403 page with "Access Denied" defaults
+- `OiErrorPage.serverError(label:, onAction:, actionLabel:)` — 500 page with "Server Error" defaults
+
+**Composition:** OiPage, OiColumn, OiLabel, OiIcon, OiButton.primary.
+
+**Behavior:**
+- Error code displayed in large display text
+- Title and description centered below
+- Action button centered at bottom (e.g. "Go Home", "Try Again")
+- Content vertically centered on page
+
+**Use When:** Router error pages, unauthorized access, server errors.
+**Combine With:** Router configuration, `OiAppShell`
 
 ---
 
@@ -3346,6 +3697,204 @@ Permission matrix editor (roles vs resources).
 
 ---
 
+#### OiCheckout
+**Tags:** `checkout`, `shop`, `e-commerce`, `wizard`, `payment`, `shipping`, `address`, `order`, `module`
+**Tier:** Module
+
+Multi-step checkout flow orchestrating address entry, shipping selection, payment selection, and order review. Responsive layout with side-by-side summary on desktop.
+
+**Key Parameters:**
+- `items` (List<OiCartItem>, required) — cart items
+- `summary` (OiCartSummary, required) — order summary data
+- `label` (String, required) — accessibility label
+- `steps` (List<OiCheckoutStep>, default [address, shipping, payment, review]) — checkout steps
+- `onShippingAddressChange` (ValueChanged<OiAddressData>?) — shipping address callback
+- `onBillingAddressChange` (ValueChanged<OiAddressData>?) — billing address callback
+- `onShippingMethodChange` (ValueChanged<OiShippingMethod>?) — shipping method callback
+- `onPaymentMethodChange` (ValueChanged<OiPaymentMethod>?) — payment method callback
+- `onPlaceOrder` (VoidCallback?) — place order callback
+- `onCancel` (VoidCallback?) — cancel callback
+- `initialShippingAddress` (OiAddressData?) — pre-filled shipping address
+- `initialBillingAddress` (OiAddressData?) — pre-filled billing address
+- `shippingMethods` (List<OiShippingMethod>?) — available shipping methods
+- `paymentMethods` (List<OiPaymentMethod>?) — available payment methods
+- `countries` (List<String>?) — country list for address dropdown
+- `showSummary` (bool, default true) — show order summary sidebar
+- `sameBillingDefault` (bool, default true) — "same as shipping" checkbox default
+- `currencyCode` (String, default 'USD') — ISO 4217 currency code
+- `placeOrderLabel` (String?) — custom place order button text
+
+**Companion: `OiCheckoutStep` enum** — `address`, `shipping`, `payment`, `review`
+
+**Composition:** OiStepper, OiOrderSummary, OiButton, OiCheckbox, OiSelect, OiTextInput, OiAccordion, OiShippingOption, OiPaymentOption.
+
+**Behavior:**
+- Steps are navigated via OiStepper with validation per step
+- Address step: shipping address form with optional separate billing address
+- Shipping step: list of OiShippingOption radio cards
+- Payment step: list of OiPaymentOption radio cards
+- Review step: read-only summary of all selections
+- Desktop: 2-column layout (form + summary sidebar)
+- Mobile: single-column with summary below
+
+**Use When:** E-commerce checkout flow.
+**Combine With:** `OiCartPanel`, `OiOrderSummary`
+
+---
+
+#### OiShopProductDetail
+**Tags:** `product`, `detail`, `shop`, `e-commerce`, `gallery`, `variants`, `module`
+**Tier:** Module
+
+Complete product detail page with gallery, variant selectors, quantity, pricing, and tabbed content sections.
+
+**Key Parameters:**
+- `product` (OiProductData, required) — product data
+- `label` (String, required) — accessibility label
+- `onAddToCart` (VoidCallback?) — add-to-cart callback
+- `onVariantChange` (ValueChanged<OiProductVariant>?) — variant selection callback
+- `onQuantityChange` (ValueChanged<int>?) — quantity change callback
+- `onWishlist` (VoidCallback?) — wishlist toggle callback
+- `selectedVariant` (OiProductVariant?) — currently selected variant
+- `quantity` (int, default 1) — current quantity
+- `description` (Widget?) — description tab content
+- `reviews` (Widget?) — reviews tab content
+- `specifications` (Widget?) — specifications tab content
+- `related` (Widget?) — related products section
+
+**Composition:** OiProductGallery, OiLabel, OiPriceTag, OiStockBadge, OiStarRating, OiQuantitySelector, OiWishlistButton, OiButton.primary, OiTabs, OiSelect, OiBadge.
+
+**Behavior:**
+- Desktop: side-by-side layout (gallery left, info right)
+- Mobile: stacked layout (gallery on top, info below)
+- Gallery with thumbnail strip for product images
+- Variant selectors as dropdowns when variants available
+- Add-to-cart disabled when out of stock
+- Tabbed content for description/specifications/reviews
+- Related products shown as horizontal scroll section
+
+**Use When:** Product detail pages in e-commerce applications.
+**Combine With:** `OiProductCard`, `OiCartPanel`
+
+---
+
+#### OiAuthPage
+**Tags:** `auth`, `authentication`, `login`, `register`, `signup`, `forgot-password`, `module`
+**Tier:** Module
+
+Full-page authentication module with login, register, and forgot-password flows. Centered form layout with optional logo and footer.
+
+**Key Parameters:**
+- `label` (String, required) — accessibility label
+- `initialMode` (OiAuthMode, default login) — starting auth mode
+- `onModeChanged` (ValueChanged<OiAuthMode>?) — mode switch callback
+- `onLogin` (Future<bool> Function(String email, String password)?) — login callback
+- `onRegister` (Future<bool> Function(String name, String email, String password)?) — register callback
+- `onForgotPassword` (Future<bool> Function(String email)?) — forgot password callback
+- `logo` (Widget?) — logo widget above form
+- `footer` (Widget?) — footer widget below form
+
+**Named Constructors:**
+- `OiAuthPage.login(label:, onLogin:, ...)` — Pre-configured for login mode
+- `OiAuthPage.register(label:, onRegister:, ...)` — Pre-configured for register mode
+
+**Companion: `OiAuthMode` enum** — `login`, `register`, `forgotPassword`
+
+**Composition:** OiPage, OiColumn, OiCard, OiTextInput, OiButton.primary, OiLabel.link.
+
+**Behavior:**
+- Centered form card (max 400dp wide)
+- Login: email + password fields with "Forgot Password?" link
+- Register: name + email + password fields
+- Forgot Password: email field with "Back to login" link
+- Mode switching links at bottom of form
+- Error display inline when callbacks return false
+- Loading state on submit button during async callbacks
+
+**Use When:** Authentication pages for web/mobile apps.
+**Combine With:** `OiAppShell`, router configuration
+
+---
+
+#### OiAppShell
+**Tags:** `app-shell`, `layout`, `scaffold`, `sidebar`, `admin`, `navigation`, `module`
+**Tier:** Module
+
+Master layout scaffold for admin/dashboard applications with sidebar navigation, top bar, and content area. Supports responsive collapse and settings persistence.
+
+**Key Parameters:**
+- `child` (Widget, required) — main content area
+- `label` (String, required) — accessibility label
+- `navigation` (List<OiNavItem>, required) — sidebar navigation items
+- `leading` (Widget?) — sidebar header widget (logo/brand)
+- `title` (Widget?) — top bar title
+- `actions` (List<Widget>?) — top bar action widgets
+- `userMenu` (Widget?) — user menu widget in top bar
+- `sidebarCollapsible` (bool, default true) — allow sidebar collapse
+- `sidebarDefaultCollapsed` (bool, default false) — initial sidebar state
+- `sidebarWidth` (double, default 256) — expanded sidebar width
+- `sidebarCollapsedWidth` (double, default 64) — collapsed sidebar width
+- `breadcrumbs` (List<OiBreadcrumbItem>?) — breadcrumb items
+- `showBreadcrumbs` (bool, default true) — show breadcrumb trail
+- `mobileBreakpoint` (OiBreakpoint, default medium) — breakpoint for mobile layout
+- `currentRoute` (String?) — current route for nav highlighting
+- `onNavigate` (ValueChanged<String>?) — navigation callback
+- `settingsDriver` / `settingsKey` / `settingsNamespace` — persistence params
+
+**Companion: `OiNavItem`** — `label` (String), `icon` (IconData), `route` (String?), `children` (List<OiNavItem>?), `badge` (String?), `dividerBefore` (bool), `section` (String?)
+
+**Composition:** OiSidebar, OiBreadcrumbs, OiDrawer, OiIconButton, OiLabel, OiDivider.
+
+**Behavior:**
+- Desktop: sidebar (collapsible) + top bar + content area
+- Mobile: hamburger menu → drawer with navigation
+- Sidebar collapse state persisted via OiSettingsMixin
+- Active nav item highlighted based on currentRoute
+- Nested nav items support expand/collapse
+- Section headers group navigation items
+
+**Use When:** Admin panels, dashboard apps, internal tools.
+**Combine With:** `OiResourcePage`, `OiDashboard`, `OiBreadcrumbs`
+
+---
+
+#### OiResourcePage
+**Tags:** `resource`, `crud`, `scaffold`, `list`, `show`, `edit`, `create`, `admin`, `module`
+**Tier:** Module
+
+Generic CRUD page scaffold providing consistent layout for list, show, edit, and create views with title area, action bar, content, and optional pagination/filters.
+
+**Key Parameters:**
+- `child` (Widget, required) — main content widget
+- `label` (String, required) — accessibility label
+- `title` (String?) — page title
+- `variant` (OiResourcePageVariant, default list) — page variant
+- `actions` (List<Widget>?) — custom action buttons
+- `filters` (Widget?) — filter bar widget
+- `pagination` (Widget?) — pagination widget
+- `breadcrumbs` (List<OiBreadcrumbItem>?) — breadcrumb items
+- `wrapInCard` (bool, default true) — wrap content in OiCard
+- `onAction` (OiResourceAction?) — default action callback (receives action name string)
+
+**Companion: `OiResourcePageVariant` enum** — `list`, `show`, `edit`, `create`
+
+**Companion: `OiResourceAction` typedef** — `void Function(String action)`
+
+**Composition:** OiPage, OiColumn, OiRow, OiCard, OiButton, OiBreadcrumbs, OiLabel.
+
+**Behavior:**
+- List variant: shows "Create" button in actions
+- Show variant: shows "Edit" and "Delete" buttons
+- Edit/Create variant: shows "Save" and "Cancel" buttons
+- Default action buttons trigger onAction with action name ('create', 'edit', 'delete', 'save', 'cancel')
+- Custom actions replace default buttons when provided
+- Content wrapped in OiCard by default (configurable)
+
+**Use When:** CRUD pages in admin applications.
+**Combine With:** `OiAppShell`, `OiTable`, `OiForm`, `OiDetailView`
+
+---
+
 ## Models
 
 ### OiFieldType (Enum)
@@ -3386,10 +3935,55 @@ Represents a file/folder node with path, name, size, dates, permissions.
 
 State management for OiFileExplorer.
 
+### OiAddressData
+**Tags:** `address`, `shipping`, `billing`, `shop`, `e-commerce`, `model`
+
+Immutable address model for shipping/billing addresses with completeness check.
+
+**Fields:** `firstName` (String?), `lastName` (String?), `company` (String?), `address1` (String?), `address2` (String?), `city` (String?), `state` (String?), `postalCode` (String?), `country` (String?), `phone` (String?), `email` (String?)
+**Computed:** `isComplete` (bool) — true when firstName, lastName, address1, city, postalCode, and country are all non-null and non-empty
+**Methods:** `copyWith(...)` with full nullable support
+
+### OiPaymentMethod
+**Tags:** `payment`, `method`, `shop`, `e-commerce`, `checkout`, `model`
+
+Payment method model for checkout flows.
+
+**Fields:** `key` (String), `label` (String), `description` (String?), `icon` (String?), `isDefault` (bool, default false)
+**Methods:** `copyWith(...)`
+
+### OiShippingMethod
+**Tags:** `shipping`, `method`, `delivery`, `shop`, `e-commerce`, `checkout`, `model`
+
+Shipping method model with price and estimated delivery info.
+
+**Fields:** `key` (String), `label` (String), `price` (double), `description` (String?), `estimatedDelivery` (String?), `currencyCode` (String, default 'USD')
+**Methods:** `copyWith(...)`
+
+### OiCouponResult
+**Tags:** `coupon`, `discount`, `promo`, `validation`, `shop`, `e-commerce`, `model`
+
+Coupon validation result returned from the apply callback.
+
+**Fields:** `valid` (bool), `message` (String?), `discountAmount` (double?)
+**Methods:** `copyWith(...)`
+
+### OiOrderData
+**Tags:** `order`, `checkout`, `shop`, `e-commerce`, `model`
+
+Complete order data aggregation combining all checkout selections.
+
+**Fields:** `shippingAddress` (OiAddressData), `shippingMethod` (OiShippingMethod), `paymentMethod` (OiPaymentMethod), `items` (List<OiCartItem>), `summary` (OiCartSummary), `billingAddress` (OiAddressData?)
+**Methods:** `copyWith(...)`
+
 ### Settings Models
 **Tags:** `settings`, `persistence`, `state`
 
-Persist widget state: `OiAccordionSettings`, `OiCalendarSettings`, `OiDashboardSettings`, `OiFileExplorerSettings`, `OiFilterBarSettings`, `OiGanttSettings`, `OiKanbanSettings`, `OiListViewSettings`, `OiSidebarSettings`, `OiSplitPaneSettings`, `OiTableSettings`, `OiTabsSettings`
+Persist widget state: `OiAccordionSettings`, `OiAppShellSettings`, `OiCalendarSettings`, `OiDashboardSettings`, `OiFileExplorerSettings`, `OiFilterBarSettings`, `OiGanttSettings`, `OiKanbanSettings`, `OiListViewSettings`, `OiSidebarSettings`, `OiSplitPaneSettings`, `OiTableSettings`, `OiTabsSettings`
+
+All settings models implement `OiSettingsData` with JSON serialization (`toJson`/`fromJson`). Key additions:
+
+- **OiAppShellSettings** — Persists sidebar collapsed state (bool). Used by `OiAppShell`.
 
 ---
 
@@ -3537,6 +4131,20 @@ Use this table to pick the right widget for your use case.
 | **Shopping cart** | `OiCartPanel` (full) / `OiMiniCart` (compact) | Custom cart UI |
 | **Product card** | `OiProductCard` | Custom product display |
 | **Order summary** | `OiOrderSummary` | Custom totals layout |
+| **Checkout flow** | `OiCheckout` | Custom multi-step checkout |
+| **Product detail** | `OiShopProductDetail` | Custom product page |
+| **Auth page** | `OiAuthPage` | Custom login/register forms |
+| **Admin layout** | `OiAppShell` | Custom sidebar + content layout |
+| **CRUD page** | `OiResourcePage` | Custom list/edit scaffolds |
+| **Error page** | `OiErrorPage` | Custom 404/403/500 pages |
+| **Product filters** | `OiProductFilters` | Custom filter panel |
+| **Stock status** | `OiStockBadge` | Custom availability indicator |
+| **Wishlist toggle** | `OiWishlistButton` | Custom heart button |
+| **Bulk actions** | `OiBulkBar` | Custom selection toolbar |
+| **Pagination** | `OiPagination` | Custom page controls |
+| **Sort control** | `OiSortButton` | Custom sort dropdown |
+| **Export data** | `OiExportButton` | Custom export UI |
+| **Language switch** | `OiLocaleSwitcher` | Custom locale picker |
 | **Price display** | `OiPriceTag` | Custom formatted text |
 | **Quantity stepper** | `OiQuantitySelector` | Custom counter |
 | **Empty state** | `OiEmptyState` | Custom empty placeholder |
@@ -3598,7 +4206,11 @@ Searchable keyword → widget mapping for quick lookup.
 | `accordion` | OiAccordion |
 | `action` | OiButton, OiIconButton, OiContextMenu |
 | `activity` | OiActivityFeed, OiTimeline |
-| `admin` | OiListView, OiDashboard, OiSidebar, OiFilterBar |
+| `address` | OiAddressData, OiCheckout |
+| `admin` | OiListView, OiDashboard, OiSidebar, OiFilterBar, OiAppShell, OiResourcePage |
+| `app-shell` | OiAppShell |
+| `auth` | OiAuthPage |
+| `authentication` | OiAuthPage |
 | `alert` | OiDialog.alert, OiToast |
 | `animation` | OiAnimatedList, OiMorph, OiPulse, OiShimmer, OiSpring, OiStagger |
 | `app` | OiApp |
@@ -3607,10 +4219,12 @@ Searchable keyword → widget mapping for quick lookup.
 | `board` | OiKanban |
 | `boolean` | OiCheckbox, OiSwitch, OiFieldDisplay(boolean) |
 | `breadcrumb` | OiBreadcrumbs, OiPathBar |
-| `button` | OiButton, OiButtonGroup, OiIconButton, OiToggleButton |
+| `bulk` | OiBulkBar |
+| `button` | OiButton, OiButtonGroup, OiIconButton, OiToggleButton, OiExportButton, OiSortButton |
 | `calendar` | OiCalendar, OiDatePicker, OiDateInput |
 | `card` | OiCard, OiDashboardCard, OiFileGridCard |
-| `cart` | OiCartItem, OiCartSummary, OiCartPanel, OiMiniCart, OiCartItemRow |
+| `cart` | OiCartItem, OiCartSummary, OiCartPanel, OiMiniCart, OiCartItemRow, OiCheckout |
+| `checkout` | OiCheckout, OiOrderSummary, OiCartPanel, OiPaymentOption, OiShippingOption |
 | `chart` | OiFunnelChart, OiGauge, OiHeatmap, OiRadarChart, OiSankey, OiTreemap |
 | `chat` | OiChat, OiChatMessage, OiTypingIndicator |
 | `checkbox` | OiCheckbox |
@@ -3626,8 +4240,8 @@ Searchable keyword → widget mapping for quick lookup.
 | `container` | OiContainer, OiSurface, OiCard |
 | `context-menu` | OiContextMenu |
 | `copy` | OiCopyButton, OiCopyable, OiFieldDisplay(copyable) |
-| `crud` | OiListView, OiForm, OiDetailView |
-| `coupon` | OiCouponInput, OiCartPanel |
+| `crud` | OiListView, OiForm, OiDetailView, OiResourcePage |
+| `coupon` | OiCouponInput, OiCouponResult, OiCartPanel |
 | `currency` | OiFieldDisplay(currency), OiNumberInput |
 | `dashboard` | OiDashboard, OiMetric |
 | `data` | OiTable, OiDetailView, OiListView, OiFieldDisplay |
@@ -3643,20 +4257,22 @@ Searchable keyword → widget mapping for quick lookup.
 | `editor` | OiRichEditor, OiSmartInput |
 | `email` | OiFieldDisplay(email), OiTextInput |
 | `emoji` | OiEmojiPicker, OiReactionBar |
-| `e-commerce` | OiPriceTag, OiQuantitySelector, OiProductCard, OiCartItemRow, OiCouponInput, OiOrderSummaryLine, OiCartPanel, OiMiniCart, OiOrderSummary |
+| `delivery` | OiShippingOption, OiShippingMethod |
+| `e-commerce` | OiPriceTag, OiQuantitySelector, OiProductCard, OiCartItemRow, OiCouponInput, OiOrderSummaryLine, OiCartPanel, OiMiniCart, OiOrderSummary, OiPaymentOption, OiShippingOption, OiStockBadge, OiWishlistButton, OiProductFilters, OiProductGallery, OiCheckout, OiShopProductDetail |
 | `empty` | OiEmptyState |
+| `error-page` | OiErrorPage |
 | `explorer` | OiFileExplorer |
-| `export` | OiThemeExporter |
+| `export` | OiExportButton, OiThemeExporter |
 | `feed` | OiActivityFeed |
 | `feedback` | OiStarRating, OiScaleRating, OiThumbs, OiSentiment, OiReactionBar |
 | `field` | OiFieldDisplay, OiFormField, OiDetailField |
 | `file` | OiFileExplorer, OiFileInput, OiFileIcon, OiFileTile, OiFileGridCard |
-| `filter` | OiFilterBar, OiListView, OiTable |
+| `filter` | OiFilterBar, OiListView, OiTable, OiProductFilters |
 | `flow` | OiFlowGraph, OiStateDiagram |
 | `folder` | OiFolderIcon, OiFolderTreeItem, OiNewFolderDialog |
 | `form` | OiForm, OiFormField, OiFormSection, OiWizard |
 | `funnel` | OiFunnelChart |
-| `gallery` | OiGallery, OiLightbox |
+| `gallery` | OiGallery, OiLightbox, OiProductGallery |
 | `gantt` | OiGantt |
 | `gauge` | OiGauge |
 | `gesture` | OiTappable, OiSwipeable, OiDoubleTap, OiLongPressMenu, OiPinchZoom |
@@ -3666,11 +4282,13 @@ Searchable keyword → widget mapping for quick lookup.
 | `heading` | OiLabel.h1, .h2, .h3, .h4 |
 | `heatmap` | OiHeatmap |
 | `hierarchy` | OiTree, OiFolderTreeItem, OiTreemap |
+| `i18n` | OiLocaleSwitcher |
 | `icon` | OiIcon, OiIconButton, OiFileIcon, OiFolderIcon |
 | `image` | OiImage, OiAvatar, OiGallery, OiLightbox, OiImageCropper, OiImageAnnotator |
 | `indicator` | OiProgress, OiLiveRing, OiPulse, OiStorageIndicator |
 | `inline-edit` | OiEditable, OiEditableText, OiEditableSelect, OiEditableDate, OiEditableNumber |
 | `input` | OiTextInput, OiNumberInput, OiDateInput, OiTimeInput, OiSelect, OiComboBox, OiCheckbox, OiSwitch, OiRadio, OiSlider, OiTagInput, OiColorInput, OiFileInput |
+| `inventory` | OiStockBadge |
 | `kanban` | OiKanban |
 | `keyboard` | OiShortcutScope, OiShortcuts, OiCommandBar, OiFocusTrap |
 | `kpi` | OiMetric |
@@ -3680,6 +4298,7 @@ Searchable keyword → widget mapping for quick lookup.
 | `list` | OiListView, OiListTile, OiVirtualList, OiAnimatedList |
 | `live` | OiLiveRing, OiCursorPresence, OiSelectionPresence |
 | `loading` | OiProgress, OiShimmer, OiSkeletonGroup, OiButton(loading) |
+| `locale` | OiLocaleSwitcher |
 | `log` | OiActivityFeed, OiTimeline |
 | `markdown` | OiMarkdown |
 | `media` | OiVideoPlayer, OiGallery, OiLightbox, OiImageCropper, OiImageAnnotator |
@@ -3694,22 +4313,24 @@ Searchable keyword → widget mapping for quick lookup.
 | `onboarding` | OiTour, OiSpotlight, OiWhatsNew |
 | `order` | OiCartItem, OiCartSummary, OiProductData, OiOrderSummary, OiOrderSummaryLine |
 | `overlay` | OiDialog, OiToast, OiSheet, OiContextMenu, OiPopover, OiPanel |
-| `pagination` | OiPaginationController, OiTable, OiListView |
+| `pagination` | OiPaginationController, OiPagination, OiTable, OiListView |
 | `panel` | OiPanel, OiResizable, OiSplitPane |
 | `path` | OiPathBar, OiBreadcrumbs |
+| `payment` | OiPaymentOption, OiPaymentMethod |
 | `permission` | OiPermissions |
 | `phone` | OiFieldDisplay(phone) |
 | `picker` | OiDatePicker, OiTimePicker, OiEmojiPicker, OiColorInput |
 | `pipeline` | OiPipeline |
 | `popover` | OiPopover |
 | `presence` | OiAvatar(presence), OiCursorPresence, OiLiveRing |
-| `product` | OiProductData, OiProductVariant, OiProductCard |
+| `product` | OiProductData, OiProductVariant, OiProductCard, OiProductFilters, OiProductGallery, OiShopProductDetail |
 | `progress` | OiProgress, OiStepper |
 | `radar` | OiRadarChart |
 | `radio` | OiRadio |
 | `rating` | OiStarRating, OiScaleRating |
 | `reaction` | OiReactionBar |
 | `reorder` | OiReorderable, OiKanban |
+| `resource` | OiResourcePage |
 | `resize` | OiResizable, OiSplitPane |
 | `responsive` | OiResponsive, OiBreakpoint, OiGrid, OiPage |
 | `rich-text` | OiRichEditor, OiMarkdown |
@@ -3721,15 +4342,17 @@ Searchable keyword → widget mapping for quick lookup.
 | `select` | OiSelect, OiComboBox, OiRadio |
 | `settings` | OiSettingsDriver, OiAccordionSettings, etc. |
 | `sheet` | OiSheet |
-| `shop` | OiPriceTag, OiQuantitySelector, OiProductData, OiCartItem, OiCartSummary, OiCartPanel, OiMiniCart, OiOrderSummary, OiCartItemRow, OiCouponInput, OiOrderSummaryLine, OiProductCard |
+| `shipping` | OiShippingOption, OiShippingMethod |
+| `shop` | OiPriceTag, OiQuantitySelector, OiProductData, OiCartItem, OiCartSummary, OiCartPanel, OiMiniCart, OiOrderSummary, OiCartItemRow, OiCouponInput, OiOrderSummaryLine, OiProductCard, OiPaymentOption, OiShippingOption, OiStockBadge, OiWishlistButton, OiProductFilters, OiProductGallery, OiCheckout, OiShopProductDetail |
 | `sidebar` | OiSidebar, OiFileSidebar |
 | `skeleton` | OiSkeletonGroup, OiShimmer |
 | `slider` | OiSlider |
 | `social` | OiChat, OiComments, OiReactionBar, OiAvatarStack |
-| `sort` | OiTable, OiListView, OiFilterBar |
+| `sort` | OiTable, OiListView, OiFilterBar, OiSortButton |
 | `split` | OiSplitPane, OiButton.split |
 | `state-diagram` | OiStateDiagram |
 | `stepper` | OiStepper, OiWizard |
+| `stock` | OiStockBadge |
 | `storage` | OiStorageIndicator, OiSettingsDriver |
 | `surface` | OiSurface |
 | `switch` | OiSwitch |
@@ -3760,6 +4383,7 @@ Searchable keyword → widget mapping for quick lookup.
 | `visibility` | OiVisibility |
 | `visualization` | OiFunnelChart, OiGauge, OiHeatmap, OiRadarChart, OiSankey, OiTreemap |
 | `wizard` | OiWizard, OiStepper |
+| `wishlist` | OiWishlistButton |
 | `workflow` | OiFlowGraph, OiPipeline, OiStateDiagram |
 
 ---
@@ -3767,13 +4391,6 @@ Searchable keyword → widget mapping for quick lookup.
 ## Planned / Not Yet Available
 
 > **WARNING:** The following widgets are defined in concept specifications but are NOT yet implemented in the codebase. Do NOT attempt to use them. They are listed here for awareness of future direction only.
-
-### Planned Components
-
-- **OiBulkBar** — Floating toolbar on row selection with bulk actions
-- **OiSortButton** — Dropdown sort control for non-table lists
-- **OiExportButton** — Export data button (single or multi-format)
-- **OiPagination** — Standalone pagination control (page numbers, per-page selector)
 
 ### Planned Layout
 
@@ -3794,21 +4411,9 @@ Searchable keyword → widget mapping for quick lookup.
 
 ### Planned Shop/E-commerce Modules
 
-- **OiShopCart** — Shopping cart with line items, quantities, totals
-- **OiShopCheckout** — Multi-step checkout (shipping, billing, payment, review)
 - **OiProductCatalog** — Product grid/list with filters and search
-- **OiProductDetail** — Full product detail page with gallery and options
 - **OiOrderHistory** — Order list with status and dates
 - **OiOrderDetail** — Single order with items, timeline, invoice
-
-### Planned Admin Page Scaffolds
-
-- **OiResourceList** — List page scaffold (title, toolbar, table, empty state)
-- **OiResourceEdit** — Edit page scaffold (form, save/cancel, unsaved warning)
-- **OiResourceShow** — Detail page scaffold (read-only fields, action buttons)
-- **OiResourceCreate** — Create page scaffold
-- **OiAppShell** — Admin app shell (sidebar, header, breadcrumb, content)
-- **OiAuthPage** — Auth page template (login/signup/forgot password)
 
 ---
 
