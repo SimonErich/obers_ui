@@ -15,6 +15,7 @@ void main() {
         'Page 1 of 4': OiPagination(
           totalItems: 100,
           currentPage: 0,
+          label: 'items',
           perPage: 25,
           onPageChange: (_) {},
           showPerPage: false,
@@ -24,6 +25,7 @@ void main() {
         'Page 2 of 4': OiPagination(
           totalItems: 100,
           currentPage: 1,
+          label: 'items',
           perPage: 25,
           onPageChange: (_) {},
           showPerPage: false,
@@ -33,6 +35,7 @@ void main() {
         'With total': OiPagination(
           totalItems: 100,
           currentPage: 0,
+          label: 'items',
           perPage: 25,
           onPageChange: (_) {},
           showPerPage: false,
@@ -51,6 +54,7 @@ void main() {
         'Page 1 of 4': OiPagination(
           totalItems: 100,
           currentPage: 0,
+          label: 'items',
           perPage: 25,
           onPageChange: (_) {},
           showPerPage: false,
@@ -60,6 +64,7 @@ void main() {
         'Page 2 of 4': OiPagination(
           totalItems: 100,
           currentPage: 1,
+          label: 'items',
           perPage: 25,
           onPageChange: (_) {},
           showPerPage: false,
@@ -69,6 +74,7 @@ void main() {
         'With total': OiPagination(
           totalItems: 100,
           currentPage: 0,
+          label: 'items',
           perPage: 25,
           onPageChange: (_) {},
           showPerPage: false,
@@ -88,18 +94,21 @@ void main() {
         'Page 1 of 4': OiPagination.compact(
           totalItems: 100,
           currentPage: 0,
+          label: 'items',
           perPage: 25,
           onPageChange: (_) {},
         ),
         'Page 3 of 4': OiPagination.compact(
           totalItems: 100,
           currentPage: 2,
+          label: 'items',
           perPage: 25,
           onPageChange: (_) {},
         ),
         'Last page': OiPagination.compact(
           totalItems: 100,
           currentPage: 3,
+          label: 'items',
           perPage: 25,
           onPageChange: (_) {},
         ),
@@ -116,18 +125,21 @@ void main() {
         'Page 1 of 4': OiPagination.compact(
           totalItems: 100,
           currentPage: 0,
+          label: 'items',
           perPage: 25,
           onPageChange: (_) {},
         ),
         'Page 3 of 4': OiPagination.compact(
           totalItems: 100,
           currentPage: 2,
+          label: 'items',
           perPage: 25,
           onPageChange: (_) {},
         ),
         'Last page': OiPagination.compact(
           totalItems: 100,
           currentPage: 3,
+          label: 'items',
           perPage: 25,
           onPageChange: (_) {},
         ),

@@ -2574,7 +2574,7 @@ Standalone pagination control with three variants: full pages, compact, and load
 **Props:**
 - `totalItems` (int, required) — total number of items
 - `currentPage` (int, required) — current page (1-based)
-- `label` (String?) — accessibility label
+- `label` (String, required) — descriptive label for items (e.g. 'rows', 'items', 'products')
 - `perPage` (int, default 25) — items per page
 - `perPageOptions` (List<int>, default [10, 25, 50, 100]) — per-page dropdown options
 - `onPageChange` (ValueChanged<int>?) — page change callback
@@ -2587,7 +2587,7 @@ Standalone pagination control with three variants: full pages, compact, and load
 
 **Named Constructors:**
 - `OiPagination.compact(totalItems:, currentPage:, label:, perPage:, onPageChange:, showFirstLast:)` — Compact variant showing "Page X of Y" with prev/next arrows only.
-- `OiPagination.loadMore(loadedCount:, totalItems:, onLoadMore:, loading:)` — Load-more button with "Showing X of Y" count.
+- `OiPagination.loadMore(loadedCount:, totalItems:, label:, onLoadMore:, loading:)` — Load-more button with "{loadedCount} of {totalItems} {label} loaded" count.
 
 **Static Method:** `computeVisiblePages(currentPage, totalPages, siblingCount)` — Returns list of page numbers with null gaps for ellipsis rendering.
 

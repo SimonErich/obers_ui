@@ -702,16 +702,17 @@ Standalone pagination control with three variants: full pages, compact, and load
 OiPagination(
   totalItems: 250,
   currentPage: 3,
+  label: 'items',
   perPage: 25,
   onPageChange: (page) => setState(() => _page = page),
   onPerPageChange: (perPage) => setState(() => _perPage = perPage),
 )
 
 // Compact
-OiPagination.compact(totalItems: 250, currentPage: 3, perPage: 25, onPageChange: (p) {})
+OiPagination.compact(totalItems: 250, currentPage: 3, label: 'items', perPage: 25, onPageChange: (p) {})
 
 // Load more
-OiPagination.loadMore(loadedCount: 50, totalItems: 250, onLoadMore: () async => loadMore())
+OiPagination.loadMore(loadedCount: 50, totalItems: 250, label: 'items', onLoadMore: () async => loadMore())
 ```
 
 ### OiLocaleSwitcher

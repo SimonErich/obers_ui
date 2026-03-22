@@ -347,7 +347,7 @@ OiResourcePage(
   title: 'Users',
   variant: OiResourcePageVariant.list,
   filters: myFilterWidget,
-  pagination: OiPagination(currentPage: 1, totalPages: 10, onPageChanged: setPage),
+  pagination: OiPagination(totalItems: 250, currentPage: 1, label: 'users', perPage: 25, onPageChange: (p) => setPage(p)),
   onAction: (action) {
     if (action == 'create') router.go('/users/new');
   },

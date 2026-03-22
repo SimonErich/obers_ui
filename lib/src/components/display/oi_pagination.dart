@@ -30,7 +30,7 @@ enum OiPaginationVariant {
 ///
 /// {@category Components}
 ///
-/// Coverage: REQ-0009
+/// Coverage: REQ-0004, REQ-0005, REQ-0006
 class OiPagination extends StatefulWidget {
   /// Creates an [OiPagination] with the [pages] variant by default.
   ///
@@ -38,7 +38,7 @@ class OiPagination extends StatefulWidget {
   const OiPagination({
     required this.totalItems,
     required this.currentPage,
-    this.label,
+    required this.label,
     this.perPage = 25,
     this.perPageOptions = const [10, 25, 50, 100],
     this.onPageChange,
@@ -58,7 +58,7 @@ class OiPagination extends StatefulWidget {
   const OiPagination.compact({
     required this.totalItems,
     required this.currentPage,
-    this.label,
+    required this.label,
     this.perPage = 25,
     this.onPageChange,
     this.showFirstLast = true,
@@ -82,6 +82,7 @@ class OiPagination extends StatefulWidget {
   const OiPagination.loadMore({
     required int loadedCount,
     required this.totalItems,
+    required this.label,
     VoidCallback? onLoadMore,
     bool loading = false,
     super.key,
@@ -90,7 +91,6 @@ class OiPagination extends StatefulWidget {
        _onLoadMore = onLoadMore,
        _loading = loading,
        currentPage = 0,
-       label = null,
        perPage = 25,
        perPageOptions = const [10, 25, 50, 100],
        onPageChange = null,
@@ -107,8 +107,8 @@ class OiPagination extends StatefulWidget {
   /// Zero-based index of the current page.
   final int currentPage;
 
-  /// Optional descriptive label (e.g. 'Rows', 'Items').
-  final String? label;
+  /// Descriptive label for the items (e.g. 'rows', 'items', 'products').
+  final String label;
 
   /// Number of items shown per page.
   final int perPage;
@@ -400,7 +400,7 @@ class _OiPaginationState extends State<OiPagination> {
           mainAxisSize: MainAxisSize.min,
           children: [
             OiLabel.small(
-              '${widget._loadedCount} of ${widget.totalItems} loaded',
+              '${widget._loadedCount} of ${widget.totalItems} ${widget.label} loaded',
             ),
             const SizedBox(height: 8),
             OiButton.ghost(
@@ -492,7 +492,7 @@ class _OiPaginationState extends State<OiPagination> {
   }
 
   Widget _buildTotalLabel() {
-    final itemLabel = widget.label ?? 'items';
+    final itemLabel = widget.label;
     if (widget.totalItems == 0) {
       return OiLabel.small(
         '0 $itemLabel',
