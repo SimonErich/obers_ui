@@ -343,31 +343,123 @@ void main() {
     // ── Keyboard arrow key navigation between options ────────────────────
 
     group('keyboard arrow key navigation between options', () {
-      testWidgets('arrow down moves focus to next option', (tester) async {
+      testWidgets('tab moves focus to first option', (tester) async {
         await tester.pumpObers(_buildPicker(selectedKey: 'visa'));
 
-        // Focus the first option.
-        await tester.tap(find.text('Visa'));
-        await tester.pump();
+        // Tab to focus the first focusable option.
+        await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+        await tester.pumpAndSettle();
 
-        // Send arrow down key event.
-        await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
-        await tester.pump();
-
-        // Widget still renders without error after keyboard input.
-        expect(find.byType(OiPaymentMethodPicker), findsOneWidget);
+        final primaryFocus = FocusManager.instance.primaryFocus;
+        expect(primaryFocus, isNotNull, reason: 'Tab should give focus');
       });
 
-      testWidgets('arrow up key event does not crash', (tester) async {
+      testWidgets('arrow down moves focus to a different node', (tester) async {
         await tester.pumpObers(_buildPicker(selectedKey: 'visa'));
 
-        await tester.tap(find.text('Visa'));
-        await tester.pump();
+        // Tab to focus the first option.
+        await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+        await tester.pumpAndSettle();
 
+        final focusBefore = FocusManager.instance.primaryFocus;
+
+        // Arrow-down to move focus.
+        await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+        await tester.pumpAndSettle();
+
+        final focusAfter = FocusManager.instance.primaryFocus;
+        expect(
+          focusAfter,
+          isNot(equals(focusBefore)),
+          reason: 'Focus should move to a different node after arrow-down',
+        );
+      });
+
+      testWidgets('arrow up moves focus to a different node', (tester) async {
+        await tester.pumpObers(_buildPicker(selectedKey: 'visa'));
+
+        // Tab twice to reach the second option.
+        await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+        await tester.pumpAndSettle();
+        await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+        await tester.pumpAndSettle();
+
+        final focusBefore = FocusManager.instance.primaryFocus;
+
+        // Arrow-up to move focus back.
         await tester.sendKeyEvent(LogicalKeyboardKey.arrowUp);
-        await tester.pump();
+        await tester.pumpAndSettle();
 
-        expect(find.byType(OiPaymentMethodPicker), findsOneWidget);
+        final focusAfter = FocusManager.instance.primaryFocus;
+        expect(
+          focusAfter,
+          isNot(equals(focusBefore)),
+          reason: 'Focus should move to a different node after arrow-up',
+        );
+      });
+
+      testWidgets('enter on focused option triggers onSelected', (
+        tester,
+      ) async {
+        OiPaymentMethod? selected;
+        await tester.pumpObers(
+          _buildPicker(onSelected: (m) => selected = m, selectedKey: 'visa'),
+        );
+
+        // Tab to focus the first option.
+        await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+        await tester.pumpAndSettle();
+
+        // Press Enter to activate the focused option.
+        await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+        await tester.pumpAndSettle();
+
+        expect(selected, isNotNull, reason: 'onSelected should fire on Enter');
+        expect(selected!.key, 'visa');
+      });
+
+      testWidgets('space on focused option triggers onSelected', (
+        tester,
+      ) async {
+        OiPaymentMethod? selected;
+        await tester.pumpObers(
+          _buildPicker(onSelected: (m) => selected = m, selectedKey: 'visa'),
+        );
+
+        // Tab to focus the first option.
+        await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+        await tester.pumpAndSettle();
+
+        // Press Space to activate the focused option.
+        await tester.sendKeyEvent(LogicalKeyboardKey.space);
+        await tester.pumpAndSettle();
+
+        expect(selected, isNotNull, reason: 'onSelected should fire on Space');
+        expect(selected!.key, 'visa');
+      });
+
+      testWidgets('tab then enter on second option selects it', (tester) async {
+        OiPaymentMethod? selected;
+        await tester.pumpObers(
+          _buildPicker(onSelected: (m) => selected = m, selectedKey: 'visa'),
+        );
+
+        // Tab twice to reach the second option.
+        await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+        await tester.pumpAndSettle();
+        await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+        await tester.pumpAndSettle();
+
+        // Press Enter to select.
+        await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+        await tester.pumpAndSettle();
+
+        expect(
+          selected,
+          isNotNull,
+          reason: 'onSelected should fire on Enter for second option',
+        );
+        expect(selected!.key, 'mastercard');
       });
 
       testWidgets('keyboard nav on single item does not crash', (tester) async {
@@ -375,13 +467,14 @@ void main() {
           _buildPicker(methods: const [_visa], selectedKey: 'visa'),
         );
 
-        await tester.tap(find.text('Visa'));
-        await tester.pump();
+        // Tab to focus the single option.
+        await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+        await tester.pumpAndSettle();
 
         await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
-        await tester.pump();
+        await tester.pumpAndSettle();
         await tester.sendKeyEvent(LogicalKeyboardKey.arrowUp);
-        await tester.pump();
+        await tester.pumpAndSettle();
 
         expect(find.byType(OiPaymentOption), findsOneWidget);
       });
