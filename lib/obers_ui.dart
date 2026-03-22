@@ -200,11 +200,32 @@ export 'src/composites/social/oi_selection_presence.dart';
 export 'src/composites/social/oi_typing_indicator.dart';
 // ── Composites: Visualization ────────────────────────────────────────────────
 
+export 'src/composites/visualization/oi_bar_chart/oi_bar_chart.dart';
+export 'src/composites/visualization/oi_bar_chart/oi_bar_chart_accessibility.dart';
+export 'src/composites/visualization/oi_bar_chart/oi_bar_chart_data.dart';
+export 'src/composites/visualization/oi_bar_chart/oi_bar_chart_legend.dart';
+export 'src/composites/visualization/oi_bar_chart/oi_bar_chart_theme.dart';
+export 'src/composites/visualization/oi_bubble_chart/oi_bubble_chart.dart';
+export 'src/composites/visualization/oi_bubble_chart/oi_bubble_chart_accessibility.dart';
+export 'src/composites/visualization/oi_bubble_chart/oi_bubble_chart_data.dart';
+export 'src/composites/visualization/oi_bubble_chart/oi_bubble_chart_interaction.dart';
+export 'src/composites/visualization/oi_bubble_chart/oi_bubble_chart_legend.dart';
+export 'src/composites/visualization/oi_bubble_chart/oi_bubble_chart_size_legend.dart';
+export 'src/composites/visualization/oi_bubble_chart/oi_bubble_chart_theme.dart';
+export 'src/composites/visualization/oi_chart_axis.dart';
 export 'src/composites/visualization/oi_funnel_chart.dart';
 export 'src/composites/visualization/oi_gauge.dart';
 export 'src/composites/visualization/oi_heatmap.dart';
+export 'src/composites/visualization/oi_line_chart/oi_line_chart.dart';
+export 'src/composites/visualization/oi_line_chart/oi_line_chart_accessibility.dart';
+export 'src/composites/visualization/oi_line_chart/oi_line_chart_data.dart';
+export 'src/composites/visualization/oi_line_chart/oi_line_chart_legend.dart';
+export 'src/composites/visualization/oi_line_chart/oi_line_chart_theme.dart';
+export 'src/composites/visualization/oi_pie_chart.dart';
 export 'src/composites/visualization/oi_radar_chart.dart';
 export 'src/composites/visualization/oi_sankey.dart';
+export 'src/composites/visualization/oi_scatter_plot.dart';
+export 'src/composites/visualization/oi_sparkline.dart';
 export 'src/composites/visualization/oi_treemap.dart';
 // ── Composites: Workflow ─────────────────────────────────────────────────────
 

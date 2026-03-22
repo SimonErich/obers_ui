@@ -1,0 +1,367 @@
+import 'dart:math' as math;
+
+import 'package:flutter/widgets.dart';
+import 'package:obers_ui/src/composites/visualization/_chart_grid_painter.dart';
+import 'package:obers_ui/src/composites/visualization/oi_bar_chart/oi_bar_chart_accessibility.dart';
+import 'package:obers_ui/src/composites/visualization/oi_bar_chart/oi_bar_chart_data.dart';
+import 'package:obers_ui/src/composites/visualization/oi_bar_chart/oi_bar_chart_legend.dart';
+import 'package:obers_ui/src/composites/visualization/oi_bar_chart/oi_bar_chart_painter.dart';
+import 'package:obers_ui/src/composites/visualization/oi_bar_chart/oi_bar_chart_theme.dart';
+import 'package:obers_ui/src/composites/visualization/oi_bubble_chart/oi_bubble_chart_interaction.dart';
+import 'package:obers_ui/src/composites/visualization/oi_chart_axis.dart';
+import 'package:obers_ui/src/foundation/oi_accessibility.dart';
+import 'package:obers_ui/src/foundation/oi_platform.dart';
+import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
+
+/// A bar chart for categorical comparisons.
+///
+/// Renders [categories] as vertical or [horizontal] bars. Supports grouped
+/// and [stacked] layouts, optional value labels, and touch/pointer
+/// interaction.
+///
+/// {@category Composites}
+class OiBarChart extends StatefulWidget {
+  /// Creates an [OiBarChart].
+  const OiBarChart({
+    required this.label,
+    required this.categories,
+    super.key,
+    this.series,
+    this.horizontal = false,
+    this.stacked = false,
+    this.showValues = false,
+    this.showGrid = true,
+    this.showLegend = true,
+    this.barRadius = 4.0,
+    this.yAxis,
+    this.onBarTap,
+    this.theme,
+    this.interactionMode,
+    this.compact,
+  });
+
+  /// Accessibility label for the chart.
+  final String label;
+
+  /// The category data to render.
+  final List<OiBarCategory> categories;
+
+  /// Optional named series (for legend and color resolution).
+  /// When null, a single implicit series is assumed.
+  final List<OiBarSeries>? series;
+
+  /// Whether to draw bars horizontally.
+  final bool horizontal;
+
+  /// Whether to stack bars instead of grouping them.
+  final bool stacked;
+
+  /// Whether to show value labels on bars.
+  final bool showValues;
+
+  /// Whether to show grid lines.
+  final bool showGrid;
+
+  /// Whether to show a legend when there are multiple series.
+  final bool showLegend;
+
+  /// The corner radius of each bar.
+  final double barRadius;
+
+  /// Configuration for the value axis.
+  final OiChartAxis? yAxis;
+
+  /// Callback when a bar is tapped.
+  final void Function(int categoryIndex, int? seriesIndex)? onBarTap;
+
+  /// Optional theme overrides.
+  final OiBarChartTheme? theme;
+
+  /// Interaction mode. Defaults to [OiChartInteractionMode.auto].
+  final OiChartInteractionMode? interactionMode;
+
+  /// Whether to use compact layout.
+  final bool? compact;
+
+  @override
+  State<OiBarChart> createState() => _OiBarChartState();
+}
+
+class _OiBarChartState extends State<OiBarChart> {
+  int? _hoveredCategoryIndex;
+  int? _hoveredSeriesIndex;
+
+  static const double _compactThreshold = 400;
+  static const double _minViableWidth = 120;
+  static const double _minViableHeight = 80;
+
+  int get _numSeries {
+    if (widget.series != null) return widget.series!.length;
+    if (widget.categories.isEmpty) return 1;
+    return widget.categories.first.values.length;
+  }
+
+  String get _effectiveLabel =>
+      widget.label.isNotEmpty
+          ? widget.label
+          : OiBarChartAccessibility.generateSummary(
+              widget.categories,
+              widget.series,
+            );
+
+  OiChartInteractionMode _resolveInteractionMode(BuildContext context) {
+    if (widget.interactionMode != null &&
+        widget.interactionMode != OiChartInteractionMode.auto) {
+      return widget.interactionMode!;
+    }
+    final modality = OiPlatform.of(context).inputModality;
+    return modality == OiInputModality.touch
+        ? OiChartInteractionMode.touch
+        : OiChartInteractionMode.pointer;
+  }
+
+  ({int categoryIndex, int seriesIndex})? _hitTest(
+    Offset position,
+    Rect chartRect,
+  ) {
+    if (widget.categories.isEmpty) return null;
+
+    if (widget.horizontal) {
+      final catHeight = chartRect.height / widget.categories.length;
+      final ci = ((position.dy - chartRect.top) / catHeight).floor();
+      if (ci < 0 || ci >= widget.categories.length) return null;
+      // Simplified: return first series.
+      return (categoryIndex: ci, seriesIndex: 0);
+    } else {
+      final catWidth = chartRect.width / widget.categories.length;
+      final ci = ((position.dx - chartRect.left) / catWidth).floor();
+      if (ci < 0 || ci >= widget.categories.length) return null;
+
+      if (widget.stacked || _numSeries == 1) {
+        return (categoryIndex: ci, seriesIndex: 0);
+      }
+
+      // Determine which bar in the group.
+      final catX = chartRect.left + ci * catWidth;
+      final padding = catWidth * 0.15;
+      final barW = (catWidth - padding * 2) / _numSeries;
+      final localX = position.dx - catX - padding;
+      final si = (localX / barW).floor().clamp(0, _numSeries - 1);
+      return (categoryIndex: ci, seriesIndex: si);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (widget.categories.isEmpty) {
+      return const SizedBox.shrink(key: Key('oi_bar_chart_empty'));
+    }
+
+    final colors = context.colors;
+    final isHighContrast = OiA11y.highContrast(context);
+    final reducedMotion = OiA11y.reducedMotion(context);
+
+    return Semantics(
+      label: _effectiveLabel,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final w = constraints.maxWidth;
+          final h = constraints.maxHeight.isFinite
+              ? constraints.maxHeight
+              : 300.0;
+
+          if (w < _minViableWidth || h < _minViableHeight) {
+            return SizedBox(
+              width: w,
+              height: h,
+              child: Center(
+                key: const Key('oi_bar_chart_fallback'),
+                child: FittedBox(
+                  child: Text(
+                    'Chart too small',
+                    style: TextStyle(
+                      fontSize: 10,
+                      color: colors.textMuted,
+                    ),
+                  ),
+                ),
+              ),
+            );
+          }
+
+          final isCompact = widget.compact ?? (w < _compactThreshold);
+          final mode = _resolveInteractionMode(context);
+          final chartSize =
+              Size(w, math.min(h, isCompact ? w * 0.6 : w * 0.75));
+          final effectiveRadius =
+              widget.theme?.barRadius ?? widget.barRadius;
+
+          final chartRect = OiChartGrid.computeChartRect(
+            chartSize,
+            compact: isCompact,
+          );
+
+          // Resolve colors.
+          final numSeries = _numSeries;
+          final resolvedColors = <Color>[
+            for (var i = 0; i < numSeries; i++)
+              OiBarChartTheme.resolveColor(
+                i,
+                widget.series != null && i < widget.series!.length
+                    ? widget.series![i].color
+                    : null,
+                context,
+                chartTheme: widget.theme,
+              ),
+          ];
+
+          // Compute max for y-axis labels.
+          var maxVal = 0.0;
+          final allValues = <List<double>>[];
+          for (final cat in widget.categories) {
+            allValues.add(cat.values);
+            if (widget.stacked) {
+              var sum = 0.0;
+              for (final v in cat.values) {
+                sum += v;
+              }
+              maxVal = math.max(maxVal, sum);
+            } else {
+              for (final v in cat.values) {
+                maxVal = math.max(maxVal, v);
+              }
+            }
+          }
+          if (maxVal == 0) maxVal = 1;
+
+          final yDiv = widget.yAxis?.divisions ?? (isCompact ? 3 : 5);
+          final yLabels = widget.yAxis?.labels ??
+              List.generate(
+                yDiv + 1,
+                (i) => (widget.yAxis ?? const OiChartAxis()).formatValue(
+                  maxVal * i / yDiv,
+                ),
+              );
+
+          final hoverCi = reducedMotion ? null : _hoveredCategoryIndex;
+          final hoverSi = reducedMotion ? null : _hoveredSeriesIndex;
+
+          final chartWidget = SizedBox(
+            key: const Key('oi_bar_chart_canvas'),
+            width: chartSize.width,
+            height: chartSize.height,
+            child: CustomPaint(
+              key: const Key('oi_bar_chart_painter'),
+              size: chartSize,
+              painter: OiBarChartPainter(
+                categoryLabels:
+                    widget.categories.map((c) => c.label).toList(),
+                values: allValues,
+                colors: resolvedColors,
+                chartRect: chartRect,
+                horizontal: widget.horizontal,
+                stacked: widget.stacked,
+                showValues: widget.showValues,
+                showGrid: widget.showGrid,
+                barRadius: effectiveRadius,
+                gridColor:
+                    widget.theme?.gridColor ?? colors.borderSubtle,
+                axisLabelColor:
+                    widget.theme?.axisLabelColor ?? colors.textMuted,
+                textColor: colors.text,
+                highContrast: isHighContrast,
+                compact: isCompact,
+                numSeries: numSeries,
+                yLabels: yLabels,
+                yDivisions: yDiv,
+                hoveredCategoryIndex: hoverCi,
+                hoveredSeriesIndex: hoverSi,
+              ),
+            ),
+          );
+
+          // Interaction wrapper.
+          Widget interactiveChart;
+          if (mode == OiChartInteractionMode.touch) {
+            interactiveChart = GestureDetector(
+              key: const Key('oi_bar_chart_touch'),
+              behavior: HitTestBehavior.opaque,
+              onTapDown: (d) {
+                final hit = _hitTest(d.localPosition, chartRect);
+                if (hit != null) {
+                  widget.onBarTap?.call(
+                    hit.categoryIndex,
+                    numSeries > 1 ? hit.seriesIndex : null,
+                  );
+                }
+              },
+              child: chartWidget,
+            );
+          } else {
+            interactiveChart = MouseRegion(
+              key: const Key('oi_bar_chart_pointer'),
+              onHover: (e) {
+                final hit = _hitTest(e.localPosition, chartRect);
+                if (hit?.categoryIndex != _hoveredCategoryIndex ||
+                    hit?.seriesIndex != _hoveredSeriesIndex) {
+                  setState(() {
+                    _hoveredCategoryIndex = hit?.categoryIndex;
+                    _hoveredSeriesIndex = hit?.seriesIndex;
+                  });
+                }
+              },
+              onExit: (_) => setState(() {
+                _hoveredCategoryIndex = null;
+                _hoveredSeriesIndex = null;
+              }),
+              child: chartWidget,
+            );
+          }
+
+          // Legend.
+          final showLegend =
+              widget.showLegend && widget.series != null && numSeries > 1;
+          final legendWidget = showLegend
+              ? OiBarChartLegend(
+                  series: widget.series!,
+                  chartTheme: widget.theme,
+                )
+              : null;
+
+          if (isCompact) {
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                interactiveChart,
+                if (legendWidget != null)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8),
+                    child: legendWidget,
+                  ),
+              ],
+            );
+          }
+
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(child: interactiveChart),
+                  if (legendWidget != null)
+                    Padding(
+                      padding: const EdgeInsets.only(left: 12),
+                      child: legendWidget,
+                    ),
+                ],
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+}
