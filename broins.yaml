@@ -4,13 +4,11 @@ llm:
     model: qwen3:14b-q4_K_M
 
 workflow:
-  # Keep iteration budgets tight for throughput on large projects.
-  # The final full-verification pass catches remaining gaps.
-  maxIterationsPerWorkItem: 2
-  maxIterationsSimple: 1
-  maxIterationsMedium: 2
-  maxIterationsComplex: 2
-  stuckLoopThreshold: 1
+  maxIterationsPerWorkItem: 3
+  maxIterationsSimple: 2
+  maxIterationsMedium: 3
+  maxIterationsComplex: 4
+  stuckLoopThreshold: 3
   maxStabilizationRounds: 3
-  maxChecksFixRounds: 2
+  maxChecksFixRounds: 3
   autoFixChecksWithClaude: true
