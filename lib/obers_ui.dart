@@ -112,13 +112,17 @@ export 'src/components/panels/oi_resizable.dart';
 export 'src/components/panels/oi_split_pane.dart';
 // ── Components: Shop ────────────────────────────────────────────────────────
 
+export 'src/components/shop/oi_address_form.dart';
 export 'src/components/shop/oi_cart_item_row.dart';
 export 'src/components/shop/oi_coupon_input.dart';
+export 'src/components/shop/oi_order_status_badge.dart';
 export 'src/components/shop/oi_order_summary_line.dart';
+export 'src/components/shop/oi_payment_method_picker.dart';
 export 'src/components/shop/oi_payment_option.dart';
 export 'src/components/shop/oi_price_tag.dart';
 export 'src/components/shop/oi_product_card.dart';
 export 'src/components/shop/oi_quantity_selector.dart';
+export 'src/components/shop/oi_shipping_method_picker.dart';
 export 'src/components/shop/oi_shipping_option.dart';
 export 'src/components/shop/oi_stock_badge.dart';
 export 'src/components/shop/oi_wishlist_button.dart';
@@ -179,6 +183,7 @@ export 'src/composites/scheduling/oi_timeline.dart';
 export 'src/composites/shop/oi_cart_panel.dart';
 export 'src/composites/shop/oi_mini_cart.dart';
 export 'src/composites/shop/oi_order_summary.dart';
+export 'src/composites/shop/oi_order_tracker.dart';
 export 'src/composites/shop/oi_product_filters.dart';
 export 'src/composites/shop/oi_product_gallery.dart';
 // ── Composites: Search ───────────────────────────────────────────────────────
@@ -247,6 +252,8 @@ export 'src/foundation/theme/oi_theme_scope.dart';
 export 'src/models/oi_address_data.dart';
 export 'src/models/oi_cart_item.dart';
 export 'src/models/oi_cart_summary.dart';
+export 'src/models/oi_checkout_data.dart';
+export 'src/models/oi_country_option.dart';
 export 'src/models/oi_coupon_result.dart';
 export 'src/models/oi_field_type.dart';
 export 'src/models/oi_file_explorer_controller.dart';
