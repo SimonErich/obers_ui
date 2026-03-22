@@ -189,6 +189,86 @@ OiTour(
 )
 ```
 
+## Shop
+
+| Widget | Description |
+|---|---|
+| `OiCartPanel` | Full shopping cart view with items, coupon, summary, checkout |
+| `OiMiniCart` | Compact cart icon with badge and popover/sheet preview |
+| `OiOrderSummary` | Order summary card with totals and optional expandable item list |
+
+### OiCartPanel
+
+Full shopping cart view with item list, optional coupon input, order summary lines, checkout button, and continue-shopping link. Shows empty state when cart has no items.
+
+```dart
+OiCartPanel(
+  items: cartItems,
+  summary: cartSummary,
+  label: 'Shopping cart',
+  onQuantityChange: (record) => updateQty(record.productKey, record.quantity),
+  onRemove: (key) => removeItem(key),
+  onApplyCoupon: (code) async => await validateCoupon(code),
+  onRemoveCoupon: () => removeCoupon(),
+  appliedCouponCode: currentCoupon,
+  onCheckout: () => navigateToCheckout(),
+  onContinueShopping: () => navigateToShop(),
+  currencyCode: 'EUR',
+)
+```
+
+**Key features:**
+
+- Empty cart shows `OiEmptyState` with cart icon
+- Coupon section hidden when `onApplyCoupon` is null
+- Summary lines conditionally show discount, shipping, tax
+- Checkout button disabled when `onCheckout` is null
+- Shimmer loading on summary lines via `loading: true`
+
+### OiMiniCart
+
+Compact cart widget with badge count that opens a popover or sheet showing a condensed cart preview.
+
+```dart
+OiMiniCart(
+  items: cartItems,
+  summary: cartSummary,
+  label: 'Cart',
+  onViewCart: () => navigateToCart(),
+  onCheckout: () => navigateToCheckout(),
+  onRemove: (key) => removeItem(key),
+  maxVisibleItems: 3,
+)
+```
+
+**Key features:**
+
+- Badge shows total quantity; hidden when cart is empty
+- Overflow indicator: "X more item(s)" when items exceed `maxVisibleItems`
+- Two display modes: `popover` (default) and `sheet`
+- Empty state shows "Cart is empty"
+
+### OiOrderSummary
+
+Complete order summary card with all line items and optional expandable item list.
+
+```dart
+OiOrderSummary(
+  summary: cartSummary,
+  label: 'Order summary',
+  items: cartItems,
+  expandedByDefault: false,
+  currencyCode: 'EUR',
+)
+```
+
+**Key features:**
+
+- Items shown in collapsible `OiAccordion` section
+- Read-only `OiCartItemRow` widgets (no quantity/remove controls)
+- Conditional discount, shipping, tax lines
+- Bold total row
+
 ## Workflow
 
 | Widget | Description |

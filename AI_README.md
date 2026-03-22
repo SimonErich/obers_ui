@@ -2262,6 +2262,215 @@ Number stepper for product quantities with minus/plus buttons and display value.
 
 ---
 
+#### OiCartItemRow
+**Tags:** `shop`, `cart`, `line-item`, `e-commerce`, `row`
+**Tier:** Component
+
+A single line item row for the shopping cart. Shows thumbnail, name, variant info, quantity selector, line total, and remove button. Supports swipe-to-remove on mobile and compact mode for mini-cart overlays.
+
+**Props:**
+- `item` (OiCartItem, required) — cart item data
+- `label` (String, required) — accessibility label
+- `onQuantityChange` (ValueChanged<int>?) — quantity change callback
+- `onRemove` (VoidCallback?) — remove callback
+- `onTap` (VoidCallback?) — row tap callback
+- `editable` (bool, default true) — show/hide quantity selector and remove button
+- `compact` (bool, default false) — smaller layout for mini-cart
+- `currencyCode` (String, default 'EUR') — ISO 4217 currency code
+
+**Behavior:**
+- Compact mode renders smaller thumbnail (48px vs 72px) and smaller text
+- Non-editable mode hides quantity selector and remove button, shows "× quantity" text
+- Swipe-to-remove via OiSwipeable when editable and onRemove is provided
+- Thumbnail falls back to placeholder icon when imageUrl is null
+
+**Use When:** Cart line items, order confirmation item lists.
+**Combine With:** `OiCartPanel`, `OiMiniCart`, `OiOrderSummary`
+
+---
+
+#### OiCouponInput
+**Tags:** `shop`, `coupon`, `discount`, `promo`, `e-commerce`, `input`
+**Tier:** Component
+
+Text input with 'Apply' button for discount/coupon codes. Shows success or error inline. Applied mode shows green check, code, and remove button.
+
+**Props:**
+- `label` (String, required) — accessibility label / visible label
+- `onApply` (Future<OiCouponResult> Function(String), required) — apply callback returning success/failure
+- `onRemove` (VoidCallback?) — remove applied coupon callback
+- `appliedCode` (String?) — currently applied code; non-null shows applied mode
+- `loading` (bool, default false) — loading state for Apply button
+
+**Behavior:**
+- Empty submit prevented (button disabled when input empty)
+- Invalid code shows red error message inline
+- Applied mode shows green check icon, bold code, and remove (X) button
+- Error clears when user types new text
+- Exception during apply shows generic error message
+
+**Use When:** Cart coupon/promo code entry.
+**Combine With:** `OiCartPanel`
+
+---
+
+#### OiOrderSummaryLine
+**Tags:** `shop`, `summary`, `total`, `subtotal`, `checkout`, `e-commerce`
+**Tier:** Component
+
+A single summary row showing label on the left and amount on the right. Used for subtotal, discount, shipping, tax, and total lines.
+
+**Props:**
+- `label` (String, required) — line label (e.g. 'Subtotal', 'Tax')
+- `amount` (double, required) — monetary amount
+- `currencyCode` (String, default 'EUR') — ISO 4217 currency code
+- `bold` (bool, default false) — bold styling for total row
+- `negative` (bool, default false) — discount styling (green, minus prefix)
+- `loading` (bool, default false) — shimmer placeholder instead of amount
+- `subtitle` (String?) — optional subtitle below label (e.g. coupon code)
+
+**Behavior:**
+- Bold mode uses bodyStrong label and medium price tag size
+- Negative mode inverts amount sign for discount display
+- Loading mode shows OiShimmer placeholder instead of price
+- Subtitle shown below label when provided
+
+**Use When:** Checkout summaries, order totals, invoice line items.
+**Combine With:** `OiCartPanel`, `OiOrderSummary`
+
+---
+
+#### OiProductCard
+**Tags:** `shop`, `product`, `card`, `catalog`, `e-commerce`, `grid`
+**Tier:** Component
+
+Product display card for grid/list layouts. Shows image, name, price, rating, and quick-action buttons. Three layout variants.
+
+**Props:**
+- `product` (OiProductData, required) — product data
+- `label` (String, required) — accessibility label
+- `onTap` (VoidCallback?) — card tap callback
+- `onAddToCart` (VoidCallback?) — add-to-cart callback
+- `onWishlist` (VoidCallback?) — wishlist callback
+- `showRating` (bool, default true) — show star rating
+- `showAddToCart` (bool, default true) — show add-to-cart button
+- `showWishlist` (bool, default false) — show wishlist button
+- `isLoading` (bool, default false) — skeleton loading state
+- `variant` (OiProductCardVariant, default vertical) — vertical / horizontal / compact
+
+**Constructors:**
+- `OiProductCard()` — default vertical layout
+- `OiProductCard.horizontal()` — image-left layout for list views
+
+**Behavior:**
+- "Sale" badge when compareAtPrice > price
+- "Out of Stock" badge when inStock is false; disables add-to-cart
+- Skeleton loading via OiShimmer when isLoading is true
+- Compact variant hides action buttons, shows single-line name
+- Image placeholder with icon when imageUrl is null
+
+**Use When:** Product grids, catalog pages, search results.
+**Combine With:** `OiGrid`, `OiVirtualGrid`, `OiFilterBar`
+
+---
+
+### COMPOSITES — Shop
+
+---
+
+#### OiCartPanel
+**Tags:** `shop`, `cart`, `checkout`, `e-commerce`, `composite`, `panel`
+**Tier:** Composite
+
+Full shopping cart view with item list, optional coupon input, order summary lines, checkout button, and continue-shopping link. Shows OiEmptyState when cart is empty. Supports shimmer loading on summary lines.
+
+**Props:**
+- `items` (List<OiCartItem>, required) — cart items
+- `summary` (OiCartSummary, required) — subtotal/discount/shipping/tax/total
+- `label` (String, required) — accessibility label
+- `onQuantityChange` (ValueChanged<({Object productKey, int quantity})>?) — quantity change callback
+- `onRemove` (ValueChanged<Object>?) — remove item callback (receives productKey)
+- `onApplyCoupon` (Future<OiCouponResult> Function(String)?) — coupon apply callback; null hides coupon section
+- `onRemoveCoupon` (VoidCallback?) — remove coupon callback
+- `appliedCouponCode` (String?) — currently applied coupon code
+- `onCheckout` (VoidCallback?) — checkout callback; null disables button
+- `onContinueShopping` (VoidCallback?) — continue shopping link; null hides it
+- `checkoutLabel` (String, default 'Proceed to Checkout') — checkout button text
+- `currencyCode` (String, default 'EUR') — ISO 4217 currency code
+- `loading` (bool, default false) — shimmer on summary lines
+
+**Composition:** OiColumn, OiCartItemRow, OiDivider, OiCouponInput, OiOrderSummaryLine, OiButton.primary, OiEmptyState.
+
+**Behavior:**
+- Empty items list → OiEmptyState with cart icon and optional continue-shopping button
+- Coupon section hidden when onApplyCoupon is null
+- Summary shows conditional discount/shipping/tax lines based on null checks
+- Checkout button disabled when onCheckout is null
+
+**Use When:** Cart page, cart side panel, cart sheet.
+**Combine With:** `OiMiniCart`, `OiOrderSummary`
+
+---
+
+#### OiMiniCart
+**Tags:** `shop`, `cart`, `mini`, `popover`, `badge`, `e-commerce`, `composite`
+**Tier:** Composite
+
+Compact cart widget: icon button with badge count that opens a popover or sheet with condensed cart preview. Badge hidden when cart is empty.
+
+**Props:**
+- `items` (List<OiCartItem>, required) — cart items
+- `summary` (OiCartSummary, required) — for total price display
+- `label` (String, required) — accessibility label
+- `onViewCart` (VoidCallback?) — 'View Cart' button callback
+- `onCheckout` (VoidCallback?) — 'Checkout' button callback
+- `onRemove` (ValueChanged<Object>?) — remove item callback (receives productKey)
+- `maxVisibleItems` (int, default 3) — max items in preview
+- `display` (OiMiniCartDisplay, default popover) — popover or sheet
+- `currencyCode` (String, default 'EUR') — ISO 4217 currency code
+
+**Composition:** OiIconButton, OiBadge, OiPopover/OiSheet, OiColumn, OiCartItemRow (compact), OiPriceTag, OiButton, OiLabel.
+
+**Behavior:**
+- Badge shows total quantity (sum of all item quantities); hidden when empty
+- Overflow indicator: "X more item(s)" when items exceed maxVisibleItems
+- Singular "1 more item" vs plural "2 more items"
+- Empty state shows "Cart is empty" centered text
+- Popover mode: constrained to 360px max width
+- Sheet mode: uses OiSheet with close callback
+
+**Use When:** Header cart icon, navigation bar cart indicator.
+**Combine With:** `OiCartPanel`, `OiSidebar`, `OiBottomBar`
+
+---
+
+#### OiOrderSummary
+**Tags:** `shop`, `order`, `summary`, `checkout`, `e-commerce`, `composite`
+**Tier:** Composite
+
+Complete order summary card showing all summary lines with optional expandable item list inside an OiAccordion.
+
+**Props:**
+- `summary` (OiCartSummary, required) — subtotal/discount/shipping/tax/total
+- `label` (String, required) — accessibility label
+- `items` (List<OiCartItem>?) — optional items for expandable list
+- `showItems` (bool, default true) — whether to show item accordion
+- `expandedByDefault` (bool, default false) — accordion starts expanded
+- `currencyCode` (String, default 'EUR') — ISO 4217 currency code
+
+**Composition:** OiCard, OiColumn, OiOrderSummaryLine, OiDivider, OiAccordion, OiCartItemRow (read-only), OiLabel.
+
+**Behavior:**
+- Items shown in accordion with "Items (N)" header
+- Items rendered as non-editable OiCartItemRow widgets
+- Summary lines: subtotal always shown; discount/shipping/tax conditional on null
+- Total line shown in bold
+
+**Use When:** Checkout page, order confirmation, order detail view.
+**Combine With:** `OiCartPanel`, `OiWizard`, `OiDetailView`
+
+---
+
 ### COMPOSITES — Data
 
 ---
@@ -3325,6 +3534,11 @@ Use this table to pick the right widget for your use case.
 | **Markdown** | `OiMarkdown` | flutter_markdown directly |
 | **User avatar** | `OiAvatar` | `CircleAvatar` |
 | **Status badge** | `OiBadge` | `Chip` |
+| **Shopping cart** | `OiCartPanel` (full) / `OiMiniCart` (compact) | Custom cart UI |
+| **Product card** | `OiProductCard` | Custom product display |
+| **Order summary** | `OiOrderSummary` | Custom totals layout |
+| **Price display** | `OiPriceTag` | Custom formatted text |
+| **Quantity stepper** | `OiQuantitySelector` | Custom counter |
 | **Empty state** | `OiEmptyState` | Custom empty placeholder |
 | **Loading** | `OiShimmer` / `OiSkeletonGroup` / `OiProgress` | Custom loading |
 | **Copy text** | `OiCopyable` / `OiCopyButton` | Custom clipboard code |
@@ -3396,7 +3610,7 @@ Searchable keyword → widget mapping for quick lookup.
 | `button` | OiButton, OiButtonGroup, OiIconButton, OiToggleButton |
 | `calendar` | OiCalendar, OiDatePicker, OiDateInput |
 | `card` | OiCard, OiDashboardCard, OiFileGridCard |
-| `cart` | OiCartItem, OiCartSummary |
+| `cart` | OiCartItem, OiCartSummary, OiCartPanel, OiMiniCart, OiCartItemRow |
 | `chart` | OiFunnelChart, OiGauge, OiHeatmap, OiRadarChart, OiSankey, OiTreemap |
 | `chat` | OiChat, OiChatMessage, OiTypingIndicator |
 | `checkbox` | OiCheckbox |
@@ -3413,6 +3627,7 @@ Searchable keyword → widget mapping for quick lookup.
 | `context-menu` | OiContextMenu |
 | `copy` | OiCopyButton, OiCopyable, OiFieldDisplay(copyable) |
 | `crud` | OiListView, OiForm, OiDetailView |
+| `coupon` | OiCouponInput, OiCartPanel |
 | `currency` | OiFieldDisplay(currency), OiNumberInput |
 | `dashboard` | OiDashboard, OiMetric |
 | `data` | OiTable, OiDetailView, OiListView, OiFieldDisplay |
@@ -3428,6 +3643,7 @@ Searchable keyword → widget mapping for quick lookup.
 | `editor` | OiRichEditor, OiSmartInput |
 | `email` | OiFieldDisplay(email), OiTextInput |
 | `emoji` | OiEmojiPicker, OiReactionBar |
+| `e-commerce` | OiPriceTag, OiQuantitySelector, OiProductCard, OiCartItemRow, OiCouponInput, OiOrderSummaryLine, OiCartPanel, OiMiniCart, OiOrderSummary |
 | `empty` | OiEmptyState |
 | `explorer` | OiFileExplorer |
 | `export` | OiThemeExporter |
@@ -3476,7 +3692,7 @@ Searchable keyword → widget mapping for quick lookup.
 | `notification` | OiNotificationCenter, OiToast |
 | `number` | OiNumberInput, OiFieldDisplay(number) |
 | `onboarding` | OiTour, OiSpotlight, OiWhatsNew |
-| `order` | OiCartItem, OiCartSummary, OiProductData |
+| `order` | OiCartItem, OiCartSummary, OiProductData, OiOrderSummary, OiOrderSummaryLine |
 | `overlay` | OiDialog, OiToast, OiSheet, OiContextMenu, OiPopover, OiPanel |
 | `pagination` | OiPaginationController, OiTable, OiListView |
 | `panel` | OiPanel, OiResizable, OiSplitPane |
@@ -3487,7 +3703,7 @@ Searchable keyword → widget mapping for quick lookup.
 | `pipeline` | OiPipeline |
 | `popover` | OiPopover |
 | `presence` | OiAvatar(presence), OiCursorPresence, OiLiveRing |
-| `product` | OiProductData, OiProductVariant |
+| `product` | OiProductData, OiProductVariant, OiProductCard |
 | `progress` | OiProgress, OiStepper |
 | `radar` | OiRadarChart |
 | `radio` | OiRadio |
@@ -3505,7 +3721,7 @@ Searchable keyword → widget mapping for quick lookup.
 | `select` | OiSelect, OiComboBox, OiRadio |
 | `settings` | OiSettingsDriver, OiAccordionSettings, etc. |
 | `sheet` | OiSheet |
-| `shop` | OiPriceTag, OiQuantitySelector, OiProductData, OiCartItem, OiCartSummary |
+| `shop` | OiPriceTag, OiQuantitySelector, OiProductData, OiCartItem, OiCartSummary, OiCartPanel, OiMiniCart, OiOrderSummary, OiCartItemRow, OiCouponInput, OiOrderSummaryLine, OiProductCard |
 | `sidebar` | OiSidebar, OiFileSidebar |
 | `skeleton` | OiSkeletonGroup, OiShimmer |
 | `slider` | OiSlider |

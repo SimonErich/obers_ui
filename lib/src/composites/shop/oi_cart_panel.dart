@@ -19,7 +19,7 @@ const IconData _kCartIcon = IconData(0xe8cc, fontFamily: 'MaterialIcons');
 /// A full shopping cart view with item list, optional coupon input, order
 /// summary lines, checkout button, and continue-shopping link.
 ///
-/// Coverage: REQ-0037
+/// Coverage: REQ-0059
 ///
 /// Shows [OiEmptyState] when the cart is empty. Supports shimmer loading on
 /// summary lines. Usable as the content of a side panel, full page, or sheet.

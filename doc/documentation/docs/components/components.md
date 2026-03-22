@@ -316,6 +316,10 @@ OiEditableText(
 |---|---|
 | `OiPriceTag` | Formatted price display with optional compare-at strikethrough and currency symbol |
 | `OiQuantitySelector` | Number stepper with minus/plus buttons for product quantities |
+| `OiCartItemRow` | Cart line item row with thumbnail, quantity selector, price, and remove |
+| `OiCouponInput` | Coupon/promo code input with apply button and success/error states |
+| `OiOrderSummaryLine` | Single summary row (subtotal, discount, shipping, tax, total) |
+| `OiProductCard` | Product display card with image, price, rating, and quick actions |
 
 ### OiPriceTag
 
@@ -379,6 +383,132 @@ OiQuantitySelector(
   onChange: (newValue) => setState(() => _qty = newValue),
 )
 ```
+
+### OiCartItemRow
+
+A single line item row for the shopping cart showing thumbnail, name, variant info, quantity selector, line total, and remove button.
+
+```dart
+OiCartItemRow(
+  item: cartItem,
+  label: 'Widget A × 2',
+  currencyCode: 'EUR',
+  onQuantityChange: (qty) => updateQuantity(cartItem.productKey, qty),
+  onRemove: () => removeItem(cartItem.productKey),
+)
+
+// Compact mode for mini-cart overlays
+OiCartItemRow(
+  item: cartItem,
+  label: 'Widget A × 2',
+  compact: true,
+  currencyCode: 'EUR',
+  onRemove: () => removeItem(cartItem.productKey),
+)
+
+// Read-only mode for order confirmation
+OiCartItemRow(
+  item: cartItem,
+  label: 'Widget A × 2',
+  editable: false,
+  currencyCode: 'EUR',
+)
+```
+
+**Key features:**
+
+- Swipe-to-remove on mobile via `OiSwipeable`
+- Compact mode for dense layouts (mini-cart)
+- Non-editable mode hides quantity selector and remove button
+- Thumbnail placeholder when no image URL provided
+
+### OiCouponInput
+
+Text input with 'Apply' button for discount/coupon codes. Shows inline success or error feedback.
+
+```dart
+// Input mode
+OiCouponInput(
+  label: 'Coupon code',
+  onApply: (code) async {
+    final valid = await api.validateCoupon(code);
+    return OiCouponResult(valid: valid, message: valid ? null : 'Invalid code');
+  },
+  onRemove: () => removeCoupon(),
+  appliedCode: currentCoupon,
+)
+```
+
+**Key features:**
+
+- Empty submit prevented (button disabled)
+- Applied mode shows green check, bold code, and remove button
+- Error messages shown inline in red
+- Loading state on Apply button during validation
+
+### OiOrderSummaryLine
+
+A label + amount row for checkout summaries. Supports bold total styling, discount coloring, shimmer loading, and optional subtitles.
+
+```dart
+// Subtotal line
+OiOrderSummaryLine(label: 'Subtotal', amount: 100.00, currencyCode: 'EUR')
+
+// Discount line (green, negative)
+OiOrderSummaryLine(
+  label: 'Discount',
+  amount: 10.00,
+  currencyCode: 'EUR',
+  negative: true,
+  subtitle: 'SUMMER20',
+)
+
+// Bold total line
+OiOrderSummaryLine(
+  label: 'Total',
+  amount: 114.00,
+  currencyCode: 'EUR',
+  bold: true,
+)
+
+// Loading state
+OiOrderSummaryLine(label: 'Shipping', amount: 0, loading: true)
+```
+
+### OiProductCard
+
+Product display card for grid/list layouts with image, name, price, rating, badges, and quick-action buttons.
+
+```dart
+// Vertical card (for grids)
+OiProductCard(
+  product: productData,
+  label: 'Product name',
+  onTap: () => navigateToProduct(productData.key),
+  onAddToCart: () => addToCart(productData.key),
+)
+
+// Horizontal card (for list views)
+OiProductCard.horizontal(
+  product: productData,
+  label: 'Product name',
+  onTap: () => navigateToProduct(productData.key),
+  onAddToCart: () => addToCart(productData.key),
+  showWishlist: true,
+  onWishlist: () => toggleWishlist(productData.key),
+)
+
+// Skeleton loading
+OiProductCard(product: emptyProduct, label: 'Loading', isLoading: true)
+```
+
+**Key features:**
+
+- Three variants: vertical (grid), horizontal (list), compact (dense)
+- "Sale" badge when `compareAtPrice > price`
+- "Out of Stock" badge when `inStock` is false (disables add-to-cart)
+- Star rating with review count
+- Skeleton loading state via `OiShimmer`
 
 ## Interaction
 

@@ -32,7 +32,7 @@ enum OiMiniCartDisplay {
 /// A compact cart widget: an icon button with badge count that opens a popover
 /// or sheet showing a condensed cart preview.
 ///
-/// Coverage: REQ-0038
+/// Coverage: REQ-0061
 ///
 /// Shows limited items with an overflow indicator, total price, and
 /// 'View Cart' and 'Checkout' buttons. Badge is hidden when the cart is empty.
