@@ -4,12 +4,14 @@ import 'package:obers_ui/obers_ui.dart';
 import 'package:obers_ui_example/apps/project/screens/project_calendar_screen.dart';
 import 'package:obers_ui_example/apps/project/screens/project_gantt_screen.dart';
 import 'package:obers_ui_example/apps/project/screens/project_kanban_screen.dart';
+import 'package:obers_ui_example/apps/project/screens/project_pipeline_screen.dart';
+import 'package:obers_ui_example/apps/project/screens/project_scheduler_screen.dart';
 import 'package:obers_ui_example/apps/project/screens/project_timeline_screen.dart';
 import 'package:obers_ui_example/shell/showcase_shell.dart';
 import 'package:obers_ui_example/theme/theme_state.dart';
 
-/// Project management mini-app showcasing Kanban, Gantt, Calendar, and
-/// Timeline widgets.
+/// Project management mini-app showcasing Kanban, Gantt, Calendar, Timeline,
+/// Pipeline, and Scheduler widgets.
 class ProjectApp extends StatefulWidget {
   const ProjectApp({required this.themeState, super.key});
 
@@ -23,22 +25,12 @@ class _ProjectAppState extends State<ProjectApp> {
   int _selectedTab = 0;
 
   static const _tabs = [
-    OiTabItem(
-      label: 'Kanban',
-      icon: IconData(0xf04b, fontFamily: 'MaterialIcons'),
-    ),
-    OiTabItem(
-      label: 'Gantt',
-      icon: IconData(0xe6e1, fontFamily: 'MaterialIcons'),
-    ),
-    OiTabItem(
-      label: 'Calendar',
-      icon: IconData(0xe614, fontFamily: 'MaterialIcons'),
-    ),
-    OiTabItem(
-      label: 'Timeline',
-      icon: IconData(0xe922, fontFamily: 'MaterialIcons'),
-    ),
+    OiTabItem(label: 'Kanban', icon: OiIcons.viewColumns),
+    OiTabItem(label: 'Gantt', icon: OiIcons.chartBar),
+    OiTabItem(label: 'Calendar', icon: OiIcons.calendarDays),
+    OiTabItem(label: 'Timeline', icon: OiIcons.clock),
+    OiTabItem(label: 'Pipeline', icon: OiIcons.arrowRight),
+    OiTabItem(label: 'Scheduler', icon: OiIcons.calendarDays),
   ];
 
   Widget _buildSelectedScreen() {
@@ -51,6 +43,10 @@ class _ProjectAppState extends State<ProjectApp> {
         return const ProjectCalendarScreen();
       case 3:
         return const ProjectTimelineScreen();
+      case 4:
+        return const ProjectPipelineScreen();
+      case 5:
+        return const ProjectSchedulerScreen();
       default:
         return const ProjectKanbanScreen();
     }

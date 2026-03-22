@@ -1,9 +1,78 @@
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/_internal/oi_input_frame.dart';
+import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/primitives/input/oi_raw_input.dart';
 import 'package:obers_ui/src/primitives/overlay/oi_floating.dart';
 import 'package:obers_ui/src/primitives/scroll/oi_virtual_list.dart';
+
+/// Tracks which [OiSelect] is currently open within a subtree.
+///
+/// When any [OiSelect] opens, it notifies this notifier with its own key so
+/// that sibling selects can close themselves. Wrap a group of selects (or an
+/// entire form) with [OiSelectScope] to enable mutual exclusion.
+///
+/// {@category Components}
+class OiSelectScope extends StatefulWidget {
+  /// Creates an [OiSelectScope].
+  const OiSelectScope({required this.child, super.key});
+
+  /// The widget subtree that shares the select group.
+  final Widget child;
+
+  // Returns the nearest [_OiSelectScopeNotifier] above [context], or null.
+  static _OiSelectScopeNotifier? _of(BuildContext context) {
+    return context
+        .dependOnInheritedWidgetOfExactType<_OiSelectScopeInherited>()
+        ?.notifier;
+  }
+
+  @override
+  State<OiSelectScope> createState() => _OiSelectScopeState();
+}
+
+class _OiSelectScopeState extends State<OiSelectScope> {
+  final _OiSelectScopeNotifier _notifier = _OiSelectScopeNotifier();
+
+  @override
+  void dispose() {
+    _notifier.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return _OiSelectScopeInherited(
+      notifier: _notifier,
+      child: widget.child,
+    );
+  }
+}
+
+class _OiSelectScopeNotifier extends ChangeNotifier {
+  Object? _openKey;
+
+  void requestOpen(Object key) {
+    if (_openKey == key) return;
+    _openKey = key;
+    notifyListeners();
+  }
+
+  void requestClose(Object key) {
+    if (_openKey != key) return;
+    _openKey = null;
+    notifyListeners();
+  }
+
+  bool isOpen(Object key) => _openKey == key;
+}
+
+class _OiSelectScopeInherited extends InheritedNotifier<_OiSelectScopeNotifier> {
+  const _OiSelectScopeInherited({
+    required super.notifier,
+    required super.child,
+  });
+}
 
 /// A single selectable option for [OiSelect].
 ///
@@ -91,6 +160,7 @@ class _OiSelectState<T> extends State<OiSelect<T>> {
   String _query = '';
   late TextEditingController _searchCtrl;
   late FocusNode _searchFocus;
+  _OiSelectScopeNotifier? _scope;
 
   @override
   void initState() {
@@ -100,7 +170,25 @@ class _OiSelectState<T> extends State<OiSelect<T>> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final newScope = OiSelectScope._of(context);
+    if (newScope != _scope) {
+      _scope?.removeListener(_onScopeChanged);
+      _scope = newScope;
+      _scope?.addListener(_onScopeChanged);
+    }
+  }
+
+  void _onScopeChanged() {
+    if (_open && !(_scope?.isOpen(widget.key ?? this) ?? true)) {
+      setState(() => _open = false);
+    }
+  }
+
+  @override
   void dispose() {
+    _scope?.removeListener(_onScopeChanged);
     _searchCtrl.dispose();
     _searchFocus.dispose();
     super.dispose();
@@ -118,6 +206,7 @@ class _OiSelectState<T> extends State<OiSelect<T>> {
     if (!widget.enabled) return;
     _query = '';
     _searchCtrl.clear();
+    _scope?.requestOpen(widget.key ?? this);
     setState(() => _open = true);
     if (widget.searchable) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -126,7 +215,10 @@ class _OiSelectState<T> extends State<OiSelect<T>> {
     }
   }
 
-  void _close() => setState(() => _open = false);
+  void _close() {
+    _scope?.requestClose(widget.key ?? this);
+    setState(() => _open = false);
+  }
 
   void _select(OiSelectOption<T> option) {
     if (!option.enabled) return;
@@ -234,7 +326,7 @@ class _OiSelectState<T> extends State<OiSelect<T>> {
     final hasValue = label != null;
 
     final chevron = Icon(
-      const IconData(0xe5c5, fontFamily: 'MaterialIcons'),
+      OiIcons.arrowDown,
       size: 16,
       color: colors.textMuted,
     );
@@ -264,6 +356,7 @@ class _OiSelectState<T> extends State<OiSelect<T>> {
     return OiFloating(
       visible: _open,
       bottomSheetOnCompact: widget.bottomSheetOnCompact,
+      onDismiss: _close,
       anchor: anchor,
       child: _buildDropdown(context),
     );

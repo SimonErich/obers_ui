@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/inputs/oi_select.dart';
+import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/persistence/oi_settings_driver.dart';
 import 'package:obers_ui/src/foundation/persistence/oi_settings_mixin.dart';
 import 'package:obers_ui/src/foundation/persistence/oi_settings_provider.dart';
@@ -356,7 +357,7 @@ class _FilterChip extends StatelessWidget {
                 onTap: onRemove,
                 behavior: HitTestBehavior.opaque,
                 child: Icon(
-                  const IconData(0xe5cd, fontFamily: 'MaterialIcons'),
+                  OiIcons.xMark,
                   size: 14,
                   color: textColor,
                 ),

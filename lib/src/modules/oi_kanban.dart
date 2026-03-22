@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/oi_responsive.dart';
 import 'package:obers_ui/src/foundation/persistence/oi_settings_driver.dart';
 import 'package:obers_ui/src/foundation/persistence/oi_settings_mixin.dart';
@@ -313,7 +314,7 @@ class _OiKanbanState<T> extends State<OiKanban<T>>
                       }
                     : null,
                 child: Icon(
-                  const IconData(0xe5cb, fontFamily: 'MaterialIcons'),
+                  OiIcons.chevronLeft,
                   size: 20,
                   color: _compactPageIndex > 0 ? colors.text : colors.textMuted,
                 ),
@@ -345,7 +346,7 @@ class _OiKanbanState<T> extends State<OiKanban<T>>
                       }
                     : null,
                 child: Icon(
-                  const IconData(0xe5cc, fontFamily: 'MaterialIcons'),
+                  OiIcons.chevronRight,
                   size: 20,
                   color: _compactPageIndex < totalColumns - 1
                       ? colors.text
@@ -482,8 +483,8 @@ class _OiKanbanState<T> extends State<OiKanban<T>>
                 const SizedBox(width: 4),
                 Icon(
                   collapsed
-                      ? const IconData(0xe5cf, fontFamily: 'MaterialIcons')
-                      : const IconData(0xe5ce, fontFamily: 'MaterialIcons'),
+                      ? OiIcons.chevronDown
+                      : OiIcons.chevronUp,
                   size: 16,
                   color: colors.textMuted,
                 ),
@@ -566,7 +567,7 @@ class _OiKanbanState<T> extends State<OiKanban<T>>
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Icon(
-                const IconData(0xe145, fontFamily: 'MaterialIcons'),
+                OiIcons.plus,
                 size: 16,
                 color: colors.textMuted,
               ),

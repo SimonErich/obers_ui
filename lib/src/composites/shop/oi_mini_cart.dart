@@ -6,6 +6,7 @@ import 'package:obers_ui/src/components/display/oi_popover.dart';
 import 'package:obers_ui/src/components/overlays/oi_sheet.dart';
 import 'package:obers_ui/src/components/shop/oi_cart_item_row.dart';
 import 'package:obers_ui/src/components/shop/oi_price_tag.dart';
+import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/oi_responsive.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/models/oi_cart_item.dart';
@@ -16,7 +17,7 @@ import 'package:obers_ui/src/primitives/layout/oi_column.dart';
 import 'package:obers_ui/src/primitives/layout/oi_row.dart';
 
 // Material Icons codepoints.
-const IconData _kCartIcon = IconData(0xe8cc, fontFamily: 'MaterialIcons');
+const IconData _kCartIcon = OiIcons.shoppingCart;
 
 /// How the [OiMiniCart] displays its content overlay.
 ///

@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_spacing_scale.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/primitives/gesture/oi_long_press_menu.dart';
@@ -309,7 +310,7 @@ class _OiChatState extends State<OiChat> {
                         child: Padding(
                           padding: EdgeInsets.only(right: spacing.xs),
                           child: Icon(
-                            const IconData(0xe226, fontFamily: 'MaterialIcons'),
+                            OiIcons.envelope,
                             size: 22,
                             color: colors.textSubtle,
                           ),
@@ -341,7 +342,7 @@ class _OiChatState extends State<OiChat> {
                           shape: BoxShape.circle,
                         ),
                         child: Icon(
-                          const IconData(0xe571, fontFamily: 'MaterialIcons'),
+                          OiIcons.paperClip,
                           size: 20,
                           color: colors.textOnPrimary,
                         ),
@@ -615,7 +616,7 @@ class _OiChatState extends State<OiChat> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(
-              const IconData(0xe226, fontFamily: 'MaterialIcons'),
+              OiIcons.envelope,
               size: 14,
               color: ownMessage ? colors.textOnPrimary : colors.textSubtle,
             ),

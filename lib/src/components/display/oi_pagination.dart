@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/buttons/oi_button.dart';
 import 'package:obers_ui/src/components/inputs/oi_select.dart';
+import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_color_scheme.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/primitives/display/oi_icon.dart';
@@ -277,7 +278,7 @@ class _OiPaginationState extends State<OiPagination> {
               if (widget.showFirstLast)
                 _buildNavButton(
                   key: const Key('oi_pagination_first'),
-                  icon: const IconData(0xe5dc, fontFamily: 'MaterialIcons'),
+                  icon: OiIcons.chevronDoubleLeft,
                   label: 'First page',
                   enabled: _hasPrev,
                   onTap: () => widget.onPageChange?.call(0),
@@ -285,7 +286,7 @@ class _OiPaginationState extends State<OiPagination> {
                 ),
               _buildNavButton(
                 key: const Key('oi_pagination_prev'),
-                icon: const IconData(0xe5cb, fontFamily: 'MaterialIcons'),
+                icon: OiIcons.chevronLeft,
                 label: 'Previous page',
                 enabled: _hasPrev,
                 onTap: () => widget.onPageChange?.call(_clampedPage - 1),
@@ -302,7 +303,7 @@ class _OiPaginationState extends State<OiPagination> {
                   _buildPageButton(visiblePages[i]!, colors),
               _buildNavButton(
                 key: const Key('oi_pagination_next'),
-                icon: const IconData(0xe5cc, fontFamily: 'MaterialIcons'),
+                icon: OiIcons.chevronRight,
                 label: 'Next page',
                 enabled: _hasNext,
                 onTap: () => widget.onPageChange?.call(_clampedPage + 1),
@@ -311,7 +312,7 @@ class _OiPaginationState extends State<OiPagination> {
               if (widget.showFirstLast)
                 _buildNavButton(
                   key: const Key('oi_pagination_last'),
-                  icon: const IconData(0xe5dd, fontFamily: 'MaterialIcons'),
+                  icon: OiIcons.chevronDoubleRight,
                   label: 'Last page',
                   enabled: _hasNext,
                   onTap: () => widget.onPageChange?.call(_totalPages - 1),
@@ -342,7 +343,7 @@ class _OiPaginationState extends State<OiPagination> {
               if (widget.showFirstLast)
                 _buildNavButton(
                   key: const Key('oi_pagination_first'),
-                  icon: const IconData(0xe5dc, fontFamily: 'MaterialIcons'),
+                  icon: OiIcons.chevronDoubleLeft,
                   label: 'First page',
                   enabled: _hasPrev,
                   onTap: () => widget.onPageChange?.call(0),
@@ -350,7 +351,7 @@ class _OiPaginationState extends State<OiPagination> {
                 ),
               _buildNavButton(
                 key: const Key('oi_pagination_prev'),
-                icon: const IconData(0xe5cb, fontFamily: 'MaterialIcons'),
+                icon: OiIcons.chevronLeft,
                 label: 'Previous page',
                 enabled: _hasPrev,
                 onTap: () => widget.onPageChange?.call(_clampedPage - 1),
@@ -365,7 +366,7 @@ class _OiPaginationState extends State<OiPagination> {
               ),
               _buildNavButton(
                 key: const Key('oi_pagination_next'),
-                icon: const IconData(0xe5cc, fontFamily: 'MaterialIcons'),
+                icon: OiIcons.chevronRight,
                 label: 'Next page',
                 enabled: _hasNext,
                 onTap: () => widget.onPageChange?.call(_clampedPage + 1),
@@ -374,7 +375,7 @@ class _OiPaginationState extends State<OiPagination> {
               if (widget.showFirstLast)
                 _buildNavButton(
                   key: const Key('oi_pagination_last'),
-                  icon: const IconData(0xe5dd, fontFamily: 'MaterialIcons'),
+                  icon: OiIcons.chevronDoubleRight,
                   label: 'Last page',
                   enabled: _hasNext,
                   onTap: () => widget.onPageChange?.call(_totalPages - 1),

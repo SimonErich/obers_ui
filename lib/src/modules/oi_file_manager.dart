@@ -4,6 +4,7 @@ import 'package:obers_ui/src/components/display/oi_empty_state.dart';
 import 'package:obers_ui/src/components/display/oi_file_grid_card.dart';
 import 'package:obers_ui/src/components/display/oi_file_tile.dart';
 import 'package:obers_ui/src/components/inputs/oi_text_input.dart';
+import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/oi_search_debounce.dart';
 import 'package:obers_ui/src/foundation/persistence/oi_settings_driver.dart';
 import 'package:obers_ui/src/foundation/persistence/oi_settings_mixin.dart';
@@ -319,15 +320,12 @@ class _OiFileManagerState extends State<OiFileManager>
           Expanded(
             child: items.isEmpty
                 ? OiEmptyState(
-                    icon: const IconData(0xe2c7, fontFamily: 'MaterialIcons'),
+                    icon: OiIcons.folder,
                     title: 'This folder is empty',
                     action: widget.onUpload != null
                         ? OiButton.primary(
                             label: 'Upload files',
-                            icon: const IconData(
-                              0xe9e4,
-                              fontFamily: 'MaterialIcons',
-                            ),
+                            icon: OiIcons.cloudArrowUp,
                             onTap: () => widget.onUpload?.call(const []),
                           )
                         : null,

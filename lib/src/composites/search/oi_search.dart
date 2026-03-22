@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/primitives/input/oi_raw_input.dart';
 
@@ -395,7 +396,7 @@ class _OiSearchState extends State<OiSearch> {
                 leading: Padding(
                   padding: const EdgeInsets.only(right: 8),
                   child: Icon(
-                    const IconData(0xe8b6, fontFamily: 'MaterialIcons'),
+                    OiIcons.magnifyingGlass,
                     size: 20,
                     color: colors.textMuted,
                   ),
@@ -458,7 +459,7 @@ class _OiSearchState extends State<OiSearch> {
         return _buildCategorySection(
           context,
           'Recent',
-          const IconData(0xe889, fontFamily: 'MaterialIcons'),
+          OiIcons.clock,
           _recentItems,
           allResults,
         );

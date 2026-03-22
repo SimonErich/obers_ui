@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/inputs/oi_date_input.dart';
 import 'package:obers_ui/src/components/inputs/oi_time_input.dart';
+import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/primitives/display/oi_label.dart';
 
@@ -160,7 +161,7 @@ class _OiDateTimeInputState extends State<OiDateTimeInput> {
             Row(
               children: [
                 Icon(
-                  const IconData(0xe000, fontFamily: 'MaterialIcons'),
+                  OiIcons.exclamationCircle,
                   size: 14,
                   color: colors.error.base,
                 ),

@@ -7,6 +7,7 @@ import 'package:obers_ui/src/components/feedback/oi_bulk_bar.dart';
 import 'package:obers_ui/src/components/panels/oi_resizable.dart';
 import 'package:obers_ui/src/composites/data/oi_pagination_controller.dart';
 import 'package:obers_ui/src/composites/data/oi_table_controller.dart';
+import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/persistence/oi_settings_driver.dart';
 import 'package:obers_ui/src/foundation/persistence/oi_settings_mixin.dart';
 import 'package:obers_ui/src/foundation/persistence/oi_settings_provider.dart';
@@ -922,10 +923,10 @@ class _OiTableState<T> extends State<OiTable<T>>
   }
 
   /// Arrow-up icon for ascending sort indicator.
-  static const _arrowUp = IconData(0xe5c7, fontFamily: 'MaterialIcons');
+  static const _arrowUp = OiIcons.arrowUp;
 
   /// Arrow-down icon for descending sort indicator.
-  static const _arrowDown = IconData(0xe5c5, fontFamily: 'MaterialIcons');
+  static const _arrowDown = OiIcons.arrowDown;
 
   Widget _buildColumnHeader(OiTableColumn<T> col) {
     final isSorted = _ctrl.sortColumnId == col.id;
@@ -979,8 +980,11 @@ class _OiTableState<T> extends State<OiTable<T>>
   }
 
   Widget _buildFilterInput(OiTableColumn<T> col) {
+    final filterWidth = _ctrl.columnWidths[col.id] ?? col.width;
+    final resolvedFilterWidth =
+        filterWidth ?? col.minWidth.clamp(col.minWidth, col.maxWidth);
     return SizedBox(
-      width: _ctrl.columnWidths[col.id] ?? col.width ?? 120,
+      width: resolvedFilterWidth,
       height: 28,
       child: _FilterField(
         key: ValueKey('filter_${col.id}'),

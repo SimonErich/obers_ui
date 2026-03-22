@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/buttons/oi_button.dart';
+import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/oi_responsive.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/primitives/display/oi_label.dart';
@@ -48,7 +49,7 @@ class OiErrorPage extends StatelessWidget {
       description:
           description ?? 'The page you are looking for does not exist.',
       errorCode: '404',
-      icon: const IconData(0xe894, fontFamily: 'MaterialIcons'), // search_off
+      icon: OiIcons.magnifyingGlass, // search_off
       actionLabel: actionLabel,
       onAction: onAction,
     );
@@ -70,7 +71,7 @@ class OiErrorPage extends StatelessWidget {
       description:
           description ?? 'You do not have permission to view this page.',
       errorCode: '403',
-      icon: const IconData(0xe897, fontFamily: 'MaterialIcons'), // lock
+      icon: OiIcons.lockClosed, // lock
       actionLabel: actionLabel,
       onAction: onAction,
     );
@@ -91,7 +92,7 @@ class OiErrorPage extends StatelessWidget {
       label: label ?? 'Something went wrong',
       description: description ?? 'An unexpected error occurred on the server.',
       errorCode: '500',
-      icon: const IconData(0xe002, fontFamily: 'MaterialIcons'), // error
+      icon: OiIcons.exclamationCircle, // error
       actionLabel: actionLabel,
       onAction: onAction,
     );

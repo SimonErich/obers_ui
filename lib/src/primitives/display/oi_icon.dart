@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/src/foundation/icons/oi_icon_data.dart';
 import 'package:obers_ui/src/foundation/theme/oi_text_theme.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 
@@ -39,7 +40,7 @@ class OiIcon extends StatelessWidget {
        _decorative = true;
 
   /// The icon glyph to render.
-  final IconData icon;
+  final OiIconData icon;
 
   /// The accessibility label announced by screen readers.
   ///

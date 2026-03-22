@@ -22,6 +22,7 @@ class _FilesAppState extends State<FilesApp> {
   late OiFileExplorerController _controller;
   late List<OiFileNodeData> _localFileTree;
   int _idCounter = 1000;
+  OiOverlayHandle? _sheetHandle;
 
   @override
   void initState() {
@@ -33,6 +34,7 @@ class _FilesAppState extends State<FilesApp> {
 
   @override
   void dispose() {
+    _sheetHandle?.dismiss();
     _controller.dispose();
     super.dispose();
   }
@@ -61,8 +63,9 @@ class _FilesAppState extends State<FilesApp> {
         label: folder.name,
         data: folder,
         children: _buildFolderTreeFromLocal(folder.id.toString()),
-        leaf: !_localFileTree
-            .any((f) => f.parentId == folder.id.toString() && f.isFolder),
+        leaf: !_localFileTree.any(
+          (f) => f.parentId == folder.id.toString() && f.isFolder,
+        ),
       );
     }).toList();
   }
@@ -132,6 +135,125 @@ class _FilesAppState extends State<FilesApp> {
     });
   }
 
+  // ── File preview builder ────────────────────────────────────────────────
+
+  Widget _buildFilePreview(OiFileNodeData file) {
+    final mime = file.mimeType ?? '';
+    if (mime.startsWith('image/')) {
+      return Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(OiIcons.photo, size: 48),
+            const SizedBox(height: 8),
+            OiLabel.body('Image preview: ${file.name}'),
+          ],
+        ),
+      );
+    }
+    if (file.name.endsWith('.md') || mime == 'text/markdown') {
+      return const Padding(
+        padding: EdgeInsets.all(16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(OiIcons.documentText, size: 48),
+            SizedBox(height: 8),
+            OiLabel.body('Markdown preview'),
+          ],
+        ),
+      );
+    }
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          OiLabel.caption(file.name),
+          if (file.size != null) ...[
+            const SizedBox(height: 4),
+            OiLabel.caption(_formatFileSize(file.size!)),
+          ],
+        ],
+      ),
+    );
+  }
+
+  // ── On preview (open sheet from right) ──────────────────────────────────
+
+  void _onPreview(OiFileNodeData file) {
+    _sheetHandle?.dismiss();
+    _sheetHandle = OiSheet.show(
+      context,
+      label: 'File preview: ${file.name}',
+      side: OiPanelSide.right,
+      size: 360,
+      child: _buildPreviewSheetContent(file),
+      onClose: () {
+        _sheetHandle?.dismiss();
+        _sheetHandle = null;
+      },
+    );
+  }
+
+  Widget _buildPreviewSheetContent(OiFileNodeData file) {
+    return Padding(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          OiLabel.h3(file.name),
+          const SizedBox(height: 16),
+          _buildFilePreview(file),
+          const SizedBox(height: 16),
+          if (file.mimeType != null) OiLabel.caption('Type: ${file.mimeType}'),
+          if (file.size != null) ...[
+            const SizedBox(height: 4),
+            OiLabel.caption('Size: ${_formatFileSize(file.size!)}'),
+          ],
+          if (file.modified != null) ...[
+            const SizedBox(height: 4),
+            OiLabel.caption(
+              'Modified: ${file.modified!.year}-'
+              '${file.modified!.month.toString().padLeft(2, '0')}-'
+              '${file.modified!.day.toString().padLeft(2, '0')}',
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  // ── Custom context menu items ───────────────────────────────────────────
+
+  List<OiMenuItem> _buildCustomContextMenuItems(OiFileNodeData file) {
+    final mime = file.mimeType ?? '';
+    if (mime.startsWith('image/')) {
+      return [
+        OiMenuItem(
+          label: 'Annotate',
+          icon: OiIcons.pencilSquare,
+          onTap: () {
+            OiToast.show(context, message: 'Annotate: ${file.name}');
+          },
+        ),
+      ];
+    }
+    return [];
+  }
+
+  // ── Helpers ─────────────────────────────────────────────────────────────
+
+  static String _formatFileSize(int bytes) {
+    if (bytes < 1024) return '$bytes B';
+    if (bytes < 1024 * 1024) return '${(bytes / 1024).toStringAsFixed(1)} KB';
+    if (bytes < 1024 * 1024 * 1024) {
+      return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
+    }
+    return '${(bytes / (1024 * 1024 * 1024)).toStringAsFixed(1)} GB';
+  }
+
   @override
   Widget build(BuildContext context) {
     return ShowcaseShell(
@@ -147,6 +269,9 @@ class _FilesAppState extends State<FilesApp> {
         onDelete: _onDelete,
         onMove: _onMove,
         onUpload: _onUpload,
+        onPreview: _onPreview,
+        filePreviewBuilder: _buildFilePreview,
+        customContextMenuItems: _buildCustomContextMenuItems,
         storage: OiStorageData(
           usedBytes: (kStorageUsed * 1024 * 1024 * 1024).round(),
           totalBytes: (kStorageTotal * 1024 * 1024 * 1024).round(),

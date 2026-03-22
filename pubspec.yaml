@@ -20,6 +20,12 @@ dependencies:
   shared_preferences: ^2.3.0
   web: ^1.1.1
 
+flutter:
+  fonts:
+    - family: HeroiconsSolid
+      fonts:
+        - asset: lib/src/foundation/icons/heroicons_solid.ttf
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

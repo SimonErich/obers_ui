@@ -4,6 +4,9 @@ import 'package:obers_ui/obers_ui.dart';
 import 'package:obers_ui_example/apps/cms/screens/cms_article_edit_screen.dart';
 import 'package:obers_ui_example/apps/cms/screens/cms_article_show_screen.dart';
 import 'package:obers_ui_example/apps/cms/screens/cms_articles_screen.dart';
+import 'package:obers_ui_example/apps/cms/screens/cms_categories_screen.dart';
+import 'package:obers_ui_example/apps/cms/screens/cms_media_screen.dart';
+import 'package:obers_ui_example/apps/cms/screens/cms_settings_screen.dart';
 import 'package:obers_ui_example/data/mock_cms.dart';
 import 'package:obers_ui_example/theme/theme_state.dart';
 
@@ -56,40 +59,15 @@ class _CmsAppState extends State<CmsApp> {
         }
         return CmsArticlesScreen(onArticleTap: _navigateToArticle);
       case 'categories':
+        return const CmsCategoriesScreen();
       case 'media':
+        return const CmsMediaScreen();
       case 'settings':
-        return _buildPlaceholder(_currentRoute);
+        return const CmsSettingsScreen();
       case 'articles':
       default:
         return CmsArticlesScreen(onArticleTap: _navigateToArticle);
     }
-  }
-
-  Widget _buildPlaceholder(String section) {
-    final colors = context.colors;
-    final spacing = context.spacing;
-
-    return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            const IconData(0xe86c, fontFamily: 'MaterialIcons'),
-            size: 48,
-            color: colors.textMuted,
-          ),
-          SizedBox(height: spacing.md),
-          OiLabel.h4(
-            '${section[0].toUpperCase()}${section.substring(1)}',
-          ),
-          SizedBox(height: spacing.xs),
-          OiLabel.body(
-            'This section is a placeholder for the showcase.',
-            color: colors.textSubtle,
-          ),
-        ],
-      ),
-    );
   }
 
   @override
@@ -107,25 +85,25 @@ class _CmsAppState extends State<CmsApp> {
       navigation: const [
         OiNavItem(
           label: 'Articles',
-          icon: IconData(0xe261, fontFamily: 'MaterialIcons'),
+          icon: OiIcons.newspaper,
           route: 'articles',
           section: 'Content',
         ),
         OiNavItem(
           label: 'Categories',
-          icon: IconData(0xe574, fontFamily: 'MaterialIcons'),
+          icon: OiIcons.tag,
           route: 'categories',
           section: 'Content',
         ),
         OiNavItem(
           label: 'Media',
-          icon: IconData(0xe332, fontFamily: 'MaterialIcons'),
+          icon: OiIcons.photo,
           route: 'media',
           section: 'Content',
         ),
         OiNavItem(
           label: 'Settings',
-          icon: IconData(0xe8b8, fontFamily: 'MaterialIcons'),
+          icon: OiIcons.cog,
           route: 'settings',
           section: 'System',
         ),
@@ -134,11 +112,7 @@ class _CmsAppState extends State<CmsApp> {
         OiTappable(
           semanticLabel: 'Go back to showcase',
           onTap: () => Navigator.of(context).pop(),
-          child: Icon(
-            OiIcons.chevronLeft,
-            size: 20,
-            color: colors.text,
-          ),
+          child: Icon(OiIcons.chevronLeft, size: 20, color: colors.text),
         ),
         OiThemeToggle(
           currentMode: widget.themeState.value,

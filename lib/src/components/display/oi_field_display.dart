@@ -6,6 +6,7 @@ import 'package:obers_ui/src/components/display/oi_badge.dart';
 import 'package:obers_ui/src/components/display/oi_code_block.dart';
 import 'package:obers_ui/src/components/display/oi_image.dart';
 import 'package:obers_ui/src/components/display/oi_tooltip.dart';
+import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/models/oi_field_type.dart';
 import 'package:obers_ui/src/primitives/clipboard/oi_copyable.dart';
@@ -437,10 +438,7 @@ class OiFieldDisplay extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           OiIcon.decorative(
-            icon: const IconData(
-              0xe15b,
-              fontFamily: 'MaterialIcons',
-            ), // remove (dash)
+            icon: OiIcons.minusCircle, // remove (dash)
             color: colors.textMuted,
             size: 18,
           ),
@@ -463,8 +461,8 @@ class OiFieldDisplay extends StatelessWidget {
       children: [
         OiIcon.decorative(
           icon: boolValue
-              ? const IconData(0xf00c, fontFamily: 'MaterialIcons') // check
-              : const IconData(0xe16a, fontFamily: 'MaterialIcons'), // close
+              ? OiIcons.check // check
+              : OiIcons.arrowUturnLeft, // close
           color: boolValue ? colors.success.base : colors.error.base,
           size: 18,
         ),
@@ -480,7 +478,7 @@ class OiFieldDisplay extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         OiIcon.decorative(
-          icon: const IconData(0xe22a, fontFamily: 'MaterialIcons'), // mail
+          icon: OiIcons.envelope, // mail
           color: colors.textMuted,
           size: 16,
         ),
@@ -505,7 +503,7 @@ class OiFieldDisplay extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         OiIcon.decorative(
-          icon: const IconData(0xe157, fontFamily: 'MaterialIcons'), // link
+          icon: OiIcons.link, // link
           color: colors.textMuted,
           size: 16,
         ),
@@ -530,7 +528,7 @@ class OiFieldDisplay extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         OiIcon.decorative(
-          icon: const IconData(0xe4a2, fontFamily: 'MaterialIcons'), // phone
+          icon: OiIcons.phone, // phone
           color: colors.textMuted,
           size: 16,
         ),
@@ -561,10 +559,7 @@ class OiFieldDisplay extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         OiIcon.decorative(
-          icon: const IconData(
-            0xe873,
-            fontFamily: 'MaterialIcons',
-          ), // insert_drive_file
+          icon: OiIcons.squares2x2, // insert_drive_file
           color: colors.textMuted,
           size: 16,
         ),

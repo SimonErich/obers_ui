@@ -2,6 +2,7 @@
 // ignore_for_file: public_member_api_docs
 
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_decoration_theme.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/primitives/display/oi_label.dart';
@@ -87,7 +88,7 @@ class OiInputFrame extends StatelessWidget {
             children: [
               // REQ-0025: error icon so color is never the sole indicator.
               Icon(
-                const IconData(0xe000, fontFamily: 'MaterialIcons'), // error
+                OiIcons.exclamationCircle, // error
                 size: 14,
                 color: colors.error.base,
               ),

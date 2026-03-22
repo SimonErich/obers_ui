@@ -115,6 +115,131 @@ void main() {
     expect(find.byType(OiFloating), findsOneWidget);
   });
 
+  // ── 9. flip: bottomStart near bottom edge flips above anchor ─────────────
+
+  testWidgets(
+      'overflow=flip: bottomStart near bottom edge positions child above anchor',
+      (tester) async {
+    // 400×200 screen with anchor at the very bottom (y=160, h=40 → bottom=200).
+    // A 100-tall child would overflow → should flip to above the anchor.
+    await tester.pumpObers(
+      const Align(
+        alignment: Alignment.bottomLeft,
+        child: OiFloating(
+          anchor: SizedBox(width: 80, height: 40),
+          visible: true,
+          child: SizedBox(width: 100, height: 100),
+        ),
+      ),
+      surfaceSize: const Size(400, 200),
+    );
+    await tester.pumpAndSettle();
+
+    final anchorTop =
+        tester.getTopLeft(find.byType(OiFloating)).dy;
+    final childBottom =
+        tester.getBottomLeft(find.byWidget(
+          tester.widget(
+            find.byType(SizedBox).last,
+          ),
+        )).dy;
+    // Child should end at or before the anchor's top edge.
+    expect(childBottom, lessThanOrEqualTo(anchorTop + 1));
+  });
+
+  // ── 10. flip: bottomEnd near bottom-right corner clamps to screen ─────────
+
+  testWidgets(
+      'overflow=flip: bottomEnd near bottom-right corner stays within screen',
+      (tester) async {
+    await tester.pumpObers(
+      const Align(
+        alignment: Alignment.bottomRight,
+        child: OiFloating(
+          anchor: SizedBox(width: 60, height: 40),
+          visible: true,
+          alignment: OiFloatingAlignment.bottomEnd,
+          child: SizedBox(width: 200, height: 150),
+        ),
+      ),
+      surfaceSize: const Size(300, 300),
+    );
+    await tester.pumpAndSettle();
+
+    final childRect = tester.getRect(
+      find.byType(SizedBox).last,
+    );
+    expect(childRect.right, lessThanOrEqualTo(300));
+    expect(childRect.bottom, lessThanOrEqualTo(300));
+    expect(childRect.left, greaterThanOrEqualTo(0));
+    expect(childRect.top, greaterThanOrEqualTo(0));
+  });
+
+  // ── 11. shift mode keeps child within bounds on the same side ─────────────
+
+  testWidgets('overflow=shift: child stays within screen bounds', (
+    tester,
+  ) async {
+    await tester.pumpObers(
+      const Align(
+        alignment: Alignment.bottomRight,
+        child: OiFloating(
+          anchor: SizedBox(width: 60, height: 40),
+          visible: true,
+          alignment: OiFloatingAlignment.bottomEnd,
+          overflow: OiFloatingOverflow.shift,
+          child: SizedBox(width: 200, height: 80),
+        ),
+      ),
+      surfaceSize: const Size(300, 300),
+    );
+    await tester.pumpAndSettle();
+
+    final childRect = tester.getRect(find.byType(SizedBox).last);
+    expect(childRect.right, lessThanOrEqualTo(300));
+    expect(childRect.left, greaterThanOrEqualTo(0));
+  });
+
+  // ── 12. overflow=none does not constrain the position ─────────────────────
+
+  testWidgets('overflow=none (autoFlip=false): widget renders without error',
+      (tester) async {
+    await tester.pumpObers(
+      const OiFloating(
+        anchor: SizedBox(width: 80, height: 40),
+        visible: true,
+        autoFlip: false,
+        child: SizedBox(width: 200, height: 150),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(find.byType(OiFloating), findsOneWidget);
+  });
+
+  // ── 13. screenPadding keeps child away from edges ─────────────────────────
+
+  testWidgets('screenPadding is respected: child stays within padded bounds',
+      (tester) async {
+    await tester.pumpObers(
+      const Align(
+        alignment: Alignment.bottomRight,
+        child: OiFloating(
+          anchor: SizedBox(width: 60, height: 40),
+          visible: true,
+          alignment: OiFloatingAlignment.bottomEnd,
+          screenPadding: EdgeInsets.all(16),
+          child: SizedBox(width: 200, height: 80),
+        ),
+      ),
+      surfaceSize: const Size(300, 300),
+    );
+    await tester.pumpAndSettle();
+
+    final childRect = tester.getRect(find.byType(SizedBox).last);
+    expect(childRect.right, lessThanOrEqualTo(300 - 16));
+    expect(childRect.left, greaterThanOrEqualTo(16));
+  });
+
   // ── 8. toggling visible shows/hides floating content ──────────────────────
 
   testWidgets('toggling visible shows and hides floating content',

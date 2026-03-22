@@ -128,6 +128,22 @@ List<OiKanbanColumn<MockTask>> buildKanbanColumns() {
           labels: ['pricing', 'seasonal'],
           dueDate: now.add(const Duration(days: 2)),
         ),
+        MockTask(
+          id: 'task-14',
+          title: 'Integrate payment gateway for Wiener Melange orders',
+          assignee: kLiesl,
+          priority: 'high',
+          labels: ['development', 'payments'],
+          dueDate: now.add(const Duration(days: 4)),
+        ),
+        MockTask(
+          id: 'task-15',
+          title: 'Optimize Alpine product image CDN delivery',
+          assignee: kElisabeth,
+          priority: 'medium',
+          labels: ['performance', 'infrastructure'],
+          dueDate: now.add(const Duration(days: 6)),
+        ),
       ],
     ),
 

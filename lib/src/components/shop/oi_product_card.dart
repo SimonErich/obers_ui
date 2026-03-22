@@ -5,6 +5,7 @@ import 'package:obers_ui/src/components/display/oi_card.dart';
 import 'package:obers_ui/src/components/display/oi_image.dart';
 import 'package:obers_ui/src/components/feedback/oi_star_rating.dart';
 import 'package:obers_ui/src/components/shop/oi_price_tag.dart';
+import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/oi_responsive.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/models/oi_product_data.dart';
@@ -15,9 +16,9 @@ import 'package:obers_ui/src/primitives/layout/oi_column.dart';
 import 'package:obers_ui/src/primitives/layout/oi_row.dart';
 
 // Material Icons codepoints.
-const IconData _kCartIcon = IconData(0xe8cc, fontFamily: 'MaterialIcons');
-const IconData _kWishlistIcon = IconData(0xe87e, fontFamily: 'MaterialIcons');
-const IconData _kImageIcon = IconData(0xe3f4, fontFamily: 'MaterialIcons');
+const IconData _kCartIcon = OiIcons.shoppingCart;
+const IconData _kWishlistIcon = OiIcons.heart;
+const IconData _kImageIcon = OiIcons.photo;
 
 /// The layout variant for an [OiProductCard].
 ///

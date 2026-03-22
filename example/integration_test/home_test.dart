@@ -32,8 +32,20 @@ void main() {
     expect(find.text('Products'), findsOneWidget);
   });
 
-  testWidgets('navigating to Shop and going back returns to home',
-      (tester) async {
+  testWidgets('tapping Admin card navigates to admin screen', (tester) async {
+    await tester.pumpWidget(const ShowcaseApp());
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Admin'));
+    await tester.pumpAndSettle();
+
+    // The admin overview screen shows dashboard metrics.
+    expect(find.text('Revenue'), findsOneWidget);
+  });
+
+  testWidgets('navigating to Shop and going back returns to home', (
+    tester,
+  ) async {
     await tester.pumpWidget(const ShowcaseApp());
     await tester.pumpAndSettle();
 

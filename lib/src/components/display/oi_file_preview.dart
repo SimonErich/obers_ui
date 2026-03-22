@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/display/oi_file_icon.dart';
+import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/models/oi_file_node_data.dart';
 
@@ -136,7 +137,7 @@ class OiFilePreview extends StatelessWidget {
                 borderRadius: BorderRadius.circular(16),
               ),
               child: const Icon(
-                IconData(0xe037, fontFamily: 'MaterialIcons'), // play_arrow
+                OiIcons.play, // play_arrow
                 color: Color(0xFFFFFFFF),
                 size: 20,
               ),

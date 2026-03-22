@@ -215,6 +215,7 @@ export 'src/composites/workflow/oi_state_diagram.dart';
 
 export 'src/foundation/oi_accessibility.dart';
 export 'src/foundation/oi_app.dart';
+export 'src/foundation/icons/oi_icon_data.dart';
 export 'src/foundation/oi_icons.dart';
 export 'src/foundation/oi_input_modality.dart';
 export 'src/foundation/oi_overlays.dart';

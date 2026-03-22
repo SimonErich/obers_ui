@@ -4,6 +4,7 @@ import 'package:obers_ui/src/components/display/oi_folder_tree_item.dart';
 import 'package:obers_ui/src/components/display/oi_storage_indicator.dart';
 import 'package:obers_ui/src/components/overlays/oi_context_menu.dart';
 import 'package:obers_ui/src/composites/data/oi_tree.dart';
+import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_color_scheme.dart';
 import 'package:obers_ui/src/foundation/theme/oi_spacing_scale.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
@@ -337,28 +338,19 @@ class _OiFileSidebarState extends State<OiFileSidebar> {
                               if (widget.onNewFolder != null)
                                 OiMenuItem(
                                   label: 'New subfolder',
-                                  icon: const IconData(
-                                    0xe2cc,
-                                    fontFamily: 'MaterialIcons',
-                                  ),
+                                  icon: OiIcons.folderOpen,
                                   onTap: () => widget.onNewFolder!(folder),
                                 ),
                               if (widget.onRenameFolder != null)
                                 OiMenuItem(
                                   label: 'Rename',
-                                  icon: const IconData(
-                                    0xe3c9,
-                                    fontFamily: 'MaterialIcons',
-                                  ),
+                                  icon: OiIcons.pencil,
                                   onTap: () => widget.onRenameFolder!(folder),
                                 ),
                               if (widget.onDeleteFolder != null)
                                 OiMenuItem(
                                   label: 'Delete',
-                                  icon: const IconData(
-                                    0xe872,
-                                    fontFamily: 'MaterialIcons',
-                                  ),
+                                  icon: OiIcons.trash,
                                   onTap: () => widget.onDeleteFolder!(folder),
                                 ),
                             ],
@@ -541,7 +533,7 @@ class _FavoriteRow extends StatelessWidget {
           child: Row(
             children: [
               Icon(
-                const IconData(0xe838, fontFamily: 'MaterialIcons'),
+                OiIcons.star,
                 size: 14,
                 color: colors.warning.base,
               ),

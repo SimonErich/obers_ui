@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/_internal/oi_input_frame.dart';
+import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/primitives/animation/oi_shimmer.dart';
 import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
@@ -283,7 +284,7 @@ class _OiTagInputState extends State<OiTagInput> {
             OiTappable(
               onTap: () => _removeTag(index),
               child: Icon(
-                const IconData(0xe5cd, fontFamily: 'MaterialIcons'),
+                OiIcons.xMark,
                 size: 14,
                 color: colors.primary.base,
               ),

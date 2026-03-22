@@ -23,7 +23,20 @@ class AuthApp extends StatelessWidget {
         child: OiAuthPage(
           label: 'Alpenglueck authentication',
           logo: const Center(child: OiLabel.h2('Alpenglueck')),
-          footer: const Center(child: OiLabel.small(kDemoHint)),
+          footer: Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const OiLabel.small(kDemoHint),
+                const SizedBox(height: 8),
+                OiLabel.small(
+                  'Password strength: '
+                  '"Your password is weaker than a decaffeinated Melange"',
+                  color: context.colors.warning.base,
+                ),
+              ],
+            ),
+          ),
           onLogin: (email, password) async {
             await Future<void>.delayed(const Duration(milliseconds: 600));
             final success =

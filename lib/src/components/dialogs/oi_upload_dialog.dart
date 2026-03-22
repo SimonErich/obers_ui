@@ -3,6 +3,7 @@ import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/buttons/oi_button.dart';
 import 'package:obers_ui/src/components/display/oi_file_icon.dart';
 import 'package:obers_ui/src/components/inputs/oi_select.dart';
+import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_color_scheme.dart';
 import 'package:obers_ui/src/foundation/theme/oi_spacing_scale.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
@@ -186,10 +187,7 @@ class _OiUploadDialogState extends State<OiUploadDialog> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Icon(
-                          const IconData(
-                            0xe9e4,
-                            fontFamily: 'MaterialIcons',
-                          ), // upload
+                          OiIcons.cloudArrowUp, // upload
                           size: 28,
                           color: colors.textMuted,
                         ),
@@ -337,7 +335,7 @@ class _OiUploadDialogState extends State<OiUploadDialog> {
           GestureDetector(
             onTap: () => _removeEntry(index),
             child: Icon(
-              const IconData(0xe5cd, fontFamily: 'MaterialIcons'), // close
+              OiIcons.xMark, // close
               size: 14,
               color: colors.textMuted,
             ),

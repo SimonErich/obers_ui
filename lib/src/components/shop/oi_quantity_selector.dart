@@ -2,6 +2,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/buttons/oi_button.dart';
 import 'package:obers_ui/src/components/buttons/oi_icon_button.dart';
+import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/oi_responsive.dart';
 import 'package:obers_ui/src/foundation/theme/oi_decoration_theme.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
@@ -10,8 +11,8 @@ import 'package:obers_ui/src/primitives/display/oi_surface.dart';
 import 'package:obers_ui/src/primitives/layout/oi_row.dart';
 
 // Material Icons codepoints.
-const IconData _kRemoveIcon = IconData(0xe15b, fontFamily: 'MaterialIcons');
-const IconData _kAddIcon = IconData(0xe145, fontFamily: 'MaterialIcons');
+const IconData _kRemoveIcon = OiIcons.minusCircle;
+const IconData _kAddIcon = OiIcons.plus;
 
 /// A compact, touch-friendly number stepper for product quantities.
 ///

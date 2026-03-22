@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/inputs/oi_text_input.dart';
+import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
 
@@ -190,7 +191,7 @@ class _OiMetadataEditorState extends State<OiMetadataEditor> {
               child: Padding(
                 padding: const EdgeInsets.only(top: 8),
                 child: Icon(
-                  const IconData(0xe5cd, fontFamily: 'MaterialIcons'),
+                  OiIcons.xMark,
                   size: 18,
                   color: colors.error.base,
                 ),
@@ -270,7 +271,7 @@ class _OiMetadataEditorState extends State<OiMetadataEditor> {
                   ),
                   child: boolValue
                       ? Icon(
-                          const IconData(0xe5ca, fontFamily: 'MaterialIcons'),
+                          OiIcons.check,
                           size: 14,
                           color: colors.primary.foreground,
                         )
@@ -327,7 +328,7 @@ class _OiMetadataEditorState extends State<OiMetadataEditor> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Icon(
-                const IconData(0xe145, fontFamily: 'MaterialIcons'),
+                OiIcons.plus,
                 size: 16,
                 color: colors.textMuted,
               ),

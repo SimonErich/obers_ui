@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
 
@@ -248,7 +249,7 @@ class _OiDatePickerState extends State<OiDatePicker> {
                   child: Padding(
                     padding: const EdgeInsets.all(8),
                     child: Icon(
-                      const IconData(0xe5cb, fontFamily: 'MaterialIcons'),
+                      OiIcons.chevronLeft,
                       size: 20,
                       color: colors.textMuted,
                     ),
@@ -271,7 +272,7 @@ class _OiDatePickerState extends State<OiDatePicker> {
                   child: Padding(
                     padding: const EdgeInsets.all(8),
                     child: Icon(
-                      const IconData(0xe5cc, fontFamily: 'MaterialIcons'),
+                      OiIcons.chevronRight,
                       size: 20,
                       color: colors.textMuted,
                     ),

@@ -49,14 +49,23 @@ List<OiCalendarEvent> buildCalendarEvents() {
       end: today.add(const Duration(days: 3, hours: 16)),
       color: const Color(0xFFEC407A),
     ),
-    // Company outing — in 5 days, all day
+    // Company outing Rax — in 5 days, all day
     OiCalendarEvent(
       key: 'cal-6',
-      title: 'Betriebsausflug Wachau',
+      title: 'Betriebsausflug Rax',
       start: today.add(const Duration(days: 5)),
       end: today.add(const Duration(days: 5, hours: 23, minutes: 59)),
       allDay: true,
       color: const Color(0xFF66BB6A),
+    ),
+    // Josephitag — March 19 (Austrian saint's day)
+    OiCalendarEvent(
+      key: 'cal-josephitag',
+      title: 'Josephitag',
+      start: DateTime(2026, 3, 19),
+      end: DateTime(2026, 3, 19, 23, 59),
+      allDay: true,
+      color: const Color(0xFFEF5350),
     ),
     // Supplier meeting — in 4 days
     OiCalendarEvent(
@@ -90,6 +99,81 @@ List<OiCalendarEvent> buildCalendarEvents() {
       start: today.subtract(const Duration(hours: 10)),
       end: today.subtract(const Duration(hours: 9)),
       color: const Color(0xFF26A69A),
+    ),
+  ];
+}
+
+// ── Scheduler slots ─────────────────────────────────────────────────────────
+
+/// Builds team schedule slots for the OiScheduler.
+List<OiScheduleSlot> buildScheduleSlots() {
+  final now = DateTime.now();
+  final today = DateTime(now.year, now.month, now.day);
+
+  return [
+    // Stefan — morning dev session
+    OiScheduleSlot(
+      key: 'sched-1',
+      title: 'Stefan: Backend Sprint',
+      start: today.add(const Duration(hours: 9)),
+      end: today.add(const Duration(hours: 12)),
+      color: const Color(0xFF42A5F5),
+    ),
+    // Maria — design review
+    OiScheduleSlot(
+      key: 'sched-2',
+      title: 'Maria: Design Review',
+      start: today.add(const Duration(hours: 10)),
+      end: today.add(const Duration(hours: 11, minutes: 30)),
+      color: const Color(0xFFAB47BC),
+    ),
+    // Liesl — code review block
+    OiScheduleSlot(
+      key: 'sched-3',
+      title: 'Liesl: Code Reviews',
+      start: today.add(const Duration(hours: 13)),
+      end: today.add(const Duration(hours: 15)),
+      color: const Color(0xFF66BB6A),
+    ),
+    // Franz — marketing sync
+    OiScheduleSlot(
+      key: 'sched-4',
+      title: 'Franz: Marketing Sync',
+      start: today.add(const Duration(hours: 14)),
+      end: today.add(const Duration(hours: 15)),
+      color: const Color(0xFFFFA726),
+    ),
+    // All-hands — afternoon
+    OiScheduleSlot(
+      key: 'sched-5',
+      title: 'All-Hands Standup',
+      start: today.add(const Duration(hours: 16)),
+      end: today.add(const Duration(hours: 16, minutes: 30)),
+      color: const Color(0xFFEF5350),
+    ),
+    // Tomorrow — Stefan planning
+    OiScheduleSlot(
+      key: 'sched-6',
+      title: 'Stefan: Sprint Planning',
+      start: today.add(const Duration(days: 1, hours: 9)),
+      end: today.add(const Duration(days: 1, hours: 10, minutes: 30)),
+      color: const Color(0xFF42A5F5),
+    ),
+    // Tomorrow — Maria user testing
+    OiScheduleSlot(
+      key: 'sched-7',
+      title: 'Maria: User Testing',
+      start: today.add(const Duration(days: 1, hours: 13)),
+      end: today.add(const Duration(days: 1, hours: 15)),
+      color: const Color(0xFFAB47BC),
+    ),
+    // Day after tomorrow — Liesl pairing
+    OiScheduleSlot(
+      key: 'sched-8',
+      title: 'Liesl: Pair Programming',
+      start: today.add(const Duration(days: 2, hours: 10)),
+      end: today.add(const Duration(days: 2, hours: 12)),
+      color: const Color(0xFF66BB6A),
     ),
   ];
 }
@@ -183,7 +267,7 @@ List<OiTimelineEvent> buildTimelineEvents() {
       description:
           'Q1 Relaunch project started. Team assembled, goals defined, '
           'and initial roadmap approved by Leopold.',
-      icon: IconData(0xe037, fontFamily: 'MaterialIcons'), // flag
+      icon: OiIcons.flag,
       color: Color(0xFF42A5F5),
     ),
     OiTimelineEvent(
@@ -192,7 +276,7 @@ List<OiTimelineEvent> buildTimelineEvents() {
       description:
           'All product requirements finalized. 42 user stories created '
           'covering the full Alpenglueck shop relaunch scope.',
-      icon: IconData(0xe876, fontFamily: 'MaterialIcons'), // check_circle
+      icon: OiIcons.checkCircle,
       color: Color(0xFF66BB6A),
     ),
     OiTimelineEvent(
@@ -201,7 +285,7 @@ List<OiTimelineEvent> buildTimelineEvents() {
       description:
           'Maria presented the new Alpine-inspired design system. '
           'Stakeholder feedback incorporated, all screens approved.',
-      icon: IconData(0xe40a, fontFamily: 'MaterialIcons'), // palette
+      icon: OiIcons.paintBrush,
       color: Color(0xFFAB47BC),
     ),
     OiTimelineEvent(
@@ -210,7 +294,7 @@ List<OiTimelineEvent> buildTimelineEvents() {
       description:
           'Core API endpoints live on staging. Product catalog, orders, '
           'and user authentication fully functional.',
-      icon: IconData(0xe871, fontFamily: 'MaterialIcons'), // cloud_done
+      icon: OiIcons.cloud,
       color: Color(0xFFFFA726),
     ),
     OiTimelineEvent(
@@ -219,7 +303,7 @@ List<OiTimelineEvent> buildTimelineEvents() {
       description:
           'First beta build deployed for internal testing. '
           'Schnitzel-themed onboarding flow getting great feedback from the team.',
-      icon: IconData(0xe8e5, fontFamily: 'MaterialIcons'), // trending_up
+      icon: OiIcons.arrowTrendingUp,
       color: Color(0xFF26A69A),
     ),
   ];

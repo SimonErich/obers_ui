@@ -11,10 +11,79 @@ import 'package:obers_ui_example/apps/shop/shop_app.dart';
 import 'package:obers_ui_example/theme/theme_state.dart';
 
 /// Home screen showing a grid of showcase category cards.
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({required this.themeState, super.key});
 
   final ThemeState themeState;
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  OiOverlayHandle? _dialogHandle;
+
+  @override
+  void dispose() {
+    _dialogHandle?.dismiss();
+    super.dispose();
+  }
+
+  void _showWhatsNew() {
+    _dialogHandle?.dismiss();
+    _dialogHandle = OiDialog.show(
+      context,
+      label: "What's New",
+      dialog: OiDialog.standard(
+        label: "What's New",
+        title: "What's New",
+        content: OiWhatsNew(
+          items: const [
+            OiWhatsNewItem(
+              title: 'Kanban Board',
+              description:
+                  'Drag and drop cards between columns with smooth '
+                  'animations and keyboard support.',
+              icon: OiIcons.viewColumns,
+              version: 'v1.2.0',
+            ),
+            OiWhatsNewItem(
+              title: 'Product Gallery',
+              description:
+                  'Multi-image gallery with zoom, thumbnails, '
+                  'and swipe navigation.',
+              icon: OiIcons.photo,
+              version: 'v1.2.0',
+            ),
+            OiWhatsNewItem(
+              title: 'CMS Categories',
+              description:
+                  'Hierarchical tree management for organizing '
+                  'articles and content.',
+              icon: OiIcons.newspaper,
+              version: 'v1.1.0',
+            ),
+            OiWhatsNewItem(
+              title: 'File Explorer Preview',
+              description:
+                  'Right-panel file preview with mime-type detection '
+                  'and custom context menus.',
+              icon: OiIcons.folder,
+              version: 'v1.2.0',
+            ),
+          ],
+          onDismiss: () {
+            _dialogHandle?.dismiss();
+            _dialogHandle = null;
+          },
+        ),
+        onClose: () {
+          _dialogHandle?.dismiss();
+          _dialogHandle = null;
+        },
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +97,16 @@ class HomeScreen extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(height: spacing.lg),
-          OiLabel.h1('obers_ui Showcase'),
+          Row(
+            children: [
+              const Expanded(child: OiLabel.h1('obers_ui Showcase')),
+              OiButton.ghost(
+                label: "What's New",
+                icon: OiIcons.sparkles,
+                onTap: _showWhatsNew,
+              ),
+            ],
+          ),
           SizedBox(height: spacing.xs),
           OiLabel.body(
             'Explore every widget through interactive mini-applications.',
@@ -47,7 +125,7 @@ class HomeScreen extends StatelessWidget {
             children: _categories.map((cat) {
               return _CategoryCard(
                 category: cat,
-                themeState: themeState,
+                themeState: widget.themeState,
               );
             }).toList(),
           ),
@@ -85,43 +163,43 @@ final _categories = [
   _Category(
     title: 'Shop',
     description: 'Browse products, manage your cart, and complete checkout.',
-    icon: const IconData(0xe8cc, fontFamily: 'MaterialIcons'), // shopping_cart
+    icon: OiIcons.shoppingCart,
     builder: (ts) => ShopApp(themeState: ts),
   ),
   _Category(
     title: 'Chat',
     description: 'Team messaging with channels, reactions, and auto-replies.',
-    icon: const IconData(0xe0ca, fontFamily: 'MaterialIcons'), // chat_bubble
+    icon: OiIcons.chatBubbleLeft,
     builder: (ts) => ChatApp(themeState: ts),
   ),
   _Category(
     title: 'Admin',
     description: 'Dashboard analytics, user management, and settings.',
-    icon: const IconData(0xe871, fontFamily: 'MaterialIcons'), // dashboard
+    icon: OiIcons.chartBar,
     builder: (ts) => AdminApp(themeState: ts),
   ),
   _Category(
     title: 'Projects',
     description: 'Kanban boards, Gantt charts, calendars, and timelines.',
-    icon: const IconData(0xf04b, fontFamily: 'MaterialIcons'), // view_kanban
+    icon: OiIcons.viewColumns,
     builder: (ts) => ProjectApp(themeState: ts),
   ),
   _Category(
     title: 'Files',
     description: 'File explorer with folders, search, and drag-and-drop.',
-    icon: const IconData(0xe2c7, fontFamily: 'MaterialIcons'), // folder
+    icon: OiIcons.folder,
     builder: (ts) => FilesApp(themeState: ts),
   ),
   _Category(
     title: 'Content',
     description: 'CMS with articles, rich editor, and threaded comments.',
-    icon: const IconData(0xe261, fontFamily: 'MaterialIcons'), // article
+    icon: OiIcons.newspaper,
     builder: (ts) => CmsApp(themeState: ts),
   ),
   _Category(
     title: 'Auth',
     description: 'Login, registration, and password reset flows.',
-    icon: const IconData(0xe899, fontFamily: 'MaterialIcons'), // lock
+    icon: OiIcons.lockClosed,
     builder: (ts) => AuthApp(themeState: ts),
   ),
 ];
@@ -129,10 +207,7 @@ final _categories = [
 // ── Category card ───────────────────────────────────────────────────────────
 
 class _CategoryCard extends StatelessWidget {
-  const _CategoryCard({
-    required this.category,
-    required this.themeState,
-  });
+  const _CategoryCard({required this.category, required this.themeState});
 
   final _Category category;
   final ThemeState themeState;
@@ -152,8 +227,8 @@ class _CategoryCard extends StatelessWidget {
                 category.builder(themeState),
             transitionsBuilder:
                 (context, animation, secondaryAnimation, child) {
-              return FadeTransition(opacity: animation, child: child);
-            },
+                  return FadeTransition(opacity: animation, child: child);
+                },
           ),
         );
       },
@@ -185,10 +260,7 @@ class _CategoryCard extends StatelessWidget {
             SizedBox(height: spacing.md),
             OiLabel.h4(category.title),
             SizedBox(height: spacing.xs),
-            OiLabel.body(
-              category.description,
-              color: colors.textSubtle,
-            ),
+            OiLabel.body(category.description, color: colors.textSubtle),
           ],
         ),
       ),

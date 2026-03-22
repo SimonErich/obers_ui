@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_decoration_theme.dart';
 import 'package:obers_ui/src/foundation/theme/oi_effects_theme.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
@@ -6,7 +7,7 @@ import 'package:obers_ui/src/primitives/display/oi_surface.dart';
 import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
 
 // Chevron icon codepoint from Material Icons (expand_more).
-const _kChevronIcon = IconData(0xe5cf, fontFamily: 'MaterialIcons');
+const _kChevronIcon = OiIcons.chevronDown;
 
 // Key for the horizontal separator between body and footer.
 const _kCardDividerKey = Key('_oi_card_divider');

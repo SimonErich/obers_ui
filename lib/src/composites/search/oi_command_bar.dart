@@ -1,5 +1,6 @@
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/primitives/input/oi_raw_input.dart';
 
@@ -430,7 +431,7 @@ class _OiCommandBarState extends State<OiCommandBar> {
                       leading: Padding(
                         padding: const EdgeInsets.only(right: 8),
                         child: Icon(
-                          const IconData(0xe5c5, fontFamily: 'MaterialIcons'),
+                          OiIcons.arrowDown,
                           size: 16,
                           color: colors.textMuted,
                         ),
@@ -575,7 +576,7 @@ class _OiCommandBarState extends State<OiCommandBar> {
               Padding(
                 padding: const EdgeInsets.only(left: 8),
                 child: Icon(
-                  const IconData(0xe5cc, fontFamily: 'MaterialIcons'),
+                  OiIcons.chevronRight,
                   size: 14,
                   color: colors.textMuted,
                 ),

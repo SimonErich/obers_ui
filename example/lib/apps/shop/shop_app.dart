@@ -6,6 +6,7 @@ import 'package:obers_ui_example/apps/shop/shop_cart_screen.dart';
 import 'package:obers_ui_example/apps/shop/shop_checkout_screen.dart';
 import 'package:obers_ui_example/apps/shop/shop_order_confirm_screen.dart';
 import 'package:obers_ui_example/apps/shop/shop_product_screen.dart';
+import 'package:obers_ui_example/apps/shop/shop_wishlist_screen.dart';
 import 'package:obers_ui_example/data/mock_shop.dart';
 import 'package:obers_ui_example/shell/showcase_shell.dart';
 import 'package:obers_ui_example/theme/theme_state.dart';
@@ -17,6 +18,7 @@ enum _ShopScreen {
   cart,
   checkout,
   orderConfirm,
+  wishlist,
 }
 
 /// Root widget for the Shop showcase mini-app.
@@ -38,6 +40,9 @@ class _ShopAppState extends State<ShopApp> {
   // ignore: use_late_for_private_fields_and_variables
   OiProductData? _selectedProduct;
   OiOrderData? _confirmedOrder;
+
+  // Wishlist state
+  final Set<Object> _wishlisted = {};
 
   // Coupon state
   String? _appliedCouponCode;
@@ -211,6 +216,8 @@ class _ShopAppState extends State<ShopApp> {
           onAddToCart: _addToCart,
           onViewCart: () => _goTo(_ShopScreen.cart),
           onCheckout: () => _goTo(_ShopScreen.checkout),
+          wishlistCount: _wishlisted.length,
+          onViewWishlist: () => _goTo(_ShopScreen.wishlist),
         );
 
       case _ShopScreen.product:
@@ -218,6 +225,17 @@ class _ShopAppState extends State<ShopApp> {
           product: _selectedProduct!,
           onAddToCart: _addCartItem,
           onBack: () => _goTo(_ShopScreen.browse),
+          isWishlisted: _wishlisted.contains(_selectedProduct!.key),
+          onWishlistToggle: () {
+            setState(() {
+              final key = _selectedProduct!.key;
+              if (_wishlisted.contains(key)) {
+                _wishlisted.remove(key);
+              } else {
+                _wishlisted.add(key);
+              }
+            });
+          },
         );
 
       case _ShopScreen.cart:
@@ -254,6 +272,24 @@ class _ShopAppState extends State<ShopApp> {
               _currentScreen = _ShopScreen.browse;
             });
           },
+        );
+
+      case _ShopScreen.wishlist:
+        return ShopWishlistScreen(
+          wishlistedKeys: _wishlisted,
+          products: kProducts,
+          onRemoveFromWishlist: (key) {
+            setState(() {
+              _wishlisted.remove(key);
+            });
+          },
+          onSelectProduct: (product) {
+            setState(() {
+              _selectedProduct = product;
+              _currentScreen = _ShopScreen.product;
+            });
+          },
+          onBack: () => _goTo(_ShopScreen.browse),
         );
     }
   }

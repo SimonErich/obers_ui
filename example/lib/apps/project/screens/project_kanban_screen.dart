@@ -58,6 +58,37 @@ class _ProjectKanbanScreenState extends State<ProjectKanbanScreen> {
     });
   }
 
+  void _moveTaskToColumn(MockTask task, String targetColumnKey) {
+    // Find which column the task is currently in.
+    String? sourceKey;
+    for (final col in _columns) {
+      if (col.items.contains(task)) {
+        sourceKey = col.key as String;
+        break;
+      }
+    }
+    if (sourceKey == null || sourceKey == targetColumnKey) return;
+
+    _onCardMove(task, sourceKey, targetColumnKey, 0);
+  }
+
+  void _deleteTask(MockTask task) {
+    setState(() {
+      _columns = _columns.map((col) {
+        if (col.items.contains(task)) {
+          final updated = List<MockTask>.from(col.items)..remove(task);
+          return OiKanbanColumn<MockTask>(
+            key: col.key,
+            title: col.title,
+            color: col.color,
+            items: updated,
+          );
+        }
+        return col;
+      }).toList();
+    });
+  }
+
   static const _priorityColors = {
     'low': OiBadgeColor.info,
     'medium': OiBadgeColor.warning,
@@ -65,64 +96,118 @@ class _ProjectKanbanScreenState extends State<ProjectKanbanScreen> {
     'critical': OiBadgeColor.error,
   };
 
+  List<OiMenuItem> _buildContextMenuItems(MockTask task) {
+    return [
+      OiMenuItem(
+        label: 'Edit',
+        icon: OiIcons.pencilSquare,
+        onTap: () {
+          OiToast.show(
+            context,
+            message: 'Editing: ${task.title}',
+            level: OiToastLevel.info,
+          );
+        },
+      ),
+      const OiMenuItem(label: '', separator: true),
+      OiMenuItem(
+        label: 'Move to Backlog',
+        icon: OiIcons.arrowUturnLeft,
+        onTap: () => _moveTaskToColumn(task, 'backlog'),
+      ),
+      OiMenuItem(
+        label: 'Move to To Do',
+        icon: OiIcons.arrowRight,
+        onTap: () => _moveTaskToColumn(task, 'todo'),
+      ),
+      OiMenuItem(
+        label: 'Move to In Progress',
+        icon: OiIcons.arrowRight,
+        onTap: () => _moveTaskToColumn(task, 'in-progress'),
+      ),
+      OiMenuItem(
+        label: 'Move to Review',
+        icon: OiIcons.arrowRight,
+        onTap: () => _moveTaskToColumn(task, 'review'),
+      ),
+      OiMenuItem(
+        label: 'Move to Done',
+        icon: OiIcons.checkCircle,
+        onTap: () => _moveTaskToColumn(task, 'done'),
+      ),
+      const OiMenuItem(label: '', separator: true),
+      OiMenuItem(
+        label: 'Delete',
+        icon: OiIcons.trash,
+        onTap: () => _deleteTask(task),
+      ),
+    ];
+  }
+
   Widget _buildCard(MockTask task) {
     return Builder(
       builder: (context) {
         final colors = context.colors;
         final spacing = context.spacing;
 
-        return Container(
-          width: double.infinity,
-          padding: EdgeInsets.all(spacing.sm),
-          decoration: BoxDecoration(
-            color: colors.surface,
-            borderRadius: BorderRadius.circular(6),
-            border: Border.all(color: colors.borderSubtle),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Task title
-              OiLabel.body(
-                task.title,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
-              SizedBox(height: spacing.xs),
-              // Bottom row: assignee avatar + priority badge
-              Row(
-                children: [
-                  if (task.assignee != null) ...[
-                    Container(
-                      width: 24,
-                      height: 24,
-                      decoration: BoxDecoration(
-                        color: colors.primary.muted,
-                        shape: BoxShape.circle,
-                      ),
-                      child: Center(
-                        child: Text(
-                          task.assignee!.initials,
-                          style: TextStyle(
-                            fontSize: 10,
-                            fontWeight: FontWeight.w600,
-                            color: colors.primary.base,
+        return OiContextMenu(
+          label: 'Task actions for ${task.title}',
+          items: _buildContextMenuItems(task),
+          child: Container(
+            width: double.infinity,
+            padding: EdgeInsets.all(spacing.sm),
+            decoration: BoxDecoration(
+              color: colors.surface,
+              borderRadius: BorderRadius.circular(6),
+              border: Border.all(color: colors.borderSubtle),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Task title
+                OiLabel.body(
+                  task.title,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                SizedBox(height: spacing.xs),
+                // Bottom row: assignee avatar + priority badge
+                Row(
+                  children: [
+                    if (task.assignee != null) ...[
+                      Container(
+                        width: 24,
+                        height: 24,
+                        decoration: BoxDecoration(
+                          color: colors.primary.muted,
+                          shape: BoxShape.circle,
+                        ),
+                        child: Center(
+                          child: Text(
+                            task.assignee!.initials,
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w600,
+                              color: colors.primary.base,
+                            ),
                           ),
                         ),
                       ),
+                      SizedBox(width: spacing.xs),
+                    ],
+                    const Spacer(),
+                    OiBadge.soft(
+                      label: task.priority,
+                      color:
+                          _priorityColors[task.priority] ??
+                          OiBadgeColor.neutral,
+                      size: OiBadgeSize.small,
                     ),
-                    SizedBox(width: spacing.xs),
                   ],
-                  const Spacer(),
-                  OiBadge.soft(
-                    label: task.priority,
-                    color: _priorityColors[task.priority] ?? OiBadgeColor.neutral,
-                    size: OiBadgeSize.small,
-                  ),
-                ],
-              ),
-            ],
+                ),
+              ],
+            ),
           ),
         );
       },

@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 
 /// The visual style of an [OiProgress] indicator.
@@ -253,10 +254,7 @@ class _OiProgressState extends State<OiProgress>
                 child: isActive
                     ? Center(
                         child: Icon(
-                          const IconData(
-                            0xe5ca,
-                            fontFamily: 'MaterialIcons',
-                          ), // check
+                          OiIcons.check, // check
                           size: dotSize * 0.7,
                           color: colors.textOnPrimary,
                         ),

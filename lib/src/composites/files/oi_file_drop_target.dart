@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/display/oi_drop_highlight.dart';
+import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/models/oi_file_node_data.dart';
 import 'package:obers_ui/src/modules/oi_chat.dart';
 import 'package:obers_ui/src/primitives/drag_drop/oi_drop_zone.dart';
@@ -65,7 +66,7 @@ class _OiFileDropTargetState extends State<OiFileDropTarget> {
         return OiDropHighlight(
           active: _isDragOver,
           message: widget.dropMessage ?? 'Drop files here',
-          icon: const IconData(0xe9e4, fontFamily: 'MaterialIcons'), // upload
+          icon: OiIcons.cloudArrowUp, // upload
           child: widget.child,
         );
       },

@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/inputs/oi_text_input.dart';
 import 'package:obers_ui/src/components/navigation/oi_breadcrumbs.dart';
+import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/primitives/animation/oi_morph.dart';
 
@@ -164,7 +165,7 @@ class _OiPathBarState extends State<OiPathBar> {
             Padding(
               padding: const EdgeInsets.only(right: 4),
               child: Icon(
-                const IconData(0xe2c7, fontFamily: 'MaterialIcons'), // folder
+                OiIcons.folder, // folder
                 size: 16,
                 color: (colors as dynamic).textSubtle as Color,
               ),

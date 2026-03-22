@@ -24,7 +24,7 @@ void main() {
     );
   });
 
-  testWidgets('tapping article shows detail', (tester) async {
+  testWidgets('tapping article shows detail with comments', (tester) async {
     await tester.pumpWidget(const ShowcaseApp());
     await tester.pumpAndSettle();
 
@@ -38,9 +38,31 @@ void main() {
     await tester.pumpAndSettle();
 
     // Verify article detail renders (the article content or title is visible).
-    expect(
-      find.textContaining('Schnitzel'),
-      findsWidgets,
+    expect(find.textContaining('Schnitzel'), findsWidgets);
+
+    // Verify comments section is present by checking for a comment author name.
+    expect(find.textContaining('Maximilian'), findsWidgets);
+  });
+
+  testWidgets('tapping edit navigates to edit screen', (tester) async {
+    await tester.pumpWidget(const ShowcaseApp());
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Content'));
+    await tester.pumpAndSettle();
+
+    // Tap on the first article to open detail.
+    await tester.tap(
+      find.text('The Art of the Perfect Schnitzel: A Scientific Approach'),
     );
+    await tester.pumpAndSettle();
+
+    // Tap the edit button (semanticLabel: 'Edit article').
+    await tester.tap(find.bySemanticsLabel('Edit article'));
+    await tester.pumpAndSettle();
+
+    // Verify the edit screen renders with form fields.
+    expect(find.text('Edit Article'), findsOneWidget);
+    expect(find.text('Article Details'), findsOneWidget);
   });
 }

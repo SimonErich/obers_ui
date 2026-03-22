@@ -31,6 +31,12 @@ class ShopOrderConfirmScreen extends StatelessWidget {
                 'Thank you for your order. Your order number is '
                 '${order.orderNumber}.',
               ),
+              OiOrderSummary(
+                summary: order.summary,
+                label: 'Order summary',
+                items: order.items,
+                expandedByDefault: true,
+              ),
               OiOrderTracker(
                 currentStatus: order.status,
                 label: 'Order status tracker',

@@ -68,59 +68,72 @@ class OiMetric extends StatelessWidget {
         trendArrow = '→';
     }
 
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Primary value.
-        Text(
-          value,
-          style: TextStyle(
-            fontSize: 32,
-            fontWeight: FontWeight.w700,
-            color: colors.text,
-            height: 1.1,
-          ),
-        ),
-        const SizedBox(height: 4),
-        // Label.
-        Text(label, style: TextStyle(fontSize: 14, color: colors.textMuted)),
-        if (subValue != null) ...[
-          const SizedBox(height: 2),
-          Text(
-            subValue!,
-            style: TextStyle(fontSize: 12, color: colors.textSubtle),
-          ),
-        ],
-        if (trend != null) ...[
-          const SizedBox(height: 6),
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                trendArrow,
-                style: TextStyle(
-                  fontSize: 14,
-                  color: trendColor,
-                  fontWeight: FontWeight.w600,
-                ),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final hasHeight = constraints.hasBoundedHeight;
+
+        final content = Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Primary value.
+            Text(
+              value,
+              style: TextStyle(
+                fontSize: 32,
+                fontWeight: FontWeight.w700,
+                color: colors.text,
+                height: 1.1,
               ),
-              if (trendPercent != null) ...[
-                const SizedBox(width: 4),
-                Text(
-                  '${trendPercent!.abs().toStringAsFixed(1)}%',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: trendColor,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
+            ),
+            const SizedBox(height: 4),
+            // Label.
+            Text(
+              label,
+              style: TextStyle(fontSize: 14, color: colors.textMuted),
+            ),
+            if (subValue != null) ...[
+              const SizedBox(height: 2),
+              Text(
+                subValue!,
+                style: TextStyle(fontSize: 12, color: colors.textSubtle),
+              ),
             ],
-          ),
-        ],
-        if (sparkline != null) ...[const SizedBox(height: 8), sparkline!],
-      ],
+            if (trend != null) ...[
+              const SizedBox(height: 6),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    trendArrow,
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: trendColor,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  if (trendPercent != null) ...[
+                    const SizedBox(width: 4),
+                    Text(
+                      '${trendPercent!.abs().toStringAsFixed(1)}%',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: trendColor,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ],
+            if (sparkline != null) ...[const SizedBox(height: 8), sparkline!],
+          ],
+        );
+
+        if (!hasHeight) return content;
+
+        return ClipRect(child: content);
+      },
     );
   }
 }

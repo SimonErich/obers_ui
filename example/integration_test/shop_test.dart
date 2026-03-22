@@ -37,7 +37,26 @@ void main() {
     expect(find.text('Back to Products'), findsOneWidget);
   });
 
-  testWidgets('add to cart and verify cart has items', (tester) async {
+  testWidgets('add to cart shows toast confirmation', (tester) async {
+    await tester.pumpWidget(const ShowcaseApp());
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Shop'));
+    await tester.pumpAndSettle();
+
+    // Tap on the Original Sacher-Torte product card.
+    await tester.tap(find.text('Original Sacher-Torte'));
+    await tester.pumpAndSettle();
+
+    // Tap "Add to Cart" button.
+    await tester.tap(find.text('Add to Cart'));
+    await tester.pumpAndSettle();
+
+    // Verify the success toast appears.
+    expect(find.textContaining('added to cart'), findsOneWidget);
+  });
+
+  testWidgets('add to cart and navigate to cart screen', (tester) async {
     await tester.pumpWidget(const ShowcaseApp());
     await tester.pumpAndSettle();
 
@@ -56,18 +75,21 @@ void main() {
     await tester.tap(find.text('Back to Products'));
     await tester.pumpAndSettle();
 
-    // The mini cart should be visible. Tap "View Cart" to navigate to cart.
-    // First we need to open the mini cart dropdown by tapping the cart icon.
+    // Tap the mini cart icon to open the cart dropdown.
+    final cartButton = find.bySemanticsLabel('Shopping cart');
+    if (cartButton.evaluate().isNotEmpty) {
+      await tester.tap(cartButton);
+      await tester.pumpAndSettle();
+    }
+
+    // Tap "View Cart" to navigate to the cart screen.
     final viewCartFinder = find.text('View Cart');
     if (viewCartFinder.evaluate().isNotEmpty) {
       await tester.tap(viewCartFinder);
       await tester.pumpAndSettle();
 
-      // Cart should show the product name.
-      expect(
-        find.textContaining('Sacher-Torte'),
-        findsWidgets,
-      );
+      // Cart screen should show the product name.
+      expect(find.textContaining('Sacher-Torte'), findsWidgets);
     }
   });
 }

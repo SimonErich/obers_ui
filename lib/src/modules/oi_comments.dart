@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/display/oi_empty_state.dart';
+import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/modules/oi_chat.dart';
 
@@ -162,7 +163,7 @@ class _OiCommentsState extends State<OiComments> {
           Expanded(
             child: widget.comments.isEmpty
                 ? OiEmptyState(
-                    icon: const IconData(0xe24c, fontFamily: 'MaterialIcons'),
+                    icon: OiIcons.chatBubbleLeft,
                     title: widget.emptyTitle,
                     description: widget.emptyDescription,
                   )

@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/_internal/oi_input_frame.dart';
 import 'package:obers_ui/src/components/display/oi_badge.dart';
+import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/primitives/input/oi_raw_input.dart';
 import 'package:obers_ui/src/primitives/overlay/oi_floating.dart';
@@ -603,7 +604,7 @@ class _OiComboBoxState<T> extends State<OiComboBox<T>> {
               child: Padding(
                 padding: const EdgeInsets.only(left: 4),
                 child: Icon(
-                  const IconData(0xe5cd, fontFamily: 'MaterialIcons'),
+                  OiIcons.xMark,
                   size: 16,
                   color: colors.textMuted,
                 ),
@@ -638,7 +639,7 @@ class _OiComboBoxState<T> extends State<OiComboBox<T>> {
             child: Padding(
               padding: const EdgeInsets.only(left: 4),
               child: Icon(
-                const IconData(0xe5cd, fontFamily: 'MaterialIcons'),
+                OiIcons.xMark,
                 size: 16,
                 color: colors.textMuted,
               ),
@@ -655,7 +656,7 @@ class _OiComboBoxState<T> extends State<OiComboBox<T>> {
     final colors = context.colors;
 
     final chevron = Icon(
-      const IconData(0xe5c5, fontFamily: 'MaterialIcons'),
+      OiIcons.arrowDown,
       size: 16,
       color: colors.textMuted,
     );
@@ -721,7 +722,7 @@ class _OiCheckMark extends StatelessWidget {
       ),
       child: checked
           ? Icon(
-              const IconData(0xe5ca, fontFamily: 'MaterialIcons'),
+              OiIcons.check,
               size: 12,
               color: colors.textOnPrimary,
             )

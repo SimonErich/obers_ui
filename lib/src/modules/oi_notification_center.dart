@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 
 /// A notification item displayed in the [OiNotificationCenter].
@@ -201,7 +202,7 @@ class OiNotificationCenter extends StatelessWidget {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Icon(
-                          const IconData(0xe7f5, fontFamily: 'MaterialIcons'),
+                          OiIcons.userGroup,
                           size: 48,
                           color: colors.textMuted,
                         ),

@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/display/oi_empty_state.dart';
 import 'package:obers_ui/src/components/display/oi_progress.dart';
+import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
 
@@ -315,7 +316,7 @@ class _OiActivityEventTile extends StatelessWidget {
           ),
           child: Center(
             child: Icon(
-              event.icon ?? const IconData(0xe5ca, fontFamily: 'MaterialIcons'),
+              event.icon ?? OiIcons.check,
               size: 16,
               color: colors.primary.base,
             ),

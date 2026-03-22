@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/buttons/oi_button.dart';
 import 'package:obers_ui/src/components/inputs/oi_text_input.dart';
+import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/oi_responsive.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/models/oi_coupon_result.dart';
@@ -10,8 +11,8 @@ import 'package:obers_ui/src/primitives/layout/oi_column.dart';
 import 'package:obers_ui/src/primitives/layout/oi_row.dart';
 
 // Material Icons codepoints.
-const IconData _kCheckIcon = IconData(0xe86c, fontFamily: 'MaterialIcons');
-const IconData _kCloseIcon = IconData(0xe5cd, fontFamily: 'MaterialIcons');
+const IconData _kCheckIcon = OiIcons.checkCircle;
+const IconData _kCloseIcon = OiIcons.xMark;
 
 /// A text input field with 'Apply' button for discount/coupon codes.
 ///

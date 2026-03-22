@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/obers_ui.dart' show OiWizard;
 import 'package:obers_ui/src/composites/forms/oi_wizard.dart' show OiWizard;
+import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 
 /// The style of the stepper.
@@ -73,16 +74,10 @@ class OiStepper extends StatelessWidget {
   // ---------------------------------------------------------------------------
 
   /// Material Icons check mark.
-  static const IconData _checkIcon = IconData(
-    0xe5ca,
-    fontFamily: 'MaterialIcons',
-  );
+  static const IconData _checkIcon = OiIcons.check;
 
   /// Material Icons error (exclamation circle).
-  static const IconData _errorIcon = IconData(
-    0xe000,
-    fontFamily: 'MaterialIcons',
-  );
+  static const IconData _errorIcon = OiIcons.exclamationCircle;
 
   // ---------------------------------------------------------------------------
   // Build helpers

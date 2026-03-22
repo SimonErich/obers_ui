@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 
 /// The status of a pipeline stage.
@@ -101,24 +102,15 @@ class OiPipeline extends StatelessWidget {
   static IconData statusIcon(OiPipelineStatus status) {
     switch (status) {
       case OiPipelineStatus.completed:
-        return const IconData(
-          0xe86c,
-          fontFamily: 'MaterialIcons',
-        ); // check_circle
+        return OiIcons.checkCircle; // check_circle
       case OiPipelineStatus.failed:
-        return const IconData(0xe000, fontFamily: 'MaterialIcons'); // error
+        return OiIcons.exclamationCircle; // error
       case OiPipelineStatus.running:
-        return const IconData(
-          0xe627,
-          fontFamily: 'MaterialIcons',
-        ); // play_circle_filled
+        return OiIcons.playCircle; // play_circle_filled
       case OiPipelineStatus.pending:
-        return const IconData(
-          0xef4a,
-          fontFamily: 'MaterialIcons',
-        ); // radio_button_unchecked
+        return OiIcons.noSymbol; // radio_button_unchecked
       case OiPipelineStatus.skipped:
-        return const IconData(0xe044, fontFamily: 'MaterialIcons'); // block
+        return OiIcons.noSymbol; // block
     }
   }
 
@@ -200,14 +192,8 @@ class OiPipeline extends StatelessWidget {
       child: Center(
         child: Icon(
           isHorizontal
-              ? const IconData(
-                  0xe5cc,
-                  fontFamily: 'MaterialIcons',
-                ) // chevron_right
-              : const IconData(
-                  0xe313,
-                  fontFamily: 'MaterialIcons',
-                ), // expand_more
+              ? OiIcons.chevronRight // chevron_right
+              : OiIcons.chevronDown, // expand_more
           color: colors.textMuted,
           size: arrowSize,
         ),

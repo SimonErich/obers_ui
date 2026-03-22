@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/display/oi_image.dart';
+import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/oi_responsive.dart';
 import 'package:obers_ui/src/foundation/theme/oi_decoration_theme.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
@@ -8,10 +9,7 @@ import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
 import 'package:obers_ui/src/primitives/layout/oi_column.dart';
 
 // Material Icons codepoint.
-const IconData _kImagePlaceholder = IconData(
-  0xe3f4,
-  fontFamily: 'MaterialIcons',
-); // image
+const IconData _kImagePlaceholder = OiIcons.photo; // image
 
 /// An image gallery with an optional thumbnail strip for product detail pages.
 ///

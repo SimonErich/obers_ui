@@ -72,8 +72,20 @@ void main() {
     // Verify the sent message appears in the chat.
     expect(find.text('Hello from integration test'), findsOneWidget);
 
-    // Pump for a few seconds to allow typing indicator and auto-response.
-    await tester.pump(const Duration(seconds: 5));
+    // Wait for the typing indicator to appear (1.5s delay in ChatAutoResponder).
+    await tester.pump(const Duration(milliseconds: 1600));
+    await tester.pump();
+
+    // Verify typing indicator is visible ("X is typing...").
+    expect(find.textContaining('is typing'), findsOneWidget);
+
+    // Wait for the auto-response to arrive (2s more in ChatAutoResponder).
+    await tester.pump(const Duration(milliseconds: 2100));
     await tester.pumpAndSettle();
+
+    // Verify an auto-response from kGeneralResponses appeared.
+    // The message "Hello from integration test" has no food/work keywords,
+    // so it picks from the general response pool.
+    expect(find.textContaining('Kaffeepause'), findsWidgets);
   });
 }

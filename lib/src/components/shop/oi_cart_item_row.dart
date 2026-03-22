@@ -3,6 +3,7 @@ import 'package:obers_ui/src/components/buttons/oi_button.dart';
 import 'package:obers_ui/src/components/display/oi_image.dart';
 import 'package:obers_ui/src/components/shop/oi_price_tag.dart';
 import 'package:obers_ui/src/components/shop/oi_quantity_selector.dart';
+import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/oi_responsive.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/models/oi_cart_item.dart';
@@ -13,8 +14,8 @@ import 'package:obers_ui/src/primitives/layout/oi_column.dart';
 import 'package:obers_ui/src/primitives/layout/oi_row.dart';
 
 // Material Icons codepoints.
-const IconData _kDeleteIcon = IconData(0xe872, fontFamily: 'MaterialIcons');
-const IconData _kImageIcon = IconData(0xe3f4, fontFamily: 'MaterialIcons');
+const IconData _kDeleteIcon = OiIcons.trash;
+const IconData _kImageIcon = OiIcons.photo;
 
 /// A single line item row for the shopping cart.
 ///

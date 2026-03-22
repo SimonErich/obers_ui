@@ -2,6 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/buttons/oi_icon_button.dart';
 import 'package:obers_ui/src/components/inputs/oi_text_input.dart';
 import 'package:obers_ui/src/components/navigation/oi_breadcrumbs.dart';
+import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/oi_search_debounce.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/primitives/animation/oi_morph.dart';
@@ -105,8 +106,8 @@ class _OiFileToolbarState extends State<OiFileToolbar> {
         if (widget.onSearch != null)
           OiIconButton(
             icon: _searchOpen
-                ? const IconData(0xe5cd, fontFamily: 'MaterialIcons') // close
-                : const IconData(0xe8b6, fontFamily: 'MaterialIcons'), // search
+                ? OiIcons.xMark // close
+                : OiIcons.magnifyingGlass, // search
             semanticLabel: _searchOpen ? 'Close search' : 'Search',
             onTap: _toggleSearch,
           ),

@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_color_scheme.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/primitives/animation/oi_shimmer.dart';
@@ -155,22 +156,16 @@ class OiAvatar extends StatelessWidget {
     switch (status) {
       case OiPresenceStatus.online:
         // Filled circle — distinct from the hollow offline circle.
-        return const IconData(0xe061, fontFamily: 'MaterialIcons'); // circle
+        return OiIcons.stop; // circle
       case OiPresenceStatus.offline:
         // Outlined (hollow) circle.
-        return const IconData(
-          0xef52,
-          fontFamily: 'MaterialIcons',
-        ); // circle_outlined
+        return OiIcons.stopCircle; // circle_outlined
       case OiPresenceStatus.away:
         // Clock/schedule icon.
-        return const IconData(0xe8b5, fontFamily: 'MaterialIcons'); // schedule
+        return OiIcons.clock; // schedule
       case OiPresenceStatus.busy:
         // "Do not disturb" / remove-circle icon.
-        return const IconData(
-          0xe15b,
-          fontFamily: 'MaterialIcons',
-        ); // remove_circle
+        return OiIcons.minusCircle; // remove_circle
     }
   }
 
@@ -315,7 +310,7 @@ class OiAvatar extends StatelessWidget {
       color: colors.surfaceHover,
       child: Center(
         child: Icon(
-          const IconData(0xe7fd, fontFamily: 'MaterialIcons'),
+          OiIcons.user,
           size: _iconSize,
           color: colors.textMuted,
         ),

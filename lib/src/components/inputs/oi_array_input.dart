@@ -172,7 +172,7 @@ class _OiArrayInputState<T> extends State<OiArrayInput<T>> {
           Padding(
             padding: const EdgeInsets.only(right: 4, top: 4),
             child: OiIcon(
-              icon: const IconData(0xe25d, fontFamily: 'MaterialIcons'),
+              icon: OiIcons.ellipsisVertical,
               label: 'Drag to reorder',
               size: 20,
               color: colors.textMuted,
@@ -299,7 +299,7 @@ class _OiArrayInputState<T> extends State<OiArrayInput<T>> {
             Row(
               children: [
                 OiIcon(
-                  icon: const IconData(0xe000, fontFamily: 'MaterialIcons'),
+                  icon: OiIcons.exclamationCircle,
                   label: 'Error',
                   size: 14,
                   color: colors.error.base,

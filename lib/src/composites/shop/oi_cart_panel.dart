@@ -4,6 +4,7 @@ import 'package:obers_ui/src/components/display/oi_empty_state.dart';
 import 'package:obers_ui/src/components/shop/oi_cart_item_row.dart';
 import 'package:obers_ui/src/components/shop/oi_coupon_input.dart';
 import 'package:obers_ui/src/components/shop/oi_order_summary_line.dart';
+import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/oi_responsive.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/models/oi_cart_item.dart';
@@ -14,7 +15,7 @@ import 'package:obers_ui/src/primitives/display/oi_label.dart';
 import 'package:obers_ui/src/primitives/layout/oi_column.dart';
 
 // Material Icons codepoints.
-const IconData _kCartIcon = IconData(0xe8cc, fontFamily: 'MaterialIcons');
+const IconData _kCartIcon = OiIcons.shoppingCart;
 
 /// A full shopping cart view with item list, optional coupon input, order
 /// summary lines, checkout button, and continue-shopping link.

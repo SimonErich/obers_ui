@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/persistence/oi_settings_driver.dart';
 import 'package:obers_ui/src/foundation/persistence/oi_settings_mixin.dart';
 import 'package:obers_ui/src/foundation/persistence/oi_settings_provider.dart';
@@ -254,11 +255,8 @@ class _OiAccordionState extends State<OiAccordion>
                                 : const Duration(milliseconds: 200),
                             curve: Curves.easeInOut,
                             child: Icon(
-                              // chevron_down icon from MaterialIcons
-                              const IconData(
-                                0xe5cf,
-                                fontFamily: 'MaterialIcons',
-                              ),
+                              // chevron_down icon
+                              OiIcons.chevronDown,
                               size: 18,
                               color: colors.textMuted,
                             ),

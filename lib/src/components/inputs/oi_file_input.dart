@@ -1,6 +1,7 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/_internal/oi_input_frame.dart';
+import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
 
@@ -100,7 +101,7 @@ class _OiFileInputState extends State<OiFileInput> {
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(
-            const IconData(0xe226, fontFamily: 'MaterialIcons'),
+            OiIcons.envelope,
             size: 14,
             color: colors.textMuted,
           ),
@@ -119,7 +120,7 @@ class _OiFileInputState extends State<OiFileInput> {
             OiTappable(
               onTap: () => _removeFile(index),
               child: Icon(
-                const IconData(0xe5cd, fontFamily: 'MaterialIcons'),
+                OiIcons.xMark,
                 size: 14,
                 color: colors.textMuted,
               ),
@@ -180,7 +181,7 @@ class _OiFileInputState extends State<OiFileInput> {
               )
             else
               Icon(
-                const IconData(0xe226, fontFamily: 'MaterialIcons'),
+                OiIcons.envelope,
                 size: 16,
                 color: colors.primary.base,
               ),

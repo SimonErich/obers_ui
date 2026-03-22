@@ -2,6 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/navigation/oi_breadcrumbs.dart';
 import 'package:obers_ui/src/components/navigation/oi_drawer.dart';
 import 'package:obers_ui/src/composites/navigation/oi_sidebar.dart';
+import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/oi_responsive.dart';
 import 'package:obers_ui/src/foundation/persistence/oi_settings_driver.dart';
 import 'package:obers_ui/src/foundation/persistence/oi_settings_mixin.dart';
@@ -336,7 +337,7 @@ class _OiAppShellState extends State<OiAppShell>
                 semanticLabel: 'Open navigation',
                 onTap: () => setState(() => _drawerOpen = true),
                 child: Icon(
-                  const IconData(0xe3dc, fontFamily: 'MaterialIcons'), // menu
+                  OiIcons.bars3, // menu
                   size: 24,
                   color: colors.text,
                 ),
@@ -412,14 +413,8 @@ class _OiAppShellState extends State<OiAppShell>
         alignment: Alignment.center,
         child: Icon(
           _sidebarCollapsed
-              ? const IconData(
-                  0xe5e1,
-                  fontFamily: 'MaterialIcons',
-                ) // chevron_right
-              : const IconData(
-                  0xe5e0,
-                  fontFamily: 'MaterialIcons',
-                ), // chevron_left
+              ? OiIcons.chevronRight // chevron_right
+              : OiIcons.chevronLeft, // chevron_left
           size: 20,
           color: colors.textMuted,
         ),

@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/_internal/oi_input_frame.dart';
+import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
 import 'package:obers_ui/src/primitives/overlay/oi_floating.dart'
@@ -262,7 +263,7 @@ class _OiTimeInputState extends State<OiTimeInput> {
     final displayText = widget.value != null ? _formatTime(widget.value!) : '';
 
     final clockIcon = Icon(
-      const IconData(0xe41e, fontFamily: 'MaterialIcons'),
+      OiIcons.clock,
       size: 18,
       color: colors.textMuted,
     );

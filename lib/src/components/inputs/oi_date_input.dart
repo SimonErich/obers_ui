@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/_internal/oi_input_frame.dart';
+import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
 import 'package:obers_ui/src/primitives/overlay/oi_floating.dart'
@@ -244,7 +245,7 @@ class _OiDateInputState extends State<OiDateInput> {
     final displayText = widget.value != null ? _formatDate(widget.value!) : '';
 
     final calendarIcon = Icon(
-      const IconData(0xe0d3, fontFamily: 'MaterialIcons'),
+      OiIcons.calendarDays,
       size: 18,
       color: colors.textMuted,
     );

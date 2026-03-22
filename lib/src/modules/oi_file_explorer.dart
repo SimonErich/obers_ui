@@ -21,6 +21,7 @@ import 'package:obers_ui/src/composites/files/oi_file_list_view.dart';
 import 'package:obers_ui/src/composites/files/oi_file_sidebar.dart';
 import 'package:obers_ui/src/composites/navigation/oi_shortcuts.dart';
 import 'package:obers_ui/src/foundation/oi_accessibility.dart';
+import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/oi_overlays.dart';
 import 'package:obers_ui/src/foundation/oi_search_debounce.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
@@ -548,7 +549,7 @@ class _OiFileExplorerState extends State<OiFileExplorer> {
       if (file.isFolder)
         OiMenuItem(
           label: 'Open',
-          icon: const IconData(0xe89e, fontFamily: 'MaterialIcons'),
+          icon: OiIcons.arrowTopRightOnSquare,
           onTap: () =>
               widget.controller.navigateTo(file.id.toString(), folder: file),
         )
@@ -556,13 +557,13 @@ class _OiFileExplorerState extends State<OiFileExplorer> {
         if (widget.onOpen != null)
           OiMenuItem(
             label: 'Open',
-            icon: const IconData(0xe89e, fontFamily: 'MaterialIcons'),
+            icon: OiIcons.arrowTopRightOnSquare,
             onTap: () => widget.onOpen!(file),
           ),
         if (widget.onPreview != null)
           OiMenuItem(
             label: 'Preview',
-            icon: const IconData(0xe417, fontFamily: 'MaterialIcons'),
+            icon: OiIcons.scissors,
             onTap: () => widget.onPreview!(file),
           ),
       ],
@@ -574,38 +575,38 @@ class _OiFileExplorerState extends State<OiFileExplorer> {
       if (widget.enableRename)
         OiMenuItem(
           label: 'Rename',
-          icon: const IconData(0xe3c9, fontFamily: 'MaterialIcons'),
+          icon: OiIcons.pencil,
           onTap: () => widget.controller.startRename(file.id),
         ),
       if (widget.enableMove)
         OiMenuItem(
           label: 'Move to...',
-          icon: const IconData(0xeb80, fontFamily: 'MaterialIcons'),
+          icon: OiIcons.arrowRight,
           onTap: () => _showMoveDialog([file]),
         ),
       if (widget.enableCopy && widget.onCopy != null)
         OiMenuItem(
           label: 'Copy to...',
-          icon: const IconData(0xe14d, fontFamily: 'MaterialIcons'),
+          icon: OiIcons.documentDuplicate,
           onTap: () => _showMoveDialog([file], copyMode: true),
         ),
       if (widget.onDownload != null)
         OiMenuItem(
           label: 'Download',
-          icon: const IconData(0xf090, fontFamily: 'MaterialIcons'),
+          icon: OiIcons.share,
           onTap: () => widget.onDownload!(file),
         ),
       if (widget.onShare != null)
         OiMenuItem(
           label: 'Share',
-          icon: const IconData(0xe80d, fontFamily: 'MaterialIcons'),
+          icon: OiIcons.informationCircle,
           onTap: () => widget.onShare!(file),
         ),
       const OiMenuItem(label: '', separator: true),
       if (widget.enableDelete)
         OiMenuItem(
           label: 'Delete',
-          icon: const IconData(0xe872, fontFamily: 'MaterialIcons'),
+          icon: OiIcons.trash,
           onTap: () => _showDeleteDialog([file]),
         ),
     ];
@@ -615,7 +616,7 @@ class _OiFileExplorerState extends State<OiFileExplorer> {
     return [
       OiMenuItem(
         label: 'New folder',
-        icon: const IconData(0xe2cc, fontFamily: 'MaterialIcons'),
+        icon: OiIcons.folderOpen,
         onTap: () async {
           final folderId =
               widget.controller.currentFolder?.id.toString() ?? 'root';
@@ -626,14 +627,14 @@ class _OiFileExplorerState extends State<OiFileExplorer> {
       if (widget.enableUpload)
         OiMenuItem(
           label: 'Upload files',
-          icon: const IconData(0xe9e4, fontFamily: 'MaterialIcons'),
+          icon: OiIcons.cloudArrowUp,
           onTap: _showUploadDialog,
         ),
       if (widget.controller.selectedKeys.isNotEmpty) ...[
         const OiMenuItem(label: '', separator: true),
         OiMenuItem(
           label: 'Select all',
-          icon: const IconData(0xe164, fontFamily: 'MaterialIcons'),
+          icon: OiIcons.paperAirplane,
           onTap: widget.controller.selectAll,
         ),
         OiMenuItem(
@@ -778,12 +779,12 @@ class _OiFileExplorerState extends State<OiFileExplorer> {
       children: [
         // Back/Forward buttons
         OiIconButton(
-          icon: const IconData(0xe5c4, fontFamily: 'MaterialIcons'),
+          icon: OiIcons.arrowLeft,
           semanticLabel: 'Go back',
           onTap: controller.canGoBack ? controller.goBack : null,
         ),
         OiIconButton(
-          icon: const IconData(0xe5c8, fontFamily: 'MaterialIcons'),
+          icon: OiIcons.arrowRight,
           semanticLabel: 'Go forward',
           onTap: controller.canGoForward ? controller.goForward : null,
         ),
@@ -811,8 +812,8 @@ class _OiFileExplorerState extends State<OiFileExplorer> {
         if (widget.enableSearch)
           OiIconButton(
             icon: _searchActive
-                ? const IconData(0xe5cd, fontFamily: 'MaterialIcons')
-                : const IconData(0xe8b6, fontFamily: 'MaterialIcons'),
+                ? OiIcons.xMark
+                : OiIcons.magnifyingGlass,
             semanticLabel: _searchActive ? 'Close search' : 'Search',
             onTap: () => setState(() {
               _searchActive = !_searchActive;
@@ -832,11 +833,11 @@ class _OiFileExplorerState extends State<OiFileExplorer> {
           },
           items: const [
             OiButtonGroupItem(
-              icon: IconData(0xe8ef, fontFamily: 'MaterialIcons'),
+              icon: OiIcons.eye,
               label: 'List view',
             ),
             OiButtonGroupItem(
-              icon: IconData(0xe3ea, fontFamily: 'MaterialIcons'),
+              icon: OiIcons.eyeSlash,
               label: 'Grid view',
             ),
           ],
@@ -845,12 +846,12 @@ class _OiFileExplorerState extends State<OiFileExplorer> {
         // Actions
         if (widget.enableUpload)
           OiIconButton(
-            icon: const IconData(0xe9e4, fontFamily: 'MaterialIcons'),
+            icon: OiIcons.cloudArrowUp,
             semanticLabel: 'Upload files',
             onTap: _showUploadDialog,
           ),
         OiIconButton(
-          icon: const IconData(0xe2cc, fontFamily: 'MaterialIcons'),
+          icon: OiIcons.folderOpen,
           semanticLabel: 'New folder',
           onTap: () async {
             final folderId = controller.currentFolder?.id.toString() ?? 'root';
@@ -939,7 +940,7 @@ class _OiFileExplorerState extends State<OiFileExplorer> {
     if (files.isEmpty) {
       if (controller.searchQuery.isNotEmpty) {
         return OiEmptyState(
-          icon: const IconData(0xe8b6, fontFamily: 'MaterialIcons'),
+          icon: OiIcons.magnifyingGlass,
           title: "No files match '${controller.searchQuery}'",
           action: OiButton.ghost(
             label: 'Clear search',
@@ -954,12 +955,12 @@ class _OiFileExplorerState extends State<OiFileExplorer> {
         label: 'Empty folder context menu',
         items: _buildBackgroundContextMenu(),
         child: OiEmptyState(
-          icon: const IconData(0xe2c7, fontFamily: 'MaterialIcons'),
+          icon: OiIcons.folder,
           title: 'This folder is empty',
           action: widget.enableUpload
               ? OiButton.primary(
                   label: 'Upload files',
-                  icon: const IconData(0xe9e4, fontFamily: 'MaterialIcons'),
+                  icon: OiIcons.cloudArrowUp,
                   onTap: _showUploadDialog,
                 )
               : null,

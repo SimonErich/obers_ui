@@ -2,6 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/buttons/oi_button.dart';
 import 'package:obers_ui/src/components/display/oi_card.dart';
 import 'package:obers_ui/src/components/navigation/oi_breadcrumbs.dart';
+import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/primitives/display/oi_label.dart';
 
@@ -214,7 +215,7 @@ class OiResourcePage extends StatelessWidget {
     return [
       OiButton.primary(
         label: 'Create',
-        icon: const IconData(0xe145, fontFamily: 'MaterialIcons'), // add
+        icon: OiIcons.plus, // add
         onTap: () => onAction?.call('create'),
       ),
     ];
@@ -224,12 +225,12 @@ class OiResourcePage extends StatelessWidget {
     return [
       OiButton.outline(
         label: 'Edit',
-        icon: const IconData(0xe3c9, fontFamily: 'MaterialIcons'), // edit
+        icon: OiIcons.pencil, // edit
         onTap: () => onAction?.call('edit'),
       ),
       OiButton.destructive(
         label: 'Delete',
-        icon: const IconData(0xe872, fontFamily: 'MaterialIcons'), // delete
+        icon: OiIcons.trash, // delete
         onTap: () => onAction?.call('delete'),
       ),
     ];
@@ -240,7 +241,7 @@ class OiResourcePage extends StatelessWidget {
       OiButton.ghost(label: 'Cancel', onTap: () => onAction?.call('cancel')),
       OiButton.primary(
         label: 'Save',
-        icon: const IconData(0xe161, fontFamily: 'MaterialIcons'), // save
+        icon: OiIcons.archiveBoxArrowDown, // save
         onTap: () => onAction?.call('save'),
       ),
     ];

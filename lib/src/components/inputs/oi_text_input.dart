@@ -1,6 +1,7 @@
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/_internal/oi_input_frame.dart';
+import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/primitives/input/oi_raw_input.dart';
 
 /// A themed single- or multi-line text input component.
@@ -50,7 +51,7 @@ class OiTextInput extends StatefulWidget {
        placeholder = 'Search\u2026',
        error = null,
        leading = const Icon(
-         IconData(0xe8b6, fontFamily: 'MaterialIcons'),
+         OiIcons.magnifyingGlass,
          size: 18,
        ),
        trailing = null,

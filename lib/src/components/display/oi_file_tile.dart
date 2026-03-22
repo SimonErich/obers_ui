@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/modules/oi_file_manager.dart';
 import 'package:obers_ui/src/utils/file_utils.dart';
@@ -67,8 +68,8 @@ class OiFileTile extends StatelessWidget {
             children: [
               Icon(
                 file.folder
-                    ? const IconData(0xe2c7, fontFamily: 'MaterialIcons')
-                    : const IconData(0xe24d, fontFamily: 'MaterialIcons'),
+                    ? OiIcons.folder
+                    : OiIcons.folderOpen,
                 size: 24,
                 color: file.folder ? colors.warning.base : colors.textSubtle,
               ),

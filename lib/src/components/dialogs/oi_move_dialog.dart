@@ -3,6 +3,7 @@ import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/buttons/oi_button.dart';
 import 'package:obers_ui/src/components/inputs/oi_text_input.dart';
 import 'package:obers_ui/src/composites/data/oi_tree.dart';
+import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/models/oi_file_node_data.dart';
 
@@ -201,10 +202,7 @@ class _OiMoveDialogState extends State<OiMoveDialog> {
                               child: Row(
                                 children: [
                                   Icon(
-                                    const IconData(
-                                      0xe2c7,
-                                      fontFamily: 'MaterialIcons',
-                                    ),
+                                    OiIcons.folder,
                                     size: 16,
                                     color: colors.warning.base,
                                   ),

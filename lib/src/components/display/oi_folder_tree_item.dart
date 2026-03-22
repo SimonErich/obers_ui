@@ -3,6 +3,7 @@ import 'package:obers_ui/src/components/display/oi_drop_highlight.dart';
 import 'package:obers_ui/src/components/display/oi_folder_icon.dart';
 import 'package:obers_ui/src/components/display/oi_rename_field.dart';
 import 'package:obers_ui/src/components/overlays/oi_context_menu.dart';
+import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/models/oi_file_node_data.dart';
 
@@ -111,14 +112,8 @@ class OiFolderTreeItem extends StatelessWidget {
                   height: 16,
                   child: Icon(
                     expanded
-                        ? const IconData(
-                            0xe5cf,
-                            fontFamily: 'MaterialIcons',
-                          ) // expand_more
-                        : const IconData(
-                            0xe5cc,
-                            fontFamily: 'MaterialIcons',
-                          ), // chevron_right
+                        ? OiIcons.chevronDown // expand_more
+                        : OiIcons.chevronRight, // chevron_right
                     size: 14,
                     color: colors.textSubtle,
                   ),

@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/persistence/oi_settings_driver.dart';
 import 'package:obers_ui/src/foundation/persistence/oi_settings_mixin.dart';
 import 'package:obers_ui/src/foundation/persistence/oi_settings_provider.dart';
@@ -257,7 +258,7 @@ class _OiDashboardState extends State<OiDashboard>
             top: 4,
             right: 4,
             child: Icon(
-              const IconData(0xe945, fontFamily: 'MaterialIcons'),
+              OiIcons.bars2,
               size: 16,
               color: colors.textMuted,
             ),

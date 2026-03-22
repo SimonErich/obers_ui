@@ -19,6 +19,12 @@ const kProducts = <OiProductData>[
     reviewCount: 1842,
     tags: ['food', 'chocolate', 'vienna', 'gift', 'classic'],
     attributes: {'Origin': 'Vienna', 'Shelf Life': '14 days'},
+    imageUrls: [
+      '/images/products/sachertorte_whole.jpg',
+      '/images/products/sachertorte_slice.jpg',
+      '/images/products/sachertorte_box.jpg',
+      '/images/products/sachertorte_detail.jpg',
+    ],
     variants: [
       OiProductVariant(
         key: 'sacher-small',
@@ -56,6 +62,11 @@ const kProducts = <OiProductData>[
     reviewCount: 623,
     tags: ['food', 'cooking', 'vienna', 'diy'],
     attributes: {'Serves': '4 persons'},
+    imageUrls: [
+      '/images/products/schnitzel_kit_box.jpg',
+      '/images/products/schnitzel_kit_contents.jpg',
+      '/images/products/schnitzel_plated.jpg',
+    ],
     variants: [
       OiProductVariant(
         key: 'schnitzel-veal',
@@ -93,6 +104,12 @@ const kProducts = <OiProductData>[
     reviewCount: 347,
     tags: ['footwear', 'hiking', 'outdoor', 'tyrol'],
     attributes: {'Material': 'Full-grain leather', 'Sole': 'Vibram'},
+    imageUrls: [
+      '/images/products/hiking_boot_side.jpg',
+      '/images/products/hiking_boot_sole.jpg',
+      '/images/products/hiking_boot_laces.jpg',
+      '/images/products/hiking_boot_mountain.jpg',
+    ],
     variants: [
       OiProductVariant(
         key: 'boot-38',
@@ -157,6 +174,11 @@ const kProducts = <OiProductData>[
     reviewCount: 215,
     tags: ['coffee', 'porcelain', 'vienna', 'gift', 'lifestyle'],
     attributes: {'Material': 'Porcelain', 'Pieces': '5'},
+    imageUrls: [
+      '/images/products/coffee_set_table.jpg',
+      '/images/products/coffee_set_cups.jpg',
+      '/images/products/coffee_set_tray.jpg',
+    ],
   ),
 
   // 5 — Mozartkugeln Gift Box 24 pcs
@@ -174,6 +196,12 @@ const kProducts = <OiProductData>[
     reviewCount: 982,
     tags: ['food', 'chocolate', 'salzburg', 'gift', 'classic'],
     attributes: {'Pieces': '24', 'Origin': 'Salzburg'},
+    imageUrls: [
+      '/images/products/mozartkugeln_box.jpg',
+      '/images/products/mozartkugeln_open.jpg',
+      '/images/products/mozartkugeln_cross_section.jpg',
+      '/images/products/mozartkugeln_gift.jpg',
+    ],
   ),
 
   // 6 — Dirndl "Almsommer"
@@ -192,6 +220,13 @@ const kProducts = <OiProductData>[
     reviewCount: 178,
     tags: ['clothing', 'tracht', 'dirndl', 'fashion', 'tradition'],
     attributes: {'Color': 'Alpine Green', 'Material': 'Cotton / Linen'},
+    imageUrls: [
+      '/images/products/dirndl_front.jpg',
+      '/images/products/dirndl_back.jpg',
+      '/images/products/dirndl_detail_bodice.jpg',
+      '/images/products/dirndl_apron.jpg',
+      '/images/products/dirndl_meadow.jpg',
+    ],
     variants: [
       OiProductVariant(
         key: 'dirndl-s',
@@ -231,6 +266,11 @@ const kProducts = <OiProductData>[
     reviewCount: 134,
     tags: ['clothing', 'tracht', 'lederhosen', 'fashion', 'tradition'],
     attributes: {'Color': 'Walnut Brown', 'Material': 'Deer leather'},
+    imageUrls: [
+      '/images/products/lederhosen_front.jpg',
+      '/images/products/lederhosen_embroidery.jpg',
+      '/images/products/lederhosen_suspenders.jpg',
+    ],
   ),
 
   // 8 — Zillertaler Graukäse
@@ -248,6 +288,11 @@ const kProducts = <OiProductData>[
     reviewCount: 89,
     tags: ['food', 'cheese', 'tyrol', 'regional'],
     attributes: {'Weight': '250 g', 'Region': 'Zillertal'},
+    imageUrls: [
+      '/images/products/graukaese_wheel.jpg',
+      '/images/products/graukaese_slice.jpg',
+      '/images/products/graukaese_plate.jpg',
+    ],
   ),
 
   // 9 — Almdudler Party Pack 12x0.5L
@@ -265,6 +310,11 @@ const kProducts = <OiProductData>[
     reviewCount: 456,
     tags: ['beverage', 'lemonade', 'party', 'classic'],
     attributes: {'Volume': '12 x 0.5 L', 'Type': 'Herbal lemonade'},
+    imageUrls: [
+      '/images/products/almdudler_pack.jpg',
+      '/images/products/almdudler_bottle.jpg',
+      '/images/products/almdudler_glass.jpg',
+    ],
   ),
 
   // 10 — Manner Schnitten Tower 12 packs (out of stock)
@@ -284,8 +334,224 @@ const kProducts = <OiProductData>[
     reviewCount: 721,
     tags: ['food', 'wafer', 'vienna', 'snack', 'classic'],
     attributes: {'Packs': '12', 'Flavor': 'Hazelnut'},
+    imageUrls: [
+      '/images/products/manner_tower.jpg',
+      '/images/products/manner_wafer.jpg',
+      '/images/products/manner_box.jpg',
+      '/images/products/manner_stephansdom.jpg',
+    ],
   ),
 ];
+
+// ── Related Products ────────────────────────────────────────────────────────
+
+/// Product-key to a set of related product keys.
+const _kRelatedMap = <String, List<String>>{
+  'prod-sachertorte': [
+    'prod-mozartkugeln',
+    'prod-coffee-set',
+    'prod-manner',
+  ],
+  'prod-schnitzel-kit': [
+    'prod-graukaese',
+    'prod-almdudler',
+    'prod-sachertorte',
+  ],
+  'prod-hiking-boot': [
+    'prod-lederhosen',
+    'prod-dirndl',
+    'prod-almdudler',
+    'prod-graukaese',
+  ],
+  'prod-coffee-set': [
+    'prod-sachertorte',
+    'prod-mozartkugeln',
+    'prod-manner',
+  ],
+  'prod-mozartkugeln': [
+    'prod-sachertorte',
+    'prod-manner',
+    'prod-coffee-set',
+  ],
+  'prod-dirndl': [
+    'prod-lederhosen',
+    'prod-hiking-boot',
+    'prod-coffee-set',
+  ],
+  'prod-lederhosen': [
+    'prod-dirndl',
+    'prod-hiking-boot',
+    'prod-almdudler',
+  ],
+  'prod-graukaese': [
+    'prod-schnitzel-kit',
+    'prod-almdudler',
+    'prod-sachertorte',
+  ],
+  'prod-almdudler': [
+    'prod-schnitzel-kit',
+    'prod-graukaese',
+    'prod-manner',
+  ],
+  'prod-manner': [
+    'prod-sachertorte',
+    'prod-mozartkugeln',
+    'prod-almdudler',
+    'prod-coffee-set',
+  ],
+};
+
+/// Returns related products for the given [productKey].
+List<OiProductData> getRelatedProducts(String productKey) {
+  final keys = _kRelatedMap[productKey];
+  if (keys == null) return [];
+  return keys
+      .map(
+        (k) => kProducts.where((p) => p.key == k).firstOrNull,
+      )
+      .whereType<OiProductData>()
+      .toList();
+}
+
+// ── Reviews ─────────────────────────────────────────────────────────────────
+
+/// A single product review.
+class MockReview {
+  /// Creates a [MockReview].
+  const MockReview({
+    required this.reviewerName,
+    required this.rating,
+    required this.text,
+    required this.date,
+    this.helpfulCount = 0,
+    this.unhelpfulCount = 0,
+  });
+
+  /// Name of the reviewer.
+  final String reviewerName;
+
+  /// Star rating (1-5).
+  final double rating;
+
+  /// Review body text.
+  final String text;
+
+  /// When the review was posted.
+  final DateTime date;
+
+  /// Number of "helpful" votes.
+  final int helpfulCount;
+
+  /// Number of "not helpful" votes.
+  final int unhelpfulCount;
+}
+
+/// Reviews keyed by product key.
+final kProductReviews = <String, List<MockReview>>{
+  'prod-sachertorte': [
+    MockReview(
+      reviewerName: 'Margarethe Gruber',
+      rating: 5,
+      text: 'Absolutely divine. The apricot jam layer is perfection. '
+          'My Oma would approve, and she approves of nothing.',
+      date: DateTime(2026, 3, 10, 14, 30),
+      helpfulCount: 42,
+      unhelpfulCount: 1,
+    ),
+    MockReview(
+      reviewerName: 'Johann Steinbauer',
+      rating: 5,
+      text: 'Ordered the Kaiserlich for a family gathering. It arrived '
+          'perfectly packaged and disappeared in under an hour.',
+      date: DateTime(2026, 3, 5, 9, 15),
+      helpfulCount: 28,
+      unhelpfulCount: 0,
+    ),
+    MockReview(
+      reviewerName: 'Franz Hofer',
+      rating: 4,
+      text: 'Very good, but I still think my Tante Helga makes a better one. '
+          'Do not tell Hotel Sacher I said that.',
+      date: DateTime(2026, 2, 20, 18, 45),
+      helpfulCount: 15,
+      unhelpfulCount: 3,
+    ),
+  ],
+  'prod-hiking-boot': [
+    MockReview(
+      reviewerName: 'Katharina Lechner',
+      rating: 5,
+      text: 'Wore these up the Grossglockner. My feet were dry, my soul '
+          'was at peace. Worth every cent.',
+      date: DateTime(2026, 3, 15, 11, 0),
+      helpfulCount: 37,
+      unhelpfulCount: 0,
+    ),
+    MockReview(
+      reviewerName: 'Helmut Winkler',
+      rating: 4,
+      text: 'Excellent grip on wet rock. Took a week to break in, but '
+          'now they feel like slippers — very sturdy slippers.',
+      date: DateTime(2026, 2, 28, 16, 20),
+      helpfulCount: 21,
+      unhelpfulCount: 2,
+    ),
+  ],
+  'prod-dirndl': [
+    MockReview(
+      reviewerName: 'Anneliese Moser',
+      rating: 5,
+      text: 'The fabric quality is outstanding. I wore it to the Villacher '
+          'Fasching and received compliments all evening.',
+      date: DateTime(2026, 3, 1, 20, 0),
+      helpfulCount: 19,
+      unhelpfulCount: 0,
+    ),
+    MockReview(
+      reviewerName: 'Renate Berger',
+      rating: 4,
+      text: 'Beautiful stitching and the green is gorgeous. Runs slightly '
+          'small — order one size up.',
+      date: DateTime(2026, 2, 14, 12, 30),
+      helpfulCount: 33,
+      unhelpfulCount: 1,
+    ),
+  ],
+  'prod-coffee-set': [
+    MockReview(
+      reviewerName: 'Leopold Brandauer',
+      rating: 5,
+      text: 'Finally, a proper Kaffeehaus experience at home. The porcelain '
+          'is thin and elegant. I now judge my own guests.',
+      date: DateTime(2026, 3, 18, 8, 0),
+      helpfulCount: 12,
+      unhelpfulCount: 0,
+    ),
+  ],
+  'prod-mozartkugeln': [
+    MockReview(
+      reviewerName: 'Waltraud Pichler',
+      rating: 3,
+      text: 'Tasty, but they melted a bit during shipping. Packaging '
+          'could use more insulation for summer orders.',
+      date: DateTime(2026, 3, 12, 15, 45),
+      helpfulCount: 8,
+      unhelpfulCount: 2,
+    ),
+    MockReview(
+      reviewerName: 'Stefan Huber',
+      rating: 5,
+      text: 'Brought these to a dinner party in Berlin. The Germans were '
+          'impressed, which is the highest praise you can get.',
+      date: DateTime(2026, 2, 25, 19, 30),
+      helpfulCount: 24,
+      unhelpfulCount: 0,
+    ),
+  ],
+};
+
+/// Free shipping threshold in EUR.
+const kFreeShippingThreshold = 100.0;
 
 // ── Cart ─────────────────────────────────────────────────────────────────────
 

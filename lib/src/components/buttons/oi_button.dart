@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/display/oi_tooltip.dart';
 import 'package:obers_ui/src/foundation/oi_app.dart';
+import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/primitives/animation/oi_pulse.dart';
 import 'package:obers_ui/src/primitives/display/oi_icon.dart';
@@ -830,7 +831,7 @@ class _OiButtonState extends State<OiButton> {
         ),
         child: Center(
           child: Icon(
-            const IconData(0xe5c5, fontFamily: 'MaterialIcons'),
+            OiIcons.arrowDown,
             size: _iconSize(),
             color: foreground,
           ),

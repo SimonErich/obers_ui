@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 
 /// The open/closed state of an [OiFolderIcon].
@@ -162,22 +163,10 @@ class OiFolderIcon extends StatelessWidget {
   IconData? get _variantOverlayIcon {
     return switch (variant) {
       OiFolderIconVariant.normal => null,
-      OiFolderIconVariant.shared => const IconData(
-        0xe7fb,
-        fontFamily: 'MaterialIcons',
-      ), // people
-      OiFolderIconVariant.starred => const IconData(
-        0xe838,
-        fontFamily: 'MaterialIcons',
-      ), // star
-      OiFolderIconVariant.locked => const IconData(
-        0xe897,
-        fontFamily: 'MaterialIcons',
-      ), // lock
-      OiFolderIconVariant.trash => const IconData(
-        0xe872,
-        fontFamily: 'MaterialIcons',
-      ), // delete
+      OiFolderIconVariant.shared => OiIcons.userGroup, // people
+      OiFolderIconVariant.starred => OiIcons.star, // star
+      OiFolderIconVariant.locked => OiIcons.lockClosed, // lock
+      OiFolderIconVariant.trash => OiIcons.trash, // delete
     };
   }
 

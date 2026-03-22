@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/buttons/oi_button.dart';
+import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/primitives/display/oi_icon.dart';
 import 'package:obers_ui/src/primitives/display/oi_label.dart';
@@ -139,19 +140,13 @@ class _OiExportButtonState extends State<OiExportButton> {
   IconData _formatIcon(OiExportFormat format) {
     switch (format) {
       case OiExportFormat.csv:
-        return const IconData(
-          0xf00e,
-          fontFamily: 'MaterialIcons',
-        ); // table_chart
+        return OiIcons.tableCells; // table_chart
       case OiExportFormat.xlsx:
-        return const IconData(0xe873, fontFamily: 'MaterialIcons'); // grid_on
+        return OiIcons.squares2x2; // grid_on
       case OiExportFormat.json:
-        return const IconData(0xe86f, fontFamily: 'MaterialIcons'); // code
+        return OiIcons.codeBracket; // code
       case OiExportFormat.pdf:
-        return const IconData(
-          0xe415,
-          fontFamily: 'MaterialIcons',
-        ); // picture_as_pdf
+        return OiIcons.documentText; // picture_as_pdf
     }
   }
 
@@ -159,10 +154,7 @@ class _OiExportButtonState extends State<OiExportButton> {
     final format = widget.formats.first;
     return OiButton.outline(
       label: widget.label,
-      icon: const IconData(
-        0xe2c4,
-        fontFamily: 'MaterialIcons',
-      ), // file_download
+      icon: OiIcons.arrowDownTray, // file_download
       onTap: _isLoading ? null : () => _handleExport(format),
       loading: _isLoading,
       semanticLabel: '${widget.label} as ${format.label}',

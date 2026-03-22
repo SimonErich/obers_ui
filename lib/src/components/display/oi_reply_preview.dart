@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/buttons/oi_button.dart';
 import 'package:obers_ui/src/components/buttons/oi_icon_button.dart';
+import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/utils/color_utils.dart';
 
@@ -108,7 +109,7 @@ class OiReplyPreview extends StatelessWidget {
               Padding(
                 padding: EdgeInsets.only(left: spacing.xs),
                 child: OiIconButton(
-                  icon: const IconData(0xe16a, fontFamily: 'MaterialIcons'),
+                  icon: OiIcons.arrowUturnLeft,
                   semanticLabel: 'Cancel reply',
                   onTap: onDismiss,
                   size: OiButtonSize.small,

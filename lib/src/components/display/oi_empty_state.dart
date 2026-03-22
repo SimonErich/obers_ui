@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/buttons/oi_button.dart';
+import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 
 /// A centered empty-state layout with an icon or illustration, title,
@@ -34,7 +35,7 @@ class OiEmptyState extends StatelessWidget {
     return OiEmptyState(
       key: key,
       title: title ?? 'Page not found',
-      icon: const IconData(0xe894, fontFamily: 'MaterialIcons'), // search_off
+      icon: OiIcons.magnifyingGlass, // search_off
       description: description,
       action: actionLabel != null && onAction != null
           ? OiButton.primary(
@@ -60,7 +61,7 @@ class OiEmptyState extends StatelessWidget {
     return OiEmptyState(
       key: key,
       title: title ?? 'Access denied',
-      icon: const IconData(0xe897, fontFamily: 'MaterialIcons'), // lock
+      icon: OiIcons.lockClosed, // lock
       description: description,
       action: actionLabel != null && onAction != null
           ? OiButton.primary(
@@ -95,7 +96,7 @@ class OiEmptyState extends StatelessWidget {
     return OiEmptyState(
       key: key,
       title: title ?? 'Something went wrong',
-      icon: const IconData(0xe002, fontFamily: 'MaterialIcons'), // error
+      icon: OiIcons.exclamationCircle, // error
       description: resolvedDescription,
       action: actionLabel != null && onAction != null
           ? OiButton.primary(

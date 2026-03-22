@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_color_scheme.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 
@@ -169,13 +170,13 @@ class OiBadge extends StatelessWidget {
   IconData? _dotIcon() {
     switch (color) {
       case OiBadgeColor.success:
-        return const IconData(0xe5ca, fontFamily: 'MaterialIcons'); // check
+        return OiIcons.check; // check
       case OiBadgeColor.warning:
-        return const IconData(0xe002, fontFamily: 'MaterialIcons'); // warning
+        return OiIcons.exclamationCircle; // warning
       case OiBadgeColor.error:
-        return const IconData(0xe5cd, fontFamily: 'MaterialIcons'); // close
+        return OiIcons.xMark; // close
       case OiBadgeColor.info:
-        return const IconData(0xe88e, fontFamily: 'MaterialIcons'); // info
+        return OiIcons.informationCircle; // info
       case OiBadgeColor.primary:
       case OiBadgeColor.accent:
       case OiBadgeColor.neutral:

@@ -5,6 +5,7 @@ import 'package:obers_ui/src/components/inputs/oi_text_input.dart';
 import 'package:obers_ui/src/components/overlays/oi_sheet.dart';
 import 'package:obers_ui/src/composites/navigation/oi_filter_bar.dart';
 import 'package:obers_ui/src/foundation/oi_app.dart';
+import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/oi_responsive.dart';
 import 'package:obers_ui/src/foundation/persistence/oi_settings_driver.dart';
 import 'package:obers_ui/src/foundation/persistence/oi_settings_mixin.dart';
@@ -453,7 +454,7 @@ class _OiListViewState<T> extends State<OiListView<T>>
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(
-              const IconData(0xe152, fontFamily: 'MaterialIcons'),
+              OiIcons.bars3BottomLeft,
               size: 16,
               color: colors.text,
             ),

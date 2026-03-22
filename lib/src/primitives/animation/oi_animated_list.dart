@@ -197,7 +197,11 @@ class _OiAnimatedListState<T> extends State<OiAnimatedList<T>> {
           index,
         );
         if (reducedMotion) return child;
-        return SizeTransition(sizeFactor: animation, child: child);
+        return SizeTransition(
+          axis: widget.scrollDirection,
+          sizeFactor: animation,
+          child: child,
+        );
       },
     );
   }

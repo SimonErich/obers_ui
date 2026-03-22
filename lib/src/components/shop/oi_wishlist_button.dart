@@ -1,16 +1,11 @@
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
 
 // Material Icons codepoints.
-const IconData _kHeartOutline = IconData(
-  0xe87e,
-  fontFamily: 'MaterialIcons',
-); // favorite_border
-const IconData _kHeartFilled = IconData(
-  0xe87d,
-  fontFamily: 'MaterialIcons',
-); // favorite
+const IconData _kHeartOutline = OiIcons.heart; // favorite_border
+const IconData _kHeartFilled = OiIcons.heart; // favorite
 
 /// A heart toggle button for adding or removing a product from a wishlist.
 ///

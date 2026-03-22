@@ -3,6 +3,7 @@ import 'package:obers_ui/src/components/buttons/oi_button.dart';
 import 'package:obers_ui/src/components/buttons/oi_toggle_button.dart';
 import 'package:obers_ui/src/components/display/oi_popover.dart';
 import 'package:obers_ui/src/components/inputs/oi_radio.dart';
+import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/primitives/display/oi_label.dart';
 
@@ -130,8 +131,8 @@ class _OiSortButtonState extends State<OiSortButton> {
 
   IconData get _directionIcon =>
       widget.currentSort.direction == OiSortDirection.asc
-      ? const IconData(0xe5d8, fontFamily: 'MaterialIcons') // arrow_upward
-      : const IconData(0xe5db, fontFamily: 'MaterialIcons'); // arrow_downward
+      ? OiIcons.arrowUp // arrow_upward
+      : OiIcons.arrowDown; // arrow_downward
 
   Widget _buildPopoverContent(BuildContext context) {
     final spacing = context.spacing;

@@ -4,6 +4,7 @@ import 'package:obers_ui/src/components/buttons/oi_button.dart';
 import 'package:obers_ui/src/components/display/oi_file_icon.dart';
 import 'package:obers_ui/src/components/display/oi_folder_icon.dart';
 import 'package:obers_ui/src/components/inputs/oi_checkbox.dart';
+import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/models/oi_file_node_data.dart';
 
@@ -149,10 +150,7 @@ class _OiDeleteDialogState extends State<OiDeleteDialog> {
                 Row(
                   children: [
                     Icon(
-                      const IconData(
-                        0xe002,
-                        fontFamily: 'MaterialIcons',
-                      ), // warning
+                      OiIcons.exclamationCircle, // warning
                       size: 16,
                       color: colors.warning.base,
                     ),
