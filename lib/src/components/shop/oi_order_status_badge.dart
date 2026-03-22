@@ -16,6 +16,7 @@ class OiOrderStatusBadge extends StatelessWidget {
   const OiOrderStatusBadge({
     required this.status,
     required this.label,
+    this.statusColors,
     this.size = OiBadgeSize.small,
     super.key,
   }) : _style = OiBadgeStyle.soft;
@@ -24,6 +25,7 @@ class OiOrderStatusBadge extends StatelessWidget {
   const OiOrderStatusBadge.soft({
     required this.status,
     required this.label,
+    this.statusColors,
     this.size = OiBadgeSize.small,
     super.key,
   }) : _style = OiBadgeStyle.soft;
@@ -32,6 +34,7 @@ class OiOrderStatusBadge extends StatelessWidget {
   const OiOrderStatusBadge.filled({
     required this.status,
     required this.label,
+    this.statusColors,
     this.size = OiBadgeSize.small,
     super.key,
   }) : _style = OiBadgeStyle.filled;
@@ -41,6 +44,7 @@ class OiOrderStatusBadge extends StatelessWidget {
   OiOrderStatusBadge.fromOrder({
     required OiOrderData order,
     this.label = 'Order status',
+    this.statusColors,
     this.size = OiBadgeSize.small,
     super.key,
   }) : status = order.status,
@@ -51,6 +55,13 @@ class OiOrderStatusBadge extends StatelessWidget {
 
   /// Accessibility label announced by screen readers.
   final String label;
+
+  /// Custom color overrides for specific statuses.
+  ///
+  /// When provided, the badge color for a given status is looked up here
+  /// first. If the status is not present in the map, the default color
+  /// mapping is used.
+  final Map<OiOrderStatus, OiBadgeColor>? statusColors;
 
   /// Badge size. Defaults to [OiBadgeSize.small].
   final OiBadgeSize size;
@@ -77,6 +88,14 @@ class OiOrderStatusBadge extends StatelessWidget {
   }
 
   OiBadgeColor get _badgeColor {
+    if (statusColors != null && statusColors!.containsKey(status)) {
+      return statusColors![status]!;
+    }
+    return _defaultColorForStatus(status);
+  }
+
+  /// Returns the default [OiBadgeColor] for the given [status].
+  static OiBadgeColor _defaultColorForStatus(OiOrderStatus status) {
     switch (status) {
       case OiOrderStatus.pending:
         return OiBadgeColor.warning;
