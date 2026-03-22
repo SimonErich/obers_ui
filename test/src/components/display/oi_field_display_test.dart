@@ -7,7 +7,9 @@ import 'dart:io';
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:golden_toolkit/golden_toolkit.dart';
 import 'package:obers_ui/src/components/display/oi_badge.dart';
+import 'package:obers_ui/src/components/display/oi_code_block.dart';
 import 'package:obers_ui/src/components/display/oi_field_display.dart';
 import 'package:obers_ui/src/components/display/oi_image.dart';
 import 'package:obers_ui/src/components/display/oi_tooltip.dart';
@@ -18,7 +20,11 @@ import 'package:obers_ui/src/primitives/display/oi_icon.dart';
 import 'package:obers_ui/src/primitives/display/oi_label.dart';
 import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
 
+import '../../../helpers/golden_helper.dart';
 import '../../../helpers/pump_app.dart';
+
+// Shorthand to reduce noise when `label` is required but not under test.
+const _l = 'test-label';
 
 // 1×1 transparent PNG bytes.
 final _kTransparentPng = <int>[
@@ -117,6 +123,7 @@ void main() {
     testWidgets('wraps content when maxLines is set', (tester) async {
       await tester.pumpObers(
         const OiFieldDisplay(
+          label: _l,
           value: 'A very long text value that should be truncated',
           type: OiFieldType.text,
           maxLines: 1,
@@ -128,7 +135,11 @@ void main() {
 
     testWidgets('does not wrap when maxLines is null', (tester) async {
       await tester.pumpObers(
-        const OiFieldDisplay(value: 'Short text', type: OiFieldType.text),
+        const OiFieldDisplay(
+          label: _l,
+          value: 'Short text',
+          type: OiFieldType.text,
+        ),
       );
 
       expect(find.byType(OiTooltip), findsNothing);
@@ -136,7 +147,11 @@ void main() {
 
     testWidgets('shows hex tooltip on color type', (tester) async {
       await tester.pumpObers(
-        const OiFieldDisplay(value: '#FF0000', type: OiFieldType.color),
+        const OiFieldDisplay(
+          label: _l,
+          value: '#FF0000',
+          type: OiFieldType.color,
+        ),
       );
 
       expect(find.byType(OiTooltip), findsOneWidget);
@@ -144,7 +159,7 @@ void main() {
 
     testWidgets('no tooltip when value is empty', (tester) async {
       await tester.pumpObers(
-        const OiFieldDisplay(value: null, type: OiFieldType.color),
+        const OiFieldDisplay(label: _l, value: null, type: OiFieldType.color),
       );
 
       expect(find.byType(OiTooltip), findsNothing);
@@ -159,6 +174,7 @@ void main() {
     ) async {
       await tester.pumpObers(
         const OiFieldDisplay(
+          label: _l,
           value: 1234567.89,
           type: OiFieldType.number,
           numberFormat: '#,##0.00',
@@ -173,6 +189,7 @@ void main() {
     ) async {
       await tester.pumpObers(
         const OiFieldDisplay(
+          label: _l,
           value: 1234.5,
           type: OiFieldType.number,
           decimalPlaces: 2,
@@ -187,6 +204,7 @@ void main() {
     ) async {
       await tester.pumpObers(
         const OiFieldDisplay(
+          label: _l,
           value: 1234.5,
           type: OiFieldType.currency,
           numberFormat: '#,##0.00',
@@ -200,6 +218,7 @@ void main() {
     testWidgets('invalid numberFormat falls back gracefully', (tester) async {
       await tester.pumpObers(
         const OiFieldDisplay(
+          label: _l,
           value: 42,
           type: OiFieldType.number,
           numberFormat: '%%%invalid%%%',
@@ -217,7 +236,11 @@ void main() {
   group('field type rendering', () {
     testWidgets('text type renders plain text', (tester) async {
       await tester.pumpObers(
-        const OiFieldDisplay(value: 'Hello World', type: OiFieldType.text),
+        const OiFieldDisplay(
+          label: _l,
+          value: 'Hello World',
+          type: OiFieldType.text,
+        ),
       );
       expect(find.text('Hello World'), findsOneWidget);
     });
@@ -225,6 +248,7 @@ void main() {
     testWidgets('number type renders formatted number', (tester) async {
       await tester.pumpObers(
         const OiFieldDisplay(
+          label: _l,
           value: 42,
           type: OiFieldType.number,
           decimalPlaces: 1,
@@ -235,7 +259,11 @@ void main() {
 
     testWidgets('currency type renders with default USD', (tester) async {
       await tester.pumpObers(
-        const OiFieldDisplay(value: 99.99, type: OiFieldType.currency),
+        const OiFieldDisplay(
+          label: _l,
+          value: 99.99,
+          type: OiFieldType.currency,
+        ),
       );
       // Default: "99.99 USD"
       expect(find.text('99.99 USD'), findsOneWidget);
@@ -243,24 +271,37 @@ void main() {
 
     testWidgets('date type renders formatted date', (tester) async {
       await tester.pumpObers(
-        OiFieldDisplay(value: DateTime(2024, 3, 15), type: OiFieldType.date),
+        OiFieldDisplay(
+          label: _l,
+          value: DateTime(2024, 3, 15),
+          type: OiFieldType.date,
+        ),
       );
-      expect(find.text('2024-03-15'), findsOneWidget);
+      // DateFormat.yMMMd() → "Mar 15, 2024"
+      expect(find.text('Mar 15, 2024'), findsOneWidget);
     });
 
     testWidgets('dateTime type renders date and time', (tester) async {
       await tester.pumpObers(
         OiFieldDisplay(
+          label: _l,
           value: DateTime(2024, 3, 15, 14, 30),
           type: OiFieldType.dateTime,
         ),
       );
-      expect(find.text('2024-03-15 14:30'), findsOneWidget);
+      // DateFormat.yMMMd().add_jm() — uses U+202F (narrow no-break space)
+      // before AM/PM, so match by OiLabel content.
+      expect(
+        find.byWidgetPredicate(
+          (w) => w is OiLabel && w.text.contains('Mar 15, 2024'),
+        ),
+        findsOneWidget,
+      );
     });
 
     testWidgets('boolean true renders Yes with check icon', (tester) async {
       await tester.pumpObers(
-        const OiFieldDisplay(value: true, type: OiFieldType.boolean),
+        const OiFieldDisplay(label: _l, value: true, type: OiFieldType.boolean),
       );
       expect(find.text('Yes'), findsOneWidget);
       expect(find.byType(OiIcon), findsOneWidget);
@@ -268,7 +309,11 @@ void main() {
 
     testWidgets('boolean false renders No', (tester) async {
       await tester.pumpObers(
-        const OiFieldDisplay(value: false, type: OiFieldType.boolean),
+        const OiFieldDisplay(
+          label: _l,
+          value: false,
+          type: OiFieldType.boolean,
+        ),
       );
       expect(find.text('No'), findsOneWidget);
     });
@@ -278,6 +323,7 @@ void main() {
     ) async {
       await tester.pumpObers(
         const OiFieldDisplay(
+          label: _l,
           value: 'user@example.com',
           type: OiFieldType.email,
         ),
@@ -289,6 +335,7 @@ void main() {
     testWidgets('url type renders with link icon', (tester) async {
       await tester.pumpObers(
         const OiFieldDisplay(
+          label: _l,
           value: 'https://example.com',
           type: OiFieldType.url,
         ),
@@ -299,7 +346,11 @@ void main() {
 
     testWidgets('phone type renders with phone icon', (tester) async {
       await tester.pumpObers(
-        const OiFieldDisplay(value: '+1-555-0123', type: OiFieldType.phone),
+        const OiFieldDisplay(
+          label: _l,
+          value: '+1-555-0123',
+          type: OiFieldType.phone,
+        ),
       );
       expect(find.text('+1-555-0123'), findsOneWidget);
       expect(find.byType(OiIcon), findsOneWidget);
@@ -308,6 +359,7 @@ void main() {
     testWidgets('file type extracts filename from path', (tester) async {
       await tester.pumpObers(
         const OiFieldDisplay(
+          label: _l,
           value: '/path/to/document.pdf',
           type: OiFieldType.file,
         ),
@@ -323,6 +375,7 @@ void main() {
 
       await tester.pumpObers(
         const OiFieldDisplay(
+          label: _l,
           value: 'https://example.com/img.png',
           type: OiFieldType.image,
         ),
@@ -335,6 +388,7 @@ void main() {
     ) async {
       await tester.pumpObers(
         const OiFieldDisplay(
+          label: _l,
           value: 'active',
           type: OiFieldType.select,
           choices: {'active': 'Active', 'inactive': 'Inactive'},
@@ -347,6 +401,7 @@ void main() {
     testWidgets('tags type renders multiple badges', (tester) async {
       await tester.pumpObers(
         const OiFieldDisplay(
+          label: _l,
           value: ['flutter', 'dart', 'ui'],
           type: OiFieldType.tags,
         ),
@@ -356,21 +411,33 @@ void main() {
 
     testWidgets('color type renders swatch and hex value', (tester) async {
       await tester.pumpObers(
-        const OiFieldDisplay(value: '#3B82F6', type: OiFieldType.color),
+        const OiFieldDisplay(
+          label: _l,
+          value: '#3B82F6',
+          type: OiFieldType.color,
+        ),
       );
       expect(find.text('#3B82F6'), findsOneWidget);
     });
 
-    testWidgets('json type renders with code label', (tester) async {
+    testWidgets('json type renders with OiCodeBlock', (tester) async {
       await tester.pumpObers(
-        const OiFieldDisplay(value: '{"key":"value"}', type: OiFieldType.json),
+        const OiFieldDisplay(
+          label: _l,
+          value: '{"key":"value"}',
+          type: OiFieldType.json,
+        ),
       );
-      expect(find.byType(OiLabel), findsOneWidget);
+      expect(find.byType(OiCodeBlock), findsOneWidget);
     });
 
     testWidgets('custom type falls back to text display', (tester) async {
       await tester.pumpObers(
-        const OiFieldDisplay(value: 'custom data', type: OiFieldType.custom),
+        const OiFieldDisplay(
+          label: _l,
+          value: 'custom data',
+          type: OiFieldType.custom,
+        ),
       );
       expect(find.text('custom data'), findsOneWidget);
     });
@@ -381,7 +448,7 @@ void main() {
   group('empty value', () {
     testWidgets('null value shows emptyText', (tester) async {
       await tester.pumpObers(
-        const OiFieldDisplay(value: null, type: OiFieldType.text),
+        const OiFieldDisplay(label: _l, value: null, type: OiFieldType.text),
       );
       expect(find.text('\u2014'), findsOneWidget);
     });
@@ -389,6 +456,7 @@ void main() {
     testWidgets('empty string shows emptyText', (tester) async {
       await tester.pumpObers(
         const OiFieldDisplay(
+          label: _l,
           value: '',
           type: OiFieldType.text,
           emptyText: 'N/A',
@@ -404,6 +472,7 @@ void main() {
     testWidgets('copyable true wraps with OiCopyable', (tester) async {
       await tester.pumpObers(
         const OiFieldDisplay(
+          label: _l,
           value: 'Copy me',
           type: OiFieldType.text,
           copyable: true,
@@ -414,7 +483,12 @@ void main() {
 
     testWidgets('onTap wraps with OiTappable', (tester) async {
       await tester.pumpObers(
-        OiFieldDisplay(value: 'Tap me', type: OiFieldType.text, onTap: () {}),
+        OiFieldDisplay(
+          label: _l,
+          value: 'Tap me',
+          type: OiFieldType.text,
+          onTap: () {},
+        ),
       );
       expect(find.byType(OiTappable), findsOneWidget);
     });
@@ -422,6 +496,7 @@ void main() {
     testWidgets('leading widget renders before value', (tester) async {
       await tester.pumpObers(
         const OiFieldDisplay(
+          label: _l,
           value: 'With icon',
           type: OiFieldType.text,
           leading: SizedBox(key: Key('leading_icon'), width: 16, height: 16),
@@ -492,6 +567,7 @@ void main() {
     ) async {
       await tester.pumpObers(
         const OiFieldDisplay(
+          label: _l,
           value: 'pending',
           type: OiFieldType.select,
           choices: {'pending': 'Pending Review', 'done': 'Completed'},
@@ -505,6 +581,7 @@ void main() {
     ) async {
       await tester.pumpObers(
         const OiFieldDisplay(
+          label: _l,
           value: 'error',
           type: OiFieldType.select,
           choices: {'error': 'Error'},
@@ -521,6 +598,7 @@ void main() {
     testWidgets('overrides default formatting', (tester) async {
       await tester.pumpObers(
         OiFieldDisplay(
+          label: _l,
           value: 42,
           type: OiFieldType.number,
           formatValue: (v) => 'Custom: $v',
@@ -532,6 +610,7 @@ void main() {
     testWidgets('exception falls back gracefully', (tester) async {
       await tester.pumpObers(
         OiFieldDisplay(
+          label: _l,
           value: 'test',
           type: OiFieldType.text,
           formatValue: (_) => throw Exception('boom'),
@@ -548,6 +627,7 @@ void main() {
     testWidgets('dateFormat custom pattern applies to date', (tester) async {
       await tester.pumpObers(
         OiFieldDisplay(
+          label: _l,
           value: DateTime(2024, 12, 25),
           type: OiFieldType.date,
           dateFormat: 'dd/MM/yyyy',
@@ -561,6 +641,7 @@ void main() {
     ) async {
       await tester.pumpObers(
         OiFieldDisplay(
+          label: _l,
           value: DateTime(2024, 12, 25, 10, 30),
           type: OiFieldType.dateTime,
           dateFormat: 'dd/MM/yyyy HH:mm',
@@ -578,6 +659,7 @@ void main() {
     ) async {
       await tester.pumpObers(
         const OiFieldDisplay(
+          label: _l,
           value: 50.0,
           type: OiFieldType.currency,
           currencySymbol: '\u20AC',
@@ -591,6 +673,7 @@ void main() {
     testWidgets('decimalPlaces controls number precision', (tester) async {
       await tester.pumpObers(
         const OiFieldDisplay(
+          label: _l,
           value: 123.456789,
           type: OiFieldType.number,
           decimalPlaces: 3,
@@ -605,7 +688,11 @@ void main() {
   group('number grouping', () {
     testWidgets('number formats with grouping separators', (tester) async {
       await tester.pumpObers(
-        const OiFieldDisplay(value: 1234567, type: OiFieldType.number),
+        const OiFieldDisplay(
+          label: _l,
+          value: 1234567,
+          type: OiFieldType.number,
+        ),
       );
       expect(find.text('1,234,567'), findsOneWidget);
     });
@@ -613,6 +700,7 @@ void main() {
     testWidgets('currency adds symbol with proper formatting', (tester) async {
       await tester.pumpObers(
         const OiFieldDisplay(
+          label: _l,
           value: 42.5,
           type: OiFieldType.currency,
           currencySymbol: '\$',
@@ -624,6 +712,7 @@ void main() {
     testWidgets('large currency formats with grouping', (tester) async {
       await tester.pumpObers(
         const OiFieldDisplay(
+          label: _l,
           value: 1234567.89,
           type: OiFieldType.currency,
           currencySymbol: '\$',
@@ -639,7 +728,7 @@ void main() {
   group('boolean null state', () {
     testWidgets('boolean null renders Unknown with dash icon', (tester) async {
       await tester.pumpObers(
-        const OiFieldDisplay(value: null, type: OiFieldType.boolean),
+        const OiFieldDisplay(label: _l, value: null, type: OiFieldType.boolean),
       );
       expect(find.text('Unknown'), findsOneWidget);
       expect(find.byType(OiIcon), findsOneWidget);
@@ -648,6 +737,7 @@ void main() {
     testWidgets('boolean null does not show emptyText', (tester) async {
       await tester.pumpObers(
         const OiFieldDisplay(
+          label: _l,
           value: null,
           type: OiFieldType.boolean,
           emptyText: 'N/A',
@@ -665,6 +755,7 @@ void main() {
     testWidgets('renders filename and size from Map', (tester) async {
       await tester.pumpObers(
         const OiFieldDisplay(
+          label: _l,
           value: {'name': 'doc.pdf', 'size': 1024},
           type: OiFieldType.file,
         ),
@@ -676,6 +767,7 @@ void main() {
     testWidgets('renders filename from Map without size', (tester) async {
       await tester.pumpObers(
         const OiFieldDisplay(
+          label: _l,
           value: {'name': 'photo.jpg'},
           type: OiFieldType.file,
         ),
@@ -686,6 +778,7 @@ void main() {
     testWidgets('large file size formats as MB', (tester) async {
       await tester.pumpObers(
         const OiFieldDisplay(
+          label: _l,
           value: {'name': 'video.mp4', 'size': 5242880},
           type: OiFieldType.file,
         ),
@@ -700,28 +793,28 @@ void main() {
   group('OiLabel convention', () {
     testWidgets('text type renders via OiLabel', (tester) async {
       await tester.pumpObers(
-        const OiFieldDisplay(value: 'Hello', type: OiFieldType.text),
+        const OiFieldDisplay(label: _l, value: 'Hello', type: OiFieldType.text),
       );
       expect(find.byType(OiLabel), findsOneWidget);
     });
 
     testWidgets('number type renders via OiLabel', (tester) async {
       await tester.pumpObers(
-        const OiFieldDisplay(value: 42, type: OiFieldType.number),
+        const OiFieldDisplay(label: _l, value: 42, type: OiFieldType.number),
       );
       expect(find.byType(OiLabel), findsOneWidget);
     });
 
     testWidgets('empty value renders via OiLabel', (tester) async {
       await tester.pumpObers(
-        const OiFieldDisplay(value: null, type: OiFieldType.text),
+        const OiFieldDisplay(label: _l, value: null, type: OiFieldType.text),
       );
       expect(find.byType(OiLabel), findsOneWidget);
     });
 
     testWidgets('boolean renders OiLabel for text', (tester) async {
       await tester.pumpObers(
-        const OiFieldDisplay(value: true, type: OiFieldType.boolean),
+        const OiFieldDisplay(label: _l, value: true, type: OiFieldType.boolean),
       );
       // OiIcon + OiLabel.body('Yes')
       expect(find.byType(OiLabel), findsOneWidget);
@@ -730,6 +823,7 @@ void main() {
     testWidgets('email renders OiLabel', (tester) async {
       await tester.pumpObers(
         const OiFieldDisplay(
+          label: _l,
           value: 'test@example.com',
           type: OiFieldType.email,
         ),
@@ -740,6 +834,7 @@ void main() {
     testWidgets('url renders OiLabel', (tester) async {
       await tester.pumpObers(
         const OiFieldDisplay(
+          label: _l,
           value: 'https://example.com',
           type: OiFieldType.url,
         ),
@@ -749,7 +844,11 @@ void main() {
 
     testWidgets('phone renders OiLabel', (tester) async {
       await tester.pumpObers(
-        const OiFieldDisplay(value: '+1-555-0123', type: OiFieldType.phone),
+        const OiFieldDisplay(
+          label: _l,
+          value: '+1-555-0123',
+          type: OiFieldType.phone,
+        ),
       );
       expect(find.byType(OiLabel), findsOneWidget);
     });
@@ -757,6 +856,7 @@ void main() {
     testWidgets('file renders OiLabel', (tester) async {
       await tester.pumpObers(
         const OiFieldDisplay(
+          label: _l,
           value: '/path/to/file.txt',
           type: OiFieldType.file,
         ),
@@ -766,21 +866,33 @@ void main() {
 
     testWidgets('color renders OiLabel', (tester) async {
       await tester.pumpObers(
-        const OiFieldDisplay(value: '#FF0000', type: OiFieldType.color),
+        const OiFieldDisplay(
+          label: _l,
+          value: '#FF0000',
+          type: OiFieldType.color,
+        ),
       );
       expect(find.byType(OiLabel), findsOneWidget);
     });
 
     testWidgets('date renders OiLabel', (tester) async {
       await tester.pumpObers(
-        OiFieldDisplay(value: DateTime(2024), type: OiFieldType.date),
+        OiFieldDisplay(
+          label: _l,
+          value: DateTime(2024),
+          type: OiFieldType.date,
+        ),
       );
       expect(find.byType(OiLabel), findsOneWidget);
     });
 
     testWidgets('currency renders OiLabel', (tester) async {
       await tester.pumpObers(
-        const OiFieldDisplay(value: 10.0, type: OiFieldType.currency),
+        const OiFieldDisplay(
+          label: _l,
+          value: 10.0,
+          type: OiFieldType.currency,
+        ),
       );
       expect(find.byType(OiLabel), findsOneWidget);
     });
@@ -788,6 +900,7 @@ void main() {
     testWidgets('custom formatValue renders OiLabel', (tester) async {
       await tester.pumpObers(
         OiFieldDisplay(
+          label: _l,
           value: 42,
           type: OiFieldType.number,
           formatValue: (v) => 'Custom: $v',
@@ -823,6 +936,24 @@ void main() {
       final tappable = tester.widget<OiTappable>(find.byType(OiTappable));
       expect(tappable.semanticLabel, 'Action Field');
     });
+
+    testWidgets('Semantics widget wraps output with correct label', (
+      tester,
+    ) async {
+      await tester.pumpObers(
+        const OiFieldDisplay(
+          label: _l,
+          value: 'test value',
+          type: OiFieldType.text,
+        ),
+      );
+
+      // Find the Semantics widget whose label matches the provided label.
+      final semanticsFinder = find.byWidgetPredicate(
+        (w) => w is Semantics && w.properties.label == _l,
+      );
+      expect(semanticsFinder, findsOneWidget);
+    });
   });
 
   // ── Theme change ────────────────────────────────────────────────────────
@@ -832,6 +963,7 @@ void main() {
       // Pump with light theme.
       await tester.pumpObers(
         const OiFieldDisplay(
+          label: _l,
           value: 'test@example.com',
           type: OiFieldType.email,
         ),
@@ -844,6 +976,7 @@ void main() {
       // Re-pump with dark theme.
       await tester.pumpObers(
         const OiFieldDisplay(
+          label: _l,
           value: 'test@example.com',
           type: OiFieldType.email,
         ),
@@ -862,6 +995,7 @@ void main() {
     testWidgets('maxLines constrains text display', (tester) async {
       await tester.pumpObers(
         const OiFieldDisplay(
+          label: _l,
           value: 'Line 1\nLine 2\nLine 3\nLine 4',
           type: OiFieldType.text,
           maxLines: 2,
@@ -871,6 +1005,178 @@ void main() {
       final label = tester.widget<OiLabel>(find.byType(OiLabel));
       expect(label.maxLines, 2);
       expect(label.overflow, TextOverflow.ellipsis);
+    });
+  });
+
+  // ── Golden tests ───────────────────────────────────────────────────────────
+
+  group('golden tests', () {
+    // Install fake HTTP client for image type golden tests.
+    late HttpOverrides? previousOverrides;
+
+    setUp(() {
+      previousOverrides = HttpOverrides.current;
+      HttpOverrides.global = _FakeHttpOverrides();
+    });
+
+    tearDown(() {
+      HttpOverrides.global = previousOverrides;
+    });
+
+    testGoldens('OiFieldDisplay golden — text types', (tester) async {
+      final builder = obersGoldenBuilder(
+        columns: 3,
+        children: {
+          'Text': const OiFieldDisplay(
+            label: _l,
+            value: 'Hello World',
+            type: OiFieldType.text,
+          ),
+          'Number': const OiFieldDisplay(
+            label: _l,
+            value: 1234567,
+            type: OiFieldType.number,
+          ),
+          'Currency': const OiFieldDisplay(
+            label: _l,
+            value: 99.99,
+            type: OiFieldType.currency,
+            currencySymbol: r'$',
+          ),
+          'Date': OiFieldDisplay(
+            label: _l,
+            value: DateTime(2024, 3, 15),
+            type: OiFieldType.date,
+          ),
+          'DateTime': OiFieldDisplay(
+            label: _l,
+            value: DateTime(2024, 3, 15, 14, 30),
+            type: OiFieldType.dateTime,
+          ),
+          'JSON': const OiFieldDisplay(
+            label: _l,
+            value: '{"key":"value"}',
+            type: OiFieldType.json,
+          ),
+        },
+      );
+      await tester.pumpWidgetBuilder(builder);
+      await screenMatchesGolden(tester, 'oi_field_display_unit_text_types');
+    });
+
+    testGoldens('OiFieldDisplay golden — interactive types', (tester) async {
+      final builder = obersGoldenBuilder(
+        columns: 3,
+        children: {
+          'Boolean true': const OiFieldDisplay(
+            label: _l,
+            value: true,
+            type: OiFieldType.boolean,
+          ),
+          'Boolean false': const OiFieldDisplay(
+            label: _l,
+            value: false,
+            type: OiFieldType.boolean,
+          ),
+          'Boolean null': const OiFieldDisplay(
+            label: _l,
+            value: null,
+            type: OiFieldType.boolean,
+          ),
+          'Email': const OiFieldDisplay(
+            label: _l,
+            value: 'user@example.com',
+            type: OiFieldType.email,
+          ),
+          'URL': const OiFieldDisplay(
+            label: _l,
+            value: 'https://example.com',
+            type: OiFieldType.url,
+          ),
+          'Phone': const OiFieldDisplay(
+            label: _l,
+            value: '+1-555-0123',
+            type: OiFieldType.phone,
+          ),
+        },
+      );
+      await tester.pumpWidgetBuilder(builder);
+      await screenMatchesGolden(
+        tester,
+        'oi_field_display_unit_interactive_types',
+      );
+    });
+
+    testGoldens('OiFieldDisplay golden — rich types', (tester) async {
+      final builder = obersGoldenBuilder(
+        columns: 3,
+        children: {
+          'File': const OiFieldDisplay(
+            label: _l,
+            value: '/path/to/document.pdf',
+            type: OiFieldType.file,
+          ),
+          'File (map)': const OiFieldDisplay(
+            label: _l,
+            value: {'name': 'report.pdf', 'size': 1048576},
+            type: OiFieldType.file,
+          ),
+          'Select': const OiFieldDisplay(
+            label: _l,
+            value: 'active',
+            type: OiFieldType.select,
+            choices: {'active': 'Active'},
+            choiceColors: {'active': OiBadgeColor.success},
+          ),
+          'Tags': const OiFieldDisplay(
+            label: _l,
+            value: ['flutter', 'dart', 'ui'],
+            type: OiFieldType.tags,
+          ),
+          'Color': const OiFieldDisplay(
+            label: _l,
+            value: '#3B82F6',
+            type: OiFieldType.color,
+          ),
+        },
+      );
+      await tester.pumpWidgetBuilder(builder);
+      await screenMatchesGolden(tester, 'oi_field_display_unit_rich_types');
+    });
+
+    testGoldens('OiFieldDisplay golden — states and pair', (tester) async {
+      final builder = obersGoldenBuilder(
+        columns: 3,
+        children: {
+          'Empty (null)': const OiFieldDisplay(
+            label: _l,
+            value: null,
+            type: OiFieldType.text,
+          ),
+          'Custom format': OiFieldDisplay(
+            label: _l,
+            value: 42,
+            type: OiFieldType.number,
+            formatValue: (v) => 'Custom: $v',
+          ),
+          'Pair horizontal': const OiFieldDisplay.pair(
+            label: 'Name',
+            value: 'Alice',
+          ),
+          'Pair vertical': const OiFieldDisplay.pair(
+            label: 'Email',
+            value: 'alice@example.com',
+            direction: Axis.vertical,
+          ),
+          'Custom type': const OiFieldDisplay(
+            label: _l,
+            value: 'custom data',
+            type: OiFieldType.custom,
+          ),
+        },
+      );
+      await tester.pumpWidgetBuilder(builder);
+      await screenMatchesGolden(tester, 'oi_field_display_unit_states_pair');
     });
   });
 }

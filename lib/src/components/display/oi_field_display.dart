@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 import 'package:obers_ui/src/components/display/oi_badge.dart';
+import 'package:obers_ui/src/components/display/oi_code_block.dart';
 import 'package:obers_ui/src/components/display/oi_image.dart';
 import 'package:obers_ui/src/components/display/oi_tooltip.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
@@ -28,9 +29,9 @@ import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
 class OiFieldDisplay extends StatelessWidget {
   /// Creates an [OiFieldDisplay] that renders a single read-only value.
   const OiFieldDisplay({
+    required this.label,
     required this.value,
     this.type = OiFieldType.text,
-    this.label,
     this.emptyText = '\u2014',
     this.copyable = false,
     this.maxLines,
@@ -76,7 +77,7 @@ class OiFieldDisplay extends StatelessWidget {
     super.key,
   }) : _isPair = true,
        _direction = direction,
-       _labelWidth = labelWidth,
+       _labelWidth = labelWidth ?? 120.0,
        label = label;
 
   /// The value to display. May be any type; the widget coerces it based on
@@ -86,8 +87,8 @@ class OiFieldDisplay extends StatelessWidget {
   /// The field type that determines rendering.
   final OiFieldType type;
 
-  /// An optional label displayed above or beside the value.
-  final String? label;
+  /// Accessibility label for the field. Required for a11y compliance.
+  final String label;
 
   /// Text shown when [value] is null or empty.
   final String emptyText;
@@ -146,16 +147,19 @@ class OiFieldDisplay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final Widget child;
     if (_isPair) {
-      return _buildPairLayout(context);
+      child = _buildPairLayout(context);
+    } else {
+      child = _wrapInteraction(context, _buildContent(context));
     }
-    return _wrapInteraction(context, _buildContent(context));
+    return Semantics(label: label, child: child);
   }
 
   Widget _buildPairLayout(BuildContext context) {
     final colors = context.colors;
     final labelWidget = OiLabel.small(
-      label ?? '',
+      label,
       overflow: TextOverflow.ellipsis,
       maxLines: 1,
     );
@@ -206,7 +210,7 @@ class OiFieldDisplay extends StatelessWidget {
     if (onTap != null) {
       result = OiTappable(
         onTap: onTap,
-        semanticLabel: label ?? _valueString,
+        semanticLabel: label,
         child: result,
       );
     }
@@ -296,7 +300,7 @@ class OiFieldDisplay extends StatelessWidget {
 
     if (maxLines != null && !_isEmpty) {
       return OiTooltip(
-        label: label ?? 'Full value',
+        label: label.isEmpty ? 'Full value' : label,
         message: _valueString,
         child: child,
       );
@@ -602,7 +606,7 @@ class OiFieldDisplay extends StatelessWidget {
   Widget _buildImageDisplay(BuildContext context) {
     return OiImage(
       src: _valueString,
-      alt: label ?? 'Image',
+      alt: label.isEmpty ? 'Image' : label,
       width: 64,
       height: 64,
       fit: BoxFit.cover,
@@ -674,10 +678,10 @@ class OiFieldDisplay extends StatelessWidget {
       formatted = _valueString;
     }
 
-    return OiLabel.code(
-      formatted,
-      maxLines: maxLines,
-      overflow: maxLines != null ? TextOverflow.ellipsis : null,
+    return OiCodeBlock(
+      code: formatted,
+      language: 'json',
+      showCopyButton: false,
     );
   }
 
@@ -691,35 +695,15 @@ class OiFieldDisplay extends StatelessWidget {
 
   String _formatDate(DateTime date) {
     if (dateFormat != null) {
-      return _applyDateFormat(date, dateFormat!);
+      return DateFormat(dateFormat).format(date);
     }
-    // Default: yyyy-MM-dd
-    final y = date.year.toString().padLeft(4, '0');
-    final m = date.month.toString().padLeft(2, '0');
-    final d = date.day.toString().padLeft(2, '0');
-    return '$y-$m-$d';
+    return DateFormat.yMMMd().format(date);
   }
 
   String _formatDateTime(DateTime date) {
     if (dateFormat != null) {
-      return _applyDateFormat(date, dateFormat!);
+      return DateFormat(dateFormat).format(date);
     }
-    // Default: yyyy-MM-dd HH:mm
-    final datePart = _formatDate(date);
-    final h = date.hour.toString().padLeft(2, '0');
-    final min = date.minute.toString().padLeft(2, '0');
-    return '$datePart $h:$min';
-  }
-
-  String _applyDateFormat(DateTime date, String format) {
-    // Simple pattern replacement without intl package.
-    return format
-        .replaceAll('yyyy', date.year.toString().padLeft(4, '0'))
-        .replaceAll('yy', (date.year % 100).toString().padLeft(2, '0'))
-        .replaceAll('MM', date.month.toString().padLeft(2, '0'))
-        .replaceAll('dd', date.day.toString().padLeft(2, '0'))
-        .replaceAll('HH', date.hour.toString().padLeft(2, '0'))
-        .replaceAll('mm', date.minute.toString().padLeft(2, '0'))
-        .replaceAll('ss', date.second.toString().padLeft(2, '0'));
+    return DateFormat.yMMMd().add_jm().format(date);
   }
 }

@@ -6,7 +6,6 @@ import 'package:obers_ui/src/components/_internal/oi_input_frame.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/primitives/animation/oi_shimmer.dart';
 import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
-import 'package:obers_ui/src/primitives/overlay/oi_floating.dart';
 
 /// A tag/chip input that lets users add and remove string tags.
 ///
@@ -178,7 +177,7 @@ class _OiTagInputState extends State<OiTagInput> {
     return source
         .where(
           (s) =>
-              s.toLowerCase().contains(lowerQuery) && !widget.tags.contains(s),
+              s.toLowerCase().startsWith(lowerQuery) && !widget.tags.contains(s),
         )
         .toList();
   }
@@ -411,13 +410,16 @@ class _OiTagInputState extends State<OiTagInput> {
 
     if (!widget._hasSuggestions) return frame;
 
-    return OiFloating(
-      visible:
-          _showSuggestions &&
-          (_filteredSuggestions.isNotEmpty || _suggestionsLoading),
-      alignment: OiFloatingAlignment.bottomStart,
-      anchor: frame,
-      child: _buildSuggestionsDropdown(context),
+    final showDropdown = _showSuggestions &&
+        (_filteredSuggestions.isNotEmpty || _suggestionsLoading);
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        frame,
+        if (showDropdown) _buildSuggestionsDropdown(context),
+      ],
     );
   }
 }
