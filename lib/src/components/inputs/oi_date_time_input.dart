@@ -16,9 +16,9 @@ import 'package:obers_ui/src/primitives/display/oi_label.dart';
 class OiDateTimeInput extends StatefulWidget {
   /// Creates an [OiDateTimeInput].
   const OiDateTimeInput({
+    required this.label,
     this.value,
     this.onChanged,
-    this.label,
     this.hint,
     this.error,
     this.min,
@@ -35,8 +35,8 @@ class OiDateTimeInput extends StatefulWidget {
   /// Called when the user changes the date or time portion.
   final ValueChanged<DateTime?>? onChanged;
 
-  /// Optional label rendered above the input pair.
-  final String? label;
+  /// Label rendered above the input pair.
+  final String label;
 
   /// Optional hint rendered below the input pair when no error is present.
   final String? hint;
@@ -122,20 +122,18 @@ class _OiDateTimeInputState extends State<OiDateTimeInput> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (widget.label != null) ...[
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                OiLabel.small(widget.label!),
-                if (widget.required)
-                  Padding(
-                    padding: const EdgeInsets.only(left: 2),
-                    child: OiLabel.small('*', color: colors.error.base),
-                  ),
-              ],
-            ),
-            const SizedBox(height: 4),
-          ],
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              OiLabel.small(widget.label),
+              if (widget.required)
+                Padding(
+                  padding: const EdgeInsets.only(left: 2),
+                  child: OiLabel.small('*', color: colors.error.base),
+                ),
+            ],
+          ),
+          const SizedBox(height: 4),
           Row(
             children: [
               Expanded(

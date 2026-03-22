@@ -11,7 +11,7 @@ import '../../../helpers/pump_app.dart';
 
 void main() {
   testWidgets('renders without error', (tester) async {
-    await tester.pumpObers(const OiDateTimeInput());
+    await tester.pumpObers(const OiDateTimeInput(label: 'Test'));
     expect(find.byType(OiDateTimeInput), findsOneWidget);
   });
 
@@ -21,27 +21,33 @@ void main() {
   });
 
   testWidgets('displays error message when provided', (tester) async {
-    await tester.pumpObers(const OiDateTimeInput(error: 'Date is required'));
+    await tester.pumpObers(
+      const OiDateTimeInput(label: 'Test', error: 'Date is required'),
+    );
     expect(find.text('Date is required'), findsOneWidget);
   });
 
   testWidgets('displays hint when provided and no error', (tester) async {
     await tester.pumpObers(
-      const OiDateTimeInput(hint: 'Select a date and time'),
+      const OiDateTimeInput(label: 'Test', hint: 'Select a date and time'),
     );
     expect(find.text('Select a date and time'), findsOneWidget);
   });
 
   testWidgets('error takes priority over hint', (tester) async {
     await tester.pumpObers(
-      const OiDateTimeInput(hint: 'Pick a date', error: 'Invalid date'),
+      const OiDateTimeInput(
+        label: 'Test',
+        hint: 'Pick a date',
+        error: 'Invalid date',
+      ),
     );
     expect(find.text('Invalid date'), findsOneWidget);
     expect(find.text('Pick a date'), findsNothing);
   });
 
   testWidgets('shows both date and time sub-inputs', (tester) async {
-    await tester.pumpObers(const OiDateTimeInput());
+    await tester.pumpObers(const OiDateTimeInput(label: 'Test'));
     expect(find.byType(OiDateInput), findsOneWidget);
     expect(find.byType(OiTimeInput), findsOneWidget);
   });
@@ -52,6 +58,7 @@ void main() {
       DateTime? result;
       await tester.pumpObers(
         OiDateTimeInput(
+          label: 'Test',
           value: DateTime(2024, 6, 15, 14, 30),
           onChanged: (v) => result = v,
         ),
@@ -84,6 +91,7 @@ void main() {
       DateTime? result;
       await tester.pumpObers(
         OiDateTimeInput(
+          label: 'Test',
           value: DateTime(2024, 6, 15, 14, 30),
           onChanged: (v) => result = v,
         ),
@@ -115,7 +123,9 @@ void main() {
     tester,
   ) async {
     DateTime? result;
-    await tester.pumpObers(OiDateTimeInput(onChanged: (v) => result = v));
+    await tester.pumpObers(
+      OiDateTimeInput(label: 'Test', onChanged: (v) => result = v),
+    );
 
     // Tap the date input to open picker
     final dateInputFinder = find.byType(OiDateInput);
@@ -139,7 +149,9 @@ void main() {
     tester,
   ) async {
     DateTime? result;
-    await tester.pumpObers(OiDateTimeInput(onChanged: (v) => result = v));
+    await tester.pumpObers(
+      OiDateTimeInput(label: 'Test', onChanged: (v) => result = v),
+    );
 
     // Tap the time input to open picker
     final timeInputFinder = find.byType(OiTimeInput);
@@ -164,7 +176,9 @@ void main() {
   testWidgets('enabled=false prevents interaction on both sub-inputs', (
     tester,
   ) async {
-    await tester.pumpObers(const OiDateTimeInput(enabled: false));
+    await tester.pumpObers(
+      const OiDateTimeInput(label: 'Test', enabled: false),
+    );
 
     // Try to tap date input — should not open picker
     final dateGestures = find.descendant(
@@ -186,7 +200,9 @@ void main() {
   });
 
   testWidgets('readOnly prevents interaction', (tester) async {
-    await tester.pumpObers(const OiDateTimeInput(readOnly: true));
+    await tester.pumpObers(
+      const OiDateTimeInput(label: 'Test', readOnly: true),
+    );
 
     final dateGestures = find.descendant(
       of: find.byType(OiDateInput),
@@ -209,7 +225,9 @@ void main() {
     final minDate = DateTime(2020);
     final maxDate = DateTime(2030);
 
-    await tester.pumpObers(OiDateTimeInput(min: minDate, max: maxDate));
+    await tester.pumpObers(
+      OiDateTimeInput(label: 'Test', min: minDate, max: maxDate),
+    );
 
     final dateInput = tester.widget<OiDateInput>(find.byType(OiDateInput));
     expect(dateInput.firstDate, minDate);
@@ -254,7 +272,7 @@ void main() {
     tester,
   ) async {
     await tester.pumpObers(
-      OiDateTimeInput(value: DateTime(2024, 3, 15, 9, 30)),
+      OiDateTimeInput(label: 'Test', value: DateTime(2024, 3, 15, 9, 30)),
     );
     // Date portion
     expect(find.text('2024-03-15'), findsOneWidget);
