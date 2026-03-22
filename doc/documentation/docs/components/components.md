@@ -434,6 +434,10 @@ OiEditableText(
 | `OiShippingOption` | Selectable shipping method row with price and radio indicator |
 | `OiStockBadge` | Stock status badge (in stock / low stock / out of stock) |
 | `OiWishlistButton` | Heart toggle button for wishlist/favorite functionality |
+| `OiAddressForm` | Standardized address form with responsive layout and country/state dropdowns |
+| `OiShippingMethodPicker` | Radio-style selector for shipping methods with loading state |
+| `OiPaymentMethodPicker` | Payment method selector with optional add-new-card slot |
+| `OiOrderStatusBadge` | Color-coded order status badge with i18n support |
 
 ### OiPriceTag
 
@@ -674,6 +678,117 @@ OiWishlistButton(
   onToggle: () => toggleWishlist(productId),
 )
 ```
+
+### OiAddressForm
+
+A standardized, reusable address form with fields for name, company, address lines, city, state/province, postal code, country, and phone. Responsive layout adapts between side-by-side and stacked fields based on breakpoint.
+
+| Parameter | Type | Default | Description |
+|---|---|---|---|
+| `label` | `String` | required | Accessibility label |
+| `initialValue` | `OiAddressData?` | `null` | Initial address to pre-fill fields |
+| `onChange` | `ValueChanged<OiAddressData>?` | `null` | Called on any field change with updated address |
+| `onSubmit` | `ValueChanged<OiAddressData>?` | `null` | Called when form is submitted |
+| `countries` | `List<OiCountryOption>?` | `null` | Country options for dropdown; state dropdown auto-appears for countries with states |
+| `showCompany` | `bool` | `true` | Whether to show company field |
+| `showPhone` | `bool` | `true` | Whether to show phone field |
+| `showName` | `bool` | `true` | Whether to show first/last name fields |
+| `readOnly` | `bool` | `false` | Whether all fields are read-only |
+| `error` | `String?` | `null` | Error message displayed below the form |
+
+```dart
+OiAddressForm(
+  label: 'Shipping address',
+  initialValue: savedAddress,
+  countries: countryOptions,
+  onChange: (address) => setState(() => _address = address),
+)
+```
+
+**Factory constructors:** `OiAddressForm.shipping()` (pre-labelled "Shipping address"), `OiAddressForm.billing()` (pre-labelled "Billing address").
+
+**Related components:** `OiCheckout`, `OiForm`, `OiTextInput`, `OiSelect`
+
+### OiShippingMethodPicker
+
+A radio-style selector that renders a list of `OiShippingOption` widgets with managed single-selection. Supports shimmer loading state.
+
+| Parameter | Type | Default | Description |
+|---|---|---|---|
+| `methods` | `List<OiShippingMethod>` | required | Available shipping methods |
+| `label` | `String` | required | Accessibility label for the group |
+| `selectedKey` | `Object?` | `null` | Key of the currently selected method |
+| `onSelect` | `ValueChanged<OiShippingMethod>?` | `null` | Called when user selects a method |
+| `currencyCode` | `String` | `'EUR'` | ISO 4217 currency code |
+| `loading` | `bool` | `false` | Show shimmer loading placeholders |
+
+```dart
+OiShippingMethodPicker(
+  methods: shippingMethods,
+  label: 'Shipping method',
+  selectedKey: selectedShipping?.key,
+  onSelect: (method) => setState(() => _shipping = method),
+  currencyCode: 'EUR',
+)
+```
+
+**Related components:** `OiShippingOption`, `OiCheckout`, `OiCard`
+
+### OiPaymentMethodPicker
+
+A selector for payment methods that renders `OiPaymentOption` widgets with managed single-selection. Optionally displays an "Add new card" slot below the options.
+
+| Parameter | Type | Default | Description |
+|---|---|---|---|
+| `methods` | `List<OiPaymentMethod>` | required | Available payment methods |
+| `label` | `String` | required | Accessibility label for the group |
+| `selectedKey` | `Object?` | `null` | Key of the currently selected method |
+| `onSelect` | `ValueChanged<OiPaymentMethod>?` | `null` | Called when user selects a method |
+| `addNewCard` | `Widget?` | `null` | Optional widget below options, separated by divider |
+
+```dart
+OiPaymentMethodPicker(
+  methods: paymentMethods,
+  label: 'Payment method',
+  selectedKey: selectedPayment?.key,
+  onSelect: (method) => setState(() => _payment = method),
+  addNewCard: OiButton(label: 'Add new card', onPressed: () => showAddCard()),
+)
+```
+
+**Related components:** `OiPaymentOption`, `OiCheckout`, `OiCard`
+
+### OiOrderStatusBadge
+
+A badge that displays `OiOrderStatus` with appropriate color coding. Default color mapping: pending (warning), confirmed (info), processing (info), shipped (primary), delivered (success), cancelled (error), refunded (muted).
+
+| Parameter | Type | Default | Description |
+|---|---|---|---|
+| `status` | `OiOrderStatus` | required | The order status to display |
+| `label` | `String` | required | Accessibility label |
+| `statusLabels` | `Map<OiOrderStatus, String>?` | `null` | Optional i18n overrides for display text |
+| `statusColors` | `Map<OiOrderStatus, Color>?` | `null` | Optional color overrides per status |
+
+```dart
+OiOrderStatusBadge(
+  status: order.status,
+  label: 'Order status',
+)
+
+// With i18n overrides
+OiOrderStatusBadge(
+  status: order.status,
+  label: 'Bestellstatus',
+  statusLabels: {
+    OiOrderStatus.pending: 'Ausstehend',
+    OiOrderStatus.delivered: 'Zugestellt',
+  },
+)
+```
+
+**Factory constructors:** `OiOrderStatusBadge.soft()`, `OiOrderStatusBadge.filled()`, `OiOrderStatusBadge.fromOrder({required OiOrderData order})`.
+
+**Related components:** `OiOrderTracker`, `OiTable`, `OiDetailView`, `OiBadge`
 
 ### OiBulkBar
 

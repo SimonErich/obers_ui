@@ -2471,6 +2471,218 @@ Heart toggle button for wishlist/favorite functionality. Shows filled heart when
 
 ---
 
+#### OiAddressForm
+**Tags:** `shop`, `address`, `form`, `checkout`, `e-commerce`, `shipping`, `billing`
+**Tier:** Component
+
+A standardized, reusable address form with fields for name, company, address lines, city, state/province, postal code, country, and phone. Responsive layout — side-by-side fields on wide breakpoints, stacked on narrow.
+
+**Props:**
+- `label` (String, required) — accessibility label
+- `initialValue` (OiAddressData?) — initial address to pre-fill fields
+- `onChange` (ValueChanged<OiAddressData>?) — called on any field change with updated address
+- `onSubmit` (ValueChanged<OiAddressData>?) — called when form is submitted
+- `countries` (List<OiCountryOption>?) — country options for dropdown; when a selected country has `states`, a state dropdown appears automatically
+- `showCompany` (bool, default true) — whether to show company field
+- `showPhone` (bool, default true) — whether to show phone field
+- `showName` (bool, default true) — whether to show first/last name fields
+- `readOnly` (bool, default false) — whether all fields are read-only
+- `error` (String?) — error message displayed below the form
+
+**Behavior:**
+- Responsive: first name + last name side by side on wide (≥ md), stacked on narrow
+- Country dropdown from `OiCountryOption` list; state becomes dropdown when country has states
+- Field order: first name, last name, company, line 1, line 2, city, state, postal code, country, phone
+- Read-only mode disables all fields
+- `onChange` fires on every field change with a new `OiAddressData`
+
+**Usage Example:**
+```dart
+OiAddressForm(
+  label: 'Shipping address',
+  initialValue: const OiAddressData(
+    firstName: 'Jane',
+    lastName: 'Doe',
+    line1: '123 Main St',
+    city: 'Berlin',
+    postalCode: '10115',
+    country: 'DE',
+  ),
+  countries: myCountryOptions, // List<OiCountryOption>
+  showCompany: false,
+  onChange: (address) => setState(() => _address = address),
+  onSubmit: (address) => _checkout(address),
+)
+```
+
+**Factory Constructors:**
+- `OiAddressForm.shipping(...)` — pre-labelled "Shipping address"
+- `OiAddressForm.billing(...)` — pre-labelled "Billing address"
+
+**Use When:** Checkout shipping/billing address, user profile address, order address display.
+**Combine With:** `OiCheckout`, `OiForm`, `OiCard`
+
+---
+
+#### OiShippingMethodPicker
+**Tags:** `shop`, `shipping`, `picker`, `radio`, `group`, `e-commerce`, `checkout`, `delivery`
+**Tier:** Component
+
+A radio-style selector that renders a list of `OiShippingOption` widgets with managed single-selection and loading state.
+
+**Props:**
+- `methods` (List<OiShippingMethod>, required) — available shipping methods
+- `label` (String, required) — accessibility label for the group
+- `selectedKey` (Object?) — key of the currently selected shipping method
+- `onSelect` (ValueChanged<OiShippingMethod>?) — called when user selects a method
+- `currencyCode` (String, default 'EUR') — ISO 4217 currency code
+- `loading` (bool, default false) — show shimmer loading placeholders
+
+**Behavior:**
+- Renders one `OiShippingOption` per method with `selected: method.key == selectedKey`
+- Loading state shows 3 shimmer placeholder rows, hides actual methods
+- Empty methods shows nothing or subtle "No shipping methods available" label
+- Forwards `currencyCode` to each `OiShippingOption`
+
+**Usage Example:**
+```dart
+OiShippingMethodPicker(
+  label: 'Choose shipping method',
+  methods: [
+    OiShippingMethod(
+      key: 'standard',
+      label: 'Standard Shipping',
+      price: 4.99,
+      estimatedDelivery: '5-7 business days',
+    ),
+    OiShippingMethod(
+      key: 'express',
+      label: 'Express Shipping',
+      price: 12.99,
+      estimatedDelivery: '1-2 business days',
+    ),
+  ],
+  selectedKey: _selectedShippingKey,
+  onSelect: (method) => setState(() => _selectedShippingKey = method.key),
+  currencyCode: 'EUR',
+)
+```
+
+**Use When:** Checkout shipping method step, delivery option selection.
+**Combine With:** `OiCheckout`, `OiCard`, `OiShippingOption`
+
+---
+
+#### OiPaymentMethodPicker
+**Tags:** `shop`, `payment`, `picker`, `radio`, `group`, `e-commerce`, `checkout`
+**Tier:** Component
+
+A selector for payment methods that renders `OiPaymentOption` widgets with managed single-selection, plus an optional slot for an "Add new card" button or form.
+
+**Props:**
+- `methods` (List<OiPaymentMethod>, required) — available payment methods
+- `label` (String, required) — accessibility label for the group
+- `selectedKey` (Object?) — key of the currently selected payment method
+- `onSelect` (ValueChanged<OiPaymentMethod>?) — called when user selects a method
+- `addNewCard` (Widget?) — optional widget displayed below options, separated by a divider
+
+**Behavior:**
+- Renders one `OiPaymentOption` per method with `selected: method.key == selectedKey`
+- If `addNewCard` is provided, renders `OiDivider` + the widget below the options
+- Empty methods with `addNewCard` shows only the add-new-card slot
+
+**Usage Example:**
+```dart
+OiPaymentMethodPicker(
+  label: 'Select payment method',
+  methods: [
+    OiPaymentMethod(
+      key: 'visa',
+      label: 'Visa',
+      lastFour: '4242',
+      expiryDate: '12/26',
+      isDefault: true,
+    ),
+    OiPaymentMethod(
+      key: 'paypal',
+      label: 'PayPal',
+      description: 'john@example.com',
+    ),
+  ],
+  selectedKey: _selectedPaymentKey,
+  onSelect: (method) => setState(() => _selectedPaymentKey = method.key),
+  addNewCard: OiButton.outline(
+    label: 'Add new card',
+    onPressed: _showAddCardForm,
+  ),
+)
+```
+
+**Use When:** Checkout payment step, saved payment method selection.
+**Combine With:** `OiCheckout`, `OiCard`, `OiPaymentOption`
+
+---
+
+#### OiOrderStatusBadge
+**Tags:** `shop`, `order`, `status`, `badge`, `e-commerce`, `tracking`
+**Tier:** Component
+
+A badge that displays `OiOrderStatus` with appropriate color coding. Wraps `OiBadge.soft` with a default color mapping for each status value.
+
+**Props:**
+- `status` (OiOrderStatus, required) — the order status to display
+- `label` (String, required) — accessibility label
+- `statusLabels` (Map<OiOrderStatus, String>?) — optional i18n overrides for display text (defaults: "Pending", "Confirmed", etc.)
+- `statusColors` (Map<OiOrderStatus, Color>?) — optional color overrides per status
+
+**Default Color Mapping:**
+- pending → warning
+- confirmed → info
+- processing → info
+- shipped → primary
+- delivered → success
+- cancelled → error
+- refunded → muted
+
+**Factory Constructors:**
+- `OiOrderStatusBadge.soft(...)` — soft (muted) background variant (default)
+- `OiOrderStatusBadge.filled(...)` — solid background variant
+- `OiOrderStatusBadge.fromOrder({required OiOrderData order})` — extracts status from an order object automatically
+
+**Behavior:**
+- Renders `OiBadge.soft` with resolved color and display label
+- Custom `statusLabels` override default title-case names
+- Custom `statusColors` override theme-derived colors
+
+**Usage Example:**
+```dart
+// Basic usage — color and label derived from status automatically
+OiOrderStatusBadge(
+  status: OiOrderStatus.shipped,
+  label: 'Order status',
+)
+
+// With custom i18n labels and color overrides
+OiOrderStatusBadge(
+  status: order.status,
+  label: 'Order status',
+  statusLabels: {
+    OiOrderStatus.pending: 'Ausstehend',
+    OiOrderStatus.shipped: 'Versendet',
+    OiOrderStatus.delivered: 'Zugestellt',
+  },
+  statusColors: {
+    OiOrderStatus.pending: context.colors.warning.base,
+    OiOrderStatus.shipped: context.colors.primary.base,
+  },
+)
+```
+
+**Use When:** Order list tables, order detail views, admin dashboards, order history.
+**Combine With:** `OiOrderTracker`, `OiTable`, `OiDetailView`, `OiListTile`
+
+---
+
 ### COMPONENTS — Buttons (continued)
 
 ---
@@ -2785,6 +2997,67 @@ Image gallery with large main image and thumbnail strip for product images. Supp
 
 **Use When:** Product detail pages, any multi-image display.
 **Combine With:** `OiShopProductDetail`, `OiLightbox`
+
+---
+
+#### OiOrderTracker
+**Tags:** `shop`, `order`, `tracking`, `stepper`, `timeline`, `status`, `e-commerce`, `composite`
+**Tier:** Composite
+
+A horizontal stepper showing order status progression (pending → confirmed → processing → shipped → delivered) with optional expandable timeline of order events. Cancelled and refunded are rendered as terminal states.
+
+**Props:**
+- `currentStatus` (OiOrderStatus, required) — the current order status to highlight
+- `label` (String, required) — accessibility label
+- `timeline` (List<OiOrderEvent>?) — optional chronological list of order events
+- `showTimeline` (bool, default false) — whether to show timeline section below stepper
+- `statusLabels` (Map<OiOrderStatus, String>?) — custom labels for each status step
+
+**Behavior:**
+- 5 happy-path steps: pending, confirmed, processing, shipped, delivered
+- Steps up to `currentStatus` marked as completed; steps after are incomplete
+- Cancelled/refunded: rendered as terminal states using `OiOrderStatusBadge` below stepper
+- Timeline section (when `showTimeline` and `timeline` provided): collapsible event list with colored dots, timestamps, titles, and descriptions using `OiTimeline`
+- Events sorted newest-first with status-based dot colors
+
+**Composition:** OiStepper, OiTimeline, OiOrderStatusBadge, OiColumn, OiLabel.
+
+**Usage Example:**
+```dart
+OiOrderTracker(
+  currentStatus: OiOrderStatus.shipped,
+  label: 'Order tracking',
+  showTimeline: true,
+  timeline: [
+    OiOrderEvent(
+      timestamp: DateTime(2026, 3, 20, 14, 30),
+      title: 'Shipped',
+      status: OiOrderStatus.shipped,
+      description: 'Package dispatched via DHL',
+    ),
+    OiOrderEvent(
+      timestamp: DateTime(2026, 3, 19, 9, 0),
+      title: 'Processing',
+      status: OiOrderStatus.processing,
+    ),
+    OiOrderEvent(
+      timestamp: DateTime(2026, 3, 18, 16, 45),
+      title: 'Confirmed',
+      status: OiOrderStatus.confirmed,
+    ),
+  ],
+  statusLabels: {
+    OiOrderStatus.pending: 'Placed',
+    OiOrderStatus.delivered: 'Arrived',
+  },
+)
+```
+
+**Factory Constructors:**
+- `OiOrderTracker.compact({required OiOrderData order})` — extracts status and timeline from order, shows stepper only (no timeline)
+
+**Use When:** Order detail pages, order confirmation, order tracking views.
+**Combine With:** `OiOrderStatusBadge`, `OiOrderSummary`, `OiDetailView`
 
 ---
 
@@ -3907,23 +4180,23 @@ Controls how forms render inputs and how `OiFieldDisplay` formats values.
 ### OiProductData
 **Tags:** `product`, `shop`, `e-commerce`, `catalog`, `item`
 
-**Fields:** `key` (Object), `name` (String), `price` (double), `description` (String?), `compareAtPrice` (double?), `currencyCode` (String, default: 'USD'), `imageUrl` (String?), `imageUrls` (List<String>), `variants` (List<OiProductVariant>), `attributes` (Map<String, String>), `inStock` (bool), `stockCount` (int?), `rating` (double?), `reviewCount` (int?), `tags` (List<String>), `sku` (String?)
+**Fields:** `key` (String), `name` (String), `price` (double), `description` (String?), `compareAtPrice` (double?), `currencyCode` (String, default: 'USD'), `imageUrl` (String?), `imageUrls` (List<String>), `variants` (List<OiProductVariant>, default: []), `attributes` (Map<String, String>, default: {}), `inStock` (bool), `stockCount` (int?), `rating` (double?), `reviewCount` (int?), `tags` (List<String>), `sku` (String?)
 
 ### OiProductVariant
 **Tags:** `variant`, `option`, `sku`, `shop`
 
-**Fields:** `key` (Object), `label` (String), `price` (double?), `imageUrl` (String?), `inStock` (bool), `stockCount` (int?), `attributes` (Map<String, String>)
+**Fields:** `key` (String), `label` (String), `price` (double?), `imageUrl` (String?), `inStock` (bool), `stockCount` (int?), `attributes` (Map<String, String>)
 
 ### OiCartItem
 **Tags:** `cart`, `shopping`, `line-item`, `order`
 
-**Fields:** `productKey` (Object), `variantKey` (Object?), `name` (String), `variantLabel` (String?), `unitPrice` (double), `quantity` (int, default: 1), `imageUrl` (String?), `maxQuantity` (int?), `attributes` (Map<String, String>)
-**Computed:** `lineTotal` (double) — `unitPrice * quantity`
+**Fields:** `productKey` (String), `variantKey` (String?), `name` (String), `variantLabel` (String?), `unitPrice` (double), `quantity` (int, default: 1), `imageUrl` (String?), `maxQuantity` (int?), `attributes` (Map<String, String>?)
+**Computed:** `totalPrice` (double) — `unitPrice * quantity`
 
 ### OiCartSummary
 **Tags:** `cart`, `total`, `summary`, `checkout`
 
-**Fields:** `subtotal` (double, default: 0), `discount` (double, default: 0), `discountLabel` (String?, e.g. "SUMMER20 (-20%)"), `shipping` (double, default: 0), `shippingLabel` (String?, e.g. "Express Shipping"), `tax` (double, default: 0), `taxLabel` (String?, e.g. "VAT 20%"), `total` (double, required), `currencyCode` (String, default: 'USD')
+**Fields:** `subtotal` (double, required), `discount` (double?), `discountLabel` (String?, e.g. "SUMMER20 (-20%)"), `shipping` (double?), `shippingLabel` (String?, e.g. "Express Shipping"), `tax` (double?), `taxLabel` (String?, e.g. "VAT 20%"), `total` (double, required), `currencyCode` (String, default: 'USD')
 
 ### OiFileNodeData
 **Tags:** `file`, `node`, `path`, `metadata`
@@ -4206,7 +4479,7 @@ Searchable keyword → widget mapping for quick lookup.
 | `accordion` | OiAccordion |
 | `action` | OiButton, OiIconButton, OiContextMenu |
 | `activity` | OiActivityFeed, OiTimeline |
-| `address` | OiAddressData, OiCheckout |
+| `address` | OiAddressData, OiAddressForm, OiCheckout |
 | `admin` | OiListView, OiDashboard, OiSidebar, OiFilterBar, OiAppShell, OiResourcePage |
 | `app-shell` | OiAppShell |
 | `auth` | OiAuthPage |
@@ -4224,7 +4497,7 @@ Searchable keyword → widget mapping for quick lookup.
 | `calendar` | OiCalendar, OiDatePicker, OiDateInput |
 | `card` | OiCard, OiDashboardCard, OiFileGridCard |
 | `cart` | OiCartItem, OiCartSummary, OiCartPanel, OiMiniCart, OiCartItemRow, OiCheckout |
-| `checkout` | OiCheckout, OiOrderSummary, OiCartPanel, OiPaymentOption, OiShippingOption |
+| `checkout` | OiCheckout, OiOrderSummary, OiCartPanel, OiPaymentOption, OiShippingOption, OiAddressForm, OiShippingMethodPicker, OiPaymentMethodPicker |
 | `chart` | OiFunnelChart, OiGauge, OiHeatmap, OiRadarChart, OiSankey, OiTreemap |
 | `chat` | OiChat, OiChatMessage, OiTypingIndicator |
 | `checkbox` | OiCheckbox |
@@ -4257,8 +4530,8 @@ Searchable keyword → widget mapping for quick lookup.
 | `editor` | OiRichEditor, OiSmartInput |
 | `email` | OiFieldDisplay(email), OiTextInput |
 | `emoji` | OiEmojiPicker, OiReactionBar |
-| `delivery` | OiShippingOption, OiShippingMethod |
-| `e-commerce` | OiPriceTag, OiQuantitySelector, OiProductCard, OiCartItemRow, OiCouponInput, OiOrderSummaryLine, OiCartPanel, OiMiniCart, OiOrderSummary, OiPaymentOption, OiShippingOption, OiStockBadge, OiWishlistButton, OiProductFilters, OiProductGallery, OiCheckout, OiShopProductDetail |
+| `delivery` | OiShippingOption, OiShippingMethod, OiShippingMethodPicker |
+| `e-commerce` | OiPriceTag, OiQuantitySelector, OiProductCard, OiCartItemRow, OiCouponInput, OiOrderSummaryLine, OiCartPanel, OiMiniCart, OiOrderSummary, OiPaymentOption, OiShippingOption, OiStockBadge, OiWishlistButton, OiProductFilters, OiProductGallery, OiCheckout, OiShopProductDetail, OiAddressForm, OiShippingMethodPicker, OiPaymentMethodPicker, OiOrderStatusBadge, OiOrderTracker |
 | `empty` | OiEmptyState |
 | `error-page` | OiErrorPage |
 | `explorer` | OiFileExplorer |
@@ -4311,15 +4584,15 @@ Searchable keyword → widget mapping for quick lookup.
 | `notification` | OiNotificationCenter, OiToast |
 | `number` | OiNumberInput, OiFieldDisplay(number) |
 | `onboarding` | OiTour, OiSpotlight, OiWhatsNew |
-| `order` | OiCartItem, OiCartSummary, OiProductData, OiOrderSummary, OiOrderSummaryLine |
+| `order` | OiCartItem, OiCartSummary, OiProductData, OiOrderSummary, OiOrderSummaryLine, OiOrderStatusBadge, OiOrderTracker |
 | `overlay` | OiDialog, OiToast, OiSheet, OiContextMenu, OiPopover, OiPanel |
 | `pagination` | OiPaginationController, OiPagination, OiTable, OiListView |
 | `panel` | OiPanel, OiResizable, OiSplitPane |
 | `path` | OiPathBar, OiBreadcrumbs |
-| `payment` | OiPaymentOption, OiPaymentMethod |
+| `payment` | OiPaymentOption, OiPaymentMethod, OiPaymentMethodPicker |
 | `permission` | OiPermissions |
 | `phone` | OiFieldDisplay(phone) |
-| `picker` | OiDatePicker, OiTimePicker, OiEmojiPicker, OiColorInput |
+| `picker` | OiDatePicker, OiTimePicker, OiEmojiPicker, OiColorInput, OiShippingMethodPicker, OiPaymentMethodPicker |
 | `pipeline` | OiPipeline |
 | `popover` | OiPopover |
 | `presence` | OiAvatar(presence), OiCursorPresence, OiLiveRing |
@@ -4342,8 +4615,8 @@ Searchable keyword → widget mapping for quick lookup.
 | `select` | OiSelect, OiComboBox, OiRadio |
 | `settings` | OiSettingsDriver, OiAccordionSettings, etc. |
 | `sheet` | OiSheet |
-| `shipping` | OiShippingOption, OiShippingMethod |
-| `shop` | OiPriceTag, OiQuantitySelector, OiProductData, OiCartItem, OiCartSummary, OiCartPanel, OiMiniCart, OiOrderSummary, OiCartItemRow, OiCouponInput, OiOrderSummaryLine, OiProductCard, OiPaymentOption, OiShippingOption, OiStockBadge, OiWishlistButton, OiProductFilters, OiProductGallery, OiCheckout, OiShopProductDetail |
+| `shipping` | OiShippingOption, OiShippingMethod, OiShippingMethodPicker, OiAddressForm |
+| `shop` | OiPriceTag, OiQuantitySelector, OiProductData, OiCartItem, OiCartSummary, OiCartPanel, OiMiniCart, OiOrderSummary, OiCartItemRow, OiCouponInput, OiOrderSummaryLine, OiProductCard, OiPaymentOption, OiShippingOption, OiStockBadge, OiWishlistButton, OiProductFilters, OiProductGallery, OiCheckout, OiShopProductDetail, OiAddressForm, OiShippingMethodPicker, OiPaymentMethodPicker, OiOrderStatusBadge, OiOrderTracker |
 | `sidebar` | OiSidebar, OiFileSidebar |
 | `skeleton` | OiSkeletonGroup, OiShimmer |
 | `slider` | OiSlider |
@@ -4351,7 +4624,8 @@ Searchable keyword → widget mapping for quick lookup.
 | `sort` | OiTable, OiListView, OiFilterBar, OiSortButton |
 | `split` | OiSplitPane, OiButton.split |
 | `state-diagram` | OiStateDiagram |
-| `stepper` | OiStepper, OiWizard |
+| `stepper` | OiStepper, OiWizard, OiOrderTracker |
+| `status` | OiOrderStatusBadge, OiStockBadge, OiBadge |
 | `stock` | OiStockBadge |
 | `storage` | OiStorageIndicator, OiSettingsDriver |
 | `surface` | OiSurface |
@@ -4364,12 +4638,13 @@ Searchable keyword → widget mapping for quick lookup.
 | `theme-toggle` | OiThemeToggle |
 | `thumbs` | OiThumbs |
 | `time` | OiTimeInput, OiTimePicker, OiRelativeTime |
-| `timeline` | OiTimeline, OiGantt |
+| `timeline` | OiTimeline, OiGantt, OiOrderTracker |
 | `toast` | OiToast |
 | `toggle` | OiToggleButton, OiSwitch, OiCheckbox |
 | `toolbar` | OiButtonGroup, OiFileToolbar |
 | `tooltip` | OiTooltip |
 | `tour` | OiTour, OiSpotlight |
+| `tracking` | OiOrderTracker, OiOrderStatusBadge |
 | `tree` | OiTree, OiFolderTreeItem, OiTreemap |
 | `treemap` | OiTreemap |
 | `typography` | OiLabel, OiTextTheme |

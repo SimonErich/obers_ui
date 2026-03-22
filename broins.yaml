@@ -4,9 +4,9 @@ llm:
     model: qwen3:14b-q4_K_M
 
 workflow:
-  maxIterationsPerWorkItem: 3
-  maxIterationsSimple: 2
-  maxIterationsMedium: 3
+  maxIterationsPerWorkItem: 4
+  maxIterationsSimple: 4
+  maxIterationsMedium: 4
   maxIterationsComplex: 4
   stuckLoopThreshold: 3
   maxStabilizationRounds: 3

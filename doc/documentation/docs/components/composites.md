@@ -190,13 +190,14 @@ OiTour(
 )
 ```
 
-## Shop
+## Shop Composites
 
 | Widget | Description |
 |---|---|
 | `OiCartPanel` | Full shopping cart view with items, coupon, summary, checkout |
 | `OiMiniCart` | Compact cart icon with badge and popover/sheet preview |
 | `OiOrderSummary` | Order summary card with totals and optional expandable item list |
+| `OiOrderTracker` | Visual order status stepper with optional event timeline |
 
 ### OiCartPanel
 
@@ -316,6 +317,57 @@ OiProductGallery(
 - Placeholder icon when no images are available
 - Clamped index to prevent out-of-bounds
 - Responsive layout via `OiColumn`
+
+### OiOrderTracker
+
+A visual order status tracker showing progression through order statuses (pending → confirmed → processing → shipped → delivered) as a horizontal stepper. Cancelled and refunded are rendered as terminal states using `OiOrderStatusBadge`. Optionally displays an expandable timeline of order events.
+
+| Parameter | Type | Default | Description |
+|---|---|---|---|
+| `currentStatus` | `OiOrderStatus` | required | The current order status to highlight |
+| `label` | `String` | required | Accessibility label |
+| `timeline` | `List<OiOrderEvent>?` | `null` | Chronological list of order events |
+| `showTimeline` | `bool` | `false` | Whether to show timeline section below stepper |
+| `statusLabels` | `Map<OiOrderStatus, String>?` | `null` | Custom labels for each status step |
+
+```dart
+// Basic tracker
+OiOrderTracker(
+  currentStatus: OiOrderStatus.shipped,
+  label: 'Order progress',
+)
+
+// With timeline
+OiOrderTracker(
+  currentStatus: OiOrderStatus.delivered,
+  label: 'Order progress',
+  showTimeline: true,
+  timeline: [
+    OiOrderEvent(
+      status: OiOrderStatus.delivered,
+      title: 'Package delivered',
+      timestamp: DateTime(2026, 3, 22, 14, 30),
+    ),
+    OiOrderEvent(
+      status: OiOrderStatus.shipped,
+      title: 'Package shipped',
+      description: 'Tracking: 1Z999AA10123456784',
+      timestamp: DateTime(2026, 3, 20, 9, 0),
+    ),
+  ],
+)
+```
+
+**Key features:**
+
+- 5 happy-path steps with completion markers
+- Terminal states (cancelled/refunded) rendered via `OiOrderStatusBadge`
+- Collapsible timeline section with colored event dots
+- Events rendered via `OiTimeline` with status-based colors
+
+**Factory constructors:** `OiOrderTracker.compact({required OiOrderData order})` — extracts status and timeline from order, shows stepper only (no timeline).
+
+**Related components:** `OiOrderStatusBadge`, `OiOrderSummary`, `OiStepper`, `OiTimeline`
 
 ## Workflow
 
