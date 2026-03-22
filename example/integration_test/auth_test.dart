@@ -8,21 +8,28 @@ import 'package:obers_ui_example/app.dart';
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
-  testWidgets('app launches and shows title', (tester) async {
+  testWidgets('auth screen shows login form', (tester) async {
     await tester.pumpWidget(const ShowcaseApp());
     await tester.pumpAndSettle();
 
-    expect(find.text('obers_ui Showcase'), findsOneWidget);
+    // Navigate to Auth.
+    await tester.tap(find.text('Auth'));
+    await tester.pumpAndSettle();
+
+    // Verify login form renders with the logo.
+    expect(find.text('Alpenglueck'), findsOneWidget);
   });
 
-  testWidgets('app shows subtitle text', (tester) async {
+  testWidgets('auth screen shows demo credentials hint', (tester) async {
     await tester.pumpWidget(const ShowcaseApp());
     await tester.pumpAndSettle();
 
+    await tester.tap(find.text('Auth'));
+    await tester.pumpAndSettle();
+
+    // Verify the demo hint is visible.
     expect(
-      find.text(
-        'Explore every widget through interactive mini-applications.',
-      ),
+      find.textContaining('famous Viennese dessert'),
       findsOneWidget,
     );
   });

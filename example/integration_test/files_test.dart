@@ -8,22 +8,19 @@ import 'package:obers_ui_example/app.dart';
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
-  testWidgets('app launches and shows title', (tester) async {
+  testWidgets('file explorer renders folder names', (tester) async {
     await tester.pumpWidget(const ShowcaseApp());
     await tester.pumpAndSettle();
 
-    expect(find.text('obers_ui Showcase'), findsOneWidget);
-  });
-
-  testWidgets('app shows subtitle text', (tester) async {
-    await tester.pumpWidget(const ShowcaseApp());
+    // Navigate to Files.
+    await tester.tap(find.text('Files'));
     await tester.pumpAndSettle();
 
-    expect(
-      find.text(
-        'Explore every widget through interactive mini-applications.',
-      ),
-      findsOneWidget,
-    );
+    // The file explorer loads folders asynchronously, so allow extra time.
+    await tester.pump(const Duration(milliseconds: 500));
+    await tester.pumpAndSettle();
+
+    // Verify a folder name is visible.
+    expect(find.text('Documents'), findsWidgets);
   });
 }
