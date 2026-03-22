@@ -23,11 +23,11 @@ import 'package:obers_ui/src/primitives/drag_drop/oi_reorderable.dart';
 class OiArrayInput<T> extends StatefulWidget {
   /// Creates an [OiArrayInput].
   const OiArrayInput({
+    required this.label,
     required this.items,
     required this.itemBuilder,
     required this.createEmpty,
     this.onChanged,
-    this.label,
     this.error,
     this.reorderable = true,
     this.addable = true,
@@ -60,8 +60,8 @@ class OiArrayInput<T> extends StatefulWidget {
   /// item-change operation.
   final ValueChanged<List<T>>? onChanged;
 
-  /// Optional label rendered above the list.
-  final String? label;
+  /// Label rendered above the list.
+  final String label;
 
   /// Validation error message rendered below the list.
   final String? error;
@@ -279,10 +279,8 @@ class _OiArrayInputState<T> extends State<OiArrayInput<T>> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (widget.label != null) ...[
-            OiLabel.small(widget.label!),
-            const SizedBox(height: 4),
-          ],
+          OiLabel.small(widget.label),
+          const SizedBox(height: 4),
           if (widget.items.isNotEmpty)
             widget.reorderable ? _buildReorderableList() : _buildAnimatedList(),
           if (showAdd)
@@ -300,8 +298,9 @@ class _OiArrayInputState<T> extends State<OiArrayInput<T>> {
             const SizedBox(height: 4),
             Row(
               children: [
-                Icon(
-                  const IconData(0xe000, fontFamily: 'MaterialIcons'),
+                OiIcon(
+                  icon: const IconData(0xe000, fontFamily: 'MaterialIcons'),
+                  label: 'Error',
                   size: 14,
                   color: colors.error.base,
                 ),

@@ -126,6 +126,30 @@ OiSelect<String>(
 )
 ```
 
+### OiArrayInput
+
+A repeatable form field group with add, remove, and reorder controls. Each row is built via `itemBuilder` and new blank rows via `createEmpty`.
+
+```dart
+OiArrayInput<String>(
+  label: 'Tags',
+  items: tags,
+  itemBuilder: (context, index, tag, onItemChanged) {
+    return OiTextInput(
+      value: tag,
+      onChanged: onItemChanged,
+      label: 'Tag ${index + 1}',
+    );
+  },
+  createEmpty: () => '',
+  onChanged: (updatedTags) => setState(() => tags = updatedTags),
+  reorderable: true,
+  addLabel: 'Add Tag',
+  minItems: 1,
+  maxItems: 10,
+)
+```
+
 ## Display
 
 | Widget | Description |

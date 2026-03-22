@@ -1683,7 +1683,7 @@ A repeatable form field group where each row contains a set of form inputs with 
 - `itemBuilder` (Widget Function(BuildContext, int, T, ValueChanged<T>), required) — Builds each row
 - `createEmpty` (T Function(), required) — Factory for new blank items
 - `onChanged` (ValueChanged<List<T>>?) — Called after add/remove/reorder/edit
-- `label` (String?) — Label above the list
+- `label` (String, required) — Label above the list
 - `error` (String?) — Validation error below the list
 - `reorderable` (bool, default: true) — Enable drag-to-reorder
 - `addable` (bool, default: true) — Show Add button

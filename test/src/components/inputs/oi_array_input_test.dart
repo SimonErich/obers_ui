@@ -16,7 +16,7 @@ void main() {
     bool removable = true,
     int? minItems,
     int? maxItems,
-    String? label,
+    String label = 'Test Array',
     String? error,
     String addLabel = 'Add',
   }) {
@@ -173,7 +173,7 @@ void main() {
   });
 
   testWidgets('no controls shown when onChanged is null', (tester) async {
-    await tester.pumpObers(buildArrayInput(items: ['a'], onChanged: null));
+    await tester.pumpObers(buildArrayInput(items: ['a']));
 
     expect(find.text('Add'), findsNothing);
     expect(find.text('Remove'), findsNothing);
@@ -211,7 +211,7 @@ void main() {
 
   testWidgets('drag handles not shown when reorderable=false', (tester) async {
     await tester.pumpObers(
-      buildArrayInput(items: ['a', 'b'], reorderable: false, onChanged: (_) {}),
+      buildArrayInput(items: ['a', 'b'], onChanged: (_) {}),
     );
 
     expect(find.bySemanticsLabel('Drag to reorder'), findsNothing);
