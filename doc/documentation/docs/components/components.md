@@ -157,6 +157,89 @@ OiSelect<String>(
 | `OiStorageIndicator` | Storage usage bar |
 | `OiTooltip` | Hover/focus tooltip |
 | `OiPagination` | Standalone pagination control with pages, compact, and load-more variants |
+| `OiFieldDisplay` | Universal read-only field renderer with 16 field types and pair layout |
+
+### OiFieldDisplay
+
+A universal read-only field renderer that formats values based on `OiFieldType`. Supports text, number, currency, date, dateTime, boolean, email, url, phone, file, image, select, tags, color, json, and custom types with appropriate formatting, icons, and link behavior.
+
+```dart
+// Simple text display
+OiFieldDisplay(
+  value: 'John Doe',
+  type: OiFieldType.text,
+  label: 'Customer name',
+)
+
+// Currency display
+OiFieldDisplay(
+  value: 42.99,
+  type: OiFieldType.currency,
+  label: 'Price',
+  currencyCode: 'EUR',
+  decimalPlaces: 2,
+)
+
+// Boolean display (shows check/cross icon with Yes/No)
+OiFieldDisplay(
+  value: true,
+  type: OiFieldType.boolean,
+  label: 'Active',
+)
+
+// Select with choice labels and badge colors
+OiFieldDisplay(
+  value: 'active',
+  type: OiFieldType.select,
+  label: 'Status',
+  choices: {'active': 'Active', 'inactive': 'Inactive'},
+  choiceColors: {'active': OiBadgeColor.success, 'inactive': OiBadgeColor.neutral},
+)
+
+// Tags display
+OiFieldDisplay(
+  value: ['flutter', 'dart', 'ui'],
+  type: OiFieldType.tags,
+  label: 'Tags',
+)
+
+// Copyable email
+OiFieldDisplay(
+  value: 'jane@example.com',
+  type: OiFieldType.email,
+  label: 'Email',
+  copyable: true,
+)
+```
+
+**Pair layout** for label + value side-by-side or stacked:
+
+```dart
+// Horizontal pair (label left, value right)
+OiFieldDisplay.pair(
+  label: 'Name',
+  value: 'Jane Smith',
+  type: OiFieldType.text,
+)
+
+// Vertical pair (label above value)
+OiFieldDisplay.pair(
+  label: 'Description',
+  value: 'A longer text value that sits below its label.',
+  type: OiFieldType.text,
+  direction: Axis.vertical,
+)
+
+// Aligned pairs with fixed label width
+Column(
+  children: [
+    OiFieldDisplay.pair(label: 'Name', value: 'Jane', labelWidth: 120),
+    OiFieldDisplay.pair(label: 'Email', value: 'jane@co.com', type: OiFieldType.email, labelWidth: 120),
+    OiFieldDisplay.pair(label: 'Status', value: 'active', type: OiFieldType.select, labelWidth: 120,
+      choices: {'active': 'Active'}, choiceColors: {'active': OiBadgeColor.success}),
+  ],
+)
+```
 
 ### OiCard
 

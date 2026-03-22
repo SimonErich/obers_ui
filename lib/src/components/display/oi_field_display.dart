@@ -24,7 +24,7 @@ import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
 ///
 /// {@category Components}
 ///
-/// Coverage: REQ-0001
+/// Coverage: REQ-0008
 class OiFieldDisplay extends StatelessWidget {
   /// Creates an [OiFieldDisplay] that renders a single read-only value.
   const OiFieldDisplay({

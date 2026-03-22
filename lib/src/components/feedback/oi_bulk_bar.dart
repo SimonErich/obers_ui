@@ -87,6 +87,8 @@ class OiBulkAction {
 /// ```
 ///
 /// {@category Components}
+///
+/// Coverage: REQ-0010
 class OiBulkBar extends StatefulWidget {
   /// Creates an [OiBulkBar].
   const OiBulkBar({

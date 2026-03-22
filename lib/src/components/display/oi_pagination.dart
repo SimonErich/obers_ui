@@ -30,7 +30,7 @@ enum OiPaginationVariant {
 ///
 /// {@category Components}
 ///
-/// Coverage: REQ-0003
+/// Coverage: REQ-0009
 class OiPagination extends StatefulWidget {
   /// Creates an [OiPagination] with the [pages] variant by default.
   ///
