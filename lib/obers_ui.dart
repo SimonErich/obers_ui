@@ -115,9 +115,13 @@ export 'src/components/panels/oi_split_pane.dart';
 export 'src/components/shop/oi_cart_item_row.dart';
 export 'src/components/shop/oi_coupon_input.dart';
 export 'src/components/shop/oi_order_summary_line.dart';
+export 'src/components/shop/oi_payment_option.dart';
 export 'src/components/shop/oi_price_tag.dart';
 export 'src/components/shop/oi_product_card.dart';
 export 'src/components/shop/oi_quantity_selector.dart';
+export 'src/components/shop/oi_shipping_option.dart';
+export 'src/components/shop/oi_stock_badge.dart';
+export 'src/components/shop/oi_wishlist_button.dart';
 // ── Composites: Data ─────────────────────────────────────────────────────────
 
 export 'src/composites/data/oi_detail_view.dart';
@@ -175,6 +179,8 @@ export 'src/composites/scheduling/oi_timeline.dart';
 export 'src/composites/shop/oi_cart_panel.dart';
 export 'src/composites/shop/oi_mini_cart.dart';
 export 'src/composites/shop/oi_order_summary.dart';
+export 'src/composites/shop/oi_product_filters.dart';
+export 'src/composites/shop/oi_product_gallery.dart';
 // ── Composites: Search ───────────────────────────────────────────────────────
 
 export 'src/composites/search/oi_combo_box.dart';
@@ -278,6 +284,7 @@ export 'src/modules/oi_list_view.dart' hide OiSelectionMode, OiSortOption;
 export 'src/modules/oi_metadata_editor.dart';
 export 'src/modules/oi_notification_center.dart';
 export 'src/modules/oi_app_shell.dart';
+export 'src/modules/oi_auth_page.dart';
 export 'src/modules/oi_permissions.dart';
 export 'src/modules/oi_checkout.dart';
 export 'src/modules/oi_resource_page.dart';

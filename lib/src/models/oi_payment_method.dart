@@ -42,10 +42,9 @@ class OiPaymentMethod {
     return OiPaymentMethod(
       key: key ?? this.key,
       label: label ?? this.label,
-      description:
-          identical(description, _sentinel)
-              ? this.description
-              : description as String?,
+      description: identical(description, _sentinel)
+          ? this.description
+          : description as String?,
       icon: identical(icon, _sentinel) ? this.icon : icon as String?,
       isDefault: isDefault ?? this.isDefault,
     );

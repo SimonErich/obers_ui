@@ -55,10 +55,9 @@ class OiOrderData {
   }) {
     return OiOrderData(
       shippingAddress: shippingAddress ?? this.shippingAddress,
-      billingAddress:
-          identical(billingAddress, _sentinel)
-              ? this.billingAddress
-              : billingAddress as OiAddressData?,
+      billingAddress: identical(billingAddress, _sentinel)
+          ? this.billingAddress
+          : billingAddress as OiAddressData?,
       shippingMethod: shippingMethod ?? this.shippingMethod,
       paymentMethod: paymentMethod ?? this.paymentMethod,
       items: items ?? this.items,

@@ -15,68 +15,63 @@ import '../../helpers/pump_app.dart';
 // ── Test data helpers ────────────────────────────────────────────────────────
 
 List<OiCartItem> _sampleCartItems() => const [
-      OiCartItem(productKey: 'p1', name: 'Widget A', unitPrice: 29.99),
-      OiCartItem(
-        productKey: 'p2',
-        name: 'Widget B',
-        unitPrice: 49.99,
-        quantity: 2,
-      ),
-    ];
+  OiCartItem(productKey: 'p1', name: 'Widget A', unitPrice: 29.99),
+  OiCartItem(productKey: 'p2', name: 'Widget B', unitPrice: 49.99, quantity: 2),
+];
 
 OiCartSummary _sampleSummary() => const OiCartSummary(
-      subtotal: 129.97,
-      shipping: 5.99,
-      tax: 10.80,
-      total: 146.76,
-    );
+  subtotal: 129.97,
+  shipping: 5.99,
+  tax: 10.80,
+  total: 146.76,
+);
 
 List<OiShippingMethod> _sampleShippingMethods() => const [
-      OiShippingMethod(
-        key: 'standard',
-        label: 'Standard Shipping',
-        price: 5.99,
-        estimatedDelivery: '5-7 business days',
-      ),
-      OiShippingMethod(
-        key: 'express',
-        label: 'Express Shipping',
-        price: 14.99,
-        estimatedDelivery: '1-2 business days',
-      ),
-    ];
+  OiShippingMethod(
+    key: 'standard',
+    label: 'Standard Shipping',
+    price: 5.99,
+    estimatedDelivery: '5-7 business days',
+  ),
+  OiShippingMethod(
+    key: 'express',
+    label: 'Express Shipping',
+    price: 14.99,
+    estimatedDelivery: '1-2 business days',
+  ),
+];
 
 List<OiPaymentMethod> _samplePaymentMethods() => const [
-      OiPaymentMethod(
-        key: 'credit',
-        label: 'Credit Card',
-        description: 'Visa ending in 4242',
-        isDefault: true,
-      ),
-      OiPaymentMethod(
-        key: 'paypal',
-        label: 'PayPal',
-        description: 'user@example.com',
-      ),
-    ];
+  OiPaymentMethod(
+    key: 'credit',
+    label: 'Credit Card',
+    description: 'Visa ending in 4242',
+    isDefault: true,
+  ),
+  OiPaymentMethod(
+    key: 'paypal',
+    label: 'PayPal',
+    description: 'user@example.com',
+  ),
+];
 
 List<OiSelectOption<String>> _sampleCountries() => const [
-      OiSelectOption(value: 'US', label: 'United States'),
-      OiSelectOption(value: 'DE', label: 'Germany'),
-      OiSelectOption(value: 'GB', label: 'United Kingdom'),
-    ];
+  OiSelectOption(value: 'US', label: 'United States'),
+  OiSelectOption(value: 'DE', label: 'Germany'),
+  OiSelectOption(value: 'GB', label: 'United Kingdom'),
+];
 
 OiAddressData _sampleAddress() => const OiAddressData(
-      firstName: 'Jane',
-      lastName: 'Doe',
-      address1: '123 Main St',
-      city: 'Springfield',
-      state: 'IL',
-      postalCode: '62701',
-      country: 'US',
-      phone: '555-0100',
-      email: 'jane@example.com',
-    );
+  firstName: 'Jane',
+  lastName: 'Doe',
+  address1: '123 Main St',
+  city: 'Springfield',
+  state: 'IL',
+  postalCode: '62701',
+  country: 'US',
+  phone: '555-0100',
+  email: 'jane@example.com',
+);
 
 Widget _buildCheckout({
   List<OiCartItem>? items,
@@ -104,7 +99,8 @@ Widget _buildCheckout({
       items: items ?? _sampleCartItems(),
       summary: summary ?? _sampleSummary(),
       label: label,
-      steps: steps ??
+      steps:
+          steps ??
           const [
             OiCheckoutStep.address,
             OiCheckoutStep.shipping,
@@ -133,10 +129,7 @@ Widget _buildCheckout({
 /// Fills the shipping address form fields with valid data and pumps.
 Future<void> _fillShippingAddress(WidgetTester tester) async {
   // Find text inputs by their label text. OiTextInput renders labels.
-  await tester.enterText(
-    find.widgetWithText(EditableText, '').first,
-    'Jane',
-  );
+  await tester.enterText(find.widgetWithText(EditableText, '').first, 'Jane');
   await tester.pump();
 
   // Use the text controllers — enter text into each OiTextInput field.
@@ -182,10 +175,7 @@ void main() {
       expect(find.text('Address'), findsAtLeast(1));
       expect(find.text('City'), findsAtLeast(1));
       expect(find.text('Postal Code'), findsAtLeast(1));
-      expect(
-        find.text('Billing address same as shipping'),
-        findsOneWidget,
-      );
+      expect(find.text('Billing address same as shipping'), findsOneWidget);
     });
 
     testWidgets('renders all steps in correct order', (tester) async {
@@ -226,8 +216,9 @@ void main() {
   // ── Validation (4) ───────────────────────────────────────────────────────
 
   group('Validation', () {
-    testWidgets('address step validates required fields before advance',
-        (tester) async {
+    testWidgets('address step validates required fields before advance', (
+      tester,
+    ) async {
       await tester.pumpObers(
         _buildCheckout(),
         surfaceSize: const Size(1200, 900),
@@ -254,8 +245,9 @@ void main() {
   // ── Selection Persistence (5-6) ──────────────────────────────────────────
 
   group('Selection Persistence', () {
-    testWidgets('shipping method selection persists across steps',
-        (tester) async {
+    testWidgets('shipping method selection persists across steps', (
+      tester,
+    ) async {
       await tester.pumpObers(
         _buildCheckout(initialShippingAddress: _sampleAddress()),
         surfaceSize: const Size(1200, 900),
@@ -285,8 +277,9 @@ void main() {
       expect(find.text('Shipping Method'), findsOneWidget);
     });
 
-    testWidgets('payment method selection persists across steps',
-        (tester) async {
+    testWidgets('payment method selection persists across steps', (
+      tester,
+    ) async {
       await tester.pumpObers(
         _buildCheckout(initialShippingAddress: _sampleAddress()),
         surfaceSize: const Size(1200, 900),
@@ -320,8 +313,9 @@ void main() {
   // ── Same-as-Shipping (7) ─────────────────────────────────────────────────
 
   group('Same-as-Shipping', () {
-    testWidgets('same-as-shipping checkbox toggles billing address fields',
-        (tester) async {
+    testWidgets('same-as-shipping checkbox toggles billing address fields', (
+      tester,
+    ) async {
       await tester.pumpObers(
         _buildCheckout(sameBillingDefault: true),
         surfaceSize: const Size(1200, 900),
@@ -421,8 +415,7 @@ void main() {
       await tester.pumpAndSettle();
     }
 
-    testWidgets('onPlaceOrder callback invoked on place order',
-        (tester) async {
+    testWidgets('onPlaceOrder callback invoked on place order', (tester) async {
       var orderPlaced = false;
       await tester.pumpObers(
         _buildCheckout(
@@ -510,8 +503,9 @@ void main() {
   // ── Responsive Layout (13-14) ────────────────────────────────────────────
 
   group('Responsive Layout', () {
-    testWidgets('desktop layout shows two-column with persistent summary',
-        (tester) async {
+    testWidgets('desktop layout shows two-column with persistent summary', (
+      tester,
+    ) async {
       // Desktop: ≥840dp → two-column layout with OiOrderSummary on right.
       await tester.pumpObers(
         _buildCheckout(),
@@ -525,8 +519,9 @@ void main() {
       expect(find.text('Order Summary'), findsNothing);
     });
 
-    testWidgets('mobile layout shows single column with collapsible summary',
-        (tester) async {
+    testWidgets('mobile layout shows single column with collapsible summary', (
+      tester,
+    ) async {
       // Mobile: <840dp → single column with accordion summary.
       await tester.pumpObers(
         _buildCheckout(),
@@ -562,8 +557,9 @@ void main() {
   // ── Keyboard (16) ────────────────────────────────────────────────────────
 
   group('Keyboard', () {
-    testWidgets('keyboard navigation advances through form fields',
-        (tester) async {
+    testWidgets('keyboard navigation advances through form fields', (
+      tester,
+    ) async {
       await tester.pumpObers(
         _buildCheckout(),
         surfaceSize: const Size(1200, 900),
@@ -589,31 +585,33 @@ void main() {
   // ── Accessibility (17) ───────────────────────────────────────────────────
 
   group('Accessibility', () {
-    testWidgets('accessibility semantics labels present on interactive elements',
-        (tester) async {
-      await tester.pumpObers(
-        _buildCheckout(initialShippingAddress: _sampleAddress()),
-        surfaceSize: const Size(1200, 900),
-      );
-      await tester.pumpAndSettle();
+    testWidgets(
+      'accessibility semantics labels present on interactive elements',
+      (tester) async {
+        await tester.pumpObers(
+          _buildCheckout(initialShippingAddress: _sampleAddress()),
+          surfaceSize: const Size(1200, 900),
+        );
+        await tester.pumpAndSettle();
 
-      // The checkout widget should have the semantics label.
-      expect(find.bySemanticsLabel('Checkout'), findsOneWidget);
+        // The checkout widget should have the semantics label.
+        expect(find.bySemanticsLabel('Checkout'), findsOneWidget);
 
-      // Advance to shipping to check shipping method semantics.
-      await tester.tap(find.text('Next'));
-      await tester.pumpAndSettle();
+        // Advance to shipping to check shipping method semantics.
+        await tester.tap(find.text('Next'));
+        await tester.pumpAndSettle();
 
-      // Shipping methods should have semantics labels.
-      expect(
-        find.bySemanticsLabel('Standard Shipping shipping option'),
-        findsOneWidget,
-      );
-      expect(
-        find.bySemanticsLabel('Express Shipping shipping option'),
-        findsOneWidget,
-      );
-    });
+        // Shipping methods should have semantics labels.
+        expect(
+          find.bySemanticsLabel('Standard Shipping shipping option'),
+          findsOneWidget,
+        );
+        expect(
+          find.bySemanticsLabel('Express Shipping shipping option'),
+          findsOneWidget,
+        );
+      },
+    );
   });
 
   // ── Golden Tests (18-20) ─────────────────────────────────────────────────

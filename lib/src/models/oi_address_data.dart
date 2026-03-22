@@ -87,26 +87,29 @@ class OiAddressData {
     Object? email = _sentinel,
   }) {
     return OiAddressData(
-      firstName:
-          identical(firstName, _sentinel)
-              ? this.firstName
-              : firstName as String?,
-      lastName:
-          identical(lastName, _sentinel) ? this.lastName : lastName as String?,
-      company:
-          identical(company, _sentinel) ? this.company : company as String?,
-      address1:
-          identical(address1, _sentinel) ? this.address1 : address1 as String?,
-      address2:
-          identical(address2, _sentinel) ? this.address2 : address2 as String?,
+      firstName: identical(firstName, _sentinel)
+          ? this.firstName
+          : firstName as String?,
+      lastName: identical(lastName, _sentinel)
+          ? this.lastName
+          : lastName as String?,
+      company: identical(company, _sentinel)
+          ? this.company
+          : company as String?,
+      address1: identical(address1, _sentinel)
+          ? this.address1
+          : address1 as String?,
+      address2: identical(address2, _sentinel)
+          ? this.address2
+          : address2 as String?,
       city: identical(city, _sentinel) ? this.city : city as String?,
       state: identical(state, _sentinel) ? this.state : state as String?,
-      postalCode:
-          identical(postalCode, _sentinel)
-              ? this.postalCode
-              : postalCode as String?,
-      country:
-          identical(country, _sentinel) ? this.country : country as String?,
+      postalCode: identical(postalCode, _sentinel)
+          ? this.postalCode
+          : postalCode as String?,
+      country: identical(country, _sentinel)
+          ? this.country
+          : country as String?,
       phone: identical(phone, _sentinel) ? this.phone : phone as String?,
       email: identical(email, _sentinel) ? this.email : email as String?,
     );

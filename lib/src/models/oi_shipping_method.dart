@@ -48,14 +48,12 @@ class OiShippingMethod {
       key: key ?? this.key,
       label: label ?? this.label,
       price: price ?? this.price,
-      description:
-          identical(description, _sentinel)
-              ? this.description
-              : description as String?,
-      estimatedDelivery:
-          identical(estimatedDelivery, _sentinel)
-              ? this.estimatedDelivery
-              : estimatedDelivery as String?,
+      description: identical(description, _sentinel)
+          ? this.description
+          : description as String?,
+      estimatedDelivery: identical(estimatedDelivery, _sentinel)
+          ? this.estimatedDelivery
+          : estimatedDelivery as String?,
       currencyCode: currencyCode ?? this.currencyCode,
     );
   }

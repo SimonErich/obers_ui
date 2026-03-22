@@ -114,11 +114,9 @@ class _OiShopProductDetailState extends State<OiShopProductDetail> {
   // Derived data
   // ---------------------------------------------------------------------------
 
-  double get _effectivePrice =>
-      _selectedVariant?.price ?? widget.product.price;
+  double get _effectivePrice => _selectedVariant?.price ?? widget.product.price;
 
-  bool get _isInStock =>
-      _selectedVariant?.inStock ?? widget.product.inStock;
+  bool get _isInStock => _selectedVariant?.inStock ?? widget.product.inStock;
 
   List<String> get _galleryImages {
     final images = <String>[];
@@ -231,15 +229,11 @@ class _OiShopProductDetailState extends State<OiShopProductDetail> {
         ),
 
         // Stock badge.
-        if (!_isInStock)
-          const OiBadge.soft(label: 'Out of Stock'),
+        if (!_isInStock) const OiBadge.soft(label: 'Out of Stock'),
 
         // SKU.
         if (widget.product.sku != null)
-          OiLabel.small(
-            'SKU: ${widget.product.sku}',
-            color: colors.textMuted,
-          ),
+          OiLabel.small('SKU: ${widget.product.sku}', color: colors.textMuted),
 
         // Variant selectors.
         if (widget.product.variants != null &&
@@ -270,10 +264,7 @@ class _OiShopProductDetailState extends State<OiShopProductDetail> {
               ),
             ),
             if (widget.onWishlist != null)
-              OiButton.outline(
-                label: 'Wishlist',
-                onTap: widget.onWishlist,
-              ),
+              OiButton.outline(label: 'Wishlist', onTap: widget.onWishlist),
           ],
         ),
       ],
@@ -611,7 +602,8 @@ class _OiProductGallery extends StatelessWidget {
                   return GestureDetector(
                     onTap: () => onIndexChange?.call(index),
                     child: Semantics(
-                      label: 'Product image ${index + 1} of ${imageUrls.length}',
+                      label:
+                          'Product image ${index + 1} of ${imageUrls.length}',
                       selected: isSelected,
                       child: Container(
                         width: 64,
@@ -630,9 +622,8 @@ class _OiProductGallery extends StatelessWidget {
                           child: Image.network(
                             imageUrls[index],
                             fit: BoxFit.cover,
-                            errorBuilder: (_, __, ___) => Container(
-                              color: colors.surfaceSubtle,
-                            ),
+                            errorBuilder: (_, __, ___) =>
+                                Container(color: colors.surfaceSubtle),
                           ),
                         ),
                       ),

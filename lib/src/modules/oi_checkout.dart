@@ -195,33 +195,37 @@ class _OiCheckoutState extends State<OiCheckout> {
           widget.paymentMethods!.first;
     }
 
-    _shipFirstName =
-        TextEditingController(text: _shippingAddress.firstName ?? '');
-    _shipLastName =
-        TextEditingController(text: _shippingAddress.lastName ?? '');
-    _shipAddress1 =
-        TextEditingController(text: _shippingAddress.address1 ?? '');
-    _shipAddress2 =
-        TextEditingController(text: _shippingAddress.address2 ?? '');
+    _shipFirstName = TextEditingController(
+      text: _shippingAddress.firstName ?? '',
+    );
+    _shipLastName = TextEditingController(
+      text: _shippingAddress.lastName ?? '',
+    );
+    _shipAddress1 = TextEditingController(
+      text: _shippingAddress.address1 ?? '',
+    );
+    _shipAddress2 = TextEditingController(
+      text: _shippingAddress.address2 ?? '',
+    );
     _shipCity = TextEditingController(text: _shippingAddress.city ?? '');
     _shipState = TextEditingController(text: _shippingAddress.state ?? '');
-    _shipPostalCode =
-        TextEditingController(text: _shippingAddress.postalCode ?? '');
+    _shipPostalCode = TextEditingController(
+      text: _shippingAddress.postalCode ?? '',
+    );
     _shipPhone = TextEditingController(text: _shippingAddress.phone ?? '');
     _shipEmail = TextEditingController(text: _shippingAddress.email ?? '');
 
-    _billFirstName =
-        TextEditingController(text: _billingAddress.firstName ?? '');
-    _billLastName =
-        TextEditingController(text: _billingAddress.lastName ?? '');
-    _billAddress1 =
-        TextEditingController(text: _billingAddress.address1 ?? '');
-    _billAddress2 =
-        TextEditingController(text: _billingAddress.address2 ?? '');
+    _billFirstName = TextEditingController(
+      text: _billingAddress.firstName ?? '',
+    );
+    _billLastName = TextEditingController(text: _billingAddress.lastName ?? '');
+    _billAddress1 = TextEditingController(text: _billingAddress.address1 ?? '');
+    _billAddress2 = TextEditingController(text: _billingAddress.address2 ?? '');
     _billCity = TextEditingController(text: _billingAddress.city ?? '');
     _billState = TextEditingController(text: _billingAddress.state ?? '');
-    _billPostalCode =
-        TextEditingController(text: _billingAddress.postalCode ?? '');
+    _billPostalCode = TextEditingController(
+      text: _billingAddress.postalCode ?? '',
+    );
   }
 
   @override
@@ -251,15 +255,13 @@ class _OiCheckoutState extends State<OiCheckout> {
 
   void _syncShippingAddress() {
     _shippingAddress = OiAddressData(
-      firstName:
-          _shipFirstName.text.isEmpty ? null : _shipFirstName.text,
+      firstName: _shipFirstName.text.isEmpty ? null : _shipFirstName.text,
       lastName: _shipLastName.text.isEmpty ? null : _shipLastName.text,
       address1: _shipAddress1.text.isEmpty ? null : _shipAddress1.text,
       address2: _shipAddress2.text.isEmpty ? null : _shipAddress2.text,
       city: _shipCity.text.isEmpty ? null : _shipCity.text,
       state: _shipState.text.isEmpty ? null : _shipState.text,
-      postalCode:
-          _shipPostalCode.text.isEmpty ? null : _shipPostalCode.text,
+      postalCode: _shipPostalCode.text.isEmpty ? null : _shipPostalCode.text,
       country: _shippingAddress.country,
       phone: _shipPhone.text.isEmpty ? null : _shipPhone.text,
       email: _shipEmail.text.isEmpty ? null : _shipEmail.text,
@@ -269,15 +271,13 @@ class _OiCheckoutState extends State<OiCheckout> {
 
   void _syncBillingAddress() {
     _billingAddress = OiAddressData(
-      firstName:
-          _billFirstName.text.isEmpty ? null : _billFirstName.text,
+      firstName: _billFirstName.text.isEmpty ? null : _billFirstName.text,
       lastName: _billLastName.text.isEmpty ? null : _billLastName.text,
       address1: _billAddress1.text.isEmpty ? null : _billAddress1.text,
       address2: _billAddress2.text.isEmpty ? null : _billAddress2.text,
       city: _billCity.text.isEmpty ? null : _billCity.text,
       state: _billState.text.isEmpty ? null : _billState.text,
-      postalCode:
-          _billPostalCode.text.isEmpty ? null : _billPostalCode.text,
+      postalCode: _billPostalCode.text.isEmpty ? null : _billPostalCode.text,
       country: _billingAddress.country,
     );
     widget.onBillingAddressChange?.call(_billingAddress);
@@ -321,8 +321,7 @@ class _OiCheckoutState extends State<OiCheckout> {
     if (_shipPostalCode.text.isEmpty) {
       errors['shipPostalCode'] = 'Postal code is required';
     }
-    if (_shippingAddress.country == null ||
-        _shippingAddress.country!.isEmpty) {
+    if (_shippingAddress.country == null || _shippingAddress.country!.isEmpty) {
       errors['shipCountry'] = 'Country is required';
     }
 
@@ -794,10 +793,7 @@ class _OiCheckoutState extends State<OiCheckout> {
         child: Semantics(
           label: 'Edit $text',
           button: true,
-          child: OiLabel.small(
-            'Edit',
-            color: colors.primary.base,
-          ),
+          child: OiLabel.small('Edit', color: colors.primary.base),
         ),
       );
     }
@@ -805,10 +801,7 @@ class _OiCheckoutState extends State<OiCheckout> {
     Widget sectionHeader(String title, OiCheckoutStep target) {
       return Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          OiLabel.bodyStrong(title),
-          editLink(title, target),
-        ],
+        children: [OiLabel.bodyStrong(title), editLink(title, target)],
       );
     }
 
@@ -913,8 +906,7 @@ class _OiCheckoutState extends State<OiCheckout> {
 
   Widget _buildNavBar(BuildContext context) {
     final isFirst = _currentStepIndex == 0;
-    final isReview =
-        widget.steps[_currentStepIndex] == OiCheckoutStep.review;
+    final isReview = widget.steps[_currentStepIndex] == OiCheckoutStep.review;
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -923,10 +915,7 @@ class _OiCheckoutState extends State<OiCheckout> {
           mainAxisSize: MainAxisSize.min,
           children: [
             if (widget.onCancel != null)
-              OiButton.ghost(
-                label: 'Cancel',
-                onTap: widget.onCancel,
-              ),
+              OiButton.ghost(label: 'Cancel', onTap: widget.onCancel),
             if (!isFirst)
               Padding(
                 padding: const EdgeInsets.only(left: 8),
@@ -937,11 +926,7 @@ class _OiCheckoutState extends State<OiCheckout> {
               ),
           ],
         ),
-        if (!isReview)
-          OiButton.primary(
-            label: 'Next',
-            onTap: _goNext,
-          ),
+        if (!isReview) OiButton.primary(label: 'Next', onTap: _goNext),
       ],
     );
   }
@@ -1044,9 +1029,7 @@ class _OiCheckoutState extends State<OiCheckout> {
     if (widget.items.isEmpty) {
       return Semantics(
         label: widget.label,
-        child: const Center(
-          child: OiLabel.body('Your cart is empty.'),
-        ),
+        child: const Center(child: OiLabel.body('Your cart is empty.')),
       );
     }
 
@@ -1076,20 +1059,14 @@ class _RadioDot extends StatelessWidget {
       height: 20,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        border: Border.all(
-          color: selected ? color : colors.border,
-          width: 2,
-        ),
+        border: Border.all(color: selected ? color : colors.border, width: 2),
       ),
       child: selected
           ? Center(
               child: Container(
                 width: 10,
                 height: 10,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: color,
-                ),
+                decoration: BoxDecoration(shape: BoxShape.circle, color: color),
               ),
             )
           : null,
