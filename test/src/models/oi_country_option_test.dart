@@ -5,17 +5,48 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui/src/models/oi_country_option.dart';
 
 void main() {
+  group('OiStateOption', () {
+    test('constructor sets all fields', () {
+      const option = OiStateOption(name: 'California', code: 'CA');
+      expect(option.name, 'California');
+      expect(option.code, 'CA');
+    });
+
+    test('equality for same values', () {
+      const a = OiStateOption(name: 'California', code: 'CA');
+      const b = OiStateOption(name: 'California', code: 'CA');
+      expect(a, b);
+      expect(a.hashCode, b.hashCode);
+    });
+
+    test('inequality for different values', () {
+      const a = OiStateOption(name: 'California', code: 'CA');
+      const b = OiStateOption(name: 'New York', code: 'NY');
+      expect(a, isNot(b));
+    });
+
+    test('toString includes all fields', () {
+      const option = OiStateOption(name: 'California', code: 'CA');
+      expect(option.toString(), 'OiStateOption(name: California, code: CA)');
+    });
+  });
+
   group('OiCountryOption', () {
     test('constructor sets all fields', () {
       const option = OiCountryOption(
         code: 'US',
         name: 'United States',
-        states: ['California', 'New York'],
+        states: [
+          OiStateOption(name: 'California', code: 'CA'),
+          OiStateOption(name: 'New York', code: 'NY'),
+        ],
       );
 
       expect(option.code, 'US');
       expect(option.name, 'United States');
-      expect(option.states, ['California', 'New York']);
+      expect(option.states, hasLength(2));
+      expect(option.states![0].name, 'California');
+      expect(option.states![1].code, 'NY');
     });
 
     test('constructor with null states', () {
@@ -27,46 +58,52 @@ void main() {
       const original = OiCountryOption(
         code: 'US',
         name: 'United States',
-        states: ['California'],
+        states: [OiStateOption(name: 'California', code: 'CA')],
       );
 
       final copied = original.copyWith(code: 'GB');
       expect(copied.code, 'GB');
       expect(copied.name, 'United States');
-      expect(copied.states, ['California']);
+      expect(copied.states, hasLength(1));
     });
 
     test('copyWith replaces name', () {
       const original = OiCountryOption(
         code: 'US',
         name: 'United States',
-        states: ['California'],
+        states: [OiStateOption(name: 'California', code: 'CA')],
       );
 
       final copied = original.copyWith(name: 'USA');
       expect(copied.code, 'US');
       expect(copied.name, 'USA');
-      expect(copied.states, ['California']);
+      expect(copied.states, hasLength(1));
     });
 
     test('copyWith replaces states', () {
       const original = OiCountryOption(
         code: 'US',
         name: 'United States',
-        states: ['California'],
+        states: [OiStateOption(name: 'California', code: 'CA')],
       );
 
-      final copied = original.copyWith(states: ['New York', 'Texas']);
+      final copied = original.copyWith(
+        states: [
+          const OiStateOption(name: 'New York', code: 'NY'),
+          const OiStateOption(name: 'Texas', code: 'TX'),
+        ],
+      );
       expect(copied.code, 'US');
       expect(copied.name, 'United States');
-      expect(copied.states, ['New York', 'Texas']);
+      expect(copied.states, hasLength(2));
+      expect(copied.states![0].name, 'New York');
     });
 
     test('copyWith with explicit null for states', () {
       const original = OiCountryOption(
         code: 'US',
         name: 'United States',
-        states: ['California'],
+        states: [OiStateOption(name: 'California', code: 'CA')],
       );
 
       final copied = original.copyWith(states: null);
@@ -77,26 +114,26 @@ void main() {
       const original = OiCountryOption(
         code: 'US',
         name: 'United States',
-        states: ['California'],
+        states: [OiStateOption(name: 'California', code: 'CA')],
       );
 
       final copied = original.copyWith();
       expect(copied, original);
       expect(copied.code, 'US');
       expect(copied.name, 'United States');
-      expect(copied.states, ['California']);
+      expect(copied.states, hasLength(1));
     });
 
     test('equality for same values', () {
       const a = OiCountryOption(
         code: 'US',
         name: 'United States',
-        states: ['CA'],
+        states: [OiStateOption(name: 'California', code: 'CA')],
       );
       const b = OiCountryOption(
         code: 'US',
         name: 'United States',
-        states: ['CA'],
+        states: [OiStateOption(name: 'California', code: 'CA')],
       );
 
       expect(a, b);
@@ -106,7 +143,7 @@ void main() {
       const a = OiCountryOption(
         code: 'US',
         name: 'United States',
-        states: ['CA'],
+        states: [OiStateOption(name: 'California', code: 'CA')],
       );
       const b = OiCountryOption(code: 'GB', name: 'United Kingdom');
 
@@ -117,17 +154,26 @@ void main() {
       const a = OiCountryOption(
         code: 'US',
         name: 'United States',
-        states: ['CA', 'NY'],
+        states: [
+          OiStateOption(name: 'California', code: 'CA'),
+          OiStateOption(name: 'New York', code: 'NY'),
+        ],
       );
       const b = OiCountryOption(
         code: 'US',
         name: 'United States',
-        states: ['CA', 'NY'],
+        states: [
+          OiStateOption(name: 'California', code: 'CA'),
+          OiStateOption(name: 'New York', code: 'NY'),
+        ],
       );
       const c = OiCountryOption(
         code: 'US',
         name: 'United States',
-        states: ['CA', 'TX'],
+        states: [
+          OiStateOption(name: 'California', code: 'CA'),
+          OiStateOption(name: 'Texas', code: 'TX'),
+        ],
       );
       const d = OiCountryOption(code: 'US', name: 'United States');
 
@@ -143,12 +189,12 @@ void main() {
       const a = OiCountryOption(
         code: 'US',
         name: 'United States',
-        states: ['CA'],
+        states: [OiStateOption(name: 'California', code: 'CA')],
       );
       const b = OiCountryOption(
         code: 'US',
         name: 'United States',
-        states: ['CA'],
+        states: [OiStateOption(name: 'California', code: 'CA')],
       );
       const c = OiCountryOption(code: 'GB', name: 'United Kingdom');
 
@@ -160,17 +206,13 @@ void main() {
       const option = OiCountryOption(
         code: 'US',
         name: 'United States',
-        states: ['CA'],
+        states: [OiStateOption(name: 'California', code: 'CA')],
       );
 
       final str = option.toString();
       expect(str, contains('US'));
       expect(str, contains('United States'));
-      expect(str, contains('CA'));
-      expect(
-        str,
-        'OiCountryOption(code: US, name: United States, states: [CA])',
-      );
+      expect(str, contains('OiStateOption'));
 
       // Also verify with null states
       const optionNull = OiCountryOption(code: 'DE', name: 'Germany');

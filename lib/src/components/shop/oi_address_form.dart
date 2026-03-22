@@ -11,59 +11,60 @@ import 'package:obers_ui/src/primitives/layout/oi_row.dart';
 
 /// A form for entering a postal / shipping address.
 ///
-/// Coverage: REQ-0022
+/// Coverage: REQ-0001, REQ-0002, REQ-0003
 ///
 /// Renders labelled text inputs for first name, last name, company (optional),
 /// address line 1, address line 2 (optional), city, state/province, postal
-/// code, country, phone, and email. Calls [onChanged] with an updated
+/// code, country, and phone. Calls [onChange] with an updated
 /// [OiAddressData] whenever a field changes.
 ///
-/// Pre-populate by passing an [initialData] value.
+/// Pre-populate by passing an [initialValue] value.
+///
+/// On wide breakpoints (≥ [OiBreakpoint.medium]), paired fields (name, city +
+/// state, postal code + country) render side by side in [OiRow]. On narrow
+/// breakpoints all fields stack vertically in [OiColumn].
 ///
 /// {@category Components}
 class OiAddressForm extends StatefulWidget {
   /// Creates an [OiAddressForm].
   const OiAddressForm({
     required this.label,
-    this.initialData = const OiAddressData(),
-    this.onChanged,
-    this.enabled = true,
-    this.showName = true,
+    this.initialValue,
+    this.onChange,
+    this.onSubmit,
+    this.countries,
     this.showCompany = true,
     this.showPhone = true,
-    this.countries,
+    this.showName = true,
     this.readOnly = false,
-    this.onSubmit,
     this.error,
     super.key,
   });
 
   /// Creates an [OiAddressForm] pre-labelled for shipping addresses.
   const OiAddressForm.shipping({
-    this.initialData = const OiAddressData(),
-    this.onChanged,
-    this.enabled = true,
-    this.showName = true,
+    this.initialValue,
+    this.onChange,
+    this.onSubmit,
+    this.countries,
     this.showCompany = true,
     this.showPhone = true,
-    this.countries,
+    this.showName = true,
     this.readOnly = false,
-    this.onSubmit,
     this.error,
     super.key,
   }) : label = 'Shipping address';
 
   /// Creates an [OiAddressForm] pre-labelled for billing addresses.
   const OiAddressForm.billing({
-    this.initialData = const OiAddressData(),
-    this.onChanged,
-    this.enabled = true,
-    this.showName = true,
+    this.initialValue,
+    this.onChange,
+    this.onSubmit,
+    this.countries,
     this.showCompany = true,
     this.showPhone = true,
-    this.countries,
+    this.showName = true,
     this.readOnly = false,
-    this.onSubmit,
     this.error,
     super.key,
   }) : label = 'Billing address';
@@ -71,23 +72,16 @@ class OiAddressForm extends StatefulWidget {
   /// Accessibility label for the form region.
   final String label;
 
-  /// Initial address values to pre-fill. Defaults to empty.
-  final OiAddressData initialData;
+  /// Initial address values to pre-fill. When `null`, all fields start empty.
+  final OiAddressData? initialValue;
 
   /// Called whenever a field value changes with the latest [OiAddressData].
-  final ValueChanged<OiAddressData>? onChanged;
+  final ValueChanged<OiAddressData>? onChange;
 
-  /// Whether the form inputs are enabled. Defaults to `true`.
-  final bool enabled;
-
-  /// Whether to show the first name and last name fields. Defaults to `true`.
-  final bool showName;
-
-  /// Whether to show the company field. Defaults to `true`.
-  final bool showCompany;
-
-  /// Whether to show the phone field. Defaults to `true`.
-  final bool showPhone;
+  /// Called when the form is submitted with valid data.
+  /// Validation runs before calling — if any required field is empty, inline
+  /// errors are shown and [onSubmit] is not called.
+  final ValueChanged<OiAddressData>? onSubmit;
 
   /// Optional list of country options. When provided, the country field
   /// renders as an [OiSelect] dropdown instead of a plain text input.
@@ -95,22 +89,21 @@ class OiAddressForm extends StatefulWidget {
   /// as a dropdown; otherwise the state field is a text input.
   final List<OiCountryOption>? countries;
 
-  /// Whether the form is read-only. When `true`, all inputs are non-editable.
-  /// Takes precedence over [enabled].
+  /// Whether to show the company field. Defaults to `true`.
+  final bool showCompany;
+
+  /// Whether to show the phone field. Defaults to `true`.
+  final bool showPhone;
+
+  /// Whether to show the first name and last name fields. Defaults to `true`.
+  final bool showName;
+
+  /// Whether the form is read-only. When `true`, all inputs are non-editable
+  /// and all selects are disabled.
   final bool readOnly;
 
-  /// Called when the form is submitted with valid data.
-  /// Validation runs before calling — if any required field is empty, inline
-  /// errors are shown and [onSubmit] is not called.
-  final ValueChanged<OiAddressData>? onSubmit;
-
-  /// Per-field error messages keyed by field name (e.g. `{'line1': 'Required'}`).
-  /// Supported keys: `firstName`, `lastName`, `company`, `line1`, `line2`,
-  /// `city`, `state`, `postalCode`, `country`, `phone`, `email`.
-  final Map<String, String>? error;
-
-  /// Whether the fields are effectively interactive.
-  bool get _isInteractive => enabled && !readOnly;
+  /// An optional global error message for the form.
+  final String? error;
 
   @override
   State<OiAddressForm> createState() => _OiAddressFormState();
@@ -127,7 +120,6 @@ class _OiAddressFormState extends State<OiAddressForm> {
   late final TextEditingController _postalCodeCtrl;
   late final TextEditingController _countryCtrl;
   late final TextEditingController _phoneCtrl;
-  late final TextEditingController _emailCtrl;
 
   String? _selectedCountryCode;
   String? _selectedStateValue;
@@ -136,23 +128,22 @@ class _OiAddressFormState extends State<OiAddressForm> {
   @override
   void initState() {
     super.initState();
-    final d = widget.initialData;
-    _firstNameCtrl = TextEditingController(text: d.firstName ?? '');
-    _lastNameCtrl = TextEditingController(text: d.lastName ?? '');
-    _companyCtrl = TextEditingController(text: d.company ?? '');
-    _line1Ctrl = TextEditingController(text: d.line1 ?? '');
-    _line2Ctrl = TextEditingController(text: d.line2 ?? '');
-    _cityCtrl = TextEditingController(text: d.city ?? '');
-    _stateCtrl = TextEditingController(text: d.state ?? '');
-    _postalCodeCtrl = TextEditingController(text: d.postalCode ?? '');
-    _countryCtrl = TextEditingController(text: d.country ?? '');
-    _phoneCtrl = TextEditingController(text: d.phone ?? '');
-    _emailCtrl = TextEditingController(text: d.email ?? '');
+    final d = widget.initialValue;
+    _firstNameCtrl = TextEditingController(text: d?.firstName ?? '');
+    _lastNameCtrl = TextEditingController(text: d?.lastName ?? '');
+    _companyCtrl = TextEditingController(text: d?.company ?? '');
+    _line1Ctrl = TextEditingController(text: d?.line1 ?? '');
+    _line2Ctrl = TextEditingController(text: d?.line2 ?? '');
+    _cityCtrl = TextEditingController(text: d?.city ?? '');
+    _stateCtrl = TextEditingController(text: d?.state ?? '');
+    _postalCodeCtrl = TextEditingController(text: d?.postalCode ?? '');
+    _countryCtrl = TextEditingController(text: d?.country ?? '');
+    _phoneCtrl = TextEditingController(text: d?.phone ?? '');
 
     // Resolve initial country code from countries list.
-    if (widget.countries != null && d.country != null) {
+    if (widget.countries != null && d?.country != null) {
       final match = widget.countries!.where(
-        (c) => c.code == d.country || c.name == d.country,
+        (c) => c.code == d!.country || c.name == d.country,
       );
       if (match.isNotEmpty) {
         _selectedCountryCode = match.first.code;
@@ -160,7 +151,7 @@ class _OiAddressFormState extends State<OiAddressForm> {
     }
 
     // Resolve initial state value.
-    if (d.state != null && d.state!.isNotEmpty) {
+    if (d?.state != null && d!.state!.isNotEmpty) {
       _selectedStateValue = d.state;
     }
   }
@@ -177,13 +168,12 @@ class _OiAddressFormState extends State<OiAddressForm> {
     _postalCodeCtrl.dispose();
     _countryCtrl.dispose();
     _phoneCtrl.dispose();
-    _emailCtrl.dispose();
     super.dispose();
   }
 
   String? _emptyToNull(String v) => v.trim().isEmpty ? null : v.trim();
 
-  OiAddressData _currentData() {
+  OiAddressData _buildCurrentData() {
     final countryValue = widget.countries != null
         ? (_selectedCountryCode != null
               ? widget.countries!
@@ -208,12 +198,11 @@ class _OiAddressFormState extends State<OiAddressForm> {
       postalCode: _emptyToNull(_postalCodeCtrl.text),
       country: countryValue,
       phone: _emptyToNull(_phoneCtrl.text),
-      email: _emptyToNull(_emailCtrl.text),
     );
   }
 
-  void _notifyChanged() {
-    widget.onChanged?.call(_currentData());
+  void _onFieldChanged() {
+    widget.onChange?.call(_buildCurrentData());
   }
 
   OiCountryOption? get _selectedCountry {
@@ -253,141 +242,191 @@ class _OiAddressFormState extends State<OiAddressForm> {
       return;
     }
     setState(() => _validationErrors = null);
-    widget.onSubmit?.call(_currentData());
+    widget.onSubmit?.call(_buildCurrentData());
   }
 
-  String? _errorFor(String field) {
-    return widget.error?[field] ?? _validationErrors?[field];
+  String? _validationErrorFor(String field) {
+    return _validationErrors?[field];
   }
 
-  Widget _buildNameFields(BuildContext context) {
-    final sp = context.spacing;
-    final breakpoint = context.breakpoint;
-    return OiRow(
-      breakpoint: breakpoint,
-      gap: OiResponsive(sp.sm),
-      children: [
-        Expanded(
-          child: OiTextInput(
-            controller: _firstNameCtrl,
-            label: 'First name',
-            placeholder: 'First name',
-            enabled: widget._isInteractive,
-            readOnly: widget.readOnly,
-            error: _errorFor('firstName'),
-            onChanged: (_) => _notifyChanged(),
-          ),
-        ),
-        Expanded(
-          child: OiTextInput(
-            controller: _lastNameCtrl,
-            label: 'Last name',
-            placeholder: 'Last name',
-            enabled: widget._isInteractive,
-            readOnly: widget.readOnly,
-            error: _errorFor('lastName'),
-            onChanged: (_) => _notifyChanged(),
-          ),
-        ),
-      ],
-    );
-  }
+  // ── Field builders ──────────────────────────────────────────────────────
 
-  Widget _buildCompanyField(BuildContext context) {
-    return OiTextInput(
-      controller: _companyCtrl,
-      label: 'Company',
-      placeholder: 'Company (optional)',
-      enabled: widget._isInteractive,
+  Widget _buildNameRow(bool isWide) {
+    final firstName = OiTextInput(
+      controller: _firstNameCtrl,
+      label: 'First name',
+      placeholder: 'First name',
       readOnly: widget.readOnly,
-      error: _errorFor('company'),
-      onChanged: (_) => _notifyChanged(),
+      enabled: !widget.readOnly,
+      error: _validationErrorFor('firstName'),
+      onChanged: (_) => _onFieldChanged(),
     );
-  }
-
-  Widget _buildPhoneField(BuildContext context) {
-    return Expanded(
-      child: OiTextInput(
-        controller: _phoneCtrl,
-        label: 'Phone',
-        placeholder: 'Phone number',
-        enabled: widget._isInteractive,
-        readOnly: widget.readOnly,
-        error: _errorFor('phone'),
-        onChanged: (_) => _notifyChanged(),
-      ),
+    final lastName = OiTextInput(
+      controller: _lastNameCtrl,
+      label: 'Last name',
+      placeholder: 'Last name',
+      readOnly: widget.readOnly,
+      enabled: !widget.readOnly,
+      error: _validationErrorFor('lastName'),
+      onChanged: (_) => _onFieldChanged(),
     );
-  }
 
-  Widget _buildCountryField(BuildContext context) {
-    if (widget.countries != null && widget.countries!.isNotEmpty) {
-      return Expanded(
-        child: OiSelect<String>(
-          label: 'Country',
-          placeholder: 'Country',
-          value: _selectedCountryCode,
-          options: widget.countries!
-              .map((c) => OiSelectOption<String>(value: c.code, label: c.name))
-              .toList(),
-          enabled: widget._isInteractive,
-          error: _errorFor('country'),
-          onChanged: (code) {
-            setState(() {
-              _selectedCountryCode = code;
-              // Reset state when country changes.
-              _selectedStateValue = null;
-              _stateCtrl.text = '';
-            });
-            _notifyChanged();
-          },
-        ),
+    if (!isWide) {
+      return OiColumn(
+        breakpoint: context.breakpoint,
+        gap: OiResponsive(context.spacing.md),
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [firstName, lastName],
       );
     }
-    return Expanded(
-      child: OiTextInput(
-        controller: _countryCtrl,
-        label: 'Country',
-        placeholder: 'Country',
-        enabled: widget._isInteractive,
-        readOnly: widget.readOnly,
-        error: _errorFor('country'),
-        onChanged: (_) => _notifyChanged(),
-      ),
+
+    return OiRow(
+      breakpoint: context.breakpoint,
+      gap: OiResponsive(context.spacing.sm),
+      children: [Expanded(child: firstName), Expanded(child: lastName)],
     );
   }
 
-  Widget _buildStateField(BuildContext context) {
+  List<Widget> _buildAddressFields() {
+    return [
+      OiTextInput(
+        controller: _line1Ctrl,
+        label: 'Address line 1',
+        placeholder: 'Street address',
+        readOnly: widget.readOnly,
+        enabled: !widget.readOnly,
+        error: _validationErrorFor('line1'),
+        onChanged: (_) => _onFieldChanged(),
+      ),
+      OiTextInput(
+        controller: _line2Ctrl,
+        label: 'Address line 2',
+        placeholder: 'Apartment, suite, etc. (optional)',
+        readOnly: widget.readOnly,
+        enabled: !widget.readOnly,
+        error: _validationErrorFor('line2'),
+        onChanged: (_) => _onFieldChanged(),
+      ),
+    ];
+  }
+
+  Widget _buildStateFieldRaw() {
     final country = _selectedCountry;
     if (country != null &&
         country.states != null &&
         country.states!.isNotEmpty) {
-      return Expanded(
-        child: OiSelect<String>(
-          label: 'State / Province',
-          placeholder: 'State / Province',
-          value: _selectedStateValue,
-          options: country.states!
-              .map((s) => OiSelectOption<String>(value: s, label: s))
-              .toList(),
-          enabled: widget._isInteractive,
-          error: _errorFor('state'),
-          onChanged: (value) {
-            setState(() => _selectedStateValue = value);
-            _notifyChanged();
-          },
-        ),
-      );
-    }
-    return Expanded(
-      child: OiTextInput(
-        controller: _stateCtrl,
+      return OiSelect<String>(
         label: 'State / Province',
         placeholder: 'State / Province',
-        enabled: widget._isInteractive,
-        readOnly: widget.readOnly,
-        error: _errorFor('state'),
-        onChanged: (_) => _notifyChanged(),
-      ),
+        value: _selectedStateValue,
+        options: country.states!
+            .map((s) => OiSelectOption<String>(value: s.code, label: s.name))
+            .toList(),
+        enabled: !widget.readOnly,
+        error: _validationErrorFor('state'),
+        onChanged: (value) {
+          setState(() => _selectedStateValue = value);
+          _onFieldChanged();
+        },
+      );
+    }
+    return OiTextInput(
+      controller: _stateCtrl,
+      label: 'State / Province',
+      placeholder: 'State / Province',
+      readOnly: widget.readOnly,
+      enabled: !widget.readOnly,
+      error: _validationErrorFor('state'),
+      onChanged: (_) => _onFieldChanged(),
+    );
+  }
+
+  Widget _buildCityStateRow(bool isWide) {
+    final city = OiTextInput(
+      controller: _cityCtrl,
+      label: 'City',
+      placeholder: 'City',
+      readOnly: widget.readOnly,
+      enabled: !widget.readOnly,
+      error: _validationErrorFor('city'),
+      onChanged: (_) => _onFieldChanged(),
+    );
+    final state = _buildStateFieldRaw();
+
+    if (!isWide) {
+      return OiColumn(
+        breakpoint: context.breakpoint,
+        gap: OiResponsive(context.spacing.md),
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [city, state],
+      );
+    }
+
+    return OiRow(
+      breakpoint: context.breakpoint,
+      gap: OiResponsive(context.spacing.sm),
+      children: [Expanded(child: city), Expanded(child: state)],
+    );
+  }
+
+  Widget _buildCountryFieldRaw() {
+    if (widget.countries != null && widget.countries!.isNotEmpty) {
+      return OiSelect<String>(
+        label: 'Country',
+        placeholder: 'Country',
+        value: _selectedCountryCode,
+        options: widget.countries!
+            .map((c) => OiSelectOption<String>(value: c.code, label: c.name))
+            .toList(),
+        enabled: !widget.readOnly,
+        error: _validationErrorFor('country'),
+        onChanged: (code) {
+          setState(() {
+            _selectedCountryCode = code;
+            // Reset state when country changes.
+            _selectedStateValue = null;
+            _stateCtrl.text = '';
+          });
+          _onFieldChanged();
+        },
+      );
+    }
+    return OiTextInput(
+      controller: _countryCtrl,
+      label: 'Country',
+      placeholder: 'Country',
+      readOnly: widget.readOnly,
+      enabled: !widget.readOnly,
+      error: _validationErrorFor('country'),
+      onChanged: (_) => _onFieldChanged(),
+    );
+  }
+
+  Widget _buildPostalCountryRow(bool isWide) {
+    final postalCode = OiTextInput(
+      controller: _postalCodeCtrl,
+      label: 'Postal code',
+      placeholder: 'Postal code',
+      readOnly: widget.readOnly,
+      enabled: !widget.readOnly,
+      error: _validationErrorFor('postalCode'),
+      onChanged: (_) => _onFieldChanged(),
+    );
+    final country = _buildCountryFieldRaw();
+
+    if (!isWide) {
+      return OiColumn(
+        breakpoint: context.breakpoint,
+        gap: OiResponsive(context.spacing.md),
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [postalCode, country],
+      );
+    }
+
+    return OiRow(
+      breakpoint: context.breakpoint,
+      gap: OiResponsive(context.spacing.sm),
+      children: [Expanded(child: postalCode), Expanded(child: country)],
     );
   }
 
@@ -395,6 +434,7 @@ class _OiAddressFormState extends State<OiAddressForm> {
   Widget build(BuildContext context) {
     final sp = context.spacing;
     final breakpoint = context.breakpoint;
+    final isWide = context.isMediumOrWider;
 
     return Semantics(
       label: widget.label,
@@ -404,80 +444,31 @@ class _OiAddressFormState extends State<OiAddressForm> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           OiLabel.bodyStrong(widget.label),
-          if (widget.showName) _buildNameFields(context),
-          if (widget.showCompany) _buildCompanyField(context),
-          OiTextInput(
-            controller: _line1Ctrl,
-            label: 'Address line 1',
-            placeholder: 'Street address',
-            enabled: widget._isInteractive,
-            readOnly: widget.readOnly,
-            error: _errorFor('line1'),
-            onChanged: (_) => _notifyChanged(),
-          ),
-          OiTextInput(
-            controller: _line2Ctrl,
-            label: 'Address line 2',
-            placeholder: 'Apartment, suite, etc. (optional)',
-            enabled: widget._isInteractive,
-            readOnly: widget.readOnly,
-            error: _errorFor('line2'),
-            onChanged: (_) => _notifyChanged(),
-          ),
-          OiRow(
-            breakpoint: breakpoint,
-            gap: OiResponsive(sp.sm),
-            children: [
-              Expanded(
-                child: OiTextInput(
-                  controller: _cityCtrl,
-                  label: 'City',
-                  placeholder: 'City',
-                  enabled: widget._isInteractive,
-                  readOnly: widget.readOnly,
-                  error: _errorFor('city'),
-                  onChanged: (_) => _notifyChanged(),
-                ),
-              ),
-              _buildStateField(context),
-            ],
-          ),
-          OiRow(
-            breakpoint: breakpoint,
-            gap: OiResponsive(sp.sm),
-            children: [
-              Expanded(
-                child: OiTextInput(
-                  controller: _postalCodeCtrl,
-                  label: 'Postal code',
-                  placeholder: 'Postal code',
-                  enabled: widget._isInteractive,
-                  readOnly: widget.readOnly,
-                  error: _errorFor('postalCode'),
-                  onChanged: (_) => _notifyChanged(),
-                ),
-              ),
-              _buildCountryField(context),
-            ],
-          ),
-          OiRow(
-            breakpoint: breakpoint,
-            gap: OiResponsive(sp.sm),
-            children: [
-              if (widget.showPhone) _buildPhoneField(context),
-              Expanded(
-                child: OiTextInput(
-                  controller: _emailCtrl,
-                  label: 'Email',
-                  placeholder: 'Email address',
-                  enabled: widget._isInteractive,
-                  readOnly: widget.readOnly,
-                  error: _errorFor('email'),
-                  onChanged: (_) => _notifyChanged(),
-                ),
-              ),
-            ],
-          ),
+          if (widget.showName) _buildNameRow(isWide),
+          if (widget.showCompany)
+            OiTextInput(
+              controller: _companyCtrl,
+              label: 'Company',
+              placeholder: 'Company (optional)',
+              readOnly: widget.readOnly,
+              enabled: !widget.readOnly,
+              error: _validationErrorFor('company'),
+              onChanged: (_) => _onFieldChanged(),
+            ),
+          ..._buildAddressFields(),
+          _buildCityStateRow(isWide),
+          _buildPostalCountryRow(isWide),
+          if (widget.showPhone)
+            OiTextInput(
+              controller: _phoneCtrl,
+              label: 'Phone',
+              placeholder: 'Phone number',
+              readOnly: widget.readOnly,
+              enabled: !widget.readOnly,
+              error: _validationErrorFor('phone'),
+              onChanged: (_) => _onFieldChanged(),
+            ),
+          if (widget.error != null) OiLabel.small(widget.error!),
         ],
       ),
     );

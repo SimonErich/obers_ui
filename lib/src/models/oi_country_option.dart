@@ -1,8 +1,38 @@
 import 'package:flutter/foundation.dart';
 
+/// A state or province subdivision within a country.
+///
+/// Coverage: REQ-0001
+///
+/// {@category Models}
+@immutable
+class OiStateOption {
+  /// Creates an [OiStateOption].
+  const OiStateOption({required this.name, required this.code});
+
+  /// Human-readable state/province name (e.g. 'California').
+  final String name;
+
+  /// State/province code (e.g. 'CA').
+  final String code;
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! OiStateOption) return false;
+    return name == other.name && code == other.code;
+  }
+
+  @override
+  int get hashCode => Object.hash(name, code);
+
+  @override
+  String toString() => 'OiStateOption(name: $name, code: $code)';
+}
+
 /// A country option for address forms with optional state/province subdivisions.
 ///
-/// Coverage: REQ-0013, REQ-0014
+/// Coverage: REQ-0001, REQ-0013, REQ-0014
 ///
 /// {@category Models}
 @immutable
@@ -16,8 +46,8 @@ class OiCountryOption {
   /// Human-readable country name (e.g. 'United States').
   final String name;
 
-  /// Optional list of state/province names for this country.
-  final List<String>? states;
+  /// Optional list of state/province subdivisions for this country.
+  final List<OiStateOption>? states;
 
   /// Returns a copy with the specified fields replaced.
   OiCountryOption copyWith({
@@ -30,7 +60,7 @@ class OiCountryOption {
       name: name ?? this.name,
       states: identical(states, _sentinel)
           ? this.states
-          : states as List<String>?,
+          : states as List<OiStateOption>?,
     );
   }
 

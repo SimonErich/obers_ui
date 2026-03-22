@@ -10,7 +10,11 @@ void main() {
       const country = OiCountryOption(
         code: 'CH',
         name: 'Switzerland',
-        states: ['Zürich', 'Bern', 'Geneva'],
+        states: [
+          OiStateOption(name: 'Zürich', code: 'ZH'),
+          OiStateOption(name: 'Bern', code: 'BE'),
+          OiStateOption(name: 'Geneva', code: 'GE'),
+        ],
       );
       expect(country.code, 'CH');
       expect(country.name, 'Switzerland');
@@ -33,7 +37,10 @@ void main() {
       const country = OiCountryOption(
         code: 'US',
         name: 'USA',
-        states: ['CA', 'NY'],
+        states: [
+          OiStateOption(name: 'California', code: 'CA'),
+          OiStateOption(name: 'New York', code: 'NY'),
+        ],
       );
       final copy = country.copyWith(states: null);
       expect(copy.states, isNull);
@@ -47,8 +54,16 @@ void main() {
     });
 
     test('equality considers states', () {
-      const a = OiCountryOption(code: 'US', name: 'USA', states: ['CA']);
-      const b = OiCountryOption(code: 'US', name: 'USA', states: ['NY']);
+      const a = OiCountryOption(
+        code: 'US',
+        name: 'USA',
+        states: [OiStateOption(name: 'California', code: 'CA')],
+      );
+      const b = OiCountryOption(
+        code: 'US',
+        name: 'USA',
+        states: [OiStateOption(name: 'New York', code: 'NY')],
+      );
       expect(a, isNot(equals(b)));
     });
 

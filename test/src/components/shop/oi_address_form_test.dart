@@ -29,44 +29,49 @@ OiAddressData _sampleAddress() => const OiAddressData(
   postalCode: '8001',
   country: 'Switzerland',
   phone: '+41 44 123 4567',
-  email: 'jane@example.com',
 );
 
 List<OiCountryOption> _sampleCountries() => const [
   OiCountryOption(
     code: 'US',
     name: 'United States',
-    states: ['California', 'New York', 'Texas'],
+    states: [
+      OiStateOption(name: 'California', code: 'CA'),
+      OiStateOption(name: 'New York', code: 'NY'),
+      OiStateOption(name: 'Texas', code: 'TX'),
+    ],
   ),
   OiCountryOption(code: 'CH', name: 'Switzerland'),
   OiCountryOption(
     code: 'DE',
     name: 'Germany',
-    states: ['Bavaria', 'Berlin', 'Hamburg'],
+    states: [
+      OiStateOption(name: 'Bavaria', code: 'BY'),
+      OiStateOption(name: 'Berlin', code: 'BE'),
+      OiStateOption(name: 'Hamburg', code: 'HH'),
+    ],
   ),
 ];
 
 Widget _buildAddressForm({
   String label = 'Shipping address',
-  OiAddressData initialData = const OiAddressData(),
-  ValueChanged<OiAddressData>? onChanged,
-  bool enabled = true,
+  OiAddressData? initialValue,
+  ValueChanged<OiAddressData>? onChange,
   bool showName = true,
   bool showCompany = true,
   bool showPhone = true,
   List<OiCountryOption>? countries,
   bool readOnly = false,
   ValueChanged<OiAddressData>? onSubmit,
-  Map<String, String>? error,
+  String? error,
   GlobalKey<State>? formKey,
 }) {
   return SingleChildScrollView(
     child: OiAddressForm(
       key: formKey,
       label: label,
-      initialData: initialData,
-      onChanged: onChanged,
-      enabled: enabled,
+      initialValue: initialValue,
+      onChange: onChange,
       showName: showName,
       showCompany: showCompany,
       showPhone: showPhone,
@@ -87,9 +92,9 @@ void main() {
         await tester.pumpObers(_buildAddressForm(), surfaceSize: _surfaceSize);
 
         expect(find.byType(OiAddressForm), findsOneWidget);
-        // 11 text inputs: first name, last name, company, line1, line2,
-        // city, state, postal code, country, phone, email.
-        expect(find.byType(OiTextInput), findsNWidgets(11));
+        // 10 text inputs: first name, last name, company, line1, line2,
+        // city, state, postal code, country, phone.
+        expect(find.byType(OiTextInput), findsNWidgets(10));
       });
 
       testWidgets('renders field placeholder texts', (tester) async {
@@ -105,7 +110,6 @@ void main() {
         expect(find.text('Postal code'), findsWidgets);
         expect(find.text('Country'), findsWidgets);
         expect(find.text('Phone number'), findsOneWidget);
-        expect(find.text('Email address'), findsOneWidget);
       });
 
       testWidgets('displays the form label', (tester) async {
@@ -143,11 +147,13 @@ void main() {
         expect(find.text('Billing address'), findsOneWidget);
       });
 
-      testWidgets('shipping constructor pre-fills initialData', (tester) async {
+      testWidgets('shipping constructor pre-fills initialValue', (
+        tester,
+      ) async {
         await tester.pumpObers(
           const SingleChildScrollView(
             child: OiAddressForm.shipping(
-              initialData: OiAddressData(firstName: 'Alice'),
+              initialValue: OiAddressData(firstName: 'Alice'),
             ),
           ),
           surfaceSize: _surfaceSize,
@@ -156,11 +162,13 @@ void main() {
         expect(find.text('Alice'), findsOneWidget);
       });
 
-      testWidgets('billing constructor pre-fills initialData', (tester) async {
+      testWidgets('billing constructor pre-fills initialValue', (
+        tester,
+      ) async {
         await tester.pumpObers(
           const SingleChildScrollView(
             child: OiAddressForm.billing(
-              initialData: OiAddressData(lastName: 'Smith'),
+              initialValue: OiAddressData(lastName: 'Smith'),
             ),
           ),
           surfaceSize: _surfaceSize,
@@ -173,12 +181,12 @@ void main() {
     // ── onChange firing ───────────────────────────────────────────────────
 
     group('onChange', () {
-      testWidgets('fires onChanged with updated data on first name edit', (
+      testWidgets('fires onChange with updated data on first name edit', (
         tester,
       ) async {
         OiAddressData? latest;
         await tester.pumpObers(
-          _buildAddressForm(onChanged: (data) => latest = data),
+          _buildAddressForm(onChange: (data) => latest = data),
           surfaceSize: _surfaceSize,
         );
 
@@ -191,12 +199,12 @@ void main() {
         expect(latest!.firstName, 'Jane');
       });
 
-      testWidgets('fires onChanged with updated data on last name edit', (
+      testWidgets('fires onChange with updated data on last name edit', (
         tester,
       ) async {
         OiAddressData? latest;
         await tester.pumpObers(
-          _buildAddressForm(onChanged: (data) => latest = data),
+          _buildAddressForm(onChange: (data) => latest = data),
           surfaceSize: _surfaceSize,
         );
 
@@ -209,12 +217,12 @@ void main() {
         expect(latest!.lastName, 'Doe');
       });
 
-      testWidgets('fires onChanged with updated data on city edit', (
+      testWidgets('fires onChange with updated data on city edit', (
         tester,
       ) async {
         OiAddressData? latest;
         await tester.pumpObers(
-          _buildAddressForm(onChanged: (data) => latest = data),
+          _buildAddressForm(onChange: (data) => latest = data),
           surfaceSize: _surfaceSize,
         );
 
@@ -227,12 +235,12 @@ void main() {
         expect(latest!.city, 'Bern');
       });
 
-      testWidgets('fires onChanged with updated data on country edit', (
+      testWidgets('fires onChange with updated data on country edit', (
         tester,
       ) async {
         OiAddressData? latest;
         await tester.pumpObers(
-          _buildAddressForm(onChanged: (data) => latest = data),
+          _buildAddressForm(onChange: (data) => latest = data),
           surfaceSize: _surfaceSize,
         );
 
@@ -245,30 +253,12 @@ void main() {
         expect(latest!.country, 'Germany');
       });
 
-      testWidgets('fires onChanged with updated data on email edit', (
-        tester,
-      ) async {
-        OiAddressData? latest;
-        await tester.pumpObers(
-          _buildAddressForm(onChanged: (data) => latest = data),
-          surfaceSize: _surfaceSize,
-        );
-
-        final inputs = find.byType(OiTextInput);
-        // Index 10 is "Email".
-        await tester.enterText(inputs.at(10), 'test@example.com');
-        await tester.pump();
-
-        expect(latest, isNotNull);
-        expect(latest!.email, 'test@example.com');
-      });
-
-      testWidgets('fires onChanged with null for empty fields', (tester) async {
+      testWidgets('fires onChange with null for empty fields', (tester) async {
         OiAddressData? latest;
         await tester.pumpObers(
           _buildAddressForm(
-            initialData: const OiAddressData(firstName: 'Jane'),
-            onChanged: (data) => latest = data,
+            initialValue: const OiAddressData(firstName: 'Jane'),
+            onChange: (data) => latest = data,
           ),
           surfaceSize: _surfaceSize,
         );
@@ -282,10 +272,10 @@ void main() {
         expect(latest!.firstName, isNull);
       });
 
-      testWidgets('trims whitespace before calling onChanged', (tester) async {
+      testWidgets('trims whitespace before calling onChange', (tester) async {
         OiAddressData? latest;
         await tester.pumpObers(
-          _buildAddressForm(onChanged: (data) => latest = data),
+          _buildAddressForm(onChange: (data) => latest = data),
           surfaceSize: _surfaceSize,
         );
 
@@ -300,10 +290,10 @@ void main() {
     // ── initialValue pre-fill ─────────────────────────────────────────────
 
     group('initialValue pre-fill', () {
-      testWidgets('pre-fills all fields from initialData', (tester) async {
+      testWidgets('pre-fills all fields from initialValue', (tester) async {
         final address = _sampleAddress();
         await tester.pumpObers(
-          _buildAddressForm(initialData: address),
+          _buildAddressForm(initialValue: address),
           surfaceSize: _surfaceSize,
         );
 
@@ -317,15 +307,14 @@ void main() {
         expect(find.text('8001'), findsOneWidget);
         expect(find.text('Switzerland'), findsOneWidget);
         expect(find.text('+41 44 123 4567'), findsOneWidget);
-        expect(find.text('jane@example.com'), findsOneWidget);
       });
 
-      testWidgets('partial initialData shows only filled fields', (
+      testWidgets('partial initialValue shows only filled fields', (
         tester,
       ) async {
         await tester.pumpObers(
           _buildAddressForm(
-            initialData: const OiAddressData(
+            initialValue: const OiAddressData(
               firstName: 'Alice',
               city: 'Zürich',
             ),
@@ -337,7 +326,7 @@ void main() {
         expect(find.text('Zürich'), findsOneWidget);
       });
 
-      testWidgets('empty initialData shows no pre-filled values', (
+      testWidgets('null initialValue shows no pre-filled values', (
         tester,
       ) async {
         await tester.pumpObers(_buildAddressForm(), surfaceSize: _surfaceSize);
@@ -349,55 +338,6 @@ void main() {
       });
     });
 
-    // ── enabled / disabled mode ──────────────────────────────────────────
-
-    group('enabled / disabled mode', () {
-      testWidgets('enabled=false disables all inputs', (tester) async {
-        await tester.pumpObers(
-          _buildAddressForm(enabled: false),
-          surfaceSize: _surfaceSize,
-        );
-
-        final textInputs = tester.widgetList<OiTextInput>(
-          find.byType(OiTextInput),
-        );
-        for (final input in textInputs) {
-          expect(input.enabled, isFalse);
-        }
-      });
-
-      testWidgets('enabled=true enables all inputs by default', (tester) async {
-        await tester.pumpObers(_buildAddressForm(), surfaceSize: _surfaceSize);
-
-        final textInputs = tester.widgetList<OiTextInput>(
-          find.byType(OiTextInput),
-        );
-        for (final input in textInputs) {
-          expect(input.enabled, isTrue);
-        }
-      });
-
-      testWidgets('disabled form does not fire onChanged on edit attempt', (
-        tester,
-      ) async {
-        var callCount = 0;
-        await tester.pumpObers(
-          _buildAddressForm(enabled: false, onChanged: (_) => callCount++),
-          surfaceSize: _surfaceSize,
-        );
-
-        // Attempt to type in the first field — should be ignored.
-        final inputs = find.byType(OiTextInput);
-        await tester.enterText(inputs.at(0), 'Test');
-        await tester.pump();
-
-        // The widget is disabled, so the field may or may not accept text,
-        // but the form should not propagate changes through onChanged.
-        // The OiTextInput.enabled=false prevents editing.
-        expect(callCount, 0);
-      });
-    });
-
     // ── readOnly mode ────────────────────────────────────────────────────
 
     group('readOnly mode', () {
@@ -405,7 +345,7 @@ void main() {
         tester,
       ) async {
         await tester.pumpObers(
-          _buildAddressForm(readOnly: true, initialData: _sampleAddress()),
+          _buildAddressForm(readOnly: true, initialValue: _sampleAddress()),
           surfaceSize: _surfaceSize,
         );
 
@@ -417,11 +357,9 @@ void main() {
         }
       });
 
-      testWidgets('readOnly takes precedence over enabled', (tester) async {
+      testWidgets('readOnly=true disables all text inputs', (tester) async {
         await tester.pumpObers(
-          // Explicitly passing enabled:true to test precedence of readOnly.
-          // ignore: avoid_redundant_argument_values
-          _buildAddressForm(readOnly: true, enabled: true),
+          _buildAddressForm(readOnly: true),
           surfaceSize: _surfaceSize,
         );
 
@@ -429,8 +367,25 @@ void main() {
           find.byType(OiTextInput),
         );
         for (final input in textInputs) {
-          // readOnly=true + enabled=true → _isInteractive is false
           expect(input.enabled, isFalse);
+        }
+      });
+
+      testWidgets('readOnly=true disables OiSelect fields', (tester) async {
+        await tester.pumpObers(
+          _buildAddressForm(
+            readOnly: true,
+            countries: _sampleCountries(),
+            initialValue: const OiAddressData(country: 'US'),
+          ),
+          surfaceSize: _surfaceSize,
+        );
+
+        final selects = tester.widgetList<OiSelect<String>>(
+          find.byType(OiSelect<String>),
+        );
+        for (final select in selects) {
+          expect(select.enabled, isFalse);
         }
       });
     });
@@ -445,7 +400,7 @@ void main() {
           tester,
           OiApp(theme: OiThemeData.light(), home: _buildAddressForm()),
           kCompactWidth,
-          height: 1200,
+          height: 1600,
         );
 
         expect(find.byType(OiAddressForm), findsOneWidget);
@@ -473,7 +428,7 @@ void main() {
           OiApp(
             theme: OiThemeData.light(),
             home: _buildAddressForm(
-              initialData: const OiAddressData(
+              initialValue: const OiAddressData(
                 firstName: 'Jane',
                 lastName: 'Doe',
               ),
@@ -493,7 +448,7 @@ void main() {
         expect(janeBox.left, isNot(doeBox.left));
       });
 
-      testWidgets('fields render narrower at compact breakpoint', (
+      testWidgets('fields stack vertically at compact breakpoint', (
         tester,
       ) async {
         await pumpAtBreakpoint(
@@ -501,26 +456,23 @@ void main() {
           OiApp(
             theme: OiThemeData.light(),
             home: _buildAddressForm(
-              initialData: const OiAddressData(
+              initialValue: const OiAddressData(
                 firstName: 'Jane',
                 lastName: 'Doe',
               ),
             ),
           ),
           kCompactWidth,
-          height: 1200,
+          height: 1600,
         );
 
         expect(find.text('Jane'), findsOneWidget);
         expect(find.text('Doe'), findsOneWidget);
 
-        // OiRow keeps Expanded children side by side at compact width,
-        // but each field is narrower. Verify both fields fit within the
-        // compact viewport.
+        // At compact, name fields should be stacked vertically (different y).
         final janeBox = tester.getRect(find.text('Jane'));
         final doeBox = tester.getRect(find.text('Doe'));
-        expect(janeBox.right, lessThanOrEqualTo(kCompactWidth));
-        expect(doeBox.right, lessThanOrEqualTo(kCompactWidth));
+        expect(janeBox.top, isNot(doeBox.top));
       });
     });
 
@@ -605,7 +557,6 @@ void main() {
         expect(textInputs[7].label, 'Postal code');
         expect(textInputs[8].label, 'Country');
         expect(textInputs[9].label, 'Phone');
-        expect(textInputs[10].label, 'Email');
       });
     });
 
@@ -619,9 +570,8 @@ void main() {
         );
 
         // Without name fields, we lose 2 text inputs (first name, last name).
-        // Default has 11 → should be 9.
-        expect(find.byType(OiTextInput), findsNWidgets(9));
-        // First name / Last name labels should not be present.
+        // Default has 10 → should be 8.
+        expect(find.byType(OiTextInput), findsNWidgets(8));
         expect(
           find.byWidgetPredicate(
             (w) => w is OiTextInput && w.label == 'First name',
@@ -666,8 +616,8 @@ void main() {
           surfaceSize: _surfaceSize,
         );
 
-        // Without company, we lose 1 text input. Default 11 → 10.
-        expect(find.byType(OiTextInput), findsNWidgets(10));
+        // Without company, we lose 1 text input. Default 10 → 9.
+        expect(find.byType(OiTextInput), findsNWidgets(9));
         expect(
           find.byWidgetPredicate(
             (w) => w is OiTextInput && w.label == 'Company',
@@ -682,8 +632,8 @@ void main() {
           surfaceSize: _surfaceSize,
         );
 
-        // Without phone, we lose 1 text input. Default 11 → 10.
-        expect(find.byType(OiTextInput), findsNWidgets(10));
+        // Without phone, we lose 1 text input. Default 10 → 9.
+        expect(find.byType(OiTextInput), findsNWidgets(9));
         expect(
           find.byWidgetPredicate((w) => w is OiTextInput && w.label == 'Phone'),
           findsNothing,
@@ -700,8 +650,8 @@ void main() {
           surfaceSize: _surfaceSize,
         );
 
-        // Without name (2), company (1), phone (1) → 11 - 4 = 7.
-        expect(find.byType(OiTextInput), findsNWidgets(7));
+        // Without name (2), company (1), phone (1) → 10 - 4 = 6.
+        expect(find.byType(OiTextInput), findsNWidgets(6));
       });
     });
 
@@ -718,8 +668,8 @@ void main() {
 
         // Should have an OiSelect for country.
         expect(find.byType(OiSelect<String>), findsOneWidget);
-        // One fewer OiTextInput (country replaced by select). 11 - 1 = 10.
-        expect(find.byType(OiTextInput), findsNWidgets(10));
+        // One fewer OiTextInput (country replaced by select). 10 - 1 = 9.
+        expect(find.byType(OiTextInput), findsNWidgets(9));
       });
 
       testWidgets('renders text input for country when no countries list', (
@@ -728,7 +678,7 @@ void main() {
         await tester.pumpObers(_buildAddressForm(), surfaceSize: _surfaceSize);
 
         expect(find.byType(OiSelect<String>), findsNothing);
-        expect(find.byType(OiTextInput), findsNWidgets(11));
+        expect(find.byType(OiTextInput), findsNWidgets(10));
       });
 
       testWidgets('country OiSelect has correct label', (tester) async {
@@ -767,7 +717,7 @@ void main() {
         await tester.pumpObers(
           _buildAddressForm(
             countries: _sampleCountries(),
-            initialData: const OiAddressData(country: 'CH'),
+            initialValue: const OiAddressData(country: 'CH'),
           ),
           surfaceSize: _surfaceSize,
         );
@@ -788,7 +738,7 @@ void main() {
         await tester.pumpObers(
           _buildAddressForm(
             countries: _sampleCountries(),
-            initialData: const OiAddressData(country: 'US'),
+            initialValue: const OiAddressData(country: 'US'),
           ),
           surfaceSize: _surfaceSize,
         );
@@ -812,7 +762,6 @@ void main() {
 
         // Trigger submit via the state's submit method.
         final state = formKey.currentState!;
-        // Calling submit() via dynamic because it's not on the public API.
         // ignore: avoid_dynamic_calls
         (state as dynamic).submit();
         await tester.pump();
@@ -838,7 +787,6 @@ void main() {
         );
 
         // First trigger with empty fields to show errors.
-        // Calling submit() via dynamic because it's not on the public API.
         // ignore: avoid_dynamic_calls
         (formKey.currentState! as dynamic).submit();
         await tester.pump();
@@ -849,11 +797,15 @@ void main() {
         await tester.enterText(inputs.at(3), '123 Main St'); // line1
         await tester.enterText(inputs.at(5), 'Zürich'); // city
         await tester.enterText(inputs.at(7), '8001'); // postalCode
-        await tester.enterText(inputs.at(8), 'Switzerland'); // country
+        // Country is at index 8 — but after validation errors, need to
+        // re-find. The country field is a text input (no countries provided).
+        await tester.pump();
+        // Re-find inputs after pump.
+        final inputsAfter = find.byType(OiTextInput);
+        await tester.enterText(inputsAfter.at(8), 'Switzerland'); // country
         await tester.pump();
 
         // Submit again — should succeed.
-        // Calling submit() via dynamic because it's not on the public API.
         // ignore: avoid_dynamic_calls
         (formKey.currentState! as dynamic).submit();
         await tester.pump();
@@ -872,7 +824,6 @@ void main() {
           surfaceSize: _surfaceSize,
         );
 
-        // Calling submit() via dynamic because it's not on the public API.
         // ignore: avoid_dynamic_calls
         (formKey.currentState! as dynamic).submit();
         await tester.pump();
@@ -886,7 +837,7 @@ void main() {
         await tester.pumpObers(
           _buildAddressForm(
             formKey: formKey,
-            initialData: const OiAddressData(
+            initialValue: const OiAddressData(
               line1: '123 Main St',
               city: 'Zürich',
               postalCode: '8001',
@@ -897,7 +848,6 @@ void main() {
           surfaceSize: _surfaceSize,
         );
 
-        // Calling submit() via dynamic because it's not on the public API.
         // ignore: avoid_dynamic_calls
         (formKey.currentState! as dynamic).submit();
         await tester.pump();
@@ -913,43 +863,24 @@ void main() {
     // ── Error message display ─────────────────────────────────────────
 
     group('error message display', () {
-      testWidgets('displays external error messages from error parameter', (
+      testWidgets('displays global error message from error parameter', (
         tester,
       ) async {
         await tester.pumpObers(
-          _buildAddressForm(
-            error: {'line1': 'Address is invalid', 'city': 'City not found'},
-          ),
+          _buildAddressForm(error: 'Address is invalid'),
           surfaceSize: _surfaceSize,
         );
 
         expect(find.text('Address is invalid'), findsOneWidget);
-        expect(find.text('City not found'), findsOneWidget);
       });
 
-      testWidgets('empty error map shows no error messages', (tester) async {
+      testWidgets('no error shown when error is null', (tester) async {
         await tester.pumpObers(
-          _buildAddressForm(error: {}),
+          _buildAddressForm(),
           surfaceSize: _surfaceSize,
         );
 
         expect(find.text('Address is invalid'), findsNothing);
-      });
-
-      testWidgets('error messages render on correct fields', (tester) async {
-        await tester.pumpObers(
-          _buildAddressForm(error: {'postalCode': 'Invalid ZIP'}),
-          surfaceSize: _surfaceSize,
-        );
-
-        expect(find.text('Invalid ZIP'), findsOneWidget);
-
-        // The postal code OiTextInput should have the error.
-        final textInputs = tester
-            .widgetList<OiTextInput>(find.byType(OiTextInput))
-            .toList();
-        // postalCode is at index 7.
-        expect(textInputs[7].error, 'Invalid ZIP');
       });
     });
 
@@ -959,7 +890,7 @@ void main() {
       testWidgets('accumulates changes across multiple fields', (tester) async {
         OiAddressData? latest;
         await tester.pumpObers(
-          _buildAddressForm(onChanged: (data) => latest = data),
+          _buildAddressForm(onChange: (data) => latest = data),
           surfaceSize: _surfaceSize,
         );
 
@@ -974,6 +905,23 @@ void main() {
         expect(latest!.firstName, 'Jane');
         expect(latest!.lastName, 'Doe');
         expect(latest!.city, 'Bern');
+      });
+    });
+
+    // ── Controller disposal ──────────────────────────────────────────────
+
+    group('controller disposal', () {
+      testWidgets('disposes controllers without error', (tester) async {
+        await tester.pumpObers(_buildAddressForm(), surfaceSize: _surfaceSize);
+
+        // Replace the widget to trigger dispose.
+        await tester.pumpObers(
+          const SizedBox.shrink(),
+          surfaceSize: _surfaceSize,
+        );
+
+        // No exception means controllers disposed properly.
+        expect(tester.takeException(), isNull);
       });
     });
   });
