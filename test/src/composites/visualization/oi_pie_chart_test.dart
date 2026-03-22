@@ -149,13 +149,13 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('compact layout positions legend below', (tester) async {
-    await tester.pumpObers(_pieChart(compact: true));
+  testWidgets('legend is positioned below chart in Column', (tester) async {
+    await tester.pumpObers(_pieChart());
 
     final legendFinder = find.byKey(const Key('oi_pie_chart_legend'));
     expect(legendFinder, findsOneWidget);
 
-    // In compact mode, legend should be inside a Column.
+    // Legend should be inside a Column (below chart).
     final columnAncestor = find.ancestor(
       of: legendFinder,
       matching: find.byType(Column),

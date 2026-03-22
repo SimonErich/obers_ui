@@ -186,7 +186,10 @@ class _OiPieChartState extends State<OiPieChart> {
 
           final mode = _resolveInteractionMode(context);
 
-          final chartDim = math.min(w, h);
+          // Reserve space for legend below.
+          final legendSpace =
+              widget.showLegend && widget.segments.isNotEmpty ? 30.0 : 0.0;
+          final chartDim = math.min(w, h - legendSpace);
           final chartSize = Size(chartDim, chartDim);
 
           // Resolve segment colors.
