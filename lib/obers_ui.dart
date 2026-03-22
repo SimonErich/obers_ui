@@ -275,6 +275,7 @@ export 'src/modules/oi_metadata_editor.dart';
 export 'src/modules/oi_notification_center.dart';
 export 'src/modules/oi_app_shell.dart';
 export 'src/modules/oi_permissions.dart';
+export 'src/modules/oi_resource_page.dart';
 // ── Primitives: Animation ────────────────────────────────────────────────────
 
 export 'src/primitives/animation/oi_animated_list.dart';

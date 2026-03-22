@@ -13,14 +13,18 @@ extension PumpObers on WidgetTester {
   }) async {
     if (surfaceSize != null) {
       await binding.setSurfaceSize(surfaceSize);
-      addTeardownSurfaceSize();
+      // Also set view physical size so MediaQuery.sizeOf() reflects the
+      // test size (setSurfaceSize alone does not update MediaQuery).
+      binding.platformDispatcher.views.first.physicalSize = surfaceSize;
+      binding.platformDispatcher.views.first.devicePixelRatio = 1.0;
+      addTearDown(() async {
+        await binding.setSurfaceSize(null);
+        binding.platformDispatcher.views.first.resetPhysicalSize();
+        binding.platformDispatcher.views.first.resetDevicePixelRatio();
+      });
     }
 
     await pumpWidget(OiApp(theme: theme ?? OiThemeData.light(), home: widget));
   }
 
-  /// Resets the surface size after a test.
-  void addTeardownSurfaceSize() {
-    addTearDown(() => binding.setSurfaceSize(null));
-  }
 }

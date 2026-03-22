@@ -21,7 +21,7 @@ import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
 ///
 /// {@category Modules}
 ///
-/// Coverage: REQ-0017
+/// Coverage: REQ-0029
 @immutable
 class OiNavItem {
   /// Creates an [OiNavItem].
@@ -73,7 +73,7 @@ class OiNavItem {
 ///
 /// {@category Modules}
 ///
-/// Coverage: REQ-0017
+/// Coverage: REQ-0029
 class OiAppShell extends StatefulWidget {
   /// Creates an [OiAppShell].
   const OiAppShell({
