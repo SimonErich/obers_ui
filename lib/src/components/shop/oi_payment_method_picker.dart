@@ -9,12 +9,12 @@ import 'package:obers_ui/src/primitives/layout/oi_column.dart';
 
 /// A picker that lists [OiPaymentMethod]s and lets the user select one.
 ///
-/// Coverage: REQ-0022
+/// Coverage: REQ-0009
 ///
 /// Renders a vertical list of [OiPaymentOption] rows. The currently selected
-/// method is highlighted. Tapping a row fires [onSelected] with the chosen
-/// [OiPaymentMethod]. When [methods] is empty an accessible empty-state
-/// message is shown.
+/// method is highlighted. Tapping a row fires [onSelect] with the chosen
+/// [OiPaymentMethod]. When [methods] is empty, only the [addNewCard] slot
+/// is shown if provided.
 ///
 /// {@category Components}
 class OiPaymentMethodPicker extends StatelessWidget {
@@ -22,9 +22,8 @@ class OiPaymentMethodPicker extends StatelessWidget {
   const OiPaymentMethodPicker({
     required this.label,
     required this.methods,
-    required this.onSelected,
+    this.onSelect,
     this.selectedKey,
-    this.emptyLabel = 'No payment methods available',
     this.addNewCard,
     super.key,
   });
@@ -36,13 +35,10 @@ class OiPaymentMethodPicker extends StatelessWidget {
   final List<OiPaymentMethod> methods;
 
   /// Called when the user selects a payment method.
-  final ValueChanged<OiPaymentMethod> onSelected;
+  final ValueChanged<OiPaymentMethod>? onSelect;
 
   /// Key of the currently selected method.
   final Object? selectedKey;
-
-  /// Text shown when [methods] is empty.
-  final String emptyLabel;
 
   /// Optional widget rendered below the method list, separated by a divider.
   ///
@@ -54,40 +50,44 @@ class OiPaymentMethodPicker extends StatelessWidget {
   Widget build(BuildContext context) {
     final sp = context.spacing;
     final breakpoint = context.breakpoint;
-    final colors = context.colors;
 
-    Widget content;
-    if (methods.isEmpty) {
-      content = OiLabel.body(emptyLabel, color: colors.textMuted);
-    } else {
-      content = OiColumn(
-        breakpoint: breakpoint,
-        gap: OiResponsive(sp.sm),
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          for (final method in methods)
-            OiPaymentOption(
-              method: method,
-              label: method.label,
-              selected: method.key == selectedKey,
-              onSelect: onSelected,
-            ),
-        ],
+    final children = <Widget>[OiLabel.bodyStrong(label)];
+
+    if (methods.isNotEmpty) {
+      children.add(
+        ExcludeSemantics(
+          child: OiColumn(
+            breakpoint: breakpoint,
+            gap: OiResponsive(sp.xs),
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              for (final method in methods)
+                OiPaymentOption(
+                  method: method,
+                  label: method.label,
+                  selected: method.key == selectedKey,
+                  onSelect: onSelect,
+                ),
+            ],
+          ),
+        ),
       );
+      if (addNewCard != null) {
+        children
+          ..add(const OiDivider())
+          ..add(addNewCard!);
+      }
+    } else if (addNewCard != null) {
+      children.add(addNewCard!);
     }
 
     return Semantics(
       label: label,
       child: OiColumn(
         breakpoint: breakpoint,
-        gap: OiResponsive(sp.sm),
+        gap: OiResponsive(sp.xs),
         crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          OiLabel.bodyStrong(label),
-          ExcludeSemantics(child: content),
-          if (addNewCard != null && methods.isNotEmpty) const OiDivider(),
-          if (addNewCard != null) addNewCard!,
-        ],
+        children: children,
       ),
     );
   }

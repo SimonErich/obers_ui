@@ -12,7 +12,7 @@ import 'package:obers_ui/src/primitives/layout/oi_row.dart';
 
 /// A picker that lists [OiShippingMethod]s and lets the user select one.
 ///
-/// Coverage: REQ-0022
+/// Coverage: REQ-0006
 ///
 /// Renders a vertical list of [OiShippingOption] rows. The currently selected
 /// method is highlighted. Tapping a row fires [onSelect] with the chosen
@@ -26,7 +26,7 @@ class OiShippingMethodPicker extends StatelessWidget {
   const OiShippingMethodPicker({
     required this.label,
     required this.methods,
-    required this.onSelect,
+    this.onSelect,
     this.selectedKey,
     this.currencyCode = 'EUR',
     this.emptyLabel = 'No shipping methods available',
@@ -41,7 +41,7 @@ class OiShippingMethodPicker extends StatelessWidget {
   final List<OiShippingMethod> methods;
 
   /// Called when the user selects a shipping method.
-  final ValueChanged<OiShippingMethod> onSelect;
+  final ValueChanged<OiShippingMethod>? onSelect;
 
   /// Key of the currently selected method.
   final Object? selectedKey;
@@ -135,7 +135,7 @@ class OiShippingMethodPicker extends StatelessWidget {
 
   Widget _buildEmptyState(BuildContext context) {
     final colors = context.colors;
-    return OiLabel.body(emptyLabel, color: colors.textMuted);
+    return OiLabel.small(emptyLabel, color: colors.textMuted);
   }
 
   @override
@@ -151,7 +151,7 @@ class OiShippingMethodPicker extends StatelessWidget {
     } else {
       content = OiColumn(
         breakpoint: breakpoint,
-        gap: OiResponsive(sp.sm),
+        gap: OiResponsive(sp.xs),
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           for (final method in methods)

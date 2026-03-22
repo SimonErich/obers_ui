@@ -104,7 +104,7 @@ void main() {
         expect(badge.color, OiBadgeColor.warning);
       });
 
-      testWidgets('confirmed uses primary color', (tester) async {
+      testWidgets('confirmed uses info color', (tester) async {
         await tester.pumpObers(
           const OiOrderStatusBadge(
             status: OiOrderStatus.confirmed,
@@ -112,10 +112,10 @@ void main() {
           ),
         );
         final badge = tester.widget<OiBadge>(find.byType(OiBadge));
-        expect(badge.color, OiBadgeColor.primary);
+        expect(badge.color, OiBadgeColor.info);
       });
 
-      testWidgets('processing uses primary color', (tester) async {
+      testWidgets('processing uses info color', (tester) async {
         await tester.pumpObers(
           const OiOrderStatusBadge(
             status: OiOrderStatus.processing,
@@ -123,10 +123,10 @@ void main() {
           ),
         );
         final badge = tester.widget<OiBadge>(find.byType(OiBadge));
-        expect(badge.color, OiBadgeColor.primary);
+        expect(badge.color, OiBadgeColor.info);
       });
 
-      testWidgets('shipped uses accent color', (tester) async {
+      testWidgets('shipped uses primary color', (tester) async {
         await tester.pumpObers(
           const OiOrderStatusBadge(
             status: OiOrderStatus.shipped,
@@ -134,7 +134,7 @@ void main() {
           ),
         );
         final badge = tester.widget<OiBadge>(find.byType(OiBadge));
-        expect(badge.color, OiBadgeColor.accent);
+        expect(badge.color, OiBadgeColor.primary);
       });
 
       testWidgets('delivered uses success color', (tester) async {
@@ -159,7 +159,7 @@ void main() {
         expect(badge.color, OiBadgeColor.error);
       });
 
-      testWidgets('refunded uses error color', (tester) async {
+      testWidgets('refunded uses neutral color', (tester) async {
         await tester.pumpObers(
           const OiOrderStatusBadge(
             status: OiOrderStatus.refunded,
@@ -167,7 +167,7 @@ void main() {
           ),
         );
         final badge = tester.widget<OiBadge>(find.byType(OiBadge));
-        expect(badge.color, OiBadgeColor.error);
+        expect(badge.color, OiBadgeColor.neutral);
       });
     });
 
@@ -195,7 +195,7 @@ void main() {
           ),
         );
         final badge = tester.widget<OiBadge>(find.byType(OiBadge));
-        expect(badge.color, OiBadgeColor.accent);
+        expect(badge.color, OiBadgeColor.primary);
       });
 
       testWidgets('all statuses can be overridden', (tester) async {

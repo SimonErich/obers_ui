@@ -2636,7 +2636,7 @@ A badge that displays `OiOrderStatus` with appropriate color coding. Wraps `OiBa
 - `status` (OiOrderStatus, required) — the order status to display
 - `label` (String, required) — accessibility label
 - `statusLabels` (Map<OiOrderStatus, String>?) — optional i18n overrides for display text (defaults: "Pending", "Confirmed", etc.)
-- `statusColors` (Map<OiOrderStatus, Color>?) — optional color overrides per status
+- `statusColors` (Map<OiOrderStatus, OiBadgeColor>?) — optional color overrides per status
 
 **Default Color Mapping:**
 - pending → warning
@@ -2651,6 +2651,10 @@ A badge that displays `OiOrderStatus` with appropriate color coding. Wraps `OiBa
 - `OiOrderStatusBadge.soft(...)` — soft (muted) background variant (default)
 - `OiOrderStatusBadge.filled(...)` — solid background variant
 - `OiOrderStatusBadge.fromOrder({required OiOrderData order})` — extracts status from an order object automatically
+
+**Static Methods:**
+- `OiOrderStatusBadge.defaultLabel(OiOrderStatus status)` — returns the default human-readable label for a status (e.g. "Pending", "Shipped")
+- `OiOrderStatusBadge.defaultColorForStatus(OiOrderStatus status)` — returns the default `OiBadgeColor` for a status
 
 **Behavior:**
 - Renders `OiBadge.soft` with resolved color and display label
@@ -2675,8 +2679,8 @@ OiOrderStatusBadge(
     OiOrderStatus.delivered: 'Zugestellt',
   },
   statusColors: {
-    OiOrderStatus.pending: context.colors.warning.base,
-    OiOrderStatus.shipped: context.colors.primary.base,
+    OiOrderStatus.pending: OiBadgeColor.success,
+    OiOrderStatus.shipped: OiBadgeColor.accent,
   },
 )
 ```
@@ -3007,7 +3011,7 @@ Image gallery with large main image and thumbnail strip for product images. Supp
 **Tags:** `shop`, `order`, `tracking`, `stepper`, `timeline`, `status`, `e-commerce`, `composite`
 **Tier:** Composite
 
-A horizontal stepper showing order status progression (pending → confirmed → processing → shipped → delivered) with optional expandable timeline of order events. Cancelled and refunded are rendered as terminal states.
+A StatelessWidget showing order status progression as a horizontal stepper (pending → confirmed → processing → shipped → delivered) with an optional expandable timeline of order events via OiAccordion. Cancelled and refunded are rendered as terminal states. On narrow breakpoints the stepper renders vertically.
 
 **Props:**
 - `currentStatus` (OiOrderStatus, required) — the current order status to highlight
@@ -3018,12 +3022,12 @@ A horizontal stepper showing order status progression (pending → confirmed →
 
 **Behavior:**
 - 5 happy-path steps: pending, confirmed, processing, shipped, delivered
-- Steps up to `currentStatus` marked as completed; steps after are incomplete
+- All steps up to and including `currentStatus` marked as completed; steps after are incomplete
 - Cancelled/refunded: rendered as terminal states using `OiOrderStatusBadge` below stepper
-- Timeline section (when `showTimeline` and `timeline` provided): collapsible event list with colored dots, timestamps, titles, and descriptions using `OiTimeline`
-- Events sorted newest-first with status-based dot colors
+- Timeline section (when `showTimeline` and `timeline` provided): OiAccordion titled "Order History" with events sorted newest-first; each event shows colored dot (status color), formatted timestamp, `OiLabel.bodyStrong` title, and optional `OiLabel.small` description with vertical line connectors
+- On narrow breakpoints (compact), stepper renders vertically via `OiStepperStyle.vertical`
 
-**Composition:** OiStepper, OiTimeline, OiOrderStatusBadge, OiColumn, OiLabel.
+**Composition:** OiStepper, OiAccordion, OiOrderStatusBadge, OiColumn, OiLabel.
 
 **Usage Example:**
 ```dart

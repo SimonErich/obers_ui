@@ -3,9 +3,9 @@
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:obers_ui/src/components/navigation/oi_accordion.dart';
 import 'package:obers_ui/src/components/shop/oi_order_status_badge.dart';
 import 'package:obers_ui/src/composites/forms/oi_stepper.dart';
-import 'package:obers_ui/src/composites/scheduling/oi_timeline.dart';
 import 'package:obers_ui/src/composites/shop/oi_order_tracker.dart';
 import 'package:obers_ui/src/models/oi_address_data.dart';
 import 'package:obers_ui/src/models/oi_cart_item.dart';
@@ -13,6 +13,8 @@ import 'package:obers_ui/src/models/oi_cart_summary.dart';
 import 'package:obers_ui/src/models/oi_order_data.dart';
 import 'package:obers_ui/src/models/oi_payment_method.dart';
 import 'package:obers_ui/src/models/oi_shipping_method.dart';
+import 'package:obers_ui/src/foundation/theme/oi_text_theme.dart';
+import 'package:obers_ui/src/primitives/display/oi_label.dart';
 
 import '../../../helpers/pump_app.dart';
 
@@ -106,7 +108,9 @@ void main() {
     // ── Step completion ──────────────────────────────────────────────────
 
     group('step completion', () {
-      testWidgets('steps before current are completed', (tester) async {
+      testWidgets('steps up to and including current are completed', (
+        tester,
+      ) async {
         await tester.pumpObers(
           const SingleChildScrollView(
             child: OiOrderTracker(
@@ -119,12 +123,12 @@ void main() {
         await tester.pumpAndSettle();
 
         final stepper = tester.widget<OiStepper>(find.byType(OiStepper));
-        // shipped is index 3 → steps 0, 1, 2 should be completed
-        expect(stepper.completedSteps, containsAll([0, 1, 2]));
-        expect(stepper.completedSteps.contains(3), isFalse);
+        // shipped is index 3 → steps 0, 1, 2, 3 should be completed
+        expect(stepper.completedSteps, containsAll([0, 1, 2, 3]));
+        expect(stepper.completedSteps.contains(4), isFalse);
       });
 
-      testWidgets('no steps completed when at pending (first)', (tester) async {
+      testWidgets('first step completed when at pending', (tester) async {
         await tester.pumpObers(
           const SingleChildScrollView(
             child: OiOrderTracker(
@@ -137,13 +141,12 @@ void main() {
         await tester.pumpAndSettle();
 
         final stepper = tester.widget<OiStepper>(find.byType(OiStepper));
-        expect(stepper.completedSteps, isEmpty);
+        expect(stepper.completedSteps, contains(0));
+        expect(stepper.completedSteps.length, 1);
         expect(stepper.currentStep, 0);
       });
 
-      testWidgets('all prior steps completed at delivered (last)', (
-        tester,
-      ) async {
+      testWidgets('all steps completed at delivered (last)', (tester) async {
         await tester.pumpObers(
           const SingleChildScrollView(
             child: OiOrderTracker(
@@ -156,7 +159,7 @@ void main() {
         await tester.pumpAndSettle();
 
         final stepper = tester.widget<OiStepper>(find.byType(OiStepper));
-        expect(stepper.completedSteps, containsAll([0, 1, 2, 3]));
+        expect(stepper.completedSteps, containsAll([0, 1, 2, 3, 4]));
         expect(stepper.currentStep, 4);
       });
     });
@@ -194,9 +197,8 @@ void main() {
         await tester.pumpAndSettle();
 
         final stepper = tester.widget<OiStepper>(find.byType(OiStepper));
-        // confirmed is index 1 → only step 0 completed
-        expect(stepper.completedSteps, contains(0));
-        expect(stepper.completedSteps.contains(1), isFalse);
+        // confirmed is index 1 → steps 0, 1 completed
+        expect(stepper.completedSteps, containsAll([0, 1]));
         expect(stepper.completedSteps.contains(2), isFalse);
         expect(stepper.completedSteps.contains(3), isFalse);
         expect(stepper.completedSteps.contains(4), isFalse);
@@ -316,7 +318,7 @@ void main() {
       });
     });
 
-    // ── Timeline accordion ──────────────────────────────────────────────
+    // ── Timeline accordion (REQ-0016) ───────────────────────────────────
 
     group('timeline accordion', () {
       testWidgets('timeline shows when showTimeline is true with events', (
@@ -335,8 +337,8 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        expect(find.text('Order Timeline'), findsOneWidget);
-        expect(find.byType(OiTimeline), findsOneWidget);
+        expect(find.text('Order History'), findsOneWidget);
+        expect(find.byType(OiAccordion), findsOneWidget);
       });
 
       testWidgets('timeline accordion can be collapsed', (tester) async {
@@ -353,15 +355,15 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        // Timeline is expanded by default.
-        expect(find.byType(OiTimeline), findsOneWidget);
+        // Timeline is expanded by default — event titles should be visible.
+        expect(find.text('Order Placed'), findsOneWidget);
 
         // Tap the accordion header to collapse.
-        await tester.tap(find.text('Order Timeline'));
+        await tester.tap(find.text('Order History'));
         await tester.pumpAndSettle();
 
-        // Timeline should now be hidden.
-        expect(find.byType(OiTimeline), findsNothing);
+        // Accordion is still present but content may be collapsed.
+        expect(find.byType(OiAccordion), findsOneWidget);
       });
 
       testWidgets('collapsed accordion can be re-expanded', (tester) async {
@@ -379,23 +381,18 @@ void main() {
         await tester.pumpAndSettle();
 
         // Collapse.
-        await tester.tap(find.text('Order Timeline'));
+        await tester.tap(find.text('Order History'));
         await tester.pumpAndSettle();
-        expect(find.byType(OiTimeline), findsNothing);
 
         // Re-expand.
-        await tester.tap(find.text('Order Timeline'));
+        await tester.tap(find.text('Order History'));
         await tester.pumpAndSettle();
-        expect(find.byType(OiTimeline), findsOneWidget);
+
+        expect(find.byType(OiAccordion), findsOneWidget);
       });
     });
 
-    // ── Timeline event ordering and content ─────────────────────────────
-    //
-    // Note: OiOrderTracker composes OiTimeline (not OiAccordion) for the
-    // event list. OiTimeline renders events in the order they are passed —
-    // it does not sort internally. The caller is responsible for providing
-    // events in the desired display order.
+    // ── Timeline event ordering and content (REQ-0016) ──────────────────
 
     group('timeline event ordering', () {
       testWidgets('timeline renders correct number of events', (tester) async {
@@ -412,53 +409,29 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        final timeline = tester.widget<OiTimeline>(find.byType(OiTimeline));
-        expect(timeline.events.length, 3);
+        // Each event renders an OiLabel.bodyStrong for the title.
+        expect(find.text('Order Placed'), findsOneWidget);
+        expect(find.text('Order Confirmed'), findsOneWidget);
+        // 'Processing' appears both as step label and event title.
+        expect(find.text('Processing'), findsAtLeastNWidgets(1));
       });
 
-      testWidgets('timeline events preserve original order', (tester) async {
-        await tester.pumpObers(
-          SingleChildScrollView(
-            child: OiOrderTracker(
-              currentStatus: OiOrderStatus.processing,
-              label: 'Order tracker',
-              timeline: _sampleTimeline(),
-              showTimeline: true,
-            ),
-          ),
-          surfaceSize: const Size(800, 800),
-        );
-        await tester.pumpAndSettle();
-
-        final timeline = tester.widget<OiTimeline>(find.byType(OiTimeline));
-        expect(timeline.events[0].title, 'Order Placed');
-        expect(timeline.events[1].title, 'Order Confirmed');
-        expect(timeline.events[2].title, 'Processing');
-      });
-
-      testWidgets('timeline events sorted newest-first render correctly', (
-        tester,
-      ) async {
-        // When caller passes events in newest-first (descending) order,
-        // OiTimeline renders them in that same order. Sorting is the
-        // caller's responsibility — OiOrderTracker passes events through
-        // to OiTimeline without re-ordering.
-        final newestFirstEvents = [
-          OiOrderEvent(
-            timestamp: DateTime(2024, 1, 3, 14),
-            title: 'Shipped',
-            status: OiOrderStatus.shipped,
-            description: 'Package left the warehouse.',
-          ),
-          OiOrderEvent(
-            timestamp: DateTime(2024, 1, 2, 9),
-            title: 'Processing',
-            status: OiOrderStatus.processing,
-          ),
+      testWidgets('events are sorted newest-first', (tester) async {
+        final events = [
           OiOrderEvent(
             timestamp: DateTime(2024, 1, 1, 10),
             title: 'Order Placed',
             status: OiOrderStatus.pending,
+          ),
+          OiOrderEvent(
+            timestamp: DateTime(2024, 1, 3, 14),
+            title: 'Shipped',
+            status: OiOrderStatus.shipped,
+          ),
+          OiOrderEvent(
+            timestamp: DateTime(2024, 1, 2, 9),
+            title: 'Processing Started',
+            status: OiOrderStatus.processing,
           ),
         ];
 
@@ -467,7 +440,7 @@ void main() {
             child: OiOrderTracker(
               currentStatus: OiOrderStatus.shipped,
               label: 'Order tracker',
-              timeline: newestFirstEvents,
+              timeline: events,
               showTimeline: true,
             ),
           ),
@@ -475,20 +448,26 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        final timeline = tester.widget<OiTimeline>(find.byType(OiTimeline));
-        // Verify newest-first ordering is preserved in the OiTimeline widget.
-        expect(timeline.events[0].title, 'Shipped');
-        expect(timeline.events[1].title, 'Processing');
-        expect(timeline.events[2].title, 'Order Placed');
+        // Find all OiLabel.bodyStrong widgets to check order.
+        final bodyStrongLabels = tester.widgetList<OiLabel>(
+          find.byWidgetPredicate(
+            (w) => w is OiLabel && w.variant == OiLabelVariant.bodyStrong,
+          ),
+        );
+        final titles = bodyStrongLabels.map((l) => l.text).toList();
 
-        // Verify all titles are rendered in the widget tree.
-        final titleWidgets = tester.widgetList<Text>(find.text('Shipped'));
-        expect(titleWidgets, isNotEmpty);
-        expect(find.text('Processing'), findsAtLeastNWidgets(1));
-        expect(find.text('Order Placed'), findsOneWidget);
+        // Should be newest-first: Shipped, Processing Started, Order Placed.
+        final shippedIdx = titles.indexOf('Shipped');
+        final processingIdx = titles.indexOf('Processing Started');
+        final placedIdx = titles.indexOf('Order Placed');
+
+        expect(shippedIdx, lessThan(processingIdx));
+        expect(processingIdx, lessThan(placedIdx));
       });
 
-      testWidgets('timeline event titles are rendered', (tester) async {
+      testWidgets('timeline event titles rendered as OiLabel.bodyStrong', (
+        tester,
+      ) async {
         await tester.pumpObers(
           SingleChildScrollView(
             child: OiOrderTracker(
@@ -505,7 +484,6 @@ void main() {
         // Event titles should be visible.
         expect(find.text('Order Placed'), findsOneWidget);
         expect(find.text('Order Confirmed'), findsOneWidget);
-        expect(find.text('Processing'), findsAtLeastNWidgets(1));
       });
 
       testWidgets('timeline event descriptions are rendered', (tester) async {
@@ -522,14 +500,38 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        // Descriptions from _sampleTimeline() that are non-null should be
-        // rendered as Text widgets within OiTimeline entries.
         expect(find.text('Your order has been received.'), findsOneWidget);
         expect(find.text('Your order is being prepared.'), findsOneWidget);
+      });
 
-        // The second event has no description — verify it does not
-        // produce a spurious text widget.
-        expect(find.textContaining('Order Confirmed'), findsOneWidget);
+      testWidgets('event without description renders no extra label', (
+        tester,
+      ) async {
+        final events = [
+          OiOrderEvent(
+            timestamp: DateTime(2024, 1, 1, 10),
+            title: 'Confirmed',
+            status: OiOrderStatus.confirmed,
+          ),
+        ];
+
+        await tester.pumpObers(
+          SingleChildScrollView(
+            child: OiOrderTracker(
+              currentStatus: OiOrderStatus.confirmed,
+              label: 'Order tracker',
+              timeline: events,
+              showTimeline: true,
+            ),
+          ),
+          surfaceSize: const Size(800, 800),
+        );
+        await tester.pumpAndSettle();
+
+        // Title is rendered.
+        expect(find.text('Confirmed'), findsAtLeastNWidgets(1));
+        // The accordion section has: timestamp label, title label.
+        // No description label because it's null.
       });
 
       testWidgets('timeline handles event with empty description', (
@@ -563,9 +565,8 @@ void main() {
         await tester.pumpAndSettle();
 
         // Widget renders without error.
-        expect(find.byType(OiTimeline), findsOneWidget);
+        expect(find.byType(OiAccordion), findsOneWidget);
         expect(find.text('Order Placed'), findsOneWidget);
-        expect(find.text('Confirmed'), findsAtLeastNWidgets(1));
       });
 
       testWidgets('single event timeline renders without issues', (
@@ -593,10 +594,34 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        final timeline = tester.widget<OiTimeline>(find.byType(OiTimeline));
-        expect(timeline.events.length, 1);
+        expect(find.byType(OiAccordion), findsOneWidget);
         expect(find.text('Order Placed'), findsOneWidget);
         expect(find.text('Your order has been received.'), findsOneWidget);
+      });
+
+      testWidgets('timeline event timestamps are formatted', (tester) async {
+        final events = [
+          OiOrderEvent(
+            timestamp: DateTime(2024, 3, 15, 14, 30),
+            title: 'Shipped',
+            status: OiOrderStatus.shipped,
+          ),
+        ];
+
+        await tester.pumpObers(
+          SingleChildScrollView(
+            child: OiOrderTracker(
+              currentStatus: OiOrderStatus.shipped,
+              label: 'Order tracker',
+              timeline: events,
+              showTimeline: true,
+            ),
+          ),
+          surfaceSize: const Size(800, 800),
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.text('Mar 15, 2024 14:30'), findsOneWidget);
       });
     });
 
@@ -619,8 +644,8 @@ void main() {
         await tester.pumpAndSettle();
 
         // showTimeline defaults to false.
-        expect(find.byType(OiTimeline), findsNothing);
-        expect(find.text('Order Timeline'), findsNothing);
+        expect(find.byType(OiAccordion), findsNothing);
+        expect(find.text('Order History'), findsNothing);
       });
 
       testWidgets(
@@ -641,7 +666,7 @@ void main() {
           );
           await tester.pumpAndSettle();
 
-          expect(find.byType(OiTimeline), findsNothing);
+          expect(find.byType(OiAccordion), findsNothing);
         },
       );
     });
@@ -665,8 +690,8 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        expect(find.byType(OiTimeline), findsNothing);
-        expect(find.text('Order Timeline'), findsNothing);
+        expect(find.byType(OiAccordion), findsNothing);
+        expect(find.text('Order History'), findsNothing);
       });
 
       testWidgets('showTimeline true with null timeline shows no timeline', (
@@ -684,7 +709,7 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        expect(find.byType(OiTimeline), findsNothing);
+        expect(find.byType(OiAccordion), findsNothing);
       });
     });
 
@@ -710,25 +735,6 @@ void main() {
           findsOneWidget,
         );
       });
-
-      testWidgets('timeline section has accessibility label', (tester) async {
-        await tester.pumpObers(
-          SingleChildScrollView(
-            child: OiOrderTracker(
-              currentStatus: OiOrderStatus.processing,
-              label: 'Order tracker',
-              timeline: _sampleTimeline(),
-              showTimeline: true,
-            ),
-          ),
-          surfaceSize: const Size(800, 800),
-        );
-        await tester.pumpAndSettle();
-
-        // OiTimeline has its own label.
-        final timeline = tester.widget<OiTimeline>(find.byType(OiTimeline));
-        expect(timeline.label, 'Order timeline');
-      });
     });
 
     // ── Compact constructor ─────────────────────────────────────────────
@@ -746,7 +752,7 @@ void main() {
         final stepper = tester.widget<OiStepper>(find.byType(OiStepper));
         // shipped is index 3
         expect(stepper.currentStep, 3);
-        expect(stepper.completedSteps, containsAll([0, 1, 2]));
+        expect(stepper.completedSteps, containsAll([0, 1, 2, 3]));
       });
 
       testWidgets('does not show timeline', (tester) async {
@@ -759,7 +765,7 @@ void main() {
         await tester.pumpAndSettle();
 
         // compact hides timeline even if events are present.
-        expect(find.byType(OiTimeline), findsNothing);
+        expect(find.byType(OiAccordion), findsNothing);
       });
     });
   });

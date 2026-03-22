@@ -4,7 +4,7 @@ import 'package:obers_ui/src/models/oi_order_data.dart';
 
 /// A badge that displays the current status of an order.
 ///
-/// Coverage: REQ-0022
+/// Coverage: REQ-0012
 ///
 /// Maps each [OiOrderStatus] to a semantic colour and human-readable text.
 /// Use [OiOrderStatusBadge.soft] for the muted-background variant (default)
@@ -82,11 +82,11 @@ class OiOrderStatusBadge extends StatelessWidget {
     if (statusLabels != null && statusLabels!.containsKey(status)) {
       return statusLabels![status]!;
     }
-    return _defaultLabelForStatus(status);
+    return defaultLabel(status);
   }
 
-  /// Returns the default label for the given [status].
-  static String _defaultLabelForStatus(OiOrderStatus status) {
+  /// Returns the default human-readable label for the given [status].
+  static String defaultLabel(OiOrderStatus status) {
     switch (status) {
       case OiOrderStatus.pending:
         return 'Pending';
@@ -109,26 +109,26 @@ class OiOrderStatusBadge extends StatelessWidget {
     if (statusColors != null && statusColors!.containsKey(status)) {
       return statusColors![status]!;
     }
-    return _defaultColorForStatus(status);
+    return defaultColorForStatus(status);
   }
 
   /// Returns the default [OiBadgeColor] for the given [status].
-  static OiBadgeColor _defaultColorForStatus(OiOrderStatus status) {
+  static OiBadgeColor defaultColorForStatus(OiOrderStatus status) {
     switch (status) {
       case OiOrderStatus.pending:
         return OiBadgeColor.warning;
       case OiOrderStatus.confirmed:
-        return OiBadgeColor.primary;
+        return OiBadgeColor.info;
       case OiOrderStatus.processing:
-        return OiBadgeColor.primary;
+        return OiBadgeColor.info;
       case OiOrderStatus.shipped:
-        return OiBadgeColor.accent;
+        return OiBadgeColor.primary;
       case OiOrderStatus.delivered:
         return OiBadgeColor.success;
       case OiOrderStatus.cancelled:
         return OiBadgeColor.error;
       case OiOrderStatus.refunded:
-        return OiBadgeColor.error;
+        return OiBadgeColor.neutral;
     }
   }
 

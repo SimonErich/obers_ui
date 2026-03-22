@@ -44,17 +44,15 @@ List<OiPaymentMethod> _samplePaymentMethods() => const [
 Widget _buildPicker({
   List<OiPaymentMethod>? methods,
   Object? selectedKey,
-  ValueChanged<OiPaymentMethod>? onSelected,
+  ValueChanged<OiPaymentMethod>? onSelect,
   String label = 'Payment method',
-  String emptyLabel = 'No payment methods available',
   Widget? addNewCard,
 }) {
   return OiPaymentMethodPicker(
     label: label,
     methods: methods ?? _samplePaymentMethods(),
     selectedKey: selectedKey,
-    onSelected: onSelected ?? (_) {},
-    emptyLabel: emptyLabel,
+    onSelect: onSelect ?? (_) {},
     addNewCard: addNewCard,
   );
 }
@@ -128,11 +126,9 @@ void main() {
     // ── onSelect fires correctly ────────────────────────────────────────
 
     group('onSelect fires correctly', () {
-      testWidgets('fires onSelected with correct method on tap', (
-        tester,
-      ) async {
+      testWidgets('fires onSelect with correct method on tap', (tester) async {
         OiPaymentMethod? selected;
-        await tester.pumpObers(_buildPicker(onSelected: (m) => selected = m));
+        await tester.pumpObers(_buildPicker(onSelect: (m) => selected = m));
 
         await tester.tap(find.text('Visa'));
         await tester.pump();
@@ -142,11 +138,11 @@ void main() {
         expect(selected!.label, 'Visa');
       });
 
-      testWidgets('fires onSelected with different method on second tap', (
+      testWidgets('fires onSelect with different method on second tap', (
         tester,
       ) async {
         OiPaymentMethod? selected;
-        await tester.pumpObers(_buildPicker(onSelected: (m) => selected = m));
+        await tester.pumpObers(_buildPicker(onSelect: (m) => selected = m));
 
         await tester.tap(find.text('Amex'));
         await tester.pump();
@@ -154,9 +150,9 @@ void main() {
         expect(selected!.key, 'amex');
       });
 
-      testWidgets('fires onSelected for default-marked method', (tester) async {
+      testWidgets('fires onSelect for default-marked method', (tester) async {
         OiPaymentMethod? selected;
-        await tester.pumpObers(_buildPicker(onSelected: (m) => selected = m));
+        await tester.pumpObers(_buildPicker(onSelect: (m) => selected = m));
 
         await tester.tap(find.text('Mastercard'));
         await tester.pump();
@@ -247,18 +243,13 @@ void main() {
         expect(find.byType(OiDivider), findsNothing);
       });
 
-      testWidgets('empty label still shown alongside addNewCard', (
+      testWidgets('empty methods without addNewCard renders nothing extra', (
         tester,
       ) async {
-        await tester.pumpObers(
-          _buildPicker(
-            methods: const [],
-            addNewCard: const Text('+ Add new card'),
-          ),
-        );
+        await tester.pumpObers(_buildPicker(methods: const []));
 
-        expect(find.text('No payment methods available'), findsOneWidget);
-        expect(find.text('+ Add new card'), findsOneWidget);
+        expect(find.byType(OiPaymentOption), findsNothing);
+        expect(find.byType(OiDivider), findsNothing);
       });
     });
 
@@ -403,7 +394,7 @@ void main() {
       ) async {
         OiPaymentMethod? selected;
         await tester.pumpObers(
-          _buildPicker(onSelected: (m) => selected = m, selectedKey: 'visa'),
+          _buildPicker(onSelect: (m) => selected = m, selectedKey: 'visa'),
         );
 
         // Tab to focus the first option.
@@ -414,7 +405,7 @@ void main() {
         await tester.sendKeyEvent(LogicalKeyboardKey.enter);
         await tester.pumpAndSettle();
 
-        expect(selected, isNotNull, reason: 'onSelected should fire on Enter');
+        expect(selected, isNotNull, reason: 'onSelect should fire on Enter');
         expect(selected!.key, 'visa');
       });
 
@@ -423,7 +414,7 @@ void main() {
       ) async {
         OiPaymentMethod? selected;
         await tester.pumpObers(
-          _buildPicker(onSelected: (m) => selected = m, selectedKey: 'visa'),
+          _buildPicker(onSelect: (m) => selected = m, selectedKey: 'visa'),
         );
 
         // Tab to focus the first option.
@@ -434,14 +425,14 @@ void main() {
         await tester.sendKeyEvent(LogicalKeyboardKey.space);
         await tester.pumpAndSettle();
 
-        expect(selected, isNotNull, reason: 'onSelected should fire on Space');
+        expect(selected, isNotNull, reason: 'onSelect should fire on Space');
         expect(selected!.key, 'visa');
       });
 
       testWidgets('tab then enter on second option selects it', (tester) async {
         OiPaymentMethod? selected;
         await tester.pumpObers(
-          _buildPicker(onSelected: (m) => selected = m, selectedKey: 'visa'),
+          _buildPicker(onSelect: (m) => selected = m, selectedKey: 'visa'),
         );
 
         // Tab twice to reach the second option.
@@ -457,7 +448,7 @@ void main() {
         expect(
           selected,
           isNotNull,
-          reason: 'onSelected should fire on Enter for second option',
+          reason: 'onSelect should fire on Enter for second option',
         );
         expect(selected!.key, 'mastercard');
       });

@@ -1,17 +1,12 @@
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/src/components/navigation/oi_accordion.dart';
 import 'package:obers_ui/src/components/shop/oi_order_status_badge.dart';
 import 'package:obers_ui/src/composites/forms/oi_stepper.dart';
-import 'package:obers_ui/src/composites/scheduling/oi_timeline.dart';
 import 'package:obers_ui/src/foundation/oi_responsive.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/models/oi_order_data.dart';
 import 'package:obers_ui/src/primitives/display/oi_label.dart';
 import 'package:obers_ui/src/primitives/layout/oi_column.dart';
-
-// Material Icons codepoints.
-const IconData _kCheckIcon = IconData(0xe5ca, fontFamily: 'MaterialIcons');
-const IconData _kCloseIcon = IconData(0xe5cd, fontFamily: 'MaterialIcons');
-const IconData _kRefundIcon = IconData(0xe042, fontFamily: 'MaterialIcons');
 
 /// The five happy-path order statuses in progression order.
 const List<OiOrderStatus> _happyPathStatuses = [
@@ -22,20 +17,44 @@ const List<OiOrderStatus> _happyPathStatuses = [
   OiOrderStatus.delivered,
 ];
 
-/// A horizontal stepper showing order status progression with an optional
-/// expandable timeline of order events.
+/// Month abbreviations for timestamp formatting.
+const List<String> _months = [
+  'Jan',
+  'Feb',
+  'Mar',
+  'Apr',
+  'May',
+  'Jun',
+  'Jul',
+  'Aug',
+  'Sep',
+  'Oct',
+  'Nov',
+  'Dec',
+];
+
+/// A visual order status tracker showing progression through statuses as a
+/// horizontal stepper with an optional detailed timeline.
 ///
-/// Coverage: REQ-0013
+/// Coverage: REQ-0015, REQ-0016
 ///
 /// Maps the 5 happy-path [OiOrderStatus] values (pending → confirmed →
-/// processing → shipped → delivered) to stepper steps. Cancelled and refunded
-/// are rendered as terminal states. An optional [timeline] of [OiOrderEvent]
-/// entries can be shown below the stepper.
+/// processing → shipped → delivered) to stepper steps. All steps up to and
+/// including the [currentStatus] are marked completed. Cancelled and refunded
+/// are rendered as terminal states with an [OiOrderStatusBadge] below the
+/// stepper.
 ///
-/// Composes [OiStepper], [OiTimeline], [OiColumn], [OiLabel].
+/// When [showTimeline] is `true` and [timeline] is non-null and non-empty,
+/// an [OiAccordion] titled "Order History" renders below the stepper with
+/// events sorted newest-first.
+///
+/// On narrow breakpoints the stepper renders vertically.
+///
+/// Composes [OiStepper], [OiAccordion], [OiOrderStatusBadge], [OiColumn],
+/// [OiLabel].
 ///
 /// {@category Composites}
-class OiOrderTracker extends StatefulWidget {
+class OiOrderTracker extends StatelessWidget {
   /// Creates an [OiOrderTracker].
   const OiOrderTracker({
     required this.currentStatus,
@@ -73,80 +92,68 @@ class OiOrderTracker extends StatefulWidget {
   final bool showTimeline;
 
   /// Custom labels for each order status. When not provided, default labels
-  /// are used (e.g. "Pending", "Confirmed", etc.).
+  /// are used via [OiOrderStatusBadge.defaultLabel].
   final Map<OiOrderStatus, String>? statusLabels;
-
-  @override
-  State<OiOrderTracker> createState() => _OiOrderTrackerState();
-}
-
-class _OiOrderTrackerState extends State<OiOrderTracker> {
-  bool _timelineExpanded = true;
 
   // ---------------------------------------------------------------------------
   // Status helpers
   // ---------------------------------------------------------------------------
 
-  Map<OiOrderStatus, String> _defaultStatusLabels() {
-    return const {
-      OiOrderStatus.pending: 'Pending',
-      OiOrderStatus.confirmed: 'Confirmed',
-      OiOrderStatus.processing: 'Processing',
-      OiOrderStatus.shipped: 'Shipped',
-      OiOrderStatus.delivered: 'Delivered',
-      OiOrderStatus.cancelled: 'Cancelled',
-      OiOrderStatus.refunded: 'Refunded',
-    };
-  }
-
-  String _labelForStatus(OiOrderStatus status) {
-    if (widget.statusLabels != null &&
-        widget.statusLabels!.containsKey(status)) {
-      return widget.statusLabels![status]!;
-    }
-    return _defaultStatusLabels()[status] ?? status.name;
-  }
+  bool get _isTerminal =>
+      currentStatus == OiOrderStatus.cancelled ||
+      currentStatus == OiOrderStatus.refunded;
 
   int _statusIndex(OiOrderStatus status) {
     final idx = _happyPathStatuses.indexOf(status);
     return idx >= 0 ? idx : -1;
   }
 
-  bool get _isTerminal =>
-      widget.currentStatus == OiOrderStatus.cancelled ||
-      widget.currentStatus == OiOrderStatus.refunded;
-
-  // ---------------------------------------------------------------------------
-  // Terminal status
-  // ---------------------------------------------------------------------------
-
-  /// Returns an [OiOrderStatusBadge] for terminal statuses (cancelled/refunded).
-  Widget _buildTerminalStatus(OiOrderStatus status) {
-    return OiOrderStatusBadge(status: status, label: _labelForStatus(status));
+  String _labelForStatus(OiOrderStatus status) {
+    if (statusLabels != null && statusLabels!.containsKey(status)) {
+      return statusLabels![status]!;
+    }
+    return OiOrderStatusBadge.defaultLabel(status);
   }
+
+  /// Returns the theme [Color] for a timeline dot based on [status].
+  Color _colorForStatus(BuildContext context, OiOrderStatus status) {
+    final colors = context.colors;
+    switch (status) {
+      case OiOrderStatus.pending:
+        return colors.warning.base;
+      case OiOrderStatus.confirmed:
+      case OiOrderStatus.processing:
+        return colors.info.base;
+      case OiOrderStatus.shipped:
+        return colors.primary.base;
+      case OiOrderStatus.delivered:
+        return colors.success.base;
+      case OiOrderStatus.cancelled:
+        return colors.error.base;
+      case OiOrderStatus.refunded:
+        return colors.textMuted;
+    }
+  }
+
+  int _completedIndex() => _statusIndex(currentStatus);
 
   // ---------------------------------------------------------------------------
   // Stepper
   // ---------------------------------------------------------------------------
 
   Widget _buildStepper(BuildContext context) {
-    final currentIdx = _statusIndex(widget.currentStatus);
+    final currentIdx = _completedIndex();
 
-    // Build completed steps set (all steps before current).
+    // All steps up to and including currentStatus are completed.
     final completedSteps = <int>{};
-    final errorSteps = <int>{};
-
-    if (_isTerminal) {
-      // For terminal states, mark all steps up to the last known progress
-      // and show the terminal indicator separately.
-      // No steps are completed — we show the terminal label below.
-    } else if (currentIdx >= 0) {
-      for (var i = 0; i < currentIdx; i++) {
+    if (!_isTerminal && currentIdx >= 0) {
+      for (var i = 0; i <= currentIdx; i++) {
         completedSteps.add(i);
       }
     }
 
     final stepLabels = _happyPathStatuses.map(_labelForStatus).toList();
+    final isNarrow = context.isCompact;
 
     Widget stepper = OiStepper(
       totalSteps: _happyPathStatuses.length,
@@ -155,10 +162,9 @@ class _OiOrderTrackerState extends State<OiOrderTracker> {
           : (currentIdx >= 0 ? currentIdx : 0),
       stepLabels: stepLabels,
       completedSteps: completedSteps,
-      errorSteps: errorSteps,
+      style: isNarrow ? OiStepperStyle.vertical : OiStepperStyle.horizontal,
     );
 
-    // For terminal states, delegate to OiOrderStatusBadge.
     if (_isTerminal) {
       stepper = OiColumn(
         breakpoint: context.breakpoint,
@@ -166,7 +172,7 @@ class _OiOrderTrackerState extends State<OiOrderTracker> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           stepper,
-          Center(child: _buildTerminalStatus(widget.currentStatus)),
+          Center(child: _buildTerminalBadge()),
         ],
       );
     }
@@ -174,82 +180,104 @@ class _OiOrderTrackerState extends State<OiOrderTracker> {
     return stepper;
   }
 
+  Widget _buildTerminalBadge() {
+    return OiOrderStatusBadge(
+      status: currentStatus,
+      label: _labelForStatus(currentStatus),
+    );
+  }
+
   // ---------------------------------------------------------------------------
-  // Timeline
+  // Timeline (REQ-0016)
   // ---------------------------------------------------------------------------
 
   Widget _buildTimeline(BuildContext context) {
+    final events = List<OiOrderEvent>.of(timeline!);
+    if (events.isEmpty) return const SizedBox.shrink();
+
+    // Sort newest-first.
+    events.sort((a, b) => b.timestamp.compareTo(a.timestamp));
+
+    return OiAccordion(
+      sections: [
+        OiAccordionSection(
+          title: 'Order History',
+          initiallyExpanded: true,
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              for (var i = 0; i < events.length; i++)
+                _buildTimelineEvent(
+                  context,
+                  events[i],
+                  isLast: i == events.length - 1,
+                ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildTimelineEvent(
+    BuildContext context,
+    OiOrderEvent event, {
+    required bool isLast,
+  }) {
     final sp = context.spacing;
-    final colors = context.colors;
-    final events = widget.timeline ?? [];
+    final dotColor = _colorForStatus(context, event.status);
+    final formattedTime = _formatTimestamp(event.timestamp);
 
-    if (events.isEmpty) {
-      return const SizedBox.shrink();
-    }
-
-    // Convert OiOrderEvent to OiTimelineEvent.
-    final timelineEvents = events.map((e) {
-      Color? dotColor;
-      IconData? icon;
-
-      switch (e.status) {
-        case OiOrderStatus.delivered:
-          dotColor = colors.success.base;
-          icon = _kCheckIcon;
-        case OiOrderStatus.cancelled:
-          dotColor = colors.error.base;
-          icon = _kCloseIcon;
-        case OiOrderStatus.refunded:
-          dotColor = colors.textMuted;
-          icon = _kRefundIcon;
-        case OiOrderStatus.pending:
-        case OiOrderStatus.confirmed:
-        case OiOrderStatus.processing:
-        case OiOrderStatus.shipped:
-          dotColor = colors.primary.base;
-      }
-
-      return OiTimelineEvent(
-        timestamp: e.timestamp,
-        title: e.title,
-        description: e.description,
-        color: dotColor,
-        icon: icon,
-      );
-    }).toList();
-
-    return Column(
-      mainAxisSize: MainAxisSize.min,
+    return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        GestureDetector(
-          behavior: HitTestBehavior.opaque,
-          onTap: () {
-            setState(() {
-              _timelineExpanded = !_timelineExpanded;
-            });
-          },
+        // Left: colored dot + vertical connector line.
+        Column(
+          children: [
+            Container(
+              width: 12,
+              height: 12,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: dotColor,
+              ),
+            ),
+            if (!isLast)
+              Container(
+                width: 2,
+                height: 40,
+                color: context.colors.textMuted,
+              ),
+          ],
+        ),
+        SizedBox(width: sp.sm),
+        // Right: timestamp, title, optional description.
+        Expanded(
           child: Padding(
-            padding: EdgeInsets.symmetric(vertical: sp.sm),
-            child: Row(
+            padding: EdgeInsets.only(bottom: isLast ? 0 : sp.sm),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  _timelineExpanded ? '\u25BC' : '\u25B6',
-                  style: TextStyle(fontSize: 10, color: colors.textMuted),
-                ),
-                const SizedBox(width: 8),
-                const OiLabel.bodyStrong('Order Timeline'),
+                OiLabel.small(formattedTime),
+                OiLabel.bodyStrong(event.title),
+                if (event.description != null &&
+                    event.description!.isNotEmpty)
+                  OiLabel.small(event.description!),
               ],
             ),
           ),
         ),
-        if (_timelineExpanded)
-          SizedBox(
-            height: events.length * 100.0,
-            child: OiTimeline(events: timelineEvents, label: 'Order timeline'),
-          ),
       ],
     );
+  }
+
+  /// Formats a [DateTime] as "Jan 1, 2024 10:00".
+  static String _formatTimestamp(DateTime dt) {
+    final month = _months[dt.month - 1];
+    final hour = dt.hour.toString().padLeft(2, '0');
+    final minute = dt.minute.toString().padLeft(2, '0');
+    return '$month ${dt.day}, ${dt.year} $hour:$minute';
   }
 
   // ---------------------------------------------------------------------------
@@ -261,12 +289,10 @@ class _OiOrderTrackerState extends State<OiOrderTracker> {
     final sp = context.spacing;
     final breakpoint = context.breakpoint;
     final hasTimeline =
-        widget.showTimeline &&
-        widget.timeline != null &&
-        widget.timeline!.isNotEmpty;
+        showTimeline && timeline != null && timeline!.isNotEmpty;
 
     return Semantics(
-      label: widget.label,
+      label: label,
       child: OiColumn(
         breakpoint: breakpoint,
         gap: OiResponsive(sp.md),
