@@ -19,22 +19,21 @@ void main() {
 
   // ── 2. visible=false hides child ──────────────────────────────────────────
 
-  testWidgets('visible=false: floating child is not visible', (tester) async {
+  testWidgets('floating child is not visible', (tester) async {
     await tester.pumpObers(
       const OiFloating(
         anchor: SizedBox(width: 80, height: 40),
         child: Text('floating'),
       ),
     );
-    await tester.pump();
-    // Visibility widget keeps it in tree but not visible.
-    final visibility = tester.widget<Visibility>(find.byType(Visibility));
-    expect(visibility.visible, isFalse);
+    await tester.pumpAndSettle();
+    // When visible=false (default), the floating text should not appear.
+    expect(find.text('floating'), findsNothing);
   });
 
   // ── 3. visible=true shows child ────────────────────────────────────────────
 
-  testWidgets('visible=true: floating child is visible', (tester) async {
+  testWidgets('floating child is visible', (tester) async {
     await tester.pumpObers(
       const OiFloating(
         anchor: SizedBox(width: 80, height: 40),
@@ -42,9 +41,8 @@ void main() {
         child: Text('floating'),
       ),
     );
-    await tester.pump();
-    final visibility = tester.widget<Visibility>(find.byType(Visibility));
-    expect(visibility.visible, isTrue);
+    await tester.pumpAndSettle();
+    expect(find.text('floating'), findsOneWidget);
   });
 
   // ── 4. Different alignments render without error ───────────────────────────
@@ -64,7 +62,7 @@ void main() {
           child: const Text('floating'),
         ),
       );
-      await tester.pump();
+      await tester.pumpAndSettle();
       expect(find.byType(OiFloating), findsOneWidget);
     });
   }
@@ -83,7 +81,7 @@ void main() {
         child: Text('floating'),
       ),
     );
-    await tester.pump();
+    await tester.pumpAndSettle();
     expect(find.byType(OiFloating), findsOneWidget);
   });
 
@@ -98,7 +96,7 @@ void main() {
         child: Text('floating'),
       ),
     );
-    await tester.pump();
+    await tester.pumpAndSettle();
     expect(find.byType(OiFloating), findsOneWidget);
   });
 
@@ -113,13 +111,14 @@ void main() {
         child: Text('floating'),
       ),
     );
-    await tester.pump();
+    await tester.pumpAndSettle();
     expect(find.byType(OiFloating), findsOneWidget);
   });
 
-  // ── 8. toggling visible updates Visibility ────────────────────────────────
+  // ── 8. toggling visible shows/hides floating content ──────────────────────
 
-  testWidgets('toggling visible updates the Visibility widget', (tester) async {
+  testWidgets('toggling visible shows and hides floating content',
+      (tester) async {
     final notifier = ValueNotifier<bool>(false);
     addTearDown(notifier.dispose);
 
@@ -133,15 +132,15 @@ void main() {
         ),
       ),
     );
-    await tester.pump();
+    await tester.pumpAndSettle();
 
     // Initially hidden.
-    expect(tester.widget<Visibility>(find.byType(Visibility)).visible, isFalse);
+    expect(find.text('floating'), findsNothing);
 
-    // Toggle visible=true via notifier (no hit-test issues).
+    // Toggle visible=true.
     notifier.value = true;
-    await tester.pump();
+    await tester.pumpAndSettle();
 
-    expect(tester.widget<Visibility>(find.byType(Visibility)).visible, isTrue);
+    expect(find.text('floating'), findsOneWidget);
   });
 }

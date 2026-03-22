@@ -45,10 +45,12 @@ enum OiFloatingAlignment {
   rightEnd,
 }
 
-/// Positions a floating overlay relative to an anchor widget using
-/// [CompositedTransformFollower].
+/// Positions a floating overlay relative to an anchor widget.
 ///
-/// The floating child is kept in sync with the anchor as the layout changes.
+/// Uses [OverlayPortal] to render the floating content in the nearest
+/// [Overlay], ensuring it paints above sibling widgets. The floating child
+/// tracks the anchor via [CompositedTransformFollower].
+///
 /// Use [visible] to show or hide the floating content. Use [alignment] to
 /// control which side of the anchor the floating content appears on. Use [gap]
 /// to add spacing between the anchor and the floating content. When
@@ -104,49 +106,18 @@ class OiFloating extends StatefulWidget {
 
 class _OiFloatingState extends State<OiFloating> {
   final LayerLink _layerLink = LayerLink();
-  OverlayEntry? _bottomSheetEntry;
+  final OverlayPortalController _portalController = OverlayPortalController();
 
   @override
-  void didUpdateWidget(OiFloating oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (widget.visible != oldWidget.visible ||
-        widget.bottomSheetOnCompact != oldWidget.bottomSheetOnCompact) {
-      _updateBottomSheet();
-    }
-  }
-
-  @override
-  void dispose() {
-    _removeBottomSheet();
-    super.dispose();
+  void initState() {
+    super.initState();
+    // Always show the portal — visibility is controlled by the builder
+    // returning SizedBox.shrink() when not visible. This avoids calling
+    // show()/hide() during build phases which can trigger assertions.
+    _portalController.show();
   }
 
   bool get _useBottomSheet => widget.bottomSheetOnCompact && context.isCompact;
-
-  void _updateBottomSheet() {
-    if (_useBottomSheet && widget.visible) {
-      _insertBottomSheet();
-    } else {
-      _removeBottomSheet();
-    }
-  }
-
-  void _insertBottomSheet() {
-    _removeBottomSheet();
-    final overlay = Overlay.maybeOf(context);
-    if (overlay == null) return;
-    _bottomSheetEntry = OverlayEntry(
-      builder: (ctx) =>
-          Positioned(left: 0, right: 0, bottom: 0, child: widget.child),
-    );
-    overlay.insert(_bottomSheetEntry!);
-  }
-
-  void _removeBottomSheet() {
-    _bottomSheetEntry?.remove();
-    _bottomSheetEntry?.dispose();
-    _bottomSheetEntry = null;
-  }
 
   /// Returns the targetAnchor, followerAnchor, and linkedOffset for the
   /// given [alignment] and [gap].
@@ -271,14 +242,12 @@ class _OiFloatingState extends State<OiFloating> {
       case OiFloatingAlignment.topStart:
       case OiFloatingAlignment.topCenter:
       case OiFloatingAlignment.topEnd:
-        // Flip to bottom if not enough space above.
         if (globalPosition.dy < 100) {
           return _flippedAlignment(widget.alignment);
         }
       case OiFloatingAlignment.bottomStart:
       case OiFloatingAlignment.bottomCenter:
       case OiFloatingAlignment.bottomEnd:
-        // Flip to top if not enough space below.
         if (globalPosition.dy + renderBox.size.height + 100 >
             viewportSize.height) {
           return _flippedAlignment(widget.alignment);
@@ -286,14 +255,12 @@ class _OiFloatingState extends State<OiFloating> {
       case OiFloatingAlignment.leftStart:
       case OiFloatingAlignment.leftCenter:
       case OiFloatingAlignment.leftEnd:
-        // Flip to right if not enough space to the left.
         if (globalPosition.dx < 100) {
           return _flippedAlignment(widget.alignment);
         }
       case OiFloatingAlignment.rightStart:
       case OiFloatingAlignment.rightCenter:
       case OiFloatingAlignment.rightEnd:
-        // Flip to left if not enough space to the right.
         if (globalPosition.dx + renderBox.size.width + 100 >
             viewportSize.width) {
           return _flippedAlignment(widget.alignment);
@@ -302,58 +269,39 @@ class _OiFloatingState extends State<OiFloating> {
     return widget.alignment;
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final isCompact = context.isCompact;
-    final useBottomSheet = widget.bottomSheetOnCompact && isCompact;
+  Widget _buildOverlayChild(BuildContext context) {
+    // When not visible, return an empty widget so the portal can stay
+    // "shown" without rendering anything.
+    if (!widget.visible) return const SizedBox.shrink();
+
+    if (_useBottomSheet) {
+      return Positioned(left: 0, right: 0, bottom: 0, child: widget.child);
+    }
 
     final resolvedAlignment = _resolvedAlignment();
     final anchors = _anchorsFor(resolvedAlignment, widget.gap);
     final extraOffset = widget.offset ?? Offset.zero;
     final linkedOffset = anchors.linkedOffset + extraOffset;
 
-    final anchorWidget = CompositedTransformTarget(
-      link: _layerLink,
-      child: widget.anchor,
-    );
-
-    if (useBottomSheet) {
-      // On compact: the bottom sheet is managed via OverlayEntry;
-      // just render the anchor here.
-      return anchorWidget;
-    }
-
-    final follower = CompositedTransformFollower(
+    return CompositedTransformFollower(
       link: _layerLink,
       showWhenUnlinked: false,
       targetAnchor: anchors.targetAnchor,
       followerAnchor: anchors.followerAnchor,
       offset: linkedOffset,
-      child: Visibility(
-        visible: widget.visible,
-        maintainState: true,
-        maintainAnimation: true,
-        child: widget.child,
-      ),
+      child: widget.child,
     );
+  }
 
-    return Stack(
-      clipBehavior: Clip.none,
-      children: [
-        anchorWidget,
-        Positioned(
-          width: 0,
-          height: 0,
-          child: OverflowBox(
-            alignment: Alignment.topLeft,
-            minWidth: 0,
-            maxWidth: double.infinity,
-            minHeight: 0,
-            maxHeight: double.infinity,
-            child: follower,
-          ),
-        ),
-      ],
+  @override
+  Widget build(BuildContext context) {
+    return OverlayPortal(
+      controller: _portalController,
+      overlayChildBuilder: _buildOverlayChild,
+      child: CompositedTransformTarget(
+        link: _layerLink,
+        child: widget.anchor,
+      ),
     );
   }
 }
