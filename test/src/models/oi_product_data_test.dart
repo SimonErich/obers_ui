@@ -87,8 +87,8 @@ void main() {
       expect(p.currencyCode, 'USD');
       expect(p.imageUrl, isNull);
       expect(p.imageUrls, isEmpty);
-      expect(p.variants, isEmpty);
-      expect(p.attributes, isEmpty);
+      expect(p.variants, isNull);
+      expect(p.attributes, isNull);
       expect(p.inStock, isTrue);
       expect(p.stockCount, isNull);
       expect(p.rating, isNull);

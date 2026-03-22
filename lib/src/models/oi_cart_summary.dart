@@ -2,7 +2,7 @@ import 'package:flutter/foundation.dart';
 
 /// A summary of cart totals for display in checkout UIs.
 ///
-/// Coverage: REQ-0022
+/// Coverage: REQ-0037
 ///
 /// All data flows in via props — no direct coupling to any backend.
 ///
@@ -13,11 +13,11 @@ class OiCartSummary {
   const OiCartSummary({
     required this.total,
     this.subtotal = 0,
-    this.discount = 0,
+    this.discount,
     this.discountLabel,
-    this.shipping = 0,
+    this.shipping,
     this.shippingLabel,
-    this.tax = 0,
+    this.tax,
     this.taxLabel,
     this.currencyCode = 'USD',
   });
@@ -26,19 +26,25 @@ class OiCartSummary {
   final double subtotal;
 
   /// Discount amount (positive value subtracted from subtotal).
-  final double discount;
+  ///
+  /// `null` means no discount is applicable (distinct from a zero discount).
+  final double? discount;
 
   /// Human-readable discount description (e.g. "SUMMER20 (-20%)").
   final String? discountLabel;
 
   /// Shipping cost.
-  final double shipping;
+  ///
+  /// `null` means shipping is not applicable (distinct from free shipping).
+  final double? shipping;
 
   /// Human-readable shipping description (e.g. "Express Shipping").
   final String? shippingLabel;
 
   /// Tax amount.
-  final double tax;
+  ///
+  /// `null` means tax is not applicable (distinct from zero tax).
+  final double? tax;
 
   /// Human-readable tax description (e.g. "VAT 20%").
   final String? taxLabel;
@@ -52,26 +58,30 @@ class OiCartSummary {
   /// Returns a copy with the specified fields replaced.
   OiCartSummary copyWith({
     double? subtotal,
-    double? discount,
+    Object? discount = _sentinel,
     Object? discountLabel = _sentinel,
-    double? shipping,
+    Object? shipping = _sentinel,
     Object? shippingLabel = _sentinel,
-    double? tax,
+    Object? tax = _sentinel,
     Object? taxLabel = _sentinel,
     double? total,
     String? currencyCode,
   }) {
     return OiCartSummary(
       subtotal: subtotal ?? this.subtotal,
-      discount: discount ?? this.discount,
+      discount: identical(discount, _sentinel)
+          ? this.discount
+          : discount as double?,
       discountLabel: identical(discountLabel, _sentinel)
           ? this.discountLabel
           : discountLabel as String?,
-      shipping: shipping ?? this.shipping,
+      shipping: identical(shipping, _sentinel)
+          ? this.shipping
+          : shipping as double?,
       shippingLabel: identical(shippingLabel, _sentinel)
           ? this.shippingLabel
           : shippingLabel as String?,
-      tax: tax ?? this.tax,
+      tax: identical(tax, _sentinel) ? this.tax : tax as double?,
       taxLabel: identical(taxLabel, _sentinel)
           ? this.taxLabel
           : taxLabel as String?,

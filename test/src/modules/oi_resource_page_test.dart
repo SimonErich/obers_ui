@@ -183,7 +183,6 @@ void main() {
 
     testWidgets('a11y: semantics label applied', (tester) async {
       final handle = tester.ensureSemantics();
-      addTearDown(handle.dispose);
 
       await tester.pumpObers(
         const OiResourcePage(
@@ -194,7 +193,14 @@ void main() {
         surfaceSize: const Size(1200, 800),
       );
 
-      expect(find.bySemanticsLabel('User Management'), findsOneWidget);
+      expect(
+        find.byWidgetPredicate(
+          (w) => w is Semantics && w.properties.label == 'User Management',
+        ),
+        findsOneWidget,
+      );
+
+      handle.dispose();
     });
 
     testWidgets('onAction callback fires for default buttons', (tester) async {

@@ -9,11 +9,11 @@ void main() {
     test('default construction has expected defaults', () {
       const s = OiCartSummary(total: 0);
       expect(s.subtotal, 0);
-      expect(s.discount, 0);
+      expect(s.discount, isNull);
       expect(s.discountLabel, isNull);
-      expect(s.shipping, 0);
+      expect(s.shipping, isNull);
       expect(s.shippingLabel, isNull);
-      expect(s.tax, 0);
+      expect(s.tax, isNull);
       expect(s.taxLabel, isNull);
       expect(s.total, 0);
       expect(s.currencyCode, 'USD');
@@ -53,18 +53,36 @@ void main() {
     test('copyWith can set nullable fields to null via sentinel', () {
       const s = OiCartSummary(
         total: 100.0,
+        discount: 10.0,
         discountLabel: 'SAVE10',
+        shipping: 5.0,
         shippingLabel: 'Standard',
+        tax: 8.0,
         taxLabel: 'VAT 20%',
       );
       final cleared = s.copyWith(
+        discount: null,
         discountLabel: null,
+        shipping: null,
         shippingLabel: null,
+        tax: null,
         taxLabel: null,
       );
+      expect(cleared.discount, isNull);
       expect(cleared.discountLabel, isNull);
+      expect(cleared.shipping, isNull);
       expect(cleared.shippingLabel, isNull);
+      expect(cleared.tax, isNull);
       expect(cleared.taxLabel, isNull);
+    });
+
+    test('copyWith preserves null when not specified', () {
+      const s = OiCartSummary(total: 50.0);
+      final updated = s.copyWith(total: 60.0);
+      expect(updated.discount, isNull);
+      expect(updated.shipping, isNull);
+      expect(updated.tax, isNull);
+      expect(updated.total, 60.0);
     });
 
     test('equal instances are ==', () {

@@ -138,26 +138,28 @@ class OiCartPanel extends StatelessWidget {
         currencyCode: currencyCode,
         loading: loading,
       ),
-      if (summary.discount != 0)
+      if (summary.discount != null)
         OiOrderSummaryLine(
           label: summary.discountLabel ?? 'Discount',
-          amount: summary.discount,
+          amount: summary.discount!,
           currencyCode: currencyCode,
           negative: true,
           loading: loading,
         ),
-      OiOrderSummaryLine(
-        label: summary.shippingLabel ?? 'Shipping',
-        amount: summary.shipping,
-        currencyCode: currencyCode,
-        loading: loading,
-      ),
-      OiOrderSummaryLine(
-        label: summary.taxLabel ?? 'Tax',
-        amount: summary.tax,
-        currencyCode: currencyCode,
-        loading: loading,
-      ),
+      if (summary.shipping != null)
+        OiOrderSummaryLine(
+          label: summary.shippingLabel ?? 'Shipping',
+          amount: summary.shipping!,
+          currencyCode: currencyCode,
+          loading: loading,
+        ),
+      if (summary.tax != null)
+        OiOrderSummaryLine(
+          label: summary.taxLabel ?? 'Tax',
+          amount: summary.tax!,
+          currencyCode: currencyCode,
+          loading: loading,
+        ),
       Padding(
         padding: EdgeInsets.symmetric(vertical: sp.xs),
         child: const OiDivider(),

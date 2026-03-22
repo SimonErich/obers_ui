@@ -2,7 +2,7 @@ import 'package:flutter/foundation.dart';
 
 /// A single item in the shopping cart.
 ///
-/// Coverage: REQ-0021
+/// Coverage: REQ-0036
 ///
 /// All data flows in via props — no direct coupling to any backend.
 ///
@@ -19,7 +19,7 @@ class OiCartItem {
     this.quantity = 1,
     this.imageUrl,
     this.maxQuantity,
-    this.attributes = const {},
+    this.attributes,
   });
 
   /// Identifier of the product this item represents.
@@ -46,8 +46,9 @@ class OiCartItem {
   /// Maximum quantity allowed (stock limit). `null` means unlimited.
   final int? maxQuantity;
 
-  /// Arbitrary key-value attributes (e.g. `{'Color': 'Red'}`).
-  final Map<String, String> attributes;
+  /// Arbitrary key-value attributes (e.g. `{'Color': 'Red'}`). `null` means
+  /// not applicable.
+  final Map<String, String>? attributes;
 
   /// Total price for this line item (`unitPrice * quantity`).
   double get lineTotal => unitPrice * quantity;
@@ -62,7 +63,7 @@ class OiCartItem {
     int? quantity,
     Object? imageUrl = _sentinel,
     Object? maxQuantity = _sentinel,
-    Map<String, String>? attributes,
+    Object? attributes = _sentinel,
   }) {
     return OiCartItem(
       productKey: productKey ?? this.productKey,
@@ -81,7 +82,9 @@ class OiCartItem {
       maxQuantity: identical(maxQuantity, _sentinel)
           ? this.maxQuantity
           : maxQuantity as int?,
-      attributes: attributes ?? this.attributes,
+      attributes: identical(attributes, _sentinel)
+          ? this.attributes
+          : attributes as Map<String, String>?,
     );
   }
 
@@ -97,7 +100,7 @@ class OiCartItem {
         quantity == other.quantity &&
         imageUrl == other.imageUrl &&
         maxQuantity == other.maxQuantity &&
-        _mapEquals(attributes, other.attributes);
+        _nullableMapEquals(attributes, other.attributes);
   }
 
   @override
@@ -110,7 +113,11 @@ class OiCartItem {
     quantity,
     imageUrl,
     maxQuantity,
-    Object.hashAll(attributes.entries.map((e) => Object.hash(e.key, e.value))),
+    attributes == null
+        ? null
+        : Object.hashAll(
+            attributes!.entries.map((e) => Object.hash(e.key, e.value)),
+          ),
   );
 
   @override
@@ -121,7 +128,9 @@ class OiCartItem {
 
 // ── Private helpers ──────────────────────────────────────────────────────────
 
-bool _mapEquals<K, V>(Map<K, V> a, Map<K, V> b) {
+bool _nullableMapEquals<K, V>(Map<K, V>? a, Map<K, V>? b) {
+  if (identical(a, b)) return true;
+  if (a == null || b == null) return false;
   if (a.length != b.length) return false;
   for (final key in a.keys) {
     if (!b.containsKey(key) || b[key] != a[key]) return false;

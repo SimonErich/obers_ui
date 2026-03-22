@@ -2,7 +2,7 @@ import 'package:flutter/foundation.dart';
 
 /// An individual product variant (e.g. "Red / Large").
 ///
-/// Coverage: REQ-0020
+/// Coverage: REQ-0035
 ///
 /// When [price] is `null` the parent [OiProductData.price] applies.
 /// When [stockCount] is `null` no stock tracking is implied at variant level.
@@ -77,7 +77,7 @@ class OiProductVariant {
         imageUrl == other.imageUrl &&
         inStock == other.inStock &&
         stockCount == other.stockCount &&
-        _mapEquals(attributes, other.attributes);
+        _nullableMapEquals(attributes, other.attributes);
   }
 
   @override
@@ -99,7 +99,7 @@ class OiProductVariant {
 
 /// A product in the shop catalog.
 ///
-/// Coverage: REQ-0020
+/// Coverage: REQ-0035
 ///
 /// All data flows in via props — no direct coupling to any backend.
 ///
@@ -116,8 +116,8 @@ class OiProductData {
     this.currencyCode = 'USD',
     this.imageUrl,
     this.imageUrls = const [],
-    this.variants = const [],
-    this.attributes = const {},
+    this.variants,
+    this.attributes,
     this.inStock = true,
     this.stockCount,
     this.rating,
@@ -150,11 +150,12 @@ class OiProductData {
   /// Gallery image URLs.
   final List<String> imageUrls;
 
-  /// Available product variants.
-  final List<OiProductVariant> variants;
+  /// Available product variants. `null` means not applicable.
+  final List<OiProductVariant>? variants;
 
-  /// Arbitrary key-value attributes (e.g. `{'Color': 'Red'}`).
-  final Map<String, String> attributes;
+  /// Arbitrary key-value attributes (e.g. `{'Color': 'Red'}`). `null` means
+  /// not applicable.
+  final Map<String, String>? attributes;
 
   /// Whether this product is currently in stock.
   final bool inStock;
@@ -184,8 +185,8 @@ class OiProductData {
     String? currencyCode,
     Object? imageUrl = _sentinel,
     List<String>? imageUrls,
-    List<OiProductVariant>? variants,
-    Map<String, String>? attributes,
+    Object? variants = _sentinel,
+    Object? attributes = _sentinel,
     bool? inStock,
     Object? stockCount = _sentinel,
     Object? rating = _sentinel,
@@ -208,8 +209,12 @@ class OiProductData {
           ? this.imageUrl
           : imageUrl as String?,
       imageUrls: imageUrls ?? this.imageUrls,
-      variants: variants ?? this.variants,
-      attributes: attributes ?? this.attributes,
+      variants: identical(variants, _sentinel)
+          ? this.variants
+          : variants as List<OiProductVariant>?,
+      attributes: identical(attributes, _sentinel)
+          ? this.attributes
+          : attributes as Map<String, String>?,
       inStock: inStock ?? this.inStock,
       stockCount: identical(stockCount, _sentinel)
           ? this.stockCount
@@ -235,8 +240,8 @@ class OiProductData {
         currencyCode == other.currencyCode &&
         imageUrl == other.imageUrl &&
         listEquals(imageUrls, other.imageUrls) &&
-        listEquals(variants, other.variants) &&
-        _mapEquals(attributes, other.attributes) &&
+        _nullableListEquals(variants, other.variants) &&
+        _nullableMapEquals(attributes, other.attributes) &&
         inStock == other.inStock &&
         stockCount == other.stockCount &&
         rating == other.rating &&
@@ -255,8 +260,12 @@ class OiProductData {
     currencyCode,
     imageUrl,
     Object.hashAll(imageUrls),
-    Object.hashAll(variants),
-    Object.hashAll(attributes.entries.map((e) => Object.hash(e.key, e.value))),
+    variants == null ? null : Object.hashAll(variants!),
+    attributes == null
+        ? null
+        : Object.hashAll(
+            attributes!.entries.map((e) => Object.hash(e.key, e.value)),
+          ),
     inStock,
     stockCount,
     rating,
@@ -273,7 +282,15 @@ class OiProductData {
 
 // ── Private helpers ──────────────────────────────────────────────────────────
 
-bool _mapEquals<K, V>(Map<K, V> a, Map<K, V> b) {
+bool _nullableListEquals<T>(List<T>? a, List<T>? b) {
+  if (identical(a, b)) return true;
+  if (a == null || b == null) return false;
+  return listEquals(a, b);
+}
+
+bool _nullableMapEquals<K, V>(Map<K, V>? a, Map<K, V>? b) {
+  if (identical(a, b)) return true;
+  if (a == null || b == null) return false;
   if (a.length != b.length) return false;
   for (final key in a.keys) {
     if (!b.containsKey(key) || b[key] != a[key]) return false;

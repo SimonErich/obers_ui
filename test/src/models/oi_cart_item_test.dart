@@ -20,7 +20,7 @@ void main() {
       expect(item.quantity, 1);
       expect(item.imageUrl, isNull);
       expect(item.maxQuantity, isNull);
-      expect(item.attributes, isEmpty);
+      expect(item.attributes, isNull);
     });
 
     test('lineTotal is unitPrice * quantity', () {

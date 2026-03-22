@@ -79,7 +79,6 @@ void main() {
       tester,
     ) async {
       final handle = tester.ensureSemantics();
-      addTearDown(handle.dispose);
 
       await tester.pumpObers(
         OiAppShell(
@@ -104,6 +103,8 @@ void main() {
         ),
         findsOneWidget,
       );
+
+      handle.dispose();
     });
 
     testWidgets('navigation items are mapped to OiSidebarSections', (
@@ -226,7 +227,6 @@ void main() {
 
     testWidgets('semantics label is applied', (tester) async {
       final handle = tester.ensureSemantics();
-      addTearDown(handle.dispose);
 
       await tester.pumpObers(
         const OiAppShell(
@@ -243,6 +243,8 @@ void main() {
         ),
         findsOneWidget,
       );
+
+      handle.dispose();
     });
 
     // ── New tests (REQ-0030) ────────────────────────────────────────────────
@@ -296,7 +298,6 @@ void main() {
 
     testWidgets('mobile drawer opens on hamburger tap', (tester) async {
       final handle = tester.ensureSemantics();
-      addTearDown(handle.dispose);
 
       await tester.pumpObers(
         OiAppShell(
@@ -324,11 +325,12 @@ void main() {
       // The drawer should now be open.
       final drawerAfter = tester.widget<OiDrawer>(drawerFinder);
       expect(drawerAfter.open, isTrue);
+
+      handle.dispose();
     });
 
     testWidgets('mobile drawer closes on close', (tester) async {
       final handle = tester.ensureSemantics();
-      addTearDown(handle.dispose);
 
       await tester.pumpObers(
         OiAppShell(
@@ -340,7 +342,10 @@ void main() {
       );
 
       // Open the drawer.
-      await tester.tap(find.bySemanticsLabel('Open navigation'));
+      final hamburgerFinder = find.byWidgetPredicate(
+        (w) => w is Semantics && w.properties.label == 'Open navigation',
+      );
+      await tester.tap(hamburgerFinder);
       await tester.pumpAndSettle();
 
       final drawerFinder = find.byType(OiDrawer);
@@ -352,6 +357,8 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(tester.widget<OiDrawer>(drawerFinder).open, isFalse);
+
+      handle.dispose();
     });
 
     testWidgets('mobile hides breadcrumbs', (tester) async {
@@ -435,7 +442,6 @@ void main() {
 
     testWidgets('a11y: sidebar label applied', (tester) async {
       final handle = tester.ensureSemantics();
-      addTearDown(handle.dispose);
 
       await tester.pumpObers(
         OiAppShell(
@@ -446,12 +452,22 @@ void main() {
         surfaceSize: const Size(1200, 800),
       );
 
-      // The shell itself has a Semantics with the label.
-      expect(find.bySemanticsLabel('Navigation Panel'), findsOneWidget);
+      // The shell and sidebar both carry the label (container + sidebar).
+      expect(
+        find.byWidgetPredicate(
+          (w) =>
+              w is Semantics &&
+              w.container == true &&
+              w.properties.label == 'Navigation Panel',
+        ),
+        findsOneWidget,
+      );
 
       // The OiSidebar should receive the same label.
       final sidebar = tester.widget<OiSidebar>(find.byType(OiSidebar));
       expect(sidebar.label, 'Navigation Panel');
+
+      handle.dispose();
     });
 
     testWidgets('keyboard: Tab focuses sidebar', (tester) async {
@@ -544,7 +560,6 @@ void main() {
       tester,
     ) async {
       final handle = tester.ensureSemantics();
-      addTearDown(handle.dispose);
 
       await tester.pumpObers(
         OiAppShell(
@@ -561,7 +576,14 @@ void main() {
       expect(sidebar.mode, OiSidebarMode.compact);
 
       // The expand toggle should be visible.
-      expect(find.bySemanticsLabel('Expand sidebar'), findsOneWidget);
+      expect(
+        find.byWidgetPredicate(
+          (w) => w is Semantics && w.properties.label == 'Expand sidebar',
+        ),
+        findsOneWidget,
+      );
+
+      handle.dispose();
     });
 
     testWidgets('active route found in nested children', (tester) async {

@@ -94,23 +94,25 @@ class OiOrderSummary extends StatelessWidget {
         amount: summary.subtotal,
         currencyCode: currencyCode,
       ),
-      if (summary.discount != 0)
+      if (summary.discount != null)
         OiOrderSummaryLine(
           label: summary.discountLabel ?? 'Discount',
-          amount: summary.discount,
+          amount: summary.discount!,
           currencyCode: currencyCode,
           negative: true,
         ),
-      OiOrderSummaryLine(
-        label: summary.shippingLabel ?? 'Shipping',
-        amount: summary.shipping,
-        currencyCode: currencyCode,
-      ),
-      OiOrderSummaryLine(
-        label: summary.taxLabel ?? 'Tax',
-        amount: summary.tax,
-        currencyCode: currencyCode,
-      ),
+      if (summary.shipping != null)
+        OiOrderSummaryLine(
+          label: summary.shippingLabel ?? 'Shipping',
+          amount: summary.shipping!,
+          currencyCode: currencyCode,
+        ),
+      if (summary.tax != null)
+        OiOrderSummaryLine(
+          label: summary.taxLabel ?? 'Tax',
+          amount: summary.tax!,
+          currencyCode: currencyCode,
+        ),
       Padding(
         padding: EdgeInsets.symmetric(vertical: sp.xs),
         child: const OiDivider(),
