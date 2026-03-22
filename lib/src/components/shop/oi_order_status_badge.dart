@@ -17,6 +17,7 @@ class OiOrderStatusBadge extends StatelessWidget {
     required this.status,
     required this.label,
     this.statusColors,
+    this.statusLabels,
     this.size = OiBadgeSize.small,
     super.key,
   }) : _style = OiBadgeStyle.soft;
@@ -26,6 +27,7 @@ class OiOrderStatusBadge extends StatelessWidget {
     required this.status,
     required this.label,
     this.statusColors,
+    this.statusLabels,
     this.size = OiBadgeSize.small,
     super.key,
   }) : _style = OiBadgeStyle.soft;
@@ -35,6 +37,7 @@ class OiOrderStatusBadge extends StatelessWidget {
     required this.status,
     required this.label,
     this.statusColors,
+    this.statusLabels,
     this.size = OiBadgeSize.small,
     super.key,
   }) : _style = OiBadgeStyle.filled;
@@ -45,6 +48,7 @@ class OiOrderStatusBadge extends StatelessWidget {
     required OiOrderData order,
     this.label = 'Order status',
     this.statusColors,
+    this.statusLabels,
     this.size = OiBadgeSize.small,
     super.key,
   }) : status = order.status,
@@ -55,6 +59,12 @@ class OiOrderStatusBadge extends StatelessWidget {
 
   /// Accessibility label announced by screen readers.
   final String label;
+
+  /// Custom label overrides for specific statuses.
+  ///
+  /// When provided, the label for a given status is looked up here first.
+  /// If the status is not present in the map, the default label is used.
+  final Map<OiOrderStatus, String>? statusLabels;
 
   /// Custom color overrides for specific statuses.
   ///
@@ -69,6 +79,14 @@ class OiOrderStatusBadge extends StatelessWidget {
   final OiBadgeStyle _style;
 
   String get _statusText {
+    if (statusLabels != null && statusLabels!.containsKey(status)) {
+      return statusLabels![status]!;
+    }
+    return _defaultLabelForStatus(status);
+  }
+
+  /// Returns the default label for the given [status].
+  static String _defaultLabelForStatus(OiOrderStatus status) {
     switch (status) {
       case OiOrderStatus.pending:
         return 'Pending';

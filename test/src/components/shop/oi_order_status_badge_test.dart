@@ -211,6 +211,45 @@ void main() {
       });
     });
 
+    // ── Custom statusLabels ──────────────────────────────────────────────
+
+    group('custom statusLabels', () {
+      testWidgets('statusLabels overrides default text', (tester) async {
+        await tester.pumpObers(
+          const OiOrderStatusBadge(
+            status: OiOrderStatus.pending,
+            label: 'Order status',
+            statusLabels: {OiOrderStatus.pending: 'Ausstehend'},
+          ),
+        );
+        expect(find.text('Ausstehend'), findsOneWidget);
+        expect(find.text('Pending'), findsNothing);
+      });
+
+      testWidgets('unoverridden status uses default label', (tester) async {
+        await tester.pumpObers(
+          const OiOrderStatusBadge(
+            status: OiOrderStatus.shipped,
+            label: 'Order status',
+            statusLabels: {OiOrderStatus.pending: 'Ausstehend'},
+          ),
+        );
+        expect(find.text('Shipped'), findsOneWidget);
+      });
+
+      testWidgets('all statuses can be overridden', (tester) async {
+        await tester.pumpObers(
+          const OiOrderStatusBadge(
+            status: OiOrderStatus.delivered,
+            label: 'Order status',
+            statusLabels: {OiOrderStatus.delivered: 'Geliefert'},
+          ),
+        );
+        expect(find.text('Geliefert'), findsOneWidget);
+        expect(find.text('Delivered'), findsNothing);
+      });
+    });
+
     // ── Constructors ────────────────────────────────────────────────────────
 
     group('constructors', () {
