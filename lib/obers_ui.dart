@@ -238,13 +238,17 @@ export 'src/foundation/theme/oi_theme_data.dart';
 export 'src/foundation/theme/oi_theme_scope.dart';
 // ── Models ───────────────────────────────────────────────────────────────────
 
+export 'src/models/oi_address_data.dart';
 export 'src/models/oi_cart_item.dart';
 export 'src/models/oi_cart_summary.dart';
 export 'src/models/oi_coupon_result.dart';
 export 'src/models/oi_field_type.dart';
 export 'src/models/oi_file_explorer_controller.dart';
 export 'src/models/oi_file_node_data.dart';
+export 'src/models/oi_order_data.dart';
+export 'src/models/oi_payment_method.dart';
 export 'src/models/oi_product_data.dart';
+export 'src/models/oi_shipping_method.dart';
 // ── Models: Settings ─────────────────────────────────────────────────────────
 
 export 'src/models/settings/oi_accordion_settings.dart';
@@ -275,7 +279,9 @@ export 'src/modules/oi_metadata_editor.dart';
 export 'src/modules/oi_notification_center.dart';
 export 'src/modules/oi_app_shell.dart';
 export 'src/modules/oi_permissions.dart';
+export 'src/modules/oi_checkout.dart';
 export 'src/modules/oi_resource_page.dart';
+export 'src/modules/oi_shop_product_detail.dart';
 // ── Primitives: Animation ────────────────────────────────────────────────────
 
 export 'src/primitives/animation/oi_animated_list.dart';
