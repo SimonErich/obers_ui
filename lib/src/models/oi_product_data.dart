@@ -2,7 +2,7 @@ import 'package:flutter/foundation.dart';
 
 /// An individual product variant (e.g. "Red / Large").
 ///
-/// Coverage: REQ-0035
+/// Coverage: REQ-0001, REQ-0050
 ///
 /// When [price] is `null` the parent [OiProductData.price] applies.
 /// When [stockCount] is `null` no stock tracking is implied at variant level.
@@ -99,7 +99,7 @@ class OiProductVariant {
 
 /// A product in the shop catalog.
 ///
-/// Coverage: REQ-0035
+/// Coverage: REQ-0001, REQ-0050
 ///
 /// All data flows in via props — no direct coupling to any backend.
 ///

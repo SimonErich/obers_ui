@@ -2,7 +2,7 @@ import 'package:flutter/foundation.dart';
 
 /// A summary of cart totals for display in checkout UIs.
 ///
-/// Coverage: REQ-0037
+/// Coverage: REQ-0003, REQ-0050
 ///
 /// All data flows in via props — no direct coupling to any backend.
 ///
