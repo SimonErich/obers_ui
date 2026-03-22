@@ -6,6 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui/src/components/shop/oi_shipping_method_picker.dart';
 import 'package:obers_ui/src/components/shop/oi_shipping_option.dart';
 import 'package:obers_ui/src/models/oi_shipping_method.dart';
+import 'package:obers_ui/src/primitives/animation/oi_shimmer.dart';
 
 import '../../../helpers/pump_app.dart';
 
@@ -38,18 +39,20 @@ List<OiShippingMethod> _sampleMethods() => const [
 Widget _buildPicker({
   List<OiShippingMethod>? methods,
   Object? selectedKey,
-  ValueChanged<OiShippingMethod>? onSelected,
+  ValueChanged<OiShippingMethod>? onSelect,
   String label = 'Shipping method',
   String currencyCode = 'EUR',
   String emptyLabel = 'No shipping methods available',
+  bool loading = false,
 }) {
   return OiShippingMethodPicker(
     label: label,
     methods: methods ?? _sampleMethods(),
     selectedKey: selectedKey,
-    onSelected: onSelected ?? (_) {},
+    onSelect: onSelect ?? (_) {},
     currencyCode: currencyCode,
     emptyLabel: emptyLabel,
+    loading: loading,
   );
 }
 
@@ -132,11 +135,9 @@ void main() {
     // ── onSelect fires correctly ────────────────────────────────────────
 
     group('onSelect fires correctly', () {
-      testWidgets('fires onSelected with correct method on tap', (
-        tester,
-      ) async {
+      testWidgets('fires onSelect with correct method on tap', (tester) async {
         OiShippingMethod? selected;
-        await tester.pumpObers(_buildPicker(onSelected: (m) => selected = m));
+        await tester.pumpObers(_buildPicker(onSelect: (m) => selected = m));
 
         await tester.tap(find.text('Standard Shipping'));
         await tester.pump();
@@ -147,11 +148,11 @@ void main() {
         expect(selected!.price, 5.99);
       });
 
-      testWidgets('fires onSelected with different method on second tap', (
+      testWidgets('fires onSelect with different method on second tap', (
         tester,
       ) async {
         OiShippingMethod? selected;
-        await tester.pumpObers(_buildPicker(onSelected: (m) => selected = m));
+        await tester.pumpObers(_buildPicker(onSelect: (m) => selected = m));
 
         await tester.tap(find.text('Express Shipping'));
         await tester.pump();
@@ -160,9 +161,9 @@ void main() {
         expect(selected!.price, 12.99);
       });
 
-      testWidgets('fires onSelected for free shipping method', (tester) async {
+      testWidgets('fires onSelect for free shipping method', (tester) async {
         OiShippingMethod? selected;
-        await tester.pumpObers(_buildPicker(onSelected: (m) => selected = m));
+        await tester.pumpObers(_buildPicker(onSelect: (m) => selected = m));
 
         await tester.tap(find.text('Free Shipping'));
         await tester.pump();
@@ -437,21 +438,54 @@ void main() {
 
     // ── Loading state ───────────────────────────────────────────────────
 
-    // Skip: OiShippingMethodPicker API does not expose a loading state —
-    // it renders methods or the empty label immediately with no shimmer
-    // placeholder support.
     group('loading state', () {
-      testWidgets(
-        'loading true shows shimmer placeholders',
-        skip: true,
-        (tester) async {},
-      );
+      testWidgets('loading true shows shimmer placeholders', (tester) async {
+        await tester.pumpObers(_buildPicker(loading: true));
 
-      testWidgets(
-        'loading true hides shipping method widgets',
-        skip: true,
-        (tester) async {},
-      );
+        expect(find.byType(OiShimmer), findsWidgets);
+      });
+
+      testWidgets('loading true hides shipping method widgets', (tester) async {
+        await tester.pumpObers(_buildPicker(loading: true));
+
+        expect(find.byType(OiShippingOption), findsNothing);
+      });
+
+      testWidgets('loading true hides methods even when methods provided', (
+        tester,
+      ) async {
+        await tester.pumpObers(
+          _buildPicker(methods: _sampleMethods(), loading: true),
+        );
+
+        expect(find.byType(OiShippingOption), findsNothing);
+        expect(find.text('Standard Shipping'), findsNothing);
+        expect(find.byType(OiShimmer), findsWidgets);
+      });
+
+      testWidgets('loading true ignores selectedKey', (tester) async {
+        await tester.pumpObers(
+          _buildPicker(selectedKey: 'express', loading: true),
+        );
+
+        expect(find.byType(OiShippingOption), findsNothing);
+        expect(find.byType(OiShimmer), findsWidgets);
+      });
+
+      testWidgets('loading false shows methods normally', (tester) async {
+        await tester.pumpObers(_buildPicker());
+
+        expect(find.byType(OiShippingOption), findsNWidgets(3));
+        expect(find.byType(OiShimmer), findsNothing);
+      });
+
+      testWidgets('still displays picker label when loading', (tester) async {
+        await tester.pumpObers(
+          _buildPicker(label: 'Choose delivery', loading: true),
+        );
+
+        expect(find.text('Choose delivery'), findsOneWidget);
+      });
     });
 
     // ── Single method ────────────────────────────────────────────────────

@@ -42,7 +42,7 @@ Widget _buildShippingPickerGolden() {
         label: 'Shipping method',
         methods: _methods,
         selectedKey: 'express',
-        onSelected: _noop,
+        onSelect: _noop,
       ),
     ),
   );
