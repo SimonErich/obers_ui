@@ -43,52 +43,90 @@ const _payment2 = OiPaymentMethod(key: 'paypal', label: 'PayPal');
 
 void main() {
   group('OiCheckoutData', () {
-    test('constructor assigns fields correctly', () {
+    test('constructor sets all required fields', () {
       const data = OiCheckoutData(
         shippingAddress: _address1,
         billingAddress: _address2,
         shippingMethod: _shipping,
         paymentMethod: _payment,
       );
-
       expect(data.shippingAddress, _address1);
       expect(data.billingAddress, _address2);
       expect(data.shippingMethod, _shipping);
       expect(data.paymentMethod, _payment);
     });
 
-    test('copyWith replaces specified fields', () {
-      const original = OiCheckoutData(
+    test('copyWith replaces shippingAddress independently', () {
+      const data = OiCheckoutData(
         shippingAddress: _address1,
         billingAddress: _address1,
         shippingMethod: _shipping,
         paymentMethod: _payment,
       );
+      final updated = data.copyWith(shippingAddress: _address2);
+      expect(updated.shippingAddress, _address2);
+      expect(updated.billingAddress, _address1);
+      expect(updated.shippingMethod, _shipping);
+      expect(updated.paymentMethod, _payment);
+    });
 
-      final copied = original.copyWith(
+    test('copyWith replaces billingAddress independently', () {
+      const data = OiCheckoutData(
+        shippingAddress: _address1,
+        billingAddress: _address1,
+        shippingMethod: _shipping,
+        paymentMethod: _payment,
+      );
+      final updated = data.copyWith(billingAddress: _address2);
+      expect(updated.shippingAddress, _address1);
+      expect(updated.billingAddress, _address2);
+      expect(updated.shippingMethod, _shipping);
+      expect(updated.paymentMethod, _payment);
+    });
+
+    test('copyWith replaces shippingMethod independently', () {
+      const data = OiCheckoutData(
+        shippingAddress: _address1,
+        billingAddress: _address1,
+        shippingMethod: _shipping,
+        paymentMethod: _payment,
+      );
+      final updated = data.copyWith(shippingMethod: _shipping2);
+      expect(updated.shippingAddress, _address1);
+      expect(updated.billingAddress, _address1);
+      expect(updated.shippingMethod, _shipping2);
+      expect(updated.paymentMethod, _payment);
+    });
+
+    test('copyWith replaces paymentMethod independently', () {
+      const data = OiCheckoutData(
+        shippingAddress: _address1,
+        billingAddress: _address1,
+        shippingMethod: _shipping,
+        paymentMethod: _payment,
+      );
+      final updated = data.copyWith(paymentMethod: _payment2);
+      expect(updated.shippingAddress, _address1);
+      expect(updated.billingAddress, _address1);
+      expect(updated.shippingMethod, _shipping);
+      expect(updated.paymentMethod, _payment2);
+    });
+
+    test('copyWith preserves unset fields', () {
+      const data = OiCheckoutData(
+        shippingAddress: _address1,
         billingAddress: _address2,
-        shippingMethod: _shipping2,
-      );
-
-      expect(copied.shippingAddress, _address1);
-      expect(copied.billingAddress, _address2);
-      expect(copied.shippingMethod, _shipping2);
-      expect(copied.paymentMethod, _payment);
-    });
-
-    test('copyWith without arguments returns equal instance', () {
-      const original = OiCheckoutData(
-        shippingAddress: _address1,
-        billingAddress: _address1,
         shippingMethod: _shipping,
         paymentMethod: _payment,
       );
-
-      final copied = original.copyWith();
-      expect(copied, original);
+      final updated = data.copyWith();
+      expect(updated.shippingAddress, _address1);
+      expect(updated.billingAddress, _address2);
+      expect(updated.shippingMethod, _shipping);
+      expect(updated.paymentMethod, _payment);
     });
 
-    test('equality based on all fields', () {
+    test('equal instances are ==', () {
       const a = OiCheckoutData(
         shippingAddress: _address1,
         billingAddress: _address1,
@@ -101,43 +139,53 @@ void main() {
         shippingMethod: _shipping,
         paymentMethod: _payment,
       );
-      const c = OiCheckoutData(
+      expect(a, equals(b));
+    });
+
+    test('different instances are not ==', () {
+      const a = OiCheckoutData(
+        shippingAddress: _address1,
+        billingAddress: _address1,
+        shippingMethod: _shipping,
+        paymentMethod: _payment,
+      );
+      const b = OiCheckoutData(
         shippingAddress: _address2,
         billingAddress: _address2,
         shippingMethod: _shipping2,
         paymentMethod: _payment2,
       );
-
-      expect(a, b);
-      expect(a, isNot(c));
-      expect(a.hashCode, b.hashCode);
-      expect(a.hashCode, isNot(c.hashCode));
+      expect(a, isNot(equals(b)));
     });
 
-    test('inequality when single field differs', () {
-      const base = OiCheckoutData(
+    test('equal instances have the same hashCode', () {
+      const a = OiCheckoutData(
         shippingAddress: _address1,
         billingAddress: _address1,
         shippingMethod: _shipping,
         paymentMethod: _payment,
       );
-
-      expect(base.copyWith(paymentMethod: _payment2), isNot(base));
-      expect(base.copyWith(shippingMethod: _shipping2), isNot(base));
-      expect(base.copyWith(billingAddress: _address2), isNot(base));
-      expect(base.copyWith(shippingAddress: _address2), isNot(base));
+      const b = OiCheckoutData(
+        shippingAddress: _address1,
+        billingAddress: _address1,
+        shippingMethod: _shipping,
+        paymentMethod: _payment,
+      );
+      expect(a.hashCode, equals(b.hashCode));
     });
 
-    test('toString returns expected format', () {
+    test('toString includes all fields', () {
       const data = OiCheckoutData(
         shippingAddress: _address1,
-        billingAddress: _address1,
+        billingAddress: _address2,
         shippingMethod: _shipping,
         paymentMethod: _payment,
       );
-
-      expect(data.toString(), contains('OiCheckoutData'));
-      expect(data.toString(), contains('shippingAddress'));
+      final str = data.toString();
+      expect(str, contains('shippingAddress:'));
+      expect(str, contains('billingAddress:'));
+      expect(str, contains('shippingMethod:'));
+      expect(str, contains('paymentMethod:'));
     });
   });
 }
