@@ -55,10 +55,10 @@ List<OiPaymentMethod> _samplePaymentMethods() => const [
   ),
 ];
 
-List<OiSelectOption<String>> _sampleCountries() => const [
-  OiSelectOption(value: 'US', label: 'United States'),
-  OiSelectOption(value: 'DE', label: 'Germany'),
-  OiSelectOption(value: 'GB', label: 'United Kingdom'),
+List<OiCountryOption> _sampleCountries() => const [
+  OiCountryOption(code: 'US', name: 'United States'),
+  OiCountryOption(code: 'DE', name: 'Germany'),
+  OiCountryOption(code: 'GB', name: 'United Kingdom'),
 ];
 
 OiAddressData _sampleAddress() => const OiAddressData(
@@ -82,13 +82,13 @@ Widget _buildCheckout({
   ValueChanged<OiAddressData>? onBillingAddressChange,
   ValueChanged<OiShippingMethod>? onShippingMethodChange,
   ValueChanged<OiPaymentMethod>? onPaymentMethodChange,
-  Future<OiOrderData> Function()? onPlaceOrder,
+  Future<OiOrderData> Function(OiCheckoutData)? onPlaceOrder,
   VoidCallback? onCancel,
   OiAddressData? initialShippingAddress,
   OiAddressData? initialBillingAddress,
   List<OiShippingMethod>? shippingMethods,
   List<OiPaymentMethod>? paymentMethods,
-  List<OiSelectOption<String>>? countries,
+  List<OiCountryOption>? countries,
   bool showSummary = true,
   bool sameBillingDefault = true,
   String currencyCode = 'USD',
@@ -420,7 +420,7 @@ void main() {
       await tester.pumpObers(
         _buildCheckout(
           initialShippingAddress: _sampleAddress(),
-          onPlaceOrder: () async {
+          onPlaceOrder: (_) async {
             orderPlaced = true;
             return OiOrderData(
               key: 'order-1',
@@ -452,7 +452,7 @@ void main() {
       await tester.pumpObers(
         _buildCheckout(
           initialShippingAddress: _sampleAddress(),
-          onPlaceOrder: () => completer.future,
+          onPlaceOrder: (_) => completer.future,
         ),
         surfaceSize: const Size(1200, 900),
       );
@@ -488,7 +488,7 @@ void main() {
       await tester.pumpObers(
         _buildCheckout(
           initialShippingAddress: _sampleAddress(),
-          onPlaceOrder: () async {
+          onPlaceOrder: (_) async {
             throw Exception('Payment declined');
           },
         ),

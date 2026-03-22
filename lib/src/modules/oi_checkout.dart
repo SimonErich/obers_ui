@@ -12,6 +12,8 @@ import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/models/oi_address_data.dart';
 import 'package:obers_ui/src/models/oi_cart_item.dart';
 import 'package:obers_ui/src/models/oi_cart_summary.dart';
+import 'package:obers_ui/src/models/oi_checkout_data.dart';
+import 'package:obers_ui/src/models/oi_country_option.dart';
 import 'package:obers_ui/src/models/oi_order_data.dart';
 import 'package:obers_ui/src/models/oi_payment_method.dart';
 import 'package:obers_ui/src/models/oi_shipping_method.dart';
@@ -40,7 +42,7 @@ enum OiCheckoutStep {
 /// A complete multi-step checkout flow orchestrating address entry, shipping
 /// selection, payment selection, and order review as a wizard.
 ///
-/// Coverage: REQ-0067
+/// Coverage: REQ-0014, REQ-0067
 ///
 /// Composes [OiStepper], [OiOrderSummary], [OiButton], [OiCheckbox],
 /// [OiSelect], [OiTextInput], [OiAccordion].
@@ -106,9 +108,10 @@ class OiCheckout extends StatefulWidget {
   /// Called when the payment method changes.
   final ValueChanged<OiPaymentMethod>? onPaymentMethodChange;
 
-  /// Called when the user places the order. Should return the completed
-  /// [OiOrderData] or throw on failure.
-  final Future<OiOrderData> Function()? onPlaceOrder;
+  /// Called when the user places the order. Receives the aggregated
+  /// [OiCheckoutData] and should return the completed [OiOrderData] or
+  /// throw on failure.
+  final Future<OiOrderData> Function(OiCheckoutData checkoutData)? onPlaceOrder;
 
   /// Called when the user cancels the checkout.
   final VoidCallback? onCancel;
@@ -126,7 +129,10 @@ class OiCheckout extends StatefulWidget {
   final List<OiPaymentMethod>? paymentMethods;
 
   /// Country options for the address step country selector.
-  final List<OiSelectOption<String>>? countries;
+  ///
+  /// When provided, the country field renders as an [OiSelect] dropdown
+  /// populated from these options.
+  final List<OiCountryOption>? countries;
 
   /// Whether to show the order summary panel. Defaults to `true`.
   final bool showSummary;
@@ -379,12 +385,21 @@ class _OiCheckoutState extends State<OiCheckout> {
 
   Future<void> _handlePlaceOrder() async {
     if (widget.onPlaceOrder == null) return;
+    if (_selectedShipping == null || _selectedPayment == null) return;
+
     setState(() {
       _isPlacingOrder = true;
       _orderError = null;
     });
     try {
-      await widget.onPlaceOrder!();
+      final billingAddr = _sameBilling ? _shippingAddress : _billingAddress;
+      final checkoutData = OiCheckoutData(
+        shippingAddress: _shippingAddress,
+        billingAddress: billingAddr,
+        shippingMethod: _selectedShipping!,
+        paymentMethod: _selectedPayment!,
+      );
+      await widget.onPlaceOrder!(checkoutData);
     } catch (e) {
       if (mounted) {
         setState(() {
@@ -580,7 +595,11 @@ class _OiCheckoutState extends State<OiCheckout> {
             Expanded(
               child: widget.countries != null
                   ? OiSelect<String>(
-                      options: widget.countries!,
+                      options: widget.countries!
+                          .map(
+                            (c) => OiSelectOption(value: c.code, label: c.name),
+                          )
+                          .toList(),
                       value: selectedCountry,
                       label: 'Country',
                       error: _addressErrors['${errorPrefix}Country'],

@@ -23,23 +23,23 @@ void main() {
       expect(item.attributes, isNull);
     });
 
-    test('lineTotal is unitPrice * quantity', () {
+    test('totalPrice is unitPrice * quantity', () {
       const item = OiCartItem(
         productKey: 'p1',
         name: 'Widget',
         unitPrice: 10.0,
         quantity: 3,
       );
-      expect(item.lineTotal, 30.0);
+      expect(item.totalPrice, 30.0);
     });
 
-    test('lineTotal with default quantity is unitPrice', () {
+    test('totalPrice with default quantity is unitPrice', () {
       const item = OiCartItem(
         productKey: 'p1',
         name: 'Widget',
         unitPrice: 7.50,
       );
-      expect(item.lineTotal, 7.50);
+      expect(item.totalPrice, 7.50);
     });
 
     test('copyWith replaces fields', () {
@@ -76,6 +76,28 @@ void main() {
       expect(cleared.variantLabel, isNull);
       expect(cleared.imageUrl, isNull);
       expect(cleared.maxQuantity, isNull);
+    });
+
+    test('copyWith preserves unchanged fields', () {
+      const item = OiCartItem(
+        productKey: 'p1',
+        variantKey: 'v1',
+        name: 'Widget',
+        variantLabel: 'Red',
+        unitPrice: 10.0,
+        quantity: 2,
+        imageUrl: 'http://img.png',
+        maxQuantity: 5,
+        attributes: {'Color': 'Red'},
+      );
+      final updated = item.copyWith(quantity: 3);
+      expect(updated.productKey, 'p1');
+      expect(updated.variantKey, 'v1');
+      expect(updated.variantLabel, 'Red');
+      expect(updated.unitPrice, 10.0);
+      expect(updated.imageUrl, 'http://img.png');
+      expect(updated.maxQuantity, 5);
+      expect(updated.attributes, {'Color': 'Red'});
     });
 
     test('equal instances are ==', () {
@@ -118,6 +140,16 @@ void main() {
         quantity: 3,
       );
       expect(a.hashCode, equals(b.hashCode));
+    });
+
+    test('toString includes totalPrice', () {
+      const item = OiCartItem(
+        productKey: 'p1',
+        name: 'Widget',
+        unitPrice: 10.0,
+        quantity: 3,
+      );
+      expect(item.toString(), contains('totalPrice: 30.0'));
     });
   });
 }

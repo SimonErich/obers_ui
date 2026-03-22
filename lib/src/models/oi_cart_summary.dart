@@ -11,8 +11,8 @@ import 'package:flutter/foundation.dart';
 class OiCartSummary {
   /// Creates an [OiCartSummary].
   const OiCartSummary({
+    required this.subtotal,
     required this.total,
-    this.subtotal = 0,
     this.discount,
     this.discountLabel,
     this.shipping,

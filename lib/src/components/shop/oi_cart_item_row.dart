@@ -154,7 +154,7 @@ class OiCartItemRow extends StatelessWidget {
 
     children.add(
       OiPriceTag(
-        price: item.lineTotal,
+        price: item.totalPrice,
         label: 'Line total for ${item.name}',
         currencyCode: currencyCode,
         size: compact ? OiPriceTagSize.small : OiPriceTagSize.medium,

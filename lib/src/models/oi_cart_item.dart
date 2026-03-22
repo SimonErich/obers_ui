@@ -23,10 +23,10 @@ class OiCartItem {
   });
 
   /// Identifier of the product this item represents.
-  final Object productKey;
+  final String productKey;
 
   /// Identifier of the selected variant, or `null` if none.
-  final Object? variantKey;
+  final String? variantKey;
 
   /// Display name of the product.
   final String name;
@@ -51,11 +51,11 @@ class OiCartItem {
   final Map<String, String>? attributes;
 
   /// Total price for this line item (`unitPrice * quantity`).
-  double get lineTotal => unitPrice * quantity;
+  double get totalPrice => unitPrice * quantity;
 
   /// Returns a copy with the specified fields replaced.
   OiCartItem copyWith({
-    Object? productKey,
+    String? productKey,
     Object? variantKey = _sentinel,
     String? name,
     Object? variantLabel = _sentinel,
@@ -69,7 +69,7 @@ class OiCartItem {
       productKey: productKey ?? this.productKey,
       variantKey: identical(variantKey, _sentinel)
           ? this.variantKey
-          : variantKey,
+          : variantKey as String?,
       name: name ?? this.name,
       variantLabel: identical(variantLabel, _sentinel)
           ? this.variantLabel
@@ -123,7 +123,7 @@ class OiCartItem {
   @override
   String toString() =>
       'OiCartItem(productKey: $productKey, name: $name, '
-      'unitPrice: $unitPrice, quantity: $quantity, lineTotal: $lineTotal)';
+      'unitPrice: $unitPrice, quantity: $quantity, totalPrice: $totalPrice)';
 }
 
 // ── Private helpers ──────────────────────────────────────────────────────────

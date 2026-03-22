@@ -1,16 +1,34 @@
 // Tests do not require documentation comments.
 // ignore_for_file: public_member_api_docs
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui/src/components/display/oi_image.dart';
 import 'package:obers_ui/src/components/shop/oi_cart_item_row.dart';
-import 'package:obers_ui/src/components/shop/oi_price_tag.dart';
 import 'package:obers_ui/src/components/shop/oi_quantity_selector.dart';
 import 'package:obers_ui/src/models/oi_cart_item.dart';
 import 'package:obers_ui/src/primitives/gesture/oi_swipeable.dart';
 
 import '../../../helpers/pump_app.dart';
+
+FlutterExceptionHandler? _originalOnError;
+
+void _ignoreImageErrors() {
+  _originalOnError = FlutterError.onError;
+  FlutterError.onError = (FlutterErrorDetails details) {
+    if (details.exception.toString().contains('NetworkImageLoadException') ||
+        details.library == 'image resource service') {
+      return;
+    }
+    _originalOnError?.call(details);
+  };
+}
+
+void _restoreOnError() {
+  FlutterError.onError = _originalOnError;
+  _originalOnError = null;
+}
 
 const _item = OiCartItem(
   productKey: 'p1',
@@ -38,6 +56,9 @@ const _itemNoVariant = OiCartItem(
 
 void main() {
   group('OiCartItemRow', () {
+    setUp(_ignoreImageErrors);
+    tearDown(_restoreOnError);
+
     testWidgets('renders product name and variant label', (tester) async {
       await tester.pumpObers(
         const OiCartItemRow(item: _item, label: 'Cart item'),

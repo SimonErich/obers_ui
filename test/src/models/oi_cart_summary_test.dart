@@ -7,7 +7,7 @@ import 'package:obers_ui/src/models/oi_cart_summary.dart';
 void main() {
   group('OiCartSummary', () {
     test('default construction has expected defaults', () {
-      const s = OiCartSummary(total: 0);
+      const s = OiCartSummary(subtotal: 0, total: 0);
       expect(s.subtotal, 0);
       expect(s.discount, isNull);
       expect(s.discountLabel, isNull);
@@ -52,6 +52,7 @@ void main() {
 
     test('copyWith can set nullable fields to null via sentinel', () {
       const s = OiCartSummary(
+        subtotal: 100.0,
         total: 100.0,
         discount: 10.0,
         discountLabel: 'SAVE10',
@@ -77,7 +78,7 @@ void main() {
     });
 
     test('copyWith preserves null when not specified', () {
-      const s = OiCartSummary(total: 50.0);
+      const s = OiCartSummary(subtotal: 50.0, total: 50.0);
       final updated = s.copyWith(total: 60.0);
       expect(updated.discount, isNull);
       expect(updated.shipping, isNull);
@@ -102,8 +103,8 @@ void main() {
     });
 
     test('different instances are not ==', () {
-      const a = OiCartSummary(total: 100.0);
-      const b = OiCartSummary(total: 90.0);
+      const a = OiCartSummary(subtotal: 100.0, total: 100.0);
+      const b = OiCartSummary(subtotal: 100.0, total: 90.0);
       expect(a, isNot(equals(b)));
     });
 

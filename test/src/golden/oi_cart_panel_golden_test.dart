@@ -83,7 +83,7 @@ void main() {
           width: 400,
           child: OiCartPanel(
             items: [],
-            summary: OiCartSummary(total: 0),
+            summary: OiCartSummary(subtotal: 0, total: 0),
             label: 'Shopping cart',
           ),
         ),
@@ -102,7 +102,7 @@ void main() {
           width: 400,
           child: OiCartPanel(
             items: [],
-            summary: OiCartSummary(total: 0),
+            summary: OiCartSummary(subtotal: 0, total: 0),
             label: 'Shopping cart',
           ),
         ),

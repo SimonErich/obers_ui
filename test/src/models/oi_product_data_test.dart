@@ -39,6 +39,25 @@ void main() {
       expect(cleared.stockCount, isNull);
     });
 
+    test('copyWith preserves unchanged fields', () {
+      const v = OiProductVariant(
+        key: 'v1',
+        label: 'Red',
+        price: 9.99,
+        imageUrl: 'http://img.png',
+        inStock: false,
+        stockCount: 0,
+        attributes: {'Color': 'Red'},
+      );
+      final updated = v.copyWith(label: 'Blue');
+      expect(updated.key, 'v1');
+      expect(updated.price, 9.99);
+      expect(updated.imageUrl, 'http://img.png');
+      expect(updated.inStock, isFalse);
+      expect(updated.stockCount, 0);
+      expect(updated.attributes, {'Color': 'Red'});
+    });
+
     test('equal instances are ==', () {
       const a = OiProductVariant(
         key: 'v1',
@@ -74,6 +93,12 @@ void main() {
       );
       expect(a.hashCode, equals(b.hashCode));
     });
+
+    test('toString includes key fields', () {
+      const v = OiProductVariant(key: 'v1', label: 'Red', price: 5.0);
+      expect(v.toString(), contains('v1'));
+      expect(v.toString(), contains('Red'));
+    });
   });
 
   group('OiProductData', () {
@@ -87,8 +112,8 @@ void main() {
       expect(p.currencyCode, 'USD');
       expect(p.imageUrl, isNull);
       expect(p.imageUrls, isEmpty);
-      expect(p.variants, isNull);
-      expect(p.attributes, isNull);
+      expect(p.variants, isEmpty);
+      expect(p.attributes, isEmpty);
       expect(p.inStock, isTrue);
       expect(p.stockCount, isNull);
       expect(p.rating, isNull);
@@ -171,6 +196,23 @@ void main() {
       expect(cleared.sku, isNull);
     });
 
+    test('copyWith replaces variants and attributes', () {
+      const p = OiProductData(
+        key: 'p1',
+        name: 'Widget',
+        price: 19.99,
+        variants: [OiProductVariant(key: 'v1', label: 'Red')],
+        attributes: {'Color': 'Red'},
+      );
+      final updated = p.copyWith(
+        variants: [const OiProductVariant(key: 'v2', label: 'Blue')],
+        attributes: {'Color': 'Blue'},
+      );
+      expect(updated.variants, hasLength(1));
+      expect(updated.variants.first.label, 'Blue');
+      expect(updated.attributes, {'Color': 'Blue'});
+    });
+
     test('equal instances with same variants are ==', () {
       const variant = OiProductVariant(key: 'v1', label: 'Red');
       const a = OiProductData(
@@ -222,6 +264,12 @@ void main() {
         tags: ['sale'],
       );
       expect(a.hashCode, equals(b.hashCode));
+    });
+
+    test('toString includes key fields', () {
+      const p = OiProductData(key: 'p1', name: 'Widget', price: 19.99);
+      expect(p.toString(), contains('p1'));
+      expect(p.toString(), contains('Widget'));
     });
   });
 }

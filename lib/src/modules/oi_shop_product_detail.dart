@@ -236,9 +236,7 @@ class _OiShopProductDetailState extends State<OiShopProductDetail> {
           OiLabel.small('SKU: ${widget.product.sku}', color: colors.textMuted),
 
         // Variant selectors.
-        if (widget.product.variants != null &&
-            widget.product.variants!.isNotEmpty)
-          _buildVariantSelectors(context),
+        if (widget.product.variants.isNotEmpty) _buildVariantSelectors(context),
 
         // Quantity.
         SizedBox(height: sp.xs),
@@ -276,7 +274,7 @@ class _OiShopProductDetailState extends State<OiShopProductDetail> {
   // ---------------------------------------------------------------------------
 
   Widget _buildVariantSelectors(BuildContext context) {
-    final variants = widget.product.variants!;
+    final variants = widget.product.variants;
     // Group variants by attribute keys.
     final attributeKeys = <String>{};
     for (final v in variants) {

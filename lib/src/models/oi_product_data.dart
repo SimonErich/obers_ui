@@ -22,7 +22,7 @@ class OiProductVariant {
   });
 
   /// Unique identifier for this variant.
-  final Object key;
+  final String key;
 
   /// Human-readable label (e.g. "Red / Large").
   final String label;
@@ -44,7 +44,7 @@ class OiProductVariant {
 
   /// Returns a copy with the specified fields replaced.
   OiProductVariant copyWith({
-    Object? key,
+    String? key,
     String? label,
     Object? price = _sentinel,
     Object? imageUrl = _sentinel,
@@ -77,7 +77,7 @@ class OiProductVariant {
         imageUrl == other.imageUrl &&
         inStock == other.inStock &&
         stockCount == other.stockCount &&
-        _nullableMapEquals(attributes, other.attributes);
+        mapEquals(attributes, other.attributes);
   }
 
   @override
@@ -116,8 +116,8 @@ class OiProductData {
     this.currencyCode = 'USD',
     this.imageUrl,
     this.imageUrls = const [],
-    this.variants,
-    this.attributes,
+    this.variants = const [],
+    this.attributes = const {},
     this.inStock = true,
     this.stockCount,
     this.rating,
@@ -127,7 +127,7 @@ class OiProductData {
   });
 
   /// Unique identifier for this product.
-  final Object key;
+  final String key;
 
   /// Product name / title.
   final String name;
@@ -150,12 +150,11 @@ class OiProductData {
   /// Gallery image URLs.
   final List<String> imageUrls;
 
-  /// Available product variants. `null` means not applicable.
-  final List<OiProductVariant>? variants;
+  /// Available product variants.
+  final List<OiProductVariant> variants;
 
-  /// Arbitrary key-value attributes (e.g. `{'Color': 'Red'}`). `null` means
-  /// not applicable.
-  final Map<String, String>? attributes;
+  /// Arbitrary key-value attributes (e.g. `{'Color': 'Red'}`).
+  final Map<String, String> attributes;
 
   /// Whether this product is currently in stock.
   final bool inStock;
@@ -177,7 +176,7 @@ class OiProductData {
 
   /// Returns a copy with the specified fields replaced.
   OiProductData copyWith({
-    Object? key,
+    String? key,
     String? name,
     Object? description = _sentinel,
     double? price,
@@ -185,8 +184,8 @@ class OiProductData {
     String? currencyCode,
     Object? imageUrl = _sentinel,
     List<String>? imageUrls,
-    Object? variants = _sentinel,
-    Object? attributes = _sentinel,
+    List<OiProductVariant>? variants,
+    Map<String, String>? attributes,
     bool? inStock,
     Object? stockCount = _sentinel,
     Object? rating = _sentinel,
@@ -209,12 +208,8 @@ class OiProductData {
           ? this.imageUrl
           : imageUrl as String?,
       imageUrls: imageUrls ?? this.imageUrls,
-      variants: identical(variants, _sentinel)
-          ? this.variants
-          : variants as List<OiProductVariant>?,
-      attributes: identical(attributes, _sentinel)
-          ? this.attributes
-          : attributes as Map<String, String>?,
+      variants: variants ?? this.variants,
+      attributes: attributes ?? this.attributes,
       inStock: inStock ?? this.inStock,
       stockCount: identical(stockCount, _sentinel)
           ? this.stockCount
@@ -240,8 +235,8 @@ class OiProductData {
         currencyCode == other.currencyCode &&
         imageUrl == other.imageUrl &&
         listEquals(imageUrls, other.imageUrls) &&
-        _nullableListEquals(variants, other.variants) &&
-        _nullableMapEquals(attributes, other.attributes) &&
+        listEquals(variants, other.variants) &&
+        mapEquals(attributes, other.attributes) &&
         inStock == other.inStock &&
         stockCount == other.stockCount &&
         rating == other.rating &&
@@ -260,12 +255,8 @@ class OiProductData {
     currencyCode,
     imageUrl,
     Object.hashAll(imageUrls),
-    variants == null ? null : Object.hashAll(variants!),
-    attributes == null
-        ? null
-        : Object.hashAll(
-            attributes!.entries.map((e) => Object.hash(e.key, e.value)),
-          ),
+    Object.hashAll(variants),
+    Object.hashAll(attributes.entries.map((e) => Object.hash(e.key, e.value))),
     inStock,
     stockCount,
     rating,
@@ -278,24 +269,6 @@ class OiProductData {
   String toString() =>
       'OiProductData(key: $key, name: $name, price: $price, '
       'currencyCode: $currencyCode, inStock: $inStock)';
-}
-
-// ── Private helpers ──────────────────────────────────────────────────────────
-
-bool _nullableListEquals<T>(List<T>? a, List<T>? b) {
-  if (identical(a, b)) return true;
-  if (a == null || b == null) return false;
-  return listEquals(a, b);
-}
-
-bool _nullableMapEquals<K, V>(Map<K, V>? a, Map<K, V>? b) {
-  if (identical(a, b)) return true;
-  if (a == null || b == null) return false;
-  if (a.length != b.length) return false;
-  for (final key in a.keys) {
-    if (!b.containsKey(key) || b[key] != a[key]) return false;
-  }
-  return true;
 }
 
 /// Sentinel used by `copyWith` to distinguish an explicit `null` from

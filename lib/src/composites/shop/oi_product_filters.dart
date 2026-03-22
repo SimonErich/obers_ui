@@ -51,14 +51,14 @@ class OiProductFilterData {
     return OiProductFilterData(
       minPrice: identical(minPrice, _sentinel)
           ? this.minPrice
-          : minPrice as double?,
+          : (minPrice as num?)?.toDouble(),
       maxPrice: identical(maxPrice, _sentinel)
           ? this.maxPrice
-          : maxPrice as double?,
+          : (maxPrice as num?)?.toDouble(),
       categories: categories ?? this.categories,
       minRating: identical(minRating, _sentinel)
           ? this.minRating
-          : minRating as double?,
+          : (minRating as num?)?.toDouble(),
       inStockOnly: inStockOnly ?? this.inStockOnly,
     );
   }
