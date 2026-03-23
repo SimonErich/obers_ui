@@ -20,10 +20,7 @@ void main() {
     testWidgets('renders with empty data', (tester) async {
       await pumpChart(
         tester,
-        const OiLineChart(
-          data: OiChartData(series: []),
-          label: 'Empty line chart',
-        ),
+        const OiLineChart(data: OiChartData.empty, label: 'Empty line chart'),
       );
 
       expect(find.byType(OiLineChart), findsOneWidget);
@@ -43,14 +40,12 @@ void main() {
 
     testWidgets('handles tap callback', (tester) async {
       final data = createSampleLineData();
-      OiChartHitResult? tappedResult;
-
       await pumpChart(
         tester,
         OiLineChart(
           data: data,
           label: 'Tappable line chart',
-          onDataPointTap: (result) => tappedResult = result,
+          onDataPointTap: (_) {},
         ),
       );
 

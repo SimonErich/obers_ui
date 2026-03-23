@@ -37,10 +37,7 @@ void main() {
     test('rects are within chart area', () {
       final data = createSampleBarData();
       const padding = OiChartPadding();
-      final result = processor.computeBarRects(
-        data,
-        const Size(400, 300),
-      );
+      final result = processor.computeBarRects(data, const Size(400, 300));
 
       for (final seriesRects in result) {
         for (final rect in seriesRects) {

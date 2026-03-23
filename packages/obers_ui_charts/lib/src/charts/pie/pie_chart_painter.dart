@@ -13,12 +13,7 @@ class OiPieChartPainter extends OiChartPainter {
     required super.data,
     required super.theme,
     this.holeRadius = 0,
-  }) : super(
-         padding: const OiChartPadding(
-           left: 16,
-           bottom: 16,
-         ),
-       );
+  }) : super(padding: const OiChartPadding(left: 16, bottom: 16));
 
   /// Inner hole radius for donut charts (0.0 = full pie, 0.5 = half-hole).
   final double holeRadius;

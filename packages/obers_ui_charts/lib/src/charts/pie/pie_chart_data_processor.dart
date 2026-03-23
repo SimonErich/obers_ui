@@ -1,8 +1,10 @@
 import 'dart:math' as math;
 
+import 'package:flutter/foundation.dart';
 import 'package:obers_ui_charts/src/core/chart_data.dart';
 
 /// A computed slice of a pie chart.
+@immutable
 class OiPieSlice {
   const OiPieSlice({
     required this.startAngle,
@@ -69,7 +71,7 @@ class OiPieChartDataProcessor {
         final slice = OiPieSlice(
           startAngle: currentAngle,
           sweepAngle: equalAngle,
-          value: 0.0,
+          value: 0,
           percentage: equalPercentage,
           label: series.dataPoints[i].label,
         );
@@ -90,7 +92,7 @@ class OiPieChartDataProcessor {
         OiPieSlice(
           startAngle: currentAngle,
           sweepAngle: sweepAngle,
-          value: value,
+          value: value.toDouble(),
           percentage: percentage,
           label: series.dataPoints[i].label,
         ),

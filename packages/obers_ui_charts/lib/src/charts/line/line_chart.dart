@@ -61,7 +61,7 @@ class _OiLineChartState extends State<OiLineChart> {
 
     final result = handler.hitTest(localPosition, size);
     if (result != null) {
-      _tooltipController.show(result);
+      _tooltipController.active = result;
       widget.onDataPointTap?.call(result);
     } else {
       _tooltipController.hide();

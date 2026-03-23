@@ -60,7 +60,7 @@ class _OiPieChartState extends State<OiPieChart> {
 
     final result = handler.hitTest(localPosition, size);
     if (result != null) {
-      _tooltipController.show(result);
+      _tooltipController.active = result;
       widget.onDataPointTap?.call(result);
     } else {
       _tooltipController.hide();

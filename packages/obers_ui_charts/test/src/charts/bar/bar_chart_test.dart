@@ -17,10 +17,7 @@ void main() {
     testWidgets('renders with empty data', (tester) async {
       await pumpChart(
         tester,
-        const OiBarChart(
-          data: OiChartData(series: []),
-          label: 'Empty bar chart',
-        ),
+        const OiBarChart(data: OiChartData.empty, label: 'Empty bar chart'),
       );
 
       expect(find.byType(OiBarChart), findsOneWidget);
@@ -73,14 +70,12 @@ void main() {
 
     testWidgets('handles tap callback', (tester) async {
       final data = createSampleBarData();
-      OiChartHitResult? tappedResult;
-
       await pumpChart(
         tester,
         OiBarChart(
           data: data,
           label: 'Tappable bar chart',
-          onDataPointTap: (result) => tappedResult = result,
+          onDataPointTap: (_) {},
         ),
       );
 

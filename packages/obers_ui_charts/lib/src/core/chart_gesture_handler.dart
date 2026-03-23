@@ -5,6 +5,7 @@ import 'package:obers_ui_charts/src/core/chart_data.dart';
 import 'package:obers_ui_charts/src/core/chart_painter.dart';
 
 /// Result of a hit test on chart data.
+@immutable
 class OiChartHitResult {
   const OiChartHitResult({
     required this.seriesIndex,
@@ -104,8 +105,11 @@ class OiChartTooltipController {
   final ValueNotifier<OiChartHitResult?> activeResult =
       ValueNotifier<OiChartHitResult?>(null);
 
+  /// The current hit result, or `null` if no tooltip is shown.
+  OiChartHitResult? get active => activeResult.value;
+
   /// Shows a tooltip for the given [result].
-  void show(OiChartHitResult result) {
+  set active(OiChartHitResult result) {
     activeResult.value = result;
   }
 

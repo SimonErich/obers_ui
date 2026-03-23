@@ -1,4 +1,3 @@
-
 import 'package:flutter/painting.dart';
 
 /// Color palette for chart rendering.

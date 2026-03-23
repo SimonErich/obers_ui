@@ -110,8 +110,8 @@ void main() {
     });
 
     test('equality and hashCode', () {
-      const a = OiChartBounds(minX: 0, maxX: 1, minY: 0, maxY: 1);
-      const b = OiChartBounds(minX: 0, maxX: 1, minY: 0, maxY: 1);
+      const a = OiChartBounds.empty;
+      const b = OiChartBounds.empty;
 
       expect(a, equals(b));
       expect(a.hashCode, equals(b.hashCode));

@@ -17,10 +17,7 @@ void main() {
     testWidgets('renders with empty data', (tester) async {
       await pumpChart(
         tester,
-        const OiPieChart(
-          data: OiChartData(series: []),
-          label: 'Empty pie chart',
-        ),
+        const OiPieChart(data: OiChartData.empty, label: 'Empty pie chart'),
       );
 
       expect(find.byType(OiPieChart), findsOneWidget);
@@ -69,14 +66,12 @@ void main() {
 
     testWidgets('handles tap callback', (tester) async {
       final data = createSamplePieData();
-      OiChartHitResult? tappedResult;
-
       await pumpChart(
         tester,
         OiPieChart(
           data: data,
           label: 'Tappable pie chart',
-          onDataPointTap: (result) => tappedResult = result,
+          onDataPointTap: (_) {},
         ),
       );
 

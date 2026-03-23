@@ -125,17 +125,9 @@ void main() {
         hitTolerance: 5,
       );
 
-      // Tap far from any data point.
-      final result = handler.hitTest(
-        const Offset(200, 150),
-        const Size(400, 300),
-      );
-
-      // Middle of chart maps to (5, 5) which is point index 1.
-      // Depending on exact pixel math, this might or might not hit.
       // Use a position definitely far from all points.
-      final result2 = handler.hitTest(const Offset(0, 0), const Size(400, 300));
-      expect(result2, isNull);
+      final result = handler.hitTest(Offset.zero, const Size(400, 300));
+      expect(result, isNull);
     });
 
     test('hitTest finds the closest point among multiple', () {
@@ -214,7 +206,7 @@ void main() {
         dataPoint: OiDataPoint(x: 1, y: 2),
       );
 
-      controller.show(result);
+      controller.active = result;
       expect(controller.activeResult.value, result);
       controller.dispose();
     });
@@ -227,8 +219,9 @@ void main() {
         dataPoint: OiDataPoint(x: 1, y: 2),
       );
 
-      controller.show(result);
-      controller.hide();
+      controller
+        ..active = result
+        ..hide();
       expect(controller.activeResult.value, isNull);
       controller.dispose();
     });
@@ -244,7 +237,7 @@ void main() {
         dataPoint: OiDataPoint(x: 1, y: 2),
       );
 
-      controller.show(result);
+      controller.active = result;
       expect(notifyCount, 1);
 
       controller.hide();
@@ -267,8 +260,9 @@ void main() {
         dataPoint: OiDataPoint(x: 3, y: 4),
       );
 
-      controller.show(result1);
-      controller.show(result2);
+      controller
+        ..active = result1
+        ..active = result2;
 
       expect(controller.activeResult.value, result2);
       controller.dispose();
