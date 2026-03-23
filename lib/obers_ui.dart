@@ -252,6 +252,7 @@ export 'src/foundation/persistence/drivers/oi_in_memory_driver.dart';
 export 'src/foundation/persistence/drivers/oi_local_storage_driver.dart';
 export 'src/foundation/persistence/oi_settings_data.dart';
 export 'src/foundation/persistence/oi_settings_driver.dart';
+export 'src/foundation/persistence/oi_chart_settings_driver_binding.dart';
 export 'src/foundation/persistence/oi_settings_mixin.dart';
 export 'src/foundation/persistence/oi_settings_provider.dart';
 // ── Foundation: Scales ───────────────────────────────────────────────────────
@@ -266,8 +267,10 @@ export 'src/foundation/scales/oi_chart_controller.dart';
 export 'src/foundation/scales/oi_chart_extension.dart';
 export 'src/foundation/scales/oi_chart_formatters.dart';
 export 'src/foundation/scales/oi_chart_hit_tester.dart';
+export 'src/foundation/scales/oi_chart_performance_config.dart';
 export 'src/foundation/scales/oi_chart_scale.dart';
 export 'src/foundation/scales/oi_chart_sync_coordinator.dart';
+export 'src/foundation/scales/oi_chart_sync_group.dart';
 export 'src/foundation/scales/oi_chart_viewport.dart';
 export 'src/foundation/scales/oi_linear_scale.dart';
 export 'src/foundation/scales/oi_logarithmic_scale.dart';
@@ -310,6 +313,7 @@ export 'src/models/oi_shipping_method.dart';
 export 'src/models/settings/oi_accordion_settings.dart';
 export 'src/models/settings/oi_app_shell_settings.dart';
 export 'src/models/settings/oi_calendar_settings.dart';
+export 'src/models/settings/oi_chart_settings.dart';
 export 'src/models/settings/oi_dashboard_settings.dart';
 export 'src/models/settings/oi_file_explorer_settings.dart'
     hide OiSortDirection;
