@@ -214,6 +214,8 @@ export 'src/composites/visualization/oi_bubble_chart/oi_bubble_chart_legend.dart
 export 'src/composites/visualization/oi_bubble_chart/oi_bubble_chart_size_legend.dart';
 export 'src/composites/visualization/oi_bubble_chart/oi_bubble_chart_theme.dart';
 export 'src/composites/visualization/oi_chart_axis.dart';
+export 'src/composites/visualization/oi_chart_legend.dart';
+export 'src/composites/visualization/oi_chart_series_toggle.dart';
 export 'src/composites/visualization/oi_funnel_chart.dart';
 export 'src/composites/visualization/oi_gauge.dart';
 export 'src/composites/visualization/oi_heatmap.dart';
