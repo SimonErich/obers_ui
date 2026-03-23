@@ -24,6 +24,7 @@ class OiBarChart extends OiCartesianChart {
     super.showLegend,
     super.annotations,
     super.thresholds,
+    super.summaryBuilder,
     this.orientation = OiBarChartOrientation.vertical,
     this.barSpacing = 8,
   });

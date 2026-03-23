@@ -21,6 +21,7 @@ class OiPieChart extends OiPolarChart {
     super.theme,
     super.showLegend,
     super.onSegmentTap,
+    super.summaryBuilder,
     this.holeRadius = 0,
   }) : legacyData = null;
 

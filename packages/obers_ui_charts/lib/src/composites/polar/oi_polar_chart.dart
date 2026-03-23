@@ -16,6 +16,7 @@ abstract class OiPolarChart extends StatefulWidget {
     this.theme,
     this.showLegend = false,
     this.onSegmentTap,
+    this.summaryBuilder,
   });
 
   final OiPolarData data;
@@ -23,6 +24,9 @@ abstract class OiPolarChart extends StatefulWidget {
   final OiChartThemeData? theme;
   final bool showLegend;
   final ValueChanged<int>? onSegmentTap;
+
+  /// Optional callback to override the auto-generated accessibility summary.
+  final OiChartA11ySummaryBuilder? summaryBuilder;
 }
 
 /// Base state for polar chart widgets.
@@ -48,11 +52,18 @@ abstract class OiPolarChartState<T extends OiPolarChart> extends State<T> {
     final theme = resolveTheme(context);
     final hasOiTheme = OiTheme.maybeOf(context) != null;
 
+    final summary = OiChartAccessibilitySummary(
+      chartType: widget.label,
+      seriesLabels: widget.data.segments.map((s) => s.label).toList(),
+    );
+
     final chartContent = Semantics(
       label: OiChartA11y.describeChart(
         widget.label,
         1,
         widget.data.segments.length,
+        summary: summary,
+        summaryBuilder: widget.summaryBuilder,
       ),
       child: RepaintBoundary(
         child: CustomPaint(

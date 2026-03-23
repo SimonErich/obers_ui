@@ -29,6 +29,7 @@ abstract class OiCartesianChart extends StatefulWidget {
     this.annotations = const [],
     this.thresholds = const [],
     this.onDataPointTap,
+    this.summaryBuilder,
   });
 
   final OiChartData data;
@@ -42,6 +43,14 @@ abstract class OiCartesianChart extends StatefulWidget {
   final List<OiChartAnnotation> annotations;
   final List<OiChartThresholdBand> thresholds;
   final ValueChanged<OiChartHitResult>? onDataPointTap;
+
+  /// Optional callback to override the auto-generated accessibility summary.
+  ///
+  /// When provided, the chart passes its auto-generated
+  /// [OiChartAccessibilitySummary] to this builder and uses the returned
+  /// string for the semantics label. When `null`, the chart uses
+  /// [OiChartAccessibilitySummary.toDescription] directly.
+  final OiChartA11ySummaryBuilder? summaryBuilder;
 }
 
 /// Base state for Cartesian chart widgets.
@@ -108,11 +117,28 @@ abstract class OiCartesianChartState<T extends OiCartesianChart>
     final theme = resolveTheme(context);
     final hasOiTheme = OiTheme.maybeOf(context) != null;
 
+    final bounds = widget.data.bounds;
+    final summary = OiChartA11y.buildCartesianSummary(
+      chartType: widget.label,
+      seriesLabels: widget.data.names,
+      xAxisLabel: widget.xAxis?.label,
+      yAxisLabel: widget.yAxis?.label,
+      xMin: bounds.minX,
+      xMax: bounds.maxX,
+      yMin: bounds.minY,
+      yMax: bounds.maxY,
+      seriesYValues: widget.data.series
+          .map((s) => s.dataPoints.map((p) => p.y).toList())
+          .toList(),
+    );
+
     final chartContent = Semantics(
       label: OiChartA11y.describeChart(
         widget.label,
         widget.data.series.length,
         widget.data.totalPoints,
+        summary: summary,
+        summaryBuilder: widget.summaryBuilder,
       ),
       child: GestureDetector(
         onTapUp: _handleTapUp,

@@ -22,6 +22,7 @@ class OiLineChart extends OiCartesianChart {
     super.showLegend,
     super.annotations,
     super.thresholds,
+    super.summaryBuilder,
     this.showPoints = true,
   });
 
