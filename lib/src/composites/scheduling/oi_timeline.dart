@@ -301,16 +301,44 @@ class _OiTimelineEntryState extends State<_OiTimelineEntry> {
     }
 
     // Default: single-column layout (dot on the left, card on the right).
+    // The continuous line runs along the left side. A Stack positions the dot
+    // vertically centred beside the card while the line fills the full height.
     return IntrinsicHeight(
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Dot + line column.
-          Column(
-            children: [
-              dot,
-              Expanded(child: line),
-            ],
+          // Left gutter: continuous line with centred dot overlay.
+          SizedBox(
+            width: dotSize,
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                // Vertical line. For non-last items it fills the full height;
+                // for the last item it runs from the top down to the dot center.
+                Positioned(
+                  top: 0,
+                  bottom: widget.last
+                      ? null
+                      : 0,
+                  child: Container(
+                    width: lineWidth,
+                    height: widget.last
+                        ? (widget.showTimestamp
+                            ? 16 + 4 + cardPadding.top + 6 + dotSize / 2
+                            : cardPadding.top + 6 + dotSize / 2)
+                        : null,
+                    color: colors.borderSubtle,
+                  ),
+                ),
+                // Dot positioned to align with the card.
+                Positioned(
+                  top: widget.showTimestamp
+                      ? 16 + 4 + cardPadding.top + 6
+                      : cardPadding.top + 6,
+                  child: dot,
+                ),
+              ],
+            ),
           ),
           const SizedBox(width: gutter),
           // Card + optional timestamp.

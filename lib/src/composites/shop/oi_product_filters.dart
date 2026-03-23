@@ -284,19 +284,12 @@ class _OiProductFiltersState extends State<OiProductFilters> {
   }
 
   Widget _buildStockFilter(BuildContext context) {
-    return OiRow(
-      breakpoint: context.breakpoint,
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        const OiLabel.body('In Stock Only'),
-        OiSwitch(
-          value: _data.inStockOnly,
-          label: 'In stock only',
-          onChanged: (value) {
-            _emit(_data.copyWith(inStockOnly: value));
-          },
-        ),
-      ],
+    return OiSwitch(
+      value: _data.inStockOnly,
+      label: 'In Stock Only',
+      onChanged: (value) {
+        _emit(_data.copyWith(inStockOnly: value));
+      },
     );
   }
 

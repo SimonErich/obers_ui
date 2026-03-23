@@ -1,11 +1,9 @@
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
-import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
 
 // Material Icons codepoints.
 const IconData _kHeartOutline = OiIcons.heart; // favorite_border
-const IconData _kHeartFilled = OiIcons.heart; // favorite
 
 /// A heart toggle button for adding or removing a product from a wishlist.
 ///
@@ -16,7 +14,7 @@ const IconData _kHeartFilled = OiIcons.heart; // favorite
 /// button and shows reduced opacity to indicate a pending server round-trip.
 ///
 /// {@category Components}
-class OiWishlistButton extends StatelessWidget {
+class OiWishlistButton extends StatefulWidget {
   /// Creates an [OiWishlistButton].
   const OiWishlistButton({
     required this.label,
@@ -38,30 +36,106 @@ class OiWishlistButton extends StatelessWidget {
   /// When `true` the button is disabled and shows reduced opacity.
   final bool loading;
 
-  bool get _interactive => !loading && onToggle != null;
+  @override
+  State<OiWishlistButton> createState() => _OiWishlistButtonState();
+}
+
+class _OiWishlistButtonState extends State<OiWishlistButton> {
+  bool _hovered = false;
+
+  bool get _interactive => !widget.loading && widget.onToggle != null;
 
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
+    final activeColor = colors.error.base;
+    final inactiveColor = colors.textMuted;
 
-    final icon = active ? _kHeartFilled : _kHeartOutline;
-    final iconColor = active ? colors.error.base : colors.textMuted;
+    Widget content;
+    if (widget.active) {
+      // Filled heart when active.
+      content = SizedBox(
+        width: 24,
+        height: 24,
+        child: _FilledHeart(color: activeColor, size: 24),
+      );
+    } else if (_hovered) {
+      // Outlined heart with active-colored stroke on hover.
+      content = Icon(_kHeartOutline, size: 24, color: activeColor);
+    } else {
+      content = Icon(_kHeartOutline, size: 24, color: inactiveColor);
+    }
 
-    Widget content = Icon(icon, size: 24, color: iconColor);
-
-    if (loading) {
+    if (widget.loading) {
       content = Opacity(opacity: 0.4, child: content);
     }
 
     if (_interactive) {
-      content = OiTappable(onTap: onToggle, child: content);
+      content = MouseRegion(
+        onEnter: (_) => setState(() => _hovered = true),
+        onExit: (_) => setState(() => _hovered = false),
+        cursor: SystemMouseCursors.click,
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: widget.onToggle,
+          child: content,
+        ),
+      );
     }
 
     return Semantics(
-      label: label,
-      toggled: active,
+      label: widget.label,
+      toggled: widget.active,
       button: true,
       child: ExcludeSemantics(child: content),
     );
   }
+}
+
+/// Draws a filled heart shape using [CustomPaint].
+class _FilledHeart extends StatelessWidget {
+  const _FilledHeart({required this.color, required this.size});
+
+  final Color color;
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    return CustomPaint(
+      size: Size(size, size),
+      painter: _FilledHeartPainter(color: color),
+    );
+  }
+}
+
+class _FilledHeartPainter extends CustomPainter {
+  _FilledHeartPainter({required this.color});
+
+  final Color color;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..style = PaintingStyle.fill;
+
+    final w = size.width;
+    final h = size.height;
+
+    // Heart path scaled to the given size. The shape uses two cubic bezier
+    // curves forming the classic heart outline.
+    final path = Path()
+      ..moveTo(w * 0.5, h * 0.85)
+      ..cubicTo(w * 0.15, h * 0.65, w * 0.0, h * 0.4, w * 0.15, h * 0.2)
+      ..cubicTo(w * 0.25, h * 0.05, w * 0.45, h * 0.1, w * 0.5, h * 0.3)
+      ..cubicTo(w * 0.55, h * 0.1, w * 0.75, h * 0.05, w * 0.85, h * 0.2)
+      ..cubicTo(w * 1.0, h * 0.4, w * 0.85, h * 0.65, w * 0.5, h * 0.85)
+      ..close();
+
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(_FilledHeartPainter oldDelegate) =>
+      color != oldDelegate.color;
 }

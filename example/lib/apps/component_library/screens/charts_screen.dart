@@ -261,7 +261,14 @@ class _ChartsScreenState extends State<ChartsScreen> {
             description:
                 'A scatter plot for visualising correlation between two '
                 'variables. Supports multiple series with configurable point '
-                'shapes (circle, square, diamond, triangle) and sizes.',
+                'shapes (circle, square, diamond, triangle) and sizes. \n\n'
+                'OiScatterPlot renders data points on a Cartesian grid. '
+                  'Required: label (String), series (List<OiScatterSeries>). '
+                  'Each OiScatterSeries has label, points '
+                  '(List<OiScatterPoint> with x, y), optional color, '
+                  'pointRadius, and shape (OiScatterShape). '
+                  'Optional: xAxis, yAxis (OiChartAxis), showGrid, '
+                  'showLegend, onPointTap.',
             examples: [
               ComponentExample(
                 title: 'Height vs Weight',
@@ -305,7 +312,12 @@ class _ChartsScreenState extends State<ChartsScreen> {
             description:
                 'A bubble chart visualization plotting data by x, y, and '
                 'size dimensions. Extends scatter plot concepts with a third '
-                'data dimension encoded as bubble radius.',
+                'data dimension encoded as bubble radius. \n\n'
+                'OiBubbleChart takes an OiBubbleChartData object containing '
+                  'series definitions, size configuration, and axis settings. '
+                  'Required: data (OiBubbleChartData). Optional: '
+                  'semanticLabel, theme (OiBubbleChartTheme), '
+                  'interactionMode, compact.',
             examples: [
               ComponentExample(
                 title: 'City Metrics',
@@ -345,7 +357,11 @@ class _ChartsScreenState extends State<ChartsScreen> {
             description:
                 'A flow diagram showing how values move between categories. '
                 'Nodes are laid out in columns and links are rendered as '
-                'curved bands proportional to their value.',
+                'curved bands proportional to their value. \n\n'
+                'OiSankey takes nodes (List<OiSankeyNode> with key, label) '
+                  'and links (List<OiSankeyLink> with source, target, value). '
+                  'Required: nodes, links, label. Optional: showLabels, '
+                  'showValues, onNodeTap, onLinkTap.',
             examples: [
               ComponentExample(
                 title: 'Energy Flow',
@@ -379,7 +395,11 @@ class _ChartsScreenState extends State<ChartsScreen> {
             widgetName: 'OiTreemap',
             description:
                 'A treemap visualization showing hierarchical data as nested '
-                'rectangles. Each node area is proportional to its value.',
+                'rectangles. Each node area is proportional to its value. \n\n'
+                'OiTreemap takes nodes (List<OiTreemapNode> with key, '
+                  'label, value, optional children for nesting). '
+                  'Required: nodes, label. Optional: showLabels, showValues, '
+                  'onNodeTap.',
             examples: [
               ComponentExample(
                 title: 'Disk Usage',

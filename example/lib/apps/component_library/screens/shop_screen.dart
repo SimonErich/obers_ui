@@ -348,7 +348,7 @@ class _ShopScreenState extends State<ShopScreen> {
           ),
 
           // ── OiOrderSummaryLine ────────────────────────────────────────
-          const ComponentShowcaseSection(
+          ComponentShowcaseSection(
             title: 'Order Summary Line',
             widgetName: 'OiOrderSummaryLine',
             description:
@@ -357,7 +357,7 @@ class _ShopScreenState extends State<ShopScreen> {
             examples: [
               ComponentExample(
                 title: 'Summary Lines',
-                child: Column(
+                child: const Column(
                   children: [
                     OiOrderSummaryLine(
                       label: 'Subtotal',
@@ -376,6 +376,7 @@ class _ShopScreenState extends State<ShopScreen> {
                       amount: 9.99,
                       currencyCode: 'USD',
                     ),
+                    OiDivider(),
                     OiOrderSummaryLine(
                       label: 'Total',
                       amount: 289.97,
@@ -389,153 +390,295 @@ class _ShopScreenState extends State<ShopScreen> {
           ),
 
           // ── OiCouponInput ─────────────────────────────────────────────
-          const ComponentShowcaseSection(
+          ComponentShowcaseSection(
             title: 'Coupon Input',
             widgetName: 'OiCouponInput',
             description:
                 'A text input with apply button for entering discount '
-                'coupon codes during checkout.',
-            examples: [
-              ComponentExample(
-                title: 'Description',
-                child: OiLabel.body(
-                  'OiCouponInput combines a text field and apply button '
+                'coupon codes during checkout. \n\n'
+                'OiCouponInput combines a text field and apply button '
                   'for coupon code entry. Key parameters: onApply, '
                   'appliedCode, onRemove, loading, error.',
+            examples: [
+              ComponentExample(
+                title: 'Apply Coupon',
+                child: OiCouponInput(
+                  label: 'Coupon code',
+                  onApply: (code) async => OiCouponResult(
+                    valid: code == 'SUMMER20',
+                    message: code == 'SUMMER20'
+                        ? '20% off applied!'
+                        : 'Invalid code',
+                    discountAmount: code == 'SUMMER20' ? 50.0 : null,
+                  ),
                 ),
               ),
             ],
           ),
 
-          // ── Complex Composites ────────────────────────────────────────
-          const ComponentShowcaseSection(
+          // ── OiCartPanel ─────────────────────────────────────────────
+          ComponentShowcaseSection(
             title: 'Cart Panel',
             widgetName: 'OiCartPanel',
             description:
                 'A slide-out panel displaying the full shopping cart with '
-                'item list, summary, and checkout button.',
-            examples: [
-              ComponentExample(
-                title: 'Description',
-                child: OiLabel.body(
-                  'OiCartPanel combines OiCartItemRow, OiOrderSummaryLine, '
+                'item list, summary, and checkout button. \n\n'
+                'OiCartPanel combines OiCartItemRow, OiOrderSummaryLine, '
                   'and OiCouponInput into a complete cart experience. '
                   'Key parameters: items, onCheckout, onQuantityChange, '
                   'onRemove, currencyCode. Best experienced in the '
                   'Shop mini-app.',
+            examples: [
+              ComponentExample(
+                title: 'Shopping Cart',
+                child: SizedBox(
+                  height: 600,
+                  child: SingleChildScrollView(
+                    child: OiCartPanel(
+                    label: 'Shopping cart',
+                    items: const [
+                      OiCartItem(
+                        productKey: 'alpine-jacket',
+                        name: 'Alpine Jacket',
+                        unitPrice: 199.99,
+                        quantity: 2,
+                      ),
+                      OiCartItem(
+                        productKey: 'trail-boots',
+                        name: 'Trail Boots',
+                        unitPrice: 129.99,
+                        variantLabel: 'Brown / Size 10',
+                      ),
+                    ],
+                    summary: const OiCartSummary(
+                      subtotal: 529.97,
+                      shipping: 9.99,
+                      tax: 42.40,
+                      total: 582.36,
+                    ),
+                    onQuantityChange: (_) {},
+                    onRemove: (_) {},
+                    onCheckout: () {},
+                  ),
+                  ),
                 ),
               ),
             ],
           ),
 
+          // ── OiProductGallery ────────────────────────────────────────
           const ComponentShowcaseSection(
             title: 'Product Gallery',
             widgetName: 'OiProductGallery',
             description:
                 'An image gallery with thumbnails and zoom for product '
-                'detail pages.',
-            examples: [
-              ComponentExample(
-                title: 'Description',
-                child: OiLabel.body(
-                  'OiProductGallery displays product images with thumbnail '
+                'detail pages. \n\n'
+                'OiProductGallery displays product images with thumbnail '
                   'navigation and pinch-to-zoom. Key parameters: imageUrls, '
                   'selectedIndex, onIndexChanged. Best experienced in the '
                   'Shop mini-app.',
+            examples: [
+              ComponentExample(
+                title: 'Gallery (No Images)',
+                child: OiProductGallery(
+                  label: 'Product gallery',
+                  imageUrls: [],
                 ),
               ),
             ],
           ),
 
-          const ComponentShowcaseSection(
+          // ── OiProductFilters ────────────────────────────────────────
+          ComponentShowcaseSection(
             title: 'Product Filters',
             widgetName: 'OiProductFilters',
             description:
                 'A filter panel for product catalog with price range, '
-                'categories, and attribute filters.',
-            examples: [
-              ComponentExample(
-                title: 'Description',
-                child: OiLabel.body(
-                  'OiProductFilters provides faceted filtering for product '
+                'categories, and attribute filters. \n\n'
+                'OiProductFilters provides faceted filtering for product '
                   'catalogs. Supports price range sliders, category '
                   'checkboxes, and attribute selectors. Key parameters: '
                   'filters, onFilterChange, availableFilters.',
+            examples: [
+              ComponentExample(
+                title: 'Catalog Filters',
+                child: OiProductFilters(
+                  label: 'Product filters',
+                  availableCategories: const [
+                    'Jackets',
+                    'Boots',
+                    'Backpacks',
+                    'Accessories',
+                  ],
+                  priceRangeMax: 500,
+                  onChanged: (_) {},
                 ),
               ),
             ],
           ),
 
+          // ── OiOrderSummary ──────────────────────────────────────────
           const ComponentShowcaseSection(
             title: 'Order Summary',
             widgetName: 'OiOrderSummary',
             description:
                 'A complete order summary card combining multiple '
-                'OiOrderSummaryLine widgets with totals.',
-            examples: [
-              ComponentExample(
-                title: 'Description',
-                child: OiLabel.body(
-                  'OiOrderSummary aggregates cart items into a summary '
+                'OiOrderSummaryLine widgets with totals. \n\n'
+                'OiOrderSummary aggregates cart items into a summary '
                   'card with subtotal, discounts, shipping, tax, and '
                   'total. Key parameters: cartSummary, currencyCode, '
                   'onCheckout.',
+            examples: [
+              ComponentExample(
+                title: 'Summary Card',
+                child: OiOrderSummary(
+                  label: 'Order summary',
+                  summary: OiCartSummary(
+                    subtotal: 329.98,
+                    discount: 50,
+                    shipping: 9.99,
+                    tax: 22.40,
+                    total: 312.37,
+                  ),
+                  items: [
+                    OiCartItem(
+                      productKey: 'alpine-jacket',
+                      name: 'Alpine Jacket',
+                      unitPrice: 199.99,
+                      quantity: 1,
+                    ),
+                    OiCartItem(
+                      productKey: 'trail-boots',
+                      name: 'Trail Boots',
+                      unitPrice: 129.99,
+                    ),
+                  ],
+                  currencyCode: 'USD',
                 ),
               ),
             ],
           ),
 
-          const ComponentShowcaseSection(
+          // ── OiOrderTracker ──────────────────────────────────────────
+          ComponentShowcaseSection(
             title: 'Order Tracker',
             widgetName: 'OiOrderTracker',
             description:
                 'A visual timeline showing order progress through its '
-                'lifecycle stages.',
-            examples: [
-              ComponentExample(
-                title: 'Description',
-                child: OiLabel.body(
-                  'OiOrderTracker displays order status as a step-by-step '
+                'lifecycle stages. \n\n'
+                'OiOrderTracker displays order status as a step-by-step '
                   'timeline from placement through delivery. Key parameters: '
                   'order (OiOrderData), steps, currentStep.',
+            examples: [
+              ComponentExample(
+                title: 'Shipped Order',
+                child: OiOrderTracker(
+                  label: 'Order tracker',
+                  currentStatus: OiOrderStatus.shipped,
+                  showTimeline: true,
+                  timeline: [
+                    OiOrderEvent(
+                      timestamp: DateTime(2026, 3, 20, 10),
+                      title: 'Order placed',
+                      status: OiOrderStatus.pending,
+                    ),
+                    OiOrderEvent(
+                      timestamp: DateTime(2026, 3, 20, 11, 30),
+                      title: 'Order confirmed',
+                      status: OiOrderStatus.confirmed,
+                    ),
+                    OiOrderEvent(
+                      timestamp: DateTime(2026, 3, 21, 9),
+                      title: 'Shipped',
+                      status: OiOrderStatus.shipped,
+                      description: 'Tracking: 1Z999AA10123456784',
+                    ),
+                  ],
                 ),
               ),
             ],
           ),
 
-          const ComponentShowcaseSection(
+          // ── OiPaymentMethodPicker ───────────────────────────────────
+          ComponentShowcaseSection(
             title: 'Payment Method Picker',
             widgetName: 'OiPaymentMethodPicker',
             description:
                 'A selection UI for choosing a payment method during '
-                'checkout.',
-            examples: [
-              ComponentExample(
-                title: 'Description',
-                child: OiLabel.body(
-                  'OiPaymentMethodPicker renders available payment methods '
+                'checkout. \n\n'
+                'OiPaymentMethodPicker renders available payment methods '
                   '(credit card, PayPal, bank transfer, etc.) as selectable '
                   'cards. Key parameters: methods, selectedMethod, '
                   'onMethodSelected.',
+            examples: [
+              ComponentExample(
+                title: 'Payment Methods',
+                child: OiPaymentMethodPicker(
+                  label: 'Payment methods',
+                  methods: const [
+                    OiPaymentMethod(
+                      key: 'visa',
+                      label: 'Visa',
+                      lastFour: '4242',
+                      expiryDate: '12/27',
+                    ),
+                    OiPaymentMethod(
+                      key: 'mastercard',
+                      label: 'Mastercard',
+                      lastFour: '8888',
+                      expiryDate: '06/26',
+                    ),
+                    OiPaymentMethod(
+                      key: 'paypal',
+                      label: 'PayPal',
+                      description: 'user@example.com',
+                    ),
+                  ],
+                  selectedKey: 'visa',
+                  onSelect: (_) {},
                 ),
               ),
             ],
           ),
 
-          const ComponentShowcaseSection(
+          // ── OiShippingMethodPicker ──────────────────────────────────
+          ComponentShowcaseSection(
             title: 'Shipping Method Picker',
             widgetName: 'OiShippingMethodPicker',
             description:
                 'A selection UI for choosing a shipping method during '
-                'checkout.',
-            examples: [
-              ComponentExample(
-                title: 'Description',
-                child: OiLabel.body(
-                  'OiShippingMethodPicker renders available shipping '
+                'checkout. \n\n'
+                'OiShippingMethodPicker renders available shipping '
                   'options with estimated delivery times and prices. '
                   'Key parameters: methods, selectedMethod, '
                   'onMethodSelected.',
+            examples: [
+              ComponentExample(
+                title: 'Shipping Options',
+                child: OiShippingMethodPicker(
+                  label: 'Shipping methods',
+                  methods: const [
+                    OiShippingMethod(
+                      key: 'standard',
+                      label: 'Standard Shipping',
+                      price: 5.99,
+                      description: '5-7 business days',
+                    ),
+                    OiShippingMethod(
+                      key: 'express',
+                      label: 'Express Shipping',
+                      price: 14.99,
+                      description: '2-3 business days',
+                    ),
+                    OiShippingMethod(
+                      key: 'overnight',
+                      label: 'Overnight',
+                      price: 29.99,
+                      description: 'Next business day',
+                    ),
+                  ],
+                  selectedKey: 'standard',
+                  onSelect: (_) {},
                 ),
               ),
             ],

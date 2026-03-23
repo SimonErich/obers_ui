@@ -135,7 +135,8 @@ class OiPipeline extends StatelessWidget {
 
     Widget stageWidget = Container(
       key: ValueKey('oi_pipeline_stage_$index'),
-      padding: const EdgeInsets.all(12),
+      constraints: const BoxConstraints(minWidth: 100),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
       decoration: BoxDecoration(
         color: colors.surface,
         border: Border.all(color: stageColor, width: 2),
@@ -183,19 +184,25 @@ class OiPipeline extends StatelessWidget {
   Widget _buildArrow(BuildContext context, int index) {
     final colors = context.colors;
     final isHorizontal = direction == Axis.horizontal;
-    const arrowSize = 16.0;
+    const arrowSize = 24.0;
 
-    return SizedBox(
+    return Padding(
       key: ValueKey('oi_pipeline_arrow_$index'),
-      width: isHorizontal ? arrowSize : null,
-      height: isHorizontal ? null : arrowSize,
-      child: Center(
-        child: Icon(
-          isHorizontal
-              ? OiIcons.chevronRight // chevron_right
-              : OiIcons.chevronDown, // expand_more
-          color: colors.textMuted,
-          size: arrowSize,
+      padding: EdgeInsets.symmetric(
+        horizontal: isHorizontal ? 4 : 0,
+        vertical: isHorizontal ? 0 : 4,
+      ),
+      child: SizedBox(
+        width: isHorizontal ? arrowSize : null,
+        height: isHorizontal ? null : arrowSize,
+        child: Center(
+          child: Icon(
+            isHorizontal
+                ? OiIcons.chevronRight
+                : OiIcons.chevronDown,
+            color: colors.textMuted,
+            size: arrowSize,
+          ),
         ),
       ),
     );
