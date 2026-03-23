@@ -258,7 +258,13 @@ export 'src/foundation/persistence/oi_settings_provider.dart';
 
 export 'src/foundation/scales/oi_band_scale.dart';
 export 'src/foundation/scales/oi_category_scale.dart';
+export 'src/foundation/scales/oi_chart_accessibility_bridge.dart';
+export 'src/foundation/scales/oi_chart_animation_config.dart';
+export 'src/foundation/scales/oi_chart_behavior.dart';
+export 'src/foundation/scales/oi_chart_controller.dart';
+export 'src/foundation/scales/oi_chart_hit_tester.dart';
 export 'src/foundation/scales/oi_chart_scale.dart';
+export 'src/foundation/scales/oi_chart_sync_coordinator.dart';
 export 'src/foundation/scales/oi_chart_viewport.dart';
 export 'src/foundation/scales/oi_linear_scale.dart';
 export 'src/foundation/scales/oi_logarithmic_scale.dart';
