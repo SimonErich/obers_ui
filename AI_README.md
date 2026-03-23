@@ -1,6 +1,6 @@
 # obers_ui — AI Integration Reference
 
-> **Version:** Synced with codebase as of 2026-03-21
+> **Version:** Synced with codebase as of 2026-03-23 (includes Shop & Admin widgets)
 > **Single import:** `import 'package:obers_ui/obers_ui.dart';`
 > **Zero Material dependency** — do NOT use MaterialApp, Scaffold, AppBar, or any Material/Cupertino widgets.
 
@@ -77,16 +77,16 @@ Tier 4: Modules       — Full-feature screens (OiListView, OiKanban, OiChat, Oi
 
 ```
 lib/
-  obers_ui.dart              ← Single barrel export (use this)
+  obers_ui.dart              <- Single barrel export (use this)
   src/
-    foundation/              ← Tier 0
-    primitives/              ← Tier 1
-    components/              ← Tier 2
-    composites/              ← Tier 3
-    modules/                 ← Tier 4
-    models/                  ← Data classes
-    tools/                   ← Dev tools
-    utils/                   ← Helpers
+    foundation/              <- Tier 0
+    primitives/              <- Tier 1
+    components/              <- Tier 2
+    composites/              <- Tier 3
+    modules/                 <- Tier 4
+    models/                  <- Data classes
+    tools/                   <- Dev tools
+    utils/                   <- Helpers
 ```
 
 ---
@@ -251,6 +251,10 @@ Per-widget visual overrides (all nullable, all have `copyWith`):
 | `sidebar` | `OiSidebarThemeData` | Sidebar appearance |
 | `fileExplorer` | `OiFileExplorerThemeData` | File explorer styling |
 | `fieldDisplay` | `OiFieldDisplayThemeData` | Field display styling |
+| `dialogShell` | `OiDialogShellThemeData` | Dialog shell styling |
+| `refreshIndicator` | `OiRefreshIndicatorThemeData` | Refresh indicator styling |
+| `navigationRail` | `OiNavigationRailThemeData` | Navigation rail styling |
+| `sliverHeader` | `OiSliverHeaderThemeData` | Sliver header styling |
 
 ### Density — OiDensity
 
@@ -388,6 +392,55 @@ OiApp(
 - `OiSettingsProvider` — Change notifier
 - `OiSettingsMixin` — Convenience mixin
 
+### OiPageRoute
+**Tags:** `route`, `page`, `transition`, `navigation`, `animation`
+
+Non-Material page route with 5 transition types. Drop-in replacement for `MaterialPageRoute` without Material dependency.
+
+**Key Parameters:**
+- `builder` (WidgetBuilder, required) — Page content builder
+- `transition` (OiPageTransitionType, default: fade) — fade, slideHorizontal, slideVertical, scaleUp, none
+- `transitionDuration` (Duration?) — Forward transition duration
+- `reverseTransitionDuration` (Duration?) — Reverse transition duration
+- `maintainState` (bool, default: true)
+- `fullscreenDialog` (bool, default: false)
+- `barrierColor` (Color?)
+- `barrierDismissible` (bool, default: false)
+
+**Static Methods:**
+- `OiPageRoute.of(context:, builder:)` — Reads transition defaults from theme (`OiAnimationConfig`)
+
+**Use When:** Programmatic navigation without go_router. Custom page transitions.
+**Avoid When:** Using go_router — use `OiTransitionPage` instead.
+**Combine With:** `Navigator`, `OiApp`
+
+---
+
+### OiTransitionPage
+**Tags:** `route`, `page`, `go-router`, `transition`
+
+Page subclass for go_router with OiPageRoute transitions. Use as `Page` in GoRouter route definitions.
+
+**Key Parameters:**
+- `child` (Widget, required) — Page content
+- `transition` (OiPageTransitionType, default: fade) — fade, slideHorizontal, slideVertical, scaleUp, none
+- `transitionDuration` (Duration?)
+- `reverseTransitionDuration` (Duration?)
+
+**Use When:** go_router navigation with custom transitions.
+**Combine With:** `GoRouter`, `OiApp.router`
+
+---
+
+### OiPageTransitionType (Enum)
+**Tags:** `route`, `transition`, `animation`, `enum`
+
+Page transition animation type.
+
+**Values:** `fade`, `slideHorizontal`, `slideVertical`, `scaleUp`, `none`
+
+**Theme Integration:** `OiAnimationConfig` has `defaultPageTransition`, `pageTransitionDuration`, `pageEntryCurve`, `pageExitCurve`.
+
 ---
 
 ## Widget Catalog
@@ -416,7 +469,7 @@ Auto-animates list differences (add/remove/reorder). Wraps Flutter's `AnimatedLi
 
 Crossfade + size morph between two widget states.
 
-**Use When:** Transitioning between two different widgets (e.g., loading → content, collapsed → expanded).
+**Use When:** Transitioning between two different widgets (e.g., loading -> content, collapsed -> expanded).
 **Avoid When:** Simple show/hide — use `OiVisibility` instead.
 
 ---
@@ -954,6 +1007,53 @@ Virtualized grid for large datasets.
 
 ---
 
+#### OiSliverList
+**Tags:** `sliver`, `list`, `scroll`, `lazy`
+**Tier:** Primitive
+
+Themed sliver list wrapper with builder/separated/children patterns. Use inside `CustomScrollView`.
+
+**Key Parameters:**
+- `itemCount` (int, required) — Number of items
+- `itemBuilder` (IndexedWidgetBuilder, required) — Item builder
+- `padding` (EdgeInsetsGeometry?)
+- `separated` (bool, default: false) — Add separators between items
+- `separatorBuilder` (IndexedWidgetBuilder?)
+- `semanticLabel` (String?)
+
+**Named Constructors:**
+- `.children(children: [...])` — From explicit widget list
+
+**Use When:** Sliver-based scrollable lists inside `CustomScrollView`.
+**Avoid When:** Standalone lists — use `OiVirtualList`. Non-sliver contexts — use `OiColumn`.
+**Combine With:** `OiSliverGrid`, `OiSliverHeader`, `CustomScrollView`
+
+---
+
+#### OiSliverGrid
+**Tags:** `sliver`, `grid`, `scroll`, `responsive`, `lazy`
+**Tier:** Primitive
+
+Themed sliver grid with fixed or extent-based columns. Use inside `CustomScrollView`.
+
+**Key Parameters:**
+- `itemCount` (int, required) — Number of items
+- `itemBuilder` (IndexedWidgetBuilder, required) — Item builder
+- `crossAxisCount` (int, required) — Number of columns
+- `mainAxisSpacing` (double?)
+- `crossAxisSpacing` (double?)
+- `childAspectRatio` (double, default: 1.0)
+- `padding` (EdgeInsetsGeometry?)
+
+**Named Constructors:**
+- `.extent(minItemWidth:)` — Responsive columns based on minimum item width
+
+**Use When:** Sliver-based grid layouts inside `CustomScrollView`.
+**Avoid When:** Standalone grids — use `OiGrid` or `OiVirtualGrid`.
+**Combine With:** `OiSliverList`, `OiSliverHeader`, `CustomScrollView`
+
+---
+
 ### COMPONENTS — Buttons
 
 ---
@@ -992,7 +1092,7 @@ Universal button with variant factories.
 - `OiButton.countdown(label:, onTap:, seconds:)` — Countdown before action
 - `OiButton.confirm(label:, confirmLabel:, onConfirm:)` — Two-click confirmation
 
-**Theme:** `context.components.button` → `OiButtonThemeData`
+**Theme:** `context.components.button` -> `OiButtonThemeData`
 
 **Use When:** Any clickable action.
 **Avoid When:** Navigation links (use OiLabel.link or router navigation). Toggle state (use OiToggleButton).
@@ -1124,7 +1224,7 @@ User/entity avatar. Shows image, initials fallback, or icon.
 - `skeleton` (bool, default: false) — Loading state
 - `presence` (OiPresenceStatus?) — online/offline/away/busy indicator
 
-**Theme:** `context.components.avatar` → `OiAvatarThemeData`
+**Theme:** `context.components.avatar` -> `OiAvatarThemeData`
 **Combine With:** `OiAvatarStack` (for multiple), `OiListTile` (as leading), `OiChat`
 
 ---
@@ -1147,7 +1247,7 @@ Status/tag badge with color variants.
 - `icon` (IconData?)
 - `dot` (bool, default: false) — Shows dot indicator
 
-**Theme:** `context.components.badge` → `OiBadgeThemeData`
+**Theme:** `context.components.badge` -> `OiBadgeThemeData`
 
 **Use When:** Status indicators, category labels, counts, tags.
 **Combine With:** `OiListTile` (as trailing), `OiCard`, `OiFieldDisplay` (for choice fields)
@@ -1182,7 +1282,7 @@ Content container with optional title, subtitle, footer, interaction.
 - `OiCard.interactive()` — Hover/focus effects (requires `label`)
 - `OiCard.compact()` — Reduced padding (8px)
 
-**Theme:** `context.components.card` → `OiCardThemeData`
+**Theme:** `context.components.card` -> `OiCardThemeData`
 
 **Use When:** Grouping related content. Product cards. Dashboard widgets.
 **Avoid When:** Simple backgrounds — use `OiSurface`. Section grouping without visual boundary — use `OiSection`.
@@ -1233,6 +1333,8 @@ Placeholder for empty views.
 
 **Use When:** Empty lists, empty search results, error pages (404/403/500).
 
+> **Note:** Planned additions include `.notFound()`, `.forbidden()`, `.error()` factory constructors for common error states. For full-page error displays now, use `OiErrorPage`.
+
 ---
 
 #### OiFieldDisplay
@@ -1245,16 +1347,16 @@ Universal read-only field renderer. Formats values by type (date, currency, bool
 - `value` (dynamic, required)
 - `type` (OiFieldType, default: text) — Controls formatting
 - `label` (String?)
-- `emptyText` (String, default: '—')
+- `emptyText` (String, default: '---')
 - `copyable` (bool, default: false)
 - `maxLines` (int?)
 - `dateFormat` (String?) — Custom date format
 - `numberFormat` (String?) — Custom number format
 - `currencyCode` (String?) — e.g., 'EUR'
-- `currencySymbol` (String?) — e.g., '€'
+- `currencySymbol` (String?) — e.g., 'EUR'
 - `decimalPlaces` (int?)
-- `choices` (Map<String, String>?) — Value→display mapping for select fields
-- `choiceColors` (Map<String, OiBadgeColor>?) — Value→badge color for select fields
+- `choices` (Map<String, String>?) — Value->display mapping for select fields
+- `choiceColors` (Map<String, OiBadgeColor>?) — Value->badge color for select fields
 - `formatValue` (String Function(dynamic)?) — Custom formatter
 - `onTap` (VoidCallback?) — Makes value tappable
 - `leading` (Widget?) — Icon/widget before value
@@ -1263,7 +1365,7 @@ Universal read-only field renderer. Formats values by type (date, currency, bool
 - `.pair(label:, value:)` — Label + value layout
   - Extra params: `direction` (Axis, default: horizontal), `labelWidth` (double?)
 
-**Theme:** `context.components.fieldDisplay` → `OiFieldDisplayThemeData`
+**Theme:** `context.components.fieldDisplay` -> `OiFieldDisplayThemeData`
 
 **Use When:** Displaying read-only data fields. Detail pages. Record views.
 **Combine With:** `OiDetailView` (orchestrates multiple fields), `OiCard`
@@ -1403,7 +1505,7 @@ Floating content box anchored to a trigger widget.
 
 Progress indicator (linear or circular). Determinate or indeterminate.
 
-**Theme:** `context.components.progress` → `OiProgressThemeData`
+**Theme:** `context.components.progress` -> `OiProgressThemeData`
 
 **Use When:** Loading states, upload/download progress, step completion.
 
@@ -1461,10 +1563,53 @@ Storage usage visualization (circular or linear).
 
 Hover/focus tooltip.
 
-**Theme:** `context.components.tooltip` → `OiTooltipThemeData`
+**Theme:** `context.components.tooltip` -> `OiTooltipThemeData`
 
 **Use When:** Brief explanatory text on hover/focus.
 **Avoid When:** Rich content — use `OiPopover`.
+
+---
+
+### COMPONENTS — Display (Admin)
+
+---
+
+#### [ADMIN] OiPriceTag
+**Tags:** `price`, `currency`, `money`, `cost`, `shop`, `e-commerce`
+**Tier:** Component
+
+Formatted price display with optional compare-at (strikethrough) price.
+
+**Key Parameters:**
+- `price` (double, required)
+- `label` (String, required)
+- `compareAtPrice` (double?) — Shows strikethrough "was" price
+- `currencyCode` / `currencySymbol` (String?)
+- `decimalPlaces` (int, default: 2)
+- `size` (OiPriceTagSize, default: medium) — small/medium/large
+
+**Use When:** Any price display.
+**Combine With:** OiProductCard, OiCartItemRow, OiOrderSummaryLine
+**Avoid When:** Non-price numbers — use OiFieldDisplay(type: currency) for read-only data fields.
+
+---
+
+#### [ADMIN] OiOrderStatusBadge
+**Tags:** `order`, `status`, `badge`, `shop`
+**Tier:** Component
+
+Badge displaying order status with color coding.
+
+**Key Parameters:**
+- `status` (OiOrderStatus, required) — pending/confirmed/processing/shipped/delivered/cancelled/refunded
+- `label` (String, required)
+- `statusLabels` (Map<OiOrderStatus, String>?) — i18n overrides
+- `statusColors` (Map<OiOrderStatus, Color>?) — Theme overrides
+
+**Default Colors:** pending->warning, confirmed->info, processing->info, shipped->primary, delivered->success, cancelled->error, refunded->muted
+
+**Use When:** Order lists, order detail pages.
+**Combine With:** OiListView, OiDetailView, OiOrderTracker
 
 ---
 
@@ -1538,7 +1683,7 @@ Base wrapper for inline edit patterns.
 **Tags:** `inline-edit`, `text`, `click-to-edit`
 **Tier:** Component
 
-Display text → inline input on click/double-click.
+Display text -> inline input on click/double-click.
 
 **Use When:** Inline text editing in tables, lists, cards.
 
@@ -1548,7 +1693,7 @@ Display text → inline input on click/double-click.
 **Tags:** `inline-edit`, `date`, `click-to-edit`
 **Tier:** Component
 
-Display date → date picker on click.
+Display date -> date picker on click.
 
 ---
 
@@ -1556,7 +1701,7 @@ Display date → date picker on click.
 **Tags:** `inline-edit`, `number`, `click-to-edit`
 **Tier:** Component
 
-Display number → number input on click.
+Display number -> number input on click.
 
 ---
 
@@ -1564,7 +1709,7 @@ Display number → number input on click.
 **Tags:** `inline-edit`, `select`, `dropdown`, `click-to-edit`
 **Tier:** Component
 
-Display value → dropdown on click.
+Display value -> dropdown on click.
 
 ---
 
@@ -1573,10 +1718,10 @@ Display value → dropdown on click.
 ---
 
 #### OiTextInput
-**Tags:** `input`, `text`, `field`, `form`, `search`, `textarea`
+**Tags:** `input`, `text`, `field`, `form`, `search`, `textarea`, `otp`, `password`, `validation`
 **Tier:** Component
 
-Standard text input field.
+Standard text input field with validation, OTP, password, and multiline support.
 
 **Key Parameters:**
 - `controller` (TextEditingController?)
@@ -1587,24 +1732,37 @@ Standard text input field.
 - `leading` (Widget?)
 - `trailing` (Widget?)
 - `maxLines` (int?, default: 1) — Set >1 for textarea
+- `minLines` (int?) — Minimum lines for multiline
 - `maxLength` (int?)
 - `keyboardType` (TextInputType?)
 - `textInputAction` (TextInputAction?)
+- `textCapitalization` (TextCapitalization, default: none)
+- `textAlign` (TextAlign, default: start)
 - `onChanged` (ValueChanged<String>?)
 - `onSubmitted` (ValueChanged<String>?)
+- `onTap` (VoidCallback?)
+- `onTapOutside` (VoidCallback?)
 - `enabled` (bool, default: true)
 - `readOnly` (bool, default: false)
 - `obscureText` (bool, default: false) — For passwords
 - `autofocus` (bool, default: false)
 - `inputFormatters` (List<TextInputFormatter>?)
 - `focusNode` (FocusNode?)
+- `validator` (String? Function(String?)?) — Form validation function
+- `autovalidateMode` (AutovalidateMode?)
+- `onSaved` (ValueChanged<String?>?)
+- `showCounter` (bool, default: false) — Show character counter
+- `counterBuilder` (Widget Function(int current, int? max)?) — Custom counter widget
 
 **Named Constructors:**
 - `OiTextInput.search()` — Pre-configured search input with search icon
+- `OiTextInput.password()` — Password input with visibility toggle
+- `OiTextInput.multiline(minLines:)` — Multi-line text area
+- `OiTextInput.otp(length:, onCompleted:, obscure:)` — OTP/PIN code input with separate digit boxes
 
-**Theme:** `context.components.textInput` → `OiTextInputThemeData`
+**Theme:** `context.components.textInput` -> `OiTextInputThemeData` (includes `validationErrorColor`, `errorAnimationDuration`, `otp` -> `OiOtpThemeData`)
 
-**Use When:** Any text entry. Email, password, search, comments, notes.
+**Use When:** Any text entry. Email, password, search, comments, notes, OTP codes.
 **Avoid When:** Number entry — use `OiNumberInput`. Date entry — use `OiDateInput`. Dropdown — use `OiSelect`.
 
 ---
@@ -1649,51 +1807,24 @@ Time picker input with hour/minute/second selection.
 
 ---
 
-#### OiDateTimeInput
-**Tags:** `input`, `date`, `time`, `datetime`, `combined`, `picker`
+#### [ADMIN] OiDateTimeInput
+**Tags:** `input`, `date`, `time`, `datetime`, `combined`
 **Tier:** Component
 
-Combined date + time input that renders `OiDateInput` and `OiTimeInput` side by side within a single form field sharing one label and one error message. Changing the date portion updates the date part of the `DateTime` value; changing the time portion updates the time part. When `value` is `null` and one half is set, the other half defaults to today / 00:00.
+Combined date + time input in a single form field.
 
 **Key Parameters:**
-- `value` (DateTime?) — Currently selected date and time
-- `onChanged` (ValueChanged<DateTime?>?) — Called when date or time changes
-- `label` (String?) — Label above the input pair
-- `hint` (String?) — Hint below inputs when no error
-- `error` (String?) — Validation error message
-- `min` (DateTime?) — Earliest selectable date-time
-- `max` (DateTime?) — Latest selectable date-time
-- `required` (bool, default: false) — Renders asterisk next to label
-- `readOnly` (bool, default: false) — Read-only state
-- `enabled` (bool, default: true) — Whether field accepts interaction
+- `label` (String, required)
+- `value` (DateTime?)
+- `onChange` (ValueChanged<DateTime?>?)
+- `min` / `max` (DateTime?)
+- `error` (String?)
+- `hint` (String?)
+- `required` (bool, default: false)
+- `readOnly` / `disabled` (bool)
 
-**Use When:** Collecting a full date + time value in one field.
-**Avoid When:** Date-only — use `OiDateInput`. Time-only — use `OiTimeInput`.
-
----
-
-#### OiArrayInput
-**Tags:** `input`, `array`, `repeatable`, `list`, `dynamic`, `reorder`, `form-group`
-**Tier:** Component
-
-A repeatable form field group where each row contains a set of form inputs with add, remove, and reorder controls. Rows are built via `itemBuilder` and new blank rows via `createEmpty`. Supports drag-to-reorder via `OiReorderable` and animated insert/remove via `OiAnimatedList`.
-
-**Key Parameters:**
-- `items` (List<T>, required) — Current list of items
-- `itemBuilder` (Widget Function(BuildContext, int, T, ValueChanged<T>), required) — Builds each row
-- `createEmpty` (T Function(), required) — Factory for new blank items
-- `onChanged` (ValueChanged<List<T>>?) — Called after add/remove/reorder/edit
-- `label` (String, required) — Label above the list
-- `error` (String?) — Validation error below the list
-- `reorderable` (bool, default: true) — Enable drag-to-reorder
-- `addable` (bool, default: true) — Show Add button
-- `removable` (bool, default: true) — Show Remove buttons
-- `minItems` (int?) — Minimum items; hides Remove at this count
-- `maxItems` (int?) — Maximum items; hides Add at this count
-- `addLabel` (String, default: 'Add') — Label for Add button
-
-**Use When:** Dynamic-length form sections (line items, tags, addresses, schedule entries).
-**Avoid When:** Static field lists — use regular form layout instead.
+**Use When:** Scheduling, event creation, deadlines requiring both date and time.
+**Avoid When:** Date-only — use OiDateInput. Time-only — use OiTimeInput.
 
 ---
 
@@ -1715,7 +1846,7 @@ Dropdown selector from options list.
 - `searchable` (bool, default: false)
 - `bottomSheetOnCompact` (bool, default: false) — Use bottom sheet on mobile
 
-**Theme:** `context.components.select` → `OiSelectThemeData`
+**Theme:** `context.components.select` -> `OiSelectThemeData`
 
 **Use When:** Choosing from a predefined list of options.
 **Avoid When:** Async/large option lists — use `OiComboBox`. Free-text with suggestions — use `OiTagInput`.
@@ -1769,7 +1900,7 @@ Checkbox with 3-state support (unchecked/checked/indeterminate).
 - `label` (String?)
 - `enabled` (bool, default: true)
 
-**Theme:** `context.components.checkbox` → `OiCheckboxThemeData`
+**Theme:** `context.components.checkbox` -> `OiCheckboxThemeData`
 
 **Use When:** Boolean fields, multi-select lists, terms acceptance.
 
@@ -1788,7 +1919,7 @@ Toggle switch (on/off).
 - `enabled` (bool, default: true)
 - `label` (String?)
 
-**Theme:** `context.components.switchTheme` → `OiSwitchThemeData`
+**Theme:** `context.components.switchTheme` -> `OiSwitchThemeData`
 
 **Use When:** Settings toggles, enable/disable features.
 **Avoid When:** Form fields — use `OiCheckbox`. Button toggle — use `OiToggleButton`.
@@ -1854,6 +1985,8 @@ Multi-item tag input.
 
 **Use When:** Multiple text values (tags, skills, categories).
 
+> **Note:** Planned additions include `suggestions`, `asyncSuggestions`, and `allowCustomTags` props for enhanced tag entry with autocompletion.
+
 ---
 
 #### OiColorInput
@@ -1869,6 +2002,133 @@ Color picker with swatch palette and hex input.
 **Tier:** Component
 
 File picker input with drag-drop zone and upload progress.
+
+---
+
+#### [ADMIN] OiArrayInput
+**Tags:** `input`, `array`, `repeatable`, `dynamic-fields`, `form`, `list-input`
+**Tier:** Component
+
+Repeatable form field group. Add/remove/reorder rows.
+
+**Key Parameters:**
+- `label` (String, required)
+- `items` (List<T>, required)
+- `itemBuilder` (Widget Function(T, int, ValueChanged<T>), required)
+- `createEmpty` (T Function(), required)
+- `onChange` (ValueChanged<List<T>>?)
+- `reorderable` (bool, default: true)
+- `addable` / `removable` (bool, default: true)
+- `minItems` / `maxItems` (int?)
+- `addLabel` (String, default: 'Add')
+- `error` (String?)
+
+**Use When:** Multiple addresses, phone numbers, line items, ingredients, any repeatable field group.
+**Combine With:** OiForm
+
+---
+
+### COMPONENTS — Inputs (Admin)
+
+---
+
+#### [ADMIN] OiCouponInput
+**Tags:** `coupon`, `discount`, `promo`, `voucher`, `shop`
+**Tier:** Component
+
+Coupon/discount code input with Apply button and success/error feedback.
+
+**Key Parameters:**
+- `label` (String, required)
+- `onApply` (Future<OiCouponResult> Function(String), required) — Returns `{valid, message, discountAmount}`
+- `onRemove` (VoidCallback?)
+- `appliedCode` (String?)
+- `loading` (bool, default: false)
+
+**Use When:** Cart/checkout for discount codes.
+**Combine With:** OiCartPanel, OiCheckout
+
+---
+
+### COMPONENTS — Inputs (Shop)
+
+---
+
+#### [SHOP] OiQuantitySelector
+**Tags:** `quantity`, `stepper`, `counter`, `amount`, `shop`, `cart`
+**Tier:** Component
+
+Compact number stepper for product quantities. Minus/value/plus layout.
+
+**Key Parameters:**
+- `value` (int, required)
+- `label` (String, required)
+- `onChange` (ValueChanged<int>?)
+- `min` (int, default: 1)
+- `max` (int, default: 99)
+- `compact` (bool, default: false)
+- `disabled` (bool, default: false)
+
+**Use When:** Cart item quantities, product detail add-to-cart.
+**Combine With:** OiCartItemRow, OiShopProductDetail
+**Avoid When:** General number input — use OiNumberInput.
+
+---
+
+#### [SHOP] OiAddressForm
+**Tags:** `address`, `form`, `shipping`, `billing`, `location`, `shop`
+**Tier:** Component
+
+Standardized address form (name, company, address lines, city, state, postal, country, phone).
+
+**Key Parameters:**
+- `label` (String, required)
+- `initialValue` (OiAddressData?)
+- `onChange` (ValueChanged<OiAddressData>?)
+- `onSubmit` (ValueChanged<OiAddressData>?)
+- `countries` (List<OiCountryOption>?) — Each has `code`, `name`, `states`
+- `showCompany` / `showPhone` / `showName` (bool, default: true)
+- `readOnly` (bool, default: false)
+- `error` (String?)
+
+**Use When:** Checkout shipping/billing, user profile address.
+**Combine With:** OiCheckout, OiForm
+
+---
+
+#### [SHOP] OiShippingMethodPicker
+**Tags:** `shipping`, `delivery`, `method`, `picker`, `shop`
+**Tier:** Component
+
+Radio-style selector for shipping methods with label, price, and delivery estimate.
+
+**Key Parameters:**
+- `methods` (List<OiShippingMethod>, required) — Each has `key`, `label`, `description`, `price`, `estimatedDelivery`, `icon`
+- `label` (String, required)
+- `selectedKey` (Object?)
+- `onSelect` (ValueChanged<OiShippingMethod>?)
+- `loading` (bool, default: false)
+
+**Use When:** Checkout shipping step.
+**Combine With:** OiCheckout
+
+---
+
+#### [SHOP] OiPaymentMethodPicker
+**Tags:** `payment`, `method`, `credit-card`, `picker`, `shop`
+**Tier:** Component
+
+Selector for payment methods (credit card, PayPal, bank transfer, saved cards).
+
+**Key Parameters:**
+- `methods` (List<OiPaymentMethod>, required) — Each has `key`, `label`, `icon`, `lastFour`, `expiryDate`, `logo`
+- `label` (String, required)
+- `selectedKey` (Object?)
+- `onSelect` (ValueChanged<OiPaymentMethod>?)
+- `addNewCard` (Widget?)
+
+**Use When:** Checkout payment step.
+**Combine With:** OiCheckout
 
 ---
 
@@ -1918,8 +2178,10 @@ Mobile bottom navigation bar.
 - `showLabels` (bool, default: true)
 - `landscapeMode` (OiBottomBarLandscapeMode, default: compact) — compact/rail/hidden
 
+> **Note:** `OiBottomBarItem` is being superseded by `OiNavigationItem` for shared use with `OiNavigationRail` and `OiResponsiveShell`. Use `OiNavigationItem.fromLegacy()` to convert existing `OiBottomBarItem` instances.
+
 **Use When:** Mobile app navigation (3-5 tabs).
-**Avoid When:** Desktop — use `OiSidebar` or `OiTabs`.
+**Avoid When:** Desktop — use `OiSidebar` or `OiTabs`. Responsive apps — use `OiResponsiveShell` instead.
 
 ---
 
@@ -1979,47 +2241,6 @@ Emoji selector with search and category tabs.
 
 ---
 
-#### OiThemeToggle
-**Tags:** `theme-toggle`, `dark-mode`, `light-mode`, `system-mode`, `appearance`
-**Tier:** Component
-
-Toggle button that switches between light, dark, and system theme modes. Shows sun (light), moon (dark), or monitor (system) icons. Three-way popover when `showSystemOption` is true; two-way cycle when false.
-
-**Key Parameters:**
-- `currentMode` (OiThemeMode, required) — The active theme mode
-- `onModeChange` (ValueChanged<OiThemeMode>?, required) — Called when user selects a mode
-- `label` (String, default: 'Toggle theme') — Accessibility label
-- `showSystemOption` (bool, default: true) — When true, opens popover with three options; when false, cycles light↔dark
-
-**Composes:** OiIconButton, OiIcon, OiPopover, OiTooltip, OiListTile
-
-**Use When:** App header or settings page for theme switching.
-**Avoid When:** You need a full theme editor — build a custom settings panel instead.
-
----
-
-#### OiUserMenu
-**Tags:** `user-menu`, `avatar-menu`, `account`, `profile`, `dropdown`
-**Tier:** Component
-
-Avatar-triggered dropdown menu showing user info and account actions. Tapping the avatar opens a popover with a header (user name and email) followed by grouped menu items separated by OiDivider.
-
-**Key Parameters:**
-- `label` (String, required) — Accessibility label
-- `userName` (String, required) — Display name in header
-- `userEmail` (String?) — Email below name
-- `avatarUrl` (String?) — URL for avatar image
-- `avatarInitials` (String?) — Fallback initials when no image
-- `items` (List<OiMenuItem>, required) — Menu items (reuses OiMenuItem from OiContextMenu)
-- `header` (Widget?) — Custom widget replacing default header
-
-**Composes:** OiAvatar, OiTappable, OiPopover, OiLabel, OiDivider, OiListTile, OiIcon
-
-**Use When:** App header user account dropdown with profile, settings, logout.
-**Avoid When:** Simple icon menus — use OiContextMenu or OiPopover directly.
-
----
-
 #### OiTabs
 **Tags:** `navigation`, `tabs`, `tab-bar`, `switch`, `view`
 **Tier:** Component
@@ -2035,10 +2256,361 @@ Horizontal tab navigation.
 - `content` (Widget?) — Auto-switch content per tab
 - Persistence params: `settingsDriver`, `settingsKey`, `settingsNamespace`
 
-**Theme:** `context.components.tabs` → `OiTabsThemeData`
+**Theme:** `context.components.tabs` -> `OiTabsThemeData`
 
 **Use When:** Switching between views/sections on the same page.
 **Combine With:** `OiPage`, `OiSection`
+
+---
+
+#### OiNavigationRail
+**Tags:** `navigation`, `rail`, `vertical`, `desktop`, `sidebar-lite`
+**Tier:** Component
+
+Compact vertical navigation rail. Lighter alternative to `OiSidebar` for apps with fewer navigation items.
+
+**Key Parameters:**
+- `items` (List<OiNavigationItem>, required) — Navigation destinations
+- `currentIndex` (int, required)
+- `onTap` (ValueChanged<int>, required)
+- `leading` (Widget?) — Widget above items (e.g., logo)
+- `trailing` (Widget?) — Widget below items (e.g., settings)
+- `width` (double, default: 72)
+- `labelBehavior` (OiRailLabelBehavior, default: all) — all/selected/none
+- `groupAlignment` (double, default: -1.0) — Vertical alignment of items
+- `backgroundColor` (Color?)
+- `indicatorColor` (Color?)
+- `indicatorShape` (ShapeBorder?)
+- `elevation` (double?)
+- `semanticLabel` (String?)
+
+**Theme:** `context.components.navigationRail` -> `OiNavigationRailThemeData`
+
+**Use When:** Desktop/tablet vertical navigation with 3-7 items.
+**Avoid When:** Mobile — use `OiBottomBar`. Full sidebar with sections — use `OiSidebar`.
+**Combine With:** `OiNavigationItem`, `OiResponsiveShell`, `OiPage`
+
+---
+
+#### OiSliverHeader
+**Tags:** `header`, `sliver`, `sticky`, `appbar`, `scroll`, `toolbar`
+**Tier:** Component
+
+Sticky scroll header using `SliverPersistentHeaderDelegate`. Collapses/expands on scroll within `CustomScrollView`.
+
+**Key Parameters:**
+- `leading` (Widget?) — Back button or icon
+- `title` (Widget?)
+- `subtitle` (Widget?)
+- `trailing` (Widget?)
+- `actions` (List<Widget>, default: [])
+- `pinned` (bool, default: true)
+- `floating` (bool, default: false)
+- `snap` (bool, default: false)
+- `expandedHeight` (double?)
+- `collapsedHeight` (double?)
+- `backgroundColor` (Color?)
+- `foregroundColor` (Color?)
+- `elevation` (double?)
+- `border` (OiBorderStyle?)
+- `flexibleSpace` (Widget?) — Content shown when expanded
+- `centerTitle` (bool, default: false)
+- `titleSpacing` (double?)
+- `toolbarHeight` (double, default: 56)
+- `semanticLabel` (String?)
+
+**Named Constructors:**
+- `.simple(title:, onBack:)` — Basic header with back button
+- `.large(title:, subtitle:, expandedHeight:)` — Large expanding title
+- `.hero(flexibleSpace:, expandedHeight:)` — Hero image/content header
+
+**Theme:** `context.components.sliverHeader` -> `OiSliverHeaderThemeData`
+
+**Use When:** Scroll-aware headers in `CustomScrollView`. Detail pages with collapsing headers.
+**Avoid When:** Static page headers — use `OiSection` with `OiLabel.h1()`.
+**Combine With:** `OiSliverList`, `OiSliverGrid`, `OiBackButton`, `CustomScrollView`
+
+---
+
+#### OiBackButton
+**Tags:** `back`, `navigation`, `button`, `header`
+**Tier:** Component
+
+RTL-aware back navigation button. Automatically mirrors arrow direction for right-to-left locales.
+
+**Key Parameters:**
+- `onPressed` (VoidCallback?) — Back action (defaults to Navigator.pop)
+- `color` (Color?)
+- `size` (double, default: 24)
+- `semanticLabel` (String, default: 'Back')
+
+**Use When:** Back navigation in headers, detail pages.
+**Combine With:** `OiSliverHeader`, `OiPage`
+
+---
+
+#### OiPageIndicator
+**Tags:** `indicator`, `dots`, `page`, `carousel`, `pagination`
+**Tier:** Component
+
+Dot indicators for paged content (carousels, onboarding, image galleries).
+
+**Key Parameters:**
+- `count` (int, required) — Total pages
+- `current` (int, required) — Active page index
+- `color` (Color?) — Inactive dot color
+- `activeColor` (Color?) — Active dot color
+- `size` (double, default: 8)
+- `activeSize` (double?) — Active dot size (for asymmetric indicators)
+- `spacing` (double, default: 8)
+- `semanticLabel` (String?)
+
+**Named Constructors:**
+- `.pill()` — Pill-shaped active indicator instead of dot
+
+**Use When:** Page indicators for carousels, onboarding flows, image galleries.
+**Combine With:** `PageView`, `OiProductGallery`, `OiWizard`
+
+---
+
+#### OiScrollToTop
+**Tags:** `scroll`, `fab`, `floating`, `scroll-to-top`
+**Tier:** Component
+
+Floating scroll-to-top button that appears after scrolling past a threshold.
+
+**Key Parameters:**
+- `controller` (ScrollController, required) — Scroll controller to monitor
+- `child` (Widget, required) — Scrollable content
+- `threshold` (double, default: 200) — Scroll offset before button appears
+- `button` (Widget?) — Custom button widget
+- `alignment` (Alignment, default: bottomRight)
+- `padding` (EdgeInsetsGeometry?)
+- `semanticLabel` (String, default: 'Scroll to top')
+
+**Use When:** Long scrollable pages where users need quick access to the top.
+**Combine With:** `OiVirtualList`, `OiPage`, `OiListView`
+
+---
+
+#### OiRefreshIndicator
+**Tags:** `refresh`, `pull-to-refresh`, `scroll`, `loading`, `gesture`
+**Tier:** Component
+
+Pull-to-refresh wrapper using `OiProgress.circular`. Non-Material replacement for Flutter's `RefreshIndicator`.
+
+**Key Parameters:**
+- `child` (Widget, required) — Scrollable content
+- `onRefresh` (Future<void> Function(), required) — Refresh callback
+- `color` (Color?)
+- `backgroundColor` (Color?)
+- `displacement` (double, default: 40)
+- `edgeOffset` (double, default: 0)
+- `triggerDistance` (double, default: 100)
+- `indicatorSize` (double, default: 40)
+- `strokeWidth` (double?)
+- `semanticLabel` (String?)
+- `notificationPredicate` (bool Function(ScrollNotification)?)
+
+**Theme:** `context.components.refreshIndicator` -> `OiRefreshIndicatorThemeData`
+
+**Use When:** Pull-to-refresh on scrollable content.
+**Avoid When:** Desktop-only apps — use a refresh button instead.
+**Combine With:** `OiVirtualList`, `OiListView`, `OiPage`
+
+---
+
+### COMPONENTS — Navigation (Admin)
+
+---
+
+#### [ADMIN] OiPagination
+**Tags:** `pagination`, `page`, `navigation`, `list`, `data`
+**Tier:** Component
+
+Standalone pagination control — page numbers, prev/next, per-page selector, total count. Extracted from OiTable for use outside tables.
+
+**Key Parameters:**
+- `totalItems` (int, required)
+- `currentPage` (int, required)
+- `label` (String, required)
+- `perPage` (int, default: 25)
+- `perPageOptions` (List<int>, default: [10, 25, 50, 100])
+- `onPageChange` (ValueChanged<int>?)
+- `onPerPageChange` (ValueChanged<int>?)
+- `showPerPage` (bool, default: true)
+- `showTotal` (bool, default: true)
+- `showFirstLast` (bool, default: true)
+- `siblingCount` (int, default: 1)
+- `variant` (OiPaginationVariant, default: pages) — pages/compact
+
+**Factory Constructors:**
+- `.loadMore(loadedCount:, totalItems:, label:, onLoadMore:, loading:)` — "Load more" button variant
+
+**Use When:** Paginated data outside OiTable (card grids, activity feeds).
+**Combine With:** OiListView, OiResourcePage
+**Avoid When:** Inside OiTable — use its built-in pagination.
+
+---
+
+#### [ADMIN] OiSortButton
+**Tags:** `sort`, `order`, `ascending`, `descending`, `dropdown`
+**Tier:** Component
+
+Dropdown button for sorting non-table lists. Shows current sort field and direction.
+
+**Key Parameters:**
+- `options` (List<OiSortOption>, required) — Each has `field`, `label`, `direction`
+- `currentSort` (OiSortOption, required)
+- `label` (String, required)
+- `onSortChange` (ValueChanged<OiSortOption>?)
+
+**OiSortDirection enum:** asc, desc
+
+**Use When:** Sorting card grids, activity feeds, any non-table list.
+**Combine With:** OiListView, OiFilterBar
+**Avoid When:** Inside OiTable — use column sort headers.
+
+---
+
+#### [ADMIN] OiExportButton
+**Tags:** `export`, `download`, `csv`, `xlsx`, `json`, `pdf`
+**Tier:** Component
+
+Data export button. Single format = direct button. Multiple formats = split dropdown.
+
+**Key Parameters:**
+- `label` (String, required)
+- `onExport` (Future<void> Function(OiExportFormat), required)
+- `formats` (List<OiExportFormat>, default: [csv]) — csv/xlsx/json/pdf
+- `loading` (bool, default: false)
+
+**Use When:** Data export from tables, lists, reports.
+**Combine With:** OiTable, OiListView, OiBulkBar
+
+---
+
+#### [ADMIN] OiThemeToggle
+**Tags:** `theme`, `dark-mode`, `light-mode`, `toggle`, `switch`
+**Tier:** Component
+
+Toggle between light/dark/system theme modes. Shows sun/moon/monitor icon.
+
+**Key Parameters:**
+- `currentMode` (ThemeMode, required)
+- `onModeChange` (ValueChanged<ThemeMode>, required)
+- `label` (String, default: 'Toggle theme')
+- `showSystemOption` (bool, default: true)
+
+**Use When:** App header/toolbar for theme switching.
+**Combine With:** OiAppShell, OiUserMenu
+
+---
+
+#### [ADMIN] OiUserMenu
+**Tags:** `user`, `menu`, `account`, `profile`, `dropdown`, `avatar`
+**Tier:** Component
+
+Avatar-triggered dropdown with user info and actions (profile, settings, logout).
+
+**Key Parameters:**
+- `label` (String, required)
+- `userName` (String, required)
+- `userEmail` (String?)
+- `avatarUrl` (String?)
+- `avatarInitials` (String?)
+- `items` (List<OiMenuItem>, required)
+- `header` (Widget?)
+
+**Use When:** Top-right user account menu in any app.
+**Combine With:** OiAppShell, OiAvatar, OiMenuItem
+
+---
+
+#### [ADMIN] OiLocaleSwitcher
+**Tags:** `locale`, `language`, `i18n`, `internationalization`, `dropdown`
+**Tier:** Component
+
+Locale dropdown with flag emoji, language name, and code.
+
+**Key Parameters:**
+- `currentLocale` (Locale, required)
+- `locales` (List<OiLocaleOption>, required) — Each has `locale`, `name`, `flagEmoji`
+- `onLocaleChange` (ValueChanged<Locale>, required)
+- `label` (String, default: 'Language')
+- `showFlag` / `showCode` / `showName` (bool)
+
+**Use When:** Multi-language apps.
+**Combine With:** OiAppShell
+
+---
+
+### COMPONENTS — Navigation (Shop)
+
+---
+
+#### [SHOP] OiProductCard
+**Tags:** `product`, `card`, `shop`, `e-commerce`, `catalog`, `grid`
+**Tier:** Component
+
+Product display card with image, name, price, rating, and actions.
+
+**Key Parameters:**
+- `product` (OiProductData, required)
+- `label` (String, required)
+- `onTap` (VoidCallback?) — Navigate to detail
+- `onAddToCart` (VoidCallback?)
+- `onWishlist` (VoidCallback?)
+- `showRating` / `showAddToCart` (bool, default: true)
+- `showWishlist` (bool, default: false)
+- `variant` (OiProductCardVariant, default: vertical) — vertical/horizontal/compact
+
+**Factory Constructors:**
+- `.horizontal()` — Image left, details right (for list views)
+
+**Use When:** Product grids, product listings, related products.
+**Combine With:** OiGrid, OiListView, OiShopProductDetail (related)
+
+---
+
+#### [SHOP] OiCartItemRow
+**Tags:** `cart`, `item`, `line-item`, `shop`, `quantity`, `row`
+**Tier:** Component
+
+Shopping cart line item row. Thumbnail, name, variant, quantity, total, remove.
+
+**Key Parameters:**
+- `item` (OiCartItem, required)
+- `label` (String, required)
+- `onQuantityChange` (ValueChanged<int>?)
+- `onRemove` (VoidCallback?)
+- `onTap` (VoidCallback?)
+- `editable` (bool, default: true)
+- `compact` (bool, default: false)
+- `currencyCode` (String, default: 'EUR')
+
+**Use When:** Cart views, checkout review, order confirmation.
+**Combine With:** OiCartPanel, OiMiniCart, OiCheckout
+
+---
+
+#### [SHOP] OiOrderSummaryLine
+**Tags:** `order`, `summary`, `subtotal`, `tax`, `total`, `shop`
+**Tier:** Component
+
+Summary row with label left and amount right (subtotal, discount, shipping, tax, total).
+
+**Key Parameters:**
+- `label` (String, required)
+- `amount` (double, required)
+- `currencyCode` (String?)
+- `bold` (bool, default: false) — For total row
+- `negative` (bool, default: false) — For discounts
+- `loading` (bool, default: false) — Shimmer
+- `subtitle` (String?) — e.g., coupon code
+
+**Use When:** Cart summary, order summary, checkout.
+**Combine With:** OiCartPanel, OiOrderSummary, OiCheckout
 
 ---
 
@@ -2085,10 +2657,66 @@ Modal dialog with variants.
 OiDialog.show(context, label: '...', dialog: OiDialog.confirm(...));
 ```
 
-**Theme:** `context.components.dialog` → `OiDialogThemeData`
+**Theme:** `context.components.dialog` -> `OiDialogThemeData`
 
 **Use When:** User confirmation, forms, alerts, important info.
 **Avoid When:** Non-blocking notifications — use `OiToast`. Side content — use `OiSheet`.
+
+---
+
+#### OiDialogShell
+**Tags:** `dialog`, `modal`, `overlay`, `container`, `shell`
+**Tier:** Component
+
+Low-level dialog container for custom dialog layouts. Use when `OiDialog` variants are too opinionated and you need full control over dialog content.
+
+**Key Parameters:**
+- `child` (Widget, required) — Dialog content
+- `width` (double?)
+- `minWidth` (double?)
+- `maxWidth` (double?)
+- `maxHeight` (double?)
+- `backgroundColor` (Color?)
+- `borderRadius` (BorderRadius?)
+- `elevation` (double?)
+- `padding` (EdgeInsetsGeometry?)
+- `semanticLabel` (String?)
+
+**Static Methods:**
+- `OiDialogShell.show<T>(context:, builder:)` — Shows dialog, returns `Future<T?>`
+
+**Theme:** `context.components.dialogShell` -> `OiDialogShellThemeData`
+
+**Use When:** Building fully custom dialog layouts that don't fit `OiDialog` variants.
+**Avoid When:** Standard dialogs — use `OiDialog.standard()`, `.confirm()`, `.form()`, etc.
+**Combine With:** Custom dialog content widgets
+
+---
+
+#### OiSnackBar
+**Tags:** `snackbar`, `feedback`, `action`, `notification`, `overlay`
+**Tier:** Component
+
+Brief action feedback shown at bottom or top of screen. Lighter weight than `OiToast` for inline action feedback.
+
+**Key Parameters:**
+- `message` (String, required) — Feedback text
+- `action` (Widget?)
+- `actionLabel` (String?)
+- `onAction` (VoidCallback?)
+- `duration` (Duration, default: 4s)
+- `onDismissed` (VoidCallback?)
+- `leading` (Widget?)
+- `backgroundColor` (Color?)
+- `dismissible` (bool, default: true)
+- `position` (OiSnackBarPosition, default: bottom) — bottom/top
+
+**Static Methods:**
+- `OiSnackBar.show(context, message:, actionLabel:, onAction:)` — Shows via overlay
+
+**Use When:** Brief action feedback ("Item deleted", "Undo available").
+**Avoid When:** Rich notifications — use `OiToast`. Critical alerts — use `OiDialog`.
+**Combine With:** `OiButton`, `OiListView`
 
 ---
 
@@ -2111,7 +2739,7 @@ Bottom sheet / side sheet.
 
 **Static Method:** `OiSheet.show(context, ...)`
 
-**Theme:** `context.components.sheet` → `OiSheetThemeData`
+**Theme:** `context.components.sheet` -> `OiSheetThemeData`
 
 **Use When:** Detail panels, filters, forms on mobile.
 **Avoid When:** Critical actions requiring attention — use `OiDialog`.
@@ -2135,7 +2763,7 @@ Auto-dismissing notification.
 
 **Static Method:** `OiToast.show(context, message: '...', level: OiToastLevel.success)`
 
-**Theme:** `context.components.toast` → `OiToastThemeData`
+**Theme:** `context.components.toast` -> `OiToastThemeData`
 
 **Use When:** Non-blocking feedback (save success, copy confirmation, errors).
 **Avoid When:** Critical info — use `OiDialog`.
@@ -2206,865 +2834,28 @@ Two-pane split layout with draggable divider.
 
 ---
 
-### COMPONENTS — Shop
+### COMPONENTS — Toolbars (Admin)
 
 ---
 
-#### OiPriceTag
-**Tags:** `shop`, `price`, `currency`, `money`, `sale`, `discount`, `strikethrough`, `e-commerce`
+#### [ADMIN] OiBulkBar
+**Tags:** `bulk`, `selection`, `toolbar`, `actions`, `batch`
 **Tier:** Component
 
-Formatted price display with optional compare-at (strikethrough) price and currency symbol. Composes `OiRow` and `OiLabel`.
-
-**Props:**
-- `price` (double, required) — current price
-- `label` (String, required) — accessibility label
-- `compareAtPrice` (double?) — original price; shown with strikethrough when > `price`
-- `currencyCode` (String?, default 'USD') — ISO 4217 currency code
-- `currencySymbol` (String?) — explicit symbol override (takes priority over `currencyCode`)
-- `decimalPlaces` (int, default 2) — number of decimal places
-- `size` (OiPriceTagSize, default medium) — small / medium / large
-
-**Behavior:**
-- Zero price shows "Free" in success color
-- Negative price shown in success color
-- `compareAtPrice <= price` → ignored, no strikethrough
-- Currency symbol positioned per locale convention ($ before for USD, € after for EUR)
-- Unknown currency code falls back to code string after amount
-
-**Use When:** Product prices, cart line items, order summaries.
-**Combine With:** `OiQuantitySelector`, `OiCard`, `OiListTile`
-
----
-
-#### OiQuantitySelector
-**Tags:** `shop`, `quantity`, `stepper`, `counter`, `cart`, `e-commerce`, `number`
-**Tier:** Component
-
-Number stepper for product quantities with minus/plus buttons and display value. Composes `OiRow`, `OiIconButton`, `OiLabel`, `OiSurface`.
-
-**Props:**
-- `value` (int, required) — current quantity
-- `label` (String, required) — accessibility label
-- `onChange` (ValueChanged<int>?) — callback; null disables interaction
-- `min` (int, default 1) — minimum allowed value
-- `max` (int, default 99) — maximum allowed value
-- `compact` (bool, default false) — reduced padding for dense layouts
-- `disabled` (bool, default false) — disables all controls (opacity 0.4)
-
-**Behavior:**
-- Min boundary disables minus button; max boundary disables plus button
-- Keyboard arrow up/down support for accessibility
-- Semantics announces label, value, min, and max
-
-**Use When:** Cart quantity adjustment, inventory counts.
-**Combine With:** `OiPriceTag`, `OiCard`, `OiListTile`
-
----
-
-#### OiCartItemRow
-**Tags:** `shop`, `cart`, `line-item`, `e-commerce`, `row`
-**Tier:** Component
-
-A single line item row for the shopping cart. Shows thumbnail, name, variant info, quantity selector, line total, and remove button. Supports swipe-to-remove on mobile and compact mode for mini-cart overlays.
-
-**Props:**
-- `item` (OiCartItem, required) — cart item data
-- `label` (String, required) — accessibility label
-- `onQuantityChange` (ValueChanged<int>?) — quantity change callback
-- `onRemove` (VoidCallback?) — remove callback
-- `onTap` (VoidCallback?) — row tap callback
-- `editable` (bool, default true) — show/hide quantity selector and remove button
-- `compact` (bool, default false) — smaller layout for mini-cart
-- `currencyCode` (String, default 'EUR') — ISO 4217 currency code
-
-**Behavior:**
-- Compact mode renders smaller thumbnail (48px vs 72px) and smaller text
-- Non-editable mode hides quantity selector and remove button, shows "× quantity" text
-- Swipe-to-remove via OiSwipeable when editable and onRemove is provided
-- Thumbnail falls back to placeholder icon when imageUrl is null
-
-**Use When:** Cart line items, order confirmation item lists.
-**Combine With:** `OiCartPanel`, `OiMiniCart`, `OiOrderSummary`
-
----
-
-#### OiCouponInput
-**Tags:** `shop`, `coupon`, `discount`, `promo`, `e-commerce`, `input`
-**Tier:** Component
-
-Text input with 'Apply' button for discount/coupon codes. Shows success or error inline. Applied mode shows green check, code, and remove button.
-
-**Props:**
-- `label` (String, required) — accessibility label / visible label
-- `onApply` (Future<OiCouponResult> Function(String), required) — apply callback returning success/failure
-- `onRemove` (VoidCallback?) — remove applied coupon callback
-- `appliedCode` (String?) — currently applied code; non-null shows applied mode
-- `loading` (bool, default false) — loading state for Apply button
-
-**Behavior:**
-- Empty submit prevented (button disabled when input empty)
-- Invalid code shows red error message inline
-- Applied mode shows green check icon, bold code, and remove (X) button
-- Error clears when user types new text
-- Exception during apply shows generic error message
-
-**Use When:** Cart coupon/promo code entry.
-**Combine With:** `OiCartPanel`
-
----
-
-#### OiOrderSummaryLine
-**Tags:** `shop`, `summary`, `total`, `subtotal`, `checkout`, `e-commerce`
-**Tier:** Component
-
-A single summary row showing label on the left and amount on the right. Used for subtotal, discount, shipping, tax, and total lines.
-
-**Props:**
-- `label` (String, required) — line label (e.g. 'Subtotal', 'Tax')
-- `amount` (double, required) — monetary amount
-- `currencyCode` (String, default 'EUR') — ISO 4217 currency code
-- `bold` (bool, default false) — bold styling for total row
-- `negative` (bool, default false) — discount styling (green, minus prefix)
-- `loading` (bool, default false) — shimmer placeholder instead of amount
-- `subtitle` (String?) — optional subtitle below label (e.g. coupon code)
-
-**Behavior:**
-- Bold mode uses bodyStrong label and medium price tag size
-- Negative mode inverts amount sign for discount display
-- Loading mode shows OiShimmer placeholder instead of price
-- Subtitle shown below label when provided
-
-**Use When:** Checkout summaries, order totals, invoice line items.
-**Combine With:** `OiCartPanel`, `OiOrderSummary`
-
----
-
-#### OiProductCard
-**Tags:** `shop`, `product`, `card`, `catalog`, `e-commerce`, `grid`
-**Tier:** Component
-
-Product display card for grid/list layouts. Shows image, name, price, rating, and quick-action buttons. Three layout variants.
-
-**Props:**
-- `product` (OiProductData, required) — product data
-- `label` (String, required) — accessibility label
-- `onTap` (VoidCallback?) — card tap callback
-- `onAddToCart` (VoidCallback?) — add-to-cart callback
-- `onWishlist` (VoidCallback?) — wishlist callback
-- `showRating` (bool, default true) — show star rating
-- `showAddToCart` (bool, default true) — show add-to-cart button
-- `showWishlist` (bool, default false) — show wishlist button
-- `isLoading` (bool, default false) — skeleton loading state
-- `variant` (OiProductCardVariant, default vertical) — vertical / horizontal / compact
-
-**Constructors:**
-- `OiProductCard()` — default vertical layout
-- `OiProductCard.horizontal()` — image-left layout for list views
-
-**Behavior:**
-- "Sale" badge when compareAtPrice > price
-- "Out of Stock" badge when inStock is false; disables add-to-cart
-- Skeleton loading via OiShimmer when isLoading is true
-- Compact variant hides action buttons, shows single-line name
-- Image placeholder with icon when imageUrl is null
-
-**Use When:** Product grids, catalog pages, search results.
-**Combine With:** `OiGrid`, `OiVirtualGrid`, `OiFilterBar`
-
----
-
-### COMPONENTS — Shop (continued)
-
----
-
-#### OiPaymentOption
-**Tags:** `shop`, `payment`, `radio`, `select`, `e-commerce`, `checkout`
-**Tier:** Component
-
-Selectable payment method row with radio indicator. Displays payment method label and optional description with a radio-style selection circle.
-
-**Props:**
-- `method` (OiPaymentMethod, required) — payment method data
-- `label` (String, required) — accessibility label
-- `selected` (bool, default false) — whether this option is selected
-- `onSelect` (ValueChanged<OiPaymentMethod>?) — callback when selected
-
-**Behavior:**
-- Shows filled radio dot when selected, empty circle when not
-- Tapping anywhere on the row selects it
-- Description shown below label in subtle text when available
-
-**Use When:** Payment method selection in checkout flows.
-**Combine With:** `OiCheckout`, `OiCard`
-
----
-
-#### OiShippingOption
-**Tags:** `shop`, `shipping`, `radio`, `select`, `e-commerce`, `checkout`, `delivery`
-**Tier:** Component
-
-Selectable shipping method row with price display and radio indicator. Shows method name, estimated delivery, and price with locale-aware currency formatting.
-
-**Props:**
-- `method` (OiShippingMethod, required) — shipping method data
-- `label` (String, required) — accessibility label
-- `selected` (bool, default false) — whether this option is selected
-- `onSelect` (ValueChanged<OiShippingMethod>?) — callback when selected
-- `currencyCode` (String, default 'EUR') — ISO 4217 currency code
-
-**Behavior:**
-- Shows filled radio dot when selected, empty circle when not
-- Price displayed on the right with locale-aware currency positioning
-- Estimated delivery shown as subtitle when available
-- Zero price shows "Free" in success color
-
-**Use When:** Shipping method selection in checkout flows.
-**Combine With:** `OiCheckout`, `OiCard`
-
----
-
-#### OiStockBadge
-**Tags:** `shop`, `stock`, `inventory`, `availability`, `badge`, `e-commerce`
-**Tier:** Component
-
-Stock status badge showing in stock, low stock, or out of stock with optional count. Color-coded: success for in stock, warning for low stock, error for out of stock.
-
-**Props:**
-- `status` (OiStockStatus, required) — inStock / lowStock / outOfStock
-- `label` (String, required) — accessibility label
-- `count` (int?) — optional stock count to display
-
-**Named Constructors:**
-- `OiStockBadge.fromCount(stockCount:, label:, lowStockThreshold:)` — Auto-determines status from count. `null` or `> threshold` → inStock, `1..threshold` → lowStock, `0` → outOfStock. Default `lowStockThreshold: 5`.
-
-**Behavior:**
-- In stock: green dot + "In Stock" (or "N in stock")
-- Low stock: amber dot + "Low Stock" (or "Only N left")
-- Out of stock: red dot + "Out of Stock"
-
-**Use When:** Product detail pages, product cards, inventory displays.
-**Combine With:** `OiProductCard`, `OiShopProductDetail`
-
----
-
-#### OiWishlistButton
-**Tags:** `shop`, `wishlist`, `favorite`, `heart`, `toggle`, `e-commerce`
-**Tier:** Component
-
-Heart toggle button for wishlist/favorite functionality. Shows filled heart when active, outline when inactive.
-
-**Props:**
-- `label` (String, required) — accessibility label
-- `active` (bool, default false) — whether item is in wishlist
-- `onToggle` (VoidCallback?) — callback when toggled
-- `loading` (bool, default false) — loading state
-
-**Behavior:**
-- Filled heart icon in error color when active
-- Outline heart when inactive
-- Spring animation on toggle
-- Loading spinner replaces icon when loading
-
-**Use When:** Product cards, product detail pages, catalog listings.
-**Combine With:** `OiProductCard`, `OiShopProductDetail`
-
----
-
-#### OiAddressForm
-**Tags:** `shop`, `address`, `form`, `checkout`, `e-commerce`, `shipping`, `billing`
-**Tier:** Component
-
-A standardized, reusable address form with fields for name, company, address lines, city, state/province, postal code, country, and phone. Responsive layout — side-by-side fields on wide breakpoints, stacked on narrow.
-
-**Props:**
-- `label` (String, required) — accessibility label
-- `initialData` (OiAddressData) — initial address to pre-fill fields (default: empty)
-- `onChanged` (ValueChanged<OiAddressData>?) — called on any field change with updated address
-- `onSubmit` (ValueChanged<OiAddressData>?) — called when form is submitted with valid data; validation runs first
-- `countries` (List<OiCountryOption>?) — country options for dropdown; when a selected country has `states`, a state dropdown appears automatically
-- `showCompany` (bool, default true) — whether to show company field
-- `showPhone` (bool, default true) — whether to show phone field
-- `showName` (bool, default true) — whether to show first/last name fields
-- `readOnly` (bool, default false) — whether all fields are read-only; takes precedence over `enabled`
-- `enabled` (bool, default true) — whether form inputs are enabled
-- `error` (Map<String, String>?) — per-field error messages keyed by field name (e.g. `{'line1': 'Required'}`)
-
-**Behavior:**
-- Responsive: first name + last name side by side on wide (≥ md), stacked on narrow
-- Country dropdown from `OiCountryOption` list; state becomes dropdown when country has states
-- Field order: first name, last name, company, line 1, line 2, city, state, postal code, country, phone
-- Read-only mode disables all fields
-- `onChanged` fires on every field change with a new `OiAddressData`
-- Built-in validation on submit: line1, city, postalCode, country are required
-- `error` map renders per-field inline error messages
-
-**Usage Example:**
-```dart
-OiAddressForm(
-  label: 'Shipping address',
-  initialData: const OiAddressData(
-    firstName: 'Jane',
-    lastName: 'Doe',
-    line1: '123 Main St',
-    city: 'Berlin',
-    postalCode: '10115',
-    country: 'DE',
-  ),
-  countries: myCountryOptions, // List<OiCountryOption>
-  showCompany: false,
-  onChanged: (address) => setState(() => _address = address),
-  onSubmit: (address) => _checkout(address),
-)
-```
-
-**Factory Constructors:**
-- `OiAddressForm.shipping(...)` — pre-labelled "Shipping address"
-- `OiAddressForm.billing(...)` — pre-labelled "Billing address"
-
-**Use When:** Checkout shipping/billing address, user profile address, order address display.
-**Combine With:** `OiCheckout`, `OiForm`, `OiCard`
-
----
-
-#### OiShippingMethodPicker
-**Tags:** `shop`, `shipping`, `picker`, `radio`, `group`, `e-commerce`, `checkout`, `delivery`
-**Tier:** Component
-
-A radio-style selector that renders a list of `OiShippingOption` widgets with managed single-selection and loading state.
-
-**Props:**
-- `methods` (List<OiShippingMethod>, required) — available shipping methods
-- `label` (String, required) — accessibility label for the group
-- `selectedKey` (Object?) — key of the currently selected shipping method
-- `onSelect` (ValueChanged<OiShippingMethod>?) — called when user selects a method
-- `currencyCode` (String, default 'EUR') — ISO 4217 currency code
-- `loading` (bool, default false) — show shimmer loading placeholders
-
-**Behavior:**
-- Renders one `OiShippingOption` per method with `selected: method.key == selectedKey`
-- Loading state shows 3 shimmer placeholder rows, hides actual methods
-- Empty methods shows nothing or subtle "No shipping methods available" label
-- Forwards `currencyCode` to each `OiShippingOption`
-
-**Usage Example:**
-```dart
-OiShippingMethodPicker(
-  label: 'Choose shipping method',
-  methods: [
-    OiShippingMethod(
-      key: 'standard',
-      label: 'Standard Shipping',
-      price: 4.99,
-      estimatedDelivery: '5-7 business days',
-    ),
-    OiShippingMethod(
-      key: 'express',
-      label: 'Express Shipping',
-      price: 12.99,
-      estimatedDelivery: '1-2 business days',
-    ),
-  ],
-  selectedKey: _selectedShippingKey,
-  onSelect: (method) => setState(() => _selectedShippingKey = method.key),
-  currencyCode: 'EUR',
-)
-```
-
-**Use When:** Checkout shipping method step, delivery option selection.
-**Combine With:** `OiCheckout`, `OiCard`, `OiShippingOption`
-
----
-
-#### OiPaymentMethodPicker
-**Tags:** `shop`, `payment`, `picker`, `radio`, `group`, `e-commerce`, `checkout`
-**Tier:** Component
-
-A selector for payment methods that renders `OiPaymentOption` widgets with managed single-selection, plus an optional slot for an "Add new card" button or form.
-
-**Props:**
-- `methods` (List<OiPaymentMethod>, required) — available payment methods
-- `label` (String, required) — accessibility label for the group
-- `selectedKey` (Object?) — key of the currently selected payment method
-- `onSelect` (ValueChanged<OiPaymentMethod>?) — called when user selects a method
-- `addNewCard` (Widget?) — optional widget displayed below options, separated by a divider
-
-**Behavior:**
-- Renders one `OiPaymentOption` per method with `selected: method.key == selectedKey`
-- If `addNewCard` is provided, renders `OiDivider` + the widget below the options
-- Empty methods with `addNewCard` shows only the add-new-card slot
-
-**Usage Example:**
-```dart
-OiPaymentMethodPicker(
-  label: 'Select payment method',
-  methods: [
-    OiPaymentMethod(
-      key: 'visa',
-      label: 'Visa',
-      lastFour: '4242',
-      expiryDate: '12/26',
-      isDefault: true,
-    ),
-    OiPaymentMethod(
-      key: 'paypal',
-      label: 'PayPal',
-      description: 'john@example.com',
-    ),
-  ],
-  selectedKey: _selectedPaymentKey,
-  onSelect: (method) => setState(() => _selectedPaymentKey = method.key),
-  addNewCard: OiButton.outline(
-    label: 'Add new card',
-    onPressed: _showAddCardForm,
-  ),
-)
-```
-
-**Use When:** Checkout payment step, saved payment method selection.
-**Combine With:** `OiCheckout`, `OiCard`, `OiPaymentOption`
-
----
-
-#### OiOrderStatusBadge
-**Tags:** `shop`, `order`, `status`, `badge`, `e-commerce`, `tracking`
-**Tier:** Component
-
-A badge that displays `OiOrderStatus` with appropriate color coding. Wraps `OiBadge.soft` with a default color mapping for each status value.
-
-**Props:**
-- `status` (OiOrderStatus, required) — the order status to display
-- `label` (String, required) — accessibility label
-- `statusLabels` (Map<OiOrderStatus, String>?) — optional i18n overrides for display text (defaults: "Pending", "Confirmed", etc.)
-- `statusColors` (Map<OiOrderStatus, OiBadgeColor>?) — optional color overrides per status
-
-**Default Color Mapping:**
-- pending → warning
-- confirmed → info
-- processing → info
-- shipped → primary
-- delivered → success
-- cancelled → error
-- refunded → muted
-
-**Factory Constructors:**
-- `OiOrderStatusBadge.soft(...)` — soft (muted) background variant (default)
-- `OiOrderStatusBadge.filled(...)` — solid background variant
-- `OiOrderStatusBadge.fromOrder({required OiOrderData order})` — extracts status from an order object automatically
-
-**Static Methods:**
-- `OiOrderStatusBadge.defaultLabel(OiOrderStatus status)` — returns the default human-readable label for a status (e.g. "Pending", "Shipped")
-- `OiOrderStatusBadge.defaultColorForStatus(OiOrderStatus status)` — returns the default `OiBadgeColor` for a status
-
-**Behavior:**
-- Renders `OiBadge.soft` with resolved color and display label
-- Custom `statusLabels` override default title-case names
-- Custom `statusColors` override theme-derived colors
-
-**Usage Example:**
-```dart
-// Basic usage — color and label derived from status automatically
-OiOrderStatusBadge(
-  status: OiOrderStatus.shipped,
-  label: 'Order status',
-)
-
-// With custom i18n labels and color overrides
-OiOrderStatusBadge(
-  status: order.status,
-  label: 'Order status',
-  statusLabels: {
-    OiOrderStatus.pending: 'Ausstehend',
-    OiOrderStatus.shipped: 'Versendet',
-    OiOrderStatus.delivered: 'Zugestellt',
-  },
-  statusColors: {
-    OiOrderStatus.pending: OiBadgeColor.success,
-    OiOrderStatus.shipped: OiBadgeColor.accent,
-  },
-)
-```
-
-**Use When:** Order list tables, order detail views, admin dashboards, order history.
-**Combine With:** `OiOrderTracker`, `OiTable`, `OiDetailView`, `OiListTile`
-
----
-
-### COMPONENTS — Buttons (continued)
-
----
-
-#### OiExportButton
-**Tags:** `button`, `export`, `download`, `csv`, `xlsx`, `json`, `pdf`, `data`
-**Tier:** Component
-
-Export data button supporting CSV, XLSX, JSON, PDF formats. Renders as a plain outline button for a single format, or a split button with dropdown for multiple formats.
-
-**Props:**
-- `label` (String, required) — accessibility label
-- `onExport` (Future<void> Function(OiExportFormat), required) — export callback receiving selected format
-- `formats` (List<OiExportFormat>, default [OiExportFormat.csv]) — available formats
-- `loading` (bool, default false) — loading state during export
-
-**Companion: `OiExportFormat` enum** — `csv`, `xlsx`, `json`, `pdf` (each has a `label` getter)
-
-**Behavior:**
-- Single format: renders OiButton.outline with direct action
-- Multiple formats: renders OiButton.split with dropdown menu
-- Loading state shows spinner and disables button
-- Format labels: "CSV", "Excel", "JSON", "PDF"
-
-**Use When:** Data export from tables, lists, reports.
-**Combine With:** `OiTable`, `OiListView`, `OiFilterBar`
-
----
-
-#### OiSortButton
-**Tags:** `button`, `sort`, `dropdown`, `order`, `ascending`, `descending`, `list`
-**Tier:** Component
-
-Dropdown button for sorting non-table lists (card grids, feeds). Shows current sort field and direction, with popover for field selection and direction toggle.
-
-**Props:**
-- `options` (List<OiSortOption>, required) — available sort fields
-- `currentSort` (OiSortOption, required) — currently active sort
-- `label` (String, required) — accessibility label
-- `onSortChange` (ValueChanged<OiSortOption>, required) — callback when sort changes
-
-**Companion: `OiSortOption`** — `field` (String), `label` (String), `direction` (OiSortDirection, default asc). Methods: `toggleDirection()`, `withDirection(OiSortDirection)`.
-
-**Companion: `OiSortDirection` enum** — `asc`, `desc`
-
-**Behavior:**
-- Shows current sort label and direction arrow in button
-- Popover lists all options with checkmark on current
-- Tapping same option toggles direction
-- Tapping different option selects it with its current direction
-
-**Use When:** Non-table list sorting (card grids, activity feeds, search results).
-**Combine With:** `OiListView`, `OiGrid`, `OiProductCard`
-
----
-
-### COMPONENTS — Feedback (continued)
-
----
-
-#### OiBulkBar
-**Tags:** `bulk`, `selection`, `toolbar`, `actions`, `batch`, `feedback`
-**Tier:** Component
-
-Floating toolbar that appears when items are selected, showing selection count and bulk action buttons. Supports select all, deselect all, and custom actions.
-
-**Props:**
-- `selectedCount` (int, required) — number of selected items
-- `totalCount` (int, required) — total number of items
-- `label` (String, required) — accessibility label
-- `actions` (List<OiBulkAction>, required) — available bulk actions
-- `onSelectAll` (VoidCallback?) — select all callback
-- `onDeselectAll` (VoidCallback?) — deselect all callback
-- `allSelected` (bool, default false) — whether all items are selected
-
-**Companion: `OiBulkAction`** — `label` (String), `icon` (IconData), `onTap` (VoidCallback), `variant` (OiBulkActionVariant, default ghost), `loading` (bool), `confirm` (bool), `confirmLabel` (String?)
-
-**Companion: `OiBulkActionVariant` enum** — `ghost`, `destructive`
-
-**Behavior:**
-- Floats at bottom of screen with slide-up animation
-- Shows "N of M selected" with select/deselect all toggle
-- Actions render as icon buttons; destructive variant shows in error color
-- Confirm mode requires double-tap for destructive actions
-
-**Use When:** Multi-select lists, tables, file explorers with bulk operations.
-**Combine With:** `OiTable`, `OiListView`, `OiFileExplorer`
-
----
-
-### COMPONENTS — Display (continued)
-
----
-
-#### OiPagination
-**Tags:** `pagination`, `paging`, `page`, `navigation`, `display`, `load-more`
-**Tier:** Component
-
-Standalone pagination control with three variants: full pages, compact, and load-more. Supports per-page selector and total count display.
-
-**Props:**
-- `totalItems` (int, required) — total number of items
-- `currentPage` (int, required) — current page (1-based)
-- `label` (String, required) — descriptive label for items (e.g. 'rows', 'items', 'products')
-- `perPage` (int, default 25) — items per page
-- `perPageOptions` (List<int>, default [10, 25, 50, 100]) — per-page dropdown options
-- `onPageChange` (ValueChanged<int>?) — page change callback
-- `onPerPageChange` (ValueChanged<int>?) — per-page change callback
-- `showPerPage` (bool, default true) — show per-page selector
-- `showTotal` (bool, default true) — show total count
-- `showFirstLast` (bool, default true) — show first/last page buttons
-- `siblingCount` (int, default 1) — visible page buttons around current
-- `variant` (OiPaginationVariant, default pages) — pages / compact
-
-**Named Constructors:**
-- `OiPagination.compact(totalItems:, currentPage:, label:, perPage:, onPageChange:, showFirstLast:)` — Compact variant showing "Page X of Y" with prev/next arrows only.
-- `OiPagination.loadMore(loadedCount:, totalItems:, label:, onLoadMore:, loading:)` — Load-more button with "{loadedCount} of {totalItems} {label} loaded" count.
-
-**Static Method:** `computeVisiblePages(currentPage, totalPages, siblingCount)` — Returns list of page numbers with null gaps for ellipsis rendering.
-
-**Behavior:**
-- Pages variant: numbered page buttons with ellipsis for large ranges
-- Compact variant: "Page X of Y" with prev/next arrows
-- Load-more variant: single button with progress text
-- First/last page buttons disabled at boundaries
-- Per-page selector shown as dropdown
-
-**Use When:** Paginated data lists, search results, table pagination.
-**Combine With:** `OiTable`, `OiListView`, `OiGrid`
-
----
-
-### COMPONENTS — Navigation (continued)
-
----
-
-#### OiLocaleSwitcher
-**Tags:** `locale`, `language`, `i18n`, `internationalization`, `dropdown`, `navigation`
-**Tier:** Component
-
-Locale/language dropdown selector with optional flag emoji support. Renders as a dropdown showing the current locale with flag and name.
-
-**Props:**
-- `currentLocale` (Locale, required) — currently selected locale
-- `locales` (List<OiLocaleOption>, required) — available locales
-- `onLocaleChange` (ValueChanged<Locale>?) — locale change callback
-- `label` (String, default 'Language') — accessibility label
-- `showFlag` (bool, default true) — show flag emoji
-- `showCode` (bool, default true) — show locale code (e.g. "EN")
-- `showName` (bool, default true) — show locale name (e.g. "English")
-
-**Companion: `OiLocaleOption`** — `locale` (Locale), `name` (String), `flagEmoji` (String?)
-
-**Behavior:**
-- Dropdown trigger shows current locale with flag + code/name
-- Popover lists all locales with flag, code, and full name
-- Selected locale highlighted with checkmark
-
-**Use When:** App header, settings page, footer language selection.
-**Combine With:** `OiAppShell`, `OiUserMenu`, `OiBottomBar`
-
----
-
-### COMPOSITES — Shop
-
----
-
-#### OiCartPanel
-**Tags:** `shop`, `cart`, `checkout`, `e-commerce`, `composite`, `panel`
-**Tier:** Composite
-
-Full shopping cart view with item list, optional coupon input, order summary lines, checkout button, and continue-shopping link. Shows OiEmptyState when cart is empty. Supports shimmer loading on summary lines.
-
-**Props:**
-- `items` (List<OiCartItem>, required) — cart items
-- `summary` (OiCartSummary, required) — subtotal/discount/shipping/tax/total
-- `label` (String, required) — accessibility label
-- `onQuantityChange` (ValueChanged<({Object productKey, int quantity})>?) — quantity change callback
-- `onRemove` (ValueChanged<Object>?) — remove item callback (receives productKey)
-- `onApplyCoupon` (Future<OiCouponResult> Function(String)?) — coupon apply callback; null hides coupon section
-- `onRemoveCoupon` (VoidCallback?) — remove coupon callback
-- `appliedCouponCode` (String?) — currently applied coupon code
-- `onCheckout` (VoidCallback?) — checkout callback; null disables button
-- `onContinueShopping` (VoidCallback?) — continue shopping link; null hides it
-- `checkoutLabel` (String, default 'Proceed to Checkout') — checkout button text
-- `currencyCode` (String, default 'EUR') — ISO 4217 currency code
-- `loading` (bool, default false) — shimmer on summary lines
-
-**Composition:** OiColumn, OiCartItemRow, OiDivider, OiCouponInput, OiOrderSummaryLine, OiButton.primary, OiEmptyState.
-
-**Behavior:**
-- Empty items list → OiEmptyState with cart icon and optional continue-shopping button
-- Coupon section hidden when onApplyCoupon is null
-- Summary shows conditional discount/shipping/tax lines based on null checks
-- Checkout button disabled when onCheckout is null
-
-**Use When:** Cart page, cart side panel, cart sheet.
-**Combine With:** `OiMiniCart`, `OiOrderSummary`
-
----
-
-#### OiMiniCart
-**Tags:** `shop`, `cart`, `mini`, `popover`, `badge`, `e-commerce`, `composite`
-**Tier:** Composite
-
-Compact cart widget: icon button with badge count that opens a popover or sheet with condensed cart preview. Badge hidden when cart is empty.
-
-**Props:**
-- `items` (List<OiCartItem>, required) — cart items
-- `summary` (OiCartSummary, required) — for total price display
-- `label` (String, required) — accessibility label
-- `onViewCart` (VoidCallback?) — 'View Cart' button callback
-- `onCheckout` (VoidCallback?) — 'Checkout' button callback
-- `onRemove` (ValueChanged<Object>?) — remove item callback (receives productKey)
-- `maxVisibleItems` (int, default 3) — max items in preview
-- `display` (OiMiniCartDisplay, default popover) — popover or sheet
-- `currencyCode` (String, default 'EUR') — ISO 4217 currency code
-
-**Composition:** OiIconButton, OiBadge, OiPopover/OiSheet, OiColumn, OiCartItemRow (compact), OiPriceTag, OiButton, OiLabel.
-
-**Behavior:**
-- Badge shows total quantity (sum of all item quantities); hidden when empty
-- Overflow indicator: "X more item(s)" when items exceed maxVisibleItems
-- Singular "1 more item" vs plural "2 more items"
-- Empty state shows "Cart is empty" centered text
-- Popover mode: constrained to 360px max width
-- Sheet mode: uses OiSheet with close callback
-
-**Use When:** Header cart icon, navigation bar cart indicator.
-**Combine With:** `OiCartPanel`, `OiSidebar`, `OiBottomBar`
-
----
-
-#### OiOrderSummary
-**Tags:** `shop`, `order`, `summary`, `checkout`, `e-commerce`, `composite`
-**Tier:** Composite
-
-Complete order summary card showing all summary lines with optional expandable item list inside an OiAccordion.
-
-**Props:**
-- `summary` (OiCartSummary, required) — subtotal/discount/shipping/tax/total
-- `label` (String, required) — accessibility label
-- `items` (List<OiCartItem>?) — optional items for expandable list
-- `showItems` (bool, default true) — whether to show item accordion
-- `expandedByDefault` (bool, default false) — accordion starts expanded
-- `currencyCode` (String, default 'EUR') — ISO 4217 currency code
-
-**Composition:** OiCard, OiColumn, OiOrderSummaryLine, OiDivider, OiAccordion, OiCartItemRow (read-only), OiLabel.
-
-**Behavior:**
-- Items shown in accordion with "Items (N)" header
-- Items rendered as non-editable OiCartItemRow widgets
-- Summary lines: subtotal always shown; discount/shipping/tax conditional on null
-- Total line shown in bold
-
-**Use When:** Checkout page, order confirmation, order detail view.
-**Combine With:** `OiCartPanel`, `OiWizard`, `OiDetailView`
-
----
-
-#### OiProductFilters
-**Tags:** `shop`, `filter`, `price`, `category`, `rating`, `stock`, `e-commerce`, `composite`
-**Tier:** Composite
-
-Filter panel for product listings with price range slider, category checkboxes, minimum rating selector, and in-stock-only toggle.
-
-**Props:**
-- `label` (String, required) — accessibility label
-- `value` (OiProductFilterData?) — current filter state
-- `onChanged` (ValueChanged<OiProductFilterData>?) — filter change callback
-- `availableCategories` (List<String>, default []) — available categories for checkbox list
-- `currencyCode` (String, default 'EUR') — ISO 4217 currency code for price labels
-- `priceRangeMin` (double, default 0) — minimum price slider bound
-- `priceRangeMax` (double, default 1000) — maximum price slider bound
-
-**Companion: `OiProductFilterData`** — `minPrice` (double?), `maxPrice` (double?), `categories` (List<String>), `minRating` (double?), `inStockOnly` (bool). Has `copyWith()` method.
-
-**Composition:** OiCard, OiColumn, OiLabel, OiSlider (range), OiCheckbox, OiStarRating, OiSwitch, OiButton.
-
-**Behavior:**
-- Price range shown as dual slider with currency-formatted labels
-- Categories shown as checkbox list
-- Rating shown as interactive star row
-- "In Stock Only" toggle at bottom
-- Clear all filters button when any filter is active
-
-**Use When:** Product catalog filtering, shop search refinement.
-**Combine With:** `OiProductCard`, `OiGrid`, `OiListView`, `OiSplitPane`
-
----
-
-#### OiProductGallery
-**Tags:** `shop`, `gallery`, `image`, `product`, `thumbnail`, `carousel`, `e-commerce`, `composite`
-**Tier:** Composite
-
-Image gallery with large main image and thumbnail strip for product images. Supports click-to-select thumbnails and index change callback.
-
-**Props:**
-- `imageUrls` (List<String>, required) — list of image URLs
-- `label` (String, required) — accessibility label
-- `initialIndex` (int, default 0) — initially selected image index
-- `onIndexChanged` (ValueChanged<int>?) — index change callback
-- `showThumbnails` (bool, default true) — show thumbnail strip below main image
-
-**Composition:** OiColumn, OiImage, OiRow, OiTappable, OiSurface.
-
-**Behavior:**
-- Main image fills available width with aspect ratio maintained
-- Thumbnail strip shows all images as small clickable squares
-- Selected thumbnail highlighted with primary border
-- Handles empty imageUrls gracefully with placeholder
-
-**Use When:** Product detail pages, any multi-image display.
-**Combine With:** `OiShopProductDetail`, `OiLightbox`
-
----
-
-#### OiOrderTracker
-**Tags:** `shop`, `order`, `tracking`, `stepper`, `timeline`, `status`, `e-commerce`, `composite`
-**Tier:** Composite
-
-A StatelessWidget showing order status progression as a horizontal stepper (pending → confirmed → processing → shipped → delivered) with an optional expandable timeline of order events via OiAccordion. Cancelled and refunded are rendered as terminal states. On narrow breakpoints the stepper renders vertically.
-
-**Props:**
-- `currentStatus` (OiOrderStatus, required) — the current order status to highlight
-- `label` (String, required) — accessibility label
-- `timeline` (List<OiOrderEvent>?) — optional chronological list of order events
-- `showTimeline` (bool, default false) — whether to show timeline section below stepper
-- `statusLabels` (Map<OiOrderStatus, String>?) — custom labels for each status step
-
-**Behavior:**
-- 5 happy-path steps: pending, confirmed, processing, shipped, delivered
-- All steps up to and including `currentStatus` marked as completed; steps after are incomplete
-- Cancelled/refunded: rendered as terminal states using `OiOrderStatusBadge` below stepper
-- Timeline section (when `showTimeline` and `timeline` provided): OiAccordion titled "Order History" with events sorted newest-first; each event shows colored dot (status color), formatted timestamp, `OiLabel.bodyStrong` title, and optional `OiLabel.small` description with vertical line connectors
-- On narrow breakpoints (compact), stepper renders vertically via `OiStepperStyle.vertical`
-
-**Composition:** OiStepper, OiAccordion, OiOrderStatusBadge, OiColumn, OiLabel.
-
-**Usage Example:**
-```dart
-OiOrderTracker(
-  currentStatus: OiOrderStatus.shipped,
-  label: 'Order tracking',
-  showTimeline: true,
-  timeline: [
-    OiOrderEvent(
-      timestamp: DateTime(2026, 3, 20, 14, 30),
-      title: 'Shipped',
-      status: OiOrderStatus.shipped,
-      description: 'Package dispatched via DHL',
-    ),
-    OiOrderEvent(
-      timestamp: DateTime(2026, 3, 19, 9, 0),
-      title: 'Processing',
-      status: OiOrderStatus.processing,
-    ),
-    OiOrderEvent(
-      timestamp: DateTime(2026, 3, 18, 16, 45),
-      title: 'Confirmed',
-      status: OiOrderStatus.confirmed,
-    ),
-  ],
-  statusLabels: {
-    OiOrderStatus.pending: 'Placed',
-    OiOrderStatus.delivered: 'Arrived',
-  },
-)
-```
-
-**Factory Constructors:**
-- `OiOrderTracker.compact({required OiOrderData order})` — extracts status and timeline from order, shows stepper only (no timeline)
-
-**Use When:** Order detail pages, order confirmation, order tracking views.
-**Combine With:** `OiOrderStatusBadge`, `OiOrderSummary`, `OiDetailView`
+Floating toolbar that appears when items are selected. Shows count and action buttons. Animates in from bottom.
+
+**Key Parameters:**
+- `selectedCount` (int, required)
+- `totalCount` (int, required)
+- `label` (String, required)
+- `actions` (List<OiBulkAction>, required) — Each has `label`, `icon`, `onTap`, `variant`, `loading`, `confirm`
+- `onSelectAll` (VoidCallback?)
+- `onDeselectAll` (VoidCallback?)
+- `allSelected` (bool, default: false)
+
+**Use When:** Bulk operations on selected items (delete, export, assign).
+**Combine With:** OiTable (via bulkActions prop), OiListView
+**Avoid When:** Single-item actions — use OiContextMenu.
 
 ---
 
@@ -3118,11 +2909,13 @@ Advanced data table with virtual scroll, column operations, inline editing, bulk
 
 **OiTableController:** Manages sort state, selection, column visibility/order/widths, filters, pagination.
 
-**Theme:** `context.components.table` → `OiTableThemeData`
+**Theme:** `context.components.table` -> `OiTableThemeData`
 
 **Use When:** Tabular data display with sort/filter/pagination needs.
 **Combine With:** `OiFilterBar`, `OiDetailView` (for row detail), `OiEditableText` (for inline edit)
 **Avoid When:** Simple lists — use `OiListView` module.
+
+> **Note:** Planned addition of `bulkActions` prop for integrated OiBulkBar support within the table.
 
 ---
 
@@ -3139,7 +2932,7 @@ Read-only record detail layout using `OiFieldDisplay.pair()` in sections.
 - `rowGap` (double, default: 12)
 - `fieldDirection` (Axis, default: horizontal) — Label-value layout
 - `labelWidth` (double?)
-- `emptyText` (String, default: '—')
+- `emptyText` (String, default: '---')
 - `showDividers` (bool, default: true)
 - `wrapInCard` (bool, default: true)
 - `padding` (EdgeInsetsGeometry?)
@@ -3181,6 +2974,141 @@ State management for paginated data.
 **Tier:** Composite
 
 State management for OiTable. Manages sort, selection, column state, pagination.
+
+---
+
+### COMPOSITES — Data (Admin)
+
+---
+
+#### [ADMIN] OiErrorPage
+**Tags:** `error`, `404`, `403`, `500`, `not-found`, `forbidden`
+**Tier:** Composite
+
+Full-page error display for HTTP error states.
+
+**Key Parameters:**
+- `title` (String, required)
+- `label` (String, required)
+- `description` (String?)
+- `errorCode` (String?) — "404", "403", "500" shown large
+- `illustration` (Widget?)
+- `actionLabel` (String?)
+- `onAction` (VoidCallback?)
+
+**Factory Constructors:**
+- `.notFound()` — 404 page
+- `.forbidden()` — 403 page
+- `.serverError()` — 500 page
+
+**Use When:** Error routes, unauthorized access, server errors.
+
+---
+
+### COMPOSITES — Data (Shop)
+
+---
+
+#### [SHOP] OiCartPanel
+**Tags:** `cart`, `shopping-cart`, `panel`, `checkout`, `shop`
+**Tier:** Composite
+
+Full cart view — item list, coupon input, order summary, checkout button.
+
+**Key Parameters:**
+- `items` (List<OiCartItem>, required)
+- `summary` (OiCartSummary, required)
+- `label` (String, required)
+- `onQuantityChange` (void Function(OiCartItem, int)?)
+- `onRemove` (ValueChanged<OiCartItem>?)
+- `onApplyCoupon` (Future<OiCouponResult> Function(String)?)
+- `onRemoveCoupon` / `appliedCouponCode`
+- `onCheckout` / `onContinueShopping` (VoidCallback?)
+- `checkoutLabel` (String, default: 'Proceed to Checkout')
+- `currencyCode` (String, default: 'EUR')
+- `loading` (bool, default: false)
+
+**Use When:** Cart page or cart side panel.
+**Combine With:** OiSheet (side cart), OiPage (cart page)
+**Avoid When:** Compact cart preview — use OiMiniCart.
+
+---
+
+#### [SHOP] OiMiniCart
+**Tags:** `cart`, `mini`, `preview`, `popover`, `icon`, `shop`
+**Tier:** Composite
+
+Compact cart icon with badge + popover/sheet preview.
+
+**Key Parameters:**
+- `items` (List<OiCartItem>, required)
+- `summary` (OiCartSummary, required)
+- `label` (String, required)
+- `onViewCart` / `onCheckout` (VoidCallback?)
+- `onRemove` (ValueChanged<OiCartItem>?)
+- `maxVisibleItems` (int, default: 3)
+- `display` (OiMiniCartDisplay, default: popover) — popover/sheet
+- `currencyCode` (String, default: 'EUR')
+
+**Use When:** Header cart icon with quick preview.
+**Combine With:** OiAppShell header, OiBottomBar
+
+---
+
+#### [SHOP] OiOrderSummary
+**Tags:** `order`, `summary`, `total`, `card`, `shop`
+**Tier:** Composite
+
+Order summary card with all line items (subtotal, discount, shipping, tax, total).
+
+**Key Parameters:**
+- `summary` (OiCartSummary, required)
+- `label` (String, required)
+- `items` (List<OiCartItem>?) — Expandable item list
+- `showItems` (bool, default: true)
+- `expandedByDefault` (bool, default: false)
+- `currencyCode` (String, default: 'EUR')
+
+**Use When:** Checkout sidebar, order confirmation.
+**Combine With:** OiCheckout, OiCartPanel
+
+---
+
+#### [SHOP] OiProductGallery
+**Tags:** `gallery`, `product`, `images`, `zoom`, `lightbox`, `shop`
+**Tier:** Composite
+
+Product image gallery with main image, thumbnails, zoom, and lightbox.
+
+**Key Parameters:**
+- `imageUrls` (List<String>, required)
+- `label` (String, required)
+- `initialIndex` (int, default: 0)
+- `showThumbnails` (bool, default: true)
+- `zoomOnHover` (bool, default: true)
+- `lightboxOnTap` (bool, default: true)
+- `thumbnailDirection` (Axis, default: horizontal)
+
+**Use When:** Product detail pages.
+**Combine With:** OiShopProductDetail
+
+---
+
+#### [SHOP] OiOrderTracker
+**Tags:** `order`, `tracking`, `status`, `stepper`, `timeline`, `shop`
+**Tier:** Composite
+
+Visual order status progression tracker (pending -> confirmed -> shipped -> delivered).
+
+**Key Parameters:**
+- `currentStatus` (OiOrderStatus, required)
+- `label` (String, required)
+- `timeline` (List<OiOrderEvent>?) — Detailed event history
+- `showTimeline` (bool, default: false)
+- `statusLabels` (Map<OiOrderStatus, String>?)
+
+**Use When:** Order detail pages, order tracking.
+**Combine With:** OiDetailView, OiTimeline
 
 ---
 
@@ -3302,6 +3230,8 @@ Dynamic form builder with validation, auto-layout, and field binding.
 **Combine With:** `OiCard`, `OiWizard` (multi-step), `OiDialog.form()`
 **Avoid When:** Read-only display — use `OiDetailView`.
 
+> **Note:** Planned additions include `onSubmitAsync`, `onCancel`, `showCancelButton`, and `warnOnUnsavedChanges` props for enhanced form workflow.
+
 ---
 
 #### OiWizard
@@ -3419,7 +3349,7 @@ Application sidebar with collapsible sections, badges, icons.
 
 **OiSidebarItem:** `id`, `label`, `icon`, `badgeCount`, `children`, `disabled`
 
-**Theme:** `context.components.sidebar` → `OiSidebarThemeData`
+**Theme:** `context.components.sidebar` -> `OiSidebarThemeData`
 
 **Use When:** Desktop app navigation, admin panels.
 **Combine With:** `OiSplitPane`, `OiPage`, `OiBreadcrumbs`
@@ -3489,37 +3419,25 @@ Keyboard shortcut display and help dialog.
 
 ---
 
-#### OiErrorPage
-**Tags:** `error`, `404`, `403`, `500`, `not-found`, `forbidden`, `server-error`, `navigation`, `composite`
+#### OiResponsiveShell
+**Tags:** `responsive`, `shell`, `navigation`, `layout`, `adaptive`
 **Tier:** Composite
 
-Full-page error display for HTTP error states. Shows error code, title, description, optional illustration, and action button. Three factory constructors for common HTTP errors.
+Responsive navigation shell that auto-switches between `OiBottomBar` (mobile) and `OiNavigationRail` (tablet/desktop) based on breakpoints.
 
-**Props:**
-- `title` (String, required) — error title
-- `label` (String, required) — accessibility label
-- `description` (String?) — descriptive text
-- `errorCode` (String?) — error code display (e.g. "404")
-- `illustration` (Widget?) — custom illustration widget
-- `icon` (IconData?) — icon shown when no illustration
-- `actionLabel` (String?) — action button label
-- `onAction` (VoidCallback?) — action button callback
+**Key Parameters:**
+- `items` (List<OiNavigationItem>, required) — Navigation destinations
+- `currentIndex` (int, required)
+- `onTap` (ValueChanged<int>, required)
+- `body` (Widget, required) — Main content
+- `railLeading` (Widget?) — Leading widget for rail mode (e.g., logo)
+- `railTrailing` (Widget?) — Trailing widget for rail mode (e.g., settings)
+- `floatingAction` (Widget?) — FAB passed to bottom bar
+- `breakpoints` (OiResponsiveShellBreakpoints?) — Custom breakpoints (default: rail at 600, expanded at 1200)
 
-**Named Constructors:**
-- `OiErrorPage.notFound(label:, onAction:, actionLabel:)` — 404 page with "Page Not Found" defaults
-- `OiErrorPage.forbidden(label:, onAction:, actionLabel:)` — 403 page with "Access Denied" defaults
-- `OiErrorPage.serverError(label:, onAction:, actionLabel:)` — 500 page with "Server Error" defaults
-
-**Composition:** OiPage, OiColumn, OiLabel, OiIcon, OiButton.primary.
-
-**Behavior:**
-- Error code displayed in large display text
-- Title and description centered below
-- Action button centered at bottom (e.g. "Go Home", "Try Again")
-- Content vertically centered on page
-
-**Use When:** Router error pages, unauthorized access, server errors.
-**Combine With:** Router configuration, `OiAppShell`
+**Use When:** Apps that need adaptive navigation across mobile, tablet, and desktop.
+**Avoid When:** Mobile-only apps — use `OiBottomBar`. Desktop-only — use `OiSidebar`. Admin apps — use `OiAppShell`.
+**Combine With:** `OiNavigationItem`, `OiPage`, `GoRouter` shell routes
 
 ---
 
@@ -3910,7 +3828,7 @@ Complete file manager with sidebar, list/grid views, drag-drop, upload.
 - `allowedUploadExtensions` (List<String>?)
 - `maxUploadFileSize` (int?)
 
-**Theme:** `context.components.fileExplorer` → `OiFileExplorerThemeData`
+**Theme:** `context.components.fileExplorer` -> `OiFileExplorerThemeData`
 
 **Use When:** File management, document libraries, media libraries.
 
@@ -3977,205 +3895,190 @@ Permission matrix editor (roles vs resources).
 
 ---
 
-#### OiCheckout
-**Tags:** `checkout`, `shop`, `e-commerce`, `wizard`, `payment`, `shipping`, `address`, `order`, `module`
-**Tier:** Module
-
-Multi-step checkout flow orchestrating address entry, shipping selection, payment selection, and order review. Responsive layout with side-by-side summary on desktop.
-
-**Key Parameters:**
-- `items` (List<OiCartItem>, required) — cart items
-- `summary` (OiCartSummary, required) — order summary data
-- `label` (String, required) — accessibility label
-- `steps` (List<OiCheckoutStep>, default [address, shipping, payment, review]) — checkout steps
-- `onShippingAddressChange` (ValueChanged<OiAddressData>?) — shipping address callback
-- `onBillingAddressChange` (ValueChanged<OiAddressData>?) — billing address callback
-- `onShippingMethodChange` (ValueChanged<OiShippingMethod>?) — shipping method callback
-- `onPaymentMethodChange` (ValueChanged<OiPaymentMethod>?) — payment method callback
-- `onPlaceOrder` (VoidCallback?) — place order callback
-- `onCancel` (VoidCallback?) — cancel callback
-- `initialShippingAddress` (OiAddressData?) — pre-filled shipping address
-- `initialBillingAddress` (OiAddressData?) — pre-filled billing address
-- `shippingMethods` (List<OiShippingMethod>?) — available shipping methods
-- `paymentMethods` (List<OiPaymentMethod>?) — available payment methods
-- `countries` (List<String>?) — country list for address dropdown
-- `showSummary` (bool, default true) — show order summary sidebar
-- `sameBillingDefault` (bool, default true) — "same as shipping" checkbox default
-- `currencyCode` (String, default 'USD') — ISO 4217 currency code
-- `placeOrderLabel` (String?) — custom place order button text
-
-**Companion: `OiCheckoutStep` enum** — `address`, `shipping`, `payment`, `review`
-
-**Composition:** OiStepper, OiOrderSummary, OiButton, OiCheckbox, OiSelect, OiTextInput, OiAccordion, OiShippingOption, OiPaymentOption.
-
-**Behavior:**
-- Steps are navigated via OiStepper with validation per step
-- Address step: shipping address form with optional separate billing address
-- Shipping step: list of OiShippingOption radio cards
-- Payment step: list of OiPaymentOption radio cards
-- Review step: read-only summary of all selections
-- Desktop: 2-column layout (form + summary sidebar)
-- Mobile: single-column with summary below
-
-**Use When:** E-commerce checkout flow.
-**Combine With:** `OiCartPanel`, `OiOrderSummary`
+### MODULES — Full Features (Admin)
 
 ---
 
-#### OiShopProductDetail
-**Tags:** `product`, `detail`, `shop`, `e-commerce`, `gallery`, `variants`, `module`
+#### [ADMIN] OiAppShell
+**Tags:** `app`, `shell`, `layout`, `admin`, `sidebar`, `header`, `scaffold`
 **Tier:** Module
 
-Complete product detail page with gallery, variant selectors, quantity, pricing, and tabbed content sections.
+Master layout scaffold for admin apps. Sidebar + top bar + breadcrumbs + content.
 
 **Key Parameters:**
-- `product` (OiProductData, required) — product data
-- `label` (String, required) — accessibility label
-- `onAddToCart` (VoidCallback?) — add-to-cart callback
-- `onVariantChange` (ValueChanged<OiProductVariant>?) — variant selection callback
-- `onQuantityChange` (ValueChanged<int>?) — quantity change callback
-- `onWishlist` (VoidCallback?) — wishlist toggle callback
-- `selectedVariant` (OiProductVariant?) — currently selected variant
-- `quantity` (int, default 1) — current quantity
-- `description` (Widget?) — description tab content
-- `reviews` (Widget?) — reviews tab content
-- `specifications` (Widget?) — specifications tab content
-- `related` (Widget?) — related products section
-
-**Composition:** OiProductGallery, OiLabel, OiPriceTag, OiStockBadge, OiStarRating, OiQuantitySelector, OiWishlistButton, OiButton.primary, OiTabs, OiSelect, OiBadge.
+- `child` (Widget, required) — Main content
+- `label` (String, required)
+- `navigation` (List<OiNavItem>, required) — Each has `label`, `icon`, `route`, `children`, `badge`, `section`
+- `leading` (Widget?) — Logo area
+- `title` (Widget?) — Page title
+- `actions` (List<Widget>?) — Top bar right side
+- `userMenu` (Widget?) — OiUserMenu
+- `sidebarCollapsible` (bool, default: true)
+- `sidebarDefaultCollapsed` (bool, default: false)
+- `sidebarWidth` / `sidebarCollapsedWidth` (double)
+- `breadcrumbs` (List<OiBreadcrumbItem>?)
+- `showBreadcrumbs` (bool, default: true)
+- `mobileBreakpoint` (OiBreakpoint, default: medium)
 
 **Behavior:**
-- Desktop: side-by-side layout (gallery left, info right)
-- Mobile: stacked layout (gallery on top, info below)
-- Gallery with thumbnail strip for product images
-- Variant selectors as dropdowns when variants available
-- Add-to-cart disabled when out of stock
-- Tabbed content for description/specifications/reviews
-- Related products shown as horizontal scroll section
+- Desktop: sidebar + top bar + content
+- Mobile: drawer + hamburger + content
+- Sidebar collapse animates width
 
-**Use When:** Product detail pages in e-commerce applications.
-**Combine With:** `OiProductCard`, `OiCartPanel`
+**Use When:** Any admin panel or dashboard app.
+**Combine With:** OiUserMenu, OiThemeToggle, OiLocaleSwitcher, OiBreadcrumbs
 
 ---
 
-#### OiAuthPage
-**Tags:** `auth`, `authentication`, `login`, `register`, `signup`, `forgot-password`, `module`
+#### [ADMIN] OiResourcePage
+**Tags:** `resource`, `crud`, `admin`, `list`, `show`, `edit`, `create`, `scaffold`
 **Tier:** Module
 
-Full-page authentication module with login, register, and forgot-password flows. Centered form layout with optional logo and footer.
+CRUD page scaffold. Title + action buttons + content area + optional filters/pagination.
 
 **Key Parameters:**
-- `label` (String, required) — accessibility label
-- `initialMode` (OiAuthMode, default login) — starting auth mode
-- `onModeChanged` (ValueChanged<OiAuthMode>?) — mode switch callback
-- `onLogin` (Future<bool> Function(String email, String password)?) — login callback
-- `onRegister` (Future<bool> Function(String name, String email, String password)?) — register callback
-- `onForgotPassword` (Future<bool> Function(String email)?) — forgot password callback
-- `logo` (Widget?) — logo widget above form
-- `footer` (Widget?) — footer widget below form
+- `title` (String, required)
+- `label` (String, required)
+- `child` (Widget, required)
+- `variant` (OiResourcePageVariant, default: list) — list/show/edit/create
+- `actions` (List<Widget>?)
+- `filters` (Widget?) — Filter bar (list variant)
+- `pagination` (Widget?) — Bottom pagination (list variant)
+- `breadcrumbs` (List<OiBreadcrumbItem>?)
+- `wrapInCard` (bool, default: true)
 
-**Named Constructors:**
-- `OiAuthPage.login(label:, onLogin:, ...)` — Pre-configured for login mode
-- `OiAuthPage.register(label:, onRegister:, ...)` — Pre-configured for register mode
+**Variant defaults:**
+- list: CreateButton in actions, filters + pagination slots
+- show: EditButton + DeleteButton in actions
+- edit: SaveButton + CancelButton in actions
+- create: SaveButton + CancelButton in actions
 
-**Companion: `OiAuthMode` enum** — `login`, `register`, `forgotPassword`
-
-**Composition:** OiPage, OiColumn, OiCard, OiTextInput, OiButton.primary, OiLabel.link.
-
-**Behavior:**
-- Centered form card (max 400dp wide)
-- Login: email + password fields with "Forgot Password?" link
-- Register: name + email + password fields
-- Forgot Password: email field with "Back to login" link
-- Mode switching links at bottom of form
-- Error display inline when callbacks return false
-- Loading state on submit button during async callbacks
-
-**Use When:** Authentication pages for web/mobile apps.
-**Combine With:** `OiAppShell`, router configuration
+**Use When:** Admin CRUD pages.
+**Combine With:** OiAppShell, OiTable, OiDetailView, OiForm
 
 ---
 
-#### OiAppShell
-**Tags:** `app-shell`, `layout`, `scaffold`, `sidebar`, `admin`, `navigation`, `module`
+#### [ADMIN] OiAuthPage
+**Tags:** `auth`, `login`, `register`, `signup`, `password`, `authentication`
 **Tier:** Module
 
-Master layout scaffold for admin/dashboard applications with sidebar navigation, top bar, and content area. Supports responsive collapse and settings persistence.
+Pre-built authentication page layouts.
 
-**Key Parameters:**
-- `child` (Widget, required) — main content area
-- `label` (String, required) — accessibility label
-- `navigation` (List<OiNavItem>, required) — sidebar navigation items
-- `leading` (Widget?) — sidebar header widget (logo/brand)
-- `title` (Widget?) — top bar title
-- `actions` (List<Widget>?) — top bar action widgets
-- `userMenu` (Widget?) — user menu widget in top bar
-- `sidebarCollapsible` (bool, default true) — allow sidebar collapse
-- `sidebarDefaultCollapsed` (bool, default false) — initial sidebar state
-- `sidebarWidth` (double, default 256) — expanded sidebar width
-- `sidebarCollapsedWidth` (double, default 64) — collapsed sidebar width
-- `breadcrumbs` (List<OiBreadcrumbItem>?) — breadcrumb items
-- `showBreadcrumbs` (bool, default true) — show breadcrumb trail
-- `mobileBreakpoint` (OiBreakpoint, default medium) — breakpoint for mobile layout
-- `currentRoute` (String?) — current route for nav highlighting
-- `onNavigate` (ValueChanged<String>?) — navigation callback
-- `settingsDriver` / `settingsKey` / `settingsNamespace` — persistence params
+**Factory Constructors:**
+- `.login(label:, onLogin:, logo:, title:, subtitle:, showRememberMe:, showForgotPassword:, onForgotPassword:, onRegister:, socialLogins:, footer:)`
+- `.register(label:, onRegister:, logo:, title:, onLogin:, socialLogins:, extraFields:, terms:)`
+- `.forgotPassword(label:, onSubmit:, logo:, onBackToLogin:)`
+- `.resetPassword(label:, onSubmit:, logo:, onBackToLogin:)`
 
-**Companion: `OiNavItem`** — `label` (String), `icon` (IconData), `route` (String?), `children` (List<OiNavItem>?), `badge` (String?), `dividerBefore` (bool), `section` (String?)
+**OiSocialLogin:** `label`, `icon`, `onTap`
 
-**Composition:** OiSidebar, OiBreadcrumbs, OiDrawer, OiIconButton, OiLabel, OiDivider.
-
-**Behavior:**
-- Desktop: sidebar (collapsible) + top bar + content area
-- Mobile: hamburger menu → drawer with navigation
-- Sidebar collapse state persisted via OiSettingsMixin
-- Active nav item highlighted based on currentRoute
-- Nested nav items support expand/collapse
-- Section headers group navigation items
-
-**Use When:** Admin panels, dashboard apps, internal tools.
-**Combine With:** `OiResourcePage`, `OiDashboard`, `OiBreadcrumbs`
+**Use When:** Any app with authentication.
 
 ---
 
-#### OiResourcePage
-**Tags:** `resource`, `crud`, `scaffold`, `list`, `show`, `edit`, `create`, `admin`, `module`
+### MODULES — Full Features (Shop)
+
+---
+
+#### [SHOP] OiCheckout
+**Tags:** `checkout`, `payment`, `order`, `wizard`, `shop`, `e-commerce`
 **Tier:** Module
 
-Generic CRUD page scaffold providing consistent layout for list, show, edit, and create views with title area, action bar, content, and optional pagination/filters.
+Complete multi-step checkout flow (address -> shipping -> payment -> review).
 
 **Key Parameters:**
-- `child` (Widget, required) — main content widget
-- `label` (String, required) — accessibility label
-- `title` (String?) — page title
-- `variant` (OiResourcePageVariant, default list) — page variant
-- `actions` (List<Widget>?) — custom action buttons
-- `filters` (Widget?) — filter bar widget
-- `pagination` (Widget?) — pagination widget
-- `breadcrumbs` (List<OiBreadcrumbItem>?) — breadcrumb items
-- `wrapInCard` (bool, default true) — wrap content in OiCard
-- `onAction` (OiResourceAction?) — default action callback (receives action name string)
+- `items` (List<OiCartItem>, required)
+- `summary` (OiCartSummary, required)
+- `label` (String, required)
+- `steps` (List<OiCheckoutStep>, default: [address, shipping, payment, review])
+- `onShippingAddressChange` / `onBillingAddressChange` (ValueChanged<OiAddressData>?)
+- `onShippingMethodChange` (ValueChanged<OiShippingMethod>?)
+- `onPaymentMethodChange` (ValueChanged<OiPaymentMethod>?)
+- `onPlaceOrder` (Future<OiOrderData> Function(OiCheckoutData)?)
+- `onCancel` (VoidCallback?)
+- `initialShippingAddress` / `initialBillingAddress` (OiAddressData?)
+- `shippingMethods` (List<OiShippingMethod>?)
+- `paymentMethods` (List<OiPaymentMethod>?)
+- `countries` (List<OiCountryOption>?)
+- `showSummary` (bool, default: true) — Persistent right column on desktop
+- `sameBillingDefault` (bool, default: true)
+- `currencyCode` (String, default: 'EUR')
+- `placeOrderLabel` (String, default: 'Place Order')
 
-**Companion: `OiResourcePageVariant` enum** — `list`, `show`, `edit`, `create`
+**Layout:**
+- Desktop: two columns — wizard left, summary right
+- Mobile: single column — collapsible summary + wizard
 
-**Companion: `OiResourceAction` typedef** — `void Function(String action)`
+**Use When:** E-commerce checkout.
+**Combine With:** OiCartPanel (before), OiOrderTracker (after)
 
-**Composition:** OiPage, OiColumn, OiRow, OiCard, OiButton, OiBreadcrumbs, OiLabel.
+---
 
-**Behavior:**
-- List variant: shows "Create" button in actions
-- Show variant: shows "Edit" and "Delete" buttons
-- Edit/Create variant: shows "Save" and "Cancel" buttons
-- Default action buttons trigger onAction with action name ('create', 'edit', 'delete', 'save', 'cancel')
-- Custom actions replace default buttons when provided
-- Content wrapped in OiCard by default (configurable)
+#### [SHOP] OiShopProductDetail
+**Tags:** `product`, `detail`, `shop`, `e-commerce`, `gallery`, `variants`
+**Tier:** Module
 
-**Use When:** CRUD pages in admin applications.
-**Combine With:** `OiAppShell`, `OiTable`, `OiForm`, `OiDetailView`
+Complete product detail page.
+
+**Key Parameters:**
+- `product` (OiProductData, required)
+- `label` (String, required)
+- `onAddToCart` (VoidCallback?)
+- `onVariantChange` (ValueChanged<OiProductVariant>?)
+- `onQuantityChange` (ValueChanged<int>?)
+- `onWishlist` (VoidCallback?)
+- `selectedVariant` (OiProductVariant?)
+- `quantity` (int, default: 1)
+- `description` (Widget?) — Rich description
+- `reviews` (Widget?) — Reviews tab content
+- `specifications` (Widget?) — Specs tab content
+- `related` (List<OiProductData>?) — Related products grid
+
+**Use When:** Product detail pages in e-commerce.
+**Combine With:** OiProductGallery, OiPriceTag, OiQuantitySelector
 
 ---
 
 ## Models
+
+### OiNavigationItem
+**Tags:** `navigation`, `item`, `destination`, `model`, `rail`, `bottom-bar`
+
+Shared navigation destination model for `OiNavigationRail`, `OiBottomBar`, and `OiResponsiveShell`.
+
+**Fields:** `icon` (IconData, required), `label` (String, required), `activeIcon` (IconData?), `badge` (Widget?), `tooltip` (String?), `semanticLabel` (String?)
+
+**Factory Constructors:**
+- `.fromLegacy(icon:, label:, badgeCount:, showBadge:)` — Converts from old `OiBottomBarItem`
+
+---
+
+### OiRailLabelBehavior (Enum)
+**Tags:** `navigation`, `rail`, `label`, `enum`
+
+Controls label visibility on `OiNavigationRail`.
+
+**Values:** `all`, `selected`, `none`
+
+---
+
+### OiSnackBarPosition (Enum)
+**Tags:** `snackbar`, `position`, `enum`
+
+Position for `OiSnackBar` display.
+
+**Values:** `bottom`, `top`
+
+---
+
+### OiResponsiveShellBreakpoints
+**Tags:** `responsive`, `breakpoint`, `shell`, `config`
+
+Breakpoint configuration for `OiResponsiveShell`.
+
+**Fields:** `rail` (double, default: 600) — Width at which to switch from bottom bar to rail, `expanded` (double, default: 1200) — Width at which to show expanded rail
+
+---
 
 ### OiFieldType (Enum)
 **Tags:** `field`, `type`, `form`, `display`, `enum`
@@ -4187,23 +4090,23 @@ Controls how forms render inputs and how `OiFieldDisplay` formats values.
 ### OiProductData
 **Tags:** `product`, `shop`, `e-commerce`, `catalog`, `item`
 
-**Fields:** `key` (String), `name` (String), `price` (double), `description` (String?), `compareAtPrice` (double?), `currencyCode` (String, default: 'USD'), `imageUrl` (String?), `imageUrls` (List<String>), `variants` (List<OiProductVariant>, default: []), `attributes` (Map<String, String>, default: {}), `inStock` (bool), `stockCount` (int?), `rating` (double?), `reviewCount` (int?), `tags` (List<String>), `sku` (String?)
+**Fields:** `key` (Object), `name` (String), `price` (double), `description` (String?), `compareAtPrice` (double?), `currencyCode` (String, default: 'USD'), `imageUrl` (String?), `imageUrls` (List<String>), `variants` (List<OiProductVariant>), `attributes` (Map<String, String>), `inStock` (bool), `stockCount` (int?), `rating` (double?), `reviewCount` (int?), `tags` (List<String>), `sku` (String?)
 
 ### OiProductVariant
 **Tags:** `variant`, `option`, `sku`, `shop`
 
-**Fields:** `key` (String), `label` (String), `price` (double?), `imageUrl` (String?), `inStock` (bool), `stockCount` (int?), `attributes` (Map<String, String>)
+**Fields:** `key` (Object), `label` (String), `price` (double?), `imageUrl` (String?), `inStock` (bool), `stockCount` (int?), `attributes` (Map<String, String>)
 
 ### OiCartItem
 **Tags:** `cart`, `shopping`, `line-item`, `order`
 
-**Fields:** `productKey` (String), `variantKey` (String?), `name` (String), `variantLabel` (String?), `unitPrice` (double), `quantity` (int, default: 1), `imageUrl` (String?), `maxQuantity` (int?), `attributes` (Map<String, String>?)
-**Computed:** `totalPrice` (double) — `unitPrice * quantity`
+**Fields:** `productKey` (Object), `variantKey` (Object?), `name` (String), `variantLabel` (String?), `unitPrice` (double), `quantity` (int, default: 1), `imageUrl` (String?), `maxQuantity` (int?), `attributes` (Map<String, String>)
+**Computed:** `lineTotal` (double) — `unitPrice * quantity`
 
 ### OiCartSummary
 **Tags:** `cart`, `total`, `summary`, `checkout`
 
-**Fields:** `subtotal` (double, required), `discount` (double?), `discountLabel` (String?, e.g. "SUMMER20 (-20%)"), `shipping` (double?), `shippingLabel` (String?, e.g. "Express Shipping"), `tax` (double?), `taxLabel` (String?, e.g. "VAT 20%"), `total` (double, required), `currencyCode` (String, default: 'USD')
+**Fields:** `subtotal` (double, default: 0), `discount` (double, default: 0), `discountLabel` (String?, e.g. "SUMMER20 (-20%)"), `shipping` (double, default: 0), `shippingLabel` (String?, e.g. "Express Shipping"), `tax` (double, default: 0), `taxLabel` (String?, e.g. "VAT 20%"), `total` (double, required), `currencyCode` (String, default: 'USD')
 
 ### OiFileNodeData
 **Tags:** `file`, `node`, `path`, `metadata`
@@ -4215,55 +4118,95 @@ Represents a file/folder node with path, name, size, dates, permissions.
 
 State management for OiFileExplorer.
 
-### OiAddressData
-**Tags:** `address`, `shipping`, `billing`, `shop`, `e-commerce`, `model`
-
-Immutable address model for shipping/billing addresses with completeness check.
-
-**Fields:** `firstName` (String?), `lastName` (String?), `company` (String?), `address1` (String?), `address2` (String?), `city` (String?), `state` (String?), `postalCode` (String?), `country` (String?), `phone` (String?), `email` (String?)
-**Computed:** `isComplete` (bool) — true when firstName, lastName, address1, city, postalCode, and country are all non-null and non-empty
-**Methods:** `copyWith(...)` with full nullable support
-
-### OiPaymentMethod
-**Tags:** `payment`, `method`, `shop`, `e-commerce`, `checkout`, `model`
-
-Payment method model for checkout flows.
-
-**Fields:** `key` (String), `label` (String), `description` (String?), `icon` (String?), `isDefault` (bool, default false)
-**Methods:** `copyWith(...)`
-
-### OiShippingMethod
-**Tags:** `shipping`, `method`, `delivery`, `shop`, `e-commerce`, `checkout`, `model`
-
-Shipping method model with price and estimated delivery info.
-
-**Fields:** `key` (String), `label` (String), `price` (double), `description` (String?), `estimatedDelivery` (String?), `currencyCode` (String, default 'USD')
-**Methods:** `copyWith(...)`
-
-### OiCouponResult
-**Tags:** `coupon`, `discount`, `promo`, `validation`, `shop`, `e-commerce`, `model`
-
-Coupon validation result returned from the apply callback.
-
-**Fields:** `valid` (bool), `message` (String?), `discountAmount` (double?)
-**Methods:** `copyWith(...)`
-
-### OiOrderData
-**Tags:** `order`, `checkout`, `shop`, `e-commerce`, `model`
-
-Complete order data aggregation combining all checkout selections.
-
-**Fields:** `shippingAddress` (OiAddressData), `shippingMethod` (OiShippingMethod), `paymentMethod` (OiPaymentMethod), `items` (List<OiCartItem>), `summary` (OiCartSummary), `billingAddress` (OiAddressData?)
-**Methods:** `copyWith(...)`
-
 ### Settings Models
 **Tags:** `settings`, `persistence`, `state`
 
-Persist widget state: `OiAccordionSettings`, `OiAppShellSettings`, `OiCalendarSettings`, `OiDashboardSettings`, `OiFileExplorerSettings`, `OiFilterBarSettings`, `OiGanttSettings`, `OiKanbanSettings`, `OiListViewSettings`, `OiSidebarSettings`, `OiSplitPaneSettings`, `OiTableSettings`, `OiTabsSettings`
+Persist widget state: `OiAccordionSettings`, `OiCalendarSettings`, `OiDashboardSettings`, `OiFileExplorerSettings`, `OiFilterBarSettings`, `OiGanttSettings`, `OiKanbanSettings`, `OiListViewSettings`, `OiSidebarSettings`, `OiSplitPaneSettings`, `OiTableSettings`, `OiTabsSettings`
 
-All settings models implement `OiSettingsData` with JSON serialization (`toJson`/`fromJson`). Key additions:
+---
 
-- **OiAppShellSettings** — Persists sidebar collapsed state (bool). Used by `OiAppShell`.
+### Models — Shop
+
+---
+
+#### [SHOP] OiShippingMethod
+**Tags:** `shipping`, `delivery`, `model`, `shop`
+
+**Fields:** `key` (Object), `label` (String), `description` (String?), `price` (double), `estimatedDelivery` (String?), `icon` (IconData?)
+
+---
+
+#### [SHOP] OiPaymentMethod
+**Tags:** `payment`, `credit-card`, `model`, `shop`
+
+**Fields:** `key` (Object), `label` (String), `icon` (IconData?), `lastFour` (String?), `expiryDate` (String?), `logo` (Widget?)
+
+---
+
+#### [SHOP] OiAddressData
+**Tags:** `address`, `location`, `model`, `shop`
+
+**Fields:** `firstName` (String?), `lastName` (String?), `company` (String?), `line1` (String), `line2` (String?), `city` (String), `state` (String?), `postalCode` (String), `country` (String), `phone` (String?)
+
+---
+
+#### [SHOP] OiOrderData
+**Tags:** `order`, `model`, `shop`
+
+**Fields:** `key` (Object), `orderNumber` (String), `createdAt` (DateTime), `status` (OiOrderStatus), `items` (List<OiCartItem>), `summary` (OiCartSummary), `shippingAddress` (OiAddressData?), `billingAddress` (OiAddressData?), `paymentMethod` (OiPaymentMethod?), `shippingMethod` (OiShippingMethod?), `timeline` (List<OiOrderEvent>?)
+
+---
+
+#### [SHOP] OiOrderEvent
+**Tags:** `order`, `event`, `timeline`, `model`, `shop`
+
+**Fields:** `timestamp` (DateTime), `title` (String), `description` (String?), `status` (OiOrderStatus)
+
+---
+
+#### [SHOP] OiOrderStatus (Enum)
+**Tags:** `order`, `status`, `enum`, `shop`
+
+**Values:** pending, confirmed, processing, shipped, delivered, cancelled, refunded
+
+---
+
+#### [SHOP] OiCouponResult
+**Tags:** `coupon`, `discount`, `result`, `shop`
+
+**Fields:** `valid` (bool), `message` (String?), `discountAmount` (double?)
+
+---
+
+#### [SHOP] OiCheckoutData
+**Tags:** `checkout`, `data`, `model`, `shop`
+
+**Fields:** `shippingAddress` (OiAddressData), `billingAddress` (OiAddressData), `shippingMethod` (OiShippingMethod), `paymentMethod` (OiPaymentMethod)
+
+---
+
+### Models — Admin
+
+---
+
+#### [ADMIN] OiSocialLogin
+**Tags:** `auth`, `social`, `login`, `model`
+
+**Fields:** `label` (String), `icon` (IconData), `onTap` (VoidCallback)
+
+---
+
+#### [ADMIN] OiCountryOption
+**Tags:** `country`, `locale`, `model`
+
+**Fields:** `code` (String), `name` (String), `states` (List<String>?)
+
+---
+
+#### [ADMIN] OiLocaleOption
+**Tags:** `locale`, `language`, `model`
+
+**Fields:** `locale` (Locale), `name` (String), `flagEmoji` (String?)
 
 ---
 
@@ -4327,18 +4270,23 @@ Spring physics calculations.
 
 ## Icons — OiIcons
 
-Static class with 150+ `IconData` constants organized by category:
+Static class with 1,950+ `IconData` constants backed by [Lucide](https://lucide.dev) v0.577.0, organized by category:
 
-- **Navigation:** `chevronLeft`, `chevronRight`, `navigateNext`, `expandMore`, `expandLess`, `arrowDropDown`, `arrowUpward`
-- **Actions:** `add`, `edit`, `delete`, `close`, `check`, `search`, `download`, `cloudUpload`, `playArrow`, `reply`
-- **Clipboard:** `contentCopy`, `contentPaste`, `attachFile`
-- **Files:** `folder`, `folderOpen`, `createNewFolder`, `insertDriveFile`, `description`
-- **File Types:** `image`, `videoFile`, `audioFile`, `pictureAsPdf`, `tableChart`, `code`, `dataObject`
-- **Layout:** `viewList`, `viewModule`, `viewAgenda`, `splitscreen`, `dashboardCustomize`
-- **Media:** `playArrow`, `pause`, `fullscreen`, `volumeUp`
-- **And more...**
+- **Arrows & Navigation:** `chevronLeft`, `chevronRight`, `chevronUp`, `chevronDown`, `chevronsLeft`, `chevronsRight`, `arrowLeft`, `arrowRight`, `arrowUp`, `arrowDown`, `undo2`, `redo2`, `trendingUp`, `externalLink`
+- **Actions:** `plus`, `minus`, `x`, `check`, `search`, `download`, `upload`, `copy`, `send`, `share2`, `trash2`, `squarePen`
+- **Files & Folders:** `file`, `fileText`, `filePlus`, `fileCheck`, `fileSearch`, `folder`, `folderOpen`, `folderPlus`, `archive`, `clipboardList`
+- **Media & Communication:** `image`, `video`, `music`, `play`, `circlePlay`, `volume2`, `mail`, `messageSquare`, `messagesSquare`, `phone`, `bell`
+- **Users & People:** `user`, `users`, `userPlus`, `circleUser`
+- **Status & Feedback:** `circleCheck`, `circleAlert`, `triangleAlert`, `info`, `circleHelp`, `ban`
+- **Layout:** `menu`, `layoutGrid`, `columns3`, `table`, `list`, `alignJustify`, `slidersHorizontal`
+- **Data & Charts:** `barChart3`, `pieChart`, `trendingUp`, `presentation`
+- **Devices & Hardware:** `monitor`, `server`, `database`, `cpu`, `lock`
+- **Tools & Utilities:** `settings`, `search`, `clock`, `calendar`, `calendarDays`, `paperclip`, `link`, `scissors`
+- **Appearance:** `sun`, `moon`, `eye`, `eyeOff`, `sparkles`, `paintbrush`, `palette`
+- **Shapes:** `star`, `heart`, `flag`, `house`, `mapPin`, `shoppingCart`, `creditCard`, `tag`, `rocket`, `zap`
+- **And 1,500+ more...** — browse all at [lucide.dev](https://lucide.dev)
 
-Always use `OiIcons.x` instead of `Icons.x` from Material.
+Always use `OiIcons.xxx` instead of `Icons.xxx` from Material.
 
 ---
 
@@ -4360,17 +4308,21 @@ Use this table to pick the right widget for your use case.
 | **Text input** | `OiTextInput` | `TextField` |
 | **Number input** | `OiNumberInput` | `TextField` with formatter |
 | **Date input** | `OiDateInput` | `showDatePicker` |
+| **Date+time input** | `OiDateTimeInput` | OiDateInput + OiTimeInput separately |
 | **Dropdown** | `OiSelect` (small lists) / `OiComboBox` (large/async) | `DropdownButton` |
 | **Checkbox** | `OiCheckbox` | `Checkbox` |
 | **Switch** | `OiSwitch` | `Switch` |
 | **Radio** | `OiRadio` | `Radio` |
 | **Slider** | `OiSlider` | `Slider` |
+| **Repeatable fields** | `OiArrayInput` | Custom dynamic form rows |
 | **Card** | `OiCard` | `Card` |
 | **List item** | `OiListTile` | `ListTile` |
 | **Dialog** | `OiDialog.show()` | `showDialog()` |
 | **Toast** | `OiToast.show()` | `ScaffoldMessenger` / `SnackBar` |
 | **Bottom sheet** | `OiSheet.show()` | `showModalBottomSheet()` |
-| **Navigation bar** | `OiBottomBar` (mobile) / `OiSidebar` (desktop) | `BottomNavigationBar` |
+| **Navigation bar** | `OiBottomBar` (mobile) / `OiNavigationRail` (tablet) / `OiSidebar` (desktop) | `BottomNavigationBar` |
+| **Responsive nav shell** | `OiResponsiveShell` | Custom adaptive layout |
+| **Vertical nav rail** | `OiNavigationRail` | Custom icon column |
 | **Tabs** | `OiTabs` | `TabBar` |
 | **Drawer** | `OiDrawer` | `Drawer` |
 | **Progress** | `OiProgress` | `CircularProgressIndicator` |
@@ -4408,35 +4360,58 @@ Use this table to pick the right widget for your use case.
 | **Markdown** | `OiMarkdown` | flutter_markdown directly |
 | **User avatar** | `OiAvatar` | `CircleAvatar` |
 | **Status badge** | `OiBadge` | `Chip` |
-| **Shopping cart** | `OiCartPanel` (full) / `OiMiniCart` (compact) | Custom cart UI |
-| **Product card** | `OiProductCard` | Custom product display |
-| **Order summary** | `OiOrderSummary` | Custom totals layout |
-| **Checkout flow** | `OiCheckout` | Custom multi-step checkout |
-| **Product detail** | `OiShopProductDetail` | Custom product page |
-| **Auth page** | `OiAuthPage` | Custom login/register forms |
-| **Admin layout** | `OiAppShell` | Custom sidebar + content layout |
-| **CRUD page** | `OiResourcePage` | Custom list/edit scaffolds |
-| **Error page** | `OiErrorPage` | Custom 404/403/500 pages |
-| **Product filters** | `OiProductFilters` | Custom filter panel |
-| **Stock status** | `OiStockBadge` | Custom availability indicator |
-| **Wishlist toggle** | `OiWishlistButton` | Custom heart button |
-| **Bulk actions** | `OiBulkBar` | Custom selection toolbar |
-| **Pagination** | `OiPagination` | Custom page controls |
-| **Sort control** | `OiSortButton` | Custom sort dropdown |
-| **Export data** | `OiExportButton` | Custom export UI |
-| **Language switch** | `OiLocaleSwitcher` | Custom locale picker |
-| **Price display** | `OiPriceTag` | Custom formatted text |
-| **Quantity stepper** | `OiQuantitySelector` | Custom counter |
 | **Empty state** | `OiEmptyState` | Custom empty placeholder |
 | **Loading** | `OiShimmer` / `OiSkeletonGroup` / `OiProgress` | Custom loading |
 | **Copy text** | `OiCopyable` / `OiCopyButton` | Custom clipboard code |
 | **Inline edit** | `OiEditableText` / `OiEditableSelect` / etc. | Custom inline edit |
 | **Large list** | `OiVirtualList` (>100 items) | `ListView.builder` |
 | **Drag to reorder** | `OiReorderable` | `ReorderableListView` |
+| **Pull-to-refresh** | `OiRefreshIndicator` | `RefreshIndicator` |
+| **Scroll-to-top button** | `OiScrollToTop` | Custom FAB |
+| **Page dots** | `OiPageIndicator` | Custom dot row |
+| **Back button** | `OiBackButton` | Custom back icon |
+| **Snackbar feedback** | `OiSnackBar.show()` | `ScaffoldMessenger` |
+| **Sliver list** | `OiSliverList` | `SliverList` |
+| **Sliver grid** | `OiSliverGrid` | `SliverGrid` |
+| **Sticky scroll header** | `OiSliverHeader` | `SliverAppBar` |
+| **Custom dialog shell** | `OiDialogShell` | Custom overlay |
+| **Page transitions** | `OiPageRoute` / `OiTransitionPage` | `MaterialPageRoute` |
+| **OTP input** | `OiTextInput.otp()` | Custom pin boxes |
+| **Password input** | `OiTextInput.password()` | `TextField(obscure)` |
 | **Swipe actions** | `OiSwipeable` | `Dismissible` |
 | **Onboarding tour** | `OiTour` + `OiSpotlight` | Custom spotlight |
 | **Metrics/KPI** | `OiMetric` | Custom number display |
-| **User menu** | `OiAvatar` + `OiPopover` + `OiNavMenu` | Custom menu |
+| **User menu** | `OiUserMenu` | Custom avatar menu |
+| **Admin app layout** | `OiAppShell` | Custom sidebar + header |
+| **CRUD list page** | `OiResourcePage(variant: list)` | Custom page layout |
+| **CRUD detail page** | `OiResourcePage(variant: show)` + `OiDetailView` | Custom detail layout |
+| **CRUD edit page** | `OiResourcePage(variant: edit)` + `OiForm` | Custom form page |
+| **Login page** | `OiAuthPage.login()` | Custom login form |
+| **Register page** | `OiAuthPage.register()` | Custom register form |
+| **Error page** | `OiErrorPage.notFound()` / `.forbidden()` | Custom error layout |
+| **Standalone pagination** | `OiPagination` | Custom page buttons |
+| **Bulk actions** | `OiBulkBar` | Custom selection toolbar |
+| **Sort dropdown** | `OiSortButton` | Custom sort UI |
+| **Data export** | `OiExportButton` | Custom export logic |
+| **Theme toggle** | `OiThemeToggle` | Custom theme switch |
+| **User account menu** | `OiUserMenu` | Custom avatar menu |
+| **Language switcher** | `OiLocaleSwitcher` | Custom locale picker |
+| **Product card** | `OiProductCard` | Custom product display |
+| **Product detail page** | `OiShopProductDetail` | Custom product page |
+| **Shopping cart** | `OiCartPanel` | Custom cart UI |
+| **Mini cart preview** | `OiMiniCart` | Custom cart popover |
+| **Checkout flow** | `OiCheckout` | Custom checkout wizard |
+| **Price display** | `OiPriceTag` | OiLabel + manual formatting |
+| **Quantity selector** | `OiQuantitySelector` | OiNumberInput |
+| **Cart line item** | `OiCartItemRow` | Custom cart row |
+| **Order summary** | `OiOrderSummary` | Custom summary layout |
+| **Coupon input** | `OiCouponInput` | Custom code input |
+| **Address form** | `OiAddressForm` | Custom address fields |
+| **Shipping picker** | `OiShippingMethodPicker` | Custom radio list |
+| **Payment picker** | `OiPaymentMethodPicker` | Custom payment selector |
+| **Order status** | `OiOrderStatusBadge` | OiBadge with manual colors |
+| **Order tracking** | `OiOrderTracker` | OiStepper manually |
+| **Product gallery** | `OiProductGallery` | Custom image carousel |
 
 ---
 
@@ -4479,35 +4454,38 @@ Use this table to pick the right widget for your use case.
 
 ## Tags Index
 
-Searchable keyword → widget mapping for quick lookup.
+Searchable keyword -> widget mapping for quick lookup.
 
 | Tag | Widgets |
 |---|---|
 | `accordion` | OiAccordion |
 | `action` | OiButton, OiIconButton, OiContextMenu |
 | `activity` | OiActivityFeed, OiTimeline |
-| `address` | OiAddressData, OiAddressForm, OiCheckout |
-| `admin` | OiListView, OiDashboard, OiSidebar, OiFilterBar, OiAppShell, OiResourcePage |
-| `app-shell` | OiAppShell |
-| `auth` | OiAuthPage |
-| `authentication` | OiAuthPage |
+| `address` | OiAddressForm, OiAddressData |
+| `admin` | OiListView, OiDashboard, OiSidebar, OiFilterBar, OiAppShell, OiResourcePage, OiAuthPage |
 | `alert` | OiDialog.alert, OiToast |
-| `animation` | OiAnimatedList, OiMorph, OiPulse, OiShimmer, OiSpring, OiStagger |
+| `adaptive` | OiResponsiveShell |
+| `animation` | OiAnimatedList, OiMorph, OiPulse, OiShimmer, OiSpring, OiStagger, OiPageTransitionType |
 | `app` | OiApp |
+| `appbar` | OiSliverHeader |
+| `auth` | OiAuthPage, OiSocialLogin |
 | `avatar` | OiAvatar, OiAvatarStack |
+| `back` | OiBackButton |
 | `badge` | OiBadge, OiBottomBar |
+| `billing` | OiAddressForm, OiCheckout |
 | `board` | OiKanban |
 | `boolean` | OiCheckbox, OiSwitch, OiFieldDisplay(boolean) |
 | `breadcrumb` | OiBreadcrumbs, OiPathBar |
 | `bulk` | OiBulkBar |
-| `button` | OiButton, OiButtonGroup, OiIconButton, OiToggleButton, OiExportButton, OiSortButton |
+| `button` | OiButton, OiButtonGroup, OiIconButton, OiToggleButton |
 | `calendar` | OiCalendar, OiDatePicker, OiDateInput |
+| `carousel` | OiPageIndicator |
 | `card` | OiCard, OiDashboardCard, OiFileGridCard |
-| `cart` | OiCartItem, OiCartSummary, OiCartPanel, OiMiniCart, OiCartItemRow, OiCheckout |
-| `checkout` | OiCheckout, OiOrderSummary, OiCartPanel, OiPaymentOption, OiShippingOption, OiAddressForm, OiShippingMethodPicker, OiPaymentMethodPicker |
+| `cart` | OiCartItem, OiCartSummary, OiCartPanel, OiMiniCart, OiCartItemRow, OiQuantitySelector |
 | `chart` | OiFunnelChart, OiGauge, OiHeatmap, OiRadarChart, OiSankey, OiTreemap |
 | `chat` | OiChat, OiChatMessage, OiTypingIndicator |
 | `checkbox` | OiCheckbox |
+| `checkout` | OiCheckout, OiCheckoutData |
 | `clipboard` | OiCopyButton, OiCopyable, OiPasteZone |
 | `code` | OiCodeBlock, OiLabel.code, OiDiffView |
 | `collapse` | OiAccordion, OiCard(collapsible) |
@@ -4517,37 +4495,39 @@ Searchable keyword → widget mapping for quick lookup.
 | `command` | OiCommandBar |
 | `comment` | OiComments |
 | `confirm` | OiButton.confirm, OiDialog.confirm, OiDeleteDialog |
-| `container` | OiContainer, OiSurface, OiCard |
+| `container` | OiContainer, OiSurface, OiCard, OiDialogShell |
 | `context-menu` | OiContextMenu |
 | `copy` | OiCopyButton, OiCopyable, OiFieldDisplay(copyable) |
+| `coupon` | OiCouponInput, OiCouponResult |
 | `crud` | OiListView, OiForm, OiDetailView, OiResourcePage |
-| `coupon` | OiCouponInput, OiCouponResult, OiCartPanel |
 | `currency` | OiFieldDisplay(currency), OiNumberInput |
 | `dashboard` | OiDashboard, OiMetric |
 | `data` | OiTable, OiDetailView, OiListView, OiFieldDisplay |
 | `date` | OiDateInput, OiDatePicker, OiFieldDisplay(date) |
 | `delete` | OiDeleteDialog, OiButton.destructive |
+| `delivery` | OiShippingMethod, OiShippingMethodPicker |
 | `detail` | OiDetailView, OiFieldDisplay |
-| `dialog` | OiDialog, OiDeleteDialog, OiNameDialog, OiRenameDialog |
+| `destination` | OiNavigationItem |
+| `dialog` | OiDialog, OiDialogShell, OiDeleteDialog, OiNameDialog, OiRenameDialog |
+| `dots` | OiPageIndicator |
 | `diff` | OiDiffView |
 | `divider` | OiDivider |
 | `drag-and-drop` | OiDraggable, OiDropZone, OiReorderable, OiDragGhost |
 | `drawer` | OiDrawer |
 | `dropdown` | OiSelect, OiComboBox, OiButton.split |
+| `e-commerce` | OiCheckout, OiShopProductDetail, OiProductCard, OiPriceTag |
 | `editor` | OiRichEditor, OiSmartInput |
 | `email` | OiFieldDisplay(email), OiTextInput |
 | `emoji` | OiEmojiPicker, OiReactionBar |
-| `delivery` | OiShippingOption, OiShippingMethod, OiShippingMethodPicker |
-| `e-commerce` | OiPriceTag, OiQuantitySelector, OiProductCard, OiCartItemRow, OiCouponInput, OiOrderSummaryLine, OiCartPanel, OiMiniCart, OiOrderSummary, OiPaymentOption, OiShippingOption, OiStockBadge, OiWishlistButton, OiProductFilters, OiProductGallery, OiCheckout, OiShopProductDetail, OiAddressForm, OiShippingMethodPicker, OiPaymentMethodPicker, OiOrderStatusBadge, OiOrderTracker |
 | `empty` | OiEmptyState |
 | `error-page` | OiErrorPage |
 | `explorer` | OiFileExplorer |
-| `export` | OiExportButton, OiThemeExporter |
+| `export` | OiThemeExporter, OiExportButton |
 | `feed` | OiActivityFeed |
 | `feedback` | OiStarRating, OiScaleRating, OiThumbs, OiSentiment, OiReactionBar |
 | `field` | OiFieldDisplay, OiFormField, OiDetailField |
 | `file` | OiFileExplorer, OiFileInput, OiFileIcon, OiFileTile, OiFileGridCard |
-| `filter` | OiFilterBar, OiListView, OiTable, OiProductFilters |
+| `filter` | OiFilterBar, OiListView, OiTable |
 | `flow` | OiFlowGraph, OiStateDiagram |
 | `folder` | OiFolderIcon, OiFolderTreeItem, OiNewFolderDialog |
 | `form` | OiForm, OiFormField, OiFormSection, OiWizard |
@@ -4555,20 +4535,23 @@ Searchable keyword → widget mapping for quick lookup.
 | `gallery` | OiGallery, OiLightbox, OiProductGallery |
 | `gantt` | OiGantt |
 | `gauge` | OiGauge |
-| `gesture` | OiTappable, OiSwipeable, OiDoubleTap, OiLongPressMenu, OiPinchZoom |
+| `floating` | OiScrollToTop |
+| `gesture` | OiTappable, OiSwipeable, OiDoubleTap, OiLongPressMenu, OiPinchZoom, OiRefreshIndicator |
+| `go-router` | OiTransitionPage |
 | `graph` | OiFlowGraph |
 | `grid` | OiGrid, OiMasonry, OiVirtualGrid, OiFileGridView |
 | `group` | OiButtonGroup, OiAccordion, OiFormSection |
+| `header` | OiSliverHeader |
 | `heading` | OiLabel.h1, .h2, .h3, .h4 |
 | `heatmap` | OiHeatmap |
 | `hierarchy` | OiTree, OiFolderTreeItem, OiTreemap |
-| `i18n` | OiLocaleSwitcher |
+| `i18n` | OiLocaleSwitcher, OiLocaleOption |
 | `icon` | OiIcon, OiIconButton, OiFileIcon, OiFolderIcon |
 | `image` | OiImage, OiAvatar, OiGallery, OiLightbox, OiImageCropper, OiImageAnnotator |
-| `indicator` | OiProgress, OiLiveRing, OiPulse, OiStorageIndicator |
+| `indicator` | OiProgress, OiLiveRing, OiPulse, OiStorageIndicator, OiPageIndicator |
 | `inline-edit` | OiEditable, OiEditableText, OiEditableSelect, OiEditableDate, OiEditableNumber |
-| `input` | OiTextInput, OiNumberInput, OiDateInput, OiTimeInput, OiSelect, OiComboBox, OiCheckbox, OiSwitch, OiRadio, OiSlider, OiTagInput, OiColorInput, OiFileInput |
-| `inventory` | OiStockBadge |
+| `input` | OiTextInput, OiNumberInput, OiDateInput, OiTimeInput, OiDateTimeInput, OiSelect, OiComboBox, OiCheckbox, OiSwitch, OiRadio, OiSlider, OiTagInput, OiColorInput, OiFileInput, OiArrayInput |
+| `lazy` | OiSliverList, OiSliverGrid, OiVirtualList |
 | `kanban` | OiKanban |
 | `keyboard` | OiShortcutScope, OiShortcuts, OiCommandBar, OiFocusTrap |
 | `kpi` | OiMetric |
@@ -4577,63 +4560,78 @@ Searchable keyword → widget mapping for quick lookup.
 | `lightbox` | OiLightbox |
 | `list` | OiListView, OiListTile, OiVirtualList, OiAnimatedList |
 | `live` | OiLiveRing, OiCursorPresence, OiSelectionPresence |
-| `loading` | OiProgress, OiShimmer, OiSkeletonGroup, OiButton(loading) |
-| `locale` | OiLocaleSwitcher |
+| `loading` | OiProgress, OiShimmer, OiSkeletonGroup, OiButton(loading), OiRefreshIndicator |
 | `log` | OiActivityFeed, OiTimeline |
+| `login` | OiAuthPage.login |
 | `markdown` | OiMarkdown |
 | `media` | OiVideoPlayer, OiGallery, OiLightbox, OiImageCropper, OiImageAnnotator |
 | `menu` | OiNavMenu, OiContextMenu, OiBottomBar, OiSidebar |
 | `message` | OiChat, OiChatMessage, OiToast |
 | `metadata` | OiMetadataEditor, OiFileInfoDialog |
 | `metric` | OiMetric |
-| `modal` | OiDialog, OiFocusTrap |
-| `navigation` | OiSidebar, OiBottomBar, OiTabs, OiBreadcrumbs, OiDrawer, OiNavMenu |
+| `modal` | OiDialog, OiDialogShell, OiFocusTrap |
+| `navigation` | OiSidebar, OiBottomBar, OiNavigationRail, OiTabs, OiBreadcrumbs, OiDrawer, OiNavMenu, OiResponsiveShell, OiPageRoute, OiTransitionPage, OiBackButton, OiNavigationItem |
 | `notification` | OiNotificationCenter, OiToast |
 | `number` | OiNumberInput, OiFieldDisplay(number) |
 | `onboarding` | OiTour, OiSpotlight, OiWhatsNew |
-| `order` | OiCartItem, OiCartSummary, OiProductData, OiOrderSummary, OiOrderSummaryLine, OiOrderStatusBadge, OiOrderTracker |
-| `overlay` | OiDialog, OiToast, OiSheet, OiContextMenu, OiPopover, OiPanel |
-| `pagination` | OiPaginationController, OiPagination, OiTable, OiListView |
+| `order` | OiCartItem, OiCartSummary, OiProductData, OiOrderData, OiOrderEvent, OiOrderStatus, OiOrderStatusBadge, OiOrderSummary, OiOrderSummaryLine, OiOrderTracker |
+| `otp` | OiTextInput.otp |
+| `overlay` | OiDialog, OiDialogShell, OiToast, OiSnackBar, OiSheet, OiContextMenu, OiPopover, OiPanel |
+| `page` | OiPageRoute, OiTransitionPage, OiPageIndicator |
+| `pagination` | OiPaginationController, OiTable, OiListView, OiPagination, OiPageIndicator |
+| `password` | OiTextInput.password |
 | `panel` | OiPanel, OiResizable, OiSplitPane |
 | `path` | OiPathBar, OiBreadcrumbs |
-| `payment` | OiPaymentOption, OiPaymentMethod, OiPaymentMethodPicker |
+| `payment` | OiPaymentMethod, OiPaymentMethodPicker |
 | `permission` | OiPermissions |
 | `phone` | OiFieldDisplay(phone) |
-| `picker` | OiDatePicker, OiTimePicker, OiEmojiPicker, OiColorInput, OiShippingMethodPicker, OiPaymentMethodPicker |
+| `picker` | OiDatePicker, OiTimePicker, OiEmojiPicker, OiColorInput |
 | `pipeline` | OiPipeline |
+| `pinned` | OiSliverHeader |
 | `popover` | OiPopover |
+| `pull-to-refresh` | OiRefreshIndicator |
 | `presence` | OiAvatar(presence), OiCursorPresence, OiLiveRing |
-| `product` | OiProductData, OiProductVariant, OiProductCard, OiProductFilters, OiProductGallery, OiShopProductDetail |
+| `price` | OiPriceTag |
+| `product` | OiProductData, OiProductVariant, OiProductCard, OiProductGallery, OiShopProductDetail |
 | `progress` | OiProgress, OiStepper |
+| `quantity` | OiQuantitySelector |
 | `radar` | OiRadarChart |
+| `rail` | OiNavigationRail, OiRailLabelBehavior |
 | `radio` | OiRadio |
+| `refresh` | OiRefreshIndicator |
 | `rating` | OiStarRating, OiScaleRating |
 | `reaction` | OiReactionBar |
+| `register` | OiAuthPage.register |
 | `reorder` | OiReorderable, OiKanban |
-| `resource` | OiResourcePage |
 | `resize` | OiResizable, OiSplitPane |
-| `responsive` | OiResponsive, OiBreakpoint, OiGrid, OiPage |
+| `resource` | OiResourcePage |
+| `responsive` | OiResponsive, OiBreakpoint, OiGrid, OiPage, OiResponsiveShell, OiSliverGrid |
+| `route` | OiPageRoute, OiTransitionPage, OiPageTransitionType |
 | `rich-text` | OiRichEditor, OiMarkdown |
 | `row` | OiRow, OiListTile |
 | `sankey` | OiSankey |
 | `schedule` | OiCalendar, OiGantt, OiScheduler |
-| `scroll` | OiVirtualList, OiVirtualGrid, OiInfiniteScroll, OiScrollbar |
+| `scroll` | OiVirtualList, OiVirtualGrid, OiInfiniteScroll, OiScrollbar, OiSliverList, OiSliverGrid, OiSliverHeader, OiScrollToTop, OiRefreshIndicator |
+| `scroll-to-top` | OiScrollToTop |
+| `shell` | OiAppShell, OiResponsiveShell, OiDialogShell |
+| `sidebar-lite` | OiNavigationRail |
 | `search` | OiSearch, OiComboBox, OiCommandBar, OiFilterBar, OiTextInput.search |
 | `select` | OiSelect, OiComboBox, OiRadio |
 | `settings` | OiSettingsDriver, OiAccordionSettings, etc. |
 | `sheet` | OiSheet |
-| `shipping` | OiShippingOption, OiShippingMethod, OiShippingMethodPicker, OiAddressForm |
-| `shop` | OiPriceTag, OiQuantitySelector, OiProductData, OiCartItem, OiCartSummary, OiCartPanel, OiMiniCart, OiOrderSummary, OiCartItemRow, OiCouponInput, OiOrderSummaryLine, OiProductCard, OiPaymentOption, OiShippingOption, OiStockBadge, OiWishlistButton, OiProductFilters, OiProductGallery, OiCheckout, OiShopProductDetail, OiAddressForm, OiShippingMethodPicker, OiPaymentMethodPicker, OiOrderStatusBadge, OiOrderTracker |
+| `shipping` | OiShippingMethod, OiShippingMethodPicker |
+| `shop` | OiProductData, OiCartItem, OiCartSummary, OiPriceTag, OiQuantitySelector, OiProductCard, OiCartItemRow, OiOrderSummaryLine, OiCouponInput, OiAddressForm, OiShippingMethodPicker, OiPaymentMethodPicker, OiOrderStatusBadge, OiCartPanel, OiMiniCart, OiOrderSummary, OiProductGallery, OiOrderTracker, OiCheckout, OiShopProductDetail |
 | `sidebar` | OiSidebar, OiFileSidebar |
 | `skeleton` | OiSkeletonGroup, OiShimmer |
+| `sliver` | OiSliverList, OiSliverGrid, OiSliverHeader |
 | `slider` | OiSlider |
+| `snackbar` | OiSnackBar |
 | `social` | OiChat, OiComments, OiReactionBar, OiAvatarStack |
 | `sort` | OiTable, OiListView, OiFilterBar, OiSortButton |
 | `split` | OiSplitPane, OiButton.split |
 | `state-diagram` | OiStateDiagram |
-| `stepper` | OiStepper, OiWizard, OiOrderTracker |
-| `status` | OiOrderStatusBadge, OiStockBadge, OiBadge |
-| `stock` | OiStockBadge |
+| `stepper` | OiStepper, OiWizard |
+| `sticky` | OiSliverHeader |
 | `storage` | OiStorageIndicator, OiSettingsDriver |
 | `surface` | OiSurface |
 | `switch` | OiSwitch |
@@ -4641,31 +4639,29 @@ Searchable keyword → widget mapping for quick lookup.
 | `table` | OiTable, OiTableColumn, OiTableController |
 | `tag` | OiTagInput, OiBadge |
 | `text` | OiLabel, OiTextInput |
-| `theme` | OiThemeData, OiColorScheme, OiDynamicTheme, OiThemePreview |
-| `theme-toggle` | OiThemeToggle |
+| `theme` | OiThemeData, OiColorScheme, OiDynamicTheme, OiThemePreview, OiThemeToggle |
 | `thumbs` | OiThumbs |
 | `time` | OiTimeInput, OiTimePicker, OiRelativeTime |
-| `timeline` | OiTimeline, OiGantt, OiOrderTracker |
+| `timeline` | OiTimeline, OiGantt |
 | `toast` | OiToast |
 | `toggle` | OiToggleButton, OiSwitch, OiCheckbox |
-| `toolbar` | OiButtonGroup, OiFileToolbar |
+| `toolbar` | OiButtonGroup, OiFileToolbar, OiSliverHeader |
+| `transition` | OiPageRoute, OiTransitionPage, OiPageTransitionType |
 | `tooltip` | OiTooltip |
 | `tour` | OiTour, OiSpotlight |
-| `tracking` | OiOrderTracker, OiOrderStatusBadge |
+| `tracking` | OiOrderTracker |
 | `tree` | OiTree, OiFolderTreeItem, OiTreemap |
 | `treemap` | OiTreemap |
 | `typography` | OiLabel, OiTextTheme |
 | `upload` | OiUploadDialog, OiFileInput, OiFileExplorer |
 | `url` | OiFieldDisplay(url) |
 | `user` | OiAvatar, OiAvatarStack, OiUserMenu |
-| `user-menu` | OiUserMenu |
-| `validation` | OiForm, OiFormField |
+| `validation` | OiForm, OiFormField, OiTextInput |
 | `video` | OiVideoPlayer |
 | `virtual-scroll` | OiVirtualList, OiVirtualGrid |
 | `visibility` | OiVisibility |
 | `visualization` | OiFunnelChart, OiGauge, OiHeatmap, OiRadarChart, OiSankey, OiTreemap |
 | `wizard` | OiWizard, OiStepper |
-| `wishlist` | OiWishlistButton |
 | `workflow` | OiFlowGraph, OiPipeline, OiStateDiagram |
 
 ---
@@ -4690,12 +4686,6 @@ Searchable keyword → widget mapping for quick lookup.
 - **OiUnreadIndicator** — Unread message separator + count badge
 - **OiTimestamp** — Interactive timestamp with hover tooltip
 - **OiThread** — Thread/reply view within OiChat
-
-### Planned Shop/E-commerce Modules
-
-- **OiProductCatalog** — Product grid/list with filters and search
-- **OiOrderHistory** — Order list with status and dates
-- **OiOrderDetail** — Single order with items, timeline, invoice
 
 ---
 

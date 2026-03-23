@@ -145,7 +145,7 @@ class _FilesAppState extends State<FilesApp> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(OiIcons.photo, size: 48),
+            const Icon(OiIcons.image, size: 48),
             const SizedBox(height: 8),
             OiLabel.body('Image preview: ${file.name}'),
           ],
@@ -158,7 +158,7 @@ class _FilesAppState extends State<FilesApp> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(OiIcons.documentText, size: 48),
+            Icon(OiIcons.fileText, size: 48),
             SizedBox(height: 8),
             OiLabel.body('Markdown preview'),
           ],
@@ -233,7 +233,7 @@ class _FilesAppState extends State<FilesApp> {
       return [
         OiMenuItem(
           label: 'Annotate',
-          icon: OiIcons.pencilSquare,
+          icon: OiIcons.squarePen,
           onTap: () {
             OiToast.show(context, message: 'Annotate: ${file.name}');
           },

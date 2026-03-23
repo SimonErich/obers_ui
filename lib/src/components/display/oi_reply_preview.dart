@@ -109,7 +109,7 @@ class OiReplyPreview extends StatelessWidget {
               Padding(
                 padding: EdgeInsets.only(left: spacing.xs),
                 child: OiIconButton(
-                  icon: OiIcons.arrowUturnLeft,
+                  icon: OiIcons.undo2,
                   semanticLabel: 'Cancel reply',
                   onTap: onDismiss,
                   size: OiButtonSize.small,

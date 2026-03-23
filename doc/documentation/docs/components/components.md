@@ -12,6 +12,7 @@ Components are the standard UI widgets you'll use every day. They're built from 
 | `OiButtonGroup` | Multi-button toolbar |
 | `OiSortButton` | Dropdown button for sorting non-table lists (card grids, feeds) |
 | `OiExportButton` | Export data in various formats (CSV, XLSX, JSON, PDF) |
+| `OiBackButton` | RTL-aware back navigation button |
 
 ### OiButton
 
@@ -27,7 +28,7 @@ OiButton(label: 'Cancel', variant: OiButtonVariant.ghost, onPressed: () {})
 OiButton(label: 'Delete', variant: OiButtonVariant.destructive, onPressed: () {})
 
 // With icon
-OiButton(label: 'Download', leading: Icon(Icons.download), onPressed: () {})
+OiButton(label: 'Download', leading: OiIcon.decorative(icon: OiIcons.download), onPressed: () {})
 
 // Sizes
 OiButton(label: 'Small', size: OiButtonSize.small, onPressed: () {})
@@ -82,11 +83,37 @@ OiExportButton(
 )
 ```
 
+### OiBackButton
+
+A themed back-navigation button that renders a chevron-left icon, automatically flipping to chevron-right in RTL layouts. Typically used as the leading widget in `OiSliverHeader` or custom app bars.
+
+```dart
+OiBackButton(
+  onPressed: () => Navigator.of(context).pop(),
+)
+
+// Custom size and color
+OiBackButton(
+  onPressed: () => goBack(),
+  size: 20,
+  color: context.colors.primary.base,
+)
+```
+
+**Key features:**
+
+- RTL-aware — automatically mirrors the chevron direction
+- Configurable icon size and color
+- Built on `OiTappable` for consistent hover, focus, and press feedback
+- Semantic label defaults to "Go back"
+
+**Related components:** `OiSliverHeader`, `OiNavigationRail`, `OiBottomBar`
+
 ## Inputs
 
 | Widget | Description |
 |---|---|
-| `OiTextInput` | Text field with validation, prefix/suffix, counter |
+| `OiTextInput` | Text field with validation, prefix/suffix, counter, plus `.otp()`, `.password()`, `.multiline()` constructors |
 | `OiCheckbox` | Checkbox with label |
 | `OiRadio` | Radio button group |
 | `OiSwitch` | Toggle switch |
@@ -112,6 +139,46 @@ OiTextInput(
     return null;
   },
   onChanged: (value) => print(value),
+)
+```
+
+**Specialized constructors:**
+
+- `OiTextInput.password()` — Obscured input with visibility toggle
+- `OiTextInput.multiline()` — Multi-line text area with auto-growing height
+- `OiTextInput.otp()` — One-time-password / PIN entry with per-digit boxes
+
+```dart
+// Password input with visibility toggle
+OiTextInput.password(label: 'Password')
+
+// Multi-line text area
+OiTextInput.multiline(
+  label: 'Description',
+  minLines: 3,
+  maxLines: 8,
+)
+
+// OTP / verification code input
+OiTextInput.otp(
+  length: 6,
+  onCompleted: (code) => verifyCode(code),
+)
+```
+
+**Form validation integration:**
+
+OiTextInput integrates with `OiForm` via standard form field properties: `validator`, `autovalidateMode`, and `onSaved`. Additional properties include `textCapitalization`, `textAlign`, `showCounter`, `counterBuilder`, `onTap`, and `onTapOutside`.
+
+```dart
+OiTextInput(
+  label: 'Username',
+  validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+  autovalidateMode: AutovalidateMode.onUserInteraction,
+  onSaved: (value) => _username = value,
+  textCapitalization: TextCapitalization.none,
+  showCounter: true,
+  maxLength: 30,
 )
 ```
 
@@ -182,6 +249,9 @@ OiArrayInput<String>(
 | `OiTooltip` | Hover/focus tooltip |
 | `OiPagination` | Standalone pagination control with pages, compact, and load-more variants |
 | `OiFieldDisplay` | Universal read-only field renderer with 16 field types and pair layout |
+| `OiRefreshIndicator` | Pull-to-refresh wrapper for scrollable content |
+| `OiPageIndicator` | Dot indicators for paged content (carousels, onboarding) |
+| `OiScrollToTop` | Floating scroll-to-top button that appears on scroll |
 
 ### OiFieldDisplay
 
@@ -265,6 +335,104 @@ Column(
 )
 ```
 
+### OiRefreshIndicator
+
+A pull-to-refresh wrapper that shows a circular progress indicator when the user overscrolls at the top of a scrollable child. The indicator appears above the content, animating in as the user drags, then switches to an indeterminate spinner while the refresh is in progress.
+
+```dart
+OiRefreshIndicator(
+  onRefresh: () async {
+    await fetchLatestData();
+  },
+  child: ListView.builder(
+    itemCount: items.length,
+    itemBuilder: (context, index) => ItemTile(items[index]),
+  ),
+)
+```
+
+**Key features:**
+
+- Drag distance threshold before triggering (configurable via `triggerDistance`)
+- Themed colors — uses primary color for the spinner, surface for the background
+- Configurable displacement, edge offset, indicator size, and stroke width
+- Accessibility announcement on refresh start and completion
+- Respects `reducedMotion` setting
+
+**Related components:** `OiProgress`, `OiInfiniteScroll`, `OiVirtualList`
+
+### OiPageIndicator
+
+A row of dots indicating the current page in a paged view. Commonly used with carousels, onboarding flows, galleries, and any horizontally-paged content.
+
+```dart
+// Standard dot indicators
+OiPageIndicator(
+  count: 5,
+  current: _currentPage,
+)
+
+// Pill-shaped active indicator
+OiPageIndicator.pill(
+  count: 5,
+  current: _currentPage,
+)
+
+// Custom colors and sizing
+OiPageIndicator(
+  count: 3,
+  current: _currentPage,
+  activeColor: context.colors.primary.base,
+  color: context.colors.borderSubtle,
+  size: 10,
+  spacing: 12,
+)
+```
+
+**Key features:**
+
+- Two variants: circular dots (default) and pill-shaped active indicator
+- Animated transitions between active states
+- Configurable dot size, active size, spacing, and colors
+- Automatic accessibility label ("Page X of Y")
+
+**Related components:** `OiProductGallery`, `OiTabs`, `OiStepper`
+
+### OiScrollToTop
+
+A floating button that appears when the user scrolls past a configurable threshold and scrolls back to the top on tap. Wrap any scrollable widget and provide the same `ScrollController`.
+
+```dart
+final _scrollController = ScrollController();
+
+OiScrollToTop(
+  controller: _scrollController,
+  child: ListView.builder(
+    controller: _scrollController,
+    itemCount: items.length,
+    itemBuilder: (context, index) => ItemTile(items[index]),
+  ),
+)
+
+// Custom threshold and position
+OiScrollToTop(
+  controller: _scrollController,
+  threshold: 400,
+  alignment: Alignment.bottomLeft,
+  child: myScrollableWidget,
+)
+```
+
+**Key features:**
+
+- Fade-in/fade-out animation when crossing the scroll threshold
+- Default themed button (circular surface with chevron-up icon and shadow)
+- Customizable via the `button` property for a completely custom widget
+- Configurable alignment and padding within the stack
+- Smooth scroll-to-top animation on tap
+
+**Related components:** `OiVirtualList`, `OiInfiniteScroll`, `OiFloating`
+
 ### OiCard
 
 ```dart
@@ -283,10 +451,10 @@ OiCard(
 
 ```dart
 // Dot badge
-OiBadge.dot(child: OiIconButton(icon: Icons.mail, onPressed: () {}))
+OiBadge.dot(child: OiIconButton(icon: OiIcons.mail, onPressed: () {}))
 
 // Count badge
-OiBadge(count: 5, child: OiIconButton(icon: Icons.notifications, onPressed: () {}))
+OiBadge(count: 5, child: OiIconButton(icon: OiIcons.bell, onPressed: () {}))
 ```
 
 ## Navigation
@@ -304,6 +472,8 @@ OiBadge(count: 5, child: OiIconButton(icon: Icons.notifications, onPressed: () {
 | `OiThemeToggle` | Light/dark/system theme mode toggle |
 | `OiUserMenu` | Avatar-triggered dropdown with user info and actions |
 | `OiLocaleSwitcher` | Locale/language dropdown selector with optional flag emoji |
+| `OiNavigationRail` | Compact vertical navigation rail with icon+label items |
+| `OiSliverHeader` | Sticky sliver header with .simple, .large, .hero constructors |
 
 ### OiTabs
 
@@ -343,12 +513,95 @@ OiUserMenu(
   userEmail: 'jane@example.com',
   avatarInitials: 'JS',
   items: [
-    OiMenuItem(label: 'Profile', icon: OiIcons.person, onTap: () {}),
+    OiMenuItem(label: 'Profile', icon: OiIcons.user, onTap: () {}),
     OiMenuItem(label: 'Settings', icon: OiIcons.settings, onTap: () {}),
-    OiMenuItem(label: 'Logout', icon: OiIcons.logout, onTap: () {}),
+    OiMenuItem(label: 'Logout', icon: OiIcons.logOut, onTap: () {}),
   ],
 )
 ```
+
+### OiNavigationRail
+
+A compact vertical navigation rail for persistent top-level navigation. The rail renders a narrow vertical strip with icon + label items, typically placed along the leading edge of a layout on medium and larger breakpoints.
+
+```dart
+OiNavigationRail(
+  items: const [
+    OiNavigationItem(icon: OiIcons.house, label: 'Home'),
+    OiNavigationItem(icon: OiIcons.search, label: 'Search'),
+    OiNavigationItem(icon: OiIcons.user, label: 'Profile'),
+  ],
+  currentIndex: _selectedIndex,
+  onTap: (index) => setState(() => _selectedIndex = index),
+)
+
+// With leading logo and trailing settings
+OiNavigationRail(
+  items: navItems,
+  currentIndex: _selectedIndex,
+  onTap: (index) => setState(() => _selectedIndex = index),
+  leading: OiImage(src: 'assets/logo.svg', label: 'Logo'),
+  trailing: OiIconButton(icon: OiIcons.settings, onPressed: () {}),
+  labelBehavior: OiRailLabelBehavior.selected,
+)
+```
+
+**Key features:**
+
+- Three label behaviors: `all` (always visible), `selected` (active item only), `none` (icon-only)
+- Pill-shaped indicator behind the selected icon with animated transitions
+- Badge overlay support via `OiNavigationItem.badge`
+- Keyboard navigation with arrow keys and Enter/Space to activate
+- Configurable width, group alignment, background, border, and elevation
+- Tooltip support per item
+
+**Related components:** `OiBottomBar`, `OiResponsiveShell`, `OiSidebar`
+
+### OiSliverHeader
+
+A sticky sliver header with support for collapsing, flexible space, and snap-to-position behaviour. Wraps `SliverPersistentHeader` with a convenient API for common app-bar patterns inside a `CustomScrollView`.
+
+```dart
+// Simple pinned header
+CustomScrollView(
+  slivers: [
+    OiSliverHeader.simple(title: 'Messages'),
+    SliverList.builder(
+      delegate: SliverChildBuilderDelegate(
+        (context, index) => MessageTile(messages[index]),
+        childCount: messages.length,
+      ),
+    ),
+  ],
+)
+
+// Large collapsing header with back button
+OiSliverHeader.large(
+  title: 'Settings',
+  subtitle: 'Manage your preferences',
+  onBack: () => Navigator.of(context).pop(),
+  expandedHeight: 120,
+)
+
+// Hero header with flexible background
+OiSliverHeader.hero(
+  flexibleSpace: OiImage(src: coverUrl, label: 'Cover'),
+  title: OiLabel.body('Album Title'),
+  onBack: () => Navigator.of(context).pop(),
+  expandedHeight: 200,
+)
+```
+
+**Key features:**
+
+- Three convenience constructors: `.simple()`, `.large()`, `.hero()`
+- Pinned, floating, and snap behaviours
+- Subtitle fades out as the header collapses
+- Flexible space background with opacity transition
+- Bottom border and shadow appear only when scrolled under content
+- Configurable toolbar height, title spacing, and center title option
+
+**Related components:** `OiBackButton`, `OiSliverList`, `OiSliverGrid`
 
 ## Overlays
 
@@ -358,6 +611,8 @@ OiUserMenu(
 | `OiSheet` | Bottom/side sheet |
 | `OiToast` | Toast notification |
 | `OiContextMenu` | Right-click / long-press context menu |
+| `OiDialogShell` | Low-level dialog container with modal overlay |
+| `OiSnackBar` | Brief action feedback bar with action button |
 
 ### OiToast
 
@@ -368,6 +623,85 @@ OiToast.show(
   variant: OiToastVariant.success,
 );
 ```
+
+### OiDialogShell
+
+A minimal, themeable dialog container and the low-level building block used by higher-level dialog widgets such as `OiDialog`. The static `OiDialogShell.show` method presents the shell as a modal overlay with a barrier, focus-trapping, enter/exit animations, and Escape-to-dismiss behaviour.
+
+```dart
+// Show a custom dialog via the static method
+final result = await OiDialogShell.show<bool>(
+  context: context,
+  builder: (close) => Padding(
+    padding: EdgeInsets.all(context.spacing.lg),
+    child: Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        OiLabel.h4('Confirm Action'),
+        SizedBox(height: context.spacing.md),
+        OiLabel.body('Are you sure you want to proceed?'),
+        SizedBox(height: context.spacing.lg),
+        OiRow(gap: context.spacing.sm, children: [
+          OiButton(label: 'Cancel', variant: OiButtonVariant.ghost, onPressed: () => close(false)),
+          OiButton(label: 'Confirm', onPressed: () => close(true)),
+        ]),
+      ],
+    ),
+  ),
+);
+
+// Inline usage as a container
+OiDialogShell(
+  padding: EdgeInsets.all(24),
+  maxWidth: 400,
+  child: myDialogContent,
+)
+```
+
+**Key features:**
+
+- Static `show<T>()` method returns a `Future<T?>` with the dialog result
+- Scale + fade enter/exit animations with theme-driven durations
+- Focus trapping and Escape key dismissal
+- Configurable width constraints, background color, border radius, elevation, and padding
+- Visual defaults read from `OiDialogShellThemeData`
+- Barrier dismiss control via `barrierDismissible`
+
+**Related components:** `OiDialog`, `OiSheet`, `OiFocusTrap`
+
+### OiSnackBar
+
+A transient notification bar with an optional action button. Unlike `OiToast` (which appears in a corner for passive notifications), `OiSnackBar` appears at the bottom or top of the screen and supports an interactive action (e.g. "Undo", "Retry"). Only one snack bar is shown at a time.
+
+```dart
+// Basic snack bar with action
+OiSnackBar.show(
+  context,
+  message: 'Item deleted',
+  actionLabel: 'Undo',
+  onAction: () => _undoDelete(),
+);
+
+// With leading icon and top position
+OiSnackBar.show(
+  context,
+  message: 'Connection restored',
+  leading: Icon(OiIcons.wifi, size: 16, color: context.colors.textInverse),
+  position: OiSnackBarPosition.top,
+);
+```
+
+**Key features:**
+
+- Static `show()` method replaces any currently visible snack bar
+- Auto-dismisses after a configurable duration (default: 4 seconds)
+- Swipe-to-dismiss when `dismissible` is true (default)
+- Slide + fade enter/exit animations
+- Top or bottom positioning via `OiSnackBarPosition`
+- Optional leading widget (e.g. icon) and trailing action button
+- Returns an `OiOverlayHandle` for programmatic dismissal
+
+**Related components:** `OiToast`, `OiDialog`, `OiDialogShell`
 
 ## Panels
 
@@ -801,7 +1135,7 @@ OiBulkBar(
   label: 'Bulk actions',
   actions: [
     OiBulkAction(label: 'Export', icon: OiIcons.download, onTap: () => export()),
-    OiBulkAction(label: 'Delete', icon: OiIcons.trash, onTap: () => delete(), variant: OiBulkActionVariant.destructive),
+    OiBulkAction(label: 'Delete', icon: OiIcons.trash2, onTap: () => delete(), variant: OiBulkActionVariant.destructive),
   ],
   onSelectAll: () => selectAll(),
   onDeselectAll: () => deselectAll(),

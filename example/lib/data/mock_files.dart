@@ -143,7 +143,7 @@ final kFileTree = <OiFileNodeData>[
     parentId: 'f-images',
     size: 4200000,
     mimeType: 'image/png',
-    modified: DateTime(2026, 3, 1),
+    modified: DateTime(2026, 3),
   ),
   OiFileNodeData(
     id: 'img-7',
@@ -316,7 +316,7 @@ final kFileTree = <OiFileNodeData>[
     parentId: 'f-recipes',
     size: 156000,
     mimeType: 'application/pdf',
-    modified: DateTime(2025, 12, 1),
+    modified: DateTime(2025, 12),
     isLocked: true,
   ),
   OiFileNodeData(

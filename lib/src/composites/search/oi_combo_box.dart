@@ -604,7 +604,7 @@ class _OiComboBoxState<T> extends State<OiComboBox<T>> {
               child: Padding(
                 padding: const EdgeInsets.only(left: 4),
                 child: Icon(
-                  OiIcons.xMark,
+                  OiIcons.x,
                   size: 16,
                   color: colors.textMuted,
                 ),
@@ -639,7 +639,7 @@ class _OiComboBoxState<T> extends State<OiComboBox<T>> {
             child: Padding(
               padding: const EdgeInsets.only(left: 4),
               child: Icon(
-                OiIcons.xMark,
+                OiIcons.x,
                 size: 16,
                 color: colors.textMuted,
               ),

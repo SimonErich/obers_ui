@@ -1,10 +1,6 @@
 import 'dart:math' as math;
 
 import 'package:flutter/widgets.dart';
-import 'package:obers_ui/src/foundation/oi_accessibility.dart';
-import 'package:obers_ui/src/foundation/oi_platform.dart';
-import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
-
 import 'package:obers_ui/src/composites/visualization/oi_bubble_chart/oi_bubble_chart_accessibility.dart';
 import 'package:obers_ui/src/composites/visualization/oi_bubble_chart/oi_bubble_chart_data.dart';
 import 'package:obers_ui/src/composites/visualization/oi_bubble_chart/oi_bubble_chart_interaction.dart';
@@ -12,6 +8,9 @@ import 'package:obers_ui/src/composites/visualization/oi_bubble_chart/oi_bubble_
 import 'package:obers_ui/src/composites/visualization/oi_bubble_chart/oi_bubble_chart_painter.dart';
 import 'package:obers_ui/src/composites/visualization/oi_bubble_chart/oi_bubble_chart_size_legend.dart';
 import 'package:obers_ui/src/composites/visualization/oi_bubble_chart/oi_bubble_chart_theme.dart';
+import 'package:obers_ui/src/foundation/oi_accessibility.dart';
+import 'package:obers_ui/src/foundation/oi_platform.dart';
+import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 
 /// A bubble chart visualization plotting data by x, y, and size dimensions.
 ///

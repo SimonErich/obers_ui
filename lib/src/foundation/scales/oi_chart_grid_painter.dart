@@ -144,7 +144,7 @@ class OiChartGridPainter extends OiChartLayerPainter {
   // ── Defaults ──────────────────────────────────────────────────────────
 
   static const Color _fallbackColor = Color(0x1A000000);
-  static const double _fallbackMajorWidth = 1.0;
+  static const double _fallbackMajorWidth = 1;
   static const double _fallbackMinorWidth = .5;
 
   // ── Painting ──────────────────────────────────────────────────────────

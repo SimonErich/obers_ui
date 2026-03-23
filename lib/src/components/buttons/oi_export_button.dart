@@ -140,13 +140,13 @@ class _OiExportButtonState extends State<OiExportButton> {
   IconData _formatIcon(OiExportFormat format) {
     switch (format) {
       case OiExportFormat.csv:
-        return OiIcons.tableCells; // table_chart
+        return OiIcons.table; // table_chart
       case OiExportFormat.xlsx:
-        return OiIcons.squares2x2; // grid_on
+        return OiIcons.layoutGrid; // grid_on
       case OiExportFormat.json:
-        return OiIcons.codeBracket; // code
+        return OiIcons.code; // code
       case OiExportFormat.pdf:
-        return OiIcons.documentText; // picture_as_pdf
+        return OiIcons.fileText; // picture_as_pdf
     }
   }
 
@@ -154,7 +154,7 @@ class _OiExportButtonState extends State<OiExportButton> {
     final format = widget.formats.first;
     return OiButton.outline(
       label: widget.label,
-      icon: OiIcons.arrowDownTray, // file_download
+      icon: OiIcons.download, // file_download
       onTap: _isLoading ? null : () => _handleExport(format),
       loading: _isLoading,
       semanticLabel: '${widget.label} as ${format.label}',

@@ -54,7 +54,6 @@ class ShopWishlistScreen extends StatelessWidget {
               if (wishlistedProducts.isNotEmpty)
                 OiBadge.soft(
                   label: '${wishlistedProducts.length}',
-                  color: OiBadgeColor.primary,
                 ),
             ],
           ),

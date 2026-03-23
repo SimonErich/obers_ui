@@ -1,14 +1,11 @@
 // Tests do not require documentation comments.
 // ignore_for_file: public_member_api_docs
 
-import 'dart:ui' as ui;
-
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui/src/components/display/oi_chart_surface.dart';
 import 'package:obers_ui/src/foundation/theme/oi_decoration_theme.dart';
 import 'package:obers_ui/src/foundation/theme/oi_effects_theme.dart';
-import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/primitives/display/oi_surface.dart';
 
 import '../../../helpers/pump_app.dart';

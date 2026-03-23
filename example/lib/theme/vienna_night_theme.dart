@@ -7,5 +7,4 @@ import 'package:obers_ui/obers_ui.dart';
 final viennaNightTheme = OiThemeData.fromBrand(
   color: const Color(0xFFCFB53B),
   brightness: Brightness.dark,
-  radiusPreference: OiRadiusPreference.medium,
 );

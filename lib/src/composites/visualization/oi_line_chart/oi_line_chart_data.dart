@@ -1,4 +1,6 @@
 import 'package:flutter/painting.dart';
+import 'package:obers_ui/obers_ui.dart' show OiLineChart;
+import 'package:obers_ui/src/composites/visualization/oi_line_chart/oi_line_chart.dart' show OiLineChart;
 
 /// The interpolation mode of an [OiLineChart].
 ///

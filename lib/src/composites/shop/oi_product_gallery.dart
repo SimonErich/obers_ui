@@ -9,7 +9,7 @@ import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
 import 'package:obers_ui/src/primitives/layout/oi_column.dart';
 
 // Material Icons codepoint.
-const IconData _kImagePlaceholder = OiIcons.photo; // image
+const IconData _kImagePlaceholder = OiIcons.image; // image
 
 /// An image gallery with an optional thumbnail strip for product detail pages.
 ///

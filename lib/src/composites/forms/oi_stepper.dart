@@ -77,7 +77,7 @@ class OiStepper extends StatelessWidget {
   static const IconData _checkIcon = OiIcons.check;
 
   /// Material Icons error (exclamation circle).
-  static const IconData _errorIcon = OiIcons.exclamationCircle;
+  static const IconData _errorIcon = OiIcons.circleAlert;
 
   // ---------------------------------------------------------------------------
   // Build helpers

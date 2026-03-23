@@ -49,13 +49,13 @@ class _CmsMediaScreenState extends State<CmsMediaScreen> {
   IconData _iconForType(String? type) {
     switch (type) {
       case 'image':
-        return OiIcons.photo;
+        return OiIcons.image;
       case 'video':
-        return OiIcons.videoCamera;
+        return OiIcons.video;
       case 'document':
-        return OiIcons.documentText;
+        return OiIcons.fileText;
       default:
-        return OiIcons.document;
+        return OiIcons.file;
     }
   }
 
@@ -79,7 +79,7 @@ class _CmsMediaScreenState extends State<CmsMediaScreen> {
               OiButton.primary(
                 label: 'Upload',
                 semanticLabel: 'Upload media file',
-                icon: OiIcons.arrowUpTray,
+                icon: OiIcons.upload,
                 onTap: _handleUpload,
               ),
             ],
@@ -90,7 +90,7 @@ class _CmsMediaScreenState extends State<CmsMediaScreen> {
         Expanded(
           child: _items.isEmpty
               ? const OiEmptyState(
-                  icon: OiIcons.photo,
+                  icon: OiIcons.image,
                   title: 'No media files',
                   description:
                       'Upload images, videos, or documents to get started.',
@@ -192,7 +192,7 @@ class _MediaCard extends StatelessWidget {
                       semanticLabel: 'Delete $name',
                       onTap: onDelete,
                       child: Icon(
-                        OiIcons.trash,
+                        OiIcons.trash2,
                         size: 14,
                         color: colors.textMuted,
                       ),

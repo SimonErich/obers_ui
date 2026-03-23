@@ -8,6 +8,7 @@ library;
 
 // ── Components: Buttons ──────────────────────────────────────────────────────
 
+export 'src/components/buttons/oi_back_button.dart';
 export 'src/components/buttons/oi_button.dart';
 export 'src/components/buttons/oi_button_group.dart';
 export 'src/components/buttons/oi_export_button.dart';
@@ -43,14 +44,18 @@ export 'src/components/display/oi_image.dart';
 export 'src/components/display/oi_list_tile.dart';
 export 'src/components/display/oi_markdown.dart';
 export 'src/components/display/oi_metric.dart';
+export 'src/components/display/oi_page_indicator.dart';
 export 'src/components/display/oi_pagination.dart';
 export 'src/components/display/oi_path_bar.dart';
 export 'src/components/display/oi_popover.dart';
 export 'src/components/display/oi_progress.dart';
+export 'src/components/display/oi_refresh_indicator.dart';
 export 'src/components/display/oi_relative_time.dart';
 export 'src/components/display/oi_rename_field.dart';
 export 'src/components/display/oi_reply_preview.dart';
+export 'src/components/display/oi_scroll_to_top.dart';
 export 'src/components/display/oi_skeleton_group.dart';
+export 'src/components/display/oi_sliver_header.dart';
 export 'src/components/display/oi_storage_indicator.dart';
 export 'src/components/display/oi_tooltip.dart';
 // ── Components: Feedback ─────────────────────────────────────────────────────
@@ -96,6 +101,7 @@ export 'src/components/navigation/oi_date_picker.dart';
 export 'src/components/navigation/oi_drawer.dart';
 export 'src/components/navigation/oi_emoji_picker.dart';
 export 'src/components/navigation/oi_locale_switcher.dart';
+export 'src/components/navigation/oi_navigation_rail.dart';
 export 'src/components/navigation/oi_tabs.dart';
 export 'src/components/navigation/oi_theme_toggle.dart';
 export 'src/components/navigation/oi_time_picker.dart';
@@ -104,7 +110,9 @@ export 'src/components/navigation/oi_user_menu.dart';
 
 export 'src/components/overlays/oi_context_menu.dart';
 export 'src/components/overlays/oi_dialog.dart';
+export 'src/components/overlays/oi_dialog_shell.dart';
 export 'src/components/overlays/oi_sheet.dart';
+export 'src/components/overlays/oi_snack_bar.dart';
 export 'src/components/overlays/oi_toast.dart';
 // ── Components: Panels ───────────────────────────────────────────────────────
 
@@ -166,6 +174,7 @@ export 'src/composites/navigation/oi_error_page.dart';
 export 'src/composites/navigation/oi_file_toolbar.dart';
 export 'src/composites/navigation/oi_filter_bar.dart';
 export 'src/composites/navigation/oi_nav_menu.dart';
+export 'src/composites/navigation/oi_responsive_shell.dart';
 export 'src/composites/navigation/oi_shortcuts.dart';
 export 'src/composites/navigation/oi_sidebar.dart';
 // ── Composites: Onboarding ───────────────────────────────────────────────────
@@ -235,14 +244,15 @@ export 'src/composites/visualization/oi_treemap.dart';
 export 'src/composites/workflow/oi_flow_graph.dart';
 export 'src/composites/workflow/oi_pipeline.dart';
 export 'src/composites/workflow/oi_state_diagram.dart';
+export 'src/foundation/icons/oi_icon_data.dart';
 // ── Foundation: Core Services ────────────────────────────────────────────────
 
 export 'src/foundation/oi_accessibility.dart';
 export 'src/foundation/oi_app.dart';
-export 'src/foundation/icons/oi_icon_data.dart';
 export 'src/foundation/oi_icons.dart';
 export 'src/foundation/oi_input_modality.dart';
 export 'src/foundation/oi_overlays.dart';
+export 'src/foundation/oi_page_route.dart';
 export 'src/foundation/oi_platform.dart';
 export 'src/foundation/oi_responsive.dart';
 export 'src/foundation/oi_shortcut_scope.dart';
@@ -253,9 +263,9 @@ export 'src/foundation/oi_undo_stack.dart';
 
 export 'src/foundation/persistence/drivers/oi_in_memory_driver.dart';
 export 'src/foundation/persistence/drivers/oi_local_storage_driver.dart';
+export 'src/foundation/persistence/oi_chart_settings_driver_binding.dart';
 export 'src/foundation/persistence/oi_settings_data.dart';
 export 'src/foundation/persistence/oi_settings_driver.dart';
-export 'src/foundation/persistence/oi_chart_settings_driver_binding.dart';
 export 'src/foundation/persistence/oi_settings_mixin.dart';
 export 'src/foundation/persistence/oi_settings_provider.dart';
 // ── Foundation: Scales ───────────────────────────────────────────────────────
@@ -316,6 +326,7 @@ export 'src/models/oi_coupon_result.dart';
 export 'src/models/oi_field_type.dart';
 export 'src/models/oi_file_explorer_controller.dart';
 export 'src/models/oi_file_node_data.dart';
+export 'src/models/oi_navigation_item.dart';
 export 'src/models/oi_order_data.dart';
 export 'src/models/oi_payment_method.dart';
 export 'src/models/oi_product_data.dart';
@@ -413,6 +424,8 @@ export 'src/primitives/overlay/oi_visibility.dart';
 
 export 'src/primitives/scroll/oi_infinite_scroll.dart';
 export 'src/primitives/scroll/oi_scrollbar.dart';
+export 'src/primitives/scroll/oi_sliver_grid.dart';
+export 'src/primitives/scroll/oi_sliver_list.dart';
 export 'src/primitives/scroll/oi_virtual_grid.dart';
 export 'src/primitives/scroll/oi_virtual_list.dart';
 // ── Tools ────────────────────────────────────────────────────────────────────

@@ -83,9 +83,9 @@ void main() {
         userName: 'Bob',
         avatarInitials: 'B',
         items: [
-          OiMenuItem(label: 'Profile', icon: OiIcons.person, onTap: () {}),
+          OiMenuItem(label: 'Profile', icon: OiIcons.user, onTap: () {}),
           OiMenuItem(label: 'Settings', icon: OiIcons.settings, onTap: () {}),
-          OiMenuItem(label: 'Logout', icon: OiIcons.logout, onTap: () {}),
+          OiMenuItem(label: 'Logout', icon: OiIcons.logOut, onTap: () {}),
         ],
       ),
     );
@@ -105,7 +105,7 @@ void main() {
         userName: 'Bob',
         avatarInitials: 'B',
         items: [
-          OiMenuItem(label: 'Profile', icon: OiIcons.person, onTap: () {}),
+          OiMenuItem(label: 'Profile', icon: OiIcons.user, onTap: () {}),
         ],
       ),
     );
@@ -113,7 +113,7 @@ void main() {
     await tester.tap(find.byType(OiAvatar));
     await tester.pumpAndSettle();
 
-    expect(find.byIcon(OiIcons.person), findsOneWidget);
+    expect(find.byIcon(OiIcons.user), findsOneWidget);
   });
 
   // ── Custom header ────────────────────────────────────────────────────────

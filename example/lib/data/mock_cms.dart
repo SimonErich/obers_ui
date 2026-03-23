@@ -212,7 +212,7 @@ List<OiComment> buildBlogComments() {
           content:
               'My grandmother in Tyrol makes the best Graukäse. She would '
               'be offended by anyone calling it "smelly cheese."',
-          timestamp: DateTime(2026, 3, 1, 16, 0),
+          timestamp: DateTime(2026, 3, 1, 16),
         ),
       ],
     ),
@@ -263,7 +263,7 @@ List<OiComment> buildBlogComments() {
           content:
               'I once ordered an Einspänner and the waiter actually '
               'smiled. I think I peaked that day.',
-          timestamp: DateTime(2026, 3, 2, 11, 0),
+          timestamp: DateTime(2026, 3, 2, 11),
         ),
         OiComment(
           key: 'c2-4',
@@ -301,7 +301,7 @@ List<OiComment> buildBlogComments() {
           content:
               'Already on it! The marketing team is designing an '
               'infographic version for social media.',
-          timestamp: DateTime(2026, 3, 3, 15, 0),
+          timestamp: DateTime(2026, 3, 3, 15),
         ),
         OiComment(
           key: 'c3-2',
@@ -320,7 +320,7 @@ List<OiComment> buildBlogComments() {
           authorId: kAnna.id,
           authorName: kAnna.name,
           content: 'Love that idea! Let me create a ticket for it.',
-          timestamp: DateTime(2026, 3, 3, 16, 0),
+          timestamp: DateTime(2026, 3, 3, 16),
         ),
       ],
     ),
@@ -355,7 +355,7 @@ List<OiComment> buildBlogComments() {
           content:
               'The numbers support this. Our Graukäse sales have '
               'increased 340% since we started the blog series.',
-          timestamp: DateTime(2026, 3, 4, 10, 0),
+          timestamp: DateTime(2026, 3, 4, 10),
           reactions: [
             const chat.OiReactionData(emoji: '📈', count: 7, reacted: false),
           ],
@@ -376,7 +376,7 @@ List<OiComment> buildBlogComments() {
           content:
               'Can we please stop calling it "smelly cheese" in the '
               'Slack channel? HR has received complaints.',
-          timestamp: DateTime(2026, 3, 4, 13, 0),
+          timestamp: DateTime(2026, 3, 4, 13),
           edited: true,
         ),
         OiComment(
@@ -402,7 +402,7 @@ List<OiComment> buildBlogComments() {
       content:
           'My favourite Kaffeehaus rule: never rush the waiter. '
           'They will come to you when they are emotionally ready.',
-      timestamp: DateTime(2026, 3, 5, 10, 0),
+      timestamp: DateTime(2026, 3, 5, 10),
       reactions: [
         const chat.OiReactionData(emoji: '😌', count: 8, reacted: false),
       ],
@@ -437,7 +437,7 @@ List<OiComment> buildBlogComments() {
               'As an accountant I can confirm: the economics of sitting '
               'in a Kaffeehaus for four hours on one Melange are '
               'surprisingly viable.',
-          timestamp: DateTime(2026, 3, 5, 12, 0),
+          timestamp: DateTime(2026, 3, 5, 12),
         ),
         OiComment(
           key: 'c5-4',
@@ -446,7 +446,7 @@ List<OiComment> buildBlogComments() {
           content:
               'Security reminder: please do not use Kaffeehaus WiFi '
               'for accessing production servers. Yes, this happened.',
-          timestamp: DateTime(2026, 3, 5, 14, 0),
+          timestamp: DateTime(2026, 3, 5, 14),
           reactions: [
             const chat.OiReactionData(emoji: '🔒', count: 2, reacted: false),
             const chat.OiReactionData(emoji: '😱', count: 4, reacted: true),
@@ -489,7 +489,7 @@ List<OiComment> buildBlogComments() {
       content:
           'Could we perhaps expand with a chapter on Bergkäse? '
           'Asking for a friend who is definitely not me.',
-      timestamp: DateTime(2026, 3, 8, 9, 0),
+      timestamp: DateTime(2026, 3, 8, 9),
       replies: [
         OiComment(
           key: 'c8-1',
@@ -498,7 +498,7 @@ List<OiComment> buildBlogComments() {
           content:
               'Bergkäse deserves its own article. The aging process '
               'alone is worth 2,000 words.',
-          timestamp: DateTime(2026, 3, 8, 10, 0),
+          timestamp: DateTime(2026, 3, 8, 10),
         ),
         OiComment(
           key: 'c8-2',
@@ -519,7 +519,7 @@ List<OiComment> buildBlogComments() {
           content:
               'Approved. Let us make it a three-part series: Graukäse, '
               'Bergkäse, and the ultimate Käseplatte ranking.',
-          timestamp: DateTime(2026, 3, 8, 14, 0),
+          timestamp: DateTime(2026, 3, 8, 14),
           reactions: [
             const chat.OiReactionData(emoji: '👍', count: 8, reacted: false),
           ],
@@ -544,7 +544,7 @@ List<OiComment> buildBlogComments() {
       content:
           'Suggestion: add a glossary of all 27 coffee types at the end '
           'of the article. Could be a nice downloadable PDF too.',
-      timestamp: DateTime(2026, 3, 9, 11, 0),
+      timestamp: DateTime(2026, 3, 9, 11),
       reactions: [
         const chat.OiReactionData(emoji: '📋', count: 3, reacted: false),
       ],
@@ -589,7 +589,7 @@ List<OiComment> buildBlogComments() {
       content:
           'Excellent article. The tone is exactly right — informative '
           'but never taking itself too seriously.',
-      timestamp: DateTime(2026, 3, 12, 9, 0),
+      timestamp: DateTime(2026, 3, 12, 9),
     ),
     OiComment(
       key: 'c15',
@@ -610,7 +610,7 @@ List<OiComment> buildBlogComments() {
       content:
           'UX research insight: our readers spend an average of 6.2 '
           'minutes on this article — highest engagement in the blog.',
-      timestamp: DateTime(2026, 3, 13, 11, 0),
+      timestamp: DateTime(2026, 3, 13, 11),
       reactions: [
         const chat.OiReactionData(emoji: '📊', count: 5, reacted: false),
       ],
@@ -622,7 +622,7 @@ List<OiComment> buildBlogComments() {
       content:
           'The data backs it up: search traffic for "Kaffeehaus Knigge" '
           'is up 280% since publication. Organic gold.',
-      timestamp: DateTime(2026, 3, 14, 15, 0),
+      timestamp: DateTime(2026, 3, 14, 15),
     ),
     OiComment(
       key: 'c18',
@@ -631,7 +631,7 @@ List<OiComment> buildBlogComments() {
       content:
           'From a finance perspective: the content marketing ROI on '
           'this article alone justifies the entire Q1 blog budget.',
-      timestamp: DateTime(2026, 3, 15, 10, 0),
+      timestamp: DateTime(2026, 3, 15, 10),
       reactions: [
         const chat.OiReactionData(emoji: '💰', count: 3, reacted: false),
       ],

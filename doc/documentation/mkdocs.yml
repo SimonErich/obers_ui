@@ -87,6 +87,7 @@ nav:
       - Theming: core-concepts/theming.md
       - Responsive Design: core-concepts/responsive.md
       - Accessibility: core-concepts/accessibility.md
+      - Icons: core-concepts/icons.md
       - Density: core-concepts/density.md
   - Components:
       - components/index.md

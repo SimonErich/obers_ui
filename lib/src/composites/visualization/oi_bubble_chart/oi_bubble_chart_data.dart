@@ -1,4 +1,6 @@
 import 'package:flutter/painting.dart';
+import 'package:obers_ui/obers_ui.dart' show OiBubbleChart;
+import 'package:obers_ui/src/composites/visualization/oi_bubble_chart/oi_bubble_chart.dart' show OiBubbleChart;
 
 /// Visual style overrides for an individual bubble point.
 ///

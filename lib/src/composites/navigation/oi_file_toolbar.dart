@@ -106,8 +106,8 @@ class _OiFileToolbarState extends State<OiFileToolbar> {
         if (widget.onSearch != null)
           OiIconButton(
             icon: _searchOpen
-                ? OiIcons.xMark // close
-                : OiIcons.magnifyingGlass, // search
+                ? OiIcons.x // close
+                : OiIcons.search, // search
             semanticLabel: _searchOpen ? 'Close search' : 'Search',
             onTap: _toggleSearch,
           ),

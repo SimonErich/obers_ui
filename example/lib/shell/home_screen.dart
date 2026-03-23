@@ -5,7 +5,9 @@ import 'package:obers_ui_example/apps/admin/admin_app.dart';
 import 'package:obers_ui_example/apps/auth/auth_app.dart';
 import 'package:obers_ui_example/apps/chat/chat_app.dart';
 import 'package:obers_ui_example/apps/cms/cms_app.dart';
+import 'package:obers_ui_example/apps/component_library/component_library_app.dart';
 import 'package:obers_ui_example/apps/files/files_app.dart';
+import 'package:obers_ui_example/apps/icons/icons_app.dart';
 import 'package:obers_ui_example/apps/project/project_app.dart';
 import 'package:obers_ui_example/apps/shop/shop_app.dart';
 import 'package:obers_ui_example/theme/theme_state.dart';
@@ -44,7 +46,7 @@ class _HomeScreenState extends State<HomeScreen> {
               description:
                   'Drag and drop cards between columns with smooth '
                   'animations and keyboard support.',
-              icon: OiIcons.viewColumns,
+              icon: OiIcons.columns3,
               version: 'v1.2.0',
             ),
             OiWhatsNewItem(
@@ -52,7 +54,7 @@ class _HomeScreenState extends State<HomeScreen> {
               description:
                   'Multi-image gallery with zoom, thumbnails, '
                   'and swipe navigation.',
-              icon: OiIcons.photo,
+              icon: OiIcons.image,
               version: 'v1.2.0',
             ),
             OiWhatsNewItem(
@@ -113,6 +115,20 @@ class _HomeScreenState extends State<HomeScreen> {
             color: colors.textSubtle,
           ),
           SizedBox(height: spacing.xl),
+
+          // ── Component Library section ────────────────────────────────
+          OiLabel.overline('COMPONENT LIBRARY', color: colors.textMuted),
+          SizedBox(height: spacing.sm),
+          _CategoryCard(
+            category: _componentLibraryCategory,
+            themeState: widget.themeState,
+          ),
+
+          SizedBox(height: spacing.xl),
+
+          // ── App Showcase section ─────────────────────────────────────
+          OiLabel.overline('APP SHOWCASE', color: colors.textMuted),
+          SizedBox(height: spacing.sm),
           OiGrid(
             breakpoint: bp,
             columns: OiResponsive.breakpoints({
@@ -159,6 +175,13 @@ class _Category {
   final Widget Function(ThemeState themeState) builder;
 }
 
+final _componentLibraryCategory = _Category(
+  title: 'Component Library',
+  description: 'Browse all 290+ widgets with live examples organized by category.',
+  icon: OiIcons.layoutGrid,
+  builder: (ts) => ComponentLibraryApp(themeState: ts),
+);
+
 final _categories = [
   _Category(
     title: 'Shop',
@@ -169,19 +192,19 @@ final _categories = [
   _Category(
     title: 'Chat',
     description: 'Team messaging with channels, reactions, and auto-replies.',
-    icon: OiIcons.chatBubbleLeft,
+    icon: OiIcons.messageSquare,
     builder: (ts) => ChatApp(themeState: ts),
   ),
   _Category(
     title: 'Admin',
     description: 'Dashboard analytics, user management, and settings.',
-    icon: OiIcons.chartBar,
+    icon: OiIcons.barChart3,
     builder: (ts) => AdminApp(themeState: ts),
   ),
   _Category(
     title: 'Projects',
     description: 'Kanban boards, Gantt charts, calendars, and timelines.',
-    icon: OiIcons.viewColumns,
+    icon: OiIcons.columns3,
     builder: (ts) => ProjectApp(themeState: ts),
   ),
   _Category(
@@ -199,8 +222,14 @@ final _categories = [
   _Category(
     title: 'Auth',
     description: 'Login, registration, and password reset flows.',
-    icon: OiIcons.lockClosed,
+    icon: OiIcons.lock,
     builder: (ts) => AuthApp(themeState: ts),
+  ),
+  _Category(
+    title: 'Icons',
+    description: 'Browse 1,951 Lucide icons with search and categories.',
+    icon: OiIcons.sparkles,
+    builder: (ts) => IconsApp(themeState: ts),
   ),
 ];
 

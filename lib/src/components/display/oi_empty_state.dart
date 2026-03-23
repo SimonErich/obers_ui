@@ -35,7 +35,7 @@ class OiEmptyState extends StatelessWidget {
     return OiEmptyState(
       key: key,
       title: title ?? 'Page not found',
-      icon: OiIcons.magnifyingGlass, // search_off
+      icon: OiIcons.search, // search_off
       description: description,
       action: actionLabel != null && onAction != null
           ? OiButton.primary(
@@ -61,7 +61,7 @@ class OiEmptyState extends StatelessWidget {
     return OiEmptyState(
       key: key,
       title: title ?? 'Access denied',
-      icon: OiIcons.lockClosed, // lock
+      icon: OiIcons.lock, // lock
       description: description,
       action: actionLabel != null && onAction != null
           ? OiButton.primary(
@@ -96,7 +96,7 @@ class OiEmptyState extends StatelessWidget {
     return OiEmptyState(
       key: key,
       title: title ?? 'Something went wrong',
-      icon: OiIcons.exclamationCircle, // error
+      icon: OiIcons.circleAlert, // error
       description: resolvedDescription,
       action: actionLabel != null && onAction != null
           ? OiButton.primary(

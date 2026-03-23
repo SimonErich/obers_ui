@@ -191,7 +191,7 @@ class _OiMetadataEditorState extends State<OiMetadataEditor> {
               child: Padding(
                 padding: const EdgeInsets.only(top: 8),
                 child: Icon(
-                  OiIcons.xMark,
+                  OiIcons.x,
                   size: 18,
                   color: colors.error.base,
                 ),

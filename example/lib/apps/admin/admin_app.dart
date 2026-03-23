@@ -68,32 +68,32 @@ class _AdminAppState extends State<AdminApp> {
     switch (_currentRoute) {
       case 'users':
         crumbs.addAll([
-          OiBreadcrumbItem(label: 'Users'),
-          OiBreadcrumbItem(label: 'User List'),
+          const OiBreadcrumbItem(label: 'Users'),
+          const OiBreadcrumbItem(label: 'User List'),
         ]);
       case 'permissions':
         crumbs.addAll([
-          OiBreadcrumbItem(label: 'Users'),
-          OiBreadcrumbItem(label: 'Roles & Permissions'),
+          const OiBreadcrumbItem(label: 'Users'),
+          const OiBreadcrumbItem(label: 'Roles & Permissions'),
         ]);
       case 'orders':
         crumbs.addAll([
-          OiBreadcrumbItem(label: 'Orders'),
-          OiBreadcrumbItem(label: 'All Orders'),
+          const OiBreadcrumbItem(label: 'Orders'),
+          const OiBreadcrumbItem(label: 'All Orders'),
         ]);
       case 'returns':
         crumbs.addAll([
-          OiBreadcrumbItem(label: 'Orders'),
-          OiBreadcrumbItem(label: 'Returns'),
+          const OiBreadcrumbItem(label: 'Orders'),
+          const OiBreadcrumbItem(label: 'Returns'),
         ]);
       case 'settings':
-        crumbs.add(OiBreadcrumbItem(label: 'Settings'));
+        crumbs.add(const OiBreadcrumbItem(label: 'Settings'));
       case 'activity':
-        crumbs.add(OiBreadcrumbItem(label: 'Activity Log'));
+        crumbs.add(const OiBreadcrumbItem(label: 'Activity Log'));
       case 'notifications':
-        crumbs.add(OiBreadcrumbItem(label: 'Notifications'));
+        crumbs.add(const OiBreadcrumbItem(label: 'Notifications'));
       default:
-        crumbs.add(OiBreadcrumbItem(label: 'Overview'));
+        crumbs.add(const OiBreadcrumbItem(label: 'Overview'));
     }
 
     return crumbs;
@@ -119,11 +119,11 @@ class _AdminAppState extends State<AdminApp> {
   IconData _commandIcon(String id) {
     if (id.startsWith('nav-')) return OiIcons.arrowRight;
     if (id == 'act-export-users' || id == 'act-export-orders') {
-      return OiIcons.arrowDownTray;
+      return OiIcons.download;
     }
     if (id == 'act-new-user') return OiIcons.userPlus;
     if (id == 'act-toggle-theme') return OiIcons.sun;
-    return OiIcons.commandLine;
+    return OiIcons.terminal;
   }
 
   void _executeCommand(String id) {
@@ -151,7 +151,6 @@ class _AdminAppState extends State<AdminApp> {
           OiToast.show(
             context,
             message: 'Command: $id',
-            level: OiToastLevel.info,
           );
         }
     }
@@ -194,18 +193,18 @@ class _AdminAppState extends State<AdminApp> {
                 navigation: const [
                   OiNavItem(
                     label: 'Overview',
-                    icon: OiIcons.chartBar,
+                    icon: OiIcons.barChart3,
                     route: 'overview',
                     section: 'Main',
                   ),
                   OiNavItem(
                     label: 'Users',
-                    icon: OiIcons.userGroup,
+                    icon: OiIcons.users,
                     section: 'Main',
                     children: [
                       OiNavItem(
                         label: 'User List',
-                        icon: OiIcons.listBullet,
+                        icon: OiIcons.list,
                         route: 'users',
                       ),
                       OiNavItem(
@@ -222,19 +221,19 @@ class _AdminAppState extends State<AdminApp> {
                     children: [
                       OiNavItem(
                         label: 'All Orders',
-                        icon: OiIcons.clipboardDocumentList,
+                        icon: OiIcons.clipboardList,
                         route: 'orders',
                       ),
                       OiNavItem(
                         label: 'Returns',
-                        icon: OiIcons.receiptRefund,
+                        icon: OiIcons.receiptText,
                         route: 'returns',
                       ),
                     ],
                   ),
                   OiNavItem(
                     label: 'Settings',
-                    icon: OiIcons.cog,
+                    icon: OiIcons.settings,
                     route: 'settings',
                     section: 'System',
                   ),
@@ -266,14 +265,14 @@ class _AdminAppState extends State<AdminApp> {
                     ),
                     OiMenuItem(
                       label: 'Preferences',
-                      icon: OiIcons.adjustmentsHorizontal,
+                      icon: OiIcons.slidersHorizontal,
                       onTap: () =>
                           OiToast.show(context, message: 'Preferences clicked'),
                     ),
                     const OiMenuItem(label: '', separator: true),
                     OiMenuItem(
                       label: 'Sign Out',
-                      icon: OiIcons.arrowRightOnRectangle,
+                      icon: OiIcons.logOut,
                       onTap: () => Navigator.of(context).pop(),
                     ),
                   ],
@@ -292,7 +291,7 @@ class _AdminAppState extends State<AdminApp> {
                     semanticLabel: 'Open command bar',
                     onTap: () => setState(() => _showCommandBar = true),
                     child: Icon(
-                      OiIcons.magnifyingGlass,
+                      OiIcons.search,
                       size: 20,
                       color: colors.text,
                     ),

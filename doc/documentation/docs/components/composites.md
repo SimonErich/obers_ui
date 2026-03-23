@@ -90,6 +90,54 @@ OiForm(
 | `OiArrowNav` | Previous/next navigation |
 | `OiShortcuts` | Keyboard shortcut hint display |
 | `OiErrorPage` | Full-page error display for 404, 403, 500 states |
+| `OiResponsiveShell` | Responsive navigation shell that auto-switches between OiBottomBar and OiNavigationRail |
+
+### OiResponsiveShell
+
+A responsive navigation shell that automatically switches between `OiBottomBar`, `OiNavigationRail` (compact), and `OiNavigationRail` (expanded with labels) based on viewport width. The consumer only needs to manage one list of `OiNavigationItem` items.
+
+```dart
+OiResponsiveShell(
+  items: const [
+    OiNavigationItem(icon: OiIcons.house, label: 'Home'),
+    OiNavigationItem(icon: OiIcons.search, label: 'Search'),
+    OiNavigationItem(icon: OiIcons.user, label: 'Profile'),
+  ],
+  currentIndex: _selectedIndex,
+  onTap: (index) => setState(() => _selectedIndex = index),
+  body: _pages[_selectedIndex],
+)
+
+// With custom breakpoints and rail options
+OiResponsiveShell(
+  items: navItems,
+  currentIndex: _selectedIndex,
+  onTap: (index) => setState(() => _selectedIndex = index),
+  body: _pages[_selectedIndex],
+  breakpoints: OiResponsiveShellBreakpoints(rail: 700, expanded: 1400),
+  railLeading: OiImage(src: 'assets/logo.svg', label: 'Logo'),
+  railTrailing: OiIconButton(icon: OiIcons.settings, onPressed: () {}),
+)
+```
+
+**Layout modes:**
+
+| Viewport width | Navigation widget |
+|---|---|
+| Below rail threshold | `OiBottomBar` at the bottom |
+| Rail to expanded | `OiNavigationRail` (icon only) |
+| At or above expanded | `OiNavigationRail` (icon + label) |
+
+**Key features:**
+
+- Three layout modes driven by configurable `OiResponsiveShellBreakpoints` (default: 600 / 1200)
+- Animated width transition between compact and expanded rail
+- Floating action widget support across all modes
+- Per-mode customization: rail width, background, border, indicator, label behavior, group alignment
+- Bottom bar style, label visibility, and haptic feedback options
+- `resolveMode(width)` pure function for testing and conditional logic
+
+**Related components:** `OiBottomBar`, `OiNavigationRail`, `OiSidebar`
 
 ## Search
 

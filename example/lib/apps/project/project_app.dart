@@ -25,8 +25,8 @@ class _ProjectAppState extends State<ProjectApp> {
   int _selectedTab = 0;
 
   static const _tabs = [
-    OiTabItem(label: 'Kanban', icon: OiIcons.viewColumns),
-    OiTabItem(label: 'Gantt', icon: OiIcons.chartBar),
+    OiTabItem(label: 'Kanban', icon: OiIcons.columns3),
+    OiTabItem(label: 'Gantt', icon: OiIcons.barChart3),
     OiTabItem(label: 'Calendar', icon: OiIcons.calendarDays),
     OiTabItem(label: 'Timeline', icon: OiIcons.clock),
     OiTabItem(label: 'Pipeline', icon: OiIcons.arrowRight),

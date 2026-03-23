@@ -405,14 +405,14 @@ class _CmsCategoriesScreenState extends State<CmsCategoriesScreen> {
               OiButton.secondary(
                 label: 'Rename',
                 semanticLabel: 'Rename category',
-                icon: OiIcons.pencilSquare,
+                icon: OiIcons.squarePen,
                 onTap: () => _showRenameDialog(node),
               ),
               SizedBox(width: spacing.sm),
               OiButton.ghost(
                 label: 'Delete',
                 semanticLabel: 'Delete category',
-                icon: OiIcons.trash,
+                icon: OiIcons.trash2,
                 onTap: () => _showDeleteDialog(node),
               ),
             ],

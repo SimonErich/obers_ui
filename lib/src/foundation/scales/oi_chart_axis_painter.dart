@@ -106,9 +106,9 @@ class OiChartAxisPainter extends OiChartLayerPainter {
   // ── Defaults ──────────────────────────────────────────────────────────
 
   static const Color _fallbackColor = Color(0xFF9E9E9E);
-  static const double _fallbackLineWidth = 1.0;
-  static const double _fallbackTickLength = 6.0;
-  static const double _fallbackTickWidth = 1.0;
+  static const double _fallbackLineWidth = 1;
+  static const double _fallbackTickLength = 6;
+  static const double _fallbackTickWidth = 1;
 
   // ── Painting ──────────────────────────────────────────────────────────
 
@@ -132,7 +132,7 @@ class OiChartAxisPainter extends OiChartLayerPainter {
     // Draw axis line.
     switch (edge) {
       case OiChartAxisEdge.bottom:
-        canvas_drawAxisLine(context.canvas, linePaint,
+        drawAxisLine(context.canvas, linePaint,
           Offset(bounds.left, bounds.bottom),
           Offset(bounds.right, bounds.bottom),
         );
@@ -144,7 +144,7 @@ class OiChartAxisPainter extends OiChartLayerPainter {
           );
         }
       case OiChartAxisEdge.top:
-        canvas_drawAxisLine(context.canvas, linePaint,
+        drawAxisLine(context.canvas, linePaint,
           Offset(bounds.left, bounds.top),
           Offset(bounds.right, bounds.top),
         );
@@ -156,7 +156,7 @@ class OiChartAxisPainter extends OiChartLayerPainter {
           );
         }
       case OiChartAxisEdge.left:
-        canvas_drawAxisLine(context.canvas, linePaint,
+        drawAxisLine(context.canvas, linePaint,
           Offset(bounds.left, bounds.top),
           Offset(bounds.left, bounds.bottom),
         );
@@ -168,7 +168,7 @@ class OiChartAxisPainter extends OiChartLayerPainter {
           );
         }
       case OiChartAxisEdge.right:
-        canvas_drawAxisLine(context.canvas, linePaint,
+        drawAxisLine(context.canvas, linePaint,
           Offset(bounds.right, bounds.top),
           Offset(bounds.right, bounds.bottom),
         );
@@ -183,7 +183,7 @@ class OiChartAxisPainter extends OiChartLayerPainter {
   }
 
   /// Helper that draws the axis line.
-  static void canvas_drawAxisLine(Canvas canvas, Paint paint, Offset a, Offset b) {
+  static void drawAxisLine(Canvas canvas, Paint paint, Offset a, Offset b) {
     canvas.drawLine(a, b, paint);
   }
 
@@ -414,9 +414,10 @@ class OiChartLabelPainter extends OiChartLayerPainter {
       final pos = tickPositions[i];
       final anchor = _labelAnchor(bounds, pos);
 
-      canvas.save();
-      canvas.translate(anchor.dx, anchor.dy);
-      canvas.rotate(
+      canvas
+        ..save()
+        ..translate(anchor.dx, anchor.dy)
+        ..rotate(
         edge == OiChartAxisEdge.bottom || edge == OiChartAxisEdge.top
             ? -radians
             : radians,

@@ -258,7 +258,7 @@ class _OiDashboardState extends State<OiDashboard>
             top: 4,
             right: 4,
             child: Icon(
-              OiIcons.bars2,
+              OiIcons.alignJustify,
               size: 16,
               color: colors.textMuted,
             ),

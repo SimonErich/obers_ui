@@ -139,7 +139,7 @@ class OiBarChart extends StatefulWidget {
   final double barRadius;
 
   /// Configuration for the value axis.
-  final OiChartAxis? yAxis;
+  final OiChartAxis<num>? yAxis;
 
   /// Callback when a bar is tapped.
   final void Function(int categoryIndex, int? seriesIndex)? onBarTap;

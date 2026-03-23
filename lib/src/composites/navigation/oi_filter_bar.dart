@@ -357,7 +357,7 @@ class _FilterChip extends StatelessWidget {
                 onTap: onRemove,
                 behavior: HitTestBehavior.opaque,
                 child: Icon(
-                  OiIcons.xMark,
+                  OiIcons.x,
                   size: 14,
                   color: textColor,
                 ),

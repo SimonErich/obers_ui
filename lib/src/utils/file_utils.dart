@@ -218,15 +218,15 @@ class OiFileUtils {
     final normalized = ext.toLowerCase().replaceFirst('.', '');
 
     if (isImage(normalized)) return OiIcons.image;
-    if (isVideo(normalized)) return OiIcons.videoFile;
-    if (isAudio(normalized)) return OiIcons.audioFile;
+    if (isVideo(normalized)) return OiIcons.video;
+    if (isAudio(normalized)) return OiIcons.music;
 
     return switch (normalized) {
-      'pdf' => OiIcons.pictureAsPdf,
-      'doc' || 'docx' || 'odt' || 'rtf' => OiIcons.description,
-      'xls' || 'xlsx' || 'ods' || 'csv' => OiIcons.tableChart,
-      'ppt' || 'pptx' || 'odp' => OiIcons.slideshow,
-      'zip' || 'rar' || 'tar' || 'gz' || '7z' => OiIcons.folderZip,
+      'pdf' => OiIcons.fileText,
+      'doc' || 'docx' || 'odt' || 'rtf' => OiIcons.fileText,
+      'xls' || 'xlsx' || 'ods' || 'csv' => OiIcons.table,
+      'ppt' || 'pptx' || 'odp' => OiIcons.presentation,
+      'zip' || 'rar' || 'tar' || 'gz' || '7z' => OiIcons.archive,
       'html' ||
       'css' ||
       'js' ||
@@ -241,9 +241,9 @@ class OiFileUtils {
       'c' ||
       'cpp' ||
       'rb' => OiIcons.code,
-      'json' || 'xml' || 'yaml' || 'yml' => OiIcons.dataObject,
-      'txt' || 'md' => OiIcons.textSnippet,
-      _ => OiIcons.insertDriveFile,
+      'json' || 'xml' || 'yaml' || 'yml' => OiIcons.database,
+      'txt' || 'md' => OiIcons.fileText,
+      _ => OiIcons.file,
     };
   }
 

@@ -172,11 +172,11 @@ class OiBadge extends StatelessWidget {
       case OiBadgeColor.success:
         return OiIcons.check; // check
       case OiBadgeColor.warning:
-        return OiIcons.exclamationCircle; // warning
+        return OiIcons.circleAlert; // warning
       case OiBadgeColor.error:
-        return OiIcons.xMark; // close
+        return OiIcons.x; // close
       case OiBadgeColor.info:
-        return OiIcons.informationCircle; // info
+        return OiIcons.info; // info
       case OiBadgeColor.primary:
       case OiBadgeColor.accent:
       case OiBadgeColor.neutral:

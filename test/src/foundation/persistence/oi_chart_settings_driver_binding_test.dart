@@ -112,10 +112,11 @@ void main() {
       await binding.init();
 
       var notified = false;
-      binding.addListener(() => notified = true);
-      binding.update(
-        const OiChartSettings(hiddenSeriesIds: {'costs'}),
-      );
+      binding
+        ..addListener(() => notified = true)
+        ..update(
+          const OiChartSettings(hiddenSeriesIds: {'costs'}),
+        );
       expect(notified, isTrue);
       binding.dispose();
     });
@@ -129,8 +130,9 @@ void main() {
       await binding.init();
 
       var notifyCount = 0;
-      binding.addListener(() => notifyCount++);
-      binding.update(const OiChartSettings());
+      binding
+        ..addListener(() => notifyCount++)
+        ..update(const OiChartSettings());
       expect(notifyCount, 0);
       binding.dispose();
     });
@@ -230,12 +232,12 @@ void main() {
         autoSave: false,
       );
       await binding.init();
-      binding.dispose();
-
       // Should not throw.
-      binding.update(
-        const OiChartSettings(hiddenSeriesIds: {'a'}),
-      );
+      binding
+        ..dispose()
+        ..update(
+          const OiChartSettings(hiddenSeriesIds: {'a'}),
+        );
     });
 
     // ── namespace ─────────────────────────────────────────────────────────

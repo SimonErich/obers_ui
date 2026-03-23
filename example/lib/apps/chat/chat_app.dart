@@ -333,7 +333,7 @@ class _ChatAppState extends State<ChatApp> {
           SizedBox(width: spacing.xs),
           // Info button.
           OiIconButton(
-            icon: OiIcons.informationCircle,
+            icon: OiIcons.info,
             semanticLabel: 'Channel details',
             size: OiButtonSize.small,
             onTap: () => setState(() {
@@ -463,7 +463,7 @@ class _ChatAppState extends State<ChatApp> {
         child: Row(
           children: [
             Icon(
-              OiIcons.hashtag,
+              OiIcons.hash,
               size: 14,
               color: isActive ? colors.primary.base : colors.textSubtle,
             ),
@@ -564,7 +564,7 @@ class _ChatAppState extends State<ChatApp> {
               SizedBox(width: spacing.sm),
               const Expanded(child: OiLabel.h4('Pinned Messages')),
               OiIconButton(
-                icon: OiIcons.xMark,
+                icon: OiIcons.x,
                 semanticLabel: 'Close pinned messages',
                 size: OiButtonSize.small,
                 onTap: () => setState(() => _pinnedSheetOpen = false),
@@ -629,14 +629,14 @@ class _ChatAppState extends State<ChatApp> {
           child: Row(
             children: [
               Icon(
-                OiIcons.informationCircle,
+                OiIcons.info,
                 size: 18,
                 color: colors.primary.base,
               ),
               SizedBox(width: spacing.sm),
               const Expanded(child: OiLabel.h4('Channel Details')),
               OiIconButton(
-                icon: OiIcons.xMark,
+                icon: OiIcons.x,
                 semanticLabel: 'Close channel details',
                 size: OiButtonSize.small,
                 onTap: () => setState(() => _infoSheetOpen = false),
@@ -721,7 +721,7 @@ class _ChatAppState extends State<ChatApp> {
             children: [
               const Expanded(child: OiLabel.h4('Profile')),
               OiIconButton(
-                icon: OiIcons.xMark,
+                icon: OiIcons.x,
                 semanticLabel: 'Close profile',
                 size: OiButtonSize.small,
                 onTap: () => setState(() {
@@ -780,7 +780,7 @@ class _ChatAppState extends State<ChatApp> {
               Expanded(
                 child: OiButton.primary(
                   label: 'Message',
-                  icon: OiIcons.chatBubbleLeft,
+                  icon: OiIcons.messageSquare,
                   size: OiButtonSize.small,
                   onTap: () {
                     // Find or indicate DM channel for this user.

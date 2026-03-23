@@ -156,16 +156,16 @@ class OiAvatar extends StatelessWidget {
     switch (status) {
       case OiPresenceStatus.online:
         // Filled circle — distinct from the hollow offline circle.
-        return OiIcons.stop; // circle
+        return OiIcons.square; // circle
       case OiPresenceStatus.offline:
         // Outlined (hollow) circle.
-        return OiIcons.stopCircle; // circle_outlined
+        return OiIcons.circleStop; // circle_outlined
       case OiPresenceStatus.away:
         // Clock/schedule icon.
         return OiIcons.clock; // schedule
       case OiPresenceStatus.busy:
         // "Do not disturb" / remove-circle icon.
-        return OiIcons.minusCircle; // remove_circle
+        return OiIcons.circleMinus; // remove_circle
     }
   }
 

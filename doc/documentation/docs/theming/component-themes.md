@@ -40,6 +40,10 @@ OiThemeData.light(
 | `OiProgress` | `OiProgressThemeData` |
 | `OiSidebar` | `OiSidebarThemeData` |
 | `OiFileExplorer` | `OiFileExplorerThemeData` |
+| `OiDialogShell` | `OiDialogShellThemeData` |
+| `OiRefreshIndicator` | `OiRefreshIndicatorThemeData` |
+| `OiNavigationRail` | `OiNavigationRailThemeData` |
+| `OiSliverHeader` | `OiSliverHeaderThemeData` |
 
 ## Accessing component themes
 

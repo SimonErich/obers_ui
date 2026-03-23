@@ -1,16 +1,23 @@
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/obers_ui.dart' show OiNavigationRail;
+import 'package:obers_ui/src/components/navigation/oi_navigation_rail.dart' show OiNavigationRail;
 import 'package:obers_ui/src/foundation/oi_responsive.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
+import 'package:obers_ui/src/models/oi_navigation_item.dart';
 import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
 
 /// A single item in an [OiBottomBar].
 ///
-/// [label] is always required even in icon-only style for accessibility.
+/// **Deprecated:** Use [OiNavigationItem] instead. This class will be removed
+/// in a future release. Use [OiNavigationItem.fromLegacy] to convert.
 ///
 /// {@category Components}
+@Deprecated('Use OiNavigationItem instead. '
+    'Migrate with OiNavigationItem.fromLegacy().')
 class OiBottomBarItem {
   /// Creates an [OiBottomBarItem].
+  @Deprecated('Use OiNavigationItem instead.')
   const OiBottomBarItem({
     required this.icon,
     required this.label,
@@ -36,6 +43,15 @@ class OiBottomBarItem {
   /// The badge is only visible when both [showBadge] is `true` and
   /// [badgeCount] is non-null and greater than zero.
   final bool showBadge;
+
+  /// Converts this item to the new [OiNavigationItem] model.
+  OiNavigationItem toNavigationItem() => OiNavigationItem.fromLegacy(
+        icon: icon,
+        label: label,
+        activeIcon: activeIcon,
+        badgeCount: badgeCount,
+        showBadge: showBadge,
+      );
 }
 
 /// The visual style of an [OiBottomBar].
@@ -119,7 +135,41 @@ class OiBottomBar extends StatelessWidget {
   });
 
   /// The navigation items to display.
+  ///
+  /// For new code, prefer constructing [OiNavigationItem] instances and
+  /// converting them via the [fromNavigationItems] helper:
+  ///
+  /// ```dart
+  /// OiBottomBar(
+  ///   items: OiBottomBar.fromNavigationItems(navItems),
+  ///   ...
+  /// )
+  /// ```
+  // ignore: deprecated_member_use_from_same_package
   final List<OiBottomBarItem> items;
+
+  /// Converts a list of [OiNavigationItem] to [OiBottomBarItem] for use
+  /// with [OiBottomBar].
+  ///
+  /// This enables sharing the same navigation model between [OiBottomBar]
+  /// and [OiNavigationRail].
+  // ignore: deprecated_member_use_from_same_package
+  static List<OiBottomBarItem> fromNavigationItems(
+    List<OiNavigationItem> items,
+  ) {
+    return items
+        .map(
+          (item) =>
+              // ignore: deprecated_member_use_from_same_package — OiBottomBar still accepts the legacy type; OiNavigationItem is the preferred API
+              OiBottomBarItem(
+            icon: item.icon,
+            label: item.label,
+            activeIcon: item.activeIcon,
+            badgeCount: item.badge != null ? int.tryParse(item.badge!) : null,
+          ),
+        )
+        .toList();
+  }
 
   /// The index of the currently active item.
   final int currentIndex;

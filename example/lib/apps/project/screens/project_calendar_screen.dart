@@ -83,7 +83,7 @@ class _ProjectCalendarScreenState extends State<ProjectCalendarScreen> {
   }
 
   void _onEventTap(OiCalendarEvent event) {
-    OiToast.show(context, message: event.title, level: OiToastLevel.info);
+    OiToast.show(context, message: event.title);
   }
 
   void _onEventMove(OiCalendarEvent event, DateTime newStart, DateTime newEnd) {

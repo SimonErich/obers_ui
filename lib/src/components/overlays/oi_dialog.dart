@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/src/components/overlays/oi_dialog_shell.dart';
 import 'package:obers_ui/src/foundation/oi_overlays.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/primitives/interaction/oi_focus_trap.dart';
@@ -218,72 +219,70 @@ class OiDialog extends StatelessWidget {
     final bodyContent = content;
     final actionList = actions;
 
-    Widget panel = Container(
-      constraints: isFullScreen
-          ? null
-          : const BoxConstraints(maxWidth: 480, minWidth: 280),
-      decoration: BoxDecoration(
-        color: colors.surface,
-        borderRadius: isFullScreen ? null : BorderRadius.circular(12),
-        boxShadow: isFullScreen
-            ? null
-            : [
-                BoxShadow(
-                  color: colors.overlay.withValues(alpha: 0.2),
-                  blurRadius: 32,
-                  offset: const Offset(0, 8),
-                ),
-              ],
-      ),
-      child: Column(
-        mainAxisSize: isFullScreen ? MainAxisSize.max : MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          // ── Title ──────────────────────────────────────────────────────────
-          if (titleText != null)
-            Padding(
-              padding: const EdgeInsets.fromLTRB(24, 20, 24, 8),
-              child: Text(
-                titleText,
-                style: textTheme.h4.copyWith(color: colors.text),
-              ),
+    final dialogContent = Column(
+      mainAxisSize: isFullScreen ? MainAxisSize.max : MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        // ── Title ──────────────────────────────────────────────────────────
+        if (titleText != null)
+          Padding(
+            padding: const EdgeInsets.fromLTRB(24, 20, 24, 8),
+            child: Text(
+              titleText,
+              style: textTheme.h4.copyWith(color: colors.text),
             ),
+          ),
 
-          // ── Content ────────────────────────────────────────────────────────
-          if (bodyContent != null)
-            if (isForm)
-              Flexible(
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
-                  child: bodyContent,
-                ),
-              )
-            else
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 8,
-                ),
+        // ── Content ────────────────────────────────────────────────────────
+        if (bodyContent != null)
+          if (isForm)
+            Flexible(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
                 child: bodyContent,
               ),
-
-          // ── Actions ────────────────────────────────────────────────────────
-          if (actionList != null && actionList.isNotEmpty)
+            )
+          else
             Padding(
-              padding: const EdgeInsets.fromLTRB(24, 12, 24, 20),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  for (var i = 0; i < actionList.length; i++) ...[
-                    if (i > 0) const SizedBox(width: 8),
-                    actionList[i],
-                  ],
-                ],
+              padding: const EdgeInsets.symmetric(
+                horizontal: 24,
+                vertical: 8,
               ),
+              child: bodyContent,
             ),
-        ],
-      ),
+
+        // ── Actions ────────────────────────────────────────────────────────
+        if (actionList != null && actionList.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.fromLTRB(24, 12, 24, 20),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                for (var i = 0; i < actionList.length; i++) ...[
+                  if (i > 0) const SizedBox(width: 8),
+                  actionList[i],
+                ],
+              ],
+            ),
+          ),
+      ],
     );
+
+    // Use OiDialogShell for non-fullScreen variants to ensure visual
+    // consistency between opinionated and custom dialogs.
+    Widget panel;
+    if (isFullScreen) {
+      panel = ColoredBox(
+        color: colors.surface,
+        child: dialogContent,
+      );
+    } else {
+      panel = OiDialogShell(
+        maxWidth: 480,
+        minWidth: 280,
+        child: dialogContent,
+      );
+    }
 
     panel = OiFocusTrap(onEscape: onClose, child: panel);
 

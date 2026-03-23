@@ -187,7 +187,7 @@ class _OiUploadDialogState extends State<OiUploadDialog> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Icon(
-                          OiIcons.cloudArrowUp, // upload
+                          OiIcons.cloudUpload, // upload
                           size: 28,
                           color: colors.textMuted,
                         ),
@@ -335,7 +335,7 @@ class _OiUploadDialogState extends State<OiUploadDialog> {
           GestureDetector(
             onTap: () => _removeEntry(index),
             child: Icon(
-              OiIcons.xMark, // close
+              OiIcons.x, // close
               size: 14,
               color: colors.textMuted,
             ),

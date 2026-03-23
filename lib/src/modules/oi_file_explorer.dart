@@ -549,7 +549,7 @@ class _OiFileExplorerState extends State<OiFileExplorer> {
       if (file.isFolder)
         OiMenuItem(
           label: 'Open',
-          icon: OiIcons.arrowTopRightOnSquare,
+          icon: OiIcons.externalLink,
           onTap: () =>
               widget.controller.navigateTo(file.id.toString(), folder: file),
         )
@@ -557,7 +557,7 @@ class _OiFileExplorerState extends State<OiFileExplorer> {
         if (widget.onOpen != null)
           OiMenuItem(
             label: 'Open',
-            icon: OiIcons.arrowTopRightOnSquare,
+            icon: OiIcons.externalLink,
             onTap: () => widget.onOpen!(file),
           ),
         if (widget.onPreview != null)
@@ -587,26 +587,26 @@ class _OiFileExplorerState extends State<OiFileExplorer> {
       if (widget.enableCopy && widget.onCopy != null)
         OiMenuItem(
           label: 'Copy to...',
-          icon: OiIcons.documentDuplicate,
+          icon: OiIcons.copy,
           onTap: () => _showMoveDialog([file], copyMode: true),
         ),
       if (widget.onDownload != null)
         OiMenuItem(
           label: 'Download',
-          icon: OiIcons.share,
+          icon: OiIcons.share2,
           onTap: () => widget.onDownload!(file),
         ),
       if (widget.onShare != null)
         OiMenuItem(
           label: 'Share',
-          icon: OiIcons.informationCircle,
+          icon: OiIcons.info,
           onTap: () => widget.onShare!(file),
         ),
       const OiMenuItem(label: '', separator: true),
       if (widget.enableDelete)
         OiMenuItem(
           label: 'Delete',
-          icon: OiIcons.trash,
+          icon: OiIcons.trash2,
           onTap: () => _showDeleteDialog([file]),
         ),
     ];
@@ -627,14 +627,14 @@ class _OiFileExplorerState extends State<OiFileExplorer> {
       if (widget.enableUpload)
         OiMenuItem(
           label: 'Upload files',
-          icon: OiIcons.cloudArrowUp,
+          icon: OiIcons.cloudUpload,
           onTap: _showUploadDialog,
         ),
       if (widget.controller.selectedKeys.isNotEmpty) ...[
         const OiMenuItem(label: '', separator: true),
         OiMenuItem(
           label: 'Select all',
-          icon: OiIcons.paperAirplane,
+          icon: OiIcons.send,
           onTap: widget.controller.selectAll,
         ),
         OiMenuItem(
@@ -812,8 +812,8 @@ class _OiFileExplorerState extends State<OiFileExplorer> {
         if (widget.enableSearch)
           OiIconButton(
             icon: _searchActive
-                ? OiIcons.xMark
-                : OiIcons.magnifyingGlass,
+                ? OiIcons.x
+                : OiIcons.search,
             semanticLabel: _searchActive ? 'Close search' : 'Search',
             onTap: () => setState(() {
               _searchActive = !_searchActive;
@@ -837,7 +837,7 @@ class _OiFileExplorerState extends State<OiFileExplorer> {
               label: 'List view',
             ),
             OiButtonGroupItem(
-              icon: OiIcons.eyeSlash,
+              icon: OiIcons.eyeOff,
               label: 'Grid view',
             ),
           ],
@@ -846,7 +846,7 @@ class _OiFileExplorerState extends State<OiFileExplorer> {
         // Actions
         if (widget.enableUpload)
           OiIconButton(
-            icon: OiIcons.cloudArrowUp,
+            icon: OiIcons.cloudUpload,
             semanticLabel: 'Upload files',
             onTap: _showUploadDialog,
           ),
@@ -940,7 +940,7 @@ class _OiFileExplorerState extends State<OiFileExplorer> {
     if (files.isEmpty) {
       if (controller.searchQuery.isNotEmpty) {
         return OiEmptyState(
-          icon: OiIcons.magnifyingGlass,
+          icon: OiIcons.search,
           title: "No files match '${controller.searchQuery}'",
           action: OiButton.ghost(
             label: 'Clear search',
@@ -960,7 +960,7 @@ class _OiFileExplorerState extends State<OiFileExplorer> {
           action: widget.enableUpload
               ? OiButton.primary(
                   label: 'Upload files',
-                  icon: OiIcons.cloudArrowUp,
+                  icon: OiIcons.cloudUpload,
                   onTap: _showUploadDialog,
                 )
               : null,

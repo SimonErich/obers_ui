@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/obers_ui.dart' show OiIcon, OiIcons;
 
 /// An icon glyph descriptor used by [OiIcon] and the [OiIcons] constants.
 ///

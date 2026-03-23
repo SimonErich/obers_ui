@@ -100,19 +100,18 @@ class _ProjectKanbanScreenState extends State<ProjectKanbanScreen> {
     return [
       OiMenuItem(
         label: 'Edit',
-        icon: OiIcons.pencilSquare,
+        icon: OiIcons.squarePen,
         onTap: () {
           OiToast.show(
             context,
             message: 'Editing: ${task.title}',
-            level: OiToastLevel.info,
           );
         },
       ),
       const OiMenuItem(label: '', separator: true),
       OiMenuItem(
         label: 'Move to Backlog',
-        icon: OiIcons.arrowUturnLeft,
+        icon: OiIcons.undo2,
         onTap: () => _moveTaskToColumn(task, 'backlog'),
       ),
       OiMenuItem(
@@ -132,13 +131,13 @@ class _ProjectKanbanScreenState extends State<ProjectKanbanScreen> {
       ),
       OiMenuItem(
         label: 'Move to Done',
-        icon: OiIcons.checkCircle,
+        icon: OiIcons.circleCheck,
         onTap: () => _moveTaskToColumn(task, 'done'),
       ),
       const OiMenuItem(label: '', separator: true),
       OiMenuItem(
         label: 'Delete',
-        icon: OiIcons.trash,
+        icon: OiIcons.trash2,
         onTap: () => _deleteTask(task),
       ),
     ];

@@ -244,31 +244,31 @@ void main() {
       });
 
       test('returns video icon for mp4', () {
-        expect(OiFileUtils.iconForExtension('mp4'), OiIcons.videoFile);
+        expect(OiFileUtils.iconForExtension('mp4'), OiIcons.video);
       });
 
       test('returns audio icon for mp3', () {
-        expect(OiFileUtils.iconForExtension('mp3'), OiIcons.audioFile);
+        expect(OiFileUtils.iconForExtension('mp3'), OiIcons.music);
       });
 
       test('returns pdf icon for pdf', () {
-        expect(OiFileUtils.iconForExtension('pdf'), OiIcons.pictureAsPdf);
+        expect(OiFileUtils.iconForExtension('pdf'), OiIcons.fileText);
       });
 
       test('returns description icon for docx', () {
-        expect(OiFileUtils.iconForExtension('docx'), OiIcons.description);
+        expect(OiFileUtils.iconForExtension('docx'), OiIcons.fileText);
       });
 
       test('returns table icon for xlsx', () {
-        expect(OiFileUtils.iconForExtension('xlsx'), OiIcons.tableChart);
+        expect(OiFileUtils.iconForExtension('xlsx'), OiIcons.table);
       });
 
       test('returns slideshow icon for pptx', () {
-        expect(OiFileUtils.iconForExtension('pptx'), OiIcons.slideshow);
+        expect(OiFileUtils.iconForExtension('pptx'), OiIcons.presentation);
       });
 
       test('returns zip icon for zip', () {
-        expect(OiFileUtils.iconForExtension('zip'), OiIcons.folderZip);
+        expect(OiFileUtils.iconForExtension('zip'), OiIcons.archive);
       });
 
       test('returns code icon for dart', () {
@@ -276,15 +276,15 @@ void main() {
       });
 
       test('returns data icon for json', () {
-        expect(OiFileUtils.iconForExtension('json'), OiIcons.dataObject);
+        expect(OiFileUtils.iconForExtension('json'), OiIcons.database);
       });
 
       test('returns text icon for txt', () {
-        expect(OiFileUtils.iconForExtension('txt'), OiIcons.textSnippet);
+        expect(OiFileUtils.iconForExtension('txt'), OiIcons.fileText);
       });
 
       test('returns generic icon for unknown extension', () {
-        expect(OiFileUtils.iconForExtension('xyz'), OiIcons.insertDriveFile);
+        expect(OiFileUtils.iconForExtension('xyz'), OiIcons.file);
       });
     });
 

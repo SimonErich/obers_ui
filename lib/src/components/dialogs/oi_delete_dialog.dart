@@ -150,7 +150,7 @@ class _OiDeleteDialogState extends State<OiDeleteDialog> {
                 Row(
                   children: [
                     Icon(
-                      OiIcons.exclamationCircle, // warning
+                      OiIcons.circleAlert, // warning
                       size: 16,
                       color: colors.warning.base,
                     ),

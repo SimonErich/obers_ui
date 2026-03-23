@@ -235,7 +235,7 @@ class _CmsSettingsScreenState extends State<CmsSettingsScreen> {
                   child: OiButton.primary(
                     label: 'Save Settings',
                     semanticLabel: 'Save settings',
-                    icon: OiIcons.checkCircle,
+                    icon: OiIcons.circleCheck,
                     onTap: _handleSave,
                   ),
                 ),

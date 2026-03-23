@@ -1,5 +1,6 @@
 import 'dart:ui' as ui;
 
+import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
 
 import 'package:obers_ui/src/foundation/scales/oi_chart_behavior.dart';

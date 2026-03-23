@@ -161,7 +161,7 @@ class _OiDateTimeInputState extends State<OiDateTimeInput> {
             Row(
               children: [
                 Icon(
-                  OiIcons.exclamationCircle,
+                  OiIcons.circleAlert,
                   size: 14,
                   color: colors.error.base,
                 ),

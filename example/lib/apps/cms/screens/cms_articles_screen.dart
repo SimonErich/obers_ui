@@ -103,8 +103,8 @@ class _CmsArticlesScreenState extends State<CmsArticlesScreen> {
       onFilterChange: (f) => setState(() => _activeFilters = f),
       headerActions: OiIconButton(
         icon: _layout == OiListViewLayout.grid
-            ? OiIcons.bars3
-            : OiIcons.squares2x2,
+            ? OiIcons.menu
+            : OiIcons.layoutGrid,
         semanticLabel: 'Toggle layout',
         onTap: () => setState(
           () => _layout = _layout == OiListViewLayout.list
@@ -127,7 +127,7 @@ class _CmsArticlesScreenState extends State<CmsArticlesScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             if (post.commentCount > 0) ...[
-              Icon(OiIcons.chatBubbleLeft, size: 16, color: colors.textMuted),
+              Icon(OiIcons.messageSquare, size: 16, color: colors.textMuted),
               const SizedBox(width: 4),
               OiLabel.small('${post.commentCount}', color: colors.textMuted),
               const SizedBox(width: 12),

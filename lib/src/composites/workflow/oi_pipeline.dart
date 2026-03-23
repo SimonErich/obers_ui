@@ -102,15 +102,15 @@ class OiPipeline extends StatelessWidget {
   static IconData statusIcon(OiPipelineStatus status) {
     switch (status) {
       case OiPipelineStatus.completed:
-        return OiIcons.checkCircle; // check_circle
+        return OiIcons.circleCheck; // check_circle
       case OiPipelineStatus.failed:
-        return OiIcons.exclamationCircle; // error
+        return OiIcons.circleAlert; // error
       case OiPipelineStatus.running:
-        return OiIcons.playCircle; // play_circle_filled
+        return OiIcons.circlePlay; // play_circle_filled
       case OiPipelineStatus.pending:
-        return OiIcons.noSymbol; // radio_button_unchecked
+        return OiIcons.ban; // radio_button_unchecked
       case OiPipelineStatus.skipped:
-        return OiIcons.noSymbol; // block
+        return OiIcons.ban; // block
     }
   }
 

@@ -1,3 +1,4 @@
+// ignore_for_file: deprecated_member_use — widgetbook demo uses OiBottomBarItem directly; OiBottomBar still accepts it
 import 'package:flutter/material.dart';
 import 'package:obers_ui/obers_ui.dart';
 import 'package:obers_ui_widgetbook/helpers/knob_helpers.dart';

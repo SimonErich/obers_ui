@@ -97,13 +97,13 @@ class _CmsAppState extends State<CmsApp> {
         ),
         OiNavItem(
           label: 'Media',
-          icon: OiIcons.photo,
+          icon: OiIcons.image,
           route: 'media',
           section: 'Content',
         ),
         OiNavItem(
           label: 'Settings',
-          icon: OiIcons.cog,
+          icon: OiIcons.settings,
           route: 'settings',
           section: 'System',
         ),

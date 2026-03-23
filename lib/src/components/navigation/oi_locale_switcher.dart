@@ -138,7 +138,7 @@ class _OiLocaleSwitcherState extends State<OiLocaleSwitcher> {
 
     final trigger = OiButton.ghost(
       label: _triggerLabel(current),
-      icon: OiIcons.language,
+      icon: OiIcons.languages,
       semanticLabel: widget.label,
       onTap: isDisabled ? null : () => setState(() => _isOpen = !_isOpen),
       enabled: !isDisabled,

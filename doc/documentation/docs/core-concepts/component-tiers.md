@@ -35,6 +35,8 @@ Single-purpose, low-level widgets. They render one thing and do it well.
 | `OiDraggable` | Makes any widget draggable |
 | `OiVirtualList` | Virtualized scrollable list |
 | `OiTouchTarget` | Enforces 48x48dp minimum touch area |
+| `OiSliverList` | Themed sliver list wrapper |
+| `OiSliverGrid` | Themed sliver grid wrapper |
 
 Primitives are the Lego bricks. Most users won't use them directly — components are built from them.
 
@@ -54,6 +56,14 @@ Standard UI components that you'll use every day. Built from primitives, styled 
 | `OiTabs` | Tab navigation with persistence |
 | `OiCard` | Content container with shadow |
 | `OiAvatar` | User avatar with image or initials |
+| `OiNavigationRail` | Compact vertical navigation rail |
+| `OiSliverHeader` | Sticky sliver header with collapsing variants |
+| `OiDialogShell` | Low-level dialog container |
+| `OiSnackBar` | Brief action feedback bar |
+| `OiRefreshIndicator` | Pull-to-refresh wrapper |
+| `OiPageIndicator` | Dot indicators for paged content |
+| `OiScrollToTop` | Floating scroll-to-top button |
+| `OiBackButton` | RTL-aware back navigation button |
 
 This is the tier most developers will interact with the most.
 
@@ -73,6 +83,7 @@ Multi-component patterns that solve complex UI problems. Built from components.
 | `OiHeatmap` | 2D data heat grid |
 | `OiGantt` | Gantt chart timeline |
 | `OiTour` | Multi-step guided onboarding |
+| `OiResponsiveShell` | Responsive navigation shell |
 
 ## Tier 4: Modules
 

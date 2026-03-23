@@ -47,7 +47,7 @@ class OiChartSurface extends StatelessWidget {
 
   /// Creates a minimal [OiChartSurface] with no border, shadow, or background.
   ///
-  /// Parallels [OiChartData.atom] and [OiChartPalette.atom] for single-series
+  /// Parallels `OiChartData.atom` and `OiChartPalette.atom` for single-series
   /// charts that need a bare surface wrapper with zero visual chrome.
   /// Default padding is `EdgeInsets.zero`.
   factory OiChartSurface.atom({

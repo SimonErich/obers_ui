@@ -22,9 +22,9 @@ dependencies:
 
 flutter:
   fonts:
-    - family: HeroiconsSolid
+    - family: lucide
       fonts:
-        - asset: lib/src/foundation/icons/heroicons_solid.ttf
+        - asset: lib/src/foundation/icons/lucide.ttf
 
 dev_dependencies:
   flutter_test:

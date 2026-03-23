@@ -14,8 +14,8 @@ import 'package:obers_ui/src/primitives/layout/oi_column.dart';
 import 'package:obers_ui/src/primitives/layout/oi_row.dart';
 
 // Material Icons codepoints.
-const IconData _kDeleteIcon = OiIcons.trash;
-const IconData _kImageIcon = OiIcons.photo;
+const IconData _kDeleteIcon = OiIcons.trash2;
+const IconData _kImageIcon = OiIcons.image;
 
 /// A single line item row for the shopping cart.
 ///

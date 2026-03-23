@@ -1,4 +1,6 @@
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/obers_ui.dart' show OiLineChart;
+import 'package:obers_ui/src/composites/visualization/oi_line_chart/oi_line_chart.dart' show OiLineChart;
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 
 /// Theme overrides for an [OiLineChart].
@@ -22,7 +24,7 @@ class OiLineChartTheme {
   final Color? axisLabelColor;
 
   /// Resolves the color for a series at [seriesIndex] following the cascade:
-  /// [seriesColor] → [chartTheme.seriesColors] → context chart palette.
+  /// `seriesColor` → `chartTheme.seriesColors` → context chart palette.
   static Color resolveColor(
     int seriesIndex,
     Color? seriesColor,

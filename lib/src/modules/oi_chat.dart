@@ -310,7 +310,7 @@ class _OiChatState extends State<OiChat> {
                         child: Padding(
                           padding: EdgeInsets.only(right: spacing.xs),
                           child: Icon(
-                            OiIcons.envelope,
+                            OiIcons.mail,
                             size: 22,
                             color: colors.textSubtle,
                           ),
@@ -342,7 +342,7 @@ class _OiChatState extends State<OiChat> {
                           shape: BoxShape.circle,
                         ),
                         child: Icon(
-                          OiIcons.paperClip,
+                          OiIcons.paperclip,
                           size: 20,
                           color: colors.textOnPrimary,
                         ),
@@ -616,7 +616,7 @@ class _OiChatState extends State<OiChat> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(
-              OiIcons.envelope,
+              OiIcons.mail,
               size: 14,
               color: ownMessage ? colors.textOnPrimary : colors.textSubtle,
             ),

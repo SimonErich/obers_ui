@@ -325,7 +325,7 @@ class _OiFileManagerState extends State<OiFileManager>
                     action: widget.onUpload != null
                         ? OiButton.primary(
                             label: 'Upload files',
-                            icon: OiIcons.cloudArrowUp,
+                            icon: OiIcons.cloudUpload,
                             onTap: () => widget.onUpload?.call(const []),
                           )
                         : null,

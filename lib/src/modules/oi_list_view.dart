@@ -454,7 +454,7 @@ class _OiListViewState<T> extends State<OiListView<T>>
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(
-              OiIcons.bars3BottomLeft,
+              OiIcons.alignLeft,
               size: 16,
               color: colors.text,
             ),

@@ -49,7 +49,7 @@ class OiErrorPage extends StatelessWidget {
       description:
           description ?? 'The page you are looking for does not exist.',
       errorCode: '404',
-      icon: OiIcons.magnifyingGlass, // search_off
+      icon: OiIcons.search, // search_off
       actionLabel: actionLabel,
       onAction: onAction,
     );
@@ -71,7 +71,7 @@ class OiErrorPage extends StatelessWidget {
       description:
           description ?? 'You do not have permission to view this page.',
       errorCode: '403',
-      icon: OiIcons.lockClosed, // lock
+      icon: OiIcons.lock, // lock
       actionLabel: actionLabel,
       onAction: onAction,
     );
@@ -92,7 +92,7 @@ class OiErrorPage extends StatelessWidget {
       label: label ?? 'Something went wrong',
       description: description ?? 'An unexpected error occurred on the server.',
       errorCode: '500',
-      icon: OiIcons.exclamationCircle, // error
+      icon: OiIcons.circleAlert, // error
       actionLabel: actionLabel,
       onAction: onAction,
     );

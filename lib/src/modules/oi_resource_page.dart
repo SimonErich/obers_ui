@@ -230,7 +230,7 @@ class OiResourcePage extends StatelessWidget {
       ),
       OiButton.destructive(
         label: 'Delete',
-        icon: OiIcons.trash, // delete
+        icon: OiIcons.trash2, // delete
         onTap: () => onAction?.call('delete'),
       ),
     ];
@@ -241,7 +241,7 @@ class OiResourcePage extends StatelessWidget {
       OiButton.ghost(label: 'Cancel', onTap: () => onAction?.call('cancel')),
       OiButton.primary(
         label: 'Save',
-        icon: OiIcons.archiveBoxArrowDown, // save
+        icon: OiIcons.archiveRestore, // save
         onTap: () => onAction?.call('save'),
       ),
     ];

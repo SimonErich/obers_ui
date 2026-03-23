@@ -100,10 +100,10 @@ class OiScatterPlot extends StatefulWidget {
   final List<OiScatterSeries> series;
 
   /// Configuration for the x-axis.
-  final OiChartAxis? xAxis;
+  final OiChartAxis<num>? xAxis;
 
   /// Configuration for the y-axis.
-  final OiChartAxis? yAxis;
+  final OiChartAxis<num>? yAxis;
 
   /// Whether to show grid lines.
   final bool showGrid;

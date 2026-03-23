@@ -66,7 +66,7 @@ class _OiFileDropTargetState extends State<OiFileDropTarget> {
         return OiDropHighlight(
           active: _isDragOver,
           message: widget.dropMessage ?? 'Drop files here',
-          icon: OiIcons.cloudArrowUp, // upload
+          icon: OiIcons.cloudUpload, // upload
           child: widget.child,
         );
       },

@@ -337,7 +337,7 @@ class _OiAppShellState extends State<OiAppShell>
                 semanticLabel: 'Open navigation',
                 onTap: () => setState(() => _drawerOpen = true),
                 child: Icon(
-                  OiIcons.bars3, // menu
+                  OiIcons.menu, // menu
                   size: 24,
                   color: colors.text,
                 ),

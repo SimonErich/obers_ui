@@ -350,7 +350,7 @@ class _OiFileSidebarState extends State<OiFileSidebar> {
                               if (widget.onDeleteFolder != null)
                                 OiMenuItem(
                                   label: 'Delete',
-                                  icon: OiIcons.trash,
+                                  icon: OiIcons.trash2,
                                   onTap: () => widget.onDeleteFolder!(folder),
                                 ),
                             ],

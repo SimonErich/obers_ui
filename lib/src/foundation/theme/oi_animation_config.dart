@@ -1,10 +1,27 @@
-import 'package:flutter/cupertino.dart'
-    show BackdropFilter, BoxShadow, MediaQueryData;
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart'
-    show BackdropFilter, BoxShadow, MediaQueryData;
-import 'package:flutter/widgets.dart'
-    show BackdropFilter, BoxShadow, MediaQueryData;
+import 'package:flutter/widgets.dart';
+import 'package:obers_ui/obers_ui.dart' show OiPageRoute;
+import 'package:obers_ui/src/foundation/oi_page_route.dart' show OiPageRoute;
+
+/// The type of transition animation used when navigating between pages.
+///
+/// {@category Foundation}
+enum OiPageTransitionType {
+  /// Crossfade between pages. Good default for most cases.
+  fade,
+
+  /// New page slides in from the right (LTR) or left (RTL).
+  slideHorizontal,
+
+  /// New page slides in from the bottom. Good for fullscreen dialogs.
+  slideVertical,
+
+  /// New page scales up from center with fade. Good for detail views.
+  scaleUp,
+
+  /// No animation. Instant swap.
+  none,
+}
 
 /// Configuration for animation durations and motion preferences.
 ///
@@ -21,6 +38,10 @@ class OiAnimationConfig {
     required this.normal,
     required this.slow,
     required this.reducedMotion,
+    this.defaultPageTransition = OiPageTransitionType.fade,
+    this.pageTransitionDuration = const Duration(milliseconds: 250),
+    this.pageEntryCurve = Curves.easeOutCubic,
+    this.pageExitCurve = Curves.easeInCubic,
   });
 
   /// Creates the standard animation configuration with typical durations.
@@ -32,7 +53,13 @@ class OiAnimationConfig {
       normal = reducedMotion
           ? Duration.zero
           : const Duration(milliseconds: 250),
-      slow = reducedMotion ? Duration.zero : const Duration(milliseconds: 400);
+      slow = reducedMotion ? Duration.zero : const Duration(milliseconds: 400),
+      defaultPageTransition = OiPageTransitionType.fade,
+      pageTransitionDuration = reducedMotion
+          ? Duration.zero
+          : const Duration(milliseconds: 250),
+      pageEntryCurve = Curves.easeOutCubic,
+      pageExitCurve = Curves.easeInCubic;
 
   /// Fast transition duration (150ms). Used for micro-interactions.
   final Duration fast;
@@ -48,18 +75,40 @@ class OiAnimationConfig {
   /// Should mirror [MediaQueryData.disableAnimations].
   final bool reducedMotion;
 
+  /// Default page transition type used by [OiPageRoute.of].
+  final OiPageTransitionType defaultPageTransition;
+
+  /// Duration for page transitions.
+  final Duration pageTransitionDuration;
+
+  /// Curve for page entry animations.
+  final Curve pageEntryCurve;
+
+  /// Curve for page exit animations.
+  final Curve pageExitCurve;
+
   /// Creates a copy with optionally overridden values.
   OiAnimationConfig copyWith({
     Duration? fast,
     Duration? normal,
     Duration? slow,
     bool? reducedMotion,
+    OiPageTransitionType? defaultPageTransition,
+    Duration? pageTransitionDuration,
+    Curve? pageEntryCurve,
+    Curve? pageExitCurve,
   }) {
     return OiAnimationConfig(
       fast: fast ?? this.fast,
       normal: normal ?? this.normal,
       slow: slow ?? this.slow,
       reducedMotion: reducedMotion ?? this.reducedMotion,
+      defaultPageTransition:
+          defaultPageTransition ?? this.defaultPageTransition,
+      pageTransitionDuration:
+          pageTransitionDuration ?? this.pageTransitionDuration,
+      pageEntryCurve: pageEntryCurve ?? this.pageEntryCurve,
+      pageExitCurve: pageExitCurve ?? this.pageExitCurve,
     );
   }
 
@@ -70,11 +119,24 @@ class OiAnimationConfig {
         other.fast == fast &&
         other.normal == normal &&
         other.slow == slow &&
-        other.reducedMotion == reducedMotion;
+        other.reducedMotion == reducedMotion &&
+        other.defaultPageTransition == defaultPageTransition &&
+        other.pageTransitionDuration == pageTransitionDuration &&
+        other.pageEntryCurve == pageEntryCurve &&
+        other.pageExitCurve == pageExitCurve;
   }
 
   @override
-  int get hashCode => Object.hash(fast, normal, slow, reducedMotion);
+  int get hashCode => Object.hash(
+        fast,
+        normal,
+        slow,
+        reducedMotion,
+        defaultPageTransition,
+        pageTransitionDuration,
+        pageEntryCurve,
+        pageExitCurve,
+      );
 }
 
 /// Configuration for device performance tiers.

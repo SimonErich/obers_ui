@@ -1,6 +1,7 @@
 import 'dart:ui' show Rect;
 
 import 'package:flutter/foundation.dart';
+import 'package:obers_ui/obers_ui.dart' show OiSettingsDriver, OiSettingsMixin;
 import 'package:obers_ui/src/foundation/persistence/oi_settings_data.dart';
 
 /// The comparison mode active on a chart.

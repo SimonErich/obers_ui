@@ -178,7 +178,7 @@ void main() {
 
   testWidgets('OiBarChart.stacked factory sets stacked mode', (tester) async {
     await tester.pumpObers(
-      SizedBox(
+      const SizedBox(
         width: 500,
         height: 400,
         child: OiBarChart.stacked(
@@ -195,7 +195,7 @@ void main() {
 
   testWidgets('OiBarChart.horizontalGrouped factory', (tester) async {
     await tester.pumpObers(
-      SizedBox(
+      const SizedBox(
         width: 500,
         height: 400,
         child: OiBarChart.horizontalGrouped(
@@ -210,7 +210,7 @@ void main() {
 
   testWidgets('OiBarChart.horizontalStacked factory', (tester) async {
     await tester.pumpObers(
-      SizedBox(
+      const SizedBox(
         width: 500,
         height: 400,
         child: OiBarChart.horizontalStacked(

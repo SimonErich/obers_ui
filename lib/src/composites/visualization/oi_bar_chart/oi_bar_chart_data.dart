@@ -1,4 +1,6 @@
 import 'package:flutter/painting.dart';
+import 'package:obers_ui/obers_ui.dart' show OiBarChart;
+import 'package:obers_ui/src/composites/visualization/oi_bar_chart/oi_bar_chart.dart' show OiBarChart;
 
 /// The layout mode of an [OiBarChart].
 ///

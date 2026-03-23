@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/foundation/scales/oi_chart_controller.dart';
 import 'package:obers_ui/src/foundation/scales/oi_chart_sync_coordinator.dart';
@@ -49,7 +48,7 @@ class OiChartSyncOptions {
 /// Concrete implementation of [OiChartSyncCoordinator] that manages a
 /// named sync group.
 ///
-/// Charts that share the same [syncGroup] string participate in
+/// Charts that share the same `syncGroup` string participate in
 /// synchronized interactions: hover on one chart updates the
 /// tooltip/crosshair on siblings, zoom/brush optionally syncs, and
 /// keyboard exploration can sync focus points.
@@ -221,7 +220,7 @@ class OiChartSyncGroup extends OiChartSyncCoordinator {
 }
 
 /// A global registry that manages [OiChartSyncGroup] instances by their
-/// [syncGroup] string identifier.
+/// `syncGroup` string identifier.
 ///
 /// Charts call [get] to obtain the coordinator for their group. When the
 /// last participant unregisters, the group is automatically cleaned up
@@ -314,8 +313,7 @@ class OiChartSyncProvider extends InheritedWidget {
   /// from [OiChartSyncGroupRegistry].
   OiChartSyncProvider({
     required String syncGroup,
-    OiChartSyncOptions options = const OiChartSyncOptions(),
-    required super.child,
+    required super.child, OiChartSyncOptions options = const OiChartSyncOptions(),
     super.key,
   }) : coordinator = OiChartSyncGroupRegistry.instance.get(
          syncGroup,

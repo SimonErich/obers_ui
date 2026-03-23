@@ -31,7 +31,6 @@ class _ProjectSchedulerScreenState extends State<ProjectSchedulerScreen> {
     OiToast.show(
       context,
       message: '${slot.title} ($startHour:00 - $endHour:00)',
-      level: OiToastLevel.info,
     );
   }
 
@@ -99,9 +98,6 @@ class _ProjectSchedulerScreenState extends State<ProjectSchedulerScreen> {
     return OiScheduler(
       slots: _slots,
       label: 'Team Schedule',
-      mode: OiSchedulerMode.day,
-      startHour: 8,
-      endHour: 18,
       onSlotTap: _onSlotTap,
       onTimeSlotTap: _onTimeSlotTap,
     );

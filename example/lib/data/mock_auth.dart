@@ -1,4 +1,5 @@
 /// Mock authentication data — demo credentials and validation messages.
+library;
 
 /// Demo login credentials displayed on the auth screen.
 const kDemoEmail = 'leopold@alpenglueck.at';

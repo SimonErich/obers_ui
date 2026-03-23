@@ -438,7 +438,7 @@ class OiFieldDisplay extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           OiIcon.decorative(
-            icon: OiIcons.minusCircle, // remove (dash)
+            icon: OiIcons.circleMinus, // remove (dash)
             color: colors.textMuted,
             size: 18,
           ),
@@ -462,7 +462,7 @@ class OiFieldDisplay extends StatelessWidget {
         OiIcon.decorative(
           icon: boolValue
               ? OiIcons.check // check
-              : OiIcons.arrowUturnLeft, // close
+              : OiIcons.undo2, // close
           color: boolValue ? colors.success.base : colors.error.base,
           size: 18,
         ),
@@ -478,7 +478,7 @@ class OiFieldDisplay extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         OiIcon.decorative(
-          icon: OiIcons.envelope, // mail
+          icon: OiIcons.mail, // mail
           color: colors.textMuted,
           size: 16,
         ),
@@ -559,7 +559,7 @@ class OiFieldDisplay extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         OiIcon.decorative(
-          icon: OiIcons.squares2x2, // insert_drive_file
+          icon: OiIcons.layoutGrid, // insert_drive_file
           color: colors.textMuted,
           size: 16,
         ),

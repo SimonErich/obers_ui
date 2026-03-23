@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/obers_ui.dart';
 
-import 'mock_users.dart';
+import 'package:obers_ui_example/data/mock_users.dart';
 
 // ── Task model ──────────────────────────────────────────────────────────────
 
@@ -42,21 +42,20 @@ List<OiKanbanColumn<MockTask>> buildKanbanColumns() {
       title: 'Backlog',
       color: const Color(0xFF9E9E9E), // grey
       items: [
-        MockTask(
+        const MockTask(
           id: 'task-01',
           title: 'Source new Bergkäse supplier from Vorarlberg',
           assignee: kWolfgang,
           priority: 'low',
           labels: ['sourcing', 'dairy'],
         ),
-        MockTask(
+        const MockTask(
           id: 'task-02',
           title: 'Design gift wrapping for Mozartkugeln box set',
           assignee: kMaria,
-          priority: 'medium',
           labels: ['design', 'packaging'],
         ),
-        MockTask(
+        const MockTask(
           id: 'task-03',
           title: 'Implement Kaffeepause reminder feature',
           priority: 'low',
@@ -66,9 +65,8 @@ List<OiKanbanColumn<MockTask>> buildKanbanColumns() {
           id: 'task-04',
           title: 'Plan Almabtrieb seasonal promotion',
           assignee: kFranz,
-          priority: 'medium',
           labels: ['marketing', 'seasonal'],
-          dueDate: DateTime(now.year, 9, 1),
+          dueDate: DateTime(now.year, 9),
         ),
       ],
     ),
@@ -91,7 +89,6 @@ List<OiKanbanColumn<MockTask>> buildKanbanColumns() {
           id: 'task-06',
           title: 'Add Steirisches Kürbiskernöl to online shop',
           assignee: kLiesl,
-          priority: 'medium',
           labels: ['development', 'food'],
           dueDate: now.add(const Duration(days: 5)),
         ),
@@ -140,7 +137,6 @@ List<OiKanbanColumn<MockTask>> buildKanbanColumns() {
           id: 'task-15',
           title: 'Fix Sachertorte image not loading on mobile',
           assignee: kElisabeth,
-          priority: 'medium',
           labels: ['performance', 'infrastructure'],
           dueDate: now.add(const Duration(days: 6)),
         ),
@@ -165,10 +161,10 @@ List<OiKanbanColumn<MockTask>> buildKanbanColumns() {
     ),
 
     // ── Done ─────────────────────────────────────────────────────────────
-    OiKanbanColumn<MockTask>(
+    const OiKanbanColumn<MockTask>(
       key: 'done',
       title: 'Done',
-      color: const Color(0xFF66BB6A), // green
+      color: Color(0xFF66BB6A), // green
       items: [
         MockTask(
           id: 'task-11',
@@ -181,7 +177,6 @@ List<OiKanbanColumn<MockTask>> buildKanbanColumns() {
           id: 'task-12',
           title: 'Ship Tiroler Speck sample packs to influencers',
           assignee: kHans,
-          priority: 'medium',
           labels: ['logistics', 'marketing'],
         ),
         MockTask(

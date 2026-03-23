@@ -11,7 +11,7 @@ import 'package:obers_ui/src/primitives/display/oi_surface.dart';
 import 'package:obers_ui/src/primitives/layout/oi_row.dart';
 
 // Material Icons codepoints.
-const IconData _kRemoveIcon = OiIcons.minusCircle;
+const IconData _kRemoveIcon = OiIcons.circleMinus;
 const IconData _kAddIcon = OiIcons.plus;
 
 /// A compact, touch-friendly number stepper for product quantities.

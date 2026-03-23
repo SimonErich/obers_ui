@@ -18,7 +18,7 @@ import 'package:obers_ui/src/primitives/layout/oi_row.dart';
 // Material Icons codepoints.
 const IconData _kCartIcon = OiIcons.shoppingCart;
 const IconData _kWishlistIcon = OiIcons.heart;
-const IconData _kImageIcon = OiIcons.photo;
+const IconData _kImageIcon = OiIcons.image;
 
 /// The layout variant for an [OiProductCard].
 ///

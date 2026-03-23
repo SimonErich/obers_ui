@@ -284,7 +284,7 @@ class _OiTagInputState extends State<OiTagInput> {
             OiTappable(
               onTap: () => _removeTag(index),
               child: Icon(
-                OiIcons.xMark,
+                OiIcons.x,
                 size: 14,
                 color: colors.primary.base,
               ),

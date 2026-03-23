@@ -188,7 +188,7 @@ class OiChartLegend extends StatelessWidget {
 
   /// Position of the legend relative to the chart.
   ///
-  /// On compact breakpoints, the legend automatically moves to [bottom]
+  /// On compact breakpoints, the legend automatically moves to `bottom`
   /// regardless of this setting.
   final OiChartLegendPosition position;
 

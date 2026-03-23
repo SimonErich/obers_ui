@@ -1,6 +1,6 @@
 import 'package:obers_ui/obers_ui.dart';
 
-import 'mock_users.dart';
+import 'package:obers_ui_example/data/mock_users.dart';
 
 // ── Metric card data ────────────────────────────────────────────────────────
 
@@ -268,7 +268,7 @@ final kActivityEvents = <OiActivityEvent>[
     title: 'Low stock warning',
     description: 'Almdudler Sirup — only 8 units remaining in warehouse',
     timestamp: DateTime.now().subtract(const Duration(hours: 3, minutes: 15)),
-    icon: OiIcons.exclamationTriangle,
+    icon: OiIcons.triangleAlert,
     category: 'Inventory',
   ),
   OiActivityEvent(
@@ -284,7 +284,7 @@ final kActivityEvents = <OiActivityEvent>[
     title: 'Database backup completed',
     description: 'Full backup finished in 4m 32s — 2.8 GB archived',
     timestamp: DateTime.now().subtract(const Duration(hours: 8)),
-    icon: OiIcons.cloudArrowUp,
+    icon: OiIcons.cloudUpload,
     category: 'System',
   ),
   OiActivityEvent(
@@ -292,7 +292,7 @@ final kActivityEvents = <OiActivityEvent>[
     title: 'Return request #318',
     description: 'Lederhosen size exchange — customer wants L instead of M',
     timestamp: DateTime.now().subtract(const Duration(hours: 11)),
-    icon: OiIcons.receiptRefund,
+    icon: OiIcons.receiptText,
     category: 'Orders',
   ),
   OiActivityEvent(
@@ -300,7 +300,7 @@ final kActivityEvents = <OiActivityEvent>[
     title: 'Newsletter sent',
     description: 'Spring collection preview — 12,847 subscribers reached',
     timestamp: DateTime.now().subtract(const Duration(hours: 23)),
-    icon: OiIcons.envelope,
+    icon: OiIcons.mail,
     category: 'Marketing',
   ),
 ];
@@ -322,7 +322,7 @@ final kNotifications = <OiNotification>[
     title: 'Inventory alert: Bergkäse',
     body: 'Stock level dropped below the reorder threshold (15 units).',
     timestamp: DateTime.now().subtract(const Duration(hours: 1)),
-    icon: OiIcons.exclamationTriangle,
+    icon: OiIcons.triangleAlert,
     category: 'Inventory',
   ),
   OiNotification(
@@ -340,7 +340,7 @@ final kNotifications = <OiNotification>[
     body: 'Revenue up 8.7% compared to last week. Full report available.',
     timestamp: DateTime.now().subtract(const Duration(hours: 6)),
     read: true,
-    icon: OiIcons.arrowTrendingUp,
+    icon: OiIcons.trendingUp,
     category: 'Reports',
   ),
   OiNotification(
@@ -357,7 +357,7 @@ final kNotifications = <OiNotification>[
     body: 'Tiroler Speck GmbH — invoice #2026-0389 for \u20AC3,420.',
     timestamp: DateTime.now().subtract(const Duration(days: 1)),
     read: true,
-    icon: OiIcons.envelope,
+    icon: OiIcons.mail,
     category: 'Finance',
   ),
 ];

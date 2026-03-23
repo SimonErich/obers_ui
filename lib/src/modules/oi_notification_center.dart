@@ -202,7 +202,7 @@ class OiNotificationCenter extends StatelessWidget {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Icon(
-                          OiIcons.userGroup,
+                          OiIcons.users,
                           size: 48,
                           color: colors.textMuted,
                         ),

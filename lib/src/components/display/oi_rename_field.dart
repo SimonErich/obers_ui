@@ -193,7 +193,7 @@ class _OiRenameFieldState extends State<OiRenameField> {
               GestureDetector(
                 onTap: _cancel,
                 child: Icon(
-                  OiIcons.xMark, // close
+                  OiIcons.x, // close
                   size: 18,
                   color: colors.error.base,
                 ),

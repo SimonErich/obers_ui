@@ -5,14 +5,18 @@ import 'package:obers_ui/src/foundation/theme/component_themes/oi_button_theme_d
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_card_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_chart_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_checkbox_theme_data.dart';
+import 'package:obers_ui/src/foundation/theme/component_themes/oi_dialog_shell_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_dialog_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_field_display_theme.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_file_explorer_theme_data.dart';
+import 'package:obers_ui/src/foundation/theme/component_themes/oi_navigation_rail_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_pagination_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_progress_theme_data.dart';
+import 'package:obers_ui/src/foundation/theme/component_themes/oi_refresh_indicator_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_select_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_sheet_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_sidebar_theme_data.dart';
+import 'package:obers_ui/src/foundation/theme/component_themes/oi_sliver_header_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_switch_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_table_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_tabs_theme_data.dart';
@@ -27,14 +31,19 @@ export 'component_themes/oi_card_theme_data.dart';
 export 'component_themes/oi_chart_palette.dart';
 export 'component_themes/oi_chart_theme_data.dart';
 export 'component_themes/oi_checkbox_theme_data.dart';
+export 'component_themes/oi_dialog_shell_theme_data.dart';
 export 'component_themes/oi_dialog_theme_data.dart';
 export 'component_themes/oi_field_display_theme.dart';
 export 'component_themes/oi_file_explorer_theme_data.dart';
+export 'component_themes/oi_navigation_rail_theme_data.dart';
+export 'component_themes/oi_otp_theme_data.dart';
 export 'component_themes/oi_pagination_theme_data.dart';
 export 'component_themes/oi_progress_theme_data.dart';
+export 'component_themes/oi_refresh_indicator_theme_data.dart';
 export 'component_themes/oi_select_theme_data.dart';
 export 'component_themes/oi_sheet_theme_data.dart';
 export 'component_themes/oi_sidebar_theme_data.dart';
+export 'component_themes/oi_sliver_header_theme_data.dart';
 export 'component_themes/oi_switch_theme_data.dart';
 export 'component_themes/oi_table_theme_data.dart';
 export 'component_themes/oi_tabs_theme_data.dart';
@@ -73,6 +82,10 @@ class OiComponentThemes {
     this.fileExplorer,
     this.fieldDisplay,
     this.pagination,
+    this.dialogShell,
+    this.refreshIndicator,
+    this.navigationRail,
+    this.sliverHeader,
   });
 
   /// Creates an [OiComponentThemes] with all fields set to `null`.
@@ -98,7 +111,11 @@ class OiComponentThemes {
       sidebar = null,
       fileExplorer = null,
       fieldDisplay = null,
-      pagination = null;
+      pagination = null,
+      dialogShell = null,
+      refreshIndicator = null,
+      navigationRail = null,
+      sliverHeader = null;
 
   /// Theme overrides for button components.
   final OiButtonThemeData? button;
@@ -160,6 +177,18 @@ class OiComponentThemes {
   /// Theme overrides for pagination components.
   final OiPaginationThemeData? pagination;
 
+  /// Theme overrides for dialog shell components.
+  final OiDialogShellThemeData? dialogShell;
+
+  /// Theme overrides for refresh indicator components.
+  final OiRefreshIndicatorThemeData? refreshIndicator;
+
+  /// Theme overrides for navigation rail components.
+  final OiNavigationRailThemeData? navigationRail;
+
+  /// Theme overrides for sliver header components.
+  final OiSliverHeaderThemeData? sliverHeader;
+
   /// Creates a copy with optionally overridden component theme fields.
   OiComponentThemes copyWith({
     OiButtonThemeData? button,
@@ -182,6 +211,10 @@ class OiComponentThemes {
     OiFileExplorerThemeData? fileExplorer,
     OiFieldDisplayThemeData? fieldDisplay,
     OiPaginationThemeData? pagination,
+    OiDialogShellThemeData? dialogShell,
+    OiRefreshIndicatorThemeData? refreshIndicator,
+    OiNavigationRailThemeData? navigationRail,
+    OiSliverHeaderThemeData? sliverHeader,
   }) {
     return OiComponentThemes(
       button: button ?? this.button,
@@ -204,6 +237,10 @@ class OiComponentThemes {
       fileExplorer: fileExplorer ?? this.fileExplorer,
       fieldDisplay: fieldDisplay ?? this.fieldDisplay,
       pagination: pagination ?? this.pagination,
+      dialogShell: dialogShell ?? this.dialogShell,
+      refreshIndicator: refreshIndicator ?? this.refreshIndicator,
+      navigationRail: navigationRail ?? this.navigationRail,
+      sliverHeader: sliverHeader ?? this.sliverHeader,
     );
   }
 
@@ -230,7 +267,11 @@ class OiComponentThemes {
         other.sidebar == sidebar &&
         other.fileExplorer == fileExplorer &&
         other.fieldDisplay == fieldDisplay &&
-        other.pagination == pagination;
+        other.pagination == pagination &&
+        other.dialogShell == dialogShell &&
+        other.refreshIndicator == refreshIndicator &&
+        other.navigationRail == navigationRail &&
+        other.sliverHeader == sliverHeader;
   }
 
   @override
@@ -250,7 +291,17 @@ class OiComponentThemes {
     switchTheme,
     sheet,
     avatar,
-    Object.hash(progress, sidebar, fileExplorer, fieldDisplay, pagination),
+    Object.hash(
+      progress,
+      sidebar,
+      fileExplorer,
+      fieldDisplay,
+      pagination,
+      dialogShell,
+      refreshIndicator,
+      navigationRail,
+      sliverHeader,
+    ),
   );
 }
 

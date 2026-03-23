@@ -87,7 +87,7 @@ class OiThumbs extends StatelessWidget {
         button: true,
         selected: selected,
         child: OiIconButton(
-          icon: up ? OiIcons.thumbUp : OiIcons.thumbDown,
+          icon: up ? OiIcons.thumbsUp : OiIcons.thumbsDown,
           semanticLabel: semanticLabel,
           onTap: enabled ? () => _handleTap(thumb) : null,
           variant: variant,

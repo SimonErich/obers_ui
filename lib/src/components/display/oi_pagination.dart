@@ -278,7 +278,7 @@ class _OiPaginationState extends State<OiPagination> {
               if (widget.showFirstLast)
                 _buildNavButton(
                   key: const Key('oi_pagination_first'),
-                  icon: OiIcons.chevronDoubleLeft,
+                  icon: OiIcons.chevronsLeft,
                   label: 'First page',
                   enabled: _hasPrev,
                   onTap: () => widget.onPageChange?.call(0),
@@ -312,7 +312,7 @@ class _OiPaginationState extends State<OiPagination> {
               if (widget.showFirstLast)
                 _buildNavButton(
                   key: const Key('oi_pagination_last'),
-                  icon: OiIcons.chevronDoubleRight,
+                  icon: OiIcons.chevronsRight,
                   label: 'Last page',
                   enabled: _hasNext,
                   onTap: () => widget.onPageChange?.call(_totalPages - 1),
@@ -343,7 +343,7 @@ class _OiPaginationState extends State<OiPagination> {
               if (widget.showFirstLast)
                 _buildNavButton(
                   key: const Key('oi_pagination_first'),
-                  icon: OiIcons.chevronDoubleLeft,
+                  icon: OiIcons.chevronsLeft,
                   label: 'First page',
                   enabled: _hasPrev,
                   onTap: () => widget.onPageChange?.call(0),
@@ -375,7 +375,7 @@ class _OiPaginationState extends State<OiPagination> {
               if (widget.showFirstLast)
                 _buildNavButton(
                   key: const Key('oi_pagination_last'),
-                  icon: OiIcons.chevronDoubleRight,
+                  icon: OiIcons.chevronsRight,
                   label: 'Last page',
                   enabled: _hasNext,
                   onTap: () => widget.onPageChange?.call(_totalPages - 1),

@@ -184,7 +184,7 @@ class _OiArrayInputState<T> extends State<OiArrayInput<T>> {
             padding: const EdgeInsets.only(left: 4),
             child: OiButton.ghost(
               label: 'Remove',
-              icon: OiIcons.close,
+              icon: OiIcons.x,
               size: OiButtonSize.small,
               onTap: () => _handleRemove(index),
               semanticLabel: 'Remove item ${index + 1}',
@@ -288,7 +288,7 @@ class _OiArrayInputState<T> extends State<OiArrayInput<T>> {
               padding: const EdgeInsets.only(top: 8),
               child: OiButton.ghost(
                 label: widget.addLabel,
-                icon: OiIcons.add,
+                icon: OiIcons.plus,
                 size: OiButtonSize.small,
                 onTap: _handleAdd,
                 semanticLabel: widget.addLabel,
@@ -299,7 +299,7 @@ class _OiArrayInputState<T> extends State<OiArrayInput<T>> {
             Row(
               children: [
                 OiIcon(
-                  icon: OiIcons.exclamationCircle,
+                  icon: OiIcons.circleAlert,
                   label: 'Error',
                   size: 14,
                   color: colors.error.base,

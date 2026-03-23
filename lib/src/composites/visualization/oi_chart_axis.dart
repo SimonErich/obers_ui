@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:obers_ui/obers_ui.dart' show OiBarChart, OiLineChart, OiScatterPlot;
 
 import 'package:obers_ui/src/foundation/oi_responsive.dart';
 import 'package:obers_ui/src/foundation/scales/oi_chart_axis_painter.dart';
@@ -105,7 +106,7 @@ enum OiTickStrategy {
   /// Auto-compute tick marks based on the scale and available space.
   auto,
 
-  /// Use evenly-spaced ticks with count determined by [divisions].
+  /// Use evenly-spaced ticks with count determined by `divisions`.
   even,
 
   /// Show a tick at every data point.

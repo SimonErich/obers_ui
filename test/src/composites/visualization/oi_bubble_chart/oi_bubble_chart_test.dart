@@ -3,7 +3,6 @@
 
 import 'dart:ui';
 
-import 'package:flutter/gestures.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -237,8 +236,7 @@ void main() {
           find.byKey(const Key('oi_bubble_chart_legend_item_0'));
       expect(item0, findsOneWidget);
 
-      final focusNode0 = Focus.of(tester.element(item0));
-      focusNode0.requestFocus();
+      Focus.of(tester.element(item0)).requestFocus();
       await tester.pumpAndSettle();
 
       // Simulate Enter key.
@@ -250,8 +248,7 @@ void main() {
       // Also verify Space key works on the second item.
       final item1 =
           find.byKey(const Key('oi_bubble_chart_legend_item_1'));
-      final focusNode1 = Focus.of(tester.element(item1));
-      focusNode1.requestFocus();
+      Focus.of(tester.element(item1)).requestFocus();
       await tester.pumpAndSettle();
 
       await tester.sendKeyEvent(LogicalKeyboardKey.space);
@@ -262,11 +259,11 @@ void main() {
 
     testWidgets('size legend items are keyboard focusable', (tester) async {
       await tester.pumpObers(
-        SizedBox(
+        const SizedBox(
           width: 500,
           height: 400,
           child: OiBubbleChartSizeLegend(
-            config: const OiBubbleSizeConfig(
+            config: OiBubbleSizeConfig(
               minRadius: 4,
               maxRadius: 24,
               sizeLabel: 'Population',
@@ -281,6 +278,7 @@ void main() {
       expect(circleFinder, findsOneWidget);
 
       final focusNode = Focus.of(tester.element(circleFinder));
+      // ignore: cascade_invocations — await between calls prevents cascade
       focusNode.requestFocus();
       await tester.pumpAndSettle();
 
@@ -453,15 +451,15 @@ void main() {
       const testBorderColor = Color(0xFFCCCCCC);
 
       await tester.pumpObers(
-        SizedBox(
+        const SizedBox(
           width: 500,
           height: 400,
           child: OiBubbleChartSizeLegend(
-            config: const OiBubbleSizeConfig(
+            config: OiBubbleSizeConfig(
               minRadius: 6,
               maxRadius: 30,
             ),
-            style: const OiBubbleSizeLegendStyle(
+            style: OiBubbleSizeLegendStyle(
               borderColor: testBorderColor,
             ),
           ),

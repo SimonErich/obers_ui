@@ -34,7 +34,7 @@ class ProjectPipelineScreen extends StatelessWidget {
       description:
           'Feature branches merged into develop. '
           'All unit tests passing, code coverage at 94%.',
-      icon: OiIcons.codeBracket,
+      icon: OiIcons.code,
       status: OiPipelineStatus.completed,
     ),
     _StageInfo(
@@ -50,7 +50,7 @@ class ProjectPipelineScreen extends StatelessWidget {
       description:
           'Integration and E2E tests running. '
           '37 of 52 test suites completed, no failures so far.',
-      icon: OiIcons.beaker,
+      icon: OiIcons.flaskConical,
       status: OiPipelineStatus.running,
     ),
     _StageInfo(
@@ -66,7 +66,7 @@ class ProjectPipelineScreen extends StatelessWidget {
       description:
           'Blue-green deployment to production. '
           'Automated rollback configured, monitoring dashboards ready.',
-      icon: OiIcons.rocketLaunch,
+      icon: OiIcons.rocket,
       status: OiPipelineStatus.pending,
     ),
   ];
@@ -82,13 +82,13 @@ class ProjectPipelineScreen extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Header
-          OiLabel.h3('Deployment Pipeline'),
+          const OiLabel.h3('Deployment Pipeline'),
           SizedBox(height: spacing.xs),
-          OiLabel.caption('Q1 Relaunch — Release v2.4.0'),
+          const OiLabel.caption('Q1 Relaunch — Release v2.4.0'),
           SizedBox(height: spacing.lg),
 
           // Pipeline widget
-          SingleChildScrollView(
+          const SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: OiPipeline(
               stages: _stages,
@@ -98,7 +98,7 @@ class ProjectPipelineScreen extends StatelessWidget {
           SizedBox(height: spacing.xl),
 
           // Stage detail cards
-          OiLabel.h4('Stage Details'),
+          const OiLabel.h4('Stage Details'),
           SizedBox(height: spacing.md),
           ..._stageDescriptions.map(
             (info) => Padding(

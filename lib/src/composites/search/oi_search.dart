@@ -396,7 +396,7 @@ class _OiSearchState extends State<OiSearch> {
                 leading: Padding(
                   padding: const EdgeInsets.only(right: 8),
                   child: Icon(
-                    OiIcons.magnifyingGlass,
+                    OiIcons.search,
                     size: 20,
                     color: colors.textMuted,
                   ),

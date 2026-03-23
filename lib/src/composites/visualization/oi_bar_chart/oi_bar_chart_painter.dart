@@ -1,7 +1,9 @@
 import 'dart:math' as math;
 
 import 'package:flutter/rendering.dart';
+import 'package:obers_ui/obers_ui.dart' show OiBarChart;
 import 'package:obers_ui/src/composites/visualization/_chart_grid_painter.dart';
+import 'package:obers_ui/src/composites/visualization/oi_bar_chart/oi_bar_chart.dart' show OiBarChart;
 
 /// Custom painter for [OiBarChart].
 class OiBarChartPainter extends CustomPainter {

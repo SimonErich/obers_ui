@@ -17,14 +17,14 @@ void main() {
     await tester.pumpObers(
       OiThemeToggle(currentMode: OiThemeMode.light, onModeChange: (_) {}),
     );
-    expect(find.byIcon(OiIcons.lightMode), findsOneWidget);
+    expect(find.byIcon(OiIcons.sun), findsOneWidget);
   });
 
   testWidgets('renders moon icon for dark mode', (tester) async {
     await tester.pumpObers(
       OiThemeToggle(currentMode: OiThemeMode.dark, onModeChange: (_) {}),
     );
-    expect(find.byIcon(OiIcons.darkMode), findsOneWidget);
+    expect(find.byIcon(OiIcons.moon), findsOneWidget);
   });
 
   testWidgets('renders monitor icon for system mode', (tester) async {
@@ -43,7 +43,7 @@ void main() {
       OiThemeToggle(currentMode: OiThemeMode.light, onModeChange: (_) {}),
     );
 
-    await tester.tap(find.byIcon(OiIcons.lightMode));
+    await tester.tap(find.byIcon(OiIcons.sun));
     await tester.pumpAndSettle();
 
     expect(find.text('Light mode'), findsOneWidget);
@@ -58,12 +58,12 @@ void main() {
       OiThemeToggle(currentMode: OiThemeMode.light, onModeChange: (_) {}),
     );
 
-    await tester.tap(find.byIcon(OiIcons.lightMode));
+    await tester.tap(find.byIcon(OiIcons.sun));
     await tester.pumpAndSettle();
 
     // All three mode icons are rendered in the popover.
-    expect(find.byIcon(OiIcons.lightMode), findsWidgets);
-    expect(find.byIcon(OiIcons.darkMode), findsOneWidget);
+    expect(find.byIcon(OiIcons.sun), findsWidgets);
+    expect(find.byIcon(OiIcons.moon), findsOneWidget);
     expect(find.byIcon(OiIcons.monitor), findsOneWidget);
   });
 
@@ -82,7 +82,7 @@ void main() {
       ),
     );
 
-    await tester.tap(find.byIcon(OiIcons.lightMode));
+    await tester.tap(find.byIcon(OiIcons.sun));
     await tester.pumpAndSettle();
 
     expect(selected, OiThemeMode.dark);
@@ -101,7 +101,7 @@ void main() {
       ),
     );
 
-    await tester.tap(find.byIcon(OiIcons.darkMode));
+    await tester.tap(find.byIcon(OiIcons.moon));
     await tester.pumpAndSettle();
 
     expect(selected, OiThemeMode.light);

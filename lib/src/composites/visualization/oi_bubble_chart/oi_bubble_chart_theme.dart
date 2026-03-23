@@ -1,7 +1,8 @@
 import 'package:flutter/widgets.dart';
-import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
-
+import 'package:obers_ui/obers_ui.dart' show OiBubbleChart;
+import 'package:obers_ui/src/composites/visualization/oi_bubble_chart/oi_bubble_chart.dart' show OiBubbleChart;
 import 'package:obers_ui/src/composites/visualization/oi_bubble_chart/oi_bubble_chart_data.dart';
+import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 
 /// Styling for the size legend component.
 ///

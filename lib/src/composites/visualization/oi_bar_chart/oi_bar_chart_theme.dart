@@ -1,4 +1,6 @@
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/obers_ui.dart' show OiBarChart;
+import 'package:obers_ui/src/composites/visualization/oi_bar_chart/oi_bar_chart.dart' show OiBarChart;
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 
 /// Theme overrides for an [OiBarChart].
@@ -26,7 +28,7 @@ class OiBarChartTheme {
   final double? barRadius;
 
   /// Resolves the color for a series at [seriesIndex] following the cascade:
-  /// [seriesColor] → [chartTheme.seriesColors] → context chart palette.
+  /// `seriesColor` → `chartTheme.seriesColors` → context chart palette.
   static Color resolveColor(
     int seriesIndex,
     Color? seriesColor,

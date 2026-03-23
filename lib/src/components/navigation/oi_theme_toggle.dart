@@ -52,8 +52,8 @@ class _OiThemeToggleState extends State<OiThemeToggle> {
   bool _isOpen = false;
 
   static IconData _iconForMode(OiThemeMode mode) => switch (mode) {
-    OiThemeMode.light => OiIcons.lightMode,
-    OiThemeMode.dark => OiIcons.darkMode,
+    OiThemeMode.light => OiIcons.sun,
+    OiThemeMode.dark => OiIcons.moon,
     OiThemeMode.system => OiIcons.monitor,
   };
 

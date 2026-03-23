@@ -14,7 +14,7 @@ class AdminUsersScreen extends StatefulWidget {
 }
 
 class _AdminUsersScreenState extends State<AdminUsersScreen> {
-  late List<Map<String, Object>> _employees = List.of(kEmployeeTableData);
+  late final List<Map<String, Object>> _employees = List.of(kEmployeeTableData);
   Set<String> _selectedKeys = {};
   String? _groupByField;
 
@@ -41,7 +41,7 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
         ),
         OiMenuItem(
           label: 'Send Email',
-          icon: OiIcons.envelope,
+          icon: OiIcons.mail,
           onTap: () => OiToast.show(
             context,
             message: 'Email sent to ${row['name']}',
@@ -50,7 +50,7 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
         const OiMenuItem(label: '', separator: true),
         OiMenuItem(
           label: 'Deactivate',
-          icon: OiIcons.noSymbol,
+          icon: OiIcons.ban,
           onTap: () {
             setState(() {
               final idx = _employees.indexWhere(
@@ -69,7 +69,7 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
         ),
         OiMenuItem(
           label: 'Delete',
-          icon: OiIcons.trash,
+          icon: OiIcons.trash2,
           onTap: () {
             setState(() {
               _employees.removeWhere((e) => e['email'] == row['email']);
@@ -265,7 +265,7 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
               actions: [
                 OiBulkAction(
                   label: 'Export',
-                  icon: OiIcons.arrowDownTray,
+                  icon: OiIcons.download,
                   onTap: () {
                     OiToast.show(
                       context,
@@ -277,7 +277,7 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
                 ),
                 OiBulkAction(
                   label: 'Delete',
-                  icon: OiIcons.trash,
+                  icon: OiIcons.trash2,
                   onTap: () {
                     setState(() {
                       _employees.removeWhere(
@@ -313,7 +313,6 @@ class _UserDetailSheetState extends State<_UserDetailSheet> {
     const OiMetadataField(
       key: 'Contract Type',
       value: 'Full-time',
-      type: OiMetadataType.text,
     ),
     const OiMetadataField(
       key: 'Remote Eligible',

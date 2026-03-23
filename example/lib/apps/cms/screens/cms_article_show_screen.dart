@@ -280,7 +280,7 @@ class _CmsArticleShowScreenState extends State<CmsArticleShowScreen> {
                     semanticLabel: 'Edit article',
                     onTap: widget.onEdit,
                     child: Icon(
-                      OiIcons.pencilSquare,
+                      OiIcons.squarePen,
                       size: 20,
                       color: colors.primary.base,
                     ),

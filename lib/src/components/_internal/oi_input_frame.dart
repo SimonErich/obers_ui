@@ -20,6 +20,7 @@ class OiInputFrame extends StatelessWidget {
     this.leading,
     this.trailing,
     this.padding,
+    this.counter,
     super.key,
   });
 
@@ -33,6 +34,9 @@ class OiInputFrame extends StatelessWidget {
   final Widget? leading;
   final Widget? trailing;
   final EdgeInsetsGeometry? padding;
+
+  /// Optional counter widget rendered below the input (e.g. "3/50").
+  final Widget? counter;
 
   OiBorderStyle _resolveBorder(BuildContext context) {
     final dec = context.decoration;
@@ -73,6 +77,8 @@ class OiInputFrame extends StatelessWidget {
       frame = Opacity(opacity: 0.6, child: frame);
     }
 
+    final hasError = error != null && error!.isNotEmpty;
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -82,28 +88,31 @@ class OiInputFrame extends StatelessWidget {
           const SizedBox(height: 4),
         ],
         frame,
-        if (error != null && error!.isNotEmpty) ...[
+        if (hasError) ...[
           const SizedBox(height: 4),
-          Row(
-            children: [
-              // REQ-0025: error icon so color is never the sole indicator.
-              Icon(
-                OiIcons.exclamationCircle, // error
-                size: 14,
-                color: colors.error.base,
-              ),
-              const SizedBox(width: 4),
-              Flexible(
-                child: Text(
-                  error!,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: colors.error.base,
-                    height: 1.3,
+          Semantics(
+            liveRegion: true,
+            child: Row(
+              children: [
+                // REQ-0025: error icon so color is never the sole indicator.
+                Icon(
+                  OiIcons.circleAlert, // error
+                  size: 14,
+                  color: colors.error.base,
+                ),
+                const SizedBox(width: 4),
+                Flexible(
+                  child: Text(
+                    error!,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: colors.error.base,
+                      height: 1.3,
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ] else if (hint != null) ...[
           const SizedBox(height: 4),
@@ -115,6 +124,10 @@ class OiInputFrame extends StatelessWidget {
               height: 1.3,
             ),
           ),
+        ],
+        if (counter != null) ...[
+          const SizedBox(height: 4),
+          Semantics(child: counter),
         ],
       ],
     );

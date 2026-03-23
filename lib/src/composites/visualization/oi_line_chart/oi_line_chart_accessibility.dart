@@ -1,3 +1,5 @@
+import 'package:obers_ui/obers_ui.dart' show OiLineChart;
+import 'package:obers_ui/src/composites/visualization/oi_line_chart/oi_line_chart.dart' show OiLineChart;
 import 'package:obers_ui/src/composites/visualization/oi_line_chart/oi_line_chart_data.dart';
 
 /// Accessibility helpers for [OiLineChart].

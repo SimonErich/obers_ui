@@ -189,8 +189,8 @@ List<OiGanttTask> buildGanttTasks() {
       label: 'Research & Requirements',
       start: DateTime(2026, 1, 6),
       end: DateTime(2026, 1, 23),
-      progress: 1.0,
-      color: Color(0xFF42A5F5),
+      progress: 1,
+      color: const Color(0xFF42A5F5),
       group: 'Planning',
     ),
     OiGanttTask(
@@ -198,10 +198,10 @@ List<OiGanttTask> buildGanttTasks() {
       label: 'UI/UX Redesign',
       start: DateTime(2026, 1, 20),
       end: DateTime(2026, 2, 13),
-      progress: 1.0,
-      color: Color(0xFFAB47BC),
+      progress: 1,
+      color: const Color(0xFFAB47BC),
       group: 'Planning',
-      dependsOn: ['gantt-1'],
+      dependsOn: const ['gantt-1'],
     ),
     OiGanttTask(
       key: 'gantt-3',
@@ -209,9 +209,9 @@ List<OiGanttTask> buildGanttTasks() {
       start: DateTime(2026, 2, 2),
       end: DateTime(2026, 3, 6),
       progress: 0.85,
-      color: Color(0xFFFFA726),
+      color: const Color(0xFFFFA726),
       group: 'Development',
-      dependsOn: ['gantt-1'],
+      dependsOn: const ['gantt-1'],
     ),
     OiGanttTask(
       key: 'gantt-4',
@@ -219,9 +219,9 @@ List<OiGanttTask> buildGanttTasks() {
       start: DateTime(2026, 2, 16),
       end: DateTime(2026, 3, 13),
       progress: 0.65,
-      color: Color(0xFF66BB6A),
+      color: const Color(0xFF66BB6A),
       group: 'Development',
-      dependsOn: ['gantt-2'],
+      dependsOn: const ['gantt-2'],
     ),
     OiGanttTask(
       key: 'gantt-5',
@@ -229,9 +229,9 @@ List<OiGanttTask> buildGanttTasks() {
       start: DateTime(2026, 2, 23),
       end: DateTime(2026, 3, 13),
       progress: 0.50,
-      color: Color(0xFF8D6E63),
+      color: const Color(0xFF8D6E63),
       group: 'Development',
-      dependsOn: ['gantt-3'],
+      dependsOn: const ['gantt-3'],
     ),
     OiGanttTask(
       key: 'gantt-klarna',
@@ -241,7 +241,7 @@ List<OiGanttTask> buildGanttTasks() {
       progress: 0.40,
       color: const Color(0xFFEC407A),
       group: 'Development',
-      dependsOn: ['gantt-3'],
+      dependsOn: const ['gantt-3'],
     ),
     OiGanttTask(
       key: 'gantt-6',
@@ -249,19 +249,18 @@ List<OiGanttTask> buildGanttTasks() {
       start: DateTime(2026, 3, 9),
       end: DateTime(2026, 3, 25),
       progress: 0.20,
-      color: Color(0xFFEF5350),
+      color: const Color(0xFFEF5350),
       group: 'Launch',
-      dependsOn: ['gantt-4', 'gantt-5', 'gantt-klarna'],
+      dependsOn: const ['gantt-4', 'gantt-5', 'gantt-klarna'],
     ),
     OiGanttTask(
       key: 'gantt-7',
       label: 'Launch',
       start: DateTime(2026, 3, 26),
       end: DateTime(2026, 3, 31),
-      progress: 0.0,
-      color: Color(0xFF26A69A),
+      color: const Color(0xFF26A69A),
       group: 'Launch',
-      dependsOn: ['gantt-6'],
+      dependsOn: const ['gantt-6'],
     ),
   ];
 }
@@ -278,7 +277,7 @@ List<OiTimelineEvent> buildTimelineEvents() {
           'Q1 Relaunch project started. Team assembled, goals defined, '
           'and initial roadmap approved by Leopold.',
       icon: OiIcons.flag,
-      color: Color(0xFF42A5F5),
+      color: const Color(0xFF42A5F5),
     ),
     OiTimelineEvent(
       timestamp: DateTime(2026, 1, 23),
@@ -286,8 +285,8 @@ List<OiTimelineEvent> buildTimelineEvents() {
       description:
           'All product requirements finalized. 42 user stories created '
           'covering the full Alpenglueck shop relaunch scope.',
-      icon: OiIcons.checkCircle,
-      color: Color(0xFF66BB6A),
+      icon: OiIcons.circleCheck,
+      color: const Color(0xFF66BB6A),
     ),
     OiTimelineEvent(
       timestamp: DateTime(2026, 2, 13),
@@ -295,8 +294,8 @@ List<OiTimelineEvent> buildTimelineEvents() {
       description:
           'Maria presented the new Alpine-inspired design system. '
           'Stakeholder feedback incorporated, all screens approved.',
-      icon: OiIcons.paintBrush,
-      color: Color(0xFFAB47BC),
+      icon: OiIcons.paintbrush,
+      color: const Color(0xFFAB47BC),
     ),
     OiTimelineEvent(
       timestamp: DateTime(2026, 3, 6),
@@ -305,7 +304,7 @@ List<OiTimelineEvent> buildTimelineEvents() {
           'Core API endpoints live on staging. Product catalog, orders, '
           'and user authentication fully functional.',
       icon: OiIcons.cloud,
-      color: Color(0xFFFFA726),
+      color: const Color(0xFFFFA726),
     ),
     OiTimelineEvent(
       timestamp: DateTime(2026, 3, 22),
@@ -313,8 +312,8 @@ List<OiTimelineEvent> buildTimelineEvents() {
       description:
           'First beta build deployed for internal testing. '
           'Schnitzel-themed onboarding flow getting great feedback from the team.',
-      icon: OiIcons.arrowTrendingUp,
-      color: Color(0xFF26A69A),
+      icon: OiIcons.trendingUp,
+      color: const Color(0xFF26A69A),
     ),
   ];
 }

@@ -101,7 +101,7 @@ class _OiFileInputState extends State<OiFileInput> {
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(
-            OiIcons.envelope,
+            OiIcons.mail,
             size: 14,
             color: colors.textMuted,
           ),
@@ -120,7 +120,7 @@ class _OiFileInputState extends State<OiFileInput> {
             OiTappable(
               onTap: () => _removeFile(index),
               child: Icon(
-                OiIcons.xMark,
+                OiIcons.x,
                 size: 14,
                 color: colors.textMuted,
               ),
@@ -181,7 +181,7 @@ class _OiFileInputState extends State<OiFileInput> {
               )
             else
               Icon(
-                OiIcons.envelope,
+                OiIcons.mail,
                 size: 16,
                 color: colors.primary.base,
               ),

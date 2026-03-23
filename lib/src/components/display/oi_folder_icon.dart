@@ -163,10 +163,10 @@ class OiFolderIcon extends StatelessWidget {
   IconData? get _variantOverlayIcon {
     return switch (variant) {
       OiFolderIconVariant.normal => null,
-      OiFolderIconVariant.shared => OiIcons.userGroup, // people
+      OiFolderIconVariant.shared => OiIcons.users, // people
       OiFolderIconVariant.starred => OiIcons.star, // star
-      OiFolderIconVariant.locked => OiIcons.lockClosed, // lock
-      OiFolderIconVariant.trash => OiIcons.trash, // delete
+      OiFolderIconVariant.locked => OiIcons.lock, // lock
+      OiFolderIconVariant.trash => OiIcons.trash2, // delete
     };
   }
 

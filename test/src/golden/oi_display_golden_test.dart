@@ -95,7 +95,7 @@ void main() {
         ),
         'Icon': const OiAvatar(
           semanticLabel: 'Default avatar',
-          icon: OiIcons.person,
+          icon: OiIcons.user,
         ),
       },
     );
@@ -113,7 +113,7 @@ void main() {
         ),
         'Icon': const OiAvatar(
           semanticLabel: 'Default avatar',
-          icon: OiIcons.person,
+          icon: OiIcons.user,
         ),
       },
     );

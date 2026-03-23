@@ -115,6 +115,74 @@ All animations respect `reducedMotion` automatically.
 | `OiVirtualGrid` | Virtualized scrollable grid |
 | `OiInfiniteScroll` | Infinite scroll trigger at list end |
 | `OiScrollbar` | Platform-adaptive scrollbar |
+| `OiSliverList` | Themed sliver list wrapper with separators and padding |
+| `OiSliverGrid` | Themed sliver grid wrapper with responsive columns |
+
+### OiSliverList
+
+A themed sliver list that wraps `SliverList` with consistent padding, optional dividers, and accessibility support. Use inside a `CustomScrollView` or any sliver-based scroll view.
+
+```dart
+// Builder with separators
+OiSliverList(
+  itemCount: items.length,
+  itemBuilder: (context, index) => OiLabel.body(items[index]),
+  separated: true,
+  padding: EdgeInsets.all(context.spacing.md),
+)
+
+// Static children list
+OiSliverList.children(
+  padding: EdgeInsets.all(context.spacing.md),
+  children: [
+    OiLabel.body('First'),
+    OiLabel.body('Second'),
+    OiLabel.body('Third'),
+  ],
+)
+```
+
+**Key features:**
+
+- Builder pattern for lazy item construction
+- `.children()` constructor for short, static lists
+- Optional themed dividers between items (`separated: true`)
+- Custom separator widget via `separatorBuilder`
+- Optional `SliverPadding` wrapper
+- Optional semantic label
+
+**Related components:** `OiSliverGrid`, `OiSliverHeader`, `OiVirtualList`
+
+### OiSliverGrid
+
+A themed sliver grid that wraps `SliverGrid` with design-system spacing defaults and responsive column support. Spacing defaults to the theme's `sm` value when not explicitly set.
+
+```dart
+// Fixed column count
+OiSliverGrid(
+  crossAxisCount: 3,
+  itemCount: items.length,
+  itemBuilder: (context, index) => OiCard(child: OiLabel.body(items[index])),
+)
+
+// Auto columns from minimum item width
+OiSliverGrid.extent(
+  minItemWidth: 200,
+  itemCount: items.length,
+  itemBuilder: (context, index) => OiCard(child: OiLabel.body(items[index])),
+)
+```
+
+**Key features:**
+
+- Fixed column count via default constructor
+- Auto-calculated columns from `minItemWidth` via `.extent()` constructor
+- Theme-derived spacing defaults (`spacing.sm`)
+- Configurable `childAspectRatio`, `mainAxisSpacing`, `crossAxisSpacing`
+- Optional `SliverPadding` wrapper
+- Optional semantic label
+
+**Related components:** `OiSliverList`, `OiSliverHeader`, `OiVirtualGrid`, `OiGrid`
 
 ## Drag & Drop
 

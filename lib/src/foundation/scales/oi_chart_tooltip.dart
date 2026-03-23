@@ -258,7 +258,8 @@ class OiChartTooltipConfig {
 /// formatted values, and colors.
 ///
 /// {@category Foundation}
-abstract class OiChartTooltipEntryResolver {
+// ignore: one_member_abstracts — intentional named interface; chart widgets implement this contract
+abstract interface class OiChartTooltipEntryResolver {
   /// Resolves a list of hit results into tooltip entries.
   ///
   /// The [hits] are the data points near the pointer. The

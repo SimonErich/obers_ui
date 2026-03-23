@@ -11,8 +11,8 @@ import 'package:obers_ui/src/primitives/layout/oi_column.dart';
 import 'package:obers_ui/src/primitives/layout/oi_row.dart';
 
 // Material Icons codepoints.
-const IconData _kCheckIcon = OiIcons.checkCircle;
-const IconData _kCloseIcon = OiIcons.xMark;
+const IconData _kCheckIcon = OiIcons.circleCheck;
+const IconData _kCloseIcon = OiIcons.x;
 
 /// A text input field with 'Apply' button for discount/coupon codes.
 ///

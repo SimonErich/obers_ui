@@ -163,7 +163,7 @@ class _OiCommentsState extends State<OiComments> {
           Expanded(
             child: widget.comments.isEmpty
                 ? OiEmptyState(
-                    icon: OiIcons.chatBubbleLeft,
+                    icon: OiIcons.messageSquare,
                     title: widget.emptyTitle,
                     description: widget.emptyDescription,
                   )

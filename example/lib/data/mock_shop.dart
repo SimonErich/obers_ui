@@ -407,7 +407,6 @@ final kProductReviews = <String, List<MockReview>>{
           'perfectly packaged and disappeared in under an hour.',
       date: DateTime(2026, 3, 5, 9, 15),
       helpfulCount: 28,
-      unhelpfulCount: 0,
     ),
     MockReview(
       reviewerName: 'Franz Hofer',
@@ -427,9 +426,8 @@ final kProductReviews = <String, List<MockReview>>{
       text:
           'Wore these up the Grossglockner. My feet were dry, my soul '
           'was at peace. Worth every cent.',
-      date: DateTime(2026, 3, 15, 11, 0),
+      date: DateTime(2026, 3, 15, 11),
       helpfulCount: 37,
-      unhelpfulCount: 0,
     ),
     MockReview(
       reviewerName: 'Helmut Winkler',
@@ -449,9 +447,8 @@ final kProductReviews = <String, List<MockReview>>{
       text:
           'The fabric quality is outstanding. I wore it to the Villacher '
           'Fasching and received compliments all evening.',
-      date: DateTime(2026, 3, 1, 20, 0),
+      date: DateTime(2026, 3, 1, 20),
       helpfulCount: 19,
-      unhelpfulCount: 0,
     ),
     MockReview(
       reviewerName: 'Renate Berger',
@@ -471,9 +468,8 @@ final kProductReviews = <String, List<MockReview>>{
       text:
           'Finally, a proper Kaffeehaus experience at home. The porcelain '
           'is thin and elegant. I now judge my own guests.',
-      date: DateTime(2026, 3, 18, 8, 0),
+      date: DateTime(2026, 3, 18, 8),
       helpfulCount: 12,
-      unhelpfulCount: 0,
     ),
   ],
   'prod-mozartkugeln': [
@@ -495,7 +491,6 @@ final kProductReviews = <String, List<MockReview>>{
           'impressed, which is the highest praise you can get.',
       date: DateTime(2026, 2, 25, 19, 30),
       helpfulCount: 24,
-      unhelpfulCount: 0,
     ),
   ],
 };
