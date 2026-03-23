@@ -360,11 +360,12 @@ class _OiSnackBarState extends State<OiSnackBar>
       );
     }
 
-    return Positioned(
-      left: 0,
-      right: 0,
-      bottom: widget.position == OiSnackBarPosition.bottom ? 0 : null,
-      top: widget.position == OiSnackBarPosition.top ? 0 : null,
+    final alignment = widget.position == OiSnackBarPosition.bottom
+        ? Alignment.bottomCenter
+        : Alignment.topCenter;
+
+    return Align(
+      alignment: alignment,
       child: SafeArea(
         child: Padding(
           padding: effectiveMargin,

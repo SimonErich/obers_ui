@@ -117,8 +117,8 @@ class _FormsWizardsScreenState extends State<FormsWizardsScreen> {
                         'Review and confirm your registration.',
                       ),
                     SizedBox(height: spacing.md),
-                    Wrap(
-                      spacing: spacing.sm,
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         if (_currentStep > 0)
                           OiButton.outline(
@@ -128,7 +128,9 @@ class _FormsWizardsScreenState extends State<FormsWizardsScreen> {
                                 _currentStep--;
                               });
                             },
-                          ),
+                          )
+                        else
+                          const SizedBox.shrink(),
                         if (_currentStep < 2)
                           OiButton.primary(
                             label: 'Next',

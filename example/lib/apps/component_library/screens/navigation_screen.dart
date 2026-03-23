@@ -26,6 +26,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
   int _currentPage = 0;
   int _compactPage = 0;
   int _loadedCount = 25;
+  int _perPage = 25;
 
   // ── OiThemeToggle state ───────────────────────────────────────────────────
   OiThemeMode _themeMode = OiThemeMode.light;
@@ -202,15 +203,18 @@ class _NavigationScreenState extends State<NavigationScreen> {
                 title: 'Fixed style',
                 child: SizedBox(
                   height: 80,
-                  child: OiBottomBar(
-                    items: OiBottomBar.fromNavigationItems(const [
-                      OiNavigationItem(icon: OiIcons.home, label: 'Home'),
-                      OiNavigationItem(icon: OiIcons.search, label: 'Search'),
-                      OiNavigationItem(icon: OiIcons.bell, label: 'Alerts'),
-                      OiNavigationItem(icon: OiIcons.user, label: 'Profile'),
-                    ]),
-                    currentIndex: _bottomBarIndex,
-                    onTap: (i) => setState(() => _bottomBarIndex = i),
+                  child: MediaQuery(
+                    data: const MediaQueryData(size: Size(400, 800)),
+                    child: OiBottomBar(
+                      items: OiBottomBar.fromNavigationItems(const [
+                        OiNavigationItem(icon: OiIcons.home, label: 'Home'),
+                        OiNavigationItem(icon: OiIcons.search, label: 'Search'),
+                        OiNavigationItem(icon: OiIcons.bell, label: 'Alerts'),
+                        OiNavigationItem(icon: OiIcons.user, label: 'Profile'),
+                      ]),
+                      currentIndex: _bottomBarIndex,
+                      onTap: (i) => setState(() => _bottomBarIndex = i),
+                    ),
                   ),
                 ),
               ),
@@ -310,8 +314,13 @@ class _NavigationScreenState extends State<NavigationScreen> {
                 child: OiPagination(
                   totalItems: 250,
                   currentPage: _currentPage,
+                  perPage: _perPage,
                   label: 'Results pagination',
                   onPageChange: (p) => setState(() => _currentPage = p),
+                  onPerPageChange: (pp) => setState(() {
+                    _perPage = pp;
+                    _currentPage = 0;
+                  }),
                 ),
               ),
               ComponentExample(

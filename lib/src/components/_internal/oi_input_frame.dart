@@ -58,7 +58,7 @@ class OiInputFrame extends StatelessWidget {
 
     final row = Row(
       children: [
-        if (leading != null) leading!,
+        if (leading != null) ...[leading!, const SizedBox(width: 8)],
         Expanded(child: child),
         if (trailing != null) trailing!,
       ],

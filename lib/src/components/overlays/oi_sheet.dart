@@ -101,10 +101,8 @@ class OiSheet extends StatefulWidget {
     final service = OiOverlays.maybeOf(context);
 
     if (service != null) {
-      // Service path: the handle is returned by service.show(); the onClose
-      // callback notifies the caller but does not need to dismiss the entry
-      // (the caller dismisses via the returned handle).
-      return service.show(
+      late final OiOverlayHandle handle;
+      handle = service.show(
         label: label,
         builder: (_) => OiSheet(
           label: label,
@@ -114,12 +112,16 @@ class OiSheet extends StatefulWidget {
           dismissible: dismissible,
           dragHandle: dragHandle,
           snapPoints: snapPoints,
-          onClose: onClose,
+          onClose: () {
+            onClose?.call();
+            handle.dismiss();
+          },
           child: child,
         ),
         zOrder: OiOverlayZOrder.panel,
         dismissible: false,
       );
+      return handle;
     }
 
     // Fallback path: create the entry first so the handle is available to

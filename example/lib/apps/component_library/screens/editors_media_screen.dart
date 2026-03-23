@@ -12,6 +12,9 @@ class EditorsMediaScreen extends StatefulWidget {
 
 class _EditorsMediaScreenState extends State<EditorsMediaScreen> {
   late final OiRichEditorController _editorController;
+  bool _showLightbox = false;
+  List<OiAnnotation> _annotations = [];
+  OiAnnotationType _selectedTool = OiAnnotationType.freehand;
 
   @override
   void initState() {
@@ -149,14 +152,47 @@ class _EditorsMediaScreenState extends State<EditorsMediaScreen> {
                 'opened from an OiGallery item tap.',
             examples: [
               ComponentExample(
-                title: 'Usage',
-                child: OiLabel.body(
-                  'OiLightbox(items: [...], initialIndex: 0, label: "Lightbox") '
-                  '— opens as a full-screen overlay. Required parameters: '
-                  'items (List<OiLightboxItem>), initialIndex (int), '
-                  'label (String). Optional: onDismiss, showThumbnails, '
-                  'enableZoom, enableSwipe.',
-                  color: colors.textSubtle,
+                title: 'Open lightbox',
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    OiButton.primary(
+                      label: 'Open Lightbox',
+                      onTap: () {
+                        setState(() => _showLightbox = true);
+                      },
+                    ),
+                    if (_showLightbox) ...[
+                      const SizedBox(height: 16),
+                      SizedBox(
+                        height: 400,
+                        child: OiLightbox(
+                          label: 'Sample lightbox',
+                          items: const [
+                            OiLightboxItem(
+                              src: 'https://picsum.photos/seed/lb1/800/600',
+                              alt: 'Sample image 1',
+                              caption: 'Mountain landscape',
+                            ),
+                            OiLightboxItem(
+                              src: 'https://picsum.photos/seed/lb2/800/600',
+                              alt: 'Sample image 2',
+                              caption: 'Ocean view',
+                            ),
+                            OiLightboxItem(
+                              src: 'https://picsum.photos/seed/lb3/800/600',
+                              alt: 'Sample image 3',
+                              caption: 'Forest path',
+                            ),
+                          ],
+                          initialIndex: 0,
+                          onDismiss: () {
+                            setState(() => _showLightbox = false);
+                          },
+                        ),
+                      ),
+                    ],
+                  ],
                 ),
               ),
             ],
@@ -171,14 +207,19 @@ class _EditorsMediaScreenState extends State<EditorsMediaScreen> {
                 'presets, rotation, and flip controls.',
             examples: [
               ComponentExample(
-                title: 'Usage',
-                child: OiLabel.body(
-                  'OiImageCropper(image: ImageProvider, label: "Crop image") '
-                  '— renders a crop interface with drag handles. Required '
-                  'parameters: image (ImageProvider), label (String). '
-                  'Optional: onCrop, aspectRatio, aspectRatioOptions, '
-                  'enableRotate, enableFlip.',
-                  color: colors.textSubtle,
+                title: 'Crop an image',
+                child: SizedBox(
+                  height: 400,
+                  child: OiImageCropper(
+                    image: const NetworkImage(
+                      'https://picsum.photos/seed/crop/800/600',
+                    ),
+                    label: 'Crop image',
+                    enableRotate: true,
+                    enableFlip: true,
+                    aspectRatioOptions: const [1.0, 16 / 9, 4 / 3],
+                    onCrop: (_) {},
+                  ),
                 ),
               ),
             ],
@@ -194,14 +235,23 @@ class _EditorsMediaScreenState extends State<EditorsMediaScreen> {
                 'types over an image.',
             examples: [
               ComponentExample(
-                title: 'Usage',
-                child: OiLabel.body(
-                  'OiImageAnnotator(image: ImageProvider, label: "Annotate") '
-                  '— renders an annotation canvas over an image. Required '
-                  'parameters: image (ImageProvider), label (String). '
-                  'Optional: annotations, onAnnotationsChange, selectedTool, '
-                  'strokeColor, strokeWidth, readOnly.',
-                  color: colors.textSubtle,
+                title: 'Annotate an image',
+                child: SizedBox(
+                  height: 400,
+                  child: OiImageAnnotator(
+                    image: const NetworkImage(
+                      'https://picsum.photos/seed/annotate/800/600',
+                    ),
+                    label: 'Annotate image',
+                    annotations: _annotations,
+                    selectedTool: _selectedTool,
+                    onToolChange: (tool) {
+                      setState(() => _selectedTool = tool);
+                    },
+                    onAnnotationsChange: (annotations) {
+                      setState(() => _annotations = annotations);
+                    },
+                  ),
                 ),
               ),
             ],
@@ -216,14 +266,14 @@ class _EditorsMediaScreenState extends State<EditorsMediaScreen> {
                 'and optional poster image. Supports autoplay and loop.',
             examples: [
               ComponentExample(
-                title: 'Usage',
-                child: OiLabel.body(
-                  'OiVideoPlayer(src: "https://...", label: "Video player") '
-                  '— renders a video player with transport controls. '
-                  'Required parameters: src (String), label (String). '
-                  'Optional: autoPlay, loop, showControls, aspectRatio, '
-                  'posterUrl, onPlay, onPause.',
-                  color: colors.textSubtle,
+                title: 'Video player',
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 600),
+                  child: const OiVideoPlayer(
+                    src: 'https://example.com/sample-video.mp4',
+                    label: 'Sample video',
+                    posterUrl: 'https://picsum.photos/seed/video/800/450',
+                  ),
                 ),
               ),
             ],

@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/_internal/oi_input_frame.dart';
 import 'package:obers_ui/src/foundation/oi_icons.dart';
+import 'package:obers_ui/src/foundation/theme/oi_color_scheme.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/primitives/input/oi_raw_input.dart';
 import 'package:obers_ui/src/primitives/overlay/oi_floating.dart';
@@ -284,30 +285,12 @@ class _OiSelectState<T> extends State<OiSelect<T>> {
                   itemBuilder: (ctx, i) {
                     final option = filtered[i];
                     final isSelected = option.value == widget.value;
-                    return GestureDetector(
+                    return _SelectDropdownItem<T>(
+                      option: option,
+                      isSelected: isSelected,
+                      height: itemHeight,
+                      colors: colors,
                       onTap: option.enabled ? () => _select(option) : null,
-                      behavior: HitTestBehavior.opaque,
-                      child: Container(
-                        height: itemHeight,
-                        padding: const EdgeInsets.symmetric(horizontal: 12),
-                        color: isSelected
-                            ? colors.primary.base.withValues(alpha: 0.1)
-                            : null,
-                        child: Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            option.label,
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: !option.enabled
-                                  ? colors.textMuted
-                                  : isSelected
-                                  ? colors.primary.base
-                                  : colors.text,
-                            ),
-                          ),
-                        ),
-                      ),
                     );
                   },
                 ),
@@ -359,6 +342,73 @@ class _OiSelectState<T> extends State<OiSelect<T>> {
       onDismiss: _close,
       anchor: anchor,
       child: _buildDropdown(context),
+    );
+  }
+}
+
+/// A single item in the select dropdown with hover support.
+class _SelectDropdownItem<T> extends StatefulWidget {
+  const _SelectDropdownItem({
+    required this.option,
+    required this.isSelected,
+    required this.height,
+    required this.colors,
+    this.onTap,
+  });
+
+  final OiSelectOption<T> option;
+  final bool isSelected;
+  final double height;
+  final OiColorScheme colors;
+  final VoidCallback? onTap;
+
+  @override
+  State<_SelectDropdownItem<T>> createState() => _SelectDropdownItemState<T>();
+}
+
+class _SelectDropdownItemState<T> extends State<_SelectDropdownItem<T>> {
+  bool _hovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = widget.colors;
+
+    Color? bgColor;
+    if (widget.isSelected) {
+      bgColor = colors.primary.base.withValues(alpha: 0.1);
+    } else if (_hovered && widget.option.enabled) {
+      bgColor = colors.primary.base.withValues(alpha: 0.05);
+    }
+
+    return MouseRegion(
+      cursor: widget.option.enabled
+          ? SystemMouseCursors.click
+          : SystemMouseCursors.basic,
+      onEnter: (_) => setState(() => _hovered = true),
+      onExit: (_) => setState(() => _hovered = false),
+      child: GestureDetector(
+        onTap: widget.onTap,
+        behavior: HitTestBehavior.opaque,
+        child: Container(
+          height: widget.height,
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          color: bgColor,
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: Text(
+              widget.option.label,
+              style: TextStyle(
+                fontSize: 14,
+                color: !widget.option.enabled
+                    ? colors.textMuted
+                    : widget.isSelected
+                    ? colors.primary.base
+                    : colors.text,
+              ),
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

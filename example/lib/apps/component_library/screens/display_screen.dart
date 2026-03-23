@@ -13,6 +13,7 @@ class DisplayScreen extends StatefulWidget {
 
 class _DisplayScreenState extends State<DisplayScreen> {
   int _pageIndex = 2;
+  int _pillPageIndex = 1;
 
   @override
   Widget build(BuildContext context) {
@@ -177,6 +178,41 @@ class _DisplayScreenState extends State<DisplayScreen> {
                     OiBadge.outline(
                       label: 'v2.1.0',
                       color: OiBadgeColor.neutral,
+                    ),
+                  ],
+                ),
+              ),
+              ComponentExample(
+                title: 'Sizes',
+                child: Wrap(
+                  spacing: 12,
+                  runSpacing: 12,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: [
+                    OiBadge.filled(
+                      label: 'Small',
+                      size: OiBadgeSize.small,
+                    ),
+                    OiBadge.filled(
+                      label: 'Medium',
+                    ),
+                    OiBadge.filled(
+                      label: 'Large',
+                      size: OiBadgeSize.large,
+                    ),
+                    OiBadge.soft(
+                      label: 'Small',
+                      size: OiBadgeSize.small,
+                      color: OiBadgeColor.success,
+                    ),
+                    OiBadge.soft(
+                      label: 'Medium',
+                      color: OiBadgeColor.success,
+                    ),
+                    OiBadge.soft(
+                      label: 'Large',
+                      size: OiBadgeSize.large,
+                      color: OiBadgeColor.success,
                     ),
                   ],
                 ),
@@ -419,14 +455,27 @@ class _DisplayScreenState extends State<DisplayScreen> {
                 'A component-level image with required accessibility alt text. '
                 'Supports placeholder and error fallback widgets.',
             examples: [
-              ComponentExample(
-                title: 'With error fallback',
+              const ComponentExample(
+                title: 'Network image',
                 child: SizedBox(
                   width: 200,
                   height: 150,
                   child: OiImage(
                     src: 'https://picsum.photos/200/150',
                     alt: 'Random sample image',
+                    width: 200,
+                    height: 150,
+                  ),
+                ),
+              ),
+              ComponentExample(
+                title: 'With error fallback',
+                child: SizedBox(
+                  width: 200,
+                  height: 150,
+                  child: OiImage(
+                    src: 'https://invalid.example/broken-image.png',
+                    alt: 'Image that fails to load',
                     width: 200,
                     height: 150,
                     errorWidget: Center(
@@ -509,7 +558,7 @@ class _DisplayScreenState extends State<DisplayScreen> {
               ComponentExample(
                 title: 'Error preset',
                 child: SizedBox(
-                  height: 200,
+                  height: 250,
                   child: OiEmptyState.error(
                     description: 'An unexpected error occurred.',
                     actionLabel: 'Retry',
@@ -599,6 +648,7 @@ class _DisplayScreenState extends State<DisplayScreen> {
                     OiPageIndicator(
                       count: 5,
                       current: _pageIndex,
+                      onDotTap: (i) => setState(() => _pageIndex = i),
                       semanticLabel: 'Page indicator',
                     ),
                     SizedBox(height: spacing.md),
@@ -632,11 +682,12 @@ class _DisplayScreenState extends State<DisplayScreen> {
                   ],
                 ),
               ),
-              const ComponentExample(
-                title: 'Pill variant',
+              ComponentExample(
+                title: 'Pill variant (tap dots to change)',
                 child: OiPageIndicator.pill(
                   count: 4,
-                  current: 1,
+                  current: _pillPageIndex,
+                  onDotTap: (i) => setState(() => _pillPageIndex = i),
                   semanticLabel: 'Pill page indicator',
                 ),
               ),

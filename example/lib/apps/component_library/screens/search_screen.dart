@@ -12,6 +12,7 @@ class SearchScreen extends StatefulWidget {
 
 class _SearchScreenState extends State<SearchScreen> {
   bool _showCommandBar = false;
+  String? _selectedFruit;
 
   @override
   Widget build(BuildContext context) {
@@ -130,7 +131,10 @@ class _SearchScreenState extends State<SearchScreen> {
                           'Grape',
                         ],
                         labelOf: (item) => item,
-                        onSelect: (_) {},
+                        value: _selectedFruit,
+                        onSelect: (fruit) {
+                          setState(() => _selectedFruit = fruit);
+                        },
                         placeholder: 'Type to search...',
                       ),
                     ),

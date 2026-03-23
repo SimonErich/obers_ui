@@ -102,7 +102,7 @@ class OiGauge extends StatelessWidget {
             segments: segments,
             target: target,
             trackColor: colors.borderSubtle,
-            needleColor: colors.text,
+            needleColor: colors.primary.base,
             targetColor: colors.warning.base,
             defaultSegmentColor: colors.primary.base,
           ),
@@ -178,7 +178,7 @@ class _OiGaugePainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final center = Offset(size.width / 2, size.height * 0.85);
+    final center = Offset(size.width / 2, size.height * 0.72);
     final radius = math.min(size.width, size.height * 1.4) / 2 * 0.8;
     final strokeWidth = radius * 0.15;
 

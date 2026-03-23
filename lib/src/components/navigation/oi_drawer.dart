@@ -48,52 +48,52 @@ class OiDrawer extends StatelessWidget {
     // Slide offset: 0.0 = fully visible (left edge at 0), -1.0 = hidden.
     final slideOffset = open ? 0.0 : -1.0;
 
+    final animDuration =
+        context.animations.reducedMotion ||
+                MediaQuery.disableAnimationsOf(context)
+            ? Duration.zero
+            : const Duration(milliseconds: 280);
+
     return Stack(
       fit: StackFit.expand,
       children: [
         // ── Scrim ────────────────────────────────────────────────────────────
-        if (open)
-          Positioned.fill(
-            child: AnimatedOpacity(
-              opacity: 1,
-              duration:
-                  context.animations.reducedMotion ||
-                      MediaQuery.disableAnimationsOf(context)
-                  ? Duration.zero
-                  : const Duration(milliseconds: 220),
-              curve: Curves.easeInOut,
-              child: GestureDetector(
-                onTap: onClose,
+        Positioned.fill(
+          child: IgnorePointer(
+            ignoring: !open,
+            child: GestureDetector(
+              onTap: onClose,
+              child: AnimatedOpacity(
+                opacity: open ? 1.0 : 0.0,
+                duration: animDuration,
+                curve: Curves.easeInOut,
                 child: ColoredBox(color: colors.overlay),
               ),
             ),
-          )
-        else
-          const SizedBox.shrink(),
+          ),
+        ),
 
         // ── Drawer panel ─────────────────────────────────────────────────────
-        AnimatedSlide(
-          offset: Offset(slideOffset, 0),
-          duration:
-              context.animations.reducedMotion ||
-                  MediaQuery.disableAnimationsOf(context)
-              ? Duration.zero
-              : const Duration(milliseconds: 220),
-          curve: Curves.easeInOut,
-          child: Align(
-            alignment: Alignment.centerLeft,
-            child: SizedBox(
-              width: width,
+        Align(
+          alignment: Alignment.centerLeft,
+          child: SizedBox(
+            width: width,
+            child: AnimatedSlide(
+              offset: Offset(slideOffset, 0),
+              duration: animDuration,
+              curve: Curves.easeOutCubic,
               child: DecoratedBox(
                 decoration: BoxDecoration(
                   color: colors.surface,
-                  boxShadow: const [
-                    BoxShadow(
-                      color: Color(0x1F000000),
-                      blurRadius: 24,
-                      offset: Offset(4, 0),
-                    ),
-                  ],
+                  boxShadow: open
+                      ? const [
+                          BoxShadow(
+                            color: Color(0x1F000000),
+                            blurRadius: 24,
+                            offset: Offset(4, 0),
+                          ),
+                        ]
+                      : null,
                 ),
                 child: child,
               ),

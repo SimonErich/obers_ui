@@ -191,6 +191,42 @@ class _OiRawInputState extends State<OiRawInput> {
     }
   }
 
+  // ── Word selection ───────────────────────────────────────────────────────
+
+  void _selectWordAtCursor() {
+    final text = widget.controller.text;
+    if (text.isEmpty) return;
+
+    final offset = widget.controller.selection.baseOffset.clamp(0, text.length);
+
+    // Find word boundaries around the cursor position.
+    var start = offset;
+    var end = offset;
+
+    while (start > 0 && _isWordChar(text[start - 1])) {
+      start--;
+    }
+    while (end < text.length && _isWordChar(text[end])) {
+      end++;
+    }
+
+    if (start != end) {
+      widget.controller.selection = TextSelection(
+        baseOffset: start,
+        extentOffset: end,
+      );
+    }
+  }
+
+  static bool _isWordChar(String c) {
+    final code = c.codeUnitAt(0);
+    return (code >= 0x30 && code <= 0x39) || // 0-9
+        (code >= 0x41 && code <= 0x5A) || // A-Z
+        (code >= 0x61 && code <= 0x7A) || // a-z
+        code == 0x5F || // _
+        code >= 0x80; // non-ASCII (accented chars, etc.)
+  }
+
   // ── Style helpers ─────────────────────────────────────────────────────────
 
   TextStyle _resolveStyle(BuildContext context) {
@@ -245,8 +281,22 @@ class _OiRawInputState extends State<OiRawInput> {
       selectionColor: effectiveCursorColor.withValues(alpha: 0.3),
     );
 
+    // Wrap in a GestureDetector to support double-tap word selection.
+    // Use onDoubleTapDown so EditableText still receives the gesture for
+    // cursor positioning. The actual selection is applied in a post-frame
+    // callback so it runs after EditableText has processed the tap.
+    final interactiveEditable = GestureDetector(
+      behavior: HitTestBehavior.translucent,
+      onDoubleTapDown: (_) {
+        SchedulerBinding.instance.addPostFrameCallback((_) {
+          if (mounted) _selectWordAtCursor();
+        });
+      },
+      child: editableText,
+    );
+
     // Wrap in a Stack to overlay the placeholder text.
-    var fieldWidget = editableText as Widget;
+    var fieldWidget = interactiveEditable as Widget;
     if (widget.placeholder != null) {
       fieldWidget = Stack(
         fit: StackFit.passthrough,

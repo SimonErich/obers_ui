@@ -1,5 +1,7 @@
 import 'package:flutter/widgets.dart';
 
+import 'package:obers_ui/obers_ui.dart';
+
 // ── Node definition ───────────────────────────────────────────────────────────
 
 /// A single node in an [OiTree].
@@ -429,7 +431,14 @@ class _DefaultNodeRow<T> extends StatelessWidget {
             child: SizedBox(
               width: 24,
               height: rowHeight,
-              child: Center(child: Text(expanded ? '▼' : '▶')),
+              child: Center(
+                child: AnimatedRotation(
+                  turns: expanded ? 0.25 : 0.0,
+                  duration: const Duration(milliseconds: 200),
+                  curve: Curves.easeInOut,
+                  child: const OiIcon(icon: OiIcons.chevronRight, label: 'Chevron Right'),
+                ),
+              ),
             ),
           )
         else

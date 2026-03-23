@@ -264,7 +264,7 @@ class _OiTabsState extends State<OiTabs>
             ? BorderRadius.circular(6)
             : null,
       ),
-      child: label,
+      child: Center(child: label),
     );
 
     if (widget.indicatorStyle == OiTabIndicatorStyle.underline) {
@@ -367,6 +367,7 @@ class _PillTabRow extends StatefulWidget {
 
 class _PillTabRowState extends State<_PillTabRow> {
   final List<GlobalKey> _keys = [];
+  final Set<int> _hoveredIndices = {};
 
   @override
   void initState() {
@@ -381,73 +382,85 @@ class _PillTabRowState extends State<_PillTabRow> {
       _keys
         ..clear()
         ..addAll(List.generate(widget.tabs.length, (_) => GlobalKey()));
+      _hoveredIndices.clear();
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
+    final reducedMotion = context.animations.reducedMotion ||
+        MediaQuery.disableAnimationsOf(context);
+    final animDuration =
+        reducedMotion ? Duration.zero : const Duration(milliseconds: 200);
 
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final children = <Widget>[];
-        for (var i = 0; i < widget.tabs.length; i++) {
-          final isSelected = i == widget.selectedIndex;
-          final tab = widget.tabs[i];
-          final textColor = isSelected ? colors.primary.base : colors.textMuted;
+    final children = <Widget>[];
+    for (var i = 0; i < widget.tabs.length; i++) {
+      final isSelected = i == widget.selectedIndex;
+      final isHovered = _hoveredIndices.contains(i);
+      final tab = widget.tabs[i];
+      final textColor = isSelected ? colors.primary.base : colors.textMuted;
 
-          // ignore: omit_local_variable_types — reassigned when icon present
-          Widget label = Text(
-            tab.label,
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
-              color: textColor,
-            ),
-          );
+      // ignore: omit_local_variable_types — reassigned when icon present
+      Widget label = Text(
+        tab.label,
+        style: TextStyle(
+          fontSize: 14,
+          fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+          color: textColor,
+        ),
+      );
 
-          if (tab.icon != null) {
-            label = Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(tab.icon, size: 18, color: textColor),
-                const SizedBox(width: 6),
-                label,
-              ],
-            );
-          }
+      if (tab.icon != null) {
+        label = Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(tab.icon, size: 18, color: textColor),
+            const SizedBox(width: 6),
+            label,
+          ],
+        );
+      }
 
-          children.add(
-            KeyboardListener(
-              focusNode: FocusNode(skipTraversal: true),
-              onKeyEvent: (e) => widget.onKeyEvent(i, e),
-              child: OiTappable(
-                key: _keys[i],
-                onTap: () => widget.onSelected(i),
-                child: AnimatedContainer(
-                  duration:
-                      context.animations.reducedMotion ||
-                          MediaQuery.disableAnimationsOf(context)
-                      ? Duration.zero
-                      : const Duration(milliseconds: 200),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 10,
-                  ),
-                  decoration: BoxDecoration(
-                    color: isSelected
-                        ? colors.primary.base.withValues(alpha: 0.12)
-                        : const Color(0x00000000),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: label,
+      Color bgColor;
+      if (isSelected) {
+        bgColor = colors.primary.base.withValues(alpha: 0.12);
+      } else if (isHovered) {
+        bgColor = colors.primary.base.withValues(alpha: 0.06);
+      } else {
+        bgColor = const Color(0x00000000);
+      }
+
+      final index = i;
+      children.add(
+        KeyboardListener(
+          focusNode: FocusNode(skipTraversal: true),
+          onKeyEvent: (e) => widget.onKeyEvent(index, e),
+          child: MouseRegion(
+            cursor: SystemMouseCursors.click,
+            onEnter: (_) => setState(() => _hoveredIndices.add(index)),
+            onExit: (_) => setState(() => _hoveredIndices.remove(index)),
+            child: GestureDetector(
+              key: _keys[index],
+              onTap: () => widget.onSelected(index),
+              behavior: HitTestBehavior.opaque,
+              child: AnimatedContainer(
+                duration: animDuration,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 10,
                 ),
+                decoration: BoxDecoration(
+                  color: bgColor,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: label,
               ),
             ),
-          );
-        }
-        return Row(mainAxisSize: MainAxisSize.min, children: children);
-      },
-    );
+          ),
+        ),
+      );
+    }
+    return Row(mainAxisSize: MainAxisSize.min, children: children);
   }
 }
