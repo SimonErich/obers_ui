@@ -3,6 +3,7 @@ import 'package:obers_ui/src/foundation/theme/component_themes/oi_avatar_theme_d
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_badge_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_button_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_card_theme_data.dart';
+import 'package:obers_ui/src/foundation/theme/component_themes/oi_chart_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_checkbox_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_dialog_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_field_display_theme.dart';
@@ -23,6 +24,8 @@ export 'component_themes/oi_avatar_theme_data.dart';
 export 'component_themes/oi_badge_theme_data.dart';
 export 'component_themes/oi_button_theme_data.dart';
 export 'component_themes/oi_card_theme_data.dart';
+export 'component_themes/oi_chart_palette.dart';
+export 'component_themes/oi_chart_theme_data.dart';
 export 'component_themes/oi_checkbox_theme_data.dart';
 export 'component_themes/oi_dialog_theme_data.dart';
 export 'component_themes/oi_field_display_theme.dart';
@@ -54,6 +57,7 @@ class OiComponentThemes {
     this.textInput,
     this.select,
     this.card,
+    this.chart,
     this.dialog,
     this.toast,
     this.tooltip,
@@ -79,6 +83,7 @@ class OiComponentThemes {
       textInput = null,
       select = null,
       card = null,
+      chart = null,
       dialog = null,
       toast = null,
       tooltip = null,
@@ -106,6 +111,9 @@ class OiComponentThemes {
 
   /// Theme overrides for card components.
   final OiCardThemeData? card;
+
+  /// Theme overrides for chart / data-visualization components.
+  final OiChartThemeData? chart;
 
   /// Theme overrides for dialog components.
   final OiDialogThemeData? dialog;
@@ -158,6 +166,7 @@ class OiComponentThemes {
     OiTextInputThemeData? textInput,
     OiSelectThemeData? select,
     OiCardThemeData? card,
+    OiChartThemeData? chart,
     OiDialogThemeData? dialog,
     OiToastThemeData? toast,
     OiTooltipThemeData? tooltip,
@@ -179,6 +188,7 @@ class OiComponentThemes {
       textInput: textInput ?? this.textInput,
       select: select ?? this.select,
       card: card ?? this.card,
+      chart: chart ?? this.chart,
       dialog: dialog ?? this.dialog,
       toast: toast ?? this.toast,
       tooltip: tooltip ?? this.tooltip,
@@ -205,6 +215,7 @@ class OiComponentThemes {
         other.textInput == textInput &&
         other.select == select &&
         other.card == card &&
+        other.chart == chart &&
         other.dialog == dialog &&
         other.toast == toast &&
         other.tooltip == tooltip &&
@@ -228,6 +239,7 @@ class OiComponentThemes {
     textInput,
     select,
     card,
+    chart,
     dialog,
     toast,
     tooltip,
@@ -238,8 +250,7 @@ class OiComponentThemes {
     switchTheme,
     sheet,
     avatar,
-    progress,
-    Object.hash(sidebar, fileExplorer, fieldDisplay, pagination),
+    Object.hash(progress, sidebar, fileExplorer, fieldDisplay, pagination),
   );
 }
 
