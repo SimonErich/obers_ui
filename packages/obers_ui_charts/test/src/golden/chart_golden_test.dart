@@ -114,7 +114,7 @@ void main() {
       final data = createSamplePieData(slices: 4);
       await pumpChart(
         tester,
-        OiPieChart(data: data, label: 'Golden pie chart'),
+        OiPieChart.fromChartData(data: data, label: 'Golden pie chart'),
         size: const Size(300, 300),
       );
 
@@ -128,7 +128,11 @@ void main() {
       final data = createSamplePieData(slices: 4);
       await pumpChart(
         tester,
-        OiPieChart(data: data, holeRadius: 0.5, label: 'Golden donut chart'),
+        OiPieChart.fromChartData(
+          data: data,
+          holeRadius: 0.5,
+          label: 'Golden donut chart',
+        ),
         size: const Size(300, 300),
       );
 
@@ -142,7 +146,7 @@ void main() {
       final data = createSamplePieData(slices: 4);
       await pumpChart(
         tester,
-        OiPieChart(
+        OiPieChart.fromChartData(
           data: data,
           theme: OiChartTheme.dark(),
           label: 'Dark pie chart',

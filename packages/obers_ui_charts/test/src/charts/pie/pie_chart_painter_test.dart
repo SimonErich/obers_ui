@@ -4,7 +4,18 @@ import 'dart:ui';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui_charts/obers_ui_charts.dart';
 
-import '../../../helpers/test_helpers.dart';
+/// Helper to create sample polar data for pie chart painter tests.
+OiPolarData _createPolarData({int slices = 4}) {
+  return OiPolarData(
+    segments: List.generate(
+      slices,
+      (i) => OiPolarSegment(
+        label: 'Slice $i',
+        value: ((i + 1) * 25).toDouble(),
+      ),
+    ),
+  );
+}
 
 void main() {
   late OiChartTheme theme;
@@ -15,7 +26,7 @@ void main() {
 
   group('OiPieChartPainter', () {
     test('creates painter with required parameters', () {
-      final data = createSamplePieData();
+      final data = _createPolarData();
       final painter = OiPieChartPainter(data: data, theme: theme);
 
       expect(painter.data, data);
@@ -24,7 +35,7 @@ void main() {
     });
 
     test('creates donut painter with holeRadius', () {
-      final data = createSamplePieData();
+      final data = _createPolarData();
       final painter = OiPieChartPainter(
         data: data,
         theme: theme,
@@ -35,7 +46,7 @@ void main() {
     });
 
     test('paints without error on valid data', () {
-      final data = createSamplePieData();
+      final data = _createPolarData();
       final painter = OiPieChartPainter(data: data, theme: theme);
 
       final recorder = PictureRecorder();
@@ -46,7 +57,10 @@ void main() {
     });
 
     test('paints without error on empty data', () {
-      final painter = OiPieChartPainter(data: OiChartData.empty, theme: theme);
+      final painter = OiPieChartPainter(
+        data: const OiPolarData(segments: []),
+        theme: theme,
+      );
 
       final recorder = PictureRecorder();
       final canvas = Canvas(recorder);
@@ -56,7 +70,7 @@ void main() {
     });
 
     test('skips painting on zero-size canvas', () {
-      final data = createSamplePieData();
+      final data = _createPolarData();
       final painter = OiPieChartPainter(data: data, theme: theme);
 
       final recorder = PictureRecorder();
@@ -67,8 +81,8 @@ void main() {
     });
 
     test('shouldRepaint returns true when data changes', () {
-      final data1 = createSamplePieData(slices: 3);
-      final data2 = createSamplePieData(slices: 5);
+      final data1 = _createPolarData(slices: 3);
+      final data2 = _createPolarData(slices: 5);
 
       final painter1 = OiPieChartPainter(data: data1, theme: theme);
       final painter2 = OiPieChartPainter(data: data2, theme: theme);
@@ -77,7 +91,7 @@ void main() {
     });
 
     test('paints single slice as full circle', () {
-      final data = createSamplePieData(slices: 1);
+      final data = _createPolarData(slices: 1);
       final painter = OiPieChartPainter(data: data, theme: theme);
 
       final recorder = PictureRecorder();
@@ -89,7 +103,7 @@ void main() {
     });
 
     test('paints donut with hole', () {
-      final data = createSamplePieData();
+      final data = _createPolarData();
       final painter = OiPieChartPainter(
         data: data,
         theme: theme,

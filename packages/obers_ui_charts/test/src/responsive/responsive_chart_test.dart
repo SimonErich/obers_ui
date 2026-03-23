@@ -122,7 +122,7 @@ void main() {
       final data = createSamplePieData();
       await pumpChart(
         tester,
-        OiPieChart(data: data, label: 'Small pie chart'),
+        OiPieChart.fromChartData(data: data, label: 'Small pie chart'),
         size: const Size(150, 150),
       );
 
@@ -133,7 +133,7 @@ void main() {
       final data = createSamplePieData();
       await pumpChart(
         tester,
-        OiPieChart(data: data, label: 'Large pie chart'),
+        OiPieChart.fromChartData(data: data, label: 'Large pie chart'),
         size: const Size(800, 800),
       );
 
@@ -144,7 +144,7 @@ void main() {
       final data = createSamplePieData();
       await pumpChart(
         tester,
-        OiPieChart(data: data, label: 'Rectangular pie chart'),
+        OiPieChart.fromChartData(data: data, label: 'Rectangular pie chart'),
         size: const Size(800, 200),
       );
 

@@ -178,16 +178,14 @@ void main() {
     });
 
     test('OiPieChartPainter paints 50 slices without timeout', () {
-      final data = OiChartData(
-        series: [
-          OiChartSeries(
-            name: 'Large Pie',
-            dataPoints: List.generate(
-              50,
-              (i) => OiDataPoint(x: i.toDouble(), y: (i + 1).toDouble()),
-            ),
+      final data = OiPolarData(
+        segments: List.generate(
+          50,
+          (i) => OiPolarSegment(
+            label: 'Slice $i',
+            value: (i + 1).toDouble(),
           ),
-        ],
+        ),
       );
       final theme = OiChartTheme.light();
       final painter = OiPieChartPainter(data: data, theme: theme);

@@ -8,7 +8,10 @@ void main() {
   group('OiPieChart', () {
     testWidgets('renders without errors', (tester) async {
       final data = createSamplePieData();
-      await pumpChart(tester, OiPieChart(data: data, label: 'Test pie chart'));
+      await pumpChart(
+        tester,
+        OiPieChart.fromChartData(data: data, label: 'Test pie chart'),
+      );
 
       expect(find.byType(OiPieChart), findsOneWidget);
       expect(find.byType(CustomPaint), findsOneWidget);
@@ -17,7 +20,10 @@ void main() {
     testWidgets('renders with empty data', (tester) async {
       await pumpChart(
         tester,
-        const OiPieChart(data: OiChartData.empty, label: 'Empty pie chart'),
+        OiPieChart.fromChartData(
+          data: OiChartData.empty,
+          label: 'Empty pie chart',
+        ),
       );
 
       expect(find.byType(OiPieChart), findsOneWidget);
@@ -27,7 +33,11 @@ void main() {
       final data = createSamplePieData();
       await pumpChart(
         tester,
-        OiPieChart(data: data, holeRadius: 0.5, label: 'Donut chart'),
+        OiPieChart.fromChartData(
+          data: data,
+          holeRadius: 0.5,
+          label: 'Donut chart',
+        ),
       );
 
       expect(find.byType(OiPieChart), findsOneWidget);
@@ -37,7 +47,7 @@ void main() {
       final data = createSamplePieData(slices: 1);
       await pumpChart(
         tester,
-        OiPieChart(data: data, label: 'Single slice pie'),
+        OiPieChart.fromChartData(data: data, label: 'Single slice pie'),
       );
 
       expect(find.byType(OiPieChart), findsOneWidget);
@@ -45,7 +55,10 @@ void main() {
 
     testWidgets('has semantics label', (tester) async {
       final data = createSamplePieData();
-      await pumpChart(tester, OiPieChart(data: data, label: 'Market share'));
+      await pumpChart(
+        tester,
+        OiPieChart.fromChartData(data: data, label: 'Market share'),
+      );
 
       expect(find.bySemanticsLabel('Market share'), findsOneWidget);
     });
@@ -54,7 +67,7 @@ void main() {
       final data = createSamplePieData();
       await pumpChart(
         tester,
-        OiPieChart(
+        OiPieChart.fromChartData(
           data: data,
           theme: OiChartTheme.dark(),
           label: 'Dark pie chart',
@@ -68,10 +81,10 @@ void main() {
       final data = createSamplePieData();
       await pumpChart(
         tester,
-        OiPieChart(
+        OiPieChart.fromChartData(
           data: data,
           label: 'Tappable pie chart',
-          onDataPointTap: (_) {},
+          onSegmentTap: (_) {},
         ),
       );
 
@@ -83,7 +96,10 @@ void main() {
 
     testWidgets('renders many slices', (tester) async {
       final data = createSamplePieData(slices: 10);
-      await pumpChart(tester, OiPieChart(data: data, label: 'Many slices'));
+      await pumpChart(
+        tester,
+        OiPieChart.fromChartData(data: data, label: 'Many slices'),
+      );
 
       expect(find.byType(OiPieChart), findsOneWidget);
     });
