@@ -2,7 +2,8 @@ import 'dart:math' as math;
 
 import 'package:flutter/rendering.dart';
 import 'package:obers_ui/src/composites/visualization/_chart_grid_painter.dart';
-import 'package:obers_ui/src/composites/visualization/oi_line_chart/oi_line_chart_data.dart';
+import 'package:obers_ui/src/composites/visualization/oi_line_chart/oi_line_chart_data.dart'
+    show OiLineChartMode, OiLinePoint;
 
 /// Resolved line series with concrete colors ready for painting.
 class ResolvedLineSeries {
@@ -54,7 +55,7 @@ class OiLineChartPainter extends CustomPainter {
     required this.axisLabelColor,
     required this.highContrast,
     required this.compact,
-    required this.smooth,
+    required this.mode,
     required this.showPoints,
     required this.stacked,
     required this.xLabels,
@@ -98,8 +99,8 @@ class OiLineChartPainter extends CustomPainter {
   /// Compact mode.
   final bool compact;
 
-  /// Whether to use smooth curves.
-  final bool smooth;
+  /// The line interpolation mode.
+  final OiLineChartMode mode;
 
   /// Whether to show point dots.
   final bool showPoints;
@@ -196,9 +197,17 @@ class OiLineChartPainter extends CustomPainter {
       }
 
       // Build path.
-      final path = smooth && mappedPoints.length > 2
-          ? _buildSmoothPath(mappedPoints)
-          : _buildLinearPath(mappedPoints);
+      final Path path;
+      switch (mode) {
+        case OiLineChartMode.smooth:
+          path = mappedPoints.length > 2
+              ? _buildSmoothPath(mappedPoints)
+              : _buildLinearPath(mappedPoints);
+        case OiLineChartMode.stepped:
+          path = _buildSteppedPath(mappedPoints);
+        case OiLineChartMode.straight:
+          path = _buildLinearPath(mappedPoints);
+      }
 
       // Draw fill.
       if (series.fill) {
@@ -281,6 +290,17 @@ class OiLineChartPainter extends CustomPainter {
     return path;
   }
 
+  Path _buildSteppedPath(List<Offset> points) {
+    final path = Path()..moveTo(points[0].dx, points[0].dy);
+    for (var i = 1; i < points.length; i++) {
+      // Horizontal segment to the next point's x, then vertical to its y.
+      path
+        ..lineTo(points[i].dx, points[i - 1].dy)
+        ..lineTo(points[i].dx, points[i].dy);
+    }
+    return path;
+  }
+
   Path _buildSmoothPath(List<Offset> points) {
     final path = Path()..moveTo(points[0].dx, points[0].dy);
     for (var i = 0; i < points.length - 1; i++) {
@@ -325,7 +345,7 @@ class OiLineChartPainter extends CustomPainter {
       oldDelegate.gridColor != gridColor ||
       oldDelegate.highContrast != highContrast ||
       oldDelegate.compact != compact ||
-      oldDelegate.smooth != smooth ||
+      oldDelegate.mode != mode ||
       oldDelegate.showPoints != showPoints ||
       oldDelegate.stacked != stacked ||
       oldDelegate.hoveredSeriesIndex != hoveredSeriesIndex ||

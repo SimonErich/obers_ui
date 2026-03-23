@@ -1,5 +1,22 @@
 import 'package:flutter/painting.dart';
 
+/// The interpolation mode of an [OiLineChart].
+///
+/// Controls how data points are connected.
+///
+/// {@category Composites}
+enum OiLineChartMode {
+  /// Data points are connected with straight line segments.
+  straight,
+
+  /// Data points are connected with horizontal-then-vertical step segments,
+  /// producing a staircase shape.
+  stepped,
+
+  /// Data points are connected with smooth Catmull-Rom curve interpolation.
+  smooth,
+}
+
 /// A single data point in a line chart.
 ///
 /// {@category Composites}

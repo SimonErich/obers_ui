@@ -15,20 +15,25 @@ import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 
 /// A bar chart for categorical comparisons.
 ///
-/// Renders [categories] as vertical or [horizontal] bars. Supports grouped
-/// and [stacked] layouts, optional value labels, and touch/pointer
-/// interaction.
+/// Renders [categories] as bars in the layout determined by [mode].
+/// Supports grouped, stacked, horizontal-grouped, and horizontal-stacked
+/// layouts, optional value labels, and touch/pointer interaction.
+///
+/// Use the named constructors for common variants:
+/// - [OiBarChart.grouped]: vertical grouped bars (default).
+/// - [OiBarChart.stacked]: vertical stacked bars.
+/// - [OiBarChart.horizontalGrouped]: horizontal grouped bars.
+/// - [OiBarChart.horizontalStacked]: horizontal stacked bars.
 ///
 /// {@category Composites}
 class OiBarChart extends StatefulWidget {
-  /// Creates an [OiBarChart].
+  /// Creates an [OiBarChart] with the given [mode].
   const OiBarChart({
     required this.label,
     required this.categories,
     super.key,
+    this.mode = OiBarChartMode.grouped,
     this.series,
-    this.horizontal = false,
-    this.stacked = false,
     this.showValues = false,
     this.showGrid = true,
     this.showLegend = true,
@@ -40,21 +45,86 @@ class OiBarChart extends StatefulWidget {
     this.compact,
   });
 
+  /// Creates a vertical grouped [OiBarChart].
+  const OiBarChart.grouped({
+    required this.label,
+    required this.categories,
+    super.key,
+    this.series,
+    this.showValues = false,
+    this.showGrid = true,
+    this.showLegend = true,
+    this.barRadius = 4.0,
+    this.yAxis,
+    this.onBarTap,
+    this.theme,
+    this.interactionMode,
+    this.compact,
+  }) : mode = OiBarChartMode.grouped;
+
+  /// Creates a vertical stacked [OiBarChart].
+  const OiBarChart.stacked({
+    required this.label,
+    required this.categories,
+    super.key,
+    this.series,
+    this.showValues = false,
+    this.showGrid = true,
+    this.showLegend = true,
+    this.barRadius = 4.0,
+    this.yAxis,
+    this.onBarTap,
+    this.theme,
+    this.interactionMode,
+    this.compact,
+  }) : mode = OiBarChartMode.stacked;
+
+  /// Creates a horizontal grouped [OiBarChart].
+  const OiBarChart.horizontalGrouped({
+    required this.label,
+    required this.categories,
+    super.key,
+    this.series,
+    this.showValues = false,
+    this.showGrid = true,
+    this.showLegend = true,
+    this.barRadius = 4.0,
+    this.yAxis,
+    this.onBarTap,
+    this.theme,
+    this.interactionMode,
+    this.compact,
+  }) : mode = OiBarChartMode.horizontalGrouped;
+
+  /// Creates a horizontal stacked [OiBarChart].
+  const OiBarChart.horizontalStacked({
+    required this.label,
+    required this.categories,
+    super.key,
+    this.series,
+    this.showValues = false,
+    this.showGrid = true,
+    this.showLegend = true,
+    this.barRadius = 4.0,
+    this.yAxis,
+    this.onBarTap,
+    this.theme,
+    this.interactionMode,
+    this.compact,
+  }) : mode = OiBarChartMode.horizontalStacked;
+
   /// Accessibility label for the chart.
   final String label;
 
   /// The category data to render.
   final List<OiBarCategory> categories;
 
+  /// The bar layout mode.
+  final OiBarChartMode mode;
+
   /// Optional named series (for legend and color resolution).
   /// When null, a single implicit series is assumed.
   final List<OiBarSeries>? series;
-
-  /// Whether to draw bars horizontally.
-  final bool horizontal;
-
-  /// Whether to stack bars instead of grouping them.
-  final bool stacked;
 
   /// Whether to show value labels on bars.
   final bool showValues;
@@ -95,6 +165,14 @@ class _OiBarChartState extends State<OiBarChart> {
   static const double _minViableWidth = 120;
   static const double _minViableHeight = 80;
 
+  bool get _isHorizontal =>
+      widget.mode == OiBarChartMode.horizontalGrouped ||
+      widget.mode == OiBarChartMode.horizontalStacked;
+
+  bool get _isStacked =>
+      widget.mode == OiBarChartMode.stacked ||
+      widget.mode == OiBarChartMode.horizontalStacked;
+
   int get _numSeries {
     if (widget.series != null) return widget.series!.length;
     if (widget.categories.isEmpty) return 1;
@@ -126,7 +204,7 @@ class _OiBarChartState extends State<OiBarChart> {
   ) {
     if (widget.categories.isEmpty) return null;
 
-    if (widget.horizontal) {
+    if (_isHorizontal) {
       final catHeight = chartRect.height / widget.categories.length;
       final ci = ((position.dy - chartRect.top) / catHeight).floor();
       if (ci < 0 || ci >= widget.categories.length) return null;
@@ -137,7 +215,7 @@ class _OiBarChartState extends State<OiBarChart> {
       final ci = ((position.dx - chartRect.left) / catWidth).floor();
       if (ci < 0 || ci >= widget.categories.length) return null;
 
-      if (widget.stacked || _numSeries == 1) {
+      if (_isStacked || _numSeries == 1) {
         return (categoryIndex: ci, seriesIndex: 0);
       }
 
@@ -220,7 +298,7 @@ class _OiBarChartState extends State<OiBarChart> {
           final allValues = <List<double>>[];
           for (final cat in widget.categories) {
             allValues.add(cat.values);
-            if (widget.stacked) {
+            if (_isStacked) {
               var sum = 0.0;
               for (final v in cat.values) {
                 sum += v;
@@ -259,8 +337,8 @@ class _OiBarChartState extends State<OiBarChart> {
                 values: allValues,
                 colors: resolvedColors,
                 chartRect: chartRect,
-                horizontal: widget.horizontal,
-                stacked: widget.stacked,
+                horizontal: _isHorizontal,
+                stacked: _isStacked,
                 showValues: widget.showValues,
                 showGrid: widget.showGrid,
                 barRadius: effectiveRadius,

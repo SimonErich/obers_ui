@@ -16,13 +16,37 @@ import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 /// A line chart for visualising time series and metric data.
 ///
 /// Renders one or more [series] as polylines on a Cartesian grid.
-/// Supports smooth curves, dashed lines, area fill, stacked mode,
-/// and touch/pointer interaction.
+/// The [mode] controls interpolation between data points.
+/// Supports dashed lines, area fill, stacked mode, and touch/pointer
+/// interaction.
+///
+/// Use the named constructors for common variants:
+/// - [OiLineChart.straight]: straight line segments (default).
+/// - [OiLineChart.stepped]: staircase step segments.
+/// - [OiLineChart.smooth]: smooth Catmull-Rom curves.
 ///
 /// {@category Composites}
 class OiLineChart extends StatefulWidget {
-  /// Creates an [OiLineChart].
+  /// Creates an [OiLineChart] with the given [mode].
   const OiLineChart({
+    required this.label,
+    required this.series,
+    super.key,
+    this.mode = OiLineChartMode.straight,
+    this.xAxis,
+    this.yAxis,
+    this.showGrid = true,
+    this.showLegend = true,
+    this.showPoints = false,
+    this.stacked = false,
+    this.onPointTap,
+    this.theme,
+    this.interactionMode,
+    this.compact,
+  });
+
+  /// Creates a straight-line [OiLineChart].
+  const OiLineChart.straight({
     required this.label,
     required this.series,
     super.key,
@@ -31,19 +55,55 @@ class OiLineChart extends StatefulWidget {
     this.showGrid = true,
     this.showLegend = true,
     this.showPoints = false,
-    this.smooth = false,
     this.stacked = false,
     this.onPointTap,
     this.theme,
     this.interactionMode,
     this.compact,
-  });
+  }) : mode = OiLineChartMode.straight;
+
+  /// Creates a stepped-line [OiLineChart].
+  const OiLineChart.stepped({
+    required this.label,
+    required this.series,
+    super.key,
+    this.xAxis,
+    this.yAxis,
+    this.showGrid = true,
+    this.showLegend = true,
+    this.showPoints = false,
+    this.stacked = false,
+    this.onPointTap,
+    this.theme,
+    this.interactionMode,
+    this.compact,
+  }) : mode = OiLineChartMode.stepped;
+
+  /// Creates a smooth-curve [OiLineChart].
+  const OiLineChart.smooth({
+    required this.label,
+    required this.series,
+    super.key,
+    this.xAxis,
+    this.yAxis,
+    this.showGrid = true,
+    this.showLegend = true,
+    this.showPoints = false,
+    this.stacked = false,
+    this.onPointTap,
+    this.theme,
+    this.interactionMode,
+    this.compact,
+  }) : mode = OiLineChartMode.smooth;
 
   /// Accessibility label for the chart.
   final String label;
 
   /// The data series to render.
   final List<OiLineSeries> series;
+
+  /// The line interpolation mode.
+  final OiLineChartMode mode;
 
   /// Configuration for the x-axis.
   final OiChartAxis? xAxis;
@@ -59,9 +119,6 @@ class OiLineChart extends StatefulWidget {
 
   /// Whether to show dots at each data point.
   final bool showPoints;
-
-  /// Whether to use smooth Catmull-Rom curve interpolation.
-  final bool smooth;
 
   /// Whether to stack series values cumulatively (stacked area chart).
   final bool stacked;
@@ -303,7 +360,7 @@ class _OiLineChartState extends State<OiLineChart> {
                     widget.theme?.axisLabelColor ?? colors.textMuted,
                 highContrast: isHighContrast,
                 compact: isCompact,
-                smooth: widget.smooth,
+                mode: widget.mode,
                 showPoints: widget.showPoints,
                 stacked: widget.stacked,
                 xLabels: xLabels,

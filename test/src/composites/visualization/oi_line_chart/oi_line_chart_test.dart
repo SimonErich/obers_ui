@@ -6,7 +6,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui/src/composites/visualization/oi_bubble_chart/oi_bubble_chart_interaction.dart';
 import 'package:obers_ui/src/composites/visualization/oi_line_chart/oi_line_chart.dart';
 import 'package:obers_ui/src/composites/visualization/oi_line_chart/oi_line_chart_accessibility.dart';
-import 'package:obers_ui/src/composites/visualization/oi_line_chart/oi_line_chart_data.dart';
+import 'package:obers_ui/src/composites/visualization/oi_line_chart/oi_line_chart_data.dart'
+    show OiLineChartMode, OiLinePoint, OiLineSeries;
 import 'package:obers_ui/src/composites/visualization/oi_line_chart/oi_line_chart_theme.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme_data.dart';
 
@@ -53,10 +54,10 @@ List<OiLineSeries> _multiSeries() {
 Widget _lineChart({
   List<OiLineSeries>? series,
   String label = 'Test line chart',
+  OiLineChartMode mode = OiLineChartMode.straight,
   bool showGrid = true,
   bool showLegend = true,
   bool showPoints = false,
-  bool smooth = false,
   bool stacked = false,
   void Function(int, int)? onPointTap,
   OiLineChartTheme? theme,
@@ -71,10 +72,10 @@ Widget _lineChart({
     child: OiLineChart(
       label: label,
       series: series ?? _testSeries(),
+      mode: mode,
       showGrid: showGrid,
       showLegend: showLegend,
       showPoints: showPoints,
-      smooth: smooth,
       stacked: stacked,
       onPointTap: onPointTap,
       theme: theme,
@@ -202,9 +203,65 @@ void main() {
   // ── Features ────────────────────────────────────────────────────────────────
 
   testWidgets('smooth mode renders without error', (tester) async {
-    await tester.pumpObers(_lineChart(smooth: true));
+    await tester.pumpObers(
+      _lineChart(mode: OiLineChartMode.smooth),
+    );
     expect(find.byType(OiLineChart), findsOneWidget);
     expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('stepped mode renders without error', (tester) async {
+    await tester.pumpObers(
+      _lineChart(mode: OiLineChartMode.stepped),
+    );
+    expect(find.byType(OiLineChart), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('OiLineChart.smooth factory sets smooth mode', (tester) async {
+    await tester.pumpObers(
+      SizedBox(
+        width: 500,
+        height: 400,
+        child: OiLineChart.smooth(
+          label: 'Smooth',
+          series: _testSeries(),
+        ),
+      ),
+    );
+    final widget = tester.widget<OiLineChart>(find.byType(OiLineChart));
+    expect(widget.mode, OiLineChartMode.smooth);
+  });
+
+  testWidgets('OiLineChart.stepped factory sets stepped mode', (tester) async {
+    await tester.pumpObers(
+      SizedBox(
+        width: 500,
+        height: 400,
+        child: OiLineChart.stepped(
+          label: 'Stepped',
+          series: _testSeries(),
+        ),
+      ),
+    );
+    final widget = tester.widget<OiLineChart>(find.byType(OiLineChart));
+    expect(widget.mode, OiLineChartMode.stepped);
+  });
+
+  testWidgets('OiLineChart.straight factory sets straight mode',
+      (tester) async {
+    await tester.pumpObers(
+      SizedBox(
+        width: 500,
+        height: 400,
+        child: OiLineChart.straight(
+          label: 'Straight',
+          series: _testSeries(),
+        ),
+      ),
+    );
+    final widget = tester.widget<OiLineChart>(find.byType(OiLineChart));
+    expect(widget.mode, OiLineChartMode.straight);
   });
 
   testWidgets('fill mode (area) renders without error', (tester) async {

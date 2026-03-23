@@ -1,5 +1,29 @@
 import 'package:flutter/painting.dart';
 
+/// The layout mode of an [OiBarChart].
+///
+/// Controls whether bars are grouped side-by-side, stacked, and whether
+/// they are rendered vertically or horizontally.
+///
+/// {@category Composites}
+enum OiBarChartMode {
+  /// Bars for each series are placed side-by-side within each category
+  /// (vertical orientation).
+  grouped,
+
+  /// Bars for each series are stacked on top of each other within each
+  /// category (vertical orientation).
+  stacked,
+
+  /// Bars for each series are placed side-by-side within each category
+  /// (horizontal orientation).
+  horizontalGrouped,
+
+  /// Bars for each series are stacked end-to-end within each category
+  /// (horizontal orientation).
+  horizontalStacked,
+}
+
 /// A category (group) of bars in a bar chart.
 ///
 /// Each category has a [label] displayed along the category axis and a list

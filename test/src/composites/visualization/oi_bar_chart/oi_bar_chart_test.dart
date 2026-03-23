@@ -5,7 +5,8 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui/src/composites/visualization/oi_bar_chart/oi_bar_chart.dart';
 import 'package:obers_ui/src/composites/visualization/oi_bar_chart/oi_bar_chart_accessibility.dart';
-import 'package:obers_ui/src/composites/visualization/oi_bar_chart/oi_bar_chart_data.dart';
+import 'package:obers_ui/src/composites/visualization/oi_bar_chart/oi_bar_chart_data.dart'
+    show OiBarCategory, OiBarChartMode, OiBarSeries;
 import 'package:obers_ui/src/composites/visualization/oi_bubble_chart/oi_bubble_chart_interaction.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme_data.dart';
 
@@ -35,8 +36,7 @@ Widget _barChart({
   List<OiBarCategory> categories = _testCategories,
   List<OiBarSeries>? series,
   String label = 'Test bar chart',
-  bool horizontal = false,
-  bool stacked = false,
+  OiBarChartMode mode = OiBarChartMode.grouped,
   bool showValues = false,
   bool showGrid = true,
   bool showLegend = true,
@@ -54,8 +54,7 @@ Widget _barChart({
       label: label,
       categories: categories,
       series: series,
-      horizontal: horizontal,
-      stacked: stacked,
+      mode: mode,
       showValues: showValues,
       showGrid: showGrid,
       showLegend: showLegend,
@@ -148,7 +147,7 @@ void main() {
   testWidgets('stacked mode renders', (tester) async {
     await tester.pumpObers(
       _barChart(
-        stacked: true,
+        mode: OiBarChartMode.stacked,
         categories: _multiSeriesCategories,
         series: _multiSeriesDef,
       ),
@@ -157,10 +156,72 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('horizontal mode renders', (tester) async {
-    await tester.pumpObers(_barChart(horizontal: true));
+  testWidgets('horizontal grouped mode renders', (tester) async {
+    await tester.pumpObers(
+      _barChart(mode: OiBarChartMode.horizontalGrouped),
+    );
     expect(find.byType(OiBarChart), findsOneWidget);
     expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('horizontal stacked mode renders', (tester) async {
+    await tester.pumpObers(
+      _barChart(
+        mode: OiBarChartMode.horizontalStacked,
+        categories: _multiSeriesCategories,
+        series: _multiSeriesDef,
+      ),
+    );
+    expect(find.byType(OiBarChart), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('OiBarChart.stacked factory sets stacked mode', (tester) async {
+    await tester.pumpObers(
+      SizedBox(
+        width: 500,
+        height: 400,
+        child: OiBarChart.stacked(
+          label: 'Stacked',
+          categories: _multiSeriesCategories,
+          series: _multiSeriesDef,
+        ),
+      ),
+    );
+    expect(find.byType(OiBarChart), findsOneWidget);
+    final widget = tester.widget<OiBarChart>(find.byType(OiBarChart));
+    expect(widget.mode, OiBarChartMode.stacked);
+  });
+
+  testWidgets('OiBarChart.horizontalGrouped factory', (tester) async {
+    await tester.pumpObers(
+      SizedBox(
+        width: 500,
+        height: 400,
+        child: OiBarChart.horizontalGrouped(
+          label: 'H-Grouped',
+          categories: _testCategories,
+        ),
+      ),
+    );
+    final widget = tester.widget<OiBarChart>(find.byType(OiBarChart));
+    expect(widget.mode, OiBarChartMode.horizontalGrouped);
+  });
+
+  testWidgets('OiBarChart.horizontalStacked factory', (tester) async {
+    await tester.pumpObers(
+      SizedBox(
+        width: 500,
+        height: 400,
+        child: OiBarChart.horizontalStacked(
+          label: 'H-Stacked',
+          categories: _multiSeriesCategories,
+          series: _multiSeriesDef,
+        ),
+      ),
+    );
+    final widget = tester.widget<OiBarChart>(find.byType(OiBarChart));
+    expect(widget.mode, OiBarChartMode.horizontalStacked);
   });
 
   testWidgets('showValues displays without error', (tester) async {
