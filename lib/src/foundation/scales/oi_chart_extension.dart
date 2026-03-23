@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 
+import 'package:obers_ui/src/foundation/scales/oi_chart_canvas.dart';
 import 'package:obers_ui/src/foundation/scales/oi_chart_controller.dart';
 import 'package:obers_ui/src/foundation/scales/oi_chart_viewport.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_chart_theme_data.dart';
@@ -204,4 +205,17 @@ abstract class OiChartExtension {
   /// Receives an [OiChartEvent] describing the interaction type,
   /// position, and any associated data element.
   void onEvent(OiChartEvent event, OiChartExtensionContext context) {}
+
+  /// Called before the canvas paints its render layers.
+  ///
+  /// Extensions receive the [OiChartCanvasContext] — the same context
+  /// provided to [OiChartLayerPainter.paint] — so they can draw
+  /// underneath the chart data.
+  void onBeforeCanvasPaint(OiChartCanvasContext canvasContext) {}
+
+  /// Called after the canvas has painted all render layers.
+  ///
+  /// Extensions receive the [OiChartCanvasContext] so they can draw
+  /// on top of the chart data (e.g. annotations, debug overlays).
+  void onAfterCanvasPaint(OiChartCanvasContext canvasContext) {}
 }
