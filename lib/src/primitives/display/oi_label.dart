@@ -452,6 +452,34 @@ class OiLabel extends StatelessWidget {
          key: key,
        );
 
+  /// Creates a field-value display with built-in copy-to-clipboard support.
+  ///
+  /// Ideal for read-only data like IDs, API keys, URLs, or error codes.
+  /// The text is selectable and a copy button is shown on hover (desktop)
+  /// or via long-press (mobile).
+  const OiLabel.copyable(
+    String text, {
+    int? maxLines,
+    TextOverflow? overflow,
+    TextAlign? textAlign,
+    String? semanticsLabel,
+    Color? color,
+    Key? key,
+  }) : this._(
+         variant: OiLabelVariant.body,
+         text: text,
+         maxLines: maxLines,
+         overflow: overflow,
+         textAlign: textAlign,
+         copyable: true,
+         selectable: true,
+         semanticsLabel: semanticsLabel,
+         color: color,
+         decoration: null,
+         decorationColor: null,
+         key: key,
+       );
+
   /// The text content to render.
   final String text;
 

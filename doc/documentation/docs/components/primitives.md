@@ -50,8 +50,26 @@ See [Layout > Grid](../layout/grid.md) for the full guide.
 |---|---|
 | `OiDivider` | Horizontal or vertical separator line |
 | `OiIcon` | Icon display with semantic sizing |
-| `OiLabel` | Text display using theme text styles |
-| `OiSurface` | Container with background, border, radius, shadow |
+| `OiLabel` | Text display using theme text styles (includes `.copyable()` constructor) |
+| `OiSurface` | Container with background, border, radius, shadow (includes `.transparent()`, `.elevated()`) |
+
+### OiLabel
+
+Text display using theme text styles. Use variant constructors like `OiLabel.h1()`, `OiLabel.body()`, `OiLabel.small()`, etc.
+
+**Factory constructor: `.copyable()`**
+
+Creates a field-value display with built-in copy-to-clipboard support. Ideal for read-only data like IDs, API keys, URLs, or error codes. The text is selectable and a copy button is shown on hover (desktop) or via long-press (mobile).
+
+```dart
+OiLabel.copyable('sk-proj-abc123xyz')
+
+OiLabel.copyable(
+  'https://api.example.com/v1/resource',
+  maxLines: 1,
+  overflow: TextOverflow.ellipsis,
+)
+```
 
 ### OiSurface
 
@@ -66,6 +84,26 @@ OiSurface(
     padding: EdgeInsets.all(context.spacing.md),
     child: Text('Content'),
   ),
+)
+```
+
+**Factory constructors:**
+
+- `OiSurface.transparent()` -- A transparent surface that provides clipping and hit-test boundary without any visual styling. Useful for wrapping overlay content or replacing `Material(color: transparent)`.
+- `OiSurface.elevated({required List<BoxShadow> elevation})` -- A surface with elevation shadow but no background fill. Useful for adding shadow to a transparent container.
+
+```dart
+// Transparent clipping surface
+OiSurface.transparent(
+  borderRadius: context.radius.md,
+  child: myOverlayContent,
+)
+
+// Shadow-only surface
+OiSurface.elevated(
+  elevation: context.shadows.md,
+  borderRadius: context.radius.lg,
+  child: myContent,
 )
 ```
 

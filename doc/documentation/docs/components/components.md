@@ -127,6 +127,14 @@ OiBackButton(
 | `OiTagInput` | Multi-value tag input |
 | `OiArrayInput` | Repeatable form field group with add/remove/reorder |
 | `OiFileInput` | File selection input |
+| `OiFormSelect` | Form-integrated dropdown with validation |
+| `OiSwitchTile` | Toggle tile with switch, label, and subtitle |
+| `OiCheckboxTile` | Toggle tile with checkbox, label, and subtitle |
+| `OiRadioTile` | Toggle tile with radio indicator, label, and subtitle |
+| `OiSegmentedControl` | Exclusive segment toggle (2-5 options) |
+| `OiDatePickerField` | Date input with calendar dialog |
+| `OiDateRangePickerField` | Date range input with presets and calendar dialog |
+| `OiTimePickerField` | Time input with time picker dialog |
 
 ### OiTextInput
 
@@ -216,6 +224,229 @@ OiArrayInput<String>(
   maxItems: 10,
 )
 ```
+
+### OiFormSelect
+
+A form-integrated dropdown that wraps `OiSelect` with `FormField<T>`. When `validator` is non-null the widget participates in ancestor `Form` validation, saving, and auto-validate flows. When `validator` is null, it renders a plain `OiSelect<T>`.
+
+```dart
+OiFormSelect<String>(
+  options: ['Admin', 'Editor', 'Viewer'],
+  labelOf: (role) => role,
+  value: _selectedRole,
+  onChanged: (role) => setState(() => _selectedRole = role),
+  label: 'Role',
+  placeholder: 'Choose a role',
+  validator: (value) => value == null ? 'Role is required' : null,
+  searchable: true,
+)
+```
+
+**Key features:**
+
+- Wraps `OiSelect` in a `FormField` when `validator` is non-null
+- Manual `error` takes precedence over form-field error text
+- Supports `searchable`, `bottomSheetOnCompact`, `autovalidateMode`
+- `onSaved` callback for `Form.save()` integration
+
+**Related components:** `OiSelect`, `OiForm`, `OiTextInput`
+
+### OiSwitchTile / OiCheckboxTile / OiRadioTile
+
+Toggle tiles that pair an `OiListTile` with a trailing toggle control. Tapping anywhere on the tile toggles the value.
+
+```dart
+// Switch tile
+OiSwitchTile(
+  title: 'Enable notifications',
+  subtitle: 'Receive push notifications',
+  value: _notificationsEnabled,
+  onChanged: (value) => setState(() => _notificationsEnabled = value),
+)
+
+// Checkbox tile with tristate
+OiCheckboxTile(
+  title: 'Select all',
+  value: _selectAll,
+  tristate: true,
+  onChanged: (value) => setState(() => _selectAll = value),
+)
+
+// Radio tile
+OiRadioTile<String>(
+  title: 'Dark mode',
+  value: 'dark',
+  groupValue: _theme,
+  onChanged: (value) => setState(() => _theme = value),
+)
+```
+
+**Key features:**
+
+- Full-tile tap toggles the control
+- Optional `subtitle`, `leading` widget, `dense` mode
+- Disabled state renders at reduced opacity
+- `OiCheckboxTile` supports tristate (`true` / `false` / `null`)
+- `OiRadioTile<T>` is generic with `value` / `groupValue` semantics
+- Accessibility labels fall back to `title` when `semanticLabel` is null
+
+**Related components:** `OiSwitch`, `OiCheckbox`, `OiRadio`, `OiListTile`
+
+### OiSegmentedControl
+
+An exclusive segment toggle that renders 2-5 options as connected buttons. Exactly one segment is selected at a time.
+
+```dart
+OiSegmentedControl<String>(
+  segments: [
+    OiSegment(value: 'day', label: 'Day'),
+    OiSegment(value: 'week', label: 'Week'),
+    OiSegment(value: 'month', label: 'Month'),
+  ],
+  selected: _view,
+  onChanged: (value) => setState(() => _view = value),
+)
+
+// With icons and expand
+OiSegmentedControl<String>(
+  segments: [
+    OiSegment(value: 'grid', label: 'Grid', icon: OiIcons.grid),
+    OiSegment(value: 'list', label: 'List', icon: OiIcons.list),
+  ],
+  selected: _layout,
+  onChanged: (value) => setState(() => _layout = value),
+  size: OiSegmentedControlSize.large,
+  expand: true,
+)
+```
+
+**Key features:**
+
+- Three size variants: `small` (28dp), `medium` (36dp), `large` (44dp)
+- Connected border styling with rounded corners on first/last segments
+- `expand: true` stretches segments to fill available width equally
+- Per-segment `enabled` flag for disabling individual options
+- Keyboard navigation: arrow keys move selection between segments
+- Optional `icon` per segment displayed alongside the label
+
+**Related components:** `OiTabs`, `OiRadio`, `OiToggleButton`
+
+### OiDatePickerField
+
+A date input field that displays a formatted date and opens an `OiDatePicker` calendar dialog when tapped.
+
+```dart
+OiDatePickerField(
+  value: _selectedDate,
+  onChanged: (date) => setState(() => _selectedDate = date),
+  label: 'Start date',
+  placeholder: 'Select a date',
+  minDate: DateTime(2020),
+  maxDate: DateTime(2030),
+  clearable: true,
+)
+
+// With form validation
+OiDatePickerField(
+  value: _dueDate,
+  onChanged: (date) => setState(() => _dueDate = date),
+  label: 'Due date',
+  validator: (date) => date == null ? 'Due date is required' : null,
+  autovalidateMode: AutovalidateMode.onUserInteraction,
+)
+```
+
+**Key features:**
+
+- Read-only input frame with trailing calendar icon
+- Opens `OiDatePicker` dialog on tap
+- Date formatting via `intl` `DateFormat` (default: `'MMM d, yyyy'`)
+- Optional clear button when `clearable: true`
+- Form integration via `validator`, `onSaved`, `autovalidateMode`
+- Supports `minDate`, `maxDate` constraints
+- `readOnly` mode (visually distinct from disabled)
+
+**Related components:** `OiDatePicker`, `OiDateInput`, `OiDateRangePickerField`, `OiForm`
+
+### OiDateRangePickerField
+
+A date range input field that opens a dialog with optional preset chips and an `OiDatePicker` in range mode.
+
+```dart
+OiDateRangePickerField(
+  startDate: _start,
+  endDate: _end,
+  onChanged: (start, end) => setState(() {
+    _start = start;
+    _end = end;
+  }),
+  label: 'Date range',
+  showPresets: true,
+)
+
+// With custom presets and validation
+OiDateRangePickerField(
+  startDate: _start,
+  endDate: _end,
+  onChanged: (start, end) => setState(() {
+    _start = start;
+    _end = end;
+  }),
+  label: 'Report period',
+  presets: [
+    OiDateRangePreset.last7Days,
+    OiDateRangePreset.last30Days,
+    OiDateRangePreset.thisMonth,
+  ],
+  validator: (range) => range == null ? 'Date range is required' : null,
+)
+```
+
+**Key features:**
+
+- Displays range as "Mar 1 - Mar 23, 2026" (compact same-year format)
+- Dialog with preset chips: Today, Last 7 days, Last 30 days, This week, This month, Last month, This year
+- Custom presets via `OiDateRangePreset(label, resolve)` with optional icon
+- Calendar in range mode for manual start/end selection
+- Cancel / Apply buttons in dialog
+- Form integration via `validator`, `onSaved`, `autovalidateMode`
+- Optional clear button via `clearable: true`
+
+**Related components:** `OiDatePickerField`, `OiDatePicker`, `OiDialogShell`, `OiForm`
+
+### OiTimePickerField
+
+A time input field that displays a formatted time and opens an `OiTimePicker` dialog when tapped.
+
+```dart
+OiTimePickerField(
+  value: OiTimeOfDay(hour: 14, minute: 30),
+  onChanged: (time) => setState(() => _time = time),
+  label: 'Meeting time',
+  use24Hour: true,
+  clearable: true,
+)
+
+// 12-hour format with form validation
+OiTimePickerField(
+  value: _startTime,
+  onChanged: (time) => setState(() => _startTime = time),
+  label: 'Start time',
+  use24Hour: false,
+  validator: (time) => time == null ? 'Start time is required' : null,
+)
+```
+
+**Key features:**
+
+- Read-only input frame with trailing clock icon
+- Opens `OiTimePicker` dialog on tap
+- 24-hour (`14:30`) or 12-hour (`2:30 PM`) display via `use24Hour`
+- Optional clear button when `clearable: true`
+- Form integration via `validator`, `onSaved`, `autovalidateMode`
+- Reserved `minTime`, `maxTime`, `minuteInterval` for future constraint support
+
+**Related components:** `OiTimePicker`, `OiTimeInput`, `OiDatePickerField`, `OiForm`
 
 ## Display
 
@@ -474,6 +705,7 @@ OiBadge(count: 5, child: OiIconButton(icon: OiIcons.bell, onPressed: () {}))
 | `OiLocaleSwitcher` | Locale/language dropdown selector with optional flag emoji |
 | `OiNavigationRail` | Compact vertical navigation rail with icon+label items |
 | `OiSliverHeader` | Sticky sliver header with .simple, .large, .hero constructors |
+| `OiTabView` | Tab bar with content switching, lazy loading, and swipe support |
 
 ### OiTabs
 
@@ -603,6 +835,120 @@ OiSliverHeader.hero(
 
 **Related components:** `OiBackButton`, `OiSliverList`, `OiSliverGrid`
 
+### OiTabView
+
+A tab bar with integrated content switching and transition animations. Combines `OiTabs` (the tab bar) with a content area that displays the widget built by the selected tab's builder.
+
+```dart
+// Uncontrolled (manages its own selection state)
+OiTabView(
+  tabs: [
+    OiTabViewItem(label: 'Overview', builder: (_) => OverviewPage()),
+    OiTabViewItem(label: 'Details', builder: (_) => DetailsPage()),
+    OiTabViewItem(label: 'Activity', icon: OiIcons.activity, builder: (_) => ActivityPage()),
+  ],
+  onTabChanged: (index) => debugPrint('Tab $index selected'),
+)
+
+// Controlled (parent manages selection)
+OiTabView.controlled(
+  tabs: tabItems,
+  selectedIndex: _currentTab,
+  onTabChanged: (index) => setState(() => _currentTab = index),
+  keepAlive: true,
+  scrollable: true,
+)
+```
+
+**Key features:**
+
+- Two modes: uncontrolled (default) and controlled (`.controlled()`)
+- Lazy content building via `OiTabViewItem.builder`
+- `keepAlive: true` retains all tab content in an `IndexedStack`
+- `keepAlive: false` (default) uses `AnimatedSwitcher` with fade transition
+- `swipeable: true` (default) enables horizontal swipe between tabs
+- Per-tab `enabled` flag, `icon`, and `badge` support
+- `scrollable` tab bar for overflow
+- Configurable `indicatorStyle`, `tabBarPadding`, `animationDuration`
+
+**Related components:** `OiTabs`, `OiSegmentedControl`, `OiAccordion`
+
+### OiDatePicker
+
+A calendar date picker widget. Can be used inline or shown as a modal dialog via the static `show()` method that returns the selected date.
+
+**Inline usage:**
+
+```dart
+OiDatePicker(
+  value: _selectedDate,
+  firstDate: DateTime(2020),
+  lastDate: DateTime(2030),
+  onChanged: (date) => setState(() => _selectedDate = date),
+)
+```
+
+**Show as dialog (`Future<DateTime?>`):**
+
+```dart
+final date = await OiDatePicker.show(
+  context,
+  initialDate: DateTime.now(),
+  firstDate: DateTime(2020),
+  lastDate: DateTime(2030),
+);
+
+if (date != null) {
+  setState(() => _selectedDate = date);
+}
+```
+
+**Key features:**
+
+- `OiDatePicker.show()` returns `Future<DateTime?>` — completes with `null` if dismissed without selection
+- Uses `OiDialogShell` under the hood for consistent modal behavior
+- Supports `firstDate` and `lastDate` constraints
+- Optional `semanticLabel` parameter (defaults to "Select date")
+
+**Related components:** `OiDateInput`, `OiTimePicker`, `OiDialogShell`
+
+### OiTimePicker
+
+A time selector widget with hour and minute wheels. Can be used inline or shown as a modal dialog via the static `show()` method.
+
+**Inline usage:**
+
+```dart
+OiTimePicker(
+  value: OiTimeOfDay(hour: 14, minute: 30),
+  use24Hour: true,
+  onChanged: (time) => setState(() => _selectedTime = time),
+)
+```
+
+**Show as dialog (`Future<OiTimeOfDay?>`):**
+
+```dart
+final time = await OiTimePicker.show(
+  context,
+  initialTime: OiTimeOfDay(hour: 9, minute: 0),
+  use24Hour: true,
+);
+
+if (time != null) {
+  setState(() => _selectedTime = time);
+}
+```
+
+**Key features:**
+
+- `OiTimePicker.show()` returns `Future<OiTimeOfDay?>` — completes with `null` if dismissed without selection
+- Uses `OiDialogShell` under the hood for consistent modal behavior
+- `use24Hour` controls 0-23 vs 1-12 AM/PM display
+- Optional `semanticLabel` parameter (defaults to "Select time")
+
+**Related components:** `OiTimeInput`, `OiDatePicker`, `OiDialogShell`
+
 ## Overlays
 
 | Widget | Description |
@@ -623,6 +969,80 @@ OiToast.show(
   variant: OiToastVariant.success,
 );
 ```
+
+### OiDialog
+
+A modal dialog overlay with five variants: `standard`, `alert`, `confirm`, `form`, and `fullScreen`. Provides both fire-and-forget and async show methods.
+
+**Showing a dialog (fire-and-forget):**
+
+```dart
+OiDialog.show(
+  context,
+  label: 'Confirm delete',
+  dialog: OiDialog.confirm(
+    label: 'Confirm delete',
+    title: 'Delete item?',
+    content: OiLabel.body('This action cannot be undone.'),
+    onConfirm: () => deleteItem(),
+    onCancel: () {},
+  ),
+);
+```
+
+**Showing a dialog and awaiting a result:**
+
+The top-level `showOiDialog<T>()` function is the recommended way to show a dialog that returns a value. It replaces Material's `showDialog()` with zero Material dependency.
+
+```dart
+final confirmed = await showOiDialog<bool>(context, builder: (ctx, close) {
+  return OiDialogShell(
+    child: Padding(
+      padding: EdgeInsets.all(ctx.spacing.lg),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          OiLabel.h4('Unsaved changes'),
+          SizedBox(height: ctx.spacing.md),
+          OiLabel.body('Discard your changes?'),
+          SizedBox(height: ctx.spacing.lg),
+          OiRow(gap: ctx.spacing.sm, children: [
+            OiButton(label: 'Cancel', variant: OiButtonVariant.ghost, onPressed: () => close(false)),
+            OiButton(label: 'Discard', variant: OiButtonVariant.destructive, onPressed: () => close(true)),
+          ]),
+        ],
+      ),
+    ),
+  );
+});
+
+if (confirmed == true) navigator.pop();
+```
+
+**`OiDialog.showAsync<T>()` — pre-built variant with async result:**
+
+```dart
+final result = await OiDialog.showAsync<bool>(
+  context,
+  label: 'Confirm action',
+  title: 'Are you sure?',
+  content: OiLabel.body('This will apply changes.'),
+  actions: [
+    OiButton(label: 'Cancel', variant: OiButtonVariant.ghost, onPressed: () => Navigator.of(context).pop()),
+    OiButton(label: 'Apply', onPressed: () => Navigator.of(context).pop(true)),
+  ],
+);
+```
+
+**Key features:**
+
+- `showOiDialog<T>()` returns `Future<T?>` that completes when the dialog is dismissed
+- Builder receives a `close` callback for returning values — call `close(value)` to dismiss and return
+- `OiDialog.show()` returns `OiOverlayHandle` for programmatic dismissal (fire-and-forget)
+- `OiDialog.showAsync<T>()` wraps the pre-built dialog variants with a `Future<T?>` return
+- Works without Material dependency — uses `OiDialogShell` under the hood
+
+**Related components:** `OiDialogShell`, `OiSheet`, `OiSnackBar`
 
 ### OiDialogShell
 
@@ -702,6 +1122,52 @@ OiSnackBar.show(
 - Returns an `OiOverlayHandle` for programmatic dismissal
 
 **Related components:** `OiToast`, `OiDialog`, `OiDialogShell`
+
+### OiSheet
+
+A bottom or side sheet overlay. Like `OiDialog`, it offers both a fire-and-forget `show()` and an async `showAsync<T>()` method.
+
+**Fire-and-forget (returns `OiOverlayHandle`):**
+
+```dart
+final handle = OiSheet.show(
+  context,
+  label: 'Filter options',
+  child: FilterPanel(),
+);
+
+// Dismiss programmatically later
+handle.dismiss();
+```
+
+**Async with return value (`Future<T?>`):**
+
+```dart
+final selectedFilter = await OiSheet.showAsync<FilterConfig>(
+  context,
+  label: 'Filter options',
+  builder: (close) => FilterPanel(
+    onApply: (config) => close(config),
+    onCancel: () => close(),
+  ),
+  side: OiPanelSide.bottom,
+  dismissible: true,
+  dragHandle: true,
+);
+
+if (selectedFilter != null) applyFilter(selectedFilter);
+```
+
+**Key features:**
+
+- `OiSheet.show()` returns `OiOverlayHandle` for programmatic dismissal (fire-and-forget)
+- `OiSheet.showAsync<T>()` returns `Future<T?>` that completes when the sheet is dismissed
+- Builder receives a `close` callback — call `close(value)` to dismiss and return a result
+- Supports `OiPanelSide.bottom`, `OiPanelSide.left`, `OiPanelSide.right`
+- Optional `dragHandle`, `snapPoints`, and `size` parameters
+- Scrim dismiss and Escape key handling
+
+**Related components:** `OiDialog`, `OiDialogShell`, `OiPanel`
 
 ## Panels
 

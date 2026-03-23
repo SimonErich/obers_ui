@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/src/components/overlays/oi_dialog_shell.dart';
 import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
@@ -71,6 +72,36 @@ class OiDatePicker extends StatefulWidget {
 
   /// When `true`, the picker operates in date-range selection mode.
   final bool rangeMode;
+
+  /// Shows a date picker in a dialog and returns the selected date.
+  ///
+  /// Returns `null` if the dialog is dismissed without selecting a date.
+  static Future<DateTime?> show(
+    BuildContext context, {
+    DateTime? initialDate,
+    DateTime? firstDate,
+    DateTime? lastDate,
+    String semanticLabel = 'Select date',
+  }) {
+    return OiDialogShell.show<DateTime>(
+      context: context,
+      semanticLabel: semanticLabel,
+      builder: (close) => Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            OiDatePicker(
+              value: initialDate,
+              firstDate: firstDate,
+              lastDate: lastDate,
+              onChanged: close,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
   @override
   State<OiDatePicker> createState() => _OiDatePickerState();

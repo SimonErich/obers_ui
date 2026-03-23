@@ -4,6 +4,25 @@ import 'package:obers_ui/src/foundation/oi_overlays.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/primitives/interaction/oi_focus_trap.dart';
 
+/// Shows a modal dialog and returns a future that completes when dismissed.
+///
+/// This is the recommended way to show dialogs that need to return a value.
+/// The [builder] receives a `close` callback that dismisses the dialog and
+/// completes the returned future with an optional result.
+Future<T?> showOiDialog<T>(
+  BuildContext context, {
+  required Widget Function(BuildContext context, void Function([T? result]) close) builder,
+  bool dismissible = true,
+  String? semanticLabel,
+}) {
+  return OiDialogShell.show<T>(
+    context: context,
+    semanticLabel: semanticLabel,
+    barrierDismissible: dismissible,
+    builder: (close) => builder(context, close),
+  );
+}
+
 /// The visual / behavioural variant of an [OiDialog].
 ///
 /// {@category Components}
@@ -205,6 +224,35 @@ class OiDialog extends StatelessWidget {
     final entry = OverlayEntry(builder: (_) => dialog);
     Overlay.of(context).insert(entry);
     return createOiOverlayHandle(entry);
+  }
+
+  /// Shows an opinionated [OiDialog] as a modal overlay and returns a future
+  /// that completes when the dialog is dismissed.
+  ///
+  /// This is a convenience wrapper around [OiDialogShell.show] for the
+  /// pre-built dialog variants. Use the top-level [showOiDialog] function
+  /// when you need a fully custom dialog body.
+  static Future<T?> showAsync<T>(
+    BuildContext context, {
+    required String label,
+    String? title,
+    Widget? content,
+    List<Widget>? actions,
+    bool dismissible = true,
+  }) async {
+    return OiDialogShell.show<T>(
+      context: context,
+      semanticLabel: label,
+      barrierDismissible: dismissible,
+      builder: (close) => OiDialog.standard(
+        label: label,
+        title: title,
+        content: content,
+        actions: actions,
+        dismissible: dismissible,
+        onClose: () => close(),
+      ),
+    );
   }
 
   @override

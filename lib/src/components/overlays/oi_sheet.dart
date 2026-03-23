@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/foundation/oi_overlays.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
@@ -145,6 +147,83 @@ class OiSheet extends StatefulWidget {
     );
     Overlay.of(context).insert(entry);
     return createOiOverlayHandle(entry);
+  }
+
+  /// Shows a sheet as a modal overlay and returns a future that completes
+  /// when the sheet is dismissed.
+  ///
+  /// The [builder] receives a `close` callback. Calling `close()` dismisses
+  /// the sheet and completes the returned future with an optional result of
+  /// type [T]. If the sheet is dismissed via the scrim or programmatically
+  /// without a result, the future completes with `null`.
+  static Future<T?> showAsync<T>(
+    BuildContext context, {
+    required String label,
+    required Widget Function(void Function([T? result]) close) builder,
+    OiPanelSide side = OiPanelSide.bottom,
+    double? size,
+    bool dismissible = true,
+    bool dragHandle = false,
+    List<double>? snapPoints,
+  }) async {
+    final completer = Completer<T?>();
+    late OiOverlayHandle handle;
+
+    void close([T? result]) {
+      if (!completer.isCompleted) {
+        completer.complete(result);
+        handle.dismiss();
+      }
+    }
+
+    // Use OiOverlays service when available.
+    final service = OiOverlays.maybeOf(context);
+    if (service != null) {
+      handle = service.show(
+        label: label,
+        zOrder: OiOverlayZOrder.panel,
+        dismissible: dismissible,
+        onDismiss: () {
+          if (!completer.isCompleted) completer.complete();
+        },
+        builder: (_) => OiSheet(
+          label: label,
+          open: true,
+          side: side,
+          size: size,
+          dismissible: dismissible,
+          dragHandle: dragHandle,
+          snapPoints: snapPoints,
+          onClose: close,
+          child: builder(close),
+        ),
+      );
+    } else {
+      final overlay = Overlay.of(context);
+      late OverlayEntry entry;
+      entry = OverlayEntry(
+        builder: (_) => OiSheet(
+          label: label,
+          open: true,
+          side: side,
+          size: size,
+          dismissible: dismissible,
+          dragHandle: dragHandle,
+          snapPoints: snapPoints,
+          onClose: () {
+            close();
+            entry
+              ..remove()
+              ..dispose();
+          },
+          child: builder(close),
+        ),
+      );
+      handle = createOiOverlayHandle(entry);
+      overlay.insert(entry);
+    }
+
+    return completer.future;
   }
 
   @override

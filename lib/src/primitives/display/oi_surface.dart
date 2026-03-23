@@ -40,6 +40,36 @@ class OiSurface extends StatelessWidget {
     super.key,
   });
 
+  /// Creates a transparent surface that provides clipping and hit-test
+  /// boundary without any visual styling. Useful for wrapping overlay content
+  /// or replacing `Material(color: transparent)`.
+  const OiSurface.transparent({
+    this.child,
+    this.borderRadius,
+    super.key,
+  })  : color = const Color(0x00000000),
+        border = null,
+        shadow = null,
+        padding = null,
+        halo = null,
+        frosted = false,
+        gradient = null;
+
+  /// Creates a surface with elevation shadow but no background fill.
+  /// Useful for adding shadow to a transparent container.
+  const OiSurface.elevated({
+    required List<BoxShadow> elevation,
+    this.child,
+    this.borderRadius,
+    super.key,
+  })  : color = const Color(0x00000000),
+        border = null,
+        shadow = elevation,
+        padding = null,
+        halo = null,
+        frosted = false,
+        gradient = null;
+
   /// Background fill color.  Defaults to the theme's surface color when null.
   final Color? color;
 

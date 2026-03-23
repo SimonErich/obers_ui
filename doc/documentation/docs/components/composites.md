@@ -8,6 +8,8 @@ Composites combine multiple components into complex UI patterns. They handle int
 |---|---|
 | `OiTable` | Full data table with sort, filter, resize, paginate, inline edit, column management |
 | `OiTree` | Hierarchical tree view with expand/collapse |
+| `OiReorderableList` | Drag-to-reorder list with drag handles, long-press, and keyboard support |
+| `OiDataGrid` | Lightweight data grid with sorting, selection, striped rows, and loading states |
 
 ### OiTable
 
@@ -49,6 +51,99 @@ OiTable<User>(
 - Status bar with aggregations
 - Column groups (spanning headers)
 
+### OiReorderableList
+
+A drag-to-reorder list that supports drag handles, long-press drag, keyboard reordering, and animated gap insertion.
+
+```dart
+OiReorderableList<Task>(
+  items: tasks,
+  itemBuilder: (context, task, index, dragHandle) {
+    return OiRow(children: [
+      if (dragHandle != null) dragHandle,
+      Expanded(child: OiLabel.body(task.title)),
+    ]);
+  },
+  onReorder: (oldIndex, newIndex) {
+    setState(() {
+      final item = tasks.removeAt(oldIndex);
+      tasks.insert(newIndex, item);
+    });
+  },
+)
+
+// Long-press drag without handle
+OiReorderableList<String>(
+  items: items,
+  itemBuilder: (context, item, index, _) => OiListTile(title: item),
+  onReorder: (from, to) => reorder(from, to),
+  dragHandle: false,
+  longPressDrag: true,
+  separator: const OiDivider(),
+)
+```
+
+**Key features:**
+
+- Three drag modes: drag handle (default), long-press drag, immediate drag
+- Keyboard reordering: Space to pick up, Arrow keys to move, Enter to drop, Escape to cancel
+- Animated gap insertion on hover during drag
+- `OiDragGhost` feedback widget during drag
+- Optional `separator` between items
+- `canReorder` predicate to lock specific items
+- `shrinkWrap` mode for use inside `Column` or other unbounded containers
+- Vertical and horizontal axis support
+- `onDragStart` / `onDragEnd` callbacks
+
+**Related components:** `OiTable`, `OiDraggable`, `OiDropZone`, `OiReorderable`
+
+### OiDataGrid
+
+A lightweight data grid for displaying tabular data with sorting, row selection, striped rows, dense mode, and loading states. A simpler alternative to `OiTable` when you don't need virtual scrolling, column resizing, or pagination.
+
+```dart
+OiDataGrid<User>(
+  rows: users,
+  columns: [
+    OiDataGridColumn.text(id: 'name', header: 'Name', valueOf: (u) => u.name, sortable: true),
+    OiDataGridColumn.text(id: 'email', header: 'Email', valueOf: (u) => u.email),
+    OiDataGridColumn(
+      id: 'role',
+      header: 'Role',
+      cellBuilder: (context, user, index) => OiBadge.soft(label: user.role),
+    ),
+  ],
+  sortColumnId: 'name',
+  sortAscending: true,
+  onSort: (columnId, {required ascending}) {
+    setState(() {
+      _sortColumn = columnId;
+      _ascending = ascending;
+    });
+  },
+  selectable: true,
+  multiSelect: true,
+  selectedRows: _selected,
+  onSelectionChanged: (rows) => setState(() => _selected = rows),
+  striped: true,
+)
+```
+
+**Key features:**
+
+- Two column types: custom `cellBuilder` and `.text()` shorthand for string values
+- Sortable columns with chevron indicators in the header
+- Single or multi-select with checkbox column
+- Header-level "select all" checkbox for multi-select
+- Three header styles: `filled`, `plain`, `none`
+- Striped alternate rows and dense mode (36dp vs 48dp row height)
+- Optional outer border with theme radius
+- Shimmer skeleton loading state
+- Custom empty state widget (defaults to "No data")
+- Fixed-width, min-width, and flex column sizing
+
+**Related components:** `OiTable`, `OiReorderableList`, `OiVirtualList`
+
 ## Forms
 
 | Widget | Description |
@@ -56,6 +151,7 @@ OiTable<User>(
 | `OiForm` | Form container with validation |
 | `OiStepper` | Step-by-step form |
 | `OiWizard` | Multi-page wizard with progress |
+| `OiFormDialog` | Form dialog with managed lifecycle (loading, error, submit states) |
 
 ### OiForm
 
@@ -71,6 +167,61 @@ OiForm(
   ],
 )
 ```
+
+### OiFormDialog
+
+A static utility for showing form dialogs with a managed lifecycle. The dialog provides a title, custom form content, an optional error area, and cancel/submit action buttons. State (loading, error, submit-enabled) is managed through an `OiFormDialogController`.
+
+```dart
+final result = await OiFormDialog.showCustom<String>(
+  context,
+  title: 'Create Item',
+  builder: (controller) {
+    var name = '';
+    return OiTextInput(
+      label: 'Name',
+      onChanged: (v) {
+        name = v ?? '';
+        controller.setSubmitEnabled(enabled: name.isNotEmpty);
+      },
+    );
+  },
+);
+
+// With error handling and loading
+final user = await OiFormDialog.showCustom<User>(
+  context,
+  title: 'Edit Profile',
+  submitLabel: 'Save',
+  cancelLabel: 'Discard',
+  builder: (controller) {
+    return ProfileForm(
+      onSave: (data) async {
+        controller.setLoading(loading: true);
+        try {
+          final user = await api.updateProfile(data);
+          await controller.submit(user);
+        } catch (e) {
+          controller.setError('Failed to save: $e');
+          controller.setLoading(loading: false);
+        }
+      },
+    );
+  },
+);
+```
+
+**Key features:**
+
+- `OiFormDialogController<T>` manages loading, error, and submit-enabled states
+- `controller.submit(result)` closes dialog and returns the result
+- `controller.cancel()` dismisses without a result
+- `controller.setError(message)` shows inline error between content and action buttons
+- `controller.setLoading(loading: true)` shows spinner on submit button and blocks dismissal
+- Uses `OiDialogShell` under the hood for consistent modal behavior
+- Configurable `submitLabel`, `cancelLabel`, `dismissible`, `maxWidth`
+
+**Related components:** `OiDialog`, `OiDialogShell`, `OiForm`
 
 ## Editors
 

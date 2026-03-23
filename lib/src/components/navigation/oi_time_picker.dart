@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/inputs/oi_time_input.dart'
     show OiTimeOfDay;
+import 'package:obers_ui/src/components/overlays/oi_dialog_shell.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
 
@@ -30,6 +31,34 @@ class OiTimePicker extends StatefulWidget {
 
   /// When `true` the hour wheel shows 0–23; otherwise 1–12 with AM/PM.
   final bool use24Hour;
+
+  /// Shows a time picker in a dialog and returns the selected time.
+  ///
+  /// Returns `null` if the dialog is dismissed without selecting a time.
+  static Future<OiTimeOfDay?> show(
+    BuildContext context, {
+    OiTimeOfDay? initialTime,
+    bool use24Hour = true,
+    String semanticLabel = 'Select time',
+  }) {
+    return OiDialogShell.show<OiTimeOfDay>(
+      context: context,
+      semanticLabel: semanticLabel,
+      builder: (close) => Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            OiTimePicker(
+              value: initialTime,
+              use24Hour: use24Hour,
+              onChanged: close,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
   @override
   State<OiTimePicker> createState() => _OiTimePickerState();

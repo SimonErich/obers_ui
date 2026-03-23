@@ -5,19 +5,26 @@ import 'package:obers_ui/src/foundation/theme/component_themes/oi_button_theme_d
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_card_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_chart_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_checkbox_theme_data.dart';
+import 'package:obers_ui/src/foundation/theme/component_themes/oi_data_grid_theme_data.dart';
+import 'package:obers_ui/src/foundation/theme/component_themes/oi_date_picker_field_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_dialog_shell_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_dialog_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_field_display_theme.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_file_explorer_theme_data.dart';
+import 'package:obers_ui/src/foundation/theme/component_themes/oi_form_select_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_navigation_rail_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_pagination_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_progress_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_refresh_indicator_theme_data.dart';
+import 'package:obers_ui/src/foundation/theme/component_themes/oi_reorderable_list_theme_data.dart';
+import 'package:obers_ui/src/foundation/theme/component_themes/oi_segmented_control_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_select_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_sheet_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_sidebar_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_sliver_header_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_switch_theme_data.dart';
+import 'package:obers_ui/src/foundation/theme/component_themes/oi_switch_tile_theme_data.dart';
+import 'package:obers_ui/src/foundation/theme/component_themes/oi_tab_view_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_table_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_tabs_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_text_input_theme_data.dart';
@@ -31,20 +38,27 @@ export 'component_themes/oi_card_theme_data.dart';
 export 'component_themes/oi_chart_palette.dart';
 export 'component_themes/oi_chart_theme_data.dart';
 export 'component_themes/oi_checkbox_theme_data.dart';
+export 'component_themes/oi_data_grid_theme_data.dart';
+export 'component_themes/oi_date_picker_field_theme_data.dart';
 export 'component_themes/oi_dialog_shell_theme_data.dart';
 export 'component_themes/oi_dialog_theme_data.dart';
 export 'component_themes/oi_field_display_theme.dart';
 export 'component_themes/oi_file_explorer_theme_data.dart';
+export 'component_themes/oi_form_select_theme_data.dart';
 export 'component_themes/oi_navigation_rail_theme_data.dart';
 export 'component_themes/oi_otp_theme_data.dart';
 export 'component_themes/oi_pagination_theme_data.dart';
 export 'component_themes/oi_progress_theme_data.dart';
 export 'component_themes/oi_refresh_indicator_theme_data.dart';
+export 'component_themes/oi_reorderable_list_theme_data.dart';
+export 'component_themes/oi_segmented_control_theme_data.dart';
 export 'component_themes/oi_select_theme_data.dart';
 export 'component_themes/oi_sheet_theme_data.dart';
 export 'component_themes/oi_sidebar_theme_data.dart';
 export 'component_themes/oi_sliver_header_theme_data.dart';
 export 'component_themes/oi_switch_theme_data.dart';
+export 'component_themes/oi_switch_tile_theme_data.dart';
+export 'component_themes/oi_tab_view_theme_data.dart';
 export 'component_themes/oi_table_theme_data.dart';
 export 'component_themes/oi_tabs_theme_data.dart';
 export 'component_themes/oi_text_input_theme_data.dart';
@@ -86,6 +100,13 @@ class OiComponentThemes {
     this.refreshIndicator,
     this.navigationRail,
     this.sliverHeader,
+    this.formSelect,
+    this.switchTile,
+    this.segmentedControl,
+    this.tabView,
+    this.reorderableList,
+    this.datePickerField,
+    this.dataGrid,
   });
 
   /// Creates an [OiComponentThemes] with all fields set to `null`.
@@ -115,7 +136,14 @@ class OiComponentThemes {
       dialogShell = null,
       refreshIndicator = null,
       navigationRail = null,
-      sliverHeader = null;
+      sliverHeader = null,
+      formSelect = null,
+      switchTile = null,
+      segmentedControl = null,
+      tabView = null,
+      reorderableList = null,
+      datePickerField = null,
+      dataGrid = null;
 
   /// Theme overrides for button components.
   final OiButtonThemeData? button;
@@ -189,6 +217,27 @@ class OiComponentThemes {
   /// Theme overrides for sliver header components.
   final OiSliverHeaderThemeData? sliverHeader;
 
+  /// Theme overrides for form select components.
+  final OiFormSelectThemeData? formSelect;
+
+  /// Theme overrides for switch tile components.
+  final OiSwitchTileThemeData? switchTile;
+
+  /// Theme overrides for segmented control components.
+  final OiSegmentedControlThemeData? segmentedControl;
+
+  /// Theme overrides for tab view components.
+  final OiTabViewThemeData? tabView;
+
+  /// Theme overrides for reorderable list components.
+  final OiReorderableListThemeData? reorderableList;
+
+  /// Theme overrides for date picker field components.
+  final OiDatePickerFieldThemeData? datePickerField;
+
+  /// Theme overrides for data grid components.
+  final OiDataGridThemeData? dataGrid;
+
   /// Creates a copy with optionally overridden component theme fields.
   OiComponentThemes copyWith({
     OiButtonThemeData? button,
@@ -215,6 +264,13 @@ class OiComponentThemes {
     OiRefreshIndicatorThemeData? refreshIndicator,
     OiNavigationRailThemeData? navigationRail,
     OiSliverHeaderThemeData? sliverHeader,
+    OiFormSelectThemeData? formSelect,
+    OiSwitchTileThemeData? switchTile,
+    OiSegmentedControlThemeData? segmentedControl,
+    OiTabViewThemeData? tabView,
+    OiReorderableListThemeData? reorderableList,
+    OiDatePickerFieldThemeData? datePickerField,
+    OiDataGridThemeData? dataGrid,
   }) {
     return OiComponentThemes(
       button: button ?? this.button,
@@ -241,6 +297,13 @@ class OiComponentThemes {
       refreshIndicator: refreshIndicator ?? this.refreshIndicator,
       navigationRail: navigationRail ?? this.navigationRail,
       sliverHeader: sliverHeader ?? this.sliverHeader,
+      formSelect: formSelect ?? this.formSelect,
+      switchTile: switchTile ?? this.switchTile,
+      segmentedControl: segmentedControl ?? this.segmentedControl,
+      tabView: tabView ?? this.tabView,
+      reorderableList: reorderableList ?? this.reorderableList,
+      datePickerField: datePickerField ?? this.datePickerField,
+      dataGrid: dataGrid ?? this.dataGrid,
     );
   }
 
@@ -271,7 +334,14 @@ class OiComponentThemes {
         other.dialogShell == dialogShell &&
         other.refreshIndicator == refreshIndicator &&
         other.navigationRail == navigationRail &&
-        other.sliverHeader == sliverHeader;
+        other.sliverHeader == sliverHeader &&
+        other.formSelect == formSelect &&
+        other.switchTile == switchTile &&
+        other.segmentedControl == segmentedControl &&
+        other.tabView == tabView &&
+        other.reorderableList == reorderableList &&
+        other.datePickerField == datePickerField &&
+        other.dataGrid == dataGrid;
   }
 
   @override
@@ -301,6 +371,13 @@ class OiComponentThemes {
       refreshIndicator,
       navigationRail,
       sliverHeader,
+      formSelect,
+      switchTile,
+      segmentedControl,
+      tabView,
+      reorderableList,
+      datePickerField,
+      dataGrid,
     ),
   );
 }

@@ -255,6 +255,13 @@ Per-widget visual overrides (all nullable, all have `copyWith`):
 | `refreshIndicator` | `OiRefreshIndicatorThemeData` | Refresh indicator styling |
 | `navigationRail` | `OiNavigationRailThemeData` | Navigation rail styling |
 | `sliverHeader` | `OiSliverHeaderThemeData` | Sliver header styling |
+| `formSelect` | `OiFormSelectThemeData` | Form select styling |
+| `switchTile` | `OiSwitchTileThemeData` | Switch tile styling |
+| `segmentedControl` | `OiSegmentedControlThemeData` | Segmented control styling |
+| `tabView` | `OiTabViewThemeData` | Tab view styling |
+| `reorderableList` | `OiReorderableListThemeData` | Reorderable list styling |
+| `datePickerField` | `OiDatePickerFieldThemeData` | Date picker field styling |
+| `dataGrid` | `OiDataGridThemeData` | Data grid styling |
 
 ### Density — OiDensity
 
@@ -316,6 +323,7 @@ OiOverlays.of(context).show(label: '...', builder: (_) => widget, zOrder: ...);
 ```
 
 Prefer the widget-specific static methods: `OiDialog.show()`, `OiToast.show()`, `OiSheet.show()`.
+For `Future<T?>` semantics, use `showOiDialog<T>()`, `OiDialog.showAsync<T>()`, or `OiSheet.showAsync<T>()`.
 
 ### OiResponsive & Breakpoints
 **Tags:** `responsive`, `breakpoint`, `adaptive`, `mobile`, `desktop`, `tablet`
@@ -616,7 +624,10 @@ Text display with semantic variants. **Use this instead of `Text()` everywhere.*
 - `selectable` (bool, default: false)
 - `semanticsLabel` (String?)
 
-**Named Constructors:** `OiLabel.display()`, `.h1()`, `.h2()`, `.h3()`, `.h4()`, `.body()`, `.bodyStrong()`, `.small()`, `.smallStrong()`, `.tiny()`, `.caption()`, `.code()`, `.overline()`, `.link()`
+**Named Constructors:** `OiLabel.display()`, `.h1()`, `.h2()`, `.h3()`, `.h4()`, `.body()`, `.bodyStrong()`, `.small()`, `.smallStrong()`, `.tiny()`, `.caption()`, `.code()`, `.overline()`, `.link()`, `.copyable()`
+
+**Special Constructors:**
+- `.copyable(text)` — Field-value display with built-in copy-to-clipboard. Selectable text with copy button on hover (desktop) or long-press (mobile). Ideal for IDs, API keys, URLs, error codes.
 
 **Use When:** Any text display. Choose the variant matching the semantic level.
 **Avoid When:** Never use raw `Text()` — always use `OiLabel`.
@@ -624,7 +635,7 @@ Text display with semantic variants. **Use this instead of `Text()` everywhere.*
 ---
 
 #### OiSurface
-**Tags:** `container`, `card`, `background`, `border`, `glass`, `frosted`
+**Tags:** `container`, `card`, `background`, `border`, `glass`, `frosted`, `transparent`, `elevated`
 **Tier:** Primitive
 
 Themed container primitive. Renders backgrounds, borders, shadows, halos, glass effects.
@@ -639,6 +650,10 @@ Themed container primitive. Renders backgrounds, borders, shadows, halos, glass 
 - `frosted` (bool, default: false) — Frosted glass blur effect
 - `gradient` (OiGradientStyle?)
 - `child` (Widget?)
+
+**Named Constructors:**
+- `.transparent(child:, borderRadius:)` — Transparent surface providing clipping and hit-test boundary without visual styling. Replaces `Material(color: transparent)`.
+- `.elevated(elevation:, child:, borderRadius:)` — Transparent surface with elevation shadow. Adds shadow to a container without background fill.
 
 **Use When:** Custom containers with visual styling. Building new component layouts.
 **Avoid When:** Standard card layouts — use `OiCard` instead (it handles title/footer/interaction).
@@ -2005,6 +2020,228 @@ File picker input with drag-drop zone and upload progress.
 
 ---
 
+#### OiFormSelect
+**Tags:** `select`, `dropdown`, `form`, `validation`
+**Tier:** Component
+
+Form-integrated dropdown wrapping `OiSelect` with `FormField<T>`. When `validator` is non-null the widget wraps itself in a `FormField<T>` so it participates in ancestor `Form` validation, saving, and auto-validate flows. When `validator` is null, it renders a plain `OiSelect<T>`.
+
+**Key Parameters:**
+- `options` (List\<T\>, required) — Values to choose from
+- `labelOf` (String Function(T), required) — Converts value to display label
+- `value` (T?) — Currently selected value
+- `onChanged` (ValueChanged\<T?\>?) — Selection callback
+- `validator` (String? Function(T?)?) — Form validation; enables FormField wrapping
+- `onSaved` (void Function(T?)?) — Called by Form.save()
+- `autovalidateMode` (AutovalidateMode?) — Controls auto-validation
+- `label` (String?) — Label above the input frame
+- `hint` (String?) — Hint below the input frame
+- `placeholder` (String?) — Placeholder when no value selected
+- `error` (String?) — Manual error (takes precedence over validator error)
+- `enabled` (bool, default: true)
+- `searchable` (bool, default: false) — Show search field in dropdown
+- `bottomSheetOnCompact` (bool, default: false) — Bottom sheet on mobile
+- `semanticLabel` (String?) — Accessibility label
+
+**Use When:** Dropdown selection inside a `Form` that needs validation. Simplifies `OiSelect` + `FormField` boilerplate.
+**Avoid When:** Standalone dropdowns without form validation -- use `OiSelect` directly. Large/async lists -- use `OiComboBox`.
+**Combine With:** `OiForm`, `OiTextInput` (other form fields), `OiSelect`
+
+---
+
+#### OiSwitchTile
+**Tags:** `switch`, `toggle`, `tile`, `settings`
+**Tier:** Component
+
+A list tile with an `OiSwitch` as its trailing widget. Tapping anywhere on the tile toggles the switch. When `enabled` is `false` the tile is rendered at reduced opacity and does not respond to taps.
+
+**Key Parameters:**
+- `title` (String, required) — Primary text content
+- `value` (bool, required) — Whether the switch is on
+- `onChanged` (ValueChanged\<bool\>, required) — Toggle callback
+- `subtitle` (String?) — Secondary text below title
+- `leading` (Widget?) — Widget at the start of the row
+- `enabled` (bool, default: true)
+- `dense` (bool, default: false) — Reduced vertical padding
+- `contentPadding` (EdgeInsetsGeometry?) — Custom padding
+- `semanticLabel` (String?) — Falls back to title
+
+**Use When:** Settings screens, preferences, feature toggles with descriptive labels.
+**Avoid When:** Bare toggle without label -- use `OiSwitch`. Form checkbox -- use `OiCheckbox`.
+**Combine With:** `OiListTile`, `OiSwitch`, `OiAccordion` (as section content)
+
+---
+
+#### OiCheckboxTile
+**Tags:** `checkbox`, `tile`, `settings`
+**Tier:** Component
+
+A list tile with an `OiCheckbox` as its trailing widget. Tapping anywhere on the tile toggles the checkbox. Supports tristate (`true`/`false`/`null`) when `tristate` is `true`.
+
+**Key Parameters:**
+- `title` (String, required) — Primary text content
+- `value` (bool?) — Current state (null = indeterminate when tristate)
+- `onChanged` (ValueChanged\<bool\>, required) — Toggle callback
+- `tristate` (bool, default: false) — Enable 3-state cycling
+- `subtitle` (String?) — Secondary text below title
+- `leading` (Widget?) — Widget at the start of the row
+- `enabled` (bool, default: true)
+- `dense` (bool, default: false) — Reduced vertical padding
+- `contentPadding` (EdgeInsetsGeometry?) — Custom padding
+- `semanticLabel` (String?) — Falls back to title
+
+**Use When:** Multi-select lists with descriptions, settings with explanatory subtitles.
+**Avoid When:** Bare checkbox -- use `OiCheckbox`. Single on/off -- use `OiSwitchTile`.
+**Combine With:** `OiListTile`, `OiCheckbox`, `OiForm`
+
+---
+
+#### OiRadioTile
+**Tags:** `radio`, `tile`, `settings`, `selection`
+**Tier:** Component
+
+A list tile with an `OiRadio` indicator as its trailing widget. Tapping anywhere on the tile selects this option. Generic type `T` identifies the option value.
+
+**Key Parameters:**
+- `title` (String, required) — Primary text content
+- `value` (T, required) — The value this tile represents
+- `groupValue` (T?, required) — Currently selected value in the radio group
+- `onChanged` (ValueChanged\<T\>, required) — Selection callback
+- `subtitle` (String?) — Secondary text below title
+- `leading` (Widget?) — Widget at the start of the row
+- `enabled` (bool, default: true)
+- `dense` (bool, default: false) — Reduced vertical padding
+- `contentPadding` (EdgeInsetsGeometry?) — Custom padding
+- `semanticLabel` (String?) — Falls back to title
+
+**Use When:** Radio selection lists with descriptive labels, settings with explanatory subtitles.
+**Avoid When:** Simple radio group -- use `OiRadio`. Many options -- use `OiSelect`.
+**Combine With:** `OiListTile`, `OiRadio`, `OiForm`
+
+---
+
+#### OiSegmentedControl
+**Tags:** `segmented`, `toggle`, `button-group`, `exclusive`
+**Tier:** Component
+
+An exclusive segment toggle that renders 2-5 options as connected buttons. Exactly one segment is selected at a time. Renders as a horizontal row of connected segments sharing a common border. Supports keyboard navigation (Tab to focus, arrow keys to move selection).
+
+**Key Parameters:**
+- `segments` (List\<OiSegment\<T\>\>, required) — 2-5 segment entries
+- `selected` (T, required) — Currently selected segment value
+- `onChanged` (ValueChanged\<T\>, required) — Selection callback
+- `enabled` (bool, default: true) — Whether the entire control is interactive
+- `size` (OiSegmentedControlSize, default: medium) — small(28dp)/medium(36dp)/large(44dp)
+- `expand` (bool, default: false) — Equal-width segments filling available space
+- `semanticLabel` (String?) — Accessibility label for the group
+
+**Companion Models:**
+- `OiSegment<T>` — `value` (T), `label` (String), `icon` (IconData?), `enabled` (bool), `semanticLabel` (String?)
+- `OiSegmentedControlSize` — Enum: `small`, `medium`, `large`
+
+**Use When:** Switching between 2-5 mutually exclusive views (Day/Week/Month, List/Grid, Tab-like toggles).
+**Avoid When:** More than 5 options -- use `OiTabs` or `OiSelect`. Non-exclusive toggles -- use `OiButtonGroup`.
+**Combine With:** `OiPage`, `OiSection`, `OiTabView`
+
+---
+
+#### OiDatePickerField
+**Tags:** `date`, `picker`, `field`, `form`, `calendar`
+**Tier:** Component
+
+A date input field that displays a formatted date and opens an `OiDatePicker` dialog when tapped. Renders an `OiInputFrame` with a read-only display and trailing calendar icon. Supports form validation when `validator` is provided.
+
+**Key Parameters:**
+- `value` (DateTime?) — Currently selected date
+- `onChanged` (ValueChanged\<DateTime?\>?) — Selection/clear callback
+- `minDate` (DateTime?) — Earliest selectable date
+- `maxDate` (DateTime?) — Latest selectable date
+- `selectableDayPredicate` (bool Function(DateTime)?) — Per-day enable predicate
+- `label` (String?) — Label above the input frame
+- `hint` (String?) — Hint below the input frame
+- `placeholder` (String?) — Placeholder text (default: 'Select date')
+- `error` (String?) — Manual error (takes precedence over validator)
+- `dateFormat` (String?) — Date format pattern (default: 'MMM d, yyyy')
+- `clearable` (bool, default: false) — Show clear icon when value is set
+- `enabled` (bool, default: true)
+- `readOnly` (bool, default: false)
+- `validator` (String? Function(DateTime?)?) — Form validation
+- `onSaved` (void Function(DateTime?)?) — Called by Form.save()
+- `autovalidateMode` (AutovalidateMode?)
+- `semanticLabel` (String?)
+
+**Use When:** Date selection in forms, filters, scheduling UIs where the field itself is a read-only display that opens a calendar dialog.
+**Avoid When:** Inline date editing -- use `OiDateInput`. Inline editable cells -- use `OiEditableDate`.
+**Combine With:** `OiForm`, `OiDatePicker`, `OiDateRangePickerField`, `OiTimePickerField`
+
+---
+
+#### OiDateRangePickerField
+**Tags:** `date-range`, `picker`, `field`, `form`, `filter`
+**Tier:** Component
+
+A date range input field that opens a dialog with optional preset chips and an `OiDatePicker` in range mode. Displays the selected range formatted as "Mar 1 - Mar 23, 2026". Dialog contains preset chips (Today, Last 7 days, etc.), a calendar, and Cancel/Apply buttons.
+
+**Key Parameters:**
+- `startDate` (DateTime?) — Start of selected range
+- `endDate` (DateTime?) — End of selected range
+- `onChanged` (void Function(DateTime start, DateTime end)?) — Selection callback
+- `minDate` (DateTime?) — Earliest selectable date
+- `maxDate` (DateTime?) — Latest selectable date
+- `label` (String?) — Label above the input frame
+- `hint` (String?) — Hint below the input frame
+- `error` (String?) — Manual error
+- `dateFormat` (String?) — Date format pattern (default: 'MMM d, yyyy')
+- `clearable` (bool, default: false) — Show clear icon
+- `enabled` (bool, default: true)
+- `presets` (List\<OiDateRangePreset\>?) — Custom presets (defaults to `OiDateRangePreset.defaults`)
+- `showPresets` (bool, default: true) — Whether to show preset chips
+- `validator` (String? Function((DateTime, DateTime)?)?) — Form validation
+- `onSaved` (void Function((DateTime, DateTime)?)?) — Called by Form.save()
+- `autovalidateMode` (AutovalidateMode?)
+- `semanticLabel` (String?)
+
+**Companion Model:**
+- `OiDateRangePreset` — `label` (String), `resolve` (() => (DateTime, DateTime)), `icon` (IconData?)
+  - Built-in presets: `.today`, `.last7Days`, `.last30Days`, `.thisWeek`, `.thisMonth`, `.lastMonth`, `.thisYear`
+  - `.defaults` — List of all built-in presets
+
+**Use When:** Date range filtering (reports, analytics, logs), booking date ranges.
+**Avoid When:** Single date selection -- use `OiDatePickerField`. Inline date range editing -- use two `OiDateInput` widgets.
+**Combine With:** `OiFilterBar`, `OiForm`, `OiDatePickerField`, `OiDatePicker`
+
+---
+
+#### OiTimePickerField
+**Tags:** `time`, `picker`, `field`, `form`, `clock`
+**Tier:** Component
+
+A time input field that displays a formatted time and opens an `OiTimePicker` dialog when tapped. Renders an `OiInputFrame` with a read-only display and trailing clock icon. Supports 24-hour and 12-hour format.
+
+**Key Parameters:**
+- `value` (OiTimeOfDay?) — Currently selected time
+- `onChanged` (ValueChanged\<OiTimeOfDay?\>?) — Selection/clear callback
+- `minTime` (OiTimeOfDay?) — Earliest selectable time (reserved for future)
+- `maxTime` (OiTimeOfDay?) — Latest selectable time (reserved for future)
+- `minuteInterval` (int, default: 1) — Minute granularity (reserved for future)
+- `label` (String?) — Label above the input frame
+- `hint` (String?) — Hint below the input frame
+- `placeholder` (String?) — Placeholder text (default: 'Select time')
+- `error` (String?) — Manual error (takes precedence over validator)
+- `use24Hour` (bool, default: true) — 24h (14:30) vs 12h (2:30 PM)
+- `clearable` (bool, default: false) — Show clear icon when value is set
+- `enabled` (bool, default: true)
+- `validator` (String? Function(OiTimeOfDay?)?) — Form validation
+- `onSaved` (void Function(OiTimeOfDay?)?) — Called by Form.save()
+- `autovalidateMode` (AutovalidateMode?)
+- `semanticLabel` (String?)
+
+**Use When:** Time selection in forms, scheduling UIs where the field opens a time picker dialog.
+**Avoid When:** Inline time editing -- use `OiTimeInput`. Combined date+time -- use `OiDateTimeInput`.
+**Combine With:** `OiForm`, `OiTimePicker`, `OiDatePickerField`
+
+---
+
 #### [ADMIN] OiArrayInput
 **Tags:** `input`, `array`, `repeatable`, `dynamic-fields`, `form`, `list-input`
 **Tier:** Component
@@ -2206,6 +2443,19 @@ Navigation breadcrumb trail.
 
 Calendar UI for date selection with month/year navigation.
 
+**Static Method:**
+
+```dart
+/// Shows date picker in dialog, returns selected date.
+static Future<DateTime?> OiDatePicker.show(
+  BuildContext context, {
+  DateTime? initialDate,
+  DateTime? minDate,
+  DateTime? maxDate,
+  String semanticLabel,
+})
+```
+
 ---
 
 #### OiTimePicker
@@ -2213,6 +2463,18 @@ Calendar UI for date selection with month/year navigation.
 **Tier:** Component
 
 Time selection with hours/minutes/seconds.
+
+**Static Method:**
+
+```dart
+/// Shows time picker in dialog, returns selected time.
+static Future<OiTimeOfDay?> OiTimePicker.show(
+  BuildContext context, {
+  OiTimeOfDay? initialTime,
+  bool use24Hour,
+  String semanticLabel,
+})
+```
 
 ---
 
@@ -2259,7 +2521,37 @@ Horizontal tab navigation.
 **Theme:** `context.components.tabs` -> `OiTabsThemeData`
 
 **Use When:** Switching between views/sections on the same page.
-**Combine With:** `OiPage`, `OiSection`
+**Combine With:** `OiPage`, `OiSection`, `OiTabView`
+
+---
+
+#### OiTabView
+**Tags:** `tabs`, `tab-view`, `content`, `switching`, `swipe`
+**Tier:** Component
+
+A tab bar with integrated content switching, lazy loading, and swipe support. Combines `OiTabs` (the tab bar) with a content area that displays the widget built by the selected `OiTabViewItem.builder`. Supports uncontrolled (manages own state) and controlled (parent manages state) modes.
+
+**Key Parameters:**
+- `tabs` (List\<OiTabViewItem\>, required) — Tab definitions with builders
+- `initialIndex` (int, default: 0) — Initial tab for uncontrolled mode
+- `onTabChanged` (ValueChanged\<int\>?) — Tab selection callback
+- `indicatorStyle` (OiTabIndicatorStyle, default: underline) — underline/filled/pill
+- `scrollable` (bool, default: false) — Scrollable tab bar
+- `tabBarPadding` (EdgeInsetsGeometry?) — Padding around the tab bar
+- `keepAlive` (bool, default: false) — Retain all tab content via IndexedStack
+- `swipeable` (bool, default: true) — Horizontal swipe to switch tabs
+- `animationDuration` (Duration?) — Content transition duration
+- `semanticLabel` (String?) — Accessibility label
+
+**Named Constructors:**
+- `.controlled(tabs:, selectedIndex:, onTabChanged:, ...)` — Parent manages selection state
+
+**Companion Model:**
+- `OiTabViewItem` — `label` (String), `builder` (WidgetBuilder), `icon` (IconData?), `badge` (String?), `enabled` (bool)
+
+**Use When:** Tabbed content pages where you want tab bar + content switching in one widget. Replaces manual `OiTabs` + content switching boilerplate.
+**Avoid When:** Tab bar without content area -- use `OiTabs` directly. Complex page-level navigation -- use `OiBottomBar` or `OiSidebar`.
+**Combine With:** `OiPage`, `OiSection`, `OiTabs`
 
 ---
 
@@ -2652,10 +2944,27 @@ Modal dialog with variants.
 - `onClose` (VoidCallback?)
 - `dismissible` (bool, default: true)
 
-**Static Method:**
+**Static Methods:**
 ```dart
+// Fire-and-forget (returns OiOverlayHandle)
 OiDialog.show(context, label: '...', dialog: OiDialog.confirm(...));
+
+// Async — returns Future<T?> (recommended for getting a result back)
+final result = await OiDialog.showAsync<T>(context, label: '...', title: '...', content: widget, actions: [...]);
 ```
+
+**Top-level function (recommended replacement for Material's `showDialog()`):**
+```dart
+/// Shows a modal dialog returning Future<T?>.
+Future<T?> showOiDialog<T>(
+  BuildContext context, {
+  required Widget Function(BuildContext, void Function([T?]) close) builder,
+  bool dismissible = true,
+  String? semanticLabel,
+})
+```
+
+> **Note:** `showOiDialog<T>()` is the recommended replacement for Material's `showDialog()`. The builder receives a `close` callback — call `close(result)` to dismiss and return a value.
 
 **Theme:** `context.components.dialog` -> `OiDialogThemeData`
 
@@ -2737,7 +3046,26 @@ Bottom sheet / side sheet.
 - `dragHandle` (bool, default: false)
 - `snapPoints` (List<double>?) — Snap heights for drag
 
-**Static Method:** `OiSheet.show(context, ...)`
+**Static Methods:**
+
+- `OiSheet.show(context, ...)` — Fire-and-forget, returns `OiOverlayHandle`
+- `OiSheet.showAsync<T>(context, ...)` — Returns `Future<T?>` (new)
+
+```dart
+/// Shows sheet returning Future<T?>.
+static Future<T?> OiSheet.showAsync<T>(
+  BuildContext context, {
+  required String label,
+  required Widget Function(void Function([T?]) close) builder,
+  OiPanelSide side,
+  double? size,
+  bool dismissible,
+  bool dragHandle,
+  List<double>? snapPoints,
+})
+```
+
+> **Note:** Existing `OiSheet.show()` returns `OiOverlayHandle` (still available). `showAsync` is the new method for `Future<T?>` semantics.
 
 **Theme:** `context.components.sheet` -> `OiSheetThemeData`
 
@@ -2974,6 +3302,41 @@ State management for paginated data.
 **Tier:** Composite
 
 State management for OiTable. Manages sort, selection, column state, pagination.
+
+---
+
+#### OiReorderableList
+**Tags:** `reorder`, `drag`, `list`, `sortable`
+**Tier:** Composite
+
+A drag-to-reorder list that supports drag handles, long-press drag, keyboard reordering, and animated gap insertion. Each item is built by `itemBuilder` which receives the item, its index, and an optional drag handle widget.
+
+**Key Parameters:**
+- `items` (List\<T\>, required) — Data items to display
+- `itemBuilder` (Widget Function(BuildContext, T, int, Widget?), required) — Item builder; fourth param is drag handle widget (or null)
+- `onReorder` (void Function(int oldIndex, int newIndex), required) — Reorder callback
+- `itemKey` (ValueKey\<Object\> Function(T)?) — Unique key extractor (defaults to index)
+- `dragHandle` (bool, default: true) — Show grip icon on each item
+- `longPressDrag` (bool, default: false) — Long-press to drag (when dragHandle is false)
+- `axis` (Axis, default: vertical) — Scroll axis
+- `padding` (EdgeInsetsGeometry?) — Padding around the list
+- `separator` (Widget?) — Separator between items
+- `shrinkWrap` (bool, default: false) — Use inside unbounded containers
+- `onDragStart` (void Function(int)?) — Drag start callback
+- `onDragEnd` (void Function(int)?) — Drag end callback
+- `canReorder` (bool Function(int)?) — Per-item reorder predicate
+- `semanticLabel` (String?) — Accessibility label
+
+**Drag Modes:**
+- `dragHandle: true` (default) — Grip icon initiates drag
+- `dragHandle: false, longPressDrag: true` — Long-press entire item to drag
+- `dragHandle: false, longPressDrag: false` — Immediate drag on entire item
+
+**Keyboard:** Focus an item, press Space to pick up, arrow keys to move, Enter to drop, Escape to cancel.
+
+**Use When:** User-sortable lists (task priority, playlist order, form field order).
+**Avoid When:** Simple display lists -- use `OiVirtualList`. Grid reorder -- use `OiReorderable` primitive.
+**Combine With:** `OiListTile`, `OiCard`, `OiDivider` (as separator)
 
 ---
 
@@ -3276,6 +3639,37 @@ Visual step indicator (horizontal/vertical/compact).
 
 **Use When:** Showing progress through a multi-step process.
 **Combine With:** `OiWizard`, `OiForm`
+
+---
+
+#### OiFormDialog
+**Tags:** `dialog`, `form`, `modal`, `validation`
+**Tier:** Composite
+
+A static-only utility for showing form dialogs with a managed lifecycle. Presents a modal dialog containing a title, custom form content, an optional error area, and cancel/submit action buttons. The dialog's state (loading, error, submit-enabled) is managed through an `OiFormDialogController` provided to the builder.
+
+**Static Methods:**
+- `OiFormDialog.showCustom<T>(context, title:, builder:, ...)` — Shows dialog, returns `Future<T?>`
+
+**Key Parameters (showCustom):**
+- `title` (String, required) — Dialog heading
+- `builder` (Widget Function(OiFormDialogController\<T\>), required) — Form content builder
+- `submitLabel` (String, default: 'Save') — Primary action button label
+- `cancelLabel` (String, default: 'Cancel') — Cancel button label
+- `dismissible` (bool, default: true) — Barrier tap to close (blocked while loading)
+- `maxWidth` (double?) — Maximum dialog width
+- `semanticLabel` (String?) — Accessibility label
+
+**OiFormDialogController\<T\>:**
+- `.submit(T result)` — Sets loading, then closes with result
+- `.cancel()` — Closes without result
+- `.setLoading(loading:)` — Toggle loading state (shows spinner on submit button)
+- `.setError(String?)` — Show/clear error message
+- `.setSubmitEnabled(enabled:)` — Enable/disable submit button
+
+**Use When:** Quick create/edit dialogs with loading/error state management. CRUD forms that don't need a full page.
+**Avoid When:** Complex multi-step forms -- use `OiWizard`. Full-page forms -- use `OiForm`.
+**Combine With:** `OiTextInput`, `OiSelect`, `OiForm`, `OiDialogShell`
 
 ---
 
@@ -4318,8 +4712,12 @@ Use this table to pick the right widget for your use case.
 | **Card** | `OiCard` | `Card` |
 | **List item** | `OiListTile` | `ListTile` |
 | **Dialog** | `OiDialog.show()` | `showDialog()` |
+| **Dialog that returns a value** | `showOiDialog<T>()` or `OiDialog.showAsync<T>()` | `showDialog()` |
 | **Toast** | `OiToast.show()` | `ScaffoldMessenger` / `SnackBar` |
 | **Bottom sheet** | `OiSheet.show()` | `showModalBottomSheet()` |
+| **Sheet that returns a value** | `OiSheet.showAsync<T>()` | `showModalBottomSheet()` |
+| **Pick a date via dialog** | `OiDatePicker.show()` | `showDatePicker()` |
+| **Pick a time via dialog** | `OiTimePicker.show()` | `showTimePicker()` |
 | **Navigation bar** | `OiBottomBar` (mobile) / `OiNavigationRail` (tablet) / `OiSidebar` (desktop) | `BottomNavigationBar` |
 | **Responsive nav shell** | `OiResponsiveShell` | Custom adaptive layout |
 | **Vertical nav rail** | `OiNavigationRail` | Custom icon column |
@@ -4365,6 +4763,17 @@ Use this table to pick the right widget for your use case.
 | **Copy text** | `OiCopyable` / `OiCopyButton` | Custom clipboard code |
 | **Inline edit** | `OiEditableText` / `OiEditableSelect` / etc. | Custom inline edit |
 | **Large list** | `OiVirtualList` (>100 items) | `ListView.builder` |
+| **Form dropdown with validation** | `OiFormSelect` | `OiSelect` + manual `FormField` |
+| **Switch with label tile** | `OiSwitchTile` | `OiListTile` + `OiSwitch` manually |
+| **Checkbox with label tile** | `OiCheckboxTile` | `OiListTile` + `OiCheckbox` manually |
+| **Radio with label tile** | `OiRadioTile` | `OiListTile` + `OiRadio` manually |
+| **Segmented toggle (2-5)** | `OiSegmentedControl` | `OiButtonGroup(exclusive)` |
+| **Date field with dialog** | `OiDatePickerField` | `OiDateInput` + manual dialog |
+| **Date range field** | `OiDateRangePickerField` | Two `OiDateInput` + custom dialog |
+| **Time field with dialog** | `OiTimePickerField` | `OiTimeInput` + manual dialog |
+| **Tabs with content** | `OiTabView` | `OiTabs` + manual content switching |
+| **Reorderable list** | `OiReorderableList` | `OiReorderable` (primitive) |
+| **Form dialog with lifecycle** | `OiFormDialog.showCustom()` | `showOiDialog` + manual state |
 | **Drag to reorder** | `OiReorderable` | `ReorderableListView` |
 | **Pull-to-refresh** | `OiRefreshIndicator` | `RefreshIndicator` |
 | **Scroll-to-top button** | `OiScrollToTop` | Custom FAB |
@@ -4433,6 +4842,20 @@ Use this table to pick the right widget for your use case.
 14. **Test at all 5 breakpoints** — compact, medium, expanded, large, extraLarge.
 15. **Provide both light and dark themes** when customizing colors.
 
+16. **Returning values from dialogs:**
+Use `showOiDialog<T>()` or `OiDialogShell.show<T>()` instead of Material's `showDialog()`.
+The builder receives a `close` callback — call `close(result)` to dismiss and return a value.
+
+```dart
+final confirmed = await showOiDialog<bool>(context, builder: (ctx, close) {
+  return Column(children: [
+    OiLabel.body('Are you sure?'),
+    OiButton.primary(label: 'Yes', onTap: () => close(true)),
+    OiButton.ghost(label: 'No', onTap: () => close(false)),
+  ]);
+});
+```
+
 ## Anti-Patterns
 
 1. **DO NOT import `material.dart`** — obers_ui replaces Material entirely.
@@ -4478,15 +4901,17 @@ Searchable keyword -> widget mapping for quick lookup.
 | `breadcrumb` | OiBreadcrumbs, OiPathBar |
 | `bulk` | OiBulkBar |
 | `button` | OiButton, OiButtonGroup, OiIconButton, OiToggleButton |
-| `calendar` | OiCalendar, OiDatePicker, OiDateInput |
+| `button-group` | OiButtonGroup, OiSegmentedControl |
+| `calendar` | OiCalendar, OiDatePicker, OiDateInput, OiDatePickerField |
 | `carousel` | OiPageIndicator |
 | `card` | OiCard, OiDashboardCard, OiFileGridCard |
 | `cart` | OiCartItem, OiCartSummary, OiCartPanel, OiMiniCart, OiCartItemRow, OiQuantitySelector |
 | `chart` | OiFunnelChart, OiGauge, OiHeatmap, OiRadarChart, OiSankey, OiTreemap |
 | `chat` | OiChat, OiChatMessage, OiTypingIndicator |
-| `checkbox` | OiCheckbox |
+| `checkbox` | OiCheckbox, OiCheckboxTile |
 | `checkout` | OiCheckout, OiCheckoutData |
-| `clipboard` | OiCopyButton, OiCopyable, OiPasteZone |
+| `clipboard` | OiCopyButton, OiCopyable, OiPasteZone, OiLabel.copyable |
+| `clock` | OiTimePickerField, OiTimePicker |
 | `code` | OiCodeBlock, OiLabel.code, OiDiffView |
 | `collapse` | OiAccordion, OiCard(collapsible) |
 | `color` | OiColorInput, OiColorScheme, OiColorSwatch |
@@ -4495,26 +4920,30 @@ Searchable keyword -> widget mapping for quick lookup.
 | `command` | OiCommandBar |
 | `comment` | OiComments |
 | `confirm` | OiButton.confirm, OiDialog.confirm, OiDeleteDialog |
-| `container` | OiContainer, OiSurface, OiCard, OiDialogShell |
+| `container` | OiContainer, OiSurface, OiSurface.transparent, OiCard, OiDialogShell |
+| `content` | OiTabView |
 | `context-menu` | OiContextMenu |
-| `copy` | OiCopyButton, OiCopyable, OiFieldDisplay(copyable) |
+| `copy` | OiCopyButton, OiCopyable, OiFieldDisplay(copyable), OiLabel.copyable |
 | `coupon` | OiCouponInput, OiCouponResult |
 | `crud` | OiListView, OiForm, OiDetailView, OiResourcePage |
 | `currency` | OiFieldDisplay(currency), OiNumberInput |
 | `dashboard` | OiDashboard, OiMetric |
 | `data` | OiTable, OiDetailView, OiListView, OiFieldDisplay |
-| `date` | OiDateInput, OiDatePicker, OiFieldDisplay(date) |
+| `date` | OiDateInput, OiDatePicker, OiDatePicker.show, OiDatePickerField, OiDateRangePickerField, OiFieldDisplay(date) |
+| `date-picker` | OiDatePicker, OiDatePicker.show, OiDatePickerField |
+| `date-range` | OiDateRangePickerField, OiDateRangePreset |
 | `delete` | OiDeleteDialog, OiButton.destructive |
 | `delivery` | OiShippingMethod, OiShippingMethodPicker |
 | `detail` | OiDetailView, OiFieldDisplay |
 | `destination` | OiNavigationItem |
-| `dialog` | OiDialog, OiDialogShell, OiDeleteDialog, OiNameDialog, OiRenameDialog |
+| `dialog` | OiDialog, OiDialog.showAsync, showOiDialog, OiDialogShell, OiDeleteDialog, OiNameDialog, OiRenameDialog, OiFormDialog |
 | `dots` | OiPageIndicator |
 | `diff` | OiDiffView |
 | `divider` | OiDivider |
+| `drag` | OiDraggable, OiReorderable, OiReorderableList, OiDragGhost |
 | `drag-and-drop` | OiDraggable, OiDropZone, OiReorderable, OiDragGhost |
 | `drawer` | OiDrawer |
-| `dropdown` | OiSelect, OiComboBox, OiButton.split |
+| `dropdown` | OiSelect, OiComboBox, OiButton.split, OiFormSelect |
 | `e-commerce` | OiCheckout, OiShopProductDetail, OiProductCard, OiPriceTag |
 | `editor` | OiRichEditor, OiSmartInput |
 | `email` | OiFieldDisplay(email), OiTextInput |
@@ -4525,13 +4954,16 @@ Searchable keyword -> widget mapping for quick lookup.
 | `export` | OiThemeExporter, OiExportButton |
 | `feed` | OiActivityFeed |
 | `feedback` | OiStarRating, OiScaleRating, OiThumbs, OiSentiment, OiReactionBar |
-| `field` | OiFieldDisplay, OiFormField, OiDetailField |
+| `elevated` | OiSurface.elevated |
+| `exclusive` | OiSegmentedControl, OiButtonGroup(exclusive) |
+| `field` | OiFieldDisplay, OiFormField, OiDetailField, OiDatePickerField, OiDateRangePickerField, OiTimePickerField |
 | `file` | OiFileExplorer, OiFileInput, OiFileIcon, OiFileTile, OiFileGridCard |
-| `filter` | OiFilterBar, OiListView, OiTable |
+| `filter` | OiFilterBar, OiListView, OiTable, OiDateRangePickerField |
 | `flow` | OiFlowGraph, OiStateDiagram |
 | `folder` | OiFolderIcon, OiFolderTreeItem, OiNewFolderDialog |
-| `form` | OiForm, OiFormField, OiFormSection, OiWizard |
+| `form` | OiForm, OiFormField, OiFormSection, OiWizard, OiFormSelect, OiFormDialog, OiDatePickerField, OiDateRangePickerField, OiTimePickerField |
 | `funnel` | OiFunnelChart |
+| `future` | showOiDialog, OiDialog.showAsync, OiSheet.showAsync, OiDatePicker.show, OiTimePicker.show |
 | `gallery` | OiGallery, OiLightbox, OiProductGallery |
 | `gantt` | OiGantt |
 | `gauge` | OiGauge |
@@ -4550,7 +4982,7 @@ Searchable keyword -> widget mapping for quick lookup.
 | `image` | OiImage, OiAvatar, OiGallery, OiLightbox, OiImageCropper, OiImageAnnotator |
 | `indicator` | OiProgress, OiLiveRing, OiPulse, OiStorageIndicator, OiPageIndicator |
 | `inline-edit` | OiEditable, OiEditableText, OiEditableSelect, OiEditableDate, OiEditableNumber |
-| `input` | OiTextInput, OiNumberInput, OiDateInput, OiTimeInput, OiDateTimeInput, OiSelect, OiComboBox, OiCheckbox, OiSwitch, OiRadio, OiSlider, OiTagInput, OiColorInput, OiFileInput, OiArrayInput |
+| `input` | OiTextInput, OiNumberInput, OiDateInput, OiTimeInput, OiDateTimeInput, OiSelect, OiFormSelect, OiComboBox, OiCheckbox, OiSwitch, OiRadio, OiSlider, OiTagInput, OiColorInput, OiFileInput, OiArrayInput, OiDatePickerField, OiDateRangePickerField, OiTimePickerField |
 | `lazy` | OiSliverList, OiSliverGrid, OiVirtualList |
 | `kanban` | OiKanban |
 | `keyboard` | OiShortcutScope, OiShortcuts, OiCommandBar, OiFocusTrap |
@@ -4585,7 +5017,7 @@ Searchable keyword -> widget mapping for quick lookup.
 | `payment` | OiPaymentMethod, OiPaymentMethodPicker |
 | `permission` | OiPermissions |
 | `phone` | OiFieldDisplay(phone) |
-| `picker` | OiDatePicker, OiTimePicker, OiEmojiPicker, OiColorInput |
+| `picker` | OiDatePicker, OiDatePicker.show, OiTimePicker, OiTimePicker.show, OiEmojiPicker, OiColorInput, OiDatePickerField, OiDateRangePickerField, OiTimePickerField |
 | `pipeline` | OiPipeline |
 | `pinned` | OiSliverHeader |
 | `popover` | OiPopover |
@@ -4597,12 +5029,12 @@ Searchable keyword -> widget mapping for quick lookup.
 | `quantity` | OiQuantitySelector |
 | `radar` | OiRadarChart |
 | `rail` | OiNavigationRail, OiRailLabelBehavior |
-| `radio` | OiRadio |
+| `radio` | OiRadio, OiRadioTile |
 | `refresh` | OiRefreshIndicator |
 | `rating` | OiStarRating, OiScaleRating |
 | `reaction` | OiReactionBar |
 | `register` | OiAuthPage.register |
-| `reorder` | OiReorderable, OiKanban |
+| `reorder` | OiReorderable, OiReorderableList, OiKanban |
 | `resize` | OiResizable, OiSplitPane |
 | `resource` | OiResourcePage |
 | `responsive` | OiResponsive, OiBreakpoint, OiGrid, OiPage, OiResponsiveShell, OiSliverGrid |
@@ -4616,9 +5048,12 @@ Searchable keyword -> widget mapping for quick lookup.
 | `shell` | OiAppShell, OiResponsiveShell, OiDialogShell |
 | `sidebar-lite` | OiNavigationRail |
 | `search` | OiSearch, OiComboBox, OiCommandBar, OiFilterBar, OiTextInput.search |
-| `select` | OiSelect, OiComboBox, OiRadio |
-| `settings` | OiSettingsDriver, OiAccordionSettings, etc. |
-| `sheet` | OiSheet |
+| `segmented` | OiSegmentedControl |
+| `select` | OiSelect, OiComboBox, OiRadio, OiFormSelect |
+| `selection` | OiRadioTile, OiSegmentedControl |
+| `settings` | OiSettingsDriver, OiAccordionSettings, OiSwitchTile, OiCheckboxTile, OiRadioTile, etc. |
+| `sheet` | OiSheet, OiSheet.showAsync |
+| `show-dialog` | showOiDialog, OiDialog.showAsync, OiDialogShell.show |
 | `shipping` | OiShippingMethod, OiShippingMethodPicker |
 | `shop` | OiProductData, OiCartItem, OiCartSummary, OiPriceTag, OiQuantitySelector, OiProductCard, OiCartItemRow, OiOrderSummaryLine, OiCouponInput, OiAddressForm, OiShippingMethodPicker, OiPaymentMethodPicker, OiOrderStatusBadge, OiCartPanel, OiMiniCart, OiOrderSummary, OiProductGallery, OiOrderTracker, OiCheckout, OiShopProductDetail |
 | `sidebar` | OiSidebar, OiFileSidebar |
@@ -4633,18 +5068,24 @@ Searchable keyword -> widget mapping for quick lookup.
 | `stepper` | OiStepper, OiWizard |
 | `sticky` | OiSliverHeader |
 | `storage` | OiStorageIndicator, OiSettingsDriver |
-| `surface` | OiSurface |
-| `switch` | OiSwitch |
-| `tab` | OiTabs |
+| `surface` | OiSurface, OiSurface.transparent, OiSurface.elevated |
+| `switch` | OiSwitch, OiSwitchTile |
+| `switching` | OiTabView |
+| `swipe` | OiTabView, OiSwipeable |
+| `tab` | OiTabs, OiTabView |
+| `tab-view` | OiTabView |
 | `table` | OiTable, OiTableColumn, OiTableController |
 | `tag` | OiTagInput, OiBadge |
-| `text` | OiLabel, OiTextInput |
+| `text` | OiLabel, OiLabel.copyable, OiTextInput |
 | `theme` | OiThemeData, OiColorScheme, OiDynamicTheme, OiThemePreview, OiThemeToggle |
 | `thumbs` | OiThumbs |
-| `time` | OiTimeInput, OiTimePicker, OiRelativeTime |
+| `tile` | OiSwitchTile, OiCheckboxTile, OiRadioTile, OiListTile |
+| `time` | OiTimeInput, OiTimePicker, OiTimePicker.show, OiTimePickerField, OiRelativeTime |
+| `time-picker` | OiTimePicker, OiTimePicker.show, OiTimePickerField |
 | `timeline` | OiTimeline, OiGantt |
 | `toast` | OiToast |
-| `toggle` | OiToggleButton, OiSwitch, OiCheckbox |
+| `toggle` | OiToggleButton, OiSwitch, OiCheckbox, OiSwitchTile, OiSegmentedControl |
+| `transparent` | OiSurface.transparent |
 | `toolbar` | OiButtonGroup, OiFileToolbar, OiSliverHeader |
 | `transition` | OiPageRoute, OiTransitionPage, OiPageTransitionType |
 | `tooltip` | OiTooltip |
@@ -4656,7 +5097,7 @@ Searchable keyword -> widget mapping for quick lookup.
 | `upload` | OiUploadDialog, OiFileInput, OiFileExplorer |
 | `url` | OiFieldDisplay(url) |
 | `user` | OiAvatar, OiAvatarStack, OiUserMenu |
-| `validation` | OiForm, OiFormField, OiTextInput |
+| `validation` | OiForm, OiFormField, OiTextInput, OiFormSelect, OiFormDialog, OiDatePickerField, OiDateRangePickerField, OiTimePickerField |
 | `video` | OiVideoPlayer |
 | `virtual-scroll` | OiVirtualList, OiVirtualGrid |
 | `visibility` | OiVisibility |

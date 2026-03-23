@@ -64,6 +64,15 @@ Standard UI components that you'll use every day. Built from primitives, styled 
 | `OiPageIndicator` | Dot indicators for paged content |
 | `OiScrollToTop` | Floating scroll-to-top button |
 | `OiBackButton` | RTL-aware back navigation button |
+| `OiFormSelect` | Form-integrated dropdown with validation |
+| `OiSwitchTile` | Toggle tile with switch, label, and subtitle |
+| `OiCheckboxTile` | Toggle tile with checkbox, label, and subtitle |
+| `OiRadioTile` | Toggle tile with radio indicator |
+| `OiSegmentedControl` | Exclusive segment toggle (2-5 options) |
+| `OiDatePickerField` | Date input with calendar dialog |
+| `OiDateRangePickerField` | Date range input with presets |
+| `OiTimePickerField` | Time input with time picker dialog |
+| `OiTabView` | Tab bar with content switching and lazy loading |
 
 This is the tier most developers will interact with the most.
 
@@ -84,6 +93,9 @@ Multi-component patterns that solve complex UI problems. Built from components.
 | `OiGantt` | Gantt chart timeline |
 | `OiTour` | Multi-step guided onboarding |
 | `OiResponsiveShell` | Responsive navigation shell |
+| `OiReorderableList` | Drag-to-reorder list with keyboard support |
+| `OiDataGrid` | Lightweight data grid with sorting and selection |
+| `OiFormDialog` | Form dialog with managed lifecycle |
 
 ## Tier 4: Modules
 

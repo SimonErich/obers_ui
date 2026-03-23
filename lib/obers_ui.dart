@@ -79,16 +79,22 @@ export 'src/components/inputs/oi_array_input.dart';
 export 'src/components/inputs/oi_checkbox.dart';
 export 'src/components/inputs/oi_color_input.dart';
 export 'src/components/inputs/oi_date_input.dart';
+export 'src/components/inputs/oi_date_picker_field.dart';
+export 'src/components/inputs/oi_date_range_picker_field.dart';
 export 'src/components/inputs/oi_date_time_input.dart';
 export 'src/components/inputs/oi_file_input.dart';
+export 'src/components/inputs/oi_form_select.dart';
 export 'src/components/inputs/oi_number_input.dart';
 export 'src/components/inputs/oi_radio.dart';
+export 'src/components/inputs/oi_segmented_control.dart';
 export 'src/components/inputs/oi_select.dart';
 export 'src/components/inputs/oi_slider.dart';
 export 'src/components/inputs/oi_switch.dart';
+export 'src/components/inputs/oi_switch_tile.dart';
 export 'src/components/inputs/oi_tag_input.dart';
 export 'src/components/inputs/oi_text_input.dart';
 export 'src/components/inputs/oi_time_input.dart';
+export 'src/components/inputs/oi_time_picker_field.dart';
 // ── Primitives: Interaction ──────────────────────────────────────────────────
 
 export 'src/components/interaction/oi_selection_overlay.dart';
@@ -102,6 +108,7 @@ export 'src/components/navigation/oi_drawer.dart';
 export 'src/components/navigation/oi_emoji_picker.dart';
 export 'src/components/navigation/oi_locale_switcher.dart';
 export 'src/components/navigation/oi_navigation_rail.dart';
+export 'src/components/navigation/oi_tab_view.dart';
 export 'src/components/navigation/oi_tabs.dart';
 export 'src/components/navigation/oi_theme_toggle.dart';
 export 'src/components/navigation/oi_time_picker.dart';
@@ -137,8 +144,10 @@ export 'src/components/shop/oi_stock_badge.dart';
 export 'src/components/shop/oi_wishlist_button.dart';
 // ── Composites: Data ─────────────────────────────────────────────────────────
 
+export 'src/composites/data/oi_data_grid.dart';
 export 'src/composites/data/oi_detail_view.dart';
 export 'src/composites/data/oi_pagination_controller.dart';
+export 'src/composites/data/oi_reorderable_list.dart';
 export 'src/composites/data/oi_table.dart';
 export 'src/composites/data/oi_table_controller.dart';
 export 'src/composites/data/oi_tree.dart';
@@ -158,6 +167,7 @@ export 'src/composites/files/oi_file_sidebar.dart';
 // ── Composites: Forms ────────────────────────────────────────────────────────
 
 export 'src/composites/forms/oi_form.dart';
+export 'src/composites/forms/oi_form_dialog.dart';
 export 'src/composites/forms/oi_stepper.dart';
 export 'src/composites/forms/oi_wizard.dart';
 // ── Composites: Media ────────────────────────────────────────────────────────

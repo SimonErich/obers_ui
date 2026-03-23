@@ -44,6 +44,13 @@ OiThemeData.light(
 | `OiRefreshIndicator` | `OiRefreshIndicatorThemeData` |
 | `OiNavigationRail` | `OiNavigationRailThemeData` |
 | `OiSliverHeader` | `OiSliverHeaderThemeData` |
+| `OiFormSelect` | `OiFormSelectThemeData` |
+| `OiSwitchTile` | `OiSwitchTileThemeData` |
+| `OiSegmentedControl` | `OiSegmentedControlThemeData` |
+| `OiTabView` | `OiTabViewThemeData` |
+| `OiReorderableList` | `OiReorderableListThemeData` |
+| `OiDatePickerField` | `OiDatePickerFieldThemeData` |
+| `OiDataGrid` | `OiDataGridThemeData` |
 
 ## Accessing component themes
 
