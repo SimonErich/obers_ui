@@ -254,6 +254,18 @@ export 'src/foundation/persistence/oi_settings_data.dart';
 export 'src/foundation/persistence/oi_settings_driver.dart';
 export 'src/foundation/persistence/oi_settings_mixin.dart';
 export 'src/foundation/persistence/oi_settings_provider.dart';
+// ── Foundation: Scales ───────────────────────────────────────────────────────
+
+export 'src/foundation/scales/oi_band_scale.dart';
+export 'src/foundation/scales/oi_category_scale.dart';
+export 'src/foundation/scales/oi_chart_scale.dart';
+export 'src/foundation/scales/oi_chart_viewport.dart';
+export 'src/foundation/scales/oi_linear_scale.dart';
+export 'src/foundation/scales/oi_logarithmic_scale.dart';
+export 'src/foundation/scales/oi_point_scale.dart';
+export 'src/foundation/scales/oi_quantile_scale.dart';
+export 'src/foundation/scales/oi_threshold_scale.dart';
+export 'src/foundation/scales/oi_time_scale.dart';
 // ── Foundation: Theme ────────────────────────────────────────────────────────
 
 export 'src/foundation/theme/oi_animation_config.dart';
