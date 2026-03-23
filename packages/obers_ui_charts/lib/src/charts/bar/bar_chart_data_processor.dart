@@ -1,10 +1,8 @@
 import 'dart:ui';
 
+import 'package:obers_ui_charts/src/charts/bar/bar_chart_orientation.dart';
 import 'package:obers_ui_charts/src/core/chart_data.dart';
-import 'package:obers_ui_charts/src/core/chart_painter.dart';
-
-/// Orientation for bar chart rendering.
-enum OiBarChartOrientation { vertical, horizontal }
+import 'package:obers_ui_charts/src/core/chart_padding.dart';
 
 /// Pure-Dart processor for bar chart layout computations.
 ///

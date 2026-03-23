@@ -119,9 +119,26 @@ class OiChartData {
 
   final List<OiChartSeries> series;
 
+  /// Creates an atomic chart data instance from a single series.
+  ///
+  /// Useful for simple charts that only display one data series.
+  factory OiChartData.atom({
+    required String name,
+    required List<OiDataPoint> dataPoints,
+    Color? color,
+  }) =>
+      OiChartData(
+        series: [
+          OiChartSeries(name: name, dataPoints: dataPoints, color: color),
+        ],
+      );
+
   /// Whether there is any data to render.
   bool get isEmpty =>
       series.isEmpty || series.every((s) => s.dataPoints.isEmpty);
+
+  /// Returns the list of series names.
+  List<String> get names => series.map((s) => s.name).toList();
 
   /// Computes the min/max bounds across all series.
   OiChartBounds get bounds {

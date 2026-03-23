@@ -1,39 +1,8 @@
 import 'dart:ui';
 
-import 'package:flutter/foundation.dart';
 import 'package:obers_ui_charts/src/core/chart_data.dart';
-import 'package:obers_ui_charts/src/core/chart_painter.dart';
-
-/// Result of a hit test on chart data.
-@immutable
-class OiChartHitResult {
-  const OiChartHitResult({
-    required this.seriesIndex,
-    required this.pointIndex,
-    required this.dataPoint,
-  });
-
-  final int seriesIndex;
-  final int pointIndex;
-  final OiDataPoint dataPoint;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is OiChartHitResult &&
-          runtimeType == other.runtimeType &&
-          seriesIndex == other.seriesIndex &&
-          pointIndex == other.pointIndex &&
-          dataPoint == other.dataPoint;
-
-  @override
-  int get hashCode => Object.hash(seriesIndex, pointIndex, dataPoint);
-
-  @override
-  String toString() =>
-      'OiChartHitResult(series: $seriesIndex, point: $pointIndex, '
-      'data: $dataPoint)';
-}
+import 'package:obers_ui_charts/src/core/chart_hit_result.dart';
+import 'package:obers_ui_charts/src/core/chart_padding.dart';
 
 /// Handles gesture hit-testing against chart data.
 ///
@@ -94,32 +63,5 @@ class OiChartGestureHandler {
     }
 
     return closest;
-  }
-}
-
-/// Controls tooltip visibility and content for chart interactions.
-class OiChartTooltipController {
-  OiChartTooltipController();
-
-  /// The currently active hit result, or `null` if no tooltip is shown.
-  final ValueNotifier<OiChartHitResult?> activeResult =
-      ValueNotifier<OiChartHitResult?>(null);
-
-  /// The current hit result, or `null` if no tooltip is shown.
-  OiChartHitResult? get active => activeResult.value;
-
-  /// Shows a tooltip for the given [result].
-  set active(OiChartHitResult result) {
-    activeResult.value = result;
-  }
-
-  /// Hides the currently visible tooltip.
-  void hide() {
-    activeResult.value = null;
-  }
-
-  /// Disposes of the internal notifier.
-  void dispose() {
-    activeResult.dispose();
   }
 }

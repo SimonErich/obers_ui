@@ -1,10 +1,12 @@
 import 'package:flutter/widgets.dart';
-import 'package:obers_ui_charts/src/charts/bar/bar_chart_data_processor.dart';
+import 'package:obers_ui_charts/src/charts/bar/bar_chart_orientation.dart';
 import 'package:obers_ui_charts/src/charts/bar/bar_chart_painter.dart';
 import 'package:obers_ui_charts/src/core/chart_data.dart';
 import 'package:obers_ui_charts/src/core/chart_gesture_handler.dart';
-import 'package:obers_ui_charts/src/core/chart_painter.dart';
+import 'package:obers_ui_charts/src/core/chart_hit_result.dart';
+import 'package:obers_ui_charts/src/core/chart_padding.dart';
 import 'package:obers_ui_charts/src/core/chart_theme.dart';
+import 'package:obers_ui_charts/src/core/chart_tooltip_controller.dart';
 
 /// A bar chart widget that renders one or more data series as grouped bars.
 ///

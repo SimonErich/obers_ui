@@ -1,58 +1,6 @@
 import 'package:flutter/painting.dart';
-
-/// Color palette for chart rendering.
-class OiChartColors {
-  const OiChartColors({
-    required this.seriesColors,
-    required this.gridColor,
-    required this.axisColor,
-    required this.backgroundColor,
-  });
-
-  final List<Color> seriesColors;
-  final Color gridColor;
-  final Color axisColor;
-  final Color backgroundColor;
-
-  /// Returns the color for a given series index, cycling through available
-  /// colors.
-  Color colorForSeries(int index) => seriesColors[index % seriesColors.length];
-
-  OiChartColors copyWith({
-    List<Color>? seriesColors,
-    Color? gridColor,
-    Color? axisColor,
-    Color? backgroundColor,
-  }) => OiChartColors(
-    seriesColors: seriesColors ?? this.seriesColors,
-    gridColor: gridColor ?? this.gridColor,
-    axisColor: axisColor ?? this.axisColor,
-    backgroundColor: backgroundColor ?? this.backgroundColor,
-  );
-}
-
-/// Text styles used in chart labels.
-class OiChartTextStyles {
-  const OiChartTextStyles({
-    required this.axisLabel,
-    required this.tooltipLabel,
-    required this.legendLabel,
-  });
-
-  final TextStyle axisLabel;
-  final TextStyle tooltipLabel;
-  final TextStyle legendLabel;
-
-  OiChartTextStyles copyWith({
-    TextStyle? axisLabel,
-    TextStyle? tooltipLabel,
-    TextStyle? legendLabel,
-  }) => OiChartTextStyles(
-    axisLabel: axisLabel ?? this.axisLabel,
-    tooltipLabel: tooltipLabel ?? this.tooltipLabel,
-    legendLabel: legendLabel ?? this.legendLabel,
-  );
-}
+import 'package:obers_ui_charts/src/core/chart_colors.dart';
+import 'package:obers_ui_charts/src/core/chart_text_styles.dart';
 
 /// Theme configuration for chart widgets.
 class OiChartTheme {

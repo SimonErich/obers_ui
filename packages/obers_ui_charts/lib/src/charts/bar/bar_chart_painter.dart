@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/rendering.dart';
 import 'package:obers_ui_charts/src/charts/bar/bar_chart_data_processor.dart';
+import 'package:obers_ui_charts/src/charts/bar/bar_chart_orientation.dart';
 import 'package:obers_ui_charts/src/core/chart_painter.dart';
 
 /// Custom painter for bar charts.

@@ -2,7 +2,9 @@ import 'package:flutter/widgets.dart';
 import 'package:obers_ui_charts/src/charts/pie/pie_chart_painter.dart';
 import 'package:obers_ui_charts/src/core/chart_data.dart';
 import 'package:obers_ui_charts/src/core/chart_gesture_handler.dart';
+import 'package:obers_ui_charts/src/core/chart_hit_result.dart';
 import 'package:obers_ui_charts/src/core/chart_theme.dart';
+import 'package:obers_ui_charts/src/core/chart_tooltip_controller.dart';
 
 /// A pie chart widget that renders data as circular slices.
 ///

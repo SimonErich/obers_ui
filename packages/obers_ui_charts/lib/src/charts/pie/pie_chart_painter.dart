@@ -3,6 +3,7 @@ import 'dart:ui';
 
 import 'package:flutter/rendering.dart';
 import 'package:obers_ui_charts/src/charts/pie/pie_chart_data_processor.dart';
+import 'package:obers_ui_charts/src/core/chart_padding.dart';
 import 'package:obers_ui_charts/src/core/chart_painter.dart';
 
 /// Custom painter for pie (and donut) charts.
