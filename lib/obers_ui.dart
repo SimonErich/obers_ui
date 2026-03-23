@@ -27,6 +27,7 @@ export 'src/components/dialogs/oi_upload_dialog.dart';
 export 'src/components/display/oi_avatar.dart';
 export 'src/components/display/oi_badge.dart';
 export 'src/components/display/oi_card.dart';
+export 'src/components/display/oi_chart_surface.dart';
 export 'src/components/display/oi_code_block.dart';
 export 'src/components/display/oi_diff_view.dart';
 export 'src/components/display/oi_drop_highlight.dart';
