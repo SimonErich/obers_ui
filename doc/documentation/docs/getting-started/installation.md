@@ -44,6 +44,33 @@ dependencies:
 | Flutter | 3.41.0 |
 | Dart | 3.11.0 |
 
+## Optional packages
+
+### obers_ui_forms — Type-Safe Form Management
+
+`obers_ui_forms` is a **separate package** for type-safe stateful forms with enum-keyed field access, declarative validation, auto-binding widgets, and computed fields.
+
+```yaml
+dependencies:
+  obers_ui_forms:
+    git:
+      url: https://github.com/simonerich/obers_ui.git
+      path: packages/obers_ui_forms
+```
+
+For local development:
+```yaml
+dependencies:
+  obers_ui_forms:
+    path: ../obers_ui/packages/obers_ui_forms
+```
+
+```dart
+import 'package:obers_ui_forms/obers_ui_forms.dart';
+```
+
+See the [Composites > Type-Safe Forms](../components/composites.md#type-safe-forms-obers_ui_forms) documentation for usage.
+
 ## What's included
 
 ObersUI has minimal external dependencies:

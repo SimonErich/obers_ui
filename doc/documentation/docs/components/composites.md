@@ -225,17 +225,43 @@ final user = await OiFormDialog.showCustom<User>(
 
 ## Type-Safe Forms (obers_ui_forms)
 
-The `obers_ui_forms` package provides type-safe stateful form management on top of the existing form composites.
+!!! note "Separate package"
+    `obers_ui_forms` is a **separate package** that must be installed alongside `obers_ui`.
+    See [Installation](../getting-started/installation.md#optional-packages) for setup instructions.
 
-| Widget | Description |
+```dart
+import 'package:obers_ui_forms/obers_ui_forms.dart';
+```
+
+Type-safe stateful form management with auto-binding widgets, declarative validation, and computed fields.
+
+### Core Classes
+
+| Class | Description |
 |---|---|
 | `OiFormController<E>` | Abstract base controller with enum-keyed field access |
 | `OiFormInputController<T>` | Per-field controller with value, validation, dirty tracking |
+| `OiFormValidation` | Static factory methods for 12 built-in validators |
+
+### Auto-Binding Widgets (Zero Boilerplate)
+
+| Widget | Description |
+|---|---|
+| `OiAutoForm<E>` | Form wrapper combining scope + onSubmit |
+| `OiAutoFormTextInput<E>` | Auto-binding text input (`.password()`, `.multiline()`) |
+| `OiAutoFormCheckbox<E>` | Auto-binding checkbox |
+| `OiAutoFormSwitch<E>` | Auto-binding switch |
+| `OiAutoFormSelect<E, T>` | Auto-binding select dropdown |
+| `OiAutoFormNumberInput<E>` | Auto-binding number input |
+
+### Manual Binding Widgets
+
+| Widget | Description |
+|---|---|
 | `OiFormScope<E>` | InheritedWidget providing controller to descendants |
 | `OiFormElement<E>` | Wrapper with label, error display, conditional visibility |
 | `OiFormSubmitButton<E>` | Auto-disabling submit button |
 | `OiFormErrorSummary<E>` | Global error summary widget |
-| `OiFormValidation` | Static factory methods for 12 built-in validators |
 
 ### Quick Start
 
@@ -258,17 +284,20 @@ class SignupController extends OiFormController<SignupFields> {
   };
 }
 
-// 3. Build UI
-OiFormScope<SignupFields>(
-  controller: controller,
+// 3. Build UI with auto-binding (recommended)
+OiAutoForm<SignupFields>(
+  controller: SignupController(),
+  onSubmit: (data, ctrl) => handleSubmit(data),
   child: Column(
     children: [
-      OiFormElement<SignupFields>(
+      OiAutoFormTextInput<SignupFields>(
         fieldKey: SignupFields.name,
         label: 'Name',
-        child: OiTextInput(
-          onChanged: (v) => controller.set(SignupFields.name, v),
-        ),
+        placeholder: 'Enter your name',
+      ),
+      OiAutoFormTextInput<SignupFields>(
+        fieldKey: SignupFields.email,
+        label: 'Email',
       ),
       OiFormSubmitButton<SignupFields>(label: 'Submit'),
     ],
@@ -278,19 +307,22 @@ OiFormScope<SignupFields>(
 
 ### Key Features
 
+- **Zero-boilerplate auto-binding** — `OiAutoFormTextInput` handles value/onChange/error automatically
 - **Type-safe** enum-keyed field access — no `Map<String, dynamic>`
-- **Declarative validation** with 12 built-in validators (sync + async)
-- **Computed fields** with watch dependencies and auto-update
-- **Cross-field validation** via `OiFormValidation.equals(fieldKey)`
-- **Conditional visibility** with `hideIf`/`showIf` callbacks
+- **12 built-in validators** — required, email, url, regex, securePassword, equals, min, max, minLength, maxLength, custom, asyncCustom
 - **Async validation** with debounce, cancellation, and loading state
-- **Transient fields** (`save: false`) excluded from data export
+- **Computed fields** with watch dependencies (`onChange`, `onInit`, `onSubmit`, `onDirty`, `onValid`, `onInvalid`)
+- **Cross-field validation** via `OiFormValidation.equals(fieldKey)` + `revalidateOnChangeOf`
+- **Conditional visibility** with `hideIf`/`showIf` callbacks
+- **Enter-to-submit** on single-line text fields (skips multiline)
+- **validateOnChange** / **validateOnBlur** per-field auto-validation
+- **Transient fields** (`save: false`) excluded from `getData()`/`json()`
 - **Getter/setter transformers** for value transformation
-- **Accessibility** — required indicators, liveRegion error announcements
+- **Disabled state propagation** — form-level and per-field
+- **Accessibility** — required asterisk indicators, `liveRegion` error announcements, semantic labels
+- **Fallback values** — `controller.get<String>(key, fallback: 'default')`
 
-**Import:** `import 'package:obers_ui_forms/obers_ui_forms.dart';`
-
-**Related components:** `OiForm`, `OiTextInput`, `OiSelect`, `OiCheckbox`, `OiSwitch`
+**Related components:** `OiForm`, `OiTextInput`, `OiSelect`, `OiCheckbox`, `OiSwitch`, `OiNumberInput`
 
 ## Editors
 
