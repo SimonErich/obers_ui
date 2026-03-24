@@ -100,11 +100,16 @@ class _OiTimePickerState extends State<OiTimePicker> {
     const visibleItems = 5;
     const pickerHeight = itemExtent * visibleItems;
 
+    final selectedHour = widget.use24Hour
+        ? _hour
+        : (_hour % 12 == 0 ? 0 : _hour % 12);
+
     Widget wheel({
       required int itemCount,
       required String Function(int) label,
       required FixedExtentScrollController controller,
       required ValueChanged<int> onChanged,
+      required int selectedIndex,
     }) {
       return SizedBox(
         width: 72,
@@ -116,14 +121,13 @@ class _OiTimePickerState extends State<OiTimePicker> {
           onSelectedItemChanged: onChanged,
           childDelegate: ListWheelChildBuilderDelegate(
             childCount: itemCount,
-            builder: (ctx, index) => Center(
-              child: Text(
-                label(index),
-                style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.w500,
-                  color: colors.text,
-                ),
+            builder: (ctx, index) => _WheelItem(
+              label: label(index),
+              selected: index == selectedIndex,
+              onTap: () => controller.animateToItem(
+                index,
+                duration: const Duration(milliseconds: 200),
+                curve: Curves.easeOut,
               ),
             ),
           ),
@@ -145,6 +149,7 @@ class _OiTimePickerState extends State<OiTimePicker> {
               },
               controller: _hourCtrl,
               onChanged: _onHourChanged,
+              selectedIndex: selectedHour,
             ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 4),
@@ -162,6 +167,7 @@ class _OiTimePickerState extends State<OiTimePicker> {
               label: (i) => i.toString().padLeft(2, '0'),
               controller: _minuteCtrl,
               onChanged: _onMinuteChanged,
+              selectedIndex: _minute,
             ),
           ],
         ),
@@ -185,6 +191,72 @@ class _OiTimePickerState extends State<OiTimePicker> {
           ),
         ],
       ],
+    );
+  }
+}
+
+// ── Wheel item with selected highlight and hover ────────────────────────────
+
+class _WheelItem extends StatefulWidget {
+  const _WheelItem({
+    required this.label,
+    required this.selected,
+    this.onTap,
+  });
+
+  final String label;
+  final bool selected;
+  final VoidCallback? onTap;
+
+  @override
+  State<_WheelItem> createState() => _WheelItemState();
+}
+
+class _WheelItemState extends State<_WheelItem> {
+  bool _hovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    final selected = widget.selected;
+
+    Color bg;
+    Color textColor;
+    if (selected) {
+      bg = colors.primary.base;
+      textColor = colors.textOnPrimary;
+    } else if (_hovered) {
+      bg = colors.surfaceHover;
+      textColor = colors.text;
+    } else {
+      bg = const Color(0x00000000);
+      textColor = colors.text;
+    }
+
+    return GestureDetector(
+      onTap: widget.onTap,
+      child: MouseRegion(
+        onEnter: (_) => setState(() => _hovered = true),
+        onExit: (_) => setState(() => _hovered = false),
+        child: AnimatedContainer(
+        duration: const Duration(milliseconds: 120),
+        margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+        decoration: BoxDecoration(
+          color: bg,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Center(
+          child: Text(
+            widget.label,
+            style: TextStyle(
+              fontSize: 22,
+              fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
+              color: textColor,
+            ),
+          ),
+        ),
+        ),
+      ),
     );
   }
 }

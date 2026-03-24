@@ -13,6 +13,8 @@ class SchedulingWorkflowScreen extends StatefulWidget {
 
 class _SchedulingWorkflowScreenState extends State<SchedulingWorkflowScreen> {
   DateTime? _selectedDate;
+  DateTime? _rangeStart;
+  DateTime? _rangeEnd;
 
   @override
   Widget build(BuildContext context) {
@@ -74,9 +76,27 @@ class _SchedulingWorkflowScreenState extends State<SchedulingWorkflowScreen> {
             examples: [
               ComponentExample(
                 title: 'Single Date Selection',
-                child: OiDatePicker(
-                  value: _selectedDate,
-                  onChanged: (date) => setState(() => _selectedDate = date),
+                child: SizedBox(
+                  width: 400,
+                  child: OiDatePicker(
+                    value: _selectedDate,
+                    onChanged: (date) => setState(() => _selectedDate = date),
+                  ),
+                ),
+              ),
+              ComponentExample(
+                title: 'Date Range Selection',
+                child: SizedBox(
+                  width: 400,
+                  child: OiDatePicker(
+                    rangeMode: true,
+                    rangeStart: _rangeStart,
+                    rangeEnd: _rangeEnd,
+                    onRangeChanged: (start, end) => setState(() {
+                      _rangeStart = start;
+                      _rangeEnd = end;
+                    }),
+                  ),
                 ),
               ),
             ],

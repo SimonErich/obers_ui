@@ -120,9 +120,41 @@ void main() {
     testWidgets('renders without errors', (tester) async {
       await _pumpExplorer(tester, _explorer());
       await tester.pumpAndSettle();
-      // The explorer should render; it shows the empty state initially
-      // until a folder is navigated to.
-      expect(find.text('Test file explorer'), findsNothing);
+      expect(find.byType(OiFileExplorer), findsOneWidget);
+    });
+
+    testWidgets('renders at small size without crashes', (tester) async {
+      await tester.pumpObers(
+        SizedBox(
+          width: 800,
+          height: 600,
+          child: _explorer(
+            storage: const OiStorageData(
+              usedBytes: 2576980378,
+              totalBytes: 10737418240,
+            ),
+          ),
+        ),
+        surfaceSize: const Size(800, 600),
+      );
+      await tester.pumpAndSettle();
+      expect(find.byType(OiFileExplorer), findsOneWidget);
+    });
+
+    testWidgets('renders with drag-drop no sidebar', (tester) async {
+      await tester.pumpObers(
+        SizedBox(
+          width: 1400,
+          height: 900,
+          child: _explorer(
+            enableDragDrop: true,
+            showSidebar: false,
+          ),
+        ),
+        surfaceSize: const Size(1400, 900),
+      );
+      await tester.pumpAndSettle();
+      expect(find.byType(OiFileExplorer), findsOneWidget);
     });
 
     testWidgets('renders toolbar', (tester) async {
@@ -137,10 +169,11 @@ void main() {
       );
     });
 
-    testWidgets('renders empty state when no folder is loaded', (tester) async {
+    testWidgets('navigates to root folder on init', (tester) async {
       await _pumpExplorer(tester, _explorer());
       await tester.pumpAndSettle();
-      expect(find.text('This folder is empty'), findsOneWidget);
+      // After init, the explorer auto-navigates to root and loads files.
+      expect(find.text('report.pdf'), findsOneWidget);
     });
 
     // ══════════════════════════════════════════════════════════════════════════

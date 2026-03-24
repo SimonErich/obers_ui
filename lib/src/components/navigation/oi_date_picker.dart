@@ -3,9 +3,6 @@ import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
 
-// Weekday abbreviations Sun–Sat (index 0 = Sunday).
-const List<String> _kWeekdays = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
-
 const List<String> _kMonths = [
   'January',
   'February',
@@ -184,45 +181,50 @@ class _OiDatePickerState extends State<OiDatePicker> {
       final isToday = _sameDay(day, today);
       final disabled = _isDisabled(day);
 
-      var bgColor = const Color(0x00000000);
+      var cellBgColor = const Color(0x00000000);
       var textColor = disabled ? colors.textMuted : colors.text;
 
       if (selected || endpoint) {
-        bgColor = colors.primary.base;
+        cellBgColor = colors.primary.base;
         textColor = colors.textOnPrimary;
       } else if (inRange) {
-        bgColor = colors.primary.base.withValues(alpha: 0.15);
+        cellBgColor = colors.primary.base.withValues(alpha: 0.15);
         textColor = colors.primary.base;
       }
 
       final cell = Container(
         margin: const EdgeInsets.all(2),
-        decoration: BoxDecoration(color: bgColor, shape: BoxShape.circle),
-        child: Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                '$dayNum',
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: selected || endpoint
-                      ? FontWeight.w600
-                      : FontWeight.w400,
-                  color: textColor,
-                ),
+        decoration: BoxDecoration(
+          color: cellBgColor,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            Text(
+              '$dayNum',
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: selected || endpoint
+                    ? FontWeight.w600
+                    : FontWeight.w400,
+                color: textColor,
               ),
-              if (isToday && !selected && !endpoint)
-                Container(
-                  width: 4,
-                  height: 4,
+            ),
+            if (isToday && !selected && !endpoint)
+              Positioned(
+                top: 4,
+                right: 4,
+                child: Container(
+                  width: 5,
+                  height: 5,
                   decoration: BoxDecoration(
                     color: colors.primary.base,
                     shape: BoxShape.circle,
                   ),
                 ),
-            ],
-          ),
+              ),
+          ],
         ),
       );
 
@@ -234,6 +236,9 @@ class _OiDatePickerState extends State<OiDatePicker> {
         ),
       );
     }
+
+    // Stripe color for alternating rows.
+    final stripeBg = colors.surfaceSubtle;
 
     return SingleChildScrollView(
       child: Column(
@@ -281,35 +286,23 @@ class _OiDatePickerState extends State<OiDatePicker> {
               ],
             ),
           ),
-          // Weekday headers.
-          Row(
-            children: _kWeekdays
-                .map(
-                  (d) => Expanded(
-                    child: Center(
-                      child: Text(
-                        d,
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                          color: colors.textMuted,
-                        ),
-                      ),
-                    ),
-                  ),
-                )
-                .toList(),
-          ),
           const SizedBox(height: 4),
-          // Day grid: 6 rows of 7.
+          // Day grid: 6 rows of 7 with alternating row backgrounds.
           for (int row = 0; row < 6; row++)
-            Row(
-              children: List.generate(7, (col) {
-                final idx = row * 7 + col;
-                return Expanded(
-                  child: AspectRatio(aspectRatio: 1, child: cells[idx]),
-                );
-              }),
+            Container(
+              decoration: BoxDecoration(
+                color: row.isOdd ? stripeBg : null,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              padding: const EdgeInsets.symmetric(vertical: 2),
+              child: Row(
+                children: List.generate(7, (col) {
+                  final idx = row * 7 + col;
+                  return Expanded(
+                    child: AspectRatio(aspectRatio: 1, child: cells[idx]),
+                  );
+                }),
+              ),
             ),
         ],
       ),
