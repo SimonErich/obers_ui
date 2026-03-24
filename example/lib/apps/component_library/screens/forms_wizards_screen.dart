@@ -299,61 +299,45 @@ class _SignupFormExampleState extends State<_SignupFormExample> {
   Widget build(BuildContext context) {
     final spacing = context.spacing;
 
-    return forms.OiFormScope<_SignupFields>(
+    return forms.OiAutoForm<_SignupFields>(
       controller: _controller,
+      onSubmit: (data, ctrl) {
+        // Handle signup
+      },
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           forms.OiFormErrorSummary<_SignupFields>(),
           SizedBox(height: spacing.sm),
-          forms.OiFormElement<_SignupFields>(
+          forms.OiAutoFormTextInput<_SignupFields>(
             fieldKey: _SignupFields.name,
             label: 'Name',
-            child: OiTextInput(
-              placeholder: 'Enter your name',
-              onChanged: (v) => _controller.set<String>(_SignupFields.name, v),
-            ),
+            placeholder: 'Enter your name',
           ),
           SizedBox(height: spacing.sm),
-          forms.OiFormElement<_SignupFields>(
+          forms.OiAutoFormTextInput<_SignupFields>(
             fieldKey: _SignupFields.email,
             label: 'Email',
-            child: OiTextInput(
-              placeholder: 'Enter your email',
-              onChanged: (v) => _controller.set<String>(_SignupFields.email, v),
-            ),
+            placeholder: 'Enter your email',
           ),
           SizedBox(height: spacing.sm),
-          forms.OiFormElement<_SignupFields>(
+          forms.OiAutoFormTextInput<_SignupFields>.password(
             fieldKey: _SignupFields.password,
             label: 'Password',
-            child: OiTextInput.password(
-              placeholder: 'Enter password',
-              onChanged: (v) =>
-                  _controller.set<String>(_SignupFields.password, v),
-            ),
+            placeholder: 'Enter password',
           ),
           SizedBox(height: spacing.sm),
-          forms.OiFormElement<_SignupFields>(
+          forms.OiAutoFormTextInput<_SignupFields>.password(
             fieldKey: _SignupFields.passwordRepeat,
             label: 'Repeat Password',
+            placeholder: 'Repeat password',
             revalidateOnChangeOf: [_SignupFields.password],
-            child: OiTextInput.password(
-              placeholder: 'Repeat password',
-              onChanged: (v) =>
-                  _controller.set<String>(_SignupFields.passwordRepeat, v),
-            ),
           ),
           SizedBox(height: spacing.md),
           Row(
             spacing: spacing.sm,
             children: [
-              forms.OiFormSubmitButton<_SignupFields>(
-                label: 'Sign Up',
-                onSubmit: (data, ctrl) {
-                  // Handle signup
-                },
-              ),
+              forms.OiFormSubmitButton<_SignupFields>(label: 'Sign Up'),
               OiButton.outline(label: 'Reset', onTap: _controller.reset),
             ],
           ),
