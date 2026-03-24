@@ -399,6 +399,9 @@ class _OiFileGridViewState extends State<OiFileGridView> {
     if (widget.enableDragDrop) {
       // If folder, make it a drop target
       if (file.isFolder && widget.onMoveToFolder != null) {
+        // Capture current card value to avoid circular reference in the
+        // closure — `card` is reassigned to OiDraggable below.
+        final innerCard = card;
         card = OiDropZone<List<OiFileNodeData>>(
           onWillAccept: (data) {
             if (data == null) return false;
@@ -415,7 +418,7 @@ class _OiFileGridViewState extends State<OiFileGridView> {
                       borderRadius: BorderRadius.circular(8),
                     )
                   : null,
-              child: card,
+              child: innerCard,
             );
           },
         );

@@ -234,6 +234,15 @@ class _OiFileExplorerState extends State<OiFileExplorer> {
       final tree = await widget.loadFolderTree('root');
       if (mounted) {
         setState(() => _folderTree = tree);
+        // Navigate to root so the content area shows initial files.
+        if (widget.controller.currentFolder == null) {
+          const rootFolder = OiFileNodeData(
+            id: 'root',
+            name: 'Home',
+            isFolder: true,
+          );
+          await widget.controller.navigateTo('root', folder: rootFolder);
+        }
       }
     } on Exception catch (_) {
       // Tree loading error handled silently
@@ -751,21 +760,23 @@ class _OiFileExplorerState extends State<OiFileExplorer> {
 
     return Semantics(
       label: 'File explorer toolbar',
-      child: Container(
-        padding: EdgeInsets.symmetric(
-          horizontal: (spacing as dynamic).md as double,
-          vertical: (spacing as dynamic).sm as double,
-        ),
-        decoration: BoxDecoration(
-          border: Border(
-            bottom: BorderSide(
-              color: (colors as dynamic).borderSubtle as Color,
+      child: ClipRect(
+        child: Container(
+          padding: EdgeInsets.symmetric(
+            horizontal: (spacing as dynamic).md as double,
+            vertical: (spacing as dynamic).sm as double,
+          ),
+          decoration: BoxDecoration(
+            border: Border(
+              bottom: BorderSide(
+                color: (colors as dynamic).borderSubtle as Color,
+              ),
             ),
           ),
+          child: isSelectionMode
+              ? _buildSelectionToolbar(colors, spacing, controller)
+              : _buildNormalToolbar(colors, spacing, controller),
         ),
-        child: isSelectionMode
-            ? _buildSelectionToolbar(colors, spacing, controller)
-            : _buildNormalToolbar(colors, spacing, controller),
       ),
     );
   }

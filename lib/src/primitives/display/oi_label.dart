@@ -530,13 +530,25 @@ class OiLabel extends StatelessWidget {
       );
     }
 
-    Widget textWidget = Text(
-      text,
-      style: style,
-      maxLines: maxLines,
-      overflow: overflow,
-      textAlign: textAlign,
-    );
+    Widget textWidget;
+
+    if (variant == OiLabelVariant.link) {
+      textWidget = _OiLinkHover(
+        text: text,
+        style: style,
+        maxLines: maxLines,
+        overflow: overflow,
+        textAlign: textAlign,
+      );
+    } else {
+      textWidget = Text(
+        text,
+        style: style,
+        maxLines: maxLines,
+        overflow: overflow,
+        textAlign: textAlign,
+      );
+    }
 
     if (selectable) {
       textWidget = SelectableRegion(
@@ -558,5 +570,56 @@ class OiLabel extends StatelessWidget {
     }
 
     return textWidget;
+  }
+}
+
+/// Wraps link text with a hover effect that changes opacity and shows a pointer
+/// cursor on hover.
+class _OiLinkHover extends StatefulWidget {
+  const _OiLinkHover({
+    required this.text,
+    required this.style,
+    this.maxLines,
+    this.overflow,
+    this.textAlign,
+  });
+
+  final String text;
+  final TextStyle style;
+  final int? maxLines;
+  final TextOverflow? overflow;
+  final TextAlign? textAlign;
+
+  @override
+  State<_OiLinkHover> createState() => _OiLinkHoverState();
+}
+
+class _OiLinkHoverState extends State<_OiLinkHover> {
+  bool _hovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    final baseColor = widget.style.color ?? colors.primary.base;
+    final hoverColor = colors.primary.dark;
+
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      onEnter: (_) => setState(() => _hovered = true),
+      onExit: (_) => setState(() => _hovered = false),
+      child: AnimatedDefaultTextStyle(
+        duration: const Duration(milliseconds: 150),
+        style: widget.style.copyWith(
+          color: _hovered ? hoverColor : baseColor,
+          decorationColor: _hovered ? hoverColor : baseColor,
+        ),
+        child: Text(
+          widget.text,
+          maxLines: widget.maxLines,
+          overflow: widget.overflow,
+          textAlign: widget.textAlign,
+        ),
+      ),
+    );
   }
 }
