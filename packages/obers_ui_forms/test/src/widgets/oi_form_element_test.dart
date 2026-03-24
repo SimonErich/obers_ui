@@ -33,7 +33,7 @@ void main() {
         ),
       );
 
-      expect(find.text('Full Name'), findsOneWidget);
+      expect(find.textContaining('Full Name'), findsOneWidget);
       expect(find.byKey(const Key('input')), findsOneWidget);
 
       controller.dispose();
@@ -56,7 +56,7 @@ void main() {
         ),
       );
 
-      expect(find.text('Name is too short'), findsOneWidget);
+      expect(find.textContaining('Name is too short'), findsOneWidget);
 
       controller.dispose();
     });
@@ -78,7 +78,7 @@ void main() {
         ),
       );
 
-      expect(find.text('Name'), findsNothing);
+      expect(find.textContaining('Name'), findsNothing);
       expect(find.byKey(const Key('input')), findsNothing);
 
       controller.dispose();
@@ -101,7 +101,7 @@ void main() {
       );
 
       // showIf=true wins over hideIf=true
-      expect(find.text('Name'), findsOneWidget);
+      expect(find.textContaining('Name'), findsOneWidget);
       expect(find.byKey(const Key('input')), findsOneWidget);
 
       controller.dispose();
@@ -118,7 +118,7 @@ void main() {
         ),
       );
 
-      expect(find.text('Name'), findsOneWidget);
+      expect(find.textContaining('Name'), findsOneWidget);
       expect(find.byKey(const Key('input')), findsOneWidget);
     });
 
@@ -137,13 +137,13 @@ void main() {
         ),
       );
 
-      expect(find.text('Error!'), findsOneWidget);
+      expect(find.textContaining('Error!'), findsOneWidget);
 
       // Changing value clears errors (clearErrorOnChange default)
       controller.set<String>(TestFields.name, 'New value');
       await tester.pump();
 
-      expect(find.text('Error!'), findsNothing);
+      expect(find.textContaining('Error!'), findsNothing);
 
       controller.dispose();
     });

@@ -23,6 +23,7 @@ class OiFormElement<E extends Enum> extends StatefulWidget {
     this.hideIf,
     this.showIf,
     this.revalidateOnChangeOf,
+    this.focusNode,
     super.key,
   });
 
@@ -44,6 +45,9 @@ class OiFormElement<E extends Enum> extends StatefulWidget {
 
   /// Re-validate this field when any of these fields change.
   final List<E>? revalidateOnChangeOf;
+
+  /// Optional focus node for this field.
+  final FocusNode? focusNode;
 
   @override
   State<OiFormElement<E>> createState() => _OiFormElementState<E>();
@@ -117,21 +121,38 @@ class _OiFormElementState<E extends Enum> extends State<OiFormElement<E>> {
     }
 
     final field = controller.getInputController(widget.fieldKey);
-    return _buildContent(context, errors: field.errors);
+    return _buildContent(
+      context,
+      errors: field.errors,
+      isRequired: field.required,
+      isDisabled: !field.enabled,
+    );
   }
 
-  Widget _buildContent(BuildContext context, {required List<String> errors}) {
+  Widget _buildContent(
+    BuildContext context, {
+    required List<String> errors,
+    bool isRequired = false,
+    bool isDisabled = false,
+  }) {
     final colors = context.colors;
     final spacing = context.spacing;
 
-    return Column(
+    final labelText = widget.label != null && isRequired
+        ? '${widget.label!} *'
+        : widget.label;
+
+    Widget content = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        if (widget.label != null)
+        if (labelText != null)
           Padding(
             padding: EdgeInsets.only(bottom: spacing.xs),
-            child: OiLabel.small(widget.label!),
+            child: Semantics(
+              label: isRequired ? '${widget.label}, required' : null,
+              child: OiLabel.small(labelText),
+            ),
           ),
         widget.child,
         if (errors.isNotEmpty)
@@ -144,5 +165,11 @@ class _OiFormElementState<E extends Enum> extends State<OiFormElement<E>> {
           ),
       ],
     );
+
+    if (isDisabled) {
+      content = Opacity(opacity: 0.6, child: IgnorePointer(child: content));
+    }
+
+    return content;
   }
 }

@@ -237,6 +237,16 @@ abstract class OiFormController<E extends Enum> extends ChangeNotifier {
     return errors;
   }
 
+  /// Returns the first field key that has validation errors, or null.
+  E? get firstInvalidField {
+    for (final entry in _fields.entries) {
+      if (!entry.value.isValid || entry.value.errors.isNotEmpty) {
+        return entry.key;
+      }
+    }
+    return null;
+  }
+
   /// Whether all fields are valid (no errors and required fields filled).
   bool get isValid {
     for (final field in _fields.values) {
