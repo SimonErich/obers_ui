@@ -159,7 +159,7 @@ void main() {
 
     test('isComputed returns true when computedValue is set', () {
       final controller = OiFormInputController<String>(
-        computedValue: (_) => 'computed',
+        computeValue: (_) => 'computed',
       );
       expect(controller.isComputed, isTrue);
     });

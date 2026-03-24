@@ -27,7 +27,7 @@ class OiFormInputController<T> extends ChangeNotifier {
     this.initFetch = true,
     this.watch,
     this.watchMode = OiFormWatchMode.onChange,
-    this.computedValue,
+    this.computeValue,
     this.save = true,
     bool enabled = true,
     this.clearErrorOnChange = true,
@@ -66,7 +66,7 @@ class OiFormInputController<T> extends ChangeNotifier {
   final OiFormWatchMode watchMode;
 
   /// Callback to compute this field's value from the form controller.
-  final T Function(dynamic controller)? computedValue;
+  final T Function(dynamic controller)? computeValue;
 
   /// Whether to include this field in getData()/json() output.
   final bool save;
@@ -119,7 +119,7 @@ class OiFormInputController<T> extends ChangeNotifier {
   bool get isValidating => _isValidating;
 
   /// Whether this is a computed/virtual field.
-  bool get isComputed => computedValue != null;
+  bool get isComputed => computeValue != null;
 
   /// Set the field value, applying setter transform if present.
   void setValue(T? value) {
@@ -160,6 +160,29 @@ class OiFormInputController<T> extends ChangeNotifier {
     if (_errors.isEmpty) return;
     _errors = [];
     notifyListeners();
+  }
+
+  /// Run synchronous validators without notifying listeners.
+  ///
+  /// Used internally when validation happens inside a notification cycle
+  /// (e.g., validateOnChange during _onFieldChanged).
+  List<String> validateSyncSilent(dynamic controller) {
+    final errors = <String>[];
+
+    if (required &&
+        (_value == null || (_value is String && (_value! as String).isEmpty))) {
+      errors.add('This field is required');
+    }
+
+    for (final validator in validation) {
+      if (validator is OiSyncFormValidator<T>) {
+        final error = validator.validate(_value, controller);
+        if (error != null) errors.add(error);
+      }
+    }
+
+    _errors = errors;
+    return errors;
   }
 
   /// Run synchronous validators and return collected error messages.

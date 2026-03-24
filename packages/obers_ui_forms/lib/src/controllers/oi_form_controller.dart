@@ -80,31 +80,67 @@ abstract class OiFormController<E extends Enum> extends ChangeNotifier {
   }
 
   void _recomputeField(E key, OiFormInputController<dynamic> field) {
-    if (field.computedValue != null) {
-      final newValue = field.computedValue!(this);
+    if (field.computeValue != null) {
+      final newValue = field.computeValue!(this);
       field.setValue(newValue);
     }
   }
 
   void _onFieldChanged(E key) {
+    final changedField = _fields[key]!;
+
+    // Auto-validate if validateOnChange is enabled.
+    // Use _validateSilent to avoid re-entrant notifyListeners — the
+    // notification at the end of this method will pick up the errors.
+    if (changedField.validateOnChange) {
+      _validateFieldSilent(changedField);
+    }
+
     // Trigger recomputation of computed fields that watch this key
     for (final entry in _fields.entries) {
       final field = entry.value;
       if (field.isComputed &&
           field.watch != null &&
-          field.watch!.contains(key) &&
-          field.watchMode == OiFormWatchMode.onChange) {
-        _recomputeField(entry.key, field);
+          field.watch!.contains(key)) {
+        if (field.watchMode == OiFormWatchMode.onChange) {
+          _recomputeField(entry.key, field);
+        }
       }
     }
+
+    // Trigger state-based watch modes
+    if (isDirty) _triggerWatchMode(OiFormWatchMode.onDirty);
+    if (isValid) {
+      _triggerWatchMode(OiFormWatchMode.onValid);
+    } else {
+      _triggerWatchMode(OiFormWatchMode.onInvalid);
+    }
+
     notifyListeners();
   }
 
+  /// Validate a field without triggering notifyListeners on the field.
+  void _validateFieldSilent(OiFormInputController<dynamic> field) {
+    field.validateSyncSilent(this);
+  }
+
+  /// Call this when a field loses focus to trigger blur validation.
+  void onFieldBlur(E key) {
+    final field = _fields[key];
+    if (field != null && field.validateOnBlur) {
+      field.validateSync(this);
+      notifyListeners();
+    }
+  }
+
   /// Get a typed value for the given field key.
-  T? get<T>(E key) {
+  ///
+  /// Returns [fallback] if the field value is null.
+  T? get<T>(E key, {T? fallback}) {
     final field = _fields[key];
     assert(field != null, 'No field registered for key: $key');
-    return field!.value as T?;
+    final value = field!.value as T?;
+    return value ?? fallback;
   }
 
   /// Set a typed value for the given field key.
@@ -194,10 +230,14 @@ abstract class OiFormController<E extends Enum> extends ChangeNotifier {
   /// Submit the form: validate all fields, then call [onSubmit] if valid.
   ///
   /// If async validators are running, waits for them to complete.
+  /// Triggers watchMode.onSubmit computed fields before validation.
   Future<bool> submit(
     void Function(Map<E, dynamic> data, OiFormController<E> controller)?
     onSubmit,
   ) async {
+    // Trigger onSubmit watch mode recomputation
+    _triggerWatchMode(OiFormWatchMode.onSubmit);
+
     final valid = await validateAsync();
     if (valid && onSubmit != null) {
       onSubmit(getData(), this);
@@ -205,11 +245,37 @@ abstract class OiFormController<E extends Enum> extends ChangeNotifier {
     return valid;
   }
 
+  void _triggerWatchMode(OiFormWatchMode mode) {
+    for (final entry in _fields.entries) {
+      final field = entry.value;
+      if (field.isComputed && field.watchMode == mode) {
+        _recomputeField(entry.key, field);
+      }
+    }
+  }
+
   /// Reset all fields to their initial values.
+  ///
+  /// Temporarily suspends field listeners to avoid validateOnChange
+  /// re-adding errors during reset.
   void reset() {
+    // Suspend listeners
+    for (final entry in _fields.entries) {
+      final listener = _fieldListeners[entry.key];
+      if (listener != null) entry.value.removeListener(listener);
+    }
+
     for (final field in _fields.values) {
       field.reset();
     }
+
+    // Restore listeners
+    for (final entry in _fields.entries) {
+      final listener = _fieldListeners[entry.key];
+      if (listener != null) entry.value.addListener(listener);
+    }
+
+    notifyListeners();
   }
 
   /// Get the error messages for a specific field.

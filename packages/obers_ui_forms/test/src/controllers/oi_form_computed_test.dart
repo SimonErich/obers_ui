@@ -10,7 +10,7 @@ class ComputedFormController extends OiFormController<ComputedFields> {
     ComputedFields.username: OiFormInputController<String>(
       watch: [ComputedFields.name],
       watchMode: OiFormWatchMode.onChange,
-      computedValue: (controller) {
+      computeValue: (controller) {
         final name = (controller as OiFormController<ComputedFields>)
             .get<String>(ComputedFields.name);
         return name?.toLowerCase().replaceAll(' ', '_') ?? '';
@@ -20,7 +20,7 @@ class ComputedFormController extends OiFormController<ComputedFields> {
       save: false,
       watch: [ComputedFields.name],
       watchMode: OiFormWatchMode.onChange,
-      computedValue: (controller) {
+      computeValue: (controller) {
         final name = (controller as OiFormController<ComputedFields>)
             .get<String>(ComputedFields.name);
         return 'Mr. $name';
@@ -36,7 +36,7 @@ class OnInitComputedController extends OiFormController<ComputedFields> {
     ComputedFields.username: OiFormInputController<String>(
       watch: [ComputedFields.name],
       watchMode: OiFormWatchMode.onInit,
-      computedValue: (controller) {
+      computeValue: (controller) {
         final name = (controller as OiFormController<ComputedFields>)
             .get<String>(ComputedFields.name);
         return name?.toLowerCase() ?? '';
@@ -114,11 +114,11 @@ class _CircularController extends OiFormController<_CircularFields> {
   Map<_CircularFields, OiFormInputController<dynamic>> inputs() => {
     _CircularFields.a: OiFormInputController<String>(
       watch: [_CircularFields.b],
-      computedValue: (_) => 'a',
+      computeValue: (_) => 'a',
     ),
     _CircularFields.b: OiFormInputController<String>(
       watch: [_CircularFields.a],
-      computedValue: (_) => 'b',
+      computeValue: (_) => 'b',
     ),
   };
 }
