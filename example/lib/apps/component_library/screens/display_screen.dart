@@ -14,6 +14,7 @@ class DisplayScreen extends StatefulWidget {
 class _DisplayScreenState extends State<DisplayScreen> {
   int _pageIndex = 2;
   int _pillPageIndex = 1;
+  bool _popoverOpen = false;
 
   @override
   Widget build(BuildContext context) {
@@ -386,16 +387,41 @@ class _DisplayScreenState extends State<DisplayScreen> {
             title: 'Popover',
             widgetName: 'OiPopover',
             description:
-                'An overlay anchored to a widget, with focus trapping and '
-                'dismiss-on-Escape. Use for rich contextual content.',
+                'A floating overlay anchored to a widget. Traps focus inside '
+                'the popover and dismisses on Escape or outside tap. Use for '
+                'rich contextual content like menus, forms, or details.',
             examples: [
               ComponentExample(
-                title: 'Description',
-                child: OiLabel.body(
-                  'OiPopover renders content in a floating overlay anchored '
-                  'to a child widget. It traps focus and dismisses on Escape '
-                  'or outside tap. See OiPopover API for interactive usage.',
-                  color: colors.textSubtle,
+                title: 'Click to toggle popover',
+                child: OiPopover(
+                  label: 'Example popover',
+                  open: _popoverOpen,
+                  onClose: () => setState(() => _popoverOpen = false),
+                  anchor: OiButton.secondary(
+                    label: 'Toggle popover',
+                    icon: OiIcons.chevronDown,
+                    onTap: () =>
+                        setState(() => _popoverOpen = !_popoverOpen),
+                  ),
+                  content: Padding(
+                    padding: EdgeInsets.all(context.spacing.md),
+                    child: SizedBox(
+                      width: 240,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const OiLabel.bodyStrong('Popover content'),
+                          SizedBox(height: context.spacing.xs),
+                          OiLabel.body(
+                            'This is a popover with rich content. '
+                            'Press Escape or click outside to close.',
+                            color: colors.textSubtle,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                 ),
               ),
             ],

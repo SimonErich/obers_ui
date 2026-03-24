@@ -331,6 +331,7 @@ class _FilterChip extends StatelessWidget {
     return OiTappable(
       onTap: onActivate,
       semanticLabel: definition.label,
+      clipBorderRadius: BorderRadius.circular(100),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(

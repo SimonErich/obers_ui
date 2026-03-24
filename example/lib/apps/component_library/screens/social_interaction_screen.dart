@@ -14,6 +14,10 @@ class SocialInteractionScreen extends StatefulWidget {
 
 class _SocialInteractionScreenState extends State<SocialInteractionScreen> {
   int _tapCount = 0;
+  final List<String> _reorderItems = ['Item A', 'Item B', 'Item C'];
+  String? _pastedText;
+  bool _spotlightActive = false;
+  final GlobalKey _spotlightTarget = GlobalKey();
 
   @override
   Widget build(BuildContext context) {
@@ -311,38 +315,26 @@ class _SocialInteractionScreenState extends State<SocialInteractionScreen> {
                 title: 'Drag to Reorder',
                 child: OiReorderable(
                   shrinkWrap: true,
-                  onReorder: (_, __) {},
+                  onReorder: (oldIndex, newIndex) {
+                    setState(() {
+                      final adjustedIndex =
+                          newIndex > oldIndex ? newIndex - 1 : newIndex;
+                      final item = _reorderItems.removeAt(oldIndex);
+                      _reorderItems.insert(adjustedIndex, item);
+                    });
+                  },
                   children: [
-                    Container(
-                      key: const ValueKey('r1'),
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: colors.surface,
-                        border: Border.all(color: colors.borderSubtle),
-                        borderRadius: context.radius.sm,
+                    for (final item in _reorderItems)
+                      Container(
+                        key: ValueKey(item),
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: colors.surface,
+                          border: Border.all(color: colors.borderSubtle),
+                          borderRadius: context.radius.sm,
+                        ),
+                        child: OiLabel.body('Drag me — $item'),
                       ),
-                      child: const OiLabel.body('Drag me — Item A'),
-                    ),
-                    Container(
-                      key: const ValueKey('r2'),
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: colors.surface,
-                        border: Border.all(color: colors.borderSubtle),
-                        borderRadius: context.radius.sm,
-                      ),
-                      child: const OiLabel.body('Drag me — Item B'),
-                    ),
-                    Container(
-                      key: const ValueKey('r3'),
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: colors.surface,
-                        border: Border.all(color: colors.borderSubtle),
-                        borderRadius: context.radius.sm,
-                      ),
-                      child: const OiLabel.body('Drag me — Item C'),
-                    ),
                   ],
                 ),
               ),
@@ -738,7 +730,8 @@ class _SocialInteractionScreenState extends State<SocialInteractionScreen> {
               ComponentExample(
                 title: 'Paste Area',
                 child: OiPasteZone(
-                  onPaste: (_) {},
+                  onPaste: (text) =>
+                      setState(() => _pastedText = text),
                   child: Container(
                     height: 100,
                     width: double.infinity,
@@ -748,12 +741,12 @@ class _SocialInteractionScreenState extends State<SocialInteractionScreen> {
                       borderRadius: context.radius.sm,
                       border: Border.all(
                         color: colors.borderSubtle,
-                        style: BorderStyle.solid,
                       ),
                     ),
-                    child: const Center(
+                    child: Center(
                       child: OiLabel.body(
-                        'Click here and press Ctrl+V / Cmd+V to paste',
+                        _pastedText ??
+                            'Click here and press Ctrl+V / Cmd+V to paste',
                       ),
                     ),
                   ),
@@ -836,22 +829,35 @@ class _SocialInteractionScreenState extends State<SocialInteractionScreen> {
               ComponentExample(
                 title: 'Spotlight Highlight',
                 child: SizedBox(
-                  height: 120,
+                  height: 180,
                   child: OiSpotlight(
-                    target: GlobalKey(),
-                    active: false,
-                    child: Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: colors.surfaceSubtle,
-                        borderRadius: context.radius.sm,
-                      ),
-                      child: const Center(
-                        child: OiLabel.body(
-                          'Spotlight target — set active to highlight',
+                    target: _spotlightTarget,
+                    active: _spotlightActive,
+                    onTapOutside: () =>
+                        setState(() => _spotlightActive = false),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          key: _spotlightTarget,
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: colors.surfaceSubtle,
+                            borderRadius: context.radius.sm,
+                          ),
+                          child: const OiLabel.body(
+                            'This widget gets spotlighted',
+                          ),
                         ),
-                      ),
+                        SizedBox(height: spacing.md),
+                        OiButton.primary(
+                          label: _spotlightActive
+                              ? 'Spotlight Active'
+                              : 'Activate Spotlight',
+                          onTap: () =>
+                              setState(() => _spotlightActive = true),
+                        ),
+                      ],
                     ),
                   ),
                 ),

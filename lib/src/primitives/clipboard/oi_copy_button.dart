@@ -2,14 +2,16 @@ import 'dart:async';
 
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/src/foundation/oi_icons.dart';
+import 'package:obers_ui/src/primitives/display/oi_icon.dart';
 import 'package:obers_ui/src/primitives/interaction/oi_touch_target.dart';
 
 /// A tappable button that copies [value] to the system clipboard.
 ///
-/// After tapping, [icon] is replaced by [copiedWidget] (or the default "✓"
-/// text) for [feedbackDuration] before reverting to the normal icon.
+/// After tapping, [icon] is replaced by [copiedWidget] (or the default check
+/// icon) for [feedbackDuration] before reverting to the normal icon.
 ///
-/// Provide a custom [icon] to override the default copy symbol ("⎘").
+/// Provide a custom [icon] to override the default copy icon.
 ///
 /// **Accessibility (REQ-0014):** [semanticLabel] is required so the button
 /// has an accessible description announced by screen readers.
@@ -39,12 +41,12 @@ class OiCopyButton extends StatefulWidget {
 
   /// Widget shown when no copy has just been performed.
   ///
-  /// Defaults to a [Text] rendering "⎘".
+  /// Defaults to an [OiIcon] rendering [OiIcons.copy].
   final Widget? icon;
 
   /// Widget shown immediately after a copy.
   ///
-  /// Defaults to a [Text] rendering "✓".
+  /// Defaults to an [OiIcon] rendering [OiIcons.check].
   final Widget? copiedWidget;
 
   @override
@@ -76,8 +78,10 @@ class _OiCopyButtonState extends State<OiCopyButton> {
   @override
   Widget build(BuildContext context) {
     final displayWidget = _copied
-        ? (widget.copiedWidget ?? const Text('✓'))
-        : (widget.icon ?? const Text('⎘'));
+        ? (widget.copiedWidget ??
+            const OiIcon.decorative(icon: OiIcons.check, size: 16))
+        : (widget.icon ??
+            const OiIcon.decorative(icon: OiIcons.copy, size: 16));
 
     return OiTouchTarget(
       child: Semantics(

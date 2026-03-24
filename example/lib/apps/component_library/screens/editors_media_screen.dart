@@ -161,11 +161,17 @@ class _EditorsMediaScreenState extends State<EditorsMediaScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    OiButton.primary(
-                      label: 'Open Lightbox',
-                      onTap: () {
-                        setState(() => _showLightbox = true);
-                      },
+                    Center(
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 150),
+                        child: OiButton.primary(
+                          label: 'Open Lightbox',
+                          fullWidth: true,
+                          onTap: () {
+                            setState(() => _showLightbox = true);
+                          },
+                        ),
+                      ),
                     ),
                     if (_showLightbox) ...[
                       const SizedBox(height: 16),

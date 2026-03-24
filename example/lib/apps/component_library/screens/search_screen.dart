@@ -153,14 +153,20 @@ class _SearchScreenState extends State<SearchScreen> {
                 examples: [
                   ComponentExample(
                     title: 'Open command palette',
-                    child: OiButton.primary(
-                      label: 'Open Command Bar',
-                      icon: OiIcons.terminal,
-                      onTap: () {
-                        setState(() {
-                          _showCommandBar = true;
-                        });
-                      },
+                    child: Center(
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 180),
+                        child: OiButton.primary(
+                          label: 'Open Command Bar',
+                          icon: OiIcons.terminal,
+                          fullWidth: true,
+                          onTap: () {
+                            setState(() {
+                              _showCommandBar = true;
+                            });
+                          },
+                        ),
+                      ),
                     ),
                   ),
                 ],

@@ -145,14 +145,20 @@ class _FormInputsScreenState extends State<FormInputsScreen> {
             examples: [
               ComponentExample(
                 title: 'Interactive stepper',
-                child: OiNumberInput(
-                  label: 'Quantity',
-                  value: _numberValue,
-                  min: 0,
-                  max: 100,
-                  onChanged: (v) {
-                    if (v != null) setState(() => _numberValue = v);
-                  },
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: SizedBox(
+                    width: 200,
+                    child: OiNumberInput(
+                      label: 'Quantity',
+                      value: _numberValue,
+                      min: 0,
+                      max: 100,
+                      onChanged: (v) {
+                        if (v != null) setState(() => _numberValue = v);
+                      },
+                    ),
+                  ),
                 ),
               ),
             ],
@@ -167,35 +173,41 @@ class _FormInputsScreenState extends State<FormInputsScreen> {
             examples: [
               ComponentExample(
                 title: 'Basic select',
-                child: OiSelect<String>(
-                  label: 'Country',
-                  placeholder: 'Choose a country',
-                  value: _selectedCountry,
-                  options: const [
-                    OiSelectOption(value: 'us', label: 'United States'),
-                    OiSelectOption(value: 'uk', label: 'United Kingdom'),
-                    OiSelectOption(value: 'de', label: 'Germany'),
-                    OiSelectOption(value: 'fr', label: 'France'),
-                    OiSelectOption(value: 'jp', label: 'Japan'),
-                  ],
-                  onChanged: (v) => setState(() => _selectedCountry = v),
+                child: SizedBox(
+                  width: 300,
+                  child: OiSelect<String>(
+                    label: 'Country',
+                    placeholder: 'Choose a country',
+                    value: _selectedCountry,
+                    options: const [
+                      OiSelectOption(value: 'us', label: 'United States'),
+                      OiSelectOption(value: 'uk', label: 'United Kingdom'),
+                      OiSelectOption(value: 'de', label: 'Germany'),
+                      OiSelectOption(value: 'fr', label: 'France'),
+                      OiSelectOption(value: 'jp', label: 'Japan'),
+                    ],
+                    onChanged: (v) => setState(() => _selectedCountry = v),
+                  ),
                 ),
               ),
               ComponentExample(
                 title: 'Searchable select',
-                child: OiSelect<String>(
-                  label: 'Language',
-                  placeholder: 'Search languages...',
-                  searchable: true,
-                  value: _selectedLanguage,
-                  options: const [
-                    OiSelectOption(value: 'dart', label: 'Dart'),
-                    OiSelectOption(value: 'ts', label: 'TypeScript'),
-                    OiSelectOption(value: 'py', label: 'Python'),
-                    OiSelectOption(value: 'rs', label: 'Rust'),
-                    OiSelectOption(value: 'go', label: 'Go'),
-                  ],
-                  onChanged: (v) => setState(() => _selectedLanguage = v),
+                child: SizedBox(
+                  width: 300,
+                  child: OiSelect<String>(
+                    label: 'Language',
+                    placeholder: 'Search languages...',
+                    searchable: true,
+                    value: _selectedLanguage,
+                    options: const [
+                      OiSelectOption(value: 'dart', label: 'Dart'),
+                      OiSelectOption(value: 'ts', label: 'TypeScript'),
+                      OiSelectOption(value: 'py', label: 'Python'),
+                      OiSelectOption(value: 'rs', label: 'Rust'),
+                      OiSelectOption(value: 'go', label: 'Go'),
+                    ],
+                    onChanged: (v) => setState(() => _selectedLanguage = v),
+                  ),
                 ),
               ),
             ],
@@ -345,27 +357,36 @@ class _FormInputsScreenState extends State<FormInputsScreen> {
             examples: [
               ComponentExample(
                 title: 'Date input',
-                child: OiDateInput(
-                  label: 'Start date',
-                  value: _selectedDate,
-                  onChanged: (v) => setState(() => _selectedDate = v),
+                child: SizedBox(
+                  width: 300,
+                  child: OiDateInput(
+                    label: 'Start date',
+                    value: _selectedDate,
+                    onChanged: (v) => setState(() => _selectedDate = v),
+                  ),
                 ),
               ),
               ComponentExample(
                 title: 'Time input',
-                child: OiTimeInput(
-                  label: 'Start time',
-                  value: _selectedTime,
-                  onChanged: (v) => setState(() => _selectedTime = v),
+                child: SizedBox(
+                  width: 300,
+                  child: OiTimeInput(
+                    label: 'Start time',
+                    value: _selectedTime,
+                    onChanged: (v) => setState(() => _selectedTime = v),
+                  ),
                 ),
               ),
               ComponentExample(
                 title: 'Combined date & time',
-                child: OiDateTimeInput(
-                  label: 'Event date/time',
-                  value: _selectedDateTime,
-                  onChanged: (v) =>
-                      setState(() => _selectedDateTime = v),
+                child: SizedBox(
+                  width: 300,
+                  child: OiDateTimeInput(
+                    label: 'Event date/time',
+                    value: _selectedDateTime,
+                    onChanged: (v) =>
+                        setState(() => _selectedDateTime = v),
+                  ),
                 ),
               ),
             ],
@@ -401,10 +422,13 @@ class _FormInputsScreenState extends State<FormInputsScreen> {
             examples: [
               ComponentExample(
                 title: 'Default color picker',
-                child: OiColorInput(
-                  label: 'Brand color',
-                  value: _selectedColor,
-                  onChanged: (v) => setState(() => _selectedColor = v),
+                child: SizedBox(
+                  width: 300,
+                  child: OiColorInput(
+                    label: 'Brand color',
+                    value: _selectedColor,
+                    onChanged: (v) => setState(() => _selectedColor = v),
+                  ),
                 ),
               ),
             ],
@@ -444,17 +468,21 @@ class _FormInputsScreenState extends State<FormInputsScreen> {
             examples: [
               ComponentExample(
                 title: 'Email list',
-                child: OiArrayInput<String>(
-                  label: 'Email addresses',
-                  items: _emails,
-                  createEmpty: () => '',
-                  itemBuilder: (context, index, value, onItemChanged) =>
-                      OiTextInput(
-                        controller: TextEditingController(text: value),
-                        placeholder: 'Enter email',
-                        onChanged: (v) => onItemChanged(v),
-                      ),
-                  onChanged: (v) => setState(() => _emails = v),
+                child: FractionallySizedBox(
+                  widthFactor: 0.5,
+                  alignment: Alignment.centerLeft,
+                  child: OiArrayInput<String>(
+                    label: 'Email addresses',
+                    items: _emails,
+                    createEmpty: () => '',
+                    itemBuilder: (context, index, value, onItemChanged) =>
+                        OiTextInput(
+                          controller: TextEditingController(text: value),
+                          placeholder: 'Enter email',
+                          onChanged: (v) => onItemChanged(v),
+                        ),
+                    onChanged: (v) => setState(() => _emails = v),
+                  ),
                 ),
               ),
             ],
@@ -470,12 +498,15 @@ class _FormInputsScreenState extends State<FormInputsScreen> {
             examples: [
               ComponentExample(
                 title: 'Coupon code entry',
-                child: OiCouponInput(
-                  label: 'Coupon code',
-                  onApply: (code) async => const OiCouponResult(
-                    valid: true,
-                    message: '10% off applied!',
-                    discountAmount: 5,
+                child: SizedBox(
+                  width: 300,
+                  child: OiCouponInput(
+                    label: 'Coupon code',
+                    onApply: (code) async => const OiCouponResult(
+                      valid: true,
+                      message: '10% off applied!',
+                      discountAmount: 5,
+                    ),
                   ),
                 ),
               ),

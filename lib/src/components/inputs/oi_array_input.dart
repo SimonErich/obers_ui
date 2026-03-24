@@ -223,7 +223,7 @@ class _OiArrayInputState<T> extends State<OiArrayInput<T>> {
         if (index < widget.items.length - 1) {
           children.add(
             const Padding(
-              padding: EdgeInsets.symmetric(vertical: 4),
+              padding: EdgeInsets.symmetric(vertical: 8),
               child: OiDivider(),
             ),
           );
@@ -253,7 +253,7 @@ class _OiArrayInputState<T> extends State<OiArrayInput<T>> {
       if (i < widget.items.length - 1) {
         children.add(
           const Padding(
-            padding: EdgeInsets.symmetric(vertical: 4),
+            padding: EdgeInsets.symmetric(vertical: 8),
             child: OiDivider(),
           ),
         );
@@ -293,14 +293,18 @@ class _OiArrayInputState<T> extends State<OiArrayInput<T>> {
           if (widget.items.isNotEmpty)
             widget.reorderable ? _buildReorderableList() : _buildAnimatedList(),
           if (showAdd)
-            Padding(
-              padding: const EdgeInsets.only(top: 8),
-              child: OiButton.ghost(
-                label: widget.addLabel,
-                icon: OiIcons.plus,
-                size: OiButtonSize.small,
-                onTap: _handleAdd,
-                semanticLabel: widget.addLabel,
+            Center(
+              child: Padding(
+                padding: const EdgeInsets.only(top: 8),
+                child: UnconstrainedBox(
+                  child: OiButton.secondary(
+                    label: widget.addLabel,
+                    icon: OiIcons.plus,
+                    size: OiButtonSize.small,
+                    onTap: _handleAdd,
+                    semanticLabel: widget.addLabel,
+                  ),
+                ),
               ),
             ),
           if (hasError) ...[

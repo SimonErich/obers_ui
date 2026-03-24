@@ -164,7 +164,10 @@ class OiEmptyState extends StatelessWidget {
                 style: TextStyle(fontSize: 14, color: colors.textMuted),
               ),
             ],
-            if (action != null) ...[const SizedBox(height: 16), action!],
+            if (action != null) ...[
+              const SizedBox(height: 16),
+              UnconstrainedBox(child: action!),
+            ],
           ],
         ),
       ),

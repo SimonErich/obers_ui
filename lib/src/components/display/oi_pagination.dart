@@ -406,11 +406,15 @@ class _OiPaginationState extends State<OiPagination> {
             ),
             const SizedBox(height: 8),
             Center(
-              child: OiButton.outline(
-                key: const Key('oi_pagination_load_more'),
-                label: 'Load more',
-                loading: widget._loading,
-                onTap: widget._loading ? null : widget._onLoadMore,
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 150),
+                child: OiButton.outline(
+                  key: const Key('oi_pagination_load_more'),
+                  label: 'Load more',
+                  fullWidth: true,
+                  loading: widget._loading,
+                  onTap: widget._loading ? null : widget._onLoadMore,
+                ),
               ),
             ),
           ],

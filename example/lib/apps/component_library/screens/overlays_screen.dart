@@ -14,6 +14,16 @@ class _OverlaysScreenState extends State<OverlaysScreen> {
   // ── Emoji picker state ────────────────────────────────────────────────────
   String _selectedEmoji = '';
 
+  /// Wraps a button in a centered 160px-max-width container.
+  Widget _centeredButton(Widget button) {
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 160),
+        child: button,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final spacing = context.spacing;
@@ -44,79 +54,90 @@ class _OverlaysScreenState extends State<OverlaysScreen> {
             examples: [
               ComponentExample(
                 title: 'Dialog variants',
-                child: Wrap(
-                  spacing: 12,
-                  runSpacing: 12,
-                  children: [
-                    OiButton.outline(
-                      label: 'Alert dialog',
-                      onTap: () {
-                        late final OiOverlayHandle handle;
-                        handle = OiDialog.show(
-                          context,
-                          label: 'Alert',
-                          dialog: OiDialog.alert(
-                            label: 'Alert dialog',
-                            title: 'Warning',
-                            content: const OiLabel.body('Something happened.'),
-                            onClose: () => handle.dismiss(),
-                          ),
-                        );
-                      },
-                    ),
-                    OiButton.outline(
-                      label: 'Confirm dialog',
-                      onTap: () {
-                        late final OiOverlayHandle handle;
-                        handle = OiDialog.show(
-                          context,
-                          label: 'Confirm',
-                          dialog: OiDialog.confirm(
-                            label: 'Confirm dialog',
-                            title: 'Delete item?',
-                            content: const OiLabel.body(
-                              'This action cannot be undone.',
-                            ),
-                            actions: [
-                              OiButton.ghost(
-                                label: 'Cancel',
-                                onTap: () => handle.dismiss(),
+                child: Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 150),
+                    child: Column(
+                      children: [
+                        OiButton.outline(
+                          label: 'Alert dialog',
+                          fullWidth: true,
+                          onTap: () {
+                            late final OiOverlayHandle handle;
+                            handle = OiDialog.show(
+                              context,
+                              label: 'Alert',
+                              dialog: OiDialog.alert(
+                                label: 'Alert dialog',
+                                title: 'Warning',
+                                content: const OiLabel.body(
+                                  'Something happened.',
+                                ),
+                                onClose: () => handle.dismiss(),
                               ),
-                              OiButton.primary(
-                                label: 'Delete',
-                                onTap: () => handle.dismiss(),
+                            );
+                          },
+                        ),
+                        const SizedBox(height: 12),
+                        OiButton.outline(
+                          label: 'Confirm dialog',
+                          fullWidth: true,
+                          onTap: () {
+                            late final OiOverlayHandle handle;
+                            handle = OiDialog.show(
+                              context,
+                              label: 'Confirm',
+                              dialog: OiDialog.confirm(
+                                label: 'Confirm dialog',
+                                title: 'Delete item?',
+                                content: const OiLabel.body(
+                                  'This action cannot be undone.',
+                                ),
+                                actions: [
+                                  OiButton.ghost(
+                                    label: 'Cancel',
+                                    onTap: () => handle.dismiss(),
+                                  ),
+                                  OiButton.primary(
+                                    label: 'Delete',
+                                    onTap: () => handle.dismiss(),
+                                  ),
+                                ],
+                                onClose: () => handle.dismiss(),
                               ),
-                            ],
-                            onClose: () => handle.dismiss(),
-                          ),
-                        );
-                      },
-                    ),
-                    OiButton.outline(
-                      label: 'Standard dialog',
-                      onTap: () {
-                        late final OiOverlayHandle handle;
-                        handle = OiDialog.show(
-                          context,
-                          label: 'Standard',
-                          dialog: OiDialog.standard(
-                            label: 'Standard dialog',
-                            title: 'Information',
-                            content: const OiLabel.body(
-                              'This is a standard dialog with custom content.',
-                            ),
-                            actions: [
-                              OiButton.primary(
-                                label: 'OK',
-                                onTap: () => handle.dismiss(),
+                            );
+                          },
+                        ),
+                        const SizedBox(height: 12),
+                        OiButton.outline(
+                          label: 'Standard dialog',
+                          fullWidth: true,
+                          onTap: () {
+                            late final OiOverlayHandle handle;
+                            handle = OiDialog.show(
+                              context,
+                              label: 'Standard',
+                              dialog: OiDialog.standard(
+                                label: 'Standard dialog',
+                                title: 'Information',
+                                content: const OiLabel.body(
+                                  'This is a standard dialog with custom '
+                                  'content.',
+                                ),
+                                actions: [
+                                  OiButton.primary(
+                                    label: 'OK',
+                                    onTap: () => handle.dismiss(),
+                                  ),
+                                ],
+                                onClose: () => handle.dismiss(),
                               ),
-                            ],
-                            onClose: () => handle.dismiss(),
-                          ),
-                        );
-                      },
+                            );
+                          },
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
               ),
             ],
@@ -134,33 +155,43 @@ class _OverlaysScreenState extends State<OverlaysScreen> {
             examples: [
               ComponentExample(
                 title: 'Custom dialog shell',
-                child: OiButton.outline(
-                  label: 'Open dialog shell',
-                  onTap: () {
-                    OiDialogShell.show<void>(
-                      context: context,
-                      semanticLabel: 'Custom dialog',
-                      builder: (close) => Padding(
-                        padding: EdgeInsets.all(spacing.lg),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const OiLabel.h3('Custom Shell'),
-                            SizedBox(height: spacing.md),
-                            const OiLabel.body(
-                              'This dialog uses OiDialogShell directly '
-                              'for full layout control.',
-                            ),
-                            SizedBox(height: spacing.lg),
-                            OiButton.primary(
-                              label: 'Close',
-                              onTap: () => close(null),
-                            ),
-                          ],
+                child: _centeredButton(
+                  OiButton.outline(
+                    label: 'Open dialog shell',
+                    fullWidth: true,
+                    onTap: () {
+                      OiDialogShell.show<void>(
+                        context: context,
+                        semanticLabel: 'Custom dialog',
+                        builder: (close) => Padding(
+                          padding: EdgeInsets.all(spacing.lg),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const OiLabel.h3('Custom Shell'),
+                              SizedBox(height: spacing.md),
+                              const OiLabel.body(
+                                'This dialog uses OiDialogShell directly '
+                                'for full layout control.',
+                              ),
+                              SizedBox(height: spacing.lg),
+                              Center(
+                                child: ConstrainedBox(
+                                  constraints:
+                                      const BoxConstraints(maxWidth: 150),
+                                  child: OiButton.primary(
+                                    label: 'Close',
+                                    fullWidth: true,
+                                    onTap: () => close(null),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                    );
-                  },
+                      );
+                    },
+                  ),
                 ),
               ),
             ],
@@ -176,67 +207,77 @@ class _OverlaysScreenState extends State<OverlaysScreen> {
             examples: [
               ComponentExample(
                 title: 'Bottom sheet',
-                child: Wrap(
-                  spacing: 12,
-                  runSpacing: 12,
-                  children: [
-                    OiButton.outline(
-                      label: 'Bottom sheet',
-                      onTap: () {
-                        late final OiOverlayHandle handle;
-                        handle = OiSheet.show(
-                          context,
+                child: Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 150),
+                    child: Column(
+                      children: [
+                        OiButton.outline(
                           label: 'Bottom sheet',
-                          child: Padding(
-                            padding: EdgeInsets.all(spacing.lg),
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                const OiLabel.h3('Sheet Content'),
-                                SizedBox(height: spacing.md),
-                                const OiLabel.body(
-                                  'This is a bottom sheet with custom content.',
+                          fullWidth: true,
+                          onTap: () {
+                            late final OiOverlayHandle handle;
+                            handle = OiSheet.show(
+                              context,
+                              label: 'Bottom sheet',
+                              child: Padding(
+                                padding: EdgeInsets.all(spacing.lg),
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    const OiLabel.h3('Sheet Content'),
+                                    SizedBox(height: spacing.md),
+                                    const OiLabel.body(
+                                      'This is a bottom sheet with custom '
+                                      'content.',
+                                    ),
+                                    SizedBox(height: spacing.lg),
+                                    OiButton.primary(
+                                      label: 'Dismiss',
+                                      onTap: () => handle.dismiss(),
+                                    ),
+                                  ],
                                 ),
-                                SizedBox(height: spacing.lg),
-                                OiButton.primary(
-                                  label: 'Dismiss',
-                                  onTap: () => handle.dismiss(),
-                                ),
-                              ],
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                    OiButton.outline(
-                      label: 'Right sheet',
-                      onTap: () {
-                        late final OiOverlayHandle handle;
-                        handle = OiSheet.show(
-                          context,
+                              ),
+                            );
+                          },
+                        ),
+                        const SizedBox(height: 12),
+                        OiButton.outline(
                           label: 'Right sheet',
-                          side: OiPanelSide.right,
-                          size: 300,
-                          child: Padding(
-                            padding: EdgeInsets.all(spacing.lg),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const OiLabel.h3('Side Panel'),
-                                SizedBox(height: spacing.md),
-                                const OiLabel.body('A right-side sheet panel.'),
-                                const Spacer(),
-                                OiButton.primary(
-                                  label: 'Close',
-                                  onTap: () => handle.dismiss(),
+                          fullWidth: true,
+                          onTap: () {
+                            late final OiOverlayHandle handle;
+                            handle = OiSheet.show(
+                              context,
+                              label: 'Right sheet',
+                              side: OiPanelSide.right,
+                              size: 300,
+                              child: Padding(
+                                padding: EdgeInsets.all(spacing.lg),
+                                child: Column(
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.start,
+                                  children: [
+                                    const OiLabel.h3('Side Panel'),
+                                    SizedBox(height: spacing.md),
+                                    const OiLabel.body(
+                                      'A right-side sheet panel.',
+                                    ),
+                                    const Spacer(),
+                                    OiButton.primary(
+                                      label: 'Close',
+                                      onTap: () => handle.dismiss(),
+                                    ),
+                                  ],
                                 ),
-                              ],
-                            ),
-                          ),
-                        );
-                      },
+                              ),
+                            );
+                          },
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
               ),
             ],
@@ -252,42 +293,52 @@ class _OverlaysScreenState extends State<OverlaysScreen> {
             examples: [
               ComponentExample(
                 title: 'Toast levels',
-                child: Wrap(
-                  spacing: 12,
-                  runSpacing: 12,
-                  children: [
-                    OiButton.outline(
-                      label: 'Info toast',
-                      onTap: () => OiToast.show(
-                        context,
-                        message: 'This is an informational message.',
-                      ),
+                child: Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 150),
+                    child: Column(
+                      children: [
+                        OiButton.outline(
+                          label: 'Info toast',
+                          fullWidth: true,
+                          onTap: () => OiToast.show(
+                            context,
+                            message: 'This is an informational message.',
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        OiButton.outline(
+                          label: 'Success toast',
+                          fullWidth: true,
+                          onTap: () => OiToast.show(
+                            context,
+                            message: 'Action completed successfully!',
+                            level: OiToastLevel.success,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        OiButton.outline(
+                          label: 'Warning toast',
+                          fullWidth: true,
+                          onTap: () => OiToast.show(
+                            context,
+                            message: 'Please review your input.',
+                            level: OiToastLevel.warning,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        OiButton.outline(
+                          label: 'Error toast',
+                          fullWidth: true,
+                          onTap: () => OiToast.show(
+                            context,
+                            message: 'Something went wrong.',
+                            level: OiToastLevel.error,
+                          ),
+                        ),
+                      ],
                     ),
-                    OiButton.outline(
-                      label: 'Success toast',
-                      onTap: () => OiToast.show(
-                        context,
-                        message: 'Action completed successfully!',
-                        level: OiToastLevel.success,
-                      ),
-                    ),
-                    OiButton.outline(
-                      label: 'Warning toast',
-                      onTap: () => OiToast.show(
-                        context,
-                        message: 'Please review your input.',
-                        level: OiToastLevel.warning,
-                      ),
-                    ),
-                    OiButton.outline(
-                      label: 'Error toast',
-                      onTap: () => OiToast.show(
-                        context,
-                        message: 'Something went wrong.',
-                        level: OiToastLevel.error,
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
               ),
             ],
@@ -303,25 +354,33 @@ class _OverlaysScreenState extends State<OverlaysScreen> {
             examples: [
               ComponentExample(
                 title: 'Snack bar with action',
-                child: Wrap(
-                  spacing: 12,
-                  runSpacing: 12,
-                  children: [
-                    OiButton.outline(
-                      label: 'Show snack bar',
-                      onTap: () => OiSnackBar.show(
-                        context,
-                        message: 'Item deleted.',
-                        actionLabel: 'Undo',
-                        onAction: () {},
-                      ),
+                child: Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 150),
+                    child: Column(
+                      children: [
+                        OiButton.outline(
+                          label: 'Show snack bar',
+                          fullWidth: true,
+                          onTap: () => OiSnackBar.show(
+                            context,
+                            message: 'Item deleted.',
+                            actionLabel: 'Undo',
+                            onAction: () {},
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        OiButton.outline(
+                          label: 'Simple snack bar',
+                          fullWidth: true,
+                          onTap: () => OiSnackBar.show(
+                            context,
+                            message: 'Settings saved.',
+                          ),
+                        ),
+                      ],
                     ),
-                    OiButton.outline(
-                      label: 'Simple snack bar',
-                      onTap: () =>
-                          OiSnackBar.show(context, message: 'Settings saved.'),
-                    ),
-                  ],
+                  ),
                 ),
               ),
             ],
@@ -345,7 +404,11 @@ class _OverlaysScreenState extends State<OverlaysScreen> {
                       icon: OiIcons.scissors,
                       onTap: () {},
                     ),
-                    OiMenuItem(label: 'Copy', icon: OiIcons.copy, onTap: () {}),
+                    OiMenuItem(
+                      label: 'Copy',
+                      icon: OiIcons.copy,
+                      onTap: () {},
+                    ),
                     OiMenuItem(
                       label: 'Paste',
                       icon: OiIcons.clipboard,
@@ -361,9 +424,7 @@ class _OverlaysScreenState extends State<OverlaysScreen> {
                   child: Container(
                     padding: EdgeInsets.all(spacing.lg),
                     decoration: BoxDecoration(
-                      border: Border.all(
-                        color: colors.borderSubtle,
-                      ),
+                      border: Border.all(color: colors.borderSubtle),
                       borderRadius: context.radius.md,
                     ),
                     child: Center(
@@ -417,34 +478,37 @@ class _OverlaysScreenState extends State<OverlaysScreen> {
             examples: [
               ComponentExample(
                 title: 'Delete confirmation',
-                child: OiButton.outline(
-                  label: 'Show delete dialog',
-                  onTap: () {
-                    late final OiOverlayHandle handle;
-                    handle = OiDialog.show(
-                      context,
-                      label: 'Delete confirmation',
-                      dialog: OiDialog.standard(
-                        label: 'Delete dialog',
-                        title: 'Delete files?',
-                        content: const OiLabel.body(
-                          'Are you sure you want to delete the selected files? '
-                          'This action cannot be undone.',
+                child: _centeredButton(
+                  OiButton.outline(
+                    label: 'Show delete dialog',
+                    fullWidth: true,
+                    onTap: () {
+                      late final OiOverlayHandle handle;
+                      handle = OiDialog.show(
+                        context,
+                        label: 'Delete confirmation',
+                        dialog: OiDialog.standard(
+                          label: 'Delete dialog',
+                          title: 'Delete files?',
+                          content: const OiLabel.body(
+                            'Are you sure you want to delete the selected '
+                            'files? This action cannot be undone.',
+                          ),
+                          actions: [
+                            OiButton.ghost(
+                              label: 'Cancel',
+                              onTap: () => handle.dismiss(),
+                            ),
+                            OiButton.primary(
+                              label: 'Delete',
+                              onTap: () => handle.dismiss(),
+                            ),
+                          ],
+                          onClose: () => handle.dismiss(),
                         ),
-                        actions: [
-                          OiButton.ghost(
-                            label: 'Cancel',
-                            onTap: () => handle.dismiss(),
-                          ),
-                          OiButton.primary(
-                            label: 'Delete',
-                            onTap: () => handle.dismiss(),
-                          ),
-                        ],
-                        onClose: () => handle.dismiss(),
-                      ),
-                    );
-                  },
+                      );
+                    },
+                  ),
                 ),
               ),
             ],
@@ -461,21 +525,24 @@ class _OverlaysScreenState extends State<OverlaysScreen> {
             examples: [
               ComponentExample(
                 title: 'Create new folder',
-                child: OiButton.outline(
-                  label: 'Show name dialog',
-                  onTap: () {
-                    late final OiOverlayHandle handle;
-                    handle = OiDialog.show(
-                      context,
-                      label: 'Name dialog',
-                      dialog: OiNameDialog(
-                        title: 'New folder',
-                        defaultName: 'Untitled',
-                        onCreate: (name) => handle.dismiss(),
-                        onCancel: () => handle.dismiss(),
-                      ),
-                    );
-                  },
+                child: _centeredButton(
+                  OiButton.outline(
+                    label: 'Show name dialog',
+                    fullWidth: true,
+                    onTap: () {
+                      late final OiOverlayHandle handle;
+                      handle = OiDialog.show(
+                        context,
+                        label: 'Name dialog',
+                        dialog: OiNameDialog(
+                          title: 'New folder',
+                          defaultName: 'Untitled',
+                          onCreate: (name) => handle.dismiss(),
+                          onCancel: () => handle.dismiss(),
+                        ),
+                      );
+                    },
+                  ),
                 ),
               ),
             ],

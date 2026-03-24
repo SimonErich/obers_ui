@@ -70,40 +70,49 @@ class _NavigationScreenState extends State<NavigationScreen> {
             examples: [
               ComponentExample(
                 title: 'Underline (default)',
-                child: OiTabs(
-                  tabs: const [
-                    OiTabItem(label: 'Overview'),
-                    OiTabItem(label: 'Details'),
-                    OiTabItem(label: 'Settings'),
-                  ],
-                  selectedIndex: _tabIndex,
-                  onSelected: (i) => setState(() => _tabIndex = i),
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 600),
+                  child: OiTabs(
+                    tabs: const [
+                      OiTabItem(label: 'Overview'),
+                      OiTabItem(label: 'Details'),
+                      OiTabItem(label: 'Settings'),
+                    ],
+                    selectedIndex: _tabIndex,
+                    onSelected: (i) => setState(() => _tabIndex = i),
+                  ),
                 ),
               ),
               ComponentExample(
                 title: 'Filled indicator',
-                child: OiTabs(
-                  tabs: const [
-                    OiTabItem(label: 'Active'),
-                    OiTabItem(label: 'Pending'),
-                    OiTabItem(label: 'Archived'),
-                  ],
-                  selectedIndex: _tabFilledIndex,
-                  onSelected: (i) => setState(() => _tabFilledIndex = i),
-                  indicatorStyle: OiTabIndicatorStyle.filled,
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 600),
+                  child: OiTabs(
+                    tabs: const [
+                      OiTabItem(label: 'Active'),
+                      OiTabItem(label: 'Pending'),
+                      OiTabItem(label: 'Archived'),
+                    ],
+                    selectedIndex: _tabFilledIndex,
+                    onSelected: (i) => setState(() => _tabFilledIndex = i),
+                    indicatorStyle: OiTabIndicatorStyle.filled,
+                  ),
                 ),
               ),
               ComponentExample(
                 title: 'Pill indicator',
-                child: OiTabs(
-                  tabs: const [
-                    OiTabItem(label: 'Day'),
-                    OiTabItem(label: 'Week'),
-                    OiTabItem(label: 'Month'),
-                  ],
-                  selectedIndex: _tabPillIndex,
-                  onSelected: (i) => setState(() => _tabPillIndex = i),
-                  indicatorStyle: OiTabIndicatorStyle.pill,
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 600),
+                  child: OiTabs(
+                    tabs: const [
+                      OiTabItem(label: 'Day'),
+                      OiTabItem(label: 'Week'),
+                      OiTabItem(label: 'Month'),
+                    ],
+                    selectedIndex: _tabPillIndex,
+                    onSelected: (i) => setState(() => _tabPillIndex = i),
+                    indicatorStyle: OiTabIndicatorStyle.pill,
+                  ),
                 ),
               ),
             ],
@@ -201,19 +210,22 @@ class _NavigationScreenState extends State<NavigationScreen> {
             examples: [
               ComponentExample(
                 title: 'Fixed style',
-                child: SizedBox(
-                  height: 80,
-                  child: MediaQuery(
-                    data: const MediaQueryData(size: Size(400, 800)),
-                    child: OiBottomBar(
-                      items: OiBottomBar.fromNavigationItems(const [
-                        OiNavigationItem(icon: OiIcons.home, label: 'Home'),
-                        OiNavigationItem(icon: OiIcons.search, label: 'Search'),
-                        OiNavigationItem(icon: OiIcons.bell, label: 'Alerts'),
-                        OiNavigationItem(icon: OiIcons.user, label: 'Profile'),
-                      ]),
-                      currentIndex: _bottomBarIndex,
-                      onTap: (i) => setState(() => _bottomBarIndex = i),
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 600),
+                  child: SizedBox(
+                    height: 80,
+                    child: MediaQuery(
+                      data: const MediaQueryData(size: Size(400, 800)),
+                      child: OiBottomBar(
+                        items: OiBottomBar.fromNavigationItems(const [
+                          OiNavigationItem(icon: OiIcons.home, label: 'Home'),
+                          OiNavigationItem(icon: OiIcons.search, label: 'Search'),
+                          OiNavigationItem(icon: OiIcons.bell, label: 'Alerts'),
+                          OiNavigationItem(icon: OiIcons.user, label: 'Profile'),
+                        ]),
+                        currentIndex: _bottomBarIndex,
+                        onTap: (i) => setState(() => _bottomBarIndex = i),
+                      ),
                     ),
                   ),
                 ),
@@ -262,38 +274,51 @@ class _NavigationScreenState extends State<NavigationScreen> {
               ComponentExample(
                 title: 'Drawer preview (constrained)',
                 child: SizedBox(
-                  height: 200,
-                  child: ClipRect(
-                    child: Stack(
-                      children: [
-                        Center(
-                          child: OiButton.primary(
-                            label: _drawerOpen ? 'Close drawer' : 'Open drawer',
-                            onTap: () =>
-                                setState(() => _drawerOpen = !_drawerOpen),
-                          ),
-                        ),
-                        OiDrawer(
-                          open: _drawerOpen,
-                          onClose: () => setState(() => _drawerOpen = false),
-                          width: 200,
-                          child: Padding(
-                            padding: EdgeInsets.all(spacing.md),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const OiLabel.bodyStrong('Navigation'),
-                                SizedBox(height: spacing.md),
-                                const OiLabel.body('Home'),
-                                SizedBox(height: spacing.sm),
-                                const OiLabel.body('Settings'),
-                                SizedBox(height: spacing.sm),
-                                const OiLabel.body('Profile'),
-                              ],
+                  width: double.infinity,
+                  child: SizedBox(
+                    height: 200,
+                    child: ClipRect(
+                      child: Stack(
+                        children: [
+                          Center(
+                            child: ConstrainedBox(
+                              constraints:
+                                  const BoxConstraints(maxWidth: 150),
+                              child: OiButton.primary(
+                                label: _drawerOpen
+                                    ? 'Close drawer'
+                                    : 'Open drawer',
+                                fullWidth: true,
+                                onTap: () => setState(
+                                  () => _drawerOpen = !_drawerOpen,
+                                ),
+                              ),
                             ),
                           ),
-                        ),
-                      ],
+                          OiDrawer(
+                            open: _drawerOpen,
+                            onClose: () =>
+                                setState(() => _drawerOpen = false),
+                            width: 200,
+                            child: Padding(
+                              padding: EdgeInsets.all(spacing.md),
+                              child: Column(
+                                crossAxisAlignment:
+                                    CrossAxisAlignment.start,
+                                children: [
+                                  const OiLabel.bodyStrong('Navigation'),
+                                  SizedBox(height: spacing.md),
+                                  const OiLabel.body('Home'),
+                                  SizedBox(height: spacing.sm),
+                                  const OiLabel.body('Settings'),
+                                  SizedBox(height: spacing.sm),
+                                  const OiLabel.body('Profile'),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -420,26 +445,33 @@ class _NavigationScreenState extends State<NavigationScreen> {
             examples: [
               ComponentExample(
                 title: 'Language selector',
-                child: OiLocaleSwitcher(
-                  currentLocale: _currentLocale,
-                  locales: const [
-                    OiLocaleOption(
-                      locale: Locale('en'),
-                      name: 'English',
-                      flagEmoji: '\u{1F1FA}\u{1F1F8}',
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 80),
+                    child: OiLocaleSwitcher(
+                      currentLocale: _currentLocale,
+                      locales: const [
+                        OiLocaleOption(
+                          locale: Locale('en'),
+                          name: 'English',
+                          flagEmoji: '\u{1F1FA}\u{1F1F8}',
+                        ),
+                        OiLocaleOption(
+                          locale: Locale('de'),
+                          name: 'Deutsch',
+                          flagEmoji: '\u{1F1E9}\u{1F1EA}',
+                        ),
+                        OiLocaleOption(
+                          locale: Locale('fr'),
+                          name: 'Fran\u00e7ais',
+                          flagEmoji: '\u{1F1EB}\u{1F1F7}',
+                        ),
+                      ],
+                      onLocaleChange: (l) =>
+                          setState(() => _currentLocale = l),
                     ),
-                    OiLocaleOption(
-                      locale: Locale('de'),
-                      name: 'Deutsch',
-                      flagEmoji: '\u{1F1E9}\u{1F1EA}',
-                    ),
-                    OiLocaleOption(
-                      locale: Locale('fr'),
-                      name: 'Fran\u00e7ais',
-                      flagEmoji: '\u{1F1EB}\u{1F1F7}',
-                    ),
-                  ],
-                  onLocaleChange: (l) => setState(() => _currentLocale = l),
+                  ),
                 ),
               ),
             ],

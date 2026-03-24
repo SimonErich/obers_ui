@@ -3,7 +3,6 @@ import 'package:obers_ui/src/components/buttons/oi_button.dart';
 import 'package:obers_ui/src/components/inputs/oi_checkbox.dart';
 import 'package:obers_ui/src/foundation/oi_responsive.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
-import 'package:obers_ui/src/primitives/animation/oi_animated_list.dart';
 import 'package:obers_ui/src/primitives/display/oi_label.dart';
 import 'package:obers_ui/src/primitives/display/oi_surface.dart';
 import 'package:obers_ui/src/primitives/layout/oi_row.dart';
@@ -252,14 +251,16 @@ class _OiBulkBarState extends State<OiBulkBar>
   Widget _buildActions(BuildContext context) {
     if (widget.actions.isEmpty) return const SizedBox.shrink();
 
-    return OiAnimatedList<OiBulkAction>(
-      items: widget.actions,
-      scrollDirection: Axis.horizontal,
-      shrinkWrap: true,
-      itemBuilder: (context, action, animation, index) {
-        return _buildActionButton(context, action);
-      },
-    );
+    final spacing = context.spacing;
+    final children = <Widget>[];
+    for (var i = 0; i < widget.actions.length; i++) {
+      children.add(_buildActionButton(context, widget.actions[i]));
+      if (i < widget.actions.length - 1) {
+        children.add(SizedBox(width: spacing.xs));
+      }
+    }
+
+    return Row(mainAxisSize: MainAxisSize.min, children: children);
   }
 
   @override
@@ -289,7 +290,7 @@ class _OiBulkBarState extends State<OiBulkBar>
               _buildSelectionInfo(context),
               if (widget.actions.isNotEmpty) ...[
                 Container(width: 1, height: 24, color: colors.borderSubtle),
-                Flexible(child: _buildActions(context)),
+                _buildActions(context),
               ],
             ],
           ),

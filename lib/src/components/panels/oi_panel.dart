@@ -158,19 +158,6 @@ class _OiPanelState extends State<OiPanel> with SingleTickerProviderStateMixin {
       decoration: BoxDecoration(
         color: colors.surface,
         borderRadius: _borderRadius(),
-        boxShadow: [
-          BoxShadow(
-            color: colors.overlay.withValues(alpha: 0.15),
-            blurRadius: 24,
-            offset: widget.side == OiPanelSide.left
-                ? const Offset(4, 0)
-                : widget.side == OiPanelSide.right
-                ? const Offset(-4, 0)
-                : widget.side == OiPanelSide.top
-                ? const Offset(0, 4)
-                : const Offset(0, -4),
-          ),
-        ],
       ),
       child: widget.child,
     );
