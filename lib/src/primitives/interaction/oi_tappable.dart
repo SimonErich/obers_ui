@@ -36,6 +36,7 @@ class OiTappable extends StatefulWidget {
     this.isDragging = false,
     this.semanticLabel,
     this.cursor,
+    this.clipBorderRadius,
     super.key,
   });
 
@@ -84,6 +85,12 @@ class OiTappable extends StatefulWidget {
   /// Defaults to [SystemMouseCursors.click] when [enabled] is true and
   /// [SystemMouseCursors.basic] when disabled.
   final MouseCursor? cursor;
+
+  /// Optional border radius used to clip the hover/active background overlay.
+  ///
+  /// When non-null the state overlay is clipped to this radius so it matches
+  /// the visible shape of the child (e.g. a rounded button).
+  final BorderRadius? clipBorderRadius;
 
   @override
   State<OiTappable> createState() => _OiTappableState();
@@ -203,15 +210,20 @@ class _OiTappableState extends State<OiTappable> {
 
     // Background overlay for the current state.
     if (style.backgroundOverlay.a > 0) {
+      Widget overlay = IgnorePointer(
+        child: ColoredBox(color: style.backgroundOverlay),
+      );
+      if (widget.clipBorderRadius != null) {
+        overlay = ClipRRect(
+          borderRadius: widget.clipBorderRadius!,
+          child: overlay,
+        );
+      }
       content = Stack(
         fit: StackFit.passthrough,
         children: [
           content,
-          Positioned.fill(
-            child: IgnorePointer(
-              child: ColoredBox(color: style.backgroundOverlay),
-            ),
-          ),
+          Positioned.fill(child: overlay),
         ],
       );
     }

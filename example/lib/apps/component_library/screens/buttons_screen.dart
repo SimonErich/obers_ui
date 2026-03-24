@@ -37,83 +37,170 @@ class _ButtonsScreenState extends State<ButtonsScreen> {
                 'The primary interactive element. Supports multiple visual '
                 'variants, sizes, icons, loading state, and disabled state.',
             examples: [
+              // ── Primary ─────────────────────────────────────────────
               ComponentExample(
-                title: 'Variants',
-                child: Wrap(
-                  spacing: spacing.sm,
-                  runSpacing: spacing.sm,
-                  children: [
-                    OiButton.primary(label: 'Primary', onTap: () {}),
-                    OiButton.secondary(label: 'Secondary', onTap: () {}),
-                    OiButton.outline(label: 'Outline', onTap: () {}),
-                    OiButton.ghost(label: 'Ghost', onTap: () {}),
-                    OiButton.destructive(label: 'Destructive', onTap: () {}),
-                    OiButton.soft(label: 'Soft', onTap: () {}),
-                  ],
+                title: 'Primary',
+                child: _ButtonVariantShowcase(
+                  builder: ({
+                    required String label,
+                    IconData? icon,
+                    OiIconPosition? iconPosition,
+                    bool fullWidth = false,
+                    bool enabled = true,
+                    VoidCallback? onTap,
+                  }) =>
+                      OiButton.primary(
+                    label: label,
+                    icon: icon,
+                    iconPosition: iconPosition ?? OiIconPosition.leading,
+                    fullWidth: fullWidth,
+                    enabled: enabled,
+                    onTap: onTap,
+                  ),
                 ),
               ),
+
+              // ── Secondary ───────────────────────────────────────────
+              ComponentExample(
+                title: 'Secondary',
+                child: _ButtonVariantShowcase(
+                  builder: ({
+                    required String label,
+                    IconData? icon,
+                    OiIconPosition? iconPosition,
+                    bool fullWidth = false,
+                    bool enabled = true,
+                    VoidCallback? onTap,
+                  }) =>
+                      OiButton.secondary(
+                    label: label,
+                    icon: icon,
+                    iconPosition: iconPosition ?? OiIconPosition.leading,
+                    fullWidth: fullWidth,
+                    enabled: enabled,
+                    onTap: onTap,
+                  ),
+                ),
+              ),
+
+              // ── Outline ─────────────────────────────────────────────
+              ComponentExample(
+                title: 'Outline',
+                child: _ButtonVariantShowcase(
+                  builder: ({
+                    required String label,
+                    IconData? icon,
+                    OiIconPosition? iconPosition,
+                    bool fullWidth = false,
+                    bool enabled = true,
+                    VoidCallback? onTap,
+                  }) =>
+                      OiButton.outline(
+                    label: label,
+                    icon: icon,
+                    iconPosition: iconPosition ?? OiIconPosition.leading,
+                    fullWidth: fullWidth,
+                    enabled: enabled,
+                    onTap: onTap,
+                  ),
+                ),
+              ),
+
+              // ── Ghost ───────────────────────────────────────────────
+              ComponentExample(
+                title: 'Ghost',
+                child: _ButtonVariantShowcase(
+                  builder: ({
+                    required String label,
+                    IconData? icon,
+                    OiIconPosition? iconPosition,
+                    bool fullWidth = false,
+                    bool enabled = true,
+                    VoidCallback? onTap,
+                  }) =>
+                      OiButton.ghost(
+                    label: label,
+                    icon: icon,
+                    iconPosition: iconPosition ?? OiIconPosition.leading,
+                    fullWidth: fullWidth,
+                    enabled: enabled,
+                    onTap: onTap,
+                  ),
+                ),
+              ),
+
+              // ── Destructive ─────────────────────────────────────────
+              ComponentExample(
+                title: 'Destructive',
+                child: _ButtonVariantShowcase(
+                  builder: ({
+                    required String label,
+                    IconData? icon,
+                    OiIconPosition? iconPosition,
+                    bool fullWidth = false,
+                    bool enabled = true,
+                    VoidCallback? onTap,
+                  }) =>
+                      OiButton.destructive(
+                    label: label,
+                    icon: icon,
+                    iconPosition: iconPosition ?? OiIconPosition.leading,
+                    fullWidth: fullWidth,
+                    enabled: enabled,
+                    onTap: onTap,
+                  ),
+                ),
+              ),
+
+              // ── Soft ────────────────────────────────────────────────
+              ComponentExample(
+                title: 'Soft',
+                child: _ButtonVariantShowcase(
+                  builder: ({
+                    required String label,
+                    IconData? icon,
+                    OiIconPosition? iconPosition,
+                    bool fullWidth = false,
+                    bool enabled = true,
+                    VoidCallback? onTap,
+                  }) =>
+                      OiButton.soft(
+                    label: label,
+                    icon: icon,
+                    iconPosition: iconPosition ?? OiIconPosition.leading,
+                    fullWidth: fullWidth,
+                    enabled: enabled,
+                    onTap: onTap,
+                  ),
+                ),
+              ),
+
+              // ── Sizes ───────────────────────────────────────────────
               ComponentExample(
                 title: 'Sizes',
-                child: Wrap(
-                  spacing: spacing.sm,
-                  runSpacing: spacing.sm,
-                  crossAxisAlignment: WrapCrossAlignment.center,
-                  children: [
-                    OiButton.primary(
-                      label: 'Small',
-                      size: OiButtonSize.small,
-                      onTap: () {},
-                    ),
-                    OiButton.primary(label: 'Medium', onTap: () {}),
-                    OiButton.primary(
-                      label: 'Large',
-                      size: OiButtonSize.large,
-                      onTap: () {},
-                    ),
-                  ],
-                ),
+                child: _ButtonSizesShowcase(),
               ),
+
+              // ── States ──────────────────────────────────────────────
               ComponentExample(
                 title: 'States',
-                child: Wrap(
-                  spacing: spacing.sm,
-                  runSpacing: spacing.sm,
-                  children: const [
-                    OiButton.primary(label: 'Loading', loading: true),
-                    OiButton.primary(label: 'Disabled'),
-                    OiButton.outline(label: 'Disabled Outline'),
-                  ],
-                ),
-              ),
-              ComponentExample(
-                title: 'With Icons',
-                child: Wrap(
-                  spacing: spacing.sm,
-                  runSpacing: spacing.sm,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    OiButton.primary(
-                      label: 'Save',
-                      icon: OiIcons.save,
-                      onTap: () {},
-                    ),
-                    OiButton.secondary(
-                      label: 'Download',
-                      icon: OiIcons.download,
-                      onTap: () {},
-                    ),
-                    OiButton.outline(
-                      label: 'Search',
-                      icon: OiIcons.search,
-                      onTap: () {},
-                    ),
-                    OiButton.destructive(
-                      label: 'Delete',
-                      icon: OiIcons.trash,
-                      onTap: () {},
+                    _buildStateRow(
+                      context,
+                      label: 'Loading',
+                      children: const [
+                        OiButton.primary(label: 'Primary', loading: true),
+                        OiButton.secondary(label: 'Secondary', loading: true),
+                        OiButton.outline(label: 'Outline', loading: true),
+                      ],
                     ),
                   ],
                 ),
               ),
+
+              // ── Icon-Only Buttons ───────────────────────────────────
               ComponentExample(
                 title: 'Icon-Only Buttons',
                 child: Wrap(
@@ -256,7 +343,8 @@ class _ButtonsScreenState extends State<ButtonsScreen> {
                       icon: OiIcons.underline,
                       selected: _underline,
                       semanticLabel: 'Underline',
-                      onChanged: (value) => setState(() => _underline = value),
+                      onChanged: (value) =>
+                          setState(() => _underline = value),
                     ),
                   ],
                 ),
@@ -341,6 +429,177 @@ class _ButtonsScreenState extends State<ButtonsScreen> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildStateRow(
+    BuildContext context, {
+    required String label,
+    required List<Widget> children,
+  }) {
+    final spacing = context.spacing;
+    final colors = context.colors;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        OiLabel.small(label, color: colors.textMuted),
+        SizedBox(height: spacing.xs),
+        Wrap(
+          spacing: spacing.sm,
+          runSpacing: spacing.sm,
+          children: children,
+        ),
+      ],
+    );
+  }
+}
+
+// ── Helper: variant sub-variants showcase ─────────────────────────────────
+
+typedef _ButtonBuilder = Widget Function({
+  required String label,
+  IconData? icon,
+  OiIconPosition? iconPosition,
+  bool fullWidth,
+  bool enabled,
+  VoidCallback? onTap,
+});
+
+class _ButtonVariantShowcase extends StatelessWidget {
+  const _ButtonVariantShowcase({required this.builder});
+
+  final _ButtonBuilder builder;
+
+  @override
+  Widget build(BuildContext context) {
+    final spacing = context.spacing;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Row of inline sub-variants
+        Wrap(
+          spacing: spacing.md,
+          runSpacing: spacing.sm,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          children: [
+            // Text only
+            IntrinsicWidth(child: builder(label: 'Button', onTap: () {})),
+            // Leading icon
+            IntrinsicWidth(
+              child: builder(
+                label: 'Button',
+                icon: OiIcons.settings,
+                onTap: () {},
+              ),
+            ),
+            // Trailing icon
+            IntrinsicWidth(
+              child: builder(
+                label: 'Button',
+                icon: OiIcons.arrowRight,
+                iconPosition: OiIconPosition.trailing,
+                onTap: () {},
+              ),
+            ),
+            // Disabled
+            IntrinsicWidth(
+              child: builder(label: 'Disabled', enabled: false),
+            ),
+          ],
+        ),
+        SizedBox(height: spacing.sm),
+        // Full width
+        builder(
+          label: 'Button',
+          icon: OiIcons.settings,
+          iconPosition: OiIconPosition.leading,
+          fullWidth: true,
+          onTap: () {},
+        ),
+      ],
+    );
+  }
+}
+
+// ── Helper: sizes showcase ────────────────────────────────────────────────
+
+class _ButtonSizesShowcase extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final spacing = context.spacing;
+    final colors = context.colors;
+
+    const sizes = [
+      (size: OiButtonSize.small, label: 'Small'),
+      (size: OiButtonSize.medium, label: 'Medium'),
+      (size: OiButtonSize.large, label: 'Large'),
+    ];
+
+    Widget buildSizeColumn(({OiButtonSize size, String label}) entry) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          OiLabel.small(entry.label, color: colors.textMuted),
+          SizedBox(height: spacing.sm),
+          IntrinsicWidth(
+            child: OiButton.primary(
+              label: 'Button',
+              size: entry.size,
+              onTap: () {},
+            ),
+          ),
+          SizedBox(height: spacing.sm),
+          IntrinsicWidth(
+            child: OiButton.secondary(
+              label: 'Button',
+              size: entry.size,
+              onTap: () {},
+            ),
+          ),
+          SizedBox(height: spacing.sm),
+          IntrinsicWidth(
+            child: OiButton.outline(
+              label: 'Button',
+              size: entry.size,
+              onTap: () {},
+            ),
+          ),
+          SizedBox(height: spacing.sm),
+          IntrinsicWidth(
+            child: OiButton.ghost(
+              label: 'Button',
+              size: entry.size,
+              onTap: () {},
+            ),
+          ),
+          SizedBox(height: spacing.sm),
+          IntrinsicWidth(
+            child: OiButton.destructive(
+              label: 'Button',
+              size: entry.size,
+              onTap: () {},
+            ),
+          ),
+          SizedBox(height: spacing.sm),
+          IntrinsicWidth(
+            child: OiButton.soft(
+              label: 'Button',
+              size: entry.size,
+              onTap: () {},
+            ),
+          ),
+        ],
+      );
+    }
+
+    return Wrap(
+      spacing: spacing.xxl,
+      runSpacing: spacing.lg,
+      children: [
+        for (final size in sizes) buildSizeColumn(size),
+      ],
     );
   }
 }

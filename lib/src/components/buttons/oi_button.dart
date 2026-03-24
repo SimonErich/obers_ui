@@ -712,6 +712,9 @@ class _OiButtonState extends State<OiButton> {
     final height = _buttonHeight(density);
     final hPad = _hPadding(context);
     final foreground = _foregroundColor(context, widget.variant);
+    final themeRadius = context.components.button?.borderRadius;
+    final effectiveRadius =
+        widget.borderRadius ?? themeRadius ?? context.radius.sm;
     final decoration = _decoration(
       context,
       widget.variant,
@@ -723,6 +726,7 @@ class _OiButtonState extends State<OiButton> {
       onTap: widget.onTap,
       enabled: isActive,
       semanticLabel: widget.semanticLabel ?? widget.label,
+      clipBorderRadius: effectiveRadius,
       child: Container(
         height: height,
         padding: EdgeInsets.symmetric(horizontal: hPad),
