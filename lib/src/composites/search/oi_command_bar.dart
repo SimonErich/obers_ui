@@ -557,7 +557,11 @@ class _OiCommandBarState extends State<OiCommandBar> {
     final isHighlighted = index == _highlightedIndex;
     final hasChildren = cmd.children != null && cmd.children!.isNotEmpty;
 
-    return GestureDetector(
+    return MouseRegion(
+      onEnter: (_) {
+        if (index >= 0) setState(() => _highlightedIndex = index);
+      },
+      child: GestureDetector(
       onTap: () => _drillDown(cmd),
       behavior: HitTestBehavior.opaque,
       child: Container(
@@ -626,6 +630,7 @@ class _OiCommandBarState extends State<OiCommandBar> {
           ],
         ),
       ),
+    ),
     );
   }
 }

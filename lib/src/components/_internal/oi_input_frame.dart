@@ -84,7 +84,7 @@ class OiInputFrame extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (label != null) ...[
-          OiLabel.small(label!),
+          OiLabel.smallStrong(label!),
           const SizedBox(height: 4),
         ],
         frame,

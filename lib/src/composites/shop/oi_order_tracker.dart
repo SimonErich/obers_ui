@@ -211,6 +211,7 @@ class OiOrderTracker extends StatelessWidget {
                 _buildTimelineEvent(
                   context,
                   events[i],
+                  isFirst: i == 0,
                   isLast: i == events.length - 1,
                 ),
             ],
@@ -223,47 +224,64 @@ class OiOrderTracker extends StatelessWidget {
   Widget _buildTimelineEvent(
     BuildContext context,
     OiOrderEvent event, {
+    required bool isFirst,
     required bool isLast,
   }) {
     final sp = context.spacing;
     final dotColor = _colorForStatus(context, event.status);
     final formattedTime = _formatTimestamp(event.timestamp);
 
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Left: colored dot + vertical connector line.
-        Column(
-          children: [
-            Container(
-              width: 12,
-              height: 12,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: dotColor,
-              ),
-            ),
-            if (!isLast)
-              Container(width: 2, height: 40, color: context.colors.textMuted),
-          ],
-        ),
-        SizedBox(width: sp.sm),
-        // Right: timestamp, title, optional description.
-        Expanded(
-          child: Padding(
-            padding: EdgeInsets.only(bottom: isLast ? 0 : sp.sm),
+    return IntrinsicHeight(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // Left: colored dot + vertical connector lines.
+          SizedBox(
+            width: 12,
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                OiLabel.small(formattedTime),
-                OiLabel.bodyStrong(event.title),
-                if (event.description != null && event.description!.isNotEmpty)
-                  OiLabel.small(event.description!),
+                // Top connector to bridge gap from previous dot.
+                Container(
+                  width: 2,
+                  height: sp.xs,
+                  color: isFirst ? null : context.colors.textMuted,
+                ),
+                Container(
+                  width: 12,
+                  height: 12,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: dotColor,
+                  ),
+                ),
+                if (!isLast)
+                  Expanded(
+                    child: Container(
+                      width: 2,
+                      color: context.colors.textMuted,
+                    ),
+                  ),
               ],
             ),
           ),
-        ),
-      ],
+          SizedBox(width: sp.sm),
+          // Right: timestamp, title, optional description.
+          Expanded(
+            child: Padding(
+              padding: EdgeInsets.only(bottom: isLast ? 0 : sp.sm),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  OiLabel.small(formattedTime),
+                  OiLabel.bodyStrong(event.title),
+                  if (event.description != null && event.description!.isNotEmpty)
+                    OiLabel.small(event.description!),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 

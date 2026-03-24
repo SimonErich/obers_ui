@@ -16,6 +16,8 @@ import 'package:obers_ui/src/primitives/display/oi_label.dart';
 import 'package:obers_ui/src/primitives/layout/oi_column.dart';
 import 'package:obers_ui/src/primitives/layout/oi_row.dart';
 
+import 'package:obers_ui/src/components/shop/oi_wishlist_button.dart';
+import 'package:obers_ui/src/components/shop/oi_stock_badge.dart';
 /// A complete product detail page layout showing gallery, title, price,
 /// description, variant selectors, quantity, add to cart, and related info.
 ///
@@ -38,12 +40,14 @@ class OiShopProductDetail extends StatefulWidget {
     this.onVariantChange,
     this.onQuantityChange,
     this.onWishlist,
+    this.isWishlisted = false,
     this.selectedVariant,
     this.quantity = 1,
     this.description,
     this.reviews,
     this.specifications,
     this.related,
+    this.onRelatedProductTap,
     super.key,
   });
 
@@ -65,6 +69,9 @@ class OiShopProductDetail extends StatefulWidget {
   /// Called when the user taps the wishlist button.
   final VoidCallback? onWishlist;
 
+  /// Whether the product is currently in the wishlist.
+  final bool isWishlisted;
+
   /// The currently selected variant, if any.
   final OiProductVariant? selectedVariant;
 
@@ -82,6 +89,9 @@ class OiShopProductDetail extends StatefulWidget {
 
   /// Optional related products to display below the main content.
   final List<OiProductData>? related;
+
+  /// Called when the user taps a related product.
+  final ValueChanged<OiProductData>? onRelatedProductTap;
 
   @override
   State<OiShopProductDetail> createState() => _OiShopProductDetailState();
@@ -209,6 +219,7 @@ class _OiShopProductDetailState extends State<OiShopProductDetail> {
             gap: OiResponsive(sp.xs),
             children: [
               OiStarRating(
+                readOnly: true,
                 value: widget.product.rating!,
                 label: '${widget.product.rating} out of 5 stars',
               ),
@@ -219,17 +230,34 @@ class _OiShopProductDetailState extends State<OiShopProductDetail> {
                 ),
             ],
           ),
-
-        // Price.
-        OiPriceTag(
-          price: _effectivePrice,
-          label: 'Product price',
-          compareAtPrice: widget.product.compareAtPrice,
-          currencyCode: widget.product.currencyCode,
+        SizedBox(height: sp.sm),
+        
+        // Price, stock badge, and wishlist.
+        Row(
+          children: [
+            OiPriceTag(
+              size: OiPriceTagSize.large,
+              price: _effectivePrice,
+              label: 'Product price',
+              compareAtPrice: widget.product.compareAtPrice,
+              currencyCode: widget.product.currencyCode,
+            ),
+            const Spacer(),
+            if (!_isInStock)
+              const OiBadge.soft(label: 'Out of Stock')
+            else
+              OiStockBadge.fromCount(
+                stockCount: _selectedVariant?.stockCount,
+                label: 'Stock status',
+              ),
+            SizedBox(width: sp.sm),
+              OiWishlistButton(
+              label: 'Toggle wishlist for ${widget.product.name}',
+              active: widget.isWishlisted,
+              onToggle: widget.onWishlist,
+            ),
+          ],
         ),
-
-        // Stock badge.
-        if (!_isInStock) const OiBadge.soft(label: 'Out of Stock'),
 
         // SKU.
         if (widget.product.sku != null)
@@ -442,14 +470,18 @@ class _OiShopProductDetailState extends State<OiShopProductDetail> {
       children: [
         const OiLabel.h3('Related Products'),
         SizedBox(
-          height: 220,
+          height: 260,
           child: ListView.separated(
             scrollDirection: Axis.horizontal,
             itemCount: widget.related!.length,
             separatorBuilder: (_, __) => SizedBox(width: sp.sm),
             itemBuilder: (context, index) {
               final product = widget.related![index];
-              return SizedBox(
+              return GestureDetector(
+                onTap: widget.onRelatedProductTap != null
+                    ? () => widget.onRelatedProductTap!(product)
+                    : null,
+                child: SizedBox(
                 width: 160,
                 child: OiCard(
                   child: Column(
@@ -491,6 +523,7 @@ class _OiShopProductDetailState extends State<OiShopProductDetail> {
                     ],
                   ),
                 ),
+              ),
               );
             },
           ),

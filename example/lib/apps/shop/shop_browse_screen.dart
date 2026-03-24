@@ -105,13 +105,12 @@ class _ShopBrowseScreenState extends State<ShopBrowseScreen> {
   }
 
   void _openCommandBar() {
-    OiSheet.show(
-      context,
+    late final OiOverlayHandle handle;
+    handle = OiOverlays.of(context).show(
       label: 'Product search',
-      side: OiPanelSide.top,
-      size: 400,
-      child: OiCommandBar(
+      builder: (_) => OiCommandBar(
         label: 'Search products',
+        onDismiss: () => handle.dismiss(),
         commands:
             kProducts
                 .map(
@@ -122,13 +121,14 @@ class _ShopBrowseScreenState extends State<ShopBrowseScreen> {
                         '${p.currencyCode} ${p.price.toStringAsFixed(2)}',
                     category: 'Products',
                     onExecute: () {
-                      Navigator.of(context, rootNavigator: true).pop();
+                      handle.dismiss();
                       widget.onSelectProduct(p);
                     },
                   ),
                 )
                 .toList(),
       ),
+      zOrder: OiOverlayZOrder.panel,
     );
   }
 
