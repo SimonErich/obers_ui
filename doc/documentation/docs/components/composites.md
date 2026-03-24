@@ -223,6 +223,75 @@ final user = await OiFormDialog.showCustom<User>(
 
 **Related components:** `OiDialog`, `OiDialogShell`, `OiForm`
 
+## Type-Safe Forms (obers_ui_forms)
+
+The `obers_ui_forms` package provides type-safe stateful form management on top of the existing form composites.
+
+| Widget | Description |
+|---|---|
+| `OiFormController<E>` | Abstract base controller with enum-keyed field access |
+| `OiFormInputController<T>` | Per-field controller with value, validation, dirty tracking |
+| `OiFormScope<E>` | InheritedWidget providing controller to descendants |
+| `OiFormElement<E>` | Wrapper with label, error display, conditional visibility |
+| `OiFormSubmitButton<E>` | Auto-disabling submit button |
+| `OiFormErrorSummary<E>` | Global error summary widget |
+| `OiFormValidation` | Static factory methods for 12 built-in validators |
+
+### Quick Start
+
+```dart
+// 1. Define fields
+enum SignupFields { name, email, password }
+
+// 2. Create controller
+class SignupController extends OiFormController<SignupFields> {
+  @override
+  Map<SignupFields, OiFormInputController<dynamic>> inputs() => {
+    SignupFields.name: OiFormInputController<String>(
+      required: true,
+      validation: [OiFormValidation.minLength(3)],
+    ),
+    SignupFields.email: OiFormInputController<String>(
+      required: true,
+      validation: [OiFormValidation.email()],
+    ),
+  };
+}
+
+// 3. Build UI
+OiFormScope<SignupFields>(
+  controller: controller,
+  child: Column(
+    children: [
+      OiFormElement<SignupFields>(
+        fieldKey: SignupFields.name,
+        label: 'Name',
+        child: OiTextInput(
+          onChanged: (v) => controller.set(SignupFields.name, v),
+        ),
+      ),
+      OiFormSubmitButton<SignupFields>(label: 'Submit'),
+    ],
+  ),
+)
+```
+
+### Key Features
+
+- **Type-safe** enum-keyed field access — no `Map<String, dynamic>`
+- **Declarative validation** with 12 built-in validators (sync + async)
+- **Computed fields** with watch dependencies and auto-update
+- **Cross-field validation** via `OiFormValidation.equals(fieldKey)`
+- **Conditional visibility** with `hideIf`/`showIf` callbacks
+- **Async validation** with debounce, cancellation, and loading state
+- **Transient fields** (`save: false`) excluded from data export
+- **Getter/setter transformers** for value transformation
+- **Accessibility** — required indicators, liveRegion error announcements
+
+**Import:** `import 'package:obers_ui_forms/obers_ui_forms.dart';`
+
+**Related components:** `OiForm`, `OiTextInput`, `OiSelect`, `OiCheckbox`, `OiSwitch`
+
 ## Editors
 
 | Widget | Description |

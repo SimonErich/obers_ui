@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/obers_ui.dart';
 import 'package:obers_ui_example/apps/component_library/shared/component_showcase_section.dart';
+import 'package:obers_ui_forms/obers_ui_forms.dart' as forms;
 
 /// Showcase screen for form, stepper, wizard, and address form widgets.
 class FormsWizardsScreen extends StatefulWidget {
@@ -78,6 +79,25 @@ class _FormsWizardsScreenState extends State<FormsWizardsScreen> {
                     ],
                     onSubmit: (_) {},
                   ),
+                ),
+              ),
+            ],
+          ),
+
+          // ── Type-Safe Forms (obers_ui_forms) ─────────────────────
+          ComponentShowcaseSection(
+            title: 'Type-Safe Form',
+            widgetName: 'OiFormController + forms.OiFormScope',
+            description:
+                'Type-safe form management with enum-keyed fields, '
+                'declarative validation (sync + async), computed fields, '
+                'and InheritedWidget scope. From the obers_ui_forms package.',
+            examples: [
+              ComponentExample(
+                title: 'Signup form with validation',
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 500),
+                  child: const _SignupFormExample(),
                 ),
               ),
             ],
@@ -209,6 +229,132 @@ class _FormsWizardsScreenState extends State<FormsWizardsScreen> {
                   child: OiAddressForm.shipping(onChange: (_) {}),
                 ),
               ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────
+// Type-Safe Signup Form Example (obers_ui_forms)
+// ─────────────────────────────────────────────────────────────────
+
+enum _SignupFields { name, email, password, passwordRepeat }
+
+class _SignupController extends forms.OiFormController<_SignupFields> {
+  @override
+  Map<_SignupFields, forms.OiFormInputController<dynamic>> inputs() => {
+    _SignupFields.name: forms.OiFormInputController<String>(
+      required: true,
+      validation: [forms.OiFormValidation.minLength(3)],
+    ),
+    _SignupFields.email: forms.OiFormInputController<String>(
+      required: true,
+      validation: [forms.OiFormValidation.email()],
+    ),
+    _SignupFields.password: forms.OiFormInputController<String>(
+      required: true,
+      validation: [
+        forms.OiFormValidation.securePassword(
+          minLength: 8,
+          requiresUppercase: true,
+          requiresDigit: true,
+        ),
+      ],
+    ),
+    _SignupFields.passwordRepeat: forms.OiFormInputController<String>(
+      save: false,
+      validation: [
+        forms.OiFormValidation.equals<String>(_SignupFields.password),
+      ],
+    ),
+  };
+}
+
+class _SignupFormExample extends StatefulWidget {
+  const _SignupFormExample();
+
+  @override
+  State<_SignupFormExample> createState() => _SignupFormExampleState();
+}
+
+class _SignupFormExampleState extends State<_SignupFormExample> {
+  late final _SignupController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = _SignupController();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final spacing = context.spacing;
+
+    return forms.OiFormScope<_SignupFields>(
+      controller: _controller,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          forms.OiFormErrorSummary<_SignupFields>(),
+          SizedBox(height: spacing.sm),
+          forms.OiFormElement<_SignupFields>(
+            fieldKey: _SignupFields.name,
+            label: 'Name',
+            child: OiTextInput(
+              placeholder: 'Enter your name',
+              onChanged: (v) => _controller.set<String>(_SignupFields.name, v),
+            ),
+          ),
+          SizedBox(height: spacing.sm),
+          forms.OiFormElement<_SignupFields>(
+            fieldKey: _SignupFields.email,
+            label: 'Email',
+            child: OiTextInput(
+              placeholder: 'Enter your email',
+              onChanged: (v) => _controller.set<String>(_SignupFields.email, v),
+            ),
+          ),
+          SizedBox(height: spacing.sm),
+          forms.OiFormElement<_SignupFields>(
+            fieldKey: _SignupFields.password,
+            label: 'Password',
+            child: OiTextInput.password(
+              placeholder: 'Enter password',
+              onChanged: (v) =>
+                  _controller.set<String>(_SignupFields.password, v),
+            ),
+          ),
+          SizedBox(height: spacing.sm),
+          forms.OiFormElement<_SignupFields>(
+            fieldKey: _SignupFields.passwordRepeat,
+            label: 'Repeat Password',
+            revalidateOnChangeOf: [_SignupFields.password],
+            child: OiTextInput.password(
+              placeholder: 'Repeat password',
+              onChanged: (v) =>
+                  _controller.set<String>(_SignupFields.passwordRepeat, v),
+            ),
+          ),
+          SizedBox(height: spacing.md),
+          Row(
+            spacing: spacing.sm,
+            children: [
+              forms.OiFormSubmitButton<_SignupFields>(
+                label: 'Sign Up',
+                onSubmit: (data, ctrl) {
+                  // Handle signup
+                },
+              ),
+              OiButton.outline(label: 'Reset', onTap: _controller.reset),
             ],
           ),
         ],

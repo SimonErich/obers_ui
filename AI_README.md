@@ -3673,6 +3673,164 @@ A static-only utility for showing form dialogs with a managed lifecycle. Present
 
 ---
 
+### PACKAGE — obers_ui_forms (Type-Safe Form Management)
+
+---
+
+#### Overview
+**Tags:** `forms`, `validation`, `state-management`, `type-safe`, `enum-keyed`
+**Package:** `obers_ui_forms` (separate package under `packages/obers_ui_forms/`)
+**Import:** `import 'package:obers_ui_forms/obers_ui_forms.dart';`
+
+Type-safe stateful form management wrapping the existing OiForm system. Uses enum-keyed field access, declarative validation (sync + async), computed fields, and InheritedWidget scope for auto-binding.
+
+**Key Classes:**
+
+| Class | Description |
+|---|---|
+| `OiFormController<E extends Enum>` | Abstract base form controller with typed field access |
+| `OiFormInputController<T>` | Per-field controller with value, validation, dirty tracking |
+| `OiFormValidation` | Static factory methods for built-in validators |
+| `OiFormScope<E>` | InheritedWidget providing controller to descendants |
+| `OiFormElement<E>` | Wrapper with label, error display, conditional visibility |
+| `OiFormSubmitButton<E>` | Auto-disabling submit button |
+| `OiFormErrorSummary<E>` | Global error summary widget |
+
+#### Usage Pattern
+
+**1. Define fields as enum:**
+```dart
+enum SignupFields { name, email, password, passwordRepeat }
+```
+
+**2. Create controller:**
+```dart
+class SignupController extends OiFormController<SignupFields> {
+  @override
+  Map<SignupFields, OiFormInputController<dynamic>> inputs() => {
+    SignupFields.name: OiFormInputController<String>(
+      required: true,
+      validation: [OiFormValidation.minLength(3)],
+    ),
+    SignupFields.email: OiFormInputController<String>(
+      required: true,
+      validation: [OiFormValidation.email()],
+    ),
+    SignupFields.password: OiFormInputController<String>(
+      required: true,
+      validation: [
+        OiFormValidation.securePassword(
+          minLength: 8, requiresUppercase: true, requiresSpecialChar: true,
+        ),
+      ],
+    ),
+    SignupFields.passwordRepeat: OiFormInputController<String>(
+      save: false,
+      validation: [OiFormValidation.equals<String>(SignupFields.password)],
+    ),
+  };
+}
+```
+
+**3. Build UI:**
+```dart
+OiFormScope<SignupFields>(
+  controller: controller,
+  child: Column(
+    children: [
+      OiFormElement<SignupFields>(
+        fieldKey: SignupFields.name,
+        label: 'Name',
+        child: OiTextInput(onChanged: (v) => controller.set(SignupFields.name, v)),
+      ),
+      OiFormSubmitButton<SignupFields>(
+        label: 'Sign Up',
+        onSubmit: (data, ctrl) => handleSubmit(data),
+      ),
+    ],
+  ),
+)
+```
+
+#### OiFormInputController<T> Parameters
+
+| Parameter | Type | Description |
+|---|---|---|
+| `required` | `bool` | Whether field must have a value |
+| `initialValue` | `T?` | Default value |
+| `validation` | `List<OiFormValidator<T>>` | Sync/async validators |
+| `getter` | `T Function(T?)?` | Transform on read |
+| `setter` | `T Function(T?)?` | Transform on write |
+| `options` | `List<T>?` | Static select options |
+| `optionQuery` | `Future<List<T>> Function(String)?` | Async search options |
+| `watch` | `List<Enum>?` | Fields to watch (computed) |
+| `watchMode` | `OiFormWatchMode` | When to recompute |
+| `computedValue` | `T Function(dynamic)?` | Compute from controller |
+| `save` | `bool` | Include in getData()/json() |
+| `clearErrorOnChange` | `bool` | Clear errors on value change |
+| `validateOnChange` | `bool` | Validate on every change |
+| `validateOnBlur` | `bool` | Validate on blur |
+
+#### OiFormValidation Catalog
+
+| Validator | Usage |
+|---|---|
+| `required()` | Non-null, non-empty |
+| `minLength(n)` | String min length |
+| `maxLength(n)` | String max length |
+| `min(n)` | Numeric minimum |
+| `max(n)` | Numeric maximum |
+| `email()` | Valid email format |
+| `url()` | Valid URL format |
+| `regex(pattern)` | Regex match |
+| `securePassword(...)` | Password strength |
+| `equals(fieldKey)` | Cross-field equality |
+| `custom(fn)` | Custom sync validator |
+| `asyncCustom(fn, debounce:)` | Custom async with debounce |
+
+#### OiFormController<E> API
+
+| Method/Property | Description |
+|---|---|
+| `get<T>(key)` | Get typed value |
+| `set<T>(key, value)` | Set typed value |
+| `setMultiple(map)` | Batch set values |
+| `getData()` | Get saved values map |
+| `getInitial()` | Get initial values |
+| `json()` | Export as `Map<String, dynamic>` |
+| `validate()` | Run sync validators |
+| `validateAsync()` | Run sync + async validators |
+| `submit(onSubmit)` | Validate and submit |
+| `reset()` | Reset to initial values |
+| `isValid` | All fields valid |
+| `isDirty` | Any field modified |
+| `isValidating` | Async validation running |
+| `enable()` / `disable()` | Form-level state |
+| `enableField(key)` / `disableField(key)` | Per-field state |
+| `getError(key)` / `setError(key, msg)` | Error management |
+| `getErrors()` | All errors map |
+| `firstInvalidField` | First invalid key |
+| `overwriteInputController(key, ctrl)` | Replace field controller |
+| `getInputController(key)` | Get field controller |
+
+#### OiFormElement<E> Parameters
+
+| Parameter | Type | Description |
+|---|---|---|
+| `fieldKey` | `E` | Enum key for this field |
+| `label` | `String?` | Label above input (adds * for required) |
+| `child` | `Widget` | The input widget |
+| `hideIf` | `bool Function(OiFormController<E>)?` | Hide when true |
+| `showIf` | `bool Function(OiFormController<E>)?` | Show when true (precedence over hideIf) |
+| `revalidateOnChangeOf` | `List<E>?` | Re-validate when these fields change |
+| `focusNode` | `FocusNode?` | Optional focus node |
+
+**Use When:** Building type-safe forms with validation, cross-field logic, or computed fields.
+**Avoid When:** Simple one-field inputs — use standalone input widgets.
+**Combine With:** `OiTextInput`, `OiSelect`, `OiCheckbox`, `OiSwitch`, `OiButton`, existing `OiForm` composites.
+
+---
+
 ### COMPOSITES — Media
 
 ---

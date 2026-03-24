@@ -10,6 +10,8 @@ dependencies:
     sdk: flutter
   obers_ui:
     path: ../
+  obers_ui_forms:
+    path: ../packages/obers_ui_forms
 
 dev_dependencies:
   flutter_test:
