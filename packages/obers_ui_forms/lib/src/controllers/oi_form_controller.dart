@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:obers_ui_forms/src/controllers/oi_form_input_controller.dart';
 import 'package:obers_ui_forms/src/validation/oi_form_validator.dart';
+import 'package:obers_ui_forms/src/validation/oi_form_watch_mode.dart';
 
 /// Type-safe form controller with enum-keyed field access.
 ///
@@ -35,15 +36,67 @@ abstract class OiFormController<E extends Enum> extends ChangeNotifier {
 
   void _registerFields() {
     final fieldMap = inputs();
+
+    // First pass: register all fields
     for (final entry in fieldMap.entries) {
       _fields[entry.key] = entry.value;
       final listener = () => _onFieldChanged(entry.key);
       _fieldListeners[entry.key] = listener;
       entry.value.addListener(listener);
     }
+
+    // Second pass: validate watch dependencies and set up computed fields
+    for (final entry in _fields.entries) {
+      final field = entry.value;
+      if (field.isComputed && field.watch != null) {
+        _validateWatchDependencies(entry.key, field.watch!);
+
+        // Compute initial value if watchMode is onInit
+        if (field.watchMode == OiFormWatchMode.onInit) {
+          _recomputeField(entry.key, field);
+        }
+      }
+    }
+  }
+
+  void _validateWatchDependencies(E key, List<Enum> watchKeys) {
+    final visited = <Enum>{key};
+    final queue = List<Enum>.from(watchKeys);
+
+    while (queue.isNotEmpty) {
+      final current = queue.removeAt(0);
+      if (visited.contains(current)) {
+        throw StateError(
+          'Circular watch dependency detected: '
+          '$key depends on $current which creates a cycle',
+        );
+      }
+      visited.add(current);
+      final field = _fields[current];
+      if (field != null && field.watch != null) {
+        queue.addAll(field.watch!);
+      }
+    }
+  }
+
+  void _recomputeField(E key, OiFormInputController<dynamic> field) {
+    if (field.computedValue != null) {
+      final newValue = field.computedValue!(this);
+      field.setValue(newValue);
+    }
   }
 
   void _onFieldChanged(E key) {
+    // Trigger recomputation of computed fields that watch this key
+    for (final entry in _fields.entries) {
+      final field = entry.value;
+      if (field.isComputed &&
+          field.watch != null &&
+          field.watch!.contains(key) &&
+          field.watchMode == OiFormWatchMode.onChange) {
+        _recomputeField(entry.key, field);
+      }
+    }
     notifyListeners();
   }
 
@@ -119,6 +172,37 @@ abstract class OiFormController<E extends Enum> extends ChangeNotifier {
       if (errors.isNotEmpty) allValid = false;
     }
     return allValid;
+  }
+
+  /// Run all validators (sync + async). Returns true if all valid.
+  ///
+  /// Waits for async validators to complete before returning.
+  Future<bool> validateAsync() async {
+    // Run sync first
+    validate();
+
+    // Then run async validators
+    final futures = <Future<void>>[];
+    for (final field in _fields.values) {
+      futures.add(field.validateAsync(this));
+    }
+    await Future.wait(futures);
+
+    return isValid;
+  }
+
+  /// Submit the form: validate all fields, then call [onSubmit] if valid.
+  ///
+  /// If async validators are running, waits for them to complete.
+  Future<bool> submit(
+    void Function(Map<E, dynamic> data, OiFormController<E> controller)?
+    onSubmit,
+  ) async {
+    final valid = await validateAsync();
+    if (valid && onSubmit != null) {
+      onSubmit(getData(), this);
+    }
+    return valid;
   }
 
   /// Reset all fields to their initial values.

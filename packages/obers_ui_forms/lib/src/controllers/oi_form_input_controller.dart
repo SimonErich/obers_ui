@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:obers_ui_forms/src/validation/oi_form_validator.dart';
 import 'package:obers_ui_forms/src/validation/oi_form_watch_mode.dart';
@@ -83,6 +85,8 @@ class OiFormInputController<T> extends ChangeNotifier {
   bool _enabled;
   List<String> _errors = [];
   bool _isValidating = false;
+  Timer? _debounceTimer;
+  int _asyncValidationGeneration = 0;
 
   /// The current field value, applying getter transform if present.
   T? get value => getter != null ? getter!(_value) : _value;
@@ -186,11 +190,88 @@ class OiFormInputController<T> extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Run async validators with debounce and cancellation.
+  ///
+  /// Returns a Future that completes when all async validators finish.
+  /// If [setValue] is called before async validation completes, the
+  /// previous validation is cancelled and only the latest result applies.
+  Future<void> validateAsync(dynamic controller) async {
+    final asyncValidators = validation.whereType<OiAsyncFormValidator<T>>();
+    if (asyncValidators.isEmpty) return;
+
+    // Cancel any pending debounce
+    _debounceTimer?.cancel();
+
+    // Use the longest debounce from all async validators
+    final debounce = asyncValidators.fold<Duration>(
+      Duration.zero,
+      (max, v) => v.debounce > max ? v.debounce : max,
+    );
+
+    if (debounce > Duration.zero) {
+      final completer = Completer<void>();
+      _debounceTimer = Timer(debounce, () async {
+        await _runAsyncValidators(asyncValidators, controller);
+        completer.complete();
+      });
+      return completer.future;
+    }
+
+    return _runAsyncValidators(asyncValidators, controller);
+  }
+
+  Future<void> _runAsyncValidators(
+    Iterable<OiAsyncFormValidator<T>> validators,
+    dynamic controller,
+  ) async {
+    final generation = ++_asyncValidationGeneration;
+    _isValidating = true;
+    notifyListeners();
+
+    final asyncErrors = <String>[];
+    for (final validator in validators) {
+      if (_asyncValidationGeneration != generation) return; // cancelled
+      try {
+        final error = await validator.validate(_value, controller);
+        if (_asyncValidationGeneration != generation) return; // cancelled
+        if (error != null) asyncErrors.add(error);
+      } catch (e) {
+        if (_asyncValidationGeneration != generation) return;
+        asyncErrors.add('Validation error');
+      }
+    }
+
+    if (_asyncValidationGeneration == generation) {
+      _errors = [..._errors, ...asyncErrors];
+      _isValidating = false;
+      notifyListeners();
+    }
+  }
+
+  /// Cancel any pending async validation.
+  void cancelAsyncValidation() {
+    _debounceTimer?.cancel();
+    _asyncValidationGeneration++;
+    if (_isValidating) {
+      _isValidating = false;
+      notifyListeners();
+    }
+  }
+
   /// Reset the field to its initial value and clear errors.
   void reset() {
+    _debounceTimer?.cancel();
+    _asyncValidationGeneration++;
     _value = _initialValue;
     _errors = [];
     _isValidating = false;
     notifyListeners();
+  }
+
+  /// Clean up resources.
+  @override
+  void dispose() {
+    _debounceTimer?.cancel();
+    super.dispose();
   }
 }
