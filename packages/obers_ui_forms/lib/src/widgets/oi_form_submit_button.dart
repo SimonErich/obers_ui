@@ -35,14 +35,17 @@ class OiFormSubmitButton<E extends Enum> extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = OiFormScope.maybeOf<E>(context);
 
-    final isEnabled =
-        controller != null && controller.isValid && !controller.isValidating;
+    if (controller == null) {
+      return OiButton.primary(label: label, icon: icon, enabled: false);
+    }
+
+    final isEnabled = controller.isValid && !controller.isValidating;
 
     return OiButton.primary(
       label: label,
       icon: icon,
       enabled: isEnabled,
-      onTap: isEnabled ? () => controller!.submit(onSubmit) : null,
+      onTap: isEnabled ? () => controller.submit(onSubmit) : null,
     );
   }
 }
