@@ -5,6 +5,7 @@ library;
 //  Controllers
 // ──────────────────────────────────────────────────
 
+export 'src/controllers/oi_form_controller.dart';
 export 'src/controllers/oi_form_input_controller.dart';
 
 // ──────────────────────────────────────────────────
