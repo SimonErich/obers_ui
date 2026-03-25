@@ -1,3 +1,5 @@
+import 'dart:ui' show Size;
+
 import 'package:flutter/foundation.dart';
 
 import 'package:obers_ui_charts/src/foundation/oi_chart_controller.dart';
@@ -43,4 +45,38 @@ abstract class OiChartSyncCoordinator extends ChangeNotifier {
 
   /// Removes a previously registered crosshair listener.
   void removeCrosshairListener(ValueChanged<double?> listener);
+
+  // ── Spec-aligned broadcast methods ──────────────────────────────────
+
+  /// Broadcasts a hover position to all peers in [syncGroup].
+  ///
+  /// Delegates to [syncCrosshair] with the normalized position.
+  void broadcastHover(
+    String syncGroup,
+    Object? xDomainValue,
+    String sourceChartId,
+  ) {
+    // The xDomainValue is passed as normalized — concrete coordinators
+    // can implement richer domain-aware sync.
+    if (xDomainValue is double?) {
+      syncCrosshair(xDomainValue);
+    }
+  }
+
+  /// Broadcasts a viewport change to all peers in [syncGroup].
+  ///
+  /// Delegates to [syncViewport] with the viewport snapshot.
+  void broadcastViewport(
+    String syncGroup,
+    OiChartViewportState viewportState,
+    String sourceChartId,
+  ) {
+    syncViewport(
+      OiChartViewport(
+        size: const Size(0, 0),
+        zoomLevel: viewportState.zoomLevel,
+        panOffset: viewportState.panOffset,
+      ),
+    );
+  }
 }
