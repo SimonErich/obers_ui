@@ -108,4 +108,11 @@ export 'package:obers_ui/src/foundation/theme/component_themes/oi_chart_palette.
 export 'package:obers_ui/src/foundation/theme/component_themes/oi_chart_theme_data.dart';
 // ── Models ───────────────────────────────────────────────────────────────────
 
+export 'src/models/oi_cartesian_series.dart';
+export 'src/models/oi_chart_datum.dart';
+export 'src/models/oi_chart_series.dart';
 export 'src/models/oi_chart_settings.dart';
+export 'src/models/oi_flow_series.dart';
+export 'src/models/oi_hierarchical_series.dart';
+export 'src/models/oi_matrix_series.dart';
+export 'src/models/oi_polar_series.dart';
