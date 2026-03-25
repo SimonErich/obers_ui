@@ -58,8 +58,8 @@ class OiChartPerformanceConfig {
   const OiChartPerformanceConfig({
     this.renderMode = OiChartRenderMode.auto,
     this.decimationStrategy = OiChartDecimationStrategy.adaptive,
-    this.progressiveChunkSize = 500,
-    this.maxInteractivePoints = 5000,
+    this.progressiveChunkSize = 5000,
+    this.maxInteractivePoints = 10000,
     this.cacheTextLayout = true,
     this.cachePaths = true,
     this.simplifyOffscreenGeometry = true,

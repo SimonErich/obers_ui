@@ -103,6 +103,18 @@ class OiQuantileScale extends OiChartScale<double> {
     return _sortedValues[lo] * (1 - frac) + _sortedValues[hi] * frac;
   }
 
+  @override
+  OiQuantileScale withDomain(double min, double max) {
+    final filtered = _sortedValues.where((v) => v >= min && v <= max).toList();
+    return OiQuantileScale(
+      values: filtered,
+      rangeMin: rangeMin,
+      rangeMax: rangeMax,
+      clamp: clamp,
+      quantileCount: quantileCount,
+    );
+  }
+
   /// Creates a copy with optionally overridden values.
   OiQuantileScale copyWith({
     List<double>? values,

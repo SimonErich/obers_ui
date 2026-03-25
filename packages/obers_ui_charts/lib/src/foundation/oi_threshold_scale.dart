@@ -73,6 +73,17 @@ class OiThresholdScale extends OiChartScale<double> {
     return thresholds.length;
   }
 
+  @override
+  OiThresholdScale withDomain(double min, double max) {
+    final filtered = thresholds.where((t) => t >= min && t <= max).toList();
+    return OiThresholdScale(
+      thresholds: filtered,
+      rangeMin: rangeMin,
+      rangeMax: rangeMax,
+      clamp: clamp,
+    );
+  }
+
   /// Creates a copy with optionally overridden values.
   OiThresholdScale copyWith({
     List<double>? thresholds,

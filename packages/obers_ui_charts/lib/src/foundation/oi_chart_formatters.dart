@@ -179,7 +179,7 @@ class OiTooltipFormatContext extends OiFormatterContext<double> {
 ///
 /// {@category Foundation}
 typedef OiAxisFormatter<T> =
-    String Function(T value, OiFormatterContext<T> context);
+    String Function(T value, OiAxisFormatContext<T> context);
 
 /// Formats a tooltip value into a display string.
 ///
@@ -198,7 +198,7 @@ typedef OiAxisFormatter<T> =
 ///
 /// {@category Foundation}
 typedef OiTooltipValueFormatter =
-    String Function(double value, OiFormatterContext<double> context);
+    String Function(double value, OiTooltipFormatContext context);
 
 /// Formats a series label for legend or tooltip display.
 ///

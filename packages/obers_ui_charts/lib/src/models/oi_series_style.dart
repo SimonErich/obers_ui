@@ -1,6 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/painting.dart';
 
+import 'package:obers_ui_charts/src/foundation/oi_chart_marker.dart';
+
 // ─────────────────────────────────────────────────────────────────────────────
 // OiSeriesFill
 // ─────────────────────────────────────────────────────────────────────────────
@@ -152,6 +154,7 @@ class OiSeriesStyle {
     this.strokeJoin,
     this.dashPattern,
     this.fill,
+    this.marker,
     this.dataLabelStyle,
     this.hoverStyle,
     this.selectedStyle,
@@ -176,6 +179,9 @@ class OiSeriesStyle {
   /// Fill style for area regions.
   final OiSeriesFill? fill;
 
+  /// Marker style for data point markers.
+  final OiChartMarkerStyle? marker;
+
   /// Data label style configuration.
   final OiDataLabelStyle? dataLabelStyle;
 
@@ -198,6 +204,7 @@ class OiSeriesStyle {
       strokeJoin: override.strokeJoin ?? strokeJoin,
       dashPattern: override.dashPattern ?? dashPattern,
       fill: override.fill ?? fill,
+      marker: override.marker ?? marker,
       dataLabelStyle: override.dataLabelStyle ?? dataLabelStyle,
       hoverStyle: override.hoverStyle ?? hoverStyle,
       selectedStyle: override.selectedStyle ?? selectedStyle,
@@ -213,6 +220,7 @@ class OiSeriesStyle {
     StrokeJoin? strokeJoin,
     List<double>? dashPattern,
     OiSeriesFill? fill,
+    OiChartMarkerStyle? marker,
     OiDataLabelStyle? dataLabelStyle,
     OiSeriesStyle? hoverStyle,
     OiSeriesStyle? selectedStyle,
@@ -225,6 +233,7 @@ class OiSeriesStyle {
       strokeJoin: strokeJoin ?? this.strokeJoin,
       dashPattern: dashPattern ?? this.dashPattern,
       fill: fill ?? this.fill,
+      marker: marker ?? this.marker,
       dataLabelStyle: dataLabelStyle ?? this.dataLabelStyle,
       hoverStyle: hoverStyle ?? this.hoverStyle,
       selectedStyle: selectedStyle ?? this.selectedStyle,
@@ -242,6 +251,7 @@ class OiSeriesStyle {
         other.strokeJoin == strokeJoin &&
         listEquals(other.dashPattern, dashPattern) &&
         other.fill == fill &&
+        other.marker == marker &&
         other.dataLabelStyle == dataLabelStyle &&
         other.hoverStyle == hoverStyle &&
         other.selectedStyle == selectedStyle &&
@@ -256,6 +266,7 @@ class OiSeriesStyle {
     strokeJoin,
     dashPattern == null ? null : Object.hashAll(dashPattern!),
     fill,
+    marker,
     dataLabelStyle,
     hoverStyle,
     selectedStyle,

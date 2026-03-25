@@ -140,6 +140,18 @@ class OiLogarithmicScale extends OiChartScale<double> {
     return ticks;
   }
 
+  @override
+  OiLogarithmicScale withDomain(double min, double max) {
+    return OiLogarithmicScale(
+      domainMin: min,
+      domainMax: max,
+      rangeMin: rangeMin,
+      rangeMax: rangeMax,
+      clamp: clamp,
+      base: base,
+    );
+  }
+
   /// Creates a copy with optionally overridden values.
   OiLogarithmicScale copyWith({
     double? domainMin,

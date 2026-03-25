@@ -71,6 +71,24 @@ class OiPointScale extends OiChartScale<String> {
     ];
   }
 
+  @override
+  OiPointScale withDomain(String min, String max) {
+    final startIdx = domain.indexOf(min);
+    final endIdx = domain.indexOf(max);
+    if (startIdx == -1 || endIdx == -1) return this;
+    final sub = domain.sublist(
+      startIdx < endIdx ? startIdx : endIdx,
+      (startIdx < endIdx ? endIdx : startIdx) + 1,
+    );
+    return OiPointScale(
+      domain: sub,
+      rangeMin: rangeMin,
+      rangeMax: rangeMax,
+      clamp: clamp,
+      padding: padding,
+    );
+  }
+
   /// Creates a copy with optionally overridden values.
   OiPointScale copyWith({
     List<String>? domain,

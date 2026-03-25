@@ -105,6 +105,17 @@ class OiTimeScale extends OiChartScale<DateTime> {
     return ticks;
   }
 
+  @override
+  OiTimeScale withDomain(DateTime min, DateTime max) {
+    return OiTimeScale(
+      domainMin: min,
+      domainMax: max,
+      rangeMin: rangeMin,
+      rangeMax: rangeMax,
+      clamp: clamp,
+    );
+  }
+
   /// Creates a copy with optionally overridden values.
   OiTimeScale copyWith({
     DateTime? domainMin,

@@ -112,6 +112,36 @@ abstract class OiChartScale<T> {
   /// For discrete scales, [count] is ignored and all values are returned.
   List<OiTick<T>> buildTicks({int count = 5});
 
+  /// Generates tick marks constrained by [maxCount] and [axisLength].
+  ///
+  /// When [minSpacingPx] is provided, ticks are thinned so adjacent
+  /// ticks are at least that many pixels apart.
+  ///
+  /// Delegates to [buildTicks] by default; concrete scales can override
+  /// for smarter tick generation (e.g. nice values, endpoint inclusion).
+  List<OiTick<T>> buildTicksConstrained({
+    int? maxCount,
+    double? minSpacingPx,
+    double? axisLength,
+  }) {
+    var ticks = buildTicks(count: maxCount ?? 5);
+    if (minSpacingPx != null && minSpacingPx > 0 && ticks.length > 1) {
+      final filtered = <OiTick<T>>[ticks.first];
+      for (var i = 1; i < ticks.length; i++) {
+        if ((ticks[i].position - filtered.last.position).abs() >=
+            minSpacingPx) {
+          filtered.add(ticks[i]);
+        }
+      }
+      ticks = filtered;
+    }
+    return ticks;
+  }
+
+  /// Returns a copy of this scale with the domain constrained to
+  /// [min] and [max].
+  OiChartScale<T> withDomain(T min, T max);
+
   /// Clamps a pixel [value] to [rangeMin]–[rangeMax] when [clamp] is true.
   @protected
   double clampPixel(double value) {

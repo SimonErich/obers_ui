@@ -56,6 +56,23 @@ class OiCategoryScale extends OiChartScale<String> {
     ];
   }
 
+  @override
+  OiCategoryScale withDomain(String min, String max) {
+    final startIdx = domain.indexOf(min);
+    final endIdx = domain.indexOf(max);
+    if (startIdx == -1 || endIdx == -1) return this;
+    final sub = domain.sublist(
+      startIdx < endIdx ? startIdx : endIdx,
+      (startIdx < endIdx ? endIdx : startIdx) + 1,
+    );
+    return OiCategoryScale(
+      domain: sub,
+      rangeMin: rangeMin,
+      rangeMax: rangeMax,
+      clamp: clamp,
+    );
+  }
+
   /// Creates a copy with optionally overridden values.
   OiCategoryScale copyWith({
     List<String>? domain,

@@ -87,6 +87,25 @@ class OiBandScale extends OiChartScale<String> {
     ];
   }
 
+  @override
+  OiBandScale withDomain(String min, String max) {
+    final startIdx = domain.indexOf(min);
+    final endIdx = domain.indexOf(max);
+    if (startIdx == -1 || endIdx == -1) return this;
+    final sub = domain.sublist(
+      startIdx < endIdx ? startIdx : endIdx,
+      (startIdx < endIdx ? endIdx : startIdx) + 1,
+    );
+    return OiBandScale(
+      domain: sub,
+      rangeMin: rangeMin,
+      rangeMax: rangeMax,
+      clamp: clamp,
+      paddingInner: paddingInner,
+      paddingOuter: paddingOuter,
+    );
+  }
+
   /// Creates a copy with optionally overridden values.
   OiBandScale copyWith({
     List<String>? domain,
