@@ -7,10 +7,15 @@ library;
 
 // ── Components: Display ──────────────────────────────────────────────────────
 
+export 'src/components/oi_chart_annotation_layer.dart';
+export 'src/components/oi_chart_axis_widget.dart';
+export 'src/components/oi_chart_brush_widget.dart';
+export 'src/components/oi_chart_crosshair_widget.dart';
 export 'src/components/oi_chart_empty_state.dart';
 export 'src/components/oi_chart_error_state.dart';
 export 'src/components/oi_chart_loading_state.dart';
 export 'src/components/oi_chart_surface.dart';
+export 'src/components/oi_chart_tooltip_widget.dart';
 export 'src/components/oi_chart_zoom_controls.dart';
 // ── Composites: Bar Chart ────────────────────────────────────────────────────
 
