@@ -234,6 +234,93 @@ class OiChartViewport {
       'zoom: $zoomLevel, pan: $panOffset)';
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// OiChartViewportState — mutable viewport state for zoom/pan
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// Mutable viewport state tracking the current zoom and pan position.
+///
+/// Used by the chart controller to track the user-driven viewport
+/// transformations. Unlike [OiChartViewport] (which is an immutable geometry
+/// snapshot), this class is designed to be mutated and observed.
+///
+/// {@category Foundation}
+class OiChartViewportState {
+  /// Creates an [OiChartViewportState].
+  OiChartViewportState({
+    this.xMin,
+    this.xMax,
+    this.yMin,
+    this.yMax,
+    double zoomLevel = 1.0,
+    this.panOffset = Offset.zero,
+  }) : _zoomLevel = zoomLevel;
+
+  /// The minimum visible x-domain value, or null for auto.
+  double? xMin;
+
+  /// The maximum visible x-domain value, or null for auto.
+  double? xMax;
+
+  /// The minimum visible y-domain value, or null for auto.
+  double? yMin;
+
+  /// The maximum visible y-domain value, or null for auto.
+  double? yMax;
+
+  double _zoomLevel;
+
+  /// The current pan offset in logical pixels.
+  Offset panOffset;
+
+  /// The current zoom level. 1.0 means no zoom.
+  double get zoomLevel => _zoomLevel;
+  set zoomLevel(double value) {
+    _zoomLevel = value.clamp(0.1, 100.0);
+  }
+
+  /// Whether the viewport is currently zoomed (not at default level).
+  bool get isZoomed => _zoomLevel != 1.0 || panOffset != Offset.zero;
+
+  /// Resets the viewport to its default state (no zoom, no pan, auto domain).
+  void reset() {
+    xMin = null;
+    xMax = null;
+    yMin = null;
+    yMax = null;
+    _zoomLevel = 1.0;
+    panOffset = Offset.zero;
+  }
+
+  /// Creates a copy of this viewport state.
+  OiChartViewportState copyWith({
+    double? xMin,
+    double? xMax,
+    double? yMin,
+    double? yMax,
+    double? zoomLevel,
+    Offset? panOffset,
+  }) {
+    return OiChartViewportState(
+      xMin: xMin ?? this.xMin,
+      xMax: xMax ?? this.xMax,
+      yMin: yMin ?? this.yMin,
+      yMax: yMax ?? this.yMax,
+      zoomLevel: zoomLevel ?? _zoomLevel,
+      panOffset: panOffset ?? this.panOffset,
+    );
+  }
+
+  @override
+  String toString() =>
+      'OiChartViewportState(zoom: $_zoomLevel, pan: $panOffset, '
+      'x: [$xMin, $xMax], y: [$yMin, $yMax])';
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// OiAxisInsets
+// ─────────────────────────────────────────────────────────────────────────────
+
 /// Space reserved for axis labels and tick marks inside the chart padding.
 ///
 /// {@category Foundation}

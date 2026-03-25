@@ -6,6 +6,7 @@ import 'package:obers_ui_charts/src/foundation/oi_chart_behavior.dart';
 import 'package:obers_ui_charts/src/foundation/oi_chart_controller.dart';
 import 'package:obers_ui_charts/src/foundation/oi_chart_hit_tester.dart';
 import 'package:obers_ui_charts/src/foundation/oi_chart_viewport.dart';
+import 'package:obers_ui_charts/src/models/oi_chart_state_models.dart';
 import 'package:obers_ui/obers_ui.dart' show OiChartThemeData;
 
 import 'dart:ui' show Offset, Size;
@@ -19,6 +20,9 @@ class _FakeController extends OiChartController {
   Set<OiChartDataRef> get selection => {};
 
   @override
+  OiChartSelectionState get selectionState => OiChartSelectionState.empty;
+
+  @override
   void select(Set<OiChartDataRef> refs) {}
 
   @override
@@ -28,7 +32,36 @@ class _FakeController extends OiChartController {
   OiChartDataRef? get hovered => null;
 
   @override
+  OiChartHoverState get hoverState => OiChartHoverState.empty;
+
+  @override
   void hover(OiChartDataRef? ref) {}
+
+  @override
+  OiChartViewportState get viewportState => OiChartViewportState();
+
+  @override
+  void resetZoom() {}
+
+  @override
+  void setVisibleDomain({
+    double? xMin,
+    double? xMax,
+    double? yMin,
+    double? yMax,
+  }) {}
+
+  @override
+  OiChartLegendState get legendState => OiChartLegendState.empty;
+
+  @override
+  void toggleSeries(String seriesId) {}
+
+  @override
+  void focusSeries(String seriesId) {}
+
+  @override
+  OiChartFocusState get focusState => OiChartFocusState.empty;
 
   @override
   bool get isLoading => false;

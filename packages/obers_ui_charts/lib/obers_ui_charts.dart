@@ -127,6 +127,8 @@ export 'src/models/oi_cartesian_series.dart';
 export 'src/models/oi_chart_datum.dart';
 export 'src/models/oi_chart_series.dart';
 export 'src/models/oi_chart_settings.dart';
+export 'src/models/oi_chart_state_models.dart';
+export 'src/models/oi_default_chart_controller.dart';
 export 'src/models/oi_flow_series.dart';
 export 'src/models/oi_hierarchical_series.dart';
 export 'src/models/oi_matrix_series.dart';

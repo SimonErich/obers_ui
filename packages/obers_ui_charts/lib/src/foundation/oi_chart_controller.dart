@@ -2,6 +2,9 @@ import 'dart:ui' show Offset;
 
 import 'package:flutter/foundation.dart';
 
+import 'package:obers_ui_charts/src/foundation/oi_chart_viewport.dart';
+import 'package:obers_ui_charts/src/models/oi_chart_state_models.dart';
+
 /// Identifies a single data element within a chart for selection and
 /// hit-testing purposes.
 ///
@@ -76,6 +79,11 @@ class OiChartHitResult {
 ///
 /// {@category Foundation}
 abstract class OiChartController extends ChangeNotifier {
+  // ── Selection ──────────────────────────────────────────────────────────
+
+  /// The current selection state.
+  OiChartSelectionState get selectionState;
+
   /// The currently selected data elements.
   Set<OiChartDataRef> get selection;
 
@@ -85,11 +93,52 @@ abstract class OiChartController extends ChangeNotifier {
   /// Clears the current selection and notifies listeners.
   void clearSelection();
 
+  // ── Hover ────────────────────────────────────────────────────────────
+
+  /// The current hover state.
+  OiChartHoverState get hoverState;
+
   /// The currently hovered data element, or null if nothing is hovered.
   OiChartDataRef? get hovered;
 
   /// Updates the hovered element and notifies listeners.
   void hover(OiChartDataRef? ref);
+
+  // ── Viewport ─────────────────────────────────────────────────────────
+
+  /// The mutable viewport state tracking zoom and pan.
+  OiChartViewportState get viewportState;
+
+  /// Resets the viewport zoom and pan to defaults.
+  void resetZoom();
+
+  /// Sets the visible domain window.
+  void setVisibleDomain({
+    double? xMin,
+    double? xMax,
+    double? yMin,
+    double? yMax,
+  });
+
+  // ── Legend ────────────────────────────────────────────────────────────
+
+  /// The current legend state.
+  OiChartLegendState get legendState;
+
+  /// Toggles the visibility of the series with the given [seriesId].
+  void toggleSeries(String seriesId);
+
+  /// Sets exclusive focus on the series with the given [seriesId].
+  ///
+  /// If the series is already focused, clears the focus.
+  void focusSeries(String seriesId);
+
+  // ── Focus ────────────────────────────────────────────────────────────
+
+  /// The current keyboard focus state.
+  OiChartFocusState get focusState;
+
+  // ── Data lifecycle ───────────────────────────────────────────────────
 
   /// Whether the chart data is currently being loaded.
   bool get isLoading;
