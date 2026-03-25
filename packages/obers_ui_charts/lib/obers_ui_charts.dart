@@ -7,7 +7,11 @@ library;
 
 // ── Components: Display ──────────────────────────────────────────────────────
 
+export 'src/components/oi_chart_empty_state.dart';
+export 'src/components/oi_chart_error_state.dart';
+export 'src/components/oi_chart_loading_state.dart';
 export 'src/components/oi_chart_surface.dart';
+export 'src/components/oi_chart_zoom_controls.dart';
 // ── Composites: Bar Chart ────────────────────────────────────────────────────
 
 export 'src/composites/oi_bar_chart/oi_bar_chart.dart';
@@ -49,6 +53,10 @@ export 'src/composites/oi_sparkline.dart';
 export 'src/composites/oi_treemap.dart';
 // ── Foundation: Behaviors ────────────────────────────────────────────────────
 
+export 'src/behaviors/oi_hover_sync_behavior.dart';
+export 'src/behaviors/oi_keyboard_explore_behavior.dart';
+export 'src/behaviors/oi_selection_behavior.dart';
+export 'src/behaviors/oi_series_toggle_behavior.dart';
 export 'src/foundation/oi_chart_behavior.dart';
 export 'src/foundation/oi_chart_brush.dart';
 export 'src/foundation/oi_chart_crosshair.dart';
