@@ -15,6 +15,7 @@ import 'package:obers_ui_charts/src/models/oi_chart_annotation.dart';
 // Imported for future annotation/threshold support on polar charts.
 // ignore: unused_import
 import 'package:obers_ui_charts/src/models/oi_chart_threshold.dart';
+import 'package:obers_ui_charts/src/models/oi_polar_axis.dart';
 import 'package:obers_ui_charts/src/models/oi_polar_series.dart';
 
 /// Base composite widget for radial/polar chart types (pie, donut, radar).
@@ -29,6 +30,8 @@ class OiPolarChart<T> extends StatefulWidget {
     super.key,
     required this.label,
     required this.series,
+    this.angleAxis,
+    this.radiusAxis,
     this.seriesBuilder,
     this.centerContent,
     this.behaviors = const [],
@@ -45,6 +48,12 @@ class OiPolarChart<T> extends StatefulWidget {
 
   /// The data series to render.
   final List<OiPolarSeries<T>> series;
+
+  /// Angle axis configuration.
+  final OiPolarAngleAxis? angleAxis;
+
+  /// Radius axis configuration.
+  final OiPolarRadiusAxis? radiusAxis;
 
   /// Builder that renders polar series data.
   final Widget Function(

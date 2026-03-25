@@ -16,6 +16,7 @@ import 'package:obers_ui_charts/src/models/oi_chart_annotation.dart';
 // Imported for future annotation/threshold support on matrix charts.
 // ignore: unused_import
 import 'package:obers_ui_charts/src/models/oi_chart_threshold.dart';
+import 'package:obers_ui_charts/src/models/oi_color_scale.dart';
 import 'package:obers_ui_charts/src/models/oi_matrix_series.dart';
 
 /// Base composite widget for cell-grid chart types (heatmap, correlation).
@@ -32,6 +33,7 @@ class OiMatrixChart<T> extends StatefulWidget {
     required this.series,
     this.xAxis,
     this.yAxis,
+    this.colorScale,
     this.seriesBuilder,
     this.behaviors = const [],
     this.controller,
@@ -53,6 +55,9 @@ class OiMatrixChart<T> extends StatefulWidget {
 
   /// Y-axis configuration.
   final OiChartAxis<dynamic>? yAxis;
+
+  /// Color scale for mapping cell values to colors.
+  final OiColorScale? colorScale;
 
   /// Builder that renders matrix series data.
   final Widget Function(
