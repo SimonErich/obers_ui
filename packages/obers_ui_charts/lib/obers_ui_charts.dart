@@ -82,6 +82,8 @@ export 'src/foundation/oi_chart_performance_config.dart';
 
 export 'src/foundation/oi_decimation.dart';
 export 'src/foundation/oi_ring_buffer.dart';
+export 'src/foundation/oi_streaming_data_source.dart';
+export 'src/foundation/oi_streaming_series_adapter.dart';
 // ── Foundation: Persistence ──────────────────────────────────────────────────
 
 export 'src/foundation/oi_chart_settings_driver_binding.dart';
