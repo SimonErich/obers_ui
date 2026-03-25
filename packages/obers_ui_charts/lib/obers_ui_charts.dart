@@ -124,11 +124,13 @@ export 'package:obers_ui/src/foundation/theme/component_themes/oi_chart_palette.
 export 'package:obers_ui/src/foundation/theme/component_themes/oi_chart_theme_data.dart';
 // ── Models ───────────────────────────────────────────────────────────────────
 
+export 'src/models/oi_axis_range.dart';
 export 'src/models/oi_cartesian_series.dart';
 export 'src/models/oi_chart_annotation.dart';
 export 'src/models/oi_chart_datum.dart';
 export 'src/models/oi_chart_series.dart';
 export 'src/models/oi_chart_settings.dart';
+export 'src/models/oi_chart_legend_config.dart';
 export 'src/models/oi_chart_state_models.dart';
 export 'src/models/oi_chart_threshold.dart';
 export 'src/models/oi_default_chart_controller.dart';

@@ -53,6 +53,119 @@ class OiFormatterContext<T> {
   int get hashCode => Object.hash(theme, locale, scale);
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// OiAxisFormatContext — axis-specific formatter context
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// Extended formatter context for axis tick formatting.
+///
+/// Adds axis-specific information: tick position flags and available
+/// rendering width.
+///
+/// {@category Foundation}
+@immutable
+class OiAxisFormatContext<T> extends OiFormatterContext<T> {
+  /// Creates an [OiAxisFormatContext].
+  const OiAxisFormatContext({
+    required super.theme,
+    required super.locale,
+    super.scale,
+    this.axisPosition,
+    this.isFirstTick = false,
+    this.isLastTick = false,
+    this.availableWidth,
+  });
+
+  /// The position of the axis (top/bottom/left/right), if known.
+  final String? axisPosition;
+
+  /// Whether this is the first tick on the axis.
+  final bool isFirstTick;
+
+  /// Whether this is the last tick on the axis.
+  final bool isLastTick;
+
+  /// Available rendering width in logical pixels for this label.
+  ///
+  /// Formatters can use this to truncate long labels.
+  final double? availableWidth;
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is OiAxisFormatContext<T> &&
+        other.theme == theme &&
+        other.locale == locale &&
+        other.scale == scale &&
+        other.axisPosition == axisPosition &&
+        other.isFirstTick == isFirstTick &&
+        other.isLastTick == isLastTick &&
+        other.availableWidth == availableWidth;
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    theme,
+    locale,
+    scale,
+    axisPosition,
+    isFirstTick,
+    isLastTick,
+    availableWidth,
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// OiTooltipFormatContext — tooltip-specific formatter context
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// Extended formatter context for tooltip value formatting.
+///
+/// Adds series identification and point index information.
+///
+/// {@category Foundation}
+@immutable
+class OiTooltipFormatContext extends OiFormatterContext<double> {
+  /// Creates an [OiTooltipFormatContext].
+  const OiTooltipFormatContext({
+    required super.theme,
+    required super.locale,
+    super.scale,
+    this.seriesId,
+    this.seriesLabel,
+    this.pointIndex,
+  });
+
+  /// The id of the series this value belongs to.
+  final String? seriesId;
+
+  /// The display label of the series.
+  final String? seriesLabel;
+
+  /// The index of the data point within its series.
+  final int? pointIndex;
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is OiTooltipFormatContext &&
+        other.theme == theme &&
+        other.locale == locale &&
+        other.scale == scale &&
+        other.seriesId == seriesId &&
+        other.seriesLabel == seriesLabel &&
+        other.pointIndex == pointIndex;
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(theme, locale, scale, seriesId, seriesLabel, pointIndex);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Formatter typedefs
+// ─────────────────────────────────────────────────────────────────────────────
+
 /// Formats an axis tick value of type [T] into a display string.
 ///
 /// Receives the raw tick [value] and an [OiFormatterContext] providing

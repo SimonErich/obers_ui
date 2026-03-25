@@ -1,12 +1,61 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 
 import 'package:obers_ui_charts/src/foundation/oi_chart_controller.dart';
 
+// ─────────────────────────────────────────────────────────────────────────────
+// OiDetectedChartInsight
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// An automatically detected insight about the chart data.
+///
+/// Used in accessibility summaries to communicate notable patterns
+/// such as trends, extrema, or anomalies.
+///
+/// {@category Foundation}
+@immutable
+class OiDetectedChartInsight {
+  /// Creates an [OiDetectedChartInsight].
+  const OiDetectedChartInsight({
+    required this.type,
+    required this.description,
+    this.seriesId,
+  });
+
+  /// The type of insight (e.g. 'trend', 'max', 'min', 'anomaly').
+  final String type;
+
+  /// Human-readable description of the insight.
+  final String description;
+
+  /// The series this insight applies to, if specific to one series.
+  final String? seriesId;
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is OiDetectedChartInsight &&
+        other.type == type &&
+        other.description == description &&
+        other.seriesId == seriesId;
+  }
+
+  @override
+  int get hashCode => Object.hash(type, description, seriesId);
+
+  @override
+  String toString() =>
+      'OiDetectedChartInsight(type: $type, description: $description)';
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// OiChartAccessibilityBridge
+// ─────────────────────────────────────────────────────────────────────────────
+
 /// Abstract bridge between chart internals and the accessibility system.
 ///
-/// [OiChartAccessibilityBridge] provides methods for chart behaviors to
-/// announce state changes, describe data elements, and manage focus for
-/// assistive technologies.
+/// Provides methods for chart behaviors to announce state changes, describe
+/// data elements, and manage focus for assistive technologies.
 ///
 /// {@category Foundation}
 abstract class OiChartAccessibilityBridge {
@@ -15,6 +64,34 @@ abstract class OiChartAccessibilityBridge {
   /// When [assertive] is true, the announcement interrupts the current
   /// speech (use for important state changes like selection).
   void announce(String message, {bool assertive = false});
+
+  /// Announces a specific data point to screen readers.
+  ///
+  /// Delegates to [announce] with a formatted message.
+  void announcePoint({
+    required String seriesLabel,
+    required String xFormatted,
+    required String yFormatted,
+  }) {
+    announce('$seriesLabel: $xFormatted, $yFormatted');
+  }
+
+  /// Announces a chart summary to screen readers.
+  ///
+  /// Delegates to [announce] with the summary text.
+  void announceSummary(String summary) {
+    announce(summary);
+  }
+
+  /// Announces a keyboard navigation action to screen readers.
+  ///
+  /// Delegates to [announce] with a navigation description.
+  void announceNavigation({
+    required String direction,
+    required String targetDescription,
+  }) {
+    announce('$direction: $targetDescription');
+  }
 
   /// Returns a human-readable description for the given data [ref].
   ///

@@ -100,18 +100,91 @@ enum OiAxisPosition {
 
 /// Strategy for generating axis tick marks.
 ///
+/// Provides both named presets (matching the former enum) and
+/// custom configuration with `maxCount`, `minSpacingPx`, etc.
+///
 /// {@category Composites}
-enum OiTickStrategy {
-  /// Auto-compute tick marks based on the scale and available space.
-  auto,
+@immutable
+class OiTickStrategy {
+  /// Creates a custom [OiTickStrategy].
+  const OiTickStrategy({
+    this.maxCount,
+    this.minSpacingPx,
+    this.includeEndpoints = true,
+    this.niceValues = true,
+    this.mode = OiTickStrategyMode.auto,
+  });
 
-  /// Use evenly-spaced ticks with count determined by `divisions`.
-  even,
+  /// Auto-compute tick marks based on the scale and available space.
+  static const auto = OiTickStrategy();
+
+  /// Use evenly-spaced ticks with count determined by axis `divisions`.
+  static const even = OiTickStrategy(mode: OiTickStrategyMode.even);
 
   /// Show a tick at every data point.
-  all,
+  static const all = OiTickStrategy(
+    mode: OiTickStrategyMode.all,
+    niceValues: false,
+  );
 
   /// Show only the first and last tick (min/max).
+  static const minMax = OiTickStrategy(
+    mode: OiTickStrategyMode.minMax,
+    maxCount: 2,
+  );
+
+  /// Maximum number of ticks to generate.
+  ///
+  /// When null, the strategy determines an appropriate count.
+  final int? maxCount;
+
+  /// Minimum pixel spacing between ticks.
+  ///
+  /// When null, a default spacing is used.
+  final double? minSpacingPx;
+
+  /// Whether to include the domain endpoints as ticks.
+  final bool includeEndpoints;
+
+  /// Whether to round tick values to "nice" numbers (e.g. 10, 50, 100).
+  final bool niceValues;
+
+  /// The generation mode.
+  final OiTickStrategyMode mode;
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is OiTickStrategy &&
+        other.maxCount == maxCount &&
+        other.minSpacingPx == minSpacingPx &&
+        other.includeEndpoints == includeEndpoints &&
+        other.niceValues == niceValues &&
+        other.mode == mode;
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(maxCount, minSpacingPx, includeEndpoints, niceValues, mode);
+
+  @override
+  String toString() => 'OiTickStrategy(mode: $mode, max: $maxCount)';
+}
+
+/// The tick generation mode.
+///
+/// {@category Composites}
+enum OiTickStrategyMode {
+  /// Auto-compute ticks.
+  auto,
+
+  /// Evenly-spaced ticks.
+  even,
+
+  /// A tick at every data point.
+  all,
+
+  /// Only min and max ticks.
   minMax,
 }
 
