@@ -82,6 +82,8 @@ class OiChartMarkerStyle {
     this.fillColor,
     this.strokeColor,
     this.strokeWidth = 1.5,
+    this.visible = true,
+    this.dashPattern,
     this.customPathBuilder,
   });
 
@@ -100,6 +102,14 @@ class OiChartMarkerStyle {
   /// The stroke width in logical pixels.
   final double strokeWidth;
 
+  /// Whether the marker is visible.
+  ///
+  /// When false, the marker is not painted but its hit area may still exist.
+  final bool visible;
+
+  /// Dash pattern for the marker stroke. Null means solid stroke.
+  final List<double>? dashPattern;
+
   /// A builder for [OiChartMarkerShape.custom] shapes.
   ///
   /// Ignored for all other shapes.
@@ -112,6 +122,8 @@ class OiChartMarkerStyle {
     Color? fillColor,
     Color? strokeColor,
     double? strokeWidth,
+    bool? visible,
+    List<double>? dashPattern,
     OiChartMarkerPathBuilder? customPathBuilder,
   }) {
     return OiChartMarkerStyle(
@@ -120,6 +132,8 @@ class OiChartMarkerStyle {
       fillColor: fillColor ?? this.fillColor,
       strokeColor: strokeColor ?? this.strokeColor,
       strokeWidth: strokeWidth ?? this.strokeWidth,
+      visible: visible ?? this.visible,
+      dashPattern: dashPattern ?? this.dashPattern,
       customPathBuilder: customPathBuilder ?? this.customPathBuilder,
     );
   }
@@ -133,6 +147,8 @@ class OiChartMarkerStyle {
         other.fillColor == fillColor &&
         other.strokeColor == strokeColor &&
         other.strokeWidth == strokeWidth &&
+        other.visible == visible &&
+        listEquals(other.dashPattern, dashPattern) &&
         other.customPathBuilder == customPathBuilder;
   }
 
@@ -143,6 +159,8 @@ class OiChartMarkerStyle {
     fillColor,
     strokeColor,
     strokeWidth,
+    visible,
+    dashPattern == null ? null : Object.hashAll(dashPattern!),
     customPathBuilder,
   );
 }

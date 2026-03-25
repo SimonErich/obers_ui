@@ -1,6 +1,9 @@
 import 'package:flutter/widgets.dart';
 
+import 'package:obers_ui_charts/src/foundation/oi_chart_animation_config.dart';
 import 'package:obers_ui_charts/src/foundation/oi_streaming_data_source.dart';
+import 'package:obers_ui_charts/src/models/oi_series_legend_config.dart';
+import 'package:obers_ui_charts/src/models/oi_series_style.dart';
 
 /// Abstract base class for all chart series types.
 ///
@@ -20,6 +23,9 @@ abstract class OiChartSeries<T> {
     this.streamingSource,
     this.visible = true,
     this.color,
+    this.style,
+    this.animation,
+    this.legend,
     this.semanticLabel,
   }) {
     if (data != null && streamingSource != null) {
@@ -51,6 +57,17 @@ abstract class OiChartSeries<T> {
 
   /// Optional series color override.
   final Color? color;
+
+  /// Series-level style configuration.
+  ///
+  /// Overrides theme-derived styles for this series.
+  final OiSeriesStyle? style;
+
+  /// Per-series animation overrides.
+  final OiSeriesAnimationConfig? animation;
+
+  /// Per-series legend configuration.
+  final OiSeriesLegendConfig? legend;
 
   /// Accessibility label for screen readers.
   final String? semanticLabel;
