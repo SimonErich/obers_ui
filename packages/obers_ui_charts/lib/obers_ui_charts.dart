@@ -78,6 +78,10 @@ export 'src/foundation/oi_chart_accessibility_config.dart';
 export 'src/foundation/oi_chart_animation_config.dart';
 export 'src/foundation/oi_chart_formatters.dart';
 export 'src/foundation/oi_chart_performance_config.dart';
+// ── Foundation: Data Utilities ────────────────────────────────────────────────
+
+export 'src/foundation/oi_decimation.dart';
+export 'src/foundation/oi_ring_buffer.dart';
 // ── Foundation: Persistence ──────────────────────────────────────────────────
 
 export 'src/foundation/oi_chart_settings_driver_binding.dart';
