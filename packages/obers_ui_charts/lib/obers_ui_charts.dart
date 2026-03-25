@@ -40,6 +40,13 @@ export 'src/composites/oi_line_chart/oi_line_chart_theme.dart';
 export 'src/composites/oi_chart_axis.dart';
 export 'src/composites/oi_chart_legend.dart';
 export 'src/composites/oi_chart_series_toggle.dart';
+// ── Composites: Family Base ──────────────────────────────────────────────────
+
+export 'src/composites/oi_cartesian_chart.dart';
+export 'src/composites/oi_flow_chart.dart';
+export 'src/composites/oi_hierarchical_chart.dart';
+export 'src/composites/oi_matrix_chart.dart';
+export 'src/composites/oi_polar_chart.dart';
 // ── Composites: Simple Charts ────────────────────────────────────────────────
 
 export 'src/composites/oi_funnel_chart.dart';
