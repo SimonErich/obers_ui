@@ -320,7 +320,7 @@ class OiBadge extends StatelessWidget {
 
     final textStyle = TextStyle(
       fontSize: dims.fontSize,
-      fontWeight: FontWeight.w500,
+      fontWeight: FontWeight.w700,
       color: resolved.textColor,
       height: 1,
     );

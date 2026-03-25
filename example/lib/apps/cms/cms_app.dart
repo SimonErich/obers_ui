@@ -80,7 +80,18 @@ class _CmsAppState extends State<CmsApp> {
       onNavigate: (route) => setState(() => _currentRoute = route),
       leading: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 4),
-        child: OiLabel.h4('Alpenglueck CMS', color: colors.primary.base),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            OiTappable(
+              semanticLabel: 'Go back to showcase',
+              onTap: () => Navigator.of(context).pop(),
+              child: Icon(OiIcons.chevronLeft, size: 20, color: colors.text),
+            ),
+            const SizedBox(width: 8),
+            OiLabel.h4('Alpenglueck CMS', color: colors.primary.base),
+          ],
+        ),
       ),
       navigation: const [
         OiNavItem(
@@ -109,11 +120,6 @@ class _CmsAppState extends State<CmsApp> {
         ),
       ],
       actions: [
-        OiTappable(
-          semanticLabel: 'Go back to showcase',
-          onTap: () => Navigator.of(context).pop(),
-          child: Icon(OiIcons.chevronLeft, size: 20, color: colors.text),
-        ),
         OiThemeToggle(
           currentMode: widget.themeState.value,
           onModeChange: (_) => widget.themeState.toggle(),

@@ -195,6 +195,7 @@ class OiListView<T> extends StatefulWidget {
 class _OiListViewState<T> extends State<OiListView<T>>
     with OiSettingsMixin<OiListView<T>, OiListViewSettings> {
   final ScrollController _scrollController = ScrollController();
+  final TextEditingController _searchController = TextEditingController();
   bool _isRefreshing = false;
   double _overscrollAccumulated = 0;
   VoidCallback? _dismissFilterSheet;
@@ -237,6 +238,7 @@ class _OiListViewState<T> extends State<OiListView<T>>
     _resolvedDriver = widget.settingsDriver;
     super.initState();
     _scrollController.addListener(_onScroll);
+    _searchController.text = widget.searchQuery ?? '';
   }
 
   @override
@@ -249,6 +251,11 @@ class _OiListViewState<T> extends State<OiListView<T>>
         reloadSettings();
       }
     }
+    // Sync search controller when the external query changes (e.g. reset).
+    final externalQuery = widget.searchQuery ?? '';
+    if (_searchController.text != externalQuery) {
+      _searchController.text = externalQuery;
+    }
   }
 
   @override
@@ -256,6 +263,7 @@ class _OiListViewState<T> extends State<OiListView<T>>
     _scrollController
       ..removeListener(_onScroll)
       ..dispose();
+    _searchController.dispose();
     super.dispose();
   }
 
@@ -367,14 +375,17 @@ class _OiListViewState<T> extends State<OiListView<T>>
       label: widget.label,
       container: true,
       explicitChildNodes: true,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          _buildHeader(context),
-          if (hasSelectionBar && !isCompact) _buildSelectionBar(context),
-          Expanded(child: _buildBody(context)),
-          if (hasSelectionBar && isCompact) _buildSelectionBar(context),
-        ],
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            _buildHeader(context),
+            if (hasSelectionBar && !isCompact) _buildSelectionBar(context),
+            Expanded(child: _buildBody(context)),
+            if (hasSelectionBar && isCompact) _buildSelectionBar(context),
+          ],
+        ),
       ),
     );
   }
@@ -413,7 +424,7 @@ class _OiListViewState<T> extends State<OiListView<T>>
             OiTextInput(
               placeholder: 'Search...',
               onChanged: widget.onSearch,
-              controller: TextEditingController(text: widget.searchQuery),
+              controller: _searchController,
             ),
           ],
           if (hasFilters && !isCompact) ...[
@@ -453,11 +464,7 @@ class _OiListViewState<T> extends State<OiListView<T>>
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              OiIcons.alignLeft,
-              size: 16,
-              color: colors.text,
-            ),
+            Icon(OiIcons.alignLeft, size: 16, color: colors.text),
             const SizedBox(width: 4),
             Text('Filters', style: TextStyle(fontSize: 13, color: colors.text)),
             if (activeCount > 0) ...[
@@ -494,6 +501,7 @@ class _OiListViewState<T> extends State<OiListView<T>>
               padding: const EdgeInsets.only(right: 8),
               child: OiTappable(
                 onTap: () => widget.onSort?.call(option),
+                clipBorderRadius: BorderRadius.circular(6),
                 child: Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 12,
@@ -564,38 +572,69 @@ class _OiListViewState<T> extends State<OiListView<T>>
       return widget.emptyState ?? const OiEmptyState(title: 'No items');
     }
 
-    final list = ListView.builder(
-      key: const Key('oi_list_view_scroll'),
-      controller: _scrollController,
-      itemCount: widget.items.length + (widget.moreAvailable ? 1 : 0),
-      itemBuilder: (context, index) {
-        if (index >= widget.items.length) {
-          return const Padding(
-            padding: EdgeInsets.all(16),
-            child: Center(child: OiProgress.linear(indeterminate: true)),
-          );
-        }
-        final item = widget.items[index];
-        final key = widget.itemKey(item);
-        final isSelected = widget.selectedKeys.contains(key);
+    Widget buildItem(BuildContext context, int index) {
+      if (index >= widget.items.length) {
+        return const Padding(
+          padding: EdgeInsets.all(16),
+          child: Center(child: OiProgress.linear(indeterminate: true)),
+        );
+      }
+      final item = widget.items[index];
+      final key = widget.itemKey(item);
+      final isSelected = widget.selectedKeys.contains(key);
 
-        var child = widget.itemBuilder(item);
+      var child = widget.itemBuilder(item);
 
-        if (widget.selectionMode != OiSelectionMode.none) {
-          child = OiTappable(
-            onTap: () => _handleItemTap(item),
-            child: Container(
-              color: isSelected
-                  ? context.colors.primary.base.withValues(alpha: 0.08)
-                  : null,
-              child: child,
+      if (widget.selectionMode != OiSelectionMode.none) {
+        child = OiTappable(
+          onTap: () => _handleItemTap(item),
+          child: Container(
+            color: isSelected
+                ? context.colors.primary.base.withValues(alpha: 0.08)
+                : null,
+            child: child,
+          ),
+        );
+      }
+
+      return child;
+    }
+
+    final itemCount = widget.items.length + (widget.moreAvailable ? 1 : 0);
+
+    final Widget list;
+    if (widget.layout == OiListViewLayout.grid) {
+      list = GridView.builder(
+        key: const Key('oi_list_view_scroll'),
+        controller: _scrollController,
+        clipBehavior: Clip.none,
+        gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+          maxCrossAxisExtent: 400,
+          mainAxisSpacing: context.spacing.md,
+          crossAxisSpacing: context.spacing.md,
+          childAspectRatio: 1.4,
+        ),
+        itemCount: itemCount,
+        itemBuilder: buildItem,
+      );
+    } else {
+      list = ListView.builder(
+        key: const Key('oi_list_view_scroll'),
+        controller: _scrollController,
+        clipBehavior: Clip.none,
+        itemCount: itemCount,
+        itemBuilder: (context, index) {
+          final child = buildItem(context, index);
+          return Padding(
+            padding: EdgeInsets.only(
+              bottom:
+                  index < widget.items.length - 1 ? context.spacing.md : 0,
             ),
+            child: child,
           );
-        }
-
-        return child;
-      },
-    );
+        },
+      );
+    }
 
     if (widget.onRefresh == null) return list;
 

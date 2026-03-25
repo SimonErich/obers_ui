@@ -705,6 +705,19 @@ class _OiRichEditorState extends State<OiRichEditor> {
       editorBody = SingleChildScrollView(child: editorBody);
     }
 
+    final wordCount = widget.showWordCount
+        ? Padding(
+            padding: const EdgeInsets.only(top: 4),
+            child: Text(
+              '${widget.controller.wordCount} words',
+              style: TextStyle(
+                fontSize: 12,
+                color: colors?.textMuted ?? const Color(0xFF6B7280),
+              ),
+            ),
+          )
+        : null;
+
     return Semantics(
       label: widget.label,
       child: Column(
@@ -725,17 +738,7 @@ class _OiRichEditorState extends State<OiRichEditor> {
               ],
             ),
           ),
-          if (widget.showWordCount)
-            Padding(
-              padding: const EdgeInsets.only(top: 4),
-              child: Text(
-                '${widget.controller.wordCount} words',
-                style: TextStyle(
-                  fontSize: 12,
-                  color: colors?.textMuted ?? const Color(0xFF6B7280),
-                ),
-              ),
-            ),
+          if (wordCount != null) wordCount,
         ],
       ),
     );

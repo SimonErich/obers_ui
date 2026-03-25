@@ -38,7 +38,9 @@ class _CmsArticleEditScreenState extends State<CmsArticleEditScreen> {
         'excerpt': widget.article.excerpt,
       },
     );
-    _editorController = OiRichEditorController();
+    _editorController = OiRichEditorController(
+      initialContent: OiRichContent.fromPlainText(kArticleContent),
+    );
   }
 
   @override
@@ -46,6 +48,15 @@ class _CmsArticleEditScreenState extends State<CmsArticleEditScreen> {
     _controller.dispose();
     _editorController.dispose();
     super.dispose();
+  }
+
+  void _handleSave() {
+    OiToast.show(
+      context,
+      message: 'Article saved successfully',
+      level: OiToastLevel.success,
+    );
+    widget.onSaved();
   }
 
   @override
@@ -70,7 +81,16 @@ class _CmsArticleEditScreenState extends State<CmsArticleEditScreen> {
                 child: Icon(OiIcons.chevronLeft, size: 20, color: colors.text),
               ),
               SizedBox(width: spacing.sm),
-              const OiLabel.h4('Edit Article'),
+              const Expanded(child: OiLabel.h4('Edit Article')),
+              OiTappable(
+                semanticLabel: 'Save article',
+                onTap: _handleSave,
+                child: Icon(
+                  OiIcons.save,
+                  size: 20,
+                  color: colors.primary.base,
+                ),
+              ),
             ],
           ),
         ),
@@ -85,14 +105,7 @@ class _CmsArticleEditScreenState extends State<CmsArticleEditScreen> {
                 // Article metadata form
                 OiForm(
                   controller: _controller,
-                  onSubmit: (values) {
-                    OiToast.show(
-                      context,
-                      message: 'Article saved successfully',
-                      level: OiToastLevel.success,
-                    );
-                    widget.onSaved();
-                  },
+                  onSubmit: (values) => _handleSave(),
                   onCancel: widget.onCancel,
                   sections: [
                     OiFormSection(
@@ -118,14 +131,25 @@ class _CmsArticleEditScreenState extends State<CmsArticleEditScreen> {
                 // Rich text editor for article body
                 const OiLabel.h4('Article Body'),
                 SizedBox(height: spacing.sm),
-                SizedBox(
-                  height: 400,
-                  child: OiRichEditor(
-                    controller: _editorController,
-                    label: 'Article body',
-                    placeholder: 'Write your article content here...',
-                    showWordCount: true,
-                  ),
+                OiRichEditor(
+                  controller: _editorController,
+                  label: 'Article body',
+                  placeholder: 'Write your article content here...',
+                  maxHeight: 350,
+                  showWordCount: true,
+                ),
+
+                SizedBox(height: spacing.lg),
+
+                // Save button
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    OiButton.primary(
+                      label: 'Save Article',
+                      onTap: _handleSave,
+                    ),
+                  ],
                 ),
               ],
             ),

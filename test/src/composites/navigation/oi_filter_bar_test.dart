@@ -4,6 +4,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui/src/composites/navigation/oi_filter_bar.dart';
+import 'package:obers_ui/src/foundation/oi_icons.dart';
 
 import '../../../helpers/pump_app.dart';
 
@@ -79,10 +80,7 @@ void main() {
       );
 
       // Find and tap the X icon to remove the filter.
-      // The close icon is rendered as an Icon widget with the clear icon code.
-      final closeIcon = find.byIcon(
-        const IconData(0xe5cd, fontFamily: 'MaterialIcons'),
-      );
+      final closeIcon = find.byIcon(OiIcons.x);
       expect(closeIcon, findsOneWidget);
 
       await tester.tap(closeIcon);

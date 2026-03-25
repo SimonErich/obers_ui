@@ -427,6 +427,7 @@ class _OiCardState extends State<OiCard> with SingleTickerProviderStateMixin {
       return OiTappable(
         onTap: widget.onTap,
         semanticLabel: widget.label,
+        clipBorderRadius: BorderRadius.circular(8),
         child: surface,
       );
     }

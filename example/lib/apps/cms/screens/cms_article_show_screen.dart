@@ -256,7 +256,7 @@ class _CmsArticleShowScreenState extends State<CmsArticleShowScreen> {
       children: [
         // Article header
         Container(
-          padding: EdgeInsets.all(spacing.lg),
+          padding: EdgeInsets.fromLTRB(spacing.lg, spacing.lg, spacing.lg, spacing.md),
           decoration: BoxDecoration(
             border: Border(bottom: BorderSide(color: colors.borderSubtle)),
           ),
@@ -289,16 +289,12 @@ class _CmsArticleShowScreenState extends State<CmsArticleShowScreen> {
               ),
               SizedBox(height: spacing.sm),
               Row(
+                mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  OiLabel.small(
-                    widget.article.author.name,
-                    color: colors.textMuted,
-                  ),
-                  SizedBox(width: spacing.sm),
                   OiBadge.soft(
                     label: widget.article.category,
                     color: OiBadgeColor.info,
-                    size: OiBadgeSize.small,
+                    size: OiBadgeSize.large,
                   ),
                   SizedBox(width: spacing.sm),
                   OiBadge.soft(
@@ -306,7 +302,7 @@ class _CmsArticleShowScreenState extends State<CmsArticleShowScreen> {
                     color: widget.article.status == 'published'
                         ? OiBadgeColor.success
                         : OiBadgeColor.warning,
-                    size: OiBadgeSize.small,
+                    size: OiBadgeSize.large,
                   ),
                 ],
               ),
