@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/obers_ui.dart';
+import 'package:obers_ui_charts/obers_ui_charts.dart';
 
 import 'package:obers_ui_example/data/mock_dashboard.dart';
 
