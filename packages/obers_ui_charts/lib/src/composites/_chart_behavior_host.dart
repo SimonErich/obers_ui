@@ -1,6 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
-import 'package:obers_ui/obers_ui.dart' show OiChartThemeData;
+import 'package:obers_ui/obers_ui.dart' show OiChartThemeData, OiTheme;
 
 import 'package:obers_ui_charts/src/foundation/oi_chart_behavior.dart';
 import 'package:obers_ui_charts/src/foundation/oi_chart_controller.dart';
@@ -72,6 +72,36 @@ mixin ChartBehaviorHost<T extends StatefulWidget> on State<T> {
     detachBehaviors();
     _internalController?.dispose();
     _internalController = null;
+  }
+
+  // ── Overlay collection ─────────────────────────────────────────────────
+
+  /// Collects overlay widgets from all attached behaviors.
+  List<Widget> collectBehaviorOverlays() {
+    final overlays = <Widget>[];
+    for (final b in _attachedBehaviors) {
+      overlays.addAll(b.buildOverlays());
+    }
+    return overlays;
+  }
+
+  // ── Theme resolution ───────────────────────────────────────────────────
+
+  /// Resolves the chart theme using the fallback chain:
+  /// widget theme → context.components.chart → default.
+  OiChartThemeData resolveTheme(
+    BuildContext ctx, {
+    OiChartThemeData? widgetTheme,
+  }) {
+    if (widgetTheme != null) return widgetTheme;
+    // Try to get from component themes via OiTheme.
+    try {
+      final theme = OiTheme.maybeOf(ctx);
+      if (theme?.components.chart != null) return theme!.components.chart!;
+    } catch (_) {
+      // Context may not have OiApp ancestor.
+    }
+    return OiChartThemeData();
   }
 
   // ── Pointer event forwarding ───────────────────────────────────────────

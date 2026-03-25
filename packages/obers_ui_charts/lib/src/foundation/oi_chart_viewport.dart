@@ -63,6 +63,22 @@ class OiChartViewport {
   /// area origin.
   final Offset panOffset;
 
+  // ── Visible domain ranges ───────────────────────────────────────────
+
+  /// The visible x-domain range as (min, max), or null if not zoomed.
+  ({double min, double max})? get visibleDomainX {
+    final vd = visibleDomain;
+    if (vd == null) return null;
+    return (min: vd.left, max: vd.right);
+  }
+
+  /// The visible y-domain range as (min, max), or null if not zoomed.
+  ({double min, double max})? get visibleDomainY {
+    final vd = visibleDomain;
+    if (vd == null) return null;
+    return (min: vd.top, max: vd.bottom);
+  }
+
   // ── Derived geometry ──────────────────────────────────────────────────
 
   /// The plot area bounds in widget-local coordinates.

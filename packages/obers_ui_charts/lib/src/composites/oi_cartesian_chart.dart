@@ -13,8 +13,12 @@ import 'package:obers_ui_charts/src/foundation/oi_chart_hit_tester.dart';
 import 'package:obers_ui_charts/src/foundation/oi_chart_performance_config.dart';
 import 'package:obers_ui_charts/src/foundation/oi_chart_sync_group.dart';
 import 'package:obers_ui_charts/src/foundation/oi_chart_viewport.dart';
+import 'package:obers_ui/obers_ui.dart' show OiChartThemeData;
+
 import 'package:obers_ui_charts/src/models/oi_cartesian_series.dart';
 import 'package:obers_ui_charts/src/models/oi_chart_annotation.dart';
+import 'package:obers_ui_charts/src/models/oi_chart_legend_config.dart';
+import 'package:obers_ui_charts/src/models/oi_chart_settings.dart';
 import 'package:obers_ui_charts/src/models/oi_chart_threshold.dart';
 
 /// Base composite widget for all cartesian (x/y) chart types.
@@ -43,6 +47,9 @@ class OiCartesianChart<T> extends StatefulWidget {
     this.performance,
     this.annotations = const [],
     this.thresholds = const [],
+    this.legend,
+    this.settings,
+    this.theme,
     this.emptyState,
     this.loadingState,
     this.errorState,
@@ -95,6 +102,15 @@ class OiCartesianChart<T> extends StatefulWidget {
 
   /// Threshold lines.
   final List<OiChartThreshold> thresholds;
+
+  /// Legend configuration.
+  final OiChartLegendConfig? legend;
+
+  /// Persistence settings.
+  final OiChartSettings? settings;
+
+  /// Chart theme override. Falls back to context.components.chart.
+  final OiChartThemeData? theme;
 
   /// Custom empty state widget.
   final Widget? emptyState;

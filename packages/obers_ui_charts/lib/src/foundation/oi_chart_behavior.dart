@@ -176,4 +176,14 @@ abstract class OiChartBehavior {
 
   /// Called when the chart's viewport changes (e.g. zoom, pan, resize).
   void onViewportChanged(OiChartViewport viewport) {}
+
+  // ── Overlay rendering ──────────────────────────────────────────────
+
+  /// Returns overlay widgets this behavior wants rendered above the chart.
+  ///
+  /// Called by composites during build to collect tooltip, crosshair, and
+  /// other overlay widgets from all attached behaviors.
+  ///
+  /// Override to provide custom overlays. Default returns empty list.
+  List<Widget> buildOverlays() => const [];
 }
