@@ -254,21 +254,21 @@ class OiBadge extends StatelessWidget {
     switch (size) {
       case OiBadgeSize.small:
         return (
-          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
           fontSize: 11,
           dotSize: 6,
           iconSize: 10,
         );
       case OiBadgeSize.medium:
         return (
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
           fontSize: 12,
           dotSize: 8,
           iconSize: 12,
         );
       case OiBadgeSize.large:
         return (
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
           fontSize: 14,
           dotSize: 10,
           iconSize: 14,
@@ -320,7 +320,7 @@ class OiBadge extends StatelessWidget {
 
     final textStyle = TextStyle(
       fontSize: dims.fontSize,
-      fontWeight: FontWeight.w500,
+      fontWeight: FontWeight.w700,
       color: resolved.textColor,
       height: 1,
     );

@@ -90,6 +90,8 @@ class OiArrayInput<T> extends StatefulWidget {
 
 class _OiArrayInputState<T> extends State<OiArrayInput<T>> {
   OiAnimatedListController<T>? _animatedController;
+  int _keyCounter = 0;
+  late List<int> _itemKeys;
 
   bool get _canAdd =>
       widget.maxItems == null || widget.items.length < widget.maxItems!;
@@ -100,6 +102,7 @@ class _OiArrayInputState<T> extends State<OiArrayInput<T>> {
   @override
   void initState() {
     super.initState();
+    _itemKeys = List.generate(widget.items.length, (_) => _keyCounter++);
     if (!widget.reorderable) {
       _animatedController = OiAnimatedListController<T>();
     }
@@ -121,6 +124,7 @@ class _OiArrayInputState<T> extends State<OiArrayInput<T>> {
     if (!_canAdd || widget.onChanged == null) return;
     final newItem = widget.createEmpty();
     final newList = [...widget.items, newItem];
+    _itemKeys = [..._itemKeys, _keyCounter++];
     _animatedController?.insert(widget.items.length, newItem);
     widget.onChanged!(newList);
   }
@@ -129,15 +133,20 @@ class _OiArrayInputState<T> extends State<OiArrayInput<T>> {
     if (!_canRemove || widget.onChanged == null) return;
     _animatedController?.remove(index);
     final newList = [...widget.items]..removeAt(index);
+    _itemKeys = [..._itemKeys]..removeAt(index);
     widget.onChanged!(newList);
   }
 
   void _handleReorder(int oldIndex, int newIndex) {
     if (widget.onChanged == null) return;
     final newList = [...widget.items];
+    final newKeys = [..._itemKeys];
     final adjustedIndex = newIndex > oldIndex ? newIndex - 1 : newIndex;
     final item = newList.removeAt(oldIndex);
+    final key = newKeys.removeAt(oldIndex);
     newList.insert(adjustedIndex, item);
+    newKeys.insert(adjustedIndex, key);
+    _itemKeys = newKeys;
     widget.onChanged!(newList);
   }
 
@@ -214,7 +223,7 @@ class _OiArrayInputState<T> extends State<OiArrayInput<T>> {
         if (index < widget.items.length - 1) {
           children.add(
             const Padding(
-              padding: EdgeInsets.symmetric(vertical: 4),
+              padding: EdgeInsets.symmetric(vertical: 8),
               child: OiDivider(),
             ),
           );
@@ -244,14 +253,14 @@ class _OiArrayInputState<T> extends State<OiArrayInput<T>> {
       if (i < widget.items.length - 1) {
         children.add(
           const Padding(
-            padding: EdgeInsets.symmetric(vertical: 4),
+            padding: EdgeInsets.symmetric(vertical: 8),
             child: OiDivider(),
           ),
         );
       }
       rowWidgets.add(
         Column(
-          key: ValueKey<int>(i),
+          key: ValueKey<int>(_itemKeys[i]),
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: children,
@@ -284,14 +293,18 @@ class _OiArrayInputState<T> extends State<OiArrayInput<T>> {
           if (widget.items.isNotEmpty)
             widget.reorderable ? _buildReorderableList() : _buildAnimatedList(),
           if (showAdd)
-            Padding(
-              padding: const EdgeInsets.only(top: 8),
-              child: OiButton.ghost(
-                label: widget.addLabel,
-                icon: OiIcons.plus,
-                size: OiButtonSize.small,
-                onTap: _handleAdd,
-                semanticLabel: widget.addLabel,
+            Center(
+              child: Padding(
+                padding: const EdgeInsets.only(top: 8),
+                child: UnconstrainedBox(
+                  child: OiButton.secondary(
+                    label: widget.addLabel,
+                    icon: OiIcons.plus,
+                    size: OiButtonSize.small,
+                    onTap: _handleAdd,
+                    semanticLabel: widget.addLabel,
+                  ),
+                ),
               ),
             ),
           if (hasError) ...[

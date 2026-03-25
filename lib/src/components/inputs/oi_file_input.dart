@@ -62,6 +62,16 @@ class OiFileInput extends StatefulWidget {
 
 class _OiFileInputState extends State<OiFileInput> {
   bool _picking = false;
+  List<String> _internalFiles = [];
+
+  List<String> get _effectiveFiles => widget.value ?? _internalFiles;
+
+  void _updateFiles(List<String> files) {
+    if (widget.value == null) {
+      setState(() => _internalFiles = files);
+    }
+    widget.onChanged?.call(files);
+  }
 
   Future<void> _pick() async {
     if (!widget.enabled || _picking) return;
@@ -73,8 +83,12 @@ class _OiFileInputState extends State<OiFileInput> {
         allowedExtensions: widget.allowedExtensions,
       );
       if (result != null) {
-        final paths = result.files.map((f) => f.path ?? f.name).toList();
-        widget.onChanged?.call(paths);
+        final paths = result.files.map((f) => f.name).toList();
+        if (widget.multipleFiles) {
+          _updateFiles([..._effectiveFiles, ...paths]);
+        } else {
+          _updateFiles(paths);
+        }
       }
     } finally {
       if (mounted) setState(() => _picking = false);
@@ -82,8 +96,8 @@ class _OiFileInputState extends State<OiFileInput> {
   }
 
   void _removeFile(int index) {
-    final updated = List<String>.from(widget.value ?? [])..removeAt(index);
-    widget.onChanged?.call(updated);
+    final updated = List<String>.from(_effectiveFiles)..removeAt(index);
+    _updateFiles(updated);
   }
 
   Widget _buildChip(BuildContext context, String name, int index) {
@@ -153,7 +167,7 @@ class _OiFileInputState extends State<OiFileInput> {
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
-    final files = widget.value ?? [];
+    final files = _effectiveFiles;
 
     final pickButton = OiTappable(
       onTap: widget.enabled ? _pick : null,

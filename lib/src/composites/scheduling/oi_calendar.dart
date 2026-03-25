@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/persistence/oi_settings_driver.dart';
 import 'package:obers_ui/src/foundation/persistence/oi_settings_mixin.dart';
 import 'package:obers_ui/src/foundation/persistence/oi_settings_provider.dart';
@@ -339,6 +340,8 @@ class _OiCalendarState extends State<OiCalendar>
 
   @override
   Widget build(BuildContext context) {
+    final sp = context.spacing;
+
     return Semantics(
       label: widget.label,
       child: Column(
@@ -346,8 +349,9 @@ class _OiCalendarState extends State<OiCalendar>
         children: [
           _buildHeader(context),
           _buildModeSelector(context),
+          SizedBox(height: sp.sm),
           if (widget.showAllDayRow && _allDayEvents.isNotEmpty)
-            _buildAllDayRow(context),
+            _buildAllDayRow(context),    
           Expanded(child: _buildBody(context)),
         ],
       ),
@@ -357,7 +361,7 @@ class _OiCalendarState extends State<OiCalendar>
   Widget _buildHeader(BuildContext context) {
     final colors = context.colors;
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
       child: Row(
         children: [
           GestureDetector(
@@ -365,7 +369,7 @@ class _OiCalendarState extends State<OiCalendar>
             onTap: _goBackward,
             child: Padding(
               padding: const EdgeInsets.all(8),
-              child: Text('\u25C0', style: TextStyle(color: colors.text)),
+              child: Icon(OiIcons.chevronLeft, size: 20, color: colors.text),
             ),
           ),
           Expanded(
@@ -374,6 +378,7 @@ class _OiCalendarState extends State<OiCalendar>
                 _headerTitle,
                 key: const ValueKey('calendar_header_title'),
                 style: TextStyle(
+                  fontSize: 20,
                   fontWeight: FontWeight.bold,
                   color: colors.text,
                 ),
@@ -385,7 +390,7 @@ class _OiCalendarState extends State<OiCalendar>
             onTap: _goForward,
             child: Padding(
               padding: const EdgeInsets.all(8),
-              child: Text('\u25B6', style: TextStyle(color: colors.text)),
+              child: Icon(OiIcons.chevronRight, size: 20, color: colors.text),
             ),
           ),
         ],

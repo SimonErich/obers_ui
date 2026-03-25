@@ -41,16 +41,19 @@ class _TablesTreesScreenState extends State<TablesTreesScreen> {
                       OiTableColumn<Map<String, String>>(
                         id: 'name',
                         header: 'Name',
+                        width: 200,
                         valueGetter: (row) => row['name'] ?? '',
                       ),
                       OiTableColumn<Map<String, String>>(
                         id: 'email',
                         header: 'Email',
+                        width: 260,
                         valueGetter: (row) => row['email'] ?? '',
                       ),
                       OiTableColumn<Map<String, String>>(
                         id: 'role',
                         header: 'Role',
+                        width: 140,
                         valueGetter: (row) => row['role'] ?? '',
                         cellBuilder: (context, row, _) =>
                             OiBadge.soft(label: row['role'] ?? ''),

@@ -292,9 +292,11 @@ class OiDialog extends StatelessWidget {
             )
           else
             Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 24,
-                vertical: 8,
+              padding: EdgeInsets.fromLTRB(
+                24,
+                8,
+                24,
+                actionList != null && actionList.isNotEmpty ? 8 : 20,
               ),
               child: bodyContent,
             ),

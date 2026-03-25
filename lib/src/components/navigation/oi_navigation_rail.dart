@@ -259,12 +259,9 @@ class _OiNavigationRailState extends State<OiNavigationRail> {
 
   Widget _buildItem(BuildContext context, int index, bool reducedMotion) {
     final colors = context.colors;
-    final animations = context.animations;
     final item = widget.items[index];
     final isSelected = index == widget.currentIndex;
     final isFocused = index == _focusedIndex && _focusNode.hasFocus;
-    final effectiveIndicatorColor =
-        widget.indicatorColor ?? colors.primary.muted;
     final iconColor = isSelected ? colors.primary.base : colors.textMuted;
     final labelColor = isSelected ? colors.primary.base : colors.textMuted;
 
@@ -283,28 +280,10 @@ class _OiNavigationRailState extends State<OiNavigationRail> {
       color: iconColor,
     );
 
-    // Pill-shaped indicator behind the icon.
-    final indicator = AnimatedContainer(
-      duration: reducedMotion ? Duration.zero : animations.fast,
-      curve: Curves.easeInOut,
-      width: isSelected ? 56 : 0,
-      height: 32,
-      decoration: BoxDecoration(
-        color: isSelected ? effectiveIndicatorColor : const Color(0x00000000),
-        borderRadius: BorderRadius.circular(16),
-      ),
-    );
-
     Widget iconArea = SizedBox(
       width: 56,
       height: 32,
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          indicator,
-          iconWidget,
-        ],
-      ),
+      child: Center(child: iconWidget),
     );
 
     // ── Badge overlay ───────────────────────────────────────────────────

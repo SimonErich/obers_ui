@@ -67,9 +67,9 @@ class _OiDateInputState extends State<OiDateInput> {
   late int _pickerMonth;
   late int _pickerDay;
 
-  late FixedExtentScrollController _yearCtrl;
-  late FixedExtentScrollController _monthCtrl;
-  late FixedExtentScrollController _dayCtrl;
+  late ScrollController _yearCtrl;
+  late ScrollController _monthCtrl;
+  late ScrollController _dayCtrl;
 
   // Derived year range.
   int get _firstYear => (widget.firstDate ?? DateTime(1900)).year;
@@ -86,12 +86,37 @@ class _OiDateInputState extends State<OiDateInput> {
     _initControllers();
   }
 
+  static const double _itemHeight = 36;
+  static const int _visibleItems = 5;
+  static const double _centerOffset = (_visibleItems ~/ 2) * _itemHeight;
+
   void _initControllers() {
-    _yearCtrl = FixedExtentScrollController(
-      initialItem: _pickerYear - _firstYear,
+    _yearCtrl = ScrollController(
+      initialScrollOffset:
+          ((_pickerYear - _firstYear) * _itemHeight - _centerOffset)
+              .clamp(0.0, double.infinity),
     );
-    _monthCtrl = FixedExtentScrollController(initialItem: _pickerMonth - 1);
-    _dayCtrl = FixedExtentScrollController(initialItem: _pickerDay - 1);
+    _monthCtrl = ScrollController(
+      initialScrollOffset:
+          ((_pickerMonth - 1) * _itemHeight - _centerOffset)
+              .clamp(0.0, double.infinity),
+    );
+    _dayCtrl = ScrollController(
+      initialScrollOffset:
+          ((_pickerDay - 1) * _itemHeight - _centerOffset)
+              .clamp(0.0, double.infinity),
+    );
+  }
+
+  @override
+  void didUpdateWidget(OiDateInput oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.value != widget.value && !_open) {
+      final ref = widget.value ?? DateTime.now();
+      _pickerYear = ref.year.clamp(_firstYear, _lastYear);
+      _pickerMonth = ref.month;
+      _pickerDay = ref.day;
+    }
   }
 
   @override
@@ -123,39 +148,73 @@ class _OiDateInputState extends State<OiDateInput> {
     setState(() => _open = false);
   }
 
-  Widget _buildPicker(BuildContext context) {
-    final colors = context.colors;
-    const itemExtent = 40.0;
-    const visibleItems = 5;
-    const pickerHeight = itemExtent * visibleItems;
-    final months = List.generate(12, (i) => i + 1);
+  void _togglePicker() {
+    if (_open) {
+      setState(() => _open = false);
+      return;
+    }
+    // Re-initialise controllers so the wheels reflect the current value.
+    _yearCtrl.dispose();
+    _monthCtrl.dispose();
+    _dayCtrl.dispose();
+    final ref = widget.value ?? DateTime.now();
+    _pickerYear = ref.year.clamp(_firstYear, _lastYear);
+    _pickerMonth = ref.month;
+    _pickerDay = ref.day;
+    _initControllers();
+    setState(() => _open = true);
+  }
 
-    Widget column(
-      int itemCount,
-      String Function(int) label,
-      FixedExtentScrollController ctrl,
-      void Function(int) onChanged,
-    ) {
-      return SizedBox(
-        width: 70,
-        height: pickerHeight,
-        child: ListWheelScrollView.useDelegate(
-          controller: ctrl,
-          itemExtent: itemExtent,
-          physics: const FixedExtentScrollPhysics(),
-          onSelectedItemChanged: onChanged,
-          childDelegate: ListWheelChildBuilderDelegate(
-            childCount: itemCount,
-            builder: (context, index) => Center(
+  Widget _buildPickerColumn({
+    required BuildContext context,
+    required int itemCount,
+    required String Function(int) label,
+    required int selectedIndex,
+    required void Function(int) onSelected,
+    required ScrollController scrollCtrl,
+  }) {
+    final colors = context.colors;
+    const itemHeight = 36.0;
+    const visibleItems = 5;
+    const columnHeight = itemHeight * visibleItems;
+
+    return SizedBox(
+      width: 70,
+      height: columnHeight,
+      child: ListView.builder(
+        controller: scrollCtrl,
+        itemCount: itemCount,
+        itemExtent: itemHeight,
+        itemBuilder: (context, index) {
+          final isSelected = index == selectedIndex;
+          return OiTappable(
+            onTap: () => onSelected(index),
+            child: Container(
+              height: itemHeight,
+              alignment: Alignment.center,
+              decoration: isSelected
+                  ? BoxDecoration(
+                      color: colors.primary.base.withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(6),
+                    )
+                  : null,
               child: Text(
                 label(index),
-                style: TextStyle(fontSize: 16, color: colors.text),
+                style: TextStyle(
+                  fontSize: 15,
+                  color: isSelected ? colors.primary.base : colors.text,
+                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                ),
               ),
             ),
-          ),
-        ),
-      );
-    }
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildPicker(BuildContext context) {
+    final colors = context.colors;
 
     return Container(
       decoration: BoxDecoration(
@@ -176,25 +235,32 @@ class _OiDateInputState extends State<OiDateInput> {
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              column(
-                _yearCount,
-                (i) => (_firstYear + i).toString(),
-                _yearCtrl,
-                (i) => setState(() => _pickerYear = _firstYear + i),
+              _buildPickerColumn(
+                context: context,
+                itemCount: _yearCount,
+                label: (i) => (_firstYear + i).toString(),
+                selectedIndex: _pickerYear - _firstYear,
+                onSelected: (i) =>
+                    setState(() => _pickerYear = _firstYear + i),
+                scrollCtrl: _yearCtrl,
               ),
               const SizedBox(width: 8),
-              column(
-                months.length,
-                (i) => (i + 1).toString().padLeft(2, '0'),
-                _monthCtrl,
-                (i) => setState(() => _pickerMonth = i + 1),
+              _buildPickerColumn(
+                context: context,
+                itemCount: 12,
+                label: (i) => (i + 1).toString().padLeft(2, '0'),
+                selectedIndex: _pickerMonth - 1,
+                onSelected: (i) => setState(() => _pickerMonth = i + 1),
+                scrollCtrl: _monthCtrl,
               ),
               const SizedBox(width: 8),
-              column(
-                _daysInMonth(_pickerYear, _pickerMonth),
-                (i) => (i + 1).toString().padLeft(2, '0'),
-                _dayCtrl,
-                (i) => setState(() => _pickerDay = i + 1),
+              _buildPickerColumn(
+                context: context,
+                itemCount: _daysInMonth(_pickerYear, _pickerMonth),
+                label: (i) => (i + 1).toString().padLeft(2, '0'),
+                selectedIndex: _pickerDay - 1,
+                onSelected: (i) => setState(() => _pickerDay = i + 1),
+                scrollCtrl: _dayCtrl,
               ),
             ],
           ),
@@ -251,7 +317,7 @@ class _OiDateInputState extends State<OiDateInput> {
     );
 
     final anchor = GestureDetector(
-      onTap: widget.enabled ? () => setState(() => _open = !_open) : null,
+      onTap: widget.enabled ? _togglePicker : null,
       behavior: HitTestBehavior.opaque,
       child: OiInputFrame(
         label: widget.label,
@@ -272,6 +338,7 @@ class _OiDateInputState extends State<OiDateInput> {
 
     return OiFloating(
       visible: _open,
+      onDismiss: _cancelPicker,
       anchor: anchor,
       child: UnconstrainedBox(
         alignment: Alignment.topLeft,

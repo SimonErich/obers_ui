@@ -103,10 +103,8 @@ class OiSheet extends StatefulWidget {
     final service = OiOverlays.maybeOf(context);
 
     if (service != null) {
-      // Service path: the handle is returned by service.show(); the onClose
-      // callback notifies the caller but does not need to dismiss the entry
-      // (the caller dismisses via the returned handle).
-      return service.show(
+      late final OiOverlayHandle handle;
+      handle = service.show(
         label: label,
         builder: (_) => OiSheet(
           label: label,
@@ -116,12 +114,16 @@ class OiSheet extends StatefulWidget {
           dismissible: dismissible,
           dragHandle: dragHandle,
           snapPoints: snapPoints,
-          onClose: onClose,
+          onClose: () {
+            onClose?.call();
+            handle.dismiss();
+          },
           child: child,
         ),
         zOrder: OiOverlayZOrder.panel,
         dismissible: false,
       );
+      return handle;
     }
 
     // Fallback path: create the entry first so the handle is available to
@@ -236,6 +238,7 @@ class _OiSheetState extends State<OiSheet> with SingleTickerProviderStateMixin {
   // Drag tracking (for snap points).
   double _dragOffset = 0;
   bool _dragging = false;
+  bool _closing = false;
 
   bool get _isVertical =>
       widget.side == OiPanelSide.bottom || widget.side == OiPanelSide.top;
@@ -246,7 +249,6 @@ class _OiSheetState extends State<OiSheet> with SingleTickerProviderStateMixin {
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 260),
-      value: widget.open ? 1.0 : 0.0,
     );
     if (widget.open) _controller.forward();
   }
@@ -266,11 +268,24 @@ class _OiSheetState extends State<OiSheet> with SingleTickerProviderStateMixin {
     super.didUpdateWidget(oldWidget);
     if (widget.open != oldWidget.open) {
       if (widget.open) {
+        _closing = false;
         _controller.forward();
       } else {
         _controller.reverse();
       }
     }
+  }
+
+  /// Animates the sheet out, then calls [widget.onClose].
+  void _animateClose() {
+    if (_closing) return;
+    _closing = true;
+    _controller.reverse().then((_) {
+      if (mounted) {
+        _closing = false;
+        widget.onClose?.call();
+      }
+    });
   }
 
   @override
@@ -317,11 +332,11 @@ class _OiSheetState extends State<OiSheet> with SingleTickerProviderStateMixin {
           (a, b) => (a - remaining).abs() < (b - remaining).abs() ? a : b,
         );
         if (nearest < snap.first) {
-          widget.onClose?.call();
+          _animateClose();
         }
         // Snap animation is handled by releasing drag and re-animating.
       } else if (fraction > 0.3) {
-        widget.onClose?.call();
+        _animateClose();
       }
     }
     setState(() => _dragOffset = 0);
@@ -400,35 +415,40 @@ class _OiSheetState extends State<OiSheet> with SingleTickerProviderStateMixin {
     }
 
     panel = OiFocusTrap(
-      onEscape: widget.onClose,
+      onEscape: _animateClose,
       child: SlideTransition(position: slideAnim, child: panel),
     );
 
-    return Semantics(
-      label: widget.label,
-      scopesRoute: true,
-      explicitChildNodes: true,
-      child: Stack(
-        children: [
-          // Scrim.
-          if (widget.open)
-            Positioned.fill(
-              child: GestureDetector(
-                behavior: HitTestBehavior.opaque,
-                onTap: widget.dismissible ? widget.onClose : null,
-                child: AnimatedBuilder(
-                  animation: _controller,
-                  builder: (_, __) => ColoredBox(
-                    color: colors.overlay.withValues(
-                      alpha: 0.6 * _controller.value,
+    final isVisible = widget.open || _controller.isAnimating;
+
+    return IgnorePointer(
+      ignoring: !isVisible,
+      child: Semantics(
+        label: widget.label,
+        scopesRoute: true,
+        explicitChildNodes: true,
+        child: Stack(
+          children: [
+            // Scrim.
+            if (isVisible)
+              Positioned.fill(
+                child: GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: widget.dismissible ? _animateClose : null,
+                  child: AnimatedBuilder(
+                    animation: _controller,
+                    builder: (_, __) => ColoredBox(
+                      color: colors.overlay.withValues(
+                        alpha: 0.6 * _controller.value,
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
-          // Panel aligned to the correct edge.
-          Align(alignment: _alignment(), child: panel),
-        ],
+            // Panel aligned to the correct edge.
+            Align(alignment: _alignment(), child: panel),
+          ],
+        ),
       ),
     );
   }

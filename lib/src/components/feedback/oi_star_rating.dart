@@ -98,7 +98,7 @@ class OiStarRating extends StatefulWidget {
     this.allowHalf = false,
     this.readOnly = false,
     this.onChanged,
-    this.size = 32.0,
+    this.size = 20.0,
     this.activeColor,
     this.inactiveColor,
     super.key,

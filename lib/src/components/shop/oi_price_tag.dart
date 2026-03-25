@@ -158,7 +158,7 @@ class OiPriceTag extends StatelessWidget {
       case OiPriceTagSize.medium:
         return _isOnSale
             ? OiLabel.smallStrong(text, color: priceColor)
-            : OiLabel.small(text, color: priceColor);
+            : OiLabel.smallStrong(text, color: priceColor);
       case OiPriceTagSize.large:
         return OiLabel.h4(text, color: priceColor);
     }

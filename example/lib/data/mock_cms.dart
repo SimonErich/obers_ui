@@ -649,12 +649,15 @@ final kCmsFormFields = [
     required: true,
   ),
   const OiFormField(key: 'slug', label: 'URL Slug', type: OiFieldType.text),
-  const OiFormField(
+  OiFormField(
     key: 'category',
     label: 'Category',
     type: OiFieldType.select,
     config: {
-      'options': ['Culinary', 'Outdoor', 'Culture', 'Tech', 'Company'],
+      'options': [
+        for (final c in kArticleCategories)
+          OiSelectOption(value: c, label: c),
+      ],
     },
   ),
   const OiFormField(key: 'tags', label: 'Tags', type: OiFieldType.tag),

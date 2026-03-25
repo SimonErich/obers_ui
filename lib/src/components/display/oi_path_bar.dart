@@ -159,19 +159,28 @@ class _OiPathBarState extends State<OiPathBar> {
       key: const ValueKey('breadcrumb-mode'),
       onTap: _enterEditMode,
       behavior: HitTestBehavior.opaque,
-      child: Row(
-        children: [
-          if (widget.showIcon && widget.segments.isNotEmpty)
-            Padding(
-              padding: const EdgeInsets.only(right: 4),
-              child: Icon(
-                OiIcons.folder, // folder
-                size: 16,
-                color: (colors as dynamic).textSubtle as Color,
-              ),
-            ),
-          Expanded(child: OiBreadcrumbs(items: items)),
-        ],
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          // At very narrow widths, skip the icon to avoid overflow.
+          final showIcon =
+              widget.showIcon &&
+              widget.segments.isNotEmpty &&
+              constraints.maxWidth > 40;
+          return Row(
+            children: [
+              if (showIcon)
+                Padding(
+                  padding: const EdgeInsets.only(right: 4),
+                  child: Icon(
+                    OiIcons.folder, // folder
+                    size: 16,
+                    color: (colors as dynamic).textSubtle as Color,
+                  ),
+                ),
+              Expanded(child: OiBreadcrumbs(items: items)),
+            ],
+          );
+        },
       ),
     );
   }

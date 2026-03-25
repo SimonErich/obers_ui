@@ -11,6 +11,13 @@ class ShopProductScreen extends StatefulWidget {
     required this.onBack,
     required this.isWishlisted,
     required this.onWishlistToggle,
+    required this.onSelectProduct,
+    required this.cartItems,
+    required this.cartSummary,
+    required this.onViewCart,
+    required this.onCheckout,
+    required this.wishlistCount,
+    required this.onViewWishlist,
     super.key,
   });
 
@@ -19,6 +26,13 @@ class ShopProductScreen extends StatefulWidget {
   final VoidCallback onBack;
   final bool isWishlisted;
   final VoidCallback onWishlistToggle;
+  final ValueChanged<OiProductData> onSelectProduct;
+  final List<OiCartItem> cartItems;
+  final OiCartSummary cartSummary;
+  final VoidCallback onViewCart;
+  final VoidCallback onCheckout;
+  final int wishlistCount;
+  final VoidCallback onViewWishlist;
 
   @override
   State<ShopProductScreen> createState() => _ShopProductScreenState();
@@ -138,50 +152,65 @@ class _ShopProductScreenState extends State<ShopProductScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Back button
-          OiButton.ghost(
-            label: 'Back to Products',
-            icon: OiIcons.chevronLeft,
-            onTap: widget.onBack,
-          ),
-          SizedBox(height: spacing.md),
-
-          // Quick info strip: price, rating, stock, wishlist
-          Wrap(
-            spacing: spacing.md,
-            runSpacing: spacing.sm,
-            crossAxisAlignment: WrapCrossAlignment.center,
+          // Navigation bar: back link + wishlist & cart icons
+          Row(
             children: [
-              OiPriceTag(
-                price: product.price,
-                compareAtPrice: product.compareAtPrice,
-                currencyCode: product.currencyCode,
-                label: 'Product price',
-                size: OiPriceTagSize.large,
-              ),
-              if (product.rating != null)
-                OiStarRating(
-                  value: product.rating!,
-                  readOnly: true,
-                  label: '${product.rating} out of 5 stars',
+              OiTappable(
+                onTap: widget.onBack,
+                semanticLabel: 'Back to Products',
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      OiIcons.chevronLeft,
+                      size: 16,
+                      color: context.colors.accent.base,
+                    ),
+                    const SizedBox(width: 4),
+                    const OiLabel.link('Back to Products'),
+                  ],
                 ),
-              OiStockBadge.fromCount(
-                stockCount: product.stockCount,
-                label: 'Stock status',
               ),
-              OiWishlistButton(
-                label: 'Toggle wishlist for ${product.name}',
-                active: widget.isWishlisted,
-                onToggle: widget.onWishlistToggle,
+              const Spacer(),
+              Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  OiIconButton(
+                    icon: OiIcons.heart,
+                    semanticLabel:
+                        'Wishlist (${widget.wishlistCount} items)',
+                    onTap: widget.onViewWishlist,
+                  ),
+                  if (widget.wishlistCount > 0)
+                    Positioned(
+                      right: -4,
+                      top: -4,
+                      child: OiBadge.filled(
+                        label: '${widget.wishlistCount}',
+                        color: OiBadgeColor.error,
+                        size: OiBadgeSize.small,
+                      ),
+                    ),
+                ],
+              ),
+              SizedBox(width: spacing.sm),
+              OiMiniCart(
+                items: widget.cartItems,
+                summary: widget.cartSummary,
+                label: 'Shopping cart',
+                onViewCart: widget.onViewCart,
+                onCheckout: widget.onCheckout,
               ),
             ],
           ),
-          SizedBox(height: spacing.md),
+          SizedBox(height: spacing.lg),
 
           // Product detail with related products and reviews
           OiShopProductDetail(
             product: product,
             label: product.name,
+            isWishlisted: widget.isWishlisted,
+            onWishlist: widget.onWishlistToggle,
             onAddToCart: (item) {
               widget.onAddToCart(item);
               OiToast.show(
@@ -194,6 +223,7 @@ class _ShopProductScreenState extends State<ShopProductScreen> {
                 ? OiMarkdown(data: product.description!)
                 : null,
             related: getRelatedProducts(product.key),
+            onRelatedProductTap: widget.onSelectProduct,
             reviews: _buildReviewsWidget(context),
           ),
         ],

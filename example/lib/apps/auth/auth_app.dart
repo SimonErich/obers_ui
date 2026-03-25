@@ -19,10 +19,15 @@ class AuthApp extends StatelessWidget {
       title: 'Auth',
       themeState: themeState,
       child: SingleChildScrollView(
-        padding: EdgeInsets.all(context.spacing.lg),
+        padding: EdgeInsets.fromLTRB(
+          context.spacing.lg,
+          context.spacing.xxl,
+          context.spacing.lg,
+          context.spacing.lg,
+        ),
         child: OiAuthPage(
           label: 'Alpenglueck authentication',
-          logo: const Center(child: OiLabel.h2('Alpenglueck')),
+          logo: const Center(child: OiLabel.bodyStrong('Alpenglueck')),
           footer: Center(
             child: Column(
               mainAxisSize: MainAxisSize.min,

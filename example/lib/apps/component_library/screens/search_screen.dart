@@ -12,6 +12,7 @@ class SearchScreen extends StatefulWidget {
 
 class _SearchScreenState extends State<SearchScreen> {
   bool _showCommandBar = false;
+  String? _selectedFruit;
 
   @override
   Widget build(BuildContext context) {
@@ -130,7 +131,10 @@ class _SearchScreenState extends State<SearchScreen> {
                           'Grape',
                         ],
                         labelOf: (item) => item,
-                        onSelect: (_) {},
+                        value: _selectedFruit,
+                        onSelect: (fruit) {
+                          setState(() => _selectedFruit = fruit);
+                        },
                         placeholder: 'Type to search...',
                       ),
                     ),
@@ -149,14 +153,20 @@ class _SearchScreenState extends State<SearchScreen> {
                 examples: [
                   ComponentExample(
                     title: 'Open command palette',
-                    child: OiButton.primary(
-                      label: 'Open Command Bar',
-                      icon: OiIcons.terminal,
-                      onTap: () {
-                        setState(() {
-                          _showCommandBar = true;
-                        });
-                      },
+                    child: Center(
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 180),
+                        child: OiButton.primary(
+                          label: 'Open Command Bar',
+                          icon: OiIcons.terminal,
+                          fullWidth: true,
+                          onTap: () {
+                            setState(() {
+                              _showCommandBar = true;
+                            });
+                          },
+                        ),
+                      ),
                     ),
                   ),
                 ],

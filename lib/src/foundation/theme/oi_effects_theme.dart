@@ -23,9 +23,14 @@ class OiFocusRingStyle {
     this.borderRadius = BorderRadius.zero,
   });
 
-  /// Creates a standard focus ring from [primaryColor].
-  factory OiFocusRingStyle.standard(Color primaryColor) {
-    return OiFocusRingStyle(color: primaryColor.withValues(alpha: 0.85));
+  /// Creates a standard focus ring from [color] (defaults to [primaryColor]).
+  ///
+  /// Uses a rounded border radius matching the default button radius.
+  factory OiFocusRingStyle.standard(Color primaryColor, {Color? color}) {
+    return OiFocusRingStyle(
+      color: (color ?? primaryColor).withValues(alpha: 0.85),
+      borderRadius: const BorderRadius.all(Radius.circular(6)),
+    );
   }
 
   /// The border color of the focus ring.
@@ -358,16 +363,19 @@ class OiEffectsTheme {
   });
 
   /// Creates the standard effects theme using [primaryColor] for focus/hover halos.
-  factory OiEffectsTheme.standard({required Color primaryColor}) {
+  ///
+  /// When [focusColor] is provided it is used for the focus ring border instead
+  /// of [primaryColor].
+  factory OiEffectsTheme.standard({
+    required Color primaryColor,
+    Color? focusColor,
+  }) {
     return OiEffectsTheme(
       hover: const OiInteractiveStyle(
         backgroundOverlay: Color(0x0A000000),
         halo: OiHaloStyle.none,
       ),
-      focus: OiInteractiveStyle(
-        backgroundOverlay: const Color(0x00000000),
-        halo: OiHaloStyle.from(primaryColor, intensity: 0.25),
-      ),
+      focus: OiInteractiveStyle.none,
       active: const OiInteractiveStyle(
         backgroundOverlay: Color(0x1A000000),
         halo: OiHaloStyle.none,
@@ -383,7 +391,7 @@ class OiEffectsTheme {
         halo: OiHaloStyle.from(primaryColor, intensity: 0.15),
         scale: 1.03,
       ),
-      focusRing: OiFocusRingStyle.standard(primaryColor),
+      focusRing: OiFocusRingStyle.standard(primaryColor, color: focusColor),
       halo: OiHaloStyle.from(primaryColor),
       haloFocus: OiHaloStyle.from(primaryColor, intensity: 0.25),
     );

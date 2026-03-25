@@ -227,15 +227,34 @@ class _ShopAppState extends State<ShopApp> {
           onBack: () => _goTo(_ShopScreen.browse),
           isWishlisted: _wishlisted.contains(_selectedProduct!.key),
           onWishlistToggle: () {
+            final key = _selectedProduct!.key;
+            final adding = !_wishlisted.contains(key);
             setState(() {
-              final key = _selectedProduct!.key;
-              if (_wishlisted.contains(key)) {
-                _wishlisted.remove(key);
-              } else {
+              if (adding) {
                 _wishlisted.add(key);
+              } else {
+                _wishlisted.remove(key);
               }
             });
+            if (adding) {
+              OiToast.show(
+                context,
+                message: '${_selectedProduct!.name} added to wishlist',
+                level: OiToastLevel.success,
+              );
+            }
           },
+          onSelectProduct: (product) {
+            setState(() {
+              _selectedProduct = product;
+            });
+          },
+          cartItems: _cartItems,
+          cartSummary: _cartSummary,
+          onViewCart: () => _goTo(_ShopScreen.cart),
+          onCheckout: () => _goTo(_ShopScreen.checkout),
+          wishlistCount: _wishlisted.length,
+          onViewWishlist: () => _goTo(_ShopScreen.wishlist),
         );
 
       case _ShopScreen.cart:
@@ -290,6 +309,10 @@ class _ShopAppState extends State<ShopApp> {
             });
           },
           onBack: () => _goTo(_ShopScreen.browse),
+          cartItems: _cartItems,
+          cartSummary: _cartSummary,
+          onViewCart: () => _goTo(_ShopScreen.cart),
+          onCheckout: () => _goTo(_ShopScreen.checkout),
         );
     }
   }

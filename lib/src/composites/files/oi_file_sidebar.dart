@@ -308,6 +308,7 @@ class _OiFileSidebarState extends State<OiFileSidebar> {
 
                         // Wrap with drop target if file drops are enabled
                         if (widget.onFileDrop != null) {
+                          final innerTreeItem = treeItem;
                           treeItem = OiDropZone<List<OiFileNodeData>>(
                             onWillAccept: (_) => true,
                             onAccept: (files) {
@@ -322,7 +323,7 @@ class _OiFileSidebarState extends State<OiFileSidebar> {
                                         borderRadius: BorderRadius.circular(4),
                                       )
                                     : null,
-                                child: treeItem,
+                                child: innerTreeItem,
                               );
                             },
                           );

@@ -188,7 +188,7 @@ class OiCartItemRow extends StatelessWidget {
     Widget content = OiRow(
       breakpoint: breakpoint,
       gap: OiResponsive(compact ? sp.sm : sp.md),
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         _buildThumbnail(context),
         Expanded(child: _buildInfo(context)),

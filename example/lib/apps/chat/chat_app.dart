@@ -189,6 +189,15 @@ class _ChatAppState extends State<ChatApp> {
     );
   }
 
+  void _closePinnedSheet() => setState(() => _pinnedSheetOpen = false);
+
+  void _closeInfoSheet() => setState(() => _infoSheetOpen = false);
+
+  void _closeProfileSheet() => setState(() {
+        _profileSheetOpen = false;
+        _profileUser = null;
+      });
+
   // ── Build ──────────────────────────────────────────────────────────────────
 
   @override
@@ -206,27 +215,25 @@ class _ChatAppState extends State<ChatApp> {
             trailing: _buildMainPanel(context),
           ),
           // Pinned messages sheet.
-          if (_pinnedSheetOpen)
-            OiSheet(
-              label: 'Pinned messages',
-              open: _pinnedSheetOpen,
-              side: OiPanelSide.right,
-              size: 360,
-              onClose: () => setState(() => _pinnedSheetOpen = false),
-              child: _buildPinnedSheet(context),
-            ),
+          OiSheet(
+            label: 'Pinned messages',
+            open: _pinnedSheetOpen,
+            side: OiPanelSide.right,
+            size: 360,
+            onClose: () => setState(() => _pinnedSheetOpen = false),
+            child: _buildPinnedSheet(context),
+          ),
           // Channel info sheet.
-          if (_infoSheetOpen)
-            OiSheet(
-              label: 'Channel details',
-              open: _infoSheetOpen,
-              side: OiPanelSide.right,
-              size: 360,
-              onClose: () => setState(() => _infoSheetOpen = false),
-              child: _buildInfoSheet(context),
-            ),
+          OiSheet(
+            label: 'Channel details',
+            open: _infoSheetOpen,
+            side: OiPanelSide.right,
+            size: 360,
+            onClose: () => setState(() => _infoSheetOpen = false),
+            child: _buildInfoSheet(context),
+          ),
           // User profile sheet.
-          if (_profileSheetOpen && _profileUser != null)
+          if (_profileUser != null)
             OiSheet(
               label: 'User profile',
               open: _profileSheetOpen,
@@ -271,6 +278,9 @@ class _ChatAppState extends State<ChatApp> {
             currentUserId: kCurrentUser.id,
             onSend: _onSend,
             onReact: _onReact,
+            onAttach: (_) {
+              OiToast.show(context, message: 'File attachments coming soon');
+            },
             typingUsers: _typingUsers.isNotEmpty ? _typingUsers : null,
           ),
         ),
@@ -458,7 +468,7 @@ class _ChatAppState extends State<ChatApp> {
           vertical: spacing.sm,
         ),
         decoration: BoxDecoration(
-          color: isActive ? colors.primary.muted : null,
+          color: isActive ? colors.primary.base.withValues(alpha: 0.1) : null,
         ),
         child: Row(
           children: [
@@ -499,7 +509,7 @@ class _ChatAppState extends State<ChatApp> {
           vertical: spacing.sm,
         ),
         decoration: BoxDecoration(
-          color: isActive ? colors.primary.muted : null,
+          color: isActive ? colors.primary.base.withValues(alpha: 0.1) : null,
         ),
         child: Row(
           children: [
@@ -567,7 +577,7 @@ class _ChatAppState extends State<ChatApp> {
                 icon: OiIcons.x,
                 semanticLabel: 'Close pinned messages',
                 size: OiButtonSize.small,
-                onTap: () => setState(() => _pinnedSheetOpen = false),
+                onTap: _closePinnedSheet,
               ),
             ],
           ),
@@ -639,7 +649,7 @@ class _ChatAppState extends State<ChatApp> {
                 icon: OiIcons.x,
                 semanticLabel: 'Close channel details',
                 size: OiButtonSize.small,
-                onTap: () => setState(() => _infoSheetOpen = false),
+                onTap: _closeInfoSheet,
               ),
             ],
           ),
@@ -724,10 +734,7 @@ class _ChatAppState extends State<ChatApp> {
                 icon: OiIcons.x,
                 semanticLabel: 'Close profile',
                 size: OiButtonSize.small,
-                onTap: () => setState(() {
-                  _profileSheetOpen = false;
-                  _profileUser = null;
-                }),
+                onTap: _closeProfileSheet,
               ),
             ],
           ),
@@ -781,7 +788,6 @@ class _ChatAppState extends State<ChatApp> {
                 child: OiButton.primary(
                   label: 'Message',
                   icon: OiIcons.messageSquare,
-                  size: OiButtonSize.small,
                   onTap: () {
                     // Find or indicate DM channel for this user.
                     final dmChannel = kChannels.cast<MockChannel?>().firstWhere(

@@ -1,3 +1,4 @@
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/_internal/oi_input_frame.dart';
 import 'package:obers_ui/src/composites/editors/oi_rich_content.dart';
@@ -245,6 +246,88 @@ class _OiRichEditorState extends State<OiRichEditor> {
     widget.controller.content = OiRichContent(blocks: blocks);
   }
 
+  /// Handles Enter key to create a new paragraph block after the current one.
+  KeyEventResult _onBlockKeyEvent(int index, FocusNode node, KeyEvent event) {
+    if (event is! KeyDownEvent && event is! KeyRepeatEvent) {
+      return KeyEventResult.ignored;
+    }
+
+    if (event.logicalKey == LogicalKeyboardKey.enter) {
+      if (widget.readOnly) return KeyEventResult.ignored;
+
+      final controller = _blockControllers[index];
+      final cursorPos = controller.selection.baseOffset;
+      final text = controller.text;
+
+      // Text after cursor goes to the new block.
+      final before = cursorPos >= 0 ? text.substring(0, cursorPos) : text;
+      final after = cursorPos >= 0 ? text.substring(cursorPos) : '';
+
+      final blocks =
+          List<OiContentBlock>.from(widget.controller.content.blocks);
+      blocks[index] = OiContentBlock(
+        type: blocks[index].type,
+        text: before,
+        metadata: blocks[index].metadata,
+        bold: blocks[index].bold,
+        italic: blocks[index].italic,
+        underline: blocks[index].underline,
+      );
+      blocks.insert(
+        index + 1,
+        OiContentBlock(type: OiBlockType.paragraph, text: after),
+      );
+      widget.controller.content = OiRichContent(blocks: blocks);
+
+      // Focus the new block after rebuild.
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (index + 1 < _blockFocusNodes.length) {
+          _blockFocusNodes[index + 1].requestFocus();
+          _blockControllers[index + 1].selection =
+              const TextSelection.collapsed(offset: 0);
+        }
+      });
+
+      return KeyEventResult.handled;
+    }
+
+    if (event.logicalKey == LogicalKeyboardKey.backspace) {
+      if (widget.readOnly) return KeyEventResult.ignored;
+      final controller = _blockControllers[index];
+      // Merge with previous block when cursor is at the start.
+      if (index > 0 && controller.selection.baseOffset == 0 &&
+          controller.selection.extentOffset == 0) {
+        final blocks =
+            List<OiContentBlock>.from(widget.controller.content.blocks);
+        final prevText = blocks[index - 1].text;
+        final curText = blocks[index].text;
+        blocks[index - 1] = OiContentBlock(
+          type: blocks[index - 1].type,
+          text: prevText + curText,
+          metadata: blocks[index - 1].metadata,
+          bold: blocks[index - 1].bold,
+          italic: blocks[index - 1].italic,
+          underline: blocks[index - 1].underline,
+        );
+        blocks.removeAt(index);
+        widget.controller.content = OiRichContent(blocks: blocks);
+
+        // Place cursor at the join point.
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (index - 1 < _blockFocusNodes.length) {
+            _blockFocusNodes[index - 1].requestFocus();
+            _blockControllers[index - 1].selection =
+                TextSelection.collapsed(offset: prevText.length);
+          }
+        });
+
+        return KeyEventResult.handled;
+      }
+    }
+
+    return KeyEventResult.ignored;
+  }
+
   // ── Block rendering ────────────────────────────────────────────────────────
 
   TextStyle _styleForBlock(OiContentBlock block, BuildContext context) {
@@ -318,16 +401,22 @@ class _OiRichEditorState extends State<OiRichEditor> {
         OiTheme.maybeOf(context)?.colors.primary.base ??
         const Color(0xFF000000);
 
-    Widget blockWidget = EditableText(
-      controller: _blockControllers[index],
-      focusNode: _blockFocusNodes[index],
-      style: style,
-      cursorColor: cursorColor,
-      backgroundCursorColor: const Color(0xFF000000),
-      maxLines: null,
-      readOnly: widget.readOnly,
-      onChanged: (text) => _onBlockChanged(index, text),
-      selectionColor: cursorColor.withValues(alpha: 0.3),
+    Widget blockWidget = Focus(
+      onKeyEvent: (node, event) => _onBlockKeyEvent(index, node, event),
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(minHeight: 24),
+        child: EditableText(
+          controller: _blockControllers[index],
+          focusNode: _blockFocusNodes[index],
+          style: style,
+          cursorColor: cursorColor,
+          backgroundCursorColor: const Color(0xFF000000),
+          maxLines: null,
+          readOnly: widget.readOnly,
+          onChanged: (text) => _onBlockChanged(index, text),
+          selectionColor: cursorColor.withValues(alpha: 0.3),
+        ),
+      ),
     );
 
     // Add prefix for list items.
@@ -534,8 +623,22 @@ class _OiRichEditorState extends State<OiRichEditor> {
   }
 
   void _insertBlock(OiBlockType type) {
-    final blocks = List<OiContentBlock>.from(widget.controller.content.blocks)
-      ..add(OiContentBlock(type: type, text: ''));
+    if (widget.readOnly) return;
+    final blocks = List<OiContentBlock>.from(widget.controller.content.blocks);
+    if (_activeBlockIndex < blocks.length) {
+      // Change the type of the active block.
+      final block = blocks[_activeBlockIndex];
+      blocks[_activeBlockIndex] = OiContentBlock(
+        type: block.type == type ? OiBlockType.paragraph : type,
+        text: block.text,
+        metadata: block.metadata,
+        bold: block.bold,
+        italic: block.italic,
+        underline: block.underline,
+      );
+    } else {
+      blocks.add(OiContentBlock(type: type, text: ''));
+    }
     widget.controller.content = OiRichContent(blocks: blocks);
   }
 
@@ -551,29 +654,45 @@ class _OiRichEditorState extends State<OiRichEditor> {
 
     Widget editorBody = Focus(
       focusNode: _focusNode,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        mainAxisSize: MainAxisSize.min,
+      child: Stack(
         children: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              for (var i = 0; i < content.blocks.length; i++)
+                _buildBlock(context, i, content.blocks[i]),
+              // Tap target below content to focus the last block.
+              GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTap: () {
+                  if (_blockFocusNodes.isNotEmpty) {
+                    _blockFocusNodes.last.requestFocus();
+                  }
+                },
+                child: const SizedBox(height: 40, width: double.infinity),
+              ),
+            ],
+          ),
           if (isEmpty && widget.placeholder != null)
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 4),
-              child: Text(
-                widget.placeholder!,
-                style: TextStyle(
-                  fontSize: 16,
-                  color: (colors?.textMuted ?? const Color(0xFF6B7280))
-                      .withValues(alpha: 0.6),
+            IgnorePointer(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 4),
+                child: Text(
+                  widget.placeholder!,
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: (colors?.textMuted ?? const Color(0xFF6B7280))
+                        .withValues(alpha: 0.6),
+                  ),
                 ),
               ),
             ),
-          for (var i = 0; i < content.blocks.length; i++)
-            _buildBlock(context, i, content.blocks[i]),
         ],
       ),
     );
 
-    // Apply height constraints.
+    // Always wrap in a scrollable view so content doesn't overflow.
     if (widget.minHeight != null || widget.maxHeight != null) {
       editorBody = ConstrainedBox(
         constraints: BoxConstraints(
@@ -582,7 +701,22 @@ class _OiRichEditorState extends State<OiRichEditor> {
         ),
         child: SingleChildScrollView(child: editorBody),
       );
+    } else {
+      editorBody = SingleChildScrollView(child: editorBody);
     }
+
+    final wordCount = widget.showWordCount
+        ? Padding(
+            padding: const EdgeInsets.only(top: 4),
+            child: Text(
+              '${widget.controller.wordCount} words',
+              style: TextStyle(
+                fontSize: 12,
+                color: colors?.textMuted ?? const Color(0xFF6B7280),
+              ),
+            ),
+          )
+        : null;
 
     return Semantics(
       label: widget.label,
@@ -604,17 +738,7 @@ class _OiRichEditorState extends State<OiRichEditor> {
               ],
             ),
           ),
-          if (widget.showWordCount)
-            Padding(
-              padding: const EdgeInsets.only(top: 4),
-              child: Text(
-                '${widget.controller.wordCount} words',
-                style: TextStyle(
-                  fontSize: 12,
-                  color: colors?.textMuted ?? const Color(0xFF6B7280),
-                ),
-              ),
-            ),
+          if (wordCount != null) wordCount,
         ],
       ),
     );

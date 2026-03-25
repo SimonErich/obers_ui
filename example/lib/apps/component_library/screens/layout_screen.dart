@@ -120,31 +120,38 @@ class LayoutScreen extends StatelessWidget {
                 'A thin line separator, horizontal by default or vertical when specified.',
             examples: [
               ComponentExample(
-                title: 'Horizontal divider',
-                child: Column(
+                title: 'Horizontal & vertical',
+                child: OiRow(
+                  breakpoint: bp,
+                  gap: OiResponsive<double>(spacing.lg),
                   children: [
-                    const OiLabel.body('Above'),
-                    SizedBox(height: spacing.sm),
-                    const OiDivider(),
-                    SizedBox(height: spacing.sm),
-                    const OiLabel.body('Below'),
+                    Expanded(
+                      child: Column(
+                        children: [
+                          const OiLabel.body('Above'),
+                          SizedBox(height: spacing.sm),
+                          const OiDivider(),
+                          SizedBox(height: spacing.sm),
+                          const OiLabel.body('Below'),
+                        ],
+                      ),
+                    ),
+                    Expanded(
+                      child: SizedBox(
+                        height: 48,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const OiLabel.body('Left'),
+                            SizedBox(width: spacing.sm),
+                            const OiDivider(axis: Axis.vertical),
+                            SizedBox(width: spacing.sm),
+                            const OiLabel.body('Right'),
+                          ],
+                        ),
+                      ),
+                    ),
                   ],
-                ),
-              ),
-              ComponentExample(
-                title: 'Vertical divider',
-                child: SizedBox(
-                  height: 48,
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const OiLabel.body('Left'),
-                      SizedBox(width: spacing.sm),
-                      const OiDivider(axis: Axis.vertical),
-                      SizedBox(width: spacing.sm),
-                      const OiLabel.body('Right'),
-                    ],
-                  ),
                 ),
               ),
             ],
@@ -158,12 +165,36 @@ class LayoutScreen extends StatelessWidget {
                 'A themed container that provides a background surface color.',
             examples: [
               ComponentExample(
-                title: 'Basic surface',
+                title: 'Default surface',
                 child: OiSurface(
-                  child: Padding(
-                    padding: EdgeInsets.all(spacing.lg),
-                    child: const OiLabel.body('Surface content'),
+                  color: context.colors.surfaceSubtle,
+                  padding: EdgeInsets.all(spacing.lg),
+                  child: const OiLabel.body('Default surface with subtle color'),
+                ),
+              ),
+              ComponentExample(
+                title: 'Primary surface',
+                child: OiSurface(
+                  color: context.colors.primary.muted,
+                  borderRadius: context.radius.md,
+                  padding: EdgeInsets.all(spacing.lg),
+                  child: OiLabel.body(
+                    'Primary muted surface',
+                    color: context.colors.primary.dark,
                   ),
+                ),
+              ),
+              ComponentExample(
+                title: 'Surface with border',
+                child: OiSurface(
+                  color: context.colors.surface,
+                  borderRadius: context.radius.md,
+                  border: OiBorderStyle.solid(
+                    context.colors.borderSubtle,
+                    1,
+                  ),
+                  padding: EdgeInsets.all(spacing.lg),
+                  child: const OiLabel.body('Surface with border'),
                 ),
               ),
             ],
@@ -232,20 +263,19 @@ class LayoutScreen extends StatelessWidget {
           ),
 
           // ── OiPanel ────────────────────────────────────────────────────
-          const ComponentShowcaseSection(
+          ComponentShowcaseSection(
             title: 'Panel',
             widgetName: 'OiPanel',
             description:
-                'A persistent slide-in side panel for navigation or auxiliary content. Requires open/close state management.',
+                'A persistent slide-in side panel for navigation or '
+                'auxiliary content. Slides in from a given side when open '
+                'is true. Designed for pointer-first desktop UIs and traps '
+                'focus while open. Use it for persistent side navigation '
+                'or detail panels.',
             examples: [
               ComponentExample(
-                title: 'Description',
-                child: OiLabel.body(
-                  'OiPanel slides in from a given side when open is true. '
-                  'It is designed for pointer-first desktop UIs and traps '
-                  'focus while open. Use it for persistent side navigation '
-                  'or detail panels.',
-                ),
+                title: 'Slide-in Panel',
+                child: _PanelDemo(),
               ),
             ],
           ),
@@ -332,11 +362,33 @@ class LayoutScreen extends StatelessWidget {
                 'Forces its child to a given width-to-height ratio, responsive across breakpoints.',
             examples: [
               ComponentExample(
-                title: '16:9 aspect ratio',
-                child: OiAspectRatio(
+                title: 'Aspect ratios',
+                child: OiRow(
                   breakpoint: bp,
-                  ratio: const OiResponsive<double>(16 / 9),
-                  child: _placeholder(context, '16 : 9'),
+                  gap: OiResponsive<double>(spacing.md),
+                  children: [
+                    Expanded(
+                      child: OiAspectRatio(
+                        breakpoint: bp,
+                        ratio: const OiResponsive<double>(16 / 9),
+                        child: _placeholder(context, '16 : 9'),
+                      ),
+                    ),
+                    Expanded(
+                      child: OiAspectRatio(
+                        breakpoint: bp,
+                        ratio: const OiResponsive<double>(4 / 3),
+                        child: _placeholder(context, '4 : 3'),
+                      ),
+                    ),
+                    Expanded(
+                      child: OiAspectRatio(
+                        breakpoint: bp,
+                        ratio: const OiResponsive<double>(1),
+                        child: _placeholder(context, '1 : 1'),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
@@ -370,24 +422,98 @@ class LayoutScreen extends StatelessWidget {
           ),
 
           // ── OiPage ─────────────────────────────────────────────────────
-          const ComponentShowcaseSection(
+          ComponentShowcaseSection(
             title: 'Page',
             widgetName: 'OiPage',
             description:
-                'A page-level layout wrapper that fills available space and arranges children vertically with responsive padding and gap. Use as the outermost layout widget to represent a full page with safe area handling.',
+                'A page-level layout wrapper that fills available space and '
+                'arranges children vertically with responsive padding and gap. '
+                'Use as the outermost layout widget to represent a full page. '
+                'Nest OiSection and OiGrid inside it for structured page layouts.',
             examples: [
               ComponentExample(
-                title: 'Description',
-                child: OiLabel.body(
-                  'OiPage is the outermost layout widget for a full page. '
-                  'It expands to fill its parent, applies responsive padding '
-                  'and gap, and provides safe area handling. Nest OiSection '
-                  'and OiGrid inside it for structured page layouts.',
+                title: 'Page with sections',
+                child: Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(color: context.colors.borderSubtle),
+                    borderRadius: context.radius.md,
+                  ),
+                  child: ClipRRect(
+                    borderRadius: context.radius.md,
+                    child: OiPage(
+                      breakpoint: bp,
+                      mainAxisSize: MainAxisSize.min,
+                      padding: OiResponsive<EdgeInsetsGeometry>(
+                        EdgeInsets.all(spacing.md),
+                      ),
+                      gap: OiResponsive<double>(spacing.md),
+                      children: [
+                        _placeholder(context, 'Header'),
+                        _placeholder(context, 'Content'),
+                        _placeholder(context, 'Footer'),
+                      ],
+                    ),
+                  ),
                 ),
               ),
             ],
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _PanelDemo extends StatefulWidget {
+  const _PanelDemo();
+
+  @override
+  State<_PanelDemo> createState() => _PanelDemoState();
+}
+
+class _PanelDemoState extends State<_PanelDemo> {
+  bool _open = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final spacing = context.spacing;
+
+    return SizedBox(
+      height: 200,
+      child: ClipRRect(
+        borderRadius: context.radius.md,
+        child: Container(
+          width: double.infinity,
+          color: context.colors.surfaceSubtle,
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              UnconstrainedBox(
+                child: OiButton.primary(
+                  label: _open ? 'Close Panel' : 'Open Panel',
+                  onTap: () => setState(() => _open = !_open),
+                ),
+              ),
+              OiPanel(
+                label: 'Demo panel',
+                open: _open,
+                size: 200,
+                onClose: () => setState(() => _open = false),
+                child: Padding(
+                  padding: EdgeInsets.all(spacing.md),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const OiLabel.bodyStrong('Panel Title'),
+                      SizedBox(height: spacing.sm),
+                      const OiLabel.body('Panel content here'),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

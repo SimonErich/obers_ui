@@ -107,9 +107,13 @@ class OiStorageIndicator extends StatelessWidget {
       children: [
         Expanded(child: _buildProgressBar(colors, 4)),
         const SizedBox(width: 8),
-        Text(
-          '$used / $total',
-          style: TextStyle(fontSize: 11, color: colors.textMuted),
+        Flexible(
+          child: Text(
+            '$used / $total',
+            style: TextStyle(fontSize: 11, color: colors.textMuted),
+            overflow: TextOverflow.ellipsis,
+            maxLines: 1,
+          ),
         ),
         if (status.isNotEmpty) ...[
           const SizedBox(width: 6),

@@ -138,7 +138,7 @@ class _OiCouponInputState extends State<OiCouponInput> {
       OiRow(
         breakpoint: breakpoint,
         gap: OiResponsive(sp.sm),
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           Expanded(
             child: OiTextInput(

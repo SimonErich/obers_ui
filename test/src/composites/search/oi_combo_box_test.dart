@@ -236,7 +236,7 @@ void main() {
     // The clear icon (close/X) should be present.
     // Find the icon with the close icon data.
     final closeIcons = find.byWidgetPredicate(
-      (w) => w is Icon && w.icon?.codePoint == 0xe5cd,
+      (w) => w is Icon && w.icon?.codePoint == 0xe1b2,
     );
     expect(closeIcons, findsWidgets);
 

@@ -13,6 +13,7 @@ class OiPageIndicator extends StatelessWidget {
   const OiPageIndicator({
     required this.count,
     required this.current,
+    this.onDotTap,
     this.color,
     this.activeColor,
     this.size = 8.0,
@@ -29,6 +30,7 @@ class OiPageIndicator extends StatelessWidget {
   const OiPageIndicator.pill({
     required this.count,
     required this.current,
+    this.onDotTap,
     this.color,
     this.activeColor,
     this.size = 8.0,
@@ -59,6 +61,9 @@ class OiPageIndicator extends StatelessWidget {
   /// Spacing between dots. Default: 8.
   final double spacing;
 
+  /// Called with the tapped dot index when a dot is tapped.
+  final ValueChanged<int>? onDotTap;
+
   /// Accessibility label for the indicator group.
   final String? semanticLabel;
 
@@ -87,18 +92,31 @@ class OiPageIndicator extends StatelessWidget {
             dotWidth = dotSize;
           }
 
+          Widget dot = AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            curve: Curves.easeInOut,
+            width: dotWidth,
+            height: dotSize,
+            decoration: BoxDecoration(
+              color: dotColor,
+              borderRadius: BorderRadius.circular(dotSize / 2),
+            ),
+          );
+
+          if (onDotTap != null) {
+            dot = GestureDetector(
+              onTap: () => onDotTap!(index),
+              behavior: HitTestBehavior.opaque,
+              child: Padding(
+                padding: const EdgeInsets.all(4),
+                child: dot,
+              ),
+            );
+          }
+
           return Padding(
             padding: EdgeInsets.only(left: index == 0 ? 0 : spacing),
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
-              curve: Curves.easeInOut,
-              width: dotWidth,
-              height: dotSize,
-              decoration: BoxDecoration(
-                color: dotColor,
-                borderRadius: BorderRadius.circular(dotSize / 2),
-              ),
-            ),
+            child: dot,
           );
         }),
       ),

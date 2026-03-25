@@ -513,7 +513,6 @@ class _OiComboBoxState<T> extends State<OiComboBox<T>> {
   }
 
   Widget _buildOptionTile(BuildContext context, T item, double height) {
-    final colors = context.colors;
     final items = _effectiveItems;
     final index = items.indexOf(item);
     final isHighlighted = index == _highlightedIndex;
@@ -531,38 +530,13 @@ class _OiComboBoxState<T> extends State<OiComboBox<T>> {
       );
     }
 
-    return GestureDetector(
+    return _ComboBoxOptionTile(
+      label: widget.labelOf(item),
+      height: height,
+      highlighted: isHighlighted,
+      selected: selected,
+      multiSelect: widget.multiSelect,
       onTap: () => _selectItem(item),
-      behavior: HitTestBehavior.opaque,
-      child: Container(
-        height: height,
-        padding: const EdgeInsets.symmetric(horizontal: 12),
-        color: isHighlighted
-            ? colors.surfaceHover
-            : selected
-            ? colors.primary.base.withValues(alpha: 0.08)
-            : null,
-        child: Row(
-          children: [
-            if (widget.multiSelect)
-              Padding(
-                padding: const EdgeInsets.only(right: 8),
-                child: _OiCheckMark(checked: selected),
-              ),
-            Expanded(
-              child: Text(
-                widget.labelOf(item),
-                style: TextStyle(
-                  fontSize: 14,
-                  color: selected ? colors.primary.base : colors.text,
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 
@@ -699,6 +673,76 @@ class _GroupedSection<T> {
 
   /// The items in this section.
   final List<T> items;
+}
+
+/// A single option tile with hover tracking.
+class _ComboBoxOptionTile extends StatefulWidget {
+  const _ComboBoxOptionTile({
+    required this.label,
+    required this.height,
+    required this.highlighted,
+    required this.selected,
+    required this.multiSelect,
+    required this.onTap,
+  });
+
+  final String label;
+  final double height;
+  final bool highlighted;
+  final bool selected;
+  final bool multiSelect;
+  final VoidCallback onTap;
+
+  @override
+  State<_ComboBoxOptionTile> createState() => _ComboBoxOptionTileState();
+}
+
+class _ComboBoxOptionTileState extends State<_ComboBoxOptionTile> {
+  bool _hovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    final showHover = _hovered || widget.highlighted;
+
+    return MouseRegion(
+      onEnter: (_) => setState(() => _hovered = true),
+      onExit: (_) => setState(() => _hovered = false),
+      child: GestureDetector(
+        onTap: widget.onTap,
+        behavior: HitTestBehavior.opaque,
+        child: Container(
+          height: widget.height,
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          color: showHover
+              ? colors.surfaceHover
+              : widget.selected
+                  ? colors.primary.base.withValues(alpha: 0.08)
+                  : null,
+          child: Row(
+            children: [
+              if (widget.multiSelect)
+                Padding(
+                  padding: const EdgeInsets.only(right: 8),
+                  child: _OiCheckMark(checked: widget.selected),
+                ),
+              Expanded(
+                child: Text(
+                  widget.label,
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: widget.selected ? colors.primary.base : colors.text,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 /// A simple check mark indicator for multi-select mode.

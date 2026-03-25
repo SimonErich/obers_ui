@@ -336,12 +336,8 @@ void main() {
       expect(theme.focusRing.color.a, greaterThan(0.0));
     });
 
-    test('focus has a non-zero halo blur', () {
-      expect(theme.focus.halo.blur, greaterThan(0));
-    });
-
-    test('focus has a non-zero halo spread', () {
-      expect(theme.focus.halo.spread, greaterThan(0));
+    test('focus has no halo (border-only focus)', () {
+      expect(theme.focus.halo, equals(OiHaloStyle.none));
     });
 
     test('active scale is less than 1', () {

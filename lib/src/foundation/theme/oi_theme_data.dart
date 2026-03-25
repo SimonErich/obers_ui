@@ -64,7 +64,10 @@ class OiThemeData {
       radius: OiRadiusScale.forPreference(radiusPreference),
       shadows: OiShadowScale.standard(),
       animations: const OiAnimationConfig.standard(),
-      effects: OiEffectsTheme.standard(primaryColor: colors.primary.base),
+      effects: OiEffectsTheme.standard(
+        primaryColor: colors.primary.base,
+        focusColor: colors.borderFocus,
+      ),
       decoration: OiDecorationTheme.standard(
         primaryColor: colors.primary.base,
         errorColor: colors.error.base,
@@ -98,7 +101,10 @@ class OiThemeData {
       radius: OiRadiusScale.forPreference(radiusPreference),
       shadows: OiShadowScale.dark(),
       animations: const OiAnimationConfig.standard(),
-      effects: OiEffectsTheme.standard(primaryColor: colors.primary.base),
+      effects: OiEffectsTheme.standard(
+        primaryColor: colors.primary.base,
+        focusColor: colors.borderFocus,
+      ),
       decoration: OiDecorationTheme.standard(
         primaryColor: colors.primary.base,
         errorColor: colors.error.base,
@@ -151,7 +157,10 @@ class OiThemeData {
 
     return base.copyWith(
       colors: brandColors,
-      effects: OiEffectsTheme.standard(primaryColor: color),
+      effects: OiEffectsTheme.standard(
+        primaryColor: color,
+        focusColor: brandColors.borderFocus,
+      ),
       decoration: OiDecorationTheme.standard(
         primaryColor: color,
         errorColor: base.colors.error.base,

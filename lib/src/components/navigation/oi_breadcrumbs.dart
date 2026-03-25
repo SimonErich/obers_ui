@@ -136,7 +136,13 @@ class _OiBreadcrumbsState extends State<OiBreadcrumbs> {
       }
     }
 
-    return Row(mainAxisSize: MainAxisSize.min, children: rowChildren);
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: rowChildren,
+      ),
+    );
   }
 }
 

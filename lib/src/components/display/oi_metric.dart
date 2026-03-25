@@ -109,7 +109,7 @@ class OiMetric extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 14,
                       color: trendColor,
-                      fontWeight: FontWeight.w600,
+                      fontWeight: FontWeight.w700,
                     ),
                   ),
                   if (trendPercent != null) ...[
@@ -119,7 +119,7 @@ class OiMetric extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 12,
                         color: trendColor,
-                        fontWeight: FontWeight.w500,
+                        fontWeight: FontWeight.w700,
                       ),
                     ),
                   ],

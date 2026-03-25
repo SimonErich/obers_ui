@@ -562,6 +562,9 @@ class _OiFileListViewState extends State<OiFileListView> {
     if (widget.enableDragDrop) {
       // If this is a folder, make it a drop target too
       if (file.isFolder && widget.onMoveToFolder != null) {
+        // Capture current row value to avoid circular reference in the
+        // closure — `row` is reassigned to OiDraggable below.
+        final innerRow = row;
         row = OiDropZone<List<OiFileNodeData>>(
           onWillAccept: (data) {
             if (data == null) return false;
@@ -579,7 +582,7 @@ class _OiFileListViewState extends State<OiFileListView> {
                       borderRadius: BorderRadius.circular(4),
                     )
                   : null,
-              child: row,
+              child: innerRow,
             );
           },
         );

@@ -9,6 +9,10 @@ class ShopWishlistScreen extends StatelessWidget {
     required this.onRemoveFromWishlist,
     required this.onSelectProduct,
     required this.onBack,
+    required this.cartItems,
+    required this.cartSummary,
+    required this.onViewCart,
+    required this.onCheckout,
     super.key,
   });
 
@@ -27,6 +31,18 @@ class ShopWishlistScreen extends StatelessWidget {
   /// Called when the user taps the back button.
   final VoidCallback onBack;
 
+  /// Cart items for the mini cart.
+  final List<OiCartItem> cartItems;
+
+  /// Cart summary for the mini cart.
+  final OiCartSummary cartSummary;
+
+  /// Called when the user taps view cart.
+  final VoidCallback onViewCart;
+
+  /// Called when the user taps checkout.
+  final VoidCallback onCheckout;
+
   @override
   Widget build(BuildContext context) {
     final spacing = context.spacing;
@@ -40,11 +56,56 @@ class ShopWishlistScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Back button
-          OiButton.ghost(
-            label: 'Back to Products',
-            icon: OiIcons.chevronLeft,
-            onTap: onBack,
+          // Navigation bar: back link + cart icon
+          Row(
+            children: [
+              OiTappable(
+                onTap: onBack,
+                semanticLabel: 'Back to Products',
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      OiIcons.chevronLeft,
+                      size: 16,
+                      color: context.colors.accent.base,
+                    ),
+                    const SizedBox(width: 4),
+                    const OiLabel.link('Back to Products'),
+                  ],
+                ),
+              ),
+              const Spacer(),
+              Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  OiIconButton(
+                    icon: OiIcons.heart,
+                    semanticLabel:
+                        'Wishlist (${wishlistedKeys.length} items)',
+                    onTap: () {},
+                  ),
+                  if (wishlistedKeys.isNotEmpty)
+                    Positioned(
+                      right: -4,
+                      top: -4,
+                      child: OiBadge.filled(
+                        label: '${wishlistedKeys.length}',
+                        color: OiBadgeColor.error,
+                        size: OiBadgeSize.small,
+                      ),
+                    ),
+                ],
+              ),
+              SizedBox(width: spacing.sm),
+              OiMiniCart(
+                items: cartItems,
+                summary: cartSummary,
+                label: 'Shopping cart',
+                onViewCart: onViewCart,
+                onCheckout: onCheckout,
+              ),
+            ],
           ),
           SizedBox(height: spacing.md),
           Row(

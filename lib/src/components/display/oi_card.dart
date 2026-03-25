@@ -427,6 +427,7 @@ class _OiCardState extends State<OiCard> with SingleTickerProviderStateMixin {
       return OiTappable(
         onTap: widget.onTap,
         semanticLabel: widget.label,
+        clipBorderRadius: BorderRadius.circular(8),
         child: surface,
       );
     }
@@ -486,11 +487,13 @@ class _OiCardState extends State<OiCard> with SingleTickerProviderStateMixin {
       mainAxisSize: MainAxisSize.min,
       children: [
         _buildBody(context),
+        const SizedBox(height: 8),
         SizedBox(
           key: _kCardDividerKey,
           height: 1,
           child: ColoredBox(color: separatorColor),
         ),
+        const SizedBox(height: 12),
         _buildFooter(context),
       ],
     );

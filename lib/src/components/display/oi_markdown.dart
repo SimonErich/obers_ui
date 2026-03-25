@@ -324,6 +324,7 @@ class OiMarkdown extends StatelessWidget {
             fontFamily: 'monospace',
             fontSize: (base.fontSize ?? 16) * 0.9,
             color: colors.primary.base,
+            backgroundColor: colors.surfaceSubtle,
           ),
         );
       }

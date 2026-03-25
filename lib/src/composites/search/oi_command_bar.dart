@@ -290,6 +290,7 @@ class _OiCommandBarState extends State<OiCommandBar> {
     }
 
     cmd.onExecute?.call();
+    widget.onDismiss?.call();
   }
 
   // ── Keyboard ──────────────────────────────────────────────────────────────
@@ -377,93 +378,111 @@ class _OiCommandBarState extends State<OiCommandBar> {
       container: true,
       explicitChildNodes: true,
       label: widget.label,
-      child: Container(
-        width: widget.previewBuilder != null ? 640 : 480,
-        constraints: const BoxConstraints(maxHeight: 420),
-        decoration: BoxDecoration(
-          color: colors.surface,
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: [
-            BoxShadow(
-              color: colors.overlay,
-              blurRadius: 24,
-              offset: const Offset(0, 8),
+      child: Stack(
+        children: [
+          // Scrim — tapping outside closes the command bar.
+          Positioned.fill(
+            child: GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: widget.onDismiss,
             ),
-          ],
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Input area
-            Padding(
-              padding: const EdgeInsets.all(12),
-              child: Row(
+          ),
+          // Centered command panel.
+          Align(
+            alignment: const Alignment(0, -0.3),
+            child: Container(
+              width: widget.previewBuilder != null ? 640 : 480,
+              constraints: const BoxConstraints(maxHeight: 420),
+              decoration: BoxDecoration(
+                color: colors.surface,
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: colors.overlay,
+                    blurRadius: 24,
+                    offset: const Offset(0, 8),
+                  ),
+                ],
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  // Back button when drilled down
-                  if (_commandStack != null) ...[
-                    GestureDetector(
-                      onTap: _goBack,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 6,
-                          vertical: 2,
+                  // Input area
+                  Padding(
+                    padding: const EdgeInsets.all(12),
+                    child: Row(
+                      children: [
+                        // Back button when drilled down
+                        if (_commandStack != null) ...[
+                          GestureDetector(
+                            onTap: _goBack,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 6,
+                                vertical: 2,
+                              ),
+                              decoration: BoxDecoration(
+                                color: colors.surfaceActive,
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: Text(
+                                _parentLabel ?? 'Back',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: colors.text,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                        ],
+                        Expanded(
+                          child: OiRawInput(
+                            controller: _textController,
+                            focusNode: _inputFocusNode,
+                            placeholder: _commandStack != null
+                                ? 'Search in ${_parentLabel ?? "submenu"}\u2026'
+                                : 'Type a command\u2026',
+                            onChanged: _applyFilter,
+                            leading: Padding(
+                              padding: const EdgeInsets.only(right: 8),
+                              child: Icon(
+                                OiIcons.arrowDown,
+                                size: 16,
+                                color: colors.textMuted,
+                              ),
+                            ),
+                          ),
                         ),
-                        decoration: BoxDecoration(
-                          color: colors.surfaceActive,
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: Text(
-                          _parentLabel ?? 'Back',
-                          style: TextStyle(fontSize: 12, color: colors.text),
-                        ),
-                      ),
+                      ],
                     ),
-                    const SizedBox(width: 8),
-                  ],
-                  Expanded(
-                    child: OiRawInput(
-                      controller: _textController,
-                      focusNode: _inputFocusNode,
-                      placeholder: _commandStack != null
-                          ? 'Search in ${_parentLabel ?? "submenu"}\u2026'
-                          : 'Type a command\u2026',
-                      onChanged: _applyFilter,
-                      leading: Padding(
-                        padding: const EdgeInsets.only(right: 8),
-                        child: Icon(
-                          OiIcons.arrowDown,
-                          size: 16,
-                          color: colors.textMuted,
-                        ),
-                      ),
+                  ),
+                  // Command list
+                  Flexible(
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(child: _buildCommandList(context, grouped)),
+                        if (widget.previewBuilder != null &&
+                            highlightedCommand != null)
+                          Container(
+                            width: 220,
+                            decoration: BoxDecoration(
+                              border: Border(
+                                left: BorderSide(color: colors.borderSubtle),
+                              ),
+                            ),
+                            padding: const EdgeInsets.all(12),
+                            child: widget.previewBuilder!(highlightedCommand),
+                          ),
+                      ],
                     ),
                   ),
                 ],
               ),
             ),
-            // Command list
-            Flexible(
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(child: _buildCommandList(context, grouped)),
-                  if (widget.previewBuilder != null &&
-                      highlightedCommand != null)
-                    Container(
-                      width: 220,
-                      decoration: BoxDecoration(
-                        border: Border(
-                          left: BorderSide(color: colors.borderSubtle),
-                        ),
-                      ),
-                      padding: const EdgeInsets.all(12),
-                      child: widget.previewBuilder!(highlightedCommand),
-                    ),
-                ],
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -538,7 +557,11 @@ class _OiCommandBarState extends State<OiCommandBar> {
     final isHighlighted = index == _highlightedIndex;
     final hasChildren = cmd.children != null && cmd.children!.isNotEmpty;
 
-    return GestureDetector(
+    return MouseRegion(
+      onEnter: (_) {
+        if (index >= 0) setState(() => _highlightedIndex = index);
+      },
+      child: GestureDetector(
       onTap: () => _drillDown(cmd),
       behavior: HitTestBehavior.opaque,
       child: Container(
@@ -607,6 +630,7 @@ class _OiCommandBarState extends State<OiCommandBar> {
           ],
         ),
       ),
+    ),
     );
   }
 }

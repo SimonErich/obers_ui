@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/src/components/navigation/oi_emoji_picker.dart';
 import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_spacing_scale.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
@@ -310,7 +311,7 @@ class _OiChatState extends State<OiChat> {
                         child: Padding(
                           padding: EdgeInsets.only(right: spacing.xs),
                           child: Icon(
-                            OiIcons.mail,
+                            OiIcons.paperclip,
                             size: 22,
                             color: colors.textSubtle,
                           ),
@@ -342,7 +343,7 @@ class _OiChatState extends State<OiChat> {
                           shape: BoxShape.circle,
                         ),
                         child: Icon(
-                          OiIcons.paperclip,
+                          OiIcons.sendHorizontal,
                           size: 20,
                           color: colors.textOnPrimary,
                         ),
@@ -485,6 +486,7 @@ class _OiChatState extends State<OiChat> {
     Widget messageBody;
     if (widget.enableReactions && widget.onReact != null) {
       messageBody = OiLongPressMenu(
+        direction: Axis.horizontal,
         items: [
           for (final emoji in _kDefaultReactions)
             OiLongPressMenuItem(
@@ -492,6 +494,9 @@ class _OiChatState extends State<OiChat> {
               onTap: () => widget.onReact!.call(message, emoji),
             ),
         ],
+        trailing: _MoreEmojiButton(
+          onSelected: (emoji) => widget.onReact!.call(message, emoji),
+        ),
         child: pendingWrapper,
       );
     } else {
@@ -527,7 +532,7 @@ class _OiChatState extends State<OiChat> {
         : null;
 
     // Use reduced spacing for continuation messages within a group.
-    final bottomSpacing = isContinuation ? spacing.xs : spacing.sm;
+    final bottomSpacing = isContinuation ? spacing.sm : spacing.md;
 
     return Padding(
       padding: EdgeInsets.only(
@@ -652,5 +657,92 @@ class _OiChatState extends State<OiChat> {
     if (users.length == 1) return '${users[0]} is typing...';
     if (users.length == 2) return '${users[0]} and ${users[1]} are typing...';
     return '${users[0]} and ${users.length - 1} others are typing...';
+  }
+}
+
+/// A "+" button that opens the full [OiEmojiPicker] in an overlay.
+class _MoreEmojiButton extends StatefulWidget {
+  const _MoreEmojiButton({required this.onSelected});
+
+  final ValueChanged<String> onSelected;
+
+  @override
+  State<_MoreEmojiButton> createState() => _MoreEmojiButtonState();
+}
+
+class _MoreEmojiButtonState extends State<_MoreEmojiButton> {
+  OverlayEntry? _overlayEntry;
+
+  void _showPicker() {
+    _removeOverlay();
+    final overlay = Overlay.maybeOf(context);
+    if (overlay == null) return;
+
+    final box = context.findRenderObject()! as RenderBox;
+    final position = box.localToGlobal(Offset.zero);
+
+    _overlayEntry = OverlayEntry(
+      builder: (_) => Stack(
+        children: [
+          Positioned.fill(
+            child: GestureDetector(
+              behavior: HitTestBehavior.translucent,
+              onTap: _removeOverlay,
+              child: const ColoredBox(color: Color(0x00000000)),
+            ),
+          ),
+          Positioned(
+            left: position.dx - 260,
+            top: position.dy + box.size.height + 4,
+            child: Container(
+              width: 320,
+              height: 360,
+              decoration: const BoxDecoration(
+                color: Color(0xFFFFFFFF),
+                borderRadius: BorderRadius.all(Radius.circular(8)),
+                boxShadow: [
+                  BoxShadow(
+                    color: Color(0x33000000),
+                    blurRadius: 8,
+                    offset: Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: OiEmojiPicker(
+                onSelected: (String emoji) {
+                  _removeOverlay();
+                  widget.onSelected(emoji);
+                },
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+    overlay.insert(_overlayEntry!);
+  }
+
+  void _removeOverlay() {
+    _overlayEntry?.remove();
+    _overlayEntry?.dispose();
+    _overlayEntry = null;
+  }
+
+  @override
+  void dispose() {
+    _removeOverlay();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: _showPicker,
+      child: const Icon(
+        OiIcons.smilePlus,
+        size: 20,
+        color: Color(0xFF888888),
+      ),
+    );
   }
 }

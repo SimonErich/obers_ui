@@ -45,6 +45,214 @@ enum OiToastPosition {
   bottomRight,
 }
 
+// ── Toast queue manager ──────────────────────────────────────────────────────
+
+/// Manages a single overlay entry that renders all active toasts in a column.
+class _OiToastQueue {
+  _OiToastQueue._();
+
+  static _OiToastQueue? _instance;
+  static _OiToastQueue get _shared => _instance ??= _OiToastQueue._();
+
+  OiOverlayHandle? _handle;
+  final List<_OiToastEntry> _entries = [];
+  final _notifier = _ToastQueueNotifier();
+
+  OiOverlayHandle addToast(
+    BuildContext context, {
+    required String message,
+    required OiToastLevel level,
+    required OiToastPosition position,
+    required Duration duration,
+    required bool pauseOnHover,
+    Widget? action,
+    VoidCallback? onDismiss,
+  }) {
+    final entry = _OiToastEntry(
+      message: message,
+      level: level,
+      position: position,
+      duration: duration,
+      pauseOnHover: pauseOnHover,
+      action: action,
+      onDismiss: onDismiss,
+    );
+    _entries.add(entry);
+
+    if (_handle == null || _handle!.isDismissed) {
+      _createOverlay(context, position);
+    } else {
+      _handle!.update();
+    }
+    _notifier.notify();
+
+    // Return a handle that removes this specific entry.
+    return _OiSingleToastHandle(
+      onDismiss: () => _removeEntry(entry),
+    );
+  }
+
+  void _removeEntry(_OiToastEntry entry) {
+    _entries.remove(entry);
+    if (_entries.isEmpty) {
+      _handle?.dismiss();
+      _handle = null;
+    } else {
+      _handle?.update();
+    }
+    _notifier.notify();
+  }
+
+  void _createOverlay(BuildContext context, OiToastPosition position) {
+    final service = OiOverlays.maybeOf(context);
+
+    Widget builder(BuildContext _) => ListenableBuilder(
+          listenable: _notifier,
+          builder: (ctx, _) => _OiToastColumn(
+            entries: List.of(_entries),
+            onEntryDismissed: _removeEntry,
+          ),
+        );
+
+    if (service != null) {
+      _handle = service.show(
+        label: 'Toast notifications',
+        builder: builder,
+        zOrder: OiOverlayZOrder.toast,
+        dismissible: false,
+      );
+    } else {
+      final entry = OverlayEntry(builder: builder);
+      Overlay.of(context).insert(entry);
+      _handle = createOiOverlayHandle(entry);
+    }
+  }
+}
+
+class _ToastQueueNotifier extends ChangeNotifier {
+  // ignore: use_setters_to_change_properties
+  void notify() => notifyListeners();
+}
+
+/// Data for a single queued toast.
+class _OiToastEntry {
+  _OiToastEntry({
+    required this.message,
+    required this.level,
+    required this.position,
+    required this.duration,
+    required this.pauseOnHover,
+    this.action,
+    this.onDismiss,
+  });
+
+  final String message;
+  final OiToastLevel level;
+  final OiToastPosition position;
+  final Duration duration;
+  final bool pauseOnHover;
+  final Widget? action;
+  final VoidCallback? onDismiss;
+}
+
+/// A fake handle that dismisses a single entry from the queue.
+class _OiSingleToastHandle implements OiOverlayHandle {
+  _OiSingleToastHandle({required VoidCallback onDismiss})
+      : _onDismiss = onDismiss;
+
+  final VoidCallback _onDismiss;
+  bool _dismissed = false;
+
+  @override
+  bool get isDismissed => _dismissed;
+
+  @override
+  void dismiss() {
+    if (_dismissed) return;
+    _dismissed = true;
+    _onDismiss();
+  }
+
+  @override
+  void update() {}
+}
+
+/// Renders the column of active toasts.
+class _OiToastColumn extends StatelessWidget {
+  const _OiToastColumn({
+    required this.entries,
+    required this.onEntryDismissed,
+  });
+
+  final List<_OiToastEntry> entries;
+  final void Function(_OiToastEntry) onEntryDismissed;
+
+  @override
+  Widget build(BuildContext context) {
+    if (entries.isEmpty) return const SizedBox.shrink();
+
+    final position = entries.first.position;
+    final isTop = position == OiToastPosition.topLeft ||
+        position == OiToastPosition.topCenter ||
+        position == OiToastPosition.topRight;
+
+    final alignment = switch (position) {
+      OiToastPosition.topLeft => Alignment.topLeft,
+      OiToastPosition.topCenter => Alignment.topCenter,
+      OiToastPosition.topRight => Alignment.topRight,
+      OiToastPosition.bottomLeft => Alignment.bottomLeft,
+      OiToastPosition.bottomCenter => Alignment.bottomCenter,
+      OiToastPosition.bottomRight => Alignment.bottomRight,
+    };
+
+    final padding = isTop
+        ? const EdgeInsets.only(top: 16, left: 16, right: 16)
+        : const EdgeInsets.only(bottom: 16, left: 16, right: 16);
+
+    final crossAlignment = switch (position) {
+      OiToastPosition.topLeft ||
+      OiToastPosition.bottomLeft =>
+        CrossAxisAlignment.start,
+      OiToastPosition.topCenter ||
+      OiToastPosition.bottomCenter =>
+        CrossAxisAlignment.center,
+      OiToastPosition.topRight ||
+      OiToastPosition.bottomRight =>
+        CrossAxisAlignment.end,
+    };
+
+    return Align(
+      alignment: alignment,
+      child: Padding(
+        padding: padding,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: crossAlignment,
+          children: [
+            for (final entry in entries) ...[
+              OiToast(
+                key: ValueKey(entry),
+                label: entry.message,
+                message: entry.message,
+                level: entry.level,
+                position: entry.position,
+                duration: entry.duration,
+                pauseOnHover: entry.pauseOnHover,
+                action: entry.action,
+                onDismiss: () {
+                  entry.onDismiss?.call();
+                  onEntryDismissed(entry);
+                },
+              ),
+              const SizedBox(height: 8),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 /// A transient notification banner that auto-dismisses after [duration].
 ///
 /// [OiToast] displays a message with a colored left-border accent and optional
@@ -97,8 +305,8 @@ class OiToast extends StatefulWidget {
 
   /// Shows a toast notification above the current widget tree.
   ///
-  /// Uses [OiOverlays.of] when available; otherwise falls back to the raw
-  /// Flutter [Overlay]. Returns an [OiOverlayHandle] for early dismissal.
+  /// Multiple toasts are stacked vertically instead of overlapping.
+  /// Returns an [OiOverlayHandle] for early dismissal.
   static OiOverlayHandle show(
     BuildContext context, {
     required String message,
@@ -109,47 +317,16 @@ class OiToast extends StatefulWidget {
     Widget? action,
     VoidCallback? onDismiss,
   }) {
-    // Build the handle first so the onDismiss closure can reference it.
-    // For the OiOverlays service path we use its built-in dismiss mechanism;
-    // for the raw-Overlay fallback we wire onDismiss → handle.dismiss().
-    final service = OiOverlays.maybeOf(context);
-
-    if (service != null) {
-      // Service manages the entry lifetime; pass onDismiss straight through.
-      return service.show(
-        label: message,
-        builder: (_) => OiToast(
-          label: message,
-          message: message,
-          level: level,
-          position: position,
-          duration: duration,
-          pauseOnHover: pauseOnHover,
-          action: action,
-          onDismiss: onDismiss,
-        ),
-        zOrder: OiOverlayZOrder.toast,
-        dismissible: false,
-      );
-    }
-
-    // Fallback: raw Overlay. We need to dismiss the entry when the toast
-    // auto-expires. Use a value notifier so the handle is captured after
-    // the entry is created.
-    final entry = OverlayEntry(
-      builder: (_) => OiToast(
-        label: message,
-        message: message,
-        level: level,
-        position: position,
-        duration: duration,
-        pauseOnHover: pauseOnHover,
-        action: action,
-        onDismiss: onDismiss,
-      ),
+    return _OiToastQueue._shared.addToast(
+      context,
+      message: message,
+      level: level,
+      position: position,
+      duration: duration,
+      pauseOnHover: pauseOnHover,
+      action: action,
+      onDismiss: onDismiss,
     );
-    Overlay.of(context).insert(entry);
-    return createOiOverlayHandle(entry);
   }
 
   @override
@@ -203,9 +380,9 @@ class _OiToastState extends State<OiToast> with SingleTickerProviderStateMixin {
   }
 
   Future<void> _dismiss() async {
-    widget.onDismiss?.call();
     if (!mounted) return;
     await _controller.reverse();
+    if (mounted) widget.onDismiss?.call();
   }
 
   @override
@@ -251,37 +428,6 @@ class _OiToastState extends State<OiToast> with SingleTickerProviderStateMixin {
         return 'Warning';
       case OiToastLevel.error:
         return 'Error';
-    }
-  }
-
-  AlignmentGeometry _alignment() {
-    switch (widget.position) {
-      case OiToastPosition.topLeft:
-        return Alignment.topLeft;
-      case OiToastPosition.topCenter:
-        return Alignment.topCenter;
-      case OiToastPosition.topRight:
-        return Alignment.topRight;
-      case OiToastPosition.bottomLeft:
-        return Alignment.bottomLeft;
-      case OiToastPosition.bottomCenter:
-        return Alignment.bottomCenter;
-      case OiToastPosition.bottomRight:
-        return Alignment.bottomRight;
-    }
-  }
-
-  EdgeInsetsGeometry _padding() {
-    const edge = 16.0;
-    switch (widget.position) {
-      case OiToastPosition.topLeft:
-      case OiToastPosition.topCenter:
-      case OiToastPosition.topRight:
-        return const EdgeInsets.only(top: edge, left: edge, right: edge);
-      case OiToastPosition.bottomLeft:
-      case OiToastPosition.bottomCenter:
-      case OiToastPosition.bottomRight:
-        return const EdgeInsets.only(bottom: edge, left: edge, right: edge);
     }
   }
 
@@ -379,12 +525,6 @@ class _OiToastState extends State<OiToast> with SingleTickerProviderStateMixin {
       child: toast,
     );
 
-    return Align(
-      alignment: _alignment(),
-      child: Padding(
-        padding: _padding(),
-        child: FadeTransition(opacity: _opacity, child: toast),
-      ),
-    );
+    return FadeTransition(opacity: _opacity, child: toast);
   }
 }

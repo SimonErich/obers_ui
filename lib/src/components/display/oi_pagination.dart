@@ -405,11 +405,17 @@ class _OiPaginationState extends State<OiPagination> {
               '${widget._loadedCount} of ${widget.totalItems} ${widget.label} loaded',
             ),
             const SizedBox(height: 8),
-            OiButton.ghost(
-              key: const Key('oi_pagination_load_more'),
-              label: 'Load more',
-              loading: widget._loading,
-              onTap: widget._loading ? null : widget._onLoadMore,
+            Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 150),
+                child: OiButton.outline(
+                  key: const Key('oi_pagination_load_more'),
+                  label: 'Load more',
+                  fullWidth: true,
+                  loading: widget._loading,
+                  onTap: widget._loading ? null : widget._onLoadMore,
+                ),
+              ),
             ),
           ],
         ),

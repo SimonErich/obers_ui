@@ -88,7 +88,9 @@ class _CmsArticlesScreenState extends State<CmsArticlesScreen> {
       layout: _layout,
       sortOptions: _sortOptions,
       activeSort: _activeSort,
-      onSort: (option) => setState(() => _activeSort = option),
+      onSort: (option) => setState(
+        () => _activeSort = _activeSort?.id == option.id ? null : option,
+      ),
       filters: [
         OiFilterDefinition(
           key: 'category',
@@ -140,11 +142,14 @@ class _CmsArticlesScreenState extends State<CmsArticlesScreen> {
             ),
           ],
         ),
-        child: OiLabel.body(
-          post.excerpt,
-          color: colors.textSubtle,
-          maxLines: 2,
-          overflow: TextOverflow.ellipsis,
+        child: Padding(
+          padding: EdgeInsets.only(top: context.spacing.sm),
+          child: OiLabel.body(
+            post.excerpt,
+            color: colors.textSubtle,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
         ),
       ),
     );

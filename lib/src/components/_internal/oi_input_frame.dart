@@ -58,7 +58,7 @@ class OiInputFrame extends StatelessWidget {
 
     final row = Row(
       children: [
-        if (leading != null) leading!,
+        if (leading != null) ...[leading!, const SizedBox(width: 8)],
         Expanded(child: child),
         if (trailing != null) trailing!,
       ],
@@ -84,7 +84,7 @@ class OiInputFrame extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (label != null) ...[
-          OiLabel.small(label!),
+          OiLabel.smallStrong(label!),
           const SizedBox(height: 4),
         ],
         frame,

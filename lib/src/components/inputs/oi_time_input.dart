@@ -83,8 +83,12 @@ class _OiTimeInputState extends State<OiTimeInput> {
   bool _open = false;
   late int _pickerHour;
   late int _pickerMinute;
-  late FixedExtentScrollController _hourCtrl;
-  late FixedExtentScrollController _minuteCtrl;
+  late ScrollController _hourCtrl;
+  late ScrollController _minuteCtrl;
+
+  static const double _itemHeight = 36;
+  static const int _visibleItems = 5;
+  static const double _centerOffset = (_visibleItems ~/ 2) * _itemHeight;
 
   int get _hourCount => widget.use24Hour ? 24 : 12;
 
@@ -99,8 +103,25 @@ class _OiTimeInputState extends State<OiTimeInput> {
 
   void _initControllers() {
     final hourItem = widget.use24Hour ? _pickerHour : (_pickerHour % 12);
-    _hourCtrl = FixedExtentScrollController(initialItem: hourItem);
-    _minuteCtrl = FixedExtentScrollController(initialItem: _pickerMinute);
+    _hourCtrl = ScrollController(
+      initialScrollOffset:
+          (hourItem * _itemHeight - _centerOffset).clamp(0.0, double.infinity),
+    );
+    _minuteCtrl = ScrollController(
+      initialScrollOffset:
+          (_pickerMinute * _itemHeight - _centerOffset)
+              .clamp(0.0, double.infinity),
+    );
+  }
+
+  @override
+  void didUpdateWidget(OiTimeInput oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.value != widget.value && !_open) {
+      final ref = widget.value ?? const OiTimeOfDay(hour: 0, minute: 0);
+      _pickerHour = ref.hour;
+      _pickerMinute = ref.minute;
+    }
   }
 
   @override
@@ -108,6 +129,20 @@ class _OiTimeInputState extends State<OiTimeInput> {
     _hourCtrl.dispose();
     _minuteCtrl.dispose();
     super.dispose();
+  }
+
+  void _togglePicker() {
+    if (_open) {
+      setState(() => _open = false);
+      return;
+    }
+    _hourCtrl.dispose();
+    _minuteCtrl.dispose();
+    final ref = widget.value ?? const OiTimeOfDay(hour: 0, minute: 0);
+    _pickerHour = ref.hour;
+    _pickerMinute = ref.minute;
+    _initControllers();
+    setState(() => _open = true);
   }
 
   String _formatTime(OiTimeOfDay t) {
@@ -128,38 +163,55 @@ class _OiTimeInputState extends State<OiTimeInput> {
 
   void _cancelPicker() => setState(() => _open = false);
 
-  Widget _buildPicker(BuildContext context) {
+  Widget _buildPickerColumn({
+    required BuildContext context,
+    required int itemCount,
+    required String Function(int) label,
+    required int selectedIndex,
+    required void Function(int) onSelected,
+    required ScrollController scrollCtrl,
+    double width = 60,
+  }) {
     final colors = context.colors;
-    const itemExtent = 40.0;
-    const visibleItems = 5;
-    const pickerHeight = itemExtent * visibleItems;
+    const columnHeight = _itemHeight * _visibleItems;
 
-    Widget column(
-      int itemCount,
-      String Function(int) label,
-      FixedExtentScrollController ctrl,
-      void Function(int) onChanged,
-    ) {
-      return SizedBox(
-        width: 60,
-        height: pickerHeight,
-        child: ListWheelScrollView.useDelegate(
-          controller: ctrl,
-          itemExtent: itemExtent,
-          physics: const FixedExtentScrollPhysics(),
-          onSelectedItemChanged: onChanged,
-          childDelegate: ListWheelChildBuilderDelegate(
-            childCount: itemCount,
-            builder: (ctx, index) => Center(
+    return SizedBox(
+      width: width,
+      height: columnHeight,
+      child: ListView.builder(
+        controller: scrollCtrl,
+        itemCount: itemCount,
+        itemExtent: _itemHeight,
+        itemBuilder: (context, index) {
+          final isSelected = index == selectedIndex;
+          return OiTappable(
+            onTap: () => onSelected(index),
+            child: Container(
+              height: _itemHeight,
+              alignment: Alignment.center,
+              decoration: isSelected
+                  ? BoxDecoration(
+                      color: colors.primary.base.withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(6),
+                    )
+                  : null,
               child: Text(
                 label(index),
-                style: TextStyle(fontSize: 16, color: colors.text),
+                style: TextStyle(
+                  fontSize: 15,
+                  color: isSelected ? colors.primary.base : colors.text,
+                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                ),
               ),
             ),
-          ),
-        ),
-      );
-    }
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildPicker(BuildContext context) {
+    final colors = context.colors;
 
     return Container(
       decoration: BoxDecoration(
@@ -180,14 +232,16 @@ class _OiTimeInputState extends State<OiTimeInput> {
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              column(
-                _hourCount,
-                (i) {
+              _buildPickerColumn(
+                context: context,
+                itemCount: _hourCount,
+                label: (i) {
                   if (widget.use24Hour) return i.toString().padLeft(2, '0');
                   return (i == 0 ? 12 : i).toString().padLeft(2, '0');
                 },
-                _hourCtrl,
-                (i) {
+                selectedIndex:
+                    widget.use24Hour ? _pickerHour : (_pickerHour % 12),
+                onSelected: (i) {
                   setState(() {
                     _pickerHour = widget.use24Hour
                         ? i
@@ -196,6 +250,7 @@ class _OiTimeInputState extends State<OiTimeInput> {
                               : (i == 0 ? 0 : i));
                   });
                 },
+                scrollCtrl: _hourCtrl,
               ),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 4),
@@ -208,11 +263,13 @@ class _OiTimeInputState extends State<OiTimeInput> {
                   ),
                 ),
               ),
-              column(
-                60,
-                (i) => i.toString().padLeft(2, '0'),
-                _minuteCtrl,
-                (i) => setState(() => _pickerMinute = i),
+              _buildPickerColumn(
+                context: context,
+                itemCount: 60,
+                label: (i) => i.toString().padLeft(2, '0'),
+                selectedIndex: _pickerMinute,
+                onSelected: (i) => setState(() => _pickerMinute = i),
+                scrollCtrl: _minuteCtrl,
               ),
             ],
           ),
@@ -269,7 +326,7 @@ class _OiTimeInputState extends State<OiTimeInput> {
     );
 
     final anchor = GestureDetector(
-      onTap: widget.enabled ? () => setState(() => _open = !_open) : null,
+      onTap: widget.enabled ? _togglePicker : null,
       behavior: HitTestBehavior.opaque,
       child: OiInputFrame(
         label: widget.label,
@@ -290,6 +347,7 @@ class _OiTimeInputState extends State<OiTimeInput> {
 
     return OiFloating(
       visible: _open,
+      onDismiss: _cancelPicker,
       anchor: anchor,
       child: UnconstrainedBox(
         alignment: Alignment.topLeft,

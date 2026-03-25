@@ -247,144 +247,366 @@ class FilesScreen extends StatelessWidget {
           ),
 
           // ── OiFileDropTarget ────────────────────────────────────────────
-          const ComponentShowcaseSection(
+          ComponentShowcaseSection(
             title: 'File Drop Target',
             widgetName: 'OiFileDropTarget',
             description:
                 'A drag-and-drop file upload zone that accepts dropped files. '
                 'Shows visual feedback when files are dragged over it. '
                 'Key parameters: onFilesDropped, allowedExtensions, '
-                'maxFileSize, child.',
+                'maxFileSize, child. \n\nOiFileDropTarget wraps a child widget and provides visual '
+                'feedback when files are dragged over the zone. It accepts '
+                'file drops and invokes onFilesDropped with the dropped '
+                'file data. Supports filtering by extension and file size.',
             examples: [
               ComponentExample(
-                title: 'Description',
-                child: OiLabel.body(
-                  'OiFileDropTarget wraps a child widget and provides visual '
-                  'feedback when files are dragged over the zone. It accepts '
-                  'file drops and invokes onFilesDropped with the dropped '
-                  'file data. Supports filtering by extension and file size.',
+                title: 'Drop Zone',
+                child: OiFileDropTarget(
+                  onInternalDrop: (_, __) {},
+                  onExternalDrop: (_) {},
+                  dropMessage: 'Drop files here to upload',
+                  child: Container(
+                    height: 120,
+                    alignment: Alignment.center,
+                    child: const OiLabel.body('Drag files here'),
+                  ),
                 ),
               ),
             ],
           ),
 
           // ── OiFileToolbar ───────────────────────────────────────────────
-          const ComponentShowcaseSection(
+          ComponentShowcaseSection(
             title: 'File Toolbar',
             widgetName: 'OiFileToolbar',
             description:
-                'A toolbar for file management actions such as copy, move, '
-                'delete, rename, and upload. Adapts to the current selection '
-                'state and available actions.',
+                'A toolbar with breadcrumb navigation, search, and bulk '
+                'actions for file management. \n\n'
+                'OiFileToolbar renders contextual action buttons based on '
+                'the current file selection. Common actions include upload, '
+                'new folder, copy, move, delete, and rename. The toolbar '
+                'collapses into an overflow menu on narrow screens.',
             examples: [
               ComponentExample(
-                title: 'Description',
-                child: OiLabel.body(
-                  'OiFileToolbar renders contextual action buttons based on '
-                  'the current file selection. Common actions include upload, '
-                  'new folder, copy, move, delete, and rename. The toolbar '
-                  'collapses into an overflow menu on narrow screens.',
+                title: 'With Breadcrumbs & Selection',
+                child: OiFileToolbar(
+                  label: 'File toolbar',
+                  breadcrumbs: [
+                    OiBreadcrumbItem(label: 'Home', onTap: () {}),
+                    OiBreadcrumbItem(label: 'Documents', onTap: () {}),
+                    const OiBreadcrumbItem(label: 'Reports'),
+                  ],
+                  selectedCount: 3,
+                  onSearch: (_) {},
                 ),
               ),
             ],
           ),
 
           // ── OiFolderTreeItem ────────────────────────────────────────────
-          const ComponentShowcaseSection(
+          ComponentShowcaseSection(
             title: 'Folder Tree Item',
             widgetName: 'OiFolderTreeItem',
             description:
                 'A tree node widget for rendering folder hierarchies with '
-                'expand/collapse, drag-and-drop, and context menu support.',
+                'expand/collapse and selection support. \n\n'
+                'OiFolderTreeItem displays a single folder in a tree '
+                'structure. It supports expand/collapse toggling, indent '
+                'levels, selection highlighting, and acts as both a drag '
+                'source and drop target for file operations.',
             examples: [
               ComponentExample(
-                title: 'Description',
-                child: OiLabel.body(
-                  'OiFolderTreeItem displays a single folder in a tree '
-                  'structure. It supports expand/collapse toggling, indent '
-                  'levels, selection highlighting, and acts as both a drag '
-                  'source and drop target for file operations.',
+                title: 'Folder Items',
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    OiFolderTreeItem(
+                      folder: const OiFileNodeData(
+                        id: 'docs',
+                        name: 'Documents',
+                        isFolder: true,
+                        itemCount: 24,
+                      ),
+                      expanded: true,
+                      selected: true,
+                      onTap: () {},
+                      onExpand: () {},
+                    ),
+                    OiFolderTreeItem(
+                      folder: const OiFileNodeData(
+                        id: 'photos',
+                        name: 'Photos',
+                        isFolder: true,
+                        itemCount: 156,
+                      ),
+                      expanded: false,
+                      selected: false,
+                      onTap: () {},
+                      onExpand: () {},
+                    ),
+                    OiFolderTreeItem(
+                      folder: const OiFileNodeData(
+                        id: 'shared',
+                        name: 'Shared with me',
+                        isFolder: true,
+                        isShared: true,
+                      ),
+                      expanded: false,
+                      selected: false,
+                      onTap: () {},
+                      onExpand: () {},
+                    ),
+                  ],
                 ),
               ),
             ],
           ),
 
           // ── OiFileGridView ──────────────────────────────────────────────
-          const ComponentShowcaseSection(
+          ComponentShowcaseSection(
             title: 'File Grid View',
             widgetName: 'OiFileGridView',
             description:
-                'A responsive grid layout of OiFileGridCard widgets. '
-                'Supports multi-select, drag-and-drop reordering, and '
-                'search highlighting.',
+                'A responsive grid layout of file cards with multi-select '
+                'and drag-and-drop support. \n\n'
+                'OiFileGridView arranges file cards in a responsive grid. '
+                'Key parameters: files (List<OiFileNode>), onTap, '
+                'onDoubleTap, selectedKeys, onSelectionChange, '
+                'searchQuery. Best experienced in the Files mini-app.',
             examples: [
               ComponentExample(
-                title: 'Description',
-                child: OiLabel.body(
-                  'OiFileGridView arranges file cards in a responsive grid. '
-                  'Key parameters: files (List<OiFileNode>), onTap, '
-                  'onDoubleTap, selectedKeys, onSelectionChange, '
-                  'searchQuery. Best experienced in the Files mini-app.',
+                title: 'Grid of Files',
+                child: SizedBox(
+                  height: 250,
+                  child: OiFileGridView(
+                    files: [
+                      OiFileNodeData(
+                        id: 'g1',
+                        name: 'photo.jpg',
+                        isFolder: false,
+                        size: 1228800,
+                        modified: DateTime(2026, 3, 20),
+                      ),
+                      OiFileNodeData(
+                        id: 'g2',
+                        name: 'budget.xlsx',
+                        isFolder: false,
+                        size: 524288,
+                        modified: DateTime(2026, 3, 18),
+                      ),
+                      const OiFileNodeData(
+                        id: 'g3',
+                        name: 'Projects',
+                        isFolder: true,
+                        itemCount: 12,
+                      ),
+                      OiFileNodeData(
+                        id: 'g4',
+                        name: 'notes.md',
+                        isFolder: false,
+                        size: 4096,
+                        modified: DateTime(2026, 3, 22),
+                      ),
+                    ],
+                    selectedKeys: const {'g2'},
+                    onSelectionChange: (_) {},
+                    onOpen: (_) {},
+                  ),
                 ),
               ),
             ],
           ),
 
           // ── OiFileListView ──────────────────────────────────────────────
-          const ComponentShowcaseSection(
+          ComponentShowcaseSection(
             title: 'File List View',
             widgetName: 'OiFileListView',
             description:
-                'A sortable list layout of OiFileTile widgets with column '
-                'headers for name, size, and modified date.',
+                'A sortable list layout with column headers for name, size, '
+                'and modified date. \n\n'
+                'OiFileListView displays files in a list with sortable '
+                'column headers. Key parameters: files, onTap, '
+                'onDoubleTap, sortField, sortDirection, onSortChange, '
+                'selectedKeys. Best experienced in the Files mini-app.',
             examples: [
               ComponentExample(
-                title: 'Description',
-                child: OiLabel.body(
-                  'OiFileListView displays files in a list with sortable '
-                  'column headers. Key parameters: files, onTap, '
-                  'onDoubleTap, sortField, sortDirection, onSortChange, '
-                  'selectedKeys. Best experienced in the Files mini-app.',
+                title: 'List of Files',
+                child: SizedBox(
+                  height: 250,
+                  child: OiFileListView(
+                    files: [
+                      const OiFileNodeData(
+                        id: 'l0',
+                        name: 'Documents',
+                        isFolder: true,
+                        itemCount: 24,
+                      ),
+                      OiFileNodeData(
+                        id: 'l1',
+                        name: 'report.pdf',
+                        isFolder: false,
+                        size: 2457600,
+                        modified: DateTime(2026, 3, 23),
+                      ),
+                      OiFileNodeData(
+                        id: 'l2',
+                        name: 'presentation.pptx',
+                        isFolder: false,
+                        size: 5242880,
+                        modified: DateTime(2026, 3, 21),
+                      ),
+                      OiFileNodeData(
+                        id: 'l3',
+                        name: 'main.dart',
+                        isFolder: false,
+                        size: 8192,
+                        modified: DateTime(2026, 3, 22),
+                      ),
+                    ],
+                    selectedKeys: const {},
+                    onSelectionChange: (_) {},
+                    onOpen: (_) {},
+                  ),
                 ),
               ),
             ],
           ),
 
           // ── OiFileSidebar ───────────────────────────────────────────────
-          const ComponentShowcaseSection(
+          ComponentShowcaseSection(
             title: 'File Sidebar',
             widgetName: 'OiFileSidebar',
             description:
                 'A sidebar panel with folder tree navigation, quick-access '
-                'sections (favorites, recent, tags), and storage usage.',
+                'sections, and storage usage indicator. \n\n'
+                'OiFileSidebar provides folder tree navigation alongside '
+                'quick-access sections like Favorites, Recent, and Tags. '
+                'It also shows a storage usage indicator at the bottom. '
+                'Best experienced in the Files mini-app.',
             examples: [
               ComponentExample(
-                title: 'Description',
-                child: OiLabel.body(
-                  'OiFileSidebar provides folder tree navigation alongside '
-                  'quick-access sections like Favorites, Recent, and Tags. '
-                  'It also shows a storage usage indicator at the bottom. '
-                  'Best experienced in the Files mini-app.',
+                title: 'Folder Navigation',
+                child: SizedBox(
+                  height: 400,
+                  child: OiFileSidebar(
+                    folderTree: [
+                      OiTreeNode<OiFileNodeData>(
+                        id: 'home',
+                        label: 'Home',
+                        data: const OiFileNodeData(
+                          id: 'home',
+                          name: 'Home',
+                          isFolder: true,
+                        ),
+                        children: [
+                          OiTreeNode<OiFileNodeData>(
+                            id: 'docs',
+                            label: 'Documents',
+                            data: const OiFileNodeData(
+                              id: 'docs',
+                              name: 'Documents',
+                              isFolder: true,
+                              itemCount: 24,
+                            ),
+                          ),
+                          OiTreeNode<OiFileNodeData>(
+                            id: 'photos',
+                            label: 'Photos',
+                            data: const OiFileNodeData(
+                              id: 'photos',
+                              name: 'Photos',
+                              isFolder: true,
+                              itemCount: 156,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                    selectedFolderId: 'docs',
+                    onFolderSelect: (_) {},
+                    quickAccess: const [
+                      OiQuickAccessItem(
+                        id: 'recent',
+                        label: 'Recent',
+                        icon: OiIcons.clock,
+                      ),
+                      OiQuickAccessItem(
+                        id: 'favorites',
+                        label: 'Favorites',
+                        icon: OiIcons.star,
+                        badgeCount: 5,
+                      ),
+                    ],
+                    storage: const OiStorageData(
+                      usedBytes: 5368709120,
+                      totalBytes: 10737418240,
+                    ),
+                  ),
                 ),
               ),
             ],
           ),
 
           // ── OiFilePreview ───────────────────────────────────────────────
-          const ComponentShowcaseSection(
+          ComponentShowcaseSection(
             title: 'File Preview',
             widgetName: 'OiFilePreview',
             description:
-                'A preview panel that displays file content (images, PDFs, '
-                'text) and metadata in a detail sidebar.',
+                'A preview panel that displays file content and metadata. \n\n'
+                'OiFilePreview renders a preview of the selected file '
+                'alongside its metadata (name, size, type, dates). '
+                'Supports image thumbnails, PDF previews, and text '
+                'content. Best experienced in the Files mini-app.',
             examples: [
               ComponentExample(
-                title: 'Description',
-                child: OiLabel.body(
-                  'OiFilePreview renders a preview of the selected file '
-                  'alongside its metadata (name, size, type, dates). '
-                  'Supports image thumbnails, PDF previews, and text '
-                  'content. Best experienced in the Files mini-app.',
+                title: 'File Previews',
+                child: Wrap(
+                  spacing: 12,
+                  runSpacing: 12,
+                  children: [
+                    SizedBox(
+                      width: 140,
+                      height: 160,
+                      child: OiFilePreview(
+                        file: OiFileNodeData(
+                          id: 'p1',
+                          name: 'photo.jpg',
+                          isFolder: false,
+                          size: 1228800,
+                          mimeType: 'image/jpeg',
+                          modified: DateTime(2026, 3, 20),
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      width: 140,
+                      height: 160,
+                      child: OiFilePreview(
+                        file: OiFileNodeData(
+                          id: 'p2',
+                          name: 'report.pdf',
+                          isFolder: false,
+                          size: 2457600,
+                          mimeType: 'application/pdf',
+                          modified: DateTime(2026, 3, 23),
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      width: 140,
+                      height: 160,
+                      child: OiFilePreview(
+                        file: OiFileNodeData(
+                          id: 'p3',
+                          name: 'video.mp4',
+                          isFolder: false,
+                          size: 52428800,
+                          mimeType: 'video/mp4',
+                          modified: DateTime(2026, 3, 15),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
@@ -396,17 +618,33 @@ class FilesScreen extends StatelessWidget {
             widgetName: 'OiDropHighlight',
             description:
                 'A visual indicator overlay for drag-and-drop targets. '
-                'Shows a highlighted border and background when files '
-                'are dragged over a valid drop zone.',
+                'Shows a highlighted border and tinted background. \n\n'
+                'OiDropHighlight provides visual feedback during '
+                'drag-and-drop operations. It highlights the target '
+                'area with a border and tinted background to indicate '
+                'a valid drop zone. Used internally by file explorer '
+                'composites.',
             examples: [
               ComponentExample(
-                title: 'Description',
-                child: OiLabel.body(
-                  'OiDropHighlight provides visual feedback during '
-                  'drag-and-drop operations. It highlights the target '
-                  'area with a border and tinted background to indicate '
-                  'a valid drop zone. Used internally by file explorer '
-                  'composites.',
+                title: 'Active Drop Zone',
+                child: SizedBox(
+                  height: 120,
+                  child: OiDropHighlight(
+                    active: true,
+                    message: 'Drop files here',
+                    icon: OiIcons.upload,
+                  ),
+                ),
+              ),
+              ComponentExample(
+                title: 'Border Style',
+                child: SizedBox(
+                  height: 120,
+                  child: OiDropHighlight(
+                    active: true,
+                    style: OiDropHighlightStyle.border,
+                    child: Center(child: OiLabel.body('Content area')),
+                  ),
                 ),
               ),
             ],

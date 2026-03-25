@@ -141,7 +141,9 @@ class _ChartsScreenState extends State<ChartsScreen> {
                 title: 'CPU Usage',
                 child: SizedBox(
                   height: 200,
-                  child: OiGauge(value: 72, label: 'CPU Usage'),
+                  child: Center(
+                    child: OiGauge(value: 72, label: 'CPU Usage'),
+                  ),
                 ),
               ),
             ],
@@ -259,18 +261,45 @@ class _ChartsScreenState extends State<ChartsScreen> {
             description:
                 'A scatter plot for visualising correlation between two '
                 'variables. Supports multiple series with configurable point '
-                'shapes (circle, square, diamond, triangle) and sizes.',
-            examples: [
-              ComponentExample(
-                title: 'Key Parameters',
-                child: OiLabel.body(
-                  'OiScatterPlot renders data points on a Cartesian grid. '
+                'shapes (circle, square, diamond, triangle) and sizes. \n\n'
+                'OiScatterPlot renders data points on a Cartesian grid. '
                   'Required: label (String), series (List<OiScatterSeries>). '
                   'Each OiScatterSeries has label, points '
                   '(List<OiScatterPoint> with x, y), optional color, '
                   'pointRadius, and shape (OiScatterShape). '
                   'Optional: xAxis, yAxis (OiChartAxis), showGrid, '
                   'showLegend, onPointTap.',
+            examples: [
+              ComponentExample(
+                title: 'Height vs Weight',
+                child: SizedBox(
+                  height: 300,
+                  child: OiScatterPlot(
+                    label: 'Height vs Weight',
+                    series: [
+                      OiScatterSeries(
+                        label: 'Male',
+                        points: [
+                          OiScatterPoint(x: 170, y: 70),
+                          OiScatterPoint(x: 175, y: 80),
+                          OiScatterPoint(x: 180, y: 85),
+                          OiScatterPoint(x: 165, y: 65),
+                          OiScatterPoint(x: 185, y: 90),
+                        ],
+                      ),
+                      OiScatterSeries(
+                        label: 'Female',
+                        shape: OiScatterShape.diamond,
+                        points: [
+                          OiScatterPoint(x: 155, y: 50),
+                          OiScatterPoint(x: 160, y: 55),
+                          OiScatterPoint(x: 165, y: 60),
+                          OiScatterPoint(x: 150, y: 48),
+                          OiScatterPoint(x: 170, y: 65),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ],
@@ -283,16 +312,39 @@ class _ChartsScreenState extends State<ChartsScreen> {
             description:
                 'A bubble chart visualization plotting data by x, y, and '
                 'size dimensions. Extends scatter plot concepts with a third '
-                'data dimension encoded as bubble radius.',
-            examples: [
-              ComponentExample(
-                title: 'Key Parameters',
-                child: OiLabel.body(
-                  'OiBubbleChart takes an OiBubbleChartData object containing '
+                'data dimension encoded as bubble radius. \n\n'
+                'OiBubbleChart takes an OiBubbleChartData object containing '
                   'series definitions, size configuration, and axis settings. '
                   'Required: data (OiBubbleChartData). Optional: '
                   'semanticLabel, theme (OiBubbleChartTheme), '
                   'interactionMode, compact.',
+            examples: [
+              ComponentExample(
+                title: 'City Metrics',
+                child: SizedBox(
+                  height: 300,
+                  child: OiBubbleChart(
+                    label: 'City metrics',
+                    data: OiBubbleChartData(
+                      series: [
+                        OiBubbleSeries(
+                          name: 'Cities',
+                          points: [
+                            OiBubblePoint(x: 50, y: 80, size: 30, label: 'NYC'),
+                            OiBubblePoint(x: 70, y: 60, size: 20, label: 'LA'),
+                            OiBubblePoint(x: 30, y: 90, size: 15, label: 'Chicago'),
+                            OiBubblePoint(x: 80, y: 40, size: 25, label: 'Houston'),
+                            OiBubblePoint(x: 60, y: 70, size: 10, label: 'Phoenix'),
+                          ],
+                        ),
+                      ],
+                      sizeConfig: OiBubbleSizeConfig(
+                        minRadius: 6,
+                        maxRadius: 30,
+                        sizeLabel: 'Population',
+                      ),
+                    ),
+                  ),
                 ),
               ),
             ],
@@ -305,15 +357,33 @@ class _ChartsScreenState extends State<ChartsScreen> {
             description:
                 'A flow diagram showing how values move between categories. '
                 'Nodes are laid out in columns and links are rendered as '
-                'curved bands proportional to their value.',
-            examples: [
-              ComponentExample(
-                title: 'Key Parameters',
-                child: OiLabel.body(
-                  'OiSankey takes nodes (List<OiSankeyNode> with key, label) '
+                'curved bands proportional to their value. \n\n'
+                'OiSankey takes nodes (List<OiSankeyNode> with key, label) '
                   'and links (List<OiSankeyLink> with source, target, value). '
                   'Required: nodes, links, label. Optional: showLabels, '
                   'showValues, onNodeTap, onLinkTap.',
+            examples: [
+              ComponentExample(
+                title: 'Energy Flow',
+                child: SizedBox(
+                  height: 300,
+                  child: OiSankey(
+                    label: 'Energy flow',
+                    nodes: [
+                      OiSankeyNode(key: 'solar', label: 'Solar'),
+                      OiSankeyNode(key: 'wind', label: 'Wind'),
+                      OiSankeyNode(key: 'grid', label: 'Grid'),
+                      OiSankeyNode(key: 'home', label: 'Home'),
+                      OiSankeyNode(key: 'ev', label: 'EV'),
+                    ],
+                    links: [
+                      OiSankeyLink(source: 'solar', target: 'grid', value: 40),
+                      OiSankeyLink(source: 'wind', target: 'grid', value: 30),
+                      OiSankeyLink(source: 'grid', target: 'home', value: 50),
+                      OiSankeyLink(source: 'grid', target: 'ev', value: 20),
+                    ],
+                    showValues: true,
+                  ),
                 ),
               ),
             ],
@@ -325,15 +395,27 @@ class _ChartsScreenState extends State<ChartsScreen> {
             widgetName: 'OiTreemap',
             description:
                 'A treemap visualization showing hierarchical data as nested '
-                'rectangles. Each node area is proportional to its value.',
-            examples: [
-              ComponentExample(
-                title: 'Key Parameters',
-                child: OiLabel.body(
-                  'OiTreemap takes nodes (List<OiTreemapNode> with key, '
+                'rectangles. Each node area is proportional to its value. \n\n'
+                'OiTreemap takes nodes (List<OiTreemapNode> with key, '
                   'label, value, optional children for nesting). '
                   'Required: nodes, label. Optional: showLabels, showValues, '
                   'onNodeTap.',
+            examples: [
+              ComponentExample(
+                title: 'Disk Usage',
+                child: SizedBox(
+                  height: 300,
+                  child: OiTreemap(
+                    label: 'Disk usage',
+                    showValues: true,
+                    nodes: [
+                      OiTreemapNode(key: 'photos', label: 'Photos', value: 45),
+                      OiTreemapNode(key: 'videos', label: 'Videos', value: 30),
+                      OiTreemapNode(key: 'docs', label: 'Documents', value: 15),
+                      OiTreemapNode(key: 'music', label: 'Music', value: 8),
+                      OiTreemapNode(key: 'other', label: 'Other', value: 2),
+                    ],
+                  ),
                 ),
               ),
             ],
