@@ -15,6 +15,8 @@ import 'package:obers_ui_charts/src/foundation/oi_chart_sync_group.dart';
 import 'package:obers_ui_charts/src/foundation/oi_chart_viewport.dart';
 import 'package:obers_ui/obers_ui.dart' show OiChartThemeData;
 
+import 'package:obers_ui_charts/src/utils/chart_math.dart';
+
 import 'package:obers_ui_charts/src/models/oi_cartesian_series.dart';
 import 'package:obers_ui_charts/src/models/oi_chart_annotation.dart';
 import 'package:obers_ui_charts/src/models/oi_chart_legend_config.dart';
@@ -183,6 +185,18 @@ class _OiCartesianChartState<T> extends State<OiCartesianChart<T>>
   bool get _hasData =>
       _visibleSeries.any((s) => s.data != null && s.data!.isNotEmpty);
 
+  /// Total data point count across all visible series.
+  int get _totalPointCount {
+    var count = 0;
+    for (final s in _visibleSeries) {
+      count += s.data?.length ?? 0;
+    }
+    return count;
+  }
+
+  /// Whether the chart has exactly one data point total (needs padding).
+  bool get _isSinglePoint => _totalPointCount == 1;
+
   bool get _allSeriesHidden =>
       widget.series.isNotEmpty &&
       widget.series.every(
@@ -252,12 +266,29 @@ class _OiCartesianChartState<T> extends State<OiCartesianChart<T>>
               ? constraints.maxHeight
               : 300.0;
 
+          // Build visible domain for single-point padding.
+          Rect? visibleDomain;
+          if (_isSinglePoint) {
+            // Find the single data point's x-value for domain padding.
+            for (final s in _visibleSeries) {
+              if (s.data != null && s.data!.isNotEmpty) {
+                final xVal = s.xMapper(s.data!.first);
+                if (xVal is num) {
+                  final pad = domainPaddingForSinglePoint(xVal.toDouble());
+                  visibleDomain = Rect.fromLTRB(xVal - pad, 0, xVal + pad, 0);
+                }
+                break;
+              }
+            }
+          }
+
           _viewport = OiChartViewport(
             size: Size(w, h),
             devicePixelRatio:
                 MediaQuery.maybeDevicePixelRatioOf(context) ?? 1.0,
             zoomLevel: ctrl.viewportState.zoomLevel,
             panOffset: ctrl.viewportState.panOffset,
+            visibleDomain: visibleDomain,
           );
 
           // Attach behaviors now that we have a valid context.
