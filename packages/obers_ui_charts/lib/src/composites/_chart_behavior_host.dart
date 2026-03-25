@@ -1,0 +1,126 @@
+import 'package:flutter/gestures.dart';
+import 'package:flutter/widgets.dart';
+import 'package:obers_ui/obers_ui.dart' show OiChartThemeData;
+
+import 'package:obers_ui_charts/src/foundation/oi_chart_behavior.dart';
+import 'package:obers_ui_charts/src/foundation/oi_chart_controller.dart';
+import 'package:obers_ui_charts/src/foundation/oi_chart_hit_tester.dart';
+import 'package:obers_ui_charts/src/foundation/oi_chart_viewport.dart';
+import 'package:obers_ui_charts/src/models/oi_default_chart_controller.dart';
+
+/// Shared mixin for chart [State] classes that host behaviors.
+///
+/// Manages behavior attach/detach lifecycle, pointer event forwarding,
+/// and internal controller creation.
+mixin ChartBehaviorHost<T extends StatefulWidget> on State<T> {
+  /// Override to return the chart's behavior list.
+  List<OiChartBehavior> get behaviors;
+
+  /// Override to return the external controller (from widget props).
+  OiChartController? get externalController;
+
+  /// Override to return the current viewport.
+  OiChartViewport get currentViewport;
+
+  /// Override to return a hit tester (may be a no-op).
+  OiChartHitTester get hitTester;
+
+  // ── Internal controller ────────────────────────────────────────────────
+
+  OiDefaultChartController? _internalController;
+
+  /// The effective controller: external if provided, otherwise internal.
+  OiChartController get effectiveController {
+    if (externalController != null) return externalController!;
+    return _internalController ??= OiDefaultChartController();
+  }
+
+  // ── Behavior lifecycle ─────────────────────────────────────────────────
+
+  List<OiChartBehavior> _attachedBehaviors = const [];
+
+  /// Attaches all [behaviors] with the current context.
+  ///
+  /// Call from [initState] and when behaviors or controller change.
+  void attachBehaviors() {
+    detachBehaviors();
+    final ctx = OiChartBehaviorContext(
+      buildContext: context,
+      controller: effectiveController,
+      viewport: currentViewport,
+      hitTester: hitTester,
+      theme: OiChartThemeData(),
+    );
+    for (final b in behaviors) {
+      b.attach(ctx);
+    }
+    _attachedBehaviors = List.of(behaviors);
+  }
+
+  /// Detaches all currently attached behaviors.
+  void detachBehaviors() {
+    for (final b in _attachedBehaviors) {
+      if (b.isAttached) b.detach();
+    }
+    _attachedBehaviors = const [];
+  }
+
+  /// Disposes internal controller and detaches behaviors.
+  ///
+  /// Call from [dispose].
+  void disposeBehaviorHost() {
+    detachBehaviors();
+    _internalController?.dispose();
+    _internalController = null;
+  }
+
+  // ── Pointer event forwarding ───────────────────────────────────────────
+
+  /// Dispatches a [PointerEvent] to all attached behaviors.
+  void dispatchPointerEvent(PointerEvent event) {
+    for (final b in _attachedBehaviors) {
+      switch (event) {
+        case PointerDownEvent():
+          b.onPointerDown(event);
+        case PointerMoveEvent():
+          b.onPointerMove(event);
+        case PointerUpEvent():
+          b.onPointerUp(event);
+        case PointerHoverEvent():
+          b.onPointerHover(event);
+        case PointerScrollEvent():
+          b.onPointerScroll(event);
+        case PointerCancelEvent():
+          b.onPointerCancel(event);
+        default:
+          break;
+      }
+    }
+  }
+
+  /// Wraps [child] in a [Listener] that forwards pointer events to behaviors.
+  Widget wrapWithPointerListener(Widget child) {
+    if (_attachedBehaviors.isEmpty) return child;
+    return Listener(
+      onPointerDown: (e) => dispatchPointerEvent(e),
+      onPointerMove: (e) => dispatchPointerEvent(e),
+      onPointerUp: (e) => dispatchPointerEvent(e),
+      onPointerHover: (e) => dispatchPointerEvent(e),
+      onPointerSignal: (e) {
+        if (e is PointerScrollEvent) dispatchPointerEvent(e);
+      },
+      onPointerCancel: (e) => dispatchPointerEvent(e),
+      child: child,
+    );
+  }
+}
+
+/// A no-op hit tester for charts that haven't set up hit testing yet.
+class NoOpHitTester extends OiChartHitTester {
+  @override
+  OiChartHitResult? hitTest(Offset position, {double tolerance = 16}) => null;
+
+  @override
+  List<OiChartHitResult> hitTestAll(Offset position, {double tolerance = 16}) =>
+      [];
+}

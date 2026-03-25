@@ -3,11 +3,19 @@ import 'package:flutter/widgets.dart';
 import 'package:obers_ui_charts/src/components/oi_chart_empty_state.dart';
 import 'package:obers_ui_charts/src/components/oi_chart_error_state.dart';
 import 'package:obers_ui_charts/src/components/oi_chart_loading_state.dart';
+import 'package:obers_ui_charts/src/composites/_chart_behavior_host.dart';
 import 'package:obers_ui_charts/src/composites/oi_chart_axis.dart';
 import 'package:obers_ui_charts/src/foundation/oi_chart_accessibility_config.dart';
 import 'package:obers_ui_charts/src/foundation/oi_chart_behavior.dart';
 import 'package:obers_ui_charts/src/foundation/oi_chart_controller.dart';
+import 'package:obers_ui_charts/src/foundation/oi_chart_hit_tester.dart';
 import 'package:obers_ui_charts/src/foundation/oi_chart_viewport.dart';
+// Imported for future annotation/threshold support on matrix charts.
+// ignore: unused_import
+import 'package:obers_ui_charts/src/models/oi_chart_annotation.dart';
+// Imported for future annotation/threshold support on matrix charts.
+// ignore: unused_import
+import 'package:obers_ui_charts/src/models/oi_chart_threshold.dart';
 import 'package:obers_ui_charts/src/models/oi_matrix_series.dart';
 
 /// Base composite widget for cell-grid chart types (heatmap, correlation).
@@ -79,12 +87,66 @@ class OiMatrixChart<T> extends StatefulWidget {
   State<OiMatrixChart<T>> createState() => _OiMatrixChartState<T>();
 }
 
-class _OiMatrixChartState<T> extends State<OiMatrixChart<T>> {
-  List<OiMatrixSeries<T>> get _visibleSeries =>
-      widget.series.where((s) => s.visible).toList();
+class _OiMatrixChartState<T> extends State<OiMatrixChart<T>>
+    with ChartBehaviorHost<OiMatrixChart<T>> {
+  OiChartViewport _viewport = const OiChartViewport(size: Size.zero);
+
+  // ── ChartBehaviorHost overrides ──────────────────────────────────────
+
+  @override
+  List<OiChartBehavior> get behaviors => widget.behaviors;
+
+  @override
+  OiChartController? get externalController => widget.controller;
+
+  @override
+  OiChartViewport get currentViewport => _viewport;
+
+  @override
+  OiChartHitTester get hitTester => _hitTester;
+
+  final OiChartHitTester _hitTester = NoOpHitTester();
+
+  // ── Lifecycle ────────────────────────────────────────────────────────
+
+  @override
+  void initState() {
+    super.initState();
+    // Defer behavior attach to first build (needs context).
+  }
+
+  @override
+  void didUpdateWidget(covariant OiMatrixChart<T> oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.behaviors != widget.behaviors ||
+        oldWidget.controller != widget.controller) {
+      attachBehaviors();
+    }
+  }
+
+  @override
+  void dispose() {
+    disposeBehaviorHost();
+    super.dispose();
+  }
+
+  // ── Series helpers ───────────────────────────────────────────────────
+
+  List<OiMatrixSeries<T>> get _visibleSeries {
+    final legend = effectiveController.legendState;
+    return widget.series
+        .where((s) => s.visible && legend.isVisible(s.id))
+        .toList();
+  }
 
   bool get _hasData =>
       _visibleSeries.any((s) => s.data != null && s.data!.isNotEmpty);
+
+  bool get _allSeriesHidden =>
+      widget.series.isNotEmpty &&
+      widget.series.every(
+        (s) => !s.visible || !effectiveController.legendState.isVisible(s.id),
+      );
 
   String get _effectiveLabel {
     if (widget.semanticLabel != null) return widget.semanticLabel!;
@@ -92,17 +154,31 @@ class _OiMatrixChartState<T> extends State<OiMatrixChart<T>> {
     return 'Matrix chart';
   }
 
+  // ── Build ────────────────────────────────────────────────────────────
+
   @override
   Widget build(BuildContext context) {
-    final isLoading = widget.controller?.isLoading ?? false;
-    final error = widget.controller?.error;
+    final ctrl = effectiveController;
+    final isLoading = ctrl.isLoading;
+    final error = ctrl.error;
 
+    // Loading state.
     if (isLoading) {
       return widget.loadingState ?? const OiChartLoadingState();
     }
+
+    // Error state.
     if (error != null) {
       return widget.errorState ?? OiChartErrorState(message: error);
     }
+
+    // All series hidden.
+    if (_allSeriesHidden) {
+      return widget.emptyState ??
+          const OiChartEmptyState(message: 'All series are hidden');
+    }
+
+    // Empty state.
     if (!_hasData) {
       return widget.emptyState ?? const OiChartEmptyState();
     }
@@ -115,17 +191,29 @@ class _OiMatrixChartState<T> extends State<OiMatrixChart<T>> {
           final h = constraints.maxHeight.isFinite
               ? constraints.maxHeight
               : 300.0;
-          final viewport = OiChartViewport(
+
+          _viewport = OiChartViewport(
             size: Size(w, h),
             devicePixelRatio:
                 MediaQuery.maybeDevicePixelRatioOf(context) ?? 1.0,
+            zoomLevel: ctrl.viewportState.zoomLevel,
+            panOffset: ctrl.viewportState.panOffset,
           );
 
+          // Attach behaviors now that we have a valid context.
+          if (behaviors.isNotEmpty && behaviors.any((b) => !b.isAttached)) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (mounted) attachBehaviors();
+            });
+          }
+
           final content =
-              widget.seriesBuilder?.call(context, viewport, _visibleSeries) ??
+              widget.seriesBuilder?.call(context, _viewport, _visibleSeries) ??
               SizedBox(width: w, height: h);
 
-          return SizedBox(width: w, height: h, child: content);
+          return wrapWithPointerListener(
+            SizedBox(width: w, height: h, child: content),
+          );
         },
       ),
     );

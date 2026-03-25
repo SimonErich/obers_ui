@@ -3,15 +3,19 @@ import 'package:flutter/widgets.dart';
 import 'package:obers_ui_charts/src/components/oi_chart_empty_state.dart';
 import 'package:obers_ui_charts/src/components/oi_chart_error_state.dart';
 import 'package:obers_ui_charts/src/components/oi_chart_loading_state.dart';
+import 'package:obers_ui_charts/src/composites/_chart_behavior_host.dart';
 import 'package:obers_ui_charts/src/composites/oi_chart_axis.dart';
 import 'package:obers_ui_charts/src/foundation/oi_chart_accessibility_config.dart';
 import 'package:obers_ui_charts/src/foundation/oi_chart_animation_config.dart';
 import 'package:obers_ui_charts/src/foundation/oi_chart_behavior.dart';
 import 'package:obers_ui_charts/src/foundation/oi_chart_controller.dart';
+import 'package:obers_ui_charts/src/foundation/oi_chart_hit_tester.dart';
 import 'package:obers_ui_charts/src/foundation/oi_chart_performance_config.dart';
 import 'package:obers_ui_charts/src/foundation/oi_chart_sync_group.dart';
 import 'package:obers_ui_charts/src/foundation/oi_chart_viewport.dart';
 import 'package:obers_ui_charts/src/models/oi_cartesian_series.dart';
+import 'package:obers_ui_charts/src/models/oi_chart_annotation.dart';
+import 'package:obers_ui_charts/src/models/oi_chart_threshold.dart';
 
 /// Base composite widget for all cartesian (x/y) chart types.
 ///
@@ -37,6 +41,8 @@ class OiCartesianChart<T> extends StatefulWidget {
     this.accessibility,
     this.animation,
     this.performance,
+    this.annotations = const [],
+    this.thresholds = const [],
     this.emptyState,
     this.loadingState,
     this.errorState,
@@ -84,6 +90,12 @@ class OiCartesianChart<T> extends StatefulWidget {
   /// Performance configuration.
   final OiChartPerformanceConfig? performance;
 
+  /// Annotation overlays (lines, regions, points, labels).
+  final List<OiChartAnnotation> annotations;
+
+  /// Threshold lines.
+  final List<OiChartThreshold> thresholds;
+
   /// Custom empty state widget.
   final Widget? emptyState;
 
@@ -100,14 +112,66 @@ class OiCartesianChart<T> extends StatefulWidget {
   State<OiCartesianChart<T>> createState() => _OiCartesianChartState<T>();
 }
 
-class _OiCartesianChartState<T> extends State<OiCartesianChart<T>> {
+class _OiCartesianChartState<T> extends State<OiCartesianChart<T>>
+    with ChartBehaviorHost<OiCartesianChart<T>> {
   OiChartViewport _viewport = const OiChartViewport(size: Size.zero);
 
-  List<OiCartesianSeries<T>> get _visibleSeries =>
-      widget.series.where((s) => s.visible).toList();
+  // ── ChartBehaviorHost overrides ──────────────────────────────────────
+
+  @override
+  List<OiChartBehavior> get behaviors => widget.behaviors;
+
+  @override
+  OiChartController? get externalController => widget.controller;
+
+  @override
+  OiChartViewport get currentViewport => _viewport;
+
+  @override
+  OiChartHitTester get hitTester => _hitTester;
+
+  final OiChartHitTester _hitTester = NoOpHitTester();
+
+  // ── Lifecycle ────────────────────────────────────────────────────────
+
+  @override
+  void initState() {
+    super.initState();
+    // Defer behavior attach to first build (needs context).
+  }
+
+  @override
+  void didUpdateWidget(covariant OiCartesianChart<T> oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.behaviors != widget.behaviors ||
+        oldWidget.controller != widget.controller) {
+      attachBehaviors();
+    }
+  }
+
+  @override
+  void dispose() {
+    disposeBehaviorHost();
+    super.dispose();
+  }
+
+  // ── Series helpers ───────────────────────────────────────────────────
+
+  List<OiCartesianSeries<T>> get _visibleSeries {
+    final legend = effectiveController.legendState;
+    return widget.series
+        .where((s) => s.visible && legend.isVisible(s.id))
+        .toList();
+  }
 
   bool get _hasData =>
       _visibleSeries.any((s) => s.data != null && s.data!.isNotEmpty);
+
+  bool get _allSeriesHidden =>
+      widget.series.isNotEmpty &&
+      widget.series.every(
+        (s) => !s.visible || !effectiveController.legendState.isVisible(s.id),
+      );
 
   String get _effectiveLabel {
     if (widget.semanticLabel != null) return widget.semanticLabel!;
@@ -134,22 +198,31 @@ class _OiCartesianChartState<T> extends State<OiCartesianChart<T>> {
     return _inferScaleType(visible.first);
   }
 
+  // ── Build ────────────────────────────────────────────────────────────
+
   @override
   Widget build(BuildContext context) {
-    final isLoading = widget.controller?.isLoading ?? false;
-    final error = widget.controller?.error;
+    final ctrl = effectiveController;
+    final isLoading = ctrl.isLoading;
+    final error = ctrl.error;
 
-    // Loading state
+    // Loading state.
     if (isLoading) {
       return widget.loadingState ?? const OiChartLoadingState();
     }
 
-    // Error state
+    // Error state.
     if (error != null) {
       return widget.errorState ?? OiChartErrorState(message: error);
     }
 
-    // Empty state
+    // All series hidden.
+    if (_allSeriesHidden) {
+      return widget.emptyState ??
+          const OiChartEmptyState(message: 'All series are hidden');
+    }
+
+    // Empty state.
     if (!_hasData) {
       return widget.emptyState ?? const OiChartEmptyState();
     }
@@ -167,13 +240,24 @@ class _OiCartesianChartState<T> extends State<OiCartesianChart<T>> {
             size: Size(w, h),
             devicePixelRatio:
                 MediaQuery.maybeDevicePixelRatioOf(context) ?? 1.0,
+            zoomLevel: ctrl.viewportState.zoomLevel,
+            panOffset: ctrl.viewportState.panOffset,
           );
+
+          // Attach behaviors now that we have a valid context.
+          if (behaviors.isNotEmpty && behaviors.any((b) => !b.isAttached)) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (mounted) attachBehaviors();
+            });
+          }
 
           final content =
               widget.seriesBuilder?.call(context, _viewport, _visibleSeries) ??
               SizedBox(width: w, height: h);
 
-          return SizedBox(width: w, height: h, child: content);
+          return wrapWithPointerListener(
+            SizedBox(width: w, height: h, child: content),
+          );
         },
       ),
     );
