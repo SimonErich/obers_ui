@@ -127,6 +127,11 @@ export 'src/foundation/oi_chart_sync_group.dart';
 
 export 'package:obers_ui/src/foundation/theme/component_themes/oi_chart_palette.dart';
 export 'package:obers_ui/src/foundation/theme/component_themes/oi_chart_theme_data.dart';
+// ── Utils ────────────────────────────────────────────────────────────────────
+
+export 'src/utils/chart_math.dart';
+export 'src/utils/label_collision.dart';
+export 'src/utils/path_utils.dart';
 // ── Models ───────────────────────────────────────────────────────────────────
 
 export 'src/models/oi_axis_range.dart';

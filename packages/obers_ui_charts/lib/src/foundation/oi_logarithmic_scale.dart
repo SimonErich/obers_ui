@@ -46,6 +46,11 @@ class OiLogarithmicScale extends OiChartScale<double> {
       );
     }
     final positive = values.where((v) => v > 0);
+    assert(
+      positive.length == values.length,
+      'OiLogarithmicScale: ${values.length - positive.length} negative/zero '
+      'values were clamped. Log scales require strictly positive values.',
+    );
     if (positive.isEmpty) {
       return OiLogarithmicScale(
         domainMin: 1,
