@@ -64,6 +64,7 @@ export 'src/behaviors/oi_hover_sync_behavior.dart';
 export 'src/behaviors/oi_keyboard_explore_behavior.dart';
 export 'src/behaviors/oi_selection_behavior.dart';
 export 'src/behaviors/oi_series_toggle_behavior.dart';
+export 'src/behaviors/oi_zoom_pan_behavior.dart';
 export 'src/foundation/oi_chart_behavior.dart';
 export 'src/foundation/oi_chart_brush.dart';
 export 'src/foundation/oi_chart_crosshair.dart';
@@ -124,10 +125,12 @@ export 'package:obers_ui/src/foundation/theme/component_themes/oi_chart_theme_da
 // ── Models ───────────────────────────────────────────────────────────────────
 
 export 'src/models/oi_cartesian_series.dart';
+export 'src/models/oi_chart_annotation.dart';
 export 'src/models/oi_chart_datum.dart';
 export 'src/models/oi_chart_series.dart';
 export 'src/models/oi_chart_settings.dart';
 export 'src/models/oi_chart_state_models.dart';
+export 'src/models/oi_chart_threshold.dart';
 export 'src/models/oi_default_chart_controller.dart';
 export 'src/models/oi_series_legend_config.dart';
 export 'src/models/oi_series_style.dart';
