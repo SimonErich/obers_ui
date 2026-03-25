@@ -123,7 +123,6 @@ export 'src/foundation/oi_time_scale.dart';
 
 export 'src/foundation/oi_chart_sync_coordinator.dart';
 export 'src/foundation/oi_chart_sync_group.dart';
-export 'src/foundation/oi_chart_sync_provider.dart';
 // ── Foundation: Theme (re-exported from obers_ui) ────────────────────────────
 
 export 'package:obers_ui/src/foundation/theme/component_themes/oi_chart_palette.dart';

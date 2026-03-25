@@ -432,7 +432,7 @@ class OiChartMarker extends OiChartLayerPainter {
     double strokeWidth,
   ) {
     final paint = Paint()
-      ..color = stroke ?? const Color(0xFF000000)
+      ..color = stroke ?? style.strokeColor ?? const Color(0xFF888888)
       ..style = PaintingStyle.stroke
       ..strokeWidth = strokeWidth
       ..strokeCap = StrokeCap.round;

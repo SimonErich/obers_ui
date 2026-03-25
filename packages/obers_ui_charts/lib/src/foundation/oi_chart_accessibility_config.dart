@@ -87,6 +87,9 @@ class OiChartSummaryData {
   );
 }
 
+/// Alias for spec compatibility. Use [OiChartSummaryData] directly.
+typedef OiChartAccessibilitySummary = OiChartSummaryData;
+
 /// A function that builds a custom accessibility summary from chart data.
 ///
 /// Receives the [OiChartSummaryData] describing the chart and returns a
