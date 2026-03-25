@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 
 /// A time slot in the scheduler.
@@ -211,7 +212,7 @@ class _OiSchedulerState extends State<OiScheduler> {
   Widget _buildHeader(BuildContext context) {
     final colors = context.colors;
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
       child: Row(
         children: [
           GestureDetector(
@@ -219,7 +220,7 @@ class _OiSchedulerState extends State<OiScheduler> {
             onTap: _goBackward,
             child: Padding(
               padding: const EdgeInsets.all(8),
-              child: Text('\u25C0', style: TextStyle(color: colors.text)),
+              child: Icon(OiIcons.chevronLeft, size: 20, color: colors.text),
             ),
           ),
           Expanded(
@@ -228,6 +229,7 @@ class _OiSchedulerState extends State<OiScheduler> {
                 _headerTitle,
                 key: const ValueKey('scheduler_header_title'),
                 style: TextStyle(
+                  fontSize: 20,
                   fontWeight: FontWeight.bold,
                   color: colors.text,
                 ),
@@ -239,7 +241,7 @@ class _OiSchedulerState extends State<OiScheduler> {
             onTap: _goForward,
             child: Padding(
               padding: const EdgeInsets.all(8),
-              child: Text('\u25B6', style: TextStyle(color: colors.text)),
+              child: Icon(OiIcons.chevronRight, size: 20, color: colors.text),
             ),
           ),
         ],

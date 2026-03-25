@@ -213,7 +213,8 @@ class _OiAuthPageState extends State<OiAuthPage> {
       gap: OiResponsive(sp.sm),
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const OiLabel.h2('Sign In'),
+        const OiLabel.h2('Sign In', textAlign: TextAlign.center,),
+        SizedBox(height: sp.sm),
         OiTextInput(
           controller: _emailController,
           label: 'Email',
@@ -230,13 +231,16 @@ class _OiAuthPageState extends State<OiAuthPage> {
           onSubmitted: _canSubmit && !_isSubmitting ? (_) => _submit() : null,
         ),
         if (_error != null) _buildError(context),
+        SizedBox(height: sp.sm),
         OiButton.primary(
           label: 'Sign In',
           onTap: _canSubmit && !_isSubmitting ? _submit : null,
           loading: _isSubmitting,
           fullWidth: true,
         ),
+        SizedBox(height: sp.sm),
         const OiDivider(),
+        SizedBox(height: sp.sm),
         if (widget.onForgotPassword != null)
           _buildLink(
             'Forgot password?',
@@ -264,7 +268,8 @@ class _OiAuthPageState extends State<OiAuthPage> {
       gap: OiResponsive(sp.sm),
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const OiLabel.h2('Create Account'),
+        const OiLabel.h2('Create Account', textAlign: TextAlign.center,),
+        SizedBox(height: sp.sm),
         OiTextInput(
           controller: _nameController,
           label: 'Full Name',
@@ -287,13 +292,16 @@ class _OiAuthPageState extends State<OiAuthPage> {
           onSubmitted: _canSubmit && !_isSubmitting ? (_) => _submit() : null,
         ),
         if (_error != null) _buildError(context),
+        SizedBox(height: sp.sm),
         OiButton.primary(
           label: 'Create Account',
           onTap: _canSubmit && !_isSubmitting ? _submit : null,
           loading: _isSubmitting,
           fullWidth: true,
         ),
+        SizedBox(height: sp.sm),
         const OiDivider(),
+        SizedBox(height: sp.sm),
         if (widget.onLogin != null)
           _buildLink(
             'Already have an account? Sign In',
@@ -316,7 +324,8 @@ class _OiAuthPageState extends State<OiAuthPage> {
       gap: OiResponsive(sp.sm),
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const OiLabel.h2('Reset Password'),
+        const OiLabel.h2('Reset Password', textAlign: TextAlign.center,),
+        SizedBox(height: sp.sm),
         const OiLabel.body(
           'Enter your email and we will send you a reset link.',
         ),
@@ -329,13 +338,16 @@ class _OiAuthPageState extends State<OiAuthPage> {
           onSubmitted: _canSubmit && !_isSubmitting ? (_) => _submit() : null,
         ),
         if (_error != null) _buildError(context),
+        SizedBox(height: sp.sm),
         OiButton.primary(
           label: 'Send Reset Link',
           onTap: _canSubmit && !_isSubmitting ? _submit : null,
           loading: _isSubmitting,
           fullWidth: true,
         ),
+        SizedBox(height: sp.sm),
         const OiDivider(),
+        SizedBox(height: sp.sm),
         if (widget.onLogin != null)
           _buildLink('Back to Sign In', () => _switchMode(OiAuthMode.login)),
       ],
@@ -403,7 +415,7 @@ class _OiAuthPageState extends State<OiAuthPage> {
             children: [
               if (widget.logo != null) ...[
                 widget.logo!,
-                SizedBox(height: sp.lg),
+                SizedBox(height: sp.sm),
               ],
               form,
               if (widget.footer != null) ...[

@@ -330,68 +330,75 @@ class _OiGanttState extends State<OiGantt>
         children: [
           _buildTimelineHeader(context),
           Expanded(
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Label column.
-                SizedBox(
-                  width: _labelColumnWidth,
-                  child: ListView.builder(
-                    itemCount: rows.length,
-                    itemBuilder: (context, index) {
-                      return _buildLabelRow(context, rows[index]);
-                    },
+            child: SingleChildScrollView(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Label column.
+                  SizedBox(
+                    width: _labelColumnWidth,
+                    child: Column(
+                      children: [
+                        for (var index = 0;
+                            index < rows.length;
+                            index++)
+                          _buildLabelRow(context, rows[index]),
+                      ],
+                    ),
                   ),
-                ),
-                // Timeline area.
-                Expanded(
-                  child: SingleChildScrollView(
-                    controller: _horizontalScroll,
-                    scrollDirection: Axis.horizontal,
-                    child: SizedBox(
-                      width: math.max(_timelineWidth, 100),
-                      child: Stack(
-                        children: [
-                          // Weekend shading.
-                          if (widget.showWeekends)
-                            _buildWeekendShading(context),
-                          // Today line.
-                          if (widget.showToday) _buildTodayLine(context),
-                          // Task bars.
-                          ListView.builder(
-                            itemCount: rows.length,
-                            itemBuilder: (context, index) {
-                              return _buildTimelineRow(
-                                context,
-                                rows[index],
-                                index,
-                              );
-                            },
-                          ),
-                          // Dependency arrows.
-                          if (widget.showDependencies)
-                            IgnorePointer(
-                              child: CustomPaint(
-                                size: Size(
-                                  math.max(_timelineWidth, 100),
-                                  rows.length * _rowHeight,
-                                ),
-                                painter: _DependencyPainter(
-                                  tasks: widget.tasks,
-                                  rows: rows,
-                                  viewStart: _viewStart,
-                                  columnWidth: _columnWidth,
-                                  rowHeight: _rowHeight,
-                                  arrowColor: context.colors.textMuted,
+                  // Timeline area.
+                  Expanded(
+                    child: SingleChildScrollView(
+                      controller: _horizontalScroll,
+                      scrollDirection: Axis.horizontal,
+                      child: SizedBox(
+                        width: math.max(_timelineWidth, 100),
+                        child: Stack(
+                          children: [
+                            // Weekend shading.
+                            if (widget.showWeekends)
+                              _buildWeekendShading(context),
+                            // Dependency arrows (behind bars).
+                            if (widget.showDependencies)
+                              IgnorePointer(
+                                child: CustomPaint(
+                                  size: Size(
+                                    math.max(_timelineWidth, 100),
+                                    rows.length * _rowHeight,
+                                  ),
+                                  painter: _DependencyPainter(
+                                    tasks: widget.tasks,
+                                    rows: rows,
+                                    viewStart: _viewStart,
+                                    columnWidth: _columnWidth,
+                                    rowHeight: _rowHeight,
+                                    arrowColor: context.colors.textMuted,
+                                  ),
                                 ),
                               ),
+                            // Task bars.
+                            Column(
+                              children: [
+                                for (var index = 0;
+                                    index < rows.length;
+                                    index++)
+                                  _buildTimelineRow(
+                                    context,
+                                    rows[index],
+                                    index,
+                                  ),
+                              ],
                             ),
-                        ],
+                            // Today line (on top of bars).
+                            if (widget.showToday)
+                              _buildTodayLine(context),
+                          ],
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ],
@@ -495,6 +502,8 @@ class _OiGanttState extends State<OiGantt>
     final task = row.task!;
     final colors = context.colors;
     final barColor = task.color ?? colors.primary.base;
+    // Blend bar color at 30% over the background to produce an opaque tint.
+    final barTint = Color.lerp(colors.background, barColor, 0.3)!;
     final startX = _dateToX(task.start);
     final endX = _dateToX(task.end);
     final barWidth = math.max<double>(endX - startX, 4);
@@ -515,7 +524,7 @@ class _OiGanttState extends State<OiGantt>
                 width: barWidth,
                 height: _rowHeight - 12,
                 decoration: BoxDecoration(
-                  color: barColor.withValues(alpha: 0.3),
+                  color: barTint,
                   borderRadius: BorderRadius.circular(3),
                   border: Border.all(color: barColor),
                 ),
@@ -545,7 +554,8 @@ class _OiGanttState extends State<OiGantt>
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(
                                 fontSize: 10,
-                                color: colors.text,
+                                fontWeight: FontWeight.w600,
+                                color: colors.textOnPrimary,
                               ),
                             ),
                           ),
