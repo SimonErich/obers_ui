@@ -28,7 +28,6 @@ export 'src/components/dialogs/oi_upload_dialog.dart';
 export 'src/components/display/oi_avatar.dart';
 export 'src/components/display/oi_badge.dart';
 export 'src/components/display/oi_card.dart';
-export 'src/components/display/oi_chart_surface.dart';
 export 'src/components/display/oi_code_block.dart';
 export 'src/components/display/oi_diff_view.dart';
 export 'src/components/display/oi_drop_highlight.dart';
@@ -218,37 +217,6 @@ export 'src/composites/social/oi_cursor_presence.dart';
 export 'src/composites/social/oi_live_ring.dart';
 export 'src/composites/social/oi_selection_presence.dart';
 export 'src/composites/social/oi_typing_indicator.dart';
-// ── Composites: Visualization ────────────────────────────────────────────────
-
-export 'src/composites/visualization/oi_bar_chart/oi_bar_chart.dart';
-export 'src/composites/visualization/oi_bar_chart/oi_bar_chart_accessibility.dart';
-export 'src/composites/visualization/oi_bar_chart/oi_bar_chart_data.dart';
-export 'src/composites/visualization/oi_bar_chart/oi_bar_chart_legend.dart';
-export 'src/composites/visualization/oi_bar_chart/oi_bar_chart_theme.dart';
-export 'src/composites/visualization/oi_bubble_chart/oi_bubble_chart.dart';
-export 'src/composites/visualization/oi_bubble_chart/oi_bubble_chart_accessibility.dart';
-export 'src/composites/visualization/oi_bubble_chart/oi_bubble_chart_data.dart';
-export 'src/composites/visualization/oi_bubble_chart/oi_bubble_chart_interaction.dart';
-export 'src/composites/visualization/oi_bubble_chart/oi_bubble_chart_legend.dart';
-export 'src/composites/visualization/oi_bubble_chart/oi_bubble_chart_size_legend.dart';
-export 'src/composites/visualization/oi_bubble_chart/oi_bubble_chart_theme.dart';
-export 'src/composites/visualization/oi_chart_axis.dart';
-export 'src/composites/visualization/oi_chart_legend.dart';
-export 'src/composites/visualization/oi_chart_series_toggle.dart';
-export 'src/composites/visualization/oi_funnel_chart.dart';
-export 'src/composites/visualization/oi_gauge.dart';
-export 'src/composites/visualization/oi_heatmap.dart';
-export 'src/composites/visualization/oi_line_chart/oi_line_chart.dart';
-export 'src/composites/visualization/oi_line_chart/oi_line_chart_accessibility.dart';
-export 'src/composites/visualization/oi_line_chart/oi_line_chart_data.dart';
-export 'src/composites/visualization/oi_line_chart/oi_line_chart_legend.dart';
-export 'src/composites/visualization/oi_line_chart/oi_line_chart_theme.dart';
-export 'src/composites/visualization/oi_pie_chart.dart';
-export 'src/composites/visualization/oi_radar_chart.dart';
-export 'src/composites/visualization/oi_sankey.dart';
-export 'src/composites/visualization/oi_scatter_plot.dart';
-export 'src/composites/visualization/oi_sparkline.dart';
-export 'src/composites/visualization/oi_treemap.dart';
 // ── Composites: Workflow ─────────────────────────────────────────────────────
 
 export 'src/composites/workflow/oi_flow_graph.dart';
@@ -273,43 +241,10 @@ export 'src/foundation/oi_undo_stack.dart';
 
 export 'src/foundation/persistence/drivers/oi_in_memory_driver.dart';
 export 'src/foundation/persistence/drivers/oi_local_storage_driver.dart';
-export 'src/foundation/persistence/oi_chart_settings_driver_binding.dart';
 export 'src/foundation/persistence/oi_settings_data.dart';
 export 'src/foundation/persistence/oi_settings_driver.dart';
 export 'src/foundation/persistence/oi_settings_mixin.dart';
 export 'src/foundation/persistence/oi_settings_provider.dart';
-// ── Foundation: Scales ───────────────────────────────────────────────────────
-
-export 'src/foundation/scales/oi_band_scale.dart';
-export 'src/foundation/scales/oi_category_scale.dart';
-export 'src/foundation/scales/oi_chart_accessibility_bridge.dart';
-export 'src/foundation/scales/oi_chart_accessibility_config.dart';
-export 'src/foundation/scales/oi_chart_animation_config.dart';
-export 'src/foundation/scales/oi_chart_axis_painter.dart';
-export 'src/foundation/scales/oi_chart_behavior.dart';
-export 'src/foundation/scales/oi_chart_brush.dart';
-export 'src/foundation/scales/oi_chart_canvas.dart';
-export 'src/foundation/scales/oi_chart_controller.dart';
-export 'src/foundation/scales/oi_chart_crosshair.dart';
-export 'src/foundation/scales/oi_chart_extension.dart';
-export 'src/foundation/scales/oi_chart_formatters.dart';
-export 'src/foundation/scales/oi_chart_grid_painter.dart';
-export 'src/foundation/scales/oi_chart_hit_test.dart';
-export 'src/foundation/scales/oi_chart_hit_tester.dart';
-export 'src/foundation/scales/oi_chart_layer.dart';
-export 'src/foundation/scales/oi_chart_marker.dart';
-export 'src/foundation/scales/oi_chart_performance_config.dart';
-export 'src/foundation/scales/oi_chart_scale.dart';
-export 'src/foundation/scales/oi_chart_sync_coordinator.dart';
-export 'src/foundation/scales/oi_chart_sync_group.dart';
-export 'src/foundation/scales/oi_chart_tooltip.dart';
-export 'src/foundation/scales/oi_chart_viewport.dart';
-export 'src/foundation/scales/oi_linear_scale.dart';
-export 'src/foundation/scales/oi_logarithmic_scale.dart';
-export 'src/foundation/scales/oi_point_scale.dart';
-export 'src/foundation/scales/oi_quantile_scale.dart';
-export 'src/foundation/scales/oi_threshold_scale.dart';
-export 'src/foundation/scales/oi_time_scale.dart';
 // ── Foundation: Theme ────────────────────────────────────────────────────────
 
 export 'src/foundation/theme/oi_animation_config.dart';
@@ -346,7 +281,6 @@ export 'src/models/oi_shipping_method.dart';
 export 'src/models/settings/oi_accordion_settings.dart';
 export 'src/models/settings/oi_app_shell_settings.dart';
 export 'src/models/settings/oi_calendar_settings.dart';
-export 'src/models/settings/oi_chart_settings.dart';
 export 'src/models/settings/oi_dashboard_settings.dart';
 export 'src/models/settings/oi_file_explorer_settings.dart'
     hide OiSortDirection;
