@@ -233,9 +233,11 @@ class _OiRawInputState extends State<OiRawInput> {
     if (widget.style != null) return widget.style!;
     final themeData = OiTheme.maybeOf(context);
     if (themeData != null) {
-      return themeData.textTheme.styleFor(OiLabelVariant.body);
+      return themeData.textTheme.styleFor(OiLabelVariant.small).copyWith(
+        height: 1.2,
+      );
     }
-    return const TextStyle(fontSize: 16, fontWeight: FontWeight.w400);
+    return const TextStyle(fontSize: 14, fontWeight: FontWeight.w400, height: 1.2);
   }
 
   Color _resolveCursorColor(BuildContext context) {

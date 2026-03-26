@@ -13,6 +13,37 @@ class AdminReturnsScreen extends StatefulWidget {
 
 class _AdminReturnsScreenState extends State<AdminReturnsScreen> {
   int _selectedIndex = 0;
+  Map<String, OiColumnFilter> _activeFilters = {};
+
+  static const _filterDefinitions = <OiFilterDefinition>[
+    OiFilterDefinition(
+      key: 'status',
+      label: 'Status',
+      type: OiFilterType.select,
+      options: [
+        OiSelectOption(value: 'requested', label: 'Requested'),
+        OiSelectOption(value: 'approved', label: 'Approved'),
+        OiSelectOption(value: 'shipped-back', label: 'Shipped Back'),
+        OiSelectOption(value: 'inspected', label: 'Inspected'),
+        OiSelectOption(value: 'refunded', label: 'Refunded'),
+      ],
+    ),
+  ];
+
+  List<Map<String, Object>> get _filteredReturns {
+    var returns = kMockReturns;
+
+    final statusFilter = _activeFilters['status'];
+    if (statusFilter != null && statusFilter.value != null) {
+      final statusValue = statusFilter.value as String;
+      if (statusValue.isNotEmpty) {
+        returns =
+            returns.where((r) => r['status'] == statusValue).toList();
+      }
+    }
+
+    return returns;
+  }
 
   int _statusIndex(String status) {
     final idx = kReturnStatuses.indexOf(status);
@@ -20,8 +51,21 @@ class _AdminReturnsScreenState extends State<AdminReturnsScreen> {
   }
 
   List<OiPipelineStage> _buildPipeline() {
-    final selected = kMockReturns[_selectedIndex];
-    final currentIdx = _statusIndex(selected['status']! as String);
+    final returns = _filteredReturns;
+    final String currentStatus;
+    if (returns.isNotEmpty) {
+      final selected = returns[_selectedIndex.clamp(0, returns.length - 1)];
+      currentStatus = selected['status']! as String;
+    } else {
+      // Show the filtered status in the pipeline when no rows match.
+      final statusFilter = _activeFilters['status'];
+      if (statusFilter != null && statusFilter.value != null) {
+        currentStatus = statusFilter.value as String;
+      } else {
+        currentStatus = kReturnStatuses.first;
+      }
+    }
+    final currentIdx = _statusIndex(currentStatus);
 
     return [
       for (var i = 0; i < kReturnStatuses.length; i++)
@@ -78,10 +122,24 @@ class _AdminReturnsScreenState extends State<AdminReturnsScreen> {
             ),
           ),
           SizedBox(height: spacing.lg),
+          // Status filter bar.
+          OiFilterBar(
+            filters: _filterDefinitions,
+            activeFilters: _activeFilters,
+            onFilterChange: (filters) {
+              setState(() {
+                _activeFilters = filters;
+                _selectedIndex = 0;
+              });
+            },
+          ),
+          SizedBox(height: spacing.md),
           // Return requests table.
-          OiTable<Map<String, Object>>(
+          SizedBox(
+            height: (_filteredReturns.length * 48.0) + 100,
+            child: OiTable<Map<String, Object>>(
             label: 'Return requests',
-            rows: kMockReturns,
+            rows: _filteredReturns,
             rowKey: (row) => row['returnId']! as String,
             onRowTap: (row, index) => setState(() => _selectedIndex = index),
             striped: true,
@@ -134,6 +192,7 @@ class _AdminReturnsScreenState extends State<AdminReturnsScreen> {
                 width: 120,
               ),
             ],
+          ),
           ),
         ],
       ),

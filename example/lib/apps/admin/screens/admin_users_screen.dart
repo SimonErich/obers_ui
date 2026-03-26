@@ -199,7 +199,6 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
                           color: _statusColor(status),
                         );
                       },
-                      width: 110,
                     ),
                     OiTableColumn<Map<String, Object>>(
                       id: 'email',
@@ -210,25 +209,21 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
                       id: 'location',
                       header: 'Location',
                       valueGetter: (row) => row['location']! as String,
-                      width: 100,
                     ),
                     OiTableColumn<Map<String, Object>>(
                       id: 'joined',
                       header: 'Joined',
                       valueGetter: (row) => row['joined']! as String,
-                      width: 110,
                     ),
                     OiTableColumn<Map<String, Object>>(
                       id: 'ordersProcessed',
                       header: 'Orders',
                       valueGetter: (row) => '${row['ordersProcessed']}',
-                      width: 90,
                     ),
                     // Actions column with context menu.
                     OiTableColumn<Map<String, Object>>(
                       id: 'actions',
                       header: '',
-                      width: 44,
                       sortable: false,
                       filterable: false,
                       resizable: false,

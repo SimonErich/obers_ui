@@ -609,10 +609,10 @@ class _OiListViewState<T> extends State<OiListView<T>>
         controller: _scrollController,
         clipBehavior: Clip.none,
         gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-          maxCrossAxisExtent: 400,
+          maxCrossAxisExtent: 500,
           mainAxisSpacing: context.spacing.md,
           crossAxisSpacing: context.spacing.md,
-          childAspectRatio: 1.4,
+          childAspectRatio: 1.2,
         ),
         itemCount: itemCount,
         itemBuilder: buildItem,

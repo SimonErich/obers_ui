@@ -182,12 +182,24 @@ class _AdminAppState extends State<AdminApp> {
                 currentRoute: _currentRoute,
                 onNavigate: (route) => setState(() => _currentRoute = route),
                 breadcrumbs: _buildBreadcrumbs(),
-                leading: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 4),
-                  child: OiLabel.h4(
-                    'Alpenglueck Admin',
-                    color: colors.primary.base,
-                  ),
+                leading: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    OiTappable(
+                      semanticLabel: 'Go back to showcase',
+                      onTap: () => Navigator.of(context).pop(),
+                      child: Icon(
+                        OiIcons.chevronLeft,
+                        size: 20,
+                        color: colors.text,
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    OiLabel.h4(
+                      'Alpenglueck Admin',
+                      color: colors.primary.base,
+                    ),
+                  ],
                 ),
                 // Nested navigation: Users and Orders have sub-items.
                 navigation: const [
@@ -278,15 +290,6 @@ class _AdminAppState extends State<AdminApp> {
                   ],
                 ),
                 actions: [
-                  OiTappable(
-                    semanticLabel: 'Go back to showcase',
-                    onTap: () => Navigator.of(context).pop(),
-                    child: Icon(
-                      OiIcons.chevronLeft,
-                      size: 20,
-                      color: colors.text,
-                    ),
-                  ),
                   OiTappable(
                     semanticLabel: 'Open command bar',
                     onTap: () => setState(() => _showCommandBar = true),

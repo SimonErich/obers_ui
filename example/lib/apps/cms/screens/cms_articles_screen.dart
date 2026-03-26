@@ -117,33 +117,37 @@ class _CmsArticlesScreenState extends State<CmsArticlesScreen> {
       itemBuilder: (post) => OiCard(
         label: 'Open article: ${post.title}',
         onTap: () => widget.onArticleTap(post),
-        title: OiLabel.h4(post.title),
-        subtitle: OiLabel.small(
-          '${post.author.name}  \u2022  '
-          '${post.publishedAt.year}-'
-          '${post.publishedAt.month.toString().padLeft(2, '0')}-'
-          '${post.publishedAt.day.toString().padLeft(2, '0')}',
-          color: colors.textMuted,
-        ),
-        trailing: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            if (post.commentCount > 0) ...[
-              Icon(OiIcons.messageSquare, size: 16, color: colors.textMuted),
-              const SizedBox(width: 4),
-              OiLabel.small('${post.commentCount}', color: colors.textMuted),
-              const SizedBox(width: 12),
+        title: OiLabel.h4(post.title, maxLines: 2, overflow: TextOverflow.ellipsis),
+        subtitle: Padding(
+          padding: EdgeInsets.only(top: context.spacing.sm),
+          child: Row(
+            children: [
+              Expanded(
+                child: OiLabel.small(
+                  '${post.author.name}  \u2022  '
+                  '${post.publishedAt.year}-'
+                  '${post.publishedAt.month.toString().padLeft(2, '0')}-'
+                  '${post.publishedAt.day.toString().padLeft(2, '0')}',
+                  color: colors.textMuted,
+                ),
+              ),
+              if (post.commentCount > 0) ...[
+                Icon(OiIcons.messageSquare, size: 16, color: colors.textMuted),
+                const SizedBox(width: 4),
+                OiLabel.small('${post.commentCount}', color: colors.textMuted),
+                const SizedBox(width: 12),
+              ],
+              OiBadge.soft(
+                label: post.status,
+                color: post.status == 'published'
+                    ? OiBadgeColor.success
+                    : OiBadgeColor.warning,
+              ),
             ],
-            OiBadge.soft(
-              label: post.status,
-              color: post.status == 'published'
-                  ? OiBadgeColor.success
-                  : OiBadgeColor.warning,
-            ),
-          ],
+          ),
         ),
         child: Padding(
-          padding: EdgeInsets.only(top: context.spacing.sm),
+          padding: EdgeInsets.only(top: context.spacing.md),
           child: OiLabel.body(
             post.excerpt,
             color: colors.textSubtle,

@@ -125,9 +125,17 @@ class _ComponentLibraryAppState extends State<ComponentLibraryApp> {
       currentRoute: _currentRoute,
       onNavigate: _onNavigate,
       breadcrumbs: _buildBreadcrumbs(),
-      leading: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 4),
-        child: OiLabel.h4('Components', color: colors.primary.base),
+      leading: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          OiTappable(
+            semanticLabel: 'Go back to showcase',
+            onTap: () => Navigator.of(context).pop(),
+            child: Icon(OiIcons.chevronLeft, size: 20, color: colors.text),
+          ),
+          const SizedBox(width: 4),
+          OiLabel.h4('Components', color: colors.primary.base),
+        ],
       ),
       navigation: const [
         // ── Fundamentals ─────────────────────────────────────────────
@@ -257,11 +265,6 @@ class _ComponentLibraryAppState extends State<ComponentLibraryApp> {
         ),
       ],
       actions: [
-        OiTappable(
-          semanticLabel: 'Go back to showcase',
-          onTap: () => Navigator.of(context).pop(),
-          child: Icon(OiIcons.chevronLeft, size: 20, color: colors.text),
-        ),
         OiThemeToggle(
           currentMode: widget.themeState.value,
           onModeChange: (_) => widget.themeState.toggle(),

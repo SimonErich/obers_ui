@@ -349,9 +349,7 @@ class _OiAppShellState extends State<OiAppShell>
               widget.breadcrumbs!.isNotEmpty &&
               !showHamburger) ...[
             if (widget.title != null) const SizedBox(width: 16),
-            Flexible(
-              child: OiBreadcrumbs(items: widget.breadcrumbs!, maxVisible: 3),
-            ),
+            OiBreadcrumbs(items: widget.breadcrumbs!, maxVisible: 3),
           ],
           const Spacer(),
           if (widget.actions != null)

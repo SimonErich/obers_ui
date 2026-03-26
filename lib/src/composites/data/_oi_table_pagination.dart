@@ -235,7 +235,15 @@ class _ColumnManagerPanel<T> extends StatelessWidget {
                 ),
                 child: Row(
                   children: [
-                    Text((visibility[col.id] ?? true) ? '☑' : '☐'),
+                    Icon(
+                      (visibility[col.id] ?? true)
+                          ? OiIcons.squareCheckBig
+                          : OiIcons.square,
+                      size: 16,
+                      color: (visibility[col.id] ?? true)
+                          ? colors.primary.base
+                          : colors.textMuted,
+                    ),
                     const SizedBox(width: 8),
                     Expanded(child: Text(col.header)),
                   ],

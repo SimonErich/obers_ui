@@ -197,7 +197,7 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
             SizedBox(height: spacing.lg),
 
             // ── Line items table ──
-            const OiLabel.caption('Line Items'),
+            const OiLabel.smallStrong('Line Items'),
             SizedBox(height: spacing.sm),
             SizedBox(
               height: (lineItems.length * 48.0) + 56,

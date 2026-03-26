@@ -191,7 +191,7 @@ class _OiDashboardState extends State<OiDashboard>
           final totalGap = widget.gap * (widget.columns - 1);
           final columnWidth =
               (constraints.maxWidth - totalGap) / widget.columns;
-          final rowHeight = columnWidth * 0.6;
+          final rowHeight = columnWidth * 0.65;
 
           return SingleChildScrollView(
             child: Padding(

@@ -185,22 +185,31 @@ class OiResourcePage extends StatelessWidget {
   }
 
   Widget _buildContent(BuildContext context) {
-    final shouldWrap =
-        wrapInCard &&
-        (variant == OiResourcePageVariant.edit ||
-            variant == OiResourcePageVariant.create);
+    if (!wrapInCard) return child;
 
-    if (shouldWrap) {
-      return OiCard(child: child);
+    switch (variant) {
+      case OiResourcePageVariant.edit:
+      case OiResourcePageVariant.create:
+        return OiCard(child: child);
+      case OiResourcePageVariant.list:
+      case OiResourcePageVariant.show:
+        // For list/show variants the child (e.g. OiTable) typically uses
+        // Expanded and needs bounded height constraints. Wrapping in OiCard
+        // (which uses MainAxisSize.min) would break the constraint chain,
+        // so we use OiCard.outlined with padding: EdgeInsets.zero and let
+        // the child fill the available space via ClipRRect + DecoratedBox.
+        return DecoratedBox(
+          decoration: BoxDecoration(
+            color: context.colors.surface,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: context.colors.borderSubtle),
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: child,
+          ),
+        );
     }
-
-    if (wrapInCard &&
-        (variant == OiResourcePageVariant.list ||
-            variant == OiResourcePageVariant.show)) {
-      return OiCard(child: child);
-    }
-
-    return child;
   }
 
   Widget _buildPaginationArea(BuildContext context) {

@@ -315,13 +315,13 @@ class OiFieldDisplay extends StatelessWidget {
   Widget _buildCustomFormatted(BuildContext context) {
     try {
       final formatted = formatValue!(value);
-      return OiLabel.body(
+      return OiLabel.small(
         formatted,
         maxLines: maxLines,
         overflow: maxLines != null ? TextOverflow.ellipsis : null,
       );
     } on Exception catch (_) {
-      return OiLabel.body(
+      return OiLabel.small(
         _valueString,
         maxLines: maxLines,
         overflow: maxLines != null ? TextOverflow.ellipsis : null,
@@ -330,7 +330,7 @@ class OiFieldDisplay extends StatelessWidget {
   }
 
   Widget _buildTextDisplay(BuildContext context) {
-    return OiLabel.body(
+    return OiLabel.small(
       _valueString,
       maxLines: maxLines,
       overflow: maxLines != null ? TextOverflow.ellipsis : null,
@@ -345,7 +345,7 @@ class OiFieldDisplay extends StatelessWidget {
     }
 
     final formatted = _formatNumber(numValue);
-    return OiLabel.body(formatted);
+    return OiLabel.small(formatted);
   }
 
   /// Formats a number using [numberFormat] pattern if provided, falling back
@@ -381,7 +381,7 @@ class OiFieldDisplay extends StatelessWidget {
     parts.add(formatted);
     if (code.isNotEmpty && symbol.isEmpty) parts.add(code);
 
-    return OiLabel.body(parts.join(symbol.isNotEmpty ? '' : ' '));
+    return OiLabel.small(parts.join(symbol.isNotEmpty ? '' : ' '));
   }
 
   /// Formats a currency number using [numberFormat] pattern if provided,
@@ -412,7 +412,7 @@ class OiFieldDisplay extends StatelessWidget {
     }
 
     final formatted = _formatDate(date);
-    return OiLabel.body(formatted);
+    return OiLabel.small(formatted);
   }
 
   Widget _buildDateTimeDisplay(BuildContext context) {
@@ -426,7 +426,7 @@ class OiFieldDisplay extends StatelessWidget {
     }
 
     final formatted = _formatDateTime(date);
-    return OiLabel.body(formatted);
+    return OiLabel.small(formatted);
   }
 
   Widget _buildBooleanDisplay(BuildContext context) {
@@ -443,7 +443,7 @@ class OiFieldDisplay extends StatelessWidget {
             size: 18,
           ),
           const SizedBox(width: 4),
-          OiLabel.body('Unknown', color: colors.textMuted),
+          OiLabel.small('Unknown', color: colors.textMuted),
         ],
       );
     }
@@ -467,7 +467,7 @@ class OiFieldDisplay extends StatelessWidget {
           size: 18,
         ),
         const SizedBox(width: 4),
-        OiLabel.body(boolValue ? 'Yes' : 'No'),
+        OiLabel.small(boolValue ? 'Yes' : 'No'),
       ],
     );
   }
@@ -484,7 +484,7 @@ class OiFieldDisplay extends StatelessWidget {
         ),
         const SizedBox(width: 6),
         Flexible(
-          child: OiLabel.body(
+          child: OiLabel.small(
             _valueString,
             color: colors.primary.base,
             decoration: TextDecoration.underline,
@@ -509,7 +509,7 @@ class OiFieldDisplay extends StatelessWidget {
         ),
         const SizedBox(width: 6),
         Flexible(
-          child: OiLabel.body(
+          child: OiLabel.small(
             _valueString,
             color: colors.primary.base,
             decoration: TextDecoration.underline,
@@ -533,7 +533,7 @@ class OiFieldDisplay extends StatelessWidget {
           size: 16,
         ),
         const SizedBox(width: 6),
-        OiLabel.body(_valueString, color: colors.primary.base),
+        OiLabel.small(_valueString, color: colors.primary.base),
       ],
     );
   }
@@ -565,7 +565,7 @@ class OiFieldDisplay extends StatelessWidget {
         ),
         const SizedBox(width: 6),
         Flexible(
-          child: OiLabel.body(
+          child: OiLabel.small(
             filename,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
@@ -608,7 +608,7 @@ class OiFieldDisplay extends StatelessWidget {
       return OiBadge.soft(label: displayLabel, color: badgeColor);
     }
 
-    return OiLabel.body(displayLabel);
+    return OiLabel.small(displayLabel);
   }
 
   Widget _buildTagsDisplay(BuildContext context) {
@@ -650,7 +650,7 @@ class OiFieldDisplay extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 8),
-        OiLabel.body('#$hex'),
+        OiLabel.small('#$hex'),
       ],
     );
   }

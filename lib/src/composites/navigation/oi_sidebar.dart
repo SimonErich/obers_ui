@@ -2,6 +2,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/display/oi_badge.dart';
 import 'package:obers_ui/src/components/display/oi_tooltip.dart';
+import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/persistence/oi_settings_driver.dart';
 import 'package:obers_ui/src/foundation/persistence/oi_settings_mixin.dart';
 import 'package:obers_ui/src/foundation/persistence/oi_settings_provider.dart';
@@ -184,9 +185,10 @@ class OiSidebar extends StatefulWidget {
 }
 
 class _OiSidebarState extends State<OiSidebar>
-    with OiSettingsMixin<OiSidebar, OiSidebarSettings> {
+    with TickerProviderStateMixin, OiSettingsMixin<OiSidebar, OiSidebarSettings> {
   final Set<String> _collapsedSections = {};
   final Set<String> _expandedParents = {};
+  final Map<String, AnimationController> _expandControllers = {};
   int _focusedIndex = -1;
   late FocusNode _focusNode;
 
@@ -254,7 +256,21 @@ class _OiSidebarState extends State<OiSidebar>
   @override
   void dispose() {
     _focusNode.dispose();
+    for (final c in _expandControllers.values) {
+      c.dispose();
+    }
     super.dispose();
+  }
+
+  AnimationController _controllerFor(String parentId) {
+    return _expandControllers.putIfAbsent(parentId, () {
+      final controller = AnimationController(
+        vsync: this,
+        duration: const Duration(milliseconds: 200),
+        value: _expandedParents.contains(parentId) ? 1.0 : 0.0,
+      );
+      return controller;
+    });
   }
 
   void _applySettings(OiSidebarSettings settings) {
@@ -344,11 +360,14 @@ class _OiSidebarState extends State<OiSidebar>
   }
 
   void _toggleParent(String parentId) {
+    final controller = _controllerFor(parentId);
     setState(() {
       if (_expandedParents.contains(parentId)) {
         _expandedParents.remove(parentId);
+        controller.reverse();
       } else {
         _expandedParents.add(parentId);
+        controller.forward();
       }
       _rebuildFlatItems();
     });
@@ -411,10 +430,25 @@ class _OiSidebarState extends State<OiSidebar>
       if (!collapsed) {
         for (final item in section.items) {
           widgets.add(_buildItem(context, item, 0, compact));
-          if (item.children != null && _expandedParents.contains(item.id)) {
-            for (final child in item.children!) {
-              widgets.add(_buildItem(context, child, 1, compact));
-            }
+          if (item.children != null && item.children!.isNotEmpty) {
+            final controller = _controllerFor(item.id);
+            widgets.add(
+              SizeTransition(
+                sizeFactor: CurvedAnimation(
+                  parent: controller,
+                  curve: Curves.easeInOut,
+                ),
+                axisAlignment: -1,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    for (final child in item.children!)
+                      _buildItem(context, child, 1, compact),
+                  ],
+                ),
+              ),
+            );
           }
         }
       }
@@ -523,9 +557,15 @@ class _OiSidebarState extends State<OiSidebar>
           if (hasKids)
             Padding(
               padding: const EdgeInsets.only(left: 4),
-              child: Text(
-                kidsExpanded ? '\u25BC' : '\u25B6',
-                style: TextStyle(fontSize: 10, color: colors.textMuted),
+              child: AnimatedRotation(
+                turns: kidsExpanded ? 0.25 : 0.0,
+                duration: const Duration(milliseconds: 200),
+                curve: Curves.easeInOut,
+                child: Icon(
+                  OiIcons.chevronRight,
+                  size: 14,
+                  color: colors.textMuted,
+                ),
               ),
             ),
         ],
