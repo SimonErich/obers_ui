@@ -21,6 +21,7 @@ import 'package:obers_ui_charts/src/models/oi_chart_complexity.dart';
 import 'package:obers_ui_charts/src/utils/chart_math.dart';
 
 import 'package:obers_ui_charts/src/models/oi_cartesian_series.dart';
+import 'package:obers_ui_charts/src/models/oi_chart_datum.dart';
 import 'package:obers_ui_charts/src/models/oi_chart_series.dart';
 import 'package:obers_ui_charts/src/models/oi_chart_annotation.dart';
 import 'package:obers_ui_charts/src/models/oi_chart_legend_config.dart';
@@ -144,6 +145,9 @@ class _OiCartesianChartState<T> extends State<OiCartesianChart<T>>
         ChartStreamingHost<OiCartesianChart<T>> {
   OiChartViewport _viewport = const OiChartViewport(size: Size.zero);
 
+  /// Cached normalized data from the last build, keyed by series id.
+  Map<String, List<OiChartDatum>> _lastNormalizedData = const {};
+
   // ── ChartBehaviorHost overrides ──────────────────────────────────────
 
   @override
@@ -206,6 +210,25 @@ class _OiCartesianChartState<T> extends State<OiCartesianChart<T>>
 
   bool get _hasData =>
       _visibleSeries.any((s) => s.data != null && s.data!.isNotEmpty);
+
+  /// Normalizes visible series into OiChartDatum lists.
+  ///
+  /// Returns a map of seriesId → normalized datums.
+  Map<String, List<OiChartDatum>> _normalizeVisibleSeries() {
+    final result = <String, List<OiChartDatum>>{};
+    for (final s in _visibleSeries) {
+      if (s.data == null || s.data!.isEmpty) continue;
+      result[s.id] = normalizeSeries(
+        seriesId: s.id,
+        data: s.data!,
+        xMapper: s.xMapper,
+        yMapper: s.yMapper,
+        pointLabel: s.pointLabel,
+        isMissing: s.isMissing,
+      );
+    }
+    return result;
+  }
 
   /// Total data point count across all visible series.
   int get _totalPointCount {
@@ -312,6 +335,9 @@ class _OiCartesianChartState<T> extends State<OiCartesianChart<T>>
             panOffset: ctrl.viewportState.panOffset,
             visibleDomain: visibleDomain,
           );
+
+          // Normalize series data through the foundation pipeline.
+          _lastNormalizedData = _normalizeVisibleSeries();
 
           // Attach behaviors and sync now that we have a valid context.
           if (behaviors.isNotEmpty && behaviors.any((b) => !b.isAttached)) {
