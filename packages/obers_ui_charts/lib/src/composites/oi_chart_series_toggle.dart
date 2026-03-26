@@ -276,7 +276,7 @@ class _BulkButton extends StatelessWidget {
         button: true,
         child: GestureDetector(
           onTap: onTap,
-          child: Text(label, style: style),
+          child: OiLabel.caption(label, color: style.color),
         ),
       ),
     );

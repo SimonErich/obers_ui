@@ -142,23 +142,16 @@ class OiTreemap extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     if (showLabels)
-                      Text(
+                      OiLabel.caption(
                         node.label,
-                        style: TextStyle(
-                          color: textColor,
-                          fontSize: 11,
-                          fontWeight: FontWeight.w600,
-                        ),
+                        color: textColor,
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,
                       ),
                     if (showValues)
-                      Text(
+                      OiLabel.small(
                         node.value.toStringAsFixed(0),
-                        style: TextStyle(
-                          color: textColor.withValues(alpha: 0.8),
-                          fontSize: 9,
-                        ),
+                        color: textColor.withValues(alpha: 0.8),
                       ),
                   ],
                 ),

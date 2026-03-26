@@ -137,12 +137,9 @@ class OiRadarChart extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(width: 4),
-                        Text(
+                        OiLabel.caption(
                           resolvedSeries[i].label,
-                          style: TextStyle(
-                            color: colors.textMuted,
-                            fontSize: 12,
-                          ),
+                          color: colors.textMuted,
                         ),
                       ],
                     ),

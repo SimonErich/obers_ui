@@ -93,12 +93,9 @@ class OiBubbleChartLegend extends StatelessWidget {
                               ),
                             ),
                             const SizedBox(width: 4),
-                            Text(
+                            OiLabel.caption(
                               series[i].name,
-                              style: TextStyle(
-                                color: colors.textMuted,
-                                fontSize: 12,
-                              ),
+                              color: colors.textMuted,
                             ),
                           ],
                         ),

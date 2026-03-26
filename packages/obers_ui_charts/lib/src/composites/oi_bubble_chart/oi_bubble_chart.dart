@@ -205,11 +205,8 @@ class _OiBubbleChartState extends State<OiBubbleChart> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('◉', style: TextStyle(fontSize: 20, color: colors.textMuted)),
-            Text(
-              'Chart too small',
-              style: TextStyle(fontSize: 10, color: colors.textMuted),
-            ),
+            OiLabel.body('◉', color: colors.textMuted),
+            OiLabel.caption('Chart too small', color: colors.textMuted),
           ],
         ),
       ),
@@ -297,10 +294,7 @@ class _OiBubbleChartState extends State<OiBubbleChart> {
       narration = Semantics(
         key: const Key('oi_bubble_chart_narration'),
         liveRegion: true,
-        child: Text(
-          desc,
-          style: TextStyle(fontSize: 11, color: colors.textSubtle),
-        ),
+        child: OiLabel.caption(desc, color: colors.textSubtle),
       );
     }
 

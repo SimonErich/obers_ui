@@ -245,7 +245,7 @@ class _OiScatterPlotState extends State<OiScatterPlot> {
               height: h,
               child: const Center(
                 key: Key('oi_scatter_plot_fallback'),
-                child: Text('…'),
+                child: OiLabel.caption('…'),
               ),
             );
           }
@@ -360,12 +360,9 @@ class _OiScatterPlotState extends State<OiScatterPlot> {
                             ),
                           ),
                           const SizedBox(width: 4),
-                          Text(
+                          OiLabel.caption(
                             widget.series[i].label,
-                            style: TextStyle(
-                              color: colors.textMuted,
-                              fontSize: 12,
-                            ),
+                            color: colors.textMuted,
                           ),
                         ],
                       ),

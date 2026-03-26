@@ -158,12 +158,9 @@ class OiHeatmap extends StatelessWidget {
                           width: cellWidth,
                           height: labelHeight,
                           child: Center(
-                            child: Text(
+                            child: OiLabel.caption(
                               c < columnLabels!.length ? columnLabels![c] : '',
-                              style: TextStyle(
-                                color: colors.textMuted,
-                                fontSize: 10,
-                              ),
+                              color: colors.textMuted,
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
@@ -184,12 +181,9 @@ class OiHeatmap extends StatelessWidget {
                           alignment: Alignment.centerRight,
                           child: Padding(
                             padding: const EdgeInsets.only(right: 4),
-                            child: Text(
+                            child: OiLabel.caption(
                               r < rowLabels!.length ? rowLabels![r] : '',
-                              style: TextStyle(
-                                color: colors.textMuted,
-                                fontSize: 10,
-                              ),
+                              color: colors.textMuted,
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
@@ -253,9 +247,9 @@ class OiHeatmap extends StatelessWidget {
         ),
         child: showValues && cell != null
             ? Center(
-                child: Text(
+                child: OiLabel.small(
                   cell.value.toStringAsFixed(0),
-                  style: TextStyle(color: textColor, fontSize: 9),
+                  color: textColor,
                 ),
               )
             : null,

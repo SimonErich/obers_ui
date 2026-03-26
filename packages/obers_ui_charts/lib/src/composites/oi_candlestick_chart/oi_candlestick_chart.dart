@@ -299,9 +299,9 @@ class _OiCandlestickChartState<T> extends State<OiCandlestickChart<T>> {
               child: Center(
                 key: const Key('oi_candlestick_chart_fallback'),
                 child: FittedBox(
-                  child: Text(
+                  child: OiLabel.caption(
                     'Chart too small',
-                    style: TextStyle(fontSize: 10, color: colors.textMuted),
+                    color: colors.textMuted,
                   ),
                 ),
               ),
@@ -449,9 +449,9 @@ class _OiCandlestickChartState<T> extends State<OiCandlestickChart<T>> {
               narration = Semantics(
                 key: const Key('oi_candlestick_chart_narration'),
                 liveRegion: true,
-                child: Text(
+                child: OiLabel.caption(
                   '${s.label}: O=$open H=$high L=$low C=$close ($dir)',
-                  style: TextStyle(fontSize: 11, color: colors.textSubtle),
+                  color: colors.textSubtle,
                 ),
               );
             }
@@ -526,7 +526,7 @@ class _CandlestickLegend extends StatelessWidget {
             children: [
               _CandleSwatch(bullColor: s.bullColor, bearColor: s.bearColor),
               const SizedBox(width: 4),
-              Text(s.label, style: TextStyle(color: textColor, fontSize: 12)),
+              OiLabel.caption(s.label, color: textColor),
             ],
           ),
       ],

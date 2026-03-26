@@ -271,9 +271,9 @@ class _OiLineChartState extends State<OiLineChart> {
               child: Center(
                 key: const Key('oi_line_chart_fallback'),
                 child: FittedBox(
-                  child: Text(
+                  child: OiLabel.caption(
                     'Chart too small',
-                    style: TextStyle(fontSize: 10, color: colors.textMuted),
+                    color: colors.textMuted,
                   ),
                 ),
               ),
@@ -438,10 +438,7 @@ class _OiLineChartState extends State<OiLineChart> {
               narration = Semantics(
                 key: const Key('oi_line_chart_narration'),
                 liveRegion: true,
-                child: Text(
-                  desc,
-                  style: TextStyle(fontSize: 11, color: colors.textSubtle),
-                ),
+                child: OiLabel.caption(desc, color: colors.textSubtle),
               );
             }
           }

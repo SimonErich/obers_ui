@@ -47,9 +47,9 @@ class OiBubbleChartSizeLegend extends StatelessWidget {
           if (config.sizeLabel != null)
             Padding(
               padding: const EdgeInsets.only(right: 8, bottom: 2),
-              child: Text(
+              child: OiLabel.caption(
                 config.sizeLabel!,
-                style: labelStyle.copyWith(fontWeight: FontWeight.bold),
+                color: labelStyle.color,
               ),
             ),
           for (var i = 0; i < radii.length; i++)
@@ -71,7 +71,7 @@ class OiBubbleChartSizeLegend extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 2),
-                      Text(labels[i], style: labelStyle),
+                      OiLabel.caption(labels[i], color: labelStyle.color),
                     ],
                   ),
                 ),

@@ -194,6 +194,32 @@ class OiSeriesStyle {
   /// Style overrides applied when the series is inactive (another is focused).
   final OiSeriesStyle? inactiveStyle;
 
+  /// Creates a dashed line style.
+  factory OiSeriesStyle.dashed({
+    Color? strokeColor,
+    double? strokeWidth,
+    List<double> pattern = const [5, 3],
+  }) {
+    return OiSeriesStyle(
+      strokeColor: strokeColor,
+      strokeWidth: strokeWidth,
+      dashPattern: pattern,
+    );
+  }
+
+  /// Creates a dotted line style.
+  factory OiSeriesStyle.dotted({
+    Color? strokeColor,
+    double? strokeWidth,
+    List<double> pattern = const [2, 3],
+  }) {
+    return OiSeriesStyle(
+      strokeColor: strokeColor,
+      strokeWidth: strokeWidth,
+      dashPattern: pattern,
+    );
+  }
+
   /// Merges this style with an [override], preferring override values.
   OiSeriesStyle merge(OiSeriesStyle? override) {
     if (override == null) return this;
