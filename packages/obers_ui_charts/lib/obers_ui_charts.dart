@@ -92,6 +92,10 @@ export 'src/composites/oi_polar_chart.dart';
 // ── Composites: Donut Chart ─────────────────────────────────────────────────
 
 export 'src/composites/oi_donut_chart.dart';
+// ── Composites: Polar Charts ─────────────────────────────────────────────────
+
+export 'src/composites/oi_polar_area_chart.dart';
+export 'src/composites/oi_radial_bar_chart.dart';
 // ── Composites: Simple Charts ────────────────────────────────────────────────
 
 export 'src/composites/oi_funnel_chart.dart';
