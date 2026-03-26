@@ -10,6 +10,13 @@ import 'package:obers_ui_charts/src/composites/oi_line_chart/oi_line_chart_data.
 import 'package:obers_ui_charts/src/composites/oi_line_chart/oi_line_chart_legend.dart';
 import 'package:obers_ui_charts/src/composites/oi_line_chart/oi_line_chart_painter.dart';
 import 'package:obers_ui_charts/src/composites/oi_line_chart/oi_line_chart_theme.dart';
+import 'package:obers_ui_charts/src/foundation/oi_chart_behavior.dart';
+import 'package:obers_ui_charts/src/foundation/oi_chart_controller.dart';
+import 'package:obers_ui_charts/src/foundation/oi_chart_performance_config.dart';
+import 'package:obers_ui_charts/src/foundation/oi_chart_viewport.dart';
+import 'package:obers_ui_charts/src/models/oi_chart_annotation.dart';
+import 'package:obers_ui_charts/src/models/oi_chart_legend_config.dart';
+import 'package:obers_ui_charts/src/models/oi_chart_threshold.dart';
 
 /// A line chart for visualising time series and metric data.
 ///
@@ -26,6 +33,10 @@ import 'package:obers_ui_charts/src/composites/oi_line_chart/oi_line_chart_theme
 /// {@category Composites}
 class OiLineChart extends StatefulWidget {
   /// Creates an [OiLineChart] with the given [mode].
+  ///
+  /// For simple usage, pass [series] as `List<OiLineSeries>` with pre-mapped
+  /// data. For full control (behaviors, sync, persistence, mapper-first
+  /// binding), use `OiCartesianChart<T>` with `OiLineSeriesData<T>` instead.
   const OiLineChart({
     required this.label,
     required this.series,
@@ -38,9 +49,18 @@ class OiLineChart extends StatefulWidget {
     this.showPoints = false,
     this.stacked = false,
     this.onPointTap,
+    this.onSeriesVisibilityChange,
+    this.onViewportChange,
     this.theme,
     this.interactionMode,
     this.compact,
+    this.behaviors = const [],
+    this.controller,
+    this.annotations = const [],
+    this.thresholds = const [],
+    this.legendConfig,
+    this.performance,
+    this.syncGroup,
   });
 
   /// Creates a straight-line [OiLineChart].
@@ -58,6 +78,15 @@ class OiLineChart extends StatefulWidget {
     this.theme,
     this.interactionMode,
     this.compact,
+    this.onSeriesVisibilityChange,
+    this.onViewportChange,
+    this.behaviors = const [],
+    this.controller,
+    this.annotations = const [],
+    this.thresholds = const [],
+    this.legendConfig,
+    this.performance,
+    this.syncGroup,
   }) : mode = OiLineChartMode.straight;
 
   /// Creates a stepped-line [OiLineChart].
@@ -75,6 +104,15 @@ class OiLineChart extends StatefulWidget {
     this.theme,
     this.interactionMode,
     this.compact,
+    this.onSeriesVisibilityChange,
+    this.onViewportChange,
+    this.behaviors = const [],
+    this.controller,
+    this.annotations = const [],
+    this.thresholds = const [],
+    this.legendConfig,
+    this.performance,
+    this.syncGroup,
   }) : mode = OiLineChartMode.stepped;
 
   /// Creates a smooth-curve [OiLineChart].
@@ -92,6 +130,15 @@ class OiLineChart extends StatefulWidget {
     this.theme,
     this.interactionMode,
     this.compact,
+    this.onSeriesVisibilityChange,
+    this.onViewportChange,
+    this.behaviors = const [],
+    this.controller,
+    this.annotations = const [],
+    this.thresholds = const [],
+    this.legendConfig,
+    this.performance,
+    this.syncGroup,
   }) : mode = OiLineChartMode.smooth;
 
   /// Accessibility label for the chart.
@@ -132,6 +179,36 @@ class OiLineChart extends StatefulWidget {
 
   /// Whether to use compact layout. When null, determined by available width.
   final bool? compact;
+
+  /// Called when series visibility changes via legend toggle.
+  final ValueChanged<String>? onSeriesVisibilityChange;
+
+  /// Called when the viewport changes (zoom/pan).
+  final ValueChanged<OiChartViewportState>? onViewportChange;
+
+  /// Composable interaction behaviors.
+  ///
+  /// For full behavior support, use `OiCartesianChart<T>` with
+  /// `OiLineSeriesData<T>` instead.
+  final List<OiChartBehavior> behaviors;
+
+  /// External chart controller.
+  final OiChartController? controller;
+
+  /// Annotation overlays (lines, regions, points, labels).
+  final List<OiChartAnnotation> annotations;
+
+  /// Threshold lines.
+  final List<OiChartThreshold> thresholds;
+
+  /// Legend configuration.
+  final OiChartLegendConfig? legendConfig;
+
+  /// Performance configuration (decimation, rendering mode).
+  final OiChartPerformanceConfig? performance;
+
+  /// Sync group identifier for linking multiple charts.
+  final String? syncGroup;
 
   @override
   State<OiLineChart> createState() => _OiLineChartState();

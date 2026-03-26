@@ -1,3 +1,5 @@
+import 'dart:math' show Point;
+
 import 'package:flutter/widgets.dart';
 
 import 'package:obers_ui_charts/src/components/oi_chart_empty_state.dart';
@@ -18,6 +20,7 @@ import 'package:obers_ui/obers_ui.dart' show OiChartThemeData, OiResponsive;
 
 import 'package:obers_ui_charts/src/models/oi_chart_complexity.dart';
 
+import 'package:obers_ui_charts/src/foundation/oi_decimation.dart';
 import 'package:obers_ui_charts/src/utils/chart_math.dart';
 
 import 'package:obers_ui_charts/src/models/oi_cartesian_series.dart';
@@ -230,6 +233,51 @@ class _OiCartesianChartState<T> extends State<OiCartesianChart<T>>
     return result;
   }
 
+  /// Applies decimation to normalized data when performance config requires it.
+  Map<String, List<OiChartDatum>> _applyDecimation(
+    Map<String, List<OiChartDatum>> data,
+  ) {
+    final perf = widget.performance;
+    if (perf == null) return data;
+    if (perf.decimationStrategy == OiChartDecimationStrategy.none) return data;
+
+    final maxPoints = perf.maxInteractivePoints;
+    final result = <String, List<OiChartDatum>>{};
+
+    for (final entry in data.entries) {
+      final datums = entry.value;
+      if (datums.length <= maxPoints) {
+        result[entry.key] = datums;
+        continue;
+      }
+
+      // Convert to Point<double> for decimation.
+      final points = <Point<double>>[
+        for (final d in datums)
+          Point(
+            (d.xRaw is num) ? (d.xRaw! as num).toDouble() : d.index.toDouble(),
+            (d.yRaw is num) ? (d.yRaw! as num).toDouble() : 0,
+          ),
+      ];
+
+      final List<Point<double>> decimated;
+      if (perf.decimationStrategy == OiChartDecimationStrategy.lttb) {
+        decimated = decimateLttb(points, targetCount: maxPoints);
+      } else {
+        decimated = decimateMinMax(points, targetCount: maxPoints);
+      }
+
+      // Map back to datums by index matching.
+      final decimatedSet = decimated.toSet();
+      result[entry.key] = [
+        for (var i = 0; i < datums.length; i++)
+          if (decimatedSet.contains(points[i])) datums[i],
+      ];
+    }
+
+    return result;
+  }
+
   /// Total data point count across all visible series.
   int get _totalPointCount {
     var count = 0;
@@ -337,7 +385,7 @@ class _OiCartesianChartState<T> extends State<OiCartesianChart<T>>
           );
 
           // Normalize series data through the foundation pipeline.
-          _lastNormalizedData = _normalizeVisibleSeries();
+          _lastNormalizedData = _applyDecimation(_normalizeVisibleSeries());
 
           // Attach behaviors and sync now that we have a valid context.
           if (behaviors.isNotEmpty && behaviors.any((b) => !b.isAttached)) {
