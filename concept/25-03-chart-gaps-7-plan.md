@@ -14,10 +14,10 @@ Close final 1%: fix 3 bubble chart test failures, add behaviors/controller to Oi
 ### Phase 1: Fix Bubble Chart Tests + Add Params to Last 2 Charts
 
 - **Goal**: 0 test failures, 16/16 charts accept behaviors
-- [ ] `test/src/composites/oi_bubble_chart/oi_bubble_chart_test.dart` — Read failing tests. Fix coordinate mismatch: either increase surfaceSize so bubbles render at expected positions, or update tap/hover coordinates to match actual layout. If overflow persists, wrap test widget in UnconstrainedBox or increase height.
-- [ ] `lib/src/composites/oi_candlestick_chart/oi_candlestick_chart.dart` — Add `behaviors: List<OiChartBehavior>`, `controller: OiChartController?` params + fields + imports
-- [ ] `lib/src/composites/oi_gauge.dart` — Add `behaviors: List<OiChartBehavior>` param + field + import
-- [ ] Verify: `dart analyze` && `flutter test` (target: 0 failures)
+- [x] `test/src/composites/oi_bubble_chart/oi_bubble_chart_test.dart` — Read failing tests. Fix coordinate mismatch: either increase surfaceSize so bubbles render at expected positions, or update tap/hover coordinates to match actual layout. If overflow persists, wrap test widget in UnconstrainedBox or increase height.
+- [x] `lib/src/composites/oi_candlestick_chart/oi_candlestick_chart.dart` — Add `behaviors: List<OiChartBehavior>`, `controller: OiChartController?` params + fields + imports
+- [x] `lib/src/composites/oi_gauge.dart` — Add `behaviors: List<OiChartBehavior>` param + field + import
+- [x] Verify: `dart analyze` && `flutter test` (target: 0 failures)
 
 ## Risks / Out of scope
 
