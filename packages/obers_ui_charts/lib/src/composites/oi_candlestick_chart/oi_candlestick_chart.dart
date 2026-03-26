@@ -7,6 +7,8 @@ import 'package:obers_ui_charts/src/composites/oi_bubble_chart/oi_bubble_chart_i
 import 'package:obers_ui_charts/src/composites/oi_candlestick_chart/oi_candlestick_chart_data.dart';
 import 'package:obers_ui_charts/src/composites/oi_candlestick_chart/oi_candlestick_chart_painter.dart';
 import 'package:obers_ui_charts/src/composites/oi_chart_axis.dart';
+import 'package:obers_ui_charts/src/foundation/oi_chart_behavior.dart';
+import 'package:obers_ui_charts/src/foundation/oi_chart_controller.dart';
 
 /// A candlestick (OHLC) chart for financial time-series data.
 ///
@@ -41,6 +43,8 @@ class OiCandlestickChart<T> extends StatefulWidget {
     this.loadingState,
     this.errorState,
     this.semanticLabel,
+    this.behaviors = const [],
+    this.controller,
   });
 
   /// Accessibility label for the chart.
@@ -87,6 +91,12 @@ class OiCandlestickChart<T> extends StatefulWidget {
 
   /// Overrides the auto-generated accessibility label.
   final String? semanticLabel;
+
+  /// Composable interaction behaviors.
+  final List<OiChartBehavior> behaviors;
+
+  /// External chart controller.
+  final OiChartController? controller;
 
   @override
   State<OiCandlestickChart<T>> createState() => _OiCandlestickChartState<T>();

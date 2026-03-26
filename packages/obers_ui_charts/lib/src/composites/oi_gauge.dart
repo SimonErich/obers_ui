@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/obers_ui.dart';
+import 'package:obers_ui_charts/src/foundation/oi_chart_behavior.dart';
 import 'package:obers_ui_charts/src/foundation/oi_chart_controller.dart';
 
 /// A segment of the gauge for coloring ranges.
@@ -54,6 +55,7 @@ class OiGauge extends StatelessWidget {
     this.target,
     this.size,
     this.controller,
+    this.behaviors = const [],
   });
 
   /// The current value displayed by the needle.
@@ -85,6 +87,9 @@ class OiGauge extends StatelessWidget {
 
   /// External chart controller.
   final OiChartController? controller;
+
+  /// Composable interaction behaviors.
+  final List<OiChartBehavior> behaviors;
 
   @override
   Widget build(BuildContext context) {
