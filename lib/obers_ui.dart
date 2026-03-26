@@ -63,6 +63,7 @@ export 'src/components/display/oi_tooltip.dart';
 export 'src/components/feedback/oi_banner.dart';
 export 'src/components/feedback/oi_bulk_bar.dart';
 export 'src/components/feedback/oi_reaction_bar.dart';
+export 'src/components/feedback/oi_skeleton_preset.dart';
 export 'src/components/feedback/oi_scale_rating.dart';
 export 'src/components/feedback/oi_sentiment.dart';
 export 'src/components/feedback/oi_star_rating.dart';
