@@ -14,20 +14,20 @@ Write 8 missing test files for Tier B charts (Phases 3-4) and modules (Phases 5-
 ### Phase 1: Tier B Chart Tests
 
 - **Goal**: 4 test files for polar, hierarchical, matrix charts
-- [ ] `test/src/composites/oi_radial_bar_chart_test.dart` — Widget renders with data, empty data shows empty state, arc sweep test (verify arc proportional to value/maxValue via painter inspection)
-- [ ] `test/src/composites/oi_polar_area_chart_test.dart` — Widget renders, wedge count matches data count, empty data
-- [ ] `test/src/composites/oi_sunburst_chart_test.dart` — Widget renders with flat node list, center content shows, empty data
-- [ ] `test/src/composites/oi_calendar_heatmap_test.dart` — Widget renders, date range produces correct grid, empty data
-- [ ] Verify: `flutter test`
+- [x] `test/src/composites/oi_radial_bar_chart_test.dart` — Widget renders with data, empty data shows empty state, arc sweep test (verify arc proportional to value/maxValue via painter inspection)
+- [x] `test/src/composites/oi_polar_area_chart_test.dart` — Widget renders, wedge count matches data count, empty data
+- [x] `test/src/composites/oi_sunburst_chart_test.dart` — Widget renders with flat node list, center content shows, empty data
+- [x] `test/src/composites/oi_calendar_heatmap_test.dart` — Widget renders, date range produces correct grid, empty data
+- [x] Verify: `flutter test`
 
 ### Phase 2: Module Tests
 
 - **Goal**: 4 test files for KPI, dashboard, explorer
-- [ ] `test/src/modules/oi_kpi_format_test.dart` — currency "$1,234,567", percentage "3.4%", number "42,000", delta computation, OiKpiStatus values
-- [ ] `test/src/modules/oi_kpi_board_test.dart` — Board renders correct card count, empty metrics shows empty, responsive column count
-- [ ] `test/src/modules/oi_analytics_dashboard_test.dart` — Dashboard renders panel count, empty panels shows empty, OiGridPosition equality
-- [ ] `test/src/modules/oi_chart_explorer_test.dart` — OiExplorerController setChartType notifies, setXColumn notifies, OiColumnType values, OiExplorerChartType values
-- [ ] Verify: `flutter test`
+- [x] `test/src/modules/oi_kpi_format_test.dart` — currency "$1,234,567", percentage "3.4%", number "42,000", delta computation, OiKpiStatus values
+- [x] `test/src/modules/oi_kpi_board_test.dart` — Board renders correct card count, empty metrics shows empty, responsive column count
+- [x] `test/src/modules/oi_analytics_dashboard_test.dart` — Dashboard renders panel count, empty panels shows empty, OiGridPosition equality
+- [x] `test/src/modules/oi_chart_explorer_test.dart` — OiExplorerController setChartType notifies, setXColumn notifies, OiColumnType values, OiExplorerChartType values
+- [x] Verify: `flutter test`
 
 ## Risks / Out of scope
 
