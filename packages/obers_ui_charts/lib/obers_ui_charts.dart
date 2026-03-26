@@ -96,6 +96,13 @@ export 'src/composites/oi_donut_chart.dart';
 
 export 'src/composites/oi_polar_area_chart.dart';
 export 'src/composites/oi_radial_bar_chart.dart';
+// ── Composites: Sunburst Chart ───────────────────────────────────────────────
+
+export 'src/composites/oi_sunburst_chart/oi_sunburst_chart.dart';
+export 'src/composites/oi_sunburst_chart/oi_sunburst_painter.dart';
+// ── Composites: Calendar Heatmap ─────────────────────────────────────────────
+
+export 'src/composites/oi_calendar_heatmap.dart';
 // ── Composites: Simple Charts ────────────────────────────────────────────────
 
 export 'src/composites/oi_funnel_chart.dart';
@@ -197,3 +204,9 @@ export 'src/models/oi_flow_series.dart';
 export 'src/models/oi_hierarchical_series.dart';
 export 'src/models/oi_matrix_series.dart';
 export 'src/models/oi_polar_series.dart';
+// ── Modules ──────────────────────────────────────────────────────────────────
+
+export 'src/modules/oi_kpi_board.dart';
+export 'src/modules/oi_kpi_card.dart';
+export 'src/modules/oi_kpi_format.dart';
+export 'src/modules/oi_kpi_metric.dart';
