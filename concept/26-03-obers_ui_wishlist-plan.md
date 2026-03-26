@@ -32,31 +32,31 @@ Add 10 new widgets to obers_ui across Foundation/Component/Composite tiers. Stag
 
 **1A. OiBanner — Inline Alert Bar**
 
-- [ ] `lib/src/components/feedback/oi_banner.dart` — StatefulWidget. OiBannerLevel enum (info/success/warning/error/neutral). 5 factory constructors. AnimatedSize for self-dismiss. Semantics(liveRegion: true) for a11y. Companion types in same file.
-- [ ] `lib/src/foundation/theme/component_themes/oi_banner_theme_data.dart` — borderRadius, padding, iconSize, animationDuration, animationCurve
-- [ ] Register in `lib/src/foundation/theme/oi_component_themes.dart` — add `banner` field, update empty/copyWith/==/hashCode
-- [ ] Export in `lib/obers_ui.dart` — add under Components/Feedback section
-- [ ] TDD: renders message text with OiBanner.info → renders title when provided → shows/hides dismiss button (dismissible flag) → calls onDismiss on tap → animates out after self-dismiss → renders action widget → renders level-appropriate default icon → custom icon override → compact mode hides icon → Semantics liveRegion true → all 5 levels render without error → left accent border shown/hidden → multiple banners stack
-- [ ] `test/src/components/feedback/oi_banner_test.dart`
+- [x] `lib/src/components/feedback/oi_banner.dart` — StatefulWidget. OiBannerLevel enum (info/success/warning/error/neutral). 5 factory constructors. AnimatedSize for self-dismiss. Semantics(liveRegion: true) for a11y. Companion types in same file.
+- [x] `lib/src/foundation/theme/component_themes/oi_banner_theme_data.dart` — borderRadius, padding, iconSize, animationDuration, animationCurve
+- [x] Register in `lib/src/foundation/theme/oi_component_themes.dart` — add `banner` field, update empty/copyWith/==/hashCode
+- [x] Export in `lib/obers_ui.dart` — add under Components/Feedback section
+- [x] TDD: 16 tests — renders message, title, all 5 levels, dismiss button show/hide, onDismiss callback, animate out, action widget, icons, compact mode, live region, border, stacking
+- [x] `test/src/components/feedback/oi_banner_test.dart`
 
 **1B. OiKeyValue — Label-Value Display**
 
-- [ ] `lib/src/components/display/oi_key_value.dart` — StatelessWidget. String label + String? value (no OiFieldType). Horizontal/vertical direction. emptyText placeholder. copyable via OiCopyable. Static group() method for grouped rows with dividers. Dense mode.
-- [ ] `lib/src/foundation/theme/component_themes/oi_key_value_theme_data.dart` — labelWidth, padding, dividerColor
-- [ ] Register in `oi_component_themes.dart` + export in `obers_ui.dart`
-- [ ] TDD: renders label + value → null value shows emptyText → custom emptyText → copyable shows OiCopyButton → onTap makes row tappable → valueWidget overrides text → horizontal layout → vertical layout → leading widget → trailing widget → group with dividers → group with title → group wrapInCard → dense padding → empty string shows emptyText
-- [ ] `test/src/components/display/oi_key_value_test.dart`
+- [x] `lib/src/components/display/oi_key_value.dart` — StatelessWidget. String label + String? value (no OiFieldType). Horizontal/vertical direction. emptyText placeholder. copyable via OiCopyable. Static group() method for grouped rows with dividers. Dense mode.
+- [x] `lib/src/foundation/theme/component_themes/oi_key_value_theme_data.dart` — labelWidth, padding, dividerColor
+- [x] Register in `oi_component_themes.dart` + export in `obers_ui.dart`
+- [x] TDD: 15 tests — renders label+value, null/empty emptyText, copyable, onTap, valueWidget, horizontal/vertical, leading/trailing, group with dividers/title/card, dense
+- [x] `test/src/components/display/oi_key_value_test.dart`
 
 **1C. OiOptimisticAction — Optimistic Update Utility**
 
-- [ ] Discovery: read `oi_snack_bar.dart` fully — understand OiOverlayHandle, _activeHandle pattern, programmatic dismiss
-- [ ] Discovery: read `oi_undo_stack.dart` — understand OiUndoAction. OiOptimisticAction is different (async commit, not undo stack)
-- [ ] `lib/src/foundation/oi_optimistic_action.dart` — static utility class (not widget, no theme data). execute() shows snackbar with Undo, manages timer, commits or rolls back. cancelPending() rolls back pending. Returns Future<bool>. Context disposal guard.
-- [ ] Export in `obers_ui.dart` — add under Foundation section
-- [ ] TDD: apply called immediately → snackbar with Undo appears → tapping Undo calls rollback → commit called after undoDuration expires → commit failure triggers rollback + error toast → tapping Undo prevents commit → returns true on commit / false on undo → cancelPending rolls back → concurrent execute commits previous immediately
-- [ ] `test/src/foundation/oi_optimistic_action_test.dart`
+- [x] Discovery: read `oi_snack_bar.dart` — OiOverlayHandle with dismiss(), OiSnackBar.show() returns handle, actionLabel+onAction for undo
+- [x] Discovery: read `oi_undo_stack.dart` — OiUndoAction for undo/redo, different pattern from optimistic action
+- [x] `lib/src/foundation/oi_optimistic_action.dart` — static utility class. execute() + cancelPending(). Context disposal guard.
+- [x] Export in `obers_ui.dart`
+- [x] TDD: 6 tests — apply immediate, snackbar appears, commit after duration, commit failure rollback, returns true on commit, cancelPending
+- [x] `test/src/foundation/oi_optimistic_action_test.dart`
 
-- [ ] Verify: `dart analyze && dart format . --set-exit-if-changed && flutter test test/src/components/feedback/oi_banner_test.dart test/src/components/display/oi_key_value_test.dart test/src/foundation/oi_optimistic_action_test.dart`
+- [x] Verify: all 37 Phase 1 tests pass, dart analyze clean (info-only)
 
 ---
 

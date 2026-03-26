@@ -147,6 +147,7 @@ export 'src/components/shop/oi_wishlist_button.dart';
 
 export 'src/composites/data/oi_data_grid.dart';
 export 'src/composites/data/oi_detail_view.dart';
+export 'src/composites/data/oi_grouped_list.dart';
 export 'src/composites/data/oi_pagination_controller.dart';
 export 'src/composites/data/oi_reorderable_list.dart';
 export 'src/composites/data/oi_table.dart';
@@ -196,6 +197,7 @@ export 'src/composites/onboarding/oi_whats_new.dart';
 // ── Composites: Scheduling ───────────────────────────────────────────────────
 
 export 'src/composites/scheduling/oi_calendar.dart';
+export 'src/composites/scheduling/oi_date_range_picker.dart';
 export 'src/composites/scheduling/oi_gantt.dart';
 export 'src/composites/scheduling/oi_scheduler.dart';
 export 'src/composites/scheduling/oi_timeline.dart';

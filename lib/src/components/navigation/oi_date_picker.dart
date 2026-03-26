@@ -43,6 +43,8 @@ class OiDatePicker extends StatefulWidget {
     this.rangeEnd,
     this.onRangeChanged,
     this.rangeMode = false,
+    this.displayMonth,
+    this.onDisplayMonthChanged,
     super.key,
   });
 
@@ -69,6 +71,15 @@ class OiDatePicker extends StatefulWidget {
 
   /// When `true`, the picker operates in date-range selection mode.
   final bool rangeMode;
+
+  /// Externally controlled display month. When provided, the picker shows
+  /// this month instead of managing its own display month state.
+  final DateTime? displayMonth;
+
+  /// Called when the user navigates to a different month via the
+  /// previous/next arrows. Only fires when [displayMonth] is provided,
+  /// allowing the parent to update the controlled month.
+  final ValueChanged<DateTime>? onDisplayMonthChanged;
 
   /// Shows a date picker in a dialog and returns the selected date.
   ///
@@ -108,23 +119,58 @@ class _OiDatePickerState extends State<OiDatePicker> {
   late DateTime _displayMonth;
   DateTime? _pendingRangeStart;
 
+  bool get _isControlled => widget.displayMonth != null;
+
+  DateTime get _effectiveDisplayMonth {
+    if (_isControlled) {
+      final dm = widget.displayMonth!;
+      return DateTime(dm.year, dm.month);
+    }
+    return _displayMonth;
+  }
+
   @override
   void initState() {
     super.initState();
-    final ref = widget.value ?? widget.rangeStart ?? DateTime.now();
+    final ref =
+        widget.displayMonth ??
+        widget.value ??
+        widget.rangeStart ??
+        DateTime.now();
     _displayMonth = DateTime(ref.year, ref.month);
   }
 
+  @override
+  void didUpdateWidget(OiDatePicker oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (_isControlled && widget.displayMonth != oldWidget.displayMonth) {
+      final dm = widget.displayMonth!;
+      _displayMonth = DateTime(dm.year, dm.month);
+    }
+  }
+
   void _prevMonth() {
-    setState(() {
-      _displayMonth = DateTime(_displayMonth.year, _displayMonth.month - 1);
-    });
+    final prev = DateTime(
+      _effectiveDisplayMonth.year,
+      _effectiveDisplayMonth.month - 1,
+    );
+    if (_isControlled) {
+      widget.onDisplayMonthChanged?.call(prev);
+    } else {
+      setState(() => _displayMonth = prev);
+    }
   }
 
   void _nextMonth() {
-    setState(() {
-      _displayMonth = DateTime(_displayMonth.year, _displayMonth.month + 1);
-    });
+    final next = DateTime(
+      _effectiveDisplayMonth.year,
+      _effectiveDisplayMonth.month + 1,
+    );
+    if (_isControlled) {
+      widget.onDisplayMonthChanged?.call(next);
+    } else {
+      setState(() => _displayMonth = next);
+    }
   }
 
   void _onDayTap(DateTime day) {
@@ -187,7 +233,7 @@ class _OiDatePickerState extends State<OiDatePicker> {
     final today = DateTime.now();
 
     // First day of the display month.
-    final firstOfMonth = _displayMonth;
+    final firstOfMonth = _effectiveDisplayMonth;
     // Day-of-week offset: 0=Sun, 1=Mon ... 6=Sat
     final startOffset = firstOfMonth.weekday % 7; // DateTime.weekday: 1=Mon
     final daysInMonth = DateTime(
