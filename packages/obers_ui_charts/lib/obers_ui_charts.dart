@@ -25,6 +25,16 @@ export 'src/composites/oi_area_chart/oi_area_chart_data.dart';
 export 'src/composites/oi_area_chart/oi_area_chart_legend.dart';
 export 'src/composites/oi_area_chart/oi_area_chart_painter.dart';
 export 'src/composites/oi_area_chart/oi_area_chart_theme.dart';
+// ── Composites: Histogram Chart ──────────────────────────────────────────────
+
+export 'src/composites/oi_histogram/oi_histogram.dart';
+export 'src/composites/oi_histogram/oi_histogram_data.dart';
+export 'src/composites/oi_histogram/oi_histogram_painter.dart';
+// ── Composites: Waterfall Chart ───────────────────────────────────────────────
+
+export 'src/composites/oi_waterfall_chart/oi_waterfall_chart.dart';
+export 'src/composites/oi_waterfall_chart/oi_waterfall_data.dart';
+export 'src/composites/oi_waterfall_chart/oi_waterfall_painter.dart';
 // ── Composites: Bar Chart ────────────────────────────────────────────────────
 
 export 'src/composites/oi_bar_chart/oi_bar_chart.dart';
