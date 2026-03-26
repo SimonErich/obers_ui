@@ -63,7 +63,7 @@ class _SbNode<T> {
 /// ## Accessibility
 ///
 /// Wrap the chart in a [Semantics] with [semanticLabel] describing the data.
-/// Individual arcs announce their label via [SemanticsProperties].
+/// Individual arcs announce their label via Semantics properties.
 ///
 /// {@category Composites}
 class OiSunburstChart<TNode> extends StatefulWidget {
@@ -143,7 +143,7 @@ class _OiSunburstChartState<TNode> extends State<OiSunburstChart<TNode>> {
 
   // ── Tree construction ─────────────────────────────────────────────────────
 
-  /// Build a forest from the flat [widget.data] list.
+  /// Build a forest from the flat data list.
   List<_SbNode<TNode>> _buildRoots() {
     final data = widget.data;
     if (data.isEmpty) return [];
@@ -393,7 +393,7 @@ class _OiSunburstChartState<TNode> extends State<OiSunburstChart<TNode>> {
               ? chartColors[0].withValues(alpha: 0.15)
               : const Color(0x11000000);
 
-          Widget chart = SizedBox(
+          final chart = SizedBox(
             key: const Key('oi_sunburst_chart'),
             width: dim,
             height: dim,

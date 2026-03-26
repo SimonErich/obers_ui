@@ -139,7 +139,7 @@ class _OiCalendarHeatmapState<T> extends State<OiCalendarHeatmap<T>> {
   DateTime _dateOnly(DateTime d) => DateTime(d.year, d.month, d.day);
 
   /// Returns the day-of-week index (0–6) for [date], adjusted so that
-  /// [widget.weekStartsOn] maps to row 0.
+  /// `weekStartsOn` maps to row 0.
   int _dayRow(DateTime date) {
     // DateTime.weekday: monday=1 … sunday=7
     return (date.weekday - widget.weekStartsOn + 7) % 7;
@@ -153,7 +153,7 @@ class _OiCalendarHeatmapState<T> extends State<OiCalendarHeatmap<T>> {
 
   // ── Compute grid ──────────────────────────────────────────────────────────
 
-  /// Aggregates [widget.data] into a map from date-only to total value.
+  /// Aggregates the data list into a map from date-only to total value.
   Map<DateTime, num> _aggregateData() {
     final map = <DateTime, num>{};
     for (final item in widget.data) {

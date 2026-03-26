@@ -91,7 +91,7 @@ class OiSunburstPainter extends CustomPainter {
       final rect = Rect.fromCircle(center: center, radius: midRadius);
 
       final isHovered = hoveredNodeId == arc.nodeId;
-      final color = isHovered ? arc.color.withValues(alpha: 1.0) : arc.color;
+      final color = isHovered ? arc.color.withValues(alpha: 1) : arc.color;
 
       final paint = Paint()
         ..color = color
