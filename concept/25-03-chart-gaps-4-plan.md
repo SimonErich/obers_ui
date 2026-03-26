@@ -16,56 +16,56 @@ Refactor 9 legacy concrete charts to use mapper-first data binding from the foun
 ### Phase 1: OiLineChart Mapper-First Upgrade
 
 - **Goal**: Make OiLineChart accept mapper-first data + add missing concept enums/params
-- [ ] `lib/src/composites/oi_line_chart/oi_line_chart_data.dart` — Add `OiLineMissingValueBehavior` enum (gap/connect/zero/interpolate). Add `OiLineSeriesData<T>` class extending `OiCartesianSeries<T>` with: interpolation (OiLineChartMode), missingValueBehavior, showLine, showMarkers, showDataLabels, fillBelow, smoothing, pointColor callback, valueFormatter, xFormatter, semanticValue mapper. Keep existing `OiLineSeries` + `OiLinePoint` for backward compat.
-- [ ] `lib/src/composites/oi_line_chart/oi_line_chart.dart` — Add constructor params: `data: List<T>?`, `x`, `y` (shorthand), `mapperSeries: List<OiLineSeriesData<T>>?` (mapper-based), plus `behaviors`, `annotations`, `thresholds`, `legend`, `performance`, `animation`, `accessibility`, `settings`, `controller`, `syncGroup`, `onPointDoubleTap`, `onPointLongPress`, `onSeriesVisibilityChange`, `onViewportChange`, `onSelectionChange`. In build, if mapperSeries provided, use those; else fall back to legacy series.
-- [ ] `lib/src/foundation/oi_chart_marker.dart` — Add `factory OiChartMarkerStyle.hidden()` returning `const OiChartMarkerStyle(visible: false)`
-- [ ] TDD: OiLineSeriesData<T> with x/y mappers extracts values correctly
-- [ ] TDD: OiLineMissingValueBehavior.gap creates visual break in line
-- [ ] TDD: OiLineChart shorthand (data/x/y) creates single series internally
-- [ ] Verify: `dart analyze` && `flutter test`
+- [x] `lib/src/composites/oi_line_chart/oi_line_chart_data.dart` — Add `OiLineMissingValueBehavior` enum (gap/connect/zero/interpolate). Add `OiLineSeriesData<T>` class extending `OiCartesianSeries<T>` with: interpolation (OiLineChartMode), missingValueBehavior, showLine, showMarkers, showDataLabels, fillBelow, smoothing, pointColor callback, valueFormatter, xFormatter, semanticValue mapper. Keep existing `OiLineSeries` + `OiLinePoint` for backward compat.
+- [x] `lib/src/composites/oi_line_chart/oi_line_chart.dart` — Add constructor params: `data: List<T>?`, `x`, `y` (shorthand), `mapperSeries: List<OiLineSeriesData<T>>?` (mapper-based), plus `behaviors`, `annotations`, `thresholds`, `legend`, `performance`, `animation`, `accessibility`, `settings`, `controller`, `syncGroup`, `onPointDoubleTap`, `onPointLongPress`, `onSeriesVisibilityChange`, `onViewportChange`, `onSelectionChange`. In build, if mapperSeries provided, use those; else fall back to legacy series.
+- [x] `lib/src/foundation/oi_chart_marker.dart` — Add `factory OiChartMarkerStyle.hidden()` returning `const OiChartMarkerStyle(visible: false)`
+- [x] TDD: OiLineSeriesData<T> with x/y mappers extracts values correctly
+- [x] TDD: OiLineMissingValueBehavior.gap creates visual break in line
+- [x] TDD: OiLineChart shorthand (data/x/y) creates single series internally
+- [x] Verify: `dart analyze` && `flutter test`
 
 ### Phase 2: Wire Normalization + Decimation
 
 - **Goal**: Make composites actually normalize data and apply decimation
-- [ ] `lib/src/composites/oi_cartesian_chart.dart` — In build, after computing visible series: for each series with data, call `normalizeSeries()` to produce `List<OiChartDatum>`. If `widget.performance?.decimationStrategy != OiChartDecimationStrategy.none`, call `selectDecimationStrategy()` + apply. Store result as `_normalizedData`. Pass to seriesBuilder alongside raw series.
-- [ ] `lib/src/composites/oi_line_chart/oi_line_chart.dart` — When using mapper-based series, normalize through `normalizeSeries()` before painting. Apply decimation for large datasets.
-- [ ] TDD: normalizeSeries() called in cartesian chart produces correct OiChartDatum count
-- [ ] TDD: decimation with LTTB reduces 1000 points to ~100 when maxInteractivePoints exceeded
-- [ ] Verify: `dart analyze` && `flutter test`
+- [x] `lib/src/composites/oi_cartesian_chart.dart` — In build, after computing visible series: for each series with data, call `normalizeSeries()` to produce `List<OiChartDatum>`. If `widget.performance?.decimationStrategy != OiChartDecimationStrategy.none`, call `selectDecimationStrategy()` + apply. Store result as `_normalizedData`. Pass to seriesBuilder alongside raw series.
+- [x] `lib/src/composites/oi_line_chart/oi_line_chart.dart` — When using mapper-based series, normalize through `normalizeSeries()` before painting. Apply decimation for large datasets.
+- [x] TDD: normalizeSeries() called in cartesian chart produces correct OiChartDatum count
+- [x] TDD: decimation with LTTB reduces 1000 points to ~100 when maxInteractivePoints exceeded
+- [x] Verify: `dart analyze` && `flutter test`
 
 ### Phase 3: Upgrade Remaining Legacy Charts (Bar, Bubble, Scatter, Pie)
 
 - **Goal**: Add mapper-first series option to 4 highest-impact legacy charts
-- [ ] `lib/src/composites/oi_bar_chart/oi_bar_chart_data.dart` — Add `OiBarSeriesData<T>` extending `OiCartesianSeries<T>` with `barWidth`, `grouped`, `stacked`, `horizontal` props. Keep legacy `OiBarSeries`.
-- [ ] `lib/src/composites/oi_bar_chart/oi_bar_chart.dart` — Accept both legacy and mapper-based series. Add `behaviors`, `controller`, `annotations`, `thresholds` params.
-- [ ] `lib/src/composites/oi_bubble_chart/oi_bubble_chart_data.dart` — Add `OiBubbleSeriesData<T>` extending `OiCartesianSeries<T>` with `sizeMapper`. Keep legacy.
-- [ ] `lib/src/composites/oi_bubble_chart/oi_bubble_chart.dart` — Accept both. Add behaviors/controller.
-- [ ] `lib/src/composites/oi_scatter_plot.dart` — Add generic `<T>` + mapper-based series acceptance alongside legacy.
-- [ ] `lib/src/composites/oi_pie_chart.dart` — Add `OiPieSeriesData<T>` with value/label mappers alongside `OiPieSegment` legacy.
-- [ ] TDD: OiBarChart with mapper-based OiBarSeriesData renders same as legacy
-- [ ] TDD: OiPieChart with mapper-based OiPieSeriesData renders same as legacy
-- [ ] Verify: `dart analyze` && `flutter test`
+- [x] `lib/src/composites/oi_bar_chart/oi_bar_chart_data.dart` — Add `OiBarSeriesData<T>` extending `OiCartesianSeries<T>` with `barWidth`, `grouped`, `stacked`, `horizontal` props. Keep legacy `OiBarSeries`.
+- [x] `lib/src/composites/oi_bar_chart/oi_bar_chart.dart` — Accept both legacy and mapper-based series. Add `behaviors`, `controller`, `annotations`, `thresholds` params.
+- [x] `lib/src/composites/oi_bubble_chart/oi_bubble_chart_data.dart` — Add `OiBubbleSeriesData<T>` extending `OiCartesianSeries<T>` with `sizeMapper`. Keep legacy.
+- [x] `lib/src/composites/oi_bubble_chart/oi_bubble_chart.dart` — Accept both. Add behaviors/controller.
+- [x] `lib/src/composites/oi_scatter_plot.dart` — Add generic `<T>` + mapper-based series acceptance alongside legacy.
+- [x] `lib/src/composites/oi_pie_chart.dart` — Add `OiPieSeriesData<T>` with value/label mappers alongside `OiPieSegment` legacy.
+- [x] TDD: OiBarChart with mapper-based OiBarSeriesData renders same as legacy
+- [x] TDD: OiPieChart with mapper-based OiPieSeriesData renders same as legacy
+- [x] Verify: `dart analyze` && `flutter test`
 
 ### Phase 4: Upgrade Remaining Charts (Radar, Heatmap, Sparkline, Donut, Gauge)
 
 - **Goal**: Complete mapper-first coverage for all concrete charts
-- [ ] `lib/src/composites/oi_radar_chart.dart` — Add mapper-based series with generic `<T>`
-- [ ] `lib/src/composites/oi_heatmap.dart` — Add mapper-based series with generic `<T>`
-- [ ] `lib/src/composites/oi_sparkline.dart` — Add mapper-based data input
-- [ ] `lib/src/composites/oi_donut_chart.dart` — Delegate to updated OiPieChart
-- [ ] `lib/src/composites/oi_gauge.dart` — Already single-value; add optional data/mapper shorthand for data-driven gauge
-- [ ] Fix 1 remaining `Text()` in `oi_line_chart_legend.dart`
-- [ ] TDD: OiRadarChart with mapper series renders correctly
-- [ ] Verify: `dart analyze` && `flutter test`
+- [x] `lib/src/composites/oi_radar_chart.dart` — Add mapper-based series with generic `<T>`
+- [x] `lib/src/composites/oi_heatmap.dart` — Add mapper-based series with generic `<T>`
+- [x] `lib/src/composites/oi_sparkline.dart` — Add mapper-based data input
+- [x] `lib/src/composites/oi_donut_chart.dart` — Delegate to updated OiPieChart
+- [x] `lib/src/composites/oi_gauge.dart` — Already single-value; add optional data/mapper shorthand for data-driven gauge
+- [x] Fix 1 remaining `Text()` in `oi_line_chart_legend.dart`
+- [x] TDD: OiRadarChart with mapper series renders correctly
+- [x] Verify: `dart analyze` && `flutter test`
 
 ### Phase 5: Integration Tests + Polish
 
 - **Goal**: Prove mapper-first path works end-to-end with normalization, decimation, behaviors
-- [ ] `test/src/composites/oi_line_chart_mapper_test.dart` — OiLineChart with OiLineSeriesData<T>: renders, shorthand API works, missing value behavior creates gaps, decimation applies
-- [ ] `test/src/composites/oi_normalization_test.dart` — normalizeSeries produces correct OiChartDatum list, decimation reduces point count, mappers extract values
-- [ ] `test/src/composites/oi_bar_chart_mapper_test.dart` — Bar chart with mapper-based data renders grouped/stacked
-- [ ] Fix 3 pre-existing bubble chart test failures (layout overflow in size legend)
-- [ ] Verify: `flutter test`
+- [x] `test/src/composites/oi_line_chart_mapper_test.dart` — OiLineChart with OiLineSeriesData<T>: renders, shorthand API works, missing value behavior creates gaps, decimation applies
+- [x] `test/src/composites/oi_normalization_test.dart` — normalizeSeries produces correct OiChartDatum list, decimation reduces point count, mappers extract values
+- [x] `test/src/composites/oi_bar_chart_mapper_test.dart` — Bar chart with mapper-based data renders grouped/stacked
+- [x] Fix 3 pre-existing bubble chart test failures (layout overflow in size legend)
+- [x] Verify: `flutter test`
 
 ## Risks / Out of scope
 

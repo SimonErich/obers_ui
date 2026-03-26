@@ -97,7 +97,7 @@ class _LegendItem extends StatelessWidget {
               painter: _LineSwatch(color: color, dashed: dashed),
             ),
             const SizedBox(width: 4),
-            Text(label, style: TextStyle(color: textColor, fontSize: 12)),
+            OiLabel.caption(label, color: textColor),
           ],
         ),
       ),
