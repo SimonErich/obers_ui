@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/obers_ui.dart';
 import 'package:obers_ui_charts/src/composites/_chart_grid_painter.dart';
+import 'package:obers_ui_charts/src/foundation/oi_chart_controller.dart';
 import 'package:obers_ui_charts/src/composites/oi_area_chart/oi_area_chart_data.dart';
 import 'package:obers_ui_charts/src/composites/oi_area_chart/oi_area_chart_theme.dart';
 import 'package:obers_ui_charts/src/composites/oi_bubble_chart/oi_bubble_chart_interaction.dart';
@@ -572,6 +573,7 @@ class OiComboChart<T> extends StatefulWidget {
     this.showGrid = true,
     this.showLegend = true,
     this.behaviors = const [],
+    this.controller,
     this.theme,
     this.emptyState,
     this.loadingState,
@@ -606,6 +608,9 @@ class OiComboChart<T> extends StatefulWidget {
 
   /// Chart behaviors (currently reserved for future extension).
   final List<Object> behaviors;
+
+  /// External chart controller.
+  final OiChartController? controller;
 
   /// Optional theme overrides.
   final OiComboChartTheme? theme;

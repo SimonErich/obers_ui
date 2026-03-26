@@ -141,6 +141,56 @@ class OiLineChart extends StatefulWidget {
     this.syncGroup,
   }) : mode = OiLineChartMode.smooth;
 
+  /// Creates an [OiLineChart] from a single data list with mapper functions.
+  ///
+  /// This is the shorthand API for the common single-series case:
+  /// ```dart
+  /// OiLineChart.fromData<SalesPoint>(
+  ///   label: 'Revenue',
+  ///   data: salesData,
+  ///   x: (p) => p.date.millisecondsSinceEpoch.toDouble(),
+  ///   y: (p) => p.revenue,
+  /// )
+  /// ```
+  ///
+  /// For multiple series, use the default constructor with [series].
+  static OiLineChart fromData<T>({
+    required String label,
+    required List<T> data,
+    required double Function(T item) x,
+    required double Function(T item) y,
+    Key? key,
+    OiLineChartMode mode = OiLineChartMode.straight,
+    OiChartAxis<num>? xAxis,
+    OiChartAxis<num>? yAxis,
+    bool showGrid = true,
+    bool showLegend = false,
+    bool showPoints = false,
+    OiLineChartTheme? theme,
+    bool? compact,
+  }) {
+    return OiLineChart(
+      key: key,
+      label: label,
+      mode: mode,
+      xAxis: xAxis,
+      yAxis: yAxis,
+      showGrid: showGrid,
+      showLegend: showLegend,
+      showPoints: showPoints,
+      theme: theme,
+      compact: compact,
+      series: [
+        OiLineSeries(
+          label: label,
+          points: [
+            for (final item in data) OiLinePoint(x: x(item), y: y(item)),
+          ],
+        ),
+      ],
+    );
+  }
+
   /// Accessibility label for the chart.
   final String label;
 
