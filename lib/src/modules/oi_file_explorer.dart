@@ -367,6 +367,37 @@ class _OiFileExplorerState extends State<OiFileExplorer> {
     );
   }
 
+  // ── New folder dialog ────────────────────────────────────────────────────
+
+  void _showNewFolderDialog() {
+    _dismissDialog();
+    final nameController = TextEditingController(text: 'New Folder');
+    _dialogHandle = OiDialog.show(
+      context,
+      label: 'New folder',
+      dialog: OiDialog.form(
+        label: 'New folder',
+        title: 'New Folder',
+        content: _NewFolderDialogContent(
+          nameController: nameController,
+          onApply: () async {
+            final name = nameController.text.trim();
+            if (name.isEmpty) return;
+            _dismissDialog();
+            final folderId =
+                widget.controller.currentFolder?.id.toString() ?? 'root';
+            await widget.onCreateFolder(folderId, name);
+            unawaited(widget.controller.refresh());
+            unawaited(_loadFolderTree());
+            _announce('Folder "$name" created');
+          },
+          onCancel: _dismissDialog,
+        ),
+        onClose: _dismissDialog,
+      ),
+    );
+  }
+
   // ── Accessibility announcements ───────────────────────────────────────────
 
   void _announce(String message) {
@@ -693,10 +724,7 @@ class _OiFileExplorerState extends State<OiFileExplorer> {
       quickAccess: widget.quickAccess,
       storage: widget.storage,
       width: widget.sidebarWidth,
-      onNewFolder: (parent) async {
-        await widget.onCreateFolder(parent.id.toString(), 'New Folder');
-        unawaited(widget.controller.refresh());
-      },
+      onNewFolder: (_) => _showNewFolderDialog(),
       onFileDrop: widget.enableDragDrop
           ? (files, folder) async {
               await widget.onMove(files, folder);
@@ -788,43 +816,33 @@ class _OiFileExplorerState extends State<OiFileExplorer> {
   ) {
     return Row(
       children: [
-        // Back/Forward buttons
-        OiIconButton(
-          icon: OiIcons.arrowLeft,
-          semanticLabel: 'Go back',
-          onTap: controller.canGoBack ? controller.goBack : null,
-        ),
-        OiIconButton(
-          icon: OiIcons.arrowRight,
-          semanticLabel: 'Go forward',
-          onTap: controller.canGoForward ? controller.goForward : null,
-        ),
-        SizedBox(width: (spacing as dynamic).xs as double),
-        // Path bar or search
+        // Path bar (breadcrumbs)
         Expanded(
-          child: _searchActive
-              ? Semantics(
-                  label: 'Search files',
-                  child: OiTextInput.search(
-                    autofocus: true,
-                    onChanged: (q) {
-                      _searchDebounce.call(q, _onSearch);
-                    },
-                  ),
-                )
-              : OiPathBar(
-                  segments: _pathSegments,
-                  onNavigate: (segment) {
-                    controller.navigateTo(segment.id);
-                  },
-                ),
+          child: OiPathBar(
+            segments: _pathSegments,
+            onNavigate: (segment) {
+              controller.navigateTo(segment.id);
+            },
+          ),
         ),
+        // Search input (constrained width)
+        if (widget.enableSearch && _searchActive)
+          ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 260),
+            child: Semantics(
+              label: 'Search files',
+              child: OiTextInput.search(
+                autofocus: true,
+                onChanged: (q) {
+                  _searchDebounce.call(q, _onSearch);
+                },
+              ),
+            ),
+          ),
         // Search toggle
         if (widget.enableSearch)
           OiIconButton(
-            icon: _searchActive
-                ? OiIcons.x
-                : OiIcons.search,
+            icon: _searchActive ? OiIcons.x : OiIcons.search,
             semanticLabel: _searchActive ? 'Close search' : 'Search',
             onTap: () => setState(() {
               _searchActive = !_searchActive;
@@ -844,11 +862,11 @@ class _OiFileExplorerState extends State<OiFileExplorer> {
           },
           items: const [
             OiButtonGroupItem(
-              icon: OiIcons.eye,
+              icon: OiIcons.layoutList,
               label: 'List view',
             ),
             OiButtonGroupItem(
-              icon: OiIcons.eyeOff,
+              icon: OiIcons.layoutGrid,
               label: 'Grid view',
             ),
           ],
@@ -864,12 +882,7 @@ class _OiFileExplorerState extends State<OiFileExplorer> {
         OiIconButton(
           icon: OiIcons.folderOpen,
           semanticLabel: 'New folder',
-          onTap: () async {
-            final folderId = controller.currentFolder?.id.toString() ?? 'root';
-            await widget.onCreateFolder(folderId, 'New Folder');
-            unawaited(controller.refresh());
-            _announce('New folder created');
-          },
+          onTap: _showNewFolderDialog,
         ),
       ],
     );
@@ -1067,6 +1080,45 @@ class _OiFileExplorerState extends State<OiFileExplorer> {
       backgroundContextMenu: _buildBackgroundContextMenu,
       searchQuery: controller.searchQuery,
       semanticsLabel: 'File grid with ${files.length} items',
+    );
+  }
+}
+
+/// Dialog content for creating a new folder.
+class _NewFolderDialogContent extends StatelessWidget {
+  const _NewFolderDialogContent({
+    required this.nameController,
+    required this.onApply,
+    required this.onCancel,
+  });
+
+  final TextEditingController nameController;
+  final VoidCallback onApply;
+  final VoidCallback onCancel;
+
+  @override
+  Widget build(BuildContext context) {
+    final spacing = context.spacing;
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        OiTextInput(
+          label: 'Folder name',
+          controller: nameController,
+          autofocus: true,
+          onSubmitted: (_) => onApply(),
+        ),
+        SizedBox(height: spacing.lg),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            OiButton.ghost(label: 'Cancel', onTap: onCancel),
+            SizedBox(width: spacing.sm),
+            OiButton.primary(label: 'Apply', onTap: onApply),
+          ],
+        ),
+      ],
     );
   }
 }

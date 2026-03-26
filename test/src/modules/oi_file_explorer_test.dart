@@ -391,24 +391,14 @@ void main() {
     });
 
     // ══════════════════════════════════════════════════════════════════════════
-    // ── Navigation buttons ────────────────────────────────────────────────
+    // ── Navigation ────────────────────────────────────────────────────────
     // ══════════════════════════════════════════════════════════════════════════
 
-    testWidgets('back and forward buttons are rendered', (tester) async {
+    testWidgets('breadcrumb path bar is rendered', (tester) async {
       await _pumpExplorer(tester, _explorer());
       await tester.pumpAndSettle();
-      expect(
-        find.byWidgetPredicate(
-          (w) => w is Semantics && w.properties.label == 'Go back',
-        ),
-        findsOneWidget,
-      );
-      expect(
-        find.byWidgetPredicate(
-          (w) => w is Semantics && w.properties.label == 'Go forward',
-        ),
-        findsOneWidget,
-      );
+      // The path bar renders the root "Home" segment.
+      expect(find.text('Home'), findsWidgets);
     });
 
     // ══════════════════════════════════════════════════════════════════════════

@@ -286,7 +286,7 @@ class OiDialog extends StatelessWidget {
           if (isForm)
             Flexible(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 24),
+                padding: const EdgeInsets.fromLTRB(24, 0, 24, 20),
                 child: bodyContent,
               ),
             )
