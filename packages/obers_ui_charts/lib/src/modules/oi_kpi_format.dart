@@ -1,6 +1,6 @@
 /// Status classification for a KPI metric.
 ///
-/// Used to drive color coding and visual emphasis on [OiKpiCard] widgets.
+/// Used to drive color coding and visual emphasis on `OiKpiCard` widgets.
 ///
 /// {@category Modules}
 enum OiKpiStatus {
@@ -17,7 +17,7 @@ enum OiKpiStatus {
   neutral,
 }
 
-/// Visual layout style for a [OiKpiCard].
+/// Visual layout style for an `OiKpiCard`.
 ///
 /// {@category Modules}
 enum OiKpiCardStyle {
@@ -79,7 +79,7 @@ class OiKpiFormat {
 
   /// Creates a percentage formatter.
   ///
-  /// The raw [value] is treated as a fractional percentage when it is less than
+  /// The raw value is treated as a fractional percentage when it is less than
   /// or equal to 1.0, and is multiplied by 100 automatically. Values greater
   /// than 1.0 are displayed as-is.
   ///

@@ -210,3 +210,15 @@ export 'src/modules/oi_kpi_board.dart';
 export 'src/modules/oi_kpi_card.dart';
 export 'src/modules/oi_kpi_format.dart';
 export 'src/modules/oi_kpi_metric.dart';
+// ── Modules: Analytics Dashboard ─────────────────────────────────────────────
+
+export 'src/modules/oi_analytics_dashboard.dart';
+export 'src/modules/oi_dashboard_filter.dart';
+export 'src/modules/oi_dashboard_panel.dart';
+export 'src/modules/oi_grid_position.dart';
+// ── Modules: Chart Explorer ───────────────────────────────────────────────────
+
+export 'src/modules/oi_chart_explorer.dart';
+export 'src/modules/oi_explorer_chart_type.dart';
+export 'src/modules/oi_explorer_column.dart';
+export 'src/modules/oi_explorer_controller.dart';

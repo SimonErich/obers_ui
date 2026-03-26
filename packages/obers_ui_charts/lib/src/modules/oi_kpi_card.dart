@@ -4,7 +4,7 @@ import 'package:obers_ui_charts/src/composites/oi_sparkline.dart';
 import 'package:obers_ui_charts/src/modules/oi_kpi_format.dart';
 import 'package:obers_ui_charts/src/modules/oi_kpi_metric.dart';
 
-/// A single-metric display card for use inside [OiKpiBoard].
+/// A single-metric display card for use inside `OiKpiBoard`.
 ///
 /// Renders a [metric] in one of three [style] modes:
 /// - [OiKpiCardStyle.standard] — title, value, delta, sparkline, target bar.
@@ -12,7 +12,7 @@ import 'package:obers_ui_charts/src/modules/oi_kpi_metric.dart';
 /// - [OiKpiCardStyle.detailed] — standard plus trend description and sparkline
 ///   statistics (min / max / avg).
 ///
-/// Visual appearance adapts to [metric.status] for color-coded emphasis:
+/// Visual appearance adapts to [OiKpiMetric.status] for color-coded emphasis:
 /// - [OiKpiStatus.onTrack] → success green
 /// - [OiKpiStatus.needsAttention] → warning amber
 /// - [OiKpiStatus.critical] → error red

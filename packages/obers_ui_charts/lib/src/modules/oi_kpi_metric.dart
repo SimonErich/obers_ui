@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:obers_ui_charts/src/modules/oi_kpi_format.dart';
 
-/// A single KPI data point for display in an [OiKpiBoard].
+/// A single KPI data point for display in an `OiKpiBoard`.
 ///
 /// Carries the primary [value], an optional [previousValue] for delta
 /// computation, formatting via [format], optional [sparklineData] for inline
@@ -94,7 +94,8 @@ class OiKpiMetric {
   /// Returns `null` when [target] is null or zero.
   double? get targetProgress {
     if (target == null || target == 0) return null;
-    return (value / target!).clamp(0.0, 1.0).toDouble();
+    final ratio = value.toDouble() / target!.toDouble();
+    return ratio.clamp(0.0, 1.0);
   }
 
   /// The formatted value string using [format], or a plain integer string.
