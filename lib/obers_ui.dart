@@ -231,6 +231,7 @@ export 'src/foundation/oi_accessibility.dart';
 export 'src/foundation/oi_app.dart';
 export 'src/foundation/oi_icons.dart';
 export 'src/foundation/oi_input_modality.dart';
+export 'src/foundation/oi_optimistic_action.dart';
 export 'src/foundation/oi_overlays.dart';
 export 'src/foundation/oi_page_route.dart';
 export 'src/foundation/oi_platform.dart';
