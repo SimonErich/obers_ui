@@ -8,7 +8,9 @@ import 'package:obers_ui_charts/src/foundation/oi_chart_accessibility_config.dar
 import 'package:obers_ui_charts/src/foundation/oi_chart_behavior.dart';
 import 'package:obers_ui_charts/src/foundation/oi_chart_controller.dart';
 import 'package:obers_ui_charts/src/foundation/oi_chart_hit_tester.dart';
+import 'package:obers_ui_charts/src/foundation/oi_chart_sync_group.dart';
 import 'package:obers_ui_charts/src/foundation/oi_chart_viewport.dart';
+import 'package:obers_ui_charts/src/models/oi_chart_settings.dart';
 // Imported for future annotation/threshold support on hierarchical charts.
 // ignore: unused_import
 import 'package:obers_ui_charts/src/models/oi_chart_annotation.dart';
@@ -82,6 +84,8 @@ class OiHierarchicalChart<TNode> extends StatefulWidget {
     this.loadingState,
     this.errorState,
     this.semanticLabel,
+    this.syncGroup,
+    this.settings,
   });
 
   /// Accessibility label for the chart.
@@ -119,6 +123,12 @@ class OiHierarchicalChart<TNode> extends StatefulWidget {
   /// Override for the semantic label.
   final String? semanticLabel;
 
+  /// Sync group for coordinating interactions with sibling charts.
+  final OiChartSyncGroup? syncGroup;
+
+  /// Persisted settings to restore on mount.
+  final OiChartSettings? settings;
+
   @override
   State<OiHierarchicalChart<TNode>> createState() =>
       _OiHierarchicalChartState<TNode>();
@@ -142,6 +152,9 @@ class _OiHierarchicalChartState<TNode> extends State<OiHierarchicalChart<TNode>>
   @override
   OiChartHitTester get hitTester => _hitTester;
 
+  @override
+  OiChartSyncGroup? get syncGroup => widget.syncGroup;
+
   final OiChartHitTester _hitTester = NoOpHitTester();
 
   // ── Lifecycle ────────────────────────────────────────────────────────
@@ -149,6 +162,7 @@ class _OiHierarchicalChartState<TNode> extends State<OiHierarchicalChart<TNode>>
   @override
   void initState() {
     super.initState();
+    restoreSettings(widget.settings);
     // Defer behavior attach to first build (needs context).
   }
 
@@ -297,7 +311,10 @@ class _OiHierarchicalChartState<TNode> extends State<OiHierarchicalChart<TNode>>
           // Attach behaviors now that we have a valid context.
           if (behaviors.isNotEmpty && behaviors.any((b) => !b.isAttached)) {
             WidgetsBinding.instance.addPostFrameCallback((_) {
-              if (mounted) attachBehaviors();
+              if (mounted) {
+                attachBehaviors();
+                registerSync();
+              }
             });
           }
 

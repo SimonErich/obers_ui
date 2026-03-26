@@ -9,6 +9,12 @@ import 'package:obers_ui_charts/src/composites/oi_bubble_chart/oi_bubble_chart_l
 import 'package:obers_ui_charts/src/composites/oi_bubble_chart/oi_bubble_chart_painter.dart';
 import 'package:obers_ui_charts/src/composites/oi_bubble_chart/oi_bubble_chart_size_legend.dart';
 import 'package:obers_ui_charts/src/composites/oi_bubble_chart/oi_bubble_chart_theme.dart';
+import 'package:obers_ui_charts/src/foundation/oi_chart_behavior.dart';
+import 'package:obers_ui_charts/src/foundation/oi_chart_controller.dart';
+import 'package:obers_ui_charts/src/foundation/oi_chart_performance_config.dart';
+import 'package:obers_ui_charts/src/models/oi_chart_annotation.dart';
+import 'package:obers_ui_charts/src/models/oi_chart_legend_config.dart';
+import 'package:obers_ui_charts/src/models/oi_chart_threshold.dart';
 
 /// A bubble chart visualization plotting data by x, y, and size dimensions.
 ///
@@ -27,6 +33,13 @@ class OiBubbleChart extends StatefulWidget {
     this.interactionMode,
     this.compact,
     this.label,
+    this.behaviors = const [],
+    this.controller,
+    this.annotations = const [],
+    this.thresholds = const [],
+    this.legendConfig,
+    this.performance,
+    this.syncGroup,
   });
 
   /// The chart data including series and size configuration.
@@ -46,6 +59,27 @@ class OiBubbleChart extends StatefulWidget {
 
   /// Accessibility label (alias for [semanticLabel]).
   final String? label;
+
+  /// Composable interaction behaviors.
+  final List<OiChartBehavior> behaviors;
+
+  /// External chart controller.
+  final OiChartController? controller;
+
+  /// Annotation overlays (lines, regions, points, labels).
+  final List<OiChartAnnotation> annotations;
+
+  /// Threshold lines.
+  final List<OiChartThreshold> thresholds;
+
+  /// Legend configuration.
+  final OiChartLegendConfig? legendConfig;
+
+  /// Performance configuration (decimation, rendering mode).
+  final OiChartPerformanceConfig? performance;
+
+  /// Sync group identifier for linking multiple charts.
+  final String? syncGroup;
 
   @override
   State<OiBubbleChart> createState() => _OiBubbleChartState();

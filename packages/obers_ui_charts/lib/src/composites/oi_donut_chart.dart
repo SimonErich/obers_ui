@@ -1,6 +1,8 @@
 import 'package:flutter/widgets.dart';
 
 import 'package:obers_ui_charts/src/composites/oi_pie_chart.dart';
+import 'package:obers_ui_charts/src/foundation/oi_chart_behavior.dart';
+import 'package:obers_ui_charts/src/foundation/oi_chart_controller.dart';
 
 /// A donut chart — a [OiPieChart] variant with a hollow center.
 ///
@@ -23,6 +25,8 @@ class OiDonutChart extends StatelessWidget {
     this.onSegmentTap,
     this.compact,
     this.semanticLabel,
+    this.behaviors = const [],
+    this.controller,
   });
 
   /// Accessibility label for the chart.
@@ -63,6 +67,12 @@ class OiDonutChart extends StatelessWidget {
   /// Override for the semantic label.
   final String? semanticLabel;
 
+  /// Composable interaction behaviors.
+  final List<OiChartBehavior> behaviors;
+
+  /// External chart controller.
+  final OiChartController? controller;
+
   @override
   Widget build(BuildContext context) {
     return OiPieChart(
@@ -77,6 +87,8 @@ class OiDonutChart extends StatelessWidget {
       showLegend: showLegend,
       onSegmentTap: onSegmentTap,
       compact: compact,
+      behaviors: behaviors,
+      controller: controller,
     );
   }
 }

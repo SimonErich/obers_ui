@@ -10,6 +10,12 @@ import 'package:obers_ui_charts/src/composites/oi_bar_chart/oi_bar_chart_painter
 import 'package:obers_ui_charts/src/composites/oi_bar_chart/oi_bar_chart_theme.dart';
 import 'package:obers_ui_charts/src/composites/oi_bubble_chart/oi_bubble_chart_interaction.dart';
 import 'package:obers_ui_charts/src/composites/oi_chart_axis.dart';
+import 'package:obers_ui_charts/src/foundation/oi_chart_behavior.dart';
+import 'package:obers_ui_charts/src/foundation/oi_chart_controller.dart';
+import 'package:obers_ui_charts/src/foundation/oi_chart_performance_config.dart';
+import 'package:obers_ui_charts/src/models/oi_chart_annotation.dart';
+import 'package:obers_ui_charts/src/models/oi_chart_legend_config.dart';
+import 'package:obers_ui_charts/src/models/oi_chart_threshold.dart';
 
 /// A bar chart for categorical comparisons.
 ///
@@ -41,6 +47,13 @@ class OiBarChart extends StatefulWidget {
     this.theme,
     this.interactionMode,
     this.compact,
+    this.behaviors = const [],
+    this.controller,
+    this.annotations = const [],
+    this.thresholds = const [],
+    this.legendConfig,
+    this.performance,
+    this.syncGroup,
   });
 
   /// Creates a vertical grouped [OiBarChart].
@@ -58,6 +71,13 @@ class OiBarChart extends StatefulWidget {
     this.theme,
     this.interactionMode,
     this.compact,
+    this.behaviors = const [],
+    this.controller,
+    this.annotations = const [],
+    this.thresholds = const [],
+    this.legendConfig,
+    this.performance,
+    this.syncGroup,
   }) : mode = OiBarChartMode.grouped;
 
   /// Creates a vertical stacked [OiBarChart].
@@ -75,6 +95,13 @@ class OiBarChart extends StatefulWidget {
     this.theme,
     this.interactionMode,
     this.compact,
+    this.behaviors = const [],
+    this.controller,
+    this.annotations = const [],
+    this.thresholds = const [],
+    this.legendConfig,
+    this.performance,
+    this.syncGroup,
   }) : mode = OiBarChartMode.stacked;
 
   /// Creates a horizontal grouped [OiBarChart].
@@ -92,6 +119,13 @@ class OiBarChart extends StatefulWidget {
     this.theme,
     this.interactionMode,
     this.compact,
+    this.behaviors = const [],
+    this.controller,
+    this.annotations = const [],
+    this.thresholds = const [],
+    this.legendConfig,
+    this.performance,
+    this.syncGroup,
   }) : mode = OiBarChartMode.horizontalGrouped;
 
   /// Creates a horizontal stacked [OiBarChart].
@@ -109,6 +143,13 @@ class OiBarChart extends StatefulWidget {
     this.theme,
     this.interactionMode,
     this.compact,
+    this.behaviors = const [],
+    this.controller,
+    this.annotations = const [],
+    this.thresholds = const [],
+    this.legendConfig,
+    this.performance,
+    this.syncGroup,
   }) : mode = OiBarChartMode.horizontalStacked;
 
   /// Accessibility label for the chart.
@@ -150,6 +191,27 @@ class OiBarChart extends StatefulWidget {
 
   /// Whether to use compact layout.
   final bool? compact;
+
+  /// Composable interaction behaviors.
+  final List<OiChartBehavior> behaviors;
+
+  /// External chart controller.
+  final OiChartController? controller;
+
+  /// Annotation overlays (lines, regions, points, labels).
+  final List<OiChartAnnotation> annotations;
+
+  /// Threshold lines.
+  final List<OiChartThreshold> thresholds;
+
+  /// Legend configuration.
+  final OiChartLegendConfig? legendConfig;
+
+  /// Performance configuration (decimation, rendering mode).
+  final OiChartPerformanceConfig? performance;
+
+  /// Sync group identifier for linking multiple charts.
+  final String? syncGroup;
 
   @override
   State<OiBarChart> createState() => _OiBarChartState();

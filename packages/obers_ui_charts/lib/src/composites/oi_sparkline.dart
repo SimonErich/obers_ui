@@ -2,6 +2,8 @@ import 'dart:math' as math;
 
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/obers_ui.dart';
+import 'package:obers_ui_charts/src/foundation/oi_chart_behavior.dart';
+import 'package:obers_ui_charts/src/foundation/oi_chart_controller.dart';
 
 /// A compact inline sparkline chart for embedding in metrics, table cells,
 /// or list tiles.
@@ -24,6 +26,8 @@ class OiSparkline extends StatelessWidget {
     this.showMinMax = false,
     this.height = 32,
     this.width,
+    this.behaviors = const [],
+    this.controller,
   });
 
   /// Accessibility label for the sparkline.
@@ -55,6 +59,12 @@ class OiSparkline extends StatelessWidget {
 
   /// The width of the sparkline. When null, fills available width.
   final double? width;
+
+  /// Composable interaction behaviors.
+  final List<OiChartBehavior> behaviors;
+
+  /// External chart controller.
+  final OiChartController? controller;
 
   @override
   Widget build(BuildContext context) {

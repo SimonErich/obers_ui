@@ -2,6 +2,8 @@ import 'dart:math' as math;
 
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/obers_ui.dart';
+import 'package:obers_ui_charts/src/foundation/oi_chart_behavior.dart';
+import 'package:obers_ui_charts/src/foundation/oi_chart_controller.dart';
 
 /// A cell in the heatmap.
 ///
@@ -49,6 +51,8 @@ class OiHeatmap extends StatelessWidget {
     this.highColor,
     this.showValues = true,
     this.onCellTap,
+    this.behaviors = const [],
+    this.controller,
   });
 
   /// The cells to render in the grid.
@@ -85,6 +89,12 @@ class OiHeatmap extends StatelessWidget {
 
   /// Called when a cell is tapped, with the tapped cell data.
   final ValueChanged<OiHeatmapCell>? onCellTap;
+
+  /// Composable interaction behaviors.
+  final List<OiChartBehavior> behaviors;
+
+  /// External chart controller.
+  final OiChartController? controller;
 
   @override
   Widget build(BuildContext context) {

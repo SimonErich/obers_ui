@@ -3,6 +3,8 @@ import 'dart:math' as math;
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/obers_ui.dart';
 import 'package:obers_ui_charts/src/composites/oi_bubble_chart/oi_bubble_chart_interaction.dart';
+import 'package:obers_ui_charts/src/foundation/oi_chart_behavior.dart';
+import 'package:obers_ui_charts/src/foundation/oi_chart_controller.dart';
 
 /// A single segment in an [OiPieChart].
 ///
@@ -45,6 +47,8 @@ class OiPieChart extends StatefulWidget {
     this.onSegmentTap,
     this.interactionMode,
     this.compact,
+    this.behaviors = const [],
+    this.controller,
   });
 
   /// Accessibility label for the chart.
@@ -82,6 +86,12 @@ class OiPieChart extends StatefulWidget {
 
   /// Whether to use compact layout. When null, determined by available width.
   final bool? compact;
+
+  /// Composable interaction behaviors.
+  final List<OiChartBehavior> behaviors;
+
+  /// External chart controller.
+  final OiChartController? controller;
 
   @override
   State<OiPieChart> createState() => _OiPieChartState();

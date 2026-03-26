@@ -1,5 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/obers_ui.dart';
+import 'package:obers_ui_charts/src/foundation/oi_chart_behavior.dart';
+import 'package:obers_ui_charts/src/foundation/oi_chart_controller.dart';
 
 /// A node in the treemap.
 ///
@@ -48,6 +50,8 @@ class OiTreemap extends StatelessWidget {
     this.showLabels = true,
     this.showValues = false,
     this.onNodeTap,
+    this.behaviors = const [],
+    this.controller,
   });
 
   /// The top-level nodes to display.
@@ -64,6 +68,12 @@ class OiTreemap extends StatelessWidget {
 
   /// Called when a node is tapped.
   final ValueChanged<OiTreemapNode>? onNodeTap;
+
+  /// Composable interaction behaviors.
+  final List<OiChartBehavior> behaviors;
+
+  /// External chart controller.
+  final OiChartController? controller;
 
   @override
   Widget build(BuildContext context) {

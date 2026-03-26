@@ -5,7 +5,13 @@ import 'package:obers_ui/obers_ui.dart';
 import 'package:obers_ui_charts/src/composites/_chart_grid_painter.dart';
 import 'package:obers_ui_charts/src/composites/oi_bubble_chart/oi_bubble_chart_interaction.dart';
 import 'package:obers_ui_charts/src/composites/oi_chart_axis.dart';
+import 'package:obers_ui_charts/src/foundation/oi_chart_behavior.dart';
+import 'package:obers_ui_charts/src/foundation/oi_chart_controller.dart';
+import 'package:obers_ui_charts/src/foundation/oi_chart_performance_config.dart';
 import 'package:obers_ui_charts/src/models/oi_cartesian_series.dart';
+import 'package:obers_ui_charts/src/models/oi_chart_annotation.dart';
+import 'package:obers_ui_charts/src/models/oi_chart_legend_config.dart';
+import 'package:obers_ui_charts/src/models/oi_chart_threshold.dart';
 
 /// Point shape in a scatter plot.
 ///
@@ -90,6 +96,13 @@ class OiScatterPlot extends StatefulWidget {
     this.onPointTap,
     this.interactionMode,
     this.compact,
+    this.behaviors = const [],
+    this.controller,
+    this.annotations = const [],
+    this.thresholds = const [],
+    this.legendConfig,
+    this.performance,
+    this.syncGroup,
   });
 
   /// Accessibility label for the chart.
@@ -118,6 +131,27 @@ class OiScatterPlot extends StatefulWidget {
 
   /// Whether to use compact layout.
   final bool? compact;
+
+  /// Composable interaction behaviors.
+  final List<OiChartBehavior> behaviors;
+
+  /// External chart controller.
+  final OiChartController? controller;
+
+  /// Annotation overlays (lines, regions, points, labels).
+  final List<OiChartAnnotation> annotations;
+
+  /// Threshold lines.
+  final List<OiChartThreshold> thresholds;
+
+  /// Legend configuration.
+  final OiChartLegendConfig? legendConfig;
+
+  /// Performance configuration (decimation, rendering mode).
+  final OiChartPerformanceConfig? performance;
+
+  /// Sync group identifier for linking multiple charts.
+  final String? syncGroup;
 
   @override
   State<OiScatterPlot> createState() => _OiScatterPlotState();

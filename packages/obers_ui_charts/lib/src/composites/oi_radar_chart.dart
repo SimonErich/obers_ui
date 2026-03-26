@@ -2,6 +2,8 @@ import 'dart:math' as math;
 
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/obers_ui.dart';
+import 'package:obers_ui_charts/src/foundation/oi_chart_behavior.dart';
+import 'package:obers_ui_charts/src/foundation/oi_chart_controller.dart';
 
 /// Data for a radar chart series.
 ///
@@ -51,6 +53,8 @@ class OiRadarChart extends StatelessWidget {
     this.showValues = false,
     this.maxValue,
     this.size,
+    this.behaviors = const [],
+    this.controller,
   });
 
   /// The axis labels displayed around the chart perimeter.
@@ -74,6 +78,12 @@ class OiRadarChart extends StatelessWidget {
 
   /// The diameter of the chart. Defaults to the available width.
   final double? size;
+
+  /// Composable interaction behaviors.
+  final List<OiChartBehavior> behaviors;
+
+  /// External chart controller.
+  final OiChartController? controller;
 
   @override
   Widget build(BuildContext context) {

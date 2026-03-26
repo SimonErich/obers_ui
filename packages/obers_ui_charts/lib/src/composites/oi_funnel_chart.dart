@@ -1,5 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/obers_ui.dart';
+import 'package:obers_ui_charts/src/foundation/oi_chart_behavior.dart';
+import 'package:obers_ui_charts/src/foundation/oi_chart_controller.dart';
 
 /// A stage in the funnel.
 ///
@@ -39,6 +41,8 @@ class OiFunnelChart extends StatelessWidget {
     this.showPercentages = true,
     this.formatValue,
     this.onStageTap,
+    this.behaviors = const [],
+    this.controller,
   });
 
   /// The funnel stages from widest (top) to narrowest (bottom).
@@ -58,6 +62,12 @@ class OiFunnelChart extends StatelessWidget {
 
   /// Called when a stage is tapped, with the stage index.
   final ValueChanged<int>? onStageTap;
+
+  /// Composable interaction behaviors.
+  final List<OiChartBehavior> behaviors;
+
+  /// External chart controller.
+  final OiChartController? controller;
 
   @override
   Widget build(BuildContext context) {
