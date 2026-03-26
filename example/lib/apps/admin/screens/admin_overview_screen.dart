@@ -40,15 +40,24 @@ class _AdminOverviewScreenState extends State<AdminOverviewScreen> {
               OiSwitch(
                 label: 'Edit mode',
                 value: _isEditing,
-                onChanged: (v) => setState(() => _isEditing = v),
+                onChanged: (v) {
+                  setState(() => _isEditing = v);
+                  if (v) {
+                    OiToast.show(
+                      context,
+                      message: 'Edit mode is not yet available. '
+                          'Drag-and-drop reordering coming soon.',
+                      level: OiToastLevel.info,
+                    );
+                  }
+                },
               ),
-              SizedBox(width: spacing.sm),
-              OiLabel.small(_isEditing ? 'Edit mode on' : 'Edit mode off'),
             ],
           ),
         ),
 
         // Dashboard grid
+        // TODO: Implement drag-and-drop reordering in OiDashboard edit mode.
         Expanded(
           child: OiDashboard(
             label: 'Admin dashboard',

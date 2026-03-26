@@ -148,6 +148,7 @@ class _OiSliderState extends State<OiSlider> {
                   trackColor: colors.border,
                   activeColor: colors.primary.base,
                   thumbColor: colors.primary.base,
+                  thumbInnerColor: colors.surface,
                   labelColor: colors.text,
                   trackHeight: trackHeight,
                   thumbRadius: thumbRadius,
@@ -183,6 +184,7 @@ class _OiSliderPainter extends CustomPainter {
     required this.trackColor,
     required this.activeColor,
     required this.thumbColor,
+    required this.thumbInnerColor,
     required this.labelColor,
     required this.trackHeight,
     required this.thumbRadius,
@@ -202,6 +204,7 @@ class _OiSliderPainter extends CustomPainter {
   final Color trackColor;
   final Color activeColor;
   final Color thumbColor;
+  final Color thumbInnerColor;
   final Color labelColor;
   final double trackHeight;
   final double thumbRadius;
@@ -287,7 +290,7 @@ class _OiSliderPainter extends CustomPainter {
       ..drawCircle(
         Offset(x, y),
         thumbRadius - 2,
-        Paint()..color = const Color(0xFFFFFFFF),
+        Paint()..color = thumbInnerColor,
       );
 
     if (showLabels) {

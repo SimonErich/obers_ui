@@ -247,9 +247,11 @@ class OiTree<T> extends StatefulWidget {
   State<OiTree<T>> createState() => _OiTreeState<T>();
 }
 
-class _OiTreeState<T> extends State<OiTree<T>> {
+class _OiTreeState<T> extends State<OiTree<T>>
+    with TickerProviderStateMixin {
   late OiTreeController _ctrl;
   bool _ownsController = false;
+  final Map<String, AnimationController> _expandControllers = {};
 
   @override
   void initState() {
@@ -269,7 +271,20 @@ class _OiTreeState<T> extends State<OiTree<T>> {
   @override
   void dispose() {
     _disposeControllerIfOwned();
+    for (final c in _expandControllers.values) {
+      c.dispose();
+    }
     super.dispose();
+  }
+
+  AnimationController _controllerFor(String nodeId) {
+    return _expandControllers.putIfAbsent(nodeId, () {
+      return AnimationController(
+        vsync: this,
+        duration: const Duration(milliseconds: 200),
+        value: _ctrl.expanded(nodeId) ? 1.0 : 0.0,
+      );
+    });
   }
 
   void _initController() {
@@ -289,26 +304,6 @@ class _OiTreeState<T> extends State<OiTree<T>> {
   }
 
   void _onControllerChanged() => setState(() {});
-
-  // ── Flattened render list ─────────────────────────────────────────────────
-
-  /// Flattens the tree to a list of visible (depth, node) pairs.
-  List<({int depth, OiTreeNode<T> node})> get _visibleItems {
-    final items = <({int depth, OiTreeNode<T> node})>[];
-    void visit(OiTreeNode<T> node, int depth) {
-      items.add((depth: depth, node: node));
-      if (node.hasChildren && _ctrl.expanded(node.id)) {
-        for (final child in node.children) {
-          visit(child, depth + 1);
-        }
-      }
-    }
-
-    for (final root in widget.nodes) {
-      visit(root, 0);
-    }
-    return items;
-  }
 
   // ── Event handlers ────────────────────────────────────────────────────────
 
@@ -334,6 +329,12 @@ class _OiTreeState<T> extends State<OiTree<T>> {
 
   void _handleToggle(OiTreeNode<T> node) {
     final willExpand = !_ctrl.expanded(node.id);
+    final controller = _controllerFor(node.id);
+    if (willExpand) {
+      controller.forward();
+    } else {
+      controller.reverse();
+    }
     _ctrl.toggle(node.id);
     widget.onExpansionChanged?.call(node, expanded: willExpand);
   }
@@ -342,18 +343,44 @@ class _OiTreeState<T> extends State<OiTree<T>> {
 
   @override
   Widget build(BuildContext context) {
-    final items = _visibleItems;
     return Semantics(
       label: widget.label,
       explicitChildNodes: true,
-      child: ListView.builder(
-        itemCount: items.length,
-        itemExtent: widget.rowHeight,
-        itemBuilder: (ctx, i) {
-          final item = items[i];
-          return _buildNodeRow(ctx, item.node, item.depth);
-        },
+      child: ListView(
+        children: [
+          for (final root in widget.nodes) _buildNodeTree(context, root, 0),
+        ],
       ),
+    );
+  }
+
+  Widget _buildNodeTree(BuildContext context, OiTreeNode<T> node, int depth) {
+    final row = _buildNodeRow(context, node, depth);
+
+    if (!node.hasChildren) return row;
+
+    final controller = _controllerFor(node.id);
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        row,
+        SizeTransition(
+          sizeFactor: CurvedAnimation(
+            parent: controller,
+            curve: Curves.easeInOut,
+          ),
+          axisAlignment: -1,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              for (final child in node.children)
+                _buildNodeTree(context, child, depth + 1),
+            ],
+          ),
+        ),
+      ],
     );
   }
 
@@ -420,6 +447,7 @@ class _DefaultNodeRow<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
     Widget row = Row(
       children: [
         SizedBox(width: depth * indentWidth),
@@ -436,7 +464,11 @@ class _DefaultNodeRow<T> extends StatelessWidget {
                   turns: expanded ? 0.25 : 0.0,
                   duration: const Duration(milliseconds: 200),
                   curve: Curves.easeInOut,
-                  child: const OiIcon(icon: OiIcons.chevronRight, label: 'Chevron Right'),
+                  child: OiIcon(
+                    icon: OiIcons.chevronRight,
+                    label: 'Chevron Right',
+                    color: colors.textMuted,
+                  ),
                 ),
               ),
             ),
@@ -450,6 +482,7 @@ class _DefaultNodeRow<T> extends StatelessWidget {
             child: Text(
               node.label,
               key: ValueKey('label_${node.id}'),
+              style: TextStyle(color: colors.text),
               overflow: TextOverflow.ellipsis,
             ),
           ),
@@ -458,7 +491,7 @@ class _DefaultNodeRow<T> extends StatelessWidget {
     );
 
     if (selected) {
-      row = ColoredBox(color: const Color(0xFFDBEAFE), child: row);
+      row = ColoredBox(color: colors.primary.muted, child: row);
     }
 
     return GestureDetector(

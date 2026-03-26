@@ -42,6 +42,7 @@ class _AdminSettingsScreenState extends State<AdminSettingsScreen> {
   @override
   Widget build(BuildContext context) {
     final spacing = context.spacing;
+    final colors = context.colors;
 
     return SingleChildScrollView(
       padding: EdgeInsets.all(spacing.lg),
@@ -55,6 +56,7 @@ class _AdminSettingsScreenState extends State<AdminSettingsScreen> {
               OiAccordionSection(
                 title: 'General',
                 initiallyExpanded: true,
+                headerBackgroundColor: colors.surfaceSubtle,
                 content: OiForm(
                   controller: _controller,
                   onSubmit: (_) {},
@@ -123,6 +125,7 @@ class _AdminSettingsScreenState extends State<AdminSettingsScreen> {
               // ── Notifications ────────────────────────────────────────
               OiAccordionSection(
                 title: 'Notifications',
+                headerBackgroundColor: colors.surfaceSubtle,
                 content: OiForm(
                   controller: _controller,
                   onSubmit: (_) {},
@@ -156,6 +159,7 @@ class _AdminSettingsScreenState extends State<AdminSettingsScreen> {
               // ── Appearance ───────────────────────────────────────────
               OiAccordionSection(
                 title: 'Appearance',
+                headerBackgroundColor: colors.surfaceSubtle,
                 content: OiForm(
                   controller: _controller,
                   onSubmit: (_) {},
@@ -197,6 +201,7 @@ class _AdminSettingsScreenState extends State<AdminSettingsScreen> {
               // ── API Keys ─────────────────────────────────────────────
               OiAccordionSection(
                 title: 'API Keys',
+                headerBackgroundColor: colors.surfaceSubtle,
                 content: _buildApiKeysSection(context),
               ),
             ],

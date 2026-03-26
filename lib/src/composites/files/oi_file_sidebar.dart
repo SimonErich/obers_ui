@@ -222,6 +222,12 @@ class _OiFileSidebarState extends State<OiFileSidebar> {
       child: SizedBox(
         width: widget.width,
         child: Container(
+          padding: EdgeInsets.fromLTRB(
+            spacing.sm,
+            spacing.sm,
+            spacing.sm,
+            0,
+          ),
           decoration: BoxDecoration(
             border: Border(right: BorderSide(color: colors.borderSubtle)),
           ),
@@ -367,17 +373,27 @@ class _OiFileSidebarState extends State<OiFileSidebar> {
               if (widget.onNewFolder != null)
                 Padding(
                   padding: EdgeInsets.all(spacing.sm),
-                  child: OiButton.ghost(
+                  child: OiButton.primary(
                     label: '+ New Folder',
                     onTap: () {
+                      // Resolve selected folder, falling back to the first
+                      // root node so the button always works.
                       final selected = widget.selectedFolderId != null
                           ? _findFolder(
                               widget.folderTree,
                               widget.selectedFolderId!,
                             )
                           : null;
-                      if (selected != null) {
-                        widget.onNewFolder?.call(selected);
+                      final target = selected ??
+                          (widget.folderTree.isNotEmpty
+                              ? widget.folderTree.first.data
+                              : const OiFileNodeData(
+                                  id: 'root',
+                                  name: 'Home',
+                                  isFolder: true,
+                                ));
+                      if (target != null) {
+                        widget.onNewFolder!.call(target);
                       }
                     },
                   ),

@@ -422,7 +422,7 @@ class OiFileIcon extends StatelessWidget {
                     style: TextStyle(
                       fontSize: dims.fontSize,
                       fontWeight: FontWeight.w700,
-                      color: const Color(0xFFFFFFFF),
+                      color: colors.textOnPrimary,
                       height: 1,
                       letterSpacing: 0.5,
                     ),

@@ -66,7 +66,8 @@ class OiIcon extends StatelessWidget {
         context.textTheme.styleFor(OiLabelVariant.body).fontSize ??
         16.0;
 
-    final iconWidget = Icon(icon, size: resolvedSize, color: color);
+    final resolvedColor = color ?? context.colors.text;
+    final iconWidget = Icon(icon, size: resolvedSize, color: resolvedColor);
 
     if (_decorative) {
       return ExcludeSemantics(child: iconWidget);

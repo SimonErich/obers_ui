@@ -216,6 +216,7 @@ class _OiPieChartState extends State<OiPieChart> {
               hoveredIndex: hoverIdx,
               highContrast: isHighContrast,
               labelColor: colors.text,
+              borderColor: colors.surface,
             ),
             child: widget.donut && widget.centerLabel != null
                 ? Center(
@@ -312,6 +313,7 @@ class _OiPieChartPainter extends CustomPainter {
     required this.showValues,
     required this.highContrast,
     required this.labelColor,
+    required this.borderColor,
     this.hoveredIndex,
   });
 
@@ -325,6 +327,7 @@ class _OiPieChartPainter extends CustomPainter {
   final bool showValues;
   final bool highContrast;
   final Color labelColor;
+  final Color borderColor;
   final int? hoveredIndex;
 
   @override
@@ -380,7 +383,7 @@ class _OiPieChartPainter extends CustomPainter {
       // Draw borders between segments.
       if (highContrast || segments.length > 1) {
         final borderPaint = Paint()
-          ..color = const Color(0xFFFFFFFF)
+          ..color = borderColor
           ..style = PaintingStyle.stroke
           ..strokeWidth = highContrast ? 3.0 : 1.5;
 
@@ -421,7 +424,7 @@ class _OiPieChartPainter extends CustomPainter {
             text: TextSpan(
               text: labelText,
               style: TextStyle(
-                color: donut ? labelColor : const Color(0xFFFFFFFF),
+                color: donut ? labelColor : borderColor,
                 fontSize: 10,
                 fontWeight: FontWeight.bold,
               ),

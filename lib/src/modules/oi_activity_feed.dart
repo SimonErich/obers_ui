@@ -106,7 +106,8 @@ class OiActivityFeed extends StatelessWidget {
   final String? activeCategory;
 
   /// Called when the user selects a category filter.
-  final ValueChanged<String>? onCategoryChange;
+  /// Passes `null` when the active category is tapped again to deselect.
+  final ValueChanged<String?>? onCategoryChange;
 
   // ── Helpers ──────────────────────────────────────────────────────────────
 
@@ -147,7 +148,12 @@ class OiActivityFeed extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.only(right: 8),
                 child: OiTappable(
-                  onTap: () => onCategoryChange?.call(category),
+                  clipBorderRadius: BorderRadius.circular(6),
+                  onTap: () {
+                    final value =
+                        activeCategory == category ? null : category;
+                    onCategoryChange?.call(value);
+                  },
                   child: Container(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 12,

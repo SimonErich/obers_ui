@@ -107,8 +107,9 @@ class _OiShimmerState extends State<OiShimmer>
   Widget build(BuildContext context) {
     if (!widget.active) return widget.child;
 
-    final base = widget.baseColor ?? const Color(0xFFE0E0E0);
-    final highlight = widget.highlightColor ?? const Color(0xFFF5F5F5);
+    final colors = context.colors;
+    final base = widget.baseColor ?? colors.surfaceActive;
+    final highlight = widget.highlightColor ?? colors.surfaceHover;
     final reduced =
         context.animations.reducedMotion ||
         MediaQuery.disableAnimationsOf(context);

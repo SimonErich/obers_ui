@@ -249,6 +249,7 @@ class _CategoryCard extends StatelessWidget {
 
     return OiTappable(
       semanticLabel: 'Open ${category.title} showcase',
+      clipBorderRadius: radius.md,
       onTap: () {
         Navigator.of(context).push(
           PageRouteBuilder<void>(

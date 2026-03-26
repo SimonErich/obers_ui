@@ -17,6 +17,7 @@ class OiAccordionSection {
     required this.title,
     required this.content,
     this.initiallyExpanded = false,
+    this.headerBackgroundColor,
   });
 
   /// The heading text shown in the section header.
@@ -27,6 +28,9 @@ class OiAccordionSection {
 
   /// Whether this section starts in the expanded state.
   final bool initiallyExpanded;
+
+  /// Optional background color for the clickable header area.
+  final Color? headerBackgroundColor;
 }
 
 /// A vertically stacked set of collapsible content sections.
@@ -227,41 +231,46 @@ class _OiAccordionState extends State<OiAccordion>
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  OiTappable(
-                    onTap: () => _toggle(i),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 14,
-                      ),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: Text(
-                              section.title,
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
-                                color: colors.text,
+                  DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: section.headerBackgroundColor,
+                    ),
+                    child: OiTappable(
+                      onTap: () => _toggle(i),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 14,
+                        ),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                section.title,
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                  color: colors.text,
+                                ),
                               ),
                             ),
-                          ),
-                          AnimatedRotation(
-                            turns: open ? 0.5 : 0.0,
-                            duration:
-                                context.animations.reducedMotion ||
-                                    MediaQuery.disableAnimationsOf(context)
-                                ? Duration.zero
-                                : const Duration(milliseconds: 200),
-                            curve: Curves.easeInOut,
-                            child: Icon(
-                              // chevron_down icon
-                              OiIcons.chevronDown,
-                              size: 18,
-                              color: colors.textMuted,
+                            AnimatedRotation(
+                              turns: open ? 0.5 : 0.0,
+                              duration:
+                                  context.animations.reducedMotion ||
+                                      MediaQuery.disableAnimationsOf(context)
+                                  ? Duration.zero
+                                  : const Duration(milliseconds: 200),
+                              curve: Curves.easeInOut,
+                              child: Icon(
+                                // chevron_down icon
+                                OiIcons.chevronDown,
+                                size: 18,
+                                color: colors.textMuted,
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ),

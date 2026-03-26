@@ -308,20 +308,23 @@ class _OiAppState extends State<OiApp> {
 
     Widget result = OiTheme(
       data: themeData,
-      child: Directionality(
-        textDirection: _resolveTextDirection(widget.locale),
-        child: OiDensityScope(
-          density: _resolveDensity(),
-          child: OiA11yScope(
-            child: OiInputModalityDetector(
-              child: OiUndoStackProvider(
-                stack: _undoStack,
-                child: OiShortcutScope(
-                  child: OiTourScope(
-                    child: OiSelectScope(
-                      child: buildOiOverlaysHost(
-                        service: _overlaysService,
-                        child: child ?? const SizedBox(),
+      child: ColoredBox(
+        color: themeData.colors.background,
+        child: Directionality(
+          textDirection: _resolveTextDirection(widget.locale),
+          child: OiDensityScope(
+            density: _resolveDensity(),
+            child: OiA11yScope(
+              child: OiInputModalityDetector(
+                child: OiUndoStackProvider(
+                  stack: _undoStack,
+                  child: OiShortcutScope(
+                    child: OiTourScope(
+                      child: OiSelectScope(
+                        child: buildOiOverlaysHost(
+                          service: _overlaysService,
+                          child: child ?? const SizedBox(),
+                        ),
                       ),
                     ),
                   ),

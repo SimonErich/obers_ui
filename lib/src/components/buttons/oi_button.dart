@@ -566,7 +566,7 @@ class _OiButtonState extends State<OiButton> {
       case OiButtonVariant.primary:
         return c.primary.base;
       case OiButtonVariant.secondary:
-        return c.surfaceSubtle;
+        return c.surfaceHover;
       case OiButtonVariant.outline:
         return const Color(0x00000000); // transparent
       case OiButtonVariant.ghost:

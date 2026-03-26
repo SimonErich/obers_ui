@@ -15,6 +15,7 @@ import 'package:obers_ui/src/components/inputs/oi_text_input.dart';
 import 'package:obers_ui/src/components/inputs/oi_time_input.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/models/oi_field_type.dart';
+import 'package:obers_ui/src/primitives/display/oi_label.dart';
 
 export 'package:obers_ui/src/models/oi_field_type.dart';
 
@@ -538,19 +539,14 @@ class _OiFormState extends State<OiForm> {
       children: [
         if (section.title != null)
           Padding(
-            padding: const EdgeInsets.only(bottom: 4),
-            child: Text(
+            padding: const EdgeInsets.only(top: 12, bottom: 4),
+            child: OiLabel.h4(
               section.title!,
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: colors.text,
-              ),
             ),
           ),
         if (section.description != null)
           Padding(
-            padding: const EdgeInsets.only(bottom: 8),
+            padding: const EdgeInsets.only(bottom: 16),
             child: Text(
               section.description!,
               style: TextStyle(fontSize: 13, color: colors.textMuted),

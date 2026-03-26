@@ -129,6 +129,7 @@ class _OiSwitchState extends State<OiSwitch> {
           ? () => widget.onChanged?.call(!widget.value)
           : null,
       enabled: widget.enabled,
+      clipBorderRadius: BorderRadius.circular(trackH / 2),
       child: track,
     );
 

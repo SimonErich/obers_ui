@@ -680,6 +680,7 @@ class _MoreEmojiButtonState extends State<_MoreEmojiButton> {
 
     final box = context.findRenderObject()! as RenderBox;
     final position = box.localToGlobal(Offset.zero);
+    final colors = context.colors;
 
     _overlayEntry = OverlayEntry(
       builder: (_) => Stack(
@@ -697,14 +698,14 @@ class _MoreEmojiButtonState extends State<_MoreEmojiButton> {
             child: Container(
               width: 320,
               height: 360,
-              decoration: const BoxDecoration(
-                color: Color(0xFFFFFFFF),
-                borderRadius: BorderRadius.all(Radius.circular(8)),
+              decoration: BoxDecoration(
+                color: colors.surface,
+                borderRadius: const BorderRadius.all(Radius.circular(8)),
                 boxShadow: [
                   BoxShadow(
-                    color: Color(0x33000000),
+                    color: colors.overlay,
                     blurRadius: 8,
-                    offset: Offset(0, 2),
+                    offset: const Offset(0, 2),
                   ),
                 ],
               ),

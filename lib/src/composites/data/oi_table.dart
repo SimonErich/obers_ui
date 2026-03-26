@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/src/components/buttons/oi_button.dart';
 import 'package:obers_ui/src/components/display/oi_pagination.dart';
 import 'package:obers_ui/src/components/feedback/oi_bulk_bar.dart';
 import 'package:obers_ui/src/components/panels/oi_resizable.dart';
@@ -360,13 +361,16 @@ class OiTable<T> extends StatefulWidget {
 // ── State ─────────────────────────────────────────────────────────────────────
 
 class _OiTableState<T> extends State<OiTable<T>>
-    with OiSettingsMixin<OiTable<T>, OiTableSettings> {
+    with OiSettingsMixin<OiTable<T>, OiTableSettings>, TickerProviderStateMixin {
   late OiTableController _ctrl;
   bool _ownsController = false;
   bool _loadingMore = false;
   final ScrollController _scrollController = ScrollController();
+  final ScrollController _horizontalScrollController = ScrollController();
+  final Map<String, AnimationController> _groupExpandControllers = {};
   int _prevPage = 0;
   int _prevPageSize = 25;
+  bool _needsHorizontalScroll = false;
 
   /// Resolved driver: explicit widget prop → OiSettingsProvider → null.
   OiSettingsDriver? _resolvedDriver;
@@ -451,8 +455,22 @@ class _OiTableState<T> extends State<OiTable<T>>
     _scrollController
       ..removeListener(_onScroll)
       ..dispose();
+    _horizontalScrollController.dispose();
+    for (final c in _groupExpandControllers.values) {
+      c.dispose();
+    }
     _disposeControllerIfOwned();
     super.dispose();
+  }
+
+  AnimationController _groupControllerFor(String groupKey) {
+    return _groupExpandControllers.putIfAbsent(groupKey, () {
+      return AnimationController(
+        vsync: this,
+        duration: const Duration(milliseconds: 200),
+        value: _ctrl.expandedGroups.contains(groupKey) ? 1.0 : 0.0,
+      );
+    });
   }
 
   void _initController() {
@@ -536,6 +554,25 @@ class _OiTableState<T> extends State<OiTable<T>>
     return cols
         .where((c) => (_ctrl.columnVisibility[c.id] ?? true) && !c.hidden)
         .toList();
+  }
+
+  /// Returns the resolved width for [col], or `null` when the column should
+  /// flex to fill remaining space.
+  double? _resolvedColumnWidth(OiTableColumn<T> col) =>
+      _ctrl.columnWidths[col.id] ?? col.width;
+
+  /// Whether [col] is a flex column (no explicit or user-set width).
+  bool _isFlexColumn(OiTableColumn<T> col) =>
+      !_needsHorizontalScroll && _resolvedColumnWidth(col) == null;
+
+  double _computeTotalColumnsWidth() {
+    var total = 0.0;
+    if (widget.selectable) total += 40; // checkbox column
+    for (final col in _visibleColumns) {
+      final w = _ctrl.columnWidths[col.id] ?? col.width;
+      total += w ?? col.minWidth.clamp(col.minWidth, col.maxWidth);
+    }
+    return total;
   }
 
   /// Applies client-side filter to rows.
@@ -751,8 +788,39 @@ class _OiTableState<T> extends State<OiTable<T>>
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             if (widget.showColumnManager) _buildColumnManagerBar(),
-            _buildHeaderRow(),
-            Expanded(child: _buildBody()),
+            Expanded(
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final totalWidth = _computeTotalColumnsWidth();
+                  final needsScroll = totalWidth > constraints.maxWidth;
+                  _needsHorizontalScroll = needsScroll;
+                  final tableWidth = needsScroll ? totalWidth : constraints.maxWidth;
+
+                  final header = _buildHeaderRow();
+                  final body = Expanded(child: _buildBody());
+
+                  if (needsScroll) {
+                    // Wrap header and body to scroll horizontally in sync.
+                    return SingleChildScrollView(
+                      controller: _horizontalScrollController,
+                      scrollDirection: Axis.horizontal,
+                      child: SizedBox(
+                        width: tableWidth,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [header, body],
+                        ),
+                      ),
+                    );
+                  }
+
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [header, body],
+                  );
+                },
+              ),
+            ),
             if (widget.paginationMode == OiTablePaginationMode.pages)
               _buildPaginationFooter(),
             if (widget.showStatusBar) _buildStatusBar(),
@@ -771,12 +839,17 @@ class _OiTableState<T> extends State<OiTable<T>>
   Widget _buildColumnManagerBar() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      child: Align(
-        alignment: AlignmentDirectional.centerEnd,
-        child: GestureDetector(
-          onTap: _showColumnManager,
-          child: const Text('Columns'),
-        ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          OiButton.secondary(
+            label: 'Columns',
+            semanticLabel: 'Manage visible columns',
+            icon: OiIcons.columns3,
+            size: OiButtonSize.small,
+            onTap: _showColumnManager,
+          ),
+        ],
       ),
     );
   }
@@ -830,12 +903,17 @@ class _OiTableState<T> extends State<OiTable<T>>
     final cols = _visibleColumns;
     return ColoredBox(
       key: const Key('oi_table_header'),
-      color: const Color(0xFFF1F5F9),
+      color: context.colors.surfaceSubtle,
       child: Row(
         children: [
           if (widget.selectable) _buildSelectAllCheckbox(),
           for (var i = 0; i < cols.length; i++)
-            _buildDraggableColumnHeader(cols[i], i, cols.length),
+            if (_isFlexColumn(cols[i]))
+              Expanded(
+                child: _buildDraggableColumnHeader(cols[i], i, cols.length),
+              )
+            else
+              _buildDraggableColumnHeader(cols[i], i, cols.length),
         ],
       ),
     );
@@ -870,19 +948,19 @@ class _OiTableState<T> extends State<OiTable<T>>
           feedback: Opacity(
             opacity: 0.7,
             child: ColoredBox(
-              color: const Color(0xFFE2E8F0),
+              color: context.colors.surfaceActive,
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                child: Text(col.header, textDirection: TextDirection.ltr),
+                child: Text(col.header, textDirection: TextDirection.ltr, style: TextStyle(color: context.colors.text)),
               ),
             ),
           ),
           childWhenDragging: Opacity(opacity: 0.3, child: header),
           child: isOver
               ? DecoratedBox(
-                  decoration: const BoxDecoration(
+                  decoration: BoxDecoration(
                     border: Border(
-                      left: BorderSide(color: Color(0xFF2563EB), width: 2),
+                      left: BorderSide(color: context.colors.primary.base, width: 2),
                     ),
                   ),
                   child: header,
@@ -916,8 +994,16 @@ class _OiTableState<T> extends State<OiTable<T>>
       },
       child: SizedBox(
         width: 40,
-        height: _effectiveRowHeight,
-        child: Center(child: Text(_ctrl.selectAll ? '☑' : '☐')),
+        height: _headerRowHeight,
+        child: Center(
+          child: Icon(
+            _ctrl.selectAll ? OiIcons.squareCheckBig : OiIcons.square,
+            size: 16,
+            color: _ctrl.selectAll
+                ? context.colors.primary.base
+                : context.colors.textMuted,
+          ),
+        ),
       ),
     );
   }
@@ -931,30 +1017,58 @@ class _OiTableState<T> extends State<OiTable<T>>
   Widget _buildColumnHeader(OiTableColumn<T> col) {
     final isSorted = _ctrl.sortColumnId == col.id;
     final width = _ctrl.columnWidths[col.id] ?? col.width;
+    final colors = context.colors;
+
+    // Estimate minimum width needed for the header label to avoid cut-off.
+    // ~7px per character at fontSize 12 + 16px horizontal padding + sort icon.
+    final labelMinWidth = col.header.length * 7.0 + 16 + (isSorted ? 18 : 0);
+    final effectiveMinWidth = math.max(col.minWidth, labelMinWidth);
+
     final innerContent = Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Flexible(
-            child: Text(
-              col.header,
+            child: _HoverText(
+              text: col.header,
               textAlign: col.textAlign,
-              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: colors.textSubtle,
+              ),
+              hoverStyle: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w700,
+                color: colors.text,
+              ),
+              sortable: col.sortable,
             ),
           ),
           if (isSorted)
-            Icon(_ctrl.sortAscending ? _arrowUp : _arrowDown, size: 16),
+            Padding(
+              padding: const EdgeInsets.only(left: 2),
+              child: Icon(
+                _ctrl.sortAscending ? _arrowUp : _arrowDown,
+                size: 14,
+                color: colors.primary.base,
+              ),
+            ),
         ],
       ),
     );
-    // When no explicit width is set, use a flexible default so the cell
-    // fills available space rather than collapsing to zero.
-    final resolvedWidth =
-        width ?? col.minWidth.clamp(col.minWidth, col.maxWidth);
+    final isFlex = _isFlexColumn(col);
+    final resolvedWidth = isFlex
+        ? null
+        : width ?? effectiveMinWidth.clamp(effectiveMinWidth, col.maxWidth);
     final headerContent = GestureDetector(
       onTap: () => _handleHeaderTap(col),
-      child: SizedBox(height: _effectiveRowHeight, child: innerContent),
+      child: Container(
+        height: _headerRowHeight,
+        alignment: AlignmentDirectional.centerStart,
+        child: innerContent,
+      ),
     );
     Widget header;
     if (col.resizable) {
@@ -967,8 +1081,10 @@ class _OiTableState<T> extends State<OiTable<T>>
         onResized: (w, _) => _ctrl.setColumnWidth(col.id, w),
         child: headerContent,
       );
-    } else {
+    } else if (resolvedWidth != null) {
       header = SizedBox(width: resolvedWidth, child: headerContent);
+    } else {
+      header = headerContent;
     }
     if (col.filterable) {
       header = Column(
@@ -980,12 +1096,13 @@ class _OiTableState<T> extends State<OiTable<T>>
   }
 
   Widget _buildFilterInput(OiTableColumn<T> col) {
+    final isFlex = _isFlexColumn(col);
     final filterWidth = _ctrl.columnWidths[col.id] ?? col.width;
     final resolvedFilterWidth =
-        filterWidth ?? col.minWidth.clamp(col.minWidth, col.maxWidth);
+        isFlex ? null : (filterWidth ?? col.minWidth.clamp(col.minWidth, col.maxWidth));
     return SizedBox(
       width: resolvedFilterWidth,
-      height: 28,
+      height: 0,
       child: _FilterField(
         key: ValueKey('filter_${col.id}'),
         initialValue: _ctrl.activeFilters[col.id] ?? '',
@@ -1100,6 +1217,7 @@ class _OiTableState<T> extends State<OiTable<T>>
       final groupKey = entry.key;
       final groupRows = entry.value;
       final expanded = _ctrl.expandedGroups.contains(groupKey);
+      final animCtrl = _groupControllerFor(groupKey);
       // Group header.
       final header = widget.groupHeaderBuilder != null
           ? widget.groupHeaderBuilder!(context, groupKey, groupRows)
@@ -1107,32 +1225,66 @@ class _OiTableState<T> extends State<OiTable<T>>
       items.add(
         GestureDetector(
           key: ValueKey('group_$groupKey'),
-          onTap: () => _ctrl.toggleGroup(groupKey),
+          onTap: () {
+            final willExpand = !_ctrl.expandedGroups.contains(groupKey);
+            if (willExpand) {
+              animCtrl.forward();
+            } else {
+              animCtrl.reverse();
+            }
+            _ctrl.toggleGroup(groupKey);
+          },
           child: header,
         ),
       );
-      if (expanded) {
-        for (var i = 0; i < groupRows.length; i++) {
-          items.add(_buildRow(groupRows[i], i));
-        }
-      }
+      // Animated group rows.
+      items.add(
+        SizeTransition(
+          key: ValueKey('group_body_$groupKey'),
+          sizeFactor: CurvedAnimation(
+            parent: animCtrl,
+            curve: Curves.easeInOut,
+          ),
+          axisAlignment: -1,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              for (var i = 0; i < groupRows.length; i++)
+                _buildRow(groupRows[i], i),
+            ],
+          ),
+        ),
+      );
     }
     return ListView(controller: _scrollController, children: items);
   }
 
   Widget _buildDefaultGroupHeader(String groupKey, int count, bool expanded) {
-    return ColoredBox(
+    final colors = context.colors;
+    return Padding(
       key: ValueKey('group_header_$groupKey'),
-      color: const Color(0xFFE2E8F0),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-        child: Row(
-          children: [
-            Text(expanded ? '▼' : '▶'),
-            const SizedBox(width: 8),
-            Text('$groupKey ($count)'),
-          ],
-        ),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      child: Row(
+        children: [
+          AnimatedRotation(
+            turns: expanded ? 0.25 : 0.0,
+            duration: const Duration(milliseconds: 200),
+            curve: Curves.easeInOut,
+            child: Icon(
+              OiIcons.chevronRight,
+              size: 16,
+              color: colors.textSubtle,
+            ),
+          ),
+          const SizedBox(width: 8),
+          Text(
+            '$groupKey ($count)',
+            style: TextStyle(
+              fontWeight: FontWeight.w600,
+              color: colors.text,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -1142,9 +1294,9 @@ class _OiTableState<T> extends State<OiTable<T>>
     final isEven = index.isEven;
     Color? bg;
     if (isSelected) {
-      bg = const Color(0xFFDBEAFE);
+      bg = context.colors.primary.muted;
     } else if (widget.striped && isEven) {
-      bg = const Color(0xFFF8FAFC);
+      bg = context.colors.surfaceSubtle;
     }
     final rowContent = Row(
       children: [
@@ -1152,9 +1304,21 @@ class _OiTableState<T> extends State<OiTable<T>>
           SizedBox(
             width: 40,
             height: _effectiveRowHeight,
-            child: Center(child: Text(isSelected ? '☑' : '☐')),
+            child: Center(
+              child: Icon(
+                isSelected ? OiIcons.squareCheckBig : OiIcons.square,
+                size: 16,
+                color: isSelected
+                    ? context.colors.primary.base
+                    : context.colors.textMuted,
+              ),
+            ),
           ),
-        for (final col in _visibleColumns) _buildCell(row, index, col),
+        for (final col in _visibleColumns)
+          if (_isFlexColumn(col))
+            Expanded(child: _buildCell(row, index, col))
+          else
+            _buildCell(row, index, col),
       ],
     );
     return GestureDetector(
@@ -1173,7 +1337,7 @@ class _OiTableState<T> extends State<OiTable<T>>
       content = col.cellBuilder!(context, row, rowIndex);
     } else {
       final text = col.valueGetter?.call(row) ?? '';
-      content = Text(text, textAlign: col.textAlign);
+      content = Text(text, textAlign: col.textAlign, style: TextStyle(color: context.colors.text));
     }
     if (widget.onCellChanged != null) {
       content = _CellFrame<T>(
@@ -1185,8 +1349,9 @@ class _OiTableState<T> extends State<OiTable<T>>
             widget.onCellChanged!(row, rowIndex, col.id, value),
       );
     }
+    final isFlex = _isFlexColumn(col);
     final resolvedWidth =
-        width ?? col.minWidth.clamp(col.minWidth, col.maxWidth);
+        isFlex ? null : (width ?? col.minWidth.clamp(col.minWidth, col.maxWidth));
     return SizedBox(
       width: resolvedWidth,
       height: _effectiveRowHeight,
@@ -1218,15 +1383,15 @@ class _OiTableState<T> extends State<OiTable<T>>
     final selected = _ctrl.selectedRows.length;
     return ColoredBox(
       key: const Key('oi_table_status_bar'),
-      color: const Color(0xFFF1F5F9),
+      color: context.colors.surfaceSubtle,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
         child: Row(
           children: [
-            Text('$totalShown rows'),
+            Text('$totalShown rows', style: TextStyle(color: context.colors.textMuted)),
             if (selected > 0) ...[
               const SizedBox(width: 16),
-              Text('$selected selected'),
+              Text('$selected selected', style: TextStyle(color: context.colors.textMuted)),
             ],
           ],
         ),
@@ -1239,11 +1404,62 @@ class _OiTableState<T> extends State<OiTable<T>>
   double get _effectiveRowHeight =>
       widget.rowHeight ?? (widget.dense ? 32 : 48);
 
+  double get _headerRowHeight => widget.dense ? 28 : 36;
+
   static AlignmentGeometry _alignmentFromTextAlign(TextAlign align) {
     return switch (align) {
       TextAlign.center => Alignment.center,
       TextAlign.end || TextAlign.right => AlignmentDirectional.centerEnd,
       _ => AlignmentDirectional.centerStart,
     };
+  }
+}
+
+// ── _HoverText ───────────────────────────────────────────────────────────────
+
+/// A text widget that changes style on hover (used for sortable column headers).
+class _HoverText extends StatefulWidget {
+  const _HoverText({
+    required this.text,
+    required this.style,
+    required this.hoverStyle,
+    this.textAlign = TextAlign.start,
+    this.sortable = true,
+  });
+
+  final String text;
+  final TextStyle style;
+  final TextStyle hoverStyle;
+  final TextAlign textAlign;
+  final bool sortable;
+
+  @override
+  State<_HoverText> createState() => _HoverTextState();
+}
+
+class _HoverTextState extends State<_HoverText> {
+  bool _hovering = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final effectiveStyle =
+        widget.sortable && _hovering ? widget.hoverStyle : widget.style;
+
+    final child = Text(
+      widget.text,
+      textAlign: widget.textAlign,
+      style: effectiveStyle,
+      overflow: TextOverflow.ellipsis,
+      maxLines: 1,
+    );
+
+    if (!widget.sortable) return child;
+
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      onEnter: (_) => setState(() => _hovering = true),
+      onExit: (_) => setState(() => _hovering = false),
+      child: child,
+    );
   }
 }

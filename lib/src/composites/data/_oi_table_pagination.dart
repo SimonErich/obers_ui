@@ -93,11 +93,11 @@ class _PageSizeSelectorState extends State<_PageSizeSelector> {
                     color: colors.surface,
                     border: Border.all(color: colors.borderSubtle),
                     borderRadius: BorderRadius.circular(4),
-                    boxShadow: const [
+                    boxShadow: [
                       BoxShadow(
-                        color: Color(0x1A000000),
+                        color: colors.overlay,
                         blurRadius: 8,
-                        offset: Offset(0, 2),
+                        offset: const Offset(0, 2),
                       ),
                     ],
                   ),
@@ -115,14 +115,17 @@ class _PageSizeSelectorState extends State<_PageSizeSelector> {
                           behavior: HitTestBehavior.opaque,
                           child: ColoredBox(
                             color: size == widget.currentSize
-                                ? colors.primary.muted.withValues(alpha: 0.15)
+                                ? colors.primary.muted
                                 : const Color(0x00000000),
                             child: Padding(
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 12,
                                 vertical: 8,
                               ),
-                              child: Text('$size'),
+                              child: Text(
+                                '$size',
+                                style: TextStyle(color: colors.text),
+                              ),
                             ),
                           ),
                         ),
@@ -167,9 +170,9 @@ class _PageSizeSelectorState extends State<_PageSizeSelector> {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('${widget.currentSize}'),
+            Text('${widget.currentSize}', style: TextStyle(color: colors.text)),
             const SizedBox(width: 4),
-            const Text('\u25be', style: TextStyle(fontSize: 10)),
+            Text('\u25be', style: TextStyle(fontSize: 10, color: colors.text)),
           ],
         ),
       ),
@@ -201,11 +204,11 @@ class _ColumnManagerPanel<T> extends StatelessWidget {
         color: colors.surface,
         border: Border.all(color: colors.borderSubtle),
         borderRadius: BorderRadius.circular(4),
-        boxShadow: const [
+        boxShadow: [
           BoxShadow(
-            color: Color(0x1A000000),
+            color: colors.overlay,
             blurRadius: 8,
-            offset: Offset(0, 2),
+            offset: const Offset(0, 2),
           ),
         ],
       ),
@@ -213,11 +216,15 @@ class _ColumnManagerPanel<T> extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const Padding(
-            padding: EdgeInsets.fromLTRB(12, 8, 12, 4),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(12, 8, 12, 4),
             child: Text(
               'Columns',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 13,
+                color: colors.text,
+              ),
             ),
           ),
           for (final col in columns)
@@ -235,9 +242,22 @@ class _ColumnManagerPanel<T> extends StatelessWidget {
                 ),
                 child: Row(
                   children: [
-                    Text((visibility[col.id] ?? true) ? '☑' : '☐'),
+                    Icon(
+                      (visibility[col.id] ?? true)
+                          ? OiIcons.squareCheckBig
+                          : OiIcons.square,
+                      size: 16,
+                      color: (visibility[col.id] ?? true)
+                          ? colors.primary.base
+                          : colors.textMuted,
+                    ),
                     const SizedBox(width: 8),
-                    Expanded(child: Text(col.header)),
+                    Expanded(
+                      child: Text(
+                        col.header,
+                        style: TextStyle(color: colors.text),
+                      ),
+                    ),
                   ],
                 ),
               ),

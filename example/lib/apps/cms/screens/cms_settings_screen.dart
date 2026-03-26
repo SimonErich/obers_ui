@@ -141,30 +141,29 @@ class _CmsSettingsScreenState extends State<CmsSettingsScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            Row(
-                              children: [
-                                const Expanded(
-                                  child: OiLabel.body('Moderate new comments'),
-                                ),
-                                OiSwitch(
-                                  value: _moderationEnabled,
-                                  label: 'Comment moderation',
-                                  onChanged: (v) =>
-                                      setState(() => _moderationEnabled = v),
-                                ),
-                              ],
+                            OiSwitch(
+                              value: _moderationEnabled,
+                              label: 'Moderate new comments',
+                              onChanged: (v) =>
+                                  setState(() => _moderationEnabled = v),
                             ),
                             SizedBox(height: spacing.md),
-                            OiNumberInput(
-                              label: 'Max Reply Depth',
-                              value: _maxCommentDepth,
-                              min: 1,
-                              max: 10,
-                              onChanged: (v) {
-                                if (v != null) {
-                                  setState(() => _maxCommentDepth = v);
-                                }
-                              },
+                            Align(
+                              alignment: Alignment.centerLeft,
+                              child: SizedBox(
+                                width: 120,
+                                child: OiNumberInput(
+                                  label: 'Max Reply Depth',
+                                  value: _maxCommentDepth,
+                                  min: 1,
+                                  max: 10,
+                                  onChanged: (v) {
+                                    if (v != null) {
+                                      setState(() => _maxCommentDepth = v);
+                                    }
+                                  },
+                                ),
+                              ),
                             ),
                           ],
                         ),
@@ -177,48 +176,27 @@ class _CmsSettingsScreenState extends State<CmsSettingsScreen> {
                       content: Padding(
                         padding: const EdgeInsets.only(bottom: 8),
                         child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Row(
-                              children: [
-                                const Expanded(
-                                  child: OiLabel.body('Email on new comment'),
-                                ),
-                                OiSwitch(
-                                  value: _emailOnNewComment,
-                                  label: 'New comment notifications',
-                                  onChanged: (v) =>
-                                      setState(() => _emailOnNewComment = v),
-                                ),
-                              ],
+                            OiSwitch(
+                              value: _emailOnNewComment,
+                              label: 'New comment email notifications',
+                              onChanged: (v) =>
+                                  setState(() => _emailOnNewComment = v),
                             ),
                             SizedBox(height: spacing.sm),
-                            Row(
-                              children: [
-                                const Expanded(
-                                  child: OiLabel.body('Email on new article'),
-                                ),
-                                OiSwitch(
-                                  value: _emailOnNewArticle,
-                                  label: 'New article notifications',
-                                  onChanged: (v) =>
-                                      setState(() => _emailOnNewArticle = v),
-                                ),
-                              ],
+                            OiSwitch(
+                              value: _emailOnNewArticle,
+                              label: 'New article email notifications',
+                              onChanged: (v) =>
+                                  setState(() => _emailOnNewArticle = v),
                             ),
                             SizedBox(height: spacing.sm),
-                            Row(
-                              children: [
-                                const Expanded(
-                                  child: OiLabel.body('Weekly digest email'),
-                                ),
-                                OiSwitch(
-                                  value: _emailWeeklyDigest,
-                                  label: 'Weekly digest notifications',
-                                  onChanged: (v) =>
-                                      setState(() => _emailWeeklyDigest = v),
-                                ),
-                              ],
+                            OiSwitch(
+                              value: _emailWeeklyDigest,
+                              label: 'Weekly digest email notifications',
+                              onChanged: (v) =>
+                                  setState(() => _emailWeeklyDigest = v),
                             ),
                           ],
                         ),
@@ -231,12 +209,15 @@ class _CmsSettingsScreenState extends State<CmsSettingsScreen> {
 
                 // Save button
                 Align(
-                  alignment: Alignment.centerLeft,
-                  child: OiButton.primary(
-                    label: 'Save Settings',
-                    semanticLabel: 'Save settings',
-                    icon: OiIcons.circleCheck,
-                    onTap: _handleSave,
+                  alignment: Alignment.centerRight,
+                  child: SizedBox(
+                    width: 150,
+                    child: OiButton.primary(
+                      label: 'Save Settings',
+                      semanticLabel: 'Save settings',
+                      icon: OiIcons.circleCheck,
+                      onTap: _handleSave,
+                    ),
                   ),
                 ),
               ],

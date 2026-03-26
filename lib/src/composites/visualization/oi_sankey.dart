@@ -139,7 +139,7 @@ class OiSankey extends StatelessWidget {
                     defaultLinkColor: colors.borderSubtle,
                   ),
                 ),
-                // Render nodes.
+                // Render nodes with labels positioned outside.
                 for (final ln in layout.nodes)
                   Positioned(
                     left: ln.rect.left,
@@ -156,42 +156,46 @@ class OiSankey extends StatelessWidget {
                           color: nodeColorMap[ln.node.key],
                           borderRadius: BorderRadius.circular(3),
                         ),
-                        child: showLabels || showValues
-                            ? Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 4,
-                                ),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    if (showLabels)
-                                      Text(
-                                        ln.node.label,
-                                        style: TextStyle(
-                                          color: colors.textOnPrimary,
-                                          fontSize: 10,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                        overflow: TextOverflow.ellipsis,
-                                        maxLines: 1,
-                                      ),
-                                    if (showValues)
-                                      Text(
-                                        ln.totalValue.toStringAsFixed(0),
-                                        style: TextStyle(
-                                          color: colors.textOnPrimary
-                                              .withValues(alpha: 0.8),
-                                          fontSize: 9,
-                                        ),
-                                      ),
-                                  ],
-                                ),
-                              )
-                            : null,
                       ),
                     ),
                   ),
+                // Render node labels outside the node bars.
+                if (showLabels || showValues)
+                  for (final ln in layout.nodes)
+                    Positioned(
+                      // Place label to the right of the node, or left for
+                      // the last column.
+                      left: ln.rect.right + 4,
+                      top: ln.rect.top,
+                      height: ln.rect.height,
+                      child: IgnorePointer(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            if (showLabels)
+                              Text(
+                                ln.node.label,
+                                style: TextStyle(
+                                  color: colors.text,
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
+                              ),
+                            if (showValues)
+                              Text(
+                                ln.totalValue.toStringAsFixed(0),
+                                style: TextStyle(
+                                  color: colors.textMuted,
+                                  fontSize: 9,
+                                ),
+                              ),
+                          ],
+                        ),
+                      ),
+                    ),
                 // Render invisible link tap targets.
                 for (final ll in layout.links)
                   Positioned.fill(
@@ -301,19 +305,29 @@ class OiSankey extends StatelessWidget {
         0,
         (s, n) => s + (nodeValue[n.key] ?? 1),
       );
-      final availHeight = height - (colNodes.length - 1) * nodePadding;
+      final totalPadding = (colNodes.length - 1) * nodePadding;
+      final availHeight = height - totalPadding;
       final x = numColumns > 1 ? col * colSpacing : (width - nodeWidth) / 2;
 
-      var y = 0.0;
+      // First pass: compute proportional heights with minimum.
+      const minNodeHeight = 12.0;
+      final rawHeights = <double>[];
       for (final n in colNodes) {
         final nv = nodeValue[n.key] ?? 1;
-        final h = math.max<double>(
-          totalValue > 0
-              ? availHeight * nv / totalValue
-              : availHeight / colNodes.length,
-          12,
-        );
-        nodeRects[n.key] = Rect.fromLTWH(x, y, nodeWidth, h);
+        final h = totalValue > 0
+            ? availHeight * nv / totalValue
+            : availHeight / colNodes.length;
+        rawHeights.add(math.max(h, minNodeHeight));
+      }
+
+      // Scale to fit within available height if minimums pushed total over.
+      final rawTotal = rawHeights.fold<double>(0, (s, h) => s + h);
+      final scale = rawTotal > availHeight ? availHeight / rawTotal : 1.0;
+
+      var y = 0.0;
+      for (var i = 0; i < colNodes.length; i++) {
+        final h = rawHeights[i] * scale;
+        nodeRects[colNodes[i].key] = Rect.fromLTWH(x, y, nodeWidth, h);
         y += h + nodePadding;
       }
     }
