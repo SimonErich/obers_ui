@@ -15,20 +15,20 @@ Close final 5% gap: wire decimation into normalization pipeline, add key params 
 ### Phase 1: Wire Decimation + Add Key Params to OiLineChart
 
 - **Goal**: Decimation auto-applies; OiLineChart gains behaviors/controller/annotations
-- [ ] `lib/src/composites/oi_cartesian_chart.dart` — After `_normalizeVisibleSeries()`, check `widget.performance?.decimationStrategy`. If not `none`, convert each series' normalized datums to `Point<double>` (xRaw as num, yRaw as num), call `decimateMinMax` or `decimateLttb` based on strategy, rebuild filtered datum list. Only decimate when point count > `maxInteractivePoints`.
-- [ ] `lib/src/composites/oi_line_chart/oi_line_chart.dart` — Add params: `behaviors: List<OiChartBehavior>`, `controller: OiChartController?`, `annotations: List<OiChartAnnotation>`, `thresholds: List<OiChartThreshold>`, `legend: OiChartLegendConfig?`, `performance: OiChartPerformanceConfig?`, `syncGroup: String?`, `onSeriesVisibilityChange`, `onViewportChange`. Store but don't wire internally yet (availability for future wiring).
-- [ ] TDD: OiCartesianChart with performance config (decimation=lttb, maxInteractivePoints=50) and 200 data points → normalized datums count ≤ 50
-- [ ] TDD: OiLineChart accepts behaviors param without error
-- [ ] Verify: `dart analyze` && `flutter test`
+- [x] `lib/src/composites/oi_cartesian_chart.dart` — After `_normalizeVisibleSeries()`, check `widget.performance?.decimationStrategy`. If not `none`, convert each series' normalized datums to `Point<double>` (xRaw as num, yRaw as num), call `decimateMinMax` or `decimateLttb` based on strategy, rebuild filtered datum list. Only decimate when point count > `maxInteractivePoints`.
+- [x] `lib/src/composites/oi_line_chart/oi_line_chart.dart` — Add params: `behaviors: List<OiChartBehavior>`, `controller: OiChartController?`, `annotations: List<OiChartAnnotation>`, `thresholds: List<OiChartThreshold>`, `legend: OiChartLegendConfig?`, `performance: OiChartPerformanceConfig?`, `syncGroup: String?`, `onSeriesVisibilityChange`, `onViewportChange`. Store but don't wire internally yet (availability for future wiring).
+- [x] TDD: OiCartesianChart with performance config (decimation=lttb, maxInteractivePoints=50) and 200 data points → normalized datums count ≤ 50
+- [x] TDD: OiLineChart accepts behaviors param without error
+- [x] Verify: `dart analyze` && `flutter test`
 
 ### Phase 2: Document Two-Tier API + Fix Bubble Tests
 
 - **Goal**: Clear documentation, fix test failures
-- [ ] `lib/src/composites/oi_line_chart/oi_line_chart.dart` — Add dartdoc section explaining two-tier API: "For simple usage, use OiLineChart with OiLineSeries (pre-mapped data). For full control (behaviors, sync, persistence, mapper-first binding), use OiCartesianChart<T> with OiLineSeriesData<T>."
-- [ ] `lib/src/composites/oi_cartesian_chart.dart` — Add dartdoc noting it's the power API base for all cartesian charts with full behavior/sync/persistence/normalization support
-- [ ] `lib/src/composites/oi_bubble_chart/oi_bubble_chart.dart` — Fix RenderFlex overflow in size legend: wrap Row in Flexible or constrain width, or add `mainAxisSize: MainAxisSize.min` + overflow handling
-- [ ] `test/src/composites/oi_bubble_chart/oi_bubble_chart_test.dart` — Verify 3 failing tests now pass after layout fix
-- [ ] Verify: `dart analyze` && `flutter test` (target: 0 failures)
+- [x] `lib/src/composites/oi_line_chart/oi_line_chart.dart` — Add dartdoc section explaining two-tier API: "For simple usage, use OiLineChart with OiLineSeries (pre-mapped data). For full control (behaviors, sync, persistence, mapper-first binding), use OiCartesianChart<T> with OiLineSeriesData<T>."
+- [x] `lib/src/composites/oi_cartesian_chart.dart` — Add dartdoc noting it's the power API base for all cartesian charts with full behavior/sync/persistence/normalization support
+- [x] `lib/src/composites/oi_bubble_chart/oi_bubble_chart.dart` — Fix RenderFlex overflow in size legend: wrap Row in Flexible or constrain width, or add `mainAxisSize: MainAxisSize.min` + overflow handling
+- [x] `test/src/composites/oi_bubble_chart/oi_bubble_chart_test.dart` — Verify 3 failing tests now pass after layout fix
+- [x] Verify: `dart analyze` && `flutter test` (target: 0 failures)
 
 ## Risks / Out of scope
 
