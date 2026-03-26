@@ -903,7 +903,7 @@ class _OiTableState<T> extends State<OiTable<T>>
     final cols = _visibleColumns;
     return ColoredBox(
       key: const Key('oi_table_header'),
-      color: const Color(0xFFF1F5F9),
+      color: context.colors.surfaceSubtle,
       child: Row(
         children: [
           if (widget.selectable) _buildSelectAllCheckbox(),
@@ -948,19 +948,19 @@ class _OiTableState<T> extends State<OiTable<T>>
           feedback: Opacity(
             opacity: 0.7,
             child: ColoredBox(
-              color: const Color(0xFFE2E8F0),
+              color: context.colors.surfaceActive,
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                child: Text(col.header, textDirection: TextDirection.ltr),
+                child: Text(col.header, textDirection: TextDirection.ltr, style: TextStyle(color: context.colors.text)),
               ),
             ),
           ),
           childWhenDragging: Opacity(opacity: 0.3, child: header),
           child: isOver
               ? DecoratedBox(
-                  decoration: const BoxDecoration(
+                  decoration: BoxDecoration(
                     border: Border(
-                      left: BorderSide(color: Color(0xFF2563EB), width: 2),
+                      left: BorderSide(color: context.colors.primary.base, width: 2),
                     ),
                   ),
                   child: header,
@@ -1294,9 +1294,9 @@ class _OiTableState<T> extends State<OiTable<T>>
     final isEven = index.isEven;
     Color? bg;
     if (isSelected) {
-      bg = const Color(0xFFDBEAFE);
+      bg = context.colors.primary.muted;
     } else if (widget.striped && isEven) {
-      bg = const Color(0xFFF8FAFC);
+      bg = context.colors.surfaceSubtle;
     }
     final rowContent = Row(
       children: [
@@ -1337,7 +1337,7 @@ class _OiTableState<T> extends State<OiTable<T>>
       content = col.cellBuilder!(context, row, rowIndex);
     } else {
       final text = col.valueGetter?.call(row) ?? '';
-      content = Text(text, textAlign: col.textAlign);
+      content = Text(text, textAlign: col.textAlign, style: TextStyle(color: context.colors.text));
     }
     if (widget.onCellChanged != null) {
       content = _CellFrame<T>(
@@ -1383,15 +1383,15 @@ class _OiTableState<T> extends State<OiTable<T>>
     final selected = _ctrl.selectedRows.length;
     return ColoredBox(
       key: const Key('oi_table_status_bar'),
-      color: const Color(0xFFF1F5F9),
+      color: context.colors.surfaceSubtle,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
         child: Row(
           children: [
-            Text('$totalShown rows'),
+            Text('$totalShown rows', style: TextStyle(color: context.colors.textMuted)),
             if (selected > 0) ...[
               const SizedBox(width: 16),
-              Text('$selected selected'),
+              Text('$selected selected', style: TextStyle(color: context.colors.textMuted)),
             ],
           ],
         ),

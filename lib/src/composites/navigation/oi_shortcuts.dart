@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart' show defaultTargetPlatform, kIsWeb;
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 
 // ── Shortcut activator ──────────────────────────────────────────────────────
 
@@ -340,11 +341,12 @@ class _OiShortcutHelpOverlay extends StatelessWidget {
       children.add(const SizedBox(height: 12));
     }
 
+    final colors = context.colors;
     return GestureDetector(
       onTap: onDismiss,
       behavior: HitTestBehavior.opaque,
       child: ColoredBox(
-        color: const Color(0x88000000),
+        color: colors.overlay,
         child: Center(
           child: GestureDetector(
             onTap: () {}, // Absorb taps on the dialog body.
@@ -352,7 +354,7 @@ class _OiShortcutHelpOverlay extends StatelessWidget {
               constraints: const BoxConstraints(maxWidth: 400, maxHeight: 500),
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: const Color(0xFFFFFFFF),
+                color: colors.surface,
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Column(

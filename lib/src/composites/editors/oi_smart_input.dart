@@ -559,7 +559,7 @@ class _OiSmartInputState extends State<OiSmartInput> {
           ? baseStyle.copyWith(color: const Color(0x00000000))
           : baseStyle,
       cursorColor: cursorColor,
-      backgroundCursorColor: const Color(0xFF000000),
+      backgroundCursorColor: themeData?.colors.text ?? const Color(0xFF000000),
       maxLines: widget.maxLines,
       readOnly: !widget.enabled,
       onChanged: (_) {},
@@ -581,7 +581,7 @@ class _OiSmartInputState extends State<OiSmartInput> {
                   child: Text(
                     widget.placeholder!,
                     style: baseStyle.copyWith(
-                      color: (baseStyle.color ?? const Color(0xFF000000))
+                      color: (baseStyle.color ?? themeData?.colors.text ?? const Color(0xFF000000))
                           .withValues(alpha: 0.45),
                     ),
                     maxLines: 1,
@@ -606,7 +606,7 @@ class _OiSmartInputState extends State<OiSmartInput> {
                   child: Text(
                     widget.placeholder!,
                     style: baseStyle.copyWith(
-                      color: (baseStyle.color ?? const Color(0xFF000000))
+                      color: (baseStyle.color ?? themeData?.colors.text ?? const Color(0xFF000000))
                           .withValues(alpha: 0.45),
                     ),
                     maxLines: 1,
@@ -620,7 +620,7 @@ class _OiSmartInputState extends State<OiSmartInput> {
             focusNode: _focusNode,
             style: baseStyle,
             cursorColor: cursorColor,
-            backgroundCursorColor: const Color(0xFF000000),
+            backgroundCursorColor: themeData?.colors.text ?? const Color(0xFF000000),
             maxLines: widget.maxLines,
             readOnly: !widget.enabled,
             onChanged: (_) {},
@@ -669,14 +669,15 @@ class _OiSuggestionPopup extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
     final decoration = BoxDecoration(
-      color: const Color(0xFFFFFFFF),
+      color: colors.surface,
       borderRadius: BorderRadius.circular(8),
-      boxShadow: const [
+      boxShadow: [
         BoxShadow(
-          color: Color(0x1F000000),
+          color: colors.overlay,
           blurRadius: 8,
-          offset: Offset(0, 2),
+          offset: const Offset(0, 2),
         ),
       ],
     );
@@ -685,9 +686,9 @@ class _OiSuggestionPopup extends StatelessWidget {
       return Container(
         padding: const EdgeInsets.all(12),
         decoration: decoration,
-        child: const Text(
+        child: Text(
           'Loading…',
-          style: TextStyle(fontSize: 14, color: Color(0xFF6B7280)),
+          style: TextStyle(fontSize: 14, color: colors.textMuted),
         ),
       );
     }
@@ -728,11 +729,12 @@ class _OiSuggestionItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
     return GestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        color: selected ? const Color(0xFFEFF6FF) : const Color(0x00000000),
+        color: selected ? colors.primary.muted : const Color(0x00000000),
         child: Row(
           children: [
             if (suggestion.leading != null) ...[
@@ -742,7 +744,7 @@ class _OiSuggestionItem extends StatelessWidget {
             Expanded(
               child: Text(
                 suggestion.label,
-                style: const TextStyle(fontSize: 14, color: Color(0xFF111827)),
+                style: TextStyle(fontSize: 14, color: colors.text),
                 overflow: TextOverflow.ellipsis,
               ),
             ),

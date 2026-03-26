@@ -447,6 +447,7 @@ class _DefaultNodeRow<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
     Widget row = Row(
       children: [
         SizedBox(width: depth * indentWidth),
@@ -463,7 +464,11 @@ class _DefaultNodeRow<T> extends StatelessWidget {
                   turns: expanded ? 0.25 : 0.0,
                   duration: const Duration(milliseconds: 200),
                   curve: Curves.easeInOut,
-                  child: const OiIcon(icon: OiIcons.chevronRight, label: 'Chevron Right'),
+                  child: OiIcon(
+                    icon: OiIcons.chevronRight,
+                    label: 'Chevron Right',
+                    color: colors.textMuted,
+                  ),
                 ),
               ),
             ),
@@ -477,6 +482,7 @@ class _DefaultNodeRow<T> extends StatelessWidget {
             child: Text(
               node.label,
               key: ValueKey('label_${node.id}'),
+              style: TextStyle(color: colors.text),
               overflow: TextOverflow.ellipsis,
             ),
           ),
@@ -485,7 +491,7 @@ class _DefaultNodeRow<T> extends StatelessWidget {
     );
 
     if (selected) {
-      row = ColoredBox(color: const Color(0xFFDBEAFE), child: row);
+      row = ColoredBox(color: colors.primary.muted, child: row);
     }
 
     return GestureDetector(

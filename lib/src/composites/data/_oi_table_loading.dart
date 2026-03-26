@@ -50,12 +50,17 @@ class _OiTableLoadingBarState extends State<_OiTableLoadingBar>
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
     return AnimatedBuilder(
       animation: _ctrl,
       builder: (context, _) {
         return CustomPaint(
           key: const Key('oi_table_loading_bar'),
-          painter: _LoadingBarPainter(progress: _ctrl.value),
+          painter: _LoadingBarPainter(
+            progress: _ctrl.value,
+            trackColor: colors.borderSubtle,
+            barColor: colors.primary.base,
+          ),
           size: const Size(double.infinity, 3),
         );
       },
@@ -64,29 +69,37 @@ class _OiTableLoadingBarState extends State<_OiTableLoadingBar>
 }
 
 class _LoadingBarPainter extends CustomPainter {
-  const _LoadingBarPainter({required this.progress});
+  const _LoadingBarPainter({
+    required this.progress,
+    required this.trackColor,
+    required this.barColor,
+  });
 
   final double progress;
+  final Color trackColor;
+  final Color barColor;
 
   @override
   void paint(Canvas canvas, Size size) {
-    const colors = Color(0xFFE5E7EB);
     // Background track.
     canvas.drawRect(
       Rect.fromLTWH(0, 0, size.width, size.height),
-      Paint()..color = colors,
+      Paint()..color = trackColor,
     );
     // Animated bar segment.
     final barWidth = size.width * 0.3;
     final start = (size.width + barWidth) * progress - barWidth;
     canvas.drawRect(
       Rect.fromLTWH(start, 0, barWidth, size.height),
-      Paint()..color = const Color(0xFF2563EB),
+      Paint()..color = barColor,
     );
   }
 
   @override
-  bool shouldRepaint(_LoadingBarPainter old) => old.progress != progress;
+  bool shouldRepaint(_LoadingBarPainter old) =>
+      old.progress != progress ||
+      old.trackColor != trackColor ||
+      old.barColor != barColor;
 }
 
 // ── _OiTableSpinner ───────────────────────────────────────────────────────────
@@ -137,19 +150,22 @@ class _OiTableSpinnerState extends State<_OiTableSpinner>
 
   @override
   Widget build(BuildContext context) {
+    final spinnerColor = context.colors.primary.base;
     return RotationTransition(
       turns: _ctrl,
-      child: const SizedBox(
+      child: SizedBox(
         width: 24,
         height: 24,
-        child: CustomPaint(painter: _SpinnerPainter()),
+        child: CustomPaint(painter: _SpinnerPainter(color: spinnerColor)),
       ),
     );
   }
 }
 
 class _SpinnerPainter extends CustomPainter {
-  const _SpinnerPainter();
+  const _SpinnerPainter({required this.color});
+
+  final Color color;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -159,7 +175,7 @@ class _SpinnerPainter extends CustomPainter {
       4.2,
       false,
       Paint()
-        ..color = const Color(0xFF2563EB)
+        ..color = color
         ..strokeWidth = 2.5
         ..style = PaintingStyle.stroke
         ..strokeCap = StrokeCap.round,
@@ -167,5 +183,5 @@ class _SpinnerPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(_SpinnerPainter old) => false;
+  bool shouldRepaint(_SpinnerPainter old) => old.color != color;
 }

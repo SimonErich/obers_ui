@@ -96,7 +96,9 @@ class _HoverUnderlineLabelState extends State<_HoverUnderlineLabel> {
 
   @override
   Widget build(BuildContext context) {
-    final baseStyle = context.textTheme.styleFor(widget.variant);
+    final baseStyle = context.textTheme.styleFor(widget.variant).copyWith(
+      color: context.colors.text,
+    );
     final merged = widget.style != null
         ? baseStyle.merge(widget.style)
         : baseStyle;

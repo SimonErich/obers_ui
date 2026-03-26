@@ -234,6 +234,7 @@ class _OiRawInputState extends State<OiRawInput> {
     final themeData = OiTheme.maybeOf(context);
     if (themeData != null) {
       return themeData.textTheme.styleFor(OiLabelVariant.small).copyWith(
+        color: themeData.colors.text,
         height: 1.2,
       );
     }
@@ -262,7 +263,7 @@ class _OiRawInputState extends State<OiRawInput> {
       focusNode: widget.focusNode,
       style: effectiveStyle,
       cursorColor: effectiveCursorColor,
-      backgroundCursorColor: const Color(0xFF000000),
+      backgroundCursorColor: OiTheme.maybeOf(context)?.colors.text ?? const Color(0xFF000000),
       keyboardType: widget.keyboardType,
       textInputAction: widget.textInputAction,
       textCapitalization: widget.textCapitalization,
@@ -311,7 +312,7 @@ class _OiRawInputState extends State<OiRawInput> {
                   child: Text(
                     widget.placeholder!,
                     style: effectiveStyle.copyWith(
-                      color: (effectiveStyle.color ?? const Color(0xFF000000))
+                      color: (effectiveStyle.color ?? OiTheme.maybeOf(context)?.colors.text ?? const Color(0xFF000000))
                           .withValues(alpha: 0.45),
                     ),
                     maxLines: 1,

@@ -72,7 +72,7 @@ class OiRadio<T> extends StatelessWidget {
       painter: _OiRadioPainter(
         selected: isSelected,
         outerColor: outerColor,
-        innerColor: colors.primary.base,
+        innerColor: colors.textOnPrimary,
         outerSize: outerSize,
         innerSize: innerSize,
       ),
@@ -162,11 +162,11 @@ class _OiRadioPainter extends CustomPainter {
       );
 
     if (selected) {
-      // Inner filled dot in white (on primary background).
+      // Inner filled dot on primary background.
       canvas.drawCircle(
         center,
         innerSize / 2,
-        Paint()..color = const Color(0xFFFFFFFF),
+        Paint()..color = innerColor,
       );
     }
   }

@@ -550,9 +550,15 @@ class OiLabel extends StatelessWidget {
       style = style.copyWith(fontSize: baseStyle.fontSize! * scale);
     }
 
-    if (color != null || decoration != null || decorationColor != null) {
+    // Apply theme text color when no explicit color is set and the text style
+    // doesn't include one, so labels render correctly in both light and dark mode.
+    final effectiveColor = color ?? style.color ?? context.colors.text;
+
+    if (effectiveColor != style.color ||
+        decoration != null ||
+        decorationColor != null) {
       style = style.copyWith(
-        color: color,
+        color: effectiveColor,
         decoration: decoration,
         decorationColor: decorationColor,
       );

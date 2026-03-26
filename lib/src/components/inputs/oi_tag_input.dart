@@ -347,6 +347,7 @@ class _OiTagInputState extends State<OiTagInput> {
   }
 
   Widget _buildShimmerPlaceholder() {
+    final shimmerColor = context.colors.surfaceActive;
     return Padding(
       key: const Key('oi_tag_input_shimmer'),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -358,7 +359,7 @@ class _OiTagInputState extends State<OiTagInput> {
               width: 120,
               height: 12,
               decoration: BoxDecoration(
-                color: const Color(0xFFE0E0E0),
+                color: shimmerColor,
                 borderRadius: BorderRadius.circular(4),
               ),
             ),
@@ -367,7 +368,7 @@ class _OiTagInputState extends State<OiTagInput> {
               width: 80,
               height: 12,
               decoration: BoxDecoration(
-                color: const Color(0xFFE0E0E0),
+                color: shimmerColor,
                 borderRadius: BorderRadius.circular(4),
               ),
             ),
@@ -461,17 +462,19 @@ class OiRawInputInline extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = OiTheme.maybeOf(context)?.colors;
+    final cursorColor = colors?.primary.base ?? const Color(0xFF2563EB);
     return EditableText(
       controller: controller,
       focusNode: focusNode,
-      style: const TextStyle(fontSize: 13),
-      cursorColor: const Color(0xFF2563EB),
-      backgroundCursorColor: const Color(0xFF000000),
+      style: TextStyle(fontSize: 13, color: colors?.text),
+      cursorColor: cursorColor,
+      backgroundCursorColor: colors?.text ?? const Color(0xFF000000),
       onSubmitted: onSubmitted,
       readOnly: !enabled,
       inputFormatters: inputFormatters,
       textInputAction: TextInputAction.done,
-      selectionColor: const Color(0x332563EB),
+      selectionColor: cursorColor.withValues(alpha: 0.3),
     );
   }
 }

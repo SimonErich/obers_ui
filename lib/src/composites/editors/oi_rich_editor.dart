@@ -370,6 +370,11 @@ class _OiRichEditorState extends State<OiRichEditor> {
             const TextStyle(fontSize: 16, fontWeight: FontWeight.w400);
     }
 
+    // Ensure text color is set for dark mode support.
+    if (base.color == null && colors != null) {
+      base = base.copyWith(color: colors.text);
+    }
+
     // Apply inline formatting overrides.
     if (block.bold) {
       base = base.copyWith(fontWeight: FontWeight.w700);
@@ -410,7 +415,7 @@ class _OiRichEditorState extends State<OiRichEditor> {
           focusNode: _blockFocusNodes[index],
           style: style,
           cursorColor: cursorColor,
-          backgroundCursorColor: const Color(0xFF000000),
+          backgroundCursorColor: OiTheme.maybeOf(context)?.colors.text ?? const Color(0xFF000000),
           maxLines: null,
           readOnly: widget.readOnly,
           onChanged: (text) => _onBlockChanged(index, text),
@@ -494,25 +499,25 @@ class _OiRichEditorState extends State<OiRichEditor> {
     final actions = <Widget>[
       // ── Bold / Italic / Underline ─────────────────────────────────────────
       _ToolbarButton(
-        icon: const Text(
+        icon: Text(
           'B',
-          style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
+          style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13, color: iconColor),
         ),
         semanticLabel: 'Bold',
         onPressed: widget.readOnly ? null : () => _toggleFormatting('bold'),
       ),
       _ToolbarButton(
-        icon: const Text(
+        icon: Text(
           'I',
-          style: TextStyle(fontStyle: FontStyle.italic, fontSize: 13),
+          style: TextStyle(fontStyle: FontStyle.italic, fontSize: 13, color: iconColor),
         ),
         semanticLabel: 'Italic',
         onPressed: widget.readOnly ? null : () => _toggleFormatting('italic'),
       ),
       _ToolbarButton(
-        icon: const Text(
+        icon: Text(
           'U',
-          style: TextStyle(decoration: TextDecoration.underline, fontSize: 13),
+          style: TextStyle(decoration: TextDecoration.underline, fontSize: 13, color: iconColor),
         ),
         semanticLabel: 'Underline',
         onPressed: widget.readOnly
@@ -522,9 +527,9 @@ class _OiRichEditorState extends State<OiRichEditor> {
 
       // ── Block type buttons ────────────────────────────────────────────────
       _ToolbarButton(
-        icon: const Text(
+        icon: Text(
           'H1',
-          style: TextStyle(fontWeight: FontWeight.w700, fontSize: 12),
+          style: TextStyle(fontWeight: FontWeight.w700, fontSize: 12, color: iconColor),
         ),
         semanticLabel: 'Heading 1',
         onPressed: widget.readOnly
@@ -533,9 +538,9 @@ class _OiRichEditorState extends State<OiRichEditor> {
       ),
       if (!isMinimal) ...[
         _ToolbarButton(
-          icon: const Text(
+          icon: Text(
             'H2',
-            style: TextStyle(fontWeight: FontWeight.w700, fontSize: 12),
+            style: TextStyle(fontWeight: FontWeight.w700, fontSize: 12, color: iconColor),
           ),
           semanticLabel: 'Heading 2',
           onPressed: widget.readOnly
@@ -543,9 +548,9 @@ class _OiRichEditorState extends State<OiRichEditor> {
               : () => _insertBlock(OiBlockType.heading2),
         ),
         _ToolbarButton(
-          icon: const Text(
+          icon: Text(
             'H3',
-            style: TextStyle(fontWeight: FontWeight.w700, fontSize: 12),
+            style: TextStyle(fontWeight: FontWeight.w700, fontSize: 12, color: iconColor),
           ),
           semanticLabel: 'Heading 3',
           onPressed: widget.readOnly
