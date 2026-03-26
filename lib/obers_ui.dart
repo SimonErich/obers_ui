@@ -101,12 +101,15 @@ export 'src/components/inputs/oi_time_picker_field.dart';
 export 'src/components/interaction/oi_selection_overlay.dart';
 // ── Components: Navigation ───────────────────────────────────────────────────
 
+export 'src/components/navigation/oi_account_switcher.dart';
+export 'src/components/navigation/oi_action_bar.dart';
 export 'src/components/navigation/oi_accordion.dart';
 export 'src/components/navigation/oi_bottom_bar.dart';
 export 'src/components/navigation/oi_breadcrumbs.dart';
 export 'src/components/navigation/oi_date_picker.dart';
 export 'src/components/navigation/oi_drawer.dart';
 export 'src/components/navigation/oi_emoji_picker.dart';
+export 'src/components/navigation/oi_index_bar.dart';
 export 'src/components/navigation/oi_locale_switcher.dart';
 export 'src/components/navigation/oi_navigation_rail.dart';
 export 'src/components/navigation/oi_tab_view.dart';
@@ -114,6 +117,7 @@ export 'src/components/navigation/oi_tabs.dart';
 export 'src/components/navigation/oi_theme_toggle.dart';
 export 'src/components/navigation/oi_time_picker.dart';
 export 'src/components/navigation/oi_user_menu.dart';
+export 'src/components/navigation/oi_week_strip.dart';
 // ── Components: Overlays ─────────────────────────────────────────────────────
 
 export 'src/components/overlays/oi_context_menu.dart';

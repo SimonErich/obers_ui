@@ -1,4 +1,6 @@
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/src/foundation/theme/component_themes/oi_account_switcher_theme_data.dart';
+import 'package:obers_ui/src/foundation/theme/component_themes/oi_action_bar_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_avatar_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_badge_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_banner_theme_data.dart';
@@ -8,6 +10,7 @@ import 'package:obers_ui/src/foundation/theme/component_themes/oi_key_value_them
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_chart_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_checkbox_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_data_grid_theme_data.dart';
+import 'package:obers_ui/src/foundation/theme/component_themes/oi_index_bar_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_date_picker_field_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_dialog_shell_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_dialog_theme_data.dart';
@@ -32,7 +35,10 @@ import 'package:obers_ui/src/foundation/theme/component_themes/oi_tabs_theme_dat
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_text_input_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_toast_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_tooltip_theme_data.dart';
+import 'package:obers_ui/src/foundation/theme/component_themes/oi_week_strip_theme_data.dart';
 
+export 'component_themes/oi_account_switcher_theme_data.dart';
+export 'component_themes/oi_action_bar_theme_data.dart';
 export 'component_themes/oi_avatar_theme_data.dart';
 export 'component_themes/oi_badge_theme_data.dart';
 export 'component_themes/oi_banner_theme_data.dart';
@@ -43,6 +49,7 @@ export 'component_themes/oi_chart_theme_data.dart';
 export 'component_themes/oi_checkbox_theme_data.dart';
 export 'component_themes/oi_key_value_theme_data.dart';
 export 'component_themes/oi_data_grid_theme_data.dart';
+export 'component_themes/oi_index_bar_theme_data.dart';
 export 'component_themes/oi_date_picker_field_theme_data.dart';
 export 'component_themes/oi_dialog_shell_theme_data.dart';
 export 'component_themes/oi_dialog_theme_data.dart';
@@ -68,6 +75,7 @@ export 'component_themes/oi_tabs_theme_data.dart';
 export 'component_themes/oi_text_input_theme_data.dart';
 export 'component_themes/oi_toast_theme_data.dart';
 export 'component_themes/oi_tooltip_theme_data.dart';
+export 'component_themes/oi_week_strip_theme_data.dart';
 
 /// Aggregates per-component theme overrides for the design system.
 ///
@@ -113,6 +121,10 @@ class OiComponentThemes {
     this.datePickerField,
     this.dataGrid,
     this.keyValue,
+    this.actionBar,
+    this.indexBar,
+    this.accountSwitcher,
+    this.weekStrip,
   });
 
   /// Creates an [OiComponentThemes] with all fields set to `null`.
@@ -151,7 +163,11 @@ class OiComponentThemes {
       reorderableList = null,
       datePickerField = null,
       dataGrid = null,
-      keyValue = null;
+      keyValue = null,
+      actionBar = null,
+      indexBar = null,
+      accountSwitcher = null,
+      weekStrip = null;
 
   /// Theme overrides for button components.
   final OiButtonThemeData? button;
@@ -252,6 +268,18 @@ class OiComponentThemes {
   /// Theme overrides for key-value display components.
   final OiKeyValueThemeData? keyValue;
 
+  /// Theme overrides for action bar components.
+  final OiActionBarThemeData? actionBar;
+
+  /// Theme overrides for index bar components.
+  final OiIndexBarThemeData? indexBar;
+
+  /// Theme overrides for account switcher components.
+  final OiAccountSwitcherThemeData? accountSwitcher;
+
+  /// Theme overrides for week strip components.
+  final OiWeekStripThemeData? weekStrip;
+
   /// Creates a copy with optionally overridden component theme fields.
   OiComponentThemes copyWith({
     OiButtonThemeData? button,
@@ -287,6 +315,10 @@ class OiComponentThemes {
     OiDatePickerFieldThemeData? datePickerField,
     OiDataGridThemeData? dataGrid,
     OiKeyValueThemeData? keyValue,
+    OiActionBarThemeData? actionBar,
+    OiIndexBarThemeData? indexBar,
+    OiAccountSwitcherThemeData? accountSwitcher,
+    OiWeekStripThemeData? weekStrip,
   }) {
     return OiComponentThemes(
       button: button ?? this.button,
@@ -322,6 +354,10 @@ class OiComponentThemes {
       datePickerField: datePickerField ?? this.datePickerField,
       dataGrid: dataGrid ?? this.dataGrid,
       keyValue: keyValue ?? this.keyValue,
+      actionBar: actionBar ?? this.actionBar,
+      indexBar: indexBar ?? this.indexBar,
+      accountSwitcher: accountSwitcher ?? this.accountSwitcher,
+      weekStrip: weekStrip ?? this.weekStrip,
     );
   }
 
@@ -361,7 +397,11 @@ class OiComponentThemes {
         other.reorderableList == reorderableList &&
         other.datePickerField == datePickerField &&
         other.dataGrid == dataGrid &&
-        other.keyValue == keyValue;
+        other.keyValue == keyValue &&
+        other.actionBar == actionBar &&
+        other.indexBar == indexBar &&
+        other.accountSwitcher == accountSwitcher &&
+        other.weekStrip == weekStrip;
   }
 
   @override
@@ -400,6 +440,7 @@ class OiComponentThemes {
       datePickerField,
       dataGrid,
       keyValue,
+      Object.hash(actionBar, accountSwitcher, indexBar, weekStrip),
     ),
   );
 }
