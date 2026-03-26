@@ -41,6 +41,14 @@ export 'src/composites/oi_bubble_chart/oi_bubble_chart_interaction.dart';
 export 'src/composites/oi_bubble_chart/oi_bubble_chart_legend.dart';
 export 'src/composites/oi_bubble_chart/oi_bubble_chart_size_legend.dart';
 export 'src/composites/oi_bubble_chart/oi_bubble_chart_theme.dart';
+// ── Composites: Candlestick Chart ────────────────────────────────────────────
+
+export 'src/composites/oi_candlestick_chart/oi_candlestick_chart.dart';
+export 'src/composites/oi_candlestick_chart/oi_candlestick_chart_data.dart';
+export 'src/composites/oi_candlestick_chart/oi_candlestick_chart_painter.dart';
+// ── Composites: Combo Chart ──────────────────────────────────────────────────
+
+export 'src/composites/oi_combo_chart.dart';
 // ── Composites: Line Chart ───────────────────────────────────────────────────
 
 export 'src/composites/oi_line_chart/oi_line_chart.dart';
