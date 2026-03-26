@@ -30,6 +30,17 @@ export 'src/composites/oi_area_chart/oi_area_chart_theme.dart';
 export 'src/composites/oi_histogram/oi_histogram.dart';
 export 'src/composites/oi_histogram/oi_histogram_data.dart';
 export 'src/composites/oi_histogram/oi_histogram_painter.dart';
+// ── Composites: Box Plot Chart ────────────────────────────────────────────────
+
+export 'src/composites/oi_box_plot_chart/oi_box_plot_chart.dart';
+export 'src/composites/oi_box_plot_chart/oi_box_plot_data.dart';
+export 'src/composites/oi_box_plot_chart/oi_box_plot_painter.dart';
+// ── Composites: Range Area Chart ─────────────────────────────────────────────
+
+export 'src/composites/oi_range_area_chart.dart';
+// ── Composites: Range Bar Chart ───────────────────────────────────────────────
+
+export 'src/composites/oi_range_bar_chart.dart';
 // ── Composites: Waterfall Chart ───────────────────────────────────────────────
 
 export 'src/composites/oi_waterfall_chart/oi_waterfall_chart.dart';
