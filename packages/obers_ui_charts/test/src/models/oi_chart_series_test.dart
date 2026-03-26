@@ -4,7 +4,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui_charts/src/foundation/oi_streaming_data_source.dart';
 import 'package:obers_ui_charts/src/models/oi_cartesian_series.dart';
 import 'package:obers_ui_charts/src/models/oi_chart_datum.dart';
-import 'package:obers_ui_charts/src/models/oi_chart_series.dart';
 
 class _SalesRecord {
   const _SalesRecord(this.date, this.amount);

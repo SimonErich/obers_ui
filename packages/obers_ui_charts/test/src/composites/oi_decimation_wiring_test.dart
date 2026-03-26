@@ -23,8 +23,6 @@ void main() {
         (i) => _Point(i.toDouble(), (i * 7 % 50).toDouble()),
       );
 
-      Map<String, List<OiChartDatum>>? capturedNormalized;
-
       await tester.pumpChartApp(
         SizedBox(
           width: 400,

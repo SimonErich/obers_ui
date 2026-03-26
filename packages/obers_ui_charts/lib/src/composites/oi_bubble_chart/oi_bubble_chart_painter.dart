@@ -1,7 +1,6 @@
 import 'dart:math' as math;
 
 import 'package:flutter/widgets.dart';
-import 'package:obers_ui/obers_ui.dart';
 
 /// Resolved data for a single bubble ready for painting.
 class ResolvedBubble {

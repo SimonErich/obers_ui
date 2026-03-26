@@ -120,10 +120,8 @@ void main() {
       expect(states.last, isNull);
     });
 
-    test('pointer cancel clears state', () {
-      OiChartCrosshairState? lastState = const OiChartCrosshairState(
-        position: Offset(1, 1),
-      );
+    test('pointer cancel clears state after state was set', () {
+      OiChartCrosshairState? lastState;
 
       behavior.detach();
       behavior = OiChartCrosshairBehavior(
@@ -131,6 +129,13 @@ void main() {
       );
       behavior.attach(behaviorContext);
 
+      // First establish some state by hovering inside the plot area.
+      behavior.onPointerHover(
+        const PointerHoverEvent(position: Offset(200, 150)),
+      );
+      expect(lastState, isNotNull);
+
+      // Cancel should clear the state.
       behavior.onPointerCancel(const PointerCancelEvent());
 
       expect(lastState, isNull);

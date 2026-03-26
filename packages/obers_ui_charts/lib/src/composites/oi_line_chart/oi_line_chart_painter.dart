@@ -1,7 +1,6 @@
 import 'dart:math' as math;
 
 import 'package:flutter/rendering.dart';
-import 'package:obers_ui/obers_ui.dart';
 import 'package:obers_ui_charts/src/composites/_chart_grid_painter.dart';
 import 'package:obers_ui_charts/src/composites/oi_line_chart/oi_line_chart.dart'
     show OiLineChart;

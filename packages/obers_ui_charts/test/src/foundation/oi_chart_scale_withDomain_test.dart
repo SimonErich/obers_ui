@@ -13,7 +13,7 @@ void main() {
           rangeMax: 400,
         );
 
-        final constrained = scale.withDomain(25, 75) as OiLinearScale;
+        final constrained = scale.withDomain(25, 75);
 
         expect(constrained.domainMin, 25);
         expect(constrained.domainMax, 75);
@@ -36,7 +36,7 @@ void main() {
         base: 10,
       );
 
-      final constrained = scale.withDomain(10, 100) as OiLogarithmicScale;
+      final constrained = scale.withDomain(10, 100);
 
       expect(constrained.domainMin, 10);
       expect(constrained.domainMax, 100);
@@ -51,8 +51,7 @@ void main() {
         rangeMax: 500,
       );
 
-      final constrained =
-          scale.withDomain(DateTime(2022), DateTime(2024)) as OiTimeScale;
+      final constrained = scale.withDomain(DateTime(2022), DateTime(2024));
 
       expect(constrained.domainMin, DateTime(2022));
       expect(constrained.domainMax, DateTime(2024));

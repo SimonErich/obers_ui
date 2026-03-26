@@ -159,6 +159,8 @@ class _OiCartesianChartState<T> extends State<OiCartesianChart<T>>
   OiChartViewport _viewport = const OiChartViewport(size: Size.zero);
 
   /// Cached normalized data from the last build, keyed by series id.
+  // Cached for future use by seriesBuilder once the API is exposed.
+  // ignore: unused_field
   Map<String, List<OiChartDatum>> _lastNormalizedData = const {};
 
   // ── ChartBehaviorHost overrides ──────────────────────────────────────

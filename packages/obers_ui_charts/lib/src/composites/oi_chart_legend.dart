@@ -1,7 +1,6 @@
 import 'package:flutter/services.dart';
 import 'package:obers_ui/obers_ui.dart';
 import 'package:flutter/widgets.dart';
-import 'package:obers_ui/obers_ui.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Legend Position

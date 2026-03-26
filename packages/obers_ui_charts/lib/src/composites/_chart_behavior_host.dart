@@ -85,6 +85,9 @@ mixin ChartBehaviorHost<T extends StatefulWidget> on State<T> {
   /// Override to return the sync group, if any.
   OiChartSyncGroup? get syncGroup => null;
 
+  // Stored for future unregistration when the widget is disposed or
+  // the sync group changes.
+  // ignore: unused_field
   OiChartSyncCoordinator? _syncCoordinator;
 
   /// Registers with the sync coordinator if syncGroup is set.

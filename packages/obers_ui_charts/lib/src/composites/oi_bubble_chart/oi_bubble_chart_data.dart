@@ -1,5 +1,4 @@
 import 'package:flutter/painting.dart';
-import 'package:obers_ui/obers_ui.dart';
 import 'package:obers_ui_charts/src/composites/oi_bubble_chart/oi_bubble_chart.dart'
     show OiBubbleChart;
 import 'package:obers_ui_charts/src/models/oi_cartesian_series.dart';

@@ -1,6 +1,3 @@
-import 'package:flutter/widgets.dart';
-
-import 'package:obers_ui_charts/src/foundation/oi_streaming_data_source.dart';
 import 'package:obers_ui_charts/src/models/oi_chart_series.dart';
 
 /// A series for cartesian (x/y) chart types such as line, bar, area, and

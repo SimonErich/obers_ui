@@ -22,18 +22,6 @@ class _TestHitTester extends OiChartHitTester {
 
 class _FakeBuildContext extends Fake implements BuildContext {}
 
-// Helper: creates a fresh context + behavior, attaches, and returns a cleanup
-// function. This avoids double-detach when tests call detach() themselves.
-OiChartBehaviorContext _makeContext() {
-  return OiChartBehaviorContext(
-    buildContext: _FakeBuildContext(),
-    controller: _TestController(),
-    viewport: const OiChartViewport(size: Size(400, 300)),
-    hitTester: _TestHitTester(),
-    theme: OiChartThemeData(),
-  );
-}
-
 void main() {
   late OiChartBrushBehavior behavior;
   late _TestController controller;
