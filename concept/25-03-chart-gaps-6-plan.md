@@ -15,35 +15,35 @@ Close final 3%: add behaviors/controller/annotations/thresholds params to 12 con
 ### Phase 1: Add Behavior Params to 12 Concrete Charts
 
 - **Goal**: Every concrete chart accepts behaviors, controller, annotations, thresholds
-- [ ] `lib/src/composites/oi_bar_chart/oi_bar_chart.dart` — Add `behaviors`, `controller`, `annotations`, `thresholds`, `legendConfig`, `performance`, `syncGroup` params + fields
-- [ ] `lib/src/composites/oi_bubble_chart/oi_bubble_chart.dart` — Same params
-- [ ] `lib/src/composites/oi_scatter_plot.dart` — Same params
-- [ ] `lib/src/composites/oi_pie_chart.dart` — Add `behaviors`, `controller` (no annotations/thresholds for pie)
-- [ ] `lib/src/composites/oi_radar_chart.dart` — Same as pie
-- [ ] `lib/src/composites/oi_heatmap.dart` — Add `behaviors`, `controller`
-- [ ] `lib/src/composites/oi_treemap.dart` — Add `behaviors`, `controller`
-- [ ] `lib/src/composites/oi_sankey.dart` — Add `behaviors`, `controller`
-- [ ] `lib/src/composites/oi_funnel_chart.dart` — Add `behaviors`, `controller`
-- [ ] `lib/src/composites/oi_sparkline.dart` — Add `behaviors`, `controller`
-- [ ] `lib/src/composites/oi_gauge.dart` — Add `controller`
-- [ ] `lib/src/composites/oi_donut_chart.dart` — Add `behaviors`, `controller` (forwarded to OiPieChart)
-- [ ] Verify: `dart analyze` && `flutter test`
+- [x] `lib/src/composites/oi_bar_chart/oi_bar_chart.dart` — Add `behaviors`, `controller`, `annotations`, `thresholds`, `legendConfig`, `performance`, `syncGroup` params + fields
+- [x] `lib/src/composites/oi_bubble_chart/oi_bubble_chart.dart` — Same params
+- [x] `lib/src/composites/oi_scatter_plot.dart` — Same params
+- [x] `lib/src/composites/oi_pie_chart.dart` — Add `behaviors`, `controller` (no annotations/thresholds for pie)
+- [x] `lib/src/composites/oi_radar_chart.dart` — Same as pie
+- [x] `lib/src/composites/oi_heatmap.dart` — Add `behaviors`, `controller`
+- [x] `lib/src/composites/oi_treemap.dart` — Add `behaviors`, `controller`
+- [x] `lib/src/composites/oi_sankey.dart` — Add `behaviors`, `controller`
+- [x] `lib/src/composites/oi_funnel_chart.dart` — Add `behaviors`, `controller`
+- [x] `lib/src/composites/oi_sparkline.dart` — Add `behaviors`, `controller`
+- [x] `lib/src/composites/oi_gauge.dart` — Add `controller`
+- [x] `lib/src/composites/oi_donut_chart.dart` — Add `behaviors`, `controller` (forwarded to OiPieChart)
+- [x] Verify: `dart analyze` && `flutter test`
 
 ### Phase 2: Wire Sync + Persistence in Remaining Family Bases
 
 - **Goal**: All family bases support sync registration and settings persistence
-- [ ] `lib/src/composites/oi_polar_chart.dart` — Add `syncGroup: OiChartSyncGroup?` and `settings: OiChartSettings?` params. Override `syncGroup` getter. Call `restoreSettings(widget.settings)` in initState. Call `registerSync()` in behavior attach callback.
-- [ ] `lib/src/composites/oi_matrix_chart.dart` — Same wiring
-- [ ] `lib/src/composites/oi_hierarchical_chart.dart` — Same wiring
-- [ ] `lib/src/composites/oi_flow_chart.dart` — Same wiring
-- [ ] Verify: `dart analyze` && `flutter test`
+- [x] `lib/src/composites/oi_polar_chart.dart` — Add `syncGroup: OiChartSyncGroup?` and `settings: OiChartSettings?` params. Override `syncGroup` getter. Call `restoreSettings(widget.settings)` in initState. Call `registerSync()` in behavior attach callback.
+- [x] `lib/src/composites/oi_matrix_chart.dart` — Same wiring
+- [x] `lib/src/composites/oi_hierarchical_chart.dart` — Same wiring
+- [x] `lib/src/composites/oi_flow_chart.dart` — Same wiring
+- [x] Verify: `dart analyze` && `flutter test`
 
 ### Phase 3: Fix Bubble Chart Test Failures
 
 - **Goal**: 0 test failures
-- [ ] `lib/src/composites/oi_bubble_chart/oi_bubble_chart.dart` — Fix vertical overflow: wrap chart body + narration + legend in a Column with Expanded for the chart body so legend/narration don't push total height beyond constraints. Use Flexible or constrain narration widget.
-- [ ] `test/src/composites/oi_bubble_chart/oi_bubble_chart_test.dart` — Verify 3 failing tests now pass
-- [ ] Verify: `flutter test` (target: 0 failures)
+- [x] `lib/src/composites/oi_bubble_chart/oi_bubble_chart.dart` — Fix vertical overflow: wrap chart body + narration + legend in a Column with Expanded for the chart body so legend/narration don't push total height beyond constraints. Use Flexible or constrain narration widget.
+- [x] `test/src/composites/oi_bubble_chart/oi_bubble_chart_test.dart` — Verify 3 failing tests now pass
+- [x] Verify: `flutter test` (target: 0 failures)
 
 ## Risks / Out of scope
 
