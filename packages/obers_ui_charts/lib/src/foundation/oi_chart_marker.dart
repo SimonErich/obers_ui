@@ -87,6 +87,17 @@ class OiChartMarkerStyle {
     this.customPathBuilder,
   });
 
+  /// Creates a hidden marker (not rendered, but hit area may still exist).
+  const OiChartMarkerStyle.hidden()
+    : shape = OiChartMarkerShape.circle,
+      size = 0,
+      fillColor = null,
+      strokeColor = null,
+      strokeWidth = 0,
+      visible = false,
+      dashPattern = null,
+      customPathBuilder = null;
+
   /// The geometric shape of the marker.
   final OiChartMarkerShape shape;
 
