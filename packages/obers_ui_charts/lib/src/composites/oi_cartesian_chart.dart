@@ -33,11 +33,21 @@ import 'package:obers_ui_charts/src/models/oi_chart_threshold.dart';
 
 /// Base composite widget for all cartesian (x/y) chart types.
 ///
-/// Orchestrates: viewport calculation, scale resolution, behavior dispatch,
-/// accessibility tree, persistence integration, and sync group registration.
+/// This is the **power API** for cartesian charts. It provides full access to:
+/// - Mapper-first data binding via [OiCartesianSeries] subclasses
+/// - Composable [behaviors] (tooltip, crosshair, zoom, selection, etc.)
+/// - Chart [controller] for programmatic state management
+/// - [annotations] and [thresholds] for reference lines
+/// - [performance] config with automatic decimation
+/// - [settings] persistence via OiSettingsDriver
+/// - [syncGroup] for multi-chart synchronization
+/// - Data normalization pipeline producing [OiChartDatum] lists
 ///
-/// Concrete chart types (line, bar, area, scatter) provide a [seriesBuilder]
-/// that paints series data within the computed chart area.
+/// For simpler usage with pre-mapped data, use the convenience wrappers:
+/// [OiLineChart], [OiBarChart], [OiBubbleChart], etc.
+///
+/// Concrete chart types provide a [seriesBuilder] that paints series data
+/// within the computed chart area.
 ///
 /// {@category Composites}
 class OiCartesianChart<T> extends StatefulWidget {

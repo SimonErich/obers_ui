@@ -39,10 +39,11 @@ class OiBubbleChartSizeLegend extends StatelessWidget {
       label: config.sizeLabel != null
           ? 'Size legend: ${config.sizeLabel}'
           : 'Size legend',
-      child: Row(
+      child: Wrap(
         key: const Key('oi_bubble_chart_size_legend'),
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.end,
+        crossAxisAlignment: WrapCrossAlignment.end,
+        spacing: 0,
+        runSpacing: 4,
         children: [
           if (config.sizeLabel != null)
             Padding(
