@@ -6,7 +6,10 @@ import 'package:obers_ui_charts/src/foundation/oi_chart_accessibility_bridge.dar
 import 'package:obers_ui_charts/src/foundation/oi_chart_behavior.dart';
 import 'package:obers_ui_charts/src/foundation/oi_chart_controller.dart';
 import 'package:obers_ui_charts/src/foundation/oi_chart_hit_tester.dart';
+import 'package:obers_ui_charts/src/foundation/oi_chart_sync_coordinator.dart';
+import 'package:obers_ui_charts/src/foundation/oi_chart_sync_group.dart';
 import 'package:obers_ui_charts/src/foundation/oi_chart_viewport.dart';
+import 'package:obers_ui_charts/src/models/oi_chart_settings.dart';
 import 'package:obers_ui_charts/src/models/oi_default_chart_controller.dart';
 
 /// Shared mixin for chart [State] classes that host behaviors.
@@ -67,13 +70,54 @@ mixin ChartBehaviorHost<T extends StatefulWidget> on State<T> {
     _attachedBehaviors = const [];
   }
 
-  /// Disposes internal controller and detaches behaviors.
+  /// Disposes internal controller, detaches behaviors, unregisters sync.
   ///
   /// Call from [dispose].
   void disposeBehaviorHost() {
+    _unregisterSync();
     detachBehaviors();
     _internalController?.dispose();
     _internalController = null;
+  }
+
+  // ── Sync registration ──────────────────────────────────────────────────
+
+  /// Override to return the sync group, if any.
+  OiChartSyncGroup? get syncGroup => null;
+
+  OiChartSyncCoordinator? _syncCoordinator;
+
+  /// Registers with the sync coordinator if syncGroup is set.
+  void registerSync() {
+    if (syncGroup == null) return;
+    _syncCoordinator = OiChartSyncProvider.of(context);
+  }
+
+  void _unregisterSync() {
+    _syncCoordinator = null;
+  }
+
+  // ── Persistence ────────────────────────────────────────────────────────
+
+  /// Restores controller state from persisted [settings].
+  void restoreSettings(OiChartSettings? settings) {
+    if (settings == null) return;
+    final ctrl = effectiveController;
+
+    // Restore hidden series → legend state.
+    for (final id in settings.hiddenSeriesIds) {
+      ctrl.toggleSeries(id);
+    }
+
+    // Restore viewport.
+    if (settings.viewport != null) {
+      ctrl.setVisibleDomain(
+        xMin: settings.viewport!.xMin,
+        xMax: settings.viewport!.xMax,
+        yMin: settings.viewport!.yMin,
+        yMax: settings.viewport!.yMax,
+      );
+    }
   }
 
   // ── Overlay collection ─────────────────────────────────────────────────

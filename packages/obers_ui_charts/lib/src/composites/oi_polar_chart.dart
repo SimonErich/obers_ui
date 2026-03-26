@@ -4,6 +4,7 @@ import 'package:obers_ui_charts/src/components/oi_chart_empty_state.dart';
 import 'package:obers_ui_charts/src/components/oi_chart_error_state.dart';
 import 'package:obers_ui_charts/src/components/oi_chart_loading_state.dart';
 import 'package:obers_ui_charts/src/composites/_chart_behavior_host.dart';
+import 'package:obers_ui_charts/src/composites/_chart_streaming_host.dart';
 import 'package:obers_ui_charts/src/foundation/oi_chart_accessibility_config.dart';
 import 'package:obers_ui_charts/src/foundation/oi_chart_behavior.dart';
 import 'package:obers_ui_charts/src/foundation/oi_chart_controller.dart';
@@ -16,6 +17,7 @@ import 'package:obers_ui_charts/src/models/oi_chart_annotation.dart';
 // ignore: unused_import
 import 'package:obers_ui_charts/src/models/oi_chart_threshold.dart';
 import 'package:obers_ui_charts/src/models/oi_polar_axis.dart';
+import 'package:obers_ui_charts/src/models/oi_chart_series.dart';
 import 'package:obers_ui_charts/src/models/oi_polar_series.dart';
 
 /// Base composite widget for radial/polar chart types (pie, donut, radar).
@@ -92,7 +94,9 @@ class OiPolarChart<T> extends StatefulWidget {
 }
 
 class _OiPolarChartState<T> extends State<OiPolarChart<T>>
-    with ChartBehaviorHost<OiPolarChart<T>> {
+    with
+        ChartBehaviorHost<OiPolarChart<T>>,
+        ChartStreamingHost<OiPolarChart<T>> {
   OiChartViewport _viewport = const OiChartViewport(size: Size.zero);
 
   // ── ChartBehaviorHost overrides ──────────────────────────────────────
@@ -111,11 +115,17 @@ class _OiPolarChartState<T> extends State<OiPolarChart<T>>
 
   final OiChartHitTester _hitTester = NoOpHitTester();
 
+  // ── ChartStreamingHost overrides ───────────────────────────────────
+
+  @override
+  List<OiChartSeries<dynamic>> get streamingSeries => widget.series;
+
   // ── Lifecycle ────────────────────────────────────────────────────────
 
   @override
   void initState() {
     super.initState();
+    attachStreamingAdapters();
     // Defer behavior attach to first build (needs context).
   }
 
@@ -130,6 +140,7 @@ class _OiPolarChartState<T> extends State<OiPolarChart<T>>
 
   @override
   void dispose() {
+    detachStreamingAdapters();
     disposeBehaviorHost();
     super.dispose();
   }

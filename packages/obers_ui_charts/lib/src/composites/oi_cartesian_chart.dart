@@ -4,6 +4,7 @@ import 'package:obers_ui_charts/src/components/oi_chart_empty_state.dart';
 import 'package:obers_ui_charts/src/components/oi_chart_error_state.dart';
 import 'package:obers_ui_charts/src/components/oi_chart_loading_state.dart';
 import 'package:obers_ui_charts/src/composites/_chart_behavior_host.dart';
+import 'package:obers_ui_charts/src/composites/_chart_streaming_host.dart';
 import 'package:obers_ui_charts/src/composites/oi_chart_axis.dart';
 import 'package:obers_ui_charts/src/foundation/oi_chart_accessibility_config.dart';
 import 'package:obers_ui_charts/src/foundation/oi_chart_animation_config.dart';
@@ -20,6 +21,7 @@ import 'package:obers_ui_charts/src/models/oi_chart_complexity.dart';
 import 'package:obers_ui_charts/src/utils/chart_math.dart';
 
 import 'package:obers_ui_charts/src/models/oi_cartesian_series.dart';
+import 'package:obers_ui_charts/src/models/oi_chart_series.dart';
 import 'package:obers_ui_charts/src/models/oi_chart_annotation.dart';
 import 'package:obers_ui_charts/src/models/oi_chart_legend_config.dart';
 import 'package:obers_ui_charts/src/models/oi_chart_settings.dart';
@@ -137,7 +139,9 @@ class OiCartesianChart<T> extends StatefulWidget {
 }
 
 class _OiCartesianChartState<T> extends State<OiCartesianChart<T>>
-    with ChartBehaviorHost<OiCartesianChart<T>> {
+    with
+        ChartBehaviorHost<OiCartesianChart<T>>,
+        ChartStreamingHost<OiCartesianChart<T>> {
   OiChartViewport _viewport = const OiChartViewport(size: Size.zero);
 
   // ── ChartBehaviorHost overrides ──────────────────────────────────────
@@ -156,12 +160,23 @@ class _OiCartesianChartState<T> extends State<OiCartesianChart<T>>
 
   final OiChartHitTester _hitTester = NoOpHitTester();
 
+  // ── ChartStreamingHost overrides ───────────────────────────────────
+
+  @override
+  List<OiChartSeries<dynamic>> get streamingSeries => widget.series;
+
+  // ── Sync override ──────────────────────────────────────────────────
+
+  @override
+  OiChartSyncGroup? get syncGroup => widget.syncGroup;
+
   // ── Lifecycle ────────────────────────────────────────────────────────
 
   @override
   void initState() {
     super.initState();
-    // Defer behavior attach to first build (needs context).
+    attachStreamingAdapters();
+    restoreSettings(widget.settings);
   }
 
   @override
@@ -175,6 +190,7 @@ class _OiCartesianChartState<T> extends State<OiCartesianChart<T>>
 
   @override
   void dispose() {
+    detachStreamingAdapters();
     disposeBehaviorHost();
     super.dispose();
   }
@@ -297,10 +313,13 @@ class _OiCartesianChartState<T> extends State<OiCartesianChart<T>>
             visibleDomain: visibleDomain,
           );
 
-          // Attach behaviors now that we have a valid context.
+          // Attach behaviors and sync now that we have a valid context.
           if (behaviors.isNotEmpty && behaviors.any((b) => !b.isAttached)) {
             WidgetsBinding.instance.addPostFrameCallback((_) {
-              if (mounted) attachBehaviors();
+              if (mounted) {
+                attachBehaviors();
+                registerSync();
+              }
             });
           }
 
