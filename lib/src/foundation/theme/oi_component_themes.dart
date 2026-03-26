@@ -1,8 +1,10 @@
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_avatar_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_badge_theme_data.dart';
+import 'package:obers_ui/src/foundation/theme/component_themes/oi_banner_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_button_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_card_theme_data.dart';
+import 'package:obers_ui/src/foundation/theme/component_themes/oi_key_value_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_chart_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_checkbox_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_data_grid_theme_data.dart';
@@ -33,11 +35,13 @@ import 'package:obers_ui/src/foundation/theme/component_themes/oi_tooltip_theme_
 
 export 'component_themes/oi_avatar_theme_data.dart';
 export 'component_themes/oi_badge_theme_data.dart';
+export 'component_themes/oi_banner_theme_data.dart';
 export 'component_themes/oi_button_theme_data.dart';
 export 'component_themes/oi_card_theme_data.dart';
 export 'component_themes/oi_chart_palette.dart';
 export 'component_themes/oi_chart_theme_data.dart';
 export 'component_themes/oi_checkbox_theme_data.dart';
+export 'component_themes/oi_key_value_theme_data.dart';
 export 'component_themes/oi_data_grid_theme_data.dart';
 export 'component_themes/oi_date_picker_field_theme_data.dart';
 export 'component_themes/oi_dialog_shell_theme_data.dart';
@@ -87,6 +91,7 @@ class OiComponentThemes {
     this.table,
     this.tabs,
     this.badge,
+    this.banner,
     this.checkbox,
     this.switchTheme,
     this.sheet,
@@ -107,6 +112,7 @@ class OiComponentThemes {
     this.reorderableList,
     this.datePickerField,
     this.dataGrid,
+    this.keyValue,
   });
 
   /// Creates an [OiComponentThemes] with all fields set to `null`.
@@ -124,6 +130,7 @@ class OiComponentThemes {
       table = null,
       tabs = null,
       badge = null,
+      banner = null,
       checkbox = null,
       switchTheme = null,
       sheet = null,
@@ -143,7 +150,8 @@ class OiComponentThemes {
       tabView = null,
       reorderableList = null,
       datePickerField = null,
-      dataGrid = null;
+      dataGrid = null,
+      keyValue = null;
 
   /// Theme overrides for button components.
   final OiButtonThemeData? button;
@@ -177,6 +185,9 @@ class OiComponentThemes {
 
   /// Theme overrides for badge components.
   final OiBadgeThemeData? badge;
+
+  /// Theme overrides for banner components.
+  final OiBannerThemeData? banner;
 
   /// Theme overrides for checkbox components.
   final OiCheckboxThemeData? checkbox;
@@ -238,6 +249,9 @@ class OiComponentThemes {
   /// Theme overrides for data grid components.
   final OiDataGridThemeData? dataGrid;
 
+  /// Theme overrides for key-value display components.
+  final OiKeyValueThemeData? keyValue;
+
   /// Creates a copy with optionally overridden component theme fields.
   OiComponentThemes copyWith({
     OiButtonThemeData? button,
@@ -251,6 +265,7 @@ class OiComponentThemes {
     OiTableThemeData? table,
     OiTabsThemeData? tabs,
     OiBadgeThemeData? badge,
+    OiBannerThemeData? banner,
     OiCheckboxThemeData? checkbox,
     OiSwitchThemeData? switchTheme,
     OiSheetThemeData? sheet,
@@ -271,6 +286,7 @@ class OiComponentThemes {
     OiReorderableListThemeData? reorderableList,
     OiDatePickerFieldThemeData? datePickerField,
     OiDataGridThemeData? dataGrid,
+    OiKeyValueThemeData? keyValue,
   }) {
     return OiComponentThemes(
       button: button ?? this.button,
@@ -284,6 +300,7 @@ class OiComponentThemes {
       table: table ?? this.table,
       tabs: tabs ?? this.tabs,
       badge: badge ?? this.badge,
+      banner: banner ?? this.banner,
       checkbox: checkbox ?? this.checkbox,
       switchTheme: switchTheme ?? this.switchTheme,
       sheet: sheet ?? this.sheet,
@@ -304,6 +321,7 @@ class OiComponentThemes {
       reorderableList: reorderableList ?? this.reorderableList,
       datePickerField: datePickerField ?? this.datePickerField,
       dataGrid: dataGrid ?? this.dataGrid,
+      keyValue: keyValue ?? this.keyValue,
     );
   }
 
@@ -322,6 +340,7 @@ class OiComponentThemes {
         other.table == table &&
         other.tabs == tabs &&
         other.badge == badge &&
+        other.banner == banner &&
         other.checkbox == checkbox &&
         other.switchTheme == switchTheme &&
         other.sheet == sheet &&
@@ -341,7 +360,8 @@ class OiComponentThemes {
         other.tabView == tabView &&
         other.reorderableList == reorderableList &&
         other.datePickerField == datePickerField &&
-        other.dataGrid == dataGrid;
+        other.dataGrid == dataGrid &&
+        other.keyValue == keyValue;
   }
 
   @override
@@ -357,6 +377,7 @@ class OiComponentThemes {
     table,
     tabs,
     badge,
+    banner,
     checkbox,
     switchTheme,
     sheet,
@@ -378,6 +399,7 @@ class OiComponentThemes {
       reorderableList,
       datePickerField,
       dataGrid,
+      keyValue,
     ),
   );
 }

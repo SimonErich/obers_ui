@@ -40,6 +40,7 @@ export 'src/components/display/oi_file_tile.dart';
 export 'src/components/display/oi_folder_icon.dart';
 export 'src/components/display/oi_folder_tree_item.dart';
 export 'src/components/display/oi_image.dart';
+export 'src/components/display/oi_key_value.dart';
 export 'src/components/display/oi_list_tile.dart';
 export 'src/components/display/oi_markdown.dart';
 export 'src/components/display/oi_metric.dart';
@@ -59,6 +60,7 @@ export 'src/components/display/oi_storage_indicator.dart';
 export 'src/components/display/oi_tooltip.dart';
 // ── Components: Feedback ─────────────────────────────────────────────────────
 
+export 'src/components/feedback/oi_banner.dart';
 export 'src/components/feedback/oi_bulk_bar.dart';
 export 'src/components/feedback/oi_reaction_bar.dart';
 export 'src/components/feedback/oi_scale_rating.dart';
