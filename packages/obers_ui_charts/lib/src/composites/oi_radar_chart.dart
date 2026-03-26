@@ -325,3 +325,48 @@ class _OiRadarChartPainter extends CustomPainter {
       oldDelegate.showValues != showValues ||
       oldDelegate.gridColor != gridColor;
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Mapper-first series (concept-aligned)
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// A mapper-first radar series that extracts values from domain model `T`.
+///
+/// Radar charts are polar (not cartesian), so this class does not extend
+/// `OiCartesianSeries`. Use [OiRadarSeries] for the simpler pre-mapped API.
+///
+/// {@category Composites}
+class OiRadarSeriesData<T> {
+  /// Creates an [OiRadarSeriesData].
+  const OiRadarSeriesData({
+    required this.id,
+    required this.label,
+    required this.data,
+    required this.valueMapper,
+    this.labelMapper,
+    this.color,
+    this.visible = true,
+  });
+
+  /// A unique identifier for this series.
+  final String id;
+
+  /// The display name for this series (shown in legend).
+  final String label;
+
+  /// The domain objects, one per radar axis.
+  final List<T> data;
+
+  /// Extracts the numeric value for a radar axis from a domain object.
+  final num Function(T item) valueMapper;
+
+  /// Optional: extracts an axis label from a domain object. When null, the
+  /// axis labels must be provided separately to the chart widget.
+  final String? Function(T item)? labelMapper;
+
+  /// An optional color override for this series.
+  final Color? color;
+
+  /// Whether this series is visible. Defaults to true.
+  final bool visible;
+}

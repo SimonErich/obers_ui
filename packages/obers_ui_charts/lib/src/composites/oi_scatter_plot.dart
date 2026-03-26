@@ -5,6 +5,7 @@ import 'package:obers_ui/obers_ui.dart';
 import 'package:obers_ui_charts/src/composites/_chart_grid_painter.dart';
 import 'package:obers_ui_charts/src/composites/oi_bubble_chart/oi_bubble_chart_interaction.dart';
 import 'package:obers_ui_charts/src/composites/oi_chart_axis.dart';
+import 'package:obers_ui_charts/src/models/oi_cartesian_series.dart';
 
 /// Point shape in a scatter plot.
 ///
@@ -581,4 +582,32 @@ class _OiScatterPlotPainter extends CustomPainter {
       oldDelegate.compact != compact ||
       oldDelegate.hoveredSeriesIndex != hoveredSeriesIndex ||
       oldDelegate.hoveredPointIndex != hoveredPointIndex;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Mapper-first series (concept-aligned)
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// A mapper-first scatter series that extracts values from domain model `T`.
+///
+/// This is the concept-aligned series type. Use [OiScatterSeries] and
+/// [OiScatterPoint] for the simpler pre-mapped API.
+///
+/// {@category Composites}
+class OiScatterSeriesData<T> extends OiCartesianSeries<T> {
+  /// Creates an [OiScatterSeriesData].
+  OiScatterSeriesData({
+    required super.id,
+    required super.label,
+    required super.data,
+    required super.xMapper,
+    required super.yMapper,
+    super.visible,
+    super.color,
+    super.semanticLabel,
+    super.pointLabel,
+    super.isMissing,
+    super.semanticValue,
+    super.yAxisId,
+  });
 }

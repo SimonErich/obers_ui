@@ -2,6 +2,7 @@ import 'package:flutter/painting.dart';
 import 'package:obers_ui/obers_ui.dart';
 import 'package:obers_ui_charts/src/composites/oi_bar_chart/oi_bar_chart.dart'
     show OiBarChart;
+import 'package:obers_ui_charts/src/models/oi_cartesian_series.dart';
 
 /// The layout mode of an [OiBarChart].
 ///
@@ -63,4 +64,42 @@ class OiBarSeries {
 
   /// An optional color override for all bars in this series.
   final Color? color;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Mapper-first series (concept-aligned)
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// A mapper-first bar series that extracts values from domain model `T`.
+///
+/// This is the concept-aligned series type. Use [OiBarSeries] and
+/// [OiBarCategory] for the simpler pre-mapped API.
+///
+/// {@category Composites}
+class OiBarSeriesData<T> extends OiCartesianSeries<T> {
+  /// Creates an [OiBarSeriesData].
+  OiBarSeriesData({
+    required super.id,
+    required super.label,
+    required super.data,
+    required super.xMapper,
+    required super.yMapper,
+    super.visible,
+    super.color,
+    super.semanticLabel,
+    super.pointLabel,
+    super.isMissing,
+    super.semanticValue,
+    super.yAxisId,
+    this.barWidth,
+    this.stackGroup,
+  });
+
+  /// The width of each bar in logical pixels. When null, bars are sized
+  /// automatically to fill the available category width.
+  final double? barWidth;
+
+  /// An optional stack group identifier. Bars sharing the same [stackGroup]
+  /// are stacked on top of each other within each category.
+  final String? stackGroup;
 }

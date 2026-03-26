@@ -257,3 +257,44 @@ class OiHeatmap extends StatelessWidget {
     );
   }
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Mapper-first series (concept-aligned)
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// A mapper-first heatmap series that extracts values from domain model `T`.
+///
+/// Heatmaps use row/column string keys rather than numeric x/y coordinates,
+/// so this class does not extend `OiCartesianSeries`. Use [OiHeatmapCell]
+/// for the simpler pre-mapped API.
+///
+/// {@category Composites}
+class OiHeatmapSeriesData<T> {
+  /// Creates an [OiHeatmapSeriesData].
+  const OiHeatmapSeriesData({
+    required this.id,
+    required this.label,
+    required this.data,
+    required this.rowMapper,
+    required this.columnMapper,
+    required this.valueMapper,
+  });
+
+  /// A unique identifier for this series.
+  final String id;
+
+  /// The display name for this series.
+  final String label;
+
+  /// The domain objects, each representing one heatmap cell.
+  final List<T> data;
+
+  /// Extracts the row key (display label) from a domain object.
+  final String Function(T item) rowMapper;
+
+  /// Extracts the column key (display label) from a domain object.
+  final String Function(T item) columnMapper;
+
+  /// Extracts the numeric value that determines cell color intensity.
+  final num Function(T item) valueMapper;
+}

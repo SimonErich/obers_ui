@@ -309,3 +309,12 @@ class _OiGaugePainter extends CustomPainter {
       oldDelegate.trackColor != trackColor ||
       oldDelegate.needleColor != needleColor;
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Mapper-first series — not applicable for OiGauge
+// ─────────────────────────────────────────────────────────────────────────────
+//
+// OiGauge is a single-value visualization (value, min, max, target, segments).
+// It does not use a mapper-first series pattern because there is no collection
+// of domain objects to iterate over — the chart represents exactly one
+// measurement at a time. Pass the scalar [value] directly to [OiGauge].

@@ -445,3 +445,36 @@ class _OiPieChartPainter extends CustomPainter {
       oldDelegate.hoveredIndex != hoveredIndex ||
       oldDelegate.highContrast != highContrast;
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Mapper-first series (concept-aligned)
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// A mapper-first pie series that extracts values from domain model `T`.
+///
+/// Pie charts are polar (not cartesian), so this class does not extend
+/// `OiCartesianSeries`. Use [OiPieSegment] for the simpler pre-mapped API.
+///
+/// {@category Composites}
+class OiPieSeriesData<T> {
+  /// Creates an [OiPieSeriesData].
+  const OiPieSeriesData({
+    required this.data,
+    required this.valueMapper,
+    required this.labelMapper,
+    this.colorMapper,
+  });
+
+  /// The domain objects to render as pie segments.
+  final List<T> data;
+
+  /// Extracts the numeric value (segment size) from a domain object.
+  final num Function(T item) valueMapper;
+
+  /// Extracts the display label from a domain object.
+  final String Function(T item) labelMapper;
+
+  /// Optional: extracts a color override for a segment. Return null to use
+  /// the theme's chart palette color for that segment.
+  final Color? Function(T item)? colorMapper;
+}

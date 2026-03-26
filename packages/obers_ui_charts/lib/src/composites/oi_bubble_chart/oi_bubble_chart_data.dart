@@ -2,6 +2,7 @@ import 'package:flutter/painting.dart';
 import 'package:obers_ui/obers_ui.dart';
 import 'package:obers_ui_charts/src/composites/oi_bubble_chart/oi_bubble_chart.dart'
     show OiBubbleChart;
+import 'package:obers_ui_charts/src/models/oi_cartesian_series.dart';
 
 /// Visual style overrides for an individual bubble point.
 ///
@@ -130,4 +131,47 @@ class OiBubbleChartData {
 
   /// Optional configuration for the size dimension.
   final OiBubbleSizeConfig? sizeConfig;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Mapper-first series (concept-aligned)
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// A mapper-first bubble series that extracts values from domain model `T`.
+///
+/// This is the concept-aligned series type. Use [OiBubbleSeries] and
+/// [OiBubblePoint] for the simpler pre-mapped API.
+///
+/// {@category Composites}
+class OiBubbleSeriesData<T> extends OiCartesianSeries<T> {
+  /// Creates an [OiBubbleSeriesData].
+  OiBubbleSeriesData({
+    required super.id,
+    required super.label,
+    required super.data,
+    required super.xMapper,
+    required super.yMapper,
+    required this.sizeMapper,
+    super.visible,
+    super.color,
+    super.semanticLabel,
+    super.pointLabel,
+    super.isMissing,
+    super.semanticValue,
+    super.yAxisId,
+    this.minRadius = 4,
+    this.maxRadius = 40,
+  });
+
+  /// Extracts the size dimension value from a domain object.
+  ///
+  /// The returned value is linearly mapped to a rendered bubble radius in the
+  /// range [[minRadius], [maxRadius]].
+  final num Function(T item) sizeMapper;
+
+  /// The minimum rendered bubble radius in logical pixels. Defaults to 4.
+  final double minRadius;
+
+  /// The maximum rendered bubble radius in logical pixels. Defaults to 40.
+  final double maxRadius;
 }

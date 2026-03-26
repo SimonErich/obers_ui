@@ -195,3 +195,39 @@ class _OiSparklinePainter extends CustomPainter {
       oldDelegate.showLastPoint != showLastPoint ||
       oldDelegate.showMinMax != showMinMax;
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Mapper-first series (concept-aligned)
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// A mapper-first sparkline series that extracts values from domain model `T`.
+///
+/// This is the concept-aligned series type. Use [OiSparkline] directly with
+/// a pre-mapped [List<double>] for the simpler API.
+///
+/// {@category Composites}
+class OiSparklineSeriesData<T> {
+  /// Creates an [OiSparklineSeriesData].
+  const OiSparklineSeriesData({
+    required this.id,
+    required this.label,
+    required this.data,
+    required this.valueMapper,
+    this.color,
+  });
+
+  /// A unique identifier for this series.
+  final String id;
+
+  /// The display name for this series.
+  final String label;
+
+  /// The domain objects to plot, ordered along the time/x axis.
+  final List<T> data;
+
+  /// Extracts the numeric value to plot from a domain object.
+  final num Function(T item) valueMapper;
+
+  /// An optional color override for the sparkline stroke and fill.
+  final Color? color;
+}
