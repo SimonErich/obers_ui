@@ -348,23 +348,25 @@ class _OiBubbleChartState extends State<OiBubbleChart> {
         : const SizedBox.shrink();
 
     if (legendPosition == _LegendPosition.below || isCompact) {
-      return Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          interactiveChart,
-          narration,
-          if (showLegend)
-            Padding(
-              padding: const EdgeInsets.only(top: 8),
-              child: legendWidget,
-            ),
-          if (hasSizeLegend)
-            Padding(
-              padding: const EdgeInsets.only(top: 4),
-              child: sizeLegendWidget,
-            ),
-        ],
+      return ClipRect(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            interactiveChart,
+            narration,
+            if (showLegend)
+              Padding(
+                padding: const EdgeInsets.only(top: 8),
+                child: legendWidget,
+              ),
+            if (hasSizeLegend)
+              Padding(
+                padding: const EdgeInsets.only(top: 4),
+                child: sizeLegendWidget,
+              ),
+          ],
+        ),
       );
     }
 
