@@ -17,6 +17,14 @@ export 'src/components/oi_chart_loading_state.dart';
 export 'src/components/oi_chart_surface.dart';
 export 'src/components/oi_chart_tooltip_widget.dart';
 export 'src/components/oi_chart_zoom_controls.dart';
+// ── Composites: Area Chart ───────────────────────────────────────────────────
+
+export 'src/composites/oi_area_chart/oi_area_chart.dart';
+export 'src/composites/oi_area_chart/oi_area_chart_accessibility.dart';
+export 'src/composites/oi_area_chart/oi_area_chart_data.dart';
+export 'src/composites/oi_area_chart/oi_area_chart_legend.dart';
+export 'src/composites/oi_area_chart/oi_area_chart_painter.dart';
+export 'src/composites/oi_area_chart/oi_area_chart_theme.dart';
 // ── Composites: Bar Chart ────────────────────────────────────────────────────
 
 export 'src/composites/oi_bar_chart/oi_bar_chart.dart';
@@ -52,6 +60,9 @@ export 'src/composites/oi_flow_chart.dart';
 export 'src/composites/oi_hierarchical_chart.dart';
 export 'src/composites/oi_matrix_chart.dart';
 export 'src/composites/oi_polar_chart.dart';
+// ── Composites: Donut Chart ─────────────────────────────────────────────────
+
+export 'src/composites/oi_donut_chart.dart';
 // ── Composites: Simple Charts ────────────────────────────────────────────────
 
 export 'src/composites/oi_funnel_chart.dart';
