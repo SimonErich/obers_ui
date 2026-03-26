@@ -121,6 +121,13 @@ class OiSeriesAnimationConfig {
 /// motion, all durations resolve to [Duration.zero] regardless of the
 /// configured values.
 ///
+/// **Design note:** The concept spec defines `OiChartEnterAnimation`,
+/// `OiChartUpdateAnimation`, and `OiChartExitAnimation` enums with named
+/// presets (grow/fade/slide/none, morph/crossfade/none, shrink/fade/none).
+/// This implementation uses class-based [OiPhaseAnimationConfig] per phase
+/// instead, which is more flexible — any curve+duration combination is
+/// expressible, not just named presets. This is an intentional deviation.
+///
 /// {@category Foundation}
 @immutable
 class OiChartAnimationConfig {
