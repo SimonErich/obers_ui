@@ -156,6 +156,7 @@ export 'src/utils/path_utils.dart';
 export 'src/models/oi_axis_range.dart';
 export 'src/models/oi_cartesian_series.dart';
 export 'src/models/oi_chart_annotation.dart';
+export 'src/models/oi_chart_complexity.dart';
 export 'src/models/oi_chart_datum.dart';
 export 'src/models/oi_chart_series.dart';
 export 'src/models/oi_chart_settings.dart';

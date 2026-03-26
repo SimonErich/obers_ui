@@ -13,7 +13,9 @@ import 'package:obers_ui_charts/src/foundation/oi_chart_hit_tester.dart';
 import 'package:obers_ui_charts/src/foundation/oi_chart_performance_config.dart';
 import 'package:obers_ui_charts/src/foundation/oi_chart_sync_group.dart';
 import 'package:obers_ui_charts/src/foundation/oi_chart_viewport.dart';
-import 'package:obers_ui/obers_ui.dart' show OiChartThemeData;
+import 'package:obers_ui/obers_ui.dart' show OiChartThemeData, OiResponsive;
+
+import 'package:obers_ui_charts/src/models/oi_chart_complexity.dart';
 
 import 'package:obers_ui_charts/src/utils/chart_math.dart';
 
@@ -52,6 +54,7 @@ class OiCartesianChart<T> extends StatefulWidget {
     this.legend,
     this.settings,
     this.theme,
+    this.complexity,
     this.emptyState,
     this.loadingState,
     this.errorState,
@@ -113,6 +116,9 @@ class OiCartesianChart<T> extends StatefulWidget {
 
   /// Chart theme override. Falls back to context.components.chart.
   final OiChartThemeData? theme;
+
+  /// Responsive complexity level for visual detail adaptation.
+  final OiResponsive<OiChartComplexity>? complexity;
 
   /// Custom empty state widget.
   final Widget? emptyState;

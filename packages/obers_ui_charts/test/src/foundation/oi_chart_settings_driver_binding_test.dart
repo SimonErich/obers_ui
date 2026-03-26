@@ -96,9 +96,7 @@ void main() {
       );
       await binding.init();
 
-      binding.update(
-        const OiChartSettings(hiddenSeriesIds: {'costs'}),
-      );
+      binding.update(const OiChartSettings(hiddenSeriesIds: {'costs'}));
       expect(binding.currentSettings.hiddenSeriesIds, {'costs'});
       binding.dispose();
     });
@@ -114,9 +112,7 @@ void main() {
       var notified = false;
       binding
         ..addListener(() => notified = true)
-        ..update(
-          const OiChartSettings(hiddenSeriesIds: {'costs'}),
-        );
+        ..update(const OiChartSettings(hiddenSeriesIds: {'costs'}));
       expect(notified, isTrue);
       binding.dispose();
     });
@@ -147,9 +143,7 @@ void main() {
       );
       await binding.init();
 
-      binding.update(
-        const OiChartSettings(hiddenSeriesIds: {'a'}),
-      );
+      binding.update(const OiChartSettings(hiddenSeriesIds: {'a'}));
       await binding.saveNow();
 
       final loaded = await driver.load<OiChartSettings>(
@@ -170,9 +164,7 @@ void main() {
       );
       await binding.init();
 
-      binding.update(
-        const OiChartSettings(hiddenSeriesIds: {'a'}),
-      );
+      binding.update(const OiChartSettings(hiddenSeriesIds: {'a'}));
       await binding.saveNow();
       await binding.reset();
 
@@ -214,12 +206,12 @@ void main() {
       await driver.save<OiChartSettings>(
         namespace: 'oi_chart',
         key: 'chart',
-        data: const OiChartSettings(legendExpandedGroups: {'g1'}),
+        data: const OiChartSettings(legendExpandedGroups: {'g1': true}),
         serialize: (s) => s.toJson(),
       );
 
       await binding.reload();
-      expect(binding.currentSettings.legendExpandedGroups, {'g1'});
+      expect(binding.currentSettings.legendExpandedGroups, {'g1': true});
       binding.dispose();
     });
 
@@ -235,9 +227,7 @@ void main() {
       // Should not throw.
       binding
         ..dispose()
-        ..update(
-          const OiChartSettings(hiddenSeriesIds: {'a'}),
-        );
+        ..update(const OiChartSettings(hiddenSeriesIds: {'a'}));
     });
 
     // ── namespace ─────────────────────────────────────────────────────────

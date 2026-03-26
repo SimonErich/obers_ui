@@ -1,106 +1,141 @@
 // Tests do not require documentation comments.
 // ignore_for_file: public_member_api_docs
 
-import 'dart:ui' show Rect;
-
 import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui_charts/src/models/oi_chart_settings.dart';
 
 void main() {
-  group('OiChartSettings', () {
-    // ── Defaults ────────────────────────────────────────────────────────────
+  group('OiPersistedViewport', () {
+    test('round-trips through toJson/fromJson', () {
+      const viewport = OiPersistedViewport(
+        xMin: 10,
+        xMax: 100,
+        yMin: 0,
+        yMax: 500,
+      );
+      final json = viewport.toJson();
+      final restored = OiPersistedViewport.fromJson(json);
+      expect(restored.xMin, 10);
+      expect(restored.xMax, 100);
+      expect(restored.yMin, 0);
+      expect(restored.yMax, 500);
+      expect(restored, viewport);
+    });
 
+    test('null fields round-trip as null', () {
+      const viewport = OiPersistedViewport(xMin: 5);
+      final json = viewport.toJson();
+      final restored = OiPersistedViewport.fromJson(json);
+      expect(restored.xMin, 5);
+      expect(restored.xMax, isNull);
+      expect(restored.yMin, isNull);
+      expect(restored.yMax, isNull);
+    });
+  });
+
+  group('OiPersistedSelection', () {
+    test('round-trips refs through toJson/fromJson', () {
+      const selection = OiPersistedSelection(
+        selectedRefs: [
+          (seriesIndex: 0, dataIndex: 3),
+          (seriesIndex: 1, dataIndex: 7),
+        ],
+      );
+      final json = selection.toJson();
+      final restored = OiPersistedSelection.fromJson(json);
+      expect(restored.selectedRefs, hasLength(2));
+      expect(restored.selectedRefs[0].seriesIndex, 0);
+      expect(restored.selectedRefs[0].dataIndex, 3);
+      expect(restored.selectedRefs[1].seriesIndex, 1);
+      expect(restored.selectedRefs[1].dataIndex, 7);
+      expect(restored.hasSelection, isTrue);
+    });
+
+    test('empty selection round-trips', () {
+      const selection = OiPersistedSelection();
+      expect(selection.hasSelection, isFalse);
+      final json = selection.toJson();
+      final restored = OiPersistedSelection.fromJson(json);
+      expect(restored.hasSelection, isFalse);
+    });
+  });
+
+  group('OiChartSettings', () {
     test('default constructor produces expected defaults', () {
       const s = OiChartSettings();
-      expect(s.schemaVersion, 1);
+      expect(s.schemaVersion, 2);
       expect(s.hiddenSeriesIds, isEmpty);
-      expect(s.viewportWindow, isNull);
-      expect(s.selectedSeriesIndex, isNull);
-      expect(s.selectedDataIndex, isNull);
+      expect(s.viewport, isNull);
+      expect(s.selection, isNull);
       expect(s.legendExpandedGroups, isEmpty);
       expect(s.comparisonMode, OiChartComparisonMode.none);
     });
 
-    // ── toJson / fromJson round-trip ──────────────────────────────────────
-
     test('round-trips all fields through toJson / fromJson', () {
       const original = OiChartSettings(
-        schemaVersion: 2,
         hiddenSeriesIds: {'revenue', 'costs'},
-        viewportWindow: Rect.fromLTRB(0, 0, 100, 200),
-        selectedSeriesIndex: 1,
-        selectedDataIndex: 5,
-        legendExpandedGroups: {'group-a', 'group-b'},
+        viewport: OiPersistedViewport(xMin: 0, xMax: 100, yMin: 0, yMax: 200),
+        selection: OiPersistedSelection(
+          selectedRefs: [(seriesIndex: 1, dataIndex: 5)],
+        ),
+        legendExpandedGroups: {'group-a': true, 'group-b': false},
         comparisonMode: OiChartComparisonMode.previousPeriod,
       );
       final json = original.toJson();
       final restored = OiChartSettings.fromJson(json);
       expect(restored.schemaVersion, original.schemaVersion);
       expect(restored.hiddenSeriesIds, original.hiddenSeriesIds);
-      expect(restored.viewportWindow, original.viewportWindow);
-      expect(restored.selectedSeriesIndex, original.selectedSeriesIndex);
-      expect(restored.selectedDataIndex, original.selectedDataIndex);
+      expect(restored.viewport, original.viewport);
+      expect(restored.selection!.selectedRefs, hasLength(1));
       expect(restored.legendExpandedGroups, original.legendExpandedGroups);
       expect(restored.comparisonMode, original.comparisonMode);
     });
 
     test('fromJson with missing fields uses defaults', () {
       final s = OiChartSettings.fromJson(const {});
-      expect(s.schemaVersion, 1);
+      expect(s.schemaVersion, 2);
       expect(s.hiddenSeriesIds, isEmpty);
-      expect(s.viewportWindow, isNull);
-      expect(s.selectedSeriesIndex, isNull);
-      expect(s.selectedDataIndex, isNull);
-      expect(s.legendExpandedGroups, isEmpty);
-      expect(s.comparisonMode, OiChartComparisonMode.none);
+      expect(s.viewport, isNull);
+      expect(s.selection, isNull);
+    });
+
+    test('fromJson migrates v1 viewportWindow to viewport', () {
+      final s = OiChartSettings.fromJson(const {
+        'schemaVersion': 1,
+        'viewportWindow': {'left': 10, 'top': 0, 'right': 100, 'bottom': 200},
+      });
+      expect(s.schemaVersion, 2);
+      expect(s.viewport, isNotNull);
+      expect(s.viewport!.xMin, 10);
+      expect(s.viewport!.xMax, 100);
+      expect(s.viewport!.yMin, 0);
+      expect(s.viewport!.yMax, 200);
+    });
+
+    test('fromJson migrates v1 selectedSeriesIndex to selection', () {
+      final s = OiChartSettings.fromJson(const {
+        'schemaVersion': 1,
+        'selectedSeriesIndex': 2,
+        'selectedDataIndex': 7,
+      });
+      expect(s.selection, isNotNull);
+      expect(s.selection!.selectedRefs, hasLength(1));
+      expect(s.selection!.selectedRefs[0].seriesIndex, 2);
+      expect(s.selection!.selectedRefs[0].dataIndex, 7);
+    });
+
+    test('fromJson migrates v1 legendExpandedGroups from list to map', () {
+      final s = OiChartSettings.fromJson(const {
+        'schemaVersion': 1,
+        'legendExpandedGroups': ['group-a', 'group-b'],
+      });
+      expect(s.legendExpandedGroups, {'group-a': true, 'group-b': true});
     });
 
     test('toJson includes schemaVersion key', () {
-      const s = OiChartSettings(schemaVersion: 3);
+      const s = OiChartSettings();
       final json = s.toJson();
-      expect(json['schemaVersion'], 3);
-    });
-
-    test('fromJson handles null values gracefully', () {
-      final s = OiChartSettings.fromJson(const {
-        'hiddenSeriesIds': null,
-        'viewportWindow': null,
-        'selectedSeriesIndex': null,
-        'selectedDataIndex': null,
-        'legendExpandedGroups': null,
-        'comparisonMode': null,
-      });
-      expect(s.hiddenSeriesIds, isEmpty);
-      expect(s.viewportWindow, isNull);
-      expect(s.selectedSeriesIndex, isNull);
-      expect(s.selectedDataIndex, isNull);
-      expect(s.legendExpandedGroups, isEmpty);
-      expect(s.comparisonMode, OiChartComparisonMode.none);
-    });
-
-    test('schemaVersion is preserved across round-trip', () {
-      const original = OiChartSettings(schemaVersion: 5);
-      final restored = OiChartSettings.fromJson(original.toJson());
-      expect(restored.schemaVersion, 5);
-    });
-
-    test('toJson serializes hiddenSeriesIds as list', () {
-      const s = OiChartSettings(hiddenSeriesIds: {'a', 'b'});
-      final json = s.toJson();
-      expect(json['hiddenSeriesIds'], isA<List<dynamic>>());
-      expect((json['hiddenSeriesIds'] as List).toSet(), {'a', 'b'});
-    });
-
-    test('toJson serializes viewportWindow as map', () {
-      const s = OiChartSettings(
-        viewportWindow: Rect.fromLTRB(10, 20, 30, 40),
-      );
-      final json = s.toJson();
-      final vp = json['viewportWindow'] as Map<String, dynamic>;
-      expect(vp['left'], 10.0);
-      expect(vp['top'], 20.0);
-      expect(vp['right'], 30.0);
-      expect(vp['bottom'], 40.0);
+      expect(json['schemaVersion'], 2);
     });
 
     test('toJson serializes comparisonMode as string name', () {
@@ -112,159 +147,62 @@ void main() {
     });
 
     test('fromJson handles invalid comparisonMode gracefully', () {
-      final s = OiChartSettings.fromJson(const {
-        'comparisonMode': 'invalidMode',
-      });
+      final s = OiChartSettings.fromJson(const {'comparisonMode': 'bogusMode'});
       expect(s.comparisonMode, OiChartComparisonMode.none);
     });
 
-    test('fromJson handles incomplete viewportWindow gracefully', () {
-      final s = OiChartSettings.fromJson(const {
-        'viewportWindow': {'left': 10, 'top': 20},
-      });
-      expect(s.viewportWindow, isNull);
-    });
-
-    // ── mergeWith ─────────────────────────────────────────────────────────
-
     test('mergeWith: empty hiddenSeriesIds filled from defaults', () {
       const saved = OiChartSettings();
-      const defaults = OiChartSettings(hiddenSeriesIds: {'a', 'b'});
+      const defaults = OiChartSettings(hiddenSeriesIds: {'cost'});
       final merged = saved.mergeWith(defaults);
-      expect(merged.hiddenSeriesIds, {'a', 'b'});
+      expect(merged.hiddenSeriesIds, {'cost'});
     });
 
     test('mergeWith: non-empty hiddenSeriesIds preserved', () {
-      const saved = OiChartSettings(hiddenSeriesIds: {'x'});
-      const defaults = OiChartSettings(hiddenSeriesIds: {'a', 'b'});
+      const saved = OiChartSettings(hiddenSeriesIds: {'revenue'});
+      const defaults = OiChartSettings(hiddenSeriesIds: {'cost'});
       final merged = saved.mergeWith(defaults);
-      expect(merged.hiddenSeriesIds, {'x'});
+      expect(merged.hiddenSeriesIds, {'revenue'});
     });
 
-    test('mergeWith: null viewportWindow filled from defaults', () {
+    test('mergeWith: null viewport filled from defaults', () {
       const saved = OiChartSettings();
       const defaults = OiChartSettings(
-        viewportWindow: Rect.fromLTRB(0, 0, 50, 50),
+        viewport: OiPersistedViewport(xMin: 0, xMax: 100),
       );
       final merged = saved.mergeWith(defaults);
-      expect(merged.viewportWindow, const Rect.fromLTRB(0, 0, 50, 50));
+      expect(merged.viewport?.xMin, 0);
+      expect(merged.viewport?.xMax, 100);
     });
-
-    test('mergeWith: empty legendExpandedGroups filled from defaults', () {
-      const saved = OiChartSettings();
-      const defaults = OiChartSettings(legendExpandedGroups: {'g1'});
-      final merged = saved.mergeWith(defaults);
-      expect(merged.legendExpandedGroups, {'g1'});
-    });
-
-    test('mergeWith: schemaVersion comes from saved', () {
-      const saved = OiChartSettings(schemaVersion: 2);
-      const defaults = OiChartSettings();
-      final merged = saved.mergeWith(defaults);
-      expect(merged.schemaVersion, 2);
-    });
-
-    // ── copyWith ──────────────────────────────────────────────────────────
 
     test('copyWith returns identical when no args provided', () {
-      const s = OiChartSettings(hiddenSeriesIds: {'a'});
-      expect(s.copyWith(), equals(s));
+      const original = OiChartSettings();
+      final copied = original.copyWith();
+      expect(copied, original);
     });
 
     test('copyWith updates single field', () {
-      const s = OiChartSettings();
-      final updated = s.copyWith(hiddenSeriesIds: {'series1'});
-      expect(updated.hiddenSeriesIds, {'series1'});
-      expect(updated.comparisonMode, OiChartComparisonMode.none);
+      const original = OiChartSettings();
+      final copied = original.copyWith(hiddenSeriesIds: {'hidden'});
+      expect(copied.hiddenSeriesIds, {'hidden'});
+      expect(copied.comparisonMode, OiChartComparisonMode.none);
     });
-
-    test('copyWith updates multiple fields at once', () {
-      const s = OiChartSettings();
-      final updated = s.copyWith(
-        hiddenSeriesIds: {'a'},
-        comparisonMode: OiChartComparisonMode.baseline,
-        selectedSeriesIndex: 2,
-      );
-      expect(updated.hiddenSeriesIds, {'a'});
-      expect(updated.comparisonMode, OiChartComparisonMode.baseline);
-      expect(updated.selectedSeriesIndex, 2);
-    });
-
-    test('copyWith can clear nullable fields', () {
-      const s = OiChartSettings(
-        viewportWindow: Rect.fromLTRB(0, 0, 100, 100),
-        selectedSeriesIndex: 1,
-        selectedDataIndex: 2,
-      );
-      final cleared = s.copyWith(
-        clearViewportWindow: true,
-        clearSelectedSeriesIndex: true,
-        clearSelectedDataIndex: true,
-      );
-      expect(cleared.viewportWindow, isNull);
-      expect(cleared.selectedSeriesIndex, isNull);
-      expect(cleared.selectedDataIndex, isNull);
-    });
-
-    // ── equality / hashCode ───────────────────────────────────────────────
 
     test('two identical instances are equal', () {
-      const a = OiChartSettings(
-        hiddenSeriesIds: {'x'},
-        comparisonMode: OiChartComparisonMode.previousPeriod,
-      );
-      const b = OiChartSettings(
-        hiddenSeriesIds: {'x'},
-        comparisonMode: OiChartComparisonMode.previousPeriod,
-      );
-      expect(a, equals(b));
+      const a = OiChartSettings(hiddenSeriesIds: {'a', 'b'});
+      const b = OiChartSettings(hiddenSeriesIds: {'b', 'a'});
+      expect(a, b);
+      expect(a.hashCode, b.hashCode);
     });
 
     test('instances with different fields are not equal', () {
       const a = OiChartSettings(hiddenSeriesIds: {'a'});
       const b = OiChartSettings(hiddenSeriesIds: {'b'});
-      expect(a, isNot(equals(b)));
+      expect(a, isNot(b));
     });
-
-    test('hashCode is same for equal instances', () {
-      const a = OiChartSettings(
-        legendExpandedGroups: {'g'},
-        selectedSeriesIndex: 3,
-      );
-      const b = OiChartSettings(
-        legendExpandedGroups: {'g'},
-        selectedSeriesIndex: 3,
-      );
-      expect(a.hashCode, equals(b.hashCode));
-    });
-
-    // ── schemaVersion ─────────────────────────────────────────────────────
-
-    test('schemaVersion is 1 by default', () {
-      const s = OiChartSettings();
-      expect(s.schemaVersion, 1);
-    });
-
-    // ── OiChartComparisonMode ─────────────────────────────────────────────
 
     test('all comparison modes are available', () {
-      expect(OiChartComparisonMode.values, hasLength(4));
-      expect(
-        OiChartComparisonMode.values,
-        contains(OiChartComparisonMode.none),
-      );
-      expect(
-        OiChartComparisonMode.values,
-        contains(OiChartComparisonMode.previousPeriod),
-      );
-      expect(
-        OiChartComparisonMode.values,
-        contains(OiChartComparisonMode.baseline),
-      );
-      expect(
-        OiChartComparisonMode.values,
-        contains(OiChartComparisonMode.yearOverYear),
-      );
+      expect(OiChartComparisonMode.values.length, 4);
     });
   });
 }

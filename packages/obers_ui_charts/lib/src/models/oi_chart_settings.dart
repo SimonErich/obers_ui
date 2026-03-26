@@ -1,5 +1,4 @@
-import 'package:obers_ui/obers_ui.dart';
-import 'dart:ui' show Rect;
+import 'package:obers_ui/obers_ui.dart' hide mapEquals;
 
 import 'package:flutter/foundation.dart';
 
@@ -20,43 +19,189 @@ enum OiChartComparisonMode {
   yearOverYear,
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// OiPersistedViewport
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// Typed viewport state for persistence.
+///
+/// Stores the visible domain window as explicit min/max values.
+///
+/// {@category Models}
+@immutable
+class OiPersistedViewport {
+  /// Creates an [OiPersistedViewport].
+  const OiPersistedViewport({this.xMin, this.xMax, this.yMin, this.yMax});
+
+  /// Deserializes from a JSON map.
+  factory OiPersistedViewport.fromJson(Map<String, dynamic> json) {
+    return OiPersistedViewport(
+      xMin: (json['xMin'] as num?)?.toDouble(),
+      xMax: (json['xMax'] as num?)?.toDouble(),
+      yMin: (json['yMin'] as num?)?.toDouble(),
+      yMax: (json['yMax'] as num?)?.toDouble(),
+    );
+  }
+
+  /// Minimum visible x-domain value, or null for auto.
+  final double? xMin;
+
+  /// Maximum visible x-domain value, or null for auto.
+  final double? xMax;
+
+  /// Minimum visible y-domain value, or null for auto.
+  final double? yMin;
+
+  /// Maximum visible y-domain value, or null for auto.
+  final double? yMax;
+
+  /// Serializes to a JSON map.
+  Map<String, dynamic> toJson() => {
+    'xMin': xMin,
+    'xMax': xMax,
+    'yMin': yMin,
+    'yMax': yMax,
+  };
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is OiPersistedViewport &&
+        other.xMin == xMin &&
+        other.xMax == xMax &&
+        other.yMin == yMin &&
+        other.yMax == yMax;
+  }
+
+  @override
+  int get hashCode => Object.hash(xMin, xMax, yMin, yMax);
+
+  @override
+  String toString() =>
+      'OiPersistedViewport(x: [$xMin, $xMax], y: [$yMin, $yMax])';
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// OiPersistedSelection
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// Typed selection state for persistence.
+///
+/// Stores selected data refs as serializable index pairs.
+///
+/// {@category Models}
+@immutable
+class OiPersistedSelection {
+  /// Creates an [OiPersistedSelection].
+  const OiPersistedSelection({this.selectedRefs = const []});
+
+  /// Deserializes from a JSON list of maps.
+  factory OiPersistedSelection.fromJson(dynamic json) {
+    if (json is! List) return const OiPersistedSelection();
+    final refs = <({int seriesIndex, int dataIndex})>[];
+    for (final item in json) {
+      if (item is Map<String, dynamic>) {
+        final si = item['seriesIndex'] as int?;
+        final di = item['dataIndex'] as int?;
+        if (si != null && di != null) {
+          refs.add((seriesIndex: si, dataIndex: di));
+        }
+      }
+    }
+    return OiPersistedSelection(selectedRefs: refs);
+  }
+
+  /// The selected data references as (seriesIndex, dataIndex) pairs.
+  final List<({int seriesIndex, int dataIndex})> selectedRefs;
+
+  /// Whether any data is selected.
+  bool get hasSelection => selectedRefs.isNotEmpty;
+
+  /// Serializes to a JSON list.
+  List<Map<String, int>> toJson() => [
+    for (final ref in selectedRefs)
+      {'seriesIndex': ref.seriesIndex, 'dataIndex': ref.dataIndex},
+  ];
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is OiPersistedSelection &&
+        listEquals(other.selectedRefs, selectedRefs);
+  }
+
+  @override
+  int get hashCode => Object.hashAll(selectedRefs);
+
+  @override
+  String toString() => 'OiPersistedSelection(refs: ${selectedRefs.length})';
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// OiChartSettings
+// ─────────────────────────────────────────────────────────────────────────────
+
 /// Persistable state for chart widgets.
 ///
-/// Stores hidden series, viewport window, selection, legend group expanded
+/// Stores hidden series, viewport, selection, legend group expanded
 /// states, and the active comparison mode. Designed to be used with the
 /// existing [OiSettingsDriver] / [OiSettingsMixin] architecture.
-///
-/// ```dart
-/// const settings = OiChartSettings();
-/// final updated = settings.copyWith(
-///   hiddenSeriesIds: {'revenue'},
-///   comparisonMode: OiChartComparisonMode.previousPeriod,
-/// );
-/// ```
 ///
 /// {@category Models}
 @immutable
 class OiChartSettings with OiSettingsData {
   /// Creates an [OiChartSettings] with optional field overrides.
   const OiChartSettings({
-    this.schemaVersion = 1,
+    this.schemaVersion = 2,
     this.hiddenSeriesIds = const {},
-    this.viewportWindow,
-    this.selectedSeriesIndex,
-    this.selectedDataIndex,
+    this.viewport,
+    this.selection,
     this.legendExpandedGroups = const {},
     this.comparisonMode = OiChartComparisonMode.none,
   });
 
   /// Deserializes an [OiChartSettings] from a JSON map.
   factory OiChartSettings.fromJson(Map<String, dynamic> json) {
+    final version = (json['schemaVersion'] as int?) ?? 1;
+
+    // v1 migration: convert old fields to new types.
+    OiPersistedViewport? viewport;
+    if (json['viewport'] is Map<String, dynamic>) {
+      viewport = OiPersistedViewport.fromJson(
+        json['viewport'] as Map<String, dynamic>,
+      );
+    } else if (json['viewportWindow'] is Map<String, dynamic>) {
+      // v1 format: Rect stored as {left, top, right, bottom}.
+      final vw = json['viewportWindow'] as Map<String, dynamic>;
+      viewport = OiPersistedViewport(
+        xMin: (vw['left'] as num?)?.toDouble(),
+        xMax: (vw['right'] as num?)?.toDouble(),
+        yMin: (vw['top'] as num?)?.toDouble(),
+        yMax: (vw['bottom'] as num?)?.toDouble(),
+      );
+    }
+
+    OiPersistedSelection? selection;
+    if (json['selection'] is List) {
+      selection = OiPersistedSelection.fromJson(json['selection']);
+    } else if (json['selectedSeriesIndex'] != null) {
+      // v1 format: single index pair.
+      selection = OiPersistedSelection(
+        selectedRefs: [
+          (
+            seriesIndex: json['selectedSeriesIndex'] as int,
+            dataIndex: (json['selectedDataIndex'] as int?) ?? 0,
+          ),
+        ],
+      );
+    }
+
     return OiChartSettings(
-      schemaVersion: (json['schemaVersion'] as int?) ?? 1,
+      schemaVersion: version < 2 ? 2 : version,
       hiddenSeriesIds: _parseStringSet(json['hiddenSeriesIds']),
-      viewportWindow: _parseRect(json['viewportWindow']),
-      selectedSeriesIndex: json['selectedSeriesIndex'] as int?,
-      selectedDataIndex: json['selectedDataIndex'] as int?,
-      legendExpandedGroups: _parseStringSet(json['legendExpandedGroups']),
+      viewport: viewport,
+      selection: selection,
+      legendExpandedGroups: _parseBoolMap(json['legendExpandedGroups']),
       comparisonMode: _parseComparisonMode(json['comparisonMode']),
     );
   }
@@ -64,23 +209,19 @@ class OiChartSettings with OiSettingsData {
   @override
   final int schemaVersion;
 
-  /// The set of series identifiers that have been hidden by the user
-  /// (e.g. by toggling them off in the legend).
+  /// The set of series identifiers hidden by the user.
   final Set<String> hiddenSeriesIds;
 
-  /// The persisted visible domain as a [Rect] in data coordinates.
+  /// The persisted visible domain viewport.
+  final OiPersistedViewport? viewport;
+
+  /// The persisted selection state.
+  final OiPersistedSelection? selection;
+
+  /// Legend group expanded/collapsed states.
   ///
-  /// When `null`, the chart uses its default auto-fit viewport.
-  final Rect? viewportWindow;
-
-  /// The series index of the currently selected data point, or `null`.
-  final int? selectedSeriesIndex;
-
-  /// The data index of the currently selected data point, or `null`.
-  final int? selectedDataIndex;
-
-  /// The set of legend group identifiers that are in the expanded state.
-  final Set<String> legendExpandedGroups;
+  /// Keys are group ids. `true` = expanded, `false` = explicitly collapsed.
+  final Map<String, bool> legendExpandedGroups;
 
   /// The active comparison mode.
   final OiChartComparisonMode comparisonMode;
@@ -89,10 +230,9 @@ class OiChartSettings with OiSettingsData {
   Map<String, dynamic> toJson() => {
     'schemaVersion': schemaVersion,
     'hiddenSeriesIds': hiddenSeriesIds.toList(),
-    'viewportWindow': _rectToJson(viewportWindow),
-    'selectedSeriesIndex': selectedSeriesIndex,
-    'selectedDataIndex': selectedDataIndex,
-    'legendExpandedGroups': legendExpandedGroups.toList(),
+    'viewport': viewport?.toJson(),
+    'selection': selection?.toJson(),
+    'legendExpandedGroups': legendExpandedGroups,
     'comparisonMode': comparisonMode.name,
   };
 
@@ -104,9 +244,8 @@ class OiChartSettings with OiSettingsData {
       hiddenSeriesIds: hiddenSeriesIds.isEmpty
           ? defaults.hiddenSeriesIds
           : hiddenSeriesIds,
-      viewportWindow: viewportWindow ?? defaults.viewportWindow,
-      selectedSeriesIndex: selectedSeriesIndex ?? defaults.selectedSeriesIndex,
-      selectedDataIndex: selectedDataIndex ?? defaults.selectedDataIndex,
+      viewport: viewport ?? defaults.viewport,
+      selection: selection ?? defaults.selection,
       legendExpandedGroups: legendExpandedGroups.isEmpty
           ? defaults.legendExpandedGroups
           : legendExpandedGroups,
@@ -114,31 +253,22 @@ class OiChartSettings with OiSettingsData {
     );
   }
 
-  /// Returns a copy of this object with the specified fields replaced.
+  /// Returns a copy with specified fields replaced.
   OiChartSettings copyWith({
     int? schemaVersion,
     Set<String>? hiddenSeriesIds,
-    Rect? viewportWindow,
-    int? selectedSeriesIndex,
-    int? selectedDataIndex,
-    Set<String>? legendExpandedGroups,
+    OiPersistedViewport? viewport,
+    OiPersistedSelection? selection,
+    Map<String, bool>? legendExpandedGroups,
     OiChartComparisonMode? comparisonMode,
-    bool clearViewportWindow = false,
-    bool clearSelectedSeriesIndex = false,
-    bool clearSelectedDataIndex = false,
+    bool clearViewport = false,
+    bool clearSelection = false,
   }) {
     return OiChartSettings(
       schemaVersion: schemaVersion ?? this.schemaVersion,
       hiddenSeriesIds: hiddenSeriesIds ?? this.hiddenSeriesIds,
-      viewportWindow: clearViewportWindow
-          ? null
-          : (viewportWindow ?? this.viewportWindow),
-      selectedSeriesIndex: clearSelectedSeriesIndex
-          ? null
-          : (selectedSeriesIndex ?? this.selectedSeriesIndex),
-      selectedDataIndex: clearSelectedDataIndex
-          ? null
-          : (selectedDataIndex ?? this.selectedDataIndex),
+      viewport: clearViewport ? null : (viewport ?? this.viewport),
+      selection: clearSelection ? null : (selection ?? this.selection),
       legendExpandedGroups: legendExpandedGroups ?? this.legendExpandedGroups,
       comparisonMode: comparisonMode ?? this.comparisonMode,
     );
@@ -149,22 +279,24 @@ class OiChartSettings with OiSettingsData {
     if (identical(this, other)) return true;
     if (other is! OiChartSettings) return false;
     return schemaVersion == other.schemaVersion &&
-        _setEquals(hiddenSeriesIds, other.hiddenSeriesIds) &&
-        viewportWindow == other.viewportWindow &&
-        selectedSeriesIndex == other.selectedSeriesIndex &&
-        selectedDataIndex == other.selectedDataIndex &&
-        _setEquals(legendExpandedGroups, other.legendExpandedGroups) &&
+        setEquals(hiddenSeriesIds, other.hiddenSeriesIds) &&
+        viewport == other.viewport &&
+        selection == other.selection &&
+        mapEquals(legendExpandedGroups, other.legendExpandedGroups) &&
         comparisonMode == other.comparisonMode;
   }
 
   @override
   int get hashCode => Object.hash(
     schemaVersion,
-    Object.hashAll(hiddenSeriesIds),
-    viewportWindow,
-    selectedSeriesIndex,
-    selectedDataIndex,
-    Object.hashAll(legendExpandedGroups),
+    // Use sum of element hashes for order-independent Set hashing.
+    hiddenSeriesIds.fold<int>(0, (h, e) => h ^ e.hashCode),
+    viewport,
+    selection,
+    legendExpandedGroups.entries.fold<int>(
+      0,
+      (h, e) => h ^ Object.hash(e.key, e.value),
+    ),
     comparisonMode,
   );
 
@@ -172,8 +304,8 @@ class OiChartSettings with OiSettingsData {
   String toString() =>
       'OiChartSettings('
       'hidden: $hiddenSeriesIds, '
-      'viewport: $viewportWindow, '
-      'selection: [$selectedSeriesIndex:$selectedDataIndex], '
+      'viewport: $viewport, '
+      'selection: $selection, '
       'legendGroups: $legendExpandedGroups, '
       'comparison: $comparisonMode)';
 
@@ -187,28 +319,20 @@ class OiChartSettings with OiSettingsData {
     return const {};
   }
 
-  static Rect? _parseRect(dynamic value) {
-    if (value == null) return null;
-    if (value is Map<String, dynamic>) {
-      final left = (value['left'] as num?)?.toDouble();
-      final top = (value['top'] as num?)?.toDouble();
-      final right = (value['right'] as num?)?.toDouble();
-      final bottom = (value['bottom'] as num?)?.toDouble();
-      if (left != null && top != null && right != null && bottom != null) {
-        return Rect.fromLTRB(left, top, right, bottom);
-      }
+  static Map<String, bool> _parseBoolMap(dynamic value) {
+    if (value == null) return const {};
+    if (value is Map) {
+      return {
+        for (final entry in value.entries)
+          if (entry.key is String && entry.value is bool)
+            entry.key as String: entry.value as bool,
+      };
     }
-    return null;
-  }
-
-  static Map<String, dynamic>? _rectToJson(Rect? rect) {
-    if (rect == null) return null;
-    return {
-      'left': rect.left,
-      'top': rect.top,
-      'right': rect.right,
-      'bottom': rect.bottom,
-    };
+    // v1 migration: convert Set<String> (stored as List) to Map.
+    if (value is List) {
+      return {for (final item in value.whereType<String>()) item: true};
+    }
+    return const {};
   }
 
   static OiChartComparisonMode _parseComparisonMode(dynamic value) {
@@ -218,10 +342,5 @@ class OiChartSettings with OiSettingsData {
       }
     }
     return OiChartComparisonMode.none;
-  }
-
-  static bool _setEquals<T>(Set<T> a, Set<T> b) {
-    if (a.length != b.length) return false;
-    return a.containsAll(b);
   }
 }
