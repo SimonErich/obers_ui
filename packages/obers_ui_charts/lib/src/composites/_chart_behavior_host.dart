@@ -2,6 +2,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/obers_ui.dart' show OiChartThemeData, OiTheme;
 
+import 'package:obers_ui_charts/src/foundation/oi_chart_accessibility_bridge.dart';
 import 'package:obers_ui_charts/src/foundation/oi_chart_behavior.dart';
 import 'package:obers_ui_charts/src/foundation/oi_chart_controller.dart';
 import 'package:obers_ui_charts/src/foundation/oi_chart_hit_tester.dart';
@@ -49,7 +50,8 @@ mixin ChartBehaviorHost<T extends StatefulWidget> on State<T> {
       controller: effectiveController,
       viewport: currentViewport,
       hitTester: hitTester,
-      theme: OiChartThemeData(),
+      theme: resolveTheme(context),
+      accessibilityBridge: OiNoOpAccessibilityBridge(context),
     );
     for (final b in behaviors) {
       b.attach(ctx);

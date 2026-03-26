@@ -113,3 +113,36 @@ abstract class OiChartAccessibilityBridge {
   /// The [BuildContext] associated with this bridge.
   BuildContext get context;
 }
+
+/// A no-op accessibility bridge for use when no real bridge is available.
+///
+/// All methods are safe to call but produce no side effects.
+///
+/// {@category Foundation}
+class OiNoOpAccessibilityBridge extends OiChartAccessibilityBridge {
+  /// Creates an [OiNoOpAccessibilityBridge] with the given [context].
+  OiNoOpAccessibilityBridge(this._context);
+
+  final BuildContext _context;
+
+  @override
+  void announce(String message, {bool assertive = false}) {}
+
+  @override
+  String describeDataPoint(OiChartDataRef ref) => '';
+
+  @override
+  String describeSelection(Set<OiChartDataRef> refs) => '';
+
+  @override
+  void focusDataPoint(OiChartDataRef ref) {}
+
+  @override
+  bool get reducedMotion => false;
+
+  @override
+  bool get highContrast => false;
+
+  @override
+  BuildContext get context => _context;
+}
