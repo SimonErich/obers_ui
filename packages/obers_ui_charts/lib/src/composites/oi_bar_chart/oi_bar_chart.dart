@@ -252,9 +252,9 @@ class _OiBarChartState extends State<OiBarChart> {
               child: Center(
                 key: const Key('oi_bar_chart_fallback'),
                 child: FittedBox(
-                  child: Text(
+                  child: OiLabel.caption(
                     'Chart too small',
-                    style: TextStyle(fontSize: 10, color: colors.textMuted),
+                    color: colors.textMuted,
                   ),
                 ),
               ),

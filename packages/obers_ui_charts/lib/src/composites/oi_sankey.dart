@@ -156,6 +156,33 @@ class OiSankey extends StatelessWidget {
                           color: nodeColorMap[ln.node.key],
                           borderRadius: BorderRadius.circular(3),
                         ),
+                        child: showLabels || showValues
+                            ? Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 4,
+                                ),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    if (showLabels)
+                                      OiLabel.small(
+                                        ln.node.label,
+                                        color: colors.textOnPrimary,
+                                        overflow: TextOverflow.ellipsis,
+                                        maxLines: 1,
+                                      ),
+                                    if (showValues)
+                                      OiLabel.tiny(
+                                        ln.totalValue.toStringAsFixed(0),
+                                        color: colors.textOnPrimary.withValues(
+                                          alpha: 0.8,
+                                        ),
+                                      ),
+                                  ],
+                                ),
+                              )
+                            : null,
                       ),
                     ),
                   ),

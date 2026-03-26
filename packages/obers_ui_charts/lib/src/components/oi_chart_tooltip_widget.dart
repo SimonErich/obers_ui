@@ -118,7 +118,7 @@ class _OiDefaultTooltipContent extends StatelessWidget {
           if (model.title != null)
             Padding(
               padding: const EdgeInsets.only(bottom: 4),
-              child: Text(model.title!, style: titleStyle),
+              child: OiLabel.small(model.title!, color: titleStyle.color),
             ),
           for (final entry in model.entries)
             Padding(
@@ -137,12 +137,13 @@ class _OiDefaultTooltipContent extends StatelessWidget {
                     ),
                     const SizedBox(width: 6),
                   ],
-                  Text('${entry.seriesLabel}: ', style: labelStyle),
-                  Text(
+                  OiLabel.caption(
+                    '${entry.seriesLabel}: ',
+                    color: labelStyle.color,
+                  ),
+                  OiLabel.caption(
                     entry.pointLabel ?? entry.formattedY,
-                    style: effectiveTextStyle.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
+                    color: effectiveTextStyle.color,
                   ),
                 ],
               ),
@@ -150,7 +151,7 @@ class _OiDefaultTooltipContent extends StatelessWidget {
           if (model.footer != null)
             Padding(
               padding: const EdgeInsets.only(top: 4),
-              child: Text(model.footer!, style: footerStyle),
+              child: OiLabel.caption(model.footer!, color: footerStyle.color),
             ),
         ],
       ),

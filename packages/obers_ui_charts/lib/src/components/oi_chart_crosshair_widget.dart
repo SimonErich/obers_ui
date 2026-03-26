@@ -65,7 +65,8 @@ class OiChartCrosshairWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final themeColor = color ?? const Color(0x80888888);
+    final themeColor =
+        color ?? const Color(0x80888888); // semi-transparent grey fallback
     return CustomPaint(
       size: viewport.size,
       painter: _OiCrosshairPainter(

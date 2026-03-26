@@ -489,10 +489,7 @@ class _OiComboChartLegend extends StatelessWidget {
             children: [
               _buildSwatch(s),
               const SizedBox(width: 4),
-              Text(
-                s.label,
-                style: TextStyle(color: colors.textMuted, fontSize: 12),
-              ),
+              OiLabel.caption(s.label, color: colors.textMuted),
             ],
           ),
       ],
@@ -838,9 +835,9 @@ class _OiComboChartState<T> extends State<OiComboChart<T>> {
               child: Center(
                 key: const Key('oi_combo_chart_fallback'),
                 child: FittedBox(
-                  child: Text(
+                  child: OiLabel.caption(
                     'Chart too small',
-                    style: TextStyle(fontSize: 10, color: colors.textMuted),
+                    color: colors.textMuted,
                   ),
                 ),
               ),
@@ -988,10 +985,10 @@ class _OiComboChartState<T> extends State<OiComboChart<T>> {
               narration = Semantics(
                 key: const Key('oi_combo_chart_narration'),
                 liveRegion: true,
-                child: Text(
+                child: OiLabel.caption(
                   '${s.label}: x=${x.toStringAsFixed(1)}, '
                   'y=${y.toStringAsFixed(1)}',
-                  style: TextStyle(fontSize: 11, color: colors.textSubtle),
+                  color: colors.textSubtle,
                 ),
               );
             }

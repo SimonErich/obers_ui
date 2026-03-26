@@ -520,13 +520,9 @@ class _DefaultTooltipContent extends StatelessWidget {
           if (model.title != null)
             Padding(
               padding: const EdgeInsets.only(bottom: 4),
-              child: Text(
+              child: OiLabel.small(
                 model.title!,
-                style: const TextStyle(
-                  color: Color(0xFFCCCCCC),
-                  fontSize: 11,
-                  fontWeight: FontWeight.w500,
-                ),
+                color: const Color(0xFFCCCCCC),
               ),
             ),
           for (final entry in model.entries)
@@ -546,20 +542,13 @@ class _DefaultTooltipContent extends StatelessWidget {
                     ),
                     const SizedBox(width: 6),
                   ],
-                  Text(
+                  OiLabel.caption(
                     '${entry.seriesLabel}: ',
-                    style: const TextStyle(
-                      color: Color(0xFFAAAAAA),
-                      fontSize: 12,
-                    ),
+                    color: const Color(0xFFAAAAAA),
                   ),
-                  Text(
+                  OiLabel.caption(
                     entry.pointLabel ?? entry.formattedY,
-                    style: const TextStyle(
-                      color: Color(0xFFFFFFFF),
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                    ),
+                    color: const Color(0xFFFFFFFF),
                   ),
                 ],
               ),
@@ -567,9 +556,9 @@ class _DefaultTooltipContent extends StatelessWidget {
           if (model.footer != null)
             Padding(
               padding: const EdgeInsets.only(top: 4),
-              child: Text(
+              child: OiLabel.caption(
                 model.footer!,
-                style: const TextStyle(color: Color(0xFF999999), fontSize: 10),
+                color: const Color(0xFF999999),
               ),
             ),
         ],

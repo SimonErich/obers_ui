@@ -300,7 +300,7 @@ class OiChartLegend extends StatelessWidget {
                   emphasized: item.emphasized,
                 ),
                 SizedBox(width: iconSize / 3),
-                Text(item.label, style: labelStyle),
+                OiLabel.caption(item.label, color: labelStyle.color),
               ],
             ),
           ),

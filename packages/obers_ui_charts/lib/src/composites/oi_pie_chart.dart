@@ -173,7 +173,7 @@ class _OiPieChartState extends State<OiPieChart> {
               height: h,
               child: const Center(
                 key: Key('oi_pie_chart_fallback'),
-                child: Text('…'),
+                child: OiLabel.caption('…'),
               ),
             );
           }
@@ -214,13 +214,10 @@ class _OiPieChartState extends State<OiPieChart> {
             ),
             child: widget.donut && widget.centerLabel != null
                 ? Center(
-                    child: Text(
+                    child: OiLabel.body(
                       widget.centerLabel!,
                       key: const Key('oi_pie_chart_center_label'),
-                      style: TextStyle(
-                        fontSize: chartDim * 0.08,
-                        color: colors.text,
-                      ),
+                      color: colors.text,
                     ),
                   )
                 : null,
@@ -264,12 +261,9 @@ class _OiPieChartState extends State<OiPieChart> {
                             ),
                           ),
                           const SizedBox(width: 4),
-                          Text(
+                          OiLabel.caption(
                             widget.segments[i].label,
-                            style: TextStyle(
-                              color: colors.textMuted,
-                              fontSize: 12,
-                            ),
+                            color: colors.textMuted,
                           ),
                         ],
                       ),

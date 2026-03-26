@@ -117,7 +117,9 @@ class _OiAxisCompositePainter extends CustomPainter {
   final OiChartViewport viewport;
   final OiChartAxisTheme? themeAxis;
 
-  static const Color _fallbackLineColor = Color(0xFF9E9E9E);
+  static const Color _fallbackLineColor = Color(
+    0xFF9E9E9E,
+  ); // theme?.axis?.lineColor is preferred
   static const double _fallbackLineWidth = 1;
   static const double _fallbackTickLength = 6;
   static const double _fallbackTickWidth = 1;
@@ -214,9 +216,9 @@ class _OiAxisCompositePainter extends CustomPainter {
     if (tickLabels.isNotEmpty && tickPositions.isNotEmpty) {
       final labelStyle = themeAxis?.labelStyle ?? const TextStyle(fontSize: 11);
       final labelColor = themeAxis?.labelColor;
-      final effectiveStyle = labelColor != null
-          ? labelStyle.copyWith(color: labelColor)
-          : labelStyle.copyWith(color: const Color(0xFF666666));
+      final effectiveStyle = labelStyle.copyWith(
+        color: labelColor ?? themeAxis?.lineColor ?? const Color(0xFF666666),
+      );
 
       final count = math.min(tickLabels.length, tickPositions.length);
       final visibleIndices = _computeVisibleIndices(count);
@@ -327,9 +329,9 @@ class _OiAxisCompositePainter extends CustomPainter {
         themeAxis?.titleStyle ??
         const TextStyle(fontSize: 12, fontWeight: FontWeight.w500);
     final titleColor = themeAxis?.titleColor;
-    final effectiveStyle = titleColor != null
-        ? titleStyle.copyWith(color: titleColor)
-        : titleStyle.copyWith(color: const Color(0xFF444444));
+    final effectiveStyle = titleStyle.copyWith(
+      color: titleColor ?? themeAxis?.lineColor ?? const Color(0xFF444444),
+    );
 
     final tp = TextPainter(
       text: TextSpan(text: title, style: effectiveStyle),

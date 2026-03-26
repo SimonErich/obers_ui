@@ -69,10 +69,7 @@ class OiBarChartLegend extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 4),
-                  Text(
-                    series[i].label,
-                    style: TextStyle(color: colors.textMuted, fontSize: 12),
-                  ),
+                  OiLabel.caption(series[i].label, color: colors.textMuted),
                 ],
               ),
             ),

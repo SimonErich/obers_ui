@@ -96,7 +96,7 @@ class _AreaLegendItem extends StatelessWidget {
               painter: _AreaSwatch(color: color, fillOpacity: fillOpacity),
             ),
             const SizedBox(width: 4),
-            Text(label, style: TextStyle(color: textColor, fontSize: 12)),
+            OiLabel.caption(label, color: textColor),
           ],
         ),
       ),

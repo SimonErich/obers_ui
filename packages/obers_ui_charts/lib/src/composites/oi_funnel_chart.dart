@@ -140,25 +140,18 @@ class OiFunnelChart extends StatelessWidget {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(
+                    OiLabel.small(
                       stage.label,
-                      style: TextStyle(
-                        color: textColor,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                      ),
+                      color: textColor,
                       overflow: TextOverflow.ellipsis,
                     ),
                     if (showValues || showPercentages)
-                      Text(
+                      OiLabel.caption(
                         [
                           if (showValues) formattedValue,
                           if (showPercentages) '$percentage%',
                         ].join(' - '),
-                        style: TextStyle(
-                          color: textColor.withValues(alpha: 0.8),
-                          fontSize: 10,
-                        ),
+                        color: textColor.withValues(alpha: 0.8),
                       ),
                   ],
                 ),
