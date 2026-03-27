@@ -39,7 +39,7 @@ class OiOptimisticAction {
   static Future<bool> execute(
     BuildContext context, {
     required VoidCallback apply,
-    required VoidCallback rollback,
+    required VoidCallback onRollback,
     required Future<void> Function() commit,
     required String message,
     Duration undoDuration = const Duration(seconds: 5),
@@ -59,7 +59,7 @@ class OiOptimisticAction {
 
     final completer = Completer<bool>();
     final action = _PendingAction(
-      rollback: rollback,
+      onRollback: onRollback,
       commit: commit,
       completer: completer,
       errorMessage: errorMessage,
@@ -106,7 +106,7 @@ class OiOptimisticAction {
 
 class _PendingAction {
   _PendingAction({
-    required this.rollback,
+    required this.onRollback,
     required this.commit,
     required this.completer,
     required this.errorMessage,
@@ -114,7 +114,7 @@ class _PendingAction {
     required this.context,
   });
 
-  final VoidCallback rollback;
+  final VoidCallback onRollback;
   final Future<void> Function() commit;
   final Completer<bool> completer;
   final String? errorMessage;
@@ -128,7 +128,7 @@ class _PendingAction {
   void undo() {
     if (_resolved) return;
     _resolved = true;
-    rollback();
+    onRollback();
     if (!completer.isCompleted) completer.complete(false);
   }
 
@@ -157,7 +157,7 @@ class _PendingAction {
         name: 'obers_ui.optimistic_action',
       );
       try {
-        rollback();
+        onRollback();
       } catch (rollbackError, rollbackSt) {
         log(
           'OiOptimisticAction rollback also failed',
