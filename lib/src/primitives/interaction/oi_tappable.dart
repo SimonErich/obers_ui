@@ -33,7 +33,7 @@ class OiTappable extends StatefulWidget {
     this.onFocusChange,
     this.enabled = true,
     this.focusable = true,
-    this.isDragging = false,
+    this.dragging = false,
     this.semanticLabel,
     this.cursor,
     this.clipBorderRadius,
@@ -74,7 +74,7 @@ class OiTappable extends StatefulWidget {
   /// This state is managed externally (e.g. by a parent [Draggable] or
   /// [LongPressDraggable]) and causes [OiEffectsTheme.dragging] to be applied.
   /// Dragging takes the highest visual priority among all interactive states.
-  final bool isDragging;
+  final bool dragging;
 
   /// An optional label announced by screen readers in place of the child's
   /// semantic content.
@@ -139,7 +139,7 @@ class _OiTappableState extends State<OiTappable> {
 
   OiInteractiveStyle _effectiveStyle(OiEffectsTheme effects) {
     if (!widget.enabled) return OiInteractiveStyle.none;
-    if (widget.isDragging) return effects.dragging;
+    if (widget.dragging) return effects.dragging;
     if (_isPressed) return effects.active;
     if (_isHovered) return effects.hover;
     if (_isFocused) return effects.focus;
@@ -266,10 +266,11 @@ class _OiTappableState extends State<OiTappable> {
       content = Opacity(opacity: 0.4, child: content);
     }
 
-    // Enforce minimum touch target on touch platforms.
-    if (minTarget > 0) {
-      content = OiTouchTarget.custom(minSize: minTarget, child: content);
-    }
+    // Enforce minimum touch target. Always rendered (even when minTarget is
+    // zero) so the widget-tree structure stays stable across input-modality
+    // changes (pointer ↔ touch). With minTarget == 0, OiTouchTarget.custom
+    // behaves as a no-op pass-through.
+    content = OiTouchTarget.custom(minSize: minTarget, child: content);
 
     // Gesture detection.
     content = GestureDetector(
@@ -283,23 +284,26 @@ class _OiTappableState extends State<OiTappable> {
       child: content,
     );
 
-    // Hover region — only active on pointer platforms.
-    if (minTarget == 0) {
-      content = MouseRegion(
-        cursor: effectiveCursor,
-        onEnter: (_) {
-          if (widget.enabled) {
-            _setHovered(true);
-            widget.onHover?.call(true);
-          }
-        },
-        onExit: (_) {
-          _setHovered(false);
-          widget.onHover?.call(false);
-        },
-        child: content,
-      );
-    }
+    // Hover region. Always rendered to keep the widget-tree structure stable
+    // across input-modality changes (pointer ↔ touch). MouseRegion callbacks
+    // only fire for mouse/trackpad/stylus pointer events, so they are silent
+    // no-ops on touch devices. Removing this widget conditionally (based on
+    // minTarget) would move the GestureDetector within the element tree mid-
+    // gesture, resetting in-flight DoubleTapGestureRecognisers.
+    content = MouseRegion(
+      cursor: effectiveCursor,
+      onEnter: (_) {
+        if (widget.enabled) {
+          _setHovered(true);
+          widget.onHover?.call(true);
+        }
+      },
+      onExit: (_) {
+        _setHovered(false);
+        widget.onHover?.call(false);
+      },
+      child: content,
+    );
 
     // Keyboard focus.
     content = Focus(
