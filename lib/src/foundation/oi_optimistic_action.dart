@@ -31,9 +31,9 @@ class OiOptimisticAction {
   ///
   /// 1. Calls [apply] immediately (optimistic update).
   /// 2. Shows an [OiSnackBar] with [message] and an Undo button.
-  /// 3. If Undo is tapped within [undoDuration], calls [rollback].
+  /// 3. If Undo is tapped within [undoDuration], calls [onRollback].
   /// 4. If the timer expires, calls [commit].
-  /// 5. If [commit] throws, calls [rollback] and shows an error toast.
+  /// 5. If [commit] throws, calls [onRollback] and shows an error toast.
   ///
   /// Returns `true` if the commit succeeded, `false` if undone or failed.
   static Future<bool> execute(
@@ -149,7 +149,7 @@ class _PendingAction {
     try {
       await commit();
       if (!completer.isCompleted) completer.complete(true);
-    } catch (e, st) {
+    } on Exception catch (e, st) {
       log(
         'OiOptimisticAction commit failed',
         error: e,
@@ -158,7 +158,7 @@ class _PendingAction {
       );
       try {
         onRollback();
-      } catch (rollbackError, rollbackSt) {
+      } on Exception catch (rollbackError, rollbackSt) {
         log(
           'OiOptimisticAction rollback also failed',
           error: rollbackError,

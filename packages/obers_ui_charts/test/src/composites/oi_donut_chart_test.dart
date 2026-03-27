@@ -1,4 +1,3 @@
-import 'dart:ui' show Size;
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -10,12 +9,12 @@ void main() {
   group('OiDonutChart', () {
     testWidgets('renders as donut with center label', (tester) async {
       await tester.pumpChartApp(
-        SizedBox(
+        const SizedBox(
           width: 400,
           height: 300,
           child: OiDonutChart(
             label: 'Distribution',
-            segments: const [
+            segments: [
               OiPieSegment(label: 'A', value: 40),
               OiPieSegment(label: 'B', value: 30),
               OiPieSegment(label: 'C', value: 30),
@@ -32,12 +31,12 @@ void main() {
 
     testWidgets('renders without center label', (tester) async {
       await tester.pumpChartApp(
-        SizedBox(
+        const SizedBox(
           width: 400,
           height: 300,
           child: OiDonutChart(
             label: 'Simple',
-            segments: const [
+            segments: [
               OiPieSegment(label: 'X', value: 60),
               OiPieSegment(label: 'Y', value: 40),
             ],
@@ -51,13 +50,13 @@ void main() {
 
     testWidgets('respects custom inner radius', (tester) async {
       await tester.pumpChartApp(
-        SizedBox(
+        const SizedBox(
           width: 400,
           height: 300,
           child: OiDonutChart(
             label: 'Thin ring',
             innerRadiusFraction: 0.7,
-            segments: const [
+            segments: [
               OiPieSegment(label: 'A', value: 50),
               OiPieSegment(label: 'B', value: 50),
             ],

@@ -97,43 +97,6 @@ class OiGauge extends StatelessWidget {
 
     final effectiveSize = size ?? 200.0;
 
-    final gauge = SizedBox(
-      width: effectiveSize,
-      height: effectiveSize * 0.7,
-      child: CustomPaint(
-        key: const Key('oi_gauge_painter'),
-        size: Size(effectiveSize, effectiveSize * 0.7),
-        painter: _OiGaugePainter(
-          value: value.clamp(min, max),
-          min: min,
-          max: max,
-          segments: segments,
-          target: target,
-          trackColor: colors.borderSubtle,
-          needleColor: colors.primary.base,
-          targetColor: colors.warning.base,
-          defaultSegmentColor: colors.primary.base,
-        ),
-        child: showValue
-            ? Align(
-                alignment: Alignment.bottomCenter,
-                child: Padding(
-                  padding: const EdgeInsets.only(bottom: 4),
-                  child: Text(
-                    _formattedValue,
-                    key: const Key('oi_gauge_value'),
-                    style: TextStyle(
-                      color: colors.text,
-                      fontSize: effectiveSize * 0.1,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-              )
-            : null,
-      ),
-    );
-
     return Semantics(
       label: label,
       value: _formattedValue,

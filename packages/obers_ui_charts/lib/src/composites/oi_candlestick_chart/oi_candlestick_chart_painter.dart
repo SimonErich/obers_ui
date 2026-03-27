@@ -65,8 +65,8 @@ class ResolvedCandlestickSeries {
 ///   [ResolvedCandlestick.high].
 /// - A filled rectangle (body) from [ResolvedCandlestick.open] to
 ///   [ResolvedCandlestick.close].
-/// - Bullish candles (close >= open) are filled with [bullColor].
-/// - Bearish candles (close < open) are filled with [bearColor].
+/// - Bullish candles (close >= open) are filled with `bullColor`.
+/// - Bearish candles (close < open) are filled with `bearColor`.
 class OiCandlestickChartPainter extends CustomPainter {
   /// Creates an [OiCandlestickChartPainter].
   OiCandlestickChartPainter({
@@ -197,7 +197,7 @@ class OiCandlestickChartPainter extends CustomPainter {
       final n = series.candles.length;
       final slotPx = n > 1 ? chartRect.width / n : chartRect.width;
       // Candle body takes up 60% of the slot width.
-      final bodyW = math.max(slotPx * 0.6, 2.0);
+      final bodyW = math.max(slotPx * 0.6, 2).toDouble();
       // Wick is 1-2 px wide.
       final wickW = highContrast ? 2.0 : 1.0;
 
@@ -227,7 +227,7 @@ class OiCandlestickChartPainter extends CustomPainter {
         final bodyTop = math.min(openPy, closePy);
         final bodyBottom = math.max(openPy, closePy);
         // Ensure minimum visible height of 1px.
-        final bodyHeight = math.max(bodyBottom - bodyTop, 1.0);
+        final bodyHeight = math.max(bodyBottom - bodyTop, 1).toDouble();
 
         final bodyRect = Rect.fromLTWH(
           cx - bodyW / 2,

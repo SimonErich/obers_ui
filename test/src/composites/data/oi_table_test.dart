@@ -6,11 +6,10 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui/src/components/buttons/oi_button.dart';
 import 'package:obers_ui/src/components/panels/oi_resizable.dart';
-import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/composites/data/oi_pagination_controller.dart';
-import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/composites/data/oi_table.dart';
 import 'package:obers_ui/src/composites/data/oi_table_controller.dart';
+import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/persistence/drivers/oi_in_memory_driver.dart';
 import 'package:obers_ui/src/foundation/persistence/oi_settings_driver.dart';
 import 'package:obers_ui/src/foundation/persistence/oi_settings_provider.dart';
@@ -1002,13 +1001,12 @@ void main() {
     // onPerPageChange callback wires up to.
     final manyRows = List.generate(100, (i) => _Row('Row$i', i));
     final ctrl = OiTableController(totalRows: 100);
-    int? changedTo;
     await tester.pumpObers(
       _table(
         rows: manyRows,
         controller: ctrl,
         paginationMode: OiTablePaginationMode.pages,
-        onPageSizeChanged: (size) => changedTo = size,
+        onPageSizeChanged: (_) {},
       ),
       surfaceSize: const Size(1400, 700),
     );
@@ -2653,16 +2651,7 @@ void main() {
 
   // 81. Commit edit via ✓ fires onCellChanged callback
   testWidgets('commit edit via ✓ fires onCellChanged callback', (tester) async {
-    String? changedColumnId;
-    dynamic changedValue;
-    await tester.pumpObers(
-      _table(
-        onCellChanged: (_, __, colId, value) {
-          changedColumnId = colId;
-          changedValue = value;
-        },
-      ),
-    );
+    await tester.pumpObers(_table(onCellChanged: (_, __, ___, ____) {}));
     await tester.pump();
     // Double-tap to enter edit mode.
     final cellDisplay = find.byKey(const Key('cell_display')).first;

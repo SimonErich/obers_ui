@@ -1,5 +1,4 @@
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 
 import 'package:obers_ui_charts/src/foundation/oi_chart_behavior.dart';
 

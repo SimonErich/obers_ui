@@ -1,7 +1,6 @@
 // Tests do not require documentation comments.
 // ignore_for_file: public_member_api_docs
 
-import 'dart:ui';
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -137,7 +136,7 @@ void main() {
     // Verify Semantics widget with liveRegion is in the tree.
     final semanticsWidget = tester.widget<Semantics>(
       find.byWidgetPredicate(
-        (w) => w is Semantics && w.properties.liveRegion == true,
+        (w) => w is Semantics && (w.properties.liveRegion ?? false),
       ),
     );
     expect(semanticsWidget, isNotNull);

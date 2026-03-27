@@ -1245,46 +1245,47 @@ class _OiTableState<T> extends State<OiTable<T>>
       final header = widget.groupHeaderBuilder != null
           ? widget.groupHeaderBuilder!(context, groupKey, groupRows)
           : _buildDefaultGroupHeader(groupKey, groupRows.length, expanded);
-      items.add(
-        GestureDetector(
-          key: ValueKey('group_$groupKey'),
-          onTap: () {
-            final willExpand = !_ctrl.expandedGroups.contains(groupKey);
-            if (willExpand) {
-              animCtrl.forward();
-            } else {
-              animCtrl.reverse();
-            }
-            _ctrl.toggleGroup(groupKey);
-          },
-          child: header,
-        ),
-      );
-      // Animated group rows.
-      items.add(
-        AnimatedBuilder(
-          key: ValueKey('group_body_$groupKey'),
-          animation: animCtrl,
-          builder: (context, child) {
-            if (animCtrl.isDismissed) return const SizedBox.shrink();
-            return SizeTransition(
-              sizeFactor: CurvedAnimation(
-                parent: animCtrl,
-                curve: Curves.easeInOut,
-              ),
-              axisAlignment: -1,
-              child: child,
-            );
-          },
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              for (var i = 0; i < groupRows.length; i++)
-                _buildRow(groupRows[i], i),
-            ],
+      items
+        ..add(
+          GestureDetector(
+            key: ValueKey('group_$groupKey'),
+            onTap: () {
+              final willExpand = !_ctrl.expandedGroups.contains(groupKey);
+              if (willExpand) {
+                animCtrl.forward();
+              } else {
+                animCtrl.reverse();
+              }
+              _ctrl.toggleGroup(groupKey);
+            },
+            child: header,
           ),
-        ),
-      );
+        )
+        // Animated group rows.
+        ..add(
+          AnimatedBuilder(
+            key: ValueKey('group_body_$groupKey'),
+            animation: animCtrl,
+            builder: (context, child) {
+              if (animCtrl.isDismissed) return const SizedBox.shrink();
+              return SizeTransition(
+                sizeFactor: CurvedAnimation(
+                  parent: animCtrl,
+                  curve: Curves.easeInOut,
+                ),
+                axisAlignment: -1,
+                child: child,
+              );
+            },
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                for (var i = 0; i < groupRows.length; i++)
+                  _buildRow(groupRows[i], i),
+              ],
+            ),
+          ),
+        );
     }
     return ListView(controller: _scrollController, children: items);
   }

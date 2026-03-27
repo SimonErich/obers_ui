@@ -52,6 +52,9 @@ class _OiToastQueue {
   _OiToastQueue._();
 
   static _OiToastQueue? _instance;
+  // A getter is used here to lazily initialise the singleton; a Dart factory
+  // constructor cannot conditionally return an already-created instance.
+  // ignore: prefer_constructors_over_static_methods
   static _OiToastQueue get _shared => _instance ??= _OiToastQueue._();
 
   OiOverlayHandle? _handle;
@@ -128,6 +131,7 @@ class _OiToastQueue {
 }
 
 class _ToastQueueNotifier extends ChangeNotifier {
+  // Intentional notify wrapper to keep the public API surface minimal.
   // ignore: use_setters_to_change_properties
   void notify() => notifyListeners();
 }

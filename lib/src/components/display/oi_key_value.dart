@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/display/oi_card.dart';
+import 'package:obers_ui/src/components/display/oi_field_display.dart';
 import 'package:obers_ui/src/foundation/oi_responsive.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/primitives/clipboard/oi_copyable.dart';

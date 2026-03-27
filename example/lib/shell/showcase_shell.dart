@@ -58,7 +58,7 @@ class ShowcaseShell extends StatelessWidget {
               // ── Theme preset switcher ──
               OiTappable(
                 semanticLabel: 'Switch theme preset',
-                onTap: () => themeState.cyclePreset(),
+                onTap: themeState.cyclePreset,
                 child: Container(
                   padding: EdgeInsets.symmetric(
                     horizontal: spacing.sm,

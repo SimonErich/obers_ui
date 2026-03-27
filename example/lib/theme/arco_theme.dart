@@ -8,16 +8,11 @@ import 'package:obers_ui/obers_ui.dart';
 // Primary: Arco Blue (#165DFF), generated 10-shade palettes
 
 /// Primary palette (Arco Blue) — shades 1-10, base = 6
-const _arcoblue1 = Color(0xFFE8F3FF);
-const _arcoblue2 = Color(0xFFBEDAFF);
 const _arcoblue3 = Color(0xFF94BFFF);
 const _arcoblue4 = Color(0xFF6AA1FF);
 const _arcoblue5 = Color(0xFF4080FF);
 const _arcoblue6 = Color(0xFF165DFF); // base primary
 const _arcoblue7 = Color(0xFF0E42D2);
-const _arcoblue8 = Color(0xFF072CA6);
-const _arcoblue9 = Color(0xFF031A79);
-const _arcoblue10 = Color(0xFF000D4D);
 
 /// Success palette (Green)
 const _green1 = Color(0xFFE8FFEA);
@@ -41,12 +36,8 @@ const _blue6 = Color(0xFF3491FA);
 const _gray1 = Color(0xFFF7F8FA);
 const _gray2 = Color(0xFFF2F3F5);
 const _gray3 = Color(0xFFE5E6EB);
-const _gray4 = Color(0xFFC9CDD4);
-const _gray5 = Color(0xFFA9AEB8);
 const _gray6 = Color(0xFF86909C);
-const _gray7 = Color(0xFF6B7785);
 const _gray8 = Color(0xFF4E5969);
-const _gray9 = Color(0xFF272E3B);
 const _gray10 = Color(0xFF1D2129);
 
 /// Dark theme background colors
@@ -54,7 +45,6 @@ const _darkBg1 = Color(0xFF17171A);
 const _darkBg2 = Color(0xFF232324);
 const _darkBg3 = Color(0xFF2A2A2B);
 const _darkBg4 = Color(0xFF313132);
-const _darkBg5 = Color(0xFF373739);
 
 // ── Theme Definitions ──────────────────────────────────────────────────────
 
@@ -63,64 +53,64 @@ const _darkBg5 = Color(0xFF373739);
 final arcoTheme = OiThemeData(
   brightness: Brightness.light,
   componentSizes: const OiComponentSizeScale.arco(),
-  colors: OiColorScheme(
+  colors: const OiColorScheme(
     primary: OiColorSwatch(
       base: _arcoblue6,
       light: _arcoblue5,
       dark: _arcoblue7,
       muted: _arcoblue3,
-      foreground: const Color(0xFFFFFFFF),
+      foreground: Color(0xFFFFFFFF),
     ),
     accent: OiColorSwatch(
-      base: const Color(0xFF722ED1), // Arco purple
-      light: const Color(0xFF8D4EDA),
-      dark: const Color(0xFF551DB0),
-      muted: const Color(0xFFD4BCFB),
-      foreground: const Color(0xFFFFFFFF),
+      base: Color(0xFF722ED1), // Arco purple
+      light: Color(0xFF8D4EDA),
+      dark: Color(0xFF551DB0),
+      muted: Color(0xFFD4BCFB),
+      foreground: Color(0xFFFFFFFF),
     ),
     success: OiColorSwatch(
       base: _green6,
       light: _green3,
-      dark: const Color(0xFF009A29),
+      dark: Color(0xFF009A29),
       muted: _green1,
-      foreground: const Color(0xFFFFFFFF),
+      foreground: Color(0xFFFFFFFF),
     ),
     warning: OiColorSwatch(
       base: _orange6,
       light: _orange3,
-      dark: const Color(0xFFD25F00),
+      dark: Color(0xFFD25F00),
       muted: _orange1,
-      foreground: const Color(0xFFFFFFFF),
+      foreground: Color(0xFFFFFFFF),
     ),
     error: OiColorSwatch(
       base: _red6,
       light: _red3,
-      dark: const Color(0xFFCB2634),
+      dark: Color(0xFFCB2634),
       muted: _red1,
-      foreground: const Color(0xFFFFFFFF),
+      foreground: Color(0xFFFFFFFF),
     ),
     info: OiColorSwatch(
       base: _blue6,
-      light: const Color(0xFF6BB5F8),
-      dark: const Color(0xFF206CCF),
-      muted: const Color(0xFFE8F7FF),
-      foreground: const Color(0xFFFFFFFF),
+      light: Color(0xFF6BB5F8),
+      dark: Color(0xFF206CCF),
+      muted: Color(0xFFE8F7FF),
+      foreground: Color(0xFFFFFFFF),
     ),
 
     // Surfaces — Arco uses pure white backgrounds
-    background: const Color(0xFFF2F3F5), // gray-2
-    surface: const Color(0xFFFFFFFF),
+    background: Color(0xFFF2F3F5), // gray-2
+    surface: Color(0xFFFFFFFF),
     surfaceHover: _gray1,
     surfaceActive: _gray3,
     surfaceSubtle: _gray1,
-    overlay: const Color(0x66000000),
+    overlay: Color(0x66000000),
 
     // Text — Arco text hierarchy uses gray-10 through gray-4
     text: _gray10, // color-text-1 (primary)
     textSubtle: _gray8, // color-text-2 (secondary)
     textMuted: _gray6, // color-text-3 (placeholder)
-    textInverse: const Color(0xFFFFFFFF),
-    textOnPrimary: const Color(0xFFFFFFFF),
+    textInverse: Color(0xFFFFFFFF),
+    textOnPrimary: Color(0xFFFFFFFF),
 
     // Borders — Arco uses gray-3 as default border
     border: _gray3, // color-border
@@ -129,11 +119,11 @@ final arcoTheme = OiThemeData(
     borderError: _red6,
 
     // Glass
-    glassBackground: const Color(0x99FFFFFF),
-    glassBorder: const Color(0x33FFFFFF),
+    glassBackground: Color(0x99FFFFFF),
+    glassBorder: Color(0x33FFFFFF),
 
     // Chart palette
-    chart: const [
+    chart: [
       Color(0xFF165DFF), // arcoblue
       Color(0xFF0FC6C2), // cyan
       Color(0xFF722ED1), // purple
@@ -149,30 +139,30 @@ final arcoTheme = OiThemeData(
   // Arco uses: small=2px, medium=4px, large=8px
   radius: OiRadiusScale.forPreference(OiRadiusPreference.medium),
   // Arco shadow scale
-  shadows: OiShadowScale(
-    none: const [],
+  shadows: const OiShadowScale(
+    none: [],
     // shadow-1: subtle
-    xs: const [
+    xs: [
       BoxShadow(color: Color(0x14000000), offset: Offset(0, 2), blurRadius: 5),
     ],
     // shadow-1 full
-    sm: const [
+    sm: [
       BoxShadow(color: Color(0x14000000), offset: Offset(0, 4), blurRadius: 10),
     ],
     // shadow-2
-    md: const [
+    md: [
       BoxShadow(color: Color(0x1F000000), offset: Offset(0, 4), blurRadius: 10),
     ],
     // shadow-3
-    lg: const [
+    lg: [
       BoxShadow(color: Color(0x14000000), offset: Offset(0, 4), blurRadius: 20),
       BoxShadow(color: Color(0x0A000000), offset: Offset(0, 2), blurRadius: 10),
     ],
-    xl: const [
+    xl: [
       BoxShadow(color: Color(0x1F000000), offset: Offset(0, 8), blurRadius: 40),
       BoxShadow(color: Color(0x14000000), offset: Offset(0, 4), blurRadius: 20),
     ],
-    glass: const [BoxShadow(color: Color(0x1A000000), blurRadius: 24)],
+    glass: [BoxShadow(color: Color(0x1A000000), blurRadius: 24)],
   ),
   animations: const OiAnimationConfig.standard(),
   effects: OiEffectsTheme.standard(
@@ -205,7 +195,7 @@ final arcoTheme = OiThemeData(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
     ),
     badge: OiBadgeThemeData(borderRadius: BorderRadius.circular(2)),
-    tabs: OiTabsThemeData(
+    tabs: const OiTabsThemeData(
       indicatorColor: _arcoblue6,
       activeLabelColor: _arcoblue6,
       inactiveLabelColor: _gray6,
@@ -232,48 +222,48 @@ final arcoTheme = OiThemeData(
 final arcoDarkTheme = OiThemeData(
   brightness: Brightness.dark,
   componentSizes: const OiComponentSizeScale.arco(),
-  colors: OiColorScheme(
+  colors: const OiColorScheme(
     primary: OiColorSwatch(
       base: _arcoblue5, // lighter in dark mode
       light: _arcoblue4,
       dark: _arcoblue6,
-      muted: const Color(0xFF0E2A5E),
-      foreground: const Color(0xFFFFFFFF),
+      muted: Color(0xFF0E2A5E),
+      foreground: Color(0xFFFFFFFF),
     ),
     accent: OiColorSwatch(
-      base: const Color(0xFF8D4EDA),
-      light: const Color(0xFFA871E3),
-      dark: const Color(0xFF722ED1),
-      muted: const Color(0xFF2A1158),
-      foreground: const Color(0xFFFFFFFF),
+      base: Color(0xFF8D4EDA),
+      light: Color(0xFFA871E3),
+      dark: Color(0xFF722ED1),
+      muted: Color(0xFF2A1158),
+      foreground: Color(0xFFFFFFFF),
     ),
     success: OiColorSwatch(
-      base: const Color(0xFF27C346),
-      light: const Color(0xFF59D97C),
+      base: Color(0xFF27C346),
+      light: Color(0xFF59D97C),
       dark: _green6,
-      muted: const Color(0xFF0A3A15),
-      foreground: const Color(0xFFFFFFFF),
+      muted: Color(0xFF0A3A15),
+      foreground: Color(0xFFFFFFFF),
     ),
     warning: OiColorSwatch(
-      base: const Color(0xFFFF9A2E),
-      light: const Color(0xFFFFB65D),
+      base: Color(0xFFFF9A2E),
+      light: Color(0xFFFFB65D),
       dark: _orange6,
-      muted: const Color(0xFF3D2600),
-      foreground: const Color(0xFFFFFFFF),
+      muted: Color(0xFF3D2600),
+      foreground: Color(0xFFFFFFFF),
     ),
     error: OiColorSwatch(
-      base: const Color(0xFFF76560),
-      light: const Color(0xFFFA9088),
+      base: Color(0xFFF76560),
+      light: Color(0xFFFA9088),
       dark: _red6,
-      muted: const Color(0xFF4D1418),
-      foreground: const Color(0xFFFFFFFF),
+      muted: Color(0xFF4D1418),
+      foreground: Color(0xFFFFFFFF),
     ),
     info: OiColorSwatch(
-      base: const Color(0xFF57A9FB),
-      light: const Color(0xFF7CC0FC),
+      base: Color(0xFF57A9FB),
+      light: Color(0xFF7CC0FC),
       dark: _blue6,
-      muted: const Color(0xFF0E2B4D),
-      foreground: const Color(0xFFFFFFFF),
+      muted: Color(0xFF0E2B4D),
+      foreground: Color(0xFFFFFFFF),
     ),
 
     // Dark surfaces — Arco dark bg scale
@@ -282,27 +272,27 @@ final arcoDarkTheme = OiThemeData(
     surfaceHover: _darkBg3,
     surfaceActive: _darkBg4,
     surfaceSubtle: _darkBg1,
-    overlay: const Color(0x99000000),
+    overlay: Color(0x99000000),
 
     // Dark text — Arco uses white at varying opacities
-    text: const Color(0xE6FFFFFF), // 90%
-    textSubtle: const Color(0xB3FFFFFF), // 70%
-    textMuted: const Color(0x80FFFFFF), // 50%
+    text: Color(0xE6FFFFFF), // 90%
+    textSubtle: Color(0xB3FFFFFF), // 70%
+    textMuted: Color(0x80FFFFFF), // 50%
     textInverse: _gray10,
-    textOnPrimary: const Color(0xFFFFFFFF),
+    textOnPrimary: Color(0xFFFFFFFF),
 
     // Dark borders
-    border: const Color(0xFF333335),
-    borderSubtle: const Color(0xFF2A2A2C),
+    border: Color(0xFF333335),
+    borderSubtle: Color(0xFF2A2A2C),
     borderFocus: _arcoblue5,
     borderError: _red6,
 
     // Glass
-    glassBackground: const Color(0x33FFFFFF),
-    glassBorder: const Color(0x1AFFFFFF),
+    glassBackground: Color(0x33FFFFFF),
+    glassBorder: Color(0x1AFFFFFF),
 
     // Dark chart palette — lighter variants
-    chart: const [
+    chart: [
       Color(0xFF4080FF),
       Color(0xFF33D1CC),
       Color(0xFF8D4EDA),
@@ -368,10 +358,10 @@ final arcoDarkTheme = OiThemeData(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
     ),
     badge: OiBadgeThemeData(borderRadius: BorderRadius.circular(2)),
-    tabs: OiTabsThemeData(
+    tabs: const OiTabsThemeData(
       indicatorColor: _arcoblue5,
       activeLabelColor: _arcoblue5,
-      inactiveLabelColor: const Color(0x80FFFFFF),
+      inactiveLabelColor: Color(0x80FFFFFF),
     ),
     progress: OiProgressThemeData(
       height: 4,

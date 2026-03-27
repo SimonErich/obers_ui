@@ -25,7 +25,7 @@ void main() {
   testWidgets('shows folder icon when showIcon is true', (tester) async {
     await tester.pumpObers(OiPathBar(segments: segments, onNavigate: (_) {}));
     // folder icon code point 0xe2c7
-    final folderIcon = OiIcons.folder;
+    const folderIcon = OiIcons.folder;
     expect(find.byIcon(folderIcon), findsOneWidget);
   });
 
@@ -33,7 +33,7 @@ void main() {
     await tester.pumpObers(
       OiPathBar(segments: segments, onNavigate: (_) {}, showIcon: false),
     );
-    final folderIcon = OiIcons.folder;
+    const folderIcon = OiIcons.folder;
     expect(find.byIcon(folderIcon), findsNothing);
   });
 
@@ -144,7 +144,7 @@ void main() {
     tester,
   ) async {
     await tester.pumpObers(OiPathBar(segments: const [], onNavigate: (_) {}));
-    final folderIcon = OiIcons.folder;
+    const folderIcon = OiIcons.folder;
     expect(find.byIcon(folderIcon), findsNothing);
   });
 }

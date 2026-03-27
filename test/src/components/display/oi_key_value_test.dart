@@ -66,10 +66,10 @@ void main() {
 
   testWidgets('valueWidget overrides text value', (tester) async {
     await tester.pumpObers(
-      OiKeyValue(
+      const OiKeyValue(
         label: 'Status',
         value: 'active',
-        valueWidget: const OiBadge.filled(label: 'Active'),
+        valueWidget: OiBadge.filled(label: 'Active'),
       ),
     );
     expect(find.byType(OiBadge), findsOneWidget);

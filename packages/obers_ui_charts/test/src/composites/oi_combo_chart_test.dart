@@ -1,4 +1,3 @@
-import 'dart:ui' show Size;
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -47,10 +46,10 @@ void main() {
 
     testWidgets('renders with empty series', (tester) async {
       await tester.pumpChartApp(
-        SizedBox(
+        const SizedBox(
           width: 400,
           height: 300,
-          child: OiComboChart<_Point>(label: 'Empty combo', series: const []),
+          child: OiComboChart<_Point>(label: 'Empty combo', series: []),
         ),
         surfaceSize: const Size(400, 300),
       );

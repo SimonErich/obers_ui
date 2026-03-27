@@ -3,9 +3,9 @@
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:obers_ui/src/foundation/theme/oi_theme_data.dart';
 import 'package:obers_ui_charts/src/composites/oi_bubble_chart/oi_bubble_chart_interaction.dart';
 import 'package:obers_ui_charts/src/composites/oi_scatter_plot.dart';
-import 'package:obers_ui/src/foundation/theme/oi_theme_data.dart';
 
 import '../../helpers/pump_chart_app.dart';
 

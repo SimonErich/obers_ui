@@ -1,17 +1,15 @@
 import 'dart:ui' show Locale;
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:obers_ui/obers_ui.dart' show OiChartThemeData;
 import 'package:obers_ui_charts/obers_ui_charts.dart';
 
 void main() {
   group('OiAxisFormatContext', () {
     test('provides tick position flags', () {
-      final context = OiAxisFormatContext<double>(
+      const context = OiAxisFormatContext<double>(
         theme: OiChartThemeData(),
-        locale: const Locale('en'),
+        locale: Locale('en'),
         isFirstTick: true,
-        isLastTick: false,
         axisPosition: 'bottom',
         availableWidth: 60,
       );
@@ -23,10 +21,10 @@ void main() {
     });
 
     test('inherits OiFormatterContext properties', () {
-      final theme = OiChartThemeData();
-      final context = OiAxisFormatContext<double>(
+      const theme = OiChartThemeData();
+      const context = OiAxisFormatContext<double>(
         theme: theme,
-        locale: const Locale('de'),
+        locale: Locale('de'),
       );
 
       expect(context.theme, theme);
@@ -35,20 +33,19 @@ void main() {
     });
 
     test('equality includes axis-specific fields', () {
-      final a = OiAxisFormatContext<double>(
+      const a = OiAxisFormatContext<double>(
         theme: OiChartThemeData(),
-        locale: const Locale('en'),
+        locale: Locale('en'),
         isFirstTick: true,
       );
-      final b = OiAxisFormatContext<double>(
+      const b = OiAxisFormatContext<double>(
         theme: OiChartThemeData(),
-        locale: const Locale('en'),
+        locale: Locale('en'),
         isFirstTick: true,
       );
-      final c = OiAxisFormatContext<double>(
+      const c = OiAxisFormatContext<double>(
         theme: OiChartThemeData(),
-        locale: const Locale('en'),
-        isFirstTick: false,
+        locale: Locale('en'),
       );
       expect(a, equals(b));
       expect(a, isNot(equals(c)));
@@ -57,9 +54,9 @@ void main() {
 
   group('OiTooltipFormatContext', () {
     test('provides series identification', () {
-      final context = OiTooltipFormatContext(
+      const context = OiTooltipFormatContext(
         theme: OiChartThemeData(),
-        locale: const Locale('en'),
+        locale: Locale('en'),
         seriesId: 'revenue',
         seriesLabel: 'Revenue',
         pointIndex: 5,

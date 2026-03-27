@@ -3,8 +3,8 @@
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:obers_ui/src/composites/data/oi_grouped_list.dart';
 import 'package:obers_ui/src/components/display/oi_progress.dart';
+import 'package:obers_ui/src/composites/data/oi_grouped_list.dart';
 import 'package:obers_ui/src/foundation/persistence/drivers/oi_in_memory_driver.dart';
 import 'package:obers_ui/src/primitives/display/oi_label.dart';
 
@@ -139,7 +139,8 @@ void main() {
         itemBuilder: (_, c, _) => Text(c.name),
         groupBy: (c) => c.letter,
         label: 'Contacts',
-        headerBuilder: (_, key, items, _) => Text('$key (${items.length})'),
+        headerBuilder: (_, key, items, {required collapsed}) =>
+            Text('$key (${items.length})'),
       ),
       surfaceSize: const Size(800, 1200),
     );

@@ -1,4 +1,3 @@
-import 'dart:ui' show Size;
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -18,7 +17,7 @@ class _Candle {
 void main() {
   group('OiCandlestickChart', () {
     final sampleData = [
-      _Candle(DateTime(2024, 1, 1), 100, 120, 95, 115), // bull
+      _Candle(DateTime(2024), 100, 120, 95, 115), // bull
       _Candle(DateTime(2024, 1, 2), 115, 125, 105, 108), // bear
       _Candle(DateTime(2024, 1, 3), 108, 130, 100, 128), // bull
     ];

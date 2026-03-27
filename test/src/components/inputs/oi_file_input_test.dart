@@ -1,7 +1,6 @@
 // Tests do not require documentation comments.
 // ignore_for_file: public_member_api_docs
 
-import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui/src/components/inputs/oi_file_input.dart';
 import 'package:obers_ui/src/foundation/oi_icons.dart';

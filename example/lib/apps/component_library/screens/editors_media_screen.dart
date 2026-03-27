@@ -231,8 +231,6 @@ class _EditorsMediaScreenState extends State<EditorsMediaScreen> {
                       'https://picsum.photos/seed/crop/800/600',
                     ),
                     label: 'Crop image',
-                    enableRotate: true,
-                    enableFlip: true,
                     aspectRatioOptions: const [1.0, 16 / 9, 4 / 3],
                     onCrop: (_) {},
                   ),

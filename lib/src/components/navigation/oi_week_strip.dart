@@ -401,7 +401,7 @@ class _OiWeekStripState extends State<OiWeekStrip> {
                     if (widget.todayLabel != null)
                       OiTappable(
                         onTap: _jumpToToday,
-                        semanticLabel: widget.todayLabel!,
+                        semanticLabel: widget.todayLabel,
                         child: OiLabel.small(
                           widget.todayLabel!,
                           color: colors.primary.base,

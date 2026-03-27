@@ -1,11 +1,7 @@
-import 'dart:ui' show Offset, Size;
-
 import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:obers_ui/obers_ui.dart' show OiChartThemeData;
 import 'package:obers_ui_charts/obers_ui_charts.dart';
-import 'package:obers_ui_charts/src/foundation/oi_chart_hit_tester.dart';
 
 // ── Test doubles ─────────────────────────────────────────────────────────────
 
@@ -36,7 +32,7 @@ void main() {
       controller: controller,
       viewport: const OiChartViewport(size: Size(400, 300)),
       hitTester: _TestHitTester(),
-      theme: OiChartThemeData(),
+      theme: const OiChartThemeData(),
     );
 
     behavior.attach(behaviorContext);
@@ -84,15 +80,15 @@ void main() {
       OiChartCrosshairState? receivedState;
 
       behavior.detach();
-      behavior = OiChartCrosshairBehavior(
-        onCrosshairUpdate: (state) => receivedState = state,
-      );
-      behavior.attach(behaviorContext);
-
-      // Simulate a pointer hover inside the plot area.
-      behavior.onPointerHover(
-        const PointerHoverEvent(position: Offset(200, 150)),
-      );
+      behavior =
+          OiChartCrosshairBehavior(
+              onCrosshairUpdate: (state) => receivedState = state,
+            )
+            ..attach(behaviorContext)
+            // Simulate a pointer hover inside the plot area.
+            ..onPointerHover(
+              const PointerHoverEvent(position: Offset(200, 150)),
+            );
 
       // The viewport plot area encompasses (0,0)-(400,300); 200,150 is inside.
       expect(receivedState, isNotNull);
@@ -103,19 +99,12 @@ void main() {
       final states = <OiChartCrosshairState?>[];
 
       behavior.detach();
-      behavior = OiChartCrosshairBehavior(
-        onCrosshairUpdate: (state) => states.add(state),
-      );
-      behavior.attach(behaviorContext);
-
-      // First move inside the plot area.
-      behavior.onPointerHover(
-        const PointerHoverEvent(position: Offset(200, 150)),
-      );
-      // Then move outside (negative coords are outside plot).
-      behavior.onPointerHover(
-        const PointerHoverEvent(position: Offset(-10, -10)),
-      );
+      behavior = OiChartCrosshairBehavior(onCrosshairUpdate: states.add)
+        ..attach(behaviorContext)
+        // First move inside the plot area.
+        ..onPointerHover(const PointerHoverEvent(position: Offset(200, 150)))
+        // Then move outside (negative coords are outside plot).
+        ..onPointerHover(const PointerHoverEvent(position: Offset(-10, -10)));
 
       expect(states.last, isNull);
     });
@@ -124,15 +113,15 @@ void main() {
       OiChartCrosshairState? lastState;
 
       behavior.detach();
-      behavior = OiChartCrosshairBehavior(
-        onCrosshairUpdate: (state) => lastState = state,
-      );
-      behavior.attach(behaviorContext);
-
-      // First establish some state by hovering inside the plot area.
-      behavior.onPointerHover(
-        const PointerHoverEvent(position: Offset(200, 150)),
-      );
+      behavior =
+          OiChartCrosshairBehavior(
+              onCrosshairUpdate: (state) => lastState = state,
+            )
+            ..attach(behaviorContext)
+            // First establish some state by hovering inside the plot area.
+            ..onPointerHover(
+              const PointerHoverEvent(position: Offset(200, 150)),
+            );
       expect(lastState, isNotNull);
 
       // Cancel should clear the state.
@@ -185,20 +174,18 @@ void main() {
 
     test('equality holds when all fields match', () {
       const a = OiChartCrosshairConfig(
-        enabled: true,
         snap: OiChartCrosshairSnap.nearestPoint,
         axis: OiChartCrosshairAxis.vertical,
-        width: 2.0,
+        width: 2,
         showLabel: true,
-        hitTestTolerance: 16.0,
+        hitTestTolerance: 16,
       );
       const b = OiChartCrosshairConfig(
-        enabled: true,
         snap: OiChartCrosshairSnap.nearestPoint,
         axis: OiChartCrosshairAxis.vertical,
-        width: 2.0,
+        width: 2,
         showLabel: true,
-        hitTestTolerance: 16.0,
+        hitTestTolerance: 16,
       );
 
       expect(a, equals(b));
@@ -206,13 +193,13 @@ void main() {
     });
 
     test('inequality when enabled differs', () {
-      const a = OiChartCrosshairConfig(enabled: true);
+      const a = OiChartCrosshairConfig();
       const b = OiChartCrosshairConfig(enabled: false);
       expect(a, isNot(equals(b)));
     });
 
     test('inequality when snap mode differs', () {
-      const a = OiChartCrosshairConfig(snap: OiChartCrosshairSnap.free);
+      const a = OiChartCrosshairConfig();
       const b = OiChartCrosshairConfig(snap: OiChartCrosshairSnap.nearestPoint);
       expect(a, isNot(equals(b)));
     });
@@ -224,8 +211,8 @@ void main() {
     });
 
     test('inequality when width differs', () {
-      const a = OiChartCrosshairConfig(width: 1.0);
-      const b = OiChartCrosshairConfig(width: 2.0);
+      const a = OiChartCrosshairConfig();
+      const b = OiChartCrosshairConfig(width: 2);
       expect(a, isNot(equals(b)));
     });
   });
@@ -271,7 +258,7 @@ void main() {
     });
 
     test('optional fields default to null', () {
-      const state = OiChartCrosshairState(position: Offset(0, 0));
+      const state = OiChartCrosshairState(position: Offset.zero);
       expect(state.snappedPosition, isNull);
       expect(state.normalizedX, isNull);
       expect(state.normalizedY, isNull);

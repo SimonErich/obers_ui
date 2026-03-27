@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/src/components/inputs/oi_select.dart';
 
 /// Tracks which [OiSelect] is currently open within a subtree.
 ///
@@ -14,7 +15,7 @@ class OiSelectScope extends StatefulWidget {
   /// The widget subtree that shares the select group.
   final Widget child;
 
-  // Returns the nearest [OiSelectScopeNotifier] above [context], or null.
+  /// Returns the nearest [OiSelectScopeNotifier] above [context], or null.
   static OiSelectScopeNotifier? of(BuildContext context) {
     return context
         .dependOnInheritedWidgetOfExactType<_OiSelectScopeInherited>()

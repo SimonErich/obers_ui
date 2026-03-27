@@ -3,8 +3,8 @@
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:obers_ui_charts/src/composites/oi_sparkline.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme_data.dart';
+import 'package:obers_ui_charts/src/composites/oi_sparkline.dart';
 
 import '../../helpers/pump_chart_app.dart';
 

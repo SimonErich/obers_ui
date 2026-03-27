@@ -65,7 +65,7 @@ void main() {
         presets: [
           OiDateRangePreset(
             label: 'Custom Range',
-            resolve: () => (DateTime(2026, 1, 1), DateTime(2026, 1, 31)),
+            resolve: () => (DateTime(2026), DateTime(2026, 1, 31)),
           ),
         ],
       ),

@@ -21,12 +21,10 @@ mixin ChartStreamingHost<T extends StatefulWidget> on State<T> {
     detachStreamingAdapters();
     for (final series in streamingSeries) {
       if (series.streamingSource != null) {
-        final adapter = OiStreamingSeriesAdapter<dynamic>(
-          series.streamingSource!,
-        );
-        adapter
-          ..addListener(_onStreamingUpdate)
-          ..attach();
+        final adapter =
+            OiStreamingSeriesAdapter<dynamic>(series.streamingSource!)
+              ..addListener(_onStreamingUpdate)
+              ..attach();
         _adapters[series.id] = adapter;
       }
     }
@@ -52,6 +50,8 @@ mixin ChartStreamingHost<T extends StatefulWidget> on State<T> {
 
   void _onStreamingUpdate() {
     if (mounted) {
+      // setState is protected in State but safe to call here because this
+      // mixin is constrained to State<T> and is only invoked while mounted.
       // ignore: invalid_use_of_protected_member
       setState(() {});
     }

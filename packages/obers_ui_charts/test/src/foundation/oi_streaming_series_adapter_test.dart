@@ -66,13 +66,15 @@ void main() {
       final throttledAdapter = OiStreamingSeriesAdapter<int>(throttledSource);
 
       var notifyCount = 0;
-      throttledAdapter.addListener(() => notifyCount++);
-      throttledAdapter.attach();
+      throttledAdapter
+        ..addListener(() => notifyCount++)
+        ..attach();
 
       // Emit multiple batches rapidly
-      throttledSource.emit([1]);
-      throttledSource.emit([2]);
-      throttledSource.emit([3]);
+      throttledSource
+        ..emit([1])
+        ..emit([2])
+        ..emit([3]);
 
       // Allow throttle interval to pass
       await Future<void>.delayed(const Duration(milliseconds: 60));

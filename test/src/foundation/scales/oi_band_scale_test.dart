@@ -114,7 +114,6 @@ void main() {
         rangeMin: 0,
         rangeMax: 300,
         paddingInner: 0.2,
-        paddingOuter: 0.1,
       );
       expect(withPadding.bandwidth, lessThan(noPadding.bandwidth));
     });

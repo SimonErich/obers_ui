@@ -158,11 +158,13 @@ class _OiChartExplorerState<T> extends State<OiChartExplorer<T>> {
   /// column clears the assignment.
   void _tapColumn(String columnId) {
     if (_controller.xColumnId == columnId) {
-      _controller.setXColumn('');
-      _controller.setYColumn(columnId);
+      _controller
+        ..setXColumn('')
+        ..setYColumn(columnId);
     } else if (_controller.yColumnId == columnId) {
-      _controller.setYColumn('');
-      _controller.setGroupBy(columnId);
+      _controller
+        ..setYColumn('')
+        ..setGroupBy(columnId);
     } else if (_controller.groupByColumnId == columnId) {
       _controller.setGroupBy(null);
     } else {

@@ -1,5 +1,3 @@
-import 'dart:ui' show Offset;
-
 import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui_charts/obers_ui_charts.dart';
 
@@ -13,7 +11,7 @@ void main() {
     });
 
     test('isZoomed returns true when zoom != 1', () {
-      final state = OiChartViewportState(zoomLevel: 2.0);
+      final state = OiChartViewportState(zoomLevel: 2);
       expect(state.isZoomed, isTrue);
     });
 
@@ -23,8 +21,7 @@ void main() {
     });
 
     test('zoom is clamped to 0.1..100', () {
-      final state = OiChartViewportState();
-      state.zoomLevel = 0.01;
+      final state = OiChartViewportState()..zoomLevel = 0.01;
       expect(state.zoomLevel, 0.1);
       state.zoomLevel = 200;
       expect(state.zoomLevel, 100.0);
@@ -36,7 +33,7 @@ void main() {
         xMax: 100,
         yMin: 0,
         yMax: 50,
-        zoomLevel: 3.0,
+        zoomLevel: 3,
         panOffset: const Offset(20, 30),
       );
       expect(state.isZoomed, isTrue);
@@ -53,7 +50,7 @@ void main() {
     });
 
     test('copyWith creates independent copy', () {
-      final original = OiChartViewportState(xMin: 5, zoomLevel: 2.0);
+      final original = OiChartViewportState(xMin: 5, zoomLevel: 2);
       final copy = original.copyWith(xMax: 100);
       expect(copy.xMin, 5);
       expect(copy.xMax, 100);

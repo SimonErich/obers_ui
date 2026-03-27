@@ -151,9 +151,9 @@ class OiGroupedList<T> extends StatefulWidget {
   final Widget Function(
     BuildContext context,
     String groupKey,
-    List<T> groupItems,
-    bool collapsed,
-  )?
+    List<T> groupItems, {
+    required bool collapsed,
+  })?
   headerBuilder;
 
   /// Controls group ordering.
@@ -359,7 +359,7 @@ class _OiGroupedListState<T> extends State<OiGroupedList<T>>
   ) {
     Widget header;
     if (widget.headerBuilder != null) {
-      header = widget.headerBuilder!(context, key, items, collapsed);
+      header = widget.headerBuilder!(context, key, items, collapsed: collapsed);
     } else {
       header = _DefaultGroupHeader(
         groupKey: key,
@@ -389,7 +389,7 @@ class _OiGroupedListState<T> extends State<OiGroupedList<T>>
     }
 
     final groups = _buildGroups();
-    var sortedKeys = groups.keys.toList();
+    final sortedKeys = groups.keys.toList();
     if (widget.groupOrder != null) {
       sortedKeys.sort(widget.groupOrder);
     }
@@ -516,7 +516,7 @@ class _OiGroupedListState<T> extends State<OiGroupedList<T>>
 
       // Group separator.
       if (widget.groupSeparator != null && gi < sortedKeys.length - 1) {
-        slivers.add(SliverToBoxAdapter(child: widget.groupSeparator!));
+        slivers.add(SliverToBoxAdapter(child: widget.groupSeparator));
       }
     }
 

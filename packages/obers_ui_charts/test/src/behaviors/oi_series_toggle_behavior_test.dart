@@ -10,9 +10,8 @@ void main() {
 
     test('toggle flips visibility', () {
       final changes = <Map<String, bool>>[];
-      final behavior = OiSeriesToggleBehavior(onVisibilityChanged: changes.add);
-
-      behavior.toggle('a');
+      final behavior = OiSeriesToggleBehavior(onVisibilityChanged: changes.add)
+        ..toggle('a');
       expect(behavior.isVisible('a'), isFalse);
       expect(changes.length, 1);
 
@@ -21,8 +20,8 @@ void main() {
     });
 
     test('setVisible explicitly sets state', () {
-      final behavior = OiSeriesToggleBehavior();
-      behavior.setVisible('a', visible: false);
+      final behavior = OiSeriesToggleBehavior()
+        ..setVisible('a', visible: false);
       expect(behavior.isVisible('a'), isFalse);
 
       behavior.setVisible('a', visible: true);
@@ -30,9 +29,9 @@ void main() {
     });
 
     test('showAll makes all series visible', () {
-      final behavior = OiSeriesToggleBehavior();
-      behavior.toggle('a');
-      behavior.toggle('b');
+      final behavior = OiSeriesToggleBehavior()
+        ..toggle('a')
+        ..toggle('b');
       expect(behavior.isVisible('a'), isFalse);
       expect(behavior.isVisible('b'), isFalse);
 
@@ -42,8 +41,7 @@ void main() {
     });
 
     test('visibility map is unmodifiable', () {
-      final behavior = OiSeriesToggleBehavior();
-      behavior.toggle('a');
+      final behavior = OiSeriesToggleBehavior()..toggle('a');
 
       expect(() => behavior.visibility['a'] = true, throwsUnsupportedError);
     });

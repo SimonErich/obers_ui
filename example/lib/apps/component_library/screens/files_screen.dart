@@ -489,11 +489,11 @@ class FilesScreen extends StatelessWidget {
                 child: SizedBox(
                   height: 400,
                   child: OiFileSidebar(
-                    folderTree: [
+                    folderTree: const [
                       OiTreeNode<OiFileNodeData>(
                         id: 'home',
                         label: 'Home',
-                        data: const OiFileNodeData(
+                        data: OiFileNodeData(
                           id: 'home',
                           name: 'Home',
                           folder: true,
@@ -502,7 +502,7 @@ class FilesScreen extends StatelessWidget {
                           OiTreeNode<OiFileNodeData>(
                             id: 'docs',
                             label: 'Documents',
-                            data: const OiFileNodeData(
+                            data: OiFileNodeData(
                               id: 'docs',
                               name: 'Documents',
                               folder: true,
@@ -512,7 +512,7 @@ class FilesScreen extends StatelessWidget {
                           OiTreeNode<OiFileNodeData>(
                             id: 'photos',
                             label: 'Photos',
-                            data: const OiFileNodeData(
+                            data: OiFileNodeData(
                               id: 'photos',
                               name: 'Photos',
                               folder: true,

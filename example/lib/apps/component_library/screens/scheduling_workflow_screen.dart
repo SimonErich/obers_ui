@@ -147,9 +147,9 @@ class _SchedulingWorkflowScreenState extends State<SchedulingWorkflowScreen> {
                       OiGanttTask(
                         key: 'design',
                         label: 'Design',
-                        start: DateTime(2026, 3, 1),
+                        start: DateTime(2026, 3),
                         end: DateTime(2026, 3, 10),
-                        progress: 1.0,
+                        progress: 1,
                       ),
                       OiGanttTask(
                         key: 'develop',
@@ -157,15 +157,15 @@ class _SchedulingWorkflowScreenState extends State<SchedulingWorkflowScreen> {
                         start: DateTime(2026, 3, 8),
                         end: DateTime(2026, 3, 25),
                         progress: 0.6,
-                        dependsOn: ['design'],
+                        dependsOn: const ['design'],
                       ),
                       OiGanttTask(
                         key: 'testing',
                         label: 'Testing',
                         start: DateTime(2026, 3, 20),
-                        end: DateTime(2026, 4, 1),
+                        end: DateTime(2026, 4),
                         progress: 0.1,
-                        dependsOn: ['develop'],
+                        dependsOn: const ['develop'],
                       ),
                     ],
                   ),
@@ -262,7 +262,7 @@ class _SchedulingWorkflowScreenState extends State<SchedulingWorkflowScreen> {
           ),
 
           // ── OiFlowGraph ───────────────────────────────────────────────
-          ComponentShowcaseSection(
+          const ComponentShowcaseSection(
             title: 'Flow Graph',
             widgetName: 'OiFlowGraph',
             description:
@@ -281,7 +281,7 @@ class _SchedulingWorkflowScreenState extends State<SchedulingWorkflowScreen> {
                   height: 350,
                   child: OiFlowGraph(
                     label: 'Approval workflow',
-                    nodes: const [
+                    nodes: [
                       OiFlowNode(
                         key: 'start',
                         label: 'Start',
@@ -308,7 +308,7 @@ class _SchedulingWorkflowScreenState extends State<SchedulingWorkflowScreen> {
                         inputs: ['in'],
                       ),
                     ],
-                    edges: const [
+                    edges: [
                       OiFlowEdge(
                         sourceNode: 'start',
                         sourcePort: 'out',
@@ -375,7 +375,7 @@ class _SchedulingWorkflowScreenState extends State<SchedulingWorkflowScreen> {
           ),
 
           // ── OiStateDiagram ────────────────────────────────────────────
-          ComponentShowcaseSection(
+          const ComponentShowcaseSection(
             title: 'State Diagram',
             widgetName: 'OiStateDiagram',
             description:
@@ -395,7 +395,7 @@ class _SchedulingWorkflowScreenState extends State<SchedulingWorkflowScreen> {
                   child: OiStateDiagram(
                     label: 'Order state machine',
                     currentState: 'processing',
-                    states: const [
+                    states: [
                       OiStateNode(
                         key: 'new',
                         label: 'New',
@@ -425,7 +425,7 @@ class _SchedulingWorkflowScreenState extends State<SchedulingWorkflowScreen> {
                         terminal: true,
                       ),
                     ],
-                    transitions: const [
+                    transitions: [
                       OiStateTransition(
                         from: 'new',
                         to: 'processing',

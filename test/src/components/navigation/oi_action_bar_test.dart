@@ -90,7 +90,7 @@ void main() {
 
   testWidgets('toggled action has primary variant', (tester) async {
     await tester.pumpObers(
-      OiActionBar(
+      const OiActionBar(
         label: 'Test actions',
         actions: [
           OiActionBarItem(
@@ -150,7 +150,7 @@ void main() {
 
   testWidgets('separator renders between groups', (tester) async {
     await tester.pumpObers(
-      OiActionBar(
+      const OiActionBar(
         label: 'Test actions',
         separator: true,
         actions: [
@@ -195,7 +195,7 @@ void main() {
 
   testWidgets('loading action shows different state', (tester) async {
     await tester.pumpObers(
-      OiActionBar(
+      const OiActionBar(
         label: 'Test actions',
         actions: [
           OiActionBarItem(

@@ -6,6 +6,8 @@ import 'dart:ui';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
+import 'package:obers_ui/src/foundation/theme/oi_theme_data.dart';
 import 'package:obers_ui_charts/src/composites/oi_bubble_chart/oi_bubble_chart.dart';
 import 'package:obers_ui_charts/src/composites/oi_bubble_chart/oi_bubble_chart_accessibility.dart';
 import 'package:obers_ui_charts/src/composites/oi_bubble_chart/oi_bubble_chart_data.dart';
@@ -14,8 +16,6 @@ import 'package:obers_ui_charts/src/composites/oi_bubble_chart/oi_bubble_chart_l
 import 'package:obers_ui_charts/src/composites/oi_bubble_chart/oi_bubble_chart_painter.dart';
 import 'package:obers_ui_charts/src/composites/oi_bubble_chart/oi_bubble_chart_size_legend.dart';
 import 'package:obers_ui_charts/src/composites/oi_bubble_chart/oi_bubble_chart_theme.dart';
-import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
-import 'package:obers_ui/src/foundation/theme/oi_theme_data.dart';
 
 import '../../../helpers/pump_chart_app.dart';
 

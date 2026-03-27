@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
+import 'package:obers_ui_charts/obers_ui_charts.dart' show OiChartBehavior;
+import 'package:obers_ui_charts/src/foundation/oi_chart_behavior.dart' show OiChartBehavior;
 
 import 'package:obers_ui_charts/src/foundation/oi_ring_buffer.dart';
 import 'package:obers_ui_charts/src/foundation/oi_streaming_data_source.dart';

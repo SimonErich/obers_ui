@@ -263,7 +263,7 @@ class LayoutScreen extends StatelessWidget {
           ),
 
           // ── OiPanel ────────────────────────────────────────────────────
-          ComponentShowcaseSection(
+          const ComponentShowcaseSection(
             title: 'Panel',
             widgetName: 'OiPanel',
             description:

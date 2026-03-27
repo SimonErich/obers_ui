@@ -44,65 +44,65 @@ const _warning600 = Color(0xFFFFAD0D);
 /// precise color mapping, sharp 4px radii, and clean neutral surfaces.
 final blueDanubeTheme = OiThemeData(
   brightness: Brightness.light,
-  colors: OiColorScheme(
+  colors: const OiColorScheme(
     // Semantic swatches — manually mapped to exact TapTap palette
     primary: OiColorSwatch(
       base: _primary600,
       light: _primary500,
       dark: _primary700,
       muted: _primary300,
-      foreground: const Color(0xFFFFFFFF),
+      foreground: Color(0xFFFFFFFF),
     ),
     accent: OiColorSwatch(
       base: _auxiliary600,
       light: _auxiliary500,
       dark: _auxiliary700,
       muted: _auxiliary300,
-      foreground: const Color(0xFFFFFFFF),
+      foreground: Color(0xFFFFFFFF),
     ),
     success: OiColorSwatch(
       base: _success600,
-      light: const Color(0xFF6FCF97),
-      dark: const Color(0xFF2D9F5A),
-      muted: const Color(0xFFB8E6C8),
-      foreground: const Color(0xFFFFFFFF),
+      light: Color(0xFF6FCF97),
+      dark: Color(0xFF2D9F5A),
+      muted: Color(0xFFB8E6C8),
+      foreground: Color(0xFFFFFFFF),
     ),
     warning: OiColorSwatch(
       base: _warning600,
-      light: const Color(0xFFFFCA4E),
-      dark: const Color(0xFFE69500),
-      muted: const Color(0xFFFFE5A0),
-      foreground: const Color(0xFFFFFFFF),
+      light: Color(0xFFFFCA4E),
+      dark: Color(0xFFE69500),
+      muted: Color(0xFFFFE5A0),
+      foreground: Color(0xFFFFFFFF),
     ),
     error: OiColorSwatch(
       base: _danger600,
-      light: const Color(0xFFFF7878),
-      dark: const Color(0xFFD63333),
-      muted: const Color(0xFFFFC0C0),
-      foreground: const Color(0xFFFFFFFF),
+      light: Color(0xFFFF7878),
+      dark: Color(0xFFD63333),
+      muted: Color(0xFFFFC0C0),
+      foreground: Color(0xFFFFFFFF),
     ),
     info: OiColorSwatch(
       base: _info600,
-      light: const Color(0xFF6BA3F8),
-      dark: const Color(0xFF2563EB),
-      muted: const Color(0xFFB3D1FC),
-      foreground: const Color(0xFFFFFFFF),
+      light: Color(0xFF6BA3F8),
+      dark: Color(0xFF2563EB),
+      muted: Color(0xFFB3D1FC),
+      foreground: Color(0xFFFFFFFF),
     ),
 
     // Surfaces — TapTap uses clean whites and very subtle greys
     background: _neutral50,
-    surface: const Color(0xFFFFFFFF),
+    surface: Color(0xFFFFFFFF),
     surfaceHover: _neutral100,
     surfaceActive: _neutral300,
     surfaceSubtle: _neutral50,
-    overlay: const Color(0x66000000),
+    overlay: Color(0x66000000),
 
     // Text — TapTap's neutral scale
     text: _neutral700,
     textSubtle: _neutral600,
     textMuted: _neutral500,
-    textInverse: const Color(0xFFFFFFFF),
-    textOnPrimary: const Color(0xFFFFFFFF),
+    textInverse: Color(0xFFFFFFFF),
+    textOnPrimary: Color(0xFFFFFFFF),
 
     // Borders — TapTap uses Neutral 300 for default, 200 for subtle
     border: _neutral300,
@@ -111,11 +111,11 @@ final blueDanubeTheme = OiThemeData(
     borderError: _danger600,
 
     // Glass
-    glassBackground: const Color(0x99FFFFFF),
-    glassBorder: const Color(0x33FFFFFF),
+    glassBackground: Color(0x99FFFFFF),
+    glassBorder: Color(0x33FFFFFF),
 
     // Chart palette — TapTap standard chart colors
-    chart: const [
+    chart: [
       Color(0xFF4887F6),
       Color(0xFF59C3CF),
       Color(0xFFE2635E),
@@ -220,7 +220,7 @@ final blueDanubeTheme = OiThemeData(
       padding: const EdgeInsets.all(8),
     ),
     badge: OiBadgeThemeData(borderRadius: BorderRadius.circular(4)),
-    tabs: OiTabsThemeData(indicatorColor: _primary600),
+    tabs: const OiTabsThemeData(indicatorColor: _primary600),
     progress: OiProgressThemeData(borderRadius: BorderRadius.circular(10)),
     select: OiSelectThemeData(borderRadius: BorderRadius.circular(4)),
   ),
@@ -229,77 +229,77 @@ final blueDanubeTheme = OiThemeData(
 /// Blue Danube dark theme — TapTap-inspired dark variant.
 final blueDanubeDarkTheme = OiThemeData(
   brightness: Brightness.dark,
-  colors: OiColorScheme(
+  colors: const OiColorScheme(
     primary: OiColorSwatch(
       base: _primary500,
       light: _primary400,
       dark: _primary600,
-      muted: const Color(0xFF1A3A3C),
-      foreground: const Color(0xFFFFFFFF),
+      muted: Color(0xFF1A3A3C),
+      foreground: Color(0xFFFFFFFF),
     ),
     accent: OiColorSwatch(
       base: _auxiliary500,
       light: _auxiliary400,
       dark: _auxiliary600,
-      muted: const Color(0xFF3D2A1F),
-      foreground: const Color(0xFFFFFFFF),
+      muted: Color(0xFF3D2A1F),
+      foreground: Color(0xFFFFFFFF),
     ),
     success: OiColorSwatch(
-      base: const Color(0xFF6FCF97),
-      light: const Color(0xFF8EDCAE),
+      base: Color(0xFF6FCF97),
+      light: Color(0xFF8EDCAE),
       dark: _success600,
-      muted: const Color(0xFF1A3D28),
-      foreground: const Color(0xFFFFFFFF),
+      muted: Color(0xFF1A3D28),
+      foreground: Color(0xFFFFFFFF),
     ),
     warning: OiColorSwatch(
-      base: const Color(0xFFFFCA4E),
-      light: const Color(0xFFFFD97A),
+      base: Color(0xFFFFCA4E),
+      light: Color(0xFFFFD97A),
       dark: _warning600,
-      muted: const Color(0xFF3D3118),
-      foreground: const Color(0xFF1F1F1F),
+      muted: Color(0xFF3D3118),
+      foreground: Color(0xFF1F1F1F),
     ),
     error: OiColorSwatch(
-      base: const Color(0xFFFF7878),
-      light: const Color(0xFFFFA0A0),
+      base: Color(0xFFFF7878),
+      light: Color(0xFFFFA0A0),
       dark: _danger600,
-      muted: const Color(0xFF3D1A1A),
-      foreground: const Color(0xFFFFFFFF),
+      muted: Color(0xFF3D1A1A),
+      foreground: Color(0xFFFFFFFF),
     ),
     info: OiColorSwatch(
-      base: const Color(0xFF6BA3F8),
-      light: const Color(0xFF8DBAFA),
+      base: Color(0xFF6BA3F8),
+      light: Color(0xFF8DBAFA),
       dark: _info600,
-      muted: const Color(0xFF1A2A3D),
-      foreground: const Color(0xFFFFFFFF),
+      muted: Color(0xFF1A2A3D),
+      foreground: Color(0xFFFFFFFF),
     ),
 
     // Dark surfaces
-    background: const Color(0xFF0F0F12),
-    surface: const Color(0xFF18181C),
-    surfaceHover: const Color(0xFF222228),
-    surfaceActive: const Color(0xFF2C2C34),
-    surfaceSubtle: const Color(0xFF121216),
-    overlay: const Color(0x99000000),
+    background: Color(0xFF0F0F12),
+    surface: Color(0xFF18181C),
+    surfaceHover: Color(0xFF222228),
+    surfaceActive: Color(0xFF2C2C34),
+    surfaceSubtle: Color(0xFF121216),
+    overlay: Color(0x99000000),
 
     // Dark text
-    text: const Color(0xFFF5F5F5),
-    textSubtle: const Color(0xFFCACACa),
-    textMuted: const Color(0xFF8E8E8E),
+    text: Color(0xFFF5F5F5),
+    textSubtle: Color(0xFFCACACa),
+    textMuted: Color(0xFF8E8E8E),
     textInverse: _neutral700,
-    textOnPrimary: const Color(0xFFFFFFFF),
+    textOnPrimary: Color(0xFFFFFFFF),
 
     // Dark borders
-    border: const Color(0xFF3A3A42),
-    borderSubtle: const Color(0xFF28282E),
+    border: Color(0xFF3A3A42),
+    borderSubtle: Color(0xFF28282E),
     borderFocus: _primary500,
     borderError: _danger600,
 
     // Glass
-    glassBackground: const Color(0x33FFFFFF),
-    glassBorder: const Color(0x1AFFFFFF),
+    glassBackground: Color(0x33FFFFFF),
+    glassBorder: Color(0x1AFFFFFF),
 
     // Dark chart palette — slightly brighter for dark backgrounds
-    chart: const [
+    chart: [
       Color(0xFF6BA3F8),
       Color(0xFF7DDDE1),
       Color(0xFFFF7878),
@@ -392,7 +392,7 @@ final blueDanubeDarkTheme = OiThemeData(
       padding: const EdgeInsets.all(8),
     ),
     badge: OiBadgeThemeData(borderRadius: BorderRadius.circular(4)),
-    tabs: OiTabsThemeData(indicatorColor: _primary500),
+    tabs: const OiTabsThemeData(indicatorColor: _primary500),
     progress: OiProgressThemeData(borderRadius: BorderRadius.circular(10)),
     select: OiSelectThemeData(borderRadius: BorderRadius.circular(4)),
   ),

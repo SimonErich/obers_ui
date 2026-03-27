@@ -1,6 +1,6 @@
 import 'package:flutter/services.dart';
-import 'package:obers_ui/obers_ui.dart';
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/obers_ui.dart';
 import 'package:obers_ui_charts/src/composites/oi_line_chart/oi_line_chart.dart'
     show OiLineChart;
 import 'package:obers_ui_charts/src/composites/oi_line_chart/oi_line_chart_data.dart';

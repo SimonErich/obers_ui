@@ -1,6 +1,5 @@
-import 'package:obers_ui/obers_ui.dart' hide mapEquals;
-
 import 'package:flutter/foundation.dart';
+import 'package:obers_ui/obers_ui.dart' hide mapEquals;
 
 /// The comparison mode active on a chart.
 ///

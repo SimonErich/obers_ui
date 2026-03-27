@@ -1,7 +1,8 @@
 import 'dart:math' show Point;
 
 import 'package:flutter/widgets.dart';
-
+import 'package:obers_ui/obers_ui.dart' show OiChartThemeData, OiResponsive;
+import 'package:obers_ui_charts/obers_ui_charts.dart' show OiBarChart, OiBubbleChart, OiLineChart;
 import 'package:obers_ui_charts/src/components/oi_chart_empty_state.dart';
 import 'package:obers_ui_charts/src/components/oi_chart_error_state.dart';
 import 'package:obers_ui_charts/src/components/oi_chart_loading_state.dart';
@@ -16,20 +17,16 @@ import 'package:obers_ui_charts/src/foundation/oi_chart_hit_tester.dart';
 import 'package:obers_ui_charts/src/foundation/oi_chart_performance_config.dart';
 import 'package:obers_ui_charts/src/foundation/oi_chart_sync_group.dart';
 import 'package:obers_ui_charts/src/foundation/oi_chart_viewport.dart';
-import 'package:obers_ui/obers_ui.dart' show OiChartThemeData, OiResponsive;
-
-import 'package:obers_ui_charts/src/models/oi_chart_complexity.dart';
-
 import 'package:obers_ui_charts/src/foundation/oi_decimation.dart';
-import 'package:obers_ui_charts/src/utils/chart_math.dart';
-
 import 'package:obers_ui_charts/src/models/oi_cartesian_series.dart';
-import 'package:obers_ui_charts/src/models/oi_chart_datum.dart';
-import 'package:obers_ui_charts/src/models/oi_chart_series.dart';
 import 'package:obers_ui_charts/src/models/oi_chart_annotation.dart';
+import 'package:obers_ui_charts/src/models/oi_chart_complexity.dart';
+import 'package:obers_ui_charts/src/models/oi_chart_datum.dart';
 import 'package:obers_ui_charts/src/models/oi_chart_legend_config.dart';
+import 'package:obers_ui_charts/src/models/oi_chart_series.dart';
 import 'package:obers_ui_charts/src/models/oi_chart_settings.dart';
 import 'package:obers_ui_charts/src/models/oi_chart_threshold.dart';
+import 'package:obers_ui_charts/src/utils/chart_math.dart';
 
 /// Base composite widget for all cartesian (x/y) chart types.
 ///
@@ -53,9 +50,7 @@ import 'package:obers_ui_charts/src/models/oi_chart_threshold.dart';
 class OiCartesianChart<T> extends StatefulWidget {
   /// Creates a cartesian chart.
   const OiCartesianChart({
-    super.key,
-    required this.label,
-    required this.series,
+    required this.label, required this.series, super.key,
     this.xAxis,
     this.yAxes,
     this.seriesBuilder,

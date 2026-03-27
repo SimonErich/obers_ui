@@ -3,13 +3,13 @@ import 'dart:math' as math;
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/obers_ui.dart';
 import 'package:obers_ui_charts/src/composites/_chart_grid_painter.dart';
-import 'package:obers_ui_charts/src/foundation/oi_chart_controller.dart';
 import 'package:obers_ui_charts/src/composites/oi_area_chart/oi_area_chart_data.dart';
 import 'package:obers_ui_charts/src/composites/oi_area_chart/oi_area_chart_theme.dart';
 import 'package:obers_ui_charts/src/composites/oi_bubble_chart/oi_bubble_chart_interaction.dart';
 import 'package:obers_ui_charts/src/composites/oi_chart_axis.dart';
 import 'package:obers_ui_charts/src/composites/oi_line_chart/oi_line_chart_data.dart';
 import 'package:obers_ui_charts/src/composites/oi_line_chart/oi_line_chart_theme.dart';
+import 'package:obers_ui_charts/src/foundation/oi_chart_controller.dart';
 import 'package:obers_ui_charts/src/models/oi_cartesian_series.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -232,7 +232,7 @@ class _OiComboChartPainter extends CustomPainter {
 
     // Compute slot width for bar series (based on number of x-values).
     // Use the series with the most data points as the reference.
-    int maxPoints = 1;
+    var maxPoints = 1;
     for (final s in resolvedSeries) {
       if (s.kind == _ComboSeriesKind.bar && s.xValues.length > maxPoints) {
         maxPoints = s.xValues.length;
@@ -293,8 +293,8 @@ class _OiComboChartPainter extends CustomPainter {
       final fillPath = Path()
         ..addPath(path, Offset.zero)
         ..lineTo(points.last.dx, chartRect.bottom)
-        ..lineTo(points.first.dx, chartRect.bottom);
-      fillPath.close();
+        ..lineTo(points.first.dx, chartRect.bottom)
+        ..close();
       canvas.drawPath(
         fillPath,
         Paint()
@@ -345,8 +345,8 @@ class _OiComboChartPainter extends CustomPainter {
     }
     fillPath
       ..lineTo(topPoints.last.dx, chartRect.bottom)
-      ..lineTo(topPoints.first.dx, chartRect.bottom);
-    fillPath.close();
+      ..lineTo(topPoints.first.dx, chartRect.bottom)
+      ..close();
 
     canvas.drawPath(
       fillPath,

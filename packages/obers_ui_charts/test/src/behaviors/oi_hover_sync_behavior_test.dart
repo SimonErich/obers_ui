@@ -7,32 +7,25 @@ void main() {
       final positions = <double?>[];
       final behavior = OiHoverSyncBehavior(
         onHoverPositionChanged: positions.add,
-      );
-
-      behavior.updatePosition(42.0);
+      )..updatePosition(42);
       expect(behavior.currentPosition, 42.0);
       expect(positions, [42.0]);
     });
 
     test('duplicate position is ignored', () {
       final positions = <double?>[];
-      final behavior = OiHoverSyncBehavior(
-        onHoverPositionChanged: positions.add,
-      );
-
-      behavior.updatePosition(42.0);
-      behavior.updatePosition(42.0);
+      OiHoverSyncBehavior(onHoverPositionChanged: positions.add)
+        ..updatePosition(42)
+        ..updatePosition(42);
       expect(positions, [42.0]); // Only one call
     });
 
     test('clearHover sets position to null', () {
       final positions = <double?>[];
-      final behavior = OiHoverSyncBehavior(
-        onHoverPositionChanged: positions.add,
-      );
-
-      behavior.updatePosition(42.0);
-      behavior.clearHover();
+      final behavior =
+          OiHoverSyncBehavior(onHoverPositionChanged: positions.add)
+            ..updatePosition(42)
+            ..clearHover();
       expect(behavior.currentPosition, isNull);
       expect(positions.last, isNull);
     });

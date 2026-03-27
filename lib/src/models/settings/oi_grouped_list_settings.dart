@@ -1,7 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:obers_ui/src/foundation/persistence/oi_settings_data.dart';
+import 'package:obers_ui/src/foundation/persistence/oi_settings_driver.dart';
 
-/// Persisted state for [OiGroupedList].
+/// Persisted state for `OiGroupedList`.
 ///
 /// Stores the set of group keys that are currently collapsed so the collapsed
 /// state can be restored across sessions when a [OiSettingsDriver] is provided.

@@ -427,7 +427,6 @@ class _OiBannerState extends State<OiBanner>
                   semanticLabel: 'Dismiss',
                   onTap: _dismiss,
                   size: OiButtonSize.small,
-                  variant: OiButtonVariant.ghost,
                 ),
             ],
           ),

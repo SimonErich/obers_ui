@@ -3,10 +3,10 @@
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:obers_ui_charts/src/components/oi_chart_surface.dart';
 import 'package:obers_ui/src/foundation/theme/oi_decoration_theme.dart';
 import 'package:obers_ui/src/foundation/theme/oi_effects_theme.dart';
 import 'package:obers_ui/src/primitives/display/oi_surface.dart';
+import 'package:obers_ui_charts/src/components/oi_chart_surface.dart';
 
 import '../../helpers/pump_chart_app.dart';
 

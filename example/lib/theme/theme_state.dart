@@ -45,7 +45,7 @@ class ThemeState extends ValueNotifier<OiThemeMode> {
 
   /// Cycle to the next theme preset.
   void cyclePreset() {
-    final values = ThemePreset.values;
+    const values = ThemePreset.values;
     final next = (values.indexOf(_preset) + 1) % values.length;
     setPreset(values[next]);
   }

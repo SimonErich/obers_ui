@@ -47,8 +47,8 @@ void main() {
       ),
     );
     // check icon (confirm) and close icon (cancel)
-    final checkIcon = OiIcons.check;
-    final closeIcon = OiIcons.x;
+    const checkIcon = OiIcons.check;
+    const closeIcon = OiIcons.x;
     expect(find.byIcon(checkIcon), findsOneWidget);
     expect(find.byIcon(closeIcon), findsOneWidget);
   });
@@ -57,8 +57,8 @@ void main() {
     await tester.pumpObers(
       OiRenameField(currentName: 'file.txt', onRename: (_) {}, onCancel: () {}),
     );
-    final checkIcon = OiIcons.check;
-    final closeIcon = OiIcons.x;
+    const checkIcon = OiIcons.check;
+    const closeIcon = OiIcons.x;
     expect(find.byIcon(checkIcon), findsNothing);
     expect(find.byIcon(closeIcon), findsNothing);
   });
@@ -93,7 +93,7 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    final closeIcon = OiIcons.x;
+    const closeIcon = OiIcons.x;
     await tester.tap(find.byIcon(closeIcon));
     expect(cancelled, isTrue);
   });
@@ -110,7 +110,7 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    final checkIcon = OiIcons.check;
+    const checkIcon = OiIcons.check;
     await tester.tap(find.byIcon(checkIcon));
     await tester.pumpAndSettle();
 
@@ -134,7 +134,7 @@ void main() {
     await tester.pumpAndSettle();
 
     // Tap confirm
-    final checkIcon = OiIcons.check;
+    const checkIcon = OiIcons.check;
     await tester.tap(find.byIcon(checkIcon));
     await tester.pumpAndSettle();
 
@@ -159,7 +159,7 @@ void main() {
     await tester.pumpAndSettle();
 
     // Tap confirm
-    final checkIcon = OiIcons.check;
+    const checkIcon = OiIcons.check;
     await tester.tap(find.byIcon(checkIcon));
     await tester.pumpAndSettle();
 
@@ -182,7 +182,7 @@ void main() {
     await tester.enterText(find.byType(EditableText), 'taken');
     await tester.pumpAndSettle();
 
-    final checkIcon = OiIcons.check;
+    const checkIcon = OiIcons.check;
     await tester.tap(find.byIcon(checkIcon));
     await tester.pumpAndSettle();
 

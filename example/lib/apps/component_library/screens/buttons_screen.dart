@@ -449,20 +449,18 @@ class _ButtonsScreenState extends State<ButtonsScreen> {
 
 // ── Helper: variant sub-variants showcase ─────────────────────────────────
 
-typedef _ButtonBuilder =
-    Widget Function({
-      required String label,
-      IconData? icon,
-      OiIconPosition? iconPosition,
-      bool fullWidth,
-      bool enabled,
-      VoidCallback? onTap,
-    });
-
 class _ButtonVariantShowcase extends StatelessWidget {
   const _ButtonVariantShowcase({required this.builder});
 
-  final _ButtonBuilder builder;
+  final Widget Function({
+    required String label,
+    IconData? icon,
+    OiIconPosition? iconPosition,
+    bool fullWidth,
+    bool enabled,
+    VoidCallback? onTap,
+  })
+  builder;
 
   @override
   Widget build(BuildContext context) {

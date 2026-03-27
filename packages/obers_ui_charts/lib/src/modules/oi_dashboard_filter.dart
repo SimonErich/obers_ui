@@ -1,4 +1,6 @@
 import 'package:flutter/foundation.dart';
+import 'package:obers_ui_charts/obers_ui_charts.dart' show OiAnalyticsDashboard;
+import 'package:obers_ui_charts/src/modules/oi_analytics_dashboard.dart' show OiAnalyticsDashboard;
 
 /// An abstract filter applied to an [OiAnalyticsDashboard].
 ///

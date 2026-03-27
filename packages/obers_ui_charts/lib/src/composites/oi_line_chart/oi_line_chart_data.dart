@@ -1,9 +1,8 @@
 import 'package:flutter/painting.dart';
-
-import 'package:obers_ui_charts/src/foundation/oi_chart_formatters.dart';
-import 'package:obers_ui_charts/src/models/oi_cartesian_series.dart';
 import 'package:obers_ui_charts/src/composites/oi_line_chart/oi_line_chart.dart'
     show OiLineChart;
+import 'package:obers_ui_charts/src/foundation/oi_chart_formatters.dart';
+import 'package:obers_ui_charts/src/models/oi_cartesian_series.dart';
 
 /// The interpolation mode of an [OiLineChart].
 ///

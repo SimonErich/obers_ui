@@ -90,7 +90,6 @@ class _SocialInteractionScreenState extends State<SocialInteractionScreen> {
                 title: 'Active & Inactive',
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     OiLiveRing(
                       child: OiAvatar(
@@ -480,8 +479,7 @@ class _SocialInteractionScreenState extends State<SocialInteractionScreen> {
               ComponentExample(
                 title: 'Pinch to Zoom',
                 child: OiPinchZoom(
-                  minScale: 0.5,
-                  maxScale: 3.0,
+                  maxScale: 3,
                   child: Container(
                     height: 120,
                     width: double.infinity,

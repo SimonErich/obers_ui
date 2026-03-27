@@ -18,7 +18,7 @@ void main() {
     tester,
   ) async {
     await tester.pumpObers(
-      const OiSkeletonPreset.text(lines: 3, lastLineWidth: 0.5),
+      const OiSkeletonPreset.text(lastLineWidth: 0.5),
     );
     final fractions = tester.widgetList<FractionallySizedBox>(
       find.byType(FractionallySizedBox),
@@ -39,7 +39,7 @@ void main() {
   });
 
   testWidgets('listTile preset shows avatar + text lines', (tester) async {
-    await tester.pumpObers(const OiSkeletonPreset.listTile(showAvatar: true));
+    await tester.pumpObers(const OiSkeletonPreset.listTile());
     // Avatar (ClipOval + OiSkeletonBox) + 2 OiSkeletonLine.
     expect(find.byType(ClipOval), findsOneWidget);
     expect(find.byType(OiSkeletonLine), findsNWidgets(2));

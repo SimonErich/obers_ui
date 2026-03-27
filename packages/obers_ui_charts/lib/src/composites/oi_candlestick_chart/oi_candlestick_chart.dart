@@ -68,7 +68,7 @@ class OiCandlestickChart<T> extends StatefulWidget {
 
   /// Callback invoked when a candle is tapped.
   ///
-  /// Receives the [seriesIndex] and [candleIndex] of the nearest candle.
+  /// Receives the `seriesIndex` and `candleIndex` of the nearest candle.
   final void Function(int seriesIndex, int candleIndex)? onCandleTap;
 
   /// Optional theme overrides.
@@ -204,7 +204,7 @@ class _OiCandlestickChartState<T> extends State<OiCandlestickChart<T>> {
     );
   }
 
-  /// Finds the nearest candle to [position] within [hitRadius] pixels.
+  /// Finds the nearest candle to [position] within `hitRadius` pixels.
   ({int seriesIndex, int candleIndex})? _findNearestCandle(
     Offset position,
     Rect chartRect,

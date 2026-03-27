@@ -1,5 +1,7 @@
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:obers_ui/obers_ui.dart' show OiChartThemeData;
 import 'package:obers_ui_charts/src/behaviors/oi_keyboard_explore_behavior.dart';
 import 'package:obers_ui_charts/src/foundation/oi_chart_accessibility_bridge.dart';
 import 'package:obers_ui_charts/src/foundation/oi_chart_behavior.dart';
@@ -7,11 +9,6 @@ import 'package:obers_ui_charts/src/foundation/oi_chart_controller.dart';
 import 'package:obers_ui_charts/src/foundation/oi_chart_hit_tester.dart';
 import 'package:obers_ui_charts/src/foundation/oi_chart_viewport.dart';
 import 'package:obers_ui_charts/src/models/oi_chart_state_models.dart';
-import 'package:obers_ui/obers_ui.dart' show OiChartThemeData;
-
-import 'dart:ui' show Offset, Size;
-
-import 'package:flutter/widgets.dart';
 
 // ── Test doubles ─────────────────────────────────────────────────────────────
 
@@ -133,7 +130,7 @@ void main() {
     bridge = _FakeAccessibilityBridge();
   });
 
-  OiChartBehaviorContext _makeContext() {
+  OiChartBehaviorContext makeContext() {
     return OiChartBehaviorContext(
       buildContext: _StubBuildContext(),
       controller: _FakeController(),
@@ -146,9 +143,9 @@ void main() {
 
   group('OiKeyboardExploreBehavior', () {
     test('left/right navigates points with wrapping', () {
-      behavior.configure(seriesCount: 2, pointCount: 3);
-
-      behavior.handleKeyEvent(_key(LogicalKeyboardKey.arrowRight));
+      behavior
+        ..configure(seriesCount: 2, pointCount: 3)
+        ..handleKeyEvent(_key(LogicalKeyboardKey.arrowRight));
       expect(behavior.focusedPointIndex, 1);
       expect(focused.last, (0, 1));
 
@@ -165,9 +162,9 @@ void main() {
     });
 
     test('up/down switches series with wrapping', () {
-      behavior.configure(seriesCount: 3, pointCount: 5);
-
-      behavior.handleKeyEvent(_key(LogicalKeyboardKey.arrowDown));
+      behavior
+        ..configure(seriesCount: 3, pointCount: 5)
+        ..handleKeyEvent(_key(LogicalKeyboardKey.arrowDown));
       expect(behavior.focusedSeriesIndex, 1);
       expect(focused.last, (1, 0));
 
@@ -184,25 +181,25 @@ void main() {
     });
 
     test('enter selects focused point', () {
-      behavior.configure(seriesCount: 2, pointCount: 5);
-      behavior.handleKeyEvent(_key(LogicalKeyboardKey.arrowRight));
-
-      behavior.handleKeyEvent(_key(LogicalKeyboardKey.enter));
+      behavior
+        ..configure(seriesCount: 2, pointCount: 5)
+        ..handleKeyEvent(_key(LogicalKeyboardKey.arrowRight))
+        ..handleKeyEvent(_key(LogicalKeyboardKey.enter));
       expect(selected, [(0, 1)]);
     });
 
     test('escape clears selection', () {
-      behavior.configure(seriesCount: 2, pointCount: 5);
-
-      behavior.handleKeyEvent(_key(LogicalKeyboardKey.escape));
+      behavior
+        ..configure(seriesCount: 2, pointCount: 5)
+        ..handleKeyEvent(_key(LogicalKeyboardKey.escape));
       expect(clearedCount, 1);
     });
 
     test('announces via accessibility bridge when attached', () {
-      behavior.attach(_makeContext());
-      behavior.configure(seriesCount: 2, pointCount: 5);
-
-      behavior.handleKeyEvent(_key(LogicalKeyboardKey.arrowRight));
+      behavior
+        ..attach(makeContext())
+        ..configure(seriesCount: 2, pointCount: 5)
+        ..handleKeyEvent(_key(LogicalKeyboardKey.arrowRight));
 
       expect(bridge.announcements, ['Series 1, point 2']);
 
@@ -213,9 +210,9 @@ void main() {
     });
 
     test('does not announce when not attached', () {
-      behavior.configure(seriesCount: 2, pointCount: 5);
-
-      behavior.handleKeyEvent(_key(LogicalKeyboardKey.arrowRight));
+      behavior
+        ..configure(seriesCount: 2, pointCount: 5)
+        ..handleKeyEvent(_key(LogicalKeyboardKey.arrowRight));
       // No crash, no announcement
       expect(bridge.announcements, isEmpty);
     });
@@ -235,9 +232,10 @@ void main() {
     });
 
     test('reset returns indices to origin', () {
-      behavior.configure(seriesCount: 3, pointCount: 5);
-      behavior.handleKeyEvent(_key(LogicalKeyboardKey.arrowRight));
-      behavior.handleKeyEvent(_key(LogicalKeyboardKey.arrowDown));
+      behavior
+        ..configure(seriesCount: 3, pointCount: 5)
+        ..handleKeyEvent(_key(LogicalKeyboardKey.arrowRight))
+        ..handleKeyEvent(_key(LogicalKeyboardKey.arrowDown));
       expect(behavior.focusedPointIndex, 1);
       expect(behavior.focusedSeriesIndex, 1);
 

@@ -11,6 +11,8 @@ dependencies:
     sdk: flutter
   obers_ui:
     path: ../
+  obers_ui_charts:
+    path: ../packages/obers_ui_charts
   widgetbook: ^3.10.0
 
 dev_dependencies:

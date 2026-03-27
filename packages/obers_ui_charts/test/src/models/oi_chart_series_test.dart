@@ -76,9 +76,9 @@ void main() {
   group('OiCartesianSeries', () {
     test('mapper extraction produces correct x/y from domain model', () {
       final data = [
-        _SalesRecord(DateTime(2024, 1, 1), 100),
-        _SalesRecord(DateTime(2024, 2, 1), 250),
-        _SalesRecord(DateTime(2024, 3, 1), 180),
+        _SalesRecord(DateTime(2024), 100),
+        _SalesRecord(DateTime(2024, 2), 250),
+        _SalesRecord(DateTime(2024, 3), 180),
       ];
 
       final series = OiCartesianSeries<_SalesRecord>(
@@ -90,9 +90,9 @@ void main() {
         pointLabel: (r) => '\$${r.amount}',
       );
 
-      expect(series.xMapper(data[0]), DateTime(2024, 1, 1));
+      expect(series.xMapper(data[0]), DateTime(2024));
       expect(series.yMapper(data[1]), 250.0);
-      expect(series.pointLabel!(data[2]), '\$180.0');
+      expect(series.pointLabel!(data[2]), r'$180.0');
     });
   });
 
@@ -101,8 +101,8 @@ void main() {
       'normalization from series via mappers produces correct datum list',
       () {
         final data = [
-          _SalesRecord(DateTime(2024, 1, 1), 100),
-          _SalesRecord(DateTime(2024, 2, 1), 250),
+          _SalesRecord(DateTime(2024), 100),
+          _SalesRecord(DateTime(2024, 2), 250),
         ];
 
         final datums = normalizeSeries<_SalesRecord>(
@@ -116,19 +116,19 @@ void main() {
         expect(datums.length, 2);
         expect(datums[0].seriesId, 'revenue');
         expect(datums[0].index, 0);
-        expect(datums[0].xRaw, DateTime(2024, 1, 1));
+        expect(datums[0].xRaw, DateTime(2024));
         expect(datums[0].yRaw, 100.0);
-        expect(datums[0].label, '\$100.0');
+        expect(datums[0].label, r'$100.0');
         expect(datums[0].isMissing, isFalse);
 
         expect(datums[1].index, 1);
-        expect(datums[1].xRaw, DateTime(2024, 2, 1));
+        expect(datums[1].xRaw, DateTime(2024, 2));
         expect(datums[1].yRaw, 250.0);
       },
     );
 
     test('normalization handles missing data flag', () {
-      final data = [_SalesRecord(DateTime(2024, 1, 1), 0)];
+      final data = [_SalesRecord(DateTime(2024), 0)];
 
       final datums = normalizeSeries<_SalesRecord>(
         seriesId: 'test',

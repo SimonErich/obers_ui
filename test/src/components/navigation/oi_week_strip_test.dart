@@ -194,7 +194,6 @@ void main() {
         selectedDate: DateTime(2026, 3, 25),
         onDateSelected: (_) {},
         label: 'Week selector',
-        showMonth: true,
       ),
       surfaceSize: const Size(800, 200),
     );
@@ -274,7 +273,7 @@ void main() {
         selectedDate: DateTime(2026, 3, 25),
         onDateSelected: (d) => selected = d,
         label: 'Week',
-        disabledDaysOfWeek: {DateTime.sunday}, // Sunday = 7
+        disabledDaysOfWeek: const {DateTime.sunday}, // Sunday = 7
       ),
       surfaceSize: const Size(800, 200),
     );
@@ -289,7 +288,6 @@ void main() {
         selectedDate: DateTime(2026, 3, 25),
         onDateSelected: (_) {},
         label: 'Week',
-        showMonth: true,
         showYear: true,
       ),
       surfaceSize: const Size(800, 200),

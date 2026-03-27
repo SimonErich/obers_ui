@@ -48,7 +48,6 @@ class _AdminOverviewScreenState extends State<AdminOverviewScreen> {
                       context,
                       message: 'Edit mode is not yet available. '
                           'Drag-and-drop reordering coming soon.',
-                      level: OiToastLevel.info,
                     );
                   }
                 },

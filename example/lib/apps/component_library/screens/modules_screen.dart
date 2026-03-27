@@ -23,9 +23,9 @@ class ModulesScreen extends StatelessWidget {
                 'Full application shell with collapsible sidebar, top bar, '
                 'breadcrumbs, and responsive layout. \n\n'
                 'OiAppShell is the top-level layout module that provides '
-                  'sidebar navigation, a header bar with breadcrumbs, and '
-                  'responsive breakpoint handling. See the Admin and CMS '
-                  'mini-apps for live demos.',
+                'sidebar navigation, a header bar with breadcrumbs, and '
+                'responsive breakpoint handling. See the Admin and CMS '
+                'mini-apps for live demos.',
             examples: [
               ComponentExample(
                 title: 'Mini App Shell',
@@ -77,9 +77,9 @@ class ModulesScreen extends StatelessWidget {
                 'A customizable list module with sorting, filtering, '
                 'pagination, and layout switching. \n\n'
                 'OiListView provides a complete data listing experience '
-                  'with column sorting, search filtering, pagination, and '
-                  'switchable layouts. Supports single and multi-select '
-                  'with bulk action toolbars. Used across many mini-apps.',
+                'with column sorting, search filtering, pagination, and '
+                'switchable layouts. Supports single and multi-select '
+                'with bulk action toolbars. Used across many mini-apps.',
             examples: [
               ComponentExample(
                 title: 'Product List',
@@ -121,9 +121,9 @@ class ModulesScreen extends StatelessWidget {
                 'A kanban board with drag-and-drop columns and cards. '
                 'Supports swimlanes and WIP limits. \n\n'
                 'OiKanban renders a multi-column board where cards can '
-                  'be dragged between columns. Supports column '
-                  'reordering, WIP limits, swimlanes, and custom card '
-                  'renderers. See the Projects mini-app for a live demo.',
+                'be dragged between columns. Supports column '
+                'reordering, WIP limits, swimlanes, and custom card '
+                'renderers. See the Projects mini-app for a live demo.',
             examples: [
               ComponentExample(
                 title: 'Task Board',
@@ -163,10 +163,10 @@ class ModulesScreen extends StatelessWidget {
                 'A full messaging module with reactions, replies, '
                 'file attachments, and typing indicators. \n\n'
                 'OiChat provides a complete messaging experience with '
-                  'channel sidebar, message bubbles, emoji reactions, '
-                  'threaded replies, file attachments, and real-time '
-                  'typing indicators. See the Chat mini-app for a live '
-                  'demo.',
+                'channel sidebar, message bubbles, emoji reactions, '
+                'threaded replies, file attachments, and real-time '
+                'typing indicators. See the Chat mini-app for a live '
+                'demo.',
             examples: [
               ComponentExample(
                 title: 'Conversation',
@@ -187,8 +187,7 @@ class ModulesScreen extends StatelessWidget {
                         key: 'm2',
                         senderId: 'user-1',
                         senderName: 'You',
-                        content:
-                            'Good! I just finished the auth module.',
+                        content: 'Good! I just finished the auth module.',
                         timestamp: DateTime(2026, 3, 23, 9, 17),
                       ),
                       OiChatMessage(
@@ -214,9 +213,9 @@ class ModulesScreen extends StatelessWidget {
                 'A threaded discussion module with nested replies, '
                 'reactions, and moderation tools. \n\n'
                 'OiComments renders a threaded comment list with nested '
-                  'replies, user avatars, timestamps, reactions, and '
-                  'moderation actions (edit, delete, report). Supports '
-                  'rich text input and @mentions.',
+                'replies, user avatars, timestamps, reactions, and '
+                'moderation actions (edit, delete, report). Supports '
+                'rich text input and @mentions.',
             examples: [
               ComponentExample(
                 title: 'Discussion Thread',
@@ -260,16 +259,16 @@ class ModulesScreen extends StatelessWidget {
           ),
 
           // ── OiDashboard ───────────────────────────────────────────────
-          ComponentShowcaseSection(
+          const ComponentShowcaseSection(
             title: 'Dashboard',
             widgetName: 'OiDashboard',
             description:
                 'A dashboard module with configurable widget cards '
                 'and responsive grid layout. \n\n'
                 'OiDashboard arranges widget cards in a responsive grid '
-                  'with drag-and-drop repositioning. Cards can display '
-                  'charts, stats, tables, or custom content. See the '
-                  'Admin mini-app for a live demo.',
+                'with drag-and-drop repositioning. Cards can display '
+                'charts, stats, tables, or custom content. See the '
+                'Admin mini-app for a live demo.',
             examples: [
               ComponentExample(
                 title: 'Analytics Dashboard',
@@ -283,40 +282,28 @@ class ModulesScreen extends StatelessWidget {
                         key: 'd1',
                         title: 'Total Revenue',
                         child: Center(
-                          child: OiMetric(
-                            label: 'Revenue',
-                            value: '\$24,500',
-                          ),
+                          child: OiMetric(label: 'Revenue', value: r'$24,500'),
                         ),
                       ),
                       OiDashboardCard(
                         key: 'd2',
                         title: 'Orders',
                         child: Center(
-                          child: OiMetric(
-                            label: 'Orders',
-                            value: '142',
-                          ),
+                          child: OiMetric(label: 'Orders', value: '142'),
                         ),
                       ),
                       OiDashboardCard(
                         key: 'd3',
                         title: 'Conversion Rate',
                         child: Center(
-                          child: OiMetric(
-                            label: 'Conversion',
-                            value: '3.2%',
-                          ),
+                          child: OiMetric(label: 'Conversion', value: '3.2%'),
                         ),
                       ),
                       OiDashboardCard(
                         key: 'd4',
                         title: 'Active Users',
                         child: Center(
-                          child: OiMetric(
-                            label: 'Users',
-                            value: '1,024',
-                          ),
+                          child: OiMetric(label: 'Users', value: '1,024'),
                         ),
                       ),
                     ],
@@ -334,9 +321,9 @@ class ModulesScreen extends StatelessWidget {
                 'A file management module with grid/list views, upload, '
                 'and drag-and-drop operations. \n\n'
                 'OiFileManager provides full CRUD file operations with '
-                  'upload progress, batch operations, conflict resolution, '
-                  'and undo support. Works alongside OiFileExplorer for '
-                  'the complete file management experience.',
+                'upload progress, batch operations, conflict resolution, '
+                'and undo support. Works alongside OiFileExplorer for '
+                'the complete file management experience.',
             examples: [
               ComponentExample(
                 title: 'File Browser',
@@ -350,11 +337,7 @@ class ModulesScreen extends StatelessWidget {
                         name: 'Documents',
                         folder: true,
                       ),
-                      const OiFileNode(
-                        key: 'f2',
-                        name: 'Photos',
-                        folder: true,
-                      ),
+                      const OiFileNode(key: 'f2', name: 'Photos', folder: true),
                       OiFileNode(
                         key: 'f3',
                         name: 'report.pdf',
@@ -385,10 +368,10 @@ class ModulesScreen extends StatelessWidget {
                 'An e-commerce checkout flow with cart review, address, '
                 'shipping, payment, and confirmation steps. \n\n'
                 'OiCheckout orchestrates a multi-step checkout flow: '
-                  'cart review, shipping address, shipping method, '
-                  'payment method, and order confirmation. Each step '
-                  'validates before proceeding. See the Shop mini-app '
-                  'for a live demo.',
+                'cart review, shipping address, shipping method, '
+                'payment method, and order confirmation. Each step '
+                'validates before proceeding. See the Shop mini-app '
+                'for a live demo.',
             examples: [
               ComponentExample(
                 title: 'Checkout Flow',
@@ -396,38 +379,12 @@ class ModulesScreen extends StatelessWidget {
                   height: 700,
                   child: SingleChildScrollView(
                     child: OiCheckout(
-                    label: 'Checkout',
-                    items: const [
-                      OiCartItem(
-                        productKey: 'p1',
-                        name: 'Wireless Headphones',
-                        unitPrice: 79.99,
-                        quantity: 1,
-                      ),
-                      OiCartItem(
-                        productKey: 'p2',
-                        name: 'USB-C Cable',
-                        unitPrice: 12.99,
-                        quantity: 2,
-                      ),
-                    ],
-                    summary: const OiCartSummary(
-                      subtotal: 105.97,
-                      shipping: 5.99,
-                      tax: 8.48,
-                      total: 120.44,
-                    ),
-                    onPlaceOrder: (checkout) async => OiOrderData(
-                      key: 'order-1',
-                      orderNumber: 'ORD-2026-001',
-                      createdAt: DateTime(2026, 3, 23),
-                      status: OiOrderStatus.confirmed,
+                      label: 'Checkout',
                       items: const [
                         OiCartItem(
                           productKey: 'p1',
                           name: 'Wireless Headphones',
                           unitPrice: 79.99,
-                          quantity: 1,
                         ),
                         OiCartItem(
                           productKey: 'p2',
@@ -442,11 +399,35 @@ class ModulesScreen extends StatelessWidget {
                         tax: 8.48,
                         total: 120.44,
                       ),
-                      shippingAddress: checkout.shippingAddress,
-                      paymentMethod: checkout.paymentMethod,
-                      shippingMethod: checkout.shippingMethod,
+                      onPlaceOrder: (checkout) async => OiOrderData(
+                        key: 'order-1',
+                        orderNumber: 'ORD-2026-001',
+                        createdAt: DateTime(2026, 3, 23),
+                        status: OiOrderStatus.confirmed,
+                        items: const [
+                          OiCartItem(
+                            productKey: 'p1',
+                            name: 'Wireless Headphones',
+                            unitPrice: 79.99,
+                          ),
+                          OiCartItem(
+                            productKey: 'p2',
+                            name: 'USB-C Cable',
+                            unitPrice: 12.99,
+                            quantity: 2,
+                          ),
+                        ],
+                        summary: const OiCartSummary(
+                          subtotal: 105.97,
+                          shipping: 5.99,
+                          tax: 8.48,
+                          total: 120.44,
+                        ),
+                        shippingAddress: checkout.shippingAddress,
+                        paymentMethod: checkout.paymentMethod,
+                        shippingMethod: checkout.shippingMethod,
+                      ),
                     ),
-                  ),
                   ),
                 ),
               ),
@@ -461,11 +442,11 @@ class ModulesScreen extends StatelessWidget {
                 'Authentication screens for login, registration, '
                 'and password reset. \n\n'
                 'OiAuthPage provides pre-built authentication screens '
-                  'with form validation, social login buttons, password '
-                  'strength indicators, and error handling. Supports '
-                  'login, register, forgot password, and email '
-                  'verification flows. See the Auth mini-app for a '
-                  'live demo.',
+                'with form validation, social login buttons, password '
+                'strength indicators, and error handling. Supports '
+                'login, register, forgot password, and email '
+                'verification flows. See the Auth mini-app for a '
+                'live demo.',
             examples: [
               ComponentExample(
                 title: 'Login Form',
@@ -489,9 +470,9 @@ class ModulesScreen extends StatelessWidget {
                 'An activity log timeline showing user actions '
                 'and system events. \n\n'
                 'OiActivityFeed renders a chronological timeline of '
-                  'events with user avatars, timestamps, action '
-                  'descriptions, and grouping by date. Supports filtering '
-                  'by event type and infinite scroll loading.',
+                'events with user avatars, timestamps, action '
+                'descriptions, and grouping by date. Supports filtering '
+                'by event type and infinite scroll loading.',
             examples: [
               ComponentExample(
                 title: 'Recent Activity',
@@ -535,9 +516,9 @@ class ModulesScreen extends StatelessWidget {
                 'A notification management module with categories '
                 'and read/unread state. \n\n'
                 'OiNotificationCenter displays a categorized list of '
-                  'notifications with read/unread indicators, timestamps, '
-                  'action buttons, and bulk mark-as-read/dismiss. '
-                  'Supports real-time notification delivery.',
+                'notifications with read/unread indicators, timestamps, '
+                'action buttons, and bulk mark-as-read/dismiss. '
+                'Supports real-time notification delivery.',
             examples: [
               ComponentExample(
                 title: 'Notifications',
@@ -583,9 +564,9 @@ class ModulesScreen extends StatelessWidget {
                 'A role-based permissions matrix for managing '
                 'access control. \n\n'
                 'OiPermissions provides a matrix-style UI for assigning '
-                  'permissions to roles. Supports role creation, '
-                  'permission grouping, inheritance visualization, and '
-                  'bulk permission toggling.',
+                'permissions to roles. Supports role creation, '
+                'permission grouping, inheritance visualization, and '
+                'bulk permission toggling.',
             examples: [
               ComponentExample(
                 title: 'Permission Matrix',
@@ -637,9 +618,9 @@ class ModulesScreen extends StatelessWidget {
                 'A generic resource detail and edit page with form '
                 'sections and action bar. \n\n'
                 'OiResourcePage provides a standardized layout for '
-                  'viewing and editing any resource type. Includes form '
-                  'sections, a metadata sidebar, revision history, and '
-                  'save/publish/delete actions.',
+                'viewing and editing any resource type. Includes form '
+                'sections, a metadata sidebar, revision history, and '
+                'save/publish/delete actions.',
             examples: [
               ComponentExample(
                 title: 'Resource Detail',
@@ -650,9 +631,7 @@ class ModulesScreen extends StatelessWidget {
                     title: 'Wireless Headphones',
                     breadcrumbs: [
                       OiBreadcrumbItem(label: 'Products', onTap: () {}),
-                      const OiBreadcrumbItem(
-                        label: 'Wireless Headphones',
-                      ),
+                      const OiBreadcrumbItem(label: 'Wireless Headphones'),
                     ],
                     child: const Padding(
                       padding: EdgeInsets.all(16),
@@ -675,9 +654,9 @@ class ModulesScreen extends StatelessWidget {
                 'A metadata editing panel for managing key-value pairs '
                 'and custom fields. \n\n'
                 'OiMetadataEditor provides a sidebar panel for editing '
-                  'resource metadata including key-value pairs, tags, '
-                  'categories, SEO fields, and custom attributes. '
-                  'Supports validation and auto-save.',
+                'resource metadata including key-value pairs, tags, '
+                'categories, SEO fields, and custom attributes. '
+                'Supports validation and auto-save.',
             examples: [
               ComponentExample(
                 title: 'Product Metadata',
@@ -711,10 +690,10 @@ class ModulesScreen extends StatelessWidget {
                 'A product detail page with gallery, variant selection, '
                 'reviews, and add-to-cart. \n\n'
                 'OiShopProductDetail combines product gallery, '
-                  'description, variant picker, price display, stock '
-                  'badge, reviews section, and add-to-cart into a '
-                  'complete product detail page. See the Shop mini-app '
-                  'for a live demo.',
+                'description, variant picker, price display, stock '
+                'badge, reviews section, and add-to-cart into a '
+                'complete product detail page. See the Shop mini-app '
+                'for a live demo.',
             examples: [
               ComponentExample(
                 title: 'Product Page',
@@ -734,18 +713,15 @@ class ModulesScreen extends StatelessWidget {
                               'with 30-hour battery life and Hi-Res audio.',
                           rating: 4.5,
                           reviewCount: 128,
-                          inStock: true,
                           stockCount: 45,
                           variants: [
                             OiProductVariant(
                               key: 'black',
                               label: 'Black',
-                              inStock: true,
                             ),
                             OiProductVariant(
                               key: 'white',
                               label: 'White',
-                              inStock: true,
                             ),
                             OiProductVariant(
                               key: 'blue',

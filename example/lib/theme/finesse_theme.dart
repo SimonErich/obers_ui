@@ -50,11 +50,7 @@ const _neutral50 = Color(0xFFFAFAFC);
 const _neutral100 = Color(0xFFF4F4F8);
 const _neutral200 = Color(0xFFE8E8F0);
 const _neutral300 = Color(0xFFD1D0DE);
-const _neutral400 = Color(0xFFB0AEC4);
 const _neutral500 = Color(0xFF8E8BA8);
-const _neutral600 = Color(0xFF6E6B8B);
-const _neutral700 = Color(0xFF4A4768);
-const _neutral800 = Color(0xFF2E2B4A);
 
 // ── Theme Definitions ──────────────────────────────────────────────────────
 
@@ -63,64 +59,64 @@ const _neutral800 = Color(0xFF2E2B4A);
 final finesseTheme = OiThemeData(
   brightness: Brightness.light,
   fontFamily: 'DM Sans',
-  colors: OiColorScheme(
+  colors: const OiColorScheme(
     primary: OiColorSwatch(
       base: _indigo,
       light: _indigoLight,
       dark: _indigoDark,
       muted: _indigoMuted,
-      foreground: const Color(0xFFFFFFFF),
+      foreground: Color(0xFFFFFFFF),
     ),
     accent: OiColorSwatch(
       base: _violet,
       light: _violetLight,
       dark: _violetDark,
       muted: _violetMuted,
-      foreground: const Color(0xFFFFFFFF),
+      foreground: Color(0xFFFFFFFF),
     ),
     success: OiColorSwatch(
       base: _green,
       light: _greenLight,
-      dark: const Color(0xFF009E72),
+      dark: Color(0xFF009E72),
       muted: _greenMuted,
-      foreground: const Color(0xFFFFFFFF),
+      foreground: Color(0xFFFFFFFF),
     ),
     warning: OiColorSwatch(
       base: _amber,
       light: _amberLight,
-      dark: const Color(0xFFD99D00),
+      dark: Color(0xFFD99D00),
       muted: _amberMuted,
-      foreground: const Color(0xFF1A1A1A),
+      foreground: Color(0xFF1A1A1A),
     ),
     error: OiColorSwatch(
       base: _coral,
       light: _coralLight,
-      dark: const Color(0xFFD93636),
+      dark: Color(0xFFD93636),
       muted: _coralMuted,
-      foreground: const Color(0xFFFFFFFF),
+      foreground: Color(0xFFFFFFFF),
     ),
     info: OiColorSwatch(
       base: _sky,
       light: _skyLight,
-      dark: const Color(0xFF2563EB),
+      dark: Color(0xFF2563EB),
       muted: _skyMuted,
-      foreground: const Color(0xFFFFFFFF),
+      foreground: Color(0xFFFFFFFF),
     ),
 
     // Surfaces — Finesse uses white with subtle purple-tinted greys
     background: _neutral50,
-    surface: const Color(0xFFFFFFFF),
+    surface: Color(0xFFFFFFFF),
     surfaceHover: _neutral100,
     surfaceActive: _neutral200,
     surfaceSubtle: _neutral50,
-    overlay: const Color(0x66000000),
+    overlay: Color(0x66000000),
 
     // Text — Finesse's purple-grey hierarchy
     text: _indigo,
     textSubtle: _bodyText,
     textMuted: _mutedText,
-    textInverse: const Color(0xFFFFFFFF),
-    textOnPrimary: const Color(0xFFFFFFFF),
+    textInverse: Color(0xFFFFFFFF),
+    textOnPrimary: Color(0xFFFFFFFF),
 
     // Borders — cool purple-tinted neutrals
     border: _neutral300,
@@ -129,11 +125,11 @@ final finesseTheme = OiThemeData(
     borderError: _coral,
 
     // Glass
-    glassBackground: const Color(0x99FFFFFF),
-    glassBorder: const Color(0x33FFFFFF),
+    glassBackground: Color(0x99FFFFFF),
+    glassBorder: Color(0x33FFFFFF),
 
     // Chart palette
-    chart: const [
+    chart: [
       Color(0xFF6C5CE7), // violet
       Color(0xFF00C48C), // green
       Color(0xFF3B82F6), // blue
@@ -228,7 +224,7 @@ final finesseTheme = OiThemeData(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
     ),
     badge: OiBadgeThemeData(borderRadius: BorderRadius.circular(6)),
-    tabs: OiTabsThemeData(
+    tabs: const OiTabsThemeData(
       indicatorColor: _violet,
       activeLabelColor: _violet,
       inactiveLabelColor: _mutedText,
@@ -245,77 +241,77 @@ final finesseTheme = OiThemeData(
 final finesseDarkTheme = OiThemeData(
   brightness: Brightness.dark,
   fontFamily: 'DM Sans',
-  colors: OiColorScheme(
+  colors: const OiColorScheme(
     primary: OiColorSwatch(
       base: _indigoMuted,
       light: _subtleText,
-      dark: const Color(0xFFE0DEF0),
-      muted: const Color(0xFF2A274A),
+      dark: Color(0xFFE0DEF0),
+      muted: Color(0xFF2A274A),
       foreground: _indigo,
     ),
     accent: OiColorSwatch(
       base: _violetLight,
-      light: const Color(0xFFA99DF4),
+      light: Color(0xFFA99DF4),
       dark: _violet,
-      muted: const Color(0xFF241E58),
-      foreground: const Color(0xFFFFFFFF),
+      muted: Color(0xFF241E58),
+      foreground: Color(0xFFFFFFFF),
     ),
     success: OiColorSwatch(
       base: _greenLight,
-      light: const Color(0xFF7FE5C5),
+      light: Color(0xFF7FE5C5),
       dark: _green,
-      muted: const Color(0xFF0A3D2B),
-      foreground: const Color(0xFFFFFFFF),
+      muted: Color(0xFF0A3D2B),
+      foreground: Color(0xFFFFFFFF),
     ),
     warning: OiColorSwatch(
       base: _amberLight,
-      light: const Color(0xFFFFDA7A),
+      light: Color(0xFFFFDA7A),
       dark: _amber,
-      muted: const Color(0xFF3D3010),
-      foreground: const Color(0xFF1A1A1A),
+      muted: Color(0xFF3D3010),
+      foreground: Color(0xFF1A1A1A),
     ),
     error: OiColorSwatch(
       base: _coralLight,
-      light: const Color(0xFFFFB3B3),
+      light: Color(0xFFFFB3B3),
       dark: _coral,
-      muted: const Color(0xFF4D1A1A),
-      foreground: const Color(0xFFFFFFFF),
+      muted: Color(0xFF4D1A1A),
+      foreground: Color(0xFFFFFFFF),
     ),
     info: OiColorSwatch(
       base: _skyLight,
-      light: const Color(0xFF93BAFA),
+      light: Color(0xFF93BAFA),
       dark: _sky,
-      muted: const Color(0xFF132A4D),
-      foreground: const Color(0xFFFFFFFF),
+      muted: Color(0xFF132A4D),
+      foreground: Color(0xFFFFFFFF),
     ),
 
     // Dark surfaces — deep indigo tones
-    background: const Color(0xFF0A0820),
-    surface: const Color(0xFF13102E),
-    surfaceHover: const Color(0xFF1C1940),
-    surfaceActive: const Color(0xFF26224E),
-    surfaceSubtle: const Color(0xFF0D0B26),
-    overlay: const Color(0x99000000),
+    background: Color(0xFF0A0820),
+    surface: Color(0xFF13102E),
+    surfaceHover: Color(0xFF1C1940),
+    surfaceActive: Color(0xFF26224E),
+    surfaceSubtle: Color(0xFF0D0B26),
+    overlay: Color(0x99000000),
 
     // Dark text
-    text: const Color(0xFFF4F4F8),
-    textSubtle: const Color(0xFFD1D0DE),
-    textMuted: const Color(0xFF8E8BA8),
+    text: Color(0xFFF4F4F8),
+    textSubtle: Color(0xFFD1D0DE),
+    textMuted: Color(0xFF8E8BA8),
     textInverse: _indigo,
     textOnPrimary: _indigo,
 
     // Dark borders
-    border: const Color(0xFF2E2B4A),
-    borderSubtle: const Color(0xFF1C1940),
+    border: Color(0xFF2E2B4A),
+    borderSubtle: Color(0xFF1C1940),
     borderFocus: _violetLight,
     borderError: _coralLight,
 
     // Glass
-    glassBackground: const Color(0x33FFFFFF),
-    glassBorder: const Color(0x1AFFFFFF),
+    glassBackground: Color(0x33FFFFFF),
+    glassBorder: Color(0x1AFFFFFF),
 
     // Dark chart palette
-    chart: const [
+    chart: [
       Color(0xFF8B7FF0), // violet light
       Color(0xFF4DD6AD), // green light
       Color(0xFF6BA3F8), // blue light
@@ -411,7 +407,7 @@ final finesseDarkTheme = OiThemeData(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
     ),
     badge: OiBadgeThemeData(borderRadius: BorderRadius.circular(6)),
-    tabs: OiTabsThemeData(
+    tabs: const OiTabsThemeData(
       indicatorColor: _violetLight,
       activeLabelColor: _violetLight,
       inactiveLabelColor: _neutral500,

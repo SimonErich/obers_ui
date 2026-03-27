@@ -5,16 +5,23 @@ import 'package:flutter/widgets.dart';
 /// {@category Foundation}
 @immutable
 class OiDateRangePickerThemeData {
+  /// Creates an [OiDateRangePickerThemeData].
   const OiDateRangePickerThemeData({
     this.presetPanelWidth,
     this.calendarSpacing,
     this.footerPadding,
   });
 
+  /// Width of the preset shortcuts panel shown beside the calendars.
   final double? presetPanelWidth;
+
+  /// Horizontal gap between the two calendar months.
   final double? calendarSpacing;
+
+  /// Padding applied around the footer action row.
   final EdgeInsetsGeometry? footerPadding;
 
+  /// Creates a copy with optionally overridden values.
   OiDateRangePickerThemeData copyWith({
     double? presetPanelWidth,
     double? calendarSpacing,
