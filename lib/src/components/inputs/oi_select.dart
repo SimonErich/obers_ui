@@ -1,79 +1,12 @@
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/_internal/oi_input_frame.dart';
+import 'package:obers_ui/src/components/inputs/oi_select_scope.dart';
 import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_color_scheme.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/primitives/input/oi_raw_input.dart';
 import 'package:obers_ui/src/primitives/overlay/oi_floating.dart';
 import 'package:obers_ui/src/primitives/scroll/oi_virtual_list.dart';
-
-/// Tracks which [OiSelect] is currently open within a subtree.
-///
-/// When any [OiSelect] opens, it notifies this notifier with its own key so
-/// that sibling selects can close themselves. Wrap a group of selects (or an
-/// entire form) with [OiSelectScope] to enable mutual exclusion.
-///
-/// {@category Components}
-class OiSelectScope extends StatefulWidget {
-  /// Creates an [OiSelectScope].
-  const OiSelectScope({required this.child, super.key});
-
-  /// The widget subtree that shares the select group.
-  final Widget child;
-
-  // Returns the nearest [_OiSelectScopeNotifier] above [context], or null.
-  static _OiSelectScopeNotifier? _of(BuildContext context) {
-    return context
-        .dependOnInheritedWidgetOfExactType<_OiSelectScopeInherited>()
-        ?.notifier;
-  }
-
-  @override
-  State<OiSelectScope> createState() => _OiSelectScopeState();
-}
-
-class _OiSelectScopeState extends State<OiSelectScope> {
-  final _OiSelectScopeNotifier _notifier = _OiSelectScopeNotifier();
-
-  @override
-  void dispose() {
-    _notifier.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return _OiSelectScopeInherited(
-      notifier: _notifier,
-      child: widget.child,
-    );
-  }
-}
-
-class _OiSelectScopeNotifier extends ChangeNotifier {
-  Object? _openKey;
-
-  void requestOpen(Object key) {
-    if (_openKey == key) return;
-    _openKey = key;
-    notifyListeners();
-  }
-
-  void requestClose(Object key) {
-    if (_openKey != key) return;
-    _openKey = null;
-    notifyListeners();
-  }
-
-  bool isOpen(Object key) => _openKey == key;
-}
-
-class _OiSelectScopeInherited extends InheritedNotifier<_OiSelectScopeNotifier> {
-  const _OiSelectScopeInherited({
-    required super.notifier,
-    required super.child,
-  });
-}
 
 /// A single selectable option for [OiSelect].
 ///
@@ -161,7 +94,7 @@ class _OiSelectState<T> extends State<OiSelect<T>> {
   String _query = '';
   late TextEditingController _searchCtrl;
   late FocusNode _searchFocus;
-  _OiSelectScopeNotifier? _scope;
+  OiSelectScopeNotifier? _scope;
 
   @override
   void initState() {
@@ -173,7 +106,7 @@ class _OiSelectState<T> extends State<OiSelect<T>> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final newScope = OiSelectScope._of(context);
+    final newScope = OiSelectScope.of(context);
     if (newScope != _scope) {
       _scope?.removeListener(_onScopeChanged);
       _scope = newScope;
@@ -182,7 +115,7 @@ class _OiSelectState<T> extends State<OiSelect<T>> {
   }
 
   void _onScopeChanged() {
-    if (_open && !(_scope?.isOpen(widget.key ?? this) ?? true)) {
+    if (_open && !(_scope?.open(widget.key ?? this) ?? true)) {
       setState(() => _open = false);
     }
   }
@@ -284,10 +217,10 @@ class _OiSelectState<T> extends State<OiSelect<T>> {
                   itemCount: filtered.length,
                   itemBuilder: (ctx, i) {
                     final option = filtered[i];
-                    final isSelected = option.value == widget.value;
+                    final selected = option.value == widget.value;
                     return _SelectDropdownItem<T>(
                       option: option,
-                      isSelected: isSelected,
+                      selected: selected,
                       height: itemHeight,
                       colors: colors,
                       onTap: option.enabled ? () => _select(option) : null,
@@ -308,11 +241,7 @@ class _OiSelectState<T> extends State<OiSelect<T>> {
     final displayText = label ?? widget.placeholder ?? '';
     final hasValue = label != null;
 
-    final chevron = Icon(
-      OiIcons.arrowDown,
-      size: 16,
-      color: colors.textMuted,
-    );
+    final chevron = Icon(OiIcons.arrowDown, size: 16, color: colors.textMuted);
 
     final anchor = GestureDetector(
       onTap: widget.enabled ? _open_ : null,
@@ -350,14 +279,14 @@ class _OiSelectState<T> extends State<OiSelect<T>> {
 class _SelectDropdownItem<T> extends StatefulWidget {
   const _SelectDropdownItem({
     required this.option,
-    required this.isSelected,
+    required this.selected,
     required this.height,
     required this.colors,
     this.onTap,
   });
 
   final OiSelectOption<T> option;
-  final bool isSelected;
+  final bool selected;
   final double height;
   final OiColorScheme colors;
   final VoidCallback? onTap;
@@ -374,7 +303,7 @@ class _SelectDropdownItemState<T> extends State<_SelectDropdownItem<T>> {
     final colors = widget.colors;
 
     Color? bgColor;
-    if (widget.isSelected) {
+    if (widget.selected) {
       bgColor = colors.primary.base.withValues(alpha: 0.1);
     } else if (_hovered && widget.option.enabled) {
       bgColor = colors.primary.base.withValues(alpha: 0.05);
@@ -401,7 +330,7 @@ class _SelectDropdownItemState<T> extends State<_SelectDropdownItem<T>> {
                 fontSize: 14,
                 color: !widget.option.enabled
                     ? colors.textMuted
-                    : widget.isSelected
+                    : widget.selected
                     ? colors.primary.base
                     : colors.text,
               ),

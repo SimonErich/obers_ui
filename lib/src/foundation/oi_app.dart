@@ -1,8 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
-import 'package:obers_ui/src/components/inputs/oi_select.dart';
+import 'package:obers_ui/src/components/inputs/oi_select_scope.dart';
 import 'package:obers_ui/src/foundation/oi_accessibility.dart';
-import 'package:obers_ui/src/foundation/oi_input_modality.dart';
+import 'package:obers_ui/src/foundation/oi_input_modality_detector.dart';
 import 'package:obers_ui/src/foundation/oi_overlays.dart';
 import 'package:obers_ui/src/foundation/oi_platform.dart';
 import 'package:obers_ui/src/foundation/oi_shortcut_scope.dart';
