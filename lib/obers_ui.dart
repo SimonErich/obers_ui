@@ -297,6 +297,7 @@ export 'src/models/settings/oi_file_explorer_settings.dart'
     hide OiSortDirection;
 export 'src/models/settings/oi_filter_bar_settings.dart';
 export 'src/models/settings/oi_gantt_settings.dart';
+export 'src/models/settings/oi_grouped_list_settings.dart';
 export 'src/models/settings/oi_kanban_settings.dart';
 export 'src/models/settings/oi_list_view_settings.dart' hide OiListViewLayout;
 export 'src/models/settings/oi_sidebar_settings.dart' hide OiSidebarMode;

@@ -5,6 +5,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui/src/composites/data/oi_grouped_list.dart';
 import 'package:obers_ui/src/components/display/oi_progress.dart';
+import 'package:obers_ui/src/foundation/persistence/drivers/oi_in_memory_driver.dart';
 import 'package:obers_ui/src/primitives/display/oi_label.dart';
 
 import '../../../helpers/pump_app.dart';
@@ -273,6 +274,39 @@ void main() {
       find.bySemanticsLabel('Contact list grouped by letter'),
       findsOneWidget,
     );
+  });
+
+  // ── Settings persistence ────────────────────────────────────────────────────
+
+  testWidgets('collapsed groups persist when settingsDriver is provided', (
+    tester,
+  ) async {
+    final driver = OiInMemorySettingsDriver();
+    // Pre-seed the driver with group A collapsed (simulates a previous session).
+    driver.store['oi_grouped_list::test'] = {
+      'schemaVersion': 1,
+      'collapsedGroups': ['A'],
+    };
+
+    // Build with the pre-seeded driver — should restore collapsed state.
+    final ctrl = OiGroupedListController();
+    await tester.pumpObers(
+      OiGroupedList<_Contact>(
+        items: _contacts,
+        itemBuilder: (_, c, __) => OiLabel.body(c.name),
+        groupBy: (c) => c.letter,
+        label: 'Contacts',
+        collapsible: true,
+        groupedListController: ctrl,
+        settingsDriver: driver,
+        settingsKey: 'test',
+      ),
+      surfaceSize: const Size(800, 1200),
+    );
+    await tester.pump(); // settle settings load
+
+    // Group A should be restored as collapsed from the persisted data.
+    expect(ctrl.isCollapsed('A'), isTrue);
   });
 }
 

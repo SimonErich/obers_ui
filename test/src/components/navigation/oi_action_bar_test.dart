@@ -282,6 +282,46 @@ void main() {
     expect(find.bySemanticsLabel('More actions'), findsOneWidget);
   });
 
+  testWidgets('tapping more button then overflow item fires onTap', (
+    tester,
+  ) async {
+    var tapped = false;
+    await tester.pumpObers(
+      OiActionBar(
+        actions: [
+          OiActionBarItem(
+            icon: OiIcons.pencil,
+            label: 'Edit',
+            semanticLabel: 'Edit',
+            onTap: () {},
+          ),
+        ],
+        overflowActions: [
+          OiActionBarItem(
+            icon: OiIcons.archive,
+            label: 'Archive',
+            semanticLabel: 'Archive',
+            onTap: () => tapped = true,
+          ),
+        ],
+        label: 'Actions',
+      ),
+      surfaceSize: const Size(400, 300),
+    );
+
+    // Tap the more button to open the overflow popover.
+    await tester.tap(find.bySemanticsLabel('More actions'));
+    await tester.pumpAndSettle();
+
+    // The overflow item label should now be visible.
+    expect(find.text('Archive'), findsOneWidget);
+
+    // Tap the overflow item.
+    await tester.tap(find.text('Archive'));
+    await tester.pump();
+    expect(tapped, isTrue);
+  });
+
   // ── Confirm ───────────────────────────────────────────────────────────────
 
   testWidgets('confirm action requires two taps', (tester) async {

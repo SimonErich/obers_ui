@@ -23,6 +23,7 @@ class OiSkeletonPreset extends StatelessWidget {
     this.lines = 3,
     this.lastLineWidth = 0.6,
     this.lineHeight = 14,
+    this.lineSpacing,
     this.height,
     this.width,
     this.aspectRatio,
@@ -39,6 +40,7 @@ class OiSkeletonPreset extends StatelessWidget {
     int lines = 3,
     double lastLineWidth = 0.6,
     double lineHeight = 14,
+    double? lineSpacing,
     double? width,
     Key? key,
   }) : this._(
@@ -46,6 +48,7 @@ class OiSkeletonPreset extends StatelessWidget {
          lines: lines,
          lastLineWidth: lastLineWidth,
          lineHeight: lineHeight,
+         lineSpacing: lineSpacing,
          width: width,
          key: key,
        );
@@ -132,6 +135,10 @@ class OiSkeletonPreset extends StatelessWidget {
   final int lines;
   final double lastLineWidth;
   final double lineHeight;
+
+  /// Space between lines in the text preset. Defaults to [OiSpacingScale.xs].
+  final double? lineSpacing;
+
   final double? height;
   final double? width;
   final double? aspectRatio;
@@ -160,11 +167,12 @@ class OiSkeletonPreset extends StatelessWidget {
   }
 
   Widget _buildText(OiSpacingScale spacing) {
+    final gap = lineSpacing ?? spacing.xs;
     return OiSkeletonGroup(
       children: [
         for (var i = 0; i < lines; i++)
           Padding(
-            padding: EdgeInsets.only(bottom: i < lines - 1 ? spacing.xs : 0),
+            padding: EdgeInsets.only(bottom: i < lines - 1 ? gap : 0),
             child: FractionallySizedBox(
               widthFactor: i == lines - 1 ? lastLineWidth : 1.0,
               alignment: Alignment.centerLeft,

@@ -2,9 +2,13 @@ import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/buttons/oi_button.dart';
 import 'package:obers_ui/src/components/buttons/oi_icon_button.dart';
 import 'package:obers_ui/src/components/display/oi_badge.dart';
+import 'package:obers_ui/src/components/display/oi_popover.dart';
 import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/oi_responsive.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
+import 'package:obers_ui/src/primitives/display/oi_icon.dart';
+import 'package:obers_ui/src/primitives/display/oi_label.dart';
+import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
 import 'package:obers_ui/src/primitives/layout/oi_row.dart';
 
 /// The visual style of an [OiActionBar].
@@ -198,16 +202,7 @@ class OiActionBar extends StatelessWidget {
 
     // Add overflow "more" button when overflowActions is populated.
     if (overflowActions != null && overflowActions!.isNotEmpty) {
-      children.add(
-        OiIconButton(
-          icon: OiIcons.ellipsisVertical,
-          semanticLabel: 'More actions',
-          onTap: () {
-            // Simplified: full implementation would use OiContextMenu or
-            // OiPopover to present overflow items.
-          },
-        ),
-      );
+      children.add(_OverflowMenuButton(actions: overflowActions!, size: size));
     }
 
     if (trailing != null) {
@@ -347,6 +342,75 @@ class OiActionBar extends StatelessWidget {
     }
 
     return actionWidget;
+  }
+}
+
+/// An overflow "more" button that opens a popover listing [actions].
+class _OverflowMenuButton extends StatefulWidget {
+  const _OverflowMenuButton({required this.actions, required this.size});
+
+  final List<OiActionBarItem> actions;
+  final OiButtonSize size;
+
+  @override
+  State<_OverflowMenuButton> createState() => _OverflowMenuButtonState();
+}
+
+class _OverflowMenuButtonState extends State<_OverflowMenuButton> {
+  bool _open = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    final spacing = context.spacing;
+
+    return OiPopover(
+      label: '',
+      open: _open,
+      onClose: () => setState(() => _open = false),
+      anchor: OiIconButton(
+        icon: OiIcons.ellipsisVertical,
+        semanticLabel: 'More actions',
+        size: widget.size,
+        onTap: () => setState(() => _open = !_open),
+      ),
+      content: IntrinsicWidth(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            for (final action in widget.actions)
+              OiTappable(
+                semanticLabel: action.semanticLabel,
+                onTap: action.enabled && action.onTap != null
+                    ? () {
+                        setState(() => _open = false);
+                        action.onTap!();
+                      }
+                    : null,
+                child: Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: spacing.md,
+                    vertical: spacing.sm,
+                  ),
+                  child: OiRow(
+                    breakpoint: context.breakpoint,
+                    gap: OiResponsive<double>(spacing.sm),
+                    children: [
+                      OiIcon.decorative(
+                        icon: action.icon,
+                        size: 16,
+                        color: colors.text,
+                      ),
+                      OiLabel.body(action.label, color: colors.text),
+                    ],
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
   }
 }
 

@@ -2,7 +2,12 @@ import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/display/oi_progress.dart';
 import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/oi_responsive.dart';
+import 'package:obers_ui/src/foundation/persistence/oi_settings_driver.dart';
+import 'package:obers_ui/src/foundation/persistence/oi_settings_mixin.dart';
+import 'package:obers_ui/src/foundation/persistence/oi_settings_provider.dart';
+import 'package:obers_ui/src/foundation/theme/oi_spacing_scale.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
+import 'package:obers_ui/src/models/settings/oi_grouped_list_settings.dart';
 import 'package:obers_ui/src/primitives/display/oi_icon.dart';
 import 'package:obers_ui/src/primitives/display/oi_label.dart';
 import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
@@ -124,6 +129,8 @@ class OiGroupedList<T> extends StatefulWidget {
     this.stickyHeaders = true,
     this.onRefresh,
     this.physics,
+    this.settingsDriver,
+    this.settingsKey,
     super.key,
   });
 
@@ -203,19 +210,60 @@ class OiGroupedList<T> extends StatefulWidget {
   /// Scroll physics override.
   final ScrollPhysics? physics;
 
+  /// Driver for persisting collapsed-group state across sessions.
+  ///
+  /// When `null`, state is not persisted. Falls back to [OiSettingsProvider]
+  /// if one is present in the widget tree and no explicit driver is provided.
+  final OiSettingsDriver? settingsDriver;
+
+  /// Sub-key scoping this list's settings within its namespace.
+  final String? settingsKey;
+
   @override
   State<OiGroupedList<T>> createState() => _OiGroupedListState<T>();
 }
 
-class _OiGroupedListState<T> extends State<OiGroupedList<T>> {
+class _OiGroupedListState<T> extends State<OiGroupedList<T>>
+    with OiSettingsMixin<OiGroupedList<T>, OiGroupedListSettings> {
   late OiGroupedListController _controller;
   bool _ownsController = false;
+  bool _settingsApplied = false;
+
+  /// Resolved settings driver: explicit prop → OiSettingsProvider → null.
+  OiSettingsDriver? _resolvedDriver;
+
+  // ── OiSettingsMixin contract ───────────────────────────────────────────────
+
+  @override
+  String get settingsNamespace => 'oi_grouped_list';
+
+  @override
+  String? get settingsKey => widget.settingsKey;
+
+  @override
+  OiSettingsDriver? get settingsDriver => _resolvedDriver;
+
+  @override
+  OiGroupedListSettings get defaultSettings => const OiGroupedListSettings();
+
+  @override
+  OiGroupedListSettings deserializeSettings(Map<String, dynamic> json) =>
+      OiGroupedListSettings.fromJson(json);
+
+  @override
+  OiGroupedListSettings mergeSettings(
+    OiGroupedListSettings saved,
+    OiGroupedListSettings defaults,
+  ) => saved.mergeWith(defaults);
+
+  // ── Lifecycle ──────────────────────────────────────────────────────────────
 
   @override
   void initState() {
-    super.initState();
+    _resolvedDriver = widget.settingsDriver;
     if (widget.groupedListController != null) {
       _controller = widget.groupedListController!;
+      _ownsController = false;
     } else {
       _controller = OiGroupedListController();
       _ownsController = true;
@@ -225,7 +273,54 @@ class _OiGroupedListState<T> extends State<OiGroupedList<T>> {
         _controller._collapsed.add(key);
       }
     }
+    super.initState();
     _controller.addListener(_onControllerChanged);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final newDriver = widget.settingsDriver ?? OiSettingsProvider.of(context);
+    if (newDriver != _resolvedDriver) {
+      _resolvedDriver = newDriver;
+      _settingsApplied = false;
+      if (settingsLoaded) reloadSettings();
+    }
+  }
+
+  @override
+  void didUpdateWidget(covariant OiGroupedList<T> oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.settingsDriver != oldWidget.settingsDriver ||
+        widget.settingsKey != oldWidget.settingsKey) {
+      _resolvedDriver = widget.settingsDriver;
+      _settingsApplied = false;
+      reloadSettings();
+    }
+    if (widget.groupedListController != oldWidget.groupedListController) {
+      _controller.removeListener(_onControllerChanged);
+      if (_ownsController) _controller.dispose();
+      if (widget.groupedListController != null) {
+        _controller = widget.groupedListController!;
+        _ownsController = false;
+      } else {
+        _controller = OiGroupedListController();
+        _ownsController = true;
+      }
+      _controller.addListener(_onControllerChanged);
+    }
+  }
+
+  /// Applies saved settings once after the async load completes.
+  ///
+  /// Called from [build] when [settingsLoaded] flips to true for the first time
+  /// (after the mixin's async load calls [setState]).
+  void _applySettingsOnce() {
+    if (_settingsApplied || !settingsLoaded || settingsDriver == null) return;
+    _settingsApplied = true;
+    for (final key in currentSettings.collapsedGroups) {
+      _controller._collapsed.add(key);
+    }
   }
 
   @override
@@ -236,7 +331,14 @@ class _OiGroupedListState<T> extends State<OiGroupedList<T>> {
   }
 
   void _onControllerChanged() {
-    if (mounted) setState(() {});
+    if (!mounted) return;
+    if (settingsDriver != null) {
+      updateSettings(
+        OiGroupedListSettings(collapsedGroups: Set.of(_controller._collapsed)),
+      );
+    } else {
+      setState(() {});
+    }
   }
 
   Map<String, List<T>> _buildGroups() {
@@ -280,6 +382,8 @@ class _OiGroupedListState<T> extends State<OiGroupedList<T>> {
 
   @override
   Widget build(BuildContext context) {
+    _applySettingsOnce();
+
     if (widget.items.isEmpty && widget.emptyState != null) {
       return widget.emptyState!;
     }
@@ -308,7 +412,7 @@ class _OiGroupedListState<T> extends State<OiGroupedList<T>> {
     BuildContext context,
     Map<String, List<T>> groups,
     List<String> sortedKeys,
-    dynamic spacing,
+    OiSpacingScale spacing,
   ) {
     final children = <Widget>[];
 
@@ -363,7 +467,7 @@ class _OiGroupedListState<T> extends State<OiGroupedList<T>> {
     BuildContext context,
     Map<String, List<T>> groups,
     List<String> sortedKeys,
-    dynamic spacing,
+    OiSpacingScale spacing,
   ) {
     final slivers = <Widget>[];
 
