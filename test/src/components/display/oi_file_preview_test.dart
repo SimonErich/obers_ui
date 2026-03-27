@@ -5,6 +5,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui/src/components/display/oi_file_icon.dart';
 import 'package:obers_ui/src/components/display/oi_file_preview.dart';
+import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/models/oi_file_node_data.dart';
 
 import '../../../helpers/pump_app.dart';
@@ -54,7 +55,7 @@ void main() {
   testWidgets('shows play button for video file with url', (tester) async {
     await tester.pumpObers(const OiFilePreview(file: videoFile));
     // Play button is an Icon with play_arrow code point
-    const playIcon = IconData(0xe037, fontFamily: 'MaterialIcons');
+    final playIcon = OiIcons.play;
     expect(find.byIcon(playIcon), findsOneWidget);
   });
 
@@ -62,7 +63,7 @@ void main() {
     await tester.pumpObers(
       const OiFilePreview(file: videoFile, showPlayButton: false),
     );
-    const playIcon = IconData(0xe037, fontFamily: 'MaterialIcons');
+    final playIcon = OiIcons.play;
     expect(find.byIcon(playIcon), findsNothing);
   });
 

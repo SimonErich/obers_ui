@@ -50,7 +50,15 @@ void main() {
       return OiPipelineStage(label: s.name, status: s);
     }).toList();
 
-    await tester.pumpObers(_pipeline(stages: stages));
+    // Use a wider surface so all status stages fit without overflow.
+    await tester.pumpObers(
+      SizedBox(
+        width: 1200,
+        height: 400,
+        child: OiPipeline(stages: stages, label: 'Test Pipeline'),
+      ),
+      surfaceSize: const Size(1200, 600),
+    );
 
     for (final status in OiPipelineStatus.values) {
       final expectedIcon = OiPipeline.statusIcon(status);

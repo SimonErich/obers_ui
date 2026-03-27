@@ -3,6 +3,7 @@ import 'package:obers_ui/src/components/buttons/oi_button.dart';
 import 'package:obers_ui/src/components/inputs/oi_checkbox.dart';
 import 'package:obers_ui/src/foundation/oi_responsive.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
+import 'package:obers_ui/src/primitives/animation/oi_animated_list.dart';
 import 'package:obers_ui/src/primitives/display/oi_label.dart';
 import 'package:obers_ui/src/primitives/display/oi_surface.dart';
 import 'package:obers_ui/src/primitives/layout/oi_row.dart';
@@ -207,8 +208,10 @@ class _OiBulkBarState extends State<OiBulkBar>
           },
           label: widget.allSelected ? 'Deselect all' : 'Select all',
         ),
-        OiLabel.bodyStrong(
-          '$_clampedCount of ${widget.totalCount} ${widget.label} selected',
+        Flexible(
+          child: OiLabel.bodyStrong(
+            '$_clampedCount of ${widget.totalCount} ${widget.label} selected',
+          ),
         ),
       ],
     );
@@ -252,15 +255,26 @@ class _OiBulkBarState extends State<OiBulkBar>
     if (widget.actions.isEmpty) return const SizedBox.shrink();
 
     final spacing = context.spacing;
-    final children = <Widget>[];
-    for (var i = 0; i < widget.actions.length; i++) {
-      children.add(_buildActionButton(context, widget.actions[i]));
-      if (i < widget.actions.length - 1) {
-        children.add(SizedBox(width: spacing.xs));
-      }
-    }
 
-    return Row(mainAxisSize: MainAxisSize.min, children: children);
+    return OiAnimatedList<OiBulkAction>(
+      items: widget.actions,
+      scrollDirection: Axis.horizontal,
+      shrinkWrap: true,
+      padding: EdgeInsets.zero,
+      itemBuilder: (context, action, animation, index) {
+        final button = _buildActionButton(context, action);
+        if (index < widget.actions.length - 1) {
+          return Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              button,
+              SizedBox(width: spacing.xs),
+            ],
+          );
+        }
+        return button;
+      },
+    );
   }
 
   @override
@@ -286,8 +300,9 @@ class _OiBulkBarState extends State<OiBulkBar>
           child: OiRow(
             breakpoint: context.breakpoint,
             gap: OiResponsive<double>(spacing.md),
+            mainAxisSize: MainAxisSize.max,
             children: [
-              _buildSelectionInfo(context),
+              Flexible(child: _buildSelectionInfo(context)),
               if (widget.actions.isNotEmpty) ...[
                 Container(width: 1, height: 24, color: colors.borderSubtle),
                 _buildActions(context),

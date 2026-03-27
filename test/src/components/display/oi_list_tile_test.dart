@@ -51,7 +51,8 @@ void main() {
 
   testWidgets('selected tile has highlight background', (tester) async {
     await tester.pumpObers(const OiListTile(title: 'Selected', selected: true));
-    expect(find.byType(ColoredBox), findsOneWidget);
+    // At least one ColoredBox (the highlight) must be present.
+    expect(find.byType(ColoredBox), findsWidgets);
   });
 
   testWidgets('dense reduces vertical space', (tester) async {

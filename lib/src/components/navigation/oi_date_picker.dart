@@ -5,6 +5,9 @@ import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
 
+// Weekday abbreviations, index 0=Monday ... 6=Sunday (matches DateTime.weekday-1).
+const List<String> _kWeekdays = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'];
+
 const List<String> _kMonths = [
   'January',
   'February',
@@ -387,6 +390,27 @@ class _OiDatePickerState extends State<OiDatePicker> {
                 ),
               ],
             ),
+          ),
+          const SizedBox(height: 4),
+          // Weekday header row.
+          Row(
+            children: List.generate(7, (col) {
+              // Reorder weekdays to start from firstDayOfWeek.
+              // DateTime.weekday: 1=Mon...7=Sun; _kWeekdays index: 0=Mon...6=Sun.
+              final dayIndex = (fdow - 1 + col) % 7;
+              return Expanded(
+                child: Center(
+                  child: Text(
+                    _kWeekdays[dayIndex],
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      color: colors.textMuted,
+                    ),
+                  ),
+                ),
+              );
+            }),
           ),
           const SizedBox(height: 4),
           // Day grid: 6 rows of 7 with alternating row backgrounds.

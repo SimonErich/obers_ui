@@ -67,9 +67,7 @@ class OiFileTile extends StatelessWidget {
           child: Row(
             children: [
               Icon(
-                file.folder
-                    ? OiIcons.folder
-                    : OiIcons.folderOpen,
+                file.folder ? OiIcons.folder : OiIcons.file,
                 size: 24,
                 color: file.folder ? colors.warning.base : colors.textSubtle,
               ),

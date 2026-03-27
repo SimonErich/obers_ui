@@ -489,11 +489,12 @@ void main() {
         ),
       );
 
-      // The list is reversed, so scrolling "up" means dragging down visually
-      // but increasing scroll offset toward maxScrollExtent (older messages).
-      // Fling toward older messages (upward visually = toward maxScrollExtent
-      // in a reversed list).
-      await tester.fling(find.byType(ListView), const Offset(0, 600), 1000);
+      // The list is reverse:true, so offset 0 = bottom (newest) and
+      // maxScrollExtent = top (oldest).  To reach older messages we must
+      // increase the scroll offset.  In a reversed list a downward drag
+      // (positive Y) scrolls toward the top (maxScrollExtent), triggering
+      // OiInfiniteScroll when pixels >= maxScrollExtent - threshold.
+      await tester.drag(find.byType(ListView), const Offset(0, 2000));
       await tester.pumpAndSettle();
 
       expect(called, isTrue);

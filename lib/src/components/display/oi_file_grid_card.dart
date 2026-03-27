@@ -63,9 +63,7 @@ class OiFileGridCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Icon(
-                file.folder
-                    ? OiIcons.folder
-                    : OiIcons.folderOpen,
+                file.folder ? OiIcons.folder : OiIcons.file,
                 size: 40,
                 color: file.folder ? colors.warning.base : colors.textSubtle,
               ),

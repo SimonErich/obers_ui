@@ -6,6 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui/src/components/display/oi_path_bar.dart';
 import 'package:obers_ui/src/components/inputs/oi_text_input.dart';
 import 'package:obers_ui/src/components/navigation/oi_breadcrumbs.dart';
+import 'package:obers_ui/src/foundation/oi_icons.dart';
 
 import '../../../helpers/pump_app.dart';
 
@@ -24,7 +25,7 @@ void main() {
   testWidgets('shows folder icon when showIcon is true', (tester) async {
     await tester.pumpObers(OiPathBar(segments: segments, onNavigate: (_) {}));
     // folder icon code point 0xe2c7
-    const folderIcon = IconData(0xe2c7, fontFamily: 'MaterialIcons');
+    final folderIcon = OiIcons.folder;
     expect(find.byIcon(folderIcon), findsOneWidget);
   });
 
@@ -32,7 +33,7 @@ void main() {
     await tester.pumpObers(
       OiPathBar(segments: segments, onNavigate: (_) {}, showIcon: false),
     );
-    const folderIcon = IconData(0xe2c7, fontFamily: 'MaterialIcons');
+    final folderIcon = OiIcons.folder;
     expect(find.byIcon(folderIcon), findsNothing);
   });
 
@@ -143,7 +144,7 @@ void main() {
     tester,
   ) async {
     await tester.pumpObers(OiPathBar(segments: const [], onNavigate: (_) {}));
-    const folderIcon = IconData(0xe2c7, fontFamily: 'MaterialIcons');
+    final folderIcon = OiIcons.folder;
     expect(find.byIcon(folderIcon), findsNothing);
   });
 }

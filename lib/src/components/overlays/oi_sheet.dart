@@ -250,17 +250,23 @@ class _OiSheetState extends State<OiSheet> with SingleTickerProviderStateMixin {
       vsync: this,
       duration: const Duration(milliseconds: 260),
     );
-    if (widget.open) _controller.forward();
+    // Forward is deferred to didChangeDependencies so the correct
+    // reduced-motion duration is applied before the animation starts.
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _controller.duration =
+    final newDuration =
         context.animations.reducedMotion ||
             MediaQuery.disableAnimationsOf(context)
         ? Duration.zero
         : const Duration(milliseconds: 260);
+    _controller.duration = newDuration;
+    // Start the open animation if the sheet is open and hasn't started yet.
+    if (widget.open && _controller.status == AnimationStatus.dismissed) {
+      _controller.forward();
+    }
   }
 
   @override
