@@ -70,7 +70,7 @@ class OiGroupedListController extends ChangeNotifier {
   }
 
   /// Whether a group is currently collapsed.
-  bool isCollapsed(String groupKey) => _collapsed.contains(groupKey);
+  bool collapsed(String groupKey) => _collapsed.contains(groupKey);
 
   /// Current set of collapsed group keys (read-only).
   Set<String> get collapsedGroups => Set.unmodifiable(_collapsed);
@@ -152,7 +152,7 @@ class OiGroupedList<T> extends StatefulWidget {
     BuildContext context,
     String groupKey,
     List<T> groupItems,
-    bool isCollapsed,
+    bool collapsed,
   )?
   headerBuilder;
 
@@ -354,17 +354,17 @@ class _OiGroupedListState<T> extends State<OiGroupedList<T>>
     BuildContext context,
     String key,
     List<T> items,
-    bool isCollapsed,
+    bool collapsed,
     GlobalKey headerKey,
   ) {
     Widget header;
     if (widget.headerBuilder != null) {
-      header = widget.headerBuilder!(context, key, items, isCollapsed);
+      header = widget.headerBuilder!(context, key, items, collapsed);
     } else {
       header = _DefaultGroupHeader(
         groupKey: key,
         itemCount: items.length,
-        isCollapsed: isCollapsed,
+        collapsed: collapsed,
         collapsible: widget.collapsible,
       );
     }
@@ -372,7 +372,7 @@ class _OiGroupedListState<T> extends State<OiGroupedList<T>>
     if (widget.collapsible) {
       header = OiTappable(
         onTap: () => _controller.toggleGroup(key),
-        semanticLabel: isCollapsed ? 'Expand $key' : 'Collapse $key',
+        semanticLabel: collapsed ? 'Expand $key' : 'Collapse $key',
         child: header,
       );
     }
@@ -419,12 +419,12 @@ class _OiGroupedListState<T> extends State<OiGroupedList<T>>
     for (var gi = 0; gi < sortedKeys.length; gi++) {
       final key = sortedKeys[gi];
       final items = groups[key]!;
-      final isCollapsed = _controller.isCollapsed(key);
+      final collapsed = _controller.collapsed(key);
       final headerKey = _controller._headerKeys.putIfAbsent(key, GlobalKey.new);
 
-      children.add(_buildHeader(context, key, items, isCollapsed, headerKey));
+      children.add(_buildHeader(context, key, items, collapsed, headerKey));
 
-      if (!isCollapsed) {
+      if (!collapsed) {
         for (var i = 0; i < items.length; i++) {
           children.add(widget.itemBuilder(context, items[i], i));
           if (widget.separator != null && i < items.length - 1) {
@@ -474,14 +474,14 @@ class _OiGroupedListState<T> extends State<OiGroupedList<T>>
     for (var gi = 0; gi < sortedKeys.length; gi++) {
       final key = sortedKeys[gi];
       final items = groups[key]!;
-      final isCollapsed = _controller.isCollapsed(key);
+      final collapsed = _controller.collapsed(key);
       final headerKey = _controller._headerKeys.putIfAbsent(key, GlobalKey.new);
 
       final headerWidget = _buildHeader(
         context,
         key,
         items,
-        isCollapsed,
+        collapsed,
         headerKey,
       );
 
@@ -499,7 +499,7 @@ class _OiGroupedListState<T> extends State<OiGroupedList<T>>
       );
 
       // Items for this group.
-      if (!isCollapsed) {
+      if (!collapsed) {
         final itemWidgets = <Widget>[];
         for (var i = 0; i < items.length; i++) {
           itemWidgets.add(widget.itemBuilder(context, items[i], i));
@@ -580,13 +580,13 @@ class _DefaultGroupHeader extends StatelessWidget {
   const _DefaultGroupHeader({
     required this.groupKey,
     required this.itemCount,
-    required this.isCollapsed,
+    required this.collapsed,
     required this.collapsible,
   });
 
   final String groupKey;
   final int itemCount;
-  final bool isCollapsed;
+  final bool collapsed;
   final bool collapsible;
 
   @override
@@ -607,7 +607,7 @@ class _DefaultGroupHeader extends StatelessWidget {
           OiLabel.h4(groupKey),
           if (collapsible)
             OiIcon.decorative(
-              icon: isCollapsed ? OiIcons.chevronRight : OiIcons.chevronDown,
+              icon: collapsed ? OiIcons.chevronRight : OiIcons.chevronDown,
               size: 14,
               color: colors.textMuted,
             ),

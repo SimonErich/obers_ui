@@ -306,7 +306,7 @@ void main() {
     await tester.pump(); // settle settings load
 
     // Group A should be restored as collapsed from the persisted data.
-    expect(ctrl.isCollapsed('A'), isTrue);
+    expect(ctrl.collapsed('A'), isTrue);
   });
 }
 
