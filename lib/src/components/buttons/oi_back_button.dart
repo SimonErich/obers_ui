@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/obers_ui.dart' show OiSliverHeader;
-import 'package:obers_ui/src/components/display/oi_sliver_header.dart' show OiSliverHeader;
+import 'package:obers_ui/src/components/display/oi_sliver_header.dart'
+    show OiSliverHeader;
 import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
@@ -16,9 +17,9 @@ class OiBackButton extends StatelessWidget {
   /// Creates an [OiBackButton].
   const OiBackButton({
     required this.onPressed,
+    required this.semanticLabel,
     this.color,
     this.size = 24.0,
-    this.semanticLabel = 'Go back',
     super.key,
   });
 

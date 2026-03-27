@@ -12,12 +12,16 @@ void main() {
     // ── Rendering ────────────────────────────────────────────────────────────
 
     testWidgets('renders without error', (tester) async {
-      await tester.pumpObers(OiBackButton(onPressed: () {}));
+      await tester.pumpObers(
+        OiBackButton(onPressed: () {}, semanticLabel: 'Go back'),
+      );
       expect(find.byType(OiBackButton), findsOneWidget);
     });
 
     testWidgets('renders an Icon widget', (tester) async {
-      await tester.pumpObers(OiBackButton(onPressed: () {}));
+      await tester.pumpObers(
+        OiBackButton(onPressed: () {}, semanticLabel: 'Go back'),
+      );
       expect(find.byType(Icon), findsOneWidget);
     });
 
@@ -26,7 +30,7 @@ void main() {
     testWidgets('fires onPressed when tapped', (tester) async {
       var pressed = false;
       await tester.pumpObers(
-        OiBackButton(onPressed: () => pressed = true),
+        OiBackButton(onPressed: () => pressed = true, semanticLabel: 'Go back'),
       );
       await tester.tap(find.byType(OiBackButton));
       await tester.pump();
@@ -35,8 +39,10 @@ void main() {
 
     // ── Semantics ────────────────────────────────────────────────────────────
 
-    testWidgets('has default semantic label "Go back"', (tester) async {
-      await tester.pumpObers(OiBackButton(onPressed: () {}));
+    testWidgets('semantic label "Go back" is applied', (tester) async {
+      await tester.pumpObers(
+        OiBackButton(onPressed: () {}, semanticLabel: 'Go back'),
+      );
       expect(find.bySemanticsLabel('Go back'), findsOneWidget);
     });
 
@@ -51,14 +57,16 @@ void main() {
 
     testWidgets('custom size is applied to icon', (tester) async {
       await tester.pumpObers(
-        OiBackButton(onPressed: () {}, size: 32),
+        OiBackButton(onPressed: () {}, semanticLabel: 'Go back', size: 32),
       );
       final icon = tester.widget<Icon>(find.byType(Icon));
       expect(icon.size, 32);
     });
 
     testWidgets('default icon size is 24', (tester) async {
-      await tester.pumpObers(OiBackButton(onPressed: () {}));
+      await tester.pumpObers(
+        OiBackButton(onPressed: () {}, semanticLabel: 'Go back'),
+      );
       final icon = tester.widget<Icon>(find.byType(Icon));
       expect(icon.size, 24);
     });
@@ -67,7 +75,9 @@ void main() {
 
     testWidgets('uses different icon in RTL layout', (tester) async {
       // LTR icon.
-      await tester.pumpObers(OiBackButton(onPressed: () {}));
+      await tester.pumpObers(
+        OiBackButton(onPressed: () {}, semanticLabel: 'Go back'),
+      );
       final ltrIcon = tester.widget<Icon>(find.byType(Icon));
       final ltrIconData = ltrIcon.icon;
 
@@ -75,7 +85,7 @@ void main() {
       await tester.pumpObers(
         Directionality(
           textDirection: TextDirection.rtl,
-          child: OiBackButton(onPressed: () {}),
+          child: OiBackButton(onPressed: () {}, semanticLabel: 'Go back'),
         ),
       );
       final rtlIcon = tester.widget<Icon>(find.byType(Icon));
