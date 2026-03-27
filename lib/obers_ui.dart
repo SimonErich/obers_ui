@@ -202,6 +202,7 @@ export 'src/composites/onboarding/oi_whats_new.dart';
 // ── Composites: Scheduling ───────────────────────────────────────────────────
 
 export 'src/composites/scheduling/oi_calendar.dart';
+export 'src/composites/scheduling/oi_date_range_input.dart';
 export 'src/composites/scheduling/oi_date_range_picker.dart';
 export 'src/composites/scheduling/oi_gantt.dart';
 export 'src/composites/scheduling/oi_scheduler.dart';

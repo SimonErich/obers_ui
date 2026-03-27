@@ -248,6 +248,36 @@ class _OiGroupedListState<T> extends State<OiGroupedList<T>> {
     return groups;
   }
 
+  Widget _buildHeader(
+    BuildContext context,
+    String key,
+    List<T> items,
+    bool isCollapsed,
+    GlobalKey headerKey,
+  ) {
+    Widget header;
+    if (widget.headerBuilder != null) {
+      header = widget.headerBuilder!(context, key, items, isCollapsed);
+    } else {
+      header = _DefaultGroupHeader(
+        groupKey: key,
+        itemCount: items.length,
+        isCollapsed: isCollapsed,
+        collapsible: widget.collapsible,
+      );
+    }
+
+    if (widget.collapsible) {
+      header = OiTappable(
+        onTap: () => _controller.toggleGroup(key),
+        semanticLabel: isCollapsed ? 'Expand $key' : 'Collapse $key',
+        child: header,
+      );
+    }
+
+    return KeyedSubtree(key: headerKey, child: header);
+  }
+
   @override
   Widget build(BuildContext context) {
     if (widget.items.isEmpty && widget.emptyState != null) {
@@ -267,40 +297,29 @@ class _OiGroupedListState<T> extends State<OiGroupedList<T>> {
 
     final spacing = context.spacing;
 
+    if (widget.stickyHeaders) {
+      return _buildStickyScrollView(context, groups, sortedKeys, spacing);
+    }
+
+    return _buildFlatListView(context, groups, sortedKeys, spacing);
+  }
+
+  Widget _buildFlatListView(
+    BuildContext context,
+    Map<String, List<T>> groups,
+    List<String> sortedKeys,
+    dynamic spacing,
+  ) {
     final children = <Widget>[];
 
     for (var gi = 0; gi < sortedKeys.length; gi++) {
       final key = sortedKeys[gi];
       final items = groups[key]!;
       final isCollapsed = _controller.isCollapsed(key);
-
-      // Ensure a GlobalKey exists for this header.
       final headerKey = _controller._headerKeys.putIfAbsent(key, GlobalKey.new);
 
-      // Header.
-      Widget header;
-      if (widget.headerBuilder != null) {
-        header = widget.headerBuilder!(context, key, items, isCollapsed);
-      } else {
-        header = _DefaultGroupHeader(
-          groupKey: key,
-          itemCount: items.length,
-          isCollapsed: isCollapsed,
-          collapsible: widget.collapsible,
-        );
-      }
+      children.add(_buildHeader(context, key, items, isCollapsed, headerKey));
 
-      if (widget.collapsible) {
-        header = OiTappable(
-          onTap: () => _controller.toggleGroup(key),
-          semanticLabel: isCollapsed ? 'Expand $key' : 'Collapse $key',
-          child: header,
-        );
-      }
-
-      children.add(KeyedSubtree(key: headerKey, child: header));
-
-      // Items.
       if (!isCollapsed) {
         for (var i = 0; i < items.length; i++) {
           children.add(widget.itemBuilder(context, items[i], i));
@@ -310,13 +329,11 @@ class _OiGroupedListState<T> extends State<OiGroupedList<T>> {
         }
       }
 
-      // Group separator.
       if (widget.groupSeparator != null && gi < sortedKeys.length - 1) {
         children.add(widget.groupSeparator!);
       }
     }
 
-    // Loading indicator.
     if (widget.loading) {
       children.add(
         Padding(
@@ -340,6 +357,118 @@ class _OiGroupedListState<T> extends State<OiGroupedList<T>> {
         children: children,
       ),
     );
+  }
+
+  Widget _buildStickyScrollView(
+    BuildContext context,
+    Map<String, List<T>> groups,
+    List<String> sortedKeys,
+    dynamic spacing,
+  ) {
+    final slivers = <Widget>[];
+
+    for (var gi = 0; gi < sortedKeys.length; gi++) {
+      final key = sortedKeys[gi];
+      final items = groups[key]!;
+      final isCollapsed = _controller.isCollapsed(key);
+      final headerKey = _controller._headerKeys.putIfAbsent(key, GlobalKey.new);
+
+      final headerWidget = _buildHeader(
+        context,
+        key,
+        items,
+        isCollapsed,
+        headerKey,
+      );
+
+      // Sticky persistent header for each group.
+      // Use 48.0 to accommodate touch target padding on interactive headers.
+      final headerExtent = widget.collapsible ? 48.0 : 40.0;
+      slivers.add(
+        SliverPersistentHeader(
+          pinned: true,
+          delegate: _GroupHeaderDelegate(
+            child: headerWidget,
+            extent: headerExtent,
+          ),
+        ),
+      );
+
+      // Items for this group.
+      if (!isCollapsed) {
+        final itemWidgets = <Widget>[];
+        for (var i = 0; i < items.length; i++) {
+          itemWidgets.add(widget.itemBuilder(context, items[i], i));
+          if (widget.separator != null && i < items.length - 1) {
+            itemWidgets.add(widget.separator!);
+          }
+        }
+        if (itemWidgets.isNotEmpty) {
+          slivers.add(
+            SliverList(delegate: SliverChildListDelegate(itemWidgets)),
+          );
+        }
+      }
+
+      // Group separator.
+      if (widget.groupSeparator != null && gi < sortedKeys.length - 1) {
+        slivers.add(SliverToBoxAdapter(child: widget.groupSeparator!));
+      }
+    }
+
+    // Loading indicator.
+    if (widget.loading) {
+      slivers.add(
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: EdgeInsets.all(spacing.md),
+            child: const Center(
+              child: SizedBox.square(
+                dimension: 24,
+                child: OiProgress.circular(indeterminate: true, size: 24),
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
+    return Semantics(
+      label: widget.semanticLabel ?? widget.label,
+      child: CustomScrollView(
+        controller: widget.controller,
+        physics: widget.physics,
+        slivers: slivers,
+      ),
+    );
+  }
+}
+
+/// Delegate for sticky group headers using [SliverPersistentHeader].
+class _GroupHeaderDelegate extends SliverPersistentHeaderDelegate {
+  _GroupHeaderDelegate({required this.child, required this.extent});
+
+  final Widget child;
+  final double extent;
+
+  @override
+  double get minExtent => extent;
+
+  @override
+  double get maxExtent => extent;
+
+  @override
+  Widget build(
+    BuildContext context,
+    double shrinkOffset,
+    bool overlapsContent,
+  ) {
+    return SizedBox.expand(child: child);
+  }
+
+  @override
+  bool shouldRebuild(covariant _GroupHeaderDelegate oldDelegate) {
+    return child != oldDelegate.child || extent != oldDelegate.extent;
   }
 }
 

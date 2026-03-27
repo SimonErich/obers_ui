@@ -133,6 +133,8 @@ class OiIndexBar extends StatelessWidget {
             labels: labels,
             onLabelSelected: onLabelSelected,
             hapticFeedback: hapticFeedback,
+            showTooltip: showTooltip,
+            tooltipColor: activeColor,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -162,12 +164,16 @@ class _IndexBarGesture extends StatefulWidget {
     required this.labels,
     required this.onLabelSelected,
     required this.hapticFeedback,
+    required this.showTooltip,
+    required this.tooltipColor,
     required this.child,
   });
 
   final List<String> labels;
   final ValueChanged<String> onLabelSelected;
   final bool hapticFeedback;
+  final bool showTooltip;
+  final Color tooltipColor;
   final Widget child;
 
   @override
@@ -176,20 +182,80 @@ class _IndexBarGesture extends StatefulWidget {
 
 class _IndexBarGestureState extends State<_IndexBarGesture> {
   String? _lastReportedLabel;
+  OverlayEntry? _tooltipEntry;
+  String _tooltipLabel = '';
+  double _tooltipDy = 0;
+  final LayerLink _layerLink = LayerLink();
 
-  void _handleDragUpdate(DragUpdateDetails details) {
+  String? _resolveLabel(Offset globalPosition) {
     final box = context.findRenderObject()! as RenderBox;
-    final localPosition = box.globalToLocal(details.globalPosition);
+    final localPosition = box.globalToLocal(globalPosition);
     final height = box.size.height;
     final labelCount = widget.labels.length;
 
-    if (labelCount == 0 || height == 0) return;
+    if (labelCount == 0 || height == 0) return null;
 
     final fraction = (localPosition.dy / height).clamp(0.0, 1.0);
     final index = (fraction * (labelCount - 1)).round();
-    final label = widget.labels[index];
+    return widget.labels[index];
+  }
 
-    // Deduplicate consecutive same-label callbacks.
+  void _showTooltipOverlay() {
+    if (!widget.showTooltip) return;
+    _tooltipEntry = OverlayEntry(
+      builder: (context) {
+        return CompositedTransformFollower(
+          link: _layerLink,
+          targetAnchor: Alignment.centerLeft,
+          followerAnchor: Alignment.centerRight,
+          offset: const Offset(-12, 0),
+          child: Align(
+            alignment: Alignment.centerRight,
+            child: _TooltipBubble(
+              label: _tooltipLabel,
+              color: widget.tooltipColor,
+              dy: _tooltipDy,
+            ),
+          ),
+        );
+      },
+    );
+    Overlay.of(context).insert(_tooltipEntry!);
+  }
+
+  void _updateTooltip(String label, double dy) {
+    _tooltipLabel = label;
+    _tooltipDy = dy;
+    _tooltipEntry?.markNeedsBuild();
+  }
+
+  void _removeTooltip() {
+    _tooltipEntry?.remove();
+    _tooltipEntry = null;
+  }
+
+  void _handleDragStart(DragStartDetails details) {
+    final label = _resolveLabel(details.globalPosition);
+    if (label == null) return;
+    _lastReportedLabel = label;
+    widget.onLabelSelected(label);
+    if (widget.hapticFeedback) {
+      HapticFeedback.selectionClick();
+    }
+
+    if (widget.showTooltip) {
+      final box = context.findRenderObject()! as RenderBox;
+      final local = box.globalToLocal(details.globalPosition);
+      _tooltipLabel = label;
+      _tooltipDy = local.dy;
+      _showTooltipOverlay();
+    }
+  }
+
+  void _handleDragUpdate(DragUpdateDetails details) {
+    final label = _resolveLabel(details.globalPosition);
+    if (label == null) return;
+
     if (label != _lastReportedLabel) {
       _lastReportedLabel = label;
       widget.onLabelSelected(label);
@@ -197,19 +263,66 @@ class _IndexBarGestureState extends State<_IndexBarGesture> {
         HapticFeedback.selectionClick();
       }
     }
+
+    if (widget.showTooltip) {
+      final box = context.findRenderObject()! as RenderBox;
+      final local = box.globalToLocal(details.globalPosition);
+      _updateTooltip(label, local.dy);
+    }
   }
 
   void _handleDragEnd(DragEndDetails details) {
     _lastReportedLabel = null;
+    _removeTooltip();
+  }
+
+  @override
+  void dispose() {
+    _removeTooltip();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onVerticalDragUpdate: _handleDragUpdate,
-      onVerticalDragEnd: _handleDragEnd,
-      behavior: HitTestBehavior.opaque,
-      child: widget.child,
+    return CompositedTransformTarget(
+      link: _layerLink,
+      child: GestureDetector(
+        onVerticalDragStart: _handleDragStart,
+        onVerticalDragUpdate: _handleDragUpdate,
+        onVerticalDragEnd: _handleDragEnd,
+        behavior: HitTestBehavior.opaque,
+        child: widget.child,
+      ),
+    );
+  }
+}
+
+/// Floating tooltip bubble shown during index bar drag.
+class _TooltipBubble extends StatelessWidget {
+  const _TooltipBubble({
+    required this.label,
+    required this.color,
+    required this.dy,
+  });
+
+  final String label;
+  final Color color;
+  final double dy;
+
+  @override
+  Widget build(BuildContext context) {
+    return Transform.translate(
+      offset: Offset(0, dy - 20),
+      child: Container(
+        width: 40,
+        height: 40,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: color,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: OiLabel.h3(label, color: const Color(0xFFFFFFFF)),
+      ),
     );
   }
 }

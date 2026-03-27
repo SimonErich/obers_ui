@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/buttons/oi_button.dart';
 import 'package:obers_ui/src/components/inputs/oi_date_range_picker_field.dart';
+import 'package:obers_ui/src/components/inputs/oi_time_input.dart';
 import 'package:obers_ui/src/components/navigation/oi_date_picker.dart';
 import 'package:obers_ui/src/foundation/oi_responsive.dart';
 import 'package:obers_ui/src/foundation/theme/oi_spacing_scale.dart';
@@ -109,6 +110,8 @@ class OiDateRangePicker extends StatefulWidget {
 class _OiDateRangePickerState extends State<OiDateRangePicker> {
   DateTime? _start;
   DateTime? _end;
+  OiTimeOfDay? _startTime;
+  OiTimeOfDay? _endTime;
   late DateTime _leftMonth;
   late DateTime _rightMonth;
 
@@ -117,6 +120,13 @@ class _OiDateRangePickerState extends State<OiDateRangePicker> {
     super.initState();
     _start = widget.startDate;
     _end = widget.endDate;
+    // Initialise time fields from incoming dates when time picker is enabled.
+    if (widget.showTimePicker && _start != null) {
+      _startTime = OiTimeOfDay(hour: _start!.hour, minute: _start!.minute);
+    }
+    if (widget.showTimePicker && _end != null) {
+      _endTime = OiTimeOfDay(hour: _end!.hour, minute: _end!.minute);
+    }
     final ref = _start ?? DateTime.now();
     _leftMonth = DateTime(ref.year, ref.month);
     _rightMonth = DateTime(ref.year, ref.month + 1);
@@ -175,9 +185,20 @@ class _OiDateRangePickerState extends State<OiDateRangePicker> {
     });
   }
 
+  DateTime _combineDateAndTime(DateTime date, OiTimeOfDay? time) {
+    if (time == null) return date;
+    return DateTime(date.year, date.month, date.day, time.hour, time.minute);
+  }
+
   void _apply() {
     if (_start != null && _end != null) {
-      widget.onApply?.call(_start!, _end!);
+      final start = widget.showTimePicker
+          ? _combineDateAndTime(_start!, _startTime)
+          : _start!;
+      final end = widget.showTimePicker
+          ? _combineDateAndTime(_end!, _endTime)
+          : _end!;
+      widget.onApply?.call(start, end);
     }
   }
 
@@ -248,33 +269,63 @@ class _OiDateRangePickerState extends State<OiDateRangePicker> {
             child: _buildPresetsList(context, presets, spacing, breakpoint),
           ),
         Expanded(
-          child: OiDatePicker(
-            rangeMode: true,
-            rangeStart: _start,
-            rangeEnd: _end,
-            onRangeChanged: _onRangeSelected,
-            firstDate: widget.firstDate,
-            lastDate: widget.lastDate,
-            disabledDates: widget.disabledDates,
-            disabledDaysOfWeek: widget.disabledDaysOfWeek,
-            firstDayOfWeek: widget.firstDayOfWeek,
-            displayMonth: _leftMonth,
-            onDisplayMonthChanged: _onLeftMonthChanged,
+          child: OiColumn(
+            breakpoint: breakpoint,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              OiDatePicker(
+                rangeMode: true,
+                rangeStart: _start,
+                rangeEnd: _end,
+                onRangeChanged: _onRangeSelected,
+                firstDate: widget.firstDate,
+                lastDate: widget.lastDate,
+                disabledDates: widget.disabledDates,
+                disabledDaysOfWeek: widget.disabledDaysOfWeek,
+                firstDayOfWeek: widget.firstDayOfWeek,
+                displayMonth: _leftMonth,
+                onDisplayMonthChanged: _onLeftMonthChanged,
+              ),
+              if (widget.showTimePicker)
+                Padding(
+                  padding: EdgeInsets.only(top: spacing.sm),
+                  child: OiTimeInput(
+                    label: 'Start time',
+                    value: _startTime,
+                    onChanged: (time) => setState(() => _startTime = time),
+                  ),
+                ),
+            ],
           ),
         ),
         Expanded(
-          child: OiDatePicker(
-            rangeMode: true,
-            rangeStart: _start,
-            rangeEnd: _end,
-            onRangeChanged: _onRangeSelected,
-            firstDate: widget.firstDate,
-            lastDate: widget.lastDate,
-            disabledDates: widget.disabledDates,
-            disabledDaysOfWeek: widget.disabledDaysOfWeek,
-            firstDayOfWeek: widget.firstDayOfWeek,
-            displayMonth: _rightMonth,
-            onDisplayMonthChanged: _onRightMonthChanged,
+          child: OiColumn(
+            breakpoint: breakpoint,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              OiDatePicker(
+                rangeMode: true,
+                rangeStart: _start,
+                rangeEnd: _end,
+                onRangeChanged: _onRangeSelected,
+                firstDate: widget.firstDate,
+                lastDate: widget.lastDate,
+                disabledDates: widget.disabledDates,
+                disabledDaysOfWeek: widget.disabledDaysOfWeek,
+                firstDayOfWeek: widget.firstDayOfWeek,
+                displayMonth: _rightMonth,
+                onDisplayMonthChanged: _onRightMonthChanged,
+              ),
+              if (widget.showTimePicker)
+                Padding(
+                  padding: EdgeInsets.only(top: spacing.sm),
+                  child: OiTimeInput(
+                    label: 'End time',
+                    value: _endTime,
+                    onChanged: (time) => setState(() => _endTime = time),
+                  ),
+                ),
+            ],
           ),
         ),
       ],
@@ -307,6 +358,18 @@ class _OiDateRangePickerState extends State<OiDateRangePicker> {
           displayMonth: _leftMonth,
           onDisplayMonthChanged: _onLeftMonthChanged,
         ),
+        if (widget.showTimePicker)
+          OiTimeInput(
+            label: 'Start time',
+            value: _startTime,
+            onChanged: (time) => setState(() => _startTime = time),
+          ),
+        if (widget.showTimePicker)
+          OiTimeInput(
+            label: 'End time',
+            value: _endTime,
+            onChanged: (time) => setState(() => _endTime = time),
+          ),
       ],
     );
   }

@@ -243,6 +243,7 @@ class OiDateRangePickerField extends StatelessWidget {
     this.startDate,
     this.endDate,
     this.onChanged,
+    this.onCleared,
     this.minDate,
     this.maxDate,
     this.label,
@@ -251,6 +252,7 @@ class OiDateRangePickerField extends StatelessWidget {
     this.dateFormat,
     this.clearable = false,
     this.enabled = true,
+    this.required = false,
     this.presets,
     this.showPresets = true,
     this.validator,
@@ -270,6 +272,12 @@ class OiDateRangePickerField extends StatelessWidget {
   ///
   /// The callback receives `(start, end)` or `null` when cleared.
   final void Function(DateTime start, DateTime end)? onChanged;
+
+  /// Called when the user taps the clear button.
+  ///
+  /// Use this to reset the date range in the parent state. When `null` and
+  /// [clearable] is `true`, the clear icon is still rendered but does nothing.
+  final VoidCallback? onCleared;
 
   /// The earliest selectable date.
   final DateTime? minDate;
@@ -297,6 +305,9 @@ class OiDateRangePickerField extends StatelessWidget {
 
   /// Whether the field accepts interaction.
   final bool enabled;
+
+  /// When `true`, a red asterisk is appended to the [label].
+  final bool required;
 
   /// Custom presets to display in the dialog.
   ///
@@ -377,19 +388,14 @@ class OiDateRangePickerField extends StatelessWidget {
     final displayText = hasValue
         ? _formatRange(startDate!, endDate!)
         : 'Select date range';
+    final effectiveLabel = required && label != null ? '$label *' : label;
 
     final trailing = Row(
       mainAxisSize: MainAxisSize.min,
       children: [
         if (clearable && hasValue && enabled)
           OiTappable(
-            onTap: () {
-              // Fire onChanged with a sentinel — but since the callback
-              // signature requires two DateTimes, clearing is handled by
-              // emitting a zero-range today and letting the consumer decide.
-              // A cleaner pattern: expose a separate onCleared callback or
-              // accept nullable onChanged. For now we just don't fire.
-            },
+            onTap: onCleared,
             child: Padding(
               padding: const EdgeInsets.only(right: 4),
               child: Icon(OiIcons.x, size: 16, color: colors.textMuted),
@@ -403,7 +409,7 @@ class OiDateRangePickerField extends StatelessWidget {
       onTap: enabled ? () => _openDialog(context) : null,
       behavior: HitTestBehavior.opaque,
       child: OiInputFrame(
-        label: label,
+        label: effectiveLabel,
         hint: hint,
         error: resolvedError,
         enabled: enabled,

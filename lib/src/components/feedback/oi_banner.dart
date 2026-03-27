@@ -323,31 +323,31 @@ class _OiBannerState extends State<OiBanner>
     final effectiveIcon = widget.icon ?? _defaultIcon();
     final showIcon = !effectiveCompact && effectiveIcon != null;
 
-    // Resolve level-specific colors.
+    // Resolve level-specific colors with theme overrides.
     final (bgColor, accentColor, iconColor) = switch (widget.level) {
       OiBannerLevel.info => (
-        colors.info.muted,
-        colors.info.base,
+        themeData?.infoBackground ?? colors.info.muted,
+        themeData?.infoBorder ?? colors.info.base,
         colors.info.base,
       ),
       OiBannerLevel.success => (
-        colors.success.muted,
-        colors.success.base,
+        themeData?.successBackground ?? colors.success.muted,
+        themeData?.successBorder ?? colors.success.base,
         colors.success.base,
       ),
       OiBannerLevel.warning => (
-        colors.warning.muted,
-        colors.warning.base,
+        themeData?.warningBackground ?? colors.warning.muted,
+        themeData?.warningBorder ?? colors.warning.base,
         colors.warning.base,
       ),
       OiBannerLevel.error => (
-        colors.error.muted,
-        colors.error.base,
+        themeData?.errorBackground ?? colors.error.muted,
+        themeData?.errorBorder ?? colors.error.base,
         colors.error.base,
       ),
       OiBannerLevel.neutral => (
-        colors.surfaceSubtle,
-        colors.border,
+        themeData?.neutralBackground ?? colors.surfaceSubtle,
+        themeData?.neutralBorder ?? colors.border,
         colors.textMuted,
       ),
     };
