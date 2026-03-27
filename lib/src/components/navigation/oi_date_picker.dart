@@ -1,8 +1,12 @@
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/overlays/oi_dialog_shell.dart';
 import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
+
+// Weekday abbreviations, index 0=Monday ... 6=Sunday (matches DateTime.weekday-1).
+const List<String> _kWeekdays = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'];
 
 const List<String> _kMonths = [
   'January',
@@ -43,6 +47,11 @@ class OiDatePicker extends StatefulWidget {
     this.rangeEnd,
     this.onRangeChanged,
     this.rangeMode = false,
+    this.displayMonth,
+    this.onDisplayMonthChanged,
+    this.disabledDates,
+    this.disabledDaysOfWeek,
+    this.firstDayOfWeek,
     super.key,
   });
 
@@ -69,6 +78,24 @@ class OiDatePicker extends StatefulWidget {
 
   /// When `true`, the picker operates in date-range selection mode.
   final bool rangeMode;
+
+  /// Specific dates that cannot be selected. Rendered with muted styling.
+  final Set<DateTime>? disabledDates;
+
+  /// Days of the week that cannot be selected (1=Monday, 7=Sunday).
+  final Set<int>? disabledDaysOfWeek;
+
+  /// First day of the week (1=Monday, 7=Sunday). Defaults to Sunday.
+  final int? firstDayOfWeek;
+
+  /// Externally controlled display month. When provided, the picker shows
+  /// this month instead of managing its own display month state.
+  final DateTime? displayMonth;
+
+  /// Called when the user navigates to a different month via the
+  /// previous/next arrows. Only fires when [displayMonth] is provided,
+  /// allowing the parent to update the controlled month.
+  final ValueChanged<DateTime>? onDisplayMonthChanged;
 
   /// Shows a date picker in a dialog and returns the selected date.
   ///
@@ -108,23 +135,58 @@ class _OiDatePickerState extends State<OiDatePicker> {
   late DateTime _displayMonth;
   DateTime? _pendingRangeStart;
 
+  bool get _isControlled => widget.displayMonth != null;
+
+  DateTime get _effectiveDisplayMonth {
+    if (_isControlled) {
+      final dm = widget.displayMonth!;
+      return DateTime(dm.year, dm.month);
+    }
+    return _displayMonth;
+  }
+
   @override
   void initState() {
     super.initState();
-    final ref = widget.value ?? widget.rangeStart ?? DateTime.now();
+    final ref =
+        widget.displayMonth ??
+        widget.value ??
+        widget.rangeStart ??
+        DateTime.now();
     _displayMonth = DateTime(ref.year, ref.month);
   }
 
+  @override
+  void didUpdateWidget(OiDatePicker oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (_isControlled && widget.displayMonth != oldWidget.displayMonth) {
+      final dm = widget.displayMonth!;
+      _displayMonth = DateTime(dm.year, dm.month);
+    }
+  }
+
   void _prevMonth() {
-    setState(() {
-      _displayMonth = DateTime(_displayMonth.year, _displayMonth.month - 1);
-    });
+    final prev = DateTime(
+      _effectiveDisplayMonth.year,
+      _effectiveDisplayMonth.month - 1,
+    );
+    if (_isControlled) {
+      widget.onDisplayMonthChanged?.call(prev);
+    } else {
+      setState(() => _displayMonth = prev);
+    }
   }
 
   void _nextMonth() {
-    setState(() {
-      _displayMonth = DateTime(_displayMonth.year, _displayMonth.month + 1);
-    });
+    final next = DateTime(
+      _effectiveDisplayMonth.year,
+      _effectiveDisplayMonth.month + 1,
+    );
+    if (_isControlled) {
+      widget.onDisplayMonthChanged?.call(next);
+    } else {
+      setState(() => _displayMonth = next);
+    }
   }
 
   void _onDayTap(DateTime day) {
@@ -175,6 +237,15 @@ class _OiDatePickerState extends State<OiDatePicker> {
     final last = widget.lastDate;
     if (first != null && day.isBefore(first)) return true;
     if (last != null && day.isAfter(last)) return true;
+    if (widget.disabledDates != null) {
+      for (final d in widget.disabledDates!) {
+        if (_sameDay(d, day)) return true;
+      }
+    }
+    if (widget.disabledDaysOfWeek != null &&
+        widget.disabledDaysOfWeek!.contains(day.weekday)) {
+      return true;
+    }
     return false;
   }
 
@@ -187,9 +258,12 @@ class _OiDatePickerState extends State<OiDatePicker> {
     final today = DateTime.now();
 
     // First day of the display month.
-    final firstOfMonth = _displayMonth;
-    // Day-of-week offset: 0=Sun, 1=Mon ... 6=Sat
-    final startOffset = firstOfMonth.weekday % 7; // DateTime.weekday: 1=Mon
+    final firstOfMonth = _effectiveDisplayMonth;
+    // Compute grid start offset respecting firstDayOfWeek.
+    // DateTime.weekday: 1=Mon ... 7=Sun.
+    final fdow = widget.firstDayOfWeek ?? 7; // Default Sunday (7)
+    var startOffset = firstOfMonth.weekday - fdow;
+    if (startOffset < 0) startOffset += 7;
     final daysInMonth = DateTime(
       firstOfMonth.year,
       firstOfMonth.month + 1,
@@ -294,7 +368,7 @@ class _OiDatePickerState extends State<OiDatePicker> {
                 Expanded(
                   child: Center(
                     child: Text(
-                      '${_kMonths[_displayMonth.month - 1]} ${_displayMonth.year}',
+                      '${_kMonths[_effectiveDisplayMonth.month - 1]} ${_effectiveDisplayMonth.year}',
                       style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w600,
@@ -316,6 +390,27 @@ class _OiDatePickerState extends State<OiDatePicker> {
                 ),
               ],
             ),
+          ),
+          const SizedBox(height: 4),
+          // Weekday header row.
+          Row(
+            children: List.generate(7, (col) {
+              // Reorder weekdays to start from firstDayOfWeek.
+              // DateTime.weekday: 1=Mon...7=Sun; _kWeekdays index: 0=Mon...6=Sun.
+              final dayIndex = (fdow - 1 + col) % 7;
+              return Expanded(
+                child: Center(
+                  child: Text(
+                    _kWeekdays[dayIndex],
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      color: colors.textMuted,
+                    ),
+                  ),
+                ),
+              );
+            }),
           ),
           const SizedBox(height: 4),
           // Day grid: 6 rows of 7 with alternating row backgrounds.

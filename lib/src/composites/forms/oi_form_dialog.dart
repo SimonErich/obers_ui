@@ -119,13 +119,13 @@ class OiFormDialog {
       barrierDismissible: dismissible,
       maxWidth: maxWidth,
       semanticLabel: semanticLabel ?? title,
-      builder: (close) {
+      builder: (onClose) {
         return _OiFormDialogContent<T>(
           title: title,
           submitLabel: submitLabel,
           cancelLabel: cancelLabel,
           dismissible: dismissible,
-          close: close,
+          onClose: onClose,
           formBuilder: builder,
         );
       },
@@ -140,7 +140,7 @@ class _OiFormDialogContent<T> extends StatefulWidget {
     required this.submitLabel,
     required this.cancelLabel,
     required this.dismissible,
-    required this.close,
+    required this.onClose,
     required this.formBuilder,
     super.key,
   });
@@ -149,7 +149,7 @@ class _OiFormDialogContent<T> extends StatefulWidget {
   final String submitLabel;
   final String cancelLabel;
   final bool dismissible;
-  final void Function([T? result]) close;
+  final void Function([T? result]) onClose;
   final Widget Function(OiFormDialogController<T> controller) formBuilder;
 
   @override
@@ -164,11 +164,7 @@ class _OiFormDialogContentState<T> extends State<_OiFormDialogContent<T>> {
   @override
   void initState() {
     super.initState();
-    _controller = OiFormDialogController<T>._(
-      _data,
-      _rebuild,
-      widget.close,
-    );
+    _controller = OiFormDialogController<T>._(_data, _rebuild, widget.onClose);
   }
 
   void _rebuild() {
@@ -196,10 +192,7 @@ class _OiFormDialogContentState<T> extends State<_OiFormDialogContent<T>> {
           // Error message
           if (_data.error != null) ...[
             SizedBox(height: spacing.sm),
-            OiLabel.small(
-              _data.error!,
-              color: colors.error.base,
-            ),
+            OiLabel.small(_data.error!, color: colors.error.base),
           ],
 
           SizedBox(height: spacing.lg),

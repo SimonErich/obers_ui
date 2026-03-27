@@ -3,6 +3,7 @@
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/modules/oi_permissions.dart';
 
 import '../../helpers/pump_app.dart';
@@ -102,11 +103,9 @@ void main() {
         ),
       ),
     );
-    // Admin has 3 permissions checked
-    expect(
-      find.byIcon(const IconData(0xe876, fontFamily: 'MaterialIcons')),
-      findsNWidgets(3),
-    );
+    // Admin has 3 permissions checked — _OiCheckbox uses OiIcons.userPlus
+    // as the check mark icon inside the checked state.
+    expect(find.byIcon(OiIcons.userPlus), findsNWidgets(3));
   });
 
   testWidgets('toggling fires onChange with updated matrix', (tester) async {

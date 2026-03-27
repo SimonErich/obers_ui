@@ -27,7 +27,7 @@ class OiRenameField extends StatefulWidget {
     required this.currentName,
     required this.onRename,
     required this.onCancel,
-    this.isFolder = false,
+    this.folder = false,
     this.validate,
     this.showButtons = false,
     this.semanticsLabel,
@@ -44,7 +44,7 @@ class OiRenameField extends StatefulWidget {
   final VoidCallback onCancel;
 
   /// Whether renaming a folder (selects entire name instead of name-only).
-  final bool isFolder;
+  final bool folder;
 
   /// Custom validation function. Return an error string or null.
   final String? Function(String)? validate;
@@ -79,7 +79,7 @@ class _OiRenameFieldState extends State<OiRenameField> {
 
   void _selectNamePart() {
     final text = _controller.text;
-    if (widget.isFolder) {
+    if (widget.folder) {
       _controller.selection = TextSelection(
         baseOffset: 0,
         extentOffset: text.length,

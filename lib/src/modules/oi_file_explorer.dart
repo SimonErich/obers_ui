@@ -239,7 +239,7 @@ class _OiFileExplorerState extends State<OiFileExplorer> {
           const rootFolder = OiFileNodeData(
             id: 'root',
             name: 'Home',
-            isFolder: true,
+            folder: true,
           );
           await widget.controller.navigateTo('root', folder: rootFolder);
         }
@@ -586,7 +586,7 @@ class _OiFileExplorerState extends State<OiFileExplorer> {
   List<OiMenuItem> _buildFileContextMenu(OiFileNodeData file) {
     final custom = widget.customContextMenuItems?.call(file) ?? [];
     return [
-      if (file.isFolder)
+      if (file.folder)
         OiMenuItem(
           label: 'Open',
           icon: OiIcons.externalLink,
@@ -998,7 +998,7 @@ class _OiFileExplorerState extends State<OiFileExplorer> {
         selectedKeys: controller.selectedKeys,
         onSelectionChange: controller.setSelection,
         onOpen: (file) {
-          if (file.isFolder) {
+          if (file.folder) {
             controller.navigateTo(file.id.toString(), folder: file);
           } else {
             widget.onOpen?.call(file);
@@ -1045,7 +1045,7 @@ class _OiFileExplorerState extends State<OiFileExplorer> {
       selectedKeys: controller.selectedKeys,
       onSelectionChange: controller.setSelection,
       onOpen: (file) {
-        if (file.isFolder) {
+        if (file.folder) {
           controller.navigateTo(file.id.toString(), folder: file);
         } else {
           widget.onOpen?.call(file);

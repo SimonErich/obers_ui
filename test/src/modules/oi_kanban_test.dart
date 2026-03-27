@@ -72,12 +72,15 @@ void main() {
     });
 
     testWidgets('collapsible columns toggle', (tester) async {
+      // quickEdit is disabled so the OiDoubleTap wrapper does not delay
+      // single-tap recognition on the column header.
       await tester.pumpObers(
         const OiKanban<String>(
           columns: [
             OiKanbanColumn(key: 'c', title: 'Col', items: ['Visible']),
           ],
           label: 'Board',
+          quickEdit: false,
         ),
         surfaceSize: const Size(800, 600),
       );
@@ -172,7 +175,7 @@ void main() {
 
         // Tap the forward arrow to navigate to the next column.
         final forwardArrow = find.byIcon(
-          const IconData(0xe5cc, fontFamily: 'MaterialIcons'),
+          const IconData(0xe06f, fontFamily: 'lucide', fontPackage: 'obers_ui'),
         );
         await tester.tap(forwardArrow);
         // A single pump is sufficient — jumpToPage completes synchronously.
@@ -202,7 +205,7 @@ void main() {
 
         // Navigate forward first.
         final forwardArrow = find.byIcon(
-          const IconData(0xe5cc, fontFamily: 'MaterialIcons'),
+          const IconData(0xe06f, fontFamily: 'lucide', fontPackage: 'obers_ui'),
         );
         await tester.tap(forwardArrow);
         await tester.pump();
@@ -210,7 +213,7 @@ void main() {
 
         // Tap the backward arrow to navigate back.
         final backwardArrow = find.byIcon(
-          const IconData(0xe5cb, fontFamily: 'MaterialIcons'),
+          const IconData(0xe06e, fontFamily: 'lucide', fontPackage: 'obers_ui'),
         );
         await tester.tap(backwardArrow);
         // A single pump is sufficient — jumpToPage completes synchronously.

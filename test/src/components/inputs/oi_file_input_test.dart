@@ -56,7 +56,9 @@ void main() {
       OiFileInput(value: const ['/tmp/a.txt'], onChanged: (v) => result = v),
     );
     await tester.tap(
-      find.byIcon(const IconData(0xe5cd, fontFamily: 'MaterialIcons')),
+      find.byIcon(
+        const IconData(0xe1b2, fontFamily: 'lucide', fontPackage: 'obers_ui'),
+      ),
     );
     await tester.pump();
     expect(result, isEmpty);

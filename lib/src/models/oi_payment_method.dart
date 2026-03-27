@@ -13,7 +13,7 @@ class OiPaymentMethod {
     required this.label,
     this.description,
     this.icon,
-    this.isDefault = false,
+    this.defaultMethod = false,
     this.lastFour,
     this.expiryDate,
     this.logo,
@@ -32,7 +32,7 @@ class OiPaymentMethod {
   final IconData? icon;
 
   /// Whether this is the default / pre-selected payment method.
-  final bool isDefault;
+  final bool defaultMethod;
 
   /// Last four digits of the card (e.g. '•••• 4242' for saved cards).
   final String? lastFour;
@@ -49,7 +49,7 @@ class OiPaymentMethod {
     String? label,
     Object? description = _sentinel,
     Object? icon = _sentinel,
-    bool? isDefault,
+    bool? defaultMethod,
     Object? lastFour = _sentinel,
     Object? expiryDate = _sentinel,
     Object? logo = _sentinel,
@@ -61,7 +61,7 @@ class OiPaymentMethod {
           ? this.description
           : description as String?,
       icon: identical(icon, _sentinel) ? this.icon : icon as IconData?,
-      isDefault: isDefault ?? this.isDefault,
+      defaultMethod: defaultMethod ?? this.defaultMethod,
       lastFour: identical(lastFour, _sentinel)
           ? this.lastFour
           : lastFour as String?,
@@ -80,7 +80,7 @@ class OiPaymentMethod {
         label == other.label &&
         description == other.description &&
         icon == other.icon &&
-        isDefault == other.isDefault &&
+        defaultMethod == other.defaultMethod &&
         lastFour == other.lastFour &&
         expiryDate == other.expiryDate &&
         logo == other.logo;
@@ -92,7 +92,7 @@ class OiPaymentMethod {
     label,
     description,
     icon,
-    isDefault,
+    defaultMethod,
     lastFour,
     expiryDate,
     logo,
@@ -100,7 +100,7 @@ class OiPaymentMethod {
 
   @override
   String toString() =>
-      'OiPaymentMethod(key: $key, label: $label, isDefault: $isDefault)';
+      'OiPaymentMethod(key: $key, label: $label, defaultMethod: $defaultMethod)';
 }
 
 /// Sentinel used by [OiPaymentMethod.copyWith] to distinguish an explicit

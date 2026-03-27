@@ -40,105 +40,184 @@ class OiDateRangePreset {
 
   /// Today (midnight to 23:59:59).
   static OiDateRangePreset get today => OiDateRangePreset(
-        label: 'Today',
-        resolve: () {
-          final n = DateTime.now();
-          return (
-            DateTime(n.year, n.month, n.day),
-            DateTime(n.year, n.month, n.day, 23, 59, 59),
-          );
-        },
+    label: 'Today',
+    resolve: () {
+      final n = DateTime.now();
+      return (
+        DateTime(n.year, n.month, n.day),
+        DateTime(n.year, n.month, n.day, 23, 59, 59),
       );
+    },
+  );
 
   /// Last 7 calendar days including today.
   static OiDateRangePreset get last7Days => OiDateRangePreset(
-        label: 'Last 7 days',
-        resolve: () {
-          final n = DateTime.now();
-          final end = DateTime(n.year, n.month, n.day, 23, 59, 59);
-          final start = DateTime(n.year, n.month, n.day - 6);
-          return (start, end);
-        },
-      );
+    label: 'Last 7 days',
+    resolve: () {
+      final n = DateTime.now();
+      final end = DateTime(n.year, n.month, n.day, 23, 59, 59);
+      final start = DateTime(n.year, n.month, n.day - 6);
+      return (start, end);
+    },
+  );
 
   /// Last 30 calendar days including today.
   static OiDateRangePreset get last30Days => OiDateRangePreset(
-        label: 'Last 30 days',
-        resolve: () {
-          final n = DateTime.now();
-          final end = DateTime(n.year, n.month, n.day, 23, 59, 59);
-          final start = DateTime(n.year, n.month, n.day - 29);
-          return (start, end);
-        },
-      );
+    label: 'Last 30 days',
+    resolve: () {
+      final n = DateTime.now();
+      final end = DateTime(n.year, n.month, n.day, 23, 59, 59);
+      final start = DateTime(n.year, n.month, n.day - 29);
+      return (start, end);
+    },
+  );
 
   /// This week (Monday through Sunday).
   static OiDateRangePreset get thisWeek => OiDateRangePreset(
-        label: 'This week',
-        resolve: () {
-          final n = DateTime.now();
-          final today = DateTime(n.year, n.month, n.day);
-          // DateTime.weekday: 1 = Monday, 7 = Sunday.
-          final monday = today.subtract(Duration(days: today.weekday - 1));
-          final sunday = monday.add(const Duration(days: 6));
-          return (
-            monday,
-            DateTime(sunday.year, sunday.month, sunday.day, 23, 59, 59),
-          );
-        },
+    label: 'This week',
+    resolve: () {
+      final n = DateTime.now();
+      final today = DateTime(n.year, n.month, n.day);
+      // DateTime.weekday: 1 = Monday, 7 = Sunday.
+      final monday = today.subtract(Duration(days: today.weekday - 1));
+      final sunday = monday.add(const Duration(days: 6));
+      return (
+        monday,
+        DateTime(sunday.year, sunday.month, sunday.day, 23, 59, 59),
       );
+    },
+  );
 
   /// This calendar month (1st through last day).
   static OiDateRangePreset get thisMonth => OiDateRangePreset(
-        label: 'This month',
-        resolve: () {
-          final n = DateTime.now();
-          final first = DateTime(n.year, n.month);
-          final lastDay = DateTime(n.year, n.month + 1, 0);
-          return (
-            first,
-            DateTime(lastDay.year, lastDay.month, lastDay.day, 23, 59, 59),
-          );
-        },
+    label: 'This month',
+    resolve: () {
+      final n = DateTime.now();
+      final first = DateTime(n.year, n.month);
+      final lastDay = DateTime(n.year, n.month + 1, 0);
+      return (
+        first,
+        DateTime(lastDay.year, lastDay.month, lastDay.day, 23, 59, 59),
       );
+    },
+  );
 
   /// Last calendar month (1st through last day).
   static OiDateRangePreset get lastMonth => OiDateRangePreset(
-        label: 'Last month',
-        resolve: () {
-          final n = DateTime.now();
-          final first = DateTime(n.year, n.month - 1);
-          final lastDay = DateTime(n.year, n.month, 0);
-          return (
-            first,
-            DateTime(lastDay.year, lastDay.month, lastDay.day, 23, 59, 59),
-          );
-        },
+    label: 'Last month',
+    resolve: () {
+      final n = DateTime.now();
+      final first = DateTime(n.year, n.month - 1);
+      final lastDay = DateTime(n.year, n.month, 0);
+      return (
+        first,
+        DateTime(lastDay.year, lastDay.month, lastDay.day, 23, 59, 59),
       );
+    },
+  );
 
   /// This calendar year (Jan 1 through Dec 31).
   static OiDateRangePreset get thisYear => OiDateRangePreset(
-        label: 'This year',
-        resolve: () {
-          final n = DateTime.now();
-          return (
-            DateTime(n.year),
-            DateTime(n.year, 12, 31, 23, 59, 59),
-          );
-        },
+    label: 'This year',
+    resolve: () {
+      final n = DateTime.now();
+      return (DateTime(n.year), DateTime(n.year, 12, 31, 23, 59, 59));
+    },
+  );
+
+  /// Last week (previous Monday through Sunday).
+  static OiDateRangePreset get lastWeek => OiDateRangePreset(
+    label: 'Last week',
+    resolve: () {
+      final n = DateTime.now();
+      final today = DateTime(n.year, n.month, n.day);
+      final thisMonday = today.subtract(Duration(days: today.weekday - 1));
+      final lastMonday = thisMonday.subtract(const Duration(days: 7));
+      final lastSunday = lastMonday.add(const Duration(days: 6));
+      return (
+        lastMonday,
+        DateTime(lastSunday.year, lastSunday.month, lastSunday.day, 23, 59, 59),
       );
+    },
+  );
+
+  /// This calendar quarter (Q1: Jan-Mar, Q2: Apr-Jun, etc.).
+  static OiDateRangePreset get thisQuarter => OiDateRangePreset(
+    label: 'This quarter',
+    resolve: () {
+      final n = DateTime.now();
+      final qStart = ((n.month - 1) ~/ 3) * 3 + 1;
+      final first = DateTime(n.year, qStart);
+      final last = DateTime(n.year, qStart + 3, 0);
+      return (first, DateTime(last.year, last.month, last.day, 23, 59, 59));
+    },
+  );
+
+  /// Last calendar quarter.
+  static OiDateRangePreset get lastQuarter => OiDateRangePreset(
+    label: 'Last quarter',
+    resolve: () {
+      final n = DateTime.now();
+      final currentQStart = ((n.month - 1) ~/ 3) * 3 + 1;
+      final prevQStart = currentQStart - 3;
+      final year = prevQStart <= 0 ? n.year - 1 : n.year;
+      final month = prevQStart <= 0 ? prevQStart + 12 : prevQStart;
+      final first = DateTime(year, month);
+      final last = DateTime(year, month + 3, 0);
+      return (first, DateTime(last.year, last.month, last.day, 23, 59, 59));
+    },
+  );
+
+  /// Last calendar year (Jan 1 through Dec 31 of previous year).
+  static OiDateRangePreset get lastYear => OiDateRangePreset(
+    label: 'Last year',
+    resolve: () {
+      final n = DateTime.now();
+      return (DateTime(n.year - 1), DateTime(n.year - 1, 12, 31, 23, 59, 59));
+    },
+  );
+
+  /// Yesterday (midnight to 23:59:59).
+  static OiDateRangePreset get yesterday => OiDateRangePreset(
+    label: 'Yesterday',
+    resolve: () {
+      final n = DateTime.now();
+      final y = DateTime(n.year, n.month, n.day - 1);
+      return (y, DateTime(y.year, y.month, y.day, 23, 59, 59));
+    },
+  );
+
+  /// Last 14 calendar days including today.
+  static OiDateRangePreset get last14Days => OiDateRangePreset(
+    label: 'Last 14 days',
+    resolve: () {
+      final n = DateTime.now();
+      final end = DateTime(n.year, n.month, n.day, 23, 59, 59);
+      final start = DateTime(n.year, n.month, n.day - 13);
+      return (start, end);
+    },
+  );
+
+  /// All time (earliest possible to now).
+  static OiDateRangePreset get allTime => OiDateRangePreset(
+    label: 'All time',
+    resolve: () {
+      final n = DateTime.now();
+      return (DateTime(2000), DateTime(n.year, n.month, n.day, 23, 59, 59));
+    },
+  );
 
   /// The default preset list used when [OiDateRangePickerField.presets] is
   /// null and [OiDateRangePickerField.showPresets] is `true`.
   static List<OiDateRangePreset> get defaults => [
-        today,
-        last7Days,
-        last30Days,
-        thisWeek,
-        thisMonth,
-        lastMonth,
-        thisYear,
-      ];
+    today,
+    last7Days,
+    last30Days,
+    thisWeek,
+    thisMonth,
+    lastMonth,
+    thisYear,
+  ];
 }
 
 /// A date range input field that opens a dialog with optional preset chips
@@ -164,6 +243,7 @@ class OiDateRangePickerField extends StatelessWidget {
     this.startDate,
     this.endDate,
     this.onChanged,
+    this.onCleared,
     this.minDate,
     this.maxDate,
     this.label,
@@ -172,6 +252,7 @@ class OiDateRangePickerField extends StatelessWidget {
     this.dateFormat,
     this.clearable = false,
     this.enabled = true,
+    this.required = false,
     this.presets,
     this.showPresets = true,
     this.validator,
@@ -191,6 +272,12 @@ class OiDateRangePickerField extends StatelessWidget {
   ///
   /// The callback receives `(start, end)` or `null` when cleared.
   final void Function(DateTime start, DateTime end)? onChanged;
+
+  /// Called when the user taps the clear button.
+  ///
+  /// Use this to reset the date range in the parent state. When `null` and
+  /// [clearable] is `true`, the clear icon is still rendered but does nothing.
+  final VoidCallback? onCleared;
 
   /// The earliest selectable date.
   final DateTime? minDate;
@@ -218,6 +305,9 @@ class OiDateRangePickerField extends StatelessWidget {
 
   /// Whether the field accepts interaction.
   final bool enabled;
+
+  /// When `true`, a red asterisk is appended to the [label].
+  final bool required;
 
   /// Custom presets to display in the dialog.
   ///
@@ -298,33 +388,20 @@ class OiDateRangePickerField extends StatelessWidget {
     final displayText = hasValue
         ? _formatRange(startDate!, endDate!)
         : 'Select date range';
+    final effectiveLabel = required && label != null ? '$label *' : label;
 
     final trailing = Row(
       mainAxisSize: MainAxisSize.min,
       children: [
         if (clearable && hasValue && enabled)
           OiTappable(
-            onTap: () {
-              // Fire onChanged with a sentinel — but since the callback
-              // signature requires two DateTimes, clearing is handled by
-              // emitting a zero-range today and letting the consumer decide.
-              // A cleaner pattern: expose a separate onCleared callback or
-              // accept nullable onChanged. For now we just don't fire.
-            },
+            onTap: onCleared,
             child: Padding(
               padding: const EdgeInsets.only(right: 4),
-              child: Icon(
-                OiIcons.x,
-                size: 16,
-                color: colors.textMuted,
-              ),
+              child: Icon(OiIcons.x, size: 16, color: colors.textMuted),
             ),
           ),
-        Icon(
-          OiIcons.calendarRange,
-          size: 18,
-          color: colors.textMuted,
-        ),
+        Icon(OiIcons.calendarRange, size: 18, color: colors.textMuted),
       ],
     );
 
@@ -332,7 +409,7 @@ class OiDateRangePickerField extends StatelessWidget {
       onTap: enabled ? () => _openDialog(context) : null,
       behavior: HitTestBehavior.opaque,
       child: OiInputFrame(
-        label: label,
+        label: effectiveLabel,
         hint: hint,
         error: resolvedError,
         enabled: enabled,
@@ -463,19 +540,12 @@ class _DateRangeDialogContentState extends State<_DateRangeDialogContent> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         if (preset.icon != null) ...[
-                          Icon(
-                            preset.icon,
-                            size: 14,
-                            color: colors.textMuted,
-                          ),
+                          Icon(preset.icon, size: 14, color: colors.textMuted),
                           const SizedBox(width: 4),
                         ],
                         Text(
                           preset.label,
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: colors.text,
-                          ),
+                          style: TextStyle(fontSize: 13, color: colors.text),
                         ),
                       ],
                     ),
@@ -511,10 +581,7 @@ class _DateRangeDialogContentState extends State<_DateRangeDialogContent> {
                   ),
                   child: Text(
                     'Cancel',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: colors.textMuted,
-                    ),
+                    style: TextStyle(fontSize: 14, color: colors.textMuted),
                   ),
                 ),
               ),
@@ -532,9 +599,7 @@ class _DateRangeDialogContentState extends State<_DateRangeDialogContent> {
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
-                      color: canApply
-                          ? colors.primary.base
-                          : colors.textMuted,
+                      color: canApply ? colors.primary.base : colors.textMuted,
                     ),
                   ),
                 ),

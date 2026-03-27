@@ -14,7 +14,7 @@ class OiFileNodeData {
   const OiFileNodeData({
     required this.id,
     required this.name,
-    required this.isFolder,
+    required this.folder,
     this.parentId,
     this.size,
     this.mimeType,
@@ -25,10 +25,10 @@ class OiFileNodeData {
     this.url,
     this.itemCount,
     this.metadata,
-    this.isFavorite = false,
-    this.isShared = false,
-    this.isLocked = false,
-    this.isTrashed = false,
+    this.favorite = false,
+    this.shared = false,
+    this.locked = false,
+    this.trashed = false,
   });
 
   /// Unique identifier.
@@ -38,7 +38,7 @@ class OiFileNodeData {
   final String name;
 
   /// Whether this node is a folder.
-  final bool isFolder;
+  final bool folder;
 
   /// Parent folder ID. Null for root.
   final String? parentId;
@@ -72,21 +72,21 @@ class OiFileNodeData {
   final Map<String, dynamic>? metadata;
 
   /// Whether this item is in the user's favorites.
-  final bool isFavorite;
+  final bool favorite;
 
   /// Whether this item is shared with others.
-  final bool isShared;
+  final bool shared;
 
   /// Whether this item is locked (read-only).
-  final bool isLocked;
+  final bool locked;
 
   /// Whether this item is in the trash.
-  final bool isTrashed;
+  final bool trashed;
 
   /// Extracts the file extension from the name.
   String get resolvedExtension =>
       extension ??
-      (isFolder
+      (folder
           ? ''
           : name.split('.').length > 1
           ? name.split('.').last
@@ -94,7 +94,7 @@ class OiFileNodeData {
 
   /// Extracts the name without extension.
   String get nameWithoutExtension {
-    if (isFolder) return name;
+    if (folder) return name;
     final parts = name.split('.');
     return parts.length > 1
         ? parts.sublist(0, parts.length - 1).join('.')
@@ -118,7 +118,7 @@ class OiFileNodeData {
   OiFileNodeData copyWith({
     Object? id,
     String? name,
-    bool? isFolder,
+    bool? folder,
     String? parentId,
     int? size,
     String? mimeType,
@@ -129,15 +129,15 @@ class OiFileNodeData {
     String? url,
     int? itemCount,
     Map<String, dynamic>? metadata,
-    bool? isFavorite,
-    bool? isShared,
-    bool? isLocked,
-    bool? isTrashed,
+    bool? favorite,
+    bool? shared,
+    bool? locked,
+    bool? trashed,
   }) {
     return OiFileNodeData(
       id: id ?? this.id,
       name: name ?? this.name,
-      isFolder: isFolder ?? this.isFolder,
+      folder: folder ?? this.folder,
       parentId: parentId ?? this.parentId,
       size: size ?? this.size,
       mimeType: mimeType ?? this.mimeType,
@@ -148,10 +148,10 @@ class OiFileNodeData {
       url: url ?? this.url,
       itemCount: itemCount ?? this.itemCount,
       metadata: metadata ?? this.metadata,
-      isFavorite: isFavorite ?? this.isFavorite,
-      isShared: isShared ?? this.isShared,
-      isLocked: isLocked ?? this.isLocked,
-      isTrashed: isTrashed ?? this.isTrashed,
+      favorite: favorite ?? this.favorite,
+      shared: shared ?? this.shared,
+      locked: locked ?? this.locked,
+      trashed: trashed ?? this.trashed,
     );
   }
 
@@ -159,9 +159,9 @@ class OiFileNodeData {
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
     if (other is! OiFileNodeData) return false;
-    return id == other.id && name == other.name && isFolder == other.isFolder;
+    return id == other.id && name == other.name && folder == other.folder;
   }
 
   @override
-  int get hashCode => Object.hash(id, name, isFolder);
+  int get hashCode => Object.hash(id, name, folder);
 }

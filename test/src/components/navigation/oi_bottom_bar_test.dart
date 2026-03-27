@@ -544,8 +544,14 @@ void main() {
     await tester.pump();
     await tester.pump(); // drain chained async awaits in HapticFeedback
 
+    // HapticFeedback.selectionClick() sends method 'HapticFeedback.vibrate'
+    // with argument 'HapticFeedbackType.selectionClick'.
     expect(
-      log.any((call) => call.method == 'HapticFeedback.selectionClick'),
+      log.any(
+        (call) =>
+            call.method == 'HapticFeedback.vibrate' &&
+            call.arguments == 'HapticFeedbackType.selectionClick',
+      ),
       isTrue,
       reason:
           'tapping with haptic=true should invoke HapticFeedback.selectionClick',
@@ -576,7 +582,11 @@ void main() {
     await tester.pump();
 
     expect(
-      log.any((call) => call.method == 'HapticFeedback.selectionClick'),
+      log.any(
+        (call) =>
+            call.method == 'HapticFeedback.vibrate' &&
+            call.arguments == 'HapticFeedbackType.selectionClick',
+      ),
       isFalse,
       reason: 'haptic=false (default) should not invoke HapticFeedback',
     );

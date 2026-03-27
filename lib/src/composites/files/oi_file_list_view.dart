@@ -336,16 +336,16 @@ class _OiFileListViewState extends State<OiFileListView> {
                     itemCount: widget.files.length,
                     itemBuilder: (context, index) {
                       final file = widget.files[index];
-                      final isSelected = widget.selectedKeys.contains(file.id);
-                      final isRenaming = widget.renamingKey == file.id;
-                      final isFocused = _focusedIndex == index;
+                      final selected = widget.selectedKeys.contains(file.id);
+                      final renaming = widget.renamingKey == file.id;
+                      final focused = _focusedIndex == index;
 
                       return _buildRow(
                         file,
                         index,
-                        isSelected,
-                        isRenaming,
-                        isFocused,
+                        selected,
+                        renaming,
+                        focused,
                         colors,
                         spacing,
                       );
@@ -454,19 +454,19 @@ class _OiFileListViewState extends State<OiFileListView> {
   Widget _buildRow(
     OiFileNodeData file,
     int index,
-    bool isSelected,
-    bool isRenaming,
-    bool isFocused,
+    bool selected,
+    bool renaming,
+    bool focused,
     OiColorScheme colors,
     OiSpacingScale spacing,
   ) {
-    final fileType = file.isFolder ? 'folder' : file.resolvedExtension;
+    final fileType = file.folder ? 'folder' : file.resolvedExtension;
     final semanticLabel =
-        '${file.name}, $fileType${isSelected ? ', selected' : ''}';
+        '${file.name}, $fileType${selected ? ', selected' : ''}';
 
     Widget row = Semantics(
       label: semanticLabel,
-      selected: isSelected,
+      selected: selected,
       child: GestureDetector(
         onTap: () => _onTap(file, index),
         onDoubleTap: () => _onDoubleTap(file),
@@ -477,7 +477,7 @@ class _OiFileListViewState extends State<OiFileListView> {
             vertical: spacing.sm,
           ),
           decoration: BoxDecoration(
-            color: isSelected
+            color: selected
                 ? colors.primary.muted.withValues(alpha: 0.15)
                 : null,
             border: Border(bottom: BorderSide(color: colors.borderSubtle)),
@@ -485,7 +485,7 @@ class _OiFileListViewState extends State<OiFileListView> {
           child: Row(
             children: [
               // Icon
-              if (file.isFolder)
+              if (file.folder)
                 const OiFolderIcon(size: OiFolderIconSize.sm)
               else
                 OiFileIcon(
@@ -497,10 +497,10 @@ class _OiFileListViewState extends State<OiFileListView> {
               // Name (or rename field)
               Expanded(
                 flex: 3,
-                child: isRenaming
+                child: renaming
                     ? OiRenameField(
                         currentName: file.name,
-                        isFolder: file.isFolder,
+                        folder: file.folder,
                         onRename: widget.onRename ?? (_) {},
                         onCancel: widget.onCancelRename ?? () {},
                         semanticsLabel: 'Rename ${file.name}',
@@ -511,7 +511,7 @@ class _OiFileListViewState extends State<OiFileListView> {
               if (widget.showSize)
                 Expanded(
                   child: Text(
-                    file.isFolder ? '—' : file.formattedSize,
+                    file.folder ? '—' : file.formattedSize,
                     style: TextStyle(
                       fontSize: 12,
                       color: (colors as dynamic).textMuted as Color,
@@ -536,7 +536,7 @@ class _OiFileListViewState extends State<OiFileListView> {
               if (widget.showType)
                 Expanded(
                   child: Text(
-                    file.isFolder ? '—' : file.resolvedExtension.toUpperCase(),
+                    file.folder ? '—' : file.resolvedExtension.toUpperCase(),
                     style: TextStyle(
                       fontSize: 12,
                       color: (colors as dynamic).textMuted as Color,
@@ -561,7 +561,7 @@ class _OiFileListViewState extends State<OiFileListView> {
     // Wrap with drag-and-drop
     if (widget.enableDragDrop) {
       // If this is a folder, make it a drop target too
-      if (file.isFolder && widget.onMoveToFolder != null) {
+      if (file.folder && widget.onMoveToFolder != null) {
         // Capture current row value to avoid circular reference in the
         // closure — `row` is reassigned to OiDraggable below.
         final innerRow = row;
@@ -589,7 +589,7 @@ class _OiFileListViewState extends State<OiFileListView> {
       }
 
       // Make selected items draggable
-      final dragData = isSelected
+      final dragData = selected
           ? widget.files
                 .where((f) => widget.selectedKeys.contains(f.id))
                 .toList()
@@ -655,7 +655,7 @@ class _OiFileListViewState extends State<OiFileListView> {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          if (files.length == 1 && files.first.isFolder)
+          if (files.length == 1 && files.first.folder)
             const OiFolderIcon(size: OiFolderIconSize.sm)
           else if (files.length == 1)
             OiFileIcon(fileName: files.first.name, size: OiFileIconSize.sm)

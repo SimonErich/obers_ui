@@ -227,11 +227,7 @@ class _OiTimePickerState extends State<OiTimePicker> {
 // ── Wheel item with selected highlight and hover ────────────────────────────
 
 class _WheelItem extends StatefulWidget {
-  const _WheelItem({
-    required this.label,
-    required this.selected,
-    this.onTap,
-  });
+  const _WheelItem({required this.label, required this.selected, this.onTap});
 
   final String label;
   final bool selected;
@@ -268,22 +264,24 @@ class _WheelItemState extends State<_WheelItem> {
         onEnter: (_) => setState(() => _hovered = true),
         onExit: (_) => setState(() => _hovered = false),
         child: AnimatedContainer(
-        duration: const Duration(milliseconds: 120),
-        margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-        decoration: BoxDecoration(
-          color: bg,
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Center(
-          child: Text(
-            widget.label,
-            style: TextStyle(
-              fontSize: 22,
-              fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
-              color: textColor,
+          duration: MediaQuery.disableAnimationsOf(context)
+              ? Duration.zero
+              : const Duration(milliseconds: 120),
+          margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+          decoration: BoxDecoration(
+            color: bg,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Center(
+            child: Text(
+              widget.label,
+              style: TextStyle(
+                fontSize: 22,
+                fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
+                color: textColor,
+              ),
             ),
           ),
-        ),
         ),
       ),
     );

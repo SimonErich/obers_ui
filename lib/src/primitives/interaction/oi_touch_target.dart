@@ -36,7 +36,12 @@ class OiTouchTarget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final minTarget = _minSize ?? OiA11y.minTouchTarget(context);
-    if (minTarget <= 0) return child;
+    // Always render _TouchTargetPadding so the widget-tree structure is stable
+    // across input-modality changes (pointer ↔ touch).  When minTarget is zero
+    // or negative, _TouchTargetPadding behaves as a no-op pass-through because
+    // max(childSize, 0) == childSize.  Keeping a consistent subtree prevents
+    // in-flight gesture recognisers from being dropped when a modality rebuild
+    // removes or adds this wrapping render-object mid-gesture.
     return _TouchTargetPadding(minSize: minTarget, child: child);
   }
 }
@@ -86,18 +91,19 @@ class _RenderTouchTargetPadding extends RenderProxyBox {
   @override
   Size computeDryLayout(BoxConstraints constraints) {
     final childSize = super.computeDryLayout(constraints);
-    return Size(
-      math.max(childSize.width, _minSize),
-      math.max(childSize.height, _minSize),
+    return constraints.constrain(
+      Size(
+        math.max(childSize.width, _minSize),
+        math.max(childSize.height, _minSize),
+      ),
     );
   }
 
   @override
   void performLayout() {
     super.performLayout();
-    size = Size(
-      math.max(size.width, _minSize),
-      math.max(size.height, _minSize),
+    size = constraints.constrain(
+      Size(math.max(size.width, _minSize), math.max(size.height, _minSize)),
     );
   }
 }

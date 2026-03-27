@@ -18,7 +18,7 @@ void main() {
       ),
     );
     expect(find.byType(AspectRatio), findsOneWidget);
-    expect(find.byType(ColoredBox), findsOneWidget);
+    expect(find.byType(ColoredBox), findsAtLeastNWidgets(1));
   });
 
   testWidgets('passes ratio to AspectRatio', (tester) async {

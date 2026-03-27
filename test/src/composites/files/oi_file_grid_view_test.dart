@@ -21,27 +21,27 @@ final _testFiles = [
   const OiFileNodeData(
     id: 'file1',
     name: 'document.pdf',
-    isFolder: false,
+    folder: false,
     size: 1024 * 1024,
     mimeType: 'application/pdf',
   ),
   const OiFileNodeData(
     id: 'file2',
     name: 'image.png',
-    isFolder: false,
+    folder: false,
     size: 2048,
     mimeType: 'image/png',
   ),
   const OiFileNodeData(
     id: 'folder1',
     name: 'Documents',
-    isFolder: true,
+    folder: true,
     itemCount: 5,
   ),
   const OiFileNodeData(
     id: 'file3',
     name: 'spreadsheet.xlsx',
-    isFolder: false,
+    folder: false,
     size: 512000,
   ),
 ];
@@ -117,7 +117,7 @@ void main() {
         const OiFileNodeData(
           id: 'emptyFolder',
           name: 'Empty Folder',
-          isFolder: true,
+          folder: true,
         ),
       ];
       await tester.pumpObers(_gridView(files: files));
@@ -207,7 +207,7 @@ void main() {
       await tester.tap(find.text('Documents'));
       await tester.pumpAndSettle();
       expect(opened?.id, 'folder1');
-      expect(opened?.isFolder, isTrue);
+      expect(opened?.folder, isTrue);
     });
 
     // ══════════════════════════════════════════════════════════════════════════

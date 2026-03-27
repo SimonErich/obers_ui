@@ -288,14 +288,14 @@ class _OiFileGridViewState extends State<OiFileGridView> {
               itemCount: widget.files.length,
               itemBuilder: (context, index) {
                 final file = widget.files[index];
-                final isSelected = widget.selectedKeys.contains(file.id);
-                final isRenaming = widget.renamingKey == file.id;
+                final selected = widget.selectedKeys.contains(file.id);
+                final renaming = widget.renamingKey == file.id;
 
                 return _buildCard(
                   file,
                   index,
-                  isSelected,
-                  isRenaming,
+                  selected,
+                  renaming,
                   colors,
                   spacing,
                 );
@@ -310,29 +310,29 @@ class _OiFileGridViewState extends State<OiFileGridView> {
   Widget _buildCard(
     OiFileNodeData file,
     int index,
-    bool isSelected,
-    bool isRenaming,
+    bool selected,
+    bool renaming,
     OiColorScheme colors,
     OiSpacingScale spacing,
   ) {
-    final fileType = file.isFolder ? 'folder' : file.resolvedExtension;
+    final fileType = file.folder ? 'folder' : file.resolvedExtension;
     final semanticLabel =
-        '${file.name}, $fileType${isSelected ? ', selected' : ''}';
+        '${file.name}, $fileType${selected ? ', selected' : ''}';
 
     Widget card = Semantics(
       label: semanticLabel,
-      selected: isSelected,
+      selected: selected,
       child: GestureDetector(
         onTap: () => _onTap(file, index),
         onDoubleTap: () => _onDoubleTap(file),
         child: Container(
           padding: EdgeInsets.all(spacing.sm),
           decoration: BoxDecoration(
-            color: isSelected
+            color: selected
                 ? colors.primary.muted.withValues(alpha: 0.15)
                 : null,
             borderRadius: BorderRadius.circular(8),
-            border: isSelected
+            border: selected
                 ? Border.all(color: colors.primary.base)
                 : Border.all(color: colors.borderSubtle),
           ),
@@ -342,7 +342,7 @@ class _OiFileGridViewState extends State<OiFileGridView> {
               // Preview area
               Expanded(
                 child: Center(
-                  child: file.isFolder
+                  child: file.folder
                       ? const OiFolderIcon(size: OiFolderIconSize.xl)
                       : (file.thumbnailUrl != null
                             ? OiFilePreview(
@@ -359,10 +359,10 @@ class _OiFileGridViewState extends State<OiFileGridView> {
               ),
               SizedBox(height: spacing.xs),
               // Name or rename field
-              if (isRenaming)
+              if (renaming)
                 OiRenameField(
                   currentName: file.name,
-                  isFolder: file.isFolder,
+                  folder: file.folder,
                   onRename: widget.onRename ?? (_) {},
                   onCancel: widget.onCancelRename ?? () {},
                   semanticsLabel: 'Rename ${file.name}',
@@ -370,12 +370,12 @@ class _OiFileGridViewState extends State<OiFileGridView> {
               else
                 _buildName(file, colors),
               // Subtitle
-              if (file.isFolder)
+              if (file.folder)
                 Text(
                   file.itemCount != null ? '${file.itemCount} items' : 'Empty',
                   style: TextStyle(fontSize: 10, color: colors.textMuted),
                 )
-              else if (!isRenaming)
+              else if (!renaming)
                 Text(
                   file.formattedSize,
                   style: TextStyle(fontSize: 10, color: colors.textMuted),
@@ -398,7 +398,7 @@ class _OiFileGridViewState extends State<OiFileGridView> {
     // Wrap with drag-and-drop
     if (widget.enableDragDrop) {
       // If folder, make it a drop target
-      if (file.isFolder && widget.onMoveToFolder != null) {
+      if (file.folder && widget.onMoveToFolder != null) {
         // Capture current card value to avoid circular reference in the
         // closure — `card` is reassigned to OiDraggable below.
         final innerCard = card;
@@ -424,7 +424,7 @@ class _OiFileGridViewState extends State<OiFileGridView> {
         );
       }
 
-      final dragData = isSelected
+      final dragData = selected
           ? widget.files
                 .where((f) => widget.selectedKeys.contains(f.id))
                 .toList()
@@ -492,7 +492,7 @@ class _OiFileGridViewState extends State<OiFileGridView> {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          if (files.length == 1 && files.first.isFolder)
+          if (files.length == 1 && files.first.folder)
             const OiFolderIcon(size: OiFolderIconSize.sm)
           else if (files.length == 1)
             OiFileIcon(fileName: files.first.name, size: OiFileIconSize.sm)

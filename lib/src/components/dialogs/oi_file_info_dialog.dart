@@ -80,7 +80,7 @@ class OiFileInfoDialog extends StatelessWidget {
                       ),
                       SizedBox(height: spacing.xs),
                       Text(
-                        file.isFolder
+                        file.folder
                             ? 'Folder'
                             : OiFileUtils.fileTypeName(file.resolvedExtension),
                         style: TextStyle(
@@ -98,7 +98,7 @@ class OiFileInfoDialog extends StatelessWidget {
             Container(height: 1, color: colors.borderSubtle),
             SizedBox(height: spacing.md),
             // Info rows
-            if (!file.isFolder && file.size != null)
+            if (!file.folder && file.size != null)
               _InfoRow(
                 label: 'Size',
                 value: file.formattedSize,
@@ -123,7 +123,7 @@ class OiFileInfoDialog extends StatelessWidget {
                 value: _formatDate(file.modified!),
                 colors: colors,
               ),
-            if (file.isFolder && file.itemCount != null)
+            if (file.folder && file.itemCount != null)
               _InfoRow(
                 label: 'Items',
                 value: '${file.itemCount}',

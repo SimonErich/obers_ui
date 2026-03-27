@@ -12,13 +12,11 @@ import '../../../helpers/pump_app.dart';
 
 void main() {
   group('Text behavior', () {
-    testWidgets('showCounter true with maxLength renders counter',
-        (tester) async {
+    testWidgets('showCounter true with maxLength renders counter', (
+      tester,
+    ) async {
       await tester.pumpObers(
-        const OiTextInput(
-          showCounter: true,
-          maxLength: 50,
-        ),
+        const OiTextInput(showCounter: true, maxLength: 50),
       );
 
       // Counter starts at 0.
@@ -32,11 +30,7 @@ void main() {
     });
 
     testWidgets('showCounter false hides counter', (tester) async {
-      await tester.pumpObers(
-        const OiTextInput(
-          maxLength: 50,
-        ),
-      );
+      await tester.pumpObers(const OiTextInput(maxLength: 50));
 
       expect(find.text('0/50'), findsNothing);
 
@@ -52,14 +46,17 @@ void main() {
         OiTextInput(
           showCounter: true,
           maxLength: 100,
-          counterBuilder: (
-            context, {
-            required int currentLength,
-            required int? maxLength,
-            required bool isFocused,
-          }) {
-            return Text('$currentLength chars remaining: ${maxLength! - currentLength}');
-          },
+          counterBuilder:
+              (
+                context, {
+                required int currentLength,
+                required int? maxLength,
+                required bool focused,
+              }) {
+                return Text(
+                  '$currentLength chars remaining: ${maxLength! - currentLength}',
+                );
+              },
         ),
       );
 
@@ -76,23 +73,18 @@ void main() {
     testWidgets('onTap fires when input tapped', (tester) async {
       var tapped = false;
 
-      await tester.pumpObers(
-        OiTextInput(
-          onTap: () => tapped = true,
-        ),
-      );
+      await tester.pumpObers(OiTextInput(onTap: () => tapped = true));
 
-      await tester.tap(find.byType(GestureDetector).last);
+      await tester.tap(find.byType(GestureDetector).first);
       await tester.pumpAndSettle();
 
       expect(tapped, isTrue);
     });
 
-    testWidgets('password constructor renders with obscured text',
-        (tester) async {
-      await tester.pumpObers(
-        const OiTextInput.password(label: 'Password'),
-      );
+    testWidgets('password constructor renders with obscured text', (
+      tester,
+    ) async {
+      await tester.pumpObers(const OiTextInput.password(label: 'Password'));
 
       // The password field should render an EditableText with obscureText.
       final editableText = tester.widget<EditableText>(
@@ -102,9 +94,7 @@ void main() {
     });
 
     testWidgets('password trailing icon toggles visibility', (tester) async {
-      await tester.pumpObers(
-        const OiTextInput.password(label: 'Password'),
-      );
+      await tester.pumpObers(const OiTextInput.password(label: 'Password'));
 
       // Initially obscured — eye icon (toggle to show) should be present.
       expect(find.byIcon(OiIcons.eye), findsOneWidget);
@@ -129,47 +119,30 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.byIcon(OiIcons.eye), findsOneWidget);
-      final reobscured = tester.widget<EditableText>(
-        find.byType(EditableText),
-      );
+      final reobscured = tester.widget<EditableText>(find.byType(EditableText));
       expect(reobscured.obscureText, isTrue);
     });
   });
 
   group('Property forwarding', () {
-    testWidgets('textCapitalization forwarded to OiRawInput',
-        (tester) async {
+    testWidgets('textCapitalization forwarded to OiRawInput', (tester) async {
       await tester.pumpObers(
-        const OiTextInput(
-          textCapitalization: TextCapitalization.words,
-        ),
+        const OiTextInput(textCapitalization: TextCapitalization.words),
       );
 
-      final rawInput = tester.widget<OiRawInput>(
-        find.byType(OiRawInput),
-      );
+      final rawInput = tester.widget<OiRawInput>(find.byType(OiRawInput));
       expect(rawInput.textCapitalization, TextCapitalization.words);
     });
 
     testWidgets('textAlign forwarded to OiRawInput', (tester) async {
-      await tester.pumpObers(
-        const OiTextInput(
-          textAlign: TextAlign.center,
-        ),
-      );
+      await tester.pumpObers(const OiTextInput(textAlign: TextAlign.center));
 
-      final rawInput = tester.widget<OiRawInput>(
-        find.byType(OiRawInput),
-      );
+      final rawInput = tester.widget<OiRawInput>(find.byType(OiRawInput));
       expect(rawInput.textAlign, TextAlign.center);
     });
 
     testWidgets('showCounter false hides counter by default', (tester) async {
-      await tester.pumpObers(
-        const OiTextInput(
-          maxLength: 50,
-        ),
-      );
+      await tester.pumpObers(const OiTextInput(maxLength: 50));
 
       // showCounter defaults to false, so no counter text should appear.
       expect(find.text('0/50'), findsNothing);
@@ -183,15 +156,9 @@ void main() {
     testWidgets('onTapOutside property is stored on widget', (tester) async {
       void handler(PointerDownEvent event) {}
 
-      await tester.pumpObers(
-        OiTextInput(
-          onTapOutside: handler,
-        ),
-      );
+      await tester.pumpObers(OiTextInput(onTapOutside: handler));
 
-      final widget = tester.widget<OiTextInput>(
-        find.byType(OiTextInput),
-      );
+      final widget = tester.widget<OiTextInput>(find.byType(OiTextInput));
       expect(widget.onTapOutside, equals(handler));
     });
   });
@@ -199,13 +166,9 @@ void main() {
   group('Constructors', () {
     testWidgets('multiline constructor renders with correct keyboardType '
         'and textInputAction', (tester) async {
-      await tester.pumpObers(
-        const OiTextInput.multiline(),
-      );
+      await tester.pumpObers(const OiTextInput.multiline());
 
-      final rawInput = tester.widget<OiRawInput>(
-        find.byType(OiRawInput),
-      );
+      final rawInput = tester.widget<OiRawInput>(find.byType(OiRawInput));
       expect(rawInput.keyboardType, TextInputType.multiline);
       expect(rawInput.textInputAction, TextInputAction.newline);
     });

@@ -196,7 +196,7 @@ class _OiCheckoutState extends State<OiCheckout> {
     }
     if (widget.paymentMethods != null && widget.paymentMethods!.isNotEmpty) {
       _selectedPayment =
-          widget.paymentMethods!.where((p) => p.isDefault).firstOrNull ??
+          widget.paymentMethods!.where((p) => p.defaultMethod).firstOrNull ??
           widget.paymentMethods!.first;
     }
 
@@ -780,7 +780,8 @@ class _OiCheckoutState extends State<OiCheckout> {
                         ],
                       ),
                     ),
-                    if (method.isDefault) const OiBadge.soft(label: 'Default'),
+                    if (method.defaultMethod)
+                      const OiBadge.soft(label: 'Default'),
                   ],
                 ),
               ),

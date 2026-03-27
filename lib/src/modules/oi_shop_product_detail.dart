@@ -18,6 +18,7 @@ import 'package:obers_ui/src/primitives/layout/oi_row.dart';
 
 import 'package:obers_ui/src/components/shop/oi_wishlist_button.dart';
 import 'package:obers_ui/src/components/shop/oi_stock_badge.dart';
+
 /// A complete product detail page layout showing gallery, title, price,
 /// description, variant selectors, quantity, add to cart, and related info.
 ///
@@ -40,7 +41,7 @@ class OiShopProductDetail extends StatefulWidget {
     this.onVariantChange,
     this.onQuantityChange,
     this.onWishlist,
-    this.isWishlisted = false,
+    this.wishlisted = false,
     this.selectedVariant,
     this.quantity = 1,
     this.description,
@@ -70,7 +71,7 @@ class OiShopProductDetail extends StatefulWidget {
   final VoidCallback? onWishlist;
 
   /// Whether the product is currently in the wishlist.
-  final bool isWishlisted;
+  final bool wishlisted;
 
   /// The currently selected variant, if any.
   final OiProductVariant? selectedVariant;
@@ -231,7 +232,7 @@ class _OiShopProductDetailState extends State<OiShopProductDetail> {
             ],
           ),
         SizedBox(height: sp.sm),
-        
+
         // Price, stock badge, and wishlist.
         Row(
           children: [
@@ -251,9 +252,9 @@ class _OiShopProductDetailState extends State<OiShopProductDetail> {
                 label: 'Stock status',
               ),
             SizedBox(width: sp.sm),
-              OiWishlistButton(
+            OiWishlistButton(
               label: 'Toggle wishlist for ${widget.product.name}',
-              active: widget.isWishlisted,
+              active: widget.wishlisted,
               onToggle: widget.onWishlist,
             ),
           ],
@@ -482,48 +483,48 @@ class _OiShopProductDetailState extends State<OiShopProductDetail> {
                     ? () => widget.onRelatedProductTap!(product)
                     : null,
                 child: SizedBox(
-                width: 160,
-                child: OiCard(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      // Placeholder for product image.
-                      Container(
-                        height: 120,
-                        decoration: BoxDecoration(
-                          color: colors.surfaceSubtle,
-                          borderRadius: context.radius.sm,
+                  width: 160,
+                  child: OiCard(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        // Placeholder for product image.
+                        Container(
+                          height: 120,
+                          decoration: BoxDecoration(
+                            color: colors.surfaceSubtle,
+                            borderRadius: context.radius.sm,
+                          ),
+                          child: product.imageUrl != null
+                              ? ClipRRect(
+                                  borderRadius: context.radius.sm,
+                                  child: Image.network(
+                                    product.imageUrl!,
+                                    fit: BoxFit.cover,
+                                    width: double.infinity,
+                                    errorBuilder: (_, __, ___) =>
+                                        const SizedBox.expand(),
+                                  ),
+                                )
+                              : const SizedBox.expand(),
                         ),
-                        child: product.imageUrl != null
-                            ? ClipRRect(
-                                borderRadius: context.radius.sm,
-                                child: Image.network(
-                                  product.imageUrl!,
-                                  fit: BoxFit.cover,
-                                  width: double.infinity,
-                                  errorBuilder: (_, __, ___) =>
-                                      const SizedBox.expand(),
-                                ),
-                              )
-                            : const SizedBox.expand(),
-                      ),
-                      SizedBox(height: sp.xs),
-                      OiLabel.small(
-                        product.name,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      SizedBox(height: sp.xs),
-                      OiPriceTag(
-                        price: product.price,
-                        label: 'Price',
-                        currencyCode: product.currencyCode,
-                      ),
-                    ],
+                        SizedBox(height: sp.xs),
+                        OiLabel.small(
+                          product.name,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        SizedBox(height: sp.xs),
+                        OiPriceTag(
+                          price: product.price,
+                          label: 'Price',
+                          currencyCode: product.currencyCode,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              ),
               );
             },
           ),

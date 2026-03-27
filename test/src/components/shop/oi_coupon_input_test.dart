@@ -86,8 +86,10 @@ void main() {
         surfaceSize: const Size(400, 200),
       );
       // Should show the applied code and check icon, not the text input.
+      // Applied mode renders 2 OiIcon widgets: the check icon and the
+      // icon inside the 'Remove coupon' ghost button.
       expect(find.byKey(const Key('coupon_applied_code')), findsOneWidget);
-      expect(find.byType(OiIcon), findsOneWidget);
+      expect(find.byType(OiIcon), findsWidgets);
       expect(find.byType(OiTextInput), findsNothing);
     });
 
@@ -134,9 +136,9 @@ void main() {
         ),
         surfaceSize: const Size(400, 200),
       );
-      final button = tester.widget<OiButton>(
-        find.widgetWithText(OiButton, 'Apply'),
-      );
+      // When loading=true the button replaces its text with a spinner,
+      // so find it by type (only one OiButton in input mode).
+      final button = tester.widget<OiButton>(find.byType(OiButton));
       expect(button.loading, isTrue);
     });
 
@@ -186,7 +188,12 @@ void main() {
         ),
         surfaceSize: const Size(400, 200),
       );
-      expect(find.bySemanticsLabel('Discount code'), findsOneWidget);
+      expect(
+        find.byWidgetPredicate(
+          (w) => w is Semantics && w.properties.label == 'Discount code',
+        ),
+        findsOneWidget,
+      );
     });
   });
 }

@@ -42,7 +42,7 @@ enum OiProductCardVariant {
 /// Shows badges: "Sale" when [OiProductData.compareAtPrice] exists and is
 /// greater than [OiProductData.price], "Out of Stock" when
 /// [OiProductData.inStock] is `false`. Supports skeleton loading via
-/// [OiShimmer] when [isLoading] is `true`.
+/// [OiShimmer] when [loading] is `true`.
 ///
 /// Use [OiProductCard.horizontal] for list views with image on the left.
 ///
@@ -61,7 +61,7 @@ class OiProductCard extends StatelessWidget {
     this.showRating = true,
     this.showAddToCart = true,
     this.showWishlist = false,
-    this.isLoading = false,
+    this.loading = false,
     this.variant = OiProductCardVariant.vertical,
     super.key,
   });
@@ -78,7 +78,7 @@ class OiProductCard extends StatelessWidget {
     this.showRating = true,
     this.showAddToCart = true,
     this.showWishlist = false,
-    this.isLoading = false,
+    this.loading = false,
     super.key,
   });
 
@@ -92,7 +92,7 @@ class OiProductCard extends StatelessWidget {
     bool showRating = true,
     bool showAddToCart = true,
     bool showWishlist = false,
-    bool isLoading = false,
+    bool loading = false,
     Key? key,
   }) : this._(
          product: product,
@@ -103,7 +103,7 @@ class OiProductCard extends StatelessWidget {
          showRating: showRating,
          showAddToCart: showAddToCart,
          showWishlist: showWishlist,
-         isLoading: isLoading,
+         loading: loading,
          variant: OiProductCardVariant.horizontal,
          key: key,
        );
@@ -133,7 +133,7 @@ class OiProductCard extends StatelessWidget {
   final bool showWishlist;
 
   /// Whether to display a skeleton loading state.
-  final bool isLoading;
+  final bool loading;
 
   /// The layout variant.
   final OiProductCardVariant variant;
@@ -415,7 +415,7 @@ class OiProductCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (isLoading) return _buildSkeleton(context);
+    if (loading) return _buildSkeleton(context);
 
     switch (variant) {
       case OiProductCardVariant.vertical:

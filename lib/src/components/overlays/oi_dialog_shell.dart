@@ -102,7 +102,7 @@ class OiDialogShell extends StatelessWidget {
 
     Widget overlayContent(BuildContext ctx) {
       return _OiDialogShellOverlay<T>(
-        close: close,
+        onClose: close,
         barrierDismissible: barrierDismissible,
         barrierColor: barrierColor,
         semanticLabel: semanticLabel,
@@ -146,10 +146,8 @@ class OiDialogShell extends StatelessWidget {
     final shadows = context.shadows;
 
     final effectiveMinWidth = minWidth ?? theme?.defaultMinWidth ?? 280.0;
-    final effectiveMaxWidthFraction =
-        theme?.defaultMaxWidthFraction ?? 0.9;
-    final effectiveMaxHeightFraction =
-        theme?.defaultMaxHeightFraction ?? 0.9;
+    final effectiveMaxWidthFraction = theme?.defaultMaxWidthFraction ?? 0.9;
+    final effectiveMaxHeightFraction = theme?.defaultMaxHeightFraction ?? 0.9;
     final effectiveBorderRadius =
         borderRadius ?? theme?.borderRadius ?? BorderRadius.circular(12);
     final effectiveBackgroundColor =
@@ -162,8 +160,7 @@ class OiDialogShell extends StatelessWidget {
         minWidth: width ?? effectiveMinWidth,
         maxWidth:
             width ?? (maxWidth ?? viewSize.width * effectiveMaxWidthFraction),
-        maxHeight:
-            maxHeight ?? viewSize.height * effectiveMaxHeightFraction,
+        maxHeight: maxHeight ?? viewSize.height * effectiveMaxHeightFraction,
       ),
       padding: padding,
       decoration: BoxDecoration(
@@ -195,7 +192,7 @@ class OiDialogShell extends StatelessWidget {
 /// and the [OiDialogShell] itself.
 class _OiDialogShellOverlay<T> extends StatefulWidget {
   const _OiDialogShellOverlay({
-    required this.close,
+    required this.onClose,
     required this.builder,
     required this.barrierDismissible,
     this.barrierColor,
@@ -210,8 +207,8 @@ class _OiDialogShellOverlay<T> extends StatefulWidget {
     super.key,
   });
 
-  final void Function([T? result]) close;
-  final Widget Function(void Function([T? result]) close) builder;
+  final void Function([T? result]) onClose;
+  final Widget Function(void Function([T? result]) onClose) builder;
   final bool barrierDismissible;
   final Color? barrierColor;
   final String? semanticLabel;
@@ -290,12 +287,12 @@ class _OiDialogShellOverlayState<T> extends State<_OiDialogShellOverlay<T>>
 
     // Respect reduced-motion — skip the reverse animation.
     if (MediaQuery.maybeDisableAnimationsOf(context) ?? false) {
-      widget.close(result);
+      widget.onClose(result);
       return;
     }
 
     _controller.reverse().then((_) {
-      if (mounted) widget.close(result);
+      if (mounted) widget.onClose(result);
     });
   }
 
@@ -320,10 +317,7 @@ class _OiDialogShellOverlayState<T> extends State<_OiDialogShellOverlay<T>>
       child: widget.builder(_close),
     );
 
-    dialogContent = OiFocusTrap(
-      onEscape: _close,
-      child: dialogContent,
-    );
+    dialogContent = OiFocusTrap(onEscape: _close, child: dialogContent);
 
     final Widget barrier = GestureDetector(
       behavior: HitTestBehavior.opaque,

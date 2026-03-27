@@ -83,7 +83,7 @@ void main() {
     await tester.tap(find.byType(OiTappable));
     await tester.pump(const Duration(milliseconds: 50));
     await tester.tap(find.byType(OiTappable));
-    await tester.pump(const Duration(milliseconds: 300));
+    await tester.pump(kDoubleTapTimeout + const Duration(milliseconds: 50));
     expect(count, greaterThanOrEqualTo(1));
   });
 
@@ -563,10 +563,7 @@ void main() {
     tester,
   ) async {
     await tester.pumpObers(
-      const OiTappable(
-        isDragging: true,
-        child: SizedBox(width: 60, height: 60),
-      ),
+      const OiTappable(dragging: true, child: SizedBox(width: 60, height: 60)),
     );
     await tester.pump();
 
@@ -593,10 +590,7 @@ void main() {
   testWidgets('isDragging takes priority over pressed state', (tester) async {
     // When both isDragging and pressed are active, dragging wins.
     await tester.pumpObers(
-      const OiTappable(
-        isDragging: true,
-        child: SizedBox(width: 60, height: 60),
-      ),
+      const OiTappable(dragging: true, child: SizedBox(width: 60, height: 60)),
     );
     await tester.pump();
 

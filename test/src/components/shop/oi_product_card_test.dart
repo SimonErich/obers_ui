@@ -228,7 +228,7 @@ void main() {
         const OiProductCard(
           product: _product,
           label: 'Loading card',
-          isLoading: true,
+          loading: true,
         ),
         surfaceSize: const Size(400, 600),
       );

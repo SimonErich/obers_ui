@@ -19,7 +19,7 @@ const _paypal = OiPaymentMethod(
   key: 'paypal',
   label: 'PayPal',
   description: 'user@example.com',
-  isDefault: true,
+  defaultMethod: true,
 );
 
 const _minimal = OiPaymentMethod(key: 'bank', label: 'Bank Transfer');
@@ -48,9 +48,9 @@ void main() {
       );
 
       expect(find.text('Bank Transfer'), findsOneWidget);
-      // Only the label text, no description.
-      final labels = tester.widgetList<Widget>(find.byType(Widget));
-      expect(labels, isNotEmpty);
+      // No description text when description is null.
+      expect(find.text('Ending in 4242'), findsNothing);
+      expect(find.text('user@example.com'), findsNothing);
     });
 
     testWidgets('shows Default tag for default method', (tester) async {

@@ -4,6 +4,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui/src/components/navigation/oi_date_picker.dart';
+import 'package:obers_ui/src/foundation/oi_icons.dart';
 
 import '../../../helpers/pump_app.dart';
 
@@ -33,20 +34,14 @@ void main() {
 
   testWidgets('prev arrow navigates to previous month', (tester) async {
     await tester.pumpObers(OiDatePicker(value: DateTime(2024, 3, 15)));
-    // Tap the left chevron icon (codePoint 0xe5cb).
-    await tester.tap(
-      find.byWidgetPredicate((w) => w is Icon && w.icon?.codePoint == 0xe5cb),
-    );
+    await tester.tap(find.byIcon(OiIcons.chevronLeft));
     await tester.pump();
     expect(find.text('February 2024'), findsOneWidget);
   });
 
   testWidgets('next arrow navigates to next month', (tester) async {
     await tester.pumpObers(OiDatePicker(value: DateTime(2024, 3, 15)));
-    // Tap the right chevron icon (codePoint 0xe5cc).
-    await tester.tap(
-      find.byWidgetPredicate((w) => w is Icon && w.icon?.codePoint == 0xe5cc),
-    );
+    await tester.tap(find.byIcon(OiIcons.chevronRight));
     await tester.pump();
     expect(find.text('April 2024'), findsOneWidget);
   });

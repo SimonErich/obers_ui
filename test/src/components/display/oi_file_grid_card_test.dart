@@ -4,6 +4,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui/src/components/display/oi_file_grid_card.dart';
+import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/modules/oi_file_manager.dart';
 
 import '../../../helpers/pump_app.dart';
@@ -60,18 +61,12 @@ void main() {
 
     testWidgets('renders folder icon for folders', (tester) async {
       await tester.pumpObers(_card(file: _folder()));
-      expect(
-        find.byIcon(const IconData(0xe2c7, fontFamily: 'MaterialIcons')),
-        findsOneWidget,
-      );
+      expect(find.byIcon(OiIcons.folder), findsOneWidget);
     });
 
     testWidgets('renders file icon for files', (tester) async {
       await tester.pumpObers(_card(file: _file()));
-      expect(
-        find.byIcon(const IconData(0xe24d, fontFamily: 'MaterialIcons')),
-        findsOneWidget,
-      );
+      expect(find.byIcon(OiIcons.file), findsOneWidget);
     });
 
     testWidgets('has semantics label', (tester) async {

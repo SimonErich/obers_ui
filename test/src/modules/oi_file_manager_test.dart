@@ -8,6 +8,7 @@ import 'package:obers_ui/src/components/display/oi_empty_state.dart';
 import 'package:obers_ui/src/components/display/oi_file_grid_card.dart';
 import 'package:obers_ui/src/components/display/oi_file_tile.dart';
 import 'package:obers_ui/src/components/inputs/oi_text_input.dart';
+import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/modules/oi_file_manager.dart';
 
 import '../../helpers/pump_app.dart';
@@ -66,11 +67,8 @@ void main() {
       ),
     );
     expect(find.text('Photos'), findsOneWidget);
-    // Folder icon (0xe2c7)
-    expect(
-      find.byIcon(const IconData(0xe2c7, fontFamily: 'MaterialIcons')),
-      findsOneWidget,
-    );
+    // OiFileGridCard uses OiIcons.folder for folders.
+    expect(find.byIcon(OiIcons.folder), findsOneWidget);
   });
 
   testWidgets('onOpen fires on double-tap', (tester) async {
@@ -153,10 +151,8 @@ void main() {
     );
     expect(find.byType(OiEmptyState), findsOneWidget);
     expect(find.text('This folder is empty'), findsOneWidget);
-    expect(
-      find.byIcon(const IconData(0xe2c7, fontFamily: 'MaterialIcons')),
-      findsOneWidget,
-    );
+    // OiFileManager uses OiIcons.folder for the empty state icon.
+    expect(find.byIcon(OiIcons.folder), findsOneWidget);
   });
 
   testWidgets('empty folder shows Upload button when onUpload is set', (
@@ -246,9 +242,26 @@ void main() {
         ),
       );
 
-      expect(find.text('report.pdf'), findsOneWidget);
-      expect(find.text('Reports'), findsOneWidget);
-      expect(find.text('notes.txt'), findsNothing);
+      // When searchQuery matches, OiFileTile uses RichText with highlighted
+      // spans. Use byWidgetPredicate to find RichText by plain-text content.
+      expect(
+        find.byWidgetPredicate(
+          (w) => w is RichText && w.text.toPlainText().contains('report.pdf'),
+        ),
+        findsOneWidget,
+      );
+      expect(
+        find.byWidgetPredicate(
+          (w) => w is RichText && w.text.toPlainText().contains('Reports'),
+        ),
+        findsOneWidget,
+      );
+      expect(
+        find.byWidgetPredicate(
+          (w) => w is RichText && w.text.toPlainText().contains('notes.txt'),
+        ),
+        findsNothing,
+      );
     });
 
     testWidgets('filters items by name case-insensitively in grid layout', (
@@ -270,9 +283,25 @@ void main() {
         ),
       );
 
-      expect(find.text('photo.jpg'), findsOneWidget);
-      expect(find.text('PHOTO_2.jpg'), findsOneWidget);
-      expect(find.text('image.png'), findsNothing);
+      // OiFileGridCard uses RichText for highlighted matches.
+      expect(
+        find.byWidgetPredicate(
+          (w) => w is RichText && w.text.toPlainText().contains('photo.jpg'),
+        ),
+        findsOneWidget,
+      );
+      expect(
+        find.byWidgetPredicate(
+          (w) => w is RichText && w.text.toPlainText().contains('PHOTO_2.jpg'),
+        ),
+        findsOneWidget,
+      );
+      expect(
+        find.byWidgetPredicate(
+          (w) => w is RichText && w.text.toPlainText().contains('image.png'),
+        ),
+        findsNothing,
+      );
     });
 
     testWidgets('shows all items when searchQuery is null', (tester) async {
@@ -564,7 +593,15 @@ void main() {
 
       // Item is visible even though its name does not contain the query,
       // because the consumer (server) already filtered the list.
-      expect(find.text('annual_summary.pdf'), findsOneWidget);
+      // OiFileTile uses RichText when searchQuery is set (for highlighting).
+      expect(
+        find.byWidgetPredicate(
+          (w) =>
+              w is RichText &&
+              w.text.toPlainText().contains('annual_summary.pdf'),
+        ),
+        findsOneWidget,
+      );
     });
 
     testWidgets(
@@ -632,9 +669,25 @@ void main() {
         ),
       );
 
-      expect(find.text('report.pdf'), findsOneWidget);
-      expect(find.text('notes.txt'), findsNothing);
-      expect(find.text('image.png'), findsNothing);
+      // OiFileTile uses RichText when searchQuery is set.
+      expect(
+        find.byWidgetPredicate(
+          (w) => w is RichText && w.text.toPlainText().contains('report.pdf'),
+        ),
+        findsOneWidget,
+      );
+      expect(
+        find.byWidgetPredicate(
+          (w) => w is RichText && w.text.toPlainText().contains('notes.txt'),
+        ),
+        findsNothing,
+      );
+      expect(
+        find.byWidgetPredicate(
+          (w) => w is RichText && w.text.toPlainText().contains('image.png'),
+        ),
+        findsNothing,
+      );
     });
 
     testWidgets('client-side filtering still works when onSearch is null', (
@@ -656,8 +709,19 @@ void main() {
         ),
       );
 
-      expect(find.text('report.pdf'), findsOneWidget);
-      expect(find.text('notes.txt'), findsNothing);
+      // OiFileTile uses RichText when searchQuery is set.
+      expect(
+        find.byWidgetPredicate(
+          (w) => w is RichText && w.text.toPlainText().contains('report.pdf'),
+        ),
+        findsOneWidget,
+      );
+      expect(
+        find.byWidgetPredicate(
+          (w) => w is RichText && w.text.toPlainText().contains('notes.txt'),
+        ),
+        findsNothing,
+      );
     });
   });
 }

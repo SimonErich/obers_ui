@@ -46,11 +46,11 @@ class OiTextInput extends StatefulWidget {
     this.onTap,
     this.onTapOutside,
     super.key,
-  })  : _isOtp = false,
-        _otpLength = 0,
-        _otpOnCompleted = null,
-        _otpObscure = false,
-        _isPassword = false;
+  }) : _isOtp = false,
+       _otpLength = 0,
+       _otpOnCompleted = null,
+       _otpObscure = false,
+       _isPassword = false;
 
   /// Creates a search-style [OiTextInput] with a leading search icon,
   /// "Search\u2026" placeholder, and [TextInputAction.search].
@@ -62,38 +62,35 @@ class OiTextInput extends StatefulWidget {
     this.enabled = true,
     this.focusNode,
     super.key,
-  })  : label = null,
-        hint = null,
-        placeholder = 'Search\u2026',
-        error = null,
-        leading = const Icon(
-          OiIcons.search,
-          size: 18,
-        ),
-        trailing = null,
-        maxLines = 1,
-        minLines = null,
-        maxLength = null,
-        keyboardType = null,
-        textInputAction = TextInputAction.search,
-        onEditingComplete = null,
-        readOnly = false,
-        obscureText = false,
-        inputFormatters = null,
-        validator = null,
-        autovalidateMode = null,
-        onSaved = null,
-        textCapitalization = TextCapitalization.none,
-        textAlign = TextAlign.start,
-        showCounter = false,
-        counterBuilder = null,
-        onTap = null,
-        onTapOutside = null,
-        _isOtp = false,
-        _otpLength = 0,
-        _otpOnCompleted = null,
-        _otpObscure = false,
-        _isPassword = false;
+  }) : label = null,
+       hint = null,
+       placeholder = 'Search\u2026',
+       error = null,
+       leading = const Icon(OiIcons.search, size: 18),
+       trailing = null,
+       maxLines = 1,
+       minLines = null,
+       maxLength = null,
+       keyboardType = null,
+       textInputAction = TextInputAction.search,
+       onEditingComplete = null,
+       readOnly = false,
+       obscureText = false,
+       inputFormatters = null,
+       validator = null,
+       autovalidateMode = null,
+       onSaved = null,
+       textCapitalization = TextCapitalization.none,
+       textAlign = TextAlign.start,
+       showCounter = false,
+       counterBuilder = null,
+       onTap = null,
+       onTapOutside = null,
+       _isOtp = false,
+       _otpLength = 0,
+       _otpOnCompleted = null,
+       _otpObscure = false,
+       _isPassword = false;
 
   /// Creates a password-style [OiTextInput] with a trailing visibility toggle.
   ///
@@ -121,21 +118,21 @@ class OiTextInput extends StatefulWidget {
     this.onTap,
     this.onTapOutside,
     super.key,
-  })  : maxLines = 1,
-        minLines = null,
-        keyboardType = TextInputType.visiblePassword,
-        textInputAction = null,
-        obscureText = true,
-        trailing = null,
-        textCapitalization = TextCapitalization.none,
-        textAlign = TextAlign.start,
-        showCounter = false,
-        counterBuilder = null,
-        _isOtp = false,
-        _otpLength = 0,
-        _otpOnCompleted = null,
-        _otpObscure = false,
-        _isPassword = true;
+  }) : maxLines = 1,
+       minLines = null,
+       keyboardType = TextInputType.visiblePassword,
+       textInputAction = null,
+       obscureText = true,
+       trailing = null,
+       textCapitalization = TextCapitalization.none,
+       textAlign = TextAlign.start,
+       showCounter = false,
+       counterBuilder = null,
+       _isOtp = false,
+       _otpLength = 0,
+       _otpOnCompleted = null,
+       _otpObscure = false,
+       _isPassword = true;
 
   /// Creates a multiline text area.
   ///
@@ -170,14 +167,14 @@ class OiTextInput extends StatefulWidget {
     this.onTap,
     this.onTapOutside,
     super.key,
-  })  : keyboardType = TextInputType.multiline,
-        textInputAction = TextInputAction.newline,
-        obscureText = false,
-        _isOtp = false,
-        _otpLength = 0,
-        _otpOnCompleted = null,
-        _otpObscure = false,
-        _isPassword = false;
+  }) : keyboardType = TextInputType.multiline,
+       textInputAction = TextInputAction.newline,
+       obscureText = false,
+       _isOtp = false,
+       _otpLength = 0,
+       _otpOnCompleted = null,
+       _otpObscure = false,
+       _isPassword = false;
 
   /// Creates an OTP / PIN / verification code input.
   ///
@@ -195,34 +192,34 @@ class OiTextInput extends StatefulWidget {
     this.autovalidateMode,
     this.onSaved,
     super.key,
-  })  : _isOtp = true,
-        _otpLength = length,
-        _otpOnCompleted = onCompleted,
-        _otpObscure = obscure,
-        _isPassword = false,
-        controller = null,
-        label = null,
-        hint = null,
-        placeholder = null,
-        leading = null,
-        trailing = null,
-        maxLines = 1,
-        minLines = null,
-        maxLength = null,
-        keyboardType = TextInputType.number,
-        textInputAction = null,
-        onEditingComplete = null,
-        onSubmitted = null,
-        readOnly = false,
-        obscureText = false,
-        inputFormatters = null,
-        focusNode = null,
-        textCapitalization = TextCapitalization.none,
-        textAlign = TextAlign.center,
-        showCounter = false,
-        counterBuilder = null,
-        onTap = null,
-        onTapOutside = null;
+  }) : _isOtp = true,
+       _otpLength = length,
+       _otpOnCompleted = onCompleted,
+       _otpObscure = obscure,
+       _isPassword = false,
+       controller = null,
+       label = null,
+       hint = null,
+       placeholder = null,
+       leading = null,
+       trailing = null,
+       maxLines = 1,
+       minLines = null,
+       maxLength = null,
+       keyboardType = TextInputType.number,
+       textInputAction = null,
+       onEditingComplete = null,
+       onSubmitted = null,
+       readOnly = false,
+       obscureText = false,
+       inputFormatters = null,
+       focusNode = null,
+       textCapitalization = TextCapitalization.none,
+       textAlign = TextAlign.center,
+       showCounter = false,
+       counterBuilder = null,
+       onTap = null,
+       onTapOutside = null;
 
   /// An optional controller for the text field.
   ///
@@ -317,8 +314,9 @@ class OiTextInput extends StatefulWidget {
     BuildContext context, {
     required int currentLength,
     required int? maxLength,
-    required bool isFocused,
-  })? counterBuilder;
+    required bool focused,
+  })?
+  counterBuilder;
 
   /// Called when the input is tapped.
   final VoidCallback? onTap;
@@ -418,17 +416,13 @@ class _OiTextInputState extends State<OiTextInput> {
         context,
         currentLength: currentLength,
         maxLength: widget.maxLength,
-        isFocused: _focused,
+        focused: _focused,
       );
     }
     final colors = context.colors;
     return Text(
       '$currentLength/${widget.maxLength}',
-      style: TextStyle(
-        fontSize: 12,
-        color: colors.textMuted,
-        height: 1.3,
-      ),
+      style: TextStyle(fontSize: 12, color: colors.textMuted, height: 1.3),
     );
   }
 
@@ -455,8 +449,7 @@ class _OiTextInputState extends State<OiTextInput> {
         ? _buildPasswordTrailing()
         : widget.trailing;
 
-    final showCounterWidget =
-        widget.showCounter && widget.maxLength != null;
+    final showCounterWidget = widget.showCounter && widget.maxLength != null;
 
     final resolvedError = errorOverride ?? widget.error;
 

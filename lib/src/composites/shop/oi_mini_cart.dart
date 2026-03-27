@@ -141,67 +141,69 @@ class _OiMiniCartState extends State<OiMiniCart> {
     final visibleItems = widget.items.take(widget.maxVisibleItems).toList();
     final overflowCount = widget.items.length - visibleItems.length;
 
-    return Padding(
-      padding: EdgeInsets.all(sp.md),
-      child: OiColumn(
-        breakpoint: breakpoint,
-        gap: OiResponsive(sp.sm),
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          const OiLabel.bodyStrong('Cart'),
-          for (final item in visibleItems)
-            OiCartItemRow(
-              item: item,
-              label: '${item.name} × ${item.quantity}',
-              compact: true,
-              currencyCode: widget.currencyCode,
-              onRemove: widget.onRemove != null
-                  ? () => widget.onRemove!(item.productKey)
-                  : null,
-            ),
-          if (overflowCount > 0)
-            Padding(
-              padding: EdgeInsets.only(left: sp.sm),
-              child: OiLabel.small(
-                '$overflowCount more item${overflowCount == 1 ? '' : 's'}',
-              ),
-            ),
-          const OiDivider(),
-          OiRow(
-            breakpoint: breakpoint,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const OiLabel.bodyStrong('Total'),
-              OiPriceTag(
-                price: widget.summary.total,
-                label: 'Cart total',
+    return SingleChildScrollView(
+      child: Padding(
+        padding: EdgeInsets.all(sp.md),
+        child: OiColumn(
+          breakpoint: breakpoint,
+          gap: OiResponsive(sp.sm),
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const OiLabel.bodyStrong('Cart'),
+            for (final item in visibleItems)
+              OiCartItemRow(
+                item: item,
+                label: '${item.name} × ${item.quantity}',
+                compact: true,
                 currencyCode: widget.currencyCode,
+                onRemove: widget.onRemove != null
+                    ? () => widget.onRemove!(item.productKey)
+                    : null,
               ),
-            ],
-          ),
-          OiRow(
-            breakpoint: breakpoint,
-            gap: OiResponsive(sp.sm),
-            children: [
-              Expanded(
-                child: OiButton.ghost(
-                  label: 'View Cart',
-                  onTap: widget.onViewCart,
-                  fullWidth: true,
-                  semanticLabel: 'View Cart',
+            if (overflowCount > 0)
+              Padding(
+                padding: EdgeInsets.only(left: sp.sm),
+                child: OiLabel.small(
+                  '$overflowCount more item${overflowCount == 1 ? '' : 's'}',
                 ),
               ),
-              Expanded(
-                child: OiButton.primary(
-                  label: 'Checkout',
-                  onTap: widget.onCheckout,
-                  fullWidth: true,
-                  semanticLabel: 'Checkout',
+            const OiDivider(),
+            OiRow(
+              breakpoint: breakpoint,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const OiLabel.bodyStrong('Total'),
+                OiPriceTag(
+                  price: widget.summary.total,
+                  label: 'Cart total',
+                  currencyCode: widget.currencyCode,
                 ),
-              ),
-            ],
-          ),
-        ],
+              ],
+            ),
+            OiRow(
+              breakpoint: breakpoint,
+              gap: OiResponsive(sp.sm),
+              children: [
+                Expanded(
+                  child: OiButton.ghost(
+                    label: 'View Cart',
+                    onTap: widget.onViewCart,
+                    fullWidth: true,
+                    semanticLabel: 'View Cart',
+                  ),
+                ),
+                Expanded(
+                  child: OiButton.primary(
+                    label: 'Checkout',
+                    onTap: widget.onCheckout,
+                    fullWidth: true,
+                    semanticLabel: 'Checkout',
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

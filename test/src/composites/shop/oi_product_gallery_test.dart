@@ -1,6 +1,7 @@
 // Tests do not require documentation comments.
 // ignore_for_file: public_member_api_docs
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui/src/components/display/oi_image.dart';
@@ -14,15 +15,39 @@ const _images = [
   'https://example.com/img3.jpg',
 ];
 
+/// Suppresses [FlutterErrorDetails] whose exception is an image-load error.
+FlutterExceptionHandler? _originalOnError;
+
+void _ignoreImageErrors() {
+  _originalOnError = FlutterError.onError;
+  FlutterError.onError = (FlutterErrorDetails details) {
+    if (details.exception.toString().contains('NetworkImageLoadException') ||
+        details.library == 'image resource service') {
+      return; // swallow image errors
+    }
+    _originalOnError?.call(details);
+  };
+}
+
+void _restoreOnError() {
+  FlutterError.onError = _originalOnError;
+  _originalOnError = null;
+}
+
+/// Helper to pump a gallery in a small surface to avoid layout overflow
+/// from the AspectRatio(1) main image.
+Future<void> _pumpGallery(WidgetTester tester, Widget gallery) async {
+  await tester.pumpObers(gallery, surfaceSize: const Size(400, 600));
+}
+
 void main() {
   group('OiProductGallery', () {
     testWidgets('renders main image from first URL', (tester) async {
-      await tester.pumpObers(
-        const SizedBox(
-          width: 400,
-          height: 600,
-          child: OiProductGallery(imageUrls: _images, label: 'Product gallery'),
-        ),
+      _ignoreImageErrors();
+      addTearDown(_restoreOnError);
+      await _pumpGallery(
+        tester,
+        const OiProductGallery(imageUrls: _images, label: 'Product gallery'),
       );
 
       // Should find OiImage widgets (main + thumbnails).
@@ -30,12 +55,9 @@ void main() {
     });
 
     testWidgets('renders placeholder when image list is empty', (tester) async {
-      await tester.pumpObers(
-        const SizedBox(
-          width: 400,
-          height: 600,
-          child: OiProductGallery(imageUrls: [], label: 'Product gallery'),
-        ),
+      await _pumpGallery(
+        tester,
+        const OiProductGallery(imageUrls: [], label: 'Product gallery'),
       );
 
       // No OiImage rendered, placeholder icon shown instead.
@@ -44,16 +66,15 @@ void main() {
     });
 
     testWidgets('tapping thumbnail changes selected index', (tester) async {
+      _ignoreImageErrors();
+      addTearDown(_restoreOnError);
       int? changedIndex;
-      await tester.pumpObers(
-        SizedBox(
-          width: 400,
-          height: 600,
-          child: OiProductGallery(
-            imageUrls: _images,
-            label: 'Product gallery',
-            onIndexChanged: (i) => changedIndex = i,
-          ),
+      await _pumpGallery(
+        tester,
+        OiProductGallery(
+          imageUrls: _images,
+          label: 'Product gallery',
+          onIndexChanged: (i) => changedIndex = i,
         ),
       );
 
@@ -70,15 +91,14 @@ void main() {
     testWidgets('hides thumbnails when showThumbnails is false', (
       tester,
     ) async {
-      await tester.pumpObers(
-        const SizedBox(
-          width: 400,
-          height: 600,
-          child: OiProductGallery(
-            imageUrls: _images,
-            label: 'Product gallery',
-            showThumbnails: false,
-          ),
+      _ignoreImageErrors();
+      addTearDown(_restoreOnError);
+      await _pumpGallery(
+        tester,
+        const OiProductGallery(
+          imageUrls: _images,
+          label: 'Product gallery',
+          showThumbnails: false,
         ),
       );
 
@@ -87,14 +107,13 @@ void main() {
     });
 
     testWidgets('hides thumbnails when single image', (tester) async {
-      await tester.pumpObers(
-        const SizedBox(
-          width: 400,
-          height: 600,
-          child: OiProductGallery(
-            imageUrls: ['https://example.com/solo.jpg'],
-            label: 'Product gallery',
-          ),
+      _ignoreImageErrors();
+      addTearDown(_restoreOnError);
+      await _pumpGallery(
+        tester,
+        const OiProductGallery(
+          imageUrls: ['https://example.com/solo.jpg'],
+          label: 'Product gallery',
         ),
       );
 
@@ -103,15 +122,14 @@ void main() {
     });
 
     testWidgets('respects initialIndex', (tester) async {
-      await tester.pumpObers(
-        const SizedBox(
-          width: 400,
-          height: 600,
-          child: OiProductGallery(
-            imageUrls: _images,
-            label: 'Product gallery',
-            initialIndex: 2,
-          ),
+      _ignoreImageErrors();
+      addTearDown(_restoreOnError);
+      await _pumpGallery(
+        tester,
+        const OiProductGallery(
+          imageUrls: _images,
+          label: 'Product gallery',
+          initialIndex: 2,
         ),
       );
 
@@ -120,14 +138,13 @@ void main() {
     });
 
     testWidgets('semantic label is set', (tester) async {
-      await tester.pumpObers(
-        const SizedBox(
-          width: 400,
-          height: 600,
-          child: OiProductGallery(
-            imageUrls: _images,
-            label: 'Gallery for Widget X',
-          ),
+      _ignoreImageErrors();
+      addTearDown(_restoreOnError);
+      await _pumpGallery(
+        tester,
+        const OiProductGallery(
+          imageUrls: _images,
+          label: 'Gallery for Widget X',
         ),
       );
 

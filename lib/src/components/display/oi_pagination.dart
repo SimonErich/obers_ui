@@ -433,7 +433,7 @@ class _OiPaginationState extends State<OiPagination> {
     required VoidCallback onTap,
     required OiColorScheme colors,
   }) {
-    return OiButton.ghost(
+    return OiButton.icon(
       key: key,
       label: label,
       icon: icon,

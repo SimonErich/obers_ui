@@ -147,7 +147,12 @@ void main() {
         surfaceSize: const Size(800, 600),
       );
 
-      expect(find.bySemanticsLabel('Error boundary'), findsOneWidget);
+      expect(
+        find.byWidgetPredicate(
+          (w) => w is Semantics && w.properties.label == 'Error boundary',
+        ),
+        findsOneWidget,
+      );
     });
 
     testWidgets('no error code shown when errorCode is null', (tester) async {

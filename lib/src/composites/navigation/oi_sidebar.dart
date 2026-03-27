@@ -185,7 +185,9 @@ class OiSidebar extends StatefulWidget {
 }
 
 class _OiSidebarState extends State<OiSidebar>
-    with TickerProviderStateMixin, OiSettingsMixin<OiSidebar, OiSidebarSettings> {
+    with
+        TickerProviderStateMixin,
+        OiSettingsMixin<OiSidebar, OiSidebarSettings> {
   final Set<String> _collapsedSections = {};
   final Set<String> _expandedParents = {};
   final Map<String, AnimationController> _expandControllers = {};
@@ -432,21 +434,29 @@ class _OiSidebarState extends State<OiSidebar>
           widgets.add(_buildItem(context, item, 0, compact));
           if (item.children != null && item.children!.isNotEmpty) {
             final controller = _controllerFor(item.id);
+            final childColumn = Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                for (final child in item.children!)
+                  _buildItem(context, child, 1, compact),
+              ],
+            );
             widgets.add(
-              SizeTransition(
-                sizeFactor: CurvedAnimation(
-                  parent: controller,
-                  curve: Curves.easeInOut,
-                ),
-                axisAlignment: -1,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    for (final child in item.children!)
-                      _buildItem(context, child, 1, compact),
-                  ],
-                ),
+              AnimatedBuilder(
+                animation: controller,
+                builder: (context, child) {
+                  if (controller.isDismissed) return const SizedBox.shrink();
+                  return SizeTransition(
+                    sizeFactor: CurvedAnimation(
+                      parent: controller,
+                      curve: Curves.easeInOut,
+                    ),
+                    axisAlignment: -1,
+                    child: child!,
+                  );
+                },
+                child: childColumn,
               ),
             );
           }

@@ -87,9 +87,7 @@ class _OiToastQueue {
     _notifier.notify();
 
     // Return a handle that removes this specific entry.
-    return _OiSingleToastHandle(
-      onDismiss: () => _removeEntry(entry),
-    );
+    return _OiSingleToastHandle(onDismiss: () => _removeEntry(entry));
   }
 
   void _removeEntry(_OiToastEntry entry) {
@@ -107,12 +105,12 @@ class _OiToastQueue {
     final service = OiOverlays.maybeOf(context);
 
     Widget builder(BuildContext _) => ListenableBuilder(
-          listenable: _notifier,
-          builder: (ctx, _) => _OiToastColumn(
-            entries: List.of(_entries),
-            onEntryDismissed: _removeEntry,
-          ),
-        );
+      listenable: _notifier,
+      builder: (ctx, _) => _OiToastColumn(
+        entries: List.of(_entries),
+        onEntryDismissed: _removeEntry,
+      ),
+    );
 
     if (service != null) {
       _handle = service.show(
@@ -158,7 +156,7 @@ class _OiToastEntry {
 /// A fake handle that dismisses a single entry from the queue.
 class _OiSingleToastHandle implements OiOverlayHandle {
   _OiSingleToastHandle({required VoidCallback onDismiss})
-      : _onDismiss = onDismiss;
+    : _onDismiss = onDismiss;
 
   final VoidCallback _onDismiss;
   bool _dismissed = false;
@@ -179,10 +177,7 @@ class _OiSingleToastHandle implements OiOverlayHandle {
 
 /// Renders the column of active toasts.
 class _OiToastColumn extends StatelessWidget {
-  const _OiToastColumn({
-    required this.entries,
-    required this.onEntryDismissed,
-  });
+  const _OiToastColumn({required this.entries, required this.onEntryDismissed});
 
   final List<_OiToastEntry> entries;
   final void Function(_OiToastEntry) onEntryDismissed;
@@ -192,7 +187,8 @@ class _OiToastColumn extends StatelessWidget {
     if (entries.isEmpty) return const SizedBox.shrink();
 
     final position = entries.first.position;
-    final isTop = position == OiToastPosition.topLeft ||
+    final isTop =
+        position == OiToastPosition.topLeft ||
         position == OiToastPosition.topCenter ||
         position == OiToastPosition.topRight;
 
@@ -211,14 +207,11 @@ class _OiToastColumn extends StatelessWidget {
 
     final crossAlignment = switch (position) {
       OiToastPosition.topLeft ||
-      OiToastPosition.bottomLeft =>
-        CrossAxisAlignment.start,
+      OiToastPosition.bottomLeft => CrossAxisAlignment.start,
       OiToastPosition.topCenter ||
-      OiToastPosition.bottomCenter =>
-        CrossAxisAlignment.center,
+      OiToastPosition.bottomCenter => CrossAxisAlignment.center,
       OiToastPosition.topRight ||
-      OiToastPosition.bottomRight =>
-        CrossAxisAlignment.end,
+      OiToastPosition.bottomRight => CrossAxisAlignment.end,
     };
 
     return Align(
@@ -472,6 +465,7 @@ class _OiToastState extends State<OiToast> with SingleTickerProviderStateMixin {
                       children: [
                         Semantics(
                           label: _iconSemanticLabel(),
+                          container: true,
                           excludeSemantics: true,
                           child: Text(
                             _icon(),
@@ -525,6 +519,10 @@ class _OiToastState extends State<OiToast> with SingleTickerProviderStateMixin {
       child: toast,
     );
 
-    return FadeTransition(opacity: _opacity, child: toast);
+    return FadeTransition(
+      opacity: _opacity,
+      alwaysIncludeSemantics: true,
+      child: toast,
+    );
   }
 }

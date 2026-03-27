@@ -193,8 +193,9 @@ class _OiFloatingState extends State<OiFloating> {
     if (_useBottomSheet) {
       content = Positioned(left: 0, right: 0, bottom: 0, child: widget.child);
     } else {
-      final effectiveOverflow =
-          widget.autoFlip ? widget.overflow : OiFloatingOverflow.none;
+      final effectiveOverflow = widget.autoFlip
+          ? widget.overflow
+          : OiFloatingOverflow.none;
 
       content = CustomSingleChildLayout(
         delegate: _FloatingLayoutDelegate(
@@ -264,8 +265,10 @@ class _FloatingLayoutDelegate extends SingleChildLayoutDelegate {
     // Cap the child at the safe area so it can never measure itself larger
     // than what fits on screen.
     final maxW =
-        (constraints.maxWidth - screenPadding.left - screenPadding.right)
-            .clamp(0.0, double.infinity);
+        (constraints.maxWidth - screenPadding.left - screenPadding.right).clamp(
+          0.0,
+          double.infinity,
+        );
     final maxH =
         (constraints.maxHeight - screenPadding.top - screenPadding.bottom)
             .clamp(0.0, double.infinity);
@@ -338,15 +341,22 @@ class _FloatingLayoutDelegate extends SingleChildLayoutDelegate {
         case OiFloatingAlignment.bottomCenter:
         case OiFloatingAlignment.bottomEnd:
           // Primary axis: Y — flip down→up if overflows bottom
-          if (overflow == OiFloatingOverflow.flip &&
-              y + h > safeBottom) {
+          if (overflow == OiFloatingOverflow.flip && y + h > safeBottom) {
             final flippedY = anchorRect.top - gap - h + offset.dy;
             if (flippedY >= safeTop) y = flippedY;
           } else if (overflow == OiFloatingOverflow.shift) {
             y = y.clamp(safeTop, safeBottom - h);
           }
           // Cross axis: X — shift/flip horizontal edge alignment
-          x = _adjustCrossX(x, w, safeLeft, safeRight, isStart: alignment == OiFloatingAlignment.bottomStart, isEnd: alignment == OiFloatingAlignment.bottomEnd, anchorRect: anchorRect);
+          x = _adjustCrossX(
+            x,
+            w,
+            safeLeft,
+            safeRight,
+            start: alignment == OiFloatingAlignment.bottomStart,
+            end: alignment == OiFloatingAlignment.bottomEnd,
+            anchorRect: anchorRect,
+          );
 
         case OiFloatingAlignment.topStart:
         case OiFloatingAlignment.topCenter:
@@ -359,22 +369,37 @@ class _FloatingLayoutDelegate extends SingleChildLayoutDelegate {
             y = y.clamp(safeTop, safeBottom - h);
           }
           // Cross axis: X
-          x = _adjustCrossX(x, w, safeLeft, safeRight, isStart: alignment == OiFloatingAlignment.topStart, isEnd: alignment == OiFloatingAlignment.topEnd, anchorRect: anchorRect);
+          x = _adjustCrossX(
+            x,
+            w,
+            safeLeft,
+            safeRight,
+            start: alignment == OiFloatingAlignment.topStart,
+            end: alignment == OiFloatingAlignment.topEnd,
+            anchorRect: anchorRect,
+          );
 
         // ── Horizontal primary (left / right) ────────────────────────────
         case OiFloatingAlignment.rightStart:
         case OiFloatingAlignment.rightCenter:
         case OiFloatingAlignment.rightEnd:
           // Primary axis: X — flip right→left if overflows right
-          if (overflow == OiFloatingOverflow.flip &&
-              x + w > safeRight) {
+          if (overflow == OiFloatingOverflow.flip && x + w > safeRight) {
             final flippedX = anchorRect.left - gap - w + offset.dx;
             if (flippedX >= safeLeft) x = flippedX;
           } else if (overflow == OiFloatingOverflow.shift) {
             x = x.clamp(safeLeft, safeRight - w);
           }
           // Cross axis: Y
-          y = _adjustCrossY(y, h, safeTop, safeBottom, isStart: alignment == OiFloatingAlignment.rightStart, isEnd: alignment == OiFloatingAlignment.rightEnd, anchorRect: anchorRect);
+          y = _adjustCrossY(
+            y,
+            h,
+            safeTop,
+            safeBottom,
+            start: alignment == OiFloatingAlignment.rightStart,
+            end: alignment == OiFloatingAlignment.rightEnd,
+            anchorRect: anchorRect,
+          );
 
         case OiFloatingAlignment.leftStart:
         case OiFloatingAlignment.leftCenter:
@@ -387,7 +412,15 @@ class _FloatingLayoutDelegate extends SingleChildLayoutDelegate {
             x = x.clamp(safeLeft, safeRight - w);
           }
           // Cross axis: Y
-          y = _adjustCrossY(y, h, safeTop, safeBottom, isStart: alignment == OiFloatingAlignment.leftStart, isEnd: alignment == OiFloatingAlignment.leftEnd, anchorRect: anchorRect);
+          y = _adjustCrossY(
+            y,
+            h,
+            safeTop,
+            safeBottom,
+            start: alignment == OiFloatingAlignment.leftStart,
+            end: alignment == OiFloatingAlignment.leftEnd,
+            anchorRect: anchorRect,
+          );
       }
     }
 
@@ -412,8 +445,8 @@ class _FloatingLayoutDelegate extends SingleChildLayoutDelegate {
     double w,
     double safeLeft,
     double safeRight, {
-    required bool isStart,
-    required bool isEnd,
+    required bool start,
+    required bool end,
     required Rect anchorRect,
   }) {
     // Already fits — no adjustment needed.
@@ -443,8 +476,8 @@ class _FloatingLayoutDelegate extends SingleChildLayoutDelegate {
     double h,
     double safeTop,
     double safeBottom, {
-    required bool isStart,
-    required bool isEnd,
+    required bool start,
+    required bool end,
     required Rect anchorRect,
   }) {
     if (y >= safeTop && y + h <= safeBottom) return y;
