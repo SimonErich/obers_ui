@@ -274,12 +274,15 @@ class _OiTappableState extends State<OiTappable> {
 
     // Gesture detection.
     content = GestureDetector(
-      onTap: _handleTap,
+      onTap: widget.onTap != null ? _handleTap : null,
       onDoubleTap: widget.onDoubleTap != null ? _handleDoubleTap : null,
       onLongPress: widget.onLongPress != null ? _handleLongPress : null,
-      onTapDown: _handleTapDown,
-      onTapUp: _handleTapUp,
-      onTapCancel: _handleTapCancel,
+      // Only register tap down/up/cancel when onTap is set. When onTap is null,
+      // registering these would create a competing TapGestureRecognizer that
+      // prevents DoubleTapGestureRecognizer from firing.
+      onTapDown: widget.onTap != null ? _handleTapDown : null,
+      onTapUp: widget.onTap != null ? _handleTapUp : null,
+      onTapCancel: widget.onTap != null ? _handleTapCancel : null,
       behavior: HitTestBehavior.opaque,
       child: content,
     );

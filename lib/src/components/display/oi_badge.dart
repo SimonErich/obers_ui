@@ -285,6 +285,10 @@ class OiBadge extends StatelessWidget {
     final colors = context.colors;
     final resolved = _resolveColors(colors);
     final dims = _resolveDimensions();
+    final bt = context.components.badge;
+    final effectivePadding = bt?.padding ?? dims.padding;
+    final effectiveBorderRadius =
+        bt?.borderRadius ?? BorderRadius.circular(100);
 
     if (dot) {
       final dotColor = resolved.background == const Color(0x00000000)
@@ -318,12 +322,14 @@ class OiBadge extends StatelessWidget {
       );
     }
 
-    final textStyle = TextStyle(
-      fontSize: dims.fontSize,
-      fontWeight: FontWeight.w700,
-      color: resolved.textColor,
-      height: 1,
-    );
+    final textStyle =
+        bt?.textStyle?.copyWith(color: resolved.textColor) ??
+        TextStyle(
+          fontSize: dims.fontSize,
+          fontWeight: FontWeight.w700,
+          color: resolved.textColor,
+          height: 1,
+        );
 
     Widget content = Text(label, style: textStyle);
 
@@ -338,16 +344,18 @@ class OiBadge extends StatelessWidget {
       );
     }
 
-    return Container(
-      padding: dims.padding,
+    final Widget badge = Container(
+      height: bt?.height,
+      padding: effectivePadding,
       decoration: BoxDecoration(
         color: resolved.background,
-        borderRadius: BorderRadius.circular(100),
+        borderRadius: effectiveBorderRadius,
         border: resolved.borderColor != null
             ? Border.all(color: resolved.borderColor!)
             : null,
       ),
-      child: content,
+      child: bt?.height != null ? Center(child: content) : content,
     );
+    return badge;
   }
 }

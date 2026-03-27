@@ -80,7 +80,10 @@ class _OiSwitchState extends State<OiSwitch> {
     final thumbSize = trackH - padding * 2;
     final travelDistance = trackW - thumbSize - padding * 2;
 
-    final trackColor = widget.value ? colors.primary.base : colors.border;
+    final st = context.components.switchTheme;
+    final trackColor = widget.value
+        ? (st?.activeTrackColor ?? colors.primary.base)
+        : (st?.inactiveTrackColor ?? colors.border);
 
     final animDuration =
         context.animations.reducedMotion ||
@@ -108,7 +111,7 @@ class _OiSwitchState extends State<OiSwitch> {
               width: thumbSize,
               height: thumbSize,
               decoration: BoxDecoration(
-                color: colors.surface,
+                color: st?.thumbColor ?? colors.surface,
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(

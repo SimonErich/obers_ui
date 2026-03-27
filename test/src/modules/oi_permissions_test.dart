@@ -81,10 +81,7 @@ void main() {
     );
     // 3 permissions x 3 roles = 9 checkboxes (each is a 20x20 Container)
     // Check that the check icon (0xe876) does not appear for unchecked
-    expect(
-      find.byIcon(const IconData(0xe876, fontFamily: 'MaterialIcons')),
-      findsNothing,
-    );
+    expect(find.byIcon(OiIcons.check), findsNothing);
   });
 
   testWidgets('checked permissions show check icon', (tester) async {
@@ -103,9 +100,8 @@ void main() {
         ),
       ),
     );
-    // Admin has 3 permissions checked — _OiCheckbox uses OiIcons.userPlus
-    // as the check mark icon inside the checked state.
-    expect(find.byIcon(OiIcons.userPlus), findsNWidgets(3));
+    // Admin has 3 permissions checked
+    expect(find.byIcon(OiIcons.check), findsNWidgets(3));
   });
 
   testWidgets('toggling fires onChange with updated matrix', (tester) async {

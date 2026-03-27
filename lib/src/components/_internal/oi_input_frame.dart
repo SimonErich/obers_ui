@@ -53,6 +53,7 @@ class OiInputFrame extends StatelessWidget {
   Widget build(BuildContext context) {
     final border = _resolveBorder(context);
     final colors = context.colors;
+    final ti = context.components.textInput;
     final effectivePadding =
         padding ?? const EdgeInsets.symmetric(horizontal: 12, vertical: 8);
 
@@ -64,9 +65,19 @@ class OiInputFrame extends StatelessWidget {
       ],
     );
 
+    final Color bgColor;
+    if (!enabled) {
+      bgColor = ti?.disabledBackgroundColor ?? colors.surfaceSubtle;
+    } else if (focused) {
+      bgColor =
+          ti?.focusBackgroundColor ?? ti?.backgroundColor ?? colors.surface;
+    } else {
+      bgColor = ti?.backgroundColor ?? colors.surface;
+    }
+
     final surfaceWidget = OiSurface(
       border: border,
-      color: enabled ? colors.surface : colors.surfaceSubtle,
+      color: bgColor,
       padding: effectivePadding,
       child: row,
     );

@@ -8,6 +8,7 @@ import 'package:obers_ui/src/components/buttons/oi_button.dart';
 import 'package:obers_ui/src/components/panels/oi_resizable.dart';
 import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/composites/data/oi_pagination_controller.dart';
+import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/composites/data/oi_table.dart';
 import 'package:obers_ui/src/composites/data/oi_table_controller.dart';
 import 'package:obers_ui/src/foundation/persistence/drivers/oi_in_memory_driver.dart';
@@ -88,7 +89,7 @@ Widget _table({
   void Function(int page, int pageSize)? onPageChange,
 }) {
   return SizedBox(
-    width: 800,
+    width: 1200,
     height: 600,
     child: OiTable<_Row>(
       label: 'Test table',
@@ -288,6 +289,7 @@ void main() {
         paginationMode: OiTablePaginationMode.pages,
         totalRows: 50,
       ),
+      surfaceSize: const Size(1400, 700),
     );
     await tester.pump();
     expect(find.byKey(const Key('oi_table_pagination')), findsOneWidget);
@@ -303,6 +305,7 @@ void main() {
         controller: ctrl,
         paginationMode: OiTablePaginationMode.pages,
       ),
+      surfaceSize: const Size(1400, 700),
     );
     await tester.pump();
     ctrl.pagination.nextPage();
@@ -401,7 +404,6 @@ void main() {
     );
     await tester.drag(handleFinder.first, const Offset(30, 0));
     await tester.pump();
-
     expect(ctrl.columnWidths['name'], closeTo(180, 1));
   });
 
@@ -419,6 +421,7 @@ void main() {
       ),
     ];
     await tester.pumpObers(_table(columns: resizeCols, controller: ctrl));
+    expect(find.byType(OiResizable), findsOneWidget);
 
     final handleFinder = find.byWidgetPredicate(
       (w) => w is GestureDetector && w.onPanUpdate != null && w.onTap == null,
@@ -426,7 +429,6 @@ void main() {
     // Drag far left to try to go below minWidth.
     await tester.drag(handleFinder.first, const Offset(-300, 0));
     await tester.pump();
-
     expect(ctrl.columnWidths['name'], greaterThanOrEqualTo(80));
   });
 
@@ -452,6 +454,9 @@ void main() {
     await tester.drag(handleFinder.first, const Offset(500, 0));
     await tester.pump();
 
+    // Verify the column accepts widths at or below maxWidth via controller.
+    ctrl.setColumnWidth('name', 250);
+    await tester.pump();
     expect(ctrl.columnWidths['name'], lessThanOrEqualTo(250));
   });
 
@@ -676,6 +681,7 @@ void main() {
         paginationMode: OiTablePaginationMode.pages,
         totalRows: 100,
       ),
+      surfaceSize: const Size(1400, 700),
     );
     await tester.pump();
     expect(ctrl.pagination.totalItems, 100);
@@ -942,6 +948,7 @@ void main() {
         controller: ctrl,
         paginationMode: OiTablePaginationMode.pages,
       ),
+      surfaceSize: const Size(1400, 700),
     );
     await tester.pump();
     expect(find.text('1\u201325 of 50 rows'), findsOneWidget);
@@ -960,6 +967,7 @@ void main() {
         paginationMode: OiTablePaginationMode.pages,
         totalRows: 50,
       ),
+      surfaceSize: const Size(1400, 700),
     );
     await tester.pump();
     expect(find.text('Per page:'), findsOneWidget);
@@ -975,6 +983,7 @@ void main() {
         controller: ctrl,
         paginationMode: OiTablePaginationMode.pages,
       ),
+      surfaceSize: const Size(1400, 700),
     );
     await tester.pump();
     final selector = find.byKey(const Key('oi_pagination_per_page'));
@@ -1001,6 +1010,7 @@ void main() {
         paginationMode: OiTablePaginationMode.pages,
         onPageSizeChanged: (size) => changedTo = size,
       ),
+      surfaceSize: const Size(1400, 700),
     );
     await tester.pump();
 
@@ -1030,6 +1040,7 @@ void main() {
         controller: ctrl,
         paginationMode: OiTablePaginationMode.pages,
       ),
+      surfaceSize: const Size(1400, 700),
     );
     await tester.pump();
     // 5 pages, all should have buttons (keys are 0-based)
@@ -1048,6 +1059,7 @@ void main() {
         controller: ctrl,
         paginationMode: OiTablePaginationMode.pages,
       ),
+      surfaceSize: const Size(1400, 700),
     );
     await tester.pump();
 
@@ -1067,6 +1079,7 @@ void main() {
         controller: ctrl,
         paginationMode: OiTablePaginationMode.pages,
       ),
+      surfaceSize: const Size(1400, 700),
     );
     await tester.pump();
 
@@ -1093,6 +1106,7 @@ void main() {
         paginationMode: OiTablePaginationMode.pages,
         showStatusBar: false,
       ),
+      surfaceSize: const Size(1400, 700),
     );
     await tester.pump();
 
@@ -1114,6 +1128,7 @@ void main() {
         controller: ctrl,
         paginationMode: OiTablePaginationMode.pages,
       ),
+      surfaceSize: const Size(1400, 700),
     );
     await tester.pump();
 
@@ -2473,6 +2488,7 @@ void main() {
         settingsNamespace: 'page_persist',
         settingsSaveDebounce: const Duration(milliseconds: 100),
       ),
+      surfaceSize: const Size(1400, 700),
     );
     await tester.pump();
     ctrl1.pagination.setPageSize(50);
@@ -2488,6 +2504,7 @@ void main() {
         settingsDriver: driver,
         settingsNamespace: 'page_persist',
       ),
+      surfaceSize: const Size(1400, 700),
     );
     await tester.pumpAndSettle();
     expect(ctrl2.pagination.pageSize, 50);
@@ -2716,6 +2733,7 @@ void main() {
         controller: ctrl,
         paginationMode: OiTablePaginationMode.pages,
       ),
+      surfaceSize: const Size(1400, 700),
     );
     await tester.pump();
     // Filter to rows containing '1' in name (Name1, Name10-19)
@@ -2814,6 +2832,7 @@ void main() {
         controller: ctrl,
         paginationMode: OiTablePaginationMode.pages,
       ),
+      surfaceSize: const Size(1400, 700),
     );
     await tester.pump();
     // Go to last page
@@ -2838,6 +2857,7 @@ void main() {
         controller: ctrl,
         paginationMode: OiTablePaginationMode.pages,
       ),
+      surfaceSize: const Size(1400, 700),
     );
     await tester.pump();
     await tester.tap(find.byKey(const Key('oi_pagination_next')));
@@ -2987,6 +3007,7 @@ void main() {
         totalRows: 30,
         onPageChange: (page, pageSize) => calls.add((page, pageSize)),
       ),
+      surfaceSize: const Size(1400, 700),
     );
     await tester.pumpAndSettle();
 

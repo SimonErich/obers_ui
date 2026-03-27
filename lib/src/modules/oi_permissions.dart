@@ -295,11 +295,7 @@ class _OiCheckbox extends StatelessWidget {
       ),
       child: checked
           ? Center(
-              child: Icon(
-                OiIcons.userPlus,
-                size: 14,
-                color: colors.textOnPrimary,
-              ),
+              child: Icon(OiIcons.check, size: 14, color: colors.textOnPrimary),
             )
           : null,
     );

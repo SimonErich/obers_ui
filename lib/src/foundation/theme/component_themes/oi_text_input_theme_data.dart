@@ -18,6 +18,11 @@ class OiTextInputThemeData {
     this.validationErrorColor,
     this.errorAnimationDuration,
     this.otp,
+    this.height,
+    this.placeholderColor,
+    this.backgroundColor,
+    this.focusBackgroundColor,
+    this.disabledBackgroundColor,
   });
 
   /// The corner radius applied to the input field border.
@@ -43,6 +48,21 @@ class OiTextInputThemeData {
   /// OTP-specific sub-theme for digit box dimensions and styling.
   final OiOtpThemeData? otp;
 
+  /// Override input field height.
+  final double? height;
+
+  /// Color for placeholder / hint text.
+  final Color? placeholderColor;
+
+  /// Background color of the input field.
+  final Color? backgroundColor;
+
+  /// Background color when the input has keyboard focus.
+  final Color? focusBackgroundColor;
+
+  /// Background color when the input is disabled.
+  final Color? disabledBackgroundColor;
+
   /// Creates a copy with optionally overridden values.
   OiTextInputThemeData copyWith({
     BorderRadius? borderRadius,
@@ -52,17 +72,27 @@ class OiTextInputThemeData {
     Color? validationErrorColor,
     Duration? errorAnimationDuration,
     OiOtpThemeData? otp,
+    double? height,
+    Color? placeholderColor,
+    Color? backgroundColor,
+    Color? focusBackgroundColor,
+    Color? disabledBackgroundColor,
   }) {
     return OiTextInputThemeData(
       borderRadius: borderRadius ?? this.borderRadius,
       contentPadding: contentPadding ?? this.contentPadding,
       borderColor: borderColor ?? this.borderColor,
       focusBorderColor: focusBorderColor ?? this.focusBorderColor,
-      validationErrorColor:
-          validationErrorColor ?? this.validationErrorColor,
+      validationErrorColor: validationErrorColor ?? this.validationErrorColor,
       errorAnimationDuration:
           errorAnimationDuration ?? this.errorAnimationDuration,
       otp: otp ?? this.otp,
+      height: height ?? this.height,
+      placeholderColor: placeholderColor ?? this.placeholderColor,
+      backgroundColor: backgroundColor ?? this.backgroundColor,
+      focusBackgroundColor: focusBackgroundColor ?? this.focusBackgroundColor,
+      disabledBackgroundColor:
+          disabledBackgroundColor ?? this.disabledBackgroundColor,
     );
   }
 
@@ -76,17 +106,27 @@ class OiTextInputThemeData {
         other.focusBorderColor == focusBorderColor &&
         other.validationErrorColor == validationErrorColor &&
         other.errorAnimationDuration == errorAnimationDuration &&
-        other.otp == otp;
+        other.otp == otp &&
+        other.height == height &&
+        other.placeholderColor == placeholderColor &&
+        other.backgroundColor == backgroundColor &&
+        other.focusBackgroundColor == focusBackgroundColor &&
+        other.disabledBackgroundColor == disabledBackgroundColor;
   }
 
   @override
   int get hashCode => Object.hash(
-        borderRadius,
-        contentPadding,
-        borderColor,
-        focusBorderColor,
-        validationErrorColor,
-        errorAnimationDuration,
-        otp,
-      );
+    borderRadius,
+    contentPadding,
+    borderColor,
+    focusBorderColor,
+    validationErrorColor,
+    errorAnimationDuration,
+    otp,
+    height,
+    placeholderColor,
+    backgroundColor,
+    focusBackgroundColor,
+    disabledBackgroundColor,
+  );
 }

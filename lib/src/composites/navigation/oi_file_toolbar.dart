@@ -106,7 +106,8 @@ class _OiFileToolbarState extends State<OiFileToolbar> {
         if (widget.onSearch != null)
           OiIconButton(
             icon: _searchOpen
-                ? OiIcons.x // close
+                ? OiIcons
+                      .x // close
                 : OiIcons.search, // search
             semanticLabel: _searchOpen ? 'Close search' : 'Search',
             onTap: _toggleSearch,
@@ -154,6 +155,7 @@ class _OiFileToolbarState extends State<OiFileToolbar> {
     final isSelectionMode = widget.selectedCount > 0;
     return Semantics(
       label: widget.label,
+      explicitChildNodes: true,
       child: OiMorph(
         // ignore: avoid_redundant_argument_values, explicit for clarity.
         transition: OiTransition.fade,

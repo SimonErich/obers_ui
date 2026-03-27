@@ -338,44 +338,48 @@ class _OiCardState extends State<OiCard> with SingleTickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
+    final ct = context.components.card;
 
     OiBorderStyle? effectiveBorder;
     List<BoxShadow>? shadow;
 
+    // Build a border style from theme borderColor/borderWidth if set.
+    OiBorderStyle? themeBorder;
+    if (ct?.borderColor != null) {
+      themeBorder = OiBorderStyle(
+        lineStyle: OiBorderLineStyle.solid,
+        color: ct!.borderColor!,
+        width: ct.borderWidth ?? 1.0,
+      );
+    }
+
+    final defaultElevatedShadow = [
+      BoxShadow(
+        color: colors.overlay.withValues(alpha: 0.08),
+        blurRadius: 8,
+        offset: const Offset(0, 2),
+      ),
+      BoxShadow(
+        color: colors.overlay.withValues(alpha: 0.04),
+        blurRadius: 2,
+        offset: const Offset(0, 1),
+      ),
+    ];
+
     switch (widget._kind) {
       case _OiCardKind.elevated:
-        shadow = [
-          BoxShadow(
-            color: colors.overlay.withValues(alpha: 0.08),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-          BoxShadow(
-            color: colors.overlay.withValues(alpha: 0.04),
-            blurRadius: 2,
-            offset: const Offset(0, 1),
-          ),
-        ];
+        shadow = ct?.shadow ?? defaultElevatedShadow;
         effectiveBorder = widget.border;
       case _OiCardKind.flat:
         effectiveBorder = widget.border;
       case _OiCardKind.outlined:
-        effectiveBorder = widget.border ?? context.decoration.defaultBorder;
+        effectiveBorder =
+            widget.border ?? themeBorder ?? context.decoration.defaultBorder;
       case _OiCardKind.interactive:
-        effectiveBorder = widget.border ?? context.decoration.defaultBorder;
+        effectiveBorder =
+            widget.border ?? themeBorder ?? context.decoration.defaultBorder;
       case _OiCardKind.compact:
-        shadow = [
-          BoxShadow(
-            color: colors.overlay.withValues(alpha: 0.08),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-          BoxShadow(
-            color: colors.overlay.withValues(alpha: 0.04),
-            blurRadius: 2,
-            offset: const Offset(0, 1),
-          ),
-        ];
+        shadow = ct?.shadow ?? defaultElevatedShadow;
         effectiveBorder = widget.border;
     }
 
@@ -414,7 +418,8 @@ class _OiCardState extends State<OiCard> with SingleTickerProviderStateMixin {
     final surface = OiSurface(
       border: effectiveBorder,
       shadow: shadow,
-      borderRadius: BorderRadius.circular(8),
+      borderRadius: ct?.borderRadius ?? BorderRadius.circular(8),
+      color: ct?.backgroundColor,
       padding: effectivePadding,
       gradient: widget.gradient,
       halo: widget.halo,
@@ -427,7 +432,7 @@ class _OiCardState extends State<OiCard> with SingleTickerProviderStateMixin {
       return OiTappable(
         onTap: widget.onTap,
         semanticLabel: widget.label,
-        clipBorderRadius: BorderRadius.circular(8),
+        clipBorderRadius: ct?.borderRadius ?? BorderRadius.circular(8),
         child: surface,
       );
     }

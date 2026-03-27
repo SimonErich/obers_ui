@@ -233,12 +233,15 @@ class _OiRawInputState extends State<OiRawInput> {
     if (widget.style != null) return widget.style!;
     final themeData = OiTheme.maybeOf(context);
     if (themeData != null) {
-      return themeData.textTheme.styleFor(OiLabelVariant.small).copyWith(
-        color: themeData.colors.text,
-        height: 1.2,
-      );
+      return themeData.textTheme
+          .styleFor(OiLabelVariant.small)
+          .copyWith(color: themeData.colors.text, height: 1.2);
     }
-    return const TextStyle(fontSize: 14, fontWeight: FontWeight.w400, height: 1.2);
+    return const TextStyle(
+      fontSize: 14,
+      fontWeight: FontWeight.w400,
+      height: 1.2,
+    );
   }
 
   Color _resolveCursorColor(BuildContext context) {
@@ -263,7 +266,8 @@ class _OiRawInputState extends State<OiRawInput> {
       focusNode: widget.focusNode,
       style: effectiveStyle,
       cursorColor: effectiveCursorColor,
-      backgroundCursorColor: OiTheme.maybeOf(context)?.colors.text ?? const Color(0xFF000000),
+      backgroundCursorColor:
+          OiTheme.maybeOf(context)?.colors.text ?? const Color(0xFF000000),
       keyboardType: widget.keyboardType,
       textInputAction: widget.textInputAction,
       textCapitalization: widget.textCapitalization,
@@ -301,6 +305,15 @@ class _OiRawInputState extends State<OiRawInput> {
     // Wrap in a Stack to overlay the placeholder text.
     var fieldWidget = interactiveEditable as Widget;
     if (widget.placeholder != null) {
+      final themePlaceholderColor = OiTheme.maybeOf(
+        context,
+      )?.components.textInput?.placeholderColor;
+      final defaultPlaceholderColor =
+          (effectiveStyle.color ??
+                  OiTheme.maybeOf(context)?.colors.text ??
+                  const Color(0xFF000000))
+              .withValues(alpha: 0.45);
+      final placeholderColor = themePlaceholderColor ?? defaultPlaceholderColor;
       fieldWidget = Stack(
         fit: StackFit.passthrough,
         children: [
@@ -311,10 +324,7 @@ class _OiRawInputState extends State<OiRawInput> {
                   alignment: Alignment.centerLeft,
                   child: Text(
                     widget.placeholder!,
-                    style: effectiveStyle.copyWith(
-                      color: (effectiveStyle.color ?? OiTheme.maybeOf(context)?.colors.text ?? const Color(0xFF000000))
-                          .withValues(alpha: 0.45),
-                    ),
+                    style: effectiveStyle.copyWith(color: placeholderColor),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),

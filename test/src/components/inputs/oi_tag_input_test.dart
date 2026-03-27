@@ -6,6 +6,7 @@ import 'dart:async';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui/src/components/inputs/oi_tag_input.dart';
+import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/primitives/animation/oi_shimmer.dart';
 
 import '../../../helpers/pump_app.dart';
@@ -33,17 +34,7 @@ void main() {
       OiTagInput(tags: const ['dart', 'flutter'], onChanged: (v) => result = v),
     );
     // Tap the first '×' remove icon.
-    await tester.tap(
-      find
-          .byIcon(
-            const IconData(
-              0xe1b2,
-              fontFamily: 'lucide',
-              fontPackage: 'obers_ui',
-            ),
-          )
-          .first,
-    );
+    await tester.tap(find.byIcon(OiIcons.x).first);
     await tester.pump();
     expect(result, isNotNull);
     expect(result!.length, 1);

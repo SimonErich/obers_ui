@@ -429,26 +429,38 @@ class _OiToastState extends State<OiToast> with SingleTickerProviderStateMixin {
     final colors = context.colors;
     final textTheme = context.textTheme;
     final accent = _accentColor(colors);
+    final tt = context.components.toast;
+
+    final effectiveBorderRadius = tt?.borderRadius ?? BorderRadius.circular(8);
+    final effectivePadding =
+        tt?.padding ?? const EdgeInsets.symmetric(horizontal: 12, vertical: 12);
+    final effectiveIconSize = tt?.iconSize ?? 16.0;
+    final effectiveGap = tt?.gap ?? 8.0;
+    final effectiveBgColor = tt?.backgroundColor ?? colors.surface;
+    final effectiveShadow =
+        tt?.shadow ??
+        [
+          BoxShadow(
+            color: colors.overlay.withValues(alpha: 0.12),
+            blurRadius: 16,
+            offset: const Offset(0, 4),
+          ),
+        ];
 
     Widget toast = Semantics(
       label: widget.label,
       liveRegion: true,
+      explicitChildNodes: true,
       child: Container(
         constraints: const BoxConstraints(minWidth: 240, maxWidth: 400),
         decoration: BoxDecoration(
-          color: colors.surface,
-          borderRadius: BorderRadius.circular(8),
+          color: effectiveBgColor,
+          borderRadius: effectiveBorderRadius,
           border: Border.all(color: colors.border),
-          boxShadow: [
-            BoxShadow(
-              color: colors.overlay.withValues(alpha: 0.12),
-              blurRadius: 16,
-              offset: const Offset(0, 4),
-            ),
-          ],
+          boxShadow: effectiveShadow,
         ),
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: effectiveBorderRadius,
           child: IntrinsicHeight(
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -457,10 +469,7 @@ class _OiToastState extends State<OiToast> with SingleTickerProviderStateMixin {
                 Container(width: 4, color: accent),
                 Expanded(
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 12,
-                    ),
+                    padding: effectivePadding,
                     child: Row(
                       children: [
                         Semantics(
@@ -471,12 +480,12 @@ class _OiToastState extends State<OiToast> with SingleTickerProviderStateMixin {
                             _icon(),
                             style: TextStyle(
                               color: accent,
-                              fontSize: 16,
+                              fontSize: effectiveIconSize,
                               fontWeight: FontWeight.w700,
                             ),
                           ),
                         ),
-                        const SizedBox(width: 8),
+                        SizedBox(width: effectiveGap),
                         Expanded(
                           child: Text(
                             widget.message,
@@ -484,7 +493,7 @@ class _OiToastState extends State<OiToast> with SingleTickerProviderStateMixin {
                           ),
                         ),
                         if (widget.action != null) ...[
-                          const SizedBox(width: 8),
+                          SizedBox(width: effectiveGap),
                           widget.action!,
                         ],
                       ],
