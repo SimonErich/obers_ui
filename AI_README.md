@@ -363,6 +363,29 @@ Detects platform (iOS/Android/macOS/Windows/Web) and input modality (touch vs po
 - All components enforce 48dp minimum touch targets on touch devices
 - Respects system `prefers-reduced-motion` setting
 
+### OiOptimisticAction
+**Tags:** `optimistic`, `undo`, `rollback`, `async`, `action`, `snackbar`, `utility`
+
+Static utility for optimistic UI updates with undo and automatic rollback.
+
+**Static Methods:**
+- `OiOptimisticAction.execute(context, apply:, rollback:, commit:, message:)` — Apply immediately, show undo snackbar, commit or rollback
+- `OiOptimisticAction.cancelPending(context)` — Cancel and rollback pending action
+
+**Key Parameters (execute):**
+- `apply` (VoidCallback, required) — Optimistic change
+- `rollback` (VoidCallback, required) — Undo function
+- `commit` (Future\<void\> Function(), required) — Real async operation
+- `message` (String, required) — Snackbar message
+- `undoDuration` (Duration, default: 5s) — Undo window
+- `errorMessage` (String?) — Error toast on commit failure
+
+**Use When:** Delete, archive, move, mark-as-read, status changes — any async mutation with undo.
+**Avoid When:** Operations requiring confirmation — use `OiDialog.confirm()`. Irreversible ops.
+**Combine With:** `OiSnackBar`, `OiToast`, `OiListView`, `OiTable`, `OiActionBar`
+
+---
+
 ### OiUndoStack
 **Tags:** `undo`, `redo`, `history`, `ctrl-z`
 
@@ -1224,6 +1247,36 @@ File upload dialog with drag-drop zone, progress tracking, pause/resume.
 
 ---
 
+#### OiKeyValue
+**Tags:** `key-value`, `label`, `value`, `detail`, `pair`, `field`, `read-only`, `display`
+**Tier:** Component
+
+Lightweight label-value pair for read-only data display. Simpler than `OiFieldDisplay.pair()` — no type-based formatting.
+
+**Key Parameters:**
+- `label` (String, required) — Field label
+- `value` (String?) — Field value. Null/empty shows `emptyText`
+- `direction` (Axis?) — Horizontal (default on desktop) or vertical (default on compact)
+- `labelWidth` (double?) — Fixed label width for alignment
+- `leading` (Widget?) — Icon before label
+- `trailing` (Widget?) — Action after value
+- `valueWidget` (Widget?) — Custom widget instead of text
+- `emptyText` (String, default: '---') — Placeholder for null/empty
+- `copyable` (bool, default: false) — Tap to copy value
+- `onTap` (VoidCallback?) — Makes row tappable
+- `dense` (bool, default: false) — Reduced padding
+
+**Static Method:**
+- `OiKeyValue.group(children:, title:, dividers:, wrapInCard:)` — Groups rows with dividers
+
+**Theme:** `context.components.keyValue` -> `OiKeyValueThemeData`
+
+**Use When:** Simple detail displays: user profiles, order details, metadata.
+**Avoid When:** Formatted values — use `OiFieldDisplay.pair()`. Editable — use `OiForm`.
+**Combine With:** `OiCard`, `OiDetailView`, `OiSheet`
+
+---
+
 #### OiAvatar
 **Tags:** `avatar`, `user`, `profile`, `image`, `initials`, `presence`
 **Tier:** Component
@@ -1629,6 +1682,63 @@ Badge displaying order status with color coding.
 ---
 
 ### COMPONENTS — Feedback
+
+---
+
+#### OiBanner
+**Tags:** `banner`, `alert`, `inline`, `notification`, `callout`, `info`, `warning`, `error`, `success`
+**Tier:** Component
+
+Inline persistent notification bar with severity levels. Stays visible in the page flow until dismissed.
+
+**Named Constructors:**
+- `OiBanner.info(message:)` — Informational (blue)
+- `OiBanner.success(message:)` — Success (green)
+- `OiBanner.warning(message:)` — Warning (amber)
+- `OiBanner.error(message:)` — Error (red)
+- `OiBanner.neutral(message:)` — Neutral (grey)
+
+**Key Parameters (all constructors):**
+- `message` (String, required) — Primary message text
+- `title` (String?) — Bold title above message
+- `icon` (IconData?) — Override default level icon
+- `action` (Widget?) — Primary action button
+- `secondaryAction` (Widget?) — Secondary action button
+- `onDismiss` (VoidCallback?) — Dismiss callback. If null, self-dismisses with animation
+- `dismissible` (bool, default: true) — Show/hide dismiss button
+- `compact` (bool, default: false) — Hides icon, reduces padding
+- `border` (bool, default: true) — Left accent border
+
+**Theme:** `context.components.banner` -> `OiBannerThemeData`
+
+**Use When:** Persistent inline messages: validation summaries, environment indicators, subscription warnings, maintenance notices.
+**Avoid When:** Transient feedback — use `OiToast`/`OiSnackBar`. Blocking decisions — use `OiDialog`.
+**Combine With:** `OiPage`, `OiForm`, `OiCard`, `OiAppShell`
+
+---
+
+#### OiSkeletonPreset
+**Tags:** `skeleton`, `loading`, `placeholder`, `shimmer`, `preset`, `text`, `avatar`, `card`
+**Tier:** Component
+
+Pre-shaped skeleton loading placeholders that compose `OiSkeletonLine`/`OiSkeletonBox` in `OiSkeletonGroup`.
+
+**Named Constructors:**
+- `OiSkeletonPreset.text(lines:, lastLineWidth:)` — Text line placeholders
+- `OiSkeletonPreset.avatar(height:)` — Circular avatar placeholder
+- `OiSkeletonPreset.card(height:, aspectRatio:)` — Card placeholder
+- `OiSkeletonPreset.image(height:, aspectRatio:)` — Image/banner placeholder
+- `OiSkeletonPreset.badge(width:)` — Badge/chip placeholder
+- `OiSkeletonPreset.listTile(showAvatar:, showTrailing:)` — List tile placeholder
+- `OiSkeletonPreset.tableRow(columns:)` — Table row placeholder
+- `OiSkeletonPreset.metric()` — Metric card placeholder
+
+**Static Factory:**
+- `OiSkeletonPreset.list(itemSkeleton:, count:)` — Repeats a skeleton N times
+
+**Use When:** Any content loading state. Compose presets to match actual content layout.
+**Avoid When:** Simple spinner — use `OiProgress`. Custom layouts — use `OiShimmer` directly.
+**Combine With:** `OiMorph`, `OiPage`, `OiCard`, `OiListView`
 
 ---
 
@@ -2382,6 +2492,107 @@ Rubber-band selection rectangle for multi-select in list/grid.
 ---
 
 ### COMPONENTS — Navigation
+
+---
+
+#### OiAccountSwitcher
+**Tags:** `account`, `switcher`, `workspace`, `organization`, `tenant`, `multi-account`, `dropdown`
+**Tier:** Component
+
+Generic workspace/org/account selector dropdown. Changes entire app context.
+
+**Key Parameters:**
+- `accounts` (List\<T\>, required) — All available accounts
+- `activeAccount` (T, required) — Currently active
+- `onSelect` (ValueChanged\<T\>, required) — Selection callback
+- `label` (String, required) — Accessibility
+- `labelOf` (String Function(T)?) — Display name
+- `avatarOf` (String Function(T)?) — Avatar initials/URL
+- `descriptionOf` (String Function(T)?) — Subtitle per account
+- `onAddAccount` (VoidCallback?) — "Add account" action
+- `searchable` (bool, default: false) — Search field in dropdown
+- `compact` (bool, default: false) — Avatar-only trigger
+
+**Theme:** `context.components.accountSwitcher` -> `OiAccountSwitcherThemeData`
+
+**Use When:** Multi-tenant SaaS, workspace switching, organization selectors.
+**Avoid When:** User profile actions — use `OiUserMenu`. Simple dropdowns — use `OiSelect`.
+**Combine With:** `OiAppShell`, `OiSidebar`, `OiAvatar`
+
+---
+
+#### OiActionBar
+**Tags:** `toolbar`, `actions`, `contextual`, `entity`, `bar`, `quick-actions`
+**Tier:** Component
+
+Contextual action toolbar for single-entity operations (email actions, document toolbar).
+
+**Key Parameters:**
+- `actions` (List\<OiActionBarItem\>, required) — Primary visible buttons
+- `label` (String, required) — Accessibility
+- `overflowActions` (List\<OiActionBarItem\>?) — Behind "more" menu
+- `leading` (Widget?) — Before actions
+- `trailing` (Widget?) — After actions
+- `style` (OiActionBarStyle, default: flat) — flat/surface/outlined/elevated
+- `showLabels` (bool?) — Show text labels (auto: show on expanded, hide on compact)
+- `separator` (bool, default: false) — Dividers between action groups
+
+**Companion:** `OiActionBarItem` — icon, label, semanticLabel, onTap, enabled, toggled, variant, loading, confirm
+
+**Theme:** `context.components.actionBar` -> `OiActionBarThemeData`
+
+**Use When:** Email toolbars, document actions, CMS toolbars, record detail pages.
+**Avoid When:** Multi-select — use `OiBulkBar`. Navigation — use `OiBottomBar`/`OiSidebar`.
+**Combine With:** `OiDetailView`, `OiCard`, `OiSliverHeader`
+
+---
+
+#### OiIndexBar
+**Tags:** `index`, `alphabet`, `sidebar`, `jump`, `scroll`, `A-Z`, `fast-scroll`
+**Tier:** Component
+
+Vertical alphabet/index sidebar for fast jumping in grouped lists.
+
+**Named Constructors:**
+- `OiIndexBar(labels:, onLabelSelected:, semanticLabel:)` — Custom labels
+- `OiIndexBar.alphabet(onLabelSelected:, semanticLabel:, includeHash:)` — A-Z + #
+
+**Key Parameters:**
+- `activeLabel` (String?) — Highlighted label
+- `availableLabels` (Set\<String\>?) — Labels with content; others dimmed
+- `size` (OiIndexBarSize, default: medium) — small/medium/large
+
+**Theme:** `context.components.indexBar` -> `OiIndexBarThemeData`
+
+**Use When:** Alongside `OiGroupedList` for fast navigation in alphabetical lists.
+**Avoid When:** Short lists (< 50 items).
+**Combine With:** `OiGroupedList`, `OiGroupedListController.scrollToGroup()`
+
+---
+
+#### OiWeekStrip
+**Tags:** `calendar`, `week`, `strip`, `date`, `selector`, `compact`, `schedule`, `horizontal`
+**Tier:** Component
+
+Compact horizontal 7-day week selector for date-oriented interfaces.
+
+**Key Parameters:**
+- `selectedDate` (DateTime, required) — Currently selected date
+- `onDateSelected` (ValueChanged\<DateTime\>, required) — Day tap callback
+- `label` (String, required) — Accessibility
+- `eventCounts` (Map\<DateTime, int\>?) — Days with events show dot
+- `firstDayOfWeek` (int, default: DateTime.monday)
+- `firstDate`/`lastDate` (DateTime?) — Navigation constraints
+- `showNavigation` (bool, default: true) — Prev/next arrows
+- `showMonth` (bool, default: true) — Month name label
+- `todayLabel` (String?) — "Today" jump button
+- `compact` (bool, default: false) — Smaller cells
+
+**Theme:** `context.components.weekStrip` -> `OiWeekStripThemeData`
+
+**Use When:** Daily planners, schedulers, booking UIs, fitness trackers.
+**Avoid When:** Full calendar — use `OiCalendar`. Date input — use `OiDateInput`.
+**Combine With:** `OiGroupedList`, `OiPage`, `OiSliverHeader`
 
 ---
 
@@ -3191,6 +3402,37 @@ Floating toolbar that appears when items are selected. Shows count and action bu
 
 ---
 
+#### OiGroupedList
+**Tags:** `list`, `grouped`, `sectioned`, `headers`, `collapsible`, `alphabetical`, `categorized`
+**Tier:** Composite
+
+Generic data list with automatic grouping, sticky headers, and collapsible sections.
+
+**Key Parameters:**
+- `items` (List\<T\>, required) — Flat item list
+- `itemBuilder` (Widget Function(BuildContext, T, int), required)
+- `groupBy` (String Function(T), required) — Group key extractor
+- `label` (String, required) — Accessibility
+- `headerBuilder` — Custom section header widget
+- `groupOrder` (int Function(String, String)?) — Group sort
+- `collapsible` (bool, default: false) — Tap headers to collapse
+- `initiallyCollapsed` (Set\<String\>?) — Groups starting collapsed
+- `emptyState` (Widget?) — Shown when items is empty
+- `separator` (Widget?) — Between items within a group
+- `loading` (bool) — Loading indicator at bottom
+- `groupedListController` (OiGroupedListController?) — Programmatic expand/collapse
+
+**Companion:** `OiGroupedListController` — expandGroup, collapseGroup, toggleGroup, expandAll, collapseAll
+**Companion:** `OiEmptyGroupBehavior` — hide/showHeader/showEmpty
+
+**Theme:** `context.components.groupedList` -> `OiGroupedListThemeData`
+
+**Use When:** Contacts by letter, events by date, products by category, settings by section.
+**Avoid When:** Flat lists — use `OiVirtualList`. Tabular data — use `OiTable`.
+**Combine With:** `OiIndexBar`, `OiTextInput.search()`, `OiEmptyState`
+
+---
+
 #### OiTable
 **Tags:** `table`, `data-grid`, `datagrid`, `spreadsheet`, `rows`, `columns`, `sort`, `filter`, `pagination`
 **Tier:** Composite
@@ -3867,6 +4109,30 @@ Spotlight effect highlighting a single element.
 ---
 
 ### COMPOSITES — Scheduling
+
+---
+
+#### OiDateRangePicker
+**Tags:** `date`, `range`, `picker`, `calendar`, `filter`, `analytics`, `report`, `period`
+**Tier:** Composite
+
+Dual-calendar date range selector with quick-select presets. Two side-by-side calendars (desktop) or single (mobile).
+
+**Key Parameters:**
+- `label` (String, required) — Accessibility
+- `startDate`/`endDate` (DateTime?) — Current selection
+- `onApply` (void Function(DateTime, DateTime)?) — Apply callback
+- `onCancel` (VoidCallback?) — Cancel callback
+- `presets` (List\<OiDateRangePreset\>?) — Quick-select presets (defaults to standard set)
+- `firstDate`/`lastDate` (DateTime?) — Date constraints
+- `singleCalendar` (bool, default: false) — Force single calendar
+- `showPresets` (bool, default: true) — Show/hide presets panel
+
+**Companion:** `OiDateRangePreset` — today, last7Days, last30Days, thisWeek, lastWeek, thisMonth, lastMonth, thisQuarter, lastQuarter, thisYear, lastYear
+
+**Use When:** Analytics date filters, report periods, booking windows, billing cycles.
+**Avoid When:** Single date — use `OiDatePicker`. Time-only — use `OiTimePicker`.
+**Combine With:** `OiFilterBar`, `OiPopover`, `OiForm`, `OiTable`
 
 ---
 

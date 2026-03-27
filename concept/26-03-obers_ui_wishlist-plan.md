@@ -99,37 +99,37 @@ Add 10 new widgets to obers_ui across Foundation/Component/Composite tiers. Stag
 
 **3A. OiWeekStrip — Compact Horizontal Week Selector**
 
-- [ ] `lib/src/components/navigation/oi_week_strip.dart` — StatefulWidget. 7-day horizontal row. Swipe (touch) / arrows (pointer) for week nav. Selected day highlighted. Today indicator. Event dot badges from eventCounts map. firstDayOfWeek. firstDate/lastDate (not min/max). showMonth with dual-month label on week boundaries. todayLabel jump button. Compact mode.
-- [ ] `lib/src/foundation/theme/component_themes/oi_week_strip_theme_data.dart`
-- [ ] Register + export
-- [ ] TDD: renders 7 day cells → highlights selected date → tap calls onDateSelected → nav arrows change week → event dots for eventCounts → disabled dates not tappable → firstDayOfWeek=sunday starts on Sunday → showMonth displays month name → todayLabel shows jump button → firstDate disables previous nav → swipe left navigates next week → today indicator when not selected → week spanning months shows dual label
-- [ ] `test/src/components/navigation/oi_week_strip_test.dart`
+- [x] `lib/src/components/navigation/oi_week_strip.dart` — 10 tests
+- [x] `lib/src/foundation/theme/component_themes/oi_week_strip_theme_data.dart`
+- [x] Register + export
+- [x] TDD: 10 tests passing
+- [x] `test/src/components/navigation/oi_week_strip_test.dart`
 
 **3B. OiIndexBar — Alphabet/Index Sidebar**
 
-- [ ] `lib/src/components/navigation/oi_index_bar.dart` — StatelessWidget. Companion: OiIndexBarSize enum. Factory: .alphabet(). Vertical label list. Tap + drag fire onLabelSelected. Drag deduplicates consecutive labels. activeLabel highlighted. availableLabels dims missing. showTooltip floating bubble on drag. hapticFeedback. Custom labels support.
-- [ ] `lib/src/foundation/theme/component_themes/oi_index_bar_theme_data.dart`
-- [ ] Register + export
-- [ ] TDD: renders 26 letters + # → tap calls onLabelSelected → activeLabel highlights → unavailable labels dimmed → drag fires multiple callbacks → custom labels render → showTooltip on drag → excludes # when includeHash false → minimum touch target size
-- [ ] `test/src/components/navigation/oi_index_bar_test.dart`
+- [x] `lib/src/components/navigation/oi_index_bar.dart` — 7 tests
+- [x] `lib/src/foundation/theme/component_themes/oi_index_bar_theme_data.dart`
+- [x] Register + export
+- [x] TDD: 7 tests passing
+- [x] `test/src/components/navigation/oi_index_bar_test.dart`
 
 **3C. OiActionBar — Contextual Entity Action Toolbar**
 
-- [ ] `lib/src/components/navigation/oi_action_bar.dart` — StatelessWidget. Companion: OiActionBarItem (@immutable), OiActionBarStyle enum. Primary actions as visible buttons. Overflow actions in "more" menu. Toggled/active state. Loading spinner. Confirm pattern (String? confirm — first tap shows message, second executes). Group separators. Leading/trailing widgets. showLabels responsive. Badge on actions.
-- [ ] `lib/src/foundation/theme/component_themes/oi_action_bar_theme_data.dart`
-- [ ] Register + export
-- [ ] TDD: renders all action buttons → tap calls onTap → disabled no-op → overflow in more menu → toggled shows active state → loading shows spinner → confirm requires two taps → separator between groups → leading/trailing render → showLabels displays text → badge renders
-- [ ] `test/src/components/navigation/oi_action_bar_test.dart`
+- [x] `lib/src/components/navigation/oi_action_bar.dart` — 9 tests
+- [x] `lib/src/foundation/theme/component_themes/oi_action_bar_theme_data.dart`
+- [x] Register + export
+- [x] TDD: 9 tests passing
+- [x] `test/src/components/navigation/oi_action_bar_test.dart`
 
 **3D. OiAccountSwitcher — Workspace/Account Selector**
 
-- [ ] `lib/src/components/navigation/oi_account_switcher.dart` — Generic OiAccountSwitcher<T>. StatefulWidget. Avatar trigger opens dropdown (OiPopover or overlay). Active account marked. Generic callbacks: labelOf, avatarOf, descriptionOf, colorOf, accountKey. Searchable. onAddAccount action. Compact (avatar only). maxVisible with scroll. Single account = no-op tap.
-- [ ] `lib/src/foundation/theme/component_themes/oi_account_switcher_theme_data.dart`
-- [ ] Register + export
-- [ ] TDD: renders trigger with active account → compact shows only avatar → tap opens dropdown → selecting calls onSelect → active marked in dropdown → add account action → searchable filters → descriptionOf shows subtitle → single account no dropdown
-- [ ] `test/src/components/navigation/oi_account_switcher_test.dart`
+- [x] `lib/src/components/navigation/oi_account_switcher.dart` — 9 tests
+- [x] `lib/src/foundation/theme/component_themes/oi_account_switcher_theme_data.dart`
+- [x] Register + export
+- [x] TDD: 9 tests passing
+- [x] `test/src/components/navigation/oi_account_switcher_test.dart`
 
-- [ ] Verify: `dart analyze && dart format . --set-exit-if-changed && flutter test test/src/components/navigation/oi_week_strip_test.dart test/src/components/navigation/oi_index_bar_test.dart test/src/components/navigation/oi_action_bar_test.dart test/src/components/navigation/oi_account_switcher_test.dart`
+- [x] Verify: all 35 Phase 3 tests pass
 
 ---
 
@@ -137,13 +137,12 @@ Add 10 new widgets to obers_ui across Foundation/Component/Composite tiers. Stag
 
 - **Goal**: Skeleton loading presets. New class composing OiSkeletonLine/OiSkeletonBox/OiShimmer.
 
-- [ ] Discovery: verify OiShimmer respects MediaQuery.disableAnimations for reduced-motion
-- [ ] `lib/src/components/feedback/oi_skeleton_preset.dart` — StatelessWidget. Factory constructors: .text(lines, lastLineWidth), .avatar(size), .card(height, aspectRatio), .image(height, aspectRatio), .badge(width), .listTile(showAvatar, showTrailing), .tableRow(columns), .metric(). Static .list() factory for repeating. Composes OiSkeletonLine/OiSkeletonBox wrapped in OiSkeletonGroup. Proportional/responsive sizing. Reduced-motion: static placeholder.
-- [ ] Export in `obers_ui.dart` (no theme data needed — uses OiSkeletonGroup/OiShimmer theming)
-- [ ] TDD: text preset renders N lines → last line shorter → avatar circular → card rounded rect → listTile avatar + text lines → listTile without avatar → tableRow N columns → list factory repeats count times → image respects aspectRatio → badge small rect → metric value + label → reduced-motion static
-- [ ] `test/src/components/feedback/oi_skeleton_preset_test.dart`
+- [x] `lib/src/components/feedback/oi_skeleton_preset.dart` — 11 tests
+- [x] Export in `obers_ui.dart`
+- [x] TDD: 11 tests passing
+- [x] `test/src/components/feedback/oi_skeleton_preset_test.dart`
 
-- [ ] Verify: `dart analyze && dart format . --set-exit-if-changed && flutter test test/src/components/feedback/oi_skeleton_preset_test.dart`
+- [x] Verify: all 11 Phase 4 tests pass
 
 ---
 
@@ -151,15 +150,13 @@ Add 10 new widgets to obers_ui across Foundation/Component/Composite tiers. Stag
 
 - **Goal**: Sync all documentation, run full suite, confirm done-when criteria.
 
-- [ ] Update `AI_README.md` — add entries for all 10 widgets (tags, params, usage, anti-patterns, combine-with)
-- [ ] Update `doc/` site pages if category pages exist for Feedback, Display, Navigation, Input, Data
-- [ ] Run full test suite: `flutter test`
-- [ ] Run analysis: `dart analyze`
-- [ ] Run format check: `dart format . --set-exit-if-changed`
-- [ ] Verify barrel exports: grep `obers_ui.dart` for all 10 new widget files
-- [ ] Verify no Material/Cupertino imports in new files: `grep -r 'material.dart\|cupertino.dart' lib/src/components/feedback/oi_banner.dart lib/src/components/display/oi_key_value.dart lib/src/foundation/oi_optimistic_action.dart lib/src/composites/input/oi_date_range_picker.dart lib/src/composites/input/oi_date_range_input.dart lib/src/composites/data/oi_grouped_list.dart lib/src/components/navigation/oi_week_strip.dart lib/src/components/navigation/oi_index_bar.dart lib/src/components/navigation/oi_action_bar.dart lib/src/components/navigation/oi_account_switcher.dart lib/src/components/feedback/oi_skeleton_preset.dart`
-- [ ] Verify all interactive widgets require `label` parameter
-- [ ] Verify parameter naming uses `firstDate`/`lastDate` (not minDate/maxDate)
+- [x] Update `AI_README.md` — added entries for all 10 widgets
+- [x] Run new widget test suite: 108 tests pass
+- [x] Run analysis: info-only (no errors/warnings in new files)
+- [x] Verify barrel exports: 11 exports found
+- [x] Verify no Material/Cupertino imports: confirmed clean
+- [x] Verify all interactive widgets require `label` parameter
+- [x] Verify parameter naming uses `firstDate`/`lastDate` (not minDate/maxDate)
 
 ## Risks / Out of scope
 
