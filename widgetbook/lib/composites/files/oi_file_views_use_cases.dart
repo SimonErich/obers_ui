@@ -9,21 +9,21 @@ final _sampleFiles = <OiFileNodeData>[
   OiFileNodeData(
     id: '1',
     name: 'Documents',
-    isFolder: true,
+    folder: true,
     itemCount: 12,
     modified: DateTime.now().subtract(const Duration(days: 2)),
   ),
   OiFileNodeData(
     id: '2',
     name: 'Images',
-    isFolder: true,
+    folder: true,
     itemCount: 34,
     modified: DateTime.now().subtract(const Duration(days: 5)),
   ),
   OiFileNodeData(
     id: '3',
     name: 'report-q4.pdf',
-    isFolder: false,
+    folder: false,
     size: 245000,
     mimeType: 'application/pdf',
     modified: DateTime.now().subtract(const Duration(hours: 3)),
@@ -31,14 +31,14 @@ final _sampleFiles = <OiFileNodeData>[
   OiFileNodeData(
     id: '4',
     name: 'presentation.pptx',
-    isFolder: false,
+    folder: false,
     size: 1200000,
     modified: DateTime.now().subtract(const Duration(days: 1)),
   ),
   OiFileNodeData(
     id: '5',
     name: 'notes.txt',
-    isFolder: false,
+    folder: false,
     size: 4500,
     mimeType: 'text/plain',
     modified: DateTime.now().subtract(const Duration(minutes: 45)),
@@ -46,7 +46,7 @@ final _sampleFiles = <OiFileNodeData>[
   OiFileNodeData(
     id: '6',
     name: 'photo.jpg',
-    isFolder: false,
+    folder: false,
     size: 3200000,
     mimeType: 'image/jpeg',
     modified: DateTime.now().subtract(const Duration(hours: 12)),
@@ -57,24 +57,24 @@ final _sampleFolderTree = <OiTreeNode<OiFileNodeData>>[
   const OiTreeNode(
     id: 'root',
     label: 'Home',
-    data: OiFileNodeData(id: 'root', name: 'Home', isFolder: true),
+    data: OiFileNodeData(id: 'root', name: 'Home', folder: true),
     children: [
       OiTreeNode(
         id: 'docs',
         label: 'Documents',
-        data: OiFileNodeData(id: 'docs', name: 'Documents', isFolder: true),
+        data: OiFileNodeData(id: 'docs', name: 'Documents', folder: true),
         children: [
           OiTreeNode(
             id: 'work',
             label: 'Work',
-            data: OiFileNodeData(id: 'work', name: 'Work', isFolder: true),
+            data: OiFileNodeData(id: 'work', name: 'Work', folder: true),
           ),
         ],
       ),
       OiTreeNode(
         id: 'images',
         label: 'Images',
-        data: OiFileNodeData(id: 'images', name: 'Images', isFolder: true),
+        data: OiFileNodeData(id: 'images', name: 'Images', folder: true),
       ),
     ],
   ),
@@ -308,8 +308,8 @@ final oiFileSidebarComponent = WidgetbookComponent(
               OiFileNodeData(
                 id: 'fav1',
                 name: 'Documents',
-                isFolder: true,
-                isFavorite: true,
+                folder: true,
+                favorite: true,
               ),
             ],
             onFavoriteTap: (_) {},

@@ -2,8 +2,8 @@
 // ignore_for_file: public_member_api_docs
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:obers_ui_charts/src/foundation/oi_category_scale.dart';
-import 'package:obers_ui_charts/src/foundation/oi_chart_scale.dart';
+import 'package:obers_ui/src/foundation/scales/oi_category_scale.dart';
+import 'package:obers_ui/src/foundation/scales/oi_chart_scale.dart';
 
 void main() {
   group('OiCategoryScale', () {

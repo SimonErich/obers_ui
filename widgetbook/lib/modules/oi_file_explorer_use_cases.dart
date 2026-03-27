@@ -7,7 +7,7 @@ final _sampleFiles = [
   OiFileNodeData(
     id: 'folder-1',
     name: 'Documents',
-    isFolder: true,
+    folder: true,
     parentId: 'root',
     itemCount: 12,
     modified: DateTime.now().subtract(const Duration(days: 2)),
@@ -15,7 +15,7 @@ final _sampleFiles = [
   OiFileNodeData(
     id: 'folder-2',
     name: 'Images',
-    isFolder: true,
+    folder: true,
     parentId: 'root',
     itemCount: 34,
     modified: DateTime.now().subtract(const Duration(days: 5)),
@@ -23,7 +23,7 @@ final _sampleFiles = [
   OiFileNodeData(
     id: 'file-1',
     name: 'report-q4.pdf',
-    isFolder: false,
+    folder: false,
     parentId: 'root',
     size: 245000,
     mimeType: 'application/pdf',
@@ -32,7 +32,7 @@ final _sampleFiles = [
   OiFileNodeData(
     id: 'file-2',
     name: 'screenshot.png',
-    isFolder: false,
+    folder: false,
     parentId: 'root',
     size: 1800000,
     mimeType: 'image/png',
@@ -41,7 +41,7 @@ final _sampleFiles = [
   OiFileNodeData(
     id: 'file-3',
     name: 'notes.txt',
-    isFolder: false,
+    folder: false,
     parentId: 'root',
     size: 4500,
     mimeType: 'text/plain',

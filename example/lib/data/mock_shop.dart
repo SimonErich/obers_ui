@@ -586,7 +586,7 @@ const kPaymentMethods = <OiPaymentMethod>[
     description: 'Visa ending in 4242',
     lastFour: '4242',
     expiryDate: '12/27',
-    isDefault: true,
+    defaultMethod: true,
   ),
   OiPaymentMethod(
     key: 'pay-eps',
