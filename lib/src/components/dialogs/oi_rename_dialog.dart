@@ -59,7 +59,7 @@ class _OiRenameDialogState extends State<OiRenameDialog> {
 
   void _selectNamePart() {
     final text = _controller.text;
-    if (widget.file.isFolder) {
+    if (widget.file.folder) {
       _controller.selection = TextSelection(
         baseOffset: 0,
         extentOffset: text.length,
@@ -134,7 +134,7 @@ class _OiRenameDialogState extends State<OiRenameDialog> {
               // Header with file icon
               Row(
                 children: [
-                  if (widget.file.isFolder)
+                  if (widget.file.folder)
                     const OiFolderIcon()
                   else
                     OiFileIcon(

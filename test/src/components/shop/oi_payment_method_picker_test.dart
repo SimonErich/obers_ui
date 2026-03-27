@@ -25,7 +25,7 @@ const _mastercard = OiPaymentMethod(
   label: 'Mastercard',
   description: 'Ending in 5555',
   lastFour: '5555',
-  isDefault: true,
+  defaultMethod: true,
 );
 
 const _amex = OiPaymentMethod(
@@ -158,7 +158,7 @@ void main() {
         await tester.pump();
 
         expect(selected!.key, 'mastercard');
-        expect(selected!.isDefault, isTrue);
+        expect(selected!.defaultMethod, isTrue);
       });
     });
 

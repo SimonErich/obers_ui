@@ -34,7 +34,15 @@ void main() {
     );
     // Tap the first '×' remove icon.
     await tester.tap(
-      find.byIcon(const IconData(0xe5cd, fontFamily: 'MaterialIcons')).first,
+      find
+          .byIcon(
+            const IconData(
+              0xe1b2,
+              fontFamily: 'lucide',
+              fontPackage: 'obers_ui',
+            ),
+          )
+          .first,
     );
     await tester.pump();
     expect(result, isNotNull);

@@ -22,7 +22,7 @@ final _testFiles = [
   OiFileNodeData(
     id: 'file1',
     name: 'document.pdf',
-    isFolder: false,
+    folder: false,
     size: 1024 * 1024,
     mimeType: 'application/pdf',
     modified: DateTime(2025, 3, 15),
@@ -30,7 +30,7 @@ final _testFiles = [
   OiFileNodeData(
     id: 'file2',
     name: 'image.png',
-    isFolder: false,
+    folder: false,
     size: 2048,
     mimeType: 'image/png',
     modified: DateTime(2025, 1, 10),
@@ -38,13 +38,13 @@ final _testFiles = [
   const OiFileNodeData(
     id: 'folder1',
     name: 'Projects',
-    isFolder: true,
+    folder: true,
     itemCount: 12,
   ),
   const OiFileNodeData(
     id: 'file3',
     name: 'notes.txt',
-    isFolder: false,
+    folder: false,
     size: 256,
   ),
 ];

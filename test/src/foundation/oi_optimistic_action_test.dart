@@ -16,7 +16,7 @@ void main() {
           onTap: () => OiOptimisticAction.execute(
             context,
             apply: () => applied = true,
-            rollback: () {},
+            onRollback: () {},
             commit: () async {},
             message: 'Done',
           ),
@@ -35,7 +35,7 @@ void main() {
           onTap: () => OiOptimisticAction.execute(
             context,
             apply: () {},
-            rollback: () {},
+            onRollback: () {},
             commit: () async {},
             message: 'Item deleted',
           ),
@@ -57,7 +57,7 @@ void main() {
           onTap: () => OiOptimisticAction.execute(
             context,
             apply: () {},
-            rollback: () {},
+            onRollback: () {},
             commit: () async => committed = true,
             message: 'Deleted',
             undoDuration: const Duration(milliseconds: 200),
@@ -79,7 +79,7 @@ void main() {
           onTap: () => OiOptimisticAction.execute(
             context,
             apply: () {},
-            rollback: () => rolledBack = true,
+            onRollback: () => rolledBack = true,
             commit: () async => throw Exception('fail'),
             message: 'Deleted',
             errorMessage: 'Failed',
@@ -103,7 +103,7 @@ void main() {
             result = await OiOptimisticAction.execute(
               context,
               apply: () {},
-              rollback: () {},
+              onRollback: () {},
               commit: () async {},
               message: 'Deleted',
               undoDuration: const Duration(milliseconds: 200),
@@ -128,7 +128,7 @@ void main() {
               onTap: () => OiOptimisticAction.execute(
                 context,
                 apply: () {},
-                rollback: () => rolledBack = true,
+                onRollback: () => rolledBack = true,
                 commit: () async {},
                 message: 'Deleted',
               ),

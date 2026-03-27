@@ -15,7 +15,7 @@ final _folderTree = <OiTreeNode<OiFileNodeData>>[
   const OiTreeNode<OiFileNodeData>(
     id: 'root',
     label: 'Root',
-    data: OiFileNodeData(id: 'root', name: 'Root', isFolder: true),
+    data: OiFileNodeData(id: 'root', name: 'Root', folder: true),
     children: [
       OiTreeNode<OiFileNodeData>(
         id: 'docs',
@@ -23,7 +23,7 @@ final _folderTree = <OiTreeNode<OiFileNodeData>>[
         data: OiFileNodeData(
           id: 'docs',
           name: 'Documents',
-          isFolder: true,
+          folder: true,
           itemCount: 10,
         ),
       ),
@@ -33,7 +33,7 @@ final _folderTree = <OiTreeNode<OiFileNodeData>>[
         data: OiFileNodeData(
           id: 'photos',
           name: 'Photos',
-          isFolder: true,
+          folder: true,
           itemCount: 42,
         ),
       ),
@@ -64,14 +64,14 @@ final _favorites = [
   const OiFileNodeData(
     id: 'fav1',
     name: 'Important Docs',
-    isFolder: true,
-    isFavorite: true,
+    folder: true,
+    favorite: true,
   ),
   const OiFileNodeData(
     id: 'fav2',
     name: 'Work Projects',
-    isFolder: true,
-    isFavorite: true,
+    folder: true,
+    favorite: true,
   ),
 ];
 

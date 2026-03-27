@@ -369,7 +369,7 @@ class _OiChatState extends State<OiChat> {
         return _buildMessage(
           context,
           widget.messages[msgIndex],
-          isContinuation: _isContinuation(msgIndex),
+          continuation: _isContinuation(msgIndex),
         );
       },
     );
@@ -388,7 +388,7 @@ class _OiChatState extends State<OiChat> {
   Widget _buildMessage(
     BuildContext context,
     OiChatMessage message, {
-    bool isContinuation = false,
+    bool continuation = false,
   }) {
     final colors = context.colors;
     final spacing = context.spacing;
@@ -401,7 +401,7 @@ class _OiChatState extends State<OiChat> {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        if (!ownMessage && !isContinuation)
+        if (!ownMessage && !continuation)
           Padding(
             padding: EdgeInsets.only(bottom: spacing.xs),
             child: Text(
@@ -503,7 +503,7 @@ class _OiChatState extends State<OiChat> {
       messageBody = pendingWrapper;
     }
 
-    final showAvatar = widget.showAvatars && !ownMessage && !isContinuation;
+    final showAvatar = widget.showAvatars && !ownMessage && !continuation;
 
     final avatar = showAvatar
         ? Padding(
@@ -532,14 +532,14 @@ class _OiChatState extends State<OiChat> {
         : null;
 
     // Use reduced spacing for continuation messages within a group.
-    final bottomSpacing = isContinuation ? spacing.sm : spacing.md;
+    final bottomSpacing = continuation ? spacing.sm : spacing.md;
 
     return Padding(
       padding: EdgeInsets.only(
         bottom: bottomSpacing,
         // Indent continuation messages to align with the bubble above the
         // avatar column (avatar 32 + right padding spacing.sm).
-        left: isContinuation && widget.showAvatars && !ownMessage
+        left: continuation && widget.showAvatars && !ownMessage
             ? 32 + spacing.sm
             : 0,
       ),
@@ -739,11 +739,7 @@ class _MoreEmojiButtonState extends State<_MoreEmojiButton> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: _showPicker,
-      child: const Icon(
-        OiIcons.smilePlus,
-        size: 20,
-        color: Color(0xFF888888),
-      ),
+      child: const Icon(OiIcons.smilePlus, size: 20, color: Color(0xFF888888)),
     );
   }
 }

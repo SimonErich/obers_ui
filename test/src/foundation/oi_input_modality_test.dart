@@ -4,7 +4,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:obers_ui/src/foundation/oi_input_modality.dart';
+import 'package:obers_ui/src/foundation/oi_input_modality_detector.dart';
 import 'package:obers_ui/src/foundation/oi_platform.dart';
 
 void main() {

@@ -106,15 +106,16 @@ void main() {
     testWidgets('nested items indent when parent is tapped', (tester) async {
       await tester.pumpObers(_sidebar());
 
-      // Initially, nested items should not be visible.
-      expect(find.text('Task 1'), findsNothing);
-      expect(find.text('Task 2'), findsNothing);
+      // Initially, nested items exist in the tree but are collapsed (height=0
+      // via SizeTransition). They are not hittable or visible.
+      expect(find.text('Task 1').hitTestable(), findsNothing);
+      expect(find.text('Task 2').hitTestable(), findsNothing);
 
       // Tap the parent item to expand.
       await tester.tap(find.text('Project A'));
       await tester.pumpAndSettle();
 
-      // Now nested items should be visible.
+      // Now nested items should be visible and hittable.
       expect(find.text('Task 1'), findsOneWidget);
       expect(find.text('Task 2'), findsOneWidget);
     });

@@ -14,17 +14,17 @@ import '../../../helpers/pump_app.dart';
 const _docFolder = OiFileNodeData(
   id: 'docs',
   name: 'Documents',
-  isFolder: true,
+  folder: true,
 );
 
-const _picFolder = OiFileNodeData(id: 'pics', name: 'Pictures', isFolder: true);
+const _picFolder = OiFileNodeData(id: 'pics', name: 'Pictures', folder: true);
 
 const _folderTree = <OiTreeNode<OiFileNodeData>>[
   OiTreeNode<OiFileNodeData>(id: 'docs', label: 'Documents', data: _docFolder),
   OiTreeNode<OiFileNodeData>(id: 'pics', label: 'Pictures', data: _picFolder),
 ];
 
-const _file = OiFileNodeData(id: 'f1', name: 'report.pdf', isFolder: false);
+const _file = OiFileNodeData(id: 'f1', name: 'report.pdf', folder: false);
 
 void main() {
   group('OiMoveDialog', () {
@@ -56,7 +56,7 @@ void main() {
       const file2 = OiFileNodeData(
         id: 'f2',
         name: 'notes.txt',
-        isFolder: false,
+        folder: false,
       );
       await tester.pumpObers(
         OiMoveDialog(

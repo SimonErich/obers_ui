@@ -15,7 +15,7 @@ void main() {
       expect(method.label, 'Credit Card');
       expect(method.description, isNull);
       expect(method.icon, isNull);
-      expect(method.isDefault, false);
+      expect(method.defaultMethod, false);
       expect(method.lastFour, isNull);
       expect(method.expiryDate, isNull);
       expect(method.logo, isNull);
@@ -27,7 +27,7 @@ void main() {
         label: 'Visa',
         description: 'Visa ending in 4242',
         icon: _kVisaIcon,
-        isDefault: true,
+        defaultMethod: true,
         lastFour: '•••• 4242',
         expiryDate: '12/25',
       );
@@ -35,7 +35,7 @@ void main() {
       expect(method.label, 'Visa');
       expect(method.description, 'Visa ending in 4242');
       expect(method.icon, _kVisaIcon);
-      expect(method.isDefault, true);
+      expect(method.defaultMethod, true);
       expect(method.lastFour, '•••• 4242');
       expect(method.expiryDate, '12/25');
     });
@@ -51,13 +51,13 @@ void main() {
       final updated = method.copyWith(
         key: 'visa',
         label: 'Visa',
-        isDefault: true,
+        defaultMethod: true,
         lastFour: '•••• 1234',
         expiryDate: '06/26',
       );
       expect(updated.key, 'visa');
       expect(updated.label, 'Visa');
-      expect(updated.isDefault, true);
+      expect(updated.defaultMethod, true);
       expect(updated.lastFour, '•••• 1234');
       expect(updated.expiryDate, '06/26');
     });
@@ -92,7 +92,7 @@ void main() {
       const method = OiPaymentMethod(
         key: 'cc',
         label: 'Credit Card',
-        isDefault: true,
+        defaultMethod: true,
       );
       final copy = method.copyWith();
       expect(copy, equals(method));
@@ -104,7 +104,7 @@ void main() {
         label: 'Credit Card',
         description: 'Primary card',
         icon: _kVisaIcon,
-        isDefault: true,
+        defaultMethod: true,
         lastFour: '•••• 4242',
         expiryDate: '12/25',
       );
@@ -113,7 +113,7 @@ void main() {
         label: 'Credit Card',
         description: 'Primary card',
         icon: _kVisaIcon,
-        isDefault: true,
+        defaultMethod: true,
         lastFour: '•••• 4242',
         expiryDate: '12/25',
       );
@@ -150,7 +150,7 @@ void main() {
       const method = OiPaymentMethod(
         key: 'cc',
         label: 'Credit Card',
-        isDefault: true,
+        defaultMethod: true,
       );
       final str = method.toString();
       expect(str, contains('cc'));

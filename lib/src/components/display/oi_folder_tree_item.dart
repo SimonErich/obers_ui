@@ -134,7 +134,7 @@ class OiFolderTreeItem extends StatelessWidget {
                 child: renaming
                     ? OiRenameField(
                         currentName: folder.name,
-                        isFolder: true,
+                        folder: true,
                         onRename: onRename ?? (_) {},
                         onCancel: onCancelRename ?? () {},
                         showButtons: true,
@@ -178,10 +178,10 @@ class OiFolderTreeItem extends StatelessWidget {
   }
 
   OiFolderIconVariant get _folderVariant {
-    if (folder.isTrashed) return OiFolderIconVariant.trash;
-    if (folder.isShared) return OiFolderIconVariant.shared;
-    if (folder.isLocked) return OiFolderIconVariant.locked;
-    if (folder.isFavorite) return OiFolderIconVariant.starred;
+    if (folder.trashed) return OiFolderIconVariant.trash;
+    if (folder.shared) return OiFolderIconVariant.shared;
+    if (folder.locked) return OiFolderIconVariant.locked;
+    if (folder.favorite) return OiFolderIconVariant.starred;
     return OiFolderIconVariant.normal;
   }
 }

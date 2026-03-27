@@ -294,7 +294,7 @@ class _OiFileSidebarState extends State<OiFileSidebar> {
                             OiFileNodeData(
                               id: node.id,
                               name: node.label,
-                              isFolder: true,
+                              folder: true,
                             );
 
                         Widget treeItem = OiFolderTreeItem(
@@ -390,7 +390,7 @@ class _OiFileSidebarState extends State<OiFileSidebar> {
                               : const OiFileNodeData(
                                   id: 'root',
                                   name: 'Home',
-                                  isFolder: true,
+                                  folder: true,
                                 ));
                       if (target != null) {
                         widget.onNewFolder!.call(target);

@@ -110,7 +110,7 @@ class _OiDeleteDialogState extends State<OiDeleteDialog> {
                       padding: EdgeInsets.only(bottom: spacing.xs),
                       child: Row(
                         children: [
-                          if (file.isFolder)
+                          if (file.folder)
                             const OiFolderIcon(size: OiFolderIconSize.sm)
                           else
                             OiFileIcon(
@@ -121,7 +121,7 @@ class _OiDeleteDialogState extends State<OiDeleteDialog> {
                           Expanded(
                             child: Text(
                               file.name +
-                                  (file.isFolder && file.itemCount != null
+                                  (file.folder && file.itemCount != null
                                       ? ' (${file.itemCount} items inside)'
                                       : ''),
                               style: TextStyle(

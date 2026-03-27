@@ -21,7 +21,8 @@ void main() {
         const OiWishlistButton(label: 'Wishlist', active: true),
       );
 
-      expect(find.byType(Icon), findsOneWidget);
+      // When active, a filled heart is drawn with CustomPaint (no Icon widget).
+      expect(find.byType(CustomPaint), findsWidgets);
     });
 
     testWidgets('fires onToggle when tapped', (tester) async {

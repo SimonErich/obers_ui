@@ -13,7 +13,7 @@ void main() {
     testWidgets('renders without errors', (tester) async {
       await tester.pumpObers(
         const OiFileInfoDialog(
-          file: OiFileNodeData(id: '1', name: 'report.pdf', isFolder: false),
+          file: OiFileNodeData(id: '1', name: 'report.pdf', folder: false),
         ),
       );
       expect(find.byType(OiFileInfoDialog), findsOneWidget);
@@ -22,7 +22,7 @@ void main() {
     testWidgets('displays file name', (tester) async {
       await tester.pumpObers(
         const OiFileInfoDialog(
-          file: OiFileNodeData(id: '1', name: 'report.pdf', isFolder: false),
+          file: OiFileNodeData(id: '1', name: 'report.pdf', folder: false),
         ),
       );
       expect(find.text('report.pdf'), findsOneWidget);
@@ -31,7 +31,7 @@ void main() {
     testWidgets('displays Folder type for folders', (tester) async {
       await tester.pumpObers(
         const OiFileInfoDialog(
-          file: OiFileNodeData(id: '1', name: 'Documents', isFolder: true),
+          file: OiFileNodeData(id: '1', name: 'Documents', folder: true),
         ),
       );
       expect(find.text('Folder'), findsOneWidget);
@@ -43,7 +43,7 @@ void main() {
           file: OiFileNodeData(
             id: '1',
             name: 'report.pdf',
-            isFolder: false,
+            folder: false,
             size: 2048,
           ),
         ),
@@ -58,7 +58,7 @@ void main() {
           file: OiFileNodeData(
             id: '1',
             name: 'notes.txt',
-            isFolder: false,
+            folder: false,
             created: DateTime(2024, 3, 15, 10, 30),
           ),
         ),
@@ -73,7 +73,7 @@ void main() {
           file: OiFileNodeData(
             id: '1',
             name: 'notes.txt',
-            isFolder: false,
+            folder: false,
             modified: DateTime(2024, 6, 1, 14, 5),
           ),
         ),
@@ -88,7 +88,7 @@ void main() {
           file: OiFileNodeData(
             id: '1',
             name: 'Photos',
-            isFolder: true,
+            folder: true,
             itemCount: 57,
           ),
         ),
@@ -100,7 +100,7 @@ void main() {
     testWidgets('displays extra metadata when provided', (tester) async {
       await tester.pumpObers(
         const OiFileInfoDialog(
-          file: OiFileNodeData(id: '1', name: 'doc.pdf', isFolder: false),
+          file: OiFileNodeData(id: '1', name: 'doc.pdf', folder: false),
           extraMetadata: {'Author': 'Jane', 'Version': '2.1'},
         ),
       );
@@ -113,7 +113,7 @@ void main() {
     testWidgets('hides extra metadata section when null', (tester) async {
       await tester.pumpObers(
         const OiFileInfoDialog(
-          file: OiFileNodeData(id: '1', name: 'doc.pdf', isFolder: false),
+          file: OiFileNodeData(id: '1', name: 'doc.pdf', folder: false),
         ),
       );
       expect(find.text('Author'), findsNothing);
@@ -123,7 +123,7 @@ void main() {
       var closed = false;
       await tester.pumpObers(
         OiFileInfoDialog(
-          file: const OiFileNodeData(id: '1', name: 'doc.pdf', isFolder: false),
+          file: const OiFileNodeData(id: '1', name: 'doc.pdf', folder: false),
           onClose: () => closed = true,
         ),
       );
@@ -135,7 +135,7 @@ void main() {
     testWidgets('has correct semantics label', (tester) async {
       await tester.pumpObers(
         const OiFileInfoDialog(
-          file: OiFileNodeData(id: '1', name: 'doc.pdf', isFolder: false),
+          file: OiFileNodeData(id: '1', name: 'doc.pdf', folder: false),
         ),
       );
       expect(find.bySemanticsLabel(RegExp('File info dialog')), findsOneWidget);
@@ -147,7 +147,7 @@ void main() {
           file: OiFileNodeData(
             id: '1',
             name: 'Docs',
-            isFolder: true,
+            folder: true,
             size: 1024,
           ),
         ),
@@ -161,7 +161,7 @@ void main() {
           file: OiFileNodeData(
             id: '1',
             name: 'notes.txt',
-            isFolder: false,
+            folder: false,
             parentId: '/home/docs',
           ),
         ),

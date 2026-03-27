@@ -2,6 +2,7 @@
 // ignore_for_file: public_member_api_docs
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui/src/foundation/oi_app.dart';
@@ -43,7 +44,7 @@ void main() {
     await tester.tap(find.byType(OiDoubleTap));
     await tester.pump(const Duration(milliseconds: 50));
     await tester.tap(find.byType(OiDoubleTap));
-    await tester.pumpAndSettle();
+    await tester.pump(kDoubleTapTimeout + const Duration(milliseconds: 50));
     expect(count, 1);
   });
 

@@ -83,7 +83,7 @@ void main() {
     await tester.tap(find.byType(OiTappable));
     await tester.pump(const Duration(milliseconds: 50));
     await tester.tap(find.byType(OiTappable));
-    await tester.pump(const Duration(milliseconds: 300));
+    await tester.pump(kDoubleTapTimeout + const Duration(milliseconds: 50));
     expect(count, greaterThanOrEqualTo(1));
   });
 

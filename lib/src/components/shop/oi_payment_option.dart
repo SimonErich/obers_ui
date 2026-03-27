@@ -100,7 +100,7 @@ class OiPaymentOption extends StatelessWidget {
             ],
           ),
         ),
-        if (method.isDefault)
+        if (method.defaultMethod)
           OiLabel.tiny('Default', color: colors.primary.base),
       ],
     );

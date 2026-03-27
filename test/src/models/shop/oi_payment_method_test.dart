@@ -12,14 +12,14 @@ void main() {
         key: 'visa',
         label: 'Visa',
         description: 'Visa ending in 4242',
-        isDefault: true,
+        defaultMethod: true,
         lastFour: '4242',
         expiryDate: '12/25',
       );
       expect(method.key, 'visa');
       expect(method.label, 'Visa');
       expect(method.description, 'Visa ending in 4242');
-      expect(method.isDefault, isTrue);
+      expect(method.defaultMethod, isTrue);
       expect(method.lastFour, '4242');
       expect(method.expiryDate, '12/25');
       expect(method.icon, isNull);
@@ -28,7 +28,7 @@ void main() {
 
     test('defaults: isDefault false, nullable fields null', () {
       const method = OiPaymentMethod(key: 'pp', label: 'PayPal');
-      expect(method.isDefault, isFalse);
+      expect(method.defaultMethod, isFalse);
       expect(method.description, isNull);
       expect(method.lastFour, isNull);
       expect(method.expiryDate, isNull);
@@ -36,9 +36,9 @@ void main() {
 
     test('copyWith replaces specified fields', () {
       const method = OiPaymentMethod(key: 'visa', label: 'Visa');
-      final copy = method.copyWith(label: 'MasterCard', isDefault: true);
+      final copy = method.copyWith(label: 'MasterCard', defaultMethod: true);
       expect(copy.label, 'MasterCard');
-      expect(copy.isDefault, isTrue);
+      expect(copy.defaultMethod, isTrue);
       expect(copy.key, 'visa');
     });
 
@@ -80,7 +80,7 @@ void main() {
       const method = OiPaymentMethod(
         key: 'visa',
         label: 'Visa',
-        isDefault: true,
+        defaultMethod: true,
       );
       expect(method.toString(), contains('visa'));
       expect(method.toString(), contains('Visa'));

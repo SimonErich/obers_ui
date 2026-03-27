@@ -142,8 +142,8 @@ class OiIndexBar extends StatelessWidget {
                   _IndexLabel(
                     label: label,
                     fontSize: fontSize,
-                    isActive: label == activeLabel,
-                    isAvailable: availableLabels?.contains(label) ?? true,
+                    active: label == activeLabel,
+                    available: availableLabels?.contains(label) ?? true,
                     activeColor: activeColor,
                     mutedColor: colors.textMuted,
                     defaultColor: colors.textSubtle,
@@ -214,7 +214,7 @@ class _IndexBarGestureState extends State<_IndexBarGesture> {
             child: _TooltipBubble(
               label: _tooltipLabel,
               color: widget.tooltipColor,
-              dy: _tooltipDy,
+              offsetY: _tooltipDy,
             ),
           ),
         );
@@ -223,9 +223,9 @@ class _IndexBarGestureState extends State<_IndexBarGesture> {
     Overlay.of(context).insert(_tooltipEntry!);
   }
 
-  void _updateTooltip(String label, double dy) {
+  void _updateTooltip(String label, double offsetY) {
     _tooltipLabel = label;
-    _tooltipDy = dy;
+    _tooltipDy = offsetY;
     _tooltipEntry?.markNeedsBuild();
   }
 
@@ -302,17 +302,17 @@ class _TooltipBubble extends StatelessWidget {
   const _TooltipBubble({
     required this.label,
     required this.color,
-    required this.dy,
+    required this.offsetY,
   });
 
   final String label;
   final Color color;
-  final double dy;
+  final double offsetY;
 
   @override
   Widget build(BuildContext context) {
     return Transform.translate(
-      offset: Offset(0, dy - 20),
+      offset: Offset(0, offsetY - 20),
       child: Container(
         width: 40,
         height: 40,
@@ -332,8 +332,8 @@ class _IndexLabel extends StatelessWidget {
   const _IndexLabel({
     required this.label,
     required this.fontSize,
-    required this.isActive,
-    required this.isAvailable,
+    required this.active,
+    required this.available,
     required this.activeColor,
     required this.mutedColor,
     required this.defaultColor,
@@ -342,8 +342,8 @@ class _IndexLabel extends StatelessWidget {
 
   final String label;
   final double fontSize;
-  final bool isActive;
-  final bool isAvailable;
+  final bool active;
+  final bool available;
   final Color activeColor;
   final Color mutedColor;
   final Color defaultColor;
@@ -352,9 +352,9 @@ class _IndexLabel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final Color color;
-    if (isActive) {
+    if (active) {
       color = activeColor;
-    } else if (!isAvailable) {
+    } else if (!available) {
       color = mutedColor;
     } else {
       color = defaultColor;

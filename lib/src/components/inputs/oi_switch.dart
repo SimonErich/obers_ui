@@ -134,16 +134,22 @@ class _OiSwitchState extends State<OiSwitch> {
     );
 
     if (widget.label != null) {
-      content = Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          content,
-          const SizedBox(width: 8),
-          Text(
-            widget.label!,
-            style: TextStyle(fontSize: 14, color: colors.text),
-          ),
-        ],
+      content = GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: widget.enabled
+            ? () => widget.onChanged?.call(!widget.value)
+            : null,
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            content,
+            const SizedBox(width: 8),
+            Text(
+              widget.label!,
+              style: TextStyle(fontSize: 14, color: colors.text),
+            ),
+          ],
+        ),
       );
     }
 

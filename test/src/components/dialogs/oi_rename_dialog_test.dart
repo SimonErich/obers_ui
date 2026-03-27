@@ -19,7 +19,7 @@ void main() {
           file: const OiFileNodeData(
             id: '1',
             name: 'report.pdf',
-            isFolder: false,
+            folder: false,
           ),
           onRename: (_) {},
         ),
@@ -33,7 +33,7 @@ void main() {
           file: const OiFileNodeData(
             id: '1',
             name: 'report.pdf',
-            isFolder: false,
+            folder: false,
           ),
           onRename: (_) {},
         ),
@@ -47,7 +47,7 @@ void main() {
           file: const OiFileNodeData(
             id: '1',
             name: 'report.pdf',
-            isFolder: false,
+            folder: false,
           ),
           onRename: (_) {},
         ),
@@ -61,7 +61,7 @@ void main() {
           file: const OiFileNodeData(
             id: '1',
             name: 'report.pdf',
-            isFolder: false,
+            folder: false,
           ),
           onRename: (_) {},
         ),
@@ -77,7 +77,7 @@ void main() {
           file: const OiFileNodeData(
             id: '1',
             name: 'report.pdf',
-            isFolder: false,
+            folder: false,
           ),
           onRename: (_) {},
         ),
@@ -93,7 +93,7 @@ void main() {
           file: const OiFileNodeData(
             id: '1',
             name: 'report.pdf',
-            isFolder: false,
+            folder: false,
           ),
           onRename: (_) {},
           validate: (name) =>
@@ -112,7 +112,7 @@ void main() {
           file: const OiFileNodeData(
             id: '1',
             name: 'report.pdf',
-            isFolder: false,
+            folder: false,
           ),
           onRename: (name) => renamed = name,
         ),
@@ -131,7 +131,7 @@ void main() {
           file: const OiFileNodeData(
             id: '1',
             name: 'report.pdf',
-            isFolder: false,
+            folder: false,
           ),
           onRename: (name) => renamed = name,
         ),
@@ -152,7 +152,7 @@ void main() {
           file: const OiFileNodeData(
             id: '1',
             name: 'report.pdf',
-            isFolder: false,
+            folder: false,
           ),
           onRename: (_) {},
           onCancel: () => cancelled = true,
@@ -170,7 +170,7 @@ void main() {
           file: const OiFileNodeData(
             id: '1',
             name: 'report.pdf',
-            isFolder: false,
+            folder: false,
           ),
           onRename: (_) {},
           onCancel: () => cancelled = true,
@@ -190,7 +190,7 @@ void main() {
           file: const OiFileNodeData(
             id: '1',
             name: 'report.pdf',
-            isFolder: false,
+            folder: false,
           ),
           onRename: (_) {},
         ),
@@ -204,7 +204,7 @@ void main() {
           file: const OiFileNodeData(
             id: '1',
             name: 'Documents',
-            isFolder: true,
+            folder: true,
           ),
           onRename: (_) {},
         ),

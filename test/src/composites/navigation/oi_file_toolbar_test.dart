@@ -90,22 +90,29 @@ void main() {
   // ── Search toggle (REQ-0945) ─────────────────────────────────────────────
 
   group('Search toggle (REQ-0945)', () {
+    // Helper to find the search/close icon button by its Semantics label in
+    // the widget tree (bySemanticsLabel uses the semantic tree which may not
+    // always reflect widget-tree labels in test environments).
+    Finder _findBySemanticLabel(String label) => find.byWidgetPredicate(
+      (w) => w is Semantics && w.properties.label == label,
+    );
+
     testWidgets('search icon visible when onSearch provided', (tester) async {
       await tester.pumpObers(_toolbar(onSearch: (_) {}));
 
-      expect(find.bySemanticsLabel('Search'), findsOneWidget);
+      expect(_findBySemanticLabel('Search'), findsOneWidget);
     });
 
     testWidgets('search icon hidden when onSearch is null', (tester) async {
       await tester.pumpObers(_toolbar());
 
-      expect(find.bySemanticsLabel('Search'), findsNothing);
+      expect(_findBySemanticLabel('Search'), findsNothing);
     });
 
     testWidgets('tapping search icon shows text input', (tester) async {
       await tester.pumpObers(_toolbar(onSearch: (_) {}));
 
-      await tester.tap(find.bySemanticsLabel('Search'));
+      await tester.tap(_findBySemanticLabel('Search'));
       await tester.pumpAndSettle();
 
       expect(find.byType(EditableText), findsOneWidget);
@@ -117,12 +124,12 @@ void main() {
       await tester.pumpObers(_toolbar(onSearch: (_) {}));
 
       // Open search.
-      await tester.tap(find.bySemanticsLabel('Search'));
+      await tester.tap(_findBySemanticLabel('Search'));
       await tester.pumpAndSettle();
       expect(find.byType(EditableText), findsOneWidget);
 
       // Close search.
-      await tester.tap(find.bySemanticsLabel('Close search'));
+      await tester.tap(_findBySemanticLabel('Close search'));
       await tester.pumpAndSettle();
 
       expect(find.byType(EditableText), findsNothing);
@@ -133,7 +140,7 @@ void main() {
       await tester.pumpObers(_toolbar(onSearch: (_) {}));
 
       // Open search and pump a single frame to start the transition.
-      await tester.tap(find.bySemanticsLabel('Search'));
+      await tester.tap(_findBySemanticLabel('Search'));
       await tester.pump();
 
       // During the crossfade both a FadeTransition (from the inner OiMorph)
@@ -145,7 +152,7 @@ void main() {
       await tester.pumpAndSettle();
 
       // Close search and verify the reverse crossfade.
-      await tester.tap(find.bySemanticsLabel('Close search'));
+      await tester.tap(_findBySemanticLabel('Close search'));
       await tester.pump();
 
       expect(find.byType(FadeTransition), findsWidgets);
@@ -157,7 +164,7 @@ void main() {
     testWidgets('search field gets autofocus when opened', (tester) async {
       await tester.pumpObers(_toolbar(onSearch: (_) {}));
 
-      await tester.tap(find.bySemanticsLabel('Search'));
+      await tester.tap(_findBySemanticLabel('Search'));
       await tester.pumpAndSettle();
 
       final editableText = tester.widget<EditableText>(
@@ -169,14 +176,23 @@ void main() {
 
   // ── Debounced search (REQ-0946) ──────────────────────────────────────────
 
+  // Helper to open the search bar.
+  Future<void> _openSearch(WidgetTester tester) async {
+    await tester.tap(
+      find.byWidgetPredicate(
+        (w) => w is Semantics && w.properties.label == 'Search',
+      ),
+    );
+    await tester.pumpAndSettle();
+  }
+
   group('Debounced search (REQ-0946)', () {
     testWidgets('onSearch not called before debounce elapses', (tester) async {
       final calls = <String>[];
       await tester.pumpObers(_toolbar(onSearch: calls.add));
 
       // Open search.
-      await tester.tap(find.bySemanticsLabel('Search'));
-      await tester.pumpAndSettle();
+      await _openSearch(tester);
 
       // Type text.
       await tester.enterText(find.byType(EditableText), 'hello');
@@ -189,8 +205,7 @@ void main() {
       final calls = <String>[];
       await tester.pumpObers(_toolbar(onSearch: calls.add));
 
-      await tester.tap(find.bySemanticsLabel('Search'));
-      await tester.pumpAndSettle();
+      await _openSearch(tester);
 
       await tester.enterText(find.byType(EditableText), 'hello');
       await tester.pump(const Duration(milliseconds: 300));
@@ -202,8 +217,7 @@ void main() {
       final calls = <String>[];
       await tester.pumpObers(_toolbar(onSearch: calls.add));
 
-      await tester.tap(find.bySemanticsLabel('Search'));
-      await tester.pumpAndSettle();
+      await _openSearch(tester);
 
       await tester.enterText(find.byType(EditableText), 'a');
       await tester.pump(const Duration(milliseconds: 200));
@@ -218,8 +232,7 @@ void main() {
       final calls = <String>[];
       await tester.pumpObers(_toolbar(onSearch: calls.add));
 
-      await tester.tap(find.bySemanticsLabel('Search'));
-      await tester.pumpAndSettle();
+      await _openSearch(tester);
 
       await tester.enterText(find.byType(EditableText), 'test');
       await tester.pump(const Duration(milliseconds: 300));

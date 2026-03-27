@@ -262,24 +262,25 @@ void main() {
       // The parent 'Settings' should be visible.
       expect(find.text('Settings'), findsOneWidget);
 
-      // Children should not be visible until parent is expanded.
-      expect(find.text('General'), findsNothing);
-      expect(find.text('Security'), findsNothing);
+      // Children exist in the tree but are clipped to zero height by
+      // SizeTransition. They are not hit-testable when collapsed.
+      expect(find.text('General').hitTestable(), findsNothing);
+      expect(find.text('Security').hitTestable(), findsNothing);
 
       // Tap Settings to expand the accordion.
       await tester.tap(find.text('Settings'));
       await tester.pumpAndSettle();
 
-      // Children should now be visible.
-      expect(find.text('General'), findsOneWidget);
-      expect(find.text('Security'), findsOneWidget);
+      // After expanding, children should be hit-testable (visible and tappable).
+      expect(find.text('General').hitTestable(), findsOneWidget);
+      expect(find.text('Security').hitTestable(), findsOneWidget);
 
       // Tap again to collapse.
       await tester.tap(find.text('Settings'));
       await tester.pumpAndSettle();
 
-      expect(find.text('General'), findsNothing);
-      expect(find.text('Security'), findsNothing);
+      expect(find.text('General').hitTestable(), findsNothing);
+      expect(find.text('Security').hitTestable(), findsNothing);
     });
 
     testWidgets('user menu renders in top bar', (tester) async {

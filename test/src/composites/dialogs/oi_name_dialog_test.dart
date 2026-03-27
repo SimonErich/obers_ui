@@ -70,8 +70,8 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // Tap the input to connect the test text input, then submit.
-      await tester.tap(find.byType(EditableText));
+      // Show keyboard to connect the test text input, then submit.
+      await tester.showKeyboard(find.byType(EditableText));
       await tester.pumpAndSettle();
       await tester.testTextInput.receiveAction(TextInputAction.done);
       await tester.pumpAndSettle();

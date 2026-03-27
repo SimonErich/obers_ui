@@ -18,13 +18,8 @@ void _focusKeyboardListener(WidgetTester tester) {
   kl.focusNode.requestFocus();
 }
 
-OiFileNodeData _file(String name, {bool isFolder = false, int? itemCount}) =>
-    OiFileNodeData(
-      id: name,
-      name: name,
-      isFolder: isFolder,
-      itemCount: itemCount,
-    );
+OiFileNodeData _file(String name, {bool folder = false, int? itemCount}) =>
+    OiFileNodeData(id: name, name: name, folder: folder, itemCount: itemCount);
 
 void main() {
   group('OiDeleteDialog', () {
@@ -66,7 +61,7 @@ void main() {
     testWidgets('shows folder item count', (tester) async {
       await tester.pumpObers(
         OiDeleteDialog(
-          files: [_file('Photos', isFolder: true, itemCount: 42)],
+          files: [_file('Photos', folder: true, itemCount: 42)],
           onDelete: () {},
         ),
       );

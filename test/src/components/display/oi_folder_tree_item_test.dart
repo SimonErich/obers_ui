@@ -11,20 +11,20 @@ import 'package:obers_ui/src/models/oi_file_node_data.dart';
 import '../../../helpers/pump_app.dart';
 
 void main() {
-  const folder = OiFileNodeData(id: 'f1', name: 'Documents', isFolder: true);
+  const folder = OiFileNodeData(id: 'f1', name: 'Documents', folder: true);
 
   const sharedFolder = OiFileNodeData(
     id: 'f2',
     name: 'Shared',
-    isFolder: true,
-    isShared: true,
+    folder: true,
+    shared: true,
   );
 
   const trashedFolder = OiFileNodeData(
     id: 'f3',
     name: 'Old Stuff',
-    isFolder: true,
-    isTrashed: true,
+    folder: true,
+    trashed: true,
   );
 
   testWidgets('renders folder name', (tester) async {

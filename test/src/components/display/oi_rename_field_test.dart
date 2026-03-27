@@ -236,7 +236,7 @@ void main() {
     await tester.pumpObers(
       OiRenameField(
         currentName: 'My Folder',
-        isFolder: true,
+        folder: true,
         onRename: (_) {},
         onCancel: () {},
       ),

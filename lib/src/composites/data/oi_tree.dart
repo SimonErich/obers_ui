@@ -247,8 +247,7 @@ class OiTree<T> extends StatefulWidget {
   State<OiTree<T>> createState() => _OiTreeState<T>();
 }
 
-class _OiTreeState<T> extends State<OiTree<T>>
-    with TickerProviderStateMixin {
+class _OiTreeState<T> extends State<OiTree<T>> with TickerProviderStateMixin {
   late OiTreeController _ctrl;
   bool _ownsController = false;
   final Map<String, AnimationController> _expandControllers = {};
@@ -303,7 +302,18 @@ class _OiTreeState<T> extends State<OiTree<T>>
     if (_ownsController) _ctrl.dispose();
   }
 
-  void _onControllerChanged() => setState(() {});
+  void _onControllerChanged() {
+    // Snap animation controllers to the logical expanded state for external
+    // controller mutations so tests and programmatic changes take immediate
+    // effect without waiting for the animation to complete.
+    for (final entry in _expandControllers.entries) {
+      final nodeId = entry.key;
+      final animCtrl = entry.value;
+      final shouldBeExpanded = _ctrl.expanded(nodeId);
+      animCtrl.value = shouldBeExpanded ? 1.0 : 0.0;
+    }
+    setState(() {});
+  }
 
   // ── Event handlers ────────────────────────────────────────────────────────
 
@@ -360,26 +370,29 @@ class _OiTreeState<T> extends State<OiTree<T>>
     if (!node.hasChildren) return row;
 
     final controller = _controllerFor(node.id);
+    final isExpanded = _ctrl.expanded(node.id);
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         row,
-        SizeTransition(
-          sizeFactor: CurvedAnimation(
-            parent: controller,
-            curve: Curves.easeInOut,
+        if (isExpanded || !controller.isDismissed)
+          SizeTransition(
+            sizeFactor: CurvedAnimation(
+              parent: controller,
+              curve: Curves.easeInOut,
+            ),
+            axisAlignment: -1,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                for (final child in node.children)
+                  _buildNodeTree(context, child, depth + 1),
+              ],
+            ),
           ),
-          axisAlignment: -1,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              for (final child in node.children)
-                _buildNodeTree(context, child, depth + 1),
-            ],
-          ),
-        ),
       ],
     );
   }

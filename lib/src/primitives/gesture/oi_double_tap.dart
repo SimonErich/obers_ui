@@ -49,6 +49,7 @@ class OiDoubleTap extends StatelessWidget {
       child: GestureDetector(
         onDoubleTap: enabled ? onDoubleTap : null,
         onTap: enabled ? onTap : null,
+        behavior: HitTestBehavior.opaque,
         child: child,
       ),
     );

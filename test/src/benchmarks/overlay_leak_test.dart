@@ -41,6 +41,7 @@ void main() {
     testWidgets('rapid show/dismiss cycle does not throw', (tester) async {
       await tester.pumpObers(
         Builder(builder: (context) => const SizedBox.expand()),
+        surfaceSize: const Size(1200, 6500),
       );
 
       final context = tester.element(find.byType(SizedBox).last);

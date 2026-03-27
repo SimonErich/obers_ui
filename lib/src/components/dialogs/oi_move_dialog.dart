@@ -87,7 +87,7 @@ class _OiMoveDialogState extends State<OiMoveDialog> {
   bool _isSelfOrDescendant(OiTreeNode<OiFileNodeData> node) {
     // Prevent moving a folder into itself or its descendants
     for (final file in widget.files) {
-      if (file.isFolder && file.id == node.id) return true;
+      if (file.folder && file.id == node.id) return true;
     }
     return false;
   }

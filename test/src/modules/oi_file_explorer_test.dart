@@ -19,30 +19,30 @@ const _testFiles = [
   OiFileNodeData(
     id: 'file1',
     name: 'report.pdf',
-    isFolder: false,
+    folder: false,
     size: 1024 * 1024,
     mimeType: 'application/pdf',
   ),
   OiFileNodeData(
     id: 'file2',
     name: 'photo.jpg',
-    isFolder: false,
+    folder: false,
     size: 2048000,
     mimeType: 'image/jpeg',
   ),
-  OiFileNodeData(id: 'folder1', name: 'Archive', isFolder: true, itemCount: 8),
+  OiFileNodeData(id: 'folder1', name: 'Archive', folder: true, itemCount: 8),
 ];
 
 final _folderTree = <OiTreeNode<OiFileNodeData>>[
   const OiTreeNode<OiFileNodeData>(
     id: 'root',
     label: 'Home',
-    data: OiFileNodeData(id: 'root', name: 'Home', isFolder: true),
+    data: OiFileNodeData(id: 'root', name: 'Home', folder: true),
     children: [
       OiTreeNode<OiFileNodeData>(
         id: 'docs',
         label: 'Documents',
-        data: OiFileNodeData(id: 'docs', name: 'Documents', isFolder: true),
+        data: OiFileNodeData(id: 'docs', name: 'Documents', folder: true),
       ),
     ],
   ),
@@ -86,7 +86,7 @@ Widget _explorer({
       onCreateFolder:
           onCreateFolder ??
           (parentId, name) async =>
-              OiFileNodeData(id: 'new_folder', name: name, isFolder: true),
+              OiFileNodeData(id: 'new_folder', name: name, folder: true),
       onRename: onRename ?? (_, __) async {},
       onDelete: onDelete ?? (_) async {},
       onMove: onMove ?? (_, __) async {},
@@ -221,7 +221,7 @@ void main() {
       // Navigate to root folder
       await controller.navigateTo(
         'root',
-        folder: const OiFileNodeData(id: 'root', name: 'Home', isFolder: true),
+        folder: const OiFileNodeData(id: 'root', name: 'Home', folder: true),
       );
       await tester.pumpAndSettle();
 
@@ -239,7 +239,7 @@ void main() {
 
       await controller.navigateTo(
         'root',
-        folder: const OiFileNodeData(id: 'root', name: 'Home', isFolder: true),
+        folder: const OiFileNodeData(id: 'root', name: 'Home', folder: true),
       );
       await tester.pumpAndSettle();
 
@@ -260,7 +260,7 @@ void main() {
 
       await controller.navigateTo(
         'root',
-        folder: const OiFileNodeData(id: 'root', name: 'Home', isFolder: true),
+        folder: const OiFileNodeData(id: 'root', name: 'Home', folder: true),
       );
       await tester.pumpAndSettle();
 
@@ -289,7 +289,7 @@ void main() {
 
       await controller.navigateTo(
         'root',
-        folder: const OiFileNodeData(id: 'root', name: 'Home', isFolder: true),
+        folder: const OiFileNodeData(id: 'root', name: 'Home', folder: true),
       );
       await tester.pumpAndSettle();
 
@@ -311,7 +311,7 @@ void main() {
 
       await controller.navigateTo(
         'root',
-        folder: const OiFileNodeData(id: 'root', name: 'Home', isFolder: true),
+        folder: const OiFileNodeData(id: 'root', name: 'Home', folder: true),
       );
       await tester.pumpAndSettle();
 
@@ -330,7 +330,7 @@ void main() {
 
       await controller.navigateTo(
         'root',
-        folder: const OiFileNodeData(id: 'root', name: 'Home', isFolder: true),
+        folder: const OiFileNodeData(id: 'root', name: 'Home', folder: true),
       );
       await tester.pumpAndSettle();
 
@@ -440,7 +440,7 @@ void main() {
 
       await controller.navigateTo(
         'root',
-        folder: const OiFileNodeData(id: 'root', name: 'Home', isFolder: true),
+        folder: const OiFileNodeData(id: 'root', name: 'Home', folder: true),
       );
       await tester.pumpAndSettle();
 
@@ -460,7 +460,7 @@ void main() {
 
       await controller.navigateTo(
         'root',
-        folder: const OiFileNodeData(id: 'root', name: 'Home', isFolder: true),
+        folder: const OiFileNodeData(id: 'root', name: 'Home', folder: true),
       );
       await tester.pumpAndSettle();
 
@@ -524,7 +524,7 @@ void main() {
 
       await controller.navigateTo(
         'root',
-        folder: const OiFileNodeData(id: 'root', name: 'Home', isFolder: true),
+        folder: const OiFileNodeData(id: 'root', name: 'Home', folder: true),
       );
       await tester.pumpAndSettle();
 

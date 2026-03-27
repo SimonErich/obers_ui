@@ -61,8 +61,8 @@ void main() {
 
     // Completed steps render an Icon widget with the check icon.
     final icons = tester.widgetList<Icon>(find.byType(Icon)).toList();
-    // Two completed steps should each have a check icon (0xe5ca).
-    final checkIcons = icons.where((i) => i.icon?.codePoint == 0xe5ca).toList();
+    // Two completed steps should each have a check icon (OiIcons.check = 0xe06c).
+    final checkIcons = icons.where((i) => i.icon?.codePoint == 0xe06c).toList();
     expect(checkIcons.length, 2);
   });
 
@@ -71,8 +71,8 @@ void main() {
     await tester.pumpObers(_stepper(currentStep: 1, errorSteps: {0}));
 
     final icons = tester.widgetList<Icon>(find.byType(Icon)).toList();
-    // One error step should have the error icon (0xe000).
-    final errorIcons = icons.where((i) => i.icon?.codePoint == 0xe000).toList();
+    // One error step should have the error icon (OiIcons.circleAlert = 0xe077).
+    final errorIcons = icons.where((i) => i.icon?.codePoint == 0xe077).toList();
     expect(errorIcons.length, 1);
   });
 

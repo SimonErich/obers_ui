@@ -10,32 +10,32 @@ import 'package:obers_ui/src/models/oi_file_node_data.dart';
 import '../../../helpers/pump_app.dart';
 
 void main() {
-  const pdfFile = OiFileNodeData(id: '1', name: 'report.pdf', isFolder: false);
+  const pdfFile = OiFileNodeData(id: '1', name: 'report.pdf', folder: false);
 
   const imageFile = OiFileNodeData(
     id: '2',
     name: 'photo.png',
-    isFolder: false,
+    folder: false,
     url: 'https://example.com/photo.png',
   );
 
   const videoFile = OiFileNodeData(
     id: '3',
     name: 'clip.mp4',
-    isFolder: false,
+    folder: false,
     url: 'https://example.com/clip.mp4',
   );
 
   const videoFileNoUrl = OiFileNodeData(
     id: '4',
     name: 'clip.mp4',
-    isFolder: false,
+    folder: false,
   );
 
   const thumbnailFile = OiFileNodeData(
     id: '5',
     name: 'doc.pdf',
-    isFolder: false,
+    folder: false,
     thumbnailUrl: 'https://example.com/thumb.png',
   );
 
