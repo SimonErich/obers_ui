@@ -1,3 +1,4 @@
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/overlays/oi_dialog_shell.dart';
 import 'package:obers_ui/src/foundation/oi_icons.dart';
@@ -45,6 +46,9 @@ class OiDatePicker extends StatefulWidget {
     this.rangeMode = false,
     this.displayMonth,
     this.onDisplayMonthChanged,
+    this.disabledDates,
+    this.disabledDaysOfWeek,
+    this.firstDayOfWeek,
     super.key,
   });
 
@@ -71,6 +75,15 @@ class OiDatePicker extends StatefulWidget {
 
   /// When `true`, the picker operates in date-range selection mode.
   final bool rangeMode;
+
+  /// Specific dates that cannot be selected. Rendered with muted styling.
+  final Set<DateTime>? disabledDates;
+
+  /// Days of the week that cannot be selected (1=Monday, 7=Sunday).
+  final Set<int>? disabledDaysOfWeek;
+
+  /// First day of the week (1=Monday, 7=Sunday). Defaults to Sunday.
+  final int? firstDayOfWeek;
 
   /// Externally controlled display month. When provided, the picker shows
   /// this month instead of managing its own display month state.
@@ -221,6 +234,15 @@ class _OiDatePickerState extends State<OiDatePicker> {
     final last = widget.lastDate;
     if (first != null && day.isBefore(first)) return true;
     if (last != null && day.isAfter(last)) return true;
+    if (widget.disabledDates != null) {
+      for (final d in widget.disabledDates!) {
+        if (_sameDay(d, day)) return true;
+      }
+    }
+    if (widget.disabledDaysOfWeek != null &&
+        widget.disabledDaysOfWeek!.contains(day.weekday)) {
+      return true;
+    }
     return false;
   }
 
@@ -234,8 +256,11 @@ class _OiDatePickerState extends State<OiDatePicker> {
 
     // First day of the display month.
     final firstOfMonth = _effectiveDisplayMonth;
-    // Day-of-week offset: 0=Sun, 1=Mon ... 6=Sat
-    final startOffset = firstOfMonth.weekday % 7; // DateTime.weekday: 1=Mon
+    // Compute grid start offset respecting firstDayOfWeek.
+    // DateTime.weekday: 1=Mon ... 7=Sun.
+    final fdow = widget.firstDayOfWeek ?? 7; // Default Sunday (7)
+    var startOffset = firstOfMonth.weekday - fdow;
+    if (startOffset < 0) startOffset += 7;
     final daysInMonth = DateTime(
       firstOfMonth.year,
       firstOfMonth.month + 1,
@@ -340,7 +365,7 @@ class _OiDatePickerState extends State<OiDatePicker> {
                 Expanded(
                   child: Center(
                     child: Text(
-                      '${_kMonths[_displayMonth.month - 1]} ${_displayMonth.year}',
+                      '${_kMonths[_effectiveDisplayMonth.month - 1]} ${_effectiveDisplayMonth.year}',
                       style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w600,
