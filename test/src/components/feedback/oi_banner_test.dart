@@ -55,16 +55,14 @@ void main() {
 
   testWidgets('shows dismiss button when dismissible is true', (tester) async {
     await tester.pumpObers(const OiBanner.info(message: 'Notice'));
-    // The dismiss icon (x) should be present.
-    expect(find.byType(GestureDetector), findsOneWidget);
+    expect(find.byType(OiIconButton), findsOneWidget);
   });
 
   testWidgets('hides dismiss button when dismissible is false', (tester) async {
     await tester.pumpObers(
       const OiBanner.error(message: 'Critical', dismissible: false),
     );
-    // No GestureDetector for dismiss.
-    expect(find.byType(GestureDetector), findsNothing);
+    expect(find.byType(OiIconButton), findsNothing);
   });
 
   testWidgets('calls onDismiss when dismiss button tapped', (tester) async {
@@ -72,14 +70,14 @@ void main() {
     await tester.pumpObers(
       OiBanner.info(message: 'Notice', onDismiss: () => dismissed = true),
     );
-    await tester.tap(find.byType(GestureDetector));
+    await tester.tap(find.byType(OiIconButton));
     expect(dismissed, isTrue);
   });
 
   testWidgets('animates out after self-dismiss (no onDismiss)', (tester) async {
     await tester.pumpObers(const OiBanner.info(message: 'Bye'));
     expect(find.text('Bye'), findsOneWidget);
-    await tester.tap(find.byType(GestureDetector));
+    await tester.tap(find.byType(OiIconButton));
     await tester.pumpAndSettle();
     expect(find.text('Bye'), findsNothing);
   });
@@ -94,6 +92,18 @@ void main() {
       ),
     );
     expect(find.text('Upgrade'), findsOneWidget);
+  });
+
+  testWidgets('renders secondary action widget', (tester) async {
+    await tester.pumpObers(
+      OiBanner.info(
+        message: 'Notice',
+        action: OiButton.outline(label: 'Primary', onTap: () {}),
+        secondaryAction: OiButton.ghost(label: 'Secondary', onTap: () {}),
+      ),
+    );
+    expect(find.text('Primary'), findsOneWidget);
+    expect(find.text('Secondary'), findsOneWidget);
   });
 
   // ── Icon ────────────────────────────────────────────────────────────────

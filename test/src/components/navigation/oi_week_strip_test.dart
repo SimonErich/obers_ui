@@ -199,7 +199,7 @@ void main() {
       surfaceSize: const Size(800, 200),
     );
 
-    expect(find.text('March 2026'), findsOneWidget);
+    expect(find.textContaining('March'), findsOneWidget);
   });
 
   // ── Today Label ────────────────────────────────────────────────────────────
@@ -244,5 +244,73 @@ void main() {
     // Still showing current week.
     expect(find.text('23'), findsOneWidget);
     expect(find.text('29'), findsOneWidget);
+  });
+
+  // ── New params ──────────────────────────────────────────────────────────
+
+  testWidgets('disabledDates prevents selection of specific dates', (
+    tester,
+  ) async {
+    DateTime? selected;
+    await tester.pumpObers(
+      OiWeekStrip(
+        selectedDate: DateTime(2026, 3, 25),
+        onDateSelected: (d) => selected = d,
+        label: 'Week',
+        disabledDates: {DateTime(2026, 3, 26)},
+      ),
+      surfaceSize: const Size(800, 200),
+    );
+    await tester.tap(find.text('26'));
+    expect(selected, isNull);
+  });
+
+  testWidgets('disabledDaysOfWeek prevents selection of weekday types', (
+    tester,
+  ) async {
+    DateTime? selected;
+    await tester.pumpObers(
+      OiWeekStrip(
+        selectedDate: DateTime(2026, 3, 25),
+        onDateSelected: (d) => selected = d,
+        label: 'Week',
+        disabledDaysOfWeek: {DateTime.sunday}, // Sunday = 7
+      ),
+      surfaceSize: const Size(800, 200),
+    );
+    // Sunday the 29th should be disabled.
+    await tester.tap(find.text('29'));
+    expect(selected, isNull);
+  });
+
+  testWidgets('showYear displays year with month', (tester) async {
+    await tester.pumpObers(
+      OiWeekStrip(
+        selectedDate: DateTime(2026, 3, 25),
+        onDateSelected: (_) {},
+        label: 'Week',
+        showMonth: true,
+        showYear: true,
+      ),
+      surfaceSize: const Size(800, 200),
+    );
+    // The month label should contain "2026".
+    expect(find.textContaining('2026'), findsOneWidget);
+  });
+
+  testWidgets('eventDotColor customizes dot color', (tester) async {
+    await tester.pumpObers(
+      OiWeekStrip(
+        selectedDate: DateTime(2026, 3, 25),
+        onDateSelected: (_) {},
+        label: 'Week',
+        eventCounts: {DateTime(2026, 3, 25): 1},
+        eventDotColor: const Color(0xFFFF0000),
+      ),
+      surfaceSize: const Size(800, 200),
+    );
+    // Event dot should render.
+    final widget = tester.widget<OiWeekStrip>(find.byType(OiWeekStrip));
+    expect(widget.eventDotColor, const Color(0xFFFF0000));
   });
 }

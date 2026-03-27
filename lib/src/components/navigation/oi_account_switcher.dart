@@ -152,10 +152,13 @@ class _OiAccountSwitcherState<T> extends State<OiAccountSwitcher<T>> {
     final avatar = _avatarFor(active);
     final name = _labelFor(active);
 
+    final color = widget.colorOf?.call(active);
+
     final avatarWidget = OiAvatar(
       semanticLabel: name,
       initials: avatar,
       size: OiAvatarSize.sm,
+      backgroundColor: color,
     );
 
     final content = widget.compact
@@ -209,6 +212,7 @@ class _OiAccountSwitcherState<T> extends State<OiAccountSwitcher<T>> {
               semanticLabel: _labelFor(account),
               initials: _avatarFor(account),
               size: OiAvatarSize.xs,
+              backgroundColor: widget.colorOf?.call(account),
             ),
             trailing: _isActive(account)
                 ? const OiIcon.decorative(icon: OiIcons.check, size: 16)

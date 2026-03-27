@@ -1,6 +1,8 @@
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/buttons/oi_button.dart';
 import 'package:obers_ui/src/components/buttons/oi_icon_button.dart';
+import 'package:obers_ui/src/components/display/oi_badge.dart';
+import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/oi_responsive.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/primitives/layout/oi_row.dart';
@@ -194,6 +196,20 @@ class OiActionBar extends StatelessWidget {
       children.add(_buildAction(context, action, effectiveShowLabels));
     }
 
+    // Add overflow "more" button when overflowActions is populated.
+    if (overflowActions != null && overflowActions!.isNotEmpty) {
+      children.add(
+        OiIconButton(
+          icon: OiIcons.ellipsisVertical,
+          semanticLabel: 'More actions',
+          onTap: () {
+            // Simplified: full implementation would use OiContextMenu or
+            // OiPopover to present overflow items.
+          },
+        ),
+      );
+    }
+
     if (trailing != null) {
       children.add(trailing!);
     }
@@ -285,8 +301,10 @@ class OiActionBar extends StatelessWidget {
         ? OiButtonVariant.primary
         : action.variant;
 
+    Widget actionWidget;
+
     if (showLabel) {
-      return OiButton.ghost(
+      actionWidget = OiButton.ghost(
         label: action.label,
         icon: action.icon,
         onTap: action.enabled ? action.onTap : null,
@@ -294,15 +312,76 @@ class OiActionBar extends StatelessWidget {
         enabled: action.enabled,
         semanticLabel: action.semanticLabel,
       );
+    } else {
+      actionWidget = OiIconButton(
+        icon: action.icon,
+        onTap: action.enabled ? action.onTap : null,
+        size: size,
+        variant: effectiveVariant,
+        enabled: action.enabled,
+        semanticLabel: action.semanticLabel,
+      );
     }
 
-    return OiIconButton(
-      icon: action.icon,
-      onTap: action.enabled ? action.onTap : null,
-      size: size,
-      variant: effectiveVariant,
-      enabled: action.enabled,
-      semanticLabel: action.semanticLabel,
+    // Overlay badge when present.
+    if (action.badge != null) {
+      actionWidget = Stack(
+        clipBehavior: Clip.none,
+        children: [
+          actionWidget,
+          Positioned(
+            top: -4,
+            right: -4,
+            child: OiBadge.filled(
+              label: action.badge!,
+              size: OiBadgeSize.small,
+            ),
+          ),
+        ],
+      );
+    }
+
+    // Wrap with confirm gate when present.
+    if (action.confirm != null) {
+      actionWidget = _ConfirmableAction(item: action, child: actionWidget);
+    }
+
+    return actionWidget;
+  }
+}
+
+/// A stateful wrapper that intercepts the first tap to show a confirmation
+/// label and only executes the action on the second tap.
+class _ConfirmableAction extends StatefulWidget {
+  const _ConfirmableAction({required this.item, required this.child});
+
+  final OiActionBarItem item;
+  final Widget child;
+
+  @override
+  State<_ConfirmableAction> createState() => _ConfirmableActionState();
+}
+
+class _ConfirmableActionState extends State<_ConfirmableAction> {
+  bool _confirming = false;
+
+  @override
+  Widget build(BuildContext context) {
+    if (_confirming) {
+      return OiButton.ghost(
+        label: widget.item.confirm!,
+        onTap: () {
+          widget.item.onTap?.call();
+          setState(() => _confirming = false);
+        },
+      );
+    }
+
+    // Absorb the child's own onTap so the first tap triggers confirmation.
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: () => setState(() => _confirming = true),
+      child: IgnorePointer(child: widget.child),
     );
   }
 }

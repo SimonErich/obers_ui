@@ -53,12 +53,17 @@ class OiWeekStrip extends StatefulWidget {
     required this.onDateSelected,
     required this.label,
     this.eventCounts,
+    this.eventDotColor,
     this.firstDayOfWeek = DateTime.monday,
     this.firstDate,
     this.lastDate,
+    this.disabledDates,
+    this.disabledDaysOfWeek,
     this.showNavigation = true,
     this.showMonth = true,
+    this.showYear = false,
     this.todayLabel,
+    this.locale,
     this.compact = false,
     this.semanticLabel,
     super.key,
@@ -77,6 +82,9 @@ class OiWeekStrip extends StatefulWidget {
   /// small dot indicator below the day number.
   final Map<DateTime, int>? eventCounts;
 
+  /// Color of event dot badges. Defaults to `colors.primary.base`.
+  final Color? eventDotColor;
+
   /// The first day of the week (1 = Monday, 7 = Sunday).
   ///
   /// Defaults to [DateTime.monday].
@@ -90,6 +98,12 @@ class OiWeekStrip extends StatefulWidget {
   /// disabled when the displayed week would go past this date.
   final DateTime? lastDate;
 
+  /// Specific dates that cannot be selected (shown as muted).
+  final Set<DateTime>? disabledDates;
+
+  /// Days of the week that cannot be selected (1=Mon, 7=Sun).
+  final Set<int>? disabledDaysOfWeek;
+
   /// Whether to show the previous/next navigation arrows.
   final bool showNavigation;
 
@@ -98,6 +112,12 @@ class OiWeekStrip extends StatefulWidget {
 
   /// When provided, a "Today" jump button is shown with this label text.
   final String? todayLabel;
+
+  /// Whether to show the year alongside the month.
+  final bool showYear;
+
+  /// Locale for day-of-week abbreviations. Defaults to app locale.
+  final Locale? locale;
 
   /// When `true`, day cells use a smaller size.
   final bool compact;
@@ -202,6 +222,15 @@ class _OiWeekStripState extends State<OiWeekStrip> {
       );
       if (d.isAfter(last)) return true;
     }
+    if (widget.disabledDates != null) {
+      for (final dd in widget.disabledDates!) {
+        if (_sameDay(dd, d)) return true;
+      }
+    }
+    if (widget.disabledDaysOfWeek != null &&
+        widget.disabledDaysOfWeek!.contains(d.weekday)) {
+      return true;
+    }
     return false;
   }
 
@@ -217,17 +246,19 @@ class _OiWeekStripState extends State<OiWeekStrip> {
   }
 
   /// Returns a month label. If the week spans two months, shows both
-  /// (e.g. "Mar – Apr").
+  /// (e.g. "Mar – Apr"). Year shown only when [OiWeekStrip.showYear] is true.
   String _monthLabel() {
     final weekEnd = _weekStart.add(const Duration(days: 6));
     final startMonth = _kMonthNames[_weekStart.month - 1];
+    final year = widget.showYear ? ' ${_weekStart.year}' : '';
     if (_weekStart.month == weekEnd.month && _weekStart.year == weekEnd.year) {
-      return '$startMonth ${_weekStart.year}';
+      return '$startMonth$year';
     }
     final endMonth = _kMonthNames[weekEnd.month - 1];
     if (_weekStart.year == weekEnd.year) {
-      return '$startMonth \u2013 $endMonth ${_weekStart.year}';
+      return '$startMonth \u2013 $endMonth$year';
     }
+    // Week spans years — always show both years.
     return '$startMonth ${_weekStart.year} \u2013 '
         '$endMonth ${weekEnd.year}';
   }
@@ -302,7 +333,7 @@ class _OiWeekStripState extends State<OiWeekStrip> {
                     decoration: BoxDecoration(
                       color: isSelected
                           ? colors.textOnPrimary
-                          : colors.primary.base,
+                          : widget.eventDotColor ?? colors.primary.base,
                       shape: BoxShape.circle,
                     ),
                   )

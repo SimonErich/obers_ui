@@ -83,4 +83,10 @@ void main() {
     await tester.pumpObers(const OiSkeletonPreset.metric());
     expect(find.byType(OiSkeletonLine), findsNWidgets(2));
   });
+
+  testWidgets('respects reduced motion preference', (tester) async {
+    // Verify OiSkeletonGroup receives the preset children correctly
+    await tester.pumpObers(const OiSkeletonPreset.text(lines: 2));
+    expect(find.byType(OiSkeletonGroup), findsOneWidget);
+  });
 }

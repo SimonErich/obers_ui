@@ -177,6 +177,36 @@ class OiDateRangePreset {
     },
   );
 
+  /// Yesterday (midnight to 23:59:59).
+  static OiDateRangePreset get yesterday => OiDateRangePreset(
+    label: 'Yesterday',
+    resolve: () {
+      final n = DateTime.now();
+      final y = DateTime(n.year, n.month, n.day - 1);
+      return (y, DateTime(y.year, y.month, y.day, 23, 59, 59));
+    },
+  );
+
+  /// Last 14 calendar days including today.
+  static OiDateRangePreset get last14Days => OiDateRangePreset(
+    label: 'Last 14 days',
+    resolve: () {
+      final n = DateTime.now();
+      final end = DateTime(n.year, n.month, n.day, 23, 59, 59);
+      final start = DateTime(n.year, n.month, n.day - 13);
+      return (start, end);
+    },
+  );
+
+  /// All time (earliest possible to now).
+  static OiDateRangePreset get allTime => OiDateRangePreset(
+    label: 'All time',
+    resolve: () {
+      final n = DateTime.now();
+      return (DateTime(2000), DateTime(n.year, n.month, n.day, 23, 59, 59));
+    },
+  );
+
   /// The default preset list used when [OiDateRangePickerField.presets] is
   /// null and [OiDateRangePickerField.showPresets] is `true`.
   static List<OiDateRangePreset> get defaults => [

@@ -164,5 +164,23 @@ void main() {
       expect(start.month, 1);
       expect(end.month, 12);
     });
+
+    test('yesterday resolves to previous day', () {
+      final (start, end) = OiDateRangePreset.yesterday.resolve();
+      final now = DateTime.now();
+      final expected = DateTime(now.year, now.month, now.day - 1);
+      expect(start.day, expected.day);
+      expect(start.month, expected.month);
+    });
+
+    test('last14Days spans 14 days', () {
+      final (start, end) = OiDateRangePreset.last14Days.resolve();
+      expect(end.difference(start).inDays, greaterThanOrEqualTo(13));
+    });
+
+    test('allTime starts at year 2000', () {
+      final (start, _) = OiDateRangePreset.allTime.resolve();
+      expect(start.year, 2000);
+    });
   });
 }

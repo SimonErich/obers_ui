@@ -1,9 +1,11 @@
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/src/components/buttons/oi_button.dart';
+import 'package:obers_ui/src/components/buttons/oi_icon_button.dart';
 import 'package:obers_ui/src/foundation/oi_icons.dart';
+import 'package:obers_ui/src/foundation/oi_responsive.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/primitives/display/oi_icon.dart';
 import 'package:obers_ui/src/primitives/display/oi_label.dart';
-import 'package:obers_ui/src/foundation/oi_responsive.dart';
 import 'package:obers_ui/src/primitives/layout/oi_row.dart';
 
 /// The severity level of an [OiBanner].
@@ -53,6 +55,7 @@ class OiBanner extends StatefulWidget {
     this.dismissible = true,
     this.compact = false,
     this.border = true,
+    this.visible,
     this.semanticLabel,
     super.key,
   });
@@ -70,6 +73,7 @@ class OiBanner extends StatefulWidget {
     bool dismissible = true,
     bool compact = false,
     bool border = true,
+    bool? visible,
     String? semanticLabel,
     Key? key,
   }) : this._(
@@ -83,6 +87,7 @@ class OiBanner extends StatefulWidget {
          dismissible: dismissible,
          compact: compact,
          border: border,
+         visible: visible,
          semanticLabel: semanticLabel,
          key: key,
        );
@@ -98,6 +103,7 @@ class OiBanner extends StatefulWidget {
     bool dismissible = true,
     bool compact = false,
     bool border = true,
+    bool? visible,
     String? semanticLabel,
     Key? key,
   }) : this._(
@@ -111,6 +117,7 @@ class OiBanner extends StatefulWidget {
          dismissible: dismissible,
          compact: compact,
          border: border,
+         visible: visible,
          semanticLabel: semanticLabel,
          key: key,
        );
@@ -126,6 +133,7 @@ class OiBanner extends StatefulWidget {
     bool dismissible = true,
     bool compact = false,
     bool border = true,
+    bool? visible,
     String? semanticLabel,
     Key? key,
   }) : this._(
@@ -139,6 +147,7 @@ class OiBanner extends StatefulWidget {
          dismissible: dismissible,
          compact: compact,
          border: border,
+         visible: visible,
          semanticLabel: semanticLabel,
          key: key,
        );
@@ -154,6 +163,7 @@ class OiBanner extends StatefulWidget {
     bool dismissible = true,
     bool compact = false,
     bool border = true,
+    bool? visible,
     String? semanticLabel,
     Key? key,
   }) : this._(
@@ -167,6 +177,7 @@ class OiBanner extends StatefulWidget {
          dismissible: dismissible,
          compact: compact,
          border: border,
+         visible: visible,
          semanticLabel: semanticLabel,
          key: key,
        );
@@ -182,6 +193,7 @@ class OiBanner extends StatefulWidget {
     bool dismissible = true,
     bool compact = false,
     bool border = true,
+    bool? visible,
     String? semanticLabel,
     Key? key,
   }) : this._(
@@ -195,6 +207,7 @@ class OiBanner extends StatefulWidget {
          dismissible: dismissible,
          compact: compact,
          border: border,
+         visible: visible,
          semanticLabel: semanticLabel,
          key: key,
        );
@@ -231,6 +244,10 @@ class OiBanner extends StatefulWidget {
   /// Whether to show a left accent border in the level color.
   final bool border;
 
+  /// When provided, controls visibility externally. When null, the banner
+  /// manages its own visibility (self-dismiss on tap).
+  final bool? visible;
+
   /// Accessibility label. Defaults to "$level: $message".
   final String? semanticLabel;
 
@@ -251,6 +268,17 @@ class _OiBannerState extends State<OiBanner>
       duration: const Duration(milliseconds: 250),
       value: 1,
     );
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final themeData = context.components.banner;
+    final duration =
+        themeData?.animationDuration ?? const Duration(milliseconds: 250);
+    if (_controller.duration != duration) {
+      _controller.duration = duration;
+    }
   }
 
   @override
@@ -281,14 +309,19 @@ class _OiBannerState extends State<OiBanner>
 
   @override
   Widget build(BuildContext context) {
-    if (!_visible) return const SizedBox.shrink();
+    if (widget.visible == false) return const SizedBox.shrink();
+    if (!_visible && widget.visible == null) return const SizedBox.shrink();
 
     final colors = context.colors;
     final spacing = context.spacing;
     final themeData = context.components.banner;
 
+    final effectiveCompact =
+        widget.compact ||
+        context.breakpoint.compareTo(OiBreakpoint.compact) <= 0;
+
     final effectiveIcon = widget.icon ?? _defaultIcon();
-    final showIcon = !widget.compact && effectiveIcon != null;
+    final showIcon = !effectiveCompact && effectiveIcon != null;
 
     // Resolve level-specific colors.
     final (bgColor, accentColor, iconColor) = switch (widget.level) {
@@ -324,7 +357,7 @@ class _OiBannerState extends State<OiBanner>
         themeData?.padding ??
         EdgeInsets.symmetric(
           horizontal: spacing.md,
-          vertical: widget.compact ? spacing.xs : spacing.sm,
+          vertical: effectiveCompact ? spacing.xs : spacing.sm,
         );
 
     final content = Semantics(
@@ -389,13 +422,12 @@ class _OiBannerState extends State<OiBanner>
                 ),
               ),
               if (widget.dismissible)
-                GestureDetector(
+                OiIconButton(
+                  icon: OiIcons.x,
+                  semanticLabel: 'Dismiss',
                   onTap: _dismiss,
-                  child: OiIcon.decorative(
-                    icon: OiIcons.x,
-                    color: colors.textMuted,
-                    size: 16,
-                  ),
+                  size: OiButtonSize.small,
+                  variant: OiButtonVariant.ghost,
                 ),
             ],
           ),

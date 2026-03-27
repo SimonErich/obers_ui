@@ -213,4 +213,102 @@ void main() {
     // The loading state renders a SizedBox with a spinner inside.
     expect(find.byType(SizedBox), findsWidgets);
   });
+
+  // ── Badge ─────────────────────────────────────────────────────────────────
+
+  testWidgets('badge renders on action', (tester) async {
+    await tester.pumpObers(
+      OiActionBar(
+        actions: [
+          OiActionBarItem(
+            icon: OiIcons.pencil,
+            label: 'Inbox',
+            semanticLabel: 'Inbox',
+            onTap: () {},
+            badge: '5',
+          ),
+        ],
+        label: 'Actions',
+      ),
+    );
+    expect(find.text('5'), findsOneWidget);
+  });
+
+  // ── Overflow actions ──────────────────────────────────────────────────────
+
+  testWidgets('empty overflowActions does not show more button', (
+    tester,
+  ) async {
+    await tester.pumpObers(
+      OiActionBar(
+        actions: [
+          OiActionBarItem(
+            icon: OiIcons.pencil,
+            label: 'Edit',
+            semanticLabel: 'Edit',
+            onTap: () {},
+          ),
+        ],
+        overflowActions: const [],
+        label: 'Actions',
+      ),
+    );
+    // Should not find a "more" button.
+    expect(find.bySemanticsLabel('More actions'), findsNothing);
+  });
+
+  testWidgets('non-empty overflowActions shows more button', (tester) async {
+    await tester.pumpObers(
+      OiActionBar(
+        actions: [
+          OiActionBarItem(
+            icon: OiIcons.pencil,
+            label: 'Edit',
+            semanticLabel: 'Edit',
+            onTap: () {},
+          ),
+        ],
+        overflowActions: [
+          OiActionBarItem(
+            icon: OiIcons.archive,
+            label: 'Archive',
+            semanticLabel: 'Archive',
+            onTap: () {},
+          ),
+        ],
+        label: 'Actions',
+      ),
+    );
+    expect(find.bySemanticsLabel('More actions'), findsOneWidget);
+  });
+
+  // ── Confirm ───────────────────────────────────────────────────────────────
+
+  testWidgets('confirm action requires two taps', (tester) async {
+    var executed = false;
+    await tester.pumpObers(
+      OiActionBar(
+        actions: [
+          OiActionBarItem(
+            icon: OiIcons.trash,
+            label: 'Delete',
+            semanticLabel: 'Delete',
+            confirm: 'Are you sure?',
+            onTap: () => executed = true,
+          ),
+        ],
+        label: 'Actions',
+      ),
+    );
+    // First tap shows confirmation.
+    await tester.tap(find.bySemanticsLabel('Delete'));
+    await tester.pump();
+    expect(executed, isFalse);
+    // Confirm text should appear.
+    expect(find.text('Are you sure?'), findsOneWidget);
+    // Second tap executes.
+    await tester.tap(find.text('Are you sure?'));
+    await tester.pump();
+    expect(executed, isTrue);
+  });
 }

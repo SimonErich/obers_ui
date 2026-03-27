@@ -62,6 +62,7 @@ class OiAvatar extends StatelessWidget {
     this.size = OiAvatarSize.md,
     this.skeleton = false,
     this.presence,
+    this.backgroundColor,
     super.key,
   });
 
@@ -82,6 +83,12 @@ class OiAvatar extends StatelessWidget {
 
   /// When set, a colored presence ring is drawn around the avatar.
   final OiPresenceStatus? presence;
+
+  /// Custom background color for the avatar circle.
+  ///
+  /// When set, this overrides the default `colors.primary.base` background
+  /// used for initials and icon fallbacks.
+  final Color? backgroundColor;
 
   /// Accessibility label announced by screen readers.
   final String semanticLabel;
@@ -281,7 +288,7 @@ class OiAvatar extends StatelessWidget {
           ? initials!.substring(0, 2).toUpperCase()
           : initials!.toUpperCase();
       return ColoredBox(
-        color: colors.primary.base,
+        color: backgroundColor ?? colors.primary.base,
         child: Center(
           child: Text(
             text,
@@ -298,7 +305,7 @@ class OiAvatar extends StatelessWidget {
 
     if (icon != null) {
       return ColoredBox(
-        color: colors.primary.base,
+        color: backgroundColor ?? colors.primary.base,
         child: Center(
           child: Icon(icon, size: _iconSize, color: colors.textOnPrimary),
         ),
@@ -309,11 +316,7 @@ class OiAvatar extends StatelessWidget {
     return ColoredBox(
       color: colors.surfaceHover,
       child: Center(
-        child: Icon(
-          OiIcons.user,
-          size: _iconSize,
-          color: colors.textMuted,
-        ),
+        child: Icon(OiIcons.user, size: _iconSize, color: colors.textMuted),
       ),
     );
   }

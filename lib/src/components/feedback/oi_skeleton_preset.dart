@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/src/components/display/oi_avatar.dart';
 import 'package:obers_ui/src/components/display/oi_skeleton_group.dart';
 import 'package:obers_ui/src/foundation/theme/oi_spacing_scale.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
@@ -29,6 +30,7 @@ class OiSkeletonPreset extends StatelessWidget {
     this.showAvatar = true,
     this.showTrailing = false,
     this.subtitleWidth = 0.5,
+    this.avatarSize,
     super.key,
   }) : _type = type;
 
@@ -49,8 +51,8 @@ class OiSkeletonPreset extends StatelessWidget {
        );
 
   /// Circular placeholder for avatars.
-  const OiSkeletonPreset.avatar({double? height, Key? key})
-    : this._(type: _SkeletonPresetType.avatar, height: height ?? 40, key: key);
+  const OiSkeletonPreset.avatar({OiAvatarSize size = OiAvatarSize.md, Key? key})
+    : this._(type: _SkeletonPresetType.avatar, avatarSize: size, key: key);
 
   /// Rounded rectangle placeholder for cards.
   const OiSkeletonPreset.card({
@@ -138,6 +140,9 @@ class OiSkeletonPreset extends StatelessWidget {
   final bool showTrailing;
   final double subtitleWidth;
 
+  /// The avatar size, used only by [_SkeletonPresetType.avatar].
+  final OiAvatarSize? avatarSize;
+
   @override
   Widget build(BuildContext context) {
     final spacing = context.spacing;
@@ -171,7 +176,13 @@ class OiSkeletonPreset extends StatelessWidget {
   }
 
   Widget _buildAvatar() {
-    final size = height ?? 40;
+    final size = switch (avatarSize ?? OiAvatarSize.md) {
+      OiAvatarSize.xs => 24.0,
+      OiAvatarSize.sm => 32.0,
+      OiAvatarSize.md => 40.0,
+      OiAvatarSize.lg => 56.0,
+      OiAvatarSize.xl => 72.0,
+    };
     return OiSkeletonGroup(
       children: [
         ClipOval(
