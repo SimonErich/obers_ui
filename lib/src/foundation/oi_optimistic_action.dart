@@ -45,6 +45,7 @@ class OiOptimisticAction {
     Duration undoDuration = const Duration(seconds: 5),
     String undoLabel = 'Undo',
     String? errorMessage,
+    OiToastLevel errorLevel = OiToastLevel.error,
     String? semanticLabel,
     OiSnackBarPosition position = OiSnackBarPosition.bottom,
   }) {
@@ -62,6 +63,7 @@ class OiOptimisticAction {
       commit: commit,
       completer: completer,
       errorMessage: errorMessage,
+      errorLevel: errorLevel,
       context: context,
     );
     _pending = action;
@@ -108,6 +110,7 @@ class _PendingAction {
     required this.commit,
     required this.completer,
     required this.errorMessage,
+    required this.errorLevel,
     required this.context,
   });
 
@@ -115,6 +118,7 @@ class _PendingAction {
   final Future<void> Function() commit;
   final Completer<bool> completer;
   final String? errorMessage;
+  final OiToastLevel errorLevel;
   final BuildContext context;
   OiOverlayHandle? snackBarHandle;
 
@@ -166,7 +170,7 @@ class _PendingAction {
         OiToast.show(
           context,
           message: errorMessage ?? 'Action failed',
-          level: OiToastLevel.error,
+          level: errorLevel,
         );
       }
       if (!completer.isCompleted) completer.complete(false);

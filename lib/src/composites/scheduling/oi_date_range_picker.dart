@@ -38,6 +38,11 @@ class OiDateRangePicker extends StatefulWidget {
     this.applyLabel,
     this.cancelLabel,
     this.semanticLabel,
+    this.disabledDates,
+    this.disabledDaysOfWeek,
+    this.locale,
+    this.firstDayOfWeek,
+    this.showTimePicker = false,
     super.key,
   });
 
@@ -81,6 +86,21 @@ class OiDateRangePicker extends StatefulWidget {
 
   /// Accessibility label.
   final String? semanticLabel;
+
+  /// Specific dates that cannot be selected.
+  final Set<DateTime>? disabledDates;
+
+  /// Days of the week that cannot be selected (1=Monday, 7=Sunday).
+  final Set<int>? disabledDaysOfWeek;
+
+  /// Locale for month/day names. Defaults to app locale.
+  final Locale? locale;
+
+  /// First day of the week (1=Monday, 7=Sunday). Defaults to locale default.
+  final int? firstDayOfWeek;
+
+  /// Whether to show time pickers below each calendar.
+  final bool showTimePicker;
 
   @override
   State<OiDateRangePicker> createState() => _OiDateRangePickerState();

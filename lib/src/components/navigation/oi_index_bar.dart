@@ -1,3 +1,4 @@
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/primitives/display/oi_label.dart';
@@ -131,6 +132,7 @@ class OiIndexBar extends StatelessWidget {
           child: _IndexBarGesture(
             labels: labels,
             onLabelSelected: onLabelSelected,
+            hapticFeedback: hapticFeedback,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -159,11 +161,13 @@ class _IndexBarGesture extends StatefulWidget {
   const _IndexBarGesture({
     required this.labels,
     required this.onLabelSelected,
+    required this.hapticFeedback,
     required this.child,
   });
 
   final List<String> labels;
   final ValueChanged<String> onLabelSelected;
+  final bool hapticFeedback;
   final Widget child;
 
   @override
@@ -189,6 +193,9 @@ class _IndexBarGestureState extends State<_IndexBarGesture> {
     if (label != _lastReportedLabel) {
       _lastReportedLabel = label;
       widget.onLabelSelected(label);
+      if (widget.hapticFeedback) {
+        HapticFeedback.selectionClick();
+      }
     }
   }
 

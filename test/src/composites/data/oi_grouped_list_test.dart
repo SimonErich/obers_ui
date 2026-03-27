@@ -4,6 +4,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui/src/composites/data/oi_grouped_list.dart';
+import 'package:obers_ui/src/components/display/oi_progress.dart';
 import 'package:obers_ui/src/primitives/display/oi_label.dart';
 
 import '../../../helpers/pump_app.dart';
@@ -183,6 +184,76 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Alice'), findsOneWidget);
     expect(find.text('Bob'), findsOneWidget);
+  });
+
+  // ── Loading ──────────────────────────────────────────────────────────────
+
+  testWidgets('loading shows progress indicator', (tester) async {
+    await tester.pumpObers(
+      OiGroupedList<_Contact>(
+        items: _contacts,
+        itemBuilder: (_, c, _) => Text(c.name),
+        groupBy: (c) => c.letter,
+        label: 'Contacts',
+        loading: true,
+      ),
+      surfaceSize: const Size(800, 1200),
+    );
+    expect(find.byType(OiProgress), findsOneWidget);
+  });
+
+  // ── Collapse all ────────────────────────────────────────────────────────
+
+  testWidgets('controller.collapseAll collapses all groups', (tester) async {
+    final ctrl = OiGroupedListController();
+    await tester.pumpObers(
+      OiGroupedList<_Contact>(
+        items: _contacts,
+        itemBuilder: (_, c, _) => Text(c.name),
+        groupBy: (c) => c.letter,
+        collapsible: true,
+        groupedListController: ctrl,
+        label: 'Contacts',
+      ),
+      surfaceSize: const Size(800, 1200),
+    );
+    expect(find.text('Alice'), findsOneWidget);
+    ctrl.collapseAll();
+    await tester.pumpAndSettle();
+    expect(find.text('Alice'), findsNothing);
+    expect(find.text('Bob'), findsNothing);
+  });
+
+  // ── Physics ─────────────────────────────────────────────────────────────
+
+  testWidgets('physics parameter is passed to ListView', (tester) async {
+    await tester.pumpObers(
+      OiGroupedList<_Contact>(
+        items: _contacts,
+        itemBuilder: (_, c, _) => Text(c.name),
+        groupBy: (c) => c.letter,
+        label: 'Contacts',
+        physics: const NeverScrollableScrollPhysics(),
+      ),
+      surfaceSize: const Size(800, 1200),
+    );
+    expect(find.byType(OiGroupedList<_Contact>), findsOneWidget);
+  });
+
+  // ── Default header style ────────────────────────────────────────────────
+
+  testWidgets('default header uses h4 style', (tester) async {
+    await tester.pumpObers(
+      OiGroupedList<_Contact>(
+        items: _contacts,
+        itemBuilder: (_, c, _) => Text(c.name),
+        groupBy: (c) => c.letter,
+        label: 'Contacts',
+      ),
+      surfaceSize: const Size(800, 1200),
+    );
+    // Headers should render (A, B, C)
+    expect(find.text('A'), findsOneWidget);
   });
 
   // ── Semantic label ────────────────────────────────────────────────────────

@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/src/components/display/oi_progress.dart';
 import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/oi_responsive.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
@@ -26,6 +27,8 @@ enum OiEmptyGroupBehavior {
 /// {@category Composites}
 class OiGroupedListController extends ChangeNotifier {
   final Set<String> _collapsed = {};
+  final Set<String> _knownGroups = {};
+  final Map<String, GlobalKey> _headerKeys = {};
 
   /// Expand a specific group.
   void expandGroup(String groupKey) {
@@ -55,9 +58,9 @@ class OiGroupedListController extends ChangeNotifier {
     }
   }
 
-  /// Collapse all groups.
-  void collapseAll(List<String> groupKeys) {
-    _collapsed.addAll(groupKeys);
+  /// Collapse all currently known groups.
+  void collapseAll() {
+    _collapsed.addAll(_knownGroups);
     notifyListeners();
   }
 
@@ -66,6 +69,17 @@ class OiGroupedListController extends ChangeNotifier {
 
   /// Current set of collapsed group keys (read-only).
   Set<String> get collapsedGroups => Set.unmodifiable(_collapsed);
+
+  /// Scroll to bring a group header into view.
+  Future<void> scrollToGroup(String groupKey) async {
+    final key = _headerKeys[groupKey];
+    if (key?.currentContext != null) {
+      await Scrollable.ensureVisible(
+        key!.currentContext!,
+        duration: const Duration(milliseconds: 300),
+      );
+    }
+  }
 }
 
 /// Data list with automatic grouping, sticky headers, and collapsible
@@ -106,6 +120,10 @@ class OiGroupedList<T> extends StatefulWidget {
     this.controller,
     this.groupedListController,
     this.semanticLabel,
+    this.itemKey,
+    this.stickyHeaders = true,
+    this.onRefresh,
+    this.physics,
     super.key,
   });
 
@@ -173,6 +191,18 @@ class OiGroupedList<T> extends StatefulWidget {
   /// Accessibility label.
   final String? semanticLabel;
 
+  /// Unique key per item. Required for virtual scrolling and animations.
+  final Object Function(T item)? itemKey;
+
+  /// Whether section headers stick to the top during scroll.
+  final bool stickyHeaders;
+
+  /// Pull-to-refresh callback.
+  final Future<void> Function()? onRefresh;
+
+  /// Scroll physics override.
+  final ScrollPhysics? physics;
+
   @override
   State<OiGroupedList<T>> createState() => _OiGroupedListState<T>();
 }
@@ -230,8 +260,12 @@ class _OiGroupedListState<T> extends State<OiGroupedList<T>> {
       sortedKeys.sort(widget.groupOrder);
     }
 
+    // Update known groups on the controller for collapseAll support.
+    _controller._knownGroups
+      ..clear()
+      ..addAll(sortedKeys);
+
     final spacing = context.spacing;
-    final breakpoint = context.breakpoint;
 
     final children = <Widget>[];
 
@@ -239,6 +273,9 @@ class _OiGroupedListState<T> extends State<OiGroupedList<T>> {
       final key = sortedKeys[gi];
       final items = groups[key]!;
       final isCollapsed = _controller.isCollapsed(key);
+
+      // Ensure a GlobalKey exists for this header.
+      final headerKey = _controller._headerKeys.putIfAbsent(key, GlobalKey.new);
 
       // Header.
       Widget header;
@@ -261,7 +298,7 @@ class _OiGroupedListState<T> extends State<OiGroupedList<T>> {
         );
       }
 
-      children.add(header);
+      children.add(KeyedSubtree(key: headerKey, child: header));
 
       // Items.
       if (!isCollapsed) {
@@ -284,7 +321,12 @@ class _OiGroupedListState<T> extends State<OiGroupedList<T>> {
       children.add(
         Padding(
           padding: EdgeInsets.all(spacing.md),
-          child: const Center(child: SizedBox.square(dimension: 24)),
+          child: const Center(
+            child: SizedBox.square(
+              dimension: 24,
+              child: OiProgress.circular(indeterminate: true, size: 24),
+            ),
+          ),
         ),
       );
     }
@@ -294,6 +336,7 @@ class _OiGroupedListState<T> extends State<OiGroupedList<T>> {
       child: ListView(
         controller: widget.controller,
         padding: widget.padding,
+        physics: widget.physics,
         children: children,
       ),
     );
@@ -328,7 +371,7 @@ class _DefaultGroupHeader extends StatelessWidget {
         breakpoint: breakpoint,
         gap: OiResponsive<double>(spacing.xs),
         children: [
-          OiLabel.bodyStrong(groupKey),
+          OiLabel.h4(groupKey),
           if (collapsible)
             OiIcon.decorative(
               icon: isCollapsed ? OiIcons.chevronRight : OiIcons.chevronDown,

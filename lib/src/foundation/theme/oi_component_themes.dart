@@ -12,11 +12,13 @@ import 'package:obers_ui/src/foundation/theme/component_themes/oi_checkbox_theme
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_data_grid_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_index_bar_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_date_picker_field_theme_data.dart';
+import 'package:obers_ui/src/foundation/theme/component_themes/oi_date_range_picker_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_dialog_shell_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_dialog_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_field_display_theme.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_file_explorer_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_form_select_theme_data.dart';
+import 'package:obers_ui/src/foundation/theme/component_themes/oi_grouped_list_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_navigation_rail_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_pagination_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_progress_theme_data.dart';
@@ -51,11 +53,13 @@ export 'component_themes/oi_key_value_theme_data.dart';
 export 'component_themes/oi_data_grid_theme_data.dart';
 export 'component_themes/oi_index_bar_theme_data.dart';
 export 'component_themes/oi_date_picker_field_theme_data.dart';
+export 'component_themes/oi_date_range_picker_theme_data.dart';
 export 'component_themes/oi_dialog_shell_theme_data.dart';
 export 'component_themes/oi_dialog_theme_data.dart';
 export 'component_themes/oi_field_display_theme.dart';
 export 'component_themes/oi_file_explorer_theme_data.dart';
 export 'component_themes/oi_form_select_theme_data.dart';
+export 'component_themes/oi_grouped_list_theme_data.dart';
 export 'component_themes/oi_navigation_rail_theme_data.dart';
 export 'component_themes/oi_otp_theme_data.dart';
 export 'component_themes/oi_pagination_theme_data.dart';
@@ -125,6 +129,8 @@ class OiComponentThemes {
     this.indexBar,
     this.accountSwitcher,
     this.weekStrip,
+    this.dateRangePicker,
+    this.groupedList,
   });
 
   /// Creates an [OiComponentThemes] with all fields set to `null`.
@@ -167,7 +173,9 @@ class OiComponentThemes {
       actionBar = null,
       indexBar = null,
       accountSwitcher = null,
-      weekStrip = null;
+      weekStrip = null,
+      dateRangePicker = null,
+      groupedList = null;
 
   /// Theme overrides for button components.
   final OiButtonThemeData? button;
@@ -280,6 +288,12 @@ class OiComponentThemes {
   /// Theme overrides for week strip components.
   final OiWeekStripThemeData? weekStrip;
 
+  /// Theme overrides for date range picker components.
+  final OiDateRangePickerThemeData? dateRangePicker;
+
+  /// Theme overrides for grouped list components.
+  final OiGroupedListThemeData? groupedList;
+
   /// Creates a copy with optionally overridden component theme fields.
   OiComponentThemes copyWith({
     OiButtonThemeData? button,
@@ -319,6 +333,8 @@ class OiComponentThemes {
     OiIndexBarThemeData? indexBar,
     OiAccountSwitcherThemeData? accountSwitcher,
     OiWeekStripThemeData? weekStrip,
+    OiDateRangePickerThemeData? dateRangePicker,
+    OiGroupedListThemeData? groupedList,
   }) {
     return OiComponentThemes(
       button: button ?? this.button,
@@ -358,6 +374,8 @@ class OiComponentThemes {
       indexBar: indexBar ?? this.indexBar,
       accountSwitcher: accountSwitcher ?? this.accountSwitcher,
       weekStrip: weekStrip ?? this.weekStrip,
+      dateRangePicker: dateRangePicker ?? this.dateRangePicker,
+      groupedList: groupedList ?? this.groupedList,
     );
   }
 
@@ -401,7 +419,9 @@ class OiComponentThemes {
         other.actionBar == actionBar &&
         other.indexBar == indexBar &&
         other.accountSwitcher == accountSwitcher &&
-        other.weekStrip == weekStrip;
+        other.weekStrip == weekStrip &&
+        other.dateRangePicker == dateRangePicker &&
+        other.groupedList == groupedList;
   }
 
   @override
@@ -440,7 +460,14 @@ class OiComponentThemes {
       datePickerField,
       dataGrid,
       keyValue,
-      Object.hash(actionBar, accountSwitcher, indexBar, weekStrip),
+      Object.hash(
+        actionBar,
+        accountSwitcher,
+        indexBar,
+        weekStrip,
+        dateRangePicker,
+        groupedList,
+      ),
     ),
   );
 }
