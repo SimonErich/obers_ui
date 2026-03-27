@@ -182,5 +182,28 @@ void main() {
       final (start, _) = OiDateRangePreset.allTime.resolve();
       expect(start.year, 2000);
     });
+
+    test('today resolves to same day for start and end', () {
+      final (start, end) = OiDateRangePreset.today.resolve();
+      expect(start.day, end.day);
+      expect(start.month, end.month);
+    });
+
+    test('thisMonth starts on day 1', () {
+      final (start, _) = OiDateRangePreset.thisMonth.resolve();
+      expect(start.day, 1);
+    });
+
+    test('lastMonth ends on last day of previous month', () {
+      final (_, end) = OiDateRangePreset.lastMonth.resolve();
+      final now = DateTime.now();
+      final firstOfThisMonth = DateTime(now.year, now.month);
+      final lastOfPrev = firstOfThisMonth.subtract(const Duration(days: 1));
+      expect(end.day, lastOfPrev.day);
+    });
+
+    test('defaults list contains expected preset count', () {
+      expect(OiDateRangePreset.defaults.length, greaterThanOrEqualTo(6));
+    });
   });
 }

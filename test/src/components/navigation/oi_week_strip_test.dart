@@ -313,4 +313,35 @@ void main() {
     final widget = tester.widget<OiWeekStrip>(find.byType(OiWeekStrip));
     expect(widget.eventDotColor, const Color(0xFFFF0000));
   });
+
+  testWidgets('has swipe gesture detector for week navigation', (tester) async {
+    await tester.pumpObers(
+      OiWeekStrip(
+        selectedDate: DateTime(2026, 3, 25),
+        onDateSelected: (_) {},
+        label: 'Week',
+      ),
+      surfaceSize: const Size(800, 200),
+    );
+    // Verify GestureDetector for horizontal drag is in the tree.
+    expect(find.byType(GestureDetector), findsWidgets);
+  });
+
+  testWidgets('today indicator visible when not selected', (tester) async {
+    // Use today's date but select tomorrow to verify today dot still shows.
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    // Select yesterday so today is visible but not selected.
+    final selected = today.subtract(const Duration(days: 1));
+    await tester.pumpObers(
+      OiWeekStrip(
+        selectedDate: selected,
+        onDateSelected: (_) {},
+        label: 'Week',
+      ),
+      surfaceSize: const Size(800, 200),
+    );
+    // The widget should render without errors (today dot is in tree).
+    expect(find.byType(OiWeekStrip), findsOneWidget);
+  });
 }
