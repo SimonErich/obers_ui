@@ -999,6 +999,7 @@ void main() {
     // limitation of OverlayPortal / CompositedTransformFollower). We verify
     // the controller responds correctly to setPageSize, which is what the
     // onPerPageChange callback wires up to.
+    int? changedTo;
     final manyRows = List.generate(100, (i) => _Row('Row$i', i));
     final ctrl = OiTableController(totalRows: 100);
     await tester.pumpObers(
@@ -1006,7 +1007,7 @@ void main() {
         rows: manyRows,
         controller: ctrl,
         paginationMode: OiTablePaginationMode.pages,
-        onPageSizeChanged: (_) {},
+        onPageSizeChanged: (v) => changedTo = v,
       ),
       surfaceSize: const Size(1400, 700),
     );
@@ -2655,7 +2656,16 @@ void main() {
 
   // 81. Commit edit via ✓ fires onCellChanged callback
   testWidgets('commit edit via ✓ fires onCellChanged callback', (tester) async {
-    await tester.pumpObers(_table(onCellChanged: (_, __, ___, ____) {}));
+    String? changedColumnId;
+    dynamic changedValue;
+    await tester.pumpObers(
+      _table(
+        onCellChanged: (_, __, colId, val) {
+          changedColumnId = colId;
+          changedValue = val;
+        },
+      ),
+    );
     await tester.pump();
     // Double-tap to enter edit mode.
     final cellDisplay = find.byKey(const Key('cell_display')).first;
