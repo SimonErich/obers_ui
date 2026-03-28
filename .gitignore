@@ -43,3 +43,5 @@ migrate_working_dir/
 .history
 packages/obers_ui_charts/build/
 .peakz
+concept/
+.claude/
