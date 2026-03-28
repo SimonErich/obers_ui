@@ -65,8 +65,8 @@ class ResolvedCandlestickSeries {
 ///   [ResolvedCandlestick.high].
 /// - A filled rectangle (body) from [ResolvedCandlestick.open] to
 ///   [ResolvedCandlestick.close].
-/// - Bullish candles (close >= open) are filled with `bullColor`.
-/// - Bearish candles (close < open) are filled with `bearColor`.
+/// - Bullish candles (close >= open) are filled with [ResolvedCandlestickSeries.bullColor].
+/// - Bearish candles (close < open) are filled with [ResolvedCandlestickSeries.bearColor].
 class OiCandlestickChartPainter extends CustomPainter {
   /// Creates an [OiCandlestickChartPainter].
   OiCandlestickChartPainter({

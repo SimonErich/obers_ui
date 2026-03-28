@@ -1,6 +1,30 @@
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/obers_ui.dart';
+import 'package:obers_ui_autoforms/obers_ui_autoforms.dart';
 import 'package:obers_ui_example/apps/component_library/shared/component_showcase_section.dart';
+
+// ── Contact form controller ───────────────────────────────────────────────────
+
+enum _ContactField { name, email, message }
+
+class _ContactController
+    extends OiAfController<_ContactField, Map<String, dynamic>> {
+  @override
+  void defineFields() {
+    addTextField(_ContactField.name, required: true);
+    addTextField(
+      _ContactField.email,
+      required: true,
+      validators: [OiAfValidators.email()],
+    );
+    addTextField(_ContactField.message);
+  }
+
+  @override
+  Map<String, dynamic> buildData() => json();
+}
+
+// ── Screen ───────────────────────────────────────────────────────────────────
 
 /// Showcase screen for form, stepper, wizard, and address form widgets.
 class FormsWizardsScreen extends StatefulWidget {
@@ -11,21 +35,18 @@ class FormsWizardsScreen extends StatefulWidget {
 }
 
 class _FormsWizardsScreenState extends State<FormsWizardsScreen> {
-  // Form controller for the contact form example.
-  late final OiFormController _formController;
-
-  // Stepper state.
+  late final _ContactController _contactController;
   int _currentStep = 0;
 
   @override
   void initState() {
     super.initState();
-    _formController = OiFormController();
+    _contactController = _ContactController();
   }
 
   @override
   void dispose() {
-    _formController.dispose();
+    _contactController.dispose();
     super.dispose();
   }
 
@@ -38,52 +59,70 @@ class _FormsWizardsScreenState extends State<FormsWizardsScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // ── OiForm ─────────────────────────────────────────────────
+          // ── OiFormSection ──────────────────────────────────────────────
           ComponentShowcaseSection(
-            title: 'Form',
-            widgetName: 'OiForm',
+            title: 'Form Section',
+            widgetName: 'OiFormSection',
             description:
-                'A declarative form builder that renders fields from a '
-                'schema. Supports validation, sections, conditional '
-                'fields, autosave, and undo/redo.',
+                'A visual grouping widget for form fields with an optional '
+                'title and description header. Works with any state '
+                'management — pair it with OiAfForm from '
+                'obers_ui_autoforms or bring your own controller.',
             examples: [
               ComponentExample(
                 title: 'Contact form',
                 child: ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: 500),
-                  child: OiForm(
-                    controller: _formController,
-                    sections: const [
-                      OiFormSection(
-                        fields: [
-                          OiFormField(
-                            key: 'name',
-                            label: 'Full Name',
-                            type: OiFieldType.text,
-                            required: true,
-                          ),
-                          OiFormField(
-                            key: 'email',
-                            label: 'Email',
-                            type: OiFieldType.email,
-                            required: true,
-                          ),
-                          OiFormField(
-                            key: 'message',
-                            label: 'Message',
-                            type: OiFieldType.text,
-                          ),
-                        ],
-                      ),
-                    ],
-                    onSubmit: (_) {},
+                  child: OiAfForm<_ContactField, Map<String, dynamic>>(
+                    controller: _contactController,
+                    onSubmit: (_, __) async {},
+                    child: const OiFormSection(
+                      title: 'Contact Us',
+                      description:
+                          "Fill in your details and we'll get back to you.",
+                      children: [
+                        OiAfTextInput(
+                          field: _ContactField.name,
+                          label: 'Full Name',
+                        ),
+                        OiAfTextInput(
+                          field: _ContactField.email,
+                          label: 'Email',
+                        ),
+                        OiAfTextInput(
+                          field: _ContactField.message,
+                          label: 'Message',
+                          maxLines: 3,
+                        ),
+                        OiAfSubmitButton<_ContactField, Map<String, dynamic>>(
+                          label: 'Send',
+                        ),
+                      ],
+                    ),
                   ),
+                ),
+              ),
+              const ComponentExample(
+                title: 'Horizontal layout',
+                child: OiFormSection(
+                  title: 'Name',
+                  layout: OiFormLayout.horizontal,
+                  children: [
+                    OiAfTextInput(
+                      field: _ContactField.name,
+                      label: 'First Name',
+                    ),
+                    OiAfTextInput(
+                      field: _ContactField.email,
+                      label: 'Last Name',
+                    ),
+                  ],
                 ),
               ),
             ],
           ),
 
-          // ── OiStepper ──────────────────────────────────────────────
+          // ── OiStepper ──────────────────────────────────────────────────
           ComponentShowcaseSection(
             title: 'Stepper',
             widgetName: 'OiStepper',
@@ -102,9 +141,7 @@ class _FormsWizardsScreenState extends State<FormsWizardsScreen> {
                       currentStep: _currentStep,
                       stepLabels: const ['Account', 'Profile', 'Confirm'],
                       onStepTap: (index) {
-                        setState(() {
-                          _currentStep = index;
-                        });
+                        setState(() => _currentStep = index);
                       },
                     ),
                     SizedBox(height: spacing.lg),
@@ -123,22 +160,14 @@ class _FormsWizardsScreenState extends State<FormsWizardsScreen> {
                         if (_currentStep > 0)
                           OiButton.outline(
                             label: 'Previous',
-                            onTap: () {
-                              setState(() {
-                                _currentStep--;
-                              });
-                            },
+                            onTap: () => setState(() => _currentStep--),
                           )
                         else
                           const SizedBox.shrink(),
                         if (_currentStep < 2)
                           OiButton.primary(
                             label: 'Next',
-                            onTap: () {
-                              setState(() {
-                                _currentStep++;
-                              });
-                            },
+                            onTap: () => setState(() => _currentStep++),
                           ),
                         if (_currentStep == 2)
                           OiButton.primary(label: 'Submit', onTap: () {}),
@@ -150,7 +179,7 @@ class _FormsWizardsScreenState extends State<FormsWizardsScreen> {
             ],
           ),
 
-          // ── OiWizard ───────────────────────────────────────────────
+          // ── OiWizard ───────────────────────────────────────────────────
           ComponentShowcaseSection(
             title: 'Wizard',
             widgetName: 'OiWizard',
@@ -195,7 +224,7 @@ class _FormsWizardsScreenState extends State<FormsWizardsScreen> {
             ],
           ),
 
-          // ── OiAddressForm ──────────────────────────────────────────
+          // ── OiAddressForm ──────────────────────────────────────────────
           ComponentShowcaseSection(
             title: 'Address Form',
             widgetName: 'OiAddressForm',

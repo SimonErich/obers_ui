@@ -169,7 +169,9 @@ class LayoutScreen extends StatelessWidget {
                 child: OiSurface(
                   color: context.colors.surfaceSubtle,
                   padding: EdgeInsets.all(spacing.lg),
-                  child: const OiLabel.body('Default surface with subtle color'),
+                  child: const OiLabel.body(
+                    'Default surface with subtle color',
+                  ),
                 ),
               ),
               ComponentExample(
@@ -189,10 +191,7 @@ class LayoutScreen extends StatelessWidget {
                 child: OiSurface(
                   color: context.colors.surface,
                   borderRadius: context.radius.md,
-                  border: OiBorderStyle.solid(
-                    context.colors.borderSubtle,
-                    1,
-                  ),
+                  border: OiBorderStyle.solid(context.colors.borderSubtle, 1),
                   padding: EdgeInsets.all(spacing.lg),
                   child: const OiLabel.body('Surface with border'),
                 ),
@@ -273,10 +272,7 @@ class LayoutScreen extends StatelessWidget {
                 'focus while open. Use it for persistent side navigation '
                 'or detail panels.',
             examples: [
-              ComponentExample(
-                title: 'Slide-in Panel',
-                child: _PanelDemo(),
-              ),
+              ComponentExample(title: 'Slide-in Panel', child: _PanelDemo()),
             ],
           ),
 
@@ -452,6 +448,34 @@ class LayoutScreen extends StatelessWidget {
                         _placeholder(context, 'Content'),
                         _placeholder(context, 'Footer'),
                       ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+
+          // ── OiGridZoomControls ──────────────────────────────────────
+          ComponentShowcaseSection(
+            title: 'Grid Zoom Controls',
+            widgetName: 'OiGridZoomControls',
+            description:
+                'A wrapper around OiGrid that adds +/- zoom controls '
+                'to interactively change the column count. Great for '
+                'gallery or card views where users want to adjust '
+                'density.',
+            examples: [
+              ComponentExample(
+                title: 'Zoomable card grid',
+                child: SizedBox(
+                  height: 250,
+                  child: OiGridZoomControls(
+                    breakpoint: OiBreakpoint.expanded,
+                    children: List.generate(
+                      9,
+                      (i) => OiCard.outlined(
+                        child: Center(child: OiLabel.body('Item ${i + 1}')),
+                      ),
                     ),
                   ),
                 ),

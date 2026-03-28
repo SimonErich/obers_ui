@@ -103,6 +103,8 @@ class OiSheet extends StatefulWidget {
     final service = OiOverlays.maybeOf(context);
 
     if (service != null) {
+      // `handle` must be declared before the show() call so the onClose
+      // closure can capture it and call handle.dismiss().
       late final OiOverlayHandle handle;
       return handle = service.show(
         label: label,

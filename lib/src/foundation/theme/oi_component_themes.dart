@@ -8,6 +8,7 @@ import 'package:obers_ui/src/foundation/theme/component_themes/oi_button_theme_d
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_card_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_chart_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_checkbox_theme_data.dart';
+import 'package:obers_ui/src/foundation/theme/component_themes/oi_context_menu_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_data_grid_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_date_picker_field_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_date_range_picker_theme_data.dart';
@@ -50,6 +51,7 @@ export 'component_themes/oi_card_theme_data.dart';
 export 'component_themes/oi_chart_palette.dart';
 export 'component_themes/oi_chart_theme_data.dart';
 export 'component_themes/oi_checkbox_theme_data.dart';
+export 'component_themes/oi_context_menu_theme_data.dart';
 export 'component_themes/oi_data_grid_theme_data.dart';
 export 'component_themes/oi_date_picker_field_theme_data.dart';
 export 'component_themes/oi_date_range_picker_theme_data.dart';
@@ -107,6 +109,7 @@ class OiComponentThemes {
     this.badge,
     this.banner,
     this.checkbox,
+    this.contextMenu,
     this.switchTheme,
     this.sheet,
     this.avatar,
@@ -153,6 +156,7 @@ class OiComponentThemes {
       badge = null,
       banner = null,
       checkbox = null,
+      contextMenu = null,
       switchTheme = null,
       sheet = null,
       avatar = null,
@@ -219,6 +223,9 @@ class OiComponentThemes {
 
   /// Theme overrides for checkbox components.
   final OiCheckboxThemeData? checkbox;
+
+  /// Theme overrides for context menu components.
+  final OiContextMenuThemeData? contextMenu;
 
   /// Theme overrides for toggle-switch components.
   final OiSwitchThemeData? switchTheme;
@@ -316,6 +323,7 @@ class OiComponentThemes {
     OiBadgeThemeData? badge,
     OiBannerThemeData? banner,
     OiCheckboxThemeData? checkbox,
+    OiContextMenuThemeData? contextMenu,
     OiSwitchThemeData? switchTheme,
     OiSheetThemeData? sheet,
     OiAvatarThemeData? avatar,
@@ -358,6 +366,7 @@ class OiComponentThemes {
       badge: badge ?? this.badge,
       banner: banner ?? this.banner,
       checkbox: checkbox ?? this.checkbox,
+      contextMenu: contextMenu ?? this.contextMenu,
       switchTheme: switchTheme ?? this.switchTheme,
       sheet: sheet ?? this.sheet,
       avatar: avatar ?? this.avatar,
@@ -405,6 +414,7 @@ class OiComponentThemes {
         other.badge == badge &&
         other.banner == banner &&
         other.checkbox == checkbox &&
+        other.contextMenu == contextMenu &&
         other.switchTheme == switchTheme &&
         other.sheet == sheet &&
         other.avatar == avatar &&
@@ -478,6 +488,7 @@ class OiComponentThemes {
         dateRangePicker,
         groupedList,
         slider,
+        contextMenu,
       ),
     ),
   );

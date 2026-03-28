@@ -12,6 +12,23 @@ const _kChevronIcon = OiIcons.chevronDown;
 // Key for the horizontal separator between body and footer.
 const _kCardDividerKey = Key('_oi_card_divider');
 
+/// The corner position of a `statusBadge` on an [OiCard].
+///
+/// {@category Components}
+enum OiBadgePosition {
+  /// Top-right corner (default).
+  topRight,
+
+  /// Top-left corner.
+  topLeft,
+
+  /// Bottom-right corner.
+  bottomRight,
+
+  /// Bottom-left corner.
+  bottomLeft,
+}
+
 /// Internal discriminator for [OiCard] factory constructors.
 enum _OiCardKind { elevated, flat, outlined, interactive, compact }
 
@@ -48,6 +65,8 @@ class OiCard extends StatefulWidget {
     this.border,
     this.gradient,
     this.halo,
+    this.statusBadge,
+    this.statusBadgePosition = OiBadgePosition.topRight,
     super.key,
   }) : assert(
          onTap == null || label != null,
@@ -72,6 +91,8 @@ class OiCard extends StatefulWidget {
     this.border,
     this.gradient,
     this.halo,
+    this.statusBadge,
+    this.statusBadgePosition = OiBadgePosition.topRight,
     super.key,
   }) : assert(
          onTap == null || label != null,
@@ -95,6 +116,8 @@ class OiCard extends StatefulWidget {
     OiBorderStyle? border,
     OiGradientStyle? gradient,
     OiHaloStyle? halo,
+    Widget? statusBadge,
+    OiBadgePosition statusBadgePosition = OiBadgePosition.topRight,
     Key? key,
   }) {
     return OiCard._(
@@ -112,6 +135,8 @@ class OiCard extends StatefulWidget {
       border: border,
       gradient: gradient,
       halo: halo,
+      statusBadge: statusBadge,
+      statusBadgePosition: statusBadgePosition,
       key: key,
       child: child,
     );
@@ -135,6 +160,8 @@ class OiCard extends StatefulWidget {
     OiBorderStyle? border,
     OiGradientStyle? gradient,
     OiHaloStyle? halo,
+    Widget? statusBadge,
+    OiBadgePosition statusBadgePosition = OiBadgePosition.topRight,
     Key? key,
   }) {
     return OiCard._(
@@ -152,6 +179,8 @@ class OiCard extends StatefulWidget {
       border: border,
       gradient: gradient,
       halo: halo,
+      statusBadge: statusBadge,
+      statusBadgePosition: statusBadgePosition,
       key: key,
       child: child,
     );
@@ -175,6 +204,8 @@ class OiCard extends StatefulWidget {
     OiBorderStyle? border,
     OiGradientStyle? gradient,
     OiHaloStyle? halo,
+    Widget? statusBadge,
+    OiBadgePosition statusBadgePosition = OiBadgePosition.topRight,
     Key? key,
   }) {
     return OiCard._(
@@ -192,6 +223,8 @@ class OiCard extends StatefulWidget {
       border: border,
       gradient: gradient,
       halo: halo,
+      statusBadge: statusBadge,
+      statusBadgePosition: statusBadgePosition,
       key: key,
       child: child,
     );
@@ -213,6 +246,8 @@ class OiCard extends StatefulWidget {
     OiBorderStyle? border,
     OiGradientStyle? gradient,
     OiHaloStyle? halo,
+    Widget? statusBadge,
+    OiBadgePosition statusBadgePosition = OiBadgePosition.topRight,
     Key? key,
   }) {
     return OiCard._(
@@ -230,6 +265,8 @@ class OiCard extends StatefulWidget {
       border: border,
       gradient: gradient,
       halo: halo,
+      statusBadge: statusBadge,
+      statusBadgePosition: statusBadgePosition,
       key: key,
       child: child,
     );
@@ -280,6 +317,12 @@ class OiCard extends StatefulWidget {
 
   /// Optional halo/glow effect rendered around the card.
   final OiHaloStyle? halo;
+
+  /// Optional badge widget overlaid on the card at [statusBadgePosition].
+  final Widget? statusBadge;
+
+  /// Corner position of the [statusBadge]. Defaults to [OiBadgePosition.topRight].
+  final OiBadgePosition statusBadgePosition;
 
   final _OiCardKind _kind;
 
@@ -428,16 +471,51 @@ class _OiCardState extends State<OiCard> with SingleTickerProviderStateMixin {
 
     final needsTappable =
         widget.onTap != null || widget._kind == _OiCardKind.interactive;
+    Widget result;
     if (needsTappable) {
-      return OiTappable(
+      result = OiTappable(
         onTap: widget.onTap,
         semanticLabel: widget.label,
         clipBorderRadius: ct?.borderRadius ?? BorderRadius.circular(8),
         child: surface,
       );
+    } else {
+      result = surface;
     }
 
-    return surface;
+    if (widget.statusBadge != null) {
+      result = Stack(
+        clipBehavior: Clip.none,
+        children: [
+          result,
+          Positioned(
+            top:
+                widget.statusBadgePosition == OiBadgePosition.topRight ||
+                    widget.statusBadgePosition == OiBadgePosition.topLeft
+                ? -8
+                : null,
+            bottom:
+                widget.statusBadgePosition == OiBadgePosition.bottomRight ||
+                    widget.statusBadgePosition == OiBadgePosition.bottomLeft
+                ? -8
+                : null,
+            right:
+                widget.statusBadgePosition == OiBadgePosition.topRight ||
+                    widget.statusBadgePosition == OiBadgePosition.bottomRight
+                ? -8
+                : null,
+            left:
+                widget.statusBadgePosition == OiBadgePosition.topLeft ||
+                    widget.statusBadgePosition == OiBadgePosition.bottomLeft
+                ? -8
+                : null,
+            child: widget.statusBadge!,
+          ),
+        ],
+      );
+    }
+
+    return result;
   }
 
   Widget _buildHeader(BuildContext context) {

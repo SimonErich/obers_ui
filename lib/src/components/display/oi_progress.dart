@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/src/components/buttons/oi_button.dart';
 import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 
@@ -16,6 +17,10 @@ enum OiProgressStyle {
 
   /// A row of step dots/squares, filled up to [OiProgress.currentStep].
   steps,
+
+  /// A linear bar with a "current / total" counter label and optional
+  /// percentage and item description.
+  bulk,
 }
 
 /// A progress indicator supporting linear, circular, and step styles.
@@ -48,6 +53,11 @@ class OiProgress extends StatefulWidget {
     this.color,
     this.strokeWidth = 4,
     this.size,
+    this.current,
+    this.total,
+    this.currentItemLabel,
+    this.showPercentage = true,
+    this.onCancel,
     super.key,
   });
 
@@ -111,6 +121,44 @@ class OiProgress extends StatefulWidget {
          key: key,
        );
 
+  /// Creates a bulk progress indicator showing "label (current/total)" with
+  /// an optional percentage and item description.
+  ///
+  /// ```dart
+  /// OiProgress.bulk(
+  ///   current: 5,
+  ///   total: 18,
+  ///   label: 'Generating screen specs',
+  ///   currentItemLabel: 'Authentication Screen',
+  ///   onCancel: () => cancelGeneration(),
+  /// )
+  /// ```
+  const OiProgress.bulk({
+    required int current,
+    required int total,
+    String? label,
+    String? currentItemLabel,
+    bool showPercentage = true,
+    Color? color,
+    double strokeWidth = 4,
+    double? size,
+    VoidCallback? onCancel,
+    Key? key,
+  }) : this._(
+         style: OiProgressStyle.bulk,
+         current: current,
+         total: total,
+         value: total > 0 ? current / total : 0,
+         label: label,
+         currentItemLabel: currentItemLabel,
+         showPercentage: showPercentage,
+         color: color,
+         strokeWidth: strokeWidth,
+         size: size,
+         onCancel: onCancel,
+         key: key,
+       );
+
   /// Progress from 0.0 to 1.0.
   final double value;
 
@@ -137,6 +185,23 @@ class OiProgress extends StatefulWidget {
 
   /// Diameter for [OiProgressStyle.circular] or height for linear.
   final double? size;
+
+  /// The current item count for [OiProgressStyle.bulk].
+  final int? current;
+
+  /// The total item count for [OiProgressStyle.bulk].
+  final int? total;
+
+  /// Optional description of the item currently being processed.
+  final String? currentItemLabel;
+
+  /// Whether to show a percentage next to the counter label.
+  final bool showPercentage;
+
+  /// Optional cancel callback for [OiProgressStyle.bulk].
+  ///
+  /// When non-null, a small × button is shown to the right of the progress bar.
+  final VoidCallback? onCancel;
 
   @override
   State<OiProgress> createState() => _OiProgressState();
@@ -263,6 +328,78 @@ class _OiProgressState extends State<OiProgress>
               ),
             );
           }),
+        );
+
+      case OiProgressStyle.bulk:
+        final cur = widget.current ?? 0;
+        final tot = widget.total ?? 0;
+        final clampedValue = tot > 0 ? (cur / tot).clamp(0.0, 1.0) : 0.0;
+        final height = widget.size ?? widget.strokeWidth;
+        final bar = CustomPaint(
+          size: Size(double.infinity, height),
+          painter: _LinearProgressPainter(
+            value: clampedValue,
+            indeterminate: false,
+            color: effectiveColor,
+            trackColor: trackColor,
+            strokeWidth: height,
+          ),
+        );
+
+        // Build the counter text: "Label (cur/tot)" or just "cur/tot".
+        final counter = widget.label != null
+            ? '${widget.label} ($cur/$tot)'
+            : '$cur/$tot';
+
+        final percentage = widget.showPercentage && tot > 0
+            ? '${(clampedValue * 100).round()}%'
+            : null;
+
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Expanded(child: bar),
+                if (widget.onCancel != null) ...[
+                  const SizedBox(width: 8),
+                  OiButton.ghost(
+                    label: 'Cancel',
+                    icon: OiIcons.x,
+                    onTap: widget.onCancel,
+                    size: OiButtonSize.small,
+                  ),
+                ],
+              ],
+            ),
+            const SizedBox(height: 4),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Flexible(
+                  child: Text(
+                    counter,
+                    style: TextStyle(fontSize: 12, color: colors.textMuted),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                if (percentage != null)
+                  Text(
+                    percentage,
+                    style: TextStyle(fontSize: 12, color: colors.textMuted),
+                  ),
+              ],
+            ),
+            if (widget.currentItemLabel != null) ...[
+              const SizedBox(height: 2),
+              Text(
+                widget.currentItemLabel!,
+                style: TextStyle(fontSize: 11, color: colors.textMuted),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ],
         );
     }
 

@@ -219,9 +219,15 @@ class _NavigationScreenState extends State<NavigationScreen> {
                       child: OiBottomBar(
                         items: OiBottomBar.fromNavigationItems(const [
                           OiNavigationItem(icon: OiIcons.home, label: 'Home'),
-                          OiNavigationItem(icon: OiIcons.search, label: 'Search'),
+                          OiNavigationItem(
+                            icon: OiIcons.search,
+                            label: 'Search',
+                          ),
                           OiNavigationItem(icon: OiIcons.bell, label: 'Alerts'),
-                          OiNavigationItem(icon: OiIcons.user, label: 'Profile'),
+                          OiNavigationItem(
+                            icon: OiIcons.user,
+                            label: 'Profile',
+                          ),
                         ]),
                         currentIndex: _bottomBarIndex,
                         onTap: (i) => setState(() => _bottomBarIndex = i),
@@ -282,29 +288,25 @@ class _NavigationScreenState extends State<NavigationScreen> {
                         children: [
                           Center(
                             child: ConstrainedBox(
-                              constraints:
-                                  const BoxConstraints(maxWidth: 150),
+                              constraints: const BoxConstraints(maxWidth: 150),
                               child: OiButton.primary(
                                 label: _drawerOpen
                                     ? 'Close drawer'
                                     : 'Open drawer',
                                 fullWidth: true,
-                                onTap: () => setState(
-                                  () => _drawerOpen = !_drawerOpen,
-                                ),
+                                onTap: () =>
+                                    setState(() => _drawerOpen = !_drawerOpen),
                               ),
                             ),
                           ),
                           OiDrawer(
                             open: _drawerOpen,
-                            onClose: () =>
-                                setState(() => _drawerOpen = false),
+                            onClose: () => setState(() => _drawerOpen = false),
                             width: 200,
                             child: Padding(
                               padding: EdgeInsets.all(spacing.md),
                               child: Column(
-                                crossAxisAlignment:
-                                    CrossAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   const OiLabel.bodyStrong('Navigation'),
                                   SizedBox(height: spacing.md),
@@ -397,7 +399,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
                       icon: OiIcons.settings,
                       onTap: () {},
                     ),
-                    const OiMenuItem(label: '', separator: true),
+                    const OiMenuDivider(),
                     OiMenuItem(
                       label: 'Log out',
                       icon: OiIcons.logOut,
@@ -468,8 +470,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
                           flagEmoji: '\u{1F1EB}\u{1F1F7}',
                         ),
                       ],
-                      onLocaleChange: (l) =>
-                          setState(() => _currentLocale = l),
+                      onLocaleChange: (l) => setState(() => _currentLocale = l),
                     ),
                   ),
                 ),
@@ -567,6 +568,194 @@ class _NavigationScreenState extends State<NavigationScreen> {
                     const OiPathSegment(id: 'reports', label: 'Reports'),
                   ],
                   onNavigate: (_) {},
+                ),
+              ),
+            ],
+          ),
+
+          // ── OiMenuBar ──────────────────────────────────────────────────
+          ComponentShowcaseSection(
+            title: 'Menu Bar',
+            widgetName: 'OiMenuBar',
+            description:
+                'A horizontal desktop-style menu bar with dropdown menus. '
+                'Uses OiMenuItem for top-level entries and nested children. '
+                'Supports keyboard navigation and dividers.',
+            examples: [
+              ComponentExample(
+                title: 'Application menu',
+                child: OiMenuBar(
+                  label: 'App menu',
+                  items: [
+                    OiMenuItem(
+                      label: 'File',
+                      children: [
+                        OiMenuItem(label: 'New', onTap: () {}),
+                        OiMenuItem(label: 'Open', onTap: () {}),
+                        OiMenuItem(label: 'Save', onTap: () {}),
+                        const OiMenuDivider(),
+                        OiMenuItem(label: 'Exit', onTap: () {}),
+                      ],
+                    ),
+                    OiMenuItem(
+                      label: 'Edit',
+                      children: [
+                        OiMenuItem(label: 'Undo', onTap: () {}),
+                        OiMenuItem(label: 'Redo', onTap: () {}),
+                        const OiMenuDivider(),
+                        OiMenuItem(label: 'Cut', onTap: () {}),
+                        OiMenuItem(label: 'Copy', onTap: () {}),
+                        OiMenuItem(label: 'Paste', onTap: () {}),
+                      ],
+                    ),
+                    OiMenuItem(
+                      label: 'View',
+                      children: [
+                        OiMenuItem(label: 'Zoom In', onTap: () {}),
+                        OiMenuItem(label: 'Zoom Out', onTap: () {}),
+                        OiMenuItem(label: 'Reset Zoom', onTap: () {}),
+                      ],
+                    ),
+                    OiMenuItem(
+                      label: 'Help',
+                      children: [
+                        OiMenuItem(label: 'Documentation', onTap: () {}),
+                        OiMenuItem(label: 'About', onTap: () {}),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+
+          // ── OiStatusBar ────────────────────────────────────────────────
+          const ComponentShowcaseSection(
+            title: 'Status Bar',
+            widgetName: 'OiStatusBar',
+            description:
+                'A compact bottom status bar with leading and trailing '
+                'widget slots. Ideal for showing editor-style status '
+                'information like file encoding, line numbers, and '
+                'git branch.',
+            examples: [
+              ComponentExample(
+                title: 'Editor status bar',
+                child: OiStatusBar(
+                  label: 'Editor status',
+                  leading: [
+                    OiStatusBarItem(label: 'main', icon: OiIcons.gitBranch),
+                    OiStatusBarItem(label: '0 errors', icon: OiIcons.circleX),
+                  ],
+                  trailing: [
+                    OiStatusBarItem(label: 'UTF-8'),
+                    OiStatusBarItem(label: 'Ln 42, Col 8'),
+                    OiStatusBarItem(label: 'Dart', icon: OiIcons.code),
+                  ],
+                ),
+              ),
+            ],
+          ),
+
+          // ── OiFilterableNavList ─────────────────────────────────────────
+          ComponentShowcaseSection(
+            title: 'Filterable Nav List',
+            widgetName: 'OiFilterableNavList',
+            description:
+                'A navigation list with search filtering, chip filters, '
+                'and collapsible groups. Generic over item type. '
+                'Commonly used in master-detail layouts.',
+            examples: [
+              ComponentExample(
+                title: 'Project navigation',
+                child: SizedBox(
+                  height: 350,
+                  width: 280,
+                  child:
+                      OiFilterableNavList<
+                        ({String id, String title, String group})
+                      >(
+                        label: 'Projects',
+                        items: const [
+                          (id: '1', title: 'Website Redesign', group: 'active'),
+                          (id: '2', title: 'Mobile App', group: 'active'),
+                          (id: '3', title: 'API Refactor', group: 'active'),
+                          (id: '4', title: 'Docs Site', group: 'completed'),
+                          (id: '5', title: 'CI Pipeline', group: 'completed'),
+                        ],
+                        groups: const [
+                          OiNavGroup(id: 'active', label: 'Active'),
+                          OiNavGroup(id: 'completed', label: 'Completed'),
+                        ],
+                        idOf: (item) => item.id,
+                        groupIdOf: (item) => item.group,
+                        titleOf: (item) => item.title,
+                        selectedItemId: '1',
+                        onItemSelected: (_) {},
+                      ),
+                ),
+              ),
+            ],
+          ),
+
+          // ── OiThreeColumnLayout ─────────────────────────────────────────
+          ComponentShowcaseSection(
+            title: 'Three Column Layout',
+            widgetName: 'OiThreeColumnLayout',
+            description:
+                'A configurable three-column layout with resizable '
+                'dividers. Common for IDE-style layouts with sidebar, '
+                'content area, and detail/preview panel.',
+            examples: [
+              ComponentExample(
+                title: 'Mail client layout',
+                child: SizedBox(
+                  height: 300,
+                  child: OiThreeColumnLayout(
+                    label: 'Mail layout',
+                    leftColumnWidth: 180,
+                    leftColumnMinWidth: 140,
+                    rightColumnWidth: 220,
+                    leftColumn: ColoredBox(
+                      color: context.colors.surfaceSubtle,
+                      child: const Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: EdgeInsets.all(12),
+                            child: OiLabel.bodyStrong('Folders'),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 4,
+                            ),
+                            child: OiLabel.body('Inbox'),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 4,
+                            ),
+                            child: OiLabel.body('Sent'),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 4,
+                            ),
+                            child: OiLabel.body('Drafts'),
+                          ),
+                        ],
+                      ),
+                    ),
+                    middleColumn: const Center(
+                      child: OiLabel.body('Message list'),
+                    ),
+                    rightColumn: const Center(
+                      child: OiLabel.body('Message preview'),
+                    ),
+                  ),
                 ),
               ),
             ],

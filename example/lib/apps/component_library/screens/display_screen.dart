@@ -59,10 +59,7 @@ class _DisplayScreenState extends State<DisplayScreen> {
                       initials: 'SM',
                       size: OiAvatarSize.sm,
                     ),
-                    OiAvatar(
-                      semanticLabel: 'Medium avatar',
-                      initials: 'MD',
-                    ),
+                    OiAvatar(semanticLabel: 'Medium avatar', initials: 'MD'),
                     OiAvatar(
                       semanticLabel: 'Large avatar',
                       initials: 'LG',
@@ -190,26 +187,15 @@ class _DisplayScreenState extends State<DisplayScreen> {
                   runSpacing: 12,
                   crossAxisAlignment: WrapCrossAlignment.center,
                   children: [
-                    OiBadge.filled(
-                      label: 'Small',
-                      size: OiBadgeSize.small,
-                    ),
-                    OiBadge.filled(
-                      label: 'Medium',
-                    ),
-                    OiBadge.filled(
-                      label: 'Large',
-                      size: OiBadgeSize.large,
-                    ),
+                    OiBadge.filled(label: 'Small', size: OiBadgeSize.small),
+                    OiBadge.filled(label: 'Medium'),
+                    OiBadge.filled(label: 'Large', size: OiBadgeSize.large),
                     OiBadge.soft(
                       label: 'Small',
                       size: OiBadgeSize.small,
                       color: OiBadgeColor.success,
                     ),
-                    OiBadge.soft(
-                      label: 'Medium',
-                      color: OiBadgeColor.success,
-                    ),
+                    OiBadge.soft(label: 'Medium', color: OiBadgeColor.success),
                     OiBadge.soft(
                       label: 'Large',
                       size: OiBadgeSize.large,
@@ -234,7 +220,9 @@ class _DisplayScreenState extends State<DisplayScreen> {
                 child: OiCard(
                   child: Padding(
                     padding: EdgeInsets.all(spacing.md),
-                    child: const OiLabel.body('Elevated card with default shadow.'),
+                    child: const OiLabel.body(
+                      'Elevated card with default shadow.',
+                    ),
                   ),
                 ),
               ),
@@ -252,7 +240,9 @@ class _DisplayScreenState extends State<DisplayScreen> {
                 child: OiCard.outlined(
                   child: Padding(
                     padding: EdgeInsets.all(spacing.md),
-                    child: const OiLabel.body('Outlined card with border only.'),
+                    child: const OiLabel.body(
+                      'Outlined card with border only.',
+                    ),
                   ),
                 ),
               ),
@@ -263,7 +253,9 @@ class _DisplayScreenState extends State<DisplayScreen> {
                   onTap: () {},
                   child: Padding(
                     padding: EdgeInsets.all(spacing.md),
-                    child: const OiLabel.body('Tap me - shows hover/focus effects.'),
+                    child: const OiLabel.body(
+                      'Tap me - shows hover/focus effects.',
+                    ),
                   ),
                 ),
               ),
@@ -400,8 +392,7 @@ class _DisplayScreenState extends State<DisplayScreen> {
                   anchor: OiButton.secondary(
                     label: 'Toggle popover',
                     icon: OiIcons.chevronDown,
-                    onTap: () =>
-                        setState(() => _popoverOpen = !_popoverOpen),
+                    onTap: () => setState(() => _popoverOpen = !_popoverOpen),
                   ),
                   content: Padding(
                     padding: EdgeInsets.all(context.spacing.md),
@@ -540,7 +531,10 @@ class _DisplayScreenState extends State<DisplayScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const OiFieldDisplay(label: 'Email', value: 'user@example.com'),
+                    const OiFieldDisplay(
+                      label: 'Email',
+                      value: 'user@example.com',
+                    ),
                     SizedBox(height: spacing.sm),
                     const OiFieldDisplay(label: 'Status', value: 'Active'),
                     SizedBox(height: spacing.sm),
@@ -761,6 +755,55 @@ class _DisplayScreenState extends State<DisplayScreen> {
                     message: 'Drop files here',
                     icon: OiIcons.upload,
                     child: SizedBox(height: 120, width: double.infinity),
+                  ),
+                ),
+              ),
+            ],
+          ),
+
+          // ── OiImagePreviewCard ──────────────────────────────────────
+          ComponentShowcaseSection(
+            title: 'Image Preview Card',
+            widgetName: 'OiImagePreviewCard',
+            description:
+                'A card that displays an image preview with optional '
+                'loading, regenerating, badge, edit-overlay, and '
+                'version-label states. Supports pinch-to-zoom and '
+                'custom placeholders.',
+            examples: [
+              const ComponentExample(
+                title: 'Default with image',
+                child: SizedBox(
+                  height: 200,
+                  width: 300,
+                  child: OiImagePreviewCard(
+                    alt: 'Sample product photo',
+                    imageUrl: 'https://picsum.photos/seed/obers/600/400',
+                    versionLabel: 'v2',
+                  ),
+                ),
+              ),
+              const ComponentExample(
+                title: 'Loading state',
+                child: SizedBox(
+                  height: 200,
+                  width: 300,
+                  child: OiImagePreviewCard(
+                    alt: 'Loading preview',
+                    loading: true,
+                  ),
+                ),
+              ),
+              ComponentExample(
+                title: 'With badge and edit overlay',
+                child: SizedBox(
+                  height: 200,
+                  width: 300,
+                  child: OiImagePreviewCard(
+                    alt: 'Editable preview',
+                    imageUrl: 'https://picsum.photos/seed/obers2/600/400',
+                    statusBadge: const OiBadge.soft(label: 'Draft'),
+                    onEdit: () {},
                   ),
                 ),
               ),

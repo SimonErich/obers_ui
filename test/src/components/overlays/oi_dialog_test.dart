@@ -121,4 +121,56 @@ void main() {
     await tester.pump();
     expect(find.text('Shown'), findsOneWidget);
   });
+
+  // ── fullScreen enhancements ─────────────────────────────────────────────
+
+  testWidgets('fullScreen: onSave callback is stored on widget', (
+    tester,
+  ) async {
+    var saved = false;
+    await tester.pumpObers(
+      OiDialog.fullScreen(
+        label: 'fs',
+        title: 'Edit',
+        onSave: () => saved = true,
+        content: const Text('Body'),
+      ),
+    );
+    final dialog = tester.widget<OiDialog>(find.byType(OiDialog));
+    expect(dialog.onSave, isNotNull);
+    dialog.onSave!();
+    expect(saved, isTrue);
+  });
+
+  testWidgets('fullScreen: unsavedChanges suppresses scrim dismiss', (
+    tester,
+  ) async {
+    var closed = false;
+    await tester.pumpObers(
+      OiDialog.fullScreen(
+        label: 'fs',
+        title: 'Edit',
+        unsavedChanges: true,
+        onClose: () => closed = true,
+        content: const Text('Body'),
+      ),
+    );
+    // Tap the scrim area — should NOT call onClose because
+    // unsavedChanges overrides dismissible to false.
+    await tester.tapAt(Offset.zero);
+    await tester.pump();
+    expect(closed, isFalse);
+  });
+
+  testWidgets('fullScreen: unsavedChanges defaults to false', (tester) async {
+    await tester.pumpObers(
+      const OiDialog.fullScreen(
+        label: 'fs',
+        title: 'Edit',
+        content: Text('Body'),
+      ),
+    );
+    final dialog = tester.widget<OiDialog>(find.byType(OiDialog));
+    expect(dialog.unsavedChanges, isFalse);
+  });
 }

@@ -1,9 +1,8 @@
-import 'package:obers_ui/obers_ui.dart'
-    show OiFieldDisplay, OiForm, OiFormField;
+import 'package:obers_ui/obers_ui.dart' show OiFieldDisplay;
 
 /// The type of a field, shared by form inputs and read-only display widgets.
 ///
-/// Determines which input widget [OiForm] renders and how [OiFieldDisplay]
+/// Determines which input widget a form renders and how [OiFieldDisplay]
 /// formats a read-only value.
 ///
 /// {@category Models}
@@ -73,6 +72,6 @@ enum OiFieldType {
   /// A JSON value rendered as formatted code.
   json,
 
-  /// A custom widget supplied via [OiFormField.customBuilder].
+  /// A custom widget supplied via a `customBuilder` callback.
   custom,
 }

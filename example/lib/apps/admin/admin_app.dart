@@ -281,7 +281,7 @@ class _AdminAppState extends State<AdminApp> {
                       onTap: () =>
                           OiToast.show(context, message: 'Preferences clicked'),
                     ),
-                    const OiMenuItem(label: '', separator: true),
+                    const OiMenuDivider(),
                     OiMenuItem(
                       label: 'Sign Out',
                       icon: OiIcons.logOut,

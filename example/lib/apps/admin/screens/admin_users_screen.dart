@@ -47,7 +47,7 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
             message: 'Email sent to ${row['name']}',
           ),
         ),
-        const OiMenuItem(label: '', separator: true),
+        const OiMenuDivider(),
         OiMenuItem(
           label: 'Deactivate',
           icon: OiIcons.ban,

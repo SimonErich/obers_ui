@@ -414,7 +414,7 @@ class _OverlaysScreenState extends State<OverlaysScreen> {
                       icon: OiIcons.clipboard,
                       onTap: () {},
                     ),
-                    const OiMenuItem(label: '', separator: true),
+                    const OiMenuDivider(),
                     OiMenuItem(
                       label: 'Delete',
                       icon: OiIcons.trash,

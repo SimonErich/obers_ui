@@ -44,7 +44,7 @@ final oiComponentDialogsComponent = WidgetbookComponent(
       name: 'Rename Dialog',
       builder: (context) {
         final isFolder = context.knobs.boolean(label: 'Is folder');
-        return useCaseWrapper(_RenameDialogDemo(isFolder: isFolder));
+        return useCaseWrapper(_RenameDialogDemo(folder: isFolder));
       },
     ),
   ],
@@ -119,8 +119,8 @@ class _NewFolderDialogDemoState extends State<_NewFolderDialogDemo> {
 }
 
 class _RenameDialogDemo extends StatefulWidget {
-  const _RenameDialogDemo({required this.isFolder});
-  final bool isFolder;
+  const _RenameDialogDemo({required this.folder});
+  final bool folder;
 
   @override
   State<_RenameDialogDemo> createState() => _RenameDialogDemoState();
@@ -133,8 +133,8 @@ class _RenameDialogDemoState extends State<_RenameDialogDemo> {
   Widget build(BuildContext context) {
     final file = OiFileNodeData(
       id: '1',
-      name: widget.isFolder ? 'My Folder' : 'document.pdf',
-      folder: widget.isFolder,
+      name: widget.folder ? 'My Folder' : 'document.pdf',
+      folder: widget.folder,
     );
 
     return Column(

@@ -20,6 +20,7 @@ Primitives are single-purpose, low-level widgets. They're the building blocks th
 | `OiWrapLayout` | Flow/wrap layout |
 | `OiShow` / `OiHide` | Show/hide children at specific breakpoints |
 | `OiSpan` | Per-child grid span configuration |
+| `OiGridZoomControls` | Wraps OiGrid with +/- zoom controls for column count |
 
 ### OiGrid
 
@@ -43,6 +44,22 @@ OiGrid(
 ```
 
 See [Layout > Grid](../layout/grid.md) for the full guide.
+
+### OiGridZoomControls
+
+A wrapper around `OiGrid` that adds +/- zoom controls to change the column count interactively. Ideal for gallery or card views where users want to adjust density.
+
+```dart
+OiGridZoomControls(
+  breakpoint: context.breakpoint,
+  initialColumns: 3,
+  minColumns: 1,
+  maxColumns: 6,
+  onColumnsChanged: (cols) => print('Now $cols columns'),
+  gap: OiResponsive<double>(16),
+  children: [...],
+)
+```
 
 ## Display
 

@@ -18,6 +18,9 @@ migrate_working_dir/
 
 # VSCode
 .vscode/
+.claude/skills
+.claude/agents
+.claude/worktrees
 
 # Flutter/Dart/Pub
 /pubspec.lock
@@ -37,4 +40,6 @@ migrate_working_dir/
 
 # dev tools
 .broins
-.historypackages/obers_ui_charts/build/
+.history
+packages/obers_ui_charts/build/
+.peakz

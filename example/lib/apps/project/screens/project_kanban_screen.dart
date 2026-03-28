@@ -108,7 +108,7 @@ class _ProjectKanbanScreenState extends State<ProjectKanbanScreen> {
           );
         },
       ),
-      const OiMenuItem(label: '', separator: true),
+      const OiMenuDivider(),
       OiMenuItem(
         label: 'Move to Backlog',
         icon: OiIcons.undo2,
@@ -134,7 +134,7 @@ class _ProjectKanbanScreenState extends State<ProjectKanbanScreen> {
         icon: OiIcons.circleCheck,
         onTap: () => _moveTaskToColumn(task, 'done'),
       ),
-      const OiMenuItem(label: '', separator: true),
+      const OiMenuDivider(),
       OiMenuItem(
         label: 'Delete',
         icon: OiIcons.trash2,

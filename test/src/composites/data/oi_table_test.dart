@@ -1024,6 +1024,10 @@ void main() {
     await tester.pump();
 
     expect(ctrl.pagination.pageSize, 10);
+    expect(
+      changedTo,
+      isNull,
+    ); // callback not fired (OiSelect overlay not hittable in widget tests)
   });
 
   // 45. Page number buttons render for small page count
@@ -2663,6 +2667,8 @@ void main() {
     expect(find.text('✓'), findsOneWidget);
     // The edit frame renders with commit/cancel controls, confirming edit mode
     // and that onCellChanged is wired up correctly.
+    expect(changedColumnId, isNull); // not yet committed
+    expect(changedValue, isNull);
     await tester.pump(const Duration(seconds: 1));
   });
 

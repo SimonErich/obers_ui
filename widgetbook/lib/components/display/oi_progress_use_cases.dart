@@ -63,5 +63,36 @@ final oiProgressComponent = WidgetbookComponent(
         );
       },
     ),
+    WidgetbookUseCase(
+      name: 'Bulk',
+      builder: (context) {
+        final current = context.knobs.int.slider(
+          label: 'Current',
+          initialValue: 5,
+        );
+        final total = context.knobs.int.slider(
+          label: 'Total',
+          initialValue: 18,
+          min: 1,
+        );
+        final showPercentage = context.knobs.boolean(
+          label: 'Show Percentage',
+          initialValue: true,
+        );
+
+        return useCaseWrapper(
+          SizedBox(
+            width: 300,
+            child: OiProgress.bulk(
+              current: current,
+              total: total,
+              label: 'Generating specs',
+              currentItemLabel: 'Authentication Screen',
+              showPercentage: showPercentage,
+            ),
+          ),
+        );
+      },
+    ),
   ],
 );

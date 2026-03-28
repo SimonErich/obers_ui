@@ -77,6 +77,8 @@ class OiDialog extends StatelessWidget {
     this.content,
     this.actions,
     this.onClose,
+    this.onSave,
+    this.unsavedChanges = false,
     this.dismissible = true,
     super.key,
   });
@@ -164,12 +166,20 @@ class OiDialog extends StatelessWidget {
        );
 
   /// Creates a full-screen dialog.
+  ///
+  /// When [unsavedChanges] is `true`, scrim tap and Escape key are
+  /// suppressed — the user must use the explicit close button.
+  ///
+  /// [onSave] is an optional save callback, typically wired to a header-bar
+  /// save button by the consumer.
   const OiDialog.fullScreen({
     required String label,
     String? title,
     Widget? content,
     List<Widget>? actions,
     VoidCallback? onClose,
+    VoidCallback? onSave,
+    bool unsavedChanges = false,
     bool dismissible = true,
     Key? key,
   }) : this._(
@@ -179,6 +189,8 @@ class OiDialog extends StatelessWidget {
          content: content,
          actions: actions,
          onClose: onClose,
+         onSave: onSave,
+         unsavedChanges: unsavedChanges,
          dismissible: dismissible,
          key: key,
        );
@@ -200,6 +212,13 @@ class OiDialog extends StatelessWidget {
 
   /// Called when the dialog should close (Escape key or scrim tap).
   final VoidCallback? onClose;
+
+  /// Called when the user saves in a [OiDialog.fullScreen] dialog.
+  final VoidCallback? onSave;
+
+  /// When `true` in a [OiDialog.fullScreen] dialog, the scrim tap and Escape
+  /// key are suppressed, forcing the user to use the explicit close button.
+  final bool unsavedChanges;
 
   /// Whether tapping the scrim closes the dialog. Defaults to `true`.
   final bool dismissible;
@@ -266,6 +285,9 @@ class OiDialog extends StatelessWidget {
     final dt = context.components.dialog;
     final isFullScreen = variant == OiDialogVariant.fullScreen;
     final isForm = variant == OiDialogVariant.form;
+    // When unsavedChanges is true on fullScreen, suppress scrim/Escape.
+    final effectiveDismissible =
+        !(isFullScreen && unsavedChanges) && dismissible;
 
     final hPad = dt?.contentPadding?.left ?? 24.0;
     final topPad = dt?.contentPadding?.top ?? 20.0;
@@ -349,7 +371,10 @@ class OiDialog extends StatelessWidget {
       panel = OiDialogShell(maxWidth: 480, minWidth: 280, child: dialogContent);
     }
 
-    panel = OiFocusTrap(onEscape: onClose, child: panel);
+    panel = OiFocusTrap(
+      onEscape: effectiveDismissible ? onClose : null,
+      child: panel,
+    );
 
     if (isFullScreen) {
       panel = Positioned.fill(child: panel);
@@ -367,7 +392,7 @@ class OiDialog extends StatelessWidget {
           Positioned.fill(
             child: GestureDetector(
               behavior: HitTestBehavior.opaque,
-              onTap: dismissible ? onClose : null,
+              onTap: effectiveDismissible ? onClose : null,
               child: ColoredBox(color: colors.overlay),
             ),
           ),

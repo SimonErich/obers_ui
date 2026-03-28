@@ -24,6 +24,21 @@ Think of modules as the "just add data" layer — the cream on top.
 | `OiAuthPage` | Authentication page with login, register, forgot-password flows |
 | `OiAppShell` | Admin layout scaffold with sidebar, top bar, responsive drawer |
 | `OiResourcePage` | Generic CRUD page scaffold for list/show/edit/create views |
+| `OiChatWindow` | LLM-focused chat with streaming, suggestion chips, provider selector |
+| `OiChangelogView` | Versioned changelog viewer with type filters and search |
+| `OiConsentBanner` | GDPR cookie consent banner with category toggles |
+| `OiDevMenu` | Developer debug menu with environment switching and feature flags |
+| `OiDrawerNavigation` | Structured drawer with header, grouped sections, and nested items |
+| `OiFeedbackSheet` | User feedback form with rating, category, and message |
+| `OiHelpCenter` | Tabbed help center with FAQ, knowledge base, and contact form |
+| `OiMaintenancePage` | Full-page maintenance/error screen with countdown and retry |
+| `OiMediaPicker` | Media selection with gallery grid, file upload, and type filtering |
+| `OiOnboardingFlow` | Multi-step onboarding with illustrations and page indicators |
+| `OiPricingTable` | Pricing comparison table with billing toggle and feature matrix |
+| `OiProfilePage` | User profile management with editable fields and linked accounts |
+| `OiSearchOverlay` | Full-screen search overlay with categories and recent searches |
+| `OiSettingsPage` | Structured settings page with toggle/select/slider item types |
+| `OiSubscriptionManager` | Subscription management with usage, billing, and payment |
 
 ---
 
@@ -396,3 +411,698 @@ OiResourcePage(
 **OiResourcePageVariant enum:** `list` (Create button + filters + pagination), `show` (Edit + Delete buttons), `edit` (Save + Cancel buttons), `create` (Save + Cancel buttons).
 
 **Action names:** `'create'`, `'edit'`, `'delete'`, `'save'`, `'cancel'`.
+
+---
+
+## OiChatWindow
+
+An LLM-focused chat interface with streaming support, suggestion chips, and provider selection. Different from `OiChat` (which is designed for social messaging with threads and reactions), `OiChatWindow` is purpose-built for AI assistant interactions.
+
+```dart
+OiChatWindow(
+  label: 'AI Assistant',
+  messages: [
+    OiChatWindowMessage(
+      id: '1', role: 'user',
+      content: 'Help me design a login screen',
+      timestamp: DateTime.now(),
+    ),
+    OiChatWindowMessage(
+      id: '2', role: 'assistant',
+      content: 'Here are some suggestions for your login screen...',
+      timestamp: DateTime.now(),
+      suggestions: [
+        OiChatSuggestion(id: 's1', text: 'Add social login'),
+        OiChatSuggestion(id: 's2', text: 'Add forgot password'),
+      ],
+    ),
+  ],
+  streamingContent: 'Generating response...',
+  streaming: true,
+  onSendMessage: (text) => sendToLlm(text),
+  providerSelector: ProviderDropdown(),
+)
+```
+
+**Key features:**
+
+- Markdown rendering in message bubbles via `OiMarkdown`
+- Token-by-token streaming with blinking cursor
+- Suggestion chips (single/multi select)
+- Auto-scroll to bottom
+- Provider selector slot
+- Session management
+
+| Parameter | Type | Description |
+|---|---|---|
+| `messages` | `List<OiChatWindowMessage>` | Chat message history (required) |
+| `label` | `String` | Accessibility label (required) |
+| `onSendMessage` | `ValueChanged<String>?` | Called when user sends a message |
+| `streaming` | `bool` | Whether the assistant is currently streaming a response |
+| `streamingContent` | `String?` | Partial content being streamed (renders with blinking cursor) |
+| `onSuggestionTap` | `ValueChanged<OiChatSuggestion>?` | Called when user taps a suggestion chip |
+| `providerSelector` | `Widget?` | Optional widget slot for LLM provider selection |
+| `onNewSession` | `VoidCallback?` | Called when user starts a new chat session |
+| `inputPlaceholder` | `String?` | Placeholder text for the compose input |
+
+**OiChatWindowMessage fields:** `id`, `role` (`'user'` / `'assistant'` / `'system'`), `content` (markdown string), `timestamp`, `suggestions` (list of `OiChatSuggestion`).
+
+**Related components:** `OiChat`, `OiMarkdown`, `OiSmartInput`
+
+---
+
+## OiFileManager
+
+A file operations manager providing UI for move, copy, delete, upload, and download actions. Works alongside `OiFileExplorer` or as a standalone operations panel.
+
+```dart
+OiFileManager(
+  label: 'File operations',
+  files: selectedFiles,
+  onMove: (files, destination) async => await api.move(files, destination),
+  onCopy: (files, destination) async => await api.copy(files, destination),
+  onDelete: (files) async => await api.delete(files),
+  onDownload: (files) => download(files),
+)
+```
+
+**Features:** batch operations, progress tracking, conflict resolution dialogs, undo support.
+
+---
+
+## OiActivityFeed
+
+A chronological activity stream showing user actions, system events, and notifications.
+
+```dart
+OiActivityFeed(
+  label: 'Activity',
+  activities: activities,
+  onLoadMore: () async => await fetchMore(),
+  activityBuilder: (activity) => OiListTile(
+    title: OiLabel.body(activity.message),
+    leading: OiAvatar(initials: activity.user.initials),
+  ),
+)
+```
+
+**Features:** infinite scroll, grouped by date, activity type icons, user avatars, and relative timestamps.
+
+---
+
+## OiMetadataEditor
+
+A key-value metadata editor for adding, editing, and removing custom fields on any entity.
+
+```dart
+OiMetadataEditor(
+  label: 'Metadata',
+  entries: metadata,
+  onAdd: (key, value) async => await api.addMeta(key, value),
+  onEdit: (key, value) async => await api.updateMeta(key, value),
+  onRemove: (key) async => await api.removeMeta(key),
+)
+```
+
+**Features:** inline editing, type-aware value inputs, validation, and add/remove rows.
+
+---
+
+## OiNotificationCenter
+
+A notification panel for displaying and managing user notifications.
+
+```dart
+OiNotificationCenter(
+  label: 'Notifications',
+  notifications: notifications,
+  onMarkRead: (id) async => await api.markRead(id),
+  onMarkAllRead: () async => await api.markAllRead(),
+  onDismiss: (id) async => await api.dismiss(id),
+)
+```
+
+**Features:** unread badge count, mark all read, dismiss individual items, grouped by date, empty state.
+
+---
+
+## OiPermissions
+
+A role-based permission matrix for managing access control.
+
+```dart
+OiPermissions(
+  label: 'Permissions',
+  roles: roles,
+  resources: resources,
+  matrix: permissionMatrix,
+  onChange: (role, resource, permission) async {
+    await api.setPermission(role, resource, permission);
+  },
+)
+```
+
+**Features:** grid-based role-resource matrix, toggle/tri-state permissions, role management, and visual permission inheritance.
+
+---
+
+## OiChangelogView
+
+A versioned changelog viewer with expandable releases, change-type badges, filtering, and search.
+
+```dart
+OiChangelogView(
+  label: 'Release notes',
+  versions: [
+    OiVersionEntry(
+      version: '2.1.0',
+      date: DateTime(2026, 3, 28),
+      isLatest: true,
+      changes: [
+        OiChangeEntry(description: 'Added dark mode', type: OiChangeType.added),
+        OiChangeEntry(description: 'Fixed timezone bug', type: OiChangeType.fixed),
+      ],
+    ),
+  ],
+)
+```
+
+| Parameter | Type | Description |
+|---|---|---|
+| `versions` | `List<OiVersionEntry>` | Release versions to display (required) |
+| `label` | `String` | Accessibility label (required) |
+| `onVersionTap` | `ValueChanged<OiVersionEntry>?` | Called when a version header is tapped |
+| `initiallyExpandedCount` | `int` | Number of versions expanded initially. Defaults to `3` |
+| `showSearch` | `bool` | Show search bar. Defaults to `true` |
+| `showTypeFilters` | `bool` | Show change-type filter chips. Defaults to `true` |
+| `maxWidth` | `double` | Maximum content width. Defaults to `720` |
+
+**OiChangeType enum:** `added`, `changed`, `fixed`, `removed`, `security`, `deprecated`.
+
+---
+
+## OiConsentBanner
+
+A GDPR-style cookie consent banner with accept/reject all, manage preferences, and per-category toggles.
+
+```dart
+OiConsentBanner(
+  label: 'Cookie consent',
+  categories: [
+    OiConsentCategory(key: 'essential', name: 'Essential', required: true),
+    OiConsentCategory(key: 'analytics', name: 'Analytics', description: 'Usage data'),
+    OiConsentCategory(key: 'marketing', name: 'Marketing'),
+  ],
+  onAcceptAll: () => saveAll(true),
+  onRejectAll: () => saveAll(false),
+  onSavePreferences: (prefs) => savePreferences(prefs),
+)
+
+// Minimal variant
+OiConsentBanner.minimal(
+  label: 'Cookies',
+  onAcceptAll: () => accept(),
+)
+```
+
+| Parameter | Type | Description |
+|---|---|---|
+| `categories` | `List<OiConsentCategory>` | Consent categories (required) |
+| `label` | `String` | Accessibility label (required) |
+| `title` | `String` | Banner title. Defaults to `'We use cookies'` |
+| `onAcceptAll` | `VoidCallback?` | Called when user accepts all |
+| `onRejectAll` | `VoidCallback?` | Called when user rejects all |
+| `onSavePreferences` | `ValueChanged<Map<String, bool>>?` | Called when user saves custom preferences |
+| `position` | `OiConsentPosition` | Top or bottom. Defaults to `bottom` |
+| `visible` | `bool` | Show/hide the banner. Defaults to `true` |
+
+**Factory constructors:** `OiConsentBanner.minimal()` for a simple accept/reject banner without category management.
+
+---
+
+## OiDevMenu
+
+A developer/debug menu with environment switching, feature flags, quick actions, and log viewer.
+
+```dart
+OiDevMenu(
+  label: 'Dev menu',
+  environments: [
+    OiDevEnvironment(key: 'dev', label: 'Development', url: 'http://localhost:3000'),
+    OiDevEnvironment(key: 'prod', label: 'Production', url: 'https://example.com'),
+  ],
+  currentEnvironment: 'dev',
+  onEnvironmentChange: (key) => switchEnv(key),
+  featureFlags: [
+    OiFeatureFlag(key: 'dark_mode', label: 'Dark Mode'),
+    OiFeatureFlag(key: 'new_ui', label: 'New UI', description: 'Redesigned dashboard'),
+  ],
+  featureFlagValues: {'dark_mode': true, 'new_ui': false},
+  onFeatureFlagChange: (key, {required value}) => setFlag(key, value),
+  actions: [
+    OiDevAction(label: 'Clear cache', icon: OiIcons.trash, onTap: () => clearCache()),
+  ],
+)
+
+// Hidden trigger variant (triple-tap to open)
+OiDevMenu.trigger(
+  label: 'Dev',
+  child: MyApp(),
+  tapCount: 3,
+  // ... same params as above
+)
+```
+
+| Parameter | Type | Description |
+|---|---|---|
+| `label` | `String` | Accessibility label (required) |
+| `environments` | `List<OiDevEnvironment>` | Available environments |
+| `currentEnvironment` | `String?` | Currently active environment key |
+| `onEnvironmentChange` | `ValueChanged<String>?` | Called on environment switch |
+| `featureFlags` | `List<OiFeatureFlag>` | Feature flag definitions |
+| `featureFlagValues` | `Map<String, bool>` | Current flag states |
+| `onFeatureFlagChange` | `Function(String, {required bool value})?` | Called on flag toggle |
+| `actions` | `List<OiDevAction>` | Quick action buttons |
+| `logs` | `List<OiLogEntry>` | Log entries for the log viewer |
+
+**OiLogLevel enum:** `debug`, `info`, `warning`, `error`.
+
+---
+
+## OiDrawerNavigation
+
+A structured mobile-first drawer with user header, grouped navigation sections, nested items, badges, and toggles.
+
+```dart
+OiDrawerNavigation(
+  label: 'Navigation',
+  header: OiDrawerHeader(
+    name: 'Jane Doe',
+    subtitle: 'jane@example.com',
+  ),
+  selectedKey: 'home',
+  onItemTap: (item) => navigate(item.key),
+  sections: [
+    OiDrawerSection(
+      items: [
+        OiDrawerItem(key: 'home', label: 'Home', icon: OiIcons.house),
+        OiDrawerItem(key: 'projects', label: 'Projects', icon: OiIcons.folder, badge: '3'),
+      ],
+    ),
+    OiDrawerSection(
+      title: 'Settings',
+      items: [
+        OiDrawerItem(key: 'account', label: 'Account', icon: OiIcons.user),
+      ],
+    ),
+  ],
+)
+```
+
+| Parameter | Type | Description |
+|---|---|---|
+| `sections` | `List<OiDrawerSection>` | Navigation sections (required) |
+| `label` | `String` | Accessibility label (required) |
+| `header` | `OiDrawerHeader?` | User header with avatar, name, subtitle |
+| `footer` | `Widget?` | Footer widget at the bottom |
+| `selectedKey` | `Object?` | Currently selected item key |
+| `onItemTap` | `ValueChanged<OiDrawerItem>?` | Called when item is tapped |
+| `width` | `double` | Drawer width. Defaults to `300` |
+| `showDividers` | `bool` | Show section dividers. Defaults to `true` |
+
+**Features:** avatar display, nested child items with expand/collapse, badge counts, section-level toggles, and disabled items.
+
+---
+
+## OiFeedbackSheet
+
+A user-feedback form with category selection, rating (stars or sentiment), free-text message, and optional email field.
+
+```dart
+OiFeedbackSheet(
+  label: 'Send feedback',
+  onSubmit: (data) async {
+    await api.submitFeedback(data);
+    return true;
+  },
+  ratingType: OiFeedbackRatingType.stars,
+  showEmail: true,
+)
+```
+
+| Parameter | Type | Description |
+|---|---|---|
+| `label` | `String` | Accessibility label (required) |
+| `onSubmit` | `Future<bool> Function(OiFeedbackData)?` | Submit callback, returns `true` on success |
+| `ratingType` | `OiFeedbackRatingType` | Stars or sentiment. Defaults to `sentiment` |
+| `categories` | `List<OiFeedbackCategory>` | Feedback categories |
+| `showEmail` | `bool` | Show email input. Defaults to `true` |
+| `metadata` | `Map<String, String>` | Extra metadata sent with submission |
+
+**OiFeedbackCategory enum:** `bug`, `featureRequest`, `general`, `other`.
+
+**Features:** multi-step flow (category → rating → message → thank you), animated transitions, thank-you confirmation screen.
+
+---
+
+## OiHelpCenter
+
+A tabbed help center with FAQ, knowledge base articles, contact form, and feedback collection. Searchable across all sections.
+
+```dart
+OiHelpCenter(
+  label: 'Help',
+  faq: [
+    OiFaqItem(question: 'How do I reset my password?', answer: 'Go to Settings > Account.'),
+    OiFaqItem(question: 'How do I export data?', answer: 'Settings > Data > Export.'),
+  ],
+  articles: [
+    OiKnowledgeArticle(key: 'getting-started', title: 'Getting Started', content: '...'),
+  ],
+  onContactSubmit: ({required subject, required message, email}) async => true,
+)
+```
+
+| Parameter | Type | Description |
+|---|---|---|
+| `label` | `String` | Accessibility label (required) |
+| `faq` | `List<OiFaqItem>` | FAQ items with question/answer |
+| `articles` | `List<OiKnowledgeArticle>` | Knowledge base articles |
+| `onContactSubmit` | `Future<bool> Function({...})?` | Contact form callback |
+| `onFeedbackSubmit` | `Future<bool> Function({...})?` | Feedback callback |
+| `showFaq` | `bool` | Show FAQ tab. Defaults to `true` |
+| `showContact` | `bool` | Show contact tab. Defaults to `true` |
+| `showKnowledgeBase` | `bool` | Show articles tab. Defaults to `true` |
+| `searchEnabled` | `bool` | Enable cross-section search. Defaults to `true` |
+
+**Features:** tab navigation, expandable FAQ accordion, article search, contact form with email/subject/message, and feedback rating.
+
+---
+
+## OiMaintenancePage
+
+A full-page maintenance/error screen with factory constructors for common scenarios.
+
+```dart
+// Scheduled maintenance with countdown
+OiMaintenancePage.maintenance(
+  estimatedReturn: DateTime.now().add(Duration(hours: 2)),
+)
+
+// 404 page
+OiMaintenancePage.notFound(onRetry: () => router.go('/'))
+
+// Server error
+OiMaintenancePage.serverError(onRetry: () => reload())
+
+// Offline
+OiMaintenancePage.offline(onRetry: () => checkConnection())
+
+// Custom
+OiMaintenancePage(
+  title: 'Coming Soon',
+  label: 'Coming soon page',
+  description: 'We are working on something amazing.',
+  icon: OiIcons.rocket,
+)
+```
+
+| Parameter | Type | Description |
+|---|---|---|
+| `title` | `String` | Page title (required) |
+| `label` | `String` | Accessibility label (required) |
+| `description` | `String?` | Description text below title |
+| `icon` | `IconData?` | Large icon above title |
+| `illustration` | `Widget?` | Custom illustration widget |
+| `estimatedReturn` | `DateTime?` | Countdown target time |
+| `showCountdown` | `bool` | Show countdown timer. Defaults to `true` |
+| `onRetry` | `VoidCallback?` | Retry/go-back button callback |
+| `socialLinks` | `List<OiSocialLink>` | Social media links |
+| `maxWidth` | `double` | Maximum content width. Defaults to `480` |
+
+**Factory constructors:** `.maintenance()`, `.notFound()`, `.serverError()`, `.offline()`.
+
+---
+
+## OiMediaPicker
+
+A media selection module with gallery grid, file upload, type filtering, multi-select, and upload progress tracking.
+
+```dart
+OiMediaPicker(
+  label: 'Select media',
+  galleryItems: existingMedia,
+  onSelect: (items) => handleSelection(items),
+  onRemove: (item) => handleRemove(item),
+  allowedTypes: OiMediaType.image,
+  maxItems: 5,
+)
+```
+
+| Parameter | Type | Description |
+|---|---|---|
+| `label` | `String` | Accessibility label (required) |
+| `sources` | `List<OiMediaSource>` | Available sources. Defaults to `[gallery, files]` |
+| `allowedTypes` | `OiMediaType` | Allowed media types. Defaults to `any` |
+| `maxItems` | `int` | Max selectable items. Defaults to `10` |
+| `selected` | `List<OiMediaItem>` | Currently selected items |
+| `onSelect` | `ValueChanged<List<OiMediaItem>>?` | Selection callback |
+| `galleryItems` | `List<OiMediaItem>` | Gallery items to display |
+| `uploadProgress` | `List<OiMediaUploadProgress>` | Upload progress indicators |
+
+**OiMediaType enum:** `image`, `video`, `document`, `any`.
+
+---
+
+## OiOnboardingFlow
+
+A multi-step onboarding experience with page indicator, skip/next buttons, and completion callback.
+
+```dart
+OiOnboardingFlow(
+  label: 'Getting started',
+  onComplete: () => markOnboardingDone(),
+  pages: [
+    OiOnboardingPage(
+      title: 'Welcome',
+      description: 'Discover everything our platform has to offer.',
+      illustration: Image.asset('assets/welcome.svg'),
+    ),
+    OiOnboardingPage(
+      title: 'Collaborate',
+      description: 'Work together with your team in real-time.',
+    ),
+    OiOnboardingPage(
+      title: 'Get Started',
+      description: "You're all set!",
+      actionLabel: 'Create First Project',
+      onAction: () => router.go('/new'),
+    ),
+  ],
+)
+```
+
+| Parameter | Type | Description |
+|---|---|---|
+| `pages` | `List<OiOnboardingPage>` | Onboarding pages (required) |
+| `label` | `String` | Accessibility label (required) |
+| `onComplete` | `VoidCallback?` | Called when user finishes all pages |
+| `onSkip` | `VoidCallback?` | Called when user skips |
+| `showSkip` | `bool` | Show skip button. Defaults to `true` |
+| `showPageIndicator` | `bool` | Show dot indicator. Defaults to `true` |
+| `skipLabel` | `String` | Skip button text. Defaults to `'Skip'` |
+| `nextLabel` | `String` | Next button text. Defaults to `'Next'` |
+| `doneLabel` | `String` | Done button text. Defaults to `'Get Started'` |
+| `maxWidth` | `double` | Maximum content width. Defaults to `600` |
+
+**Features:** swipe navigation, animated page transitions, per-page action buttons, and configurable button labels.
+
+---
+
+## OiPricingTable
+
+A responsive pricing comparison table with monthly/yearly billing toggle, feature matrix, and recommended plan highlighting.
+
+```dart
+OiPricingTable(
+  label: 'Choose a plan',
+  plans: [
+    OiPricingPlan(key: 'free', name: 'Free', monthlyPrice: 0, ctaLabel: 'Get Started'),
+    OiPricingPlan(key: 'pro', name: 'Pro', monthlyPrice: 29, yearlyPrice: 290, recommended: true),
+    OiPricingPlan(key: 'enterprise', name: 'Enterprise', monthlyPrice: 99, contactSales: true),
+  ],
+  onPlanSelect: (plan, cycle) => handlePlanSelect(plan, cycle),
+)
+```
+
+| Parameter | Type | Description |
+|---|---|---|
+| `plans` | `List<OiPricingPlan>` | Pricing plans (required) |
+| `label` | `String` | Accessibility label (required) |
+| `features` | `List<OiPricingFeature>` | Feature comparison rows |
+| `onPlanSelect` | `Function(OiPricingPlan, OiBillingCycle)?` | Called when user selects a plan |
+| `billingCycle` | `OiBillingCycle` | Current billing cycle. Defaults to `monthly` |
+| `showBillingToggle` | `bool` | Show monthly/yearly toggle. Defaults to `true` |
+| `yearlyDiscount` | `String?` | Discount badge text (e.g. "Save 20%") |
+| `currencySymbol` | `String` | Currency symbol. Defaults to `'$'` |
+| `showFeatureMatrix` | `bool` | Show feature comparison. Defaults to `true` |
+
+**OiBillingCycle enum:** `monthly`, `yearly`.
+
+---
+
+## OiProfilePage
+
+A user profile management page with avatar upload, inline-editable fields, password change, linked accounts, and danger zone.
+
+```dart
+OiProfilePage(
+  label: 'My profile',
+  profile: OiProfileData(name: 'Jane Doe', email: 'jane@example.com', role: 'Admin'),
+  onFieldSave: (field, value) async => await api.updateProfile(field, value),
+  onPasswordChange: (current, newPassword) async => await api.changePassword(current, newPassword),
+  onAvatarChange: () async => await pickAndUploadAvatar(),
+  linkedAccounts: [
+    OiLinkedAccount(provider: 'google', label: 'Google', connected: true, username: 'jane@gmail.com'),
+    OiLinkedAccount(provider: 'github', label: 'GitHub', connected: false),
+  ],
+  onDeleteAccount: () async => await confirmAndDelete(),
+)
+```
+
+| Parameter | Type | Description |
+|---|---|---|
+| `profile` | `OiProfileData` | User profile data (required) |
+| `label` | `String` | Accessibility label (required) |
+| `onAvatarChange` | `VoidCallback?` | Called to change avatar |
+| `onFieldSave` | `Future<bool> Function(String, String)?` | Called to save a profile field |
+| `onPasswordChange` | `Future<bool> Function(String, String)?` | Called to change password |
+| `linkedAccounts` | `List<OiLinkedAccount>?` | Linked social/OAuth accounts |
+| `onAccountLink` | `ValueChanged<String>?` | Called to link an account |
+| `onAccountUnlink` | `ValueChanged<String>?` | Called to unlink an account |
+| `onDeleteAccount` | `VoidCallback?` | Called to delete the account |
+| `showDangerZone` | `bool` | Show delete account section. Defaults to `true` |
+
+**Features:** avatar with upload overlay, inline-editable text fields, password change form with confirmation, linked accounts with connect/disconnect, and destructive "delete account" zone.
+
+---
+
+## OiSearchOverlay
+
+A full-screen search overlay with recent searches, category filtering, debounced results, and keyboard navigation.
+
+```dart
+OiSearchOverlay(
+  label: 'Search',
+  categories: [
+    OiSearchCategory(key: 'all', label: 'All'),
+    OiSearchCategory(key: 'docs', label: 'Docs'),
+    OiSearchCategory(key: 'users', label: 'Users'),
+  ],
+  recentSearches: ['dashboard', 'API keys'],
+  onSearch: (query, category) async {
+    return await api.search(query, category: category);
+  },
+  onSuggestionTap: (suggestion) => navigate(suggestion.key),
+)
+```
+
+| Parameter | Type | Description |
+|---|---|---|
+| `label` | `String` | Accessibility label (required) |
+| `onSearch` | `Future<List<OiSearchSuggestion>> Function(String, String?)?` | Search callback |
+| `onSuggestionTap` | `ValueChanged<OiSearchSuggestion>?` | Called when result is selected |
+| `categories` | `List<OiSearchCategory>` | Search category tabs |
+| `recentSearches` | `List<String>` | Recent search terms |
+| `onClearRecents` | `VoidCallback?` | Called to clear recent searches |
+| `placeholder` | `String` | Input placeholder. Defaults to `'Search...'` |
+| `debounce` | `Duration` | Search debounce. Defaults to `300ms` |
+| `maxWidth` | `double` | Maximum overlay width. Defaults to `640` |
+
+**Features:** keyboard navigation (arrow keys + enter), search debouncing, category filtering, recent searches with clear, empty state, and auto-focus on open.
+
+---
+
+## OiSettingsPage
+
+A structured settings page with grouped sections, multiple item types, search, and reset functionality.
+
+```dart
+OiSettingsPage(
+  label: 'Settings',
+  onSettingChanged: (groupKey, itemKey, value) => saveSetting(groupKey, itemKey, value),
+  groups: [
+    OiSettingsGroup(
+      key: 'appearance',
+      title: 'Appearance',
+      icon: OiIcons.palette,
+      items: [
+        OiSettingsItem(key: 'dark_mode', title: 'Dark Mode', type: OiSettingsItemType.toggle, value: false),
+        OiSettingsItem(key: 'font_size', title: 'Font Size', type: OiSettingsItemType.slider, value: 14.0, min: 10, max: 24),
+        OiSettingsItem(key: 'language', title: 'Language', type: OiSettingsItemType.select, value: 'en', options: ['English', 'German', 'French']),
+      ],
+    ),
+  ],
+)
+```
+
+| Parameter | Type | Description |
+|---|---|---|
+| `groups` | `List<OiSettingsGroup>` | Settings groups (required) |
+| `label` | `String` | Accessibility label (required) |
+| `onSettingChanged` | `Function(String, String, dynamic)?` | Called when any setting changes (groupKey, itemKey, value) |
+| `onNavigate` | `ValueChanged<String>?` | Called for navigation-type items |
+| `onResetGroup` | `ValueChanged<String>?` | Called to reset a group |
+| `onResetAll` | `VoidCallback?` | Called to reset all settings |
+| `searchEnabled` | `bool` | Enable search. Defaults to `true` |
+| `showResetButtons` | `bool` | Show reset buttons. Defaults to `true` |
+
+**OiSettingsItemType enum:** `toggle`, `navigation`, `select`, `slider`, `custom`.
+
+---
+
+## OiSubscriptionManager
+
+A subscription management module showing current plan details, usage quotas, billing history, payment method, and plan change actions.
+
+```dart
+OiSubscriptionManager(
+  label: 'Subscription',
+  currentPlan: OiSubscriptionPlan(
+    key: 'pro',
+    name: 'Pro',
+    price: 29,
+    billingCycle: OiBillingCycle.monthly,
+    status: OiSubscriptionStatus.active,
+    renewalDate: DateTime(2026, 4, 28),
+  ),
+  usage: [
+    OiUsageQuota(label: 'Storage', used: 32, limit: 50, unit: 'GB'),
+    OiUsageQuota(label: 'API Calls', used: 8500, limit: 10000),
+  ],
+  invoices: [
+    OiInvoice(key: 'inv-1', date: DateTime(2026, 3, 1), description: 'Pro - March', amount: 29),
+  ],
+  paymentMethod: OiPaymentMethodInfo(label: 'Visa ending in 4242', last4: '4242', brand: 'visa'),
+  onUpgrade: () => showUpgradeDialog(),
+  onCancel: () async => await confirmCancel(),
+)
+```
+
+| Parameter | Type | Description |
+|---|---|---|
+| `currentPlan` | `OiSubscriptionPlan` | Current subscription plan (required) |
+| `label` | `String` | Accessibility label (required) |
+| `usage` | `List<OiUsageQuota>` | Usage quota meters |
+| `invoices` | `List<OiInvoice>` | Billing history |
+| `paymentMethod` | `OiPaymentMethodInfo?` | Current payment method |
+| `onUpgrade` | `VoidCallback?` | Called to upgrade plan |
+| `onDowngrade` | `VoidCallback?` | Called to downgrade plan |
+| `onCancel` | `Future<bool> Function()?` | Called to cancel subscription |
+| `onUpdatePayment` | `VoidCallback?` | Called to update payment method |
+| `onInvoiceDownload` | `ValueChanged<OiInvoice>?` | Called to download an invoice |
+| `currencySymbol` | `String` | Currency symbol. Defaults to `'$'` |
+
+**OiSubscriptionStatus enum:** `active`, `trialing`, `pastDue`, `canceled`, `expired`.
+
+**Features:** plan summary card with status badge, usage quota progress bars, billing history table, payment method display with update, and plan change actions.

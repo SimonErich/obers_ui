@@ -115,6 +115,7 @@ nav:
       - Custom Modules: advanced/custom-modules.md
       - Extending Themes: advanced/extending-themes.md
       - Performance: advanced/performance.md
+      - AutoForms: advanced/autoforms.md
       - Contributing: advanced/contributing.md
       - AI Integration Guide: advanced/ai-readme.md
   - Widgetbook: widgetbook.md

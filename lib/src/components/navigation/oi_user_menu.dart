@@ -93,13 +93,13 @@ class _OiUserMenuState extends State<OiUserMenu> {
               leading: item.icon != null
                   ? OiIcon.decorative(icon: item.icon!)
                   : null,
-              onTap: item.disabled
+              onTap: !item.enabled
                   ? null
                   : () {
                       setState(() => _isOpen = false);
                       item.onTap?.call();
                     },
-              enabled: !item.disabled,
+              enabled: item.enabled,
               dense: true,
             ),
         ],

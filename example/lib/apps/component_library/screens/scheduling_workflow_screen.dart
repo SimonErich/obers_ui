@@ -132,10 +132,10 @@ class _SchedulingWorkflowScreenState extends State<SchedulingWorkflowScreen> {
                 'tasks as horizontal bars across a time axis, showing '
                 'duration, dependencies, and progress. \n\n'
                 'OiGantt takes a list of OiGanttTask objects, each with '
-                  'a key, title, start and end DateTime, optional progress '
-                  '(0.0-1.0), color, and dependencies (list of task keys). '
-                  'Required: tasks, label. Optional: onTaskTap, '
-                  'onTaskMove, onTaskResize, settingsDriver.',
+                'a key, title, start and end DateTime, optional progress '
+                '(0.0-1.0), color, and dependencies (list of task keys). '
+                'Required: tasks, label. Optional: onTaskTap, '
+                'onTaskMove, onTaskResize, settingsDriver.',
             examples: [
               ComponentExample(
                 title: 'Project Tasks',
@@ -183,9 +183,9 @@ class _SchedulingWorkflowScreenState extends State<SchedulingWorkflowScreen> {
                 'resource-based view for managing time slots and bookings '
                 'across multiple resources. \n\n'
                 'OiScheduler displays a time-resource grid for managing '
-                  'appointments. It takes resources, events, a time range, '
-                  'and callbacks for event creation and interaction. '
-                  'Supports drag-to-create and drag-to-reschedule.',
+                'appointments. It takes resources, events, a time range, '
+                'and callbacks for event creation and interaction. '
+                'Supports drag-to-create and drag-to-reschedule.',
             examples: [
               ComponentExample(
                 title: 'Day View',
@@ -270,10 +270,10 @@ class _SchedulingWorkflowScreenState extends State<SchedulingWorkflowScreen> {
                 'and directed edges for workflow diagrams, decision trees, '
                 'and process flows. \n\n'
                 'OiFlowGraph takes a list of OiFlowNode objects (each with '
-                  'key, label, position, and optional content widget) and '
-                  'OiFlowEdge objects (source, target, optional label). '
-                  'Required: nodes, edges, label. Supports interactive '
-                  'panning, zooming, and node drag-and-drop.',
+                'key, label, position, and optional content widget) and '
+                'OiFlowEdge objects (source, target, optional label). '
+                'Required: nodes, edges, label. Supports interactive '
+                'panning, zooming, and node drag-and-drop.',
             examples: [
               ComponentExample(
                 title: 'Workflow Diagram',
@@ -383,10 +383,10 @@ class _SchedulingWorkflowScreenState extends State<SchedulingWorkflowScreen> {
                 'transitions. Renders nodes as states and directed edges as '
                 'transitions between them. \n\n'
                 'OiStateDiagram takes a list of OiState objects (each with '
-                  'key, label, and an isInitial/isFinal flag) and '
-                  'OiTransition objects (source, target, label/event). '
-                  'Required: states, transitions, label. Renders states as '
-                  'rounded rectangles with transition arrows between them.',
+                'key, label, and an isInitial/isFinal flag) and '
+                'OiTransition objects (source, target, label/event). '
+                'Required: states, transitions, label. Renders states as '
+                'rounded rectangles with transition arrows between them.',
             examples: [
               ComponentExample(
                 title: 'Order State Machine',
@@ -445,6 +445,96 @@ class _SchedulingWorkflowScreenState extends State<SchedulingWorkflowScreen> {
                         from: 'processing',
                         to: 'cancelled',
                         label: 'cancel',
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+
+          // ── OiWorkflowStepper ──────────────────────────────────────
+          const ComponentShowcaseSection(
+            title: 'Workflow Stepper',
+            widgetName: 'OiWorkflowStepper',
+            description:
+                'A multi-phase workflow stepper that shows phases and '
+                'their constituent steps. Supports horizontal and '
+                'vertical orientation with completed, active, and '
+                'skipped states.',
+            examples: [
+              ComponentExample(
+                title: 'Onboarding workflow',
+                child: OiWorkflowStepper(
+                  label: 'Onboarding',
+                  currentPhaseId: 'setup',
+                  currentStepId: 'profile',
+                  completedStepIds: {'account', 'verify'},
+                  phases: [
+                    OiWorkflowPhase(
+                      id: 'register',
+                      label: 'Register',
+                      steps: [
+                        OiWorkflowStep(id: 'account', label: 'Account'),
+                        OiWorkflowStep(id: 'verify', label: 'Verify Email'),
+                      ],
+                    ),
+                    OiWorkflowPhase(
+                      id: 'setup',
+                      label: 'Setup',
+                      steps: [
+                        OiWorkflowStep(id: 'profile', label: 'Profile'),
+                        OiWorkflowStep(id: 'prefs', label: 'Preferences'),
+                      ],
+                    ),
+                    OiWorkflowPhase(
+                      id: 'launch',
+                      label: 'Launch',
+                      steps: [
+                        OiWorkflowStep(id: 'tour', label: 'Tour'),
+                        OiWorkflowStep(id: 'done', label: 'Done'),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              ComponentExample(
+                title: 'Vertical orientation',
+                child: SizedBox(
+                  height: 300,
+                  child: OiWorkflowStepper(
+                    label: 'Deploy pipeline',
+                    orientation: OiWorkflowStepperOrientation.vertical,
+                    currentPhaseId: 'test',
+                    currentStepId: 'integration',
+                    completedStepIds: {'build', 'lint', 'unit'},
+                    phases: [
+                      OiWorkflowPhase(
+                        id: 'build',
+                        label: 'Build',
+                        steps: [
+                          OiWorkflowStep(id: 'build', label: 'Compile'),
+                          OiWorkflowStep(id: 'lint', label: 'Lint'),
+                        ],
+                      ),
+                      OiWorkflowPhase(
+                        id: 'test',
+                        label: 'Test',
+                        steps: [
+                          OiWorkflowStep(id: 'unit', label: 'Unit'),
+                          OiWorkflowStep(
+                            id: 'integration',
+                            label: 'Integration',
+                          ),
+                        ],
+                      ),
+                      OiWorkflowPhase(
+                        id: 'deploy',
+                        label: 'Deploy',
+                        steps: [
+                          OiWorkflowStep(id: 'staging', label: 'Staging'),
+                          OiWorkflowStep(id: 'prod', label: 'Production'),
+                        ],
                       ),
                     ],
                   ),

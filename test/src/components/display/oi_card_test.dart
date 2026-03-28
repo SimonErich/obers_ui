@@ -3,6 +3,7 @@
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:obers_ui/src/components/display/oi_badge.dart';
 import 'package:obers_ui/src/components/display/oi_card.dart';
 import 'package:obers_ui/src/foundation/theme/oi_decoration_theme.dart';
 import 'package:obers_ui/src/foundation/theme/oi_effects_theme.dart';
@@ -471,6 +472,103 @@ void main() {
       );
       final surface = tester.widget<OiSurface>(find.byType(OiSurface));
       expect(surface.halo, equals(halo));
+    });
+  });
+
+  // ---------------------------------------------------------------------------
+  // Status badge
+  // ---------------------------------------------------------------------------
+
+  group('statusBadge', () {
+    testWidgets('renders statusBadge when provided', (tester) async {
+      await tester.pumpObers(
+        const OiCard(
+          statusBadge: OiBadge.filled(label: 'stale'),
+          child: Text('content'),
+        ),
+      );
+      expect(find.text('stale'), findsOneWidget);
+      expect(find.byType(Stack), findsAtLeastNWidgets(1));
+    });
+
+    testWidgets('no Stack when statusBadge is null', (tester) async {
+      await tester.pumpObers(const OiCard(child: Text('content')));
+      // OiCard should not introduce a Stack when there is no badge.
+      final stacks = tester.widgetList<Stack>(find.byType(Stack));
+      for (final stack in stacks) {
+        // Verify none of the Stacks contain a Positioned with a badge.
+        final hasPositioned = stack.children.any((c) => c is Positioned);
+        expect(hasPositioned, isFalse);
+      }
+    });
+
+    testWidgets('statusBadge defaults to topRight position', (tester) async {
+      await tester.pumpObers(
+        const OiCard(
+          statusBadge: OiBadge.filled(label: 'new'),
+          child: Text('content'),
+        ),
+      );
+      final positioned = tester.widget<Positioned>(find.byType(Positioned));
+      expect(positioned.top, isNotNull);
+      expect(positioned.right, isNotNull);
+      expect(positioned.bottom, isNull);
+      expect(positioned.left, isNull);
+    });
+
+    testWidgets('statusBadge at topLeft', (tester) async {
+      await tester.pumpObers(
+        const OiCard(
+          statusBadge: OiBadge.filled(label: 'new'),
+          statusBadgePosition: OiBadgePosition.topLeft,
+          child: Text('content'),
+        ),
+      );
+      final positioned = tester.widget<Positioned>(find.byType(Positioned));
+      expect(positioned.top, isNotNull);
+      expect(positioned.left, isNotNull);
+      expect(positioned.bottom, isNull);
+      expect(positioned.right, isNull);
+    });
+
+    testWidgets('statusBadge at bottomRight', (tester) async {
+      await tester.pumpObers(
+        const OiCard(
+          statusBadge: OiBadge.filled(label: 'new'),
+          statusBadgePosition: OiBadgePosition.bottomRight,
+          child: Text('content'),
+        ),
+      );
+      final positioned = tester.widget<Positioned>(find.byType(Positioned));
+      expect(positioned.bottom, isNotNull);
+      expect(positioned.right, isNotNull);
+      expect(positioned.top, isNull);
+      expect(positioned.left, isNull);
+    });
+
+    testWidgets('statusBadge at bottomLeft', (tester) async {
+      await tester.pumpObers(
+        const OiCard(
+          statusBadge: OiBadge.filled(label: 'new'),
+          statusBadgePosition: OiBadgePosition.bottomLeft,
+          child: Text('content'),
+        ),
+      );
+      final positioned = tester.widget<Positioned>(find.byType(Positioned));
+      expect(positioned.bottom, isNotNull);
+      expect(positioned.left, isNotNull);
+      expect(positioned.top, isNull);
+      expect(positioned.right, isNull);
+    });
+
+    testWidgets('statusBadge works with factory constructors', (tester) async {
+      await tester.pumpObers(
+        OiCard.flat(
+          statusBadge: const OiBadge.filled(label: 'tag'),
+          child: const Text('flat'),
+        ),
+      );
+      expect(find.text('tag'), findsOneWidget);
     });
   });
 }

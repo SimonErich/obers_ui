@@ -177,6 +177,54 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
               ),
             ],
           ),
+
+          // ── OiPipelineProgress ──────────────────────────────────────
+          ComponentShowcaseSection(
+            title: 'Pipeline Progress',
+            widgetName: 'OiPipelineProgress',
+            description:
+                'A multi-step pipeline progress indicator. Shows '
+                'completed, active, and pending steps with optional '
+                'sub-progress, error states, and collapse for '
+                'completed steps.',
+            examples: [
+              const ComponentExample(
+                title: 'Deployment pipeline',
+                child: OiPipelineProgress(
+                  label: 'Deployment',
+                  currentStepIndex: 2,
+                  steps: [
+                    OiPipelineProgressStep(label: 'Build'),
+                    OiPipelineProgressStep(label: 'Test'),
+                    OiPipelineProgressStep(
+                      label: 'Deploy',
+                      detail: 'Deploying to production...',
+                      subProgress: OiProgress.linear(
+                        value: 0.65,
+                        label: 'Deploy progress',
+                      ),
+                    ),
+                    OiPipelineProgressStep(label: 'Verify'),
+                  ],
+                ),
+              ),
+              ComponentExample(
+                title: 'With error',
+                child: OiPipelineProgress(
+                  label: 'CI Pipeline',
+                  currentStepIndex: 1,
+                  error: 'Test suite failed: 3 failures',
+                  onRetry: () {},
+                  steps: const [
+                    OiPipelineProgressStep(label: 'Lint'),
+                    OiPipelineProgressStep(label: 'Unit Tests'),
+                    OiPipelineProgressStep(label: 'Integration'),
+                    OiPipelineProgressStep(label: 'Publish'),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ],
       ),
     );

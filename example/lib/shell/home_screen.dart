@@ -3,6 +3,7 @@ import 'package:obers_ui/obers_ui.dart';
 
 import 'package:obers_ui_example/apps/admin/admin_app.dart';
 import 'package:obers_ui_example/apps/auth/auth_app.dart';
+import 'package:obers_ui_example/apps/autoforms/autoforms_app.dart';
 import 'package:obers_ui_example/apps/chat/chat_app.dart';
 import 'package:obers_ui_example/apps/cms/cms_app.dart';
 import 'package:obers_ui_example/apps/component_library/component_library_app.dart';
@@ -224,6 +225,12 @@ final _categories = [
     description: 'Login, registration, and password reset flows.',
     icon: OiIcons.lock,
     builder: (ts) => AuthApp(themeState: ts),
+  ),
+  _Category(
+    title: 'AutoForms',
+    description: 'Controller-first forms with validation, derived fields, and wizards.',
+    icon: OiIcons.formInput,
+    builder: (ts) => AutoFormsApp(themeState: ts),
   ),
   _Category(
     title: 'Icons',

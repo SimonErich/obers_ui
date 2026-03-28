@@ -99,4 +99,68 @@ void main() {
     await tester.pump(const Duration(milliseconds: 600));
     expect(find.byType(CustomPaint), findsAtLeastNWidgets(1));
   });
+
+  // ── Bulk style ──────────────────────────────────────────────────────────────
+
+  testWidgets('bulk style renders a linear progress bar', (tester) async {
+    await tester.pumpObers(const OiProgress.bulk(current: 5, total: 18));
+    expect(find.byType(CustomPaint), findsAtLeastNWidgets(1));
+  });
+
+  testWidgets('bulk style renders formatted label "(5/18)"', (tester) async {
+    await tester.pumpObers(
+      const OiProgress.bulk(
+        current: 5,
+        total: 18,
+        label: 'Generating screen specs',
+      ),
+    );
+    expect(find.text('Generating screen specs (5/18)'), findsOneWidget);
+  });
+
+  testWidgets('bulk style shows percentage when showPercentage is true', (
+    tester,
+  ) async {
+    await tester.pumpObers(
+      const OiProgress.bulk(current: 5, total: 20),
+    );
+    expect(find.text('25%'), findsOneWidget);
+  });
+
+  testWidgets('bulk style hides percentage when showPercentage is false', (
+    tester,
+  ) async {
+    await tester.pumpObers(
+      const OiProgress.bulk(current: 5, total: 20, showPercentage: false),
+    );
+    expect(find.text('25%'), findsNothing);
+  });
+
+  testWidgets('bulk style renders currentItemLabel when provided', (
+    tester,
+  ) async {
+    await tester.pumpObers(
+      const OiProgress.bulk(
+        current: 5,
+        total: 18,
+        currentItemLabel: 'Authentication Screen',
+      ),
+    );
+    expect(find.text('Authentication Screen'), findsOneWidget);
+  });
+
+  testWidgets('bulk style handles total=0 without error', (tester) async {
+    await tester.pumpObers(const OiProgress.bulk(current: 0, total: 0));
+    expect(find.byType(CustomPaint), findsAtLeastNWidgets(1));
+  });
+
+  testWidgets('bulk style handles current > total gracefully', (tester) async {
+    await tester.pumpObers(const OiProgress.bulk(current: 20, total: 10));
+    expect(find.byType(CustomPaint), findsAtLeastNWidgets(1));
+  });
+
+  testWidgets('bulk style without label renders count only', (tester) async {
+    await tester.pumpObers(const OiProgress.bulk(current: 3, total: 10));
+    expect(find.text('3/10'), findsOneWidget);
+  });
 }

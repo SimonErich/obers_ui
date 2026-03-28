@@ -1,6 +1,6 @@
 # obers_ui — AI Integration Reference
 
-> **Version:** Synced with codebase as of 2026-03-23 (includes Shop & Admin widgets)
+> **Version:** Synced with codebase as of 2026-03-28 (includes Shop, Admin & new UI elements)
 > **Single import:** `import 'package:obers_ui/obers_ui.dart';`
 > **Zero Material dependency** — do NOT use MaterialApp, Scaffold, AppBar, or any Material/Cupertino widgets.
 
@@ -213,6 +213,26 @@ final theme = OiTheme.of(context);
 | `lg` | 24dp | Major section gaps |
 | `xl` | 32dp | Page sections |
 | `xxl` | 48dp | Hero spacing |
+
+### Quick-Access Constants (context-free)
+
+Top-level `const` values for fast layout without `BuildContext`. The number is the dp value.
+
+| Family | Constants | Example |
+|---|---|---|
+| Sizes (`double`) | `s0`..`s128` | `Container(width: s64)` |
+| Vertical gaps | `gapH0`..`gapH64` | `gapH16` between column children |
+| Horizontal gaps | `gapW0`..`gapW64` | `gapW8` between row children |
+| Padding (all) | `pad4`..`pad48` | `Padding(padding: pad16, child: ...)` |
+| Padding (horizontal) | `padX4`..`padX32` | `Padding(padding: padX24, child: ...)` |
+| Padding (vertical) | `padY4`..`padY32` | `Padding(padding: padY16, child: ...)` |
+| Shrink | `shrink` | Zero-size `SizedBox` |
+
+Mapping: `s4`=xs, `s8`=sm, `s16`=md, `s24`=lg, `s32`=xl, `s48`=xxl.
+
+Use `context.spacing.*` for theme-aware spacing; use these constants for fixed layout.
+
+tags: `spacing`, `gap`, `padding`, `sizes`, `constants`, `layout`
 
 ### Radius — OiRadiusScale
 
@@ -899,6 +919,19 @@ Responsive grid layout with column count or min column width.
 
 ---
 
+#### OiGridZoomControls
+**Tags:** `grid`, `zoom`, `columns`, `controls`, `resize`
+**Tier:** Primitive
+
+Interactive wrapper around `OiGrid` with +/- buttons to change column count.
+
+**Props:** `breakpoint`, `children`, `initialColumns`, `minColumns`, `maxColumns`, `onColumnsChanged`, `gap`, `rowGap`
+
+**Use When:** User-adjustable grid density (gallery views, card grids).
+**Combine With:** `OiGrid`
+
+---
+
 #### OiMasonry
 **Tags:** `layout`, `masonry`, `pinterest`, `waterfall`
 **Tier:** Primitive
@@ -1350,6 +1383,8 @@ Content container with optional title, subtitle, footer, interaction.
 - `OiCard.interactive()` — Hover/focus effects (requires `label`)
 - `OiCard.compact()` — Reduced padding (8px)
 
+**New props:** `statusBadge: Widget?`, `statusBadgePosition: OiBadgePosition` — overlays a badge widget (e.g. `OiBadge`) at the specified corner
+
 **Theme:** `context.components.card` -> `OiCardThemeData`
 
 **Use When:** Grouping related content. Product cards. Dashboard widgets.
@@ -1522,10 +1557,12 @@ Standardized list row.
 ---
 
 #### OiMarkdown
-**Tags:** `markdown`, `rich-text`, `content`, `documentation`
+**Tags:** `markdown`, `rich-text`, `content`, `documentation`, `mermaid`
 **Tier:** Component
 
 Rendered markdown content (headings, lists, code blocks, links, images, tables).
+
+**Mermaid support:** `enableMermaid: bool`, `mermaidBuilder: Widget Function(String)?`, `onMermaidError: void Function(String)?` — renders mermaid code blocks via builder or default placeholder
 
 ---
 
@@ -1568,14 +1605,111 @@ Floating content box anchored to a trigger widget.
 ---
 
 #### OiProgress
-**Tags:** `progress`, `loading`, `bar`, `circular`, `spinner`, `percentage`
+**Tags:** `progress`, `loading`, `bar`, `circular`, `spinner`, `percentage`, `bulk`, `counter`
 **Tier:** Component
 
-Progress indicator (linear or circular). Determinate or indeterminate.
+Progress indicator: linear, circular, steps, or bulk. Determinate or indeterminate.
+
+**Variants:**
+- `.linear()` — horizontal bar
+- `.circular()` — arc
+- `.steps()` — row of step dots
+- `.bulk({required int current, required int total})` — linear bar with "label (current/total)" counter, optional percentage, optional `currentItemLabel`
 
 **Theme:** `context.components.progress` -> `OiProgressThemeData`
 
-**Use When:** Loading states, upload/download progress, step completion.
+**Use When:** Loading states, upload/download progress, step completion, batch operations.
+
+---
+
+#### OiStatusBar
+**Tags:** `status`, `bar`, `bottom`, `indicator`, `desktop`
+**Tier:** Component
+
+Compact bottom status bar (default 24dp) with leading/trailing widget slots and top border.
+
+**Props:** `label` (a11y), `leading: List<Widget>`, `trailing: List<Widget>`, `height`, `backgroundColor`
+
+**Use When:** IDE status bars, connection indicators, encoding/line info.
+**Combine With:** `OiStatusBarItem`
+
+---
+
+#### OiStatusBarItem
+**Tags:** `status`, `indicator`, `icon`, `dot`, `label`
+**Tier:** Component
+
+Individual status indicator: optional icon + label + optional color dot. Wraps in `OiTappable` when `onTap` provided.
+
+**Props:** `label`, `icon`, `color` (status dot), `onTap`, `tooltip`
+
+**Combine With:** `OiStatusBar`
+
+---
+
+#### OiMenuBar
+**Tags:** `menu`, `menubar`, `dropdown`, `desktop`, `navigation`
+**Tier:** Component
+
+Horizontal menu bar with dropdown menus. Desktop-oriented (default height 28dp). Uses overlay for dropdowns.
+
+**Props:** `items: List<OiMenuItem>`, `label` (a11y), `height`, `backgroundColor`
+
+**Use When:** Desktop app menu bars (File/Edit/View).
+**Combine With:** `OiMenuItem`, `OiMenuDivider`, `OiStatusBar`
+
+**Note:** `OiMenuBarItem` and `OiMenuBarDivider` are deprecated typedefs for `OiMenuItem` and `OiMenuDivider`.
+
+---
+
+#### OiMenuItem
+**Tags:** `menu`, `item`, `dropdown`, `shortcut`, `checked`, `context-menu`
+**Tier:** Data model
+
+Shared menu item model used by both `OiContextMenu` and `OiMenuBar`. Supports label, icon, shortcut hint, checked state, destructive styling, and nested children for sub-menus.
+
+**Props:** `label`, `icon`, `shortcut`, `onTap`, `enabled`, `checked`, `children`, `semanticLabel`, `destructive`
+
+**Companion:** `OiMenuDivider` — renders a horizontal separator line.
+
+---
+
+#### OiPipelineProgress
+**Tags:** `pipeline`, `progress`, `steps`, `sequential`, `loading`
+**Tier:** Component
+
+Vertical multi-step progress indicator. Shows completed (checkmark), active (spinner), future (grey) steps with connecting lines.
+
+**Props:** `steps: List<OiPipelineProgressStep>`, `currentStepIndex`, `label` (a11y), `onCancel`, `error`, `onRetry`
+
+**Use When:** Multi-step operations (export pipelines, deploy sequences, setup wizards).
+**Combine With:** `OiProgress.bulk`, `OiDialog.fullScreen`
+
+---
+
+#### OiImagePreviewCard
+**Tags:** `image`, `preview`, `card`, `loading`, `shimmer`, `version`, `badge`
+**Tier:** Component
+
+Image display card with loading shimmer, regeneration overlay, status badge, edit overlay on hover, version label, and context menu support.
+
+**Props:** `alt` (a11y), `imageUrl`, `statusBadge`, `onTap`, `onEdit`, `loading`, `regenerating`, `enableZoom`, `versionLabel`, `aspectRatio`, `placeholder`
+
+**Use When:** Wireframe/design previews, image galleries with status overlays.
+**Combine With:** `OiBadge`, `OiGrid`, `OiContextMenu`
+
+---
+
+#### OiColorPalettePicker
+**Tags:** `color`, `palette`, `picker`, `swatch`, `preset`, `design-system`
+**Tier:** Component
+
+Multi-slot color palette picker with preset palettes. Row of tappable color circles (filled or dashed for unset), with optional preset palette cards below.
+
+**Props:** `slots: List<OiColorSlot>`, `onSlotChanged`, `label` (a11y), `compact`, `presets: List<OiColorPalette>?`, `onPresetSelected`, `showPresets`
+
+**Use When:** Design system color selection, theme customization, brand color pickers.
+**Combine With:** `OiColorInput`
 
 ---
 
@@ -1697,6 +1831,7 @@ Inline persistent notification bar with severity levels. Stays visible in the pa
 - `OiBanner.warning(message:)` — Warning (amber)
 - `OiBanner.error(message:)` — Error (red)
 - `OiBanner.neutral(message:)` — Neutral (grey)
+- `OiBanner.loading({required String message})` — Non-dismissible banner with indeterminate progress bar at top
 
 **Key Parameters (all constructors):**
 - `message` (String, required) — Primary message text
@@ -2372,6 +2507,26 @@ Repeatable form field group. Add/remove/reorder rows.
 
 **Use When:** Multiple addresses, phone numbers, line items, ingredients, any repeatable field group.
 **Combine With:** OiForm
+
+---
+
+### COMPONENTS — Inputs (Utility)
+
+---
+
+#### OiSelectScope
+**Tags:** `select`, `dropdown`, `scope`, `mutual-exclusion`, `utility`
+**Tier:** Component
+
+Wraps a subtree to ensure only one `OiSelect` dropdown is open at a time. When a new select opens, any previously open one closes automatically.
+
+**Key Parameters:**
+- `child` (Widget, required)
+
+**Static Method:** `OiSelectScopeNotifier? of(BuildContext context)` — Access the notifier
+
+**Use When:** Forms or layouts with multiple `OiSelect` / `OiFormSelect` widgets side by side.
+**Avoid When:** Single select inputs — mutual exclusion is unnecessary.
 
 ---
 
@@ -3117,6 +3272,46 @@ Summary row with label left and amount right (subtotal, discount, shipping, tax,
 
 ---
 
+#### [SHOP] OiWishlistButton
+**Tags:** `wishlist`, `heart`, `favorite`, `toggle`, `shop`
+**Tier:** Component
+
+Heart toggle button for adding/removing products from a wishlist.
+
+**Key Parameters:**
+- `label` (String, required) — Accessibility label
+- `active` (bool, default: false) — Whether product is wishlisted
+- `onToggle` (VoidCallback?) — Callback when toggled
+- `loading` (bool, default: false) — Disabled with reduced opacity
+
+**Visual States:** Active = filled red heart, hover = outlined red, inactive = outlined gray.
+
+**Use When:** Product cards, product detail pages, wishlist management.
+**Combine With:** OiProductCard, OiShopProductDetail
+
+---
+
+#### [SHOP] OiStockBadge
+**Tags:** `stock`, `inventory`, `availability`, `badge`, `shop`
+**Tier:** Component
+
+Colored badge indicating product stock availability.
+
+**Key Parameters:**
+- `status` (OiStockStatus, required) — inStock/lowStock/outOfStock
+- `label` (String, required) — Accessibility label
+- `count` (int?) — Optional remaining quantity
+
+**Factory Constructor:**
+- `OiStockBadge.fromCount(stockCount:, label:, lowStockThreshold: 5)` — Derives status from count
+
+**Color Mapping:** Green = inStock, amber = lowStock, red = outOfStock.
+
+**Use When:** Product detail, product cards, inventory management.
+**Combine With:** OiProductCard, OiShopProductDetail, OiDataGrid
+
+---
+
 ### COMPONENTS — Overlays
 
 ---
@@ -3125,9 +3320,22 @@ Summary row with label left and amount right (subtotal, discount, shipping, tax,
 **Tags:** `overlay`, `context-menu`, `right-click`, `long-press`, `menu`
 **Tier:** Component
 
-Right-click/long-press context menu.
+Right-click/long-press context menu with screen-edge clamping, animated entrance,
+keyboard navigation, and recursive sub-menu support.
 
-**Companion:** `OiMenuItem` with `label`, `icon`, `onTap`, `disabled`, `separator`, `subMenu`.
+**Key Parameters:**
+
+- `label` (String, required) — Accessibility label
+- `child` (Widget, required) — Trigger widget
+- `items` (List\<OiMenuItem\>, required) — Menu items
+- `enabled` (bool, default: true) — Disable the trigger
+
+**Companion:** `OiMenuItem` with `label`, `icon`, `shortcut`, `onTap`, `enabled`,
+`checked`, `children` (sub-menus), `semanticLabel`, `destructive`.
+Use `OiMenuDivider()` for visual separators.
+
+**Theme:** `OiContextMenuThemeData` — `borderRadius`, `minWidth`, `maxWidth`,
+`maxHeight`, `backgroundColor`, `borderColor`, `shadow`.
 
 **Use When:** Context-specific actions on items.
 **Combine With:** `OiTable` (row context menu), `OiFileExplorer`, `OiListTile`
@@ -3176,6 +3384,8 @@ Future<T?> showOiDialog<T>(
 ```
 
 > **Note:** `showOiDialog<T>()` is the recommended replacement for Material's `showDialog()`. The builder receives a `close` callback — call `close(result)` to dismiss and return a value.
+
+**fullScreen enhancements:** `onSave: VoidCallback?`, `unsavedChanges: bool` — when `unsavedChanges` is true, scrim/Escape dismiss is suppressed
 
 **Theme:** `context.components.dialog` -> `OiDialogThemeData`
 
@@ -3399,6 +3609,38 @@ Floating toolbar that appears when items are selected. Shows count and action bu
 ---
 
 ### COMPOSITES — Data
+
+---
+
+#### OiDataGrid
+**Tags:** `data-grid`, `table`, `rows`, `columns`, `sort`, `select`, `lightweight`
+**Tier:** Composite
+
+Lightweight data grid — simpler alternative to `OiTable` for read-only tabular display with optional sorting and selection.
+
+**Key Parameters:**
+- `rows` (List\<T\>, required) — Data items
+- `columns` (List\<OiDataGridColumn\<T\>\>, required) — Column definitions
+- `sortColumnId` (String?) — Currently sorted column
+- `sortAscending` (bool, default: true)
+- `onSort` (void Function(String, {required bool ascending})?)
+- `selectable` / `multiSelect` (bool)
+- `selectedRows` (Set\<int\>?)
+- `onSelectionChanged` (ValueChanged\<Set\<int\>\>?)
+- `onRowTap` (void Function(T, int)?)
+- `headerStyle` (OiDataGridHeaderStyle) — filled/plain/none
+- `striped` / `dense` / `showBorder` (bool)
+- `emptyState` (Widget?)
+- `loading` (bool) — Shimmer skeleton
+- `semanticLabel` (String?)
+
+**Column Definition:** `OiDataGridColumn<T>`
+- `OiDataGridColumn(id:, header:, cellBuilder:, width:, minWidth:, flex:, sortable:, textAlign:, numeric:)`
+- `OiDataGridColumn.text(id:, header:, valueOf:, sortable:, style:)` — Text-only shorthand
+
+**Use When:** Simple tabular display, admin lists, read-only data tables.
+**Avoid When:** Need column resize, inline editing, grouping — use `OiTable`.
+**Combine With:** `OiFilterBar`, `OiPagination`, `OiBulkBar`
 
 ---
 
@@ -3717,6 +3959,27 @@ Visual order status progression tracker (pending -> confirmed -> shipped -> deli
 
 ---
 
+#### [SHOP] OiProductFilters
+**Tags:** `filter`, `product`, `price`, `category`, `rating`, `shop`
+**Tier:** Composite
+
+Product filter panel with price range slider, category checkboxes, rating filter, and in-stock toggle.
+
+**Key Parameters:**
+- `label` (String, required)
+- `value` (OiProductFilterData?) — Current filter state
+- `onChanged` (ValueChanged\<OiProductFilterData\>?)
+- `availableCategories` (List\<String\>, default: [])
+- `currencyCode` (String, default: 'EUR')
+- `priceRangeMin` / `priceRangeMax` (double, default: 0 / 1000)
+
+**Data Model:** `OiProductFilterData` — `minPrice`, `maxPrice`, `categories`, `minRating`, `inStockOnly`
+
+**Use When:** Shop catalog pages, product listing sidebars.
+**Combine With:** OiSidebar, OiListView, OiProductCard
+
+---
+
 ### COMPOSITES — Dialogs
 
 ---
@@ -3884,6 +4147,19 @@ Visual step indicator (horizontal/vertical/compact).
 
 ---
 
+#### OiWorkflowStepper
+**Tags:** `workflow`, `stepper`, `phases`, `steps`, `navigation`, `progress`
+**Tier:** Composite
+
+Two-row horizontal stepper: phase pills (top) + step pills within current phase (bottom). Supports completed, current, enabled, disabled, and skipped states.
+
+**Props:** `phases: List<OiWorkflowPhase>`, `currentPhaseId`, `currentStepId`, `label` (a11y), `onStepTap`, `completedStepIds`, `enabledStepIds`, `skippedStepIds`
+
+**Use When:** Multi-phase workflows, wizard navigation with prerequisite gating.
+**Combine With:** `OiStepper`, `OiProgress`
+
+---
+
 #### OiFormDialog
 **Tags:** `dialog`, `form`, `modal`, `validation`
 **Tier:** Composite
@@ -3990,6 +4266,32 @@ Application sidebar with collapsible sections, badges, icons.
 **Use When:** Desktop app navigation, admin panels.
 **Combine With:** `OiSplitPane`, `OiPage`, `OiBreadcrumbs`
 **Avoid When:** Mobile — use `OiBottomBar` or `OiDrawer`.
+
+---
+
+#### OiThreeColumnLayout
+**Tags:** `layout`, `three-column`, `ide`, `sidebar`, `resizable`, `editor`
+**Tier:** Composite
+
+Configurable three-column layout with resizable dividers. Left navigation, middle content, optional right detail panel.
+
+**Props:** `leftColumn`, `middleColumn`, `rightColumn`, `leftColumnWidth/Min/Max`, `rightColumnWidth/Min/Max`, `showRightColumn`, `resizable`, `label` (a11y)
+
+**Use When:** IDE-style interfaces, editor layouts, dashboards with side panels.
+**Combine With:** `OiSidebar`, `OiStatusBar`, `OiMenuBar`
+
+---
+
+#### OiFilterableNavList<T>
+**Tags:** `navigation`, `filter`, `search`, `grouped-list`, `sidebar`, `chips`
+**Tier:** Composite
+
+Generic typed navigation list with pinned search input, toggleable chip filters, collapsible grouped items, and loading states. Auto-expands groups on search match.
+
+**Props:** `items`, `groups`, `idOf`, `groupIdOf`, `titleOf`, `label` (a11y), `subtitleOf`, `iconOf`, `chipFilters`, `chipFilterOf`, `selectedItemId`, `onItemSelected`, `headerAction`, `itemLoadingIds`
+
+**Use When:** Filterable sidebar navigation, requirement lists, screen inventories.
+**Combine With:** `OiSidebar`, `OiThreeColumnLayout`
 
 ---
 
@@ -4253,58 +4555,6 @@ Shows user text selections color-coded.
 
 ---
 
-### COMPOSITES — Visualization
-
----
-
-#### OiFunnelChart
-**Tags:** `chart`, `funnel`, `conversion`, `stages`, `pipeline`
-**Tier:** Composite
-
-Funnel chart for conversion/pipeline visualization.
-
----
-
-#### OiGauge
-**Tags:** `chart`, `gauge`, `speedometer`, `meter`, `value`
-**Tier:** Composite
-
-Gauge/speedometer chart with min-max range and colored zones.
-
----
-
-#### OiHeatmap
-**Tags:** `chart`, `heatmap`, `grid`, `density`, `correlation`
-**Tier:** Composite
-
-2D heatmap grid visualization.
-
----
-
-#### OiRadarChart
-**Tags:** `chart`, `radar`, `spider`, `comparison`, `multi-axis`
-**Tier:** Composite
-
-Radar/spider chart for multi-dimensional comparison.
-
----
-
-#### OiSankey
-**Tags:** `chart`, `sankey`, `flow`, `allocation`, `distribution`
-**Tier:** Composite
-
-Flow diagram showing weighted flows between nodes.
-
----
-
-#### OiTreemap
-**Tags:** `chart`, `treemap`, `hierarchy`, `proportional`, `space-filling`
-**Tier:** Composite
-
-Hierarchical rectangle treemap visualization.
-
----
-
 ### COMPOSITES — Workflow
 
 ---
@@ -4424,6 +4674,21 @@ Real-time messaging interface.
 
 **Use When:** Messaging, customer support chat, team chat.
 **Combine With:** `OiAvatar`, `OiReactionBar`, `OiTypingIndicator`
+
+---
+
+#### OiChatWindow
+**Tags:** `chat`, `llm`, `ai`, `streaming`, `suggestions`, `message`, `conversation`
+**Tier:** Module
+
+LLM-focused chat interface with message list, streaming support, suggestion chips, and provider selector. Different from `OiChat` (social messaging).
+
+**Props:** `messages: List<OiChatWindowMessage>`, `label` (a11y), `onSendMessage`, `streamingContent`, `streaming`, `inputPlaceholder`, `inputActions`, `providerSelector`, `onNewSession`, `autoScrollToBottom`, `onScrollToTop`, `onMessageReaction`, `onMessageEdit`, `submitOnEnter`
+
+**Sub-types:** `OiChatWindowMessage`, `OiChatSuggestion`, `OiSuggestionType`
+
+**Use When:** AI chat interfaces, LLM assistants, code generation UIs.
+**Combine With:** `OiMarkdown`, `OiThreeColumnLayout`, `OiFilterableNavList`
 
 ---
 
@@ -4552,6 +4817,225 @@ Edit structured metadata (key-value pairs, tags).
 **Tier:** Module
 
 Permission matrix editor (roles vs resources).
+
+---
+
+#### OiChangelogView
+**Tags:** `changelog`, `release-notes`, `versions`, `history`, `updates`
+**Tier:** Module
+
+Version-grouped changelog/release notes viewer with color-coded change type badges, optional search, and type filtering.
+
+**Props:** `versions: List<OiVersionEntry>` (required), `label` (a11y, required), `onVersionTap`, `initiallyExpandedCount`, `showSearch`, `showTypeFilters`, `maxWidth`
+
+**Sub-types:** `OiVersionEntry`, `OiChangeEntry`, `OiChangeType` (added/changed/fixed/removed/security/deprecated)
+
+**Use When:** Product changelog pages, release notes modals, update history screens.
+**Combine With:** `OiDialog`, `OiSheet`, `OiMarkdown`
+
+---
+
+#### OiConsentBanner
+**Tags:** `consent`, `gdpr`, `cookie`, `privacy`, `compliance`, `legal`, `banner`
+**Tier:** Module
+
+GDPR/cookie consent banner with accept-all, reject-all, and manage-preferences actions. The preferences dialog lists each category with a toggle. Required categories are locked on.
+
+**Props:** `categories: List<OiConsentCategory>` (required), `label` (a11y, required), `title`, `description`, `privacyPolicyLabel`, `onAcceptAll`, `onRejectAll`, `onSavePreferences`, `onPrivacyPolicyTap`, `visible`, `position` (OiConsentPosition: top/bottom), `maxWidth`
+
+**Sub-types:** `OiConsentCategory` (key, name, description, required, defaultValue), `OiConsentPosition`
+
+**Named constructors:** `.minimal()` — simplified two-button variant without manage-preferences
+
+**Use When:** GDPR compliance, cookie consent, privacy preferences.
+**Avoid When:** Simple notification banners — use `OiBanner`.
+
+---
+
+#### OiDevMenu
+**Tags:** `debug`, `developer`, `dev-tools`, `feature-flags`, `environment`, `logs`, `internal`
+**Tier:** Module
+
+Developer/debug menu with environment switcher, feature flags panel, custom action buttons, and log viewer. Only render in debug/staging builds.
+
+**Props:** `label` (a11y, required), `environments: List<OiDevEnvironment>?`, `currentEnvironment`, `onEnvironmentChange`, `featureFlags: List<OiFeatureFlag>?`, `featureFlagValues: Map<String, bool>`, `onFeatureFlagChange`, `actions: List<OiDevAction>?`, `logs: List<OiLogEntry>?`, `onCopyLogs`
+
+**Sub-types:** `OiDevEnvironment`, `OiFeatureFlag`, `OiDevAction`, `OiLogEntry`, `OiLogLevel`
+
+**Named constructors:** `.trigger()` — floating trigger button that opens the menu as a sheet
+
+**Use When:** Debug builds, QA builds, internal tooling. Gate with `kDebugMode`.
+
+---
+
+#### OiDrawerNavigation
+**Tags:** `drawer`, `navigation`, `sidebar`, `mobile`, `menu`, `hamburger`, `nested`
+**Tier:** Module
+
+Animated navigation drawer with user header, grouped sections, fast-toggle tiles, and nested submenus with slide animation.
+
+**Props:** `sections: List<OiDrawerSection>` (required), `label` (a11y, required), `header: OiDrawerHeader?`, `footer: Widget?`, `selectedKey`, `onItemTap`, `width`, `showDividers`
+
+**Sub-types:** `OiDrawerSection`, `OiDrawerHeader` (name, subtitle, avatarUrl, onTap), `OiDrawerItem` (key, label, icon, badge, children, onTap, disabled), `OiDrawerToggle`
+
+**Use When:** Mobile-first navigation drawers, hamburger menus, side navigation panels.
+**Combine With:** `OiPanel`, `OiAvatar`, `OiBadge`
+
+---
+
+#### OiFeedbackSheet
+**Tags:** `feedback`, `rating`, `survey`, `nps`, `bug-report`, `sentiment`, `review`
+**Tier:** Module
+
+In-app feedback form with configurable rating input (stars or emoji sentiment), category selector, message input, and optional email field.
+
+**Props:** `label` (a11y, required), `onSubmit: Function(OiFeedbackData)?`, `ratingType` (OiFeedbackRatingType: stars/sentiment), `categories: List<OiFeedbackCategory>?`, `showEmail`, `metadata: Map<String, String>?`, `thankYouTitle`, `thankYouDescription`
+
+**Sub-types:** `OiFeedbackData` (category, rating, message, email, metadata), `OiFeedbackCategory` (bug/featureRequest/general/other), `OiFeedbackRatingType`
+
+**Use When:** User satisfaction surveys, NPS collection, bug reporting forms.
+**Combine With:** `OiSheet`, `OiDialog`
+
+---
+
+#### OiHelpCenter
+**Tags:** `help`, `support`, `faq`, `knowledge-base`, `contact`, `documentation`, `search`
+**Tier:** Module
+
+Help center combining FAQ accordion, knowledge base articles, contact form, and feedback tab in a unified tabbed interface.
+
+**Props:** `label` (a11y, required), `faq: List<OiFaqItem>?`, `articles: List<OiKnowledgeArticle>?`, `onContactSubmit`, `onFeedbackSubmit`, `showFaq`, `showContact`, `showKnowledgeBase`, `showFeedback`, `searchEnabled`
+
+**Sub-types:** `OiFaqItem` (question, answer, category, keywords), `OiKnowledgeArticle` (key, title, content, category, tags, lastUpdated)
+
+**Use When:** In-app help overlays, support pages, documentation hubs.
+**Combine With:** `OiSheet`, `OiMarkdown`, `OiThreeColumnLayout`
+
+---
+
+#### OiMaintenancePage
+**Tags:** `maintenance`, `downtime`, `error`, `404`, `503`, `offline`, `status`
+**Tier:** Module
+
+Full-page maintenance/downtime/error display with illustration, countdown timer, retry button, status page link, and social links.
+
+**Props:** `title` (required), `label` (a11y, required), `description`, `illustration: Widget?`, `icon: IconData?`, `estimatedReturn: DateTime?`, `showCountdown`, `statusPageUrl`, `onRetry`, `retryLabel`, `socialLinks: List<OiSocialLink>?`, `maxWidth`
+
+**Sub-types:** `OiSocialLink` (label, url, icon)
+
+**Named constructors:**
+
+- `.maintenance()` — pre-configured for scheduled maintenance
+- `.notFound()` — 404 not found page
+- `.serverError()` — 500 server error page
+- `.offline()` — no internet connection page
+
+**Use When:** Error pages (404/500), maintenance windows, offline detection screens.
+
+---
+
+#### OiMediaPicker
+**Tags:** `media`, `picker`, `upload`, `gallery`, `image`, `file`, `camera`, `video`
+**Tier:** Module
+
+Media picker with gallery browsing, file selection, multi-select, upload progress indicators, and source selection (camera/gallery/file).
+
+**Props:** `label` (a11y, required), `sources: List<OiMediaSource>?`, `allowedTypes: OiMediaType?`, `maxItems`, `maxFileSize`, `selected: List<OiMediaItem>?`, `onSelect`, `onRemove`, `uploadProgress: List<OiMediaUploadProgress>?`, `galleryItems: List<OiMediaItem>?`, `onLoadMoreGallery`, `moreGalleryAvailable`
+
+**Sub-types:** `OiMediaItem` (key, url, name, size, type, thumbnailUrl), `OiMediaUploadProgress` (name, progress, error), `OiMediaSource`, `OiMediaType`
+
+**Use When:** Profile photo upload, media attachments, file selection with preview.
+**Combine With:** `OiSheet`, `OiImagePreviewCard`
+
+---
+
+#### OiOnboardingFlow
+**Tags:** `onboarding`, `wizard`, `walkthrough`, `intro`, `tutorial`, `welcome`
+**Tier:** Module
+
+Multi-page onboarding flow with illustration/icon per page, progress dots indicator, and skip/next/done navigation.
+
+**Props:** `pages: List<OiOnboardingPage>` (required), `label` (a11y, required), `onComplete`, `onSkip`, `onPageChange: ValueChanged<int>?`, `skipLabel`, `nextLabel`, `doneLabel`, `showSkip`, `showPageIndicator`, `maxWidth`
+
+**Sub-types:** `OiOnboardingPage` (title, description, illustration, icon, backgroundColor)
+
+**Use When:** New user flows, feature introductions, permission request walkthroughs.
+**Combine With:** `OiDialog`, `OiSheet`
+
+---
+
+#### OiPricingTable
+**Tags:** `pricing`, `plans`, `billing`, `subscription`, `comparison`, `features`, `saas`
+**Tier:** Module
+
+Pricing plan comparison table with feature matrix, billing cycle toggle (monthly/yearly), and recommended plan highlighting.
+
+**Props:** `plans: List<OiPricingPlan>` (required), `label` (a11y, required), `features: List<OiPricingFeature>?`, `onPlanSelect: Function(OiPricingPlan, OiBillingCycle)?`, `onBillingCycleChange`, `billingCycle: OiBillingCycle?`, `showBillingToggle`, `yearlyDiscount`, `currencySymbol`, `showFeatureMatrix`, `maxWidth`, `mobileBreakpoint`
+
+**Sub-types:** `OiPricingPlan` (key, name, description, monthlyPrice, yearlyPrice, features, recommended, billingCycle), `OiPricingFeature` (key, label, description), `OiBillingCycle` (monthly/yearly)
+
+**Use When:** SaaS pricing pages, plan comparison, subscription upgrade prompts.
+**Combine With:** `OiSubscriptionManager`, `OiBadge`
+
+---
+
+#### OiProfilePage
+**Tags:** `profile`, `user`, `account`, `avatar`, `settings`, `linked-accounts`, `danger-zone`
+**Tier:** Module
+
+User profile page with avatar upload, editable fields, linked accounts (OAuth), and danger zone for account deletion.
+
+**Props:** `profile: OiProfileData` (required), `label` (a11y, required), `onAvatarChange`, `onFieldSave: Function(String, dynamic)?`, `onPasswordChange`, `linkedAccounts: List<OiLinkedAccount>?`, `onAccountLink`, `onAccountUnlink`, `onDeleteAccount`, `sections: List<OiProfileSection>?`, `showDangerZone`
+
+**Sub-types:** `OiProfileData` (name, email, avatarUrl, fields), `OiLinkedAccount` (provider, username, avatarUrl, connected), `OiProfileSection` (key, title, items)
+
+**Use When:** User account pages, profile settings, account management.
+**Combine With:** `OiSettingsPage`, `OiAvatar`
+
+---
+
+#### OiSearchOverlay
+**Tags:** `search`, `overlay`, `spotlight`, `quick-find`, `autocomplete`, `keyboard`, `cmd-k`
+**Tier:** Module
+
+Full-screen search overlay with recent searches, async suggestions, category filters, and keyboard navigation. Cmd+K style.
+
+**Props:** `label` (a11y, required), `onSearch: Function(String)?`, `onSuggestionTap: Function(OiSearchSuggestion)?`, `onRecentTap: Function(String)?`, `onClearRecents`, `categories: List<OiSearchCategory>?`, `recentSearches: List<String>?`, `placeholder`, `debounce: Duration?`, `maxRecents`, `emptyStateTitle`, `emptyStateDescription`, `maxWidth`
+
+**Sub-types:** `OiSearchSuggestion` (key, title, subtitle, icon, category), `OiSearchCategory` (key, label, icon)
+
+**Use When:** Global search overlays, command palettes, spotlight-style search.
+**Combine With:** `OiThreeColumnLayout`, `OiPortal`
+
+---
+
+#### OiSettingsPage
+**Tags:** `settings`, `preferences`, `configuration`, `toggles`, `sliders`, `options`
+**Tier:** Module
+
+Settings screen with grouped sections, searchable items, and multiple tile types: toggle, navigation, select (dropdown), and slider.
+
+**Props:** `groups: List<OiSettingsGroup>` (required), `label` (a11y, required), `onSettingChanged: Function(String, String, dynamic)?` (groupKey, itemKey, value), `onNavigate: Function(String, String)?`, `onResetGroup: Function(String)?`, `onResetAll`, `searchEnabled`, `showResetButtons`
+
+**Sub-types:** `OiSettingsGroup` (key, title, items), `OiSettingsItem` (key, title, subtitle, type, value, options, min, max, enabled, onTap), `OiSettingsItemType` (toggle/navigation/select/slider/info)
+
+**Use When:** App settings screens, preferences pages, admin configuration panels.
+**Combine With:** `OiProfilePage`, `OiSidebar`, `OiThreeColumnLayout`
+
+---
+
+#### OiSubscriptionManager
+**Tags:** `subscription`, `billing`, `invoices`, `payment`, `plan`, `usage`, `saas`
+**Tier:** Module
+
+Subscription management page with current plan display, usage meters, billing history table, and payment method management.
+
+**Props:** `currentPlan: OiSubscriptionPlan` (required), `label` (a11y, required), `usage: List<OiUsageQuota>?`, `invoices: List<OiInvoice>?`, `paymentMethod: OiPaymentMethodInfo?`, `onUpgrade`, `onDowngrade`, `onCancel: Future<bool> Function()?`, `onUpdatePayment`, `onInvoiceDownload: Function(OiInvoice)?`, `currencySymbol`
+
+**Sub-types:** `OiSubscriptionPlan` (key, name, price, billingCycle, status, renewalDate, features), `OiUsageQuota` (label, used, limit, unit), `OiInvoice` (key, date, amount, status, downloadUrl), `OiPaymentMethodInfo` (brand, last4, expiry), `OiSubscriptionStatus`, `OiBillingCycle`
+
+**Use When:** SaaS billing pages, subscription management, upgrade/downgrade flows.
+**Combine With:** `OiPricingTable`, `OiTable`
 
 ---
 
@@ -4781,7 +5265,27 @@ State management for OiFileExplorer.
 ### Settings Models
 **Tags:** `settings`, `persistence`, `state`
 
-Persist widget state: `OiAccordionSettings`, `OiCalendarSettings`, `OiDashboardSettings`, `OiFileExplorerSettings`, `OiFilterBarSettings`, `OiGanttSettings`, `OiKanbanSettings`, `OiListViewSettings`, `OiSidebarSettings`, `OiSplitPaneSettings`, `OiTableSettings`, `OiTabsSettings`
+All settings classes extend `OiSettingsData`, are `@immutable` with `const` constructors, and include `fromJson()`, `toJson()`, `copyWith()`. They persist widget state via `OiSettingsDriver`.
+
+| Class | Widget | Key Fields |
+|---|---|---|
+| `OiAccordionSettings` | OiAccordion | `expandedIndices` (Set\<int\>) |
+| `OiAppShellSettings` | OiAppShell | `sidebarCollapsed` (bool) |
+| `OiCalendarSettings` | OiCalendar | `viewType` (month/week/day), `collapsedCategories` |
+| `OiConsentBannerSettings` | OiConsentBanner | `consented` (bool), `preferences` (Map), `consentedAt` |
+| `OiDashboardSettings` | OiDashboard | `cardPositions` (Map\<String, OiDashboardCardPosition\>) |
+| `OiFileExplorerSettings` | OiFileExplorer | `viewMode`, `sortField`, `sortDirection`, `sidebarWidth`, `favoriteFolderIds`, `recentPaths` |
+| `OiFilterBarSettings` | OiFilterBar | `activeFilters` (Map), `filterOrder` (List) |
+| `OiGanttSettings` | OiGantt | `zoomLevel`, `scrollPosition`, `collapsedGroups` |
+| `OiGroupedListSettings` | OiGroupedList | `collapsedGroups` (Set\<String\>) |
+| `OiKanbanSettings` | OiKanban | `columnOrder` (List), `collapsedColumnKeys` (Set) |
+| `OiListViewSettings` | OiListView | `layout` (list/grid/table), `activeSortId`, `activeFilters`, `pageSize` |
+| `OiSidebarSettings` | OiSidebar | `mode` (full/compact/hidden), `width`, `collapsedSectionIds` |
+| `OiSplitPaneSettings` | OiSplitPane | `dividerPosition` (double), `paneCollapsed` (bool) |
+| `OiTableSettings` | OiTable | `columnOrder`, `columnVisibility`, `columnWidths`, `sortColumnId`, `sortAscending`, `activeFilters`, `pageSize`, `pageIndex`, `groupByColumnId`, `frozenColumns` |
+| `OiTabsSettings` | OiTabs | `selectedIndex`, `tabOrder` (List\<int\>) |
+
+All include `schemaVersion` (int, default: 1) for migration support.
 
 ---
 
@@ -5012,11 +5516,6 @@ Use this table to pick the right widget for your use case.
 | **Gantt chart** | `OiGantt` | Third-party chart lib |
 | **Calendar** | `OiCalendar` | Third-party calendar |
 | **Timeline** | `OiTimeline` | Custom timeline |
-| **Heatmap** | `OiHeatmap` | Third-party chart |
-| **Radar chart** | `OiRadarChart` | Third-party chart |
-| **Funnel chart** | `OiFunnelChart` | Third-party chart |
-| **Gauge** | `OiGauge` | Third-party chart |
-| **Treemap** | `OiTreemap` | Third-party chart |
 | **Flow diagram** | `OiFlowGraph` | Third-party graph |
 | **Pipeline view** | `OiPipeline` | Custom stage display |
 | **Rich text editor** | `OiRichEditor` | flutter_quill directly |
@@ -5152,6 +5651,7 @@ Searchable keyword -> widget mapping for quick lookup.
 | `activity` | OiActivityFeed, OiTimeline |
 | `address` | OiAddressForm, OiAddressData |
 | `admin` | OiListView, OiDashboard, OiSidebar, OiFilterBar, OiAppShell, OiResourcePage, OiAuthPage |
+| `ai` | OiChatWindow |
 | `alert` | OiDialog.alert, OiToast |
 | `adaptive` | OiResponsiveShell |
 | `animation` | OiAnimatedList, OiMorph, OiPulse, OiShimmer, OiSpring, OiStagger, OiPageTransitionType |
@@ -5161,54 +5661,63 @@ Searchable keyword -> widget mapping for quick lookup.
 | `avatar` | OiAvatar, OiAvatarStack |
 | `back` | OiBackButton |
 | `badge` | OiBadge, OiBottomBar |
-| `billing` | OiAddressForm, OiCheckout |
+| `billing` | OiAddressForm, OiCheckout, OiSubscriptionManager, OiPricingTable |
 | `board` | OiKanban |
 | `boolean` | OiCheckbox, OiSwitch, OiFieldDisplay(boolean) |
 | `breadcrumb` | OiBreadcrumbs, OiPathBar |
-| `bulk` | OiBulkBar |
+| `bulk` | OiBulkBar, OiProgress.bulk |
 | `button` | OiButton, OiButtonGroup, OiIconButton, OiToggleButton |
 | `button-group` | OiButtonGroup, OiSegmentedControl |
 | `calendar` | OiCalendar, OiDatePicker, OiDateInput, OiDatePickerField |
 | `carousel` | OiPageIndicator |
 | `card` | OiCard, OiDashboardCard, OiFileGridCard |
 | `cart` | OiCartItem, OiCartSummary, OiCartPanel, OiMiniCart, OiCartItemRow, OiQuantitySelector |
-| `chart` | OiFunnelChart, OiGauge, OiHeatmap, OiRadarChart, OiSankey, OiTreemap |
-| `chat` | OiChat, OiChatMessage, OiTypingIndicator |
+| `chart` | *(see obers_ui_charts package)* |
+| `chat` | OiChat, OiChatMessage, OiTypingIndicator, OiChatWindow |
 | `checkbox` | OiCheckbox, OiCheckboxTile |
 | `checkout` | OiCheckout, OiCheckoutData |
 | `clipboard` | OiCopyButton, OiCopyable, OiPasteZone, OiLabel.copyable |
 | `clock` | OiTimePickerField, OiTimePicker |
 | `code` | OiCodeBlock, OiLabel.code, OiDiffView |
 | `collapse` | OiAccordion, OiCard(collapsible) |
-| `color` | OiColorInput, OiColorScheme, OiColorSwatch |
+| `color` | OiColorInput, OiColorScheme, OiColorSwatch, OiColorPalettePicker |
 | `column` | OiColumn, OiTableColumn |
+| `conversation` | OiChatWindow |
+| `counter` | OiProgress.bulk |
 | `combobox` | OiComboBox |
 | `command` | OiCommandBar |
 | `comment` | OiComments |
 | `confirm` | OiButton.confirm, OiDialog.confirm, OiDeleteDialog |
 | `container` | OiContainer, OiSurface, OiSurface.transparent, OiCard, OiDialogShell |
 | `content` | OiTabView |
+| `changelog` | OiChangelogView |
+| `consent` | OiConsentBanner |
 | `context-menu` | OiContextMenu |
 | `copy` | OiCopyButton, OiCopyable, OiFieldDisplay(copyable), OiLabel.copyable |
 | `coupon` | OiCouponInput, OiCouponResult |
 | `crud` | OiListView, OiForm, OiDetailView, OiResourcePage |
 | `currency` | OiFieldDisplay(currency), OiNumberInput |
 | `dashboard` | OiDashboard, OiMetric |
-| `data` | OiTable, OiDetailView, OiListView, OiFieldDisplay |
+| `data` | OiTable, OiDataGrid, OiDetailView, OiListView, OiFieldDisplay |
+| `data-grid` | OiDataGrid, OiTable |
 | `date` | OiDateInput, OiDatePicker, OiDatePicker.show, OiDatePickerField, OiDateRangePickerField, OiFieldDisplay(date) |
 | `date-picker` | OiDatePicker, OiDatePicker.show, OiDatePickerField |
 | `date-range` | OiDateRangePickerField, OiDateRangePreset |
 | `delete` | OiDeleteDialog, OiButton.destructive |
 | `delivery` | OiShippingMethod, OiShippingMethodPicker |
+| `design-system` | OiColorPalettePicker |
+| `debug` | OiDevMenu |
+| `desktop` | OiStatusBar, OiMenuBar |
 | `detail` | OiDetailView, OiFieldDisplay |
 | `destination` | OiNavigationItem |
 | `dialog` | OiDialog, OiDialog.showAsync, showOiDialog, OiDialogShell, OiDeleteDialog, OiNameDialog, OiRenameDialog, OiFormDialog |
+| `dot` | OiStatusBarItem |
 | `dots` | OiPageIndicator |
 | `diff` | OiDiffView |
 | `divider` | OiDivider |
 | `drag` | OiDraggable, OiReorderable, OiReorderableList, OiDragGhost |
 | `drag-and-drop` | OiDraggable, OiDropZone, OiReorderable, OiDragGhost |
-| `drawer` | OiDrawer |
+| `drawer` | OiDrawer, OiDrawerNavigation |
 | `dropdown` | OiSelect, OiComboBox, OiButton.split, OiFormSelect |
 | `e-commerce` | OiCheckout, OiShopProductDetail, OiProductCard, OiPriceTag |
 | `editor` | OiRichEditor, OiSmartInput |
@@ -5219,33 +5728,33 @@ Searchable keyword -> widget mapping for quick lookup.
 | `explorer` | OiFileExplorer |
 | `export` | OiThemeExporter, OiExportButton |
 | `feed` | OiActivityFeed |
-| `feedback` | OiStarRating, OiScaleRating, OiThumbs, OiSentiment, OiReactionBar |
+| `feedback` | OiStarRating, OiScaleRating, OiThumbs, OiSentiment, OiReactionBar, OiFeedbackSheet |
 | `elevated` | OiSurface.elevated |
 | `exclusive` | OiSegmentedControl, OiButtonGroup(exclusive) |
 | `field` | OiFieldDisplay, OiFormField, OiDetailField, OiDatePickerField, OiDateRangePickerField, OiTimePickerField |
 | `file` | OiFileExplorer, OiFileInput, OiFileIcon, OiFileTile, OiFileGridCard |
-| `filter` | OiFilterBar, OiListView, OiTable, OiDateRangePickerField |
+| `filter` | OiFilterBar, OiProductFilters, OiListView, OiTable, OiDateRangePickerField |
 | `flow` | OiFlowGraph, OiStateDiagram |
 | `folder` | OiFolderIcon, OiFolderTreeItem, OiNewFolderDialog |
 | `form` | OiForm, OiFormField, OiFormSection, OiWizard, OiFormSelect, OiFormDialog, OiDatePickerField, OiDateRangePickerField, OiTimePickerField |
-| `funnel` | OiFunnelChart |
 | `future` | showOiDialog, OiDialog.showAsync, OiSheet.showAsync, OiDatePicker.show, OiTimePicker.show |
 | `gallery` | OiGallery, OiLightbox, OiProductGallery |
 | `gantt` | OiGantt |
-| `gauge` | OiGauge |
 | `floating` | OiScrollToTop |
 | `gesture` | OiTappable, OiSwipeable, OiDoubleTap, OiLongPressMenu, OiPinchZoom, OiRefreshIndicator |
+| `gdpr` | OiConsentBanner |
 | `go-router` | OiTransitionPage |
 | `graph` | OiFlowGraph |
-| `grid` | OiGrid, OiMasonry, OiVirtualGrid, OiFileGridView |
+| `grid` | OiGrid, OiMasonry, OiVirtualGrid, OiFileGridView, OiGridZoomControls |
 | `group` | OiButtonGroup, OiAccordion, OiFormSection |
 | `header` | OiSliverHeader |
 | `heading` | OiLabel.h1, .h2, .h3, .h4 |
-| `heatmap` | OiHeatmap |
-| `hierarchy` | OiTree, OiFolderTreeItem, OiTreemap |
+| `help` | OiHelpCenter |
+| `hierarchy` | OiTree, OiFolderTreeItem |
 | `i18n` | OiLocaleSwitcher, OiLocaleOption |
 | `icon` | OiIcon, OiIconButton, OiFileIcon, OiFolderIcon |
-| `image` | OiImage, OiAvatar, OiGallery, OiLightbox, OiImageCropper, OiImageAnnotator |
+| `ide` | OiThreeColumnLayout |
+| `image` | OiImage, OiAvatar, OiGallery, OiLightbox, OiImageCropper, OiImageAnnotator, OiImagePreviewCard |
 | `indicator` | OiProgress, OiLiveRing, OiPulse, OiStorageIndicator, OiPageIndicator |
 | `inline-edit` | OiEditable, OiEditableText, OiEditableSelect, OiEditableDate, OiEditableNumber |
 | `input` | OiTextInput, OiNumberInput, OiDateInput, OiTimeInput, OiDateTimeInput, OiSelect, OiFormSelect, OiComboBox, OiCheckbox, OiSwitch, OiRadio, OiSlider, OiTagInput, OiColorInput, OiFileInput, OiArrayInput, OiDatePickerField, OiDateRangePickerField, OiTimePickerField |
@@ -5254,28 +5763,33 @@ Searchable keyword -> widget mapping for quick lookup.
 | `keyboard` | OiShortcutScope, OiShortcuts, OiCommandBar, OiFocusTrap |
 | `kpi` | OiMetric |
 | `label` | OiLabel |
-| `layout` | OiRow, OiColumn, OiGrid, OiPage, OiSection, OiMasonry, OiWrapLayout, OiSpacer |
+| `layout` | OiRow, OiColumn, OiGrid, OiPage, OiSection, OiMasonry, OiWrapLayout, OiSpacer, OiThreeColumnLayout |
 | `lightbox` | OiLightbox |
 | `list` | OiListView, OiListTile, OiVirtualList, OiAnimatedList |
 | `live` | OiLiveRing, OiCursorPresence, OiSelectionPresence |
+| `llm` | OiChatWindow |
 | `loading` | OiProgress, OiShimmer, OiSkeletonGroup, OiButton(loading), OiRefreshIndicator |
 | `log` | OiActivityFeed, OiTimeline |
 | `login` | OiAuthPage.login |
 | `markdown` | OiMarkdown |
-| `media` | OiVideoPlayer, OiGallery, OiLightbox, OiImageCropper, OiImageAnnotator |
-| `menu` | OiNavMenu, OiContextMenu, OiBottomBar, OiSidebar |
+| `menubar` | OiMenuBar |
+| `mermaid` | OiMarkdown |
+| `media` | OiVideoPlayer, OiGallery, OiLightbox, OiImageCropper, OiImageAnnotator, OiMediaPicker |
+| `menu` | OiNavMenu, OiContextMenu, OiBottomBar, OiSidebar, OiMenuBar, OiMenuItem |
 | `message` | OiChat, OiChatMessage, OiToast |
 | `metadata` | OiMetadataEditor, OiFileInfoDialog |
 | `metric` | OiMetric |
+| `maintenance` | OiMaintenancePage |
 | `modal` | OiDialog, OiDialogShell, OiFocusTrap |
-| `navigation` | OiSidebar, OiBottomBar, OiNavigationRail, OiTabs, OiBreadcrumbs, OiDrawer, OiNavMenu, OiResponsiveShell, OiPageRoute, OiTransitionPage, OiBackButton, OiNavigationItem |
+| `navigation` | OiSidebar, OiBottomBar, OiNavigationRail, OiTabs, OiBreadcrumbs, OiDrawer, OiNavMenu, OiResponsiveShell, OiPageRoute, OiTransitionPage, OiBackButton, OiNavigationItem, OiFilterableNavList, OiWorkflowStepper |
 | `notification` | OiNotificationCenter, OiToast |
 | `number` | OiNumberInput, OiFieldDisplay(number) |
-| `onboarding` | OiTour, OiSpotlight, OiWhatsNew |
+| `onboarding` | OiTour, OiSpotlight, OiWhatsNew, OiOnboardingFlow |
 | `order` | OiCartItem, OiCartSummary, OiProductData, OiOrderData, OiOrderEvent, OiOrderStatus, OiOrderStatusBadge, OiOrderSummary, OiOrderSummaryLine, OiOrderTracker |
 | `otp` | OiTextInput.otp |
 | `overlay` | OiDialog, OiDialogShell, OiToast, OiSnackBar, OiSheet, OiContextMenu, OiPopover, OiPanel |
 | `page` | OiPageRoute, OiTransitionPage, OiPageIndicator |
+| `palette` | OiColorPalettePicker |
 | `pagination` | OiPaginationController, OiTable, OiListView, OiPagination, OiPageIndicator |
 | `password` | OiTextInput.password |
 | `panel` | OiPanel, OiResizable, OiSplitPane |
@@ -5284,16 +5798,21 @@ Searchable keyword -> widget mapping for quick lookup.
 | `permission` | OiPermissions |
 | `phone` | OiFieldDisplay(phone) |
 | `picker` | OiDatePicker, OiDatePicker.show, OiTimePicker, OiTimePicker.show, OiEmojiPicker, OiColorInput, OiDatePickerField, OiDateRangePickerField, OiTimePickerField |
-| `pipeline` | OiPipeline |
+| `pipeline` | OiPipeline, OiPipelineProgress |
 | `pinned` | OiSliverHeader |
 | `popover` | OiPopover |
 | `pull-to-refresh` | OiRefreshIndicator |
+| `phases` | OiWorkflowStepper |
 | `presence` | OiAvatar(presence), OiCursorPresence, OiLiveRing |
+| `preset` | OiColorPalettePicker |
+| `preview` | OiImagePreviewCard |
 | `price` | OiPriceTag |
+| `pricing` | OiPricingTable, OiSubscriptionManager |
+| `privacy` | OiConsentBanner |
 | `product` | OiProductData, OiProductVariant, OiProductCard, OiProductGallery, OiShopProductDetail |
+| `profile` | OiProfilePage |
 | `progress` | OiProgress, OiStepper |
 | `quantity` | OiQuantitySelector |
-| `radar` | OiRadarChart |
 | `rail` | OiNavigationRail, OiRailLabelBehavior |
 | `radio` | OiRadio, OiRadioTile |
 | `refresh` | OiRefreshIndicator |
@@ -5307,21 +5826,20 @@ Searchable keyword -> widget mapping for quick lookup.
 | `route` | OiPageRoute, OiTransitionPage, OiPageTransitionType |
 | `rich-text` | OiRichEditor, OiMarkdown |
 | `row` | OiRow, OiListTile |
-| `sankey` | OiSankey |
 | `schedule` | OiCalendar, OiGantt, OiScheduler |
 | `scroll` | OiVirtualList, OiVirtualGrid, OiInfiniteScroll, OiScrollbar, OiSliverList, OiSliverGrid, OiSliverHeader, OiScrollToTop, OiRefreshIndicator |
 | `scroll-to-top` | OiScrollToTop |
 | `shell` | OiAppShell, OiResponsiveShell, OiDialogShell |
 | `sidebar-lite` | OiNavigationRail |
-| `search` | OiSearch, OiComboBox, OiCommandBar, OiFilterBar, OiTextInput.search |
+| `search` | OiSearch, OiComboBox, OiCommandBar, OiFilterBar, OiTextInput.search, OiSearchOverlay |
 | `segmented` | OiSegmentedControl |
 | `select` | OiSelect, OiComboBox, OiRadio, OiFormSelect |
 | `selection` | OiRadioTile, OiSegmentedControl |
-| `settings` | OiSettingsDriver, OiAccordionSettings, OiSwitchTile, OiCheckboxTile, OiRadioTile, etc. |
+| `settings` | OiSettingsDriver, OiAccordionSettings, OiSwitchTile, OiCheckboxTile, OiRadioTile, OiSettingsPage, etc. |
 | `sheet` | OiSheet, OiSheet.showAsync |
 | `show-dialog` | showOiDialog, OiDialog.showAsync, OiDialogShell.show |
 | `shipping` | OiShippingMethod, OiShippingMethodPicker |
-| `shop` | OiProductData, OiCartItem, OiCartSummary, OiPriceTag, OiQuantitySelector, OiProductCard, OiCartItemRow, OiOrderSummaryLine, OiCouponInput, OiAddressForm, OiShippingMethodPicker, OiPaymentMethodPicker, OiOrderStatusBadge, OiCartPanel, OiMiniCart, OiOrderSummary, OiProductGallery, OiOrderTracker, OiCheckout, OiShopProductDetail |
+| `shop` | OiProductData, OiCartItem, OiCartSummary, OiPriceTag, OiQuantitySelector, OiProductCard, OiCartItemRow, OiOrderSummaryLine, OiCouponInput, OiAddressForm, OiShippingMethodPicker, OiPaymentMethodPicker, OiOrderStatusBadge, OiCartPanel, OiMiniCart, OiOrderSummary, OiProductGallery, OiOrderTracker, OiCheckout, OiShopProductDetail, OiWishlistButton, OiStockBadge, OiProductFilters |
 | `sidebar` | OiSidebar, OiFileSidebar |
 | `skeleton` | OiSkeletonGroup, OiShimmer |
 | `sliver` | OiSliverList, OiSliverGrid, OiSliverHeader |
@@ -5331,8 +5849,15 @@ Searchable keyword -> widget mapping for quick lookup.
 | `sort` | OiTable, OiListView, OiFilterBar, OiSortButton |
 | `split` | OiSplitPane, OiButton.split |
 | `state-diagram` | OiStateDiagram |
-| `stepper` | OiStepper, OiWizard |
+| `status` | OiStatusBar, OiStatusBarItem |
+| `stepper` | OiStepper, OiWizard, OiWorkflowStepper |
+| `streaming` | OiChatWindow |
+| `subscription` | OiSubscriptionManager, OiPricingTable |
+| `suggestions` | OiChatWindow |
+| `support` | OiHelpCenter |
+| `swatch` | OiColorPalettePicker |
 | `sticky` | OiSliverHeader |
+| `stock` | OiStockBadge |
 | `storage` | OiStorageIndicator, OiSettingsDriver |
 | `surface` | OiSurface, OiSurface.transparent, OiSurface.elevated |
 | `switch` | OiSwitch, OiSwitchTile |
@@ -5343,6 +5868,7 @@ Searchable keyword -> widget mapping for quick lookup.
 | `table` | OiTable, OiTableColumn, OiTableController |
 | `tag` | OiTagInput, OiBadge |
 | `text` | OiLabel, OiLabel.copyable, OiTextInput |
+| `three-column` | OiThreeColumnLayout |
 | `theme` | OiThemeData, OiColorScheme, OiDynamicTheme, OiThemePreview, OiThemeToggle |
 | `thumbs` | OiThumbs |
 | `tile` | OiSwitchTile, OiCheckboxTile, OiRadioTile, OiListTile |
@@ -5357,19 +5883,21 @@ Searchable keyword -> widget mapping for quick lookup.
 | `tooltip` | OiTooltip |
 | `tour` | OiTour, OiSpotlight |
 | `tracking` | OiOrderTracker |
-| `tree` | OiTree, OiFolderTreeItem, OiTreemap |
-| `treemap` | OiTreemap |
+| `tree` | OiTree, OiFolderTreeItem |
 | `typography` | OiLabel, OiTextTheme |
 | `upload` | OiUploadDialog, OiFileInput, OiFileExplorer |
 | `url` | OiFieldDisplay(url) |
 | `user` | OiAvatar, OiAvatarStack, OiUserMenu |
 | `validation` | OiForm, OiFormField, OiTextInput, OiFormSelect, OiFormDialog, OiDatePickerField, OiDateRangePickerField, OiTimePickerField |
+| `version` | OiImagePreviewCard |
 | `video` | OiVideoPlayer |
 | `virtual-scroll` | OiVirtualList, OiVirtualGrid |
 | `visibility` | OiVisibility |
-| `visualization` | OiFunnelChart, OiGauge, OiHeatmap, OiRadarChart, OiSankey, OiTreemap |
+| `visualization` | OiFlowGraph, OiPipeline, OiStateDiagram |
+| `wishlist` | OiWishlistButton |
 | `wizard` | OiWizard, OiStepper |
-| `workflow` | OiFlowGraph, OiPipeline, OiStateDiagram |
+| `workflow` | OiFlowGraph, OiPipeline, OiStateDiagram, OiWorkflowStepper |
+| `zoom` | OiGridZoomControls |
 
 ---
 
@@ -5404,3 +5932,123 @@ This document must be kept in sync with the codebase. When widgets are added, mo
 3. Update the Decision Matrix if applicable
 4. Move items from "Planned" to the main catalog when implemented
 5. Update the doc/ documentation folder as well
+
+---
+
+## obers_ui_autoforms — Auto-Form Package
+
+> **Package:** `packages/obers_ui_autoforms`
+> **Import:** `import 'package:obers_ui_autoforms/obers_ui_autoforms.dart';`
+> **Prefix:** `OiAf` (e.g., `OiAfForm`, `OiAfTextInput`, `OiAfSelect`)
+> **Depends on:** `obers_ui` (core), `collection` (deep equality)
+
+### Overview
+
+Controller-first, enum-keyed, context-bound stateful form handling for obers_ui. Controller defines data behavior (validation, visibility, derived fields); widgets define visual behavior (labels, hints, icons, layout).
+
+### Quick Start
+
+```dart
+import 'package:obers_ui_autoforms/obers_ui_autoforms.dart';
+
+// 1. Define field enum
+enum MyField { name, email }
+
+// 2. Define controller
+class MyController extends OiAfController<MyField, Map<String, dynamic>> {
+  @override
+  void defineFields() {
+    addTextField(MyField.name, required: true);
+    addTextField(MyField.email, required: true, validators: [OiAfValidators.email()]);
+  }
+
+  @override
+  Map<String, dynamic> buildData() => json();
+}
+
+// 3. Build UI
+OiAfForm<MyField, Map<String, dynamic>>(
+  controller: MyController(),
+  onSubmit: (data, ctrl) async { /* save */ },
+  child: OiColumn(children: [
+    OiAfTextInput<MyField>(field: MyField.name, label: 'Name'),
+    OiAfTextInput<MyField>(field: MyField.email, label: 'Email'),
+    OiAfSubmitButton<MyField, Map<String, dynamic>>(label: 'Save'),
+  ]),
+)
+```
+
+### Key Types
+
+| Type | Purpose |
+|---|---|
+| `OiAfController<TField, TData>` | Abstract form controller. Subclass to define fields. |
+| `OiAfForm<TField, TData>` | Root widget providing scope to the subtree. |
+| `OiAfFieldController<TField, TValue>` | Per-field runtime state (value, dirty, errors). |
+| `OiAfFieldDefinition<TField, TValue>` | Immutable field specification. |
+| `OiAfValidators` | 60+ built-in validators (Laravel-inspired). |
+| `OiAfOption<T>` | Selectable option for select/radio/combo. |
+| `OiAfSubmitResult<TData>` | Sealed: Success, Invalid, Failure. |
+
+### Field Widget Catalog
+
+| Widget | Wraps | Value Type |
+|---|---|---|
+| `OiAfTextInput<TField>` | `OiTextInput` | `String` |
+| `OiAfNumberInput<TField>` | `OiNumberInput` | `num` |
+| `OiAfCheckbox<TField>` | `OiCheckbox` | `bool?` |
+| `OiAfSwitch<TField>` | `OiSwitch` | `bool` |
+| `OiAfRadio<TField, TValue>` | `OiRadio<TValue>` | `TValue` |
+| `OiAfSelect<TField, TValue>` | `OiSelect<TValue>` | `TValue` |
+| `OiAfComboBox<TField, TValue>` | `OiComboBox<TValue>` | `TValue` |
+| `OiAfDateInput<TField>` | `OiDateInput` | `DateTime` |
+| `OiAfTimeInput<TField>` | `OiTimeInput` | `OiTimeOfDay` |
+| `OiAfDateTimeInput<TField>` | `OiDateTimeInput` | `DateTime` |
+| `OiAfDatePickerField<TField>` | `OiDatePickerField` | `DateTime` |
+| `OiAfDateRangePickerField<TField>` | `OiDateRangePickerField` | `(DateTime, DateTime)` |
+| `OiAfTimePickerField<TField>` | `OiTimePickerField` | `OiTimeOfDay` |
+| `OiAfTagInput<TField>` | `OiTagInput` | `List<String>` |
+| `OiAfSlider<TField>` | `OiSlider` | `double` |
+| `OiAfColorInput<TField>` | `OiColorInput` | `Color` |
+| `OiAfFileInput<TField>` | `OiFileInput` | `List<String>` |
+| `OiAfSegmentedControl<TField, TValue>` | `OiSegmentedControl<TValue>` | `TValue` |
+
+### Aggregate Widgets
+
+| Widget | Purpose |
+|---|---|
+| `OiAfErrorSummary<TField>` | Displays all form errors with focus-on-tap. |
+| `OiAfSubmitButton<TField, TData>` | Submit button with loading state. |
+| `OiAfResetButton<TField>` | Reset button with configurable mode. |
+
+### Controller Registration Helpers
+
+```dart
+addTextField(field, required: true, validators: [...])
+addNumberField(field, min: 0, max: 100)
+addBoolField(field, initialValue: false)
+addSelectField<String>(field, options: [...])
+addRadioField<String>(field, options: [...])
+addDateField(field, minDate: ...)
+addSliderField(field, min: 0, max: 100)
+addFormValidator(validator)
+```
+
+### Validation Modes
+
+| Mode | Behavior |
+|---|---|
+| `disabled` | Manual only |
+| `onSubmit` | Validate on submit |
+| `onBlur` | Validate on focus loss |
+| `onChange` | Validate on every change |
+| `onBlurThenChange` | **Default.** Validate on blur first, then on each change |
+| `onInit` | Validate immediately |
+
+### Tags
+
+| Tag | Widgets |
+|---|---|
+| `autoform` | OiAfForm, OiAfController, OiAfTextInput, OiAfSubmitButton, ... |
+| `form` | OiAfForm, OiAfErrorSummary, OiAfSubmitButton, OiAfResetButton |
+| `validation` | OiAfValidators, OiAfValidationContext |

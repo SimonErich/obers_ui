@@ -153,7 +153,12 @@ OiDataGrid<User>(
 | `OiWizard` | Multi-page wizard with progress |
 | `OiFormDialog` | Form dialog with managed lifecycle (loading, error, submit states) |
 
-### OiForm
+### OiForm (Deprecated)
+
+!!! warning "Deprecated"
+    `OiForm`, `OiFormField`, `OiFormSection`, and `OiFormController` are deprecated.
+    Use `OiAfForm` from `package:obers_ui_autoforms` instead.
+    See the [AutoForms documentation](../advanced/autoforms.md) for the migration guide.
 
 ```dart
 OiForm(
@@ -242,6 +247,8 @@ final user = await OiFormDialog.showCustom<User>(
 | `OiShortcuts` | Keyboard shortcut hint display |
 | `OiErrorPage` | Full-page error display for 404, 403, 500 states |
 | `OiResponsiveShell` | Responsive navigation shell that auto-switches between OiBottomBar and OiNavigationRail |
+| `OiThreeColumnLayout` | Resizable three-column IDE-style layout |
+| `OiFilterableNavList<T>` | Typed navigation list with search, chip filters, grouped items |
 
 ### OiResponsiveShell
 
@@ -289,6 +296,71 @@ OiResponsiveShell(
 - `resolveMode(width)` pure function for testing and conditional logic
 
 **Related components:** `OiBottomBar`, `OiNavigationRail`, `OiSidebar`
+
+### OiThreeColumnLayout
+
+Resizable three-column layout for IDE-style interfaces. Each column width is independently adjustable via drag handles, and columns can be toggled on/off.
+
+```dart
+OiThreeColumnLayout(
+  label: 'Editor layout',
+  leftColumn: NavigationSidebar(),
+  middleColumn: EditorContent(),
+  rightColumn: PreviewPanel(),
+  leftColumnWidth: 260,
+  rightColumnWidth: 320,
+  resizable: true,
+  showRightColumn: true,
+)
+```
+
+**Key features:**
+
+- Three independently sized columns with configurable initial widths
+- Drag-to-resize handles between columns
+- `showLeftColumn` / `showRightColumn` toggles with animated collapse
+- Minimum and maximum width constraints per column
+- Middle column fills remaining space
+- Persists column widths when used with a settings driver
+
+**Related components:** `OiSplitPane`, `OiResizable`, `OiPanel`, `OiSidebar`
+
+### OiFilterableNavList
+
+Generic typed navigation list with search, chip filters, and grouped items. Useful for sidebar navigation panels that need filtering and categorization.
+
+```dart
+OiFilterableNavList<Screen>(
+  label: 'Screens',
+  items: screens,
+  groups: [
+    OiNavGroup(id: 'auth', label: 'Authentication'),
+    OiNavGroup(id: 'dash', label: 'Dashboard'),
+  ],
+  idOf: (s) => s.id,
+  groupIdOf: (s) => s.groupId,
+  titleOf: (s) => s.name,
+  subtitleOf: (s) => s.description,
+  chipFilters: [
+    OiChipFilter(id: 'has-spec', label: 'Has Spec', color: OiBadgeColor.success),
+  ],
+  chipFilterOf: (s) => s.hasSpec ? {'has-spec'} : {},
+  onItemSelected: (screen) => openScreen(screen),
+)
+```
+
+**Key features:**
+
+- Generic `<T>` type for any data model
+- Built-in search input that filters by title and subtitle
+- Chip filter row for tag-based filtering
+- Grouped items with collapsible group headers via `OiNavGroup`
+- Callback-based property extraction (`idOf`, `titleOf`, `groupIdOf`, etc.)
+- Selected item highlighting
+- Empty state when no items match filters
+- Keyboard navigation support
+
+**Related components:** `OiSidebar`, `OiNavMenu`, `OiSearch`, `OiFilterBar`
 
 ## Search
 
@@ -575,3 +647,42 @@ OiOrderTracker(
 | `OiFlowGraph` | Node-edge graph editor |
 | `OiPipeline` | Linear stage pipeline |
 | `OiStateDiagram` | State machine visualization |
+| `OiWorkflowStepper` | Two-row phase/step navigation stepper |
+
+### OiWorkflowStepper
+
+Two-row horizontal stepper showing phases (top) and steps within the active phase (bottom). Useful for multi-stage workflows where each phase contains its own set of ordered steps.
+
+```dart
+OiWorkflowStepper(
+  label: 'Design workflow',
+  phases: [
+    OiWorkflowPhase(id: 'req', label: 'Requirements', steps: [
+      OiWorkflowStep(id: 'gather', label: 'Gather'),
+      OiWorkflowStep(id: 'review', label: 'Review'),
+    ]),
+    OiWorkflowPhase(id: 'design', label: 'Design', steps: [
+      OiWorkflowStep(id: 'wireframe', label: 'Wireframe'),
+      OiWorkflowStep(id: 'prototype', label: 'Prototype'),
+    ]),
+  ],
+  currentPhaseId: 'design',
+  currentStepId: 'wireframe',
+  completedStepIds: {'gather', 'review'},
+  enabledStepIds: {'gather', 'review', 'wireframe', 'prototype'},
+  onStepTap: (phaseId, stepId) => navigate(phaseId, stepId),
+)
+```
+
+**Key features:**
+
+- Two-row layout: phase pills on top, step pills on bottom
+- Active phase and step highlighting with themed colors
+- Completed steps show checkmark indicators
+- Disabled steps are visually dimmed and non-interactive
+- `enabledStepIds` controls which steps are tappable (for enforcing sequential completion)
+- Connector lines between phases and between steps
+- Responsive: scrollable horizontally when phases/steps overflow
+- Keyboard navigation between steps
+
+**Related components:** `OiStepper`, `OiPipeline`, `OiWizard`, `OiTabs`

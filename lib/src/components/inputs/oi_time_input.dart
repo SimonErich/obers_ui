@@ -6,15 +6,27 @@ import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
 import 'package:obers_ui/src/primitives/overlay/oi_floating.dart'
     show OiFloating;
 
-/// A time value with hour and minute components.
+/// A time of day independent of Flutter's Material TimeOfDay.
 ///
-/// [hour] must be in the range 0–23; [minute] in 0–59.
+/// Zero-dependency. [Comparable]. Immutable.
+///
+/// [hour] must be in the range 0–23; [minute] in 0–59; [second] in 0–59.
 ///
 /// {@category Components}
 @immutable
-class OiTimeOfDay {
+class OiTimeOfDay implements Comparable<OiTimeOfDay> {
   /// Creates an [OiTimeOfDay].
-  const OiTimeOfDay({required this.hour, required this.minute});
+  const OiTimeOfDay({
+    required this.hour,
+    required this.minute,
+    this.second = 0,
+  });
+
+  /// Creates an [OiTimeOfDay] from the current local time.
+  factory OiTimeOfDay.now() {
+    final now = DateTime.now();
+    return OiTimeOfDay(hour: now.hour, minute: now.minute, second: now.second);
+  }
 
   /// The hour component, in the range 0–23.
   final int hour;
@@ -22,16 +34,47 @@ class OiTimeOfDay {
   /// The minute component, in the range 0–59.
   final int minute;
 
+  /// The second component, in the range 0–59.
+  final int second;
+
+  /// Formats as 24-hour `HH:MM` (or `HH:MM:SS` when [second] is non-zero).
+  String format24() {
+    final hh = hour.toString().padLeft(2, '0');
+    final mm = minute.toString().padLeft(2, '0');
+    if (second != 0) {
+      final ss = second.toString().padLeft(2, '0');
+      return '$hh:$mm:$ss';
+    }
+    return '$hh:$mm';
+  }
+
+  /// Formats as 12-hour `h:MM AM/PM`.
+  String format12() {
+    final period = hour < 12 ? 'AM' : 'PM';
+    final h = hour == 0 ? 12 : (hour > 12 ? hour - 12 : hour);
+    final mm = minute.toString().padLeft(2, '0');
+    return '$h:$mm $period';
+  }
+
+  @override
+  int compareTo(OiTimeOfDay other) {
+    if (hour != other.hour) return hour.compareTo(other.hour);
+    if (minute != other.minute) return minute.compareTo(other.minute);
+    return second.compareTo(other.second);
+  }
+
   @override
   bool operator ==(Object other) =>
-      other is OiTimeOfDay && other.hour == hour && other.minute == minute;
+      other is OiTimeOfDay &&
+      other.hour == hour &&
+      other.minute == minute &&
+      other.second == second;
 
   @override
-  int get hashCode => Object.hash(hour, minute);
+  int get hashCode => Object.hash(hour, minute, second);
 
   @override
-  String toString() =>
-      '${hour.toString().padLeft(2, '0')}:${minute.toString().padLeft(2, '0')}';
+  String toString() => format24();
 }
 
 /// A time-picker input component.
@@ -104,13 +147,16 @@ class _OiTimeInputState extends State<OiTimeInput> {
   void _initControllers() {
     final hourItem = widget.use24Hour ? _pickerHour : (_pickerHour % 12);
     _hourCtrl = ScrollController(
-      initialScrollOffset:
-          (hourItem * _itemHeight - _centerOffset).clamp(0.0, double.infinity),
+      initialScrollOffset: (hourItem * _itemHeight - _centerOffset).clamp(
+        0.0,
+        double.infinity,
+      ),
     );
     _minuteCtrl = ScrollController(
-      initialScrollOffset:
-          (_pickerMinute * _itemHeight - _centerOffset)
-              .clamp(0.0, double.infinity),
+      initialScrollOffset: (_pickerMinute * _itemHeight - _centerOffset).clamp(
+        0.0,
+        double.infinity,
+      ),
     );
   }
 
@@ -239,8 +285,9 @@ class _OiTimeInputState extends State<OiTimeInput> {
                   if (widget.use24Hour) return i.toString().padLeft(2, '0');
                   return (i == 0 ? 12 : i).toString().padLeft(2, '0');
                 },
-                selectedIndex:
-                    widget.use24Hour ? _pickerHour : (_pickerHour % 12),
+                selectedIndex: widget.use24Hour
+                    ? _pickerHour
+                    : (_pickerHour % 12),
                 onSelected: (i) {
                   setState(() {
                     _pickerHour = widget.use24Hour
@@ -319,11 +366,7 @@ class _OiTimeInputState extends State<OiTimeInput> {
     final colors = context.colors;
     final displayText = widget.value != null ? _formatTime(widget.value!) : '';
 
-    final clockIcon = Icon(
-      OiIcons.clock,
-      size: 18,
-      color: colors.textMuted,
-    );
+    final clockIcon = Icon(OiIcons.clock, size: 18, color: colors.textMuted);
 
     final anchor = GestureDetector(
       onTap: widget.enabled ? _togglePicker : null,

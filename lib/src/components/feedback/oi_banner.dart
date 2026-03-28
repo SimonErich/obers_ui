@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/buttons/oi_button.dart';
 import 'package:obers_ui/src/components/buttons/oi_icon_button.dart';
+import 'package:obers_ui/src/components/display/oi_progress.dart';
 import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/oi_responsive.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
@@ -26,6 +27,9 @@ enum OiBannerLevel {
 
   /// Neutral message with no severity.
   neutral,
+
+  /// Loading state with an indeterminate progress bar.
+  loading,
 }
 
 /// Inline persistent notification bar.
@@ -57,6 +61,7 @@ class OiBanner extends StatefulWidget {
     this.border = true,
     this.visible,
     this.semanticLabel,
+    this.loadingOnDismiss,
     super.key,
   });
 
@@ -212,6 +217,40 @@ class OiBanner extends StatefulWidget {
          key: key,
        );
 
+  /// Creates a loading banner with an indeterminate progress bar.
+  ///
+  /// Loading banners are non-dismissible by the user. Pass [onDismiss] as a
+  /// [Future]-returning callback to trigger an animated auto-dismiss once the
+  /// operation completes — the banner fades out after the future resolves.
+  ///
+  /// ```dart
+  /// OiBanner.loading(
+  ///   message: 'Analyzing connections...',
+  ///   onDismiss: () async { await operation(); },
+  /// )
+  /// ```
+  const OiBanner.loading({
+    required String message,
+    String? title,
+    bool compact = false,
+    bool border = true,
+    bool? visible,
+    String? semanticLabel,
+    Future<void> Function()? onDismiss,
+    Key? key,
+  }) : this._(
+         message: message,
+         level: OiBannerLevel.loading,
+         title: title,
+         dismissible: false,
+         compact: compact,
+         border: border,
+         visible: visible,
+         semanticLabel: semanticLabel,
+         loadingOnDismiss: onDismiss,
+         key: key,
+       );
+
   /// The alert severity. Controls background tint, icon, and border color.
   final OiBannerLevel level;
 
@@ -251,6 +290,13 @@ class OiBanner extends StatefulWidget {
   /// Accessibility label. Defaults to "$level: $message".
   final String? semanticLabel;
 
+  /// For [OiBannerLevel.loading] banners: an async callback that, when
+  /// provided, is awaited and then triggers an animated dismiss.
+  ///
+  /// The banner fades out once the future resolves, giving the operation a
+  /// chance to complete before the banner disappears.
+  final Future<void> Function()? loadingOnDismiss;
+
   @override
   State<OiBanner> createState() => _OiBannerState();
 }
@@ -268,6 +314,14 @@ class _OiBannerState extends State<OiBanner>
       duration: const Duration(milliseconds: 250),
       value: 1,
     );
+    // For loading banners with an async dismiss callback, await the future
+    // then animate out.
+    if (widget.level == OiBannerLevel.loading &&
+        widget.loadingOnDismiss != null) {
+      widget.loadingOnDismiss!().then((_) {
+        if (mounted) _dismiss();
+      });
+    }
   }
 
   @override
@@ -304,6 +358,7 @@ class _OiBannerState extends State<OiBanner>
       OiBannerLevel.warning => OiIcons.triangleAlert,
       OiBannerLevel.error => OiIcons.circleX,
       OiBannerLevel.neutral => null,
+      OiBannerLevel.loading => null,
     };
   }
 
@@ -350,6 +405,11 @@ class _OiBannerState extends State<OiBanner>
         themeData?.neutralBorder ?? colors.border,
         colors.textMuted,
       ),
+      OiBannerLevel.loading => (
+        themeData?.infoBackground ?? colors.info.muted,
+        themeData?.infoBorder ?? colors.info.base,
+        colors.info.base,
+      ),
     };
 
     final borderRadius = themeData?.borderRadius ?? context.radius.md;
@@ -379,55 +439,75 @@ class _OiBannerState extends State<OiBanner>
                 ? Border(left: BorderSide(color: accentColor, width: 3))
                 : null,
           ),
-          padding: padding,
-          child: OiRow(
-            breakpoint: context.breakpoint,
-            gap: OiResponsive<double>(spacing.sm),
-            crossAxisAlignment: CrossAxisAlignment.start,
+          clipBehavior: widget.level == OiBannerLevel.loading
+              ? Clip.antiAlias
+              : Clip.none,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              if (showIcon)
-                Padding(
-                  padding: const EdgeInsets.only(top: 2),
-                  child: OiIcon.decorative(
-                    icon: effectiveIcon,
-                    color: iconColor,
-                    size: themeData?.iconSize ?? 18,
+              if (widget.level == OiBannerLevel.loading)
+                SizedBox(
+                  height: 3,
+                  child: OiProgress.linear(
+                    indeterminate: true,
+                    color: accentColor,
+                    strokeWidth: 3,
                   ),
                 ),
-              Expanded(
-                child: Column(
+              Padding(
+                padding: padding,
+                child: OiRow(
+                  breakpoint: context.breakpoint,
+                  gap: OiResponsive<double>(spacing.sm),
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    if (widget.title != null)
+                    if (showIcon)
                       Padding(
-                        padding: const EdgeInsets.only(bottom: 2),
-                        child: OiLabel.bodyStrong(widget.title!),
-                      ),
-                    OiLabel.body(widget.message),
-                    if (widget.action != null || widget.secondaryAction != null)
-                      Padding(
-                        padding: EdgeInsets.only(top: spacing.xs),
-                        child: OiRow(
-                          breakpoint: context.breakpoint,
-                          gap: OiResponsive<double>(spacing.xs),
-                          children: [
-                            if (widget.action != null) widget.action!,
-                            if (widget.secondaryAction != null)
-                              widget.secondaryAction!,
-                          ],
+                        padding: const EdgeInsets.only(top: 2),
+                        child: OiIcon.decorative(
+                          icon: effectiveIcon,
+                          color: iconColor,
+                          size: themeData?.iconSize ?? 18,
                         ),
+                      ),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          if (widget.title != null)
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 2),
+                              child: OiLabel.bodyStrong(widget.title!),
+                            ),
+                          OiLabel.body(widget.message),
+                          if (widget.action != null ||
+                              widget.secondaryAction != null)
+                            Padding(
+                              padding: EdgeInsets.only(top: spacing.xs),
+                              child: OiRow(
+                                breakpoint: context.breakpoint,
+                                gap: OiResponsive<double>(spacing.xs),
+                                children: [
+                                  if (widget.action != null) widget.action!,
+                                  if (widget.secondaryAction != null)
+                                    widget.secondaryAction!,
+                                ],
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+                    if (widget.dismissible)
+                      OiIconButton(
+                        icon: OiIcons.x,
+                        semanticLabel: 'Dismiss',
+                        onTap: _dismiss,
+                        size: OiButtonSize.small,
                       ),
                   ],
                 ),
               ),
-              if (widget.dismissible)
-                OiIconButton(
-                  icon: OiIcons.x,
-                  semanticLabel: 'Dismiss',
-                  onTap: _dismiss,
-                  size: OiButtonSize.small,
-                ),
             ],
           ),
         ),

@@ -341,8 +341,7 @@ class _FormInputsScreenState extends State<FormInputsScreen> {
                   divisions: 4,
                   showLabels: true,
                   showTicks: true,
-                  onChanged: (v) =>
-                      setState(() => _discreteSliderValue = v),
+                  onChanged: (v) => setState(() => _discreteSliderValue = v),
                 ),
               ),
             ],
@@ -384,8 +383,7 @@ class _FormInputsScreenState extends State<FormInputsScreen> {
                   child: OiDateTimeInput(
                     label: 'Event date/time',
                     value: _selectedDateTime,
-                    onChanged: (v) =>
-                        setState(() => _selectedDateTime = v),
+                    onChanged: (v) => setState(() => _selectedDateTime = v),
                   ),
                 ),
               ),
@@ -542,8 +540,7 @@ class _FormInputsScreenState extends State<FormInputsScreen> {
                   value: _editableNumber,
                   min: 0,
                   max: 100,
-                  onChanged: (v) =>
-                      setState(() => _editableNumber = v),
+                  onChanged: (v) => setState(() => _editableNumber = v),
                 ),
               ),
               ComponentExample(
@@ -555,8 +552,44 @@ class _FormInputsScreenState extends State<FormInputsScreen> {
                     OiSelectOption(value: 'Inactive', label: 'Inactive'),
                     OiSelectOption(value: 'Archived', label: 'Archived'),
                   ],
-                  onChanged: (v) =>
-                      setState(() => _editableSelect = v),
+                  onChanged: (v) => setState(() => _editableSelect = v),
+                ),
+              ),
+            ],
+          ),
+
+          // ── OiColorPalettePicker ────────────────────────────────────
+          ComponentShowcaseSection(
+            title: 'Color Palette Picker',
+            widgetName: 'OiColorPalettePicker',
+            description:
+                'A color palette picker with individual color slots, '
+                'preset palette selection, and optional randomize. '
+                'Each slot opens a color picker for fine-tuning.',
+            examples: [
+              ComponentExample(
+                title: 'Brand palette',
+                child: OiColorPalettePicker(
+                  label: 'Brand colors',
+                  slots: const [
+                    OiColorSlot(
+                      id: 'primary',
+                      label: 'Primary',
+                      value: Color(0xFF3B82F6),
+                    ),
+                    OiColorSlot(
+                      id: 'secondary',
+                      label: 'Secondary',
+                      value: Color(0xFF8B5CF6),
+                    ),
+                    OiColorSlot(
+                      id: 'accent',
+                      label: 'Accent',
+                      value: Color(0xFFF59E0B),
+                    ),
+                  ],
+                  onSlotChanged: (_, __) {},
+                  onRandomize: () {},
                 ),
               ),
             ],

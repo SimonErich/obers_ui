@@ -1,7 +1,53 @@
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/obers_ui.dart';
+import 'package:obers_ui_autoforms/obers_ui_autoforms.dart';
 
 import 'package:obers_ui_example/data/mock_cms.dart';
+
+// ── Field enum & controller ───────────────────────────────────────────────────
+
+enum _ArticleField {
+  title,
+  slug,
+  category,
+  tags,
+  publishDate,
+  featured,
+  excerpt,
+}
+
+class _ArticleController
+    extends OiAfController<_ArticleField, Map<String, dynamic>> {
+  _ArticleController({required MockBlogPost article}) : _article = article;
+
+  final MockBlogPost _article;
+
+  @override
+  void defineFields() {
+    addTextField(
+      _ArticleField.title,
+      initialValue: _article.title,
+      required: true,
+    );
+    addTextField(_ArticleField.slug, initialValue: _article.id);
+    addSelectField<String>(
+      _ArticleField.category,
+      initialValue: _article.category,
+      options: [
+        for (final c in kArticleCategories) OiAfOption(value: c, label: c),
+      ],
+    );
+    addTagField(_ArticleField.tags, initialValue: _article.tags);
+    addDateField(_ArticleField.publishDate, initialValue: _article.publishedAt);
+    addBoolField(_ArticleField.featured, initialValue: false);
+    addTextField(_ArticleField.excerpt, initialValue: _article.excerpt);
+  }
+
+  @override
+  Map<String, dynamic> buildData() => json();
+}
+
+// ── Screen ───────────────────────────────────────────────────────────────────
 
 /// Article edit form with rich text editor and file input for featured image.
 class CmsArticleEditScreen extends StatefulWidget {
@@ -21,23 +67,13 @@ class CmsArticleEditScreen extends StatefulWidget {
 }
 
 class _CmsArticleEditScreenState extends State<CmsArticleEditScreen> {
-  late final OiFormController _controller;
+  late final _ArticleController _controller;
   late final OiRichEditorController _editorController;
 
   @override
   void initState() {
     super.initState();
-    _controller = OiFormController(
-      initialValues: {
-        'title': widget.article.title,
-        'slug': widget.article.id,
-        'category': widget.article.category,
-        'tags': widget.article.tags,
-        'publishDate': widget.article.publishedAt,
-        'featured': false,
-        'excerpt': widget.article.excerpt,
-      },
-    );
+    _controller = _ArticleController(article: widget.article);
     _editorController = OiRichEditorController(
       initialContent: OiRichContent.fromPlainText(kArticleContent),
     );
@@ -85,11 +121,7 @@ class _CmsArticleEditScreenState extends State<CmsArticleEditScreen> {
               OiTappable(
                 semanticLabel: 'Save article',
                 onTap: _handleSave,
-                child: Icon(
-                  OiIcons.save,
-                  size: 20,
-                  color: colors.primary.base,
-                ),
+                child: Icon(OiIcons.save, size: 20, color: colors.primary.base),
               ),
             ],
           ),
@@ -99,59 +131,89 @@ class _CmsArticleEditScreenState extends State<CmsArticleEditScreen> {
         Expanded(
           child: SingleChildScrollView(
             padding: EdgeInsets.all(spacing.lg),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                // Article metadata form
-                OiForm(
-                  controller: _controller,
-                  onSubmit: (values) => _handleSave(),
-                  onCancel: widget.onCancel,
-                  sections: [
-                    OiFormSection(
-                      title: 'Article Details',
-                      fields: kCmsFormFields,
-                    ),
-                  ],
-                ),
+            child: OiAfForm<_ArticleField, Map<String, dynamic>>(
+              controller: _controller,
+              onSubmit: (_, __) async => _handleSave(),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  // Article metadata
+                  OiFormSection(
+                    title: 'Article Details',
+                    children: [
+                      const OiAfTextInput(
+                        field: _ArticleField.title,
+                        label: 'Title',
+                      ),
+                      const OiAfTextInput(
+                        field: _ArticleField.slug,
+                        label: 'URL Slug',
+                      ),
+                      OiAfSelect<_ArticleField, String>(
+                        field: _ArticleField.category,
+                        label: 'Category',
+                        options: [
+                          for (final c in kArticleCategories)
+                            OiAfOption(value: c, label: c),
+                        ],
+                      ),
+                      const OiAfTagInput(
+                        field: _ArticleField.tags,
+                        label: 'Tags',
+                      ),
+                      const OiAfDateInput(
+                        field: _ArticleField.publishDate,
+                        label: 'Publish Date',
+                      ),
+                      const OiAfCheckbox(
+                        field: _ArticleField.featured,
+                        label: 'Featured',
+                      ),
+                      const OiAfTextInput(
+                        field: _ArticleField.excerpt,
+                        label: 'Excerpt',
+                        maxLines: 3,
+                      ),
+                    ],
+                  ),
 
-                SizedBox(height: spacing.lg),
+                  SizedBox(height: spacing.lg),
 
-                // Featured image upload
-                OiFileInput(
-                  label: 'Featured Image',
-                  hint: 'Upload an image for the article header',
-                  allowedExtensions: const ['jpg', 'jpeg', 'png', 'webp'],
-                  dropZone: true,
-                  onChanged: (_) {},
-                ),
+                  // Featured image upload
+                  OiFileInput(
+                    label: 'Featured Image',
+                    hint: 'Upload an image for the article header',
+                    allowedExtensions: const ['jpg', 'jpeg', 'png', 'webp'],
+                    dropZone: true,
+                    onChanged: (_) {},
+                  ),
 
-                SizedBox(height: spacing.lg),
+                  SizedBox(height: spacing.lg),
 
-                // Rich text editor for article body
-                const OiLabel.h4('Article Body'),
-                SizedBox(height: spacing.sm),
-                OiRichEditor(
-                  controller: _editorController,
-                  label: 'Article body',
-                  placeholder: 'Write your article content here...',
-                  maxHeight: 350,
-                  showWordCount: true,
-                ),
+                  // Rich text editor for article body
+                  const OiLabel.h4('Article Body'),
+                  SizedBox(height: spacing.sm),
+                  OiRichEditor(
+                    controller: _editorController,
+                    label: 'Article body',
+                    placeholder: 'Write your article content here...',
+                    maxHeight: 350,
+                    showWordCount: true,
+                  ),
 
-                SizedBox(height: spacing.lg),
+                  SizedBox(height: spacing.lg),
 
-                // Save button
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    OiButton.primary(
-                      label: 'Save Article',
-                      onTap: _handleSave,
-                    ),
-                  ],
-                ),
-              ],
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      OiButton.primary(
+                        label: 'Save Article',
+                        onTap: _handleSave,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
         ),

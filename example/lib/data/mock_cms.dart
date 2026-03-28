@@ -639,47 +639,6 @@ List<OiComment> buildBlogComments() {
   ];
 }
 
-// ── CMS form fields ─────────────────────────────────────────────────────────
-
-final kCmsFormFields = [
-  const OiFormField(
-    key: 'title',
-    label: 'Title',
-    type: OiFieldType.text,
-    required: true,
-  ),
-  const OiFormField(key: 'slug', label: 'URL Slug', type: OiFieldType.text),
-  OiFormField(
-    key: 'category',
-    label: 'Category',
-    type: OiFieldType.select,
-    config: {
-      'options': [
-        for (final c in kArticleCategories)
-          OiSelectOption(value: c, label: c),
-      ],
-    },
-  ),
-  const OiFormField(key: 'tags', label: 'Tags', type: OiFieldType.tag),
-  const OiFormField(
-    key: 'publishDate',
-    label: 'Publish Date',
-    type: OiFieldType.dateTime,
-  ),
-  const OiFormField(
-    key: 'featured',
-    label: 'Featured',
-    type: OiFieldType.checkbox,
-    defaultValue: false,
-  ),
-  const OiFormField(
-    key: 'excerpt',
-    label: 'Excerpt',
-    type: OiFieldType.text,
-    config: {'multiline': true, 'maxLines': 3},
-  ),
-];
-
 /// Available article categories for filtering.
 const kArticleCategories = [
   'Culinary',

@@ -215,6 +215,9 @@ class OiMarkdown extends StatelessWidget {
     required this.data,
     this.style,
     this.codeBlockMaxWidth,
+    this.enableMermaid = true,
+    this.mermaidBuilder,
+    this.onMermaidError,
     super.key,
   });
 
@@ -226,6 +229,18 @@ class OiMarkdown extends StatelessWidget {
 
   /// Maximum width for rendered code blocks.
   final double? codeBlockMaxWidth;
+
+  /// When `true` (default), `` ```mermaid `` blocks are rendered via
+  /// [mermaidBuilder] or a default placeholder instead of [OiCodeBlock].
+  final bool enableMermaid;
+
+  /// Custom builder for mermaid diagram blocks. Receives the raw mermaid
+  /// source and should return a rendered widget. When `null`, a default
+  /// placeholder is shown.
+  final Widget Function(String source)? mermaidBuilder;
+
+  /// Called when [mermaidBuilder] throws an exception.
+  final void Function(String error)? onMermaidError;
 
   @override
   Widget build(BuildContext context) {
@@ -262,14 +277,22 @@ class OiMarkdown extends StatelessWidget {
           ),
         );
       } else if (block is _FenceBlock) {
-        Widget codeWidget = OiCodeBlock(code: block.code, language: block.lang);
-        if (codeBlockMaxWidth != null) {
-          codeWidget = SizedBox(width: codeBlockMaxWidth, child: codeWidget);
+        Widget fenceWidget;
+        if (enableMermaid && block.lang == 'mermaid') {
+          fenceWidget = _buildMermaidWidget(block.code, colors);
+        } else {
+          fenceWidget = OiCodeBlock(code: block.code, language: block.lang);
+          if (codeBlockMaxWidth != null) {
+            fenceWidget = SizedBox(
+              width: codeBlockMaxWidth,
+              child: fenceWidget,
+            );
+          }
         }
         widgets.add(
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 6),
-            child: codeWidget,
+            child: fenceWidget,
           ),
         );
       } else if (block is _ListItemBlock) {
@@ -299,6 +322,44 @@ class OiMarkdown extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: widgets,
+    );
+  }
+
+  Widget _buildMermaidWidget(String source, OiColorScheme colors) {
+    if (mermaidBuilder != null) {
+      try {
+        return mermaidBuilder!(source);
+      } on Exception catch (e) {
+        onMermaidError?.call(e.toString());
+      }
+    }
+    return _buildMermaidPlaceholder(source, colors);
+  }
+
+  Widget _buildMermaidPlaceholder(String source, OiColorScheme colors) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: colors.surfaceSubtle,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: colors.borderSubtle),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            'Mermaid Diagram',
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: colors.textMuted,
+            ),
+          ),
+          const SizedBox(height: 8),
+          OiCodeBlock(code: source, language: 'mermaid'),
+        ],
+      ),
     );
   }
 

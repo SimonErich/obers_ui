@@ -6,6 +6,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui/src/components/buttons/oi_button.dart';
 import 'package:obers_ui/src/components/buttons/oi_icon_button.dart';
+import 'package:obers_ui/src/components/display/oi_progress.dart';
 import 'package:obers_ui/src/components/feedback/oi_banner.dart';
 import 'package:obers_ui/src/primitives/display/oi_icon.dart';
 
@@ -168,5 +169,45 @@ void main() {
       ),
     );
     expect(find.byType(OiBanner), findsNWidgets(2));
+  });
+
+  // ── Loading variant ─────────────────────────────────────────────────────
+
+  testWidgets('loading level renders without errors', (tester) async {
+    await tester.pumpObers(
+      const OiBanner.loading(message: 'Analyzing connections...'),
+    );
+    expect(find.byType(OiBanner), findsOneWidget);
+  });
+
+  testWidgets('loading level shows message text', (tester) async {
+    await tester.pumpObers(
+      const OiBanner.loading(message: 'Analyzing connections...'),
+    );
+    expect(find.text('Analyzing connections...'), findsOneWidget);
+  });
+
+  testWidgets('loading level shows no dismiss button', (tester) async {
+    await tester.pumpObers(const OiBanner.loading(message: 'Loading...'));
+    expect(find.byType(OiIconButton), findsNothing);
+  });
+
+  testWidgets('loading level is non-dismissible by default', (tester) async {
+    await tester.pumpObers(const OiBanner.loading(message: 'Loading...'));
+    final banner = tester.widget<OiBanner>(find.byType(OiBanner));
+    expect(banner.dismissible, isFalse);
+  });
+
+  testWidgets('loading factory sets correct level', (tester) async {
+    await tester.pumpObers(const OiBanner.loading(message: 'Loading...'));
+    final banner = tester.widget<OiBanner>(find.byType(OiBanner));
+    expect(banner.level, OiBannerLevel.loading);
+  });
+
+  testWidgets('loading level shows indeterminate progress indicator', (
+    tester,
+  ) async {
+    await tester.pumpObers(const OiBanner.loading(message: 'Loading...'));
+    expect(find.byType(OiProgress), findsOneWidget);
   });
 }

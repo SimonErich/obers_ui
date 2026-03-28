@@ -135,6 +135,7 @@ OiBackButton(
 | `OiDatePickerField` | Date input with calendar dialog |
 | `OiDateRangePickerField` | Date range input with presets and calendar dialog |
 | `OiTimePickerField` | Time input with time picker dialog |
+| `OiColorPalettePicker` | Multi-slot color palette picker with preset palettes |
 
 ### OiTextInput
 
@@ -448,6 +449,37 @@ OiTimePickerField(
 
 **Related components:** `OiTimePicker`, `OiTimeInput`, `OiDatePickerField`, `OiForm`
 
+### OiColorPalettePicker
+
+Multi-slot color palette picker with preset palettes. Each slot represents a named color role (e.g. primary, accent) and can be edited individually or filled from a preset palette.
+
+```dart
+OiColorPalettePicker(
+  label: 'Brand colors',
+  slots: [
+    OiColorSlot(id: 'primary', label: 'Primary', value: Color(0xFF2563EB)),
+    OiColorSlot(id: 'accent', label: 'Accent'),
+  ],
+  onSlotChanged: (slotId, color) => updateColor(slotId, color),
+  presets: [
+    OiColorPalette(
+      id: 'ocean', name: 'Ocean',
+      colors: {'primary': Color(0xFF0077B6), 'accent': Color(0xFF00B4D8)},
+    ),
+  ],
+)
+```
+
+**Key features:**
+
+- Multiple named color slots with individual edit controls
+- Preset palettes that fill all slots at once
+- Each slot opens an `OiColorInput` picker on tap
+- Empty slots show a placeholder swatch
+- `onSlotChanged` fires per-slot; `onPresetSelected` fires when a preset is applied
+
+**Related components:** `OiColorInput`, `OiForm`, `OiCard`
+
 ## Display
 
 | Widget | Description |
@@ -483,6 +515,39 @@ OiTimePickerField(
 | `OiRefreshIndicator` | Pull-to-refresh wrapper for scrollable content |
 | `OiPageIndicator` | Dot indicators for paged content (carousels, onboarding) |
 | `OiScrollToTop` | Floating scroll-to-top button that appears on scroll |
+| `OiImagePreviewCard` | Image card with shimmer loading, status badge, edit overlay, version label |
+
+### OiProgress
+
+**Enhancement:** `OiProgress.bulk()` — A new factory constructor for rendering batch/bulk operation progress. Displays an overall progress bar with a label showing "N of M items processed", estimated time remaining, and an optional cancel button.
+
+```dart
+OiProgress.bulk(
+  completed: 42,
+  total: 100,
+  label: 'Uploading files',
+  onCancel: () => cancelUpload(),
+)
+```
+
+### OiMarkdown
+
+**Enhancement:** `OiMarkdown` now supports Mermaid diagram rendering. Fenced code blocks tagged with `mermaid` are parsed and rendered as inline SVG diagrams. Supported diagram types include flowchart, sequence, class, state, and Gantt.
+
+````dart
+OiMarkdown(
+  data: '''
+## Architecture
+
+```mermaid
+graph TD
+  A[Client] --> B[API Gateway]
+  B --> C[Auth Service]
+  B --> D[Data Service]
+```
+''',
+)
+````
 
 ### OiFieldDisplay
 
@@ -664,6 +729,32 @@ OiScrollToTop(
 
 **Related components:** `OiVirtualList`, `OiInfiniteScroll`, `OiFloating`
 
+### OiImagePreviewCard
+
+Image card with loading shimmer, status badge overlay, edit overlay, and version indicator. Useful for design asset browsers, media libraries, and project dashboards.
+
+```dart
+OiImagePreviewCard(
+  alt: 'Authentication wireframe',
+  imageUrl: 'https://example.com/wireframe.png',
+  statusBadge: OiBadge.filled(label: 'stale', color: OiBadgeColor.warning),
+  versionLabel: 'v3',
+  onTap: () {},
+  onEdit: () {},
+)
+```
+
+**Key features:**
+
+- Shimmer loading state while image loads
+- Optional status badge overlay (top-right corner)
+- Edit overlay with pencil icon appears on hover (or always visible on touch)
+- Version label pill in the bottom-left corner
+- Rounded corners and shadow from theme
+- Error state with broken-image placeholder
+
+**Related components:** `OiCard`, `OiBadge`, `OiImage`, `OiShimmer`
+
 ### OiCard
 
 ```dart
@@ -675,6 +766,15 @@ OiCard(
       Text('Card content goes here'),
     ],
   ),
+)
+```
+
+**Enhancement:** `OiCard` now supports an optional `statusBadge` parameter that renders an `OiBadge` overlay in the top-right corner of the card. Useful for showing state indicators (e.g. "Draft", "Active", "Archived") directly on cards in grid layouts.
+
+```dart
+OiCard(
+  statusBadge: OiBadge.soft(label: 'Draft', color: OiBadgeColor.warning),
+  child: myContent,
 )
 ```
 
@@ -706,6 +806,8 @@ OiBadge(count: 5, child: OiIconButton(icon: OiIcons.bell, onPressed: () {}))
 | `OiNavigationRail` | Compact vertical navigation rail with icon+label items |
 | `OiSliverHeader` | Sticky sliver header with .simple, .large, .hero constructors |
 | `OiTabView` | Tab bar with content switching, lazy loading, and swipe support |
+| `OiMenuBar` | Horizontal menu bar with dropdown menus |
+| `OiStatusBar` | Bottom status bar with leading/trailing widget slots |
 
 ### OiTabs
 
@@ -873,6 +975,76 @@ OiTabView.controlled(
 
 **Related components:** `OiTabs`, `OiSegmentedControl`, `OiAccordion`
 
+### OiMenuBar
+
+Desktop horizontal menu bar with dropdown menus. Supports shortcuts, checked state, destructive items, nested sub-menus, and keyboard navigation.
+
+```dart
+OiMenuBar(
+  label: 'Main menu',
+  items: [
+    OiMenuItem(
+      label: 'File',
+      children: [
+        OiMenuItem(label: 'New', shortcut: 'Cmd+N', onTap: () {}),
+        OiMenuItem(label: 'Open', shortcut: 'Cmd+O', onTap: () {}),
+        const OiMenuDivider(),
+        OiMenuItem(label: 'Save', shortcut: 'Cmd+S', onTap: () {}),
+      ],
+    ),
+    OiMenuItem(
+      label: 'Edit',
+      children: [
+        OiMenuItem(label: 'Undo', shortcut: 'Cmd+Z', onTap: () {}),
+        OiMenuItem(label: 'Redo', shortcut: 'Cmd+Shift+Z', onTap: () {}),
+      ],
+    ),
+  ],
+)
+```
+
+**Key features:**
+
+- Top-level items render as a horizontal row of text buttons
+- Each top-level item opens a dropdown menu on hover or click
+- Keyboard shortcut labels displayed right-aligned in menu items
+- `OiMenuDivider` for visual grouping within menus
+- Nested sub-menus via recursive `children`
+- Checked state and destructive variant per item
+- Full keyboard navigation: arrow keys, Enter to activate, Escape to close
+- Focus management follows WAI-ARIA menu bar pattern
+
+**Related components:** `OiContextMenu`, `OiNavMenu`, `OiCommandBar`
+
+### OiStatusBar
+
+Compact bottom status bar (default 24dp) for desktop interfaces. Provides leading and trailing widget slots for status information.
+
+```dart
+OiStatusBar(
+  label: 'Application status',
+  leading: [
+    OiStatusBarItem(label: 'main', icon: OiIcons.gitBranch),
+    OiStatusBarItem(label: 'UTF-8'),
+  ],
+  trailing: [
+    OiStatusBarItem(label: 'Ln 42, Col 8'),
+    OiStatusBarItem(label: 'Connected', color: Color(0xFF16A34A)),
+  ],
+)
+```
+
+**Key features:**
+
+- Compact 24dp height for desktop IDE-style layouts
+- Leading and trailing slots for flexible content placement
+- `OiStatusBarItem` renders icon + label pairs with optional color override
+- Themed background and border from `context.colors`
+- Separator dots between items
+- Clickable items via optional `onTap` callback
+
+**Related components:** `OiMenuBar`, `OiAppShell`, `OiToolbar`
+
 ### OiDatePicker
 
 A calendar date picker widget. Can be used inline or shown as a modal dialog via the static `show()` method that returns the selected date.
@@ -973,6 +1145,8 @@ OiToast.show(
 ### OiDialog
 
 A modal dialog overlay with five variants: `standard`, `alert`, `confirm`, `form`, and `fullScreen`. Provides both fire-and-forget and async show methods.
+
+**Enhancement:** The `fullScreen` variant now supports responsive breakpoints, transitioning from a centered dialog on desktop to a true full-screen sheet on mobile. Use `OiDialog.fullScreen()` for content that benefits from maximum viewport usage (e.g. image editors, multi-step wizards, rich document previews).
 
 **Showing a dialog (fire-and-forget):**
 
@@ -1187,6 +1361,46 @@ if (selectedFilter != null) applyFilter(selectedFilter);
 | `OiThumbs` | Thumbs up/down |
 | `OiReactionBar` | Emoji reaction bar |
 | `OiBulkBar` | Floating toolbar for bulk actions on selected items |
+| `OiPipelineProgress` | Sequential step progress indicator with checkmarks, spinners, error/retry |
+
+### OiPipelineProgress
+
+Vertical multi-step progress indicator for sequential operations. Each step shows its state (pending, active with spinner, completed with checkmark, or errored with retry). Ideal for build pipelines, export flows, and multi-stage processes.
+
+```dart
+OiPipelineProgress(
+  label: 'Export progress',
+  steps: [
+    OiPipelineProgressStep(label: 'Validating schema...'),
+    OiPipelineProgressStep(label: 'Generating assets...'),
+    OiPipelineProgressStep(label: 'Uploading to CDN...'),
+  ],
+  currentStepIndex: 1,
+  onCancel: () {},
+)
+```
+
+**Key features:**
+
+- Four step states: pending (dimmed), active (spinner), completed (checkmark), error (red with retry)
+- Vertical connector lines between steps
+- `onCancel` shows a cancel button at the bottom
+- `onRetry` per step for error recovery
+- Animated transitions between step states
+- Accessible step announcements via semantics
+
+**Related components:** `OiProgress`, `OiStepper`, `OiPipeline`
+
+### OiBanner
+
+**Enhancement:** `OiBanner.loading()` -- A new factory constructor that displays a persistent banner with an animated progress indicator and message. Useful for indicating background operations or loading states that span the full width of a container.
+
+```dart
+OiBanner.loading(
+  label: 'Syncing data',
+  message: 'Syncing your changes with the server...',
+)
+```
 
 ## Inline Edit
 

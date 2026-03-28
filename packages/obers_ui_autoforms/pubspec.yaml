@@ -1,0 +1,24 @@
+name: obers_ui_autoforms
+description: >-
+  Opt-in, controller-first, enum-keyed, context-bound stateful form handling
+  for obers_ui. Provides OiAfForm, OiAfController, and 20+ field widget
+  wrappers with comprehensive validation, derived fields, and conditional
+  visibility.
+version: 0.1.0
+publish_to: 'none'
+
+environment:
+  sdk: '>=3.11.0 <4.0.0'
+  flutter: '>=3.41.0'
+
+dependencies:
+  collection: ^1.18.0
+  flutter:
+    sdk: flutter
+  obers_ui:
+    path: ../../
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  very_good_analysis: ^7.0.0

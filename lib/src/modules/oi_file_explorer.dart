@@ -607,11 +607,8 @@ class _OiFileExplorerState extends State<OiFileExplorer> {
             onTap: () => widget.onPreview!(file),
           ),
       ],
-      if (custom.isNotEmpty) ...[
-        const OiMenuItem(label: '', separator: true),
-        ...custom,
-      ],
-      const OiMenuItem(label: '', separator: true),
+      if (custom.isNotEmpty) ...[const OiMenuDivider(), ...custom],
+      const OiMenuDivider(),
       if (widget.enableRename)
         OiMenuItem(
           label: 'Rename',
@@ -642,7 +639,7 @@ class _OiFileExplorerState extends State<OiFileExplorer> {
           icon: OiIcons.info,
           onTap: () => widget.onShare!(file),
         ),
-      const OiMenuItem(label: '', separator: true),
+      const OiMenuDivider(),
       if (widget.enableDelete)
         OiMenuItem(
           label: 'Delete',
@@ -671,7 +668,7 @@ class _OiFileExplorerState extends State<OiFileExplorer> {
           onTap: _showUploadDialog,
         ),
       if (widget.controller.selectedKeys.isNotEmpty) ...[
-        const OiMenuItem(label: '', separator: true),
+        const OiMenuDivider(),
         OiMenuItem(
           label: 'Select all',
           icon: OiIcons.send,
@@ -861,14 +858,8 @@ class _OiFileExplorerState extends State<OiFileExplorer> {
             );
           },
           items: const [
-            OiButtonGroupItem(
-              icon: OiIcons.layoutList,
-              label: 'List view',
-            ),
-            OiButtonGroupItem(
-              icon: OiIcons.layoutGrid,
-              label: 'Grid view',
-            ),
+            OiButtonGroupItem(icon: OiIcons.layoutList, label: 'List view'),
+            OiButtonGroupItem(icon: OiIcons.layoutGrid, label: 'Grid view'),
           ],
         ),
         SizedBox(width: (spacing as dynamic).sm as double),
