@@ -73,7 +73,7 @@ abstract class OiChartSyncCoordinator extends ChangeNotifier {
   ) {
     syncViewport(
       OiChartViewport(
-        size: const Size(0, 0),
+        size: Size.zero,
         zoomLevel: viewportState.zoomLevel,
         panOffset: viewportState.panOffset,
       ),

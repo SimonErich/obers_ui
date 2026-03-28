@@ -1,7 +1,6 @@
 import 'package:flutter/foundation.dart';
-import 'package:obers_ui/obers_ui.dart';
 import 'package:flutter/painting.dart';
-
+import 'package:obers_ui/obers_ui.dart';
 import 'package:obers_ui_charts/src/foundation/oi_chart_canvas.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────

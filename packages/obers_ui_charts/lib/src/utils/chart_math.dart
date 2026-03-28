@@ -10,7 +10,7 @@ double clampZoom(double zoom, {double min = 0.1, double max = 100.0}) {
 /// When only one value exists, we add symmetric padding so the point
 /// is visible and centered rather than spanning a zero-range domain.
 double domainPaddingForSinglePoint(double value) {
-  if (value == 0) return 1.0;
+  if (value == 0) return 1;
   return (value.abs() * 0.1).clamp(0.5, double.infinity);
 }
 

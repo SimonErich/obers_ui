@@ -267,7 +267,7 @@ class _PanelSurface extends StatelessWidget {
         color: colors.surface,
         border: OiBorderStyle.solid(colors.borderSubtle, 1),
         borderRadius: BorderRadius.circular(8),
-        padding: const EdgeInsets.all(0),
+        padding: EdgeInsets.zero,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -276,9 +276,7 @@ class _PanelSurface extends StatelessWidget {
               key: Key('oi_dashboard_panel_header_${panel.id}'),
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               decoration: BoxDecoration(
-                border: Border(
-                  bottom: BorderSide(color: colors.borderSubtle, width: 1),
-                ),
+                border: Border(bottom: BorderSide(color: colors.borderSubtle)),
               ),
               child: OiLabel.small(
                 panel.title,

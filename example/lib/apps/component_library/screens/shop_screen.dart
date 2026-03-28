@@ -348,7 +348,7 @@ class _ShopScreenState extends State<ShopScreen> {
           ),
 
           // ── OiOrderSummaryLine ────────────────────────────────────────
-          ComponentShowcaseSection(
+          const ComponentShowcaseSection(
             title: 'Order Summary Line',
             widgetName: 'OiOrderSummaryLine',
             description:
@@ -357,7 +357,7 @@ class _ShopScreenState extends State<ShopScreen> {
             examples: [
               ComponentExample(
                 title: 'Summary Lines',
-                child: const Column(
+                child: Column(
                   children: [
                     OiOrderSummaryLine(
                       label: 'Subtotal',
@@ -545,7 +545,6 @@ class _ShopScreenState extends State<ShopScreen> {
                       productKey: 'alpine-jacket',
                       name: 'Alpine Jacket',
                       unitPrice: 199.99,
-                      quantity: 1,
                     ),
                     OiCartItem(
                       productKey: 'trail-boots',

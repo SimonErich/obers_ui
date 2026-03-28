@@ -11,7 +11,11 @@ import 'package:obers_ui/src/primitives/interaction/oi_focus_trap.dart';
 /// completes the returned future with an optional result.
 Future<T?> showOiDialog<T>(
   BuildContext context, {
-  required Widget Function(BuildContext context, void Function([T? result]) close) builder,
+  required Widget Function(
+    BuildContext context,
+    void Function([T? result]) close,
+  )
+  builder,
   bool dismissible = true,
   String? semanticLabel,
 }) {
@@ -259,8 +263,16 @@ class OiDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.colors;
     final textTheme = context.textTheme;
+    final dt = context.components.dialog;
     final isFullScreen = variant == OiDialogVariant.fullScreen;
     final isForm = variant == OiDialogVariant.form;
+
+    final hPad = dt?.contentPadding?.left ?? 24.0;
+    final topPad = dt?.contentPadding?.top ?? 20.0;
+    final bottomPad = dt?.contentPadding?.bottom ?? 20.0;
+    final titleBodyGap = dt?.titleBodyGap ?? 8.0;
+    final contentButtonGap = dt?.contentButtonGap ?? 12.0;
+    final buttonGap = dt?.buttonGap ?? 8.0;
 
     // Local aliases to satisfy promotion for use inside closures / conditionals.
     final titleText = title;
@@ -274,7 +286,7 @@ class OiDialog extends StatelessWidget {
         // ── Title ──────────────────────────────────────────────────────────
         if (titleText != null)
           Padding(
-            padding: const EdgeInsets.fromLTRB(24, 20, 24, 8),
+            padding: EdgeInsets.fromLTRB(hPad, topPad, hPad, titleBodyGap),
             child: Text(
               titleText,
               style: textTheme.h4.copyWith(color: colors.text),
@@ -286,17 +298,19 @@ class OiDialog extends StatelessWidget {
           if (isForm)
             Flexible(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(24, 0, 24, 20),
+                padding: EdgeInsets.fromLTRB(hPad, 0, hPad, bottomPad),
                 child: bodyContent,
               ),
             )
           else
             Padding(
               padding: EdgeInsets.fromLTRB(
-                24,
-                8,
-                24,
-                actionList != null && actionList.isNotEmpty ? 8 : 20,
+                hPad,
+                titleBodyGap,
+                hPad,
+                actionList != null && actionList.isNotEmpty
+                    ? titleBodyGap
+                    : bottomPad,
               ),
               child: bodyContent,
             ),
@@ -304,12 +318,17 @@ class OiDialog extends StatelessWidget {
         // ── Actions ────────────────────────────────────────────────────────
         if (actionList != null && actionList.isNotEmpty)
           Padding(
-            padding: const EdgeInsets.fromLTRB(24, 12, 24, 20),
+            padding: EdgeInsets.fromLTRB(
+              hPad,
+              contentButtonGap,
+              hPad,
+              bottomPad,
+            ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 for (var i = 0; i < actionList.length; i++) ...[
-                  if (i > 0) const SizedBox(width: 8),
+                  if (i > 0) SizedBox(width: buttonGap),
                   actionList[i],
                 ],
               ],
@@ -323,15 +342,11 @@ class OiDialog extends StatelessWidget {
     Widget panel;
     if (isFullScreen) {
       panel = ColoredBox(
-        color: colors.surface,
+        color: dt?.backgroundColor ?? colors.surface,
         child: dialogContent,
       );
     } else {
-      panel = OiDialogShell(
-        maxWidth: 480,
-        minWidth: 280,
-        child: dialogContent,
-      );
+      panel = OiDialogShell(maxWidth: 480, minWidth: 280, child: dialogContent);
     }
 
     panel = OiFocusTrap(onEscape: onClose, child: panel);

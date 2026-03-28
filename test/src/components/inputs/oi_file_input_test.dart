@@ -1,9 +1,9 @@
 // Tests do not require documentation comments.
 // ignore_for_file: public_member_api_docs
 
-import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui/src/components/inputs/oi_file_input.dart';
+import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
 
 import '../../../helpers/pump_app.dart';
@@ -55,11 +55,7 @@ void main() {
     await tester.pumpObers(
       OiFileInput(value: const ['/tmp/a.txt'], onChanged: (v) => result = v),
     );
-    await tester.tap(
-      find.byIcon(
-        const IconData(0xe1b2, fontFamily: 'lucide', fontPackage: 'obers_ui'),
-      ),
-    );
+    await tester.tap(find.byIcon(OiIcons.x));
     await tester.pump();
     expect(result, isEmpty);
   });

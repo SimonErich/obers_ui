@@ -3,13 +3,13 @@
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:obers_ui/src/foundation/theme/oi_theme_data.dart';
 import 'package:obers_ui_charts/src/composites/oi_bubble_chart/oi_bubble_chart_interaction.dart';
 import 'package:obers_ui_charts/src/composites/oi_line_chart/oi_line_chart.dart';
 import 'package:obers_ui_charts/src/composites/oi_line_chart/oi_line_chart_accessibility.dart';
 import 'package:obers_ui_charts/src/composites/oi_line_chart/oi_line_chart_data.dart'
     show OiLineChartMode, OiLinePoint, OiLineSeries;
 import 'package:obers_ui_charts/src/composites/oi_line_chart/oi_line_chart_theme.dart';
-import 'package:obers_ui/src/foundation/theme/oi_theme_data.dart';
 
 import '../../../helpers/pump_chart_app.dart';
 

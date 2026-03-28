@@ -1,4 +1,3 @@
-import 'dart:ui' show Color, StrokeCap;
 
 import 'package:flutter/painting.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -38,7 +37,7 @@ void main() {
     test('merge prefers override values', () {
       const base = OiSeriesStyle(
         strokeColor: Color(0xFFFF0000),
-        strokeWidth: 2.0,
+        strokeWidth: 2,
         strokeCap: StrokeCap.round,
       );
       const override = OiSeriesStyle(
@@ -54,20 +53,20 @@ void main() {
     });
 
     test('merge with null returns self', () {
-      const style = OiSeriesStyle(strokeWidth: 3.0);
+      const style = OiSeriesStyle(strokeWidth: 3);
       expect(style.merge(null), same(style));
     });
 
     test('hover/selected/inactive overrides merge correctly', () {
       const base = OiSeriesStyle(
         strokeColor: Color(0xFFFF0000),
-        strokeWidth: 2.0,
-        hoverStyle: OiSeriesStyle(strokeWidth: 4.0),
+        strokeWidth: 2,
+        hoverStyle: OiSeriesStyle(strokeWidth: 4),
         selectedStyle: OiSeriesStyle(
           strokeColor: Color(0xFF0000FF),
-          strokeWidth: 3.0,
+          strokeWidth: 3,
         ),
-        inactiveStyle: OiSeriesStyle(strokeWidth: 1.0),
+        inactiveStyle: OiSeriesStyle(strokeWidth: 1),
       );
 
       // Merge base with hover override.
@@ -101,9 +100,9 @@ void main() {
     test('copyWith preserves unset fields', () {
       const style = OiSeriesStyle(
         strokeColor: Color(0xFFFF0000),
-        strokeWidth: 2.0,
+        strokeWidth: 2,
       );
-      final copied = style.copyWith(strokeWidth: 5.0);
+      final copied = style.copyWith(strokeWidth: 5);
       expect(copied.strokeColor, const Color(0xFFFF0000));
       expect(copied.strokeWidth, 5.0);
     });

@@ -1,10 +1,6 @@
-import 'dart:ui' show Offset, Size;
-
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:obers_ui/obers_ui.dart' show OiChartThemeData;
 import 'package:obers_ui_charts/obers_ui_charts.dart';
-import 'package:obers_ui_charts/src/foundation/oi_chart_hit_tester.dart';
 
 // ── Test doubles ─────────────────────────────────────────────────────────────
 
@@ -31,7 +27,7 @@ class _FakeResolver implements OiChartTooltipEntryResolver {
   }) {
     return OiChartTooltipModel(
       globalPosition: globalPosition,
-      entries: [
+      entries: const [
         OiChartTooltipEntry(
           seriesLabel: 'Series A',
           formattedX: '1',
@@ -56,7 +52,7 @@ void main() {
       controller: controller,
       viewport: const OiChartViewport(size: Size(400, 300)),
       hitTester: _TestHitTester(),
-      theme: OiChartThemeData(),
+      theme: const OiChartThemeData(),
     );
 
     behavior.attach(behaviorContext);
@@ -142,20 +138,18 @@ void main() {
 
     test('equality holds when all fields match', () {
       const a = OiChartTooltipConfig(
-        enabled: true,
         trigger: OiChartTooltipTrigger.hover,
         anchor: OiChartTooltipAnchor.pointer,
         showDelay: Duration(milliseconds: 300),
         hideDelay: Duration(milliseconds: 150),
-        hitTestTolerance: 16.0,
+        hitTestTolerance: 16,
       );
       const b = OiChartTooltipConfig(
-        enabled: true,
         trigger: OiChartTooltipTrigger.hover,
         anchor: OiChartTooltipAnchor.pointer,
         showDelay: Duration(milliseconds: 300),
         hideDelay: Duration(milliseconds: 150),
-        hitTestTolerance: 16.0,
+        hitTestTolerance: 16,
       );
 
       expect(a, equals(b));
@@ -163,7 +157,7 @@ void main() {
     });
 
     test('inequality when enabled differs', () {
-      const a = OiChartTooltipConfig(enabled: true);
+      const a = OiChartTooltipConfig();
       const b = OiChartTooltipConfig(enabled: false);
       expect(a, isNot(equals(b)));
     });
@@ -185,7 +179,7 @@ void main() {
     const entry = OiChartTooltipEntry(
       seriesLabel: 'Revenue',
       formattedX: 'Jan',
-      formattedY: '\$1,000',
+      formattedY: r'$1,000',
     );
 
     test('equality holds when all fields match', () {
@@ -222,21 +216,21 @@ void main() {
 
     test('inequality when entries differ', () {
       const a = OiChartTooltipModel(
-        globalPosition: Offset(0, 0),
+        globalPosition: Offset.zero,
         entries: [entry],
       );
-      const b = OiChartTooltipModel(globalPosition: Offset(0, 0), entries: []);
+      const b = OiChartTooltipModel(globalPosition: Offset.zero, entries: []);
       expect(a, isNot(equals(b)));
     });
 
     test('inequality when title differs', () {
       const a = OiChartTooltipModel(
-        globalPosition: Offset(0, 0),
+        globalPosition: Offset.zero,
         entries: [],
         title: 'A',
       );
       const b = OiChartTooltipModel(
-        globalPosition: Offset(0, 0),
+        globalPosition: Offset.zero,
         entries: [],
         title: 'B',
       );
@@ -245,7 +239,7 @@ void main() {
 
     test('title and footer default to null', () {
       const model = OiChartTooltipModel(
-        globalPosition: Offset(0, 0),
+        globalPosition: Offset.zero,
         entries: [],
       );
       expect(model.title, isNull);

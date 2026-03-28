@@ -16,7 +16,7 @@ Widget _pipeline({
   String label = 'Test Pipeline',
 }) {
   return SizedBox(
-    width: 800,
+    width: 1200,
     height: 400,
     child: OiPipeline(
       stages:
@@ -52,12 +52,8 @@ void main() {
 
     // Use a wider surface so all status stages fit without overflow.
     await tester.pumpObers(
-      SizedBox(
-        width: 1200,
-        height: 400,
-        child: OiPipeline(stages: stages, label: 'Test Pipeline'),
-      ),
-      surfaceSize: const Size(1200, 600),
+      _pipeline(stages: stages),
+      surfaceSize: const Size(1400, 700),
     );
 
     for (final status in OiPipelineStatus.values) {

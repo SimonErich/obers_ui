@@ -6,7 +6,7 @@ import 'package:widgetbook/widgetbook.dart';
 const _sampleFile = OiFileNodeData(
   id: '1',
   name: 'report.pdf',
-  isFolder: false,
+  folder: false,
   size: 1024 * 512,
   mimeType: 'application/pdf',
 );
@@ -14,7 +14,7 @@ const _sampleFile = OiFileNodeData(
 const _sampleFolder = OiFileNodeData(
   id: '2',
   name: 'images',
-  isFolder: true,
+  folder: true,
   itemCount: 14,
 );
 
@@ -134,7 +134,7 @@ class _RenameDialogDemoState extends State<_RenameDialogDemo> {
     final file = OiFileNodeData(
       id: '1',
       name: widget.isFolder ? 'My Folder' : 'document.pdf',
-      isFolder: widget.isFolder,
+      folder: widget.isFolder,
     );
 
     return Column(

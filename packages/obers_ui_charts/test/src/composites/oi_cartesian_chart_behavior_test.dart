@@ -1,5 +1,3 @@
-import 'dart:ui' show Size;
-
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui_charts/obers_ui_charts.dart';
@@ -99,9 +97,9 @@ void main() {
     testWidgets('shows "all series hidden" when all toggled off', (
       tester,
     ) async {
-      final controller = OiDefaultChartController();
-      controller.toggleSeries('s1');
-      controller.toggleSeries('s2');
+      final controller = OiDefaultChartController()
+        ..toggleSeries('s1')
+        ..toggleSeries('s2');
 
       await tester.pumpChartApp(
         SizedBox(

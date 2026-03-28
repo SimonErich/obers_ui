@@ -7,9 +7,7 @@ import 'package:obers_ui/obers_ui.dart';
 class OiChartZoomControls extends StatelessWidget {
   /// Creates chart zoom controls.
   const OiChartZoomControls({
-    super.key,
-    required this.onZoomIn,
-    required this.onZoomOut,
+    required this.onZoomIn, required this.onZoomOut, super.key,
     this.onReset,
   });
 

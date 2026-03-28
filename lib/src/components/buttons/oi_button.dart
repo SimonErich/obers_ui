@@ -4,6 +4,7 @@ import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/display/oi_tooltip.dart';
 import 'package:obers_ui/src/foundation/oi_app.dart';
 import 'package:obers_ui/src/foundation/oi_icons.dart';
+import 'package:obers_ui/src/foundation/theme/component_themes/oi_button_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/primitives/animation/oi_pulse.dart';
 import 'package:obers_ui/src/primitives/display/oi_icon.dart';
@@ -560,7 +561,24 @@ class _OiButtonState extends State<OiButton> {
 
   // ── Colour helpers ──────────────────────────────────────────────────────
 
+  /// Returns the per-variant style override from the button theme, if any.
+  OiButtonVariantStyle? _variantStyle(
+    OiButtonThemeData? bt,
+    OiButtonVariant variant,
+  ) {
+    return switch (variant) {
+      OiButtonVariant.primary => bt?.primaryStyle,
+      OiButtonVariant.secondary => bt?.secondaryStyle,
+      OiButtonVariant.outline => bt?.outlineStyle,
+      OiButtonVariant.ghost => bt?.ghostStyle,
+      OiButtonVariant.destructive => bt?.destructiveStyle,
+      OiButtonVariant.soft => bt?.softStyle,
+    };
+  }
+
   Color _backgroundColor(BuildContext context, OiButtonVariant variant) {
+    final vs = _variantStyle(context.components.button, variant);
+    if (vs?.background != null) return vs!.background!;
     final c = context.colors;
     switch (variant) {
       case OiButtonVariant.primary:
@@ -579,6 +597,8 @@ class _OiButtonState extends State<OiButton> {
   }
 
   Color _foregroundColor(BuildContext context, OiButtonVariant variant) {
+    final vs = _variantStyle(context.components.button, variant);
+    if (vs?.foreground != null) return vs!.foreground!;
     final c = context.colors;
     switch (variant) {
       case OiButtonVariant.primary:
@@ -603,15 +623,26 @@ class _OiButtonState extends State<OiButton> {
     OiButtonVariant variant, {
     BorderRadius? borderRadius,
   }) {
+    final bt = context.components.button;
     final bg = _backgroundColor(context, variant);
-    final themeRadius = context.components.button?.borderRadius;
+    final themeRadius = bt?.borderRadius;
     final effectiveRadius = borderRadius ?? themeRadius ?? context.radius.sm;
+
+    // Resolve border: check variant style override first, then default
+    final vs = _variantStyle(bt, variant);
+    final Border? border;
+    if (vs?.border != null) {
+      border = Border.all(color: vs!.border!);
+    } else if (variant == OiButtonVariant.outline) {
+      border = Border.all(color: context.colors.border);
+    } else {
+      border = null;
+    }
+
     return BoxDecoration(
       color: bg,
       borderRadius: effectiveRadius,
-      border: variant == OiButtonVariant.outline
-          ? Border.all(color: context.colors.border)
-          : null,
+      border: border,
     );
   }
 
@@ -642,19 +673,22 @@ class _OiButtonState extends State<OiButton> {
       return _buildLoadingIndicator(foreground);
     }
 
+    final bt = context.components.button;
+    final effectiveIconSize = bt?.iconSize ?? _iconSize();
+    final effectiveIconGap = bt?.iconGap ?? context.spacing.xs;
     final iconWidget = icon != null
         ? Padding(
             padding: EdgeInsets.only(
               right: (iconPosition == OiIconPosition.leading && label != null)
-                  ? context.spacing.xs
+                  ? effectiveIconGap
                   : 0,
               left: (iconPosition == OiIconPosition.trailing && label != null)
-                  ? context.spacing.xs
+                  ? effectiveIconGap
                   : 0,
             ),
             child: OiIcon.decorative(
               icon: icon,
-              size: _iconSize(),
+              size: effectiveIconSize,
               color: foreground,
             ),
           )
@@ -709,10 +743,11 @@ class _OiButtonState extends State<OiButton> {
 
   Widget _buildStandardButton(BuildContext context) {
     final density = OiDensityScope.of(context);
-    final height = _buttonHeight(density);
+    final bt = context.components.button;
+    final height = bt?.height ?? _buttonHeight(density);
     final hPad = _hPadding(context);
     final foreground = _foregroundColor(context, widget.variant);
-    final themeRadius = context.components.button?.borderRadius;
+    final themeRadius = bt?.borderRadius;
     final effectiveRadius =
         widget.borderRadius ?? themeRadius ?? context.radius.sm;
     final decoration = _decoration(
@@ -744,6 +779,12 @@ class _OiButtonState extends State<OiButton> {
       ),
     );
 
+    if (bt?.minWidth != null) {
+      button = ConstrainedBox(
+        constraints: BoxConstraints(minWidth: bt!.minWidth!),
+        child: button,
+      );
+    }
     if (widget.fullWidth) {
       button = SizedBox(width: double.infinity, child: button);
     }
@@ -759,7 +800,7 @@ class _OiButtonState extends State<OiButton> {
 
   Widget _buildIconButton(BuildContext context) {
     final density = OiDensityScope.of(context);
-    final height = _buttonHeight(density);
+    final height = context.components.button?.height ?? _buttonHeight(density);
     final foreground = _foregroundColor(context, widget.variant);
     final decoration = _decoration(context, widget.variant);
     final isActive = widget.enabled;
@@ -781,7 +822,7 @@ class _OiButtonState extends State<OiButton> {
 
   Widget _buildSplitButton(BuildContext context) {
     final density = OiDensityScope.of(context);
-    final height = _buttonHeight(density);
+    final height = context.components.button?.height ?? _buttonHeight(density);
     final hPad = _hPadding(context);
     final foreground = _foregroundColor(context, widget.variant);
     final bgColor = _backgroundColor(context, widget.variant);
@@ -859,7 +900,7 @@ class _OiButtonState extends State<OiButton> {
         : '${widget.label ?? ''} ($_remaining)';
 
     final density = OiDensityScope.of(context);
-    final height = _buttonHeight(density);
+    final height = context.components.button?.height ?? _buttonHeight(density);
     final hPad = _hPadding(context);
     final foreground = _foregroundColor(context, widget.variant);
     final decoration = _decoration(context, widget.variant);
@@ -890,7 +931,7 @@ class _OiButtonState extends State<OiButton> {
 
   Widget _buildConfirmButton(BuildContext context) {
     final density = OiDensityScope.of(context);
-    final height = _buttonHeight(density);
+    final height = context.components.button?.height ?? _buttonHeight(density);
     final hPad = _hPadding(context);
 
     final activeVariant = _confirmPending

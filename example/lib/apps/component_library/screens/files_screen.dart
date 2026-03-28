@@ -324,7 +324,7 @@ class FilesScreen extends StatelessWidget {
                       folder: const OiFileNodeData(
                         id: 'docs',
                         name: 'Documents',
-                        isFolder: true,
+                        folder: true,
                         itemCount: 24,
                       ),
                       expanded: true,
@@ -336,7 +336,7 @@ class FilesScreen extends StatelessWidget {
                       folder: const OiFileNodeData(
                         id: 'photos',
                         name: 'Photos',
-                        isFolder: true,
+                        folder: true,
                         itemCount: 156,
                       ),
                       expanded: false,
@@ -348,8 +348,8 @@ class FilesScreen extends StatelessWidget {
                       folder: const OiFileNodeData(
                         id: 'shared',
                         name: 'Shared with me',
-                        isFolder: true,
-                        isShared: true,
+                        folder: true,
+                        shared: true,
                       ),
                       expanded: false,
                       selected: false,
@@ -383,27 +383,27 @@ class FilesScreen extends StatelessWidget {
                       OiFileNodeData(
                         id: 'g1',
                         name: 'photo.jpg',
-                        isFolder: false,
+                        folder: false,
                         size: 1228800,
                         modified: DateTime(2026, 3, 20),
                       ),
                       OiFileNodeData(
                         id: 'g2',
                         name: 'budget.xlsx',
-                        isFolder: false,
+                        folder: false,
                         size: 524288,
                         modified: DateTime(2026, 3, 18),
                       ),
                       const OiFileNodeData(
                         id: 'g3',
                         name: 'Projects',
-                        isFolder: true,
+                        folder: true,
                         itemCount: 12,
                       ),
                       OiFileNodeData(
                         id: 'g4',
                         name: 'notes.md',
-                        isFolder: false,
+                        folder: false,
                         size: 4096,
                         modified: DateTime(2026, 3, 22),
                       ),
@@ -438,27 +438,27 @@ class FilesScreen extends StatelessWidget {
                       const OiFileNodeData(
                         id: 'l0',
                         name: 'Documents',
-                        isFolder: true,
+                        folder: true,
                         itemCount: 24,
                       ),
                       OiFileNodeData(
                         id: 'l1',
                         name: 'report.pdf',
-                        isFolder: false,
+                        folder: false,
                         size: 2457600,
                         modified: DateTime(2026, 3, 23),
                       ),
                       OiFileNodeData(
                         id: 'l2',
                         name: 'presentation.pptx',
-                        isFolder: false,
+                        folder: false,
                         size: 5242880,
                         modified: DateTime(2026, 3, 21),
                       ),
                       OiFileNodeData(
                         id: 'l3',
                         name: 'main.dart',
-                        isFolder: false,
+                        folder: false,
                         size: 8192,
                         modified: DateTime(2026, 3, 22),
                       ),
@@ -489,33 +489,33 @@ class FilesScreen extends StatelessWidget {
                 child: SizedBox(
                   height: 400,
                   child: OiFileSidebar(
-                    folderTree: [
+                    folderTree: const [
                       OiTreeNode<OiFileNodeData>(
                         id: 'home',
                         label: 'Home',
-                        data: const OiFileNodeData(
+                        data: OiFileNodeData(
                           id: 'home',
                           name: 'Home',
-                          isFolder: true,
+                          folder: true,
                         ),
                         children: [
                           OiTreeNode<OiFileNodeData>(
                             id: 'docs',
                             label: 'Documents',
-                            data: const OiFileNodeData(
+                            data: OiFileNodeData(
                               id: 'docs',
                               name: 'Documents',
-                              isFolder: true,
+                              folder: true,
                               itemCount: 24,
                             ),
                           ),
                           OiTreeNode<OiFileNodeData>(
                             id: 'photos',
                             label: 'Photos',
-                            data: const OiFileNodeData(
+                            data: OiFileNodeData(
                               id: 'photos',
                               name: 'Photos',
-                              isFolder: true,
+                              folder: true,
                               itemCount: 156,
                             ),
                           ),
@@ -571,7 +571,7 @@ class FilesScreen extends StatelessWidget {
                         file: OiFileNodeData(
                           id: 'p1',
                           name: 'photo.jpg',
-                          isFolder: false,
+                          folder: false,
                           size: 1228800,
                           mimeType: 'image/jpeg',
                           modified: DateTime(2026, 3, 20),
@@ -585,7 +585,7 @@ class FilesScreen extends StatelessWidget {
                         file: OiFileNodeData(
                           id: 'p2',
                           name: 'report.pdf',
-                          isFolder: false,
+                          folder: false,
                           size: 2457600,
                           mimeType: 'application/pdf',
                           modified: DateTime(2026, 3, 23),
@@ -599,7 +599,7 @@ class FilesScreen extends StatelessWidget {
                         file: OiFileNodeData(
                           id: 'p3',
                           name: 'video.mp4',
-                          isFolder: false,
+                          folder: false,
                           size: 52428800,
                           mimeType: 'video/mp4',
                           modified: DateTime(2026, 3, 15),

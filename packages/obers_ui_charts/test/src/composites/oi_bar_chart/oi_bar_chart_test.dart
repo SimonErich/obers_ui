@@ -3,12 +3,12 @@
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:obers_ui/src/foundation/theme/oi_theme_data.dart';
 import 'package:obers_ui_charts/src/composites/oi_bar_chart/oi_bar_chart.dart';
 import 'package:obers_ui_charts/src/composites/oi_bar_chart/oi_bar_chart_accessibility.dart';
 import 'package:obers_ui_charts/src/composites/oi_bar_chart/oi_bar_chart_data.dart'
     show OiBarCategory, OiBarChartMode, OiBarSeries;
 import 'package:obers_ui_charts/src/composites/oi_bubble_chart/oi_bubble_chart_interaction.dart';
-import 'package:obers_ui/src/foundation/theme/oi_theme_data.dart';
 
 import '../../../helpers/pump_chart_app.dart';
 

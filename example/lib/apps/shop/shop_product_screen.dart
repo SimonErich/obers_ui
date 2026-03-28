@@ -91,17 +91,13 @@ class _ShopProductScreenState extends State<ShopProductScreen> {
                         value: reviews[i].rating,
                         readOnly: true,
                         size: 18,
-                        label:
-                            '${reviews[i].rating} out of 5 stars',
+                        label: '${reviews[i].rating} out of 5 stars',
                       ),
                     ],
                   ),
                   SizedBox(height: spacing.sm),
                   // Review text
-                  OiLabel.body(
-                    reviews[i].text,
-                    color: colors.textMuted,
-                  ),
+                  OiLabel.body(reviews[i].text, color: colors.textMuted),
                   SizedBox(height: spacing.sm),
                   // Helpful thumbs
                   Row(
@@ -177,8 +173,7 @@ class _ShopProductScreenState extends State<ShopProductScreen> {
                 children: [
                   OiIconButton(
                     icon: OiIcons.heart,
-                    semanticLabel:
-                        'Wishlist (${widget.wishlistCount} items)',
+                    semanticLabel: 'Wishlist (${widget.wishlistCount} items)',
                     onTap: widget.onViewWishlist,
                   ),
                   if (widget.wishlistCount > 0)
@@ -209,7 +204,7 @@ class _ShopProductScreenState extends State<ShopProductScreen> {
           OiShopProductDetail(
             product: product,
             label: product.name,
-            isWishlisted: widget.isWishlisted,
+            wishlisted: widget.isWishlisted,
             onWishlist: widget.onWishlistToggle,
             onAddToCart: (item) {
               widget.onAddToCart(item);

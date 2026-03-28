@@ -59,13 +59,15 @@ class OiCheckbox extends StatelessWidget {
 
     final isChecked = value ?? false;
     final isIndeterminate = value == null;
+    final cht = themeData.components.checkbox;
 
+    final checkedColor = cht?.checkedColor ?? colors.primary.base;
     final fillColor = (isChecked || isIndeterminate)
-        ? colors.primary.base
+        ? checkedColor
         : colors.surface;
     final borderColor = (isChecked || isIndeterminate)
-        ? colors.primary.base
-        : colors.border;
+        ? checkedColor
+        : (cht?.uncheckedBorderColor ?? colors.border);
 
     Widget box = CustomPaint(
       size: Size(size, size),
@@ -73,7 +75,7 @@ class OiCheckbox extends StatelessWidget {
         state: value,
         fillColor: fillColor,
         borderColor: borderColor,
-        checkColor: colors.textOnPrimary,
+        checkColor: cht?.checkmarkColor ?? colors.textOnPrimary,
         borderRadius: borderRadius,
       ),
     );

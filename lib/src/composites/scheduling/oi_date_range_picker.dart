@@ -6,7 +6,6 @@ import 'package:obers_ui/src/components/navigation/oi_date_picker.dart';
 import 'package:obers_ui/src/foundation/oi_responsive.dart';
 import 'package:obers_ui/src/foundation/theme/oi_spacing_scale.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
-import 'package:obers_ui/src/primitives/display/oi_label.dart';
 import 'package:obers_ui/src/primitives/layout/oi_column.dart';
 import 'package:obers_ui/src/primitives/layout/oi_row.dart';
 

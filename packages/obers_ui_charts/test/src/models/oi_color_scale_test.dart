@@ -27,9 +27,9 @@ void main() {
 
       final mid = scale.resolve(50);
       // Midpoint between black and white should be ~gray.
-      expect(mid.red, closeTo(128, 2));
-      expect(mid.green, closeTo(128, 2));
-      expect(mid.blue, closeTo(128, 2));
+      expect((mid.r * 255.0).round().clamp(0, 255), closeTo(128, 2));
+      expect((mid.g * 255.0).round().clamp(0, 255), closeTo(128, 2));
+      expect((mid.b * 255.0).round().clamp(0, 255), closeTo(128, 2));
     });
 
     test('linear clamps values outside range', () {

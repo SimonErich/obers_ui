@@ -8,6 +8,8 @@ import 'package:obers_ui/src/components/navigation/oi_accordion.dart';
 import 'package:obers_ui/src/components/navigation/oi_tabs.dart';
 import 'package:obers_ui/src/components/shop/oi_price_tag.dart';
 import 'package:obers_ui/src/components/shop/oi_quantity_selector.dart';
+import 'package:obers_ui/src/components/shop/oi_stock_badge.dart';
+import 'package:obers_ui/src/components/shop/oi_wishlist_button.dart';
 import 'package:obers_ui/src/foundation/oi_responsive.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/models/oi_cart_item.dart';
@@ -15,9 +17,6 @@ import 'package:obers_ui/src/models/oi_product_data.dart';
 import 'package:obers_ui/src/primitives/display/oi_label.dart';
 import 'package:obers_ui/src/primitives/layout/oi_column.dart';
 import 'package:obers_ui/src/primitives/layout/oi_row.dart';
-
-import 'package:obers_ui/src/components/shop/oi_wishlist_button.dart';
-import 'package:obers_ui/src/components/shop/oi_stock_badge.dart';
 
 /// A complete product detail page layout showing gallery, title, price,
 /// description, variant selectors, quantity, add to cart, and related info.

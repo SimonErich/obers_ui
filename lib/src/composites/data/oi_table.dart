@@ -361,7 +361,9 @@ class OiTable<T> extends StatefulWidget {
 // ── State ─────────────────────────────────────────────────────────────────────
 
 class _OiTableState<T> extends State<OiTable<T>>
-    with OiSettingsMixin<OiTable<T>, OiTableSettings>, TickerProviderStateMixin {
+    with
+        OiSettingsMixin<OiTable<T>, OiTableSettings>,
+        TickerProviderStateMixin {
   late OiTableController _ctrl;
   bool _ownsController = false;
   bool _loadingMore = false;
@@ -506,6 +508,17 @@ class _OiTableState<T> extends State<OiTable<T>>
       _prevPage = curPage;
       _prevPageSize = curPageSize;
       widget.onPageChange!(curPage, curPageSize);
+    }
+    // Snap group animation controllers to match the current expanded state
+    // when toggled programmatically (not via the GestureDetector tap).
+    for (final entry in _groupExpandControllers.entries) {
+      final key = entry.key;
+      final animCtrl = entry.value;
+      if (_ctrl.expandedGroups.contains(key)) {
+        if (animCtrl.isDismissed) animCtrl.value = 1.0;
+      } else {
+        if (animCtrl.isCompleted) animCtrl.value = 0.0;
+      }
     }
     // Persist settings on every controller change (debounced by the mixin).
     updateSettings(_ctrl.toSettings(), debounce: widget.settingsSaveDebounce);
@@ -794,7 +807,9 @@ class _OiTableState<T> extends State<OiTable<T>>
                   final totalWidth = _computeTotalColumnsWidth();
                   final needsScroll = totalWidth > constraints.maxWidth;
                   _needsHorizontalScroll = needsScroll;
-                  final tableWidth = needsScroll ? totalWidth : constraints.maxWidth;
+                  final tableWidth = needsScroll
+                      ? totalWidth
+                      : constraints.maxWidth;
 
                   final header = _buildHeaderRow();
                   final body = Expanded(child: _buildBody());
@@ -951,7 +966,11 @@ class _OiTableState<T> extends State<OiTable<T>>
               color: context.colors.surfaceActive,
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                child: Text(col.header, textDirection: TextDirection.ltr, style: TextStyle(color: context.colors.text)),
+                child: Text(
+                  col.header,
+                  textDirection: TextDirection.ltr,
+                  style: TextStyle(color: context.colors.text),
+                ),
               ),
             ),
           ),
@@ -960,7 +979,10 @@ class _OiTableState<T> extends State<OiTable<T>>
               ? DecoratedBox(
                   decoration: BoxDecoration(
                     border: Border(
-                      left: BorderSide(color: context.colors.primary.base, width: 2),
+                      left: BorderSide(
+                        color: context.colors.primary.base,
+                        width: 2,
+                      ),
                     ),
                   ),
                   child: header,
@@ -1098,8 +1120,9 @@ class _OiTableState<T> extends State<OiTable<T>>
   Widget _buildFilterInput(OiTableColumn<T> col) {
     final isFlex = _isFlexColumn(col);
     final filterWidth = _ctrl.columnWidths[col.id] ?? col.width;
-    final resolvedFilterWidth =
-        isFlex ? null : (filterWidth ?? col.minWidth.clamp(col.minWidth, col.maxWidth));
+    final resolvedFilterWidth = isFlex
+        ? null
+        : (filterWidth ?? col.minWidth.clamp(col.minWidth, col.maxWidth));
     return SizedBox(
       width: resolvedFilterWidth,
       height: 0,
@@ -1222,39 +1245,47 @@ class _OiTableState<T> extends State<OiTable<T>>
       final header = widget.groupHeaderBuilder != null
           ? widget.groupHeaderBuilder!(context, groupKey, groupRows)
           : _buildDefaultGroupHeader(groupKey, groupRows.length, expanded);
-      items.add(
-        GestureDetector(
-          key: ValueKey('group_$groupKey'),
-          onTap: () {
-            final willExpand = !_ctrl.expandedGroups.contains(groupKey);
-            if (willExpand) {
-              animCtrl.forward();
-            } else {
-              animCtrl.reverse();
-            }
-            _ctrl.toggleGroup(groupKey);
-          },
-          child: header,
-        ),
-      );
-      // Animated group rows.
-      items.add(
-        SizeTransition(
-          key: ValueKey('group_body_$groupKey'),
-          sizeFactor: CurvedAnimation(
-            parent: animCtrl,
-            curve: Curves.easeInOut,
+      items
+        ..add(
+          GestureDetector(
+            key: ValueKey('group_$groupKey'),
+            onTap: () {
+              final willExpand = !_ctrl.expandedGroups.contains(groupKey);
+              if (willExpand) {
+                animCtrl.forward();
+              } else {
+                animCtrl.reverse();
+              }
+              _ctrl.toggleGroup(groupKey);
+            },
+            child: header,
           ),
-          axisAlignment: -1,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              for (var i = 0; i < groupRows.length; i++)
-                _buildRow(groupRows[i], i),
-            ],
+        )
+        // Animated group rows.
+        ..add(
+          AnimatedBuilder(
+            key: ValueKey('group_body_$groupKey'),
+            animation: animCtrl,
+            builder: (context, child) {
+              if (animCtrl.isDismissed) return const SizedBox.shrink();
+              return SizeTransition(
+                sizeFactor: CurvedAnimation(
+                  parent: animCtrl,
+                  curve: Curves.easeInOut,
+                ),
+                axisAlignment: -1,
+                child: child,
+              );
+            },
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                for (var i = 0; i < groupRows.length; i++)
+                  _buildRow(groupRows[i], i),
+              ],
+            ),
           ),
-        ),
-      );
+        );
     }
     return ListView(controller: _scrollController, children: items);
   }
@@ -1279,10 +1310,7 @@ class _OiTableState<T> extends State<OiTable<T>>
           const SizedBox(width: 8),
           Text(
             '$groupKey ($count)',
-            style: TextStyle(
-              fontWeight: FontWeight.w600,
-              color: colors.text,
-            ),
+            style: TextStyle(fontWeight: FontWeight.w600, color: colors.text),
           ),
         ],
       ),
@@ -1337,7 +1365,11 @@ class _OiTableState<T> extends State<OiTable<T>>
       content = col.cellBuilder!(context, row, rowIndex);
     } else {
       final text = col.valueGetter?.call(row) ?? '';
-      content = Text(text, textAlign: col.textAlign, style: TextStyle(color: context.colors.text));
+      content = Text(
+        text,
+        textAlign: col.textAlign,
+        style: TextStyle(color: context.colors.text),
+      );
     }
     if (widget.onCellChanged != null) {
       content = _CellFrame<T>(
@@ -1350,8 +1382,9 @@ class _OiTableState<T> extends State<OiTable<T>>
       );
     }
     final isFlex = _isFlexColumn(col);
-    final resolvedWidth =
-        isFlex ? null : (width ?? col.minWidth.clamp(col.minWidth, col.maxWidth));
+    final resolvedWidth = isFlex
+        ? null
+        : (width ?? col.minWidth.clamp(col.minWidth, col.maxWidth));
     return SizedBox(
       width: resolvedWidth,
       height: _effectiveRowHeight,
@@ -1388,10 +1421,16 @@ class _OiTableState<T> extends State<OiTable<T>>
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
         child: Row(
           children: [
-            Text('$totalShown rows', style: TextStyle(color: context.colors.textMuted)),
+            Text(
+              '$totalShown rows',
+              style: TextStyle(color: context.colors.textMuted),
+            ),
             if (selected > 0) ...[
               const SizedBox(width: 16),
-              Text('$selected selected', style: TextStyle(color: context.colors.textMuted)),
+              Text(
+                '$selected selected',
+                style: TextStyle(color: context.colors.textMuted),
+              ),
             ],
           ],
         ),
@@ -1442,8 +1481,9 @@ class _HoverTextState extends State<_HoverText> {
 
   @override
   Widget build(BuildContext context) {
-    final effectiveStyle =
-        widget.sortable && _hovering ? widget.hoverStyle : widget.style;
+    final effectiveStyle = widget.sortable && _hovering
+        ? widget.hoverStyle
+        : widget.style;
 
     final child = Text(
       widget.text,

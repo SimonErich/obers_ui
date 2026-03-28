@@ -42,7 +42,6 @@ class OiBubbleChartSizeLegend extends StatelessWidget {
       child: Wrap(
         key: const Key('oi_bubble_chart_size_legend'),
         crossAxisAlignment: WrapCrossAlignment.end,
-        spacing: 0,
         runSpacing: 4,
         children: [
           if (config.sizeLabel != null)

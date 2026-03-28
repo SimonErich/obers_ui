@@ -215,7 +215,7 @@ class _OiMenuPanel extends StatelessWidget {
             padding: direction == Axis.horizontal
                 ? const EdgeInsets.symmetric(horizontal: 8, vertical: 8)
                 : const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            child: trailing!,
+            child: trailing,
           ),
         ),
       );

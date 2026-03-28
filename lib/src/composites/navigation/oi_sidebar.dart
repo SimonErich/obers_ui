@@ -453,7 +453,7 @@ class _OiSidebarState extends State<OiSidebar>
                       curve: Curves.easeInOut,
                     ),
                     axisAlignment: -1,
-                    child: child!,
+                    child: child,
                   );
                 },
                 child: childColumn,

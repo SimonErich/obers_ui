@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:ui' show Size;
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -38,7 +37,7 @@ void main() {
           child: OiCartesianChart<_Point>(
             label: 'Test',
             series: [
-              _makeSeries(id: 's1'),
+              _makeSeries(),
               _makeSeries(id: 's2'),
             ],
             controller: controller,

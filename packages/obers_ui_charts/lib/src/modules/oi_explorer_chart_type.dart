@@ -1,3 +1,6 @@
+import 'package:obers_ui_charts/obers_ui_charts.dart' show OiChartExplorer;
+import 'package:obers_ui_charts/src/modules/oi_chart_explorer.dart' show OiChartExplorer;
+
 /// The chart type displayed in the [OiChartExplorer] canvas area.
 ///
 /// The explorer infers a sensible default chart type from the assigned column

@@ -21,9 +21,9 @@ void main() {
 
       test('select notifies listeners', () {
         var notified = false;
-        controller.addListener(() => notified = true);
-
-        controller.select({const OiChartDataRef(seriesIndex: 0, dataIndex: 1)});
+        controller
+          ..addListener(() => notified = true)
+          ..select({const OiChartDataRef(seriesIndex: 0, dataIndex: 1)});
 
         expect(notified, isTrue);
         expect(controller.selection, hasLength(1));
@@ -34,8 +34,9 @@ void main() {
         controller.select({const OiChartDataRef(seriesIndex: 0, dataIndex: 0)});
 
         var notified = false;
-        controller.addListener(() => notified = true);
-        controller.clearSelection();
+        controller
+          ..addListener(() => notified = true)
+          ..clearSelection();
 
         expect(notified, isTrue);
         expect(controller.selection, isEmpty);
@@ -43,8 +44,9 @@ void main() {
 
       test('clearSelection is no-op when already empty', () {
         var notified = false;
-        controller.addListener(() => notified = true);
-        controller.clearSelection();
+        controller
+          ..addListener(() => notified = true)
+          ..clearSelection();
         expect(notified, isFalse);
       });
     });
@@ -57,9 +59,9 @@ void main() {
 
       test('hover notifies listeners', () {
         var notified = false;
-        controller.addListener(() => notified = true);
-
-        controller.hover(const OiChartDataRef(seriesIndex: 0, dataIndex: 2));
+        controller
+          ..addListener(() => notified = true)
+          ..hover(const OiChartDataRef(seriesIndex: 0, dataIndex: 2));
 
         expect(notified, isTrue);
         expect(controller.hovered, isNotNull);
@@ -71,8 +73,9 @@ void main() {
         controller.hover(ref);
 
         var notified = false;
-        controller.addListener(() => notified = true);
-        controller.hover(ref);
+        controller
+          ..addListener(() => notified = true)
+          ..hover(ref);
         expect(notified, isFalse);
       });
     });
@@ -87,8 +90,9 @@ void main() {
         controller.viewportState.zoomLevel = 2.0;
 
         var notified = false;
-        controller.addListener(() => notified = true);
-        controller.resetZoom();
+        controller
+          ..addListener(() => notified = true)
+          ..resetZoom();
 
         expect(notified, isTrue);
         expect(controller.viewportState.isZoomed, isFalse);
@@ -96,16 +100,17 @@ void main() {
 
       test('resetZoom is no-op when not zoomed', () {
         var notified = false;
-        controller.addListener(() => notified = true);
-        controller.resetZoom();
+        controller
+          ..addListener(() => notified = true)
+          ..resetZoom();
         expect(notified, isFalse);
       });
 
       test('setVisibleDomain updates state and notifies', () {
         var notified = false;
-        controller.addListener(() => notified = true);
-
-        controller.setVisibleDomain(xMin: 10, xMax: 100);
+        controller
+          ..addListener(() => notified = true)
+          ..setVisibleDomain(xMin: 10, xMax: 100);
 
         expect(notified, isTrue);
         expect(controller.viewportState.xMin, 10);
@@ -121,9 +126,9 @@ void main() {
 
       test('toggleSeries hides then shows', () {
         var notifyCount = 0;
-        controller.addListener(() => notifyCount++);
-
-        controller.toggleSeries('series-1');
+        controller
+          ..addListener(() => notifyCount++)
+          ..toggleSeries('series-1');
         expect(controller.legendState.isVisible('series-1'), isFalse);
         expect(notifyCount, 1);
 
@@ -134,9 +139,9 @@ void main() {
 
       test('focusSeries toggles focus', () {
         var notifyCount = 0;
-        controller.addListener(() => notifyCount++);
-
-        controller.focusSeries('series-a');
+        controller
+          ..addListener(() => notifyCount++)
+          ..focusSeries('series-a');
         expect(controller.legendState.focusedSeriesId, 'series-a');
         expect(notifyCount, 1);
 
@@ -161,8 +166,9 @@ void main() {
     group('data lifecycle', () {
       test('setLoading notifies', () {
         var notified = false;
-        controller.addListener(() => notified = true);
-        controller.setLoading(loading: true);
+        controller
+          ..addListener(() => notified = true)
+          ..setLoading(loading: true);
 
         expect(notified, isTrue);
         expect(controller.isLoading, isTrue);
@@ -170,15 +176,17 @@ void main() {
 
       test('setLoading with same value does not notify', () {
         var notified = false;
-        controller.addListener(() => notified = true);
-        controller.setLoading(loading: false);
+        controller
+          ..addListener(() => notified = true)
+          ..setLoading(loading: false);
         expect(notified, isFalse);
       });
 
       test('setError notifies', () {
         var notified = false;
-        controller.addListener(() => notified = true);
-        controller.setError('Something went wrong');
+        controller
+          ..addListener(() => notified = true)
+          ..setError('Something went wrong');
 
         expect(notified, isTrue);
         expect(controller.error, 'Something went wrong');

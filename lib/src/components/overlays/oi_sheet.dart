@@ -104,7 +104,7 @@ class OiSheet extends StatefulWidget {
 
     if (service != null) {
       late final OiOverlayHandle handle;
-      handle = service.show(
+      return handle = service.show(
         label: label,
         builder: (_) => OiSheet(
           label: label,
@@ -123,7 +123,6 @@ class OiSheet extends StatefulWidget {
         zOrder: OiOverlayZOrder.panel,
         dismissible: false,
       );
-      return handle;
     }
 
     // Fallback path: create the entry first so the handle is available to
@@ -282,7 +281,7 @@ class _OiSheetState extends State<OiSheet> with SingleTickerProviderStateMixin {
     }
   }
 
-  /// Animates the sheet out, then calls [widget.onClose].
+  /// Animates the sheet out, then calls [OiSheet.onClose].
   void _animateClose() {
     if (_closing) return;
     _closing = true;

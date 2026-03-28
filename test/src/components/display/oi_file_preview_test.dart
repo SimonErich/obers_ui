@@ -55,7 +55,7 @@ void main() {
   testWidgets('shows play button for video file with url', (tester) async {
     await tester.pumpObers(const OiFilePreview(file: videoFile));
     // Play button is an Icon with play_arrow code point
-    final playIcon = OiIcons.play;
+    const playIcon = OiIcons.play;
     expect(find.byIcon(playIcon), findsOneWidget);
   });
 
@@ -63,7 +63,7 @@ void main() {
     await tester.pumpObers(
       const OiFilePreview(file: videoFile, showPlayButton: false),
     );
-    final playIcon = OiIcons.play;
+    const playIcon = OiIcons.play;
     expect(find.byIcon(playIcon), findsNothing);
   });
 

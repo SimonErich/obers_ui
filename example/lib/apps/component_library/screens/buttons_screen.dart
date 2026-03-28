@@ -41,22 +41,22 @@ class _ButtonsScreenState extends State<ButtonsScreen> {
               ComponentExample(
                 title: 'Primary',
                 child: _ButtonVariantShowcase(
-                  builder: ({
-                    required String label,
-                    IconData? icon,
-                    OiIconPosition? iconPosition,
-                    bool fullWidth = false,
-                    bool enabled = true,
-                    VoidCallback? onTap,
-                  }) =>
-                      OiButton.primary(
-                    label: label,
-                    icon: icon,
-                    iconPosition: iconPosition ?? OiIconPosition.leading,
-                    fullWidth: fullWidth,
-                    enabled: enabled,
-                    onTap: onTap,
-                  ),
+                  builder:
+                      ({
+                        required String label,
+                        IconData? icon,
+                        OiIconPosition? iconPosition,
+                        bool fullWidth = false,
+                        bool enabled = true,
+                        VoidCallback? onTap,
+                      }) => OiButton.primary(
+                        label: label,
+                        icon: icon,
+                        iconPosition: iconPosition ?? OiIconPosition.leading,
+                        fullWidth: fullWidth,
+                        enabled: enabled,
+                        onTap: onTap,
+                      ),
                 ),
               ),
 
@@ -64,22 +64,22 @@ class _ButtonsScreenState extends State<ButtonsScreen> {
               ComponentExample(
                 title: 'Secondary',
                 child: _ButtonVariantShowcase(
-                  builder: ({
-                    required String label,
-                    IconData? icon,
-                    OiIconPosition? iconPosition,
-                    bool fullWidth = false,
-                    bool enabled = true,
-                    VoidCallback? onTap,
-                  }) =>
-                      OiButton.secondary(
-                    label: label,
-                    icon: icon,
-                    iconPosition: iconPosition ?? OiIconPosition.leading,
-                    fullWidth: fullWidth,
-                    enabled: enabled,
-                    onTap: onTap,
-                  ),
+                  builder:
+                      ({
+                        required String label,
+                        IconData? icon,
+                        OiIconPosition? iconPosition,
+                        bool fullWidth = false,
+                        bool enabled = true,
+                        VoidCallback? onTap,
+                      }) => OiButton.secondary(
+                        label: label,
+                        icon: icon,
+                        iconPosition: iconPosition ?? OiIconPosition.leading,
+                        fullWidth: fullWidth,
+                        enabled: enabled,
+                        onTap: onTap,
+                      ),
                 ),
               ),
 
@@ -87,22 +87,22 @@ class _ButtonsScreenState extends State<ButtonsScreen> {
               ComponentExample(
                 title: 'Outline',
                 child: _ButtonVariantShowcase(
-                  builder: ({
-                    required String label,
-                    IconData? icon,
-                    OiIconPosition? iconPosition,
-                    bool fullWidth = false,
-                    bool enabled = true,
-                    VoidCallback? onTap,
-                  }) =>
-                      OiButton.outline(
-                    label: label,
-                    icon: icon,
-                    iconPosition: iconPosition ?? OiIconPosition.leading,
-                    fullWidth: fullWidth,
-                    enabled: enabled,
-                    onTap: onTap,
-                  ),
+                  builder:
+                      ({
+                        required String label,
+                        IconData? icon,
+                        OiIconPosition? iconPosition,
+                        bool fullWidth = false,
+                        bool enabled = true,
+                        VoidCallback? onTap,
+                      }) => OiButton.outline(
+                        label: label,
+                        icon: icon,
+                        iconPosition: iconPosition ?? OiIconPosition.leading,
+                        fullWidth: fullWidth,
+                        enabled: enabled,
+                        onTap: onTap,
+                      ),
                 ),
               ),
 
@@ -110,22 +110,22 @@ class _ButtonsScreenState extends State<ButtonsScreen> {
               ComponentExample(
                 title: 'Ghost',
                 child: _ButtonVariantShowcase(
-                  builder: ({
-                    required String label,
-                    IconData? icon,
-                    OiIconPosition? iconPosition,
-                    bool fullWidth = false,
-                    bool enabled = true,
-                    VoidCallback? onTap,
-                  }) =>
-                      OiButton.ghost(
-                    label: label,
-                    icon: icon,
-                    iconPosition: iconPosition ?? OiIconPosition.leading,
-                    fullWidth: fullWidth,
-                    enabled: enabled,
-                    onTap: onTap,
-                  ),
+                  builder:
+                      ({
+                        required String label,
+                        IconData? icon,
+                        OiIconPosition? iconPosition,
+                        bool fullWidth = false,
+                        bool enabled = true,
+                        VoidCallback? onTap,
+                      }) => OiButton.ghost(
+                        label: label,
+                        icon: icon,
+                        iconPosition: iconPosition ?? OiIconPosition.leading,
+                        fullWidth: fullWidth,
+                        enabled: enabled,
+                        onTap: onTap,
+                      ),
                 ),
               ),
 
@@ -133,22 +133,22 @@ class _ButtonsScreenState extends State<ButtonsScreen> {
               ComponentExample(
                 title: 'Destructive',
                 child: _ButtonVariantShowcase(
-                  builder: ({
-                    required String label,
-                    IconData? icon,
-                    OiIconPosition? iconPosition,
-                    bool fullWidth = false,
-                    bool enabled = true,
-                    VoidCallback? onTap,
-                  }) =>
-                      OiButton.destructive(
-                    label: label,
-                    icon: icon,
-                    iconPosition: iconPosition ?? OiIconPosition.leading,
-                    fullWidth: fullWidth,
-                    enabled: enabled,
-                    onTap: onTap,
-                  ),
+                  builder:
+                      ({
+                        required String label,
+                        IconData? icon,
+                        OiIconPosition? iconPosition,
+                        bool fullWidth = false,
+                        bool enabled = true,
+                        VoidCallback? onTap,
+                      }) => OiButton.destructive(
+                        label: label,
+                        icon: icon,
+                        iconPosition: iconPosition ?? OiIconPosition.leading,
+                        fullWidth: fullWidth,
+                        enabled: enabled,
+                        onTap: onTap,
+                      ),
                 ),
               ),
 
@@ -156,30 +156,27 @@ class _ButtonsScreenState extends State<ButtonsScreen> {
               ComponentExample(
                 title: 'Soft',
                 child: _ButtonVariantShowcase(
-                  builder: ({
-                    required String label,
-                    IconData? icon,
-                    OiIconPosition? iconPosition,
-                    bool fullWidth = false,
-                    bool enabled = true,
-                    VoidCallback? onTap,
-                  }) =>
-                      OiButton.soft(
-                    label: label,
-                    icon: icon,
-                    iconPosition: iconPosition ?? OiIconPosition.leading,
-                    fullWidth: fullWidth,
-                    enabled: enabled,
-                    onTap: onTap,
-                  ),
+                  builder:
+                      ({
+                        required String label,
+                        IconData? icon,
+                        OiIconPosition? iconPosition,
+                        bool fullWidth = false,
+                        bool enabled = true,
+                        VoidCallback? onTap,
+                      }) => OiButton.soft(
+                        label: label,
+                        icon: icon,
+                        iconPosition: iconPosition ?? OiIconPosition.leading,
+                        fullWidth: fullWidth,
+                        enabled: enabled,
+                        onTap: onTap,
+                      ),
                 ),
               ),
 
               // ── Sizes ───────────────────────────────────────────────
-              ComponentExample(
-                title: 'Sizes',
-                child: _ButtonSizesShowcase(),
-              ),
+              ComponentExample(title: 'Sizes', child: _ButtonSizesShowcase()),
 
               // ── States ──────────────────────────────────────────────
               ComponentExample(
@@ -343,8 +340,7 @@ class _ButtonsScreenState extends State<ButtonsScreen> {
                       icon: OiIcons.underline,
                       selected: _underline,
                       semanticLabel: 'Underline',
-                      onChanged: (value) =>
-                          setState(() => _underline = value),
+                      onChanged: (value) => setState(() => _underline = value),
                     ),
                   ],
                 ),
@@ -368,7 +364,7 @@ class _ButtonsScreenState extends State<ButtonsScreen> {
             examples: [
               ComponentExample(
                 title: 'Default',
-                child: OiBackButton(onPressed: () {}),
+                child: OiBackButton(onPressed: () {}, semanticLabel: 'Go back'),
               ),
             ],
           ),
@@ -445,11 +441,7 @@ class _ButtonsScreenState extends State<ButtonsScreen> {
       children: [
         OiLabel.small(label, color: colors.textMuted),
         SizedBox(height: spacing.xs),
-        Wrap(
-          spacing: spacing.sm,
-          runSpacing: spacing.sm,
-          children: children,
-        ),
+        Wrap(spacing: spacing.sm, runSpacing: spacing.sm, children: children),
       ],
     );
   }
@@ -457,19 +449,18 @@ class _ButtonsScreenState extends State<ButtonsScreen> {
 
 // ── Helper: variant sub-variants showcase ─────────────────────────────────
 
-typedef _ButtonBuilder = Widget Function({
-  required String label,
-  IconData? icon,
-  OiIconPosition? iconPosition,
-  bool fullWidth,
-  bool enabled,
-  VoidCallback? onTap,
-});
-
 class _ButtonVariantShowcase extends StatelessWidget {
   const _ButtonVariantShowcase({required this.builder});
 
-  final _ButtonBuilder builder;
+  final Widget Function({
+    required String label,
+    IconData? icon,
+    OiIconPosition? iconPosition,
+    bool fullWidth,
+    bool enabled,
+    VoidCallback? onTap,
+  })
+  builder;
 
   @override
   Widget build(BuildContext context) {
@@ -485,7 +476,9 @@ class _ButtonVariantShowcase extends StatelessWidget {
           crossAxisAlignment: WrapCrossAlignment.center,
           children: [
             // Text only
-            IntrinsicWidth(child: builder(label: 'Button', onTap: () {})),
+            IntrinsicWidth(
+              child: builder(label: 'Button', onTap: () {}),
+            ),
             // Leading icon
             IntrinsicWidth(
               child: builder(
@@ -504,9 +497,7 @@ class _ButtonVariantShowcase extends StatelessWidget {
               ),
             ),
             // Disabled
-            IntrinsicWidth(
-              child: builder(label: 'Disabled', enabled: false),
-            ),
+            IntrinsicWidth(child: builder(label: 'Disabled', enabled: false)),
           ],
         ),
         SizedBox(height: spacing.sm),
@@ -597,9 +588,7 @@ class _ButtonSizesShowcase extends StatelessWidget {
     return Wrap(
       spacing: spacing.xxl,
       runSpacing: spacing.lg,
-      children: [
-        for (final size in sizes) buildSizeColumn(size),
-      ],
+      children: [for (final size in sizes) buildSizeColumn(size)],
     );
   }
 }

@@ -4,18 +4,17 @@ import 'package:obers_ui_charts/src/foundation/oi_ring_buffer.dart';
 void main() {
   group('OiRingBuffer', () {
     test('add within capacity retains all items', () {
-      final buffer = OiRingBuffer<int>(5);
-      buffer.add(1);
-      buffer.add(2);
-      buffer.add(3);
+      final buffer = OiRingBuffer<int>(5)
+        ..add(1)
+        ..add(2)
+        ..add(3);
 
       expect(buffer.length, 3);
       expect(buffer.items, [1, 2, 3]);
     });
 
     test('add beyond capacity evicts oldest', () {
-      final buffer = OiRingBuffer<int>(3);
-      buffer
+      final buffer = OiRingBuffer<int>(3)
         ..add(1)
         ..add(2)
         ..add(3)
@@ -28,16 +27,14 @@ void main() {
     });
 
     test('addAll with batch larger than capacity keeps last N', () {
-      final buffer = OiRingBuffer<int>(3);
-      buffer.addAll([1, 2, 3, 4, 5, 6, 7]);
+      final buffer = OiRingBuffer<int>(3)..addAll([1, 2, 3, 4, 5, 6, 7]);
 
       expect(buffer.length, 3);
       expect(buffer.items, [5, 6, 7]);
     });
 
     test('items returned in insertion order', () {
-      final buffer = OiRingBuffer<int>(4);
-      buffer
+      final buffer = OiRingBuffer<int>(4)
         ..add(10)
         ..add(20)
         ..add(30)
@@ -55,8 +52,7 @@ void main() {
     });
 
     test('clear resets to empty', () {
-      final buffer = OiRingBuffer<int>(5);
-      buffer
+      final buffer = OiRingBuffer<int>(5)
         ..add(1)
         ..add(2)
         ..add(3)
@@ -68,9 +64,9 @@ void main() {
     });
 
     test('capacity 0 edge case', () {
-      final buffer = OiRingBuffer<int>(0);
-      buffer.add(1);
-      buffer.add(2);
+      final buffer = OiRingBuffer<int>(0)
+        ..add(1)
+        ..add(2);
 
       expect(buffer.length, 0);
       expect(buffer.isEmpty, isTrue);

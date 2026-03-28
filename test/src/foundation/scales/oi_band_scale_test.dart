@@ -2,8 +2,8 @@
 // ignore_for_file: public_member_api_docs
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:obers_ui_charts/src/foundation/oi_band_scale.dart';
-import 'package:obers_ui_charts/src/foundation/oi_chart_scale.dart';
+import 'package:obers_ui/src/foundation/scales/oi_band_scale.dart';
+import 'package:obers_ui/src/foundation/scales/oi_chart_scale.dart';
 
 void main() {
   group('OiBandScale', () {
@@ -114,7 +114,6 @@ void main() {
         rangeMin: 0,
         rangeMax: 300,
         paddingInner: 0.2,
-        paddingOuter: 0.1,
       );
       expect(withPadding.bandwidth, lessThan(noPadding.bandwidth));
     });

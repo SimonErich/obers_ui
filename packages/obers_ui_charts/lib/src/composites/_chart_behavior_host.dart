@@ -147,10 +147,10 @@ mixin ChartBehaviorHost<T extends StatefulWidget> on State<T> {
     try {
       final theme = OiTheme.maybeOf(ctx);
       if (theme?.components.chart != null) return theme!.components.chart!;
-    } catch (_) {
+    } on Exception catch (_) {
       // Context may not have OiApp ancestor.
     }
-    return OiChartThemeData();
+    return const OiChartThemeData();
   }
 
   // ── Pointer event forwarding ───────────────────────────────────────────
@@ -181,14 +181,14 @@ mixin ChartBehaviorHost<T extends StatefulWidget> on State<T> {
   Widget wrapWithPointerListener(Widget child) {
     if (_attachedBehaviors.isEmpty) return child;
     return Listener(
-      onPointerDown: (e) => dispatchPointerEvent(e),
-      onPointerMove: (e) => dispatchPointerEvent(e),
-      onPointerUp: (e) => dispatchPointerEvent(e),
-      onPointerHover: (e) => dispatchPointerEvent(e),
+      onPointerDown: dispatchPointerEvent,
+      onPointerMove: dispatchPointerEvent,
+      onPointerUp: dispatchPointerEvent,
+      onPointerHover: dispatchPointerEvent,
       onPointerSignal: (e) {
         if (e is PointerScrollEvent) dispatchPointerEvent(e);
       },
-      onPointerCancel: (e) => dispatchPointerEvent(e),
+      onPointerCancel: dispatchPointerEvent,
       child: child,
     );
   }

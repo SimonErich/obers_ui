@@ -63,9 +63,9 @@ export 'src/components/display/oi_tooltip.dart';
 export 'src/components/feedback/oi_banner.dart';
 export 'src/components/feedback/oi_bulk_bar.dart';
 export 'src/components/feedback/oi_reaction_bar.dart';
-export 'src/components/feedback/oi_skeleton_preset.dart';
 export 'src/components/feedback/oi_scale_rating.dart';
 export 'src/components/feedback/oi_sentiment.dart';
+export 'src/components/feedback/oi_skeleton_preset.dart';
 export 'src/components/feedback/oi_star_rating.dart';
 export 'src/components/feedback/oi_thumbs.dart';
 // ── Components: Inline Edit ──────────────────────────────────────────────────
@@ -101,11 +101,11 @@ export 'src/components/inputs/oi_time_picker_field.dart';
 // ── Primitives: Interaction ──────────────────────────────────────────────────
 
 export 'src/components/interaction/oi_selection_overlay.dart';
+export 'src/components/navigation/oi_accordion.dart';
 // ── Components: Navigation ───────────────────────────────────────────────────
 
 export 'src/components/navigation/oi_account_switcher.dart';
 export 'src/components/navigation/oi_action_bar.dart';
-export 'src/components/navigation/oi_accordion.dart';
 export 'src/components/navigation/oi_bottom_bar.dart';
 export 'src/components/navigation/oi_breadcrumbs.dart';
 export 'src/components/navigation/oi_date_picker.dart';
@@ -262,6 +262,7 @@ export 'src/foundation/persistence/oi_settings_provider.dart';
 export 'src/foundation/theme/oi_animation_config.dart';
 export 'src/foundation/theme/oi_color_scheme.dart';
 export 'src/foundation/theme/oi_color_swatch.dart';
+export 'src/foundation/theme/oi_component_size_scale.dart';
 export 'src/foundation/theme/oi_component_themes.dart';
 export 'src/foundation/theme/oi_decoration_theme.dart';
 export 'src/foundation/theme/oi_effects_theme.dart';

@@ -1,11 +1,7 @@
-import 'dart:ui' show Offset, Size;
-
 import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:obers_ui/obers_ui.dart' show OiChartThemeData;
 import 'package:obers_ui_charts/obers_ui_charts.dart';
-import 'package:obers_ui_charts/src/foundation/oi_chart_hit_tester.dart';
 
 // ── Test doubles ─────────────────────────────────────────────────────────────
 
@@ -34,7 +30,7 @@ void main() {
       controller: controller,
       viewport: const OiChartViewport(size: Size(400, 300)),
       hitTester: _TestHitTester(),
-      theme: OiChartThemeData(),
+      theme: const OiChartThemeData(),
     );
 
     behavior.attach(behaviorContext);
@@ -47,9 +43,9 @@ void main() {
 
   group('OiZoomPanBehavior', () {
     test('scroll up zooms in', () {
-      final event = PointerScrollEvent(
-        position: const Offset(200, 150),
-        scrollDelta: const Offset(0, -120),
+      const event = PointerScrollEvent(
+        position: Offset(200, 150),
+        scrollDelta: Offset(0, -120),
       );
       behavior.onPointerScroll(event);
       expect(controller.viewportState.zoomLevel, greaterThan(1.0));
@@ -59,9 +55,9 @@ void main() {
       // First zoom in.
       controller.viewportState.zoomLevel = 2.0;
 
-      final event = PointerScrollEvent(
-        position: const Offset(200, 150),
-        scrollDelta: const Offset(0, 120),
+      const event = PointerScrollEvent(
+        position: Offset(200, 150),
+        scrollDelta: Offset(0, 120),
       );
       behavior.onPointerScroll(event);
       expect(controller.viewportState.zoomLevel, lessThan(2.0));
@@ -71,9 +67,9 @@ void main() {
       // Zoom way in.
       for (var i = 0; i < 100; i++) {
         behavior.onPointerScroll(
-          PointerScrollEvent(
-            position: const Offset(200, 150),
-            scrollDelta: const Offset(0, -120),
+          const PointerScrollEvent(
+            position: Offset(200, 150),
+            scrollDelta: Offset(0, -120),
           ),
         );
       }
@@ -82,9 +78,9 @@ void main() {
       // Zoom way out.
       for (var i = 0; i < 200; i++) {
         behavior.onPointerScroll(
-          PointerScrollEvent(
-            position: const Offset(200, 150),
-            scrollDelta: const Offset(0, 120),
+          const PointerScrollEvent(
+            position: Offset(200, 150),
+            scrollDelta: Offset(0, 120),
           ),
         );
       }
@@ -92,16 +88,17 @@ void main() {
     });
 
     test('drag pan updates pan offset', () {
-      behavior.onPointerDown(
-        const PointerDownEvent(pointer: 1, position: Offset(100, 100)),
-      );
-      behavior.onPointerMove(
-        const PointerMoveEvent(
-          pointer: 1,
-          position: Offset(150, 120),
-          delta: Offset(50, 20),
-        ),
-      );
+      behavior
+        ..onPointerDown(
+          const PointerDownEvent(pointer: 1, position: Offset(100, 100)),
+        )
+        ..onPointerMove(
+          const PointerMoveEvent(
+            pointer: 1,
+            position: Offset(150, 120),
+            delta: Offset(50, 20),
+          ),
+        );
 
       expect(controller.viewportState.panOffset, const Offset(50, 20));
     });
@@ -111,20 +108,20 @@ void main() {
       Offset? reportedPan;
 
       behavior.detach();
-      behavior = OiZoomPanBehavior(
-        onZoomChanged: (zoom, pan) {
-          reportedZoom = zoom;
-          reportedPan = pan;
-        },
-      );
-      behavior.attach(behaviorContext);
-
-      behavior.onPointerScroll(
-        PointerScrollEvent(
-          position: const Offset(200, 150),
-          scrollDelta: const Offset(0, -120),
-        ),
-      );
+      behavior =
+          OiZoomPanBehavior(
+              onZoomChanged: (zoom, pan) {
+                reportedZoom = zoom;
+                reportedPan = pan;
+              },
+            )
+            ..attach(behaviorContext)
+            ..onPointerScroll(
+              const PointerScrollEvent(
+                position: Offset(200, 150),
+                scrollDelta: Offset(0, -120),
+              ),
+            );
 
       expect(reportedZoom, isNotNull);
       expect(reportedPan, isNotNull);
@@ -132,17 +129,17 @@ void main() {
 
     test('wheel zoom disabled when config says so', () {
       behavior.detach();
-      behavior = OiZoomPanBehavior(
-        config: const OiZoomPanConfig(enableWheelZoom: false),
-      );
-      behavior.attach(behaviorContext);
-
-      behavior.onPointerScroll(
-        PointerScrollEvent(
-          position: const Offset(200, 150),
-          scrollDelta: const Offset(0, -120),
-        ),
-      );
+      behavior =
+          OiZoomPanBehavior(
+              config: const OiZoomPanConfig(enableWheelZoom: false),
+            )
+            ..attach(behaviorContext)
+            ..onPointerScroll(
+              const PointerScrollEvent(
+                position: Offset(200, 150),
+                scrollDelta: Offset(0, -120),
+              ),
+            );
 
       expect(controller.viewportState.zoomLevel, 1.0);
     });

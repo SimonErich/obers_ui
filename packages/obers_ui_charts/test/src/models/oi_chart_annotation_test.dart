@@ -49,10 +49,10 @@ void main() {
     test('copyWith preserves unset fields', () {
       const style = OiAnnotationStyle(
         color: Color(0xFFFF0000),
-        strokeWidth: 2.0,
+        strokeWidth: 2,
         dashPattern: [4, 2],
       );
-      final copied = style.copyWith(strokeWidth: 3.0);
+      final copied = style.copyWith(strokeWidth: 3);
       expect(copied.color, const Color(0xFFFF0000));
       expect(copied.strokeWidth, 3.0);
       expect(copied.dashPattern, [4, 2]);

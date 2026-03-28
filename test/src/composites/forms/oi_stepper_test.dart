@@ -4,6 +4,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui/src/composites/forms/oi_stepper.dart';
+import 'package:obers_ui/src/foundation/oi_icons.dart';
 
 import '../../../helpers/pump_app.dart';
 
@@ -61,8 +62,10 @@ void main() {
 
     // Completed steps render an Icon widget with the check icon.
     final icons = tester.widgetList<Icon>(find.byType(Icon)).toList();
-    // Two completed steps should each have a check icon (OiIcons.check = 0xe06c).
-    final checkIcons = icons.where((i) => i.icon?.codePoint == 0xe06c).toList();
+    // Two completed steps should each have a check icon.
+    final checkIcons = icons
+        .where((i) => i.icon?.codePoint == OiIcons.check.codePoint)
+        .toList();
     expect(checkIcons.length, 2);
   });
 
@@ -71,8 +74,10 @@ void main() {
     await tester.pumpObers(_stepper(currentStep: 1, errorSteps: {0}));
 
     final icons = tester.widgetList<Icon>(find.byType(Icon)).toList();
-    // One error step should have the error icon (OiIcons.circleAlert = 0xe077).
-    final errorIcons = icons.where((i) => i.icon?.codePoint == 0xe077).toList();
+    // One error step should have the error icon.
+    final errorIcons = icons
+        .where((i) => i.icon?.codePoint == OiIcons.circleAlert.codePoint)
+        .toList();
     expect(errorIcons.length, 1);
   });
 

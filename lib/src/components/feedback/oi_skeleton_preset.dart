@@ -132,19 +132,38 @@ class OiSkeletonPreset extends StatelessWidget {
   }
 
   final _SkeletonPresetType _type;
+
+  /// Number of lines rendered by the text preset.
   final int lines;
+
+  /// Width fraction of the last line in the text preset (0.0–1.0).
   final double lastLineWidth;
+
+  /// Height of each individual skeleton line.
   final double lineHeight;
 
   /// Space between lines in the text preset. Defaults to [OiSpacingScale.xs].
   final double? lineSpacing;
 
+  /// Fixed height override for the skeleton shape.
   final double? height;
+
+  /// Fixed width override for the skeleton shape.
   final double? width;
+
+  /// Aspect ratio used when neither [height] nor [width] is set.
   final double? aspectRatio;
+
+  /// Number of columns in the grid preset.
   final int columns;
+
+  /// Whether the list-item preset includes a leading avatar placeholder.
   final bool showAvatar;
+
+  /// Whether the list-item preset includes a trailing placeholder.
   final bool showTrailing;
+
+  /// Width fraction of the subtitle line in the list-item preset (0.0–1.0).
   final double subtitleWidth;
 
   /// The avatar size, used only by [_SkeletonPresetType.avatar].
@@ -228,7 +247,7 @@ class OiSkeletonPreset extends StatelessWidget {
         Row(
           children: [
             if (showAvatar) ...[
-              ClipOval(child: OiSkeletonBox(width: 40, height: 40)),
+              const ClipOval(child: OiSkeletonBox(width: 40, height: 40)),
               SizedBox(width: spacing.sm),
             ],
             Expanded(
@@ -236,7 +255,7 @@ class OiSkeletonPreset extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const OiSkeletonLine(height: 14),
+                  const OiSkeletonLine(),
                   SizedBox(height: spacing.xs),
                   FractionallySizedBox(
                     widthFactor: subtitleWidth,
@@ -262,7 +281,7 @@ class OiSkeletonPreset extends StatelessWidget {
         Row(
           children: [
             for (var i = 0; i < columns; i++) ...[
-              Expanded(child: OiSkeletonLine(height: 14)),
+              const Expanded(child: OiSkeletonLine()),
               if (i < columns - 1) SizedBox(width: spacing.sm),
             ],
           ],

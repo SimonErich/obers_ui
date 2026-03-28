@@ -3,9 +3,9 @@ import 'dart:math' as math;
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/obers_ui.dart';
 import 'package:obers_ui_charts/src/composites/_chart_grid_painter.dart';
-import 'package:obers_ui_charts/src/composites/oi_chart_axis.dart';
 import 'package:obers_ui_charts/src/composites/oi_box_plot_chart/oi_box_plot_data.dart';
 import 'package:obers_ui_charts/src/composites/oi_box_plot_chart/oi_box_plot_painter.dart';
+import 'package:obers_ui_charts/src/composites/oi_chart_axis.dart';
 import 'package:obers_ui_charts/src/foundation/oi_chart_behavior.dart';
 import 'package:obers_ui_charts/src/foundation/oi_chart_controller.dart';
 

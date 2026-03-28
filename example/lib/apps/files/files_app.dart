@@ -55,7 +55,7 @@ class _FilesAppState extends State<FilesApp> {
 
   List<OiTreeNode<OiFileNodeData>> _buildFolderTreeFromLocal(String parentId) {
     final folders = _localFileTree
-        .where((f) => f.parentId == parentId && f.isFolder)
+        .where((f) => f.parentId == parentId && f.folder)
         .toList();
     return folders.map((folder) {
       return OiTreeNode<OiFileNodeData>(
@@ -64,7 +64,7 @@ class _FilesAppState extends State<FilesApp> {
         data: folder,
         children: _buildFolderTreeFromLocal(folder.id.toString()),
         leaf: !_localFileTree.any(
-          (f) => f.parentId == folder.id.toString() && f.isFolder,
+          (f) => f.parentId == folder.id.toString() && f.folder,
         ),
       );
     }).toList();
@@ -75,7 +75,7 @@ class _FilesAppState extends State<FilesApp> {
     final newFolder = OiFileNodeData(
       id: 'folder-$_idCounter',
       name: name,
-      isFolder: true,
+      folder: true,
       parentId: parentId,
       modified: DateTime.now(),
       itemCount: 0,
@@ -124,7 +124,7 @@ class _FilesAppState extends State<FilesApp> {
           OiFileNodeData(
             id: 'upload-$_idCounter',
             name: file.name,
-            isFolder: false,
+            folder: false,
             parentId: folderId,
             size: file.size,
             mimeType: file.mimeType,

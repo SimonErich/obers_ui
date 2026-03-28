@@ -47,11 +47,11 @@ void main() {
     });
 
     test('niceNumber returns nice values', () {
-      expect(niceNumber(1.0), 1.0);
+      expect(niceNumber(1), 1.0);
       expect(niceNumber(1.8), 2.0);
       expect(niceNumber(4.5), 5.0);
-      expect(niceNumber(8.0), 10.0);
-      expect(niceNumber(15.0), 20.0);
+      expect(niceNumber(8), 10.0);
+      expect(niceNumber(15), 20.0);
     });
 
     test('clampZoom enforces bounds', () {

@@ -1,4 +1,6 @@
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui_charts/obers_ui_charts.dart' show OiCartesianSeries;
+import 'package:obers_ui_charts/src/models/oi_cartesian_series.dart' show OiCartesianSeries;
 
 /// A normalized internal data point used by the chart rendering pipeline.
 ///

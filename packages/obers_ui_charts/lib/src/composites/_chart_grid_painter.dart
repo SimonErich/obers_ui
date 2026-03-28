@@ -1,4 +1,5 @@
 import 'package:flutter/painting.dart';
+import 'package:obers_ui_charts/obers_ui_charts.dart' show OiBarChart, OiLineChart, OiScatterPlot;
 
 /// Shared grid and axis painting utilities for Cartesian charts.
 ///

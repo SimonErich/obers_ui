@@ -36,9 +36,7 @@ class ShowcaseShell extends StatelessWidget {
           padding: EdgeInsets.symmetric(horizontal: spacing.md),
           decoration: BoxDecoration(
             color: colors.surface,
-            border: Border(
-              bottom: BorderSide(color: colors.borderSubtle),
-            ),
+            border: Border(bottom: BorderSide(color: colors.borderSubtle)),
           ),
           child: Row(
             children: [
@@ -57,6 +55,28 @@ class ShowcaseShell extends StatelessWidget {
                 ),
               OiLabel.h4(title),
               const Spacer(),
+              // ── Theme preset switcher ──
+              OiTappable(
+                semanticLabel: 'Switch theme preset',
+                onTap: themeState.cyclePreset,
+                child: Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: spacing.sm,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: colors.primary.base.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: OiLabel.smallStrong(switch (themeState.preset) {
+                    ThemePreset.alpine => 'Alpine',
+                    ThemePreset.blueDanube => 'Blue Danube',
+                    ThemePreset.arco => 'Arco',
+                    ThemePreset.finesse => 'Finesse',
+                  }, color: colors.primary.base),
+                ),
+              ),
+              SizedBox(width: spacing.sm),
               OiThemeToggle(
                 currentMode: themeState.value,
                 onModeChange: (_) => themeState.toggle(),

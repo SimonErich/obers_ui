@@ -23,9 +23,11 @@ class OiRingBuffer<T> extends Iterable<T> {
   int _length = 0;
 
   /// The number of items currently in the buffer.
+  @override
   int get length => _length;
 
   /// Whether the buffer contains no items.
+  @override
   bool get isEmpty => _length == 0;
 
   /// Whether the buffer is at capacity.
@@ -80,7 +82,7 @@ class OiRingBuffer<T> extends Iterable<T> {
   List<T> get items {
     final result = <T>[];
     for (var i = 0; i < _length; i++) {
-      result.add(_buffer[(_head + i) % capacity]!);
+      result.add(_buffer[(_head + i) % capacity] as T);
     }
     return result;
   }

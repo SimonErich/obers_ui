@@ -1,7 +1,6 @@
 // Tests do not require documentation comments.
 // ignore_for_file: public_member_api_docs
 
-import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui/src/composites/scheduling/oi_date_range_input.dart';
 
@@ -12,7 +11,7 @@ void main() {
     await tester.pumpObers(
       OiDateRangeInput(
         label: 'Period',
-        startDate: DateTime(2026, 3, 1),
+        startDate: DateTime(2026, 3),
         endDate: DateTime(2026, 3, 15),
       ),
     );

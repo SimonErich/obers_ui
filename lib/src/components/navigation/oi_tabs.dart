@@ -191,22 +191,27 @@ class _OiTabsState extends State<OiTabs>
     final tab = widget.tabs[index];
     final isSelected = index == widget.selectedIndex;
 
+    final tt = context.components.tabs;
+    final activeColor = tt?.activeLabelColor ?? colors.primary.base;
+    final inactiveColor = tt?.inactiveLabelColor ?? colors.textMuted;
+    final indicatorColor = tt?.indicatorColor ?? activeColor;
+
     final textColor = switch (widget.indicatorStyle) {
       OiTabIndicatorStyle.filled when isSelected => colors.textOnPrimary,
-      _ when isSelected => colors.primary.base,
-      _ => colors.textMuted,
+      _ when isSelected => activeColor,
+      _ => inactiveColor,
     };
 
     final bgColor = switch (widget.indicatorStyle) {
-      OiTabIndicatorStyle.filled when isSelected => colors.primary.base,
+      OiTabIndicatorStyle.filled when isSelected => indicatorColor,
       OiTabIndicatorStyle.pill => const Color(0x00000000),
       _ => const Color(0x00000000),
     };
 
+    final baseLabelStyle = tt?.labelStyle ?? const TextStyle(fontSize: 14);
     Widget label = Text(
       tab.label,
-      style: TextStyle(
-        fontSize: 14,
+      style: baseLabelStyle.copyWith(
         fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
         color: textColor,
       ),
@@ -257,7 +262,9 @@ class _OiTabsState extends State<OiTabs>
     Widget tabContent = AnimatedContainer(
       key: _tabKeys[index],
       duration: animDuration,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      padding:
+          tt?.tabPadding ??
+          const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       decoration: BoxDecoration(
         color: bgColor,
         borderRadius: widget.indicatorStyle == OiTabIndicatorStyle.filled
@@ -274,9 +281,9 @@ class _OiTabsState extends State<OiTabs>
           tabContent,
           AnimatedContainer(
             duration: animDuration,
-            height: 2,
+            height: tt?.indicatorThickness ?? 2,
             decoration: BoxDecoration(
-              color: isSelected ? colors.primary.base : const Color(0x00000000),
+              color: isSelected ? indicatorColor : const Color(0x00000000),
               borderRadius: BorderRadius.circular(1),
             ),
           ),
@@ -389,10 +396,12 @@ class _PillTabRowState extends State<_PillTabRow> {
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
-    final reducedMotion = context.animations.reducedMotion ||
+    final reducedMotion =
+        context.animations.reducedMotion ||
         MediaQuery.disableAnimationsOf(context);
-    final animDuration =
-        reducedMotion ? Duration.zero : const Duration(milliseconds: 200);
+    final animDuration = reducedMotion
+        ? Duration.zero
+        : const Duration(milliseconds: 200);
 
     final children = <Widget>[];
     for (var i = 0; i < widget.tabs.length; i++) {

@@ -33,7 +33,6 @@ void main() {
         domainMax: 1000,
         rangeMin: 0,
         rangeMax: 300,
-        base: 10,
       );
 
       final constrained = scale.withDomain(10, 100);

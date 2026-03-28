@@ -1,5 +1,4 @@
 import 'package:flutter/widgets.dart';
-
 import 'package:obers_ui_charts/src/components/oi_chart_empty_state.dart';
 import 'package:obers_ui_charts/src/components/oi_chart_error_state.dart';
 import 'package:obers_ui_charts/src/components/oi_chart_loading_state.dart';
@@ -10,10 +9,10 @@ import 'package:obers_ui_charts/src/foundation/oi_chart_controller.dart';
 import 'package:obers_ui_charts/src/foundation/oi_chart_hit_tester.dart';
 import 'package:obers_ui_charts/src/foundation/oi_chart_sync_group.dart';
 import 'package:obers_ui_charts/src/foundation/oi_chart_viewport.dart';
-import 'package:obers_ui_charts/src/models/oi_chart_settings.dart';
 // Imported for future annotation/threshold support on flow charts.
 // ignore: unused_import
 import 'package:obers_ui_charts/src/models/oi_chart_annotation.dart';
+import 'package:obers_ui_charts/src/models/oi_chart_settings.dart';
 // Imported for future annotation/threshold support on flow charts.
 // ignore: unused_import
 import 'package:obers_ui_charts/src/models/oi_chart_threshold.dart';
@@ -27,9 +26,7 @@ import 'package:obers_ui_charts/src/models/oi_flow_series.dart';
 class OiFlowChart<TNode, TLink> extends StatefulWidget {
   /// Creates a flow chart.
   const OiFlowChart({
-    super.key,
-    required this.label,
-    required this.series,
+    required this.label, required this.series, super.key,
     this.seriesBuilder,
     this.behaviors = const [],
     this.controller,

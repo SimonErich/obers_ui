@@ -28,7 +28,7 @@ void main() {
       WidgetTester tester,
     ) async {
       await tester.pumpChartApp(
-        OiChartLegend(items: const [redItem, blueItem, hiddenItem]),
+        const OiChartLegend(items: [redItem, blueItem, hiddenItem]),
       );
 
       expect(find.text('Revenue'), findsOneWidget);
@@ -76,7 +76,7 @@ void main() {
       WidgetTester tester,
     ) async {
       await tester.pumpChartApp(
-        OiChartLegend(items: const [redItem, hiddenItem]),
+        const OiChartLegend(items: [redItem, hiddenItem]),
       );
 
       // The hidden item is wrapped in an Opacity widget with 0.4 opacity.
@@ -85,13 +85,13 @@ void main() {
       final opacityValues = opacityWidgets.map((o) => o.opacity).toList();
 
       // At least one Opacity with 0.4 (hidden item) and one with 1.0 (visible item).
-      expect(opacityValues, containsAll(<double>[0.4, 1.0]));
+      expect(opacityValues, containsAll(<double>[0.4, 1]));
     });
 
     testWidgets('visible item has full opacity (1.0)', (
       WidgetTester tester,
     ) async {
-      await tester.pumpChartApp(OiChartLegend(items: const [redItem]));
+      await tester.pumpChartApp(const OiChartLegend(items: [redItem]));
 
       final opacity = tester.widget<Opacity>(find.byType(Opacity));
       expect(opacity.opacity, equals(1.0));
@@ -101,7 +101,7 @@ void main() {
       WidgetTester tester,
     ) async {
       const customKey = Key('custom_legend_item');
-      int builderCallCount = 0;
+      var builderCallCount = 0;
 
       await tester.pumpChartApp(
         OiChartLegend(
@@ -109,7 +109,7 @@ void main() {
           itemBuilder: (context, item, index, onTap, onDoubleTap) {
             builderCallCount++;
             return GestureDetector(
-              key: Key('${customKey.toString()}_$index'),
+              key: Key('${customKey}_$index'),
               onTap: onTap,
               child: Text('custom_${item.label}'),
             );
@@ -213,7 +213,7 @@ void main() {
     testWidgets('legend renders with key oi_chart_legend', (
       WidgetTester tester,
     ) async {
-      await tester.pumpChartApp(OiChartLegend(items: const [redItem]));
+      await tester.pumpChartApp(const OiChartLegend(items: [redItem]));
 
       expect(find.byKey(const Key('oi_chart_legend')), findsOneWidget);
     });
@@ -222,7 +222,7 @@ void main() {
       WidgetTester tester,
     ) async {
       await tester.pumpChartApp(
-        OiChartLegend(items: const [redItem, blueItem]),
+        const OiChartLegend(items: [redItem, blueItem]),
       );
 
       expect(
@@ -242,16 +242,12 @@ void main() {
         id: 'a',
         label: 'Series A',
         color: Color(0xFF112233),
-        visible: true,
-        emphasized: false,
         markerShape: OiLegendMarkerShape.circle,
       );
       const b = OiChartLegendItem(
         id: 'a',
         label: 'Series A',
         color: Color(0xFF112233),
-        visible: true,
-        emphasized: false,
         markerShape: OiLegendMarkerShape.circle,
       );
 
@@ -278,7 +274,6 @@ void main() {
         id: 'x',
         label: 'X',
         color: Color(0xFF000000),
-        visible: true,
       );
       const b = OiChartLegendItem(
         id: 'x',
