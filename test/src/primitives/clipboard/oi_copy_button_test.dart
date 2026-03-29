@@ -1,5 +1,4 @@
 // Tests do not require documentation comments.
-// ignore_for_file: public_member_api_docs
 // REQ-0014: OiCopyButton required-prop enforcement tests.
 
 import 'package:flutter/services.dart';
@@ -15,7 +14,7 @@ void main() {
   setUp(() {
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(SystemChannels.platform, (
-          MethodCall call,
+          call,
         ) async {
           if (call.method == 'Clipboard.setData') return null;
           if (call.method == 'Clipboard.getData') {
@@ -153,7 +152,7 @@ void main() {
     String? written;
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(SystemChannels.platform, (
-          MethodCall call,
+          call,
         ) async {
           if (call.method == 'Clipboard.setData') {
             written = (call.arguments as Map)['text'] as String?;

@@ -91,7 +91,7 @@ class _OiVideoPlayerState extends State<OiVideoPlayer> {
     final textTheme = context.textTheme;
     final ar = widget.aspectRatio ?? 16 / 9;
 
-    Widget content = Container(
+    Widget content = DecoratedBox(
       key: const Key('oi_video_player_surface'),
       decoration: BoxDecoration(
         color: const Color(0xFF000000),

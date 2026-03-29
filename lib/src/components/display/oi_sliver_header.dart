@@ -363,7 +363,7 @@ class _OiSliverHeaderDelegate extends SliverPersistentHeaderDelegate {
           Expanded(
             child: centerTitle ? Center(child: titleArea) : titleArea,
           ),
-          if (trailing != null) trailing!,
+          ?trailing,
           for (final action in actions) action,
         ],
       ),

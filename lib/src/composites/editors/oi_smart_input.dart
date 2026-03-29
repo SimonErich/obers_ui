@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/_internal/oi_input_frame.dart';
@@ -376,7 +378,7 @@ class _OiSmartInputState extends State<OiSmartInput> {
         _activeTrigger = trigger;
         _suggestionQuery = query;
         _selectedSuggestionIndex = 0;
-        _loadSuggestions(trigger, query);
+        unawaited(_loadSuggestions(trigger, query));
       }
       return;
     }
@@ -581,8 +583,11 @@ class _OiSmartInputState extends State<OiSmartInput> {
                   child: Text(
                     widget.placeholder!,
                     style: baseStyle.copyWith(
-                      color: (baseStyle.color ?? themeData?.colors.text ?? const Color(0xFF000000))
-                          .withValues(alpha: 0.45),
+                      color:
+                          (baseStyle.color ??
+                                  themeData?.colors.text ??
+                                  const Color(0xFF000000))
+                              .withValues(alpha: 0.45),
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -606,8 +611,11 @@ class _OiSmartInputState extends State<OiSmartInput> {
                   child: Text(
                     widget.placeholder!,
                     style: baseStyle.copyWith(
-                      color: (baseStyle.color ?? themeData?.colors.text ?? const Color(0xFF000000))
-                          .withValues(alpha: 0.45),
+                      color:
+                          (baseStyle.color ??
+                                  themeData?.colors.text ??
+                                  const Color(0xFF000000))
+                              .withValues(alpha: 0.45),
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -620,7 +628,8 @@ class _OiSmartInputState extends State<OiSmartInput> {
             focusNode: _focusNode,
             style: baseStyle,
             cursorColor: cursorColor,
-            backgroundCursorColor: themeData?.colors.text ?? const Color(0xFF000000),
+            backgroundCursorColor:
+                themeData?.colors.text ?? const Color(0xFF000000),
             maxLines: widget.maxLines,
             readOnly: !widget.enabled,
             onChanged: (_) {},

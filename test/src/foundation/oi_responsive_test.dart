@@ -1,5 +1,4 @@
 // Tests are internal; doc comments on local helpers are not required.
-// ignore_for_file: public_member_api_docs
 // ignore_for_file: deprecated_member_use_from_same_package
 
 import 'package:flutter/widgets.dart';

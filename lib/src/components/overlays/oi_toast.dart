@@ -132,7 +132,6 @@ class _OiToastQueue {
 
 class _ToastQueueNotifier extends ChangeNotifier {
   // Intentional notify wrapper to keep the public API surface minimal.
-  // ignore: use_setters_to_change_properties
   void notify() => notifyListeners();
 }
 
@@ -356,7 +355,7 @@ class _OiToastState extends State<OiToast> with SingleTickerProviderStateMixin {
     _controller.duration = reduced ? Duration.zero : _animDuration;
     if (!_animationStarted) {
       _animationStarted = true;
-      _controller.forward();
+      unawaited(_controller.forward());
     }
   }
 

@@ -1,5 +1,4 @@
 // Test file — public_member_api_docs not required for test helpers.
-// ignore_for_file: public_member_api_docs
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';

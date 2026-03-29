@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 
@@ -70,7 +72,7 @@ class _OiInfiniteScrollState extends State<OiInfiniteScroll> {
 
     final metrics = notification.metrics;
     if (metrics.pixels >= metrics.maxScrollExtent - widget.threshold) {
-      _loadMore();
+      unawaited(_loadMore());
     }
     return false;
   }
@@ -126,7 +128,8 @@ class _InfiniteScrollSpinnerState extends State<_InfiniteScrollSpinner>
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 800),
-    )..repeat();
+    );
+    unawaited(_controller.repeat());
   }
 
   @override
@@ -143,7 +146,7 @@ class _InfiniteScrollSpinnerState extends State<_InfiniteScrollSpinner>
         ..stop()
         ..value = 0;
     } else if (!reduced && !_controller.isAnimating) {
-      _controller.repeat();
+      unawaited(_controller.repeat());
     }
   }
 

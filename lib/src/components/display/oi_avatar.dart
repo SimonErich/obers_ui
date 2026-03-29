@@ -276,7 +276,7 @@ class OiAvatar extends StatelessWidget {
         width: d,
         height: d,
         fit: BoxFit.cover,
-        errorBuilder: (ctx, _, __) => _buildFallback(context, colors, d),
+        errorBuilder: (ctx, _, _) => _buildFallback(context, colors, d),
       );
     }
     return _buildFallback(context, colors, d);

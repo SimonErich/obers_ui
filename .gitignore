@@ -45,3 +45,4 @@ packages/obers_ui_charts/build/
 .peakz
 concept/
 .claude/
+.mcp.json

@@ -136,13 +136,13 @@ class _PendingAction {
     if (_resolved) return;
     _resolved = true;
     snackBarHandle?.dismiss();
-    _commitAndHandleError();
+    unawaited(_commitAndHandleError());
   }
 
   void commitAsync() {
     if (_resolved) return;
     _resolved = true;
-    _commitAndHandleError();
+    unawaited(_commitAndHandleError());
   }
 
   Future<void> _commitAndHandleError() async {

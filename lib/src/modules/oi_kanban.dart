@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/oi_responsive.dart';
@@ -182,7 +184,7 @@ class _OiKanbanState<T> extends State<OiKanban<T>>
     if (newDriver != _resolvedDriver) {
       _resolvedDriver = newDriver;
       if (settingsLoaded) {
-        reloadSettings();
+        unawaited(reloadSettings());
       }
     }
     if (settingsLoaded && settingsDriver != null) {
@@ -305,10 +307,12 @@ class _OiKanbanState<T> extends State<OiKanban<T>>
                         if (reduced) {
                           _pageController.jumpToPage(next);
                         } else {
-                          _pageController.animateToPage(
-                            next,
-                            duration: const Duration(milliseconds: 300),
-                            curve: Curves.easeInOut,
+                          unawaited(
+                            _pageController.animateToPage(
+                              next,
+                              duration: const Duration(milliseconds: 300),
+                              curve: Curves.easeInOut,
+                            ),
                           );
                         }
                       }
@@ -337,10 +341,12 @@ class _OiKanbanState<T> extends State<OiKanban<T>>
                         if (reduced) {
                           _pageController.jumpToPage(next);
                         } else {
-                          _pageController.animateToPage(
-                            next,
-                            duration: const Duration(milliseconds: 300),
-                            curve: Curves.easeInOut,
+                          unawaited(
+                            _pageController.animateToPage(
+                              next,
+                              duration: const Duration(milliseconds: 300),
+                              curve: Curves.easeInOut,
+                            ),
                           );
                         }
                       }
@@ -482,9 +488,7 @@ class _OiKanbanState<T> extends State<OiKanban<T>>
               if (widget.collapsibleColumns) ...[
                 const SizedBox(width: 4),
                 Icon(
-                  collapsed
-                      ? OiIcons.chevronDown
-                      : OiIcons.chevronUp,
+                  collapsed ? OiIcons.chevronDown : OiIcons.chevronUp,
                   size: 16,
                   color: colors.textMuted,
                 ),

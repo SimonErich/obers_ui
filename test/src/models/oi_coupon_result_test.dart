@@ -1,5 +1,4 @@
 // Tests do not require documentation comments.
-// ignore_for_file: public_member_api_docs
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui/src/models/oi_coupon_result.dart';
@@ -48,7 +47,6 @@ void main() {
         discountAmount: 5,
       );
       // 15.0 is intentionally a double literal to test double precision handling.
-      // ignore: prefer_int_literals
       final updated = result.copyWith(discountAmount: 15.0);
       expect(updated.valid, true);
       expect(updated.message, 'Applied');

@@ -1,5 +1,4 @@
 // Why: Test files are not part of the public API surface; requiring doc comments on every test group and helper closure would add noise without value.
-// ignore_for_file: public_member_api_docs
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui/src/models/oi_product_data.dart';

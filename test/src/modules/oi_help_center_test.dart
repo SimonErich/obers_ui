@@ -1,5 +1,4 @@
 // Tests do not require documentation comments.
-// ignore_for_file: public_member_api_docs
 
 import 'dart:async';
 
@@ -134,9 +133,9 @@ void main() {
             showFeedback: false,
             onContactSubmit:
                 ({
-                  required String subject,
-                  required String message,
-                  String? email,
+                  required subject,
+                  required message,
+                  email,
                 }) {
                   capturedSubject = subject;
                   capturedMessage = message;

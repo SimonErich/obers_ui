@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/widgets.dart';
@@ -208,7 +209,7 @@ class _OiGanttState extends State<OiGantt>
     if (newDriver != _resolvedDriver) {
       _resolvedDriver = newDriver;
       if (settingsLoaded) {
-        reloadSettings();
+        unawaited(reloadSettings());
       }
     }
     if (settingsLoaded && settingsDriver != null) {
@@ -339,9 +340,7 @@ class _OiGanttState extends State<OiGantt>
                     width: _labelColumnWidth,
                     child: Column(
                       children: [
-                        for (var index = 0;
-                            index < rows.length;
-                            index++)
+                        for (var index = 0; index < rows.length; index++)
                           _buildLabelRow(context, rows[index]),
                       ],
                     ),
@@ -379,9 +378,11 @@ class _OiGanttState extends State<OiGantt>
                             // Task bars.
                             Column(
                               children: [
-                                for (var index = 0;
-                                    index < rows.length;
-                                    index++)
+                                for (
+                                  var index = 0;
+                                  index < rows.length;
+                                  index++
+                                )
                                   _buildTimelineRow(
                                     context,
                                     rows[index],
@@ -390,8 +391,7 @@ class _OiGanttState extends State<OiGantt>
                               ],
                             ),
                             // Today line (on top of bars).
-                            if (widget.showToday)
-                              _buildTodayLine(context),
+                            if (widget.showToday) _buildTodayLine(context),
                           ],
                         ),
                       ),

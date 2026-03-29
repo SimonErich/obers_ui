@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:obers_ui/obers_ui.dart' show OiFileExplorer;
 import 'package:obers_ui/src/models/oi_file_node_data.dart';
@@ -131,7 +133,9 @@ class OiFileExplorerController extends ChangeNotifier {
     if (!canGoBack) return;
     _historyIndex--;
     _currentFolder = _navigationHistory[_historyIndex];
-    navigateTo(_currentFolder!.id.toString(), folder: _currentFolder);
+    unawaited(
+      navigateTo(_currentFolder!.id.toString(), folder: _currentFolder),
+    );
   }
 
   /// Goes forward in navigation history.
@@ -139,13 +143,15 @@ class OiFileExplorerController extends ChangeNotifier {
     if (!canGoForward) return;
     _historyIndex++;
     _currentFolder = _navigationHistory[_historyIndex];
-    navigateTo(_currentFolder!.id.toString(), folder: _currentFolder);
+    unawaited(
+      navigateTo(_currentFolder!.id.toString(), folder: _currentFolder),
+    );
   }
 
   /// Navigates up to the parent folder.
   void goUp() {
     if (_currentFolder?.parentId != null) {
-      navigateTo(_currentFolder!.parentId!);
+      unawaited(navigateTo(_currentFolder!.parentId!));
     }
   }
 

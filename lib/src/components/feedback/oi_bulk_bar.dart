@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/buttons/oi_button.dart';
 import 'package:obers_ui/src/components/inputs/oi_checkbox.dart';
@@ -170,9 +172,9 @@ class _OiBulkBarState extends State<OiBulkBar>
       _animationController.value = forward ? 1.0 : 0.0;
     } else {
       if (forward) {
-        _animationController.forward();
+        unawaited(_animationController.forward());
       } else {
-        _animationController.reverse();
+        unawaited(_animationController.reverse());
       }
     }
   }

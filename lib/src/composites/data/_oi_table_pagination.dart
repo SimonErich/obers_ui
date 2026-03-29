@@ -20,7 +20,7 @@ class _PaginationBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListenableBuilder(
       listenable: pagination,
-      builder: (_, __) {
+      builder: (_, _) {
         return OiPagination(
           totalItems: pagination.totalItems,
           currentPage: pagination.currentPage,
@@ -87,7 +87,7 @@ class _PageSizeSelectorState extends State<_PageSizeSelector> {
             child: Align(
               alignment: Alignment.bottomLeft,
               child: IntrinsicWidth(
-                child: Container(
+                child: DecoratedBox(
                   key: const Key('pagination_page_size_dropdown'),
                   decoration: BoxDecoration(
                     color: colors.surface,

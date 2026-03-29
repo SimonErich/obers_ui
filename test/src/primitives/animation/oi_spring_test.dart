@@ -1,5 +1,4 @@
 // Tests do not require documentation comments.
-// ignore_for_file: public_member_api_docs
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -14,7 +13,7 @@ void main() {
     await tester.pumpObers(
       OiSpring(
         value: 1,
-        builder: (_, v, __) => Text('val:${v.toStringAsFixed(1)}'),
+        builder: (_, v, _) => Text('val:${v.toStringAsFixed(1)}'),
       ),
     );
     await tester.pump();
@@ -27,7 +26,7 @@ void main() {
 
   testWidgets('wraps output in AnimatedBuilder', (tester) async {
     await tester.pumpObers(
-      OiSpring(value: 0, builder: (_, __, ___) => const SizedBox()),
+      OiSpring(value: 0, builder: (_, _, _) => const SizedBox()),
     );
     await tester.pump();
 
@@ -44,7 +43,7 @@ void main() {
     await tester.pumpObers(
       OiSpring(
         value: 0.5,
-        builder: (_, __, child) => child!,
+        builder: (_, _, child) => child!,
         child: const Text('passed'),
       ),
     );
@@ -63,9 +62,9 @@ void main() {
     await tester.pumpObers(
       ValueListenableBuilder<double>(
         valueListenable: notifier,
-        builder: (_, v, __) => OiSpring(
+        builder: (_, v, _) => OiSpring(
           value: v,
-          builder: (_, animVal, ___) =>
+          builder: (_, animVal, _) =>
               Text(animVal.toStringAsFixed(2), key: const ValueKey('out')),
         ),
       ),
@@ -98,9 +97,9 @@ void main() {
         data: const MediaQueryData(disableAnimations: true),
         child: ValueListenableBuilder<double>(
           valueListenable: notifier,
-          builder: (_, v, __) => OiSpring(
+          builder: (_, v, _) => OiSpring(
             value: v,
-            builder: (_, animVal, ___) =>
+            builder: (_, animVal, _) =>
                 Text(animVal.toStringAsFixed(2), key: const ValueKey('out')),
           ),
         ),
@@ -127,7 +126,7 @@ void main() {
         stiffness: 500,
         damping: 20,
         mass: 2,
-        builder: (_, v, __) => Text(v.toStringAsFixed(1)),
+        builder: (_, v, _) => Text(v.toStringAsFixed(1)),
       ),
     );
     await tester.pumpAndSettle();

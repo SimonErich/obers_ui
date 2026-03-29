@@ -280,7 +280,7 @@ class _OiReorderableListState<T> extends State<OiReorderableList<T>>
         },
         onLeave: (_) => _clearHover(index),
         onAcceptWithDetails: (details) => _handleDrop(details.data, index),
-        builder: (context, _, __) => child,
+        builder: (context, _, _) => child,
       );
     }
 
@@ -332,7 +332,7 @@ class _OiReorderableListState<T> extends State<OiReorderableList<T>>
         },
         onLeave: (_) => _clearHover(index),
         onAcceptWithDetails: (details) => _handleDrop(details.data, index),
-        builder: (context, _, __) {
+        builder: (context, _, _) {
           return Draggable<int>(
             data: index,
             axis: widget.axis,
@@ -353,7 +353,7 @@ class _OiReorderableListState<T> extends State<OiReorderableList<T>>
         },
         onLeave: (_) => _clearHover(index),
         onAcceptWithDetails: (details) => _handleDrop(details.data, index),
-        builder: (context, _, __) {
+        builder: (context, _, _) {
           return LongPressDraggable<int>(
             data: index,
             axis: widget.axis,
@@ -374,7 +374,7 @@ class _OiReorderableListState<T> extends State<OiReorderableList<T>>
         },
         onLeave: (_) => _clearHover(index),
         onAcceptWithDetails: (details) => _handleDrop(details.data, index),
-        builder: (context, _, __) {
+        builder: (context, _, _) {
           return Draggable<int>(
             data: index,
             axis: widget.axis,

@@ -1,5 +1,4 @@
 // Tests do not require documentation comments.
-// ignore_for_file: public_member_api_docs
 
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
@@ -49,9 +48,9 @@ void main() {
           counterBuilder:
               (
                 context, {
-                required int currentLength,
-                required int? maxLength,
-                required bool focused,
+                required currentLength,
+                required maxLength,
+                required focused,
               }) {
                 return Text(
                   '$currentLength chars remaining: ${maxLength! - currentLength}',

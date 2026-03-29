@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/foundation/persistence/oi_settings_driver.dart';
@@ -156,7 +158,7 @@ class _OiTabsState extends State<OiTabs>
     if (newDriver != _resolvedDriver) {
       _resolvedDriver = newDriver;
       if (settingsLoaded) {
-        reloadSettings();
+        unawaited(reloadSettings());
       }
     }
   }
@@ -410,7 +412,6 @@ class _PillTabRowState extends State<_PillTabRow> {
       final tab = widget.tabs[i];
       final textColor = isSelected ? colors.primary.base : colors.textMuted;
 
-      // ignore: omit_local_variable_types — reassigned when icon present
       Widget label = Text(
         tab.label,
         style: TextStyle(

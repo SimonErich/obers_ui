@@ -366,7 +366,7 @@ class _OiDevMenuState extends State<OiDevMenu> {
   // ── Tab row ───────────────────────────────────────────────────────────────
 
   static const _tabLabels = ['Environment', 'Flags', 'Actions', 'Logs'];
-  static const _tabIcons = [
+  static const List<IconData> _tabIcons = [
     OiIcons.server,
     OiIcons.flag,
     OiIcons.zap,
@@ -463,7 +463,7 @@ class _OiDevMenuState extends State<OiDevMenu> {
     return ListView.separated(
       padding: EdgeInsets.all(spacing.sm),
       itemCount: widget.environments.length,
-      separatorBuilder: (_, __) => SizedBox(height: spacing.xs),
+      separatorBuilder: (_, _) => SizedBox(height: spacing.xs),
       itemBuilder: (context, index) {
         final env = widget.environments[index];
         final selected = env.key == widget.currentEnvironment;
@@ -552,7 +552,7 @@ class _OiDevMenuState extends State<OiDevMenu> {
     return ListView.separated(
       padding: EdgeInsets.all(spacing.sm),
       itemCount: widget.featureFlags.length,
-      separatorBuilder: (_, __) => const OiDivider(),
+      separatorBuilder: (_, _) => const OiDivider(),
       itemBuilder: (context, index) {
         final flag = widget.featureFlags[index];
         final value = widget.featureFlagValues[flag.key] ?? flag.defaultValue;
@@ -587,7 +587,7 @@ class _OiDevMenuState extends State<OiDevMenu> {
     return ListView.separated(
       padding: EdgeInsets.all(spacing.md),
       itemCount: widget.actions.length,
-      separatorBuilder: (_, __) => SizedBox(height: spacing.sm),
+      separatorBuilder: (_, _) => SizedBox(height: spacing.sm),
       itemBuilder: (context, index) {
         final action = widget.actions[index];
         if (action.destructive) {

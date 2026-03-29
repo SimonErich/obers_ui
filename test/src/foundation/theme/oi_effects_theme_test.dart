@@ -1,5 +1,4 @@
 // Tests for OiEffectsTheme — no public API docs needed in test files.
-// ignore_for_file: public_member_api_docs
 
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';

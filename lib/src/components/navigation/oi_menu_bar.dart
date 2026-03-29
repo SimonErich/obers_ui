@@ -7,14 +7,6 @@ import 'package:obers_ui/src/primitives/display/oi_icon.dart';
 import 'package:obers_ui/src/primitives/display/oi_label.dart';
 import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
 
-/// Deprecated. Use [OiMenuItem] instead.
-@Deprecated('Use OiMenuItem instead')
-typedef OiMenuBarItem = OiMenuItem;
-
-/// Deprecated. Use [OiMenuDivider] instead.
-@Deprecated('Use OiMenuDivider instead')
-typedef OiMenuBarDivider = OiMenuDivider;
-
 // ── Widget ──────────────────────────────────────────────────────────────────
 
 /// A horizontal desktop-style menu bar with dropdown menus.

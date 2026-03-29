@@ -59,7 +59,7 @@ class OiDropHighlight extends StatelessWidget {
     if (!active) return child ?? const SizedBox.shrink();
 
     if (style == OiDropHighlightStyle.border) {
-      return Container(
+      return DecoratedBox(
         decoration: BoxDecoration(
           border: Border.all(color: colors.primary.base, width: 2),
           borderRadius: BorderRadius.circular(4),
@@ -72,7 +72,7 @@ class OiDropHighlight extends StatelessWidget {
     // Area style
     return Stack(
       children: [
-        if (child != null) child!,
+        ?child,
         Positioned.fill(
           child: AnimatedOpacity(
             opacity: active ? 1.0 : 0.0,
@@ -81,7 +81,7 @@ class OiDropHighlight extends StatelessWidget {
                     MediaQuery.disableAnimationsOf(context)
                 ? Duration.zero
                 : const Duration(milliseconds: 100),
-            child: Container(
+            child: DecoratedBox(
               decoration: BoxDecoration(
                 color: colors.primary.muted.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(8),

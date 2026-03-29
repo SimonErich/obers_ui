@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/navigation/oi_breadcrumbs.dart';
 import 'package:obers_ui/src/components/navigation/oi_drawer.dart';
@@ -212,7 +214,7 @@ class _OiAppShellState extends State<OiAppShell>
     if (newDriver != _resolvedDriver) {
       _resolvedDriver = newDriver;
       if (settingsLoaded) {
-        reloadSettings();
+        unawaited(reloadSettings());
       }
     }
     if (settingsLoaded && settingsDriver != null) {
@@ -411,7 +413,8 @@ class _OiAppShellState extends State<OiAppShell>
         alignment: Alignment.center,
         child: Icon(
           _sidebarCollapsed
-              ? OiIcons.chevronRight // chevron_right
+              ? OiIcons
+                    .chevronRight // chevron_right
               : OiIcons.chevronLeft, // chevron_left
           size: 20,
           color: colors.textMuted,

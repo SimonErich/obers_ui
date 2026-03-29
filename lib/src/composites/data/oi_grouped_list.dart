@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/display/oi_progress.dart';
 import 'package:obers_ui/src/foundation/oi_icons.dart';
@@ -269,9 +271,7 @@ class _OiGroupedListState<T> extends State<OiGroupedList<T>>
       _ownsController = true;
     }
     if (widget.initiallyCollapsed != null) {
-      for (final key in widget.initiallyCollapsed!) {
-        _controller._collapsed.add(key);
-      }
+      widget.initiallyCollapsed!.forEach(_controller._collapsed.add);
     }
     super.initState();
     _controller.addListener(_onControllerChanged);
@@ -284,7 +284,7 @@ class _OiGroupedListState<T> extends State<OiGroupedList<T>>
     if (newDriver != _resolvedDriver) {
       _resolvedDriver = newDriver;
       _settingsApplied = false;
-      if (settingsLoaded) reloadSettings();
+      if (settingsLoaded) unawaited(reloadSettings());
     }
   }
 
@@ -295,7 +295,7 @@ class _OiGroupedListState<T> extends State<OiGroupedList<T>>
         widget.settingsKey != oldWidget.settingsKey) {
       _resolvedDriver = widget.settingsDriver;
       _settingsApplied = false;
-      reloadSettings();
+      unawaited(reloadSettings());
     }
     if (widget.groupedListController != oldWidget.groupedListController) {
       _controller.removeListener(_onControllerChanged);
@@ -318,9 +318,7 @@ class _OiGroupedListState<T> extends State<OiGroupedList<T>>
   void _applySettingsOnce() {
     if (_settingsApplied || !settingsLoaded || settingsDriver == null) return;
     _settingsApplied = true;
-    for (final key in currentSettings.collapsedGroups) {
-      _controller._collapsed.add(key);
-    }
+    currentSettings.collapsedGroups.forEach(_controller._collapsed.add);
   }
 
   @override

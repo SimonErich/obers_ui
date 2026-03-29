@@ -1,5 +1,4 @@
 // Tests are internal; doc comments on local helpers are not required.
-// ignore_for_file: public_member_api_docs
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui/src/utils/formatters.dart';

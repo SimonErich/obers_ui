@@ -368,7 +368,7 @@ class _OiAppState extends State<OiApp> {
       supportedLocales: widget.supportedLocales,
       title: widget.title,
       debugShowCheckedModeBanner: widget.debugShowCheckedModeBanner,
-      pageRouteBuilder: <T>(RouteSettings settings, WidgetBuilder builder) {
+      pageRouteBuilder: <T>(settings, builder) {
         return PageRouteBuilder<T>(
           settings: settings,
           pageBuilder: (context, animation, secondaryAnimation) =>

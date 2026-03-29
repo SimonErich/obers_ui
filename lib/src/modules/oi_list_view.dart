@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/display/oi_empty_state.dart';
 import 'package:obers_ui/src/components/display/oi_progress.dart';
@@ -248,7 +250,7 @@ class _OiListViewState<T> extends State<OiListView<T>>
     if (newDriver != _resolvedDriver) {
       _resolvedDriver = newDriver;
       if (settingsLoaded) {
-        reloadSettings();
+        unawaited(reloadSettings());
       }
     }
     // Sync search controller when the external query changes (e.g. reset).
@@ -273,7 +275,7 @@ class _OiListViewState<T> extends State<OiListView<T>>
     final maxScroll = _scrollController.position.maxScrollExtent;
     final currentScroll = _scrollController.position.pixels;
     if (currentScroll >= maxScroll - 100) {
-      widget.onLoadMore!();
+      unawaited(widget.onLoadMore!());
     }
   }
 
@@ -294,7 +296,7 @@ class _OiListViewState<T> extends State<OiListView<T>>
         _overscrollAccumulated += notification.overscroll.abs();
         if (_overscrollAccumulated >= 60 && !_isRefreshing) {
           _overscrollAccumulated = 0;
-          _triggerRefresh();
+          unawaited(_triggerRefresh());
         }
       }
     }
@@ -627,8 +629,7 @@ class _OiListViewState<T> extends State<OiListView<T>>
           final child = buildItem(context, index);
           return Padding(
             padding: EdgeInsets.only(
-              bottom:
-                  index < widget.items.length - 1 ? context.spacing.md : 0,
+              bottom: index < widget.items.length - 1 ? context.spacing.md : 0,
             ),
             child: child,
           );

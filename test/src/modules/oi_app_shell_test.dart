@@ -1,5 +1,4 @@
 // Tests do not require documentation comments.
-// ignore_for_file: public_member_api_docs
 
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
@@ -458,7 +457,7 @@ void main() {
         find.byWidgetPredicate(
           (w) =>
               w is Semantics &&
-              w.container == true &&
+              w.container &&
               w.properties.label == 'Navigation Panel',
         ),
         findsOneWidget,

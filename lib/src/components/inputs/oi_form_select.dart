@@ -126,7 +126,7 @@ class OiFormSelect<T> extends StatelessWidget {
         autovalidateMode: autovalidateMode,
         onSaved: onSaved,
         initialValue: value,
-        builder: (FormFieldState<T> state) {
+        builder: (state) {
           // Manual error wins over form-field error.
           final resolvedError = error ?? state.errorText;
 

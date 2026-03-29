@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
@@ -179,12 +181,14 @@ class _OiRawInputState extends State<OiRawInput> {
               context.animations.reducedMotion ||
               MediaQuery.disableAnimationsOf(context);
           Scrollable.maybeOf(context)?.position; // trigger dependency
-          Scrollable.ensureVisible(
-            context,
-            alignment: 0.5,
-            duration: reduced
-                ? Duration.zero
-                : const Duration(milliseconds: 200),
+          unawaited(
+            Scrollable.ensureVisible(
+              context,
+              alignment: 0.5,
+              duration: reduced
+                  ? Duration.zero
+                  : const Duration(milliseconds: 200),
+            ),
           );
         }
       });

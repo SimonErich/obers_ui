@@ -239,7 +239,7 @@ class _OiSearchOverlayState extends State<OiSearchOverlay> {
     final query = _searchController.text.trim();
     if (query.isNotEmpty) {
       setState(() => _isLoading = true);
-      _performSearch(query);
+      unawaited(_performSearch(query));
     }
   }
 

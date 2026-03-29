@@ -115,7 +115,7 @@ class OiAvatarStack extends StatelessWidget {
           child: OiTooltip(
             label: user.label,
             message: user.label,
-            child: Container(
+            child: DecoratedBox(
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 border: Border.all(color: colors.surface, width: 2),

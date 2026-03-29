@@ -1,5 +1,4 @@
 // Tests do not require documentation comments.
-// ignore_for_file: public_member_api_docs
 
 import 'dart:async';
 
@@ -182,7 +181,7 @@ void main() {
       (w) =>
           w is Semantics &&
           w.properties.label == 'Feedback' &&
-          w.container == true,
+          w.container,
     );
     expect(semantics, findsOneWidget);
   });

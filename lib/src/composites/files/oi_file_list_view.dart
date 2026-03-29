@@ -575,13 +575,13 @@ class _OiFileListViewState extends State<OiFileListView> {
             widget.onMoveToFolder!(droppedFiles, file);
           },
           builder: (context, state) {
-            return Container(
+            return DecoratedBox(
               decoration: state == OiDropState.hovering
                   ? BoxDecoration(
                       border: Border.all(color: colors.primary.base, width: 2),
                       borderRadius: BorderRadius.circular(4),
                     )
-                  : null,
+                  : const BoxDecoration(),
               child: innerRow,
             );
           },

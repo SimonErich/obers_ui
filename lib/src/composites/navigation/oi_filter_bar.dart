@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/inputs/oi_select.dart';
 import 'package:obers_ui/src/foundation/oi_icons.dart';
@@ -6,7 +8,6 @@ import 'package:obers_ui/src/foundation/persistence/oi_settings_mixin.dart';
 import 'package:obers_ui/src/foundation/persistence/oi_settings_provider.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/models/settings/oi_filter_bar_settings.dart';
-
 
 // ── Filter types ─────────────────────────────────────────────────────────────
 
@@ -225,7 +226,7 @@ class _OiFilterBarState extends State<OiFilterBar>
     if (newDriver != _resolvedDriver) {
       _resolvedDriver = newDriver;
       if (settingsLoaded) {
-        reloadSettings();
+        unawaited(reloadSettings());
       }
     }
   }
@@ -356,7 +357,7 @@ class _FilterChipState extends State<_FilterChip> {
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: () => widget.onActivate(context),
-        child: Container(
+        child: DecoratedBox(
           decoration: BoxDecoration(
             color: _chipHovered && !_closeHovered ? hoveredColor : baseColor,
             borderRadius: BorderRadius.circular(100),
@@ -375,7 +376,7 @@ class _FilterChipState extends State<_FilterChip> {
                 child: Text(
                   isActive
                       ? '${widget.definition.label}: '
-                          '${_formatValue(widget.activeFilter)}'
+                            '${_formatValue(widget.activeFilter)}'
                       : widget.definition.label,
                   style: TextStyle(
                     fontSize: 13,
@@ -627,8 +628,8 @@ class _FilterOptionState extends State<_FilterOption> {
             color: widget.selected
                 ? colors.primary.base.withValues(alpha: 0.1)
                 : _hovered
-                    ? colors.surfaceSubtle
-                    : null,
+                ? colors.surfaceSubtle
+                : null,
             borderRadius: BorderRadius.circular(6),
           ),
           child: Text(

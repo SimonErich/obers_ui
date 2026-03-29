@@ -256,7 +256,7 @@ class _OiDialogShellOverlayState<T> extends State<_OiDialogShellOverlay<T>>
       ),
     );
 
-    _controller.forward();
+    unawaited(_controller.forward());
   }
 
   @override
@@ -291,9 +291,11 @@ class _OiDialogShellOverlayState<T> extends State<_OiDialogShellOverlay<T>>
       return;
     }
 
-    _controller.reverse().then((_) {
-      if (mounted) widget.onClose(result);
-    });
+    unawaited(
+      _controller.reverse().then((_) {
+        if (mounted) widget.onClose(result);
+      }),
+    );
   }
 
   @override

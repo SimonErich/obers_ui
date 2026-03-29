@@ -1,5 +1,4 @@
 // Tests do not require documentation comments.
-// ignore_for_file: public_member_api_docs
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -22,7 +21,7 @@ Widget _dropTarget({
     width: 600,
     height: 400,
     child: OiFileDropTarget(
-      onInternalDrop: onInternalDrop ?? (_, __) {},
+      onInternalDrop: onInternalDrop ?? (_, _) {},
       onExternalDrop: onExternalDrop ?? (_) {},
       enabled: enabled,
       dropMessage: dropMessage,

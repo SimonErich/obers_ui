@@ -441,7 +441,7 @@ class OiDateRangePickerField extends StatelessWidget {
         autovalidateMode: autovalidateMode,
         onSaved: onSaved,
         initialValue: _currentValue,
-        builder: (FormFieldState<(DateTime, DateTime)> state) {
+        builder: (state) {
           final resolvedError = error ?? state.errorText;
           return _buildField(context, resolvedError);
         },

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/persistence/oi_settings_driver.dart';
@@ -185,7 +187,7 @@ class _OiCalendarState extends State<OiCalendar>
     if (newDriver != _resolvedDriver) {
       _resolvedDriver = newDriver;
       if (settingsLoaded) {
-        reloadSettings();
+        unawaited(reloadSettings());
       }
     }
     if (settingsLoaded && settingsDriver != null) {
@@ -351,7 +353,7 @@ class _OiCalendarState extends State<OiCalendar>
           _buildModeSelector(context),
           SizedBox(height: sp.sm),
           if (widget.showAllDayRow && _allDayEvents.isNotEmpty)
-            _buildAllDayRow(context),    
+            _buildAllDayRow(context),
           Expanded(child: _buildBody(context)),
         ],
       ),

@@ -1,5 +1,4 @@
 // Tests do not require documentation comments.
-// ignore_for_file: public_member_api_docs
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -7,7 +6,7 @@ import 'package:obers_ui/src/components/inputs/oi_select.dart';
 
 import '../../../helpers/pump_app.dart';
 
-const _kOptions = [
+const List<OiSelectOption<String>> _kOptions = [
   OiSelectOption(value: 'a', label: 'Apple'),
   OiSelectOption(value: 'b', label: 'Banana'),
   OiSelectOption(value: 'c', label: 'Cherry', enabled: false),

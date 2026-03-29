@@ -474,7 +474,7 @@ class _OiShopProductDetailState extends State<OiShopProductDetail> {
           child: ListView.separated(
             scrollDirection: Axis.horizontal,
             itemCount: widget.related!.length,
-            separatorBuilder: (_, __) => SizedBox(width: sp.sm),
+            separatorBuilder: (_, _) => SizedBox(width: sp.sm),
             itemBuilder: (context, index) {
               final product = widget.related![index];
               return GestureDetector(
@@ -502,7 +502,7 @@ class _OiShopProductDetailState extends State<OiShopProductDetail> {
                                     product.imageUrl!,
                                     fit: BoxFit.cover,
                                     width: double.infinity,
-                                    errorBuilder: (_, __, ___) =>
+                                    errorBuilder: (_, _, _) =>
                                         const SizedBox.expand(),
                                   ),
                                 )
@@ -609,7 +609,7 @@ class _OiProductGallery extends StatelessWidget {
               child: Image.network(
                 imageUrls[safeIndex],
                 fit: BoxFit.contain,
-                errorBuilder: (_, __, ___) => Center(
+                errorBuilder: (_, _, _) => Center(
                   child: OiLabel.body(
                     'Image not available',
                     color: colors.textMuted,
@@ -627,7 +627,7 @@ class _OiProductGallery extends StatelessWidget {
               child: ListView.separated(
                 scrollDirection: Axis.horizontal,
                 itemCount: imageUrls.length,
-                separatorBuilder: (_, __) => SizedBox(width: sp.xs),
+                separatorBuilder: (_, _) => SizedBox(width: sp.xs),
                 itemBuilder: (context, index) {
                   final isSelected = index == safeIndex;
                   return GestureDetector(
@@ -653,7 +653,7 @@ class _OiProductGallery extends StatelessWidget {
                           child: Image.network(
                             imageUrls[index],
                             fit: BoxFit.cover,
-                            errorBuilder: (_, __, ___) =>
+                            errorBuilder: (_, _, _) =>
                                 Container(color: colors.surfaceSubtle),
                           ),
                         ),

@@ -79,7 +79,7 @@ class _OiDropZoneState<T extends Object> extends State<OiDropZone<T>> {
         widget.onAccept(details.data);
         _setState(OiDropState.idle);
       },
-      builder: (context, _, __) => widget.builder(context, _state),
+      builder: (context, _, _) => widget.builder(context, _state),
     );
   }
 }

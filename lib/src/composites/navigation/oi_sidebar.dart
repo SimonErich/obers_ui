@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/display/oi_badge.dart';
@@ -247,7 +249,7 @@ class _OiSidebarState extends State<OiSidebar>
     if (newDriver != _resolvedDriver) {
       _resolvedDriver = newDriver;
       if (settingsLoaded) {
-        reloadSettings();
+        unawaited(reloadSettings());
       }
     }
     if (settingsLoaded && settingsDriver != null) {
@@ -366,10 +368,10 @@ class _OiSidebarState extends State<OiSidebar>
     setState(() {
       if (_expandedParents.contains(parentId)) {
         _expandedParents.remove(parentId);
-        controller.reverse();
+        unawaited(controller.reverse());
       } else {
         _expandedParents.add(parentId);
-        controller.forward();
+        unawaited(controller.forward());
       }
       _rebuildFlatItems();
     });

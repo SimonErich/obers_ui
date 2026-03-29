@@ -1,5 +1,4 @@
 // Tests do not require documentation comments.
-// ignore_for_file: public_member_api_docs
 
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/buttons/oi_button.dart';
 import 'package:obers_ui/src/components/display/oi_page_indicator.dart';
@@ -147,10 +149,12 @@ class _OiOnboardingFlowState extends State<OiOnboardingFlow> {
   void _nextPage() {
     if (_isLastPage) return;
     final next = _currentPage + 1;
-    _pageController.animateToPage(
-      next,
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeInOut,
+    unawaited(
+      _pageController.animateToPage(
+        next,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      ),
     );
     // onPageChanged from the PageView will update _currentPage and fire
     // the callback, but we also set it eagerly so the UI is responsive.

@@ -204,7 +204,7 @@ class OiDatePickerField extends StatelessWidget {
         autovalidateMode: autovalidateMode,
         onSaved: onSaved,
         initialValue: value,
-        builder: (FormFieldState<DateTime> state) {
+        builder: (state) {
           final resolvedError = error ?? state.errorText;
           return _buildField(context, resolvedError);
         },

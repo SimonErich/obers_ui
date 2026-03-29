@@ -2773,15 +2773,13 @@ Collapsible sections.
 Mobile bottom navigation bar.
 
 **Key Parameters:**
-- `items` (List<OiBottomBarItem>, required) — Each has `icon`, `label`, `activeIcon`, `badgeCount`
+- `items` (List<OiNavigationItem>, required) — Each has `icon`, `label`, `activeIcon`, `badge`
 - `currentIndex` (int, required)
 - `onTap` (ValueChanged<int>, required)
 - `style` (OiBottomBarStyle, default: fixed) — fixed/shifting/labeled/iconOnly
 - `floatingAction` (Widget?) — FAB
 - `showLabels` (bool, default: true)
 - `landscapeMode` (OiBottomBarLandscapeMode, default: compact) — compact/rail/hidden
-
-> **Note:** `OiBottomBarItem` is being superseded by `OiNavigationItem` for shared use with `OiNavigationRail` and `OiResponsiveShell`. Use `OiNavigationItem.fromLegacy()` to convert existing `OiBottomBarItem` instances.
 
 **Use When:** Mobile app navigation (3-5 tabs).
 **Avoid When:** Desktop — use `OiSidebar` or `OiTabs`. Responsive apps — use `OiResponsiveShell` instead.

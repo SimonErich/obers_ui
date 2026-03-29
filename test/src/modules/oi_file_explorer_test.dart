@@ -1,5 +1,4 @@
 // Tests do not require documentation comments.
-// ignore_for_file: public_member_api_docs
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -87,10 +86,10 @@ Widget _explorer({
           onCreateFolder ??
           (parentId, name) async =>
               OiFileNodeData(id: 'new_folder', name: name, folder: true),
-      onRename: onRename ?? (_, __) async {},
+      onRename: onRename ?? (_, _) async {},
       onDelete: onDelete ?? (_) async {},
-      onMove: onMove ?? (_, __) async {},
-      onUpload: onUpload ?? (_, __) async {},
+      onMove: onMove ?? (_, _) async {},
+      onUpload: onUpload ?? (_, _) async {},
       defaultViewMode: defaultViewMode,
       showSidebar: showSidebar,
       enableUpload: enableUpload,
@@ -563,7 +562,7 @@ void main() {
           (w) =>
               w is Semantics &&
               w.properties.label == 'My Files' &&
-              w.container == true,
+              w.container,
         ),
         findsOneWidget,
       );

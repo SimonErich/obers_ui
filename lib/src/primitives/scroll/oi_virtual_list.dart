@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/foundation/oi_app.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
@@ -108,7 +110,7 @@ class _OiVirtualListState extends State<OiVirtualList> {
         if (_overscrollAccumulated >= _kRefreshTriggerDistance &&
             !_isRefreshing) {
           _overscrollAccumulated = 0;
-          _triggerRefresh();
+          unawaited(_triggerRefresh());
         }
       }
     }
@@ -178,7 +180,8 @@ class _OiSpinnerState extends State<_OiSpinner>
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 800),
-    )..repeat();
+    );
+    unawaited(_controller.repeat());
   }
 
   @override
@@ -195,7 +198,7 @@ class _OiSpinnerState extends State<_OiSpinner>
         ..stop()
         ..value = 0;
     } else if (!reduced && !_controller.isAnimating) {
-      _controller.repeat();
+      unawaited(_controller.repeat());
     }
   }
 

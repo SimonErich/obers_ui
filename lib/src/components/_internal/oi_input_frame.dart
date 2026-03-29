@@ -1,5 +1,4 @@
 // Internal widget — no need for public doc comments on private class
-// ignore_for_file: public_member_api_docs
 
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/foundation/oi_icons.dart';
@@ -61,7 +60,7 @@ class OiInputFrame extends StatelessWidget {
       children: [
         if (leading != null) ...[leading!, const SizedBox(width: 8)],
         Expanded(child: child),
-        if (trailing != null) trailing!,
+        ?trailing,
       ],
     );
 

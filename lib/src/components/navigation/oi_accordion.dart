@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/persistence/oi_settings_driver.dart';
@@ -152,7 +154,7 @@ class _OiAccordionState extends State<OiAccordion>
     if (newDriver != _resolvedDriver) {
       _resolvedDriver = newDriver;
       if (settingsLoaded) {
-        reloadSettings();
+        unawaited(reloadSettings());
       }
     }
     if (settingsLoaded && settingsDriver != null) {
@@ -194,14 +196,14 @@ class _OiAccordionState extends State<OiAccordion>
       // Close all others.
       for (var i = 0; i < _controllers.length; i++) {
         if (i != index && _controllers[i].value > 0) {
-          _controllers[i].reverse();
+          unawaited(_controllers[i].reverse());
         }
       }
     }
     if (isCurrentlyOpen) {
-      _controllers[index].reverse();
+      unawaited(_controllers[index].reverse());
     } else {
-      _controllers[index].forward();
+      unawaited(_controllers[index].forward());
     }
     updateSettings(_toSettings(), debounce: widget.settingsSaveDebounce);
   }

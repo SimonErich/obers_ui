@@ -1,5 +1,4 @@
 // Tests do not require documentation comments.
-// ignore_for_file: public_member_api_docs
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -98,7 +97,7 @@ void main() {
     await tester.pumpObers(
       ValueListenableBuilder<bool>(
         valueListenable: notifier,
-        builder: (_, active, __) =>
+        builder: (_, active, _) =>
             OiPulse(active: active, child: const Text('toggle')),
       ),
     );

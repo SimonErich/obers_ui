@@ -1,5 +1,4 @@
 // Tests do not require documentation comments.
-// ignore_for_file: public_member_api_docs
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -7,7 +6,7 @@ import 'package:obers_ui/src/components/inputs/oi_radio.dart';
 
 import '../../../helpers/pump_app.dart';
 
-const _kOptions = [
+const List<OiRadioOption<String>> _kOptions = [
   OiRadioOption(value: 'a', label: 'Alpha'),
   OiRadioOption(value: 'b', label: 'Beta'),
   OiRadioOption(value: 'c', label: 'Gamma', enabled: false),

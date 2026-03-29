@@ -1,58 +1,15 @@
+import 'dart:async';
+
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
-import 'package:obers_ui/obers_ui.dart' show OiNavigationRail;
-import 'package:obers_ui/src/components/navigation/oi_navigation_rail.dart' show OiNavigationRail;
+import 'package:obers_ui/src/components/navigation/oi_navigation_rail.dart'
+    show OiNavigationRail;
+import 'package:obers_ui/src/composites/navigation/oi_responsive_shell.dart'
+    show OiResponsiveShell;
 import 'package:obers_ui/src/foundation/oi_responsive.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/models/oi_navigation_item.dart';
 import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
-
-/// A single item in an [OiBottomBar].
-///
-/// **Deprecated:** Use [OiNavigationItem] instead. This class will be removed
-/// in a future release. Use [OiNavigationItem.fromLegacy] to convert.
-///
-/// {@category Components}
-@Deprecated('Use OiNavigationItem instead. '
-    'Migrate with OiNavigationItem.fromLegacy().')
-class OiBottomBarItem {
-  /// Creates an [OiBottomBarItem].
-  @Deprecated('Use OiNavigationItem instead.')
-  const OiBottomBarItem({
-    required this.icon,
-    required this.label,
-    this.activeIcon,
-    this.badgeCount,
-    this.showBadge = true,
-  });
-
-  /// The icon shown when this item is not selected.
-  final IconData icon;
-
-  /// The label shown below the icon (always required for accessibility).
-  final String label;
-
-  /// An optional icon shown instead of [icon] when this item is selected.
-  final IconData? activeIcon;
-
-  /// An optional badge count shown over the icon.  Counts >99 display as '99+'.
-  final int? badgeCount;
-
-  /// Whether to show the badge overlay.  Defaults to `true`.
-  ///
-  /// The badge is only visible when both [showBadge] is `true` and
-  /// [badgeCount] is non-null and greater than zero.
-  final bool showBadge;
-
-  /// Converts this item to the new [OiNavigationItem] model.
-  OiNavigationItem toNavigationItem() => OiNavigationItem.fromLegacy(
-        icon: icon,
-        label: label,
-        activeIcon: activeIcon,
-        badgeCount: badgeCount,
-        showBadge: showBadge,
-      );
-}
 
 /// The visual style of an [OiBottomBar].
 ///
@@ -108,9 +65,9 @@ enum OiBottomBarLandscapeMode {
 /// ```dart
 /// OiBottomBar(
 ///   items: const [
-///     OiBottomBarItem(icon: Icons.home, label: 'Home'),
-///     OiBottomBarItem(icon: Icons.search, label: 'Search'),
-///     OiBottomBarItem(icon: Icons.person, label: 'Profile'),
+///     OiNavigationItem(icon: Icons.home, label: 'Home'),
+///     OiNavigationItem(icon: Icons.search, label: 'Search'),
+///     OiNavigationItem(icon: Icons.person, label: 'Profile'),
 ///   ],
 ///   currentIndex: _tab,
 ///   onTap: (i) => setState(() => _tab = i),
@@ -136,39 +93,20 @@ class OiBottomBar extends StatelessWidget {
 
   /// The navigation items to display.
   ///
-  /// For new code, prefer constructing [OiNavigationItem] instances and
-  /// converting them via the [fromNavigationItems] helper:
-  ///
-  /// ```dart
-  /// OiBottomBar(
-  ///   items: OiBottomBar.fromNavigationItems(navItems),
-  ///   ...
-  /// )
-  /// ```
-  // ignore: deprecated_member_use_from_same_package
-  final List<OiBottomBarItem> items;
+  /// This list is shared with [OiNavigationRail] and [OiResponsiveShell] —
+  /// create [OiNavigationItem] instances once and pass them to all navigation
+  /// widgets.
+  final List<OiNavigationItem> items;
 
-  /// Converts a list of [OiNavigationItem] to [OiBottomBarItem] for use
-  /// with [OiBottomBar].
+  /// Returns [items] unchanged.
   ///
-  /// This enables sharing the same navigation model between [OiBottomBar]
-  /// and [OiNavigationRail].
-  // ignore: deprecated_member_use_from_same_package
-  static List<OiBottomBarItem> fromNavigationItems(
+  /// This helper exists for API compatibility.  Since [OiBottomBar] now
+  /// accepts [OiNavigationItem] directly, you can pass the list directly
+  /// without calling this method.
+  static List<OiNavigationItem> fromNavigationItems(
     List<OiNavigationItem> items,
   ) {
-    return items
-        .map(
-          (item) =>
-              // ignore: deprecated_member_use_from_same_package — OiBottomBar still accepts the legacy type; OiNavigationItem is the preferred API
-              OiBottomBarItem(
-            icon: item.icon,
-            label: item.label,
-            activeIcon: item.activeIcon,
-            badgeCount: item.badge != null ? int.tryParse(item.badge!) : null,
-          ),
-        )
-        .toList();
+    return items;
   }
 
   /// The index of the currently active item.
@@ -401,18 +339,15 @@ class OiBottomBar extends StatelessWidget {
 
   Widget _buildIconWithBadge(
     BuildContext context,
-    OiBottomBarItem item,
+    OiNavigationItem item,
     IconData iconData,
     Color iconColor,
   ) {
     final colors = context.colors;
     Widget iconWidget = Icon(iconData, size: 24, color: iconColor);
 
-    final effectiveBadgeCount = item.badgeCount;
-    final hasBadge =
-        item.showBadge &&
-        effectiveBadgeCount != null &&
-        effectiveBadgeCount > 0;
+    final badgeText = item.badge;
+    final hasBadge = badgeText != null && badgeText.isNotEmpty;
 
     if (hasBadge) {
       iconWidget = Stack(
@@ -429,7 +364,7 @@ class OiBottomBar extends StatelessWidget {
                 borderRadius: BorderRadius.circular(9999),
               ),
               child: Text(
-                effectiveBadgeCount > 99 ? '99+' : '$effectiveBadgeCount',
+                badgeText,
                 style: TextStyle(
                   fontSize: 10,
                   fontWeight: FontWeight.w600,
@@ -465,7 +400,7 @@ class OiBottomBar extends StatelessWidget {
 
   void _handleTap(int index) {
     if (haptic) {
-      HapticFeedback.selectionClick();
+      unawaited(HapticFeedback.selectionClick());
     }
     onTap(index);
   }

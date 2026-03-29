@@ -1,5 +1,4 @@
 // Tests do not require documentation comments.
-// ignore_for_file: public_member_api_docs
 
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
@@ -13,7 +12,7 @@ void main() {
   group('OiUploadDialog', () {
     testWidgets('renders without errors', (tester) async {
       await tester.pumpObers(
-        OiUploadDialog(onUpload: (_, __) {}),
+        OiUploadDialog(onUpload: (_, _) {}),
         surfaceSize: const Size(600, 800),
       );
       expect(find.byType(OiUploadDialog), findsOneWidget);
@@ -21,7 +20,7 @@ void main() {
 
     testWidgets('shows Upload Files title by default', (tester) async {
       await tester.pumpObers(
-        OiUploadDialog(onUpload: (_, __) {}),
+        OiUploadDialog(onUpload: (_, _) {}),
         surfaceSize: const Size(600, 800),
       );
       expect(find.text('Upload Files'), findsOneWidget);
@@ -31,7 +30,7 @@ void main() {
       tester,
     ) async {
       await tester.pumpObers(
-        OiUploadDialog(onUpload: (_, __) {}, destinationPath: '/Documents'),
+        OiUploadDialog(onUpload: (_, _) {}, destinationPath: '/Documents'),
         surfaceSize: const Size(600, 800),
       );
       expect(find.text('Upload to: /Documents'), findsOneWidget);
@@ -40,7 +39,7 @@ void main() {
 
     testWidgets('shows drop zone text', (tester) async {
       await tester.pumpObers(
-        OiUploadDialog(onUpload: (_, __) {}),
+        OiUploadDialog(onUpload: (_, _) {}),
         surfaceSize: const Size(600, 800),
       );
       expect(find.text('Drop files here or browse'), findsOneWidget);
@@ -48,7 +47,7 @@ void main() {
 
     testWidgets('shows conflict resolution selector', (tester) async {
       await tester.pumpObers(
-        OiUploadDialog(onUpload: (_, __) {}),
+        OiUploadDialog(onUpload: (_, _) {}),
         surfaceSize: const Size(600, 800),
       );
       expect(find.text('If file exists:'), findsOneWidget);
@@ -56,7 +55,7 @@ void main() {
 
     testWidgets('Upload button present when no files added', (tester) async {
       await tester.pumpObers(
-        OiUploadDialog(onUpload: (_, __) {}),
+        OiUploadDialog(onUpload: (_, _) {}),
         surfaceSize: const Size(600, 800),
       );
       expect(find.widgetWithText(OiButton, 'Upload'), findsOneWidget);
@@ -67,7 +66,7 @@ void main() {
     ) async {
       var called = false;
       await tester.pumpObers(
-        OiUploadDialog(onUpload: (_, __) => called = true),
+        OiUploadDialog(onUpload: (_, _) => called = true),
         surfaceSize: const Size(600, 800),
       );
       await tester.tap(
@@ -81,7 +80,7 @@ void main() {
     testWidgets('tapping Cancel fires onCancel', (tester) async {
       var cancelled = false;
       await tester.pumpObers(
-        OiUploadDialog(onUpload: (_, __) {}, onCancel: () => cancelled = true),
+        OiUploadDialog(onUpload: (_, _) {}, onCancel: () => cancelled = true),
         surfaceSize: const Size(600, 800),
       );
       await tester.tap(find.widgetWithText(OiButton, 'Cancel'));
@@ -92,7 +91,7 @@ void main() {
     testWidgets('ESC key fires onCancel', (tester) async {
       var cancelled = false;
       await tester.pumpObers(
-        OiUploadDialog(onUpload: (_, __) {}, onCancel: () => cancelled = true),
+        OiUploadDialog(onUpload: (_, _) {}, onCancel: () => cancelled = true),
         surfaceSize: const Size(600, 800),
       );
       final kl = tester.widget<KeyboardListener>(find.byType(KeyboardListener));
@@ -105,7 +104,7 @@ void main() {
 
     testWidgets('has correct semantics label', (tester) async {
       await tester.pumpObers(
-        OiUploadDialog(onUpload: (_, __) {}),
+        OiUploadDialog(onUpload: (_, _) {}),
         surfaceSize: const Size(600, 800),
       );
       expect(find.bySemanticsLabel(RegExp('Upload dialog')), findsOneWidget);
@@ -113,7 +112,7 @@ void main() {
 
     testWidgets('does not show file list when no files added', (tester) async {
       await tester.pumpObers(
-        OiUploadDialog(onUpload: (_, __) {}),
+        OiUploadDialog(onUpload: (_, _) {}),
         surfaceSize: const Size(600, 800),
       );
       expect(find.text('Files to upload:'), findsNothing);
@@ -121,7 +120,7 @@ void main() {
 
     testWidgets('default conflict resolution is ask', (tester) async {
       await tester.pumpObers(
-        OiUploadDialog(onUpload: (_, __) {}),
+        OiUploadDialog(onUpload: (_, _) {}),
         surfaceSize: const Size(600, 800),
       );
       expect(find.text('Ask'), findsOneWidget);
@@ -130,7 +129,7 @@ void main() {
     testWidgets('custom default resolution is respected', (tester) async {
       await tester.pumpObers(
         OiUploadDialog(
-          onUpload: (_, __) {},
+          onUpload: (_, _) {},
           defaultResolution: OiConflictResolution.replace,
         ),
         surfaceSize: const Size(600, 800),
@@ -141,7 +140,7 @@ void main() {
     testWidgets('renders with allowed extensions constraint', (tester) async {
       await tester.pumpObers(
         OiUploadDialog(
-          onUpload: (_, __) {},
+          onUpload: (_, _) {},
           allowedExtensions: const ['pdf', 'docx'],
         ),
         surfaceSize: const Size(600, 800),
@@ -151,7 +150,7 @@ void main() {
 
     testWidgets('renders with max file size constraint', (tester) async {
       await tester.pumpObers(
-        OiUploadDialog(onUpload: (_, __) {}, maxFileSize: 1024 * 1024),
+        OiUploadDialog(onUpload: (_, _) {}, maxFileSize: 1024 * 1024),
         surfaceSize: const Size(600, 800),
       );
       expect(find.byType(OiUploadDialog), findsOneWidget);
@@ -159,7 +158,7 @@ void main() {
 
     testWidgets('renders with max files constraint', (tester) async {
       await tester.pumpObers(
-        OiUploadDialog(onUpload: (_, __) {}, maxFiles: 5),
+        OiUploadDialog(onUpload: (_, _) {}, maxFiles: 5),
         surfaceSize: const Size(600, 800),
       );
       expect(find.byType(OiUploadDialog), findsOneWidget);
@@ -167,7 +166,7 @@ void main() {
 
     testWidgets('Cancel and Upload buttons are both visible', (tester) async {
       await tester.pumpObers(
-        OiUploadDialog(onUpload: (_, __) {}),
+        OiUploadDialog(onUpload: (_, _) {}),
         surfaceSize: const Size(600, 800),
       );
       expect(find.widgetWithText(OiButton, 'Cancel'), findsOneWidget);

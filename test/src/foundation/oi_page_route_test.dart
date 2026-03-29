@@ -1,5 +1,6 @@
 // Tests do not require documentation comments.
-// ignore_for_file: public_member_api_docs
+
+import 'dart:async';
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -16,9 +17,11 @@ void main() {
           builder: (context) {
             return GestureDetector(
               onTap: () {
-                Navigator.of(context).push<void>(
-                  OiPageRoute<void>(
-                    builder: (_) => const Text('Page 2'),
+                unawaited(
+                  Navigator.of(context).push<void>(
+                    OiPageRoute<void>(
+                      builder: (_) => const Text('Page 2'),
+                    ),
                   ),
                 );
               },
@@ -40,10 +43,12 @@ void main() {
           builder: (context) {
             return GestureDetector(
               onTap: () {
-                Navigator.of(context).push<void>(
-                  OiPageRoute<void>(
-                    builder: (_) => const Text('Slid Page'),
-                    transition: OiPageTransitionType.slideHorizontal,
+                unawaited(
+                  Navigator.of(context).push<void>(
+                    OiPageRoute<void>(
+                      builder: (_) => const Text('Slid Page'),
+                      transition: OiPageTransitionType.slideHorizontal,
+                    ),
                   ),
                 );
               },
@@ -65,10 +70,12 @@ void main() {
           builder: (context) {
             return GestureDetector(
               onTap: () {
-                Navigator.of(context).push<void>(
-                  OiPageRoute<void>(
-                    builder: (_) => const Text('Instant Page'),
-                    transition: OiPageTransitionType.none,
+                unawaited(
+                  Navigator.of(context).push<void>(
+                    OiPageRoute<void>(
+                      builder: (_) => const Text('Instant Page'),
+                      transition: OiPageTransitionType.none,
+                    ),
                   ),
                 );
               },
@@ -174,8 +181,7 @@ void main() {
         ),
       );
 
-      final route =
-          page.createRoute(capturedContext) as OiPageRoute<void>;
+      final route = page.createRoute(capturedContext) as OiPageRoute<void>;
       expect(route.transition, OiPageTransitionType.slideVertical);
     });
 
@@ -196,8 +202,7 @@ void main() {
         ),
       );
 
-      final route =
-          page.createRoute(capturedContext) as OiPageRoute<void>;
+      final route = page.createRoute(capturedContext) as OiPageRoute<void>;
       expect(route.transitionDuration, const Duration(milliseconds: 500));
       expect(
         route.reverseTransitionDuration,

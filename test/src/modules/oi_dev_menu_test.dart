@@ -1,5 +1,4 @@
 // Tests do not require documentation comments.
-// ignore_for_file: public_member_api_docs
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -122,7 +121,7 @@ void main() {
             label: 'Dev Menu',
             featureFlags: _flags,
             featureFlagValues: const {'dark_mode': false, 'new_ui': true},
-            onFeatureFlagChange: (key, {required bool value}) {
+            onFeatureFlagChange: (key, {required value}) {
               changedKey = key;
               changedValue = value;
             },

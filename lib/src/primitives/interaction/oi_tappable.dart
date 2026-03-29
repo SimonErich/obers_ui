@@ -229,7 +229,7 @@ class _OiTappableState extends State<OiTappable> {
     }
 
     // Halo / glow rendered as a DecoratedBox behind the content.
-    final halo = style.halo; // ignore: omit_local_variable_types
+    final halo = style.halo;
     if (halo != OiHaloStyle.none &&
         (halo.color.a > 0 || halo.spread > 0 || halo.blur > 0)) {
       content = DecoratedBox(

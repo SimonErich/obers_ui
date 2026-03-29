@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/display/oi_empty_state.dart';
 import 'package:obers_ui/src/components/display/oi_progress.dart';
@@ -150,8 +152,7 @@ class OiActivityFeed extends StatelessWidget {
                 child: OiTappable(
                   clipBorderRadius: BorderRadius.circular(6),
                   onTap: () {
-                    final value =
-                        activeCategory == category ? null : category;
+                    final value = activeCategory == category ? null : category;
                     onCategoryChange?.call(value);
                   },
                   child: Container(
@@ -260,7 +261,7 @@ class _OiActivityFeedListState extends State<_OiActivityFeedList> {
     final maxScroll = _scrollController.position.maxScrollExtent;
     final currentScroll = _scrollController.position.pixels;
     if (currentScroll >= maxScroll - 100) {
-      widget.onLoadMore!();
+      unawaited(widget.onLoadMore!());
     }
   }
 

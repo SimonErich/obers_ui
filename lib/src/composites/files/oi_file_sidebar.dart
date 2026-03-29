@@ -286,8 +286,8 @@ class _OiFileSidebarState extends State<OiFileSidebar> {
                         context,
                         node,
                         depth, {
-                        required bool expanded,
-                        required bool selected,
+                        required expanded,
+                        required selected,
                       }) {
                         final folder =
                             node.data ??
@@ -321,14 +321,14 @@ class _OiFileSidebarState extends State<OiFileSidebar> {
                               widget.onFileDrop!(files, folder);
                             },
                             builder: (ctx, state) {
-                              return Container(
+                              return DecoratedBox(
                                 decoration: state == OiDropState.hovering
                                     ? BoxDecoration(
                                         color: context.colors.primary.muted
                                             .withValues(alpha: 0.15),
                                         borderRadius: BorderRadius.circular(4),
                                       )
-                                    : null,
+                                    : const BoxDecoration(),
                                 child: innerTreeItem,
                               );
                             },
@@ -384,7 +384,8 @@ class _OiFileSidebarState extends State<OiFileSidebar> {
                               widget.selectedFolderId!,
                             )
                           : null;
-                      final target = selected ??
+                      final target =
+                          selected ??
                           (widget.folderTree.isNotEmpty
                               ? widget.folderTree.first.data
                               : const OiFileNodeData(
@@ -575,13 +576,13 @@ class _FavoriteRow extends StatelessWidget {
         onWillAccept: (_) => true,
         onAccept: (files) => onFileDrop!(files, folder),
         builder: (ctx, state) {
-          return Container(
+          return DecoratedBox(
             decoration: state == OiDropState.hovering
                 ? BoxDecoration(
                     color: colors.primary.muted.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(4),
                   )
-                : null,
+                : const BoxDecoration(),
             child: row,
           );
         },

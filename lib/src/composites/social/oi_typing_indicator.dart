@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/display/oi_avatar.dart';
 import 'package:obers_ui/src/composites/social/oi_avatar_stack.dart';
@@ -50,7 +52,8 @@ class _OiTypingIndicatorState extends State<OiTypingIndicator>
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 600),
-    )..repeat();
+    );
+    unawaited(_controller.repeat());
   }
 
   @override
@@ -67,7 +70,7 @@ class _OiTypingIndicatorState extends State<OiTypingIndicator>
         ..stop()
         ..value = 0;
     } else if (!reduced && !_controller.isAnimating) {
-      _controller.repeat();
+      unawaited(_controller.repeat());
     }
   }
 

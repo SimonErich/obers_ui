@@ -1,5 +1,4 @@
 // Tests do not require documentation comments.
-// ignore_for_file: public_member_api_docs
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -761,7 +760,6 @@ void main() {
         // Trigger submit via the state's submit method.
         final state = formKey.currentState!;
         // `submit()` is an internal method not exposed through the public interface.
-        // ignore: avoid_dynamic_calls
         (state as dynamic).submit();
         await tester.pump();
 
@@ -786,7 +784,6 @@ void main() {
         );
 
         // First trigger with empty fields to show errors.
-        // ignore: avoid_dynamic_calls
         (formKey.currentState! as dynamic).submit();
         await tester.pump();
         expect(find.text('Street address is required'), findsOneWidget);
@@ -805,7 +802,6 @@ void main() {
         await tester.pump();
 
         // Submit again — should succeed.
-        // ignore: avoid_dynamic_calls
         (formKey.currentState! as dynamic).submit();
         await tester.pump();
 
@@ -824,7 +820,6 @@ void main() {
         );
 
         // `submit()` is an internal method not exposed through the public interface.
-        // ignore: avoid_dynamic_calls
         (formKey.currentState! as dynamic).submit();
         await tester.pump();
 
@@ -849,7 +844,6 @@ void main() {
         );
 
         // `submit()` is an internal method not exposed through the public interface.
-        // ignore: avoid_dynamic_calls
         (formKey.currentState! as dynamic).submit();
         await tester.pump();
 

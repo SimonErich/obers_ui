@@ -52,7 +52,7 @@ class _OiPopoverState extends State<OiPopover> {
 
     Widget popoverContent = OiFocusTrap(
       onEscape: widget.onClose,
-      child: Container(
+      child: DecoratedBox(
         decoration: BoxDecoration(
           color: colors.surface,
           borderRadius: BorderRadius.circular(8),

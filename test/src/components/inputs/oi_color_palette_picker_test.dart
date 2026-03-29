@@ -1,5 +1,4 @@
 // Tests do not require documentation comments.
-// ignore_for_file: public_member_api_docs
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -39,7 +38,7 @@ void main() {
       OiColorPalettePicker(
         label: 'Colors',
         slots: const [redSlot, blueSlot, unsetSlot],
-        onSlotChanged: (_, __) {},
+        onSlotChanged: (_, _) {},
       ),
     );
     // Each slot gets an OiTappable wrapper.
@@ -52,7 +51,7 @@ void main() {
       OiColorPalettePicker(
         label: 'Colors',
         slots: const [redSlot],
-        onSlotChanged: (_, __) {},
+        onSlotChanged: (_, _) {},
       ),
     );
     // A filled slot renders a DecoratedBox with a color — look for the
@@ -73,7 +72,7 @@ void main() {
       OiColorPalettePicker(
         label: 'Colors',
         slots: const [unsetSlot],
-        onSlotChanged: (_, __) {},
+        onSlotChanged: (_, _) {},
       ),
     );
     // An unset slot renders a CustomPaint with _DashedCirclePainter.
@@ -85,7 +84,7 @@ void main() {
       OiColorPalettePicker(
         label: 'Colors',
         slots: const [redSlot, unsetSlot],
-        onSlotChanged: (_, __) {},
+        onSlotChanged: (_, _) {},
       ),
     );
     // compact=true (default) — slot labels should NOT appear as text.
@@ -99,7 +98,7 @@ void main() {
         label: 'Colors',
         compact: false,
         slots: const [redSlot, unsetSlot],
-        onSlotChanged: (_, __) {},
+        onSlotChanged: (_, _) {},
       ),
     );
     expect(find.text('Primary'), findsOneWidget);
@@ -111,7 +110,7 @@ void main() {
       OiColorPalettePicker(
         label: 'Colors',
         slots: const [redSlot],
-        onSlotChanged: (_, __) {},
+        onSlotChanged: (_, _) {},
         presets: testPresets,
       ),
     );
@@ -124,7 +123,7 @@ void main() {
       OiColorPalettePicker(
         label: 'Colors',
         slots: const [redSlot],
-        onSlotChanged: (_, __) {},
+        onSlotChanged: (_, _) {},
         showPresets: false,
         presets: testPresets,
       ),
@@ -139,7 +138,7 @@ void main() {
       OiColorPalettePicker(
         label: 'Colors',
         slots: const [redSlot],
-        onSlotChanged: (_, __) {},
+        onSlotChanged: (_, _) {},
         presets: testPresets,
         onPresetSelected: (p) => selected = p,
       ),
@@ -156,7 +155,7 @@ void main() {
       OiColorPalettePicker(
         label: 'Brand colors',
         slots: const [redSlot],
-        onSlotChanged: (_, __) {},
+        onSlotChanged: (_, _) {},
       ),
     );
     // The outermost Semantics widget should carry the label.
@@ -171,7 +170,7 @@ void main() {
       OiColorPalettePicker(
         label: 'Colors',
         slots: const [],
-        onSlotChanged: (_, __) {},
+        onSlotChanged: (_, _) {},
       ),
     );
     expect(find.byType(OiColorPalettePicker), findsOneWidget);

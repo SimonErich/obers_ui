@@ -1,4 +1,3 @@
-// ignore_for_file: public_member_api_docs // No public API docs needed in test files.
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui/src/foundation/theme/oi_spacing_scale.dart';
@@ -77,7 +76,6 @@ void main() {
       test('identical instance equals itself', () {
         final scale = OiSpacingScale.standard();
         // Comparing a value to itself via == to verify the identity fast-path.
-        // ignore: unrelated_type_equality_checks
         expect(scale == scale, isTrue);
       });
 

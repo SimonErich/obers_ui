@@ -209,7 +209,7 @@ class OiTimePickerField extends StatelessWidget {
         autovalidateMode: autovalidateMode,
         onSaved: onSaved,
         initialValue: value,
-        builder: (FormFieldState<OiTimeOfDay> state) {
+        builder: (state) {
           final resolvedError = error ?? state.errorText;
           return _buildField(context, resolvedError);
         },

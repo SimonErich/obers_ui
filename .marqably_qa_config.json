@@ -1,0 +1,18 @@
+{
+  "version": "1.0.0",
+  "initialized_at": "2026-03-29T00:00:00Z",
+  "project_type": "flutter",
+  "project_name": "obers_ui",
+  "features_folder": "features",
+  "core_folder": "core",
+  "uikit_folder": "uikit",
+  "routing_folder": "navigation",
+  "layer_mapping": {
+    "presentation": "presentation",
+    "domain": "domain",
+    "data": "data"
+  },
+  "ui_library": "obers_ui",
+  "packages_configured": ["obers_ui"],
+  "boilerplate_path": "/home/simonerich/.pub-cache/git/dart-flutter-qa-rules-13089de13f32a40eec6e89e772d22092a61b1a15/"
+}

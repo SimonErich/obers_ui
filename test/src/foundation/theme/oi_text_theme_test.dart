@@ -1,5 +1,4 @@
 // Tests for OiTextTheme and OiLabelVariant — no public API docs needed in test files.
-// ignore_for_file: public_member_api_docs
 
 import 'package:flutter/painting.dart';
 import 'package:flutter_test/flutter_test.dart';

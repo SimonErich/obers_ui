@@ -363,7 +363,7 @@ class _OiConsentBannerState extends State<OiConsentBanner> {
     final buttons = [
       acceptButton,
       rejectButton,
-      if (manageButton != null) manageButton,
+      ?manageButton,
     ];
 
     if (isCompact) {

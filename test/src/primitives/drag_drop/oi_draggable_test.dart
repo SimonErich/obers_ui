@@ -1,5 +1,4 @@
 // Tests do not require documentation comments.
-// ignore_for_file: public_member_api_docs
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -96,7 +95,7 @@ void main() {
             ),
             DragTarget<String>(
               onAcceptWithDetails: (_) {},
-              builder: (_, __, ___) => const SizedBox(
+              builder: (_, _, _) => const SizedBox(
                 key: Key('tgt'),
                 width: 80,
                 height: 80,

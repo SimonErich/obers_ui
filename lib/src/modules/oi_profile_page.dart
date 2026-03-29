@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/buttons/oi_button.dart';
 import 'package:obers_ui/src/components/display/oi_avatar.dart';
@@ -267,10 +269,12 @@ class _OiProfilePageState extends State<OiProfilePage> {
     final key = entries[index].key;
     final ctx = key.currentContext;
     if (ctx != null) {
-      Scrollable.ensureVisible(
-        ctx,
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeInOut,
+      unawaited(
+        Scrollable.ensureVisible(
+          ctx,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+        ),
       );
     }
     setState(() => _activeNavIndex = index);

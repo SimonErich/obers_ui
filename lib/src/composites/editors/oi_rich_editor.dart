@@ -743,7 +743,7 @@ class _OiRichEditorState extends State<OiRichEditor> {
               ],
             ),
           ),
-          if (wordCount != null) wordCount,
+          ?wordCount,
         ],
       ),
     );

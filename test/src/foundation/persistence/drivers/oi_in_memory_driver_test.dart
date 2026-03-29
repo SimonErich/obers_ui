@@ -6,7 +6,6 @@ import 'package:obers_ui/src/foundation/persistence/oi_settings_data.dart';
 import 'driver_contract_tests.dart';
 
 // Const constructors omitted in tests for readability.
-// ignore_for_file: prefer_const_constructors
 
 class _TestSettings with OiSettingsData {
   const _TestSettings({this.count = 0});

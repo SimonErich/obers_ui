@@ -1,5 +1,4 @@
 // Tests do not require documentation comments.
-// ignore_for_file: public_member_api_docs
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -198,7 +197,7 @@ void main() {
 
     final semanticsFinder = find.byWidgetPredicate(
       (w) =>
-          w is Semantics && w.container == true && w.properties.label == 'Tags',
+          w is Semantics && w.container && w.properties.label == 'Tags',
     );
     expect(semanticsFinder, findsOneWidget);
 

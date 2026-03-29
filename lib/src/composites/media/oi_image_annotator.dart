@@ -116,7 +116,7 @@ class _OiImageAnnotatorState extends State<OiImageAnnotator> {
 
   // ── Tool labels ─────────────────────────────────────────────────────────
 
-  static const _toolLabels = {
+  static const Map<OiAnnotationType, String> _toolLabels = {
     OiAnnotationType.freehand: 'Draw',
     OiAnnotationType.rectangle: 'Rect',
     OiAnnotationType.circle: 'Circle',

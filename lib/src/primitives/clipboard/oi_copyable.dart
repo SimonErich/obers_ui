@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/primitives/interaction/oi_touch_target.dart';
@@ -55,7 +57,7 @@ class OiCopyable extends StatelessWidget {
         HardwareKeyboard.instance.isMetaPressed;
 
     if (isCtrlOrMeta && event.logicalKey == LogicalKeyboardKey.keyC) {
-      _copy();
+      unawaited(_copy());
       return KeyEventResult.handled;
     }
     return KeyEventResult.ignored;

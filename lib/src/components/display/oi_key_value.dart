@@ -145,10 +145,10 @@ class OiKeyValue extends StatelessWidget {
           gap: OiResponsive<double>(spacing.sm),
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (leading != null) leading!,
+            ?leading,
             labelWidget,
             Expanded(child: valueContent),
-            if (trailing != null) trailing!,
+            ?trailing,
           ],
         ),
       );
@@ -169,7 +169,7 @@ class OiKeyValue extends StatelessWidget {
             else
               labelWidget,
             valueContent,
-            if (trailing != null) trailing!,
+            ?trailing,
           ],
         ),
       );

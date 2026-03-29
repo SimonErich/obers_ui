@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
@@ -52,10 +54,12 @@ class OiPasteZone extends StatelessWidget {
         HardwareKeyboard.instance.isMetaPressed;
 
     if (isCtrlOrMeta && event.logicalKey == LogicalKeyboardKey.keyV) {
-      Clipboard.getData(Clipboard.kTextPlain).then((data) {
-        final text = data?.text;
-        if (text != null) onPaste(text);
-      });
+      unawaited(
+        Clipboard.getData(Clipboard.kTextPlain).then((data) {
+          final text = data?.text;
+          if (text != null) onPaste(text);
+        }),
+      );
       return KeyEventResult.handled;
     }
     return KeyEventResult.ignored;

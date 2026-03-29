@@ -1,5 +1,6 @@
 // Internal widget — no need for public doc comments on private class
-// ignore_for_file: public_member_api_docs
+
+import 'dart:async';
 
 import 'package:flutter/semantics.dart';
 import 'package:flutter/services.dart';
@@ -62,8 +63,7 @@ class _OiOtpInputState extends State<OiOtpInput> {
     super.dispose();
   }
 
-  String get _currentValue =>
-      _controllers.map((c) => c.text).join();
+  String get _currentValue => _controllers.map((c) => c.text).join();
 
   void _onControllerChanged(int index) {
     final text = _controllers[index].text;
@@ -90,7 +90,11 @@ class _OiOtpInputState extends State<OiOtpInput> {
       return;
     }
 
-    for (var i = 0; i < digits.length && (startIndex + i) < widget.length; i++) {
+    for (
+      var i = 0;
+      i < digits.length && (startIndex + i) < widget.length;
+      i++
+    ) {
       _controllers[startIndex + i].text = digits[i];
     }
 
@@ -108,7 +112,7 @@ class _OiOtpInputState extends State<OiOtpInput> {
 
     // Announce paste for accessibility
     // ignore: deprecated_member_use
-    SemanticsService.announce('Code pasted', TextDirection.ltr);
+    unawaited(SemanticsService.announce('Code pasted', TextDirection.ltr));
   }
 
   void _notifyChanged() {
@@ -189,7 +193,8 @@ class _OiOtpInputState extends State<OiOtpInput> {
                 child: EditableText(
                   controller: _controllers[index],
                   focusNode: _focusNodes[index],
-                  style: otpTheme?.digitStyle ??
+                  style:
+                      otpTheme?.digitStyle ??
                       TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.w600,

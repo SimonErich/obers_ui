@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/semantics.dart';
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/obers_ui.dart' show OiApp;
@@ -27,7 +29,6 @@ class OiA11yScope extends InheritedWidget {
 /// {@category Foundation}
 abstract final class OiA11y {
   // Private constructor intentionally unreachable; class is static-only.
-  // ignore: unused_element
   OiA11y._();
 
   /// The minimum touch target size in logical pixels on touch devices.
@@ -51,11 +52,15 @@ abstract final class OiA11y {
     String message, {
     bool assertive = false,
   }) {
-    SemanticsService.sendAnnouncement(
-      View.of(context),
-      message,
-      Directionality.of(context),
-      assertiveness: assertive ? Assertiveness.assertive : Assertiveness.polite,
+    unawaited(
+      SemanticsService.sendAnnouncement(
+        View.of(context),
+        message,
+        Directionality.of(context),
+        assertiveness: assertive
+            ? Assertiveness.assertive
+            : Assertiveness.polite,
+      ),
     );
   }
 

@@ -266,7 +266,7 @@ class _OiSheetState extends State<OiSheet> with SingleTickerProviderStateMixin {
     _controller.duration = newDuration;
     // Start the open animation if the sheet is open and hasn't started yet.
     if (widget.open && _controller.status == AnimationStatus.dismissed) {
-      _controller.forward();
+      unawaited(_controller.forward());
     }
   }
 
@@ -276,9 +276,9 @@ class _OiSheetState extends State<OiSheet> with SingleTickerProviderStateMixin {
     if (widget.open != oldWidget.open) {
       if (widget.open) {
         _closing = false;
-        _controller.forward();
+        unawaited(_controller.forward());
       } else {
-        _controller.reverse();
+        unawaited(_controller.reverse());
       }
     }
   }
@@ -287,12 +287,14 @@ class _OiSheetState extends State<OiSheet> with SingleTickerProviderStateMixin {
   void _animateClose() {
     if (_closing) return;
     _closing = true;
-    _controller.reverse().then((_) {
-      if (mounted) {
-        _closing = false;
-        widget.onClose?.call();
-      }
-    });
+    unawaited(
+      _controller.reverse().then((_) {
+        if (mounted) {
+          _closing = false;
+          widget.onClose?.call();
+        }
+      }),
+    );
   }
 
   @override
@@ -444,7 +446,7 @@ class _OiSheetState extends State<OiSheet> with SingleTickerProviderStateMixin {
                   onTap: widget.dismissible ? _animateClose : null,
                   child: AnimatedBuilder(
                     animation: _controller,
-                    builder: (_, __) => ColoredBox(
+                    builder: (_, _) => ColoredBox(
                       color: colors.overlay.withValues(
                         alpha: 0.6 * _controller.value,
                       ),

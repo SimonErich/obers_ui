@@ -326,7 +326,7 @@ class _OiLightboxState extends State<OiLightbox> {
                       scrollDirection: Axis.horizontal,
                       shrinkWrap: true,
                       itemCount: widget.items.length,
-                      separatorBuilder: (_, __) => const SizedBox(width: 8),
+                      separatorBuilder: (_, _) => const SizedBox(width: 8),
                       itemBuilder: (context, index) {
                         final thumbItem = widget.items[index];
                         final isSelected = index == _currentIndex;

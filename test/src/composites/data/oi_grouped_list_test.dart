@@ -1,5 +1,4 @@
 // Tests do not require documentation comments.
-// ignore_for_file: public_member_api_docs
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -294,7 +293,7 @@ void main() {
     await tester.pumpObers(
       OiGroupedList<_Contact>(
         items: _contacts,
-        itemBuilder: (_, c, __) => OiLabel.body(c.name),
+        itemBuilder: (_, c, _) => OiLabel.body(c.name),
         groupBy: (c) => c.letter,
         label: 'Contacts',
         collapsible: true,

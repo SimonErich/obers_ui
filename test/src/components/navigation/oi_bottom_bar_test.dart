@@ -1,10 +1,10 @@
 // Tests do not require documentation comments.
-// ignore_for_file: public_member_api_docs
 
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui/src/components/navigation/oi_bottom_bar.dart';
+import 'package:obers_ui/src/models/oi_navigation_item.dart';
 
 import '../../../helpers/pump_app.dart';
 
@@ -14,9 +14,9 @@ const _kIcon3 = IconData(0xe7fd, fontFamily: 'MaterialIcons');
 const _kActiveIcon = IconData(0xe88a, fontFamily: 'MaterialIcons');
 
 const _kItems = [
-  OiBottomBarItem(icon: _kIcon, label: 'Home'),
-  OiBottomBarItem(icon: _kIcon2, label: 'Search'),
-  OiBottomBarItem(icon: _kIcon3, label: 'Profile'),
+  OiNavigationItem(icon: _kIcon, label: 'Home'),
+  OiNavigationItem(icon: _kIcon2, label: 'Search'),
+  OiNavigationItem(icon: _kIcon3, label: 'Profile'),
 ];
 
 // Wrap child in a compact MediaQuery so the bar passes breakpoint checks.
@@ -111,12 +111,12 @@ void main() {
       _wrapMQ(
         OiBottomBar(
           items: const [
-            OiBottomBarItem(
+            OiNavigationItem(
               icon: _kIcon,
               label: 'Home',
               activeIcon: _kActiveIcon,
             ),
-            OiBottomBarItem(icon: _kIcon2, label: 'Search'),
+            OiNavigationItem(icon: _kIcon2, label: 'Search'),
           ],
           currentIndex: 0,
           onTap: (_) {},
@@ -138,8 +138,8 @@ void main() {
       _wrapMQ(
         OiBottomBar(
           items: const [
-            OiBottomBarItem(icon: _kIcon, label: 'Home', badgeCount: 5),
-            OiBottomBarItem(icon: _kIcon2, label: 'Search'),
+            OiNavigationItem(icon: _kIcon, label: 'Home', badge: '5'),
+            OiNavigationItem(icon: _kIcon2, label: 'Search'),
           ],
           currentIndex: 0,
           onTap: (_) {},
@@ -155,7 +155,7 @@ void main() {
       _wrapMQ(
         OiBottomBar(
           items: const [
-            OiBottomBarItem(icon: _kIcon, label: 'Home', badgeCount: 150),
+            OiNavigationItem(icon: _kIcon, label: 'Home', badge: '99+'),
           ],
           currentIndex: 0,
           onTap: (_) {},
@@ -170,7 +170,7 @@ void main() {
     await tester.pumpObers(
       _wrapMQ(
         OiBottomBar(
-          items: const [OiBottomBarItem(icon: _kIcon, label: 'Home')],
+          items: const [OiNavigationItem(icon: _kIcon, label: 'Home')],
           currentIndex: 0,
           onTap: (_) {},
         ),
@@ -180,18 +180,17 @@ void main() {
     expect(find.text('0'), findsNothing);
   });
 
-  testWidgets('showBadge=false hides badge even when badgeCount > 0', (
+  testWidgets('no badge field hides badge even when previously had count', (
     tester,
   ) async {
     await tester.pumpObers(
       _wrapMQ(
         OiBottomBar(
           items: const [
-            OiBottomBarItem(
+            OiNavigationItem(
               icon: _kIcon,
               label: 'Home',
-              badgeCount: 5,
-              showBadge: false,
+              // badge omitted — equivalent to showBadge: false
             ),
           ],
           currentIndex: 0,
@@ -366,8 +365,8 @@ void main() {
       _wrapMQ(
         OiBottomBar(
           items: const [
-            OiBottomBarItem(icon: _kIcon, label: 'Home'),
-            OiBottomBarItem(icon: _kIcon2, label: 'Search'),
+            OiNavigationItem(icon: _kIcon, label: 'Home'),
+            OiNavigationItem(icon: _kIcon2, label: 'Search'),
           ],
           currentIndex: 0,
           onTap: (_) {},
@@ -602,10 +601,10 @@ void main() {
       _wrapMQ(
         OiBottomBar(
           items: const [
-            OiBottomBarItem(icon: _kIcon, label: 'A'),
-            OiBottomBarItem(icon: _kIcon2, label: 'B'),
-            OiBottomBarItem(icon: _kIcon3, label: 'C'),
-            OiBottomBarItem(icon: _kIcon, label: 'D'),
+            OiNavigationItem(icon: _kIcon, label: 'A'),
+            OiNavigationItem(icon: _kIcon2, label: 'B'),
+            OiNavigationItem(icon: _kIcon3, label: 'C'),
+            OiNavigationItem(icon: _kIcon, label: 'D'),
           ],
           currentIndex: 0,
           onTap: (_) {},

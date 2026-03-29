@@ -114,8 +114,9 @@ class _OiRefreshIndicatorState extends State<OiRefreshIndicator>
     final reducedMotion =
         context.animations.reducedMotion ||
         MediaQuery.disableAnimationsOf(context);
-    _controller.duration =
-        reducedMotion ? Duration.zero : const Duration(milliseconds: 200);
+    _controller.duration = reducedMotion
+        ? Duration.zero
+        : const Duration(milliseconds: 200);
   }
 
   @override
@@ -149,7 +150,7 @@ class _OiRefreshIndicatorState extends State<OiRefreshIndicator>
     });
 
     if (_dragOffset >= widget.triggerDistance) {
-      _triggerRefresh();
+      unawaited(_triggerRefresh());
     }
   }
 
@@ -167,13 +168,15 @@ class _OiRefreshIndicatorState extends State<OiRefreshIndicator>
     if (_isRefreshing) return;
     if (_dragOffset > 0 && _dragOffset < widget.triggerDistance) {
       // Did not reach trigger distance — snap back.
-      _controller.reverse(from: 1).then((_) {
-        if (mounted) {
-          setState(() {
-            _dragOffset = 0.0;
-          });
-        }
-      });
+      unawaited(
+        _controller.reverse(from: 1).then((_) {
+          if (mounted) {
+            setState(() {
+              _dragOffset = 0.0;
+            });
+          }
+        }),
+      );
     }
   }
 
@@ -241,12 +244,9 @@ class _OiRefreshIndicatorState extends State<OiRefreshIndicator>
     final containerSize = widget.indicatorSize + 8;
 
     // The indicator's vertical position during the pull phase.
-    final indicatorTop =
-        _isRefreshing
-            ? widget.edgeOffset + widget.displacement
-            : widget.edgeOffset +
-                (widget.displacement * progress) -
-                containerSize;
+    final indicatorTop = _isRefreshing
+        ? widget.edgeOffset + widget.displacement
+        : widget.edgeOffset + (widget.displacement * progress) - containerSize;
 
     final showIndicator = _dragOffset > 0 || _isRefreshing;
 

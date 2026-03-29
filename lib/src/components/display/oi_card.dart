@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_decoration_theme.dart';
@@ -7,7 +9,7 @@ import 'package:obers_ui/src/primitives/display/oi_surface.dart';
 import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
 
 // Chevron icon codepoint from Material Icons (expand_more).
-const _kChevronIcon = OiIcons.chevronDown;
+const IconData _kChevronIcon = OiIcons.chevronDown;
 
 // Key for the horizontal separator between body and footer.
 const _kCardDividerKey = Key('_oi_card_divider');
@@ -372,9 +374,9 @@ class _OiCardState extends State<OiCard> with SingleTickerProviderStateMixin {
     if (reducedMotion) {
       _controller.value = _collapsed ? 0.0 : 1.0;
     } else if (_collapsed) {
-      _controller.reverse();
+      unawaited(_controller.reverse());
     } else {
-      _controller.forward();
+      unawaited(_controller.forward());
     }
   }
 

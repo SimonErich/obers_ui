@@ -82,7 +82,7 @@ class OiDiffView extends StatelessWidget {
       height: 1.5,
     );
 
-    return Container(
+    return DecoratedBox(
       decoration: BoxDecoration(
         color: colors.surfaceSubtle,
         borderRadius: BorderRadius.circular(6),
@@ -194,7 +194,7 @@ class OiDiffView extends StatelessWidget {
       );
     }
 
-    return Container(
+    return DecoratedBox(
       decoration: BoxDecoration(
         color: colors.surfaceSubtle,
         borderRadius: BorderRadius.circular(6),

@@ -1,5 +1,4 @@
 // Tests do not require documentation comments.
-// ignore_for_file: public_member_api_docs
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -18,7 +17,7 @@ void main() {
   testWidgets('renders all children', (tester) async {
     await tester.pumpObers(
       OiReorderable(
-        onReorder: (_, __) {},
+        onReorder: (_, _) {},
         children: const [
           Text('alpha', key: ValueKey('a')),
           Text('beta', key: ValueKey('b')),
@@ -38,7 +37,7 @@ void main() {
   ) async {
     await tester.pumpObers(
       OiReorderable(
-        onReorder: (_, __) {},
+        onReorder: (_, _) {},
         children: const [Text('item', key: ValueKey('i'))],
       ),
     );
@@ -55,7 +54,7 @@ void main() {
       _withDensity(
         OiDensity.compact,
         OiReorderable(
-          onReorder: (_, __) {},
+          onReorder: (_, _) {},
           children: const [
             Text('a', key: ValueKey('a')),
             Text('b', key: ValueKey('b')),
@@ -76,7 +75,7 @@ void main() {
       _withDensity(
         OiDensity.comfortable,
         OiReorderable(
-          onReorder: (_, __) {},
+          onReorder: (_, _) {},
           children: const [
             Text('a', key: ValueKey('a')),
             Text('b', key: ValueKey('b')),
@@ -93,7 +92,7 @@ void main() {
   testWidgets('padding inserts SliverPadding', (tester) async {
     await tester.pumpObers(
       OiReorderable(
-        onReorder: (_, __) {},
+        onReorder: (_, _) {},
         padding: const EdgeInsets.all(16),
         children: const [Text('item', key: ValueKey('i'))],
       ),
@@ -106,7 +105,7 @@ void main() {
   testWidgets('no SliverPadding when padding is omitted', (tester) async {
     await tester.pumpObers(
       OiReorderable(
-        onReorder: (_, __) {},
+        onReorder: (_, _) {},
         children: const [Text('item', key: ValueKey('i'))],
       ),
     );

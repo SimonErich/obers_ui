@@ -21,7 +21,8 @@ class _OiTableLoadingBarState extends State<_OiTableLoadingBar>
     _ctrl = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1500),
-    )..repeat();
+    );
+    unawaited(_ctrl.repeat());
   }
 
   @override
@@ -38,7 +39,7 @@ class _OiTableLoadingBarState extends State<_OiTableLoadingBar>
         ..stop()
         ..value = 0;
     } else if (!reduced && !_ctrl.isAnimating) {
-      _ctrl.repeat();
+      unawaited(_ctrl.repeat());
     }
   }
 
@@ -121,7 +122,8 @@ class _OiTableSpinnerState extends State<_OiTableSpinner>
     _ctrl = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 800),
-    )..repeat();
+    );
+    unawaited(_ctrl.repeat());
   }
 
   @override
@@ -138,7 +140,7 @@ class _OiTableSpinnerState extends State<_OiTableSpinner>
         ..stop()
         ..value = 0;
     } else if (!reduced && !_ctrl.isAnimating) {
-      _ctrl.repeat();
+      unawaited(_ctrl.repeat());
     }
   }
 

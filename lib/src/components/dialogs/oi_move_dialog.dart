@@ -168,8 +168,8 @@ class _OiMoveDialogState extends State<OiMoveDialog> {
                         context,
                         node,
                         depth, {
-                        required bool expanded,
-                        required bool selected,
+                        required expanded,
+                        required selected,
                       }) {
                         final disabled = _isSelfOrDescendant(node);
                         final isMatch =

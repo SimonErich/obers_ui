@@ -1,5 +1,4 @@
 // Tests do not require documentation comments.
-// ignore_for_file: public_member_api_docs
 
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
@@ -186,7 +185,7 @@ void main() {
       _table(
         controller: ctrl,
         serverSideSort: true,
-        onSort: (col, {required bool ascending}) => sortedCol = col,
+        onSort: (col, {required ascending}) => sortedCol = col,
       ),
     );
     // Tap header before any sort so text is still plain 'Name'.
@@ -580,7 +579,7 @@ void main() {
   testWidgets('double-tapping cell with onCellChanged enters edit mode', (
     tester,
   ) async {
-    await tester.pumpObers(_table(onCellChanged: (_, __, ___, ____) {}));
+    await tester.pumpObers(_table(onCellChanged: (_, _, _, _) {}));
     await tester.pump(); // settle settings load
     // _CellFrame displays content via GestureDetector with key 'cell_display'.
     final cellDisplay = find.byKey(const Key('cell_display')).first;
@@ -646,7 +645,7 @@ void main() {
     String? capturedText;
     tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
       SystemChannels.platform,
-      (MethodCall call) async {
+      (call) async {
         if (call.method == 'Clipboard.setData') {
           capturedText = (call.arguments as Map)['text'] as String?;
         }
@@ -738,7 +737,7 @@ void main() {
         header: 'Name',
         filterable: false,
         resizable: false,
-        cellBuilder: (_, row, __) =>
+        cellBuilder: (_, row, _) =>
             Text('custom:${row.name}', key: ValueKey('custom_${row.name}')),
       ),
     ];
@@ -797,7 +796,7 @@ void main() {
       _table(
         controller: ctrl,
         serverSideSort: true,
-        onSort: (col, {required bool ascending}) => calls.add(ascending),
+        onSort: (col, {required ascending}) => calls.add(ascending),
       ),
     );
     // First tap – ascending.
@@ -1157,7 +1156,6 @@ void main() {
   ) async {
     // This is a static method test; no widget needed but
     // wrapping in testWidgets for consistency.
-    // ignore: avoid_dynamic_calls
     final pages = _PaginationBarHelper.computeVisiblePages(0, 5);
     expect(pages, [0, 1, 2, 3, 4]);
   });
@@ -1181,7 +1179,7 @@ void main() {
     tester,
   ) async {
     await tester.pumpObers(
-      _table(reorderable: true, onRowReordered: (_, __) {}),
+      _table(reorderable: true, onRowReordered: (_, _) {}),
     );
     expect(find.byType(ReorderableDragStartListener), findsNWidgets(3));
   });
@@ -2278,7 +2276,7 @@ void main() {
     String? capturedText;
     tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
       SystemChannels.platform,
-      (MethodCall call) async {
+      (call) async {
         if (call.method == 'Clipboard.setData') {
           capturedText = (call.arguments as Map)['text'] as String?;
         }
@@ -2302,7 +2300,7 @@ void main() {
     String? capturedText;
     tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
       SystemChannels.platform,
-      (MethodCall call) async {
+      (call) async {
         if (call.method == 'Clipboard.setData') {
           capturedText = (call.arguments as Map)['text'] as String?;
         }
@@ -2637,7 +2635,7 @@ void main() {
 
   // 80. Cancel edit via ✗ button reverts to display mode
   testWidgets('cancel edit via ✗ reverts to display mode', (tester) async {
-    await tester.pumpObers(_table(onCellChanged: (_, __, ___, ____) {}));
+    await tester.pumpObers(_table(onCellChanged: (_, _, _, _) {}));
     await tester.pump();
     // Double-tap to enter edit mode.
     final cellDisplay = find.byKey(const Key('cell_display')).first;
@@ -2660,7 +2658,7 @@ void main() {
     dynamic changedValue;
     await tester.pumpObers(
       _table(
-        onCellChanged: (_, __, colId, val) {
+        onCellChanged: (_, _, colId, val) {
           changedColumnId = colId;
           changedValue = val;
         },

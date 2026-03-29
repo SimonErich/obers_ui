@@ -523,7 +523,7 @@ class _OiTextInputState extends State<OiTextInput> {
           validator: widget.validator,
           autovalidateMode: widget.autovalidateMode,
           onSaved: widget.onSaved,
-          builder: (FormFieldState<String> state) {
+          builder: (state) {
             final resolvedError = widget.error ?? state.errorText;
             return _buildOtpInput(resolvedError);
           },
@@ -539,7 +539,7 @@ class _OiTextInputState extends State<OiTextInput> {
         autovalidateMode: widget.autovalidateMode,
         onSaved: widget.onSaved,
         controller: _controller,
-        builder: (String? formError) {
+        builder: (formError) {
           final resolvedError = widget.error ?? formError;
           return _buildStandardInput(errorOverride: resolvedError);
         },
@@ -606,7 +606,7 @@ class _OiTextInputFormFieldState extends State<_OiTextInputFormField> {
       autovalidateMode: widget.autovalidateMode,
       onSaved: widget.onSaved,
       initialValue: widget.controller.text,
-      builder: (FormFieldState<String> state) {
+      builder: (state) {
         return widget.builder(state.errorText);
       },
     );

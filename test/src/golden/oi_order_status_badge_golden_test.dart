@@ -1,5 +1,4 @@
 // Golden tests have no public API.
-// ignore_for_file: public_member_api_docs
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -11,7 +10,6 @@ import '../../helpers/golden_helper.dart';
 void main() {
   // Enable autoUpdateGoldenFiles for initial generation; CI compares against
   // committed goldens.
-  // ignore: deprecated_member_use
   autoUpdateGoldenFiles = true;
 
   // ── Light theme ───────────────────────────────────────────────────────────

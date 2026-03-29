@@ -494,7 +494,7 @@ class _OiMediaPickerState extends State<OiMediaPicker> {
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
               itemCount: selectedItems.length,
-              separatorBuilder: (_, __) => SizedBox(width: spacing.xs),
+              separatorBuilder: (_, _) => SizedBox(width: spacing.xs),
               itemBuilder: (context, index) {
                 final item = selectedItems[index];
                 final progress = _progressFor(item.key);

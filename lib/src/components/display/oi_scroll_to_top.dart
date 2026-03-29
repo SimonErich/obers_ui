@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
@@ -84,18 +86,20 @@ class _OiScrollToTopState extends State<OiScrollToTop>
     if (shouldShow != _visible) {
       _visible = shouldShow;
       if (_visible) {
-        _fadeController.forward();
+        unawaited(_fadeController.forward());
       } else {
-        _fadeController.reverse();
+        unawaited(_fadeController.reverse());
       }
     }
   }
 
   void _scrollToTop() {
-    widget.controller.animateTo(
-      0,
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeOutCubic,
+    unawaited(
+      widget.controller.animateTo(
+        0,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOutCubic,
+      ),
     );
   }
 

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
@@ -240,7 +242,7 @@ class _IndexBarGestureState extends State<_IndexBarGesture> {
     _lastReportedLabel = label;
     widget.onLabelSelected(label);
     if (widget.hapticFeedback) {
-      HapticFeedback.selectionClick();
+      unawaited(HapticFeedback.selectionClick());
     }
 
     if (widget.showTooltip) {
@@ -260,7 +262,7 @@ class _IndexBarGestureState extends State<_IndexBarGesture> {
       _lastReportedLabel = label;
       widget.onLabelSelected(label);
       if (widget.hapticFeedback) {
-        HapticFeedback.selectionClick();
+        unawaited(HapticFeedback.selectionClick());
       }
     }
 

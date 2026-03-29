@@ -22,7 +22,6 @@ class OiAnimatedListController<T> {
   }
 
   // Symmetric detach uses the same pattern as _attach above.
-  // ignore: use_setters_to_change_properties
   void _detach() {
     _state = null;
   }

@@ -1,6 +1,7 @@
 // Tests do not require documentation comments.
-// ignore_for_file: public_member_api_docs
 // Tests for OiSettingsMixin – load, save, debounce, reset, and dispose.
+
+import 'dart:async';
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -94,7 +95,7 @@ class _WState extends State<_W> with OiSettingsMixin<_W, _S> {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.driver != widget.driver ||
         oldWidget.settingsKey != widget.settingsKey) {
-      reloadSettings();
+      unawaited(reloadSettings());
     }
   }
 

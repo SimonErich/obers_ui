@@ -164,7 +164,7 @@ class OiGallery extends StatelessWidget {
               child: Semantics(
                 label: 'Upload media',
                 button: true,
-                child: Container(
+                child: DecoratedBox(
                   decoration: BoxDecoration(
                     color: colors.surfaceHover,
                     borderRadius: BorderRadius.circular(8),
@@ -190,7 +190,7 @@ class OiGallery extends StatelessWidget {
             child: Semantics(
               label: item.alt,
               selected: isSelected,
-              child: Container(
+              child: DecoratedBox(
                 key: ValueKey('oi_gallery_item_${item.key}'),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(8),

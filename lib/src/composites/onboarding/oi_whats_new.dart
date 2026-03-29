@@ -115,7 +115,7 @@ class OiWhatsNew extends StatelessWidget {
                     vertical: 8,
                   ),
                   itemCount: items.length,
-                  separatorBuilder: (_, __) => const SizedBox(height: 16),
+                  separatorBuilder: (_, _) => const SizedBox(height: 16),
                   itemBuilder: (context, index) {
                     final item = items[index];
                     return _OiWhatsNewItemTile(item: item);

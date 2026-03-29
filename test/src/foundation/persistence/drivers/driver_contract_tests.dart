@@ -3,7 +3,6 @@
 // Usage:
 //   runDriverContractTests(() => OiInMemorySettingsDriver());
 //
-// ignore_for_file: public_member_api_docs
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui/src/foundation/persistence/oi_settings_data.dart';

@@ -411,13 +411,13 @@ class _OiFileGridViewState extends State<OiFileGridView> {
             widget.onMoveToFolder!(droppedFiles, file);
           },
           builder: (context, state) {
-            return Container(
+            return DecoratedBox(
               decoration: state == OiDropState.hovering
                   ? BoxDecoration(
                       border: Border.all(color: colors.primary.base, width: 2),
                       borderRadius: BorderRadius.circular(8),
                     )
-                  : null,
+                  : const BoxDecoration(),
               child: innerCard,
             );
           },

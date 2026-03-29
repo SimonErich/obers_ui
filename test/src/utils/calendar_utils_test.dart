@@ -1,5 +1,5 @@
 // Tests are internal; doc comments on local helpers are not required.
-// ignore_for_file: public_member_api_docs, avoid_redundant_argument_values
+// ignore_for_file: avoid_redundant_argument_values
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui/src/utils/calendar_utils.dart';

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/services.dart';
@@ -440,7 +441,7 @@ class _OiTableState<T> extends State<OiTable<T>>
       _resolvedDriver = newDriver;
       // Driver changed (e.g. provider now available) — reload settings.
       if (settingsLoaded) {
-        reloadSettings();
+        unawaited(reloadSettings());
       }
     }
     // Apply persisted settings once they load, but only when a driver is
@@ -531,7 +532,7 @@ class _OiTableState<T> extends State<OiTable<T>>
     if (_loadingMore) return;
     if (_scrollController.position.pixels >=
         _scrollController.position.maxScrollExtent - 100) {
-      _triggerLoadMore();
+      unawaited(_triggerLoadMore());
     }
   }
 
@@ -735,7 +736,7 @@ class _OiTableState<T> extends State<OiTable<T>>
         buffer.writeln(cells);
       }
     }
-    Clipboard.setData(ClipboardData(text: buffer.toString()));
+    unawaited(Clipboard.setData(ClipboardData(text: buffer.toString())));
   }
 
   // ── Bulk bar ──────────────────────────────────────────────────────────────
@@ -894,7 +895,7 @@ class _OiTableState<T> extends State<OiTable<T>>
             child: _ColumnManagerPanel<T>(
               columns: widget.columns,
               visibility: _ctrl.columnVisibility,
-              onToggle: (columnId, {required bool visible}) {
+              onToggle: (columnId, {required visible}) {
                 _ctrl.setColumnVisible(columnId, visible: visible);
                 _columnManagerOverlay?.markNeedsBuild();
               },
@@ -1031,10 +1032,10 @@ class _OiTableState<T> extends State<OiTable<T>>
   }
 
   /// Arrow-up icon for ascending sort indicator.
-  static const _arrowUp = OiIcons.arrowUp;
+  static const IconData _arrowUp = OiIcons.arrowUp;
 
   /// Arrow-down icon for descending sort indicator.
-  static const _arrowDown = OiIcons.arrowDown;
+  static const IconData _arrowDown = OiIcons.arrowDown;
 
   Widget _buildColumnHeader(OiTableColumn<T> col) {
     final isSorted = _ctrl.sortColumnId == col.id;
@@ -1188,7 +1189,7 @@ class _OiTableState<T> extends State<OiTable<T>>
     return ListView.builder(
       controller: _scrollController,
       itemCount: rows.length + (_loadingMore ? 1 : 0),
-      itemBuilder: (ctx, int i) {
+      itemBuilder: (ctx, i) {
         if (i == rows.length) {
           return const Center(
             key: Key('oi_table_load_more_indicator'),
@@ -1252,9 +1253,9 @@ class _OiTableState<T> extends State<OiTable<T>>
             onTap: () {
               final willExpand = !_ctrl.expandedGroups.contains(groupKey);
               if (willExpand) {
-                animCtrl.forward();
+                unawaited(animCtrl.forward());
               } else {
-                animCtrl.reverse();
+                unawaited(animCtrl.reverse());
               }
               _ctrl.toggleGroup(groupKey);
             },

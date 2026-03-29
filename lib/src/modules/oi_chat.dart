@@ -549,7 +549,7 @@ class _OiChatState extends State<OiChat> {
             : MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
-          if (avatar != null) avatar,
+          ?avatar,
           Flexible(
             child: Column(
               crossAxisAlignment: ownMessage
@@ -558,7 +558,7 @@ class _OiChatState extends State<OiChat> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 messageBody,
-                if (reactionsWidget != null) reactionsWidget,
+                ?reactionsWidget,
               ],
             ),
           ),
@@ -710,7 +710,7 @@ class _MoreEmojiButtonState extends State<_MoreEmojiButton> {
                 ],
               ),
               child: OiEmojiPicker(
-                onSelected: (String emoji) {
+                onSelected: (emoji) {
                   _removeOverlay();
                   widget.onSelected(emoji);
                 },

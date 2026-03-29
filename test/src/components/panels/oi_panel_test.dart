@@ -1,5 +1,4 @@
 // Tests do not require documentation comments.
-// ignore_for_file: public_member_api_docs
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -166,7 +165,7 @@ void main() {
         data: const MediaQueryData(disableAnimations: true),
         child: ValueListenableBuilder<bool>(
           valueListenable: notifier,
-          builder: (_, isOpen, __) => OiPanel(
+          builder: (_, isOpen, _) => OiPanel(
             label: 'panel',
             open: isOpen,
             child: const Text('instant panel'),

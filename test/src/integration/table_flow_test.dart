@@ -1,5 +1,4 @@
 // Tests do not require documentation comments.
-// ignore_for_file: public_member_api_docs
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -261,7 +260,7 @@ void main() {
         _table(
           controller: ctrl,
           serverSideSort: true,
-          onSort: (col, {required bool ascending}) => sortedCol = col,
+          onSort: (col, {required ascending}) => sortedCol = col,
         ),
         surfaceSize: const Size(900, 700),
       );

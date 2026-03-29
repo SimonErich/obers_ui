@@ -121,7 +121,7 @@ class _OiProductGalleryState extends State<OiProductGallery> {
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         itemCount: widget.imageUrls.length,
-        separatorBuilder: (_, __) => SizedBox(width: sp.xs),
+        separatorBuilder: (_, _) => SizedBox(width: sp.xs),
         itemBuilder: (context, index) {
           final isSelected = index == _currentIndex;
           final borderColor = isSelected

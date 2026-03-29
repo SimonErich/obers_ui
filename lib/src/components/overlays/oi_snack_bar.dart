@@ -220,20 +220,21 @@ class _OiSnackBarState extends State<OiSnackBar>
     final slideBegin = widget.position == OiSnackBarPosition.bottom
         ? const Offset(0, 1)
         : const Offset(0, -1);
-    _slideAnimation = Tween<Offset>(
-      begin: slideBegin,
-      end: Offset.zero,
-    ).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: Curves.easeOutCubic,
-        reverseCurve: Curves.easeInCubic,
-      ),
-    );
+    _slideAnimation =
+        Tween<Offset>(
+          begin: slideBegin,
+          end: Offset.zero,
+        ).animate(
+          CurvedAnimation(
+            parent: _controller,
+            curve: Curves.easeOutCubic,
+            reverseCurve: Curves.easeInCubic,
+          ),
+        );
 
     if (!_animationStarted) {
       _animationStarted = true;
-      _controller.forward();
+      unawaited(_controller.forward());
     }
   }
 
@@ -266,7 +267,7 @@ class _OiSnackBarState extends State<OiSnackBar>
         ? dy > 0
         : dy < 0;
     if (shouldDismiss && dy.abs() > 2) {
-      _dismiss();
+      unawaited(_dismiss());
     }
   }
 
@@ -291,7 +292,8 @@ class _OiSnackBarState extends State<OiSnackBar>
     final shadowScale = context.shadows;
 
     final bgColor = widget.backgroundColor ?? colors.text;
-    final msgStyle = widget.messageStyle ??
+    final msgStyle =
+        widget.messageStyle ??
         textTheme.small.copyWith(color: colors.textInverse);
     final effectiveRadius = widget.borderRadius ?? radiusScale.md;
     final effectiveMargin = widget.margin ?? _defaultMargin();
@@ -306,7 +308,7 @@ class _OiSnackBarState extends State<OiSnackBar>
           behavior: HitTestBehavior.opaque,
           onTap: () {
             widget.onAction?.call();
-            _dismiss();
+            unawaited(_dismiss());
           },
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),

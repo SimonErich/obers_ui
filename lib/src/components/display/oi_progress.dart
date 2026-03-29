@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/widgets.dart';
@@ -218,7 +219,7 @@ class _OiProgressState extends State<OiProgress>
       vsync: this,
       duration: const Duration(milliseconds: 1200),
     );
-    if (widget.indeterminate) _controller.repeat();
+    if (widget.indeterminate) unawaited(_controller.repeat());
   }
 
   @override
@@ -235,7 +236,7 @@ class _OiProgressState extends State<OiProgress>
   void didUpdateWidget(OiProgress oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.indeterminate && !_controller.isAnimating) {
-      _controller.repeat();
+      unawaited(_controller.repeat());
     } else if (!widget.indeterminate && _controller.isAnimating) {
       _controller.stop();
     }

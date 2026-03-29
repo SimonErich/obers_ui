@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/buttons/oi_button.dart';
 import 'package:obers_ui/src/components/buttons/oi_icon_button.dart';
@@ -318,9 +320,11 @@ class _OiBannerState extends State<OiBanner>
     // then animate out.
     if (widget.level == OiBannerLevel.loading &&
         widget.loadingOnDismiss != null) {
-      widget.loadingOnDismiss!().then((_) {
-        if (mounted) _dismiss();
-      });
+      unawaited(
+        widget.loadingOnDismiss!().then((_) {
+          if (mounted) _dismiss();
+        }),
+      );
     }
   }
 
@@ -345,9 +349,11 @@ class _OiBannerState extends State<OiBanner>
     if (widget.onDismiss != null) {
       widget.onDismiss!();
     } else {
-      _controller.reverse().then((_) {
-        if (mounted) setState(() => _visible = false);
-      });
+      unawaited(
+        _controller.reverse().then((_) {
+          if (mounted) setState(() => _visible = false);
+        }),
+      );
     }
   }
 

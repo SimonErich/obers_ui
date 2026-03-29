@@ -169,7 +169,7 @@ class _OiComboBoxState<T> extends State<OiComboBox<T>> {
     if (widget.search != null) {
       _debounce?.cancel();
       _debounce = Timer(const Duration(milliseconds: 200), () {
-        _performAsyncSearch(query);
+        unawaited(_performAsyncSearch(query));
       });
       return;
     }
@@ -717,8 +717,8 @@ class _ComboBoxOptionTileState extends State<_ComboBoxOptionTile> {
           color: showHover
               ? colors.surfaceHover
               : widget.selected
-                  ? colors.primary.base.withValues(alpha: 0.08)
-                  : null,
+              ? colors.primary.base.withValues(alpha: 0.08)
+              : null,
           child: Row(
             children: [
               if (widget.multiSelect)

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/widgets.dart';
 
 import 'package:obers_ui/obers_ui.dart';
@@ -341,9 +343,9 @@ class _OiTreeState<T> extends State<OiTree<T>> with TickerProviderStateMixin {
     final willExpand = !_ctrl.expanded(node.id);
     final controller = _controllerFor(node.id);
     if (willExpand) {
-      controller.forward();
+      unawaited(controller.forward());
     } else {
-      controller.reverse();
+      unawaited(controller.reverse());
     }
     _ctrl.toggle(node.id);
     widget.onExpansionChanged?.call(node, expanded: willExpand);

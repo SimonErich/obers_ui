@@ -1,10 +1,30 @@
+# Flutter App — Strict Analysis Options
+#
+# BASE: Uses `very_good_analysis` for 200+ opinionated lint rules.
+#       Add dev dependency: very_good_analysis: ^10.0.0
+#
+# STRICT SETTINGS: strict-casts, strict-inference, strict-raw-types are
+#   already enabled by very_good_analysis. Additional project overrides below.
+
 include: package:very_good_analysis/analysis_options.yaml
 
 analyzer:
-
+  exclude:
+    - build/**
+    - .dart_tool/**
   errors:
-    lines_longer_than_80_chars: ignore
+    close_sinks: warning       # VGA ignores; we want it active
+  plugins:
+    - custom_lint               # Remove if not using custom_lint
 
 linter:
   rules:
-    - require_trailing_commas
+    # --- Overrides: re-enable rules VGA excludes ---
+    use_decorated_box: true
+
+    # --- Overrides: disable rules that conflict with project conventions ---
+    public_member_api_docs: false     # Not required by default
+    lines_longer_than_80_chars: false  # Let the formatter handle line length
+
+formatter:
+  trailing_commas: preserve

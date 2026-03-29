@@ -1,5 +1,4 @@
 // Golden tests have no public API.
-// ignore_for_file: public_member_api_docs
 
 import 'package:golden_toolkit/golden_toolkit.dart';
 import 'package:obers_ui/obers_ui.dart';

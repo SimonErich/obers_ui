@@ -1,5 +1,4 @@
 // Tests do not require documentation comments.
-// ignore_for_file: public_member_api_docs
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -241,7 +240,7 @@ void main() {
 
       // Find the Semantics container wrapping the OiDateTimeInput
       final semantics = find.byWidgetPredicate(
-        (w) => w is Semantics && w.container == true,
+        (w) => w is Semantics && w.container,
       );
       expect(semantics, findsWidgets);
 
@@ -254,7 +253,7 @@ void main() {
       final containerSemantics = find.ancestor(
         of: find.byType(OiDateInput),
         matching: find.byWidgetPredicate(
-          (w) => w is Semantics && w.container == true,
+          (w) => w is Semantics && w.container,
         ),
       );
       expect(containerSemantics, findsWidgets);

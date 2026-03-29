@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/buttons/oi_button.dart';
 import 'package:obers_ui/src/components/inputs/oi_select.dart';
@@ -578,10 +580,12 @@ class _OiSettingsPageState extends State<OiSettingsPage> {
     final groupKey = _groupKeys[widget.groups[index].key];
     if (groupKey?.currentContext == null) return;
 
-    Scrollable.ensureVisible(
-      groupKey!.currentContext!,
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeInOut,
+    unawaited(
+      Scrollable.ensureVisible(
+        groupKey!.currentContext!,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      ),
     );
   }
 

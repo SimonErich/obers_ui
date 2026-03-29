@@ -1,5 +1,4 @@
 // Tests do not require documentation comments.
-// ignore_for_file: public_member_api_docs
 // REQ-0018: OiImage accessibility enforcement tests.
 
 import 'package:flutter/foundation.dart';
@@ -17,7 +16,7 @@ FlutterExceptionHandler? _originalOnError;
 
 void _ignoreImageErrors() {
   _originalOnError = FlutterError.onError;
-  FlutterError.onError = (FlutterErrorDetails details) {
+  FlutterError.onError = (details) {
     if (details.exception.toString().contains('NetworkImageLoadException') ||
         details.exception.toString().contains('Unable to load asset') ||
         details.library == 'image resource service') {

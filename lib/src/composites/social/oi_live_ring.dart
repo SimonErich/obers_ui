@@ -48,7 +48,7 @@ class OiLiveRing extends StatelessWidget {
           minScale: 0.95,
           maxScale: 1.1,
           duration: const Duration(milliseconds: 1500),
-          child: Container(
+          child: DecoratedBox(
             key: const Key('oi_live_ring_indicator'),
             decoration: BoxDecoration(
               shape: BoxShape.circle,

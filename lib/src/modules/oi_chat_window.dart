@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/buttons/oi_button.dart';
@@ -155,7 +157,8 @@ class _StreamingCursorState extends State<_StreamingCursor>
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 500),
-    )..repeat(reverse: true);
+    );
+    unawaited(_controller.repeat(reverse: true));
   }
 
   @override
@@ -333,10 +336,12 @@ class _OiChatWindowState extends State<OiChatWindow> {
   void _scrollToBottom() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_scrollController.hasClients) {
-        _scrollController.animateTo(
-          0,
-          duration: const Duration(milliseconds: 200),
-          curve: Curves.easeOut,
+        unawaited(
+          _scrollController.animateTo(
+            0,
+            duration: const Duration(milliseconds: 200),
+            curve: Curves.easeOut,
+          ),
         );
       }
     });
@@ -569,7 +574,7 @@ class _OiChatWindowState extends State<OiChatWindow> {
                   width: 60,
                   height: 60,
                   fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) =>
+                  errorBuilder: (_, _, _) =>
                       _buildAttachmentChip(context, a, textColor: colors.text),
                 ),
               );
@@ -739,7 +744,7 @@ class _OiChatWindowState extends State<OiChatWindow> {
           mainAxisSize: MainAxisSize.min,
           children: [
             // Attachments row.
-            if (attachmentsRow != null) attachmentsRow,
+            ?attachmentsRow,
 
             // Bubble.
             _HoverActionWrapper(
@@ -757,7 +762,7 @@ class _OiChatWindowState extends State<OiChatWindow> {
             ),
 
             // Reactions row.
-            if (reactionsRow != null) reactionsRow,
+            ?reactionsRow,
 
             // Suggestion chips.
             if (message.suggestions != null &&

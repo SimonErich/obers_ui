@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/foundation/oi_responsive.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
@@ -142,13 +144,15 @@ class _OiVisibilityState extends State<OiVisibility>
     if (widget.visible != oldWidget.visible) {
       if (widget.visible) {
         setState(() => _inTree = true);
-        _controller.forward();
+        unawaited(_controller.forward());
       } else {
-        _controller.reverse().whenComplete(() {
-          if (mounted && !widget.visible && !widget.maintainState) {
-            setState(() => _inTree = false);
-          }
-        });
+        unawaited(
+          _controller.reverse().whenComplete(() {
+            if (mounted && !widget.visible && !widget.maintainState) {
+              setState(() => _inTree = false);
+            }
+          }),
+        );
       }
     }
   }

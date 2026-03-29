@@ -27,10 +27,15 @@ flutter:
         - asset: lib/src/foundation/icons/lucide.ttf
 
 dev_dependencies:
+  custom_lint: ^0.8.0
   flutter_test:
     sdk: flutter
   golden_toolkit: ^0.15.0
+  marqably_dart_qa_rules:
+    git: git@git.duko.at:flutter/dart-flutter-qa-rules.git
+  marqably_lints:
+    path: marqably_lints
   mocktail: ^1.0.4
   obers_ui_charts:
     path: packages/obers_ui_charts
-  very_good_analysis: ^7.0.0
+  very_good_analysis: ^10.0.0

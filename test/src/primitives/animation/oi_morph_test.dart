@@ -1,5 +1,4 @@
 // Tests do not require documentation comments.
-// ignore_for_file: public_member_api_docs
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -41,7 +40,7 @@ void main() {
     await tester.pumpObers(
       ValueListenableBuilder<bool>(
         valueListenable: notifier,
-        builder: (_, flag, __) => OiMorph(
+        builder: (_, flag, _) => OiMorph(
           child: flag
               ? const Text('B', key: ValueKey('b'))
               : const Text('A', key: ValueKey('a')),
@@ -72,7 +71,7 @@ void main() {
     await tester.pumpObers(
       ValueListenableBuilder<bool>(
         valueListenable: notifier,
-        builder: (_, flag, __) => OiMorph(
+        builder: (_, flag, _) => OiMorph(
           transition: OiTransition.none,
           child: flag
               ? const Text('Y', key: ValueKey('y'))
@@ -101,7 +100,7 @@ void main() {
     await tester.pumpObers(
       ValueListenableBuilder<bool>(
         valueListenable: notifier,
-        builder: (_, flag, __) => OiMorph(
+        builder: (_, flag, _) => OiMorph(
           transition: OiTransition.fadeScale,
           child: flag
               ? const Text('2', key: ValueKey('2'))
@@ -147,7 +146,7 @@ void main() {
             data: const MediaQueryData(disableAnimations: true),
             child: ValueListenableBuilder<bool>(
               valueListenable: notifier,
-              builder: (_, flag, __) => OiMorph(
+              builder: (_, flag, _) => OiMorph(
                 child: flag
                     ? const Text('B', key: ValueKey('b'))
                     : const Text('A', key: ValueKey('a')),
@@ -178,7 +177,7 @@ void main() {
           data: const MediaQueryData(disableAnimations: true),
           child: ValueListenableBuilder<bool>(
             valueListenable: notifier,
-            builder: (_, flag, __) => OiMorph(
+            builder: (_, flag, _) => OiMorph(
               child: flag
                   ? const Text('B', key: ValueKey('b'))
                   : const Text('A', key: ValueKey('a')),

@@ -156,7 +156,7 @@ class OiFilePreview extends StatelessWidget {
       fit: fit,
       width: width,
       height: height,
-      errorBuilder: (_, __, ___) => _buildIconFallback(),
+      errorBuilder: (_, _, _) => _buildIconFallback(),
     );
   }
 

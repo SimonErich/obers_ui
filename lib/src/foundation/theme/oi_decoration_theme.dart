@@ -15,7 +15,6 @@ enum OiBorderLineStyle {
   dotted,
 
   /// A double-line border.
-  // ignore: constant_identifier_names
   double_,
 
   /// A gradient-stroked border.

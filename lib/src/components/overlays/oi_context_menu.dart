@@ -202,7 +202,7 @@ class _ContextMenuRootState extends State<_ContextMenuRoot>
         ? Duration.zero
         : const Duration(milliseconds: 150);
     if (!_controller.isAnimating && _controller.value == 0) {
-      _controller.forward();
+      unawaited(_controller.forward());
     }
   }
 
@@ -748,7 +748,7 @@ class _SubMenuWrapperState extends State<_SubMenuWrapper>
         ? Duration.zero
         : const Duration(milliseconds: 120);
     if (!_controller.isAnimating && _controller.value == 0) {
-      _controller.forward();
+      unawaited(_controller.forward());
     }
   }
 

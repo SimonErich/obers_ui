@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/display/oi_avatar.dart';
 import 'package:obers_ui/src/components/display/oi_badge.dart';
@@ -231,9 +233,8 @@ class _OiDrawerNavigationState extends State<OiDrawerNavigation>
       _slideDirection = 1;
       _submenuStack.add(parent);
     });
-    _animationController
-      ..reset()
-      ..forward();
+    _animationController.reset();
+    unawaited(_animationController.forward());
   }
 
   void _popSubmenu() {
@@ -241,9 +242,8 @@ class _OiDrawerNavigationState extends State<OiDrawerNavigation>
       _slideDirection = -1;
       _submenuStack.removeLast();
     });
-    _animationController
-      ..reset()
-      ..forward();
+    _animationController.reset();
+    unawaited(_animationController.forward());
   }
 
   void _handleItemTap(OiDrawerItem item) {

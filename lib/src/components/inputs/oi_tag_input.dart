@@ -495,7 +495,7 @@ class _CommaFormatter extends TextInputFormatter {
       final toAdd = parts.sublist(0, parts.length - 1).join(',');
       if (toAdd.isNotEmpty) {
         // Fire after the current frame to avoid re-entrant formatting.
-        Future.microtask(() => onComma(toAdd));
+        unawaited(Future.microtask(() => onComma(toAdd)));
       }
       return newValue.copyWith(
         text: last,

@@ -263,7 +263,7 @@ class OiResponsiveShell extends StatelessWidget {
         ? Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              if (railTrailing != null) railTrailing!,
+              ?railTrailing,
               if (railTrailing != null) const SizedBox(height: 8),
               floatingAction!,
             ],

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/buttons/oi_button.dart';
 import 'package:obers_ui/src/components/buttons/oi_icon_button.dart';
@@ -468,7 +470,8 @@ class _LoadingIndicatorState extends State<_LoadingIndicator>
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 800),
-    )..repeat();
+    );
+    unawaited(_controller.repeat());
   }
 
   @override

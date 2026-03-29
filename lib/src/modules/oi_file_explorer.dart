@@ -214,7 +214,7 @@ class _OiFileExplorerState extends State<OiFileExplorer> {
     super.initState();
     widget.controller.loadFolder = widget.loadFolder;
     widget.controller.addListener(_onControllerChanged);
-    _loadFolderTree();
+    unawaited(_loadFolderTree());
   }
 
   @override
@@ -716,7 +716,9 @@ class _OiFileExplorerState extends State<OiFileExplorer> {
       folderTree: _folderTree,
       selectedFolderId: widget.controller.currentFolder?.id.toString(),
       onFolderSelect: (folder) {
-        widget.controller.navigateTo(folder.id.toString(), folder: folder);
+        unawaited(
+          widget.controller.navigateTo(folder.id.toString(), folder: folder),
+        );
       },
       quickAccess: widget.quickAccess,
       storage: widget.storage,
@@ -818,7 +820,7 @@ class _OiFileExplorerState extends State<OiFileExplorer> {
           child: OiPathBar(
             segments: _pathSegments,
             onNavigate: (segment) {
-              controller.navigateTo(segment.id);
+              unawaited(controller.navigateTo(segment.id));
             },
           ),
         ),
@@ -852,7 +854,7 @@ class _OiFileExplorerState extends State<OiFileExplorer> {
           label: 'View mode',
           exclusive: true,
           selectedIndex: controller.viewMode == OiFileViewMode.list ? 0 : 1,
-          onSelect: (int index) {
+          onSelect: (index) {
             controller.setViewMode(
               index == 0 ? OiFileViewMode.list : OiFileViewMode.grid,
             );
@@ -990,7 +992,7 @@ class _OiFileExplorerState extends State<OiFileExplorer> {
         onSelectionChange: controller.setSelection,
         onOpen: (file) {
           if (file.folder) {
-            controller.navigateTo(file.id.toString(), folder: file);
+            unawaited(controller.navigateTo(file.id.toString(), folder: file));
           } else {
             widget.onOpen?.call(file);
           }
@@ -1037,7 +1039,7 @@ class _OiFileExplorerState extends State<OiFileExplorer> {
       onSelectionChange: controller.setSelection,
       onOpen: (file) {
         if (file.folder) {
-          controller.navigateTo(file.id.toString(), folder: file);
+          unawaited(controller.navigateTo(file.id.toString(), folder: file));
         } else {
           widget.onOpen?.call(file);
         }

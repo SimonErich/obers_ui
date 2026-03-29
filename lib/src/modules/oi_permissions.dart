@@ -200,7 +200,7 @@ class OiPermissions extends StatelessWidget {
     final colors = context.colors;
     final spacing = context.spacing;
 
-    return Container(
+    return DecoratedBox(
       decoration: BoxDecoration(
         border: Border(bottom: BorderSide(color: colors.borderSubtle)),
       ),

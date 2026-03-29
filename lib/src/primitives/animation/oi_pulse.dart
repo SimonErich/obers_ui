@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 
@@ -76,7 +78,7 @@ class _OiPulseState extends State<OiPulse> with SingleTickerProviderStateMixin {
     );
     _buildAnimations();
     if (widget.active) {
-      _controller.repeat(reverse: true);
+      unawaited(_controller.repeat(reverse: true));
     }
   }
 
@@ -118,7 +120,9 @@ class _OiPulseState extends State<OiPulse> with SingleTickerProviderStateMixin {
         context.animations.reducedMotion ||
         MediaQuery.disableAnimationsOf(context);
     if (widget.active && !reduced) {
-      if (!_controller.isAnimating) _controller.repeat(reverse: true);
+      if (!_controller.isAnimating) {
+        unawaited(_controller.repeat(reverse: true));
+      }
     } else {
       _controller.stop();
     }

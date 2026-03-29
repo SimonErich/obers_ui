@@ -1,5 +1,4 @@
 // Tests do not require documentation comments.
-// ignore_for_file: public_member_api_docs
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui/src/foundation/scales/oi_chart_scale.dart';

@@ -1,5 +1,4 @@
 // Tests do not require documentation comments.
-// ignore_for_file: public_member_api_docs
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -30,7 +29,7 @@ class _TestRouterDelegate extends RouterDelegate<Object>
     return Navigator(
       key: navigatorKey,
       onGenerateRoute: (_) =>
-          PageRouteBuilder<void>(pageBuilder: (_, __, ___) => _child),
+          PageRouteBuilder<void>(pageBuilder: (_, _, _) => _child),
     );
   }
 

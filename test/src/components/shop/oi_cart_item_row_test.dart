@@ -1,5 +1,4 @@
 // Tests do not require documentation comments.
-// ignore_for_file: public_member_api_docs
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
@@ -16,7 +15,7 @@ FlutterExceptionHandler? _originalOnError;
 
 void _ignoreImageErrors() {
   _originalOnError = FlutterError.onError;
-  FlutterError.onError = (FlutterErrorDetails details) {
+  FlutterError.onError = (details) {
     if (details.exception.toString().contains('NetworkImageLoadException') ||
         details.library == 'image resource service') {
       return;
