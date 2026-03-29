@@ -516,6 +516,7 @@ OiColorPalettePicker(
 | `OiPageIndicator` | Dot indicators for paged content (carousels, onboarding) |
 | `OiScrollToTop` | Floating scroll-to-top button that appears on scroll |
 | `OiImagePreviewCard` | Image card with shimmer loading, status badge, edit overlay, version label |
+| `OiStatusDot` | Semantic live-status indicator dot with pulse animation and OiStatusVariant enum |
 
 ### OiProgress
 
@@ -1350,6 +1351,7 @@ if (selectedFilter != null) applyFilter(selectedFilter);
 | `OiPanel` | Sliding side panel |
 | `OiResizable` | Resizable container |
 | `OiSplitPane` | Draggable splitter between two children |
+| `OiPanelHeader` | Titled header bar for panels with leading/trailing slots, subtitle, 3 sizes, border options |
 
 ## Feedback
 
@@ -1865,3 +1867,69 @@ OiLocaleSwitcher(
 | Widget | Description |
 |---|---|
 | `OiSelectionOverlay` | Multi-selection UI overlay |
+| `OiKbd` | Keyboard shortcut display with platform-specific glyph mapping |
+
+### OiPanelHeader
+
+Titled header bar for use inside `OiSplitPane`, `OiPanel`, `OiResizable`, or any panel-like container. Shows a label with optional subtitle, leading/trailing slots, and configurable size and borders.
+
+```dart
+OiPanelHeader(
+  label: 'Properties',
+  subtitle: '12 items',
+  trailing: OiIconButton(icon: OiIcons.settings, semanticLabel: 'Settings'),
+  size: OiPanelHeaderSize.compact,
+  border: OiPanelHeaderBorder.bottom,
+)
+```
+
+**Key features:**
+
+- Three sizes: compact (32px), medium (48px, default), large (64px)
+- Three border modes: none, bottom (default), all
+- Optional `onTap` wraps content in `OiTappable` with hover/focus states
+- Optional `backgroundColor` override
+- Semantic header role for accessibility
+
+**Related components:** `OiPanel`, `OiSplitPane`, `OiResizable`, `OiPropertyGrid`
+
+### OiStatusDot
+
+Semantic live-status indicator dot with optional pulse animation. Use `OiStatusDot.active()` for a boolean on/off shorthand.
+
+```dart
+// Explicit variant
+OiStatusDot(label: 'Service health', variant: OiStatusVariant.success, pulsing: true)
+
+// Boolean shorthand
+OiStatusDot.active(active: isOnline, label: 'Connection status')
+```
+
+**Key features:**
+
+- Six semantic variants: success (green), warning (amber), error (red), info (blue), neutral, muted
+- Optional `color` override takes precedence over variant
+- Configurable `size` (default 8px diameter)
+- `pulsing` enables OiPulse glow animation
+- `OiStatusDot.active()` factory: `active: true` -> success + pulse, `active: false` -> muted
+
+**Related components:** `OiAvatar` (presence), `OiWorkflowTree`, `OiPipeline`, `OiStatusBar`
+
+### OiKbd
+
+Displays a sequence of keyboard keys as styled chips with platform-specific glyph mapping. For example, `meta` renders as the command symbol on Apple and `Ctrl` elsewhere.
+
+```dart
+OiKbd(keys: const ['meta', 'shift', 'K'])
+// Apple:  ⌘  ⇧  K
+// Other: Ctrl Shift K
+```
+
+**Key features:**
+
+- Recognised keys: `meta`/`cmd`, `ctrl`, `shift`, `alt`/`option`, `enter`, `tab`, `esc`, `backspace`, `delete`, `up`, `down`, `left`, `right`, `space`
+- Unrecognised strings pass through capitalised
+- Styled with theme tokens: `surfaceHover` background, `borderSubtle` border, `radius.xs`
+- Semantic label auto-generated from key names joined with ` + `
+
+**Related components:** `OiCommandBar`, `OiMenuBar`, `OiTooltip`, `OiShortcutScope`

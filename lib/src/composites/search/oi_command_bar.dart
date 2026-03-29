@@ -1,5 +1,6 @@
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/src/components/interaction/oi_kbd.dart';
 import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/primitives/input/oi_raw_input.dart';
@@ -350,17 +351,17 @@ class _OiCommandBarState extends State<OiCommandBar> {
   // ── Shortcut display ──────────────────────────────────────────────────────
 
   /// Formats a [ShortcutActivator] into a human-readable string.
-  String _formatShortcut(ShortcutActivator activator) {
+  List<String> _shortcutKeys(ShortcutActivator activator) {
     if (activator is SingleActivator) {
       final parts = <String>[];
-      if (activator.control) parts.add('Ctrl');
-      if (activator.meta) parts.add('\u2318');
-      if (activator.alt) parts.add('Alt');
-      if (activator.shift) parts.add('Shift');
+      if (activator.control) parts.add('ctrl');
+      if (activator.meta) parts.add('meta');
+      if (activator.alt) parts.add('alt');
+      if (activator.shift) parts.add('shift');
       parts.add(activator.trigger.keyLabel);
-      return parts.join('+');
+      return parts;
     }
-    return activator.toString();
+    return [activator.toString()];
   }
 
   // ── Build ─────────────────────────────────────────────────────────────────
@@ -562,75 +563,57 @@ class _OiCommandBarState extends State<OiCommandBar> {
         if (index >= 0) setState(() => _highlightedIndex = index);
       },
       child: GestureDetector(
-      onTap: () => _drillDown(cmd),
-      behavior: HitTestBehavior.opaque,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        color: isHighlighted ? colors.surfaceHover : null,
-        child: Row(
-          children: [
-            if (cmd.icon != null)
-              Padding(
-                padding: const EdgeInsets.only(right: 8),
-                child: Icon(cmd.icon, size: 16, color: colors.text),
-              ),
-            Expanded(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    cmd.label,
-                    style: TextStyle(fontSize: 14, color: colors.text),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  if (cmd.description != null)
+        onTap: () => _drillDown(cmd),
+        behavior: HitTestBehavior.opaque,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          color: isHighlighted ? colors.surfaceHover : null,
+          child: Row(
+            children: [
+              if (cmd.icon != null)
+                Padding(
+                  padding: const EdgeInsets.only(right: 8),
+                  child: Icon(cmd.icon, size: 16, color: colors.text),
+                ),
+              Expanded(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
                     Text(
-                      cmd.description!,
-                      style: TextStyle(fontSize: 12, color: colors.textMuted),
+                      cmd.label,
+                      style: TextStyle(fontSize: 14, color: colors.text),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
-                ],
-              ),
-            ),
-            if (hasChildren)
-              Padding(
-                padding: const EdgeInsets.only(left: 8),
-                child: Icon(
-                  OiIcons.chevronRight,
-                  size: 14,
-                  color: colors.textMuted,
+                    if (cmd.description != null)
+                      Text(
+                        cmd.description!,
+                        style: TextStyle(fontSize: 12, color: colors.textMuted),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                  ],
                 ),
               ),
-            if (cmd.shortcut != null && !hasChildren)
-              Padding(
-                padding: const EdgeInsets.only(left: 8),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 6,
-                    vertical: 2,
-                  ),
-                  decoration: BoxDecoration(
-                    color: colors.surfaceSubtle,
-                    borderRadius: BorderRadius.circular(4),
-                    border: Border.all(color: colors.borderSubtle),
-                  ),
-                  child: Text(
-                    _formatShortcut(cmd.shortcut!),
-                    style: TextStyle(
-                      fontSize: 11,
-                      color: colors.textMuted,
-                      fontFamily: 'monospace',
-                    ),
+              if (hasChildren)
+                Padding(
+                  padding: const EdgeInsets.only(left: 8),
+                  child: Icon(
+                    OiIcons.chevronRight,
+                    size: 14,
+                    color: colors.textMuted,
                   ),
                 ),
-              ),
-          ],
+              if (cmd.shortcut != null && !hasChildren)
+                Padding(
+                  padding: const EdgeInsets.only(left: 8),
+                  child: OiKbd(keys: _shortcutKeys(cmd.shortcut!)),
+                ),
+            ],
+          ),
         ),
       ),
-    ),
     );
   }
 }

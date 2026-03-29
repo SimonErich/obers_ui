@@ -10,6 +10,7 @@ Composites combine multiple components into complex UI patterns. They handle int
 | `OiTree` | Hierarchical tree view with expand/collapse |
 | `OiReorderableList` | Drag-to-reorder list with drag handles, long-press, and keyboard support |
 | `OiDataGrid` | Lightweight data grid with sorting, selection, striped rows, and loading states |
+| `OiPropertyGrid` | Dense two-column settings grid with draggable divider |
 
 ### OiTable
 
@@ -249,6 +250,7 @@ final user = await OiFormDialog.showCustom<User>(
 | `OiResponsiveShell` | Responsive navigation shell that auto-switches between OiBottomBar and OiNavigationRail |
 | `OiThreeColumnLayout` | Resizable three-column IDE-style layout |
 | `OiFilterableNavList<T>` | Typed navigation list with search, chip filters, grouped items |
+| `OiPageHeader` | Standardised page header with breadcrumbs, title, status badge, actions, bottom slot |
 
 ### OiResponsiveShell
 
@@ -648,6 +650,7 @@ OiOrderTracker(
 | `OiPipeline` | Linear stage pipeline |
 | `OiStateDiagram` | State machine visualization |
 | `OiWorkflowStepper` | Two-row phase/step navigation stepper |
+| `OiWorkflowTree<T>` | Expandable group-to-item tree with progress, status dots, role badges |
 
 ### OiWorkflowStepper
 
@@ -686,3 +689,87 @@ OiWorkflowStepper(
 - Keyboard navigation between steps
 
 **Related components:** `OiStepper`, `OiPipeline`, `OiWizard`, `OiTabs`
+
+### OiWorkflowTree
+
+Expandable group-to-item tree with inline progress indicators. Bridges the gap between `OiPipeline` (flat stage list) and `OiTree` (generic hierarchy) by adding workflow-specific semantics: aggregate status, progress counts, role badges, and auto-expansion of active groups.
+
+```dart
+OiWorkflowTree<void>(
+  label: 'Build pipeline',
+  groups: [
+    OiWorkflowGroup(id: 'build', label: 'Build', items: [
+      OiWorkflowItem(id: 'lint', label: 'Lint', status: OiPipelineStatus.completed),
+      OiWorkflowItem(id: 'test', label: 'Test', status: OiPipelineStatus.running),
+      OiWorkflowItem(id: 'deploy', label: 'Deploy', status: OiPipelineStatus.pending),
+    ]),
+  ],
+  onItemTap: (item) => showDetails(item.id),
+)
+```
+
+**Key features:**
+
+- Groups with collapsible item lists and animated expand/collapse
+- Aggregate status dot per group (running/failed/completed/pending)
+- Inline progress counts ("3 / 7") in group headers
+- Auto-expand groups containing running items on first build
+- Per-item: status dot, role badge, duration display, trailing widget, highlight
+- `OiWorkflowTreeController` for programmatic expand/collapse
+
+**Related components:** `OiPipeline`, `OiTree`, `OiStatusDot`, `OiBadge`, `OiStepper`
+
+### OiPropertyGrid
+
+Dense two-column grid for displaying and editing properties or settings. The label and editor columns are separated by a draggable divider.
+
+```dart
+OiPropertyGrid(
+  properties: [
+    OiPropertyRow(label: 'Visible', editor: OiSwitch(value: true, onChanged: (_) {})),
+    OiPropertyRow(label: 'Opacity', editor: OiSlider(value: 0.8, onChanged: (_) {}), tooltip: 'Layer opacity'),
+    OiPropertyRow(label: 'Name', editor: OiEditableText(value: 'Layer 1', onChanged: (_) {})),
+  ],
+)
+```
+
+**Key features:**
+
+- Draggable divider between label and editor columns (clamped 20%-80%)
+- Configurable initial split ratio via `dividerPosition` (default 0.4)
+- `onDividerDragged` callback reports new ratio
+- Optional tooltip on label hover via `OiPropertyRow.tooltip`
+- Row separators with theme-aware border colour
+- `MergeSemantics` for each row for accessibility
+
+**Related components:** `OiPanelHeader`, `OiSplitPane`, `OiAccordion`, `OiKeyValue`
+
+### OiPageHeader
+
+Standardised page header combining breadcrumbs, title, status badge, action buttons, and an optional bottom slot (e.g. tabs). All slots except `title` are optional.
+
+```dart
+OiPageHeader(
+  title: 'Users',
+  breadcrumbs: [
+    OiBreadcrumbItem(label: 'Home', onTap: () => go('/')),
+    OiBreadcrumbItem(label: 'Users'),
+  ],
+  statusBadge: OiBadge.soft(label: '142 active', color: OiBadgeColor.success),
+  actions: [
+    OiButton.primary(label: 'Add User', onTap: () {}),
+  ],
+  bottom: OiTabs(items: [OiTabItem(label: 'All'), OiTabItem(label: 'Active')]),
+)
+```
+
+**Key features:**
+
+- Optional breadcrumb trail above the title row
+- Status badge displayed inline next to the title
+- Action widgets at the trailing end (buttons, icon buttons)
+- Optional bottom slot for tabs, filters, or other sub-navigation
+- Semantic header role for accessibility
+- Degrades cleanly to a standalone title when optional slots are omitted
+
+**Related components:** `OiBreadcrumbs`, `OiBadge`, `OiTabs`, `OiButton`, `OiPage`, `OiResourcePage`

@@ -1,6 +1,6 @@
 # obers_ui — AI Integration Reference
 
-> **Version:** Synced with codebase as of 2026-03-28 (includes Shop, Admin & new UI elements)
+> **Version:** Synced with codebase as of 2026-03-29 (includes Shop, Admin & new UI elements)
 > **Single import:** `import 'package:obers_ui/obers_ui.dart';`
 > **Zero Material dependency** — do NOT use MaterialApp, Scaffold, AppBar, or any Material/Cupertino widgets.
 
@@ -312,7 +312,7 @@ OiApp(
 ### OiApp
 **Tags:** `app`, `root`, `setup`, `theme`, `entry-point`
 
-Root widget replacing `MaterialApp`. Injects theme, overlays, undo stack, accessibility, platform info, density, shortcuts, tour scope, settings.
+Root widget replacing `MaterialApp`. Injects theme, overlays, undo stack, accessibility, platform info, density, shortcuts, tour scope, settings. Also injects `HeroController` (via `HeroControllerScope` for router, `navigatorObservers` for non-router), `AnnotatedRegion<SystemUiOverlayStyle>` for status-bar styling, and `ScrollConfiguration` with `OiScrollBehavior` to strip Material overscroll glow.
 
 **Key Parameters:**
 - `home` (Widget, required) — Root widget for basic navigation
@@ -442,6 +442,45 @@ OiApp(
 - `OiSettingsData` — Settings storage model
 - `OiSettingsProvider` — Change notifier
 - `OiSettingsMixin` — Convenience mixin
+
+### OiScrollBehavior
+**Tags:** `scroll`, `overscroll`, `physics`, `glow`, `foundation`
+
+Custom `ScrollBehavior` that strips Material's Android overscroll glow and picks platform-appropriate physics (bouncing on Apple, clamping elsewhere). Injected automatically by `OiApp` via `ScrollConfiguration` — every scrollable in the tree inherits it.
+
+**Usage:** Automatic — no manual setup needed. If you need to override in a subtree:
+```dart
+ScrollConfiguration(
+  behavior: const OiScrollBehavior(),
+  child: myScrollable,
+)
+```
+
+---
+
+### OiTextSelectionControls
+
+**Tags:** `text-selection`, `handles`, `context-menu`, `clipboard`, `foundation`
+
+Custom `TextSelectionControls` that render selection handles as themed circles with a short stem (using `primary.base` colour) instead of Material/Cupertino handles. The deprecated toolbar API is suppressed — use `buildOiSelectionToolbar` as the `contextMenuBuilder` instead.
+
+**Companion Function:**
+
+- `buildOiSelectionToolbar(context, editableTextState)` — Builds an obers_ui-styled text-selection context menu (Cut/Copy/Paste/Select All). Pass as `contextMenuBuilder` on `EditableText` or `OiRawInput`.
+
+**Usage:**
+```dart
+EditableText(
+  selectionControls: OiTextSelectionControls(),
+  contextMenuBuilder: buildOiSelectionToolbar,
+  // ...
+)
+```
+
+**Use When:** Any `EditableText` or custom text input that needs themed handles and context menu.
+**Avoid When:** Using `OiTextInput` — it configures these automatically.
+
+---
 
 ### OiPageRoute
 **Tags:** `route`, `page`, `transition`, `navigation`, `animation`
@@ -1772,6 +1811,38 @@ Hover/focus tooltip.
 
 ---
 
+#### OiStatusDot
+**Tags:** `status`, `dot`, `indicator`, `live`, `pulse`, `health`, `online`
+**Tier:** Component
+
+Semantic live-status indicator dot with optional pulse animation via `OiPulse`.
+
+**Key Parameters:**
+
+- `label` (String, required) — Accessibility label
+- `variant` (OiStatusVariant, default: neutral) — success/warning/error/info/neutral/muted
+- `color` (Color?) — Explicit colour override (takes precedence over variant)
+- `size` (double, default: 8.0) — Diameter in logical pixels
+- `pulsing` (bool, default: false) — Whether the dot animates with a pulsing glow
+
+**Factory Constructor:**
+
+- `OiStatusDot.active(active:, label:)` — Boolean shorthand: `active: true` -> success + pulse, `active: false` -> muted
+
+**Enum — OiStatusVariant:** success (green), warning (amber), error (red), info (blue), neutral (text), muted (dimmed)
+
+**Usage:**
+```dart
+OiStatusDot(label: 'Service health', variant: OiStatusVariant.success, pulsing: true)
+OiStatusDot.active(active: isOnline, label: 'Connection status')
+```
+
+**Use When:** Health indicators, online/offline status, build status, server monitoring.
+**Avoid When:** Category labels — use `OiBadge`. Presence on avatars — use `OiAvatar(presence:)`.
+**Combine With:** `OiListTile`, `OiWorkflowTree`, `OiStatusBar`, `OiPipeline`
+
+---
+
 ### COMPONENTS — Display (Admin)
 
 ---
@@ -2643,6 +2714,30 @@ Selector for payment methods (credit card, PayPal, bank transfer, saved cards).
 **Tier:** Component
 
 Rubber-band selection rectangle for multi-select in list/grid.
+
+---
+
+#### OiKbd
+**Tags:** `keyboard`, `shortcut`, `key`, `hotkey`, `keybinding`, `display`
+**Tier:** Component
+
+Displays a sequence of keyboard keys as styled chips with platform-specific glyph mapping (e.g. `meta` renders as `⌘` on Apple, `Ctrl` elsewhere).
+
+**Key Parameters:**
+
+- `keys` (List\<String\>, required) — Logical key names to display
+
+**Recognised Keys (case-insensitive):** `meta`/`cmd`, `ctrl`, `shift`, `alt`/`option`, `enter`, `tab`, `esc`, `backspace`, `delete`, `up`, `down`, `left`, `right`, `space`. Unrecognised strings pass through capitalised.
+
+**Usage:**
+```dart
+OiKbd(keys: const ['meta', 'shift', 'K'])
+// Apple:  ⌘  ⇧  K
+// Other: Ctrl Shift K
+```
+
+**Use When:** Keyboard shortcut hints in menus, tooltips, command palettes, documentation.
+**Combine With:** `OiCommandBar`, `OiMenuBar`, `OiTooltip`, `OiShortcutScope`
 
 ---
 
@@ -3581,6 +3676,46 @@ Two-pane split layout with draggable divider.
 
 ---
 
+#### OiPanelHeader
+**Tags:** `panel`, `header`, `title`, `bar`, `section-header`
+**Tier:** Component
+
+Titled header bar for panels, with leading/trailing slots, optional subtitle, three sizes, and configurable borders.
+
+**Key Parameters:**
+
+- `label` (String, required) — Primary title text
+- `leading` (Widget?) — Widget before title (e.g. icon, toggle)
+- `trailing` (Widget?) — Widget after title (e.g. action icons)
+- `subtitle` (String?) — Subtitle shown below label
+- `size` (OiPanelHeaderSize, default: medium) — compact(32px)/medium(48px)/large(64px)
+- `border` (OiPanelHeaderBorder, default: bottom) — none/bottom/all
+- `backgroundColor` (Color?) — Overrides default surface background
+- `onTap` (VoidCallback?) — When set, wraps content in OiTappable with hover/focus states
+- `semanticLabel` (String?) — Falls back to `label`
+
+**Enums:**
+
+- `OiPanelHeaderSize` — compact, medium, large
+- `OiPanelHeaderBorder` — none, bottom, all
+
+**Usage:**
+```dart
+OiPanelHeader(
+  label: 'Properties',
+  subtitle: '12 items',
+  trailing: OiIconButton(icon: OiIcons.settings, semanticLabel: 'Settings'),
+  size: OiPanelHeaderSize.compact,
+  border: OiPanelHeaderBorder.bottom,
+)
+```
+
+**Use When:** Panel/split-pane headers, section titles inside `OiSplitPane`, `OiPanel`, `OiResizable`.
+**Avoid When:** Page-level headers — use `OiPageHeader`. App-level headers — use `OiSliverHeader`.
+**Combine With:** `OiSplitPane`, `OiPanel`, `OiResizable`, `OiPropertyGrid`
+
+---
+
 ### COMPONENTS — Toolbars (Admin)
 
 ---
@@ -3819,6 +3954,41 @@ A drag-to-reorder list that supports drag handles, long-press drag, keyboard reo
 **Use When:** User-sortable lists (task priority, playlist order, form field order).
 **Avoid When:** Simple display lists -- use `OiVirtualList`. Grid reorder -- use `OiReorderable` primitive.
 **Combine With:** `OiListTile`, `OiCard`, `OiDivider` (as separator)
+
+---
+
+#### OiPropertyGrid
+**Tags:** `property`, `grid`, `settings`, `two-column`, `divider`, `inspector`
+**Tier:** Composite
+
+Dense two-column settings grid with a draggable divider between label and editor columns.
+
+**Key Parameters:**
+
+- `properties` (List\<OiPropertyRow\>, required) — The property rows to display
+- `dividerPosition` (double, default: 0.4) — Initial split ratio (0.0-1.0), 40% labels / 60% editors
+- `onDividerDragged` (ValueChanged\<double\>?) — Called when the user drags the divider
+
+**Companion Class — OiPropertyRow:**
+
+- `label` (String, required) — Property name shown in label column
+- `editor` (Widget, required) — Inline editor widget (e.g. `OiSwitch`, `OiEditableText`)
+- `tooltip` (String?) — Optional tooltip on hover over label
+
+**Usage:**
+```dart
+OiPropertyGrid(
+  properties: [
+    OiPropertyRow(label: 'Visible', editor: OiSwitch(value: true, onChanged: (_) {})),
+    OiPropertyRow(label: 'Opacity', editor: OiSlider(value: 0.8, onChanged: (_) {}), tooltip: 'Layer opacity'),
+    OiPropertyRow(label: 'Name', editor: OiEditableText(value: 'Layer 1', onChanged: (_) {})),
+  ],
+)
+```
+
+**Use When:** Property inspectors, settings panels, attribute editors (like IDE/design tool side panels).
+**Avoid When:** Forms with validation — use `OiForm`. Read-only display — use `OiKeyValue.group`.
+**Combine With:** `OiPanelHeader`, `OiSplitPane`, `OiResizable`, `OiAccordion`
 
 ---
 
@@ -4377,6 +4547,42 @@ Responsive navigation shell that auto-switches between `OiBottomBar` (mobile) an
 
 ---
 
+#### OiPageHeader
+**Tags:** `page`, `header`, `breadcrumbs`, `title`, `actions`, `navigation`
+**Tier:** Composite
+
+Standardised page header combining breadcrumbs, title, status badge, action buttons, and an optional bottom slot (e.g. tabs). All slots except `title` are optional — degrades cleanly to a standalone title row.
+
+**Key Parameters:**
+
+- `title` (String, required) — The page title
+- `breadcrumbs` (List\<OiBreadcrumbItem\>?) — Breadcrumb trail rendered above the title row
+- `statusBadge` (Widget?) — Status badge displayed next to the title (e.g. `OiBadge`)
+- `actions` (List\<Widget\>?) — Action widgets at the trailing end of the title row (e.g. `OiButton`)
+- `bottom` (Widget?) — Widget below the title row (e.g. `OiTabs`)
+
+**Usage:**
+```dart
+OiPageHeader(
+  title: 'Users',
+  breadcrumbs: [
+    OiBreadcrumbItem(label: 'Home', onTap: () => go('/')),
+    OiBreadcrumbItem(label: 'Users'),
+  ],
+  statusBadge: OiBadge.soft(label: '142 active', color: OiBadgeColor.success),
+  actions: [
+    OiButton.primary(label: 'Add User', onTap: () {}),
+  ],
+  bottom: OiTabs(items: [OiTabItem(label: 'All'), OiTabItem(label: 'Active')]),
+)
+```
+
+**Use When:** Page-level headers in admin/dashboard apps, CRUD pages, detail pages.
+**Avoid When:** Panel-level headers — use `OiPanelHeader`. App-level sticky headers — use `OiSliverHeader`.
+**Combine With:** `OiPage`, `OiBreadcrumbs`, `OiBadge`, `OiTabs`, `OiButton`, `OiResourcePage`
+
+---
+
 ### COMPOSITES — Onboarding
 
 ---
@@ -4582,6 +4788,49 @@ Linear pipeline stage visualization with status indicators.
 **Tier:** Composite
 
 State machine visualization extending OiFlowGraph.
+
+---
+
+#### OiWorkflowTree\<T\>
+**Tags:** `workflow`, `tree`, `expand`, `progress`, `group`, `pipeline`, `status`
+**Tier:** Composite
+
+Expandable group-to-item tree with inline progress indicators. Bridges the gap between `OiPipeline` (flat stage list) and `OiTree` (generic hierarchy) by adding workflow-specific semantics: aggregate status, progress counts, role badges, and auto-expansion of active groups.
+
+**Key Parameters:**
+
+- `label` (String, required) — Semantic label for the entire tree
+- `groups` (List\<OiWorkflowGroup\<T\>\>, required) — The groups displayed in the tree
+- `controller` (OiWorkflowTreeController?) — External controller; internal one created when null
+- `showProgress` (bool, default: true) — Show inline progress counts (e.g. "3 / 7") in group headers
+- `autoExpandActive` (bool, default: true) — Auto-expand groups containing a running item on first build
+- `onItemTap` (void Function(OiWorkflowItem\<T\>)?) — Called when an item row is tapped
+- `onGroupTap` (void Function(OiWorkflowGroup\<T\>)?) — Called when a group header is tapped
+
+**Companion Classes:**
+
+- `OiWorkflowGroup<T>` — `id`, `label`, `items` (List\<OiWorkflowItem\<T\>\>), `icon`
+- `OiWorkflowItem<T>` — `id`, `label`, `status` (OiPipelineStatus), `data`, `role`, `duration`, `trailingWidget`, `highlighted`
+- `OiWorkflowTreeController` — `isExpanded()`, `expandGroup()`, `collapseGroup()`, `toggleGroup()`, `expandAll()`, `collapseAll()`
+
+**Usage:**
+```dart
+OiWorkflowTree<void>(
+  label: 'Build pipeline',
+  groups: [
+    OiWorkflowGroup(id: 'build', label: 'Build', items: [
+      OiWorkflowItem(id: 'lint', label: 'Lint', status: OiPipelineStatus.completed),
+      OiWorkflowItem(id: 'test', label: 'Test', status: OiPipelineStatus.running),
+      OiWorkflowItem(id: 'deploy', label: 'Deploy', status: OiPipelineStatus.pending),
+    ]),
+  ],
+  onItemTap: (item) => showDetails(item.id),
+)
+```
+
+**Use When:** Multi-group workflow tracking, build pipelines with stages, onboarding checklists, approval workflows.
+**Avoid When:** Simple flat pipelines — use `OiPipeline`. Generic tree — use `OiTree`.
+**Combine With:** `OiStatusDot`, `OiBadge`, `OiPipeline`, `OiSplitPane`
 
 ---
 
@@ -5709,7 +5958,7 @@ Searchable keyword -> widget mapping for quick lookup.
 | `detail` | OiDetailView, OiFieldDisplay |
 | `destination` | OiNavigationItem |
 | `dialog` | OiDialog, OiDialog.showAsync, showOiDialog, OiDialogShell, OiDeleteDialog, OiNameDialog, OiRenameDialog, OiFormDialog |
-| `dot` | OiStatusBarItem |
+| `dot` | OiStatusDot, OiStatusBarItem |
 | `dots` | OiPageIndicator |
 | `diff` | OiDiffView |
 | `divider` | OiDivider |
@@ -5745,7 +5994,7 @@ Searchable keyword -> widget mapping for quick lookup.
 | `graph` | OiFlowGraph |
 | `grid` | OiGrid, OiMasonry, OiVirtualGrid, OiFileGridView, OiGridZoomControls |
 | `group` | OiButtonGroup, OiAccordion, OiFormSection |
-| `header` | OiSliverHeader |
+| `header` | OiSliverHeader, OiPanelHeader, OiPageHeader |
 | `heading` | OiLabel.h1, .h2, .h3, .h4 |
 | `help` | OiHelpCenter |
 | `hierarchy` | OiTree, OiFolderTreeItem |
@@ -5753,12 +6002,12 @@ Searchable keyword -> widget mapping for quick lookup.
 | `icon` | OiIcon, OiIconButton, OiFileIcon, OiFolderIcon |
 | `ide` | OiThreeColumnLayout |
 | `image` | OiImage, OiAvatar, OiGallery, OiLightbox, OiImageCropper, OiImageAnnotator, OiImagePreviewCard |
-| `indicator` | OiProgress, OiLiveRing, OiPulse, OiStorageIndicator, OiPageIndicator |
+| `indicator` | OiProgress, OiLiveRing, OiPulse, OiStorageIndicator, OiPageIndicator, OiStatusDot |
 | `inline-edit` | OiEditable, OiEditableText, OiEditableSelect, OiEditableDate, OiEditableNumber |
 | `input` | OiTextInput, OiNumberInput, OiDateInput, OiTimeInput, OiDateTimeInput, OiSelect, OiFormSelect, OiComboBox, OiCheckbox, OiSwitch, OiRadio, OiSlider, OiTagInput, OiColorInput, OiFileInput, OiArrayInput, OiDatePickerField, OiDateRangePickerField, OiTimePickerField |
 | `lazy` | OiSliverList, OiSliverGrid, OiVirtualList |
 | `kanban` | OiKanban |
-| `keyboard` | OiShortcutScope, OiShortcuts, OiCommandBar, OiFocusTrap |
+| `keyboard` | OiShortcutScope, OiShortcuts, OiCommandBar, OiFocusTrap, OiKbd |
 | `kpi` | OiMetric |
 | `label` | OiLabel |
 | `layout` | OiRow, OiColumn, OiGrid, OiPage, OiSection, OiMasonry, OiWrapLayout, OiSpacer, OiThreeColumnLayout |
@@ -5790,7 +6039,7 @@ Searchable keyword -> widget mapping for quick lookup.
 | `palette` | OiColorPalettePicker |
 | `pagination` | OiPaginationController, OiTable, OiListView, OiPagination, OiPageIndicator |
 | `password` | OiTextInput.password |
-| `panel` | OiPanel, OiResizable, OiSplitPane |
+| `panel` | OiPanel, OiResizable, OiSplitPane, OiPanelHeader |
 | `path` | OiPathBar, OiBreadcrumbs |
 | `payment` | OiPaymentMethod, OiPaymentMethodPicker |
 | `permission` | OiPermissions |
@@ -5825,7 +6074,7 @@ Searchable keyword -> widget mapping for quick lookup.
 | `rich-text` | OiRichEditor, OiMarkdown |
 | `row` | OiRow, OiListTile |
 | `schedule` | OiCalendar, OiGantt, OiScheduler |
-| `scroll` | OiVirtualList, OiVirtualGrid, OiInfiniteScroll, OiScrollbar, OiSliverList, OiSliverGrid, OiSliverHeader, OiScrollToTop, OiRefreshIndicator |
+| `scroll` | OiVirtualList, OiVirtualGrid, OiInfiniteScroll, OiScrollbar, OiSliverList, OiSliverGrid, OiSliverHeader, OiScrollToTop, OiRefreshIndicator, OiScrollBehavior |
 | `scroll-to-top` | OiScrollToTop |
 | `shell` | OiAppShell, OiResponsiveShell, OiDialogShell |
 | `sidebar-lite` | OiNavigationRail |
@@ -5847,7 +6096,8 @@ Searchable keyword -> widget mapping for quick lookup.
 | `sort` | OiTable, OiListView, OiFilterBar, OiSortButton |
 | `split` | OiSplitPane, OiButton.split |
 | `state-diagram` | OiStateDiagram |
-| `status` | OiStatusBar, OiStatusBarItem |
+| `status` | OiStatusBar, OiStatusBarItem, OiStatusDot |
+| `status-dot` | OiStatusDot |
 | `stepper` | OiStepper, OiWizard, OiWorkflowStepper |
 | `streaming` | OiChatWindow |
 | `subscription` | OiSubscriptionManager, OiPricingTable |
@@ -5894,7 +6144,7 @@ Searchable keyword -> widget mapping for quick lookup.
 | `visualization` | OiFlowGraph, OiPipeline, OiStateDiagram |
 | `wishlist` | OiWishlistButton |
 | `wizard` | OiWizard, OiStepper |
-| `workflow` | OiFlowGraph, OiPipeline, OiStateDiagram, OiWorkflowStepper |
+| `workflow` | OiFlowGraph, OiPipeline, OiStateDiagram, OiWorkflowStepper, OiWorkflowTree |
 | `zoom` | OiGridZoomControls |
 
 ---

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/src/foundation/oi_text_selection_controls.dart';
 import 'package:obers_ui/src/foundation/theme/oi_text_theme.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 
@@ -42,6 +43,8 @@ class OiRawInput extends StatefulWidget {
     this.autofocus = false,
     this.inputFormatters,
     this.scrollController,
+    this.selectionControls,
+    this.contextMenuBuilder = buildOiSelectionToolbar,
     super.key,
   });
 
@@ -127,6 +130,16 @@ class OiRawInput extends StatefulWidget {
 
   /// An optional scroll controller for the internal [EditableText].
   final ScrollController? scrollController;
+
+  /// Custom [TextSelectionControls] for the selection handles.
+  ///
+  /// When null, [OiTextSelectionControls] is used.
+  final TextSelectionControls? selectionControls;
+
+  /// Builder for the text selection context menu (Cut / Copy / Paste / …).
+  ///
+  /// Defaults to [buildOiSelectionToolbar].
+  final EditableTextContextMenuBuilder contextMenuBuilder;
 
   @override
   State<OiRawInput> createState() => _OiRawInputState();
@@ -288,6 +301,8 @@ class _OiRawInputState extends State<OiRawInput> {
       autofocus: widget.autofocus,
       inputFormatters: widget.inputFormatters,
       scrollController: widget.scrollController,
+      selectionControls: widget.selectionControls ?? OiTextSelectionControls(),
+      contextMenuBuilder: widget.contextMenuBuilder,
       // Required: renderedCursorColor drives the actual cursor painting.
       selectionColor: effectiveCursorColor.withValues(alpha: 0.3),
     );

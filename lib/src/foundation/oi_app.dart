@@ -1,10 +1,12 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart' show SystemUiOverlayStyle;
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/inputs/oi_select_scope.dart';
 import 'package:obers_ui/src/foundation/oi_accessibility.dart';
 import 'package:obers_ui/src/foundation/oi_input_modality_detector.dart';
 import 'package:obers_ui/src/foundation/oi_overlays.dart';
 import 'package:obers_ui/src/foundation/oi_platform.dart';
+import 'package:obers_ui/src/foundation/oi_scroll_behavior.dart';
 import 'package:obers_ui/src/foundation/oi_shortcut_scope.dart';
 import 'package:obers_ui/src/foundation/oi_tour_scope.dart';
 import 'package:obers_ui/src/foundation/oi_undo_stack.dart';
@@ -214,6 +216,7 @@ class OiApp extends StatefulWidget {
 class _OiAppState extends State<OiApp> {
   late final OiUndoStack _undoStack;
   late final OiOverlaysService _overlaysService;
+  final HeroController _heroController = HeroController();
 
   @override
   void initState() {
@@ -336,6 +339,11 @@ class _OiAppState extends State<OiApp> {
       ),
     );
 
+    result = ScrollConfiguration(
+      behavior: const OiScrollBehavior(),
+      child: result,
+    );
+
     if (widget.settingsDriver != null) {
       result = OiSettingsProvider(
         driver: widget.settingsDriver!,
@@ -343,7 +351,21 @@ class _OiAppState extends State<OiApp> {
       );
     }
 
-    return result;
+    // Provide a HeroController for router-based navigation where
+    // navigatorObservers is not available on WidgetsApp.router.
+    if (widget._useRouter) {
+      result = HeroControllerScope(
+        controller: _heroController,
+        child: result,
+      );
+    }
+
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: themeData.colors.background.computeLuminance() > 0.5
+          ? SystemUiOverlayStyle.dark
+          : SystemUiOverlayStyle.light,
+      child: result,
+    );
   }
 
   @override
@@ -368,6 +390,7 @@ class _OiAppState extends State<OiApp> {
       supportedLocales: widget.supportedLocales,
       title: widget.title,
       debugShowCheckedModeBanner: widget.debugShowCheckedModeBanner,
+      navigatorObservers: [HeroController()],
       pageRouteBuilder: <T>(settings, builder) {
         return PageRouteBuilder<T>(
           settings: settings,
