@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/buttons/oi_button.dart';
 import 'package:obers_ui/src/components/display/oi_empty_state.dart';
+import 'package:obers_ui/src/components/navigation/oi_accordion.dart';
 import 'package:obers_ui/src/components/display/oi_markdown.dart';
 import 'package:obers_ui/src/components/feedback/oi_star_rating.dart';
 import 'package:obers_ui/src/components/inputs/oi_text_input.dart';
@@ -162,9 +163,6 @@ class _OiHelpCenterState extends State<OiHelpCenter> {
   int _activeTab = 0;
   String _searchQuery = '';
   final _searchController = TextEditingController();
-
-  // FAQ state
-  final Set<int> _expandedFaqIndices = {};
 
   // Knowledge base state
   OiKnowledgeArticle? _selectedArticle;
@@ -423,15 +421,11 @@ class _OiHelpCenterState extends State<OiHelpCenter> {
   // ---------------------------------------------------------------------------
 
   Widget _buildFaqTab() {
-    final filtered = <int>[];
-    for (var i = 0; i < widget.faq.length; i++) {
-      final item = widget.faq[i];
-      if (_matchesQuery(item.question) ||
+    final filtered = widget.faq.where((item) {
+      return _matchesQuery(item.question) ||
           _matchesQuery(item.answer) ||
-          item.keywords.any(_matchesQuery)) {
-        filtered.add(i);
-      }
-    }
+          item.keywords.any(_matchesQuery);
+    }).toList();
 
     if (filtered.isEmpty) {
       return const Center(
@@ -442,58 +436,17 @@ class _OiHelpCenterState extends State<OiHelpCenter> {
       );
     }
 
-    return ListView.builder(
-      itemCount: filtered.length,
-      itemBuilder: (context, listIndex) {
-        final faqIndex = filtered[listIndex];
-        final item = widget.faq[faqIndex];
-        final expanded = _expandedFaqIndices.contains(faqIndex);
-
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            OiTappable(
-              semanticLabel:
-                  '${item.question}, ${expanded ? 'expanded' : 'collapsed'}',
-              onTap: () {
-                setState(() {
-                  if (expanded) {
-                    _expandedFaqIndices.remove(faqIndex);
-                  } else {
-                    _expandedFaqIndices.add(faqIndex);
-                  }
-                });
-              },
-              child: Padding(
-                padding: EdgeInsets.symmetric(
-                  vertical: context.spacing.sm,
-                  horizontal: context.spacing.xs,
-                ),
-                child: Row(
-                  children: [
-                    Expanded(child: OiLabel.bodyStrong(item.question)),
-                    Icon(
-                      expanded ? OiIcons.chevronUp : OiIcons.chevronDown,
-                      size: 16,
-                      color: context.colors.textMuted,
-                    ),
-                  ],
-                ),
-              ),
+    return SingleChildScrollView(
+      child: OiAccordion(
+        allowMultiple: true,
+        sections: [
+          for (final item in filtered)
+            OiAccordionSection(
+              title: item.question,
+              content: OiMarkdown(data: item.answer),
             ),
-            if (expanded)
-              Padding(
-                padding: EdgeInsets.only(
-                  left: context.spacing.xs,
-                  right: context.spacing.xs,
-                  bottom: context.spacing.sm,
-                ),
-                child: OiMarkdown(data: item.answer),
-              ),
-            const OiDivider(),
-          ],
-        );
-      },
+        ],
+      ),
     );
   }
 

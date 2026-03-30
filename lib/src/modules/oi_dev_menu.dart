@@ -222,6 +222,11 @@ class _OiDevMenuState extends State<OiDevMenu> {
   String _logSearchQuery = '';
   late final TextEditingController _logSearchController;
 
+  // Environment selection – managed internally so that tapping an environment
+  // always provides visual feedback, even when the parent does not update
+  // [currentEnvironment].
+  String? _selectedEnvironment;
+
   // Trigger mode state.
   bool _isOpen = false;
   int _tapCount = 0;
@@ -231,6 +236,15 @@ class _OiDevMenuState extends State<OiDevMenu> {
   void initState() {
     super.initState();
     _logSearchController = TextEditingController();
+    _selectedEnvironment = widget.currentEnvironment;
+  }
+
+  @override
+  void didUpdateWidget(OiDevMenu oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.currentEnvironment != oldWidget.currentEnvironment) {
+      _selectedEnvironment = widget.currentEnvironment;
+    }
   }
 
   @override
@@ -466,10 +480,13 @@ class _OiDevMenuState extends State<OiDevMenu> {
       separatorBuilder: (_, _) => SizedBox(height: spacing.xs),
       itemBuilder: (context, index) {
         final env = widget.environments[index];
-        final selected = env.key == widget.currentEnvironment;
+        final selected = env.key == _selectedEnvironment;
 
         return OiTappable(
-          onTap: () => widget.onEnvironmentChange?.call(env.key),
+          onTap: () {
+            setState(() => _selectedEnvironment = env.key);
+            widget.onEnvironmentChange?.call(env.key);
+          },
           semanticLabel: '${env.label} environment',
           child: Container(
             padding: EdgeInsets.symmetric(

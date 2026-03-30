@@ -239,6 +239,7 @@ class _OiFeedbackSheetState extends State<OiFeedbackSheet> {
               selected: selected,
               child: OiTappable(
                 onTap: () => setState(() => _selectedCategory = cat),
+                clipBorderRadius: radius.md,
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 150),
                   padding: EdgeInsets.symmetric(
@@ -335,22 +336,24 @@ class _OiFeedbackSheetState extends State<OiFeedbackSheet> {
             padding: EdgeInsets.all(spacing.md),
             child: _isSubmitted
                 ? _buildThankYou(context)
-                : Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      _buildRating(context),
-                      SizedBox(height: spacing.lg),
-                      _buildCategory(context),
-                      SizedBox(height: spacing.lg),
-                      _buildMessage(),
-                      if (widget.showEmail) ...[
-                        SizedBox(height: spacing.md),
-                        _buildEmail(),
+                : SingleChildScrollView(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        _buildRating(context),
+                        SizedBox(height: spacing.lg),
+                        _buildCategory(context),
+                        SizedBox(height: spacing.lg),
+                        _buildMessage(),
+                        if (widget.showEmail) ...[
+                          SizedBox(height: spacing.md),
+                          _buildEmail(),
+                        ],
+                        SizedBox(height: spacing.lg),
+                        _buildSubmit(),
                       ],
-                      SizedBox(height: spacing.lg),
-                      _buildSubmit(),
-                    ],
+                    ),
                   ),
           ),
         ),

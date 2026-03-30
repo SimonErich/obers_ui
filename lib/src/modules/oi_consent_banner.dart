@@ -294,21 +294,27 @@ class _OiConsentBannerState extends State<OiConsentBanner> {
           padding: EdgeInsets.all(spacing.lg),
           child: Column(
             mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               // Title row with cookie icon
               Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   Icon(OiIcons.cookie, size: 20, color: colors.text),
                   SizedBox(width: spacing.sm),
-                  Expanded(child: OiLabel.h4(widget.title, color: colors.text)),
+                  OiLabel.h4(widget.title, color: colors.text),
                 ],
               ),
 
               // Description
               if (widget.description != null) ...[
                 SizedBox(height: spacing.sm),
-                OiLabel.body(widget.description!, color: colors.textMuted),
+                OiLabel.body(
+                  widget.description!,
+                  color: colors.textMuted,
+                  textAlign: TextAlign.center,
+                ),
               ],
 
               // Privacy policy link
@@ -353,7 +359,7 @@ class _OiConsentBannerState extends State<OiConsentBanner> {
     );
 
     final manageButton = widget._showManage
-        ? OiButton.ghost(
+        ? OiButton.secondary(
             label: widget.manageLabel,
             icon: OiIcons.settings,
             onTap: _showPreferencesDialog,
@@ -380,7 +386,7 @@ class _OiConsentBannerState extends State<OiConsentBanner> {
     }
 
     return Row(
-      mainAxisAlignment: MainAxisAlignment.end,
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
         for (var i = 0; i < buttons.length; i++) ...[
           if (i > 0) SizedBox(width: context.spacing.sm),
