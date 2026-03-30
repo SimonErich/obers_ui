@@ -3,12 +3,8 @@ import 'dart:async';
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/buttons/oi_button.dart';
 import 'package:obers_ui/src/components/inputs/oi_checkbox.dart';
-import 'package:obers_ui/src/foundation/oi_responsive.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
-import 'package:obers_ui/src/primitives/animation/oi_animated_list.dart';
-import 'package:obers_ui/src/primitives/display/oi_label.dart';
 import 'package:obers_ui/src/primitives/display/oi_surface.dart';
-import 'package:obers_ui/src/primitives/layout/oi_row.dart';
 
 /// Visual variant for a bulk action button.
 ///
@@ -191,31 +187,35 @@ class _OiBulkBarState extends State<OiBulkBar>
     super.dispose();
   }
 
-  Widget _buildSelectionInfo(BuildContext context) {
-    final spacing = context.spacing;
-    final bp = context.breakpoint;
+  TextStyle _labelStyle(BuildContext context) {
+    final colors = context.colors;
+    // Use fontSize 12 to match OiButtonSize.small used by action buttons.
+    return TextStyle(
+      fontSize: 12,
+      fontWeight: FontWeight.w600,
+      color: colors.text,
+    );
+  }
 
-    return OiRow(
-      breakpoint: bp,
-      gap: OiResponsive<double>(spacing.sm),
-      children: [
-        OiCheckbox(
-          value: widget.allSelected,
-          onChanged: (_) {
-            if (widget.allSelected) {
-              widget.onDeselectAll?.call();
-            } else {
-              widget.onSelectAll?.call();
-            }
-          },
-          label: widget.allSelected ? 'Deselect all' : 'Select all',
-        ),
-        Flexible(
-          child: OiLabel.bodyStrong(
-            '$_clampedCount of ${widget.totalCount} ${widget.label} selected',
-          ),
-        ),
-      ],
+  Widget _buildCheckbox(BuildContext context) {
+    return OiCheckbox(
+      value: widget.allSelected,
+      onChanged: (_) {
+        if (widget.allSelected) {
+          widget.onDeselectAll?.call();
+        } else {
+          widget.onSelectAll?.call();
+        }
+      },
+      label: widget.allSelected ? 'Deselect all' : 'Select all',
+      labelStyle: _labelStyle(context),
+    );
+  }
+
+  Widget _buildCountLabel(BuildContext context) {
+    return Text(
+      '$_clampedCount of ${widget.totalCount} ${widget.label} selected',
+      style: _labelStyle(context),
     );
   }
 
@@ -258,24 +258,14 @@ class _OiBulkBarState extends State<OiBulkBar>
 
     final spacing = context.spacing;
 
-    return OiAnimatedList<OiBulkAction>(
-      items: widget.actions,
-      scrollDirection: Axis.horizontal,
-      shrinkWrap: true,
-      padding: EdgeInsets.zero,
-      itemBuilder: (context, action, animation, index) {
-        final button = _buildActionButton(context, action);
-        if (index < widget.actions.length - 1) {
-          return Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              button,
-              SizedBox(width: spacing.xs),
-            ],
-          );
-        }
-        return button;
-      },
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        for (var i = 0; i < widget.actions.length; i++) ...[
+          _buildActionButton(context, widget.actions[i]),
+          if (i < widget.actions.length - 1) SizedBox(width: spacing.xs),
+        ],
+      ],
     );
   }
 
@@ -284,7 +274,6 @@ class _OiBulkBarState extends State<OiBulkBar>
     final spacing = context.spacing;
     final colors = context.colors;
     final shadows = context.shadows;
-
     return SlideTransition(
       position: _slideAnimation,
       child: Semantics(
@@ -299,17 +288,59 @@ class _OiBulkBarState extends State<OiBulkBar>
             horizontal: spacing.md,
             vertical: spacing.sm,
           ),
-          child: OiRow(
-            breakpoint: context.breakpoint,
-            gap: OiResponsive<double>(spacing.md),
-            mainAxisSize: MainAxisSize.max,
-            children: [
-              Flexible(child: _buildSelectionInfo(context)),
-              if (widget.actions.isNotEmpty) ...[
-                Container(width: 1, height: 24, color: colors.borderSubtle),
-                _buildActions(context),
-              ],
-            ],
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              // Use actual available width rather than viewport breakpoint,
+              // since the bar may be inside a constrained parent.
+              final narrow = constraints.maxWidth < 480;
+
+              if (narrow) {
+                return Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildCheckbox(context),
+                    SizedBox(height: spacing.xs),
+                    _buildCountLabel(context),
+                    if (widget.actions.isNotEmpty) ...[
+                      Padding(
+                        padding: EdgeInsets.symmetric(vertical: spacing.xs),
+                        child: Container(
+                          height: 1,
+                          color: colors.borderSubtle,
+                        ),
+                      ),
+                      Wrap(
+                        spacing: spacing.xs,
+                        runSpacing: spacing.xs,
+                        children: [
+                          for (final action in widget.actions)
+                            _buildActionButton(context, action),
+                        ],
+                      ),
+                    ],
+                  ],
+                );
+              }
+
+              return Row(
+                children: [
+                  _buildCheckbox(context),
+                  SizedBox(width: spacing.sm),
+                  Flexible(child: _buildCountLabel(context)),
+                  if (widget.actions.isNotEmpty) ...[
+                    SizedBox(width: spacing.md),
+                    Container(
+                      width: 1,
+                      height: 24,
+                      color: colors.borderSubtle,
+                    ),
+                    SizedBox(width: spacing.md),
+                    Flexible(child: _buildActions(context)),
+                  ],
+                ],
+              );
+            },
           ),
         ),
       ),

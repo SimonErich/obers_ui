@@ -9,7 +9,7 @@ import 'package:obers_ui/src/composites/navigation/oi_responsive_shell.dart'
 import 'package:obers_ui/src/foundation/oi_responsive.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/models/oi_navigation_item.dart';
-import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
+
 
 /// The visual style of an [OiBottomBar].
 ///
@@ -75,7 +75,7 @@ enum OiBottomBarLandscapeMode {
 /// ```
 ///
 /// {@category Components}
-class OiBottomBar extends StatelessWidget {
+class OiBottomBar extends StatefulWidget {
   /// Creates an [OiBottomBar].
   const OiBottomBar({
     required this.items,
@@ -148,12 +148,19 @@ class OiBottomBar extends StatelessWidget {
   final OiBottomBarLandscapeMode landscapeMode;
 
   @override
+  State<OiBottomBar> createState() => _OiBottomBarState();
+}
+
+class _OiBottomBarState extends State<OiBottomBar> {
+  final Set<int> _hoveredIndices = {};
+
+  @override
   Widget build(BuildContext context) {
     // ── Responsive visibility ─────────────────────────────────────────────
     final isExpanded = context.isExpandedOrWider;
     final isMedium = context.isMedium;
     if (isExpanded) return const SizedBox.shrink();
-    if (isMedium && !showOnMedium) return const SizedBox.shrink();
+    if (isMedium && !widget.showOnMedium) return const SizedBox.shrink();
 
     // ── Keyboard visibility ───────────────────────────────────────────────
     final viewInsets = MediaQuery.of(context).viewInsets;
@@ -163,7 +170,7 @@ class OiBottomBar extends StatelessWidget {
     final isLandscape = context.isLandscape;
     final isCompact = context.isCompact;
     if (isLandscape && isCompact) {
-      switch (landscapeMode) {
+      switch (widget.landscapeMode) {
         case OiBottomBarLandscapeMode.hidden:
           return const SizedBox.shrink();
         case OiBottomBarLandscapeMode.rail:
@@ -187,17 +194,17 @@ class OiBottomBar extends StatelessWidget {
 
     final vertPad = compactLandscape ? 4.0 : 8.0;
 
-    final itemWidgets = List<Widget>.generate(items.length, (i) {
+    final itemWidgets = List<Widget>.generate(widget.items.length, (i) {
       return Expanded(child: _buildItem(context, i, vertPad));
     });
 
     // Insert centered floatingAction between middle items.
     final List<Widget> rowChildren;
-    if (floatingAction != null) {
+    if (widget.floatingAction != null) {
       final mid = itemWidgets.length ~/ 2;
       rowChildren = [
         ...itemWidgets.take(mid),
-        floatingAction!,
+        widget.floatingAction!,
         ...itemWidgets.skip(mid),
       ];
     } else {
@@ -231,22 +238,32 @@ class OiBottomBar extends StatelessWidget {
     final safeBottom = mq.padding.bottom;
     final safeLeft = mq.padding.left;
 
-    final railItems = List<Widget>.generate(items.length, (i) {
-      final item = items[i];
-      final isSelected = i == currentIndex;
-      final iconColor = isSelected ? colors.primary.base : colors.textMuted;
+    final railItems = List<Widget>.generate(widget.items.length, (i) {
+      final item = widget.items[i];
+      final isSelected = i == widget.currentIndex;
+      final isHovered = _hoveredIndices.contains(i);
+      final iconColor = (isSelected || isHovered)
+          ? colors.primary.base
+          : colors.textMuted;
       final iconData = isSelected && item.activeIcon != null
           ? item.activeIcon!
           : item.icon;
 
-      return OiTappable(
-        onTap: () => _handleTap(i),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-          child: Semantics(
-            label: item.label,
-            selected: isSelected,
-            child: _buildIconWithBadge(context, item, iconData, iconColor),
+      final index = i;
+      return MouseRegion(
+        cursor: SystemMouseCursors.click,
+        onEnter: (_) => setState(() => _hoveredIndices.add(index)),
+        onExit: (_) => setState(() => _hoveredIndices.remove(index)),
+        child: GestureDetector(
+          onTap: () => _handleTap(index),
+          behavior: HitTestBehavior.opaque,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            child: Semantics(
+              label: item.label,
+              selected: isSelected,
+              child: _buildIconWithBadge(context, item, iconData, iconColor),
+            ),
           ),
         ),
       );
@@ -275,46 +292,57 @@ class OiBottomBar extends StatelessWidget {
 
   Widget _buildItem(BuildContext context, int index, double vertPad) {
     final colors = context.colors;
-    final item = items[index];
-    final isSelected = index == currentIndex;
-    final iconColor = isSelected ? colors.primary.base : colors.textMuted;
-    final labelColor = isSelected ? colors.primary.base : colors.textMuted;
+    final item = widget.items[index];
+    final isSelected = index == widget.currentIndex;
+    final isHovered = _hoveredIndices.contains(index);
+    final iconColor = (isSelected || isHovered)
+        ? colors.primary.base
+        : colors.textMuted;
+    final labelColor = (isSelected || isHovered)
+        ? colors.primary.base
+        : colors.textMuted;
     final iconData = isSelected && item.activeIcon != null
         ? item.activeIcon!
         : item.icon;
 
     final showItemLabel = _shouldShowLabel(index);
 
-    return OiTappable(
-      onTap: () => _handleTap(index),
-      child: Padding(
-        padding: EdgeInsets.symmetric(vertical: vertPad),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Semantics(
-              label: item.label,
-              selected: isSelected,
-              child: _buildIconWithBadge(context, item, iconData, iconColor),
-            ),
-            if (showItemLabel) ...[
-              const SizedBox(height: 4),
-              Text(
-                item.label,
-                style: TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w500,
-                  color: labelColor,
-                  height: 1,
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      onEnter: (_) => setState(() => _hoveredIndices.add(index)),
+      onExit: (_) => setState(() => _hoveredIndices.remove(index)),
+      child: GestureDetector(
+        onTap: () => _handleTap(index),
+        behavior: HitTestBehavior.opaque,
+        child: Padding(
+          padding: EdgeInsets.symmetric(vertical: vertPad),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Semantics(
+                label: item.label,
+                selected: isSelected,
+                child: _buildIconWithBadge(context, item, iconData, iconColor),
               ),
-            ] else if (showDot && isSelected) ...[
-              const SizedBox(height: 4),
-              _buildDot(context),
+              if (showItemLabel) ...[
+                const SizedBox(height: 4),
+                Text(
+                  item.label,
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w500,
+                    color: labelColor,
+                    height: 1,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ] else if (widget.showDot && isSelected) ...[
+                const SizedBox(height: 4),
+                _buildDot(context),
+              ],
             ],
-          ],
+          ),
         ),
       ),
     );
@@ -384,12 +412,12 @@ class OiBottomBar extends StatelessWidget {
   // ── Label visibility logic ─────────────────────────────────────────────────
 
   bool _shouldShowLabel(int index) {
-    if (!showLabels) return false;
-    switch (style) {
+    if (!widget.showLabels) return false;
+    switch (widget.style) {
       case OiBottomBarStyle.iconOnly:
         return false;
       case OiBottomBarStyle.shifting:
-        return index == currentIndex;
+        return index == widget.currentIndex;
       case OiBottomBarStyle.fixed:
       case OiBottomBarStyle.labeled:
         return true;
@@ -399,9 +427,9 @@ class OiBottomBar extends StatelessWidget {
   // ── Tap handler ────────────────────────────────────────────────────────────
 
   void _handleTap(int index) {
-    if (haptic) {
+    if (widget.haptic) {
       unawaited(HapticFeedback.selectionClick());
     }
-    onTap(index);
+    widget.onTap(index);
   }
 }

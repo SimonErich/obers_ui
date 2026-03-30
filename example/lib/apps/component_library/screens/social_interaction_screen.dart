@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/obers_ui.dart';
 import 'package:obers_ui_example/apps/component_library/shared/component_showcase_section.dart';
@@ -18,6 +20,62 @@ class _SocialInteractionScreenState extends State<SocialInteractionScreen> {
   String? _pastedText;
   bool _spotlightActive = false;
   final GlobalKey _spotlightTarget = GlobalKey();
+
+  // Animation demo state
+  double _springValue = 0;
+  bool _morphToggle = false;
+  Timer? _loopTimer;
+  double _pinchScale = 1;
+  int _staggerKey = 0;
+  final _animListController = OiAnimatedListController<String>();
+  final List<String> _animListItems = [];
+  int _animListCycle = 0;
+  static const _animListAllItems = ['Apple', 'Banana', 'Cherry', 'Date'];
+
+  @override
+  void initState() {
+    super.initState();
+    _loopTimer = Timer.periodic(const Duration(milliseconds: 1500), (_) {
+      if (!mounted) return;
+      setState(() {
+        _springValue = _springValue == 0.0 ? 1.0 : 0.0;
+        _morphToggle = !_morphToggle;
+        _staggerKey++;
+      });
+    });
+    // Kick off animated list cycle after first frame.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _runAnimListCycle();
+    });
+  }
+
+  void _runAnimListCycle() {
+    if (!mounted) return;
+    // Insert items one by one, then remove them, then repeat.
+    if (_animListCycle < _animListAllItems.length) {
+      // Insert next item.
+      final item = _animListAllItems[_animListCycle];
+      _animListItems.add(item);
+      _animListController.insert(_animListItems.length - 1, item);
+      _animListCycle++;
+      Future.delayed(const Duration(milliseconds: 600), _runAnimListCycle);
+    } else if (_animListItems.isNotEmpty) {
+      // Remove first item.
+      _animListItems.removeAt(0);
+      _animListController.remove(0);
+      Future.delayed(const Duration(milliseconds: 600), _runAnimListCycle);
+    } else {
+      // All removed — restart cycle after a short pause.
+      _animListCycle = 0;
+      Future.delayed(const Duration(milliseconds: 800), _runAnimListCycle);
+    }
+  }
+
+  @override
+  void dispose() {
+    _loopTimer?.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -236,26 +294,65 @@ class _SocialInteractionScreenState extends State<SocialInteractionScreen> {
             ],
           ),
 
-          // ── OiSpring / OiStagger / OiMorph / OiAnimatedList ──────────
+          // ── OiSpring ──────────────────────────────────────────────────
           ComponentShowcaseSection(
-            title: 'Spring, Stagger, Morph & Animated List',
-            widgetName: 'OiSpring / OiStagger / OiMorph / OiAnimatedList',
+            title: 'Spring',
+            widgetName: 'OiSpring',
             description:
-                'Advanced animation primitives for physics-based springs, '
-                'staggered entrance animations, smooth morphing transitions, '
-                'and animated list item insertion/removal. \n\n'
-                'OiSpring: physics-based spring animation wrapper with '
-                  'configurable mass, stiffness, and damping.\n'
-                  'OiStagger: staggers entrance animations across a list '
-                  'of children with configurable delay.\n'
-                  'OiMorph: smoothly transitions between two child widgets '
-                  'with cross-fade and size interpolation.\n'
-                  'OiAnimatedList: an animated list that auto-animates '
-                  'item insertions and removals.',
+                'Physics-based spring animation wrapper with configurable '
+                'mass, stiffness, and damping. The box below bounces back '
+                'and forth on an infinite loop.',
+            examples: [
+              ComponentExample(
+                title: 'Looping Spring Translation',
+                child: ClipRect(
+                  child: SizedBox(
+                    height: 60,
+                    child: OiSpring(
+                      value: _springValue,
+                      stiffness: 180,
+                      damping: 12,
+                      builder: (context, v, child) => Align(
+                        alignment: Alignment(
+                          (-1.0 + v * 2.0).clamp(-1.0, 1.0),
+                          0,
+                        ),
+                        child: child,
+                      ),
+                      child: Container(
+                        width: 48,
+                        height: 48,
+                        decoration: BoxDecoration(
+                          color: colors.primary.base,
+                          borderRadius: context.radius.sm,
+                        ),
+                        child: const Center(
+                          child: OiIcon(
+                            icon: OiIcons.arrowRight,
+                            label: 'spring',
+                            size: 20,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+
+          // ── OiStagger ──────────────────────────────────────────────────
+          ComponentShowcaseSection(
+            title: 'Stagger',
+            widgetName: 'OiStagger',
+            description:
+                'Staggers entrance animations across a list of children '
+                'with configurable delay. Items fade in one after another.',
             examples: [
               ComponentExample(
                 title: 'Staggered Entrance',
                 child: OiStagger(
+                  key: ValueKey('stagger-$_staggerKey'),
                   staggerDelay: const Duration(milliseconds: 100),
                   children: [
                     Container(
@@ -289,6 +386,88 @@ class _SocialInteractionScreenState extends State<SocialInteractionScreen> {
                       child: const OiLabel.body('Item 3 — fades in third'),
                     ),
                   ],
+                ),
+              ),
+            ],
+          ),
+
+          // ── OiMorph ────────────────────────────────────────────────────
+          ComponentShowcaseSection(
+            title: 'Morph',
+            widgetName: 'OiMorph',
+            description:
+                'Smoothly transitions between two child widgets with '
+                'cross-fade and size interpolation. Toggles on a loop '
+                'between two states.',
+            examples: [
+              ComponentExample(
+                title: 'Looping Morph Transition',
+                child: OiMorph(
+                  transition: OiTransition.fadeScale,
+                  child: _morphToggle
+                      ? Container(
+                          key: const ValueKey('state-a'),
+                          height: 60,
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: colors.success.muted,
+                            borderRadius: context.radius.sm,
+                          ),
+                          child: const Center(
+                            child: OiLabel.body('State A — Active'),
+                          ),
+                        )
+                      : Container(
+                          key: const ValueKey('state-b'),
+                          height: 60,
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: colors.info.muted,
+                            borderRadius: context.radius.sm,
+                          ),
+                          child: const Center(
+                            child: OiLabel.body('State B — Idle'),
+                          ),
+                        ),
+                ),
+              ),
+            ],
+          ),
+
+          // ── OiAnimatedList ─────────────────────────────────────────────
+          ComponentShowcaseSection(
+            title: 'Animated List',
+            widgetName: 'OiAnimatedList',
+            description:
+                'An animated list that auto-animates item insertions and '
+                'removals with fade transitions.',
+            examples: [
+              ComponentExample(
+                title: 'Animated Items',
+                child: SizedBox(
+                  height: 200,
+                  child: OiAnimatedList<String>(
+                    shrinkWrap: true,
+                    controller: _animListController,
+                    items: const [],
+                    itemBuilder: (context, item, animation, index) =>
+                        SizeTransition(
+                      sizeFactor: animation,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 4),
+                        child: Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: colors.surfaceSubtle,
+                            borderRadius: context.radius.sm,
+                          ),
+                          child: OiLabel.body(item),
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
               ),
             ],
@@ -478,19 +657,46 @@ class _SocialInteractionScreenState extends State<SocialInteractionScreen> {
             examples: [
               ComponentExample(
                 title: 'Pinch to Zoom',
-                child: OiPinchZoom(
-                  maxScale: 3,
-                  child: Container(
-                    height: 120,
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: colors.surfaceSubtle,
-                      borderRadius: context.radius.sm,
+                child: Column(
+                  children: [
+                    SizedBox(
+                      height: 150,
+                      width: double.infinity,
+                      child: OiPinchZoom(
+                        maxScale: 3,
+                        onScaleChanged: (scale) =>
+                            setState(() => _pinchScale = scale),
+                        child: Container(
+                          height: 150,
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            color: colors.surfaceSubtle,
+                            borderRadius: context.radius.sm,
+                          ),
+                          child: Center(
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const OiIcon(
+                                  icon: OiIcons.search,
+                                  label: 'zoom',
+                                  size: 32,
+                                ),
+                                const SizedBox(height: 8),
+                                OiLabel.body(
+                                  'Scale: ${_pinchScale.toStringAsFixed(2)}x',
+                                ),
+                                const SizedBox(height: 4),
+                                const OiLabel.caption(
+                                  'Pinch, scroll-wheel, or trackpad to zoom',
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
                     ),
-                    child: const Center(
-                      child: OiLabel.body('Pinch or scroll to zoom'),
-                    ),
-                  ),
+                  ],
                 ),
               ),
               ComponentExample(

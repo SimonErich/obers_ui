@@ -1,6 +1,5 @@
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
-import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
 
 /// A single option in an [OiRadio] group.
 ///
@@ -57,53 +56,18 @@ class OiRadio<T> extends StatelessWidget {
   /// The axis along which options are laid out.
   final Axis direction;
 
-  Widget _buildOption(BuildContext context, OiRadioOption<T> option) {
-    final colors = context.colors;
-    final isSelected = option.value == value;
-    final isDisabled = !enabled || !option.enabled;
-
-    const outerSize = 18.0;
-    const innerSize = 8.0;
-
-    final outerColor = isSelected ? colors.primary.base : colors.border;
-
-    final circle = CustomPaint(
-      size: const Size(outerSize, outerSize),
-      painter: _OiRadioPainter(
-        selected: isSelected,
-        outerColor: outerColor,
-        innerColor: colors.textOnPrimary,
-        outerSize: outerSize,
-        innerSize: innerSize,
-      ),
-    );
-
-    return OiTappable(
-      onTap: isDisabled ? null : () => onChanged?.call(option.value),
-      enabled: !isDisabled,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 4),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            circle,
-            const SizedBox(width: 8),
-            Text(
-              option.label,
-              style: TextStyle(
-                fontSize: 14,
-                color: isDisabled ? colors.textMuted : colors.text,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
-    final children = options.map((o) => _buildOption(context, o)).toList();
+    final children = options
+        .map(
+          (o) => _OiRadioOptionTile<T>(
+            option: o,
+            selected: o.value == value,
+            disabled: !enabled || !o.enabled,
+            onTap: () => onChanged?.call(o.value),
+          ),
+        )
+        .toList();
 
     if (direction == Axis.horizontal) {
       return Row(
@@ -123,6 +87,95 @@ class OiRadio<T> extends StatelessWidget {
 }
 
 // ---------------------------------------------------------------------------
+// Option tile (tracks hover & focus)
+// ---------------------------------------------------------------------------
+
+class _OiRadioOptionTile<T> extends StatefulWidget {
+  const _OiRadioOptionTile({
+    required this.option,
+    required this.selected,
+    required this.disabled,
+    required this.onTap,
+    super.key,
+  });
+
+  final OiRadioOption<T> option;
+  final bool selected;
+  final bool disabled;
+  final VoidCallback onTap;
+
+  @override
+  State<_OiRadioOptionTile<T>> createState() => _OiRadioOptionTileState<T>();
+}
+
+class _OiRadioOptionTileState<T> extends State<_OiRadioOptionTile<T>> {
+  bool _hovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    final isSelected = widget.selected;
+    final isActive = !widget.disabled;
+    final highlighted = isActive && _hovered;
+
+    const outerSize = 18.0;
+    const innerSize = 8.0;
+
+    final Color outerColor;
+    final Color fillColor;
+
+    if (isSelected) {
+      outerColor = colors.primary.base;
+      fillColor = colors.primary.base;
+    } else if (highlighted) {
+      outerColor = colors.primary.base;
+      fillColor = colors.primary.base.withValues(alpha: 0.1);
+    } else {
+      outerColor = colors.border;
+      fillColor = const Color(0x00000000);
+    }
+
+    final circle = CustomPaint(
+      size: const Size(outerSize, outerSize),
+      painter: _OiRadioPainter(
+        selected: isSelected,
+        outerColor: outerColor,
+        fillColor: fillColor,
+        innerColor: colors.textOnPrimary,
+        outerSize: outerSize,
+        innerSize: innerSize,
+      ),
+    );
+
+    final labelColor = widget.disabled ? colors.textMuted : colors.text;
+
+    return MouseRegion(
+      onEnter: (_) => setState(() => _hovered = true),
+      onExit: (_) => setState(() => _hovered = false),
+      cursor: isActive ? SystemMouseCursors.click : SystemMouseCursors.basic,
+      child: GestureDetector(
+        onTap: isActive ? widget.onTap : null,
+        behavior: HitTestBehavior.opaque,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 4),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              circle,
+              const SizedBox(width: 8),
+              Text(
+                widget.option.label,
+                style: TextStyle(fontSize: 14, color: labelColor),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
 // Painter
 // ---------------------------------------------------------------------------
 
@@ -130,6 +183,7 @@ class _OiRadioPainter extends CustomPainter {
   const _OiRadioPainter({
     required this.selected,
     required this.outerColor,
+    required this.fillColor,
     required this.innerColor,
     required this.outerSize,
     required this.innerSize,
@@ -137,6 +191,7 @@ class _OiRadioPainter extends CustomPainter {
 
   final bool selected;
   final Color outerColor;
+  final Color fillColor;
   final Color innerColor;
   final double outerSize;
   final double innerSize;
@@ -150,7 +205,7 @@ class _OiRadioPainter extends CustomPainter {
       ..drawCircle(
         center,
         radius,
-        Paint()..color = selected ? outerColor : const Color(0x00000000),
+        Paint()..color = fillColor,
       )
       ..drawCircle(
         center,
@@ -175,5 +230,6 @@ class _OiRadioPainter extends CustomPainter {
   bool shouldRepaint(_OiRadioPainter old) =>
       old.selected != selected ||
       old.outerColor != outerColor ||
+      old.fillColor != fillColor ||
       old.innerColor != innerColor;
 }

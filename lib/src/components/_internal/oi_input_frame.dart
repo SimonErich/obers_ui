@@ -5,7 +5,6 @@ import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_decoration_theme.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/primitives/display/oi_label.dart';
-import 'package:obers_ui/src/primitives/display/oi_surface.dart';
 
 class OiInputFrame extends StatelessWidget {
   const OiInputFrame({
@@ -53,6 +52,7 @@ class OiInputFrame extends StatelessWidget {
     final border = _resolveBorder(context);
     final colors = context.colors;
     final ti = context.components.textInput;
+    final anim = context.animations;
     final effectivePadding =
         padding ?? const EdgeInsets.symmetric(horizontal: 12, vertical: 8);
 
@@ -74,9 +74,16 @@ class OiInputFrame extends StatelessWidget {
       bgColor = ti?.backgroundColor ?? colors.surface;
     }
 
-    final surfaceWidget = OiSurface(
-      border: border,
-      color: bgColor,
+    final resolvedRadius =
+        border.borderRadius ?? BorderRadius.circular(8);
+
+    final surfaceWidget = _AnimatedInputSurface(
+      borderColor: border.color,
+      borderWidth: border.width,
+      borderRadius: resolvedRadius,
+      backgroundColor: bgColor,
+      duration: anim.fast,
+      curve: Curves.easeOut,
       padding: effectivePadding,
       child: row,
     );
@@ -140,6 +147,86 @@ class OiInputFrame extends StatelessWidget {
           Semantics(child: counter),
         ],
       ],
+    );
+  }
+}
+
+/// Implicitly animates border color, width, radius, and background color
+/// so that focus/error transitions feel smooth rather than snapping.
+class _AnimatedInputSurface extends ImplicitlyAnimatedWidget {
+  const _AnimatedInputSurface({
+    required this.borderColor,
+    required this.borderWidth,
+    required this.borderRadius,
+    required this.backgroundColor,
+    required this.padding,
+    required super.duration,
+    required super.curve,
+    this.child,
+  });
+
+  final Color borderColor;
+  final double borderWidth;
+  final BorderRadius borderRadius;
+  final Color backgroundColor;
+  final EdgeInsetsGeometry padding;
+  final Widget? child;
+
+  @override
+  _AnimatedInputSurfaceState createState() => _AnimatedInputSurfaceState();
+}
+
+class _AnimatedInputSurfaceState
+    extends AnimatedWidgetBaseState<_AnimatedInputSurface> {
+  ColorTween? _borderColorTween;
+  Tween<double>? _borderWidthTween;
+  BorderRadiusTween? _borderRadiusTween;
+  ColorTween? _bgColorTween;
+
+  @override
+  void forEachTween(TweenVisitor<dynamic> visitor) {
+    _borderColorTween = visitor(
+      _borderColorTween,
+      widget.borderColor,
+      (dynamic value) => ColorTween(begin: value as Color),
+    ) as ColorTween?;
+    _borderWidthTween = visitor(
+      _borderWidthTween,
+      widget.borderWidth,
+      (dynamic value) => Tween<double>(begin: value as double),
+    ) as Tween<double>?;
+    _borderRadiusTween = visitor(
+      _borderRadiusTween,
+      widget.borderRadius,
+      (dynamic value) => BorderRadiusTween(begin: value as BorderRadius),
+    ) as BorderRadiusTween?;
+    _bgColorTween = visitor(
+      _bgColorTween,
+      widget.backgroundColor,
+      (dynamic value) => ColorTween(begin: value as Color),
+    ) as ColorTween?;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final color = _borderColorTween?.evaluate(animation) ?? widget.borderColor;
+    final width =
+        _borderWidthTween?.evaluate(animation) ?? widget.borderWidth;
+    final radius =
+        _borderRadiusTween?.evaluate(animation) ?? widget.borderRadius;
+    final bgColor =
+        _bgColorTween?.evaluate(animation) ?? widget.backgroundColor;
+
+    return Container(
+      decoration: BoxDecoration(
+        color: bgColor,
+        borderRadius: radius,
+        border: width > 0
+            ? Border.all(color: color, width: width)
+            : null,
+      ),
+      padding: widget.padding,
+      child: widget.child,
     );
   }
 }

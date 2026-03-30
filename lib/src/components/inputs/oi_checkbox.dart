@@ -1,6 +1,5 @@
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
-import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
 
 /// A custom-painted checkbox with checked, unchecked, and indeterminate states.
 ///
@@ -14,12 +13,13 @@ import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
 /// Colors and size are resolved from the nearest [OiTheme].
 ///
 /// {@category Components}
-class OiCheckbox extends StatelessWidget {
+class OiCheckbox extends StatefulWidget {
   /// Creates an [OiCheckbox].
   const OiCheckbox({
     required this.value,
     this.onChanged,
     this.label,
+    this.labelStyle,
     this.enabled = true,
     super.key,
   });
@@ -37,15 +37,25 @@ class OiCheckbox extends StatelessWidget {
   /// Optional label rendered to the right of the checkbox.
   final String? label;
 
+  /// Optional style override for the label text.
+  final TextStyle? labelStyle;
+
   /// Whether the checkbox responds to taps.
   final bool enabled;
 
+  @override
+  State<OiCheckbox> createState() => _OiCheckboxState();
+}
+
+class _OiCheckboxState extends State<OiCheckbox> {
+  bool _hovered = false;
+
   void _handleTap() {
-    if (onChanged == null) return;
-    if (value ?? false) {
-      onChanged!(false);
+    if (widget.onChanged == null) return;
+    if (widget.value ?? false) {
+      widget.onChanged!(false);
     } else {
-      onChanged!(true);
+      widget.onChanged!(true);
     }
   }
 
@@ -57,22 +67,30 @@ class OiCheckbox extends StatelessWidget {
     final borderRadius =
         themeData.components.checkbox?.borderRadius ?? BorderRadius.circular(4);
 
-    final isChecked = value ?? false;
-    final isIndeterminate = value == null;
+    final isChecked = widget.value ?? false;
+    final isIndeterminate = widget.value == null;
     final cht = themeData.components.checkbox;
+    final isActive = widget.enabled;
 
     final checkedColor = cht?.checkedColor ?? colors.primary.base;
-    final fillColor = (isChecked || isIndeterminate)
-        ? checkedColor
-        : colors.surface;
-    final borderColor = (isChecked || isIndeterminate)
-        ? checkedColor
-        : (cht?.uncheckedBorderColor ?? colors.border);
+    final Color fillColor;
+    final Color borderColor;
+
+    if (isChecked || isIndeterminate) {
+      fillColor = checkedColor;
+      borderColor = checkedColor;
+    } else if (_hovered && isActive) {
+      fillColor = colors.primary.base.withValues(alpha: 0.1);
+      borderColor = colors.primary.base;
+    } else {
+      fillColor = colors.surface;
+      borderColor = cht?.uncheckedBorderColor ?? colors.border;
+    }
 
     Widget box = CustomPaint(
       size: Size(size, size),
       painter: _OiCheckboxPainter(
-        state: value,
+        state: widget.value,
         fillColor: fillColor,
         borderColor: borderColor,
         checkColor: cht?.checkmarkColor ?? colors.textOnPrimary,
@@ -80,21 +98,30 @@ class OiCheckbox extends StatelessWidget {
       ),
     );
 
-    if (label != null) {
+    if (widget.label != null) {
       box = Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           box,
           const SizedBox(width: 8),
-          Text(label!, style: TextStyle(fontSize: 14, color: colors.text)),
+          Text(
+            widget.label!,
+            style: widget.labelStyle ??
+                TextStyle(fontSize: 14, color: colors.text),
+          ),
         ],
       );
     }
 
-    return OiTappable(
-      onTap: enabled ? _handleTap : null,
-      enabled: enabled,
-      child: box,
+    return MouseRegion(
+      cursor: isActive ? SystemMouseCursors.click : SystemMouseCursors.basic,
+      onEnter: (_) => setState(() => _hovered = true),
+      onExit: (_) => setState(() => _hovered = false),
+      child: GestureDetector(
+        onTap: isActive ? _handleTap : null,
+        behavior: HitTestBehavior.opaque,
+        child: box,
+      ),
     );
   }
 }

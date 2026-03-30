@@ -119,7 +119,7 @@ class OiDetailView extends StatelessWidget {
     this.label,
     this.columns = 1,
     this.columnGap = 16.0,
-    this.rowGap = 12.0,
+    this.rowGap = 20.0,
     this.fieldDirection = Axis.horizontal,
     this.labelWidth,
     this.emptyText = '\u2014',
@@ -246,16 +246,40 @@ class OiDetailView extends StatelessWidget {
       );
     }
 
-    // Multi-column layout using Wrap.
+    // Multi-column layout using Wrap, with responsive column collapsing.
     return LayoutBuilder(
       builder: (context, constraints) {
-        final totalGap = columnGap * (columns - 1);
-        final columnWidth = (constraints.maxWidth - totalGap) / columns;
+        // Collapse to single column when available width is narrow.
+        final effectiveColumns =
+            constraints.maxWidth < OiBreakpoint.medium.minWidth
+                ? 1
+                : columns;
+
+        if (effectiveColumns <= 1) {
+          return OiColumn(
+            breakpoint: bp,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              for (var i = 0; i < section.fields.length; i++) ...[
+                _buildField(
+                  context,
+                  section.fields[i],
+                  directionOverride: Axis.vertical,
+                ),
+                if (i < section.fields.length - 1) SizedBox(height: rowGap),
+              ],
+            ],
+          );
+        }
+
+        final totalGap = columnGap * (effectiveColumns - 1);
+        final columnWidth =
+            (constraints.maxWidth - totalGap) / effectiveColumns;
 
         final children = <Widget>[];
         for (var i = 0; i < section.fields.length; i++) {
           final field = section.fields[i];
-          final span = field.columnSpan.clamp(1, columns);
+          final span = field.columnSpan.clamp(1, effectiveColumns);
           final fieldWidth = columnWidth * span + columnGap * (span - 1);
 
           children.add(
@@ -274,12 +298,16 @@ class OiDetailView extends StatelessWidget {
     );
   }
 
-  Widget _buildField(BuildContext context, OiDetailField field) {
+  Widget _buildField(
+    BuildContext context,
+    OiDetailField field, {
+    Axis? directionOverride,
+  }) {
     return OiFieldDisplay.pair(
       label: field.label,
       value: field.value,
       type: field.type,
-      direction: fieldDirection,
+      direction: directionOverride ?? fieldDirection,
       labelWidth: labelWidth,
       emptyText: emptyText,
       copyable: field.copyable,

@@ -436,7 +436,7 @@ class _OiTreeState<T> extends State<OiTree<T>> with TickerProviderStateMixin {
 
 // ── Default node row ──────────────────────────────────────────────────────────
 
-class _DefaultNodeRow<T> extends StatelessWidget {
+class _DefaultNodeRow<T> extends StatefulWidget {
   const _DefaultNodeRow({
     required this.node,
     required this.depth,
@@ -461,22 +461,39 @@ class _DefaultNodeRow<T> extends StatelessWidget {
   final VoidCallback? onToggle;
 
   @override
+  State<_DefaultNodeRow<T>> createState() => _DefaultNodeRowState<T>();
+}
+
+class _DefaultNodeRowState<T> extends State<_DefaultNodeRow<T>> {
+  bool _hovered = false;
+
+  @override
   Widget build(BuildContext context) {
     final colors = context.colors;
+
+    Color backgroundColor;
+    if (widget.selected) {
+      backgroundColor = Color.lerp(colors.surface, colors.primary.base, 0.1)!;
+    } else if (_hovered) {
+      backgroundColor = colors.surfaceHover;
+    } else {
+      backgroundColor = colors.surface;
+    }
+
     Widget row = Row(
       children: [
-        SizedBox(width: depth * indentWidth),
-        if (node.hasChildren)
+        SizedBox(width: widget.depth * widget.indentWidth),
+        if (widget.node.hasChildren)
           GestureDetector(
-            key: ValueKey('toggle_${node.id}'),
+            key: ValueKey('toggle_${widget.node.id}'),
             behavior: HitTestBehavior.opaque,
-            onTap: onToggle,
+            onTap: widget.onToggle,
             child: SizedBox(
               width: 24,
-              height: rowHeight,
+              height: widget.rowHeight,
               child: Center(
                 child: AnimatedRotation(
-                  turns: expanded ? 0.25 : 0.0,
+                  turns: widget.expanded ? 0.25 : 0.0,
                   duration: const Duration(milliseconds: 200),
                   curve: Curves.easeInOut,
                   child: OiIcon(
@@ -489,14 +506,17 @@ class _DefaultNodeRow<T> extends StatelessWidget {
             ),
           )
         else
-          SizedBox(width: 24, height: rowHeight),
-        if (node.icon != null) ...[node.icon!, const SizedBox(width: 4)],
+          SizedBox(width: 24, height: widget.rowHeight),
+        if (widget.node.icon != null) ...[
+          widget.node.icon!,
+          const SizedBox(width: 4),
+        ],
         Expanded(
           child: Align(
             alignment: AlignmentDirectional.centerStart,
             child: Text(
-              node.label,
-              key: ValueKey('label_${node.id}'),
+              widget.node.label,
+              key: ValueKey('label_${widget.node.id}'),
               style: TextStyle(color: colors.text),
               overflow: TextOverflow.ellipsis,
             ),
@@ -505,15 +525,24 @@ class _DefaultNodeRow<T> extends StatelessWidget {
       ],
     );
 
-    if (selected) {
-      row = ColoredBox(color: colors.primary.muted, child: row);
-    }
-
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onTap: onTap,
-      onDoubleTap: onDoubleTap,
-      child: SizedBox(height: rowHeight, child: row),
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      onEnter: (_) => setState(() => _hovered = true),
+      onExit: (_) => setState(() => _hovered = false),
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: widget.onTap,
+        onDoubleTap: widget.onDoubleTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 150),
+          height: widget.rowHeight,
+          decoration: BoxDecoration(
+            color: backgroundColor,
+            borderRadius: BorderRadius.circular(4),
+          ),
+          child: row,
+        ),
+      ),
     );
   }
 }

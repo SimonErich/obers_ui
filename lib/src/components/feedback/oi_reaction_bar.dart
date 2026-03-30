@@ -97,6 +97,7 @@ class _OiReactionBarState extends State<OiReactionBar> {
 
       return OiTappable(
         onTap: () => widget.onReact?.call(r.emoji),
+        clipBorderRadius: BorderRadius.circular(16),
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
           decoration: BoxDecoration(
@@ -144,6 +145,7 @@ class _OiReactionBarState extends State<OiReactionBar> {
             .map(
               (e) => OiTappable(
                 onTap: () => _pickEmoji(e),
+                clipBorderRadius: BorderRadius.circular(6),
                 child: SizedBox(
                   width: 32,
                   height: 32,
@@ -162,6 +164,7 @@ class _OiReactionBarState extends State<OiReactionBar> {
       visible: _pickerOpen,
       anchor: OiTappable(
         onTap: _togglePicker,
+        clipBorderRadius: BorderRadius.circular(16),
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
           decoration: BoxDecoration(

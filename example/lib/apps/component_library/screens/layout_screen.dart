@@ -471,6 +471,7 @@ class LayoutScreen extends StatelessWidget {
                   height: 250,
                   child: OiGridZoomControls(
                     breakpoint: OiBreakpoint.expanded,
+                    gap: OiResponsive<double>(spacing.xs),
                     children: List.generate(
                       9,
                       (i) => OiCard.outlined(

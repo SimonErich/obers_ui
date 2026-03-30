@@ -1,20 +1,21 @@
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
-import 'package:obers_ui/src/components/buttons/oi_button.dart';
-import 'package:obers_ui/src/components/buttons/oi_button_group.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 
 /// A numeric scale rating widget (e.g. NPS 1–10, satisfaction 1–7).
 ///
-/// Renders a connected [OiButtonGroup] with numbered buttons from [min] to
-/// [max]. The currently selected button (matching [value]) is highlighted.
+/// Renders a connected row of numbered buttons from [min] to [max]. The
+/// currently selected button (matching [value]) is highlighted with a bold
+/// label and tinted background. Hovering or focusing a button shows a subtle
+/// primary-tinted background without changing the font weight.
+///
 /// Optional [minLabel] and [maxLabel] strings are shown at the left and right
-/// ends below the scale. Arrow-key navigation is provided by [OiButtonGroup]
-/// when the group is focused.
+/// ends below the scale. Arrow-key navigation moves the selection when focused.
 ///
 /// When [enabled] is `false` all buttons are non-interactive.
 ///
 /// {@category Components}
-class OiScaleRating extends StatelessWidget {
+class OiScaleRating extends StatefulWidget {
   /// Creates an [OiScaleRating].
   const OiScaleRating({
     this.label,
@@ -53,55 +54,153 @@ class OiScaleRating extends StatelessWidget {
   final bool enabled;
 
   @override
+  State<OiScaleRating> createState() => _OiScaleRatingState();
+}
+
+class _OiScaleRatingState extends State<OiScaleRating> {
+  int? _hoveredIndex;
+
+  KeyEventResult _onKeyEvent(FocusNode node, KeyEvent event) {
+    if (!widget.enabled || widget.onChanged == null) {
+      return KeyEventResult.ignored;
+    }
+    if (event is! KeyDownEvent && event is! KeyRepeatEvent) {
+      return KeyEventResult.ignored;
+    }
+
+    final current = widget.value ?? widget.min;
+    if (event.logicalKey == LogicalKeyboardKey.arrowRight) {
+      final next = (current + 1).clamp(widget.min, widget.max);
+      widget.onChanged?.call(next);
+      return KeyEventResult.handled;
+    }
+    if (event.logicalKey == LogicalKeyboardKey.arrowLeft) {
+      final next = (current - 1).clamp(widget.min, widget.max);
+      widget.onChanged?.call(next);
+      return KeyEventResult.handled;
+    }
+    return KeyEventResult.ignored;
+  }
+
+  @override
   Widget build(BuildContext context) {
     final textTheme = context.textTheme;
     final colors = context.colors;
-    final count = max - min + 1;
+    final radius = context.radius;
+    final count = widget.max - widget.min + 1;
 
-    final items = List<OiButtonGroupItem>.generate(count, (i) {
-      final n = min + i;
-      return OiButtonGroupItem(label: '$n', enabled: enabled);
-    });
+    final buttons = <Widget>[];
+    for (var i = 0; i < count; i++) {
+      final n = widget.min + i;
+      final isSelected = widget.value == n;
+      final isHovered = _hoveredIndex == i;
 
-    final selectedIndex = value != null ? value! - min : null;
+      Color bg;
+      if (isSelected) {
+        bg = colors.primary.muted;
+      } else if (isHovered) {
+        bg = colors.primary.base.withValues(alpha: 0.2 * 255 / 255);
+      } else {
+        bg = const Color(0x00000000);
+      }
 
-    Widget group = OiButtonGroup(
-      label: label ?? 'Scale rating',
-      items: items,
-      exclusive: true,
-      selectedIndex: selectedIndex,
-      onSelect: enabled ? (i) => onChanged?.call(min + i) : null,
-      size: OiButtonSize.small,
+      final fontWeight = isSelected ? FontWeight.w700 : FontWeight.w500;
+
+      Widget cell = GestureDetector(
+        onTap: widget.enabled ? () => widget.onChanged?.call(n) : null,
+        behavior: HitTestBehavior.opaque,
+        child: MouseRegion(
+          cursor: widget.enabled
+              ? SystemMouseCursors.click
+              : SystemMouseCursors.basic,
+          onEnter: widget.enabled
+              ? (_) => setState(() => _hoveredIndex = i)
+              : null,
+          onExit: widget.enabled
+              ? (_) => setState(() => _hoveredIndex = null)
+              : null,
+          child: Container(
+            height: 28,
+            constraints: const BoxConstraints(minWidth: 32),
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            color: bg,
+            alignment: Alignment.center,
+            child: Text(
+              '$n',
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: fontWeight,
+                color: isSelected ? colors.primary.base : colors.text,
+                height: 1,
+              ),
+            ),
+          ),
+        ),
+      );
+
+      if (!widget.enabled) {
+        cell = Opacity(opacity: 0.4, child: cell);
+      }
+
+      buttons.add(cell);
+
+      if (i < count - 1) {
+        buttons.add(Container(width: 1, color: colors.border));
+      }
+    }
+
+    Widget group = Focus(
+      onKeyEvent: _onKeyEvent,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          borderRadius: radius.sm,
+          border: Border.all(color: colors.border),
+        ),
+        child: ClipRRect(
+          borderRadius: radius.sm,
+          child: Row(mainAxisSize: MainAxisSize.min, children: buttons),
+        ),
+      ),
     );
 
-    if (minLabel != null || maxLabel != null) {
-      group = Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          group,
-          const SizedBox(height: 4),
-          Row(
+    if (widget.minLabel != null || widget.maxLabel != null) {
+      group = SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: IntrinsicWidth(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              if (minLabel != null)
-                Text(
-                  minLabel!,
-                  style: textTheme.tiny.copyWith(color: colors.textMuted),
-                ),
-              const Spacer(),
-              if (maxLabel != null)
-                Text(
-                  maxLabel!,
-                  style: textTheme.tiny.copyWith(color: colors.textMuted),
-                ),
+              group,
+              const SizedBox(height: 4),
+              Row(
+                children: [
+                  if (widget.minLabel != null)
+                    Text(
+                      widget.minLabel!,
+                      style: textTheme.tiny.copyWith(color: colors.textMuted),
+                    ),
+                  const Spacer(),
+                  if (widget.maxLabel != null)
+                    Text(
+                      widget.maxLabel!,
+                      style: textTheme.tiny.copyWith(color: colors.textMuted),
+                    ),
+                ],
+              ),
             ],
           ),
-        ],
+        ),
+      );
+    } else {
+      group = SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: group,
       );
     }
 
-    final semanticLabel =
-        label ?? 'Scale rating, selected: ${value ?? 'none'} of $max';
+    final semanticLabel = widget.label ??
+        'Scale rating, selected: ${widget.value ?? 'none'} of ${widget.max}';
 
     return Semantics(label: semanticLabel, child: group);
   }

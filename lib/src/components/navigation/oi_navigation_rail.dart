@@ -5,7 +5,7 @@ import 'package:obers_ui/src/components/display/oi_tooltip.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/models/oi_navigation_item.dart';
 import 'package:obers_ui/src/primitives/display/oi_label.dart';
-import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
+
 
 /// Controls when labels are visible on an [OiNavigationRail].
 ///
@@ -125,6 +125,7 @@ class OiNavigationRail extends StatefulWidget {
 class _OiNavigationRailState extends State<OiNavigationRail> {
   late FocusNode _focusNode;
   int _focusedIndex = -1;
+  final Set<int> _hoveredIndices = {};
 
   @override
   void initState() {
@@ -262,8 +263,13 @@ class _OiNavigationRailState extends State<OiNavigationRail> {
     final item = widget.items[index];
     final isSelected = index == widget.currentIndex;
     final isFocused = index == _focusedIndex && _focusNode.hasFocus;
-    final iconColor = isSelected ? colors.primary.base : colors.textMuted;
-    final labelColor = isSelected ? colors.primary.base : colors.textMuted;
+    final isHovered = _hoveredIndices.contains(index);
+    final iconColor = (isSelected || isHovered)
+        ? colors.primary.base
+        : colors.textMuted;
+    final labelColor = (isSelected || isHovered)
+        ? colors.primary.base
+        : colors.textMuted;
 
     // Determine whether to show the label.
     final showLabel = switch (widget.labelBehavior) {
@@ -340,12 +346,21 @@ class _OiNavigationRailState extends State<OiNavigationRail> {
 
     // ── Tappable wrapper ────────────────────────────────────────────────
 
-    Widget tappableItem = OiTappable(
-      onTap: () => widget.onTap(index),
-      semanticLabel: item.label,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 4),
-        child: tappableContent,
+    Widget tappableItem = MouseRegion(
+      cursor: SystemMouseCursors.click,
+      onEnter: (_) => setState(() => _hoveredIndices.add(index)),
+      onExit: (_) => setState(() => _hoveredIndices.remove(index)),
+      child: GestureDetector(
+        onTap: () => widget.onTap(index),
+        behavior: HitTestBehavior.opaque,
+        child: Semantics(
+          label: item.label,
+          button: true,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 4),
+            child: tappableContent,
+          ),
+        ),
       ),
     );
 

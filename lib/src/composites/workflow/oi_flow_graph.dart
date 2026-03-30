@@ -187,12 +187,15 @@ class _OiFlowGraphState extends State<OiFlowGraph> {
 
     return Semantics(
       label: widget.label,
-      child: SizedBox(
-        width: resolvedWidth,
-        height: resolvedHeight,
-        child: Stack(
-          clipBehavior: Clip.none,
-          children: [
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: SingleChildScrollView(
+          child: SizedBox(
+            width: resolvedWidth,
+            height: resolvedHeight,
+            child: Stack(
+              clipBehavior: Clip.none,
+              children: [
             // Grid background.
             if (widget.snapToGrid)
               Positioned.fill(
@@ -226,6 +229,8 @@ class _OiFlowGraphState extends State<OiFlowGraph> {
               ),
           ],
         ),
+      ),
+      ),
       ),
     );
   }

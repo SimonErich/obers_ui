@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/obers_ui.dart';
 
@@ -28,6 +30,12 @@ class _FormInputsScreenState extends State<FormInputsScreen> {
   Color? _selectedColor;
   List<String> _tags = ['flutter', 'dart', 'obers'];
   List<String> _emails = ['alice@example.com', 'bob@example.com'];
+  final _random = Random();
+  List<OiColorSlot> _paletteSlots = const [
+    OiColorSlot(id: 'primary', label: 'Primary', value: Color(0xFF3B82F6)),
+    OiColorSlot(id: 'secondary', label: 'Secondary', value: Color(0xFF8B5CF6)),
+    OiColorSlot(id: 'accent', label: 'Accent', value: Color(0xFFF59E0B)),
+  ];
   String _editableText = 'Click to edit this text';
   DateTime? _editableDate = DateTime(2026, 3, 23);
   double? _editableNumber = 42;
@@ -147,17 +155,14 @@ class _FormInputsScreenState extends State<FormInputsScreen> {
                 title: 'Interactive stepper',
                 child: Align(
                   alignment: Alignment.centerLeft,
-                  child: SizedBox(
-                    width: 200,
-                    child: OiNumberInput(
-                      label: 'Quantity',
-                      value: _numberValue,
-                      min: 0,
-                      max: 100,
-                      onChanged: (v) {
-                        if (v != null) setState(() => _numberValue = v);
-                      },
-                    ),
+                  child: OiNumberInput(
+                    label: 'Quantity',
+                    value: _numberValue,
+                    min: 0,
+                    max: 1000,
+                    onChanged: (v) {
+                      if (v != null) setState(() => _numberValue = v);
+                    },
                   ),
                 ),
               ),
@@ -432,6 +437,55 @@ class _FormInputsScreenState extends State<FormInputsScreen> {
             ],
           ),
 
+          // ── OiColorPalettePicker ────────────────────────────────────
+          ComponentShowcaseSection(
+            title: 'Color Palette Picker',
+            widgetName: 'OiColorPalettePicker',
+            description:
+                'A color palette picker with individual color slots, '
+                'preset palette selection, and optional randomize. '
+                'Each slot opens a color picker for fine-tuning.',
+            examples: [
+              ComponentExample(
+                title: 'Brand palette',
+                child: OiColorPalettePicker(
+                  label: 'Brand colors',
+                  slots: _paletteSlots,
+                  onSlotChanged: (slotId, color) {
+                    setState(() {
+                      _paletteSlots = _paletteSlots
+                          .map(
+                            (s) => s.id == slotId
+                                ? OiColorSlot(
+                                    id: s.id,
+                                    label: s.label,
+                                    value: color,
+                                  )
+                                : s,
+                          )
+                          .toList();
+                    });
+                  },
+                  onRandomize: () {
+                    setState(() {
+                      _paletteSlots = _paletteSlots
+                          .map(
+                            (s) => OiColorSlot(
+                              id: s.id,
+                              label: s.label,
+                              value: Color(
+                                0xFF000000 | _random.nextInt(0xFFFFFF),
+                              ),
+                            ),
+                          )
+                          .toList();
+                    });
+                  },
+                ),
+              ),
+            ],
+          ),
+
           // ── File Input ──────────────────────────────────────────────────
           ComponentShowcaseSection(
             title: 'File Input',
@@ -553,43 +607,6 @@ class _FormInputsScreenState extends State<FormInputsScreen> {
                     OiSelectOption(value: 'Archived', label: 'Archived'),
                   ],
                   onChanged: (v) => setState(() => _editableSelect = v),
-                ),
-              ),
-            ],
-          ),
-
-          // ── OiColorPalettePicker ────────────────────────────────────
-          ComponentShowcaseSection(
-            title: 'Color Palette Picker',
-            widgetName: 'OiColorPalettePicker',
-            description:
-                'A color palette picker with individual color slots, '
-                'preset palette selection, and optional randomize. '
-                'Each slot opens a color picker for fine-tuning.',
-            examples: [
-              ComponentExample(
-                title: 'Brand palette',
-                child: OiColorPalettePicker(
-                  label: 'Brand colors',
-                  slots: const [
-                    OiColorSlot(
-                      id: 'primary',
-                      label: 'Primary',
-                      value: Color(0xFF3B82F6),
-                    ),
-                    OiColorSlot(
-                      id: 'secondary',
-                      label: 'Secondary',
-                      value: Color(0xFF8B5CF6),
-                    ),
-                    OiColorSlot(
-                      id: 'accent',
-                      label: 'Accent',
-                      value: Color(0xFFF59E0B),
-                    ),
-                  ],
-                  onSlotChanged: (_, __) {},
-                  onRandomize: () {},
                 ),
               ),
             ],

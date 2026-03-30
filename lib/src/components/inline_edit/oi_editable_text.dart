@@ -3,7 +3,7 @@ import 'package:obers_ui/src/components/inline_edit/oi_editable.dart';
 import 'package:obers_ui/src/components/inputs/oi_text_input.dart';
 import 'package:obers_ui/src/foundation/theme/oi_text_theme.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
-import 'package:obers_ui/src/primitives/display/oi_label.dart';
+import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
 
 /// An inline-editable text field that toggles between a label display and
 /// a text input.
@@ -48,12 +48,15 @@ class OiEditableText extends StatelessWidget {
       enabled: enabled,
       displayBuilder: (ctx, v, startEdit) {
         final colors = ctx.colors;
-        return _HoverUnderlineLabel(
-          text: v.isEmpty ? ' ' : v,
-          variant: variant,
-          style: style,
-          hoverColor: colors.borderFocus,
+        final effectiveStyle = style ??
+            TextStyle(fontSize: 14, color: colors.text);
+        return OiTappable(
           onTap: enabled ? startEdit : null,
+          enabled: enabled,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 2),
+            child: Text(v.isEmpty ? ' ' : v, style: effectiveStyle),
+          ),
         );
       },
       editBuilder: (ctx, v, commit, cancel) {
@@ -65,62 +68,6 @@ class OiEditableText extends StatelessWidget {
         );
       },
     );
-  }
-}
-
-// ---------------------------------------------------------------------------
-// Display helper — label with hover underline on pointer devices
-// ---------------------------------------------------------------------------
-
-class _HoverUnderlineLabel extends StatefulWidget {
-  const _HoverUnderlineLabel({
-    required this.text,
-    required this.variant,
-    required this.hoverColor,
-    this.style,
-    this.onTap,
-  });
-
-  final String text;
-  final OiLabelVariant variant;
-  final TextStyle? style;
-  final Color hoverColor;
-  final VoidCallback? onTap;
-
-  @override
-  State<_HoverUnderlineLabel> createState() => _HoverUnderlineLabelState();
-}
-
-class _HoverUnderlineLabelState extends State<_HoverUnderlineLabel> {
-  bool _hovered = false;
-
-  @override
-  Widget build(BuildContext context) {
-    final baseStyle = context.textTheme.styleFor(widget.variant).copyWith(
-      color: context.colors.text,
-    );
-    final merged = widget.style != null
-        ? baseStyle.merge(widget.style)
-        : baseStyle;
-    final effective = _hovered && widget.onTap != null
-        ? merged.copyWith(
-            decoration: TextDecoration.underline,
-            decorationColor: widget.hoverColor,
-          )
-        : merged;
-
-    Widget label = Text(widget.text, style: effective);
-
-    if (widget.onTap != null) {
-      label = MouseRegion(
-        cursor: SystemMouseCursors.click,
-        onEnter: (_) => setState(() => _hovered = true),
-        onExit: (_) => setState(() => _hovered = false),
-        child: label,
-      );
-    }
-
-    return label;
   }
 }
 

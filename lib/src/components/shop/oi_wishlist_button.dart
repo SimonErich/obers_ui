@@ -115,24 +115,43 @@ class _FilledHeartPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = color
-      ..style = PaintingStyle.fill;
-
     final w = size.width;
     final h = size.height;
 
-    // Heart path scaled to the given size. The shape uses two cubic bezier
-    // curves forming the classic heart outline.
+    // Lucide-style heart path matching the OiIcons.heart outline shape.
+    // Derived from the Lucide "heart" SVG scaled to a 24×24 viewBox,
+    // then normalised to the actual [size].
+    final sx = w / 24;
+    final sy = h / 24;
+
     final path = Path()
-      ..moveTo(w * 0.5, h * 0.85)
-      ..cubicTo(w * 0.15, h * 0.65, w * 0.0, h * 0.4, w * 0.15, h * 0.2)
-      ..cubicTo(w * 0.25, h * 0.05, w * 0.45, h * 0.1, w * 0.5, h * 0.3)
-      ..cubicTo(w * 0.55, h * 0.1, w * 0.75, h * 0.05, w * 0.85, h * 0.2)
-      ..cubicTo(w * 1.0, h * 0.4, w * 0.85, h * 0.65, w * 0.5, h * 0.85)
+      ..moveTo(19 * sx, 14 * sy)
+      ..cubicTo(20.49 * sx, 12.54 * sy, 22 * sx, 10.28 * sy, 22 * sx, 8.5 * sy)
+      ..cubicTo(22 * sx, 5.42 * sy, 19.58 * sx, 3 * sy, 16.5 * sx, 3 * sy)
+      ..cubicTo(14.76 * sx, 3 * sy, 13.09 * sx, 3.81 * sy, 12 * sx, 5.09 * sy)
+      ..cubicTo(10.91 * sx, 3.81 * sy, 9.24 * sx, 3 * sy, 7.5 * sx, 3 * sy)
+      ..cubicTo(4.42 * sx, 3 * sy, 2 * sx, 5.42 * sy, 2 * sx, 8.5 * sy)
+      ..cubicTo(2 * sx, 10.28 * sy, 3.51 * sx, 12.54 * sy, 5 * sx, 14 * sy)
+      ..lineTo(12 * sx, 21 * sy)
       ..close();
 
-    canvas.drawPath(path, paint);
+    canvas
+      ..drawPath(
+        path,
+        Paint()
+          ..color = color
+          ..style = PaintingStyle.fill,
+      )
+      // Draw the same path as a stroke so the outline matches the icon.
+      ..drawPath(
+        path,
+        Paint()
+          ..color = color
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 2 * sx
+          ..strokeJoin = StrokeJoin.round
+          ..strokeCap = StrokeCap.round,
+      );
   }
 
   @override

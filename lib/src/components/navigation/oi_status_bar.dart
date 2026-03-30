@@ -58,7 +58,21 @@ class OiStatusBar extends StatelessWidget {
           border: Border(top: BorderSide(color: colors.borderSubtle)),
         ),
         padding: const EdgeInsets.symmetric(horizontal: 8),
-        child: Row(children: [...leading, const Spacer(), ...trailing]),
+        child: Row(
+          children: [
+            ...leading,
+            const Spacer(),
+            Flexible(
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: trailing,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

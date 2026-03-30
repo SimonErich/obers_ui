@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/primitives/display/oi_image.dart';
 
@@ -62,6 +63,7 @@ class OiVideoPlayer extends StatefulWidget {
 
 class _OiVideoPlayerState extends State<OiVideoPlayer> {
   bool _isPlaying = false;
+  bool _playHovered = false;
 
   @override
   void initState() {
@@ -120,9 +122,10 @@ class _OiVideoPlayerState extends State<OiVideoPlayer> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(
-                    '\u25B6',
-                    style: TextStyle(fontSize: 32, color: colors.textInverse),
+                  Icon(
+                    OiIcons.play,
+                    size: 32,
+                    color: colors.textInverse,
                   ),
                   const SizedBox(height: 8),
                   Text(
@@ -141,29 +144,36 @@ class _OiVideoPlayerState extends State<OiVideoPlayer> {
           // Play/pause overlay
           if (widget.showControls)
             Positioned.fill(
-              child: GestureDetector(
-                key: const Key('oi_video_player_controls'),
-                onTap: _togglePlayback,
-                behavior: HitTestBehavior.opaque,
-                child: Center(
-                  child: Container(
-                    width: 56,
-                    height: 56,
-                    decoration: BoxDecoration(
-                      color: colors.overlay,
-                      shape: BoxShape.circle,
-                    ),
-                    child: Center(
-                      child: Semantics(
-                        label: _isPlaying ? 'Pause' : 'Play',
-                        button: true,
-                        child: Text(
-                          _isPlaying ? '\u23F8' : '\u25B6',
-                          key: const Key('oi_video_player_play_icon'),
-                          style: TextStyle(
-                            fontSize: 24,
-                            color: colors.textInverse,
-                            height: 1,
+              child: MouseRegion(
+                cursor: SystemMouseCursors.click,
+                onEnter: (_) => setState(() => _playHovered = true),
+                onExit: (_) => setState(() => _playHovered = false),
+                child: GestureDetector(
+                  key: const Key('oi_video_player_controls'),
+                  onTap: _togglePlayback,
+                  behavior: HitTestBehavior.opaque,
+                  child: Center(
+                    child: AnimatedScale(
+                      scale: _playHovered ? 1.15 : 1.0,
+                      duration: const Duration(milliseconds: 150),
+                      curve: Curves.easeOut,
+                      child: Container(
+                        width: 56,
+                        height: 56,
+                        decoration: BoxDecoration(
+                          color: colors.overlay,
+                          shape: BoxShape.circle,
+                        ),
+                        child: Center(
+                          child: Semantics(
+                            label: _isPlaying ? 'Pause' : 'Play',
+                            button: true,
+                            child: Icon(
+                              _isPlaying ? OiIcons.pause : OiIcons.play,
+                              key: const Key('oi_video_player_play_icon'),
+                              size: 24,
+                              color: colors.textInverse,
+                            ),
                           ),
                         ),
                       ),

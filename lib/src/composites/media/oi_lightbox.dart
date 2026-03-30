@@ -67,6 +67,9 @@ class OiLightbox extends StatefulWidget {
 class _OiLightboxState extends State<OiLightbox> {
   late int _currentIndex;
   late final FocusNode _focusNode;
+  bool _closeHovered = false;
+  bool _prevHovered = false;
+  bool _nextHovered = false;
 
   @override
   void initState() {
@@ -196,26 +199,33 @@ class _OiLightboxState extends State<OiLightbox> {
             Positioned(
               top: 16,
               right: 16,
-              child: GestureDetector(
-                key: const Key('oi_lightbox_close'),
-                onTap: widget.onDismiss,
-                child: Semantics(
-                  label: 'Close lightbox',
-                  button: true,
-                  child: Container(
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      color: colors.surface.withValues(alpha: 0.8),
-                      shape: BoxShape.circle,
-                    ),
-                    child: Center(
-                      child: Text(
-                        '\u00D7',
-                        style: TextStyle(
-                          fontSize: 24,
-                          color: colors.text,
-                          height: 1,
+              child: MouseRegion(
+                cursor: SystemMouseCursors.click,
+                onEnter: (_) => setState(() => _closeHovered = true),
+                onExit: (_) => setState(() => _closeHovered = false),
+                child: GestureDetector(
+                  key: const Key('oi_lightbox_close'),
+                  onTap: widget.onDismiss,
+                  child: Semantics(
+                    label: 'Close lightbox',
+                    button: true,
+                    child: Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: _closeHovered
+                            ? colors.primary.base.withValues(alpha: 0.1)
+                            : colors.surface.withValues(alpha: 0.8),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Center(
+                        child: Text(
+                          '\u00D7',
+                          style: TextStyle(
+                            fontSize: 24,
+                            color: colors.text,
+                            height: 1,
+                          ),
                         ),
                       ),
                     ),
@@ -231,26 +241,33 @@ class _OiLightboxState extends State<OiLightbox> {
                 top: 0,
                 bottom: 0,
                 child: Center(
-                  child: GestureDetector(
-                    key: const Key('oi_lightbox_previous'),
-                    onTap: _previous,
-                    child: Semantics(
-                      label: 'Previous image',
-                      button: true,
-                      child: Container(
-                        width: 40,
-                        height: 40,
-                        decoration: BoxDecoration(
-                          color: colors.surface.withValues(alpha: 0.8),
-                          shape: BoxShape.circle,
-                        ),
-                        child: Center(
-                          child: Text(
-                            '\u2039',
-                            style: TextStyle(
-                              fontSize: 24,
-                              color: colors.text,
-                              height: 1,
+                  child: MouseRegion(
+                    cursor: SystemMouseCursors.click,
+                    onEnter: (_) => setState(() => _prevHovered = true),
+                    onExit: (_) => setState(() => _prevHovered = false),
+                    child: GestureDetector(
+                      key: const Key('oi_lightbox_previous'),
+                      onTap: _previous,
+                      child: Semantics(
+                        label: 'Previous image',
+                        button: true,
+                        child: Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            color: _prevHovered
+                                ? colors.primary.base.withValues(alpha: 0.1)
+                                : colors.surface.withValues(alpha: 0.8),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Center(
+                            child: Text(
+                              '\u2039',
+                              style: TextStyle(
+                                fontSize: 24,
+                                color: colors.text,
+                                height: 1,
+                              ),
                             ),
                           ),
                         ),
@@ -267,26 +284,33 @@ class _OiLightboxState extends State<OiLightbox> {
                 top: 0,
                 bottom: 0,
                 child: Center(
-                  child: GestureDetector(
-                    key: const Key('oi_lightbox_next'),
-                    onTap: _next,
-                    child: Semantics(
-                      label: 'Next image',
-                      button: true,
-                      child: Container(
-                        width: 40,
-                        height: 40,
-                        decoration: BoxDecoration(
-                          color: colors.surface.withValues(alpha: 0.8),
-                          shape: BoxShape.circle,
-                        ),
-                        child: Center(
-                          child: Text(
-                            '\u203A',
-                            style: TextStyle(
-                              fontSize: 24,
-                              color: colors.text,
-                              height: 1,
+                  child: MouseRegion(
+                    cursor: SystemMouseCursors.click,
+                    onEnter: (_) => setState(() => _nextHovered = true),
+                    onExit: (_) => setState(() => _nextHovered = false),
+                    child: GestureDetector(
+                      key: const Key('oi_lightbox_next'),
+                      onTap: _next,
+                      child: Semantics(
+                        label: 'Next image',
+                        button: true,
+                        child: Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            color: _nextHovered
+                                ? colors.primary.base.withValues(alpha: 0.1)
+                                : colors.surface.withValues(alpha: 0.8),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Center(
+                            child: Text(
+                              '\u203A',
+                              style: TextStyle(
+                                fontSize: 24,
+                                color: colors.text,
+                                height: 1,
+                              ),
                             ),
                           ),
                         ),

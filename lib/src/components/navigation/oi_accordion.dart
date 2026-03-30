@@ -6,6 +6,7 @@ import 'package:obers_ui/src/foundation/persistence/oi_settings_driver.dart';
 import 'package:obers_ui/src/foundation/persistence/oi_settings_mixin.dart';
 import 'package:obers_ui/src/foundation/persistence/oi_settings_provider.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
+import 'package:obers_ui/src/foundation/theme/oi_theme_scope.dart';
 import 'package:obers_ui/src/models/settings/oi_accordion_settings.dart';
 import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
 
@@ -283,7 +284,23 @@ class _OiAccordionState extends State<OiAccordion>
                       padding: const EdgeInsets.fromLTRB(16, 0, 16, 14),
                       child: Align(
                         alignment: Alignment.topLeft,
-                        child: section.content,
+                        child: Builder(
+                          builder: (context) {
+                            final theme = context.theme;
+                            final tt = theme.textTheme;
+                            return OiThemeScope(
+                              data: theme.copyWith(
+                                textTheme: tt.copyWith(
+                                  body: tt.body.copyWith(fontSize: 14),
+                                  bodyStrong: tt.bodyStrong.copyWith(
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ),
+                              child: section.content,
+                            );
+                          },
+                        ),
                       ),
                     ),
                   ),

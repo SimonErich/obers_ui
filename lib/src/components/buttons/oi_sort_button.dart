@@ -199,6 +199,7 @@ class _OiSortButtonState extends State<OiSortButton> {
       label: widget.label,
       open: _isOpen,
       onClose: _closePopover,
+      initialFocus: false,
       anchor: OiButton.outline(
         label: widget.currentSort.label,
         icon: _directionIcon,

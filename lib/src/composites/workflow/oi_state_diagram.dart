@@ -136,33 +136,37 @@ class OiStateDiagram extends StatelessWidget {
 
     return Semantics(
       label: label,
-      child: SizedBox(
-        width: resolvedWidth,
-        height: resolvedHeight,
-        child: Stack(
-          clipBehavior: Clip.none,
-          children: [
-            // Paint transitions as a background layer.
-            Positioned.fill(
-              child: CustomPaint(
-                painter: _TransitionPainter(
-                  transitions: transitions,
-                  nodeMap: nodeMap,
-                  nodeWidth: _nodeWidth,
-                  nodeHeight: _nodeHeight,
-                  defaultColor: colors.border,
-                  textColor: colors.textMuted,
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: SingleChildScrollView(
+          child: SizedBox(
+            width: resolvedWidth,
+            height: resolvedHeight,
+            child: Stack(
+              children: [
+                // Paint transitions as a background layer.
+                Positioned.fill(
+                  child: CustomPaint(
+                    painter: _TransitionPainter(
+                      transitions: transitions,
+                      nodeMap: nodeMap,
+                      nodeWidth: _nodeWidth,
+                      nodeHeight: _nodeHeight,
+                      defaultColor: colors.border,
+                      textColor: colors.textMuted,
+                    ),
+                  ),
                 ),
-              ),
+                // Render state nodes.
+                for (final state in states)
+                  Positioned(
+                    left: state.position.dx,
+                    top: state.position.dy,
+                    child: _buildNode(context, state, colors),
+                  ),
+              ],
             ),
-            // Render state nodes.
-            for (final state in states)
-              Positioned(
-                left: state.position.dx,
-                top: state.position.dy,
-                child: _buildNode(context, state, colors),
-              ),
-          ],
+          ),
         ),
       ),
     );

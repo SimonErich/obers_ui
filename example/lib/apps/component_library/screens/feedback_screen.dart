@@ -16,6 +16,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
   int _scaleRating = 7;
   String _sentiment = '\u{1f642}'; // default to slightly smiling face
   OiThumbsValue _thumbs = OiThumbsValue.up;
+  bool _bulkAllSelected = false;
 
   @override
   Widget build(BuildContext context) {
@@ -155,9 +156,10 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
               ComponentExample(
                 title: 'Bulk actions',
                 child: OiBulkBar(
-                  selectedCount: 3,
+                  selectedCount: _bulkAllSelected ? 10 : 3,
                   totalCount: 10,
                   label: 'items',
+                  allSelected: _bulkAllSelected,
                   actions: [
                     OiBulkAction(
                       label: 'Delete',
@@ -171,8 +173,10 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                       onTap: () {},
                     ),
                   ],
-                  onSelectAll: () {},
-                  onDeselectAll: () {},
+                  onSelectAll: () =>
+                      setState(() => _bulkAllSelected = true),
+                  onDeselectAll: () =>
+                      setState(() => _bulkAllSelected = false),
                 ),
               ),
             ],

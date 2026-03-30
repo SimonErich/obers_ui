@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/obers_ui.dart';
 import 'package:obers_ui_example/apps/component_library/shared/component_showcase_section.dart';
@@ -11,6 +13,23 @@ class TypographyScreen extends StatefulWidget {
 }
 
 class _TypographyScreenState extends State<TypographyScreen> {
+  bool _copied = false;
+  Timer? _copiedTimer;
+
+  @override
+  void dispose() {
+    _copiedTimer?.cancel();
+    super.dispose();
+  }
+
+  void _onCopied() {
+    setState(() => _copied = true);
+    _copiedTimer?.cancel();
+    _copiedTimer = Timer(const Duration(seconds: 2), () {
+      if (mounted) setState(() => _copied = false);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final spacing = context.spacing;
@@ -302,12 +321,18 @@ class _TypographyScreenState extends State<TypographyScreen> {
                 title: 'Tap to Copy',
                 child: OiCopyable(
                   value: 'Hello, ObersUI!',
+                  onCopied: _onCopied,
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       const OiLabel.body('Hello, ObersUI!'),
                       SizedBox(width: spacing.sm),
-                      OiLabel.small('(tap to copy)', color: colors.textMuted),
+                      OiLabel.small(
+                        _copied ? '(copied!)' : '(tap to copy)',
+                        color: _copied
+                            ? colors.success.base
+                            : colors.textMuted,
+                      ),
                     ],
                   ),
                 ),

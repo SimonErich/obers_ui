@@ -36,17 +36,20 @@ class FormsWizardsScreen extends StatefulWidget {
 
 class _FormsWizardsScreenState extends State<FormsWizardsScreen> {
   late final _ContactController _contactController;
+  late final _ContactController _horizontalController;
   int _currentStep = 0;
 
   @override
   void initState() {
     super.initState();
     _contactController = _ContactController();
+    _horizontalController = _ContactController();
   }
 
   @override
   void dispose() {
     _contactController.dispose();
+    _horizontalController.dispose();
     super.dispose();
   }
 
@@ -102,21 +105,25 @@ class _FormsWizardsScreenState extends State<FormsWizardsScreen> {
                   ),
                 ),
               ),
-              const ComponentExample(
+              ComponentExample(
                 title: 'Horizontal layout',
-                child: OiFormSection(
-                  title: 'Name',
-                  layout: OiFormLayout.horizontal,
-                  children: [
-                    OiAfTextInput(
-                      field: _ContactField.name,
-                      label: 'First Name',
-                    ),
-                    OiAfTextInput(
-                      field: _ContactField.email,
-                      label: 'Last Name',
-                    ),
-                  ],
+                child: OiAfForm<_ContactField, Map<String, dynamic>>(
+                  controller: _horizontalController,
+                  onSubmit: (_, __) async {},
+                  child: const OiFormSection(
+                    title: 'Name',
+                    layout: OiFormLayout.horizontal,
+                    children: [
+                      OiAfTextInput(
+                        field: _ContactField.name,
+                        label: 'First Name',
+                      ),
+                      OiAfTextInput(
+                        field: _ContactField.email,
+                        label: 'Last Name',
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ],

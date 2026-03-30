@@ -99,7 +99,7 @@ class OiCartPanel extends StatelessWidget {
 
     return OiColumn(
       breakpoint: breakpoint,
-      gap: OiResponsive(sp.xs),
+      gap: OiResponsive(sp.sm),
       children: [
         for (final item in items)
           OiCartItemRow(
@@ -129,50 +129,53 @@ class OiCartPanel extends StatelessWidget {
     );
   }
 
-  List<Widget> _buildSummarySection(BuildContext context) {
+  Widget _buildSummarySection(BuildContext context) {
+    final breakpoint = context.breakpoint;
     final sp = context.spacing;
 
-    return [
-      OiOrderSummaryLine(
-        label: 'Subtotal',
-        amount: summary.subtotal,
-        currencyCode: currencyCode,
-        loading: loading,
-      ),
-      if (summary.discount != null)
+    return OiColumn(
+      breakpoint: breakpoint,
+      gap: OiResponsive(sp.sm),
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
         OiOrderSummaryLine(
-          label: summary.discountLabel ?? 'Discount',
-          amount: summary.discount!,
-          currencyCode: currencyCode,
-          negative: true,
-          loading: loading,
-        ),
-      if (summary.shipping != null)
-        OiOrderSummaryLine(
-          label: summary.shippingLabel ?? 'Shipping',
-          amount: summary.shipping!,
+          label: 'Subtotal',
+          amount: summary.subtotal,
           currencyCode: currencyCode,
           loading: loading,
         ),
-      if (summary.tax != null)
+        if (summary.discount != null)
+          OiOrderSummaryLine(
+            label: summary.discountLabel ?? 'Discount',
+            amount: summary.discount!,
+            currencyCode: currencyCode,
+            negative: true,
+            loading: loading,
+          ),
+        if (summary.shipping != null)
+          OiOrderSummaryLine(
+            label: summary.shippingLabel ?? 'Shipping',
+            amount: summary.shipping!,
+            currencyCode: currencyCode,
+            loading: loading,
+          ),
+        if (summary.tax != null)
+          OiOrderSummaryLine(
+            label: summary.taxLabel ?? 'Tax',
+            amount: summary.tax!,
+            currencyCode: currencyCode,
+            loading: loading,
+          ),
+        const OiDivider(),
         OiOrderSummaryLine(
-          label: summary.taxLabel ?? 'Tax',
-          amount: summary.tax!,
+          label: 'Total',
+          amount: summary.total,
           currencyCode: currencyCode,
+          bold: true,
           loading: loading,
         ),
-      Padding(
-        padding: EdgeInsets.symmetric(vertical: sp.xs),
-        child: const OiDivider(),
-      ),
-      OiOrderSummaryLine(
-        label: 'Total',
-        amount: summary.total,
-        currencyCode: currencyCode,
-        bold: true,
-        loading: loading,
-      ),
-    ];
+      ],
+    );
   }
 
   Widget _buildActions(BuildContext context) {
@@ -238,7 +241,8 @@ class OiCartPanel extends StatelessWidget {
           _buildItemList(context),
           const OiDivider(),
           if (onApplyCoupon != null) _buildCouponSection(context),
-          ..._buildSummarySection(context),
+          _buildSummarySection(context),
+          SizedBox(height: sp.sm),
           _buildActions(context),
         ],
       ),

@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 
 /// The result of a crop operation.
@@ -109,6 +110,13 @@ class _OiImageCropperState extends State<OiImageCropper> {
   /// The currently enforced aspect ratio, if any.
   double? _activeAspectRatio;
 
+  /// Hover tracking for toolbar buttons.
+  bool _rotateHovered = false;
+  bool _flipHHovered = false;
+  bool _flipVHovered = false;
+  bool _confirmHovered = false;
+  double? _hoveredAspectRatio;
+
   @override
   void initState() {
     super.initState();
@@ -194,30 +202,31 @@ class _OiImageCropperState extends State<OiImageCropper> {
         children: [
           // Image with crop overlay
           Expanded(
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                final size = Size(constraints.maxWidth, constraints.maxHeight);
-                return Stack(
-                  children: [
-                    // Background image
-                    Positioned.fill(
-                      child: Transform(
-                        alignment: Alignment.center,
-                        transform: Matrix4.identity()
-                          ..rotateZ(_rotationRadians)
-                          ..scaleByDouble(
-                            _flippedH ? -1.0 : 1.0,
-                            _flippedV ? -1.0 : 1.0,
-                            1,
-                            1,
+            child: ClipRect(
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final size = Size(constraints.maxWidth, constraints.maxHeight);
+                  return Stack(
+                    children: [
+                      // Background image
+                      Positioned.fill(
+                        child: Transform(
+                          alignment: Alignment.center,
+                          transform: Matrix4.identity()
+                            ..rotateZ(_rotationRadians)
+                            ..scaleByDouble(
+                              _flippedH ? -1.0 : 1.0,
+                              _flippedV ? -1.0 : 1.0,
+                              1,
+                              1,
+                            ),
+                          child: Image(
+                            key: const Key('oi_image_cropper_image'),
+                            image: widget.image,
+                            fit: BoxFit.contain,
                           ),
-                        child: Image(
-                          key: const Key('oi_image_cropper_image'),
-                          image: widget.image,
-                          fit: BoxFit.contain,
                         ),
                       ),
-                    ),
 
                     // Dark overlay outside crop area
                     Positioned.fill(
@@ -250,32 +259,42 @@ class _OiImageCropperState extends State<OiImageCropper> {
                 );
               },
             ),
+            ),
           ),
 
           // Toolbar
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+            child: Wrap(
+              alignment: WrapAlignment.center,
+              runSpacing: 8,
               children: [
                 if (widget.enableRotate)
-                  GestureDetector(
-                    key: const Key('oi_image_cropper_rotate'),
-                    onTap: _rotate,
-                    child: Semantics(
-                      label: 'Rotate image',
-                      button: true,
-                      child: Container(
-                        width: 40,
-                        height: 40,
-                        decoration: BoxDecoration(
-                          color: colors.surfaceHover,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Center(
-                          child: Text(
-                            '\u21BB',
-                            style: TextStyle(fontSize: 20, color: colors.text),
+                  MouseRegion(
+                    cursor: SystemMouseCursors.click,
+                    onEnter: (_) => setState(() => _rotateHovered = true),
+                    onExit: (_) => setState(() => _rotateHovered = false),
+                    child: GestureDetector(
+                      key: const Key('oi_image_cropper_rotate'),
+                      onTap: _rotate,
+                      child: Semantics(
+                        label: 'Rotate image',
+                        button: true,
+                        child: Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            color: _rotateHovered
+                                ? colors.primary.base.withValues(alpha: 0.1)
+                                : colors.surfaceHover,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Center(
+                            child: Icon(
+                              OiIcons.rotateCw,
+                              size: 20,
+                              color: colors.text,
+                            ),
                           ),
                         ),
                       ),
@@ -283,46 +302,62 @@ class _OiImageCropperState extends State<OiImageCropper> {
                   ),
                 if (widget.enableRotate) const SizedBox(width: 8),
                 if (widget.enableFlip) ...[
-                  GestureDetector(
-                    key: const Key('oi_image_cropper_flip_h'),
-                    onTap: _flipHorizontal,
-                    child: Semantics(
-                      label: 'Flip horizontal',
-                      button: true,
-                      child: Container(
-                        width: 40,
-                        height: 40,
-                        decoration: BoxDecoration(
-                          color: colors.surfaceHover,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Center(
-                          child: Text(
-                            '\u2194',
-                            style: TextStyle(fontSize: 20, color: colors.text),
+                  MouseRegion(
+                    cursor: SystemMouseCursors.click,
+                    onEnter: (_) => setState(() => _flipHHovered = true),
+                    onExit: (_) => setState(() => _flipHHovered = false),
+                    child: GestureDetector(
+                      key: const Key('oi_image_cropper_flip_h'),
+                      onTap: _flipHorizontal,
+                      child: Semantics(
+                        label: 'Flip horizontal',
+                        button: true,
+                        child: Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            color: _flipHHovered
+                                ? colors.primary.base.withValues(alpha: 0.1)
+                                : colors.surfaceHover,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Center(
+                            child: Icon(
+                              OiIcons.flipHorizontal,
+                              size: 20,
+                              color: colors.text,
+                            ),
                           ),
                         ),
                       ),
                     ),
                   ),
                   const SizedBox(width: 8),
-                  GestureDetector(
-                    key: const Key('oi_image_cropper_flip_v'),
-                    onTap: _flipVertical,
-                    child: Semantics(
-                      label: 'Flip vertical',
-                      button: true,
-                      child: Container(
-                        width: 40,
-                        height: 40,
-                        decoration: BoxDecoration(
-                          color: colors.surfaceHover,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Center(
-                          child: Text(
-                            '\u2195',
-                            style: TextStyle(fontSize: 20, color: colors.text),
+                  MouseRegion(
+                    cursor: SystemMouseCursors.click,
+                    onEnter: (_) => setState(() => _flipVHovered = true),
+                    onExit: (_) => setState(() => _flipVHovered = false),
+                    child: GestureDetector(
+                      key: const Key('oi_image_cropper_flip_v'),
+                      onTap: _flipVertical,
+                      child: Semantics(
+                        label: 'Flip vertical',
+                        button: true,
+                        child: Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            color: _flipVHovered
+                                ? colors.primary.base.withValues(alpha: 0.1)
+                                : colors.surfaceHover,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Center(
+                            child: Icon(
+                              OiIcons.flipVertical,
+                              size: 20,
+                              color: colors.text,
+                            ),
                           ),
                         ),
                       ),
@@ -341,61 +376,81 @@ class _OiImageCropperState extends State<OiImageCropper> {
                         : ar == 4 / 3
                         ? '4:3'
                         : ar.toStringAsFixed(2);
+                    final isArHovered = _hoveredAspectRatio == ar;
                     return Padding(
                       padding: const EdgeInsets.only(right: 8),
-                      child: GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            _activeAspectRatio = isActive ? null : ar;
-                            if (_activeAspectRatio != null) {
-                              _applyCropAspectRatio();
-                            }
-                          });
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 4,
-                          ),
-                          decoration: BoxDecoration(
-                            color: isActive
-                                ? colors.primary.base
-                                : colors.surfaceHover,
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                          child: Text(
-                            arLabel,
-                            style: textTheme.small.copyWith(
+                      child: MouseRegion(
+                        cursor: SystemMouseCursors.click,
+                        onEnter: (_) =>
+                            setState(() => _hoveredAspectRatio = ar),
+                        onExit: (_) => setState(() {
+                          if (_hoveredAspectRatio == ar) {
+                            _hoveredAspectRatio = null;
+                          }
+                        }),
+                        child: GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              _activeAspectRatio = isActive ? null : ar;
+                              if (_activeAspectRatio != null) {
+                                _applyCropAspectRatio();
+                              }
+                            });
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
                               color: isActive
-                                  ? colors.textOnPrimary
-                                  : colors.text,
+                                  ? colors.primary.base
+                                  : isArHovered
+                                      ? colors.primary.base
+                                          .withValues(alpha: 0.1)
+                                      : colors.surfaceHover,
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: Text(
+                              arLabel,
+                              style: textTheme.small.copyWith(
+                                color: isActive
+                                    ? colors.textOnPrimary
+                                    : colors.text,
+                              ),
                             ),
                           ),
                         ),
                       ),
                     );
                   }),
-                const Spacer(),
                 // Confirm button
-                GestureDetector(
-                  key: const Key('oi_image_cropper_confirm'),
-                  onTap: _onConfirm,
-                  child: Semantics(
-                    label: 'Confirm crop',
-                    button: true,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 8,
-                      ),
-                      decoration: BoxDecoration(
-                        color: colors.primary.base,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Text(
-                        'Crop',
-                        style: textTheme.body.copyWith(
-                          color: colors.textOnPrimary,
+                MouseRegion(
+                  cursor: SystemMouseCursors.click,
+                  onEnter: (_) => setState(() => _confirmHovered = true),
+                  onExit: (_) => setState(() => _confirmHovered = false),
+                  child: GestureDetector(
+                    key: const Key('oi_image_cropper_confirm'),
+                    onTap: _onConfirm,
+                    child: Semantics(
+                      label: 'Confirm crop',
+                      button: true,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 8,
+                        ),
+                        decoration: BoxDecoration(
+                          color: _confirmHovered
+                              ? colors.primary.dark
+                              : colors.primary.base,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Text(
+                          'Crop',
+                          style: textTheme.body.copyWith(
+                            color: colors.textOnPrimary,
+                          ),
                         ),
                       ),
                     ),

@@ -3,7 +3,6 @@ import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/_internal/oi_input_frame.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/primitives/input/oi_raw_input.dart';
-import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
 
 /// A numeric input field with stepper buttons.
 ///
@@ -25,6 +24,7 @@ class OiNumberInput extends StatefulWidget {
     this.hint,
     this.error,
     this.enabled = true,
+    this.minWidth = 120,
     super.key,
   });
 
@@ -61,6 +61,9 @@ class OiNumberInput extends StatefulWidget {
   /// Whether the field accepts input.
   final bool enabled;
 
+  /// Minimum width of the input. Defaults to 120.
+  final double minWidth;
+
   @override
   State<OiNumberInput> createState() => _OiNumberInputState();
 }
@@ -69,6 +72,8 @@ class _OiNumberInputState extends State<OiNumberInput> {
   late TextEditingController _controller;
   late FocusNode _focusNode;
   bool _focused = false;
+  bool _decrementHovered = false;
+  bool _incrementHovered = false;
 
   @override
   void initState() {
@@ -156,19 +161,36 @@ class _OiNumberInputState extends State<OiNumberInput> {
     _controller.text = _format(next);
   }
 
-  Widget _stepButton(String symbol, VoidCallback onTap) {
+  Widget _stepButton(
+    String symbol,
+    VoidCallback onTap, {
+    required bool hovered,
+    required ValueChanged<bool> onHoverChanged,
+  }) {
     final colors = context.colors;
-    return OiTappable(
-      onTap: widget.enabled ? onTap : null,
-      enabled: widget.enabled,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8),
-        child: Text(
-          symbol,
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w500,
-            color: widget.enabled ? colors.text : colors.textMuted,
+    final isActive = widget.enabled;
+    final color = hovered && isActive
+        ? colors.primary.base
+        : isActive
+            ? colors.text
+            : colors.textMuted;
+
+    return MouseRegion(
+      cursor: isActive ? SystemMouseCursors.click : SystemMouseCursors.basic,
+      onEnter: (_) => onHoverChanged(true),
+      onExit: (_) => onHoverChanged(false),
+      child: GestureDetector(
+        onTap: isActive ? onTap : null,
+        behavior: HitTestBehavior.opaque,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8),
+          child: Text(
+            symbol,
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w500,
+              color: color,
+            ),
           ),
         ),
       ),
@@ -177,22 +199,39 @@ class _OiNumberInputState extends State<OiNumberInput> {
 
   @override
   Widget build(BuildContext context) {
-    return OiInputFrame(
-      label: widget.label,
-      hint: widget.hint,
-      error: widget.error,
-      focused: _focused,
-      enabled: widget.enabled,
-      leading: _stepButton('−', _decrement),
-      trailing: _stepButton('+', _increment),
-      child: OiRawInput(
-        controller: _controller,
-        focusNode: _focusNode,
-        keyboardType: const TextInputType.numberWithOptions(decimal: true),
-        textAlign: TextAlign.center,
-        onSubmitted: _commitText,
-        enabled: widget.enabled,
-        inputFormatters: [FilteringTextInputFormatter.allow(RegExp('[-0-9.]'))],
+    return IntrinsicWidth(
+      child: ConstrainedBox(
+        constraints: BoxConstraints(minWidth: widget.minWidth),
+        child: OiInputFrame(
+          label: widget.label,
+          hint: widget.hint,
+          error: widget.error,
+          focused: _focused,
+          enabled: widget.enabled,
+          leading: _stepButton(
+            '-',
+            _decrement,
+            hovered: _decrementHovered,
+            onHoverChanged: (v) => setState(() => _decrementHovered = v),
+          ),
+          trailing: _stepButton(
+            '+',
+            _increment,
+            hovered: _incrementHovered,
+            onHoverChanged: (v) => setState(() => _incrementHovered = v),
+          ),
+          child: OiRawInput(
+            controller: _controller,
+            focusNode: _focusNode,
+            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+            textAlign: TextAlign.center,
+            onSubmitted: _commitText,
+            enabled: widget.enabled,
+            inputFormatters: [
+              FilteringTextInputFormatter.allow(RegExp('[-0-9.]')),
+            ],
+          ),
+        ),
       ),
     );
   }

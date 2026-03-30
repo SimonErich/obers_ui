@@ -103,7 +103,10 @@ class OiThumbs extends StatelessWidget {
             const SizedBox(width: 4),
             Text(
               '$count',
-              style: textTheme.small.copyWith(color: colors.textMuted),
+              style: textTheme.small.copyWith(
+                color: selected ? colors.primary.base : colors.textMuted,
+                fontWeight: selected ? FontWeight.w700 : FontWeight.w400,
+              ),
             ),
           ],
         );

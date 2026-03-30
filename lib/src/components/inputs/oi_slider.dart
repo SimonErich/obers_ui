@@ -66,9 +66,70 @@ class OiSlider extends StatefulWidget {
   State<OiSlider> createState() => _OiSliderState();
 }
 
-class _OiSliderState extends State<OiSlider> {
+class _OiSliderState extends State<OiSlider>
+    with SingleTickerProviderStateMixin {
   // Which thumb is being dragged: 0 = primary, 1 = secondary.
   int? _draggingThumb;
+
+  late AnimationController _animController;
+  late double _displayValue;
+  late double _displaySecondary;
+  late double _startValue;
+  late double _startSecondary;
+  late double _targetValue;
+  late double _targetSecondary;
+
+  @override
+  void initState() {
+    super.initState();
+    _displayValue = widget.value;
+    _displaySecondary = widget.secondaryValue ?? widget.value;
+    _targetValue = _displayValue;
+    _targetSecondary = _displaySecondary;
+    _startValue = _displayValue;
+    _startSecondary = _displaySecondary;
+    _animController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 250),
+    )..addListener(_onAnimate);
+  }
+
+  @override
+  void didUpdateWidget(OiSlider oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    final newSecondary = widget.secondaryValue ?? widget.value;
+    if (widget.value != _targetValue || newSecondary != _targetSecondary) {
+      _startValue = _displayValue;
+      _startSecondary = _displaySecondary;
+      _targetValue = widget.value;
+      _targetSecondary = newSecondary;
+      if (_draggingThumb != null) {
+        // While dragging, snap immediately — no animation lag.
+        _displayValue = _targetValue;
+        _displaySecondary = _targetSecondary;
+        _animController.value = 1.0;
+      } else {
+        _animController
+          ..value = 0.0
+          ..animateTo(1.0, curve: Curves.easeOutCubic);
+      }
+    }
+  }
+
+  void _onAnimate() {
+    setState(() {
+      final t = _animController.value;
+      _displayValue = _startValue + (_targetValue - _startValue) * t;
+      _displaySecondary =
+          _startSecondary + (_targetSecondary - _startSecondary) * t;
+    });
+  }
+
+  @override
+  void dispose() {
+    _animController.dispose();
+    super.dispose();
+  }
 
   double _snap(double v) {
     if (widget.divisions == null || widget.divisions! <= 0) return v;
@@ -118,9 +179,34 @@ class _OiSliderState extends State<OiSlider> {
     }
   }
 
+  void _handleTapDown(TapDownDetails details, double width) {
+    if (!widget.enabled) return;
+    final v = _valueFromPosition(details.localPosition.dx, width);
+    if (widget.secondaryValue != null) {
+      final dPrimary = (v - widget.value).abs();
+      final dSecondary = (v - widget.secondaryValue!).abs();
+      if (dPrimary <= dSecondary) {
+        final start = v.clamp(widget.min, widget.secondaryValue!);
+        widget.onRangeChanged?.call(start, widget.secondaryValue!);
+      } else {
+        final end = v.clamp(widget.value, widget.max);
+        widget.onRangeChanged?.call(widget.value, end);
+      }
+    } else {
+      widget.onChanged?.call(v);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
+    final reduceMotion = context.animations.reducedMotion ||
+        MediaQuery.disableAnimationsOf(context);
+    if (reduceMotion) {
+      _animController.duration = Duration.zero;
+    } else {
+      _animController.duration = const Duration(milliseconds: 250);
+    }
     const trackHeight = 4.0;
     const thumbRadius = 10.0;
     const totalHeight = 28.0;
@@ -129,6 +215,7 @@ class _OiSliderState extends State<OiSlider> {
       builder: (ctx, constraints) {
         final width = constraints.maxWidth;
         return GestureDetector(
+          onTapDown: (d) => _handleTapDown(d, width),
           onHorizontalDragStart: (d) => _handleDragStart(d, width),
           onHorizontalDragUpdate: (d) => _handleDragUpdate(d, width),
           onHorizontalDragEnd: _handleDragEnd,
@@ -140,8 +227,12 @@ class _OiSliderState extends State<OiSlider> {
               width: double.infinity,
               child: CustomPaint(
                 painter: _OiSliderPainter(
-                  value: widget.value,
-                  secondaryValue: widget.secondaryValue,
+                  value: _displayValue,
+                  secondaryValue: widget.secondaryValue != null
+                      ? _displaySecondary
+                      : null,
+                  labelValue: widget.value,
+                  labelSecondaryValue: widget.secondaryValue,
                   min: widget.min,
                   max: widget.max,
                   divisions: widget.divisions,
@@ -192,12 +283,16 @@ class _OiSliderPainter extends CustomPainter {
     required this.showLabels,
     required this.showTicks,
     required this.enabled,
+    required this.labelValue,
     this.secondaryValue,
+    this.labelSecondaryValue,
     this.divisions,
   });
 
   final double value;
   final double? secondaryValue;
+  final double labelValue;
+  final double? labelSecondaryValue;
   final double min;
   final double max;
   final int? divisions;
@@ -273,9 +368,9 @@ class _OiSliderPainter extends CustomPainter {
     }
 
     // Thumb(s).
-    _drawThumb(canvas, primaryX, trackY, value);
+    _drawThumb(canvas, primaryX, trackY, labelValue);
     if (secondaryX != null) {
-      _drawThumb(canvas, secondaryX, trackY, secondaryValue!);
+      _drawThumb(canvas, secondaryX, trackY, labelSecondaryValue!);
     }
   }
 

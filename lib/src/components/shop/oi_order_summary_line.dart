@@ -61,8 +61,16 @@ class OiOrderSummaryLine extends StatelessWidget {
   Widget _buildLabel(BuildContext context) {
     final breakpoint = context.breakpoint;
     final sp = context.spacing;
+    final colors = context.colors;
 
-    final labelWidget = bold ? OiLabel.bodyStrong(label) : OiLabel.body(label);
+    final Widget labelWidget;
+    if (bold) {
+      labelWidget = OiLabel.h4(label);
+    } else if (negative) {
+      labelWidget = OiLabel.small(label);
+    } else {
+      labelWidget = OiLabel.body(label);
+    }
 
     if (subtitle == null) return labelWidget;
 
@@ -70,7 +78,16 @@ class OiOrderSummaryLine extends StatelessWidget {
       breakpoint: breakpoint,
       gap: OiResponsive(sp.xs / 2),
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: [labelWidget, OiLabel.small(subtitle!)],
+      children: [
+        labelWidget,
+        Text(
+          subtitle!,
+          style: TextStyle(
+            fontSize: 12,
+            color: colors.primary.base,
+          ),
+        ),
+      ],
     );
   }
 
@@ -91,7 +108,7 @@ class OiOrderSummaryLine extends StatelessWidget {
       price: displayAmount,
       label: '$label amount',
       currencyCode: currencyCode,
-      size: bold ? OiPriceTagSize.medium : OiPriceTagSize.small,
+      size: bold ? OiPriceTagSize.large : OiPriceTagSize.medium,
     );
   }
 

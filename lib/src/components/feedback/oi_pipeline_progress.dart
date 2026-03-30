@@ -255,8 +255,8 @@ class OiPipelineProgress extends StatelessWidget {
                 children: [
                   Expanded(
                     child: isActive
-                        ? OiLabel.bodyStrong(step.label, color: labelColor)
-                        : OiLabel.body(step.label, color: labelColor),
+                        ? OiLabel.smallStrong(step.label, color: labelColor)
+                        : OiLabel.small(step.label, color: labelColor),
                   ),
                   if (step.estimatedDuration != null && !isCompleted)
                     Padding(
@@ -277,10 +277,15 @@ class OiPipelineProgress extends StatelessWidget {
                 OiLabel.small(error!, color: colors.error.base),
                 if (onRetry != null) ...[
                   SizedBox(height: spacing.sm),
-                  OiButton.outline(
-                    label: 'Retry',
-                    onTap: onRetry,
-                    size: OiButtonSize.small,
+                  Align(
+                    widthFactor: 1,
+                    child: UnconstrainedBox(
+                      child: OiButton.outline(
+                        label: 'Retry',
+                        onTap: onRetry,
+                        size: OiButtonSize.small,
+                      ),
+                    ),
                   ),
                 ],
               ],

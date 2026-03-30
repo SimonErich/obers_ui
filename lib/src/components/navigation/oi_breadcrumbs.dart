@@ -57,6 +57,7 @@ class OiBreadcrumbs extends StatefulWidget {
 
 class _OiBreadcrumbsState extends State<OiBreadcrumbs> {
   bool _overflowOpen = false;
+  final Set<int> _hoveredIndices = {};
 
   @override
   Widget build(BuildContext context) {
@@ -119,16 +120,25 @@ class _OiBreadcrumbsState extends State<OiBreadcrumbs> {
           ),
         );
       } else {
+        final index = i;
+        final isHovered = _hoveredIndices.contains(index);
         rowChildren.add(
-          OiTappable(
-            onTap: item.onTap,
-            child: Text(
-              item.label,
-              style: TextStyle(
-                fontSize: 14,
-                color: colors.primary.base,
-                decoration: TextDecoration.underline,
-                decorationColor: colors.primary.base,
+          MouseRegion(
+            cursor: SystemMouseCursors.click,
+            onEnter: (_) => setState(() => _hoveredIndices.add(index)),
+            onExit: (_) => setState(() => _hoveredIndices.remove(index)),
+            child: GestureDetector(
+              onTap: item.onTap,
+              behavior: HitTestBehavior.opaque,
+              child: Text(
+                item.label,
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: isHovered ? FontWeight.w600 : FontWeight.w400,
+                  color: colors.primary.base,
+                  decoration: TextDecoration.underline,
+                  decorationColor: colors.primary.base,
+                ),
               ),
             ),
           ),

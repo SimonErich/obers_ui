@@ -2,6 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:obers_ui/obers_ui.dart' show OiWizard;
 import 'package:obers_ui/src/composites/forms/oi_wizard.dart' show OiWizard;
 import 'package:obers_ui/src/foundation/oi_icons.dart';
+import 'package:obers_ui/src/foundation/theme/oi_color_scheme.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 
 /// The style of the stepper.
@@ -26,6 +27,11 @@ enum OiStepperStyle {
 /// connected dots/circles with labels, highlighting the current step
 /// and marking completed/error steps.
 ///
+/// When [enabledSteps] is provided, only those steps are interactive;
+/// all other steps appear visually disabled. This is useful for wizard
+/// forms where the user must complete steps sequentially and cannot
+/// jump to future steps.
+///
 /// {@category Composites}
 class OiStepper extends StatelessWidget {
   /// Creates an [OiStepper].
@@ -39,6 +45,7 @@ class OiStepper extends StatelessWidget {
     this.onStepTap,
     this.completedSteps = const {},
     this.errorSteps = const {},
+    this.enabledSteps,
   });
 
   /// The total number of steps in the process.
@@ -69,93 +76,38 @@ class OiStepper extends StatelessWidget {
   /// and use the error color.
   final Set<int> errorSteps;
 
-  // ---------------------------------------------------------------------------
-  // Icon constants
-  // ---------------------------------------------------------------------------
+  /// Optional set of step indices that are enabled (interactive).
+  ///
+  /// When null, all steps are enabled if [onStepTap] is provided.
+  /// When provided, only steps in this set are tappable and show hover
+  /// effects; all other steps appear visually disabled.
+  final Set<int>? enabledSteps;
 
-  /// Material Icons check mark.
-  static const IconData _checkIcon = OiIcons.check;
-
-  /// Material Icons error (exclamation circle).
-  static const IconData _errorIcon = OiIcons.circleAlert;
+  /// Whether a step at [index] is enabled for interaction.
+  bool _isStepEnabled(int index) {
+    if (onStepTap == null) return false;
+    if (enabledSteps == null) return true;
+    return enabledSteps!.contains(index);
+  }
 
   // ---------------------------------------------------------------------------
   // Build helpers
   // ---------------------------------------------------------------------------
 
-  /// Returns the color for a step at [index].
-  Color _stepColor(BuildContext context, int index) {
-    final colors = context.colors;
-    if (errorSteps.contains(index)) return colors.error.base;
-    if (completedSteps.contains(index)) return colors.success.base;
-    if (index == currentStep) return colors.primary.base;
-    return colors.borderSubtle;
-  }
-
-  /// Builds the icon inside a step circle at [index].
-  Widget? _stepIcon(BuildContext context, int index) {
-    final colors = context.colors;
-    if (errorSteps.contains(index)) {
-      return Icon(_errorIcon, size: 14, color: colors.textOnPrimary);
-    }
-    if (completedSteps.contains(index)) {
-      return Icon(_checkIcon, size: 14, color: colors.textOnPrimary);
-    }
-    if (stepIcons != null && index < stepIcons!.length) {
-      return Icon(
-        stepIcons![index],
-        size: 14,
-        color: index == currentStep ? colors.textOnPrimary : colors.textMuted,
-      );
-    }
-    return null;
-  }
-
   /// Builds a single step circle at [index].
   Widget _buildStep(BuildContext context, int index) {
-    final colors = context.colors;
-    final color = _stepColor(context, index);
-    final isCurrent = index == currentStep;
-    const circleSize = 28.0;
-
-    final icon = _stepIcon(context, index);
-
-    Widget circle = Container(
-      width: circleSize,
-      height: circleSize,
-      decoration: BoxDecoration(
-        color:
-            (completedSteps.contains(index) ||
-                errorSteps.contains(index) ||
-                isCurrent)
-            ? color
-            : colors.surface,
-        shape: BoxShape.circle,
-        border: Border.all(color: color, width: 2),
-      ),
-      child: Center(
-        child:
-            icon ??
-            Text(
-              '${index + 1}',
-              style: TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-                color: isCurrent ? colors.textOnPrimary : colors.textMuted,
-              ),
-            ),
-      ),
+    return _OiStepCircle(
+      index: index,
+      isCurrent: index == currentStep,
+      isCompleted: completedSteps.contains(index),
+      isError: errorSteps.contains(index),
+      isEnabled: _isStepEnabled(index),
+      isDisabled: enabledSteps != null && !enabledSteps!.contains(index),
+      icon: stepIcons != null && index < stepIcons!.length
+          ? stepIcons![index]
+          : null,
+      onTap: _isStepEnabled(index) ? () => onStepTap!(index) : null,
     );
-
-    if (onStepTap != null) {
-      circle = GestureDetector(
-        onTap: () => onStepTap!(index),
-        behavior: HitTestBehavior.opaque,
-        child: circle,
-      );
-    }
-
-    return circle;
   }
 
   /// Builds a connector line between steps.
@@ -289,5 +241,127 @@ class OiStepper extends StatelessWidget {
       label: 'Step ${currentStep + 1} of $totalSteps',
       child: content,
     );
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Step circle (private)
+// -----------------------------------------------------------------------------
+
+/// A single step circle with hover and disabled state support.
+class _OiStepCircle extends StatefulWidget {
+  const _OiStepCircle({
+    required this.index,
+    required this.isCurrent,
+    required this.isCompleted,
+    required this.isError,
+    required this.isEnabled,
+    required this.isDisabled,
+    this.icon,
+    this.onTap,
+  });
+
+  final int index;
+  final bool isCurrent;
+  final bool isCompleted;
+  final bool isError;
+  final bool isEnabled;
+  final bool isDisabled;
+  final IconData? icon;
+  final VoidCallback? onTap;
+
+  @override
+  State<_OiStepCircle> createState() => _OiStepCircleState();
+}
+
+class _OiStepCircleState extends State<_OiStepCircle> {
+  bool _hovered = false;
+
+  static const IconData _checkIcon = OiIcons.check;
+  static const IconData _errorIcon = OiIcons.circleAlert;
+  static const _circleSize = 28.0;
+
+  Color _borderColor(OiColorScheme colors) {
+    if (widget.isDisabled) return colors.borderSubtle;
+    if (widget.isError) return colors.error.base;
+    if (widget.isCompleted) return colors.success.base;
+    if (_hovered) return colors.primary.base;
+    if (widget.isCurrent) return colors.primary.base;
+    return colors.borderSubtle;
+  }
+
+  Color _fillColor(OiColorScheme colors) {
+    if (widget.isDisabled) return colors.surface;
+    if (widget.isError) return colors.error.base;
+    if (widget.isCompleted) return colors.success.base;
+    if (widget.isCurrent) return colors.primary.base;
+    if (_hovered) return colors.primary.base.withValues(alpha: 0.2);
+    return colors.surface;
+  }
+
+  Color _contentColor(OiColorScheme colors) {
+    if (widget.isDisabled) return colors.textMuted;
+    if (widget.isError || widget.isCompleted || widget.isCurrent) {
+      return colors.textOnPrimary;
+    }
+    if (_hovered) return colors.primary.base;
+    return colors.textMuted;
+  }
+
+  Widget? _buildIcon(OiColorScheme colors) {
+    final color = _contentColor(colors);
+    if (widget.isError) {
+      return Icon(_errorIcon, size: 14, color: color);
+    }
+    if (widget.isCompleted) {
+      return Icon(_checkIcon, size: 14, color: color);
+    }
+    if (widget.icon != null) {
+      return Icon(widget.icon, size: 14, color: color);
+    }
+    return null;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    final icon = _buildIcon(colors);
+
+    Widget circle = AnimatedContainer(
+      duration: const Duration(milliseconds: 150),
+      width: _circleSize,
+      height: _circleSize,
+      decoration: BoxDecoration(
+        color: _fillColor(colors),
+        shape: BoxShape.circle,
+        border: Border.all(color: _borderColor(colors), width: 2),
+      ),
+      child: Center(
+        child: icon ??
+            Text(
+              '${widget.index + 1}',
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: _contentColor(colors),
+              ),
+            ),
+      ),
+    );
+
+    if (widget.isEnabled) {
+      circle = MouseRegion(
+        cursor: SystemMouseCursors.click,
+        onEnter: (_) => setState(() => _hovered = true),
+        onExit: (_) => setState(() => _hovered = false),
+        child: GestureDetector(
+          onTap: widget.onTap,
+          behavior: HitTestBehavior.opaque,
+          child: circle,
+        ),
+      );
+    }
+
+    return circle;
   }
 }

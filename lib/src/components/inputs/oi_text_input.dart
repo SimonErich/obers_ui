@@ -344,6 +344,7 @@ class _OiTextInputState extends State<OiTextInput> {
   bool _ownsFocusNode = false;
   bool _focused = false;
   bool _passwordVisible = false;
+  bool _passwordIconHovered = false;
 
   @override
   void initState() {
@@ -427,14 +428,24 @@ class _OiTextInputState extends State<OiTextInput> {
   }
 
   Widget _buildPasswordTrailing() {
-    return GestureDetector(
-      onTap: () => setState(() => _passwordVisible = !_passwordVisible),
-      child: Padding(
-        padding: const EdgeInsets.only(left: 8),
-        child: Icon(
-          _passwordVisible ? OiIcons.eyeOff : OiIcons.eye,
-          size: 18,
-          color: context.colors.textMuted,
+    final colors = context.colors;
+    final iconColor =
+        _passwordIconHovered ? colors.primary.base : colors.textMuted;
+
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      onEnter: (_) => setState(() => _passwordIconHovered = true),
+      onExit: (_) => setState(() => _passwordIconHovered = false),
+      child: GestureDetector(
+        onTap: () => setState(() => _passwordVisible = !_passwordVisible),
+        behavior: HitTestBehavior.opaque,
+        child: Padding(
+          padding: const EdgeInsets.only(left: 8),
+          child: Icon(
+            _passwordVisible ? OiIcons.eyeOff : OiIcons.eye,
+            size: 18,
+            color: iconColor,
+          ),
         ),
       ),
     );

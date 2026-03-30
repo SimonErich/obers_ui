@@ -135,6 +135,70 @@ class _OiThreeColumnLayoutState extends State<OiThreeColumnLayout> {
 
   @override
   Widget build(BuildContext context) {
+    return Semantics(
+      label: widget.label,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final narrow = constraints.maxWidth < 600;
+
+          if (narrow) {
+            return _buildNarrowLayout(context);
+          }
+
+          return _buildWideLayout(context);
+        },
+      ),
+    );
+  }
+
+  /// Stacked column layout for narrow screens.
+  Widget _buildNarrowLayout(BuildContext context) {
+    final colors = context.colors;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        // Left column — constrained height
+        SizedBox(
+          height: 200,
+          child: widget.leftColumn,
+        ),
+        DecoratedBox(
+          decoration: BoxDecoration(
+            border: Border(bottom: BorderSide(color: colors.borderSubtle)),
+          ),
+          child: const SizedBox(height: 1),
+        ),
+        // Middle column
+        if (widget.equalMiddleSplit &&
+            widget.middleLeftColumn != null &&
+            widget.middleRightColumn != null) ...[
+          Expanded(child: widget.middleLeftColumn!),
+          DecoratedBox(
+            decoration: BoxDecoration(
+              border: Border(bottom: BorderSide(color: colors.borderSubtle)),
+            ),
+            child: const SizedBox(height: 1),
+          ),
+          Expanded(child: widget.middleRightColumn!),
+        ] else
+          Expanded(child: widget.middleColumn),
+        // Right column
+        if (_showRight) ...[
+          DecoratedBox(
+            decoration: BoxDecoration(
+              border: Border(bottom: BorderSide(color: colors.borderSubtle)),
+            ),
+            child: const SizedBox(height: 1),
+          ),
+          Expanded(child: widget.rightColumn!),
+        ],
+      ],
+    );
+  }
+
+  /// Side-by-side column layout with resizable dividers for wide screens.
+  Widget _buildWideLayout(BuildContext context) {
     final colors = context.colors;
     const dividerWidth = 2.0;
 
@@ -156,42 +220,38 @@ class _OiThreeColumnLayoutState extends State<OiThreeColumnLayout> {
       );
     }
 
-    return Semantics(
-      label: widget.label,
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          // Left column
-          SizedBox(width: _leftWidth, child: widget.leftColumn),
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        // Left column
+        SizedBox(width: _leftWidth, child: widget.leftColumn),
 
-          // Left divider
-          buildDivider(onDrag: _onLeftDividerDrag),
+        // Left divider
+        buildDivider(onDrag: _onLeftDividerDrag),
 
-          // Middle column (takes remaining space).
-          // When equalMiddleSplit is true, split into two equal halves.
-          if (widget.equalMiddleSplit &&
-              widget.middleLeftColumn != null &&
-              widget.middleRightColumn != null)
-            Expanded(
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Expanded(child: widget.middleLeftColumn!),
-                  buildDivider(onDrag: (_) {}),
-                  Expanded(child: widget.middleRightColumn!),
-                ],
-              ),
-            )
-          else
-            Expanded(child: widget.middleColumn),
+        // Middle column (takes remaining space).
+        if (widget.equalMiddleSplit &&
+            widget.middleLeftColumn != null &&
+            widget.middleRightColumn != null)
+          Expanded(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Expanded(child: widget.middleLeftColumn!),
+                buildDivider(onDrag: (_) {}),
+                Expanded(child: widget.middleRightColumn!),
+              ],
+            ),
+          )
+        else
+          Expanded(child: widget.middleColumn),
 
-          // Right divider + right column
-          if (_showRight) ...[
-            buildDivider(onDrag: _onRightDividerDrag),
-            SizedBox(width: _rightWidth, child: widget.rightColumn),
-          ],
+        // Right divider + right column
+        if (_showRight) ...[
+          buildDivider(onDrag: _onRightDividerDrag),
+          SizedBox(width: _rightWidth, child: widget.rightColumn),
         ],
-      ),
+      ],
     );
   }
 }

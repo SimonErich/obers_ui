@@ -7,7 +7,7 @@ import 'package:obers_ui/src/foundation/persistence/oi_settings_mixin.dart';
 import 'package:obers_ui/src/foundation/persistence/oi_settings_provider.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/models/settings/oi_tabs_settings.dart';
-import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
+
 
 /// A single tab entry in an [OiTabs] bar.
 ///
@@ -188,25 +188,33 @@ class _OiTabsState extends State<OiTabs>
     }
   }
 
+  /// Tracks which tab indices are currently hovered (underline / filled).
+  final Set<int> _hoveredTabIndices = {};
+
   Widget _buildTab(BuildContext context, int index) {
     final colors = context.colors;
     final tab = widget.tabs[index];
     final isSelected = index == widget.selectedIndex;
+    final isHovered = _hoveredTabIndices.contains(index);
 
     final tt = context.components.tabs;
     final activeColor = tt?.activeLabelColor ?? colors.primary.base;
     final inactiveColor = tt?.inactiveLabelColor ?? colors.textMuted;
     final indicatorColor = tt?.indicatorColor ?? activeColor;
 
+    // For underline style: hover → bold + primary color, no grey bg.
+    // For filled style: hover → grey bg with rounded corners (same as active).
     final textColor = switch (widget.indicatorStyle) {
       OiTabIndicatorStyle.filled when isSelected => colors.textOnPrimary,
       _ when isSelected => activeColor,
+      _ when isHovered => activeColor,
       _ => inactiveColor,
     };
 
     final bgColor = switch (widget.indicatorStyle) {
       OiTabIndicatorStyle.filled when isSelected => indicatorColor,
-      OiTabIndicatorStyle.pill => const Color(0x00000000),
+      OiTabIndicatorStyle.filled when isHovered =>
+        colors.textMuted.withValues(alpha: 0.1),
       _ => const Color(0x00000000),
     };
 
@@ -214,7 +222,7 @@ class _OiTabsState extends State<OiTabs>
     Widget label = Text(
       tab.label,
       style: baseLabelStyle.copyWith(
-        fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+        fontWeight: (isSelected || isHovered) ? FontWeight.w600 : FontWeight.w400,
         color: textColor,
       ),
     );
@@ -296,9 +304,15 @@ class _OiTabsState extends State<OiTabs>
     return KeyboardListener(
       focusNode: FocusNode(skipTraversal: true),
       onKeyEvent: (e) => _handleKey(index, e),
-      child: OiTappable(
-        onTap: () => widget.onSelected(index),
-        child: tabContent,
+      child: MouseRegion(
+        cursor: SystemMouseCursors.click,
+        onEnter: (_) => setState(() => _hoveredTabIndices.add(index)),
+        onExit: (_) => setState(() => _hoveredTabIndices.remove(index)),
+        child: GestureDetector(
+          onTap: () => widget.onSelected(index),
+          behavior: HitTestBehavior.opaque,
+          child: tabContent,
+        ),
       ),
     );
   }
@@ -410,13 +424,15 @@ class _PillTabRowState extends State<_PillTabRow> {
       final isSelected = i == widget.selectedIndex;
       final isHovered = _hoveredIndices.contains(i);
       final tab = widget.tabs[i];
-      final textColor = isSelected ? colors.primary.base : colors.textMuted;
+      final textColor = (isSelected || isHovered)
+          ? colors.primary.base
+          : colors.textMuted;
 
       Widget label = Text(
         tab.label,
         style: TextStyle(
           fontSize: 14,
-          fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+          fontWeight: (isSelected || isHovered) ? FontWeight.w600 : FontWeight.w400,
           color: textColor,
         ),
       );
@@ -435,8 +451,6 @@ class _PillTabRowState extends State<_PillTabRow> {
       Color bgColor;
       if (isSelected) {
         bgColor = colors.primary.base.withValues(alpha: 0.12);
-      } else if (isHovered) {
-        bgColor = colors.primary.base.withValues(alpha: 0.06);
       } else {
         bgColor = const Color(0x00000000);
       }

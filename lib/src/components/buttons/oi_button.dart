@@ -441,6 +441,9 @@ class OiButton extends StatefulWidget {
 // ── State ───────────────────────────────────────────────────────────────────
 
 class _OiButtonState extends State<OiButton> {
+  // ── Ghost hover / focus state ───────────────────────────────────────────────
+  bool _highlighted = false;
+
   // ── Confirm state ──────────────────────────────────────────────────────────
   bool _confirmPending = false;
 
@@ -668,6 +671,7 @@ class _OiButtonState extends State<OiButton> {
     required OiIconPosition iconPosition,
     required Color foreground,
     required bool loading,
+    bool bold = false,
   }) {
     if (loading) {
       return _buildLoadingIndicator(foreground);
@@ -699,7 +703,7 @@ class _OiButtonState extends State<OiButton> {
             label,
             style: TextStyle(
               fontSize: _fontSize(),
-              fontWeight: FontWeight.w500,
+              fontWeight: bold ? FontWeight.w700 : FontWeight.w500,
               color: foreground,
               height: 1,
             ),
@@ -742,6 +746,10 @@ class _OiButtonState extends State<OiButton> {
   }
 
   Widget _buildStandardButton(BuildContext context) {
+    if (widget.variant == OiButtonVariant.ghost) {
+      return _buildGhostButton(context);
+    }
+
     final density = OiDensityScope.of(context);
     final bt = context.components.button;
     final height = bt?.height ?? _buttonHeight(density);
@@ -758,22 +766,25 @@ class _OiButtonState extends State<OiButton> {
     final isActive = widget.enabled && !widget.loading;
 
     Widget button = OiTappable(
-      onTap: widget.onTap,
+      onTap: isActive ? widget.onTap : null,
       enabled: isActive,
       semanticLabel: widget.semanticLabel ?? widget.label,
       clipBorderRadius: effectiveRadius,
-      child: Container(
-        height: height,
-        padding: EdgeInsets.symmetric(horizontal: hPad),
-        decoration: decoration,
-        child: Center(
-          child: _buildContent(
-            context,
-            label: widget.label,
-            icon: widget.icon,
-            iconPosition: widget.iconPosition,
-            foreground: foreground,
-            loading: widget.loading,
+      child: Opacity(
+        opacity: widget.enabled ? 1 : 0.4,
+        child: Container(
+          height: height,
+          padding: EdgeInsets.symmetric(horizontal: hPad),
+          decoration: decoration,
+          child: Center(
+            child: _buildContent(
+              context,
+              label: widget.label,
+              icon: widget.icon,
+              iconPosition: widget.iconPosition,
+              foreground: foreground,
+              loading: widget.loading,
+            ),
           ),
         ),
       ),
@@ -798,26 +809,145 @@ class _OiButtonState extends State<OiButton> {
     return button;
   }
 
+  Widget _buildGhostButton(BuildContext context) {
+    final density = OiDensityScope.of(context);
+    final bt = context.components.button;
+    final height = bt?.height ?? _buttonHeight(density);
+    final hPad = _hPadding(context);
+    final foreground = _foregroundColor(context, widget.variant);
+    final isActive = widget.enabled && !widget.loading;
+
+    Widget content = Container(
+      height: height,
+      padding: EdgeInsets.symmetric(horizontal: hPad),
+      child: Center(
+        child: _buildContent(
+          context,
+          label: widget.label,
+          icon: widget.icon,
+          iconPosition: widget.iconPosition,
+          foreground: foreground,
+          loading: widget.loading,
+          bold: _highlighted,
+        ),
+      ),
+    );
+
+    if (!widget.enabled) {
+      content = Opacity(opacity: 0.4, child: content);
+    }
+
+    content = GestureDetector(
+      onTap: isActive ? widget.onTap : null,
+      behavior: HitTestBehavior.opaque,
+      child: content,
+    );
+
+    content = MouseRegion(
+      cursor: isActive ? SystemMouseCursors.click : SystemMouseCursors.basic,
+      onEnter: (_) {
+        if (isActive) setState(() => _highlighted = true);
+      },
+      onExit: (_) => setState(() => _highlighted = false),
+      child: content,
+    );
+
+    content = Focus(
+      canRequestFocus: isActive,
+      onFocusChange: (focused) {
+        setState(() => _highlighted = focused);
+      },
+      child: content,
+    );
+
+    if (widget.semanticLabel != null) {
+      content = Semantics(
+        label: widget.semanticLabel,
+        button: true,
+        enabled: widget.enabled,
+        child: content,
+      );
+    }
+
+    Widget button = content;
+
+    if (bt?.minWidth != null) {
+      button = ConstrainedBox(
+        constraints: BoxConstraints(minWidth: bt!.minWidth!),
+        child: button,
+      );
+    }
+    if (widget.fullWidth) {
+      button = SizedBox(width: double.infinity, child: button);
+    }
+    if (widget.tooltip != null) {
+      return OiTooltip(
+        label: widget.tooltip!,
+        message: widget.tooltip!,
+        child: button,
+      );
+    }
+    return button;
+  }
+
   Widget _buildIconButton(BuildContext context) {
     final density = OiDensityScope.of(context);
     final height = context.components.button?.height ?? _buttonHeight(density);
     final foreground = _foregroundColor(context, widget.variant);
-    final decoration = _decoration(context, widget.variant);
-    final isActive = widget.enabled;
+    final highlightColor = context.colors.primary.base;
+    final isActive = widget.enabled && !widget.loading;
+    final iconSize = _iconSize();
+    final highlightedSize = iconSize + 2;
 
-    return OiTappable(
-      onTap: widget.onTap,
-      enabled: isActive,
-      semanticLabel: widget.semanticLabel,
-      child: Container(
-        width: height,
-        height: height,
-        decoration: decoration,
-        child: Center(
-          child: Icon(widget.icon, size: _iconSize(), color: foreground),
+    Widget content = SizedBox(
+      width: height,
+      height: height,
+      child: Center(
+        child: Icon(
+          widget.icon,
+          size: _highlighted ? highlightedSize : iconSize,
+          color: _highlighted ? highlightColor : foreground,
         ),
       ),
     );
+
+    if (!widget.enabled) {
+      content = Opacity(opacity: 0.4, child: content);
+    }
+
+    content = GestureDetector(
+      onTap: isActive ? widget.onTap : null,
+      behavior: HitTestBehavior.opaque,
+      child: content,
+    );
+
+    content = MouseRegion(
+      cursor: isActive ? SystemMouseCursors.click : SystemMouseCursors.basic,
+      onEnter: (_) {
+        if (isActive) setState(() => _highlighted = true);
+      },
+      onExit: (_) => setState(() => _highlighted = false),
+      child: content,
+    );
+
+    content = Focus(
+      canRequestFocus: isActive,
+      onFocusChange: (focused) {
+        setState(() => _highlighted = focused);
+      },
+      child: content,
+    );
+
+    if (widget.semanticLabel != null) {
+      content = Semantics(
+        label: widget.semanticLabel,
+        button: true,
+        enabled: widget.enabled,
+        child: content,
+      );
+    }
+
+    return content;
   }
 
   Widget _buildSplitButton(BuildContext context) {

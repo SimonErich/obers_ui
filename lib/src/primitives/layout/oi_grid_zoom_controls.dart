@@ -96,41 +96,70 @@ class _OiGridZoomControlsState extends State<OiGridZoomControls> {
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
-    return Column(
-      mainAxisSize: MainAxisSize.min,
+    final shadows = context.shadows;
+    final radius = context.radius;
+    final spacing = context.spacing;
+
+    return Stack(
       children: [
-        Flexible(
-          child: OiGrid(
-            breakpoint: widget.breakpoint,
-            columns: OiResponsive<int>(_currentColumns),
-            gap: widget.gap,
-            rowGap: widget.rowGap,
-            scale: widget.scale,
-            children: widget.children,
+        Positioned.fill(
+          child: SingleChildScrollView(
+            padding: EdgeInsets.only(bottom: spacing.xl),
+            child: OiGrid(
+              breakpoint: widget.breakpoint,
+              columns: OiResponsive<int>(_currentColumns),
+              gap: widget.gap,
+              rowGap: widget.rowGap,
+              scale: widget.scale,
+              children: widget.children,
+            ),
           ),
         ),
-        const SizedBox(height: 8),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            OiIconButton(
-              icon: OiIcons.minus,
-              semanticLabel: 'Decrease columns',
-              onTap: _currentColumns > widget.minColumns ? _decrement : null,
-              size: OiButtonSize.small,
+        Positioned(
+          left: 0,
+          right: 0,
+          bottom: 0,
+          child: Center(
+            child: Container(
+              padding: EdgeInsets.symmetric(
+                horizontal: spacing.md,
+                vertical: spacing.xs,
+              ),
+              decoration: BoxDecoration(
+                color: colors.surface,
+                borderRadius: radius.full,
+                boxShadow: shadows.sm,
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  OiIconButton(
+                    icon: OiIcons.minus,
+                    semanticLabel: 'Decrease columns',
+                    onTap: _currentColumns > widget.minColumns
+                        ? _decrement
+                        : null,
+                    size: OiButtonSize.small,
+                  ),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: spacing.sm),
+                    child: OiLabel.small(
+                      '$_currentColumns',
+                      color: colors.textMuted,
+                    ),
+                  ),
+                  OiIconButton(
+                    icon: OiIcons.plus,
+                    semanticLabel: 'Increase columns',
+                    onTap: _currentColumns < widget.maxColumns
+                        ? _increment
+                        : null,
+                    size: OiButtonSize.small,
+                  ),
+                ],
+              ),
             ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8),
-              child: OiLabel.small('$_currentColumns', color: colors.textMuted),
-            ),
-            OiIconButton(
-              icon: OiIcons.plus,
-              semanticLabel: 'Increase columns',
-              onTap: _currentColumns < widget.maxColumns ? _increment : null,
-              size: OiButtonSize.small,
-            ),
-          ],
+          ),
         ),
       ],
     );
