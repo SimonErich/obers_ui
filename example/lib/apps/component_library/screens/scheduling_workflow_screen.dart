@@ -123,6 +123,28 @@ class _SchedulingWorkflowScreenState extends State<SchedulingWorkflowScreen> {
             ],
           ),
 
+          // ── OiMonthPicker ────────────────────────────────────────────
+          ComponentShowcaseSection(
+            title: 'Month Picker',
+            widgetName: 'OiMonthPicker',
+            description:
+                'A month-and-year picker with scrollable wheels. '
+                'Displays two columns — one for months (Jan–Dec), one for '
+                'years — that snap to discrete values.',
+            examples: [
+              ComponentExample(
+                title: 'Default',
+                child: SizedBox(
+                  height: 180,
+                  child: OiMonthPicker(
+                    value: const OiMonth(year: 2026, month: 3),
+                    onChanged: (_) {},
+                  ),
+                ),
+              ),
+            ],
+          ),
+
           // ── OiGantt ───────────────────────────────────────────────────
           ComponentShowcaseSection(
             title: 'Gantt Chart',

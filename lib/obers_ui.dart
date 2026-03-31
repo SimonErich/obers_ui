@@ -119,6 +119,7 @@ export 'src/components/navigation/oi_emoji_picker.dart';
 export 'src/components/navigation/oi_index_bar.dart';
 export 'src/components/navigation/oi_locale_switcher.dart';
 export 'src/components/navigation/oi_menu_bar.dart';
+export 'src/components/navigation/oi_month_picker.dart';
 export 'src/components/navigation/oi_navigation_rail.dart';
 export 'src/components/navigation/oi_status_bar.dart';
 export 'src/components/navigation/oi_tab_view.dart';
