@@ -85,14 +85,15 @@ class _OiSwitchState extends State<OiSwitch> {
         ? (st?.activeTrackColor ?? colors.primary.base)
         : (st?.inactiveTrackColor ?? colors.border);
 
-    final animDuration =
-        context.animations.reducedMotion ||
-            MediaQuery.disableAnimationsOf(context)
-        ? Duration.zero
-        : const Duration(milliseconds: 200);
+    final reduceMotion = context.animations.reducedMotion ||
+        MediaQuery.disableAnimationsOf(context);
+    final trackDuration =
+        reduceMotion ? Duration.zero : const Duration(milliseconds: 300);
+    final thumbDuration =
+        reduceMotion ? Duration.zero : const Duration(milliseconds: 350);
 
     final track = AnimatedContainer(
-      duration: animDuration,
+      duration: trackDuration,
       curve: Curves.easeInOut,
       width: trackW,
       height: trackH,
@@ -103,11 +104,13 @@ class _OiSwitchState extends State<OiSwitch> {
       child: Stack(
         children: [
           AnimatedPositioned(
-            duration: animDuration,
-            curve: Curves.easeInOut,
+            duration: thumbDuration,
+            curve: Curves.easeOutBack,
             top: padding,
             left: widget.value ? padding + travelDistance : padding,
-            child: Container(
+            child: AnimatedContainer(
+              duration: thumbDuration,
+              curve: Curves.easeInOut,
               width: thumbSize,
               height: thumbSize,
               decoration: BoxDecoration(
@@ -115,8 +118,10 @@ class _OiSwitchState extends State<OiSwitch> {
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
-                    color: colors.overlay.withValues(alpha: 0.3),
-                    blurRadius: 4,
+                    color: colors.overlay.withValues(
+                      alpha: widget.value ? 0.4 : 0.3,
+                    ),
+                    blurRadius: widget.value ? 6 : 4,
                     offset: const Offset(0, 1),
                   ),
                 ],

@@ -13,6 +13,9 @@ class ShopScreen extends StatefulWidget {
 class _ShopScreenState extends State<ShopScreen> {
   int _quantity = 1;
   bool _wishlisted = false;
+  OiProductFilterData _filterData = const OiProductFilterData();
+  String _selectedPaymentKey = 'visa';
+  String _selectedShippingKey = 'standard';
 
   static const _sampleProduct = OiProductData(
     key: 'alpine-jacket',
@@ -64,8 +67,8 @@ class _ShopScreenState extends State<ShopScreen> {
               ComponentExample(
                 title: 'Vertical Cards',
                 child: Wrap(
-                  spacing: 12,
-                  runSpacing: 12,
+                  spacing: 24,
+                  runSpacing: 24,
                   children: [
                     SizedBox(
                       width: 200,
@@ -269,6 +272,7 @@ class _ShopScreenState extends State<ShopScreen> {
                       onQuantityChange: (_) {},
                       onRemove: () {},
                     ),
+                    const SizedBox(height: 12),
                     OiCartItemRow(
                       item: const OiCartItem(
                         productKey: 'trail-boots',
@@ -348,7 +352,7 @@ class _ShopScreenState extends State<ShopScreen> {
           ),
 
           // ── OiOrderSummaryLine ────────────────────────────────────────
-          const ComponentShowcaseSection(
+          ComponentShowcaseSection(
             title: 'Order Summary Line',
             widgetName: 'OiOrderSummaryLine',
             description:
@@ -359,25 +363,29 @@ class _ShopScreenState extends State<ShopScreen> {
                 title: 'Summary Lines',
                 child: Column(
                   children: [
-                    OiOrderSummaryLine(
+                    const OiOrderSummaryLine(
                       label: 'Subtotal',
                       amount: 329.98,
                       currencyCode: 'USD',
                     ),
-                    OiOrderSummaryLine(
+                    SizedBox(height: context.spacing.sm),
+                    const OiOrderSummaryLine(
                       label: 'Discount',
                       amount: 50,
                       currencyCode: 'USD',
                       negative: true,
                       subtitle: 'SUMMER20',
                     ),
-                    OiOrderSummaryLine(
+                    SizedBox(height: context.spacing.sm),
+                    const OiOrderSummaryLine(
                       label: 'Shipping',
                       amount: 9.99,
                       currencyCode: 'USD',
                     ),
-                    OiDivider(),
-                    OiOrderSummaryLine(
+                    SizedBox(height: context.spacing.xs),
+                    const OiDivider(),
+                    SizedBox(height: context.spacing.xs),
+                    const OiOrderSummaryLine(
                       label: 'Total',
                       amount: 289.97,
                       currencyCode: 'USD',
@@ -504,6 +512,7 @@ class _ShopScreenState extends State<ShopScreen> {
                 title: 'Catalog Filters',
                 child: OiProductFilters(
                   label: 'Product filters',
+                  value: _filterData,
                   availableCategories: const [
                     'Jackets',
                     'Boots',
@@ -511,7 +520,8 @@ class _ShopScreenState extends State<ShopScreen> {
                     'Accessories',
                   ],
                   priceRangeMax: 500,
-                  onChanged: (_) {},
+                  onChanged: (data) =>
+                      setState(() => _filterData = data),
                 ),
               ),
             ],
@@ -633,8 +643,9 @@ class _ShopScreenState extends State<ShopScreen> {
                       description: 'user@example.com',
                     ),
                   ],
-                  selectedKey: 'visa',
-                  onSelect: (_) {},
+                  selectedKey: _selectedPaymentKey,
+                  onSelect: (method) =>
+                      setState(() => _selectedPaymentKey = method.key as String),
                 ),
               ),
             ],
@@ -676,8 +687,9 @@ class _ShopScreenState extends State<ShopScreen> {
                       description: 'Next business day',
                     ),
                   ],
-                  selectedKey: 'standard',
-                  onSelect: (_) {},
+                  selectedKey: _selectedShippingKey,
+                  onSelect: (method) =>
+                      setState(() => _selectedShippingKey = method.key as String),
                 ),
               ),
             ],

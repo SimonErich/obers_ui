@@ -222,16 +222,17 @@ class _OiFeedbackSheetState extends State<OiFeedbackSheet> {
       children: [
         Padding(
           padding: EdgeInsets.only(bottom: spacing.sm),
-          child: const OiLabel.body('Category'),
+          child: const OiLabel.smallStrong('Category'),
         ),
         Wrap(
           spacing: spacing.sm,
           runSpacing: spacing.sm,
           children: widget.categories.map((cat) {
             final selected = _selectedCategory == cat;
-            final bg = selected ? colors.primary.muted : colors.surface;
+            final bg = selected ? colors.primary.base : colors.surface;
             final borderColor = selected ? colors.primary.base : colors.border;
-            final textColor = selected ? colors.primary.base : colors.text;
+            final textColor =
+                selected ? colors.primary.foreground : colors.text;
 
             return Semantics(
               button: true,
@@ -239,6 +240,7 @@ class _OiFeedbackSheetState extends State<OiFeedbackSheet> {
               selected: selected,
               child: OiTappable(
                 onTap: () => setState(() => _selectedCategory = cat),
+                clipBorderRadius: radius.md,
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 150),
                   padding: EdgeInsets.symmetric(
@@ -285,13 +287,17 @@ class _OiFeedbackSheetState extends State<OiFeedbackSheet> {
   Widget _buildSubmit() {
     final hasCategory = _selectedCategory != null;
 
-    return OiButton.primary(
-      label: 'Submit Feedback',
-      onTap: hasCategory ? _handleSubmit : null,
-      loading: _isSubmitting,
-      enabled: hasCategory && !_isSubmitting,
-      fullWidth: true,
-      icon: OiIcons.send,
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        OiButton.primary(
+          label: 'Submit Feedback',
+          onTap: hasCategory ? _handleSubmit : null,
+          loading: _isSubmitting,
+          enabled: hasCategory && !_isSubmitting,
+          icon: OiIcons.send,
+        ),
+      ],
     );
   }
 
@@ -335,22 +341,24 @@ class _OiFeedbackSheetState extends State<OiFeedbackSheet> {
             padding: EdgeInsets.all(spacing.md),
             child: _isSubmitted
                 ? _buildThankYou(context)
-                : Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      _buildRating(context),
-                      SizedBox(height: spacing.lg),
-                      _buildCategory(context),
-                      SizedBox(height: spacing.lg),
-                      _buildMessage(),
-                      if (widget.showEmail) ...[
-                        SizedBox(height: spacing.md),
-                        _buildEmail(),
+                : SingleChildScrollView(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        _buildRating(context),
+                        SizedBox(height: spacing.lg),
+                        _buildCategory(context),
+                        SizedBox(height: spacing.lg),
+                        _buildMessage(),
+                        if (widget.showEmail) ...[
+                          SizedBox(height: spacing.md),
+                          _buildEmail(),
+                        ],
+                        SizedBox(height: spacing.lg),
+                        _buildSubmit(),
                       ],
-                      SizedBox(height: spacing.lg),
-                      _buildSubmit(),
-                    ],
+                    ),
                   ),
           ),
         ),

@@ -288,7 +288,7 @@ class _OiArrayInputState<T> extends State<OiArrayInput<T>> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          OiLabel.small(widget.label),
+          OiLabel.smallStrong(widget.label),
           const SizedBox(height: 4),
           if (widget.items.isNotEmpty)
             widget.reorderable ? _buildReorderableList() : _buildAnimatedList(),

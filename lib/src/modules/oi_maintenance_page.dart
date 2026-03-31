@@ -399,10 +399,15 @@ class _OiMaintenancePageState extends State<OiMaintenancePage> {
         mainAxisSize: MainAxisSize.min,
         children: [
           if (hasRetry)
-            OiButton.primary(
-              label: widget.retryLabel,
-              onTap: widget.onRetry,
-              semanticLabel: widget.retryLabel,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                OiButton.primary(
+                  label: widget.retryLabel,
+                  onTap: widget.onRetry,
+                  semanticLabel: widget.retryLabel,
+                ),
+              ],
             ),
           if (hasRetry && hasStatusPage) SizedBox(height: sp.sm),
           if (hasStatusPage)

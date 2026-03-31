@@ -1303,7 +1303,7 @@ class ModulesScreen extends StatelessWidget {
               ComponentExample(
                 title: 'Global search',
                 child: SizedBox(
-                  height: 350,
+                  height: 450,
                   child: OiSearchOverlay(
                     label: 'Search',
                     categories: const [
@@ -1312,18 +1312,60 @@ class ModulesScreen extends StatelessWidget {
                       OiSearchCategory(key: 'users', label: 'Users'),
                     ],
                     recentSearches: const ['dashboard', 'settings'],
-                    onSearch: (query, _) async => [
-                      const OiSearchSuggestion(
-                        key: '1',
-                        title: 'Dashboard Overview',
-                        subtitle: 'Main dashboard page',
-                      ),
-                      const OiSearchSuggestion(
-                        key: '2',
-                        title: 'User Settings',
-                        subtitle: 'Account preferences',
-                      ),
-                    ],
+                    onSearch: (query, _) async {
+                      // Simulate network delay.
+                      await Future<void>.delayed(
+                        const Duration(milliseconds: 600),
+                      );
+                      return [
+                        const OiSearchSuggestion(
+                          key: '1',
+                          title: 'Dashboard Overview',
+                          subtitle: 'Main dashboard page',
+                          category: 'Docs',
+                        ),
+                        const OiSearchSuggestion(
+                          key: '2',
+                          title: 'User Settings',
+                          subtitle: 'Account preferences',
+                          category: 'Users',
+                        ),
+                        const OiSearchSuggestion(
+                          key: '3',
+                          title: 'Team Management',
+                          subtitle: 'Invite and manage team members',
+                          category: 'Users',
+                        ),
+                        const OiSearchSuggestion(
+                          key: '4',
+                          title: 'Billing & Invoices',
+                          subtitle: 'View payment history',
+                          category: 'Docs',
+                        ),
+                        const OiSearchSuggestion(
+                          key: '5',
+                          title: 'API Documentation',
+                          subtitle: 'REST API reference guide',
+                          category: 'Docs',
+                        ),
+                        const OiSearchSuggestion(
+                          key: '6',
+                          title: 'Notification Preferences',
+                          subtitle: 'Configure email and push alerts',
+                        ),
+                        const OiSearchSuggestion(
+                          key: '7',
+                          title: 'Security & Privacy',
+                          subtitle: 'Two-factor auth, sessions, data export',
+                        ),
+                        const OiSearchSuggestion(
+                          key: '8',
+                          title: 'Integrations',
+                          subtitle: 'Connect Slack, GitHub, Jira and more',
+                          category: 'Docs',
+                        ),
+                      ];
+                    },
                   ),
                 ),
               ),

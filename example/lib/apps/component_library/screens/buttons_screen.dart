@@ -11,6 +11,9 @@ class ButtonsScreen extends StatefulWidget {
 }
 
 class _ButtonsScreenState extends State<ButtonsScreen> {
+  // Loading state toggle
+  bool _isLoading = false;
+
   // Toggle button state
   bool _bold = false;
   bool _italic = false;
@@ -186,11 +189,39 @@ class _ButtonsScreenState extends State<ButtonsScreen> {
                   children: [
                     _buildStateRow(
                       context,
-                      label: 'Loading',
+                      label: 'Loading (static)',
                       children: const [
                         OiButton.primary(label: 'Primary', loading: true),
                         OiButton.secondary(label: 'Secondary', loading: true),
                         OiButton.outline(label: 'Outline', loading: true),
+                        OiButton.destructive(
+                          label: 'Destructive',
+                          loading: true,
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: spacing.xl),
+                    _buildStateRow(
+                      context,
+                      label: 'Loading (interactive)',
+                      children: [
+                        OiButton.primary(
+                          label: _isLoading ? 'Saving…' : 'Click Me',
+                          loading: _isLoading,
+                          onTap: _isLoading
+                              ? null
+                              : () {
+                                  setState(() => _isLoading = true);
+                                  Future<void>.delayed(
+                                    const Duration(seconds: 2),
+                                    () {
+                                      if (mounted) {
+                                        setState(() => _isLoading = false);
+                                      }
+                                    },
+                                  );
+                                },
+                        ),
                       ],
                     ),
                   ],

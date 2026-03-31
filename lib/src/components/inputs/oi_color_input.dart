@@ -3,7 +3,6 @@ import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/_internal/oi_input_frame.dart';
 import 'package:obers_ui/src/components/inputs/oi_slider.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
-import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
 import 'package:obers_ui/src/primitives/overlay/oi_floating.dart'
     show OiFloating;
 
@@ -171,20 +170,10 @@ class _OiColorInputState extends State<OiColorInput> {
               final isSelected =
                   widget.value != null &&
                   _colorToHex(widget.value!) == _colorToHex(c);
-              return OiTappable(
+              return _ColorSwatch(
+                color: c,
+                isSelected: isSelected,
                 onTap: () => _selectPreset(c),
-                child: Container(
-                  width: 28,
-                  height: 28,
-                  decoration: BoxDecoration(
-                    color: c,
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: isSelected ? colors.primary.base : colors.border,
-                      width: isSelected ? 2.5 : 1,
-                    ),
-                  ),
-                ),
               );
             }).toList(),
           ),
@@ -240,38 +229,90 @@ class _OiColorInputState extends State<OiColorInput> {
     final colors = context.colors;
     final displayColor = widget.value ?? const Color(0x00000000);
 
-    final swatch = GestureDetector(
-      onTap: widget.enabled ? () => setState(() => _open = !_open) : null,
-      behavior: HitTestBehavior.opaque,
-      child: Container(
-        width: 24,
-        height: 24,
-        decoration: BoxDecoration(
-          color: displayColor,
-          shape: BoxShape.circle,
-          border: Border.all(color: colors.border),
-        ),
+    final swatch = Container(
+      width: 24,
+      height: 24,
+      decoration: BoxDecoration(
+        color: displayColor,
+        shape: BoxShape.circle,
+        border: Border.all(color: colors.border),
       ),
     );
 
     final hexText = widget.value != null ? _colorToHex(widget.value!) : '—';
 
-    final anchor = OiInputFrame(
-      label: widget.label,
-      hint: widget.hint,
-      error: widget.error,
-      focused: _open,
-      enabled: widget.enabled,
-      leading: Padding(padding: const EdgeInsets.only(right: 8), child: swatch),
-      child: Text(hexText, style: TextStyle(fontSize: 13, color: colors.text)),
+    final anchor = GestureDetector(
+      onTap: widget.enabled ? () => setState(() => _open = !_open) : null,
+      behavior: HitTestBehavior.opaque,
+      child: OiInputFrame(
+        label: widget.label,
+        hint: widget.hint,
+        error: widget.error,
+        focused: _open,
+        enabled: widget.enabled,
+        leading: Padding(
+          padding: const EdgeInsets.only(right: 8),
+          child: swatch,
+        ),
+        child:
+            Text(hexText, style: TextStyle(fontSize: 13, color: colors.text)),
+      ),
     );
 
     return OiFloating(
       visible: _open,
+      onDismiss: () => setState(() => _open = false),
       anchor: anchor,
       child: UnconstrainedBox(
         alignment: Alignment.topLeft,
         child: _buildPicker(context),
+      ),
+    );
+  }
+}
+
+class _ColorSwatch extends StatefulWidget {
+  const _ColorSwatch({
+    required this.color,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  final Color color;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  @override
+  State<_ColorSwatch> createState() => _ColorSwatchState();
+}
+
+class _ColorSwatchState extends State<_ColorSwatch> {
+  bool _hovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    final highlighted = _hovered || widget.isSelected;
+
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      onEnter: (_) => setState(() => _hovered = true),
+      onExit: (_) => setState(() => _hovered = false),
+      child: GestureDetector(
+        onTap: widget.onTap,
+        behavior: HitTestBehavior.opaque,
+        child: Container(
+          width: 28,
+          height: 28,
+          decoration: BoxDecoration(
+            color: widget.color,
+            shape: BoxShape.circle,
+            border: Border.all(
+              color: highlighted ? colors.primary.base : colors.border,
+              width: highlighted ? 2.5 : 1,
+            ),
+          ),
+        ),
       ),
     );
   }

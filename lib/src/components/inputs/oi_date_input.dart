@@ -189,6 +189,7 @@ class _OiDateInputState extends State<OiDateInput> {
           final isSelected = index == selectedIndex;
           return OiTappable(
             onTap: () => onSelected(index),
+            clipBorderRadius: BorderRadius.circular(6),
             child: Container(
               height: itemHeight,
               alignment: Alignment.center,

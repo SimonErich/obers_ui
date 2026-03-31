@@ -20,6 +20,7 @@ class OiPopover extends StatefulWidget {
     this.open = false,
     this.onClose,
     this.alignment = OiFloatingAlignment.bottomStart,
+    this.initialFocus = true,
     super.key,
   });
 
@@ -41,6 +42,10 @@ class OiPopover extends StatefulWidget {
   /// Alignment of the popover relative to the anchor.
   final OiFloatingAlignment alignment;
 
+  /// Whether the first focusable descendant should receive focus when the
+  /// popover opens.
+  final bool initialFocus;
+
   @override
   State<OiPopover> createState() => _OiPopoverState();
 }
@@ -50,7 +55,8 @@ class _OiPopoverState extends State<OiPopover> {
   Widget build(BuildContext context) {
     final colors = context.colors;
 
-    Widget popoverContent = OiFocusTrap(
+    final popoverContent = OiFocusTrap(
+      initialFocus: widget.initialFocus,
       onEscape: widget.onClose,
       child: DecoratedBox(
         decoration: BoxDecoration(
@@ -69,27 +75,12 @@ class _OiPopoverState extends State<OiPopover> {
       ),
     );
 
-    // Wrap with a barrier so tapping outside calls onClose.
-    if (widget.open && widget.onClose != null) {
-      popoverContent = Stack(
-        children: [
-          Positioned.fill(
-            child: GestureDetector(
-              onTap: widget.onClose,
-              behavior: HitTestBehavior.translucent,
-              child: const SizedBox.expand(),
-            ),
-          ),
-          popoverContent,
-        ],
-      );
-    }
-
     return Semantics(
       label: widget.label,
       child: OiFloating(
         visible: widget.open,
         alignment: widget.alignment,
+        onDismiss: widget.onClose,
         anchor: widget.anchor,
         child: popoverContent,
       ),

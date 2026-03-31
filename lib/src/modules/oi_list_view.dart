@@ -609,7 +609,6 @@ class _OiListViewState<T> extends State<OiListView<T>>
       list = GridView.builder(
         key: const Key('oi_list_view_scroll'),
         controller: _scrollController,
-        clipBehavior: Clip.none,
         gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
           maxCrossAxisExtent: 500,
           mainAxisSpacing: context.spacing.md,
@@ -623,13 +622,13 @@ class _OiListViewState<T> extends State<OiListView<T>>
       list = ListView.builder(
         key: const Key('oi_list_view_scroll'),
         controller: _scrollController,
-        clipBehavior: Clip.none,
+        padding: const EdgeInsets.symmetric(horizontal: 16),
         itemCount: itemCount,
         itemBuilder: (context, index) {
           final child = buildItem(context, index);
           return Padding(
             padding: EdgeInsets.only(
-              bottom: index < widget.items.length - 1 ? context.spacing.md : 0,
+              bottom: index < widget.items.length - 1 ? context.spacing.sm : 0,
             ),
             child: child,
           );

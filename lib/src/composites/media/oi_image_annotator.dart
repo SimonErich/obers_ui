@@ -113,6 +113,7 @@ class OiImageAnnotator extends StatefulWidget {
 class _OiImageAnnotatorState extends State<OiImageAnnotator> {
   List<Offset> _currentPoints = [];
   bool _isDrawing = false;
+  OiAnnotationType? _hoveredTool;
 
   // ── Tool labels ─────────────────────────────────────────────────────────
 
@@ -223,33 +224,43 @@ class _OiImageAnnotatorState extends State<OiImageAnnotator> {
     final colors = context.colors;
     return Padding(
       padding: const EdgeInsets.only(bottom: 4),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
+      child: Wrap(
+        alignment: WrapAlignment.center,
+        runSpacing: 4,
         children: [
           for (final tool in OiAnnotationType.values)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 4),
-              child: GestureDetector(
-                key: ValueKey('annotator_tool_${tool.name}'),
-                onTap: () => widget.onToolChange?.call(tool),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: widget.selectedTool == tool
-                        ? colors.primary.base
-                        : colors.surface,
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  child: Text(
-                    _toolLabels[tool]!,
-                    style: TextStyle(
+              child: MouseRegion(
+                cursor: SystemMouseCursors.click,
+                onEnter: (_) => setState(() => _hoveredTool = tool),
+                onExit: (_) => setState(() {
+                  if (_hoveredTool == tool) _hoveredTool = null;
+                }),
+                child: GestureDetector(
+                  key: ValueKey('annotator_tool_${tool.name}'),
+                  onTap: () => widget.onToolChange?.call(tool),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
                       color: widget.selectedTool == tool
-                          ? colors.textOnPrimary
-                          : colors.text,
-                      fontSize: 12,
+                          ? colors.primary.base
+                          : _hoveredTool == tool
+                              ? colors.surfaceHover
+                              : colors.surface,
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: Text(
+                      _toolLabels[tool]!,
+                      style: TextStyle(
+                        color: widget.selectedTool == tool
+                            ? colors.textOnPrimary
+                            : colors.text,
+                        fontSize: 12,
+                      ),
                     ),
                   ),
                 ),

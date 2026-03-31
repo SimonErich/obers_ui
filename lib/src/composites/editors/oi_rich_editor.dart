@@ -739,7 +739,12 @@ class _OiRichEditorState extends State<OiRichEditor> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 _buildToolbar(context),
-                Padding(padding: const EdgeInsets.all(8), child: editorBody),
+                Flexible(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8),
+                    child: editorBody,
+                  ),
+                ),
               ],
             ),
           ),

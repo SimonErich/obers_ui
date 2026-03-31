@@ -5,7 +5,6 @@ import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/primitives/display/oi_icon.dart';
 import 'package:obers_ui/src/primitives/display/oi_label.dart';
-import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
 
 // ── Data classes ────────────────────────────────────────────────────────────
 
@@ -225,7 +224,9 @@ class OiColorPalettePicker extends StatelessWidget {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        OiTappable(
+                        _PaletteColorSwatch(
+                          child: circle,
+                          enabled: !isLocked,
                           semanticLabel: slot.label,
                           onTap: isLocked
                               ? null
@@ -233,7 +234,6 @@ class OiColorPalettePicker extends StatelessWidget {
                                   slot.id,
                                   slot.value ?? colors.primary.base,
                                 ),
-                          child: circle,
                         ),
                         if (!compact) ...[
                           SizedBox(height: spacing.xs),
@@ -262,11 +262,11 @@ class OiColorPalettePicker extends StatelessWidget {
             ...presets!.map((palette) {
               return Padding(
                 padding: EdgeInsets.only(bottom: spacing.sm),
-                child: OiTappable(
-                  semanticLabel: palette.name,
+                child: GestureDetector(
                   onTap: onPresetSelected != null
                       ? () => onPresetSelected!(palette)
                       : null,
+                  behavior: HitTestBehavior.opaque,
                   child: DecoratedBox(
                     decoration: BoxDecoration(
                       border: Border.all(color: colors.borderSubtle),
@@ -353,4 +353,68 @@ class _DashedCirclePainter extends CustomPainter {
   @override
   bool shouldRepaint(_DashedCirclePainter oldDelegate) =>
       color != oldDelegate.color;
+}
+
+// ── Hover-aware color swatch ────────────────────────────────────────────────
+
+class _PaletteColorSwatch extends StatefulWidget {
+  const _PaletteColorSwatch({
+    required this.child,
+    required this.enabled,
+    this.onTap,
+    this.semanticLabel,
+  });
+
+  final Widget child;
+  final bool enabled;
+  final VoidCallback? onTap;
+  final String? semanticLabel;
+
+  @override
+  State<_PaletteColorSwatch> createState() => _PaletteColorSwatchState();
+}
+
+class _PaletteColorSwatchState extends State<_PaletteColorSwatch> {
+  bool _hovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    final highlighted = _hovered && widget.enabled;
+
+    Widget swatch = Container(
+      width: 28,
+      height: 28,
+      decoration: highlighted
+          ? BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: colors.primary.base,
+                width: 2.5,
+              ),
+            )
+          : null,
+      child: widget.child,
+    );
+
+    if (widget.semanticLabel != null) {
+      swatch = Semantics(
+        label: widget.semanticLabel,
+        button: true,
+        child: swatch,
+      );
+    }
+
+    return MouseRegion(
+      cursor:
+          widget.enabled ? SystemMouseCursors.click : SystemMouseCursors.basic,
+      onEnter: (_) => setState(() => _hovered = true),
+      onExit: (_) => setState(() => _hovered = false),
+      child: GestureDetector(
+        onTap: widget.onTap,
+        behavior: HitTestBehavior.opaque,
+        child: swatch,
+      ),
+    );
+  }
 }

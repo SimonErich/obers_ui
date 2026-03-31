@@ -158,7 +158,7 @@ class OiFieldDisplay extends StatelessWidget {
 
   Widget _buildPairLayout(BuildContext context) {
     final colors = context.colors;
-    final labelWidget = OiLabel.small(
+    final labelWidget = OiLabel.smallStrong(
       label,
       overflow: TextOverflow.ellipsis,
       maxLines: 1,

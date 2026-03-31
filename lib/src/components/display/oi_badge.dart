@@ -203,30 +203,10 @@ class OiBadge extends StatelessWidget {
     }
   }
 
-  Color _mutedColor(OiColorScheme colors) {
-    switch (color) {
-      case OiBadgeColor.primary:
-        return colors.primary.muted;
-      case OiBadgeColor.accent:
-        return colors.accent.muted;
-      case OiBadgeColor.success:
-        return colors.success.muted;
-      case OiBadgeColor.warning:
-        return colors.warning.muted;
-      case OiBadgeColor.error:
-        return colors.error.muted;
-      case OiBadgeColor.info:
-        return colors.info.muted;
-      case OiBadgeColor.neutral:
-        return colors.borderSubtle;
-    }
-  }
-
   ({Color background, Color textColor, Color? borderColor}) _resolveColors(
     OiColorScheme colors,
   ) {
     final base = _baseColor(colors);
-    final muted = _mutedColor(colors);
     switch (style) {
       case OiBadgeStyle.filled:
         return (
@@ -236,7 +216,7 @@ class OiBadge extends StatelessWidget {
         );
       case OiBadgeStyle.soft:
         return (
-          background: muted.withValues(alpha: 0.15),
+          background: base.withValues(alpha: 0.2),
           textColor: base,
           borderColor: null,
         );

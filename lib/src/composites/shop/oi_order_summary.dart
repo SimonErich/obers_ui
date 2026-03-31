@@ -85,45 +85,48 @@ class OiOrderSummary extends StatelessWidget {
     );
   }
 
-  List<Widget> _buildSummaryLines(BuildContext context) {
+  Widget _buildSummaryLines(BuildContext context) {
+    final breakpoint = context.breakpoint;
     final sp = context.spacing;
 
-    return [
-      OiOrderSummaryLine(
-        label: 'Subtotal',
-        amount: summary.subtotal,
-        currencyCode: currencyCode,
-      ),
-      if (summary.discount != null)
+    return OiColumn(
+      breakpoint: breakpoint,
+      gap: OiResponsive(sp.sm),
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
         OiOrderSummaryLine(
-          label: summary.discountLabel ?? 'Discount',
-          amount: summary.discount!,
-          currencyCode: currencyCode,
-          negative: true,
-        ),
-      if (summary.shipping != null)
-        OiOrderSummaryLine(
-          label: summary.shippingLabel ?? 'Shipping',
-          amount: summary.shipping!,
+          label: 'Subtotal',
+          amount: summary.subtotal,
           currencyCode: currencyCode,
         ),
-      if (summary.tax != null)
+        if (summary.discount != null)
+          OiOrderSummaryLine(
+            label: summary.discountLabel ?? 'Discount',
+            amount: summary.discount!,
+            currencyCode: currencyCode,
+            negative: true,
+          ),
+        if (summary.shipping != null)
+          OiOrderSummaryLine(
+            label: summary.shippingLabel ?? 'Shipping',
+            amount: summary.shipping!,
+            currencyCode: currencyCode,
+          ),
+        if (summary.tax != null)
+          OiOrderSummaryLine(
+            label: summary.taxLabel ?? 'Tax',
+            amount: summary.tax!,
+            currencyCode: currencyCode,
+          ),
+        const OiDivider(),
         OiOrderSummaryLine(
-          label: summary.taxLabel ?? 'Tax',
-          amount: summary.tax!,
+          label: 'Total',
+          amount: summary.total,
           currencyCode: currencyCode,
+          bold: true,
         ),
-      Padding(
-        padding: EdgeInsets.symmetric(vertical: sp.xs),
-        child: const OiDivider(),
-      ),
-      OiOrderSummaryLine(
-        label: 'Total',
-        amount: summary.total,
-        currencyCode: currencyCode,
-        bold: true,
-      ),
-    ];
+      ],
+    );
   }
 
   @override
@@ -142,7 +145,7 @@ class OiOrderSummary extends StatelessWidget {
           children: [
             const OiLabel.bodyStrong('Order Summary'),
             if (hasItems) ...[_buildItemList(context), const OiDivider()],
-            ..._buildSummaryLines(context),
+            _buildSummaryLines(context),
           ],
         ),
       ),

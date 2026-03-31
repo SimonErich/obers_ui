@@ -187,6 +187,10 @@ class _OiSettingsPageState extends State<OiSettingsPage> {
   late TextEditingController _searchController;
   late Set<String> _expandedGroups;
 
+  // Internal value overrides so that controls are interactive even when the
+  // parent provides const data or a no-op callback.
+  final Map<String, Map<String, dynamic>> _valueOverrides = {};
+
   // Desktop sidebar state.
   int _selectedGroupIndex = 0;
   late ScrollController _contentScrollController;
@@ -217,6 +221,19 @@ class _OiSettingsPageState extends State<OiSettingsPage> {
           ? 0
           : widget.groups.length - 1;
     }
+  }
+
+  /// Returns the effective value for a setting, using internal overrides
+  /// if available, otherwise falling back to the widget-provided value.
+  dynamic _effectiveValue(String groupKey, OiSettingsItem item) {
+    return _valueOverrides[groupKey]?[item.key] ?? item.value;
+  }
+
+  void _handleValueChanged(String groupKey, String itemKey, dynamic value) {
+    setState(() {
+      _valueOverrides.putIfAbsent(groupKey, () => {})[itemKey] = value;
+    });
+    widget.onSettingChanged?.call(groupKey, itemKey, value);
   }
 
   @override
@@ -286,6 +303,7 @@ class _OiSettingsPageState extends State<OiSettingsPage> {
     return OiTappable(
       semanticLabel:
           '${group.title} settings group, ${isExpanded ? 'expanded' : 'collapsed'}',
+      clipBorderRadius: context.radius.sm,
       onTap: () {
         setState(() {
           if (isExpanded) {
@@ -351,12 +369,12 @@ class _OiSettingsPageState extends State<OiSettingsPage> {
     return OiSwitchTile(
       title: item.title,
       subtitle: item.subtitle,
-      value: item.value as bool? ?? false,
+      value: _effectiveValue(group.key, item) as bool? ?? false,
       leading: item.icon != null
           ? Icon(item.icon, size: 20, color: context.colors.textMuted)
           : null,
       onChanged: (value) {
-        widget.onSettingChanged?.call(group.key, item.key, value);
+        _handleValueChanged(group.key, item.key, value);
       },
       semanticLabel: item.title,
     );
@@ -450,9 +468,9 @@ class _OiSettingsPageState extends State<OiSettingsPage> {
                 for (final opt in options)
                   OiSelectOption(value: opt, label: opt),
               ],
-              value: item.value as String?,
+              value: _effectiveValue(group.key, item) as String?,
               onChanged: (value) {
-                widget.onSettingChanged?.call(group.key, item.key, value);
+                _handleValueChanged(group.key, item.key, value);
               },
               placeholder: 'Select...',
             ),
@@ -470,7 +488,7 @@ class _OiSettingsPageState extends State<OiSettingsPage> {
     final spacing = context.spacing;
     final min = item.min ?? 0;
     final max = item.max ?? 100;
-    final value = (item.value as double?) ?? min;
+    final value = (_effectiveValue(group.key, item) as double?) ?? min;
 
     return Padding(
       padding: EdgeInsets.symmetric(
@@ -480,34 +498,20 @@ class _OiSettingsPageState extends State<OiSettingsPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (item.icon != null)
-            Padding(
-              padding: EdgeInsets.only(bottom: spacing.xs),
-              child: Row(
-                children: [
-                  Icon(item.icon, size: 20, color: context.colors.textMuted),
-                  SizedBox(width: spacing.sm),
-                  OiLabel.body(item.title),
-                ],
-              ),
-            )
-          else
-            OiLabel.body(item.title),
           if (item.subtitle != null)
             Padding(
-              padding: EdgeInsets.only(top: spacing.xs),
+              padding: EdgeInsets.only(bottom: spacing.xs),
               child: OiLabel.small(
                 item.subtitle!,
                 color: context.colors.textMuted,
               ),
             ),
-          SizedBox(height: spacing.sm),
           OiSlider(
             value: value,
             min: min,
             max: max,
             onChanged: (v) {
-              widget.onSettingChanged?.call(group.key, item.key, v);
+              _handleValueChanged(group.key, item.key, v);
             },
             label: item.title,
             showLabels: true,
@@ -601,6 +605,7 @@ class _OiSettingsPageState extends State<OiSettingsPage> {
     return OiTappable(
       semanticLabel: '${group.title} settings section',
       onTap: () => _scrollToGroup(index),
+      clipBorderRadius: context.radius.md,
       child: Container(
         padding: EdgeInsets.symmetric(
           vertical: spacing.sm,

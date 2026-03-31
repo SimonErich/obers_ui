@@ -445,11 +445,16 @@ class _OiMediaPickerState extends State<OiMediaPicker> {
         children: [
           Icon(OiIcons.upload, size: 48, color: colors.textMuted),
           SizedBox(height: spacing.md),
-          OiButton.primary(
-            label: 'Browse Files',
-            icon: OiIcons.file,
-            semanticLabel: 'Browse files to upload',
-            onTap: widget.onSelect != null ? () {} : null,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              OiButton.primary(
+                label: 'Browse Files',
+                icon: OiIcons.file,
+                semanticLabel: 'Browse files to upload',
+                onTap: widget.onSelect != null ? () {} : null,
+              ),
+            ],
           ),
           SizedBox(height: spacing.sm),
           OiLabel.small('or drag and drop files here', color: colors.textMuted),

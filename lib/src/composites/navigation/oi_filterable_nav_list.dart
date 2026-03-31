@@ -364,8 +364,8 @@ class _ChipFilterButton extends StatelessWidget {
   }
 }
 
-/// A collapsible group section with a header and item rows.
-class _GroupSection<T> extends StatelessWidget {
+/// A collapsible group section with a header and animated item rows.
+class _GroupSection<T> extends StatefulWidget {
   const _GroupSection({
     required this.group,
     required this.expanded,
@@ -391,6 +391,47 @@ class _GroupSection<T> extends StatelessWidget {
   final Set<String>? itemLoadingIds;
 
   @override
+  State<_GroupSection<T>> createState() => _GroupSectionState<T>();
+}
+
+class _GroupSectionState<T> extends State<_GroupSection<T>>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _animController;
+  late Animation<double> _animation;
+
+  @override
+  void initState() {
+    super.initState();
+    _animController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 200),
+      value: widget.expanded ? 1.0 : 0.0,
+    );
+    _animation = CurvedAnimation(
+      parent: _animController,
+      curve: Curves.easeInOut,
+    );
+  }
+
+  @override
+  void didUpdateWidget(_GroupSection<T> oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.expanded != oldWidget.expanded) {
+      if (widget.expanded) {
+        _animController.forward();
+      } else {
+        _animController.reverse();
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _animController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final spacing = context.spacing;
 
@@ -400,10 +441,10 @@ class _GroupSection<T> extends StatelessWidget {
       children: [
         // Group header
         OiTappable(
-          onTap: onToggle,
+          onTap: widget.onToggle,
           semanticLabel:
-              '${group.group.label} group, '
-              '${expanded ? "collapse" : "expand"}',
+              '${widget.group.group.label} group, '
+              '${widget.expanded ? "collapse" : "expand"}',
           child: Padding(
             padding: EdgeInsets.symmetric(
               horizontal: spacing.sm,
@@ -411,14 +452,19 @@ class _GroupSection<T> extends StatelessWidget {
             ),
             child: Row(
               children: [
-                OiIcon.decorative(
-                  icon: expanded ? OiIcons.chevronDown : OiIcons.chevronRight,
-                  size: 14,
+                AnimatedRotation(
+                  turns: widget.expanded ? 0.25 : 0.0,
+                  duration: const Duration(milliseconds: 200),
+                  curve: Curves.easeInOut,
+                  child: const OiIcon.decorative(
+                    icon: OiIcons.chevronRight,
+                    size: 14,
+                  ),
                 ),
                 SizedBox(width: spacing.xs),
                 Expanded(
                   child: OiLabel.small(
-                    group.group.label,
+                    widget.group.group.label,
                     color: context.colors.textSubtle,
                   ),
                 ),
@@ -427,29 +473,39 @@ class _GroupSection<T> extends StatelessWidget {
           ),
         ),
 
-        // Group items (only visible when expanded)
-        if (expanded)
-          ...group.items.map(
-            (item) => _NavItemTile<T>(
-              item: item,
-              selected: selectedItemId == idOf(item),
-              loading: itemLoadingIds?.contains(idOf(item)) ?? false,
-              onTap: onItemSelected != null
-                  ? () => onItemSelected!(item)
-                  : null,
-              idOf: idOf,
-              titleOf: titleOf,
-              subtitleOf: subtitleOf,
-              iconOf: iconOf,
-            ),
+        // Group items with animated expand/collapse
+        SizeTransition(
+          sizeFactor: _animation,
+          axisAlignment: -1,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              for (final item in widget.group.items)
+                _NavItemTile<T>(
+                  item: item,
+                  selected: widget.selectedItemId == widget.idOf(item),
+                  loading:
+                      widget.itemLoadingIds?.contains(widget.idOf(item)) ??
+                      false,
+                  onTap: widget.onItemSelected != null
+                      ? () => widget.onItemSelected!(item)
+                      : null,
+                  idOf: widget.idOf,
+                  titleOf: widget.titleOf,
+                  subtitleOf: widget.subtitleOf,
+                  iconOf: widget.iconOf,
+                ),
+            ],
           ),
+        ),
       ],
     );
   }
 }
 
-/// A single navigation item row.
-class _NavItemTile<T> extends StatelessWidget {
+/// A single navigation item row with hover and selection states.
+class _NavItemTile<T> extends StatefulWidget {
   const _NavItemTile({
     required this.item,
     required this.selected,
@@ -471,68 +527,90 @@ class _NavItemTile<T> extends StatelessWidget {
   final IconData Function(T)? iconOf;
 
   @override
+  State<_NavItemTile<T>> createState() => _NavItemTileState<T>();
+}
+
+class _NavItemTileState<T> extends State<_NavItemTile<T>> {
+  bool _hovered = false;
+
+  @override
   Widget build(BuildContext context) {
     final colors = context.colors;
     final spacing = context.spacing;
     final radius = context.radius;
-    final subtitle = subtitleOf?.call(item);
-    final iconData = iconOf?.call(item);
+    final subtitle = widget.subtitleOf?.call(widget.item);
+    final iconData = widget.iconOf?.call(widget.item);
 
-    final selectedBg = selected
-        ? colors.primary.base.withValues(alpha: 0.1)
-        : null;
+    Color? bg;
+    if (widget.selected) {
+      bg = colors.primary.base.withValues(alpha: 0.1);
+    } else if (_hovered) {
+      bg = colors.surfaceHover;
+    }
 
-    return OiTappable(
-      onTap: onTap,
-      semanticLabel: titleOf(item),
-      child: Container(
-        margin: EdgeInsets.symmetric(horizontal: spacing.xs, vertical: 1),
-        padding: EdgeInsets.symmetric(
-          horizontal: spacing.sm,
-          vertical: spacing.xs,
-        ),
-        decoration: BoxDecoration(color: selectedBg, borderRadius: radius.sm),
-        child: Row(
-          children: [
-            // Leading: icon or loading spinner
-            if (loading)
-              const SizedBox(
-                width: 18,
-                height: 18,
-                child: OiProgress.circular(
-                  indeterminate: true,
-                  size: 18,
-                  strokeWidth: 2,
-                ),
-              )
-            else if (iconData != null)
-              OiIcon.decorative(icon: iconData, size: 18),
-
-            if (loading || iconData != null) SizedBox(width: spacing.sm),
-
-            // Title and subtitle
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  OiLabel.body(
-                    titleOf(item),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    color: selected ? colors.primary.base : null,
-                  ),
-                  if (subtitle != null && subtitle.isNotEmpty)
-                    OiLabel.small(
-                      subtitle,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      color: colors.textMuted,
-                    ),
-                ],
-              ),
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      onEnter: (_) => setState(() => _hovered = true),
+      onExit: (_) => setState(() => _hovered = false),
+      child: GestureDetector(
+        onTap: widget.onTap,
+        behavior: HitTestBehavior.opaque,
+        child: Semantics(
+          label: widget.titleOf(widget.item),
+          button: true,
+          child: Container(
+            margin: EdgeInsets.symmetric(horizontal: spacing.xs, vertical: 1),
+            padding: EdgeInsets.only(
+              left: spacing.sm + spacing.md,
+              right: spacing.sm,
+              top: spacing.xs,
+              bottom: spacing.xs,
             ),
-          ],
+            decoration: BoxDecoration(color: bg, borderRadius: radius.sm),
+            child: Row(
+              children: [
+                // Leading: icon or loading spinner
+                if (widget.loading)
+                  const SizedBox(
+                    width: 18,
+                    height: 18,
+                    child: OiProgress.circular(
+                      indeterminate: true,
+                      size: 18,
+                      strokeWidth: 2,
+                    ),
+                  )
+                else if (iconData != null)
+                  OiIcon.decorative(icon: iconData, size: 18),
+
+                if (widget.loading || iconData != null)
+                  SizedBox(width: spacing.sm),
+
+                // Title and subtitle
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      OiLabel.small(
+                        widget.titleOf(widget.item),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        color: widget.selected ? colors.primary.base : null,
+                      ),
+                      if (subtitle != null && subtitle.isNotEmpty)
+                        OiLabel.tiny(
+                          subtitle,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          color: colors.textMuted,
+                        ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );

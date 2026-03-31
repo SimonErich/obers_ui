@@ -221,9 +221,14 @@ class OiPipeline extends StatelessWidget {
 
     Widget pipeline;
     if (direction == Axis.horizontal) {
-      pipeline = Row(mainAxisSize: MainAxisSize.min, children: children);
+      pipeline = SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(mainAxisSize: MainAxisSize.min, children: children),
+      );
     } else {
-      pipeline = Column(mainAxisSize: MainAxisSize.min, children: children);
+      pipeline = SingleChildScrollView(
+        child: Column(mainAxisSize: MainAxisSize.min, children: children),
+      );
     }
 
     return Semantics(label: label, child: pipeline);

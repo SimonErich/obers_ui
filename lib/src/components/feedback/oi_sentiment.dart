@@ -53,6 +53,7 @@ class OiSentiment extends StatelessWidget {
         child: OiTappable(
           enabled: enabled,
           onTap: () => onChanged?.call(emoji),
+          clipBorderRadius: BorderRadius.circular(8),
           child: AnimatedContainer(
             duration:
                 context.animations.reducedMotion ||
