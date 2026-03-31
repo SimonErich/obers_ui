@@ -36,14 +36,6 @@ ObersUI is a comprehensive, open-source Flutter UI library built for modern, com
 
     [:octicons-arrow-right-24: Browse components](components/index.md)
 
-- :material-play-box-outline:{ .lg .middle } **Widgetbook**
-
-    ---
-
-    Interactive playground to explore every component with live controls.
-
-    [:octicons-arrow-right-24: Open Widgetbook](widgetbook.md)
-
 </div>
 
 ---
@@ -89,5 +81,4 @@ That's it. One import, one theme, one app widget. Creamy smooth.
 ## Explore more
 
 - [**API Reference**](/obers_ui/api/) — Full generated dart doc
-- [**Widgetbook**](/obers_ui/widgetbook/) — Interactive component playground
 - [**GitHub**](https://github.com/simonerich/obers_ui) — Source code & issues

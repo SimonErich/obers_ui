@@ -20,10 +20,10 @@ class OiKbd extends StatelessWidget {
 
   /// The logical key names to display.
   ///
-  /// Recognised values (case-insensitive): `meta`, `ctrl`, `shift`,
+  /// Recognized values (case-insensitive): `meta`, `ctrl`, `shift`,
   /// `alt`, `enter`, `tab`, `esc`, `backspace`, `delete`, `up`, `down`,
-  /// `left`, `right`, `space`. Any unrecognised string is passed
-  /// through capitalised.
+  /// `left`, `right`, `space`. Any unrecognized string is passed
+  /// through capitalized.
   final List<String> keys;
 
   static bool get _isApple =>

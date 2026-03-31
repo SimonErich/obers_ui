@@ -250,7 +250,7 @@ final user = await OiFormDialog.showCustom<User>(
 | `OiResponsiveShell` | Responsive navigation shell that auto-switches between OiBottomBar and OiNavigationRail |
 | `OiThreeColumnLayout` | Resizable three-column IDE-style layout |
 | `OiFilterableNavList<T>` | Typed navigation list with search, chip filters, grouped items |
-| `OiPageHeader` | Standardised page header with breadcrumbs, title, status badge, actions, bottom slot |
+| `OiPageHeader` | Standardized page header with breadcrumbs, title, status badge, actions, bottom slot |
 
 ### OiResponsiveShell
 

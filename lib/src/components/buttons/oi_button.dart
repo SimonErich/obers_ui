@@ -67,7 +67,7 @@ enum _OiButtonKind { standard, icon, split, countdown, confirm }
 ///
 /// [OiButton] supports six visual variants, three density-aware sizes, loading
 /// and disabled states, leading/trailing icons, full-width layout, and four
-/// specialised constructors:
+/// specialized constructors:
 ///
 /// - [OiButton.icon] — an icon-only square button.
 /// - [OiButton.split] — a main action paired with a dropdown trigger.
