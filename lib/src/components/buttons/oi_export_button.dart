@@ -101,36 +101,44 @@ class _OiExportButtonState extends State<OiExportButton> {
     return IntrinsicWidth(
       child: ConstrainedBox(
         constraints: const BoxConstraints(minWidth: 160),
-        child: Padding(
-          padding: EdgeInsets.symmetric(vertical: spacing.xs),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              for (final format in widget.formats)
-                GestureDetector(
-                  onTap: () => _handleExport(format),
-                  behavior: HitTestBehavior.opaque,
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: spacing.sm,
-                      vertical: spacing.xs,
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        OiIcon.decorative(
-                          icon: _formatIcon(format),
-                          size: 16,
-                          color: colors.text,
-                        ),
-                        SizedBox(width: spacing.sm),
-                        OiLabel.body(format.label),
-                      ],
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            color: colors.surface,
+            borderRadius: context.radius.md,
+            border: Border.all(color: colors.border),
+            boxShadow: context.shadows.sm,
+          ),
+          child: Padding(
+            padding: EdgeInsets.symmetric(vertical: spacing.xs),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                for (final format in widget.formats)
+                  GestureDetector(
+                    onTap: () => _handleExport(format),
+                    behavior: HitTestBehavior.opaque,
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: spacing.sm,
+                        vertical: spacing.xs,
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          OiIcon.decorative(
+                            icon: _formatIcon(format),
+                            size: 16,
+                            color: colors.text,
+                          ),
+                          SizedBox(width: spacing.sm),
+                          OiLabel.body(format.label),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
