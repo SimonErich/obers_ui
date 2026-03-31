@@ -494,7 +494,7 @@ class _OiDevMenuState extends State<OiDevMenu> {
               vertical: spacing.sm,
             ),
             decoration: BoxDecoration(
-              color: selected ? colors.primary.muted : null,
+              color: selected ? colors.primary.base : null,
               borderRadius: context.radius.sm,
               border: Border.all(
                 color: selected ? colors.primary.base : colors.borderSubtle,
@@ -509,7 +509,9 @@ class _OiDevMenuState extends State<OiDevMenu> {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color: selected ? colors.primary.base : colors.textMuted,
+                      color: selected
+                          ? colors.primary.foreground
+                          : colors.textMuted,
                       width: 2,
                     ),
                   ),
@@ -520,7 +522,7 @@ class _OiDevMenuState extends State<OiDevMenu> {
                             height: 6,
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              color: colors.primary.base,
+                              color: colors.primary.foreground,
                             ),
                           ),
                         )
@@ -532,14 +534,28 @@ class _OiDevMenuState extends State<OiDevMenu> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      OiLabel.body(env.label),
+                      OiLabel.body(
+                        env.label,
+                        color: selected
+                            ? colors.primary.foreground
+                            : null,
+                      ),
                       if (env.url != null)
-                        OiLabel.small(env.url!, color: colors.textMuted),
+                        OiLabel.small(
+                          env.url!,
+                          color: selected
+                              ? colors.primary.foreground
+                              : colors.textMuted,
+                        ),
                     ],
                   ),
                 ),
                 if (selected)
-                  Icon(OiIcons.check, size: 16, color: colors.primary.base),
+                  Icon(
+                    OiIcons.check,
+                    size: 16,
+                    color: colors.primary.foreground,
+                  ),
               ],
             ),
           ),

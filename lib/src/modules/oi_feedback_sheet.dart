@@ -222,16 +222,17 @@ class _OiFeedbackSheetState extends State<OiFeedbackSheet> {
       children: [
         Padding(
           padding: EdgeInsets.only(bottom: spacing.sm),
-          child: const OiLabel.body('Category'),
+          child: const OiLabel.smallStrong('Category'),
         ),
         Wrap(
           spacing: spacing.sm,
           runSpacing: spacing.sm,
           children: widget.categories.map((cat) {
             final selected = _selectedCategory == cat;
-            final bg = selected ? colors.primary.muted : colors.surface;
+            final bg = selected ? colors.primary.base : colors.surface;
             final borderColor = selected ? colors.primary.base : colors.border;
-            final textColor = selected ? colors.primary.base : colors.text;
+            final textColor =
+                selected ? colors.primary.foreground : colors.text;
 
             return Semantics(
               button: true,
@@ -286,13 +287,17 @@ class _OiFeedbackSheetState extends State<OiFeedbackSheet> {
   Widget _buildSubmit() {
     final hasCategory = _selectedCategory != null;
 
-    return OiButton.primary(
-      label: 'Submit Feedback',
-      onTap: hasCategory ? _handleSubmit : null,
-      loading: _isSubmitting,
-      enabled: hasCategory && !_isSubmitting,
-      fullWidth: true,
-      icon: OiIcons.send,
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        OiButton.primary(
+          label: 'Submit Feedback',
+          onTap: hasCategory ? _handleSubmit : null,
+          loading: _isSubmitting,
+          enabled: hasCategory && !_isSubmitting,
+          icon: OiIcons.send,
+        ),
+      ],
     );
   }
 

@@ -393,6 +393,7 @@ class _OiProfilePageState extends State<OiProfilePage> {
                           child: OiTappable(
                             onTap: () => _scrollToSection(i),
                             semanticLabel: 'Navigate to ${entry.title}',
+                            clipBorderRadius: context.radius.sm,
                             child: Container(
                               width: double.infinity,
                               padding: EdgeInsets.symmetric(
@@ -582,9 +583,7 @@ class _OiProfilePageState extends State<OiProfilePage> {
     final sp = context.spacing;
 
     return Row(
-      crossAxisAlignment: maxLines > 1
-          ? CrossAxisAlignment.start
-          : CrossAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.end,
       children: [
         Expanded(
           child: OiTextInput(
@@ -596,14 +595,11 @@ class _OiProfilePageState extends State<OiProfilePage> {
         ),
         if (widget.onFieldSave != null) ...[
           SizedBox(width: sp.sm),
-          Padding(
-            padding: EdgeInsets.only(top: maxLines > 1 ? sp.lg : 0),
-            child: OiButton.ghost(
-              label: 'Save $label',
-              icon: OiIcons.check,
-              size: OiButtonSize.small,
-              onTap: () => _saveField(field, controller.text),
-            ),
+          OiButton.ghost(
+            label: 'Save $label',
+            icon: OiIcons.check,
+            size: OiButtonSize.small,
+            onTap: () => _saveField(field, controller.text),
           ),
         ],
       ],

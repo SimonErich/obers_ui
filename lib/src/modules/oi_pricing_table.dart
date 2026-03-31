@@ -1,7 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/buttons/oi_button.dart';
 import 'package:obers_ui/src/components/display/oi_badge.dart';
-import 'package:obers_ui/src/components/display/oi_page_indicator.dart';
 import 'package:obers_ui/src/components/inputs/oi_segmented_control.dart';
 import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/oi_responsive.dart';
@@ -166,20 +165,11 @@ class OiPricingTable extends StatefulWidget {
 
 class _OiPricingTableState extends State<OiPricingTable> {
   late OiBillingCycle _billingCycle;
-  late PageController _mobilePageController;
-  int _mobileActivePlan = 0;
 
   @override
   void initState() {
     super.initState();
     _billingCycle = widget.billingCycle;
-    // Start on the recommended plan if there is one.
-    final recommendedIndex = widget.plans.indexWhere((p) => p.recommended);
-    _mobileActivePlan = recommendedIndex >= 0 ? recommendedIndex : 0;
-    _mobilePageController = PageController(
-      initialPage: _mobileActivePlan,
-      viewportFraction: 0.85,
-    );
   }
 
   @override
@@ -192,7 +182,6 @@ class _OiPricingTableState extends State<OiPricingTable> {
 
   @override
   void dispose() {
-    _mobilePageController.dispose();
     super.dispose();
   }
 
@@ -220,7 +209,7 @@ class _OiPricingTableState extends State<OiPricingTable> {
           builder: (context, constraints) {
             final mobile = _isMobile(constraints.maxWidth);
 
-            return Column(
+            final content = Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 if (widget.showBillingToggle) ...[
@@ -237,6 +226,11 @@ class _OiPricingTableState extends State<OiPricingTable> {
                 ],
               ],
             );
+
+            if (mobile) {
+              return SingleChildScrollView(child: content);
+            }
+            return content;
           },
         ),
       ),
@@ -303,36 +297,10 @@ class _OiPricingTableState extends State<OiPricingTable> {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        LayoutBuilder(
-          builder: (context, constraints) {
-            // Scale card height based on available width, with a reasonable range.
-            final cardHeight = (constraints.maxWidth * 1.1).clamp(360.0, 520.0);
-            return SizedBox(
-              height: cardHeight,
-              child: PageView.builder(
-                controller: _mobilePageController,
-                itemCount: widget.plans.length,
-                onPageChanged: (index) {
-                  setState(() => _mobileActivePlan = index);
-                },
-                itemBuilder: (context, index) {
-                  return Padding(
-                    padding: EdgeInsets.symmetric(horizontal: sp.xs),
-                    child: _buildPlanCard(context, widget.plans[index]),
-                  );
-                },
-              ),
-            );
-          },
-        ),
-        SizedBox(height: sp.md),
-        OiPageIndicator(
-          count: widget.plans.length,
-          current: _mobileActivePlan,
-          semanticLabel:
-              'Plan ${_mobileActivePlan + 1} of '
-              '${widget.plans.length}',
-        ),
+        for (int i = 0; i < widget.plans.length; i++) ...[
+          _buildPlanCard(context, widget.plans[i]),
+          if (i < widget.plans.length - 1) SizedBox(height: sp.md),
+        ],
       ],
     );
   }
@@ -434,7 +402,7 @@ class _OiPricingTableState extends State<OiPricingTable> {
                 fullWidth: true,
               )
             else
-              OiButton.ghost(
+              OiButton.secondary(
                 label: plan.currentPlan ? 'Current Plan' : plan.ctaLabel,
                 onTap: plan.currentPlan
                     ? null

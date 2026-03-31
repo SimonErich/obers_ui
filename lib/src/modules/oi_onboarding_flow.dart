@@ -3,11 +3,8 @@ import 'dart:async';
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/buttons/oi_button.dart';
 import 'package:obers_ui/src/components/display/oi_page_indicator.dart';
-import 'package:obers_ui/src/foundation/oi_responsive.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/primitives/display/oi_label.dart';
-import 'package:obers_ui/src/primitives/layout/oi_column.dart';
-import 'package:obers_ui/src/primitives/layout/oi_row.dart';
 
 // ── Data model ──────────────────────────────────────────────────────────────
 
@@ -182,19 +179,16 @@ class _OiOnboardingFlowState extends State<OiOnboardingFlow> {
   Widget _buildPage(BuildContext context, OiOnboardingPage page) {
     final sp = context.spacing;
     final colors = context.colors;
-    final breakpoint = context.breakpoint;
 
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: sp.md),
-      child: OiColumn(
-        breakpoint: breakpoint,
+      child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          if (page.illustration != null)
-            Expanded(child: Center(child: page.illustration))
-          else
-            const Spacer(),
-          SizedBox(height: sp.lg),
+          if (page.illustration != null) ...[
+            Expanded(child: Center(child: page.illustration)),
+            SizedBox(height: sp.lg),
+          ],
           OiLabel.h2(page.title, textAlign: TextAlign.center),
           SizedBox(height: sp.sm),
           OiLabel.body(
@@ -206,7 +200,6 @@ class _OiOnboardingFlowState extends State<OiOnboardingFlow> {
             SizedBox(height: sp.md),
             OiButton.ghost(label: page.actionLabel!, onTap: page.onAction),
           ],
-          SizedBox(height: sp.lg),
         ],
       ),
     );
@@ -221,42 +214,53 @@ class _OiOnboardingFlowState extends State<OiOnboardingFlow> {
     );
   }
 
+  void _goToPage(int index) {
+    unawaited(
+      _pageController.animateToPage(
+        index,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      ),
+    );
+    setState(() => _currentPage = index);
+    widget.onPageChange?.call(index);
+  }
+
   Widget _buildControls(BuildContext context) {
     final sp = context.spacing;
-    final breakpoint = context.breakpoint;
 
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: sp.md, vertical: sp.sm),
-      child: OiRow(
-        breakpoint: breakpoint,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          // Left: skip button (only on non-last pages if enabled).
-          SizedBox(
-            width: 80,
-            child: (widget.showSkip && !_isLastPage)
-                ? OiButton.ghost(label: widget.skipLabel, onTap: _skip)
-                : const SizedBox.shrink(),
+          // Action button row: skip / next / done.
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              if (widget.showSkip && !_isLastPage) ...[
+                OiButton.ghost(label: widget.skipLabel, onTap: _skip),
+                SizedBox(width: sp.sm),
+              ],
+              _isLastPage
+                  ? OiButton.primary(label: widget.doneLabel, onTap: _done)
+                  : OiButton.primary(
+                      label: widget.nextLabel,
+                      onTap: _nextPage,
+                    ),
+            ],
           ),
+          SizedBox(height: sp.sm),
 
-          // Center: page indicator dots.
+          // Page indicator dots.
           if (widget.showPageIndicator)
             OiPageIndicator(
               count: widget.pages.length,
               current: _currentPage,
+              onDotTap: _goToPage,
               semanticLabel:
                   'Page ${_currentPage + 1} of ${widget.pages.length}',
-            )
-          else
-            const SizedBox.shrink(),
-
-          // Right: next or done button.
-          SizedBox(
-            width: 120,
-            child: _isLastPage
-                ? OiButton.primary(label: widget.doneLabel, onTap: _done)
-                : OiButton.primary(label: widget.nextLabel, onTap: _nextPage),
-          ),
+            ),
         ],
       ),
     );

@@ -502,12 +502,17 @@ class _OiHelpCenterState extends State<OiHelpCenter> {
             minLines: 4,
           ),
           SizedBox(height: context.spacing.md),
-          OiButton.primary(
-            label: 'Send message',
-            semanticLabel: 'Send contact message',
-            loading: _contactSubmitting,
-            enabled: !_contactSubmitting,
-            onTap: _handleContactSubmit,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              OiButton.primary(
+                label: 'Send message',
+                semanticLabel: 'Send contact message',
+                loading: _contactSubmitting,
+                enabled: !_contactSubmitting,
+                onTap: _handleContactSubmit,
+              ),
+            ],
           ),
         ],
       ),

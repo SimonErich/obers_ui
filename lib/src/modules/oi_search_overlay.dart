@@ -340,7 +340,14 @@ class _OiSearchOverlayState extends State<OiSearchOverlay> {
                     SizedBox(height: spacing.sm),
                     const OiDivider(),
                     SizedBox(height: spacing.sm),
-                    Flexible(child: _buildBody(context)),
+                    Flexible(
+                      child: AnimatedSize(
+                        duration: const Duration(milliseconds: 200),
+                        curve: Curves.easeInOut,
+                        alignment: Alignment.topCenter,
+                        child: _buildBody(context),
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -371,24 +378,16 @@ class _OiSearchOverlayState extends State<OiSearchOverlay> {
       scrollDirection: Axis.horizontal,
       child: Row(
         children: [
-          _buildChip(
-            context,
-            label: 'All',
-            selected: _selectedCategory == null,
-            onTap: () => _selectCategory(null),
-          ),
-          ...widget.categories.map(
-            (cat) => Padding(
-              padding: EdgeInsets.only(left: spacing.xs),
-              child: _buildChip(
-                context,
-                label: cat.label,
-                icon: cat.icon,
-                selected: _selectedCategory == cat.key,
-                onTap: () => _selectCategory(cat.key),
-              ),
+          for (int i = 0; i < widget.categories.length; i++) ...[
+            if (i > 0) SizedBox(width: spacing.xs),
+            _buildChip(
+              context,
+              label: widget.categories[i].label,
+              icon: widget.categories[i].icon,
+              selected: _selectedCategory == widget.categories[i].key,
+              onTap: () => _selectCategory(widget.categories[i].key),
             ),
-          ),
+          ],
         ],
       ),
     );
@@ -404,6 +403,7 @@ class _OiSearchOverlayState extends State<OiSearchOverlay> {
     return OiTappable(
       onTap: onTap,
       semanticLabel: label,
+      clipBorderRadius: context.radius.full,
       child: DecoratedBox(
         decoration: BoxDecoration(
           color: selected
@@ -450,9 +450,24 @@ class _OiSearchOverlayState extends State<OiSearchOverlay> {
       return const SizedBox.shrink();
     }
 
-    // Loading state.
+    // While loading, show a spinner overlaid on previous results to
+    // avoid resizing the container.
     if (_isLoading) {
-      return _buildLoading(context);
+      return Stack(
+        children: [
+          // Keep the previous content underneath to maintain height.
+          if (_results.isNotEmpty)
+            Opacity(opacity: 0.3, child: _buildResultsList(context))
+          else
+            const SizedBox.shrink(),
+          const Center(
+            child: Padding(
+              padding: EdgeInsets.symmetric(vertical: 16),
+              child: OiProgress.circular(indeterminate: true, size: 24),
+            ),
+          ),
+        ],
+      );
     }
 
     // Empty state after search completes with no results.
@@ -470,15 +485,6 @@ class _OiSearchOverlayState extends State<OiSearchOverlay> {
     }
 
     return const SizedBox.shrink();
-  }
-
-  Widget _buildLoading(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.symmetric(vertical: context.spacing.lg),
-      child: const Center(
-        child: OiProgress.circular(indeterminate: true, size: 32),
-      ),
-    );
   }
 
   Widget _buildResultsList(BuildContext context) {
@@ -576,23 +582,65 @@ class _OiSearchOverlayState extends State<OiSearchOverlay> {
         ),
         SizedBox(height: spacing.xs),
         ...recents.map(
-          (query) => OiTappable(
+          (query) => _RecentSearchItem(
+            query: query,
             onTap: () => _onRecentSelected(query),
-            semanticLabel: query,
-            child: Padding(
-              padding: EdgeInsets.symmetric(vertical: spacing.xs),
-              child: Row(
-                children: [
-                  Icon(OiIcons.clock, size: 16, color: colors.textMuted),
-                  SizedBox(width: spacing.sm),
-                  Expanded(child: OiLabel.body(query, maxLines: 1)),
-                  Icon(OiIcons.arrowRight, size: 14, color: colors.textMuted),
-                ],
-              ),
-            ),
           ),
         ),
       ],
+    );
+  }
+}
+
+class _RecentSearchItem extends StatefulWidget {
+  const _RecentSearchItem({required this.query, required this.onTap});
+
+  final String query;
+  final VoidCallback onTap;
+
+  @override
+  State<_RecentSearchItem> createState() => _RecentSearchItemState();
+}
+
+class _RecentSearchItemState extends State<_RecentSearchItem> {
+  bool _hovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    final spacing = context.spacing;
+    final textColor = _hovered ? colors.primary.base : null;
+    final iconColor = _hovered ? colors.primary.base : colors.textMuted;
+
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      onEnter: (_) => setState(() => _hovered = true),
+      onExit: (_) => setState(() => _hovered = false),
+      child: GestureDetector(
+        onTap: widget.onTap,
+        behavior: HitTestBehavior.opaque,
+        child: Semantics(
+          label: widget.query,
+          button: true,
+          child: Padding(
+            padding: EdgeInsets.symmetric(vertical: spacing.xs),
+            child: Row(
+              children: [
+                Icon(OiIcons.clock, size: 16, color: iconColor),
+                SizedBox(width: spacing.sm),
+                Expanded(
+                  child: OiLabel.body(
+                    widget.query,
+                    maxLines: 1,
+                    color: textColor,
+                  ),
+                ),
+                Icon(OiIcons.arrowRight, size: 14, color: iconColor),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
