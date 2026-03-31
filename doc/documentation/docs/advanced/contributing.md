@@ -76,7 +76,7 @@ class OiExample extends StatelessWidget {
 ### Test types
 
 | Type | Location | Purpose |
-|---|---|---|
+| --- | --- | --- |
 | Widget tests | `test/src/components/` | Behavior, interaction, accessibility |
 | Golden tests | `test/src/golden/` | Visual regression (light/dark, all breakpoints) |
 | Integration tests | `test/src/integration/` | Multi-component interaction flows |

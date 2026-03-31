@@ -7,7 +7,7 @@ Think of modules as the "just add data" layer — the cream on top.
 ## Overview
 
 | Module | Description |
-|---|---|
+| --- | --- |
 | `OiFileExplorer` | Full file browser with sidebar, toolbar, grid/list views, search, drag-drop |
 | `OiFileManager` | File operations UI (move, copy, delete, upload) |
 | `OiDashboard` | Draggable, resizable widget grid |
@@ -166,7 +166,7 @@ OiListView<Project>(
 All modules that support persistence auto-save user preferences when you provide a `settingsDriver` to `OiApp`:
 
 | Module | What's persisted |
-|---|---|
+| --- | --- |
 | `OiFileExplorer` | View mode, sort, sidebar state, favorites, recent paths |
 | `OiKanban` | Column order, collapsed columns, WIP limits |
 | `OiDashboard` | Card positions and sizes |
@@ -198,7 +198,7 @@ OiCheckout(
 ```
 
 | Parameter | Type | Description |
-|---|---|---|
+| --- | --- | --- |
 | `items` | `List<OiCartItem>` | Cart items being checked out (required) |
 | `summary` | `OiCartSummary` | Cart summary totals (required) |
 | `label` | `String` | Accessibility label (required) |
@@ -241,7 +241,7 @@ OiShopProductDetail(
 ```
 
 | Parameter | Type | Description |
-|---|---|---|
+| --- | --- | --- |
 | `product` | `OiProductData` | Product to display (required) |
 | `label` | `String` | Accessibility label (required) |
 | `onAddToCart` | `ValueChanged<OiCartItem>?` | Called when user taps "Add to Cart" |
@@ -287,7 +287,7 @@ OiAuthPage.register(
 ```
 
 | Parameter | Type | Description |
-|---|---|---|
+| --- | --- | --- |
 | `label` | `String` | Accessibility label (required) |
 | `initialMode` | `OiAuthMode` | Starting mode. Defaults to `OiAuthMode.login` |
 | `onModeChanged` | `ValueChanged<OiAuthMode>?` | Called when user switches modes |
@@ -328,7 +328,7 @@ OiAppShell(
 ```
 
 | Parameter | Type | Description |
-|---|---|---|
+| --- | --- | --- |
 | `child` | `Widget` | Main content area (required) |
 | `label` | `String` | Accessibility label (required) |
 | `navigation` | `List<OiNavItem>` | Navigation items for the sidebar (required) |
@@ -396,7 +396,7 @@ OiResourcePage(
 ```
 
 | Parameter | Type | Description |
-|---|---|---|
+| --- | --- | --- |
 | `child` | `Widget` | Main content area (required) |
 | `label` | `String` | Accessibility label (required) |
 | `title` | `String?` | Page title heading |
@@ -454,7 +454,7 @@ OiChatWindow(
 - Session management
 
 | Parameter | Type | Description |
-|---|---|---|
+| --- | --- | --- |
 | `messages` | `List<OiChatWindowMessage>` | Chat message history (required) |
 | `label` | `String` | Accessibility label (required) |
 | `onSendMessage` | `ValueChanged<String>?` | Called when user sends a message |
@@ -588,7 +588,7 @@ OiChangelogView(
 ```
 
 | Parameter | Type | Description |
-|---|---|---|
+| --- | --- | --- |
 | `versions` | `List<OiVersionEntry>` | Release versions to display (required) |
 | `label` | `String` | Accessibility label (required) |
 | `onVersionTap` | `ValueChanged<OiVersionEntry>?` | Called when a version header is tapped |
@@ -626,7 +626,7 @@ OiConsentBanner.minimal(
 ```
 
 | Parameter | Type | Description |
-|---|---|---|
+| --- | --- | --- |
 | `categories` | `List<OiConsentCategory>` | Consent categories (required) |
 | `label` | `String` | Accessibility label (required) |
 | `title` | `String` | Banner title. Defaults to `'We use cookies'` |
@@ -674,7 +674,7 @@ OiDevMenu.trigger(
 ```
 
 | Parameter | Type | Description |
-|---|---|---|
+| --- | --- | --- |
 | `label` | `String` | Accessibility label (required) |
 | `environments` | `List<OiDevEnvironment>` | Available environments |
 | `currentEnvironment` | `String?` | Currently active environment key |
@@ -720,7 +720,7 @@ OiDrawerNavigation(
 ```
 
 | Parameter | Type | Description |
-|---|---|---|
+| --- | --- | --- |
 | `sections` | `List<OiDrawerSection>` | Navigation sections (required) |
 | `label` | `String` | Accessibility label (required) |
 | `header` | `OiDrawerHeader?` | User header with avatar, name, subtitle |
@@ -751,7 +751,7 @@ OiFeedbackSheet(
 ```
 
 | Parameter | Type | Description |
-|---|---|---|
+| --- | --- | --- |
 | `label` | `String` | Accessibility label (required) |
 | `onSubmit` | `Future<bool> Function(OiFeedbackData)?` | Submit callback, returns `true` on success |
 | `ratingType` | `OiFeedbackRatingType` | Stars or sentiment. Defaults to `sentiment` |
@@ -784,7 +784,7 @@ OiHelpCenter(
 ```
 
 | Parameter | Type | Description |
-|---|---|---|
+| --- | --- | --- |
 | `label` | `String` | Accessibility label (required) |
 | `faq` | `List<OiFaqItem>` | FAQ items with question/answer |
 | `articles` | `List<OiKnowledgeArticle>` | Knowledge base articles |
@@ -828,7 +828,7 @@ OiMaintenancePage(
 ```
 
 | Parameter | Type | Description |
-|---|---|---|
+| --- | --- | --- |
 | `title` | `String` | Page title (required) |
 | `label` | `String` | Accessibility label (required) |
 | `description` | `String?` | Description text below title |
@@ -860,7 +860,7 @@ OiMediaPicker(
 ```
 
 | Parameter | Type | Description |
-|---|---|---|
+| --- | --- | --- |
 | `label` | `String` | Accessibility label (required) |
 | `sources` | `List<OiMediaSource>` | Available sources. Defaults to `[gallery, files]` |
 | `allowedTypes` | `OiMediaType` | Allowed media types. Defaults to `any` |
@@ -903,7 +903,7 @@ OiOnboardingFlow(
 ```
 
 | Parameter | Type | Description |
-|---|---|---|
+| --- | --- | --- |
 | `pages` | `List<OiOnboardingPage>` | Onboarding pages (required) |
 | `label` | `String` | Accessibility label (required) |
 | `onComplete` | `VoidCallback?` | Called when user finishes all pages |
@@ -936,7 +936,7 @@ OiPricingTable(
 ```
 
 | Parameter | Type | Description |
-|---|---|---|
+| --- | --- | --- |
 | `plans` | `List<OiPricingPlan>` | Pricing plans (required) |
 | `label` | `String` | Accessibility label (required) |
 | `features` | `List<OiPricingFeature>` | Feature comparison rows |
@@ -971,7 +971,7 @@ OiProfilePage(
 ```
 
 | Parameter | Type | Description |
-|---|---|---|
+| --- | --- | --- |
 | `profile` | `OiProfileData` | User profile data (required) |
 | `label` | `String` | Accessibility label (required) |
 | `onAvatarChange` | `VoidCallback?` | Called to change avatar |
@@ -1008,7 +1008,7 @@ OiSearchOverlay(
 ```
 
 | Parameter | Type | Description |
-|---|---|---|
+| --- | --- | --- |
 | `label` | `String` | Accessibility label (required) |
 | `onSearch` | `Future<List<OiSearchSuggestion>> Function(String, String?)?` | Search callback |
 | `onSuggestionTap` | `ValueChanged<OiSearchSuggestion>?` | Called when result is selected |
@@ -1047,7 +1047,7 @@ OiSettingsPage(
 ```
 
 | Parameter | Type | Description |
-|---|---|---|
+| --- | --- | --- |
 | `groups` | `List<OiSettingsGroup>` | Settings groups (required) |
 | `label` | `String` | Accessibility label (required) |
 | `onSettingChanged` | `Function(String, String, dynamic)?` | Called when any setting changes (groupKey, itemKey, value) |
@@ -1090,7 +1090,7 @@ OiSubscriptionManager(
 ```
 
 | Parameter | Type | Description |
-|---|---|---|
+| --- | --- | --- |
 | `currentPlan` | `OiSubscriptionPlan` | Current subscription plan (required) |
 | `label` | `String` | Accessibility label (required) |
 | `usage` | `List<OiUsageQuota>` | Usage quota meters |

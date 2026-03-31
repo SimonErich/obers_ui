@@ -5,7 +5,7 @@ Components are the standard UI widgets you'll use every day. They're built from 
 ## Buttons
 
 | Widget | Description |
-|---|---|
+| --- | --- |
 | `OiButton` | Primary, secondary, outline, ghost, destructive, soft variants |
 | `OiIconButton` | Icon-only button |
 | `OiToggleButton` | Toggle/switch button |
@@ -112,7 +112,7 @@ OiBackButton(
 ## Inputs
 
 | Widget | Description |
-|---|---|
+| --- | --- |
 | `OiTextInput` | Text field with validation, prefix/suffix, counter, plus `.otp()`, `.password()`, `.multiline()` constructors |
 | `OiCheckbox` | Checkbox with label |
 | `OiRadio` | Radio button group |
@@ -483,7 +483,7 @@ OiColorPalettePicker(
 ## Display
 
 | Widget | Description |
-|---|---|
+| --- | --- |
 | `OiAvatar` | User avatar with image or initials |
 | `OiBadge` | Count badge or dot indicator |
 | `OiCard` | Content container with shadow |
@@ -792,7 +792,7 @@ OiBadge(count: 5, child: OiIconButton(icon: OiIcons.bell, onPressed: () {}))
 ## Navigation
 
 | Widget | Description |
-|---|---|
+| --- | --- |
 | `OiTabs` | Tab navigation with optional persistence |
 | `OiAccordion` | Collapsible sections |
 | `OiBreadcrumbs` | Path navigation |
@@ -1125,7 +1125,7 @@ if (time != null) {
 ## Overlays
 
 | Widget | Description |
-|---|---|
+| --- | --- |
 | `OiDialog` | Modal dialog |
 | `OiSheet` | Bottom/side sheet |
 | `OiToast` | Toast notification |
@@ -1347,7 +1347,7 @@ if (selectedFilter != null) applyFilter(selectedFilter);
 ## Panels
 
 | Widget | Description |
-|---|---|
+| --- | --- |
 | `OiPanel` | Sliding side panel |
 | `OiResizable` | Resizable container |
 | `OiSplitPane` | Draggable splitter between two children |
@@ -1356,7 +1356,7 @@ if (selectedFilter != null) applyFilter(selectedFilter);
 ## Feedback
 
 | Widget | Description |
-|---|---|
+| --- | --- |
 | `OiStarRating` | Star rating (1-5) |
 | `OiScaleRating` | Numeric scale (1-10) |
 | `OiSentiment` | Mood/emoji selector |
@@ -1407,7 +1407,7 @@ OiBanner.loading(
 ## Inline Edit
 
 | Widget | Description |
-|---|---|
+| --- | --- |
 | `OiEditable` | Generic inline editor wrapper |
 | `OiEditableText` | Click-to-edit text |
 | `OiEditableNumber` | Click-to-edit number |
@@ -1428,7 +1428,7 @@ OiEditableText(
 ## Dialogs (file management)
 
 | Widget | Description |
-|---|---|
+| --- | --- |
 | `OiDeleteDialog` | Delete confirmation dialog |
 | `OiRenameDialog` | Rename dialog |
 | `OiMoveDialog` | Move/copy file dialog |
@@ -1439,7 +1439,7 @@ OiEditableText(
 ## Shop
 
 | Widget | Description |
-|---|---|
+| --- | --- |
 | `OiPriceTag` | Formatted price display with optional compare-at strikethrough and currency symbol |
 | `OiQuantitySelector` | Number stepper with minus/plus buttons for product quantities |
 | `OiCartItemRow` | Cart line item row with thumbnail, quantity selector, price, and remove |
@@ -1700,7 +1700,7 @@ OiWishlistButton(
 A standardized, reusable address form with fields for name, company, address lines, city, state/province, postal code, country, and phone. Responsive layout adapts between side-by-side and stacked fields based on breakpoint.
 
 | Parameter | Type | Default | Description |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `label` | `String` | required | Accessibility label |
 | `initialValue` | `OiAddressData?` | `null` | Initial address to pre-fill fields |
 | `onChange` | `ValueChanged<OiAddressData>?` | `null` | Called on any field change with updated address |
@@ -1730,7 +1730,7 @@ OiAddressForm(
 A radio-style selector that renders a list of `OiShippingOption` widgets with managed single-selection. Supports shimmer loading state.
 
 | Parameter | Type | Default | Description |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `methods` | `List<OiShippingMethod>` | required | Available shipping methods |
 | `label` | `String` | required | Accessibility label for the group |
 | `selectedKey` | `Object?` | `null` | Key of the currently selected method |
@@ -1755,7 +1755,7 @@ OiShippingMethodPicker(
 A selector for payment methods that renders `OiPaymentOption` widgets with managed single-selection. Optionally displays an "Add new card" slot below the options.
 
 | Parameter | Type | Default | Description |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `methods` | `List<OiPaymentMethod>` | required | Available payment methods |
 | `label` | `String` | required | Accessibility label for the group |
 | `selectedKey` | `Object?` | `null` | Key of the currently selected method |
@@ -1779,7 +1779,7 @@ OiPaymentMethodPicker(
 A badge that displays `OiOrderStatus` with appropriate color coding. Default color mapping: pending (warning), confirmed (info), processing (info), shipped (primary), delivered (success), cancelled (error), refunded (muted).
 
 | Parameter | Type | Default | Description |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `status` | `OiOrderStatus` | required | The order status to display |
 | `label` | `String` | required | Accessibility label |
 | `statusLabels` | `Map<OiOrderStatus, String>?` | `null` | Optional i18n overrides for display text |
@@ -1865,7 +1865,7 @@ OiLocaleSwitcher(
 ## Interaction
 
 | Widget | Description |
-|---|---|
+| --- | --- |
 | `OiSelectionOverlay` | Multi-selection UI overlay |
 | `OiKbd` | Keyboard shortcut display with platform-specific glyph mapping |
 

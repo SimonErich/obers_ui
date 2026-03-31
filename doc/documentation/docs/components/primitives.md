@@ -5,7 +5,7 @@ Primitives are single-purpose, low-level widgets. They're the building blocks th
 ## Layout
 
 | Widget | Description |
-|---|---|
+| --- | --- |
 | `OiGrid` | Responsive CSS Grid-like layout with column spans |
 | `OiRow` | Horizontal flex with gap |
 | `OiColumn` | Vertical flex with gap |
@@ -64,7 +64,7 @@ OiGridZoomControls(
 ## Display
 
 | Widget | Description |
-|---|---|
+| --- | --- |
 | `OiDivider` | Horizontal or vertical separator line |
 | `OiIcon` | Icon display with semantic sizing |
 | `OiLabel` | Text display using theme text styles (includes `.copyable()` constructor) |
@@ -127,7 +127,7 @@ OiSurface.elevated(
 ## Interaction
 
 | Widget | Description |
-|---|---|
+| --- | --- |
 | `OiTappable` | Tap handler with hover, focus, press feedback — foundation for all interactive widgets |
 | `OiTouchTarget` | Ensures 48x48dp minimum touch area on touch devices |
 | `OiFocusTrap` | Confines keyboard focus within a subtree (for dialogs, panels) |
@@ -152,7 +152,7 @@ Automatically handles: hover overlay, focus ring, press scale, disabled state (0
 ## Animation
 
 | Widget | Description |
-|---|---|
+| --- | --- |
 | `OiAnimatedList` | List item entry/exit animations |
 | `OiMorph` | Shape morphing animation |
 | `OiPulse` | Pulsing scale animation |
@@ -165,7 +165,7 @@ All animations respect `reducedMotion` automatically.
 ## Scroll
 
 | Widget | Description |
-|---|---|
+| --- | --- |
 | `OiVirtualList` | Virtualized scrollable list (for 10k+ items) |
 | `OiVirtualGrid` | Virtualized scrollable grid |
 | `OiInfiniteScroll` | Infinite scroll trigger at list end |
@@ -242,7 +242,7 @@ OiSliverGrid.extent(
 ## Drag & Drop
 
 | Widget | Description |
-|---|---|
+| --- | --- |
 | `OiDraggable` | Makes any widget draggable |
 | `OiDropZone` | Drop target area |
 | `OiDragGhost` | Custom drag preview |
@@ -251,7 +251,7 @@ OiSliverGrid.extent(
 ## Gesture
 
 | Widget | Description |
-|---|---|
+| --- | --- |
 | `OiDoubleTap` | Double-tap handler |
 | `OiLongPressMenu` | Long-press context menu (mobile alternative to right-click) |
 | `OiPinchZoom` | Pinch-to-zoom and pan |
@@ -260,7 +260,7 @@ OiSliverGrid.extent(
 ## Clipboard
 
 | Widget | Description |
-|---|---|
+| --- | --- |
 | `OiCopyable` | Wraps content with copy-on-tap |
 | `OiCopyButton` | One-click copy button |
 | `OiPasteZone` | Paste target area |
@@ -268,7 +268,7 @@ OiSliverGrid.extent(
 ## Overlay
 
 | Widget | Description |
-|---|---|
+| --- | --- |
 | `OiFloating` | Floating action button / element |
 | `OiPortal` | Overlay portal for tooltips, popovers |
 | `OiVisibility` | Visibility wrapper |

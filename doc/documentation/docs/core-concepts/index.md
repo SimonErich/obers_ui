@@ -5,7 +5,7 @@ Before diving into components, it helps to understand the ideas that hold ObersU
 ## Overview
 
 | Concept | What it means |
-|---|---|
+| --- | --- |
 | [**Component Tiers**](component-tiers.md) | Four layers of abstraction — primitives, components, composites, modules |
 | [**Theming**](theming.md) | A token-based design system for colors, typography, spacing, and more |
 | [**Responsive Design**](responsive.md) | Five breakpoints with adaptive layouts and responsive values |

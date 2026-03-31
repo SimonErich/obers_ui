@@ -15,7 +15,7 @@ OiApp(
 ```
 
 | Preset | Blur | Shadows | Animations | Use case |
-|---|---|---|---|---|
+| --- | --- | --- | --- | --- |
 | `OiPerformanceConfig.high()` | Full | Full | Full | Default — desktops, modern phones |
 | `OiPerformanceConfig.reduced()` | Disabled | Reduced | Shorter | Older devices, budget phones |
 | `OiPerformanceConfig.minimal()` | Disabled | Disabled | Minimal | Very constrained devices |

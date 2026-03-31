@@ -5,7 +5,7 @@ Composites combine multiple components into complex UI patterns. They handle int
 ## Data
 
 | Widget | Description |
-|---|---|
+| --- | --- |
 | `OiTable` | Full data table with sort, filter, resize, paginate, inline edit, column management |
 | `OiTree` | Hierarchical tree view with expand/collapse |
 | `OiReorderableList` | Drag-to-reorder list with drag handles, long-press, and keyboard support |
@@ -148,7 +148,7 @@ OiDataGrid<User>(
 ## Forms
 
 | Widget | Description |
-|---|---|
+| --- | --- |
 | `OiForm` | Form container with validation |
 | `OiStepper` | Step-by-step form |
 | `OiWizard` | Multi-page wizard with progress |
@@ -232,14 +232,14 @@ final user = await OiFormDialog.showCustom<User>(
 ## Editors
 
 | Widget | Description |
-|---|---|
+| --- | --- |
 | `OiRichEditor` | Rich text editor with markdown support |
 | `OiSmartInput` | Smart input with mentions and autocomplete |
 
 ## Navigation
 
 | Widget | Description |
-|---|---|
+| --- | --- |
 | `OiSidebar` | Collapsible sidebar with sections |
 | `OiNavMenu` | Navigation menu |
 | `OiFilterBar` | Advanced filter bar with chips |
@@ -283,7 +283,7 @@ OiResponsiveShell(
 **Layout modes:**
 
 | Viewport width | Navigation widget |
-|---|---|
+| --- | --- |
 | Below rail threshold | `OiBottomBar` at the bottom |
 | Rail to expanded | `OiNavigationRail` (icon only) |
 | At or above expanded | `OiNavigationRail` (icon + label) |
@@ -367,7 +367,7 @@ OiFilterableNavList<Screen>(
 ## Search
 
 | Widget | Description |
-|---|---|
+| --- | --- |
 | `OiSearch` | Full-text search with results |
 | `OiCommandBar` | Ctrl+K command palette |
 | `OiComboBox` | Searchable dropdown |
@@ -389,7 +389,7 @@ OiCommandBar(
 ## Files
 
 | Widget | Description |
-|---|---|
+| --- | --- |
 | `OiFileDropTarget` | Drag-and-drop file zone |
 | `OiFileGridView` | Grid file browser |
 | `OiFileListView` | List file browser |
@@ -398,7 +398,7 @@ OiCommandBar(
 ## Media
 
 | Widget | Description |
-|---|---|
+| --- | --- |
 | `OiGallery` | Image/media grid |
 | `OiLightbox` | Full-screen image viewer |
 | `OiVideoPlayer` | Video player with controls |
@@ -408,7 +408,7 @@ OiCommandBar(
 ## Visualization
 
 | Widget | Description |
-|---|---|
+| --- | --- |
 | `OiHeatmap` | 2D heat grid |
 | `OiRadarChart` | Radar/spider chart |
 | `OiFunnelChart` | Funnel/conversion chart |
@@ -421,7 +421,7 @@ All visualization widgets use the `context.colors.chart` palette by default.
 ## Scheduling
 
 | Widget | Description |
-|---|---|
+| --- | --- |
 | `OiCalendar` | Day/week/month calendar view |
 | `OiTimeline` | Chronological timeline |
 | `OiGantt` | Gantt chart |
@@ -429,7 +429,7 @@ All visualization widgets use the `context.colors.chart` palette by default.
 ## Social
 
 | Widget | Description |
-|---|---|
+| --- | --- |
 | `OiAvatarStack` | Overlapping avatar group |
 | `OiCursorPresence` | Live cursor position display |
 | `OiLiveRing` | Live/active status indicator |
@@ -439,7 +439,7 @@ All visualization widgets use the `context.colors.chart` palette by default.
 ## Onboarding
 
 | Widget | Description |
-|---|---|
+| --- | --- |
 | `OiTour` | Multi-step guided tour |
 | `OiSpotlight` | Feature highlight overlay |
 | `OiWhatsNew` | Release notes dialog |
@@ -466,7 +466,7 @@ OiTour(
 ## Shop Composites
 
 | Widget | Description |
-|---|---|
+| --- | --- |
 | `OiCartPanel` | Full shopping cart view with items, coupon, summary, checkout |
 | `OiMiniCart` | Compact cart icon with badge and popover/sheet preview |
 | `OiOrderSummary` | Order summary card with totals and optional expandable item list |
@@ -596,7 +596,7 @@ OiProductGallery(
 A visual order status tracker showing progression through order statuses (pending → confirmed → processing → shipped → delivered) as a horizontal stepper. Cancelled and refunded are rendered as terminal states using `OiOrderStatusBadge`. Optionally displays an expandable timeline of order events.
 
 | Parameter | Type | Default | Description |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `currentStatus` | `OiOrderStatus` | required | The current order status to highlight |
 | `label` | `String` | required | Accessibility label |
 | `timeline` | `List<OiOrderEvent>?` | `null` | Chronological list of order events |
@@ -645,7 +645,7 @@ OiOrderTracker(
 ## Workflow
 
 | Widget | Description |
-|---|---|
+| --- | --- |
 | `OiFlowGraph` | Node-edge graph editor |
 | `OiPipeline` | Linear stage pipeline |
 | `OiStateDiagram` | State machine visualization |

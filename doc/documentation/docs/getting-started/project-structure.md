@@ -35,7 +35,7 @@ lib/
 ObersUI follows a strict composition hierarchy. Each tier builds on the one below:
 
 | Tier | Directory | Purpose | Example |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | **Foundation** | `foundation/` | Theme, accessibility, overlays, persistence | `OiThemeData`, `OiA11yScope` |
 | **Primitives** | `primitives/` | Single-purpose rendering widgets | `OiTappable`, `OiGrid`, `OiShimmer` |
 | **Components** | `components/` | Standard interactive widgets | `OiButton`, `OiTextInput`, `OiDialog` |
@@ -60,7 +60,7 @@ Within each tier, widgets are grouped by function:
 ## Other directories
 
 | Directory | Purpose |
-|---|---|
+| --- | --- |
 | `widgetbook/` | Interactive component showcase (separate Flutter app) |
 | `example/` | Minimal example app |
 | `test/` | Widget tests, golden tests, integration tests, benchmarks |

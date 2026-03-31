@@ -16,7 +16,7 @@ OiApp(
 ## Theme modes
 
 | Mode | Behavior |
-|---|---|
+| --- | --- |
 | `OiThemeMode.light` | Always use light theme |
 | `OiThemeMode.dark` | Always use dark theme |
 | `OiThemeMode.system` | Follow the OS brightness setting |
@@ -47,7 +47,7 @@ final isLight = context.theme.isLight;
 ## What changes in dark mode
 
 | Token | Light | Dark |
-|---|---|---|
+| --- | --- | --- |
 | Background | `#F9FAFB` (light grey) | `#0A0A0F` (near-black) |
 | Surface | `#FFFFFF` (white) | `#111118` (dark grey) |
 | Text | `#111827` (dark) | `#F9FAFB` (light) |

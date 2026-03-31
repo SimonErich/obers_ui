@@ -33,7 +33,7 @@ Browse the full catalog at [lucide.dev/icons](https://lucide.dev/icons).
 ### Arrows & Navigation
 
 | Icon | Constant |
-|------|----------|
+| ------ | ---------- |
 | Chevrons | `chevronLeft`, `chevronRight`, `chevronUp`, `chevronDown` |
 | Double chevrons | `chevronsLeft`, `chevronsRight`, `chevronsUp`, `chevronsDown`, `chevronsUpDown` |
 | Arrows | `arrowLeft`, `arrowRight`, `arrowUp`, `arrowDown`, `arrowUpLeft`, `arrowUpRight`, `arrowDownLeft`, `arrowDownRight` |
@@ -45,7 +45,7 @@ Browse the full catalog at [lucide.dev/icons](https://lucide.dev/icons).
 ### Actions
 
 | Icon | Constant |
-|------|----------|
+| ------ | ---------- |
 | Add/Remove | `plus`, `minus`, `x`, `check` |
 | Circle variants | `circlePlus`, `circleMinus`, `circleX`, `circleCheck` |
 | Edit | `pencil`, `squarePen`, `eraser` |
@@ -56,7 +56,7 @@ Browse the full catalog at [lucide.dev/icons](https://lucide.dev/icons).
 ### Files & Folders
 
 | Icon | Constant |
-|------|----------|
+| ------ | ---------- |
 | Files | `file`, `fileText`, `filePlus`, `fileMinus`, `fileCheck`, `fileSearch`, `fileUp`, `fileDown` |
 | Folders | `folder`, `folderOpen`, `folderPlus`, `folderMinus` |
 | Archive | `archive`, `archiveRestore`, `archiveX` |
@@ -65,7 +65,7 @@ Browse the full catalog at [lucide.dev/icons](https://lucide.dev/icons).
 ### Media & Communication
 
 | Icon | Constant |
-|------|----------|
+| ------ | ---------- |
 | Images | `image`, `camera` |
 | Video/Audio | `video`, `videoOff`, `music`, `play`, `circlePlay`, `pause`, `volume2`, `volumeX` |
 | Messages | `mail`, `mailOpen`, `messageSquare`, `messagesSquare`, `messageCircle` |
@@ -75,7 +75,7 @@ Browse the full catalog at [lucide.dev/icons](https://lucide.dev/icons).
 ### Users & People
 
 | Icon | Constant |
-|------|----------|
+| ------ | ---------- |
 | Single | `user`, `circleUser`, `userPlus`, `userMinus`, `userCheck`, `userX` |
 | Group | `users` |
 | Reactions | `thumbsUp`, `thumbsDown`, `hand` |
@@ -83,7 +83,7 @@ Browse the full catalog at [lucide.dev/icons](https://lucide.dev/icons).
 ### Status & Feedback
 
 | Icon | Constant |
-|------|----------|
+| ------ | ---------- |
 | Success | `circleCheck`, `badgeCheck`, `shieldCheck` |
 | Warning | `circleAlert`, `triangleAlert` |
 | Info | `info`, `circleHelp` |
@@ -92,7 +92,7 @@ Browse the full catalog at [lucide.dev/icons](https://lucide.dev/icons).
 ### Layout & Display
 
 | Icon | Constant |
-|------|----------|
+| ------ | ---------- |
 | Menu | `menu`, `alignJustify`, `alignLeft` |
 | Grid | `layoutGrid`, `columns3`, `table`, `list` |
 | Settings | `slidersHorizontal`, `slidersVertical`, `settings` |
@@ -101,14 +101,14 @@ Browse the full catalog at [lucide.dev/icons](https://lucide.dev/icons).
 ### Data & Charts
 
 | Icon | Constant |
-|------|----------|
+| ------ | ---------- |
 | Charts | `barChart3`, `pieChart`, `trendingUp`, `trendingDown` |
 | Presentation | `presentation` |
 
 ### Appearance
 
 | Icon | Constant |
-|------|----------|
+| ------ | ---------- |
 | Theme | `sun`, `moon`, `monitor` |
 | Visibility | `eye`, `eyeOff` |
 | Design | `sparkles`, `paintbrush`, `palette`, `pipette` |
@@ -116,7 +116,7 @@ Browse the full catalog at [lucide.dev/icons](https://lucide.dev/icons).
 ### Objects & Symbols
 
 | Icon | Constant |
-|------|----------|
+| ------ | ---------- |
 | Places | `house`, `mapPin`, `globe`, `flag` |
 | Commerce | `shoppingCart`, `creditCard`, `tag`, `receiptText` |
 | Favorites | `star`, `heart`, `bookmark` |

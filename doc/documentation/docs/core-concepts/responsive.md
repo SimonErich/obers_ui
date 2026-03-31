@@ -7,7 +7,7 @@ ObersUI is responsive by default. Layouts, spacing, and component behavior adapt
 The library defines five breakpoints:
 
 | Breakpoint | Width | Typical device |
-|---|---|---|
+| --- | --- | --- |
 | **compact** | 0 – 599 | Phones |
 | **medium** | 600 – 839 | Small tablets, landscape phones |
 | **expanded** | 840 – 1199 | Tablets, small desktops |
@@ -39,7 +39,7 @@ Values cascade upward — if you only define `compact` and `expanded`, medium in
 Several primitives respond to breakpoints automatically:
 
 | Widget | Behavior |
-|---|---|
+| --- | --- |
 | `OiGrid` | Column count adapts to viewport width |
 | `OiPage` | Gutters widen at larger breakpoints |
 | `OiSection` | Aside layout on wide screens, stacked on narrow |
@@ -51,7 +51,7 @@ Several primitives respond to breakpoints automatically:
 ObersUI adapts navigation paradigms per breakpoint:
 
 | Breakpoint | Navigation pattern |
-|---|---|
+| --- | --- |
 | **compact** | `OiBottomBar` + `OiDrawer` overlay |
 | **medium** | `OiSidebar` as compact 64dp rail |
 | **expanded+** | `OiSidebar` at 260dp with labels |
@@ -61,7 +61,7 @@ ObersUI adapts navigation paradigms per breakpoint:
 Spacing automatically adjusts by breakpoint:
 
 | Breakpoint | Gutter |
-|---|---|
+| --- | --- |
 | compact | 16dp |
 | medium | 24dp |
 | expanded | 32dp |

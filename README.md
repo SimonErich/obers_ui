@@ -53,7 +53,7 @@ void main() {
 ## Components
 
 | Category | Widgets |
-|----------|---------|
+| ---------- | --------- |
 | **Theme** | `OiTheme`, `OiColors`, `OiTypography`, `OiSpacing`, `OiRadius`, `OiShadows`, `OiDurations`, `OiBreakpoints` |
 | **Components** | `OiButton`, `OiCard`, `OiText`, `OiInput`, `OiCheckbox`, `OiDivider`, `OiSpacer`, `OiSurface`, `OiIconButton` |
 | **Widgets** | `OiAvatar`, `OiBadge`, `OiToggle`, `OiModal`, `OiHoverCard`, `OiEmptyState`, `OiLoadingState`, `OiErrorState` |

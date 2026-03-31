@@ -63,7 +63,7 @@ OiGrid(
 `OiSpan` supports:
 
 | Property | Description |
-|---|---|
+| --- | --- |
 | `columnSpan` | Number of columns to span |
 | `columnStart` | Explicit column start position |
 | `columnOrder` | Override visual order |

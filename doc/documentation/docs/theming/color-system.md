@@ -11,7 +11,7 @@ ObersUI's color system is built on **semantic tokens** — colors are named by p
 Each swatch is an `OiColorSwatch` with 5 variants:
 
 | Swatch | Purpose | Default (light) |
-|---|---|---|
+| --- | --- | --- |
 | `primary` | Brand / main actions | Blue (#2563EB) |
 | `accent` | Secondary emphasis | Teal (#0D9488) |
 | `success` | Positive / success states | Green (#16A34A) |
@@ -98,7 +98,7 @@ OiThemeData.light().copyWith(
 ## Built-in schemes
 
 | Factory | Description |
-|---|---|
+| --- | --- |
 | `OiColorScheme.light()` | Light theme with blue primary, grey surfaces |
 | `OiColorScheme.dark()` | Dark theme with blue primary, near-black surfaces |
 

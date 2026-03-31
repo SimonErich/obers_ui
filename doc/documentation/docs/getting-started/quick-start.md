@@ -92,7 +92,7 @@ Widget build(BuildContext context) {
 All theme tokens are available via these getters:
 
 | Extension | Returns |
-|---|---|
+| --- | --- |
 | `context.theme` | Full `OiThemeData` |
 | `context.colors` | `OiColorScheme` |
 | `context.textTheme` | `OiTextTheme` |

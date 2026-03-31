@@ -33,7 +33,7 @@ No `Theme.of(context)` wrappers needed. Just `context.colors`, `context.spacing`
 `OiThemeData` aggregates all design tokens:
 
 | Token | Class | What it controls |
-|---|---|---|
+| --- | --- | --- |
 | Colors | `OiColorScheme` | Semantic colors (primary, accent, success, warning, error, info), surfaces, text, borders |
 | Typography | `OiTextTheme` | 14 text styles (display, h1-h4, body, small, tiny, caption, code, overline, link) |
 | Spacing | `OiSpacingScale` | 6 spacing values (xs=4, sm=8, md=16, lg=24, xl=32, xxl=48) + page gutters |

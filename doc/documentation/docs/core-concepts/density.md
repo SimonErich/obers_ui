@@ -5,7 +5,7 @@ Density controls how much information fits on screen. ObersUI adapts padding, si
 ## Modes
 
 | Mode | Default on | Touch target | Typical use |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | **comfortable** | Touch devices (iOS, Android) | 48dp | Consumer apps, mobile |
 | **compact** | Desktop, web | 44dp | Standard desktop apps |
 | **dense** | — (explicit) | 44dp | Data-heavy dashboards |
