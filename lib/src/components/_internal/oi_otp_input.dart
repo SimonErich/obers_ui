@@ -49,6 +49,7 @@ class _OiOtpInputState extends State<OiOtpInput> {
     _focusNodes = List.generate(widget.length, (_) => FocusNode());
     for (var i = 0; i < widget.length; i++) {
       _controllers[i].addListener(() => _onControllerChanged(i));
+      _focusNodes[i].addListener(_onFocusChanged);
     }
   }
 
@@ -58,12 +59,18 @@ class _OiOtpInputState extends State<OiOtpInput> {
       c.dispose();
     }
     for (final n in _focusNodes) {
+      n.removeListener(_onFocusChanged);
       n.dispose();
     }
     super.dispose();
   }
 
   String get _currentValue => _controllers.map((c) => c.text).join();
+
+  void _onFocusChanged() {
+    if (!mounted) return;
+    setState(() {});
+  }
 
   void _onControllerChanged(int index) {
     final text = _controllers[index].text;
@@ -79,6 +86,9 @@ class _OiOtpInputState extends State<OiOtpInput> {
       _focusNodes[index + 1].requestFocus();
     }
 
+    if (mounted) {
+      setState(() {});
+    }
     _notifyChanged();
   }
 
