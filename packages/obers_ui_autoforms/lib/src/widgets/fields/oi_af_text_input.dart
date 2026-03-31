@@ -208,6 +208,14 @@ class _OiAfTextInputState<TField extends Enum>
     _syncTextController();
   }
 
+  @override
+  void didUpdateWidget(covariant OiAfTextInput<TField> oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.field != widget.field) {
+      _syncTextController();
+    }
+  }
+
   void _syncTextController() {
     final fieldValue = typedValue ?? '';
     if (_textController.text != fieldValue) {
