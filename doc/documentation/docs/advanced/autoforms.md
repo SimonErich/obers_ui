@@ -86,7 +86,7 @@ OiAfForm<SignupField, SignupData>(
 ### Validate Modes
 
 | Mode | When Errors Appear |
-|---|---|
+| --- | --- |
 | `disabled` | Never (manual only) |
 | `onSubmit` | Only on submit |
 | `onBlur` | When field loses focus |
@@ -163,7 +163,7 @@ addTextField(MyField.step2Email,
 ## Available Field Widgets
 
 | Widget | Wraps | Value Type |
-|---|---|---|
+| --- | --- | --- |
 | `OiAfTextInput` | `OiTextInput` | `String` |
 | `OiAfNumberInput` | `OiNumberInput` | `num` |
 | `OiAfCheckbox` | `OiCheckbox` | `bool?` |
@@ -186,7 +186,7 @@ addTextField(MyField.step2Email,
 ## Migration from OiForm
 
 | Old | New |
-|---|---|
+| --- | --- |
 | `OiForm` | `OiAfForm` |
 | `OiFormController` | `OiAfController` (subclass) |
 | `OiFormField` | `OiAfTextInput` / `OiAfSelect` / etc. |

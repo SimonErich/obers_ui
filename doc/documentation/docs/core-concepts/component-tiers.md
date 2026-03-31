@@ -28,7 +28,7 @@ Single-purpose, low-level widgets. They render one thing and do it well.
 **Examples:**
 
 | Widget | Purpose |
-|---|---|
+| --- | --- |
 | `OiTappable` | Tap handler with hover, focus, and press feedback |
 | `OiGrid` | Responsive CSS Grid-like layout |
 | `OiShimmer` | Loading shimmer animation |
@@ -47,7 +47,7 @@ Standard UI components that you'll use every day. Built from primitives, styled 
 **Examples:**
 
 | Widget | Purpose |
-|---|---|
+| --- | --- |
 | `OiButton` | Primary, secondary, outline, ghost, destructive variants |
 | `OiTextInput` | Text field with validation and formatting |
 | `OiSelect` | Dropdown select with search |
@@ -83,7 +83,7 @@ Multi-component patterns that solve complex UI problems. Built from components.
 **Examples:**
 
 | Widget | Purpose |
-|---|---|
+| --- | --- |
 | `OiTable` | Full data table with sort, filter, resize, pagination, inline edit |
 | `OiForm` | Form container with validation |
 | `OiCalendar` | Day/week/month calendar view |
@@ -104,7 +104,7 @@ Complete, feature-rich screens you can drop into your app. Built from composites
 **Examples:**
 
 | Widget | Purpose |
-|---|---|
+| --- | --- |
 | `OiFileExplorer` | Full file browser with sidebar, toolbar, grid/list views |
 | `OiChat` | Messaging interface with threads, reactions, attachments |
 | `OiDashboard` | Draggable, resizable widget grid |

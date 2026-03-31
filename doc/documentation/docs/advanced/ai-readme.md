@@ -17,7 +17,7 @@ ObersUI ships with an **AI-optimized reference document** (`AI_README.md`) desig
 
 The file lives at the project root:
 
-```
+```text
 obers_ui/
 ├── AI_README.md    ← This file
 ├── CLAUDE.md
@@ -29,7 +29,7 @@ obers_ui/
 
 Pass `AI_README.md` as context to any coding AI (Claude, GPT, Copilot, etc.) along with your design requirements:
 
-```
+```text
 "Here is the ObersUI reference: [AI_README.md contents]
 
 Build this design: [your design description]"

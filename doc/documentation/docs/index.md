@@ -12,7 +12,7 @@ ObersUI is a comprehensive, open-source Flutter UI library built for modern, com
 
 <div class="grid cards" markdown>
 
--   :material-rocket-launch:{ .lg .middle } **Getting Started**
+- :material-rocket-launch:{ .lg .middle } **Getting Started**
 
     ---
 
@@ -20,7 +20,7 @@ ObersUI is a comprehensive, open-source Flutter UI library built for modern, com
 
     [:octicons-arrow-right-24: Get started](getting-started/index.md)
 
--   :material-palette-outline:{ .lg .middle } **Theming**
+- :material-palette-outline:{ .lg .middle } **Theming**
 
     ---
 
@@ -28,21 +28,13 @@ ObersUI is a comprehensive, open-source Flutter UI library built for modern, com
 
     [:octicons-arrow-right-24: Explore theming](theming/index.md)
 
--   :material-view-grid-outline:{ .lg .middle } **Components**
+- :material-view-grid-outline:{ .lg .middle } **Components**
 
     ---
 
     Buttons, tables, charts, file explorers, kanban boards — browse the full catalog.
 
     [:octicons-arrow-right-24: Browse components](components/index.md)
-
--   :material-play-box-outline:{ .lg .middle } **Widgetbook**
-
-    ---
-
-    Interactive playground to explore every component with live controls.
-
-    [:octicons-arrow-right-24: Open Widgetbook](widgetbook.md)
 
 </div>
 
@@ -51,7 +43,7 @@ ObersUI is a comprehensive, open-source Flutter UI library built for modern, com
 ## Highlights
 
 | Feature | Details |
-|---|---|
+| --- | --- |
 | **100+ widgets** | Primitives, components, composites, and full modules |
 | **Design tokens** | Colors, typography, spacing, radius, shadows, animations |
 | **Responsive** | 5 breakpoints, adaptive layouts, density modes |
@@ -89,5 +81,4 @@ That's it. One import, one theme, one app widget. Creamy smooth.
 ## Explore more
 
 - [**API Reference**](/obers_ui/api/) — Full generated dart doc
-- [**Widgetbook**](/obers_ui/widgetbook/) — Interactive component playground
 - [**GitHub**](https://github.com/simonerich/obers_ui) — Source code & issues

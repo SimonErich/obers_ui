@@ -77,7 +77,7 @@ Children flow horizontally and wrap to the next line when they run out of space.
 ## When to use which
 
 | Widget | Use for |
-|---|---|
+| --- | --- |
 | `OiGrid` | Multi-column layouts, dashboard cards, form fields |
 | `OiRow` | Simple horizontal groups (buttons, icons, labels) |
 | `OiColumn` | Simple vertical groups (form fields, list items) |

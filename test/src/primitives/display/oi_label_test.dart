@@ -14,6 +14,13 @@ void main() {
   // ── Variant rendering ──────────────────────────────────────────────────────
 
   group('OiLabel variant rendering', () {
+    testWidgets('renders runtime variant constructor', (tester) async {
+      await tester.pumpObers(
+        const OiLabel.variant('Hello', variant: OiLabelVariant.h2),
+      );
+      expect(find.text('Hello'), findsOneWidget);
+    });
+
     testWidgets('renders display variant', (tester) async {
       await tester.pumpObers(const OiLabel.display('Hello'));
       expect(find.text('Hello'), findsOneWidget);

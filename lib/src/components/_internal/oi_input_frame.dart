@@ -74,8 +74,7 @@ class OiInputFrame extends StatelessWidget {
       bgColor = ti?.backgroundColor ?? colors.surface;
     }
 
-    final resolvedRadius =
-        border.borderRadius ?? BorderRadius.circular(8);
+    final resolvedRadius = border.borderRadius ?? BorderRadius.circular(8);
 
     final surfaceWidget = _AnimatedInputSurface(
       borderColor: border.color,
@@ -185,48 +184,88 @@ class _AnimatedInputSurfaceState
 
   @override
   void forEachTween(TweenVisitor<dynamic> visitor) {
-    _borderColorTween = visitor(
-      _borderColorTween,
-      widget.borderColor,
-      (dynamic value) => ColorTween(begin: value as Color),
-    ) as ColorTween?;
-    _borderWidthTween = visitor(
-      _borderWidthTween,
-      widget.borderWidth,
-      (dynamic value) => Tween<double>(begin: value as double),
-    ) as Tween<double>?;
-    _borderRadiusTween = visitor(
-      _borderRadiusTween,
-      widget.borderRadius,
-      (dynamic value) => BorderRadiusTween(begin: value as BorderRadius),
-    ) as BorderRadiusTween?;
-    _bgColorTween = visitor(
-      _bgColorTween,
-      widget.backgroundColor,
-      (dynamic value) => ColorTween(begin: value as Color),
-    ) as ColorTween?;
+    _borderColorTween =
+        visitor(
+              _borderColorTween,
+              widget.borderColor,
+              (dynamic value) => ColorTween(begin: value as Color),
+            )
+            as ColorTween?;
+    _borderWidthTween =
+        visitor(
+              _borderWidthTween,
+              widget.borderWidth,
+              (dynamic value) => Tween<double>(begin: value as double),
+            )
+            as Tween<double>?;
+    _borderRadiusTween =
+        visitor(
+              _borderRadiusTween,
+              widget.borderRadius,
+              (dynamic value) =>
+                  BorderRadiusTween(begin: value as BorderRadius),
+            )
+            as BorderRadiusTween?;
+    _bgColorTween =
+        visitor(
+              _bgColorTween,
+              widget.backgroundColor,
+              (dynamic value) => ColorTween(begin: value as Color),
+            )
+            as ColorTween?;
   }
 
   @override
   Widget build(BuildContext context) {
     final color = _borderColorTween?.evaluate(animation) ?? widget.borderColor;
-    final width =
-        _borderWidthTween?.evaluate(animation) ?? widget.borderWidth;
+    final width = _borderWidthTween?.evaluate(animation) ?? widget.borderWidth;
     final radius =
         _borderRadiusTween?.evaluate(animation) ?? widget.borderRadius;
     final bgColor =
         _bgColorTween?.evaluate(animation) ?? widget.backgroundColor;
 
-    return Container(
-      decoration: BoxDecoration(
-        color: bgColor,
-        borderRadius: radius,
-        border: width > 0
-            ? Border.all(color: color, width: width)
-            : null,
+    return CustomPaint(
+      foregroundPainter: _InputFrameBorderPainter(
+        color: color,
+        width: width,
+        radius: radius,
       ),
-      padding: widget.padding,
-      child: widget.child,
+      child: DecoratedBox(
+        decoration: BoxDecoration(color: bgColor, borderRadius: radius),
+        child: Padding(padding: widget.padding, child: widget.child),
+      ),
     );
+  }
+}
+
+class _InputFrameBorderPainter extends CustomPainter {
+  const _InputFrameBorderPainter({
+    required this.color,
+    required this.width,
+    required this.radius,
+  });
+
+  final Color color;
+  final double width;
+  final BorderRadius radius;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    if (width <= 0) return;
+    final strokePaint = Paint()
+      ..color = color
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = width;
+    final rect = Offset.zero & size;
+    // Draw the stroke fully inside to avoid visual size jumps on width changes.
+    final rrect = radius.toRRect(rect).deflate(width / 2);
+    canvas.drawRRect(rrect, strokePaint);
+  }
+
+  @override
+  bool shouldRepaint(_InputFrameBorderPainter oldDelegate) {
+    return oldDelegate.color != color ||
+        oldDelegate.width != width ||
+        oldDelegate.radius != radius;
   }
 }

@@ -16,5 +16,3 @@ Welcome to ObersUI! This section will get you from zero to a running app with cr
 
 After that, head to [Core Concepts](../core-concepts/index.md) to learn about the architecture, or jump straight into the [Component Catalog](../components/index.md) if you prefer to explore by doing.
 
-!!! tip "Interactive exploration"
-    The [Widgetbook](../widgetbook.md) lets you play with every component in the browser — great for discovering what's available before writing any code.

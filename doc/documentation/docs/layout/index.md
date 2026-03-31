@@ -5,7 +5,7 @@ ObersUI provides a set of layout primitives that make building responsive, well-
 ## Layout widgets
 
 | Widget | Purpose | Guide |
-|---|---|---|
+| --- | --- | --- |
 | `OiGrid` | Responsive multi-column grid with span control | [Grid](grid.md) |
 | `OiPage` | Max-width centered page container | [Page & Section](page-and-section.md) |
 | `OiSection` | Content group with header, aside layout, collapse | [Page & Section](page-and-section.md) |

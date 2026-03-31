@@ -21,7 +21,7 @@ That's it. No per-widget configuration needed.
 ## Available drivers
 
 | Driver | Storage | Use case |
-|---|---|---|
+| --- | --- | --- |
 | `OiLocalStorageDriver` | `SharedPreferences` (mobile) / `localStorage` (web) | Production apps |
 | `OiInMemorySettingsDriver` | RAM only | Testing, prototyping |
 
@@ -67,7 +67,7 @@ class ApiSettingsDriver extends OiSettingsDriver {
 ## What gets persisted
 
 | Widget | Persisted settings |
-|---|---|
+| --- | --- |
 | `OiTable` | Column order, widths, visibility, sort, filters, page size, groups |
 | `OiFileExplorer` | View mode, sort, sidebar state, favorites, recent paths |
 | `OiKanban` | Column order, collapsed columns, WIP limits |

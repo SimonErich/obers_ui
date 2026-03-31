@@ -40,7 +40,7 @@ dependencies:
 ## Requirements
 
 | Requirement | Minimum version |
-|---|---|
+| --- | --- |
 | Flutter | 3.41.0 |
 | Dart | 3.11.0 |
 

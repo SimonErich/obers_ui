@@ -22,7 +22,7 @@ OiThemeData.light(
 ## Available component themes
 
 | Widget | Theme class |
-|---|---|
+| --- | --- |
 | `OiButton` | `OiButtonThemeData` |
 | `OiTextInput` | `OiTextInputThemeData` |
 | `OiSelect` | `OiSelectThemeData` |

@@ -5,7 +5,7 @@ ObersUI ships with a complete type scale — 14 semantic text styles covering ev
 ## The type scale
 
 | Style | Size | Weight | Use case |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `display` | 56px | Bold | Hero / marketing text |
 | `h1` | 40px | Bold | Page titles |
 | `h2` | 32px | Semi-bold | Section headers |
@@ -66,7 +66,16 @@ OiThemeData.light().copyWith(
 For convenience, use the `OiLabel` primitive:
 
 ```dart
-OiLabel('Section Title', variant: OiLabelVariant.h3)
+OiLabel.h3('Section Title')
+OiLabel.variant('Dynamic title', variant: OiLabelVariant.h3)
 ```
 
 It reads the correct style from the theme automatically.
+
+## Variant usage guidance
+
+- Use `display` for hero sections or marketing moments.
+- Use `h1` for page-level titles, `h2`/`h3` for section headings, and `h4` for card titles.
+- Use `body` as default paragraph text and `bodyStrong` only for emphasis inside body copy.
+- Use `small`/`smallStrong` for helper and supporting text, and `tiny` only in dense UIs.
+- Use `overline` for compact all-caps labels and `caption` for media descriptions.

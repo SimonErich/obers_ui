@@ -231,8 +231,9 @@ class _OiFeedbackSheetState extends State<OiFeedbackSheet> {
             final selected = _selectedCategory == cat;
             final bg = selected ? colors.primary.base : colors.surface;
             final borderColor = selected ? colors.primary.base : colors.border;
-            final textColor =
-                selected ? colors.primary.foreground : colors.text;
+            final textColor = selected
+                ? colors.primary.foreground
+                : colors.text;
 
             return Semantics(
               button: true,
@@ -252,7 +253,6 @@ class _OiFeedbackSheetState extends State<OiFeedbackSheet> {
                     borderRadius: radius.md,
                     border: Border.all(
                       color: borderColor,
-                      width: selected ? 2 : 1,
                     ),
                   ),
                   child: OiLabel.small(_categoryLabel(cat), color: textColor),

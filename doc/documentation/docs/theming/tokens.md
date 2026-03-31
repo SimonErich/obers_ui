@@ -7,7 +7,7 @@ Beyond colors and typography, ObersUI provides tokens for every visual dimension
 The spacing scale follows a **4dp base grid** with doubling progression:
 
 | Token | Value | Use case |
-|---|---|---|
+| --- | --- | --- |
 | `xs` | 4dp | Tight internal gaps |
 | `sm` | 8dp | Element gaps, compact padding |
 | `md` | 16dp | Default padding, standard gaps |
@@ -40,7 +40,7 @@ OiThemeData.light().copyWith(
 For layout code where you need **compile-time constants without a BuildContext**, obers_ui provides a set of top-level constants inspired by Tailwind CSS's spacing scale:
 
 | Family | Example | Expands to |
-|---|---|---|
+| --- | --- | --- |
 | Size values | `s16` | `16.0` (double) |
 | Vertical gaps | `gapH16` | `const SizedBox(height: 16)` |
 | Horizontal gaps | `gapW16` | `const SizedBox(width: 16)` |
@@ -82,7 +82,7 @@ Available sizes: `s0` `s1` `s2` `s4` `s6` `s8` `s10` `s12` `s14` `s16` `s20` `s2
 Radius tokens come in a scale with a **preference** that shifts the entire scale:
 
 | Preference | Effect |
-|---|---|
+| --- | --- |
 | `OiRadiusPreference.sharp` | Minimal rounding |
 | `OiRadiusPreference.medium` | Balanced (default) |
 | `OiRadiusPreference.rounded` | Generous rounding |
@@ -132,7 +132,7 @@ These are consumed automatically by `OiTappable` and all interactive widgets. Yo
 `OiAnimationConfig` provides duration tokens:
 
 | Token | Duration | Use case |
-|---|---|---|
+| --- | --- | --- |
 | `fast` | 150ms | Micro-interactions (hover, toggle) |
 | `normal` | 250ms | Standard transitions |
 | `slow` | 400ms | Complex animations (page transitions) |

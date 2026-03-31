@@ -5,7 +5,7 @@ ObersUI's theming system is designed with a simple philosophy: **easy to start, 
 ## Choose your level
 
 | Level | Effort | For whom |
-|---|---|---|
+| --- | --- | --- |
 | [**Quick Brand Setup**](quick-brand.md) | One line | "Just make it match my brand color" |
 | [**Color System**](color-system.md) | Token overrides | "I want specific colors" |
 | [**Typography**](typography.md) | Font swap | "I want my own fonts" |
@@ -15,7 +15,7 @@ ObersUI's theming system is designed with a simple philosophy: **easy to start, 
 
 ## Architecture at a glance
 
-```
+```text
 OiThemeData
 ├── OiColorScheme        (semantic colors)
 ├── OiTextTheme          (14 text styles)
