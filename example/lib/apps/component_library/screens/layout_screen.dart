@@ -513,11 +513,9 @@ class _PanelDemoState extends State<_PanelDemo> {
           child: Stack(
             alignment: Alignment.center,
             children: [
-              UnconstrainedBox(
-                child: OiButton.primary(
-                  label: _open ? 'Close Panel' : 'Open Panel',
-                  onTap: () => setState(() => _open = !_open),
-                ),
+              OiButton.primary(
+                label: _open ? 'Close Panel' : 'Open Panel',
+                onTap: () => setState(() => _open = !_open),
               ),
               OiPanel(
                 label: 'Demo panel',

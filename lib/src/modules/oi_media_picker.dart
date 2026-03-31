@@ -333,15 +333,13 @@ class _OiMediaPickerState extends State<OiMediaPicker> {
           SliverToBoxAdapter(
             child: Padding(
               padding: EdgeInsets.symmetric(vertical: spacing.md),
-              child: Center(
-                child: OiButton.ghost(
-                  label: 'Load more',
-                  icon: OiIcons.plus,
-                  semanticLabel: 'Load more gallery items',
-                  onTap: widget.onLoadMoreGallery != null
-                      ? () => widget.onLoadMoreGallery!()
-                      : null,
-                ),
+              child: OiButton.ghost(
+                label: 'Load more',
+                icon: OiIcons.plus,
+                semanticLabel: 'Load more gallery items',
+                onTap: widget.onLoadMoreGallery != null
+                    ? () => widget.onLoadMoreGallery!()
+                    : null,
               ),
             ),
           ),

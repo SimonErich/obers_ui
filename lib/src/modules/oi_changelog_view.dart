@@ -331,6 +331,7 @@ class _OiChangelogViewState extends State<OiChangelogView> {
         if (remaining > 0 && !_showAll)
           OiButton.ghost(
             label: 'Show older versions ($remaining more)',
+            fullWidth: true,
             onTap: () {
               setState(() {
                 _showAll = true;

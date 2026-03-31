@@ -296,14 +296,12 @@ class _OiArrayInputState<T> extends State<OiArrayInput<T>> {
             Center(
               child: Padding(
                 padding: const EdgeInsets.only(top: 8),
-                child: UnconstrainedBox(
-                  child: OiButton.secondary(
-                    label: widget.addLabel,
-                    icon: OiIcons.plus,
-                    size: OiButtonSize.small,
-                    onTap: _handleAdd,
-                    semanticLabel: widget.addLabel,
-                  ),
+                child: OiButton.secondary(
+                  label: widget.addLabel,
+                  icon: OiIcons.plus,
+                  size: OiButtonSize.small,
+                  onTap: _handleAdd,
+                  semanticLabel: widget.addLabel,
                 ),
               ),
             ),

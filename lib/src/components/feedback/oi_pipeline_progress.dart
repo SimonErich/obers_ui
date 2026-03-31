@@ -279,12 +279,10 @@ class OiPipelineProgress extends StatelessWidget {
                   SizedBox(height: spacing.sm),
                   Align(
                     widthFactor: 1,
-                    child: UnconstrainedBox(
-                      child: OiButton.outline(
-                        label: 'Retry',
-                        onTap: onRetry,
-                        size: OiButtonSize.small,
-                      ),
+                    child: OiButton.outline(
+                      label: 'Retry',
+                      onTap: onRetry,
+                      size: OiButtonSize.small,
                     ),
                   ),
                 ],

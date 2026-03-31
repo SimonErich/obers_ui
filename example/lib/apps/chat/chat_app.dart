@@ -418,10 +418,11 @@ class _ChatAppState extends State<ChatApp> {
                     horizontal: spacing.sm,
                     vertical: spacing.xs,
                   ),
-                  child: OiButton.ghost(
+                  child: OiButton.outline(
                     label: 'New Channel',
                     icon: OiIcons.plus,
                     size: OiButtonSize.small,
+                    fullWidth: true,
                     onTap: () {
                       OiToast.show(
                         context,
