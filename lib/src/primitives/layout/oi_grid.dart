@@ -109,6 +109,7 @@ class OiGrid extends StatelessWidget {
     this.minColumnWidth,
     this.gap = const OiResponsive<double>(0),
     this.rowGap,
+    this.stretchRows = false,
     this.scale = OiBreakpointScale.defaultScale,
     super.key,
   }) : _containerRelative = false,
@@ -134,6 +135,7 @@ class OiGrid extends StatelessWidget {
     this.minColumnWidth,
     this.gap = const OiResponsive<double>(0),
     this.rowGap,
+    this.stretchRows = false,
     this.scale = OiBreakpointScale.defaultScale,
     super.key,
   }) : breakpoint = null,
@@ -156,6 +158,11 @@ class OiGrid extends StatelessWidget {
 
   /// Vertical gap between rows. When null, [gap] is used for both axes.
   final OiResponsive<double>? rowGap;
+
+  /// When `true`, children are re-laid out with tight height constraints
+  /// matching their row height so that all items in a row share the same
+  /// height.
+  final bool stretchRows;
 
   /// The active breakpoint. Null when [_containerRelative] is true.
   ///
@@ -184,7 +191,7 @@ class OiGrid extends StatelessWidget {
     if (_containerRelative) {
       return _buildContainerRelative(context);
     }
-    return _buildGrid(breakpoint: breakpoint);
+    return _buildGrid(breakpoint: breakpoint, stretchRows: stretchRows);
   }
 
   /// Builds a container-relative grid.
@@ -199,6 +206,7 @@ class OiGrid extends StatelessWidget {
     final grid = _buildGrid(
       containerRelative: true,
       ancestorContainerWidth: ancestorWidth,
+      stretchRows: stretchRows,
     );
 
     // Only the outermost container-relative grid publishes its width
@@ -222,6 +230,7 @@ class OiGrid extends StatelessWidget {
     OiBreakpoint? breakpoint,
     bool containerRelative = false,
     double? ancestorContainerWidth,
+    bool stretchRows = false,
   }) {
     // Wrap each child in a _OiGridSlot ParentDataWidget carrying the
     // responsive span metadata. The render object resolves these during
@@ -248,6 +257,7 @@ class OiGrid extends StatelessWidget {
       minColumnWidth: minColumnWidth,
       gap: gap,
       rowGap: rowGap,
+      stretchRows: stretchRows,
       scale: scale,
       breakpoint: breakpoint,
       containerRelative: containerRelative,
@@ -356,6 +366,7 @@ class _OiGridLayout extends MultiChildRenderObjectWidget {
     required this.minColumnWidth,
     required this.gap,
     required this.rowGap,
+    required this.stretchRows,
     required this.scale,
     required this.breakpoint,
     required this.containerRelative,
@@ -367,6 +378,7 @@ class _OiGridLayout extends MultiChildRenderObjectWidget {
   final OiResponsive<double>? minColumnWidth;
   final OiResponsive<double> gap;
   final OiResponsive<double>? rowGap;
+  final bool stretchRows;
   final OiBreakpointScale scale;
   final OiBreakpoint? breakpoint;
   final bool containerRelative;
@@ -379,6 +391,7 @@ class _OiGridLayout extends MultiChildRenderObjectWidget {
       minColumnWidth: minColumnWidth,
       gap: gap,
       rowGap: rowGap,
+      stretchRows: stretchRows,
       scale: scale,
       breakpoint: breakpoint,
       containerRelative: containerRelative,
@@ -393,6 +406,7 @@ class _OiGridLayout extends MultiChildRenderObjectWidget {
       ..minColumnWidth = minColumnWidth
       ..gap = gap
       ..rowGap = rowGap
+      ..stretchRows = stretchRows
       ..scale = scale
       ..breakpoint = breakpoint
       ..containerRelative = containerRelative
@@ -427,6 +441,7 @@ class _RenderOiGrid extends RenderBox
     required OiResponsive<double>? minColumnWidth,
     required OiResponsive<double> gap,
     required OiResponsive<double>? rowGap,
+    required bool stretchRows,
     required OiBreakpointScale scale,
     required OiBreakpoint? breakpoint,
     required bool containerRelative,
@@ -435,6 +450,7 @@ class _RenderOiGrid extends RenderBox
        _minColumnWidth = minColumnWidth,
        _gap = gap,
        _rowGap = rowGap,
+       _stretchRows = stretchRows,
        _scale = scale,
        _breakpoint = breakpoint,
        _containerRelative = containerRelative,
@@ -471,6 +487,14 @@ class _RenderOiGrid extends RenderBox
   set rowGap(OiResponsive<double>? value) {
     if (_rowGap == value) return;
     _rowGap = value;
+    markNeedsLayout();
+  }
+
+  bool get stretchRows => _stretchRows;
+  bool _stretchRows;
+  set stretchRows(bool value) {
+    if (_stretchRows == value) return;
+    _stretchRows = value;
     markNeedsLayout();
   }
 
@@ -644,6 +668,24 @@ class _RenderOiGrid extends RenderBox
         for (var r = p.row; r < p.row + p.rowSpan; r++) {
           rowHeights[r] += perRow;
         }
+      }
+    }
+
+    // Stretch pass: re-layout children with tight height matching their row.
+    if (_stretchRows) {
+      for (final p in placements) {
+        final childWidth =
+            p.effectiveSpan * unitWidth +
+            math.max(0, p.effectiveSpan - 1) * resolvedGap;
+        var targetHeight = 0.0;
+        for (var r = p.row; r < p.row + p.rowSpan; r++) {
+          targetHeight += rowHeights[r];
+          if (r < p.row + p.rowSpan - 1) targetHeight += effectiveRowGap;
+        }
+        p.renderBox.layout(
+          BoxConstraints.tight(Size(childWidth, targetHeight)),
+          parentUsesSize: true,
+        );
       }
     }
 

@@ -191,14 +191,14 @@ class OiSegmentedControl<T> extends StatelessWidget {
       final bgColor =
           isSelected ? colors.primary.muted : colors.surface;
       final textColor =
-          isSelected ? colors.primary.base : colors.text;
+          isSelected ? colors.primary.foreground : colors.text;
 
       // Build label content.
       Widget labelWidget = Text(
         segment.label,
         style: TextStyle(
           fontSize: fontSize,
-          fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+          fontWeight: FontWeight.w400,
           color: textColor,
         ),
         maxLines: 1,

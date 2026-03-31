@@ -177,7 +177,10 @@ class OiOverlays extends InheritedWidget {
   bool updateShouldNotify(OiOverlays oldWidget) => service != oldWidget.service;
 }
 
-/// Internal host widget that creates the [Overlay] and attaches the service.
+/// Internal host widget that provides overlay capabilities to the app.
+///
+/// Uses a [Stack] to layer the main content with a dedicated [Overlay]
+/// for dynamically-shown overlays (dialogs, toasts, command bar, etc.).
 ///
 /// This widget is rendered internally by [OiApp] and is not exported.
 class _OiOverlaysHost extends StatefulWidget {
@@ -192,18 +195,31 @@ class _OiOverlaysHost extends StatefulWidget {
 
 class _OiOverlaysHostState extends State<_OiOverlaysHost> {
   late final GlobalKey<OverlayState> _overlayKey;
+  late final OverlayEntry _contentEntry;
 
   @override
   void initState() {
     super.initState();
-    _overlayKey = GlobalKey<OverlayState>();
+    _overlayKey = GlobalKey<OverlayState>(debugLabel: 'OiOverlaysHost');
+    _contentEntry = OverlayEntry(builder: (_) => widget.child);
+  }
+
+  @override
+  void didUpdateWidget(_OiOverlaysHost oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.child != widget.child) {
+      _contentEntry.markNeedsBuild();
+    }
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    // Attach once the overlay is mounted
+    // Rebuild the content entry so it picks up changes from
+    // InheritedWidgets above (e.g. MediaQuery, Directionality).
+    _contentEntry.markNeedsBuild();
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
       final state = _overlayKey.currentState;
       if (state != null) {
         widget.service._overlayState = state;
@@ -217,7 +233,7 @@ class _OiOverlaysHostState extends State<_OiOverlaysHost> {
       service: widget.service,
       child: Overlay(
         key: _overlayKey,
-        initialEntries: [OverlayEntry(builder: (_) => widget.child)],
+        initialEntries: [_contentEntry],
       ),
     );
   }

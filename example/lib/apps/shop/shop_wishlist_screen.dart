@@ -13,6 +13,7 @@ class ShopWishlistScreen extends StatelessWidget {
     required this.cartSummary,
     required this.onViewCart,
     required this.onCheckout,
+    required this.onCartQuantityChange,
     super.key,
   });
 
@@ -42,6 +43,9 @@ class ShopWishlistScreen extends StatelessWidget {
 
   /// Called when the user taps checkout.
   final VoidCallback onCheckout;
+
+  /// Called when the user changes the quantity of a cart item.
+  final void Function(({Object productKey, int quantity})) onCartQuantityChange;
 
   @override
   Widget build(BuildContext context) {
@@ -104,6 +108,7 @@ class ShopWishlistScreen extends StatelessWidget {
                 label: 'Shopping cart',
                 onViewCart: onViewCart,
                 onCheckout: onCheckout,
+                onQuantityChange: onCartQuantityChange,
               ),
             ],
           ),

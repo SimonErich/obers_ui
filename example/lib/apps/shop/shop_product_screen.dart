@@ -16,6 +16,7 @@ class ShopProductScreen extends StatefulWidget {
     required this.cartSummary,
     required this.onViewCart,
     required this.onCheckout,
+    required this.onCartQuantityChange,
     required this.wishlistCount,
     required this.onViewWishlist,
     super.key,
@@ -31,6 +32,7 @@ class ShopProductScreen extends StatefulWidget {
   final OiCartSummary cartSummary;
   final VoidCallback onViewCart;
   final VoidCallback onCheckout;
+  final void Function(({Object productKey, int quantity})) onCartQuantityChange;
   final int wishlistCount;
   final VoidCallback onViewWishlist;
 
@@ -195,6 +197,7 @@ class _ShopProductScreenState extends State<ShopProductScreen> {
                 label: 'Shopping cart',
                 onViewCart: widget.onViewCart,
                 onCheckout: widget.onCheckout,
+                onQuantityChange: widget.onCartQuantityChange,
               ),
             ],
           ),
