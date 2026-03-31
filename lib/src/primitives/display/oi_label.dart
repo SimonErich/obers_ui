@@ -37,6 +37,7 @@ import 'package:obers_ui/src/primitives/clipboard/oi_copyable.dart';
 /// OiLabel.body('Hello world')
 /// OiLabel.display('Hero text')
 /// OiLabel.small('Secondary info')
+/// OiLabel.variant('Dynamic title', variant: OiLabelVariant.h2)
 /// ```
 ///
 /// {@category Primitives}
@@ -59,6 +60,38 @@ class OiLabel extends StatelessWidget {
   });
 
   // ── Named variant constructors ────────────────────────────────────────────
+
+  /// Creates a label from a runtime [variant].
+  ///
+  /// Useful when a style is selected dynamically from configuration or user
+  /// input and cannot be known at compile time.
+  const OiLabel.variant(
+    String text, {
+    required OiLabelVariant variant,
+    int? maxLines,
+    TextOverflow? overflow,
+    TextAlign? textAlign,
+    bool copyable = false,
+    bool selectable = false,
+    String? semanticsLabel,
+    Color? color,
+    TextDecoration? decoration,
+    Color? decorationColor,
+    Key? key,
+  }) : this._(
+         variant: variant,
+         text: text,
+         maxLines: maxLines,
+         overflow: overflow,
+         textAlign: textAlign,
+         copyable: copyable,
+         selectable: selectable,
+         semanticsLabel: semanticsLabel,
+         color: color,
+         decoration: decoration,
+         decorationColor: decorationColor,
+         key: key,
+       );
 
   /// Creates a display label — hero / marketing display text.
   const OiLabel.display(
@@ -546,8 +579,9 @@ class OiLabel extends StatelessWidget {
     final scale = _scaleFactor(context);
 
     var style = baseStyle;
-    if (scale != 1 && baseStyle.fontSize != null) {
-      style = style.copyWith(fontSize: baseStyle.fontSize! * scale);
+    final baseFontSize = baseStyle.fontSize;
+    if (scale != 1 && baseFontSize != null) {
+      style = style.copyWith(fontSize: baseFontSize * scale);
     }
 
     // Apply theme text color when no explicit color is set and the text style
@@ -585,11 +619,7 @@ class OiLabel extends StatelessWidget {
     }
 
     if (selectable) {
-      textWidget = SelectableRegion(
-        focusNode: FocusNode(),
-        selectionControls: emptyTextSelectionControls,
-        child: textWidget,
-      );
+      textWidget = _OiSelectableTextRegion(child: textWidget);
     }
 
     if (copyable) {
@@ -604,6 +634,41 @@ class OiLabel extends StatelessWidget {
     }
 
     return textWidget;
+  }
+}
+
+class _OiSelectableTextRegion extends StatefulWidget {
+  const _OiSelectableTextRegion({required this.child});
+
+  final Widget child;
+
+  @override
+  State<_OiSelectableTextRegion> createState() =>
+      _OiSelectableTextRegionState();
+}
+
+class _OiSelectableTextRegionState extends State<_OiSelectableTextRegion> {
+  late final FocusNode _focusNode;
+
+  @override
+  void initState() {
+    super.initState();
+    _focusNode = FocusNode();
+  }
+
+  @override
+  void dispose() {
+    _focusNode.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SelectableRegion(
+      focusNode: _focusNode,
+      selectionControls: emptyTextSelectionControls,
+      child: widget.child,
+    );
   }
 }
 
