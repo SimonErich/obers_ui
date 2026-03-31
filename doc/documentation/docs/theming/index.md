@@ -15,7 +15,7 @@ ObersUI's theming system is designed with a simple philosophy: **easy to start, 
 
 ## Architecture at a glance
 
-```
+```text
 OiThemeData
 ├── OiColorScheme        (semantic colors)
 ├── OiTextTheme          (14 text styles)

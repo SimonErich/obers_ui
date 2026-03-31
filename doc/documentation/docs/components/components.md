@@ -1484,6 +1484,7 @@ OiPriceTag(
 ```
 
 **Special states:**
+
 - Zero price shows "Free" in success color
 - Negative prices shown in success color
 - Compare-at price shown with strikethrough when greater than current price

@@ -14,7 +14,7 @@ That's the only import you need. All widgets, tokens, utilities, and models are 
 
 ## Source layout
 
-```
+```text
 lib/
 ├── obers_ui.dart              # Barrel export — import this
 └── src/
