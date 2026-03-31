@@ -8,7 +8,6 @@ Each tier page includes:
 
 - A **complete table** of all widgets in that tier with one-line descriptions
 - **Expanded sections** for the most commonly used widgets with code examples
-- Links to the **Widgetbook** for interactive exploration
 - Links to the **API docs** for full parameter reference
 
 ## Tiers at a glance
@@ -32,5 +31,3 @@ Each tier page includes:
 
 **"I need drag and drop"** → [Primitives](primitives.md) → Drag & Drop section
 
-!!! tip "Widgetbook"
-    The fastest way to explore components is the [Widgetbook](../widgetbook.md) — an interactive playground where you can see every widget with live controls.

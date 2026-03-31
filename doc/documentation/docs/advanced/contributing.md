@@ -39,7 +39,6 @@ ObersUI uses [very_good_analysis](https://pub.dev/packages/very_good_analysis) f
 5. **Export**: Add to `lib/obers_ui.dart` barrel file
 6. **Write tests**: `test/src/components/<category>/oi_<name>_test.dart`
 7. **Add golden test**: `test/src/golden/oi_<name>_golden_test.dart`
-8. **Add to Widgetbook**: `widgetbook/lib/components/<category>/oi_<name>_use_case.dart`
 
 ### Component template
 
