@@ -187,7 +187,7 @@ abstract final class OiAfValidators {
     String? message,
   }) =>
       (ctx) {
-        final v = ctx.value;
+        final v = ctx.value?.trim();
         if (v == null || v.isEmpty) return null;
         if (!_emailRegex.hasMatch(v)) {
           return message ?? 'Please enter a valid email address.';

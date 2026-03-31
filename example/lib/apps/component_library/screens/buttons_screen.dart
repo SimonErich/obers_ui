@@ -507,28 +507,22 @@ class _ButtonVariantShowcase extends StatelessWidget {
           crossAxisAlignment: WrapCrossAlignment.center,
           children: [
             // Text only
-            IntrinsicWidth(
-              child: builder(label: 'Button', onTap: () {}),
-            ),
+            builder(label: 'Button', onTap: () {}),
             // Leading icon
-            IntrinsicWidth(
-              child: builder(
-                label: 'Button',
-                icon: OiIcons.settings,
-                onTap: () {},
-              ),
+            builder(
+              label: 'Button',
+              icon: OiIcons.settings,
+              onTap: () {},
             ),
             // Trailing icon
-            IntrinsicWidth(
-              child: builder(
-                label: 'Button',
-                icon: OiIcons.arrowRight,
-                iconPosition: OiIconPosition.trailing,
-                onTap: () {},
-              ),
+            builder(
+              label: 'Button',
+              icon: OiIcons.arrowRight,
+              iconPosition: OiIconPosition.trailing,
+              onTap: () {},
             ),
             // Disabled
-            IntrinsicWidth(child: builder(label: 'Disabled', enabled: false)),
+            builder(label: 'Disabled', enabled: false),
           ],
         ),
         SizedBox(height: spacing.sm),
@@ -565,52 +559,40 @@ class _ButtonSizesShowcase extends StatelessWidget {
         children: [
           OiLabel.small(entry.label, color: colors.textMuted),
           SizedBox(height: spacing.sm),
-          IntrinsicWidth(
-            child: OiButton.primary(
-              label: 'Button',
-              size: entry.size,
-              onTap: () {},
-            ),
+          OiButton.primary(
+            label: 'Button',
+            size: entry.size,
+            onTap: () {},
           ),
           SizedBox(height: spacing.sm),
-          IntrinsicWidth(
-            child: OiButton.secondary(
-              label: 'Button',
-              size: entry.size,
-              onTap: () {},
-            ),
+          OiButton.secondary(
+            label: 'Button',
+            size: entry.size,
+            onTap: () {},
           ),
           SizedBox(height: spacing.sm),
-          IntrinsicWidth(
-            child: OiButton.outline(
-              label: 'Button',
-              size: entry.size,
-              onTap: () {},
-            ),
+          OiButton.outline(
+            label: 'Button',
+            size: entry.size,
+            onTap: () {},
           ),
           SizedBox(height: spacing.sm),
-          IntrinsicWidth(
-            child: OiButton.ghost(
-              label: 'Button',
-              size: entry.size,
-              onTap: () {},
-            ),
+          OiButton.ghost(
+            label: 'Button',
+            size: entry.size,
+            onTap: () {},
           ),
           SizedBox(height: spacing.sm),
-          IntrinsicWidth(
-            child: OiButton.destructive(
-              label: 'Button',
-              size: entry.size,
-              onTap: () {},
-            ),
+          OiButton.destructive(
+            label: 'Button',
+            size: entry.size,
+            onTap: () {},
           ),
           SizedBox(height: spacing.sm),
-          IntrinsicWidth(
-            child: OiButton.soft(
-              label: 'Button',
-              size: entry.size,
-              onTap: () {},
-            ),
+          OiButton.soft(
+            label: 'Button',
+            size: entry.size,
+            onTap: () {},
           ),
         ],
       );

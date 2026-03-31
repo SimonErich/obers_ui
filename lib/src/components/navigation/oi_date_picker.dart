@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/src/components/navigation/oi_month_picker.dart';
 import 'package:obers_ui/src/components/overlays/oi_dialog_shell.dart';
 import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
@@ -7,20 +8,6 @@ import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
 // Weekday abbreviations, index 0=Monday ... 6=Sunday (matches DateTime.weekday-1).
 const List<String> _kWeekdays = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'];
 
-const List<String> _kMonths = [
-  'January',
-  'February',
-  'March',
-  'April',
-  'May',
-  'June',
-  'July',
-  'August',
-  'September',
-  'October',
-  'November',
-  'December',
-];
 
 /// A calendar date picker with optional date-range selection.
 ///
@@ -109,8 +96,10 @@ class OiDatePicker extends StatefulWidget {
     return OiDialogShell.show<DateTime>(
       context: context,
       semanticLabel: semanticLabel,
+      width: 350,
+      initialFocus: false,
       builder: (close) => Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(10),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -251,6 +240,23 @@ class _OiDatePickerState extends State<OiDatePicker> {
   static bool _sameDay(DateTime a, DateTime b) =>
       a.year == b.year && a.month == b.month && a.day == b.day;
 
+  Future<void> _openMonthPicker() async {
+    final result = await OiMonthPicker.show(
+      context,
+      initialValue: OiMonth(
+        year: _effectiveDisplayMonth.year,
+        month: _effectiveDisplayMonth.month,
+      ),
+    );
+    if (result == null) return;
+    final target = DateTime(result.year, result.month);
+    if (_isControlled) {
+      widget.onDisplayMonthChanged?.call(target);
+    } else {
+      setState(() => _displayMonth = target);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
@@ -269,8 +275,10 @@ class _OiDatePickerState extends State<OiDatePicker> {
       0,
     ).day;
 
-    // Build the 6-row grid cells.
-    const totalCells = 42; // 6 rows × 7
+    // Build grid cells — only as many rows as needed.
+    final totalDays = startOffset + daysInMonth;
+    final rowCount = (totalDays / 7).ceil();
+    final totalCells = rowCount * 7;
     final cells = <Widget>[];
     for (var i = 0; i < totalCells; i++) {
       final dayNum = i - startOffset + 1;
@@ -300,7 +308,7 @@ class _OiDatePickerState extends State<OiDatePicker> {
         margin: const EdgeInsets.all(2),
         decoration: BoxDecoration(
           color: cellBgColor,
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(5),
         ),
         child: Stack(
           alignment: Alignment.center,
@@ -308,7 +316,7 @@ class _OiDatePickerState extends State<OiDatePicker> {
             Text(
               '$dayNum',
               style: TextStyle(
-                fontSize: 14,
+                fontSize: 13,
                 fontWeight: selected || endpoint
                     ? FontWeight.w600
                     : FontWeight.w400,
@@ -317,8 +325,8 @@ class _OiDatePickerState extends State<OiDatePicker> {
             ),
             if (isToday && !selected && !endpoint)
               Positioned(
-                top: 4,
-                right: 4,
+                top: 3,
+                right: 3,
                 child: Container(
                   width: 5,
                   height: 5,
@@ -350,39 +358,35 @@ class _OiDatePickerState extends State<OiDatePicker> {
         children: [
           // Month/year header with navigation.
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 3),
             child: Row(
               children: [
                 OiTappable(
                   onTap: _prevMonth,
                   child: Padding(
-                    padding: const EdgeInsets.all(8),
+                    padding: const EdgeInsets.all(5),
                     child: Icon(
                       OiIcons.chevronLeft,
-                      size: 20,
+                      size: 17,
                       color: colors.textMuted,
                     ),
                   ),
                 ),
                 Expanded(
                   child: Center(
-                    child: Text(
-                      '${_kMonths[_effectiveDisplayMonth.month - 1]} ${_effectiveDisplayMonth.year}',
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600,
-                        color: colors.text,
-                      ),
+                    child: _MonthYearLabel(
+                      label: '${kOiMonthLabels[_effectiveDisplayMonth.month - 1]} ${_effectiveDisplayMonth.year}',
+                      onTap: _openMonthPicker,
                     ),
                   ),
                 ),
                 OiTappable(
                   onTap: _nextMonth,
                   child: Padding(
-                    padding: const EdgeInsets.all(8),
+                    padding: const EdgeInsets.all(5),
                     child: Icon(
                       OiIcons.chevronRight,
-                      size: 20,
+                      size: 17,
                       color: colors.textMuted,
                     ),
                   ),
@@ -390,7 +394,7 @@ class _OiDatePickerState extends State<OiDatePicker> {
               ],
             ),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 2),
           // Weekday header row.
           Row(
             children: List.generate(7, (col) {
@@ -411,25 +415,75 @@ class _OiDatePickerState extends State<OiDatePicker> {
               );
             }),
           ),
-          const SizedBox(height: 4),
-          // Day grid: 6 rows of 7 with alternating row backgrounds.
-          for (int row = 0; row < 6; row++)
+          const SizedBox(height: 2),
+          // Day grid with alternating row backgrounds.
+          for (int row = 0; row < rowCount; row++)
             Container(
               decoration: BoxDecoration(
                 color: row.isOdd ? stripeBg : null,
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(5),
               ),
               padding: const EdgeInsets.symmetric(vertical: 2),
               child: Row(
                 children: List.generate(7, (col) {
                   final idx = row * 7 + col;
                   return Expanded(
-                    child: AspectRatio(aspectRatio: 1, child: cells[idx]),
+                    child: AspectRatio(aspectRatio: 1.3, child: cells[idx]),
                   );
                 }),
               ),
             ),
         ],
+      ),
+    );
+  }
+}
+
+// ── Month/year header label with hover color ────────────────────────────────
+
+class _MonthYearLabel extends StatefulWidget {
+  const _MonthYearLabel({required this.label, required this.onTap});
+
+  final String label;
+  final VoidCallback onTap;
+
+  @override
+  State<_MonthYearLabel> createState() => _MonthYearLabelState();
+}
+
+class _MonthYearLabelState extends State<_MonthYearLabel> {
+  bool _hovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    final color = _hovered ? colors.primary.base : colors.text;
+
+    return GestureDetector(
+      onTap: widget.onTap,
+      child: MouseRegion(
+        cursor: SystemMouseCursors.click,
+        onEnter: (_) => setState(() => _hovered = true),
+        onExit: (_) => setState(() => _hovered = false),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              widget.label,
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: color,
+              ),
+            ),
+            const SizedBox(width: 4),
+            Icon(
+              OiIcons.chevronDown,
+              size: 14,
+              color: color,
+            ),
+          ],
+        ),
       ),
     );
   }

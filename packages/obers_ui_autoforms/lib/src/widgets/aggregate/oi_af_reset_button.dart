@@ -13,6 +13,7 @@ class OiAfResetButton<TField extends Enum> extends StatefulWidget {
     this.variant = OiButtonVariant.secondary,
     this.hideWhenClean = false,
     this.resetMode = OiAfResetMode.toInitial,
+    this.fullWidth = false,
     super.key,
   });
 
@@ -27,6 +28,9 @@ class OiAfResetButton<TField extends Enum> extends StatefulWidget {
 
   /// The reset behavior.
   final OiAfResetMode resetMode;
+
+  /// Whether the button should stretch to fill its container.
+  final bool fullWidth;
 
   @override
   State<OiAfResetButton<TField>> createState() => _OiAfResetButtonState<TField>();
@@ -65,17 +69,47 @@ class _OiAfResetButtonState<TField extends Enum>
   }) {
     switch (widget.variant) {
       case OiButtonVariant.primary:
-        return OiButton.primary(label: label, enabled: isEnabled, onTap: onTap);
+        return OiButton.primary(
+          label: label,
+          enabled: isEnabled,
+          onTap: onTap,
+          fullWidth: widget.fullWidth,
+        );
       case OiButtonVariant.secondary:
-        return OiButton.secondary(label: label, enabled: isEnabled, onTap: onTap);
+        return OiButton.secondary(
+          label: label,
+          enabled: isEnabled,
+          onTap: onTap,
+          fullWidth: widget.fullWidth,
+        );
       case OiButtonVariant.outline:
-        return OiButton.outline(label: label, enabled: isEnabled, onTap: onTap);
+        return OiButton.outline(
+          label: label,
+          enabled: isEnabled,
+          onTap: onTap,
+          fullWidth: widget.fullWidth,
+        );
       case OiButtonVariant.ghost:
-        return OiButton.ghost(label: label, enabled: isEnabled, onTap: onTap);
+        return OiButton.ghost(
+          label: label,
+          enabled: isEnabled,
+          onTap: onTap,
+          fullWidth: widget.fullWidth,
+        );
       case OiButtonVariant.destructive:
-        return OiButton.destructive(label: label, enabled: isEnabled, onTap: onTap);
+        return OiButton.destructive(
+          label: label,
+          enabled: isEnabled,
+          onTap: onTap,
+          fullWidth: widget.fullWidth,
+        );
       case OiButtonVariant.soft:
-        return OiButton.soft(label: label, enabled: isEnabled, onTap: onTap);
+        return OiButton.soft(
+          label: label,
+          enabled: isEnabled,
+          onTap: onTap,
+          fullWidth: widget.fullWidth,
+        );
     }
   }
 

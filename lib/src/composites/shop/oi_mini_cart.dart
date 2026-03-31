@@ -52,6 +52,7 @@ class OiMiniCart extends StatefulWidget {
     this.onViewCart,
     this.onCheckout,
     this.onRemove,
+    this.onQuantityChange,
     this.maxVisibleItems = 3,
     this.display = OiMiniCartDisplay.popover,
     this.currencyCode = 'EUR',
@@ -75,6 +76,9 @@ class OiMiniCart extends StatefulWidget {
 
   /// Called when the user removes an item, with the item's `productKey`.
   final ValueChanged<Object>? onRemove;
+
+  /// Called when the user changes the quantity of an item.
+  final void Function(({Object productKey, int quantity}))? onQuantityChange;
 
   /// Maximum number of items shown in the preview. Defaults to `3`.
   final int maxVisibleItems;
@@ -156,6 +160,11 @@ class _OiMiniCartState extends State<OiMiniCart> {
                 label: '${item.name} × ${item.quantity}',
                 compact: true,
                 currencyCode: widget.currencyCode,
+                onQuantityChange: widget.onQuantityChange != null
+                    ? (qty) => widget.onQuantityChange!(
+                          (productKey: item.productKey, quantity: qty),
+                        )
+                    : null,
                 onRemove: widget.onRemove != null
                     ? () => widget.onRemove!(item.productKey)
                     : null,

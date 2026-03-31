@@ -453,16 +453,28 @@ class _StepProgress extends StatelessWidget {
           children: List.generate(total, (i) {
             final isActive = i == current;
             final isDone = i < current;
+            final labelColor = isActive
+                ? colors.primary.base
+                : isDone
+                    ? colors.success.base
+                    : colors.textMuted;
+            final style = context.textTheme.caption.copyWith(
+              color: labelColor,
+              fontWeight:
+                  (isActive || isDone) ? FontWeight.w600 : FontWeight.w400,
+            );
             return Expanded(
               child: Center(
-                child: OiLabel.caption(
-                  titles[i],
-                  color: isActive
-                      ? colors.primary.base
-                      : isDone
-                          ? colors.success.base
-                          : colors.textMuted,
-                ),
+                child: isDone
+                    ? Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(OiIcons.check, size: 14, color: labelColor),
+                          const SizedBox(width: 4),
+                          Text(titles[i], style: style),
+                        ],
+                      )
+                    : Text(titles[i], style: style),
               ),
             );
           }),

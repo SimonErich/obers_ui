@@ -12,6 +12,7 @@ class ShopBrowseScreen extends StatefulWidget {
     required this.onAddToCart,
     required this.onViewCart,
     required this.onCheckout,
+    required this.onCartQuantityChange,
     required this.wishlistCount,
     required this.onViewWishlist,
     super.key,
@@ -23,6 +24,7 @@ class ShopBrowseScreen extends StatefulWidget {
   final ValueChanged<OiProductData> onAddToCart;
   final VoidCallback onViewCart;
   final VoidCallback onCheckout;
+  final void Function(({Object productKey, int quantity})) onCartQuantityChange;
   final int wishlistCount;
   final VoidCallback onViewWishlist;
 
@@ -203,6 +205,7 @@ class _ShopBrowseScreenState extends State<ShopBrowseScreen> {
                     label: 'Shopping cart',
                     onViewCart: widget.onViewCart,
                     onCheckout: widget.onCheckout,
+                    onQuantityChange: widget.onCartQuantityChange,
                   ),
                 ],
               ),
@@ -226,6 +229,7 @@ class _ShopBrowseScreenState extends State<ShopBrowseScreen> {
                 OiBreakpoint.large: 4,
               }),
               gap: OiResponsive<double>(spacing.md),
+              stretchRows: true,
               children:
                   _displayedProducts.map((product) {
                     return OiProductCard(

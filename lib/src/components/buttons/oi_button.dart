@@ -777,6 +777,7 @@ class _OiButtonState extends State<OiButton> {
           padding: EdgeInsets.symmetric(horizontal: hPad),
           decoration: decoration,
           child: Center(
+            widthFactor: 1.0,
             child: _buildContent(
               context,
               label: widget.label,
@@ -798,6 +799,11 @@ class _OiButtonState extends State<OiButton> {
     }
     if (widget.fullWidth) {
       button = SizedBox(width: double.infinity, child: button);
+    } else {
+      button = UnconstrainedBox(
+        constrainedAxis: Axis.vertical,
+        child: button,
+      );
     }
     if (widget.tooltip != null) {
       return OiTooltip(
@@ -821,6 +827,7 @@ class _OiButtonState extends State<OiButton> {
       height: height,
       padding: EdgeInsets.symmetric(horizontal: hPad),
       child: Center(
+        widthFactor: 1.0,
         child: _buildContent(
           context,
           label: widget.label,
@@ -879,6 +886,11 @@ class _OiButtonState extends State<OiButton> {
     }
     if (widget.fullWidth) {
       button = SizedBox(width: double.infinity, child: button);
+    } else {
+      button = UnconstrainedBox(
+        constrainedAxis: Axis.vertical,
+        child: button,
+      );
     }
     if (widget.tooltip != null) {
       return OiTooltip(
@@ -1035,7 +1047,7 @@ class _OiButtonState extends State<OiButton> {
     final foreground = _foregroundColor(context, widget.variant);
     final decoration = _decoration(context, widget.variant);
 
-    return OiTappable(
+    Widget button = OiTappable(
       onTap: widget.onTap,
       enabled: isExpired,
       child: Container(
@@ -1043,6 +1055,7 @@ class _OiButtonState extends State<OiButton> {
         padding: EdgeInsets.symmetric(horizontal: hPad),
         decoration: decoration,
         child: Center(
+          widthFactor: 1.0,
           child: Text(
             displayLabel,
             style: TextStyle(
@@ -1057,6 +1070,16 @@ class _OiButtonState extends State<OiButton> {
         ),
       ),
     );
+
+    if (widget.fullWidth) {
+      button = SizedBox(width: double.infinity, child: button);
+    } else {
+      button = UnconstrainedBox(
+        constrainedAxis: Axis.vertical,
+        child: button,
+      );
+    }
+    return button;
   }
 
   Widget _buildConfirmButton(BuildContext context) {
@@ -1073,7 +1096,7 @@ class _OiButtonState extends State<OiButton> {
     final foreground = _foregroundColor(context, activeVariant);
     final decoration = _decoration(context, activeVariant);
 
-    return OiTappable(
+    Widget button = OiTappable(
       onTap: () {
         if (_confirmPending) {
           setState(() => _confirmPending = false);
@@ -1087,6 +1110,7 @@ class _OiButtonState extends State<OiButton> {
         padding: EdgeInsets.symmetric(horizontal: hPad),
         decoration: decoration,
         child: Center(
+          widthFactor: 1.0,
           child: Text(
             displayLabel,
             style: TextStyle(
@@ -1101,5 +1125,15 @@ class _OiButtonState extends State<OiButton> {
         ),
       ),
     );
+
+    if (widget.fullWidth) {
+      button = SizedBox(width: double.infinity, child: button);
+    } else {
+      button = UnconstrainedBox(
+        constrainedAxis: Axis.vertical,
+        child: button,
+      );
+    }
+    return button;
   }
 }

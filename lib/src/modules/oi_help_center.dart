@@ -726,6 +726,7 @@ class _OiHelpCenterState extends State<OiHelpCenter> {
             loading: _feedbackSubmitting,
             enabled: !_feedbackSubmitting && _feedbackRating > 0,
             onTap: _handleFeedbackSubmit,
+            fullWidth: true,
           ),
         ],
       ),

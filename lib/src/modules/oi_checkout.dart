@@ -1,10 +1,11 @@
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/buttons/oi_button.dart';
-import 'package:obers_ui/src/components/display/oi_badge.dart';
 import 'package:obers_ui/src/components/inputs/oi_checkbox.dart';
 import 'package:obers_ui/src/components/inputs/oi_select.dart';
 import 'package:obers_ui/src/components/inputs/oi_text_input.dart';
 import 'package:obers_ui/src/components/navigation/oi_accordion.dart';
+import 'package:obers_ui/src/components/shop/oi_payment_option.dart';
+import 'package:obers_ui/src/components/shop/oi_shipping_option.dart';
 import 'package:obers_ui/src/composites/forms/oi_stepper.dart';
 import 'package:obers_ui/src/composites/shop/oi_order_summary.dart';
 import 'package:obers_ui/src/foundation/oi_responsive.dart';
@@ -651,7 +652,6 @@ class _OiCheckoutState extends State<OiCheckout> {
   Widget _buildShippingStep(BuildContext context) {
     final breakpoint = context.breakpoint;
     final sp = context.spacing;
-    final colors = context.colors;
     final methods = widget.shippingMethods ?? [];
 
     if (methods.isEmpty) {
@@ -665,56 +665,17 @@ class _OiCheckoutState extends State<OiCheckout> {
       children: [
         const OiLabel.h3('Shipping Method'),
         for (final method in methods)
-          GestureDetector(
-            onTap: () {
+          OiShippingOption(
+            method: method,
+            label: '${method.label} shipping option',
+            selected: _selectedShipping?.key == method.key,
+            currencyCode: widget.currencyCode,
+            onSelect: (m) {
               setState(() {
-                _selectedShipping = method;
+                _selectedShipping = m;
               });
-              widget.onShippingMethodChange?.call(method);
+              widget.onShippingMethodChange?.call(m);
             },
-            child: Semantics(
-              label: '${method.label} shipping option',
-              selected: _selectedShipping?.key == method.key,
-              child: Container(
-                padding: EdgeInsets.all(sp.md),
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    color: _selectedShipping?.key == method.key
-                        ? colors.primary.base
-                        : colors.border,
-                    width: _selectedShipping?.key == method.key ? 2 : 1,
-                  ),
-                  borderRadius: context.radius.md,
-                ),
-                child: Row(
-                  children: [
-                    _RadioDot(
-                      selected: _selectedShipping?.key == method.key,
-                      color: colors.primary.base,
-                    ),
-                    SizedBox(width: sp.sm),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          OiLabel.bodyStrong(method.label),
-                          if (method.description != null)
-                            OiLabel.small(method.description!),
-                          if (method.estimatedDelivery != null)
-                            OiLabel.small(method.estimatedDelivery!),
-                        ],
-                      ),
-                    ),
-                    OiLabel.bodyStrong(
-                      method.price == 0
-                          ? 'Free'
-                          : '\$${method.price.toStringAsFixed(2)}',
-                    ),
-                  ],
-                ),
-              ),
-            ),
           ),
       ],
     );
@@ -727,7 +688,6 @@ class _OiCheckoutState extends State<OiCheckout> {
   Widget _buildPaymentStep(BuildContext context) {
     final breakpoint = context.breakpoint;
     final sp = context.spacing;
-    final colors = context.colors;
     final methods = widget.paymentMethods ?? [];
 
     if (methods.isEmpty) {
@@ -741,51 +701,16 @@ class _OiCheckoutState extends State<OiCheckout> {
       children: [
         const OiLabel.h3('Payment Method'),
         for (final method in methods)
-          GestureDetector(
-            onTap: () {
+          OiPaymentOption(
+            method: method,
+            label: '${method.label} payment option',
+            selected: _selectedPayment?.key == method.key,
+            onSelect: (m) {
               setState(() {
-                _selectedPayment = method;
+                _selectedPayment = m;
               });
-              widget.onPaymentMethodChange?.call(method);
+              widget.onPaymentMethodChange?.call(m);
             },
-            child: Semantics(
-              label: '${method.label} payment option',
-              selected: _selectedPayment?.key == method.key,
-              child: Container(
-                padding: EdgeInsets.all(sp.md),
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    color: _selectedPayment?.key == method.key
-                        ? colors.primary.base
-                        : colors.border,
-                    width: _selectedPayment?.key == method.key ? 2 : 1,
-                  ),
-                  borderRadius: context.radius.md,
-                ),
-                child: Row(
-                  children: [
-                    _RadioDot(
-                      selected: _selectedPayment?.key == method.key,
-                      color: colors.primary.base,
-                    ),
-                    SizedBox(width: sp.sm),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          OiLabel.bodyStrong(method.label),
-                          if (method.description != null)
-                            OiLabel.small(method.description!),
-                        ],
-                      ),
-                    ),
-                    if (method.defaultMethod)
-                      const OiBadge.soft(label: 'Default'),
-                  ],
-                ),
-              ),
-            ),
           ),
       ],
     );
@@ -808,7 +733,7 @@ class _OiCheckoutState extends State<OiCheckout> {
         child: Semantics(
           label: 'Edit $text',
           button: true,
-          child: OiLabel.small('Edit', color: colors.primary.base),
+          child: OiLabel.link('Edit', color: colors.primary.base),
         ),
       );
     }
@@ -886,13 +811,6 @@ class _OiCheckoutState extends State<OiCheckout> {
             child: OiLabel.body(_orderError!, color: colors.error.base),
           ),
 
-        // Place order button.
-        OiButton.primary(
-          label: widget.placeOrderLabel ?? 'Place Order',
-          onTap: _isPlacingOrder ? null : _handlePlaceOrder,
-          loading: _isPlacingOrder,
-          fullWidth: true,
-        ),
       ],
     );
   }
@@ -941,7 +859,14 @@ class _OiCheckoutState extends State<OiCheckout> {
               ),
           ],
         ),
-        if (!isReview) OiButton.primary(label: 'Next', onTap: _goNext),
+        if (isReview)
+          OiButton.primary(
+            label: widget.placeOrderLabel ?? 'Place Order',
+            onTap: _isPlacingOrder ? null : _handlePlaceOrder,
+            loading: _isPlacingOrder,
+          )
+        else
+          OiButton.primary(label: 'Next', onTap: _goNext),
       ],
     );
   }
@@ -1051,38 +976,6 @@ class _OiCheckoutState extends State<OiCheckout> {
       child: isDesktop
           ? _buildDesktopLayout(context)
           : _buildMobileLayout(context),
-    );
-  }
-}
-
-// ── Private helper widgets ──────────────────────────────────────────────────
-
-/// A small radio-button dot indicator.
-class _RadioDot extends StatelessWidget {
-  const _RadioDot({required this.selected, required this.color});
-
-  final bool selected;
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = context.colors;
-    return Container(
-      width: 20,
-      height: 20,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        border: Border.all(color: selected ? color : colors.border, width: 2),
-      ),
-      child: selected
-          ? Center(
-              child: Container(
-                width: 10,
-                height: 10,
-                decoration: BoxDecoration(shape: BoxShape.circle, color: color),
-              ),
-            )
-          : null,
     );
   }
 }

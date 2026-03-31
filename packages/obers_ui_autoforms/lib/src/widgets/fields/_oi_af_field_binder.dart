@@ -57,6 +57,12 @@ mixin OiAfFieldBinderMixin<
     _bindField();
   }
 
+  @override
+  void didUpdateWidget(covariant TWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    _bindField();
+  }
+
   void _bindField() {
     form = OiAfScope.of<TField, Object?>(context);
     final next = form.fieldController(fieldEnum);

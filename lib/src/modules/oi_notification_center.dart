@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
+import 'package:obers_ui/src/components/buttons/oi_button.dart';
 
 /// A notification item displayed in the [OiNotificationCenter].
 ///
@@ -175,20 +176,9 @@ class OiNotificationCenter extends StatelessWidget {
                   ),
                 ),
                 if (onMarkAllRead != null)
-                  GestureDetector(
+                  OiButton.outline(
+                    label: 'Mark all read',
                     onTap: onMarkAllRead,
-                    child: Semantics(
-                      label: 'Mark all as read',
-                      button: true,
-                      child: Text(
-                        'Mark all read',
-                        style: TextStyle(
-                          color: colors.primary.base,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
                   ),
               ],
             ),

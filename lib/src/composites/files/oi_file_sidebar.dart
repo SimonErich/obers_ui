@@ -375,6 +375,7 @@ class _OiFileSidebarState extends State<OiFileSidebar> {
                   padding: EdgeInsets.all(spacing.sm),
                   child: OiButton.primary(
                     label: '+ New Folder',
+                    fullWidth: true,
                     onTap: () {
                       // Resolve selected folder, falling back to the first
                       // root node so the button always works.

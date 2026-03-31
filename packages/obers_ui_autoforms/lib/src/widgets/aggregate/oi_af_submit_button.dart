@@ -15,6 +15,7 @@ class OiAfSubmitButton<TField extends Enum, TData> extends StatefulWidget {
     this.variant = OiButtonVariant.primary,
     this.disableWhenInvalid = false,
     this.disableWhenClean = false,
+    this.fullWidth = false,
     this.onTap,
     super.key,
   });
@@ -36,6 +37,9 @@ class OiAfSubmitButton<TField extends Enum, TData> extends StatefulWidget {
 
   /// Whether to disable when the form has no dirty fields.
   final bool disableWhenClean;
+
+  /// Whether the button should stretch to fill its container.
+  final bool fullWidth;
 
   /// Additional callback after submit completes.
   final VoidCallback? onTap;
@@ -98,6 +102,7 @@ class _OiAfSubmitButtonState<TField extends Enum, TData>
           loading: isLoading,
           enabled: !isDisabled,
           onTap: isDisabled ? null : _handleSubmit,
+          fullWidth: widget.fullWidth,
         );
       case OiButtonVariant.secondary:
         return OiButton.secondary(
@@ -106,6 +111,7 @@ class _OiAfSubmitButtonState<TField extends Enum, TData>
           loading: isLoading,
           enabled: !isDisabled,
           onTap: isDisabled ? null : _handleSubmit,
+          fullWidth: widget.fullWidth,
         );
       case OiButtonVariant.outline:
         return OiButton.outline(
@@ -114,6 +120,7 @@ class _OiAfSubmitButtonState<TField extends Enum, TData>
           loading: isLoading,
           enabled: !isDisabled,
           onTap: isDisabled ? null : _handleSubmit,
+          fullWidth: widget.fullWidth,
         );
       case OiButtonVariant.ghost:
         return OiButton.ghost(
@@ -122,6 +129,7 @@ class _OiAfSubmitButtonState<TField extends Enum, TData>
           loading: isLoading,
           enabled: !isDisabled,
           onTap: isDisabled ? null : _handleSubmit,
+          fullWidth: widget.fullWidth,
         );
       case OiButtonVariant.destructive:
         return OiButton.destructive(
@@ -130,6 +138,7 @@ class _OiAfSubmitButtonState<TField extends Enum, TData>
           loading: isLoading,
           enabled: !isDisabled,
           onTap: isDisabled ? null : _handleSubmit,
+          fullWidth: widget.fullWidth,
         );
       case OiButtonVariant.soft:
         return OiButton.soft(
@@ -138,6 +147,7 @@ class _OiAfSubmitButtonState<TField extends Enum, TData>
           loading: isLoading,
           enabled: !isDisabled,
           onTap: isDisabled ? null : _handleSubmit,
+          fullWidth: widget.fullWidth,
         );
     }
   }

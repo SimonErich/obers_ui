@@ -4,7 +4,9 @@ import 'package:obers_ui_autoforms/obers_ui_autoforms.dart' show OiAfController;
 
 import 'package:obers_ui_autoforms/src/foundation/oi_af_enums.dart';
 import 'package:obers_ui_autoforms/src/foundation/oi_af_option.dart';
+import 'package:obers_ui_autoforms/src/foundation/oi_af_reader.dart';
 import 'package:obers_ui_autoforms/src/foundation/oi_af_typedefs.dart';
+import 'package:obers_ui_autoforms/src/validation/oi_af_validation_context.dart';
 import 'package:obers_ui_autoforms/src/runtime/controller/oi_af_controller.dart'
     show OiAfController;
 
@@ -106,6 +108,29 @@ abstract class OiAfFieldDefinition<TField extends Enum, TValue> {
 
   /// Callback to compute a derived value from form state.
   final OiAfDerivedValue<TField, TValue>? derive;
+
+  /// Creates a [OiAfValidationContext] with the concrete [TValue] type
+  /// preserved at runtime. Called via `dynamic` dispatch from the field
+  /// controller so that Dart's reified generics produce the correct type
+  /// (e.g. `OiAfValidationContext<TField, String>` instead of `dynamic`).
+  OiAfValidationContext<TField, TValue> createValidationContext({
+    required Object? value,
+    required OiAfReader<TField> form,
+    required OiAfValidationTrigger trigger,
+    required bool isRequired,
+    required bool isVisible,
+    required bool isEnabled,
+  }) {
+    return OiAfValidationContext<TField, TValue>(
+      field: field,
+      value: value as TValue?,
+      form: form,
+      trigger: trigger,
+      isRequired: isRequired,
+      isVisible: isVisible,
+      isEnabled: isEnabled,
+    );
+  }
 }
 
 // ── Typed Subclasses ─────────────────────────────────────────────────────────

@@ -89,6 +89,7 @@ class OiDialogShell extends StatelessWidget {
     Color? backgroundColor,
     BorderRadius? borderRadius,
     EdgeInsets? padding,
+    bool initialFocus = true,
   }) async {
     final completer = Completer<T?>();
     late OiOverlayHandle handle;
@@ -113,6 +114,7 @@ class OiDialogShell extends StatelessWidget {
         backgroundColor: backgroundColor,
         borderRadius: borderRadius,
         padding: padding,
+        initialFocus: initialFocus,
         builder: builder,
       );
     }
@@ -204,6 +206,7 @@ class _OiDialogShellOverlay<T> extends StatefulWidget {
     this.backgroundColor,
     this.borderRadius,
     this.padding,
+    this.initialFocus = true,
     super.key,
   });
 
@@ -219,6 +222,7 @@ class _OiDialogShellOverlay<T> extends StatefulWidget {
   final Color? backgroundColor;
   final BorderRadius? borderRadius;
   final EdgeInsets? padding;
+  final bool initialFocus;
 
   @override
   State<_OiDialogShellOverlay<T>> createState() =>
@@ -319,7 +323,7 @@ class _OiDialogShellOverlayState<T> extends State<_OiDialogShellOverlay<T>>
       child: widget.builder(_close),
     );
 
-    dialogContent = OiFocusTrap(onEscape: _close, child: dialogContent);
+    dialogContent = OiFocusTrap(initialFocus: widget.initialFocus, onEscape: _close, child: dialogContent);
 
     final Widget barrier = GestureDetector(
       behavior: HitTestBehavior.opaque,

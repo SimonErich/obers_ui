@@ -7,7 +7,6 @@ import 'package:obers_ui_autoforms/src/definitions/oi_af_field_definition.dart';
 import 'package:obers_ui_autoforms/src/diagnostics/oi_af_observer.dart';
 import 'package:obers_ui_autoforms/src/foundation/oi_af_enums.dart';
 import 'package:obers_ui_autoforms/src/foundation/oi_af_reader.dart';
-import 'package:obers_ui_autoforms/src/validation/oi_af_validation_context.dart';
 import 'package:obers_ui_autoforms/src/validation/oi_af_validators.dart';
 import 'package:obers_ui_autoforms/src/widgets/fields/_oi_af_field_binder.dart'
     show OiAfFieldBinderMixin;
@@ -361,8 +360,10 @@ class OiAfFieldController<TField extends Enum> extends ChangeNotifier {
         }
 
         try {
-          final ctx = OiAfValidationContext<TField, dynamic>(
-            field: _definition.field,
+          // Create the context via dynamic dispatch on the definition so
+          // that Dart's reified generics produce the concrete TValue type
+          // (e.g. OiAfValidationContext<TField, String>) instead of dynamic.
+          final ctx = (_definition as dynamic).createValidationContext(
             value: _value,
             form: form,
             trigger: trigger,
@@ -370,12 +371,7 @@ class OiAfFieldController<TField extends Enum> extends ChangeNotifier {
             isVisible: _isVisible,
             isEnabled: _isEnabled,
           );
-          final typedValidator =
-              validator
-                  as Future<String?> Function(
-                    OiAfValidationContext<TField, dynamic>,
-                  );
-          final result = await typedValidator(ctx);
+          final result = await (validator as dynamic)(ctx) as String?;
           if (version != _validationVersion) {
             _isValidating = false;
             notifyListeners();

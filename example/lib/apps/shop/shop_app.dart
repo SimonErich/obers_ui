@@ -216,6 +216,7 @@ class _ShopAppState extends State<ShopApp> {
           onAddToCart: _addToCart,
           onViewCart: () => _goTo(_ShopScreen.cart),
           onCheckout: () => _goTo(_ShopScreen.checkout),
+          onCartQuantityChange: _updateQuantity,
           wishlistCount: _wishlisted.length,
           onViewWishlist: () => _goTo(_ShopScreen.wishlist),
         );
@@ -253,6 +254,7 @@ class _ShopAppState extends State<ShopApp> {
           cartSummary: _cartSummary,
           onViewCart: () => _goTo(_ShopScreen.cart),
           onCheckout: () => _goTo(_ShopScreen.checkout),
+          onCartQuantityChange: _updateQuantity,
           wishlistCount: _wishlisted.length,
           onViewWishlist: () => _goTo(_ShopScreen.wishlist),
         );
@@ -313,6 +315,7 @@ class _ShopAppState extends State<ShopApp> {
           cartSummary: _cartSummary,
           onViewCart: () => _goTo(_ShopScreen.cart),
           onCheckout: () => _goTo(_ShopScreen.checkout),
+          onCartQuantityChange: _updateQuantity,
         );
     }
   }
