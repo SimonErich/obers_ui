@@ -94,11 +94,11 @@ Kanban board with columns, cards, and drag-and-drop:
 ```dart
 OiKanban(
   columns: [
-    OiKanbanColumn(id: 'todo', title: 'To Do', cards: todoCards),
-    OiKanbanColumn(id: 'progress', title: 'In Progress', cards: progressCards),
-    OiKanbanColumn(id: 'done', title: 'Done', cards: doneCards),
+    OiKanbanColumn(key: 'todo', title: 'To Do', items: todoCards),
+    OiKanbanColumn(key: 'progress', title: 'In Progress', items: progressCards),
+    OiKanbanColumn(key: 'done', title: 'Done', items: doneCards),
   ],
-  onCardMoved: (card, fromColumn, toColumn, index) async {
+  onCardMove: (card, fromColumn, toColumn, index) async {
     await api.moveCard(card.id, toColumn, index);
   },
 )

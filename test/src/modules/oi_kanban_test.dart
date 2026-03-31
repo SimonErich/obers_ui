@@ -152,6 +152,27 @@ void main() {
       expect(find.bySemanticsLabel('My Board'), findsOneWidget);
     });
 
+    testWidgets('renders draggable cards and column drop slots', (
+      tester,
+    ) async {
+      await tester.pumpObers(
+        OiKanban<String>(
+          columns: const [
+            OiKanbanColumn(key: 'todo', title: 'To Do', items: ['Task A']),
+            OiKanbanColumn(key: 'done', title: 'Done', items: []),
+          ],
+          label: 'Board',
+        ),
+        surfaceSize: const Size(900, 600),
+      );
+      await tester.pumpAndSettle();
+
+      final cardFinder = find.byKey(const ValueKey('kanban_card_todo_0'));
+      final dropFinder = find.byKey(const ValueKey('kanban_drop_done_0'));
+      expect(cardFinder, findsOneWidget);
+      expect(dropFinder, findsOneWidget);
+    });
+
     testWidgets(
       'compact forward navigation uses jumpToPage when reducedMotion',
       (tester) async {
