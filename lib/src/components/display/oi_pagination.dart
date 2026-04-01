@@ -192,6 +192,7 @@ class OiPagination extends StatefulWidget {
 
 class _OiPaginationState extends State<OiPagination> {
   final FocusNode _focusNode = FocusNode();
+  int? _hoveredPage;
 
   // ── Computed ──────────────────────────────────────────────────────────────
 
@@ -485,29 +486,40 @@ class _OiPaginationState extends State<OiPagination> {
 
   Widget _buildPageButton(int page, OiColorScheme colors) {
     final isCurrent = page == _clampedPage;
+    final isHovered = _hoveredPage == page;
+    final hasBackground = isCurrent || isHovered;
     return Semantics(
       button: true,
       label: 'Page ${page + 1}',
       selected: isCurrent,
       child: Focus(
-        child: GestureDetector(
-          key: Key('oi_pagination_page_$page'),
-          onTap: isCurrent ? null : () => widget.onPageChange?.call(page),
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-            margin: const EdgeInsets.symmetric(horizontal: 1),
-            decoration: isCurrent
-                ? BoxDecoration(
-                    color: colors.primary.base,
-                    borderRadius: BorderRadius.circular(4),
-                  )
-                : null,
-            child: isCurrent
-                ? OiLabel.bodyStrong(
-                    '${page + 1}',
-                    color: colors.primary.foreground,
-                  )
-                : OiLabel.body('${page + 1}', color: colors.text),
+        child: MouseRegion(
+          cursor: isCurrent ? SystemMouseCursors.basic : SystemMouseCursors.click,
+          onEnter: (_) => setState(() => _hoveredPage = page),
+          onExit: (_) {
+            if (_hoveredPage == page) {
+              setState(() => _hoveredPage = null);
+            }
+          },
+          child: GestureDetector(
+            key: Key('oi_pagination_page_$page'),
+            onTap: isCurrent ? null : () => widget.onPageChange?.call(page),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+              margin: const EdgeInsets.symmetric(horizontal: 1),
+              decoration: hasBackground
+                  ? BoxDecoration(
+                      color: isCurrent ? colors.primary.base : colors.surfaceHover,
+                      borderRadius: BorderRadius.circular(4),
+                    )
+                  : null,
+              child: isCurrent
+                  ? OiLabel.bodyStrong(
+                      '${page + 1}',
+                      color: colors.primary.foreground,
+                    )
+                  : OiLabel.body('${page + 1}', color: colors.text),
+            ),
           ),
         ),
       ),
