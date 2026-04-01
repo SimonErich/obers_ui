@@ -127,30 +127,7 @@ class ModulesScreen extends StatelessWidget {
             examples: [
               ComponentExample(
                 title: 'Task Board',
-                child: SizedBox(
-                  height: 350,
-                  child: OiKanban<String>(
-                    label: 'Sprint Board',
-                    columns: const [
-                      OiKanbanColumn(
-                        key: 'todo',
-                        title: 'To Do',
-                        items: ['Design homepage', 'Write API docs'],
-                      ),
-                      OiKanbanColumn(
-                        key: 'progress',
-                        title: 'In Progress',
-                        items: ['Implement auth', 'Setup CI/CD'],
-                      ),
-                      OiKanbanColumn(
-                        key: 'done',
-                        title: 'Done',
-                        items: ['Project setup', 'Database schema'],
-                      ),
-                    ],
-                    onCardMove: (_, __, ___, ____) {},
-                  ),
-                ),
+                child: SizedBox(height: 350, child: const _KanbanDemo()),
               ),
             ],
           ),
@@ -1504,6 +1481,97 @@ class ModulesScreen extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _KanbanDemo extends StatefulWidget {
+  const _KanbanDemo();
+
+  @override
+  State<_KanbanDemo> createState() => _KanbanDemoState();
+}
+
+class _KanbanDemoState extends State<_KanbanDemo> {
+  static const List<OiKanbanColumn<String>> _initialColumns = [
+    OiKanbanColumn(
+      key: 'todo',
+      title: 'To Do',
+      items: ['Design homepage', 'Write API docs'],
+    ),
+    OiKanbanColumn(
+      key: 'progress',
+      title: 'In Progress',
+      items: ['Implement auth', 'Setup CI/CD'],
+    ),
+    OiKanbanColumn(
+      key: 'done',
+      title: 'Done',
+      items: ['Project setup', 'Database schema'],
+    ),
+  ];
+
+  late List<OiKanbanColumn<String>> _columns;
+
+  @override
+  void initState() {
+    super.initState();
+    _columns = _initialColumns
+        .map(
+          (column) => OiKanbanColumn<String>(
+            key: column.key,
+            title: column.title,
+            items: List<String>.from(column.items),
+            color: column.color,
+          ),
+        )
+        .toList();
+  }
+
+  void _handleCardMove(
+    String item,
+    Object fromColumn,
+    Object toColumn,
+    int newIndex,
+  ) {
+    final nextColumns = _columns
+        .map(
+          (column) => OiKanbanColumn<String>(
+            key: column.key,
+            title: column.title,
+            items: List<String>.from(column.items),
+            color: column.color,
+          ),
+        )
+        .toList();
+
+    final fromIndex = nextColumns.indexWhere(
+      (column) => column.key == fromColumn,
+    );
+    final toIndex = nextColumns.indexWhere((column) => column.key == toColumn);
+    if (fromIndex == -1 || toIndex == -1) return;
+
+    final fromItems = nextColumns[fromIndex].items;
+    final removeIndex = fromItems.indexOf(item);
+    if (removeIndex == -1) return;
+
+    fromItems.removeAt(removeIndex);
+
+    final toItems = nextColumns[toIndex].items;
+    var insertIndex = newIndex;
+    if (insertIndex < 0) insertIndex = 0;
+    if (insertIndex > toItems.length) insertIndex = toItems.length;
+    toItems.insert(insertIndex, item);
+
+    setState(() => _columns = nextColumns);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return OiKanban<String>(
+      label: 'Sprint Board',
+      columns: _columns,
+      onCardMove: _handleCardMove,
     );
   }
 }

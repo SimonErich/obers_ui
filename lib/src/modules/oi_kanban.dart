@@ -251,6 +251,27 @@ class _OiKanbanState<T> extends State<OiKanban<T>>
     return column.items.length > limit;
   }
 
+  void _handleCardDrop(
+    _KanbanDragPayload<T> payload,
+    Object toColumnKey,
+    int targetIndex,
+  ) {
+    var resolvedIndex = targetIndex;
+    if (payload.fromColumnKey == toColumnKey &&
+        payload.fromIndex < targetIndex) {
+      resolvedIndex = targetIndex - 1;
+    }
+    if (resolvedIndex < 0) {
+      resolvedIndex = 0;
+    }
+    widget.onCardMove?.call(
+      payload.item,
+      payload.fromColumnKey,
+      toColumnKey,
+      resolvedIndex,
+    );
+  }
+
   // ── Build ────────────────────────────────────────────────────────────────
 
   @override
@@ -507,11 +528,20 @@ class _OiKanbanState<T> extends State<OiKanban<T>>
 
     if (column.items.isEmpty) {
       return Padding(
-        padding: const EdgeInsets.all(16),
-        child: Text(
-          'No items',
-          textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 13, color: colors.textMuted),
+        padding: const EdgeInsets.all(8),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _buildDropSlot(context, column.key, 0),
+            Padding(
+              padding: const EdgeInsets.all(8),
+              child: Text(
+                'No items',
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 13, color: colors.textMuted),
+              ),
+            ),
+          ],
         ),
       );
     }
@@ -521,13 +551,66 @@ class _OiKanbanState<T> extends State<OiKanban<T>>
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          for (var i = 0; i < column.items.length; i++)
-            Padding(
-              padding: EdgeInsets.only(top: i == 0 ? 0 : 6),
-              child: _buildCard(context, column.items[i]),
-            ),
+          _buildDropSlot(context, column.key, 0),
+          for (var i = 0; i < column.items.length; i++) ...[
+            _buildDraggableCard(context, column, i),
+            _buildDropSlot(context, column.key, i + 1),
+          ],
         ],
       ),
+    );
+  }
+
+  Widget _buildDraggableCard(
+    BuildContext context,
+    OiKanbanColumn<T> column,
+    int index,
+  ) {
+    final item = column.items[index];
+    final card = _buildCard(context, item);
+    final payload = _KanbanDragPayload<T>(
+      item: item,
+      fromColumnKey: column.key,
+      fromIndex: index,
+      identity: widget.cardKey?.call(item) ?? item,
+    );
+    return Draggable<_KanbanDragPayload<T>>(
+      key: ValueKey('kanban_card_${column.key}_$index'),
+      data: payload,
+      feedback: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 280),
+        child: Opacity(opacity: 0.9, child: card),
+      ),
+      childWhenDragging: Opacity(opacity: 0.35, child: card),
+      child: card,
+    );
+  }
+
+  Widget _buildDropSlot(BuildContext context, Object columnKey, int index) {
+    final colors = context.colors;
+    return DragTarget<_KanbanDragPayload<T>>(
+      onWillAcceptWithDetails: (_) => true,
+      onAcceptWithDetails: (details) {
+        _handleCardDrop(details.data, columnKey, index);
+      },
+      builder: (context, candidateData, rejectedData) {
+        final active = candidateData.isNotEmpty;
+        return AnimatedContainer(
+          key: ValueKey('kanban_drop_${columnKey}_$index'),
+          duration: const Duration(milliseconds: 120),
+          margin: const EdgeInsets.symmetric(vertical: 3),
+          height: active ? 12 : 6,
+          decoration: BoxDecoration(
+            color: active
+                ? colors.primary.base.withValues(alpha: 0.16)
+                : colors.surface.withValues(alpha: 0),
+            borderRadius: BorderRadius.circular(4),
+            border: active
+                ? Border.all(color: colors.primary.base.withValues(alpha: 0.5))
+                : null,
+          ),
+        );
+      },
     );
   }
 
@@ -590,4 +673,19 @@ class _OiKanbanState<T> extends State<OiKanban<T>>
       ),
     );
   }
+}
+
+@immutable
+class _KanbanDragPayload<T> {
+  const _KanbanDragPayload({
+    required this.item,
+    required this.fromColumnKey,
+    required this.fromIndex,
+    this.identity,
+  });
+
+  final T item;
+  final Object fromColumnKey;
+  final int fromIndex;
+  final Object? identity;
 }
