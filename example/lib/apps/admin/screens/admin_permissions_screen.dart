@@ -17,10 +17,35 @@ class _AdminPermissionsScreenState extends State<AdminPermissionsScreen> {
       entry.key: Set<String>.of(entry.value),
   };
 
-  bool _hasChanges = false;
+  late Map<String, Set<String>> _savedMatrix = {
+    for (final entry in _matrix.entries)
+      entry.key: Set<String>.of(entry.value),
+  };
+
+  bool _editing = false;
+
+  void _startEditing() {
+    setState(() {
+      _savedMatrix = {
+        for (final entry in _matrix.entries)
+          entry.key: Set<String>.of(entry.value),
+      };
+      _editing = true;
+    });
+  }
+
+  void _cancel() {
+    setState(() {
+      _matrix = {
+        for (final entry in _savedMatrix.entries)
+          entry.key: Set<String>.of(entry.value),
+      };
+      _editing = false;
+    });
+  }
 
   void _save() {
-    setState(() => _hasChanges = false);
+    setState(() => _editing = false);
     OiToast.show(
       context,
       message: 'Permissions saved successfully',
@@ -45,17 +70,29 @@ class _AdminPermissionsScreenState extends State<AdminPermissionsScreen> {
                   children: [
                     const OiLabel.h3('Roles & Permissions'),
                     SizedBox(height: spacing.xs),
-                    const OiLabel.caption(
+                    const OiLabel.small(
                       'Manage what each role can access across the system.',
                     ),
                   ],
                 ),
               ),
-              OiButton.primary(
-                label: 'Save Changes',
-                icon: OiIcons.check,
-                onTap: _hasChanges ? _save : null,
-              ),
+              if (_editing) ...[
+                OiButton.ghost(
+                  label: 'Cancel',
+                  onTap: _cancel,
+                ),
+                SizedBox(width: spacing.sm),
+                OiButton.primary(
+                  label: 'Save',
+                  icon: OiIcons.check,
+                  onTap: _save,
+                ),
+              ] else
+                OiButton.primary(
+                  label: 'Edit',
+                  icon: OiIcons.pencil,
+                  onTap: _startEditing,
+                ),
             ],
           ),
           SizedBox(height: spacing.lg),
@@ -78,11 +115,11 @@ class _AdminPermissionsScreenState extends State<AdminPermissionsScreen> {
                   color: Color(r.color),
                 ),
             ],
+            enabled: _editing,
             matrix: _matrix,
             onChange: (updated) {
               setState(() {
                 _matrix = updated;
-                _hasChanges = true;
               });
             },
           ),

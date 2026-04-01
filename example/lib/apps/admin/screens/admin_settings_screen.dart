@@ -149,7 +149,6 @@ class _AdminSettingsScreenState extends State<AdminSettingsScreen> {
                   controller: _generalController,
                   onSubmit: (_, __) async {},
                   child: const OiFormSection(
-                    title: 'General',
                     description: 'Basic application settings',
                     children: [
                       OiAfTextInput(
@@ -183,7 +182,6 @@ class _AdminSettingsScreenState extends State<AdminSettingsScreen> {
                   controller: _notificationsController,
                   onSubmit: (_, __) async {},
                   child: const OiFormSection(
-                    title: 'Notifications',
                     description: 'Configure how you receive notifications',
                     children: [
                       OiAfSwitch(
@@ -211,7 +209,6 @@ class _AdminSettingsScreenState extends State<AdminSettingsScreen> {
                   controller: _appearanceController,
                   onSubmit: (_, __) async {},
                   child: const OiFormSection(
-                    title: 'Appearance',
                     description: 'Customize the look and feel',
                     children: [
                       OiAfColorInput(

@@ -19,7 +19,7 @@ class _AdminReturnsScreenState extends State<AdminReturnsScreen> {
     OiFilterDefinition(
       key: 'status',
       label: 'Status',
-      type: OiFilterType.select,
+      type: OiFilterType.multiSelect,
       options: [
         OiSelectOption(value: 'requested', label: 'Requested'),
         OiSelectOption(value: 'approved', label: 'Approved'),
@@ -35,10 +35,10 @@ class _AdminReturnsScreenState extends State<AdminReturnsScreen> {
 
     final statusFilter = _activeFilters['status'];
     if (statusFilter != null && statusFilter.value != null) {
-      final statusValue = statusFilter.value as String;
-      if (statusValue.isNotEmpty) {
+      final statusValues = statusFilter.value as List<String>;
+      if (statusValues.isNotEmpty) {
         returns =
-            returns.where((r) => r['status'] == statusValue).toList();
+            returns.where((r) => statusValues.contains(r['status'])).toList();
       }
     }
 
@@ -108,7 +108,7 @@ class _AdminReturnsScreenState extends State<AdminReturnsScreen> {
         children: [
           const OiLabel.h3('Returns'),
           SizedBox(height: spacing.xs),
-          const OiLabel.caption('Return workflow and request management.'),
+          const OiLabel.small('Return workflow and request management.'),
           SizedBox(height: spacing.lg),
           // Pipeline visualization for selected return.
           OiCard(
@@ -160,6 +160,7 @@ class _AdminReturnsScreenState extends State<AdminReturnsScreen> {
                 id: 'customer',
                 header: 'Customer',
                 valueGetter: (row) => row['customer']! as String,
+                width: 200,
               ),
               OiTableColumn(
                 id: 'reason',
