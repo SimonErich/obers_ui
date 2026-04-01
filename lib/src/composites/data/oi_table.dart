@@ -374,6 +374,7 @@ class _OiTableState<T> extends State<OiTable<T>>
   int _prevPage = 0;
   int _prevPageSize = 25;
   bool _needsHorizontalScroll = false;
+  int? _hoveredRowIndex;
 
   /// Resolved driver: explicit widget prop → OiSettingsProvider → null.
   OiSettingsDriver? _resolvedDriver;
@@ -1002,6 +1003,9 @@ class _OiTableState<T> extends State<OiTable<T>>
   }
 
   Widget _buildSelectAllCheckbox() {
+    if (!widget.multiSelect) {
+      return const SizedBox(width: 40);
+    }
     return GestureDetector(
       onTap: () {
         if (_ctrl.selectAll) {
@@ -1057,12 +1061,12 @@ class _OiTableState<T> extends State<OiTable<T>>
               text: col.header,
               textAlign: col.textAlign,
               style: TextStyle(
-                fontSize: 12,
+                fontSize: 14,
                 fontWeight: FontWeight.w600,
                 color: colors.textSubtle,
               ),
               hoverStyle: TextStyle(
-                fontSize: 12,
+                fontSize: 14,
                 fontWeight: FontWeight.w700,
                 color: colors.text,
               ),
@@ -1320,26 +1324,40 @@ class _OiTableState<T> extends State<OiTable<T>>
 
   Widget _buildRow(T row, int index, {Key? key}) {
     final isSelected = _ctrl.selectedRows.contains(_rowKeyAt(row, index));
+    final isHovered = _hoveredRowIndex == index;
     final isEven = index.isEven;
     Color? bg;
     if (isSelected) {
-      bg = context.colors.primary.muted;
+      bg = context.colors.primary.muted.withValues(alpha: 0.3);
+    } else if (isHovered) {
+      bg = context.colors.surfaceHover;
     } else if (widget.striped && isEven) {
       bg = context.colors.surfaceSubtle;
     }
     final rowContent = Row(
       children: [
         if (widget.selectable)
-          SizedBox(
-            width: 40,
-            height: _effectiveRowHeight,
-            child: Center(
-              child: Icon(
-                isSelected ? OiIcons.squareCheckBig : OiIcons.square,
-                size: 16,
-                color: isSelected
-                    ? context.colors.primary.base
-                    : context.colors.textMuted,
+          GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTap: () {
+              final key = _rowKeyAt(row, index);
+              _ctrl.toggleRow(key);
+              _lastSelectedIndex = index;
+              widget.onSelectionChanged?.call(
+                Set<String>.from(_ctrl.selectedRows),
+              );
+            },
+            child: SizedBox(
+              width: 40,
+              height: _effectiveRowHeight,
+              child: Center(
+                child: Icon(
+                  isSelected ? OiIcons.squareCheckBig : OiIcons.square,
+                  size: 16,
+                  color: isSelected
+                      ? context.colors.primary.base
+                      : context.colors.textMuted,
+                ),
               ),
             ),
           ),
@@ -1350,12 +1368,19 @@ class _OiTableState<T> extends State<OiTable<T>>
             _buildCell(row, index, col),
       ],
     );
-    return GestureDetector(
-      key: key ?? ValueKey('row_$index'),
-      behavior: HitTestBehavior.opaque,
-      onTap: () => _handleRowTap(row, index),
-      onDoubleTap: () => _handleRowDoubleTap(row, index),
-      child: bg != null ? ColoredBox(color: bg, child: rowContent) : rowContent,
+    return MouseRegion(
+      onEnter: (_) => setState(() => _hoveredRowIndex = index),
+      onExit: (_) => setState(() => _hoveredRowIndex = null),
+      cursor: (widget.onRowTap != null || widget.selectable)
+          ? SystemMouseCursors.click
+          : SystemMouseCursors.basic,
+      child: GestureDetector(
+        key: key ?? ValueKey('row_$index'),
+        behavior: HitTestBehavior.opaque,
+        onTap: () => _handleRowTap(row, index),
+        onDoubleTap: () => _handleRowDoubleTap(row, index),
+        child: bg != null ? ColoredBox(color: bg, child: rowContent) : rowContent,
+      ),
     );
   }
 

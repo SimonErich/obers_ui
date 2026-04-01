@@ -138,14 +138,17 @@ class _OiContextMenuState extends State<OiContextMenu> {
     if (!widget.enabled) return widget.child;
 
     return Listener(
-      // Right-click on pointer devices.
       onPointerDown: (e) {
-        if (e.buttons == kSecondaryMouseButton) {
+        // Left-click or right-click both open the menu.
+        if (e.buttons == kPrimaryMouseButton ||
+            e.buttons == kSecondaryMouseButton) {
           _show(e.position);
         }
       },
       child: GestureDetector(
-        onLongPressStart: (d) => _show(d.globalPosition),
+        // Long-press for touch devices.
+        onLongPressStart: (details) => _show(details.globalPosition),
+        behavior: HitTestBehavior.opaque,
         child: widget.child,
       ),
     );
