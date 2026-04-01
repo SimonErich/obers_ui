@@ -191,7 +191,6 @@ class OiCartPanel extends StatelessWidget {
           label: checkoutLabel,
           onTap: onCheckout,
           enabled: onCheckout != null,
-          fullWidth: true,
           semanticLabel: checkoutLabel,
         ),
         if (onContinueShopping != null)

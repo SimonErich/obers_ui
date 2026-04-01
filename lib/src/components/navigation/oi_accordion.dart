@@ -251,8 +251,8 @@ class _OiAccordionState extends State<OiAccordion>
                               child: Text(
                                 section.title,
                                 style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w500,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
                                   color: colors.text,
                                 ),
                               ),
