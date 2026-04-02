@@ -18,7 +18,7 @@ class _CmsArticlesScreenState extends State<CmsArticlesScreen> {
   String _searchQuery = '';
   Map<String, OiColumnFilter> _activeFilters = {};
   OiListViewLayout _layout = OiListViewLayout.list;
-  OiListSortOption? _activeSort;
+  OiListSortOption? _activeSort = _sortOptions.first;
 
   static const _sortOptions = [
     OiListSortOption(id: 'date-desc', label: 'Newest first'),
@@ -47,7 +47,10 @@ class _CmsArticlesScreenState extends State<CmsArticlesScreen> {
     final category = _activeFilters['category'];
     if (category != null) {
       final value = category.value;
-      if (value != null && value is String && value.isNotEmpty) {
+      if (value != null && value is List && value.isNotEmpty) {
+        final selected = value.cast<String>();
+        posts = posts.where((p) => selected.contains(p.category)).toList();
+      } else if (value != null && value is String && value.isNotEmpty) {
         posts = posts.where((p) => p.category == value).toList();
       }
     }
@@ -95,7 +98,7 @@ class _CmsArticlesScreenState extends State<CmsArticlesScreen> {
         OiFilterDefinition(
           key: 'category',
           label: 'Category',
-          type: OiFilterType.select,
+          type: OiFilterType.multiSelect,
           options: kArticleCategories
               .map((c) => OiSelectOption(value: c, label: c))
               .toList(),
@@ -103,15 +106,23 @@ class _CmsArticlesScreenState extends State<CmsArticlesScreen> {
       ],
       activeFilters: _activeFilters,
       onFilterChange: (f) => setState(() => _activeFilters = f),
-      headerActions: OiIconButton(
-        icon: _layout == OiListViewLayout.grid
-            ? OiIcons.menu
-            : OiIcons.layoutGrid,
-        semanticLabel: 'Toggle layout',
-        onTap: () => setState(
-          () => _layout = _layout == OiListViewLayout.list
-              ? OiListViewLayout.grid
-              : OiListViewLayout.list,
+      headerActions: OiTooltip(
+        label: _layout == OiListViewLayout.grid
+            ? 'Switch to list view'
+            : 'Switch to grid view',
+        message: _layout == OiListViewLayout.grid
+            ? 'Switch to list view'
+            : 'Switch to grid view',
+        child: OiIconButton(
+          icon: _layout == OiListViewLayout.grid
+              ? OiIcons.menu
+              : OiIcons.layoutGrid,
+          semanticLabel: 'Toggle layout',
+          onTap: () => setState(
+            () => _layout = _layout == OiListViewLayout.list
+                ? OiListViewLayout.grid
+                : OiListViewLayout.list,
+          ),
         ),
       ),
       itemBuilder: (post) => OiCard(
