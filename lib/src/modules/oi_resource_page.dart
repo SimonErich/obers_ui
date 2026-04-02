@@ -123,7 +123,7 @@ class OiResourcePage extends StatelessWidget {
             _buildTitleBar(context),
             if (variant == OiResourcePageVariant.list && filters != null)
               Padding(
-                padding: EdgeInsets.only(top: spacing.sm),
+                padding: EdgeInsets.only(top: spacing.md),
                 child: filters,
               ),
             SizedBox(height: spacing.md),

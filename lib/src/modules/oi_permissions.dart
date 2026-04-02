@@ -150,8 +150,8 @@ class OiPermissions extends StatelessWidget {
                       child: Text(
                         'Permission',
                         style: TextStyle(
-                          color: colors.textMuted,
-                          fontSize: 12,
+                          color: colors.text,
+                          fontSize: 14,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -165,8 +165,8 @@ class OiPermissions extends StatelessWidget {
                         child: Text(
                           role.label,
                           style: TextStyle(
-                            color: role.color ?? colors.text,
-                            fontSize: 13,
+                            color: colors.text,
+                            fontSize: 14,
                             fontWeight: FontWeight.w600,
                           ),
                           textAlign: TextAlign.center,
@@ -216,14 +216,14 @@ class OiPermissions extends StatelessWidget {
                 children: [
                   Text(
                     permission.label,
-                    style: TextStyle(color: colors.text, fontSize: 13),
+                    style: TextStyle(color: colors.text, fontSize: 14),
                   ),
                   if (permission.description != null)
                     Padding(
                       padding: const EdgeInsets.only(top: 2),
                       child: Text(
                         permission.description!,
-                        style: TextStyle(color: colors.textMuted, fontSize: 11),
+                        style: TextStyle(color: colors.textMuted, fontSize: 12),
                       ),
                     ),
                 ],

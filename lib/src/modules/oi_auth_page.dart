@@ -236,7 +236,6 @@ class _OiAuthPageState extends State<OiAuthPage> {
           label: 'Sign In',
           onTap: _canSubmit && !_isSubmitting ? _submit : null,
           loading: _isSubmitting,
-          fullWidth: true,
         ),
         SizedBox(height: sp.sm),
         const OiDivider(),

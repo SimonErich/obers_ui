@@ -52,8 +52,27 @@ class OiSelect<T> extends StatefulWidget {
     this.enabled = true,
     this.searchable = false,
     this.bottomSheetOnCompact = false,
+    this.inline = false,
     super.key,
   });
+
+  /// Creates an inline [OiSelect] without an input frame.
+  ///
+  /// Renders only the selected label and a chevron. The dropdown shows a
+  /// checkmark next to the active option.
+  const OiSelect.inline({
+    required this.options,
+    this.value,
+    this.onChanged,
+    this.placeholder,
+    this.enabled = true,
+    this.searchable = false,
+    this.bottomSheetOnCompact = false,
+    super.key,
+  })  : inline = true,
+        label = null,
+        hint = null,
+        error = null;
 
   /// The currently selected value.
   final T? value;
@@ -85,12 +104,17 @@ class OiSelect<T> extends StatefulWidget {
   /// When true the dropdown appears as a bottom sheet on compact breakpoints.
   final bool bottomSheetOnCompact;
 
+  /// When true renders an inline trigger (label + chevron) without an input
+  /// frame. The dropdown shows a checkmark next to the selected option.
+  final bool inline;
+
   @override
   State<OiSelect<T>> createState() => _OiSelectState<T>();
 }
 
 class _OiSelectState<T> extends State<OiSelect<T>> {
   bool _open = false;
+  bool _hovered = false;
   String _query = '';
   late TextEditingController _searchCtrl;
   late FocusNode _searchFocus;
@@ -223,6 +247,7 @@ class _OiSelectState<T> extends State<OiSelect<T>> {
                       selected: selected,
                       height: itemHeight,
                       colors: colors,
+                      showCheckmark: widget.inline,
                       onTap: option.enabled ? () => _select(option) : null,
                     );
                   },
@@ -241,29 +266,64 @@ class _OiSelectState<T> extends State<OiSelect<T>> {
     final displayText = label ?? widget.placeholder ?? '';
     final hasValue = label != null;
 
-    final chevron = Icon(OiIcons.arrowDown, size: 16, color: colors.textMuted);
-
-    final anchor = GestureDetector(
-      onTap: widget.enabled ? _open_ : null,
-      behavior: HitTestBehavior.opaque,
-      child: OiInputFrame(
-        label: widget.label,
-        hint: widget.hint,
-        error: widget.error,
-        focused: _open,
-        enabled: widget.enabled,
-        trailing: chevron,
-        child: Text(
-          displayText,
-          style: TextStyle(
-            fontSize: 14,
-            color: hasValue ? colors.text : colors.textMuted,
+    final Widget anchor;
+    if (widget.inline) {
+      anchor = MouseRegion(
+        cursor: SystemMouseCursors.click,
+        onEnter: (_) => setState(() => _hovered = true),
+        onExit: (_) => setState(() => _hovered = false),
+        child: GestureDetector(
+          onTap: widget.enabled ? _open_ : null,
+          behavior: HitTestBehavior.opaque,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                displayText,
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  height: 1.5,
+                  color: _hovered
+                      ? colors.primary.base
+                      : hasValue
+                          ? colors.text
+                          : colors.textMuted,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              const SizedBox(width: 4),
+              Icon(OiIcons.arrowDown, size: 14, color: colors.textMuted),
+            ],
           ),
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
         ),
-      ),
-    );
+      );
+    } else {
+      final chevron =
+          Icon(OiIcons.arrowDown, size: 16, color: colors.textMuted);
+      anchor = GestureDetector(
+        onTap: widget.enabled ? _open_ : null,
+        behavior: HitTestBehavior.opaque,
+        child: OiInputFrame(
+          label: widget.label,
+          hint: widget.hint,
+          error: widget.error,
+          focused: _open,
+          enabled: widget.enabled,
+          trailing: chevron,
+          child: Text(
+            displayText,
+            style: TextStyle(
+              fontSize: 14,
+              color: hasValue ? colors.text : colors.textMuted,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+      );
+    }
 
     return OiFloating(
       visible: _open,
@@ -282,6 +342,7 @@ class _SelectDropdownItem<T> extends StatefulWidget {
     required this.selected,
     required this.height,
     required this.colors,
+    this.showCheckmark = false,
     this.onTap,
   });
 
@@ -289,6 +350,7 @@ class _SelectDropdownItem<T> extends StatefulWidget {
   final bool selected;
   final double height;
   final OiColorScheme colors;
+  final bool showCheckmark;
   final VoidCallback? onTap;
 
   @override
@@ -322,19 +384,24 @@ class _SelectDropdownItemState<T> extends State<_SelectDropdownItem<T>> {
           height: widget.height,
           padding: const EdgeInsets.symmetric(horizontal: 12),
           color: bgColor,
-          child: Align(
-            alignment: Alignment.centerLeft,
-            child: Text(
-              widget.option.label,
-              style: TextStyle(
-                fontSize: 14,
-                color: !widget.option.enabled
-                    ? colors.textMuted
-                    : widget.selected
-                    ? colors.primary.base
-                    : colors.text,
+          child: Row(
+            children: [
+              Expanded(
+                child: Text(
+                  widget.option.label,
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: !widget.option.enabled
+                        ? colors.textMuted
+                        : widget.selected && !widget.showCheckmark
+                        ? colors.primary.base
+                        : colors.text,
+                  ),
+                ),
               ),
-            ),
+              if (widget.showCheckmark && widget.selected)
+                Icon(OiIcons.check, size: 16, color: colors.text),
+            ],
           ),
         ),
       ),

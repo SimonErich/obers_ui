@@ -265,14 +265,11 @@ class _CmsArticleShowScreenState extends State<CmsArticleShowScreen> {
             children: [
               Row(
                 children: [
-                  OiTappable(
+                  OiIconButton(
+                    icon: OiIcons.chevronLeft,
                     semanticLabel: 'Back to articles',
                     onTap: widget.onBack,
-                    child: Icon(
-                      OiIcons.chevronLeft,
-                      size: 20,
-                      color: colors.text,
-                    ),
+                    size: OiButtonSize.large,
                   ),
                   SizedBox(width: spacing.sm),
                   Expanded(child: OiLabel.h3(widget.article.title)),

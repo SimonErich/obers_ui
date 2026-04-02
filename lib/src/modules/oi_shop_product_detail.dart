@@ -281,13 +281,11 @@ class _OiShopProductDetailState extends State<OiShopProductDetail> {
         OiRow(
           breakpoint: breakpoint,
           gap: OiResponsive(sp.sm),
+          mainAxisAlignment: MainAxisAlignment.end,
           children: [
-            Expanded(
-              child: OiButton.primary(
-                label: 'Add to Cart',
-                onTap: _isInStock ? _handleAddToCart : null,
-                fullWidth: true,
-              ),
+            OiButton.primary(
+              label: 'Add to Cart',
+              onTap: _isInStock ? _handleAddToCart : null,
             ),
             if (widget.onWishlist != null)
               OiButton.outline(label: 'Wishlist', onTap: widget.onWishlist),

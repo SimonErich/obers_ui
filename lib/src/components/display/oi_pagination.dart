@@ -192,6 +192,7 @@ class OiPagination extends StatefulWidget {
 
 class _OiPaginationState extends State<OiPagination> {
   final FocusNode _focusNode = FocusNode();
+  int? _hoveredPage;
 
   // ── Computed ──────────────────────────────────────────────────────────────
 
@@ -299,7 +300,7 @@ class _OiPaginationState extends State<OiPagination> {
                     if (visiblePages[i] == null)
                       Padding(
                         key: Key('oi_pagination_ellipsis_$i'),
-                        padding: const EdgeInsets.symmetric(horizontal: 2),
+                        padding: const EdgeInsets.symmetric(horizontal: 4),
                         child: const OiLabel.small('\u2026'),
                       )
                     else
@@ -328,34 +329,43 @@ class _OiPaginationState extends State<OiPagination> {
                 return Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
+                    pageNav,
                     if (widget.showTotal || widget.showPerPage) ...[
+                      const SizedBox(height: 8),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          if (widget.showTotal)
-                            Flexible(child: _buildTotalLabel()),
-                          if (widget.showTotal && widget.showPerPage)
-                            const SizedBox(width: 12),
                           if (widget.showPerPage)
                             _buildPerPageSelector(context),
+                          if (widget.showTotal && widget.showPerPage)
+                            const SizedBox(width: 12),
+                          if (widget.showTotal)
+                            Flexible(child: _buildTotalLabel()),
                         ],
                       ),
-                      const SizedBox(height: 8),
                     ],
-                    pageNav,
                   ],
                 );
               }
 
+              // 3-column layout: left (per page + total), center (page nav),
+              // right (empty, balances the row).
               return Row(
                 children: [
-                  if (widget.showTotal) Flexible(child: _buildTotalLabel()),
-                  if (widget.showTotal) const SizedBox(width: 12),
-                  if (widget.showPerPage) ...[
-                    _buildPerPageSelector(context),
-                    const SizedBox(width: 16),
-                  ],
+                  Expanded(
+                    child: Row(
+                      children: [
+                        if (widget.showPerPage)
+                          _buildPerPageSelector(context),
+                        if (widget.showPerPage && widget.showTotal)
+                          const SizedBox(width: 24),
+                        if (widget.showTotal)
+                          Flexible(child: _buildTotalLabel()),
+                      ],
+                    ),
+                  ),
                   pageNav,
+                  const Expanded(child: SizedBox.shrink()),
                 ],
               );
             },
@@ -485,29 +495,40 @@ class _OiPaginationState extends State<OiPagination> {
 
   Widget _buildPageButton(int page, OiColorScheme colors) {
     final isCurrent = page == _clampedPage;
+    final isHovered = _hoveredPage == page;
+    final hasBackground = isCurrent || isHovered;
     return Semantics(
       button: true,
       label: 'Page ${page + 1}',
       selected: isCurrent,
       child: Focus(
-        child: GestureDetector(
-          key: Key('oi_pagination_page_$page'),
-          onTap: isCurrent ? null : () => widget.onPageChange?.call(page),
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-            margin: const EdgeInsets.symmetric(horizontal: 1),
-            decoration: isCurrent
-                ? BoxDecoration(
-                    color: colors.primary.base,
-                    borderRadius: BorderRadius.circular(4),
-                  )
-                : null,
-            child: isCurrent
-                ? OiLabel.bodyStrong(
-                    '${page + 1}',
-                    color: colors.primary.foreground,
-                  )
-                : OiLabel.body('${page + 1}', color: colors.text),
+        child: MouseRegion(
+          cursor: isCurrent ? SystemMouseCursors.basic : SystemMouseCursors.click,
+          onEnter: (_) => setState(() => _hoveredPage = page),
+          onExit: (_) {
+            if (_hoveredPage == page) {
+              setState(() => _hoveredPage = null);
+            }
+          },
+          child: GestureDetector(
+            key: Key('oi_pagination_page_$page'),
+            onTap: isCurrent ? null : () => widget.onPageChange?.call(page),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              margin: const EdgeInsets.symmetric(horizontal: 4),
+              decoration: hasBackground
+                  ? BoxDecoration(
+                      color: isCurrent ? colors.primary.base : colors.surfaceHover,
+                      borderRadius: BorderRadius.circular(4),
+                    )
+                  : null,
+              child: isCurrent
+                  ? OiLabel.bodyStrong(
+                      '${page + 1}',
+                      color: colors.primary.foreground,
+                    )
+                  : OiLabel.body('${page + 1}', color: colors.text),
+            ),
           ),
         ),
       ),

@@ -24,6 +24,7 @@ class _FormInputsScreenState extends State<FormInputsScreen> {
   double _discreteSliderValue = 3;
   String? _selectedCountry;
   String? _selectedLanguage;
+  String? _inlineSortOption = 'newest';
   DateTime? _selectedDate;
   OiTimeOfDay? _selectedTime;
   DateTime? _selectedDateTime;
@@ -213,6 +214,35 @@ class _FormInputsScreenState extends State<FormInputsScreen> {
                     ],
                     onChanged: (v) => setState(() => _selectedLanguage = v),
                   ),
+                ),
+              ),
+              ComponentExample(
+                title: 'Inline select',
+                child: Row(
+                  children: [
+                    OiLabel.small(
+                      'Sort by:',
+                      color: context.colors.textMuted,
+                    ),
+                    SizedBox(width: spacing.sm),
+                    OiSelect<String>.inline(
+                      value: _inlineSortOption,
+                      options: const [
+                        OiSelectOption(value: 'newest', label: 'Newest first'),
+                        OiSelectOption(value: 'oldest', label: 'Oldest first'),
+                        OiSelectOption(
+                          value: 'title-asc',
+                          label: 'Title A\u2013Z',
+                        ),
+                        OiSelectOption(
+                          value: 'title-desc',
+                          label: 'Title Z\u2013A',
+                        ),
+                      ],
+                      onChanged: (v) =>
+                          setState(() => _inlineSortOption = v),
+                    ),
+                  ],
                 ),
               ),
             ],

@@ -455,7 +455,6 @@ class _OiChatWindowState extends State<OiChatWindow> {
                     icon: OiIcons.sendHorizontal,
                     onTap: widget.streaming ? null : _handleSend,
                     enabled: !widget.streaming,
-                    size: OiButtonSize.small,
                   ),
                 ],
               ),

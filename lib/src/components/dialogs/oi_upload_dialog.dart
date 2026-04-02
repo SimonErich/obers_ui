@@ -1,3 +1,7 @@
+import 'dart:async';
+
+import 'package:desktop_drop/desktop_drop.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/buttons/oi_button.dart';
@@ -74,6 +78,8 @@ class _OiUploadDialogState extends State<OiUploadDialog> {
   final List<_UploadEntry> _entries = [];
   late OiConflictResolution _resolution;
   late final FocusNode _escapeFocusNode;
+  bool _isDragOver = false;
+  bool _picking = false;
 
   @override
   void initState() {
@@ -106,8 +112,6 @@ class _OiUploadDialogState extends State<OiUploadDialog> {
     return null;
   }
 
-  // Called by the host via GlobalKey or file picker integration.
-  // ignore: unused_element
   void _addFiles(List<OiFileData> files) {
     setState(() {
       for (final file in files) {
@@ -117,6 +121,59 @@ class _OiUploadDialogState extends State<OiUploadDialog> {
         _entries.add(_UploadEntry(file: file, error: _validateFile(file)));
       }
     });
+  }
+
+  Future<void> _pickFiles() async {
+    if (_picking) return;
+    setState(() => _picking = true);
+    try {
+      final result = await FilePicker.platform.pickFiles(
+        allowMultiple: true,
+        type: widget.allowedExtensions != null ? FileType.custom : FileType.any,
+        allowedExtensions: widget.allowedExtensions,
+        withData: true,
+      );
+      if (result != null && mounted) {
+        final files = result.files
+            .map(
+              (f) => OiFileData(
+                name: f.name,
+                size: f.size,
+                bytes: f.bytes,
+                mimeType: OiFileUtils.mimeType(OiFileUtils.extension(f.name)),
+              ),
+            )
+            .toList();
+        _addFiles(files);
+      }
+    } finally {
+      if (mounted) setState(() => _picking = false);
+    }
+  }
+
+  Future<void> _handleDroppedFiles(DropDoneDetails details) async {
+    final files = <OiFileData>[];
+    for (final item in details.files) {
+      // Skip directories.
+      if (item is DropItemDirectory) continue;
+      try {
+        final bytes = await item.readAsBytes();
+        files.add(
+          OiFileData(
+            name: item.name,
+            size: bytes.length,
+            bytes: bytes,
+            mimeType:
+                item.mimeType ??
+                OiFileUtils.mimeType(OiFileUtils.extension(item.name)),
+          ),
+        );
+      } on Exception {
+        // Skip files that cannot be read (e.g. sandbox restrictions).
+        continue;
+      }
+    }
+    if (files.isNotEmpty && mounted) _addFiles(files);
   }
 
   void _removeEntry(int index) {
@@ -169,37 +226,59 @@ class _OiUploadDialogState extends State<OiUploadDialog> {
                   ),
                 ),
               SizedBox(height: spacing.md),
-              // Drop zone placeholder
-              GestureDetector(
-                onTap: () {
-                  // In a real implementation, this would trigger a file picker
-                  // The consumer provides files via the dialog's API
+              // Drop zone with file picker and OS drag-and-drop
+              DropTarget(
+                onDragEntered: (_) => setState(() => _isDragOver = true),
+                onDragExited: (_) => setState(() => _isDragOver = false),
+                onDragDone: (details) {
+                  setState(() => _isDragOver = false);
+                  unawaited(_handleDroppedFiles(details));
                 },
-                child: Container(
-                  height: 100,
-                  decoration: BoxDecoration(
-                    border: Border.all(color: colors.borderSubtle),
-                    borderRadius: BorderRadius.circular(8),
-                    color: colors.surfaceSubtle,
-                  ),
-                  child: Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          OiIcons.cloudUpload, // upload
-                          size: 28,
-                          color: colors.textMuted,
-                        ),
-                        SizedBox(height: spacing.xs),
-                        Text(
-                          'Drop files here or browse',
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: colors.textMuted,
+                child: GestureDetector(
+                  onTap: _pickFiles,
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 150),
+                    height: 100,
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: _isDragOver
+                            ? colors.primary.base
+                            : colors.borderSubtle,
+                        width: _isDragOver ? 2 : 1,
+                      ),
+                      borderRadius: BorderRadius.circular(8),
+                      color: _isDragOver
+                          ? colors.primary.muted.withValues(alpha: 0.12)
+                          : colors.surfaceSubtle,
+                    ),
+                    child: Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            OiIcons.cloudUpload,
+                            size: 28,
+                            color: _isDragOver
+                                ? colors.primary.base
+                                : colors.textMuted,
                           ),
-                        ),
-                      ],
+                          SizedBox(height: spacing.xs),
+                          Text(
+                            _isDragOver
+                                ? 'Release to add files'
+                                : 'Drop files here or browse',
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: _isDragOver
+                                  ? FontWeight.w500
+                                  : FontWeight.normal,
+                              color: _isDragOver
+                                  ? colors.primary.base
+                                  : colors.textMuted,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
