@@ -211,6 +211,7 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
       cellBuilder: (_, row, __) => OiContextMenu(
         label: 'Actions for ${row['name']}',
         items: _rowMenuItems(row),
+        openOnTap: true,
         child: const Padding(
           padding: EdgeInsets.all(8.0),
           child: Icon(OiIcons.ellipsisVertical, size: 18),
