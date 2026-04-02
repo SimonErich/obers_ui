@@ -99,7 +99,7 @@ class OiInputFrame extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if (label != null) ...[
+        if (label != null && label!.isNotEmpty) ...[
           OiLabel.smallStrong(label!),
           const SizedBox(height: 4),
         ],
