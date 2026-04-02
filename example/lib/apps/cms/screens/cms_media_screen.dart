@@ -86,13 +86,50 @@ class _CmsMediaScreenState extends State<CmsMediaScreen> {
 
   void _handleDelete(int index) {
     final name = _items[index]['name'] ?? 'file';
-    setState(() {
-      _items = List.of(_items)..removeAt(index);
-    });
-    OiToast.show(
+    _dialogHandle?.dismiss();
+    _dialogHandle = OiDialog.show(
       context,
-      message: '"$name" deleted',
-      level: OiToastLevel.success,
+      label: 'Delete media',
+      dialog: OiDialog.confirm(
+        label: 'Confirm delete',
+        title: 'Delete "$name"?',
+        content: const Padding(
+          padding: EdgeInsets.symmetric(vertical: 8),
+          child: OiLabel.body(
+            'This will permanently remove the file from the media library.',
+          ),
+        ),
+        onClose: () {
+          _dialogHandle?.dismiss();
+          _dialogHandle = null;
+        },
+        actions: [
+          OiButton.ghost(
+            label: 'Cancel',
+            semanticLabel: 'Cancel',
+            onTap: () {
+              _dialogHandle?.dismiss();
+              _dialogHandle = null;
+            },
+          ),
+          OiButton.primary(
+            label: 'Delete',
+            semanticLabel: 'Confirm delete',
+            onTap: () {
+              setState(() {
+                _items = List.of(_items)..removeAt(index);
+              });
+              OiToast.show(
+                context,
+                message: '"$name" deleted',
+                level: OiToastLevel.success,
+              );
+              _dialogHandle?.dismiss();
+              _dialogHandle = null;
+            },
+          ),
+        ],
+      ),
     );
   }
 
@@ -217,7 +254,12 @@ class _MediaCard extends StatelessWidget {
                 ),
               ),
               child: Center(
-                child: Icon(icon, size: 36, color: colors.textMuted),
+                child: OiIcon(
+                  icon: icon,
+                  label: 'Preview of $name',
+                  size: 36,
+                  color: colors.textMuted,
+                ),
               ),
             ),
           ),
@@ -242,14 +284,10 @@ class _MediaCard extends StatelessWidget {
                         color: colors.textMuted,
                       ),
                     ),
-                    OiTappable(
+                    OiIconButton(
+                      icon: OiIcons.trash2,
                       semanticLabel: 'Delete $name',
                       onTap: onDelete,
-                      child: Icon(
-                        OiIcons.trash2,
-                        size: 14,
-                        color: colors.textMuted,
-                      ),
                     ),
                   ],
                 ),
