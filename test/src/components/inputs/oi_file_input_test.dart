@@ -46,7 +46,7 @@ void main() {
 
   testWidgets('dropZone=true shows drop target', (tester) async {
     await tester.pumpObers(const OiFileInput(dropZone: true));
-    expect(find.text('Drop files here'), findsOneWidget);
+    expect(find.text('Drop files here or browse'), findsOneWidget);
   });
 
   testWidgets('removing a file chip calls onChanged', (tester) async {

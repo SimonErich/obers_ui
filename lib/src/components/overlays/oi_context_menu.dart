@@ -139,9 +139,8 @@ class _OiContextMenuState extends State<OiContextMenu> {
 
     return Listener(
       onPointerDown: (e) {
-        // Left-click or right-click both open the menu.
-        if (e.buttons == kPrimaryMouseButton ||
-            e.buttons == kSecondaryMouseButton) {
+        // Open only on right-click; touch still uses long-press below.
+        if (e.buttons == kSecondaryMouseButton) {
           _show(e.position);
         }
       },

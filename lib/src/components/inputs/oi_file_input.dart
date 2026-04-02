@@ -1,3 +1,4 @@
+import 'package:desktop_drop/desktop_drop.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/_internal/oi_input_frame.dart';
@@ -62,6 +63,7 @@ class OiFileInput extends StatefulWidget {
 
 class _OiFileInputState extends State<OiFileInput> {
   bool _picking = false;
+  bool _isDragOver = false;
   List<String> _internalFiles = [];
 
   List<String> get _effectiveFiles => widget.value ?? _internalFiles;
@@ -95,6 +97,15 @@ class _OiFileInputState extends State<OiFileInput> {
     }
   }
 
+  void _handleDrop(DropDoneDetails details) {
+    final names = details.files.map((f) => f.name).toList();
+    if (widget.multipleFiles) {
+      _updateFiles([..._effectiveFiles, ...names]);
+    } else if (names.isNotEmpty) {
+      _updateFiles([names.first]);
+    }
+  }
+
   void _removeFile(int index) {
     final updated = List<String>.from(_effectiveFiles)..removeAt(index);
     _updateFiles(updated);
@@ -115,7 +126,7 @@ class _OiFileInputState extends State<OiFileInput> {
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(
-            OiIcons.mail,
+            OiIcons.file,
             size: 14,
             color: colors.textMuted,
           ),
@@ -147,18 +158,54 @@ class _OiFileInputState extends State<OiFileInput> {
 
   Widget _buildDropZone(BuildContext context) {
     final colors = context.colors;
-    return Container(
-      margin: const EdgeInsets.only(top: 8),
-      height: 64,
-      decoration: BoxDecoration(
-        color: colors.surfaceSubtle,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: colors.borderSubtle),
-      ),
-      child: Center(
-        child: Text(
-          'Drop files here',
-          style: TextStyle(fontSize: 13, color: colors.textMuted),
+    return DropTarget(
+      enable: widget.enabled,
+      onDragEntered: (_) => setState(() => _isDragOver = true),
+      onDragExited: (_) => setState(() => _isDragOver = false),
+      onDragDone: (details) {
+        setState(() => _isDragOver = false);
+        _handleDrop(details);
+      },
+      child: GestureDetector(
+        onTap: widget.enabled ? _pick : null,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 150),
+          margin: const EdgeInsets.only(top: 8),
+          height: 64,
+          decoration: BoxDecoration(
+            color: _isDragOver
+                ? colors.primary.muted.withValues(alpha: 0.12)
+                : colors.surfaceSubtle,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(
+              color: _isDragOver ? colors.primary.base : colors.borderSubtle,
+              width: _isDragOver ? 2 : 1,
+            ),
+          ),
+          child: Center(
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  OiIcons.cloudUpload,
+                  size: 16,
+                  color:
+                      _isDragOver ? colors.primary.base : colors.textMuted,
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  _isDragOver ? 'Release to add files' : 'Drop files here or browse',
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight:
+                        _isDragOver ? FontWeight.w500 : FontWeight.normal,
+                    color:
+                        _isDragOver ? colors.primary.base : colors.textMuted,
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );
@@ -195,7 +242,7 @@ class _OiFileInputState extends State<OiFileInput> {
               )
             else
               Icon(
-                OiIcons.mail,
+                OiIcons.upload,
                 size: 16,
                 color: colors.primary.base,
               ),
