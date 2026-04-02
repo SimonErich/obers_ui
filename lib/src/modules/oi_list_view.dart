@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/display/oi_empty_state.dart';
 import 'package:obers_ui/src/components/display/oi_progress.dart';
+import 'package:obers_ui/src/components/inputs/oi_select.dart';
 import 'package:obers_ui/src/components/inputs/oi_text_input.dart';
 import 'package:obers_ui/src/components/overlays/oi_sheet.dart';
 import 'package:obers_ui/src/composites/navigation/oi_filter_bar.dart';
@@ -15,6 +16,7 @@ import 'package:obers_ui/src/foundation/persistence/oi_settings_provider.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/models/settings/oi_list_view_settings.dart'
     hide OiListViewLayout;
+import 'package:obers_ui/src/primitives/display/oi_label.dart';
 import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
 
 // ---------------------------------------------------------------------------
@@ -341,14 +343,7 @@ class _OiListViewState<T> extends State<OiListView<T>>
           crossAxisAlignment: CrossAxisAlignment.stretch,
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(
-              'Filters',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: context.colors.text,
-              ),
-            ),
+            const OiLabel.h4('Filters'),
             const SizedBox(height: 12),
             OiFilterBar(
               filters: widget.filters!,
@@ -393,7 +388,6 @@ class _OiListViewState<T> extends State<OiListView<T>>
   }
 
   Widget _buildHeader(BuildContext context) {
-    final colors = context.colors;
     final isCompact = context.isCompact;
     final hasFilters = widget.filters != null && widget.filters!.isNotEmpty;
 
@@ -405,14 +399,7 @@ class _OiListViewState<T> extends State<OiListView<T>>
           Row(
             children: [
               Expanded(
-                child: Text(
-                  widget.label,
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                    color: colors.text,
-                  ),
-                ),
+                child: OiLabel.h2(widget.label),
               ),
               if (hasFilters && isCompact) ...[
                 _buildFiltersButton(context),
@@ -421,27 +408,71 @@ class _OiListViewState<T> extends State<OiListView<T>>
               if (widget.headerActions != null) widget.headerActions!,
             ],
           ),
-          if (widget.onSearch != null) ...[
-            const SizedBox(height: 12),
-            OiTextInput(
-              placeholder: 'Search...',
-              onChanged: widget.onSearch,
-              controller: _searchController,
-            ),
-          ],
-          if (hasFilters && !isCompact) ...[
-            const SizedBox(height: 8),
-            OiFilterBar(
-              filters: widget.filters!,
-              activeFilters: widget.activeFilters,
-              onFilterChange: (updated) {
-                widget.onFilterChange?.call(updated);
-              },
-            ),
-          ],
-          if (widget.sortOptions != null && widget.sortOptions!.isNotEmpty) ...[
-            const SizedBox(height: 8),
-            _buildSortBar(context),
+          if (isCompact) ...[
+            if (widget.onSearch != null) ...[
+              const SizedBox(height: 12),
+              OiTextInput(
+                placeholder: 'Search...',
+                onChanged: widget.onSearch,
+                controller: _searchController,
+              ),
+            ],
+            if (hasFilters) ...[
+              const SizedBox(height: 8),
+              OiFilterBar(
+                filters: widget.filters!,
+                activeFilters: widget.activeFilters,
+                onFilterChange: (updated) {
+                  widget.onFilterChange?.call(updated);
+                },
+              ),
+            ],
+            if (widget.sortOptions != null &&
+                widget.sortOptions!.isNotEmpty) ...[
+              const SizedBox(height: 8),
+              _buildSortBar(context),
+            ],
+          ] else ...[
+            if (widget.onSearch != null ||
+                hasFilters ||
+                (widget.sortOptions != null &&
+                    widget.sortOptions!.isNotEmpty)) ...[
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  if (widget.onSearch != null)
+                    Expanded(
+                      child: OiTextInput(
+                        placeholder: 'Search...',
+                        onChanged: widget.onSearch,
+                        controller: _searchController,
+                      ),
+                    ),
+                  if (widget.onSearch != null &&
+                      (hasFilters ||
+                          (widget.sortOptions != null &&
+                              widget.sortOptions!.isNotEmpty)))
+                    const SizedBox(width: 16),
+                  if (hasFilters)
+                    Flexible(
+                      child: OiFilterBar(
+                        filters: widget.filters!,
+                        activeFilters: widget.activeFilters,
+                        onFilterChange: (updated) {
+                          widget.onFilterChange?.call(updated);
+                        },
+                      ),
+                    ),
+                  if (hasFilters &&
+                      widget.sortOptions != null &&
+                      widget.sortOptions!.isNotEmpty)
+                    const SizedBox(width: 16),
+                  if (widget.sortOptions != null &&
+                      widget.sortOptions!.isNotEmpty)
+                    _buildSortBar(context),
+                ],
+              ),
+            ],
           ],
         ],
       ),
@@ -468,7 +499,7 @@ class _OiListViewState<T> extends State<OiListView<T>>
           children: [
             Icon(OiIcons.alignLeft, size: 16, color: colors.text),
             const SizedBox(width: 4),
-            Text('Filters', style: TextStyle(fontSize: 13, color: colors.text)),
+            OiLabel.small('Filters', color: colors.text),
             if (activeCount > 0) ...[
               const SizedBox(width: 4),
               Container(
@@ -479,9 +510,9 @@ class _OiListViewState<T> extends State<OiListView<T>>
                   shape: BoxShape.circle,
                 ),
                 child: Center(
-                  child: Text(
+                  child: OiLabel.tiny(
                     '$activeCount',
-                    style: TextStyle(fontSize: 10, color: colors.textOnPrimary),
+                    color: colors.textOnPrimary,
                   ),
                 ),
               ),
@@ -494,51 +525,24 @@ class _OiListViewState<T> extends State<OiListView<T>>
 
   Widget _buildSortBar(BuildContext context) {
     final colors = context.colors;
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        children: [
-          for (final option in widget.sortOptions!)
-            Padding(
-              padding: const EdgeInsets.only(right: 8),
-              child: OiTappable(
-                onTap: () => widget.onSort?.call(option),
-                clipBorderRadius: BorderRadius.circular(6),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 6,
-                  ),
-                  decoration: BoxDecoration(
-                    color: widget.activeSort?.id == option.id
-                        ? colors.primary.base.withValues(alpha: 0.1)
-                        : null,
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      if (option.icon != null) ...[
-                        Icon(option.icon, size: 14, color: colors.text),
-                        const SizedBox(width: 4),
-                      ],
-                      Text(
-                        option.label,
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: widget.activeSort?.id == option.id
-                              ? FontWeight.w600
-                              : FontWeight.w400,
-                          color: colors.text,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-        ],
-      ),
+    final options = widget.sortOptions!;
+    return Row(
+      children: [
+        OiLabel.small('Sort by:', color: colors.textMuted),
+        const SizedBox(width: 8),
+        OiSelect<String>.inline(
+          options: [
+            for (final option in options)
+              OiSelectOption(value: option.id, label: option.label),
+          ],
+          value: widget.activeSort?.id ?? options.first.id,
+          onChanged: (id) {
+            if (id == null) return;
+            final option = options.firstWhere((o) => o.id == id);
+            widget.onSort?.call(option);
+          },
+        ),
+      ],
     );
   }
 
@@ -550,13 +554,9 @@ class _OiListViewState<T> extends State<OiListView<T>>
       color: colors.primary.base.withValues(alpha: 0.08),
       child: Row(
         children: [
-          Text(
+          OiLabel.smallStrong(
             '${widget.selectedKeys.length} selected',
-            style: TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w500,
-              color: colors.text,
-            ),
+            color: colors.text,
           ),
           const Spacer(),
           ...actions,
