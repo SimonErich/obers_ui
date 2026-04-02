@@ -6,15 +6,8 @@ import 'package:obers_ui_example/data/mock_dashboard.dart';
 
 /// Dashboard overview with metric cards, funnel, gauge, heatmap, radar,
 /// sankey, and treemap.
-class AdminOverviewScreen extends StatefulWidget {
+class AdminOverviewScreen extends StatelessWidget {
   const AdminOverviewScreen({super.key});
-
-  @override
-  State<AdminOverviewScreen> createState() => _AdminOverviewScreenState();
-}
-
-class _AdminOverviewScreenState extends State<AdminOverviewScreen> {
-  bool _isEditing = false;
 
   static const _metricTooltips = [
     'Total revenue earned this month compared to the previous month.',
@@ -26,154 +19,120 @@ class _AdminOverviewScreenState extends State<AdminOverviewScreen> {
   @override
   Widget build(BuildContext context) {
     final spacing = context.spacing;
+    final bp = context.breakpoint;
 
-    return Column(
-      children: [
-        // Edit mode toolbar
-        Padding(
-          padding: EdgeInsets.symmetric(
-            horizontal: spacing.lg,
-            vertical: spacing.sm,
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              OiSwitch(
-                label: 'Edit mode',
-                value: _isEditing,
-                onChanged: (v) {
-                  setState(() => _isEditing = v);
-                  if (v) {
-                    OiToast.show(
-                      context,
-                      message: 'Edit mode is not yet available. '
-                          'Drag-and-drop reordering coming soon.',
-                    );
-                  }
-                },
+    return SingleChildScrollView(
+      padding: EdgeInsets.all(spacing.lg),
+      child: OiGrid(
+        breakpoint: bp,
+        columns: OiResponsive.breakpoints({
+          OiBreakpoint.compact: 1,
+          OiBreakpoint.expanded: 2,
+          OiBreakpoint.large: 4,
+        }),
+        gap: OiResponsive.breakpoints({
+          OiBreakpoint.compact: 12.0,
+          OiBreakpoint.expanded: 14.0,
+          OiBreakpoint.large: 16.0,
+        }),
+        stretchRows: true,
+        children: [
+          // ── Row 1 — 4 metric cards (1 col each) ──────────────────────
+          for (var i = 0; i < kDashboardMetrics.length; i++)
+            _DashboardTile(
+              title: kDashboardMetrics[i].label,
+              child: OiTooltip(
+                label: '${kDashboardMetrics[i].label} tooltip',
+                message: _metricTooltips[i],
+                child: OiMetric(
+                  label: kDashboardMetrics[i].label,
+                  value: kDashboardMetrics[i].value,
+                  subValue: kDashboardMetrics[i].subValue,
+                  trend: kDashboardMetrics[i].trend,
+                  trendPercent: kDashboardMetrics[i].trendPercent,
+                ),
               ),
-            ],
-          ),
-        ),
+            ),
 
-        // Dashboard grid
-        // TODO: Implement drag-and-drop reordering in OiDashboard edit mode.
-        Expanded(
-          child: OiDashboard(
-            label: 'Admin dashboard',
-            editable: _isEditing,
-            cards: [
-              // 4 metric cards wrapped in OiTooltip
-              for (var i = 0; i < kDashboardMetrics.length; i++)
-                OiDashboardCard(
-                  key: 'metric-$i',
-                  title: kDashboardMetrics[i].label,
-                  child: OiTooltip(
-                    label: '${kDashboardMetrics[i].label} tooltip',
-                    message: _metricTooltips[i],
-                    child: OiMetric(
-                      label: kDashboardMetrics[i].label,
-                      value: kDashboardMetrics[i].value,
-                      subValue: kDashboardMetrics[i].subValue,
-                      trend: kDashboardMetrics[i].trend,
-                      trendPercent: kDashboardMetrics[i].trendPercent,
-                    ),
+          // ── Row 2 — Funnel + Gauge (2 cols each on desktop, full on mobile) ─
+          _DashboardTile(
+            title: 'Conversion Funnel',
+            child: OiFunnelChart(
+              label: 'Sales conversion funnel',
+              stages: [
+                for (final stage in kFunnelStages)
+                  OiFunnelStage(
+                    label: stage.label,
+                    value: stage.value.toDouble(),
                   ),
-                ),
+              ],
+            ),
+          ).span(columnSpan: OiResponsive.breakpoints({
+            OiBreakpoint.compact: 1,
+            OiBreakpoint.large: 2,
+          })),
+          _DashboardTile(
+            title: 'Customer Satisfaction',
+            child: OiGauge(
+              label: 'Customer satisfaction score',
+              value: 4.7,
+              max: 5,
+              formatValue: (v) => v.toStringAsFixed(1),
+            ),
+          ).span(columnSpan: OiResponsive.breakpoints({
+            OiBreakpoint.compact: 1,
+            OiBreakpoint.large: 2,
+          })),
 
-              // Funnel chart
-              OiDashboardCard(
-                key: 'funnel',
-                title: 'Conversion Funnel',
-                columnSpan: 2,
-                rowSpan: 2,
-                child: OiFunnelChart(
-                  label: 'Sales conversion funnel',
-                  stages: [
-                    for (final stage in kFunnelStages)
-                      OiFunnelStage(
-                        label: stage.label,
-                        value: stage.value.toDouble(),
-                      ),
-                  ],
+          // ── Row 3 — Radar + Treemap (2 cols each) ─────────────────────
+          _DashboardTile(
+            title: 'Category Performance',
+            child: OiRadarChart(
+              label: 'Product category performance comparison',
+              axes: kRadarCategories,
+              series: [
+                OiRadarSeries(
+                  label: 'This Quarter',
+                  values: kRadarValues[0],
                 ),
-              ),
-
-              // Gauge
-              OiDashboardCard(
-                key: 'gauge',
-                title: 'Customer Satisfaction',
-                columnSpan: 2,
-                rowSpan: 2,
-                child: OiGauge(
-                  label: 'Customer satisfaction score',
-                  value: 4.7,
-                  max: 5,
-                  formatValue: (v) => v.toStringAsFixed(1),
+                OiRadarSeries(
+                  label: 'Last Quarter',
+                  values: kRadarValues[1],
                 ),
-              ),
+              ],
+              maxValue: 100,
+            ),
+          ).span(columnSpan: OiResponsive.breakpoints({
+            OiBreakpoint.compact: 1,
+            OiBreakpoint.large: 2,
+          })),
+          _DashboardTile(
+            title: 'Revenue by Category',
+            child: OiTreemap(
+              label: 'Revenue by product category',
+              nodes: [
+                for (final n in kTreemapNodes)
+                  OiTreemapNode(
+                    key: n.key,
+                    label: n.label,
+                    value: n.value,
+                  ),
+              ],
+              showValues: true,
+            ),
+          ).span(columnSpan: OiResponsive.breakpoints({
+            OiBreakpoint.compact: 1,
+            OiBreakpoint.large: 2,
+          })),
 
-              // Heatmap
-              OiDashboardCard(
-                key: 'heatmap',
-                title: 'Activity Heatmap',
-                columnSpan: 4,
-                rowSpan: 2,
-                child: OiHeatmap(
-                  label: 'Activity by day and hour',
-                  cells: [
-                    for (var r = 0; r < kHeatmapData.length; r++)
-                      for (var c = 0; c < kHeatmapData[r].length; c++)
-                        OiHeatmapCell(
-                          row: r,
-                          column: c,
-                          value: kHeatmapData[r][c].toDouble(),
-                        ),
-                  ],
-                  rowLabels: const [
-                    'Mon',
-                    'Tue',
-                    'Wed',
-                    'Thu',
-                    'Fri',
-                    'Sat',
-                    'Sun',
-                  ],
-                  columnLabels: List.generate(24, (i) => '${i}h'),
-                  showValues: false,
-                ),
-              ),
-
-              // Radar chart
-              OiDashboardCard(
-                key: 'radar',
-                title: 'Category Performance',
-                columnSpan: 2,
-                rowSpan: 2,
-                child: OiRadarChart(
-                  label: 'Product category performance comparison',
-                  axes: kRadarCategories,
-                  series: [
-                    OiRadarSeries(
-                      label: 'This Quarter',
-                      values: kRadarValues[0],
-                    ),
-                    OiRadarSeries(
-                      label: 'Last Quarter',
-                      values: kRadarValues[1],
-                    ),
-                  ],
-                  maxValue: 100,
-                ),
-              ),
-
-              // Sankey chart — customer journey
-              OiDashboardCard(
-                key: 'sankey',
-                title: 'Customer Journey',
-                columnSpan: 4,
-                rowSpan: 2,
-                child: OiSankey(
+          // ── Row 4 — Customer Journey (full width) ─────────────────────
+          _DashboardTile(
+            title: 'Customer Journey',
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                const minWidth = 600.0;
+                final needsScroll = constraints.maxWidth < minWidth;
+                final chart = OiSankey(
                   label: 'Customer journey flow',
                   nodes: [
                     for (final n in kSankeyNodes)
@@ -188,28 +147,93 @@ class _AdminOverviewScreenState extends State<AdminOverviewScreen> {
                       ),
                   ],
                   showValues: true,
-                ),
-              ),
+                );
+                if (!needsScroll) return chart;
+                return SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: SizedBox(width: minWidth, child: chart),
+                );
+              },
+            ),
+          ).span(columnSpan: const OiResponsive(fullSpanSentinel)),
 
-              // Treemap — revenue by category
-              OiDashboardCard(
-                key: 'treemap',
-                title: 'Revenue by Category',
-                columnSpan: 2,
-                rowSpan: 2,
-                child: OiTreemap(
-                  label: 'Revenue by product category',
-                  nodes: [
-                    for (final n in kTreemapNodes)
-                      OiTreemapNode(key: n.key, label: n.label, value: n.value),
-                  ],
-                  showValues: true,
-                ),
+          // ── Row 5 — Activity Heatmap (full width) ─────────────────────
+          _DashboardTile(
+            title: 'Activity Heatmap',
+            child: OiHeatmap(
+              label: 'Activity by day and hour',
+              cells: [
+                for (var r = 0; r < kHeatmapData.length; r++)
+                  for (var c = 0; c < kHeatmapData[r].length; c++)
+                    OiHeatmapCell(
+                      row: r,
+                      column: c,
+                      value: kHeatmapData[r][c].toDouble(),
+                    ),
+              ],
+              rowLabels: const [
+                'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun',
+              ],
+              columnLabels: List.generate(24, (i) => '${i}h'),
+              showValues: false,
+            ),
+          ).span(columnSpan: const OiResponsive(fullSpanSentinel)),
+        ],
+      ),
+    );
+  }
+}
+
+// ─── Helper widgets ──────────────────────────────────────────────────────────
+
+/// A single dashboard card with a title header and content area.
+class _DashboardTile extends StatelessWidget {
+  const _DashboardTile({
+    required this.title,
+    required this.child,
+  });
+
+  final String title;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+
+    return Container(
+      decoration: BoxDecoration(
+        color: colors.surface,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: colors.borderSubtle),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            decoration: BoxDecoration(
+              border: Border(
+                bottom: BorderSide(color: colors.borderSubtle),
               ),
-            ],
+            ),
+            child: Text(
+              title,
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: colors.text,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
           ),
-        ),
-      ],
+          Padding(
+            padding: const EdgeInsets.all(12),
+            child: child,
+          ),
+        ],
+      ),
     );
   }
 }
