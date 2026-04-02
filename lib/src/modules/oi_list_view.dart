@@ -18,6 +18,7 @@ import 'package:obers_ui/src/models/settings/oi_list_view_settings.dart'
     hide OiListViewLayout;
 import 'package:obers_ui/src/primitives/display/oi_label.dart';
 import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
+import 'package:obers_ui/src/primitives/layout/oi_grid.dart';
 
 // ---------------------------------------------------------------------------
 // Supporting types
@@ -101,7 +102,10 @@ class OiListView<T> extends StatefulWidget {
     this.loading = false,
     this.emptyState,
     this.layout = OiListViewLayout.list,
+    this.gridColumns,
+    this.gridGap,
     this.headerActions,
+    this.footer,
     this.onRefresh,
     this.settingsDriver,
     this.settingsKey,
@@ -172,8 +176,21 @@ class OiListView<T> extends StatefulWidget {
   /// The layout mode for the list.
   final OiListViewLayout layout;
 
+  /// Responsive column count for the grid layout.
+  ///
+  /// When null, defaults to 3 columns for all breakpoints.
+  final OiResponsive<int>? gridColumns;
+
+  /// Gap between grid items in logical pixels.
+  ///
+  /// When null, defaults to [OiSpacingTheme.md].
+  final OiResponsive<double>? gridGap;
+
   /// Widget displayed in the header action slot.
   final Widget? headerActions;
+
+  /// Optional widget displayed below the list body (e.g. pagination).
+  final Widget? footer;
 
   /// Called when the user triggers a pull-to-refresh.
   final Future<void> Function()? onRefresh;
@@ -380,6 +397,7 @@ class _OiListViewState<T> extends State<OiListView<T>>
             _buildHeader(context),
             if (hasSelectionBar && !isCompact) _buildSelectionBar(context),
             Expanded(child: _buildBody(context)),
+            if (widget.footer != null) widget.footer!,
             if (hasSelectionBar && isCompact) _buildSelectionBar(context),
           ],
         ),
@@ -606,29 +624,31 @@ class _OiListViewState<T> extends State<OiListView<T>>
 
     final Widget list;
     if (widget.layout == OiListViewLayout.grid) {
-      list = GridView.builder(
+      final defaultGap = OiResponsive<double>(context.spacing.md);
+      list = SingleChildScrollView(
         key: const Key('oi_list_view_scroll'),
         controller: _scrollController,
-        gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-          maxCrossAxisExtent: 500,
-          mainAxisSpacing: context.spacing.md,
-          crossAxisSpacing: context.spacing.md,
-          childAspectRatio: 1.2,
+        padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
+        child: OiGrid.containerRelative(
+          columns: widget.gridColumns ?? const OiResponsive<int>(3),
+          gap: widget.gridGap ?? defaultGap,
+          stretchRows: true,
+          children: [
+            for (var i = 0; i < itemCount; i++) buildItem(context, i),
+          ],
         ),
-        itemCount: itemCount,
-        itemBuilder: buildItem,
       );
     } else {
       list = ListView.builder(
         key: const Key('oi_list_view_scroll'),
         controller: _scrollController,
-        padding: const EdgeInsets.symmetric(horizontal: 16),
+        padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
         itemCount: itemCount,
         itemBuilder: (context, index) {
           final child = buildItem(context, index);
           return Padding(
             padding: EdgeInsets.only(
-              bottom: index < widget.items.length - 1 ? context.spacing.sm : 0,
+              bottom: index < widget.items.length - 1 ? context.spacing.md : 0,
             ),
             child: child,
           );

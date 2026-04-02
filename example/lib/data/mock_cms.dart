@@ -17,6 +17,7 @@ class MockBlogPost {
     required this.author,
     required this.publishedAt,
     required this.category,
+    this.imageUrl,
     this.tags = const [],
     this.status = 'published',
     this.commentCount = 0,
@@ -28,6 +29,7 @@ class MockBlogPost {
   final MockUser author;
   final DateTime publishedAt;
   final String category;
+  final String? imageUrl;
   final List<String> tags;
   final String status;
   final int commentCount;
@@ -43,6 +45,7 @@ final kBlogPosts = [
     author: kFranz,
     publishedAt: DateTime(2026, 3, 18),
     category: 'Culinary',
+    imageUrl: 'https://picsum.photos/seed/schnitzel/600/300',
     tags: ['schnitzel', 'cooking', 'science'],
     commentCount: 23,
   ),
@@ -55,6 +58,7 @@ final kBlogPosts = [
     author: kHans,
     publishedAt: DateTime(2026, 3, 12),
     category: 'Outdoor',
+    imageUrl: 'https://picsum.photos/seed/hiking/600/300',
     tags: ['hiking', 'alps', 'nature'],
     commentCount: 15,
   ),
@@ -67,6 +71,7 @@ final kBlogPosts = [
     author: kLiesl,
     publishedAt: DateTime(2026, 3, 5),
     category: 'Culture',
+    imageUrl: 'https://picsum.photos/seed/coffee/600/300',
     tags: ['coffee', 'vienna', 'etiquette'],
     commentCount: 42,
   ),
@@ -79,6 +84,7 @@ final kBlogPosts = [
     author: kStefan,
     publishedAt: DateTime(2026, 2, 28),
     category: 'Culinary',
+    imageUrl: 'https://picsum.photos/seed/cheese/600/300',
     tags: ['cheese', 'tyrol', 'controversial'],
     status: 'draft',
   ),
@@ -91,8 +97,179 @@ final kBlogPosts = [
     author: kLiesl,
     publishedAt: DateTime(2026, 2, 14),
     category: 'Tech',
+    imageUrl: 'https://picsum.photos/seed/dashboard/600/300',
     tags: ['flutter', 'obers_ui', 'engineering'],
     commentCount: 31,
+  ),
+  MockBlogPost(
+    id: 'post-6',
+    title: 'Skiing in Tyrol: The Definitive Guide for Non-Austrians',
+    excerpt:
+        'Everything you need to know before strapping on skis in the Alps, '
+        'including the unwritten rules of the Skihütte.',
+    author: kKaspar,
+    publishedAt: DateTime(2026, 2, 7),
+    category: 'Outdoor',
+    imageUrl: 'https://picsum.photos/seed/skiing/600/300',
+    tags: ['skiing', 'tyrol', 'winter'],
+    commentCount: 19,
+  ),
+  MockBlogPost(
+    id: 'post-7',
+    title: 'The Great Semmelknödel Debate: Bread or Butter?',
+    excerpt:
+        'Our team spent an entire Friday afternoon arguing about the correct '
+        'Semmelknödel recipe. HR had to intervene.',
+    author: kGertrud,
+    publishedAt: DateTime(2026, 1, 30),
+    category: 'Culinary',
+    imageUrl: 'https://picsum.photos/seed/knodel/600/300',
+    tags: ['knödel', 'cooking', 'debate'],
+    commentCount: 38,
+  ),
+  MockBlogPost(
+    id: 'post-8',
+    title: 'A Backend Developer Walks into a Kaffeehaus',
+    excerpt:
+        'What happens when you apply microservice architecture principles '
+        'to ordering breakfast in Vienna.',
+    author: kFerdinand,
+    publishedAt: DateTime(2026, 1, 22),
+    category: 'Tech',
+    imageUrl: 'https://picsum.photos/seed/backend/600/300',
+    tags: ['backend', 'humor', 'vienna'],
+    commentCount: 27,
+  ),
+  MockBlogPost(
+    id: 'post-9',
+    title: 'Mozart, Falco, and the Spotify Algorithm',
+    excerpt:
+        'How Austrian music went from concert halls to algorithmic playlists, '
+        'and why "Rock Me Amadeus" still slaps.',
+    author: kMaria,
+    publishedAt: DateTime(2026, 1, 15),
+    category: 'Culture',
+    imageUrl: 'https://picsum.photos/seed/music/600/300',
+    tags: ['music', 'culture', 'streaming'],
+    commentCount: 11,
+  ),
+  MockBlogPost(
+    id: 'post-10',
+    title: 'The Warehouse Automation Nobody Asked For',
+    excerpt:
+        'Otto built a Raspberry Pi system that alerts Slack when the coffee '
+        'machine in the Linz warehouse runs out of beans.',
+    author: kOtto,
+    publishedAt: DateTime(2026, 1, 8),
+    category: 'Tech',
+    imageUrl: 'https://picsum.photos/seed/warehouse/600/300',
+    tags: ['automation', 'iot', 'coffee'],
+    commentCount: 14,
+  ),
+  MockBlogPost(
+    id: 'post-11',
+    title: 'Advent Markets Ranked: A Highly Subjective List',
+    excerpt:
+        'We visited 12 Christkindlmärkte and ranked them by Punsch quality, '
+        'Lebkuchen freshness, and overall Gemütlichkeit.',
+    author: kAnna,
+    publishedAt: DateTime(2025, 12, 20),
+    category: 'Culture',
+    imageUrl: 'https://picsum.photos/seed/advent/600/300',
+    tags: ['christmas', 'markets', 'ranking'],
+    commentCount: 56,
+  ),
+  MockBlogPost(
+    id: 'post-12',
+    title: 'Accessibility in Flutter: Lessons from Our Audit',
+    excerpt:
+        'What we learned after running a full accessibility audit on our '
+        'component library — and the 14 issues we fixed.',
+    author: kLiesl,
+    publishedAt: DateTime(2025, 12, 12),
+    category: 'Tech',
+    imageUrl: 'https://picsum.photos/seed/a11y/600/300',
+    tags: ['accessibility', 'flutter', 'audit'],
+    commentCount: 8,
+    status: 'draft',
+  ),
+  MockBlogPost(
+    id: 'post-13',
+    title: 'Why Every Office Needs a Käseplatte Friday',
+    excerpt:
+        'The productivity gains of ending the week with cheese, bread, and '
+        'a glass of Grüner Veltliner are scientifically unproven but real.',
+    author: kWolfgang,
+    publishedAt: DateTime(2025, 12, 5),
+    category: 'Company',
+    imageUrl: 'https://picsum.photos/seed/kaese/600/300',
+    tags: ['company', 'culture', 'cheese'],
+    commentCount: 33,
+  ),
+  MockBlogPost(
+    id: 'post-14',
+    title: 'Cross-Country Skiing vs Downhill: The Office Poll Results',
+    excerpt:
+        'We polled the entire company. The results were controversial, '
+        'friendships were tested, and the Slack channel got heated.',
+    author: kHans,
+    publishedAt: DateTime(2025, 11, 28),
+    category: 'Outdoor',
+    imageUrl: 'https://picsum.photos/seed/xc-ski/600/300',
+    tags: ['skiing', 'poll', 'winter'],
+    commentCount: 21,
+  ),
+  MockBlogPost(
+    id: 'post-15',
+    title: 'Deploying on a Friday: A Horror Story in Three Acts',
+    excerpt:
+        'Act I: Confidence. Act II: The 500 errors. Act III: The rollback '
+        'at 11pm and the promise to never do this again.',
+    author: kFerdinand,
+    publishedAt: DateTime(2025, 11, 20),
+    category: 'Tech',
+    imageUrl: 'https://picsum.photos/seed/deploy/600/300',
+    tags: ['devops', 'deployment', 'horror'],
+    commentCount: 45,
+  ),
+  MockBlogPost(
+    id: 'post-16',
+    title: 'The Sachertorte Taste Test: Original vs Hotel Sacher',
+    excerpt:
+        'A blind taste test involving 20 colleagues, two cakes, and one '
+        'very strong opinion from the CEO.',
+    author: kFranz,
+    publishedAt: DateTime(2025, 11, 12),
+    category: 'Culinary',
+    imageUrl: 'https://picsum.photos/seed/sacher/600/300',
+    tags: ['sachertorte', 'taste-test', 'vienna'],
+    commentCount: 29,
+  ),
+  MockBlogPost(
+    id: 'post-17',
+    title: 'Remote Work from an Alpine Hut: A Field Report',
+    excerpt:
+        'I spent a week working from a mountain hut at 1,800m. The WiFi was '
+        'terrible, the views were incredible, and the goats were distracting.',
+    author: kKaspar,
+    publishedAt: DateTime(2025, 11, 5),
+    category: 'Company',
+    imageUrl: 'https://picsum.photos/seed/alpine-hut/600/300',
+    tags: ['remote-work', 'mountains', 'experiment'],
+    commentCount: 17,
+  ),
+  MockBlogPost(
+    id: 'post-18',
+    title: 'State Management Patterns We Actually Use',
+    excerpt:
+        'Not another theoretical comparison — these are the patterns our '
+        'team uses daily and why we chose them.',
+    author: kLiesl,
+    publishedAt: DateTime(2025, 10, 28),
+    category: 'Tech',
+    imageUrl: 'https://picsum.photos/seed/state/600/300',
+    tags: ['flutter', 'state-management', 'architecture'],
+    commentCount: 36,
   ),
 ];
 
