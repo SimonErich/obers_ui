@@ -396,6 +396,7 @@ class _OiListViewState<T> extends State<OiListView<T>>
           children: [
             _buildHeader(context),
             if (hasSelectionBar && !isCompact) _buildSelectionBar(context),
+            SizedBox(height: context.spacing.md),
             Expanded(child: _buildBody(context)),
             if (widget.footer != null) widget.footer!,
             if (hasSelectionBar && isCompact) _buildSelectionBar(context),
