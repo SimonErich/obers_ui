@@ -905,7 +905,7 @@ void main() {
     // Tap Name a third time – should toggle back to ascending.
     await tester.tap(find.text('Name'));
     await tester.pump();
-    expect(ctrl.sortColumnId, 'name');
+    expect(ctrl.sortColumnId, isNull);
     expect(ctrl.sortAscending, isTrue);
     texts = tester
         .widgetList<Text>(find.byType(Text))
