@@ -44,18 +44,12 @@ class OiTimePicker extends StatefulWidget {
     return OiDialogShell.show<OiTimeOfDay>(
       context: context,
       semanticLabel: semanticLabel,
-      builder: (close) => Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            OiTimePicker(
-              value: initialTime,
-              use24Hour: use24Hour,
-              onChanged: close,
-            ),
-          ],
-        ),
+      maxWidth: 280,
+      builder: (close) => _OiTimePickerDialog(
+        initialTime: initialTime,
+        use24Hour: use24Hour,
+        onConfirm: close,
+        onCancel: () => close(),
       ),
     );
   }
@@ -325,6 +319,95 @@ class _AmPmButton extends StatelessWidget {
             color: selected ? colors.textOnPrimary : colors.textMuted,
           ),
         ),
+      ),
+    );
+  }
+}
+
+// ── Time picker dialog with confirm/cancel ─────────────────────────────────
+
+class _OiTimePickerDialog extends StatefulWidget {
+  const _OiTimePickerDialog({
+    required this.onConfirm,
+    required this.onCancel,
+    this.initialTime,
+    this.use24Hour = true,
+  });
+
+  final OiTimeOfDay? initialTime;
+  final bool use24Hour;
+  final void Function([OiTimeOfDay?]) onConfirm;
+  final VoidCallback onCancel;
+
+  @override
+  State<_OiTimePickerDialog> createState() => _OiTimePickerDialogState();
+}
+
+class _OiTimePickerDialogState extends State<_OiTimePickerDialog> {
+  late OiTimeOfDay _selected;
+
+  @override
+  void initState() {
+    super.initState();
+    _selected =
+        widget.initialTime ?? const OiTimeOfDay(hour: 0, minute: 0);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          OiTimePicker(
+            value: widget.initialTime,
+            use24Hour: widget.use24Hour,
+            onChanged: (time) => _selected = time,
+          ),
+          const SizedBox(height: 16),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              OiTappable(
+                onTap: widget.onCancel,
+                child: Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  child: Text(
+                    'Cancel',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: colors.textMuted,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              OiTappable(
+                onTap: () => widget.onConfirm(_selected),
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: colors.primary.base,
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Text(
+                    'OK',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: colors.textOnPrimary,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
