@@ -307,10 +307,12 @@ class _CellFrame<T> extends StatefulWidget {
 class _CellFrameState<T> extends State<_CellFrame<T>> {
   bool _editing = false;
   final TextEditingController _textCtrl = TextEditingController();
+  final FocusNode _editFocusNode = FocusNode();
 
   @override
   void dispose() {
     _textCtrl.dispose();
+    _editFocusNode.dispose();
     super.dispose();
   }
 
@@ -337,7 +339,7 @@ class _CellFrameState<T> extends State<_CellFrame<T>> {
           Expanded(
             child: EditableText(
               controller: _textCtrl,
-              focusNode: FocusNode()..requestFocus(),
+              focusNode: _editFocusNode..requestFocus(),
               style: const TextStyle(fontSize: 14),
               cursorColor: colors.primary.base,
               backgroundCursorColor: colors.borderSubtle,

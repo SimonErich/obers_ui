@@ -385,6 +385,9 @@ class _OiTableState<T> extends State<OiTable<T>>
   /// Shift+click range selection.
   int? _lastSelectedIndex;
 
+  /// Focus node for the keyboard listener (Ctrl+C copy).
+  final FocusNode _keyboardFocusNode = FocusNode();
+
   /// Overlay entry for the column manager panel.
   OverlayEntry? _columnManagerOverlay;
 
@@ -475,6 +478,7 @@ class _OiTableState<T> extends State<OiTable<T>>
   @override
   void dispose() {
     _closeColumnManager();
+    _keyboardFocusNode.dispose();
     _scrollController
       ..removeListener(_onScroll)
       ..dispose();
@@ -557,7 +561,7 @@ class _OiTableState<T> extends State<OiTable<T>>
       label: widget.label,
       explicitChildNodes: true,
       child: KeyboardListener(
-        focusNode: FocusNode(),
+        focusNode: _keyboardFocusNode,
         onKeyEvent: (event) {
           if (!widget.copyable) return;
           if (event is! KeyDownEvent) return;
