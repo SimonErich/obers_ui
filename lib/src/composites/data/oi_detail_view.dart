@@ -126,6 +126,7 @@ class OiDetailView extends StatelessWidget {
     this.showDividers = true,
     this.wrapInCard = true,
     this.padding,
+    this.collapseBreakpoint = OiBreakpoint.medium,
     super.key,
   });
 
@@ -155,6 +156,10 @@ class OiDetailView extends StatelessWidget {
 
   /// Whether to render dividers between sections.
   final bool showDividers;
+
+  /// The breakpoint below which multi-column layouts collapse to a single
+  /// column. Defaults to [OiBreakpoint.medium] (600dp).
+  final OiBreakpoint collapseBreakpoint;
 
   /// Whether to wrap the entire detail view in an [OiCard].
   final bool wrapInCard;
@@ -251,7 +256,7 @@ class OiDetailView extends StatelessWidget {
       builder: (context, constraints) {
         // Collapse to single column when available width is narrow.
         final effectiveColumns =
-            constraints.maxWidth < OiBreakpoint.medium.minWidth
+            constraints.maxWidth < collapseBreakpoint.minWidth
                 ? 1
                 : columns;
 

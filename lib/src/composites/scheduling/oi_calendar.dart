@@ -452,14 +452,14 @@ class _OiCalendarState extends State<OiCalendar>
                   ? () => widget.onEventTap!(e)
                   : null,
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
                   color: e.color ?? colors.primary.base,
                   borderRadius: BorderRadius.circular(3),
                 ),
                 child: Text(
                   e.title,
-                  style: TextStyle(fontSize: 11, color: colors.textOnPrimary),
+                  style: TextStyle(fontSize: 12, color: colors.textOnPrimary),
                 ),
               ),
             ),
@@ -587,7 +587,7 @@ class _OiCalendarState extends State<OiCalendar>
               child: Text(
                 '${date.day}',
                 style: TextStyle(
-                  fontSize: 11,
+                  fontSize: 12,
                   fontWeight: today ? FontWeight.bold : FontWeight.normal,
                   color: isCurrentMonth ? colors.text : colors.textMuted,
                 ),
@@ -604,19 +604,19 @@ class _OiCalendarState extends State<OiCalendar>
                   child: Container(
                     width: double.infinity,
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 3,
-                      vertical: 1,
+                      horizontal: 4,
+                      vertical: 2,
                     ),
                     decoration: BoxDecoration(
                       color: ev.color ?? colors.primary.base,
-                      borderRadius: BorderRadius.circular(2),
+                      borderRadius: BorderRadius.circular(3),
                     ),
                     child: Text(
                       ev.title,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
-                        fontSize: 9,
+                        fontSize: 11,
                         color: colors.textOnPrimary,
                       ),
                     ),
@@ -735,14 +735,14 @@ class _OiCalendarState extends State<OiCalendar>
                             ? () => widget.onEventTap!(ev)
                             : null,
                         child: Container(
-                          padding: const EdgeInsets.all(2),
+                          padding: const EdgeInsets.all(3),
                           color: ev.color ?? colors.primary.base,
                           child: Text(
                             ev.title,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
-                              fontSize: 9,
+                              fontSize: 11,
                               color: colors.textOnPrimary,
                             ),
                           ),
@@ -822,7 +822,7 @@ class _OiCalendarState extends State<OiCalendar>
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
                                       style: TextStyle(
-                                        fontSize: 11,
+                                        fontSize: 12,
                                         color: colors.textOnPrimary,
                                       ),
                                     ),

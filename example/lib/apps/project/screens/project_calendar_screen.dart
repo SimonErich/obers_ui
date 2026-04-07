@@ -25,65 +25,54 @@ class _ProjectCalendarScreenState extends State<ProjectCalendarScreen> {
   }
 
   void _onDateTap(DateTime date) {
-    final controller = TextEditingController();
-    OiOverlayHandle? handle;
-
-    handle = OiDialog.show(
+    OiCalendarEventDialog.showCreate(
       context,
-      label: 'Create event dialog',
-      dialog: OiDialog.form(
-        label: 'Create event',
-        title: 'New Event',
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(bottom: 8),
-              child: OiLabel.caption(
-                'Date: ${date.day}/${date.month}/${date.year}',
-              ),
+      date: date,
+      onCreated: (result) {
+        setState(() {
+          _nextEventId++;
+          _events = [
+            ..._events,
+            OiCalendarEvent(
+              key: 'user-cal-$_nextEventId',
+              title: result.title,
+              start: result.start,
+              end: result.end,
+              color: const Color(0xFF26A69A),
             ),
-            OiTextInput(
-              controller: controller,
-              label: 'Event title',
-              placeholder: 'Enter event title...',
-              autofocus: true,
-            ),
-          ],
-        ),
-        actions: [
-          OiButton.ghost(label: 'Cancel', onTap: () => handle?.dismiss()),
-          OiButton.primary(
-            label: 'Create',
-            onTap: () {
-              final title = controller.text.trim();
-              if (title.isNotEmpty) {
-                setState(() {
-                  _nextEventId++;
-                  _events = [
-                    ..._events,
-                    OiCalendarEvent(
-                      key: 'user-cal-$_nextEventId',
-                      title: title,
-                      start: DateTime(date.year, date.month, date.day, 9),
-                      end: DateTime(date.year, date.month, date.day, 10),
-                      color: const Color(0xFF26A69A),
-                    ),
-                  ];
-                });
-              }
-              handle?.dismiss();
-            },
-          ),
-        ],
-        onClose: () => handle?.dismiss(),
-      ),
+          ];
+        });
+      },
     );
   }
 
   void _onEventTap(OiCalendarEvent event) {
-    OiToast.show(context, message: event.title);
+    OiCalendarEventDialog.show(
+      context,
+      event: event,
+      onSaved: (result) {
+        setState(() {
+          _events = _events.map((e) {
+            if (e.key == event.key) {
+              return OiCalendarEvent(
+                key: e.key,
+                title: result.title,
+                start: result.start,
+                end: result.end,
+                allDay: e.allDay,
+                color: e.color,
+              );
+            }
+            return e;
+          }).toList();
+        });
+      },
+      onDeleted: () {
+        setState(() {
+          _events = _events.where((e) => e.key != event.key).toList();
+        });
+      },
+    );
   }
 
   void _onEventMove(OiCalendarEvent event, DateTime newStart, DateTime newEnd) {

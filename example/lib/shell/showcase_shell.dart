@@ -79,7 +79,7 @@ class ShowcaseShell extends StatelessWidget {
               SizedBox(width: spacing.sm),
               OiThemeToggle(
                 currentMode: themeState.value,
-                onModeChange: (_) => themeState.toggle(),
+                onModeChange: (mode) => themeState.value = mode,
               ),
             ],
           ),
