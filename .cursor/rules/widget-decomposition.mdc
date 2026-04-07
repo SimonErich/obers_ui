@@ -1,0 +1,104 @@
+---
+description: Rules for splitting large widget files in the obers_ui library using Dart part files and extensions.
+globs:
+  - "lib/src/components/**/*.dart"
+  - "lib/src/primitives/**/*.dart"
+  - "lib/src/composites/**/*.dart"
+alwaysApply: false
+---
+
+# Widget Decomposition Rules
+
+## When to Split
+
+- **Under 300 lines**: Don't split.
+- **300–500 lines**: Optional. Split if there are 2+ clearly distinct logical groups.
+- **Over 500 lines**: Should be split.
+
+## Pattern: `part` files with extensions on State
+
+Use Dart `part`/`part of` directives. Extract methods into **extensions on the private State class** in separate part files.
+
+```text
+components/category/
+  oi_foo.dart                              # Public API, State class, build()
+  oi_foo/
+    oi_foo_variants.part.dart              # Variant-specific _build* methods
+    oi_foo_styling.part.dart               # Pure style helpers + decoration builders
+    oi_foo_interaction.part.dart           # Keyboard/gesture handlers
+    oi_foo_layout.part.dart                # Layout orchestration builders
+```
+
+Not every widget needs all four. Pick what fits. Don't over-split.
+
+### File naming
+
+Always prefix part filenames with the widget name to avoid collisions in fuzzy search:
+
+- `oi_foo_layout.part.dart` (good)
+- `layout.part.dart` (bad — ambiguous across widgets)
+
+## What goes where
+
+### 1. Pure computations → top-level private functions
+
+If a method does **not** access `this`, `widget`, or any state field, it is a pure function. Place it as a **top-level private function** in the part file, not inside an extension.
+
+```dart
+// Good — pure function, no state access
+BorderRadius _connectedItemRadius(int index, int count, Axis direction, BorderRadius radius) { ... }
+
+// Bad — wrapping a pure function in an extension on State
+extension _FooRadius on _FooState {
+  BorderRadius _connectedItemRadius(...) { ... }  // never touches widget or state
+}
+```
+
+### 2. Build helpers needing State access → extensions via part files
+
+Methods that read `widget.*` properties or state fields belong in extensions.  
+**Do not call `setState` directly inside extension methods** (Dart treats this as invalid protected-member usage).
+
+When extension code needs to mutate state:
+
+- Add a small instance method inside the `State` class (e.g. `_setHighlighted`, `_toggleDropdownVisible`, `_tickCountdown`) that calls `setState`.
+- Call that instance method from the extension.
+
+```dart
+extension _FooLayout on _FooState {
+  Widget _buildConnected(BuildContext context, ...) {
+    final gap = widget.spacing;  // reads widget — belongs in extension
+    ...
+  }
+}
+
+class _FooState extends State<Foo> {
+  void _setExpanded(bool value) => setState(() => _expanded = value);
+}
+
+extension _FooInteraction on _FooState {
+  void _onToggle() => _setExpanded(!_expanded); // good
+}
+```
+
+### 3. Independent lifecycle → private sub-widget
+
+Only when a piece needs its **own** `State` — its own animations, timers, or focus management independent of the parent. This is rare for internal build helpers.
+
+### 4. Cross-widget shared behavior → mixins
+
+If the same logic (keyboard navigation, drag handling, animation orchestration) appears in 2+ widgets, extract to a mixin on State.
+
+### 5. Complex non-UI logic → controllers
+
+If a widget accumulates timers, debounce logic, data transformation, or complex state machines, extract to a `ChangeNotifier` or plain controller class.
+
+## Quick decision guide
+
+| Method touches…             | Extract as…                        |
+|-----------------------------|------------------------------------|
+| Only its arguments          | Top-level private function         |
+| `widget.*` or state fields  | Extension method in a part file    |
+| Has own animations/timers   | Private sub-widget (StatefulWidget)|
+| Shared across 2+ widgets    | Mixin on State                     |
+| Complex non-UI state logic  | Controller class                   |

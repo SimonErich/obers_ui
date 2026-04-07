@@ -1,6 +1,6 @@
-part of 'oi_table.dart';
+part of '../oi_table.dart';
 
-// ── _OiTableLoadingBar ────────────────────────────────────────────────────
+// ── _OiTableLoadingBar ──────────────────────────────────────────────────
 
 /// An indeterminate loading bar shown when [OiTableController.loading] is
 /// `true`. Renders a thin animated bar across the top of the table body.
@@ -103,7 +103,7 @@ class _LoadingBarPainter extends CustomPainter {
       old.barColor != barColor;
 }
 
-// ── _OiTableSpinner ───────────────────────────────────────────────────────────
+// ── _OiTableSpinner ─────────────────────────────────────────────────────────
 
 class _OiTableSpinner extends StatefulWidget {
   const _OiTableSpinner();
