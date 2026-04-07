@@ -4,6 +4,7 @@ import 'package:obers_ui/obers_ui.dart';
 // ignore: implementation_imports
 import 'package:obers_ui/src/modules/oi_chat.dart' as chat;
 
+import 'package:obers_ui_example/apps/cms/screens/cms_article_preview_dialog.dart';
 import 'package:obers_ui_example/data/mock_cms.dart';
 import 'package:obers_ui_example/data/mock_users.dart';
 
@@ -28,11 +29,19 @@ class CmsArticleShowScreen extends StatefulWidget {
 class _CmsArticleShowScreenState extends State<CmsArticleShowScreen> {
   late List<OiComment> _comments;
   int _nextKey = 100;
+  final FocusNode _commentInputFocusNode = FocusNode();
+  bool _commentsExpanded = false;
 
   @override
   void initState() {
     super.initState();
     _comments = buildBlogComments();
+  }
+
+  @override
+  void dispose() {
+    _commentInputFocusNode.dispose();
+    super.dispose();
   }
 
   // ── Comment callbacks ─────────────────────────────────────────────────────
@@ -81,6 +90,23 @@ class _CmsArticleShowScreenState extends State<CmsArticleShowScreen> {
     setState(() {
       _comments = _toggleReaction(_comments, comment.key, emoji);
     });
+  }
+
+  Future<void> _openPreview() async {
+    await showArticlePreviewDialog(context, article: widget.article);
+  }
+
+  void _toggleComments() {
+    final opening = !_commentsExpanded;
+    setState(() {
+      _commentsExpanded = opening;
+    });
+    if (opening) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        _commentInputFocusNode.requestFocus();
+      });
+    }
   }
 
   // ── Tree helpers ──────────────────────────────────────────────────────────
@@ -250,6 +276,8 @@ class _CmsArticleShowScreenState extends State<CmsArticleShowScreen> {
   Widget build(BuildContext context) {
     final colors = context.colors;
     final spacing = context.spacing;
+    final radius = context.radius;
+    final theme = context.theme;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -273,13 +301,25 @@ class _CmsArticleShowScreenState extends State<CmsArticleShowScreen> {
                   ),
                   SizedBox(width: spacing.sm),
                   Expanded(child: OiLabel.h3(widget.article.title)),
-                  OiTappable(
-                    semanticLabel: 'Edit article',
-                    onTap: widget.onEdit,
-                    child: Icon(
-                      OiIcons.squarePen,
-                      size: 20,
-                      color: colors.primary.base,
+                  OiTooltip(
+                    label: 'Preview article',
+                    message: 'Preview article',
+                    child: OiIconButton(
+                      icon: OiIcons.eye,
+                      semanticLabel: 'Preview article',
+                      size: OiButtonSize.large,
+                      onTap: _openPreview,
+                    ),
+                  ),
+                  SizedBox(width: spacing.xs),
+                  OiTooltip(
+                    label: 'Edit article',
+                    message: 'Edit article',
+                    child: OiIconButton(
+                      icon: OiIcons.squarePen,
+                      semanticLabel: 'Edit article',
+                      size: OiButtonSize.large,
+                      onTap: widget.onEdit,
                     ),
                   ),
                 ],
@@ -315,66 +355,101 @@ class _CmsArticleShowScreenState extends State<CmsArticleShowScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 // Metadata detail view
-                OiDetailView(
-                  label: 'Article metadata',
-                  columns: 2,
-                  sections: [
-                    OiDetailSection(
-                      title: 'Article Info',
-                      fields: [
-                        OiDetailField(
-                          label: 'Author',
-                          value: widget.article.author.name,
-                        ),
-                        OiDetailField(
-                          label: 'Category',
-                          value: widget.article.category,
-                        ),
-                        OiDetailField(
-                          label: 'Status',
-                          value: widget.article.status,
-                        ),
-                        OiDetailField(
-                          label: 'Published',
-                          value:
-                              '${widget.article.publishedAt.year}-'
-                              '${widget.article.publishedAt.month.toString().padLeft(2, '0')}-'
-                              '${widget.article.publishedAt.day.toString().padLeft(2, '0')}',
-                        ),
-                        OiDetailField(
-                          label: 'Comments',
-                          value: '${widget.article.commentCount}',
-                        ),
-                      ],
+                OiSurface(
+                  color: colors.primary.base.withValues(alpha: 0.2),
+                  border: OiBorderStyle.solid(colors.borderSubtle, 1),
+                  borderRadius: radius.md,
+                  padding: EdgeInsets.all(spacing.md),
+                  child: OiThemeScope(
+                    data: theme.copyWith(
+                      colors: theme.colors.copyWith(
+                        surface: const Color(0x00000000),
+                      ),
                     ),
-                  ],
+                    child: OiDetailView(
+                    label: 'Article metadata',
+                    columns: 2,
+                    collapseBreakpoint: const OiBreakpoint('small', 360),
+                    rowGap: spacing.sm,
+                    wrapInCard: false,
+                    sections: [
+                      OiDetailSection(
+                        title: 'Article Info',
+                        fields: [
+                          OiDetailField(
+                            label: 'Author',
+                            value: widget.article.author.name,
+                          ),
+                          OiDetailField(
+                            label: 'Category',
+                            value: widget.article.category,
+                          ),
+                          OiDetailField(
+                            label: 'Status',
+                            value: widget.article.status,
+                          ),
+                          OiDetailField(
+                            label: 'Published',
+                            value:
+                                '${widget.article.publishedAt.year}-'
+                                '${widget.article.publishedAt.month.toString().padLeft(2, '0')}-'
+                                '${widget.article.publishedAt.day.toString().padLeft(2, '0')}',
+                          ),
+                          OiDetailField(
+                            label: 'Comments',
+                            value: '${widget.article.commentCount}',
+                          ),
+                        ],
+                      ),
+                    ],
+                    ),
+                  ),
                 ),
 
                 SizedBox(height: spacing.lg),
 
                 // Article content as Markdown
-                const OiMarkdown(data: kArticleContent),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: spacing.sm),
+                  child: const OiMarkdown(data: kArticleContent),
+                ),
 
                 SizedBox(height: spacing.lg),
 
-                // Divider
-                Container(height: 1, color: colors.borderSubtle),
-
-                SizedBox(height: spacing.lg),
-
-                // Comments section
-                SizedBox(
-                  height: 400,
-                  child: OiComments(
-                    label: 'Article comments',
-                    comments: _comments,
-                    currentUserId: kCurrentUser.id,
-                    onComment: _onComment,
-                    onReply: _onReply,
-                    onEdit: _onEdit,
-                    onDelete: _onDelete,
-                    onReact: _onReact,
+                OiCard(
+                  title: const OiLabel.h4('Comments'),
+                  trailing: OiIconButton(
+                    icon: _commentsExpanded
+                        ? OiIcons.chevronUp
+                        : OiIcons.chevronDown,
+                    semanticLabel: _commentsExpanded
+                        ? 'Collapse comments'
+                        : 'Expand comments',
+                    onTap: _toggleComments,
                   ),
+                  child: AnimatedSwitcher(
+                    duration: context.animations.normal,
+                    child: _commentsExpanded
+                        ? SizedBox(
+                            key: const ValueKey('comments-open'),
+                            height: 400,
+                            child: OiComments(
+                              label: 'Comments',
+                              comments: _comments,
+                              currentUserId: kCurrentUser.id,
+                              inputFocusNode: _commentInputFocusNode,
+                              onComment: _onComment,
+                              onReply: _onReply,
+                              onEdit: _onEdit,
+                              onDelete: _onDelete,
+                              onReact: _onReact,
+                            ),
+                          )
+                        : const SizedBox(
+                            key: ValueKey('comments-closed'),
+                            height: 0,
+                          ),
+                    ),
                 ),
               ],
             ),

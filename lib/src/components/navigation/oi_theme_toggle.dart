@@ -75,7 +75,9 @@ class _OiThemeToggleState extends State<OiThemeToggle> {
 
   void _handleSelect(OiThemeMode mode) {
     setState(() => _isOpen = false);
-    widget.onModeChange?.call(mode);
+    if (mode != widget.currentMode) {
+      widget.onModeChange?.call(mode);
+    }
   }
 
   @override
@@ -108,6 +110,7 @@ class _OiThemeToggleState extends State<OiThemeToggle> {
       child: OiPopover(
         label: widget.label,
         open: _isOpen,
+        initialFocus: false,
         onClose: () => setState(() => _isOpen = false),
         anchor: iconButton,
         content: UnconstrainedBox(

@@ -73,6 +73,7 @@ class OiComments extends StatefulWidget {
     this.showTimestamps = true,
     this.emptyTitle = 'No comments yet',
     this.emptyDescription = 'Be the first to share your thoughts.',
+    this.inputFocusNode,
   });
 
   /// The top-level comments to display.
@@ -114,16 +115,23 @@ class OiComments extends StatefulWidget {
   /// Description shown in the empty state when there are no comments.
   final String emptyDescription;
 
+  /// Optional focus node for the main comment input.
+  ///
+  /// Provide this to request focus from a parent widget.
+  final FocusNode? inputFocusNode;
+
   @override
   State<OiComments> createState() => _OiCommentsState();
 }
 
 class _OiCommentsState extends State<OiComments> {
   final TextEditingController _controller = TextEditingController();
+  final FocusNode _internalInputFocusNode = FocusNode();
 
   @override
   void dispose() {
     _controller.dispose();
+    _internalInputFocusNode.dispose();
     super.dispose();
   }
 
@@ -187,7 +195,7 @@ class _OiCommentsState extends State<OiComments> {
                 Expanded(
                   child: EditableText(
                     controller: _controller,
-                    focusNode: FocusNode(),
+                    focusNode: widget.inputFocusNode ?? _internalInputFocusNode,
                     style: TextStyle(color: colors.text, fontSize: 14),
                     cursorColor: colors.primary.base,
                     backgroundCursorColor: colors.surfaceHover,
