@@ -401,6 +401,7 @@ class _CmsCategoriesScreenState extends State<CmsCategoriesScreen> {
           ),
           SizedBox(height: spacing.lg),
           Row(
+            mainAxisAlignment: MainAxisAlignment.end,
             children: [
               OiButton.secondary(
                 label: 'Rename',
@@ -409,7 +410,7 @@ class _CmsCategoriesScreenState extends State<CmsCategoriesScreen> {
                 onTap: () => _showRenameDialog(node),
               ),
               SizedBox(width: spacing.sm),
-              OiButton.ghost(
+              OiButton.destructive(
                 label: 'Delete',
                 semanticLabel: 'Delete category',
                 icon: OiIcons.trash2,
