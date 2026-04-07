@@ -1,7 +1,10 @@
 import 'dart:async';
 
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/src/components/inputs/oi_checkbox.dart';
 import 'package:obers_ui/src/components/inputs/oi_select.dart';
+import 'package:obers_ui/src/components/inputs/oi_text_input.dart';
+import 'package:obers_ui/src/components/navigation/oi_date_picker.dart';
 import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/persistence/oi_settings_driver.dart';
 import 'package:obers_ui/src/foundation/persistence/oi_settings_mixin.dart';
@@ -20,6 +23,9 @@ enum OiFilterType {
 
   /// A select / dropdown filter with predefined [OiSelectOption]s.
   select,
+
+  /// A multi-select filter with checkboxes for each option.
+  multiSelect,
 
   /// A single date filter.
   date,
@@ -98,6 +104,7 @@ class OiFilterDefinition {
     required this.label,
     required this.type,
     this.options,
+    this.suggestions,
     this.customBuilder,
   });
 
@@ -110,10 +117,16 @@ class OiFilterDefinition {
   /// The type of input control for this filter.
   final OiFilterType type;
 
-  /// Options for [OiFilterType.select] filters.
+  /// Options for [OiFilterType.select] and [OiFilterType.multiSelect] filters.
   ///
   /// Ignored for other filter types.
   final List<OiSelectOption<String>>? options;
+
+  /// Static suggestions for [OiFilterType.text] filters.
+  ///
+  /// When provided, the text filter popover shows a search input with a
+  /// filterable list of suggestions below it.
+  final List<String>? suggestions;
 
   /// A custom widget builder for [OiFilterType.custom] filters.
   ///
@@ -266,6 +279,12 @@ class _OiFilterBarState extends State<OiFilterBar>
   }
 
   void _openFilter(BuildContext chipContext, OiFilterDefinition filter) {
+    // For date filters, open the date picker dialog directly.
+    if (filter.type == OiFilterType.date) {
+      unawaited(_openDatePicker(chipContext, filter));
+      return;
+    }
+
     final overlay = Overlay.of(chipContext);
     final box = chipContext.findRenderObject()! as RenderBox;
     final position = box.localToGlobal(Offset.zero);
@@ -293,6 +312,25 @@ class _OiFilterBarState extends State<OiFilterBar>
       ),
     );
     overlay.insert(entry);
+  }
+
+  Future<void> _openDatePicker(
+    BuildContext chipContext,
+    OiFilterDefinition filter,
+  ) async {
+    final currentValue = widget.activeFilters[filter.key]?.value;
+    final initialDate = currentValue is DateTime ? currentValue : null;
+
+    final result = await OiDatePicker.show(
+      chipContext,
+      initialDate: initialDate,
+    );
+    if (result != null && mounted) {
+      final updated = Map<String, OiColumnFilter>.from(widget.activeFilters)
+        ..[filter.key] = OiColumnFilter(value: result);
+      widget.onFilterChange(updated);
+      updateSettings(_toSettings(), debounce: widget.settingsSaveDebounce);
+    }
   }
 
   void _removeFilter(String key) {
@@ -332,8 +370,29 @@ class _FilterChipState extends State<_FilterChip> {
   String _formatValue(OiColumnFilter? filter) {
     if (filter == null) return '';
     final v = filter.value;
+    if (v is List<String>) {
+      if (v.isEmpty) return '';
+      // For multiselect, resolve labels from options if available.
+      final options = widget.definition.options;
+      if (options != null) {
+        return v.map((val) {
+          final match = options.where((o) => o.value == val);
+          return match.isNotEmpty ? match.first.label : val;
+        }).join(', ');
+      }
+      return v.join(', ');
+    }
+    if (v is DateTime) {
+      return '${v.year}-${v.month.toString().padLeft(2, '0')}-${v.day.toString().padLeft(2, '0')}';
+    }
     if (v is String) return v;
     return v.toString();
+  }
+
+  int _activeCount() {
+    final v = widget.activeFilter?.value;
+    if (v is List<String>) return v.length;
+    return 0;
   }
 
   @override
@@ -341,6 +400,8 @@ class _FilterChipState extends State<_FilterChip> {
     final colors = context.colors;
 
     final isActive = widget.active;
+    final isMultiSelect = widget.definition.type == OiFilterType.multiSelect;
+    final multiCount = isMultiSelect ? _activeCount() : 0;
     final baseColor = isActive
         ? colors.primary.base.withValues(alpha: 0.1)
         : colors.surfaceSubtle;
@@ -366,15 +427,16 @@ class _FilterChipState extends State<_FilterChip> {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
+              // Label (and value for non-multiselect active chips).
               Padding(
                 padding: EdgeInsets.only(
                   left: 12,
                   top: 6,
                   bottom: 6,
-                  right: isActive ? 4 : 12,
+                  right: isActive && !isMultiSelect ? 4 : 0,
                 ),
                 child: Text(
-                  isActive
+                  isActive && !isMultiSelect
                       ? '${widget.definition.label}: '
                             '${_formatValue(widget.activeFilter)}'
                       : widget.definition.label,
@@ -385,6 +447,29 @@ class _FilterChipState extends State<_FilterChip> {
                   ),
                 ),
               ),
+
+              // Multi-select: show count badge.
+              if (isActive && isMultiSelect && multiCount > 0) ...[
+                const SizedBox(width: 6),
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+                  decoration: BoxDecoration(
+                    color: colors.primary.base,
+                    borderRadius: BorderRadius.circular(100),
+                  ),
+                  child: Text(
+                    '$multiCount',
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                      color: colors.textOnPrimary,
+                    ),
+                  ),
+                ),
+              ],
+
+              // Active: show X to remove; Inactive: show chevron.
               if (isActive)
                 MouseRegion(
                   onEnter: (_) => setState(() => _closeHovered = true),
@@ -395,6 +480,7 @@ class _FilterChipState extends State<_FilterChip> {
                     onTap: widget.onRemove,
                     child: Padding(
                       padding: const EdgeInsets.only(
+                        left: 4,
                         right: 8,
                         top: 6,
                         bottom: 6,
@@ -411,6 +497,15 @@ class _FilterChipState extends State<_FilterChip> {
                       ),
                     ),
                   ),
+                )
+              else
+                Padding(
+                  padding: const EdgeInsets.only(left: 4, right: 8),
+                  child: Icon(
+                    OiIcons.chevronDown,
+                    size: 14,
+                    color: colors.textMuted,
+                  ),
                 ),
             ],
           ),
@@ -425,8 +520,9 @@ class _FilterChipState extends State<_FilterChip> {
 /// An overlay popover that collects a filter value from the user.
 ///
 /// Positioned as a dropdown below the [anchor] point. For select filters the
-/// options are shown directly and tapping one applies immediately. For text
-/// filters a text input with an apply button is shown.
+/// options are shown directly and tapping one applies immediately. For
+/// multi-select filters, checkboxes are shown with an Apply button. For text
+/// filters with suggestions, a search input with a filterable list is shown.
 class _FilterPopover extends StatefulWidget {
   const _FilterPopover({
     required this.definition,
@@ -448,12 +544,22 @@ class _FilterPopover extends StatefulWidget {
 
 class _FilterPopoverState extends State<_FilterPopover> {
   late TextEditingController _textController;
+  late Set<String> _selectedValues;
+  String _searchQuery = '';
 
   @override
   void initState() {
     super.initState();
     final initial = widget.currentFilter?.value?.toString() ?? '';
     _textController = TextEditingController(text: initial);
+
+    // Initialize multi-select state.
+    final currentValue = widget.currentFilter?.value;
+    if (currentValue is List<String>) {
+      _selectedValues = Set<String>.of(currentValue);
+    } else {
+      _selectedValues = {};
+    }
   }
 
   @override
@@ -474,9 +580,32 @@ class _FilterPopoverState extends State<_FilterPopover> {
       widget.definition.options != null &&
       widget.definition.options!.isNotEmpty;
 
+  bool get _isMultiSelect =>
+      widget.definition.type == OiFilterType.multiSelect &&
+      widget.definition.options != null &&
+      widget.definition.options!.isNotEmpty;
+
+  bool get _isTextWithSuggestions =>
+      widget.definition.type == OiFilterType.text &&
+      widget.definition.suggestions != null &&
+      widget.definition.suggestions!.isNotEmpty;
+
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
+
+    Widget content;
+    if (_isMultiSelect) {
+      content = _buildMultiSelectOptions(context);
+    } else if (_isSelect) {
+      content = _buildSelectOptions(context);
+    } else if (_isTextWithSuggestions) {
+      content = _buildSearchSuggestions(context);
+    } else {
+      content = _buildTextInput(context);
+    }
+
+    final needsPadding = !_isSelect && !_isMultiSelect;
 
     return Stack(
       children: [
@@ -494,10 +623,10 @@ class _FilterPopoverState extends State<_FilterPopover> {
           top: widget.anchor.dy,
           child: Container(
             key: const Key('oi_filter_popover'),
-            width: 220,
-            padding: _isSelect
-                ? const EdgeInsets.symmetric(vertical: 4)
-                : const EdgeInsets.all(12),
+            width: _isMultiSelect ? 260 : 220,
+            padding: needsPadding
+                ? const EdgeInsets.all(12)
+                : const EdgeInsets.symmetric(vertical: 4),
             decoration: BoxDecoration(
               color: colors.surface,
               borderRadius: BorderRadius.circular(8),
@@ -510,9 +639,7 @@ class _FilterPopoverState extends State<_FilterPopover> {
                 ),
               ],
             ),
-            child: _isSelect
-                ? _buildSelectOptions(context)
-                : _buildTextInput(context),
+            child: content,
           ),
         ),
       ],
@@ -532,6 +659,124 @@ class _FilterPopoverState extends State<_FilterPopover> {
             selected: currentValue == option.value,
             onTap: () => widget.onApply(OiColumnFilter(value: option.value)),
           ),
+      ],
+    );
+  }
+
+  Widget _buildMultiSelectOptions(BuildContext context) {
+    final colors = context.colors;
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        for (final option in widget.definition.options!)
+          _FilterCheckboxOption(
+            label: option.label,
+            checked: _selectedValues.contains(option.value),
+            onChanged: (checked) {
+              setState(() {
+                if (checked) {
+                  _selectedValues.add(option.value);
+                } else {
+                  _selectedValues.remove(option.value);
+                }
+              });
+            },
+          ),
+        // Apply button.
+        Padding(
+          padding: const EdgeInsets.fromLTRB(8, 4, 8, 4),
+          child: GestureDetector(
+            onTap: () {
+              if (_selectedValues.isNotEmpty) {
+                widget.onApply(
+                  OiColumnFilter(value: _selectedValues.toList()),
+                );
+              }
+            },
+            child: Container(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              decoration: BoxDecoration(
+                color: _selectedValues.isNotEmpty
+                    ? colors.primary.base
+                    : colors.border,
+                borderRadius: BorderRadius.circular(6),
+              ),
+              alignment: Alignment.center,
+              child: Text(
+                'Apply${_selectedValues.isNotEmpty ? ' (${_selectedValues.length})' : ''}',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: colors.textOnPrimary,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSearchSuggestions(BuildContext context) {
+    final colors = context.colors;
+    final suggestions = widget.definition.suggestions!;
+    final filtered = _searchQuery.isEmpty
+        ? suggestions
+        : suggestions
+              .where(
+                (s) => s.toLowerCase().contains(_searchQuery.toLowerCase()),
+              )
+              .toList();
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        OiTextInput.search(
+          controller: _textController,
+          autofocus: true,
+          onChanged: (value) {
+            setState(() => _searchQuery = value);
+          },
+          onSubmitted: (_) => _apply(),
+        ),
+        if (filtered.isNotEmpty) ...[
+          const SizedBox(height: 8),
+          Container(
+            constraints: const BoxConstraints(maxHeight: 200),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  for (final suggestion in filtered)
+                    _FilterOption(
+                      label: suggestion,
+                      selected: _textController.text == suggestion,
+                      onTap: () => widget.onApply(
+                        OiColumnFilter(
+                          value: suggestion,
+                          operator: OiFilterOperator.contains,
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          ),
+        ] else if (_searchQuery.isNotEmpty) ...[
+          const SizedBox(height: 8),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+            child: Text(
+              'No results',
+              style: TextStyle(fontSize: 13, color: colors.textMuted),
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ],
       ],
     );
   }
@@ -639,6 +884,67 @@ class _FilterOptionState extends State<_FilterOption> {
               fontWeight: widget.selected ? FontWeight.w600 : FontWeight.w400,
               color: widget.selected ? colors.primary.base : colors.text,
             ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// A checkbox option row for multi-select filter popovers.
+class _FilterCheckboxOption extends StatefulWidget {
+  const _FilterCheckboxOption({
+    required this.label,
+    required this.checked,
+    required this.onChanged,
+  });
+
+  final String label;
+  final bool checked;
+  final ValueChanged<bool> onChanged;
+
+  @override
+  State<_FilterCheckboxOption> createState() => _FilterCheckboxOptionState();
+}
+
+class _FilterCheckboxOptionState extends State<_FilterCheckboxOption> {
+  bool _hovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+
+    return MouseRegion(
+      onEnter: (_) => setState(() => _hovered = true),
+      onExit: (_) => setState(() => _hovered = false),
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () => widget.onChanged(!widget.checked),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          margin: const EdgeInsets.symmetric(horizontal: 4),
+          decoration: BoxDecoration(
+            color: _hovered ? colors.surfaceSubtle : null,
+            borderRadius: BorderRadius.circular(6),
+          ),
+          child: Row(
+            children: [
+              OiCheckbox(
+                value: widget.checked,
+                onChanged: widget.onChanged,
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  widget.label,
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: colors.text,
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ),

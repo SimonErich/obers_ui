@@ -324,9 +324,7 @@ class _CmsCategoriesScreenState extends State<CmsCategoriesScreen> {
               // Tree panel
               SizedBox(
                 width: 300,
-                child: Padding(
-                  padding: EdgeInsets.all(spacing.md),
-                  child: OiTree<String>(
+                child: OiTree<String>(
                     label: 'Category tree',
                     nodes: _nodes,
                     controller: _treeController,
@@ -339,8 +337,7 @@ class _CmsCategoriesScreenState extends State<CmsCategoriesScreen> {
                       if (ids.isNotEmpty) {
                         setState(() => _selectedId = ids.first);
                       }
-                    },
-                  ),
+                  },
                 ),
               ),
 

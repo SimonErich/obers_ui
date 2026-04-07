@@ -3,6 +3,19 @@ import 'package:obers_ui/obers_ui.dart';
 
 import 'package:obers_ui_example/data/mock_dashboard.dart';
 
+String _initialsFrom(String name) {
+  final parts = name.split(' ');
+  if (parts.length >= 2) return '${parts[0][0]}${parts[1][0]}';
+  return parts[0][0];
+}
+
+OiBadgeColor _statusColor(String status) => switch (status) {
+  'active' => OiBadgeColor.success,
+  'on-leave' => OiBadgeColor.warning,
+  'inactive' => OiBadgeColor.error,
+  _ => OiBadgeColor.neutral,
+};
+
 /// Employee directory table showcasing advanced [OiTable] features:
 /// grouping, column manager, striped rows, built-in pagination,
 /// context menu, and a detail sheet with [OiTabs] and [OiMetadataEditor].
@@ -14,76 +27,99 @@ class AdminUsersScreen extends StatefulWidget {
 }
 
 class _AdminUsersScreenState extends State<AdminUsersScreen> {
-  late final List<Map<String, Object>> _employees = List.of(kEmployeeTableData);
+  late final List<Map<String, Object>> _employees =
+      List.of(kEmployeeTableData);
   Set<String> _selectedKeys = {};
   String? _groupByField;
 
-  String _initialsFrom(String name) {
-    final parts = name.split(' ');
-    if (parts.length >= 2) return '${parts[0][0]}${parts[1][0]}';
-    return parts[0][0];
+  // ── Employee mutations ─────────────────────────────────────────────────
+
+  int _indexByEmail(Map<String, Object> row) =>
+      _employees.indexWhere((e) => e['email'] == row['email']);
+
+  void _setStatus(Map<String, Object> row, String status) {
+    final idx = _indexByEmail(row);
+    if (idx < 0) return;
+    setState(() {
+      _employees[idx] = {..._employees[idx], 'status': status};
+    });
   }
 
-  OiBadgeColor _statusColor(String status) => switch (status) {
-    'active' => OiBadgeColor.success,
-    'on-leave' => OiBadgeColor.warning,
-    'inactive' => OiBadgeColor.error,
-    _ => OiBadgeColor.neutral,
-  };
+  void _removeEmployee(Map<String, Object> row) {
+    setState(() {
+      _employees.removeWhere((e) => e['email'] == row['email']);
+    });
+  }
 
-  // ── Context menu ────────────────────────────────────────────────────────
-
-  List<OiMenuItem> _rowMenuItems(Map<String, Object> row) => [
-        OiMenuItem(
-          label: 'View Details',
-          icon: OiIcons.eye,
-          onTap: () => _showUserDetail(row),
+  Future<bool> _confirmDelete(String name) async {
+    final confirmed = await showOiDialog<bool>(
+      context,
+      builder: (context, close) => OiDialog.confirm(
+        label: 'Confirm deletion',
+        title: 'Delete user',
+        content: Text(
+          'Are you sure you want to delete $name? '
+          'This action cannot be undone.',
         ),
-        OiMenuItem(
-          label: 'Send Email',
-          icon: OiIcons.mail,
-          onTap: () => OiToast.show(
+        actions: [
+          OiButton.ghost(label: 'Cancel', onTap: () => close(false)),
+          OiButton.destructive(label: 'Delete', onTap: () => close(true)),
+        ],
+      ),
+    );
+    return confirmed == true;
+  }
+
+  // ── Context menu ──────────────────────────────────────────────────────
+
+  List<OiMenuItem> _rowMenuItems(Map<String, Object> row) {
+    final isActive = row['status'] == 'active';
+
+    return [
+      OiMenuItem(
+        label: 'View Details',
+        icon: OiIcons.eye,
+        onTap: () => _showUserDetail(row),
+      ),
+      OiMenuItem(
+        label: 'Send Email',
+        icon: OiIcons.mail,
+        onTap: () => OiToast.show(
+          context,
+          message: 'Email sent to ${row['name']}',
+        ),
+      ),
+      const OiMenuDivider(),
+      OiMenuItem(
+        label: isActive ? 'Deactivate' : 'Activate',
+        icon: isActive ? OiIcons.ban : OiIcons.check,
+        onTap: () {
+          final newStatus = isActive ? 'inactive' : 'active';
+          _setStatus(row, newStatus);
+          OiToast.show(
             context,
-            message: 'Email sent to ${row['name']}',
-          ),
-        ),
-        const OiMenuDivider(),
-        OiMenuItem(
-          label: 'Deactivate',
-          icon: OiIcons.ban,
-          onTap: () {
-            setState(() {
-              final idx = _employees.indexWhere(
-                (e) => e['email'] == row['email'],
-              );
-              if (idx >= 0) {
-                _employees[idx] = {..._employees[idx], 'status': 'inactive'};
-              }
-            });
-            OiToast.show(
-              context,
-              message: '${row['name']} deactivated',
-              level: OiToastLevel.warning,
-            );
-          },
-        ),
-        OiMenuItem(
-          label: 'Delete',
-          icon: OiIcons.trash2,
-          onTap: () {
-            setState(() {
-              _employees.removeWhere((e) => e['email'] == row['email']);
-            });
-            OiToast.show(
-              context,
-              message: '${row['name']} removed',
-              level: OiToastLevel.error,
-            );
-          },
-        ),
-      ];
+            message: '${row['name']} ${isActive ? 'deactivated' : 'activated'}',
+            level: isActive ? OiToastLevel.warning : OiToastLevel.success,
+          );
+        },
+      ),
+      OiMenuItem(
+        label: 'Delete',
+        icon: OiIcons.trash2,
+        onTap: () async {
+          if (!await _confirmDelete(row['name']! as String)) return;
+          _removeEmployee(row);
+          OiToast.show(
+            context,
+            message: '${row['name']} removed',
+            level: OiToastLevel.error,
+          );
+        },
+      ),
+    ];
+  }
 
-  // ── Detail sheet ────────────────────────────────────────────────────────
+  // ── Detail sheet ──────────────────────────────────────────────────────
 
   void _showUserDetail(Map<String, Object> row) {
     OiSheet.show(
@@ -95,7 +131,134 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
     );
   }
 
-  // ── Build ───────────────────────────────────────────────────────────────
+  // ── Columns ───────────────────────────────────────────────────────────
+
+  List<OiTableColumn<Map<String, Object>>> get _columns => [
+    OiTableColumn(
+      id: 'avatar',
+      header: '',
+      width: 48,
+      sortable: false,
+      filterable: false,
+      resizable: false,
+      cellBuilder: (context, row, _) => OiAvatar(
+        semanticLabel: row['name']! as String,
+        initials: _initialsFrom(row['name']! as String),
+        size: OiAvatarSize.sm,
+      ),
+    ),
+    OiTableColumn(
+      id: 'name',
+      header: 'Name',
+      width: 180,
+      valueGetter: (row) => row['name']! as String,
+    ),
+    OiTableColumn(
+      id: 'role',
+      header: 'Role',
+      width: 160,
+      valueGetter: (row) => row['role']! as String,
+    ),
+    OiTableColumn(
+      id: 'department',
+      header: 'Department',
+      width: 140,
+      valueGetter: (row) => row['department']! as String,
+    ),
+    OiTableColumn(
+      id: 'status',
+      header: 'Status',
+      width: 100,
+      valueGetter: (row) => row['status']! as String,
+      cellBuilder: (_, row, __) {
+        final status = row['status']! as String;
+        return OiBadge.soft(
+          label: status[0].toUpperCase() + status.substring(1),
+          color: _statusColor(status),
+        );
+      },
+    ),
+    OiTableColumn(
+      id: 'email',
+      header: 'Email',
+      width: 200,
+      valueGetter: (row) => row['email']! as String,
+    ),
+    OiTableColumn(
+      id: 'location',
+      header: 'Location',
+      width: 120,
+      valueGetter: (row) => row['location']! as String,
+    ),
+    OiTableColumn(
+      id: 'joined',
+      header: 'Joined',
+      width: 120,
+      valueGetter: (row) => row['joined']! as String,
+    ),
+    OiTableColumn(
+      id: 'ordersProcessed',
+      header: 'Orders',
+      width: 70,
+      valueGetter: (row) => '${row['ordersProcessed']}',
+    ),
+    OiTableColumn(
+      id: 'actions',
+      header: '',
+      sortable: false,
+      filterable: false,
+      resizable: false,
+      cellBuilder: (_, row, __) => OiContextMenu(
+        label: 'Actions for ${row['name']}',
+        items: _rowMenuItems(row),
+        openOnTap: true,
+        child: const Padding(
+          padding: EdgeInsets.all(8.0),
+          child: Icon(OiIcons.ellipsisVertical, size: 18),
+        ),
+      ),
+    ),
+  ];
+
+  // ── Bulk actions ──────────────────────────────────────────────────────
+
+  List<OiBulkAction> get _bulkActions => [
+    OiBulkAction(
+      label: 'Export',
+      icon: OiIcons.download,
+      onTap: () {
+        OiToast.show(
+          context,
+          message: 'Exported ${_selectedKeys.length} users',
+          level: OiToastLevel.success,
+        );
+        setState(() => _selectedKeys = {});
+      },
+    ),
+    OiBulkAction(
+      label: 'Delete',
+      icon: OiIcons.trash2,
+      onTap: () async {
+        final count = _selectedKeys.length;
+        final confirmed = await _confirmDelete('$count users');
+        if (!confirmed) return;
+        setState(() {
+          _employees.removeWhere(
+            (e) => _selectedKeys.contains(e['email']! as String),
+          );
+          _selectedKeys = {};
+        });
+        OiToast.show(
+          context,
+          message: '$count users removed',
+          level: OiToastLevel.error,
+        );
+      },
+      variant: OiBulkActionVariant.destructive,
+    ),
+  ];
+
+  // ── Build ─────────────────────────────────────────────────────────────
 
   @override
   Widget build(BuildContext context) {
@@ -106,20 +269,14 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Group-by toggle
             Padding(
-              padding: EdgeInsets.fromLTRB(
-                spacing.md,
-                spacing.md,
-                spacing.md,
-                0,
-              ),
+              padding: EdgeInsets.fromLTRB(spacing.md, spacing.md, spacing.md, 0),
               child: Row(
                 children: [
                   const OiLabel.bodyStrong('Group by: '),
                   SizedBox(width: spacing.sm),
-                  ...[null, 'department', 'status'].map(
-                    (field) => Padding(
+                  for (final field in [null, 'department', 'status'])
+                    Padding(
                       padding: EdgeInsets.only(right: spacing.xs),
                       child: _groupByField == field
                           ? OiButton.primary(
@@ -135,12 +292,9 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
                               size: OiButtonSize.small,
                             ),
                     ),
-                  ),
                 ],
               ),
             ),
-
-            // Table
             Expanded(
               child: Padding(
                 padding: EdgeInsets.all(spacing.md),
@@ -155,92 +309,14 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
                   pageSizeOptions: const [5, 10, 25],
                   rowKey: (row) => row['email']! as String,
                   groupBy: _groupByField,
-                  onSelectionChanged: (keys) {
-                    setState(() => _selectedKeys = keys);
-                  },
-                  onRowTap: (row, index) => _showUserDetail(row),
-                  columns: [
-                    OiTableColumn<Map<String, Object>>(
-                      id: 'avatar',
-                      header: '',
-                      width: 48,
-                      sortable: false,
-                      filterable: false,
-                      resizable: false,
-                      cellBuilder: (context, row, _) => OiAvatar(
-                        semanticLabel: row['name']! as String,
-                        initials: _initialsFrom(row['name']! as String),
-                        size: OiAvatarSize.sm,
-                      ),
-                    ),
-                    OiTableColumn<Map<String, Object>>(
-                      id: 'name',
-                      header: 'Name',
-                      valueGetter: (row) => row['name']! as String,
-                    ),
-                    OiTableColumn<Map<String, Object>>(
-                      id: 'role',
-                      header: 'Role',
-                      valueGetter: (row) => row['role']! as String,
-                    ),
-                    OiTableColumn<Map<String, Object>>(
-                      id: 'department',
-                      header: 'Department',
-                      valueGetter: (row) => row['department']! as String,
-                    ),
-                    OiTableColumn<Map<String, Object>>(
-                      id: 'status',
-                      header: 'Status',
-                      valueGetter: (row) => row['status']! as String,
-                      cellBuilder: (ctx, row, _) {
-                        final status = row['status']! as String;
-                        return OiBadge.soft(
-                          label: status[0].toUpperCase() + status.substring(1),
-                          color: _statusColor(status),
-                        );
-                      },
-                    ),
-                    OiTableColumn<Map<String, Object>>(
-                      id: 'email',
-                      header: 'Email',
-                      valueGetter: (row) => row['email']! as String,
-                    ),
-                    OiTableColumn<Map<String, Object>>(
-                      id: 'location',
-                      header: 'Location',
-                      valueGetter: (row) => row['location']! as String,
-                    ),
-                    OiTableColumn<Map<String, Object>>(
-                      id: 'joined',
-                      header: 'Joined',
-                      valueGetter: (row) => row['joined']! as String,
-                    ),
-                    OiTableColumn<Map<String, Object>>(
-                      id: 'ordersProcessed',
-                      header: 'Orders',
-                      valueGetter: (row) => '${row['ordersProcessed']}',
-                    ),
-                    // Actions column with context menu.
-                    OiTableColumn<Map<String, Object>>(
-                      id: 'actions',
-                      header: '',
-                      sortable: false,
-                      filterable: false,
-                      resizable: false,
-                      cellBuilder: (ctx, row, _) => OiContextMenu(
-                        label: 'Actions for ${row['name']}',
-                        items: _rowMenuItems(row),
-                        child: const Icon(OiIcons.ellipsisVertical, size: 18),
-                      ),
-                    ),
-                  ],
+                  onSelectionChanged: (keys) =>
+                      setState(() => _selectedKeys = keys),
+                  columns: _columns,
                 ),
               ),
             ),
           ],
         ),
-
-        // Bulk action bar.
         if (_selectedKeys.isNotEmpty)
           Positioned(
             bottom: spacing.lg + 48,
@@ -257,33 +333,7 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
                 });
               },
               onDeselectAll: () => setState(() => _selectedKeys = {}),
-              actions: [
-                OiBulkAction(
-                  label: 'Export',
-                  icon: OiIcons.download,
-                  onTap: () {
-                    OiToast.show(
-                      context,
-                      message: 'Exported ${_selectedKeys.length} users',
-                      level: OiToastLevel.success,
-                    );
-                    setState(() => _selectedKeys = {});
-                  },
-                ),
-                OiBulkAction(
-                  label: 'Delete',
-                  icon: OiIcons.trash2,
-                  onTap: () {
-                    setState(() {
-                      _employees.removeWhere(
-                        (e) => _selectedKeys.contains(e['email']! as String),
-                      );
-                      _selectedKeys = {};
-                    });
-                  },
-                  variant: OiBulkActionVariant.destructive,
-                ),
-              ],
+              actions: _bulkActions,
             ),
           ),
       ],
@@ -305,10 +355,7 @@ class _UserDetailSheetState extends State<_UserDetailSheet> {
   int _tabIndex = 0;
   late List<OiMetadataField> _metadata = [
     const OiMetadataField(key: 'Employee ID', value: 'EMP-2026-042'),
-    const OiMetadataField(
-      key: 'Contract Type',
-      value: 'Full-time',
-    ),
+    const OiMetadataField(key: 'Contract Type', value: 'Full-time'),
     const OiMetadataField(
       key: 'Remote Eligible',
       value: true,
@@ -321,103 +368,103 @@ class _UserDetailSheetState extends State<_UserDetailSheet> {
     final spacing = context.spacing;
     final row = widget.row;
 
-    return SingleChildScrollView(
-      padding: EdgeInsets.all(spacing.md),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Header with avatar.
-          Row(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: EdgeInsets.fromLTRB(spacing.md, spacing.md, spacing.md, 0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              OiAvatar(
-                semanticLabel: row['name']! as String,
-                initials: _initialsFrom(row['name']! as String),
-                size: OiAvatarSize.lg,
+              Row(
+                children: [
+                  OiAvatar(
+                    semanticLabel: row['name']! as String,
+                    initials: _initialsFrom(row['name']! as String),
+                    size: OiAvatarSize.lg,
+                  ),
+                  SizedBox(width: spacing.md),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        OiLabel.h4(row['name']! as String),
+                        SizedBox(height: spacing.xs),
+                        OiLabel.caption(row['role']! as String),
+                      ],
+                    ),
+                  ),
+                ],
               ),
-              SizedBox(width: spacing.md),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    OiLabel.h4(row['name']! as String),
-                    SizedBox(height: spacing.xs),
-                    OiLabel.caption(row['role']! as String),
-                  ],
-                ),
+              SizedBox(height: spacing.lg),
+              OiTabs(
+                tabs: const [
+                  OiTabItem(label: 'Profile'),
+                  OiTabItem(label: 'Metadata'),
+                ],
+                selectedIndex: _tabIndex,
+                onSelected: (i) => setState(() => _tabIndex = i),
               ),
             ],
           ),
-          SizedBox(height: spacing.lg),
-
-          // Tabs.
-          OiTabs(
-            tabs: const [
-              OiTabItem(label: 'Profile'),
-              OiTabItem(label: 'Metadata'),
-            ],
-            selectedIndex: _tabIndex,
-            onSelected: (i) => setState(() => _tabIndex = i),
+        ),
+        Expanded(
+          child: SingleChildScrollView(
+            padding: EdgeInsets.all(spacing.md),
+            child: _tabIndex == 0
+                ? OiDetailView(
+                    label: 'Profile details',
+                    sections: [
+                      OiDetailSection(
+                        title: 'Contact',
+                        fields: [
+                          OiDetailField(label: 'Name', value: row['name']),
+                          OiDetailField(
+                            label: 'Email',
+                            value: row['email'],
+                            type: OiFieldType.email,
+                          ),
+                          OiDetailField(label: 'Phone', value: row['phone']),
+                          OiDetailField(
+                            label: 'Location',
+                            value: row['location'],
+                          ),
+                        ],
+                      ),
+                      OiDetailSection(
+                        title: 'Work',
+                        fields: [
+                          OiDetailField(label: 'Role', value: row['role']),
+                          OiDetailField(
+                            label: 'Department',
+                            value: row['department'],
+                          ),
+                          OiDetailField(label: 'Status', value: row['status']),
+                          OiDetailField(label: 'Joined', value: row['joined']),
+                          OiDetailField(
+                            label: 'Orders Processed',
+                            value: '${row['ordersProcessed']}',
+                          ),
+                        ],
+                      ),
+                    ],
+                  )
+                : OiMetadataEditor(
+                    label: 'Employee metadata',
+                    fields: _metadata,
+                    availableKeys: const [
+                      'Employee ID',
+                      'Contract Type',
+                      'Remote Eligible',
+                      'Team Lead',
+                      'Start Date',
+                      'Notes',
+                    ],
+                    onChange: (fields) => setState(() => _metadata = fields),
+                  ),
           ),
-          SizedBox(height: spacing.md),
-
-          if (_tabIndex == 0) ...[
-            OiDetailView(
-              label: 'Profile details',
-              sections: [
-                OiDetailSection(
-                  title: 'Contact',
-                  fields: [
-                    OiDetailField(label: 'Name', value: row['name']),
-                    OiDetailField(
-                      label: 'Email',
-                      value: row['email'],
-                      type: OiFieldType.email,
-                    ),
-                    OiDetailField(label: 'Phone', value: row['phone']),
-                    OiDetailField(label: 'Location', value: row['location']),
-                  ],
-                ),
-                OiDetailSection(
-                  title: 'Work',
-                  fields: [
-                    OiDetailField(label: 'Role', value: row['role']),
-                    OiDetailField(
-                      label: 'Department',
-                      value: row['department'],
-                    ),
-                    OiDetailField(label: 'Status', value: row['status']),
-                    OiDetailField(label: 'Joined', value: row['joined']),
-                    OiDetailField(
-                      label: 'Orders Processed',
-                      value: '${row['ordersProcessed']}',
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ] else ...[
-            OiMetadataEditor(
-              label: 'Employee metadata',
-              fields: _metadata,
-              availableKeys: const [
-                'Employee ID',
-                'Contract Type',
-                'Remote Eligible',
-                'Team Lead',
-                'Start Date',
-                'Notes',
-              ],
-              onChange: (fields) => setState(() => _metadata = fields),
-            ),
-          ],
-        ],
-      ),
+        ),
+      ],
     );
-  }
-
-  String _initialsFrom(String name) {
-    final parts = name.split(' ');
-    if (parts.length >= 2) return '${parts[0][0]}${parts[1][0]}';
-    return parts[0][0];
   }
 }
