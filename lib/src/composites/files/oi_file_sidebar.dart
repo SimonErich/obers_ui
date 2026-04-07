@@ -373,7 +373,7 @@ class _OiFileSidebarState extends State<OiFileSidebar> {
               if (widget.onNewFolder != null)
                 Padding(
                   padding: EdgeInsets.all(spacing.sm),
-                  child: OiButton.primary(
+                  child: OiButton.outline(
                     label: '+ New Folder',
                     fullWidth: true,
                     onTap: () {

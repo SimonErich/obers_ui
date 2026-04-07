@@ -290,14 +290,10 @@ class _AdminAppState extends State<AdminApp> {
                   ],
                 ),
                 actions: [
-                  OiTappable(
+                  OiIconButton(
+                    icon: OiIcons.search,
                     semanticLabel: 'Open command bar',
                     onTap: () => setState(() => _showCommandBar = true),
-                    child: Icon(
-                      OiIcons.search,
-                      size: 20,
-                      color: colors.text,
-                    ),
                   ),
                   OiThemeToggle(
                     currentMode: widget.themeState.value,

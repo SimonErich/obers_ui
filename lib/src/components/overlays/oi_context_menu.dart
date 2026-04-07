@@ -52,6 +52,7 @@ class OiContextMenu extends StatefulWidget {
     required this.child,
     required this.items,
     this.enabled = true,
+    this.openOnTap = false,
     super.key,
   });
 
@@ -66,6 +67,13 @@ class OiContextMenu extends StatefulWidget {
 
   /// Whether the context menu is active. Defaults to `true`.
   final bool enabled;
+
+  /// Whether a normal (left) click / tap should open the context menu.
+  ///
+  /// Defaults to `false` – only right-click and long-press trigger the menu.
+  /// Set to `true` for action buttons (e.g. a "⋮" icon in a table row) where
+  /// a single click is the expected interaction.
+  final bool openOnTap;
 
   @override
   State<OiContextMenu> createState() => _OiContextMenuState();
@@ -138,14 +146,22 @@ class _OiContextMenuState extends State<OiContextMenu> {
     if (!widget.enabled) return widget.child;
 
     return Listener(
-      // Right-click on pointer devices.
       onPointerDown: (e) {
+        // Open only on right-click; touch still uses long-press below.
         if (e.buttons == kSecondaryMouseButton) {
           _show(e.position);
         }
       },
       child: GestureDetector(
-        onLongPressStart: (d) => _show(d.globalPosition),
+        // Long-press for touch devices.
+        onLongPressStart: (details) => _show(details.globalPosition),
+        // When openOnTap is true, a normal click/tap opens the menu.
+        // This also wins the gesture arena so parent tap handlers
+        // (e.g. row selection in a table) do not fire.
+        onTapUp: widget.openOnTap
+            ? (details) => _show(details.globalPosition)
+            : null,
+        behavior: HitTestBehavior.opaque,
         child: widget.child,
       ),
     );

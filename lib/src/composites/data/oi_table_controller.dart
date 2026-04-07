@@ -129,12 +129,19 @@ class OiTableController extends ChangeNotifier {
   /// Sorts by [columnId].
   ///
   /// If [ascending] is omitted and the column is already the active sort
-  /// column, the direction is toggled. Otherwise [ascending] defaults to
-  /// `true`.
+  /// column, the direction cycles: ascending → descending → cleared.
+  /// Otherwise [ascending] defaults to `true`.
   void sortBy(String columnId, {bool? ascending}) {
     if (ascending == null) {
       if (sortColumnId == columnId) {
-        sortAscending = !sortAscending;
+        if (sortAscending) {
+          // asc → desc
+          sortAscending = false;
+        } else {
+          // desc → clear
+          sortColumnId = null;
+          sortAscending = true;
+        }
       } else {
         sortColumnId = columnId;
         sortAscending = true;

@@ -10,6 +10,7 @@ import 'package:obers_ui/src/components/dialogs/oi_move_dialog.dart';
 import 'package:obers_ui/src/components/dialogs/oi_upload_dialog.dart';
 import 'package:obers_ui/src/components/display/oi_empty_state.dart';
 import 'package:obers_ui/src/components/display/oi_path_bar.dart';
+import 'package:obers_ui/src/components/display/oi_tooltip.dart';
 import 'package:obers_ui/src/components/inputs/oi_text_input.dart';
 import 'package:obers_ui/src/components/overlays/oi_context_menu.dart';
 import 'package:obers_ui/src/components/overlays/oi_dialog.dart';
@@ -209,6 +210,11 @@ class _OiFileExplorerState extends State<OiFileExplorer> {
   /// Overlay handle for open dialogs.
   OiOverlayHandle? _dialogHandle;
 
+  /// Whether a dialog overlay is currently open. Used to disable the
+  /// background [OiFileDropTarget] so that OS-level drops are only handled
+  /// by the dialog's own [DropTarget], preventing duplicate uploads.
+  bool _isDialogOpen = false;
+
   @override
   void initState() {
     super.initState();
@@ -278,6 +284,7 @@ class _OiFileExplorerState extends State<OiFileExplorer> {
   void _dismissDialog() {
     _dialogHandle?.dismiss();
     _dialogHandle = null;
+    if (_isDialogOpen) setState(() => _isDialogOpen = false);
   }
 
   void _showDeleteDialog(List<OiFileNodeData> files) {
@@ -365,6 +372,7 @@ class _OiFileExplorerState extends State<OiFileExplorer> {
         onClose: _dismissDialog,
       ),
     );
+    setState(() => _isDialogOpen = true);
   }
 
   // ── New folder dialog ────────────────────────────────────────────────────
@@ -770,7 +778,7 @@ class _OiFileExplorerState extends State<OiFileExplorer> {
                 '${externalFiles.length} file${externalFiles.length == 1 ? '' : 's'} uploaded',
               );
             },
-            enabled: widget.enableDragDrop,
+            enabled: widget.enableDragDrop && !_isDialogOpen,
             child: _buildContentArea(colors, spacing, files, controller),
           ),
         ),
@@ -867,15 +875,23 @@ class _OiFileExplorerState extends State<OiFileExplorer> {
         SizedBox(width: (spacing as dynamic).sm as double),
         // Actions
         if (widget.enableUpload)
-          OiIconButton(
-            icon: OiIcons.cloudUpload,
-            semanticLabel: 'Upload files',
-            onTap: _showUploadDialog,
+          OiTooltip(
+            label: 'Upload File',
+            message: 'Upload File',
+            child: OiIconButton(
+              icon: OiIcons.cloudUpload,
+              semanticLabel: 'Upload files',
+              onTap: _showUploadDialog,
+            ),
           ),
-        OiIconButton(
-          icon: OiIcons.folderOpen,
-          semanticLabel: 'New folder',
-          onTap: _showNewFolderDialog,
+        OiTooltip(
+          label: 'Add New Folder',
+          message: 'Add New Folder',
+          child: OiIconButton(
+            icon: OiIcons.folderOpen,
+            semanticLabel: 'New folder',
+            onTap: _showNewFolderDialog,
+          ),
         ),
       ],
     );

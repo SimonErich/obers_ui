@@ -31,6 +31,13 @@ class OiGaugeSegment {
   final String? label;
 }
 
+/// The height-to-width ratio of the 270° arc bounding box.
+///
+/// The arc spans from 135° to 45° (270° sweep). Its vertical extent is
+/// r (above center) + r·sin(45°) (below center) ≈ 1.707r, while the
+/// horizontal extent is 2r. With stroke this works out to roughly 0.85.
+const double _kGaugeAspectRatio = 0.85;
+
 /// A gauge / speedometer visualization showing a value within a range.
 ///
 /// The gauge renders a 240-degree arc from [min] to [max] with an optional
@@ -95,42 +102,70 @@ class OiGauge extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.colors;
 
-    final effectiveSize = size ?? 200.0;
+    Widget buildGauge(double effectiveSize) {
+      return CustomPaint(
+        key: const Key('oi_gauge_painter'),
+        size: Size(effectiveSize, effectiveSize * _kGaugeAspectRatio),
+        painter: _OiGaugePainter(
+          value: value.clamp(min, max),
+          min: min,
+          max: max,
+          segments: segments,
+          target: target,
+          trackColor: colors.borderSubtle,
+          needleColor: colors.text,
+          targetColor: colors.warning.base,
+          defaultSegmentColor: colors.primary.base,
+        ),
+        child: showValue
+            ? Align(
+                alignment: Alignment.bottomCenter,
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: 4),
+                  child: OiLabel.body(
+                    _formattedValue,
+                    key: const Key('oi_gauge_value'),
+                    color: colors.text,
+                  ),
+                ),
+              )
+            : null,
+      );
+    }
+
+    if (size != null) {
+      return Semantics(
+        label: label,
+        value: _formattedValue,
+        child: SizedBox(
+          width: size,
+          height: size! * _kGaugeAspectRatio,
+          child: buildGauge(size!),
+        ),
+      );
+    }
 
     return Semantics(
       label: label,
       value: _formattedValue,
-      child: SizedBox(
-        width: effectiveSize,
-        height: effectiveSize * 0.7,
-        child: CustomPaint(
-          key: const Key('oi_gauge_painter'),
-          size: Size(effectiveSize, effectiveSize * 0.7),
-          painter: _OiGaugePainter(
-            value: value.clamp(min, max),
-            min: min,
-            max: max,
-            segments: segments,
-            target: target,
-            trackColor: colors.borderSubtle,
-            needleColor: colors.text,
-            targetColor: colors.warning.base,
-            defaultSegmentColor: colors.primary.base,
-          ),
-          child: showValue
-              ? Align(
-                  alignment: Alignment.bottomCenter,
-                  child: Padding(
-                    padding: const EdgeInsets.only(bottom: 4),
-                    child: OiLabel.body(
-                      _formattedValue,
-                      key: const Key('oi_gauge_value'),
-                      color: colors.text,
-                    ),
-                  ),
-                )
-              : null,
-        ),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          // Pick the largest size that fits within the available space,
+          // respecting the 0.7 height ratio of the gauge arc.
+          final maxFromWidth = constraints.maxWidth.isFinite
+              ? constraints.maxWidth
+              : 200.0;
+          final maxFromHeight = constraints.maxHeight.isFinite
+              ? constraints.maxHeight / _kGaugeAspectRatio
+              : double.infinity;
+          final effectiveSize = math.min(maxFromWidth, maxFromHeight);
+
+          return SizedBox(
+            width: effectiveSize,
+            height: effectiveSize * _kGaugeAspectRatio,
+            child: buildGauge(effectiveSize),
+          );
+        },
       ),
     );
   }
@@ -185,9 +220,20 @@ class _OiGaugePainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final center = Offset(size.width / 2, size.height * 0.72);
-    final radius = math.min(size.width, size.height * 1.4) / 2 * 0.8;
-    final strokeWidth = radius * 0.15;
+    // Derive the largest radius that fits within the given size, accounting
+    // for stroke width. We solve:
+    //   2·r + stroke ≤ width     →  r ≤ (width  - stroke) / 2
+    //   1.707·r + stroke ≤ height →  r ≤ (height - stroke) / 1.707
+    // We start with a rough estimate, then refine once strokeWidth is known.
+    final rEstimate = math.min(size.width / 2, size.height / 1.707);
+    final strokeWidth = rEstimate * 0.15;
+    final radius = math.min(
+      (size.width - strokeWidth) / 2,
+      (size.height - strokeWidth) / 1.707,
+    );
+    // Center horizontally; vertically place so the top of the arc (center − r)
+    // sits at half the stroke width (leaving room for the stroke).
+    final center = Offset(size.width / 2, radius + strokeWidth / 2);
 
     // Draw track arc.
     final trackPaint = Paint()

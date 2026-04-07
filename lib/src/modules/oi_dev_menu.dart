@@ -628,14 +628,12 @@ class _OiDevMenuState extends State<OiDevMenu> {
             label: action.label,
             icon: action.icon,
             onTap: action.onTap,
-            fullWidth: true,
           );
         }
         return OiButton.ghost(
           label: action.label,
           icon: action.icon,
           onTap: action.onTap,
-          fullWidth: true,
         );
       },
     );

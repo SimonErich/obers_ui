@@ -39,6 +39,9 @@ class _NavigationScreenState extends State<NavigationScreen> {
 
   // ── OiFilterBar state ─────────────────────────────────────────────────────
   Map<String, OiColumnFilter> _activeFilters = {};
+  Map<String, OiColumnFilter> _multiSelectFilters = {};
+  Map<String, OiColumnFilter> _dateFilters = {};
+  Map<String, OiColumnFilter> _searchFilters = {};
 
   // ── OiArrowNav state ──────────────────────────────────────────────────────
   int? _arrowHighlight;
@@ -484,7 +487,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
             widgetName: 'OiFilterBar',
             description:
                 'A bar of filter chips that open input controls. Supports '
-                'text, select, date, and number filter types.',
+                'text, select, multi-select, date, and number filter types.',
             examples: [
               ComponentExample(
                 title: 'Text and select filters',
@@ -509,6 +512,64 @@ class _NavigationScreenState extends State<NavigationScreen> {
                   activeFilters: _activeFilters,
                   onFilterChange: (filters) =>
                       setState(() => _activeFilters = filters),
+                ),
+              ),
+              ComponentExample(
+                title: 'Multi-select filter',
+                child: OiFilterBar(
+                  filters: const [
+                    OiFilterDefinition(
+                      key: 'category',
+                      label: 'Category',
+                      type: OiFilterType.multiSelect,
+                      options: [
+                        OiSelectOption(value: 'electronics', label: 'Electronics'),
+                        OiSelectOption(value: 'clothing', label: 'Clothing'),
+                        OiSelectOption(value: 'books', label: 'Books'),
+                        OiSelectOption(value: 'food', label: 'Food & Drinks'),
+                      ],
+                    ),
+                  ],
+                  activeFilters: _multiSelectFilters,
+                  onFilterChange: (filters) =>
+                      setState(() => _multiSelectFilters = filters),
+                ),
+              ),
+              ComponentExample(
+                title: 'Date filter',
+                child: OiFilterBar(
+                  filters: const [
+                    OiFilterDefinition(
+                      key: 'date',
+                      label: 'Date',
+                      type: OiFilterType.date,
+                    ),
+                  ],
+                  activeFilters: _dateFilters,
+                  onFilterChange: (filters) =>
+                      setState(() => _dateFilters = filters),
+                ),
+              ),
+              ComponentExample(
+                title: 'Search with suggestions',
+                child: OiFilterBar(
+                  filters: const [
+                    OiFilterDefinition(
+                      key: 'customer',
+                      label: 'Customer',
+                      type: OiFilterType.text,
+                      suggestions: [
+                        'Maria Hinterberger',
+                        'Thomas Oberhuber',
+                        'Eva Schneider',
+                        'Karl Huber',
+                        'Sophie Maier',
+                      ],
+                    ),
+                  ],
+                  activeFilters: _searchFilters,
+                  onFilterChange: (filters) =>
+                      setState(() => _searchFilters = filters),
                 ),
               ),
             ],
