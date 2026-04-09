@@ -113,6 +113,7 @@ export 'src/components/navigation/oi_account_switcher.dart';
 export 'src/components/navigation/oi_action_bar.dart';
 export 'src/components/navigation/oi_bottom_bar.dart';
 export 'src/components/navigation/oi_breadcrumbs.dart';
+export 'src/components/navigation/oi_calendar_week_picker.dart';
 export 'src/components/navigation/oi_date_picker.dart';
 export 'src/components/navigation/oi_drawer.dart';
 export 'src/components/navigation/oi_emoji_picker.dart';

@@ -16,6 +16,8 @@ class OiButtonVariantStyle {
     this.backgroundPressed,
     this.backgroundDisabled,
     this.foreground,
+    this.foregroundHover,
+    this.foregroundPressed,
     this.foregroundDisabled,
     this.border,
     this.borderHover,
@@ -37,6 +39,12 @@ class OiButtonVariantStyle {
 
   /// Foreground (label/icon) color.
   final Color? foreground;
+
+  /// Foreground color on pointer hover.
+  final Color? foregroundHover;
+
+  /// Foreground color when pressed.
+  final Color? foregroundPressed;
 
   /// Foreground color when disabled.
   final Color? foregroundDisabled;
@@ -62,6 +70,8 @@ class OiButtonVariantStyle {
         other.backgroundPressed == backgroundPressed &&
         other.backgroundDisabled == backgroundDisabled &&
         other.foreground == foreground &&
+        other.foregroundHover == foregroundHover &&
+        other.foregroundPressed == foregroundPressed &&
         other.foregroundDisabled == foregroundDisabled &&
         other.border == border &&
         other.borderHover == borderHover &&
@@ -76,6 +86,8 @@ class OiButtonVariantStyle {
     backgroundPressed,
     backgroundDisabled,
     foreground,
+    foregroundHover,
+    foregroundPressed,
     foregroundDisabled,
     border,
     borderHover,
