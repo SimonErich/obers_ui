@@ -1,9 +1,12 @@
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/src/components/navigation/oi_calendar_week_picker.dart';
 import 'package:obers_ui/src/components/navigation/oi_month_picker.dart';
 import 'package:obers_ui/src/components/overlays/oi_dialog_shell.dart';
 import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
+import 'package:obers_ui/src/primitives/display/oi_label.dart';
 import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
+import 'package:obers_ui/src/utils/calendar_utils.dart';
 
 // Weekday abbreviations, index 0=Monday ... 6=Sunday (matches DateTime.weekday-1).
 const List<String> _kWeekdays = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'];
@@ -33,11 +36,16 @@ class OiDatePicker extends StatefulWidget {
     this.rangeEnd,
     this.onRangeChanged,
     this.rangeMode = false,
+    this.weekHighlightMode = false,
+    this.onWeekSelected,
+    this.selectedWeek,
+    this.highlightedWeeks,
     this.displayMonth,
     this.onDisplayMonthChanged,
     this.disabledDates,
     this.disabledDaysOfWeek,
     this.firstDayOfWeek,
+    this.headerBuilder,
     super.key,
   });
 
@@ -65,14 +73,39 @@ class OiDatePicker extends StatefulWidget {
   /// When `true`, the picker operates in date-range selection mode.
   final bool rangeMode;
 
+  /// When `true`, tapping a day highlights the entire week and fires
+  /// [onWeekSelected] with the first day of that week.
+  final bool weekHighlightMode;
+
+  /// Called when a week is selected in [weekHighlightMode].
+  /// The parameter is the first day of the selected week (respecting
+  /// [firstDayOfWeek]).
+  final ValueChanged<DateTime>? onWeekSelected;
+
+  /// The externally selected calendar week. When provided, this week is
+  /// highlighted in the grid (used to reflect a selection made via
+  /// [OiCalendarWeekPicker]).
+  final OiCalendarWeek? selectedWeek;
+
+  /// Calendar weeks to visually highlight with a tinted background
+  /// (e.g. weeks with data). Uses the same tint as range highlighting.
+  final Set<OiCalendarWeek>? highlightedWeeks;
+
   /// Specific dates that cannot be selected. Rendered with muted styling.
   final Set<DateTime>? disabledDates;
 
   /// Days of the week that cannot be selected (1=Monday, 7=Sunday).
   final Set<int>? disabledDaysOfWeek;
 
-  /// First day of the week (1=Monday, 7=Sunday). Defaults to Sunday.
+  /// First day of the week (1=Monday, 7=Sunday). Defaults to Monday.
   final int? firstDayOfWeek;
+
+  /// Custom builder for the center part of the header (between the nav arrows).
+  /// Receives the currently displayed month so the custom widget can react to
+  /// navigation. When `null`, the default month/year label with
+  /// [OiMonthPicker] is shown.
+  final Widget Function(BuildContext context, DateTime displayMonth)?
+      headerBuilder;
 
   /// Externally controlled display month. When provided, the picker shows
   /// this month instead of managing its own display month state.
@@ -122,6 +155,7 @@ class OiDatePicker extends StatefulWidget {
 class _OiDatePickerState extends State<OiDatePicker> {
   late DateTime _displayMonth;
   DateTime? _pendingRangeStart;
+  DateTime? _weekHighlightStart;
 
   bool get _isControlled => widget.displayMonth != null;
 
@@ -151,6 +185,17 @@ class _OiDatePickerState extends State<OiDatePicker> {
       final dm = widget.displayMonth!;
       _displayMonth = DateTime(dm.year, dm.month);
     }
+    // When selectedWeek changes externally, navigate to that week's month.
+    if (widget.selectedWeek != oldWidget.selectedWeek &&
+        widget.selectedWeek != null) {
+      final ws = _weekStartFromCalendarWeek(widget.selectedWeek!);
+      final target = DateTime(ws.year, ws.month);
+      if (_isControlled) {
+        widget.onDisplayMonthChanged?.call(target);
+      } else {
+        _displayMonth = target;
+      }
+    }
   }
 
   void _prevMonth() {
@@ -178,6 +223,16 @@ class _OiDatePickerState extends State<OiDatePicker> {
   }
 
   void _onDayTap(DateTime day) {
+    if (widget.weekHighlightMode) {
+      final fdow = widget.firstDayOfWeek ?? 1;
+      final weekStart = OiCalendarUtils.firstDayOfWeek(day, startOfWeek: fdow);
+      setState(() {
+        _weekHighlightStart = weekStart;
+      });
+      widget.onWeekSelected?.call(weekStart);
+      widget.onChanged?.call(day);
+      return;
+    }
     if (widget.rangeMode) {
       if (_pendingRangeStart == null) {
         setState(() => _pendingRangeStart = day);
@@ -203,6 +258,19 @@ class _OiDatePickerState extends State<OiDatePicker> {
   }
 
   bool _isInRange(DateTime day) {
+    // Week highlight mode: check if day falls in the selected week.
+    if (widget.weekHighlightMode) {
+      // Prefer external selectedWeek, fall back to internal tap state.
+      var ws = _weekHighlightStart;
+      if (widget.selectedWeek != null) {
+        ws = _weekStartFromCalendarWeek(widget.selectedWeek!);
+      }
+      if (ws != null) {
+        final we = DateTime(ws.year, ws.month, ws.day + 6);
+        final d = DateTime(day.year, day.month, day.day);
+        return !d.isBefore(ws) && !d.isAfter(we);
+      }
+    }
     final start = widget.rangeStart ?? _pendingRangeStart;
     final end = widget.rangeEnd;
     if (start == null || end == null) return false;
@@ -210,6 +278,28 @@ class _OiDatePickerState extends State<OiDatePicker> {
     final s = DateTime(start.year, start.month, start.day);
     final e = DateTime(end.year, end.month, end.day);
     return !d.isBefore(s) && !d.isAfter(e);
+  }
+
+  bool _isInHighlightedWeek(DateTime day) {
+    if (widget.highlightedWeeks == null || widget.highlightedWeeks!.isEmpty) {
+      return false;
+    }
+    final cw = OiCalendarWeek.fromDateTime(day);
+    return widget.highlightedWeeks!.contains(cw);
+  }
+
+  /// Compute the Monday (first day) of an ISO calendar week.
+  ///
+  /// Uses [DateTime] constructor arithmetic (not [Duration]) to avoid
+  /// daylight-saving-time edge cases.
+  static DateTime _weekStartFromCalendarWeek(OiCalendarWeek cw) {
+    // Jan 4 is always in ISO week 1.
+    final jan4 = DateTime(cw.year, 1, 4);
+    // Monday of ISO week 1: step back (weekday - 1) days from Jan 4.
+    // weekday: Mon=1..Sun=7, so Mon→0, Tue→1, ..., Sun→6.
+    final week1MondayDay = 4 - (jan4.weekday - 1);
+    // Monday of the target week.
+    return DateTime(cw.year, 1, week1MondayDay + (cw.week - 1) * 7);
   }
 
   bool _isRangeEndpoint(DateTime day) {
@@ -266,7 +356,7 @@ class _OiDatePickerState extends State<OiDatePicker> {
     final firstOfMonth = _effectiveDisplayMonth;
     // Compute grid start offset respecting firstDayOfWeek.
     // DateTime.weekday: 1=Mon ... 7=Sun.
-    final fdow = widget.firstDayOfWeek ?? 7; // Default Sunday (7)
+    final fdow = widget.firstDayOfWeek ?? 1; // Default Monday (1)
     var startOffset = firstOfMonth.weekday - fdow;
     if (startOffset < 0) startOffset += 7;
     final daysInMonth = DateTime(
@@ -290,6 +380,7 @@ class _OiDatePickerState extends State<OiDatePicker> {
       final selected = _isSelected(day);
       final inRange = _isInRange(day);
       final endpoint = _isRangeEndpoint(day);
+      final inHighlightedWeek = _isInHighlightedWeek(day);
       final isToday = _sameDay(day, today);
       final disabled = _isDisabled(day);
 
@@ -302,6 +393,8 @@ class _OiDatePickerState extends State<OiDatePicker> {
       } else if (inRange) {
         cellBgColor = colors.primary.base.withValues(alpha: 0.15);
         textColor = colors.primary.base;
+      } else if (inHighlightedWeek) {
+        cellBgColor = colors.error.base.withValues(alpha: 0.15);
       }
 
       final cell = Container(
@@ -343,6 +436,7 @@ class _OiDatePickerState extends State<OiDatePicker> {
       cells.add(
         OiTappable(
           enabled: !disabled,
+          clipBorderRadius: BorderRadius.circular(5),
           onTap: () => _onDayTap(day),
           child: cell,
         ),
@@ -373,11 +467,21 @@ class _OiDatePickerState extends State<OiDatePicker> {
                   ),
                 ),
                 Expanded(
-                  child: Center(
-                    child: _MonthYearLabel(
-                      label: '${kOiMonthLabels[_effectiveDisplayMonth.month - 1]} ${_effectiveDisplayMonth.year}',
-                      onTap: _openMonthPicker,
-                    ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (widget.headerBuilder != null) ...[
+                        widget.headerBuilder!(context, _effectiveDisplayMonth),
+                        OiLabel.tiny(
+                          '${kOiMonthLabels[_effectiveDisplayMonth.month - 1]} ${_effectiveDisplayMonth.year}',
+                          color: colors.textMuted,
+                        ),
+                      ] else
+                        _MonthYearLabel(
+                          label: '${kOiMonthLabels[_effectiveDisplayMonth.month - 1]} ${_effectiveDisplayMonth.year}',
+                          onTap: _openMonthPicker,
+                        ),
+                    ],
                   ),
                 ),
                 OiTappable(

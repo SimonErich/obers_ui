@@ -28,6 +28,7 @@ class OiPanel extends StatefulWidget {
     this.size,
     this.dismissible = true,
     this.showScrim = false,
+    this.duration = const Duration(milliseconds: 240),
     super.key,
   });
 
@@ -57,6 +58,9 @@ class OiPanel extends StatefulWidget {
   /// Defaults to `false`.
   final bool showScrim;
 
+  /// Duration of the slide animation. Defaults to 240ms.
+  final Duration duration;
+
   @override
   State<OiPanel> createState() => _OiPanelState();
 }
@@ -72,7 +76,7 @@ class _OiPanelState extends State<OiPanel> with SingleTickerProviderStateMixin {
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 240),
+      duration: widget.duration,
       value: widget.open ? 1.0 : 0.0,
     );
   }
@@ -84,7 +88,7 @@ class _OiPanelState extends State<OiPanel> with SingleTickerProviderStateMixin {
         context.animations.reducedMotion ||
             MediaQuery.disableAnimationsOf(context)
         ? Duration.zero
-        : const Duration(milliseconds: 240);
+        : widget.duration;
   }
 
   @override

@@ -15,6 +15,8 @@ class _SchedulingWorkflowScreenState extends State<SchedulingWorkflowScreen> {
   DateTime? _selectedDate;
   DateTime? _rangeStart;
   DateTime? _rangeEnd;
+  DateTime? _weekSelectedDate;
+  OiCalendarWeek? _selectedWeek;
 
   @override
   Widget build(BuildContext context) {
@@ -96,6 +98,99 @@ class _SchedulingWorkflowScreenState extends State<SchedulingWorkflowScreen> {
                       _rangeStart = start;
                       _rangeEnd = end;
                     }),
+                  ),
+                ),
+              ),
+            ],
+          ),
+
+          // ── OiDatePicker – Week Highlight Mode ───────────────────────
+          ComponentShowcaseSection(
+            title: 'Date Picker – Week Highlight',
+            widgetName: 'OiDatePicker',
+            description:
+                'Week highlight mode: tapping a day highlights the entire '
+                'week. Combined with a custom headerBuilder that opens an '
+                'OiCalendarWeekPicker instead of the default month picker.',
+            examples: [
+              ComponentExample(
+                title: 'Week Selection with Calendar Week Picker Header',
+                child: SizedBox(
+                  width: 400,
+                  child: OiDatePicker(
+                    weekHighlightMode: true,
+                    value: _weekSelectedDate,
+                    selectedWeek: _selectedWeek,
+                    highlightedWeeks: {
+                      const OiCalendarWeek(week: 15, year: 2026),
+                      const OiCalendarWeek(week: 16, year: 2026),
+                      const OiCalendarWeek(week: 17, year: 2026),
+                      const OiCalendarWeek(week: 20, year: 2026),
+                      const OiCalendarWeek(week: 38, year: 2026),
+                    },
+                    onChanged: (date) =>
+                        setState(() => _weekSelectedDate = date),
+                    onWeekSelected: (weekStart) => setState(() {
+                      _selectedWeek = OiCalendarWeek.fromDateTime(weekStart);
+                    }),
+                    headerBuilder: (context, displayMonth) =>
+                        _WeekPickerHeaderLabel(
+                      displayMonth: displayMonth,
+                      selectedWeek: _selectedWeek,
+                      onWeekSelected: (week) =>
+                          setState(() => _selectedWeek = week),
+                      weekFormatter: (week, year) => 'KW $week / SW ${week + 17} ($year)',
+                      highlightedWeeks: {
+                        const OiCalendarWeek(week: 15, year: 2026),
+                        const OiCalendarWeek(week: 16, year: 2026),
+                        const OiCalendarWeek(week: 17, year: 2026),
+                        const OiCalendarWeek(week: 20, year: 2026),
+                        const OiCalendarWeek(week: 38, year: 2026),
+                      },
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+
+          // ── OiCalendarWeekPicker ────────────────────────────────────────
+          ComponentShowcaseSection(
+            title: 'Calendar Week Picker',
+            widgetName: 'OiCalendarWeekPicker',
+            description:
+                'A calendar-week picker with scrollable wheels for week and '
+                'year. Supports highlighted weeks and a custom week '
+                'formatter to override the default "KW {week} ({year})" '
+                'label.',
+            examples: [
+              ComponentExample(
+                title: 'Default',
+                child: SizedBox(
+                  height: 180,
+                  child: OiCalendarWeekPicker(
+                    value: const OiCalendarWeek(week: 15, year: 2026),
+                    onChanged: (_) {},
+                  ),
+                ),
+              ),
+              ComponentExample(
+                title: 'With Highlighted Weeks & Custom Formatter',
+                child: SizedBox(
+                  height: 180,
+                  child: OiCalendarWeekPicker(
+                    value: const OiCalendarWeek(week: 21, year: 2026),
+                    highlightedWeeks: {
+                      const OiCalendarWeek(week: 15, year: 2026),
+                      const OiCalendarWeek(week: 16, year: 2026),
+                      const OiCalendarWeek(week: 17, year: 2026),
+                      const OiCalendarWeek(week: 20, year: 2026),
+                      const OiCalendarWeek(week: 21, year: 2026),
+                      const OiCalendarWeek(week: 38, year: 2026),
+                    },
+                    weekFormatter: (week, year) =>
+                        'KW $week / SW ${week + 17} ($year)',
+                    onChanged: (_) {},
                   ),
                 ),
               ),
@@ -565,6 +660,86 @@ class _SchedulingWorkflowScreenState extends State<SchedulingWorkflowScreen> {
             ],
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// Header label that shows the selected calendar week and opens
+/// [OiCalendarWeekPicker] on tap — demonstrates [OiDatePicker.headerBuilder].
+class _WeekPickerHeaderLabel extends StatefulWidget {
+  const _WeekPickerHeaderLabel({
+    required this.displayMonth,
+    this.selectedWeek,
+    this.onWeekSelected,
+    this.weekFormatter,
+    this.highlightedWeeks,
+  });
+
+  final DateTime displayMonth;
+  final OiCalendarWeek? selectedWeek;
+  final ValueChanged<OiCalendarWeek>? onWeekSelected;
+  final String Function(int week, int year)? weekFormatter;
+  final Set<OiCalendarWeek>? highlightedWeeks;
+
+  @override
+  State<_WeekPickerHeaderLabel> createState() => _WeekPickerHeaderLabelState();
+}
+
+class _WeekPickerHeaderLabelState extends State<_WeekPickerHeaderLabel> {
+  bool _hovered = false;
+
+  String get _label {
+    final week = widget.selectedWeek ??
+        OiCalendarWeek.fromDateTime(widget.displayMonth);
+    if (widget.weekFormatter != null) {
+      return widget.weekFormatter!(week.week, week.year);
+    }
+    return week.format();
+  }
+
+  Future<void> _openWeekPicker() async {
+    final result = await OiCalendarWeekPicker.show(
+      context,
+      initialValue: widget.selectedWeek ??
+          OiCalendarWeek.fromDateTime(widget.displayMonth),
+      highlightedWeeks: widget.highlightedWeeks,
+      weekFormatter: widget.weekFormatter,
+    );
+    if (result == null || !mounted) return;
+    widget.onWeekSelected?.call(result);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    final color = _hovered ? colors.primary.base : colors.text;
+
+    return GestureDetector(
+      onTap: _openWeekPicker,
+      child: MouseRegion(
+        cursor: SystemMouseCursors.click,
+        onEnter: (_) => setState(() => _hovered = true),
+        onExit: (_) => setState(() => _hovered = false),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              _label,
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: color,
+              ),
+            ),
+            const SizedBox(width: 4),
+            Icon(
+              OiIcons.chevronDown,
+              size: 14,
+              color: color,
+            ),
+          ],
+        ),
       ),
     );
   }

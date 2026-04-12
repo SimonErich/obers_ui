@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/display/oi_badge.dart';
@@ -27,6 +29,10 @@ enum OiRailLabelBehavior {
 /// typically placed along the leading edge of a layout on medium and larger
 /// breakpoints.
 ///
+/// Set [expanded] to `true` to smoothly widen the rail and reveal inline labels
+/// next to icons (useful for hover-to-expand side navigation). The animation
+/// interpolates between [collapsedWidth] and [width].
+///
 /// ```dart
 /// OiNavigationRail(
 ///   items: const [
@@ -49,8 +55,12 @@ class OiNavigationRail extends StatefulWidget {
     this.leading,
     this.trailing,
     this.width = 72,
+    this.collapsedWidth,
+    this.expanded,
+    this.expandDuration = const Duration(milliseconds: 200),
     this.labelBehavior = OiRailLabelBehavior.all,
     this.groupAlignment = -1.0,
+    this.itemAlignment = CrossAxisAlignment.center,
     this.backgroundColor,
     this.indicatorColor,
     this.indicatorShape,
@@ -76,8 +86,22 @@ class OiNavigationRail extends StatefulWidget {
   /// An optional widget displayed below the items (e.g. a settings icon).
   final Widget? trailing;
 
-  /// The width of the rail in logical pixels.
+  /// The width of the rail in logical pixels (expanded state when [expanded]
+  /// is used, or the fixed width otherwise).
   final double width;
+
+  /// The width when collapsed. Only used when [expanded] is non-null.
+  /// Defaults to 48 logical pixels.
+  final double? collapsedWidth;
+
+  /// When non-null, enables expand/collapse animation. `true` = expanded
+  /// (full [width] with inline labels), `false` = collapsed ([collapsedWidth],
+  /// icons only). When null the rail behaves as before with a fixed [width].
+  final bool? expanded;
+
+  /// The duration of the expand/collapse animation.
+  /// Defaults to 200ms.
+  final Duration expandDuration;
 
   /// Controls when item labels are visible.
   final OiRailLabelBehavior labelBehavior;
@@ -86,6 +110,11 @@ class OiNavigationRail extends StatefulWidget {
   ///
   /// Ranges from -1.0 (top) through 0.0 (center) to 1.0 (bottom).
   final double groupAlignment;
+
+  /// The cross-axis (horizontal) alignment of items within the rail.
+  ///
+  /// Defaults to [CrossAxisAlignment.center].
+  final CrossAxisAlignment itemAlignment;
 
   /// The background color of the rail.
   ///
@@ -122,16 +151,36 @@ class OiNavigationRail extends StatefulWidget {
   State<OiNavigationRail> createState() => _OiNavigationRailState();
 }
 
-class _OiNavigationRailState extends State<OiNavigationRail> {
+class _OiNavigationRailState extends State<OiNavigationRail>
+    with SingleTickerProviderStateMixin {
   late FocusNode _focusNode;
   int _focusedIndex = -1;
   final Set<int> _hoveredIndices = {};
+  AnimationController? _expandController;
+
+  bool get _isExpandable => widget.expanded != null;
 
   @override
   void initState() {
     super.initState();
     _focusNode = FocusNode();
     _focusedIndex = widget.currentIndex;
+    if (_isExpandable) {
+      _expandController = AnimationController(
+        vsync: this,
+        duration: widget.expandDuration,
+        value: widget.expanded! ? 1.0 : 0.0,
+      );
+    }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final reducedMotion = context.animations.reducedMotion ||
+        MediaQuery.disableAnimationsOf(context);
+    _expandController?.duration =
+        reducedMotion ? Duration.zero : widget.expandDuration;
   }
 
   @override
@@ -140,11 +189,19 @@ class _OiNavigationRailState extends State<OiNavigationRail> {
     if (widget.currentIndex != oldWidget.currentIndex) {
       _focusedIndex = widget.currentIndex;
     }
+    if (widget.expanded != oldWidget.expanded && _expandController != null) {
+      if (widget.expanded!) {
+        unawaited(_expandController!.forward());
+      } else {
+        unawaited(_expandController!.reverse());
+      }
+    }
   }
 
   @override
   void dispose() {
     _focusNode.dispose();
+    _expandController?.dispose();
     super.dispose();
   }
 
@@ -194,6 +251,8 @@ class _OiNavigationRailState extends State<OiNavigationRail> {
     final effectiveBorderColor = widget.borderColor ?? colors.borderSubtle;
     final effectiveBorderWidth = widget.borderWidth ?? 1.0;
 
+    final effectiveCollapsedWidth = widget.collapsedWidth ?? 48.0;
+
     // Build the items list.
     final itemWidgets = <Widget>[];
     for (var i = 0; i < widget.items.length; i++) {
@@ -211,47 +270,67 @@ class _OiNavigationRailState extends State<OiNavigationRail> {
       alignment = MainAxisAlignment.center;
     }
 
+    final rail = DecoratedBox(
+      decoration: BoxDecoration(
+        color: effectiveBg,
+        border: Border(
+          right: BorderSide(
+            color: effectiveBorderColor,
+            width: effectiveBorderWidth,
+          ),
+        ),
+        boxShadow: widget.elevation,
+      ),
+      child: Column(
+        crossAxisAlignment: _isExpandable
+            ? CrossAxisAlignment.stretch
+            : CrossAxisAlignment.center,
+        children: [
+          if (widget.leading != null)
+            Padding(
+              padding: const EdgeInsets.only(top: 8, bottom: 8),
+              child: widget.leading,
+            ),
+          Expanded(
+            child: Column(
+              mainAxisAlignment: alignment,
+              crossAxisAlignment: widget.itemAlignment,
+              children: itemWidgets,
+            ),
+          ),
+          if (widget.trailing != null)
+            Padding(
+              padding: const EdgeInsets.only(top: 8, bottom: 8),
+              child: widget.trailing,
+            ),
+        ],
+      ),
+    );
+
+    // When expandable, animate the width. Otherwise use fixed width.
+    Widget sized;
+    if (_isExpandable && _expandController != null) {
+      sized = AnimatedBuilder(
+        animation: _expandController!,
+        builder: (context, child) {
+          final w = effectiveCollapsedWidth +
+              (_expandController!.value *
+                  (widget.width - effectiveCollapsedWidth));
+          return SizedBox(width: w, child: child);
+        },
+        child: rail,
+      );
+    } else {
+      sized = SizedBox(width: widget.width, child: rail);
+    }
+
     return Semantics(
       container: true,
       label: widget.semanticLabel ?? 'Navigation',
       child: Focus(
         focusNode: _focusNode,
         onKeyEvent: _handleKeyEvent,
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            color: effectiveBg,
-            border: Border(
-              right: BorderSide(
-                color: effectiveBorderColor,
-                width: effectiveBorderWidth,
-              ),
-            ),
-            boxShadow: widget.elevation,
-          ),
-          child: SizedBox(
-            width: widget.width,
-            child: Column(
-              children: [
-                if (widget.leading != null)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 8, bottom: 8),
-                    child: widget.leading,
-                  ),
-                Expanded(
-                  child: Column(
-                    mainAxisAlignment: alignment,
-                    children: itemWidgets,
-                  ),
-                ),
-                if (widget.trailing != null)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 8, bottom: 8),
-                    child: widget.trailing,
-                  ),
-              ],
-            ),
-          ),
-        ),
+        child: _isExpandable ? ClipRect(child: sized) : sized,
       ),
     );
   }
@@ -271,7 +350,7 @@ class _OiNavigationRailState extends State<OiNavigationRail> {
         ? colors.primary.base
         : colors.textMuted;
 
-    // Determine whether to show the label.
+    // Determine whether to show the label (non-expandable mode).
     final showLabel = switch (widget.labelBehavior) {
       OiRailLabelBehavior.all => true,
       OiRailLabelBehavior.selected => isSelected,
@@ -286,8 +365,9 @@ class _OiNavigationRailState extends State<OiNavigationRail> {
       color: iconColor,
     );
 
+    final iconWidth = _isExpandable ? (widget.collapsedWidth ?? 48.0) : 56.0;
     Widget iconArea = SizedBox(
-      width: 56,
+      width: iconWidth,
       height: 32,
       child: Center(child: iconWidget),
     );
@@ -312,27 +392,57 @@ class _OiNavigationRailState extends State<OiNavigationRail> {
       );
     }
 
-    // ── Compose item column ─────────────────────────────────────────────
+    // ── Compose item layout ─────────────────────────────────────────────
 
-    final itemContent = Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        iconArea,
-        if (showLabel) ...[
-          const SizedBox(height: 4),
-          OiLabel.tiny(
-            item.label,
-            color: labelColor,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
+    final Widget itemContent;
+
+    if (_isExpandable && _expandController != null) {
+      // Expandable mode: horizontal row with icon + animated label.
+      itemContent = Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          iconArea,
+          Flexible(
+            child: FadeTransition(
+              opacity: CurvedAnimation(
+                parent: _expandController!,
+                curve: const Interval(0.3, 1, curve: Curves.easeIn),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.only(left: 4, right: 8),
+                child: OiLabel.small(
+                  item.label,
+                  color: labelColor,
+                  maxLines: 1,
+                  overflow: TextOverflow.clip,
+                ),
+              ),
+            ),
           ),
         ],
-      ],
-    );
+      );
+    } else {
+      // Classic mode: vertical column with icon + optional label below.
+      itemContent = Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          iconArea,
+          if (showLabel) ...[
+            const SizedBox(height: 4),
+            OiLabel.tiny(
+              item.label,
+              color: labelColor,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
+        ],
+      );
+    }
 
     // ── Focus ring ──────────────────────────────────────────────────────
 
-    Widget tappableContent = itemContent;
+    var tappableContent = itemContent;
     if (isFocused) {
       tappableContent = DecoratedBox(
         position: DecorationPosition.foreground,
