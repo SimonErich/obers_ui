@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_color_scheme.dart';
+import 'package:obers_ui/src/foundation/theme/oi_color_swatch.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 
 /// The semantic color of an [OiBadge].
@@ -184,29 +185,30 @@ class OiBadge extends StatelessWidget {
     }
   }
 
-  Color _baseColor(OiColorScheme colors) {
+  OiColorSwatch _swatch(OiColorScheme colors) {
     switch (color) {
       case OiBadgeColor.primary:
-        return colors.primary.base;
+        return colors.primary;
       case OiBadgeColor.accent:
-        return colors.accent.base;
+        return colors.accent;
       case OiBadgeColor.success:
-        return colors.success.base;
+        return colors.success;
       case OiBadgeColor.warning:
-        return colors.warning.base;
+        return colors.warning;
       case OiBadgeColor.error:
-        return colors.error.base;
+        return colors.error;
       case OiBadgeColor.info:
-        return colors.info.base;
+        return colors.info;
       case OiBadgeColor.neutral:
-        return colors.textMuted;
+        return OiColorSwatch.from(colors.textMuted);
     }
   }
 
   ({Color background, Color textColor, Color? borderColor}) _resolveColors(
     OiColorScheme colors,
   ) {
-    final base = _baseColor(colors);
+    final swatch = _swatch(colors);
+    final base = swatch.base;
     switch (style) {
       case OiBadgeStyle.filled:
         return (
@@ -217,7 +219,7 @@ class OiBadge extends StatelessWidget {
       case OiBadgeStyle.soft:
         return (
           background: base.withValues(alpha: 0.2),
-          textColor: base,
+          textColor: swatch.dark,
           borderColor: null,
         );
       case OiBadgeStyle.outline:

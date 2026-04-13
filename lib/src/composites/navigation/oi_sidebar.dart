@@ -386,7 +386,6 @@ class _OiSidebarState extends State<OiSidebar>
     }
 
     final compact = widget.mode == OiSidebarMode.compact;
-    final effectiveWidth = compact ? widget.compactWidth : widget.width;
 
     return Semantics(
       label: widget.label,
@@ -394,23 +393,20 @@ class _OiSidebarState extends State<OiSidebar>
       child: Focus(
         focusNode: _focusNode,
         onKeyEvent: _handleKeyEvent,
-        child: SizedBox(
-          width: effectiveWidth,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              if (widget.header != null) widget.header!,
-              Expanded(
-                child: SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: _buildSections(context, compact),
-                  ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            if (widget.header != null) widget.header!,
+            Expanded(
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: _buildSections(context, compact),
                 ),
               ),
-              if (widget.footer != null) widget.footer!,
-            ],
-          ),
+            ),
+            if (widget.footer != null) widget.footer!,
+          ],
         ),
       ),
     );
@@ -424,7 +420,7 @@ class _OiSidebarState extends State<OiSidebar>
       final collapsed = _collapsedSections.contains(sectionKey);
 
       // Section header.
-      if (section.title != null && !compact) {
+      if (section.title != null) {
         widgets.add(
           _buildSectionHeader(context, section, sectionKey, collapsed),
         );
@@ -485,6 +481,8 @@ class _OiSidebarState extends State<OiSidebar>
           letterSpacing: 1.5,
           color: colors.textMuted,
         ),
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
       ),
     );
 
@@ -535,20 +533,25 @@ class _OiSidebarState extends State<OiSidebar>
         ? colors.textMuted
         : colors.textSubtle;
 
-    if (compact) {
-      return _buildCompactItem(context, item, bg, iconColor, selected);
-    }
-
-    // Full mode.
+    // Unified layout so icons hold position during the animated width
+    // transition. The icon sits in a fixed-width leading area that matches
+    // the collapsed sidebar width. Labels and trailing widgets are clipped
+    // by the parent AnimatedContainer as it shrinks.
     final indent = depth * 24.0;
 
     final Widget content = Container(
       color: bg,
-      padding: EdgeInsets.only(left: 12 + indent, right: 12, top: 8, bottom: 8),
+      constraints: const BoxConstraints(minHeight: 40),
+      padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
         children: [
-          Icon(item.icon, size: 20, color: iconColor),
-          const SizedBox(width: 10),
+          SizedBox(
+            width: widget.compactWidth,
+            child: Center(
+              child: Icon(item.icon, size: 20, color: iconColor),
+            ),
+          ),
+          if (indent > 0) SizedBox(width: indent),
           Expanded(
             child: Text(
               item.label,
@@ -580,62 +583,32 @@ class _OiSidebarState extends State<OiSidebar>
                 ),
               ),
             ),
+          const SizedBox(width: 12),
         ],
       ),
     );
 
-    return OiTappable(
+    Widget result = OiTappable(
       enabled: !item.disabled,
       semanticLabel: item.label,
       onTap: () {
-        if (hasKids) {
+        if (hasKids && !compact) {
           _toggleParent(item.id);
         }
         widget.onSelect(item.id);
       },
       child: content,
     );
-  }
 
-  Widget _buildCompactItem(
-    BuildContext context,
-    OiSidebarItem item,
-    Color bg,
-    Color iconColor,
-    bool selected,
-  ) {
-    final Widget icon = Container(
-      color: bg,
-      width: widget.compactWidth,
-      height: 48,
-      alignment: Alignment.center,
-      child: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          Icon(item.icon, size: 24, color: iconColor),
-          if (item.badgeCount != null && item.badgeCount! > 0)
-            Positioned(
-              top: -4,
-              right: -8,
-              child: OiBadge.filled(
-                label: item.badgeCount.toString(),
-                size: OiBadgeSize.small,
-              ),
-            ),
-        ],
-      ),
-    );
+    if (compact) {
+      result = OiTooltip(
+        label: item.label,
+        message: item.label,
+        child: result,
+      );
+    }
 
-    return OiTooltip(
-      label: item.label,
-      message: item.label,
-      child: OiTappable(
-        enabled: !item.disabled,
-        semanticLabel: item.label,
-        onTap: () => widget.onSelect(item.id),
-        child: icon,
-      ),
-    );
+    return result;
   }
 }
 

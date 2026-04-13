@@ -460,6 +460,7 @@ class _OiCommandBarState extends State<OiCommandBar> {
                   ),
                   // Command list
                   Flexible(
+                    fit: FlexFit.tight,
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [

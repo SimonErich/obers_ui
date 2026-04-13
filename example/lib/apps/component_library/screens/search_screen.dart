@@ -13,6 +13,11 @@ class SearchScreen extends StatefulWidget {
 class _SearchScreenState extends State<SearchScreen> {
   bool _showCommandBar = false;
   String? _selectedFruit;
+  List<String> _selectedFruits = [];
+  String? _selectedGroupedItem;
+  String? _selectedAsyncFruit;
+  String? _selectedCreatable;
+  String? _selectedWithSections;
 
   @override
   Widget build(BuildContext context) {
@@ -107,40 +112,7 @@ class _SearchScreenState extends State<SearchScreen> {
               ),
 
               // ── OiComboBox ─────────────────────────────────────────────
-              ComponentShowcaseSection(
-                title: 'Combo Box',
-                widgetName: 'OiComboBox',
-                description:
-                    'A searchable select box with type-ahead filtering. '
-                    'Supports async search, multi-select, grouping, '
-                    'create-new, and virtualization.',
-                examples: [
-                  ComponentExample(
-                    title: 'Searchable dropdown',
-                    child: SizedBox(
-                      width: 300,
-                      child: OiComboBox<String>(
-                        label: 'Select fruit',
-                        items: const [
-                          'Apple',
-                          'Banana',
-                          'Cherry',
-                          'Date',
-                          'Elderberry',
-                          'Fig',
-                          'Grape',
-                        ],
-                        labelOf: (item) => item,
-                        value: _selectedFruit,
-                        onSelect: (fruit) {
-                          setState(() => _selectedFruit = fruit);
-                        },
-                        placeholder: 'Type to search...',
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+              _buildComboBoxSection(context),
 
               // ── OiCommandBar ───────────────────────────────────────────
               ComponentShowcaseSection(
@@ -220,6 +192,300 @@ class _SearchScreenState extends State<SearchScreen> {
             },
           ),
       ],
+    );
+  }
+
+  Widget _buildComboBoxCard({
+    required BuildContext context,
+    required String title,
+    required Widget child,
+  }) {
+    final colors = context.colors;
+    final spacing = context.spacing;
+    final radius = context.radius;
+
+    return Container(
+      padding: EdgeInsets.all(spacing.lg),
+      decoration: BoxDecoration(
+        color: colors.surface,
+        borderRadius: radius.md,
+        border: Border.all(color: colors.borderSubtle),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          OiLabel.caption(title, color: colors.textMuted),
+          SizedBox(height: spacing.md),
+          child,
+        ],
+      ),
+    );
+  }
+
+  Widget _buildComboBoxSection(BuildContext context) {
+    final colors = context.colors;
+    final spacing = context.spacing;
+    final bp = context.breakpoint;
+
+    return Padding(
+      padding: EdgeInsets.only(bottom: spacing.xl),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // ── Header ───────────────────────────────────────────────────
+          const OiLabel.h3('Combo Box'),
+          SizedBox(height: spacing.xs),
+          OiLabel.code('OiComboBox', color: colors.primary.base),
+          SizedBox(height: spacing.xs),
+          OiLabel.body(
+            'A searchable select box with type-ahead filtering. '
+            'Supports async search, multi-select, grouping, '
+            'create-new, and virtualization.',
+            color: colors.textSubtle,
+          ),
+          SizedBox(height: spacing.lg),
+
+          // ── Examples grid ────────────────────────────────────────────
+          OiGrid(
+            breakpoint: bp,
+            columns: OiResponsive.breakpoints({
+              OiBreakpoint.compact: 1,
+              OiBreakpoint.medium: 2,
+              OiBreakpoint.expanded: 3,
+            }),
+            gap: OiResponsive(spacing.sm),
+            rowGap: OiResponsive(spacing.sm),
+            children: [
+              _buildComboBoxCard(
+                context: context,
+                title: 'Searchable dropdown',
+                child: OiComboBox<String>(
+                  label: 'Select fruit',
+                  items: const [
+                    'Apple',
+                    'Banana',
+                    'Cherry',
+                    'Date',
+                    'Elderberry',
+                    'Fig',
+                    'Grape',
+                  ],
+                  labelOf: (item) => item,
+                  value: _selectedFruit,
+                  onSelect: (fruit) {
+                    setState(() => _selectedFruit = fruit);
+                  },
+                  placeholder: 'Type to search...',
+                ),
+              ),
+              _buildComboBoxCard(
+                context: context,
+                title: 'Multi-select',
+                child: OiComboBox<String>(
+                  label: 'Select fruits',
+                  items: const [
+                    'Apple',
+                    'Banana',
+                    'Cherry',
+                    'Date',
+                    'Elderberry',
+                    'Fig',
+                    'Grape',
+                  ],
+                  labelOf: (item) => item,
+                  multiSelect: true,
+                  selectedValues: _selectedFruits,
+                  onMultiSelect: (fruits) {
+                    setState(() => _selectedFruits = fruits);
+                  },
+                  placeholder: 'Type to search...',
+                ),
+              ),
+              _buildComboBoxCard(
+                context: context,
+                title: 'Grouped items',
+                child: OiComboBox<String>(
+                  label: 'Select item',
+                  items: const [
+                    'Apple',
+                    'Banana',
+                    'Cherry',
+                    'Carrot',
+                    'Broccoli',
+                    'Spinach',
+                    'Salmon',
+                    'Chicken',
+                    'Tofu',
+                  ],
+                  labelOf: (item) => item,
+                  value: _selectedGroupedItem,
+                  onSelect: (item) {
+                    setState(() => _selectedGroupedItem = item);
+                  },
+                  groupBy: (item) {
+                    const fruits = ['Apple', 'Banana', 'Cherry'];
+                    const vegetables = ['Carrot', 'Broccoli', 'Spinach'];
+                    if (fruits.contains(item)) return 'Fruits';
+                    if (vegetables.contains(item)) return 'Vegetables';
+                    return 'Protein';
+                  },
+                  groupOrder: const ['Fruits', 'Vegetables', 'Protein'],
+                  placeholder: 'Select a food...',
+                ),
+              ),
+              _buildComboBoxCard(
+                context: context,
+                title: 'Async search',
+                child: OiComboBox<String>(
+                  label: 'Search fruit',
+                  labelOf: (item) => item,
+                  value: _selectedAsyncFruit,
+                  onSelect: (fruit) {
+                    setState(() => _selectedAsyncFruit = fruit);
+                  },
+                  search: (query) async {
+                    // Simulate network delay.
+                    await Future<void>.delayed(
+                      const Duration(milliseconds: 500),
+                    );
+                    const allFruits = [
+                      'Apple',
+                      'Apricot',
+                      'Avocado',
+                      'Banana',
+                      'Blackberry',
+                      'Blueberry',
+                      'Cherry',
+                      'Coconut',
+                      'Cranberry',
+                      'Dragon fruit',
+                      'Elderberry',
+                      'Fig',
+                      'Grape',
+                      'Guava',
+                      'Kiwi',
+                      'Lemon',
+                      'Lime',
+                      'Lychee',
+                      'Mango',
+                      'Melon',
+                    ];
+                    return allFruits
+                        .where(
+                          (f) => f.toLowerCase().contains(
+                            query.toLowerCase(),
+                          ),
+                        )
+                        .toList();
+                  },
+                  placeholder: 'Type to search remotely...',
+                ),
+              ),
+              _buildComboBoxCard(
+                context: context,
+                title: 'Creatable',
+                child: OiComboBox<String>(
+                  label: 'Select or create tag',
+                  items: const [
+                    'Bug',
+                    'Feature',
+                    'Enhancement',
+                    'Documentation',
+                  ],
+                  labelOf: (item) => item,
+                  value: _selectedCreatable,
+                  onSelect: (tag) {
+                    setState(() => _selectedCreatable = tag);
+                  },
+                  onCreate: (value) {
+                    setState(() => _selectedCreatable = value);
+                  },
+                  placeholder: 'Select or type new...',
+                ),
+              ),
+              _buildComboBoxCard(
+                context: context,
+                title: 'Recent & favorites',
+                child: OiComboBox<String>(
+                  label: 'Select city',
+                  items: const [
+                    'Amsterdam',
+                    'Berlin',
+                    'Copenhagen',
+                    'Dublin',
+                    'Edinburgh',
+                    'Florence',
+                    'Geneva',
+                    'Helsinki',
+                  ],
+                  labelOf: (item) => item,
+                  value: _selectedWithSections,
+                  onSelect: (city) {
+                    setState(() => _selectedWithSections = city);
+                  },
+                  recentItems: const ['Berlin', 'Dublin'],
+                  favoriteItems: const ['Amsterdam', 'Copenhagen'],
+                  placeholder: 'Select a city...',
+                ),
+              ),
+              _buildComboBoxCard(
+                context: context,
+                title: 'Custom option rendering',
+                child: OiComboBox<String>(
+                  label: 'Select status',
+                  items: const ['Online', 'Away', 'Busy', 'Offline'],
+                  labelOf: (item) => item,
+                  onSelect: (_) {},
+                  placeholder: 'Set your status...',
+                  optionBuilder: (
+                    item, {
+                    required bool highlighted,
+                    required bool selected,
+                  }) {
+                    final color = switch (item) {
+                      'Online' => const Color(0xFF22C55E),
+                      'Away' => const Color(0xFFEAB308),
+                      'Busy' => const Color(0xFFEF4444),
+                      _ => const Color(0xFF6B7280),
+                    };
+                    return Row(
+                      children: [
+                        Container(
+                          width: 8,
+                          height: 8,
+                          decoration: BoxDecoration(
+                            color: color,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(item),
+                      ],
+                    );
+                  },
+                ),
+              ),
+              _buildComboBoxCard(
+                context: context,
+                title: 'Disabled',
+                child: OiComboBox<String>(
+                  label: 'Select fruit',
+                  items: const ['Apple', 'Banana', 'Cherry'],
+                  labelOf: (item) => item,
+                  value: 'Banana',
+                  onSelect: (_) {},
+                  enabled: false,
+                  placeholder: 'Disabled...',
+                ),
+              ),
+            ],
+          ),
+
+          // ── Separator ────────────────────────────────────────────────
+          SizedBox(height: spacing.md),
+          const OiDivider(),
+        ],
+      ),
     );
   }
 }

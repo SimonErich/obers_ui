@@ -186,7 +186,7 @@ class OiCodeBlock extends StatelessWidget {
         borderRadius: BorderRadius.circular(8),
         border: Border.all(color: colors.border),
       ),
-      padding: const EdgeInsets.all(16),
+      padding: showCopyButton ? const EdgeInsets.fromLTRB(16, 22, 16, 16) : const EdgeInsets.all(16),
       child: codeContent,
     );
 
@@ -196,15 +196,11 @@ class OiCodeBlock extends StatelessWidget {
       children: [
         block,
         Positioned(
-          top: 8,
-          right: 8,
+          top: 2,
+          right: 2,
           child: OiCopyButton(
             value: code,
             semanticLabel: 'Copy code',
-            icon: Text(
-              '⎘',
-              style: TextStyle(fontSize: 14, color: colors.textMuted),
-            ),
           ),
         ),
       ],

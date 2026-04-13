@@ -294,7 +294,7 @@ class _EditorsMediaScreenState extends State<EditorsMediaScreen> {
                 child: ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: 600),
                   child: const OiVideoPlayer(
-                    src: 'https://example.com/sample-video.mp4',
+                    src: 'https://www.w3schools.com/html/mov_bbb.mp4',
                     label: 'Sample video',
                     posterUrl: 'https://picsum.photos/seed/video/800/450',
                   ),

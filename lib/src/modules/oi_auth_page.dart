@@ -247,8 +247,9 @@ class _OiAuthPageState extends State<OiAuthPage> {
           ),
         if (widget.onRegister != null)
           _buildLink(
-            "Don't have an account? Sign Up",
+            'Sign Up',
             () => _switchMode(OiAuthMode.register),
+            prefix: "Don't have an account? ",
           ),
       ],
     );
@@ -303,8 +304,9 @@ class _OiAuthPageState extends State<OiAuthPage> {
         SizedBox(height: sp.sm),
         if (widget.onLogin != null)
           _buildLink(
-            'Already have an account? Sign In',
+            'Sign In',
             () => _switchMode(OiAuthMode.login),
+            prefix: 'Already have an account? ',
           ),
       ],
     );
@@ -349,6 +351,7 @@ class _OiAuthPageState extends State<OiAuthPage> {
         SizedBox(height: sp.sm),
         if (widget.onLogin != null)
           _buildLink('Back to Sign In', () => _switchMode(OiAuthMode.login)),
+
       ],
     );
   }
@@ -370,18 +373,24 @@ class _OiAuthPageState extends State<OiAuthPage> {
     );
   }
 
-  Widget _buildLink(String text, VoidCallback onTap) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Semantics(
-        button: true,
-        label: text,
-        child: Builder(
-          builder: (context) {
-            return OiLabel.small(text, color: context.colors.primary.base);
-          },
+  Widget _buildLink(
+    String buttonLabel,
+    VoidCallback onTap, {
+    String? prefix,
+  }) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        if (prefix != null) OiLabel.body(prefix),
+        GestureDetector(
+          onTap: onTap,
+          child: Semantics(
+            button: true,
+            label: buttonLabel,
+            child: OiLabel.link(buttonLabel),
+          ),
         ),
-      ),
+      ],
     );
   }
 
