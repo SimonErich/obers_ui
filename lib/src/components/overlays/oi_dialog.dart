@@ -2,7 +2,6 @@ import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/overlays/oi_dialog_shell.dart';
 import 'package:obers_ui/src/foundation/oi_overlays.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
-import 'package:obers_ui/src/primitives/interaction/oi_focus_trap.dart';
 
 /// Shows a modal dialog and returns a future that completes when dismissed.
 ///
@@ -23,6 +22,8 @@ Future<T?> showOiDialog<T>(
     context: context,
     semanticLabel: semanticLabel,
     barrierDismissible: dismissible,
+    maxWidth: 480,
+    minWidth: 280,
     builder: (close) => builder(context, close),
   );
 }
@@ -232,21 +233,51 @@ class OiDialog extends StatelessWidget {
     BuildContext context, {
     required String label,
     required Widget dialog,
+    bool dismissible = true,
   }) {
-    final service = OiOverlays.maybeOf(context);
-    if (service != null) {
-      return service.show(
-        label: label,
-        builder: (_) => dialog,
-        zOrder: OiOverlayZOrder.dialog,
-        dismissible: false,
+    late OiOverlayHandle handle;
+
+    // Wrap the dialog content in a scrim + shell so that OiDialog variants
+    // (which only render content) are properly presented.
+    Widget wrappedDialog(BuildContext ctx) {
+      final colors = OiTheme.of(ctx).colors;
+      return Stack(
+        children: [
+          Positioned.fill(
+            child: GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: dismissible ? () => handle.dismiss() : null,
+              child: ColoredBox(color: colors.overlay),
+            ),
+          ),
+          Center(
+            child: OiDialogShell(
+              maxWidth: 480,
+              minWidth: 280,
+              child: dialog,
+            ),
+          ),
+        ],
       );
     }
 
+    final service = OiOverlays.maybeOf(context);
+    if (service != null) {
+      handle = service.show(
+        label: label,
+        builder: wrappedDialog,
+        zOrder: OiOverlayZOrder.dialog,
+        dismissible: dismissible,
+        onDismiss: () => handle.dismiss(),
+      );
+      return handle;
+    }
+
     // Fallback: insert directly into the nearest Flutter Overlay.
-    final entry = OverlayEntry(builder: (_) => dialog);
+    final entry = OverlayEntry(builder: wrappedDialog);
     Overlay.of(context).insert(entry);
-    return createOiOverlayHandle(entry);
+    handle = createOiOverlayHandle(entry);
+    return handle;
   }
 
   /// Shows an opinionated [OiDialog] as a modal overlay and returns a future
@@ -267,6 +298,8 @@ class OiDialog extends StatelessWidget {
       context: context,
       semanticLabel: label,
       barrierDismissible: dismissible,
+      maxWidth: 480,
+      minWidth: 280,
       builder: (close) => OiDialog.standard(
         label: label,
         title: title,
@@ -285,10 +318,6 @@ class OiDialog extends StatelessWidget {
     final dt = context.components.dialog;
     final isFullScreen = variant == OiDialogVariant.fullScreen;
     final isForm = variant == OiDialogVariant.form;
-    // When unsavedChanges is true on fullScreen, suppress scrim/Escape.
-    final effectiveDismissible =
-        !(isFullScreen && unsavedChanges) && dismissible;
-
     final hPad = dt?.contentPadding?.left ?? 24.0;
     final topPad = dt?.contentPadding?.top ?? 20.0;
     final bottomPad = dt?.contentPadding?.bottom ?? 20.0;
@@ -301,7 +330,12 @@ class OiDialog extends StatelessWidget {
     final bodyContent = content;
     final actionList = actions;
 
-    final dialogContent = Column(
+    // OiDialog only renders the dialog *content* (title, body, actions).
+    // The scrim, shell surface, focus-trapping, and animations are provided
+    // by OiDialogShell / _OiDialogShellOverlay when using showOiDialog() or
+    // OiDialogShell.show().  For the imperative OiDialog.show() path, the
+    // caller is responsible for providing the shell wrapper.
+    return Column(
       mainAxisSize: isFullScreen ? MainAxisSize.max : MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -357,49 +391,6 @@ class OiDialog extends StatelessWidget {
             ),
           ),
       ],
-    );
-
-    // Use OiDialogShell for non-fullScreen variants to ensure visual
-    // consistency between opinionated and custom dialogs.
-    Widget panel;
-    if (isFullScreen) {
-      panel = ColoredBox(
-        color: dt?.backgroundColor ?? colors.surface,
-        child: dialogContent,
-      );
-    } else {
-      panel = OiDialogShell(maxWidth: 480, minWidth: 280, child: dialogContent);
-    }
-
-    panel = OiFocusTrap(
-      onEscape: effectiveDismissible ? onClose : null,
-      child: panel,
-    );
-
-    if (isFullScreen) {
-      panel = Positioned.fill(child: panel);
-    } else {
-      panel = Center(child: panel);
-    }
-
-    return Semantics(
-      label: label,
-      scopesRoute: true,
-      explicitChildNodes: true,
-      child: Stack(
-        children: [
-          // ── Scrim ───────────────────────────────────────────────────────────
-          Positioned.fill(
-            child: GestureDetector(
-              behavior: HitTestBehavior.opaque,
-              onTap: effectiveDismissible ? onClose : null,
-              child: ColoredBox(color: colors.overlay),
-            ),
-          ),
-          // ── Panel ───────────────────────────────────────────────────────────
-          panel,
-        ],
-      ),
     );
   }
 }
