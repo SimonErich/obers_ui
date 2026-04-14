@@ -207,9 +207,11 @@ const List<String> _kDefaultReactions = ['👍', '❤️', '😂', '😮', '😢
 class _OiChatState extends State<OiChat> {
   final TextEditingController _controller = TextEditingController();
   final ScrollController _scrollController = ScrollController();
+  final FocusNode _inputFocusNode = FocusNode();
 
   @override
   void dispose() {
+    _inputFocusNode.dispose();
     _controller.dispose();
     _scrollController.dispose();
     super.dispose();
@@ -322,7 +324,7 @@ class _OiChatState extends State<OiChat> {
                   Expanded(
                     child: EditableText(
                       controller: _controller,
-                      focusNode: FocusNode(),
+                      focusNode: _inputFocusNode,
                       style: TextStyle(color: colors.text, fontSize: 14),
                       cursorColor: colors.primary.base,
                       backgroundCursorColor: colors.surfaceHover,
