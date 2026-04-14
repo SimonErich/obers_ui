@@ -1,14 +1,16 @@
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/src/composites/media/_oi_video_player_stub.dart'
+    if (dart.library.js_interop) 'package:obers_ui/src/composites/media/_oi_video_player_web.dart'
+    as platform;
 import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/primitives/display/oi_image.dart';
 
 /// A video player widget with controls and progress bar.
 ///
-/// Note: This is a placeholder implementation. Full video playback
-/// requires adding the `video_player` package dependency. The widget renders
-/// a poster image (if provided) with a play button overlay and wires up
-/// [onPlay] / [onPause] callbacks to a simulated play/pause toggle.
+/// On web, clicking play embeds a native HTML `<video>` element for actual
+/// playback. On other platforms, displays a poster image (if provided) with a
+/// play button overlay and wires up [onPlay] / [onPause] callbacks.
 ///
 /// {@category Composites}
 class OiVideoPlayer extends StatefulWidget {
@@ -33,8 +35,6 @@ class OiVideoPlayer extends StatefulWidget {
   final String label;
 
   /// Whether the video should start playing automatically.
-  ///
-  /// In this placeholder the flag is stored but no actual playback occurs.
   final bool autoPlay;
 
   /// Whether the video should loop when it reaches the end.
@@ -65,20 +65,67 @@ class _OiVideoPlayerState extends State<OiVideoPlayer> {
   bool _isPlaying = false;
   bool _playHovered = false;
 
+  /// The embedded video widget, created once when playback starts on web.
+  Widget? _videoSurface;
+
+  /// The underlying platform video element for controlling playback.
+  dynamic _videoElement;
+
   @override
   void initState() {
     super.initState();
     if (widget.autoPlay) {
       _isPlaying = true;
+      _createVideoSurface();
       WidgetsBinding.instance.addPostFrameCallback((_) {
         widget.onPlay?.call();
       });
     }
   }
 
+  @override
+  void didUpdateWidget(OiVideoPlayer oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.src != widget.src || oldWidget.loop != widget.loop) {
+      _disposeVideoSurface();
+      if (_isPlaying) {
+        _createVideoSurface();
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _disposeVideoSurface();
+    super.dispose();
+  }
+
+  void _createVideoSurface() {
+    if (!platform.isSupported || _videoSurface != null) return;
+    final result = platform.buildVideoSurface(
+      src: widget.src,
+      loop: widget.loop,
+    );
+    _videoSurface = result.widget;
+    _videoElement = result.element;
+  }
+
+  void _disposeVideoSurface() {
+    if (_videoElement != null) {
+      platform.disposeVideoElement(_videoElement);
+      _videoElement = null;
+    }
+    _videoSurface = null;
+  }
+
   void _togglePlayback() {
     setState(() {
       _isPlaying = !_isPlaying;
+      if (_isPlaying) {
+        _createVideoSurface();
+      } else {
+        _disposeVideoSurface();
+      }
     });
     if (_isPlaying) {
       widget.onPlay?.call();
@@ -89,12 +136,47 @@ class _OiVideoPlayerState extends State<OiVideoPlayer> {
 
   @override
   Widget build(BuildContext context) {
-    final colors = context.colors;
-    final textTheme = context.textTheme;
     final ar = widget.aspectRatio ?? 16 / 9;
 
-    Widget content = DecoratedBox(
-      key: const Key('oi_video_player_surface'),
+    Widget content;
+
+    if (_isPlaying && _videoSurface != null) {
+      // Web playback: show the native HTML video element.
+      content = DecoratedBox(
+        key: const Key('oi_video_player_surface'),
+        decoration: BoxDecoration(
+          color: const Color(0xFF000000),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(8),
+          child: _videoSurface,
+        ),
+      );
+    } else {
+      // Poster / placeholder with play button overlay.
+      content = _buildPoster(context);
+    }
+
+    content = AspectRatio(
+      key: const Key('oi_video_player_aspect'),
+      aspectRatio: ar,
+      child: content,
+    );
+
+    return Semantics(
+      container: true,
+      explicitChildNodes: true,
+      label: widget.label,
+      child: content,
+    );
+  }
+
+  Widget _buildPoster(BuildContext context) {
+    final colors = context.colors;
+    final textTheme = context.textTheme;
+    return DecoratedBox(
+      key: const Key('oi_video_player_poster'),
       decoration: BoxDecoration(
         color: const Color(0xFF000000),
         borderRadius: BorderRadius.circular(8),
@@ -215,19 +297,6 @@ class _OiVideoPlayerState extends State<OiVideoPlayer> {
             ),
         ],
       ),
-    );
-
-    content = AspectRatio(
-      key: const Key('oi_video_player_aspect'),
-      aspectRatio: ar,
-      child: content,
-    );
-
-    return Semantics(
-      container: true,
-      explicitChildNodes: true,
-      label: widget.label,
-      child: content,
     );
   }
 }
