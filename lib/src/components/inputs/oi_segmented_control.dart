@@ -86,7 +86,7 @@ enum OiSegmentedControlSize {
 /// ```
 ///
 /// {@category Components}
-class OiSegmentedControl<T> extends StatelessWidget {
+class OiSegmentedControl<T> extends StatefulWidget {
   /// Creates an [OiSegmentedControl].
   const OiSegmentedControl({
     required this.segments,
@@ -135,6 +135,66 @@ class OiSegmentedControl<T> extends StatelessWidget {
   final String? semanticLabel;
 
   @override
+  State<OiSegmentedControl<T>> createState() => _OiSegmentedControlState<T>();
+}
+
+class _OiSegmentedControlState<T> extends State<OiSegmentedControl<T>> {
+  late List<FocusNode> _segmentFocusNodes;
+
+  @override
+  void initState() {
+    super.initState();
+    _segmentFocusNodes = List.generate(
+      widget.segments.length,
+      (_) => FocusNode(skipTraversal: true),
+    );
+  }
+
+  @override
+  void didUpdateWidget(OiSegmentedControl<T> oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.segments.length != widget.segments.length) {
+      for (final node in _segmentFocusNodes) {
+        node.dispose();
+      }
+      _segmentFocusNodes = List.generate(
+        widget.segments.length,
+        (_) => FocusNode(skipTraversal: true),
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    for (final node in _segmentFocusNodes) {
+      node.dispose();
+    }
+    super.dispose();
+  }
+
+  void _selectSegmentAt(int index) {
+    if (index < 0 || index >= widget.segments.length) return;
+    final segment = widget.segments[index];
+    final isEnabled = widget.enabled && segment.enabled;
+    if (!isEnabled) return;
+    _segmentFocusNodes[index].requestFocus();
+    widget.onChanged(segment.value);
+  }
+
+  int? _nextEnabledIndex(int start, int delta) {
+    if (widget.segments.isEmpty) return null;
+    for (var step = 1; step <= widget.segments.length; step++) {
+      final idx =
+          (start + (delta * step) + widget.segments.length) %
+          widget.segments.length;
+      if (widget.enabled && widget.segments[idx].enabled) {
+        return idx;
+      }
+    }
+    return null;
+  }
+
+  @override
   Widget build(BuildContext context) {
     final colors = context.colors;
     final radius = context.radius;
@@ -144,25 +204,25 @@ class OiSegmentedControl<T> extends StatelessWidget {
         animations.reducedMotion || MediaQuery.disableAnimationsOf(context);
     final animDuration = reducedMotion ? Duration.zero : animations.fast;
 
-    final segmentHeight = switch (size) {
+    final segmentHeight = switch (widget.size) {
       OiSegmentedControlSize.small => 28.0,
       OiSegmentedControlSize.medium => 36.0,
       OiSegmentedControlSize.large => 44.0,
     };
 
-    final fontSize = switch (size) {
+    final fontSize = switch (widget.size) {
       OiSegmentedControlSize.small => 12.0,
       OiSegmentedControlSize.medium => 14.0,
       OiSegmentedControlSize.large => 16.0,
     };
 
-    final iconSize = switch (size) {
+    final iconSize = switch (widget.size) {
       OiSegmentedControlSize.small => 14.0,
       OiSegmentedControlSize.medium => 16.0,
       OiSegmentedControlSize.large => 18.0,
     };
 
-    final horizontalPadding = switch (size) {
+    final horizontalPadding = switch (widget.size) {
       OiSegmentedControlSize.small => 8.0,
       OiSegmentedControlSize.medium => 12.0,
       OiSegmentedControlSize.large => 16.0,
@@ -173,12 +233,12 @@ class OiSegmentedControl<T> extends StatelessWidget {
 
     final children = <Widget>[];
 
-    for (var i = 0; i < segments.length; i++) {
-      final segment = segments[i];
-      final isSelected = segment.value == selected;
+    for (var i = 0; i < widget.segments.length; i++) {
+      final segment = widget.segments[i];
+      final isSelected = segment.value == widget.selected;
       final isFirst = i == 0;
-      final isLast = i == segments.length - 1;
-      final isEnabled = enabled && segment.enabled;
+      final isLast = i == widget.segments.length - 1;
+      final isEnabled = widget.enabled && segment.enabled;
 
       // Compute per-segment border radius: left on first, right on last.
       final segmentRadius = BorderRadius.only(
@@ -188,17 +248,15 @@ class OiSegmentedControl<T> extends StatelessWidget {
         bottomRight: isLast ? baseRadius : Radius.zero,
       );
 
-      final bgColor =
-          isSelected ? colors.primary.muted : colors.surface;
-      final textColor =
-          isSelected ? colors.primary.foreground : colors.text;
+      final bgColor = isSelected ? colors.primary.muted : colors.surface;
+      final textColor = isSelected ? colors.primary.foreground : colors.text;
 
       // Build label content.
       Widget labelWidget = Text(
         segment.label,
         style: TextStyle(
           fontSize: fontSize,
-          fontWeight: FontWeight.w400,
+          fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
           color: textColor,
         ),
         maxLines: 1,
@@ -249,23 +307,27 @@ class OiSegmentedControl<T> extends StatelessWidget {
         enabled: isEnabled,
         label: segment.semanticLabel ?? segment.label,
         child: OiTappable(
-          onTap: isEnabled && !isSelected
-              ? () => onChanged(segment.value)
+          onTap: isEnabled
+              ? () {
+                  _segmentFocusNodes[i].requestFocus();
+                  if (!isSelected) {
+                    widget.onChanged(segment.value);
+                  }
+                }
               : null,
           enabled: isEnabled,
           child: _SegmentKeyboardHandler<T>(
             index: i,
-            segmentCount: segments.length,
-            segments: segments,
-            selected: selected,
-            onChanged: onChanged,
             enabled: isEnabled,
+            focusNode: _segmentFocusNodes[i],
+            nextEnabledIndex: _nextEnabledIndex,
+            onSelectIndex: _selectSegmentAt,
             child: segmentWidget,
           ),
         ),
       );
 
-      if (expand) {
+      if (widget.expand) {
         segmentWidget = Expanded(child: segmentWidget);
       }
 
@@ -275,9 +337,9 @@ class OiSegmentedControl<T> extends StatelessWidget {
     // Wrap with group-level semantics.
     return Semantics(
       container: true,
-      label: semanticLabel,
+      label: widget.semanticLabel,
       child: Row(
-        mainAxisSize: expand ? MainAxisSize.max : MainAxisSize.min,
+        mainAxisSize: widget.expand ? MainAxisSize.max : MainAxisSize.min,
         children: children,
       ),
     );
@@ -288,40 +350,43 @@ class OiSegmentedControl<T> extends StatelessWidget {
 class _SegmentKeyboardHandler<T> extends StatelessWidget {
   const _SegmentKeyboardHandler({
     required this.index,
-    required this.segmentCount,
-    required this.segments,
-    required this.selected,
-    required this.onChanged,
     required this.enabled,
+    required this.focusNode,
+    required this.nextEnabledIndex,
+    required this.onSelectIndex,
     required this.child,
   });
 
   final int index;
-  final int segmentCount;
-  final List<OiSegment<T>> segments;
-  final T selected;
-  final ValueChanged<T> onChanged;
   final bool enabled;
+  final FocusNode focusNode;
+  final int? Function(int start, int delta) nextEnabledIndex;
+  final ValueChanged<int> onSelectIndex;
   final Widget child;
 
   @override
   Widget build(BuildContext context) {
-    return KeyboardListener(
-      focusNode: FocusNode(skipTraversal: true),
-      onKeyEvent: (event) {
-        if (!enabled) return;
-        if (event is! KeyDownEvent) return;
+    return Focus(
+      focusNode: focusNode,
+      onKeyEvent: (node, event) {
+        if (!enabled) return KeyEventResult.ignored;
+        if (event is! KeyDownEvent) return KeyEventResult.ignored;
 
-        int? nextIndex;
+        int delta;
         if (event.logicalKey == LogicalKeyboardKey.arrowRight) {
-          nextIndex = (index + 1) % segmentCount;
+          delta = 1;
         } else if (event.logicalKey == LogicalKeyboardKey.arrowLeft) {
-          nextIndex = (index - 1 + segmentCount) % segmentCount;
+          delta = -1;
+        } else {
+          return KeyEventResult.ignored;
         }
 
-        if (nextIndex != null && segments[nextIndex].enabled) {
-          onChanged(segments[nextIndex].value);
+        final nextIndex = nextEnabledIndex(index, delta);
+        if (nextIndex != null && nextIndex != index) {
+          onSelectIndex(nextIndex);
+          return KeyEventResult.handled;
         }
+        return KeyEventResult.ignored;
       },
       child: child,
     );
