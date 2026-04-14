@@ -94,8 +94,8 @@ void main() {
         OiUploadDialog(onUpload: (_, _) {}, onCancel: () => cancelled = true),
         surfaceSize: const Size(600, 800),
       );
-      final kl = tester.widget<KeyboardListener>(find.byType(KeyboardListener));
-      kl.focusNode.requestFocus();
+      final focus = tester.widget<Focus>(find.byType(Focus).first);
+      focus.focusNode!.requestFocus();
       await tester.pump();
       await tester.sendKeyEvent(LogicalKeyboardKey.escape);
       await tester.pump();
