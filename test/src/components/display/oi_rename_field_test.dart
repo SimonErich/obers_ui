@@ -97,6 +97,28 @@ void main() {
     expect(cancelled, isTrue);
   });
 
+  testWidgets('cancel resets text to currentName', (tester) async {
+    await tester.pumpObers(
+      OiRenameField(
+        currentName: 'file.txt',
+        onRename: (_) {},
+        onCancel: () {},
+        showButtons: true,
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.enterText(find.byType(EditableText), 'draft-name.txt');
+    await tester.pumpAndSettle();
+
+    const closeIcon = OiIcons.x;
+    await tester.tap(find.byIcon(closeIcon));
+    await tester.pumpAndSettle();
+
+    final editableText = tester.widget<EditableText>(find.byType(EditableText));
+    expect(editableText.controller.text, 'file.txt');
+  });
+
   testWidgets('confirm button fires onRename', (tester) async {
     String? renamedTo;
     await tester.pumpObers(

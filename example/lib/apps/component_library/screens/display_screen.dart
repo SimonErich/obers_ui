@@ -15,6 +15,9 @@ class _DisplayScreenState extends State<DisplayScreen> {
   int _pageIndex = 2;
   int _pillPageIndex = 1;
   bool _popoverOpen = false;
+  String _renameFileName = 'document.pdf';
+  String _renameFolderName = 'Quarterly Reports';
+  String _renameStatus = 'No action yet';
 
   @override
   Widget build(BuildContext context) {
@@ -643,11 +646,64 @@ class _DisplayScreenState extends State<DisplayScreen> {
                 'Auto-selects the filename without extension.',
             examples: [
               ComponentExample(
-                title: 'File rename',
-                child: OiRenameField(
-                  currentName: 'document.pdf',
-                  onRename: (_) {},
-                  onCancel: () {},
+                title: 'Interactive file rename',
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    OiRenameField(
+                      currentName: _renameFileName,
+                      showButtons: true,
+                      onRename: (name) {
+                        setState(() {
+                          _renameFileName = name;
+                          _renameStatus = 'Renamed file to "$name"';
+                        });
+                      },
+                      onCancel: () {
+                        setState(() {
+                          _renameStatus = 'Rename canceled';
+                        });
+                      },
+                    ),
+                    SizedBox(height: spacing.xs),
+                    OiLabel.caption(
+                      'Current: $_renameFileName',
+                      color: colors.textMuted,
+                    ),
+                    SizedBox(height: spacing.xs),
+                    OiLabel.caption(
+                      'Last action: $_renameStatus',
+                      color: colors.textMuted,
+                    ),
+                  ],
+                ),
+              ),
+              ComponentExample(
+                title: 'Folder rename',
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    OiRenameField(
+                      currentName: _renameFolderName,
+                      folder: true,
+                      onRename: (name) {
+                        setState(() {
+                          _renameFolderName = name;
+                          _renameStatus = 'Renamed folder to "$name"';
+                        });
+                      },
+                      onCancel: () {
+                        setState(() {
+                          _renameStatus = 'Folder rename canceled';
+                        });
+                      },
+                    ),
+                    SizedBox(height: spacing.xs),
+                    OiLabel.caption(
+                      'Current folder: $_renameFolderName',
+                      color: colors.textMuted,
+                    ),
+                  ],
                 ),
               ),
             ],
