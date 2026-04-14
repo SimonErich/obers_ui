@@ -164,6 +164,7 @@ class OiFloating extends StatefulWidget {
 
 class _OiFloatingState extends State<OiFloating> {
   final OverlayPortalController _portalController = OverlayPortalController();
+  ScrollPosition? _scrollPosition;
 
   @override
   void initState() {
@@ -172,6 +173,43 @@ class _OiFloatingState extends State<OiFloating> {
     // returning SizedBox.shrink() when not visible. This avoids calling
     // show()/hide() during build phases which can trigger assertions.
     _portalController.show();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _updateScrollListener();
+  }
+
+  @override
+  void didUpdateWidget(OiFloating oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.visible != oldWidget.visible ||
+        widget.onDismiss != oldWidget.onDismiss) {
+      _updateScrollListener();
+    }
+  }
+
+  void _updateScrollListener() {
+    final shouldListen = widget.visible && widget.onDismiss != null;
+    final newPosition =
+        shouldListen ? Scrollable.maybeOf(context)?.position : null;
+
+    if (newPosition == _scrollPosition) return;
+
+    _scrollPosition?.removeListener(_onAncestorScroll);
+    _scrollPosition = newPosition;
+    _scrollPosition?.addListener(_onAncestorScroll);
+  }
+
+  void _onAncestorScroll() {
+    // Detach first to avoid re-entrant calls when onDismiss triggers
+    // a setState that rebuilds this widget (and calls _updateScrollListener
+    // while we're still inside the scroll callback).
+    final pos = _scrollPosition;
+    _scrollPosition = null;
+    pos?.removeListener(_onAncestorScroll);
+    widget.onDismiss?.call();
   }
 
   bool get _useBottomSheet => widget.bottomSheetOnCompact && context.isCompact;
@@ -213,10 +251,13 @@ class _OiFloatingState extends State<OiFloating> {
     if (widget.onDismiss != null) {
       return Stack(
         children: [
+          // Barrier that dismisses on tap but lets scroll gestures pass
+          // through so the page behind can still scroll (which in turn
+          // triggers dismiss via the ScrollPosition listener).
           Positioned.fill(
-            child: GestureDetector(
+            child: Listener(
               behavior: HitTestBehavior.translucent,
-              onTap: widget.onDismiss,
+              onPointerDown: (_) => widget.onDismiss?.call(),
             ),
           ),
           content,
@@ -225,6 +266,13 @@ class _OiFloatingState extends State<OiFloating> {
     }
 
     return content;
+  }
+
+  @override
+  void dispose() {
+    _scrollPosition?.removeListener(_onAncestorScroll);
+    _scrollPosition = null;
+    super.dispose();
   }
 
   @override

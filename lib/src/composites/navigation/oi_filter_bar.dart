@@ -6,6 +6,7 @@ import 'package:obers_ui/src/components/inputs/oi_select.dart';
 import 'package:obers_ui/src/components/inputs/oi_text_input.dart';
 import 'package:obers_ui/src/components/navigation/oi_date_picker.dart';
 import 'package:obers_ui/src/foundation/oi_icons.dart';
+import 'package:obers_ui/src/foundation/oi_overlays.dart';
 import 'package:obers_ui/src/foundation/persistence/oi_settings_driver.dart';
 import 'package:obers_ui/src/foundation/persistence/oi_settings_mixin.dart';
 import 'package:obers_ui/src/foundation/persistence/oi_settings_provider.dart';
@@ -237,6 +238,12 @@ class _OiFilterBarState extends State<OiFilterBar>
   }
 
   @override
+  void dispose() {
+    _closeFilter();
+    super.dispose();
+  }
+
+  @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     final newDriver = widget.settingsDriver ?? OiSettingsProvider.of(context);
@@ -282,6 +289,13 @@ class _OiFilterBarState extends State<OiFilterBar>
     );
   }
 
+  OiOverlayHandle? _filterHandle;
+
+  void _closeFilter() {
+    _filterHandle?.dismiss();
+    _filterHandle = null;
+  }
+
   void _openFilter(BuildContext chipContext, OiFilterDefinition filter) {
     // For date filters, open the date picker dialog directly.
     if (filter.type == OiFilterType.date) {
@@ -289,13 +303,13 @@ class _OiFilterBarState extends State<OiFilterBar>
       return;
     }
 
-    final overlay = Overlay.of(chipContext);
+    _closeFilter();
+
     final box = chipContext.findRenderObject()! as RenderBox;
     final position = box.localToGlobal(Offset.zero);
-    late OverlayEntry entry;
 
-    entry = OverlayEntry(
-      builder: (ctx) => _FilterPopover(
+    Widget popoverBuilder(BuildContext ctx) {
+      return _FilterPopover(
         definition: filter,
         currentFilter: widget.activeFilters[filter.key],
         anchor: Offset(position.dx, position.dy + box.size.height + 4),
@@ -304,18 +318,28 @@ class _OiFilterBarState extends State<OiFilterBar>
             ..[filter.key] = value;
           widget.onFilterChange(updated);
           updateSettings(_toSettings(), debounce: widget.settingsSaveDebounce);
-          entry
-            ..remove()
-            ..dispose();
+          _closeFilter();
         },
-        onClose: () {
-          entry
-            ..remove()
-            ..dispose();
-        },
-      ),
-    );
-    overlay.insert(entry);
+        onClose: _closeFilter,
+      );
+    }
+
+    final service = OiOverlays.maybeOf(chipContext);
+    if (service != null) {
+      _filterHandle = service.show(
+        label: '${filter.label} filter',
+        builder: popoverBuilder,
+        zOrder: OiOverlayZOrder.dropdown,
+        dismissOnScroll: true,
+        onDismiss: _closeFilter,
+      );
+    } else {
+      // Fallback: insert directly into the nearest Flutter Overlay.
+      final overlay = Overlay.of(chipContext);
+      final entry = OverlayEntry(builder: popoverBuilder);
+      overlay.insert(entry);
+      _filterHandle = createOiOverlayHandle(entry);
+    }
   }
 
   Future<void> _openDatePicker(

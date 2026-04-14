@@ -183,8 +183,8 @@ void main() {
       );
       await tester.pump();
 
-      // Tap the dismiss barrier GestureDetector directly
-      await tester.tap(find.byType(GestureDetector).first);
+      // Tap the dismiss barrier Listener directly
+      await tester.tap(find.byType(Listener).first);
       await tester.pump();
 
       expect(dismissed, isTrue);

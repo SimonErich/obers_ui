@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:math' as math;
 
-import 'package:flutter/gestures.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/overlays/oi_menu_item.dart';
@@ -88,6 +87,29 @@ class OiContextMenu extends StatefulWidget {
 
 class _OiContextMenuState extends State<OiContextMenu> {
   OiOverlayHandle? _handle;
+  ScrollPosition? _scrollPosition;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _updateScrollListener();
+  }
+
+  void _updateScrollListener() {
+    final shouldListen = _handle != null;
+    final newPosition =
+        shouldListen ? Scrollable.maybeOf(context)?.position : null;
+
+    if (newPosition == _scrollPosition) return;
+
+    _scrollPosition?.removeListener(_onAncestorScroll);
+    _scrollPosition = newPosition;
+    _scrollPosition?.addListener(_onAncestorScroll);
+  }
+
+  void _onAncestorScroll() {
+    _close();
+  }
 
   void _show(Offset globalPosition) {
     _close();
@@ -97,6 +119,7 @@ class _OiContextMenuState extends State<OiContextMenu> {
       _handle = overlays.show(
         label: widget.label,
         zOrder: OiOverlayZOrder.dropdown,
+        dismissOnScroll: true,
         onDismiss: _close,
         builder: (_) => _ContextMenuRoot(
           position: globalPosition,
@@ -115,10 +138,9 @@ class _OiContextMenuState extends State<OiContextMenu> {
           child: Stack(
             children: [
               Positioned.fill(
-                child: GestureDetector(
+                child: Listener(
                   behavior: HitTestBehavior.translucent,
-                  onTap: _close,
-                  child: const SizedBox.expand(),
+                  onPointerDown: (_) => _close(),
                 ),
               ),
               _ContextMenuRoot(
@@ -133,9 +155,13 @@ class _OiContextMenuState extends State<OiContextMenu> {
       overlay.insert(entry);
       _handle = createOiOverlayHandle(entry);
     }
+
+    _updateScrollListener();
   }
 
   void _close() {
+    _scrollPosition?.removeListener(_onAncestorScroll);
+    _scrollPosition = null;
     final handle = _handle;
     _handle = null;
     handle?.dismiss();
@@ -151,25 +177,20 @@ class _OiContextMenuState extends State<OiContextMenu> {
   Widget build(BuildContext context) {
     if (!widget.enabled) return widget.child;
 
-    return Listener(
-      onPointerDown: (e) {
-        // Open only on right-click; touch still uses long-press below.
-        if (e.buttons == kSecondaryMouseButton) {
-          _show(e.position);
-        }
-      },
-      child: GestureDetector(
-        // Long-press for touch devices.
-        onLongPressStart: (details) => _show(details.globalPosition),
-        // When openOnTap is true, a normal click/tap opens the menu.
-        // This also wins the gesture arena so parent tap handlers
-        // (e.g. row selection in a table) do not fire.
-        onTapUp: widget.openOnTap
-            ? (details) => _show(details.globalPosition)
-            : null,
-        behavior: HitTestBehavior.opaque,
-        child: widget.child,
-      ),
+    return GestureDetector(
+      // onSecondaryTapDown shows the menu immediately on right-click.
+      // Registering this callback also makes Flutter's gesture recognizer
+      // claim the pointer, which on web calls preventDefault() on the DOM
+      // contextmenu event — suppressing the browser's native context menu.
+      onSecondaryTapDown: (details) => _show(details.globalPosition),
+      // Long-press for touch devices.
+      onLongPressStart: (details) => _show(details.globalPosition),
+      // When openOnTap is true, a normal click/tap opens the menu.
+      onTapUp: widget.openOnTap
+          ? (details) => _show(details.globalPosition)
+          : null,
+      behavior: HitTestBehavior.opaque,
+      child: widget.child,
     );
   }
 }
