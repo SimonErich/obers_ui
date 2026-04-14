@@ -207,7 +207,6 @@ extension _OiChatWindowMessages on _OiChatWindowState {
     if (message.attachments == null || message.attachments!.isEmpty) {
       return null;
     }
-    final colors = context.colors;
     final spacing = context.spacing;
     final radius = context.radius;
 
