@@ -33,7 +33,7 @@ extension _OiButtonStandardVariants on _OiButtonState {
           padding: EdgeInsets.symmetric(horizontal: hPad),
           decoration: decoration,
           child: Center(
-            widthFactor: 1.0,
+            widthFactor: 1,
             child: _buildContent(
               context,
               label: widget.label,
@@ -83,7 +83,7 @@ extension _OiButtonStandardVariants on _OiButtonState {
       height: height,
       padding: EdgeInsets.symmetric(horizontal: hPad),
       child: Center(
-        widthFactor: 1.0,
+        widthFactor: 1,
         child: _buildContent(
           context,
           label: widget.label,
@@ -123,16 +123,17 @@ extension _OiButtonStandardVariants on _OiButtonState {
       child: content,
     );
 
-    if (widget.semanticLabel != null) {
+    final semLabel = widget.semanticLabel ?? widget.label;
+    if (semLabel != null) {
       content = Semantics(
-        label: widget.semanticLabel,
+        label: semLabel,
         button: true,
         enabled: widget.enabled,
         child: content,
       );
     }
 
-    Widget button = content;
+    var button = content;
 
     if (bt?.minWidth != null) {
       button = ConstrainedBox(
@@ -206,9 +207,10 @@ extension _OiButtonStandardVariants on _OiButtonState {
       child: content,
     );
 
-    if (widget.semanticLabel != null) {
+    final semLabel = widget.semanticLabel ?? widget.label;
+    if (semLabel != null) {
       content = Semantics(
-        label: widget.semanticLabel,
+        label: semLabel,
         button: true,
         enabled: widget.enabled,
         child: content,
