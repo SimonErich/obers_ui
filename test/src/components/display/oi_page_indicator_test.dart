@@ -60,9 +60,11 @@ void main() {
       await tester.pumpObers(
         const OiPageIndicator.pill(count: 3, current: 0),
       );
-      final containers = tester.widgetList<AnimatedContainer>(
-        find.byType(AnimatedContainer),
-      ).toList();
+      final containers = tester
+          .widgetList<AnimatedContainer>(
+            find.byType(AnimatedContainer),
+          )
+          .toList();
 
       // The active pill dot should be wider than the inactive dot.
       // Active width = size * 2.5 = 20, inactive width = size = 8.
@@ -85,9 +87,11 @@ void main() {
       await tester.pumpObers(
         const OiPageIndicator(count: 3, current: 0),
       );
-      final containers = tester.widgetList<AnimatedContainer>(
-        find.byType(AnimatedContainer),
-      ).toList();
+      final containers = tester
+          .widgetList<AnimatedContainer>(
+            find.byType(AnimatedContainer),
+          )
+          .toList();
 
       final activeBox = tester.getSize(find.byWidget(containers[0]));
       final inactiveBox = tester.getSize(find.byWidget(containers[1]));

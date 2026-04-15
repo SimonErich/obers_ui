@@ -57,7 +57,8 @@ class OiReorderableList<T> extends StatefulWidget {
     T item,
     int index,
     Widget? dragHandle,
-  ) itemBuilder;
+  )
+  itemBuilder;
 
   /// Called when the user drops an item at a new position.
   final void Function(int oldIndex, int newIndex) onReorder;
@@ -236,7 +237,8 @@ class _OiReorderableListState<T> extends State<OiReorderableList<T>>
 
     // Keyboard-picked highlight.
     final isKeyboardPicked = _keyboardPickedIndex == index;
-    final isKeyboardTarget = _keyboardTargetIndex == index &&
+    final isKeyboardTarget =
+        _keyboardTargetIndex == index &&
         _keyboardPickedIndex != null &&
         _keyboardTargetIndex != _keyboardPickedIndex;
 

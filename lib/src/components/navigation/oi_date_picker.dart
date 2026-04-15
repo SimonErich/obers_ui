@@ -11,7 +11,6 @@ import 'package:obers_ui/src/utils/calendar_utils.dart';
 // Weekday abbreviations, index 0=Monday ... 6=Sunday (matches DateTime.weekday-1).
 const List<String> _kWeekdays = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'];
 
-
 /// A calendar date picker with optional date-range selection.
 ///
 /// Displays a month-view calendar grid. The user can navigate between months
@@ -105,7 +104,7 @@ class OiDatePicker extends StatefulWidget {
   /// navigation. When `null`, the default month/year label with
   /// [OiMonthPicker] is shown.
   final Widget Function(BuildContext context, DateTime displayMonth)?
-      headerBuilder;
+  headerBuilder;
 
   /// Externally controlled display month. When provided, the picker shows
   /// this month instead of managing its own display month state.
@@ -478,7 +477,8 @@ class _OiDatePickerState extends State<OiDatePicker> {
                         ),
                       ] else
                         _MonthYearLabel(
-                          label: '${kOiMonthLabels[_effectiveDisplayMonth.month - 1]} ${_effectiveDisplayMonth.year}',
+                          label:
+                              '${kOiMonthLabels[_effectiveDisplayMonth.month - 1]} ${_effectiveDisplayMonth.year}',
                           onTap: _openMonthPicker,
                         ),
                     ],

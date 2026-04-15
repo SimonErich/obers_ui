@@ -86,10 +86,7 @@ void main() {
 
   testWidgets('legend shows series names for multi-series', (tester) async {
     await tester.pumpChartApp(
-      _barChart(
-        categories: _multiSeriesCategories,
-        series: _multiSeriesDef,
-      ),
+      _barChart(categories: _multiSeriesCategories, series: _multiSeriesDef),
     );
     expect(find.byKey(const Key('oi_bar_chart_legend')), findsOneWidget);
     expect(find.text('Revenue'), findsOneWidget);
@@ -105,11 +102,7 @@ void main() {
     await tester.pumpChartApp(
       _barChart(
         categories: const [
-          OiBarCategory(
-            label: 'A',
-            values: [50],
-            colors: [Color(0xFFFF5722)],
-          ),
+          OiBarCategory(label: 'A', values: [50], colors: [Color(0xFFFF5722)]),
         ],
       ),
     );
@@ -261,18 +254,12 @@ void main() {
   });
 
   testWidgets('light theme renders correctly', (tester) async {
-    await tester.pumpChartApp(
-      _barChart(),
-      theme: OiThemeData.light(),
-    );
+    await tester.pumpChartApp(_barChart(), theme: OiThemeData.light());
     expect(find.byType(OiBarChart), findsOneWidget);
   });
 
   testWidgets('dark theme renders correctly', (tester) async {
-    await tester.pumpChartApp(
-      _barChart(),
-      theme: OiThemeData.dark(),
-    );
+    await tester.pumpChartApp(_barChart(), theme: OiThemeData.dark());
     expect(find.byType(OiBarChart), findsOneWidget);
   });
 

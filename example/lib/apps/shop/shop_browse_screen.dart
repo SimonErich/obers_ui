@@ -34,10 +34,7 @@ class ShopBrowseScreen extends StatefulWidget {
 
 class _ShopBrowseScreenState extends State<ShopBrowseScreen> {
   OiProductFilterData _filterData = const OiProductFilterData();
-  OiSortOption _currentSort = const OiSortOption(
-    field: 'name',
-    label: 'Name',
-  );
+  OiSortOption _currentSort = const OiSortOption(field: 'name', label: 'Name');
 
   late List<OiProductData> _displayedProducts = List.of(kProducts);
 
@@ -63,22 +60,16 @@ class _ShopBrowseScreenState extends State<ShopBrowseScreen> {
 
     // Categories
     if (_filterData.categories.isNotEmpty) {
-      result =
-          result
-              .where(
-                (p) => p.tags.any((t) => _filterData.categories.contains(t)),
-              )
-              .toList();
+      result = result
+          .where((p) => p.tags.any((t) => _filterData.categories.contains(t)))
+          .toList();
     }
 
     // Rating
     if (_filterData.minRating != null) {
-      result =
-          result
-              .where(
-                (p) => (p.rating ?? 0) >= _filterData.minRating!,
-              )
-              .toList();
+      result = result
+          .where((p) => (p.rating ?? 0) >= _filterData.minRating!)
+          .toList();
     }
 
     // In stock only
@@ -91,9 +82,7 @@ class _ShopBrowseScreenState extends State<ShopBrowseScreen> {
       case 'price':
         result.sort((a, b) => a.price.compareTo(b.price));
       case 'rating':
-        result.sort(
-          (a, b) => (b.rating ?? 0).compareTo(a.rating ?? 0),
-        );
+        result.sort((a, b) => (b.rating ?? 0).compareTo(a.rating ?? 0));
       case 'name':
       default:
         result.sort((a, b) => a.name.compareTo(b.name));
@@ -113,22 +102,20 @@ class _ShopBrowseScreenState extends State<ShopBrowseScreen> {
       builder: (_) => OiCommandBar(
         label: 'Search products',
         onDismiss: () => handle.dismiss(),
-        commands:
-            kProducts
-                .map(
-                  (p) => OiCommand(
-                    id: p.key,
-                    label: p.name,
-                    description:
-                        '${p.currencyCode} ${p.price.toStringAsFixed(2)}',
-                    category: 'Products',
-                    onExecute: () {
-                      handle.dismiss();
-                      widget.onSelectProduct(p);
-                    },
-                  ),
-                )
-                .toList(),
+        commands: kProducts
+            .map(
+              (p) => OiCommand(
+                id: p.key,
+                label: p.name,
+                description: '${p.currencyCode} ${p.price.toStringAsFixed(2)}',
+                category: 'Products',
+                onExecute: () {
+                  handle.dismiss();
+                  widget.onSelectProduct(p);
+                },
+              ),
+            )
+            .toList(),
       ),
       zOrder: OiOverlayZOrder.panel,
     );
@@ -172,8 +159,7 @@ class _ShopBrowseScreenState extends State<ShopBrowseScreen> {
                     ],
                     currentSort: _currentSort,
                     label: 'Sort products',
-                    onSortChange: (sort) =>
-                        setState(() => _currentSort = sort),
+                    onSortChange: (sort) => setState(() => _currentSort = sort),
                   ),
                   SizedBox(width: spacing.sm),
                   // Wishlist button with badge count
@@ -230,17 +216,16 @@ class _ShopBrowseScreenState extends State<ShopBrowseScreen> {
               }),
               gap: OiResponsive<double>(spacing.md),
               stretchRows: true,
-              children:
-                  _displayedProducts.map((product) {
-                    return OiProductCard(
-                      product: product,
-                      label: product.name,
-                      onTap: () => widget.onSelectProduct(product),
-                      onAddToCart: product.inStock
-                          ? () => widget.onAddToCart(product)
-                          : null,
-                    );
-                  }).toList(),
+              children: _displayedProducts.map((product) {
+                return OiProductCard(
+                  product: product,
+                  label: product.name,
+                  onTap: () => widget.onSelectProduct(product),
+                  onAddToCart: product.inStock
+                      ? () => widget.onAddToCart(product)
+                      : null,
+                );
+              }).toList(),
             ),
         ],
       ),

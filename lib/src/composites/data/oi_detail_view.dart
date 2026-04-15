@@ -256,9 +256,7 @@ class OiDetailView extends StatelessWidget {
       builder: (context, constraints) {
         // Collapse to single column when available width is narrow.
         final effectiveColumns =
-            constraints.maxWidth < collapseBreakpoint.minWidth
-                ? 1
-                : columns;
+            constraints.maxWidth < collapseBreakpoint.minWidth ? 1 : columns;
 
         if (effectiveColumns <= 1) {
           return OiColumn(

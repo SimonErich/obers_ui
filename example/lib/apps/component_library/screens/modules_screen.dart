@@ -114,7 +114,7 @@ class ModulesScreen extends StatelessWidget {
           ),
 
           // ── OiKanban ──────────────────────────────────────────────────
-          ComponentShowcaseSection(
+          const ComponentShowcaseSection(
             title: 'Kanban',
             widgetName: 'OiKanban',
             description:
@@ -127,7 +127,7 @@ class ModulesScreen extends StatelessWidget {
             examples: [
               ComponentExample(
                 title: 'Task Board',
-                child: SizedBox(height: 350, child: const _KanbanDemo()),
+                child: SizedBox(height: 350, child: _KanbanDemo()),
               ),
             ],
           ),

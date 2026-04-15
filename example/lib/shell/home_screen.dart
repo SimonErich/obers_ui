@@ -178,7 +178,8 @@ class _Category {
 
 final _componentLibraryCategory = _Category(
   title: 'Component Library',
-  description: 'Browse all 290+ widgets with live examples organized by category.',
+  description:
+      'Browse all 290+ widgets with live examples organized by category.',
   icon: OiIcons.layoutGrid,
   builder: (ts) => ComponentLibraryApp(themeState: ts),
 );
@@ -228,7 +229,8 @@ final _categories = [
   ),
   _Category(
     title: 'AutoForms',
-    description: 'Controller-first forms with validation, derived fields, and wizards.',
+    description:
+        'Controller-first forms with validation, derived fields, and wizards.',
     icon: OiIcons.formInput,
     builder: (ts) => AutoFormsApp(themeState: ts),
   ),

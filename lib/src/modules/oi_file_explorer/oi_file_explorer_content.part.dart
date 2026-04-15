@@ -29,7 +29,7 @@ extension _OiFileExplorerContent on _OiFileExplorerState {
   }
 
   Future<void> Function(List<OiFileNodeData>, OiFileNodeData)?
-      get _onMoveToFolder {
+  get _onMoveToFolder {
     if (!widget.enableMove) return null;
     return (movedFiles, folder) async {
       await widget.onMove(movedFiles, folder);

@@ -361,8 +361,7 @@ class _OiTreeState<T> extends State<OiTree<T>> {
               key: ValueKey('node_${node.id}'),
               behavior: HitTestBehavior.opaque,
               onTap: () => _handleTap(node),
-              onDoubleTap:
-                  onDoubleTap != null ? () => onDoubleTap(node) : null,
+              onDoubleTap: onDoubleTap != null ? () => onDoubleTap(node) : null,
               child: widget.nodeBuilder!(
                 context,
                 node,
@@ -444,7 +443,7 @@ class _DefaultNodeRowState<T> extends State<_DefaultNodeRow<T>> {
 
     final doubleTap = widget.onDoubleTap;
 
-    Widget row = Row(
+    final Widget row = Row(
       children: [
         SizedBox(width: widget.depth * widget.indentWidth),
         if (widget.node.hasChildren)
@@ -491,8 +490,7 @@ class _DefaultNodeRowState<T> extends State<_DefaultNodeRow<T>> {
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: () => widget.onTap(widget.node),
-        onDoubleTap:
-            doubleTap != null ? () => doubleTap(widget.node) : null,
+        onDoubleTap: doubleTap != null ? () => doubleTap(widget.node) : null,
         child: SizedBox(
           height: widget.rowHeight,
           child: DecoratedBox(

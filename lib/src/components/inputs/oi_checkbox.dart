@@ -106,7 +106,8 @@ class _OiCheckboxState extends State<OiCheckbox> {
           const SizedBox(width: 8),
           Text(
             widget.label!,
-            style: widget.labelStyle ??
+            style:
+                widget.labelStyle ??
                 TextStyle(fontSize: 14, color: colors.text),
           ),
         ],

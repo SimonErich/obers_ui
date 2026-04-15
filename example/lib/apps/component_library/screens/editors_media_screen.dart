@@ -151,10 +151,10 @@ class _EditorsMediaScreenState extends State<EditorsMediaScreen> {
                 'pinch-to-zoom, and optional thumbnail strip. Typically '
                 'opened from an OiGallery item tap. \n\n'
                 'OiLightbox(items: [...], initialIndex: 0, label: "Lightbox") '
-                  '— opens as a full-screen overlay. Required parameters: '
-                  'items (List<OiLightboxItem>), initialIndex (int), '
-                  'label (String). Optional: onDismiss, showThumbnails, '
-                  'enableZoom, enableSwipe.',
+                '— opens as a full-screen overlay. Required parameters: '
+                'items (List<OiLightboxItem>), initialIndex (int), '
+                'label (String). Optional: onDismiss, showThumbnails, '
+                'enableZoom, enableSwipe.',
             examples: [
               ComponentExample(
                 title: 'Open lightbox',
@@ -217,10 +217,10 @@ class _EditorsMediaScreenState extends State<EditorsMediaScreen> {
                 'An interactive image cropping tool with aspect ratio '
                 'presets, rotation, and flip controls. \n\n'
                 'OiImageCropper(image: ImageProvider, label: "Crop image") '
-                  '— renders a crop interface with drag handles. Required '
-                  'parameters: image (ImageProvider), label (String). '
-                  'Optional: onCrop, aspectRatio, aspectRatioOptions, '
-                  'enableRotate, enableFlip.',
+                '— renders a crop interface with drag handles. Required '
+                'parameters: image (ImageProvider), label (String). '
+                'Optional: onCrop, aspectRatio, aspectRatioOptions, '
+                'enableRotate, enableFlip.',
             examples: [
               ComponentExample(
                 title: 'Crop an image',
@@ -248,10 +248,10 @@ class _EditorsMediaScreenState extends State<EditorsMediaScreen> {
                 'arrows, rectangles, text labels, and other annotation '
                 'types over an image. \n\n'
                 'OiImageAnnotator(image: ImageProvider, label: "Annotate") '
-                  '— renders an annotation canvas over an image. Required '
-                  'parameters: image (ImageProvider), label (String). '
-                  'Optional: annotations, onAnnotationsChange, selectedTool, '
-                  'strokeColor, strokeWidth, readOnly.',
+                '— renders an annotation canvas over an image. Required '
+                'parameters: image (ImageProvider), label (String). '
+                'Optional: annotations, onAnnotationsChange, selectedTool, '
+                'strokeColor, strokeWidth, readOnly.',
             examples: [
               ComponentExample(
                 title: 'Annotate an image',
@@ -284,10 +284,10 @@ class _EditorsMediaScreenState extends State<EditorsMediaScreen> {
                 'A video player with play/pause controls, progress bar, '
                 'and optional poster image. Supports autoplay and loop. \n\n'
                 'OiVideoPlayer(src: "https://...", label: "Video player") '
-                  '— renders a video player with transport controls. '
-                  'Required parameters: src (String), label (String). '
-                  'Optional: autoPlay, loop, showControls, aspectRatio, '
-                  'posterUrl, onPlay, onPause.',
+                '— renders a video player with transport controls. '
+                'Required parameters: src (String), label (String). '
+                'Optional: autoPlay, loop, showControls, aspectRatio, '
+                'posterUrl, onPlay, onPause.',
             examples: [
               ComponentExample(
                 title: 'Video player',

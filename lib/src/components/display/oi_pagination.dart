@@ -355,8 +355,7 @@ class _OiPaginationState extends State<OiPagination> {
                   Expanded(
                     child: Row(
                       children: [
-                        if (widget.showPerPage)
-                          _buildPerPageSelector(context),
+                        if (widget.showPerPage) _buildPerPageSelector(context),
                         if (widget.showPerPage && widget.showTotal)
                           const SizedBox(width: 24),
                         if (widget.showTotal)
@@ -503,7 +502,9 @@ class _OiPaginationState extends State<OiPagination> {
       selected: isCurrent,
       child: Focus(
         child: MouseRegion(
-          cursor: isCurrent ? SystemMouseCursors.basic : SystemMouseCursors.click,
+          cursor: isCurrent
+              ? SystemMouseCursors.basic
+              : SystemMouseCursors.click,
           onEnter: (_) => setState(() => _hoveredPage = page),
           onExit: (_) {
             if (_hoveredPage == page) {
@@ -518,7 +519,9 @@ class _OiPaginationState extends State<OiPagination> {
               margin: const EdgeInsets.symmetric(horizontal: 4),
               decoration: hasBackground
                   ? BoxDecoration(
-                      color: isCurrent ? colors.primary.base : colors.surfaceHover,
+                      color: isCurrent
+                          ? colors.primary.base
+                          : colors.surfaceHover,
                       borderRadius: BorderRadius.circular(4),
                     )
                   : null,

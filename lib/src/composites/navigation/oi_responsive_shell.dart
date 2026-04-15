@@ -22,8 +22,8 @@ class OiResponsiveShellBreakpoints {
   const OiResponsiveShellBreakpoints({
     this.rail = 600.0,
     this.expanded = 1200.0,
-  })  : assert(rail > 0, 'rail must be positive'),
-        assert(expanded > rail, 'expanded must be greater than rail');
+  }) : assert(rail > 0, 'rail must be positive'),
+       assert(expanded > rail, 'expanded must be greater than rail');
 
   /// Viewport width at which the shell switches from a bottom bar to a
   /// navigation rail.
@@ -200,7 +200,9 @@ class OiResponsiveShell extends StatelessWidget {
   /// This is a pure function exposed for testing and for consumers that need
   /// to know the active mode without building the widget.
   OiResponsiveShellMode resolveMode(double width) {
-    if (width >= breakpoints.expanded) return OiResponsiveShellMode.expandedRail;
+    if (width >= breakpoints.expanded) {
+      return OiResponsiveShellMode.expandedRail;
+    }
     if (width >= breakpoints.rail) return OiResponsiveShellMode.rail;
     return OiResponsiveShellMode.bottomBar;
   }
@@ -252,7 +254,8 @@ class OiResponsiveShell extends StatelessWidget {
   // ── Rail layout (medium / expanded) ──────────────────────────────────────
 
   Widget _buildRailLayout(BuildContext context, {required bool expanded}) {
-    final effectiveLabelBehavior = railLabelBehavior ??
+    final effectiveLabelBehavior =
+        railLabelBehavior ??
         (expanded ? OiRailLabelBehavior.all : OiRailLabelBehavior.none);
 
     final effectiveWidth = expanded ? expandedRailWidth : railWidth;
@@ -273,8 +276,9 @@ class OiResponsiveShell extends StatelessWidget {
     final animations = context.animations;
     final reducedMotion =
         animations.reducedMotion || MediaQuery.disableAnimationsOf(context);
-    final animDuration =
-        reducedMotion ? Duration.zero : const Duration(milliseconds: 200);
+    final animDuration = reducedMotion
+        ? Duration.zero
+        : const Duration(milliseconds: 200);
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.stretch,

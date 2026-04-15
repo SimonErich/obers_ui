@@ -249,8 +249,8 @@ class _OiImageAnnotatorState extends State<OiImageAnnotator> {
                       color: widget.selectedTool == tool
                           ? colors.primary.base
                           : _hoveredTool == tool
-                              ? colors.surfaceHover
-                              : colors.surface,
+                          ? colors.surfaceHover
+                          : colors.surface,
                       borderRadius: BorderRadius.circular(4),
                     ),
                     child: Text(

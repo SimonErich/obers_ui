@@ -85,12 +85,15 @@ class _OiSwitchState extends State<OiSwitch> {
         ? (st?.activeTrackColor ?? colors.primary.base)
         : (st?.inactiveTrackColor ?? colors.border);
 
-    final reduceMotion = context.animations.reducedMotion ||
+    final reduceMotion =
+        context.animations.reducedMotion ||
         MediaQuery.disableAnimationsOf(context);
-    final trackDuration =
-        reduceMotion ? Duration.zero : const Duration(milliseconds: 300);
-    final thumbDuration =
-        reduceMotion ? Duration.zero : const Duration(milliseconds: 350);
+    final trackDuration = reduceMotion
+        ? Duration.zero
+        : const Duration(milliseconds: 300);
+    final thumbDuration = reduceMotion
+        ? Duration.zero
+        : const Duration(milliseconds: 350);
 
     final track = AnimatedContainer(
       duration: trackDuration,

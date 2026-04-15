@@ -183,7 +183,7 @@ class OiListView<T> extends StatefulWidget {
 
   /// Gap between grid items in logical pixels.
   ///
-  /// When null, defaults to [OiSpacingTheme.md].
+  /// When null, defaults to OiSpacingTheme.md.
   final OiResponsive<double>? gridGap;
 
   /// Widget displayed in the header action slot.

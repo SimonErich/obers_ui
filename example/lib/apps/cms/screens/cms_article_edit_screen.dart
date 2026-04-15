@@ -111,15 +111,9 @@ class _CmsArticleEditScreenState extends State<CmsArticleEditScreen> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         mainAxisSize: MainAxisSize.min,
         children: [
-          const OiAfTextInput(
-            field: _ArticleField.title,
-            label: 'Title',
-          ),
+          const OiAfTextInput(field: _ArticleField.title, label: 'Title'),
           SizedBox(height: spacing.sm),
-          const OiAfTextInput(
-            field: _ArticleField.slug,
-            label: 'Slug',
-          ),
+          const OiAfTextInput(field: _ArticleField.slug, label: 'Slug'),
           SizedBox(height: spacing.sm),
           OiAfSelect<_ArticleField, String>(
             field: _ArticleField.category,
@@ -127,10 +121,7 @@ class _CmsArticleEditScreenState extends State<CmsArticleEditScreen> {
             options: _categoryOptions,
           ),
           SizedBox(height: spacing.sm),
-          const OiAfTagInput(
-            field: _ArticleField.tags,
-            label: 'Tags',
-          ),
+          const OiAfTagInput(field: _ArticleField.tags, label: 'Tags'),
           SizedBox(height: spacing.sm),
           const OiAfDateInput(
             field: _ArticleField.publishDate,
@@ -182,15 +173,9 @@ class _CmsArticleEditScreenState extends State<CmsArticleEditScreen> {
               ),
               SizedBox(width: spacing.sm),
               Expanded(child: OiLabel.h3(widget.article.title)),
-              OiButton.outline(
-                label: 'Cancel',
-                onTap: widget.onCancel,
-              ),
+              OiButton.outline(label: 'Cancel', onTap: widget.onCancel),
               SizedBox(width: spacing.sm),
-              OiButton.primary(
-                label: 'Publish',
-                onTap: _handleSave,
-              ),
+              OiButton.primary(label: 'Publish', onTap: _handleSave),
             ],
           ),
           SizedBox(height: spacing.sm),

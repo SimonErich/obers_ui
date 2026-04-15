@@ -31,7 +31,9 @@ import 'package:obers_ui_charts/src/models/oi_matrix_series.dart';
 class OiMatrixChart<T> extends StatefulWidget {
   /// Creates a matrix chart.
   const OiMatrixChart({
-    required this.label, required this.series, super.key,
+    required this.label,
+    required this.series,
+    super.key,
     this.xAxis,
     this.yAxis,
     this.colorScale,

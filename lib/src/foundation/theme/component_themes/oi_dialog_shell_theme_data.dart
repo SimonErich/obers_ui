@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/obers_ui.dart' show OiDialogShell;
-import 'package:obers_ui/src/components/overlays/oi_dialog_shell.dart' show OiDialogShell;
+import 'package:obers_ui/src/components/overlays/oi_dialog_shell.dart'
+    show OiDialogShell;
 
 /// Theme overrides for [OiDialogShell].
 ///
@@ -101,15 +102,15 @@ class OiDialogShellThemeData {
 
   @override
   int get hashCode => Object.hash(
-        backgroundColor,
-        borderRadius,
-        barrierColor,
-        defaultMinWidth,
-        defaultMaxWidthFraction,
-        defaultMaxHeightFraction,
-        enterDuration,
-        exitDuration,
-        enterCurve,
-        exitCurve,
-      );
+    backgroundColor,
+    borderRadius,
+    barrierColor,
+    defaultMinWidth,
+    defaultMaxWidthFraction,
+    defaultMaxHeightFraction,
+    enterDuration,
+    exitDuration,
+    enterCurve,
+    exitCurve,
+  );
 }

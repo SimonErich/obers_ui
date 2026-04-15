@@ -20,7 +20,8 @@ class MockReader implements OiAfReader<TestField> {
   }
 
   @override
-  TValue getOr<TValue>(TestField field, TValue fallback) => get<TValue>(field) ?? fallback;
+  TValue getOr<TValue>(TestField field, TValue fallback) =>
+      get<TValue>(field) ?? fallback;
 
   @override
   bool isFieldVisible(TestField field) => true;
@@ -152,11 +153,13 @@ void main() {
         TestField.country,
         'US',
       );
-      final result = validator(_ctx<Object?>(
-        TestField.name,
-        null,
-        formValues: {TestField.country: 'US'},
-      ));
+      final result = validator(
+        _ctx<Object?>(
+          TestField.name,
+          null,
+          formValues: {TestField.country: 'US'},
+        ),
+      );
       expect(result, isNotNull);
     });
 
@@ -165,11 +168,13 @@ void main() {
         TestField.country,
         'US',
       );
-      final result = validator(_ctx<Object?>(
-        TestField.name,
-        null,
-        formValues: {TestField.country: 'DE'},
-      ));
+      final result = validator(
+        _ctx<Object?>(
+          TestField.name,
+          null,
+          formValues: {TestField.country: 'DE'},
+        ),
+      );
       expect(result, isNull);
     });
 
@@ -178,11 +183,13 @@ void main() {
         TestField.country,
         'US',
       );
-      final result = validator(_ctx<Object?>(
-        TestField.name,
-        'John',
-        formValues: {TestField.country: 'US'},
-      ));
+      final result = validator(
+        _ctx<Object?>(
+          TestField.name,
+          'John',
+          formValues: {TestField.country: 'US'},
+        ),
+      );
       expect(result, isNull);
     });
   });
@@ -193,11 +200,13 @@ void main() {
         TestField.country,
         'skip',
       );
-      final result = validator(_ctx<Object?>(
-        TestField.name,
-        null,
-        formValues: {TestField.country: 'US'},
-      ));
+      final result = validator(
+        _ctx<Object?>(
+          TestField.name,
+          null,
+          formValues: {TestField.country: 'US'},
+        ),
+      );
       expect(result, isNotNull);
     });
 
@@ -206,75 +215,87 @@ void main() {
         TestField.country,
         'skip',
       );
-      final result = validator(_ctx<Object?>(
-        TestField.name,
-        null,
-        formValues: {TestField.country: 'skip'},
-      ));
+      final result = validator(
+        _ctx<Object?>(
+          TestField.name,
+          null,
+          formValues: {TestField.country: 'skip'},
+        ),
+      );
       expect(result, isNull);
     });
   });
 
   group('OiAfValidators.requiredWith', () {
     test('required when at least one other field is present', () {
-      final validator = OiAfValidators.requiredWith<TestField>(
-        [TestField.email, TestField.age],
+      final validator = OiAfValidators.requiredWith<TestField>([
+        TestField.email,
+        TestField.age,
+      ]);
+      final result = validator(
+        _ctx<Object?>(
+          TestField.name,
+          null,
+          formValues: {TestField.email: 'a@b.com'},
+        ),
       );
-      final result = validator(_ctx<Object?>(
-        TestField.name,
-        null,
-        formValues: {TestField.email: 'a@b.com'},
-      ));
       expect(result, isNotNull);
     });
 
     test('not required when all other fields are absent', () {
-      final validator = OiAfValidators.requiredWith<TestField>(
-        [TestField.email, TestField.age],
+      final validator = OiAfValidators.requiredWith<TestField>([
+        TestField.email,
+        TestField.age,
+      ]);
+      final result = validator(
+        _ctx<Object?>(TestField.name, null, formValues: {}),
       );
-      final result = validator(_ctx<Object?>(
-        TestField.name,
-        null,
-        formValues: {},
-      ));
       expect(result, isNull);
     });
 
     test('passes when required and value present', () {
-      final validator = OiAfValidators.requiredWith<TestField>(
-        [TestField.email],
+      final validator = OiAfValidators.requiredWith<TestField>([
+        TestField.email,
+      ]);
+      final result = validator(
+        _ctx<Object?>(
+          TestField.name,
+          'John',
+          formValues: {TestField.email: 'a@b.com'},
+        ),
       );
-      final result = validator(_ctx<Object?>(
-        TestField.name,
-        'John',
-        formValues: {TestField.email: 'a@b.com'},
-      ));
       expect(result, isNull);
     });
   });
 
   group('OiAfValidators.requiredWithout', () {
     test('required when at least one other field is absent', () {
-      final validator = OiAfValidators.requiredWithout<TestField>(
-        [TestField.email, TestField.age],
+      final validator = OiAfValidators.requiredWithout<TestField>([
+        TestField.email,
+        TestField.age,
+      ]);
+      final result = validator(
+        _ctx<Object?>(
+          TestField.name,
+          null,
+          formValues: {TestField.email: 'a@b.com'},
+        ),
       );
-      final result = validator(_ctx<Object?>(
-        TestField.name,
-        null,
-        formValues: {TestField.email: 'a@b.com'},
-      ));
       expect(result, isNotNull);
     });
 
     test('not required when all other fields are present', () {
-      final validator = OiAfValidators.requiredWithout<TestField>(
-        [TestField.email, TestField.age],
+      final validator = OiAfValidators.requiredWithout<TestField>([
+        TestField.email,
+        TestField.age,
+      ]);
+      final result = validator(
+        _ctx<Object?>(
+          TestField.name,
+          null,
+          formValues: {TestField.email: 'a@b.com', TestField.age: 25},
+        ),
       );
-      final result = validator(_ctx<Object?>(
-        TestField.name,
-        null,
-        formValues: {TestField.email: 'a@b.com', TestField.age: 25},
-      ));
       expect(result, isNull);
     });
   });
@@ -339,11 +360,17 @@ void main() {
     });
 
     test('passes for valid email', () {
-      expect(validator(_ctx<String>(TestField.email, 'test@example.com')), isNull);
+      expect(
+        validator(_ctx<String>(TestField.email, 'test@example.com')),
+        isNull,
+      );
     });
 
     test('fails for invalid email', () {
-      expect(validator(_ctx<String>(TestField.email, 'not-an-email')), isNotNull);
+      expect(
+        validator(_ctx<String>(TestField.email, 'not-an-email')),
+        isNotNull,
+      );
     });
 
     test('fails for email missing domain', () {
@@ -363,15 +390,24 @@ void main() {
     });
 
     test('passes for valid https URL', () {
-      expect(validator(_ctx<String>(TestField.name, 'https://example.com')), isNull);
+      expect(
+        validator(_ctx<String>(TestField.name, 'https://example.com')),
+        isNull,
+      );
     });
 
     test('passes for valid http URL', () {
-      expect(validator(_ctx<String>(TestField.name, 'http://example.com')), isNull);
+      expect(
+        validator(_ctx<String>(TestField.name, 'http://example.com')),
+        isNull,
+      );
     });
 
     test('fails for ftp URL when only http/https allowed', () {
-      expect(validator(_ctx<String>(TestField.name, 'ftp://example.com')), isNotNull);
+      expect(
+        validator(_ctx<String>(TestField.name, 'ftp://example.com')),
+        isNotNull,
+      );
     });
 
     test('allows custom protocols', () {
@@ -654,46 +690,56 @@ void main() {
     });
 
     test('passes when values match', () {
-      final result = validator(_ctx<String>(
-        TestField.name,
-        'secret',
-        formValues: {TestField.password: 'secret'},
-      ));
+      final result = validator(
+        _ctx<String>(
+          TestField.name,
+          'secret',
+          formValues: {TestField.password: 'secret'},
+        ),
+      );
       expect(result, isNull);
     });
 
     test('fails when values differ', () {
-      final result = validator(_ctx<String>(
-        TestField.name,
-        'secret',
-        formValues: {TestField.password: 'different'},
-      ));
+      final result = validator(
+        _ctx<String>(
+          TestField.name,
+          'secret',
+          formValues: {TestField.password: 'different'},
+        ),
+      );
       expect(result, isNotNull);
     });
   });
 
   group('OiAfValidators.differentFromField', () {
-    final validator = OiAfValidators.differentFromField<TestField>(TestField.email);
+    final validator = OiAfValidators.differentFromField<TestField>(
+      TestField.email,
+    );
 
     test('passes for null', () {
       expect(validator(_ctx<Object?>(TestField.name, null)), isNull);
     });
 
     test('passes when values differ', () {
-      final result = validator(_ctx<Object?>(
-        TestField.name,
-        'hello',
-        formValues: {TestField.email: 'world'},
-      ));
+      final result = validator(
+        _ctx<Object?>(
+          TestField.name,
+          'hello',
+          formValues: {TestField.email: 'world'},
+        ),
+      );
       expect(result, isNull);
     });
 
     test('fails when values match', () {
-      final result = validator(_ctx<Object?>(
-        TestField.name,
-        'same',
-        formValues: {TestField.email: 'same'},
-      ));
+      final result = validator(
+        _ctx<Object?>(
+          TestField.name,
+          'same',
+          formValues: {TestField.email: 'same'},
+        ),
+      );
       expect(result, isNotNull);
     });
   });
@@ -715,7 +761,10 @@ void main() {
   });
 
   group('OiAfValidators.notIn', () {
-    final validator = OiAfValidators.notIn<TestField, String>(['admin', 'root']);
+    final validator = OiAfValidators.notIn<TestField, String>([
+      'admin',
+      'root',
+    ]);
 
     test('passes for null', () {
       expect(validator(_ctx<String>(TestField.name, null)), isNull);
@@ -876,10 +925,7 @@ void main() {
     });
 
     test('fails when fewer than min items', () {
-      expect(
-        validator(_ctx<List<Object?>?>(TestField.tags, ['a'])),
-        isNotNull,
-      );
+      expect(validator(_ctx<List<Object?>?>(TestField.tags, ['a'])), isNotNull);
     });
 
     test('passes when exactly min items', () {
@@ -953,10 +999,7 @@ void main() {
 
     test('ignores case when ignoreCase is true', () {
       final v = OiAfValidators.distinct<TestField>(ignoreCase: true);
-      expect(
-        v(_ctx<List<Object?>?>(TestField.tags, ['A', 'a'])),
-        isNotNull,
-      );
+      expect(v(_ctx<List<Object?>?>(TestField.tags, ['A', 'a'])), isNotNull);
     });
 
     test('does not ignore case by default', () {

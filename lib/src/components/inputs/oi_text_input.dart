@@ -429,8 +429,9 @@ class _OiTextInputState extends State<OiTextInput> {
 
   Widget _buildPasswordTrailing() {
     final colors = context.colors;
-    final iconColor =
-        _passwordIconHovered ? colors.primary.base : colors.textMuted;
+    final iconColor = _passwordIconHovered
+        ? colors.primary.base
+        : colors.textMuted;
 
     return MouseRegion(
       cursor: SystemMouseCursors.click,

@@ -30,7 +30,9 @@ import 'package:obers_ui_charts/src/models/oi_polar_series.dart';
 class OiPolarChart<T> extends StatefulWidget {
   /// Creates a polar chart.
   const OiPolarChart({
-    required this.label, required this.series, super.key,
+    required this.label,
+    required this.series,
+    super.key,
     this.angleAxis,
     this.radiusAxis,
     this.seriesBuilder,

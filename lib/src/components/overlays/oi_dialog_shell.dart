@@ -323,7 +323,11 @@ class _OiDialogShellOverlayState<T> extends State<_OiDialogShellOverlay<T>>
       child: widget.builder(_close),
     );
 
-    dialogContent = OiFocusTrap(initialFocus: widget.initialFocus, onEscape: _close, child: dialogContent);
+    dialogContent = OiFocusTrap(
+      initialFocus: widget.initialFocus,
+      onEscape: _close,
+      child: dialogContent,
+    );
 
     final Widget barrier = GestureDetector(
       behavior: HitTestBehavior.opaque,

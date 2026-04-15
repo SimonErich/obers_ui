@@ -93,18 +93,18 @@ class _OiDateInputState extends State<OiDateInput> {
   void _initControllers() {
     _yearCtrl = ScrollController(
       initialScrollOffset:
-          ((_pickerYear - _firstYear) * _itemHeight - _centerOffset)
-              .clamp(0.0, double.infinity),
+          ((_pickerYear - _firstYear) * _itemHeight - _centerOffset).clamp(
+            0.0,
+            double.infinity,
+          ),
     );
     _monthCtrl = ScrollController(
-      initialScrollOffset:
-          ((_pickerMonth - 1) * _itemHeight - _centerOffset)
-              .clamp(0.0, double.infinity),
+      initialScrollOffset: ((_pickerMonth - 1) * _itemHeight - _centerOffset)
+          .clamp(0.0, double.infinity),
     );
     _dayCtrl = ScrollController(
-      initialScrollOffset:
-          ((_pickerDay - 1) * _itemHeight - _centerOffset)
-              .clamp(0.0, double.infinity),
+      initialScrollOffset: ((_pickerDay - 1) * _itemHeight - _centerOffset)
+          .clamp(0.0, double.infinity),
     );
   }
 
@@ -241,8 +241,7 @@ class _OiDateInputState extends State<OiDateInput> {
                 itemCount: _yearCount,
                 label: (i) => (_firstYear + i).toString(),
                 selectedIndex: _pickerYear - _firstYear,
-                onSelected: (i) =>
-                    setState(() => _pickerYear = _firstYear + i),
+                onSelected: (i) => setState(() => _pickerYear = _firstYear + i),
                 scrollCtrl: _yearCtrl,
               ),
               const SizedBox(width: 8),

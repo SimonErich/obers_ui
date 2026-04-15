@@ -65,12 +65,7 @@ Future<void> showArticlePreviewDialog(
                         ),
                       ),
                     Padding(
-                      padding: EdgeInsets.fromLTRB(
-                        148,
-                        spacing.xxl,
-                        148,
-                        96,
-                      ),
+                      padding: EdgeInsets.fromLTRB(148, spacing.xxl, 148, 96),
                       child: const OiMarkdown(data: kArticleContent),
                     ),
                   ],

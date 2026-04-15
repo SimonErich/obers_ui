@@ -12,14 +12,7 @@ import 'package:obers_ui_example/shell/showcase_shell.dart';
 import 'package:obers_ui_example/theme/theme_state.dart';
 
 /// The screens available in the shop mini-app.
-enum _ShopScreen {
-  browse,
-  product,
-  cart,
-  checkout,
-  orderConfirm,
-  wishlist,
-}
+enum _ShopScreen { browse, product, cart, checkout, orderConfirm, wishlist }
 
 /// Root widget for the Shop showcase mini-app.
 ///
@@ -52,10 +45,10 @@ class _ShopAppState extends State<ShopApp> {
   // ── Cart helpers ───────────────────────────────────────────────────────────
 
   OiCartSummary get _cartSummary => computeCartSummary(
-        _cartItems,
-        discountAmount: _discountAmount,
-        discountLabel: _discountLabel,
-      );
+    _cartItems,
+    discountAmount: _discountAmount,
+    discountLabel: _discountLabel,
+  );
 
   void _addToCart(OiProductData product) {
     setState(() {
@@ -103,8 +96,9 @@ class _ShopAppState extends State<ShopApp> {
 
   void _removeFromCart(Object productKey) {
     setState(() {
-      _cartItems =
-          _cartItems.where((item) => item.productKey != productKey).toList();
+      _cartItems = _cartItems
+          .where((item) => item.productKey != productKey)
+          .toList();
     });
   }
 
@@ -127,8 +121,10 @@ class _ShopAppState extends State<ShopApp> {
   }
 
   Future<OiCouponResult> _applyCoupon(String code) async {
-    final subtotal =
-        _cartItems.fold<double>(0, (sum, item) => sum + item.totalPrice);
+    final subtotal = _cartItems.fold<double>(
+      0,
+      (sum, item) => sum + item.totalPrice,
+    );
     final result = validateCoupon(code, subtotal);
 
     if (result.valid) {

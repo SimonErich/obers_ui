@@ -72,7 +72,9 @@ class OiHierarchyNode<TNode> {
 class OiHierarchicalChart<TNode> extends StatefulWidget {
   /// Creates a hierarchical chart.
   const OiHierarchicalChart({
-    required this.label, required this.series, super.key,
+    required this.label,
+    required this.series,
+    super.key,
     this.seriesBuilder,
     this.behaviors = const [],
     this.controller,

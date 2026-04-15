@@ -44,14 +44,12 @@ class AuthApp extends StatelessWidget {
           ),
           onLogin: (email, password) async {
             await Future<void>.delayed(const Duration(milliseconds: 600));
-            final success =
-                email == kDemoEmail && password == kDemoPassword;
+            final success = email == kDemoEmail && password == kDemoPassword;
             if (context.mounted) {
               OiToast.show(
                 context,
                 message: success ? kLoginSuccess : kLoginFailed,
-                level:
-                    success ? OiToastLevel.success : OiToastLevel.error,
+                level: success ? OiToastLevel.success : OiToastLevel.error,
               );
             }
             return success;
@@ -70,10 +68,7 @@ class AuthApp extends StatelessWidget {
           onForgotPassword: (email) async {
             await Future<void>.delayed(const Duration(milliseconds: 600));
             if (context.mounted) {
-              OiToast.show(
-                context,
-                message: kForgotSuccess,
-              );
+              OiToast.show(context, message: kForgotSuccess);
             }
             return true;
           },

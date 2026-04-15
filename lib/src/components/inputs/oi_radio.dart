@@ -1,5 +1,8 @@
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/obers_ui.dart' show OiTappable;
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
+import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart'
+    show OiTappable;
 
 /// A single option in an [OiRadio] group.
 ///

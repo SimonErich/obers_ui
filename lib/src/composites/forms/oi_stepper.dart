@@ -337,7 +337,8 @@ class _OiStepCircleState extends State<_OiStepCircle> {
         border: Border.all(color: _borderColor(colors), width: 2),
       ),
       child: Center(
-        child: icon ??
+        child:
+            icon ??
             Text(
               '${widget.index + 1}',
               style: TextStyle(

@@ -153,10 +153,7 @@ class _CmsArticlesScreenState extends State<CmsArticlesScreen> {
         }),
       ),
       itemBuilder: (post) => _layout == OiListViewLayout.grid
-          ? _ArticleGridCard(
-              post: post,
-              onTap: () => widget.onArticleTap(post),
-            )
+          ? _ArticleGridCard(post: post, onTap: () => widget.onArticleTap(post))
           : _ArticleListCard(
               post: post,
               onTap: () => widget.onArticleTap(post),
@@ -185,8 +182,9 @@ class _ArticleGridCard extends StatelessWidget {
         children: [
           if (post.imageUrl != null)
             ClipRRect(
-              borderRadius:
-                  const BorderRadius.vertical(top: Radius.circular(8)),
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(8),
+              ),
               child: AspectRatio(
                 aspectRatio: 16 / 9,
                 child: OiImage(
@@ -248,8 +246,9 @@ class _ArticleListCard extends StatelessWidget {
           children: [
             if (post.imageUrl != null)
               ClipRRect(
-                borderRadius:
-                    const BorderRadius.horizontal(left: Radius.circular(8)),
+                borderRadius: const BorderRadius.horizontal(
+                  left: Radius.circular(8),
+                ),
                 child: SizedBox(
                   width: 160,
                   child: OiImage(

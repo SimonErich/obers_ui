@@ -85,11 +85,7 @@ void main() {
     await tester.pumpChartApp(
       _pieChart(
         segments: const [
-          OiPieSegment(
-            label: 'Custom',
-            value: 100,
-            color: Color(0xFFFF5722),
-          ),
+          OiPieSegment(label: 'Custom', value: 100, color: Color(0xFFFF5722)),
         ],
       ),
     );
@@ -136,10 +132,7 @@ void main() {
     await tester.pumpChartApp(
       _pieChart(donut: true, centerLabel: 'Total: 100'),
     );
-    expect(
-      find.byKey(const Key('oi_pie_chart_center_label')),
-      findsOneWidget,
-    );
+    expect(find.byKey(const Key('oi_pie_chart_center_label')), findsOneWidget);
     expect(find.text('Total: 100'), findsOneWidget);
   });
 
@@ -164,18 +157,12 @@ void main() {
   });
 
   testWidgets('light theme renders correctly', (tester) async {
-    await tester.pumpChartApp(
-      _pieChart(),
-      theme: OiThemeData.light(),
-    );
+    await tester.pumpChartApp(_pieChart(), theme: OiThemeData.light());
     expect(find.byType(OiPieChart), findsOneWidget);
   });
 
   testWidgets('dark theme renders correctly', (tester) async {
-    await tester.pumpChartApp(
-      _pieChart(),
-      theme: OiThemeData.dark(),
-    );
+    await tester.pumpChartApp(_pieChart(), theme: OiThemeData.dark());
     expect(find.byType(OiPieChart), findsOneWidget);
   });
 

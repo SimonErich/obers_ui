@@ -10,7 +10,6 @@ import 'package:obers_ui/src/foundation/oi_responsive.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/models/oi_navigation_item.dart';
 
-
 /// The visual style of an [OiBottomBar].
 ///
 /// {@category Components}

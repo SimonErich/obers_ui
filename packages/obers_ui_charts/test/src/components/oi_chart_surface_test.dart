@@ -25,9 +25,7 @@ void main() {
     });
 
     testWidgets('card variant applies elevation shadows', (tester) async {
-      await tester.pumpChartApp(
-        const OiChartSurface(child: Text('chart')),
-      );
+      await tester.pumpChartApp(const OiChartSurface(child: Text('chart')));
       final surface = tester.widget<OiSurface>(find.byType(OiSurface));
       expect(surface.shadow, isNotNull);
       expect(surface.shadow!.length, equals(2));
@@ -36,25 +34,19 @@ void main() {
     });
 
     testWidgets('card variant uses borderRadius of 8', (tester) async {
-      await tester.pumpChartApp(
-        const OiChartSurface(child: Text('chart')),
-      );
+      await tester.pumpChartApp(const OiChartSurface(child: Text('chart')));
       final surface = tester.widget<OiSurface>(find.byType(OiSurface));
       expect(surface.borderRadius, equals(BorderRadius.circular(8)));
     });
 
     testWidgets('card variant has default padding of 16', (tester) async {
-      await tester.pumpChartApp(
-        const OiChartSurface(child: Text('chart')),
-      );
+      await tester.pumpChartApp(const OiChartSurface(child: Text('chart')));
       final surface = tester.widget<OiSurface>(find.byType(OiSurface));
       expect(surface.padding, equals(const EdgeInsets.all(16)));
     });
 
     testWidgets('card variant does not set frosted', (tester) async {
-      await tester.pumpChartApp(
-        const OiChartSurface(child: Text('chart')),
-      );
+      await tester.pumpChartApp(const OiChartSurface(child: Text('chart')));
       final surface = tester.widget<OiSurface>(find.byType(OiSurface));
       expect(surface.frosted, isFalse);
     });
@@ -239,10 +231,7 @@ void main() {
     testWidgets('custom border overrides soft default border', (tester) async {
       final customBorder = OiBorderStyle.dotted(const Color(0xFF00FF00), 1);
       await tester.pumpChartApp(
-        OiChartSurface.soft(
-          border: customBorder,
-          child: const Text('chart'),
-        ),
+        OiChartSurface.soft(border: customBorder, child: const Text('chart')),
       );
       final surface = tester.widget<OiSurface>(find.byType(OiSurface));
       expect(surface.border, equals(customBorder));
@@ -280,8 +269,7 @@ void main() {
       // Find the Semantics widget that OiChartSurface adds.
       final semanticsFinder = find.byWidgetPredicate(
         (widget) =>
-            widget is Semantics &&
-            widget.properties.label == 'Sales chart',
+            widget is Semantics && widget.properties.label == 'Sales chart',
       );
       expect(semanticsFinder, findsOneWidget);
     });
@@ -289,9 +277,7 @@ void main() {
     testWidgets('no Semantics widget when semanticLabel is null', (
       tester,
     ) async {
-      await tester.pumpChartApp(
-        const OiChartSurface(child: Text('chart')),
-      );
+      await tester.pumpChartApp(const OiChartSurface(child: Text('chart')));
       // There may be Semantics from OiApp; verify none wrapping OiSurface
       // directly from OiChartSurface by checking the build output shape.
       final surface = find.byType(OiSurface);

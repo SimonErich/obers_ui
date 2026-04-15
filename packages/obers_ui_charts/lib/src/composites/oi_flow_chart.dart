@@ -26,7 +26,9 @@ import 'package:obers_ui_charts/src/models/oi_flow_series.dart';
 class OiFlowChart<TNode, TLink> extends StatefulWidget {
   /// Creates a flow chart.
   const OiFlowChart({
-    required this.label, required this.series, super.key,
+    required this.label,
+    required this.series,
+    super.key,
     this.seriesBuilder,
     this.behaviors = const [],
     this.controller,

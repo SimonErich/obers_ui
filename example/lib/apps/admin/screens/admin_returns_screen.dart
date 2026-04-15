@@ -37,8 +37,9 @@ class _AdminReturnsScreenState extends State<AdminReturnsScreen> {
     if (statusFilter != null && statusFilter.value != null) {
       final statusValues = statusFilter.value as List<String>;
       if (statusValues.isNotEmpty) {
-        returns =
-            returns.where((r) => statusValues.contains(r['status'])).toList();
+        returns = returns
+            .where((r) => statusValues.contains(r['status']))
+            .toList();
       }
     }
 
@@ -138,62 +139,62 @@ class _AdminReturnsScreenState extends State<AdminReturnsScreen> {
           SizedBox(
             height: (_filteredReturns.length * 48.0) + 100,
             child: OiTable<Map<String, Object>>(
-            label: 'Return requests',
-            rows: _filteredReturns,
-            rowKey: (row) => row['returnId']! as String,
-            onRowTap: (row, index) => setState(() => _selectedIndex = index),
-            striped: true,
-            columns: [
-              OiTableColumn(
-                id: 'returnId',
-                header: 'Return ID',
-                valueGetter: (row) => row['returnId']! as String,
-                width: 100,
-              ),
-              OiTableColumn(
-                id: 'orderId',
-                header: 'Order',
-                valueGetter: (row) => row['orderId']! as String,
-                width: 140,
-              ),
-              OiTableColumn(
-                id: 'customer',
-                header: 'Customer',
-                valueGetter: (row) => row['customer']! as String,
-                width: 200,
-              ),
-              OiTableColumn(
-                id: 'reason',
-                header: 'Reason',
-                valueGetter: (row) => row['reason']! as String,
-              ),
-              OiTableColumn(
-                id: 'status',
-                header: 'Status',
-                valueGetter: (row) => row['status']! as String,
-                cellBuilder: (ctx, row, _) {
-                  final status = row['status']! as String;
-                  return OiBadge.soft(
-                    label: _statusLabel(status),
-                    color: _statusBadgeColor(status),
-                  );
-                },
-                width: 130,
-              ),
-              OiTableColumn(
-                id: 'refundAmount',
-                header: 'Refund',
-                valueGetter: (row) => row['refundAmount']! as String,
-                width: 100,
-              ),
-              OiTableColumn(
-                id: 'requestDate',
-                header: 'Requested',
-                valueGetter: (row) => row['requestDate']! as String,
-                width: 120,
-              ),
-            ],
-          ),
+              label: 'Return requests',
+              rows: _filteredReturns,
+              rowKey: (row) => row['returnId']! as String,
+              onRowTap: (row, index) => setState(() => _selectedIndex = index),
+              striped: true,
+              columns: [
+                OiTableColumn(
+                  id: 'returnId',
+                  header: 'Return ID',
+                  valueGetter: (row) => row['returnId']! as String,
+                  width: 100,
+                ),
+                OiTableColumn(
+                  id: 'orderId',
+                  header: 'Order',
+                  valueGetter: (row) => row['orderId']! as String,
+                  width: 140,
+                ),
+                OiTableColumn(
+                  id: 'customer',
+                  header: 'Customer',
+                  valueGetter: (row) => row['customer']! as String,
+                  width: 200,
+                ),
+                OiTableColumn(
+                  id: 'reason',
+                  header: 'Reason',
+                  valueGetter: (row) => row['reason']! as String,
+                ),
+                OiTableColumn(
+                  id: 'status',
+                  header: 'Status',
+                  valueGetter: (row) => row['status']! as String,
+                  cellBuilder: (ctx, row, _) {
+                    final status = row['status']! as String;
+                    return OiBadge.soft(
+                      label: _statusLabel(status),
+                      color: _statusBadgeColor(status),
+                    );
+                  },
+                  width: 130,
+                ),
+                OiTableColumn(
+                  id: 'refundAmount',
+                  header: 'Refund',
+                  valueGetter: (row) => row['refundAmount']! as String,
+                  width: 100,
+                ),
+                OiTableColumn(
+                  id: 'requestDate',
+                  header: 'Requested',
+                  valueGetter: (row) => row['requestDate']! as String,
+                  width: 120,
+                ),
+              ],
+            ),
           ),
         ],
       ),

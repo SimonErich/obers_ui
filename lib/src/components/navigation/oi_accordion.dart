@@ -243,42 +243,42 @@ class _OiAccordionState extends State<OiAccordion>
                         behavior: HitTestBehavior.opaque,
                         onTap: () => _toggle(i),
                         child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 14,
-                        ),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: Text(
-                                section.title,
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
-                                  color: colors.text,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 14,
+                          ),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  section.title,
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                    color: colors.text,
+                                  ),
                                 ),
                               ),
-                            ),
-                            AnimatedRotation(
-                              turns: open ? 0.5 : 0.0,
-                              duration:
-                                  context.animations.reducedMotion ||
-                                      MediaQuery.disableAnimationsOf(context)
-                                  ? Duration.zero
-                                  : const Duration(milliseconds: 200),
-                              curve: Curves.easeInOut,
-                              child: Icon(
-                                // chevron_down icon
-                                OiIcons.chevronDown,
-                                size: 18,
-                                color: colors.textMuted,
+                              AnimatedRotation(
+                                turns: open ? 0.5 : 0.0,
+                                duration:
+                                    context.animations.reducedMotion ||
+                                        MediaQuery.disableAnimationsOf(context)
+                                    ? Duration.zero
+                                    : const Duration(milliseconds: 200),
+                                curve: Curves.easeInOut,
+                                child: Icon(
+                                  // chevron_down icon
+                                  OiIcons.chevronDown,
+                                  size: 18,
+                                  color: colors.textMuted,
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                     ),
-                  ),
                   ),
                   SizeTransition(
                     sizeFactor: _animations[i],

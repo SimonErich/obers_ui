@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/obers_ui.dart' show OiRefreshIndicator;
-import 'package:obers_ui/src/components/display/oi_refresh_indicator.dart' show OiRefreshIndicator;
+import 'package:obers_ui/src/components/display/oi_refresh_indicator.dart'
+    show OiRefreshIndicator;
 
 /// Theme overrides for [OiRefreshIndicator].
 ///
@@ -102,15 +103,15 @@ class OiRefreshIndicatorThemeData {
 
   @override
   int get hashCode => Object.hash(
-        indicatorColor,
-        indicatorBackgroundColor,
-        displacement,
-        triggerDistance,
-        indicatorSize,
-        strokeWidth,
-        snapBackDuration,
-        completionHideDuration,
-        snapBackCurve,
-        completionCurve,
-      );
+    indicatorColor,
+    indicatorBackgroundColor,
+    displacement,
+    triggerDistance,
+    indicatorSize,
+    strokeWidth,
+    snapBackDuration,
+    completionHideDuration,
+    snapBackCurve,
+    completionCurve,
+  );
 }

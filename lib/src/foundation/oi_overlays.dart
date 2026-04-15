@@ -153,7 +153,7 @@ class OiOverlaysService {
 
   /// Called by the overlay host when a scroll notification is detected
   /// in the content tree. Dismisses all overlays that opted into
-  /// [dismissOnScroll].
+  /// dismissOnScroll.
   void _handleContentScroll() {
     // Copy the list — dismiss() mutates _scrollDismissHandles via _onDismiss.
     final handles = List<OiOverlayHandle>.of(_scrollDismissHandles);

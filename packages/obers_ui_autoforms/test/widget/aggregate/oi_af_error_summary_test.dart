@@ -45,10 +45,7 @@ void main() {
       tester,
     ) async {
       await tester.pumpWidget(
-        _pump(
-          controller: ctrl,
-          child: const OiAfErrorSummary<_F>(),
-        ),
+        _pump(controller: ctrl, child: const OiAfErrorSummary<_F>()),
       );
       await tester.pumpAndSettle();
 
@@ -94,10 +91,7 @@ void main() {
       tester,
     ) async {
       await tester.pumpWidget(
-        _pump(
-          controller: ctrl,
-          child: const OiAfErrorSummary<_F>(),
-        ),
+        _pump(controller: ctrl, child: const OiAfErrorSummary<_F>()),
       );
       await tester.pumpAndSettle();
 

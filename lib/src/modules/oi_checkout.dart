@@ -200,11 +200,13 @@ class _OiCheckoutState extends State<OiCheckout> {
   void _setSameBilling({required bool sameBilling}) =>
       setState(() => _sameBilling = sameBilling);
 
-  void _setShippingCountry(String? country) =>
-      setState(() => _shippingAddress = _shippingAddress.copyWith(country: country));
+  void _setShippingCountry(String? country) => setState(
+    () => _shippingAddress = _shippingAddress.copyWith(country: country),
+  );
 
-  void _setBillingCountry(String? country) =>
-      setState(() => _billingAddress = _billingAddress.copyWith(country: country));
+  void _setBillingCountry(String? country) => setState(
+    () => _billingAddress = _billingAddress.copyWith(country: country),
+  );
 
   void _setSelectedShipping(OiShippingMethod method) =>
       setState(() => _selectedShipping = method);

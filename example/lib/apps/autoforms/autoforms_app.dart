@@ -174,11 +174,7 @@ class _DemoCard extends StatelessWidget {
                 ],
               ),
             ),
-            Icon(
-              OiIcons.chevronRight,
-              size: 20,
-              color: colors.textMuted,
-            ),
+            Icon(OiIcons.chevronRight, size: 20, color: colors.textMuted),
           ],
         ),
       ),
@@ -213,9 +209,7 @@ class _DemoShell extends StatelessWidget {
           padding: EdgeInsets.symmetric(horizontal: spacing.md),
           decoration: BoxDecoration(
             color: colors.surface,
-            border: Border(
-              bottom: BorderSide(color: colors.borderSubtle),
-            ),
+            border: Border(bottom: BorderSide(color: colors.borderSubtle)),
           ),
           child: Row(
             children: [

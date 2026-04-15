@@ -523,7 +523,10 @@ class _NavigationScreenState extends State<NavigationScreen> {
                       label: 'Category',
                       type: OiFilterType.multiSelect,
                       options: [
-                        OiSelectOption(value: 'electronics', label: 'Electronics'),
+                        OiSelectOption(
+                          value: 'electronics',
+                          label: 'Electronics',
+                        ),
                         OiSelectOption(value: 'clothing', label: 'Clothing'),
                         OiSelectOption(value: 'books', label: 'Books'),
                         OiSelectOption(value: 'food', label: 'Food & Drinks'),

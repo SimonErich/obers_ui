@@ -203,17 +203,13 @@ void main() {
   // ── Features ────────────────────────────────────────────────────────────────
 
   testWidgets('smooth mode renders without error', (tester) async {
-    await tester.pumpChartApp(
-      _lineChart(mode: OiLineChartMode.smooth),
-    );
+    await tester.pumpChartApp(_lineChart(mode: OiLineChartMode.smooth));
     expect(find.byType(OiLineChart), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 
   testWidgets('stepped mode renders without error', (tester) async {
-    await tester.pumpChartApp(
-      _lineChart(mode: OiLineChartMode.stepped),
-    );
+    await tester.pumpChartApp(_lineChart(mode: OiLineChartMode.stepped));
     expect(find.byType(OiLineChart), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
@@ -223,10 +219,7 @@ void main() {
       SizedBox(
         width: 500,
         height: 400,
-        child: OiLineChart.smooth(
-          label: 'Smooth',
-          series: _testSeries(),
-        ),
+        child: OiLineChart.smooth(label: 'Smooth', series: _testSeries()),
       ),
     );
     final widget = tester.widget<OiLineChart>(find.byType(OiLineChart));
@@ -238,26 +231,21 @@ void main() {
       SizedBox(
         width: 500,
         height: 400,
-        child: OiLineChart.stepped(
-          label: 'Stepped',
-          series: _testSeries(),
-        ),
+        child: OiLineChart.stepped(label: 'Stepped', series: _testSeries()),
       ),
     );
     final widget = tester.widget<OiLineChart>(find.byType(OiLineChart));
     expect(widget.mode, OiLineChartMode.stepped);
   });
 
-  testWidgets('OiLineChart.straight factory sets straight mode',
-      (tester) async {
+  testWidgets('OiLineChart.straight factory sets straight mode', (
+    tester,
+  ) async {
     await tester.pumpChartApp(
       SizedBox(
         width: 500,
         height: 400,
-        child: OiLineChart.straight(
-          label: 'Straight',
-          series: _testSeries(),
-        ),
+        child: OiLineChart.straight(label: 'Straight', series: _testSeries()),
       ),
     );
     final widget = tester.widget<OiLineChart>(find.byType(OiLineChart));
@@ -290,10 +278,7 @@ void main() {
         series: const [
           OiLineSeries(
             label: 'Dashed',
-            points: [
-              OiLinePoint(x: 1, y: 10),
-              OiLinePoint(x: 2, y: 25),
-            ],
+            points: [OiLinePoint(x: 1, y: 10), OiLinePoint(x: 2, y: 25)],
             dashed: true,
           ),
         ],
@@ -316,18 +301,12 @@ void main() {
         series: [
           const OiLineSeries(
             label: 'A',
-            points: [
-              OiLinePoint(x: 1, y: 10),
-              OiLinePoint(x: 2, y: 20),
-            ],
+            points: [OiLinePoint(x: 1, y: 10), OiLinePoint(x: 2, y: 20)],
             fill: true,
           ),
           const OiLineSeries(
             label: 'B',
-            points: [
-              OiLinePoint(x: 1, y: 5),
-              OiLinePoint(x: 2, y: 15),
-            ],
+            points: [OiLinePoint(x: 1, y: 5), OiLinePoint(x: 2, y: 15)],
             fill: true,
           ),
         ],
@@ -340,26 +319,19 @@ void main() {
   // ── Theming ─────────────────────────────────────────────────────────────────
 
   testWidgets('light theme renders correctly', (tester) async {
-    await tester.pumpChartApp(
-      _lineChart(),
-      theme: OiThemeData.light(),
-    );
+    await tester.pumpChartApp(_lineChart(), theme: OiThemeData.light());
     expect(find.byType(OiLineChart), findsOneWidget);
   });
 
   testWidgets('dark theme renders correctly', (tester) async {
-    await tester.pumpChartApp(
-      _lineChart(),
-      theme: OiThemeData.dark(),
-    );
+    await tester.pumpChartApp(_lineChart(), theme: OiThemeData.dark());
     expect(find.byType(OiLineChart), findsOneWidget);
   });
 
   // ── Accessibility ───────────────────────────────────────────────────────────
 
   test('generateSummary describes data correctly', () {
-    final summary =
-        OiLineChartAccessibility.generateSummary(_multiSeries());
+    final summary = OiLineChartAccessibility.generateSummary(_multiSeries());
     expect(summary, contains('2-series'));
     expect(summary, contains('Revenue'));
     expect(summary, contains('Costs'));
@@ -372,8 +344,7 @@ void main() {
 
   test('describePoint includes series name and coordinates', () {
     const point = OiLinePoint(x: 10, y: 20, label: 'March');
-    final desc =
-        OiLineChartAccessibility.describePoint(point, 'Revenue');
+    final desc = OiLineChartAccessibility.describePoint(point, 'Revenue');
     expect(desc, contains('Revenue'));
     expect(desc, contains('March'));
     expect(desc, contains('x=10'));

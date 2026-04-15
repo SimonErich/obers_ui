@@ -178,10 +178,7 @@ void main() {
     await tester.pumpObers(buildSheet(), surfaceSize: const Size(800, 600));
 
     final semantics = find.byWidgetPredicate(
-      (w) =>
-          w is Semantics &&
-          w.properties.label == 'Feedback' &&
-          w.container,
+      (w) => w is Semantics && w.properties.label == 'Feedback' && w.container,
     );
     expect(semantics, findsOneWidget);
   });

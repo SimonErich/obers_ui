@@ -1,7 +1,10 @@
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/obers_ui.dart' show OiFocusTrap;
 import 'package:obers_ui/src/components/overlays/oi_dialog_shell.dart';
 import 'package:obers_ui/src/foundation/oi_overlays.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
+import 'package:obers_ui/src/primitives/interaction/oi_focus_trap.dart'
+    show OiFocusTrap;
 
 /// Shows a modal dialog and returns a future that completes when dismissed.
 ///
@@ -263,21 +266,19 @@ class OiDialog extends StatelessWidget {
 
     final service = OiOverlays.maybeOf(context);
     if (service != null) {
-      handle = service.show(
+      return handle = service.show(
         label: label,
         builder: wrappedDialog,
         zOrder: OiOverlayZOrder.dialog,
         dismissible: dismissible,
         onDismiss: () => handle.dismiss(),
       );
-      return handle;
     }
 
     // Fallback: insert directly into the nearest Flutter Overlay.
     final entry = OverlayEntry(builder: wrappedDialog);
     Overlay.of(context).insert(entry);
-    handle = createOiOverlayHandle(entry);
-    return handle;
+    return handle = createOiOverlayHandle(entry);
   }
 
   /// Shows an opinionated [OiDialog] as a modal overlay and returns a future

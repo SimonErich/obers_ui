@@ -1,5 +1,6 @@
 import 'package:obers_ui_charts/obers_ui_charts.dart' show OiChartExplorer;
-import 'package:obers_ui_charts/src/modules/oi_chart_explorer.dart' show OiChartExplorer;
+import 'package:obers_ui_charts/src/modules/oi_chart_explorer.dart'
+    show OiChartExplorer;
 
 /// The data type of an [OiExplorerColumn].
 ///

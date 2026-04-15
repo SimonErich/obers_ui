@@ -141,8 +141,9 @@ class OiDatePickerField extends StatelessWidget {
   Widget _buildField(BuildContext context, String? resolvedError) {
     final colors = context.colors;
     final hasValue = value != null;
-    final displayText =
-        hasValue ? _formatDate(value!) : (placeholder ?? 'Select date');
+    final displayText = hasValue
+        ? _formatDate(value!)
+        : (placeholder ?? 'Select date');
 
     final trailing = Row(
       mainAxisSize: MainAxisSize.min,

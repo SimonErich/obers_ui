@@ -213,7 +213,10 @@ class _OiAuthPageState extends State<OiAuthPage> {
       gap: OiResponsive(sp.sm),
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const OiLabel.h2('Sign In', textAlign: TextAlign.center,),
+        const OiLabel.h2(
+          'Sign In',
+          textAlign: TextAlign.center,
+        ),
         SizedBox(height: sp.sm),
         OiTextInput(
           controller: _emailController,
@@ -268,7 +271,10 @@ class _OiAuthPageState extends State<OiAuthPage> {
       gap: OiResponsive(sp.sm),
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const OiLabel.h2('Create Account', textAlign: TextAlign.center,),
+        const OiLabel.h2(
+          'Create Account',
+          textAlign: TextAlign.center,
+        ),
         SizedBox(height: sp.sm),
         OiTextInput(
           controller: _nameController,
@@ -325,7 +331,10 @@ class _OiAuthPageState extends State<OiAuthPage> {
       gap: OiResponsive(sp.sm),
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const OiLabel.h2('Reset Password', textAlign: TextAlign.center,),
+        const OiLabel.h2(
+          'Reset Password',
+          textAlign: TextAlign.center,
+        ),
         SizedBox(height: sp.sm),
         const OiLabel.body(
           'Enter your email and we will send you a reset link.',
@@ -351,7 +360,6 @@ class _OiAuthPageState extends State<OiAuthPage> {
         SizedBox(height: sp.sm),
         if (widget.onLogin != null)
           _buildLink('Back to Sign In', () => _switchMode(OiAuthMode.login)),
-
       ],
     );
   }

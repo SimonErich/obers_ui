@@ -50,9 +50,9 @@ class OiDrawer extends StatelessWidget {
 
     final animDuration =
         context.animations.reducedMotion ||
-                MediaQuery.disableAnimationsOf(context)
-            ? Duration.zero
-            : const Duration(milliseconds: 280);
+            MediaQuery.disableAnimationsOf(context)
+        ? Duration.zero
+        : const Duration(milliseconds: 280);
 
     return Stack(
       fit: StackFit.expand,

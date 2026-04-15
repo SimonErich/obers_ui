@@ -135,19 +135,20 @@ class _SchedulingWorkflowScreenState extends State<SchedulingWorkflowScreen> {
                     }),
                     headerBuilder: (context, displayMonth) =>
                         _WeekPickerHeaderLabel(
-                      displayMonth: displayMonth,
-                      selectedWeek: _selectedWeek,
-                      onWeekSelected: (week) =>
-                          setState(() => _selectedWeek = week),
-                      weekFormatter: (week, year) => 'KW $week / SW ${week + 17} ($year)',
-                      highlightedWeeks: {
-                        const OiCalendarWeek(week: 15, year: 2026),
-                        const OiCalendarWeek(week: 16, year: 2026),
-                        const OiCalendarWeek(week: 17, year: 2026),
-                        const OiCalendarWeek(week: 20, year: 2026),
-                        const OiCalendarWeek(week: 38, year: 2026),
-                      },
-                    ),
+                          displayMonth: displayMonth,
+                          selectedWeek: _selectedWeek,
+                          onWeekSelected: (week) =>
+                              setState(() => _selectedWeek = week),
+                          weekFormatter: (week, year) =>
+                              'KW $week / SW ${week + 17} ($year)',
+                          highlightedWeeks: {
+                            const OiCalendarWeek(week: 15, year: 2026),
+                            const OiCalendarWeek(week: 16, year: 2026),
+                            const OiCalendarWeek(week: 17, year: 2026),
+                            const OiCalendarWeek(week: 20, year: 2026),
+                            const OiCalendarWeek(week: 38, year: 2026),
+                          },
+                        ),
                   ),
                 ),
               ),
@@ -690,8 +691,8 @@ class _WeekPickerHeaderLabelState extends State<_WeekPickerHeaderLabel> {
   bool _hovered = false;
 
   String get _label {
-    final week = widget.selectedWeek ??
-        OiCalendarWeek.fromDateTime(widget.displayMonth);
+    final week =
+        widget.selectedWeek ?? OiCalendarWeek.fromDateTime(widget.displayMonth);
     if (widget.weekFormatter != null) {
       return widget.weekFormatter!(week.week, week.year);
     }
@@ -701,7 +702,8 @@ class _WeekPickerHeaderLabelState extends State<_WeekPickerHeaderLabel> {
   Future<void> _openWeekPicker() async {
     final result = await OiCalendarWeekPicker.show(
       context,
-      initialValue: widget.selectedWeek ??
+      initialValue:
+          widget.selectedWeek ??
           OiCalendarWeek.fromDateTime(widget.displayMonth),
       highlightedWeeks: widget.highlightedWeeks,
       weekFormatter: widget.weekFormatter,
@@ -733,11 +735,7 @@ class _WeekPickerHeaderLabelState extends State<_WeekPickerHeaderLabel> {
               ),
             ),
             const SizedBox(width: 4),
-            Icon(
-              OiIcons.chevronDown,
-              size: 14,
-              color: color,
-            ),
+            Icon(OiIcons.chevronDown, size: 14, color: color),
           ],
         ),
       ),

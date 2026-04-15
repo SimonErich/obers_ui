@@ -162,8 +162,8 @@ class _OiMiniCartState extends State<OiMiniCart> {
                 currencyCode: widget.currencyCode,
                 onQuantityChange: widget.onQuantityChange != null
                     ? (qty) => widget.onQuantityChange!(
-                          (productKey: item.productKey, quantity: qty),
-                        )
+                        (productKey: item.productKey, quantity: qty),
+                      )
                     : null,
                 onRemove: widget.onRemove != null
                     ? () => widget.onRemove!(item.productKey)

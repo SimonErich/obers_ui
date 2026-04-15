@@ -192,8 +192,9 @@ class _OiFloatingState extends State<OiFloating> {
 
   void _updateScrollListener() {
     final shouldListen = widget.visible && widget.onDismiss != null;
-    final newPosition =
-        shouldListen ? Scrollable.maybeOf(context)?.position : null;
+    final newPosition = shouldListen
+        ? Scrollable.maybeOf(context)?.position
+        : null;
 
     if (newPosition == _scrollPosition) return;
 

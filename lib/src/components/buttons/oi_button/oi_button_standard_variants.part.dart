@@ -117,9 +117,7 @@ extension _OiButtonStandardVariants on _OiButtonState {
 
     content = Focus(
       canRequestFocus: isActive,
-      onFocusChange: (focused) {
-        _setHighlighted(focused);
-      },
+      onFocusChange: _setHighlighted,
       child: content,
     );
 
@@ -201,9 +199,7 @@ extension _OiButtonStandardVariants on _OiButtonState {
 
     content = Focus(
       canRequestFocus: isActive,
-      onFocusChange: (focused) {
-        _setHighlighted(focused);
-      },
+      onFocusChange: _setHighlighted,
       child: content,
     );
 

@@ -147,8 +147,9 @@ class OiTimePickerField extends StatelessWidget {
   Widget _buildField(BuildContext context, String? resolvedError) {
     final colors = context.colors;
     final hasValue = value != null;
-    final displayText =
-        hasValue ? _formatTime(value!) : (placeholder ?? 'Select time');
+    final displayText = hasValue
+        ? _formatTime(value!)
+        : (placeholder ?? 'Select time');
 
     final trailing = Row(
       mainAxisSize: MainAxisSize.min,

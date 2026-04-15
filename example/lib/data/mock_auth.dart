@@ -9,8 +9,7 @@ const kDemoHint =
 
 /// Feedback messages shown via toast on auth actions.
 const kLoginSuccess = 'Welcome back! A Melange awaits you.';
-const kLoginFailed =
-    'Wrong credentials. Maybe try again after a coffee?';
+const kLoginFailed = 'Wrong credentials. Maybe try again after a coffee?';
 const kRegisterSuccess =
     'Welcome to Alpenglueck! Your account has been created.';
 const kForgotSuccess =

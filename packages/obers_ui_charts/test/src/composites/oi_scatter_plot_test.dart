@@ -28,17 +28,11 @@ List<OiScatterSeries> _multiSeries() {
   return const [
     OiScatterSeries(
       label: 'Group A',
-      points: [
-        OiScatterPoint(x: 10, y: 20),
-        OiScatterPoint(x: 30, y: 50),
-      ],
+      points: [OiScatterPoint(x: 10, y: 20), OiScatterPoint(x: 30, y: 50)],
     ),
     OiScatterSeries(
       label: 'Group B',
-      points: [
-        OiScatterPoint(x: 20, y: 40),
-        OiScatterPoint(x: 50, y: 70),
-      ],
+      points: [OiScatterPoint(x: 20, y: 40), OiScatterPoint(x: 50, y: 70)],
     ),
   ];
 }
@@ -79,36 +73,24 @@ void main() {
 
   testWidgets('CustomPaint painter is present', (tester) async {
     await tester.pumpChartApp(_scatterPlot());
-    expect(
-      find.byKey(const Key('oi_scatter_plot_painter')),
-      findsOneWidget,
-    );
+    expect(find.byKey(const Key('oi_scatter_plot_painter')), findsOneWidget);
   });
 
   testWidgets('grid renders with canvas key', (tester) async {
     await tester.pumpChartApp(_scatterPlot());
-    expect(
-      find.byKey(const Key('oi_scatter_plot_canvas')),
-      findsOneWidget,
-    );
+    expect(find.byKey(const Key('oi_scatter_plot_canvas')), findsOneWidget);
   });
 
   testWidgets('legend shows series names for multi-series', (tester) async {
     await tester.pumpChartApp(_scatterPlot(series: _multiSeries()));
-    expect(
-      find.byKey(const Key('oi_scatter_plot_legend')),
-      findsOneWidget,
-    );
+    expect(find.byKey(const Key('oi_scatter_plot_legend')), findsOneWidget);
     expect(find.text('Group A'), findsOneWidget);
     expect(find.text('Group B'), findsOneWidget);
   });
 
   testWidgets('hides legend for single series', (tester) async {
     await tester.pumpChartApp(_scatterPlot());
-    expect(
-      find.byKey(const Key('oi_scatter_plot_legend')),
-      findsNothing,
-    );
+    expect(find.byKey(const Key('oi_scatter_plot_legend')), findsNothing);
   });
 
   testWidgets('custom colors applied', (tester) async {
@@ -146,10 +128,7 @@ void main() {
 
   testWidgets('empty series returns SizedBox.shrink', (tester) async {
     await tester.pumpChartApp(_scatterPlot(series: const []));
-    expect(
-      find.byKey(const Key('oi_scatter_plot_empty')),
-      findsOneWidget,
-    );
+    expect(find.byKey(const Key('oi_scatter_plot_empty')), findsOneWidget);
   });
 
   testWidgets('has semantics label', (tester) async {
@@ -199,35 +178,23 @@ void main() {
     await tester.pumpChartApp(
       _scatterPlot(interactionMode: OiChartInteractionMode.touch),
     );
-    expect(
-      find.byKey(const Key('oi_scatter_plot_touch')),
-      findsOneWidget,
-    );
+    expect(find.byKey(const Key('oi_scatter_plot_touch')), findsOneWidget);
   });
 
   testWidgets('pointer mode renders MouseRegion', (tester) async {
     await tester.pumpChartApp(
       _scatterPlot(interactionMode: OiChartInteractionMode.pointer),
     );
-    expect(
-      find.byKey(const Key('oi_scatter_plot_pointer')),
-      findsOneWidget,
-    );
+    expect(find.byKey(const Key('oi_scatter_plot_pointer')), findsOneWidget);
   });
 
   testWidgets('light theme renders correctly', (tester) async {
-    await tester.pumpChartApp(
-      _scatterPlot(),
-      theme: OiThemeData.light(),
-    );
+    await tester.pumpChartApp(_scatterPlot(), theme: OiThemeData.light());
     expect(find.byType(OiScatterPlot), findsOneWidget);
   });
 
   testWidgets('dark theme renders correctly', (tester) async {
-    await tester.pumpChartApp(
-      _scatterPlot(),
-      theme: OiThemeData.dark(),
-    );
+    await tester.pumpChartApp(_scatterPlot(), theme: OiThemeData.dark());
     expect(find.byType(OiScatterPlot), findsOneWidget);
   });
 }

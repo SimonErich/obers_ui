@@ -148,10 +148,7 @@ class _AdminAppState extends State<AdminApp> {
         widget.themeState.toggle();
       default:
         if (mounted) {
-          OiToast.show(
-            context,
-            message: 'Command: $id',
-          );
+          OiToast.show(context, message: 'Command: $id');
         }
     }
   }
@@ -195,10 +192,7 @@ class _AdminAppState extends State<AdminApp> {
                       ),
                     ),
                     const SizedBox(width: 4),
-                    OiLabel.h4(
-                      'Alpenglueck Admin',
-                      color: colors.primary.base,
-                    ),
+                    OiLabel.h4('Alpenglueck Admin', color: colors.primary.base),
                   ],
                 ),
                 // Nested navigation: Users and Orders have sub-items.

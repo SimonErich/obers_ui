@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/src/components/buttons/oi_button.dart';
 import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
-import 'package:obers_ui/src/components/buttons/oi_button.dart';
 
 /// A notification item displayed in the [OiNotificationCenter].
 ///

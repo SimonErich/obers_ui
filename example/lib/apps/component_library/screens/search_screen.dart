@@ -372,9 +372,7 @@ class _SearchScreenState extends State<SearchScreen> {
                     ];
                     return allFruits
                         .where(
-                          (f) => f.toLowerCase().contains(
-                            query.toLowerCase(),
-                          ),
+                          (f) => f.toLowerCase().contains(query.toLowerCase()),
                         )
                         .toList();
                   },
@@ -437,32 +435,33 @@ class _SearchScreenState extends State<SearchScreen> {
                   labelOf: (item) => item,
                   onSelect: (_) {},
                   placeholder: 'Set your status...',
-                  optionBuilder: (
-                    item, {
-                    required bool highlighted,
-                    required bool selected,
-                  }) {
-                    final color = switch (item) {
-                      'Online' => const Color(0xFF22C55E),
-                      'Away' => const Color(0xFFEAB308),
-                      'Busy' => const Color(0xFFEF4444),
-                      _ => const Color(0xFF6B7280),
-                    };
-                    return Row(
-                      children: [
-                        Container(
-                          width: 8,
-                          height: 8,
-                          decoration: BoxDecoration(
-                            color: color,
-                            shape: BoxShape.circle,
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Text(item),
-                      ],
-                    );
-                  },
+                  optionBuilder:
+                      (
+                        item, {
+                        required bool highlighted,
+                        required bool selected,
+                      }) {
+                        final color = switch (item) {
+                          'Online' => const Color(0xFF22C55E),
+                          'Away' => const Color(0xFFEAB308),
+                          'Busy' => const Color(0xFFEF4444),
+                          _ => const Color(0xFF6B7280),
+                        };
+                        return Row(
+                          children: [
+                            Container(
+                              width: 8,
+                              height: 8,
+                              decoration: BoxDecoration(
+                                color: color,
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Text(item),
+                          ],
+                        );
+                      },
                 ),
               ),
               _buildComboBoxCard(

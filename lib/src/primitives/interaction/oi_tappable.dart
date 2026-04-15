@@ -218,9 +218,7 @@ class _OiTappableState extends State<OiTappable> {
           opacity: showOverlay ? 1.0 : 0.0,
           duration: reducedMotion ? Duration.zero : animations.fast,
           child: ColoredBox(
-            color: showOverlay
-                ? overlayColor
-                : effects.hover.backgroundOverlay,
+            color: showOverlay ? overlayColor : effects.hover.backgroundOverlay,
           ),
         ),
       );

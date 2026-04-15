@@ -97,8 +97,9 @@ class _OiContextMenuState extends State<OiContextMenu> {
 
   void _updateScrollListener() {
     final shouldListen = _handle != null;
-    final newPosition =
-        shouldListen ? Scrollable.maybeOf(context)?.position : null;
+    final newPosition = shouldListen
+        ? Scrollable.maybeOf(context)?.position
+        : null;
 
     if (newPosition == _scrollPosition) return;
 

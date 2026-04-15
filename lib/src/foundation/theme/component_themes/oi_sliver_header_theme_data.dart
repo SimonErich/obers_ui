@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/obers_ui.dart' show OiSliverHeader;
-import 'package:obers_ui/src/components/display/oi_sliver_header.dart' show OiSliverHeader;
+import 'package:obers_ui/src/components/display/oi_sliver_header.dart'
+    show OiSliverHeader;
 
 /// Theme overrides for [OiSliverHeader].
 ///
@@ -93,14 +94,14 @@ class OiSliverHeaderThemeData {
 
   @override
   int get hashCode => Object.hash(
-        backgroundColor,
-        foregroundColor,
-        scrolledUnderBackgroundColor,
-        border,
-        toolbarHeight,
-        titleSpacing,
-        titleStyle,
-        subtitleStyle,
-        centerTitle,
-      );
+    backgroundColor,
+    foregroundColor,
+    scrolledUnderBackgroundColor,
+    border,
+    toolbarHeight,
+    titleSpacing,
+    titleStyle,
+    subtitleStyle,
+    centerTitle,
+  );
 }

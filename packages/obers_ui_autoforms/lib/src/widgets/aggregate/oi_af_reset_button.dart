@@ -33,7 +33,8 @@ class OiAfResetButton<TField extends Enum> extends StatefulWidget {
   final bool fullWidth;
 
   @override
-  State<OiAfResetButton<TField>> createState() => _OiAfResetButtonState<TField>();
+  State<OiAfResetButton<TField>> createState() =>
+      _OiAfResetButtonState<TField>();
 }
 
 class _OiAfResetButtonState<TField extends Enum>

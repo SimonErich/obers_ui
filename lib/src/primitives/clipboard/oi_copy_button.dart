@@ -96,9 +96,9 @@ class _OiCopyButtonState extends State<OiCopyButton> {
     // Legacy path: custom icon/copiedWidget — plain tap target.
     final displayWidget = _copied
         ? (widget.copiedWidget ??
-            const OiIcon.decorative(icon: OiIcons.check, size: 16))
+              const OiIcon.decorative(icon: OiIcons.check, size: 16))
         : (widget.icon ??
-            const OiIcon.decorative(icon: OiIcons.copy, size: 16));
+              const OiIcon.decorative(icon: OiIcons.copy, size: 16));
 
     return OiTouchTarget(
       child: Semantics(

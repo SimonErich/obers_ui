@@ -19,7 +19,8 @@ enum OiExportFormat {
   json,
 
   /// Portable Document Format.
-  pdf;
+  pdf
+  ;
 
   /// A human-readable label for this format.
   String get label {

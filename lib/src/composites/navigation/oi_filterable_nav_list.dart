@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/display/oi_badge.dart';
 import 'package:obers_ui/src/components/display/oi_progress.dart';
@@ -418,9 +420,9 @@ class _GroupSectionState<T> extends State<_GroupSection<T>>
     super.didUpdateWidget(oldWidget);
     if (widget.expanded != oldWidget.expanded) {
       if (widget.expanded) {
-        _animController.forward();
+        unawaited(_animController.forward());
       } else {
-        _animController.reverse();
+        unawaited(_animController.reverse());
       }
     }
   }

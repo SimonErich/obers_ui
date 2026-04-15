@@ -284,7 +284,12 @@ class _CmsArticleShowScreenState extends State<CmsArticleShowScreen> {
       children: [
         // Article header
         Container(
-          padding: EdgeInsets.fromLTRB(spacing.lg, spacing.lg, spacing.lg, spacing.md),
+          padding: EdgeInsets.fromLTRB(
+            spacing.lg,
+            spacing.lg,
+            spacing.lg,
+            spacing.md,
+          ),
           decoration: BoxDecoration(
             border: Border(bottom: BorderSide(color: colors.borderSubtle)),
           ),
@@ -367,41 +372,41 @@ class _CmsArticleShowScreenState extends State<CmsArticleShowScreen> {
                       ),
                     ),
                     child: OiDetailView(
-                    label: 'Article metadata',
-                    columns: 2,
-                    collapseBreakpoint: const OiBreakpoint('small', 360),
-                    rowGap: spacing.sm,
-                    wrapInCard: false,
-                    sections: [
-                      OiDetailSection(
-                        title: 'Article Info',
-                        fields: [
-                          OiDetailField(
-                            label: 'Author',
-                            value: widget.article.author.name,
-                          ),
-                          OiDetailField(
-                            label: 'Category',
-                            value: widget.article.category,
-                          ),
-                          OiDetailField(
-                            label: 'Status',
-                            value: widget.article.status,
-                          ),
-                          OiDetailField(
-                            label: 'Published',
-                            value:
-                                '${widget.article.publishedAt.year}-'
-                                '${widget.article.publishedAt.month.toString().padLeft(2, '0')}-'
-                                '${widget.article.publishedAt.day.toString().padLeft(2, '0')}',
-                          ),
-                          OiDetailField(
-                            label: 'Comments',
-                            value: '${widget.article.commentCount}',
-                          ),
-                        ],
-                      ),
-                    ],
+                      label: 'Article metadata',
+                      columns: 2,
+                      collapseBreakpoint: const OiBreakpoint('small', 360),
+                      rowGap: spacing.sm,
+                      wrapInCard: false,
+                      sections: [
+                        OiDetailSection(
+                          title: 'Article Info',
+                          fields: [
+                            OiDetailField(
+                              label: 'Author',
+                              value: widget.article.author.name,
+                            ),
+                            OiDetailField(
+                              label: 'Category',
+                              value: widget.article.category,
+                            ),
+                            OiDetailField(
+                              label: 'Status',
+                              value: widget.article.status,
+                            ),
+                            OiDetailField(
+                              label: 'Published',
+                              value:
+                                  '${widget.article.publishedAt.year}-'
+                                  '${widget.article.publishedAt.month.toString().padLeft(2, '0')}-'
+                                  '${widget.article.publishedAt.day.toString().padLeft(2, '0')}',
+                            ),
+                            OiDetailField(
+                              label: 'Comments',
+                              value: '${widget.article.commentCount}',
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
                   ),
                 ),
@@ -449,7 +454,7 @@ class _CmsArticleShowScreenState extends State<CmsArticleShowScreen> {
                             key: ValueKey('comments-closed'),
                             height: 0,
                           ),
-                    ),
+                  ),
                 ),
               ],
             ),

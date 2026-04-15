@@ -225,7 +225,6 @@ class OiColorPalettePicker extends StatelessWidget {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         _PaletteColorSwatch(
-                          child: circle,
                           enabled: !isLocked,
                           semanticLabel: slot.label,
                           onTap: isLocked
@@ -234,6 +233,7 @@ class OiColorPalettePicker extends StatelessWidget {
                                   slot.id,
                                   slot.value ?? colors.primary.base,
                                 ),
+                          child: circle,
                         ),
                         if (!compact) ...[
                           SizedBox(height: spacing.xs),
@@ -406,8 +406,9 @@ class _PaletteColorSwatchState extends State<_PaletteColorSwatch> {
     }
 
     return MouseRegion(
-      cursor:
-          widget.enabled ? SystemMouseCursors.click : SystemMouseCursors.basic,
+      cursor: widget.enabled
+          ? SystemMouseCursors.click
+          : SystemMouseCursors.basic,
       onEnter: (_) => setState(() => _hovered = true),
       onExit: (_) => setState(() => _hovered = false),
       child: GestureDetector(

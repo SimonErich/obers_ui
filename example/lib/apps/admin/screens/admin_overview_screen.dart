@@ -67,10 +67,12 @@ class AdminOverviewScreen extends StatelessWidget {
                   ),
               ],
             ),
-          ).span(columnSpan: OiResponsive.breakpoints({
-            OiBreakpoint.compact: 1,
-            OiBreakpoint.large: 2,
-          })),
+          ).span(
+            columnSpan: OiResponsive.breakpoints({
+              OiBreakpoint.compact: 1,
+              OiBreakpoint.large: 2,
+            }),
+          ),
           _DashboardTile(
             title: 'Customer Satisfaction',
             child: OiGauge(
@@ -79,10 +81,12 @@ class AdminOverviewScreen extends StatelessWidget {
               max: 5,
               formatValue: (v) => v.toStringAsFixed(1),
             ),
-          ).span(columnSpan: OiResponsive.breakpoints({
-            OiBreakpoint.compact: 1,
-            OiBreakpoint.large: 2,
-          })),
+          ).span(
+            columnSpan: OiResponsive.breakpoints({
+              OiBreakpoint.compact: 1,
+              OiBreakpoint.large: 2,
+            }),
+          ),
 
           // ── Row 3 — Radar + Treemap (2 cols each) ─────────────────────
           _DashboardTile(
@@ -91,39 +95,33 @@ class AdminOverviewScreen extends StatelessWidget {
               label: 'Product category performance comparison',
               axes: kRadarCategories,
               series: [
-                OiRadarSeries(
-                  label: 'This Quarter',
-                  values: kRadarValues[0],
-                ),
-                OiRadarSeries(
-                  label: 'Last Quarter',
-                  values: kRadarValues[1],
-                ),
+                OiRadarSeries(label: 'This Quarter', values: kRadarValues[0]),
+                OiRadarSeries(label: 'Last Quarter', values: kRadarValues[1]),
               ],
               maxValue: 100,
             ),
-          ).span(columnSpan: OiResponsive.breakpoints({
-            OiBreakpoint.compact: 1,
-            OiBreakpoint.large: 2,
-          })),
+          ).span(
+            columnSpan: OiResponsive.breakpoints({
+              OiBreakpoint.compact: 1,
+              OiBreakpoint.large: 2,
+            }),
+          ),
           _DashboardTile(
             title: 'Revenue by Category',
             child: OiTreemap(
               label: 'Revenue by product category',
               nodes: [
                 for (final n in kTreemapNodes)
-                  OiTreemapNode(
-                    key: n.key,
-                    label: n.label,
-                    value: n.value,
-                  ),
+                  OiTreemapNode(key: n.key, label: n.label, value: n.value),
               ],
               showValues: true,
             ),
-          ).span(columnSpan: OiResponsive.breakpoints({
-            OiBreakpoint.compact: 1,
-            OiBreakpoint.large: 2,
-          })),
+          ).span(
+            columnSpan: OiResponsive.breakpoints({
+              OiBreakpoint.compact: 1,
+              OiBreakpoint.large: 2,
+            }),
+          ),
 
           // ── Row 4 — Customer Journey (full width) ─────────────────────
           _DashboardTile(
@@ -172,7 +170,13 @@ class AdminOverviewScreen extends StatelessWidget {
                     ),
               ],
               rowLabels: const [
-                'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun',
+                'Mon',
+                'Tue',
+                'Wed',
+                'Thu',
+                'Fri',
+                'Sat',
+                'Sun',
               ],
               columnLabels: List.generate(24, (i) => '${i}h'),
               showValues: false,
@@ -188,10 +192,7 @@ class AdminOverviewScreen extends StatelessWidget {
 
 /// A single dashboard card with a title header and content area.
 class _DashboardTile extends StatelessWidget {
-  const _DashboardTile({
-    required this.title,
-    required this.child,
-  });
+  const _DashboardTile({required this.title, required this.child});
 
   final String title;
   final Widget child;
@@ -213,9 +214,7 @@ class _DashboardTile extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
             decoration: BoxDecoration(
-              border: Border(
-                bottom: BorderSide(color: colors.borderSubtle),
-              ),
+              border: Border(bottom: BorderSide(color: colors.borderSubtle)),
             ),
             child: Text(
               title,
@@ -228,10 +227,7 @@ class _DashboardTile extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.all(12),
-            child: child,
-          ),
+          Padding(padding: const EdgeInsets.all(12), child: child),
         ],
       ),
     );

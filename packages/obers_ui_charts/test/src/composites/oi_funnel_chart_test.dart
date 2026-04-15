@@ -109,7 +109,9 @@ void main() {
 
   // 9. formatValue callback is used.
   testWidgets('formatValue callback formats displayed value', (tester) async {
-    await tester.pumpChartApp(_funnelChart(formatValue: (v) => '${v.toInt()}k'));
+    await tester.pumpChartApp(
+      _funnelChart(formatValue: (v) => '${v.toInt()}k'),
+    );
     expect(find.text('1000k - 100%'), findsOneWidget);
   });
 

@@ -194,9 +194,9 @@ class _ChatAppState extends State<ChatApp> {
   void _closeInfoSheet() => setState(() => _infoSheetOpen = false);
 
   void _closeProfileSheet() => setState(() {
-        _profileSheetOpen = false;
-        _profileUser = null;
-      });
+    _profileSheetOpen = false;
+    _profileUser = null;
+  });
 
   // ── Build ──────────────────────────────────────────────────────────────────
 
@@ -639,11 +639,7 @@ class _ChatAppState extends State<ChatApp> {
           padding: EdgeInsets.all(spacing.md),
           child: Row(
             children: [
-              Icon(
-                OiIcons.info,
-                size: 18,
-                color: colors.primary.base,
-              ),
+              Icon(OiIcons.info, size: 18, color: colors.primary.base),
               SizedBox(width: spacing.sm),
               const Expanded(child: OiLabel.h4('Channel Details')),
               OiIconButton(
