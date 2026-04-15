@@ -44,6 +44,44 @@ void main() {
 
   // ── Search ─────────────────────────────────────────────────────────────────
 
+  testWidgets('search input matches category names', (tester) async {
+    await tester.pumpObers(OiEmojiPicker(onSelected: (_) {}));
+    await tester.enterText(find.byType(EditableText), 'smile');
+    await tester.pump();
+    expect(find.text('Smileys'), findsOneWidget);
+    expect(find.text('No emoji found'), findsNothing);
+  });
+
+  testWidgets('search input matches category keywords', (tester) async {
+    await tester.pumpObers(OiEmojiPicker(onSelected: (_) {}));
+    await tester.enterText(find.byType(EditableText), 'fist');
+    await tester.pump();
+    expect(find.text('People'), findsOneWidget);
+    expect(find.text('👊'), findsOneWidget);
+    expect(find.text('👃'), findsNothing);
+    expect(find.text('No emoji found'), findsNothing);
+  });
+
+  testWidgets('search input matches heart keyword', (tester) async {
+    await tester.pumpObers(OiEmojiPicker(onSelected: (_) {}));
+    await tester.enterText(find.byType(EditableText), 'heart');
+    await tester.pump();
+    expect(find.text('Symbols'), findsOneWidget);
+    expect(find.text('❤️'), findsOneWidget);
+    expect(find.text('💙'), findsOneWidget);
+    expect(find.text('No emoji found'), findsNothing);
+  });
+
+  testWidgets('search input matches color keywords', (tester) async {
+    await tester.pumpObers(OiEmojiPicker(onSelected: (_) {}));
+    await tester.enterText(find.byType(EditableText), 'blue');
+    await tester.pump();
+    expect(find.text('Symbols'), findsOneWidget);
+    expect(find.text('💙'), findsOneWidget);
+    expect(find.text('🔵'), findsOneWidget);
+    expect(find.text('No emoji found'), findsNothing);
+  });
+
   testWidgets('search input filters emoji — no results shows message', (
     tester,
   ) async {

@@ -49,6 +49,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.3.5+2"
+  desktop_drop:
+    dependency: transitive
+    description:
+      name: desktop_drop
+      sha256: e70b46b2d61f1af7a81a40d1f79b43c28a879e30a4ef31e87e9c27bea4d784e8
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.7.0"
   fake_async:
     dependency: transitive
     description:
@@ -182,7 +190,7 @@ packages:
       path: "../.."
       relative: true
     source: path
-    version: "0.1.0"
+    version: "0.1.2"
   path:
     dependency: transitive
     description:
@@ -336,10 +344,26 @@ packages:
     dependency: transitive
     description:
       name: test_api
-      sha256: "93167629bfc610f71560ab9312acdda4959de4df6fac7492c89ff0d3886f6636"
+      sha256: "19a78f63e83d3a61f00826d09bc2f60e191bf3504183c001262be6ac75589fb8"
       url: "https://pub.dev"
     source: hosted
-    version: "0.7.9"
+    version: "0.7.8"
+  unicode_emojis:
+    dependency: transitive
+    description:
+      name: unicode_emojis
+      sha256: f97d3ebb5d525f2a6334b0d2e975d26b3b7ca2df6674bf9ff9708022a7a21b88
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.5.1"
+  universal_platform:
+    dependency: transitive
+    description:
+      name: universal_platform
+      sha256: "64e16458a0ea9b99260ceb5467a214c1f298d647c659af1bff6d3bf82536b1ec"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.1.0"
   vector_math:
     dependency: transitive
     description:

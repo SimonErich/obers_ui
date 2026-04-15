@@ -41,6 +41,9 @@ class _FormInputsScreenState extends State<FormInputsScreen> {
   DateTime? _editableDate = DateTime(2026, 3, 23);
   double? _editableNumber = 42;
   String? _editableSelect = 'Active';
+  String _segmentedView = 'feed';
+  String _segmentedIconView = 'inventory';
+  String _segmentedDisabledView = 'week';
 
   @override
   Widget build(BuildContext context) {
@@ -220,10 +223,7 @@ class _FormInputsScreenState extends State<FormInputsScreen> {
                 title: 'Inline select',
                 child: Row(
                   children: [
-                    OiLabel.small(
-                      'Sort by:',
-                      color: context.colors.textMuted,
-                    ),
+                    OiLabel.small('Sort by:', color: context.colors.textMuted),
                     SizedBox(width: spacing.sm),
                     OiSelect<String>.inline(
                       value: _inlineSortOption,
@@ -239,8 +239,7 @@ class _FormInputsScreenState extends State<FormInputsScreen> {
                           label: 'Title Z\u2013A',
                         ),
                       ],
-                      onChanged: (v) =>
-                          setState(() => _inlineSortOption = v),
+                      onChanged: (v) => setState(() => _inlineSortOption = v),
                     ),
                   ],
                 ),
@@ -343,6 +342,67 @@ class _FormInputsScreenState extends State<FormInputsScreen> {
                     OiRadioOption(value: 'c', label: 'Large'),
                   ],
                   onChanged: (v) => setState(() => _radioValue = v),
+                ),
+              ),
+            ],
+          ),
+
+          // ── Segmented Control ───────────────────────────────────────────
+          ComponentShowcaseSection(
+            title: 'Segmented Control',
+            widgetName: 'OiSegmentedControl',
+            description:
+                'A connected single-select control for quickly switching '
+                'between a small set of options.',
+            examples: [
+              ComponentExample(
+                title: 'Default',
+                child: OiSegmentedControl<String>(
+                  segments: const [
+                    OiSegment(value: 'feed', label: 'Feed'),
+                    OiSegment(value: 'timeline', label: 'Timeline'),
+                    OiSegment(value: 'insights', label: 'Insights'),
+                  ],
+                  selected: _segmentedView,
+                  onChanged: (value) => setState(() => _segmentedView = value),
+                ),
+              ),
+              ComponentExample(
+                title: 'With icons',
+                child: OiSegmentedControl<String>(
+                  segments: const [
+                    OiSegment(
+                      value: 'inventory',
+                      label: 'Inventory',
+                      icon: OiIcons.package,
+                    ),
+                    OiSegment(
+                      value: 'orders',
+                      label: 'Orders',
+                      icon: OiIcons.shoppingCart,
+                    ),
+                    OiSegment(
+                      value: 'reviews',
+                      label: 'Reviews',
+                      icon: OiIcons.star,
+                    ),
+                  ],
+                  selected: _segmentedIconView,
+                  onChanged: (value) =>
+                      setState(() => _segmentedIconView = value),
+                ),
+              ),
+              ComponentExample(
+                title: 'Disabled segment',
+                child: OiSegmentedControl<String>(
+                  segments: const [
+                    OiSegment(value: 'day', label: 'Day'),
+                    OiSegment(value: 'week', label: 'Week'),
+                    OiSegment(value: 'month', label: 'Month', enabled: false),
+                  ],
+                  selected: _segmentedDisabledView,
+                  onChanged: (value) =>
+                      setState(() => _segmentedDisabledView = value),
                 ),
               ),
             ],
