@@ -41,9 +41,7 @@ extension _OiButtonSpecialVariants on _OiButtonState {
     );
 
     final chevronPart = OiTappable(
-      onTap: widget.enabled
-          ? _toggleDropdownVisible
-          : null,
+      onTap: widget.enabled ? _toggleDropdownVisible : null,
       enabled: widget.enabled,
       child: Container(
         height: height,
@@ -149,7 +147,7 @@ extension _OiButtonSpecialVariants on _OiButtonState {
         padding: EdgeInsets.symmetric(horizontal: hPad),
         decoration: decoration,
         child: Center(
-          widthFactor: 1.0,
+          widthFactor: 1,
           child: Text(
             displayLabel,
             style: TextStyle(

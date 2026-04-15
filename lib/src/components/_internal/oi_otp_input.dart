@@ -46,7 +46,12 @@ class _OiOtpInputState extends State<OiOtpInput> {
   void initState() {
     super.initState();
     _controllers = List.generate(widget.length, (_) => TextEditingController());
-    _focusNodes = List.generate(widget.length, (_) => FocusNode());
+    _focusNodes = List.generate(
+      widget.length,
+      (index) => FocusNode(
+        onKeyEvent: (_, event) => _handleKeyEvent(index, event),
+      ),
+    );
     for (var i = 0; i < widget.length; i++) {
       _controllers[i].addListener(() => _onControllerChanged(i));
       _focusNodes[i].addListener(_onFocusChanged);
@@ -59,8 +64,9 @@ class _OiOtpInputState extends State<OiOtpInput> {
       c.dispose();
     }
     for (final n in _focusNodes) {
-      n.removeListener(_onFocusChanged);
-      n.dispose();
+      n
+        ..removeListener(_onFocusChanged)
+        ..dispose();
     }
     super.dispose();
   }
@@ -137,8 +143,8 @@ class _OiOtpInputState extends State<OiOtpInput> {
     }
   }
 
-  void _handleKeyEvent(int index, KeyEvent event) {
-    if (event is! KeyDownEvent) return;
+  KeyEventResult _handleKeyEvent(int index, KeyEvent event) {
+    if (event is! KeyDownEvent) return KeyEventResult.ignored;
 
     // Backspace on empty box: move to previous and clear it
     if (event.logicalKey == LogicalKeyboardKey.backspace &&
@@ -147,7 +153,9 @@ class _OiOtpInputState extends State<OiOtpInput> {
       _controllers[index - 1].clear();
       _focusNodes[index - 1].requestFocus();
       _notifyChanged();
+      return KeyEventResult.handled;
     }
+    return KeyEventResult.ignored;
   }
 
   @override
@@ -192,36 +200,32 @@ class _OiOtpInputState extends State<OiOtpInput> {
         child: SizedBox(
           width: boxWidth,
           height: boxHeight,
-          child: KeyboardListener(
-            focusNode: FocusNode(),
-            onKeyEvent: (event) => _handleKeyEvent(index, event),
-            child: OiSurface(
-              color: bgColor,
-              border: border,
-              borderRadius: boxRadius,
-              child: Center(
-                child: EditableText(
-                  controller: _controllers[index],
-                  focusNode: _focusNodes[index],
-                  style:
-                      otpTheme?.digitStyle ??
-                      TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w600,
-                        color: colors.text,
-                      ),
-                  cursorColor: colors.primary.base,
-                  backgroundCursorColor: colors.surfaceSubtle,
-                  textAlign: TextAlign.center,
-                  keyboardType: TextInputType.number,
-                  obscureText: widget.obscure,
-                  autofocus: widget.autofocus && index == 0,
-                  readOnly: !widget.enabled,
-                  inputFormatters: [
-                    FilteringTextInputFormatter.digitsOnly,
-                    LengthLimitingTextInputFormatter(1),
-                  ],
-                ),
+          child: OiSurface(
+            color: bgColor,
+            border: border,
+            borderRadius: boxRadius,
+            child: Center(
+              child: EditableText(
+                controller: _controllers[index],
+                focusNode: _focusNodes[index],
+                style:
+                    otpTheme?.digitStyle ??
+                    TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w600,
+                      color: colors.text,
+                    ),
+                cursorColor: colors.primary.base,
+                backgroundCursorColor: colors.surfaceSubtle,
+                textAlign: TextAlign.center,
+                keyboardType: TextInputType.number,
+                obscureText: widget.obscure,
+                autofocus: widget.autofocus && index == 0,
+                readOnly: !widget.enabled,
+                inputFormatters: [
+                  FilteringTextInputFormatter.digitsOnly,
+                  LengthLimitingTextInputFormatter(1),
+                ],
               ),
             ),
           ),

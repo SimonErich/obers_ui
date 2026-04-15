@@ -1,5 +1,6 @@
 // Tests do not require documentation comments.
 
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui/obers_ui.dart';
@@ -97,5 +98,36 @@ void main() {
     // When expand is true the Row uses MainAxisSize.max.
     final row = tester.widget<Row>(find.byType(Row).first);
     expect(row.mainAxisSize, MainAxisSize.max);
+  });
+
+  testWidgets('arrow keys change selected segment after click focus', (
+    tester,
+  ) async {
+    var selected = 'day';
+    await tester.pumpObers(
+      StatefulBuilder(
+        builder: (context, setState) {
+          return OiSegmentedControl<String>(
+            segments: _segments,
+            selected: selected,
+            onChanged: (v) => setState(() => selected = v),
+          );
+        },
+      ),
+    );
+
+    await tester.tap(find.text('Day'));
+    await tester.pump();
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);
+    await tester.pump();
+    expect(selected, 'week');
+
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);
+    await tester.pump();
+    expect(selected, 'month');
+
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowLeft);
+    await tester.pump();
+    expect(selected, 'week');
   });
 }

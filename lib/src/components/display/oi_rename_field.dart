@@ -64,17 +64,39 @@ class _OiRenameFieldState extends State<OiRenameField> {
   late FocusNode _focusNode;
   String? _error;
 
+  KeyEventResult _handleKeyEvent(FocusNode node, KeyEvent event) {
+    if (event is! KeyDownEvent) return KeyEventResult.ignored;
+    if (event.logicalKey == LogicalKeyboardKey.escape) {
+      _cancel();
+      return KeyEventResult.handled;
+    }
+    if (event.logicalKey == LogicalKeyboardKey.enter) {
+      _submit();
+      return KeyEventResult.handled;
+    }
+    return KeyEventResult.ignored;
+  }
+
   @override
   void initState() {
     super.initState();
     _controller = TextEditingController(text: widget.currentName);
-    _focusNode = FocusNode();
+    _focusNode = FocusNode(onKeyEvent: _handleKeyEvent);
 
     // Auto-select the name part (without extension) on mount
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _focusNode.requestFocus();
       _selectNamePart();
     });
+  }
+
+  @override
+  void didUpdateWidget(covariant OiRenameField oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.currentName != widget.currentName) {
+      _controller.text = widget.currentName;
+      _selectNamePart();
+    }
   }
 
   void _selectNamePart() {
@@ -119,6 +141,9 @@ class _OiRenameFieldState extends State<OiRenameField> {
   }
 
   void _cancel() {
+    _controller.text = widget.currentName;
+    _error = null;
+    _selectNamePart();
     widget.onCancel();
   }
 
@@ -135,72 +160,60 @@ class _OiRenameFieldState extends State<OiRenameField> {
 
     return Semantics(
       label: widget.semanticsLabel ?? 'Rename file',
-      child: KeyboardListener(
-        focusNode: FocusNode(),
-        onKeyEvent: (event) {
-          if (event is KeyDownEvent) {
-            if (event.logicalKey == LogicalKeyboardKey.escape) {
-              _cancel();
-            } else if (event.logicalKey == LogicalKeyboardKey.enter) {
-              _submit();
-            }
-          }
-        },
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Expanded(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  OiTextInput(
-                    controller: _controller,
-                    focusNode: _focusNode,
-                    autofocus: true,
-                    onSubmitted: (_) => _submit(),
-                    onChanged: (value) {
-                      if (_error != null) {
-                        setState(() => _error = _validate(value));
-                      }
-                    },
-                  ),
-                  if (_error != null)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 2),
-                      child: Text(
-                        _error!,
-                        style: TextStyle(
-                          fontSize: 11,
-                          color: colors.error.base,
-                        ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Expanded(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                OiTextInput(
+                  controller: _controller,
+                  focusNode: _focusNode,
+                  autofocus: true,
+                  onSubmitted: (_) => _submit(),
+                  onChanged: (value) {
+                    if (_error != null) {
+                      setState(() => _error = _validate(value));
+                    }
+                  },
+                ),
+                if (_error != null)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 2),
+                    child: Text(
+                      _error!,
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: colors.error.base,
                       ),
                     ),
-                ],
+                  ),
+              ],
+            ),
+          ),
+          if (widget.showButtons) ...[
+            const SizedBox(width: 4),
+            GestureDetector(
+              onTap: _submit,
+              child: Icon(
+                OiIcons.check, // check
+                size: 18,
+                color: colors.success.base,
               ),
             ),
-            if (widget.showButtons) ...[
-              const SizedBox(width: 4),
-              GestureDetector(
-                onTap: _submit,
-                child: Icon(
-                  OiIcons.check, // check
-                  size: 18,
-                  color: colors.success.base,
-                ),
+            const SizedBox(width: 2),
+            GestureDetector(
+              onTap: _cancel,
+              child: Icon(
+                OiIcons.x, // close
+                size: 18,
+                color: colors.error.base,
               ),
-              const SizedBox(width: 2),
-              GestureDetector(
-                onTap: _cancel,
-                child: Icon(
-                  OiIcons.x, // close
-                  size: 18,
-                  color: colors.error.base,
-                ),
-              ),
-            ],
+            ),
           ],
-        ),
+        ],
       ),
     );
   }

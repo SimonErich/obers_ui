@@ -10,7 +10,6 @@ import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/models/settings/oi_tabs_settings.dart';
 import 'package:obers_ui/src/primitives/layout/oi_row.dart';
 
-
 /// A single tab entry in an [OiTabs] bar.
 ///
 /// {@category Components}
@@ -117,6 +116,7 @@ class _OiTabsState extends State<OiTabs>
     with OiSettingsMixin<OiTabs, OiTabsSettings> {
   // Track each tab's key so we can measure positions for the pill indicator.
   late List<GlobalKey> _tabKeys;
+  late List<FocusNode> _tabFocusNodes;
 
   /// Resolved driver: explicit widget prop → OiSettingsProvider → null.
   OiSettingsDriver? _resolvedDriver;
@@ -151,6 +151,10 @@ class _OiTabsState extends State<OiTabs>
     _resolvedDriver = widget.settingsDriver;
     super.initState();
     _tabKeys = List.generate(widget.tabs.length, (_) => GlobalKey());
+    _tabFocusNodes = List.generate(
+      widget.tabs.length,
+      (_) => FocusNode(skipTraversal: true),
+    );
   }
 
   @override
@@ -169,7 +173,14 @@ class _OiTabsState extends State<OiTabs>
   void didUpdateWidget(OiTabs oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.tabs.length != widget.tabs.length) {
+      for (final node in _tabFocusNodes) {
+        node.dispose();
+      }
       _tabKeys = List.generate(widget.tabs.length, (_) => GlobalKey());
+      _tabFocusNodes = List.generate(
+        widget.tabs.length,
+        (_) => FocusNode(skipTraversal: true),
+      );
     }
     if (oldWidget.selectedIndex != widget.selectedIndex) {
       updateSettings(
@@ -179,13 +190,23 @@ class _OiTabsState extends State<OiTabs>
     }
   }
 
+  @override
+  void dispose() {
+    for (final node in _tabFocusNodes) {
+      node.dispose();
+    }
+    super.dispose();
+  }
+
   void _handleKey(int index, KeyEvent event) {
     if (event is! KeyDownEvent) return;
     if (event.logicalKey == LogicalKeyboardKey.arrowRight) {
       final next = (index + 1) % widget.tabs.length;
+      _tabFocusNodes[next].requestFocus();
       widget.onSelected(next);
     } else if (event.logicalKey == LogicalKeyboardKey.arrowLeft) {
       final prev = (index - 1 + widget.tabs.length) % widget.tabs.length;
+      _tabFocusNodes[prev].requestFocus();
       widget.onSelected(prev);
     }
   }
@@ -215,8 +236,9 @@ class _OiTabsState extends State<OiTabs>
 
     final bgColor = switch (widget.indicatorStyle) {
       OiTabIndicatorStyle.filled when isSelected => indicatorColor,
-      OiTabIndicatorStyle.filled when isHovered =>
-        colors.textMuted.withValues(alpha: 0.1),
+      OiTabIndicatorStyle.filled when isHovered => colors.textMuted.withValues(
+        alpha: 0.1,
+      ),
       _ => const Color(0x00000000),
     };
 
@@ -224,7 +246,9 @@ class _OiTabsState extends State<OiTabs>
     Widget label = Text(
       tab.label,
       style: baseLabelStyle.copyWith(
-        fontWeight: (isSelected || isHovered) ? FontWeight.w600 : FontWeight.w400,
+        fontWeight: (isSelected || isHovered)
+            ? FontWeight.w600
+            : FontWeight.w400,
         color: textColor,
       ),
     );
@@ -303,15 +327,21 @@ class _OiTabsState extends State<OiTabs>
       );
     }
 
-    return KeyboardListener(
-      focusNode: FocusNode(skipTraversal: true),
-      onKeyEvent: (e) => _handleKey(index, e),
+    return Focus(
+      focusNode: _tabFocusNodes[index],
+      onKeyEvent: (node, event) {
+        _handleKey(index, event);
+        return KeyEventResult.ignored;
+      },
       child: MouseRegion(
         cursor: SystemMouseCursors.click,
         onEnter: (_) => setState(() => _hoveredTabIndices.add(index)),
         onExit: (_) => setState(() => _hoveredTabIndices.remove(index)),
         child: GestureDetector(
-          onTap: () => widget.onSelected(index),
+          onTap: () {
+            _tabFocusNodes[index].requestFocus();
+            widget.onSelected(index);
+          },
           behavior: HitTestBehavior.opaque,
           child: tabContent,
         ),
@@ -329,7 +359,6 @@ class _OiTabsState extends State<OiTabs>
             tabs: widget.tabs,
             selectedIndex: widget.selectedIndex,
             onSelected: widget.onSelected,
-            onKeyEvent: _handleKey,
           )
         : Row(
             mainAxisSize: widget.scrollable
@@ -378,13 +407,11 @@ class _PillTabRow extends StatefulWidget {
     required this.tabs,
     required this.selectedIndex,
     required this.onSelected,
-    required this.onKeyEvent,
   });
 
   final List<OiTabItem> tabs;
   final int selectedIndex;
   final ValueChanged<int> onSelected;
-  final void Function(int, KeyEvent) onKeyEvent;
 
   @override
   State<_PillTabRow> createState() => _PillTabRowState();
@@ -392,23 +419,46 @@ class _PillTabRow extends StatefulWidget {
 
 class _PillTabRowState extends State<_PillTabRow> {
   final List<GlobalKey> _keys = [];
+  final List<FocusNode> _focusNodes = [];
   final Set<int> _hoveredIndices = {};
 
   @override
   void initState() {
     super.initState();
     _keys.addAll(List.generate(widget.tabs.length, (_) => GlobalKey()));
+    _focusNodes.addAll(
+      List.generate(widget.tabs.length, (_) => FocusNode(skipTraversal: true)),
+    );
   }
 
   @override
   void didUpdateWidget(_PillTabRow oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.tabs.length != widget.tabs.length) {
+      for (final node in _focusNodes) {
+        node.dispose();
+      }
       _keys
         ..clear()
         ..addAll(List.generate(widget.tabs.length, (_) => GlobalKey()));
+      _focusNodes
+        ..clear()
+        ..addAll(
+          List.generate(
+            widget.tabs.length,
+            (_) => FocusNode(skipTraversal: true),
+          ),
+        );
       _hoveredIndices.clear();
     }
+  }
+
+  @override
+  void dispose() {
+    for (final node in _focusNodes) {
+      node.dispose();
+    }
+    super.dispose();
   }
 
   @override
@@ -434,7 +484,9 @@ class _PillTabRowState extends State<_PillTabRow> {
         tab.label,
         style: TextStyle(
           fontSize: 14,
-          fontWeight: (isSelected || isHovered) ? FontWeight.w600 : FontWeight.w400,
+          fontWeight: (isSelected || isHovered)
+              ? FontWeight.w600
+              : FontWeight.w400,
           color: textColor,
         ),
       );
@@ -459,16 +511,35 @@ class _PillTabRowState extends State<_PillTabRow> {
 
       final index = i;
       children.add(
-        KeyboardListener(
-          focusNode: FocusNode(skipTraversal: true),
-          onKeyEvent: (e) => widget.onKeyEvent(index, e),
+        Focus(
+          focusNode: _focusNodes[index],
+          onKeyEvent: (node, event) {
+            if (event is! KeyDownEvent) return KeyEventResult.ignored;
+            if (event.logicalKey == LogicalKeyboardKey.arrowRight) {
+              final next = (index + 1) % widget.tabs.length;
+              _focusNodes[next].requestFocus();
+              widget.onSelected(next);
+              return KeyEventResult.handled;
+            }
+            if (event.logicalKey == LogicalKeyboardKey.arrowLeft) {
+              final prev =
+                  (index - 1 + widget.tabs.length) % widget.tabs.length;
+              _focusNodes[prev].requestFocus();
+              widget.onSelected(prev);
+              return KeyEventResult.handled;
+            }
+            return KeyEventResult.ignored;
+          },
           child: MouseRegion(
             cursor: SystemMouseCursors.click,
             onEnter: (_) => setState(() => _hoveredIndices.add(index)),
             onExit: (_) => setState(() => _hoveredIndices.remove(index)),
             child: GestureDetector(
               key: _keys[index],
-              onTap: () => widget.onSelected(index),
+              onTap: () {
+                _focusNodes[index].requestFocus();
+                widget.onSelected(index);
+              },
               behavior: HitTestBehavior.opaque,
               child: AnimatedContainer(
                 duration: animDuration,
