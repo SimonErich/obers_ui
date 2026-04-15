@@ -96,12 +96,11 @@ class _FilterPopoverState extends State<_FilterPopover> {
 
     return Stack(
       children: [
-        // Barrier.
+        // Barrier that dismisses on tap but lets scroll gestures pass through.
         Positioned.fill(
-          child: GestureDetector(
-            behavior: HitTestBehavior.opaque,
-            onTap: widget.onClose,
-            child: const SizedBox.expand(),
+          child: Listener(
+            behavior: HitTestBehavior.translucent,
+            onPointerDown: (_) => widget.onClose(),
           ),
         ),
         // Dropdown positioned below the chip.

@@ -8,7 +8,6 @@ import 'package:obers_ui/src/foundation/persistence/oi_settings_provider.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme_scope.dart';
 import 'package:obers_ui/src/models/settings/oi_accordion_settings.dart';
-import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
 
 /// A single section within an [OiAccordion].
 ///
@@ -238,9 +237,12 @@ class _OiAccordionState extends State<OiAccordion>
                     decoration: BoxDecoration(
                       color: section.headerBackgroundColor,
                     ),
-                    child: OiTappable(
-                      onTap: () => _toggle(i),
-                      child: Padding(
+                    child: MouseRegion(
+                      cursor: SystemMouseCursors.click,
+                      child: GestureDetector(
+                        behavior: HitTestBehavior.opaque,
+                        onTap: () => _toggle(i),
+                        child: Padding(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 16,
                           vertical: 14,
@@ -276,6 +278,7 @@ class _OiAccordionState extends State<OiAccordion>
                         ),
                       ),
                     ),
+                  ),
                   ),
                   SizeTransition(
                     sizeFactor: _animations[i],

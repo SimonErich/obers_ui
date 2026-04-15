@@ -656,6 +656,7 @@ class _OiComboBoxState<T> extends State<OiComboBox<T>> {
     return OiFloating(
       visible: _open,
       anchor: anchor,
+      onDismiss: _closeDropdown,
       child: _buildDropdown(context),
     );
   }

@@ -132,7 +132,11 @@ class _OiSwipeableState extends State<OiSwipeable> {
         children: [
           // Action background layer.
           if (showLeading)
-            Positioned.fill(
+            Positioned(
+              top: 0,
+              bottom: 0,
+              left: 0,
+              width: _dragOffset.abs(),
               child: Row(
                 children: widget.leadingActions
                     .map(
@@ -150,9 +154,12 @@ class _OiSwipeableState extends State<OiSwipeable> {
               ),
             ),
           if (showTrailing)
-            Positioned.fill(
+            Positioned(
+              top: 0,
+              bottom: 0,
+              right: 0,
+              width: _dragOffset.abs(),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
                 children: widget.trailingActions
                     .map(
                       (action) => Expanded(

@@ -44,6 +44,10 @@ class OiOverlayHandle {
 
   bool _dismissed = false;
 
+  /// Callback invoked when the handle is dismissed, used by the service
+  /// to eagerly remove the handle from its tracking lists.
+  VoidCallback? _onDismiss;
+
   /// Whether this overlay has been dismissed.
   bool get isDismissed => _dismissed;
 
@@ -51,6 +55,8 @@ class OiOverlayHandle {
   void dismiss() {
     if (_dismissed) return;
     _dismissed = true;
+    _onDismiss?.call();
+    _onDismiss = null;
     _entry
       ..remove()
       ..dispose();
@@ -75,10 +81,16 @@ class OiOverlaysService {
 
   OverlayState? _overlayState;
   final List<OiOverlayHandle> _activeHandles = [];
+  final List<OiOverlayHandle> _scrollDismissHandles = [];
 
   /// Shows a custom overlay widget above all content.
   ///
   /// The [label] is announced by screen readers when the overlay appears.
+  ///
+  /// When [dismissOnScroll] is `true`, the overlay is automatically dismissed
+  /// when any scrollable in the content tree scrolls. This is appropriate for
+  /// lightweight overlays like dropdowns and context menus, but not for modal
+  /// dialogs or persistent notifications.
   ///
   /// Returns an [OiOverlayHandle] that can be used to dismiss or update
   /// the overlay.
@@ -87,6 +99,7 @@ class OiOverlaysService {
     required WidgetBuilder builder,
     OiOverlayZOrder zOrder = OiOverlayZOrder.base,
     bool dismissible = true,
+    bool dismissOnScroll = false,
     VoidCallback? onDismiss,
   }) {
     assert(_overlayState != null, 'OiOverlays not attached to OverlayState');
@@ -100,15 +113,15 @@ class OiOverlaysService {
         if (dismissible) {
           content = Stack(
             children: [
-              // Invisible dismiss barrier
+              // Barrier that dismisses on tap but lets scroll gestures
+              // pass through so the background can still scroll.
               Positioned.fill(
-                child: GestureDetector(
+                child: Listener(
                   behavior: HitTestBehavior.translucent,
-                  onTap: () {
+                  onPointerDown: (_) {
                     onDismiss?.call();
                     handle.dismiss();
                   },
-                  child: const SizedBox.expand(),
                 ),
               ),
               builder(context),
@@ -128,18 +141,33 @@ class OiOverlaysService {
 
     handle = OiOverlayHandle._(entry);
     _activeHandles.add(handle);
+    if (dismissOnScroll) _scrollDismissHandles.add(handle);
+    handle._onDismiss = () {
+      _activeHandles.remove(handle);
+      _scrollDismissHandles.remove(handle);
+    };
     _overlayState!.insert(entry);
 
     return handle;
   }
 
+  /// Called by the overlay host when a scroll notification is detected
+  /// in the content tree. Dismisses all overlays that opted into
+  /// [dismissOnScroll].
+  void _handleContentScroll() {
+    // Copy the list — dismiss() mutates _scrollDismissHandles via _onDismiss.
+    final handles = List<OiOverlayHandle>.of(_scrollDismissHandles);
+    for (final h in handles) {
+      h.dismiss();
+    }
+  }
+
   /// Dismisses all active overlays.
   void dismissAll() {
-    // Copy list to avoid modification during iteration
+    // Copy the list — dismiss() mutates _activeHandles via _onDismiss.
     for (final h in List<OiOverlayHandle>.of(_activeHandles)) {
       h.dismiss();
     }
-    _activeHandles.removeWhere((h) => h.isDismissed);
   }
 }
 
@@ -201,7 +229,20 @@ class _OiOverlaysHostState extends State<_OiOverlaysHost> {
   void initState() {
     super.initState();
     _overlayKey = GlobalKey<OverlayState>(debugLabel: 'OiOverlaysHost');
-    _contentEntry = OverlayEntry(builder: (_) => widget.child);
+    _contentEntry = OverlayEntry(
+      builder: (_) => NotificationListener<ScrollNotification>(
+        onNotification: _onScrollNotification,
+        child: widget.child,
+      ),
+    );
+  }
+
+  bool _onScrollNotification(ScrollNotification notification) {
+    if (notification is ScrollStartNotification) {
+      widget.service._handleContentScroll();
+    }
+    // Don't consume — let the notification continue bubbling.
+    return false;
   }
 
   @override

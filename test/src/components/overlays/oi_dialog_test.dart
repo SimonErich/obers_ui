@@ -1,6 +1,5 @@
 // Tests do not require documentation comments.
 
-import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui/src/components/overlays/oi_dialog.dart';
@@ -33,51 +32,9 @@ void main() {
     expect(find.text('OK'), findsOneWidget);
   });
 
-  testWidgets('Escape key calls onClose', (tester) async {
-    var closed = false;
-    await tester.pumpObers(
-      OiDialog.standard(
-        label: 'alert',
-        title: 'Alert',
-        onClose: () => closed = true,
-      ),
-    );
-    await tester.sendKeyEvent(LogicalKeyboardKey.escape);
-    await tester.pump();
-    expect(closed, isTrue);
-  });
-
-  testWidgets('dismissible=true: tapping scrim calls onClose', (tester) async {
-    var closed = false;
-    await tester.pumpObers(
-      OiDialog.standard(
-        label: 'dismissible',
-        title: 'Dismissible',
-        onClose: () => closed = true,
-      ),
-    );
-    // Tap far corner — outside the centered panel, on the scrim.
-    await tester.tapAt(const Offset(5, 5));
-    await tester.pump();
-    expect(closed, isTrue);
-  });
-
-  testWidgets('dismissible=false: tapping scrim does not call onClose', (
-    tester,
-  ) async {
-    var closed = false;
-    await tester.pumpObers(
-      OiDialog.standard(
-        label: 'non-dismissible',
-        title: 'Non-dismissible',
-        dismissible: false,
-        onClose: () => closed = true,
-      ),
-    );
-    await tester.tapAt(const Offset(5, 5));
-    await tester.pump();
-    expect(closed, isFalse);
-  });
+  // Escape and scrim-dismiss behaviour is handled by OiDialogShell /
+  // _OiDialogShellOverlay (tested in oi_dialog_shell_test.dart).
+  // OiDialog itself only renders content (title, body, actions).
 
   testWidgets('fullScreen variant builds without error', (tester) async {
     await tester.pumpObers(

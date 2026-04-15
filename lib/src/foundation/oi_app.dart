@@ -1,5 +1,7 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
-import 'package:flutter/services.dart' show SystemUiOverlayStyle;
+import 'package:flutter/services.dart' show BrowserContextMenu, SystemUiOverlayStyle;
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/inputs/oi_select_scope.dart';
 import 'package:obers_ui/src/foundation/oi_accessibility.dart';
@@ -221,6 +223,7 @@ class _OiAppState extends State<OiApp> {
   @override
   void initState() {
     super.initState();
+    if (kIsWeb) unawaited(BrowserContextMenu.disableContextMenu());
     _undoStack = OiUndoStack(maxHistory: widget.undoStackMaxHistory);
     _overlaysService = createOiOverlaysService();
   }

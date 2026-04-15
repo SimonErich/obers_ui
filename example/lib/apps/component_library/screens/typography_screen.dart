@@ -327,11 +327,8 @@ class _TypographyScreenState extends State<TypographyScreen> {
                     children: [
                       const OiLabel.body('Hello, ObersUI!'),
                       SizedBox(width: spacing.sm),
-                      OiLabel.small(
-                        _copied ? '(copied!)' : '(tap to copy)',
-                        color: _copied
-                            ? colors.success.base
-                            : colors.textMuted,
+                      OiButton.ghost(
+                        label: _copied ? '(copied!)' : '(tap to copy)',
                       ),
                     ],
                   ),
