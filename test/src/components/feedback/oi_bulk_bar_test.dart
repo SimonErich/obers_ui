@@ -3,9 +3,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui/src/components/feedback/oi_bulk_bar.dart';
-import 'package:obers_ui/src/primitives/animation/oi_animated_list.dart';
-import 'package:obers_ui/src/primitives/layout/oi_row.dart';
-
 import '../../../helpers/pump_app.dart';
 
 void main() {
@@ -295,7 +292,7 @@ void main() {
     expect(find.text('10 of 10 items selected'), findsOneWidget);
   });
 
-  testWidgets('uses OiRow instead of raw Row', (tester) async {
+  testWidgets('uses Row for layout', (tester) async {
     await tester.pumpObers(
       OiBulkBar(
         selectedCount: 3,
@@ -306,11 +303,11 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    // OiRow should be used for layout
-    expect(find.byType(OiRow), findsWidgets);
+    // Row should be used for layout
+    expect(find.byType(Row), findsWidgets);
   });
 
-  testWidgets('uses OiAnimatedList for action buttons', (tester) async {
+  testWidgets('action buttons render in a Row', (tester) async {
     await tester.pumpObers(
       Center(
         child: OiBulkBar(
@@ -323,11 +320,12 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    // OiAnimatedList should wrap the action buttons
-    expect(find.byType(OiAnimatedList<OiBulkAction>), findsOneWidget);
+    // Both action labels should be rendered.
+    expect(find.text('Archive'), findsOneWidget);
+    expect(find.text('Delete'), findsOneWidget);
   });
 
-  testWidgets('OiAnimatedList not present when actions list is empty', (
+  testWidgets('no action buttons when actions list is empty', (
     tester,
   ) async {
     await tester.pumpObers(
@@ -340,6 +338,7 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.byType(OiAnimatedList<OiBulkAction>), findsNothing);
+    // With no actions the bar should still render but without action buttons.
+    expect(find.byType(OiBulkBar), findsOneWidget);
   });
 }

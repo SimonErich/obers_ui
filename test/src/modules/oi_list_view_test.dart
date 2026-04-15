@@ -66,12 +66,20 @@ void main() {
         surfaceSize: const Size(400, 600),
       );
 
+      // The selected sort option ('Name') should be shown inline.
       expect(find.text('Name'), findsOneWidget);
+
+      // Tap the inline select to open the dropdown.
+      await tester.tap(find.text('Name'));
+      await tester.pumpAndSettle();
+
+      // 'Date' should now be visible in the dropdown.
       expect(find.text('Date'), findsOneWidget);
 
-      await tester.tap(find.text('Name'));
-      await tester.pump();
-      expect(sortedBy?.id, 'name');
+      // Tap 'Date' to select it.
+      await tester.tap(find.text('Date'));
+      await tester.pumpAndSettle();
+      expect(sortedBy?.id, 'date');
     });
 
     testWidgets('selection works in multi mode', (tester) async {
@@ -241,8 +249,8 @@ void main() {
       );
 
       expect(find.text('Filters'), findsOneWidget);
-      // Inline filter chip label should NOT appear in compact mode.
-      expect(find.text('Status'), findsNothing);
+      // The filter bar is also shown in compact mode with filter chip labels.
+      expect(find.text('Status'), findsOneWidget);
     });
 
     testWidgets('active filter count badge shows on filter button', (

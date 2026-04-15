@@ -808,7 +808,7 @@ class ModulesScreen extends StatelessWidget {
                     versions: [
                       OiVersionEntry(
                         version: '2.1.0',
-                        isLatest: true,
+                        latest: true,
                         date: DateTime(2026, 3, 28),
                         changes: const [
                           OiChangeEntry(

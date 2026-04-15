@@ -71,7 +71,7 @@ mixin _MenuPanelKeyboardMixin on State<_MenuPanel> {
     } else if (key == LogicalKeyboardKey.arrowRight) {
       _openKeyboardSubMenuForFocusedItem();
     } else if (key == LogicalKeyboardKey.arrowLeft) {
-      if (widget.isSubMenu) {
+      if (widget.subMenu) {
         widget.onCloseSubMenu?.call();
       }
     } else if (key == LogicalKeyboardKey.enter ||

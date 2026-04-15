@@ -100,17 +100,17 @@ void main() {
       await tester.pump(const Duration(milliseconds: 300));
 
       // Initially collapsed.
-      expect(controller.isExpanded('build'), isFalse);
+      expect(controller.expanded('build'), isFalse);
 
       controller.expandGroup('build');
       await tester.pump(const Duration(milliseconds: 300));
 
-      expect(controller.isExpanded('build'), isTrue);
+      expect(controller.expanded('build'), isTrue);
 
       controller.collapseAll();
       await tester.pump(const Duration(milliseconds: 300));
 
-      expect(controller.isExpanded('build'), isFalse);
+      expect(controller.expanded('build'), isFalse);
     });
 
     testWidgets('onItemTap fires with correct item', (tester) async {

@@ -5,13 +5,13 @@ class _MenuPanel extends StatefulWidget {
     required this.items,
     required this.onClose,
     this.onCloseSubMenu,
-    this.isSubMenu = false,
+    this.subMenu = false,
   });
 
   final List<OiMenuItem> items;
   final VoidCallback onClose;
   final VoidCallback? onCloseSubMenu;
-  final bool isSubMenu;
+  final bool subMenu;
 
   @override
   State<_MenuPanel> createState() => _MenuPanelState();

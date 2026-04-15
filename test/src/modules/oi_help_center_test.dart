@@ -86,14 +86,14 @@ void main() {
       );
 
       // Answer should not be visible initially.
-      expect(find.byType(OiMarkdown), findsNothing);
+      expect(find.byType(OiMarkdown).hitTestable(), findsNothing);
 
       // Tap the first question.
       await tester.tap(find.text('How do I reset my password?'));
       await tester.pumpAndSettle();
 
       // OiMarkdown should now be visible with the answer.
-      expect(find.byType(OiMarkdown), findsOneWidget);
+      expect(find.byType(OiMarkdown).hitTestable(), findsOneWidget);
     });
 
     testWidgets('contact form renders fields', (tester) async {

@@ -98,11 +98,11 @@ class OiStepper extends StatelessWidget {
   Widget _buildStep(BuildContext context, int index) {
     return _OiStepCircle(
       index: index,
-      isCurrent: index == currentStep,
-      isCompleted: completedSteps.contains(index),
-      isError: errorSteps.contains(index),
-      isEnabled: _isStepEnabled(index),
-      isDisabled: enabledSteps != null && !enabledSteps!.contains(index),
+      current: index == currentStep,
+      completed: completedSteps.contains(index),
+      errored: errorSteps.contains(index),
+      enabled: _isStepEnabled(index),
+      disabled: enabledSteps != null && !enabledSteps!.contains(index),
       icon: stepIcons != null && index < stepIcons!.length
           ? stepIcons![index]
           : null,
@@ -252,21 +252,21 @@ class OiStepper extends StatelessWidget {
 class _OiStepCircle extends StatefulWidget {
   const _OiStepCircle({
     required this.index,
-    required this.isCurrent,
-    required this.isCompleted,
-    required this.isError,
-    required this.isEnabled,
-    required this.isDisabled,
+    required this.current,
+    required this.completed,
+    required this.errored,
+    required this.enabled,
+    required this.disabled,
     this.icon,
     this.onTap,
   });
 
   final int index;
-  final bool isCurrent;
-  final bool isCompleted;
-  final bool isError;
-  final bool isEnabled;
-  final bool isDisabled;
+  final bool current;
+  final bool completed;
+  final bool errored;
+  final bool enabled;
+  final bool disabled;
   final IconData? icon;
   final VoidCallback? onTap;
 
@@ -282,26 +282,26 @@ class _OiStepCircleState extends State<_OiStepCircle> {
   static const _circleSize = 28.0;
 
   Color _borderColor(OiColorScheme colors) {
-    if (widget.isDisabled) return colors.borderSubtle;
-    if (widget.isError) return colors.error.base;
-    if (widget.isCompleted) return colors.success.base;
+    if (widget.disabled) return colors.borderSubtle;
+    if (widget.errored) return colors.error.base;
+    if (widget.completed) return colors.success.base;
     if (_hovered) return colors.primary.base;
-    if (widget.isCurrent) return colors.primary.base;
+    if (widget.current) return colors.primary.base;
     return colors.borderSubtle;
   }
 
   Color _fillColor(OiColorScheme colors) {
-    if (widget.isDisabled) return colors.surface;
-    if (widget.isError) return colors.error.base;
-    if (widget.isCompleted) return colors.success.base;
-    if (widget.isCurrent) return colors.primary.base;
+    if (widget.disabled) return colors.surface;
+    if (widget.errored) return colors.error.base;
+    if (widget.completed) return colors.success.base;
+    if (widget.current) return colors.primary.base;
     if (_hovered) return colors.primary.base.withValues(alpha: 0.2);
     return colors.surface;
   }
 
   Color _contentColor(OiColorScheme colors) {
-    if (widget.isDisabled) return colors.textMuted;
-    if (widget.isError || widget.isCompleted || widget.isCurrent) {
+    if (widget.disabled) return colors.textMuted;
+    if (widget.errored || widget.completed || widget.current) {
       return colors.textOnPrimary;
     }
     if (_hovered) return colors.primary.base;
@@ -310,10 +310,10 @@ class _OiStepCircleState extends State<_OiStepCircle> {
 
   Widget? _buildIcon(OiColorScheme colors) {
     final color = _contentColor(colors);
-    if (widget.isError) {
+    if (widget.errored) {
       return Icon(_errorIcon, size: 14, color: color);
     }
-    if (widget.isCompleted) {
+    if (widget.completed) {
       return Icon(_checkIcon, size: 14, color: color);
     }
     if (widget.icon != null) {
@@ -350,7 +350,7 @@ class _OiStepCircleState extends State<_OiStepCircle> {
       ),
     );
 
-    if (widget.isEnabled) {
+    if (widget.enabled) {
       circle = MouseRegion(
         cursor: SystemMouseCursors.click,
         onEnter: (_) => setState(() => _hovered = true),

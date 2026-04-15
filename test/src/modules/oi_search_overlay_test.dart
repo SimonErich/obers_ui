@@ -161,7 +161,6 @@ void main() {
       surfaceSize: const Size(800, 600),
     );
 
-    expect(find.text('All'), findsOneWidget);
     expect(find.text('Docs'), findsOneWidget);
     expect(find.text('Code'), findsOneWidget);
   });

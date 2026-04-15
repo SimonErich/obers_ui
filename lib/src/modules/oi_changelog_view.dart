@@ -60,7 +60,7 @@ class OiVersionEntry {
     required this.version,
     required this.changes,
     this.date,
-    this.isLatest = false,
+    this.latest = false,
     this.summary,
   });
 
@@ -74,7 +74,7 @@ class OiVersionEntry {
   final DateTime? date;
 
   /// Whether this is the latest/current version.
-  final bool isLatest;
+  final bool latest;
 
   /// Optional summary text for the version.
   final String? summary;
@@ -217,7 +217,7 @@ class _OiChangelogViewState extends State<OiChangelogView> {
             version: version.version,
             changes: changes,
             date: version.date,
-            isLatest: version.isLatest,
+            latest: version.latest,
             summary: version.summary,
           );
         })
@@ -381,7 +381,7 @@ class _OiChangelogViewState extends State<OiChangelogView> {
               crossAxisAlignment: WrapCrossAlignment.center,
               children: [
                 OiLabel.h3(version.version),
-                if (version.isLatest)
+                if (version.latest)
                   Container(
                     padding: EdgeInsets.symmetric(
                       horizontal: spacing.sm,

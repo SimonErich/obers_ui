@@ -10,7 +10,7 @@ void main() {
   final sampleVersions = [
     OiVersionEntry(
       version: '2.1.0',
-      isLatest: true,
+      latest: true,
       date: DateTime(2026, 3, 15),
       changes: const [
         OiChangeEntry(

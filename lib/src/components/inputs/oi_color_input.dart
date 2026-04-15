@@ -173,7 +173,7 @@ class _OiColorInputState extends State<OiColorInput> {
                   _colorToHex(widget.value!) == _colorToHex(c);
               return _ColorSwatch(
                 color: c,
-                isSelected: isSelected,
+                selected: isSelected,
                 onTap: () => _selectPreset(c),
               );
             }).toList(),
@@ -277,12 +277,12 @@ class _OiColorInputState extends State<OiColorInput> {
 class _ColorSwatch extends StatefulWidget {
   const _ColorSwatch({
     required this.color,
-    required this.isSelected,
+    required this.selected,
     required this.onTap,
   });
 
   final Color color;
-  final bool isSelected;
+  final bool selected;
   final VoidCallback onTap;
 
   @override
@@ -295,7 +295,7 @@ class _ColorSwatchState extends State<_ColorSwatch> {
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
-    final highlighted = _hovered || widget.isSelected;
+    final highlighted = _hovered || widget.selected;
 
     return MouseRegion(
       cursor: SystemMouseCursors.click,

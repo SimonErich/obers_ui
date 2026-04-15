@@ -3,8 +3,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui/src/components/inputs/oi_color_palette_picker.dart';
-import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
-
 import '../../../helpers/pump_app.dart';
 
 void main() {
@@ -41,9 +39,18 @@ void main() {
         onSlotChanged: (_, _) {},
       ),
     );
-    // Each slot gets an OiTappable wrapper.
-    // There should be at least 3 tappable widgets for the 3 slots.
-    expect(find.byType(OiTappable), findsAtLeast(3));
+    // Each slot gets a Semantics button wrapper with the slot label.
+    expect(
+      find.byWidgetPredicate(
+        (w) =>
+            w is Semantics &&
+            (w.properties.button ?? false) &&
+            (w.properties.label == 'Primary' ||
+                w.properties.label == 'Accent' ||
+                w.properties.label == 'Background'),
+      ),
+      findsNWidgets(3),
+    );
   });
 
   testWidgets('filled slot shows colored circle', (tester) async {

@@ -66,10 +66,10 @@ void main() {
     );
 
     // The ring indicator container has a border with the custom color.
-    final container = tester.widget<Container>(
+    final box = tester.widget<DecoratedBox>(
       find.byKey(const Key('oi_live_ring_indicator')),
     );
-    final decoration = container.decoration! as BoxDecoration;
+    final decoration = box.decoration as BoxDecoration;
     final border = decoration.border! as Border;
     expect(border.top.color, customColor);
   });

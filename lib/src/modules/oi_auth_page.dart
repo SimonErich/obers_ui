@@ -386,8 +386,7 @@ class _OiAuthPageState extends State<OiAuthPage> {
     VoidCallback onTap, {
     String? prefix,
   }) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
+    return Wrap(
       children: [
         if (prefix != null) OiLabel.body(prefix),
         GestureDetector(
