@@ -295,18 +295,18 @@ class _OiSettingsPageState extends State<OiSettingsPage> {
   Widget _buildGroupHeader(
     BuildContext context,
     OiSettingsGroup group,
-    bool isExpanded,
+    bool expanded,
   ) {
     final colors = context.colors;
     final spacing = context.spacing;
 
     return OiTappable(
       semanticLabel:
-          '${group.title} settings group, ${isExpanded ? 'expanded' : 'collapsed'}',
+          '${group.title} settings group, ${expanded ? 'expanded' : 'collapsed'}',
       clipBorderRadius: context.radius.sm,
       onTap: () {
         setState(() {
-          if (isExpanded) {
+          if (expanded) {
             _expandedGroups.remove(group.key);
           } else {
             _expandedGroups.add(group.key);
@@ -351,7 +351,7 @@ class _OiSettingsPageState extends State<OiSettingsPage> {
                 ),
               ),
             Icon(
-              isExpanded ? OiIcons.chevronUp : OiIcons.chevronDown,
+              expanded ? OiIcons.chevronUp : OiIcons.chevronDown,
               size: 18,
               color: colors.textMuted,
             ),

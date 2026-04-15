@@ -4,22 +4,22 @@ part of '../oi_chat_window.dart';
 
 Color _messageBubbleTextColor(
   OiChatWindowMessage message,
-  bool isUser,
+  bool fromUser,
   OiColorScheme colors,
 ) {
-  if (isUser && !message.error) return colors.textOnPrimary;
+  if (fromUser && !message.error) return colors.textOnPrimary;
   return colors.text;
 }
 
 BoxDecoration _messageBubbleDecoration(
   OiChatWindowMessage message,
-  bool isUser,
+  bool fromUser,
   OiColorScheme colors,
   OiRadiusScale radius,
 ) {
   final bubbleColor = message.error
       ? colors.surfaceHover
-      : isUser
+      : fromUser
       ? colors.primary.base
       : colors.surfaceHover;
   return BoxDecoration(
@@ -202,7 +202,7 @@ extension _OiChatWindowMessages on _OiChatWindowState {
   Widget? _buildMessageAttachmentsRow(
     BuildContext context,
     OiChatWindowMessage message,
-    bool isUser,
+    bool fromUser,
   ) {
     if (message.attachments == null || message.attachments!.isEmpty) {
       return null;
@@ -215,7 +215,7 @@ extension _OiChatWindowMessages on _OiChatWindowState {
       child: Wrap(
         spacing: spacing.xs,
         runSpacing: spacing.xs,
-        alignment: isUser ? WrapAlignment.end : WrapAlignment.start,
+        alignment: fromUser ? WrapAlignment.end : WrapAlignment.start,
         children: message.attachments!.map((a) {
           if (a.thumbnailUrl != null) {
             return ClipRRect(
@@ -283,7 +283,7 @@ extension _OiChatWindowMessages on _OiChatWindowState {
   Widget _buildMessageHoverActions(
     BuildContext context,
     OiChatWindowMessage message,
-    bool isUser,
+    bool fromUser,
   ) {
     final colors = context.colors;
 
@@ -303,7 +303,7 @@ extension _OiChatWindowMessages on _OiChatWindowState {
             ),
           ),
         ),
-        if (!isUser && widget.onMessageReaction != null) ...[
+        if (!fromUser && widget.onMessageReaction != null) ...[
           OiTooltip(
             label: 'Good response',
             message: 'Good response',
@@ -335,7 +335,7 @@ extension _OiChatWindowMessages on _OiChatWindowState {
             ),
           ),
         ],
-        if (isUser && widget.onMessageEdit != null)
+        if (fromUser && widget.onMessageEdit != null)
           OiTooltip(
             label: 'Edit message',
             message: 'Edit message',

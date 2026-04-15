@@ -478,7 +478,7 @@ class _OiPricingTableState extends State<OiPricingTable> {
           context,
           label: '',
           cells: widget.plans.map((p) => p.name).toList(),
-          isHeader: true,
+          header: true,
         ),
         const OiDivider(),
         SizedBox(height: sp.xs),
@@ -509,7 +509,7 @@ class _OiPricingTableState extends State<OiPricingTable> {
     BuildContext context, {
     required String label,
     required List<Object?> cells,
-    bool isHeader = false,
+    bool header = false,
   }) {
     final sp = context.spacing;
 
@@ -520,14 +520,14 @@ class _OiPricingTableState extends State<OiPricingTable> {
           // Feature label column (takes ~40% of width).
           Expanded(
             flex: 2,
-            child: isHeader ? const SizedBox.shrink() : OiLabel.small(label),
+            child: header ? const SizedBox.shrink() : OiLabel.small(label),
           ),
 
           // Plan value columns.
           ...cells.map(
             (cell) => Expanded(
               child: Center(
-                child: _buildCellContent(context, cell, isHeader: isHeader),
+                child: _buildCellContent(context, cell, header: header),
               ),
             ),
           ),
@@ -539,11 +539,11 @@ class _OiPricingTableState extends State<OiPricingTable> {
   Widget _buildCellContent(
     BuildContext context,
     Object? value, {
-    bool isHeader = false,
+    bool header = false,
   }) {
     final colors = context.colors;
 
-    if (isHeader) {
+    if (header) {
       return OiLabel.small(
         value?.toString() ?? '',
         textAlign: TextAlign.center,
