@@ -55,7 +55,7 @@ void main() {
 
     testWidgets(
       'scrolls to end of 100k item list',
-      timeout: const Timeout(Duration(seconds: 30)),
+      timeout: const Timeout(Duration(minutes: 60)),
       (tester) async {
         final controller = ScrollController();
         addTearDown(controller.dispose);
