@@ -1,4 +1,7 @@
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/src/components/buttons/oi_icon_button.dart';
+import 'package:obers_ui/src/components/inputs/oi_text_input.dart';
 import 'package:obers_ui/src/components/navigation/oi_emoji_picker.dart';
 import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_spacing_scale.dart';
@@ -224,6 +227,18 @@ class _OiChatState extends State<OiChat> {
     _controller.clear();
   }
 
+  Future<void> _handleAttach() async {
+    final result = await FilePicker.platform.pickFiles(allowMultiple: true);
+    if (result == null || result.files.isEmpty) return;
+    final files = result.files.map((f) {
+      return OiFileData(
+        name: f.name,
+        size: f.size,
+      );
+    }).toList();
+    widget.onAttach?.call(files);
+  }
+
   String _formatTime(DateTime dt) {
     final h = dt.hour.toString().padLeft(2, '0');
     final m = dt.minute.toString().padLeft(2, '0');
@@ -303,31 +318,24 @@ class _OiChatState extends State<OiChat> {
                 border: Border(top: BorderSide(color: colors.borderSubtle)),
               ),
               child: Row(
+                crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   if (widget.enableAttachments) ...[
-                    Semantics(
-                      button: true,
-                      label: 'Attach file',
-                      child: OiTappable(
-                        onTap: () => widget.onAttach?.call(const []),
-                        child: Padding(
-                          padding: EdgeInsets.only(right: spacing.xs),
-                          child: Icon(
-                            OiIcons.paperclip,
-                            size: 22,
-                            color: colors.textSubtle,
-                          ),
-                        ),
+                    Padding(
+                      padding: EdgeInsets.only(right: spacing.xs),
+                      child: OiIconButton(
+                        icon: OiIcons.paperclip,
+                        semanticLabel: 'Attach file',
+                        onTap: _handleAttach,
                       ),
                     ),
                   ],
                   Expanded(
-                    child: EditableText(
+                    child: OiTextInput(
                       controller: _controller,
+                      placeholder: 'Type a message\u2026',
+                      onSubmitted: (_) => _handleSend(),
                       focusNode: _inputFocusNode,
-                      style: TextStyle(color: colors.text, fontSize: 14),
-                      cursorColor: colors.primary.base,
-                      backgroundCursorColor: colors.surfaceHover,
                     ),
                   ),
                   SizedBox(width: spacing.sm),

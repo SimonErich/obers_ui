@@ -2,11 +2,13 @@ import 'dart:async';
 
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/src/foundation/oi_responsive.dart';
 import 'package:obers_ui/src/foundation/persistence/oi_settings_driver.dart';
 import 'package:obers_ui/src/foundation/persistence/oi_settings_mixin.dart';
 import 'package:obers_ui/src/foundation/persistence/oi_settings_provider.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/models/settings/oi_tabs_settings.dart';
+import 'package:obers_ui/src/primitives/layout/oi_row.dart';
 
 /// A single tab entry in an [OiTabs] bar.
 ///
@@ -556,6 +558,10 @@ class _PillTabRowState extends State<_PillTabRow> {
         ),
       );
     }
-    return Row(mainAxisSize: MainAxisSize.min, children: children);
+    return OiRow(
+      breakpoint: context.breakpoint,
+      gap: const OiResponsive<double>(4),
+      children: children,
+    );
   }
 }

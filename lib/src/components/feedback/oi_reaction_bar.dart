@@ -2,6 +2,8 @@ import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
 import 'package:obers_ui/src/primitives/overlay/oi_floating.dart';
+import 'package:obers_ui/src/primitives/layout/oi_row.dart';
+import 'package:obers_ui/src/foundation/oi_responsive.dart';
 
 /// Data for a single emoji reaction chip.
 ///
@@ -194,8 +196,9 @@ class _OiReactionBarState extends State<OiReactionBar> {
           : const SizedBox.shrink(),
     );
 
-    return Row(
-      mainAxisSize: MainAxisSize.min,
+    return OiRow(
+      breakpoint: context.breakpoint,
+      gap: OiResponsive<double>(context.spacing.xs),
       children: [
         ...widget.reactions.map(chip),
         if (widget.reactions.isNotEmpty) const SizedBox(width: 4),

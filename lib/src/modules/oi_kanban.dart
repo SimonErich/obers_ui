@@ -478,7 +478,7 @@ class _OiKanbanState<T> extends State<OiKanban<T>>
             ? () => _toggleCollapse(column.key)
             : null,
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
           decoration: BoxDecoration(
             color: column.color?.withValues(alpha: 0.1),
             borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),

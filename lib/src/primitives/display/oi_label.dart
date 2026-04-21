@@ -586,7 +586,11 @@ class OiLabel extends StatelessWidget {
 
     // Apply theme text color when no explicit color is set and the text style
     // doesn't include one, so labels render correctly in both light and dark mode.
-    final effectiveColor = color ?? style.color ?? context.colors.text;
+    // Links default to the primary color rather than the standard text color.
+    final defaultColor = variant == OiLabelVariant.link
+        ? context.colors.primary.base
+        : context.colors.text;
+    final effectiveColor = color ?? style.color ?? defaultColor;
 
     if (effectiveColor != style.color ||
         decoration != null ||
@@ -707,9 +711,12 @@ class _OiLinkHoverState extends State<_OiLinkHover> {
       onEnter: (_) => setState(() => _hovered = true),
       onExit: (_) => setState(() => _hovered = false),
       child: AnimatedDefaultTextStyle(
-        duration: const Duration(milliseconds: 150),
+        duration: const Duration(milliseconds: 100),
+        curve: Curves.easeOut,
         style: widget.style.copyWith(
           color: _hovered ? hoverColor : baseColor,
+          decoration:
+              _hovered ? TextDecoration.underline : TextDecoration.none,
           decorationColor: _hovered ? hoverColor : baseColor,
         ),
         child: Text(

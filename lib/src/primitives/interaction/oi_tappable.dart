@@ -208,10 +208,21 @@ class _OiTappableState extends State<OiTappable> {
     // ignore: omit_local_variable_types
     Widget content = widget.child;
 
-    // Background overlay for the current state.
-    if (style.backgroundOverlay.a > 0) {
+    // Background overlay for the current state — always in the tree so
+    // AnimatedOpacity can smoothly transition it in and out.
+    {
+      final overlayColor = style.backgroundOverlay;
+      final showOverlay = overlayColor.a > 0;
       Widget overlay = IgnorePointer(
-        child: ColoredBox(color: style.backgroundOverlay),
+        child: AnimatedOpacity(
+          opacity: showOverlay ? 1.0 : 0.0,
+          duration: reducedMotion ? Duration.zero : animations.fast,
+          child: ColoredBox(
+            color: showOverlay
+                ? overlayColor
+                : effects.hover.backgroundOverlay,
+          ),
+        ),
       );
       if (widget.clipBorderRadius != null) {
         overlay = ClipRRect(

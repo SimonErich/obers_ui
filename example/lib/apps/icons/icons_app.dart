@@ -62,7 +62,7 @@ class _IconsAppState extends State<IconsApp> {
                 ),
                 SizedBox(height: spacing.sm),
                 SizedBox(
-                  height: 36,
+                  height: 44,
                   child: ListView(
                     scrollDirection: Axis.horizontal,
                     children: [
@@ -194,10 +194,13 @@ class _CategoryChip extends StatelessWidget {
     final colors = context.colors;
     final radius = context.radius;
 
-    return OiTappable(
-      semanticLabel: '$label category filter',
-      onTap: onTap,
-      child: Container(
+    return Align(
+      alignment: Alignment.topCenter,
+      child: OiTappable(
+        semanticLabel: '$label category filter',
+        onTap: onTap,
+        clipBorderRadius: radius.full,
+        child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(
           color: selected ? colors.primary.base : colors.surfaceHover,
@@ -210,6 +213,7 @@ class _CategoryChip extends StatelessWidget {
           label,
           color: selected ? colors.primary.foreground : colors.textSubtle,
         ),
+      ),
       ),
     );
   }

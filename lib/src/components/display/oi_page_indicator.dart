@@ -8,7 +8,7 @@ import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 /// distinct color and optionally larger size.
 ///
 /// {@category Components}
-class OiPageIndicator extends StatelessWidget {
+class OiPageIndicator extends StatefulWidget {
   /// Creates an [OiPageIndicator] with circular dots.
   const OiPageIndicator({
     required this.count,
@@ -70,52 +70,99 @@ class OiPageIndicator extends StatelessWidget {
   final bool _isPill;
 
   @override
+  State<OiPageIndicator> createState() => _OiPageIndicatorState();
+}
+
+class _OiPageIndicatorState extends State<OiPageIndicator> {
+  int? _hoveredIndex;
+
+  @override
   Widget build(BuildContext context) {
     final colors = context.colors;
-    final effectiveColor = color ?? colors.borderSubtle;
-    final effectiveActiveColor = activeColor ?? colors.primary.base;
-    final effectiveActiveSize = activeSize ?? size;
+    final effectiveColor = widget.color ?? colors.borderSubtle;
+    final effectiveActiveColor = widget.activeColor ?? colors.primary.base;
+    final effectiveActiveSize = widget.activeSize ?? widget.size;
 
     return Semantics(
-      label: semanticLabel ?? 'Page ${current + 1} of $count',
+      label: widget.semanticLabel ??
+          'Page ${widget.current + 1} of ${widget.count}',
       child: Row(
         mainAxisSize: MainAxisSize.min,
-        children: List.generate(count, (index) {
-          final isActive = index == current;
-          final dotSize = isActive ? effectiveActiveSize : size;
-          final dotColor = isActive ? effectiveActiveColor : effectiveColor;
+        children: List.generate(widget.count, (index) {
+          final isActive = index == widget.current;
+          final isHovered = _hoveredIndex == index;
+          final dotSize = isActive ? effectiveActiveSize : widget.size;
+
+          Color dotColor;
+          if (isActive) {
+            dotColor = effectiveActiveColor;
+          } else if (isHovered) {
+            dotColor = effectiveActiveColor.withValues(alpha: 0.5);
+          } else {
+            dotColor = effectiveColor;
+          }
 
           final double dotWidth;
-          if (isActive && _isPill) {
+          if (isActive && widget._isPill) {
             dotWidth = dotSize * 2.5;
+          } else if (isHovered && widget._isPill) {
+            dotWidth = dotSize * 1.5;
           } else {
             dotWidth = dotSize;
           }
 
-          Widget dot = AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
-            curve: Curves.easeInOut,
-            width: dotWidth,
-            height: dotSize,
-            decoration: BoxDecoration(
-              color: dotColor,
-              borderRadius: BorderRadius.circular(dotSize / 2),
+          final double dotHeight;
+          if (isHovered && !isActive) {
+            dotHeight = dotSize * 1.25;
+          } else {
+            dotHeight = dotSize;
+          }
+
+          final double dotEffectiveWidth;
+          if (isHovered && !isActive && !widget._isPill) {
+            dotEffectiveWidth = dotWidth * 1.25;
+          } else {
+            dotEffectiveWidth = dotWidth;
+          }
+
+          // Reserve the max hover height so the row doesn't shift on hover.
+          final maxHeight = (isActive ? dotSize : dotSize * 1.25) + 8;
+
+          Widget dot = SizedBox(
+            height: maxHeight,
+            child: Center(
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                curve: Curves.easeInOut,
+                width: dotEffectiveWidth,
+                height: dotHeight,
+                decoration: BoxDecoration(
+                  color: dotColor,
+                  borderRadius: BorderRadius.circular(dotHeight / 2),
+                ),
+              ),
             ),
           );
 
-          if (onDotTap != null) {
+          dot = MouseRegion(
+            cursor: widget.onDotTap != null
+                ? SystemMouseCursors.click
+                : MouseCursor.defer,
+            onEnter: (_) => setState(() => _hoveredIndex = index),
+            onExit: (_) => setState(() => _hoveredIndex = null),
+            child: dot,
+          );
+
+          if (widget.onDotTap != null) {
             dot = GestureDetector(
-              onTap: () => onDotTap!(index),
+              onTap: () => widget.onDotTap!(index),
               behavior: HitTestBehavior.opaque,
-              child: Padding(
-                padding: const EdgeInsets.all(4),
-                child: dot,
-              ),
+              child: dot,
             );
           }
 
           return Padding(
-            padding: EdgeInsets.only(left: index == 0 ? 0 : spacing),
+            padding: EdgeInsets.only(left: index == 0 ? 0 : widget.spacing),
             child: dot,
           );
         }),

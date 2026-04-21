@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/widgets.dart';
 
 import 'package:obers_ui/obers_ui.dart';
@@ -249,15 +247,16 @@ class OiTree<T> extends StatefulWidget {
   State<OiTree<T>> createState() => _OiTreeState<T>();
 }
 
-class _OiTreeState<T> extends State<OiTree<T>> with TickerProviderStateMixin {
+class _OiTreeState<T> extends State<OiTree<T>> {
   late OiTreeController _ctrl;
   bool _ownsController = false;
-  final Map<String, AnimationController> _expandControllers = {};
+  List<_FlatEntry<T>> _entries = const [];
 
   @override
   void initState() {
     super.initState();
     _initController();
+    _rebuildEntries();
   }
 
   @override
@@ -267,25 +266,15 @@ class _OiTreeState<T> extends State<OiTree<T>> with TickerProviderStateMixin {
       _disposeControllerIfOwned();
       _initController();
     }
+    if (widget.nodes != oldWidget.nodes) {
+      _rebuildEntries();
+    }
   }
 
   @override
   void dispose() {
     _disposeControllerIfOwned();
-    for (final c in _expandControllers.values) {
-      c.dispose();
-    }
     super.dispose();
-  }
-
-  AnimationController _controllerFor(String nodeId) {
-    return _expandControllers.putIfAbsent(nodeId, () {
-      return AnimationController(
-        vsync: this,
-        duration: const Duration(milliseconds: 200),
-        value: _ctrl.expanded(nodeId) ? 1.0 : 0.0,
-      );
-    });
   }
 
   void _initController() {
@@ -305,21 +294,18 @@ class _OiTreeState<T> extends State<OiTree<T>> with TickerProviderStateMixin {
   }
 
   void _onControllerChanged() {
-    // Snap animation controllers to the logical expanded state for external
-    // controller mutations so tests and programmatic changes take immediate
-    // effect without waiting for the animation to complete.
-    for (final entry in _expandControllers.entries) {
-      final nodeId = entry.key;
-      final animCtrl = entry.value;
-      final shouldBeExpanded = _ctrl.expanded(nodeId);
-      animCtrl.value = shouldBeExpanded ? 1.0 : 0.0;
-    }
+    _rebuildEntries();
     setState(() {});
   }
 
   // ── Event handlers ────────────────────────────────────────────────────────
 
   void _handleTap(OiTreeNode<T> node) {
+    if (node.hasChildren) {
+      final willExpand = !_ctrl.expanded(node.id);
+      _ctrl.toggle(node.id);
+      widget.onExpansionChanged?.call(node, expanded: willExpand);
+    }
     if (widget.selectable) {
       if (_ctrl.multiSelect) {
         if (_ctrl.selected(node.id)) {
@@ -335,103 +321,81 @@ class _OiTreeState<T> extends State<OiTree<T>> with TickerProviderStateMixin {
     widget.onNodeTap?.call(node);
   }
 
-  void _handleDoubleTap(OiTreeNode<T> node) {
-    widget.onNodeDoubleTap?.call(node);
-  }
+  // ── Flattening ──────────────────────────────────────────────────────────
 
-  void _handleToggle(OiTreeNode<T> node) {
-    final willExpand = !_ctrl.expanded(node.id);
-    final controller = _controllerFor(node.id);
-    if (willExpand) {
-      unawaited(controller.forward());
-    } else {
-      unawaited(controller.reverse());
+  void _rebuildEntries() {
+    final result = <_FlatEntry<T>>[];
+    void walk(List<OiTreeNode<T>> nodes, int depth) {
+      for (final node in nodes) {
+        result.add(_FlatEntry(node: node, depth: depth));
+        if (node.hasChildren && _ctrl.expanded(node.id)) {
+          walk(node.children, depth + 1);
+        }
+      }
     }
-    _ctrl.toggle(node.id);
-    widget.onExpansionChanged?.call(node, expanded: willExpand);
+
+    walk(widget.nodes, 0);
+    _entries = result;
   }
 
   // ── Build ─────────────────────────────────────────────────────────────────
 
   @override
   Widget build(BuildContext context) {
+    final onDoubleTap = widget.onNodeDoubleTap;
+
     return Semantics(
       label: widget.label,
       explicitChildNodes: true,
-      child: ListView(
-        children: [
-          for (final root in widget.nodes) _buildNodeTree(context, root, 0),
-        ],
+      child: ListView.builder(
+        itemCount: _entries.length,
+        itemExtent: widget.rowHeight,
+        itemBuilder: (context, index) {
+          final entry = _entries[index];
+          final node = entry.node;
+          final expanded = _ctrl.expanded(node.id);
+          final selected = _ctrl.selected(node.id);
+
+          if (widget.nodeBuilder != null) {
+            return GestureDetector(
+              key: ValueKey('node_${node.id}'),
+              behavior: HitTestBehavior.opaque,
+              onTap: () => _handleTap(node),
+              onDoubleTap:
+                  onDoubleTap != null ? () => onDoubleTap(node) : null,
+              child: widget.nodeBuilder!(
+                context,
+                node,
+                entry.depth,
+                expanded: expanded,
+                selected: selected,
+              ),
+            );
+          }
+
+          return _DefaultNodeRow<T>(
+            key: ValueKey('node_${node.id}'),
+            node: node,
+            depth: entry.depth,
+            expanded: expanded,
+            selected: selected,
+            indentWidth: widget.indentWidth,
+            rowHeight: widget.rowHeight,
+            onTap: _handleTap,
+            onDoubleTap: onDoubleTap,
+          );
+        },
       ),
     );
   }
+}
 
-  Widget _buildNodeTree(BuildContext context, OiTreeNode<T> node, int depth) {
-    final row = _buildNodeRow(context, node, depth);
+// ── Flat entry ───────────────────────────────────────────────────────────────
 
-    if (!node.hasChildren) return row;
-
-    final controller = _controllerFor(node.id);
-    final isExpanded = _ctrl.expanded(node.id);
-
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        row,
-        if (isExpanded || !controller.isDismissed)
-          SizeTransition(
-            sizeFactor: CurvedAnimation(
-              parent: controller,
-              curve: Curves.easeInOut,
-            ),
-            axisAlignment: -1,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                for (final child in node.children)
-                  _buildNodeTree(context, child, depth + 1),
-              ],
-            ),
-          ),
-      ],
-    );
-  }
-
-  Widget _buildNodeRow(BuildContext ctx, OiTreeNode<T> node, int depth) {
-    final expanded = _ctrl.expanded(node.id);
-    final selected = _ctrl.selected(node.id);
-
-    if (widget.nodeBuilder != null) {
-      return GestureDetector(
-        key: ValueKey('node_${node.id}'),
-        behavior: HitTestBehavior.opaque,
-        onTap: () => _handleTap(node),
-        onDoubleTap: () => _handleDoubleTap(node),
-        child: widget.nodeBuilder!(
-          ctx,
-          node,
-          depth,
-          expanded: expanded,
-          selected: selected,
-        ),
-      );
-    }
-
-    return _DefaultNodeRow<T>(
-      key: ValueKey('node_${node.id}'),
-      node: node,
-      depth: depth,
-      expanded: expanded,
-      selected: selected,
-      indentWidth: widget.indentWidth,
-      rowHeight: widget.rowHeight,
-      onTap: () => _handleTap(node),
-      onDoubleTap: () => _handleDoubleTap(node),
-      onToggle: node.hasChildren ? () => _handleToggle(node) : null,
-    );
-  }
+class _FlatEntry<T> {
+  const _FlatEntry({required this.node, required this.depth});
+  final OiTreeNode<T> node;
+  final int depth;
 }
 
 // ── Default node row ──────────────────────────────────────────────────────────
@@ -445,8 +409,7 @@ class _DefaultNodeRow<T> extends StatefulWidget {
     required this.indentWidth,
     required this.rowHeight,
     required this.onTap,
-    required this.onDoubleTap,
-    this.onToggle,
+    this.onDoubleTap,
     super.key,
   });
 
@@ -456,9 +419,8 @@ class _DefaultNodeRow<T> extends StatefulWidget {
   final bool selected;
   final double indentWidth;
   final double rowHeight;
-  final VoidCallback onTap;
-  final VoidCallback onDoubleTap;
-  final VoidCallback? onToggle;
+  final void Function(OiTreeNode<T> node) onTap;
+  final void Function(OiTreeNode<T> node)? onDoubleTap;
 
   @override
   State<_DefaultNodeRow<T>> createState() => _DefaultNodeRowState<T>();
@@ -480,27 +442,24 @@ class _DefaultNodeRowState<T> extends State<_DefaultNodeRow<T>> {
       backgroundColor = colors.surface;
     }
 
+    final doubleTap = widget.onDoubleTap;
+
     Widget row = Row(
       children: [
         SizedBox(width: widget.depth * widget.indentWidth),
         if (widget.node.hasChildren)
-          GestureDetector(
+          SizedBox(
             key: ValueKey('toggle_${widget.node.id}'),
-            behavior: HitTestBehavior.opaque,
-            onTap: widget.onToggle,
-            child: SizedBox(
-              width: 24,
-              height: widget.rowHeight,
-              child: Center(
-                child: AnimatedRotation(
-                  turns: widget.expanded ? 0.25 : 0.0,
-                  duration: const Duration(milliseconds: 200),
-                  curve: Curves.easeInOut,
-                  child: OiIcon(
-                    icon: OiIcons.chevronRight,
-                    label: 'Chevron Right',
-                    color: colors.textMuted,
-                  ),
+            width: 24,
+            height: widget.rowHeight,
+            child: Center(
+              child: AnimatedRotation(
+                turns: widget.expanded ? 0.25 : 0.0,
+                duration: const Duration(milliseconds: 200),
+                curve: Curves.easeInOut,
+                child: OiIcon.decorative(
+                  icon: OiIcons.chevronRight,
+                  color: colors.textMuted,
                 ),
               ),
             ),
@@ -531,16 +490,18 @@ class _DefaultNodeRowState<T> extends State<_DefaultNodeRow<T>> {
       onExit: (_) => setState(() => _hovered = false),
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
-        onTap: widget.onTap,
-        onDoubleTap: widget.onDoubleTap,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 150),
+        onTap: () => widget.onTap(widget.node),
+        onDoubleTap:
+            doubleTap != null ? () => doubleTap(widget.node) : null,
+        child: SizedBox(
           height: widget.rowHeight,
-          decoration: BoxDecoration(
-            color: backgroundColor,
-            borderRadius: BorderRadius.circular(4),
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              color: backgroundColor,
+              borderRadius: BorderRadius.circular(4),
+            ),
+            child: row,
           ),
-          child: row,
         ),
       ),
     );
