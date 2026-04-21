@@ -12,11 +12,12 @@ analyzer:
   exclude:
     - build/**
     - .dart_tool/**
-    # Nested packages have their own pubspec + package resolution. Analyzing
-    # them from the root context breaks `package:obers_ui_autoforms/...` URIs
-    # because that package is not a dependency of `obers_ui`. CI and local
-    # `dart analyze` in each package dir cover them instead.
+    # Nested packages have their own pubspec + analysis_options. Analyzing them
+    # from the root context either breaks package URIs (e.g. autoforms) or applies
+    # the root VGA ruleset to code meant for a different lint config (charts).
+    # CI runs `dart analyze` inside each package directory instead.
     - packages/obers_ui_autoforms/**
+    - packages/obers_ui_charts/**
   errors:
     close_sinks: warning       # VGA ignores; we want it active
   plugins:
