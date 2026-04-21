@@ -704,7 +704,9 @@ class _OiLinkHoverState extends State<_OiLinkHover> {
   Widget build(BuildContext context) {
     final colors = context.colors;
     final baseColor = widget.style.color ?? colors.primary.base;
-    final hoverColor = colors.primary.dark;
+    final hoverColor = colors.primary.base;
+    final baseDecoration =
+        widget.style.decoration ?? TextDecoration.underline;
 
     return MouseRegion(
       cursor: SystemMouseCursors.click,
