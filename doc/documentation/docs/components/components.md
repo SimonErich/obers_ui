@@ -6,46 +6,51 @@ Components are the standard UI widgets you'll use every day. They're built from 
 
 | Widget | Description |
 | --- | --- |
-| `OiButton` | Primary, secondary, outline, ghost, destructive, soft variants |
-| `OiIconButton` | Icon-only button |
-| `OiToggleButton` | Toggle/switch button |
-| `OiButtonGroup` | Multi-button toolbar |
-| `OiSortButton` | Dropdown button for sorting non-table lists (card grids, feeds) |
-| `OiExportButton` | Export data in various formats (CSV, XLSX, JSON, PDF) |
-| `OiBackButton` | RTL-aware back navigation button |
+| [OiButton](lib/src/components/buttons/oi_button.dart) | Six visual variants (primary, secondary, outline, ghost, destructive, soft) plus four special forms (icon, split, countdown, confirm) |
+| [OiIconButton](lib/src/components/buttons/oi_icon_button.dart) | Icon-only button with required `semanticLabel` |
+| [OiToggleButton](lib/src/components/buttons/oi_toggle_button.dart) | Two-state toggle button |
+| [OiButtonGroup](lib/src/components/buttons/oi_button_group.dart) | Multi-button toolbar |
+| [OiSortButton](lib/src/components/buttons/oi_sort_button.dart) | Dropdown button for sorting non-table lists (card grids, feeds) |
+| [OiExportButton](lib/src/components/buttons/oi_export_button.dart) | Export data in various formats (CSV, XLSX, JSON, PDF) |
+| [OiBackButton](lib/src/components/buttons/oi_back_button.dart) | RTL-aware back navigation button |
 
 ### OiButton
 
-The workhorse. Six visual variants, three sizes, four specialized constructors:
+`OiButton` has **no unnamed constructor**. Pick a variant via a named constructor. The callback is always `onTap:`. Six visual variants and four special forms:
 
 ```dart
-// Standard button
-OiButton(label: 'Save', onPressed: () {})
+// Variant constructors — all require `label:` and take `onTap:`.
+OiButton.primary(label: 'Save', onTap: () {})
+OiButton.secondary(label: 'Details', onTap: () {})
+OiButton.outline(label: 'Cancel', onTap: () {})
+OiButton.ghost(label: 'Skip', onTap: () {})
+OiButton.destructive(label: 'Delete', onTap: () {})
+OiButton.soft(label: 'Save draft', onTap: () {})
 
-// Variants
-OiButton(label: 'Save', variant: OiButtonVariant.primary, onPressed: () {})
-OiButton(label: 'Cancel', variant: OiButtonVariant.ghost, onPressed: () {})
-OiButton(label: 'Delete', variant: OiButtonVariant.destructive, onPressed: () {})
+// With a leading/trailing icon — `icon:` takes IconData, position defaults to leading.
+OiButton.primary(
+  label: 'Download',
+  icon: OiIcons.download,
+  iconPosition: OiIconPosition.leading,
+  onTap: () {},
+)
 
-// With icon
-OiButton(label: 'Download', leading: OiIcon.decorative(icon: OiIcons.download), onPressed: () {})
+// Sizes: OiButtonSize.small | medium | large.
+OiButton.primary(label: 'Small', size: OiButtonSize.small, onTap: () {})
 
-// Sizes
-OiButton(label: 'Small', size: OiButtonSize.small, onPressed: () {})
+// Loading state disables the button and shows a spinner.
+OiButton.primary(label: 'Saving...', loading: true, onTap: () {})
 
-// Loading state
-OiButton(label: 'Saving...', isLoading: true, onPressed: () {})
-
-// Full width
-OiButton(label: 'Continue', fullWidth: true, onPressed: () {})
+// Full-width stretches to the parent's width.
+OiButton.primary(label: 'Continue', fullWidth: true, onTap: () {})
 ```
 
-**Specialized constructors:**
+**Special constructors:**
 
-- `OiButton.icon()` — Icon-only with tooltip
-- `OiButton.split()` — Button with dropdown arrow
-- `OiButton.countdown()` — Countdown before enabling
-- `OiButton.confirm()` — Double-click to confirm
+- `OiButton.icon({required IconData icon, required String label, VoidCallback? onTap, OiButtonSize size, OiButtonVariant variant = OiButtonVariant.ghost})` — square icon-only button. `label` becomes the semantics label.
+- `OiButton.split({required String label, required VoidCallback onTap, required Widget dropdown, ...})` — main action plus a dropdown trigger.
+- `OiButton.countdown({required String label, required VoidCallback onTap, required int seconds, ...})` — disabled until the timer expires.
+- `OiButton.confirm({required String label, required String confirmLabel, required VoidCallback onConfirm, ...})` — first tap shows `confirmLabel`; second tap fires `onConfirm`.
 
 ### OiSortButton
 
@@ -85,27 +90,24 @@ OiExportButton(
 
 ### OiBackButton
 
-A themed back-navigation button that renders a chevron-left icon, automatically flipping to chevron-right in RTL layouts. Typically used as the leading widget in `OiSliverHeader` or custom app bars.
+A themed back-navigation button that renders a chevron-left icon, automatically flipping to chevron-right in RTL layouts. Typically used as the leading widget in [OiSliverHeader](lib/src/components/display/oi_sliver_header.dart) or custom app bars.
 
 ```dart
 OiBackButton(
   onPressed: () => Navigator.of(context).pop(),
+  semanticLabel: 'Go back',
 )
 
 // Custom size and color
 OiBackButton(
   onPressed: () => goBack(),
+  semanticLabel: 'Back to inbox',
   size: 20,
   color: context.colors.primary.base,
 )
 ```
 
-**Key features:**
-
-- RTL-aware — automatically mirrors the chevron direction
-- Configurable icon size and color
-- Built on `OiTappable` for consistent hover, focus, and press feedback
-- Semantic label defaults to "Go back"
+`semanticLabel:` is required — the widget does not assume a default. Both `onPressed` and `semanticLabel` must be provided.
 
 **Related components:** `OiSliverHeader`, `OiNavigationRail`, `OiBottomBar`
 
@@ -113,29 +115,29 @@ OiBackButton(
 
 | Widget | Description |
 | --- | --- |
-| `OiTextInput` | Text field with validation, prefix/suffix, counter, plus `.otp()`, `.password()`, `.multiline()` constructors |
-| `OiCheckbox` | Checkbox with label |
-| `OiRadio` | Radio button group |
-| `OiSwitch` | Toggle switch |
-| `OiSlider` | Range slider |
-| `OiSelect` | Dropdown select with search |
-| `OiNumberInput` | Number input with increment/decrement |
-| `OiDateInput` | Date picker input |
-| `OiTimeInput` | Time picker input |
-| `OiDateTimeInput` | Combined date + time input |
-| `OiColorInput` | Color picker input |
-| `OiTagInput` | Multi-value tag input |
-| `OiArrayInput` | Repeatable form field group with add/remove/reorder |
-| `OiFileInput` | File selection input |
-| `OiFormSelect` | Form-integrated dropdown with validation |
-| `OiSwitchTile` | Toggle tile with switch, label, and subtitle |
-| `OiCheckboxTile` | Toggle tile with checkbox, label, and subtitle |
-| `OiRadioTile` | Toggle tile with radio indicator, label, and subtitle |
-| `OiSegmentedControl` | Exclusive segment toggle (2-5 options) |
-| `OiDatePickerField` | Date input with calendar dialog |
-| `OiDateRangePickerField` | Date range input with presets and calendar dialog |
-| `OiTimePickerField` | Time input with time picker dialog |
-| `OiColorPalettePicker` | Multi-slot color palette picker with preset palettes |
+| [OiTextInput](lib/src/components/inputs/oi_text_input.dart) | Text field with validation, prefix/suffix, counter, plus `.password()`, `.multiline()`, `.otp()` constructors |
+| [OiCheckbox](lib/src/components/inputs/oi_checkbox.dart) | Checkbox with label |
+| [OiRadio](lib/src/components/inputs/oi_radio.dart) | Radio group (pass `OiRadioOption<T>` list) |
+| [OiSwitch](lib/src/components/inputs/oi_switch.dart) | Toggle switch |
+| [OiSlider](lib/src/components/inputs/oi_slider.dart) | Single- or dual-thumb range slider |
+| [OiSelect](lib/src/components/inputs/oi_select.dart) | Dropdown select (accepts `OiSelectOption<T>` list) |
+| [OiNumberInput](lib/src/components/inputs/oi_number_input.dart) | Number input with increment/decrement |
+| [OiDateInput](lib/src/components/inputs/oi_date_input.dart) | Date picker input |
+| [OiTimeInput](lib/src/components/inputs/oi_time_input.dart) | Time picker input (also defines `OiTimeOfDay`) |
+| [OiDateTimeInput](lib/src/components/inputs/oi_date_time_input.dart) | Combined date + time input |
+| [OiColorInput](lib/src/components/inputs/oi_color_input.dart) | Color picker input |
+| [OiTagInput](lib/src/components/inputs/oi_tag_input.dart) | Multi-value tag input with suggestions |
+| [OiArrayInput](lib/src/components/inputs/oi_array_input.dart) | Repeatable form field group with add/remove/reorder |
+| [OiFileInput](lib/src/components/inputs/oi_file_input.dart) | File selection input |
+| [OiFormSelect](lib/src/components/inputs/oi_form_select.dart) | Form-integrated dropdown with validation |
+| [OiSwitchTile](lib/src/components/inputs/oi_switch_tile.dart) | Toggle tile with switch, label, and subtitle |
+| [OiCheckboxTile](lib/src/components/inputs/oi_switch_tile.dart) | Toggle tile with checkbox, label, and subtitle |
+| [OiRadioTile](lib/src/components/inputs/oi_switch_tile.dart) | Toggle tile with radio indicator, label, and subtitle |
+| [OiSegmentedControl](lib/src/components/inputs/oi_segmented_control.dart) | Exclusive segment toggle (2–5 options) |
+| [OiDatePickerField](lib/src/components/inputs/oi_date_picker_field.dart) | Date input with calendar dialog |
+| [OiDateRangePickerField](lib/src/components/inputs/oi_date_range_picker_field.dart) | Date range input with presets and calendar dialog |
+| [OiTimePickerField](lib/src/components/inputs/oi_time_picker_field.dart) | Time input with time picker dialog |
+| [OiColorPalettePicker](lib/src/components/inputs/oi_color_palette_picker.dart) | Multi-slot color palette picker with preset palettes |
 
 ### OiTextInput
 
@@ -177,7 +179,7 @@ OiTextInput.otp(
 
 **Form validation integration:**
 
-OiTextInput integrates with `OiForm` via standard form field properties: `validator`, `autovalidateMode`, and `onSaved`. Additional properties include `textCapitalization`, `textAlign`, `showCounter`, `counterBuilder`, `onTap`, and `onTapOutside`.
+OiTextInput integrates with Flutter's `Form` via standard form field properties: `validator`, `autovalidateMode`, and `onSaved`. Additional properties include `textCapitalization`, `textAlign`, `showCounter`, `counterBuilder`, `onTap`, and `onTapOutside`.
 
 ```dart
 OiTextInput(
@@ -193,14 +195,23 @@ OiTextInput(
 
 ### OiSelect
 
+`OiSelect<T>` takes a list of `OiSelectOption<T>` — pairs of `(value, label)` — not a raw list of values with an item builder.
+
 ```dart
 OiSelect<String>(
   label: 'Country',
-  items: ['Austria', 'Germany', 'Switzerland'],
-  itemBuilder: (country) => Text(country),
-  onChanged: (country) => print(country),
+  value: _country,
+  onChanged: (country) => setState(() => _country = country),
+  searchable: true,
+  options: const [
+    OiSelectOption(value: 'at', label: 'Austria'),
+    OiSelectOption(value: 'de', label: 'Germany'),
+    OiSelectOption(value: 'ch', label: 'Switzerland'),
+  ],
 )
 ```
+
+Use `OiSelect.inline()` to render just a label + chevron without an input frame (good for toolbars).
 
 ### OiArrayInput
 
@@ -211,10 +222,12 @@ OiArrayInput<String>(
   label: 'Tags',
   items: tags,
   itemBuilder: (context, index, tag, onItemChanged) {
-    return OiTextInput(
-      value: tag,
-      onChanged: onItemChanged,
+    // Use a StatefulWidget wrapper in real code so the TextEditingController
+    // is created once per row instead of on every rebuild.
+    return _TagRow(
+      initial: tag,
       label: 'Tag ${index + 1}',
+      onChanged: onItemChanged,
     );
   },
   createEmpty: () => '',
@@ -225,6 +238,8 @@ OiArrayInput<String>(
   maxItems: 10,
 )
 ```
+
+`itemBuilder` receives `(BuildContext context, int index, T item, ValueChanged<T> onItemChanged)` — call `onItemChanged` with the updated value to persist edits.
 
 ### OiFormSelect
 
@@ -250,7 +265,7 @@ OiFormSelect<String>(
 - Supports `searchable`, `bottomSheetOnCompact`, `autovalidateMode`
 - `onSaved` callback for `Form.save()` integration
 
-**Related components:** `OiSelect`, `OiForm`, `OiTextInput`
+**Related components:** `OiSelect`, `OiFormSection`, `OiTextInput`
 
 ### OiSwitchTile / OiCheckboxTile / OiRadioTile
 
@@ -367,7 +382,7 @@ OiDatePickerField(
 - Supports `minDate`, `maxDate` constraints
 - `readOnly` mode (visually distinct from disabled)
 
-**Related components:** `OiDatePicker`, `OiDateInput`, `OiDateRangePickerField`, `OiForm`
+**Related components:** `OiDatePicker`, `OiDateInput`, `OiDateRangePickerField`, `OiFormSection`
 
 ### OiDateRangePickerField
 
@@ -413,7 +428,7 @@ OiDateRangePickerField(
 - Form integration via `validator`, `onSaved`, `autovalidateMode`
 - Optional clear button via `clearable: true`
 
-**Related components:** `OiDatePickerField`, `OiDatePicker`, `OiDialogShell`, `OiForm`
+**Related components:** `OiDatePickerField`, `OiDatePicker`, `OiDialogShell`, `OiFormSection`
 
 ### OiTimePickerField
 
@@ -447,7 +462,7 @@ OiTimePickerField(
 - Form integration via `validator`, `onSaved`, `autovalidateMode`
 - Reserved `minTime`, `maxTime`, `minuteInterval` for future constraint support
 
-**Related components:** `OiTimePicker`, `OiTimeInput`, `OiDatePickerField`, `OiForm`
+**Related components:** `OiTimePicker`, `OiTimeInput`, `OiDatePickerField`, `OiFormSection`
 
 ### OiColorPalettePicker
 
@@ -478,7 +493,7 @@ OiColorPalettePicker(
 - Empty slots show a placeholder swatch
 - `onSlotChanged` fires per-slot; `onPresetSelected` fires when a preset is applied
 
-**Related components:** `OiColorInput`, `OiForm`, `OiCard`
+**Related components:** `OiColorInput`, `OiFormSection`, `OiCard`
 
 ## Display
 
@@ -781,12 +796,18 @@ OiCard(
 
 ### OiBadge
 
-```dart
-// Dot badge
-OiBadge.dot(child: OiIconButton(icon: OiIcons.mail, onPressed: () {}))
+`OiBadge` is a small chip that communicates status or metadata. Three named constructors plus seven `OiBadgeColor` tokens (primary, accent, success, warning, error, info, neutral). Set `dot: true` to render a small circle with no text.
 
-// Count badge
-OiBadge(count: 5, child: OiIconButton(icon: OiIcons.bell, onPressed: () {}))
+```dart
+OiBadge.filled(label: 'New', color: OiBadgeColor.primary)
+OiBadge.soft(label: 'Draft', color: OiBadgeColor.warning)
+OiBadge.outline(label: 'v2.1')
+
+// Dot-only variant (color-coded icon for non-sighted users when semantically meaningful)
+OiBadge.soft(label: '', color: OiBadgeColor.success, dot: true)
+
+// With an icon
+OiBadge.filled(label: 'Shipped', icon: OiIcons.truck, color: OiBadgeColor.success)
 ```
 
 ## Navigation
@@ -875,8 +896,8 @@ OiNavigationRail(
   items: navItems,
   currentIndex: _selectedIndex,
   onTap: (index) => setState(() => _selectedIndex = index),
-  leading: OiImage(src: 'assets/logo.svg', label: 'Logo'),
-  trailing: OiIconButton(icon: OiIcons.settings, onPressed: () {}),
+  leading: const OiImage(src: 'assets/logo.svg', alt: 'Logo'),
+  trailing: OiIconButton(icon: OiIcons.settings, semanticLabel: 'Settings', onTap: () {}),
   labelBehavior: OiRailLabelBehavior.selected,
 )
 ```
@@ -920,7 +941,7 @@ OiSliverHeader.large(
 
 // Hero header with flexible background
 OiSliverHeader.hero(
-  flexibleSpace: OiImage(src: coverUrl, label: 'Cover'),
+  flexibleSpace: OiImage(src: coverUrl, alt: 'Cover art'),
   title: OiLabel.body('Album Title'),
   onBack: () => Navigator.of(context).pop(),
   expandedHeight: 200,
@@ -1159,11 +1180,15 @@ OiDialog.show(
     label: 'Confirm delete',
     title: 'Delete item?',
     content: OiLabel.body('This action cannot be undone.'),
-    onConfirm: () => deleteItem(),
-    onCancel: () {},
+    actions: [
+      OiButton.ghost(label: 'Cancel', onTap: () {}),
+      OiButton.destructive(label: 'Delete', onTap: () => deleteItem()),
+    ],
   ),
 );
 ```
+
+`OiDialog.confirm` does not take `onConfirm:` / `onCancel:` — supply the actions yourself and wire their `onTap` to your logic. The confirm variant is purely a visual preset.
 
 **Showing a dialog and awaiting a result:**
 
@@ -1181,10 +1206,14 @@ final confirmed = await showOiDialog<bool>(context, builder: (ctx, close) {
           SizedBox(height: ctx.spacing.md),
           OiLabel.body('Discard your changes?'),
           SizedBox(height: ctx.spacing.lg),
-          OiRow(gap: ctx.spacing.sm, children: [
-            OiButton(label: 'Cancel', variant: OiButtonVariant.ghost, onPressed: () => close(false)),
-            OiButton(label: 'Discard', variant: OiButtonVariant.destructive, onPressed: () => close(true)),
-          ]),
+          OiRow(
+            breakpoint: ctx.breakpoint,
+            gap: OiResponsive<double>(ctx.spacing.sm),
+            children: [
+              OiButton.ghost(label: 'Cancel', onTap: () => close(false)),
+              OiButton.destructive(label: 'Discard', onTap: () => close(true)),
+            ],
+          ),
         ],
       ),
     ),
@@ -1203,8 +1232,8 @@ final result = await OiDialog.showAsync<bool>(
   title: 'Are you sure?',
   content: OiLabel.body('This will apply changes.'),
   actions: [
-    OiButton(label: 'Cancel', variant: OiButtonVariant.ghost, onPressed: () => Navigator.of(context).pop()),
-    OiButton(label: 'Apply', onPressed: () => Navigator.of(context).pop(true)),
+    OiButton.ghost(label: 'Cancel', onTap: () => Navigator.of(context).pop()),
+    OiButton.primary(label: 'Apply', onTap: () => Navigator.of(context).pop(true)),
   ],
 );
 ```
@@ -1236,10 +1265,14 @@ final result = await OiDialogShell.show<bool>(
         SizedBox(height: context.spacing.md),
         OiLabel.body('Are you sure you want to proceed?'),
         SizedBox(height: context.spacing.lg),
-        OiRow(gap: context.spacing.sm, children: [
-          OiButton(label: 'Cancel', variant: OiButtonVariant.ghost, onPressed: () => close(false)),
-          OiButton(label: 'Confirm', onPressed: () => close(true)),
-        ]),
+        OiRow(
+          breakpoint: context.breakpoint,
+          gap: OiResponsive<double>(context.spacing.sm),
+          children: [
+            OiButton.ghost(label: 'Cancel', onTap: () => close(false)),
+            OiButton.primary(label: 'Confirm', onTap: () => close(true)),
+          ],
+        ),
       ],
     ),
   ),
@@ -1399,7 +1432,6 @@ OiPipelineProgress(
 
 ```dart
 OiBanner.loading(
-  label: 'Syncing data',
   message: 'Syncing your changes with the server...',
 )
 ```
@@ -1419,9 +1451,7 @@ OiBanner.loading(
 ```dart
 OiEditableText(
   value: 'Project Alpha',
-  onSave: (newValue) async {
-    await api.rename(newValue);
-  },
+  onChanged: (newValue) => _persistRename(newValue),
 )
 ```
 
@@ -1724,7 +1754,7 @@ OiAddressForm(
 
 **Factory constructors:** `OiAddressForm.shipping()` (pre-labelled "Shipping address"), `OiAddressForm.billing()` (pre-labelled "Billing address").
 
-**Related components:** `OiCheckout`, `OiForm`, `OiTextInput`, `OiSelect`
+**Related components:** `OiCheckout`, `OiFormSection`, `OiTextInput`, `OiSelect`
 
 ### OiShippingMethodPicker
 
@@ -1769,7 +1799,7 @@ OiPaymentMethodPicker(
   label: 'Payment method',
   selectedKey: selectedPayment?.key,
   onSelect: (method) => setState(() => _payment = method),
-  addNewCard: OiButton(label: 'Add new card', onPressed: () => showAddCard()),
+  addNewCard: OiButton.outline(label: 'Add new card', onTap: () => showAddCard()),
 )
 ```
 
@@ -1878,7 +1908,7 @@ Titled header bar for use inside `OiSplitPane`, `OiPanel`, `OiResizable`, or any
 OiPanelHeader(
   label: 'Properties',
   subtitle: '12 items',
-  trailing: OiIconButton(icon: OiIcons.settings, semanticLabel: 'Settings'),
+  trailing: OiIconButton(icon: OiIcons.settings, semanticLabel: 'Settings', onTap: () {}),
   size: OiPanelHeaderSize.compact,
   border: OiPanelHeaderBorder.bottom,
 )

@@ -2,7 +2,9 @@
 
 ## Add the dependency
 
-ObersUI is installed as a Git dependency. Add it to your `pubspec.yaml`:
+ObersUI is installed as a Git dependency. Add it to your `pubspec.yaml`
+(replace the URL below with the actual ObersUI Git remote for your
+organisation):
 
 ```yaml
 dependencies:
@@ -46,14 +48,19 @@ dependencies:
 
 ## What's included
 
-ObersUI has minimal external dependencies:
+ObersUI has a small set of external dependencies, all of which are
+pulled in transitively when you add `obers_ui`:
 
-- `shared_preferences` — Settings persistence on all platforms
-- `intl` — Internationalization utilities
+- `shared_preferences` — Settings persistence on mobile / desktop
+- `intl` — Internationalization utilities (date / number formatting)
 - `file_picker` — Native file selection dialogs
-- `web` — Web platform support
+- `desktop_drop` — Desktop drag-and-drop for file drop zones
+- `unicode_emojis` — Emoji data for `OiEmojiPicker` and related widgets
+- `web` — Web-platform interop (used by the web launcher, storage driver,
+  etc.)
 
-All UI components are built from scratch — no Material or Cupertino dependency required.
+All UI components are built from scratch — no Material or Cupertino
+dependency required.
 
 ## Next step
 

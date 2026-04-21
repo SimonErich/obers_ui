@@ -27,16 +27,24 @@ No opt-in required. If a user enables reduced motion in their OS settings, Obers
 
 ## Semantic labels
 
-Every overlay, dialog, and panel requires an accessibility label:
+Every overlay, dialog, and panel takes an accessibility label used by screen readers to announce the surface. Named constructors on [OiDialog](lib/src/components/overlays/oi_dialog.dart) require `label:`; the `showOiDialog` helper accepts `semanticLabel:`.
 
 ```dart
-OiDialog(
-  semanticLabel: 'Delete confirmation',  // Required
-  child: ...,
+// Named constructor — label is required.
+OiDialog.confirm(
+  label: 'Delete confirmation',
+  title: 'Delete this file?',
+  content: const Text('This action cannot be undone.'),
+  actions: [/* ... */],
+)
+
+// Helper — semanticLabel is optional but strongly recommended.
+showOiDialog<bool>(
+  context,
+  semanticLabel: 'Delete confirmation',
+  builder: (context, close) => /* ... */,
 )
 ```
-
-This ensures screen readers announce overlays meaningfully.
 
 ## Screen reader support
 
@@ -49,6 +57,10 @@ OiA11y.announce(context, 'File uploaded successfully');
 // Assertive announcement (interrupts current speech)
 OiA11y.announce(context, 'Error: upload failed', assertive: true);
 ```
+
+## Links carry link semantics
+
+Use [OiLink](lib/src/components/interaction/oi_link.dart) — not a tappable with text inside — for anything that is conceptually a hyperlink. It sets link semantics so assistive technology announces "link" instead of "button", supports `semanticLabel` / `semanticHint`, and on web renders a real anchor with `target: OiLinkTarget.blank` applying `rel="noopener noreferrer"` automatically.
 
 ## Keyboard navigation
 

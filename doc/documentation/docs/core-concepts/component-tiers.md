@@ -85,17 +85,16 @@ Multi-component patterns that solve complex UI problems. Built from components.
 | Widget | Purpose |
 | --- | --- |
 | `OiTable` | Full data table with sort, filter, resize, pagination, inline edit |
-| `OiForm` | Form container with validation |
+| `OiFormSection` | Grouped form fields with heading, description, and validation |
+| `OiFormDialog` | Form dialog with managed submit lifecycle |
 | `OiCalendar` | Day/week/month calendar view |
 | `OiSearch` | Full-text search with filters |
 | `OiCommandBar` | Ctrl+K command palette |
-| `OiHeatmap` | 2D data heat grid |
 | `OiGantt` | Gantt chart timeline |
 | `OiTour` | Multi-step guided onboarding |
 | `OiResponsiveShell` | Responsive navigation shell |
 | `OiReorderableList` | Drag-to-reorder list with keyboard support |
 | `OiDataGrid` | Lightweight data grid with sorting and selection |
-| `OiFormDialog` | Form dialog with managed lifecycle |
 
 ## Tier 4: Modules
 
@@ -123,6 +122,6 @@ Primitives don't know about components. Components don't know about composites. 
 ## Which tier should I use?
 
 - **Building a screen?** Start with **modules** — they handle the heavy lifting
-- **Building a form?** Use **composites** like `OiForm` and `OiTable`
+- **Building a form?** Use **composites** like `OiFormSection`, `OiFormDialog`, and `OiTable`
 - **Building custom UI?** Compose from **components**
 - **Building a design system on top of ObersUI?** Work with **primitives**

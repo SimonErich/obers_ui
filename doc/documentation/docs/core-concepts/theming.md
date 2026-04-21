@@ -35,12 +35,12 @@ No `Theme.of(context)` wrappers needed. Just `context.colors`, `context.spacing`
 | Token | Class | What it controls |
 | --- | --- | --- |
 | Colors | `OiColorScheme` | Semantic colors (primary, accent, success, warning, error, info), surfaces, text, borders |
-| Typography | `OiTextTheme` | 14 text styles (display, h1-h4, body, small, tiny, caption, code, overline, link) |
+| Typography | `OiTextTheme` | 14 text styles (display, h1–h4, body, bodyStrong, small, smallStrong, tiny, caption, code, overline, link) |
 | Spacing | `OiSpacingScale` | 6 spacing values (xs=4, sm=8, md=16, lg=24, xl=32, xxl=48) + page gutters |
 | Radius | `OiRadiusScale` | Border radii with preference (sharp, medium, rounded) |
 | Shadows | `OiShadowScale` | Elevation-based shadows |
 | Animations | `OiAnimationConfig` | Durations (fast=150ms, normal=250ms, slow=400ms) + reduced motion |
-| Effects | `OiEffectsTheme` | Hover, focus, active, press visual feedback |
+| Effects | `OiEffectsTheme` | Six interaction states: hover, focus, active, selected, dragging, disabled |
 | Decoration | `OiDecorationTheme` | Border styles (solid, dashed, dotted, gradient) |
 | Components | `OiComponentThemes` | Per-widget theme overrides |
 

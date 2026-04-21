@@ -20,7 +20,6 @@ The file lives at the project root:
 ```text
 obers_ui/
 ├── AI_README.md    ← This file
-├── CLAUDE.md
 ├── lib/
 └── ...
 ```

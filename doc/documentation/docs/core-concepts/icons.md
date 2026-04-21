@@ -1,6 +1,6 @@
 # Icons
 
-ObersUI ships with [Lucide](https://lucide.dev) v0.577.0 — a comprehensive open-source icon set with **1,950+ icons** embedded as a font. Zero external dependencies, zero network requests.
+ObersUI ships with [Lucide](https://lucide.dev) v0.577.0 — a comprehensive open-source icon set with **1,951 icons** embedded as a font. Zero external dependencies, zero network requests.
 
 ## Quick Start
 
@@ -14,7 +14,7 @@ OiIcon(icon: OiIcons.search, label: 'Search')
 OiIcon.decorative(icon: OiIcons.chevronRight)
 
 // Icon button
-OiIconButton(icon: OiIcons.settings, label: 'Settings', onPressed: () {})
+OiIconButton(icon: OiIcons.settings, semanticLabel: 'Settings', onTap: () {})
 ```
 
 ## OiIcons Reference
@@ -144,13 +144,15 @@ OiIcon(icon: OiIcons.star, label: 'Favorite', size: 24, color: Colors.amber)
 
 ## OiIconButton
 
-An icon-only button with built-in tooltip and accessibility label.
+An icon-only button with a required accessibility label. Defined in [oi_icon_button.dart](lib/src/components/buttons/oi_icon_button.dart).
 
 ```dart
 OiIconButton(
   icon: OiIcons.trash2,
-  label: 'Delete',
-  onPressed: () {},
+  semanticLabel: 'Delete',
+  onTap: () {},
+  size: OiButtonSize.medium,       // optional
+  variant: OiButtonVariant.ghost,  // optional — defaults to ghost
 )
 ```
 

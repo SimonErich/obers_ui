@@ -30,11 +30,12 @@ lib/
     └── utils/                 # Helper functions
 ```
 
-## The four tiers
+## Foundation + four composition tiers
 
-ObersUI follows a strict composition hierarchy. Each tier builds on the one below:
+ObersUI follows a strict composition hierarchy. Foundation services sit
+underneath, and each UI tier builds on the one below:
 
-| Tier | Directory | Purpose | Example |
+| Layer | Directory | Purpose | Example |
 | --- | --- | --- | --- |
 | **Foundation** | `foundation/` | Theme, accessibility, overlays, persistence | `OiThemeData`, `OiA11yScope` |
 | **Primitives** | `primitives/` | Single-purpose rendering widgets | `OiTappable`, `OiGrid`, `OiShimmer` |

@@ -6,7 +6,7 @@ We'd love your help making ObersUI even creamier. Here's how to get started.
 
 ```bash
 # Clone the repository
-git clone https://github.com/simonerich/obers_ui.git
+git clone https://github.com/SimonErich/obers_ui.git
 cd obers_ui
 
 # Install dependencies
@@ -99,17 +99,17 @@ flutter test --update-goldens
 
 ### Test helpers
 
-ObersUI provides helpers in `test/helpers/`:
+ObersUI provides helpers in [test/helpers/](test/helpers/platform_helpers.dart) — all top-level functions that take the `WidgetTester` as the first argument:
 
 ```dart
 // Pump a widget with touch device simulation
-await tester.pumpTouchApp(MyWidget());
+await pumpTouchApp(tester, MyWidget());
 
 // Pump with pointer device simulation
-await tester.pumpPointerApp(MyWidget());
+await pumpPointerApp(tester, MyWidget());
 
 // Pump at a specific breakpoint
-await tester.pumpAtBreakpoint(MyWidget(), width: kMediumWidth);
+await pumpAtBreakpoint(tester, MyWidget(), kMediumWidth);
 ```
 
 ## Pull request requirements
@@ -127,4 +127,4 @@ See [Project Structure](../getting-started/project-structure.md) for the full di
 
 ## Questions or issues?
 
-Open an issue on [GitHub](https://github.com/simonerich/obers_ui/issues).
+Open an issue on [GitHub](https://github.com/SimonErich/obers_ui/issues).

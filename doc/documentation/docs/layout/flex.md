@@ -1,24 +1,34 @@
 # Flex Layouts
 
-ObersUI provides enhanced flex widgets that add gaps and responsive behavior on top of Flutter's built-in layout.
+ObersUI provides enhanced flex primitives that add responsive gaps and
+optional axis-swap behaviour on top of Flutter's built-in layout.
+
+All three primitives require an explicit `breakpoint` and accept
+`OiResponsive<T>` values for their spacing.
 
 ## OiRow and OiColumn
 
-Drop-in replacements for `Row` and `Column` with a `gap` parameter:
+`OiRow` and `OiColumn` are horizontal and vertical layouts with a `gap`
+between children — no more `SizedBox(height: 16)` between every child.
 
 ```dart
-// Horizontal layout with 8dp gaps
+// Horizontal layout with responsive gap
 OiRow(
-  gap: context.spacing.sm,
+  breakpoint: context.breakpoint,
+  gap: OiResponsive.breakpoints({
+    OiBreakpoint.compact: 8,
+    OiBreakpoint.expanded: 12,
+  }),
   children: [
-    OiButton(label: 'Cancel', variant: OiButtonVariant.ghost, onPressed: () {}),
-    OiButton(label: 'Save', onPressed: () {}),
+    OiButton.ghost(label: 'Cancel', onTap: () {}),
+    OiButton.primary(label: 'Save', onTap: () {}),
   ],
 )
 
-// Vertical layout with 16dp gaps
+// Vertical layout with a static gap
 OiColumn(
-  gap: context.spacing.md,
+  breakpoint: context.breakpoint,
+  gap: const OiResponsive<double>(16),
   children: [
     OiTextInput(label: 'Name'),
     OiTextInput(label: 'Email'),
@@ -27,61 +37,107 @@ OiColumn(
 )
 ```
 
-No more `SizedBox(height: 16)` between every child.
+Both default to `MainAxisSize.min` so they nest freely inside other layouts
+without unbounded-constraint errors.
 
-## OiFlex
+### Parameters
 
-Advanced flex with `grow` and `fixed` children:
+| Parameter | Type | Description |
+| --- | --- | --- |
+| `breakpoint` | `OiBreakpoint` | **Required.** The active breakpoint. |
+| `children` | `List<Widget>` | **Required.** The children to lay out. |
+| `gap` | `OiResponsive<double>` | Spacing between children. Defaults to `0`. |
+| `mainAxisAlignment` | `MainAxisAlignment` | Defaults to `start`. |
+| `crossAxisAlignment` | `CrossAxisAlignment` | Defaults to `center`. |
+| `mainAxisSize` | `MainAxisSize` | Defaults to `MainAxisSize.min`. |
+| `collapse` | `OiBreakpoint?` | See below. |
+| `scale` | `OiBreakpointScale` | Defaults to `OiBreakpointScale.defaultScale`. |
+
+### Responsive axis swap
+
+Both `OiRow` and `OiColumn` accept an optional `collapse` breakpoint that
+swaps their axis at or across that threshold. The gap is preserved — it
+becomes horizontal spacing in the swapped direction.
+
+**`OiRow` — collapses into a `Column`** when the active breakpoint is *at or
+below* `collapse`:
 
 ```dart
-OiFlex(
-  gap: context.spacing.md,
+OiRow(
+  breakpoint: context.breakpoint,
+  collapse: OiBreakpoint.medium,  // Stack vertically on compact/medium
+  gap: const OiResponsive<double>(16),
   children: [
-    OiFlex.fixed(width: 240, child: SidePanel()),
-    OiFlex.grow(child: MainContent()),       // Takes remaining space
-    OiFlex.fixed(width: 300, child: DetailPanel()),
+    SidePanel(),
+    MainContent(),
   ],
 )
 ```
 
-### Responsive stacking
-
-`OiFlex` can stack vertically below a breakpoint:
+**`OiColumn` — expands into a `Row`** when the active breakpoint is *at or
+above* `collapse`:
 
 ```dart
-OiFlex(
-  gap: context.spacing.md,
-  stackBelow: OiBreakpoint.medium,  // Stack vertically on compact
+OiColumn(
+  breakpoint: context.breakpoint,
+  collapse: OiBreakpoint.expanded, // Side-by-side on expanded and up
+  gap: const OiResponsive<double>(16),
   children: [
-    OiFlex.fixed(width: 240, child: SidePanel()),
-    OiFlex.grow(child: MainContent()),
+    LabelWidget(),
+    ValueWidget(),
   ],
 )
 ```
 
-Above the breakpoint: horizontal side-by-side. Below: vertical stack.
+Use whichever direction matches the "default" layout of your content — the
+`collapse` parameter describes the *threshold* where the axis flips, not the
+resulting direction.
 
 ## OiWrapLayout
 
-Like `Wrap` but with consistent gap handling:
+A thin wrapper around Flutter's `Wrap` with responsive spacing:
 
 ```dart
 OiWrapLayout(
-  gap: context.spacing.sm,
-  children: tags.map((tag) => OiBadge.soft(label: tag)).toList(),
+  breakpoint: context.breakpoint,
+  spacing: const OiResponsive<double>(8),    // gap along the main axis
+  runSpacing: const OiResponsive<double>(8), // gap between runs
+  children: tags
+      .map((tag) => OiBadge.soft(label: tag, color: OiBadgeColor.neutral))
+      .toList(),
 )
 ```
 
-Children flow horizontally and wrap to the next line when they run out of space.
+Children flow horizontally (or vertically via `direction: Axis.vertical`)
+and wrap to the next run when they run out of space.
+
+### Parameters
+
+| Parameter | Type | Description |
+| --- | --- | --- |
+| `breakpoint` | `OiBreakpoint` | **Required.** |
+| `children` | `List<Widget>` | **Required.** |
+| `spacing` | `OiResponsive<double>` | Gap between children within a run. |
+| `runSpacing` | `OiResponsive<double>` | Gap between runs. |
+| `alignment` | `WrapAlignment` | Main-axis alignment within a run. Defaults to `start`. |
+| `runAlignment` | `WrapAlignment` | Cross-axis alignment of runs. Defaults to `start`. |
+| `crossAxisAlignment` | `WrapCrossAlignment` | Cross-axis alignment of children within a run. Defaults to `start`. |
+| `direction` | `Axis` | Primary axis. Defaults to `Axis.horizontal`. |
+| `scale` | `OiBreakpointScale` | |
 
 ## When to use which
 
 | Widget | Use for |
 | --- | --- |
 | `OiGrid` | Multi-column layouts, dashboard cards, form fields |
-| `OiRow` | Simple horizontal groups (buttons, icons, labels) |
-| `OiColumn` | Simple vertical groups (form fields, list items) |
-| `OiFlex` | Sidebar + main content, split layouts |
-| `OiWrapLayout` | Tags, chips, badges, filter pills |
+| `OiRow` | Horizontal groups (buttons, icons, labels); side-by-side panels that stack on compact via `collapse` |
+| `OiColumn` | Vertical groups (form fields, list items); label/value pairs that expand into a row on wider screens via `collapse` |
+| `OiWrapLayout` | Tags, chips, badges, filter pills — content that should wrap freely |
+| `OiMasonry` | Pinterest-style feeds with variable child heights |
 | `OiPage` | Top-level page structure |
-| `OiSection` | Content groups within a page |
+| `OiSection` | Accessible content regions inside a page |
+| `OiContainer` | Max-width / centered wrapper around page content |
+
+For grid-style fixed-column layouts with cross-cutting `columnSpan` /
+`columnStart` / `rowSpan` control, reach for `OiGrid` instead — see
+[Grid](grid.md).

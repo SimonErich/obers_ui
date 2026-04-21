@@ -38,21 +38,23 @@ class OiProjectBoard extends StatefulWidget {
 class _OiProjectBoardState extends State<OiProjectBoard> {
   @override
   Widget build(BuildContext context) {
-    final colors = context.colors;
     final spacing = context.spacing;
+    final bp = context.breakpoint;
 
     return OiColumn(
-      gap: spacing.md,
+      breakpoint: bp,
+      gap: OiResponsive<double>(spacing.md),
       children: [
         // Toolbar using existing composites
         OiRow(
-          gap: spacing.sm,
+          breakpoint: bp,
+          gap: OiResponsive<double>(spacing.sm),
           children: [
             Expanded(child: OiSearch(onSearch: _filterProjects)),
             if (widget.onProjectCreate != null)
-              OiButton(
+              OiButton.primary(
                 label: 'New Project',
-                onPressed: widget.onProjectCreate,
+                onTap: widget.onProjectCreate,
               ),
           ],
         ),
@@ -60,12 +62,13 @@ class _OiProjectBoardState extends State<OiProjectBoard> {
         // Content using existing components
         Expanded(
           child: OiGrid(
-            columns: OiResponsive({
+            breakpoint: bp,
+            columns: OiResponsive.breakpoints(const {
               OiBreakpoint.compact: 1,
               OiBreakpoint.medium: 2,
               OiBreakpoint.large: 3,
             }),
-            gap: spacing.md,
+            gap: OiResponsive<double>(spacing.md),
             children: _filteredProjects.map((project) {
               return OiCard(
                 child: OiTappable(
@@ -91,8 +94,11 @@ Modules accept `onX` callbacks rather than managing data internally. This keeps 
 ```dart
 // Good: parent controls the data
 OiFileExplorer(
-  roots: [rootNode],
-  onDelete: (files) async => await myApi.delete(files),
+  label: 'Files',
+  controller: _fileExplorerController,
+  loadFolder: (path) async => myApi.listFolder(path),
+  loadFolderTree: () async => myApi.loadTree(),
+  onDelete: (files) async => myApi.delete(files),
 )
 
 // Avoid: module managing its own API calls
