@@ -14,8 +14,5 @@ abstract class OiAfPersistenceDriver {
   });
 
   /// Delete a saved draft.
-  Future<void> deleteDraft({
-    required String formId,
-    String? key,
-  });
+  Future<void> deleteDraft({required String formId, String? key});
 }

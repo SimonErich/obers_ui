@@ -50,9 +50,7 @@ class _IconsAppState extends State<IconsApp> {
             ),
             decoration: BoxDecoration(
               color: colors.surface,
-              border: Border(
-                bottom: BorderSide(color: colors.borderSubtle),
-              ),
+              border: Border(bottom: BorderSide(color: colors.borderSubtle)),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -110,9 +108,7 @@ class _IconsAppState extends State<IconsApp> {
                       childAspectRatio: 0.85,
                     ),
                     itemCount: filtered.length,
-                    itemBuilder: (context, i) => _IconTile(
-                      entry: filtered[i],
-                    ),
+                    itemBuilder: (context, i) => _IconTile(entry: filtered[i]),
                   ),
           ),
         ],
@@ -145,10 +141,7 @@ class _IconTile extends StatelessWidget {
       semanticLabel: '${entry.name} icon — tap to copy name',
       onTap: () {
         Clipboard.setData(ClipboardData(text: 'OiIcons.${entry.name}'));
-        OiToast.show(
-          context,
-          message: 'Copied OiIcons.${entry.name}',
-        );
+        OiToast.show(context, message: 'Copied OiIcons.${entry.name}');
       },
       child: Container(
         padding: EdgeInsets.all(spacing.sm),
@@ -201,19 +194,19 @@ class _CategoryChip extends StatelessWidget {
         onTap: onTap,
         clipBorderRadius: radius.full,
         child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-        decoration: BoxDecoration(
-          color: selected ? colors.primary.base : colors.surfaceHover,
-          borderRadius: radius.full,
-          border: Border.all(
-            color: selected ? colors.primary.base : colors.borderSubtle,
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          decoration: BoxDecoration(
+            color: selected ? colors.primary.base : colors.surfaceHover,
+            borderRadius: radius.full,
+            border: Border.all(
+              color: selected ? colors.primary.base : colors.borderSubtle,
+            ),
+          ),
+          child: OiLabel.caption(
+            label,
+            color: selected ? colors.primary.foreground : colors.textSubtle,
           ),
         ),
-        child: OiLabel.caption(
-          label,
-          color: selected ? colors.primary.foreground : colors.textSubtle,
-        ),
-      ),
       ),
     );
   }

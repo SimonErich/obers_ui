@@ -18,7 +18,7 @@ extension _OiFieldDisplayStatusContactContent on OiFieldDisplay {
       );
     }
 
-    final bool boolValue = value is bool
+    final boolValue = value is bool
         ? value as bool
         : value != 0 && value != '' && value != false;
 
@@ -115,7 +115,7 @@ extension _OiFieldDisplayStatusContactContent on OiFieldDisplay {
   }
 
   Widget _buildTagsDisplay(BuildContext context) {
-    final List<String> tagList = value is List
+    final tagList = value is List
         ? (value as List).map((e) => e.toString()).toList()
         : [_valueString];
 

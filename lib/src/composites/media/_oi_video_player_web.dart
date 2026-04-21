@@ -20,19 +20,19 @@ final Set<String> _registeredViewTypes = {};
 }) {
   final viewType = 'oi-video-${src.hashCode}';
 
-  final element =
-      web.document.createElement('video') as web.HTMLVideoElement
-        ..src = src
-        ..style.width = '100%'
-        ..style.height = '100%'
-        ..style.objectFit = 'cover'
-        ..style.borderRadius = '8px'
-        ..style.display = 'block'
-        ..style.backgroundColor = 'black'
-        ..controls = true
-        ..autoplay = true
-        ..muted = true // browsers require muted for autoplay
-        ..loop = loop;
+  final element = web.document.createElement('video') as web.HTMLVideoElement
+    ..src = src
+    ..style.width = '100%'
+    ..style.height = '100%'
+    ..style.objectFit = 'cover'
+    ..style.borderRadius = '8px'
+    ..style.display = 'block'
+    ..style.backgroundColor = 'black'
+    ..controls = true
+    ..autoplay = true
+    ..muted =
+        true // browsers require muted for autoplay
+    ..loop = loop;
 
   if (!_registeredViewTypes.contains(viewType)) {
     ui_web.platformViewRegistry.registerViewFactory(

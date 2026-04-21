@@ -317,15 +317,13 @@ class _OiTimelineEntryState extends State<_OiTimelineEntry> {
                 // for the last item it runs from the top down to the dot center.
                 Positioned(
                   top: 0,
-                  bottom: widget.last
-                      ? null
-                      : 0,
+                  bottom: widget.last ? null : 0,
                   child: Container(
                     width: lineWidth,
                     height: widget.last
                         ? (widget.showTimestamp
-                            ? 16 + 4 + cardPadding.top + 6 + dotSize / 2
-                            : cardPadding.top + 6 + dotSize / 2)
+                              ? 16 + 4 + cardPadding.top + 6 + dotSize / 2
+                              : cardPadding.top + 6 + dotSize / 2)
                         : null,
                     color: colors.borderSubtle,
                   ),

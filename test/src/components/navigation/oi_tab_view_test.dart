@@ -7,9 +7,18 @@ import 'package:obers_ui/obers_ui.dart';
 import '../../../helpers/pump_app.dart';
 
 final _tabs = [
-  OiTabViewItem(label: 'Overview', builder: (_) => const Text('Overview Content')),
-  OiTabViewItem(label: 'Details', builder: (_) => const Text('Details Content')),
-  OiTabViewItem(label: 'Activity', builder: (_) => const Text('Activity Content')),
+  OiTabViewItem(
+    label: 'Overview',
+    builder: (_) => const Text('Overview Content'),
+  ),
+  OiTabViewItem(
+    label: 'Details',
+    builder: (_) => const Text('Details Content'),
+  ),
+  OiTabViewItem(
+    label: 'Activity',
+    builder: (_) => const Text('Activity Content'),
+  ),
 ];
 
 void main() {

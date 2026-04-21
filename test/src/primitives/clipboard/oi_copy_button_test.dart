@@ -6,8 +6,6 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/primitives/clipboard/oi_copy_button.dart';
-import 'package:obers_ui/src/primitives/display/oi_icon.dart';
-
 import '../../../helpers/pump_app.dart';
 
 void main() {
@@ -72,19 +70,9 @@ void main() {
     await tester.pumpObers(
       const OiCopyButton(value: 'text', semanticLabel: 'Copy'),
     );
-    // Default icon is OiIcons.copy.
-    expect(
-      find.byWidgetPredicate(
-        (w) => w is OiIcon && w.icon == OiIcons.copy,
-      ),
-      findsOneWidget,
-    );
-    expect(
-      find.byWidgetPredicate(
-        (w) => w is OiIcon && w.icon == OiIcons.check,
-      ),
-      findsNothing,
-    );
+    // Default icon is OiIcons.copy rendered via OiIconButton → Icon.
+    expect(find.byIcon(OiIcons.copy), findsOneWidget);
+    expect(find.byIcon(OiIcons.check), findsNothing);
   });
 
   // ── 2. Shows copied widget after tap ──────────────────────────────────────
@@ -97,18 +85,8 @@ void main() {
     await tester.tap(find.byType(OiCopyButton));
     await tester.pump();
 
-    expect(
-      find.byWidgetPredicate(
-        (w) => w is OiIcon && w.icon == OiIcons.check,
-      ),
-      findsOneWidget,
-    );
-    expect(
-      find.byWidgetPredicate(
-        (w) => w is OiIcon && w.icon == OiIcons.copy,
-      ),
-      findsNothing,
-    );
+    expect(find.byIcon(OiIcons.check), findsOneWidget);
+    expect(find.byIcon(OiIcons.copy), findsNothing);
   });
 
   // ── 3. Reverts to icon after feedbackDuration ──────────────────────────────
@@ -124,26 +102,11 @@ void main() {
 
     await tester.tap(find.byType(OiCopyButton));
     await tester.pump();
-    expect(
-      find.byWidgetPredicate(
-        (w) => w is OiIcon && w.icon == OiIcons.check,
-      ),
-      findsOneWidget,
-    );
+    expect(find.byIcon(OiIcons.check), findsOneWidget);
 
     await tester.pump(const Duration(milliseconds: 250));
-    expect(
-      find.byWidgetPredicate(
-        (w) => w is OiIcon && w.icon == OiIcons.copy,
-      ),
-      findsOneWidget,
-    );
-    expect(
-      find.byWidgetPredicate(
-        (w) => w is OiIcon && w.icon == OiIcons.check,
-      ),
-      findsNothing,
-    );
+    expect(find.byIcon(OiIcons.copy), findsOneWidget);
+    expect(find.byIcon(OiIcons.check), findsNothing);
   });
 
   // ── 4. Copies value to clipboard on tap ───────────────────────────────────

@@ -75,9 +75,12 @@ class OiCalendarUtils {
   /// Week 1 is the week containing the first Thursday of the year.
   static int weekNumber(DateTime date) {
     // Use UTC to compute dayOfYear so DST transitions don't shift the count.
-    final dayOfYear = DateTime.utc(date.year, date.month, date.day)
-            .difference(DateTime.utc(date.year))
-            .inDays +
+    final dayOfYear =
+        DateTime.utc(
+          date.year,
+          date.month,
+          date.day,
+        ).difference(DateTime.utc(date.year)).inDays +
         1;
     final weekday = date.weekday; // Mon=1 .. Sun=7
 
@@ -203,8 +206,7 @@ class OiCalendarUtils {
   /// Returns the number of ISO weeks in the given [year].
   static int _isoWeeksInYear(int year) {
     final dec28 = DateTime.utc(year, 12, 28);
-    final dayOfYear =
-        dec28.difference(DateTime.utc(year)).inDays + 1;
+    final dayOfYear = dec28.difference(DateTime.utc(year)).inDays + 1;
     return ((dayOfYear - dec28.weekday + 10) / 7).floor();
   }
 

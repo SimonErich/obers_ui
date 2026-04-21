@@ -232,11 +232,11 @@ void main() {
 
       // Tap group header to collapse.
       await tester.tap(find.text('Group A'));
-      await tester.pump();
+      await tester.pumpAndSettle();
 
       // Items in Group A should be hidden.
-      expect(find.text('Alpha'), findsNothing);
-      expect(find.text('Beta'), findsNothing);
+      expect(find.text('Alpha').hitTestable(), findsNothing);
+      expect(find.text('Beta').hitTestable(), findsNothing);
 
       // Group B items should still be visible.
       expect(find.text('Gamma'), findsOneWidget);

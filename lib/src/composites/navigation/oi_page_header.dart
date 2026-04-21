@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/obers_ui.dart' show OiBadge, OiButton, OiTabs;
 import 'package:obers_ui/src/components/navigation/oi_breadcrumbs.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/primitives/display/oi_label.dart';

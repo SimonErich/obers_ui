@@ -31,8 +31,7 @@ Set<int> _completedSteps(String status) => switch (status) {
   _ => {},
 };
 
-Set<int> _errorSteps(String status) =>
-    status == 'returned' ? {3} : {};
+Set<int> _errorSteps(String status) => status == 'returned' ? {3} : {};
 
 // ── Field enum ──────────────────────────────────────────────────────────────
 
@@ -60,13 +59,12 @@ const _productCatalog = <Map<String, Object>>[
 ];
 
 List<OiAfOption<String>> get _productOptions => [
-      for (final p in _productCatalog)
-        OiAfOption(
-          value: p['name']! as String,
-          label:
-              '${p['name']} (${_eur(p['price']! as double)})',
-        ),
-    ];
+  for (final p in _productCatalog)
+    OiAfOption(
+      value: p['name']! as String,
+      label: '${p['name']} (${_eur(p['price']! as double)})',
+    ),
+];
 
 // ── Controller ──────────────────────────────────────────────────────────────
 
@@ -86,16 +84,8 @@ class _CreateOrderController
     );
 
     // Step 2 — Items (used for the add-item form within step 2)
-    addSelectField<String>(
-      _OrderField.product,
-      options: _productOptions,
-    );
-    addNumberField(
-      _OrderField.quantity,
-      initialValue: 1,
-      min: 1,
-      max: 99,
-    );
+    addSelectField<String>(_OrderField.product, options: _productOptions);
+    addNumberField(_OrderField.quantity, initialValue: 1, min: 1, max: 99);
   }
 
   @override
@@ -112,9 +102,7 @@ class _CreateOrderController
   void addCurrentItem() {
     final productName = get<String>(_OrderField.product);
     if (productName == null) return;
-    final product = _productCatalog.firstWhere(
-      (p) => p['name'] == productName,
-    );
+    final product = _productCatalog.firstWhere((p) => p['name'] == productName);
     final unitPrice = product['price']! as double;
     final qty = getOr<num>(_OrderField.quantity, 1).toInt();
     lineItems.add(<String, Object>{
@@ -135,9 +123,7 @@ class _CreateOrderController
 
   Future<bool> validateStep(int step) async {
     final fields = _fieldsForStep(step);
-    final results = await Future.wait(
-      fields.map((f) => validate(field: f)),
-    );
+    final results = await Future.wait(fields.map((f) => validate(field: f)));
     return results.every((r) => r);
   }
 
@@ -187,11 +173,7 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
         OiSelectOption(value: 'returned', label: 'Returned'),
       ],
     ),
-    OiFilterDefinition(
-      key: 'date',
-      label: 'Date',
-      type: OiFilterType.date,
-    ),
+    OiFilterDefinition(key: 'date', label: 'Date', type: OiFilterType.date),
     OiFilterDefinition(
       key: 'customer',
       label: 'Customer',
@@ -302,8 +284,7 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
               'date': DateTime.now().toIso8601String().substring(0, 10),
               'paymentMethod': data['paymentMethod'] as String,
               'shippingAddress': data['address'] as String,
-              'lineItems':
-                  List<Map<String, Object>>.of(controller.lineItems),
+              'lineItems': List<Map<String, Object>>.of(controller.lineItems),
             });
           }
 
@@ -340,8 +321,7 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
                       const OiAfTextInput<_OrderField>(
                         field: _OrderField.address,
                         label: 'Shipping Address',
-                        placeholder:
-                            'e.g. Getreidegasse 12, 5020 Salzburg',
+                        placeholder: 'e.g. Getreidegasse 12, 5020 Salzburg',
                       ),
                       SizedBox(height: spacing.md),
                       const OiAfSelect<_OrderField, String>(
@@ -380,10 +360,7 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
                   onTap: goBack,
                 ),
               const Spacer(),
-              OiButton.ghost(
-                label: 'Cancel',
-                onTap: () => close(),
-              ),
+              OiButton.ghost(label: 'Cancel', onTap: () => close()),
               if (currentStep < 2)
                 OiButton.primary(
                   label: 'Next',
@@ -432,9 +409,9 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
     var unitPrice = 0.0;
     if (selectedProduct != null) {
       final product = _productCatalog.cast<Map<String, Object>?>().firstWhere(
-            (p) => p!['name'] == selectedProduct,
-            orElse: () => null,
-          );
+        (p) => p!['name'] == selectedProduct,
+        orElse: () => null,
+      );
       if (product != null) unitPrice = product['price']! as double;
     }
 
@@ -466,9 +443,7 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
                   SizedBox(height: spacing.sm),
                   Align(
                     alignment: Alignment.centerRight,
-                    child: OiLabel.body(
-                      'Subtotal: ${_eur(unitPrice * qty)}',
-                    ),
+                    child: OiLabel.body('Subtotal: ${_eur(unitPrice * qty)}'),
                   ),
                 ],
                 SizedBox(height: spacing.sm),
@@ -505,16 +480,13 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
               padding: EdgeInsets.only(bottom: spacing.sm),
               child: _LineItemRow(
                 item: controller.lineItems[i],
-                onRemove: () =>
-                    setDialogState(() => controller.removeItem(i)),
+                onRemove: () => setDialogState(() => controller.removeItem(i)),
               ),
             ),
           SizedBox(height: spacing.sm),
           Align(
             alignment: Alignment.centerRight,
-            child: OiLabel.bodyStrong(
-              'Total: ${_eur(controller.orderTotal)}',
-            ),
+            child: OiLabel.bodyStrong('Total: ${_eur(controller.orderTotal)}'),
           ),
         ],
       ],
@@ -562,25 +534,19 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
             padding: EdgeInsets.only(bottom: spacing.xs),
             child: Row(
               children: [
-                Expanded(
-                  child: OiLabel.body(item['product']! as String),
-                ),
+                Expanded(child: OiLabel.body(item['product']! as String)),
                 OiLabel.body(
                   '${item['quantity']}x ${_eur(item['unitPrice']! as double)}',
                 ),
                 SizedBox(width: spacing.md),
-                OiLabel.bodyStrong(
-                  _eur(item['total']! as double),
-                ),
+                OiLabel.bodyStrong(_eur(item['total']! as double)),
               ],
             ),
           ),
         SizedBox(height: spacing.sm),
         Align(
           alignment: Alignment.centerRight,
-          child: OiLabel.h4(
-            'Total: ${_eur(controller.orderTotal)}',
-          ),
+          child: OiLabel.h4('Total: ${_eur(controller.orderTotal)}'),
         ),
       ],
     );
@@ -615,12 +581,7 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
               currentStep: _statusToStep(status),
               completedSteps: _completedSteps(status),
               errorSteps: _errorSteps(status),
-              stepLabels: const [
-                'Placed',
-                'Confirmed',
-                'Shipped',
-                'Delivered',
-              ],
+              stepLabels: const ['Placed', 'Confirmed', 'Shipped', 'Delivered'],
             ),
             SizedBox(height: spacing.lg),
             OiDetailView(
@@ -676,14 +637,12 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
                   OiTableColumn<Map<String, Object>>(
                     id: 'unitPrice',
                     header: 'Unit Price',
-                    valueGetter: (row) =>
-                        _eur(row['unitPrice']! as double),
+                    valueGetter: (row) => _eur(row['unitPrice']! as double),
                   ),
                   OiTableColumn<Map<String, Object>>(
                     id: 'total',
                     header: 'Total',
-                    valueGetter: (row) =>
-                        _eur(row['total']! as double),
+                    valueGetter: (row) => _eur(row['total']! as double),
                   ),
                 ],
                 showStatusBar: false,
@@ -751,10 +710,7 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
             valueGetter: (row) => row['status']! as String,
             cellBuilder: (_, row, __) {
               final status = row['status']! as String;
-              return OiBadge.soft(
-                label: status,
-                color: _statusColor(status),
-              );
+              return OiBadge.soft(label: status, color: _statusColor(status));
             },
             width: 130,
           ),

@@ -85,10 +85,10 @@ void main() {
       ),
     );
     expect(find.text('folder'), findsOneWidget);
-    // The Container wrapping the child should have a BoxDecoration with a border
-    final container = tester.widget<Container>(find.byType(Container).first);
-    expect(container.decoration, isA<BoxDecoration>());
-    final decoration = container.decoration! as BoxDecoration;
+    // The DecoratedBox wrapping the child should have a BoxDecoration with a border.
+    final box = tester.widget<DecoratedBox>(find.byType(DecoratedBox).first);
+    expect(box.decoration, isA<BoxDecoration>());
+    final decoration = box.decoration as BoxDecoration;
     expect(decoration.border, isNotNull);
   });
 

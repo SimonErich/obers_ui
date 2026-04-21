@@ -84,7 +84,8 @@ class _OiPageIndicatorState extends State<OiPageIndicator> {
     final effectiveActiveSize = widget.activeSize ?? widget.size;
 
     return Semantics(
-      label: widget.semanticLabel ??
+      label:
+          widget.semanticLabel ??
           'Page ${widget.current + 1} of ${widget.count}',
       child: Row(
         mainAxisSize: MainAxisSize.min,

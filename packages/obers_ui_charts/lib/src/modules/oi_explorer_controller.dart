@@ -3,7 +3,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart' show AnimatedBuilder, ListenableBuilder;
 import 'package:flutter/widgets.dart' show AnimatedBuilder, ListenableBuilder;
 import 'package:obers_ui_charts/obers_ui_charts.dart' show OiChartExplorer;
-import 'package:obers_ui_charts/src/modules/oi_chart_explorer.dart' show OiChartExplorer;
+import 'package:obers_ui_charts/src/modules/oi_chart_explorer.dart'
+    show OiChartExplorer;
 import 'package:obers_ui_charts/src/modules/oi_explorer_chart_type.dart';
 
 /// Manages the axis assignments, chart type, and grouping configuration for

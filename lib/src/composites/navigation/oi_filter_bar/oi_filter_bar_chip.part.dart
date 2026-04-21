@@ -34,10 +34,12 @@ class _FilterChipState extends State<_FilterChip> {
       // For multiselect, resolve labels from options if available.
       final options = widget.definition.options;
       if (options != null) {
-        return v.map((val) {
-          final match = options.where((o) => o.value == val);
-          return match.isNotEmpty ? match.first.label : val;
-        }).join(', ');
+        return v
+            .map((val) {
+              final match = options.where((o) => o.value == val);
+              return match.isNotEmpty ? match.first.label : val;
+            })
+            .join(', ');
       }
       return v.join(', ');
     }
@@ -111,8 +113,10 @@ class _FilterChipState extends State<_FilterChip> {
               if (isActive && isMultiSelect && multiCount > 0) ...[
                 const SizedBox(width: 6),
                 Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 6,
+                    vertical: 1,
+                  ),
                   decoration: BoxDecoration(
                     color: colors.primary.base,
                     borderRadius: BorderRadius.circular(100),

@@ -325,18 +325,18 @@ class _CmsCategoriesScreenState extends State<CmsCategoriesScreen> {
               SizedBox(
                 width: 300,
                 child: OiTree<String>(
-                    label: 'Category tree',
-                    nodes: _nodes,
-                    controller: _treeController,
-                    selectable: true,
-                    showLines: true,
-                    onNodeTap: (node) {
-                      setState(() => _selectedId = node.id);
-                    },
-                    onSelectionChanged: (ids) {
-                      if (ids.isNotEmpty) {
-                        setState(() => _selectedId = ids.first);
-                      }
+                  label: 'Category tree',
+                  nodes: _nodes,
+                  controller: _treeController,
+                  selectable: true,
+                  showLines: true,
+                  onNodeTap: (node) {
+                    setState(() => _selectedId = node.id);
+                  },
+                  onSelectionChanged: (ids) {
+                    if (ids.isNotEmpty) {
+                      setState(() => _selectedId = ids.first);
+                    }
                   },
                 ),
               ),

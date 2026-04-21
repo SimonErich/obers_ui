@@ -1,10 +1,10 @@
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/buttons/oi_button.dart';
 import 'package:obers_ui/src/components/display/oi_empty_state.dart';
-import 'package:obers_ui/src/components/navigation/oi_accordion.dart';
 import 'package:obers_ui/src/components/display/oi_markdown.dart';
 import 'package:obers_ui/src/components/feedback/oi_star_rating.dart';
 import 'package:obers_ui/src/components/inputs/oi_text_input.dart';
+import 'package:obers_ui/src/components/navigation/oi_accordion.dart';
 import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/oi_responsive.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
@@ -84,7 +84,8 @@ enum _HelpTab {
   faq('FAQ', OiIcons.helpCircle),
   contact('Contact', OiIcons.messageCircle),
   articles('Articles', OiIcons.bookOpen),
-  feedback('Feedback', OiIcons.star);
+  feedback('Feedback', OiIcons.star)
+  ;
 
   const _HelpTab(this.label, this.icon);
   final String label;

@@ -328,10 +328,10 @@ void main() {
       );
       await tester.pump();
 
-      final animOpacity = tester.widget<AnimatedOpacity>(
+      final animOpacities = tester.widgetList<AnimatedOpacity>(
         find.byType(AnimatedOpacity),
       );
-      expect(animOpacity.duration, Duration.zero);
+      expect(animOpacities.every((o) => o.duration == Duration.zero), isTrue);
     },
   );
 

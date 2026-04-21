@@ -1,7 +1,9 @@
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/obers_ui.dart' show OiTextInputThemeData;
-import 'package:obers_ui/src/foundation/theme/component_themes/oi_text_input_theme_data.dart' show OiTextInputThemeData;
-import 'package:obers_ui/src/foundation/theme/oi_component_themes.dart' show OiTextInputThemeData;
+import 'package:obers_ui/src/foundation/theme/component_themes/oi_text_input_theme_data.dart'
+    show OiTextInputThemeData;
+import 'package:obers_ui/src/foundation/theme/oi_component_themes.dart'
+    show OiTextInputThemeData;
 
 /// Theme overrides for the OTP (one-time-password) input variant.
 ///
@@ -86,13 +88,13 @@ class OiOtpThemeData {
 
   @override
   int get hashCode => Object.hash(
-        boxWidth,
-        boxHeight,
-        gap,
-        boxRadius,
-        filledBoxColor,
-        emptyBoxColor,
-        focusedBoxColor,
-        digitStyle,
-      );
+    boxWidth,
+    boxHeight,
+    gap,
+    boxRadius,
+    filledBoxColor,
+    emptyBoxColor,
+    focusedBoxColor,
+    digitStyle,
+  );
 }

@@ -1,5 +1,8 @@
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/obers_ui.dart' show OiDatePicker;
 import 'package:obers_ui/src/components/buttons/oi_button.dart';
+import 'package:obers_ui/src/components/navigation/oi_date_picker.dart'
+    show OiDatePicker;
 import 'package:obers_ui/src/components/overlays/oi_dialog_shell.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/primitives/display/oi_divider.dart';
@@ -31,9 +34,7 @@ class OiMonth {
   const OiMonth({required this.year, required this.month});
 
   /// Creates an [OiMonth] from a [DateTime].
-  OiMonth.fromDateTime(DateTime dt)
-      : year = dt.year,
-        month = dt.month;
+  OiMonth.fromDateTime(DateTime dt) : year = dt.year, month = dt.month;
 
   /// The year.
   final int year;
@@ -132,7 +133,9 @@ class _OiMonthPickerState extends State<OiMonthPicker> {
     _year = ref.year.clamp(widget.minYear, widget.maxYear);
 
     _monthCtrl = FixedExtentScrollController(initialItem: _month - 1);
-    _yearCtrl = FixedExtentScrollController(initialItem: _year - widget.minYear);
+    _yearCtrl = FixedExtentScrollController(
+      initialItem: _year - widget.minYear,
+    );
   }
 
   @override
@@ -306,8 +309,7 @@ class _OiMonthPickerDialogState extends State<_OiMonthPickerDialog> {
   void initState() {
     super.initState();
     final now = DateTime.now();
-    _current =
-        widget.initialValue ?? OiMonth(year: now.year, month: now.month);
+    _current = widget.initialValue ?? OiMonth(year: now.year, month: now.month);
   }
 
   @override

@@ -173,10 +173,8 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                       onTap: () {},
                     ),
                   ],
-                  onSelectAll: () =>
-                      setState(() => _bulkAllSelected = true),
-                  onDeselectAll: () =>
-                      setState(() => _bulkAllSelected = false),
+                  onSelectAll: () => setState(() => _bulkAllSelected = true),
+                  onDeselectAll: () => setState(() => _bulkAllSelected = false),
                 ),
               ),
             ],

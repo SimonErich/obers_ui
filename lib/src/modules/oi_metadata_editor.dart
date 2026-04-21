@@ -127,10 +127,7 @@ class _OiMetadataEditorState extends State<OiMetadataEditor> {
 
   void _syncControllers() {
     // Remove controllers for indices that no longer exist.
-    _controllers.keys
-        .where((i) => i >= _fields.length)
-        .toList()
-        .forEach((i) {
+    _controllers.keys.where((i) => i >= _fields.length).toList().forEach((i) {
       _controllers.remove(i)?.dispose();
     });
 

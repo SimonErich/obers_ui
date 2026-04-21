@@ -8,8 +8,9 @@ import '../../../helpers/pump_app.dart';
 
 void main() {
   group('Form validation', () {
-    testWidgets('sync validator displays error on form.validate()',
-        (tester) async {
+    testWidgets('sync validator displays error on form.validate()', (
+      tester,
+    ) async {
       final formKey = GlobalKey<FormState>();
 
       await tester.pumpObers(
@@ -56,8 +57,9 @@ void main() {
       expect(find.text('Required'), findsNothing);
     });
 
-    testWidgets('autovalidateMode.onUserInteraction triggers on edit',
-        (tester) async {
+    testWidgets('autovalidateMode.onUserInteraction triggers on edit', (
+      tester,
+    ) async {
       final formKey = GlobalKey<FormState>();
 
       await tester.pumpObers(
@@ -110,8 +112,7 @@ void main() {
       expect(find.text('Manual error'), findsOneWidget);
     });
 
-    testWidgets('Form.save() calls onSaved with current value',
-        (tester) async {
+    testWidgets('Form.save() calls onSaved with current value', (tester) async {
       final formKey = GlobalKey<FormState>();
       String? savedValue;
 
@@ -136,8 +137,9 @@ void main() {
       expect(savedValue, 'saved text');
     });
 
-    testWidgets('multiple OiTextInputs in one Form validate independently',
-        (tester) async {
+    testWidgets('multiple OiTextInputs in one Form validate independently', (
+      tester,
+    ) async {
       final formKey = GlobalKey<FormState>();
 
       await tester.pumpObers(
@@ -188,8 +190,9 @@ void main() {
       expect(find.text('Invalid email'), findsNothing);
     });
 
-    testWidgets('autovalidateMode.always shows error immediately on mount',
-        (tester) async {
+    testWidgets('autovalidateMode.always shows error immediately on mount', (
+      tester,
+    ) async {
       final formKey = GlobalKey<FormState>();
 
       await tester.pumpObers(
@@ -209,8 +212,9 @@ void main() {
       expect(find.text('Required'), findsOneWidget);
     });
 
-    testWidgets('FormField key access — state is accessible via GlobalKey',
-        (tester) async {
+    testWidgets('FormField key access — state is accessible via GlobalKey', (
+      tester,
+    ) async {
       final formKey = GlobalKey<FormState>();
 
       await tester.pumpObers(

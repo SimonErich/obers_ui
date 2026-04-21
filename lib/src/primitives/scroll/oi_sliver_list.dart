@@ -50,13 +50,13 @@ class OiSliverList extends StatelessWidget {
     this.padding,
     this.semanticLabel,
     super.key,
-  })  : itemCount = 0,
-        itemBuilder = null,
-        separated = false,
-        separatorBuilder = null,
-        addAutomaticKeepAlives = true,
-        addRepaintBoundaries = true,
-        addSemanticIndexes = true;
+  }) : itemCount = 0,
+       itemBuilder = null,
+       separated = false,
+       separatorBuilder = null,
+       addAutomaticKeepAlives = true,
+       addRepaintBoundaries = true,
+       addSemanticIndexes = true;
 
   /// The total number of items in the list.
   final int itemCount;
@@ -116,10 +116,11 @@ class OiSliverList extends StatelessWidget {
       );
     } else if (_hasSeparators) {
       // Separated builder — interleave items with separators.
-      final effectiveSeparatorBuilder = separatorBuilder ??
+      final effectiveSeparatorBuilder =
+          separatorBuilder ??
           (BuildContext ctx, int index) => _DefaultSeparator(
-                color: ctx.colors.borderSubtle,
-              );
+            color: ctx.colors.borderSubtle,
+          );
 
       sliver = SliverList.separated(
         itemCount: itemCount,

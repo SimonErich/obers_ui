@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/obers_ui.dart' show OiNavigationRail;
-import 'package:obers_ui/src/components/navigation/oi_navigation_rail.dart' show OiNavigationRail;
+import 'package:obers_ui/src/components/navigation/oi_navigation_rail.dart'
+    show OiNavigationRail;
 
 /// Theme overrides for [OiNavigationRail].
 ///
@@ -84,8 +85,7 @@ class OiNavigationRailThemeData {
       selectedIconColor: selectedIconColor ?? this.selectedIconColor,
       unselectedIconColor: unselectedIconColor ?? this.unselectedIconColor,
       selectedLabelStyle: selectedLabelStyle ?? this.selectedLabelStyle,
-      unselectedLabelStyle:
-          unselectedLabelStyle ?? this.unselectedLabelStyle,
+      unselectedLabelStyle: unselectedLabelStyle ?? this.unselectedLabelStyle,
       iconSize: iconSize ?? this.iconSize,
       itemSpacing: itemSpacing ?? this.itemSpacing,
       itemPadding: itemPadding ?? this.itemPadding,
@@ -114,17 +114,17 @@ class OiNavigationRailThemeData {
 
   @override
   int get hashCode => Object.hash(
-        width,
-        backgroundColor,
-        indicatorColor,
-        selectedIconColor,
-        unselectedIconColor,
-        selectedLabelStyle,
-        unselectedLabelStyle,
-        iconSize,
-        itemSpacing,
-        itemPadding,
-        borderColor,
-        borderWidth,
-      );
+    width,
+    backgroundColor,
+    indicatorColor,
+    selectedIconColor,
+    unselectedIconColor,
+    selectedLabelStyle,
+    unselectedLabelStyle,
+    iconSize,
+    itemSpacing,
+    itemPadding,
+    borderColor,
+    borderWidth,
+  );
 }

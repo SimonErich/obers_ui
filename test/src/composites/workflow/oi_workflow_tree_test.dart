@@ -8,21 +8,21 @@ import 'package:obers_ui/src/composites/workflow/oi_workflow_tree.dart';
 import '../../../helpers/pump_app.dart';
 
 List<OiWorkflowGroup<void>> _sampleGroups() => [
-  OiWorkflowGroup<void>(
+  const OiWorkflowGroup<void>(
     id: 'build',
     label: 'Build',
     items: [
-      const OiWorkflowItem(
+      OiWorkflowItem(
         id: 'lint',
         label: 'Lint',
         status: OiPipelineStatus.completed,
       ),
-      const OiWorkflowItem(
+      OiWorkflowItem(
         id: 'compile',
         label: 'Compile',
         status: OiPipelineStatus.running,
       ),
-      const OiWorkflowItem(
+      OiWorkflowItem(
         id: 'test',
         label: 'Test',
         status: OiPipelineStatus.pending,
@@ -100,23 +100,22 @@ void main() {
       await tester.pump(const Duration(milliseconds: 300));
 
       // Initially collapsed.
-      expect(controller.isExpanded('build'), isFalse);
+      expect(controller.expanded('build'), isFalse);
 
       controller.expandGroup('build');
       await tester.pump(const Duration(milliseconds: 300));
 
-      expect(controller.isExpanded('build'), isTrue);
+      expect(controller.expanded('build'), isTrue);
 
       controller.collapseAll();
       await tester.pump(const Duration(milliseconds: 300));
 
-      expect(controller.isExpanded('build'), isFalse);
+      expect(controller.expanded('build'), isFalse);
     });
 
     testWidgets('onItemTap fires with correct item', (tester) async {
       OiWorkflowItem<void>? tappedItem;
-      final controller = OiWorkflowTreeController();
-      controller.expandGroup('build');
+      final controller = OiWorkflowTreeController()..expandGroup('build');
 
       await tester.pumpObers(
         OiWorkflowTree<void>(

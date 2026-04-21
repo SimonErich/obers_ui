@@ -22,15 +22,17 @@ enum SignupField {
 // ── Controller ──────────────────────────────────────────────────────────────
 
 /// Controller for the signup form.
-class SignupFormController
-    extends OiAfController<SignupField, SignupFormData> {
+class SignupFormController extends OiAfController<SignupField, SignupFormData> {
   @override
   void defineFields() {
     addTextField(
       SignupField.name,
       required: true,
       validators: [
-        OiAfValidators.minLength(2, message: 'Name must be at least 2 characters.'),
+        OiAfValidators.minLength(
+          2,
+          message: 'Name must be at least 2 characters.',
+        ),
       ],
     );
 
@@ -47,7 +49,10 @@ class SignupFormController
             .replaceAll(RegExp('[^a-z0-9_]'), '');
       },
       validators: [
-        OiAfValidators.minLength(3, message: 'Username must be at least 3 characters.'),
+        OiAfValidators.minLength(
+          3,
+          message: 'Username must be at least 3 characters.',
+        ),
         OiAfValidators.alphaDash(
           asciiOnly: true,
           message: 'Only letters, numbers, dashes and underscores.',
@@ -58,9 +63,7 @@ class SignupFormController
     addTextField(
       SignupField.email,
       required: true,
-      validators: [
-        OiAfValidators.email(),
-      ],
+      validators: [OiAfValidators.email()],
     );
 
     addTextField(
@@ -70,7 +73,8 @@ class SignupFormController
         OiAfValidators.securePassword(
           requiresUppercase: true,
           requiresDigit: true,
-          message: 'Password must have 8+ chars, an uppercase letter, and a digit.',
+          message:
+              'Password must have 8+ chars, an uppercase letter, and a digit.',
         ),
       ],
     );
@@ -87,10 +91,7 @@ class SignupFormController
       ],
     );
 
-    addBoolField(
-      SignupField.newsletter,
-      initialValue: false,
-    );
+    addBoolField(SignupField.newsletter, initialValue: false);
 
     addRadioField<String>(
       SignupField.gender,
@@ -99,7 +100,8 @@ class SignupFormController
         OiAfOption(value: 'female', label: 'Female'),
         OiAfOption(value: 'other', label: 'Other'),
       ],
-      visibleWhen: (form) => form.getOr<bool?>(SignupField.newsletter, false) ?? false,
+      visibleWhen: (form) =>
+          form.getOr<bool?>(SignupField.newsletter, false) ?? false,
     );
 
     addDatePickerField(
@@ -191,9 +193,7 @@ class _SignupFormScreenState extends State<SignupFormScreen> {
                 SizedBox(height: spacing.lg),
 
                 // ── Error summary ───────────────────────────────────────
-                const OiAfErrorSummary<SignupField>(
-                  showOnlyAfterSubmit: true,
-                ),
+                const OiAfErrorSummary<SignupField>(showOnlyAfterSubmit: true),
                 SizedBox(height: spacing.md),
 
                 // ── Name ────────────────────────────────────────────────

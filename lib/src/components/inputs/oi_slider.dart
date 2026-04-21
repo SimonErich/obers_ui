@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/_internal/oi_input_frame.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
@@ -109,9 +111,8 @@ class _OiSliderState extends State<OiSlider>
         _displaySecondary = _targetSecondary;
         _animController.value = 1.0;
       } else {
-        _animController
-          ..value = 0.0
-          ..animateTo(1.0, curve: Curves.easeOutCubic);
+        _animController.value = 0.0;
+        unawaited(_animController.animateTo(1, curve: Curves.easeOutCubic));
       }
     }
   }
@@ -200,7 +201,8 @@ class _OiSliderState extends State<OiSlider>
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
-    final reduceMotion = context.animations.reducedMotion ||
+    final reduceMotion =
+        context.animations.reducedMotion ||
         MediaQuery.disableAnimationsOf(context);
     if (reduceMotion) {
       _animController.duration = Duration.zero;

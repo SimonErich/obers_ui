@@ -196,41 +196,41 @@ class _OiFlowGraphState extends State<OiFlowGraph> {
             child: Stack(
               clipBehavior: Clip.none,
               children: [
-            // Grid background.
-            if (widget.snapToGrid)
-              Positioned.fill(
-                child: CustomPaint(
-                  key: const ValueKey('oi_flow_graph_grid'),
-                  painter: _GridPainter(
-                    gridSize: widget.gridSize,
-                    color: colors.borderSubtle,
+                // Grid background.
+                if (widget.snapToGrid)
+                  Positioned.fill(
+                    child: CustomPaint(
+                      key: const ValueKey('oi_flow_graph_grid'),
+                      painter: _GridPainter(
+                        gridSize: widget.gridSize,
+                        color: colors.borderSubtle,
+                      ),
+                    ),
+                  ),
+                // Edges layer.
+                Positioned.fill(
+                  child: CustomPaint(
+                    painter: _EdgePainter(
+                      edges: widget.edges,
+                      nodeMap: nodeMap,
+                      nodeWidth: _defaultNodeWidth,
+                      nodeHeight: _defaultNodeHeight,
+                      defaultColor: colors.border,
+                      textColor: colors.textMuted,
+                    ),
                   ),
                 ),
-              ),
-            // Edges layer.
-            Positioned.fill(
-              child: CustomPaint(
-                painter: _EdgePainter(
-                  edges: widget.edges,
-                  nodeMap: nodeMap,
-                  nodeWidth: _defaultNodeWidth,
-                  nodeHeight: _defaultNodeHeight,
-                  defaultColor: colors.border,
-                  textColor: colors.textMuted,
-                ),
-              ),
+                // Node layer.
+                for (final node in widget.nodes)
+                  Positioned(
+                    left: node.position.dx,
+                    top: node.position.dy,
+                    child: _buildNode(context, node, colors),
+                  ),
+              ],
             ),
-            // Node layer.
-            for (final node in widget.nodes)
-              Positioned(
-                left: node.position.dx,
-                top: node.position.dy,
-                child: _buildNode(context, node, colors),
-              ),
-          ],
+          ),
         ),
-      ),
-      ),
       ),
     );
   }

@@ -1,7 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
-import 'package:flutter/services.dart' show BrowserContextMenu, SystemUiOverlayStyle;
+import 'package:flutter/services.dart'
+    show BrowserContextMenu, SystemUiOverlayStyle;
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/inputs/oi_select_scope.dart';
 import 'package:obers_ui/src/foundation/oi_accessibility.dart';

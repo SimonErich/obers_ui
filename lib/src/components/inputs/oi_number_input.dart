@@ -172,8 +172,8 @@ class _OiNumberInputState extends State<OiNumberInput> {
     final color = hovered && isActive
         ? colors.primary.base
         : isActive
-            ? colors.text
-            : colors.textMuted;
+        ? colors.text
+        : colors.textMuted;
 
     return MouseRegion(
       cursor: isActive ? SystemMouseCursors.click : SystemMouseCursors.basic,

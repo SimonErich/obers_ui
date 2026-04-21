@@ -1,8 +1,10 @@
 import 'dart:async';
 
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/obers_ui.dart' show OiTree;
 import 'package:obers_ui/src/components/display/oi_badge.dart';
 import 'package:obers_ui/src/components/display/oi_status_dot.dart';
+import 'package:obers_ui/src/composites/data/oi_tree.dart' show OiTree;
 import 'package:obers_ui/src/composites/workflow/oi_pipeline.dart';
 import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
@@ -88,7 +90,7 @@ class OiWorkflowTreeController extends ChangeNotifier {
   final Set<String> _expanded = {};
 
   /// Whether the group with [id] is currently expanded.
-  bool isExpanded(String id) => _expanded.contains(id);
+  bool expanded(String id) => _expanded.contains(id);
 
   /// Expands a single group.
   void expandGroup(String id) {
@@ -236,7 +238,7 @@ class _OiWorkflowTreeState<T> extends State<OiWorkflowTree<T>>
         duration: context.animations.reducedMotion
             ? Duration.zero
             : const Duration(milliseconds: 200),
-        value: _controller.isExpanded(groupId) ? 1.0 : 0.0,
+        value: _controller.expanded(groupId) ? 1.0 : 0.0,
       );
       return ac;
     });
@@ -295,7 +297,7 @@ class _OiWorkflowTreeState<T> extends State<OiWorkflowTree<T>>
   Widget _buildGroup(BuildContext context, OiWorkflowGroup<T> group) {
     final colors = context.colors;
     final spacing = context.spacing;
-    final expanded = _controller.isExpanded(group.id);
+    final expanded = _controller.expanded(group.id);
     final ac = _animationFor(group.id);
 
     // Drive the animation to match the controller.

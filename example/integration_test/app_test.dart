@@ -20,9 +20,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(
-      find.text(
-        'Explore every widget through interactive mini-applications.',
-      ),
+      find.text('Explore every widget through interactive mini-applications.'),
       findsOneWidget,
     );
   });

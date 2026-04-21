@@ -9,8 +9,7 @@ import '../../../helpers/pump_app.dart';
 
 void main() {
   group('OiTextInput.otp', () {
-    testWidgets('renders correct number of boxes for length=6',
-        (tester) async {
+    testWidgets('renders correct number of boxes for length=6', (tester) async {
       await tester.pumpObers(
         const OiTextInput.otp(length: 6, autofocus: false),
       );
@@ -19,8 +18,7 @@ void main() {
       expect(find.byType(EditableText), findsNWidgets(6));
     });
 
-    testWidgets('renders correct number of boxes for length=4',
-        (tester) async {
+    testWidgets('renders correct number of boxes for length=4', (tester) async {
       await tester.pumpObers(
         const OiTextInput.otp(length: 4, autofocus: false),
       );
@@ -119,8 +117,9 @@ void main() {
       expect(controller.text, isEmpty);
     });
 
-    testWidgets('backspace on empty box moves focus to previous box',
-        (tester) async {
+    testWidgets('backspace on empty box moves focus to previous box', (
+      tester,
+    ) async {
       await tester.pumpObers(
         const OiTextInput.otp(length: 4, autofocus: false),
       );
@@ -149,8 +148,9 @@ void main() {
       );
     });
 
-    testWidgets('obscure: true sets obscureText on EditableText',
-        (tester) async {
+    testWidgets('obscure: true sets obscureText on EditableText', (
+      tester,
+    ) async {
       await tester.pumpObers(
         const OiTextInput.otp(length: 4, autofocus: false, obscure: true),
       );
@@ -190,8 +190,9 @@ void main() {
 
       // Each box should contain one digit after distribution.
       for (var i = 0; i < 4; i++) {
-        final boxController =
-            tester.widget<EditableText>(boxes.at(i)).controller;
+        final boxController = tester
+            .widget<EditableText>(boxes.at(i))
+            .controller;
         expect(boxController.text, '${i + 1}');
       }
 

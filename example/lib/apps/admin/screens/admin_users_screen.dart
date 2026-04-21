@@ -27,8 +27,7 @@ class AdminUsersScreen extends StatefulWidget {
 }
 
 class _AdminUsersScreenState extends State<AdminUsersScreen> {
-  late final List<Map<String, Object>> _employees =
-      List.of(kEmployeeTableData);
+  late final List<Map<String, Object>> _employees = List.of(kEmployeeTableData);
   Set<String> _selectedKeys = {};
   String? _groupByField;
 
@@ -67,7 +66,7 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
         ],
       ),
     );
-    return confirmed == true;
+    return confirmed ?? false;
   }
 
   // ── Context menu ──────────────────────────────────────────────────────
@@ -84,10 +83,8 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
       OiMenuItem(
         label: 'Send Email',
         icon: OiIcons.mail,
-        onTap: () => OiToast.show(
-          context,
-          message: 'Email sent to ${row['name']}',
-        ),
+        onTap: () =>
+            OiToast.show(context, message: 'Email sent to ${row['name']}'),
       ),
       const OiMenuDivider(),
       OiMenuItem(
@@ -109,6 +106,7 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
         onTap: () async {
           if (!await _confirmDelete(row['name']! as String)) return;
           _removeEmployee(row);
+          if (!mounted) return;
           OiToast.show(
             context,
             message: '${row['name']} removed',
@@ -213,7 +211,7 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
         items: _rowMenuItems(row),
         openOnTap: true,
         child: const Padding(
-          padding: EdgeInsets.all(8.0),
+          padding: EdgeInsets.all(8),
           child: Icon(OiIcons.ellipsisVertical, size: 18),
         ),
       ),
@@ -248,6 +246,7 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
           );
           _selectedKeys = {};
         });
+        if (!mounted) return;
         OiToast.show(
           context,
           message: '$count users removed',
@@ -270,7 +269,12 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: EdgeInsets.fromLTRB(spacing.md, spacing.md, spacing.md, 0),
+              padding: EdgeInsets.fromLTRB(
+                spacing.md,
+                spacing.md,
+                spacing.md,
+                0,
+              ),
               child: Row(
                 children: [
                   const OiLabel.bodyStrong('Group by: '),
@@ -328,8 +332,9 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
               label: 'users',
               onSelectAll: () {
                 setState(() {
-                  _selectedKeys =
-                      _employees.map((r) => r['email']! as String).toSet();
+                  _selectedKeys = _employees
+                      .map((r) => r['email']! as String)
+                      .toSet();
                 });
               },
               onDeselectAll: () => setState(() => _selectedKeys = {}),

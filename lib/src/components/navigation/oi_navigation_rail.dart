@@ -8,7 +8,6 @@ import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/models/oi_navigation_item.dart';
 import 'package:obers_ui/src/primitives/display/oi_label.dart';
 
-
 /// Controls when labels are visible on an [OiNavigationRail].
 ///
 /// {@category Components}
@@ -177,10 +176,12 @@ class _OiNavigationRailState extends State<OiNavigationRail>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final reducedMotion = context.animations.reducedMotion ||
+    final reducedMotion =
+        context.animations.reducedMotion ||
         MediaQuery.disableAnimationsOf(context);
-    _expandController?.duration =
-        reducedMotion ? Duration.zero : widget.expandDuration;
+    _expandController?.duration = reducedMotion
+        ? Duration.zero
+        : widget.expandDuration;
   }
 
   @override
@@ -313,7 +314,8 @@ class _OiNavigationRailState extends State<OiNavigationRail>
       sized = AnimatedBuilder(
         animation: _expandController!,
         builder: (context, child) {
-          final w = effectiveCollapsedWidth +
+          final w =
+              effectiveCollapsedWidth +
               (_expandController!.value *
                   (widget.width - effectiveCollapsedWidth));
           return SizedBox(width: w, child: child);

@@ -27,25 +27,45 @@ class OiIcons {
   static const arrowBigDown = IconData(0xe1e1, fontFamily: _f, fontPackage: _p);
 
   /// arrow-big-down-dash icon.
-  static const arrowBigDownDash = IconData(0xe41d, fontFamily: _f, fontPackage: _p);
+  static const arrowBigDownDash = IconData(
+    0xe41d,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// arrow-big-left icon.
   static const arrowBigLeft = IconData(0xe1e2, fontFamily: _f, fontPackage: _p);
 
   /// arrow-big-left-dash icon.
-  static const arrowBigLeftDash = IconData(0xe41e, fontFamily: _f, fontPackage: _p);
+  static const arrowBigLeftDash = IconData(
+    0xe41e,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// arrow-big-right icon.
-  static const arrowBigRight = IconData(0xe1e3, fontFamily: _f, fontPackage: _p);
+  static const arrowBigRight = IconData(
+    0xe1e3,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// arrow-big-right-dash icon.
-  static const arrowBigRightDash = IconData(0xe41f, fontFamily: _f, fontPackage: _p);
+  static const arrowBigRightDash = IconData(
+    0xe41f,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// arrow-big-up icon.
   static const arrowBigUp = IconData(0xe1e4, fontFamily: _f, fontPackage: _p);
 
   /// arrow-big-up-dash icon.
-  static const arrowBigUpDash = IconData(0xe420, fontFamily: _f, fontPackage: _p);
+  static const arrowBigUpDash = IconData(
+    0xe420,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// arrow-down icon.
   static const arrowDown = IconData(0xe042, fontFamily: _f, fontPackage: _p);
@@ -63,52 +83,112 @@ class OiIcons {
   static const arrowDownAz = IconData(0xe415, fontFamily: _f, fontPackage: _p);
 
   /// arrow-down-circle icon.
-  static const arrowDownCircle = IconData(0xe078, fontFamily: _f, fontPackage: _p);
+  static const arrowDownCircle = IconData(
+    0xe078,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// arrow-down-from-line icon.
-  static const arrowDownFromLine = IconData(0xe454, fontFamily: _f, fontPackage: _p);
+  static const arrowDownFromLine = IconData(
+    0xe454,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// arrow-down-left icon.
-  static const arrowDownLeft = IconData(0xe043, fontFamily: _f, fontPackage: _p);
+  static const arrowDownLeft = IconData(
+    0xe043,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// arrow-down-left-from-circle icon.
-  static const arrowDownLeftFromCircle = IconData(0xe3f7, fontFamily: _f, fontPackage: _p);
+  static const arrowDownLeftFromCircle = IconData(
+    0xe3f7,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// arrow-down-left-from-square icon.
-  static const arrowDownLeftFromSquare = IconData(0xe5a1, fontFamily: _f, fontPackage: _p);
+  static const arrowDownLeftFromSquare = IconData(
+    0xe5a1,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// arrow-down-left-square icon.
-  static const arrowDownLeftSquare = IconData(0xe4b5, fontFamily: _f, fontPackage: _p);
+  static const arrowDownLeftSquare = IconData(
+    0xe4b5,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// arrow-down-narrow-wide icon.
-  static const arrowDownNarrowWide = IconData(0xe044, fontFamily: _f, fontPackage: _p);
+  static const arrowDownNarrowWide = IconData(
+    0xe044,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// arrow-down-right icon.
-  static const arrowDownRight = IconData(0xe045, fontFamily: _f, fontPackage: _p);
+  static const arrowDownRight = IconData(
+    0xe045,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// arrow-down-right-from-circle icon.
-  static const arrowDownRightFromCircle = IconData(0xe3f8, fontFamily: _f, fontPackage: _p);
+  static const arrowDownRightFromCircle = IconData(
+    0xe3f8,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// arrow-down-right-from-square icon.
-  static const arrowDownRightFromSquare = IconData(0xe5a2, fontFamily: _f, fontPackage: _p);
+  static const arrowDownRightFromSquare = IconData(
+    0xe5a2,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// arrow-down-right-square icon.
-  static const arrowDownRightSquare = IconData(0xe4b6, fontFamily: _f, fontPackage: _p);
+  static const arrowDownRightSquare = IconData(
+    0xe4b6,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// arrow-down-square icon.
-  static const arrowDownSquare = IconData(0xe427, fontFamily: _f, fontPackage: _p);
+  static const arrowDownSquare = IconData(
+    0xe427,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// arrow-down-to-dot icon.
-  static const arrowDownToDot = IconData(0xe44d, fontFamily: _f, fontPackage: _p);
+  static const arrowDownToDot = IconData(
+    0xe44d,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// arrow-down-to-line icon.
-  static const arrowDownToLine = IconData(0xe455, fontFamily: _f, fontPackage: _p);
+  static const arrowDownToLine = IconData(
+    0xe455,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// arrow-down-up icon.
   static const arrowDownUp = IconData(0xe046, fontFamily: _f, fontPackage: _p);
 
   /// arrow-down-wide-narrow icon.
-  static const arrowDownWideNarrow = IconData(0xe047, fontFamily: _f, fontPackage: _p);
+  static const arrowDownWideNarrow = IconData(
+    0xe047,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// arrow-down-z-a icon.
   static const arrowDownZA = IconData(0xe416, fontFamily: _f, fontPackage: _p);
@@ -120,37 +200,77 @@ class OiIcons {
   static const arrowLeft = IconData(0xe048, fontFamily: _f, fontPackage: _p);
 
   /// arrow-left-circle icon.
-  static const arrowLeftCircle = IconData(0xe079, fontFamily: _f, fontPackage: _p);
+  static const arrowLeftCircle = IconData(
+    0xe079,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// arrow-left-from-line icon.
-  static const arrowLeftFromLine = IconData(0xe456, fontFamily: _f, fontPackage: _p);
+  static const arrowLeftFromLine = IconData(
+    0xe456,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// arrow-left-right icon.
-  static const arrowLeftRight = IconData(0xe24a, fontFamily: _f, fontPackage: _p);
+  static const arrowLeftRight = IconData(
+    0xe24a,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// arrow-left-square icon.
-  static const arrowLeftSquare = IconData(0xe428, fontFamily: _f, fontPackage: _p);
+  static const arrowLeftSquare = IconData(
+    0xe428,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// arrow-left-to-line icon.
-  static const arrowLeftToLine = IconData(0xe457, fontFamily: _f, fontPackage: _p);
+  static const arrowLeftToLine = IconData(
+    0xe457,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// arrow-right icon.
   static const arrowRight = IconData(0xe049, fontFamily: _f, fontPackage: _p);
 
   /// arrow-right-circle icon.
-  static const arrowRightCircle = IconData(0xe07a, fontFamily: _f, fontPackage: _p);
+  static const arrowRightCircle = IconData(
+    0xe07a,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// arrow-right-from-line icon.
-  static const arrowRightFromLine = IconData(0xe458, fontFamily: _f, fontPackage: _p);
+  static const arrowRightFromLine = IconData(
+    0xe458,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// arrow-right-left icon.
-  static const arrowRightLeft = IconData(0xe417, fontFamily: _f, fontPackage: _p);
+  static const arrowRightLeft = IconData(
+    0xe417,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// arrow-right-square icon.
-  static const arrowRightSquare = IconData(0xe429, fontFamily: _f, fontPackage: _p);
+  static const arrowRightSquare = IconData(
+    0xe429,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// arrow-right-to-line icon.
-  static const arrowRightToLine = IconData(0xe459, fontFamily: _f, fontPackage: _p);
+  static const arrowRightToLine = IconData(
+    0xe459,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// arrow-up icon.
   static const arrowUp = IconData(0xe04a, fontFamily: _f, fontPackage: _p);
@@ -168,52 +288,104 @@ class OiIcons {
   static const arrowUpAz = IconData(0xe41a, fontFamily: _f, fontPackage: _p);
 
   /// arrow-up-circle icon.
-  static const arrowUpCircle = IconData(0xe07b, fontFamily: _f, fontPackage: _p);
+  static const arrowUpCircle = IconData(
+    0xe07b,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// arrow-up-down icon.
   static const arrowUpDown = IconData(0xe37d, fontFamily: _f, fontPackage: _p);
 
   /// arrow-up-from-dot icon.
-  static const arrowUpFromDot = IconData(0xe44e, fontFamily: _f, fontPackage: _p);
+  static const arrowUpFromDot = IconData(
+    0xe44e,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// arrow-up-from-line icon.
-  static const arrowUpFromLine = IconData(0xe45a, fontFamily: _f, fontPackage: _p);
+  static const arrowUpFromLine = IconData(
+    0xe45a,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// arrow-up-left icon.
   static const arrowUpLeft = IconData(0xe04b, fontFamily: _f, fontPackage: _p);
 
   /// arrow-up-left-from-circle icon.
-  static const arrowUpLeftFromCircle = IconData(0xe3f9, fontFamily: _f, fontPackage: _p);
+  static const arrowUpLeftFromCircle = IconData(
+    0xe3f9,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// arrow-up-left-from-square icon.
-  static const arrowUpLeftFromSquare = IconData(0xe5a3, fontFamily: _f, fontPackage: _p);
+  static const arrowUpLeftFromSquare = IconData(
+    0xe5a3,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// arrow-up-left-square icon.
-  static const arrowUpLeftSquare = IconData(0xe4b7, fontFamily: _f, fontPackage: _p);
+  static const arrowUpLeftSquare = IconData(
+    0xe4b7,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// arrow-up-narrow-wide icon.
-  static const arrowUpNarrowWide = IconData(0xe04c, fontFamily: _f, fontPackage: _p);
+  static const arrowUpNarrowWide = IconData(
+    0xe04c,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// arrow-up-right icon.
   static const arrowUpRight = IconData(0xe04d, fontFamily: _f, fontPackage: _p);
 
   /// arrow-up-right-from-circle icon.
-  static const arrowUpRightFromCircle = IconData(0xe3fa, fontFamily: _f, fontPackage: _p);
+  static const arrowUpRightFromCircle = IconData(
+    0xe3fa,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// arrow-up-right-from-square icon.
-  static const arrowUpRightFromSquare = IconData(0xe5a4, fontFamily: _f, fontPackage: _p);
+  static const arrowUpRightFromSquare = IconData(
+    0xe5a4,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// arrow-up-right-square icon.
-  static const arrowUpRightSquare = IconData(0xe4b8, fontFamily: _f, fontPackage: _p);
+  static const arrowUpRightSquare = IconData(
+    0xe4b8,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// arrow-up-square icon.
-  static const arrowUpSquare = IconData(0xe42a, fontFamily: _f, fontPackage: _p);
+  static const arrowUpSquare = IconData(
+    0xe42a,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// arrow-up-to-line icon.
-  static const arrowUpToLine = IconData(0xe45b, fontFamily: _f, fontPackage: _p);
+  static const arrowUpToLine = IconData(
+    0xe45b,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// arrow-up-wide-narrow icon.
-  static const arrowUpWideNarrow = IconData(0xe41b, fontFamily: _f, fontPackage: _p);
+  static const arrowUpWideNarrow = IconData(
+    0xe41b,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// arrow-up-z-a icon.
   static const arrowUpZA = IconData(0xe41c, fontFamily: _f, fontPackage: _p);
@@ -222,31 +394,59 @@ class OiIcons {
   static const arrowUpZa = IconData(0xe41c, fontFamily: _f, fontPackage: _p);
 
   /// arrows-up-from-line icon.
-  static const arrowsUpFromLine = IconData(0xe4d4, fontFamily: _f, fontPackage: _p);
+  static const arrowsUpFromLine = IconData(
+    0xe4d4,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// banknote-arrow-down icon.
-  static const banknoteArrowDown = IconData(0xe64c, fontFamily: _f, fontPackage: _p);
+  static const banknoteArrowDown = IconData(
+    0xe64c,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// banknote-arrow-up icon.
-  static const banknoteArrowUp = IconData(0xe64d, fontFamily: _f, fontPackage: _p);
+  static const banknoteArrowUp = IconData(
+    0xe64d,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// bow-arrow icon.
   static const bowArrow = IconData(0xe65e, fontFamily: _f, fontPackage: _p);
 
   /// calendar-arrow-down icon.
-  static const calendarArrowDown = IconData(0xe5fe, fontFamily: _f, fontPackage: _p);
+  static const calendarArrowDown = IconData(
+    0xe5fe,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// calendar-arrow-up icon.
-  static const calendarArrowUp = IconData(0xe5ff, fontFamily: _f, fontPackage: _p);
+  static const calendarArrowUp = IconData(
+    0xe5ff,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// chevron-down icon.
   static const chevronDown = IconData(0xe06d, fontFamily: _f, fontPackage: _p);
 
   /// chevron-down-circle icon.
-  static const chevronDownCircle = IconData(0xe4dd, fontFamily: _f, fontPackage: _p);
+  static const chevronDownCircle = IconData(
+    0xe4dd,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// chevron-down-square icon.
-  static const chevronDownSquare = IconData(0xe3cf, fontFamily: _f, fontPackage: _p);
+  static const chevronDownSquare = IconData(
+    0xe3cf,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// chevron-first icon.
   static const chevronFirst = IconData(0xe243, fontFamily: _f, fontPackage: _p);
@@ -258,97 +458,201 @@ class OiIcons {
   static const chevronLeft = IconData(0xe06e, fontFamily: _f, fontPackage: _p);
 
   /// chevron-left-circle icon.
-  static const chevronLeftCircle = IconData(0xe4de, fontFamily: _f, fontPackage: _p);
+  static const chevronLeftCircle = IconData(
+    0xe4de,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// chevron-left-square icon.
-  static const chevronLeftSquare = IconData(0xe3d0, fontFamily: _f, fontPackage: _p);
+  static const chevronLeftSquare = IconData(
+    0xe3d0,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// chevron-right icon.
   static const chevronRight = IconData(0xe06f, fontFamily: _f, fontPackage: _p);
 
   /// chevron-right-circle icon.
-  static const chevronRightCircle = IconData(0xe4df, fontFamily: _f, fontPackage: _p);
+  static const chevronRightCircle = IconData(
+    0xe4df,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// chevron-right-square icon.
-  static const chevronRightSquare = IconData(0xe3d1, fontFamily: _f, fontPackage: _p);
+  static const chevronRightSquare = IconData(
+    0xe3d1,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// chevron-up icon.
   static const chevronUp = IconData(0xe070, fontFamily: _f, fontPackage: _p);
 
   /// chevron-up-circle icon.
-  static const chevronUpCircle = IconData(0xe4e0, fontFamily: _f, fontPackage: _p);
+  static const chevronUpCircle = IconData(
+    0xe4e0,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// chevron-up-square icon.
-  static const chevronUpSquare = IconData(0xe3d2, fontFamily: _f, fontPackage: _p);
+  static const chevronUpSquare = IconData(
+    0xe3d2,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// chevrons-down icon.
   static const chevronsDown = IconData(0xe071, fontFamily: _f, fontPackage: _p);
 
   /// chevrons-down-up icon.
-  static const chevronsDownUp = IconData(0xe228, fontFamily: _f, fontPackage: _p);
+  static const chevronsDownUp = IconData(
+    0xe228,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// chevrons-left icon.
   static const chevronsLeft = IconData(0xe072, fontFamily: _f, fontPackage: _p);
 
   /// chevrons-left-right icon.
-  static const chevronsLeftRight = IconData(0xe293, fontFamily: _f, fontPackage: _p);
+  static const chevronsLeftRight = IconData(
+    0xe293,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// chevrons-left-right-ellipsis icon.
-  static const chevronsLeftRightEllipsis = IconData(0xe61f, fontFamily: _f, fontPackage: _p);
+  static const chevronsLeftRightEllipsis = IconData(
+    0xe61f,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// chevrons-right icon.
-  static const chevronsRight = IconData(0xe073, fontFamily: _f, fontPackage: _p);
+  static const chevronsRight = IconData(
+    0xe073,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// chevrons-right-left icon.
-  static const chevronsRightLeft = IconData(0xe294, fontFamily: _f, fontPackage: _p);
+  static const chevronsRightLeft = IconData(
+    0xe294,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// chevrons-up icon.
   static const chevronsUp = IconData(0xe074, fontFamily: _f, fontPackage: _p);
 
   /// chevrons-up-down icon.
-  static const chevronsUpDown = IconData(0xe211, fontFamily: _f, fontPackage: _p);
+  static const chevronsUpDown = IconData(
+    0xe211,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// circle-arrow-down icon.
-  static const circleArrowDown = IconData(0xe078, fontFamily: _f, fontPackage: _p);
+  static const circleArrowDown = IconData(
+    0xe078,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// circle-arrow-left icon.
-  static const circleArrowLeft = IconData(0xe079, fontFamily: _f, fontPackage: _p);
+  static const circleArrowLeft = IconData(
+    0xe079,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// circle-arrow-out-down-left icon.
-  static const circleArrowOutDownLeft = IconData(0xe3f7, fontFamily: _f, fontPackage: _p);
+  static const circleArrowOutDownLeft = IconData(
+    0xe3f7,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// circle-arrow-out-down-right icon.
-  static const circleArrowOutDownRight = IconData(0xe3f8, fontFamily: _f, fontPackage: _p);
+  static const circleArrowOutDownRight = IconData(
+    0xe3f8,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// circle-arrow-out-up-left icon.
-  static const circleArrowOutUpLeft = IconData(0xe3f9, fontFamily: _f, fontPackage: _p);
+  static const circleArrowOutUpLeft = IconData(
+    0xe3f9,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// circle-arrow-out-up-right icon.
-  static const circleArrowOutUpRight = IconData(0xe3fa, fontFamily: _f, fontPackage: _p);
+  static const circleArrowOutUpRight = IconData(
+    0xe3fa,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// circle-arrow-right icon.
-  static const circleArrowRight = IconData(0xe07a, fontFamily: _f, fontPackage: _p);
+  static const circleArrowRight = IconData(
+    0xe07a,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// circle-arrow-up icon.
-  static const circleArrowUp = IconData(0xe07b, fontFamily: _f, fontPackage: _p);
+  static const circleArrowUp = IconData(
+    0xe07b,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// circle-chevron-down icon.
-  static const circleChevronDown = IconData(0xe4dd, fontFamily: _f, fontPackage: _p);
+  static const circleChevronDown = IconData(
+    0xe4dd,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// circle-chevron-left icon.
-  static const circleChevronLeft = IconData(0xe4de, fontFamily: _f, fontPackage: _p);
+  static const circleChevronLeft = IconData(
+    0xe4de,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// circle-chevron-right icon.
-  static const circleChevronRight = IconData(0xe4df, fontFamily: _f, fontPackage: _p);
+  static const circleChevronRight = IconData(
+    0xe4df,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// circle-chevron-up icon.
-  static const circleChevronUp = IconData(0xe4e0, fontFamily: _f, fontPackage: _p);
+  static const circleChevronUp = IconData(
+    0xe4e0,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// circle-fading-arrow-up icon.
-  static const circleFadingArrowUp = IconData(0xe618, fontFamily: _f, fontPackage: _p);
+  static const circleFadingArrowUp = IconData(
+    0xe618,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// clock-arrow-down icon.
-  static const clockArrowDown = IconData(0xe600, fontFamily: _f, fontPackage: _p);
+  static const clockArrowDown = IconData(
+    0xe600,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// clock-arrow-up icon.
   static const clockArrowUp = IconData(0xe601, fontFamily: _f, fontPackage: _p);
@@ -357,76 +661,160 @@ class OiIcons {
   static const compass = IconData(0xe09b, fontFamily: _f, fontPackage: _p);
 
   /// corner-down-left icon.
-  static const cornerDownLeft = IconData(0xe0a1, fontFamily: _f, fontPackage: _p);
+  static const cornerDownLeft = IconData(
+    0xe0a1,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// corner-down-right icon.
-  static const cornerDownRight = IconData(0xe0a2, fontFamily: _f, fontPackage: _p);
+  static const cornerDownRight = IconData(
+    0xe0a2,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// corner-left-down icon.
-  static const cornerLeftDown = IconData(0xe0a3, fontFamily: _f, fontPackage: _p);
+  static const cornerLeftDown = IconData(
+    0xe0a3,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// corner-left-up icon.
   static const cornerLeftUp = IconData(0xe0a4, fontFamily: _f, fontPackage: _p);
 
   /// corner-right-down icon.
-  static const cornerRightDown = IconData(0xe0a5, fontFamily: _f, fontPackage: _p);
+  static const cornerRightDown = IconData(
+    0xe0a5,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// corner-right-up icon.
-  static const cornerRightUp = IconData(0xe0a6, fontFamily: _f, fontPackage: _p);
+  static const cornerRightUp = IconData(
+    0xe0a6,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// corner-up-left icon.
   static const cornerUpLeft = IconData(0xe0a7, fontFamily: _f, fontPackage: _p);
 
   /// corner-up-right icon.
-  static const cornerUpRight = IconData(0xe0a8, fontFamily: _f, fontPackage: _p);
+  static const cornerUpRight = IconData(
+    0xe0a8,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// decimals-arrow-left icon.
-  static const decimalsArrowLeft = IconData(0xe65c, fontFamily: _f, fontPackage: _p);
+  static const decimalsArrowLeft = IconData(
+    0xe65c,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// decimals-arrow-right icon.
-  static const decimalsArrowRight = IconData(0xe65d, fontFamily: _f, fontPackage: _p);
+  static const decimalsArrowRight = IconData(
+    0xe65d,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// drafting-compass icon.
-  static const draftingCompass = IconData(0xe527, fontFamily: _f, fontPackage: _p);
+  static const draftingCompass = IconData(
+    0xe527,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// file-braces-corner icon.
-  static const fileBracesCorner = IconData(0xe36c, fontFamily: _f, fontPackage: _p);
+  static const fileBracesCorner = IconData(
+    0xe36c,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// file-check-corner icon.
-  static const fileCheckCorner = IconData(0xe0c2, fontFamily: _f, fontPackage: _p);
+  static const fileCheckCorner = IconData(
+    0xe0c2,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// file-code-corner icon.
-  static const fileCodeCorner = IconData(0xe45e, fontFamily: _f, fontPackage: _p);
+  static const fileCodeCorner = IconData(
+    0xe45e,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// file-minus-corner icon.
-  static const fileMinusCorner = IconData(0xe0c7, fontFamily: _f, fontPackage: _p);
+  static const fileMinusCorner = IconData(
+    0xe0c7,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// file-plus-corner icon.
-  static const filePlusCorner = IconData(0xe0ca, fontFamily: _f, fontPackage: _p);
+  static const filePlusCorner = IconData(
+    0xe0ca,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// file-search-corner icon.
-  static const fileSearchCorner = IconData(0xe324, fontFamily: _f, fontPackage: _p);
+  static const fileSearchCorner = IconData(
+    0xe324,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// file-type-corner icon.
-  static const fileTypeCorner = IconData(0xe36d, fontFamily: _f, fontPackage: _p);
+  static const fileTypeCorner = IconData(
+    0xe36d,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// file-x-corner icon.
   static const fileXCorner = IconData(0xe0ce, fontFamily: _f, fontPackage: _p);
 
   /// git-compare-arrows icon.
-  static const gitCompareArrows = IconData(0xe553, fontFamily: _f, fontPackage: _p);
+  static const gitCompareArrows = IconData(
+    0xe553,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// git-pull-request-arrow icon.
-  static const gitPullRequestArrow = IconData(0xe555, fontFamily: _f, fontPackage: _p);
+  static const gitPullRequestArrow = IconData(
+    0xe555,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// git-pull-request-create-arrow icon.
-  static const gitPullRequestCreateArrow = IconData(0xe557, fontFamily: _f, fontPackage: _p);
+  static const gitPullRequestCreateArrow = IconData(
+    0xe557,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// list-chevrons-down-up icon.
-  static const listChevronsDownUp = IconData(0xe694, fontFamily: _f, fontPackage: _p);
+  static const listChevronsDownUp = IconData(
+    0xe694,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// list-chevrons-up-down icon.
-  static const listChevronsUpDown = IconData(0xe696, fontFamily: _f, fontPackage: _p);
+  static const listChevronsUpDown = IconData(
+    0xe696,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// move icon.
   static const move = IconData(0xe121, fontFamily: _f, fontPackage: _p);
@@ -441,7 +829,11 @@ class OiIcons {
   static const moveDiagonal = IconData(0xe1c4, fontFamily: _f, fontPackage: _p);
 
   /// move-diagonal-2 icon.
-  static const moveDiagonal2 = IconData(0xe1c5, fontFamily: _f, fontPackage: _p);
+  static const moveDiagonal2 = IconData(
+    0xe1c5,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// move-down icon.
   static const moveDown = IconData(0xe48c, fontFamily: _f, fontPackage: _p);
@@ -450,10 +842,18 @@ class OiIcons {
   static const moveDownLeft = IconData(0xe48d, fontFamily: _f, fontPackage: _p);
 
   /// move-down-right icon.
-  static const moveDownRight = IconData(0xe48e, fontFamily: _f, fontPackage: _p);
+  static const moveDownRight = IconData(
+    0xe48e,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// move-horizontal icon.
-  static const moveHorizontal = IconData(0xe1c6, fontFamily: _f, fontPackage: _p);
+  static const moveHorizontal = IconData(
+    0xe1c6,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// move-left icon.
   static const moveLeft = IconData(0xe48f, fontFamily: _f, fontPackage: _p);
@@ -480,10 +880,18 @@ class OiIcons {
   static const navigation2 = IconData(0xe124, fontFamily: _f, fontPackage: _p);
 
   /// navigation-2-off icon.
-  static const navigation2Off = IconData(0xe2a7, fontFamily: _f, fontPackage: _p);
+  static const navigation2Off = IconData(
+    0xe2a7,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// navigation-off icon.
-  static const navigationOff = IconData(0xe2a8, fontFamily: _f, fontPackage: _p);
+  static const navigationOff = IconData(
+    0xe2a8,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// redo icon.
   static const redo = IconData(0xe143, fontFamily: _f, fontPackage: _p);
@@ -495,7 +903,11 @@ class OiIcons {
   static const redoDot = IconData(0xe450, fontFamily: _f, fontPackage: _p);
 
   /// remove-formatting icon.
-  static const removeFormatting = IconData(0xe3b3, fontFamily: _f, fontPackage: _p);
+  static const removeFormatting = IconData(
+    0xe3b3,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// route icon.
   static const route = IconData(0xe53e, fontFamily: _f, fontPackage: _p);
@@ -513,61 +925,137 @@ class OiIcons {
   static const signpostBig = IconData(0xe541, fontFamily: _f, fontPackage: _p);
 
   /// square-arrow-down icon.
-  static const squareArrowDown = IconData(0xe427, fontFamily: _f, fontPackage: _p);
+  static const squareArrowDown = IconData(
+    0xe427,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// square-arrow-down-left icon.
-  static const squareArrowDownLeft = IconData(0xe4b5, fontFamily: _f, fontPackage: _p);
+  static const squareArrowDownLeft = IconData(
+    0xe4b5,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// square-arrow-down-right icon.
-  static const squareArrowDownRight = IconData(0xe4b6, fontFamily: _f, fontPackage: _p);
+  static const squareArrowDownRight = IconData(
+    0xe4b6,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// square-arrow-left icon.
-  static const squareArrowLeft = IconData(0xe428, fontFamily: _f, fontPackage: _p);
+  static const squareArrowLeft = IconData(
+    0xe428,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// square-arrow-out-down-left icon.
-  static const squareArrowOutDownLeft = IconData(0xe5a1, fontFamily: _f, fontPackage: _p);
+  static const squareArrowOutDownLeft = IconData(
+    0xe5a1,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// square-arrow-out-down-right icon.
-  static const squareArrowOutDownRight = IconData(0xe5a2, fontFamily: _f, fontPackage: _p);
+  static const squareArrowOutDownRight = IconData(
+    0xe5a2,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// square-arrow-out-up-left icon.
-  static const squareArrowOutUpLeft = IconData(0xe5a3, fontFamily: _f, fontPackage: _p);
+  static const squareArrowOutUpLeft = IconData(
+    0xe5a3,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// square-arrow-out-up-right icon.
-  static const squareArrowOutUpRight = IconData(0xe5a4, fontFamily: _f, fontPackage: _p);
+  static const squareArrowOutUpRight = IconData(
+    0xe5a4,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// square-arrow-right icon.
-  static const squareArrowRight = IconData(0xe429, fontFamily: _f, fontPackage: _p);
+  static const squareArrowRight = IconData(
+    0xe429,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// square-arrow-right-enter icon.
-  static const squareArrowRightEnter = IconData(0xe6c3, fontFamily: _f, fontPackage: _p);
+  static const squareArrowRightEnter = IconData(
+    0xe6c3,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// square-arrow-right-exit icon.
-  static const squareArrowRightExit = IconData(0xe6c4, fontFamily: _f, fontPackage: _p);
+  static const squareArrowRightExit = IconData(
+    0xe6c4,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// square-arrow-up icon.
-  static const squareArrowUp = IconData(0xe42a, fontFamily: _f, fontPackage: _p);
+  static const squareArrowUp = IconData(
+    0xe42a,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// square-arrow-up-left icon.
-  static const squareArrowUpLeft = IconData(0xe4b7, fontFamily: _f, fontPackage: _p);
+  static const squareArrowUpLeft = IconData(
+    0xe4b7,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// square-arrow-up-right icon.
-  static const squareArrowUpRight = IconData(0xe4b8, fontFamily: _f, fontPackage: _p);
+  static const squareArrowUpRight = IconData(
+    0xe4b8,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// square-chevron-down icon.
-  static const squareChevronDown = IconData(0xe3cf, fontFamily: _f, fontPackage: _p);
+  static const squareChevronDown = IconData(
+    0xe3cf,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// square-chevron-left icon.
-  static const squareChevronLeft = IconData(0xe3d0, fontFamily: _f, fontPackage: _p);
+  static const squareChevronLeft = IconData(
+    0xe3d0,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// square-chevron-right icon.
-  static const squareChevronRight = IconData(0xe3d1, fontFamily: _f, fontPackage: _p);
+  static const squareChevronRight = IconData(
+    0xe3d1,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// square-chevron-up icon.
-  static const squareChevronUp = IconData(0xe3d2, fontFamily: _f, fontPackage: _p);
+  static const squareChevronUp = IconData(
+    0xe3d2,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// square-round-corner icon.
-  static const squareRoundCorner = IconData(0xe648, fontFamily: _f, fontPackage: _p);
+  static const squareRoundCorner = IconData(
+    0xe648,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// undo icon.
   static const undo = IconData(0xe19b, fontFamily: _f, fontPackage: _p);
@@ -579,7 +1067,11 @@ class OiIcons {
   static const undoDot = IconData(0xe451, fontFamily: _f, fontPackage: _p);
 
   /// waves-arrow-down icon.
-  static const wavesArrowDown = IconData(0xe6a9, fontFamily: _f, fontPackage: _p);
+  static const wavesArrowDown = IconData(
+    0xe6a9,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// waves-arrow-up icon.
   static const wavesArrowUp = IconData(0xe6aa, fontFamily: _f, fontPackage: _p);
@@ -588,8 +1080,11 @@ class OiIcons {
   static const waypoints = IconData(0xe542, fontFamily: _f, fontPackage: _p);
 
   /// wind-arrow-down icon.
-  static const windArrowDown = IconData(0xe631, fontFamily: _f, fontPackage: _p);
-
+  static const windArrowDown = IconData(
+    0xe631,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   // ── Layout ────────────────────────────────────────────────────────
 
@@ -597,40 +1092,88 @@ class OiIcons {
   static const alignCenter = IconData(0xe182, fontFamily: _f, fontPackage: _p);
 
   /// align-center-horizontal icon.
-  static const alignCenterHorizontal = IconData(0xe26c, fontFamily: _f, fontPackage: _p);
+  static const alignCenterHorizontal = IconData(
+    0xe26c,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// align-center-vertical icon.
-  static const alignCenterVertical = IconData(0xe26d, fontFamily: _f, fontPackage: _p);
+  static const alignCenterVertical = IconData(
+    0xe26d,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// align-end-horizontal icon.
-  static const alignEndHorizontal = IconData(0xe26e, fontFamily: _f, fontPackage: _p);
+  static const alignEndHorizontal = IconData(
+    0xe26e,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// align-end-vertical icon.
-  static const alignEndVertical = IconData(0xe26f, fontFamily: _f, fontPackage: _p);
+  static const alignEndVertical = IconData(
+    0xe26f,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// align-horizontal-distribute-center icon.
-  static const alignHorizontalDistributeCenter = IconData(0xe03c, fontFamily: _f, fontPackage: _p);
+  static const alignHorizontalDistributeCenter = IconData(
+    0xe03c,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// align-horizontal-distribute-end icon.
-  static const alignHorizontalDistributeEnd = IconData(0xe03d, fontFamily: _f, fontPackage: _p);
+  static const alignHorizontalDistributeEnd = IconData(
+    0xe03d,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// align-horizontal-distribute-start icon.
-  static const alignHorizontalDistributeStart = IconData(0xe03e, fontFamily: _f, fontPackage: _p);
+  static const alignHorizontalDistributeStart = IconData(
+    0xe03e,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// align-horizontal-justify-center icon.
-  static const alignHorizontalJustifyCenter = IconData(0xe272, fontFamily: _f, fontPackage: _p);
+  static const alignHorizontalJustifyCenter = IconData(
+    0xe272,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// align-horizontal-justify-end icon.
-  static const alignHorizontalJustifyEnd = IconData(0xe273, fontFamily: _f, fontPackage: _p);
+  static const alignHorizontalJustifyEnd = IconData(
+    0xe273,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// align-horizontal-justify-start icon.
-  static const alignHorizontalJustifyStart = IconData(0xe274, fontFamily: _f, fontPackage: _p);
+  static const alignHorizontalJustifyStart = IconData(
+    0xe274,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// align-horizontal-space-around icon.
-  static const alignHorizontalSpaceAround = IconData(0xe275, fontFamily: _f, fontPackage: _p);
+  static const alignHorizontalSpaceAround = IconData(
+    0xe275,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// align-horizontal-space-between icon.
-  static const alignHorizontalSpaceBetween = IconData(0xe276, fontFamily: _f, fontPackage: _p);
+  static const alignHorizontalSpaceBetween = IconData(
+    0xe276,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// align-justify icon.
   static const alignJustify = IconData(0xe184, fontFamily: _f, fontPackage: _p);
@@ -642,76 +1185,168 @@ class OiIcons {
   static const alignRight = IconData(0xe183, fontFamily: _f, fontPackage: _p);
 
   /// align-start-horizontal icon.
-  static const alignStartHorizontal = IconData(0xe270, fontFamily: _f, fontPackage: _p);
+  static const alignStartHorizontal = IconData(
+    0xe270,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// align-start-vertical icon.
-  static const alignStartVertical = IconData(0xe271, fontFamily: _f, fontPackage: _p);
+  static const alignStartVertical = IconData(
+    0xe271,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// align-vertical-distribute-center icon.
-  static const alignVerticalDistributeCenter = IconData(0xe27e, fontFamily: _f, fontPackage: _p);
+  static const alignVerticalDistributeCenter = IconData(
+    0xe27e,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// align-vertical-distribute-end icon.
-  static const alignVerticalDistributeEnd = IconData(0xe27f, fontFamily: _f, fontPackage: _p);
+  static const alignVerticalDistributeEnd = IconData(
+    0xe27f,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// align-vertical-distribute-start icon.
-  static const alignVerticalDistributeStart = IconData(0xe280, fontFamily: _f, fontPackage: _p);
+  static const alignVerticalDistributeStart = IconData(
+    0xe280,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// align-vertical-justify-center icon.
-  static const alignVerticalJustifyCenter = IconData(0xe277, fontFamily: _f, fontPackage: _p);
+  static const alignVerticalJustifyCenter = IconData(
+    0xe277,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// align-vertical-justify-end icon.
-  static const alignVerticalJustifyEnd = IconData(0xe278, fontFamily: _f, fontPackage: _p);
+  static const alignVerticalJustifyEnd = IconData(
+    0xe278,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// align-vertical-justify-start icon.
-  static const alignVerticalJustifyStart = IconData(0xe279, fontFamily: _f, fontPackage: _p);
+  static const alignVerticalJustifyStart = IconData(
+    0xe279,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// align-vertical-space-around icon.
-  static const alignVerticalSpaceAround = IconData(0xe27a, fontFamily: _f, fontPackage: _p);
+  static const alignVerticalSpaceAround = IconData(
+    0xe27a,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// align-vertical-space-between icon.
-  static const alignVerticalSpaceBetween = IconData(0xe27b, fontFamily: _f, fontPackage: _p);
+  static const alignVerticalSpaceBetween = IconData(
+    0xe27b,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// between-horizonal-end icon.
-  static const betweenHorizonalEnd = IconData(0xe591, fontFamily: _f, fontPackage: _p);
+  static const betweenHorizonalEnd = IconData(
+    0xe591,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// between-horizonal-start icon.
-  static const betweenHorizonalStart = IconData(0xe592, fontFamily: _f, fontPackage: _p);
+  static const betweenHorizonalStart = IconData(
+    0xe592,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// between-horizontal-end icon.
-  static const betweenHorizontalEnd = IconData(0xe591, fontFamily: _f, fontPackage: _p);
+  static const betweenHorizontalEnd = IconData(
+    0xe591,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// between-horizontal-start icon.
-  static const betweenHorizontalStart = IconData(0xe592, fontFamily: _f, fontPackage: _p);
+  static const betweenHorizontalStart = IconData(
+    0xe592,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// between-vertical-end icon.
-  static const betweenVerticalEnd = IconData(0xe593, fontFamily: _f, fontPackage: _p);
+  static const betweenVerticalEnd = IconData(
+    0xe593,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// between-vertical-start icon.
-  static const betweenVerticalStart = IconData(0xe594, fontFamily: _f, fontPackage: _p);
+  static const betweenVerticalStart = IconData(
+    0xe594,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// chart-column icon.
   static const chartColumn = IconData(0xe2a3, fontFamily: _f, fontPackage: _p);
 
   /// chart-column-big icon.
-  static const chartColumnBig = IconData(0xe4a9, fontFamily: _f, fontPackage: _p);
+  static const chartColumnBig = IconData(
+    0xe4a9,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// chart-column-decreasing icon.
-  static const chartColumnDecreasing = IconData(0xe067, fontFamily: _f, fontPackage: _p);
+  static const chartColumnDecreasing = IconData(
+    0xe067,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// chart-column-increasing icon.
-  static const chartColumnIncreasing = IconData(0xe2a4, fontFamily: _f, fontPackage: _p);
+  static const chartColumnIncreasing = IconData(
+    0xe2a4,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// chart-column-stacked icon.
-  static const chartColumnStacked = IconData(0xe60a, fontFamily: _f, fontPackage: _p);
+  static const chartColumnStacked = IconData(
+    0xe60a,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// chart-no-axes-column icon.
-  static const chartNoAxesColumn = IconData(0xe068, fontFamily: _f, fontPackage: _p);
+  static const chartNoAxesColumn = IconData(
+    0xe068,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// chart-no-axes-column-decreasing icon.
-  static const chartNoAxesColumnDecreasing = IconData(0xe069, fontFamily: _f, fontPackage: _p);
+  static const chartNoAxesColumnDecreasing = IconData(
+    0xe069,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// chart-no-axes-column-increasing icon.
-  static const chartNoAxesColumnIncreasing = IconData(0xe06a, fontFamily: _f, fontPackage: _p);
+  static const chartNoAxesColumnIncreasing = IconData(
+    0xe06a,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// columns icon.
   static const columns = IconData(0xe098, fontFamily: _f, fontPackage: _p);
@@ -729,16 +1364,28 @@ class OiIcons {
   static const columns4 = IconData(0xe589, fontFamily: _f, fontPackage: _p);
 
   /// columns-settings icon.
-  static const columnsSettings = IconData(0xe661, fontFamily: _f, fontPackage: _p);
+  static const columnsSettings = IconData(
+    0xe661,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// crown icon.
   static const crown = IconData(0xe1d6, fontFamily: _f, fontPackage: _p);
 
   /// file-chart-column icon.
-  static const fileChartColumn = IconData(0xe311, fontFamily: _f, fontPackage: _p);
+  static const fileChartColumn = IconData(
+    0xe311,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// file-chart-column-increasing icon.
-  static const fileChartColumnIncreasing = IconData(0xe312, fontFamily: _f, fontPackage: _p);
+  static const fileChartColumnIncreasing = IconData(
+    0xe312,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// folder-kanban icon.
   static const folderKanban = IconData(0xe4c6, fontFamily: _f, fontPackage: _p);
@@ -786,7 +1433,11 @@ class OiIcons {
   static const group = IconData(0xe464, fontFamily: _f, fontPackage: _p);
 
   /// inspection-panel icon.
-  static const inspectionPanel = IconData(0xe583, fontFamily: _f, fontPackage: _p);
+  static const inspectionPanel = IconData(
+    0xe583,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// kanban icon.
   static const kanban = IconData(0xe4dc, fontFamily: _f, fontPackage: _p);
@@ -795,13 +1446,21 @@ class OiIcons {
   static const kanbanSquare = IconData(0xe170, fontFamily: _f, fontPackage: _p);
 
   /// kanban-square-dashed icon.
-  static const kanbanSquareDashed = IconData(0xe16c, fontFamily: _f, fontPackage: _p);
+  static const kanbanSquareDashed = IconData(
+    0xe16c,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// layout icon.
   static const layout = IconData(0xe12c, fontFamily: _f, fontPackage: _p);
 
   /// layout-dashboard icon.
-  static const layoutDashboard = IconData(0xe1c1, fontFamily: _f, fontPackage: _p);
+  static const layoutDashboard = IconData(
+    0xe1c1,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// layout-grid icon.
   static const layoutGrid = IconData(0xe0ff, fontFamily: _f, fontPackage: _p);
@@ -810,13 +1469,25 @@ class OiIcons {
   static const layoutList = IconData(0xe1d9, fontFamily: _f, fontPackage: _p);
 
   /// layout-panel-left icon.
-  static const layoutPanelLeft = IconData(0xe470, fontFamily: _f, fontPackage: _p);
+  static const layoutPanelLeft = IconData(
+    0xe470,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// layout-panel-top icon.
-  static const layoutPanelTop = IconData(0xe471, fontFamily: _f, fontPackage: _p);
+  static const layoutPanelTop = IconData(
+    0xe471,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// layout-template icon.
-  static const layoutTemplate = IconData(0xe207, fontFamily: _f, fontPackage: _p);
+  static const layoutTemplate = IconData(
+    0xe207,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// microwave icon.
   static const microwave = IconData(0xe37a, fontFamily: _f, fontPackage: _p);
@@ -825,82 +1496,170 @@ class OiIcons {
   static const panelBottom = IconData(0xe42c, fontFamily: _f, fontPackage: _p);
 
   /// panel-bottom-close icon.
-  static const panelBottomClose = IconData(0xe42d, fontFamily: _f, fontPackage: _p);
+  static const panelBottomClose = IconData(
+    0xe42d,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// panel-bottom-dashed icon.
-  static const panelBottomDashed = IconData(0xe42e, fontFamily: _f, fontPackage: _p);
+  static const panelBottomDashed = IconData(
+    0xe42e,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// panel-bottom-inactive icon.
-  static const panelBottomInactive = IconData(0xe42e, fontFamily: _f, fontPackage: _p);
+  static const panelBottomInactive = IconData(
+    0xe42e,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// panel-bottom-open icon.
-  static const panelBottomOpen = IconData(0xe42f, fontFamily: _f, fontPackage: _p);
+  static const panelBottomOpen = IconData(
+    0xe42f,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// panel-left icon.
   static const panelLeft = IconData(0xe12a, fontFamily: _f, fontPackage: _p);
 
   /// panel-left-close icon.
-  static const panelLeftClose = IconData(0xe21c, fontFamily: _f, fontPackage: _p);
+  static const panelLeftClose = IconData(
+    0xe21c,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// panel-left-dashed icon.
-  static const panelLeftDashed = IconData(0xe430, fontFamily: _f, fontPackage: _p);
+  static const panelLeftDashed = IconData(
+    0xe430,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// panel-left-inactive icon.
-  static const panelLeftInactive = IconData(0xe430, fontFamily: _f, fontPackage: _p);
+  static const panelLeftInactive = IconData(
+    0xe430,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// panel-left-open icon.
-  static const panelLeftOpen = IconData(0xe21d, fontFamily: _f, fontPackage: _p);
+  static const panelLeftOpen = IconData(
+    0xe21d,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// panel-left-right-dashed icon.
-  static const panelLeftRightDashed = IconData(0xe692, fontFamily: _f, fontPackage: _p);
+  static const panelLeftRightDashed = IconData(
+    0xe692,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// panel-right icon.
   static const panelRight = IconData(0xe431, fontFamily: _f, fontPackage: _p);
 
   /// panel-right-close icon.
-  static const panelRightClose = IconData(0xe432, fontFamily: _f, fontPackage: _p);
+  static const panelRightClose = IconData(
+    0xe432,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// panel-right-dashed icon.
-  static const panelRightDashed = IconData(0xe433, fontFamily: _f, fontPackage: _p);
+  static const panelRightDashed = IconData(
+    0xe433,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// panel-right-inactive icon.
-  static const panelRightInactive = IconData(0xe433, fontFamily: _f, fontPackage: _p);
+  static const panelRightInactive = IconData(
+    0xe433,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// panel-right-open icon.
-  static const panelRightOpen = IconData(0xe434, fontFamily: _f, fontPackage: _p);
+  static const panelRightOpen = IconData(
+    0xe434,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// panel-top icon.
   static const panelTop = IconData(0xe435, fontFamily: _f, fontPackage: _p);
 
   /// panel-top-bottom-dashed icon.
-  static const panelTopBottomDashed = IconData(0xe693, fontFamily: _f, fontPackage: _p);
+  static const panelTopBottomDashed = IconData(
+    0xe693,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// panel-top-close icon.
-  static const panelTopClose = IconData(0xe436, fontFamily: _f, fontPackage: _p);
+  static const panelTopClose = IconData(
+    0xe436,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// panel-top-dashed icon.
-  static const panelTopDashed = IconData(0xe437, fontFamily: _f, fontPackage: _p);
+  static const panelTopDashed = IconData(
+    0xe437,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// panel-top-inactive icon.
-  static const panelTopInactive = IconData(0xe437, fontFamily: _f, fontPackage: _p);
+  static const panelTopInactive = IconData(
+    0xe437,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// panel-top-open icon.
   static const panelTopOpen = IconData(0xe438, fontFamily: _f, fontPackage: _p);
 
   /// panels-left-bottom icon.
-  static const panelsLeftBottom = IconData(0xe12b, fontFamily: _f, fontPackage: _p);
+  static const panelsLeftBottom = IconData(
+    0xe12b,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// panels-left-right icon.
-  static const panelsLeftRight = IconData(0xe099, fontFamily: _f, fontPackage: _p);
+  static const panelsLeftRight = IconData(
+    0xe099,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// panels-right-bottom icon.
-  static const panelsRightBottom = IconData(0xe588, fontFamily: _f, fontPackage: _p);
+  static const panelsRightBottom = IconData(
+    0xe588,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// panels-top-bottom icon.
-  static const panelsTopBottom = IconData(0xe58a, fontFamily: _f, fontPackage: _p);
+  static const panelsTopBottom = IconData(
+    0xe58a,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// panels-top-left icon.
-  static const panelsTopLeft = IconData(0xe12c, fontFamily: _f, fontPackage: _p);
+  static const panelsTopLeft = IconData(
+    0xe12c,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// pilcrow icon.
   static const pilcrow = IconData(0xe3a3, fontFamily: _f, fontPackage: _p);
@@ -912,7 +1671,11 @@ class OiIcons {
   static const pilcrowRight = IconData(0xe5dd, fontFamily: _f, fontPackage: _p);
 
   /// pilcrow-square icon.
-  static const pilcrowSquare = IconData(0xe48b, fontFamily: _f, fontPackage: _p);
+  static const pilcrowSquare = IconData(
+    0xe48b,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// rows icon.
   static const rows = IconData(0xe439, fontFamily: _f, fontPackage: _p);
@@ -930,10 +1693,18 @@ class OiIcons {
   static const section = IconData(0xe5e8, fontFamily: _f, fontPackage: _p);
 
   /// separator-horizontal icon.
-  static const separatorHorizontal = IconData(0xe1c8, fontFamily: _f, fontPackage: _p);
+  static const separatorHorizontal = IconData(
+    0xe1c8,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// separator-vertical icon.
-  static const separatorVertical = IconData(0xe1c9, fontFamily: _f, fontPackage: _p);
+  static const separatorVertical = IconData(
+    0xe1c9,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// sidebar icon.
   static const sidebar = IconData(0xe12a, fontFamily: _f, fontPackage: _p);
@@ -954,46 +1725,94 @@ class OiIcons {
   static const split = IconData(0xe440, fontFamily: _f, fontPackage: _p);
 
   /// split-square-horizontal icon.
-  static const splitSquareHorizontal = IconData(0xe3b6, fontFamily: _f, fontPackage: _p);
+  static const splitSquareHorizontal = IconData(
+    0xe3b6,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// split-square-vertical icon.
-  static const splitSquareVertical = IconData(0xe3b7, fontFamily: _f, fontPackage: _p);
+  static const splitSquareVertical = IconData(
+    0xe3b7,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// square-dashed-kanban icon.
-  static const squareDashedKanban = IconData(0xe16c, fontFamily: _f, fontPackage: _p);
+  static const squareDashedKanban = IconData(
+    0xe16c,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// square-kanban icon.
   static const squareKanban = IconData(0xe170, fontFamily: _f, fontPackage: _p);
 
   /// square-pilcrow icon.
-  static const squarePilcrow = IconData(0xe48b, fontFamily: _f, fontPackage: _p);
+  static const squarePilcrow = IconData(
+    0xe48b,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// square-split-horizontal icon.
-  static const squareSplitHorizontal = IconData(0xe3b6, fontFamily: _f, fontPackage: _p);
+  static const squareSplitHorizontal = IconData(
+    0xe3b6,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// square-split-vertical icon.
-  static const squareSplitVertical = IconData(0xe3b7, fontFamily: _f, fontPackage: _p);
+  static const squareSplitVertical = IconData(
+    0xe3b7,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// table-cells-split icon.
-  static const tableCellsSplit = IconData(0xe5c8, fontFamily: _f, fontPackage: _p);
+  static const tableCellsSplit = IconData(
+    0xe5c8,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// table-columns-split icon.
-  static const tableColumnsSplit = IconData(0xe5c9, fontFamily: _f, fontPackage: _p);
+  static const tableColumnsSplit = IconData(
+    0xe5c9,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// table-rows-split icon.
-  static const tableRowsSplit = IconData(0xe5ca, fontFamily: _f, fontPackage: _p);
+  static const tableRowsSplit = IconData(
+    0xe5ca,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// text-align-center icon.
-  static const textAlignCenter = IconData(0xe182, fontFamily: _f, fontPackage: _p);
+  static const textAlignCenter = IconData(
+    0xe182,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// text-align-end icon.
   static const textAlignEnd = IconData(0xe183, fontFamily: _f, fontPackage: _p);
 
   /// text-align-justify icon.
-  static const textAlignJustify = IconData(0xe184, fontFamily: _f, fontPackage: _p);
+  static const textAlignJustify = IconData(
+    0xe184,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// text-align-start icon.
-  static const textAlignStart = IconData(0xe185, fontFamily: _f, fontPackage: _p);
+  static const textAlignStart = IconData(
+    0xe185,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// text-wrap icon.
   static const textWrap = IconData(0xe248, fontFamily: _f, fontPackage: _p);
@@ -1003,7 +1822,6 @@ class OiIcons {
 
   /// wrap-text icon.
   static const wrapText = IconData(0xe248, fontFamily: _f, fontPackage: _p);
-
 
   // ── Text & Typography ─────────────────────────────────────────────
 
@@ -1029,13 +1847,25 @@ class OiIcons {
   static const briefcase = IconData(0xe062, fontFamily: _f, fontPackage: _p);
 
   /// briefcase-business icon.
-  static const briefcaseBusiness = IconData(0xe5d5, fontFamily: _f, fontPackage: _p);
+  static const briefcaseBusiness = IconData(
+    0xe5d5,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// briefcase-conveyor-belt icon.
-  static const briefcaseConveyorBelt = IconData(0xe62b, fontFamily: _f, fontPackage: _p);
+  static const briefcaseConveyorBelt = IconData(
+    0xe62b,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// briefcase-medical icon.
-  static const briefcaseMedical = IconData(0xe5d6, fontFamily: _f, fontPackage: _p);
+  static const briefcaseMedical = IconData(
+    0xe5d6,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// captions icon.
   static const captions = IconData(0xe3a4, fontFamily: _f, fontPackage: _p);
@@ -1047,16 +1877,28 @@ class OiIcons {
   static const caseLower = IconData(0xe3d8, fontFamily: _f, fontPackage: _p);
 
   /// case-sensitive icon.
-  static const caseSensitive = IconData(0xe3d9, fontFamily: _f, fontPackage: _p);
+  static const caseSensitive = IconData(
+    0xe3d9,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// case-upper icon.
   static const caseUpper = IconData(0xe3da, fontFamily: _f, fontPackage: _p);
 
   /// clipboard-list icon.
-  static const clipboardList = IconData(0xe086, fontFamily: _f, fontPackage: _p);
+  static const clipboardList = IconData(
+    0xe086,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// clipboard-type icon.
-  static const clipboardType = IconData(0xe309, fontFamily: _f, fontPackage: _p);
+  static const clipboardType = IconData(
+    0xe309,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// file-text icon.
   static const fileText = IconData(0xe0cc, fontFamily: _f, fontPackage: _p);
@@ -1092,10 +1934,18 @@ class OiIcons {
   static const indent = IconData(0xe108, fontFamily: _f, fontPackage: _p);
 
   /// indent-decrease icon.
-  static const indentDecrease = IconData(0xe107, fontFamily: _f, fontPackage: _p);
+  static const indentDecrease = IconData(
+    0xe107,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// indent-increase icon.
-  static const indentIncrease = IconData(0xe108, fontFamily: _f, fontPackage: _p);
+  static const indentIncrease = IconData(
+    0xe108,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// italic icon.
   static const italic = IconData(0xe0fb, fontFamily: _f, fontPackage: _p);
@@ -1125,13 +1975,25 @@ class OiIcons {
   static const listFilter = IconData(0xe460, fontFamily: _f, fontPackage: _p);
 
   /// list-filter-plus icon.
-  static const listFilterPlus = IconData(0xe639, fontFamily: _f, fontPackage: _p);
+  static const listFilterPlus = IconData(
+    0xe639,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// list-indent-decrease icon.
-  static const listIndentDecrease = IconData(0xe107, fontFamily: _f, fontPackage: _p);
+  static const listIndentDecrease = IconData(
+    0xe107,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// list-indent-increase icon.
-  static const listIndentIncrease = IconData(0xe108, fontFamily: _f, fontPackage: _p);
+  static const listIndentIncrease = IconData(
+    0xe108,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// list-minus icon.
   static const listMinus = IconData(0xe23e, fontFamily: _f, fontPackage: _p);
@@ -1164,10 +2026,18 @@ class OiIcons {
   static const listX = IconData(0xe240, fontFamily: _f, fontPackage: _p);
 
   /// message-square-quote icon.
-  static const messageSquareQuote = IconData(0xe572, fontFamily: _f, fontPackage: _p);
+  static const messageSquareQuote = IconData(
+    0xe572,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// message-square-text icon.
-  static const messageSquareText = IconData(0xe575, fontFamily: _f, fontPackage: _p);
+  static const messageSquareText = IconData(
+    0xe575,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// notebook-text icon.
   static const notebookText = IconData(0xe598, fontFamily: _f, fontPackage: _p);
@@ -1176,7 +2046,11 @@ class OiIcons {
   static const notepadText = IconData(0xe599, fontFamily: _f, fontPackage: _p);
 
   /// notepad-text-dashed icon.
-  static const notepadTextDashed = IconData(0xe59a, fontFamily: _f, fontPackage: _p);
+  static const notepadTextDashed = IconData(
+    0xe59a,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// pc-case icon.
   static const pcCase = IconData(0xe446, fontFamily: _f, fontPackage: _p);
@@ -1203,7 +2077,11 @@ class OiIcons {
   static const spellCheck2 = IconData(0xe49b, fontFamily: _f, fontPackage: _p);
 
   /// strikethrough icon.
-  static const strikethrough = IconData(0xe177, fontFamily: _f, fontPackage: _p);
+  static const strikethrough = IconData(
+    0xe177,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// subscript icon.
   static const subscript = IconData(0xe25c, fontFamily: _f, fontPackage: _p);
@@ -1221,7 +2099,11 @@ class OiIcons {
   static const textCursor = IconData(0xe264, fontFamily: _f, fontPackage: _p);
 
   /// text-cursor-input icon.
-  static const textCursorInput = IconData(0xe265, fontFamily: _f, fontPackage: _p);
+  static const textCursorInput = IconData(
+    0xe265,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// text-initial icon.
   static const textInitial = IconData(0xe605, fontFamily: _f, fontPackage: _p);
@@ -1236,7 +2118,11 @@ class OiIcons {
   static const textSelect = IconData(0xe3de, fontFamily: _f, fontPackage: _p);
 
   /// text-selection icon.
-  static const textSelection = IconData(0xe3de, fontFamily: _f, fontPackage: _p);
+  static const textSelection = IconData(
+    0xe3de,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// tool-case icon.
   static const toolCase = IconData(0xe67d, fontFamily: _f, fontPackage: _p);
@@ -1253,11 +2139,14 @@ class OiIcons {
   /// whole-word icon.
   static const wholeWord = IconData(0xe3df, fontFamily: _f, fontPackage: _p);
 
-
   // ── Shapes ────────────────────────────────────────────────────────
 
   /// activity-square icon.
-  static const activitySquare = IconData(0xe4b4, fontFamily: _f, fontPackage: _p);
+  static const activitySquare = IconData(
+    0xe4b4,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// alert-circle icon.
   static const alertCircle = IconData(0xe077, fontFamily: _f, fontPackage: _p);
@@ -1266,19 +2155,35 @@ class OiIcons {
   static const alertOctagon = IconData(0xe127, fontFamily: _f, fontPackage: _p);
 
   /// alert-triangle icon.
-  static const alertTriangle = IconData(0xe193, fontFamily: _f, fontPackage: _p);
+  static const alertTriangle = IconData(
+    0xe193,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// asterisk-square icon.
-  static const asteriskSquare = IconData(0xe168, fontFamily: _f, fontPackage: _p);
+  static const asteriskSquare = IconData(
+    0xe168,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// book-heart icon.
   static const bookHeart = IconData(0xe548, fontFamily: _f, fontPackage: _p);
 
   /// bot-message-square icon.
-  static const botMessageSquare = IconData(0xe5ce, fontFamily: _f, fontPackage: _p);
+  static const botMessageSquare = IconData(
+    0xe5ce,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// calendar-heart icon.
-  static const calendarHeart = IconData(0xe305, fontFamily: _f, fontPackage: _p);
+  static const calendarHeart = IconData(
+    0xe305,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// check-circle icon.
   static const checkCircle = IconData(0xe07c, fontFamily: _f, fontPackage: _p);
@@ -1302,7 +2207,11 @@ class OiIcons {
   static const circleCheck = IconData(0xe226, fontFamily: _f, fontPackage: _p);
 
   /// circle-check-big icon.
-  static const circleCheckBig = IconData(0xe07c, fontFamily: _f, fontPackage: _p);
+  static const circleCheckBig = IconData(
+    0xe07c,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// circle-dashed icon.
   static const circleDashed = IconData(0xe4b0, fontFamily: _f, fontPackage: _p);
@@ -1311,22 +2220,38 @@ class OiIcons {
   static const circleDivide = IconData(0xe07d, fontFamily: _f, fontPackage: _p);
 
   /// circle-dollar-sign icon.
-  static const circleDollarSign = IconData(0xe47d, fontFamily: _f, fontPackage: _p);
+  static const circleDollarSign = IconData(
+    0xe47d,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// circle-dot icon.
   static const circleDot = IconData(0xe345, fontFamily: _f, fontPackage: _p);
 
   /// circle-dot-dashed icon.
-  static const circleDotDashed = IconData(0xe4b1, fontFamily: _f, fontPackage: _p);
+  static const circleDotDashed = IconData(
+    0xe4b1,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// circle-ellipsis icon.
-  static const circleEllipsis = IconData(0xe346, fontFamily: _f, fontPackage: _p);
+  static const circleEllipsis = IconData(
+    0xe346,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// circle-equal icon.
   static const circleEqual = IconData(0xe400, fontFamily: _f, fontPackage: _p);
 
   /// circle-fading-plus icon.
-  static const circleFadingPlus = IconData(0xe5bc, fontFamily: _f, fontPackage: _p);
+  static const circleFadingPlus = IconData(
+    0xe5bc,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// circle-gauge icon.
   static const circleGauge = IconData(0xe4e1, fontFamily: _f, fontPackage: _p);
@@ -1341,16 +2266,28 @@ class OiIcons {
   static const circleOff = IconData(0xe401, fontFamily: _f, fontPackage: _p);
 
   /// circle-parking icon.
-  static const circleParking = IconData(0xe3c9, fontFamily: _f, fontPackage: _p);
+  static const circleParking = IconData(
+    0xe3c9,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// circle-parking-off icon.
-  static const circleParkingOff = IconData(0xe3ca, fontFamily: _f, fontPackage: _p);
+  static const circleParkingOff = IconData(
+    0xe3ca,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// circle-pause icon.
   static const circlePause = IconData(0xe07f, fontFamily: _f, fontPackage: _p);
 
   /// circle-percent icon.
-  static const circlePercent = IconData(0xe51a, fontFamily: _f, fontPackage: _p);
+  static const circlePercent = IconData(
+    0xe51a,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// circle-pile icon.
   static const circlePile = IconData(0xe6af, fontFamily: _f, fontPackage: _p);
@@ -1362,13 +2299,21 @@ class OiIcons {
   static const circlePlus = IconData(0xe081, fontFamily: _f, fontPackage: _p);
 
   /// circle-pound-sterling icon.
-  static const circlePoundSterling = IconData(0xe66d, fontFamily: _f, fontPackage: _p);
+  static const circlePoundSterling = IconData(
+    0xe66d,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// circle-power icon.
   static const circlePower = IconData(0xe550, fontFamily: _f, fontPackage: _p);
 
   /// circle-question-mark icon.
-  static const circleQuestionMark = IconData(0xe082, fontFamily: _f, fontPackage: _p);
+  static const circleQuestionMark = IconData(
+    0xe082,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// circle-slash icon.
   static const circleSlash = IconData(0xe402, fontFamily: _f, fontPackage: _p);
@@ -1377,7 +2322,11 @@ class OiIcons {
   static const circleSlash2 = IconData(0xe213, fontFamily: _f, fontPackage: _p);
 
   /// circle-slashed icon.
-  static const circleSlashed = IconData(0xe213, fontFamily: _f, fontPackage: _p);
+  static const circleSlashed = IconData(
+    0xe213,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// circle-small icon.
   static const circleSmall = IconData(0xe640, fontFamily: _f, fontPackage: _p);
@@ -1392,7 +2341,11 @@ class OiIcons {
   static const circleUser = IconData(0xe461, fontFamily: _f, fontPackage: _p);
 
   /// circle-user-round icon.
-  static const circleUserRound = IconData(0xe462, fontFamily: _f, fontPackage: _p);
+  static const circleUserRound = IconData(
+    0xe462,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// circle-x icon.
   static const circleX = IconData(0xe084, fontFamily: _f, fontPackage: _p);
@@ -1407,7 +2360,11 @@ class OiIcons {
   static const diamondMinus = IconData(0xe5e1, fontFamily: _f, fontPackage: _p);
 
   /// diamond-percent icon.
-  static const diamondPercent = IconData(0xe51b, fontFamily: _f, fontPackage: _p);
+  static const diamondPercent = IconData(
+    0xe51b,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// diamond-plus icon.
   static const diamondPlus = IconData(0xe5e2, fontFamily: _f, fontPackage: _p);
@@ -1428,19 +2385,35 @@ class OiIcons {
   static const fileHeart = IconData(0xe31b, fontFamily: _f, fontPackage: _p);
 
   /// flag-triangle-left icon.
-  static const flagTriangleLeft = IconData(0xe237, fontFamily: _f, fontPackage: _p);
+  static const flagTriangleLeft = IconData(
+    0xe237,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// flag-triangle-right icon.
-  static const flagTriangleRight = IconData(0xe238, fontFamily: _f, fontPackage: _p);
+  static const flagTriangleRight = IconData(
+    0xe238,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// folder-heart icon.
   static const folderHeart = IconData(0xe333, fontFamily: _f, fontPackage: _p);
 
   /// function-square icon.
-  static const functionSquare = IconData(0xe22d, fontFamily: _f, fontPackage: _p);
+  static const functionSquare = IconData(
+    0xe22d,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// gantt-chart-square icon.
-  static const ganttChartSquare = IconData(0xe624, fontFamily: _f, fontPackage: _p);
+  static const ganttChartSquare = IconData(
+    0xe624,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// gauge-circle icon.
   static const gaugeCircle = IconData(0xe4e1, fontFamily: _f, fontPackage: _p);
@@ -1455,7 +2428,11 @@ class OiIcons {
   static const heartCrack = IconData(0xe2d6, fontFamily: _f, fontPackage: _p);
 
   /// heart-handshake icon.
-  static const heartHandshake = IconData(0xe2d7, fontFamily: _f, fontPackage: _p);
+  static const heartHandshake = IconData(
+    0xe2d7,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// heart-minus icon.
   static const heartMinus = IconData(0xe651, fontFamily: _f, fontPackage: _p);
@@ -1482,7 +2459,11 @@ class OiIcons {
   static const keySquare = IconData(0xe4a4, fontFamily: _f, fontPackage: _p);
 
   /// library-square icon.
-  static const librarySquare = IconData(0xe54f, fontFamily: _f, fontPackage: _p);
+  static const librarySquare = IconData(
+    0xe54f,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// loader-circle icon.
   static const loaderCircle = IconData(0xe10a, fontFamily: _f, fontPackage: _p);
@@ -1494,91 +2475,207 @@ class OiIcons {
   static const menuSquare = IconData(0xe453, fontFamily: _f, fontPackage: _p);
 
   /// message-circle icon.
-  static const messageCircle = IconData(0xe116, fontFamily: _f, fontPackage: _p);
+  static const messageCircle = IconData(
+    0xe116,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// message-circle-check icon.
-  static const messageCircleCheck = IconData(0xe6ba, fontFamily: _f, fontPackage: _p);
+  static const messageCircleCheck = IconData(
+    0xe6ba,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// message-circle-code icon.
-  static const messageCircleCode = IconData(0xe562, fontFamily: _f, fontPackage: _p);
+  static const messageCircleCode = IconData(
+    0xe562,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// message-circle-dashed icon.
-  static const messageCircleDashed = IconData(0xe563, fontFamily: _f, fontPackage: _p);
+  static const messageCircleDashed = IconData(
+    0xe563,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// message-circle-heart icon.
-  static const messageCircleHeart = IconData(0xe564, fontFamily: _f, fontPackage: _p);
+  static const messageCircleHeart = IconData(
+    0xe564,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// message-circle-more icon.
-  static const messageCircleMore = IconData(0xe565, fontFamily: _f, fontPackage: _p);
+  static const messageCircleMore = IconData(
+    0xe565,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// message-circle-off icon.
-  static const messageCircleOff = IconData(0xe566, fontFamily: _f, fontPackage: _p);
+  static const messageCircleOff = IconData(
+    0xe566,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// message-circle-plus icon.
-  static const messageCirclePlus = IconData(0xe567, fontFamily: _f, fontPackage: _p);
+  static const messageCirclePlus = IconData(
+    0xe567,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// message-circle-question icon.
-  static const messageCircleQuestion = IconData(0xe568, fontFamily: _f, fontPackage: _p);
+  static const messageCircleQuestion = IconData(
+    0xe568,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// message-circle-question-mark icon.
-  static const messageCircleQuestionMark = IconData(0xe568, fontFamily: _f, fontPackage: _p);
+  static const messageCircleQuestionMark = IconData(
+    0xe568,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// message-circle-reply icon.
-  static const messageCircleReply = IconData(0xe569, fontFamily: _f, fontPackage: _p);
+  static const messageCircleReply = IconData(
+    0xe569,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// message-circle-warning icon.
-  static const messageCircleWarning = IconData(0xe56a, fontFamily: _f, fontPackage: _p);
+  static const messageCircleWarning = IconData(
+    0xe56a,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// message-circle-x icon.
-  static const messageCircleX = IconData(0xe56b, fontFamily: _f, fontPackage: _p);
+  static const messageCircleX = IconData(
+    0xe56b,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// message-square icon.
-  static const messageSquare = IconData(0xe117, fontFamily: _f, fontPackage: _p);
+  static const messageSquare = IconData(
+    0xe117,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// message-square-check icon.
-  static const messageSquareCheck = IconData(0xe6bb, fontFamily: _f, fontPackage: _p);
+  static const messageSquareCheck = IconData(
+    0xe6bb,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// message-square-code icon.
-  static const messageSquareCode = IconData(0xe56c, fontFamily: _f, fontPackage: _p);
+  static const messageSquareCode = IconData(
+    0xe56c,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// message-square-dashed icon.
-  static const messageSquareDashed = IconData(0xe40b, fontFamily: _f, fontPackage: _p);
+  static const messageSquareDashed = IconData(
+    0xe40b,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// message-square-diff icon.
-  static const messageSquareDiff = IconData(0xe56d, fontFamily: _f, fontPackage: _p);
+  static const messageSquareDiff = IconData(
+    0xe56d,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// message-square-dot icon.
-  static const messageSquareDot = IconData(0xe56e, fontFamily: _f, fontPackage: _p);
+  static const messageSquareDot = IconData(
+    0xe56e,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// message-square-heart icon.
-  static const messageSquareHeart = IconData(0xe56f, fontFamily: _f, fontPackage: _p);
+  static const messageSquareHeart = IconData(
+    0xe56f,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// message-square-lock icon.
-  static const messageSquareLock = IconData(0xe62c, fontFamily: _f, fontPackage: _p);
+  static const messageSquareLock = IconData(
+    0xe62c,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// message-square-more icon.
-  static const messageSquareMore = IconData(0xe570, fontFamily: _f, fontPackage: _p);
+  static const messageSquareMore = IconData(
+    0xe570,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// message-square-off icon.
-  static const messageSquareOff = IconData(0xe571, fontFamily: _f, fontPackage: _p);
+  static const messageSquareOff = IconData(
+    0xe571,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// message-square-plus icon.
-  static const messageSquarePlus = IconData(0xe40c, fontFamily: _f, fontPackage: _p);
+  static const messageSquarePlus = IconData(
+    0xe40c,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// message-square-reply icon.
-  static const messageSquareReply = IconData(0xe573, fontFamily: _f, fontPackage: _p);
+  static const messageSquareReply = IconData(
+    0xe573,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// message-square-share icon.
-  static const messageSquareShare = IconData(0xe574, fontFamily: _f, fontPackage: _p);
+  static const messageSquareShare = IconData(
+    0xe574,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// message-square-warning icon.
-  static const messageSquareWarning = IconData(0xe576, fontFamily: _f, fontPackage: _p);
+  static const messageSquareWarning = IconData(
+    0xe576,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// message-square-x icon.
-  static const messageSquareX = IconData(0xe577, fontFamily: _f, fontPackage: _p);
+  static const messageSquareX = IconData(
+    0xe577,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// messages-square icon.
-  static const messagesSquare = IconData(0xe40d, fontFamily: _f, fontPackage: _p);
+  static const messagesSquare = IconData(
+    0xe40d,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// minus-circle icon.
   static const minusCircle = IconData(0xe07e, fontFamily: _f, fontPackage: _p);
@@ -1590,7 +2687,11 @@ class OiIcons {
   static const moonStar = IconData(0xe410, fontFamily: _f, fontPackage: _p);
 
   /// mouse-pointer-square-dashed icon.
-  static const mousePointerSquareDashed = IconData(0xe509, fontFamily: _f, fontPackage: _p);
+  static const mousePointerSquareDashed = IconData(
+    0xe509,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// octagon icon.
   static const octagon = IconData(0xe126, fontFamily: _f, fontPackage: _p);
@@ -1608,16 +2709,32 @@ class OiIcons {
   static const octagonX = IconData(0xe128, fontFamily: _f, fontPackage: _p);
 
   /// parking-circle icon.
-  static const parkingCircle = IconData(0xe3c9, fontFamily: _f, fontPackage: _p);
+  static const parkingCircle = IconData(
+    0xe3c9,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// parking-circle-off icon.
-  static const parkingCircleOff = IconData(0xe3ca, fontFamily: _f, fontPackage: _p);
+  static const parkingCircleOff = IconData(
+    0xe3ca,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// parking-square icon.
-  static const parkingSquare = IconData(0xe3cb, fontFamily: _f, fontPackage: _p);
+  static const parkingSquare = IconData(
+    0xe3cb,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// parking-square-off icon.
-  static const parkingSquareOff = IconData(0xe3cc, fontFamily: _f, fontPackage: _p);
+  static const parkingSquareOff = IconData(
+    0xe3cc,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// pause-circle icon.
   static const pauseCircle = IconData(0xe07f, fontFamily: _f, fontPackage: _p);
@@ -1632,13 +2749,25 @@ class OiIcons {
   static const pentagon = IconData(0xe52b, fontFamily: _f, fontPackage: _p);
 
   /// percent-circle icon.
-  static const percentCircle = IconData(0xe51a, fontFamily: _f, fontPackage: _p);
+  static const percentCircle = IconData(
+    0xe51a,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// percent-diamond icon.
-  static const percentDiamond = IconData(0xe51b, fontFamily: _f, fontPackage: _p);
+  static const percentDiamond = IconData(
+    0xe51b,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// percent-square icon.
-  static const percentSquare = IconData(0xe51c, fontFamily: _f, fontPackage: _p);
+  static const percentSquare = IconData(
+    0xe51c,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// pi-square icon.
   static const piSquare = IconData(0xe488, fontFamily: _f, fontPackage: _p);
@@ -1662,22 +2791,42 @@ class OiIcons {
   static const powerSquare = IconData(0xe551, fontFamily: _f, fontPackage: _p);
 
   /// rectangle-circle icon.
-  static const rectangleCircle = IconData(0xe673, fontFamily: _f, fontPackage: _p);
+  static const rectangleCircle = IconData(
+    0xe673,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// rotate-ccw-square icon.
-  static const rotateCcwSquare = IconData(0xe5d0, fontFamily: _f, fontPackage: _p);
+  static const rotateCcwSquare = IconData(
+    0xe5d0,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// rotate-cw-square icon.
-  static const rotateCwSquare = IconData(0xe5d1, fontFamily: _f, fontPackage: _p);
+  static const rotateCwSquare = IconData(
+    0xe5d1,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// scan-heart icon.
   static const scanHeart = IconData(0xe63a, fontFamily: _f, fontPackage: _p);
 
   /// scissors-square icon.
-  static const scissorsSquare = IconData(0xe4ec, fontFamily: _f, fontPackage: _p);
+  static const scissorsSquare = IconData(
+    0xe4ec,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// scissors-square-dashed-bottom icon.
-  static const scissorsSquareDashedBottom = IconData(0xe4eb, fontFamily: _f, fontPackage: _p);
+  static const scissorsSquareDashedBottom = IconData(
+    0xe4eb,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// shapes icon.
   static const shapes = IconData(0xe4b3, fontFamily: _f, fontPackage: _p);
@@ -1692,28 +2841,56 @@ class OiIcons {
   static const square = IconData(0xe167, fontFamily: _f, fontPackage: _p);
 
   /// square-activity icon.
-  static const squareActivity = IconData(0xe4b4, fontFamily: _f, fontPackage: _p);
+  static const squareActivity = IconData(
+    0xe4b4,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// square-asterisk icon.
-  static const squareAsterisk = IconData(0xe168, fontFamily: _f, fontPackage: _p);
+  static const squareAsterisk = IconData(
+    0xe168,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// square-bottom-dashed-scissors icon.
-  static const squareBottomDashedScissors = IconData(0xe4eb, fontFamily: _f, fontPackage: _p);
+  static const squareBottomDashedScissors = IconData(
+    0xe4eb,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// square-centerline-dashed-horizontal icon.
-  static const squareCenterlineDashedHorizontal = IconData(0xe6c5, fontFamily: _f, fontPackage: _p);
+  static const squareCenterlineDashedHorizontal = IconData(
+    0xe6c5,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// square-centerline-dashed-vertical icon.
-  static const squareCenterlineDashedVertical = IconData(0xe6c6, fontFamily: _f, fontPackage: _p);
+  static const squareCenterlineDashedVertical = IconData(
+    0xe6c6,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// square-chart-gantt icon.
-  static const squareChartGantt = IconData(0xe169, fontFamily: _f, fontPackage: _p);
+  static const squareChartGantt = IconData(
+    0xe169,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// square-check icon.
   static const squareCheck = IconData(0xe559, fontFamily: _f, fontPackage: _p);
 
   /// square-check-big icon.
-  static const squareCheckBig = IconData(0xe16a, fontFamily: _f, fontPackage: _p);
+  static const squareCheckBig = IconData(
+    0xe16a,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// square-code icon.
   static const squareCode = IconData(0xe16b, fontFamily: _f, fontPackage: _p);
@@ -1722,16 +2899,32 @@ class OiIcons {
   static const squareDashed = IconData(0xe1cb, fontFamily: _f, fontPackage: _p);
 
   /// square-dashed-bottom icon.
-  static const squareDashedBottom = IconData(0xe4c0, fontFamily: _f, fontPackage: _p);
+  static const squareDashedBottom = IconData(
+    0xe4c0,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// square-dashed-bottom-code icon.
-  static const squareDashedBottomCode = IconData(0xe4c1, fontFamily: _f, fontPackage: _p);
+  static const squareDashedBottomCode = IconData(
+    0xe4c1,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// square-dashed-mouse-pointer icon.
-  static const squareDashedMousePointer = IconData(0xe509, fontFamily: _f, fontPackage: _p);
+  static const squareDashedMousePointer = IconData(
+    0xe509,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// square-dashed-top-solid icon.
-  static const squareDashedTopSolid = IconData(0xe66c, fontFamily: _f, fontPackage: _p);
+  static const squareDashedTopSolid = IconData(
+    0xe66c,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// square-divide icon.
   static const squareDivide = IconData(0xe16d, fontFamily: _f, fontPackage: _p);
@@ -1743,13 +2936,25 @@ class OiIcons {
   static const squareEqual = IconData(0xe16f, fontFamily: _f, fontPackage: _p);
 
   /// square-function icon.
-  static const squareFunction = IconData(0xe22d, fontFamily: _f, fontPackage: _p);
+  static const squareFunction = IconData(
+    0xe22d,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// square-gantt-chart icon.
-  static const squareGanttChart = IconData(0xe169, fontFamily: _f, fontPackage: _p);
+  static const squareGanttChart = IconData(
+    0xe169,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// square-library icon.
-  static const squareLibrary = IconData(0xe54f, fontFamily: _f, fontPackage: _p);
+  static const squareLibrary = IconData(
+    0xe54f,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// square-m icon.
   static const squareM = IconData(0xe503, fontFamily: _f, fontPackage: _p);
@@ -1761,13 +2966,25 @@ class OiIcons {
   static const squareMinus = IconData(0xe171, fontFamily: _f, fontPackage: _p);
 
   /// square-mouse-pointer icon.
-  static const squareMousePointer = IconData(0xe202, fontFamily: _f, fontPackage: _p);
+  static const squareMousePointer = IconData(
+    0xe202,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// square-parking icon.
-  static const squareParking = IconData(0xe3cb, fontFamily: _f, fontPackage: _p);
+  static const squareParking = IconData(
+    0xe3cb,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// square-parking-off icon.
-  static const squareParkingOff = IconData(0xe3cc, fontFamily: _f, fontPackage: _p);
+  static const squareParkingOff = IconData(
+    0xe3cc,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// square-pause icon.
   static const squarePause = IconData(0xe684, fontFamily: _f, fontPackage: _p);
@@ -1776,7 +2993,11 @@ class OiIcons {
   static const squarePen = IconData(0xe172, fontFamily: _f, fontPackage: _p);
 
   /// square-percent icon.
-  static const squarePercent = IconData(0xe51c, fontFamily: _f, fontPackage: _p);
+  static const squarePercent = IconData(
+    0xe51c,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// square-pi icon.
   static const squarePi = IconData(0xe488, fontFamily: _f, fontPackage: _p);
@@ -1791,10 +3012,18 @@ class OiIcons {
   static const squarePower = IconData(0xe551, fontFamily: _f, fontPackage: _p);
 
   /// square-radical icon.
-  static const squareRadical = IconData(0xe5c3, fontFamily: _f, fontPackage: _p);
+  static const squareRadical = IconData(
+    0xe5c3,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// square-scissors icon.
-  static const squareScissors = IconData(0xe4ec, fontFamily: _f, fontPackage: _p);
+  static const squareScissors = IconData(
+    0xe4ec,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// square-sigma icon.
   static const squareSigma = IconData(0xe489, fontFamily: _f, fontPackage: _p);
@@ -1815,25 +3044,45 @@ class OiIcons {
   static const squareStop = IconData(0xe685, fontFamily: _f, fontPackage: _p);
 
   /// square-terminal icon.
-  static const squareTerminal = IconData(0xe20a, fontFamily: _f, fontPackage: _p);
+  static const squareTerminal = IconData(
+    0xe20a,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// square-user icon.
   static const squareUser = IconData(0xe465, fontFamily: _f, fontPackage: _p);
 
   /// square-user-round icon.
-  static const squareUserRound = IconData(0xe466, fontFamily: _f, fontPackage: _p);
+  static const squareUserRound = IconData(
+    0xe466,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// square-x icon.
   static const squareX = IconData(0xe175, fontFamily: _f, fontPackage: _p);
 
   /// squares-exclude icon.
-  static const squaresExclude = IconData(0xe657, fontFamily: _f, fontPackage: _p);
+  static const squaresExclude = IconData(
+    0xe657,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// squares-intersect icon.
-  static const squaresIntersect = IconData(0xe658, fontFamily: _f, fontPackage: _p);
+  static const squaresIntersect = IconData(
+    0xe658,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// squares-subtract icon.
-  static const squaresSubtract = IconData(0xe659, fontFamily: _f, fontPackage: _p);
+  static const squaresSubtract = IconData(
+    0xe659,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// squares-unite icon.
   static const squaresUnite = IconData(0xe65a, fontFamily: _f, fontPackage: _p);
@@ -1854,19 +3103,35 @@ class OiIcons {
   static const stopCircle = IconData(0xe083, fontFamily: _f, fontPackage: _p);
 
   /// terminal-square icon.
-  static const terminalSquare = IconData(0xe20a, fontFamily: _f, fontPackage: _p);
+  static const terminalSquare = IconData(
+    0xe20a,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// triangle icon.
   static const triangle = IconData(0xe192, fontFamily: _f, fontPackage: _p);
 
   /// triangle-alert icon.
-  static const triangleAlert = IconData(0xe193, fontFamily: _f, fontPackage: _p);
+  static const triangleAlert = IconData(
+    0xe193,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// triangle-dashed icon.
-  static const triangleDashed = IconData(0xe63d, fontFamily: _f, fontPackage: _p);
+  static const triangleDashed = IconData(
+    0xe63d,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// triangle-right icon.
-  static const triangleRight = IconData(0xe4ed, fontFamily: _f, fontPackage: _p);
+  static const triangleRight = IconData(
+    0xe4ed,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// user-circle icon.
   static const userCircle = IconData(0xe461, fontFamily: _f, fontPackage: _p);
@@ -1895,14 +3160,21 @@ class OiIcons {
   /// x-square icon.
   static const xSquare = IconData(0xe175, fontFamily: _f, fontPackage: _p);
 
-
   // ── Math & Symbols ────────────────────────────────────────────────
 
   /// alarm-clock-minus icon.
-  static const alarmClockMinus = IconData(0xe1ed, fontFamily: _f, fontPackage: _p);
+  static const alarmClockMinus = IconData(
+    0xe1ed,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// alarm-clock-plus icon.
-  static const alarmClockPlus = IconData(0xe1ee, fontFamily: _f, fontPackage: _p);
+  static const alarmClockPlus = IconData(
+    0xe1ee,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// alarm-minus icon.
   static const alarmMinus = IconData(0xe1ed, fontFamily: _f, fontPackage: _p);
@@ -1938,7 +3210,11 @@ class OiIcons {
   static const bookPlus = IconData(0xe3f3, fontFamily: _f, fontPackage: _p);
 
   /// bookmark-minus icon.
-  static const bookmarkMinus = IconData(0xe23c, fontFamily: _f, fontPackage: _p);
+  static const bookmarkMinus = IconData(
+    0xe23c,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// bookmark-plus icon.
   static const bookmarkPlus = IconData(0xe23d, fontFamily: _f, fontPackage: _p);
@@ -1947,25 +3223,45 @@ class OiIcons {
   static const calculator = IconData(0xe1bc, fontFamily: _f, fontPackage: _p);
 
   /// calendar-minus icon.
-  static const calendarMinus = IconData(0xe2ba, fontFamily: _f, fontPackage: _p);
+  static const calendarMinus = IconData(
+    0xe2ba,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// calendar-minus-2 icon.
-  static const calendarMinus2 = IconData(0xe5b5, fontFamily: _f, fontPackage: _p);
+  static const calendarMinus2 = IconData(
+    0xe5b5,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// calendar-plus icon.
   static const calendarPlus = IconData(0xe2bc, fontFamily: _f, fontPackage: _p);
 
   /// calendar-plus-2 icon.
-  static const calendarPlus2 = IconData(0xe5b6, fontFamily: _f, fontPackage: _p);
+  static const calendarPlus2 = IconData(
+    0xe5b6,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// chart-pie icon.
   static const chartPie = IconData(0xe06b, fontFamily: _f, fontPackage: _p);
 
   /// clipboard-minus icon.
-  static const clipboardMinus = IconData(0xe5be, fontFamily: _f, fontPackage: _p);
+  static const clipboardMinus = IconData(
+    0xe5be,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// clipboard-plus icon.
-  static const clipboardPlus = IconData(0xe5bf, fontFamily: _f, fontPackage: _p);
+  static const clipboardPlus = IconData(
+    0xe5bf,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// clock-plus icon.
   static const clockPlus = IconData(0xe667, fontFamily: _f, fontPackage: _p);
@@ -1983,7 +3279,11 @@ class OiIcons {
   static const equal = IconData(0xe1bd, fontFamily: _f, fontPackage: _p);
 
   /// equal-approximately icon.
-  static const equalApproximately = IconData(0xe634, fontFamily: _f, fontPackage: _p);
+  static const equalApproximately = IconData(
+    0xe634,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// equal-not icon.
   static const equalNot = IconData(0xe1be, fontFamily: _f, fontPackage: _p);
@@ -2016,10 +3316,18 @@ class OiIcons {
   static const funnelPlus = IconData(0xe0dd, fontFamily: _f, fontPackage: _p);
 
   /// git-branch-minus icon.
-  static const gitBranchMinus = IconData(0xe69c, fontFamily: _f, fontPackage: _p);
+  static const gitBranchMinus = IconData(
+    0xe69c,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// git-branch-plus icon.
-  static const gitBranchPlus = IconData(0xe1f4, fontFamily: _f, fontPackage: _p);
+  static const gitBranchPlus = IconData(
+    0xe1f4,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// hand-helping icon.
   static const handHelping = IconData(0xe3b8, fontFamily: _f, fontPackage: _p);
@@ -2049,7 +3357,11 @@ class OiIcons {
   static const layersPlus = IconData(0xe6af, fontFamily: _f, fontPackage: _p);
 
   /// loader-pinwheel icon.
-  static const loaderPinwheel = IconData(0xe5e6, fontFamily: _f, fontPackage: _p);
+  static const loaderPinwheel = IconData(
+    0xe5e6,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// mail-minus icon.
   static const mailMinus = IconData(0xe362, fontFamily: _f, fontPackage: _p);
@@ -2067,7 +3379,11 @@ class OiIcons {
   static const mapPinCheck = IconData(0xe60f, fontFamily: _f, fontPackage: _p);
 
   /// map-pin-check-inside icon.
-  static const mapPinCheckInside = IconData(0xe610, fontFamily: _f, fontPackage: _p);
+  static const mapPinCheckInside = IconData(
+    0xe610,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// map-pin-house icon.
   static const mapPinHouse = IconData(0xe61c, fontFamily: _f, fontPackage: _p);
@@ -2076,7 +3392,11 @@ class OiIcons {
   static const mapPinMinus = IconData(0xe611, fontFamily: _f, fontPackage: _p);
 
   /// map-pin-minus-inside icon.
-  static const mapPinMinusInside = IconData(0xe612, fontFamily: _f, fontPackage: _p);
+  static const mapPinMinusInside = IconData(
+    0xe612,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// map-pin-off icon.
   static const mapPinOff = IconData(0xe2a6, fontFamily: _f, fontPackage: _p);
@@ -2088,13 +3408,21 @@ class OiIcons {
   static const mapPinPlus = IconData(0xe613, fontFamily: _f, fontPackage: _p);
 
   /// map-pin-plus-inside icon.
-  static const mapPinPlusInside = IconData(0xe614, fontFamily: _f, fontPackage: _p);
+  static const mapPinPlusInside = IconData(
+    0xe614,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// map-pin-x icon.
   static const mapPinX = IconData(0xe615, fontFamily: _f, fontPackage: _p);
 
   /// map-pin-x-inside icon.
-  static const mapPinXInside = IconData(0xe616, fontFamily: _f, fontPackage: _p);
+  static const mapPinXInside = IconData(
+    0xe616,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// map-pinned icon.
   static const mapPinned = IconData(0xe53d, fontFamily: _f, fontPackage: _p);
@@ -2118,7 +3446,11 @@ class OiIcons {
   static const percent = IconData(0xe132, fontFamily: _f, fontPackage: _p);
 
   /// philippine-peso icon.
-  static const philippinePeso = IconData(0xe604, fontFamily: _f, fontPackage: _p);
+  static const philippinePeso = IconData(
+    0xe604,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// pi icon.
   static const pi = IconData(0xe472, fontFamily: _f, fontPackage: _p);
@@ -2130,10 +3462,18 @@ class OiIcons {
   static const pickaxe = IconData(0xe5c6, fontFamily: _f, fontPackage: _p);
 
   /// picture-in-picture icon.
-  static const pictureInPicture = IconData(0xe3ae, fontFamily: _f, fontPackage: _p);
+  static const pictureInPicture = IconData(
+    0xe3ae,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// picture-in-picture-2 icon.
-  static const pictureInPicture2 = IconData(0xe3af, fontFamily: _f, fontPackage: _p);
+  static const pictureInPicture2 = IconData(
+    0xe3af,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// pie-chart icon.
   static const pieChart = IconData(0xe06b, fontFamily: _f, fontPackage: _p);
@@ -2175,7 +3515,11 @@ class OiIcons {
   static const shoppingBag = IconData(0xe15b, fontFamily: _f, fontPackage: _p);
 
   /// shopping-basket icon.
-  static const shoppingBasket = IconData(0xe4ea, fontFamily: _f, fontPackage: _p);
+  static const shoppingBasket = IconData(
+    0xe4ea,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// shopping-cart icon.
   static const shoppingCart = IconData(0xe15c, fontFamily: _f, fontPackage: _p);
@@ -2205,7 +3549,11 @@ class OiIcons {
   static const ticketMinus = IconData(0xe5af, fontFamily: _f, fontPackage: _p);
 
   /// ticket-percent icon.
-  static const ticketPercent = IconData(0xe5b0, fontFamily: _f, fontPackage: _p);
+  static const ticketPercent = IconData(
+    0xe5b0,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// ticket-plus icon.
   static const ticketPlus = IconData(0xe5b1, fontFamily: _f, fontPackage: _p);
@@ -2226,17 +3574,28 @@ class OiIcons {
   static const userPlus2 = IconData(0xe46c, fontFamily: _f, fontPackage: _p);
 
   /// user-round-minus icon.
-  static const userRoundMinus = IconData(0xe46b, fontFamily: _f, fontPackage: _p);
+  static const userRoundMinus = IconData(
+    0xe46b,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// user-round-plus icon.
-  static const userRoundPlus = IconData(0xe46c, fontFamily: _f, fontPackage: _p);
+  static const userRoundPlus = IconData(
+    0xe46c,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// zodiac-pisces icon.
   static const zodiacPisces = IconData(0xe6d3, fontFamily: _f, fontPackage: _p);
 
   /// zodiac-scorpio icon.
-  static const zodiacScorpio = IconData(0xe6d5, fontFamily: _f, fontPackage: _p);
-
+  static const zodiacScorpio = IconData(
+    0xe6d5,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   // ── Files & Folders ───────────────────────────────────────────────
 
@@ -2244,7 +3603,11 @@ class OiIcons {
   static const archive = IconData(0xe041, fontFamily: _f, fontPackage: _p);
 
   /// archive-restore icon.
-  static const archiveRestore = IconData(0xe2cd, fontFamily: _f, fontPackage: _p);
+  static const archiveRestore = IconData(
+    0xe2cd,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// archive-x icon.
   static const archiveX = IconData(0xe50c, fontFamily: _f, fontPackage: _p);
@@ -2274,7 +3637,11 @@ class OiIcons {
   static const bookDown = IconData(0xe3ee, fontFamily: _f, fontPackage: _p);
 
   /// book-headphones icon.
-  static const bookHeadphones = IconData(0xe547, fontFamily: _f, fontPackage: _p);
+  static const bookHeadphones = IconData(
+    0xe547,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// book-image icon.
   static const bookImage = IconData(0xe549, fontFamily: _f, fontPackage: _p);
@@ -2292,7 +3659,11 @@ class OiIcons {
   static const bookOpen = IconData(0xe05f, fontFamily: _f, fontPackage: _p);
 
   /// book-open-check icon.
-  static const bookOpenCheck = IconData(0xe381, fontFamily: _f, fontPackage: _p);
+  static const bookOpenCheck = IconData(
+    0xe381,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// book-search icon.
   static const bookSearch = IconData(0xe6ab, fontFamily: _f, fontPackage: _p);
@@ -2316,7 +3687,11 @@ class OiIcons {
   static const bookmark = IconData(0xe060, fontFamily: _f, fontPackage: _p);
 
   /// bookmark-check icon.
-  static const bookmarkCheck = IconData(0xe51f, fontFamily: _f, fontPackage: _p);
+  static const bookmarkCheck = IconData(
+    0xe51f,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// bookmark-x icon.
   static const bookmarkX = IconData(0xe520, fontFamily: _f, fontPackage: _p);
@@ -2325,28 +3700,56 @@ class OiIcons {
   static const clipboard = IconData(0xe085, fontFamily: _f, fontPackage: _p);
 
   /// clipboard-check icon.
-  static const clipboardCheck = IconData(0xe219, fontFamily: _f, fontPackage: _p);
+  static const clipboardCheck = IconData(
+    0xe219,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// clipboard-clock icon.
-  static const clipboardClock = IconData(0xe688, fontFamily: _f, fontPackage: _p);
+  static const clipboardClock = IconData(
+    0xe688,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// clipboard-copy icon.
-  static const clipboardCopy = IconData(0xe225, fontFamily: _f, fontPackage: _p);
+  static const clipboardCopy = IconData(
+    0xe225,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// clipboard-edit icon.
-  static const clipboardEdit = IconData(0xe307, fontFamily: _f, fontPackage: _p);
+  static const clipboardEdit = IconData(
+    0xe307,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// clipboard-paste icon.
-  static const clipboardPaste = IconData(0xe3e8, fontFamily: _f, fontPackage: _p);
+  static const clipboardPaste = IconData(
+    0xe3e8,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// clipboard-pen icon.
   static const clipboardPen = IconData(0xe307, fontFamily: _f, fontPackage: _p);
 
   /// clipboard-pen-line icon.
-  static const clipboardPenLine = IconData(0xe308, fontFamily: _f, fontPackage: _p);
+  static const clipboardPenLine = IconData(
+    0xe308,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// clipboard-signature icon.
-  static const clipboardSignature = IconData(0xe308, fontFamily: _f, fontPackage: _p);
+  static const clipboardSignature = IconData(
+    0xe308,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// clipboard-x icon.
   static const clipboardX = IconData(0xe222, fontFamily: _f, fontPackage: _p);
@@ -2400,7 +3803,11 @@ class OiIcons {
   static const fileBarChart = IconData(0xe312, fontFamily: _f, fontPackage: _p);
 
   /// file-bar-chart-2 icon.
-  static const fileBarChart2 = IconData(0xe311, fontFamily: _f, fontPackage: _p);
+  static const fileBarChart2 = IconData(
+    0xe311,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// file-box icon.
   static const fileBox = IconData(0xe310, fontFamily: _f, fontPackage: _p);
@@ -2409,7 +3816,11 @@ class OiIcons {
   static const fileBraces = IconData(0xe36b, fontFamily: _f, fontPackage: _p);
 
   /// file-chart-line icon.
-  static const fileChartLine = IconData(0xe313, fontFamily: _f, fontPackage: _p);
+  static const fileChartLine = IconData(
+    0xe313,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// file-check icon.
   static const fileCheck = IconData(0xe0c1, fontFamily: _f, fontPackage: _p);
@@ -2445,10 +3856,18 @@ class OiIcons {
   static const fileEdit = IconData(0xe31f, fontFamily: _f, fontPackage: _p);
 
   /// file-exclamation-point icon.
-  static const fileExclamationPoint = IconData(0xe319, fontFamily: _f, fontPackage: _p);
+  static const fileExclamationPoint = IconData(
+    0xe319,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// file-headphone icon.
-  static const fileHeadphone = IconData(0xe31a, fontFamily: _f, fontPackage: _p);
+  static const fileHeadphone = IconData(
+    0xe31a,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// file-image icon.
   static const fileImage = IconData(0xe31c, fontFamily: _f, fontPackage: _p);
@@ -2469,7 +3888,11 @@ class OiIcons {
   static const fileKey2 = IconData(0xe31d, fontFamily: _f, fontPackage: _p);
 
   /// file-line-chart icon.
-  static const fileLineChart = IconData(0xe313, fontFamily: _f, fontPackage: _p);
+  static const fileLineChart = IconData(
+    0xe313,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// file-lock icon.
   static const fileLock = IconData(0xe31e, fontFamily: _f, fontPackage: _p);
@@ -2496,7 +3919,11 @@ class OiIcons {
   static const fileQuestion = IconData(0xe322, fontFamily: _f, fontPackage: _p);
 
   /// file-question-mark icon.
-  static const fileQuestionMark = IconData(0xe322, fontFamily: _f, fontPackage: _p);
+  static const fileQuestionMark = IconData(
+    0xe322,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// file-scan icon.
   static const fileScan = IconData(0xe323, fontFamily: _f, fontPackage: _p);
@@ -2511,13 +3938,21 @@ class OiIcons {
   static const fileSignal = IconData(0xe325, fontFamily: _f, fontPackage: _p);
 
   /// file-signature icon.
-  static const fileSignature = IconData(0xe320, fontFamily: _f, fontPackage: _p);
+  static const fileSignature = IconData(
+    0xe320,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// file-sliders icon.
   static const fileSliders = IconData(0xe5a0, fontFamily: _f, fontPackage: _p);
 
   /// file-spreadsheet icon.
-  static const fileSpreadsheet = IconData(0xe326, fontFamily: _f, fontPackage: _p);
+  static const fileSpreadsheet = IconData(
+    0xe326,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// file-stack icon.
   static const fileStack = IconData(0xe4a1, fontFamily: _f, fontPackage: _p);
@@ -2541,7 +3976,11 @@ class OiIcons {
   static const fileVideo2 = IconData(0xe32b, fontFamily: _f, fontPackage: _p);
 
   /// file-video-camera icon.
-  static const fileVideoCamera = IconData(0xe32b, fontFamily: _f, fontPackage: _p);
+  static const fileVideoCamera = IconData(
+    0xe32b,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// file-volume icon.
   static const fileVolume = IconData(0xe32c, fontFamily: _f, fontPackage: _p);
@@ -2565,7 +4004,11 @@ class OiIcons {
   static const folder = IconData(0xe0d7, fontFamily: _f, fontPackage: _p);
 
   /// folder-archive icon.
-  static const folderArchive = IconData(0xe32d, fontFamily: _f, fontPackage: _p);
+  static const folderArchive = IconData(
+    0xe32d,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// folder-check icon.
   static const folderCheck = IconData(0xe32e, fontFamily: _f, fontPackage: _p);
@@ -2613,7 +4056,11 @@ class OiIcons {
   static const folderOpen = IconData(0xe247, fontFamily: _f, fontPackage: _p);
 
   /// folder-open-dot icon.
-  static const folderOpenDot = IconData(0xe4c7, fontFamily: _f, fontPackage: _p);
+  static const folderOpenDot = IconData(
+    0xe4c7,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// folder-output icon.
   static const folderOutput = IconData(0xe337, fontFamily: _f, fontPackage: _p);
@@ -2628,10 +4075,18 @@ class OiIcons {
   static const folderSearch = IconData(0xe339, fontFamily: _f, fontPackage: _p);
 
   /// folder-search-2 icon.
-  static const folderSearch2 = IconData(0xe33a, fontFamily: _f, fontPackage: _p);
+  static const folderSearch2 = IconData(
+    0xe33a,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// folder-symlink icon.
-  static const folderSymlink = IconData(0xe33b, fontFamily: _f, fontPackage: _p);
+  static const folderSymlink = IconData(
+    0xe33b,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// folder-sync icon.
   static const folderSync = IconData(0xe4c9, fontFamily: _f, fontPackage: _p);
@@ -2649,7 +4104,11 @@ class OiIcons {
   static const folders = IconData(0xe33f, fontFamily: _f, fontPackage: _p);
 
   /// git-pull-request-draft icon.
-  static const gitPullRequestDraft = IconData(0xe35b, fontFamily: _f, fontPackage: _p);
+  static const gitPullRequestDraft = IconData(
+    0xe35b,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// notebook icon.
   static const notebook = IconData(0xe595, fontFamily: _f, fontPackage: _p);
@@ -2675,7 +4134,6 @@ class OiIcons {
   /// swatch-book icon.
   static const swatchBook = IconData(0xe59f, fontFamily: _f, fontPackage: _p);
 
-
   // ── Media & Communication ─────────────────────────────────────────
 
   /// airplay icon.
@@ -2691,7 +4149,11 @@ class OiIcons {
   static const audioLines = IconData(0xe55a, fontFamily: _f, fontPackage: _p);
 
   /// audio-waveform icon.
-  static const audioWaveform = IconData(0xe55b, fontFamily: _f, fontPackage: _p);
+  static const audioWaveform = IconData(
+    0xe55b,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// bell icon.
   static const bell = IconData(0xe059, fontFamily: _f, fontPackage: _p);
@@ -2727,7 +4189,11 @@ class OiIcons {
   static const cctv = IconData(0xe57d, fontFamily: _f, fontPackage: _p);
 
   /// concierge-bell icon.
-  static const conciergeBell = IconData(0xe378, fontFamily: _f, fontPackage: _p);
+  static const conciergeBell = IconData(
+    0xe378,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// contact icon.
   static const contact = IconData(0xe09c, fontFamily: _f, fontPackage: _p);
@@ -2775,7 +4241,11 @@ class OiIcons {
   static const inbox = IconData(0xe0f7, fontFamily: _f, fontPackage: _p);
 
   /// keyboard-music icon.
-  static const keyboardMusic = IconData(0xe560, fontFamily: _f, fontPackage: _p);
+  static const keyboardMusic = IconData(
+    0xe560,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// mail icon.
   static const mail = IconData(0xe10f, fontFamily: _f, fontPackage: _p);
@@ -2790,7 +4260,11 @@ class OiIcons {
   static const mailQuestion = IconData(0xe365, fontFamily: _f, fontPackage: _p);
 
   /// mail-question-mark icon.
-  static const mailQuestionMark = IconData(0xe365, fontFamily: _f, fontPackage: _p);
+  static const mailQuestionMark = IconData(
+    0xe365,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// mail-search icon.
   static const mailSearch = IconData(0xe366, fontFamily: _f, fontPackage: _p);
@@ -2838,10 +4312,18 @@ class OiIcons {
   static const monitorPlay = IconData(0xe485, fontFamily: _f, fontPackage: _p);
 
   /// monitor-smartphone icon.
-  static const monitorSmartphone = IconData(0xe3a2, fontFamily: _f, fontPackage: _p);
+  static const monitorSmartphone = IconData(
+    0xe3a2,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// monitor-speaker icon.
-  static const monitorSpeaker = IconData(0xe210, fontFamily: _f, fontPackage: _p);
+  static const monitorSpeaker = IconData(
+    0xe210,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// monitor-stop icon.
   static const monitorStop = IconData(0xe486, fontFamily: _f, fontPackage: _p);
@@ -2868,10 +4350,18 @@ class OiIcons {
   static const phoneCall = IconData(0xe134, fontFamily: _f, fontPackage: _p);
 
   /// phone-forwarded icon.
-  static const phoneForwarded = IconData(0xe135, fontFamily: _f, fontPackage: _p);
+  static const phoneForwarded = IconData(
+    0xe135,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// phone-incoming icon.
-  static const phoneIncoming = IconData(0xe136, fontFamily: _f, fontPackage: _p);
+  static const phoneIncoming = IconData(
+    0xe136,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// phone-missed icon.
   static const phoneMissed = IconData(0xe137, fontFamily: _f, fontPackage: _p);
@@ -2880,7 +4370,11 @@ class OiIcons {
   static const phoneOff = IconData(0xe138, fontFamily: _f, fontPackage: _p);
 
   /// phone-outgoing icon.
-  static const phoneOutgoing = IconData(0xe139, fontFamily: _f, fontPackage: _p);
+  static const phoneOutgoing = IconData(
+    0xe139,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// play icon.
   static const play = IconData(0xe13c, fontFamily: _f, fontPackage: _p);
@@ -2898,7 +4392,11 @@ class OiIcons {
   static const radio = IconData(0xe142, fontFamily: _f, fontPackage: _p);
 
   /// radio-receiver icon.
-  static const radioReceiver = IconData(0xe1fb, fontFamily: _f, fontPackage: _p);
+  static const radioReceiver = IconData(
+    0xe1fb,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// radio-tower icon.
   static const radioTower = IconData(0xe404, fontFamily: _f, fontPackage: _p);
@@ -2913,22 +4411,38 @@ class OiIcons {
   static const satellite = IconData(0xe447, fontFamily: _f, fontPackage: _p);
 
   /// satellite-dish icon.
-  static const satelliteDish = IconData(0xe448, fontFamily: _f, fontPackage: _p);
+  static const satelliteDish = IconData(
+    0xe448,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// screen-share icon.
   static const screenShare = IconData(0xe14f, fontFamily: _f, fontPackage: _p);
 
   /// screen-share-off icon.
-  static const screenShareOff = IconData(0xe150, fontFamily: _f, fontPackage: _p);
+  static const screenShareOff = IconData(
+    0xe150,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// send icon.
   static const send = IconData(0xe152, fontFamily: _f, fontPackage: _p);
 
   /// send-horizonal icon.
-  static const sendHorizonal = IconData(0xe4f2, fontFamily: _f, fontPackage: _p);
+  static const sendHorizonal = IconData(
+    0xe4f2,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// send-horizontal icon.
-  static const sendHorizontal = IconData(0xe4f2, fontFamily: _f, fontPackage: _p);
+  static const sendHorizontal = IconData(
+    0xe4f2,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// send-to-back icon.
   static const sendToBack = IconData(0xe4f3, fontFamily: _f, fontPackage: _p);
@@ -2958,10 +4472,18 @@ class OiIcons {
   static const smartphone = IconData(0xe163, fontFamily: _f, fontPackage: _p);
 
   /// smartphone-charging icon.
-  static const smartphoneCharging = IconData(0xe22e, fontFamily: _f, fontPackage: _p);
+  static const smartphoneCharging = IconData(
+    0xe22e,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// smartphone-nfc icon.
-  static const smartphoneNfc = IconData(0xe3c4, fontFamily: _f, fontPackage: _p);
+  static const smartphoneNfc = IconData(
+    0xe3c4,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// speaker icon.
   static const speaker = IconData(0xe166, fontFamily: _f, fontPackage: _p);
@@ -2970,7 +4492,11 @@ class OiIcons {
   static const switchCamera = IconData(0xe17c, fontFamily: _f, fontPackage: _p);
 
   /// tablet-smartphone icon.
-  static const tabletSmartphone = IconData(0xe50a, fontFamily: _f, fontPackage: _p);
+  static const tabletSmartphone = IconData(
+    0xe50a,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// tv icon.
   static const tv = IconData(0xe195, fontFamily: _f, fontPackage: _p);
@@ -2982,7 +4508,11 @@ class OiIcons {
   static const tvMinimal = IconData(0xe203, fontFamily: _f, fontPackage: _p);
 
   /// tv-minimal-play icon.
-  static const tvMinimalPlay = IconData(0xe5ec, fontFamily: _f, fontPackage: _p);
+  static const tvMinimalPlay = IconData(
+    0xe5ec,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// video icon.
   static const video = IconData(0xe1a5, fontFamily: _f, fontPackage: _p);
@@ -3011,7 +4541,6 @@ class OiIcons {
   /// volume-x icon.
   static const volumeX = IconData(0xe1ac, fontFamily: _f, fontPackage: _p);
 
-
   // ── Weather & Nature ──────────────────────────────────────────────
 
   /// app-window icon.
@@ -3030,7 +4559,11 @@ class OiIcons {
   static const brainCog = IconData(0xe3c8, fontFamily: _f, fontPackage: _p);
 
   /// brick-wall-fire icon.
-  static const brickWallFire = IconData(0xe653, fontFamily: _f, fontPackage: _p);
+  static const brickWallFire = IconData(
+    0xe653,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// cloud icon.
   static const cloud = IconData(0xe088, fontFamily: _f, fontPackage: _p);
@@ -3048,7 +4581,11 @@ class OiIcons {
   static const cloudCog = IconData(0xe30a, fontFamily: _f, fontPackage: _p);
 
   /// cloud-download icon.
-  static const cloudDownload = IconData(0xe089, fontFamily: _f, fontPackage: _p);
+  static const cloudDownload = IconData(
+    0xe089,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// cloud-drizzle icon.
   static const cloudDrizzle = IconData(0xe08a, fontFamily: _f, fontPackage: _p);
@@ -3060,13 +4597,21 @@ class OiIcons {
   static const cloudHail = IconData(0xe08b, fontFamily: _f, fontPackage: _p);
 
   /// cloud-lightning icon.
-  static const cloudLightning = IconData(0xe08c, fontFamily: _f, fontPackage: _p);
+  static const cloudLightning = IconData(
+    0xe08c,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// cloud-moon icon.
   static const cloudMoon = IconData(0xe215, fontFamily: _f, fontPackage: _p);
 
   /// cloud-moon-rain icon.
-  static const cloudMoonRain = IconData(0xe2fa, fontFamily: _f, fontPackage: _p);
+  static const cloudMoonRain = IconData(
+    0xe2fa,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// cloud-off icon.
   static const cloudOff = IconData(0xe08d, fontFamily: _f, fontPackage: _p);
@@ -3075,7 +4620,11 @@ class OiIcons {
   static const cloudRain = IconData(0xe08e, fontFamily: _f, fontPackage: _p);
 
   /// cloud-rain-wind icon.
-  static const cloudRainWind = IconData(0xe08f, fontFamily: _f, fontPackage: _p);
+  static const cloudRainWind = IconData(
+    0xe08f,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// cloud-snow icon.
   static const cloudSnow = IconData(0xe090, fontFamily: _f, fontPackage: _p);
@@ -3099,7 +4648,11 @@ class OiIcons {
   static const clover = IconData(0xe092, fontFamily: _f, fontPackage: _p);
 
   /// download-cloud icon.
-  static const downloadCloud = IconData(0xe089, fontFamily: _f, fontPackage: _p);
+  static const downloadCloud = IconData(
+    0xe089,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// droplet icon.
   static const droplet = IconData(0xe0b4, fontFamily: _f, fontPackage: _p);
@@ -3111,13 +4664,21 @@ class OiIcons {
   static const droplets = IconData(0xe0b5, fontFamily: _f, fontPackage: _p);
 
   /// fire-extinguisher icon.
-  static const fireExtinguisher = IconData(0xe57e, fontFamily: _f, fontPackage: _p);
+  static const fireExtinguisher = IconData(
+    0xe57e,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// flame icon.
   static const flame = IconData(0xe0d2, fontFamily: _f, fontPackage: _p);
 
   /// flame-kindling icon.
-  static const flameKindling = IconData(0xe53a, fontFamily: _f, fontPackage: _p);
+  static const flameKindling = IconData(
+    0xe53a,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// flower icon.
   static const flower = IconData(0xe2d3, fontFamily: _f, fontPackage: _p);
@@ -3156,7 +4717,11 @@ class OiIcons {
   static const snowflake = IconData(0xe165, fontFamily: _f, fontPackage: _p);
 
   /// soap-dispenser-droplet icon.
-  static const soapDispenserDroplet = IconData(0xe669, fontFamily: _f, fontPackage: _p);
+  static const soapDispenserDroplet = IconData(
+    0xe669,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// sprout icon.
   static const sprout = IconData(0xe1eb, fontFamily: _f, fontPackage: _p);
@@ -3189,10 +4754,18 @@ class OiIcons {
   static const thermometer = IconData(0xe186, fontFamily: _f, fontPackage: _p);
 
   /// thermometer-snowflake icon.
-  static const thermometerSnowflake = IconData(0xe187, fontFamily: _f, fontPackage: _p);
+  static const thermometerSnowflake = IconData(
+    0xe187,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// thermometer-sun icon.
-  static const thermometerSun = IconData(0xe188, fontFamily: _f, fontPackage: _p);
+  static const thermometerSun = IconData(
+    0xe188,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// tornado icon.
   static const tornado = IconData(0xe218, fontFamily: _f, fontPackage: _p);
@@ -3204,13 +4777,21 @@ class OiIcons {
   static const trainFront = IconData(0xe506, fontFamily: _f, fontPackage: _p);
 
   /// train-front-tunnel icon.
-  static const trainFrontTunnel = IconData(0xe507, fontFamily: _f, fontPackage: _p);
+  static const trainFrontTunnel = IconData(
+    0xe507,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// train-track icon.
   static const trainTrack = IconData(0xe508, fontFamily: _f, fontPackage: _p);
 
   /// tree-deciduous icon.
-  static const treeDeciduous = IconData(0xe2f3, fontFamily: _f, fontPackage: _p);
+  static const treeDeciduous = IconData(
+    0xe2f3,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// tree-palm icon.
   static const treePalm = IconData(0xe281, fontFamily: _f, fontPackage: _p);
@@ -3238,7 +4819,6 @@ class OiIcons {
 
   /// wind icon.
   static const wind = IconData(0xe1b0, fontFamily: _f, fontPackage: _p);
-
 
   // ── Maps & Travel ─────────────────────────────────────────────────
 
@@ -3309,7 +4889,11 @@ class OiIcons {
   static const planeTakeoff = IconData(0xe3ce, fontFamily: _f, fontPackage: _p);
 
   /// table-of-contents icon.
-  static const tableOfContents = IconData(0xe61e, fontFamily: _f, fontPackage: _p);
+  static const tableOfContents = IconData(
+    0xe61e,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// tent icon.
   static const tent = IconData(0xe227, fontFamily: _f, fontPackage: _p);
@@ -3331,7 +4915,6 @@ class OiIcons {
 
   /// tickets-plane icon.
   static const ticketsPlane = IconData(0xe623, fontFamily: _f, fontPackage: _p);
-
 
   // ── Charts & Data ─────────────────────────────────────────────────
 
@@ -3357,10 +4940,18 @@ class OiIcons {
   static const barChartBig = IconData(0xe4a9, fontFamily: _f, fontPackage: _p);
 
   /// bar-chart-horizontal icon.
-  static const barChartHorizontal = IconData(0xe2a2, fontFamily: _f, fontPackage: _p);
+  static const barChartHorizontal = IconData(
+    0xe2a2,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// bar-chart-horizontal-big icon.
-  static const barChartHorizontalBig = IconData(0xe4a7, fontFamily: _f, fontPackage: _p);
+  static const barChartHorizontalBig = IconData(
+    0xe4a7,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// barcode icon.
   static const barcode = IconData(0xe533, fontFamily: _f, fontPackage: _p);
@@ -3369,7 +4960,11 @@ class OiIcons {
   static const barrel = IconData(0xe675, fontFamily: _f, fontPackage: _p);
 
   /// candlestick-chart icon.
-  static const candlestickChart = IconData(0xe4a8, fontFamily: _f, fontPackage: _p);
+  static const candlestickChart = IconData(
+    0xe4a8,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// chart-area icon.
   static const chartArea = IconData(0xe4d3, fontFamily: _f, fontPackage: _p);
@@ -3381,16 +4976,32 @@ class OiIcons {
   static const chartBarBig = IconData(0xe4a7, fontFamily: _f, fontPackage: _p);
 
   /// chart-bar-decreasing icon.
-  static const chartBarDecreasing = IconData(0xe607, fontFamily: _f, fontPackage: _p);
+  static const chartBarDecreasing = IconData(
+    0xe607,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// chart-bar-increasing icon.
-  static const chartBarIncreasing = IconData(0xe608, fontFamily: _f, fontPackage: _p);
+  static const chartBarIncreasing = IconData(
+    0xe608,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// chart-bar-stacked icon.
-  static const chartBarStacked = IconData(0xe609, fontFamily: _f, fontPackage: _p);
+  static const chartBarStacked = IconData(
+    0xe609,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// chart-candlestick icon.
-  static const chartCandlestick = IconData(0xe4a8, fontFamily: _f, fontPackage: _p);
+  static const chartCandlestick = IconData(
+    0xe4a8,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// chart-gantt icon.
   static const chartGantt = IconData(0xe624, fontFamily: _f, fontPackage: _p);
@@ -3402,10 +5013,18 @@ class OiIcons {
   static const chartNetwork = IconData(0xe60b, fontFamily: _f, fontPackage: _p);
 
   /// chart-no-axes-combined icon.
-  static const chartNoAxesCombined = IconData(0xe60c, fontFamily: _f, fontPackage: _p);
+  static const chartNoAxesCombined = IconData(
+    0xe60c,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// chart-no-axes-gantt icon.
-  static const chartNoAxesGantt = IconData(0xe4c4, fontFamily: _f, fontPackage: _p);
+  static const chartNoAxesGantt = IconData(
+    0xe4c4,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// chart-scatter icon.
   static const chartScatter = IconData(0xe48a, fontFamily: _f, fontPackage: _p);
@@ -3444,8 +5063,11 @@ class OiIcons {
   static const trendingUp = IconData(0xe191, fontFamily: _f, fontPackage: _p);
 
   /// trending-up-down icon.
-  static const trendingUpDown = IconData(0xe625, fontFamily: _f, fontPackage: _p);
-
+  static const trendingUpDown = IconData(
+    0xe625,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   // ── Devices & Hardware ────────────────────────────────────────────
 
@@ -3453,7 +5075,11 @@ class OiIcons {
   static const battery = IconData(0xe053, fontFamily: _f, fontPackage: _p);
 
   /// battery-charging icon.
-  static const batteryCharging = IconData(0xe054, fontFamily: _f, fontPackage: _p);
+  static const batteryCharging = IconData(
+    0xe054,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// battery-full icon.
   static const batteryFull = IconData(0xe055, fontFamily: _f, fontPackage: _p);
@@ -3462,22 +5088,38 @@ class OiIcons {
   static const batteryLow = IconData(0xe056, fontFamily: _f, fontPackage: _p);
 
   /// battery-medium icon.
-  static const batteryMedium = IconData(0xe057, fontFamily: _f, fontPackage: _p);
+  static const batteryMedium = IconData(
+    0xe057,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// battery-warning icon.
-  static const batteryWarning = IconData(0xe3ac, fontFamily: _f, fontPackage: _p);
+  static const batteryWarning = IconData(
+    0xe3ac,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// bluetooth icon.
   static const bluetooth = IconData(0xe05c, fontFamily: _f, fontPackage: _p);
 
   /// bluetooth-connected icon.
-  static const bluetoothConnected = IconData(0xe1b8, fontFamily: _f, fontPackage: _p);
+  static const bluetoothConnected = IconData(
+    0xe1b8,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// bluetooth-off icon.
   static const bluetoothOff = IconData(0xe1b9, fontFamily: _f, fontPackage: _p);
 
   /// bluetooth-searching icon.
-  static const bluetoothSearching = IconData(0xe1ba, fontFamily: _f, fontPackage: _p);
+  static const bluetoothSearching = IconData(
+    0xe1ba,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// cable icon.
   static const cable = IconData(0xe4e3, fontFamily: _f, fontPackage: _p);
@@ -3495,10 +5137,18 @@ class OiIcons {
   static const database = IconData(0xe0ad, fontFamily: _f, fontPackage: _p);
 
   /// database-backup icon.
-  static const databaseBackup = IconData(0xe3ab, fontFamily: _f, fontPackage: _p);
+  static const databaseBackup = IconData(
+    0xe3ab,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// database-search icon.
-  static const databaseSearch = IconData(0xe6b1, fontFamily: _f, fontPackage: _p);
+  static const databaseSearch = IconData(
+    0xe6b1,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// database-zap icon.
   static const databaseZap = IconData(0xe50b, fontFamily: _f, fontPackage: _p);
@@ -3507,10 +5157,18 @@ class OiIcons {
   static const hardDrive = IconData(0xe0ed, fontFamily: _f, fontPackage: _p);
 
   /// hard-drive-download icon.
-  static const hardDriveDownload = IconData(0xe4e5, fontFamily: _f, fontPackage: _p);
+  static const hardDriveDownload = IconData(
+    0xe4e5,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// hard-drive-upload icon.
-  static const hardDriveUpload = IconData(0xe4e6, fontFamily: _f, fontPackage: _p);
+  static const hardDriveUpload = IconData(
+    0xe4e6,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// house-plug icon.
   static const housePlug = IconData(0xe5f0, fontFamily: _f, fontPackage: _p);
@@ -3531,10 +5189,18 @@ class OiIcons {
   static const laptop2 = IconData(0xe1d8, fontFamily: _f, fontPackage: _p);
 
   /// laptop-minimal icon.
-  static const laptopMinimal = IconData(0xe1d8, fontFamily: _f, fontPackage: _p);
+  static const laptopMinimal = IconData(
+    0xe1d8,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// laptop-minimal-check icon.
-  static const laptopMinimalCheck = IconData(0xe632, fontFamily: _f, fontPackage: _p);
+  static const laptopMinimalCheck = IconData(
+    0xe632,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// memory-stick icon.
   static const memoryStick = IconData(0xe445, fontFamily: _f, fontPackage: _p);
@@ -3576,16 +5242,32 @@ class OiIcons {
   static const mousePointer = IconData(0xe11f, fontFamily: _f, fontPackage: _p);
 
   /// mouse-pointer-2 icon.
-  static const mousePointer2 = IconData(0xe1c3, fontFamily: _f, fontPackage: _p);
+  static const mousePointer2 = IconData(
+    0xe1c3,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// mouse-pointer-2-off icon.
-  static const mousePointer2Off = IconData(0xe6a6, fontFamily: _f, fontPackage: _p);
+  static const mousePointer2Off = IconData(
+    0xe6a6,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// mouse-pointer-ban icon.
-  static const mousePointerBan = IconData(0xe5e7, fontFamily: _f, fontPackage: _p);
+  static const mousePointerBan = IconData(
+    0xe5e7,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// mouse-pointer-click icon.
-  static const mousePointerClick = IconData(0xe120, fontFamily: _f, fontPackage: _p);
+  static const mousePointerClick = IconData(
+    0xe120,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// mouse-right icon.
   static const mouseRight = IconData(0xe6c0, fontFamily: _f, fontPackage: _p);
@@ -3668,7 +5350,6 @@ class OiIcons {
   /// wifi-zero icon.
   static const wifiZero = IconData(0xe5f9, fontFamily: _f, fontPackage: _p);
 
-
   // ── Development ───────────────────────────────────────────────────
 
   /// blocks icon.
@@ -3717,10 +5398,18 @@ class OiIcons {
   static const gitCommit = IconData(0xe0e3, fontFamily: _f, fontPackage: _p);
 
   /// git-commit-horizontal icon.
-  static const gitCommitHorizontal = IconData(0xe0e3, fontFamily: _f, fontPackage: _p);
+  static const gitCommitHorizontal = IconData(
+    0xe0e3,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// git-commit-vertical icon.
-  static const gitCommitVertical = IconData(0xe552, fontFamily: _f, fontPackage: _p);
+  static const gitCommitVertical = IconData(
+    0xe552,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// git-compare icon.
   static const gitCompare = IconData(0xe359, fontFamily: _f, fontPackage: _p);
@@ -3732,16 +5421,32 @@ class OiIcons {
   static const gitMerge = IconData(0xe0e4, fontFamily: _f, fontPackage: _p);
 
   /// git-merge-conflict icon.
-  static const gitMergeConflict = IconData(0xe6b4, fontFamily: _f, fontPackage: _p);
+  static const gitMergeConflict = IconData(
+    0xe6b4,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// git-pull-request icon.
-  static const gitPullRequest = IconData(0xe0e5, fontFamily: _f, fontPackage: _p);
+  static const gitPullRequest = IconData(
+    0xe0e5,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// git-pull-request-closed icon.
-  static const gitPullRequestClosed = IconData(0xe35a, fontFamily: _f, fontPackage: _p);
+  static const gitPullRequestClosed = IconData(
+    0xe35a,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// git-pull-request-create icon.
-  static const gitPullRequestCreate = IconData(0xe556, fontFamily: _f, fontPackage: _p);
+  static const gitPullRequestCreate = IconData(
+    0xe556,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// github icon.
   static const github = IconData(0xe0e6, fontFamily: _f, fontPackage: _p);
@@ -3777,8 +5482,11 @@ class OiIcons {
   static const workflow = IconData(0xe425, fontFamily: _f, fontPackage: _p);
 
   /// zodiac-sagittarius icon.
-  static const zodiacSagittarius = IconData(0xe6d4, fontFamily: _f, fontPackage: _p);
-
+  static const zodiacSagittarius = IconData(
+    0xe6d4,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   // ── Security ──────────────────────────────────────────────────────
 
@@ -3786,10 +5494,18 @@ class OiIcons {
   static const alarmClock = IconData(0xe03a, fontFamily: _f, fontPackage: _p);
 
   /// alarm-clock-check icon.
-  static const alarmClockCheck = IconData(0xe1ec, fontFamily: _f, fontPackage: _p);
+  static const alarmClockCheck = IconData(
+    0xe1ec,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// alarm-clock-off icon.
-  static const alarmClockOff = IconData(0xe23b, fontFamily: _f, fontPackage: _p);
+  static const alarmClockOff = IconData(
+    0xe23b,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// badge icon.
   static const badge = IconData(0xe474, fontFamily: _f, fontPackage: _p);
@@ -3804,7 +5520,11 @@ class OiIcons {
   static const badgeCheck = IconData(0xe241, fontFamily: _f, fontPackage: _p);
 
   /// badge-dollar-sign icon.
-  static const badgeDollarSign = IconData(0xe476, fontFamily: _f, fontPackage: _p);
+  static const badgeDollarSign = IconData(
+    0xe476,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// badge-euro icon.
   static const badgeEuro = IconData(0xe510, fontFamily: _f, fontPackage: _p);
@@ -3813,37 +5533,73 @@ class OiIcons {
   static const badgeHelp = IconData(0xe47b, fontFamily: _f, fontPackage: _p);
 
   /// badge-indian-rupee icon.
-  static const badgeIndianRupee = IconData(0xe511, fontFamily: _f, fontPackage: _p);
+  static const badgeIndianRupee = IconData(
+    0xe511,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// badge-info icon.
   static const badgeInfo = IconData(0xe477, fontFamily: _f, fontPackage: _p);
 
   /// badge-japanese-yen icon.
-  static const badgeJapaneseYen = IconData(0xe512, fontFamily: _f, fontPackage: _p);
+  static const badgeJapaneseYen = IconData(
+    0xe512,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// badge-pound-sterling icon.
-  static const badgePoundSterling = IconData(0xe513, fontFamily: _f, fontPackage: _p);
+  static const badgePoundSterling = IconData(
+    0xe513,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// badge-question-mark icon.
-  static const badgeQuestionMark = IconData(0xe47b, fontFamily: _f, fontPackage: _p);
+  static const badgeQuestionMark = IconData(
+    0xe47b,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// badge-russian-ruble icon.
-  static const badgeRussianRuble = IconData(0xe514, fontFamily: _f, fontPackage: _p);
+  static const badgeRussianRuble = IconData(
+    0xe514,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// badge-swiss-franc icon.
-  static const badgeSwissFranc = IconData(0xe515, fontFamily: _f, fontPackage: _p);
+  static const badgeSwissFranc = IconData(
+    0xe515,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// badge-turkish-lira icon.
-  static const badgeTurkishLira = IconData(0xe67e, fontFamily: _f, fontPackage: _p);
+  static const badgeTurkishLira = IconData(
+    0xe67e,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// badge-x icon.
   static const badgeX = IconData(0xe47c, fontFamily: _f, fontPackage: _p);
 
   /// brick-wall-shield icon.
-  static const brickWallShield = IconData(0xe690, fontFamily: _f, fontPackage: _p);
+  static const brickWallShield = IconData(
+    0xe690,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// calendar-clock icon.
-  static const calendarClock = IconData(0xe304, fontFamily: _f, fontPackage: _p);
+  static const calendarClock = IconData(
+    0xe304,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// clock icon.
   static const clock = IconData(0xe087, fontFamily: _f, fontPackage: _p);
@@ -3894,7 +5650,11 @@ class OiIcons {
   static const clockFading = IconData(0xe64a, fontFamily: _f, fontPackage: _p);
 
   /// door-closed-locked icon.
-  static const doorClosedLocked = IconData(0xe664, fontFamily: _f, fontPackage: _p);
+  static const doorClosedLocked = IconData(
+    0xe664,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// eye icon.
   static const eye = IconData(0xe0ba, fontFamily: _f, fontPackage: _p);
@@ -3909,13 +5669,21 @@ class OiIcons {
   static const fingerprint = IconData(0xe2cb, fontFamily: _f, fontPackage: _p);
 
   /// fingerprint-pattern icon.
-  static const fingerprintPattern = IconData(0xe2cb, fontFamily: _f, fontPackage: _p);
+  static const fingerprintPattern = IconData(
+    0xe2cb,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// id-card icon.
   static const idCard = IconData(0xe617, fontFamily: _f, fontPackage: _p);
 
   /// id-card-lanyard icon.
-  static const idCardLanyard = IconData(0xe670, fontFamily: _f, fontPackage: _p);
+  static const idCardLanyard = IconData(
+    0xe670,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// key icon.
   static const key = IconData(0xe0fd, fontFamily: _f, fontPackage: _p);
@@ -3930,7 +5698,11 @@ class OiIcons {
   static const lockKeyhole = IconData(0xe531, fontFamily: _f, fontPackage: _p);
 
   /// lock-keyhole-open icon.
-  static const lockKeyholeOpen = IconData(0xe532, fontFamily: _f, fontPackage: _p);
+  static const lockKeyholeOpen = IconData(
+    0xe532,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// lock-open icon.
   static const lockOpen = IconData(0xe10c, fontFamily: _f, fontPackage: _p);
@@ -3969,7 +5741,11 @@ class OiIcons {
   static const shieldClose = IconData(0xe200, fontFamily: _f, fontPackage: _p);
 
   /// shield-ellipsis icon.
-  static const shieldEllipsis = IconData(0xe516, fontFamily: _f, fontPackage: _p);
+  static const shieldEllipsis = IconData(
+    0xe516,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// shield-half icon.
   static const shieldHalf = IconData(0xe517, fontFamily: _f, fontPackage: _p);
@@ -3978,10 +5754,18 @@ class OiIcons {
   static const shieldOff = IconData(0xe15a, fontFamily: _f, fontPackage: _p);
 
   /// shield-question icon.
-  static const shieldQuestion = IconData(0xe40e, fontFamily: _f, fontPackage: _p);
+  static const shieldQuestion = IconData(
+    0xe40e,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// shield-question-mark icon.
-  static const shieldQuestionMark = IconData(0xe40e, fontFamily: _f, fontPackage: _p);
+  static const shieldQuestionMark = IconData(
+    0xe40e,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// shield-user icon.
   static const shieldUser = IconData(0xe647, fontFamily: _f, fontPackage: _p);
@@ -3993,7 +5777,11 @@ class OiIcons {
   static const unlock = IconData(0xe10c, fontFamily: _f, fontPackage: _p);
 
   /// unlock-keyhole icon.
-  static const unlockKeyhole = IconData(0xe532, fontFamily: _f, fontPackage: _p);
+  static const unlockKeyhole = IconData(
+    0xe532,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// user-key icon.
   static const userKey = IconData(0xe6c8, fontFamily: _f, fontPackage: _p);
@@ -4004,11 +5792,14 @@ class OiIcons {
   /// user-round-key icon.
   static const userRoundKey = IconData(0xe6c9, fontFamily: _f, fontPackage: _p);
 
-
   // ── Users & People ────────────────────────────────────────────────
 
   /// accessibility icon.
-  static const accessibility = IconData(0xe297, fontFamily: _f, fontPackage: _p);
+  static const accessibility = IconData(
+    0xe297,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// angry icon.
   static const angry = IconData(0xe2fc, fontFamily: _f, fontPackage: _p);
@@ -4053,7 +5844,11 @@ class OiIcons {
   static const meh = IconData(0xe114, fontFamily: _f, fontPackage: _p);
 
   /// person-standing icon.
-  static const personStanding = IconData(0xe21e, fontFamily: _f, fontPackage: _p);
+  static const personStanding = IconData(
+    0xe21e,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// skull icon.
   static const skull = IconData(0xe221, fontFamily: _f, fontPackage: _p);
@@ -4092,7 +5887,11 @@ class OiIcons {
   static const userRound = IconData(0xe468, fontFamily: _f, fontPackage: _p);
 
   /// user-round-check icon.
-  static const userRoundCheck = IconData(0xe469, fontFamily: _f, fontPackage: _p);
+  static const userRoundCheck = IconData(
+    0xe469,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// user-round-cog icon.
   static const userRoundCog = IconData(0xe46a, fontFamily: _f, fontPackage: _p);
@@ -4101,7 +5900,11 @@ class OiIcons {
   static const userRoundPen = IconData(0xe5fd, fontFamily: _f, fontPackage: _p);
 
   /// user-round-search icon.
-  static const userRoundSearch = IconData(0xe578, fontFamily: _f, fontPackage: _p);
+  static const userRoundSearch = IconData(
+    0xe578,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// user-round-x icon.
   static const userRoundX = IconData(0xe46d, fontFamily: _f, fontPackage: _p);
@@ -4123,7 +5926,6 @@ class OiIcons {
 
   /// users-round icon.
   static const usersRound = IconData(0xe46e, fontFamily: _f, fontPackage: _p);
-
 
   // ── Shopping & Commerce ───────────────────────────────────────────
 
@@ -4173,13 +5975,21 @@ class OiIcons {
   static const packageOpen = IconData(0xe2cc, fontFamily: _f, fontPackage: _p);
 
   /// package-search icon.
-  static const packageSearch = IconData(0xe269, fontFamily: _f, fontPackage: _p);
+  static const packageSearch = IconData(
+    0xe269,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// package-x icon.
   static const packageX = IconData(0xe26a, fontFamily: _f, fontPackage: _p);
 
   /// pound-sterling icon.
-  static const poundSterling = IconData(0xe13f, fontFamily: _f, fontPackage: _p);
+  static const poundSterling = IconData(
+    0xe13f,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// receipt icon.
   static const receipt = IconData(0xe3d3, fontFamily: _f, fontPackage: _p);
@@ -4191,22 +6001,46 @@ class OiIcons {
   static const receiptEuro = IconData(0xe5a6, fontFamily: _f, fontPackage: _p);
 
   /// receipt-indian-rupee icon.
-  static const receiptIndianRupee = IconData(0xe5a7, fontFamily: _f, fontPackage: _p);
+  static const receiptIndianRupee = IconData(
+    0xe5a7,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// receipt-japanese-yen icon.
-  static const receiptJapaneseYen = IconData(0xe5a8, fontFamily: _f, fontPackage: _p);
+  static const receiptJapaneseYen = IconData(
+    0xe5a8,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// receipt-pound-sterling icon.
-  static const receiptPoundSterling = IconData(0xe5a9, fontFamily: _f, fontPackage: _p);
+  static const receiptPoundSterling = IconData(
+    0xe5a9,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// receipt-russian-ruble icon.
-  static const receiptRussianRuble = IconData(0xe5aa, fontFamily: _f, fontPackage: _p);
+  static const receiptRussianRuble = IconData(
+    0xe5aa,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// receipt-swiss-franc icon.
-  static const receiptSwissFranc = IconData(0xe5ab, fontFamily: _f, fontPackage: _p);
+  static const receiptSwissFranc = IconData(
+    0xe5ab,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// receipt-turkish-lira icon.
-  static const receiptTurkishLira = IconData(0xe67f, fontFamily: _f, fontPackage: _p);
+  static const receiptTurkishLira = IconData(
+    0xe67f,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// store icon.
   static const store = IconData(0xe3e4, fontFamily: _f, fontPackage: _p);
@@ -4221,7 +6055,11 @@ class OiIcons {
   static const truck = IconData(0xe194, fontFamily: _f, fontPackage: _p);
 
   /// truck-electric icon.
-  static const truckElectric = IconData(0xe65f, fontFamily: _f, fontPackage: _p);
+  static const truckElectric = IconData(
+    0xe65f,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// wallet icon.
   static const wallet = IconData(0xe204, fontFamily: _f, fontPackage: _p);
@@ -4233,8 +6071,11 @@ class OiIcons {
   static const walletCards = IconData(0xe4cc, fontFamily: _f, fontPackage: _p);
 
   /// wallet-minimal icon.
-  static const walletMinimal = IconData(0xe4cd, fontFamily: _f, fontPackage: _p);
-
+  static const walletMinimal = IconData(
+    0xe4cd,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   // ── Medical & Health ──────────────────────────────────────────────
 
@@ -4257,7 +6098,11 @@ class OiIcons {
   static const dnaOff = IconData(0xe394, fontFamily: _f, fontPackage: _p);
 
   /// fork-knife-crossed icon.
-  static const forkKnifeCrossed = IconData(0xe2f7, fontFamily: _f, fontPackage: _p);
+  static const forkKnifeCrossed = IconData(
+    0xe2f7,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// stethoscope icon.
   static const stethoscope = IconData(0xe2f1, fontFamily: _f, fontPackage: _p);
@@ -4266,8 +6111,11 @@ class OiIcons {
   static const syringe = IconData(0xe2f2, fontFamily: _f, fontPackage: _p);
 
   /// utensils-crossed icon.
-  static const utensilsCrossed = IconData(0xe2f7, fontFamily: _f, fontPackage: _p);
-
+  static const utensilsCrossed = IconData(
+    0xe2f7,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   // ── Food & Drink ──────────────────────────────────────────────────
 
@@ -4415,7 +6263,6 @@ class OiIcons {
   /// wine-off icon.
   static const wineOff = IconData(0xe3a0, fontFamily: _f, fontPackage: _p);
 
-
   // ── Animals ───────────────────────────────────────────────────────
 
   /// bird icon.
@@ -4469,7 +6316,6 @@ class OiIcons {
   /// vibrate-off icon.
   static const vibrateOff = IconData(0xe29d, fontFamily: _f, fontPackage: _p);
 
-
   // ── Buildings ─────────────────────────────────────────────────────
 
   /// brick-wall icon.
@@ -4516,7 +6362,6 @@ class OiIcons {
 
   /// warehouse icon.
   static const warehouse = IconData(0xe3e6, fontFamily: _f, fontPackage: _p);
-
 
   // ── Vehicles & Transport ──────────────────────────────────────────
 
@@ -4568,7 +6413,6 @@ class OiIcons {
   /// tractor icon.
   static const tractor = IconData(0xe504, fontFamily: _f, fontPackage: _p);
 
-
   // ── Tools & Utilities ─────────────────────────────────────────────
 
   /// alarm-check icon.
@@ -4611,7 +6455,11 @@ class OiIcons {
   static const brush = IconData(0xe1d3, fontFamily: _f, fontPackage: _p);
 
   /// brush-cleaning icon.
-  static const brushCleaning = IconData(0xe666, fontFamily: _f, fontPackage: _p);
+  static const brushCleaning = IconData(
+    0xe666,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// calendar icon.
   static const calendar = IconData(0xe063, fontFamily: _f, fontPackage: _p);
@@ -4620,10 +6468,18 @@ class OiIcons {
   static const calendar1 = IconData(0xe630, fontFamily: _f, fontPackage: _p);
 
   /// calendar-check icon.
-  static const calendarCheck = IconData(0xe2b7, fontFamily: _f, fontPackage: _p);
+  static const calendarCheck = IconData(
+    0xe2b7,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// calendar-check-2 icon.
-  static const calendarCheck2 = IconData(0xe2b8, fontFamily: _f, fontPackage: _p);
+  static const calendarCheck2 = IconData(
+    0xe2b8,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// calendar-cog icon.
   static const calendarCog = IconData(0xe5ed, fontFamily: _f, fontPackage: _p);
@@ -4638,10 +6494,18 @@ class OiIcons {
   static const calendarOff = IconData(0xe2bb, fontFamily: _f, fontPackage: _p);
 
   /// calendar-range icon.
-  static const calendarRange = IconData(0xe2bd, fontFamily: _f, fontPackage: _p);
+  static const calendarRange = IconData(
+    0xe2bd,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// calendar-search icon.
-  static const calendarSearch = IconData(0xe306, fontFamily: _f, fontPackage: _p);
+  static const calendarSearch = IconData(
+    0xe306,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// calendar-sync icon.
   static const calendarSync = IconData(0xe636, fontFamily: _f, fontPackage: _p);
@@ -4701,19 +6565,35 @@ class OiIcons {
   static const flashlight = IconData(0xe0d3, fontFamily: _f, fontPackage: _p);
 
   /// flashlight-off icon.
-  static const flashlightOff = IconData(0xe0d4, fontFamily: _f, fontPackage: _p);
+  static const flashlightOff = IconData(
+    0xe0d4,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// flip-horizontal icon.
-  static const flipHorizontal = IconData(0xe35d, fontFamily: _f, fontPackage: _p);
+  static const flipHorizontal = IconData(
+    0xe35d,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// flip-horizontal-2 icon.
-  static const flipHorizontal2 = IconData(0xe35e, fontFamily: _f, fontPackage: _p);
+  static const flipHorizontal2 = IconData(
+    0xe35e,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// flip-vertical icon.
   static const flipVertical = IconData(0xe35f, fontFamily: _f, fontPackage: _p);
 
   /// flip-vertical-2 icon.
-  static const flipVertical2 = IconData(0xe360, fontFamily: _f, fontPackage: _p);
+  static const flipVertical2 = IconData(
+    0xe360,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// fork-knife icon.
   static const forkKnife = IconData(0xe2f6, fontFamily: _f, fontPackage: _p);
@@ -4812,7 +6692,11 @@ class OiIcons {
   static const paintbrush2 = IconData(0xe2e8, fontFamily: _f, fontPackage: _p);
 
   /// paintbrush-vertical icon.
-  static const paintbrushVertical = IconData(0xe2e8, fontFamily: _f, fontPackage: _p);
+  static const paintbrushVertical = IconData(
+    0xe2e8,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// palette icon.
   static const palette = IconData(0xe1dd, fontFamily: _f, fontPackage: _p);
@@ -4854,7 +6738,11 @@ class OiIcons {
   static const refreshCcw = IconData(0xe144, fontFamily: _f, fontPackage: _p);
 
   /// refresh-ccw-dot icon.
-  static const refreshCcwDot = IconData(0xe4b2, fontFamily: _f, fontPackage: _p);
+  static const refreshCcwDot = IconData(
+    0xe4b2,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// refresh-cw icon.
   static const refreshCw = IconData(0xe145, fontFamily: _f, fontPackage: _p);
@@ -4893,13 +6781,21 @@ class OiIcons {
   static const ruler = IconData(0xe14b, fontFamily: _f, fontPackage: _p);
 
   /// ruler-dimension-line icon.
-  static const rulerDimensionLine = IconData(0xe662, fontFamily: _f, fontPackage: _p);
+  static const rulerDimensionLine = IconData(
+    0xe662,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// scissors icon.
   static const scissors = IconData(0xe14e, fontFamily: _f, fontPackage: _p);
 
   /// scissors-line-dashed icon.
-  static const scissorsLineDashed = IconData(0xe4e9, fontFamily: _f, fontPackage: _p);
+  static const scissorsLineDashed = IconData(
+    0xe4e9,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// search icon.
   static const search = IconData(0xe151, fontFamily: _f, fontPackage: _p);
@@ -4941,10 +6837,18 @@ class OiIcons {
   static const sliders = IconData(0xe162, fontFamily: _f, fontPackage: _p);
 
   /// sliders-horizontal icon.
-  static const slidersHorizontal = IconData(0xe29a, fontFamily: _f, fontPackage: _p);
+  static const slidersHorizontal = IconData(
+    0xe29a,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// sliders-vertical icon.
-  static const slidersVertical = IconData(0xe162, fontFamily: _f, fontPackage: _p);
+  static const slidersVertical = IconData(
+    0xe162,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// sparkle icon.
   static const sparkle = IconData(0xe47e, fontFamily: _f, fontPackage: _p);
@@ -4956,7 +6860,11 @@ class OiIcons {
   static const stamp = IconData(0xe3bb, fontFamily: _f, fontPackage: _p);
 
   /// table-cells-merge icon.
-  static const tableCellsMerge = IconData(0xe5c7, fontFamily: _f, fontPackage: _p);
+  static const tableCellsMerge = IconData(
+    0xe5c7,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// timer icon.
   static const timer = IconData(0xe1e0, fontFamily: _f, fontPackage: _p);
@@ -5023,7 +6931,6 @@ class OiIcons {
 
   /// zoom-out icon.
   static const zoomOut = IconData(0xe1b7, fontFamily: _f, fontPackage: _p);
-
 
   // ── Miscellaneous ─────────────────────────────────────────────────
 
@@ -5157,7 +7064,11 @@ class OiIcons {
   static const clapperboard = IconData(0xe29b, fontFamily: _f, fontPackage: _p);
 
   /// closed-caption icon.
-  static const closedCaption = IconData(0xe68a, fontFamily: _f, fontPackage: _p);
+  static const closedCaption = IconData(
+    0xe68a,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// club icon.
   static const club = IconData(0xe496, fontFamily: _f, fontPackage: _p);
@@ -5181,7 +7092,11 @@ class OiIcons {
   static const cookingPot = IconData(0xe584, fontFamily: _f, fontPackage: _p);
 
   /// creative-commons icon.
-  static const creativeCommons = IconData(0xe3b2, fontFamily: _f, fontPackage: _p);
+  static const creativeCommons = IconData(
+    0xe3b2,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// croissant icon.
   static const croissant = IconData(0xe2ae, fontFamily: _f, fontPackage: _p);
@@ -5280,7 +7195,11 @@ class OiIcons {
   static const ellipsis = IconData(0xe0b6, fontFamily: _f, fontPackage: _p);
 
   /// ellipsis-vertical icon.
-  static const ellipsisVertical = IconData(0xe0b7, fontFamily: _f, fontPackage: _p);
+  static const ellipsisVertical = IconData(
+    0xe0b7,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// ethernet-port icon.
   static const ethernetPort = IconData(0xe620, fontFamily: _f, fontPackage: _p);
@@ -5307,7 +7226,11 @@ class OiIcons {
   static const flaskConical = IconData(0xe0d5, fontFamily: _f, fontPackage: _p);
 
   /// flask-conical-off icon.
-  static const flaskConicalOff = IconData(0xe396, fontFamily: _f, fontPackage: _p);
+  static const flaskConicalOff = IconData(
+    0xe396,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// flask-round icon.
   static const flaskRound = IconData(0xe0d6, fontFamily: _f, fontPackage: _p);
@@ -5316,7 +7239,11 @@ class OiIcons {
   static const focus = IconData(0xe29e, fontFamily: _f, fontPackage: _p);
 
   /// fold-horizontal icon.
-  static const foldHorizontal = IconData(0xe43b, fontFamily: _f, fontPackage: _p);
+  static const foldHorizontal = IconData(
+    0xe43b,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// fold-vertical icon.
   static const foldVertical = IconData(0xe43c, fontFamily: _f, fontPackage: _p);
@@ -5343,19 +7270,39 @@ class OiIcons {
   static const fullscreen = IconData(0xe534, fontFamily: _f, fontPackage: _p);
 
   /// gallery-horizontal icon.
-  static const galleryHorizontal = IconData(0xe4ce, fontFamily: _f, fontPackage: _p);
+  static const galleryHorizontal = IconData(
+    0xe4ce,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// gallery-horizontal-end icon.
-  static const galleryHorizontalEnd = IconData(0xe4cf, fontFamily: _f, fontPackage: _p);
+  static const galleryHorizontalEnd = IconData(
+    0xe4cf,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// gallery-thumbnails icon.
-  static const galleryThumbnails = IconData(0xe4d0, fontFamily: _f, fontPackage: _p);
+  static const galleryThumbnails = IconData(
+    0xe4d0,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// gallery-vertical icon.
-  static const galleryVertical = IconData(0xe4d1, fontFamily: _f, fontPackage: _p);
+  static const galleryVertical = IconData(
+    0xe4d1,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// gallery-vertical-end icon.
-  static const galleryVerticalEnd = IconData(0xe4d2, fontFamily: _f, fontPackage: _p);
+  static const galleryVerticalEnd = IconData(
+    0xe4d2,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// gamepad icon.
   static const gamepad = IconData(0xe0de, fontFamily: _f, fontPackage: _p);
@@ -5364,7 +7311,11 @@ class OiIcons {
   static const gamepad2 = IconData(0xe0df, fontFamily: _f, fontPackage: _p);
 
   /// gamepad-directional icon.
-  static const gamepadDirectional = IconData(0xe69b, fontFamily: _f, fontPackage: _p);
+  static const gamepadDirectional = IconData(
+    0xe69b,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// gavel icon.
   static const gavel = IconData(0xe0e0, fontFamily: _f, fontPackage: _p);
@@ -5391,13 +7342,21 @@ class OiIcons {
   static const grab = IconData(0xe1e6, fontFamily: _f, fontPackage: _p);
 
   /// graduation-cap icon.
-  static const graduationCap = IconData(0xe234, fontFamily: _f, fontPackage: _p);
+  static const graduationCap = IconData(
+    0xe234,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// grip icon.
   static const grip = IconData(0xe3b1, fontFamily: _f, fontPackage: _p);
 
   /// grip-horizontal icon.
-  static const gripHorizontal = IconData(0xe0ea, fontFamily: _f, fontPackage: _p);
+  static const gripHorizontal = IconData(
+    0xe0ea,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// grip-vertical icon.
   static const gripVertical = IconData(0xe0eb, fontFamily: _f, fontPackage: _p);
@@ -5487,7 +7446,11 @@ class OiIcons {
   static const lifeBuoy = IconData(0xe101, fontFamily: _f, fontPackage: _p);
 
   /// line-dot-right-horizontal icon.
-  static const lineDotRightHorizontal = IconData(0xe6b9, fontFamily: _f, fontPackage: _p);
+  static const lineDotRightHorizontal = IconData(
+    0xe6b9,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// line-squiggle icon.
   static const lineSquiggle = IconData(0xe67a, fontFamily: _f, fontPackage: _p);
@@ -5517,13 +7480,21 @@ class OiIcons {
   static const metronome = IconData(0xe6bc, fontFamily: _f, fontPackage: _p);
 
   /// mirror-rectangular icon.
-  static const mirrorRectangular = IconData(0xe6bd, fontFamily: _f, fontPackage: _p);
+  static const mirrorRectangular = IconData(
+    0xe6bd,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// mirror-round icon.
   static const mirrorRound = IconData(0xe6be, fontFamily: _f, fontPackage: _p);
 
   /// more-horizontal icon.
-  static const moreHorizontal = IconData(0xe0b6, fontFamily: _f, fontPackage: _p);
+  static const moreHorizontal = IconData(
+    0xe0b6,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// more-vertical icon.
   static const moreVertical = IconData(0xe0b7, fontFamily: _f, fontPackage: _p);
@@ -5592,16 +7563,32 @@ class OiIcons {
   static const railSymbol = IconData(0xe501, fontFamily: _f, fontPackage: _p);
 
   /// rectangle-ellipsis icon.
-  static const rectangleEllipsis = IconData(0xe21f, fontFamily: _f, fontPackage: _p);
+  static const rectangleEllipsis = IconData(
+    0xe21f,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// rectangle-goggles icon.
-  static const rectangleGoggles = IconData(0xe656, fontFamily: _f, fontPackage: _p);
+  static const rectangleGoggles = IconData(
+    0xe656,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// rectangle-horizontal icon.
-  static const rectangleHorizontal = IconData(0xe376, fontFamily: _f, fontPackage: _p);
+  static const rectangleHorizontal = IconData(
+    0xe376,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// rectangle-vertical icon.
-  static const rectangleVertical = IconData(0xe377, fontFamily: _f, fontPackage: _p);
+  static const rectangleVertical = IconData(
+    0xe377,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// reply icon.
   static const reply = IconData(0xe22a, fontFamily: _f, fontPackage: _p);
@@ -5616,7 +7603,11 @@ class OiIcons {
   static const rockingChair = IconData(0xe233, fontFamily: _f, fontPackage: _p);
 
   /// roller-coaster icon.
-  static const rollerCoaster = IconData(0xe480, fontFamily: _f, fontPackage: _p);
+  static const rollerCoaster = IconData(
+    0xe480,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// rose icon.
   static const rose = IconData(0xe691, fontFamily: _f, fontPackage: _p);
@@ -5703,7 +7694,11 @@ class OiIcons {
   static const spline = IconData(0xe38b, fontFamily: _f, fontPackage: _p);
 
   /// spline-pointer icon.
-  static const splinePointer = IconData(0xe64f, fontFamily: _f, fontPackage: _p);
+  static const splinePointer = IconData(
+    0xe64f,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// spool icon.
   static const spool = IconData(0xe677, fontFamily: _f, fontPackage: _p);
@@ -5718,7 +7713,11 @@ class OiIcons {
   static const squircle = IconData(0xe57a, fontFamily: _f, fontPackage: _p);
 
   /// squircle-dashed icon.
-  static const squircleDashed = IconData(0xe679, fontFamily: _f, fontPackage: _p);
+  static const squircleDashed = IconData(
+    0xe679,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// step-back icon.
   static const stepBack = IconData(0xe3e9, fontFamily: _f, fontPackage: _p);
@@ -5736,10 +7735,18 @@ class OiIcons {
   static const stone = IconData(0xe6af, fontFamily: _f, fontPackage: _p);
 
   /// stretch-horizontal icon.
-  static const stretchHorizontal = IconData(0xe27c, fontFamily: _f, fontPackage: _p);
+  static const stretchHorizontal = IconData(
+    0xe27c,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// stretch-vertical icon.
-  static const stretchVertical = IconData(0xe27d, fontFamily: _f, fontPackage: _p);
+  static const stretchVertical = IconData(
+    0xe27d,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// swiss-franc icon.
   static const swissFranc = IconData(0xe17b, fontFamily: _f, fontPackage: _p);
@@ -5760,7 +7767,11 @@ class OiIcons {
   static const tableConfig = IconData(0xe661, fontFamily: _f, fontPackage: _p);
 
   /// table-properties icon.
-  static const tableProperties = IconData(0xe4db, fontFamily: _f, fontPackage: _p);
+  static const tableProperties = IconData(
+    0xe4db,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// tangent icon.
   static const tangent = IconData(0xe52e, fontFamily: _f, fontPackage: _p);
@@ -5778,7 +7789,11 @@ class OiIcons {
   static const testTube2 = IconData(0xe406, fontFamily: _f, fontPackage: _p);
 
   /// test-tube-diagonal icon.
-  static const testTubeDiagonal = IconData(0xe406, fontFamily: _f, fontPackage: _p);
+  static const testTubeDiagonal = IconData(
+    0xe406,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// test-tubes icon.
   static const testTubes = IconData(0xe407, fontFamily: _f, fontPackage: _p);
@@ -5832,10 +7847,18 @@ class OiIcons {
   static const twitter = IconData(0xe197, fontFamily: _f, fontPackage: _p);
 
   /// unfold-horizontal icon.
-  static const unfoldHorizontal = IconData(0xe43d, fontFamily: _f, fontPackage: _p);
+  static const unfoldHorizontal = IconData(
+    0xe43d,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// unfold-vertical icon.
-  static const unfoldVertical = IconData(0xe43e, fontFamily: _f, fontPackage: _p);
+  static const unfoldVertical = IconData(
+    0xe43e,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// university icon.
   static const university = IconData(0xe3e5, fontFamily: _f, fontPackage: _p);
@@ -5874,7 +7897,11 @@ class OiIcons {
   static const wallpaper = IconData(0xe44b, fontFamily: _f, fontPackage: _p);
 
   /// washing-machine icon.
-  static const washingMachine = IconData(0xe590, fontFamily: _f, fontPackage: _p);
+  static const washingMachine = IconData(
+    0xe590,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// webcam icon.
   static const webcam = IconData(0xe205, fontFamily: _f, fontPackage: _p);
@@ -5892,7 +7919,11 @@ class OiIcons {
   static const youtube = IconData(0xe1b3, fontFamily: _f, fontPackage: _p);
 
   /// zodiac-aquarius icon.
-  static const zodiacAquarius = IconData(0xe6cb, fontFamily: _f, fontPackage: _p);
+  static const zodiacAquarius = IconData(
+    0xe6cb,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// zodiac-aries icon.
   static const zodiacAries = IconData(0xe6cc, fontFamily: _f, fontPackage: _p);
@@ -5901,7 +7932,11 @@ class OiIcons {
   static const zodiacCancer = IconData(0xe6cd, fontFamily: _f, fontPackage: _p);
 
   /// zodiac-capricorn icon.
-  static const zodiacCapricorn = IconData(0xe6ce, fontFamily: _f, fontPackage: _p);
+  static const zodiacCapricorn = IconData(
+    0xe6ce,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// zodiac-gemini icon.
   static const zodiacGemini = IconData(0xe6cf, fontFamily: _f, fontPackage: _p);
@@ -5913,12 +7948,15 @@ class OiIcons {
   static const zodiacLibra = IconData(0xe6d1, fontFamily: _f, fontPackage: _p);
 
   /// zodiac-ophiuchus icon.
-  static const zodiacOphiuchus = IconData(0xe6d2, fontFamily: _f, fontPackage: _p);
+  static const zodiacOphiuchus = IconData(
+    0xe6d2,
+    fontFamily: _f,
+    fontPackage: _p,
+  );
 
   /// zodiac-taurus icon.
   static const zodiacTaurus = IconData(0xe6d6, fontFamily: _f, fontPackage: _p);
 
   /// zodiac-virgo icon.
   static const zodiacVirgo = IconData(0xe6d7, fontFamily: _f, fontPackage: _p);
-
 }

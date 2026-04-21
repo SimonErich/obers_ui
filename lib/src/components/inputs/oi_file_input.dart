@@ -189,18 +189,19 @@ class _OiFileInputState extends State<OiFileInput> {
                 Icon(
                   OiIcons.cloudUpload,
                   size: 16,
-                  color:
-                      _isDragOver ? colors.primary.base : colors.textMuted,
+                  color: _isDragOver ? colors.primary.base : colors.textMuted,
                 ),
                 const SizedBox(width: 6),
                 Text(
-                  _isDragOver ? 'Release to add files' : 'Drop files here or browse',
+                  _isDragOver
+                      ? 'Release to add files'
+                      : 'Drop files here or browse',
                   style: TextStyle(
                     fontSize: 13,
-                    fontWeight:
-                        _isDragOver ? FontWeight.w500 : FontWeight.normal,
-                    color:
-                        _isDragOver ? colors.primary.base : colors.textMuted,
+                    fontWeight: _isDragOver
+                        ? FontWeight.w500
+                        : FontWeight.normal,
+                    color: _isDragOver ? colors.primary.base : colors.textMuted,
                   ),
                 ),
               ],

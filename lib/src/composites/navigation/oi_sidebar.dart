@@ -540,7 +540,8 @@ class _OiSidebarState extends State<OiSidebar>
     final indent = depth * 24.0;
 
     final Widget content = Container(
-      color: bg,
+      clipBehavior: Clip.hardEdge,
+      decoration: BoxDecoration(color: bg),
       constraints: const BoxConstraints(minHeight: 40),
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
@@ -552,38 +553,40 @@ class _OiSidebarState extends State<OiSidebar>
             ),
           ),
           if (indent > 0) SizedBox(width: indent),
-          Expanded(
-            child: Text(
-              item.label,
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
-                color: textColor,
+          if (!compact) ...[
+            Expanded(
+              child: Text(
+                item.label,
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
+                  color: textColor,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
             ),
-          ),
-          if (item.badgeCount != null && item.badgeCount! > 0)
-            OiBadge.filled(
-              label: item.badgeCount.toString(),
-              size: OiBadgeSize.small,
-            ),
-          if (hasKids)
-            Padding(
-              padding: const EdgeInsets.only(left: 4),
-              child: AnimatedRotation(
-                turns: kidsExpanded ? 0.25 : 0.0,
-                duration: const Duration(milliseconds: 200),
-                curve: Curves.easeInOut,
-                child: Icon(
-                  OiIcons.chevronRight,
-                  size: 14,
-                  color: colors.textMuted,
+            if (item.badgeCount != null && item.badgeCount! > 0)
+              OiBadge.filled(
+                label: item.badgeCount.toString(),
+                size: OiBadgeSize.small,
+              ),
+            if (hasKids)
+              Padding(
+                padding: const EdgeInsets.only(left: 4),
+                child: AnimatedRotation(
+                  turns: kidsExpanded ? 0.25 : 0.0,
+                  duration: const Duration(milliseconds: 200),
+                  curve: Curves.easeInOut,
+                  child: Icon(
+                    OiIcons.chevronRight,
+                    size: 14,
+                    color: colors.textMuted,
+                  ),
                 ),
               ),
-            ),
-          const SizedBox(width: 12),
+            const SizedBox(width: 12),
+          ],
         ],
       ),
     );

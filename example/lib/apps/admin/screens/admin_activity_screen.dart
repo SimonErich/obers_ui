@@ -87,7 +87,6 @@ class _AdminActivityScreenState extends State<AdminActivityScreen> {
                         padding: EdgeInsets.all(spacing.md),
                         child: OiButton.outline(
                           label: 'Load More',
-                          fullWidth: false,
                           onTap: () {
                             setState(() {
                               _visibleCount += 5;

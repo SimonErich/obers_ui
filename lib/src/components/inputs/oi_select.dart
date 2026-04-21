@@ -69,10 +69,10 @@ class OiSelect<T> extends StatefulWidget {
     this.searchable = false,
     this.bottomSheetOnCompact = false,
     super.key,
-  })  : inline = true,
-        label = null,
-        hint = null,
-        error = null;
+  }) : inline = true,
+       label = null,
+       hint = null,
+       error = null;
 
   /// The currently selected value.
   final T? value;
@@ -287,8 +287,8 @@ class _OiSelectState<T> extends State<OiSelect<T>> {
                   color: _hovered
                       ? colors.primary.base
                       : hasValue
-                          ? colors.text
-                          : colors.textMuted,
+                      ? colors.text
+                      : colors.textMuted,
                 ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
@@ -300,8 +300,11 @@ class _OiSelectState<T> extends State<OiSelect<T>> {
         ),
       );
     } else {
-      final chevron =
-          Icon(OiIcons.arrowDown, size: 16, color: colors.textMuted);
+      final chevron = Icon(
+        OiIcons.arrowDown,
+        size: 16,
+        color: colors.textMuted,
+      );
       anchor = GestureDetector(
         onTap: widget.enabled ? _open_ : null,
         behavior: HitTestBehavior.opaque,

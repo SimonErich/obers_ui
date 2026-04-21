@@ -33,8 +33,10 @@ class ShopCartScreen extends StatelessWidget {
     final spacing = context.spacing;
     final colors = context.colors;
 
-    final subtotal =
-        cartItems.fold<double>(0, (sum, item) => sum + item.totalPrice);
+    final subtotal = cartItems.fold<double>(
+      0,
+      (sum, item) => sum + item.totalPrice,
+    );
     final remaining = kFreeShippingThreshold - subtotal;
     final progress = (subtotal / kFreeShippingThreshold).clamp(0.0, 1.0);
     final hasFreeShipping = remaining <= 0;
@@ -83,8 +85,8 @@ class ShopCartScreen extends StatelessWidget {
                           label: hasFreeShipping
                               ? 'Free shipping unlocked'
                               : 'EUR ${subtotal.toStringAsFixed(2)} '
-                                  'of EUR '
-                                  '${kFreeShippingThreshold.toStringAsFixed(2)}',
+                                    'of EUR '
+                                    '${kFreeShippingThreshold.toStringAsFixed(2)}',
                         ),
                       ],
                     ),

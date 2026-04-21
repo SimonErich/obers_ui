@@ -28,10 +28,10 @@ class OiPageRoute<T> extends PageRoute<T> {
     this.barrierColor,
     this.barrierDismissible = false,
     super.settings,
-  })  : _transitionDuration =
-            transitionDuration ?? const Duration(milliseconds: 250),
-        _reverseTransitionDuration =
-            reverseTransitionDuration ?? const Duration(milliseconds: 200);
+  }) : _transitionDuration =
+           transitionDuration ?? const Duration(milliseconds: 250),
+       _reverseTransitionDuration =
+           reverseTransitionDuration ?? const Duration(milliseconds: 200);
 
   /// Creates an [OiPageRoute] that reads transition defaults from the
   /// nearest [OiTheme].
@@ -48,12 +48,12 @@ class OiPageRoute<T> extends PageRoute<T> {
   }) {
     final themeData = OiTheme.maybeOf(context);
     final animations = themeData?.animations;
-    final effectiveTransition = transition ??
+    final effectiveTransition =
+        transition ??
         animations?.defaultPageTransition ??
         OiPageTransitionType.fade;
     final effectiveDuration =
-        animations?.pageTransitionDuration ??
-        const Duration(milliseconds: 250);
+        animations?.pageTransitionDuration ?? const Duration(milliseconds: 250);
 
     return OiPageRoute<T>(
       builder: builder,
@@ -146,14 +146,13 @@ class OiPageRoute<T> extends PageRoute<T> {
 
       case OiPageTransitionType.slideVertical:
         return SlideTransition(
-          position:
-              Tween<Offset>(begin: const Offset(0, 1), end: Offset.zero)
-                  .animate(
-            CurvedAnimation(
-              parent: animation,
-              curve: Curves.easeOutCubic,
-            ),
-          ),
+          position: Tween<Offset>(begin: const Offset(0, 1), end: Offset.zero)
+              .animate(
+                CurvedAnimation(
+                  parent: animation,
+                  curve: Curves.easeOutCubic,
+                ),
+              ),
           child: child,
         );
 

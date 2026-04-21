@@ -32,7 +32,7 @@ void main() {
     await tester.pumpObers(
       OiNumberInput(value: 5, onChanged: (v) => result = v),
     );
-    await tester.tap(find.text('−'));
+    await tester.tap(find.text('-'));
     await tester.pump();
     expect(result, 4);
   });
@@ -52,7 +52,7 @@ void main() {
     await tester.pumpObers(
       OiNumberInput(value: 0, min: 0, onChanged: (v) => result = v),
     );
-    await tester.tap(find.text('−'));
+    await tester.tap(find.text('-'));
     await tester.pump();
     expect(result, 0);
   });

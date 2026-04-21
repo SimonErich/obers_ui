@@ -123,8 +123,9 @@ void main() {
       expect(widget.semanticLabel, isNull);
     });
 
-    testWidgets('no Semantics wrapper when semanticLabel is null',
-        (tester) async {
+    testWidgets('no Semantics wrapper when semanticLabel is null', (
+      tester,
+    ) async {
       await tester.pumpObers(
         const OiDialogShell(child: Text('plain')),
       );
@@ -135,8 +136,7 @@ void main() {
           of: find.byType(OiDialogShell),
           matching: find.byWidgetPredicate(
             (widget) =>
-                widget is Semantics &&
-                (widget.properties.namesRoute ?? false),
+                widget is Semantics && (widget.properties.namesRoute ?? false),
           ),
         ),
       );

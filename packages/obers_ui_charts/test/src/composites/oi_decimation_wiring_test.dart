@@ -1,4 +1,3 @@
-
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui_charts/obers_ui_charts.dart';
@@ -99,10 +98,7 @@ void main() {
             series: const [
               OiLineSeries(
                 label: 'Test',
-                points: [
-                  OiLinePoint(x: 1, y: 10),
-                  OiLinePoint(x: 2, y: 20),
-                ],
+                points: [OiLinePoint(x: 1, y: 10), OiLinePoint(x: 2, y: 20)],
               ),
             ],
             behaviors: [OiZoomPanBehavior()],

@@ -199,7 +199,8 @@ class _OiScaleRatingState extends State<OiScaleRating> {
       );
     }
 
-    final semanticLabel = widget.label ??
+    final semanticLabel =
+        widget.label ??
         'Scale rating, selected: ${widget.value ?? 'none'} of ${widget.max}';
 
     return Semantics(label: semanticLabel, child: group);

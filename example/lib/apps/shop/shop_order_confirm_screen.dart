@@ -43,10 +43,7 @@ class ShopOrderConfirmScreen extends StatelessWidget {
                 timeline: order.timeline,
                 showTimeline: order.timeline != null,
               ),
-              OiButton.primary(
-                label: 'Back to Shop',
-                onTap: onBackToShop,
-              ),
+              OiButton.primary(label: 'Back to Shop', onTap: onBackToShop),
             ],
           ),
         ),

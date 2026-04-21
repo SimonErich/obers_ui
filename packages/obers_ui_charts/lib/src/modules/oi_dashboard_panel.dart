@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui_charts/obers_ui_charts.dart' show OiAnalyticsDashboard;
-import 'package:obers_ui_charts/src/modules/oi_analytics_dashboard.dart' show OiAnalyticsDashboard;
+import 'package:obers_ui_charts/src/modules/oi_analytics_dashboard.dart'
+    show OiAnalyticsDashboard;
 import 'package:obers_ui_charts/src/modules/oi_grid_position.dart';
 
 /// A single panel in an [OiAnalyticsDashboard].

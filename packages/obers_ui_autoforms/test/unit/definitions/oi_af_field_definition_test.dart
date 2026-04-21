@@ -121,10 +121,7 @@ void main() {
     });
 
     test('initialValue supports null for tristate', () {
-      const def = OiAfBoolFieldDef<_F>(
-        field: _F.a,
-        tristate: true,
-      );
+      const def = OiAfBoolFieldDef<_F>(field: _F.a, tristate: true);
       expect(def.initialValue, isNull);
     });
 

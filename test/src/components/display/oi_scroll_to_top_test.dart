@@ -34,10 +34,12 @@ void main() {
         surfaceSize: const Size(400, 600),
       );
       final fadeTransition = tester.widget<FadeTransition>(
-        find.descendant(
-          of: find.byType(OiScrollToTop),
-          matching: find.byType(FadeTransition),
-        ).first,
+        find
+            .descendant(
+              of: find.byType(OiScrollToTop),
+              matching: find.byType(FadeTransition),
+            )
+            .first,
       );
       expect(fadeTransition.opacity.value, 0.0);
     });
@@ -56,10 +58,12 @@ void main() {
       controller.jumpTo(150);
       await tester.pumpAndSettle();
       final fadeTransition = tester.widget<FadeTransition>(
-        find.descendant(
-          of: find.byType(OiScrollToTop),
-          matching: find.byType(FadeTransition),
-        ).first,
+        find
+            .descendant(
+              of: find.byType(OiScrollToTop),
+              matching: find.byType(FadeTransition),
+            )
+            .first,
       );
       expect(fadeTransition.opacity.value, 1.0);
     });
@@ -78,10 +82,12 @@ void main() {
       controller.jumpTo(100);
       await tester.pumpAndSettle();
       final fadeTransition = tester.widget<FadeTransition>(
-        find.descendant(
-          of: find.byType(OiScrollToTop),
-          matching: find.byType(FadeTransition),
-        ).first,
+        find
+            .descendant(
+              of: find.byType(OiScrollToTop),
+              matching: find.byType(FadeTransition),
+            )
+            .first,
       );
       expect(fadeTransition.opacity.value, 0.0);
     });
@@ -107,10 +113,12 @@ void main() {
       await tester.pumpAndSettle();
 
       final fadeTransition = tester.widget<FadeTransition>(
-        find.descendant(
-          of: find.byType(OiScrollToTop),
-          matching: find.byType(FadeTransition),
-        ).first,
+        find
+            .descendant(
+              of: find.byType(OiScrollToTop),
+              matching: find.byType(FadeTransition),
+            )
+            .first,
       );
       expect(fadeTransition.opacity.value, 0.0);
     });

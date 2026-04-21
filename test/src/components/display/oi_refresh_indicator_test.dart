@@ -40,8 +40,9 @@ void main() {
       );
     });
 
-    testWidgets('calls onRefresh when overscrolled past trigger distance',
-        (tester) async {
+    testWidgets('calls onRefresh when overscrolled past trigger distance', (
+      tester,
+    ) async {
       var refreshed = false;
       await tester.pumpObers(
         OiRefreshIndicator(

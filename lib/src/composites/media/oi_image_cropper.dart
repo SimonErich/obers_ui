@@ -205,7 +205,10 @@ class _OiImageCropperState extends State<OiImageCropper> {
             child: ClipRect(
               child: LayoutBuilder(
                 builder: (context, constraints) {
-                  final size = Size(constraints.maxWidth, constraints.maxHeight);
+                  final size = Size(
+                    constraints.maxWidth,
+                    constraints.maxHeight,
+                  );
                   return Stack(
                     children: [
                       // Background image
@@ -228,37 +231,40 @@ class _OiImageCropperState extends State<OiImageCropper> {
                         ),
                       ),
 
-                    // Dark overlay outside crop area
-                    Positioned.fill(
-                      child: CustomPaint(
-                        key: const Key('oi_image_cropper_overlay'),
-                        painter: _CropOverlayPainter(
-                          cropRect: _cropRect,
-                          overlayColor: const Color(0x88000000),
-                        ),
-                      ),
-                    ),
-
-                    // Draggable crop area
-                    Positioned(
-                      left: _cropRect.left * size.width,
-                      top: _cropRect.top * size.height,
-                      width: _cropRect.width * size.width,
-                      height: _cropRect.height * size.height,
-                      child: GestureDetector(
-                        key: const Key('oi_image_cropper_handle'),
-                        onPanUpdate: (d) => _onPanUpdate(d, size),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            border: Border.all(color: colors.surface, width: 2),
+                      // Dark overlay outside crop area
+                      Positioned.fill(
+                        child: CustomPaint(
+                          key: const Key('oi_image_cropper_overlay'),
+                          painter: _CropOverlayPainter(
+                            cropRect: _cropRect,
+                            overlayColor: const Color(0x88000000),
                           ),
                         ),
                       ),
-                    ),
-                  ],
-                );
-              },
-            ),
+
+                      // Draggable crop area
+                      Positioned(
+                        left: _cropRect.left * size.width,
+                        top: _cropRect.top * size.height,
+                        width: _cropRect.width * size.width,
+                        height: _cropRect.height * size.height,
+                        child: GestureDetector(
+                          key: const Key('oi_image_cropper_handle'),
+                          onPanUpdate: (d) => _onPanUpdate(d, size),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                color: colors.surface,
+                                width: 2,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              ),
             ),
           ),
 
@@ -406,9 +412,8 @@ class _OiImageCropperState extends State<OiImageCropper> {
                               color: isActive
                                   ? colors.primary.base
                                   : isArHovered
-                                      ? colors.primary.base
-                                          .withValues(alpha: 0.1)
-                                      : colors.surfaceHover,
+                                  ? colors.primary.base.withValues(alpha: 0.1)
+                                  : colors.surfaceHover,
                               borderRadius: BorderRadius.circular(4),
                             ),
                             child: Text(

@@ -177,8 +177,9 @@ class _OverlaysScreenState extends State<OverlaysScreen> {
                               SizedBox(height: spacing.lg),
                               Center(
                                 child: ConstrainedBox(
-                                  constraints:
-                                      const BoxConstraints(maxWidth: 150),
+                                  constraints: const BoxConstraints(
+                                    maxWidth: 150,
+                                  ),
                                   child: OiButton.primary(
                                     label: 'Close',
                                     fullWidth: true,
@@ -256,8 +257,7 @@ class _OverlaysScreenState extends State<OverlaysScreen> {
                               child: Padding(
                                 padding: EdgeInsets.all(spacing.lg),
                                 child: Column(
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     const OiLabel.h3('Side Panel'),
                                     SizedBox(height: spacing.md),
@@ -404,11 +404,7 @@ class _OverlaysScreenState extends State<OverlaysScreen> {
                       icon: OiIcons.scissors,
                       onTap: () {},
                     ),
-                    OiMenuItem(
-                      label: 'Copy',
-                      icon: OiIcons.copy,
-                      onTap: () {},
-                    ),
+                    OiMenuItem(label: 'Copy', icon: OiIcons.copy, onTap: () {}),
                     OiMenuItem(
                       label: 'Paste',
                       icon: OiIcons.clipboard,

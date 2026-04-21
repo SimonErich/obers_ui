@@ -156,8 +156,8 @@ void main() {
       tester,
     ) async {
       await tester.pumpObers(
-        OiKanban<String>(
-          columns: const [
+        const OiKanban<String>(
+          columns: [
             OiKanbanColumn(key: 'todo', title: 'To Do', items: ['Task A']),
             OiKanbanColumn(key: 'done', title: 'Done', items: []),
           ],

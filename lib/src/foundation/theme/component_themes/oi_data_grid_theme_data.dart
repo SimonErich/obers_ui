@@ -84,13 +84,13 @@ class OiDataGridThemeData {
 
   @override
   int get hashCode => Object.hash(
-        headerBackgroundColor,
-        headerTextStyle,
-        rowHeight,
-        denseRowHeight,
-        borderColor,
-        stripeColor,
-        selectedRowColor,
-        hoverRowColor,
-      );
+    headerBackgroundColor,
+    headerTextStyle,
+    rowHeight,
+    denseRowHeight,
+    borderColor,
+    stripeColor,
+    selectedRowColor,
+    hoverRowColor,
+  );
 }

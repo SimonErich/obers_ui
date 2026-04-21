@@ -294,7 +294,6 @@ class _OiConsentBannerState extends State<OiConsentBanner> {
           padding: EdgeInsets.all(spacing.lg),
           child: Column(
             mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               // Title row with cookie icon
               Row(

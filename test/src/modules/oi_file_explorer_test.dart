@@ -560,9 +560,7 @@ void main() {
       expect(
         find.byWidgetPredicate(
           (w) =>
-              w is Semantics &&
-              w.properties.label == 'My Files' &&
-              w.container,
+              w is Semantics && w.properties.label == 'My Files' && w.container,
         ),
         findsOneWidget,
       );

@@ -23,44 +23,23 @@ const kCountries = <OiCountryOption>[
   ),
 
   // ── Germany ──────────────────────────────────────────────────────────────
-  OiCountryOption(
-    code: 'DE',
-    name: 'Germany',
-  ),
+  OiCountryOption(code: 'DE', name: 'Germany'),
 
   // ── Switzerland ──────────────────────────────────────────────────────────
-  OiCountryOption(
-    code: 'CH',
-    name: 'Switzerland',
-  ),
+  OiCountryOption(code: 'CH', name: 'Switzerland'),
 
   // ── Italy ────────────────────────────────────────────────────────────────
-  OiCountryOption(
-    code: 'IT',
-    name: 'Italy',
-  ),
+  OiCountryOption(code: 'IT', name: 'Italy'),
 
   // ── Hungary ──────────────────────────────────────────────────────────────
-  OiCountryOption(
-    code: 'HU',
-    name: 'Hungary',
-  ),
+  OiCountryOption(code: 'HU', name: 'Hungary'),
 
   // ── Czech Republic ───────────────────────────────────────────────────────
-  OiCountryOption(
-    code: 'CZ',
-    name: 'Czech Republic',
-  ),
+  OiCountryOption(code: 'CZ', name: 'Czech Republic'),
 
   // ── Slovakia ─────────────────────────────────────────────────────────────
-  OiCountryOption(
-    code: 'SK',
-    name: 'Slovakia',
-  ),
+  OiCountryOption(code: 'SK', name: 'Slovakia'),
 
   // ── Slovenia ─────────────────────────────────────────────────────────────
-  OiCountryOption(
-    code: 'SI',
-    name: 'Slovenia',
-  ),
+  OiCountryOption(code: 'SI', name: 'Slovenia'),
 ];

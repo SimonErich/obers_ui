@@ -349,8 +349,7 @@ class _OiTimePickerDialogState extends State<_OiTimePickerDialog> {
   @override
   void initState() {
     super.initState();
-    _selected =
-        widget.initialTime ?? const OiTimeOfDay(hour: 0, minute: 0);
+    _selected = widget.initialTime ?? const OiTimeOfDay(hour: 0, minute: 0);
   }
 
   @override
@@ -373,8 +372,10 @@ class _OiTimePickerDialogState extends State<_OiTimePickerDialog> {
               OiTappable(
                 onTap: widget.onCancel,
                 child: Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 8,
+                  ),
                   child: Text(
                     'Cancel',
                     style: TextStyle(
@@ -389,8 +390,10 @@ class _OiTimePickerDialogState extends State<_OiTimePickerDialog> {
               OiTappable(
                 onTap: () => widget.onConfirm(_selected),
                 child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
                   decoration: BoxDecoration(
                     color: colors.primary.base,
                     borderRadius: BorderRadius.circular(6),

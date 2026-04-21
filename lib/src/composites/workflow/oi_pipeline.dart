@@ -197,9 +197,7 @@ class OiPipeline extends StatelessWidget {
         height: isHorizontal ? null : arrowSize,
         child: Center(
           child: Icon(
-            isHorizontal
-                ? OiIcons.chevronRight
-                : OiIcons.chevronDown,
+            isHorizontal ? OiIcons.chevronRight : OiIcons.chevronDown,
             color: colors.textMuted,
             size: arrowSize,
           ),

@@ -1,8 +1,10 @@
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/obers_ui.dart' show OiLabel;
 import 'package:obers_ui/src/components/inline_edit/oi_editable.dart';
 import 'package:obers_ui/src/components/inputs/oi_text_input.dart';
 import 'package:obers_ui/src/foundation/theme/oi_text_theme.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
+import 'package:obers_ui/src/primitives/display/oi_label.dart' show OiLabel;
 import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
 
 /// An inline-editable text field that toggles between a label display and
@@ -48,8 +50,8 @@ class OiEditableText extends StatelessWidget {
       enabled: enabled,
       displayBuilder: (ctx, v, startEdit) {
         final colors = ctx.colors;
-        final effectiveStyle = style ??
-            TextStyle(fontSize: 14, color: colors.text);
+        final effectiveStyle =
+            style ?? TextStyle(fontSize: 14, color: colors.text);
         return OiTappable(
           onTap: enabled ? startEdit : null,
           enabled: enabled,

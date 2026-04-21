@@ -155,8 +155,9 @@ class _OiCalendarWeekPickerState extends State<OiCalendarWeekPicker> {
 
   bool _isHighlighted(int week, int year) {
     if (widget.highlightedWeeks == null) return false;
-    return widget.highlightedWeeks!
-        .contains(OiCalendarWeek(week: week, year: year));
+    return widget.highlightedWeeks!.contains(
+      OiCalendarWeek(week: week, year: year),
+    );
   }
 
   void _onWeekChanged(int index) {
@@ -166,8 +167,7 @@ class _OiCalendarWeekPickerState extends State<OiCalendarWeekPicker> {
 
   static int _isoWeeksInYear(int year) {
     final dec28 = DateTime.utc(year, 12, 28);
-    final dayOfYear =
-        dec28.difference(DateTime.utc(year)).inDays + 1;
+    final dayOfYear = dec28.difference(DateTime.utc(year)).inDays + 1;
     return ((dayOfYear - dec28.weekday + 10) / 7).floor();
   }
 

@@ -57,9 +57,9 @@ class OiTabViewThemeData {
 
   @override
   int get hashCode => Object.hash(
-        contentAnimationDuration,
-        contentAnimationCurve,
-        tabBarPadding,
-        contentPadding,
-      );
+    contentAnimationDuration,
+    contentAnimationCurve,
+    tabBarPadding,
+    contentPadding,
+  );
 }

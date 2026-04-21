@@ -76,12 +76,12 @@ class OiSegmentedControlThemeData {
 
   @override
   int get hashCode => Object.hash(
-        backgroundColor,
-        selectedColor,
-        selectedTextColor,
-        unselectedTextColor,
-        borderRadius,
-        borderColor,
-        height,
-      );
+    backgroundColor,
+    selectedColor,
+    selectedTextColor,
+    unselectedTextColor,
+    borderRadius,
+    borderColor,
+    height,
+  );
 }

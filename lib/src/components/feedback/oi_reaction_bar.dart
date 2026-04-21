@@ -1,9 +1,9 @@
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/src/foundation/oi_responsive.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
-import 'package:obers_ui/src/primitives/overlay/oi_floating.dart';
 import 'package:obers_ui/src/primitives/layout/oi_row.dart';
-import 'package:obers_ui/src/foundation/oi_responsive.dart';
+import 'package:obers_ui/src/primitives/overlay/oi_floating.dart';
 
 /// Data for a single emoji reaction chip.
 ///

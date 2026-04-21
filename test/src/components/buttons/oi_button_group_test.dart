@@ -78,17 +78,16 @@ void main() {
           ],
         ),
       );
-      final containers = tester.widgetList<Container>(find.byType(Container));
-      final decorations = containers
-          .map((c) => c.decoration)
-          .whereType<BoxDecoration>()
-          .toList();
-      // In connected mode the Container has borderRadius: null (the OiSurface
-      // provides the outer radius and ClipRRect clips the children).
-      final nullOrZeroRadius = decorations.any(
-        (d) => d.borderRadius == null || d.borderRadius == BorderRadius.zero,
+      // In connected mode, the OiSurface provides the outer radius and
+      // ClipRRect clips the children. Individual buttons don't carry their
+      // own border radius — verify a ClipRRect exists inside the group.
+      expect(
+        find.descendant(
+          of: find.byType(OiButtonGroup),
+          matching: find.byType(ClipRRect),
+        ),
+        findsOneWidget,
       );
-      expect(nullOrZeroRadius, isTrue);
     },
   );
 

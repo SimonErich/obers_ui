@@ -128,15 +128,15 @@ class OiAnimationConfig {
 
   @override
   int get hashCode => Object.hash(
-        fast,
-        normal,
-        slow,
-        reducedMotion,
-        defaultPageTransition,
-        pageTransitionDuration,
-        pageEntryCurve,
-        pageExitCurve,
-      );
+    fast,
+    normal,
+    slow,
+    reducedMotion,
+    defaultPageTransition,
+    pageTransitionDuration,
+    pageEntryCurve,
+    pageExitCurve,
+  );
 }
 
 /// Configuration for device performance tiers.

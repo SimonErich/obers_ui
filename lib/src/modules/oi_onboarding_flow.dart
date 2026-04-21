@@ -242,12 +242,13 @@ class _OiOnboardingFlowState extends State<OiOnboardingFlow> {
                 OiButton.ghost(label: widget.skipLabel, onTap: _skip),
                 SizedBox(width: sp.sm),
               ],
-              _isLastPage
-                  ? OiButton.primary(label: widget.doneLabel, onTap: _done)
-                  : OiButton.primary(
-                      label: widget.nextLabel,
-                      onTap: _nextPage,
-                    ),
+              if (_isLastPage)
+                OiButton.primary(label: widget.doneLabel, onTap: _done)
+              else
+                OiButton.primary(
+                  label: widget.nextLabel,
+                  onTap: _nextPage,
+                ),
             ],
           ),
           SizedBox(height: sp.sm),

@@ -14,10 +14,7 @@ class ProjectTimelineScreen extends StatelessWidget {
 
     return Padding(
       padding: EdgeInsets.all(spacing.lg),
-      child: OiTimeline(
-        events: events,
-        label: 'Project Milestones',
-      ),
+      child: OiTimeline(events: events, label: 'Project Milestones'),
     );
   }
 }

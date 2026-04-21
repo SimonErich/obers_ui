@@ -1,5 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/obers_ui.dart' show OiApp;
+import 'package:obers_ui/src/foundation/oi_app.dart' show OiApp;
 
 /// Custom [ScrollBehavior] that strips Material's Android overscroll glow
 /// and picks platform-appropriate physics.

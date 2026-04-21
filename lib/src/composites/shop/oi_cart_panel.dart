@@ -194,11 +194,11 @@ class OiCartPanel extends StatelessWidget {
           semanticLabel: checkoutLabel,
         ),
         if (onContinueShopping != null)
-        OiButton.ghost(
-          label: 'Continue Shopping',
-          onTap: onContinueShopping,
-          semanticLabel: 'Continue Shopping',
-        ),
+          OiButton.ghost(
+            label: 'Continue Shopping',
+            onTap: onContinueShopping,
+            semanticLabel: 'Continue Shopping',
+          ),
       ],
     );
   }

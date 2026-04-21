@@ -60,9 +60,7 @@ void main() {
   });
 
   testWidgets('custom color applied', (tester) async {
-    await tester.pumpChartApp(
-      _sparkline(color: const Color(0xFFFF5722)),
-    );
+    await tester.pumpChartApp(_sparkline(color: const Color(0xFFFF5722)));
     expect(find.byType(OiSparkline), findsOneWidget);
   });
 
@@ -107,18 +105,12 @@ void main() {
   });
 
   testWidgets('light theme renders correctly', (tester) async {
-    await tester.pumpChartApp(
-      _sparkline(),
-      theme: OiThemeData.light(),
-    );
+    await tester.pumpChartApp(_sparkline(), theme: OiThemeData.light());
     expect(find.byType(OiSparkline), findsOneWidget);
   });
 
   testWidgets('dark theme renders correctly', (tester) async {
-    await tester.pumpChartApp(
-      _sparkline(),
-      theme: OiThemeData.dark(),
-    );
+    await tester.pumpChartApp(_sparkline(), theme: OiThemeData.dark());
     expect(find.byType(OiSparkline), findsOneWidget);
   });
 }

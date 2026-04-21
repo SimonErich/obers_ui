@@ -47,13 +47,13 @@ class OiSurface extends StatelessWidget {
     this.child,
     this.borderRadius,
     super.key,
-  })  : color = const Color(0x00000000),
-        border = null,
-        shadow = null,
-        padding = null,
-        halo = null,
-        frosted = false,
-        gradient = null;
+  }) : color = const Color(0x00000000),
+       border = null,
+       shadow = null,
+       padding = null,
+       halo = null,
+       frosted = false,
+       gradient = null;
 
   /// Creates a surface with elevation shadow but no background fill.
   /// Useful for adding shadow to a transparent container.
@@ -62,13 +62,13 @@ class OiSurface extends StatelessWidget {
     this.child,
     this.borderRadius,
     super.key,
-  })  : color = const Color(0x00000000),
-        border = null,
-        shadow = elevation,
-        padding = null,
-        halo = null,
-        frosted = false,
-        gradient = null;
+  }) : color = const Color(0x00000000),
+       border = null,
+       shadow = elevation,
+       padding = null,
+       halo = null,
+       frosted = false,
+       gradient = null;
 
   /// Background fill color.  Defaults to the theme's surface color when null.
   final Color? color;

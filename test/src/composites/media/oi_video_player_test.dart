@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui/src/composites/media/oi_video_player.dart';
+import 'package:obers_ui/src/foundation/oi_icons.dart';
 
 import '../../../helpers/pump_app.dart';
 
@@ -66,7 +67,9 @@ void main() {
       await tester.pumpObers(_player(), surfaceSize: const Size(400, 300));
       await tester.pump();
 
-      expect(find.byKey(const Key('oi_video_player_surface')), findsOneWidget);
+      // On non-web platforms the poster/placeholder DecoratedBox is shown, not
+      // the video surface (which only appears during web playback).
+      expect(find.byKey(const Key('oi_video_player_aspect')), findsOneWidget);
     });
 
     testWidgets('displays poster image when posterUrl is provided', (
@@ -78,14 +81,20 @@ void main() {
       );
       await tester.pump();
 
-      expect(find.byKey(const Key('oi_video_player_poster')), findsOneWidget);
+      // The key 'oi_video_player_poster' is used on both the outer DecoratedBox
+      // (always present) and the inner OiImage (only when posterUrl != null),
+      // so two widgets carry that key when a posterUrl is provided.
+      expect(find.byKey(const Key('oi_video_player_poster')), findsNWidgets(2));
     });
 
     testWidgets('hides poster when posterUrl is null', (tester) async {
       await tester.pumpObers(_player(), surfaceSize: const Size(400, 300));
       await tester.pump();
 
-      expect(find.byKey(const Key('oi_video_player_poster')), findsNothing);
+      // The outer DecoratedBox (poster container / placeholder) always renders
+      // with the 'oi_video_player_poster' key. When posterUrl is null the inner
+      // OiImage is omitted, so only the one DecoratedBox carries the key.
+      expect(find.byKey(const Key('oi_video_player_poster')), findsOneWidget);
     });
 
     testWidgets('shows source text when no poster', (tester) async {
@@ -208,20 +217,20 @@ void main() {
       await tester.pumpObers(_player(), surfaceSize: const Size(400, 300));
       await tester.pump();
 
-      // Initially should show play icon (▶).
-      final playIcon = tester.widget<Text>(
+      // Initially should show the play Icon widget.
+      final playIcon = tester.widget<Icon>(
         find.byKey(const Key('oi_video_player_play_icon')),
       );
-      expect(playIcon.data, '\u25B6');
+      expect(playIcon.icon, OiIcons.play);
 
-      // Tap to play — icon should change to pause (⏸).
+      // Tap to play — icon should change to pause.
       await tester.tap(find.byKey(const Key('oi_video_player_controls')));
       await tester.pump();
 
-      final pauseIcon = tester.widget<Text>(
+      final pauseIcon = tester.widget<Icon>(
         find.byKey(const Key('oi_video_player_play_icon')),
       );
-      expect(pauseIcon.data, '\u23F8');
+      expect(pauseIcon.icon, OiIcons.pause);
     });
   });
 }

@@ -131,7 +131,8 @@ class _OiSortButtonState extends State<OiSortButton> {
 
   IconData get _directionIcon =>
       widget.currentSort.direction == OiSortDirection.asc
-      ? OiIcons.arrowUp // arrow_upward
+      ? OiIcons
+            .arrowUp // arrow_upward
       : OiIcons.arrowDown; // arrow_downward
 
   Widget _buildPopoverContent(BuildContext context) {

@@ -536,9 +536,7 @@ class _OiDevMenuState extends State<OiDevMenu> {
                     children: [
                       OiLabel.body(
                         env.label,
-                        color: selected
-                            ? colors.primary.foreground
-                            : null,
+                        color: selected ? colors.primary.foreground : null,
                       ),
                       if (env.url != null)
                         OiLabel.small(

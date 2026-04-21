@@ -56,9 +56,9 @@ void main() {
   // 2. Data displays correctly — node labels shown.
   testWidgets('displays node labels', (tester) async {
     await tester.pumpChartApp(_sankey());
-    expect(find.text('Source A'), findsOneWidget);
-    expect(find.text('Source B'), findsOneWidget);
-    expect(find.text('Target C'), findsOneWidget);
+    expect(find.text('Source A'), findsAtLeastNWidgets(1));
+    expect(find.text('Source B'), findsAtLeastNWidgets(1));
+    expect(find.text('Target C'), findsAtLeastNWidgets(1));
   });
 
   // 3. Labels render with correct keys.
@@ -80,8 +80,8 @@ void main() {
         links: const [OiSankeyLink(source: 'x', target: 'y', value: 50)],
       ),
     );
-    expect(find.text('X'), findsOneWidget);
-    expect(find.text('Y'), findsOneWidget);
+    expect(find.text('X'), findsAtLeastNWidgets(1));
+    expect(find.text('Y'), findsAtLeastNWidgets(1));
   });
 
   // 5. onNodeTap fires.

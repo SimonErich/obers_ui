@@ -102,10 +102,7 @@ class _ProjectKanbanScreenState extends State<ProjectKanbanScreen> {
         label: 'Edit',
         icon: OiIcons.squarePen,
         onTap: () {
-          OiToast.show(
-            context,
-            message: 'Editing: ${task.title}',
-          );
+          OiToast.show(context, message: 'Editing: ${task.title}');
         },
       ),
       const OiMenuDivider(),

@@ -715,8 +715,7 @@ class _OiLinkHoverState extends State<_OiLinkHover> {
         curve: Curves.easeOut,
         style: widget.style.copyWith(
           color: _hovered ? hoverColor : baseColor,
-          decoration:
-              _hovered ? TextDecoration.underline : TextDecoration.none,
+          decoration: _hovered ? TextDecoration.underline : TextDecoration.none,
           decorationColor: _hovered ? hoverColor : baseColor,
         ),
         child: Text(

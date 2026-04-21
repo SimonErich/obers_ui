@@ -18,8 +18,7 @@ class _AdminPermissionsScreenState extends State<AdminPermissionsScreen> {
   };
 
   late Map<String, Set<String>> _savedMatrix = {
-    for (final entry in _matrix.entries)
-      entry.key: Set<String>.of(entry.value),
+    for (final entry in _matrix.entries) entry.key: Set<String>.of(entry.value),
   };
 
   bool _editing = false;
@@ -77,10 +76,7 @@ class _AdminPermissionsScreenState extends State<AdminPermissionsScreen> {
                 ),
               ),
               if (_editing) ...[
-                OiButton.ghost(
-                  label: 'Cancel',
-                  onTap: _cancel,
-                ),
+                OiButton.ghost(label: 'Cancel', onTap: _cancel),
                 SizedBox(width: spacing.sm),
                 OiButton.primary(
                   label: 'Save',

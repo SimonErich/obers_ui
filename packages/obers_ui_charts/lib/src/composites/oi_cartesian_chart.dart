@@ -2,7 +2,8 @@ import 'dart:math' show Point;
 
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/obers_ui.dart' show OiChartThemeData, OiResponsive;
-import 'package:obers_ui_charts/obers_ui_charts.dart' show OiBarChart, OiBubbleChart, OiLineChart;
+import 'package:obers_ui_charts/obers_ui_charts.dart'
+    show OiBarChart, OiBubbleChart, OiLineChart;
 import 'package:obers_ui_charts/src/components/oi_chart_empty_state.dart';
 import 'package:obers_ui_charts/src/components/oi_chart_error_state.dart';
 import 'package:obers_ui_charts/src/components/oi_chart_loading_state.dart';
@@ -50,7 +51,9 @@ import 'package:obers_ui_charts/src/utils/chart_math.dart';
 class OiCartesianChart<T> extends StatefulWidget {
   /// Creates a cartesian chart.
   const OiCartesianChart({
-    required this.label, required this.series, super.key,
+    required this.label,
+    required this.series,
+    super.key,
     this.xAxis,
     this.yAxes,
     this.seriesBuilder,

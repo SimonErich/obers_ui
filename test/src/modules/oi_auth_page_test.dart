@@ -61,8 +61,8 @@ void main() {
         surfaceSize: const Size(800, 600),
       );
 
-      // Tap the "Don't have an account? Sign Up" link.
-      await tester.tap(find.text("Don't have an account? Sign Up"));
+      // Tap the "Sign Up" link.
+      await tester.tap(find.text('Sign Up'));
       await tester.pumpAndSettle();
 
       expect(changedMode, OiAuthMode.register);

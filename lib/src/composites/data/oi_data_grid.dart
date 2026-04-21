@@ -269,9 +269,11 @@ class OiDataGrid<T> extends StatelessWidget {
     if (_allSelected) {
       onSelectionChanged!(<int>{});
     } else {
-      onSelectionChanged!(Set<int>.of(
-        List<int>.generate(rows.length, (i) => i),
-      ));
+      onSelectionChanged!(
+        Set<int>.of(
+          List<int>.generate(rows.length, (i) => i),
+        ),
+      );
     }
   }
 
@@ -307,9 +309,7 @@ class OiDataGrid<T> extends StatelessWidget {
           width: _rowHeight,
           child: Center(
             child: OiCheckbox(
-              value: _allSelected
-                  ? true
-                  : (_someSelected ? null : false),
+              value: _allSelected ? true : (_someSelected ? null : false),
               onChanged: (_) => _toggleAll(),
               label: 'Select all',
             ),
@@ -514,7 +514,8 @@ class OiDataGrid<T> extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(spacing.xl),
       alignment: Alignment.center,
-      child: emptyState ??
+      child:
+          emptyState ??
           OiLabel.body(
             'No data',
             color: colors.textMuted,

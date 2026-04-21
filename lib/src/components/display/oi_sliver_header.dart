@@ -313,10 +313,9 @@ class _OiSliverHeaderDelegate extends SliverPersistentHeaderDelegate {
     final contextColors = context.colors;
     final contextShadows = context.shadows;
 
-    final collapseProgress =
-        maxExtent == minExtent
-            ? 0.0
-            : (shrinkOffset / (maxExtent - minExtent)).clamp(0.0, 1.0);
+    final collapseProgress = maxExtent == minExtent
+        ? 0.0
+        : (shrinkOffset / (maxExtent - minExtent)).clamp(0.0, 1.0);
 
     final effectiveBg = backgroundColor ?? contextColors.surface;
     final effectiveFg = foregroundColor ?? contextColors.text;
@@ -334,8 +333,9 @@ class _OiSliverHeaderDelegate extends SliverPersistentHeaderDelegate {
 
     final titleArea = Column(
       mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment:
-          centerTitle ? CrossAxisAlignment.center : CrossAxisAlignment.start,
+      crossAxisAlignment: centerTitle
+          ? CrossAxisAlignment.center
+          : CrossAxisAlignment.start,
       children: [
         if (titleWidget != null) Flexible(child: titleWidget),
         if (subtitle != null) ...[
@@ -375,13 +375,12 @@ class _OiSliverHeaderDelegate extends SliverPersistentHeaderDelegate {
         ? contextShadows.sm
         : contextShadows.none;
 
-    final bottomBorder =
-        isScrolledUnder
-            ? (border ??
-                Border(
-                  bottom: BorderSide(color: contextColors.borderSubtle),
-                ))
-            : null;
+    final bottomBorder = isScrolledUnder
+        ? (border ??
+              Border(
+                bottom: BorderSide(color: contextColors.borderSubtle),
+              ))
+        : null;
 
     final decoration = BoxDecoration(
       color: effectiveBg,

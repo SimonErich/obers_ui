@@ -112,7 +112,8 @@ class OiFolderTreeItem extends StatelessWidget {
                   height: 16,
                   child: Icon(
                     expanded
-                        ? OiIcons.chevronDown // expand_more
+                        ? OiIcons
+                              .chevronDown // expand_more
                         : OiIcons.chevronRight, // chevron_right
                     size: 14,
                     color: colors.textSubtle,

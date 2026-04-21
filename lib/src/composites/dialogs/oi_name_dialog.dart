@@ -1,3 +1,4 @@
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/buttons/oi_button.dart';
 import 'package:obers_ui/src/components/inputs/oi_text_input.dart';
@@ -144,28 +145,39 @@ class _OiNameDialogState extends State<OiNameDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return OiDialog.standard(
-      label: widget.title,
-      title: widget.title,
-      onClose: widget.onCancel,
-      dismissible: false,
-      content: OiTextInput(
-        controller: _controller,
-        focusNode: _focusNode,
-        label: widget.inputLabel,
-        error: _error,
-        autofocus: true,
-        onChanged: _handleChanged,
-        onSubmitted: (_) => _handleCreate(),
-      ),
-      actions: [
-        OiButton.ghost(label: widget.cancelLabel, onTap: widget.onCancel),
-        OiButton.primary(
-          label: widget.createLabel,
-          onTap: _isValid ? _handleCreate : null,
-          enabled: _isValid,
+    return Focus(
+      autofocus: true,
+      onKeyEvent: (node, event) {
+        if (event is KeyDownEvent &&
+            event.logicalKey == LogicalKeyboardKey.escape) {
+          widget.onCancel?.call();
+          return KeyEventResult.handled;
+        }
+        return KeyEventResult.ignored;
+      },
+      child: OiDialog.standard(
+        label: widget.title,
+        title: widget.title,
+        onClose: widget.onCancel,
+        dismissible: false,
+        content: OiTextInput(
+          controller: _controller,
+          focusNode: _focusNode,
+          label: widget.inputLabel,
+          error: _error,
+          autofocus: true,
+          onChanged: _handleChanged,
+          onSubmitted: (_) => _handleCreate(),
         ),
-      ],
+        actions: [
+          OiButton.ghost(label: widget.cancelLabel, onTap: widget.onCancel),
+          OiButton.primary(
+            label: widget.createLabel,
+            onTap: _isValid ? _handleCreate : null,
+            enabled: _isValid,
+          ),
+        ],
+      ),
     );
   }
 }

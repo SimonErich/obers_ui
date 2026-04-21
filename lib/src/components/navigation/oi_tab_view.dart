@@ -186,9 +186,8 @@ class _OiTabViewState extends State<OiTabView> {
   }
 
   /// The effective selected index.
-  int get _effectiveIndex => widget._isControlled
-      ? widget._selectedIndex!
-      : _currentIndex;
+  int get _effectiveIndex =>
+      widget._isControlled ? widget._selectedIndex! : _currentIndex;
 
   void _handleTabSelected(int index) {
     // Skip disabled tabs.

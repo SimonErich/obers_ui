@@ -51,9 +51,7 @@ class RegistrationController
     addTextField(
       RegField.email,
       required: true,
-      validators: [
-        OiAfValidators.email(),
-      ],
+      validators: [OiAfValidators.email()],
     );
 
     // ── Step 2: Account Setup ─────────────────────────────────────────────
@@ -104,10 +102,7 @@ class RegistrationController
     );
 
     // ── Step 3: Preferences ───────────────────────────────────────────────
-    addBoolField(
-      RegField.newsletter,
-      initialValue: false,
-    );
+    addBoolField(RegField.newsletter, initialValue: false);
 
     addSegmentedControlField<String>(
       RegField.theme,
@@ -143,9 +138,7 @@ class RegistrationController
   /// Validates only the fields belonging to the given step.
   Future<bool> validateStep(int step) async {
     final fields = _fieldsForStep(step);
-    final results = await Future.wait(
-      fields.map((f) => validate(field: f)),
-    );
+    final results = await Future.wait(fields.map((f) => validate(field: f)));
     return results.every((r) => r);
   }
 
@@ -179,11 +172,7 @@ class _RegistrationWizardScreenState extends State<RegistrationWizardScreen> {
   late final RegistrationController _controller;
   int _currentStep = 0;
 
-  static const _stepTitles = [
-    'Personal Info',
-    'Account Setup',
-    'Preferences',
-  ];
+  static const _stepTitles = ['Personal Info', 'Account Setup', 'Preferences'];
 
   static const _totalSteps = 3;
 
@@ -456,12 +445,13 @@ class _StepProgress extends StatelessWidget {
             final labelColor = isActive
                 ? colors.primary.base
                 : isDone
-                    ? colors.success.base
-                    : colors.textMuted;
+                ? colors.success.base
+                : colors.textMuted;
             final style = context.textTheme.caption.copyWith(
               color: labelColor,
-              fontWeight:
-                  (isActive || isDone) ? FontWeight.w600 : FontWeight.w400,
+              fontWeight: (isActive || isDone)
+                  ? FontWeight.w600
+                  : FontWeight.w400,
             );
             return Expanded(
               child: Center(

@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
-import 'package:obers_ui/obers_ui.dart' show OiIcon, OiIcons, OiLabel, OiSurface;
+import 'package:obers_ui/obers_ui.dart'
+    show OiIcon, OiIcons, OiLabel, OiSurface;
 import 'package:obers_ui/obers_ui.dart' show OiTheme;
 import 'package:obers_ui_autoforms/src/runtime/controller/oi_af_controller.dart';
 import 'package:obers_ui_autoforms/src/widgets/root/oi_af_scope.dart';

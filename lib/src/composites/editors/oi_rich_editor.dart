@@ -263,8 +263,9 @@ class _OiRichEditorState extends State<OiRichEditor> {
       final before = cursorPos >= 0 ? text.substring(0, cursorPos) : text;
       final after = cursorPos >= 0 ? text.substring(cursorPos) : '';
 
-      final blocks =
-          List<OiContentBlock>.from(widget.controller.content.blocks);
+      final blocks = List<OiContentBlock>.from(
+        widget.controller.content.blocks,
+      );
       blocks[index] = OiContentBlock(
         type: blocks[index].type,
         text: before,
@@ -295,10 +296,12 @@ class _OiRichEditorState extends State<OiRichEditor> {
       if (widget.readOnly) return KeyEventResult.ignored;
       final controller = _blockControllers[index];
       // Merge with previous block when cursor is at the start.
-      if (index > 0 && controller.selection.baseOffset == 0 &&
+      if (index > 0 &&
+          controller.selection.baseOffset == 0 &&
           controller.selection.extentOffset == 0) {
-        final blocks =
-            List<OiContentBlock>.from(widget.controller.content.blocks);
+        final blocks = List<OiContentBlock>.from(
+          widget.controller.content.blocks,
+        );
         final prevText = blocks[index - 1].text;
         final curText = blocks[index].text;
         blocks[index - 1] = OiContentBlock(
@@ -316,8 +319,9 @@ class _OiRichEditorState extends State<OiRichEditor> {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (index - 1 < _blockFocusNodes.length) {
             _blockFocusNodes[index - 1].requestFocus();
-            _blockControllers[index - 1].selection =
-                TextSelection.collapsed(offset: prevText.length);
+            _blockControllers[index - 1].selection = TextSelection.collapsed(
+              offset: prevText.length,
+            );
           }
         });
 
@@ -415,7 +419,8 @@ class _OiRichEditorState extends State<OiRichEditor> {
           focusNode: _blockFocusNodes[index],
           style: style,
           cursorColor: cursorColor,
-          backgroundCursorColor: OiTheme.maybeOf(context)?.colors.text ?? const Color(0xFF000000),
+          backgroundCursorColor:
+              OiTheme.maybeOf(context)?.colors.text ?? const Color(0xFF000000),
           maxLines: null,
           readOnly: widget.readOnly,
           onChanged: (text) => _onBlockChanged(index, text),
@@ -501,7 +506,11 @@ class _OiRichEditorState extends State<OiRichEditor> {
       _ToolbarButton(
         icon: Text(
           'B',
-          style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13, color: iconColor),
+          style: TextStyle(
+            fontWeight: FontWeight.w700,
+            fontSize: 13,
+            color: iconColor,
+          ),
         ),
         semanticLabel: 'Bold',
         onPressed: widget.readOnly ? null : () => _toggleFormatting('bold'),
@@ -509,7 +518,11 @@ class _OiRichEditorState extends State<OiRichEditor> {
       _ToolbarButton(
         icon: Text(
           'I',
-          style: TextStyle(fontStyle: FontStyle.italic, fontSize: 13, color: iconColor),
+          style: TextStyle(
+            fontStyle: FontStyle.italic,
+            fontSize: 13,
+            color: iconColor,
+          ),
         ),
         semanticLabel: 'Italic',
         onPressed: widget.readOnly ? null : () => _toggleFormatting('italic'),
@@ -517,7 +530,11 @@ class _OiRichEditorState extends State<OiRichEditor> {
       _ToolbarButton(
         icon: Text(
           'U',
-          style: TextStyle(decoration: TextDecoration.underline, fontSize: 13, color: iconColor),
+          style: TextStyle(
+            decoration: TextDecoration.underline,
+            fontSize: 13,
+            color: iconColor,
+          ),
         ),
         semanticLabel: 'Underline',
         onPressed: widget.readOnly
@@ -529,7 +546,11 @@ class _OiRichEditorState extends State<OiRichEditor> {
       _ToolbarButton(
         icon: Text(
           'H1',
-          style: TextStyle(fontWeight: FontWeight.w700, fontSize: 12, color: iconColor),
+          style: TextStyle(
+            fontWeight: FontWeight.w700,
+            fontSize: 12,
+            color: iconColor,
+          ),
         ),
         semanticLabel: 'Heading 1',
         onPressed: widget.readOnly
@@ -540,7 +561,11 @@ class _OiRichEditorState extends State<OiRichEditor> {
         _ToolbarButton(
           icon: Text(
             'H2',
-            style: TextStyle(fontWeight: FontWeight.w700, fontSize: 12, color: iconColor),
+            style: TextStyle(
+              fontWeight: FontWeight.w700,
+              fontSize: 12,
+              color: iconColor,
+            ),
           ),
           semanticLabel: 'Heading 2',
           onPressed: widget.readOnly
@@ -550,7 +575,11 @@ class _OiRichEditorState extends State<OiRichEditor> {
         _ToolbarButton(
           icon: Text(
             'H3',
-            style: TextStyle(fontWeight: FontWeight.w700, fontSize: 12, color: iconColor),
+            style: TextStyle(
+              fontWeight: FontWeight.w700,
+              fontSize: 12,
+              color: iconColor,
+            ),
           ),
           semanticLabel: 'Heading 3',
           onPressed: widget.readOnly

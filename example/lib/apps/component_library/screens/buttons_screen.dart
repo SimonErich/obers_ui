@@ -509,11 +509,7 @@ class _ButtonVariantShowcase extends StatelessWidget {
             // Text only
             builder(label: 'Button', onTap: () {}),
             // Leading icon
-            builder(
-              label: 'Button',
-              icon: OiIcons.settings,
-              onTap: () {},
-            ),
+            builder(label: 'Button', icon: OiIcons.settings, onTap: () {}),
             // Trailing icon
             builder(
               label: 'Button',
@@ -559,41 +555,17 @@ class _ButtonSizesShowcase extends StatelessWidget {
         children: [
           OiLabel.small(entry.label, color: colors.textMuted),
           SizedBox(height: spacing.sm),
-          OiButton.primary(
-            label: 'Button',
-            size: entry.size,
-            onTap: () {},
-          ),
+          OiButton.primary(label: 'Button', size: entry.size, onTap: () {}),
           SizedBox(height: spacing.sm),
-          OiButton.secondary(
-            label: 'Button',
-            size: entry.size,
-            onTap: () {},
-          ),
+          OiButton.secondary(label: 'Button', size: entry.size, onTap: () {}),
           SizedBox(height: spacing.sm),
-          OiButton.outline(
-            label: 'Button',
-            size: entry.size,
-            onTap: () {},
-          ),
+          OiButton.outline(label: 'Button', size: entry.size, onTap: () {}),
           SizedBox(height: spacing.sm),
-          OiButton.ghost(
-            label: 'Button',
-            size: entry.size,
-            onTap: () {},
-          ),
+          OiButton.ghost(label: 'Button', size: entry.size, onTap: () {}),
           SizedBox(height: spacing.sm),
-          OiButton.destructive(
-            label: 'Button',
-            size: entry.size,
-            onTap: () {},
-          ),
+          OiButton.destructive(label: 'Button', size: entry.size, onTap: () {}),
           SizedBox(height: spacing.sm),
-          OiButton.soft(
-            label: 'Button',
-            size: entry.size,
-            onTap: () {},
-          ),
+          OiButton.soft(label: 'Button', size: entry.size, onTap: () {}),
         ],
       );
     }

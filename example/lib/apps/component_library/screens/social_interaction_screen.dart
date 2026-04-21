@@ -178,11 +178,11 @@ class _SocialInteractionScreenState extends State<SocialInteractionScreen> {
                 'named cursors for remote users. OiSelectionPresence '
                 'highlights text or cell selections made by collaborators. \n\n'
                 'OiCursorPresence renders labeled cursor markers at '
-                  'remote user positions.\n'
-                  'OiSelectionPresence overlays '
-                  'colored highlights for remote selections. Both are '
-                  'driven by a stream of presence events. Key parameters: '
-                  'cursors, selections, userColors.',
+                'remote user positions.\n'
+                'OiSelectionPresence overlays '
+                'colored highlights for remote selections. Both are '
+                'driven by a stream of presence events. Key parameters: '
+                'cursors, selections, userColors.',
             examples: [
               ComponentExample(
                 title: 'Remote Cursors',
@@ -454,19 +454,19 @@ class _SocialInteractionScreenState extends State<SocialInteractionScreen> {
                     items: const [],
                     itemBuilder: (context, item, animation, index) =>
                         SizeTransition(
-                      sizeFactor: animation,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 4),
-                        child: Container(
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: colors.surfaceSubtle,
-                            borderRadius: context.radius.sm,
+                          sizeFactor: animation,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 4),
+                            child: Container(
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: colors.surfaceSubtle,
+                                borderRadius: context.radius.sm,
+                              ),
+                              child: OiLabel.body(item),
+                            ),
                           ),
-                          child: OiLabel.body(item),
                         ),
-                      ),
-                    ),
                   ),
                 ),
               ),
@@ -485,9 +485,9 @@ class _SocialInteractionScreenState extends State<SocialInteractionScreen> {
                 'A drag-to-reorder list that supports both touch and '
                 'pointer-based reordering with animated transitions. \n\n'
                 'OiReorderable wraps a list of items and enables '
-                  'drag-to-reorder. Key parameters: items, itemBuilder, '
-                  'onReorder, dragHandleBuilder. Provides haptic feedback '
-                  'and animated placeholder positioning.',
+                'drag-to-reorder. Key parameters: items, itemBuilder, '
+                'onReorder, dragHandleBuilder. Provides haptic feedback '
+                'and animated placeholder positioning.',
             examples: [
               ComponentExample(
                 title: 'Drag to Reorder',
@@ -495,8 +495,9 @@ class _SocialInteractionScreenState extends State<SocialInteractionScreen> {
                   shrinkWrap: true,
                   onReorder: (oldIndex, newIndex) {
                     setState(() {
-                      final adjustedIndex =
-                          newIndex > oldIndex ? newIndex - 1 : newIndex;
+                      final adjustedIndex = newIndex > oldIndex
+                          ? newIndex - 1
+                          : newIndex;
                       final item = _reorderItems.removeAt(oldIndex);
                       _reorderItems.insert(adjustedIndex, item);
                     });
@@ -527,11 +528,11 @@ class _SocialInteractionScreenState extends State<SocialInteractionScreen> {
                 'Low-level drag-and-drop primitives for custom drag '
                 'interactions. \n\n'
                 'OiDraggable: makes a widget draggable with typed data '
-                  'payload. Key parameters: data, child, feedback.\n'
-                  'OiDropZone: defines a zone that accepts dropped items. '
-                  'Key parameters: onDrop, onHover, accepts.\n'
-                  'OiDragGhost: the visual feedback widget shown during '
-                  'a drag operation. Customizable opacity and scale.',
+                'payload. Key parameters: data, child, feedback.\n'
+                'OiDropZone: defines a zone that accepts dropped items. '
+                'Key parameters: onDrop, onHover, accepts.\n'
+                'OiDragGhost: the visual feedback widget shown during '
+                'a drag operation. Customizable opacity and scale.',
             examples: [
               ComponentExample(
                 title: 'Drag & Drop',
@@ -604,8 +605,8 @@ class _SocialInteractionScreenState extends State<SocialInteractionScreen> {
                 'A swipe-to-dismiss or swipe-to-reveal widget for list '
                 'items. Supports left and right swipe actions. \n\n'
                 'OiSwipeable enables swipe gestures on list items. '
-                  'Key parameters: onSwipeLeft, onSwipeRight, '
-                  'leftActions, rightActions, dismissThreshold, child.',
+                'Key parameters: onSwipeLeft, onSwipeRight, '
+                'leftActions, rightActions, dismissThreshold, child.',
             examples: [
               ComponentExample(
                 title: 'Swipe Actions',
@@ -645,15 +646,16 @@ class _SocialInteractionScreenState extends State<SocialInteractionScreen> {
           ComponentShowcaseSection(
             title: 'Pinch Zoom, Double Tap & Long Press Menu',
             widgetName: 'OiPinchZoom / OiDoubleTap / OiLongPressMenu',
-            description: 'Gesture handlers for advanced touch interactions. \n\n'
+            description:
+                'Gesture handlers for advanced touch interactions. \n\n'
                 'OiPinchZoom: wraps a child with pinch-to-zoom and '
-                  'pan gestures. Key parameters: minScale, maxScale, '
-                  'child.\n'
-                  'OiDoubleTap: detects double-tap gestures with '
-                  'configurable timeout. Key parameters: onDoubleTap, '
-                  'child.\n'
-                  'OiLongPressMenu: shows a context menu on long press. '
-                  'Key parameters: items, onSelected, child.',
+                'pan gestures. Key parameters: minScale, maxScale, '
+                'child.\n'
+                'OiDoubleTap: detects double-tap gestures with '
+                'configurable timeout. Key parameters: onDoubleTap, '
+                'child.\n'
+                'OiLongPressMenu: shows a context menu on long press. '
+                'Key parameters: items, onSelected, child.',
             examples: [
               ComponentExample(
                 title: 'Pinch to Zoom',
@@ -773,12 +775,12 @@ class _SocialInteractionScreenState extends State<SocialInteractionScreen> {
                 'Interaction primitives for focus management, touch target '
                 'sizing, and selection visualization. \n\n'
                 'OiFocusTrap: traps keyboard focus within a subtree '
-                  '(for modals/dialogs). Key parameters: child, '
-                  'autoFocus.\n'
-                  'OiTouchTarget: ensures a minimum 48x48 hit area for '
-                  'accessibility. Wraps small interactive widgets.\n'
-                  'OiSelectionOverlay: renders a selection highlight '
-                  'overlay for selected items in lists or grids.',
+                '(for modals/dialogs). Key parameters: child, '
+                'autoFocus.\n'
+                'OiTouchTarget: ensures a minimum 48x48 hit area for '
+                'accessibility. Wraps small interactive widgets.\n'
+                'OiSelectionOverlay: renders a selection highlight '
+                'overlay for selected items in lists or grids.',
             examples: [
               ComponentExample(
                 title: 'Focus Trap',
@@ -906,9 +908,7 @@ class _SocialInteractionScreenState extends State<SocialInteractionScreen> {
                         color: colors.surfaceSubtle,
                         borderRadius: context.radius.sm,
                       ),
-                      child: Center(
-                        child: OiLabel.body('${index + 1}'),
-                      ),
+                      child: Center(child: OiLabel.body('${index + 1}')),
                     ),
                   ),
                 ),
@@ -934,8 +934,7 @@ class _SocialInteractionScreenState extends State<SocialInteractionScreen> {
               ComponentExample(
                 title: 'Paste Area',
                 child: OiPasteZone(
-                  onPaste: (text) =>
-                      setState(() => _pastedText = text),
+                  onPaste: (text) => setState(() => _pastedText = text),
                   child: Container(
                     height: 100,
                     width: double.infinity,
@@ -943,9 +942,7 @@ class _SocialInteractionScreenState extends State<SocialInteractionScreen> {
                     decoration: BoxDecoration(
                       color: colors.surfaceSubtle,
                       borderRadius: context.radius.sm,
-                      border: Border.all(
-                        color: colors.borderSubtle,
-                      ),
+                      border: Border.all(color: colors.borderSubtle),
                     ),
                     child: Center(
                       child: OiLabel.body(
@@ -1058,8 +1055,7 @@ class _SocialInteractionScreenState extends State<SocialInteractionScreen> {
                           label: _spotlightActive
                               ? 'Spotlight Active'
                               : 'Activate Spotlight',
-                          onTap: () =>
-                              setState(() => _spotlightActive = true),
+                          onTap: () => setState(() => _spotlightActive = true),
                         ),
                       ],
                     ),
@@ -1082,32 +1078,32 @@ class _SocialInteractionScreenState extends State<SocialInteractionScreen> {
                 child: SizedBox(
                   height: 350,
                   child: OiWhatsNew(
-                  items: const [
-                    OiWhatsNewItem(
-                      title: 'Dark Mode',
-                      description:
-                          'Full dark mode support across all components.',
-                      icon: OiIcons.moon,
-                      version: 'v2.1.0',
-                    ),
-                    OiWhatsNewItem(
-                      title: 'File Explorer',
-                      description:
-                          'New drag-and-drop file management with folder '
-                          'tree navigation.',
-                      icon: OiIcons.folderOpen,
-                      version: 'v2.0.0',
-                    ),
-                    OiWhatsNewItem(
-                      title: 'Performance',
-                      description:
-                          'Virtual scrolling for lists with 10,000+ items.',
-                      icon: OiIcons.zap,
-                      version: 'v1.9.0',
-                    ),
-                  ],
-                  onDismiss: () {},
-                ),
+                    items: const [
+                      OiWhatsNewItem(
+                        title: 'Dark Mode',
+                        description:
+                            'Full dark mode support across all components.',
+                        icon: OiIcons.moon,
+                        version: 'v2.1.0',
+                      ),
+                      OiWhatsNewItem(
+                        title: 'File Explorer',
+                        description:
+                            'New drag-and-drop file management with folder '
+                            'tree navigation.',
+                        icon: OiIcons.folderOpen,
+                        version: 'v2.0.0',
+                      ),
+                      OiWhatsNewItem(
+                        title: 'Performance',
+                        description:
+                            'Virtual scrolling for lists with 10,000+ items.',
+                        icon: OiIcons.zap,
+                        version: 'v1.9.0',
+                      ),
+                    ],
+                    onDismiss: () {},
+                  ),
                 ),
               ),
             ],

@@ -52,8 +52,9 @@ class ShopWishlistScreen extends StatelessWidget {
     final spacing = context.spacing;
     final bp = context.breakpoint;
 
-    final wishlistedProducts =
-        products.where((p) => wishlistedKeys.contains(p.key)).toList();
+    final wishlistedProducts = products
+        .where((p) => wishlistedKeys.contains(p.key))
+        .toList();
 
     return SingleChildScrollView(
       padding: EdgeInsets.all(spacing.lg),
@@ -85,8 +86,7 @@ class ShopWishlistScreen extends StatelessWidget {
                 children: [
                   OiIconButton(
                     icon: OiIcons.heart,
-                    semanticLabel:
-                        'Wishlist (${wishlistedKeys.length} items)',
+                    semanticLabel: 'Wishlist (${wishlistedKeys.length} items)',
                     onTap: () {},
                   ),
                   if (wishlistedKeys.isNotEmpty)
@@ -118,9 +118,7 @@ class ShopWishlistScreen extends StatelessWidget {
               const OiLabel.h3('Wishlist'),
               SizedBox(width: spacing.sm),
               if (wishlistedProducts.isNotEmpty)
-                OiBadge.soft(
-                  label: '${wishlistedProducts.length}',
-                ),
+                OiBadge.soft(label: '${wishlistedProducts.length}'),
             ],
           ),
           SizedBox(height: spacing.lg),

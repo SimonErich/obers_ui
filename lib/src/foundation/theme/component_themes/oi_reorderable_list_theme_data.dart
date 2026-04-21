@@ -53,8 +53,8 @@ class OiReorderableListThemeData {
 
   @override
   int get hashCode => Object.hash(
-        dragHandleColor,
-        placeholderColor,
-        dragElevation == null ? null : Object.hashAll(dragElevation!),
-      );
+    dragHandleColor,
+    placeholderColor,
+    dragElevation == null ? null : Object.hashAll(dragElevation!),
+  );
 }

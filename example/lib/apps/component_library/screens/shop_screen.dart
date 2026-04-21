@@ -157,10 +157,7 @@ class _ShopScreenState extends State<ShopScreen> {
                       label: 'Small price',
                       size: OiPriceTagSize.small,
                     ),
-                    OiPriceTag(
-                      price: 29.99,
-                      label: 'Medium price',
-                    ),
+                    OiPriceTag(price: 29.99, label: 'Medium price'),
                     OiPriceTag(
                       price: 29.99,
                       label: 'Large price',
@@ -405,8 +402,8 @@ class _ShopScreenState extends State<ShopScreen> {
                 'A text input with apply button for entering discount '
                 'coupon codes during checkout. \n\n'
                 'OiCouponInput combines a text field and apply button '
-                  'for coupon code entry. Key parameters: onApply, '
-                  'appliedCode, onRemove, loading, error.',
+                'for coupon code entry. Key parameters: onApply, '
+                'appliedCode, onRemove, loading, error.',
             examples: [
               ComponentExample(
                 title: 'Apply Coupon',
@@ -432,10 +429,10 @@ class _ShopScreenState extends State<ShopScreen> {
                 'A slide-out panel displaying the full shopping cart with '
                 'item list, summary, and checkout button. \n\n'
                 'OiCartPanel combines OiCartItemRow, OiOrderSummaryLine, '
-                  'and OiCouponInput into a complete cart experience. '
-                  'Key parameters: items, onCheckout, onQuantityChange, '
-                  'onRemove, currencyCode. Best experienced in the '
-                  'Shop mini-app.',
+                'and OiCouponInput into a complete cart experience. '
+                'Key parameters: items, onCheckout, onQuantityChange, '
+                'onRemove, currencyCode. Best experienced in the '
+                'Shop mini-app.',
             examples: [
               ComponentExample(
                 title: 'Shopping Cart',
@@ -443,31 +440,31 @@ class _ShopScreenState extends State<ShopScreen> {
                   height: 600,
                   child: SingleChildScrollView(
                     child: OiCartPanel(
-                    label: 'Shopping cart',
-                    items: const [
-                      OiCartItem(
-                        productKey: 'alpine-jacket',
-                        name: 'Alpine Jacket',
-                        unitPrice: 199.99,
-                        quantity: 2,
+                      label: 'Shopping cart',
+                      items: const [
+                        OiCartItem(
+                          productKey: 'alpine-jacket',
+                          name: 'Alpine Jacket',
+                          unitPrice: 199.99,
+                          quantity: 2,
+                        ),
+                        OiCartItem(
+                          productKey: 'trail-boots',
+                          name: 'Trail Boots',
+                          unitPrice: 129.99,
+                          variantLabel: 'Brown / Size 10',
+                        ),
+                      ],
+                      summary: const OiCartSummary(
+                        subtotal: 529.97,
+                        shipping: 9.99,
+                        tax: 42.40,
+                        total: 582.36,
                       ),
-                      OiCartItem(
-                        productKey: 'trail-boots',
-                        name: 'Trail Boots',
-                        unitPrice: 129.99,
-                        variantLabel: 'Brown / Size 10',
-                      ),
-                    ],
-                    summary: const OiCartSummary(
-                      subtotal: 529.97,
-                      shipping: 9.99,
-                      tax: 42.40,
-                      total: 582.36,
+                      onQuantityChange: (_) {},
+                      onRemove: (_) {},
+                      onCheckout: () {},
                     ),
-                    onQuantityChange: (_) {},
-                    onRemove: (_) {},
-                    onCheckout: () {},
-                  ),
                   ),
                 ),
               ),
@@ -482,9 +479,9 @@ class _ShopScreenState extends State<ShopScreen> {
                 'An image gallery with thumbnails and zoom for product '
                 'detail pages. \n\n'
                 'OiProductGallery displays product images with thumbnail '
-                  'navigation and pinch-to-zoom. Key parameters: imageUrls, '
-                  'selectedIndex, onIndexChanged. Best experienced in the '
-                  'Shop mini-app.',
+                'navigation and pinch-to-zoom. Key parameters: imageUrls, '
+                'selectedIndex, onIndexChanged. Best experienced in the '
+                'Shop mini-app.',
             examples: [
               ComponentExample(
                 title: 'Gallery (No Images)',
@@ -504,9 +501,9 @@ class _ShopScreenState extends State<ShopScreen> {
                 'A filter panel for product catalog with price range, '
                 'categories, and attribute filters. \n\n'
                 'OiProductFilters provides faceted filtering for product '
-                  'catalogs. Supports price range sliders, category '
-                  'checkboxes, and attribute selectors. Key parameters: '
-                  'filters, onFilterChange, availableFilters.',
+                'catalogs. Supports price range sliders, category '
+                'checkboxes, and attribute selectors. Key parameters: '
+                'filters, onFilterChange, availableFilters.',
             examples: [
               ComponentExample(
                 title: 'Catalog Filters',
@@ -520,8 +517,7 @@ class _ShopScreenState extends State<ShopScreen> {
                     'Accessories',
                   ],
                   priceRangeMax: 500,
-                  onChanged: (data) =>
-                      setState(() => _filterData = data),
+                  onChanged: (data) => setState(() => _filterData = data),
                 ),
               ),
             ],
@@ -535,9 +531,9 @@ class _ShopScreenState extends State<ShopScreen> {
                 'A complete order summary card combining multiple '
                 'OiOrderSummaryLine widgets with totals. \n\n'
                 'OiOrderSummary aggregates cart items into a summary '
-                  'card with subtotal, discounts, shipping, tax, and '
-                  'total. Key parameters: cartSummary, currencyCode, '
-                  'onCheckout.',
+                'card with subtotal, discounts, shipping, tax, and '
+                'total. Key parameters: cartSummary, currencyCode, '
+                'onCheckout.',
             examples: [
               ComponentExample(
                 title: 'Summary Card',
@@ -576,8 +572,8 @@ class _ShopScreenState extends State<ShopScreen> {
                 'A visual timeline showing order progress through its '
                 'lifecycle stages. \n\n'
                 'OiOrderTracker displays order status as a step-by-step '
-                  'timeline from placement through delivery. Key parameters: '
-                  'order (OiOrderData), steps, currentStep.',
+                'timeline from placement through delivery. Key parameters: '
+                'order (OiOrderData), steps, currentStep.',
             examples: [
               ComponentExample(
                 title: 'Shipped Order',
@@ -616,9 +612,9 @@ class _ShopScreenState extends State<ShopScreen> {
                 'A selection UI for choosing a payment method during '
                 'checkout. \n\n'
                 'OiPaymentMethodPicker renders available payment methods '
-                  '(credit card, PayPal, bank transfer, etc.) as selectable '
-                  'cards. Key parameters: methods, selectedMethod, '
-                  'onMethodSelected.',
+                '(credit card, PayPal, bank transfer, etc.) as selectable '
+                'cards. Key parameters: methods, selectedMethod, '
+                'onMethodSelected.',
             examples: [
               ComponentExample(
                 title: 'Payment Methods',
@@ -644,8 +640,9 @@ class _ShopScreenState extends State<ShopScreen> {
                     ),
                   ],
                   selectedKey: _selectedPaymentKey,
-                  onSelect: (method) =>
-                      setState(() => _selectedPaymentKey = method.key as String),
+                  onSelect: (method) => setState(
+                    () => _selectedPaymentKey = method.key as String,
+                  ),
                 ),
               ),
             ],
@@ -659,9 +656,9 @@ class _ShopScreenState extends State<ShopScreen> {
                 'A selection UI for choosing a shipping method during '
                 'checkout. \n\n'
                 'OiShippingMethodPicker renders available shipping '
-                  'options with estimated delivery times and prices. '
-                  'Key parameters: methods, selectedMethod, '
-                  'onMethodSelected.',
+                'options with estimated delivery times and prices. '
+                'Key parameters: methods, selectedMethod, '
+                'onMethodSelected.',
             examples: [
               ComponentExample(
                 title: 'Shipping Options',
@@ -688,8 +685,9 @@ class _ShopScreenState extends State<ShopScreen> {
                     ),
                   ],
                   selectedKey: _selectedShippingKey,
-                  onSelect: (method) =>
-                      setState(() => _selectedShippingKey = method.key as String),
+                  onSelect: (method) => setState(
+                    () => _selectedShippingKey = method.key as String,
+                  ),
                 ),
               ),
             ],

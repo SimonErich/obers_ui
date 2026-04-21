@@ -76,7 +76,7 @@ class _SubMenuWrapperState extends State<_SubMenuWrapper>
             items: widget.items,
             onClose: widget.onClose,
             onCloseSubMenu: widget.onCloseSubMenu,
-            isSubMenu: true,
+            subMenu: true,
           ),
         ),
       ),

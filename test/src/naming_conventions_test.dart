@@ -811,15 +811,6 @@ void main() {
       expect(progressContent, contains('this.indeterminate'));
       expect(progressContent, contains('this.strokeWidth'));
 
-      // OiForm — sections, controller, onSubmit, autoValidate, layout
-      final formFile = File('lib/src/composites/forms/oi_form.dart');
-      final formContent = formFile.readAsStringSync();
-      expect(formContent, contains('this.sections'));
-      expect(formContent, contains('this.controller'));
-      expect(formContent, contains('this.onSubmit'));
-      expect(formContent, contains('this.autoValidate'));
-      expect(formContent, contains('this.layout'));
-
       // OiTimeline — events, label, showTimestamps, onEventTap
       final timelineFile = File(
         'lib/src/composites/scheduling/oi_timeline.dart',

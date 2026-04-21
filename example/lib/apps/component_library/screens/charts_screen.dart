@@ -142,9 +142,7 @@ class _ChartsScreenState extends State<ChartsScreen> {
                 title: 'CPU Usage',
                 child: SizedBox(
                   height: 200,
-                  child: Center(
-                    child: OiGauge(value: 72, label: 'CPU Usage'),
-                  ),
+                  child: Center(child: OiGauge(value: 72, label: 'CPU Usage')),
                 ),
               ),
             ],
@@ -264,12 +262,12 @@ class _ChartsScreenState extends State<ChartsScreen> {
                 'variables. Supports multiple series with configurable point '
                 'shapes (circle, square, diamond, triangle) and sizes. \n\n'
                 'OiScatterPlot renders data points on a Cartesian grid. '
-                  'Required: label (String), series (List<OiScatterSeries>). '
-                  'Each OiScatterSeries has label, points '
-                  '(List<OiScatterPoint> with x, y), optional color, '
-                  'pointRadius, and shape (OiScatterShape). '
-                  'Optional: xAxis, yAxis (OiChartAxis), showGrid, '
-                  'showLegend, onPointTap.',
+                'Required: label (String), series (List<OiScatterSeries>). '
+                'Each OiScatterSeries has label, points '
+                '(List<OiScatterPoint> with x, y), optional color, '
+                'pointRadius, and shape (OiScatterShape). '
+                'Optional: xAxis, yAxis (OiChartAxis), showGrid, '
+                'showLegend, onPointTap.',
             examples: [
               ComponentExample(
                 title: 'Height vs Weight',
@@ -315,10 +313,10 @@ class _ChartsScreenState extends State<ChartsScreen> {
                 'size dimensions. Extends scatter plot concepts with a third '
                 'data dimension encoded as bubble radius. \n\n'
                 'OiBubbleChart takes an OiBubbleChartData object containing '
-                  'series definitions, size configuration, and axis settings. '
-                  'Required: data (OiBubbleChartData). Optional: '
-                  'semanticLabel, theme (OiBubbleChartTheme), '
-                  'interactionMode, compact.',
+                'series definitions, size configuration, and axis settings. '
+                'Required: data (OiBubbleChartData). Optional: '
+                'semanticLabel, theme (OiBubbleChartTheme), '
+                'interactionMode, compact.',
             examples: [
               ComponentExample(
                 title: 'City Metrics',
@@ -333,9 +331,24 @@ class _ChartsScreenState extends State<ChartsScreen> {
                           points: [
                             OiBubblePoint(x: 50, y: 80, size: 30, label: 'NYC'),
                             OiBubblePoint(x: 70, y: 60, size: 20, label: 'LA'),
-                            OiBubblePoint(x: 30, y: 90, size: 15, label: 'Chicago'),
-                            OiBubblePoint(x: 80, y: 40, size: 25, label: 'Houston'),
-                            OiBubblePoint(x: 60, y: 70, size: 10, label: 'Phoenix'),
+                            OiBubblePoint(
+                              x: 30,
+                              y: 90,
+                              size: 15,
+                              label: 'Chicago',
+                            ),
+                            OiBubblePoint(
+                              x: 80,
+                              y: 40,
+                              size: 25,
+                              label: 'Houston',
+                            ),
+                            OiBubblePoint(
+                              x: 60,
+                              y: 70,
+                              size: 10,
+                              label: 'Phoenix',
+                            ),
                           ],
                         ),
                       ],
@@ -360,9 +373,9 @@ class _ChartsScreenState extends State<ChartsScreen> {
                 'Nodes are laid out in columns and links are rendered as '
                 'curved bands proportional to their value. \n\n'
                 'OiSankey takes nodes (List<OiSankeyNode> with key, label) '
-                  'and links (List<OiSankeyLink> with source, target, value). '
-                  'Required: nodes, links, label. Optional: showLabels, '
-                  'showValues, onNodeTap, onLinkTap.',
+                'and links (List<OiSankeyLink> with source, target, value). '
+                'Required: nodes, links, label. Optional: showLabels, '
+                'showValues, onNodeTap, onLinkTap.',
             examples: [
               ComponentExample(
                 title: 'Energy Flow',
@@ -398,9 +411,9 @@ class _ChartsScreenState extends State<ChartsScreen> {
                 'A treemap visualization showing hierarchical data as nested '
                 'rectangles. Each node area is proportional to its value. \n\n'
                 'OiTreemap takes nodes (List<OiTreemapNode> with key, '
-                  'label, value, optional children for nesting). '
-                  'Required: nodes, label. Optional: showLabels, showValues, '
-                  'onNodeTap.',
+                'label, value, optional children for nesting). '
+                'Required: nodes, label. Optional: showLabels, showValues, '
+                'onNodeTap.',
             examples: [
               ComponentExample(
                 title: 'Disk Usage',

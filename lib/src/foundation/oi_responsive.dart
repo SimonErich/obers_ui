@@ -489,7 +489,6 @@ class OiResponsive<T> {
   /// final scale = context.breakpointScale;
   /// final cols = columns.resolve(bp, scale);
   /// ```
-  // ignore: remove_deprecations_in_breaking_versions
   @Deprecated(
     'Use resolve(breakpoint, scale) with explicit parameters instead. '
     'Resolve the breakpoint once at the layout level and pass it down.',
@@ -592,7 +591,6 @@ extension OiResponsiveMapExt<T> on Map<OiBreakpoint, T> {
 /// **Deprecated:** Use [OiResponsive] instead for new code.
 ///
 /// {@category Foundation}
-// ignore: remove_deprecations_in_breaking_versions
 @Deprecated(
   'Use OiResponsive<T> instead. '
   'OiResponsive supports mobile-first cascading and explicit resolution '
@@ -600,7 +598,6 @@ extension OiResponsiveMapExt<T> on Map<OiBreakpoint, T> {
 )
 class OiResponsiveValue<T> {
   /// Creates an [OiResponsiveValue] with per-breakpoint values.
-  // ignore: remove_deprecations_in_breaking_versions
   @Deprecated('Use OiResponsive<T> instead.')
   const OiResponsiveValue({
     this.compact,
@@ -747,7 +744,6 @@ extension OiResponsiveExt on BuildContext {
   /// **Deprecated:** Prefer [OiResponsive.resolve] with an explicit breakpoint
   /// and scale. Resolve the breakpoint once at the layout level and pass
   /// concrete values down.
-  // ignore: remove_deprecations_in_breaking_versions
   @Deprecated(
     'Use value.resolve(breakpoint, scale) with explicit parameters instead.',
   )
@@ -769,7 +765,6 @@ extension OiResponsiveExt on BuildContext {
       values.resolve(breakpoint, breakpointScale);
 
   /// Resolves an [OiResponsiveValue] for the current screen width.
-  // ignore: remove_deprecations_in_breaking_versions
   @Deprecated(
     'Use responsive<T>(OiResponsive<T>) or '
     'OiResponsive<T>.resolve(breakpoint, scale) instead.',
