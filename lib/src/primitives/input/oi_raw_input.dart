@@ -208,6 +208,13 @@ class _OiRawInputState extends State<OiRawInput> {
     }
   }
 
+  void _handlePointerDown(PointerDownEvent _) {
+    if (!widget.enabled || widget.readOnly) return;
+    if (!widget.focusNode.hasFocus) {
+      widget.focusNode.requestFocus();
+    }
+  }
+
   // ── Word selection ───────────────────────────────────────────────────────
 
   void _selectWordAtCursor() {
@@ -357,15 +364,18 @@ class _OiRawInputState extends State<OiRawInput> {
 
     // Build the Row with optional leading / trailing.
     if (widget.leading == null && widget.trailing == null) {
-      return fieldWidget;
+      return Listener(onPointerDown: _handlePointerDown, child: fieldWidget);
     }
 
-    return Row(
-      children: [
-        if (widget.leading != null) widget.leading!,
-        Expanded(child: fieldWidget),
-        if (widget.trailing != null) widget.trailing!,
-      ],
+    return Listener(
+      onPointerDown: _handlePointerDown,
+      child: Row(
+        children: [
+          if (widget.leading != null) widget.leading!,
+          Expanded(child: fieldWidget),
+          if (widget.trailing != null) widget.trailing!,
+        ],
+      ),
     );
   }
 }
