@@ -18,6 +18,11 @@ jobs:
           channel: stable
       - run: flutter pub get
       - run: dart analyze --fatal-infos
+      - name: Analyze packages/obers_ui_autoforms
+        run: |
+          cd packages/obers_ui_autoforms
+          dart pub get
+          dart analyze --fatal-infos
       - run: dart format --output=none --set-exit-if-changed .
 
   test:
