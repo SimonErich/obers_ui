@@ -22,22 +22,22 @@ OiTable<User>(
     OiTableColumn(
       id: 'name',
       header: 'Name',
-      cellBuilder: (user) => Text(user.name),
+      cellBuilder: (context, user, rowIndex) => Text(user.name),
       sortable: true,
     ),
     OiTableColumn(
       id: 'email',
       header: 'Email',
-      cellBuilder: (user) => Text(user.email),
+      cellBuilder: (context, user, rowIndex) => Text(user.email),
     ),
     OiTableColumn(
       id: 'role',
       header: 'Role',
-      cellBuilder: (user) => OiBadge.soft(label: user.role),
+      cellBuilder: (context, user, rowIndex) => OiBadge.soft(label: user.role),
     ),
   ],
   rows: users,
-  onSort: (columnId, ascending) { /* ... */ },
+  onSort: (columnId, {required ascending}) { /* ... */ },
 )
 ```
 
@@ -60,10 +60,13 @@ A drag-to-reorder list that supports drag handles, long-press drag, keyboard reo
 OiReorderableList<Task>(
   items: tasks,
   itemBuilder: (context, task, index, dragHandle) {
-    return OiRow(children: [
-      if (dragHandle != null) dragHandle,
-      Expanded(child: OiLabel.body(task.title)),
-    ]);
+    return OiRow(
+      breakpoint: context.breakpoint,
+      children: [
+        if (dragHandle != null) dragHandle,
+        Expanded(child: OiLabel.body(task.title)),
+      ],
+    );
   },
   onReorder: (oldIndex, newIndex) {
     setState(() {
@@ -149,30 +152,12 @@ OiDataGrid<User>(
 
 | Widget | Description |
 | --- | --- |
-| `OiForm` | Form container with validation |
-| `OiStepper` | Step-by-step form |
-| `OiWizard` | Multi-page wizard with progress |
-| `OiFormDialog` | Form dialog with managed lifecycle (loading, error, submit states) |
+| [OiFormSection](lib/src/composites/forms/oi_form_section.dart) | Grouped form fields with heading, description, and inline validation |
+| [OiStepper](lib/src/composites/forms/oi_stepper.dart) | Step-by-step form |
+| [OiWizard](lib/src/composites/forms/oi_wizard.dart) | Multi-page wizard with progress |
+| [OiFormDialog](lib/src/composites/forms/oi_form_dialog.dart) | Form dialog with managed lifecycle (loading, error, submit states) |
 
-### OiForm (Deprecated)
-
-!!! warning "Deprecated"
-    `OiForm`, `OiFormField`, `OiFormSection`, and `OiFormController` are deprecated.
-    Use `OiAfForm` from `package:obers_ui_autoforms` instead.
-    See the [AutoForms documentation](../advanced/autoforms.md) for the migration guide.
-
-```dart
-OiForm(
-  onSubmit: (values) async {
-    await api.save(values);
-  },
-  children: [
-    OiTextInput(label: 'Name', name: 'name'),
-    OiSelect(label: 'Role', name: 'role', items: roles),
-    OiButton(label: 'Submit', type: OiButtonType.submit),
-  ],
-)
-```
+For schema-driven forms with validation, auto-binding, and submit logic, use `OiAfForm` from the sibling [`obers_ui_autoforms`](../advanced/autoforms.md) package. Plain form composition uses Flutter's built-in `Form` with any ObersUI input widget.
 
 ### OiFormDialog
 
@@ -275,8 +260,8 @@ OiResponsiveShell(
   onTap: (index) => setState(() => _selectedIndex = index),
   body: _pages[_selectedIndex],
   breakpoints: OiResponsiveShellBreakpoints(rail: 700, expanded: 1400),
-  railLeading: OiImage(src: 'assets/logo.svg', label: 'Logo'),
-  railTrailing: OiIconButton(icon: OiIcons.settings, onPressed: () {}),
+  railLeading: const OiImage(src: 'assets/logo.svg', alt: 'Logo'),
+  railTrailing: OiIconButton(icon: OiIcons.settings, semanticLabel: 'Settings', onTap: () {}),
 )
 ```
 
@@ -406,6 +391,8 @@ OiCommandBar(
 | `OiImageAnnotator` | Image markup tool |
 
 ## Visualization
+
+Visualization widgets ship in the sibling [`obers_ui_charts`](../../../packages/obers_ui_charts) package — add it alongside `obers_ui` in your `pubspec.yaml` to use them.
 
 | Widget | Description |
 | --- | --- |

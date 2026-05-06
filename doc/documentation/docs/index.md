@@ -64,9 +64,9 @@ void main() {
     OiApp(
       theme: OiThemeData.fromBrand(color: Color(0xFF8B6914)),
       home: Center(
-        child: OiButton(
+        child: OiButton.primary(
           label: 'Pour some Obers',
-          onPressed: () {},
+          onTap: () {},
         ),
       ),
     ),
@@ -81,4 +81,4 @@ That's it. One import, one theme, one app widget. Creamy smooth.
 ## Explore more
 
 - [**API Reference**](/obers_ui/api/) — Full generated dart doc
-- [**GitHub**](https://github.com/simonerich/obers_ui) — Source code & issues
+- [**GitHub**](https://github.com/SimonErich/obers_ui) — Source code & issues

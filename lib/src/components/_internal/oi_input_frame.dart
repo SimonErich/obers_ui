@@ -18,6 +18,8 @@ class OiInputFrame extends StatelessWidget {
     this.leading,
     this.trailing,
     this.padding,
+    this.leadingGap = 8,
+    this.trailingGap = 0,
     this.counter,
     super.key,
   });
@@ -32,6 +34,12 @@ class OiInputFrame extends StatelessWidget {
   final Widget? leading;
   final Widget? trailing;
   final EdgeInsetsGeometry? padding;
+
+  /// Horizontal gap between [leading] and the child. Defaults to 8.
+  final double leadingGap;
+
+  /// Horizontal gap between the child and [trailing]. Defaults to 0.
+  final double trailingGap;
 
   /// Optional counter widget rendered below the input (e.g. "3/50").
   final Widget? counter;
@@ -58,9 +66,9 @@ class OiInputFrame extends StatelessWidget {
 
     final row = Row(
       children: [
-        if (leading != null) ...[leading!, const SizedBox(width: 8)],
+        if (leading != null) ...[leading!, SizedBox(width: leadingGap)],
         Expanded(child: child),
-        ?trailing,
+        if (trailing != null) ...[SizedBox(width: trailingGap), trailing!],
       ],
     );
 

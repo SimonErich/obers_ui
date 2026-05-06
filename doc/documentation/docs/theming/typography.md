@@ -63,14 +63,37 @@ OiThemeData.light().copyWith(
 
 ## The OiLabel widget
 
-For convenience, use the `OiLabel` primitive:
+For convenience, use the `OiLabel` primitive — it reads the correct style
+from the theme automatically. There is a named constructor for every
+variant plus two helpers:
 
 ```dart
-OiLabel.h3('Section Title')
+// One named constructor per variant
+OiLabel.display('Hero line')
+OiLabel.h1('Page title')
+OiLabel.h2('Section header')
+OiLabel.h3('Subsection header')
+OiLabel.h4('Card title')
+OiLabel.body('Paragraph text')
+OiLabel.bodyStrong('Emphasised body')
+OiLabel.small('Secondary text')
+OiLabel.smallStrong('Emphasised small')
+OiLabel.tiny('Dense UI text')
+OiLabel.caption('Image caption')
+OiLabel.code('const x = 1;')
+OiLabel.overline('SECTION LABEL')
+OiLabel.link('Read more')
+
+// Pick a variant at runtime
 OiLabel.variant('Dynamic title', variant: OiLabelVariant.h3)
+
+// Select-and-copy support for code / IDs / tokens
+OiLabel.copyable('api_key_abc123', variant: OiLabelVariant.code)
 ```
 
-It reads the correct style from the theme automatically.
+`OiLabel.copyable` wraps the label in long-press / right-click copy
+affordances — use it for values users commonly need to copy (IDs, tokens,
+error codes).
 
 ## Variant usage guidance
 

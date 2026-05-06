@@ -44,16 +44,20 @@ Think of modules as the "just add data" layer — the cream on top.
 
 ## OiFileExplorer
 
-A complete file browser — the Swiss Army knife of file UIs.
+A complete file browser — the Swiss Army knife of file UIs. Data is supplied via async loaders (`loadFolder`, `loadFolderTree`) so it works against any remote or local backend.
 
 ```dart
 OiFileExplorer(
-  roots: [rootNode],
+  label: 'Files',
+  controller: _fileExplorerController,
+  loadFolder: (path) async => api.listFolder(path),
+  loadFolderTree: () async => api.loadTree(),
+  onCreateFolder: (parent, name) async => api.createFolder(parent, name),
+  onRename: (file, name) async => api.rename(file, name),
+  onDelete: (files) async => api.delete(files),
+  onMove: (files, destination) async => api.move(files, destination),
+  onUpload: (destination, files) async => api.upload(destination, files),
   onOpen: (file) => openFile(file),
-  onDelete: (files) async => await api.delete(files),
-  onRename: (file, name) async => await api.rename(file, name),
-  onMove: (files, destination) async => await api.move(files, destination),
-  onUpload: (destination) async => await pickAndUpload(destination),
 )
 ```
 
@@ -63,19 +67,20 @@ OiFileExplorer(
 
 ## OiDashboard
 
-A draggable, resizable widget grid — like a home screen for data:
+A draggable, resizable widget grid — like a home screen for data. Cards specify their span directly via `columnSpan` / `rowSpan`.
 
 ```dart
 OiDashboard(
   cards: [
     OiDashboardCard(
-      id: 'revenue',
+      key: 'revenue',
       title: 'Revenue',
-      defaultSpan: OiGridSpan(columns: 2, rows: 1),
+      columnSpan: 2,
+      rowSpan: 1,
       child: RevenueChart(),
     ),
     OiDashboardCard(
-      id: 'users',
+      key: 'users',
       title: 'Active Users',
       child: UserMetric(),
     ),
@@ -132,10 +137,11 @@ Threaded discussion — like GitHub issue comments:
 
 ```dart
 OiComments(
+  label: 'Discussion',
   comments: comments,
-  currentUser: currentUser,
-  onPost: (payload) async => await api.postComment(payload),
-  onReply: (parentId, payload) async => await api.reply(parentId, payload),
+  currentUserId: currentUser.id,
+  onComment: (text) async => api.postComment(text),
+  onReply: (parentId, text) async => api.reply(parentId, text),
 )
 ```
 
@@ -143,21 +149,27 @@ OiComments(
 
 ## OiListView
 
-A complete list screen with sort, filter, and pagination:
+A complete list screen with sort, filter, and pagination. Sort options are identifiers — perform the actual sort in your data layer based on the current `sortId`.
 
 ```dart
+const sortByName = OiListSortOption(id: 'name', label: 'Name');
+const sortByDate = OiListSortOption(id: 'createdAt', label: 'Created');
+
 OiListView<Project>(
-  items: projects,
+  label: 'Projects',
+  items: _sorted(projects),
+  itemKey: (project) => project.id,
   itemBuilder: (project) => OiListTile(
-    title: Text(project.name),
-    subtitle: Text(project.description),
+    title: project.name,
+    subtitle: project.description,
   ),
-  sortOptions: [
-    OiSortOption(label: 'Name', comparator: (a, b) => a.name.compareTo(b.name)),
-    OiSortOption(label: 'Created', comparator: (a, b) => a.createdAt.compareTo(b.createdAt)),
-  ],
+  sortOptions: const [sortByName, sortByDate],
+  activeSort: _activeSort,
+  onSort: (option) => setState(() => _activeSort = option),
 )
 ```
+
+`itemBuilder` receives just the item. Provide `itemKey:` (required) to give the list a stable identifier for selection tracking and settings persistence.
 
 ---
 
@@ -497,12 +509,9 @@ A chronological activity stream showing user actions, system events, and notific
 ```dart
 OiActivityFeed(
   label: 'Activity',
-  activities: activities,
-  onLoadMore: () async => await fetchMore(),
-  activityBuilder: (activity) => OiListTile(
-    title: OiLabel.body(activity.message),
-    leading: OiAvatar(initials: activity.user.initials),
-  ),
+  events: events,
+  onLoadMore: () async => fetchMore(),
+  onEventTap: (event) => openDetails(event),
 )
 ```
 
@@ -517,12 +526,14 @@ A key-value metadata editor for adding, editing, and removing custom fields on a
 ```dart
 OiMetadataEditor(
   label: 'Metadata',
-  entries: metadata,
-  onAdd: (key, value) async => await api.addMeta(key, value),
-  onEdit: (key, value) async => await api.updateMeta(key, value),
-  onRemove: (key) async => await api.removeMeta(key),
+  fields: _fields,
+  onChange: (updatedFields) => setState(() => _fields = updatedFields),
+  allowAdd: true,
+  allowRemove: true,
 )
 ```
+
+`onChange` fires with the full updated list after any add, remove, or edit — persist the new list and let the widget re-render.
 
 **Features:** inline editing, type-aware value inputs, validation, and add/remove rows.
 
@@ -577,7 +588,7 @@ OiChangelogView(
     OiVersionEntry(
       version: '2.1.0',
       date: DateTime(2026, 3, 28),
-      isLatest: true,
+      latest: true,
       changes: [
         OiChangeEntry(description: 'Added dark mode', type: OiChangeType.added),
         OiChangeEntry(description: 'Fixed timezone bug', type: OiChangeType.fixed),
@@ -593,6 +604,8 @@ OiChangelogView(
 | `label` | `String` | Accessibility label (required) |
 | `onVersionTap` | `ValueChanged<OiVersionEntry>?` | Called when a version header is tapped |
 | `initiallyExpandedCount` | `int` | Number of versions expanded initially. Defaults to `3` |
+
+Note: `OiVersionEntry` uses `latest:` (not `isLatest:`) to flag the current release.
 | `showSearch` | `bool` | Show search bar. Defaults to `true` |
 | `showTypeFilters` | `bool` | Show change-type filter chips. Defaults to `true` |
 | `maxWidth` | `double` | Maximum content width. Defaults to `720` |

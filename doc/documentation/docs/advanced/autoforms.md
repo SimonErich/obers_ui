@@ -183,11 +183,3 @@ addTextField(MyField.step2Email,
 | `OiAfFileInput` | `OiFileInput` | `List<String>` |
 | `OiAfSegmentedControl` | `OiSegmentedControl` | `TValue` |
 
-## Migration from OiForm
-
-| Old | New |
-| --- | --- |
-| `OiForm` | `OiAfForm` |
-| `OiFormController` | `OiAfController` (subclass) |
-| `OiFormField` | `OiAfTextInput` / `OiAfSelect` / etc. |
-| `OiFormSection` | Any layout widget |

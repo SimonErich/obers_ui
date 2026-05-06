@@ -89,10 +89,11 @@ class OiQuantitySelector extends StatelessWidget {
   }
 
   Widget _buildValueDisplay(BuildContext context) {
-    final width = compact ? 28.0 : 36.0;
-    return SizedBox(
-      width: width,
+    final minWidth = compact ? 12.0 : 14.0;
+    return ConstrainedBox(
+      constraints: BoxConstraints(minWidth: minWidth),
       child: Center(
+        widthFactor: 1,
         child: compact
             ? OiLabel.small('$value', textAlign: TextAlign.center)
             : OiLabel.body('$value', textAlign: TextAlign.center),
@@ -125,6 +126,7 @@ class OiQuantitySelector extends StatelessWidget {
 
     Widget content = OiRow(
       breakpoint: breakpoint,
+      gap: OiResponsive<double>(compact ? 2 : 4),
       children: [
         _buildMinusButton(context),
         _buildValueDisplay(context),
@@ -136,7 +138,7 @@ class OiQuantitySelector extends StatelessWidget {
       borderRadius: context.radius.sm,
       border: OiBorderStyle.solid(colors.borderSubtle, 1),
       padding: EdgeInsets.symmetric(
-        horizontal: compact ? sp.xs : sp.sm,
+        horizontal: compact ? 2 : 4,
         vertical: compact ? 2 : sp.xs,
       ),
       child: content,

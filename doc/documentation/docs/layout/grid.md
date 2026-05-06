@@ -1,89 +1,177 @@
 # Grid System
 
-`OiGrid` is the primary layout widget for multi-column layouts. It behaves like CSS Grid — you define columns, and children fill them in order with optional span control.
+`OiGrid` is a CSS-Grid-style multi-column layout. You declare a column count
+(or a minimum column width) and children fill the columns in source order,
+with optional per-child spans.
+
+All numeric props (`columns`, `minColumnWidth`, `gap`, `rowGap`) use
+`OiResponsive<T>` — either a static `OiResponsive(value)` or a per-breakpoint
+`OiResponsive.breakpoints({...})`.
 
 ## Basic grid
 
 ```dart
 OiGrid(
-  columns: 3,
-  gap: context.spacing.md,
+  breakpoint: context.breakpoint,
+  columns: const OiResponsive<int>(3),
+  gap: const OiResponsive<double>(16),
   children: [
     CardWidget(),
     CardWidget(),
     CardWidget(),
-    CardWidget(),  // Wraps to second row
+    CardWidget(), // Wraps to the second row
   ],
+)
+```
+
+`gap` controls both horizontal and vertical spacing. Pass `rowGap` to use a
+different vertical gap:
+
+```dart
+OiGrid(
+  breakpoint: context.breakpoint,
+  columns: const OiResponsive<int>(3),
+  gap: const OiResponsive<double>(16),     // horizontal
+  rowGap: const OiResponsive<double>(24),  // vertical
+  children: [/* ... */],
 )
 ```
 
 ## Responsive columns
 
-Use `OiResponsive` to change the column count at different breakpoints:
+Change the column count per breakpoint:
 
 ```dart
 OiGrid(
-  columns: OiResponsive({
+  breakpoint: context.breakpoint,
+  columns: OiResponsive.breakpoints({
     OiBreakpoint.compact: 1,
     OiBreakpoint.medium: 2,
     OiBreakpoint.expanded: 3,
     OiBreakpoint.large: 4,
   }),
-  gap: context.spacing.md,
+  gap: const OiResponsive<double>(16),
   children: cards,
 )
 ```
 
-Values cascade upward — define `compact` and `expanded`, and medium inherits from compact while large inherits from expanded.
+Values cascade **down** from the active breakpoint: the grid walks from the
+current breakpoint toward smaller breakpoints and picks the first value it
+finds. So with only `compact` and `expanded` defined, `medium` resolves to
+the `compact` value (next smaller) and `large` resolves to `expanded`.
 
-## Spanning columns
+## Minimum column width
 
-Use `OiSpan` to make a child span multiple columns:
+Instead of a fixed count, let the grid compute columns from a minimum width:
 
 ```dart
 OiGrid(
-  columns: 3,
-  gap: context.spacing.md,
+  breakpoint: context.breakpoint,
+  minColumnWidth: const OiResponsive<double>(240),
+  gap: const OiResponsive<double>(16),
+  children: cards,
+)
+```
+
+The grid lays out as many columns as fit while respecting `minColumnWidth`.
+`columns` and `minColumnWidth` are mutually exclusive.
+
+## Container-relative breakpoints
+
+The default constructor resolves the breakpoint from the viewport. To
+resolve from the grid's own constraints (useful inside panels, splits, or
+nested layouts), use `OiGrid.containerRelative`:
+
+```dart
+OiGrid.containerRelative(
+  columns: OiResponsive.breakpoints({
+    OiBreakpoint.compact: 1,
+    OiBreakpoint.medium: 2,
+  }),
+  gap: const OiResponsive<double>(16),
+  children: cards,
+)
+```
+
+This variant re-layouts when its own width changes and does **not** rebuild
+on unrelated viewport changes.
+
+## Spanning columns
+
+Children opt into grid placement using the `.span()` extension (preferred)
+or by wrapping in an `OiSpan` widget directly.
+
+```dart
+OiGrid(
+  breakpoint: context.breakpoint,
+  columns: const OiResponsive<int>(3),
+  gap: const OiResponsive<double>(16),
   children: [
-    OiSpan(
-      columnSpan: 2,  // Spans 2 of 3 columns
-      child: WideCard(),
-    ),
+    WideCard().span(columnSpan: const OiResponsive<int>(2)),
     NarrowCard(),
-    OiSpan(
-      columnSpan: 3,  // Full width
-      child: FullWidthBanner(),
-    ),
+    FullWidthBanner().spanFull(), // Shorthand: span all columns
   ],
 )
 ```
 
+`spanFull()` is a shorthand for "span every column at every breakpoint."
+
 ## Span options
 
-`OiSpan` supports:
+`.span()` (and the underlying `OiSpanData`) accepts:
 
 | Property | Description |
 | --- | --- |
-| `columnSpan` | Number of columns to span |
-| `columnStart` | Explicit column start position |
-| `columnOrder` | Override visual order |
-| `rowSpan` | Number of rows to span |
+| `columnSpan` | How many columns the child occupies (default 1). |
+| `columnStart` | Explicit column start position (1-indexed). `null` = auto-place. |
+| `columnOrder` | Visual ordering; lower values render first. `null` = source order. |
+| `rowSpan` | How many rows the child occupies (default 1). |
 
-All properties accept `OiResponsive` values for per-breakpoint control.
+All four take `OiResponsive<int>?` so placement can change per breakpoint:
+
+```dart
+HeroCard().span(
+  columnSpan: OiResponsive.breakpoints({
+    OiBreakpoint.compact: 1,
+    OiBreakpoint.medium: 2,
+  }),
+)
+```
+
+## Row stretching
+
+By default, rows fit their tallest child. Set `stretchRows: true` to force
+every child in a row to the row's height (useful for card grids with
+matching heights):
+
+```dart
+OiGrid(
+  breakpoint: context.breakpoint,
+  columns: const OiResponsive<int>(3),
+  gap: const OiResponsive<double>(16),
+  stretchRows: true,
+  children: cards,
+)
+```
 
 ## Masonry layout
 
-For content with variable heights (images, cards), use `OiMasonry`:
+For content with variable heights where you don't want equal-height rows,
+use `OiMasonry`. It distributes children across columns round-robin (or
+honouring `columnStart`/`columnOrder` via `.span()`) and each column
+flows independently.
 
 ```dart
 OiMasonry(
-  columns: OiResponsive({
+  breakpoint: context.breakpoint,
+  columns: OiResponsive.breakpoints({
     OiBreakpoint.compact: 2,
     OiBreakpoint.expanded: 3,
   }),
-  gap: context.spacing.md,
+  gap: const OiResponsive<double>(12),
   children: imageCards,
 )
 ```
 
-Unlike `OiGrid`, masonry fills columns top-to-bottom by shortest column, avoiding empty gaps.
+Children with `columnSpan > 1` are rendered as full-width "breakers"
+between masonry sections rather than within a column.

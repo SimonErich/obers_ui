@@ -98,9 +98,12 @@ Container(
 )
 ```
 
+`OiRadiusScale` exposes the keys: `none`, `xs`, `sm`, `md`, `lg`, `xl`,
+`full` (fully rounded / pill shape).
+
 ## Shadows
 
-Elevation-based shadow tokens:
+Elevation-based shadow tokens — each key resolves to a `List<BoxShadow>`:
 
 ```dart
 Container(
@@ -110,22 +113,23 @@ Container(
 )
 ```
 
-Shadows automatically reduce:
-
-- **25%** on compact/touch devices
-- **15% opacity** reduction at 1x pixel density
+`OiShadowScale` exposes the keys: `none`, `xs`, `sm`, `md`, `lg`, `xl`,
+plus `glass` for frosted-glass surfaces.
 
 ## Effects
 
-`OiEffectsTheme` controls interactive state feedback:
+`OiEffectsTheme` controls interactive state feedback. Each state maps to an
+`OiInteractiveStyle` (background overlay, halo/glow, scale transform):
 
-- **Hover** — background overlay on mouse-over
-- **Focus** — focus ring color and width
-- **Active** — pressed / active state
-- **Dragging** — drag state visual
-- **Disabled** — 0.4 opacity
+- **hover** — pointer-over overlay
+- **focus** — focus ring style
+- **active** — pressed / tap-down state
+- **selected** — persistent selected state (used by toggles, list selection)
+- **dragging** — drag-in-progress style
+- **disabled** — 0.4 opacity, interaction suppressed
 
-These are consumed automatically by `OiTappable` and all interactive widgets. You rarely need to read them directly.
+These are consumed automatically by `OiTappable` and all interactive
+widgets. You rarely need to read them directly.
 
 ## Animations
 
@@ -144,4 +148,8 @@ AnimatedContainer(
 )
 ```
 
-When `reducedMotion` is enabled, all durations become `Duration.zero`.
+Reduced motion is controlled via the `reducedMotion: true` flag on
+`OiAnimationConfig.standard(...)` — when set, all durations collapse to
+`Duration.zero`. It's a constructor argument, not runtime magic: you wire
+it up yourself (e.g. from `MediaQuery.of(context).disableAnimations`) when
+constructing the theme.

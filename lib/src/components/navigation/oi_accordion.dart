@@ -242,40 +242,34 @@ class _OiAccordionState extends State<OiAccordion>
                       child: GestureDetector(
                         behavior: HitTestBehavior.opaque,
                         onTap: () => _toggle(i),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 14,
-                          ),
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: Text(
-                                  section.title,
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
-                                    color: colors.text,
-                                  ),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                section.title,
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  color: colors.text,
                                 ),
                               ),
-                              AnimatedRotation(
-                                turns: open ? 0.5 : 0.0,
-                                duration:
-                                    context.animations.reducedMotion ||
-                                        MediaQuery.disableAnimationsOf(context)
-                                    ? Duration.zero
-                                    : const Duration(milliseconds: 200),
-                                curve: Curves.easeInOut,
-                                child: Icon(
-                                  // chevron_down icon
-                                  OiIcons.chevronDown,
-                                  size: 18,
-                                  color: colors.textMuted,
-                                ),
+                            ),
+                            AnimatedRotation(
+                              turns: open ? 0.5 : 0.0,
+                              duration:
+                                  context.animations.reducedMotion ||
+                                      MediaQuery.disableAnimationsOf(context)
+                                  ? Duration.zero
+                                  : const Duration(milliseconds: 200),
+                              curve: Curves.easeInOut,
+                              child: Icon(
+                                // chevron_down icon
+                                OiIcons.chevronDown,
+                                size: 18,
+                                color: colors.textMuted,
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
                       ),
                     ),
@@ -284,27 +278,27 @@ class _OiAccordionState extends State<OiAccordion>
                     sizeFactor: _animations[i],
                     axisAlignment: -1,
                     child: Padding(
-                      padding: const EdgeInsets.fromLTRB(16, 0, 16, 14),
+                      padding: const EdgeInsets.only(top: 14),
                       child: Align(
-                        alignment: Alignment.topLeft,
-                        child: Builder(
-                          builder: (context) {
-                            final theme = context.theme;
-                            final tt = theme.textTheme;
-                            return OiThemeScope(
-                              data: theme.copyWith(
-                                textTheme: tt.copyWith(
-                                  body: tt.body.copyWith(fontSize: 14),
-                                  bodyStrong: tt.bodyStrong.copyWith(
-                                    fontSize: 14,
-                                  ),
+                      alignment: Alignment.topLeft,
+                      child: Builder(
+                        builder: (context) {
+                          final theme = context.theme;
+                          final tt = theme.textTheme;
+                          return OiThemeScope(
+                            data: theme.copyWith(
+                              textTheme: tt.copyWith(
+                                body: tt.body.copyWith(fontSize: 14),
+                                bodyStrong: tt.bodyStrong.copyWith(
+                                  fontSize: 14,
                                 ),
                               ),
-                              child: section.content,
-                            );
-                          },
-                        ),
+                            ),
+                            child: section.content,
+                          );
+                        },
                       ),
+                    ),
                     ),
                   ),
                 ],

@@ -19,7 +19,7 @@ ObersUI's theming system is designed with a simple philosophy: **easy to start, 
 OiThemeData
 ├── OiColorScheme        (semantic colors)
 ├── OiTextTheme          (14 text styles)
-├── OiSpacingScale       (6 spacing values + page gutters)
+├── OiSpacingScale       (6 core values `xs`–`xxl` + 5 per-breakpoint page gutters)
 ├── OiRadiusScale        (border radii)
 ├── OiShadowScale        (elevation shadows)
 ├── OiAnimationConfig    (durations + reduced motion)

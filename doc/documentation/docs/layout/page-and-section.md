@@ -1,89 +1,128 @@
 # Page & Section
 
-`OiPage` and `OiSection` work together to structure your content into well-organized, responsive pages.
+`OiPage` and `OiSection` are simple, explicit vertical-layout primitives that
+structure content into well-organized, responsive pages.
+
+Both widgets follow the library's **zero magic** principle: the active
+`breakpoint` is a required parameter — resolve it once at the page/layout level
+(e.g. `context.breakpoint`) and pass it down explicitly.
 
 ## OiPage
 
-A scrollable, max-width-centered container with responsive gutters:
+A full-page vertical layout that arranges `children` in a `Column` with
+optional responsive `gap` and `padding`:
 
 ```dart
 OiPage(
+  breakpoint: context.breakpoint,
+  gap: OiResponsive.breakpoints({
+    OiBreakpoint.compact: 16,
+    OiBreakpoint.expanded: 24,
+  }),
+  padding: OiResponsive.breakpoints({
+    OiBreakpoint.compact: EdgeInsets.all(16),
+    OiBreakpoint.expanded: EdgeInsets.all(32),
+  }),
   children: [
-    OiSection(title: 'Profile', child: ProfileForm()),
-    OiSection(title: 'Settings', child: SettingsPanel()),
+    OiSection(breakpoint: context.breakpoint, children: [/* ... */]),
+    OiSection(breakpoint: context.breakpoint, children: [/* ... */]),
   ],
 )
 ```
 
 **What it does:**
 
-- Centers content with a max width (configurable)
-- Adds responsive page gutters (16dp on compact, up to 48dp on extra-large)
-- Provides consistent vertical spacing between children
-- Optionally scrollable
+- Lays out `children` in a `Column` that fills available space by default
+  (`mainAxisSize: MainAxisSize.max`).
+- Inserts responsive `gap` spacing between children.
+- Optionally applies responsive `padding` around the content.
+- Defaults `crossAxisAlignment` to `CrossAxisAlignment.stretch` so children
+  fill the page width.
+
+### Parameters
+
+| Parameter | Type | Description |
+| --- | --- | --- |
+| `breakpoint` | `OiBreakpoint` | **Required.** The active breakpoint. |
+| `children` | `List<Widget>` | **Required.** The children to lay out vertically. |
+| `gap` | `OiResponsive<double>` | Spacing between children. Defaults to `0`. |
+| `padding` | `OiResponsive<EdgeInsetsGeometry>?` | Optional padding around the content. |
+| `crossAxisAlignment` | `CrossAxisAlignment` | Defaults to `CrossAxisAlignment.stretch`. |
+| `mainAxisSize` | `MainAxisSize` | Defaults to `MainAxisSize.max`. Use `MainAxisSize.min` for nesting. |
+| `scale` | `OiBreakpointScale` | Defaults to `OiBreakpointScale.defaultScale`. |
+
+`OiPage` is **not** scrollable on its own. Wrap it in a `SingleChildScrollView`
+(or place it inside a scrolling parent) if you need scrolling.
 
 ## OiSection
 
-Groups content with an optional header, description, icon, and actions:
+A semantic grouping widget that arranges `children` vertically with optional
+responsive `gap` and `padding`. It renders a `Semantics` container so assistive
+technologies can announce section boundaries.
 
 ```dart
 OiSection(
-  title: 'Notifications',
-  description: 'Choose how you want to be notified.',
-  icon: Icons.notifications,
-  actions: [
-    OiButton(label: 'Reset', variant: OiButtonVariant.ghost, onPressed: () {}),
+  breakpoint: context.breakpoint,
+  semanticLabel: 'Notifications',
+  gap: OiResponsive.breakpoints({
+    OiBreakpoint.compact: 8,
+    OiBreakpoint.expanded: 16,
+  }),
+  padding: OiResponsive.breakpoints({
+    OiBreakpoint.compact: EdgeInsets.all(16),
+    OiBreakpoint.expanded: EdgeInsets.all(32),
+  }),
+  children: [
+    // ...
   ],
-  child: NotificationSettings(),
 )
 ```
 
-### Aside layout
+### Parameters
 
-On wider screens, the header can sit to the left of the content:
+| Parameter | Type | Description |
+| --- | --- | --- |
+| `breakpoint` | `OiBreakpoint` | **Required.** The active breakpoint. |
+| `children` | `List<Widget>` | **Required.** The children to lay out vertically. |
+| `gap` | `OiResponsive<double>` | Spacing between children. Defaults to `0`. |
+| `padding` | `OiResponsive<EdgeInsetsGeometry>?` | Optional padding around the content. |
+| `crossAxisAlignment` | `CrossAxisAlignment` | Defaults to `CrossAxisAlignment.start`. |
+| `mainAxisSize` | `MainAxisSize` | Defaults to `MainAxisSize.min` — shrink-wraps its children. |
+| `semanticLabel` | `String?` | Optional label announced by assistive technologies. |
+| `scale` | `OiBreakpointScale` | Defaults to `OiBreakpointScale.defaultScale`. |
+
+`OiSection` does **not** render a visible header, title, icon, description,
+actions, or collapsible affordance — it is a structural/semantic primitive
+only. Compose visible headings from your own widgets as children.
+
+## Section with grid
+
+Combine sections with [`OiGrid`](./grid) for form layouts:
 
 ```dart
 OiSection(
-  title: 'Billing',
-  description: 'Manage your subscription and payment.',
-  aside: true,  // Header left, content right on expanded+
-  child: BillingForm(),
+  breakpoint: context.breakpoint,
+  gap: const OiResponsive<double>(16),
+  children: [
+    OiGrid(
+      breakpoint: context.breakpoint,
+      columns: OiResponsive.breakpoints({
+        OiBreakpoint.compact: 1,
+        OiBreakpoint.medium: 2,
+      }),
+      gap: const OiResponsive<double>(16),
+      children: [
+        const OiTextInput(label: 'First Name'),
+        const OiTextInput(label: 'Last Name'),
+        const OiTextInput(label: 'Email').span(
+          columnSpan: OiResponsive<int>(2),
+        ),
+      ],
+    ),
+  ],
 )
 ```
 
-On compact screens, it stacks vertically automatically.
-
-### Collapsible sections
-
-```dart
-OiSection(
-  title: 'Advanced Options',
-  collapsible: true,
-  initiallyCollapsed: true,
-  child: AdvancedSettings(),
-)
-```
-
-Collapsed state can be persisted via the settings system.
-
-### Section with grid
-
-Combine sections with grids for form layouts:
-
-```dart
-OiSection(
-  title: 'Contact Information',
-  child: OiGrid(
-    columns: OiResponsive({
-      OiBreakpoint.compact: 1,
-      OiBreakpoint.medium: 2,
-    }),
-    gap: context.spacing.md,
-    children: [
-      OiTextInput(label: 'First Name'),
-      OiTextInput(label: 'Last Name'),
-      OiSpan(columnSpan: 2, child: OiTextInput(label: 'Email')),
-    ],
-  ),
-)
-```
+Children can be positioned in the grid using the `.span()` extension (or the
+`OiSpan` widget) — see the [Grid documentation](./grid) for details on
+`columnSpan`, `columnStart`, `columnOrder`, and `rowSpan`.

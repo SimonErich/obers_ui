@@ -24,7 +24,7 @@ class OiNumberInput extends StatefulWidget {
     this.hint,
     this.error,
     this.enabled = true,
-    this.minWidth = 120,
+    this.minWidth = 48,
     super.key,
   });
 
@@ -61,7 +61,7 @@ class OiNumberInput extends StatefulWidget {
   /// Whether the field accepts input.
   final bool enabled;
 
-  /// Minimum width of the input. Defaults to 120.
+  /// Minimum width of the input. Defaults to 48.
   final double minWidth;
 
   @override
@@ -183,7 +183,7 @@ class _OiNumberInputState extends State<OiNumberInput> {
         onTap: isActive ? onTap : null,
         behavior: HitTestBehavior.opaque,
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8),
+          padding: const EdgeInsets.symmetric(horizontal: 2),
           child: Text(
             symbol,
             style: TextStyle(
@@ -208,6 +208,8 @@ class _OiNumberInputState extends State<OiNumberInput> {
           error: widget.error,
           focused: _focused,
           enabled: widget.enabled,
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+          leadingGap: 4,
           leading: _stepButton(
             '-',
             _decrement,
