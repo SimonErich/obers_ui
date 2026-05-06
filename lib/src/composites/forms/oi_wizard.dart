@@ -58,14 +58,20 @@ class OiWizardStep {
   const OiWizardStep({
     required this.title,
     required this.builder,
+    String? stepperLabel,
     this.subtitle,
     this.icon,
     this.validate,
     this.optional = false,
-  });
+  }) : _stepperLabel = stepperLabel;
 
   /// The title shown in the stepper and step header.
   final String title;
+
+  final String? _stepperLabel;
+
+  /// The label shown in the stepper. Defaults to [title] if not provided.
+  String get stepperLabel => _stepperLabel ?? title;
 
   /// An optional subtitle shown below the title.
   final String? subtitle;
@@ -305,7 +311,7 @@ class _OiWizardState extends State<OiWizard> {
           totalSteps: widget.steps.length,
           currentStep: _currentStep,
           style: widget.stepperStyle,
-          stepLabels: widget.steps.map((s) => s.title).toList(),
+          stepLabels: widget.steps.map((s) => s.stepperLabel).toList(),
           stepIcons: widget.steps.any((s) => s.icon != null)
               ? widget.steps.map((s) => s.icon ?? const IconData(0)).toList()
               : null,

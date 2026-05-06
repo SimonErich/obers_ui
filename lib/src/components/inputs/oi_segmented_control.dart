@@ -199,16 +199,26 @@ class _OiSegmentedControlState<T> extends State<OiSegmentedControl<T>> {
     final colors = context.colors;
     final radius = context.radius;
     final animations = context.animations;
+    final themeData = context.components.segmentedControl;
+
+    final selectedColor = themeData?.selectedColor ?? colors.primary.muted;
+    final backgroundColor = themeData?.backgroundColor ?? colors.surface;
+    final selectedTextColor =
+        themeData?.selectedTextColor ?? colors.primary.foreground;
+    final unselectedTextColor = themeData?.unselectedTextColor ?? colors.text;
+    final borderColor = themeData?.borderColor ?? colors.border;
 
     final reducedMotion =
         animations.reducedMotion || MediaQuery.disableAnimationsOf(context);
     final animDuration = reducedMotion ? Duration.zero : animations.fast;
 
-    final segmentHeight = switch (widget.size) {
-      OiSegmentedControlSize.small => 28.0,
-      OiSegmentedControlSize.medium => 36.0,
-      OiSegmentedControlSize.large => 44.0,
-    };
+    final segmentHeight =
+        themeData?.height ??
+        switch (widget.size) {
+          OiSegmentedControlSize.small => 28.0,
+          OiSegmentedControlSize.medium => 36.0,
+          OiSegmentedControlSize.large => 44.0,
+        };
 
     final fontSize = switch (widget.size) {
       OiSegmentedControlSize.small => 12.0,
@@ -228,8 +238,8 @@ class _OiSegmentedControlState<T> extends State<OiSegmentedControl<T>> {
       OiSegmentedControlSize.large => 16.0,
     };
 
-    // Resolve the base radius value from the theme's sm scale.
-    final baseRadius = radius.sm.topLeft;
+    // Resolve the base radius value from the theme override or sm scale.
+    final baseRadius = themeData?.borderRadius?.topLeft ?? radius.sm.topLeft;
 
     final children = <Widget>[];
 
@@ -248,8 +258,8 @@ class _OiSegmentedControlState<T> extends State<OiSegmentedControl<T>> {
         bottomRight: isLast ? baseRadius : Radius.zero,
       );
 
-      final bgColor = isSelected ? colors.primary.muted : colors.surface;
-      final textColor = isSelected ? colors.primary.foreground : colors.text;
+      final bgColor = isSelected ? selectedColor : backgroundColor;
+      final textColor = isSelected ? selectedTextColor : unselectedTextColor;
 
       // Build label content.
       Widget labelWidget = Text(
@@ -279,14 +289,14 @@ class _OiSegmentedControlState<T> extends State<OiSegmentedControl<T>> {
       // Build the segment border. Shared borders: only the left border is
       // drawn on non-first segments to avoid double borders.
       final segmentBorder = Border(
-        top: BorderSide(color: colors.border),
-        bottom: BorderSide(color: colors.border),
+        top: BorderSide(color: borderColor),
+        bottom: BorderSide(color: borderColor),
         left: isFirst
-            ? BorderSide(color: colors.border)
-            : BorderSide(color: colors.border, width: 0.5),
+            ? BorderSide(color: borderColor)
+            : BorderSide(color: borderColor, width: 0.5),
         right: isLast
-            ? BorderSide(color: colors.border)
-            : BorderSide(color: colors.border, width: 0.5),
+            ? BorderSide(color: borderColor)
+            : BorderSide(color: borderColor, width: 0.5),
       );
 
       Widget segmentWidget = AnimatedContainer(
