@@ -33,6 +33,8 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   golden_toolkit: ^0.15.0
+  marqably_dart_qa_rules:
+    git: git@git.duko.at:flutter/dart-flutter-qa-rules.git
   mocktail: ^1.0.4
   obers_ui_charts:
     path: packages/obers_ui_charts
