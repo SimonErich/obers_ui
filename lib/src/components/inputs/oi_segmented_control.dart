@@ -60,7 +60,8 @@ enum OiSegmentedControlSize {
   large,
 }
 
-/// An exclusive segment toggle that renders 2–5 options as connected buttons.
+/// An exclusive segment toggle that renders up to 5 options as connected
+/// buttons (2–5 in typical use).
 ///
 /// Exactly one segment is selected at a time. Tapping an inactive segment fires
 /// [onChanged] with the corresponding [OiSegment.value].
@@ -97,12 +98,13 @@ class OiSegmentedControl<T> extends StatefulWidget {
     this.expand = false,
     this.semanticLabel,
     super.key,
-  }) : assert(segments.length >= 2, 'At least 2 segments are required'),
-       assert(segments.length <= 5, 'At most 5 segments are allowed');
+  }) : assert(segments.length <= 5, 'At most 5 segments are allowed');
 
   /// The list of segments to display.
   ///
-  /// Must contain between 2 and 5 entries (inclusive).
+  /// May contain up to 5 entries. Typically 2–5 segments are used. As a
+  /// safeguard against dynamic data, the control degrades gracefully: an empty
+  /// list renders nothing, and a single segment renders as a standalone pill.
   final List<OiSegment<T>> segments;
 
   /// The currently selected segment value.
@@ -196,6 +198,13 @@ class _OiSegmentedControlState<T> extends State<OiSegmentedControl<T>> {
 
   @override
   Widget build(BuildContext context) {
+    // Degrade gracefully when segment data is empty (e.g. from a dynamic list)
+    // rather than throwing. A single segment falls through and renders as a
+    // standalone pill via the loop below.
+    if (widget.segments.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
     final colors = context.colors;
     final radius = context.radius;
     final animations = context.animations;
