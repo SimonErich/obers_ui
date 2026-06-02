@@ -280,25 +280,25 @@ class _OiAccordionState extends State<OiAccordion>
                     child: Padding(
                       padding: const EdgeInsets.only(top: 14),
                       child: Align(
-                      alignment: Alignment.topLeft,
-                      child: Builder(
-                        builder: (context) {
-                          final theme = context.theme;
-                          final tt = theme.textTheme;
-                          return OiThemeScope(
-                            data: theme.copyWith(
-                              textTheme: tt.copyWith(
-                                body: tt.body.copyWith(fontSize: 14),
-                                bodyStrong: tt.bodyStrong.copyWith(
-                                  fontSize: 14,
+                        alignment: Alignment.topLeft,
+                        child: Builder(
+                          builder: (context) {
+                            final theme = context.theme;
+                            final tt = theme.textTheme;
+                            return OiThemeScope(
+                              data: theme.copyWith(
+                                textTheme: tt.copyWith(
+                                  body: tt.body.copyWith(fontSize: 14),
+                                  bodyStrong: tt.bodyStrong.copyWith(
+                                    fontSize: 14,
+                                  ),
                                 ),
                               ),
-                            ),
-                            child: section.content,
-                          );
-                        },
+                              child: section.content,
+                            );
+                          },
+                        ),
                       ),
-                    ),
                     ),
                   ),
                 ],

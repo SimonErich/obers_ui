@@ -1,7 +1,7 @@
 // Golden tests have no public API.
 
+import 'package:alchemist/alchemist.dart';
 import 'package:flutter/widgets.dart';
-import 'package:golden_toolkit/golden_toolkit.dart';
 import 'package:obers_ui/obers_ui.dart';
 
 import '../../helpers/golden_helper.dart';
@@ -49,37 +49,29 @@ void _noop(OiPaymentMethod _) {}
 
 // ── Tests ────────────────────────────────────────────────────────────────────
 
-void main() {
-  testGoldens('OiPaymentMethodPicker 3 methods + addNewCard — light', (
-    tester,
-  ) async {
-    final builder = obersGoldenBuilder(
+Future<void> main() async {
+  await goldenTest(
+    'OiPaymentMethodPicker 3 methods + addNewCard — light',
+    fileName: 'oi_payment_method_picker_3_methods_add_card_light',
+    builder: () => obersGoldenGroup(
       columns: 1,
+      cellSize: const Size(440, 440),
       children: {
         '3 methods + addNewCard, visa selected': _buildPaymentPickerGolden(),
       },
-    );
-    await tester.pumpWidgetBuilder(builder);
-    await screenMatchesGolden(
-      tester,
-      'oi_payment_method_picker_3_methods_add_card_light',
-    );
-  });
+    ),
+  );
 
-  testGoldens('OiPaymentMethodPicker 3 methods + addNewCard — dark', (
-    tester,
-  ) async {
-    final builder = obersGoldenBuilder(
+  await goldenTest(
+    'OiPaymentMethodPicker 3 methods + addNewCard — dark',
+    fileName: 'oi_payment_method_picker_3_methods_add_card_dark',
+    builder: () => obersGoldenGroup(
       columns: 1,
       theme: OiThemeData.dark(),
+      cellSize: const Size(440, 440),
       children: {
         '3 methods + addNewCard, visa selected': _buildPaymentPickerGolden(),
       },
-    );
-    await tester.pumpWidgetBuilder(builder);
-    await screenMatchesGolden(
-      tester,
-      'oi_payment_method_picker_3_methods_add_card_dark',
-    );
-  });
+    ),
+  );
 }

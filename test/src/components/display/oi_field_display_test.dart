@@ -4,9 +4,9 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:alchemist/alchemist.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:golden_toolkit/golden_toolkit.dart';
 import 'package:obers_ui/src/components/display/oi_badge.dart';
 import 'package:obers_ui/src/components/display/oi_code_block.dart';
 import 'package:obers_ui/src/components/display/oi_field_display.dart';
@@ -976,152 +976,161 @@ void main() {
       HttpOverrides.global = previousOverrides;
     });
 
-    testGoldens('OiFieldDisplay golden — text types', (tester) async {
-      final builder = obersGoldenBuilder(
-        columns: 3,
-        children: {
-          'Text': const OiFieldDisplay(label: _l, value: 'Hello World'),
-          'Number': const OiFieldDisplay(
-            label: _l,
-            value: 1234567,
-            type: OiFieldType.number,
-          ),
-          'Currency': const OiFieldDisplay(
-            label: _l,
-            value: 99.99,
-            type: OiFieldType.currency,
-            currencySymbol: r'$',
-          ),
-          'Date': OiFieldDisplay(
-            label: _l,
-            value: DateTime(2024, 3, 15),
-            type: OiFieldType.date,
-          ),
-          'DateTime': OiFieldDisplay(
-            label: _l,
-            value: DateTime(2024, 3, 15, 14, 30),
-            type: OiFieldType.dateTime,
-          ),
-          'JSON': const OiFieldDisplay(
-            label: _l,
-            value: '{"key":"value"}',
-            type: OiFieldType.json,
-          ),
-        },
-      );
-      await tester.pumpWidgetBuilder(builder);
-      await screenMatchesGolden(tester, 'oi_field_display_unit_text_types');
-    });
+    unawaited(
+      goldenTest(
+        'OiFieldDisplay golden — text types',
+        fileName: 'oi_field_display_unit_text_types',
+        builder: () => obersGoldenGroup(
+          columns: 3,
+          cellSize: const Size(300, 160),
+          children: {
+            'Text': const OiFieldDisplay(label: _l, value: 'Hello World'),
+            'Number': const OiFieldDisplay(
+              label: _l,
+              value: 1234567,
+              type: OiFieldType.number,
+            ),
+            'Currency': const OiFieldDisplay(
+              label: _l,
+              value: 99.99,
+              type: OiFieldType.currency,
+              currencySymbol: r'$',
+            ),
+            'Date': OiFieldDisplay(
+              label: _l,
+              value: DateTime(2024, 3, 15),
+              type: OiFieldType.date,
+            ),
+            'DateTime': OiFieldDisplay(
+              label: _l,
+              value: DateTime(2024, 3, 15, 14, 30),
+              type: OiFieldType.dateTime,
+            ),
+            'JSON': const OiFieldDisplay(
+              label: _l,
+              value: '{"key":"value"}',
+              type: OiFieldType.json,
+            ),
+          },
+        ),
+      ),
+    );
 
-    testGoldens('OiFieldDisplay golden — interactive types', (tester) async {
-      final builder = obersGoldenBuilder(
-        columns: 3,
-        children: {
-          'Boolean true': const OiFieldDisplay(
-            label: _l,
-            value: true,
-            type: OiFieldType.boolean,
-          ),
-          'Boolean false': const OiFieldDisplay(
-            label: _l,
-            value: false,
-            type: OiFieldType.boolean,
-          ),
-          'Boolean null': const OiFieldDisplay(
-            label: _l,
-            value: null,
-            type: OiFieldType.boolean,
-          ),
-          'Email': const OiFieldDisplay(
-            label: _l,
-            value: 'user@example.com',
-            type: OiFieldType.email,
-          ),
-          'URL': const OiFieldDisplay(
-            label: _l,
-            value: 'https://example.com',
-            type: OiFieldType.url,
-          ),
-          'Phone': const OiFieldDisplay(
-            label: _l,
-            value: '+1-555-0123',
-            type: OiFieldType.phone,
-          ),
-        },
-      );
-      await tester.pumpWidgetBuilder(builder);
-      await screenMatchesGolden(
-        tester,
-        'oi_field_display_unit_interactive_types',
-      );
-    });
+    unawaited(
+      goldenTest(
+        'OiFieldDisplay golden — interactive types',
+        fileName: 'oi_field_display_unit_interactive_types',
+        builder: () => obersGoldenGroup(
+          columns: 3,
+          cellSize: const Size(300, 160),
+          children: {
+            'Boolean true': const OiFieldDisplay(
+              label: _l,
+              value: true,
+              type: OiFieldType.boolean,
+            ),
+            'Boolean false': const OiFieldDisplay(
+              label: _l,
+              value: false,
+              type: OiFieldType.boolean,
+            ),
+            'Boolean null': const OiFieldDisplay(
+              label: _l,
+              value: null,
+              type: OiFieldType.boolean,
+            ),
+            'Email': const OiFieldDisplay(
+              label: _l,
+              value: 'user@example.com',
+              type: OiFieldType.email,
+            ),
+            'URL': const OiFieldDisplay(
+              label: _l,
+              value: 'https://example.com',
+              type: OiFieldType.url,
+            ),
+            'Phone': const OiFieldDisplay(
+              label: _l,
+              value: '+1-555-0123',
+              type: OiFieldType.phone,
+            ),
+          },
+        ),
+      ),
+    );
 
-    testGoldens('OiFieldDisplay golden — rich types', (tester) async {
-      final builder = obersGoldenBuilder(
-        columns: 3,
-        children: {
-          'File': const OiFieldDisplay(
-            label: _l,
-            value: '/path/to/document.pdf',
-            type: OiFieldType.file,
-          ),
-          'File (map)': const OiFieldDisplay(
-            label: _l,
-            value: {'name': 'report.pdf', 'size': 1048576},
-            type: OiFieldType.file,
-          ),
-          'Select': const OiFieldDisplay(
-            label: _l,
-            value: 'active',
-            type: OiFieldType.select,
-            choices: {'active': 'Active'},
-            choiceColors: {'active': OiBadgeColor.success},
-          ),
-          'Tags': const OiFieldDisplay(
-            label: _l,
-            value: ['flutter', 'dart', 'ui'],
-            type: OiFieldType.tags,
-          ),
-          'Color': const OiFieldDisplay(
-            label: _l,
-            value: '#3B82F6',
-            type: OiFieldType.color,
-          ),
-        },
-      );
-      await tester.pumpWidgetBuilder(builder);
-      await screenMatchesGolden(tester, 'oi_field_display_unit_rich_types');
-    });
+    unawaited(
+      goldenTest(
+        'OiFieldDisplay golden — rich types',
+        fileName: 'oi_field_display_unit_rich_types',
+        builder: () => obersGoldenGroup(
+          columns: 3,
+          cellSize: const Size(300, 160),
+          children: {
+            'File': const OiFieldDisplay(
+              label: _l,
+              value: '/path/to/document.pdf',
+              type: OiFieldType.file,
+            ),
+            'File (map)': const OiFieldDisplay(
+              label: _l,
+              value: {'name': 'report.pdf', 'size': 1048576},
+              type: OiFieldType.file,
+            ),
+            'Select': const OiFieldDisplay(
+              label: _l,
+              value: 'active',
+              type: OiFieldType.select,
+              choices: {'active': 'Active'},
+              choiceColors: {'active': OiBadgeColor.success},
+            ),
+            'Tags': const OiFieldDisplay(
+              label: _l,
+              value: ['flutter', 'dart', 'ui'],
+              type: OiFieldType.tags,
+            ),
+            'Color': const OiFieldDisplay(
+              label: _l,
+              value: '#3B82F6',
+              type: OiFieldType.color,
+            ),
+          },
+        ),
+      ),
+    );
 
-    testGoldens('OiFieldDisplay golden — states and pair', (tester) async {
-      final builder = obersGoldenBuilder(
-        columns: 3,
-        children: {
-          'Empty (null)': const OiFieldDisplay(label: _l, value: null),
-          'Custom format': OiFieldDisplay(
-            label: _l,
-            value: 42,
-            type: OiFieldType.number,
-            formatValue: (v) => 'Custom: $v',
-          ),
-          'Pair horizontal': const OiFieldDisplay.pair(
-            label: 'Name',
-            value: 'Alice',
-          ),
-          'Pair vertical': const OiFieldDisplay.pair(
-            label: 'Email',
-            value: 'alice@example.com',
-            direction: Axis.vertical,
-          ),
-          'Custom type': const OiFieldDisplay(
-            label: _l,
-            value: 'custom data',
-            type: OiFieldType.custom,
-          ),
-        },
-      );
-      await tester.pumpWidgetBuilder(builder);
-      await screenMatchesGolden(tester, 'oi_field_display_unit_states_pair');
-    });
+    unawaited(
+      goldenTest(
+        'OiFieldDisplay golden — states and pair',
+        fileName: 'oi_field_display_unit_states_pair',
+        builder: () => obersGoldenGroup(
+          columns: 3,
+          cellSize: const Size(300, 160),
+          children: {
+            'Empty (null)': const OiFieldDisplay(label: _l, value: null),
+            'Custom format': OiFieldDisplay(
+              label: _l,
+              value: 42,
+              type: OiFieldType.number,
+              formatValue: (v) => 'Custom: $v',
+            ),
+            'Pair horizontal': const OiFieldDisplay.pair(
+              label: 'Name',
+              value: 'Alice',
+            ),
+            'Pair vertical': const OiFieldDisplay.pair(
+              label: 'Email',
+              value: 'alice@example.com',
+              direction: Axis.vertical,
+            ),
+            'Custom type': const OiFieldDisplay(
+              label: _l,
+              value: 'custom data',
+              type: OiFieldType.custom,
+            ),
+          },
+        ),
+      ),
+    );
   });
 }

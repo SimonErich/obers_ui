@@ -1,14 +1,14 @@
 // Golden tests have no public API.
 
+import 'package:alchemist/alchemist.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:golden_toolkit/golden_toolkit.dart';
 import 'package:obers_ui/src/composites/navigation/oi_sidebar.dart';
+import 'package:obers_ui/src/foundation/oi_app.dart';
+import 'package:obers_ui/src/foundation/theme/oi_theme_data.dart';
 import 'package:obers_ui/src/modules/oi_app_shell.dart';
 
-import '../../helpers/pump_app.dart';
-
-void main() {
+Future<void> main() async {
   final testNav = [
     const OiNavItem(
       label: 'Dashboard',
@@ -40,82 +40,100 @@ void main() {
     ),
   ];
 
-  testGoldens('OiAppShell — desktop expanded', (tester) async {
-    await tester.pumpObers(
-      OiAppShell(
-        label: 'Admin',
-        navigation: testNav,
-        currentRoute: '/dashboard',
-        title: 'Dashboard',
-        leading: const Text('MyApp'),
+  Widget shell({List<Widget>? actions, Widget? userMenu}) => OiAppShell(
+    label: 'Admin',
+    navigation: testNav,
+    currentRoute: '/dashboard',
+    title: 'Dashboard',
+    leading: const Text('MyApp'),
+    actions: actions,
+    userMenu: userMenu,
+    child: const Center(child: Text('Page content')),
+  );
+
+  await goldenTest(
+    'OiAppShell — desktop expanded',
+    fileName: 'oi_app_shell_desktop_expanded',
+    constraints: const BoxConstraints.tightFor(width: 1200, height: 800),
+    pumpBeforeTest: (tester) async {
+      await _setSurface(tester, const Size(1200, 800));
+    },
+    builder: () => _OiAppShellHarness(
+      child: shell(
         actions: const [Text('Action')],
         userMenu: const Text('JohnDoe'),
-        child: const Center(child: Text('Page content')),
       ),
-      surfaceSize: const Size(1200, 800),
-    );
-    await tester.pumpAndSettle();
+    ),
+  );
 
-    await screenMatchesGolden(tester, 'oi_app_shell_desktop_expanded');
+  await goldenTest(
+    'OiAppShell — desktop collapsed',
+    fileName: 'oi_app_shell_desktop_collapsed',
+    constraints: const BoxConstraints.tightFor(width: 1200, height: 800),
+    pumpBeforeTest: (tester) async {
+      await _setSurface(tester, const Size(1200, 800));
+      final handle = tester.ensureSemantics();
+      // Collapse the sidebar before snapshotting.
+      final collapseFinder = find.byWidgetPredicate(
+        (w) => w is Semantics && w.properties.label == 'Collapse sidebar',
+      );
+      await tester.tap(collapseFinder);
+      await tester.pumpAndSettle();
+
+      final sidebar = tester.widget<OiSidebar>(find.byType(OiSidebar));
+      assert(
+        sidebar.mode == OiSidebarMode.compact,
+        'sidebar should be in compact mode after collapse',
+      );
+      handle.dispose();
+    },
+    builder: () => _OiAppShellHarness(child: shell()),
+  );
+
+  await goldenTest(
+    'OiAppShell — mobile drawer open',
+    fileName: 'oi_app_shell_mobile_drawer_open',
+    // 480 (still below the mobile breakpoint) gives the CI-variant Ahem text,
+    // which is wider than real glyphs, room to fit the top bar without a
+    // RenderFlex overflow. Real-font (Linux) goldens are unaffected.
+    constraints: const BoxConstraints.tightFor(width: 480, height: 600),
+    pumpBeforeTest: (tester) async {
+      await _setSurface(tester, const Size(480, 600));
+      final handle = tester.ensureSemantics();
+      // Open the drawer via the hamburger before snapshotting.
+      final hamburgerFinder = find.byWidgetPredicate(
+        (w) => w is Semantics && w.properties.label == 'Open navigation',
+      );
+      await tester.tap(hamburgerFinder);
+      await tester.pumpAndSettle();
+      handle.dispose();
+    },
+    builder: () => _OiAppShellHarness(child: shell()),
+  );
+}
+
+/// Sets the test surface + view size so OiAppShell's MediaQuery-driven
+/// mobile/desktop breakpoint resolves correctly. Reset after the test.
+Future<void> _setSurface(WidgetTester tester, Size size) async {
+  await tester.binding.setSurfaceSize(size);
+  tester.view.physicalSize = size;
+  tester.view.devicePixelRatio = 1.0;
+  addTearDown(() {
+    tester.view.resetPhysicalSize();
+    tester.view.resetDevicePixelRatio();
   });
+  await tester.pumpAndSettle();
+}
 
-  testGoldens('OiAppShell — desktop collapsed', (tester) async {
-    final handle = tester.ensureSemantics();
+/// Wraps a full-screen [OiAppShell] in [OiApp] for golden capture. The shell
+/// fills the bounded surface set via `goldenTest`'s `constraints`.
+class _OiAppShellHarness extends StatelessWidget {
+  const _OiAppShellHarness({required this.child});
 
-    await tester.pumpObers(
-      OiAppShell(
-        label: 'Admin',
-        navigation: testNav,
-        currentRoute: '/dashboard',
-        title: 'Dashboard',
-        leading: const Text('MyApp'),
-        child: const Center(child: Text('Page content')),
-      ),
-      surfaceSize: const Size(1200, 800),
-    );
+  final Widget child;
 
-    // Collapse the sidebar.
-    final collapseFinder = find.byWidgetPredicate(
-      (w) => w is Semantics && w.properties.label == 'Collapse sidebar',
-    );
-    await tester.tap(collapseFinder);
-    await tester.pumpAndSettle();
-
-    // Verify collapsed state before snapshot.
-    final sidebar = tester.widget<OiSidebar>(find.byType(OiSidebar));
-    assert(
-      sidebar.mode == OiSidebarMode.compact,
-      'sidebar should be in compact mode after collapse',
-    );
-
-    await screenMatchesGolden(tester, 'oi_app_shell_desktop_collapsed');
-
-    handle.dispose();
-  });
-
-  testGoldens('OiAppShell — mobile drawer open', (tester) async {
-    final handle = tester.ensureSemantics();
-
-    await tester.pumpObers(
-      OiAppShell(
-        label: 'Admin',
-        navigation: testNav,
-        currentRoute: '/dashboard',
-        title: 'Dashboard',
-        child: const Center(child: Text('Page content')),
-      ),
-      surfaceSize: const Size(400, 600),
-    );
-
-    // Open the drawer via hamburger.
-    final hamburgerFinder = find.byWidgetPredicate(
-      (w) => w is Semantics && w.properties.label == 'Open navigation',
-    );
-    await tester.tap(hamburgerFinder);
-    await tester.pumpAndSettle();
-
-    await screenMatchesGolden(tester, 'oi_app_shell_mobile_drawer_open');
-
-    handle.dispose();
-  });
+  @override
+  Widget build(BuildContext context) {
+    return OiApp(theme: OiThemeData.light(), home: child);
+  }
 }

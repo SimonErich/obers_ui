@@ -1,15 +1,17 @@
 // Golden tests have no public API.
 
-import 'package:golden_toolkit/golden_toolkit.dart';
+import 'package:alchemist/alchemist.dart';
 import 'package:obers_ui/obers_ui.dart';
 
 import '../../helpers/golden_helper.dart';
 
-void main() {
+Future<void> main() async {
   // ── OiBadge ───────────────────────────────────────────────────────────────
 
-  testGoldens('OiBadge variants — light', (tester) async {
-    final builder = obersGoldenBuilder(
+  await goldenTest(
+    'OiBadge variants — light',
+    fileName: 'oi_badge_variants_light',
+    builder: () => obersGoldenGroup(
       columns: 4,
       children: {
         'Primary filled': const OiBadge.filled(label: 'New'),
@@ -40,13 +42,13 @@ void main() {
         'Soft': const OiBadge.soft(label: 'Draft'),
         'Outline': const OiBadge.outline(label: 'v2.1'),
       },
-    );
-    await tester.pumpWidgetBuilder(builder);
-    await screenMatchesGolden(tester, 'oi_badge_variants_light');
-  });
+    ),
+  );
 
-  testGoldens('OiBadge variants — dark', (tester) async {
-    final builder = obersGoldenBuilder(
+  await goldenTest(
+    'OiBadge variants — dark',
+    fileName: 'oi_badge_variants_dark',
+    builder: () => obersGoldenGroup(
       columns: 4,
       theme: OiThemeData.dark(),
       children: {
@@ -78,15 +80,15 @@ void main() {
         'Soft': const OiBadge.soft(label: 'Draft'),
         'Outline': const OiBadge.outline(label: 'v2.1'),
       },
-    );
-    await tester.pumpWidgetBuilder(builder);
-    await screenMatchesGolden(tester, 'oi_badge_variants_dark');
-  });
+    ),
+  );
 
   // ── OiAvatar ──────────────────────────────────────────────────────────────
 
-  testGoldens('OiAvatar variants — light', (tester) async {
-    final builder = obersGoldenBuilder(
+  await goldenTest(
+    'OiAvatar variants — light',
+    fileName: 'oi_avatar_variants_light',
+    builder: () => obersGoldenGroup(
       children: {
         'Initials': const OiAvatar(
           semanticLabel: 'User avatar',
@@ -97,13 +99,13 @@ void main() {
           icon: OiIcons.user,
         ),
       },
-    );
-    await tester.pumpWidgetBuilder(builder);
-    await screenMatchesGolden(tester, 'oi_avatar_variants_light');
-  });
+    ),
+  );
 
-  testGoldens('OiAvatar variants — dark', (tester) async {
-    final builder = obersGoldenBuilder(
+  await goldenTest(
+    'OiAvatar variants — dark',
+    fileName: 'oi_avatar_variants_dark',
+    builder: () => obersGoldenGroup(
       theme: OiThemeData.dark(),
       children: {
         'Initials': const OiAvatar(
@@ -115,15 +117,15 @@ void main() {
           icon: OiIcons.user,
         ),
       },
-    );
-    await tester.pumpWidgetBuilder(builder);
-    await screenMatchesGolden(tester, 'oi_avatar_variants_dark');
-  });
+    ),
+  );
 
   // ── OiProgress ────────────────────────────────────────────────────────────
 
-  testGoldens('OiProgress variants — light', (tester) async {
-    final builder = obersGoldenBuilder(
+  await goldenTest(
+    'OiProgress variants — light',
+    fileName: 'oi_progress_variants_light',
+    builder: () => obersGoldenGroup(
       children: {
         'Linear 0%': const OiProgress.linear(),
         'Linear 50%': const OiProgress.linear(value: 0.5),
@@ -131,13 +133,13 @@ void main() {
         'Circular 75%': const OiProgress.circular(value: 0.75),
         'Steps 2/5': const OiProgress.steps(steps: 5, currentStep: 2),
       },
-    );
-    await tester.pumpWidgetBuilder(builder);
-    await screenMatchesGolden(tester, 'oi_progress_variants_light');
-  });
+    ),
+  );
 
-  testGoldens('OiProgress variants — dark', (tester) async {
-    final builder = obersGoldenBuilder(
+  await goldenTest(
+    'OiProgress variants — dark',
+    fileName: 'oi_progress_variants_dark',
+    builder: () => obersGoldenGroup(
       theme: OiThemeData.dark(),
       children: {
         'Linear 0%': const OiProgress.linear(),
@@ -146,8 +148,6 @@ void main() {
         'Circular 75%': const OiProgress.circular(value: 0.75),
         'Steps 2/5': const OiProgress.steps(steps: 5, currentStep: 2),
       },
-    );
-    await tester.pumpWidgetBuilder(builder);
-    await screenMatchesGolden(tester, 'oi_progress_variants_dark');
-  });
+    ),
+  );
 }

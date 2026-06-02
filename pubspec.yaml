@@ -29,10 +29,10 @@ flutter:
         - asset: lib/src/foundation/icons/lucide.ttf
 
 dev_dependencies:
+  alchemist: ^0.14.0
   custom_lint: ^0.8.0
   flutter_test:
     sdk: flutter
-  golden_toolkit: ^0.15.0
   mocktail: ^1.0.4
   obers_ui_charts:
     path: packages/obers_ui_charts

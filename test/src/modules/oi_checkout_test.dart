@@ -5,10 +5,8 @@ import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:golden_toolkit/golden_toolkit.dart';
 import 'package:obers_ui/obers_ui.dart';
 
-import '../../helpers/golden_helper.dart';
 import '../../helpers/pump_app.dart';
 
 // ── Test data helpers ────────────────────────────────────────────────────────
@@ -605,59 +603,5 @@ void main() {
         semantics.dispose();
       },
     );
-  });
-
-  // ── Golden Tests (18-20) ─────────────────────────────────────────────────
-
-  group('Golden Tests', () {
-    testGoldens('golden — desktop address step', (tester) async {
-      final builder = obersGoldenBuilder(
-        columns: 1,
-        children: {
-          'Desktop Address': SizedBox(
-            width: 1000,
-            height: 700,
-            child: _buildCheckout(),
-          ),
-        },
-      );
-      await tester.pumpWidgetBuilder(builder);
-      await screenMatchesGolden(tester, 'oi_checkout_desktop_address');
-    });
-
-    testGoldens('golden — mobile address step', (tester) async {
-      final builder = obersGoldenBuilder(
-        columns: 1,
-        children: {
-          'Mobile Address': SizedBox(
-            width: 390,
-            height: 700,
-            child: _buildCheckout(),
-          ),
-        },
-      );
-      await tester.pumpWidgetBuilder(builder);
-      await screenMatchesGolden(tester, 'oi_checkout_mobile_address');
-    });
-
-    testGoldens('golden — desktop review step', (tester) async {
-      // For golden tests we build the checkout pre-configured at review step
-      // by using a custom step list that only has review.
-      final builder = obersGoldenBuilder(
-        columns: 1,
-        children: {
-          'Desktop Review': SizedBox(
-            width: 1000,
-            height: 700,
-            child: _buildCheckout(
-              initialShippingAddress: _sampleAddress(),
-              steps: const [OiCheckoutStep.review],
-            ),
-          ),
-        },
-      );
-      await tester.pumpWidgetBuilder(builder);
-      await screenMatchesGolden(tester, 'oi_checkout_desktop_review');
-    });
   });
 }

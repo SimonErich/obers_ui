@@ -1,9 +1,13 @@
 // Tests do not require documentation comments.
 
+import 'dart:async';
+
+import 'package:alchemist/alchemist.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui/src/components/display/oi_file_icon.dart';
 
+import '../../../helpers/golden_helper.dart';
 import '../../../helpers/pump_app.dart';
 
 void main() {
@@ -314,60 +318,35 @@ void main() {
   // ── REQ-0845: Dog-ear fold effect ───────────────────────────────────────
 
   group('dog-ear fold (REQ-0845)', () {
-    testWidgets('golden: xs size fold geometry', (tester) async {
-      await tester.pumpObers(
-        const OiFileIcon(fileName: 'file.pdf', size: OiFileIconSize.xs),
-        surfaceSize: const Size(48, 52),
-      );
-      await expectLater(
-        find.byType(OiFileIcon),
-        matchesGoldenFile('goldens/oi_file_icon_fold_xs.png'),
-      );
-    });
-
-    testWidgets('golden: sm size fold geometry', (tester) async {
-      await tester.pumpObers(
-        const OiFileIcon(fileName: 'file.pdf', size: OiFileIconSize.sm),
-        surfaceSize: const Size(56, 62),
-      );
-      await expectLater(
-        find.byType(OiFileIcon),
-        matchesGoldenFile('goldens/oi_file_icon_fold_sm.png'),
-      );
-    });
-
-    testWidgets('golden: md size fold geometry', (tester) async {
-      await tester.pumpObers(
-        const OiFileIcon(fileName: 'file.pdf'),
-        surfaceSize: const Size(64, 72),
-      );
-      await expectLater(
-        find.byType(OiFileIcon),
-        matchesGoldenFile('goldens/oi_file_icon_fold_md.png'),
-      );
-    });
-
-    testWidgets('golden: lg size fold geometry', (tester) async {
-      await tester.pumpObers(
-        const OiFileIcon(fileName: 'file.pdf', size: OiFileIconSize.lg),
-        surfaceSize: const Size(80, 92),
-      );
-      await expectLater(
-        find.byType(OiFileIcon),
-        matchesGoldenFile('goldens/oi_file_icon_fold_lg.png'),
-      );
-    });
-
-    testWidgets('golden: xl size fold geometry', (tester) async {
-      await tester.pumpObers(
-        const OiFileIcon(fileName: 'file.pdf', size: OiFileIconSize.xl),
-        surfaceSize: const Size(96, 112),
-      );
-      await expectLater(
-        find.byType(OiFileIcon),
-        matchesGoldenFile('goldens/oi_file_icon_fold_xl.png'),
-      );
-    });
+    unawaited(
+      goldenTest(
+        'golden: fold geometry across sizes',
+        fileName: 'oi_file_icon_fold',
+        builder: () => obersGoldenGroup(
+          columns: 5,
+          cellSize: const Size(120, 130),
+          children: {
+            'xs': const OiFileIcon(
+              fileName: 'file.pdf',
+              size: OiFileIconSize.xs,
+            ),
+            'sm': const OiFileIcon(
+              fileName: 'file.pdf',
+              size: OiFileIconSize.sm,
+            ),
+            'md': const OiFileIcon(fileName: 'file.pdf'),
+            'lg': const OiFileIcon(
+              fileName: 'file.pdf',
+              size: OiFileIconSize.lg,
+            ),
+            'xl': const OiFileIcon(
+              fileName: 'file.pdf',
+              size: OiFileIconSize.xl,
+            ),
+          },
+        ),
+      ),
+    );
   });
 
   // ── REQ-0846: Extension label on colored band ───────────────────────────

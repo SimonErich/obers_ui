@@ -1,7 +1,7 @@
 // Golden tests have no public API.
 
+import 'package:alchemist/alchemist.dart';
 import 'package:flutter/widgets.dart';
-import 'package:golden_toolkit/golden_toolkit.dart';
 import 'package:obers_ui/obers_ui.dart';
 
 import '../../helpers/golden_helper.dart';
@@ -51,33 +51,25 @@ void _noop(OiShippingMethod _) {}
 
 // ── Tests ────────────────────────────────────────────────────────────────────
 
-void main() {
-  testGoldens('OiShippingMethodPicker 3 methods selected — light', (
-    tester,
-  ) async {
-    final builder = obersGoldenBuilder(
+Future<void> main() async {
+  await goldenTest(
+    'OiShippingMethodPicker 3 methods selected — light',
+    fileName: 'oi_shipping_method_picker_3_methods_light',
+    builder: () => obersGoldenGroup(
       columns: 1,
+      cellSize: const Size(460, 360),
       children: {'3 methods, express selected': _buildShippingPickerGolden()},
-    );
-    await tester.pumpWidgetBuilder(builder);
-    await screenMatchesGolden(
-      tester,
-      'oi_shipping_method_picker_3_methods_light',
-    );
-  });
+    ),
+  );
 
-  testGoldens('OiShippingMethodPicker 3 methods selected — dark', (
-    tester,
-  ) async {
-    final builder = obersGoldenBuilder(
+  await goldenTest(
+    'OiShippingMethodPicker 3 methods selected — dark',
+    fileName: 'oi_shipping_method_picker_3_methods_dark',
+    builder: () => obersGoldenGroup(
       columns: 1,
       theme: OiThemeData.dark(),
+      cellSize: const Size(460, 360),
       children: {'3 methods, express selected': _buildShippingPickerGolden()},
-    );
-    await tester.pumpWidgetBuilder(builder);
-    await screenMatchesGolden(
-      tester,
-      'oi_shipping_method_picker_3_methods_dark',
-    );
-  });
+    ),
+  );
 }

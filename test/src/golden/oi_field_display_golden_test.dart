@@ -4,9 +4,9 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:alchemist/alchemist.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:golden_toolkit/golden_toolkit.dart';
 import 'package:obers_ui/obers_ui.dart';
 
 import '../../helpers/golden_helper.dart';
@@ -104,7 +104,7 @@ class _FakeHttpOverrides extends HttpOverrides {
   }
 }
 
-void main() {
+Future<void> main() async {
   // Install fake HTTP client for image type golden tests.
   late HttpOverrides? previousOverrides;
 
@@ -119,9 +119,12 @@ void main() {
 
   // ── OiFieldDisplay text types — light ──────────────────────────────────────
 
-  testGoldens('OiFieldDisplay text types — light', (tester) async {
-    final builder = obersGoldenBuilder(
+  await goldenTest(
+    'OiFieldDisplay text types — light',
+    fileName: 'oi_field_display_text_types_light',
+    builder: () => obersGoldenGroup(
       columns: 3,
+      cellSize: const Size(300, 160),
       children: {
         'Text': const OiFieldDisplay(label: _l, value: 'Hello World'),
         'Number': const OiFieldDisplay(
@@ -151,14 +154,15 @@ void main() {
           type: OiFieldType.json,
         ),
       },
-    );
-    await tester.pumpWidgetBuilder(builder);
-    await screenMatchesGolden(tester, 'oi_field_display_text_types_light');
-  });
+    ),
+  );
 
-  testGoldens('OiFieldDisplay text types — dark', (tester) async {
-    final builder = obersGoldenBuilder(
+  await goldenTest(
+    'OiFieldDisplay text types — dark',
+    fileName: 'oi_field_display_text_types_dark',
+    builder: () => obersGoldenGroup(
       columns: 3,
+      cellSize: const Size(300, 160),
       theme: OiThemeData.dark(),
       children: {
         'Text': const OiFieldDisplay(label: _l, value: 'Hello World'),
@@ -189,16 +193,17 @@ void main() {
           type: OiFieldType.json,
         ),
       },
-    );
-    await tester.pumpWidgetBuilder(builder);
-    await screenMatchesGolden(tester, 'oi_field_display_text_types_dark');
-  });
+    ),
+  );
 
   // ── OiFieldDisplay interactive types — light ───────────────────────────────
 
-  testGoldens('OiFieldDisplay interactive types — light', (tester) async {
-    final builder = obersGoldenBuilder(
+  await goldenTest(
+    'OiFieldDisplay interactive types — light',
+    fileName: 'oi_field_display_interactive_types_light',
+    builder: () => obersGoldenGroup(
       columns: 3,
+      cellSize: const Size(300, 160),
       children: {
         'Boolean true': const OiFieldDisplay(
           label: _l,
@@ -231,17 +236,15 @@ void main() {
           type: OiFieldType.phone,
         ),
       },
-    );
-    await tester.pumpWidgetBuilder(builder);
-    await screenMatchesGolden(
-      tester,
-      'oi_field_display_interactive_types_light',
-    );
-  });
+    ),
+  );
 
-  testGoldens('OiFieldDisplay interactive types — dark', (tester) async {
-    final builder = obersGoldenBuilder(
+  await goldenTest(
+    'OiFieldDisplay interactive types — dark',
+    fileName: 'oi_field_display_interactive_types_dark',
+    builder: () => obersGoldenGroup(
       columns: 3,
+      cellSize: const Size(300, 160),
       theme: OiThemeData.dark(),
       children: {
         'Boolean true': const OiFieldDisplay(
@@ -275,19 +278,17 @@ void main() {
           type: OiFieldType.phone,
         ),
       },
-    );
-    await tester.pumpWidgetBuilder(builder);
-    await screenMatchesGolden(
-      tester,
-      'oi_field_display_interactive_types_dark',
-    );
-  });
+    ),
+  );
 
   // ── OiFieldDisplay rich types — light ──────────────────────────────────────
 
-  testGoldens('OiFieldDisplay rich types — light', (tester) async {
-    final builder = obersGoldenBuilder(
+  await goldenTest(
+    'OiFieldDisplay rich types — light',
+    fileName: 'oi_field_display_rich_types_light',
+    builder: () => obersGoldenGroup(
       columns: 3,
+      cellSize: const Size(300, 160),
       children: {
         'File (path)': const OiFieldDisplay(
           label: _l,
@@ -322,14 +323,15 @@ void main() {
           type: OiFieldType.color,
         ),
       },
-    );
-    await tester.pumpWidgetBuilder(builder);
-    await screenMatchesGolden(tester, 'oi_field_display_rich_types_light');
-  });
+    ),
+  );
 
-  testGoldens('OiFieldDisplay rich types — dark', (tester) async {
-    final builder = obersGoldenBuilder(
+  await goldenTest(
+    'OiFieldDisplay rich types — dark',
+    fileName: 'oi_field_display_rich_types_dark',
+    builder: () => obersGoldenGroup(
       columns: 3,
+      cellSize: const Size(300, 160),
       theme: OiThemeData.dark(),
       children: {
         'File (path)': const OiFieldDisplay(
@@ -365,16 +367,17 @@ void main() {
           type: OiFieldType.color,
         ),
       },
-    );
-    await tester.pumpWidgetBuilder(builder);
-    await screenMatchesGolden(tester, 'oi_field_display_rich_types_dark');
-  });
+    ),
+  );
 
   // ── OiFieldDisplay states — light ──────────────────────────────────────────
 
-  testGoldens('OiFieldDisplay states — light', (tester) async {
-    final builder = obersGoldenBuilder(
+  await goldenTest(
+    'OiFieldDisplay states — light',
+    fileName: 'oi_field_display_states_light',
+    builder: () => obersGoldenGroup(
       columns: 3,
+      cellSize: const Size(300, 160),
       children: {
         'Empty (null)': const OiFieldDisplay(label: _l, value: null),
         'Custom emptyText': const OiFieldDisplay(
@@ -403,14 +406,15 @@ void main() {
           type: OiFieldType.custom,
         ),
       },
-    );
-    await tester.pumpWidgetBuilder(builder);
-    await screenMatchesGolden(tester, 'oi_field_display_states_light');
-  });
+    ),
+  );
 
-  testGoldens('OiFieldDisplay states — dark', (tester) async {
-    final builder = obersGoldenBuilder(
+  await goldenTest(
+    'OiFieldDisplay states — dark',
+    fileName: 'oi_field_display_states_dark',
+    builder: () => obersGoldenGroup(
       columns: 3,
+      cellSize: const Size(300, 160),
       theme: OiThemeData.dark(),
       children: {
         'Empty (null)': const OiFieldDisplay(label: _l, value: null),
@@ -440,8 +444,6 @@ void main() {
           type: OiFieldType.custom,
         ),
       },
-    );
-    await tester.pumpWidgetBuilder(builder);
-    await screenMatchesGolden(tester, 'oi_field_display_states_dark');
-  });
+    ),
+  );
 }

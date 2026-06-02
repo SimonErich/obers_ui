@@ -1,15 +1,17 @@
 // Golden tests have no public API.
 
-import 'package:golden_toolkit/golden_toolkit.dart';
+import 'package:alchemist/alchemist.dart';
 import 'package:obers_ui/obers_ui.dart';
 
 import '../../helpers/golden_helper.dart';
 
-void main() {
+Future<void> main() async {
   // ── Light theme ───────────────────────────────────────────────────────────
 
-  testGoldens('OiButton variants — light', (tester) async {
-    final builder = obersGoldenBuilder(
+  await goldenTest(
+    'OiButton variants — light',
+    fileName: 'oi_button_variants_light',
+    builder: () => obersGoldenGroup(
       columns: 3,
       children: {
         'Primary': const OiButton.primary(label: 'Click'),
@@ -19,13 +21,13 @@ void main() {
         'Destructive': const OiButton.destructive(label: 'Click'),
         'Soft': const OiButton.soft(label: 'Click'),
       },
-    );
-    await tester.pumpWidgetBuilder(builder);
-    await screenMatchesGolden(tester, 'oi_button_variants_light');
-  });
+    ),
+  );
 
-  testGoldens('OiButton variants — dark', (tester) async {
-    final builder = obersGoldenBuilder(
+  await goldenTest(
+    'OiButton variants — dark',
+    fileName: 'oi_button_variants_dark',
+    builder: () => obersGoldenGroup(
       columns: 3,
       theme: OiThemeData.dark(),
       children: {
@@ -36,15 +38,15 @@ void main() {
         'Destructive': const OiButton.destructive(label: 'Click'),
         'Soft': const OiButton.soft(label: 'Click'),
       },
-    );
-    await tester.pumpWidgetBuilder(builder);
-    await screenMatchesGolden(tester, 'oi_button_variants_dark');
-  });
+    ),
+  );
 
   // ── Sizes ─────────────────────────────────────────────────────────────────
 
-  testGoldens('OiButton sizes — light', (tester) async {
-    final builder = obersGoldenBuilder(
+  await goldenTest(
+    'OiButton sizes — light',
+    fileName: 'oi_button_sizes_light',
+    builder: () => obersGoldenGroup(
       columns: 3,
       children: {
         'Small': const OiButton.primary(
@@ -57,13 +59,13 @@ void main() {
           size: OiButtonSize.large,
         ),
       },
-    );
-    await tester.pumpWidgetBuilder(builder);
-    await screenMatchesGolden(tester, 'oi_button_sizes_light');
-  });
+    ),
+  );
 
-  testGoldens('OiButton sizes — dark', (tester) async {
-    final builder = obersGoldenBuilder(
+  await goldenTest(
+    'OiButton sizes — dark',
+    fileName: 'oi_button_sizes_dark',
+    builder: () => obersGoldenGroup(
       columns: 3,
       theme: OiThemeData.dark(),
       children: {
@@ -77,15 +79,15 @@ void main() {
           size: OiButtonSize.large,
         ),
       },
-    );
-    await tester.pumpWidgetBuilder(builder);
-    await screenMatchesGolden(tester, 'oi_button_sizes_dark');
-  });
+    ),
+  );
 
   // ── Disabled state ────────────────────────────────────────────────────────
 
-  testGoldens('OiButton disabled — light', (tester) async {
-    final builder = obersGoldenBuilder(
+  await goldenTest(
+    'OiButton disabled — light',
+    fileName: 'oi_button_disabled_light',
+    builder: () => obersGoldenGroup(
       columns: 3,
       children: {
         'Primary disabled': const OiButton.primary(
@@ -107,13 +109,13 @@ void main() {
         ),
         'Soft disabled': const OiButton.soft(label: 'Click', enabled: false),
       },
-    );
-    await tester.pumpWidgetBuilder(builder);
-    await screenMatchesGolden(tester, 'oi_button_disabled_light');
-  });
+    ),
+  );
 
-  testGoldens('OiButton disabled — dark', (tester) async {
-    final builder = obersGoldenBuilder(
+  await goldenTest(
+    'OiButton disabled — dark',
+    fileName: 'oi_button_disabled_dark',
+    builder: () => obersGoldenGroup(
       columns: 3,
       theme: OiThemeData.dark(),
       children: {
@@ -136,8 +138,6 @@ void main() {
         ),
         'Soft disabled': const OiButton.soft(label: 'Click', enabled: false),
       },
-    );
-    await tester.pumpWidgetBuilder(builder);
-    await screenMatchesGolden(tester, 'oi_button_disabled_dark');
-  });
+    ),
+  );
 }

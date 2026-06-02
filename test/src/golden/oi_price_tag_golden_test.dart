@@ -1,15 +1,17 @@
 // Golden tests have no public API.
 
-import 'package:golden_toolkit/golden_toolkit.dart';
+import 'package:alchemist/alchemist.dart';
 import 'package:obers_ui/obers_ui.dart';
 
 import '../../helpers/golden_helper.dart';
 
-void main() {
+Future<void> main() async {
   // ── OiPriceTag ────────────────────────────────────────────────────────────
 
-  testGoldens('OiPriceTag variants — light', (tester) async {
-    final builder = obersGoldenBuilder(
+  await goldenTest(
+    'OiPriceTag variants — light',
+    fileName: 'oi_price_tag_variants_light',
+    builder: () => obersGoldenGroup(
       columns: 3,
       children: {
         'Normal price': const OiPriceTag(price: 42.99, label: 'Normal price'),
@@ -41,13 +43,13 @@ void main() {
           decimalPlaces: 0,
         ),
       },
-    );
-    await tester.pumpWidgetBuilder(builder);
-    await screenMatchesGolden(tester, 'oi_price_tag_variants_light');
-  });
+    ),
+  );
 
-  testGoldens('OiPriceTag variants — dark', (tester) async {
-    final builder = obersGoldenBuilder(
+  await goldenTest(
+    'OiPriceTag variants — dark',
+    fileName: 'oi_price_tag_variants_dark',
+    builder: () => obersGoldenGroup(
       columns: 3,
       theme: OiThemeData.dark(),
       children: {
@@ -80,8 +82,6 @@ void main() {
           decimalPlaces: 0,
         ),
       },
-    );
-    await tester.pumpWidgetBuilder(builder);
-    await screenMatchesGolden(tester, 'oi_price_tag_variants_dark');
-  });
+    ),
+  );
 }
