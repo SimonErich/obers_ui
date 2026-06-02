@@ -38,6 +38,12 @@ migrate_working_dir/
 # Golden test failures
 **/failures/
 
+# Alchemist platform goldens (host-specific, local debugging only).
+# Only the machine-independent CI goldens (goldens/ci/) are committed.
+**/goldens/linux/
+**/goldens/macos/
+**/goldens/windows/
+
 # dev tools
 .broins
 .history
