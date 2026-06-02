@@ -1,7 +1,7 @@
 // Golden tests have no public API.
 
+import 'package:alchemist/alchemist.dart';
 import 'package:flutter/widgets.dart';
-import 'package:golden_toolkit/golden_toolkit.dart';
 import 'package:obers_ui/obers_ui.dart';
 
 import '../../helpers/golden_helper.dart';
@@ -24,12 +24,15 @@ const _summary = OiCartSummary(
 
 // ── Tests ────────────────────────────────────────────────────────────────────
 
-void main() {
+Future<void> main() async {
   // ── Full cart ──────────────────────────────────────────────────────────────
 
-  testGoldens('OiCartPanel full cart — light', (tester) async {
-    final builder = obersGoldenBuilder(
+  await goldenTest(
+    'OiCartPanel full cart — light',
+    fileName: 'oi_cart_panel_full_light',
+    builder: () => obersGoldenGroup(
       columns: 1,
+      cellSize: const Size(440, 560),
       children: {
         'Full cart': const SingleChildScrollView(
           child: SizedBox(
@@ -42,14 +45,15 @@ void main() {
           ),
         ),
       },
-    );
-    await tester.pumpWidgetBuilder(builder);
-    await screenMatchesGolden(tester, 'oi_cart_panel_full_light');
-  });
+    ),
+  );
 
-  testGoldens('OiCartPanel full cart — dark', (tester) async {
-    final builder = obersGoldenBuilder(
+  await goldenTest(
+    'OiCartPanel full cart — dark',
+    fileName: 'oi_cart_panel_full_dark',
+    builder: () => obersGoldenGroup(
       columns: 1,
+      cellSize: const Size(440, 560),
       theme: OiThemeData.dark(),
       children: {
         'Full cart': const SingleChildScrollView(
@@ -63,16 +67,17 @@ void main() {
           ),
         ),
       },
-    );
-    await tester.pumpWidgetBuilder(builder);
-    await screenMatchesGolden(tester, 'oi_cart_panel_full_dark');
-  });
+    ),
+  );
 
   // ── Empty cart ─────────────────────────────────────────────────────────────
 
-  testGoldens('OiCartPanel empty cart — light', (tester) async {
-    final builder = obersGoldenBuilder(
+  await goldenTest(
+    'OiCartPanel empty cart — light',
+    fileName: 'oi_cart_panel_empty_light',
+    builder: () => obersGoldenGroup(
       columns: 1,
+      cellSize: const Size(440, 360),
       children: {
         'Empty cart': const SizedBox(
           width: 400,
@@ -83,14 +88,15 @@ void main() {
           ),
         ),
       },
-    );
-    await tester.pumpWidgetBuilder(builder);
-    await screenMatchesGolden(tester, 'oi_cart_panel_empty_light');
-  });
+    ),
+  );
 
-  testGoldens('OiCartPanel empty cart — dark', (tester) async {
-    final builder = obersGoldenBuilder(
+  await goldenTest(
+    'OiCartPanel empty cart — dark',
+    fileName: 'oi_cart_panel_empty_dark',
+    builder: () => obersGoldenGroup(
       columns: 1,
+      cellSize: const Size(440, 360),
       theme: OiThemeData.dark(),
       children: {
         'Empty cart': const SizedBox(
@@ -102,8 +108,6 @@ void main() {
           ),
         ),
       },
-    );
-    await tester.pumpWidgetBuilder(builder);
-    await screenMatchesGolden(tester, 'oi_cart_panel_empty_dark');
-  });
+    ),
+  );
 }

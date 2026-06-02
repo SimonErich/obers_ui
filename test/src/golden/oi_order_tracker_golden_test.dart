@@ -1,68 +1,57 @@
 // Golden tests have no public API.
 
+import 'package:alchemist/alchemist.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_test/flutter_test.dart';
-import 'package:golden_toolkit/golden_toolkit.dart';
 import 'package:obers_ui/obers_ui.dart';
 
 import '../../helpers/golden_helper.dart';
 
-void main() {
-  // Enable autoUpdateGoldenFiles for initial generation; CI compares against
-  // committed goldens.
-  autoUpdateGoldenFiles = true;
-
+Future<void> main() async {
   // ── Delivered with timeline ─────────────────────────────────────────────
 
-  testGoldens('OiOrderTracker delivered with timeline — light', (tester) async {
-    final builder = obersGoldenBuilder(
+  await goldenTest(
+    'OiOrderTracker delivered with timeline — light',
+    fileName: 'oi_order_tracker_delivered_with_timeline_light',
+    builder: () => obersGoldenGroup(
+      columns: 1,
+      cellSize: const Size(760, 520),
       children: {'Delivered + Timeline': _buildDeliveredWithTimeline()},
-    );
-    await tester.pumpWidgetBuilder(builder);
-    await screenMatchesGolden(
-      tester,
-      'oi_order_tracker_delivered_with_timeline_light',
-    );
-  });
+    ),
+  );
 
-  testGoldens('OiOrderTracker delivered with timeline — dark', (tester) async {
-    final builder = obersGoldenBuilder(
+  await goldenTest(
+    'OiOrderTracker delivered with timeline — dark',
+    fileName: 'oi_order_tracker_delivered_with_timeline_dark',
+    builder: () => obersGoldenGroup(
+      columns: 1,
+      cellSize: const Size(760, 520),
       theme: OiThemeData.dark(),
       children: {'Delivered + Timeline': _buildDeliveredWithTimeline()},
-    );
-    await tester.pumpWidgetBuilder(builder);
-    await screenMatchesGolden(
-      tester,
-      'oi_order_tracker_delivered_with_timeline_dark',
-    );
-  });
+    ),
+  );
 
   // ── Shipped without timeline ────────────────────────────────────────────
 
-  testGoldens('OiOrderTracker shipped without timeline — light', (
-    tester,
-  ) async {
-    final builder = obersGoldenBuilder(
+  await goldenTest(
+    'OiOrderTracker shipped without timeline — light',
+    fileName: 'oi_order_tracker_shipped_without_timeline_light',
+    builder: () => obersGoldenGroup(
+      columns: 1,
+      cellSize: const Size(760, 220),
       children: {'Shipped (no timeline)': _buildShippedWithoutTimeline()},
-    );
-    await tester.pumpWidgetBuilder(builder, surfaceSize: const Size(800, 200));
-    await screenMatchesGolden(
-      tester,
-      'oi_order_tracker_shipped_without_timeline_light',
-    );
-  });
+    ),
+  );
 
-  testGoldens('OiOrderTracker shipped without timeline — dark', (tester) async {
-    final builder = obersGoldenBuilder(
+  await goldenTest(
+    'OiOrderTracker shipped without timeline — dark',
+    fileName: 'oi_order_tracker_shipped_without_timeline_dark',
+    builder: () => obersGoldenGroup(
+      columns: 1,
+      cellSize: const Size(760, 220),
       theme: OiThemeData.dark(),
       children: {'Shipped (no timeline)': _buildShippedWithoutTimeline()},
-    );
-    await tester.pumpWidgetBuilder(builder, surfaceSize: const Size(800, 200));
-    await screenMatchesGolden(
-      tester,
-      'oi_order_tracker_shipped_without_timeline_dark',
-    );
-  });
+    ),
+  );
 }
 
 /// Builds an [OiOrderTracker] in delivered status with timeline visible.

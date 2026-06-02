@@ -2,23 +2,29 @@
 
 import 'dart:ui';
 
-import 'package:golden_toolkit/golden_toolkit.dart';
+import 'package:alchemist/alchemist.dart';
 import 'package:obers_ui/src/components/shop/oi_address_form.dart';
 import 'package:obers_ui/src/models/oi_address_data.dart';
 
 import '../../helpers/golden_helper.dart';
 
-void main() {
-  testGoldens('OiAddressForm — default empty form', (tester) async {
-    final builder = obersGoldenBuilder(
+Future<void> main() async {
+  await goldenTest(
+    'OiAddressForm — default empty form',
+    fileName: 'oi_address_form_empty',
+    builder: () => obersGoldenGroup(
+      columns: 1,
+      cellSize: const Size(800, 1000),
       children: {'Empty form': const OiAddressForm(label: 'Shipping address')},
-    );
-    await tester.pumpWidgetBuilder(builder, surfaceSize: const Size(800, 1000));
-    await screenMatchesGolden(tester, 'oi_address_form_empty');
-  });
+    ),
+  );
 
-  testGoldens('OiAddressForm — pre-filled form', (tester) async {
-    final builder = obersGoldenBuilder(
+  await goldenTest(
+    'OiAddressForm — pre-filled form',
+    fileName: 'oi_address_form_prefilled',
+    builder: () => obersGoldenGroup(
+      columns: 1,
+      cellSize: const Size(800, 1000),
       children: {
         'Pre-filled': const OiAddressForm(
           label: 'Shipping address',
@@ -37,8 +43,6 @@ void main() {
           ),
         ),
       },
-    );
-    await tester.pumpWidgetBuilder(builder, surfaceSize: const Size(800, 1000));
-    await screenMatchesGolden(tester, 'oi_address_form_prefilled');
-  });
+    ),
+  );
 }

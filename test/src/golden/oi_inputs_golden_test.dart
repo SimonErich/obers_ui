@@ -1,28 +1,30 @@
 // Golden tests have no public API.
 
-import 'package:golden_toolkit/golden_toolkit.dart';
+import 'package:alchemist/alchemist.dart';
 import 'package:obers_ui/obers_ui.dart';
 
 import '../../helpers/golden_helper.dart';
 
-void main() {
+Future<void> main() async {
   // ── OiCheckbox ────────────────────────────────────────────────────────────
 
-  testGoldens('OiCheckbox states — light', (tester) async {
-    final builder = obersGoldenBuilder(
+  await goldenTest(
+    'OiCheckbox states — light',
+    fileName: 'oi_checkbox_states_light',
+    builder: () => obersGoldenGroup(
       columns: 3,
       children: {
         'Unchecked': const OiCheckbox(value: false, label: 'Off'),
         'Checked': const OiCheckbox(value: true, label: 'On'),
         'Indeterminate': const OiCheckbox(value: null, label: 'Mixed'),
       },
-    );
-    await tester.pumpWidgetBuilder(builder);
-    await screenMatchesGolden(tester, 'oi_checkbox_states_light');
-  });
+    ),
+  );
 
-  testGoldens('OiCheckbox states — dark', (tester) async {
-    final builder = obersGoldenBuilder(
+  await goldenTest(
+    'OiCheckbox states — dark',
+    fileName: 'oi_checkbox_states_dark',
+    builder: () => obersGoldenGroup(
       columns: 3,
       theme: OiThemeData.dark(),
       children: {
@@ -30,33 +32,31 @@ void main() {
         'Checked': const OiCheckbox(value: true, label: 'On'),
         'Indeterminate': const OiCheckbox(value: null, label: 'Mixed'),
       },
-    );
-    await tester.pumpWidgetBuilder(builder);
-    await screenMatchesGolden(tester, 'oi_checkbox_states_dark');
-  });
+    ),
+  );
 
   // ── OiSwitch ──────────────────────────────────────────────────────────────
 
-  testGoldens('OiSwitch states — light', (tester) async {
-    final builder = obersGoldenBuilder(
+  await goldenTest(
+    'OiSwitch states — light',
+    fileName: 'oi_switch_states_light',
+    builder: () => obersGoldenGroup(
       children: {
         'Off': const OiSwitch(value: false, label: 'Off'),
         'On': const OiSwitch(value: true, label: 'On'),
       },
-    );
-    await tester.pumpWidgetBuilder(builder);
-    await screenMatchesGolden(tester, 'oi_switch_states_light');
-  });
+    ),
+  );
 
-  testGoldens('OiSwitch states — dark', (tester) async {
-    final builder = obersGoldenBuilder(
+  await goldenTest(
+    'OiSwitch states — dark',
+    fileName: 'oi_switch_states_dark',
+    builder: () => obersGoldenGroup(
       theme: OiThemeData.dark(),
       children: {
         'Off': const OiSwitch(value: false, label: 'Off'),
         'On': const OiSwitch(value: true, label: 'On'),
       },
-    );
-    await tester.pumpWidgetBuilder(builder);
-    await screenMatchesGolden(tester, 'oi_switch_states_dark');
-  });
+    ),
+  );
 }

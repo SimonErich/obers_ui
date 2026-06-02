@@ -1,15 +1,19 @@
 // Golden tests have no public API.
 
-import 'package:golden_toolkit/golden_toolkit.dart';
+import 'package:alchemist/alchemist.dart';
+import 'package:flutter/widgets.dart';
 import 'package:obers_ui/obers_ui.dart';
 
 import '../../helpers/golden_helper.dart';
 
-void main() {
+Future<void> main() async {
   // ── Pages variant ───────────────────────────────────────────────────────
 
-  testGoldens('OiPagination pages variant — light', (tester) async {
-    final builder = obersGoldenBuilder(
+  await goldenTest(
+    'OiPagination pages variant — light',
+    fileName: 'oi_pagination_pages_light',
+    builder: () => obersGoldenGroup(
+      cellSize: const Size(420, 120),
       children: {
         'Page 1 of 4': OiPagination(
           totalItems: 100,
@@ -38,14 +42,15 @@ void main() {
           showFirstLast: false,
         ),
       },
-    );
-    await tester.pumpWidgetBuilder(builder);
-    await screenMatchesGolden(tester, 'oi_pagination_pages_light');
-  });
+    ),
+  );
 
-  testGoldens('OiPagination pages variant — dark', (tester) async {
-    final builder = obersGoldenBuilder(
+  await goldenTest(
+    'OiPagination pages variant — dark',
+    fileName: 'oi_pagination_pages_dark',
+    builder: () => obersGoldenGroup(
       theme: OiThemeData.dark(),
+      cellSize: const Size(420, 120),
       children: {
         'Page 1 of 4': OiPagination(
           totalItems: 100,
@@ -74,15 +79,16 @@ void main() {
           showFirstLast: false,
         ),
       },
-    );
-    await tester.pumpWidgetBuilder(builder);
-    await screenMatchesGolden(tester, 'oi_pagination_pages_dark');
-  });
+    ),
+  );
 
   // ── Compact variant ─────────────────────────────────────────────────────
 
-  testGoldens('OiPagination compact variant — light', (tester) async {
-    final builder = obersGoldenBuilder(
+  await goldenTest(
+    'OiPagination compact variant — light',
+    fileName: 'oi_pagination_compact_light',
+    builder: () => obersGoldenGroup(
+      cellSize: const Size(420, 120),
       children: {
         'Page 1 of 4': OiPagination.compact(
           totalItems: 100,
@@ -103,14 +109,15 @@ void main() {
           onPageChange: (_) {},
         ),
       },
-    );
-    await tester.pumpWidgetBuilder(builder);
-    await screenMatchesGolden(tester, 'oi_pagination_compact_light');
-  });
+    ),
+  );
 
-  testGoldens('OiPagination compact variant — dark', (tester) async {
-    final builder = obersGoldenBuilder(
+  await goldenTest(
+    'OiPagination compact variant — dark',
+    fileName: 'oi_pagination_compact_dark',
+    builder: () => obersGoldenGroup(
       theme: OiThemeData.dark(),
+      cellSize: const Size(420, 120),
       children: {
         'Page 1 of 4': OiPagination.compact(
           totalItems: 100,
@@ -131,8 +138,6 @@ void main() {
           onPageChange: (_) {},
         ),
       },
-    );
-    await tester.pumpWidgetBuilder(builder);
-    await screenMatchesGolden(tester, 'oi_pagination_compact_dark');
-  });
+    ),
+  );
 }
