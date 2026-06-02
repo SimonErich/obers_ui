@@ -130,4 +130,39 @@ void main() {
     await tester.pump();
     expect(selected, 'week');
   });
+
+  testWidgets('empty segments renders nothing instead of throwing', (
+    tester,
+  ) async {
+    await tester.pumpObers(
+      OiSegmentedControl<String>(
+        segments: const [],
+        selected: 'day',
+        onChanged: (_) {},
+      ),
+    );
+
+    expect(tester.takeException(), isNull);
+    expect(find.byType(OiSegment<String>), findsNothing);
+    expect(find.byType(SizedBox), findsWidgets);
+  });
+
+  testWidgets('single segment renders as a standalone pill', (tester) async {
+    String? result;
+    await tester.pumpObers(
+      OiSegmentedControl<String>(
+        segments: const [OiSegment<String>(value: 'day', label: 'Day')],
+        selected: 'day',
+        onChanged: (v) => result = v,
+      ),
+    );
+
+    expect(tester.takeException(), isNull);
+    expect(find.text('Day'), findsOneWidget);
+
+    // Tapping the already-selected single segment does not fire onChanged.
+    await tester.tap(find.text('Day'));
+    await tester.pump();
+    expect(result, isNull);
+  });
 }
