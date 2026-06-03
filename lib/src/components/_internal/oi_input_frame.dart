@@ -84,15 +84,20 @@ class OiInputFrame extends StatelessWidget {
 
     final resolvedRadius = border.borderRadius ?? BorderRadius.circular(8);
 
-    final surfaceWidget = _AnimatedInputSurface(
-      borderColor: border.color,
-      borderWidth: border.width,
-      borderRadius: resolvedRadius,
-      backgroundColor: bgColor,
-      duration: anim.fast,
-      curve: Curves.easeOut,
-      padding: effectivePadding,
-      child: row,
+    // RepaintBoundary isolates the implicit focus/error border+background
+    // animation to this field's own layer, so it doesn't invalidate and
+    // repaint sibling fields across the rest of the form.
+    final surfaceWidget = RepaintBoundary(
+      child: _AnimatedInputSurface(
+        borderColor: border.color,
+        borderWidth: border.width,
+        borderRadius: resolvedRadius,
+        backgroundColor: bgColor,
+        duration: anim.fast,
+        curve: Curves.easeOut,
+        padding: effectivePadding,
+        child: row,
+      ),
     );
 
     Widget frame = surfaceWidget;

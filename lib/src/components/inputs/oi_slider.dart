@@ -74,26 +74,34 @@ class _OiSliderState extends State<OiSlider>
   int? _draggingThumb;
 
   late AnimationController _animController;
-  late double _displayValue;
-  late double _displaySecondary;
   late double _startValue;
   late double _startSecondary;
   late double _targetValue;
   late double _targetSecondary;
 
+  // Display values are derived from the animation progress at paint time
+  // rather than stored via setState on every tick — see the AnimatedBuilder
+  // in build(). This keeps the per-frame work to a repaint of the painter
+  // instead of a full subtree rebuild.
+  double get _displayValue =>
+      _startValue + (_targetValue - _startValue) * _animController.value;
+  double get _displaySecondary =>
+      _startSecondary +
+      (_targetSecondary - _startSecondary) * _animController.value;
+
   @override
   void initState() {
     super.initState();
-    _displayValue = widget.value;
-    _displaySecondary = widget.secondaryValue ?? widget.value;
-    _targetValue = _displayValue;
-    _targetSecondary = _displaySecondary;
-    _startValue = _displayValue;
-    _startSecondary = _displaySecondary;
+    final initialSecondary = widget.secondaryValue ?? widget.value;
+    _targetValue = widget.value;
+    _targetSecondary = initialSecondary;
+    _startValue = widget.value;
+    _startSecondary = initialSecondary;
     _animController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 250),
-    )..addListener(_onAnimate);
+      value: 1, // start settled; display == value at t=1 (start==target)
+    );
   }
 
   @override
@@ -106,24 +114,14 @@ class _OiSliderState extends State<OiSlider>
       _targetValue = widget.value;
       _targetSecondary = newSecondary;
       if (_draggingThumb != null) {
-        // While dragging, snap immediately — no animation lag.
-        _displayValue = _targetValue;
-        _displaySecondary = _targetSecondary;
+        // While dragging, snap immediately — no animation lag. At t=1 the
+        // display getters evaluate to the target, so this shows the new value.
         _animController.value = 1.0;
       } else {
         _animController.value = 0.0;
         unawaited(_animController.animateTo(1, curve: Curves.easeOutCubic));
       }
     }
-  }
-
-  void _onAnimate() {
-    setState(() {
-      final t = _animController.value;
-      _displayValue = _startValue + (_targetValue - _startValue) * t;
-      _displaySecondary =
-          _startSecondary + (_targetSecondary - _startSecondary) * t;
-    });
   }
 
   @override
@@ -227,28 +225,36 @@ class _OiSliderState extends State<OiSlider>
             child: SizedBox(
               height: totalHeight + (widget.showLabels ? 20.0 : 0.0),
               width: double.infinity,
-              child: CustomPaint(
-                painter: _OiSliderPainter(
-                  value: _displayValue,
-                  secondaryValue: widget.secondaryValue != null
-                      ? _displaySecondary
-                      : null,
-                  labelValue: widget.value,
-                  labelSecondaryValue: widget.secondaryValue,
-                  min: widget.min,
-                  max: widget.max,
-                  divisions: widget.divisions,
-                  trackColor: colors.border,
-                  activeColor: colors.primary.base,
-                  thumbColor: colors.primary.base,
-                  thumbInnerColor: colors.surface,
-                  labelColor: colors.text,
-                  trackHeight: trackHeight,
-                  thumbRadius: thumbRadius,
-                  totalHeight: totalHeight,
-                  showLabels: widget.showLabels,
-                  showTicks: widget.showTicks,
-                  enabled: widget.enabled,
+              // Only the painter rebuilds per animation frame; the gesture/
+              // layout tree above stays put, and the RepaintBoundary keeps the
+              // per-frame repaint off neighbouring widgets.
+              child: RepaintBoundary(
+                child: AnimatedBuilder(
+                  animation: _animController,
+                  builder: (context, _) => CustomPaint(
+                    painter: _OiSliderPainter(
+                      value: _displayValue,
+                      secondaryValue: widget.secondaryValue != null
+                          ? _displaySecondary
+                          : null,
+                      labelValue: widget.value,
+                      labelSecondaryValue: widget.secondaryValue,
+                      min: widget.min,
+                      max: widget.max,
+                      divisions: widget.divisions,
+                      trackColor: colors.border,
+                      activeColor: colors.primary.base,
+                      thumbColor: colors.primary.base,
+                      thumbInnerColor: colors.surface,
+                      labelColor: colors.text,
+                      trackHeight: trackHeight,
+                      thumbRadius: thumbRadius,
+                      totalHeight: totalHeight,
+                      showLabels: widget.showLabels,
+                      showTicks: widget.showTicks,
+                      enabled: widget.enabled,
+                    ),
+                  ),
                 ),
               ),
             ),
