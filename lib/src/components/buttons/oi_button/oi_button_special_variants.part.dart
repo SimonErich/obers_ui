@@ -30,8 +30,8 @@ extension _OiButtonSpecialVariants on _OiButtonState {
           child: Text(
             widget.label ?? '',
             style: TextStyle(
-              fontSize: _fontSize(),
-              fontWeight: FontWeight.w500,
+              fontSize: _fontSize(context),
+              fontWeight: _fontWeight(context),
               color: foreground,
               height: 1,
             ),
@@ -96,8 +96,8 @@ extension _OiButtonSpecialVariants on _OiButtonState {
           child: Text(
             displayLabel,
             style: TextStyle(
-              fontSize: _fontSize(),
-              fontWeight: FontWeight.w500,
+              fontSize: _fontSize(context),
+              fontWeight: _fontWeight(context),
               color: foreground,
               height: 1,
             ),
@@ -151,8 +151,8 @@ extension _OiButtonSpecialVariants on _OiButtonState {
           child: Text(
             displayLabel,
             style: TextStyle(
-              fontSize: _fontSize(),
-              fontWeight: FontWeight.w500,
+              fontSize: _fontSize(context),
+              fontWeight: _fontWeight(context),
               color: foreground,
               height: 1,
             ),
