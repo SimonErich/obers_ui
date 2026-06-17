@@ -64,6 +64,7 @@ class OiBanner extends StatefulWidget {
     this.visible,
     this.semanticLabel,
     this.loadingOnDismiss,
+    this.padding,
     super.key,
   });
 
@@ -82,6 +83,7 @@ class OiBanner extends StatefulWidget {
     bool border = true,
     bool? visible,
     String? semanticLabel,
+    EdgeInsetsGeometry? padding,
     Key? key,
   }) : this._(
          message: message,
@@ -96,6 +98,7 @@ class OiBanner extends StatefulWidget {
          border: border,
          visible: visible,
          semanticLabel: semanticLabel,
+         padding: padding,
          key: key,
        );
 
@@ -112,6 +115,7 @@ class OiBanner extends StatefulWidget {
     bool border = true,
     bool? visible,
     String? semanticLabel,
+    EdgeInsetsGeometry? padding,
     Key? key,
   }) : this._(
          message: message,
@@ -126,6 +130,7 @@ class OiBanner extends StatefulWidget {
          border: border,
          visible: visible,
          semanticLabel: semanticLabel,
+         padding: padding,
          key: key,
        );
 
@@ -142,6 +147,7 @@ class OiBanner extends StatefulWidget {
     bool border = true,
     bool? visible,
     String? semanticLabel,
+    EdgeInsetsGeometry? padding,
     Key? key,
   }) : this._(
          message: message,
@@ -156,6 +162,7 @@ class OiBanner extends StatefulWidget {
          border: border,
          visible: visible,
          semanticLabel: semanticLabel,
+         padding: padding,
          key: key,
        );
 
@@ -172,6 +179,7 @@ class OiBanner extends StatefulWidget {
     bool border = true,
     bool? visible,
     String? semanticLabel,
+    EdgeInsetsGeometry? padding,
     Key? key,
   }) : this._(
          message: message,
@@ -186,6 +194,7 @@ class OiBanner extends StatefulWidget {
          border: border,
          visible: visible,
          semanticLabel: semanticLabel,
+         padding: padding,
          key: key,
        );
 
@@ -202,6 +211,7 @@ class OiBanner extends StatefulWidget {
     bool border = true,
     bool? visible,
     String? semanticLabel,
+    EdgeInsetsGeometry? padding,
     Key? key,
   }) : this._(
          message: message,
@@ -216,6 +226,7 @@ class OiBanner extends StatefulWidget {
          border: border,
          visible: visible,
          semanticLabel: semanticLabel,
+         padding: padding,
          key: key,
        );
 
@@ -239,6 +250,7 @@ class OiBanner extends StatefulWidget {
     bool? visible,
     String? semanticLabel,
     Future<void> Function()? onDismiss,
+    EdgeInsetsGeometry? padding,
     Key? key,
   }) : this._(
          message: message,
@@ -250,6 +262,7 @@ class OiBanner extends StatefulWidget {
          visible: visible,
          semanticLabel: semanticLabel,
          loadingOnDismiss: onDismiss,
+         padding: padding,
          key: key,
        );
 
@@ -298,6 +311,10 @@ class OiBanner extends StatefulWidget {
   /// The banner fades out once the future resolves, giving the operation a
   /// chance to complete before the banner disappears.
   final Future<void> Function()? loadingOnDismiss;
+
+  /// Optional padding override. When null, falls back to the
+  /// `OiBannerThemeData.padding` and then to the level + [compact] default.
+  final EdgeInsetsGeometry? padding;
 
   @override
   State<OiBanner> createState() => _OiBannerState();
@@ -419,7 +436,7 @@ class _OiBannerState extends State<OiBanner>
     };
 
     final borderRadius = themeData?.borderRadius ?? context.radius.md;
-    final padding =
+    final padding = widget.padding ??
         themeData?.padding ??
         EdgeInsets.symmetric(
           horizontal: spacing.md,
