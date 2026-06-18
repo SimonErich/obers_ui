@@ -281,6 +281,7 @@ export 'src/foundation/persistence/oi_settings_provider.dart';
 // ── Foundation: Theme ────────────────────────────────────────────────────────
 
 export 'src/foundation/theme/oi_animation_config.dart';
+export 'src/foundation/theme/oi_button_font_size_scale.dart';
 export 'src/foundation/theme/oi_color_scheme.dart';
 export 'src/foundation/theme/oi_color_swatch.dart';
 export 'src/foundation/theme/oi_component_size_scale.dart';

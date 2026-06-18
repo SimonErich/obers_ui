@@ -54,8 +54,11 @@ extension _OiButtonContent on _OiButtonState {
         ? Text(
             label,
             style: TextStyle(
-              fontSize: _fontSize(),
-              fontWeight: bold ? FontWeight.w700 : FontWeight.w500,
+              fontSize: _fontSize(context),
+              // The pressed/highlighted state bumps the weight; otherwise
+              // the per-size weight from the theme scale (defaulting to
+              // w500) wins.
+              fontWeight: bold ? FontWeight.w700 : _fontWeight(context),
               color: foreground,
               height: 1,
             ),

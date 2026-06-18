@@ -48,7 +48,7 @@ class OiWizardContext {
 
 /// A step in the wizard.
 ///
-/// Each step has a [title], an optional [subtitle] and [icon], and a
+/// Each step has an optional [title], [subtitle] and [icon], and a
 /// [builder] that receives an [OiWizardContext]. The optional [validate]
 /// function determines whether the user may advance past this step.
 ///
@@ -56,22 +56,24 @@ class OiWizardContext {
 class OiWizardStep {
   /// Creates an [OiWizardStep].
   const OiWizardStep({
-    required this.title,
     required this.builder,
     String? stepperLabel,
+    this.title,
     this.subtitle,
     this.icon,
     this.validate,
     this.optional = false,
   }) : _stepperLabel = stepperLabel;
 
-  /// The title shown in the stepper and step header.
-  final String title;
+  /// The title shown in the step header. Also used as the stepper label
+  /// when [stepperLabel] is not provided.
+  final String? title;
 
   final String? _stepperLabel;
 
-  /// The label shown in the stepper. Defaults to [title] if not provided.
-  String get stepperLabel => _stepperLabel ?? title;
+  /// The label shown in the stepper. Defaults to [title] if not provided,
+  /// or an empty string if neither is set.
+  String get stepperLabel => _stepperLabel ?? title ?? '';
 
   /// An optional subtitle shown below the title.
   final String? subtitle;
@@ -322,22 +324,24 @@ class _OiWizardState extends State<OiWizard> {
         const SizedBox(height: 16),
 
         // Step title.
-        Text(
-          step.title,
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-            color: colors.text,
+        if (step.title != null)
+          Text(
+            step.title!,
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+              color: colors.text,
+            ),
           ),
-        ),
         if (step.subtitle != null) ...[
-          const SizedBox(height: 4),
+          if (step.title != null) const SizedBox(height: 4),
           Text(
             step.subtitle!,
             style: TextStyle(fontSize: 13, color: colors.textMuted),
           ),
         ],
-        const SizedBox(height: 16),
+        if (step.title != null || step.subtitle != null)
+          const SizedBox(height: 16),
 
         // Step content.
         body,

@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/src/foundation/theme/oi_button_font_size_scale.dart';
 import 'package:obers_ui/src/foundation/theme/oi_color_scheme.dart';
 
 /// Per-variant color overrides for button states.
@@ -110,6 +111,7 @@ class OiButtonThemeData {
     this.borderRadius,
     this.padding,
     this.textStyle,
+    this.fontSizes,
     this.height,
     this.minWidth,
     this.iconSize,
@@ -130,6 +132,10 @@ class OiButtonThemeData {
 
   /// The text style for button labels.
   final TextStyle? textStyle;
+
+  /// Per-size font sizes and weights. Overrides the built-in 12/14/16,
+  /// w500 defaults when set.
+  final OiButtonFontSizeScale? fontSizes;
 
   /// Override button height (ignores size/density calculation).
   final double? height;
@@ -166,6 +172,7 @@ class OiButtonThemeData {
     BorderRadius? borderRadius,
     EdgeInsets? padding,
     TextStyle? textStyle,
+    OiButtonFontSizeScale? fontSizes,
     double? height,
     double? minWidth,
     double? iconSize,
@@ -181,6 +188,7 @@ class OiButtonThemeData {
       borderRadius: borderRadius ?? this.borderRadius,
       padding: padding ?? this.padding,
       textStyle: textStyle ?? this.textStyle,
+      fontSizes: fontSizes ?? this.fontSizes,
       height: height ?? this.height,
       minWidth: minWidth ?? this.minWidth,
       iconSize: iconSize ?? this.iconSize,
@@ -201,6 +209,7 @@ class OiButtonThemeData {
         other.borderRadius == borderRadius &&
         other.padding == padding &&
         other.textStyle == textStyle &&
+        other.fontSizes == fontSizes &&
         other.height == height &&
         other.minWidth == minWidth &&
         other.iconSize == iconSize &&
@@ -218,6 +227,7 @@ class OiButtonThemeData {
     borderRadius,
     padding,
     textStyle,
+    fontSizes,
     height,
     minWidth,
     iconSize,

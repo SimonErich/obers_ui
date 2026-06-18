@@ -59,14 +59,27 @@ extension _OiButtonStyling on _OiButtonState {
     }
   }
 
-  double _fontSize() {
+  double _fontSize(BuildContext context) {
+    final scale = context.components.button?.fontSizes;
     switch (widget.size) {
       case OiButtonSize.small:
-        return 12;
+        return scale?.small ?? 12;
       case OiButtonSize.medium:
-        return 14;
+        return scale?.medium ?? 14;
       case OiButtonSize.large:
-        return 16;
+        return scale?.large ?? 16;
+    }
+  }
+
+  FontWeight _fontWeight(BuildContext context) {
+    final scale = context.components.button?.fontSizes;
+    switch (widget.size) {
+      case OiButtonSize.small:
+        return scale?.weightSmall ?? FontWeight.w500;
+      case OiButtonSize.medium:
+        return scale?.weightMedium ?? FontWeight.w500;
+      case OiButtonSize.large:
+        return scale?.weightLarge ?? FontWeight.w500;
     }
   }
 

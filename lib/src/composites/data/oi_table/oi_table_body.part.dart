@@ -234,9 +234,10 @@ extension _OiTableBody<T> on _OiTableState<T> {
         behavior: HitTestBehavior.opaque,
         onTap: () => _handleRowTap(row, index),
         onDoubleTap: () => _handleRowDoubleTap(row, index),
-        child: bg != null
-            ? ColoredBox(color: bg, child: rowContent)
-            : rowContent,
+        child: ColoredBox(
+          color: bg ?? const Color(0x00000000),
+          child: rowContent,
+        ),
       ),
     );
   }
