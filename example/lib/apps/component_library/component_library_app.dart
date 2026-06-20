@@ -9,6 +9,7 @@ import 'package:obers_ui_example/apps/component_library/screens/feedback_screen.
 import 'package:obers_ui_example/apps/component_library/screens/files_screen.dart';
 import 'package:obers_ui_example/apps/component_library/screens/form_inputs_screen.dart';
 import 'package:obers_ui_example/apps/component_library/screens/forms_wizards_screen.dart';
+import 'package:obers_ui_example/apps/component_library/screens/input_stress_screen.dart';
 import 'package:obers_ui_example/apps/component_library/screens/layout_screen.dart';
 import 'package:obers_ui_example/apps/component_library/screens/modules_screen.dart';
 import 'package:obers_ui_example/apps/component_library/screens/navigation_screen.dart';
@@ -42,6 +43,7 @@ class _ComponentLibraryAppState extends State<ComponentLibraryApp> {
     'layout': 'Layout',
     'buttons': 'Buttons',
     'form-inputs': 'Form Inputs',
+    'input-stress': 'Input Stress Test',
     'forms-wizards': 'Forms & Wizards',
     'display': 'Display',
     'tables-trees': 'Tables & Trees',
@@ -66,6 +68,7 @@ class _ComponentLibraryAppState extends State<ComponentLibraryApp> {
       'layout' => const LayoutScreen(),
       'buttons' => const ButtonsScreen(),
       'form-inputs' => const FormInputsScreen(),
+      'input-stress' => const InputStressScreen(),
       'forms-wizards' => const FormsWizardsScreen(),
       'display' => const DisplayScreen(),
       'tables-trees' => const TablesTreesScreen(),
@@ -175,6 +178,12 @@ class _ComponentLibraryAppState extends State<ComponentLibraryApp> {
           label: 'Forms & Wizards',
           icon: OiIcons.clipboardList,
           route: 'forms-wizards',
+          section: 'Controls',
+        ),
+        OiNavItem(
+          label: 'Input Stress Test',
+          icon: OiIcons.gauge,
+          route: 'input-stress',
           section: 'Controls',
         ),
 
