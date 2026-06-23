@@ -436,7 +436,8 @@ class _OiBannerState extends State<OiBanner>
     };
 
     final borderRadius = themeData?.borderRadius ?? context.radius.md;
-    final padding = widget.padding ??
+    final padding =
+        widget.padding ??
         themeData?.padding ??
         EdgeInsets.symmetric(
           horizontal: spacing.md,

@@ -75,11 +75,11 @@ class OiButtonFontSizeScale {
 
   @override
   int get hashCode => Object.hash(
-        small,
-        medium,
-        large,
-        weightSmall,
-        weightMedium,
-        weightLarge,
-      );
+    small,
+    medium,
+    large,
+    weightSmall,
+    weightMedium,
+    weightLarge,
+  );
 }
