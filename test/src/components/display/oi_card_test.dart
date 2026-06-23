@@ -492,13 +492,10 @@ void main() {
 
     testWidgets('no Stack when statusBadge is null', (tester) async {
       await tester.pumpObers(const OiCard(child: Text('content')));
-      // OiCard should not introduce a Stack when there is no badge.
-      final stacks = tester.widgetList<Stack>(find.byType(Stack));
-      for (final stack in stacks) {
-        // Verify none of the Stacks contain a Positioned with a badge.
-        final hasPositioned = stack.children.any((c) => c is Positioned);
-        expect(hasPositioned, isFalse);
-      }
+      expect(
+        find.descendant(of: find.byType(OiCard), matching: find.byType(Stack)),
+        findsNothing,
+      );
     });
 
     testWidgets('statusBadge defaults to topRight position', (tester) async {
@@ -508,7 +505,9 @@ void main() {
           child: Text('content'),
         ),
       );
-      final positioned = tester.widget<Positioned>(find.byType(Positioned));
+      final positioned = tester.widget<Positioned>(
+        find.ancestor(of: find.text('new'), matching: find.byType(Positioned)),
+      );
       expect(positioned.top, isNotNull);
       expect(positioned.right, isNotNull);
       expect(positioned.bottom, isNull);
@@ -523,7 +522,9 @@ void main() {
           child: Text('content'),
         ),
       );
-      final positioned = tester.widget<Positioned>(find.byType(Positioned));
+      final positioned = tester.widget<Positioned>(
+        find.ancestor(of: find.text('new'), matching: find.byType(Positioned)),
+      );
       expect(positioned.top, isNotNull);
       expect(positioned.left, isNotNull);
       expect(positioned.bottom, isNull);
@@ -538,7 +539,9 @@ void main() {
           child: Text('content'),
         ),
       );
-      final positioned = tester.widget<Positioned>(find.byType(Positioned));
+      final positioned = tester.widget<Positioned>(
+        find.ancestor(of: find.text('new'), matching: find.byType(Positioned)),
+      );
       expect(positioned.bottom, isNotNull);
       expect(positioned.right, isNotNull);
       expect(positioned.top, isNull);
@@ -553,7 +556,9 @@ void main() {
           child: Text('content'),
         ),
       );
-      final positioned = tester.widget<Positioned>(find.byType(Positioned));
+      final positioned = tester.widget<Positioned>(
+        find.ancestor(of: find.text('new'), matching: find.byType(Positioned)),
+      );
       expect(positioned.bottom, isNotNull);
       expect(positioned.left, isNotNull);
       expect(positioned.top, isNull);

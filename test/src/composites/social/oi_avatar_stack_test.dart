@@ -27,8 +27,11 @@ void main() {
       const Center(child: OiAvatarStack(users: _users, maxVisible: 3)),
     );
 
+    final stack = find.byType(OiAvatarStack);
     final positioned = tester
-        .widgetList<Positioned>(find.byType(Positioned))
+        .widgetList<Positioned>(
+          find.descendant(of: stack, matching: find.byType(Positioned)),
+        )
         .where((p) => p.left != null)
         .toList();
     final lefts = positioned.map((p) => p.left!).toList();

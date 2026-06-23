@@ -42,7 +42,10 @@ void main() {
     );
 
     // There should be a Positioned widget at left=100, top=200.
-    final positioned = tester.widgetList<Positioned>(find.byType(Positioned));
+    final presence = find.byType(OiCursorPresence);
+    final positioned = tester.widgetList<Positioned>(
+      find.descendant(of: presence, matching: find.byType(Positioned)),
+    );
     final cursorPositioned = positioned.where(
       (p) => p.left == 100 && p.top == 200,
     );
