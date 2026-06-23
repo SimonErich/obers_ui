@@ -90,7 +90,44 @@ class OiDialogShell extends StatelessWidget {
     BorderRadius? borderRadius,
     EdgeInsets? padding,
     bool initialFocus = true,
-  }) async {
+  }) {
+    final navigator = Navigator.maybeOf(context, rootNavigator: true);
+    if (navigator != null) {
+      return navigator.push<T>(
+        RawDialogRoute<T>(
+          requestFocus: false,
+          barrierDismissible: false,
+          barrierColor: const Color(0x00000000),
+          barrierLabel: semanticLabel ?? 'Dialog',
+          transitionDuration: Duration.zero,
+          pageBuilder: (routeContext, animation, secondaryAnimation) {
+            void close([T? result]) {
+              if (routeContext.mounted) {
+                Navigator.of(routeContext).pop(result);
+              }
+            }
+
+            return _OiDialogShellOverlay<T>(
+              onClose: close,
+              barrierDismissible: barrierDismissible,
+              barrierColor: barrierColor,
+              semanticLabel: semanticLabel,
+              width: width,
+              minWidth: minWidth,
+              maxWidth: maxWidth,
+              maxHeight: maxHeight,
+              backgroundColor: backgroundColor,
+              borderRadius: borderRadius,
+              padding: padding,
+              initialFocus: initialFocus,
+              builder: builder,
+            );
+          },
+        ),
+      );
+    }
+
+    // Fallback when no [Navigator] is available (e.g. isolated widget tests).
     final completer = Completer<T?>();
     late OiOverlayHandle handle;
 
@@ -124,12 +161,11 @@ class OiDialogShell extends StatelessWidget {
       handle = service.show(
         label: semanticLabel ?? 'Dialog',
         zOrder: OiOverlayZOrder.dialog,
-        dismissible: barrierDismissible,
+        dismissible: false,
         onDismiss: close,
         builder: overlayContent,
       );
     } else {
-      // Fallback: insert directly into the nearest Flutter Overlay.
       final overlay = Overlay.of(context);
       final entry = OverlayEntry(builder: overlayContent);
       handle = createOiOverlayHandle(entry);
