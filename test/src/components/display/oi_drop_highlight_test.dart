@@ -55,8 +55,15 @@ void main() {
         child: SizedBox(width: 200, height: 200),
       ),
     );
-    expect(find.byType(Stack), findsOneWidget);
-    expect(find.byType(AnimatedOpacity), findsOneWidget);
+    final highlight = find.byType(OiDropHighlight);
+    expect(
+      find.descendant(of: highlight, matching: find.byType(Stack)),
+      findsOneWidget,
+    );
+    expect(
+      find.descendant(of: highlight, matching: find.byType(AnimatedOpacity)),
+      findsOneWidget,
+    );
   });
 
   testWidgets('area style AnimatedOpacity has full opacity when active', (

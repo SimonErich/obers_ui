@@ -57,9 +57,7 @@ class OiOverlayHandle {
     _dismissed = true;
     _onDismiss?.call();
     _onDismiss = null;
-    _entry
-      ..remove()
-      ..dispose();
+    _entry.remove();
   }
 
   /// Marks the overlay entry as needing a rebuild.
@@ -102,7 +100,11 @@ class OiOverlaysService {
     bool dismissOnScroll = false,
     VoidCallback? onDismiss,
   }) {
-    assert(_overlayState != null, 'OiOverlays not attached to OverlayState');
+    final overlayState = _overlayState;
+    assert(
+      overlayState != null && overlayState.mounted,
+      'OiOverlays not attached to a mounted OverlayState',
+    );
 
     late OiOverlayHandle handle;
     late OverlayEntry entry;
@@ -146,7 +148,7 @@ class OiOverlaysService {
       _activeHandles.remove(handle);
       _scrollDismissHandles.remove(handle);
     };
-    _overlayState!.insert(entry);
+    overlayState!.insert(entry);
 
     return handle;
   }
@@ -207,12 +209,16 @@ class OiOverlays extends InheritedWidget {
 
 /// Internal host widget that provides overlay capabilities to the app.
 ///
-/// Uses a [Stack] to layer the main content with a dedicated [Overlay]
-/// for dynamically-shown overlays (dialogs, toasts, command bar, etc.).
+/// App content is a normal [Stack] child. Dialogs/toasts use a dedicated empty
+/// [Overlay] on top — never an [OverlayEntry] for content, which breaks when
+/// keyboard inset / [MediaQuery] changes call [OverlayEntry.markNeedsBuild].
 ///
 /// This widget is rendered internally by [OiApp] and is not exported.
 class _OiOverlaysHost extends StatefulWidget {
-  const _OiOverlaysHost({required this.service, required this.child});
+  const _OiOverlaysHost({
+    required this.service,
+    required this.child,
+  });
 
   final OiOverlaysService service;
   final Widget child;
@@ -222,59 +228,56 @@ class _OiOverlaysHost extends StatefulWidget {
 }
 
 class _OiOverlaysHostState extends State<_OiOverlaysHost> {
-  late final GlobalKey<OverlayState> _overlayKey;
-  late final OverlayEntry _contentEntry;
+  final GlobalKey<OverlayState> _overlayKey = GlobalKey<OverlayState>(
+    debugLabel: 'OiOverlaysHost',
+  );
 
   @override
   void initState() {
     super.initState();
-    _overlayKey = GlobalKey<OverlayState>(debugLabel: 'OiOverlaysHost');
-    _contentEntry = OverlayEntry(
-      builder: (_) => NotificationListener<ScrollNotification>(
-        onNotification: _onScrollNotification,
-        child: widget.child,
-      ),
-    );
+    WidgetsBinding.instance.addPostFrameCallback((_) => _attachOverlayState());
+  }
+
+  @override
+  void dispose() {
+    widget.service._overlayState = null;
+    super.dispose();
+  }
+
+  void _attachOverlayState() {
+    if (!mounted) return;
+    widget.service._overlayState = _overlayKey.currentState;
   }
 
   bool _onScrollNotification(ScrollNotification notification) {
     if (notification is ScrollStartNotification) {
       widget.service._handleContentScroll();
     }
-    // Don't consume — let the notification continue bubbling.
     return false;
-  }
-
-  @override
-  void didUpdateWidget(_OiOverlaysHost oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.child != widget.child) {
-      _contentEntry.markNeedsBuild();
-    }
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    // Rebuild the content entry so it picks up changes from
-    // InheritedWidgets above (e.g. MediaQuery, Directionality).
-    _contentEntry.markNeedsBuild();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
-      final state = _overlayKey.currentState;
-      if (state != null) {
-        widget.service._overlayState = state;
-      }
-    });
+    WidgetsBinding.instance.addPostFrameCallback((_) => _attachOverlayState());
   }
 
   @override
   Widget build(BuildContext context) {
+    final content = NotificationListener<ScrollNotification>(
+      onNotification: _onScrollNotification,
+      child: widget.child,
+    );
+
     return OiOverlays(
       service: widget.service,
-      child: Overlay(
-        key: _overlayKey,
-        initialEntries: [_contentEntry],
+      child: Stack(
+        children: [
+          content,
+          Positioned.fill(
+            child: Overlay(key: _overlayKey),
+          ),
+        ],
       ),
     );
   }
@@ -285,7 +288,10 @@ Widget buildOiOverlaysHost({
   required OiOverlaysService service,
   required Widget child,
 }) {
-  return _OiOverlaysHost(service: service, child: child);
+  return _OiOverlaysHost(
+    service: service,
+    child: child,
+  );
 }
 
 /// Creates a fresh [OiOverlaysService] instance.

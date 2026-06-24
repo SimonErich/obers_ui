@@ -52,7 +52,10 @@ void main() {
         presence: OiPresenceStatus.online,
       ),
     );
-    expect(find.byType(Stack), findsOneWidget);
+    expect(
+      find.descendant(of: find.byType(OiAvatar), matching: find.byType(Stack)),
+      findsOneWidget,
+    );
   });
 
   testWidgets('all size variants render without error', (tester) async {

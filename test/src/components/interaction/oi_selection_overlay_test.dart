@@ -227,7 +227,13 @@ void main() {
         child: const Text('Always visible'),
       ),
     );
-    expect(find.byType(Stack), findsOneWidget);
+    expect(
+      find.descendant(
+        of: find.byType(OiSelectionOverlay),
+        matching: find.byType(Stack),
+      ),
+      findsOneWidget,
+    );
     expect(find.text('Always visible'), findsOneWidget);
   });
 }

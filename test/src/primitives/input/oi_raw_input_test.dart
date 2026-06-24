@@ -74,8 +74,13 @@ void main() {
 
   testWidgets('no placeholder widget when placeholder is null', (tester) async {
     await tester.pumpObers(buildInput());
-    // No extra Text widget present besides any EditableText internal rendering.
-    expect(find.byType(Stack), findsNothing);
+    expect(
+      find.descendant(
+        of: find.byType(OiRawInput),
+        matching: find.byType(Stack),
+      ),
+      findsNothing,
+    );
   });
 
   // ── Leading / trailing ─────────────────────────────────────────────────────
