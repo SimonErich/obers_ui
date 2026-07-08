@@ -79,7 +79,7 @@ class _OiFileInputState extends State<OiFileInput> {
     if (!widget.enabled || _picking) return;
     setState(() => _picking = true);
     try {
-      final result = await FilePicker.platform.pickFiles(
+      final result = await FilePicker.pickFiles(
         allowMultiple: widget.multipleFiles,
         type: widget.allowedExtensions != null ? FileType.custom : FileType.any,
         allowedExtensions: widget.allowedExtensions,
