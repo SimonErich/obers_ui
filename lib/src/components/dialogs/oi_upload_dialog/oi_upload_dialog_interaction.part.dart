@@ -16,7 +16,7 @@ extension _OiUploadDialogInteraction on _OiUploadDialogState {
     if (_picking) return;
     _updateState(() => _picking = true);
     try {
-      final result = await FilePicker.platform.pickFiles(
+      final result = await FilePicker.pickFiles(
         allowMultiple: true,
         type: widget.allowedExtensions != null ? FileType.custom : FileType.any,
         allowedExtensions: widget.allowedExtensions,
