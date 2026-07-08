@@ -14,7 +14,7 @@ environment:
 
 dependencies:
   desktop_drop: ^0.7.0
-  file_picker: ^8.1.0
+  file_picker: ^11.0.2
   flutter:
     sdk: flutter
   intl: ^0.20.0
