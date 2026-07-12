@@ -204,7 +204,7 @@ class _OiTileMapState extends State<OiTileMap> {
 
     final markers = <Widget>[
       for (final marker in widget.markers)
-        _positionedMarker(marker, topLeft, colors),
+        _positionedMarker(marker, topLeft, size, colors),
     ];
 
     final stack = Stack(
@@ -244,20 +244,32 @@ class _OiTileMapState extends State<OiTileMap> {
   Widget _positionedMarker(
     OiMapMarker marker,
     Offset topLeft,
+    Size viewport,
     OiColorScheme colors,
   ) {
-    final pixel =
-        _project(OiLatLng(marker.latitude, marker.longitude)) - topLeft;
-    const size = 26.0;
+    final projected = _project(OiLatLng(marker.latitude, marker.longitude));
+    // Place the marker on the copy of the globe nearest the viewport, so it
+    // wraps at the antimeridian exactly like the tile grid (and stays put when
+    // panning drives the center longitude outside [-180, 180]).
+    final viewportCenterX = topLeft.dx + viewport.width / 2;
+    var worldX = projected.dx;
+    while (worldX - viewportCenterX > _worldSize / 2) {
+      worldX -= _worldSize;
+    }
+    while (worldX - viewportCenterX < -_worldSize / 2) {
+      worldX += _worldSize;
+    }
+    final pixel = Offset(worldX, projected.dy) - topLeft;
+    const markerSize = 26.0;
     return Positioned(
-      left: pixel.dx - size / 2,
-      top: pixel.dy - size,
+      left: pixel.dx - markerSize / 2,
+      top: pixel.dy - markerSize,
       child: Semantics(
         container: true,
         label: marker.label,
         child: OiIcon.decorative(
           icon: OiIcons.mapPin,
-          size: size,
+          size: markerSize,
           color: marker.color ?? colors.primary.base,
         ),
       ),

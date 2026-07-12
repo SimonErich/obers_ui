@@ -51,6 +51,42 @@ void main() {
       expect(find.bySemanticsLabel('Zoom in'), findsNothing);
     });
 
+    testWidgets('wraps a marker across the antimeridian into view', (
+      tester,
+    ) async {
+      // Center just west of the antimeridian; the marker sits just east of it,
+      // so it belongs ~2° (a few px) to the right of the viewport center — on
+      // the *next* copy of the globe, exactly where the wrapping tile grid is.
+      await tester.pumpChartApp(
+        const OiTileMap(
+          label: 'Pacific',
+          center: OiLatLng(0, 179),
+          markers: [
+            OiMapMarker(
+              latitude: 0,
+              longitude: -179,
+              label: 'Across',
+              value: 1,
+            ),
+          ],
+        ),
+        surfaceSize: const Size(800, 600),
+      );
+      await tester.pump();
+
+      final positioned = tester.widget<Positioned>(
+        find.ancestor(
+          of: find.bySemanticsLabel('Across'),
+          matching: find.byType(Positioned),
+        ),
+      );
+      // Without the wrap it would land a whole world (~2048px) to the left,
+      // off-screen; with it, near the 400px viewport center.
+      expect(positioned.left, isNotNull);
+      expect(positioned.left, greaterThan(350));
+      expect(positioned.left, lessThan(450));
+    });
+
     testWidgets('zooming in renders a finer tile grid', (tester) async {
       await tester.pumpChartApp(
         const OiTileMap(label: 'World', center: OiLatLng(0, 0), zoom: 2),
