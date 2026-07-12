@@ -38,6 +38,3 @@ dev_dependencies:
     path: packages/obers_ui_charts
   very_good_analysis: ^10.0.0
 
-# win32 override necessary for file_picker 11.0.2 to work - remove if it works without later (after 07/2026).
-dependency_overrides:
-  win32: 6.0.0
