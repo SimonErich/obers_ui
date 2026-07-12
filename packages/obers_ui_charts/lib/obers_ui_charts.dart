@@ -120,7 +120,15 @@ export 'src/composites/oi_sparkline.dart';
 
 export 'src/composites/oi_sunburst_chart/oi_sunburst_chart.dart';
 export 'src/composites/oi_sunburst_chart/oi_sunburst_painter.dart';
+export 'src/composites/oi_tile_map/oi_tile_map.dart';
 export 'src/composites/oi_treemap.dart';
+// ── Composites: Vector Map ───────────────────────────────────────────────────
+
+export 'src/composites/oi_vector_map/oi_vector_map.dart';
+export 'src/composites/oi_vector_map/oi_vector_map_data.dart';
+export 'src/composites/oi_vector_map/oi_vector_map_painter.dart';
+export 'src/composites/oi_vector_map/oi_vector_map_projection.dart';
+export 'src/composites/oi_vector_map/oi_world_map.dart';
 // ── Composites: Waterfall Chart ───────────────────────────────────────────────
 
 export 'src/composites/oi_waterfall_chart/oi_waterfall_chart.dart';

@@ -1,6 +1,7 @@
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/buttons/oi_button.dart';
+import 'package:obers_ui/src/components/display/oi_avatar.dart';
 import 'package:obers_ui/src/components/inputs/oi_text_input.dart';
 import 'package:obers_ui/src/foundation/oi_responsive.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
@@ -20,14 +21,19 @@ enum OiAuthMode {
 
   /// Email-only forgot-password form.
   forgotPassword,
+
+  /// Lock screen: a known user's avatar and name with a password-only
+  /// unlock field.
+  lock,
 }
 
-/// A full-page authentication module with login, registration, and
-/// forgot-password flows.
+/// A full-page authentication module with login, registration,
+/// forgot-password, and lock-screen flows.
 ///
 /// Coverage: REQ-0071
 ///
-/// Composes [OiTextInput], [OiButton], [OiLabel], [OiColumn], [OiDivider].
+/// Composes [OiTextInput], [OiButton], [OiLabel], [OiColumn], [OiDivider],
+/// and [OiAvatar] (lock screen).
 ///
 /// The page centres its content in a card-like column (max 400 dp) and
 /// switches between forms via [OiAuthMode]. All action callbacks are optional;
@@ -43,6 +49,9 @@ class OiAuthPage extends StatefulWidget {
     this.onLogin,
     this.onRegister,
     this.onForgotPassword,
+    this.onUnlock,
+    this.userName,
+    this.avatar,
     this.logo,
     this.footer,
     super.key,
@@ -58,7 +67,10 @@ class OiAuthPage extends StatefulWidget {
     super.key,
   }) : initialMode = OiAuthMode.login,
        onRegister = null,
-       onForgotPassword = null;
+       onForgotPassword = null,
+       onUnlock = null,
+       userName = null,
+       avatar = null;
 
   /// Creates an [OiAuthPage] locked to [OiAuthMode.register].
   const OiAuthPage.register({
@@ -70,6 +82,27 @@ class OiAuthPage extends StatefulWidget {
     super.key,
   }) : initialMode = OiAuthMode.register,
        onLogin = null,
+       onForgotPassword = null,
+       onUnlock = null,
+       userName = null,
+       avatar = null;
+
+  /// Creates an [OiAuthPage] locked to [OiAuthMode.lock].
+  ///
+  /// Shows the known user's [avatar] and [userName] above a password-only
+  /// field and an unlock button that invokes [onUnlock].
+  const OiAuthPage.lock({
+    required this.label,
+    this.onUnlock,
+    this.userName,
+    this.avatar,
+    this.onModeChanged,
+    this.logo,
+    this.footer,
+    super.key,
+  }) : initialMode = OiAuthMode.lock,
+       onLogin = null,
+       onRegister = null,
        onForgotPassword = null;
 
   /// Accessibility label announced by screen readers.
@@ -92,6 +125,17 @@ class OiAuthPage extends StatefulWidget {
   /// Called when the user submits the forgot-password form. Returns `true` on
   /// success.
   final Future<bool> Function(String email)? onForgotPassword;
+
+  /// Called when the user submits the lock-screen unlock form. Returns
+  /// `true` on success.
+  final Future<bool> Function(String password)? onUnlock;
+
+  /// The known user's display name, shown on the lock screen.
+  final String? userName;
+
+  /// An avatar widget for the lock screen. When `null`, a default
+  /// [OiAvatar] built from [userName]'s initials is shown.
+  final Widget? avatar;
 
   /// An optional logo widget displayed above the form.
   final Widget? logo;
@@ -168,6 +212,8 @@ class _OiAuthPageState extends State<OiAuthPage> {
           );
         case OiAuthMode.forgotPassword:
           success = await widget.onForgotPassword!(_emailController.text);
+        case OiAuthMode.lock:
+          success = await widget.onUnlock!(_passwordController.text);
       }
       if (!success && mounted) {
         setState(() {
@@ -197,6 +243,8 @@ class _OiAuthPageState extends State<OiAuthPage> {
         return widget.onRegister != null;
       case OiAuthMode.forgotPassword:
         return widget.onForgotPassword != null;
+      case OiAuthMode.lock:
+        return widget.onUnlock != null;
     }
   }
 
@@ -365,6 +413,67 @@ class _OiAuthPageState extends State<OiAuthPage> {
   }
 
   // ---------------------------------------------------------------------------
+  // Lock form
+  // ---------------------------------------------------------------------------
+
+  Widget _buildLockForm(BuildContext context) {
+    final sp = context.spacing;
+    final breakpoint = context.breakpoint;
+    final name = widget.userName ?? 'User';
+
+    return OiColumn(
+      breakpoint: breakpoint,
+      gap: OiResponsive(sp.sm),
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Center(
+          child:
+              widget.avatar ??
+              OiAvatar(
+                semanticLabel: name,
+                initials: _initials(name),
+                size: OiAvatarSize.xl,
+              ),
+        ),
+        SizedBox(height: sp.sm),
+        OiLabel.h2(name, textAlign: TextAlign.center),
+        SizedBox(height: sp.sm),
+        OiTextInput(
+          controller: _passwordController,
+          label: 'Password',
+          placeholder: 'Enter your password',
+          obscureText: true,
+          textInputAction: TextInputAction.done,
+          onSubmitted: _canSubmit && !_isSubmitting ? (_) => _submit() : null,
+        ),
+        if (_error != null) _buildError(context),
+        SizedBox(height: sp.sm),
+        OiButton.primary(
+          label: 'Unlock',
+          onTap: _canSubmit && !_isSubmitting ? _submit : null,
+          loading: _isSubmitting,
+          fullWidth: true,
+        ),
+      ],
+    );
+  }
+
+  /// Derives up to two uppercase initials from a display [name].
+  String _initials(String name) {
+    final words = name
+        .trim()
+        .split(RegExp(r'\s+'))
+        .where((w) => w.isNotEmpty)
+        .toList();
+    if (words.isEmpty) return '?';
+    if (words.length == 1) {
+      return words.first.substring(0, 1).toUpperCase();
+    }
+    return (words.first.substring(0, 1) + words.last.substring(0, 1))
+        .toUpperCase();
+  }
+
+  // ---------------------------------------------------------------------------
   // Shared helpers
   // ---------------------------------------------------------------------------
 
@@ -417,6 +526,8 @@ class _OiAuthPageState extends State<OiAuthPage> {
         form = _buildRegisterForm(context);
       case OiAuthMode.forgotPassword:
         form = _buildForgotPasswordForm(context);
+      case OiAuthMode.lock:
+        form = _buildLockForm(context);
     }
 
     return Semantics(

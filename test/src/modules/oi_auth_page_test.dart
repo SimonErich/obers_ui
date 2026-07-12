@@ -237,5 +237,82 @@ void main() {
 
       expect(find.text('Operation failed. Please try again.'), findsOneWidget);
     });
+
+    testWidgets('renders lock form when initialMode is lock', (tester) async {
+      await tester.pumpObers(
+        const OiAuthPage(
+          label: 'Auth',
+          initialMode: OiAuthMode.lock,
+          userName: 'Ada Lovelace',
+        ),
+        surfaceSize: const Size(800, 600),
+      );
+
+      expect(find.text('Ada Lovelace'), findsOneWidget);
+      expect(find.text('Unlock'), findsOneWidget);
+      // Password-only: no email or name fields.
+      expect(find.text('Email'), findsNothing);
+      expect(find.text('Full Name'), findsNothing);
+      expect(find.text('Password'), findsOneWidget);
+    });
+
+    testWidgets('OiAuthPage.lock factory shows avatar, name, and unlock', (
+      tester,
+    ) async {
+      await tester.pumpObers(
+        OiAuthPage.lock(
+          label: 'Lock',
+          userName: 'Grace Hopper',
+          onUnlock: (password) async => true,
+        ),
+        surfaceSize: const Size(800, 600),
+      );
+
+      expect(find.byType(OiAvatar), findsOneWidget);
+      expect(find.text('Grace Hopper'), findsOneWidget);
+      expect(find.text('Unlock'), findsOneWidget);
+    });
+
+    testWidgets('invokes onUnlock callback with the password', (tester) async {
+      String? capturedPassword;
+      final completer = Completer<bool>();
+
+      await tester.pumpObers(
+        OiAuthPage.lock(
+          label: 'Lock',
+          userName: 'Ada',
+          onUnlock: (password) {
+            capturedPassword = password;
+            return completer.future;
+          },
+        ),
+        surfaceSize: const Size(800, 600),
+      );
+
+      await tester.enterText(find.byType(EditableText).first, 's3cret');
+      await tester.tap(find.text('Unlock'));
+      await tester.pump();
+
+      expect(capturedPassword, 's3cret');
+
+      completer.complete(true);
+      await tester.pumpAndSettle();
+    });
+
+    testWidgets('shows a default avatar with initials when none is given', (
+      tester,
+    ) async {
+      await tester.pumpObers(
+        OiAuthPage.lock(
+          label: 'Lock',
+          userName: 'Ada Lovelace',
+          onUnlock: (password) async => true,
+        ),
+        surfaceSize: const Size(800, 600),
+      );
+
+      // Default OiAvatar renders the derived initials "AL".
+      expect(find.text('AL'), findsOneWidget);
+    });
   });
 }
