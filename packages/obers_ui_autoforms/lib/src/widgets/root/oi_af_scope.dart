@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui_autoforms/src/foundation/oi_af_message_resolver.dart';
 import 'package:obers_ui_autoforms/src/runtime/controller/oi_af_controller.dart';
 
 /// InheritedWidget that provides the [OiAfController] to the widget subtree.
@@ -10,6 +11,7 @@ class OiAfScope extends InheritedWidget {
   /// Creates an [OiAfScope] wrapping the given controller.
   const OiAfScope({
     required this.rawController,
+    required this.messageResolver,
     required super.child,
     super.key,
   });
@@ -17,6 +19,9 @@ class OiAfScope extends InheritedWidget {
   /// The form controller stored as dynamic to avoid generic type mismatch
   /// with `dependOnInheritedWidgetOfExactType`.
   final OiAfController<dynamic, dynamic> rawController;
+
+  /// Resolver for default validation messages when validators omit `message`.
+  final OiAfMessageResolver messageResolver;
 
   /// Retrieve the nearest [OiAfController] from the widget tree.
   static OiAfController<TField, Object?> of<TField extends Enum, TData>(
@@ -40,8 +45,20 @@ class OiAfScope extends InheritedWidget {
     return scope.rawController as OiAfController<TField, TData>;
   }
 
+  /// Retrieve the nearest [OiAfMessageResolver] from the widget tree.
+  static OiAfMessageResolver messageResolverOf(BuildContext context) {
+    final scope = context.dependOnInheritedWidgetOfExactType<OiAfScope>();
+    assert(
+      scope != null,
+      'OiAfScope not found. '
+      'Wrap your OiAf* field widgets inside an OiAfForm.',
+    );
+    return scope!.messageResolver;
+  }
+
   @override
   bool updateShouldNotify(OiAfScope oldWidget) {
-    return rawController != oldWidget.rawController;
+    return rawController != oldWidget.rawController ||
+        messageResolver != oldWidget.messageResolver;
   }
 }

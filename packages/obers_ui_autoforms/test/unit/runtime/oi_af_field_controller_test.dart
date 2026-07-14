@@ -1,9 +1,18 @@
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui_autoforms/obers_ui_autoforms.dart';
+import 'package:obers_ui_autoforms/src/validation/oi_af_validation_messages.dart';
 
 // ── Test Enum ────────────────────────────────────────────────────────────────
 
 enum TestField { name, email, password, age, agree }
+
+final class _TestMessageResolver extends OiAfMessageResolver {
+  const _TestMessageResolver();
+
+  @override
+  String requiredText(BuildContext context) => 'RESOLVED_REQUIRED';
+}
 
 // ── Mock Reader ──────────────────────────────────────────────────────────────
 
@@ -610,6 +619,29 @@ void main() {
       );
       expect(result, isFalse);
       expect(fc.errors, isNotEmpty);
+    });
+
+    testWidgets('required uses validationMessagesGetter when attached to form', (
+      tester,
+    ) async {
+      await tester.pumpWidget(const SizedBox.shrink());
+      final context = tester.element(find.byType(SizedBox));
+
+      final fc = _textFieldController(required: true);
+      // validationMessagesGetter cannot be cascade-assigned (analyzer false positive).
+      // ignore: cascade_invocations
+      fc.validationMessagesGetter = () => OiAfValidationMessages(
+        resolver: const _TestMessageResolver(),
+        context: context,
+      );
+
+      final result = await fc.validate(
+        effectiveMode: OiAfValidateMode.onChange,
+        form: MockReader(),
+      );
+
+      expect(result, isFalse);
+      expect(fc.primaryError, 'RESOLVED_REQUIRED');
     });
 
     test('required field passes for non-null', () async {

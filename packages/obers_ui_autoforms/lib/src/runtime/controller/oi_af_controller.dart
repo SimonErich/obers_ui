@@ -8,6 +8,7 @@ import 'package:obers_ui_autoforms/src/definitions/oi_af_field_definition.dart';
 import 'package:obers_ui_autoforms/src/diagnostics/oi_af_observer.dart';
 import 'package:obers_ui_autoforms/src/foundation/oi_af_aggregate_state.dart';
 import 'package:obers_ui_autoforms/src/foundation/oi_af_enums.dart';
+import 'package:obers_ui_autoforms/src/foundation/oi_af_message_resolver.dart';
 import 'package:obers_ui_autoforms/src/foundation/oi_af_option.dart';
 import 'package:obers_ui_autoforms/src/foundation/oi_af_reader.dart';
 import 'package:obers_ui_autoforms/src/foundation/oi_af_submit_result.dart';
@@ -18,6 +19,7 @@ import 'package:obers_ui_autoforms/src/runtime/graphs/oi_af_dependency_graph.dar
 import 'package:obers_ui_autoforms/src/runtime/graphs/oi_af_focus_graph.dart';
 
 import 'package:obers_ui_autoforms/src/validation/oi_af_form_validation_context.dart';
+import 'package:obers_ui_autoforms/src/validation/oi_af_validation_messages.dart';
 import 'package:obers_ui_autoforms/src/widgets/aggregate/oi_af_error_summary.dart'
     show OiAfErrorSummary;
 
@@ -99,6 +101,9 @@ abstract class OiAfController<TField extends Enum, TData> extends ChangeNotifier
   )?
   _onSubmitResult;
   OiAfSubmitErrorMapper<TField, TData>? _errorMapper;
+
+  OiAfMessageResolver messageResolver = const OiAfDefaultMessageResolver();
+  BuildContext? Function()? _getMessageContext;
 
   // ── Lifecycle ──────────────────────────────────────────────────────────
 
@@ -336,10 +341,7 @@ abstract class OiAfController<TField extends Enum, TData> extends ChangeNotifier
       ..removeListener(_notifyListeners)
       ..dispose();
 
-    controller
-      ..onValueChanged = _handleFieldValueChanged
-      ..onFocusChanged = _handleFieldFocusChanged
-      ..observerGetter = () => observer;
+    _wireFieldControllerCallbacks(controller);
 
     _fieldControllers[field] = controller;
     notifyListeners();
@@ -384,7 +386,7 @@ abstract class OiAfController<TField extends Enum, TData> extends ChangeNotifier
         final result = await validator(ctx);
         if (result != null) _globalErrors.add(result);
       } on Object {
-        _globalErrors.add('Validation failed.');
+        _globalErrors.add(_resolveValidationFailed());
       }
     }
 
@@ -465,7 +467,7 @@ abstract class OiAfController<TField extends Enum, TData> extends ChangeNotifier
       _onSubmitResult?.call(result, this);
       return result;
     } on Object catch (e, st) {
-      var globalErrors = <String>['Submission failed.'];
+      var globalErrors = <String>[_resolveSubmitFailed()];
       if (_errorMapper != null) {
         try {
           final mapped = _errorMapper!(
@@ -1268,14 +1270,11 @@ abstract class OiAfController<TField extends Enum, TData> extends ChangeNotifier
         definition as OiAfFieldDefinition<TField, dynamic>;
     _fieldOrder.add(definition.field);
 
-    final fc =
-        OiAfFieldController<TField>(
-            definition: definition,
-            initialValue: definition.initialValue,
-          )
-          ..onValueChanged = _handleFieldValueChanged
-          ..onFocusChanged = _handleFieldFocusChanged
-          ..observerGetter = () => observer;
+    final fc = OiAfFieldController<TField>(
+      definition: definition,
+      initialValue: definition.initialValue,
+    );
+    _wireFieldControllerCallbacks(fc);
 
     _fieldControllers[definition.field] = fc;
   }
@@ -1425,6 +1424,8 @@ abstract class OiAfController<TField extends Enum, TData> extends ChangeNotifier
     void Function(OiAfSubmitResult<TData>, OiAfController<TField, TData>)?
     onSubmitResult,
     OiAfSubmitErrorMapper<TField, TData>? errorMapper,
+    OiAfMessageResolver messageResolver = const OiAfDefaultMessageResolver(),
+    BuildContext? Function()? getMessageContext,
   }) {
     assert(!_isAttached, 'Controller already attached to a form.');
     _isAttached = true;
@@ -1437,6 +1438,9 @@ abstract class OiAfController<TField extends Enum, TData> extends ChangeNotifier
     _onSubmit = onSubmit;
     _onSubmitResult = onSubmitResult;
     _errorMapper = errorMapper;
+    this.messageResolver = messageResolver;
+    _getMessageContext = getMessageContext;
+    _wireFieldMessageGetters();
   }
 
   void detach() {
@@ -1444,5 +1448,47 @@ abstract class OiAfController<TField extends Enum, TData> extends ChangeNotifier
     _onSubmit = null;
     _onSubmitResult = null;
     _errorMapper = null;
+    _getMessageContext = null;
+    for (final fc in _fieldControllers.values) {
+      fc.validationMessagesGetter = null;
+    }
+  }
+
+  void _wireFieldControllerCallbacks(OiAfFieldController<TField> fc) {
+    fc
+      ..onValueChanged = _handleFieldValueChanged
+      ..onFocusChanged = _handleFieldFocusChanged
+      ..observerGetter = () => observer;
+    // Cannot cascade-assign [validationMessagesGetter] (analyzer false positive).
+    // ignore: cascade_invocations
+    fc.validationMessagesGetter = _validationMessages;
+  }
+
+  OiAfValidationMessages? _validationMessages() {
+    final context = _getMessageContext?.call();
+    if (context == null) return null;
+    return OiAfValidationMessages(resolver: messageResolver, context: context);
+  }
+
+  void _wireFieldMessageGetters() {
+    for (final fc in _fieldControllers.values) {
+      fc.validationMessagesGetter = _validationMessages;
+    }
+  }
+
+  String _resolveValidationFailed() {
+    final messages = _validationMessages();
+    if (messages != null) {
+      return messages.resolver.validationFailed(messages.context);
+    }
+    return 'Validation failed.';
+  }
+
+  String _resolveSubmitFailed() {
+    final messages = _validationMessages();
+    if (messages != null) {
+      return messages.resolver.submitFailed(messages.context);
+    }
+    return 'Submission failed. Please try again.';
   }
 }
