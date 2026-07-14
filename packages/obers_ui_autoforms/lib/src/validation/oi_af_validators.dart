@@ -14,13 +14,12 @@ String _oiAfMsg<TField extends Enum, TValue>(
   required String englishFallback,
   String? message,
   String Function(OiAfMessageResolver resolver, BuildContext context)? resolve,
-}) =>
-    oiAfResolveValidatorMessage(
-      ctx,
-      englishFallback: englishFallback,
-      message: message,
-      resolve: resolve,
-    );
+}) => oiAfResolveValidatorMessage(
+  ctx,
+  englishFallback: englishFallback,
+  message: message,
+  resolve: resolve,
+);
 
 /// Built-in validator factories inspired by Laravel's validation rules.
 ///

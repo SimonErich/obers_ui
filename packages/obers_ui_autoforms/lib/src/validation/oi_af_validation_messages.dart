@@ -5,10 +5,7 @@ import 'package:obers_ui_autoforms/src/validation/oi_af_validation_context.dart'
 
 /// Resolver + [BuildContext] pair available during field validation.
 final class OiAfValidationMessages {
-  const OiAfValidationMessages({
-    required this.resolver,
-    required this.context,
-  });
+  const OiAfValidationMessages({required this.resolver, required this.context});
 
   final OiAfMessageResolver resolver;
   final BuildContext context;

@@ -102,7 +102,7 @@ abstract class OiAfController<TField extends Enum, TData> extends ChangeNotifier
   _onSubmitResult;
   OiAfSubmitErrorMapper<TField, TData>? _errorMapper;
 
-  OiAfMessageResolver _messageResolver = const OiAfDefaultMessageResolver();
+  OiAfMessageResolver messageResolver = const OiAfDefaultMessageResolver();
   BuildContext? Function()? _getMessageContext;
 
   // ── Lifecycle ──────────────────────────────────────────────────────────
@@ -341,10 +341,7 @@ abstract class OiAfController<TField extends Enum, TData> extends ChangeNotifier
       ..removeListener(_notifyListeners)
       ..dispose();
 
-    controller.onValueChanged = _handleFieldValueChanged;
-    controller.onFocusChanged = _handleFieldFocusChanged;
-    controller.observerGetter = () => observer;
-    controller.validationMessagesGetter = _validationMessages;
+    _wireFieldControllerCallbacks(controller);
 
     _fieldControllers[field] = controller;
     notifyListeners();
@@ -1277,10 +1274,7 @@ abstract class OiAfController<TField extends Enum, TData> extends ChangeNotifier
       definition: definition,
       initialValue: definition.initialValue,
     );
-    fc.onValueChanged = _handleFieldValueChanged;
-    fc.onFocusChanged = _handleFieldFocusChanged;
-    fc.observerGetter = () => observer;
-    fc.validationMessagesGetter = _validationMessages;
+    _wireFieldControllerCallbacks(fc);
 
     _fieldControllers[definition.field] = fc;
   }
@@ -1444,14 +1438,9 @@ abstract class OiAfController<TField extends Enum, TData> extends ChangeNotifier
     _onSubmit = onSubmit;
     _onSubmitResult = onSubmitResult;
     _errorMapper = errorMapper;
-    _messageResolver = messageResolver;
+    this.messageResolver = messageResolver;
     _getMessageContext = getMessageContext;
     _wireFieldMessageGetters();
-  }
-
-  /// Updates the message resolver while attached (e.g. when [OiAfForm] rebuilds).
-  void updateMessageResolver(OiAfMessageResolver messageResolver) {
-    _messageResolver = messageResolver;
   }
 
   void detach() {
@@ -1465,13 +1454,20 @@ abstract class OiAfController<TField extends Enum, TData> extends ChangeNotifier
     }
   }
 
+  void _wireFieldControllerCallbacks(OiAfFieldController<TField> fc) {
+    fc
+      ..onValueChanged = _handleFieldValueChanged
+      ..onFocusChanged = _handleFieldFocusChanged
+      ..observerGetter = () => observer;
+    // Cannot cascade-assign [validationMessagesGetter] (analyzer false positive).
+    // ignore: cascade_invocations
+    fc.validationMessagesGetter = _validationMessages;
+  }
+
   OiAfValidationMessages? _validationMessages() {
     final context = _getMessageContext?.call();
     if (context == null) return null;
-    return OiAfValidationMessages(
-      resolver: _messageResolver,
-      context: context,
-    );
+    return OiAfValidationMessages(resolver: messageResolver, context: context);
   }
 
   void _wireFieldMessageGetters() {

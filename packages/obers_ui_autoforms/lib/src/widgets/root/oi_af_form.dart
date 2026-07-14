@@ -107,7 +107,7 @@ class _OiAfFormState<TField extends Enum, TData>
       oldWidget.controller.detach();
       _attach();
     } else if (oldWidget.messageResolver != widget.messageResolver) {
-      widget.controller.updateMessageResolver(widget.messageResolver);
+      widget.controller.messageResolver = widget.messageResolver;
     }
   }
 

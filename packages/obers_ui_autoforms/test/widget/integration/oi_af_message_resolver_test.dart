@@ -15,7 +15,8 @@ final class _LocalizedResolver extends OiAfMessageResolver {
   String invalidEmail(BuildContext context) => 'LOCALIZED_EMAIL';
 
   @override
-  String validationFailed(BuildContext context) => 'LOCALIZED_VALIDATION_FAILED';
+  String validationFailed(BuildContext context) =>
+      'LOCALIZED_VALIDATION_FAILED';
 
   @override
   String submitFailed(BuildContext context) => 'LOCALIZED_SUBMIT_FAILED';
@@ -92,10 +93,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('LOCALIZED_EMAIL'), findsOneWidget);
-      expect(
-        find.text('Please enter a valid email address.'),
-        findsNothing,
-      );
+      expect(find.text('Please enter a valid email address.'), findsNothing);
     });
 
     testWidgets('default resolver keeps English required message', (

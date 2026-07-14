@@ -36,6 +36,6 @@ final class OiAfValidationContext<TField extends Enum, TValue> {
   /// Whether the field is currently enabled.
   final bool isEnabled;
 
-  /// Localized messages from [OiAfForm.messageResolver], when attached.
+  /// Localized messages from the attached form's message resolver, if any.
   final OiAfValidationMessages? messages;
 }

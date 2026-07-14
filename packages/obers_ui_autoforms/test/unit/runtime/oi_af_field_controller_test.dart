@@ -628,6 +628,8 @@ void main() {
       final context = tester.element(find.byType(SizedBox));
 
       final fc = _textFieldController(required: true);
+      // validationMessagesGetter cannot be cascade-assigned (analyzer false positive).
+      // ignore: cascade_invocations
       fc.validationMessagesGetter = () => OiAfValidationMessages(
         resolver: const _TestMessageResolver(),
         context: context,
