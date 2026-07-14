@@ -1,9 +1,26 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:flutter/widgets.dart';
+
 import 'package:obers_ui_autoforms/src/definitions/oi_af_field_definition.dart';
+import 'package:obers_ui_autoforms/src/foundation/oi_af_message_resolver.dart';
 import 'package:obers_ui_autoforms/src/foundation/oi_af_typedefs.dart';
 import 'package:obers_ui_autoforms/src/validation/oi_af_validation_context.dart';
+import 'package:obers_ui_autoforms/src/validation/oi_af_validation_messages.dart';
+
+String _oiAfMsg<TField extends Enum, TValue>(
+  OiAfValidationContext<TField, TValue> ctx, {
+  required String englishFallback,
+  String? message,
+  String Function(OiAfMessageResolver resolver, BuildContext context)? resolve,
+}) =>
+    oiAfResolveValidatorMessage(
+      ctx,
+      englishFallback: englishFallback,
+      message: message,
+      resolve: resolve,
+    );
 
 /// Built-in validator factories inspired by Laravel's validation rules.
 ///
@@ -21,7 +38,12 @@ abstract final class OiAfValidators {
   }) => (ctx) {
     final v = ctx.value;
     if (v == null || v.trim().isEmpty) {
-      return message ?? 'This field is required.';
+      return _oiAfMsg(
+        ctx,
+        englishFallback: 'This field is required.',
+        message: message,
+        resolve: (r, c) => r.requiredText(c),
+      );
     }
     return null;
   };
@@ -31,11 +53,30 @@ abstract final class OiAfValidators {
     String? message,
   }) => (ctx) {
     final v = ctx.value;
-    if (v == null) return message ?? 'This field is required.';
-    if (v is String && v.trim().isEmpty) {
-      return message ?? 'This field is required.';
+    if (v == null) {
+      return _oiAfMsg(
+        ctx,
+        englishFallback: 'This field is required.',
+        message: message,
+        resolve: (r, c) => r.requiredText(c),
+      );
     }
-    if (v is List && v.isEmpty) return message ?? 'This field is required.';
+    if (v is String && v.trim().isEmpty) {
+      return _oiAfMsg(
+        ctx,
+        englishFallback: 'This field is required.',
+        message: message,
+        resolve: (r, c) => r.requiredText(c),
+      );
+    }
+    if (v is List && v.isEmpty) {
+      return _oiAfMsg(
+        ctx,
+        englishFallback: 'This field is required.',
+        message: message,
+        resolve: (r, c) => r.requiredText(c),
+      );
+    }
     return null;
   };
 
@@ -43,7 +84,14 @@ abstract final class OiAfValidators {
   static OiAfValidator<TField, bool?> requiredTrue<TField extends Enum>({
     String? message,
   }) => (ctx) {
-    if (ctx.value != true) return message ?? 'This must be accepted.';
+    if (ctx.value != true) {
+      return _oiAfMsg(
+        ctx,
+        englishFallback: 'This must be accepted.',
+        message: message,
+        resolve: (r, c) => r.mustBeTrue(c),
+      );
+    }
     return null;
   };
 
@@ -51,7 +99,14 @@ abstract final class OiAfValidators {
   static OiAfValidator<TField, bool?> requiredFalse<TField extends Enum>({
     String? message,
   }) => (ctx) {
-    if (ctx.value ?? true) return message ?? 'This must be declined.';
+    if (ctx.value ?? true) {
+      return _oiAfMsg(
+        ctx,
+        englishFallback: 'This must be declined.',
+        message: message,
+        resolve: (r, c) => r.mustBeFalse(c),
+      );
+    }
     return null;
   };
 
@@ -62,7 +117,14 @@ abstract final class OiAfValidators {
     String? message,
   }) => (ctx) {
     if (ctx.form.get<Object?>(otherField) != value) return null;
-    if (_isEmpty(ctx.value)) return message ?? 'This field is required.';
+    if (_isEmpty(ctx.value)) {
+      return _oiAfMsg(
+        ctx,
+        englishFallback: 'This field is required.',
+        message: message,
+        resolve: (r, c) => r.requiredText(c),
+      );
+    }
     return null;
   };
 
@@ -73,7 +135,14 @@ abstract final class OiAfValidators {
     String? message,
   }) => (ctx) {
     if (ctx.form.get<Object?>(otherField) == value) return null;
-    if (_isEmpty(ctx.value)) return message ?? 'This field is required.';
+    if (_isEmpty(ctx.value)) {
+      return _oiAfMsg(
+        ctx,
+        englishFallback: 'This field is required.',
+        message: message,
+        resolve: (r, c) => r.requiredText(c),
+      );
+    }
     return null;
   };
 
@@ -86,7 +155,14 @@ abstract final class OiAfValidators {
       (f) => !_isEmpty(ctx.form.get<Object?>(f)),
     );
     if (!anyPresent) return null;
-    if (_isEmpty(ctx.value)) return message ?? 'This field is required.';
+    if (_isEmpty(ctx.value)) {
+      return _oiAfMsg(
+        ctx,
+        englishFallback: 'This field is required.',
+        message: message,
+        resolve: (r, c) => r.requiredText(c),
+      );
+    }
     return null;
   };
 
@@ -99,7 +175,14 @@ abstract final class OiAfValidators {
       (f) => !_isEmpty(ctx.form.get<Object?>(f)),
     );
     if (!allPresent) return null;
-    if (_isEmpty(ctx.value)) return message ?? 'This field is required.';
+    if (_isEmpty(ctx.value)) {
+      return _oiAfMsg(
+        ctx,
+        englishFallback: 'This field is required.',
+        message: message,
+        resolve: (r, c) => r.requiredText(c),
+      );
+    }
     return null;
   };
 
@@ -112,7 +195,14 @@ abstract final class OiAfValidators {
       (f) => _isEmpty(ctx.form.get<Object?>(f)),
     );
     if (!anyAbsent) return null;
-    if (_isEmpty(ctx.value)) return message ?? 'This field is required.';
+    if (_isEmpty(ctx.value)) {
+      return _oiAfMsg(
+        ctx,
+        englishFallback: 'This field is required.',
+        message: message,
+        resolve: (r, c) => r.requiredText(c),
+      );
+    }
     return null;
   };
 
@@ -125,7 +215,14 @@ abstract final class OiAfValidators {
       (f) => _isEmpty(ctx.form.get<Object?>(f)),
     );
     if (!allAbsent) return null;
-    if (_isEmpty(ctx.value)) return message ?? 'This field is required.';
+    if (_isEmpty(ctx.value)) {
+      return _oiAfMsg(
+        ctx,
+        englishFallback: 'This field is required.',
+        message: message,
+        resolve: (r, c) => r.requiredText(c),
+      );
+    }
     return null;
   };
 
@@ -140,7 +237,14 @@ abstract final class OiAfValidators {
   }) => (ctx) {
     final v = ctx.value;
     if (v == null || v.isEmpty) return null;
-    if (v.length < min) return message ?? 'Must be at least $min characters.';
+    if (v.length < min) {
+      return _oiAfMsg(
+        ctx,
+        englishFallback: 'Must be at least $min characters.',
+        message: message,
+        resolve: (r, c) => r.tooShort(c, min),
+      );
+    }
     return null;
   };
 
@@ -151,7 +255,14 @@ abstract final class OiAfValidators {
   }) => (ctx) {
     final v = ctx.value;
     if (v == null || v.isEmpty) return null;
-    if (v.length > max) return message ?? 'Must be at most $max characters.';
+    if (v.length > max) {
+      return _oiAfMsg(
+        ctx,
+        englishFallback: 'Must be at most $max characters.',
+        message: message,
+        resolve: (r, c) => r.tooLong(c, max),
+      );
+    }
     return null;
   };
 
@@ -163,7 +274,12 @@ abstract final class OiAfValidators {
     final v = ctx.value;
     if (v == null || v.isEmpty) return null;
     if (v.length != length) {
-      return message ?? 'Must be exactly $length characters.';
+      return _oiAfMsg(
+        ctx,
+        englishFallback: 'Must be exactly $length characters.',
+        message: message,
+        resolve: (r, c) => r.exactLength(c, length),
+      );
     }
     return null;
   };
@@ -177,7 +293,12 @@ abstract final class OiAfValidators {
     final v = ctx.value;
     if (v == null || v.isEmpty) return null;
     if (v.length < min || v.length > max) {
-      return message ?? 'Must be between $min and $max characters.';
+      return _oiAfMsg(
+        ctx,
+        englishFallback: 'Must be between $min and $max characters.',
+        message: message,
+        resolve: (r, c) => r.lengthBetween(c, min, max),
+      );
     }
     return null;
   };
@@ -189,7 +310,12 @@ abstract final class OiAfValidators {
     final v = ctx.value?.trim();
     if (v == null || v.isEmpty) return null;
     if (!_emailRegex.hasMatch(v)) {
-      return message ?? 'Please enter a valid email address.';
+      return _oiAfMsg(
+        ctx,
+        englishFallback: 'Please enter a valid email address.',
+        message: message,
+        resolve: (r, c) => r.invalidEmail(c),
+      );
     }
     return null;
   };
@@ -203,7 +329,12 @@ abstract final class OiAfValidators {
     if (v == null || v.isEmpty) return null;
     final uri = Uri.tryParse(v);
     if (uri == null || !uri.hasScheme || !protocols.contains(uri.scheme)) {
-      return message ?? 'Please enter a valid URL.';
+      return _oiAfMsg(
+        ctx,
+        englishFallback: 'Please enter a valid URL.',
+        message: message,
+        resolve: (r, c) => r.invalidUrl(c),
+      );
     }
     return null;
   };
@@ -215,7 +346,14 @@ abstract final class OiAfValidators {
   }) => (ctx) {
     final v = ctx.value;
     if (v == null || v.isEmpty) return null;
-    if (!pattern.hasMatch(v)) return message ?? 'Invalid format.';
+    if (!pattern.hasMatch(v)) {
+      return _oiAfMsg(
+        ctx,
+        englishFallback: 'Invalid format.',
+        message: message,
+        resolve: (r, c) => r.invalidPattern(c),
+      );
+    }
     return null;
   };
 
@@ -226,7 +364,14 @@ abstract final class OiAfValidators {
   }) => (ctx) {
     final v = ctx.value;
     if (v == null || v.isEmpty) return null;
-    if (pattern.hasMatch(v)) return message ?? 'Invalid format.';
+    if (pattern.hasMatch(v)) {
+      return _oiAfMsg(
+        ctx,
+        englishFallback: 'Invalid format.',
+        message: message,
+        resolve: (r, c) => r.invalidPattern(c),
+      );
+    }
     return null;
   };
 
@@ -373,7 +518,12 @@ abstract final class OiAfValidators {
       jsonDecode(v);
       return null;
     } on FormatException catch (_) {
-      return message ?? 'Invalid JSON.';
+      return _oiAfMsg(
+        ctx,
+        englishFallback: 'Invalid JSON.',
+        message: message,
+        resolve: (r, c) => r.invalidJson(c),
+      );
     }
   };
 
@@ -383,7 +533,14 @@ abstract final class OiAfValidators {
   }) => (ctx) {
     final v = ctx.value;
     if (v == null || v.isEmpty) return null;
-    if (!_uuidRegex.hasMatch(v)) return message ?? 'Invalid UUID.';
+    if (!_uuidRegex.hasMatch(v)) {
+      return _oiAfMsg(
+        ctx,
+        englishFallback: 'Invalid UUID.',
+        message: message,
+        resolve: (r, c) => r.invalidUuid(c),
+      );
+    }
     return null;
   };
 
@@ -447,7 +604,13 @@ abstract final class OiAfValidators {
       errors.add('a special character');
     }
     if (errors.isNotEmpty) {
-      return message ?? 'Password must contain ${errors.join(', ')}.';
+      if (message != null) return message;
+      return _oiAfMsg(
+        ctx,
+        englishFallback: 'Password must contain ${errors.join(', ')}.',
+        message: message,
+        resolve: (r, c) => r.passwordTooWeak(c),
+      );
     }
     return null;
   };
@@ -463,7 +626,14 @@ abstract final class OiAfValidators {
   }) => (ctx) {
     final v = ctx.value;
     if (v == null) return null;
-    if (v < min) return message ?? 'Must be at least $min.';
+    if (v < min) {
+      return _oiAfMsg(
+        ctx,
+        englishFallback: 'Must be at least $min.',
+        message: message,
+        resolve: (r, c) => r.minValue(c, min),
+      );
+    }
     return null;
   };
 
@@ -474,7 +644,14 @@ abstract final class OiAfValidators {
   }) => (ctx) {
     final v = ctx.value;
     if (v == null) return null;
-    if (v > max) return message ?? 'Must be at most $max.';
+    if (v > max) {
+      return _oiAfMsg(
+        ctx,
+        englishFallback: 'Must be at most $max.',
+        message: message,
+        resolve: (r, c) => r.maxValue(c, max),
+      );
+    }
     return null;
   };
 
@@ -486,7 +663,14 @@ abstract final class OiAfValidators {
   }) => (ctx) {
     final v = ctx.value;
     if (v == null) return null;
-    if (v < min || v > max) return message ?? 'Must be between $min and $max.';
+    if (v < min || v > max) {
+      return _oiAfMsg(
+        ctx,
+        englishFallback: 'Must be between $min and $max.',
+        message: message,
+        resolve: (r, c) => r.rangeValue(c, min, max),
+      );
+    }
     return null;
   };
 
@@ -535,7 +719,14 @@ abstract final class OiAfValidators {
   }) => (ctx) {
     final v = ctx.value;
     if (v == null) return null;
-    if (v != v.toInt()) return message ?? 'Must be a whole number.';
+    if (v != v.toInt()) {
+      return _oiAfMsg(
+        ctx,
+        englishFallback: 'Must be a whole number.',
+        message: message,
+        resolve: (r, c) => r.mustBeInteger(c),
+      );
+    }
     return null;
   };
 
@@ -585,7 +776,14 @@ abstract final class OiAfValidators {
     final v = ctx.value;
     if (v == null || v.isEmpty) return null;
     final otherVal = ctx.form.get<String>(other);
-    if (v != otherVal) return message ?? 'The values do not match.';
+    if (v != otherVal) {
+      return _oiAfMsg(
+        ctx,
+        englishFallback: 'The values do not match.',
+        message: message,
+        resolve: (r, c) => r.valuesDoNotMatch(c),
+      );
+    }
     return null;
   };
 
@@ -597,7 +795,14 @@ abstract final class OiAfValidators {
     final v = ctx.value;
     if (v == null) return null;
     final otherVal = ctx.form.get<Object?>(other);
-    if (v == otherVal) return message ?? 'Must be different.';
+    if (v == otherVal) {
+      return _oiAfMsg(
+        ctx,
+        englishFallback: 'Must be different.',
+        message: message,
+        resolve: (r, c) => r.differentFromField(c),
+      );
+    }
     return null;
   };
 
@@ -608,7 +813,14 @@ abstract final class OiAfValidators {
   }) => (ctx) {
     final v = ctx.value;
     if (v == null) return null;
-    if (!allowed.contains(v)) return message ?? 'This value is not allowed.';
+    if (!allowed.contains(v)) {
+      return _oiAfMsg(
+        ctx,
+        englishFallback: 'This value is not allowed.',
+        message: message,
+        resolve: (r, c) => r.notInList(c),
+      );
+    }
     return null;
   };
 
@@ -619,7 +831,14 @@ abstract final class OiAfValidators {
   }) => (ctx) {
     final v = ctx.value;
     if (v == null) return null;
-    if (disallowed.contains(v)) return message ?? 'This value is not allowed.';
+    if (disallowed.contains(v)) {
+      return _oiAfMsg(
+        ctx,
+        englishFallback: 'This value is not allowed.',
+        message: message,
+        resolve: (r, c) => r.notInList(c),
+      );
+    }
     return null;
   };
 
@@ -635,7 +854,12 @@ abstract final class OiAfValidators {
     final v = ctx.value;
     if (v == null) return null;
     if (!v.isAfter(date)) {
-      return message ?? 'Must be after ${_formatDate(date)}.';
+      return _oiAfMsg(
+        ctx,
+        englishFallback: 'Must be after ${_formatDate(date)}.',
+        message: message,
+        resolve: (r, c) => r.dateAfterError(c, _formatDate(date)),
+      );
     }
     return null;
   };
@@ -662,7 +886,12 @@ abstract final class OiAfValidators {
     final v = ctx.value;
     if (v == null) return null;
     if (v.isBefore(date)) {
-      return message ?? 'Must be on or after ${_formatDate(date)}.';
+      return _oiAfMsg(
+        ctx,
+        englishFallback: 'Must be on or after ${_formatDate(date)}.',
+        message: message,
+        resolve: (r, c) => r.dateAfterError(c, _formatDate(date)),
+      );
     }
     return null;
   };
@@ -675,7 +904,12 @@ abstract final class OiAfValidators {
     final v = ctx.value;
     if (v == null) return null;
     if (!v.isBefore(date)) {
-      return message ?? 'Must be before ${_formatDate(date)}.';
+      return _oiAfMsg(
+        ctx,
+        englishFallback: 'Must be before ${_formatDate(date)}.',
+        message: message,
+        resolve: (r, c) => r.dateBeforeError(c, _formatDate(date)),
+      );
     }
     return null;
   };
@@ -701,7 +935,12 @@ abstract final class OiAfValidators {
         final v = ctx.value;
         if (v == null) return null;
         if (v.isAfter(date)) {
-          return message ?? 'Must be on or before ${_formatDate(date)}.';
+          return _oiAfMsg(
+            ctx,
+            englishFallback: 'Must be on or before ${_formatDate(date)}.',
+            message: message,
+            resolve: (r, c) => r.dateBeforeError(c, _formatDate(date)),
+          );
         }
         return null;
       };
@@ -733,7 +972,12 @@ abstract final class OiAfValidators {
       return message ?? 'Must be today or later.';
     }
     if (!includeToday && !dateOnly.isAfter(today)) {
-      return message ?? 'Must be a future date.';
+      return _oiAfMsg(
+        ctx,
+        englishFallback: 'Must be a future date.',
+        message: message,
+        resolve: (r, c) => r.dateFutureError(c),
+      );
     }
     return null;
   };
@@ -752,7 +996,12 @@ abstract final class OiAfValidators {
       return message ?? 'Must be today or earlier.';
     }
     if (!includeToday && !dateOnly.isBefore(today)) {
-      return message ?? 'Must be a past date.';
+      return _oiAfMsg(
+        ctx,
+        englishFallback: 'Must be a past date.',
+        message: message,
+        resolve: (r, c) => r.datePastError(c),
+      );
     }
     return null;
   };
@@ -769,7 +1018,12 @@ abstract final class OiAfValidators {
     final v = ctx.value;
     if (v == null || v.isEmpty) return null;
     if (v.length < min) {
-      return message ?? 'Must have at least $min item${min == 1 ? '' : 's'}.';
+      return _oiAfMsg(
+        ctx,
+        englishFallback: 'Must have at least $min item${min == 1 ? '' : 's'}.',
+        message: message,
+        resolve: (r, c) => r.minItems(c, min),
+      );
     }
     return null;
   };
@@ -782,7 +1036,12 @@ abstract final class OiAfValidators {
     final v = ctx.value;
     if (v == null) return null;
     if (v.length > max) {
-      return message ?? 'Must have at most $max item${max == 1 ? '' : 's'}.';
+      return _oiAfMsg(
+        ctx,
+        englishFallback: 'Must have at most $max item${max == 1 ? '' : 's'}.',
+        message: message,
+        resolve: (r, c) => r.maxItems(c, max),
+      );
     }
     return null;
   };
@@ -858,7 +1117,12 @@ abstract final class OiAfValidators {
     if (v == null || v.isEmpty) return null;
     for (final file in v) {
       if (file.sizeInBytes != null && file.sizeInBytes! > maxKb * 1024) {
-        return message ?? 'File "${file.name}" exceeds ${maxKb}KB.';
+        return _oiAfMsg(
+          ctx,
+          englishFallback: 'File "${file.name}" exceeds ${maxKb}KB.',
+          message: message,
+          resolve: (r, c) => r.fileTooLarge(c, maxKb),
+        );
       }
     }
     return null;
@@ -876,7 +1140,12 @@ abstract final class OiAfValidators {
           file.extension?.toLowerCase() ??
           file.name.split('.').last.toLowerCase();
       if (!lowerAllowed.contains(ext)) {
-        return message ?? 'Allowed file types: ${allowed.join(', ')}.';
+        return _oiAfMsg(
+          ctx,
+          englishFallback: 'Allowed file types: ${allowed.join(', ')}.',
+          message: message,
+          resolve: (r, c) => r.invalidFileExtension(c, allowed),
+        );
       }
     }
     return null;

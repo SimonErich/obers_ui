@@ -1,5 +1,6 @@
 import 'package:obers_ui_autoforms/src/foundation/oi_af_enums.dart';
 import 'package:obers_ui_autoforms/src/foundation/oi_af_reader.dart';
+import 'package:obers_ui_autoforms/src/validation/oi_af_validation_messages.dart';
 
 /// Context provided to field-level validators.
 final class OiAfValidationContext<TField extends Enum, TValue> {
@@ -11,6 +12,7 @@ final class OiAfValidationContext<TField extends Enum, TValue> {
     required this.isRequired,
     required this.isVisible,
     required this.isEnabled,
+    this.messages,
   });
 
   /// The field being validated.
@@ -33,4 +35,7 @@ final class OiAfValidationContext<TField extends Enum, TValue> {
 
   /// Whether the field is currently enabled.
   final bool isEnabled;
+
+  /// Localized messages from [OiAfForm.messageResolver], when attached.
+  final OiAfValidationMessages? messages;
 }

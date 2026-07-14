@@ -8,6 +8,7 @@ import 'package:obers_ui_autoforms/src/foundation/oi_af_typedefs.dart';
 import 'package:obers_ui_autoforms/src/runtime/controller/oi_af_controller.dart'
     show OiAfController;
 import 'package:obers_ui_autoforms/src/validation/oi_af_validation_context.dart';
+import 'package:obers_ui_autoforms/src/validation/oi_af_validation_messages.dart';
 
 // ── Base Definition ──────────────────────────────────────────────────────────
 
@@ -119,6 +120,7 @@ abstract class OiAfFieldDefinition<TField extends Enum, TValue> {
     required bool isRequired,
     required bool isVisible,
     required bool isEnabled,
+    OiAfValidationMessages? messages,
   }) {
     return OiAfValidationContext<TField, TValue>(
       field: field,
@@ -128,6 +130,7 @@ abstract class OiAfFieldDefinition<TField extends Enum, TValue> {
       isRequired: isRequired,
       isVisible: isVisible,
       isEnabled: isEnabled,
+      messages: messages,
     );
   }
 }

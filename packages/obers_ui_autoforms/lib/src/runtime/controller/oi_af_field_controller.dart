@@ -7,6 +7,7 @@ import 'package:obers_ui_autoforms/src/definitions/oi_af_field_definition.dart';
 import 'package:obers_ui_autoforms/src/diagnostics/oi_af_observer.dart';
 import 'package:obers_ui_autoforms/src/foundation/oi_af_enums.dart';
 import 'package:obers_ui_autoforms/src/foundation/oi_af_reader.dart';
+import 'package:obers_ui_autoforms/src/validation/oi_af_validation_messages.dart';
 import 'package:obers_ui_autoforms/src/validation/oi_af_validators.dart';
 import 'package:obers_ui_autoforms/src/widgets/fields/_oi_af_field_binder.dart'
     show OiAfFieldBinderMixin;
@@ -73,6 +74,9 @@ class OiAfFieldController<TField extends Enum> extends ChangeNotifier {
 
   /// Lazy getter for the parent controller's observer (stays in sync).
   OiAfObserver? Function()? observerGetter;
+
+  /// Lazy getter for localized validation messages from the attached form.
+  OiAfValidationMessages? Function()? validationMessagesGetter;
 
   // ── Public getters ─────────────────────────────────────────────────────
 
@@ -370,6 +374,7 @@ class OiAfFieldController<TField extends Enum> extends ChangeNotifier {
             isRequired: _definition.required,
             isVisible: _isVisible,
             isEnabled: _isEnabled,
+            messages: validationMessagesGetter?.call(),
           );
           final result = await (validator as dynamic)(ctx) as String?;
           if (version != _validationVersion) {
@@ -379,7 +384,7 @@ class OiAfFieldController<TField extends Enum> extends ChangeNotifier {
           }
           if (result != null) errors.add(result);
         } on Object catch (e, st) {
-          errors.add('Validation failed.');
+          errors.add(_resolveValidationFailed());
           observerGetter?.call()?.onValidationCrash(_definition.field, e, st);
         }
       }
@@ -398,14 +403,31 @@ class OiAfFieldController<TField extends Enum> extends ChangeNotifier {
   }
 
   String? _checkRequired() {
-    if (_value == null) return 'This field is required.';
+    final message = _resolveRequiredText();
+    if (_value == null) return message;
     if (_value is String && (_value! as String).trim().isEmpty) {
-      return 'This field is required.';
+      return message;
     }
     if (_value is List && (_value! as List).isEmpty) {
-      return 'This field is required.';
+      return message;
     }
     return null;
+  }
+
+  String _resolveRequiredText() {
+    final messages = validationMessagesGetter?.call();
+    if (messages != null) {
+      return messages.resolver.requiredText(messages.context);
+    }
+    return 'This field is required.';
+  }
+
+  String _resolveValidationFailed() {
+    final messages = validationMessagesGetter?.call();
+    if (messages != null) {
+      return messages.resolver.validationFailed(messages.context);
+    }
+    return 'Validation failed.';
   }
 
   /// Force the validation phase to blurredOnce (used after submit).

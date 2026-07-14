@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui_autoforms/src/foundation/oi_af_enums.dart';
+import 'package:obers_ui_autoforms/src/foundation/oi_af_message_resolver.dart';
 import 'package:obers_ui_autoforms/src/foundation/oi_af_submit_result.dart';
 import 'package:obers_ui_autoforms/src/foundation/oi_af_typedefs.dart';
 import 'package:obers_ui_autoforms/src/runtime/controller/oi_af_controller.dart';
@@ -27,6 +28,7 @@ class OiAfForm<TField extends Enum, TData> extends StatefulWidget {
     this.onSubmit,
     this.onSubmitResult,
     this.errorMapper,
+    this.messageResolver = const OiAfDefaultMessageResolver(),
     this.validateMode = OiAfValidateMode.onBlurThenChange,
     this.autofocusFirstField = false,
     this.submitOnEnterFromLastField = true,
@@ -58,6 +60,9 @@ class OiAfForm<TField extends Enum, TData> extends StatefulWidget {
 
   /// Maps submit exceptions to field/global errors.
   final OiAfSubmitErrorMapper<TField, TData>? errorMapper;
+
+  /// Localized default messages for validators that omit an explicit `message`.
+  final OiAfMessageResolver messageResolver;
 
   /// When to auto-validate fields.
   final OiAfValidateMode validateMode;
@@ -101,6 +106,8 @@ class _OiAfFormState<TField extends Enum, TData>
     if (oldWidget.controller != widget.controller) {
       oldWidget.controller.detach();
       _attach();
+    } else if (oldWidget.messageResolver != widget.messageResolver) {
+      widget.controller.updateMessageResolver(widget.messageResolver);
     }
   }
 
@@ -115,6 +122,8 @@ class _OiAfFormState<TField extends Enum, TData>
       onSubmit: widget.onSubmit,
       onSubmitResult: widget.onSubmitResult,
       errorMapper: widget.errorMapper,
+      messageResolver: widget.messageResolver,
+      getMessageContext: () => context,
     );
   }
 
@@ -126,6 +135,10 @@ class _OiAfFormState<TField extends Enum, TData>
 
   @override
   Widget build(BuildContext context) {
-    return OiAfScope(rawController: widget.controller, child: widget.child);
+    return OiAfScope(
+      rawController: widget.controller,
+      messageResolver: widget.messageResolver,
+      child: widget.child,
+    );
   }
 }
