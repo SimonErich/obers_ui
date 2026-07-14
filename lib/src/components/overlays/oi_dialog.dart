@@ -20,13 +20,17 @@ Future<T?> showOiDialog<T>(
   builder,
   bool dismissible = true,
   String? semanticLabel,
+  double? width,
+  double? minWidth,
+  double? maxWidth,
 }) {
   return OiDialogShell.show<T>(
     context: context,
     semanticLabel: semanticLabel,
     barrierDismissible: dismissible,
-    maxWidth: 480,
-    minWidth: 280,
+    width: width,
+    minWidth: minWidth ?? 280,
+    maxWidth: maxWidth ?? 480,
     builder: (close) => builder(context, close),
   );
 }
