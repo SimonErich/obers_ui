@@ -31,11 +31,7 @@ const _kColorOpts = [
   OiAfOption(value: 'g', label: 'Green'),
 ];
 
-Widget _wrap({
-  required _Ctrl controller,
-  required Widget child,
-  Size? surfaceSize,
-}) {
+Widget _wrap({required _Ctrl controller, required Widget child}) {
   return OiApp(
     home: OiAfForm<_F, Map<String, dynamic>>(
       controller: controller,
@@ -132,7 +128,7 @@ void main() {
       await tester.pumpWidget(
         _wrap(
           controller: ctrl,
-          child: Row(
+          child: const Row(
             children: [
               Expanded(
                 child: OiAfSelect<_F, String>(
@@ -184,7 +180,7 @@ void main() {
       await tester.pumpWidget(
         _wrap(
           controller: rightCtrl,
-          child: Row(
+          child: const Row(
             children: [
               Expanded(
                 child: OiAfSelect<_F, String>(
@@ -195,7 +191,7 @@ void main() {
               ),
               Expanded(
                 child: OiAfSelect<_F, String>(
-                  key: const Key('right'),
+                  key: Key('right'),
                   field: _F.fruit,
                   options: _kFruitOpts,
                   placeholder: 'Right',
