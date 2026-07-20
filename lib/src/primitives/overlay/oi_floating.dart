@@ -215,14 +215,25 @@ class _OiFloatingState extends State<OiFloating> {
 
   bool get _useBottomSheet => widget.bottomSheetOnCompact && context.isCompact;
 
-  /// Returns the anchor widget's rect in global (overlay) coordinates.
-  Rect _getAnchorRect() {
-    final box = context.findRenderObject() as RenderBox?;
-    if (box == null || !box.hasSize) return Rect.zero;
-    return box.localToGlobal(Offset.zero) & box.size;
+  /// Computes the anchor rect in the overlay's coordinate space from the
+  /// [OverlayChildLayoutInfo] provided by [OverlayPortal.overlayChildLayoutBuilder].
+  ///
+  /// Uses the paint transform from the layout surrogate to the overlay theater,
+  /// which is correct even when the anchor is inside a [Transform], [ScaleTransition],
+  /// [AnimatedSwitcher], or a dialog.  This avoids the [RenderBox.localToGlobal]
+  /// approach which can be offset when a paint-only transform (e.g. [ScaleTransition])
+  /// sits between the anchor and the root.
+  static Rect _anchorRectFromInfo(OverlayChildLayoutInfo info) {
+    final t = info.childPaintTransform;
+    final tl = MatrixUtils.transformPoint(t, Offset.zero);
+    final br = MatrixUtils.transformPoint(
+      t,
+      info.childSize.bottomRight(Offset.zero),
+    );
+    return Rect.fromPoints(tl, br);
   }
 
-  Widget _buildOverlayChild(BuildContext context) {
+  Widget _buildOverlayChild(BuildContext context, OverlayChildLayoutInfo info) {
     // When not visible, return an empty widget so the portal can stay
     // "shown" without rendering anything.
     if (!widget.visible) return const SizedBox.shrink();
@@ -238,7 +249,7 @@ class _OiFloatingState extends State<OiFloating> {
 
       content = CustomSingleChildLayout(
         delegate: _FloatingLayoutDelegate(
-          anchorRect: _getAnchorRect(),
+          anchorRect: _anchorRectFromInfo(info),
           alignment: widget.alignment,
           gap: widget.gap,
           overflow: effectiveOverflow,
@@ -278,7 +289,7 @@ class _OiFloatingState extends State<OiFloating> {
 
   @override
   Widget build(BuildContext context) {
-    return OverlayPortal(
+    return OverlayPortal.overlayChildLayoutBuilder(
       controller: _portalController,
       overlayChildBuilder: _buildOverlayChild,
       child: widget.anchor,
@@ -505,6 +516,10 @@ class _FloatingLayoutDelegate extends SingleChildLayoutDelegate {
     if (x + w > safeRight) {
       final snapped = anchorRect.right - w + offset.dx;
       if (snapped >= safeLeft && snapped + w <= safeRight) return snapped;
+      // Child is wider than available space on the right; pin its right edge to
+      // safeRight so it stays as close to the anchor as possible rather than
+      // jumping to the opposite screen edge.
+      return (safeRight - w).clamp(safeLeft, safeRight);
     }
 
     // Overflows left → snap left edge of child to left edge of anchor.
@@ -534,6 +549,8 @@ class _FloatingLayoutDelegate extends SingleChildLayoutDelegate {
     if (y + h > safeBottom) {
       final snapped = anchorRect.bottom - h + offset.dy;
       if (snapped >= safeTop && snapped + h <= safeBottom) return snapped;
+      // Child taller than available space below; pin to safeBottom.
+      return (safeBottom - h).clamp(safeTop, safeBottom);
     }
 
     if (y < safeTop) {
