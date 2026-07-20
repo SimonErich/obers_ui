@@ -172,4 +172,140 @@ void main() {
     expect(find.text('Apple'), findsOneWidget);
     expect(find.text('Banana'), findsOneWidget);
   });
+  // ── Constrained-parent regression tests ──────────────────────────────────
+
+  testWidgets(
+    'dropdown is right-pinned (not left-jumped) for right-column anchor on narrow screen',
+    (tester) async {
+      // 320 px-wide screen → each Expanded column is 160 px.
+      // The dropdown (240 px) is wider than one column.  Before the fix,
+      // _adjustCrossX fell through to safeLeft (x≈8), placing the dropdown
+      // on the far-left edge — far from the anchor in the right column.
+      // After the fix, the right edge is pinned to safeRight so the dropdown
+      // stays as close to the anchor as possible.
+      await tester.pumpObers(
+        const Row(
+          children: [
+            Expanded(
+              child: OiSelect<String>(options: _kOptions, placeholder: 'L'),
+            ),
+            Expanded(
+              child: OiSelect<String>(
+                key: Key('right'),
+                options: _kOptions,
+                value: 'a',
+              ),
+            ),
+          ],
+        ),
+        surfaceSize: const Size(320, 400),
+      );
+      await tester.pumpAndSettle();
+
+      // Selected value must be visible in the right column's trigger.
+      expect(find.text('Apple'), findsOneWidget);
+
+      final anchorRect = tester.getRect(find.byKey(const Key('right')));
+      await tester.tap(find.byKey(const Key('right')));
+      await tester.pumpAndSettle();
+
+      // Both options must be visible.
+      expect(find.text('Apple'), findsAtLeastNWidgets(1));
+      expect(find.text('Banana'), findsOneWidget);
+
+      final dropItemRect = tester.getRect(find.text('Apple').last);
+
+      // Dropdown must appear BELOW the anchor.
+      expect(
+        dropItemRect.top,
+        greaterThanOrEqualTo(anchorRect.bottom - 1),
+        reason: 'dropdown below anchor',
+      );
+
+      // Dropdown must stay on screen.
+      expect(dropItemRect.left, greaterThanOrEqualTo(0), reason: 'on screen');
+
+      // KEY: dropdown right edge must be near the safe right boundary (pinned),
+      // NOT at the left edge (safeLeft ≈ 8 px).  Before the fix the dropdown
+      // appeared at x≈8; after the fix it is right-pinned to safeRight≈312.
+      // The item has 12 px horizontal padding, so its right edge is at
+      // containerRight − 12.  We check that containerRight > half-screen (160).
+      final dropContainerRight = dropItemRect.right + 12;
+      expect(
+        dropContainerRight,
+        greaterThan(160),
+        reason: 'dropdown right-pinned near safeRight, not left-jumped to x≈8',
+      );
+    },
+  );
+
+  testWidgets(
+    'selected value is visible in left column of narrow 2-col Row',
+    (tester) async {
+      await tester.pumpObers(
+        const Row(
+          children: [
+            Expanded(
+              child: OiSelect<String>(
+                options: _kOptions,
+                value: 'b',
+              ),
+            ),
+            Expanded(
+              child: OiSelect<String>(
+                options: _kOptions,
+                placeholder: 'R',
+              ),
+            ),
+          ],
+        ),
+        surfaceSize: const Size(320, 400),
+      );
+      await tester.pumpAndSettle();
+
+      expect(
+        find.text('Banana'),
+        findsOneWidget,
+        reason: 'selected value shown in constrained column trigger',
+      );
+    },
+  );
+
+  testWidgets(
+    'dropdown of left column stays on screen in narrow 2-col Row',
+    (tester) async {
+      await tester.pumpObers(
+        const Row(
+          children: [
+            Expanded(
+              child: OiSelect<String>(
+                key: Key('left'),
+                options: _kOptions,
+                value: 'a',
+              ),
+            ),
+            Expanded(
+              child: OiSelect<String>(
+                options: _kOptions,
+                placeholder: 'R',
+              ),
+            ),
+          ],
+        ),
+        surfaceSize: const Size(320, 400),
+      );
+      await tester.pumpAndSettle();
+
+      final anchorRect = tester.getRect(find.byKey(const Key('left')));
+
+      await tester.tap(find.byKey(const Key('left')));
+      await tester.pumpAndSettle();
+
+      final dropLeft = tester.getRect(find.text('Apple').last).left;
+      final dropTop = tester.getRect(find.text('Apple').last).top;
+
+      expect(dropLeft, greaterThanOrEqualTo(0));
+      expect(dropTop, greaterThanOrEqualTo(anchorRect.bottom - 1));
+    },
+  );
 }

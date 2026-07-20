@@ -198,21 +198,23 @@ class _OiSelectState<T> extends State<OiSelect<T>> {
     const itemHeight = 44.0;
     final maxHeight = (itemHeight * 6).clamp(0.0, 300.0);
 
-    return UnconstrainedBox(
-      alignment: Alignment.topLeft,
-      child: Container(
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: colors.surface,
+        borderRadius: BorderRadius.circular(8),
+        boxShadow: [
+          BoxShadow(
+            color: colors.overlay,
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      // Width 240 is a loose default; the OiFloating layout delegate's
+      // getConstraintsForChild will cap this to (screenWidth − screenPadding)
+      // on narrow screens, so the dropdown is never wider than the viewport.
+      child: SizedBox(
         width: 240,
-        decoration: BoxDecoration(
-          color: colors.surface,
-          borderRadius: BorderRadius.circular(8),
-          boxShadow: [
-            BoxShadow(
-              color: colors.overlay,
-              blurRadius: 12,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [

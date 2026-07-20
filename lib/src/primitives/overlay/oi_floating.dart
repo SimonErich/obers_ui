@@ -505,6 +505,10 @@ class _FloatingLayoutDelegate extends SingleChildLayoutDelegate {
     if (x + w > safeRight) {
       final snapped = anchorRect.right - w + offset.dx;
       if (snapped >= safeLeft && snapped + w <= safeRight) return snapped;
+      // Child is wider than available space on the right; pin its right edge to
+      // safeRight so it stays as close to the anchor as possible rather than
+      // jumping to the opposite screen edge.
+      return (safeRight - w).clamp(safeLeft, safeRight);
     }
 
     // Overflows left → snap left edge of child to left edge of anchor.
@@ -534,6 +538,8 @@ class _FloatingLayoutDelegate extends SingleChildLayoutDelegate {
     if (y + h > safeBottom) {
       final snapped = anchorRect.bottom - h + offset.dy;
       if (snapped >= safeTop && snapped + h <= safeBottom) return snapped;
+      // Child taller than available space below; pin to safeBottom.
+      return (safeBottom - h).clamp(safeTop, safeBottom);
     }
 
     if (y < safeTop) {
