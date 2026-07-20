@@ -402,24 +402,30 @@ class _OiBannerState extends State<OiBanner>
     final showIcon = !effectiveCompact && effectiveIcon != null;
 
     // Resolve level-specific colors with theme overrides.
+    //
+    // Backgrounds use an alpha-blended accent color rather than the swatch's
+    // `muted` shade — `muted` always raises lightness, so in dark mode it
+    // collapses toward white and loses contrast against dark-theme text.
     final (bgColor, accentColor, iconColor) = switch (widget.level) {
       OiBannerLevel.info => (
-        themeData?.infoBackground ?? colors.info.muted,
+        themeData?.infoBackground ?? colors.info.base.withValues(alpha: 0.12),
         themeData?.infoBorder ?? colors.info.base,
         colors.info.base,
       ),
       OiBannerLevel.success => (
-        themeData?.successBackground ?? colors.success.muted,
+        themeData?.successBackground ??
+            colors.success.base.withValues(alpha: 0.12),
         themeData?.successBorder ?? colors.success.base,
         colors.success.base,
       ),
       OiBannerLevel.warning => (
-        themeData?.warningBackground ?? colors.warning.muted,
+        themeData?.warningBackground ??
+            colors.warning.base.withValues(alpha: 0.12),
         themeData?.warningBorder ?? colors.warning.base,
         colors.warning.base,
       ),
       OiBannerLevel.error => (
-        themeData?.errorBackground ?? colors.error.muted,
+        themeData?.errorBackground ?? colors.error.base.withValues(alpha: 0.12),
         themeData?.errorBorder ?? colors.error.base,
         colors.error.base,
       ),
@@ -429,7 +435,7 @@ class _OiBannerState extends State<OiBanner>
         colors.textMuted,
       ),
       OiBannerLevel.loading => (
-        themeData?.infoBackground ?? colors.info.muted,
+        themeData?.infoBackground ?? colors.info.base.withValues(alpha: 0.12),
         themeData?.infoBorder ?? colors.info.base,
         colors.info.base,
       ),
