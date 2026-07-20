@@ -116,126 +116,124 @@ void main() {
 
     // ── Constrained-parent regression ──────────────────────────────────────
 
-    testWidgets(
-      'selected value shown in constrained Expanded column',
-      (tester) async {
-        const size = Size(320, 400);
-        await tester.binding.setSurfaceSize(size);
-        tester.binding.platformDispatcher.views.first.physicalSize = size;
-        tester.binding.platformDispatcher.views.first.devicePixelRatio = 1.0;
-        addTearDown(() async {
-          await tester.binding.setSurfaceSize(null);
-          tester.binding.platformDispatcher.views.first.resetPhysicalSize();
-          tester.binding.platformDispatcher.views.first.resetDevicePixelRatio();
-        });
+    testWidgets('selected value shown in constrained Expanded column', (
+      tester,
+    ) async {
+      const size = Size(320, 400);
+      await tester.binding.setSurfaceSize(size);
+      tester.binding.platformDispatcher.views.first.physicalSize = size;
+      tester.binding.platformDispatcher.views.first.devicePixelRatio = 1.0;
+      addTearDown(() async {
+        await tester.binding.setSurfaceSize(null);
+        tester.binding.platformDispatcher.views.first.resetPhysicalSize();
+        tester.binding.platformDispatcher.views.first.resetDevicePixelRatio();
+      });
 
-        await tester.pumpWidget(
-          _wrap(
-            controller: ctrl,
-            child: Row(
-              children: [
-                Expanded(
-                  child: OiAfSelect<_F, String>(
-                    field: _F.fruit,
-                    options: _kFruitOpts,
-                  ),
+      await tester.pumpWidget(
+        _wrap(
+          controller: ctrl,
+          child: Row(
+            children: [
+              Expanded(
+                child: OiAfSelect<_F, String>(
+                  field: _F.fruit,
+                  options: _kFruitOpts,
                 ),
-                Expanded(
-                  child: OiAfSelect<_F, String>(
-                    field: _F.color,
-                    options: _kColorOpts,
-                    placeholder: 'Color',
-                  ),
+              ),
+              Expanded(
+                child: OiAfSelect<_F, String>(
+                  field: _F.color,
+                  options: _kColorOpts,
+                  placeholder: 'Color',
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-        );
-        await tester.pumpAndSettle();
+        ),
+      );
+      await tester.pumpAndSettle();
 
-        // The initial value 'a' → 'Apple' must appear in the left column trigger.
-        expect(
-          find.text('Apple'),
-          findsOneWidget,
-          reason: 'selected value shown in constrained Expanded column',
-        );
-      },
-    );
+      // The initial value 'a' → 'Apple' must appear in the left column trigger.
+      expect(
+        find.text('Apple'),
+        findsOneWidget,
+        reason: 'selected value shown in constrained Expanded column',
+      );
+    });
 
-    testWidgets(
-      'dropdown stays near right-column anchor on narrow screen',
-      (tester) async {
-        // 320 px wide, 2 columns = 160 px each.  The dropdown is at least
-        // 200 px wide — wider than one column.  After the fix, it must NOT
-        // jump to the left screen edge but stay as close to the anchor as
-        // possible (right edge pinned to safeRight).
-        const size = Size(320, 400);
-        await tester.binding.setSurfaceSize(size);
-        tester.binding.platformDispatcher.views.first.physicalSize = size;
-        tester.binding.platformDispatcher.views.first.devicePixelRatio = 1.0;
-        addTearDown(() async {
-          await tester.binding.setSurfaceSize(null);
-          tester.binding.platformDispatcher.views.first.resetPhysicalSize();
-          tester.binding.platformDispatcher.views.first.resetDevicePixelRatio();
-        });
+    testWidgets('dropdown stays near right-column anchor on narrow screen', (
+      tester,
+    ) async {
+      // 320 px wide, 2 columns = 160 px each.  The dropdown is at least
+      // 200 px wide — wider than one column.  After the fix, it must NOT
+      // jump to the left screen edge but stay as close to the anchor as
+      // possible (right edge pinned to safeRight).
+      const size = Size(320, 400);
+      await tester.binding.setSurfaceSize(size);
+      tester.binding.platformDispatcher.views.first.physicalSize = size;
+      tester.binding.platformDispatcher.views.first.devicePixelRatio = 1.0;
+      addTearDown(() async {
+        await tester.binding.setSurfaceSize(null);
+        tester.binding.platformDispatcher.views.first.resetPhysicalSize();
+        tester.binding.platformDispatcher.views.first.resetDevicePixelRatio();
+      });
 
-        final rightCtrl = _Ctrl();
-        addTearDown(rightCtrl.dispose);
+      final rightCtrl = _Ctrl();
+      addTearDown(rightCtrl.dispose);
 
-        await tester.pumpWidget(
-          _wrap(
-            controller: rightCtrl,
-            child: Row(
-              children: [
-                Expanded(
-                  child: OiAfSelect<_F, String>(
-                    field: _F.color,
-                    options: _kColorOpts,
-                    placeholder: 'Left',
-                  ),
+      await tester.pumpWidget(
+        _wrap(
+          controller: rightCtrl,
+          child: Row(
+            children: [
+              Expanded(
+                child: OiAfSelect<_F, String>(
+                  field: _F.color,
+                  options: _kColorOpts,
+                  placeholder: 'Left',
                 ),
-                Expanded(
-                  child: OiAfSelect<_F, String>(
-                    key: const Key('right'),
-                    field: _F.fruit,
-                    options: _kFruitOpts,
-                    placeholder: 'Right',
-                  ),
+              ),
+              Expanded(
+                child: OiAfSelect<_F, String>(
+                  key: const Key('right'),
+                  field: _F.fruit,
+                  options: _kFruitOpts,
+                  placeholder: 'Right',
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-        );
-        await tester.pumpAndSettle();
+        ),
+      );
+      await tester.pumpAndSettle();
 
-        final anchorRect = tester.getRect(find.byKey(const Key('right')));
+      final anchorRect = tester.getRect(find.byKey(const Key('right')));
 
-        await tester.tap(find.byKey(const Key('right')));
-        await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('right')));
+      await tester.pumpAndSettle();
 
-        expect(find.text('Apple'), findsAtLeastNWidgets(1));
+      expect(find.text('Apple'), findsAtLeastNWidgets(1));
 
-        final dropItemRect = tester.getRect(find.text('Apple').last);
+      final dropItemRect = tester.getRect(find.text('Apple').last);
 
-        // Must appear below the anchor.
-        expect(
-          dropItemRect.top,
-          greaterThanOrEqualTo(anchorRect.bottom - 1),
-          reason: 'dropdown below anchor',
-        );
-        // Must stay on screen.
-        expect(dropItemRect.left, greaterThanOrEqualTo(0), reason: 'on screen');
-        // KEY: must NOT jump to the far-left edge (x≈8).  The 240 px dropdown
-        // is wider than the 160 px column, so it can't align to anchor.left.
-        // After the fix the right edge is pinned to safeRight; container right
-        // = itemRight + 12 px padding must exceed half-screen (160).
-        final dropContainerRight = dropItemRect.right + 12;
-        expect(
-          dropContainerRight,
-          greaterThan(160),
-          reason: 'right-pinned, not left-jumped',
-        );
-      },
-    );
+      // Must appear below the anchor.
+      expect(
+        dropItemRect.top,
+        greaterThanOrEqualTo(anchorRect.bottom - 1),
+        reason: 'dropdown below anchor',
+      );
+      // Must stay on screen.
+      expect(dropItemRect.left, greaterThanOrEqualTo(0), reason: 'on screen');
+      // KEY: must NOT jump to the far-left edge (x≈8).  The 240 px dropdown
+      // is wider than the 160 px column, so it can't align to anchor.left.
+      // After the fix the right edge is pinned to safeRight; container right
+      // = itemRight + 12 px padding must exceed half-screen (160).
+      final dropContainerRight = dropItemRect.right + 12;
+      expect(
+        dropContainerRight,
+        greaterThan(160),
+        reason: 'right-pinned, not left-jumped',
+      );
+    });
   });
 }
