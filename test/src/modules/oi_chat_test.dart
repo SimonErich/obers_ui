@@ -211,7 +211,30 @@ void main() {
     expect(find.byType(EditableText), findsNothing);
   });
 
-  testWidgets('compose bar is visible when messages exist', (tester) async {
+  testWidgets('compose bar is visible when a send handler is wired', (
+    tester,
+  ) async {
+    await tester.pumpObers(
+      SizedBox(
+        width: 400,
+        height: 600,
+        child: OiChat(
+          messages: [msg()],
+          currentUserId: 'user-b',
+          label: 'Chat',
+          onSend: (_) {},
+        ),
+      ),
+    );
+    expect(find.bySemanticsLabel('Send message'), findsOneWidget);
+    expect(find.byType(EditableText), findsOneWidget);
+  });
+
+  testWidgets('compose bar is hidden on a read-only transcript', (
+    tester,
+  ) async {
+    // Without onSend the composer would silently discard typed text, so it
+    // is not rendered at all.
     await tester.pumpObers(
       SizedBox(
         width: 400,
@@ -223,8 +246,8 @@ void main() {
         ),
       ),
     );
-    expect(find.bySemanticsLabel('Send message'), findsOneWidget);
-    expect(find.byType(EditableText), findsOneWidget);
+    expect(find.bySemanticsLabel('Send message'), findsNothing);
+    expect(find.byType(EditableText), findsNothing);
   });
 
   testWidgets('has semantics label', (tester) async {

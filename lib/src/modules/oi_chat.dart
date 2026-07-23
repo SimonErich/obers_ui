@@ -154,7 +154,9 @@ class OiChat extends StatefulWidget {
   /// Accessibility label for the chat interface.
   final String label;
 
-  /// Called when the user sends a new message.
+  /// Called when the user sends a new message. When `null` the chat is a
+  /// read-only transcript: the composer input bar is not rendered, so typed
+  /// text can never be silently discarded.
   final ValueChanged<String>? onSend;
 
   /// Called when the user attaches files.
@@ -309,8 +311,9 @@ class _OiChatState extends State<OiChat> {
               ),
             ),
 
-          // Input bar – hidden when the empty state is displayed.
-          if (widget.messages.isNotEmpty)
+          // Input bar – hidden when the empty state is displayed and when
+          // there is no send handler (a read-only transcript).
+          if (widget.messages.isNotEmpty && widget.onSend != null)
             Container(
               padding: EdgeInsets.all(spacing.sm),
               decoration: BoxDecoration(

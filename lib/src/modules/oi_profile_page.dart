@@ -133,7 +133,9 @@ class OiProfilePage extends StatefulWidget {
   /// Called when the user requests to change their avatar.
   final Future<void> Function(Object imageData)? onAvatarChange;
 
-  /// Called when the user saves a field. Returns `true` on success.
+  /// Called when the user saves a field (`name`, `email`, `phone`, or
+  /// `bio`). Returns `true` on success. When `null` the identity fields
+  /// render read-only, since edits could never be persisted.
   final Future<bool> Function(String field, String value)? onFieldSave;
 
   /// Called when the user changes their password. Returns `true` on success.
@@ -586,11 +588,15 @@ class _OiProfilePageState extends State<OiProfilePage> {
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
         Expanded(
+          // Without a save handler the fields are read-only: an editable
+          // input whose edits can never be persisted would silently discard
+          // the user's typing.
           child: OiTextInput(
             controller: controller,
             label: label,
             keyboardType: keyboardType,
             maxLines: maxLines,
+            readOnly: widget.onFieldSave == null,
           ),
         ),
         if (widget.onFieldSave != null) ...[

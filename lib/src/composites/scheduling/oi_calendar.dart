@@ -561,69 +561,143 @@ class _OiCalendarState extends State<OiCalendar>
     );
   }
 
+  // ── Event drag-and-drop ───────────────────────────────────────────────────
+
+  /// Whether events can be dragged — a move handler is wired.
+  bool get _canMoveEvents => widget.onEventMove != null;
+
+  /// Wraps an event [chip] in a long-press draggable carrying [event] when
+  /// moves are enabled; [feedbackWidth] sizes the floating copy.
+  Widget _draggableEvent(
+    OiCalendarEvent event,
+    Widget chip, {
+    required double feedbackWidth,
+  }) {
+    if (!_canMoveEvents) return chip;
+    return LongPressDraggable<OiCalendarEvent>(
+      data: event,
+      feedback: SizedBox(
+        width: feedbackWidth,
+        child: Opacity(opacity: 0.85, child: chip),
+      ),
+      childWhenDragging: Opacity(opacity: 0.4, child: chip),
+      child: chip,
+    );
+  }
+
+  /// Reports [event] moved so its start lands on [target] — keeping its
+  /// time-of-day in day-granular (month) drops, or taking the target's hour
+  /// in hour-granular (week/day) drops — and preserving its duration.
+  void _moveEvent(
+    OiCalendarEvent event,
+    DateTime target, {
+    required bool preserveTimeOfDay,
+  }) {
+    final start = DateTime(
+      target.year,
+      target.month,
+      target.day,
+      preserveTimeOfDay ? event.start.hour : target.hour,
+      event.start.minute,
+    );
+    final end = start.add(event.end.difference(event.start));
+    widget.onEventMove!(event, start, end);
+  }
+
+  /// Wraps a calendar cell in a drop target landing dragged events on
+  /// [target] when moves are enabled; [builder] receives whether a drag is
+  /// hovering so the cell can highlight.
+  Widget _eventDropTarget({
+    required DateTime target,
+    required bool preserveTimeOfDay,
+    required Widget Function({required bool hovering}) builder,
+  }) {
+    if (!_canMoveEvents) return builder(hovering: false);
+    return DragTarget<OiCalendarEvent>(
+      onAcceptWithDetails: (details) => _moveEvent(
+        details.data,
+        target,
+        preserveTimeOfDay: preserveTimeOfDay,
+      ),
+      builder: (context, candidates, rejected) =>
+          builder(hovering: candidates.isNotEmpty),
+    );
+  }
+
   Widget _buildDayCell(BuildContext context, DateTime date) {
     final colors = context.colors;
     final isCurrentMonth = date.month == _focusDate.month;
     final today = _isToday(date);
     final dayEvents = _eventsOn(date).where((e) => !e.allDay).toList();
 
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onTap: widget.onDateTap != null ? () => widget.onDateTap!(date) : null,
-      child: Container(
-        margin: const EdgeInsets.all(1),
-        decoration: BoxDecoration(
-          color: today ? colors.primary.base.withValues(alpha: 0.1) : null,
-          border: today
-              ? Border.all(color: colors.primary.base)
-              : Border.all(color: colors.borderSubtle.withValues(alpha: 0.3)),
-          borderRadius: BorderRadius.circular(4),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(2),
-              child: Text(
-                '${date.day}',
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: today ? FontWeight.bold : FontWeight.normal,
-                  color: isCurrentMonth ? colors.text : colors.textMuted,
-                ),
-              ),
-            ),
-            // Show up to 2 event chips.
-            for (final ev in dayEvents.take(2))
+    return _eventDropTarget(
+      target: date,
+      preserveTimeOfDay: true,
+      builder: ({required hovering}) => GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: widget.onDateTap != null ? () => widget.onDateTap!(date) : null,
+        child: Container(
+          margin: const EdgeInsets.all(1),
+          decoration: BoxDecoration(
+            color: today ? colors.primary.base.withValues(alpha: 0.1) : null,
+            border: hovering || today
+                ? Border.all(color: colors.primary.base)
+                : Border.all(color: colors.borderSubtle.withValues(alpha: 0.3)),
+            borderRadius: BorderRadius.circular(4),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 1),
-                child: GestureDetector(
-                  onTap: widget.onEventTap != null
-                      ? () => widget.onEventTap!(ev)
-                      : null,
-                  child: Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 4,
-                      vertical: 2,
-                    ),
-                    decoration: BoxDecoration(
-                      color: ev.color ?? colors.primary.base,
-                      borderRadius: BorderRadius.circular(3),
-                    ),
-                    child: Text(
-                      ev.title,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        fontSize: 11,
-                        color: colors.textOnPrimary,
-                      ),
-                    ),
+                padding: const EdgeInsets.all(2),
+                child: Text(
+                  '${date.day}',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: today ? FontWeight.bold : FontWeight.normal,
+                    color: isCurrentMonth ? colors.text : colors.textMuted,
                   ),
                 ),
               ),
-          ],
+              // Show up to 2 event chips.
+              for (final ev in dayEvents.take(2))
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 2,
+                    vertical: 1,
+                  ),
+                  child: _draggableEvent(
+                    ev,
+                    GestureDetector(
+                      onTap: widget.onEventTap != null
+                          ? () => widget.onEventTap!(ev)
+                          : null,
+                      child: Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 4,
+                          vertical: 2,
+                        ),
+                        decoration: BoxDecoration(
+                          color: ev.color ?? colors.primary.base,
+                          borderRadius: BorderRadius.circular(3),
+                        ),
+                        child: Text(
+                          ev.title,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: colors.textOnPrimary,
+                          ),
+                        ),
+                      ),
+                    ),
+                    feedbackWidth: 140,
+                  ),
+                ),
+            ],
+          ),
         ),
       ),
     );
@@ -713,44 +787,56 @@ class _OiCalendarState extends State<OiCalendar>
       return e.start.hour <= hour && e.end.hour > hour;
     }).toList();
 
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onTap: widget.onDateTap != null
-          ? () => widget.onDateTap!(cellTime)
-          : null,
-      child: Container(
-        margin: const EdgeInsets.all(0.5),
-        decoration: BoxDecoration(
-          border: Border.all(color: colors.borderSubtle.withValues(alpha: 0.3)),
-        ),
-        child: dayEvents.isEmpty
-            ? null
-            : Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  for (final ev in dayEvents.take(1))
-                    Expanded(
-                      child: GestureDetector(
-                        onTap: widget.onEventTap != null
-                            ? () => widget.onEventTap!(ev)
-                            : null,
-                        child: Container(
-                          padding: const EdgeInsets.all(3),
-                          color: ev.color ?? colors.primary.base,
-                          child: Text(
-                            ev.title,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              fontSize: 11,
-                              color: colors.textOnPrimary,
+    return _eventDropTarget(
+      target: cellTime,
+      preserveTimeOfDay: false,
+      builder: ({required hovering}) => GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: widget.onDateTap != null
+            ? () => widget.onDateTap!(cellTime)
+            : null,
+        child: Container(
+          margin: const EdgeInsets.all(0.5),
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: hovering
+                  ? colors.primary.base
+                  : colors.borderSubtle.withValues(alpha: 0.3),
+            ),
+          ),
+          child: dayEvents.isEmpty
+              ? null
+              : Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    for (final ev in dayEvents.take(1))
+                      Expanded(
+                        child: _draggableEvent(
+                          ev,
+                          GestureDetector(
+                            onTap: widget.onEventTap != null
+                                ? () => widget.onEventTap!(ev)
+                                : null,
+                            child: Container(
+                              padding: const EdgeInsets.all(3),
+                              color: ev.color ?? colors.primary.base,
+                              child: Text(
+                                ev.title,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  color: colors.textOnPrimary,
+                                ),
+                              ),
                             ),
                           ),
+                          feedbackWidth: 120,
                         ),
                       ),
-                    ),
-                ],
-              ),
+                  ],
+                ),
+        ),
       ),
     );
   }
@@ -777,62 +863,76 @@ class _OiCalendarState extends State<OiCalendar>
           return e.start.hour <= hour && e.end.hour > hour;
         }).toList();
 
-        return GestureDetector(
-          behavior: HitTestBehavior.opaque,
-          onTap: widget.onDateTap != null
-              ? () => widget.onDateTap!(cellTime)
-              : null,
-          child: Container(
-            height: 48,
-            decoration: BoxDecoration(
-              border: Border(bottom: BorderSide(color: colors.borderSubtle)),
-            ),
-            child: Row(
-              children: [
-                SizedBox(
-                  width: 48,
-                  child: Center(
-                    child: Text(
-                      '${hour.toString().padLeft(2, '0')}:00',
-                      style: TextStyle(fontSize: 10, color: colors.textMuted),
+        return _eventDropTarget(
+          target: cellTime,
+          preserveTimeOfDay: false,
+          builder: ({required hovering}) => GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTap: widget.onDateTap != null
+                ? () => widget.onDateTap!(cellTime)
+                : null,
+            child: Container(
+              height: 48,
+              decoration: BoxDecoration(
+                color: hovering
+                    ? colors.primary.base.withValues(alpha: 0.08)
+                    : null,
+                border: Border(bottom: BorderSide(color: colors.borderSubtle)),
+              ),
+              child: Row(
+                children: [
+                  SizedBox(
+                    width: 48,
+                    child: Center(
+                      child: Text(
+                        '${hour.toString().padLeft(2, '0')}:00',
+                        style: TextStyle(fontSize: 10, color: colors.textMuted),
+                      ),
                     ),
                   ),
-                ),
-                Expanded(
-                  child: hourEvents.isEmpty
-                      ? const SizedBox.shrink()
-                      : Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            for (final ev in hourEvents)
-                              Expanded(
-                                child: GestureDetector(
-                                  onTap: widget.onEventTap != null
-                                      ? () => widget.onEventTap!(ev)
-                                      : null,
-                                  child: Container(
-                                    padding: const EdgeInsets.all(4),
-                                    margin: const EdgeInsets.all(1),
-                                    decoration: BoxDecoration(
-                                      color: ev.color ?? colors.primary.base,
-                                      borderRadius: BorderRadius.circular(3),
-                                    ),
-                                    child: Text(
-                                      ev.title,
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        color: colors.textOnPrimary,
+                  Expanded(
+                    child: hourEvents.isEmpty
+                        ? const SizedBox.shrink()
+                        : Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              for (final ev in hourEvents)
+                                Expanded(
+                                  child: _draggableEvent(
+                                    ev,
+                                    GestureDetector(
+                                      onTap: widget.onEventTap != null
+                                          ? () => widget.onEventTap!(ev)
+                                          : null,
+                                      child: Container(
+                                        padding: const EdgeInsets.all(4),
+                                        margin: const EdgeInsets.all(1),
+                                        decoration: BoxDecoration(
+                                          color:
+                                              ev.color ?? colors.primary.base,
+                                          borderRadius: BorderRadius.circular(
+                                            3,
+                                          ),
+                                        ),
+                                        child: Text(
+                                          ev.title,
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            color: colors.textOnPrimary,
+                                          ),
+                                        ),
                                       ),
                                     ),
+                                    feedbackWidth: 160,
                                   ),
                                 ),
-                              ),
-                          ],
-                        ),
-                ),
-              ],
+                            ],
+                          ),
+                  ),
+                ],
+              ),
             ),
           ),
         );

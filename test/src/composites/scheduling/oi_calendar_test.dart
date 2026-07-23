@@ -1,5 +1,6 @@
 // Tests do not require documentation comments.
 
+import 'package:flutter/gestures.dart' show kLongPressTimeout;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui/src/composites/scheduling/oi_calendar.dart';
@@ -46,6 +47,8 @@ Widget _calendar({
   DateTime? initialDate,
   ValueChanged<OiCalendarEvent>? onEventTap,
   ValueChanged<DateTime>? onDateTap,
+  void Function(OiCalendarEvent event, DateTime start, DateTime end)?
+  onEventMove,
   bool showWeekNumbers = false,
   bool showAllDayRow = true,
   int firstDayOfWeek = DateTime.monday,
@@ -60,6 +63,7 @@ Widget _calendar({
       initialDate: initialDate ?? _initialDate,
       onEventTap: onEventTap,
       onDateTap: onDateTap,
+      onEventMove: onEventMove,
       showWeekNumbers: showWeekNumbers,
       showAllDayRow: showAllDayRow,
       firstDayOfWeek: firstDayOfWeek,
@@ -264,5 +268,38 @@ void main() {
     expect(find.text('Day'), findsOneWidget);
     expect(find.text('Week'), findsOneWidget);
     expect(find.text('Month'), findsOneWidget);
+  });
+
+  // Dragging an event chip to another day fires onEventMove with the
+  // time-of-day and duration preserved.
+  testWidgets('long-press dragging an event to another day moves it', (
+    tester,
+  ) async {
+    OiCalendarEvent? moved;
+    DateTime? newStart;
+    DateTime? newEnd;
+    await tester.pumpObers(
+      _calendar(
+        onEventMove: (event, start, end) {
+          moved = event;
+          newStart = start;
+          newEnd = end;
+        },
+      ),
+    );
+
+    // 'Sprint Review' sits on June 20, 14:00-15:00. Drop it on June 11.
+    final chip = find.text('Sprint Review');
+    expect(chip, findsOneWidget);
+    final gesture = await tester.startGesture(tester.getCenter(chip));
+    await tester.pump(kLongPressTimeout + const Duration(milliseconds: 50));
+    await gesture.moveTo(tester.getCenter(find.text('11')));
+    await tester.pump();
+    await gesture.up();
+    await tester.pumpAndSettle();
+
+    expect(moved?.key, 'e3');
+    expect(newStart, DateTime(2025, 6, 11, 14));
+    expect(newEnd, DateTime(2025, 6, 11, 15));
   });
 }
