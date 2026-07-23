@@ -87,6 +87,33 @@ void main() {
       expect(positioned.left, lessThan(450));
     });
 
+    testWidgets('pins every visible world copy when zoomed out wide', (
+      tester,
+    ) async {
+      // At zoom 1 the world is 512 px, so a 1200-px viewport tiles ~2.3
+      // copies of the globe side by side — the marker must appear on each
+      // visible copy (here 3: at ~88, ~600, and ~1112 px), matching the tiles.
+      await tester.pumpChartApp(
+        const OiTileMap(
+          label: 'World',
+          center: OiLatLng(0, 0),
+          zoom: 1,
+          markers: [
+            OiMapMarker(
+              latitude: 0,
+              longitude: 0,
+              label: 'Everywhere',
+              value: 1,
+            ),
+          ],
+        ),
+        surfaceSize: const Size(1200, 600),
+      );
+      await tester.pump();
+
+      expect(find.bySemanticsLabel('Everywhere'), findsNWidgets(3));
+    });
+
     testWidgets('zooming in renders a finer tile grid', (tester) async {
       await tester.pumpChartApp(
         const OiTileMap(label: 'World', center: OiLatLng(0, 0), zoom: 2),

@@ -185,6 +185,10 @@ class _OiTileMapState extends State<OiTileMap> {
         final wrappedX = ((tx % tileCount) + tileCount) % tileCount;
         tiles.add(
           Positioned(
+            // Key by the unwrapped slot so panning and zooming never update an
+            // existing element to a different tile's URL — with gaplessPlayback
+            // that would keep painting the old tile's imagery in the new slot.
+            key: ValueKey<String>('$_zoom/$tx/$ty'),
             left: tx * _tileSize - topLeft.dx,
             top: ty * _tileSize - topLeft.dy,
             width: _tileSize,
@@ -204,7 +208,7 @@ class _OiTileMapState extends State<OiTileMap> {
 
     final markers = <Widget>[
       for (final marker in widget.markers)
-        _positionedMarker(marker, topLeft, size, colors),
+        ..._markerCopies(marker, topLeft, size, colors),
     ];
 
     final stack = Stack(
@@ -241,39 +245,47 @@ class _OiTileMapState extends State<OiTileMap> {
     );
   }
 
-  Widget _positionedMarker(
+  /// One pinned marker per world copy visible in the viewport, so the pin
+  /// wraps at the antimeridian exactly like the tile grid, stays put when
+  /// panning drives the center longitude outside [-180, 180], and — at low
+  /// zoom, when the viewport is wider than the world — appears on **every**
+  /// tiled copy of the globe rather than only the one nearest the center.
+  List<Widget> _markerCopies(
     OiMapMarker marker,
     Offset topLeft,
     Size viewport,
     OiColorScheme colors,
   ) {
     final projected = _project(OiLatLng(marker.latitude, marker.longitude));
-    // Place the marker on the copy of the globe nearest the viewport, so it
-    // wraps at the antimeridian exactly like the tile grid (and stays put when
-    // panning drives the center longitude outside [-180, 180]).
-    final viewportCenterX = topLeft.dx + viewport.width / 2;
-    var worldX = projected.dx;
-    while (worldX - viewportCenterX > _worldSize / 2) {
-      worldX -= _worldSize;
-    }
-    while (worldX - viewportCenterX < -_worldSize / 2) {
-      worldX += _worldSize;
-    }
-    final pixel = Offset(worldX, projected.dy) - topLeft;
     const markerSize = 26.0;
-    return Positioned(
-      left: pixel.dx - markerSize / 2,
-      top: pixel.dy - markerSize,
-      child: Semantics(
-        container: true,
-        label: marker.label,
-        child: OiIcon.decorative(
-          icon: OiIcons.mapPin,
-          size: markerSize,
-          color: marker.color ?? colors.primary.base,
+    // The first world copy whose pin could still touch the viewport's left
+    // edge, then every copy rightward until the pin leaves the right edge.
+    final firstCopy =
+        ((topLeft.dx - markerSize / 2 - projected.dx) / _worldSize).ceil();
+    final copies = <Widget>[];
+    for (var copy = firstCopy; ; copy++) {
+      final pixel =
+          Offset(projected.dx + copy * _worldSize, projected.dy) - topLeft;
+      if (pixel.dx - markerSize / 2 > viewport.width) {
+        break;
+      }
+      copies.add(
+        Positioned(
+          left: pixel.dx - markerSize / 2,
+          top: pixel.dy - markerSize,
+          child: Semantics(
+            container: true,
+            label: marker.label,
+            child: OiIcon.decorative(
+              icon: OiIcons.mapPin,
+              size: markerSize,
+              color: marker.color ?? colors.primary.base,
+            ),
+          ),
         ),
-      ),
-    );
+      );
+    }
+    return copies;
   }
 
   Widget _zoomControls(OiColorScheme colors) => DecoratedBox(
