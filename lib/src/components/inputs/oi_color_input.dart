@@ -117,9 +117,20 @@ class _OiColorInputState extends State<OiColorInput> {
   void didUpdateWidget(OiColorInput oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.value != widget.value && !_hexFocus.hasFocus) {
-      _hexCtrl.text = widget.value != null ? _colorToHex(widget.value!) : '';
+      _setHexText(widget.value != null ? _colorToHex(widget.value!) : '');
       _opacity = widget.value?.a ?? 1.0;
     }
+  }
+
+  /// Replaces the hex field text, keeping the selection valid.
+  ///
+  /// Assigning `.text` collapses the selection to offset -1, which leaves an
+  /// unfocused EditableText with nothing to paint until it gains focus.
+  void _setHexText(String text) {
+    _hexCtrl.value = TextEditingValue(
+      text: text,
+      selection: TextSelection.collapsed(offset: text.length),
+    );
   }
 
   @override
@@ -132,7 +143,7 @@ class _OiColorInputState extends State<OiColorInput> {
   void _selectPreset(Color c) {
     final withOpacity = c.withValues(alpha: _opacity);
     widget.onChanged?.call(withOpacity);
-    _hexCtrl.text = _colorToHex(withOpacity);
+    _setHexText(_colorToHex(withOpacity));
     setState(() => _open = false);
   }
 
