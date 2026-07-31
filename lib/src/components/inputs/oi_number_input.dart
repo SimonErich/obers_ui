@@ -86,19 +86,8 @@ class _OiNumberInputState extends State<OiNumberInput> {
   void didUpdateWidget(OiNumberInput oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.value != widget.value && !_focused) {
-      _setText(_format(widget.value));
+      _controller.text = _format(widget.value);
     }
-  }
-
-  /// Replaces the field text, keeping the selection valid.
-  ///
-  /// Assigning `.text` collapses the selection to offset -1, which leaves an
-  /// unfocused EditableText with nothing to paint until it gains focus.
-  void _setText(String text) {
-    _controller.value = TextEditingValue(
-      text: text,
-      selection: TextSelection.collapsed(offset: text.length),
-    );
   }
 
   @override
@@ -148,13 +137,13 @@ class _OiNumberInputState extends State<OiNumberInput> {
     final parsed = double.tryParse(trimmed);
     if (parsed == null) {
       // Revert to last valid value.
-      _setText(_format(widget.value));
+      _controller.text = _format(widget.value);
       return;
     }
     final clamped = _clamp(parsed);
     widget.onChanged?.call(clamped);
     if (clamped != parsed) {
-      _setText(_format(clamped));
+      _controller.text = _format(clamped);
     }
   }
 
@@ -162,14 +151,14 @@ class _OiNumberInputState extends State<OiNumberInput> {
     final current = widget.value ?? 0;
     final next = _clamp(current + widget.step);
     widget.onChanged?.call(next);
-    _setText(_format(next));
+    _controller.text = _format(next);
   }
 
   void _decrement() {
     final current = widget.value ?? 0;
     final next = _clamp(current - widget.step);
     widget.onChanged?.call(next);
-    _setText(_format(next));
+    _controller.text = _format(next);
   }
 
   Widget _stepButton(

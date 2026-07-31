@@ -181,6 +181,7 @@ abstract class OiAfController<TField extends Enum, TData> extends ChangeNotifier
     bool markDirty = true,
     bool validate = false,
   }) {
+    final mutated = <OiAfFieldController<TField>>[];
     for (final entry in values.entries) {
       final fc = _fieldControllers[entry.key];
       if (fc != null) {
@@ -190,20 +191,25 @@ abstract class OiAfController<TField extends Enum, TData> extends ChangeNotifier
           fromUser: false,
           notify: false,
         );
+        mutated.add(fc);
       }
     }
+    _notifyFields(mutated);
     notifyListeners();
     if (validate) this.validate();
   }
 
   void rebase(Map<TField, Object?> values, {bool validate = false}) {
+    final mutated = <OiAfFieldController<TField>>[];
     for (final entry in values.entries) {
       final fc = _fieldControllers[entry.key];
       if (fc != null) {
         fc.rebaseInitialValue(entry.value, notify: false);
+        mutated.add(fc);
       }
     }
     _globalErrors.clear();
+    _notifyFields(mutated);
     notifyListeners();
     if (validate) this.validate();
   }
@@ -295,6 +301,7 @@ abstract class OiAfController<TField extends Enum, TData> extends ChangeNotifier
       for (final fc in _fieldControllers.values) {
         fc.clearBackendErrors(notify: false);
       }
+      _notifyFields(_fieldControllers.values);
       notifyListeners();
     }
   }
@@ -311,6 +318,7 @@ abstract class OiAfController<TField extends Enum, TData> extends ChangeNotifier
           ..clearBackendErrors(notify: false);
       }
       if (includeGlobal) _globalErrors.clear();
+      _notifyFields(_fieldControllers.values);
       notifyListeners();
     }
   }
@@ -348,6 +356,17 @@ abstract class OiAfController<TField extends Enum, TData> extends ChangeNotifier
   }
 
   void _notifyListeners() => notifyListeners();
+
+  /// Notifies each field controller in [controllers].
+  ///
+  /// Bound widgets listen to their own field controller rather than to this
+  /// form, so batch mutations that pass `notify: false` per field must fan the
+  /// notification out here.
+  void _notifyFields(Iterable<OiAfFieldController<TField>> controllers) {
+    for (final fc in controllers) {
+      fc.notifyChanged();
+    }
+  }
 
   // ── Validation ─────────────────────────────────────────────────────────
 
@@ -529,6 +548,7 @@ abstract class OiAfController<TField extends Enum, TData> extends ChangeNotifier
     observer?.onFormReset();
     _evaluateAllConditions();
     _computeInitialDerivedFields();
+    _notifyFields(_fieldControllers.values);
     notifyListeners();
   }
 

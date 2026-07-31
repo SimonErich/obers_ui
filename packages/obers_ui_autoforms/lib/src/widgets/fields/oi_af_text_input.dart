@@ -220,14 +220,7 @@ class _OiAfTextInputState<TField extends Enum>
     final fieldValue = typedValue ?? '';
     if (_textController.text != fieldValue) {
       _syncing = true;
-      // Assigning `.text` collapses the selection to offset -1, which leaves an
-      // unfocused EditableText with nothing to paint until it gains focus. Set
-      // the whole value so the selection stays valid and the text renders
-      // immediately — e.g. when a form is programmatically prefilled.
-      _textController.value = TextEditingValue(
-        text: fieldValue,
-        selection: TextSelection.collapsed(offset: fieldValue.length),
-      );
+      _textController.text = fieldValue;
       _syncing = false;
     }
   }

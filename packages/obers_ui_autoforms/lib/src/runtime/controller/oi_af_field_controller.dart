@@ -192,6 +192,13 @@ class OiAfFieldController<TField extends Enum> extends ChangeNotifier {
     onValueChanged?.call(_definition.field, fromUser: fromUser);
   }
 
+  /// Notifies this field's listeners without mutating any state.
+  ///
+  /// Bound widgets only observe their own field controller, so form-level
+  /// batch operations that mutate many fields with `notify: false` must call
+  /// this afterwards or the widgets will keep rendering stale values.
+  void notifyChanged() => notifyListeners();
+
   // ── Focus ──────────────────────────────────────────────────────────────
 
   void setFocused({required bool focused, bool notify = true}) {
