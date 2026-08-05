@@ -79,18 +79,26 @@ class _OiFileInputState extends State<OiFileInput> {
     if (!widget.enabled || _picking) return;
     setState(() => _picking = true);
     try {
-      final result = await FilePicker.pickFiles(
-        allowMultiple: widget.multipleFiles,
-        type: widget.allowedExtensions != null ? FileType.custom : FileType.any,
-        allowedExtensions: widget.allowedExtensions,
-      );
-      if (result != null) {
-        final paths = result.files.map((f) => f.name).toList();
-        if (widget.multipleFiles) {
+      final type = widget.allowedExtensions != null
+          ? FileType.custom
+          : FileType.any;
+
+      // `pickFiles` is the multi-select entry point, `pickFile` the single one.
+      if (widget.multipleFiles) {
+        final result = await FilePicker.pickFiles(
+          type: type,
+          allowedExtensions: widget.allowedExtensions,
+        );
+        if (result != null) {
+          final paths = result.files.map((file) => file.name).toList();
           _updateFiles([..._effectiveFiles, ...paths]);
-        } else {
-          _updateFiles(paths);
         }
+      } else {
+        final file = await FilePicker.pickFile(
+          type: type,
+          allowedExtensions: widget.allowedExtensions,
+        );
+        if (file != null) _updateFiles([file.name]);
       }
     } finally {
       if (mounted) setState(() => _picking = false);

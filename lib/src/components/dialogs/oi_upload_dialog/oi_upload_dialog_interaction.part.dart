@@ -17,23 +17,24 @@ extension _OiUploadDialogInteraction on _OiUploadDialogState {
     _updateState(() => _picking = true);
     try {
       final result = await FilePicker.pickFiles(
-        allowMultiple: true,
         type: widget.allowedExtensions != null ? FileType.custom : FileType.any,
         allowedExtensions: widget.allowedExtensions,
-        withData: true,
       );
-      if (result != null && mounted) {
-        final files = result.files
-            .map(
-              (f) => OiFileData(
-                name: f.name,
-                size: f.size,
-                bytes: f.bytes,
-                mimeType: OiFileUtils.mimeType(OiFileUtils.extension(f.name)),
-              ),
-            )
-            .toList();
-        _addFiles(files);
+      if (result != null) {
+        // Read eagerly: the picker no longer populates `bytes` itself, and the
+        // dialog hands complete [OiFileData] to its caller.
+        final files = <OiFileData>[];
+        for (final file in result.files) {
+          files.add(
+            OiFileData(
+              name: file.name,
+              size: file.size,
+              bytes: await file.readAsBytes(),
+              mimeType: OiFileUtils.mimeType(OiFileUtils.extension(file.name)),
+            ),
+          );
+        }
+        if (mounted) _addFiles(files);
       }
     } finally {
       if (mounted) _escapeFocusNode.requestFocus();

@@ -14,7 +14,18 @@ environment:
 
 dependencies:
   desktop_drop: ^0.7.0
-  file_picker: ^11.0.2
+  # file_picker 11 needs win32 ^5, 12 needs ^6. Consumers that also pull win32
+  # ^6 (e.g. a Serverpod 4 workspace) cannot resolve 11 at all: it compiles
+  # against win32 5 APIs (COINIT_*, FOS_*, CoInitializeEx arity) that no longer
+  # exist, so the Windows sources fail to build — even on Linux/macOS, where
+  # they are still type-checked.
+  #
+  # 12.x is prerelease-only for now, so the constraint has to name the
+  # prerelease explicitly: a plain range like '>=11.0.2 <13.0.0' still resolves
+  # to 11.x, because pub skips prereleases unless opted into.
+  #
+  # TODO: move to ^12.0.0 once it ships stable.
+  file_picker: ^12.0.0-beta.7
   flutter:
     sdk: flutter
   intl: ^0.20.0

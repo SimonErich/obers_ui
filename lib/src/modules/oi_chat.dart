@@ -230,7 +230,7 @@ class _OiChatState extends State<OiChat> {
   }
 
   Future<void> _handleAttach() async {
-    final result = await FilePicker.pickFiles(allowMultiple: true);
+    final result = await FilePicker.pickFiles();
     if (result == null || result.files.isEmpty) return;
     final files = result.files.map((f) {
       return OiFileData(
