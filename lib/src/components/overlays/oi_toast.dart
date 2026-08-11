@@ -1,6 +1,9 @@
 import 'dart:async';
 
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/src/components/buttons/oi_button.dart';
+import 'package:obers_ui/src/components/buttons/oi_icon_button.dart';
+import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/oi_overlays.dart';
 import 'package:obers_ui/src/foundation/theme/oi_color_scheme.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
@@ -68,6 +71,7 @@ class _OiToastQueue {
     required OiToastPosition position,
     required Duration duration,
     required bool pauseOnHover,
+    required bool dismissible,
     Widget? action,
     VoidCallback? onDismiss,
   }) {
@@ -77,6 +81,7 @@ class _OiToastQueue {
       position: position,
       duration: duration,
       pauseOnHover: pauseOnHover,
+      dismissible: dismissible,
       action: action,
       onDismiss: onDismiss,
     );
@@ -143,6 +148,7 @@ class _OiToastEntry {
     required this.position,
     required this.duration,
     required this.pauseOnHover,
+    required this.dismissible,
     this.action,
     this.onDismiss,
   });
@@ -152,6 +158,7 @@ class _OiToastEntry {
   final OiToastPosition position;
   final Duration duration;
   final bool pauseOnHover;
+  final bool dismissible;
   final Widget? action;
   final VoidCallback? onDismiss;
 }
@@ -234,6 +241,7 @@ class _OiToastColumn extends StatelessWidget {
                 position: entry.position,
                 duration: entry.duration,
                 pauseOnHover: entry.pauseOnHover,
+                dismissible: entry.dismissible,
                 action: entry.action,
                 onDismiss: () {
                   entry.onDismiss?.call();
@@ -256,6 +264,15 @@ class _OiToastColumn extends StatelessWidget {
 /// pointer over the toast pauses the auto-dismiss timer. The timer is also
 /// paused while the widget is pressed on touch devices.
 ///
+/// When [dismissible] is `true` (the default), a close button is rendered at
+/// the trailing edge so the toast can be dismissed before [duration] elapses.
+///
+/// Passing a `null` [duration] hands expiry to the caller: the toast then runs
+/// no timer of its own and stays until it is removed from the tree. State-driven
+/// callers that keep their own list of toasts want this — they render [OiToast]
+/// directly and use [onPauseRequested] / [onResumeRequested] to keep their timer
+/// in step with the pointer.
+///
 /// Use [OiToast.show] to insert a toast into the overlay stack. The returned
 /// [OiOverlayHandle] can be used to dismiss the toast early.
 ///
@@ -269,8 +286,11 @@ class OiToast extends StatefulWidget {
     this.position = OiToastPosition.bottomRight,
     this.duration = const Duration(seconds: 4),
     this.pauseOnHover = true,
+    this.dismissible = true,
     this.action,
     this.onDismiss,
+    this.onPauseRequested,
+    this.onResumeRequested,
     super.key,
   });
 
@@ -287,10 +307,15 @@ class OiToast extends StatefulWidget {
   final OiToastPosition position;
 
   /// How long the toast remains visible before auto-dismissing.
-  final Duration duration;
+  ///
+  /// When `null` the toast runs no timer and the caller owns expiry.
+  final Duration? duration;
 
   /// Whether hovering over the toast pauses the auto-dismiss timer.
   final bool pauseOnHover;
+
+  /// Whether a close button is rendered at the trailing edge of the toast.
+  final bool dismissible;
 
   /// An optional action widget rendered to the right of the message.
   final Widget? action;
@@ -298,6 +323,15 @@ class OiToast extends StatefulWidget {
   /// Called just before the toast is dismissed (either automatically or by
   /// the user).
   final VoidCallback? onDismiss;
+
+  /// Called when the pointer enters the toast, or a long press begins.
+  ///
+  /// Only useful with a `null` [duration]: it lets a caller that owns expiry
+  /// pause its own timer while the user is reading.
+  final VoidCallback? onPauseRequested;
+
+  /// Called when the pointer leaves the toast, or a long press ends.
+  final VoidCallback? onResumeRequested;
 
   /// Shows a toast notification above the current widget tree.
   ///
@@ -310,6 +344,7 @@ class OiToast extends StatefulWidget {
     OiToastPosition position = OiToastPosition.bottomRight,
     Duration duration = const Duration(seconds: 4),
     bool pauseOnHover = true,
+    bool dismissible = true,
     Widget? action,
     VoidCallback? onDismiss,
   }) {
@@ -320,6 +355,7 @@ class OiToast extends StatefulWidget {
       position: position,
       duration: duration,
       pauseOnHover: pauseOnHover,
+      dismissible: dismissible,
       action: action,
       onDismiss: onDismiss,
     );
@@ -361,18 +397,22 @@ class _OiToastState extends State<OiToast> with SingleTickerProviderStateMixin {
 
   void _scheduleTimer() {
     _timer?.cancel();
-    _timer = Timer(widget.duration, _dismiss);
+    // A null duration means the caller owns expiry.
+    final duration = widget.duration;
+    _timer = duration == null ? null : Timer(duration, _dismiss);
   }
 
   void _pauseTimer() {
     _timer?.cancel();
     _timer = null;
+    widget.onPauseRequested?.call();
   }
 
   void _resumeTimer() {
     if (_timer == null && !_hovered) {
       _scheduleTimer();
     }
+    widget.onResumeRequested?.call();
   }
 
   Future<void> _dismiss() async {
@@ -450,12 +490,20 @@ class _OiToastState extends State<OiToast> with SingleTickerProviderStateMixin {
           ),
         ];
 
+    // Clamp to the viewport so the toast never overflows on narrow screens.
+    // The toast column insets its content by 16 on each side.
+    final availableWidth = MediaQuery.sizeOf(context).width - 32;
+    final maxWidth = availableWidth.clamp(0.0, 400.0);
+    // On very narrow viewports the minimum must yield to the maximum,
+    // otherwise the constraints are unsatisfiable.
+    final minWidth = maxWidth < 240.0 ? maxWidth : 240.0;
+
     Widget toast = Semantics(
       label: widget.label,
       liveRegion: true,
       explicitChildNodes: true,
       child: Container(
-        constraints: const BoxConstraints(minWidth: 240, maxWidth: 400),
+        constraints: BoxConstraints(minWidth: minWidth, maxWidth: maxWidth),
         decoration: BoxDecoration(
           color: effectiveBgColor,
           borderRadius: effectiveBorderRadius,
@@ -499,6 +547,15 @@ class _OiToastState extends State<OiToast> with SingleTickerProviderStateMixin {
                           SizedBox(width: effectiveGap),
                           widget.action!,
                         ],
+                        if (widget.dismissible) ...[
+                          SizedBox(width: effectiveGap),
+                          OiIconButton(
+                            icon: OiIcons.x,
+                            semanticLabel: 'Dismiss',
+                            onTap: _dismiss,
+                            size: OiButtonSize.small,
+                          ),
+                        ],
                       ],
                     ),
                   ),
@@ -518,7 +575,7 @@ class _OiToastState extends State<OiToast> with SingleTickerProviderStateMixin {
         },
         onExit: (_) {
           _hovered = false;
-          _scheduleTimer();
+          _resumeTimer();
         },
         child: toast,
       );
