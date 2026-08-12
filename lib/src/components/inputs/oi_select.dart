@@ -184,8 +184,14 @@ class _OiSelectState<T> extends State<OiSelect<T>> {
     _close();
   }
 
+  /// The label of the currently selected option, or null when nothing matches.
+  ///
+  /// `null` is a legitimate option value — an "Auto-detect" or "None" entry is
+  /// usually modelled as `OiSelectOption(value: null, label: 'Auto-detect')` —
+  /// so the options are searched even when the current value is null. Returning
+  /// early on a null value made such an option impossible to display: the
+  /// select rendered blank however it was configured.
   String? get _selectedLabel {
-    if (widget.value == null) return null;
     for (final o in widget.options) {
       if (o.value == widget.value) return o.label;
     }

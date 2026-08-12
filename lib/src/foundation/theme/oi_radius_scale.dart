@@ -52,7 +52,11 @@ class OiRadiusScale {
           md: BorderRadius.zero,
           lg: BorderRadius.zero,
           xl: BorderRadius.zero,
-          full: BorderRadius.zero,
+          // `full` stays a pill even under a sharp preference. It is not a step
+          // on the radius ladder — it is the token that makes a shape circular,
+          // so avatars, status dots and pill badges depend on it. Zeroing it
+          // turned every avatar in a sharp theme into a square.
+          full: BorderRadius.all(Radius.circular(9999)),
         );
       case OiRadiusPreference.medium:
         return const OiRadiusScale(

@@ -32,6 +32,36 @@ void main() {
     expect(find.text('Banana'), findsOneWidget);
   });
 
+  // `null` is a legitimate option value — "Auto-detect", "None", "Inbox
+  // (default)" are all naturally modelled that way. The label lookup used to
+  // return early whenever the current value was null, so such an option could
+  // never be displayed and the select rendered blank however it was
+  // configured.
+  testWidgets('shows the label of an option whose value is null', (
+    tester,
+  ) async {
+    await tester.pumpObers(
+      const OiSelect<String?>(
+        options: [
+          OiSelectOption(value: null, label: 'Auto-detect'),
+          OiSelectOption(value: 'de', label: 'German'),
+        ],
+        placeholder: 'Pick a language',
+      ),
+    );
+    expect(find.text('Auto-detect'), findsOneWidget);
+    expect(find.text('Pick a language'), findsNothing);
+  });
+
+  testWidgets('falls back to the placeholder when no option matches', (
+    tester,
+  ) async {
+    await tester.pumpObers(
+      const OiSelect<String>(options: _kOptions, placeholder: 'Pick one'),
+    );
+    expect(find.text('Pick one'), findsOneWidget);
+  });
+
   testWidgets('closed trigger updates when value changes', (tester) async {
     await tester.pumpObers(
       const OiSelect<String>(options: _kOptions, value: 'a'),

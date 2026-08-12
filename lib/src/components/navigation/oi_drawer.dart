@@ -85,15 +85,10 @@ class OiDrawer extends StatelessWidget {
               child: DecoratedBox(
                 decoration: BoxDecoration(
                   color: colors.surface,
-                  boxShadow: open
-                      ? const [
-                          BoxShadow(
-                            color: Color(0x1F000000),
-                            blurRadius: 24,
-                            offset: Offset(4, 0),
-                          ),
-                        ]
-                      : null,
+                  // From the shadow scale, so a theme that tints or removes
+                  // shadows reaches the drawer too. This was a fixed black
+                  // shadow that ignored the scale entirely.
+                  boxShadow: open ? context.shadows.xl : null,
                 ),
                 child: child,
               ),

@@ -22,7 +22,10 @@ void main() {
       test('md is zero', () => expect(scale.md, BorderRadius.zero));
       test('lg is zero', () => expect(scale.lg, BorderRadius.zero));
       test('xl is zero', () => expect(scale.xl, BorderRadius.zero));
-      test('full is zero', () => expect(scale.full, BorderRadius.zero));
+      test(
+        'full stays a pill — it makes shapes circular, it is not a ladder step',
+        () => expect(scale.full, BorderRadius.circular(9999)),
+      );
     });
 
     group('forPreference(medium)', () {

@@ -371,26 +371,36 @@ class OiDecorationTheme {
     this.componentBorders,
   });
 
-  /// Creates the standard decoration theme from [primaryColor] and [errorColor].
+  /// Creates the standard decoration theme from the theme's own tokens.
+  ///
+  /// [borderColor] and [borderRadius] are required rather than defaulted
+  /// because this factory is what styles every input and outlined container in
+  /// the app: `OiInputFrame` resolves its border from here, not from
+  /// `OiComponentThemes.textInput`. It previously hardcoded a light grey
+  /// (`#D1D5DB`) and a radius of 8 for both brightnesses, so every input in a
+  /// dark theme got a pale border, and no radius preference could reach them.
+  /// Passing `colors.border` and `radius.md` keeps them on the token system.
   factory OiDecorationTheme.standard({
     required Color primaryColor,
     required Color errorColor,
+    required Color borderColor,
+    required BorderRadius borderRadius,
   }) {
     return OiDecorationTheme(
       defaultBorder: OiBorderStyle.solid(
-        const Color(0xFFD1D5DB),
+        borderColor,
         1,
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: borderRadius,
       ),
       focusBorder: OiBorderStyle.solid(
         primaryColor,
         2,
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: borderRadius,
       ),
       errorBorder: OiBorderStyle.solid(
         errorColor,
         2,
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: borderRadius,
       ),
       gradients: {
         'primary': OiGradientStyle.linear([

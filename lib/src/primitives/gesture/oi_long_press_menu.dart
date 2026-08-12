@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/primitives/interaction/oi_touch_target.dart';
 
 /// A menu item for the long-press context menu.
@@ -221,17 +222,15 @@ class _OiMenuPanel extends StatelessWidget {
       );
     }
 
+    // Themed rather than a literal white panel with a hard black shadow, which
+    // rendered as a white menu floating on a near-black canvas in any dark
+    // theme — unreadable, and the loudest remaining hardcoded surface in the
+    // package.
     return DecoratedBox(
-      decoration: const BoxDecoration(
-        color: Color(0xFFFFFFFF),
-        borderRadius: BorderRadius.all(Radius.circular(8)),
-        boxShadow: [
-          BoxShadow(
-            color: Color(0x33000000),
-            blurRadius: 8,
-            offset: Offset(0, 2),
-          ),
-        ],
+      decoration: BoxDecoration(
+        color: context.colors.surface,
+        borderRadius: context.radius.md,
+        boxShadow: context.shadows.md,
       ),
       child: direction == Axis.horizontal
           ? Row(mainAxisSize: MainAxisSize.min, children: itemWidgets)

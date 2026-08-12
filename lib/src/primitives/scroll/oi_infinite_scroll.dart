@@ -160,22 +160,27 @@ class _InfiniteScrollSpinnerState extends State<_InfiniteScrollSpinner>
   Widget build(BuildContext context) {
     return RotationTransition(
       turns: _controller,
-      child: const SizedBox(
+      child: SizedBox(
         width: 24,
         height: 24,
-        child: CustomPaint(painter: _SpinnerPainter()),
+        child: CustomPaint(painter: _SpinnerPainter(context.colors.primary.base)),
       ),
     );
   }
 }
 
 class _SpinnerPainter extends CustomPainter {
-  const _SpinnerPainter();
+  const _SpinnerPainter(this.color);
+
+  /// Painted from the theme rather than a literal: this used to be a hardcoded
+  /// `#2563EB`, so a loading spinner ignored the brand entirely and showed the
+  /// default Tailwind blue in every theme.
+  final Color color;
 
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = const Color(0xFF2563EB)
+      ..color = color
       ..strokeWidth = 2.5
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round;
@@ -190,5 +195,5 @@ class _SpinnerPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(_SpinnerPainter oldDelegate) => false;
+  bool shouldRepaint(_SpinnerPainter oldDelegate) => oldDelegate.color != color;
 }

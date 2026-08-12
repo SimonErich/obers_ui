@@ -115,6 +115,8 @@ void main() {
         final expectedDecoration = OiDecorationTheme.standard(
           primaryColor: brandColor,
           errorColor: baseLight.colors.error.base,
+          borderColor: baseLight.colors.border,
+          borderRadius: baseLight.radius.md,
         );
         expect(theme.decoration, equals(expectedDecoration));
       });

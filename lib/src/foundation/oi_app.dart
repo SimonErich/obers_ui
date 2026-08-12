@@ -372,11 +372,22 @@ class _OiAppState extends State<OiApp> {
     );
   }
 
+  /// The colour the OS shows for this app in task switchers.
+  ///
+  /// Read from the resolved theme's primary rather than the hardcoded
+  /// `#2563EB` this used to pass, which meant every obers_ui app identified
+  /// itself to the window manager as default-Tailwind-blue. Brightness comes
+  /// from the platform dispatcher because there is no [MediaQuery] above
+  /// [WidgetsApp] to ask.
+  Color get _appColor => _resolveTheme(
+    View.of(context).platformDispatcher.platformBrightness,
+  ).colors.primary.base;
+
   @override
   Widget build(BuildContext context) {
     if (widget._useRouter) {
       return WidgetsApp.router(
-        color: const Color(0xFF2563EB),
+        color: _appColor,
         locale: widget.locale,
         localizationsDelegates: widget.localizationsDelegates,
         supportedLocales: widget.supportedLocales,
@@ -388,7 +399,7 @@ class _OiAppState extends State<OiApp> {
     }
 
     return WidgetsApp(
-      color: const Color(0xFF2563EB),
+      color: _appColor,
       locale: widget.locale,
       localizationsDelegates: widget.localizationsDelegates,
       supportedLocales: widget.supportedLocales,

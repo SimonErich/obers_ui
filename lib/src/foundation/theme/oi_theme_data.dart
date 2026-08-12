@@ -74,6 +74,8 @@ class OiThemeData {
       decoration: OiDecorationTheme.standard(
         primaryColor: colors.primary.base,
         errorColor: colors.error.base,
+        borderColor: colors.border,
+        borderRadius: OiRadiusScale.forPreference(radiusPreference).md,
       ),
       components: components ?? const OiComponentThemes.empty(),
       breakpoints: breakpoints,
@@ -111,6 +113,8 @@ class OiThemeData {
       decoration: OiDecorationTheme.standard(
         primaryColor: colors.primary.base,
         errorColor: colors.error.base,
+        borderColor: colors.border,
+        borderRadius: OiRadiusScale.forPreference(radiusPreference).md,
       ),
       components: components ?? const OiComponentThemes.empty(),
       breakpoints: breakpoints,
@@ -167,6 +171,8 @@ class OiThemeData {
       decoration: OiDecorationTheme.standard(
         primaryColor: color,
         errorColor: base.colors.error.base,
+        borderColor: base.colors.border,
+        borderRadius: base.radius.md,
       ),
     );
   }

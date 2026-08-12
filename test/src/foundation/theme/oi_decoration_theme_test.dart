@@ -198,12 +198,16 @@ void main() {
   group('OiDecorationTheme.standard', () {
     const primary = Color(0xFF2563EB);
     const error = Color(0xFFDC2626);
+    const border = Color(0xFF8B857D);
+    const radius = BorderRadius.all(Radius.circular(10));
     late OiDecorationTheme theme;
 
     setUp(() {
       theme = OiDecorationTheme.standard(
         primaryColor: primary,
         errorColor: error,
+        borderColor: border,
+        borderRadius: radius,
       );
     });
 
@@ -227,6 +231,16 @@ void main() {
       expect(theme.errorBorder.color, equals(error));
     });
 
+    test('defaultBorder color comes from borderColor, not a hardcoded grey', () {
+      expect(theme.defaultBorder.color, equals(border));
+    });
+
+    test('every border uses the supplied radius', () {
+      expect(theme.defaultBorder.borderRadius, equals(radius));
+      expect(theme.focusBorder.borderRadius, equals(radius));
+      expect(theme.errorBorder.borderRadius, equals(radius));
+    });
+
     test('gradients map is non-empty', () {
       expect(theme.gradients, isNotEmpty);
     });
@@ -237,6 +251,8 @@ void main() {
       final theme = OiDecorationTheme.standard(
         primaryColor: const Color(0xFF2563EB),
         errorColor: const Color(0xFFDC2626),
+        borderColor: const Color(0xFF8B857D),
+        borderRadius: BorderRadius.circular(10),
       );
       final newBorder = OiBorderStyle.dashed(const Color(0xFF000000), 1);
       final copy = theme.copyWith(defaultBorder: newBorder);
@@ -249,6 +265,8 @@ void main() {
       final theme = OiDecorationTheme.standard(
         primaryColor: const Color(0xFF2563EB),
         errorColor: const Color(0xFFDC2626),
+        borderColor: const Color(0xFF8B857D),
+        borderRadius: BorderRadius.circular(10),
       );
       final copy = theme.copyWith();
       expect(copy, equals(theme));
@@ -258,10 +276,14 @@ void main() {
       final a = OiDecorationTheme.standard(
         primaryColor: const Color(0xFF2563EB),
         errorColor: const Color(0xFFDC2626),
+        borderColor: const Color(0xFF8B857D),
+        borderRadius: BorderRadius.circular(10),
       );
       final b = OiDecorationTheme.standard(
         primaryColor: const Color(0xFF2563EB),
         errorColor: const Color(0xFFDC2626),
+        borderColor: const Color(0xFF8B857D),
+        borderRadius: BorderRadius.circular(10),
       );
       expect(a.hashCode, equals(b.hashCode));
     });
