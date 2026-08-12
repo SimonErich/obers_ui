@@ -58,6 +58,7 @@ class OiLabel extends StatelessWidget {
     this.color,
     this.decoration,
     this.decorationColor,
+    this.emphasis = false,
     super.key,
   });
 
@@ -247,9 +248,11 @@ class OiLabel extends StatelessWidget {
     Color? color,
     TextDecoration? decoration,
     Color? decorationColor,
+    bool emphasis = false,
     Key? key,
   }) : this._(
          variant: OiLabelVariant.body,
+         emphasis: emphasis,
          text: text,
          maxLines: maxLines,
          overflow: overflow,
@@ -308,9 +311,11 @@ class OiLabel extends StatelessWidget {
     Color? color,
     TextDecoration? decoration,
     Color? decorationColor,
+    bool emphasis = false,
     Key? key,
   }) : this._(
          variant: OiLabelVariant.prose,
+         emphasis: emphasis,
          text: text,
          maxLines: maxLines,
          overflow: overflow,
@@ -617,6 +622,16 @@ class OiLabel extends StatelessWidget {
   /// Color of the text decoration. Only used when [decoration] is set.
   final Color? decorationColor;
 
+  /// Renders the text in italic.
+  ///
+  /// Only offered on the long-form styles ([OiLabel.prose] and [OiLabel.body]),
+  /// because that is where emphasis belongs: a quoted passage, a term being
+  /// defined, or text that is provisional — a transcript line still being
+  /// revised by a speech-to-text engine, say. Headings and labels should not
+  /// need it, and a system that italicises them is usually reaching for a
+  /// hierarchy it should express with weight or size.
+  final bool emphasis;
+
   // ---------------------------------------------------------------------------
   // Responsive scale helpers
   // ---------------------------------------------------------------------------
@@ -660,11 +675,13 @@ class OiLabel extends StatelessWidget {
 
     if (effectiveColor != style.color ||
         decoration != null ||
-        decorationColor != null) {
+        decorationColor != null ||
+        emphasis) {
       style = style.copyWith(
         color: effectiveColor,
         decoration: decoration,
         decorationColor: decorationColor,
+        fontStyle: emphasis ? FontStyle.italic : null,
       );
     }
 
