@@ -215,7 +215,9 @@ class _OiSpinnerState extends State<_OiSpinner>
       child: SizedBox(
         width: 24,
         height: 24,
-        child: CustomPaint(painter: _SpinnerPainter(context.colors.primary.base)),
+        child: CustomPaint(
+          painter: _SpinnerPainter(context.colors.primary.base),
+        ),
       ),
     );
   }

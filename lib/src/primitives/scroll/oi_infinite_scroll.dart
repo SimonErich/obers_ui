@@ -163,7 +163,9 @@ class _InfiniteScrollSpinnerState extends State<_InfiniteScrollSpinner>
       child: SizedBox(
         width: 24,
         height: 24,
-        child: CustomPaint(painter: _SpinnerPainter(context.colors.primary.base)),
+        child: CustomPaint(
+          painter: _SpinnerPainter(context.colors.primary.base),
+        ),
       ),
     );
   }

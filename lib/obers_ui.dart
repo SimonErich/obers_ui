@@ -43,6 +43,7 @@ export 'src/components/display/oi_folder_tree_item.dart';
 export 'src/components/display/oi_image.dart';
 export 'src/components/display/oi_image_preview_card.dart';
 export 'src/components/display/oi_key_value.dart';
+export 'src/components/display/oi_level_meter.dart';
 export 'src/components/display/oi_list_tile.dart';
 export 'src/components/display/oi_markdown.dart';
 export 'src/components/display/oi_metric.dart';

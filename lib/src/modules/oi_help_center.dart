@@ -84,8 +84,7 @@ enum _HelpTab {
   faq('FAQ', OiIcons.helpCircle),
   contact('Contact', OiIcons.messageCircle),
   articles('Articles', OiIcons.bookOpen),
-  feedback('Feedback', OiIcons.star)
-  ;
+  feedback('Feedback', OiIcons.star);
 
   const _HelpTab(this.label, this.icon);
   final String label;
