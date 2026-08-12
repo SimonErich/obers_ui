@@ -177,6 +177,8 @@ final finesseTheme = OiThemeData(
   decoration: OiDecorationTheme.standard(
     primaryColor: _indigo,
     errorColor: _coral,
+    borderColor: _neutral300,
+    borderRadius: BorderRadius.circular(10),
   ),
   components: OiComponentThemes(
     button: OiButtonThemeData(
@@ -360,6 +362,8 @@ final finesseDarkTheme = OiThemeData(
   decoration: OiDecorationTheme.standard(
     primaryColor: _violetLight,
     errorColor: _coralLight,
+    borderColor: const Color(0xFF2E2B4A),
+    borderRadius: BorderRadius.circular(10),
   ),
   components: OiComponentThemes(
     button: OiButtonThemeData(

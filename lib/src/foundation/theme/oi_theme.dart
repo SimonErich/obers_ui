@@ -6,6 +6,7 @@ import 'package:obers_ui/src/foundation/theme/oi_color_scheme.dart';
 import 'package:obers_ui/src/foundation/theme/oi_component_themes.dart';
 import 'package:obers_ui/src/foundation/theme/oi_decoration_theme.dart';
 import 'package:obers_ui/src/foundation/theme/oi_effects_theme.dart';
+import 'package:obers_ui/src/foundation/theme/oi_icon_size_scale.dart';
 import 'package:obers_ui/src/foundation/theme/oi_radius_scale.dart';
 import 'package:obers_ui/src/foundation/theme/oi_shadow_scale.dart';
 import 'package:obers_ui/src/foundation/theme/oi_spacing_scale.dart';
@@ -70,6 +71,9 @@ extension OiBuildContextThemeExt on BuildContext {
   /// The [OiSpacingScale] from the nearest [OiTheme].
   OiSpacingScale get spacing => OiTheme.of(this).spacing;
 
+  /// The icon-size ladder from the nearest [OiTheme].
+  OiIconSizeScale get iconSizes => OiTheme.of(this).iconSizes;
+
   /// The [OiRadiusScale] from the nearest [OiTheme].
   OiRadiusScale get radius => OiTheme.of(this).radius;
 
@@ -108,6 +112,9 @@ extension OiThemeExt on BuildContext {
 
   /// The [OiSpacingScale] from the nearest [OiTheme].
   OiSpacingScale get oiSpacing => OiTheme.of(this).spacing;
+
+  /// The icon-size ladder from the nearest [OiTheme].
+  OiIconSizeScale get oiIconSizes => OiTheme.of(this).iconSizes;
 
   /// The [OiRadiusScale] from the nearest [OiTheme].
   OiRadiusScale get oiRadius => OiTheme.of(this).radius;

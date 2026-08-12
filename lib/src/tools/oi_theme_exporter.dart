@@ -422,6 +422,8 @@ class OiThemeExporter {
       'small': _textStyleToMap(textTheme.small),
       'smallStrong': _textStyleToMap(textTheme.smallStrong),
       'tiny': _textStyleToMap(textTheme.tiny),
+      'prose': _textStyleToMap(textTheme.prose),
+      'numeric': _textStyleToMap(textTheme.numeric),
       'caption': _textStyleToMap(textTheme.caption),
       'code': _textStyleToMap(textTheme.code),
       'overline': _textStyleToMap(textTheme.overline),
@@ -451,6 +453,14 @@ class OiThemeExporter {
       bodyStrong: _textStyleFromMap(
         map['bodyStrong'] as Map<String, dynamic>?,
         fallback.bodyStrong,
+      ),
+      prose: _textStyleFromMap(
+        map['prose'] as Map<String, dynamic>?,
+        fallback.prose,
+      ),
+      numeric: _textStyleFromMap(
+        map['numeric'] as Map<String, dynamic>?,
+        fallback.numeric,
       ),
       small: _textStyleFromMap(
         map['small'] as Map<String, dynamic>?,
@@ -540,11 +550,7 @@ class OiThemeExporter {
       'lg': spacing.lg,
       'xl': spacing.xl,
       'xxl': spacing.xxl,
-      'pageGutterCompact': spacing.pageGutterCompact,
-      'pageGutterMedium': spacing.pageGutterMedium,
-      'pageGutterExpanded': spacing.pageGutterExpanded,
-      'pageGutterLarge': spacing.pageGutterLarge,
-      'pageGutterExtraLarge': spacing.pageGutterExtraLarge,
+      'base': spacing.base,
     };
   }
 
@@ -561,21 +567,7 @@ class OiThemeExporter {
       lg: (map['lg'] as num?)?.toDouble() ?? fallback.lg,
       xl: (map['xl'] as num?)?.toDouble() ?? fallback.xl,
       xxl: (map['xxl'] as num?)?.toDouble() ?? fallback.xxl,
-      pageGutterCompact:
-          (map['pageGutterCompact'] as num?)?.toDouble() ??
-          fallback.pageGutterCompact,
-      pageGutterMedium:
-          (map['pageGutterMedium'] as num?)?.toDouble() ??
-          fallback.pageGutterMedium,
-      pageGutterExpanded:
-          (map['pageGutterExpanded'] as num?)?.toDouble() ??
-          fallback.pageGutterExpanded,
-      pageGutterLarge:
-          (map['pageGutterLarge'] as num?)?.toDouble() ??
-          fallback.pageGutterLarge,
-      pageGutterExtraLarge:
-          (map['pageGutterExtraLarge'] as num?)?.toDouble() ??
-          fallback.pageGutterExtraLarge,
+      base: (map['base'] as num?)?.toDouble() ?? fallback.base,
     );
   }
 
@@ -1068,11 +1060,7 @@ class OiThemeExporter {
       ..writeln('    lg: ${spacing.lg},')
       ..writeln('    xl: ${spacing.xl},')
       ..writeln('    xxl: ${spacing.xxl},')
-      ..writeln('    pageGutterCompact: ${spacing.pageGutterCompact},')
-      ..writeln('    pageGutterMedium: ${spacing.pageGutterMedium},')
-      ..writeln('    pageGutterExpanded: ${spacing.pageGutterExpanded},')
-      ..writeln('    pageGutterLarge: ${spacing.pageGutterLarge},')
-      ..writeln('    pageGutterExtraLarge: ${spacing.pageGutterExtraLarge},');
+      ..writeln('    base: ${spacing.base},');
   }
 
   /// Writes radius fields as Dart source code.

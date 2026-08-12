@@ -172,6 +172,8 @@ final arcoTheme = OiThemeData(
   decoration: OiDecorationTheme.standard(
     primaryColor: _arcoblue6,
     errorColor: _red6,
+    borderColor: _gray3,
+    borderRadius: BorderRadius.circular(4),
   ),
   components: OiComponentThemes(
     button: OiButtonThemeData(
@@ -335,6 +337,8 @@ final arcoDarkTheme = OiThemeData(
   decoration: OiDecorationTheme.standard(
     primaryColor: _arcoblue5,
     errorColor: _red6,
+    borderColor: const Color(0xFF333335),
+    borderRadius: BorderRadius.circular(4),
   ),
   components: OiComponentThemes(
     button: OiButtonThemeData(

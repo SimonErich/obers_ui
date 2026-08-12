@@ -1,6 +1,5 @@
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/foundation/icons/oi_icon_data.dart';
-import 'package:obers_ui/src/foundation/theme/oi_text_theme.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 
 /// A semantically-annotated icon widget.
@@ -49,7 +48,9 @@ class OiIcon extends StatelessWidget {
 
   /// The size of the icon in logical pixels.
   ///
-  /// Defaults to the body font size from the nearest [OiTheme].
+  /// Defaults to `iconSizes.md` from the nearest [OiTheme]. Prefer passing a
+  /// value from that ladder over a literal, so icon sizes can be retuned in
+  /// one place.
   final double? size;
 
   /// The color of the icon.
@@ -61,10 +62,10 @@ class OiIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final resolvedSize =
-        size ??
-        context.textTheme.styleFor(OiLabelVariant.body).fontSize ??
-        16.0;
+    // The icon ladder, not the body font size: an interface with 15dp body
+    // text does not want 15dp icons, and sizing a glyph off a text style makes
+    // it drift every time the type scale is retuned.
+    final resolvedSize = size ?? context.iconSizes.md;
 
     final resolvedColor = color ?? context.colors.text;
     final iconWidget = Icon(icon, size: resolvedSize, color: resolvedColor);

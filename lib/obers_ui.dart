@@ -290,6 +290,7 @@ export 'src/foundation/theme/oi_component_size_scale.dart';
 export 'src/foundation/theme/oi_component_themes.dart';
 export 'src/foundation/theme/oi_decoration_theme.dart';
 export 'src/foundation/theme/oi_effects_theme.dart';
+export 'src/foundation/theme/oi_icon_size_scale.dart';
 export 'src/foundation/theme/oi_radius_scale.dart';
 export 'src/foundation/theme/oi_shadow_scale.dart';
 export 'src/foundation/theme/oi_spacing_scale.dart';

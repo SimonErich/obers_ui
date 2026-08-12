@@ -179,6 +179,8 @@ final blueDanubeTheme = OiThemeData(
   decoration: OiDecorationTheme.standard(
     primaryColor: _primary600,
     errorColor: _danger600,
+    borderColor: _neutral300,
+    borderRadius: BorderRadius.circular(4),
   ),
   // Component-level overrides to match TapTap's exact styling
   components: OiComponentThemes(
@@ -352,6 +354,8 @@ final blueDanubeDarkTheme = OiThemeData(
   decoration: OiDecorationTheme.standard(
     primaryColor: _primary500,
     errorColor: _danger600,
+    borderColor: const Color(0xFF3A3A42),
+    borderRadius: BorderRadius.circular(4),
   ),
   components: OiComponentThemes(
     button: OiButtonThemeData(

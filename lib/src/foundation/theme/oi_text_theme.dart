@@ -28,6 +28,19 @@ enum OiLabelVariant {
   /// Bold / emphasized paragraph body text.
   bodyStrong,
 
+  /// Sustained-reading prose — transcripts, articles, generated summaries.
+  ///
+  /// Distinct from [body], which is sized for interface text read in glances.
+  /// Prose is read in paragraphs, so it carries looser leading and is meant to
+  /// be constrained to a 60–80 character measure by its container.
+  prose,
+
+  /// Tabular numerals — timestamps, durations, counts, table figures.
+  ///
+  /// Carries [FontFeature.tabularFigures] so digits occupy equal width and a
+  /// running value does not jitter as it changes.
+  numeric,
+
   /// Small body text, suitable for secondary information.
   small,
 
@@ -69,6 +82,8 @@ class OiTextTheme {
     required this.h4,
     required this.body,
     required this.bodyStrong,
+    required this.prose,
+    required this.numeric,
     required this.small,
     required this.smallStrong,
     required this.tiny,
@@ -130,6 +145,21 @@ class OiTextTheme {
         fontWeight: FontWeight.w600,
         height: 1.5,
       ),
+      prose: TextStyle(
+        fontFamily: fontFamily,
+        fontSize: 16,
+        fontWeight: FontWeight.w400,
+        // Looser than `body` on purpose: this style is read in paragraphs
+        // rather than glanced at, and 1.5 is tight for sustained reading.
+        height: 1.65,
+      ),
+      numeric: TextStyle(
+        fontFamily: monoFontFamily ?? defaultMono,
+        fontSize: 14,
+        fontWeight: FontWeight.w400,
+        height: 1.4,
+        fontFeatures: const [FontFeature.tabularFigures()],
+      ),
       small: TextStyle(
         fontFamily: fontFamily,
         fontSize: 14,
@@ -189,6 +219,8 @@ class OiTextTheme {
       h4 = TextStyle.lerp(a.h4, b.h4, t)!,
       body = TextStyle.lerp(a.body, b.body, t)!,
       bodyStrong = TextStyle.lerp(a.bodyStrong, b.bodyStrong, t)!,
+      prose = TextStyle.lerp(a.prose, b.prose, t)!,
+      numeric = TextStyle.lerp(a.numeric, b.numeric, t)!,
       small = TextStyle.lerp(a.small, b.small, t)!,
       smallStrong = TextStyle.lerp(a.smallStrong, b.smallStrong, t)!,
       tiny = TextStyle.lerp(a.tiny, b.tiny, t)!,
@@ -219,6 +251,12 @@ class OiTextTheme {
 
   /// Bold / emphasized paragraph body text.
   final TextStyle bodyStrong;
+
+  /// Sustained-reading prose — transcripts, articles, generated summaries.
+  final TextStyle prose;
+
+  /// Tabular numerals — timestamps, durations, counts, table figures.
+  final TextStyle numeric;
 
   /// Small body text, suitable for secondary information.
   final TextStyle small;
@@ -260,6 +298,10 @@ class OiTextTheme {
         return body;
       case OiLabelVariant.bodyStrong:
         return bodyStrong;
+      case OiLabelVariant.prose:
+        return prose;
+      case OiLabelVariant.numeric:
+        return numeric;
       case OiLabelVariant.small:
         return small;
       case OiLabelVariant.smallStrong:
@@ -286,6 +328,8 @@ class OiTextTheme {
     TextStyle? h4,
     TextStyle? body,
     TextStyle? bodyStrong,
+    TextStyle? prose,
+    TextStyle? numeric,
     TextStyle? small,
     TextStyle? smallStrong,
     TextStyle? tiny,
@@ -302,6 +346,8 @@ class OiTextTheme {
       h4: h4 ?? this.h4,
       body: body ?? this.body,
       bodyStrong: bodyStrong ?? this.bodyStrong,
+      prose: prose ?? this.prose,
+      numeric: numeric ?? this.numeric,
       small: small ?? this.small,
       smallStrong: smallStrong ?? this.smallStrong,
       tiny: tiny ?? this.tiny,
@@ -323,6 +369,8 @@ class OiTextTheme {
         other.h4 == h4 &&
         other.body == body &&
         other.bodyStrong == bodyStrong &&
+        other.prose == prose &&
+        other.numeric == numeric &&
         other.small == small &&
         other.smallStrong == smallStrong &&
         other.tiny == tiny &&
@@ -341,6 +389,8 @@ class OiTextTheme {
     h4,
     body,
     bodyStrong,
+    prose,
+    numeric,
     small,
     smallStrong,
     tiny,

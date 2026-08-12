@@ -25,6 +25,8 @@ import 'package:obers_ui/src/primitives/clipboard/oi_copyable.dart';
 /// - [OiLabel.h4]: fourth-level heading.
 /// - [OiLabel.body]: standard paragraph body text.
 /// - [OiLabel.bodyStrong]: bold / emphasized body text.
+/// - [OiLabel.prose]: sustained-reading text — transcripts, articles, summaries.
+/// - [OiLabel.numeric]: tabular figures — timestamps, durations, counts.
 /// - [OiLabel.small]: small body text for secondary information.
 /// - [OiLabel.smallStrong]: bold small body text.
 /// - [OiLabel.tiny]: extra-small text for dense UI elements.
@@ -276,6 +278,70 @@ class OiLabel extends StatelessWidget {
     Key? key,
   }) : this._(
          variant: OiLabelVariant.bodyStrong,
+         text: text,
+         maxLines: maxLines,
+         overflow: overflow,
+         textAlign: textAlign,
+         copyable: copyable,
+         selectable: selectable,
+         semanticsLabel: semanticsLabel,
+         color: color,
+         decoration: decoration,
+         decorationColor: decorationColor,
+         key: key,
+       );
+
+  /// Creates a prose label — sustained-reading text such as a transcript,
+  /// an article body or a generated summary.
+  ///
+  /// Prefer this over [OiLabel.body] wherever the text is read in paragraphs
+  /// rather than glanced at, and constrain its container to a 60–80 character
+  /// measure.
+  const OiLabel.prose(
+    String text, {
+    int? maxLines,
+    TextOverflow? overflow,
+    TextAlign? textAlign,
+    bool copyable = false,
+    bool selectable = false,
+    String? semanticsLabel,
+    Color? color,
+    TextDecoration? decoration,
+    Color? decorationColor,
+    Key? key,
+  }) : this._(
+         variant: OiLabelVariant.prose,
+         text: text,
+         maxLines: maxLines,
+         overflow: overflow,
+         textAlign: textAlign,
+         copyable: copyable,
+         selectable: selectable,
+         semanticsLabel: semanticsLabel,
+         color: color,
+         decoration: decoration,
+         decorationColor: decorationColor,
+         key: key,
+       );
+
+  /// Creates a numeric label — a timestamp, duration, count or table figure.
+  ///
+  /// Renders with tabular figures, so a value that updates in place does not
+  /// shift the layout as its digits change.
+  const OiLabel.numeric(
+    String text, {
+    int? maxLines,
+    TextOverflow? overflow,
+    TextAlign? textAlign,
+    bool copyable = false,
+    bool selectable = false,
+    String? semanticsLabel,
+    Color? color,
+    TextDecoration? decoration,
+    Color? decorationColor,
+    Key? key,
+  }) : this._(
+         variant: OiLabelVariant.numeric,
          text: text,
          maxLines: maxLines,
          overflow: overflow,

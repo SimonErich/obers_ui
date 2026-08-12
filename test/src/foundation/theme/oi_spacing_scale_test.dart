@@ -14,13 +14,22 @@ void main() {
         expect(scale.xxl, 48);
       });
 
-      test('produces correct page gutter values', () {
+      test('base is the 4dp grid unit', () {
+        expect(OiSpacingScale.standard().base, 4);
+      });
+
+      test('every named value is a whole number of grid units', () {
         final scale = OiSpacingScale.standard();
-        expect(scale.pageGutterCompact, 16);
-        expect(scale.pageGutterMedium, 24);
-        expect(scale.pageGutterExpanded, 32);
-        expect(scale.pageGutterLarge, 40);
-        expect(scale.pageGutterExtraLarge, 48);
+        for (final value in [
+          scale.xs,
+          scale.sm,
+          scale.md,
+          scale.lg,
+          scale.xl,
+          scale.xxl,
+        ]) {
+          expect(value % scale.base, 0, reason: '$value is off the grid');
+        }
       });
     });
 
@@ -42,14 +51,12 @@ void main() {
         expect(copy.xxl, scale.xxl);
       });
 
-      test('overrides pageGutterCompact only', () {
+      test('overrides base only, and step follows it', () {
         final scale = OiSpacingScale.standard();
-        final copy = scale.copyWith(pageGutterCompact: 12);
-        expect(copy.pageGutterCompact, 12);
-        expect(copy.pageGutterMedium, scale.pageGutterMedium);
-        expect(copy.pageGutterExpanded, scale.pageGutterExpanded);
-        expect(copy.pageGutterLarge, scale.pageGutterLarge);
-        expect(copy.pageGutterExtraLarge, scale.pageGutterExtraLarge);
+        final copy = scale.copyWith(base: 8);
+        expect(copy.base, 8);
+        expect(copy.step(3), 24);
+        expect(copy.xs, scale.xs);
       });
 
       test('overrides multiple fields', () {
@@ -100,11 +107,7 @@ void main() {
         lg: 12,
         xl: 16,
         xxl: 24,
-        pageGutterCompact: 10,
-        pageGutterMedium: 12,
-        pageGutterExpanded: 14,
-        pageGutterLarge: 16,
-        pageGutterExtraLarge: 18,
+        base: 2,
       );
       expect(scale.xs, 2);
       expect(scale.sm, 4);
@@ -112,11 +115,33 @@ void main() {
       expect(scale.lg, 12);
       expect(scale.xl, 16);
       expect(scale.xxl, 24);
-      expect(scale.pageGutterCompact, 10);
-      expect(scale.pageGutterMedium, 12);
-      expect(scale.pageGutterExpanded, 14);
-      expect(scale.pageGutterLarge, 16);
-      expect(scale.pageGutterExtraLarge, 18);
+      expect(scale.base, 2);
+    });
+
+    group('step', () {
+      test('returns whole grid units', () {
+        final scale = OiSpacingScale.standard();
+        expect(scale.step(1), 4);
+        expect(scale.step(2), 8);
+        // The step the named ladder skips, and the reason this exists: call
+        // sites were writing `spacing.sm + 4` to reach it.
+        expect(scale.step(3), 12);
+        expect(scale.step(4), 16);
+      });
+
+      test('agrees with the named ladder where they overlap', () {
+        final scale = OiSpacingScale.standard();
+        expect(scale.step(1), scale.xs);
+        expect(scale.step(2), scale.sm);
+        expect(scale.step(4), scale.md);
+        expect(scale.step(6), scale.lg);
+        expect(scale.step(8), scale.xl);
+        expect(scale.step(12), scale.xxl);
+      });
+
+      test('step(0) is no spacing', () {
+        expect(OiSpacingScale.standard().step(0), 0);
+      });
     });
   });
 }
