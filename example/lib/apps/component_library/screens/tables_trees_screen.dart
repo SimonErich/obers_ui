@@ -89,6 +89,35 @@ class _TablesTreesScreenState extends State<TablesTreesScreen> {
                   ),
                 ),
               ),
+              ComponentExample(
+                title: 'Sized to its rows (shrinkWrap)',
+                child: OiTable<Map<String, String>>(
+                  label: 'Compact users table',
+                  shrinkWrap: true,
+                  showStatusBar: false,
+                  columns: [
+                    OiTableColumn<Map<String, String>>(
+                      id: 'name',
+                      header: 'Name',
+                      width: 200,
+                      valueGetter: (row) => row['name'] ?? '',
+                    ),
+                    OiTableColumn<Map<String, String>>(
+                      id: 'role',
+                      header: 'Role',
+                      width: 140,
+                      valueGetter: (row) => row['role'] ?? '',
+                      cellBuilder: (context, row, _) =>
+                          OiBadge.soft(label: row['role'] ?? ''),
+                    ),
+                  ],
+                  rows: const [
+                    {'name': 'Alice Johnson', 'role': 'Admin'},
+                    {'name': 'Bob Smith', 'role': 'Editor'},
+                    {'name': 'Carol Lee', 'role': 'Viewer'},
+                  ],
+                ),
+              ),
             ],
           ),
 

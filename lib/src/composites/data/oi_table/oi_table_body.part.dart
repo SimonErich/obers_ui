@@ -34,16 +34,45 @@ extension _OiTableBody<T> on _OiTableState<T> {
   }
 
   Widget _buildLoadingState() {
-    return const Center(key: Key('oi_table_loading'), child: _OiTableSpinner());
+    return _placeholderBody(
+      const Center(key: Key('oi_table_loading'), child: _OiTableSpinner()),
+    );
   }
 
   Widget _buildDefaultEmptyState() {
-    return const Center(key: Key('oi_table_empty'), child: Text('No data'));
+    return _placeholderBody(
+      const Center(key: Key('oi_table_empty'), child: Text('No data')),
+    );
+  }
+
+  /// Centres a placeholder (loading spinner, empty state) in the body area.
+  ///
+  /// When expanding, the body already has a height to centre within. When
+  /// shrink-wrapping it does not, so reserve a few rows' worth of height to
+  /// keep an empty or loading table from collapsing to the placeholder's own
+  /// size.
+  Widget _placeholderBody(Widget child) {
+    if (!widget.shrinkWrap) return child;
+    return ConstrainedBox(
+      constraints: BoxConstraints(minHeight: _effectiveRowHeight * 3),
+      child: child,
+    );
   }
 
   Widget _buildFlatBody(List<T> rows) {
     if (widget.reorderable) {
       return _buildReorderableBody(rows);
+    }
+    if (widget.shrinkWrap) {
+      // The surrounding scrollable owns scrolling, so build rows directly
+      // rather than nesting a viewport that would need its own height.
+      return Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          for (var i = 0; i < rows.length; i++) _buildRow(rows[i], i),
+        ],
+      );
     }
     return ListView.builder(
       controller: _scrollController,
@@ -62,7 +91,9 @@ extension _OiTableBody<T> on _OiTableState<T> {
 
   Widget _buildReorderableBody(List<T> rows) {
     return CustomScrollView(
-      controller: _scrollController,
+      controller: widget.shrinkWrap ? null : _scrollController,
+      shrinkWrap: widget.shrinkWrap,
+      physics: widget.shrinkWrap ? const NeverScrollableScrollPhysics() : null,
       slivers: [
         SliverReorderableList(
           itemCount: rows.length,
@@ -146,6 +177,13 @@ extension _OiTableBody<T> on _OiTableState<T> {
             ),
           ),
         );
+    }
+    if (widget.shrinkWrap) {
+      return Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: items,
+      );
     }
     return ListView(controller: _scrollController, children: items);
   }

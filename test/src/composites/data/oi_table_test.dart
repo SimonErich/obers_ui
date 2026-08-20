@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui/src/components/buttons/oi_button.dart';
+import 'package:obers_ui/src/components/feedback/oi_bulk_bar.dart';
 import 'package:obers_ui/src/components/panels/oi_resizable.dart';
 import 'package:obers_ui/src/composites/data/oi_pagination_controller.dart';
 import 'package:obers_ui/src/composites/data/oi_table.dart';
@@ -3166,6 +3167,268 @@ void main() {
     await tester.sendKeyUpEvent(LogicalKeyboardKey.controlLeft);
     // Only the last clicked row should be selected.
     expect(ctrl.selectedRows, {'Bob'});
+  });
+
+  // ── shrinkWrap ──────────────────────────────────────────────────────────────
+
+  group('OiTable shrinkWrap', () {
+    Widget unbounded(Widget table) {
+      return SingleChildScrollView(
+        child: Column(children: [table]),
+      );
+    }
+
+    testWidgets('renders inside an unbounded-height parent', (tester) async {
+      await tester.pumpObers(
+        unbounded(
+          OiTable<_Row>(
+            label: 'Test table',
+            rows: _rows,
+            columns: _cols,
+            shrinkWrap: true,
+          ),
+        ),
+      );
+      await tester.pump();
+
+      expect(tester.takeException(), isNull);
+      expect(find.text('Alice'), findsOneWidget);
+      expect(find.text('Bob'), findsOneWidget);
+      expect(find.text('Charlie'), findsOneWidget);
+    });
+
+    testWidgets('sizes itself to its rows', (tester) async {
+      await tester.pumpObers(
+        unbounded(
+          OiTable<_Row>(
+            label: 'Test table',
+            rows: _rows,
+            columns: _cols,
+            showStatusBar: false,
+            shrinkWrap: true,
+          ),
+        ),
+      );
+      await tester.pump();
+
+      // Header (36) + 3 rows (48 each) = 180.
+      final height = tester.getSize(find.byType(OiTable<_Row>)).height;
+      expect(height, 36 + 48 * 3);
+    });
+
+    testWidgets('grows when rows are added', (tester) async {
+      Widget build(List<_Row> rows) {
+        return unbounded(
+          OiTable<_Row>(
+            label: 'Test table',
+            rows: rows,
+            columns: _cols,
+            showStatusBar: false,
+            shrinkWrap: true,
+          ),
+        );
+      }
+
+      await tester.pumpObers(build(_rows.take(1).toList()));
+      await tester.pump();
+      final short = tester.getSize(find.byType(OiTable<_Row>)).height;
+
+      await tester.pumpObers(build(_rows));
+      await tester.pump();
+      final tall = tester.getSize(find.byType(OiTable<_Row>)).height;
+
+      expect(tall, greaterThan(short));
+      expect(tall - short, 48 * 2);
+    });
+
+    testWidgets('still expands when shrinkWrap is false', (tester) async {
+      await tester.pumpObers(
+        SizedBox(
+          height: 600,
+          child: OiTable<_Row>(
+            label: 'Test table',
+            rows: _rows,
+            columns: _cols,
+          ),
+        ),
+      );
+      await tester.pump();
+
+      expect(tester.takeException(), isNull);
+      expect(tester.getSize(find.byType(OiTable<_Row>)).height, 600);
+    });
+
+    testWidgets('empty state does not collapse', (tester) async {
+      await tester.pumpObers(
+        unbounded(
+          OiTable<_Row>(
+            label: 'Test table',
+            rows: const [],
+            columns: _cols,
+            showStatusBar: false,
+            shrinkWrap: true,
+          ),
+        ),
+      );
+      await tester.pump();
+
+      expect(find.byKey(const Key('oi_table_empty')), findsOneWidget);
+      // Header + at least three rows' worth of placeholder height.
+      expect(
+        tester.getSize(find.byType(OiTable<_Row>)).height,
+        greaterThanOrEqualTo(36 + 48 * 3),
+      );
+    });
+
+    testWidgets('loading state does not collapse', (tester) async {
+      await tester.pumpObers(
+        unbounded(
+          OiTable<_Row>(
+            label: 'Test table',
+            rows: _rows,
+            columns: _cols,
+            loading: true,
+            showStatusBar: false,
+            shrinkWrap: true,
+          ),
+        ),
+      );
+      await tester.pump();
+
+      expect(find.byKey(const Key('oi_table_loading')), findsOneWidget);
+      expect(
+        tester.getSize(find.byType(OiTable<_Row>)).height,
+        greaterThanOrEqualTo(36 + 48 * 3),
+      );
+    });
+
+    testWidgets('renders wide tables that scroll horizontally', (tester) async {
+      final wideCols = [
+        for (var i = 0; i < 12; i++)
+          OiTableColumn<_Row>(
+            id: 'col$i',
+            header: 'Column $i',
+            width: 200,
+            valueGetter: _nameGetter,
+          ),
+      ];
+
+      await tester.pumpObers(
+        unbounded(
+          OiTable<_Row>(
+            label: 'Test table',
+            rows: _rows,
+            columns: wideCols,
+            shrinkWrap: true,
+          ),
+        ),
+        surfaceSize: const Size(800, 600),
+      );
+      await tester.pump();
+
+      expect(tester.takeException(), isNull);
+      expect(find.text('Column 0'), findsOneWidget);
+    });
+
+    testWidgets('renders grouped rows', (tester) async {
+      await tester.pumpObers(
+        unbounded(
+          OiTable<_Row>(
+            label: 'Test table',
+            rows: _rows,
+            columns: _cols,
+            groupBy: 'name',
+            shrinkWrap: true,
+          ),
+        ),
+      );
+      await tester.pump();
+
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('renders with bulk actions', (tester) async {
+      await tester.pumpObers(
+        unbounded(
+          OiTable<_Row>(
+            label: 'Test table',
+            rows: _rows,
+            columns: _cols,
+            selectable: true,
+            rowKey: _nameGetter,
+            shrinkWrap: true,
+            bulkActions: [
+              OiBulkAction(
+                label: 'Delete',
+                icon: OiIcons.trash,
+                onTap: () {},
+              ),
+            ],
+          ),
+        ),
+      );
+      await tester.pump();
+
+      expect(tester.takeException(), isNull);
+      expect(find.text('Alice'), findsOneWidget);
+    });
+
+    testWidgets('renders reorderable rows', (tester) async {
+      await tester.pumpObers(
+        unbounded(
+          OiTable<_Row>(
+            label: 'Test table',
+            rows: _rows,
+            columns: _cols,
+            reorderable: true,
+            shrinkWrap: true,
+          ),
+        ),
+      );
+      await tester.pump();
+
+      expect(tester.takeException(), isNull);
+      expect(find.text('Alice'), findsOneWidget);
+    });
+
+    test('asserts against infinite pagination', () {
+      expect(
+        () => OiTable<_Row>(
+          label: 'Test table',
+          rows: _rows,
+          columns: _cols,
+          shrinkWrap: true,
+          paginationMode: OiTablePaginationMode.infinite,
+        ),
+        throwsAssertionError,
+      );
+    });
+
+    test('asserts against virtual pagination', () {
+      expect(
+        () => OiTable<_Row>(
+          label: 'Test table',
+          rows: _rows,
+          columns: _cols,
+          shrinkWrap: true,
+          paginationMode: OiTablePaginationMode.virtual,
+        ),
+        throwsAssertionError,
+      );
+    });
+
+    test('allows paged pagination', () {
+      expect(
+        () => OiTable<_Row>(
+          label: 'Test table',
+          rows: _rows,
+          columns: _cols,
+          shrinkWrap: true,
+          paginationMode: OiTablePaginationMode.pages,
+        ),
+        returnsNormally,
+      );
+    });
   });
 }
 
