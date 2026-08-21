@@ -16,19 +16,19 @@ extension _OiUploadDialogInteraction on _OiUploadDialogState {
     if (_picking) return;
     _updateState(() => _picking = true);
     try {
-      final result = await FilePicker.pickFiles(
+      final picked = await FilePicker.pickFiles(
         type: widget.allowedExtensions != null ? FileType.custom : FileType.any,
         allowedExtensions: widget.allowedExtensions,
       );
-      if (result != null) {
+      if (picked.isNotEmpty) {
         // Read eagerly: the picker no longer populates `bytes` itself, and the
         // dialog hands complete [OiFileData] to its caller.
         final files = <OiFileData>[];
-        for (final file in result.files) {
+        for (final file in picked) {
           files.add(
             OiFileData(
               name: file.name,
-              size: file.size,
+              size: await file.length(),
               bytes: await file.readAsBytes(),
               mimeType: OiFileUtils.mimeType(OiFileUtils.extension(file.name)),
             ),
