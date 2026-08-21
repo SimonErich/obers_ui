@@ -85,12 +85,12 @@ class _OiFileInputState extends State<OiFileInput> {
 
       // `pickFiles` is the multi-select entry point, `pickFile` the single one.
       if (widget.multipleFiles) {
-        final result = await FilePicker.pickFiles(
+        final picked = await FilePicker.pickFiles(
           type: type,
           allowedExtensions: widget.allowedExtensions,
         );
-        if (result != null) {
-          final paths = result.files.map((file) => file.name).toList();
+        if (picked.isNotEmpty) {
+          final paths = picked.map((file) => file.name).toList();
           _updateFiles([..._effectiveFiles, ...paths]);
         }
       } else {
