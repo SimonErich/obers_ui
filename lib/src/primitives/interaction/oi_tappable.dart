@@ -208,8 +208,13 @@ class _OiTappableState extends State<OiTappable> {
     // ignore: omit_local_variable_types
     Widget content = widget.child;
 
-    // Background overlay for the current state — always in the tree so
-    // AnimatedOpacity can smoothly transition it in and out.
+    // Background for the current state — always in the tree so AnimatedOpacity
+    // can smoothly transition it in and out.
+    //
+    // `backgroundOverride` replaces the widget's background outright, so it is
+    // painted opaquely *behind* the child; `backgroundOverlay` tints whatever
+    // the child already draws, so it is layered on top. A state that sets both
+    // gets the override behind and the overlay over it.
     {
       final overlayColor = style.backgroundOverlay;
       final showOverlay = overlayColor.a > 0;
@@ -228,9 +233,29 @@ class _OiTappableState extends State<OiTappable> {
           child: overlay,
         );
       }
+
+      final override = style.backgroundOverride;
+      Widget? background;
+      if (override != null && override.a > 0) {
+        Widget fill = IgnorePointer(
+          child: AnimatedContainer(
+            duration: reducedMotion ? Duration.zero : animations.fast,
+            color: override,
+          ),
+        );
+        if (widget.clipBorderRadius != null) {
+          fill = ClipRRect(
+            borderRadius: widget.clipBorderRadius!,
+            child: fill,
+          );
+        }
+        background = fill;
+      }
+
       content = Stack(
         fit: StackFit.passthrough,
         children: [
+          if (background != null) Positioned.fill(child: background),
           content,
           Positioned.fill(child: overlay),
         ],

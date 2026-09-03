@@ -10,6 +10,7 @@ import 'package:obers_ui/src/foundation/oi_accessibility.dart' show OiA11y;
 import 'package:obers_ui/src/foundation/oi_app.dart';
 import 'package:obers_ui/src/foundation/oi_platform.dart';
 import 'package:obers_ui/src/foundation/theme/oi_effects_theme.dart';
+import 'package:obers_ui/src/foundation/theme/oi_theme_data.dart';
 import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
 
 import '../../../helpers/pump_app.dart';
@@ -625,4 +626,126 @@ void main() {
 
     expect(tapped, isFalse);
   });
+
+  // ── 22. Hover: backgroundOverride ─────────────────────────────────────────
+
+  /// Pointer-modality app whose hover state overrides the background outright,
+  /// with no translucent overlay.
+  Widget hoverStyledApp(Widget child) {
+    final base = OiThemeData.light();
+    return OiApp(
+      theme: base.copyWith(
+        effects: base.effects.copyWith(
+          hover: const OiInteractiveStyle(
+            backgroundOverlay: Color(0x00000000),
+            halo: OiHaloStyle.none,
+            backgroundOverride: Color(0xFF123456),
+          ),
+        ),
+      ),
+      home: OiPlatform(
+        data: OiPlatformData(
+          platform: defaultTargetPlatform,
+          keyboardHeight: 0,
+          keyboardVisible: false,
+          inputModality: OiInputModality.pointer,
+        ),
+        child: child,
+      ),
+    );
+  }
+
+  Future<TestGesture> hoverOver(WidgetTester tester, Finder finder) async {
+    final gesture = await tester.createGesture(kind: PointerDeviceKind.mouse);
+    await gesture.addPointer(location: Offset.zero);
+    addTearDown(gesture.removePointer);
+    await tester.pump();
+    await gesture.moveTo(tester.getCenter(finder));
+    await tester.pumpAndSettle();
+    return gesture;
+  }
+
+  /// True when a state fill is painting [color]. `AnimatedContainer` folds its
+  /// `color` argument into a `BoxDecoration`, so it is read from there.
+  bool hasContainerColor(WidgetTester tester, Color color) => tester
+      .widgetList<AnimatedContainer>(find.byType(AnimatedContainer))
+      .any((c) {
+        final deco = c.decoration;
+        return deco is BoxDecoration && deco.color == color;
+      });
+
+  testWidgets(
+    'hover: backgroundOverride paints the state background',
+    (tester) async {
+      await tester.pumpWidget(
+        hoverStyledApp(
+          const Center(
+            child: OiTappable(child: SizedBox(width: 60, height: 60)),
+          ),
+        ),
+      );
+      await tester.pump();
+
+      expect(hasContainerColor(tester, const Color(0xFF123456)), isFalse);
+
+      await hoverOver(tester, find.byType(OiTappable));
+
+      expect(hasContainerColor(tester, const Color(0xFF123456)), isTrue);
+    },
+    variant: TargetPlatformVariant.only(TargetPlatform.linux),
+  );
+
+  testWidgets(
+    'hover: backgroundOverride is painted behind the child',
+    (tester) async {
+      await tester.pumpWidget(
+        hoverStyledApp(
+          const Center(
+            child: OiTappable(
+              child: SizedBox(width: 60, height: 60, child: Text('Label')),
+            ),
+          ),
+        ),
+      );
+      await tester.pump();
+      await hoverOver(tester, find.byType(OiTappable));
+
+      // The child must still be hit-testable and visible above the fill, so
+      // the override cannot be covering it.
+      expect(find.text('Label'), findsOneWidget);
+      expect(hasContainerColor(tester, const Color(0xFF123456)), isTrue);
+    },
+    variant: TargetPlatformVariant.only(TargetPlatform.linux),
+  );
+
+  testWidgets(
+    'resting state paints no override',
+    (tester) async {
+      await tester.pumpWidget(
+        hoverStyledApp(
+          const Center(
+            child: OiTappable(child: Text('Label')),
+          ),
+        ),
+      );
+      await tester.pump();
+
+      expect(hasContainerColor(tester, const Color(0xFF123456)), isFalse);
+    },
+    variant: TargetPlatformVariant.only(TargetPlatform.linux),
+  );
+
+  testWidgets(
+    'a theme leaving backgroundOverride unset renders as before',
+    (tester) async {
+      await tester.pumpObers(
+        const OiTappable(child: Text('Label')),
+      );
+      await tester.pump();
+
+      // OiEffectsTheme.standard leaves it unset, so no state fill is added.
+      expect(hasContainerColor(tester, const Color(0xFF123456)), isFalse);
+      expect(find.text('Label'), findsOneWidget);
+    },
+  );
 }

@@ -216,9 +216,17 @@ class OiInteractiveStyle {
 
   /// An optional background color that replaces the widget's background
   /// entirely when this state is active.
+  ///
+  /// Painted behind the child, so it replaces rather than tints what the child
+  /// draws. A child that paints its own opaque background hides it — use
+  /// [backgroundOverlay] to tint such a child instead.
   final Color? backgroundOverride;
 
   /// Semi-transparent overlay tinted over the widget background.
+  ///
+  /// Layered on top of the child, so it tints whatever the child draws. When a
+  /// state sets this and [backgroundOverride], the override paints behind the
+  /// child and this overlay on top of it.
   final Color backgroundOverlay;
 
   /// An optional border color applied when this state is active.
