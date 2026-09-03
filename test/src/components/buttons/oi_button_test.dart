@@ -2,11 +2,13 @@
 // REQ-0014: Required props enforce correctness — buttons require label.
 // REQ-0019: OiButton accessibility enforcement tests.
 
+import 'package:flutter/gestures.dart' show PointerDeviceKind;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui/src/components/buttons/oi_button.dart';
 import 'package:obers_ui/src/components/display/oi_tooltip.dart';
 import 'package:obers_ui/src/foundation/oi_app.dart';
+import 'package:obers_ui/src/foundation/theme/component_themes/oi_button_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme_data.dart';
 import 'package:obers_ui/src/primitives/animation/oi_pulse.dart';
 import 'package:obers_ui/src/primitives/display/oi_icon.dart';
@@ -684,5 +686,122 @@ void main() {
     final denseH = bodyHeight(tester);
 
     expect(denseH, lessThan(comfortableH));
+  });
+
+  // ── Per-state variant colors (OiButtonVariantStyle) ───────────────────────
+
+  /// Theme whose primary variant overrides every state this button resolves.
+  OiThemeData themeWithPrimaryStates() {
+    final base = OiThemeData.light();
+    return base.copyWith(
+      components: base.components.copyWith(
+        button: const OiButtonThemeData(
+          primaryStyle: OiButtonVariantStyle(
+            background: Color(0xFF101010),
+            backgroundHover: Color(0xFF202020),
+            backgroundDisabled: Color(0xFF303030),
+            foreground: Color(0xFFF1F1F1),
+            foregroundHover: Color(0xFFF2F2F2),
+            foregroundDisabled: Color(0xFFF3F3F3),
+            border: Color(0xFF404040),
+            borderHover: Color(0xFF505050),
+            borderDisabled: Color(0xFF606060),
+          ),
+        ),
+      ),
+    );
+  }
+
+  bool hasBackground(WidgetTester tester, Color color) =>
+      tester.widgetList<Container>(find.byType(Container)).any((c) {
+        final deco = c.decoration;
+        return deco is BoxDecoration && deco.color == color;
+      });
+
+  bool hasBorder(WidgetTester tester, Color color) =>
+      tester.widgetList<Container>(find.byType(Container)).any((c) {
+        final deco = c.decoration;
+        return deco is BoxDecoration && deco.border?.top.color == color;
+      });
+
+  bool hasForeground(WidgetTester tester, Color color) => tester
+      .widgetList<Text>(find.byType(Text))
+      .any((t) => t.style?.color == color);
+
+  testWidgets('resting state uses the base variant colors', (tester) async {
+    await tester.pumpObers(
+      OiButton.primary(label: 'Save', onTap: () {}),
+      theme: themeWithPrimaryStates(),
+    );
+
+    expect(hasBackground(tester, const Color(0xFF101010)), isTrue);
+    expect(hasForeground(tester, const Color(0xFFF1F1F1)), isTrue);
+    expect(hasBorder(tester, const Color(0xFF404040)), isTrue);
+  });
+
+  testWidgets('hovering applies the *Hover variant colors', (tester) async {
+    await tester.pumpObers(
+      OiButton.primary(label: 'Save', onTap: () {}),
+      theme: themeWithPrimaryStates(),
+    );
+
+    final pointer = TestPointer(1, PointerDeviceKind.mouse);
+    await tester.sendEventToBinding(
+      pointer.hover(tester.getCenter(find.text('Save'))),
+    );
+    await tester.pumpAndSettle();
+
+    expect(hasBackground(tester, const Color(0xFF202020)), isTrue);
+    expect(hasForeground(tester, const Color(0xFFF2F2F2)), isTrue);
+    expect(hasBorder(tester, const Color(0xFF505050)), isTrue);
+  });
+
+  testWidgets('a disabled button uses the *Disabled variant colors', (
+    tester,
+  ) async {
+    await tester.pumpObers(
+      const OiButton.primary(label: 'Save', enabled: false),
+      theme: themeWithPrimaryStates(),
+    );
+
+    expect(hasBackground(tester, const Color(0xFF303030)), isTrue);
+    expect(hasForeground(tester, const Color(0xFFF3F3F3)), isTrue);
+    expect(hasBorder(tester, const Color(0xFF606060)), isTrue);
+  });
+
+  testWidgets('a disabled button ignores hover', (tester) async {
+    await tester.pumpObers(
+      const OiButton.primary(label: 'Save', enabled: false),
+      theme: themeWithPrimaryStates(),
+    );
+
+    final pointer = TestPointer(1, PointerDeviceKind.mouse);
+    await tester.sendEventToBinding(
+      pointer.hover(tester.getCenter(find.text('Save'))),
+    );
+    await tester.pumpAndSettle();
+
+    expect(hasBackground(tester, const Color(0xFF303030)), isTrue);
+    expect(hasBackground(tester, const Color(0xFF202020)), isFalse);
+  });
+
+  testWidgets('states fall back to the variant default when theme is unset', (
+    tester,
+  ) async {
+    final theme = OiThemeData.light();
+    await tester.pumpObers(
+      OiButton.primary(label: 'Save', onTap: () {}),
+      theme: theme,
+    );
+
+    final pointer = TestPointer(1, PointerDeviceKind.mouse);
+    await tester.sendEventToBinding(
+      pointer.hover(tester.getCenter(find.text('Save'))),
+    );
+    await tester.pumpAndSettle();
+
+    // No *Hover override configured, so the resting colour is kept and the
+    // hover feedback stays with OiTappable's overlay.
+    expect(hasBackground(tester, theme.colors.primary.base), isTrue);
   });
 }

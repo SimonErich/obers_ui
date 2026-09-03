@@ -68,6 +68,13 @@ enum OiIconPosition {
 
 enum _OiButtonKind { standard, icon, split, countdown, confirm }
 
+/// Interaction state used to pick the matching per-state colours from
+/// [OiButtonVariantStyle].
+///
+/// Pressed is intentionally absent: [OiTappable] reports hover and focus but
+/// not the pressed state, so `*Pressed` overrides stay unresolved for now.
+enum _OiButtonVisualState { normal, hovered, disabled }
+
 /// A fully-featured button component for the Obers UI design system.
 ///
 /// [OiButton] supports six visual variants, three density-aware sizes, loading
@@ -449,6 +456,11 @@ class _OiButtonState extends State<OiButton> {
   // ── Ghost hover / focus state ───────────────────────────────────────────────
   bool _highlighted = false;
 
+  // ── Standard-variant pointer hover state ───────────────────────────────────
+  // Separate from [_highlighted], which also tracks focus and drives the ghost
+  // and icon variants' size/weight changes.
+  bool _hovered = false;
+
   // ── Confirm state ──────────────────────────────────────────────────────────
   bool _confirmPending = false;
 
@@ -462,6 +474,11 @@ class _OiButtonState extends State<OiButton> {
   void _setHighlighted(bool value) {
     if (_highlighted == value) return;
     setState(() => _highlighted = value);
+  }
+
+  void _setHovered(bool value) {
+    if (_hovered == value) return;
+    setState(() => _hovered = value);
   }
 
   void _toggleDropdownVisible() {

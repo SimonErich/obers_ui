@@ -10,19 +10,31 @@ extension _OiButtonStandardVariants on _OiButtonState {
     final bt = context.components.button;
     final height = bt?.height ?? _buttonHeight(density);
     final hPad = _hPadding(context);
-    final foreground = _foregroundColor(context, widget.variant);
     final themeRadius = bt?.borderRadius;
     final effectiveRadius =
         widget.borderRadius ?? themeRadius ?? context.radius.sm;
+    final isActive = widget.enabled && !widget.loading;
+
+    final visualState = !widget.enabled
+        ? _OiButtonVisualState.disabled
+        : _hovered
+        ? _OiButtonVisualState.hovered
+        : _OiButtonVisualState.normal;
+    final foreground = _foregroundColor(
+      context,
+      widget.variant,
+      state: visualState,
+    );
     final decoration = _decoration(
       context,
       widget.variant,
       borderRadius: widget.borderRadius,
+      state: visualState,
     );
-    final isActive = widget.enabled && !widget.loading;
 
     Widget button = OiTappable(
       onTap: isActive ? widget.onTap : null,
+      onHover: isActive ? _setHovered : null,
       enabled: isActive,
       semanticLabel: widget.semanticLabel ?? widget.label,
       clipBorderRadius: effectiveRadius,
