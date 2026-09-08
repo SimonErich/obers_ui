@@ -231,13 +231,14 @@ class _OiChatState extends State<OiChat> {
 
   Future<void> _handleAttach() async {
     final result = await FilePicker.pickFiles();
-    if (result == null || result.files.isEmpty) return;
-    final files = result.files.map((f) {
-      return OiFileData(
-        name: f.name,
-        size: f.size,
-      );
-    }).toList();
+    if (result.isEmpty) return;
+    final files = <OiFileData>[
+      for (final f in result)
+        OiFileData(
+          name: f.name,
+          size: f.lengthSync() ?? await f.length(),
+        ),
+    ];
     widget.onAttach?.call(files);
   }
 

@@ -10,24 +10,45 @@ extension _OiButtonStandardVariants on _OiButtonState {
     final bt = context.components.button;
     final height = bt?.height ?? _buttonHeight(density);
     final hPad = _hPadding(context);
-    final foreground = _foregroundColor(context, widget.variant);
     final themeRadius = bt?.borderRadius;
     final effectiveRadius =
         widget.borderRadius ?? themeRadius ?? context.radius.sm;
+    final isActive = widget.enabled && !widget.loading;
+    final vs = _variantStyle(bt, widget.variant);
+    final hasDisabledOverride =
+        vs?.backgroundDisabled != null ||
+        vs?.foregroundDisabled != null ||
+        vs?.borderDisabled != null;
+
+    final visualState = !widget.enabled
+        ? _OiButtonVisualState.disabled
+        : (isActive && _hovered)
+        ? _OiButtonVisualState.hovered
+        : _OiButtonVisualState.normal;
+    final foreground = _foregroundColor(
+      context,
+      widget.variant,
+      state: visualState,
+    );
     final decoration = _decoration(
       context,
       widget.variant,
       borderRadius: widget.borderRadius,
+      state: visualState,
     );
-    final isActive = widget.enabled && !widget.loading;
 
     Widget button = OiTappable(
       onTap: isActive ? widget.onTap : null,
+      onHover: _setHovered,
       enabled: isActive,
+      applyBackgroundOverlay:
+          visualState != _OiButtonVisualState.hovered ||
+          vs?.backgroundHover == null,
+      dimWhenDisabled: widget.enabled || !hasDisabledOverride,
       semanticLabel: widget.semanticLabel ?? widget.label,
       clipBorderRadius: effectiveRadius,
       child: Opacity(
-        opacity: widget.enabled ? 1 : 0.4,
+        opacity: widget.enabled || hasDisabledOverride ? 1 : 0.4,
         child: Container(
           height: height,
           padding: EdgeInsets.symmetric(horizontal: hPad),

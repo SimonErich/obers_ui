@@ -95,8 +95,41 @@ extension _OiButtonStyling on _OiButtonState {
     }
   }
 
-  Color _backgroundColor(BuildContext context, OiButtonVariant variant) {
+  /// Resolves the per-state override for [state] from [vs], falling back to
+  /// the variant's default colour when the theme leaves it unset.
+  ///
+  /// Disabled wins over hovered when both apply, since a disabled button never
+  /// reacts to the pointer.
+  Color? _stateOverride(
+    OiButtonVariantStyle? vs,
+    _OiButtonVisualState state, {
+    required Color? Function(OiButtonVariantStyle vs) hovered,
+    required Color? Function(OiButtonVariantStyle vs) disabled,
+  }) {
+    if (vs == null) return null;
+    switch (state) {
+      case _OiButtonVisualState.disabled:
+        return disabled(vs);
+      case _OiButtonVisualState.hovered:
+        return hovered(vs);
+      case _OiButtonVisualState.normal:
+        return null;
+    }
+  }
+
+  Color _backgroundColor(
+    BuildContext context,
+    OiButtonVariant variant, {
+    _OiButtonVisualState state = _OiButtonVisualState.normal,
+  }) {
     final vs = _variantStyle(context.components.button, variant);
+    final override = _stateOverride(
+      vs,
+      state,
+      hovered: (s) => s.backgroundHover,
+      disabled: (s) => s.backgroundDisabled,
+    );
+    if (override != null) return override;
     if (vs?.background != null) return vs!.background!;
     final c = context.colors;
     switch (variant) {
@@ -115,8 +148,19 @@ extension _OiButtonStyling on _OiButtonState {
     }
   }
 
-  Color _foregroundColor(BuildContext context, OiButtonVariant variant) {
+  Color _foregroundColor(
+    BuildContext context,
+    OiButtonVariant variant, {
+    _OiButtonVisualState state = _OiButtonVisualState.normal,
+  }) {
     final vs = _variantStyle(context.components.button, variant);
+    final override = _stateOverride(
+      vs,
+      state,
+      hovered: (s) => s.foregroundHover,
+      disabled: (s) => s.foregroundDisabled,
+    );
+    if (override != null) return override;
     if (vs?.foreground != null) return vs!.foreground!;
     final c = context.colors;
     switch (variant) {
@@ -139,15 +183,24 @@ extension _OiButtonStyling on _OiButtonState {
     BuildContext context,
     OiButtonVariant variant, {
     BorderRadius? borderRadius,
+    _OiButtonVisualState state = _OiButtonVisualState.normal,
   }) {
     final bt = context.components.button;
-    final bg = _backgroundColor(context, variant);
+    final bg = _backgroundColor(context, variant, state: state);
     final themeRadius = bt?.borderRadius;
     final effectiveRadius = borderRadius ?? themeRadius ?? context.radius.sm;
 
     final vs = _variantStyle(bt, variant);
+    final borderOverride = _stateOverride(
+      vs,
+      state,
+      hovered: (s) => s.borderHover,
+      disabled: (s) => s.borderDisabled,
+    );
     final Border? border;
-    if (vs?.border != null) {
+    if (borderOverride != null) {
+      border = Border.all(color: borderOverride);
+    } else if (vs?.border != null) {
       border = Border.all(color: vs!.border!);
     } else if (variant == OiButtonVariant.outline) {
       border = Border.all(color: context.colors.border);

@@ -20,12 +20,13 @@ dependencies:
   # exist, so the Windows sources fail to build — even on Linux/macOS, where
   # they are still type-checked.
   #
-  # 12.x is prerelease-only for now, so the constraint has to name the
-  # prerelease explicitly: a plain range like '>=11.0.2 <13.0.0' still resolves
-  # to 11.x, because pub skips prereleases unless opted into.
-  #
-  # TODO: move to ^12.0.0 once it ships stable.
-  file_picker: ^12.0.0-beta.7
+  # 12.0.0 stable moved PlatformFile into file_picker_platform_interface and
+  # dropped the FilePickerResult wrapper: pickFiles returns a non-nullable
+  # List<PlatformFile>, and PlatformFile.size gave way to lengthSync()/length().
+  # The 12.0.0-beta.x line still had the old wrapper, so the constraint must
+  # exclude the prereleases — ^12.0.0 does, since pub skips prereleases unless
+  # a bound names one explicitly.
+  file_picker: ^12.0.0
   flutter:
     sdk: flutter
   intl: ^0.20.0
