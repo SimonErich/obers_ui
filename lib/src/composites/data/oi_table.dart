@@ -190,8 +190,16 @@ class OiTable<T> extends StatefulWidget {
     this.settingsNamespace = 'oi_table',
     this.bulkActions,
     this.settingsSaveDebounce = const Duration(milliseconds: 500),
+    this.shrinkWrap = false,
     super.key,
-  });
+  }) : assert(
+         !shrinkWrap ||
+             (paginationMode != OiTablePaginationMode.infinite &&
+                 paginationMode != OiTablePaginationMode.virtual),
+         'shrinkWrap cannot be combined with infinite or virtual pagination: '
+         "both load more rows in response to the table's own scroll "
+         'position, which a shrink-wrapped table does not have.',
+       );
 
   // ── Accessibility ────────────────────────────────────────────────────────
 
@@ -359,6 +367,25 @@ class OiTable<T> extends StatefulWidget {
   ///
   /// Default: 500ms. Set to [Duration.zero] for immediate saves.
   final Duration settingsSaveDebounce;
+
+  // ── Layout ────────────────────────────────────────────────────────────────
+
+  /// Whether the table sizes itself to its rows instead of expanding to fill
+  /// its parent.
+  ///
+  /// By default the table expands, which requires a parent that provides a
+  /// bounded height. When `true`, the body shrink-wraps its rows so the table
+  /// can be placed inside unbounded-height containers such as a [Column]
+  /// inside a scroll view.
+  ///
+  /// Rows are no longer virtualised in this mode — every row is built and laid
+  /// out eagerly, and scrolling is left to the surrounding scrollable. Prefer
+  /// the default for large datasets.
+  ///
+  /// Cannot be combined with [OiTablePaginationMode.infinite] or
+  /// [OiTablePaginationMode.virtual], which both depend on the table owning
+  /// its own scroll position.
+  final bool shrinkWrap;
 
   @override
   State<OiTable<T>> createState() => _OiTableState<T>();
@@ -552,6 +579,13 @@ class _OiTableState<T> extends State<OiTable<T>>
 
   // ── Build ─────────────────────────────────────────────────────────────────
 
+  /// Wraps the header + body area so it expands to fill the available height,
+  /// or sizes to its content when [OiTable.shrinkWrap] is set.
+  Widget _wrapTableArea(Widget child) {
+    if (widget.shrinkWrap) return child;
+    return Expanded(child: child);
+  }
+
   @override
   Widget build(BuildContext context) {
     final hasBulkActions =
@@ -573,11 +607,12 @@ class _OiTableState<T> extends State<OiTable<T>>
           }
         },
         child: Column(
+          mainAxisSize: widget.shrinkWrap ? MainAxisSize.min : MainAxisSize.max,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             if (widget.showColumnManager) _buildColumnManagerBar(),
-            Expanded(
-              child: LayoutBuilder(
+            _wrapTableArea(
+              LayoutBuilder(
                 builder: (context, constraints) {
                   final totalWidth = _computeTotalColumnsWidth();
                   final needsScroll = totalWidth > constraints.maxWidth;
@@ -587,7 +622,11 @@ class _OiTableState<T> extends State<OiTable<T>>
                       : constraints.maxWidth;
 
                   final header = _buildHeaderRow();
-                  final body = Expanded(child: _buildBody());
+                  // When shrink-wrapping the body sizes to its rows, so it
+                  // must not claim flex from the surrounding Column.
+                  final body = widget.shrinkWrap
+                      ? _buildBody()
+                      : Expanded(child: _buildBody());
 
                   if (needsScroll) {
                     // Wrap header and body to scroll horizontally in sync.
@@ -597,6 +636,9 @@ class _OiTableState<T> extends State<OiTable<T>>
                       child: SizedBox(
                         width: tableWidth,
                         child: Column(
+                          mainAxisSize: widget.shrinkWrap
+                              ? MainAxisSize.min
+                              : MainAxisSize.max,
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [header, body],
                         ),
@@ -605,6 +647,9 @@ class _OiTableState<T> extends State<OiTable<T>>
                   }
 
                   return Column(
+                    mainAxisSize: widget.shrinkWrap
+                        ? MainAxisSize.min
+                        : MainAxisSize.max,
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [header, body],
                   );
