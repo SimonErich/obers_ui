@@ -240,8 +240,9 @@ class _OiTappableState extends State<OiTappable> {
     {
       final duration = reducedMotion ? Duration.zero : animations.fast;
       final override = style.backgroundOverride;
-      final visibleOverride =
-          override != null && override.a > 0 ? override : null;
+      final visibleOverride = override != null && override.a > 0
+          ? override
+          : null;
       if (visibleOverride != null) {
         _overrideFill = visibleOverride;
       }
