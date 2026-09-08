@@ -3167,6 +3167,133 @@ void main() {
     // Only the last clicked row should be selected.
     expect(ctrl.selectedRows, {'Bob'});
   });
+
+  // ── shrinkWrap ────────────────────────────────────────────────────────────
+
+  // 100. Sizes itself to its rows inside an unbounded parent
+  testWidgets('shrinkWrap lays out inside a scrollable', (tester) async {
+    await tester.pumpObers(
+      SingleChildScrollView(
+        child: SizedBox(
+          width: 1200,
+          child: OiTable<_Row>(
+            label: 'Test table',
+            rows: _rows,
+            columns: _cols,
+            rowHeight: 50,
+            shrinkWrap: true,
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    // Without shrinkWrap the flex body would throw on the unbounded height.
+    expect(tester.takeException(), isNull);
+    expect(find.text('Alice'), findsOneWidget);
+    expect(find.text('Charlie'), findsOneWidget);
+  });
+
+  // 101. Grows by exactly one row height per row
+  testWidgets('shrinkWrap height tracks the row count', (tester) async {
+    Future<double> heightOf(List<_Row> rows) async {
+      await tester.pumpObers(
+        SingleChildScrollView(
+          child: SizedBox(
+            width: 1200,
+            child: OiTable<_Row>(
+              label: 'Test table',
+              rows: rows,
+              columns: _cols,
+              rowHeight: 50,
+              shrinkWrap: true,
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      return tester.getSize(find.byType(OiTable<_Row>)).height;
+    }
+
+    final two = await heightOf(_rows.take(2).toList());
+    final three = await heightOf(_rows);
+
+    expect(three - two, 50);
+  });
+
+  // 102. A row-less body keeps a visible height
+  testWidgets('shrinkWrap keeps the empty state visible', (tester) async {
+    await tester.pumpObers(
+      SingleChildScrollView(
+        child: SizedBox(
+          width: 1200,
+          child: OiTable<_Row>(
+            label: 'Test table',
+            rows: const [],
+            columns: _cols,
+            shrinkWrap: true,
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    // A bare Center would collapse to zero height when shrink-wrapping.
+    expect(tester.takeException(), isNull);
+    expect(find.byKey(const Key('oi_table_empty')), findsOneWidget);
+    expect(
+      tester.getSize(find.byKey(const Key('oi_table_empty'))).height,
+      greaterThan(0),
+    );
+  });
+
+  // 103. Infinite scroll needs a scrollable body, so the combination is barred
+  test('shrinkWrap rejects onLoadMore', () {
+    expect(
+      () => OiTable<_Row>(
+        label: 'Test table',
+        rows: _rows,
+        columns: _cols,
+        shrinkWrap: true,
+        onLoadMore: () async {},
+      ),
+      throwsAssertionError,
+    );
+  });
+
+  // 104. Grouped rows shrink-wrap too
+  testWidgets('shrinkWrap lays out a grouped body', (tester) async {
+    await tester.pumpObers(
+      SingleChildScrollView(
+        child: SizedBox(
+          width: 1200,
+          child: OiTable<_Row>(
+            label: 'Test table',
+            rows: _rows,
+            columns: _cols,
+            rowHeight: 50,
+            groupBy: 'name',
+            shrinkWrap: true,
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(tester.takeException(), isNull);
+  });
+
+  // 105. Without shrinkWrap the body still fills and scrolls
+  testWidgets('the default table fills its given height', (tester) async {
+    await tester.pumpObers(_table(rows: _rows));
+    await tester.pumpAndSettle();
+
+    // The helper hands it 600px, which it takes in full.
+    expect(tester.getSize(find.byType(OiTable<_Row>)).height, 600);
+    final listView = tester.widget<ListView>(find.byType(ListView));
+    expect(listView.shrinkWrap, isFalse);
+  });
 }
 
 // Expose _copySelectedRows for test 28 via an extension on OiTableController.

@@ -3,6 +3,12 @@ part of '../oi_table.dart';
 // ── Body rendering ───────────────────────────────────────────────────────────
 
 extension _OiTableBody<T> on _OiTableState<T> {
+  /// Whether the body sizes itself to its rows rather than filling its parent.
+  bool get _shrinkWrapping => widget.shrinkWrap;
+
+  /// Height reserved for a body with no rows to measure, in logical pixels.
+  static const double _placeholderHeight = 120;
+
   Widget _buildBody() {
     if (widget.loading) return _buildLoadingState();
     final rows = _displayRows;
@@ -34,19 +40,33 @@ extension _OiTableBody<T> on _OiTableState<T> {
   }
 
   Widget _buildLoadingState() {
-    return const Center(key: Key('oi_table_loading'), child: _OiTableSpinner());
+    return _placeholderBody(
+      const Center(key: Key('oi_table_loading'), child: _OiTableSpinner()),
+    );
   }
 
   Widget _buildDefaultEmptyState() {
-    return const Center(key: Key('oi_table_empty'), child: Text('No data'));
+    return _placeholderBody(
+      const Center(key: Key('oi_table_empty'), child: Text('No data')),
+    );
   }
+
+  /// Gives a row-less body (loading, empty) a height of its own.
+  ///
+  /// [Center] takes all the height it is offered, which is none when the table
+  /// shrink-wraps — the placeholder would collapse to nothing.
+  Widget _placeholderBody(Widget child) => _shrinkWrapping
+      ? SizedBox(height: _placeholderHeight, child: child)
+      : child;
 
   Widget _buildFlatBody(List<T> rows) {
     if (widget.reorderable) {
       return _buildReorderableBody(rows);
     }
     return ListView.builder(
-      controller: _scrollController,
+      controller: _shrinkWrapping ? null : _scrollController,
+      shrinkWrap: _shrinkWrapping,
+      physics: _shrinkWrapping ? const NeverScrollableScrollPhysics() : null,
       itemCount: rows.length + (_loadingMore ? 1 : 0),
       itemBuilder: (ctx, i) {
         if (i == rows.length) {
@@ -62,7 +82,9 @@ extension _OiTableBody<T> on _OiTableState<T> {
 
   Widget _buildReorderableBody(List<T> rows) {
     return CustomScrollView(
-      controller: _scrollController,
+      controller: _shrinkWrapping ? null : _scrollController,
+      shrinkWrap: _shrinkWrapping,
+      physics: _shrinkWrapping ? const NeverScrollableScrollPhysics() : null,
       slivers: [
         SliverReorderableList(
           itemCount: rows.length,
@@ -147,7 +169,12 @@ extension _OiTableBody<T> on _OiTableState<T> {
           ),
         );
     }
-    return ListView(controller: _scrollController, children: items);
+    return ListView(
+      controller: _shrinkWrapping ? null : _scrollController,
+      shrinkWrap: _shrinkWrapping,
+      physics: _shrinkWrapping ? const NeverScrollableScrollPhysics() : null,
+      children: items,
+    );
   }
 
   Widget _buildDefaultGroupHeader(String groupKey, int count, bool expanded) {
