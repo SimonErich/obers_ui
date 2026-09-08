@@ -20,22 +20,20 @@ extension _OiUploadDialogInteraction on _OiUploadDialogState {
         type: widget.allowedExtensions != null ? FileType.custom : FileType.any,
         allowedExtensions: widget.allowedExtensions,
       );
-      if (result != null) {
-        // Read eagerly: the picker no longer populates `bytes` itself, and the
-        // dialog hands complete [OiFileData] to its caller.
-        final files = <OiFileData>[];
-        for (final file in result.files) {
-          files.add(
-            OiFileData(
-              name: file.name,
-              size: file.size,
-              bytes: await file.readAsBytes(),
-              mimeType: OiFileUtils.mimeType(OiFileUtils.extension(file.name)),
-            ),
-          );
-        }
-        if (mounted) _addFiles(files);
+      // Read eagerly: the picker no longer populates `bytes` itself, and the
+      // dialog hands complete [OiFileData] to its caller.
+      final files = <OiFileData>[];
+      for (final file in result) {
+        files.add(
+          OiFileData(
+            name: file.name,
+            size: file.lengthSync() ?? await file.length(),
+            bytes: await file.readAsBytes(),
+            mimeType: OiFileUtils.mimeType(OiFileUtils.extension(file.name)),
+          ),
+        );
       }
+      if (mounted) _addFiles(files);
     } finally {
       if (mounted) _escapeFocusNode.requestFocus();
       _updateState(() => _picking = false);

@@ -89,8 +89,8 @@ class _OiFileInputState extends State<OiFileInput> {
           type: type,
           allowedExtensions: widget.allowedExtensions,
         );
-        if (result != null) {
-          final paths = result.files.map((file) => file.name).toList();
+        final paths = result.map((file) => file.name).toList();
+        if (paths.isNotEmpty) {
           _updateFiles([..._effectiveFiles, ...paths]);
         }
       } else {
