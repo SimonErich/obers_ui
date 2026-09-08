@@ -71,8 +71,9 @@ enum _OiButtonKind { standard, icon, split, countdown, confirm }
 /// Interaction state used to pick the matching per-state colours from
 /// [OiButtonVariantStyle].
 ///
-/// Pressed is intentionally absent: [OiTappable] reports hover and focus but
-/// not the pressed state, so `*Pressed` overrides stay unresolved for now.
+/// Pressed is intentionally absent: [OiTappable] tracks press internally
+/// but does not yet expose an `onPressed` callback, so `*Pressed` overrides
+/// stay unresolved for now.
 enum _OiButtonVisualState { normal, hovered, disabled }
 
 /// A fully-featured button component for the Obers UI design system.

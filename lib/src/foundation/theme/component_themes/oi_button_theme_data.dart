@@ -7,6 +7,13 @@ import 'package:obers_ui/src/foundation/theme/oi_color_scheme.dart';
 /// All fields are nullable; a `null` value instructs the button to derive
 /// colors from [OiColorScheme] swatches as usual.
 ///
+/// Hover and disabled colours are resolved for the filled standard variants
+/// (primary, secondary, outline, destructive, soft). Ghost, icon, split,
+/// countdown, and confirm buttons do not read the per-state fields yet.
+///
+/// [backgroundPressed], [foregroundPressed], and [borderPressed] are unused
+/// until a pressed callback is available on the tappable primitive.
+///
 /// {@category Foundation}
 @immutable
 class OiButtonVariantStyle {

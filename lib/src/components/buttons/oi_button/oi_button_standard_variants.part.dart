@@ -14,10 +14,15 @@ extension _OiButtonStandardVariants on _OiButtonState {
     final effectiveRadius =
         widget.borderRadius ?? themeRadius ?? context.radius.sm;
     final isActive = widget.enabled && !widget.loading;
+    final vs = _variantStyle(bt, widget.variant);
+    final hasDisabledOverride =
+        vs?.backgroundDisabled != null ||
+        vs?.foregroundDisabled != null ||
+        vs?.borderDisabled != null;
 
     final visualState = !widget.enabled
         ? _OiButtonVisualState.disabled
-        : _hovered
+        : (isActive && _hovered)
         ? _OiButtonVisualState.hovered
         : _OiButtonVisualState.normal;
     final foreground = _foregroundColor(
@@ -34,12 +39,16 @@ extension _OiButtonStandardVariants on _OiButtonState {
 
     Widget button = OiTappable(
       onTap: isActive ? widget.onTap : null,
-      onHover: isActive ? _setHovered : null,
+      onHover: _setHovered,
       enabled: isActive,
+      applyBackgroundOverlay:
+          visualState != _OiButtonVisualState.hovered ||
+          vs?.backgroundHover == null,
+      dimWhenDisabled: widget.enabled || !hasDisabledOverride,
       semanticLabel: widget.semanticLabel ?? widget.label,
       clipBorderRadius: effectiveRadius,
       child: Opacity(
-        opacity: widget.enabled ? 1 : 0.4,
+        opacity: widget.enabled || hasDisabledOverride ? 1 : 0.4,
         child: Container(
           height: height,
           padding: EdgeInsets.symmetric(horizontal: hPad),
