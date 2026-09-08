@@ -34,6 +34,8 @@ class OiTappable extends StatefulWidget {
     this.enabled = true,
     this.focusable = true,
     this.dragging = false,
+    this.applyBackgroundOverlay = true,
+    this.dimWhenDisabled = true,
     this.semanticLabel,
     this.cursor,
     this.clipBorderRadius,
@@ -60,8 +62,8 @@ class OiTappable extends StatefulWidget {
 
   /// Whether the widget responds to interactions.
   ///
-  /// When `false`, callbacks are suppressed and the widget renders at 0.4
-  /// opacity to indicate its disabled state.
+  /// When `false`, callbacks are suppressed. The widget also fades to 0.4
+  /// opacity unless [dimWhenDisabled] is `false`.
   final bool enabled;
 
   /// Whether the widget participates in keyboard focus traversal.
@@ -76,6 +78,20 @@ class OiTappable extends StatefulWidget {
   /// Dragging takes the highest visual priority among all interactive states.
   final bool dragging;
 
+  /// Whether to paint [OiInteractiveStyle.backgroundOverlay] for the current
+  /// state.
+  ///
+  /// Set to `false` when the child already paints a per-state fill so the
+  /// overlay does not tint that colour. Ignored when the current style sets
+  /// [OiInteractiveStyle.backgroundOverride] — a concrete fill always
+  /// replaces the tint.
+  final bool applyBackgroundOverlay;
+
+  /// When [enabled] is `false`, whether to fade the child to 0.4 opacity.
+  ///
+  /// Set to `false` when the child already paints a disabled appearance.
+  final bool dimWhenDisabled;
+
   /// An optional label announced by screen readers in place of the child's
   /// semantic content.
   final String? semanticLabel;
@@ -86,10 +102,11 @@ class OiTappable extends StatefulWidget {
   /// [SystemMouseCursors.basic] when disabled.
   final MouseCursor? cursor;
 
-  /// Optional border radius used to clip the hover/active background overlay.
+  /// Optional border radius used to clip the hover/active state fills.
   ///
-  /// When non-null the state overlay is clipped to this radius so it matches
-  /// the visible shape of the child (e.g. a rounded button).
+  /// When non-null the background overlay, background override, and child are
+  /// clipped to this radius so they match the visible shape of the child
+  /// (e.g. a rounded button).
   final BorderRadius? clipBorderRadius;
 
   @override
@@ -101,6 +118,10 @@ class _OiTappableState extends State<OiTappable> {
   bool _isPressed = false;
   bool _isFocused = false;
   FocusHighlightMode _highlightMode = FocusHighlightMode.touch;
+
+  /// Last non-transparent override colour, kept so [AnimatedOpacity] can fade
+  /// the fill out instead of snapping to transparent.
+  Color _overrideFill = const Color(0x00000000);
 
   @override
   void initState() {
@@ -208,58 +229,58 @@ class _OiTappableState extends State<OiTappable> {
     // ignore: omit_local_variable_types
     Widget content = widget.child;
 
-    // Background for the current state — always in the tree so AnimatedOpacity
-    // can smoothly transition it in and out.
+    // Background for the current state — both layers stay in the tree so
+    // AnimatedOpacity can smoothly transition them in and out without shifting
+    // the child's slot in the [Stack].
     //
     // `backgroundOverride` replaces the widget's background outright, so it is
     // painted opaquely *behind* the child; `backgroundOverlay` tints whatever
-    // the child already draws, so it is layered on top. A state that sets both
-    // gets the override behind and the overlay over it.
+    // the child already draws, so it is layered on top. A concrete override
+    // replaces the overlay tint — they do not stack.
     {
-      final overlayColor = style.backgroundOverlay;
-      final showOverlay = overlayColor.a > 0;
-      Widget overlay = IgnorePointer(
-        child: AnimatedOpacity(
-          opacity: showOverlay ? 1.0 : 0.0,
-          duration: reducedMotion ? Duration.zero : animations.fast,
-          child: ColoredBox(
-            color: showOverlay ? overlayColor : effects.hover.backgroundOverlay,
-          ),
-        ),
-      );
-      if (widget.clipBorderRadius != null) {
-        overlay = ClipRRect(
-          borderRadius: widget.clipBorderRadius!,
-          child: overlay,
-        );
+      final duration = reducedMotion ? Duration.zero : animations.fast;
+      final override = style.backgroundOverride;
+      final visibleOverride =
+          override != null && override.a > 0 ? override : null;
+      if (visibleOverride != null) {
+        _overrideFill = visibleOverride;
       }
 
-      final override = style.backgroundOverride;
-      Widget? background;
-      if (override != null && override.a > 0) {
-        Widget fill = IgnorePointer(
-          child: AnimatedContainer(
-            duration: reducedMotion ? Duration.zero : animations.fast,
-            color: override,
-          ),
-        );
-        if (widget.clipBorderRadius != null) {
-          fill = ClipRRect(
-            borderRadius: widget.clipBorderRadius!,
-            child: fill,
-          );
-        }
-        background = fill;
-      }
+      final overlayColor = style.backgroundOverlay;
+      final showOverlay =
+          widget.applyBackgroundOverlay &&
+          overlayColor.a > 0 &&
+          visibleOverride == null;
 
       content = Stack(
         fit: StackFit.passthrough,
         children: [
-          if (background != null) Positioned.fill(child: background),
+          Positioned.fill(
+            child: _stateFill(
+              opacity: visibleOverride != null ? 1.0 : 0.0,
+              color: visibleOverride ?? _overrideFill,
+              duration: duration,
+            ),
+          ),
           content,
-          Positioned.fill(child: overlay),
+          Positioned.fill(
+            child: _stateFill(
+              opacity: showOverlay ? 1.0 : 0.0,
+              color: showOverlay
+                  ? overlayColor
+                  : effects.hover.backgroundOverlay,
+              duration: duration,
+            ),
+          ),
         ],
       );
+
+      if (widget.clipBorderRadius != null) {
+        content = ClipRRect(
+          borderRadius: widget.clipBorderRadius!,
+          child: content,
+        );
+      }
     }
 
     // Halo / glow rendered as a DecoratedBox behind the content.
@@ -296,7 +317,7 @@ class _OiTappableState extends State<OiTappable> {
     }
 
     // Reduced opacity when disabled.
-    if (!widget.enabled) {
+    if (!widget.enabled && widget.dimWhenDisabled) {
       content = Opacity(opacity: 0.4, child: content);
     }
 
@@ -370,4 +391,19 @@ class _OiTappableState extends State<OiTappable> {
       child: content,
     );
   }
+}
+
+/// A non-hit-testable fill used for the hover/active overlay and override.
+Widget _stateFill({
+  required double opacity,
+  required Color color,
+  required Duration duration,
+}) {
+  return IgnorePointer(
+    child: AnimatedOpacity(
+      opacity: opacity,
+      duration: duration,
+      child: ColoredBox(color: color),
+    ),
+  );
 }

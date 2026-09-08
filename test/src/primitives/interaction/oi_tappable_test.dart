@@ -629,18 +629,19 @@ void main() {
 
   // ── 22. Hover: backgroundOverride ─────────────────────────────────────────
 
-  /// Pointer-modality app whose hover state overrides the background outright,
-  /// with no translucent overlay.
-  Widget hoverStyledApp(Widget child) {
+  /// Pointer-modality app whose hover state overrides the background outright.
+  Widget hoverStyledApp(Widget child, {OiInteractiveStyle? hover}) {
     final base = OiThemeData.light();
     return OiApp(
       theme: base.copyWith(
         effects: base.effects.copyWith(
-          hover: const OiInteractiveStyle(
-            backgroundOverlay: Color(0x00000000),
-            halo: OiHaloStyle.none,
-            backgroundOverride: Color(0xFF123456),
-          ),
+          hover:
+              hover ??
+              const OiInteractiveStyle(
+                backgroundOverlay: Color(0x00000000),
+                halo: OiHaloStyle.none,
+                backgroundOverride: Color(0xFF123456),
+              ),
         ),
       ),
       home: OiPlatform(
@@ -665,14 +666,24 @@ void main() {
     return gesture;
   }
 
-  /// True when a state fill is painting [color]. `AnimatedContainer` folds its
-  /// `color` argument into a `BoxDecoration`, so it is read from there.
-  bool hasContainerColor(WidgetTester tester, Color color) => tester
-      .widgetList<AnimatedContainer>(find.byType(AnimatedContainer))
-      .any((c) {
-        final deco = c.decoration;
-        return deco is BoxDecoration && deco.color == color;
-      });
+  /// True when a state fill of [color] is currently shown (opacity 1).
+  bool hasVisibleColoredBox(WidgetTester tester, Color color) => tester
+      .widgetList<AnimatedOpacity>(find.byType(AnimatedOpacity))
+      .any(
+        (o) =>
+            o.opacity == 1.0 &&
+            o.child is ColoredBox &&
+            (o.child! as ColoredBox).color == color,
+      );
+
+  Stack stateStack(WidgetTester tester) => tester.widget<Stack>(
+    find.descendant(
+      of: find.byType(OiTappable),
+      matching: find.byWidgetPredicate(
+        (w) => w is Stack && w.children.length == 3,
+      ),
+    ),
+  );
 
   testWidgets(
     'hover: backgroundOverride paints the state background',
@@ -686,11 +697,11 @@ void main() {
       );
       await tester.pump();
 
-      expect(hasContainerColor(tester, const Color(0xFF123456)), isFalse);
+      expect(hasVisibleColoredBox(tester, const Color(0xFF123456)), isFalse);
 
       await hoverOver(tester, find.byType(OiTappable));
 
-      expect(hasContainerColor(tester, const Color(0xFF123456)), isTrue);
+      expect(hasVisibleColoredBox(tester, const Color(0xFF123456)), isTrue);
     },
     variant: TargetPlatformVariant.only(TargetPlatform.linux),
   );
@@ -710,13 +721,130 @@ void main() {
       await tester.pump();
       await hoverOver(tester, find.byType(OiTappable));
 
-      // The child must still be hit-testable and visible above the fill, so
-      // the override cannot be covering it.
+      final stack = stateStack(tester);
+      expect(stack.children[1], isA<SizedBox>());
       expect(find.text('Label'), findsOneWidget);
-      expect(hasContainerColor(tester, const Color(0xFF123456)), isTrue);
+      expect(hasVisibleColoredBox(tester, const Color(0xFF123456)), isTrue);
     },
     variant: TargetPlatformVariant.only(TargetPlatform.linux),
   );
+
+  testWidgets(
+    'override layer stays in the tree at rest and on hover',
+    (tester) async {
+      await tester.pumpWidget(
+        hoverStyledApp(
+          const Center(
+            child: OiTappable(child: SizedBox(width: 60, height: 60)),
+          ),
+        ),
+      );
+      await tester.pump();
+
+      expect(stateStack(tester).children, hasLength(3));
+
+      await hoverOver(tester, find.byType(OiTappable));
+
+      expect(stateStack(tester).children, hasLength(3));
+    },
+    variant: TargetPlatformVariant.only(TargetPlatform.linux),
+  );
+
+  testWidgets(
+    'hover: child state survives the override appearing',
+    (tester) async {
+      final probeKey = GlobalKey<_HoverProbeState>();
+      await tester.pumpWidget(
+        hoverStyledApp(
+          Center(
+            child: OiTappable(
+              child: SizedBox(
+                width: 60,
+                height: 60,
+                child: _HoverProbe(key: probeKey),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pump();
+      probeKey.currentState!.bump();
+      await tester.pump();
+      expect(find.text('1'), findsOneWidget);
+
+      await hoverOver(tester, find.byType(OiTappable));
+
+      expect(find.text('1'), findsOneWidget);
+      expect(hasVisibleColoredBox(tester, const Color(0xFF123456)), isTrue);
+    },
+    variant: TargetPlatformVariant.only(TargetPlatform.linux),
+  );
+
+  testWidgets(
+    'backgroundOverride suppresses the overlay tint',
+    (tester) async {
+      await tester.pumpWidget(
+        hoverStyledApp(
+          const Center(
+            child: OiTappable(child: SizedBox(width: 60, height: 60)),
+          ),
+          hover: const OiInteractiveStyle(
+            backgroundOverlay: Color(0x80FF0000),
+            halo: OiHaloStyle.none,
+            backgroundOverride: Color(0xFF123456),
+          ),
+        ),
+      );
+      await tester.pump();
+      await hoverOver(tester, find.byType(OiTappable));
+
+      expect(hasVisibleColoredBox(tester, const Color(0xFF123456)), isTrue);
+      expect(hasVisibleColoredBox(tester, const Color(0x80FF0000)), isFalse);
+    },
+    variant: TargetPlatformVariant.only(TargetPlatform.linux),
+  );
+
+  testWidgets(
+    'applyBackgroundOverlay: false keeps the overlay hidden',
+    (tester) async {
+      await tester.pumpWidget(
+        pointerApp(
+          const Center(
+            child: OiTappable(
+              applyBackgroundOverlay: false,
+              child: SizedBox(width: 60, height: 60),
+            ),
+          ),
+        ),
+      );
+      await tester.pump();
+      await hoverOver(tester, find.byType(OiTappable));
+
+      expect(
+        hasVisibleColoredBox(tester, const Color(0x0A000000)),
+        isFalse,
+      );
+    },
+    variant: TargetPlatformVariant.only(TargetPlatform.linux),
+  );
+
+  testWidgets('dimWhenDisabled: false skips the 0.4 fade', (tester) async {
+    await tester.pumpObers(
+      const OiTappable(
+        enabled: false,
+        dimWhenDisabled: false,
+        child: Text('x'),
+      ),
+    );
+    await tester.pump();
+
+    expect(
+      tester
+          .widgetList<Opacity>(find.byType(Opacity))
+          .any((o) => o.opacity == 0.4),
+      isFalse,
+    );
+  });
 
   testWidgets(
     'resting state paints no override',
@@ -730,7 +858,7 @@ void main() {
       );
       await tester.pump();
 
-      expect(hasContainerColor(tester, const Color(0xFF123456)), isFalse);
+      expect(hasVisibleColoredBox(tester, const Color(0xFF123456)), isFalse);
     },
     variant: TargetPlatformVariant.only(TargetPlatform.linux),
   );
@@ -743,9 +871,24 @@ void main() {
       );
       await tester.pump();
 
-      // OiEffectsTheme.standard leaves it unset, so no state fill is added.
-      expect(hasContainerColor(tester, const Color(0xFF123456)), isFalse);
+      expect(hasVisibleColoredBox(tester, const Color(0xFF123456)), isFalse);
       expect(find.text('Label'), findsOneWidget);
     },
   );
+}
+
+class _HoverProbe extends StatefulWidget {
+  const _HoverProbe({super.key});
+
+  @override
+  State<_HoverProbe> createState() => _HoverProbeState();
+}
+
+class _HoverProbeState extends State<_HoverProbe> {
+  int ticks = 0;
+
+  void bump() => setState(() => ticks++);
+
+  @override
+  Widget build(BuildContext context) => Text('$ticks');
 }
