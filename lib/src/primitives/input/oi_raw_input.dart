@@ -306,7 +306,16 @@ class _OiRawInputState extends State<OiRawInput> {
       cursorHeight: widget.cursorHeight,
       textAlign: widget.textAlign,
       autofocus: widget.autofocus,
-      inputFormatters: widget.inputFormatters,
+      // maxLength is enforced here rather than passed on: EditableText has no
+      // maxLength API — at this layer the formatter is the mechanism, exactly
+      // as Material's TextField wires it internally. The bare constructor
+      // inherits the platform-default enforcement, which avoids truncating
+      // mid-IME-composition.
+      inputFormatters: [
+        ...?widget.inputFormatters,
+        if (widget.maxLength != null)
+          LengthLimitingTextInputFormatter(widget.maxLength),
+      ],
       scrollController: widget.scrollController,
       selectionControls: widget.selectionControls ?? OiTextSelectionControls(),
       contextMenuBuilder: widget.contextMenuBuilder,
