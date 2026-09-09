@@ -20,7 +20,8 @@ const IconData _kAddIcon = OiIcons.plus;
 ///
 /// Minus button, display value, plus button. Boundary buttons are disabled at
 /// [min] / [max]. Supports [compact] mode for dense layouts, [disabled] state,
-/// and keyboard arrow up/down for accessibility.
+/// an optional [suffix] unit after the stepper, and keyboard arrow up/down
+/// for accessibility.
 ///
 /// Composes [OiRow], [OiIconButton], [OiLabel], [OiSurface].
 ///
@@ -35,6 +36,7 @@ class OiQuantitySelector extends StatelessWidget {
     this.max = 99,
     this.compact = false,
     this.disabled = false,
+    this.suffix,
     super.key,
   });
 
@@ -58,6 +60,12 @@ class OiQuantitySelector extends StatelessWidget {
 
   /// When `true`, all controls are disabled.
   final bool disabled;
+
+  /// Visible unit rendered after the stepper (e.g. `Stk.`, `€`).
+  ///
+  /// [label] stays the accessibility name; the suffix is included in the
+  /// announced quantity value.
+  final String? suffix;
 
   /// Whether the value is at the minimum.
   bool get _atMin => value <= min;
@@ -144,15 +152,26 @@ class OiQuantitySelector extends StatelessWidget {
       child: content,
     );
 
+    final unit = suffix;
+    if (unit != null) {
+      content = OiRow(
+        breakpoint: breakpoint,
+        gap: OiResponsive<double>(sp.xs),
+        children: [content, OiLabel.smallStrong(unit)],
+      );
+    }
+
     if (disabled) {
       content = Opacity(opacity: 0.4, child: content);
     }
 
+    String quantity(int n) => unit == null ? '$n' : '$n $unit';
+
     return Semantics(
-      label: '$label, Quantity: $value, minimum $min, maximum $max',
-      value: '$value',
-      increasedValue: _atMax ? null : '${value + 1}',
-      decreasedValue: _atMin ? null : '${value - 1}',
+      label: '$label, Quantity: ${quantity(value)}, minimum $min, maximum $max',
+      value: quantity(value),
+      increasedValue: _atMax ? null : quantity(value + 1),
+      decreasedValue: _atMin ? null : quantity(value - 1),
       child: Focus(
         onKeyEvent: _onKeyEvent,
         child: ExcludeSemantics(child: content),
