@@ -157,6 +157,39 @@ void main() {
       expect(received, 2);
     });
 
+    testWidgets('suffix is shown after the value', (tester) async {
+      await tester.pumpObers(
+        OiQuantitySelector(
+          value: 8,
+          label: 'Value',
+          suffix: '€',
+          onChange: (_) {},
+        ),
+      );
+      expect(find.text('8'), findsOneWidget);
+      expect(find.text('€'), findsOneWidget);
+    });
+
+    testWidgets('accessibility: semantics include the suffix', (tester) async {
+      final handle = tester.ensureSemantics();
+      await tester.pumpObers(
+        OiQuantitySelector(
+          value: 8,
+          label: 'Value',
+          suffix: '€',
+          max: 10,
+          onChange: (_) {},
+        ),
+      );
+      expect(
+        find.bySemanticsLabel(
+          RegExp('Value.*Quantity.*8 €.*minimum.*1.*maximum.*10'),
+        ),
+        findsOneWidget,
+      );
+      handle.dispose();
+    });
+
     testWidgets('accessibility: semantics label includes value, min, max', (
       tester,
     ) async {

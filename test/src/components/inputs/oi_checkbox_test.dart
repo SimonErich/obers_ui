@@ -1,5 +1,6 @@
 // Tests do not require documentation comments.
 
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui/src/components/inputs/oi_checkbox.dart';
 
@@ -58,6 +59,28 @@ void main() {
       const OiCheckbox(value: false, label: 'Accept terms'),
     );
     expect(find.text('Accept terms'), findsOneWidget);
+  });
+
+  testWidgets('tapping the label fires onChanged', (tester) async {
+    bool? result;
+    await tester.pumpObers(
+      OiCheckbox(
+        value: false,
+        label: 'Accept terms',
+        onChanged: (v) => result = v,
+      ),
+    );
+    await tester.tap(find.text('Accept terms'));
+    await tester.pump();
+    expect(result, isTrue);
+  });
+
+  testWidgets('labelGap is used between box and label', (tester) async {
+    await tester.pumpObers(
+      const OiCheckbox(value: false, label: 'Accept terms', labelGap: 24),
+    );
+    final gaps = tester.widgetList<SizedBox>(find.byType(SizedBox));
+    expect(gaps.any((box) => box.width == 24), isTrue);
   });
 
   testWidgets('enabled=false suppresses onChanged', (tester) async {

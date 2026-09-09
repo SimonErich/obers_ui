@@ -304,6 +304,14 @@ class _ShopScreenState extends State<ShopScreen> {
                 ),
               ),
               const ComponentExample(
+                title: 'With unit suffix',
+                child: OiQuantitySelector(
+                  value: 8,
+                  label: 'Voucher value',
+                  suffix: '€',
+                ),
+              ),
+              const ComponentExample(
                 title: 'Disabled',
                 child: OiQuantitySelector(
                   value: 3,

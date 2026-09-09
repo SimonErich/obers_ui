@@ -20,6 +20,7 @@ class OiCheckbox extends StatefulWidget {
     this.onChanged,
     this.label,
     this.labelStyle,
+    this.labelGap,
     this.enabled = true,
     super.key,
   });
@@ -39,6 +40,11 @@ class OiCheckbox extends StatefulWidget {
 
   /// Optional style override for the label text.
   final TextStyle? labelStyle;
+
+  /// Space between the box and [label]. Defaults to the theme's `sm` spacing.
+  ///
+  /// Ignored when [label] is null.
+  final double? labelGap;
 
   /// Whether the checkbox responds to taps.
   final bool enabled;
@@ -103,7 +109,7 @@ class _OiCheckboxState extends State<OiCheckbox> {
         mainAxisSize: MainAxisSize.min,
         children: [
           box,
-          const SizedBox(width: 8),
+          SizedBox(width: widget.labelGap ?? context.spacing.sm),
           Text(
             widget.label!,
             style:
