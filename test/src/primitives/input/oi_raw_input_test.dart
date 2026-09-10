@@ -17,8 +17,10 @@ void main() {
     Widget? leading,
     Widget? trailing,
     int? maxLines = 1,
+    int? maxLength,
     bool enabled = true,
     bool obscureText = false,
+    List<TextInputFormatter>? inputFormatters,
     ValueChanged<String>? onChanged,
     ValueChanged<String>? onSubmitted,
   }) {
@@ -29,8 +31,10 @@ void main() {
       leading: leading,
       trailing: trailing,
       maxLines: maxLines,
+      maxLength: maxLength,
       enabled: enabled,
       obscureText: obscureText,
+      inputFormatters: inputFormatters,
       onChanged: onChanged,
       onSubmitted: onSubmitted,
     );
@@ -41,6 +45,46 @@ void main() {
   testWidgets('renders EditableText', (tester) async {
     await tester.pumpObers(buildInput());
     expect(find.byType(EditableText), findsOneWidget);
+  });
+
+  // ── Max length ─────────────────────────────────────────────────────────────
+
+  testWidgets('caps input at maxLength', (tester) async {
+    final controller = TextEditingController();
+    addTearDown(controller.dispose);
+    await tester.pumpObers(buildInput(controller: controller, maxLength: 5));
+
+    await tester.enterText(find.byType(EditableText), 'abcdefghij');
+
+    expect(controller.text, 'abcde');
+  });
+
+  testWidgets('leaves input uncapped without a maxLength', (tester) async {
+    final controller = TextEditingController();
+    addTearDown(controller.dispose);
+    await tester.pumpObers(buildInput(controller: controller));
+
+    await tester.enterText(find.byType(EditableText), 'abcdefghij');
+
+    expect(controller.text, 'abcdefghij');
+  });
+
+  testWidgets('keeps caller formatters working alongside maxLength', (
+    tester,
+  ) async {
+    final controller = TextEditingController();
+    addTearDown(controller.dispose);
+    await tester.pumpObers(
+      buildInput(
+        controller: controller,
+        maxLength: 3,
+        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+      ),
+    );
+
+    await tester.enterText(find.byType(EditableText), 'a1b2c3d4');
+
+    expect(controller.text, '123');
   });
 
   // ── Placeholder ────────────────────────────────────────────────────────────
