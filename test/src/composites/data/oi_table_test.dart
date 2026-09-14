@@ -3171,6 +3171,47 @@ void main() {
     expect(ctrl.selectedRows, {'Bob'});
   });
 
+  // ── header alignment ────────────────────────────────────────────────────────
+
+  group('OiTableColumn header alignment', () {
+    List<OiTableColumn<_Row>> aligned(TextAlign textAlign) => [
+      OiTableColumn(
+        id: 'value',
+        header: 'Value',
+        textAlign: textAlign,
+        valueGetter: _valueGetter,
+        filterable: false,
+        resizable: false,
+      ),
+    ];
+
+    /// Where the header label sits inside its own header cell.
+    Alignment alignmentOf(WidgetTester tester) {
+      final container = tester.widget<Container>(
+        find
+            .ancestor(of: find.text('Value'), matching: find.byType(Container))
+            .first,
+      );
+      return (container.alignment! as AlignmentDirectional).resolve(
+        TextDirection.ltr,
+      );
+    }
+
+    testWidgets('a right-aligned column sits its header right', (tester) async {
+      await tester.pumpObers(_table(columns: aligned(TextAlign.end)));
+      await tester.pumpAndSettle();
+
+      expect(alignmentOf(tester), Alignment.centerRight);
+    });
+
+    testWidgets('a default column keeps its header left', (tester) async {
+      await tester.pumpObers(_table(columns: aligned(TextAlign.start)));
+      await tester.pumpAndSettle();
+
+      expect(alignmentOf(tester), Alignment.centerLeft);
+    });
+  });
+
   // ── header tooltip ──────────────────────────────────────────────────────────
 
   group('OiTableColumn tooltip', () {
@@ -3186,7 +3227,9 @@ void main() {
     ];
 
     testWidgets('shows the full wording on hover', (tester) async {
-      await tester.pumpObers(_table(columns: abbreviated(tooltip: 'Employees')));
+      await tester.pumpObers(
+        _table(columns: abbreviated(tooltip: 'Employees')),
+      );
       await tester.pumpAndSettle();
 
       final gesture = await tester.createGesture(kind: PointerDeviceKind.mouse);

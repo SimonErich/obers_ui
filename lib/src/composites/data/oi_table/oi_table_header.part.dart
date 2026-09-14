@@ -128,6 +128,23 @@ extension _OiTableHeader<T> on _OiTableState<T> {
     );
   }
 
+  /// Where a header label sits, given the column's [TextAlign].
+  ///
+  /// Returns a directional alignment so the mapping still reads correctly in
+  /// RTL: `start`/`end` follow the reading direction, and `left`/`right` are
+  /// the two that deliberately do not.
+  AlignmentGeometry _headerAlignment(TextAlign textAlign) {
+    return switch (textAlign) {
+      TextAlign.end => AlignmentDirectional.centerEnd,
+      TextAlign.right => Alignment.centerRight,
+      TextAlign.center => Alignment.center,
+      TextAlign.left => Alignment.centerLeft,
+      // `justify` has no meaning for a single-line label, so it falls in with
+      // the default rather than being given an alignment of its own.
+      TextAlign.start || TextAlign.justify => AlignmentDirectional.centerStart,
+    };
+  }
+
   Widget _buildColumnHeader(OiTableColumn<T> col) {
     final isSorted = _ctrl.sortColumnId == col.id;
     final width = _ctrl.columnWidths[col.id] ?? col.width;
@@ -189,7 +206,17 @@ extension _OiTableHeader<T> on _OiTableState<T> {
       onTap: () => _handleHeaderTap(col),
       child: Container(
         height: _headerRowHeight,
-        alignment: AlignmentDirectional.centerStart,
+        // Follows the column's own alignment, so a right-aligned numeric
+        // column does not read as a left-sitting header over right-sitting
+        // figures.
+        //
+        // This is what moves the header in the ordinary case: the label row
+        // shrink-wraps its text — it has to, so the sort icon sits against the
+        // label rather than at the column edge — which leaves the `textAlign`
+        // passed to the label nothing to align within. That one still applies
+        // when the header is too long for its column and ellipsises, where the
+        // label does fill the available width.
+        alignment: _headerAlignment(col.textAlign),
         child: labelContent,
       ),
     );
