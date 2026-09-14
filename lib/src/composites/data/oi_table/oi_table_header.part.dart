@@ -176,12 +176,21 @@ extension _OiTableHeader<T> on _OiTableState<T> {
     final resolvedWidth = isFlex
         ? null
         : width ?? effectiveMinWidth.clamp(effectiveMinWidth, col.maxWidth);
+    // Wraps the label rather than the whole header cell, so hovering the
+    // resize handle or the drop target does not raise it.
+    final labelContent = col.tooltip == null
+        ? innerContent
+        : OiTooltip(
+            label: col.header,
+            message: col.tooltip!,
+            child: innerContent,
+          );
     final headerContent = GestureDetector(
       onTap: () => _handleHeaderTap(col),
       child: Container(
         height: _headerRowHeight,
         alignment: AlignmentDirectional.centerStart,
-        child: innerContent,
+        child: labelContent,
       ),
     );
     Widget header;
