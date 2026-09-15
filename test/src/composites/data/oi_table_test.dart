@@ -1,9 +1,11 @@
 // Tests do not require documentation comments.
 
+import 'package:flutter/gestures.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui/src/components/buttons/oi_button.dart';
+import 'package:obers_ui/src/components/display/oi_tooltip.dart';
 import 'package:obers_ui/src/components/feedback/oi_bulk_bar.dart';
 import 'package:obers_ui/src/components/panels/oi_resizable.dart';
 import 'package:obers_ui/src/composites/data/oi_pagination_controller.dart';
@@ -3167,6 +3169,88 @@ void main() {
     await tester.sendKeyUpEvent(LogicalKeyboardKey.controlLeft);
     // Only the last clicked row should be selected.
     expect(ctrl.selectedRows, {'Bob'});
+  });
+
+  // ── header alignment ────────────────────────────────────────────────────────
+
+  group('OiTableColumn header alignment', () {
+    List<OiTableColumn<_Row>> aligned(TextAlign textAlign) => [
+      OiTableColumn(
+        id: 'value',
+        header: 'Value',
+        textAlign: textAlign,
+        valueGetter: _valueGetter,
+        filterable: false,
+        resizable: false,
+      ),
+    ];
+
+    /// Where the header label sits inside its own header cell.
+    Alignment alignmentOf(WidgetTester tester) {
+      final container = tester.widget<Container>(
+        find
+            .ancestor(of: find.text('Value'), matching: find.byType(Container))
+            .first,
+      );
+      return (container.alignment! as AlignmentDirectional).resolve(
+        TextDirection.ltr,
+      );
+    }
+
+    testWidgets('a right-aligned column sits its header right', (tester) async {
+      await tester.pumpObers(_table(columns: aligned(TextAlign.end)));
+      await tester.pumpAndSettle();
+
+      expect(alignmentOf(tester), Alignment.centerRight);
+    });
+
+    testWidgets('a default column keeps its header left', (tester) async {
+      await tester.pumpObers(_table(columns: aligned(TextAlign.start)));
+      await tester.pumpAndSettle();
+
+      expect(alignmentOf(tester), Alignment.centerLeft);
+    });
+  });
+
+  // ── header tooltip ──────────────────────────────────────────────────────────
+
+  group('OiTableColumn tooltip', () {
+    List<OiTableColumn<_Row>> abbreviated({String? tooltip}) => [
+      OiTableColumn(
+        id: 'name',
+        header: 'MA',
+        tooltip: tooltip,
+        valueGetter: _nameGetter,
+        filterable: false,
+        resizable: false,
+      ),
+    ];
+
+    testWidgets('shows the full wording on hover', (tester) async {
+      await tester.pumpObers(
+        _table(columns: abbreviated(tooltip: 'Employees')),
+      );
+      await tester.pumpAndSettle();
+
+      final gesture = await tester.createGesture(kind: PointerDeviceKind.mouse);
+      await gesture.addPointer(location: Offset.zero);
+      addTearDown(gesture.removePointer);
+      await gesture.moveTo(tester.getCenter(find.text('MA')));
+      await tester.pumpAndSettle(const Duration(seconds: 1));
+
+      expect(find.text('Employees'), findsOneWidget);
+    });
+
+    testWidgets('renders no tooltip when the column carries none', (
+      tester,
+    ) async {
+      await tester.pumpObers(_table(columns: abbreviated()));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(OiTooltip), findsNothing);
+      // The header itself still renders; only the tooltip is absent.
+      expect(find.text('MA'), findsOneWidget);
+    });
   });
 
   // ── shrinkWrap ──────────────────────────────────────────────────────────────

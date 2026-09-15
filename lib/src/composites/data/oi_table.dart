@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/buttons/oi_button.dart';
 import 'package:obers_ui/src/components/display/oi_pagination.dart';
+import 'package:obers_ui/src/components/display/oi_tooltip.dart';
 import 'package:obers_ui/src/components/feedback/oi_bulk_bar.dart';
 import 'package:obers_ui/src/components/panels/oi_resizable.dart';
 import 'package:obers_ui/src/composites/data/oi_pagination_controller.dart';
@@ -38,6 +39,7 @@ class OiTableColumn<T> {
   const OiTableColumn({
     required this.id,
     required this.header,
+    this.tooltip,
     this.width,
     this.minWidth = 60,
     this.maxWidth = 500,
@@ -58,6 +60,13 @@ class OiTableColumn<T> {
 
   /// Text shown in the column header.
   final String header;
+
+  /// Longer explanation shown on hover or focus of the header.
+  ///
+  /// For a header that has to stay short — an abbreviation, or a narrow numeric
+  /// column — this is where the full wording goes. Null leaves the header with
+  /// no tooltip, which is the default.
+  final String? tooltip;
 
   /// Default width in logical pixels. When `null` the table uses a flex layout.
   final double? width;
