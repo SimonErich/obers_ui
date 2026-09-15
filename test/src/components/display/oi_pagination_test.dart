@@ -558,4 +558,173 @@ void main() {
       handle.dispose();
     });
   });
+
+  group('OiPaginationLabels', () {
+    testWidgets('defaults render the English per-page prefix', (tester) async {
+      await tester.pumpObers(
+        OiPagination(
+          totalItems: 100,
+          currentPage: 0,
+          label: 'items',
+          onPageChange: (_) {},
+          onPerPageChange: (_) {},
+        ),
+        surfaceSize: wide,
+      );
+
+      expect(find.text('Per page:'), findsOneWidget);
+      expect(find.text('1–25 of 100 items'), findsOneWidget);
+    });
+
+    testWidgets('custom perPage replaces the prefix', (tester) async {
+      await tester.pumpObers(
+        OiPagination(
+          totalItems: 100,
+          currentPage: 0,
+          label: 'Zeilen',
+          onPageChange: (_) {},
+          onPerPageChange: (_) {},
+          labels: const OiPaginationLabels(perPage: 'Pro Seite:'),
+        ),
+        surfaceSize: wide,
+      );
+
+      expect(find.text('Pro Seite:'), findsOneWidget);
+      expect(find.text('Per page:'), findsNothing);
+      // The per-page selector itself keeps its key.
+      expect(find.byKey(const Key('oi_pagination_per_page')), findsOneWidget);
+    });
+
+    testWidgets('custom total builds the count label', (tester) async {
+      await tester.pumpObers(
+        OiPagination(
+          totalItems: 100,
+          currentPage: 0,
+          label: 'Zeilen',
+          onPageChange: (_) {},
+          labels: OiPaginationLabels(
+            total: (start, end, total, noun) =>
+                '$start bis $end von $total $noun',
+          ),
+        ),
+        surfaceSize: wide,
+      );
+
+      expect(find.text('1 bis 25 von 100 Zeilen'), findsOneWidget);
+      expect(find.byKey(const Key('oi_pagination_total')), findsOneWidget);
+    });
+
+    testWidgets('custom total is used for the empty state too', (tester) async {
+      await tester.pumpObers(
+        OiPagination(
+          totalItems: 0,
+          currentPage: 0,
+          label: 'Zeilen',
+          labels: OiPaginationLabels(
+            total: (start, end, total, noun) => 'Keine $noun',
+          ),
+        ),
+        surfaceSize: wide,
+      );
+
+      expect(find.text('Keine Zeilen'), findsOneWidget);
+    });
+
+    testWidgets('custom navigation labels reach the semantics tree', (
+      tester,
+    ) async {
+      final handle = tester.ensureSemantics();
+
+      await tester.pumpObers(
+        OiPagination(
+          totalItems: 100,
+          currentPage: 1,
+          label: 'Zeilen',
+          onPageChange: (_) {},
+          labels: const OiPaginationLabels(
+            navigation: 'Seitennavigation',
+            firstPage: 'Erste Seite',
+            previousPage: 'Vorherige Seite',
+            nextPage: 'Nächste Seite',
+            lastPage: 'Letzte Seite',
+          ),
+        ),
+        surfaceSize: wide,
+      );
+
+      expect(
+        find.bySemanticsLabel(RegExp('Seitennavigation')),
+        findsOneWidget,
+      );
+      expect(find.bySemanticsLabel(RegExp('Erste Seite')), findsWidgets);
+      expect(find.bySemanticsLabel(RegExp('Vorherige Seite')), findsWidgets);
+      expect(find.bySemanticsLabel(RegExp('Nächste Seite')), findsWidgets);
+      expect(find.bySemanticsLabel(RegExp('Letzte Seite')), findsWidgets);
+
+      handle.dispose();
+    });
+
+    testWidgets('custom page label reaches the page buttons', (tester) async {
+      final handle = tester.ensureSemantics();
+
+      await tester.pumpObers(
+        OiPagination(
+          totalItems: 75,
+          currentPage: 0,
+          label: 'Zeilen',
+          onPageChange: (_) {},
+          labels: OiPaginationLabels(page: (number) => 'Seite $number'),
+        ),
+        surfaceSize: wide,
+      );
+
+      expect(find.bySemanticsLabel(RegExp('Seite 1')), findsWidgets);
+
+      handle.dispose();
+    });
+
+    testWidgets('compact variant honours custom labels', (tester) async {
+      final handle = tester.ensureSemantics();
+
+      await tester.pumpObers(
+        OiPagination.compact(
+          totalItems: 100,
+          currentPage: 0,
+          label: 'Zeilen',
+          onPageChange: (_) {},
+          labels: const OiPaginationLabels(navigation: 'Seitennavigation'),
+        ),
+      );
+
+      expect(
+        find.bySemanticsLabel(RegExp('Seitennavigation')),
+        findsOneWidget,
+      );
+
+      handle.dispose();
+    });
+
+    testWidgets('loadMore variant honours custom labels', (tester) async {
+      await tester.pumpObers(
+        OiPagination.loadMore(
+          loadedCount: 25,
+          totalItems: 100,
+          label: 'Zeilen',
+          onLoadMore: () {},
+          labels: OiPaginationLabels(
+            loadMore: 'Mehr laden',
+            loadedProgress: (loaded, total, noun) =>
+                '$loaded von $total $noun geladen',
+          ),
+        ),
+      );
+
+      expect(find.text('Mehr laden'), findsOneWidget);
+      expect(find.text('25 von 100 Zeilen geladen'), findsOneWidget);
+      expect(
+        find.byKey(const Key('oi_pagination_load_more')),
+        findsOneWidget,
+      );
+    });
+  });
 }

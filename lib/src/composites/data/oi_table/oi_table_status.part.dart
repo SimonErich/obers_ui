@@ -16,7 +16,7 @@ extension _OiTableStatus<T> on _OiTableState<T> {
         child: OiBulkBar(
           selectedCount: selectedCount,
           totalCount: totalCount,
-          label: 'rows',
+          label: widget.labels.rows,
           actions: widget.bulkActions!,
           allSelected: _ctrl.selectAll,
           onSelectAll: () {
@@ -46,6 +46,7 @@ extension _OiTableStatus<T> on _OiTableState<T> {
     return _PaginationBar(
       key: const Key('oi_table_pagination'),
       pagination: _ctrl.pagination,
+      labels: widget.labels,
       pageSizeOptions: widget.pageSizeOptions,
       onPageSizeChanged: widget.onPageSizeChanged,
     );
@@ -56,6 +57,7 @@ extension _OiTableStatus<T> on _OiTableState<T> {
   Widget _buildStatusBar() {
     final totalShown = _displayRows.length;
     final selected = _ctrl.selectedRows.length;
+    final labels = widget.labels;
     return ColoredBox(
       key: const Key('oi_table_status_bar'),
       color: context.colors.surfaceSubtle,
@@ -64,13 +66,13 @@ extension _OiTableStatus<T> on _OiTableState<T> {
         child: Row(
           children: [
             Text(
-              '$totalShown rows',
+              labels.rowCount?.call(totalShown) ?? '$totalShown ${labels.rows}',
               style: TextStyle(color: context.colors.textMuted),
             ),
             if (selected > 0) ...[
               const SizedBox(width: 16),
               Text(
-                '$selected selected',
+                labels.selectedCount?.call(selected) ?? '$selected selected',
                 style: TextStyle(color: context.colors.textMuted),
               ),
             ],

@@ -111,6 +111,68 @@ class OiTableColumn<T> {
   final TextAlign textAlign;
 }
 
+// ── Labels ────────────────────────────────────────────────────────────────────
+
+/// User-visible strings for [OiTable]'s chrome — the pagination footer, the
+/// status bar, the bulk bar, and the column manager.
+///
+/// Every field defaults to the English text [OiTable] has always shown, so
+/// omitting this object changes nothing. Supply a localized instance to
+/// translate the table chrome — the app's own l10n system owns the
+/// translations, this package only accepts finished strings.
+///
+/// The count-bearing strings are callbacks rather than plain text so that a
+/// consumer can pluralize correctly for its locale (`1 Zeile` / `2 Zeilen`).
+///
+/// ```dart
+/// OiTable<Person>(
+///   label: 'Mitarbeiterabrechnung',
+///   rows: people,
+///   columns: columns,
+///   labels: OiTableLabels(
+///     rows: 'Zeilen',
+///     pagination: OiPaginationLabels(perPage: 'Pro Seite:'),
+///     rowCount: (count) => count == 1 ? '1 Zeile' : '$count Zeilen',
+///     selectedCount: (count) => '$count ausgewählt',
+///   ),
+/// )
+/// ```
+///
+/// {@category Composites}
+@immutable
+class OiTableLabels {
+  /// Creates an [OiTableLabels].
+  const OiTableLabels({
+    this.rows = 'rows',
+    this.pagination = const OiPaginationLabels(),
+    this.rowCount,
+    this.selectedCount,
+    this.columns = 'Columns',
+    this.manageColumns = 'Manage visible columns',
+  });
+
+  /// Noun for the items being paginated, used by the pagination footer's total
+  /// (`1–3 of 3 rows`) and by the bulk bar (`2 of 3 rows selected`).
+  final String rows;
+
+  /// Strings for the pagination footer, including its `Per page:` prefix and
+  /// the accessible labels of its navigation buttons.
+  final OiPaginationLabels pagination;
+
+  /// Builds the status bar's row count. Defaults to `'$count rows'`, using
+  /// [rows] as the noun.
+  final String Function(int count)? rowCount;
+
+  /// Builds the status bar's selection count. Defaults to `'$count selected'`.
+  final String Function(int count)? selectedCount;
+
+  /// Label of the column manager button.
+  final String columns;
+
+  /// Accessible label of the column manager button.
+  final String manageColumns;
+}
+
 // ── Pagination mode ───────────────────────────────────────────────────────────
 
 /// Controls how [OiTable] handles pagination.
@@ -200,6 +262,7 @@ class OiTable<T> extends StatefulWidget {
     this.bulkActions,
     this.settingsSaveDebounce = const Duration(milliseconds: 500),
     this.shrinkWrap = false,
+    this.labels = const OiTableLabels(),
     super.key,
   }) : assert(
          !shrinkWrap ||
@@ -213,7 +276,16 @@ class OiTable<T> extends StatefulWidget {
   // ── Accessibility ────────────────────────────────────────────────────────
 
   /// Accessible label describing the table for screen readers.
+  ///
+  /// This is the table's description, not a noun for its rows — to translate
+  /// the footer and status bar, use [labels].
   final String label;
+
+  // ── Labels ────────────────────────────────────────────────────────────────
+
+  /// User-visible strings for the pagination footer, status bar, bulk bar and
+  /// column manager. Defaults to English.
+  final OiTableLabels labels;
 
   // ── Data ──────────────────────────────────────────────────────────────────
 
