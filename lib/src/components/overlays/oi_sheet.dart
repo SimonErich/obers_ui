@@ -93,9 +93,9 @@ class OiSheet extends StatefulWidget {
   ///
   /// Pass `false` for a touch-first sheet of tappable rows, where an automatic
   /// focus ring on the first row reads as a selection the user did not make.
-  /// Focus is still trapped inside the sheet, Escape still closes it, and
-  /// keyboard users can Tab into the content — the trap simply does not move
-  /// focus on its own.
+  /// The trap then holds focus on its own scope rather than on a descendant,
+  /// so nothing is highlighted while Escape still closes the sheet and Tab
+  /// still moves into the content.
   final bool initialFocus;
 
   /// Shows a sheet above the current widget tree.

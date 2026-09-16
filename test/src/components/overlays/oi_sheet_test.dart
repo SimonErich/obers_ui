@@ -204,7 +204,9 @@ void main() {
     // sheet must be mounted *after* focus is established elsewhere —
     // otherwise the outside node grabs focus after the trap already ran and
     // the assertion would hold regardless of initialFocus.
-    testWidgets('false leaves focus where it was', (tester) async {
+    testWidgets('false highlights nothing, and restores focus on close', (
+      tester,
+    ) async {
       final outside = FocusNode(debugLabel: 'outside');
       final inside = FocusNode(debugLabel: 'inside');
       addTearDown(outside.dispose);
@@ -240,11 +242,18 @@ void main() {
       await tester.pumpAndSettle();
       expect(outside.hasPrimaryFocus, isTrue);
 
-      // Now open the sheet: the trap must not pull focus off `outside`.
+      // Opening the sheet must not highlight anything inside it. Focus does
+      // move onto the trap's own scope — it has to, or Escape would be dead —
+      // but no descendant is focused, so no row shows a ring.
       showSheet.value = true;
       await tester.pumpAndSettle();
 
       expect(inside.hasFocus, isFalse);
+
+      // Closing restores focus to where it was before the sheet opened.
+      showSheet.value = false;
+      await tester.pumpAndSettle();
+
       expect(outside.hasPrimaryFocus, isTrue);
     });
 
@@ -312,11 +321,45 @@ void main() {
       await tester.pumpAndSettle();
       expect(node.hasFocus, isFalse);
 
-      // Keyboard users must still be able to reach the content.
-      node.requestFocus();
+      // Keyboard users must still be able to reach the content — pressing Tab,
+      // not calling requestFocus(), which would prove nothing about the trap.
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
       await tester.pumpAndSettle();
 
-      expect(node.hasFocus, isTrue);
+      expect(node.hasPrimaryFocus, isTrue);
+    });
+
+    testWidgets('false puts no focus ring on any row', (tester) async {
+      final first = FocusNode(debugLabel: 'first');
+      final second = FocusNode(debugLabel: 'second');
+      addTearDown(first.dispose);
+      addTearDown(second.dispose);
+
+      await tester.pumpObers(
+        OiSheet(
+          label: 'sheet',
+          open: true,
+          initialFocus: false,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Focus(
+                focusNode: first,
+                child: const SizedBox(width: 40, height: 40),
+              ),
+              Focus(
+                focusNode: second,
+                child: const SizedBox(width: 40, height: 40),
+              ),
+            ],
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // The trap holds focus on its own scope, so no row is highlighted.
+      expect(first.hasPrimaryFocus, isFalse);
+      expect(second.hasPrimaryFocus, isFalse);
     });
 
     testWidgets('Escape still closes when initialFocus is true', (
@@ -367,14 +410,16 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // Focus something inside the scope so key events flow through the trap.
-      node.requestFocus();
-      await tester.pumpAndSettle();
-
+      // No requestFocus() here on purpose: this is the motivating case — the
+      // picker opens on a touch device, nothing inside is focused, and the
+      // user hits Escape. The trap focuses its own scope so key events still
+      // reach it.
       await tester.sendKeyEvent(LogicalKeyboardKey.escape);
       await tester.pumpAndSettle();
 
       expect(closed, isTrue);
+      // ...and it closed without ever putting a ring on the content.
+      expect(node.hasPrimaryFocus, isFalse);
     });
   });
 }
