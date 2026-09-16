@@ -490,7 +490,7 @@ class _OiPaginationState extends State<OiPagination> {
                 _buildNavButton(
                   key: const Key('oi_pagination_first'),
                   icon: OiIcons.chevronsLeft,
-                  label: 'First page',
+                  label: widget.labels.firstPage,
                   enabled: _hasPrev,
                   onTap: () => widget.onPageChange?.call(0),
                   colors: colors,
@@ -498,7 +498,7 @@ class _OiPaginationState extends State<OiPagination> {
               _buildNavButton(
                 key: const Key('oi_pagination_prev'),
                 icon: OiIcons.chevronLeft,
-                label: 'Previous page',
+                label: widget.labels.previousPage,
                 enabled: _hasPrev,
                 onTap: () => widget.onPageChange?.call(_clampedPage - 1),
                 colors: colors,
@@ -513,7 +513,7 @@ class _OiPaginationState extends State<OiPagination> {
               _buildNavButton(
                 key: const Key('oi_pagination_next'),
                 icon: OiIcons.chevronRight,
-                label: 'Next page',
+                label: widget.labels.nextPage,
                 enabled: _hasNext,
                 onTap: () => widget.onPageChange?.call(_clampedPage + 1),
                 colors: colors,
@@ -522,7 +522,7 @@ class _OiPaginationState extends State<OiPagination> {
                 _buildNavButton(
                   key: const Key('oi_pagination_last'),
                   icon: OiIcons.chevronsRight,
-                  label: 'Last page',
+                  label: widget.labels.lastPage,
                   enabled: _hasNext,
                   onTap: () => widget.onPageChange?.call(_totalPages - 1),
                   colors: colors,

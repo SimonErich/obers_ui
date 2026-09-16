@@ -661,6 +661,12 @@ void main() {
       expect(find.bySemanticsLabel(RegExp('Nächste Seite')), findsWidgets);
       expect(find.bySemanticsLabel(RegExp('Letzte Seite')), findsWidgets);
 
+      // No English survives — a missed substitution would show up here.
+      expect(find.bySemanticsLabel(RegExp('First page')), findsNothing);
+      expect(find.bySemanticsLabel(RegExp('Previous page')), findsNothing);
+      expect(find.bySemanticsLabel(RegExp('Next page')), findsNothing);
+      expect(find.bySemanticsLabel(RegExp('Last page')), findsNothing);
+
       handle.dispose();
     });
 
@@ -688,18 +694,34 @@ void main() {
 
       await tester.pumpObers(
         OiPagination.compact(
+          // currentPage 1 of 4 so prev/next and first/last are all enabled —
+          // a disabled nav button would not surface its label.
           totalItems: 100,
-          currentPage: 0,
+          currentPage: 1,
           label: 'Zeilen',
           onPageChange: (_) {},
-          labels: const OiPaginationLabels(navigation: 'Seitennavigation'),
+          labels: const OiPaginationLabels(
+            navigation: 'Seitennavigation',
+            firstPage: 'Erste Seite',
+            previousPage: 'Vorherige Seite',
+            nextPage: 'Nächste Seite',
+            lastPage: 'Letzte Seite',
+          ),
         ),
       );
 
-      expect(
-        find.bySemanticsLabel(RegExp('Seitennavigation')),
-        findsOneWidget,
-      );
+      expect(find.bySemanticsLabel(RegExp('Seitennavigation')), findsOneWidget);
+
+      // The four nav buttons must be localized too, not just the container.
+      expect(find.bySemanticsLabel(RegExp('Erste Seite')), findsWidgets);
+      expect(find.bySemanticsLabel(RegExp('Vorherige Seite')), findsWidgets);
+      expect(find.bySemanticsLabel(RegExp('Nächste Seite')), findsWidgets);
+      expect(find.bySemanticsLabel(RegExp('Letzte Seite')), findsWidgets);
+
+      expect(find.bySemanticsLabel(RegExp('First page')), findsNothing);
+      expect(find.bySemanticsLabel(RegExp('Previous page')), findsNothing);
+      expect(find.bySemanticsLabel(RegExp('Next page')), findsNothing);
+      expect(find.bySemanticsLabel(RegExp('Last page')), findsNothing);
 
       handle.dispose();
     });
