@@ -56,6 +56,65 @@ class OiBulkAction {
   final String? confirmLabel;
 }
 
+// ── Labels ────────────────────────────────────────────────────────────────────
+
+/// User-visible strings for [OiBulkBar].
+///
+/// Every field defaults to the English text [OiBulkBar] has always shown, so
+/// omitting this object changes nothing. Supply a localized instance to
+/// translate the bar — the app's own l10n system owns the translations, this
+/// package only accepts finished strings.
+///
+/// The count-bearing string is a callback rather than a format string so that
+/// a consumer can pluralize and order the words for its locale.
+///
+/// ```dart
+/// OiBulkBarLabels(
+///   selectAll: 'Alle auswählen',
+///   deselectAll: 'Auswahl aufheben',
+///   selectionCount: (selected, total, noun) =>
+///       '$selected von $total $noun ausgewählt',
+///   confirmAction: (action) => '$action bestätigen',
+///   bulkActions: (noun) => 'Massenaktionen für $noun',
+/// )
+/// ```
+///
+/// {@category Components}
+@immutable
+class OiBulkBarLabels {
+  /// Creates an [OiBulkBarLabels].
+  const OiBulkBarLabels({
+    this.selectAll = 'Select all',
+    this.deselectAll = 'Deselect all',
+    this.selectionCount,
+    this.confirmAction,
+    this.bulkActions,
+  });
+
+  /// Label of the select-all checkbox when not everything is selected.
+  final String selectAll;
+
+  /// Label of the select-all checkbox when everything is selected.
+  final String deselectAll;
+
+  /// Builds the selection-count sentence. Receives the selected count, the
+  /// total, and the item noun ([OiBulkBar.label]).
+  ///
+  /// Defaults to `'3 of 10 items selected'`.
+  final String Function(int selected, int total, String itemLabel)?
+  selectionCount;
+
+  /// Builds the confirmation label for a two-press action. Receives the
+  /// action's own label. Defaults to `'Confirm Delete'`.
+  ///
+  /// An [OiBulkAction.confirmLabel] set on the action itself wins over this.
+  final String Function(String actionLabel)? confirmAction;
+
+  /// Builds the bar's accessible label. Receives the item noun
+  /// ([OiBulkBar.label]). Defaults to `'items bulk actions'`.
+  final String Function(String itemLabel)? bulkActions;
+}
+
 /// A floating toolbar that appears when items are selected in a list or table.
 ///
 /// Slides in from the bottom when [selectedCount] >= 1. Displays the selection
@@ -97,6 +156,7 @@ class OiBulkBar extends StatefulWidget {
     this.onSelectAll,
     this.onDeselectAll,
     this.allSelected = false,
+    this.labels = const OiBulkBarLabels(),
     super.key,
   });
 
@@ -120,6 +180,9 @@ class OiBulkBar extends StatefulWidget {
 
   /// Whether all items are currently selected.
   final bool allSelected;
+
+  /// User-visible strings. Defaults to English.
+  final OiBulkBarLabels labels;
 
   @override
   State<OiBulkBar> createState() => _OiBulkBarState();
@@ -207,14 +270,21 @@ class _OiBulkBarState extends State<OiBulkBar>
           widget.onSelectAll?.call();
         }
       },
-      label: widget.allSelected ? 'Deselect all' : 'Select all',
+      label: widget.allSelected
+          ? widget.labels.deselectAll
+          : widget.labels.selectAll,
       labelStyle: _labelStyle(context),
     );
   }
 
   Widget _buildCountLabel(BuildContext context) {
     return Text(
-      '$_clampedCount of ${widget.totalCount} ${widget.label} selected',
+      widget.labels.selectionCount?.call(
+            _clampedCount,
+            widget.totalCount,
+            widget.label,
+          ) ??
+          '$_clampedCount of ${widget.totalCount} ${widget.label} selected',
       style: _labelStyle(context),
     );
   }
@@ -223,7 +293,10 @@ class _OiBulkBarState extends State<OiBulkBar>
     if (action.confirm) {
       return OiButton.confirm(
         label: action.label,
-        confirmLabel: action.confirmLabel ?? 'Confirm ${action.label}',
+        confirmLabel:
+            action.confirmLabel ??
+            widget.labels.confirmAction?.call(action.label) ??
+            'Confirm ${action.label}',
         onConfirm: action.onTap,
         variant: action.variant == OiBulkActionVariant.destructive
             ? OiButtonVariant.destructive
@@ -277,7 +350,9 @@ class _OiBulkBarState extends State<OiBulkBar>
     return SlideTransition(
       position: _slideAnimation,
       child: Semantics(
-        label: '${widget.label} bulk actions',
+        label:
+            widget.labels.bulkActions?.call(widget.label) ??
+            '${widget.label} bulk actions',
         container: true,
         explicitChildNodes: true,
         child: OiSurface(

@@ -145,6 +145,7 @@ class OiTableLabels {
   const OiTableLabels({
     this.rows = 'rows',
     this.pagination = const OiPaginationLabels(),
+    this.bulkBar = const OiBulkBarLabels(),
     this.rowCount,
     this.selectedCount,
     this.columns = 'Columns',
@@ -158,6 +159,11 @@ class OiTableLabels {
   /// Strings for the pagination footer, including its `Per page:` prefix and
   /// the accessible labels of its navigation buttons.
   final OiPaginationLabels pagination;
+
+  /// Strings for the bulk bar shown when rows are selected — its select-all
+  /// toggle, selection count, action confirmation prefix, and accessible
+  /// label. [rows] supplies the item noun the defaults build on.
+  final OiBulkBarLabels bulkBar;
 
   /// Builds the status bar's row count. Defaults to `'$count rows'`, using
   /// [rows] as the noun.

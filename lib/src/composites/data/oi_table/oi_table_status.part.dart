@@ -17,6 +17,7 @@ extension _OiTableStatus<T> on _OiTableState<T> {
           selectedCount: selectedCount,
           totalCount: totalCount,
           label: widget.labels.rows,
+          labels: widget.labels.bulkBar,
           actions: widget.bulkActions!,
           allSelected: _ctrl.selectAll,
           onSelectAll: () {

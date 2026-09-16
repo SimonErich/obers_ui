@@ -3621,7 +3621,37 @@ void main() {
       );
       await tester.pumpAndSettle();
 
+      // The noun alone only reaches the default English sentence.
       expect(find.text('1 of 3 Zeilen selected'), findsOneWidget);
+    });
+
+    testWidgets('bulkBar labels translate the whole bar', (tester) async {
+      final ctrl = OiTableController(totalRows: _rows.length)
+        ..selectRow('Alice');
+      await tester.pumpObers(
+        _table(
+          controller: ctrl,
+          selectable: true,
+          rowKey: (r) => r.name,
+          bulkActions: [
+            OiBulkAction(label: 'Löschen', icon: OiIcons.trash2, onTap: () {}),
+          ],
+          labels: OiTableLabels(
+            rows: 'Zeilen',
+            bulkBar: OiBulkBarLabels(
+              selectAll: 'Alle auswählen',
+              selectionCount: (selected, total, noun) =>
+                  '$selected von $total $noun ausgewählt',
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('1 von 3 Zeilen ausgewählt'), findsOneWidget);
+      expect(find.text('Alle auswählen'), findsOneWidget);
+      expect(find.text('1 of 3 Zeilen selected'), findsNothing);
+      expect(find.text('Select all'), findsNothing);
     });
 
     testWidgets('column manager labels are used', (tester) async {
