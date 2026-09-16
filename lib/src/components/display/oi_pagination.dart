@@ -11,6 +11,97 @@ import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/primitives/display/oi_icon.dart';
 import 'package:obers_ui/src/primitives/display/oi_label.dart';
 
+// ── Labels ────────────────────────────────────────────────────────────────────
+
+/// User-visible strings for [OiPagination].
+///
+/// Every field defaults to the English text [OiPagination] has always shown,
+/// so omitting this object changes nothing. Supply a localized instance to
+/// translate the control — the app's own l10n system owns the translations,
+/// this package only accepts finished strings.
+///
+/// ```dart
+/// OiPagination(
+///   totalItems: 42,
+///   currentPage: 0,
+///   label: 'Zeilen',
+///   labels: OiPaginationLabels(
+///     perPage: 'Pro Seite:',
+///     navigation: 'Seitennavigation',
+///     firstPage: 'Erste Seite',
+///     previousPage: 'Vorherige Seite',
+///     nextPage: 'Nächste Seite',
+///     lastPage: 'Letzte Seite',
+///     loadMore: 'Mehr laden',
+///   ),
+/// )
+/// ```
+///
+/// {@category Components}
+@immutable
+class OiPaginationLabels {
+  /// Creates an [OiPaginationLabels].
+  const OiPaginationLabels({
+    this.perPage = 'Per page:',
+    this.navigation = 'Pagination navigation',
+    this.firstPage = 'First page',
+    this.previousPage = 'Previous page',
+    this.nextPage = 'Next page',
+    this.lastPage = 'Last page',
+    this.loadMore = 'Load more',
+    this.page,
+    this.total,
+    this.loadedProgress,
+  });
+
+  /// Prefix shown before the per-page size selector.
+  final String perPage;
+
+  /// Accessible label announced for the pagination container.
+  final String navigation;
+
+  /// Accessible label for the first-page button.
+  final String firstPage;
+
+  /// Accessible label for the previous-page button.
+  final String previousPage;
+
+  /// Accessible label for the next-page button.
+  final String nextPage;
+
+  /// Accessible label for the last-page button.
+  final String lastPage;
+
+  /// Label of the load-more button in [OiPagination.loadMore].
+  final String loadMore;
+
+  /// Builds the accessible label for a single page button. Receives the
+  /// one-based page number. Defaults to `'Page 1'`.
+  final String Function(int pageNumber)? page;
+
+  /// Builds the total-count label. Receives the one-based first and last item
+  /// index on the current page, the total item count, and the item noun
+  /// ([OiPagination.label]).
+  ///
+  /// Defaults to `'1–25 of 100 rows'`, or `'0 rows'` when there are no items —
+  /// in which case the first and last index are both `0`.
+  final String Function(
+    int start,
+    int end,
+    int totalItems,
+    String itemLabel,
+  )?
+  total;
+
+  /// Builds the progress label above the load-more button. Receives the number
+  /// of items loaded so far, the total, and the item noun
+  /// ([OiPagination.label]).
+  ///
+  /// Defaults to `'25 of 100 rows loaded'`.
+  final String Function(int loadedCount, int totalItems, String itemLabel)?
+  loadedProgress;
+}
+
 /// Visual variant for [OiPagination].
 ///
 /// {@category Components}
@@ -51,6 +142,7 @@ class OiPagination extends StatefulWidget {
     this.showFirstLast = true,
     this.siblingCount = 1,
     this.variant = OiPaginationVariant.pages,
+    this.labels = const OiPaginationLabels(),
     super.key,
   }) : _isLoadMore = false,
        _loadedCount = 0,
@@ -65,6 +157,7 @@ class OiPagination extends StatefulWidget {
     this.perPage = 25,
     this.onPageChange,
     this.showFirstLast = true,
+    this.labels = const OiPaginationLabels(),
     super.key,
   }) : variant = OiPaginationVariant.compact,
        perPageOptions = const [10, 25, 50, 100],
@@ -88,6 +181,7 @@ class OiPagination extends StatefulWidget {
     required this.label,
     VoidCallback? onLoadMore,
     bool loading = false,
+    this.labels = const OiPaginationLabels(),
     super.key,
   }) : _isLoadMore = true,
        _loadedCount = loadedCount,
@@ -139,6 +233,9 @@ class OiPagination extends StatefulWidget {
 
   /// The visual variant.
   final OiPaginationVariant variant;
+
+  /// User-visible strings. Defaults to English.
+  final OiPaginationLabels labels;
 
   final bool _isLoadMore;
   final int _loadedCount;
@@ -262,7 +359,7 @@ class _OiPaginationState extends State<OiPagination> {
     );
 
     return Semantics(
-      label: 'Pagination navigation',
+      label: widget.labels.navigation,
       container: true,
       child: Focus(
         focusNode: _focusNode,
@@ -283,7 +380,7 @@ class _OiPaginationState extends State<OiPagination> {
                     _buildNavButton(
                       key: const Key('oi_pagination_first'),
                       icon: OiIcons.chevronsLeft,
-                      label: 'First page',
+                      label: widget.labels.firstPage,
                       enabled: _hasPrev,
                       onTap: () => widget.onPageChange?.call(0),
                       colors: colors,
@@ -291,7 +388,7 @@ class _OiPaginationState extends State<OiPagination> {
                   _buildNavButton(
                     key: const Key('oi_pagination_prev'),
                     icon: OiIcons.chevronLeft,
-                    label: 'Previous page',
+                    label: widget.labels.previousPage,
                     enabled: _hasPrev,
                     onTap: () => widget.onPageChange?.call(_clampedPage - 1),
                     colors: colors,
@@ -308,7 +405,7 @@ class _OiPaginationState extends State<OiPagination> {
                   _buildNavButton(
                     key: const Key('oi_pagination_next'),
                     icon: OiIcons.chevronRight,
-                    label: 'Next page',
+                    label: widget.labels.nextPage,
                     enabled: _hasNext,
                     onTap: () => widget.onPageChange?.call(_clampedPage + 1),
                     colors: colors,
@@ -317,7 +414,7 @@ class _OiPaginationState extends State<OiPagination> {
                     _buildNavButton(
                       key: const Key('oi_pagination_last'),
                       icon: OiIcons.chevronsRight,
-                      label: 'Last page',
+                      label: widget.labels.lastPage,
                       enabled: _hasNext,
                       onTap: () => widget.onPageChange?.call(_totalPages - 1),
                       colors: colors,
@@ -379,7 +476,7 @@ class _OiPaginationState extends State<OiPagination> {
     final displayPage = _totalPages == 0 ? 0 : _clampedPage + 1;
 
     return Semantics(
-      label: 'Pagination navigation',
+      label: widget.labels.navigation,
       container: true,
       child: Focus(
         focusNode: _focusNode,
@@ -393,7 +490,7 @@ class _OiPaginationState extends State<OiPagination> {
                 _buildNavButton(
                   key: const Key('oi_pagination_first'),
                   icon: OiIcons.chevronsLeft,
-                  label: 'First page',
+                  label: widget.labels.firstPage,
                   enabled: _hasPrev,
                   onTap: () => widget.onPageChange?.call(0),
                   colors: colors,
@@ -401,7 +498,7 @@ class _OiPaginationState extends State<OiPagination> {
               _buildNavButton(
                 key: const Key('oi_pagination_prev'),
                 icon: OiIcons.chevronLeft,
-                label: 'Previous page',
+                label: widget.labels.previousPage,
                 enabled: _hasPrev,
                 onTap: () => widget.onPageChange?.call(_clampedPage - 1),
                 colors: colors,
@@ -416,7 +513,7 @@ class _OiPaginationState extends State<OiPagination> {
               _buildNavButton(
                 key: const Key('oi_pagination_next'),
                 icon: OiIcons.chevronRight,
-                label: 'Next page',
+                label: widget.labels.nextPage,
                 enabled: _hasNext,
                 onTap: () => widget.onPageChange?.call(_clampedPage + 1),
                 colors: colors,
@@ -425,7 +522,7 @@ class _OiPaginationState extends State<OiPagination> {
                 _buildNavButton(
                   key: const Key('oi_pagination_last'),
                   icon: OiIcons.chevronsRight,
-                  label: 'Last page',
+                  label: widget.labels.lastPage,
                   enabled: _hasNext,
                   onTap: () => widget.onPageChange?.call(_totalPages - 1),
                   colors: colors,
@@ -443,7 +540,7 @@ class _OiPaginationState extends State<OiPagination> {
     }
 
     return Semantics(
-      label: 'Pagination navigation',
+      label: widget.labels.navigation,
       container: true,
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 8),
@@ -451,7 +548,13 @@ class _OiPaginationState extends State<OiPagination> {
           mainAxisSize: MainAxisSize.min,
           children: [
             OiLabel.small(
-              '${widget._loadedCount} of ${widget.totalItems} ${widget.label} loaded',
+              widget.labels.loadedProgress?.call(
+                    widget._loadedCount,
+                    widget.totalItems,
+                    widget.label,
+                  ) ??
+                  '${widget._loadedCount} of ${widget.totalItems} '
+                      '${widget.label} loaded',
             ),
             const SizedBox(height: 8),
             Center(
@@ -459,7 +562,7 @@ class _OiPaginationState extends State<OiPagination> {
                 constraints: const BoxConstraints(maxWidth: 150),
                 child: OiButton.outline(
                   key: const Key('oi_pagination_load_more'),
-                  label: 'Load more',
+                  label: widget.labels.loadMore,
                   fullWidth: true,
                   loading: widget._loading,
                   onTap: widget._loading ? null : widget._onLoadMore,
@@ -498,7 +601,7 @@ class _OiPaginationState extends State<OiPagination> {
     final hasBackground = isCurrent || isHovered;
     return Semantics(
       button: true,
-      label: 'Page ${page + 1}',
+      label: widget.labels.page?.call(page + 1) ?? 'Page ${page + 1}',
       selected: isCurrent,
       child: Focus(
         child: MouseRegion(
@@ -543,7 +646,7 @@ class _OiPaginationState extends State<OiPagination> {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        const OiLabel.small('Per page:'),
+        OiLabel.small(widget.labels.perPage),
         const SizedBox(width: 4),
         SizedBox(
           width: 80,
@@ -565,9 +668,11 @@ class _OiPaginationState extends State<OiPagination> {
 
   Widget _buildTotalLabel() {
     final itemLabel = widget.label;
+    final build = widget.labels.total;
+
     if (widget.totalItems == 0) {
       return OiLabel.small(
-        '0 $itemLabel',
+        build?.call(0, 0, 0, itemLabel) ?? '0 $itemLabel',
         key: const Key('oi_pagination_total'),
         overflow: TextOverflow.ellipsis,
       );
@@ -579,7 +684,8 @@ class _OiPaginationState extends State<OiPagination> {
       widget.totalItems,
     );
     return OiLabel.small(
-      '$start\u2013$end of ${widget.totalItems} $itemLabel',
+      build?.call(start, end, widget.totalItems, itemLabel) ??
+          '$start\u2013$end of ${widget.totalItems} $itemLabel',
       key: const Key('oi_pagination_total'),
       overflow: TextOverflow.ellipsis,
     );

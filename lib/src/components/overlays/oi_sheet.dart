@@ -28,7 +28,9 @@ enum OiPanelSide {
 /// back off screen. A semi-transparent scrim is placed behind the sheet; when
 /// [dismissible] is `true`, tapping the scrim calls [onClose].
 ///
-/// [OiFocusTrap] keeps keyboard focus inside the sheet while it is open.
+/// [OiFocusTrap] keeps keyboard focus inside the sheet while it is open. By
+/// default the first focusable descendant is focused on open; set
+/// [initialFocus] to `false` to leave focus where it was.
 /// When [dragHandle] is `true` a pill-shaped handle is rendered along the
 /// near edge of the panel.
 ///
@@ -51,6 +53,7 @@ class OiSheet extends StatefulWidget {
     this.dismissible = true,
     this.dragHandle = false,
     this.snapPoints,
+    this.initialFocus = true,
     super.key,
   });
 
@@ -85,6 +88,16 @@ class OiSheet extends StatefulWidget {
   /// a drag ends. Dragging past the lowest snap point closes the sheet.
   final List<double>? snapPoints;
 
+  /// Whether the first focusable descendant receives focus when the sheet
+  /// opens. Defaults to `true`.
+  ///
+  /// Pass `false` for a touch-first sheet of tappable rows, where an automatic
+  /// focus ring on the first row reads as a selection the user did not make.
+  /// The trap then holds focus on its own scope rather than on a descendant,
+  /// so nothing is highlighted while Escape still closes the sheet and Tab
+  /// still moves into the content.
+  final bool initialFocus;
+
   /// Shows a sheet above the current widget tree.
   ///
   /// Uses [OiOverlays.of] when available; otherwise falls back to the raw
@@ -98,6 +111,7 @@ class OiSheet extends StatefulWidget {
     bool dismissible = true,
     bool dragHandle = false,
     List<double>? snapPoints,
+    bool initialFocus = true,
     VoidCallback? onClose,
   }) {
     final service = OiOverlays.maybeOf(context);
@@ -116,6 +130,7 @@ class OiSheet extends StatefulWidget {
           dismissible: dismissible,
           dragHandle: dragHandle,
           snapPoints: snapPoints,
+          initialFocus: initialFocus,
           onClose: () {
             onClose?.call();
             handle.dismiss();
@@ -139,6 +154,7 @@ class OiSheet extends StatefulWidget {
         dismissible: dismissible,
         dragHandle: dragHandle,
         snapPoints: snapPoints,
+        initialFocus: initialFocus,
         onClose: () {
           onClose?.call();
           entry
@@ -168,6 +184,7 @@ class OiSheet extends StatefulWidget {
     bool dismissible = true,
     bool dragHandle = false,
     List<double>? snapPoints,
+    bool initialFocus = true,
   }) async {
     final completer = Completer<T?>();
     late OiOverlayHandle handle;
@@ -197,6 +214,7 @@ class OiSheet extends StatefulWidget {
           dismissible: dismissible,
           dragHandle: dragHandle,
           snapPoints: snapPoints,
+          initialFocus: initialFocus,
           onClose: close,
           child: builder(close),
         ),
@@ -213,6 +231,7 @@ class OiSheet extends StatefulWidget {
           dismissible: dismissible,
           dragHandle: dragHandle,
           snapPoints: snapPoints,
+          initialFocus: initialFocus,
           onClose: () {
             close();
             entry
@@ -424,6 +443,7 @@ class _OiSheetState extends State<OiSheet> with SingleTickerProviderStateMixin {
     }
 
     panel = OiFocusTrap(
+      initialFocus: widget.initialFocus,
       onEscape: _animateClose,
       child: SlideTransition(position: slideAnim, child: panel),
     );

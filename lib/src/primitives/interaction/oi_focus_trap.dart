@@ -16,7 +16,9 @@ import 'package:flutter/widgets.dart';
 /// - `Escape` — calls [onEscape] when provided.
 /// - Android back button — calls [onEscape] when provided (via [PopScope]).
 /// - [initialFocus] — when `true` (the default), the first focusable element
-///   inside the scope receives focus after the first frame.
+///   inside the scope receives focus after the first frame. When `false`, the
+///   scope itself takes focus instead: no descendant is highlighted, but key
+///   events still reach the trap so Escape and Tab keep working.
 /// - [restoreFocus] — when `true` (the default), the widget that held focus
 ///   before the trap was built regains it when the trap is disposed.
 ///
@@ -36,6 +38,10 @@ class OiFocusTrap extends StatefulWidget {
 
   /// Whether the first focusable descendant should receive focus automatically
   /// after the first frame.
+  ///
+  /// When `false` the trap focuses its own scope node instead of a descendant.
+  /// The scope must hold focus for [FocusScope.onKeyEvent] to fire at all, so
+  /// leaving focus outside the trap entirely would make Escape and Tab dead.
   final bool initialFocus;
 
   /// Whether the widget that held focus before this trap was built should
@@ -64,14 +70,18 @@ class _OiFocusTrapState extends State<OiFocusTrap> {
       _previousFocus = FocusManager.instance.primaryFocus;
     }
 
-    if (widget.initialFocus) {
-      SchedulerBinding.instance.addPostFrameCallback((_) {
-        if (mounted) {
-          // Move to the first focusable descendant inside the scope.
-          _scopeNode.nextFocus();
-        }
-      });
-    }
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      if (widget.initialFocus) {
+        // Move to the first focusable descendant inside the scope.
+        _scopeNode.nextFocus();
+      } else {
+        // Focus the scope itself rather than a descendant. Key events still
+        // reach onKeyEvent — so Escape and Tab work — but no descendant is
+        // focused, so nothing draws a focus ring the user did not ask for.
+        _scopeNode.requestFocus();
+      }
+    });
   }
 
   @override

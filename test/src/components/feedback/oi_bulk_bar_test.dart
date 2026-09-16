@@ -341,4 +341,145 @@ void main() {
     // With no actions the bar should still render but without action buttons.
     expect(find.byType(OiBulkBar), findsOneWidget);
   });
+
+  // ── Labels ──────────────────────────────────────────────────────────────────
+
+  group('OiBulkBarLabels', () {
+    testWidgets('defaults render the English strings', (tester) async {
+      await tester.pumpObers(
+        OiBulkBar(
+          selectedCount: 3,
+          totalCount: 10,
+          label: 'items',
+          actions: [archiveAction],
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('3 of 10 items selected'), findsOneWidget);
+      expect(find.text('Select all'), findsOneWidget);
+    });
+
+    testWidgets('custom selectionCount and selectAll are used', (tester) async {
+      await tester.pumpObers(
+        OiBulkBar(
+          selectedCount: 3,
+          totalCount: 10,
+          label: 'Zeilen',
+          actions: [archiveAction],
+          labels: OiBulkBarLabels(
+            selectAll: 'Alle auswählen',
+            selectionCount: (selected, total, noun) =>
+                '$selected von $total $noun ausgewählt',
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('3 von 10 Zeilen ausgewählt'), findsOneWidget);
+      expect(find.text('Alle auswählen'), findsOneWidget);
+      expect(find.text('Select all'), findsNothing);
+    });
+
+    testWidgets('deselectAll is used when everything is selected', (
+      tester,
+    ) async {
+      await tester.pumpObers(
+        OiBulkBar(
+          selectedCount: 10,
+          totalCount: 10,
+          label: 'Zeilen',
+          allSelected: true,
+          actions: [archiveAction],
+          labels: const OiBulkBarLabels(deselectAll: 'Auswahl aufheben'),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Auswahl aufheben'), findsOneWidget);
+      expect(find.text('Deselect all'), findsNothing);
+    });
+
+    testWidgets('confirmAction builds the confirmation label', (tester) async {
+      await tester.pumpObers(
+        OiBulkBar(
+          selectedCount: 1,
+          totalCount: 10,
+          label: 'Zeilen',
+          actions: [
+            OiBulkAction(
+              label: 'Löschen',
+              icon: const IconData(0xe872, fontFamily: 'MaterialIcons'),
+              onTap: () {},
+              confirm: true,
+            ),
+          ],
+          labels: OiBulkBarLabels(
+            confirmAction: (action) => '$action bestätigen',
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Löschen'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Löschen bestätigen'), findsOneWidget);
+    });
+
+    testWidgets("an action's own confirmLabel wins over confirmAction", (
+      tester,
+    ) async {
+      await tester.pumpObers(
+        OiBulkBar(
+          selectedCount: 1,
+          totalCount: 10,
+          label: 'Zeilen',
+          actions: [
+            OiBulkAction(
+              label: 'Löschen',
+              icon: const IconData(0xe872, fontFamily: 'MaterialIcons'),
+              onTap: () {},
+              confirm: true,
+              confirmLabel: 'Wirklich löschen?',
+            ),
+          ],
+          labels: OiBulkBarLabels(
+            confirmAction: (action) => '$action bestätigen',
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Löschen'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Wirklich löschen?'), findsOneWidget);
+      expect(find.text('Löschen bestätigen'), findsNothing);
+    });
+
+    testWidgets('bulkActions builds the accessible label', (tester) async {
+      final handle = tester.ensureSemantics();
+
+      await tester.pumpObers(
+        OiBulkBar(
+          selectedCount: 1,
+          totalCount: 10,
+          label: 'Zeilen',
+          actions: [archiveAction],
+          labels: OiBulkBarLabels(
+            bulkActions: (noun) => 'Massenaktionen für $noun',
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(
+        find.bySemanticsLabel(RegExp('Massenaktionen für Zeilen')),
+        findsOneWidget,
+      );
+
+      handle.dispose();
+    });
+  });
 }

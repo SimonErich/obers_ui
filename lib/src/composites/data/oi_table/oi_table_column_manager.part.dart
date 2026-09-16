@@ -10,8 +10,8 @@ extension _OiTableColumnManager<T> on _OiTableState<T> {
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
           OiButton.secondary(
-            label: 'Columns',
-            semanticLabel: 'Manage visible columns',
+            label: widget.labels.columns,
+            semanticLabel: widget.labels.manageColumns,
             icon: OiIcons.columns3,
             size: OiButtonSize.small,
             onTap: _showColumnManager,
@@ -43,6 +43,7 @@ extension _OiTableColumnManager<T> on _OiTableState<T> {
             top: offset.dy + 32,
             child: _ColumnManagerPanel<T>(
               columns: widget.columns,
+              title: widget.labels.columns,
               visibility: _ctrl.columnVisibility,
               onToggle: (columnId, {required visible}) {
                 _ctrl.setColumnVisible(columnId, visible: visible);
@@ -69,11 +70,15 @@ extension _OiTableColumnManager<T> on _OiTableState<T> {
 class _ColumnManagerPanel<T> extends StatelessWidget {
   const _ColumnManagerPanel({
     required this.columns,
+    required this.title,
     required this.visibility,
     required this.onToggle,
   });
 
   final List<OiTableColumn<T>> columns;
+
+  /// Heading shown above the column list.
+  final String title;
   final Map<String, bool> visibility;
   final void Function(String columnId, {required bool visible}) onToggle;
 
@@ -102,7 +107,7 @@ class _ColumnManagerPanel<T> extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.fromLTRB(12, 8, 12, 4),
             child: Text(
-              'Columns',
+              title,
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 13,

@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui/src/components/buttons/oi_button.dart';
+import 'package:obers_ui/src/components/display/oi_pagination.dart';
 import 'package:obers_ui/src/components/display/oi_tooltip.dart';
 import 'package:obers_ui/src/components/feedback/oi_bulk_bar.dart';
 import 'package:obers_ui/src/components/panels/oi_resizable.dart';
@@ -88,6 +89,8 @@ Widget _table({
   List<int> pageSizeOptions = const [10, 25, 50, 100],
   void Function(int)? onPageSizeChanged,
   void Function(int page, int pageSize)? onPageChange,
+  OiTableLabels labels = const OiTableLabels(),
+  List<OiBulkAction>? bulkActions,
 }) {
   return SizedBox(
     width: 1200,
@@ -128,6 +131,8 @@ Widget _table({
       settingsNamespace: settingsNamespace,
       settingsSaveDebounce: settingsSaveDebounce,
       onPageChange: onPageChange,
+      labels: labels,
+      bulkActions: bulkActions,
     ),
   );
 }
@@ -3512,6 +3517,162 @@ void main() {
         ),
         returnsNormally,
       );
+    });
+  });
+
+  // ── Labels ─────────────────────────────────────────────────────────────────
+
+  group('OiTableLabels', () {
+    testWidgets('defaults render the English status bar', (tester) async {
+      await tester.pumpObers(_table());
+
+      expect(find.text('3 rows'), findsOneWidget);
+    });
+
+    testWidgets('custom rowCount replaces the status bar count', (
+      tester,
+    ) async {
+      await tester.pumpObers(
+        _table(
+          labels: OiTableLabels(
+            rowCount: (count) => count == 1 ? '1 Zeile' : '$count Zeilen',
+          ),
+        ),
+      );
+
+      expect(find.text('3 Zeilen'), findsOneWidget);
+      expect(find.text('3 rows'), findsNothing);
+    });
+
+    testWidgets('rows noun feeds the default status bar count', (tester) async {
+      await tester.pumpObers(
+        _table(labels: const OiTableLabels(rows: 'Zeilen')),
+      );
+
+      expect(find.text('3 Zeilen'), findsOneWidget);
+    });
+
+    testWidgets('custom selectedCount replaces the selection count', (
+      tester,
+    ) async {
+      final ctrl = OiTableController(totalRows: _rows.length)
+        ..selectRow('Alice');
+      await tester.pumpObers(
+        _table(
+          controller: ctrl,
+          selectable: true,
+          rowKey: (r) => r.name,
+          labels: OiTableLabels(selectedCount: (count) => '$count ausgewählt'),
+        ),
+      );
+      await tester.pump();
+
+      expect(find.text('1 ausgewählt'), findsOneWidget);
+      expect(find.text('1 selected'), findsNothing);
+    });
+
+    testWidgets('pagination labels reach the footer', (tester) async {
+      await tester.pumpObers(
+        _table(
+          paginationMode: OiTablePaginationMode.pages,
+          labels: const OiTableLabels(
+            rows: 'Zeilen',
+            pagination: OiPaginationLabels(perPage: 'Pro Seite:'),
+          ),
+        ),
+      );
+
+      expect(find.byKey(const Key('oi_table_pagination')), findsOneWidget);
+      expect(find.text('Pro Seite:'), findsOneWidget);
+      expect(find.text('Per page:'), findsNothing);
+      expect(find.text('1–3 of 3 Zeilen'), findsOneWidget);
+    });
+
+    testWidgets('pagination total callback reaches the footer', (tester) async {
+      await tester.pumpObers(
+        _table(
+          paginationMode: OiTablePaginationMode.pages,
+          labels: OiTableLabels(
+            rows: 'Zeilen',
+            pagination: OiPaginationLabels(
+              total: (start, end, total, noun) =>
+                  '$start bis $end von $total $noun',
+            ),
+          ),
+        ),
+      );
+
+      expect(find.text('1 bis 3 von 3 Zeilen'), findsOneWidget);
+    });
+
+    testWidgets('bulk bar uses the rows noun', (tester) async {
+      final ctrl = OiTableController(totalRows: _rows.length)
+        ..selectRow('Alice');
+      await tester.pumpObers(
+        _table(
+          controller: ctrl,
+          selectable: true,
+          rowKey: (r) => r.name,
+          bulkActions: [
+            OiBulkAction(label: 'Löschen', icon: OiIcons.trash2, onTap: () {}),
+          ],
+          labels: const OiTableLabels(rows: 'Zeilen'),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // The noun alone only reaches the default English sentence.
+      expect(find.text('1 of 3 Zeilen selected'), findsOneWidget);
+    });
+
+    testWidgets('bulkBar labels translate the whole bar', (tester) async {
+      final ctrl = OiTableController(totalRows: _rows.length)
+        ..selectRow('Alice');
+      await tester.pumpObers(
+        _table(
+          controller: ctrl,
+          selectable: true,
+          rowKey: (r) => r.name,
+          bulkActions: [
+            OiBulkAction(label: 'Löschen', icon: OiIcons.trash2, onTap: () {}),
+          ],
+          labels: OiTableLabels(
+            rows: 'Zeilen',
+            bulkBar: OiBulkBarLabels(
+              selectAll: 'Alle auswählen',
+              selectionCount: (selected, total, noun) =>
+                  '$selected von $total $noun ausgewählt',
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('1 von 3 Zeilen ausgewählt'), findsOneWidget);
+      expect(find.text('Alle auswählen'), findsOneWidget);
+      expect(find.text('1 of 3 Zeilen selected'), findsNothing);
+      expect(find.text('Select all'), findsNothing);
+    });
+
+    testWidgets('column manager labels are used', (tester) async {
+      await tester.pumpObers(
+        _table(
+          showColumnManager: true,
+          labels: const OiTableLabels(
+            columns: 'Spalten',
+            manageColumns: 'Sichtbare Spalten verwalten',
+          ),
+        ),
+      );
+
+      expect(find.text('Spalten'), findsOneWidget);
+      expect(find.text('Columns'), findsNothing);
+
+      await tester.tap(find.text('Spalten'));
+      await tester.pumpAndSettle();
+
+      // Button label plus the panel heading.
+      expect(find.text('Spalten'), findsNWidgets(2));
     });
   });
 }

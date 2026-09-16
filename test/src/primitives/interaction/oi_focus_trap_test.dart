@@ -59,6 +59,43 @@ void main() {
     expect(focusNode.hasPrimaryFocus, isFalse);
   });
 
+  // ── 3b. initialFocus=false: the scope still holds focus ───────────────────
+
+  testWidgets(
+    'initialFocus=false: Escape and Tab still work without a focused descendant',
+    (tester) async {
+      var escaped = false;
+      final focusNode = FocusNode();
+      addTearDown(focusNode.dispose);
+
+      await tester.pumpObers(
+        OiFocusTrap(
+          initialFocus: false,
+          onEscape: () => escaped = true,
+          child: Focus(
+            focusNode: focusNode,
+            child: const SizedBox(width: 40, height: 40),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // No descendant is focused, so nothing draws a focus ring...
+      expect(focusNode.hasPrimaryFocus, isFalse);
+
+      // ...but the trap focuses its own scope, so key events still reach it.
+      // Without that, onKeyEvent never fires and Escape is dead.
+      await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+      await tester.pump();
+      expect(escaped, isTrue);
+
+      // Tab moves focus into the content on demand.
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.pumpAndSettle();
+      expect(focusNode.hasPrimaryFocus, isTrue);
+    },
+  );
+
   // ── 4. onEscape called on Escape key press ────────────────────────────────
 
   testWidgets('onEscape called on Escape key press', (tester) async {
