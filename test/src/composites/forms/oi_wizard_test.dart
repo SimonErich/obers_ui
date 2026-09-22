@@ -328,16 +328,23 @@ void main() {
     expect(changes, isEmpty);
   });
 
-  // 19. An empty list renders nothing rather than throwing
+  // 19. An empty list renders nothing rather than throwing, and reports no
+  // step change — there is no step to change to.
   testWidgets('renders nothing when the step list empties', (tester) async {
-    await tester.pumpObers(_wizard());
+    final changes = <int>[];
+
+    await tester.pumpObers(_wizard(onStepChange: changes.add));
     await tester.tap(find.text('Next'));
     await tester.pumpAndSettle();
 
-    await tester.pumpObers(_wizard(steps: const []));
+    changes.clear();
+    await tester.pumpObers(
+      _wizard(steps: const [], onStepChange: changes.add),
+    );
     await tester.pumpAndSettle();
 
     expect(tester.takeException(), isNull);
     expect(find.text('Content One'), findsNothing);
+    expect(changes, isEmpty);
   });
 }

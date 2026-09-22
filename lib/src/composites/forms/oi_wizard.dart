@@ -180,8 +180,10 @@ class _OiWizardState extends State<OiWizard> {
   /// Pulls [_currentStep] back inside [OiWizard.steps] after the list shrank,
   /// dropping any completion / error marks that no longer name a step.
   ///
-  /// Indices shift when a step is removed from the middle, so marks at or past
-  /// the removal would otherwise decorate the wrong steps.
+  /// Marks are positional, so this is only correct for removals from the
+  /// tail. A step removed from the middle shifts every later index down
+  /// and the surviving marks then decorate the wrong steps — tracking
+  /// that would need identity on [OiWizardStep], which it does not have.
   void _clampCurrentStep() {
     final lastIndex = widget.steps.length - 1;
     if (_currentStep <= lastIndex) return;
@@ -195,6 +197,10 @@ class _OiWizardState extends State<OiWizard> {
       _completedSteps.removeWhere((index) => index > lastIndex);
       _errorSteps.removeWhere((index) => index > lastIndex);
     });
+
+    // An empty list has no step to change *to* — the clamp to 0 above is a
+    // placeholder, not a step the caller should mirror into its own state.
+    if (widget.steps.isEmpty) return;
     widget.onStepChange?.call(clamped);
   }
 
