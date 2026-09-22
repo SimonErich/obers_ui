@@ -25,6 +25,21 @@ List<OiWizardStep> _steps({
   ),
 ];
 
+/// Same as [_steps] but with the first step marked optional, so the skip
+/// button renders.
+List<OiWizardStep> _optionalSteps() => [
+  OiWizardStep(
+    title: 'Step One',
+    optional: true,
+    builder: (ctx) => const Text('Content One'),
+  ),
+  OiWizardStep(title: 'Step Two', builder: (ctx) => const Text('Content Two')),
+  OiWizardStep(
+    title: 'Step Three',
+    builder: (ctx) => const Text('Content Three'),
+  ),
+];
+
 Widget _wizard({
   List<OiWizardStep>? steps,
   ValueChanged<Map<String, dynamic>>? onComplete,
@@ -36,6 +51,7 @@ Widget _wizard({
   OiStepperStyle stepperStyle = OiStepperStyle.horizontal,
   bool animated = true,
   Map<String, dynamic>? initialValues,
+  OiWizardLabels labels = const OiWizardLabels(),
 }) {
   return SizedBox(
     width: 500,
@@ -52,6 +68,7 @@ Widget _wizard({
         stepperStyle: stepperStyle,
         animated: animated,
         initialValues: initialValues,
+        labels: labels,
       ),
     ),
   );
@@ -346,5 +363,127 @@ void main() {
     expect(tester.takeException(), isNull);
     expect(find.text('Content One'), findsNothing);
     expect(changes, isEmpty);
+  });
+
+  // 20. Every nav label falls back to its English default when not overridden.
+  testWidgets('nav labels default to the English literals', (tester) async {
+    await tester.pumpObers(
+      _wizard(onCancel: () {}, allowSkip: true, steps: _optionalSteps()),
+    );
+
+    expect(find.text('Cancel'), findsOneWidget);
+    expect(find.text('Next'), findsOneWidget);
+    expect(find.text('Skip'), findsOneWidget);
+
+    // Previous and Complete only surface on later steps.
+    await tester.tap(find.text('Next'));
+    await tester.pumpAndSettle();
+    expect(find.text('Previous'), findsOneWidget);
+
+    await tester.tap(find.text('Next'));
+    await tester.pumpAndSettle();
+    expect(find.text('Complete'), findsOneWidget);
+  });
+
+  // 21. Supplied overrides replace the defaults on every nav button.
+  testWidgets('nav labels honour the supplied overrides', (tester) async {
+    await tester.pumpObers(
+      _wizard(
+        steps: _optionalSteps(),
+        onCancel: () {},
+        allowSkip: true,
+        labels: const OiWizardLabels(
+          next: 'Weiter',
+          previous: 'Zurück',
+          skip: 'Überspringen',
+          complete: 'Fertig',
+          cancel: 'Abbrechen',
+        ),
+      ),
+    );
+
+    // Step 1: cancel, skip and next are visible; previous is not.
+    expect(find.text('Abbrechen'), findsOneWidget);
+    expect(find.text('Überspringen'), findsOneWidget);
+    expect(find.text('Weiter'), findsOneWidget);
+    expect(find.text('Next'), findsNothing);
+    expect(find.text('Zurück'), findsNothing);
+
+    // Step 2: previous appears.
+    await tester.tap(find.text('Weiter'));
+    await tester.pumpAndSettle();
+    expect(find.text('Zurück'), findsOneWidget);
+    expect(find.text('Previous'), findsNothing);
+
+    // Step 3 (last): the primary button switches to the complete label.
+    await tester.tap(find.text('Weiter'));
+    await tester.pumpAndSettle();
+    expect(find.text('Fertig'), findsOneWidget);
+    expect(find.text('Complete'), findsNothing);
+    expect(find.text('Weiter'), findsNothing);
+  });
+
+  // 22. Overridden labels still drive navigation, not just rendering.
+  testWidgets('overridden labels still trigger navigation', (tester) async {
+    var completed = false;
+
+    await tester.pumpObers(
+      _wizard(
+        labels: const OiWizardLabels(
+          next: 'Weiter',
+          previous: 'Zurück',
+          complete: 'Fertig',
+        ),
+        onComplete: (_) => completed = true,
+      ),
+    );
+
+    await tester.tap(find.text('Weiter'));
+    await tester.pumpAndSettle();
+    expect(find.text('Content Two'), findsOneWidget);
+
+    await tester.tap(find.text('Zurück'));
+    await tester.pumpAndSettle();
+    expect(find.text('Content One'), findsOneWidget);
+
+    await tester.tap(find.text('Weiter'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Weiter'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Fertig'));
+    await tester.pumpAndSettle();
+
+    expect(completed, isTrue);
+  });
+
+  // 23. The summary heading defaults to English and honours its override.
+  testWidgets('summary heading honours its override', (tester) async {
+    await tester.pumpObers(
+      _wizard(
+        initialValues: const {'name': 'Ada'},
+        labels: const OiWizardLabels(summary: 'Übersicht'),
+      ),
+    );
+
+    // Advance to the last step, where the summary renders.
+    await tester.tap(find.text('Next'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Next'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Übersicht'), findsOneWidget);
+    expect(find.text('Summary'), findsNothing);
+  });
+
+  // 24. Without an override the summary heading keeps the English default.
+  testWidgets('summary heading defaults to English', (tester) async {
+    await tester.pumpObers(_wizard(initialValues: const {'name': 'Ada'}));
+
+    await tester.tap(find.text('Next'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Next'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Summary'), findsOneWidget);
   });
 }

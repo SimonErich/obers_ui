@@ -92,6 +92,62 @@ class OiWizardStep {
   final bool optional;
 }
 
+// ── Labels ──────────────────────────────────────────────────────────────────
+
+/// User-visible strings for [OiWizard].
+///
+/// Every field defaults to the English text [OiWizard] has always shown, so
+/// omitting this object changes nothing. Supply a localized instance to
+/// translate the wizard — the app's own l10n system owns the translations,
+/// this package only accepts finished strings.
+///
+/// ```dart
+/// OiWizard(
+///   steps: steps,
+///   labels: OiWizardLabels(
+///     next: 'Weiter',
+///     previous: 'Zurück',
+///     skip: 'Überspringen',
+///     complete: 'Fertig',
+///     cancel: 'Abbrechen',
+///     summary: 'Übersicht',
+///   ),
+/// )
+/// ```
+///
+/// {@category Composites}
+@immutable
+class OiWizardLabels {
+  /// Creates an [OiWizardLabels].
+  const OiWizardLabels({
+    this.next = 'Next',
+    this.previous = 'Previous',
+    this.skip = 'Skip',
+    this.complete = 'Complete',
+    this.cancel = 'Cancel',
+    this.summary = 'Summary',
+  });
+
+  /// Label of the button that advances to the next step.
+  final String next;
+
+  /// Label of the button that returns to the previous step.
+  final String previous;
+
+  /// Label of the button that skips an optional step, shown when
+  /// [OiWizard.allowSkip] is set and the step is [OiWizardStep.optional].
+  final String skip;
+
+  /// Label of the primary button on the last step, shown in place of [next].
+  final String complete;
+
+  /// Label of the cancel button, shown when [OiWizard.onCancel] is set.
+  final String cancel;
+
+  /// Heading of the summary block, shown when [OiWizard.showSummary] is set.
+  final String summary;
+}
+
 // ── OiWizard ────────────────────────────────────────────────────────────────
 
 /// A multi-step form wizard with step navigation and validation.
@@ -115,6 +171,7 @@ class OiWizard extends StatefulWidget {
     this.stepperStyle = OiStepperStyle.horizontal,
     this.animated = true,
     this.initialValues,
+    this.labels = const OiWizardLabels(),
   });
 
   /// The steps in the wizard.
@@ -147,6 +204,9 @@ class OiWizard extends StatefulWidget {
 
   /// Initial values seeded into the wizard's shared value map.
   final Map<String, dynamic>? initialValues;
+
+  /// User-visible strings. Defaults to English.
+  final OiWizardLabels labels;
 
   @override
   State<OiWizard> createState() => _OiWizardState();
@@ -272,7 +332,7 @@ class _OiWizardState extends State<OiWizard> {
       mainAxisSize: MainAxisSize.min,
       children: [
         Text(
-          'Summary',
+          widget.labels.summary,
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w600,
@@ -415,7 +475,7 @@ class _OiWizardState extends State<OiWizard> {
                         vertical: 8,
                       ),
                       child: Text(
-                        'Cancel',
+                        widget.labels.cancel,
                         style: TextStyle(fontSize: 14, color: colors.textMuted),
                       ),
                     ),
@@ -433,7 +493,7 @@ class _OiWizardState extends State<OiWizard> {
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: Text(
-                        'Previous',
+                        widget.labels.previous,
                         style: TextStyle(fontSize: 14, color: colors.text),
                       ),
                     ),
@@ -454,7 +514,7 @@ class _OiWizardState extends State<OiWizard> {
                         vertical: 8,
                       ),
                       child: Text(
-                        'Skip',
+                        widget.labels.skip,
                         style: TextStyle(fontSize: 14, color: colors.textMuted),
                       ),
                     ),
@@ -471,7 +531,7 @@ class _OiWizardState extends State<OiWizard> {
                       borderRadius: BorderRadius.circular(6),
                     ),
                     child: Text(
-                      isLastStep ? 'Complete' : 'Next',
+                      isLastStep ? widget.labels.complete : widget.labels.next,
                       style: TextStyle(
                         fontSize: 14,
                         color: colors.textOnPrimary,
