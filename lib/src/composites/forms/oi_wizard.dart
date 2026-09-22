@@ -165,6 +165,45 @@ class _OiWizardState extends State<OiWizard> {
     _values = Map<String, dynamic>.from(widget.initialValues ?? {});
   }
 
+  @override
+  void didUpdateWidget(covariant OiWizard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    // [steps] may shrink while a later one is open — a caller can drop a step
+    // in response to state changing elsewhere. Without this the index is left
+    // past the end and the next build throws on `widget.steps[_currentStep]`.
+    if (widget.steps.length < oldWidget.steps.length) {
+      _clampCurrentStep();
+    }
+  }
+
+  /// Pulls [_currentStep] back inside [OiWizard.steps] after the list shrank,
+  /// dropping any completion / error marks that no longer name a step.
+  ///
+  /// Marks are positional, so this is only correct for removals from the
+  /// tail. A step removed from the middle shifts every later index down
+  /// and the surviving marks then decorate the wrong steps — tracking
+  /// that would need identity on [OiWizardStep], which it does not have.
+  void _clampCurrentStep() {
+    final lastIndex = widget.steps.length - 1;
+    if (_currentStep <= lastIndex) return;
+
+    // An empty list leaves nothing to show; 0 keeps the field in the state the
+    // constructor puts it in, and build is guarded separately.
+    final clamped = lastIndex < 0 ? 0 : lastIndex;
+
+    setState(() {
+      _currentStep = clamped;
+      _completedSteps.removeWhere((index) => index > lastIndex);
+      _errorSteps.removeWhere((index) => index > lastIndex);
+    });
+
+    // An empty list has no step to change *to* — the clamp to 0 above is a
+    // placeholder, not a step the caller should mirror into its own state.
+    if (widget.steps.isEmpty) return;
+    widget.onStepChange?.call(clamped);
+  }
+
   // ---------------------------------------------------------------------------
   // Navigation
   // ---------------------------------------------------------------------------
@@ -274,6 +313,11 @@ class _OiWizardState extends State<OiWizard> {
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
+
+    // A wizard with no steps has nothing to render — an empty box beats
+    // throwing while a caller's step list is briefly empty.
+    if (widget.steps.isEmpty) return const SizedBox.shrink();
+
     final step = widget.steps[_currentStep];
     final isFirstStep = _currentStep == 0;
     final isLastStep = _currentStep == widget.steps.length - 1;

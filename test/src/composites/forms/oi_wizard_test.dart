@@ -265,4 +265,86 @@ void main() {
 
     expect(find.text('Step 1 of 3'), findsWidgets);
   });
+
+  // 16. A shrinking step list must not strand the index past the end
+  testWidgets('clamps the current step when the step list shrinks', (
+    tester,
+  ) async {
+    await tester.pumpObers(_wizard());
+
+    // Sit on the last step, then hand over a shorter list — as a caller does
+    // when state elsewhere drops a step.
+    await tester.tap(find.text('Next'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Next'));
+    await tester.pumpAndSettle();
+    expect(find.text('Content Three'), findsOneWidget);
+
+    await tester.pumpObers(_wizard(steps: _steps().sublist(0, 2)));
+    await tester.pumpAndSettle();
+
+    expect(tester.takeException(), isNull);
+    expect(find.text('Content Two'), findsOneWidget);
+  });
+
+  // 17. The clamp is a step change like any other
+  testWidgets('onStepChange fires with the clamped index', (tester) async {
+    final changes = <int>[];
+
+    await tester.pumpObers(_wizard(onStepChange: changes.add));
+    await tester.tap(find.text('Next'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Next'));
+    await tester.pumpAndSettle();
+
+    changes.clear();
+    await tester.pumpObers(
+      _wizard(steps: _steps().sublist(0, 2), onStepChange: changes.add),
+    );
+    await tester.pumpAndSettle();
+
+    expect(changes, [1]);
+  });
+
+  // 18. A list that still covers the index leaves it alone
+  testWidgets('keeps the current step when the list still reaches it', (
+    tester,
+  ) async {
+    final changes = <int>[];
+
+    await tester.pumpObers(_wizard(onStepChange: changes.add));
+    await tester.tap(find.text('Next'));
+    await tester.pumpAndSettle();
+    expect(find.text('Content Two'), findsOneWidget);
+
+    // Drops one step, but step 2 is still in range — nothing should move.
+    changes.clear();
+    await tester.pumpObers(
+      _wizard(steps: _steps().sublist(0, 2), onStepChange: changes.add),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Content Two'), findsOneWidget);
+    expect(changes, isEmpty);
+  });
+
+  // 19. An empty list renders nothing rather than throwing, and reports no
+  // step change — there is no step to change to.
+  testWidgets('renders nothing when the step list empties', (tester) async {
+    final changes = <int>[];
+
+    await tester.pumpObers(_wizard(onStepChange: changes.add));
+    await tester.tap(find.text('Next'));
+    await tester.pumpAndSettle();
+
+    changes.clear();
+    await tester.pumpObers(
+      _wizard(steps: const [], onStepChange: changes.add),
+    );
+    await tester.pumpAndSettle();
+
+    expect(tester.takeException(), isNull);
+    expect(find.text('Content One'), findsNothing);
+    expect(changes, isEmpty);
+  });
 }
