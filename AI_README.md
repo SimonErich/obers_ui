@@ -2219,6 +2219,26 @@ Searchable dropdown with async option loading, fuzzy match, virtual scroll.
 
 ---
 
+#### OiAutocomplete (Composite-tier)
+**Tags:** `input`, `search`, `autocomplete`, `typeahead`, `suggestions`, `async`
+**Tier:** Composite
+
+Search input with suggestions floating below it. Nothing opens until the user types; selecting a suggestion is an action (e.g. navigate) — `onSelect` fires and the field resets. Arrow keys move the highlight, Enter selects, Escape or a tap outside closes. A slow search result arriving after a newer query is discarded.
+
+**Key Parameters:**
+- `label` (String, required) — Accessibility label
+- `search` (Future<List<T>> Function(String), required) — Called for each non-blank query
+- `labelOf` (String Function(T), required) — Display text of a suggestion
+- `onSelect` (ValueChanged<T>, required)
+- `placeholder` (String?)
+- `emptyLabel` (String?) — Shown when nothing matches; null keeps the list closed instead
+- `maxListHeight` (double, default: 320) — Height after which the list scrolls
+
+**Use When:** Site/catalogue search where picking a result opens it.
+**Avoid When:** The field should hold the picked value — use `OiComboBox`. Global multi-source search — use `OiSearch`.
+
+---
+
 #### OiCheckbox
 **Tags:** `input`, `checkbox`, `toggle`, `boolean`, `check`
 **Tier:** Component
