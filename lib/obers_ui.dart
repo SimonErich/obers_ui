@@ -228,6 +228,7 @@ export 'src/composites/scheduling/oi_scheduler.dart';
 export 'src/composites/scheduling/oi_timeline.dart';
 // ── Composites: Search ───────────────────────────────────────────────────────
 
+export 'src/composites/search/oi_autocomplete.dart';
 export 'src/composites/search/oi_combo_box.dart';
 export 'src/composites/search/oi_command_bar.dart';
 export 'src/composites/search/oi_search.dart';
