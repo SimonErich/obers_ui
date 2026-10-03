@@ -405,7 +405,7 @@ class _DropdownItemWidget extends StatelessWidget {
     // Optional leading icon.
     if (item.icon != null) {
       children
-        ..add(OiIcon.decorative(icon: item.icon!, size: 14, color: textColor))
+        ..add(OiIcon.decorative(icon: item.icon, size: 14, color: textColor))
         ..add(SizedBox(width: spacing.sm));
     }
 

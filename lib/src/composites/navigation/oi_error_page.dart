@@ -3,6 +3,7 @@ import 'package:obers_ui/src/components/buttons/oi_button.dart';
 import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/oi_responsive.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
+import 'package:obers_ui/src/primitives/display/oi_icon.dart';
 import 'package:obers_ui/src/primitives/display/oi_label.dart';
 import 'package:obers_ui/src/primitives/layout/oi_container.dart';
 
@@ -164,7 +165,7 @@ class OiErrorPage extends StatelessWidget {
     if (icon != null) {
       return Padding(
         padding: const EdgeInsets.only(bottom: 24),
-        child: Icon(icon, size: 64, color: colors.textMuted),
+        child: OiIcon.raw(icon, size: 64, color: colors.textMuted),
       );
     }
 

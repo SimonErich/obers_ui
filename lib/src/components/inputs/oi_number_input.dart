@@ -25,6 +25,10 @@ class OiNumberInput extends StatefulWidget {
     this.error,
     this.enabled = true,
     this.minWidth = 48,
+    this.prefix,
+    this.suffix,
+    this.placeholder,
+    this.showSteppers = true,
     super.key,
   });
 
@@ -60,6 +64,18 @@ class OiNumberInput extends StatefulWidget {
 
   /// Whether the field accepts input.
   final bool enabled;
+
+  /// Optional leading unit or currency symbol, before the value.
+  final Widget? prefix;
+
+  /// Optional trailing unit or currency symbol after the value.
+  final Widget? suffix;
+
+  /// Example shown when the value is empty.
+  final String? placeholder;
+
+  /// Shows increment/decrement buttons. Plain amounts can omit them.
+  final bool showSteppers;
 
   /// Minimum width of the input. Defaults to 48.
   final double minWidth;
@@ -208,25 +224,52 @@ class _OiNumberInputState extends State<OiNumberInput> {
           error: widget.error,
           focused: _focused,
           enabled: widget.enabled,
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+          padding: widget.showSteppers
+              ? const EdgeInsets.symmetric(horizontal: 8, vertical: 8)
+              : null,
           leadingGap: 4,
-          leading: _stepButton(
-            '-',
-            _decrement,
-            hovered: _decrementHovered,
-            onHoverChanged: (v) => setState(() => _decrementHovered = v),
-          ),
-          trailing: _stepButton(
-            '+',
-            _increment,
-            hovered: _incrementHovered,
-            onHoverChanged: (v) => setState(() => _incrementHovered = v),
-          ),
+          leading: widget.showSteppers
+              ? Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    _stepButton(
+                      '-',
+                      _decrement,
+                      hovered: _decrementHovered,
+                      onHoverChanged: (v) =>
+                          setState(() => _decrementHovered = v),
+                    ),
+                    if (widget.prefix != null) ...[
+                      const SizedBox(width: 4),
+                      widget.prefix!,
+                    ],
+                  ],
+                )
+              : widget.prefix,
+          trailing: widget.showSteppers
+              ? Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (widget.suffix != null) ...[
+                      widget.suffix!,
+                      const SizedBox(width: 4),
+                    ],
+                    _stepButton(
+                      '+',
+                      _increment,
+                      hovered: _incrementHovered,
+                      onHoverChanged: (v) =>
+                          setState(() => _incrementHovered = v),
+                    ),
+                  ],
+                )
+              : widget.suffix,
           child: OiRawInput(
             controller: _controller,
+            placeholder: widget.placeholder,
             focusNode: _focusNode,
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
-            textAlign: TextAlign.center,
+            textAlign: widget.showSteppers ? TextAlign.center : TextAlign.start,
             onSubmitted: _commitText,
             enabled: widget.enabled,
             inputFormatters: [

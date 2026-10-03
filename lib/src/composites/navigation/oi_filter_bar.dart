@@ -5,6 +5,7 @@ import 'package:obers_ui/src/components/inputs/oi_checkbox.dart';
 import 'package:obers_ui/src/components/inputs/oi_select.dart';
 import 'package:obers_ui/src/components/inputs/oi_text_input.dart';
 import 'package:obers_ui/src/components/navigation/oi_date_picker.dart';
+import 'package:obers_ui/src/composites/navigation/oi_filter_panel.dart';
 import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/oi_overlays.dart';
 import 'package:obers_ui/src/foundation/persistence/oi_settings_driver.dart';
@@ -12,6 +13,7 @@ import 'package:obers_ui/src/foundation/persistence/oi_settings_mixin.dart';
 import 'package:obers_ui/src/foundation/persistence/oi_settings_provider.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/models/settings/oi_filter_bar_settings.dart';
+import 'package:obers_ui/src/primitives/display/oi_icon.dart';
 
 part 'oi_filter_bar/oi_filter_bar_chip.part.dart';
 part 'oi_filter_bar/oi_filter_bar_options.part.dart';

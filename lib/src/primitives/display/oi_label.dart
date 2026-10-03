@@ -56,6 +56,8 @@ class OiLabel extends StatelessWidget {
     this.color,
     this.decoration,
     this.decorationColor,
+    this.style,
+    this.highlightQuery,
     super.key,
   });
 
@@ -77,6 +79,8 @@ class OiLabel extends StatelessWidget {
     Color? color,
     TextDecoration? decoration,
     Color? decorationColor,
+    TextStyle? style,
+    String? highlightQuery,
     Key? key,
   }) : this._(
          variant: variant,
@@ -90,6 +94,8 @@ class OiLabel extends StatelessWidget {
          color: color,
          decoration: decoration,
          decorationColor: decorationColor,
+         style: style,
+         highlightQuery: highlightQuery,
          key: key,
        );
 
@@ -245,6 +251,7 @@ class OiLabel extends StatelessWidget {
     Color? color,
     TextDecoration? decoration,
     Color? decorationColor,
+    TextStyle? style,
     Key? key,
   }) : this._(
          variant: OiLabelVariant.body,
@@ -258,6 +265,7 @@ class OiLabel extends StatelessWidget {
          color: color,
          decoration: decoration,
          decorationColor: decorationColor,
+         style: style,
          key: key,
        );
 
@@ -513,6 +521,9 @@ class OiLabel extends StatelessWidget {
          key: key,
        );
 
+  /// Optional overrides merged over the themed variant before explicit colors.
+  final TextStyle? style;
+
   /// The text content to render.
   final String text;
 
@@ -551,6 +562,10 @@ class OiLabel extends StatelessWidget {
   /// Color of the text decoration. Only used when [decoration] is set.
   final Color? decorationColor;
 
+  /// Case-insensitive literal search matches, using the theme's warning tint.
+  /// The full label remains one coherent accessible text value.
+  final String? highlightQuery;
+
   // ---------------------------------------------------------------------------
   // Responsive scale helpers
   // ---------------------------------------------------------------------------
@@ -563,6 +578,10 @@ class OiLabel extends StatelessWidget {
 
   double _scaleFactor(BuildContext context) {
     if (!_responsiveVariants.contains(variant)) return 1;
+    final explicit = context.textTheme.headingScale;
+    if (explicit != null) {
+      return explicit.resolve(context.breakpoint, context.breakpointScale);
+    }
     final width = MediaQuery.sizeOf(context).width;
     if (width >= OiBreakpoint.expanded.minWidth) return 1.2;
     if (width >= OiBreakpoint.medium.minWidth) return 1.1;
@@ -575,7 +594,7 @@ class OiLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final baseStyle = context.textTheme.styleFor(variant);
+    final baseStyle = context.textTheme.styleFor(variant).merge(this.style);
     final scale = _scaleFactor(context);
 
     var style = baseStyle;
@@ -612,12 +631,46 @@ class OiLabel extends StatelessWidget {
         overflow: overflow,
         textAlign: textAlign,
       );
+    } else if (highlightQuery?.trim().isNotEmpty == true) {
+      final query = highlightQuery!.trim();
+      final matches = RegExp(
+        RegExp.escape(query),
+        caseSensitive: false,
+      ).allMatches(text);
+      final spans = <TextSpan>[];
+      var offset = 0;
+      for (final match in matches) {
+        if (match.start > offset) {
+          spans.add(TextSpan(text: text.substring(offset, match.start)));
+        }
+        spans.add(
+          TextSpan(
+            text: text.substring(match.start, match.end),
+            style: TextStyle(backgroundColor: context.colors.warning.muted),
+          ),
+        );
+        offset = match.end;
+      }
+      spans.add(TextSpan(text: text.substring(offset)));
+      textWidget = Text.rich(
+        TextSpan(style: style, children: spans),
+        maxLines: maxLines,
+        overflow: overflow,
+        softWrap: maxLines == 1 && overflow == TextOverflow.visible
+            ? false
+            : null,
+        textAlign: textAlign,
+        semanticsLabel: text,
+      );
     } else {
       textWidget = Text(
         text,
         style: style,
         maxLines: maxLines,
         overflow: overflow,
+        softWrap: maxLines == 1 && overflow == TextOverflow.visible
+            ? false
+            : null,
         textAlign: textAlign,
       );
     }

@@ -1,7 +1,5 @@
 // Tests do not require documentation comments.
 
-import 'dart:async';
-
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui/src/foundation/oi_page_route.dart';
@@ -17,11 +15,9 @@ void main() {
           builder: (context) {
             return GestureDetector(
               onTap: () {
-                unawaited(
-                  Navigator.of(context).push<void>(
-                    OiPageRoute<void>(
-                      builder: (_) => const Text('Page 2'),
-                    ),
+                Navigator.of(context).push<void>(
+                  OiPageRoute<void>(
+                    builder: (_) => const Text('Page 2'),
                   ),
                 );
               },
@@ -43,12 +39,10 @@ void main() {
           builder: (context) {
             return GestureDetector(
               onTap: () {
-                unawaited(
-                  Navigator.of(context).push<void>(
-                    OiPageRoute<void>(
-                      builder: (_) => const Text('Slid Page'),
-                      transition: OiPageTransitionType.slideHorizontal,
-                    ),
+                Navigator.of(context).push<void>(
+                  OiPageRoute<void>(
+                    builder: (_) => const Text('Slid Page'),
+                    transition: OiPageTransitionType.slideHorizontal,
                   ),
                 );
               },
@@ -70,12 +64,10 @@ void main() {
           builder: (context) {
             return GestureDetector(
               onTap: () {
-                unawaited(
-                  Navigator.of(context).push<void>(
-                    OiPageRoute<void>(
-                      builder: (_) => const Text('Instant Page'),
-                      transition: OiPageTransitionType.none,
-                    ),
+                Navigator.of(context).push<void>(
+                  OiPageRoute<void>(
+                    builder: (_) => const Text('Instant Page'),
+                    transition: OiPageTransitionType.none,
                   ),
                 );
               },

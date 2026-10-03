@@ -16,6 +16,7 @@ import 'package:obers_ui/src/foundation/persistence/oi_settings_provider.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/models/settings/oi_list_view_settings.dart'
     hide OiListViewLayout;
+import 'package:obers_ui/src/primitives/display/oi_icon.dart';
 import 'package:obers_ui/src/primitives/display/oi_label.dart';
 import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
 import 'package:obers_ui/src/primitives/layout/oi_grid.dart';
@@ -516,7 +517,7 @@ class _OiListViewState<T> extends State<OiListView<T>>
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(OiIcons.alignLeft, size: 16, color: colors.text),
+            OiIcon.raw(OiIcons.alignLeft, size: 16, color: colors.text),
             const SizedBox(width: 4),
             OiLabel.small('Filters', color: colors.text),
             if (activeCount > 0) ...[

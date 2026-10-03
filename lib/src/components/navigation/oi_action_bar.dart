@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/buttons/oi_button.dart';
 import 'package:obers_ui/src/components/buttons/oi_icon_button.dart';
@@ -12,6 +10,7 @@ import 'package:obers_ui/src/primitives/display/oi_icon.dart';
 import 'package:obers_ui/src/primitives/display/oi_label.dart';
 import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
 import 'package:obers_ui/src/primitives/layout/oi_row.dart';
+import 'package:obers_ui/src/primitives/overlay/oi_floating.dart';
 
 /// The visual style of an [OiActionBar].
 ///
@@ -132,6 +131,7 @@ class OiActionBar extends StatelessWidget {
     this.showLabels,
     this.size = OiButtonSize.medium,
     this.separator = false,
+    this.overflowIcon = OiIcons.ellipsisVertical,
     this.semanticLabel,
     super.key,
   });
@@ -165,6 +165,9 @@ class OiActionBar extends StatelessWidget {
 
   /// Whether to render vertical dividers between different action groups.
   final bool separator;
+
+  /// Icon used by the overflow trigger.
+  final IconData overflowIcon;
 
   /// An optional semantic label override for the bar container.
   final String? semanticLabel;
@@ -204,7 +207,14 @@ class OiActionBar extends StatelessWidget {
 
     // Add overflow "more" button when overflowActions is populated.
     if (overflowActions != null && overflowActions!.isNotEmpty) {
-      children.add(_OverflowMenuButton(actions: overflowActions!, size: size));
+      children.add(
+        _OverflowMenuButton(
+          actions: overflowActions!,
+          size: size,
+          icon: overflowIcon,
+          separator: separator,
+        ),
+      );
     }
 
     if (trailing != null) {
@@ -349,7 +359,15 @@ class OiActionBar extends StatelessWidget {
 
 /// An overflow "more" button that opens a popover listing [actions].
 class _OverflowMenuButton extends StatefulWidget {
-  const _OverflowMenuButton({required this.actions, required this.size});
+  const _OverflowMenuButton({
+    required this.actions,
+    required this.size,
+    required this.icon,
+    required this.separator,
+  });
+
+  final IconData icon;
+  final bool separator;
 
   final List<OiActionBarItem> actions;
   final OiButtonSize size;
@@ -367,49 +385,91 @@ class _OverflowMenuButtonState extends State<_OverflowMenuButton> {
     final spacing = context.spacing;
 
     return OiPopover(
-      label: '',
+      label: 'More actions',
+      alignment: OiFloatingAlignment.bottomEnd,
+      borderRadius: context.components.actionBar?.menuRadius,
       open: _open,
       onClose: () => setState(() => _open = false),
       anchor: OiIconButton(
-        icon: OiIcons.ellipsisVertical,
+        icon: widget.icon,
         semanticLabel: 'More actions',
         size: widget.size,
         onTap: () => setState(() => _open = !_open),
       ),
-      content: IntrinsicWidth(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            for (final action in widget.actions)
-              OiTappable(
-                semanticLabel: action.semanticLabel,
-                onTap: action.enabled && action.onTap != null
-                    ? () {
-                        setState(() => _open = false);
-                        action.onTap!();
-                      }
-                    : null,
-                child: Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: spacing.md,
-                    vertical: spacing.sm,
-                  ),
-                  child: OiRow(
-                    breakpoint: context.breakpoint,
-                    gap: OiResponsive<double>(spacing.sm),
-                    children: [
-                      OiIcon.decorative(
-                        icon: action.icon,
-                        size: 16,
-                        color: colors.text,
+      content: ConstrainedBox(
+        constraints: BoxConstraints(
+          minWidth: context.components.actionBar?.menuMinWidth ?? 0,
+        ),
+        child: Padding(
+          padding: context.components.actionBar?.menuPadding ?? EdgeInsets.zero,
+          child: IntrinsicWidth(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                for (var i = 0; i < widget.actions.length; i++) ...[
+                  if (widget.separator &&
+                      i > 0 &&
+                      widget.actions[i].group != widget.actions[i - 1].group)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 4),
+                      child: Container(height: 1, color: colors.borderSubtle),
+                    ),
+                  OiTappable(
+                    semanticLabel: widget.actions[i].semanticLabel,
+                    enabled: widget.actions[i].enabled,
+                    onTap:
+                        widget.actions[i].enabled &&
+                            widget.actions[i].onTap != null
+                        ? () {
+                            setState(() => _open = false);
+                            widget.actions[i].onTap!();
+                          }
+                        : null,
+                    clipBorderRadius:
+                        context.components.actionBar?.menuItemRadius ??
+                        BorderRadius.circular(4),
+                    child: ExcludeSemantics(
+                      child: Padding(
+                        padding:
+                            context.components.actionBar?.menuItemPadding ??
+                            EdgeInsets.symmetric(
+                              horizontal: spacing.md,
+                              vertical: spacing.sm,
+                            ),
+                        child: OiRow(
+                          breakpoint: context.breakpoint,
+                          gap: OiResponsive<double>(
+                            context.components.actionBar?.menuIconGap ??
+                                spacing.sm,
+                          ),
+                          children: [
+                            OiIcon.decorative(
+                              icon: widget.actions[i].icon,
+                              size: 16,
+                              color:
+                                  widget.actions[i].variant ==
+                                      OiButtonVariant.destructive
+                                  ? colors.error.base
+                                  : colors.textMuted,
+                            ),
+                            OiLabel.body(
+                              widget.actions[i].label,
+                              color:
+                                  widget.actions[i].variant ==
+                                      OiButtonVariant.destructive
+                                  ? colors.error.base
+                                  : colors.text,
+                            ),
+                          ],
+                        ),
                       ),
-                      OiLabel.body(action.label, color: colors.text),
-                    ],
+                    ),
                   ),
-                ),
-              ),
-          ],
+                ],
+              ],
+            ),
+          ),
         ),
       ),
     );
@@ -471,7 +531,7 @@ class _LoadingIndicatorState extends State<_LoadingIndicator>
       vsync: this,
       duration: const Duration(milliseconds: 800),
     );
-    unawaited(_controller.repeat());
+    _controller.repeat();
   }
 
   @override

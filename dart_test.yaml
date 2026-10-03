@@ -1,0 +1,3 @@
+tags:
+  golden:
+    description: "Golden (screenshot) tests. Machine-independent CI goldens live in goldens/ci/ and are committed; platform goldens (goldens/linux|macos|windows/) are host-specific, gitignored, and generated locally with: flutter test --update-goldens --name 'variant: Linux'"

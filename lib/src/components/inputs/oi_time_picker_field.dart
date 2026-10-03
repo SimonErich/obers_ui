@@ -5,6 +5,7 @@ import 'package:obers_ui/src/components/inputs/oi_time_input.dart'
 import 'package:obers_ui/src/components/navigation/oi_time_picker.dart';
 import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
+import 'package:obers_ui/src/primitives/display/oi_icon.dart';
 import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
 
 /// A time input field that displays a formatted time and opens an
@@ -159,14 +160,14 @@ class OiTimePickerField extends StatelessWidget {
             onTap: _clear,
             child: Padding(
               padding: const EdgeInsets.only(right: 4),
-              child: Icon(
+              child: OiIcon.raw(
                 OiIcons.x,
                 size: 16,
                 color: colors.textMuted,
               ),
             ),
           ),
-        Icon(
+        OiIcon.raw(
           OiIcons.clock,
           size: 18,
           color: colors.textMuted,

@@ -12,6 +12,128 @@ import 'package:obers_ui/src/primitives/display/oi_icon.dart';
 import '../../../helpers/pump_app.dart';
 
 void main() {
+  testWidgets('short trailing values leave remaining width to the label', (
+    tester,
+  ) async {
+    await tester.pumpObers(
+      const Center(
+        child: SizedBox(
+          width: 312,
+          child: OiKeyValue(
+            label: 'Delivery · framework agreement',
+            value: '€0.00',
+            direction: Axis.horizontal,
+            valueAtEnd: true,
+            labelWidget: Text('Delivery · framework agreement'),
+          ),
+        ),
+      ),
+    );
+    final label = tester.getRect(find.text('Delivery · framework agreement'));
+    final value = tester.getRect(find.text('€0.00'));
+    expect(label.width, greaterThan(220));
+    expect(
+      value.right,
+      closeTo(tester.getRect(find.byType(OiKeyValue)).right, .1),
+    );
+    expect(value.left, greaterThan(label.right));
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('long trailing values remain bounded at narrow widths', (
+    tester,
+  ) async {
+    await tester.pumpObers(
+      const Center(
+        child: SizedBox(
+          width: 180,
+          child: OiKeyValue(
+            label: 'Reference',
+            value: 'An unusually long value which must wrap safely',
+            direction: Axis.horizontal,
+            valueAtEnd: true,
+          ),
+        ),
+      ),
+    );
+    expect(tester.takeException(), isNull);
+    expect(
+      tester
+          .getSize(find.text('An unusually long value which must wrap safely'))
+          .width,
+      lessThanOrEqualTo(90),
+    );
+  });
+
+  testWidgets('custom trailing totals can use more room beside a short label', (
+    tester,
+  ) async {
+    await tester.pumpObers(
+      const Center(
+        child: SizedBox(
+          width: 248,
+          child: OiKeyValue(
+            label: 'Total',
+            value: '€35.90',
+            direction: Axis.horizontal,
+            valueAtEnd: true,
+            valueMaxWidthFraction: .75,
+            valueWidget: SizedBox(
+              key: ValueKey('total'),
+              width: 170,
+              height: 20,
+            ),
+          ),
+        ),
+      ),
+    );
+    expect(tester.getSize(find.byKey(const ValueKey('total'))).width, 170);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('trailing summaries wrap labels and retain group slots', (
+    tester,
+  ) async {
+    await tester.pumpObers(
+      SizedBox(
+        width: 280,
+        child: OiKeyValue.group(
+          dividers: false,
+          children: const [
+            OiKeyValue(
+              label: 'Total',
+              value: '€41.31',
+              direction: Axis.horizontal,
+              valueAtEnd: true,
+              padding: EdgeInsets.zero,
+              labelWidget: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Total'),
+                  Text('Includes tax and delivery charges'),
+                ],
+              ),
+              valueWidget: Text('€41.31', style: TextStyle(fontSize: 24)),
+            ),
+          ],
+        ),
+      ),
+    );
+    expect(find.text('Includes tax and delivery charges'), findsOneWidget);
+    final row = tester.widget<OiKeyValue>(find.byType(OiKeyValue));
+    expect(row.valueAtEnd, isTrue);
+    expect(row.padding, EdgeInsets.zero);
+    expect(
+      tester.getTopLeft(find.text('€41.31')).dx,
+      greaterThan(tester.getTopLeft(find.text('Total')).dx),
+    );
+    expect(
+      tester.getBottomRight(find.text('€41.31')).dx,
+      closeTo(tester.getBottomRight(find.byType(OiKeyValue)).dx, .1),
+    );
+    expect(tester.takeException(), isNull);
+  });
+
   // ── Rendering ─────────────────────────────────────────────────────────────
 
   testWidgets('renders label and value', (tester) async {

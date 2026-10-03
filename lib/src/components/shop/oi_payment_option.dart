@@ -4,6 +4,7 @@ import 'package:obers_ui/src/foundation/oi_responsive.dart';
 import 'package:obers_ui/src/foundation/theme/oi_decoration_theme.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/models/oi_payment_method.dart';
+import 'package:obers_ui/src/primitives/display/oi_icon.dart';
 import 'package:obers_ui/src/primitives/display/oi_label.dart';
 import 'package:obers_ui/src/primitives/display/oi_surface.dart';
 import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
@@ -71,7 +72,7 @@ class OiPaymentOption extends StatelessWidget {
   Widget _buildIcon(BuildContext context) {
     final colors = context.colors;
     final icon = _resolveIcon();
-    return Icon(icon, size: 20, color: colors.textMuted);
+    return OiIcon.raw(icon, size: 20, color: colors.textMuted);
   }
 
   @override

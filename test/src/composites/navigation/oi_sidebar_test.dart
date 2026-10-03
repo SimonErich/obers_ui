@@ -1,9 +1,13 @@
 // Tests do not require documentation comments.
 
+import 'dart:ui' as ui;
+
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui/src/composites/navigation/oi_sidebar.dart';
+import 'package:obers_ui/src/foundation/theme/component_themes/oi_sidebar_theme_data.dart';
+import 'package:obers_ui/src/foundation/theme/oi_theme_data.dart';
 
 import '../../../helpers/pump_app.dart';
 
@@ -82,6 +86,199 @@ Widget _sidebar({
 // ── Tests ────────────────────────────────────────────────────────────────────
 
 void main() {
+  testWidgets(
+    'context branch uses21px inset, radius8 and independent stroke role',
+    (tester) async {
+      const color = Color(0xff445566);
+      const token = OiSidebarThemeData(
+        contextBranchColor: color,
+        iconWidth: 24,
+        itemHeight: 36,
+      );
+      expect(token.copyWith(), token);
+      expect(token.copyWith().hashCode, token.hashCode);
+      final base = OiThemeData.light();
+      await tester.pumpObers(
+        SizedBox(
+          width: 260,
+          height: 300,
+          child: OiSidebar(
+            label: 'Navigation',
+            selectedId: null,
+            onSelect: (_) {},
+            sections: const [
+              OiSidebarSection(
+                items: [
+                  OiSidebarItem(
+                    id: 'parent',
+                    label: 'Orders',
+                    icon: IconData(1),
+                    children: [
+                      OiSidebarItem(
+                        id: 'record',
+                        label: 'ORD-1',
+                        icon: IconData(2),
+                        contextChild: true,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+        theme: base.copyWith(
+          components: base.components.copyWith(sidebar: token),
+        ),
+      );
+      final paint = tester.widget<CustomPaint>(
+        find.byKey(const Key('oi_sidebar_context_branch')),
+      );
+      final recorder = ui.PictureRecorder();
+      paint.painter!.paint(Canvas(recorder), const Size(36, 36));
+      final picture = recorder.endRecording();
+      final bytes = (await tester.runAsync(() async {
+        final image = await picture.toImage(36, 36);
+        final result = (await image.toByteData())!.buffer.asUint8List();
+        image.dispose();
+        return result;
+      }))!;
+      List<int> pixel(int x, int y) =>
+          bytes.sublist((y * 36 + x) * 4, (y * 36 + x) * 4 + 4);
+      expect(pixel(21, 5), [68, 85, 102, 255]);
+      expect(pixel(28, 5)[3], 0);
+      expect(pixel(21, 17)[3], 0);
+      expect(pixel(31, 17), [68, 85, 102, 255]);
+      picture.dispose();
+    },
+  );
+
+  testWidgets(
+    'mixed contextual and ordinary children retain accordion behavior',
+    (tester) async {
+      await tester.pumpObers(
+        SizedBox(
+          width: 260,
+          height: 300,
+          child: OiSidebar(
+            label: 'Navigation',
+            selectedId: 'parent',
+            onSelect: (_) {},
+            sections: const [
+              OiSidebarSection(
+                items: [
+                  OiSidebarItem(
+                    id: 'parent',
+                    label: 'Orders',
+                    icon: IconData(1),
+                    children: [
+                      OiSidebarItem(
+                        id: 'record',
+                        label: 'ORD-1',
+                        icon: IconData(2),
+                        contextChild: true,
+                      ),
+                      OiSidebarItem(
+                        id: 'ordinary',
+                        label: 'All orders',
+                        icon: IconData(3),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('ORD-1'), findsNothing);
+      expect(find.byType(AnimatedRotation), findsOneWidget);
+      await tester.tap(find.text('Orders'));
+      await tester.pumpAndSettle();
+      expect(find.text('ORD-1'), findsOneWidget);
+      expect(find.text('All orders'), findsOneWidget);
+      await tester.tap(find.text('Orders'));
+      await tester.pumpAndSettle();
+      expect(find.text('ORD-1'), findsNothing);
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets(
+    'context record branch keeps selection and code label semantics',
+    (tester) async {
+      var selected = '';
+      await tester.pumpObers(
+        SizedBox(
+          width: 260,
+          height: 300,
+          child: OiSidebar(
+            label: 'Navigation',
+            selectedId: 'parent',
+            onSelect: (id) => selected = id,
+            sections: const [
+              OiSidebarSection(
+                items: [
+                  OiSidebarItem(
+                    id: 'parent',
+                    label: 'Orders',
+                    icon: IconData(1),
+                    children: [
+                      OiSidebarItem(
+                        id: 'record',
+                        label: 'ORD-1',
+                        icon: IconData(2),
+                        contextChild: true,
+                        monospace: true,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.byType(AnimatedRotation), findsNothing);
+      await tester.tap(find.text('Orders'));
+      await tester.pumpAndSettle();
+      expect(selected, 'parent');
+      final label = find.text('ORD-1');
+      expect(label, findsOneWidget);
+      expect(tester.widget<Text>(label).style!.fontFamily, 'monospace');
+      expect(
+        find.byWidgetPredicate(
+          (widget) => widget is Icon && widget.icon == const IconData(2),
+        ),
+        findsNothing,
+      );
+      await tester.tap(label);
+      await tester.pumpAndSettle();
+      expect(selected, 'record');
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets(
+    'selected nested destinations reveal their parent automatically',
+    (
+      tester,
+    ) async {
+      await tester.pumpObers(_sidebar(selectedId: 'task_1'));
+      await tester.pumpAndSettle();
+      expect(find.text('Task 1').hitTestable(), findsOneWidget);
+      await tester.pumpObers(_sidebar(selectedId: 'home'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Project A'));
+      await tester.pumpAndSettle();
+      expect(find.text('Task 1').hitTestable(), findsNothing);
+      await tester.pumpObers(_sidebar(selectedId: 'task_2'));
+      await tester.pumpAndSettle();
+      expect(find.text('Task 2').hitTestable(), findsOneWidget);
+    },
+  );
   group('OiSidebar', () {
     testWidgets('renders items with icon and label', (tester) async {
       await tester.pumpObers(_sidebar());

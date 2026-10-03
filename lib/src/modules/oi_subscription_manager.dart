@@ -7,6 +7,7 @@ import 'package:obers_ui/src/foundation/oi_responsive.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/modules/oi_pricing_table.dart' show OiBillingCycle;
 import 'package:obers_ui/src/primitives/display/oi_divider.dart';
+import 'package:obers_ui/src/primitives/display/oi_icon.dart';
 import 'package:obers_ui/src/primitives/display/oi_label.dart';
 import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
 
@@ -373,7 +374,11 @@ class OiSubscriptionManager extends StatelessWidget {
                   padding: EdgeInsets.only(bottom: spacing.xs),
                   child: Row(
                     children: [
-                      Icon(OiIcons.check, size: 16, color: colors.success.base),
+                      OiIcon.raw(
+                        OiIcons.check,
+                        size: 16,
+                        color: colors.success.base,
+                      ),
                       SizedBox(width: spacing.sm),
                       Expanded(child: OiLabel.body(feature)),
                     ],
@@ -495,7 +500,7 @@ class OiSubscriptionManager extends StatelessWidget {
         Row(
           children: [
             if (quota.icon != null) ...[
-              Icon(quota.icon, size: 16, color: colors.textSubtle),
+              OiIcon.raw(quota.icon, size: 16, color: colors.textSubtle),
               SizedBox(width: spacing.xs),
             ],
             Expanded(child: OiLabel.bodyStrong(quota.label)),
@@ -593,7 +598,7 @@ class OiSubscriptionManager extends StatelessWidget {
               OiTappable(
                 semanticLabel: 'Download invoice ${invoice.description}',
                 onTap: () => onInvoiceDownload!(invoice),
-                child: Icon(
+                child: OiIcon.raw(
                   OiIcons.download,
                   size: 18,
                   color: colors.textSubtle,
@@ -627,7 +632,7 @@ class OiSubscriptionManager extends StatelessWidget {
             padding: EdgeInsets.all(spacing.md),
             child: Row(
               children: [
-                Icon(
+                OiIcon.raw(
                   pm.icon ?? OiIcons.creditCard,
                   size: 24,
                   color: colors.text,

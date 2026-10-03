@@ -1,5 +1,7 @@
 // Tests do not require documentation comments.
 
+import 'dart:ui' show PointerDeviceKind;
+
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui/src/components/display/oi_badge.dart';
@@ -15,6 +17,88 @@ import '../../../helpers/pump_app.dart';
 const _kDividerKey = Key('_oi_card_divider');
 
 void main() {
+  testWidgets('collapsing a card removes its header gap with the body', (
+    tester,
+  ) async {
+    await tester.pumpObers(
+      const Center(
+        child: OiCard(
+          title: Text('Collapsible gap'),
+          label: 'Collapsible gap',
+          collapsible: true,
+          headerGap: 18,
+          child: SizedBox(height: 40),
+        ),
+      ),
+    );
+    final expandedHeight = tester.getSize(find.byType(OiCard)).height;
+    await tester.tap(
+      find.byWidgetPredicate(
+        (widget) =>
+            widget is OiTappable &&
+            widget.semanticLabel == 'Collapse Collapsible gap',
+      ),
+      kind: PointerDeviceKind.mouse,
+    );
+    await tester.pumpAndSettle();
+    expect(expandedHeight - tester.getSize(find.byType(OiCard)).height, 58);
+    await tester.tap(
+      find.byWidgetPredicate(
+        (widget) =>
+            widget is OiTappable &&
+            widget.semanticLabel == 'Expand Collapsible gap',
+      ),
+      kind: PointerDeviceKind.mouse,
+    );
+    await tester.pumpAndSettle();
+    expect(tester.getSize(find.byType(OiCard)).height, expandedHeight);
+  });
+
+  testWidgets('header gap separates content only when a header exists', (
+    tester,
+  ) async {
+    await tester.pumpObers(
+      const Center(
+        child: OiCard(
+          title: SizedBox(key: Key('header'), height: 20),
+          headerGap: 18,
+          child: SizedBox(key: Key('content'), height: 40),
+        ),
+      ),
+    );
+    expect(
+      tester.getTopLeft(find.byKey(const Key('content'))).dy -
+          tester.getBottomLeft(find.byKey(const Key('header'))).dy,
+      18,
+    );
+    await tester.pumpObers(
+      const Center(
+        child: OiCard(
+          padding: EdgeInsets.zero,
+          headerGap: 18,
+          child: SizedBox(width: 100, height: 40),
+        ),
+      ),
+    );
+    expect(tester.getSize(find.byType(OiCard)).height, 40);
+  });
+
+  testWidgets('a card without a header preserves bounded child constraints', (
+    tester,
+  ) async {
+    await tester.pumpObers(
+      const SizedBox(
+        width: 300,
+        height: 220,
+        child: OiCard(
+          child: Column(children: [Expanded(child: Text('Bounded table'))]),
+        ),
+      ),
+    );
+    expect(tester.takeException(), isNull);
+    expect(tester.getSize(find.text('Bounded table')).height, greaterThan(100));
+  });
+
   // ---------------------------------------------------------------------------
   // REQ-0243 — Structure: child, header slots, footer with divider
   // ---------------------------------------------------------------------------

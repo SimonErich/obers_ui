@@ -3,6 +3,7 @@ import 'package:obers_ui/src/components/inputs/oi_date_input.dart';
 import 'package:obers_ui/src/components/inputs/oi_time_input.dart';
 import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
+import 'package:obers_ui/src/primitives/display/oi_icon.dart';
 import 'package:obers_ui/src/primitives/display/oi_label.dart';
 
 /// A combined date + time input that renders [OiDateInput] and [OiTimeInput]
@@ -27,6 +28,8 @@ class OiDateTimeInput extends StatefulWidget {
     this.required = false,
     this.readOnly = false,
     this.enabled = true,
+    this.dateFormat,
+    this.locale,
     super.key,
   });
 
@@ -59,6 +62,12 @@ class OiDateTimeInput extends StatefulWidget {
 
   /// Whether the field accepts interaction.
   final bool enabled;
+
+  /// Intl pattern used by the date half; null preserves its default pattern.
+  final String? dateFormat;
+
+  /// Locale used by the date half; null preserves intl's default locale.
+  final String? locale;
 
   @override
   State<OiDateTimeInput> createState() => _OiDateTimeInputState();
@@ -144,6 +153,8 @@ class _OiDateTimeInputState extends State<OiDateTimeInput> {
                   firstDate: widget.min,
                   lastDate: widget.max,
                   enabled: effectiveEnabled,
+                  dateFormat: widget.dateFormat,
+                  locale: widget.locale,
                 ),
               ),
               const SizedBox(width: 8),
@@ -160,7 +171,7 @@ class _OiDateTimeInputState extends State<OiDateTimeInput> {
             const SizedBox(height: 4),
             Row(
               children: [
-                Icon(
+                OiIcon.raw(
                   OiIcons.circleAlert,
                   size: 14,
                   color: colors.error.base,

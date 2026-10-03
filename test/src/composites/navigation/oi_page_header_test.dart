@@ -8,6 +8,36 @@ import '../../../helpers/pump_app.dart';
 
 void main() {
   group('OiPageHeader', () {
+    testWidgets('actions align with the subtitle and stack on narrow screens', (
+      tester,
+    ) async {
+      Future<void> show(double width) => tester.pumpObers(
+        const Center(
+          child: OiPageHeader(
+            title: 'Orders',
+            subtitle: '412 orders for today',
+            actionAlignment: CrossAxisAlignment.end,
+            padding: EdgeInsets.zero,
+            actions: [SizedBox(key: Key('action'), width: 100, height: 32)],
+          ),
+        ),
+        surfaceSize: Size(width, 400),
+      );
+      await show(900);
+      final action = find.byKey(const Key('action'));
+      final subtitle = find.text('412 orders for today');
+      expect(
+        tester.getBottomRight(action).dy,
+        tester.getBottomRight(subtitle).dy,
+      );
+      await show(390);
+      expect(
+        tester.getTopLeft(action).dy,
+        greaterThan(tester.getBottomRight(subtitle).dy),
+      );
+      expect(tester.takeException(), isNull);
+    });
+
     testWidgets('renders title', (tester) async {
       await tester.pumpObers(
         const OiPageHeader(title: 'Dashboard'),

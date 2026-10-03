@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
+import 'package:obers_ui/src/primitives/display/oi_label.dart';
 import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
 
 /// The size variants for [OiSwitch].
@@ -36,6 +37,7 @@ class OiSwitch extends StatefulWidget {
     this.size = OiSwitchSize.medium,
     this.enabled = true,
     this.label,
+    this.labelLeading = false,
     super.key,
   });
 
@@ -53,6 +55,9 @@ class OiSwitch extends StatefulWidget {
 
   /// Optional label rendered to the right of the switch.
   final String? label;
+
+  /// Places the visible label before the switch, useful in trailing toolbars.
+  final bool labelLeading;
 
   @override
   State<OiSwitch> createState() => _OiSwitchState();
@@ -74,13 +79,13 @@ class _OiSwitchState extends State<OiSwitch> {
   Widget build(BuildContext context) {
     final colors = context.colors;
     final dim = _dimensions();
-    final trackW = dim.width;
-    final trackH = dim.height;
+    final st = context.components.switchTheme;
+    final trackW = st?.width ?? dim.width;
+    final trackH = st?.height ?? dim.height;
     const padding = 2.0;
     final thumbSize = trackH - padding * 2;
     final travelDistance = trackW - thumbSize - padding * 2;
 
-    final st = context.components.switchTheme;
     final trackColor = widget.value
         ? (st?.activeTrackColor ?? colors.primary.base)
         : (st?.inactiveTrackColor ?? colors.border);
@@ -153,12 +158,13 @@ class _OiSwitchState extends State<OiSwitch> {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            content,
-            const SizedBox(width: 8),
-            Text(
+            if (!widget.labelLeading) ...[content, const SizedBox(width: 8)],
+            OiLabel.body(
               widget.label!,
-              style: TextStyle(fontSize: 14, color: colors.text),
+              color: colors.text,
+              style: const TextStyle(fontSize: 14),
             ),
+            if (widget.labelLeading) ...[const SizedBox(width: 8), content],
           ],
         ),
       );

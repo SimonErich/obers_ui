@@ -3,6 +3,7 @@ import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/buttons/oi_button.dart';
 import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
+import 'package:obers_ui/src/primitives/display/oi_icon.dart';
 
 /// A centered empty-state layout with an icon or illustration, title,
 /// optional description, and an optional action widget.
@@ -145,7 +146,7 @@ class OiEmptyState extends StatelessWidget {
             else if (icon != null)
               Padding(
                 padding: const EdgeInsets.only(bottom: 16),
-                child: Icon(icon, size: 56, color: colors.textMuted),
+                child: OiIcon.raw(icon, size: 56, color: colors.textMuted),
               ),
             Text(
               title,

@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
@@ -20,6 +18,7 @@ class OiRawInput extends StatefulWidget {
     required this.controller,
     required this.focusNode,
     this.placeholder,
+    this.excludePlaceholderSemantics = false,
     this.leading,
     this.trailing,
     this.maxLines = 1,
@@ -56,6 +55,10 @@ class OiRawInput extends StatefulWidget {
 
   /// Placeholder text shown when [controller] text is empty.
   final String? placeholder;
+
+  /// Prevents a visual placeholder from being merged into an explicit label.
+  /// The owning input should expose it as a semantic hint instead.
+  final bool excludePlaceholderSemantics;
 
   /// An optional widget placed before the text field.
   final Widget? leading;
@@ -94,6 +97,9 @@ class OiRawInput extends StatefulWidget {
   final ValueChanged<String>? onSubmitted;
 
   /// Whether the field accepts user input.
+  ///
+  /// Disabling releases focus and blocks focus requests while preserving the
+  /// controller, selection and caller-owned [focusNode] settings.
   final bool enabled;
 
   /// Whether the field is read-only (shows text but ignores input).
@@ -146,6 +152,9 @@ class OiRawInput extends StatefulWidget {
 }
 
 class _OiRawInputState extends State<OiRawInput> {
+  // EditableText treats changed selection controls as a replacement overlay.
+  // Keep their identity stable across controller, focus and theme rebuilds.
+  final OiTextSelectionControls _selectionControls = OiTextSelectionControls();
   // Track whether the placeholder should be visible.
   bool _showPlaceholder = true;
 
@@ -194,14 +203,13 @@ class _OiRawInputState extends State<OiRawInput> {
               context.animations.reducedMotion ||
               MediaQuery.disableAnimationsOf(context);
           Scrollable.maybeOf(context)?.position; // trigger dependency
-          unawaited(
-            Scrollable.ensureVisible(
-              context,
-              alignment: 0.5,
-              duration: reduced
-                  ? Duration.zero
-                  : const Duration(milliseconds: 200),
-            ),
+
+          Scrollable.ensureVisible(
+            context,
+            alignment: 0.5,
+            duration: reduced
+                ? Duration.zero
+                : const Duration(milliseconds: 200),
           );
         }
       });
@@ -259,7 +267,8 @@ class _OiRawInputState extends State<OiRawInput> {
     if (themeData != null) {
       return themeData.textTheme
           .styleFor(OiLabelVariant.small)
-          .copyWith(color: themeData.colors.text, height: 1.2);
+          .copyWith(color: themeData.colors.text, height: 1.2)
+          .merge(themeData.components.textInput?.textStyle);
     }
     return const TextStyle(
       fontSize: 14,
@@ -308,7 +317,7 @@ class _OiRawInputState extends State<OiRawInput> {
       autofocus: widget.autofocus,
       inputFormatters: widget.inputFormatters,
       scrollController: widget.scrollController,
-      selectionControls: widget.selectionControls ?? OiTextSelectionControls(),
+      selectionControls: widget.selectionControls ?? _selectionControls,
       contextMenuBuilder: widget.contextMenuBuilder,
       // Required: renderedCursorColor drives the actual cursor painting.
       selectionColor: effectiveCursorColor.withValues(alpha: 0.3),
@@ -347,12 +356,17 @@ class _OiRawInputState extends State<OiRawInput> {
             Positioned.fill(
               child: IgnorePointer(
                 child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    widget.placeholder!,
-                    style: effectiveStyle.copyWith(color: placeholderColor),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+                  alignment: widget.maxLines == 1
+                      ? Alignment.centerLeft
+                      : Alignment.topLeft,
+                  child: ExcludeSemantics(
+                    excluding: widget.excludePlaceholderSemantics,
+                    child: Text(
+                      widget.placeholder!,
+                      style: effectiveStyle.copyWith(color: placeholderColor),
+                      maxLines: widget.maxLines,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
                 ),
               ),
@@ -362,19 +376,40 @@ class _OiRawInputState extends State<OiRawInput> {
       );
     }
 
-    // Build the Row with optional leading / trailing.
-    if (widget.leading == null && widget.trailing == null) {
-      return Listener(onPointerDown: _handlePointerDown, child: fieldWidget);
+    // EditableText delegates enabled/focus semantics to its input wrapper.
+    // Without this contract the web engine emits a disabled native text field.
+    void focusInput() {
+      if (!widget.enabled || !widget.focusNode.canRequestFocus) return;
+      if (!widget.controller.selection.isValid) {
+        widget.controller.selection = TextSelection.collapsed(
+          offset: widget.controller.text.length,
+        );
+      }
+      widget.focusNode.requestFocus();
     }
 
-    return Listener(
-      onPointerDown: _handlePointerDown,
-      child: Row(
-        children: [
-          if (widget.leading != null) widget.leading!,
-          Expanded(child: fieldWidget),
-          if (widget.trailing != null) widget.trailing!,
-        ],
+    // A temporarily disabled editor must release its input connection. Merely
+    // making EditableText read-only leaves it focused and can retain a stale
+    // read-only web editing configuration when it becomes enabled again.
+    // ExcludeFocus also respects caller-owned FocusNode settings on re-enable.
+    return ExcludeFocus(
+      excluding: !widget.enabled,
+      child: Semantics(
+        enabled: widget.enabled,
+        onTap: widget.enabled && !widget.readOnly ? focusInput : null,
+        onFocus: widget.enabled ? focusInput : null,
+        child: Listener(
+          onPointerDown: _handlePointerDown,
+          child: widget.leading == null && widget.trailing == null
+              ? fieldWidget
+              : Row(
+                  children: [
+                    if (widget.leading != null) widget.leading!,
+                    Expanded(child: fieldWidget),
+                    if (widget.trailing != null) widget.trailing!,
+                  ],
+                ),
+        ),
       ),
     );
   }

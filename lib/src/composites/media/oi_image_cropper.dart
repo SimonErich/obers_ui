@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
+import 'package:obers_ui/src/primitives/display/oi_icon.dart';
 
 /// The result of a crop operation.
 ///
@@ -296,7 +297,7 @@ class _OiImageCropperState extends State<OiImageCropper> {
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Center(
-                            child: Icon(
+                            child: OiIcon.raw(
                               OiIcons.rotateCw,
                               size: 20,
                               color: colors.text,
@@ -328,7 +329,7 @@ class _OiImageCropperState extends State<OiImageCropper> {
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Center(
-                            child: Icon(
+                            child: OiIcon.raw(
                               OiIcons.flipHorizontal,
                               size: 20,
                               color: colors.text,
@@ -359,7 +360,7 @@ class _OiImageCropperState extends State<OiImageCropper> {
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Center(
-                            child: Icon(
+                            child: OiIcon.raw(
                               OiIcons.flipVertical,
                               size: 20,
                               color: colors.text,

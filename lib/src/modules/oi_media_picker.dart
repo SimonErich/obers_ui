@@ -6,6 +6,7 @@ import 'package:obers_ui/src/components/display/oi_progress.dart';
 import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/primitives/display/oi_divider.dart';
+import 'package:obers_ui/src/primitives/display/oi_icon.dart';
 import 'package:obers_ui/src/primitives/display/oi_label.dart';
 import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
 
@@ -380,7 +381,11 @@ class _OiMediaPickerState extends State<OiMediaPicker> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(OiIcons.image, size: 28, color: colors.textMuted),
+                      OiIcon.raw(
+                        OiIcons.image,
+                        size: 28,
+                        color: colors.textMuted,
+                      ),
                       SizedBox(height: context.spacing.xs),
                       Padding(
                         padding: EdgeInsets.symmetric(
@@ -409,7 +414,7 @@ class _OiMediaPickerState extends State<OiMediaPicker> {
                       color: colors.primary.base,
                       shape: BoxShape.circle,
                     ),
-                    child: Icon(
+                    child: OiIcon.raw(
                       OiIcons.check,
                       size: 14,
                       color: colors.textOnPrimary,
@@ -441,7 +446,7 @@ class _OiMediaPickerState extends State<OiMediaPicker> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(OiIcons.upload, size: 48, color: colors.textMuted),
+          OiIcon.raw(OiIcons.upload, size: 48, color: colors.textMuted),
           SizedBox(height: spacing.md),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -519,7 +524,7 @@ class _OiMediaPickerState extends State<OiMediaPicker> {
                         child: item.thumbnail != null
                             ? SizedBox.expand(child: item.thumbnail)
                             : Center(
-                                child: Icon(
+                                child: OiIcon.raw(
                                   OiIcons.image,
                                   size: 20,
                                   color: colors.textMuted,
@@ -541,7 +546,7 @@ class _OiMediaPickerState extends State<OiMediaPicker> {
                               color: colors.error.base,
                               shape: BoxShape.circle,
                             ),
-                            child: Icon(
+                            child: OiIcon.raw(
                               OiIcons.x,
                               size: 12,
                               color: colors.textOnPrimary,
@@ -586,7 +591,7 @@ class _OiMediaPickerState extends State<OiMediaPicker> {
         ),
       ),
       child: progress.error != null
-          ? Icon(OiIcons.x, size: 12, color: colors.error.base)
+          ? OiIcon.raw(OiIcons.x, size: 12, color: colors.error.base)
           : OiProgress.linear(value: progress.progress, strokeWidth: 3),
     );
   }

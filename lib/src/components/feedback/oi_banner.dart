@@ -54,8 +54,10 @@ class OiBanner extends StatefulWidget {
     required this.message,
     required this.level,
     this.title,
+    this.inlineTitle = false,
     this.icon,
     this.action,
+    this.trailing,
     this.secondaryAction,
     this.onDismiss,
     this.dismissible = true,
@@ -74,8 +76,10 @@ class OiBanner extends StatefulWidget {
   const OiBanner.info({
     required String message,
     String? title,
+    bool inlineTitle = false,
     IconData? icon,
     Widget? action,
+    Widget? trailing,
     Widget? secondaryAction,
     VoidCallback? onDismiss,
     bool dismissible = true,
@@ -89,8 +93,10 @@ class OiBanner extends StatefulWidget {
          message: message,
          level: OiBannerLevel.info,
          title: title,
+         inlineTitle: inlineTitle,
          icon: icon,
          action: action,
+         trailing: trailing,
          secondaryAction: secondaryAction,
          onDismiss: onDismiss,
          dismissible: dismissible,
@@ -106,8 +112,10 @@ class OiBanner extends StatefulWidget {
   const OiBanner.success({
     required String message,
     String? title,
+    bool inlineTitle = false,
     IconData? icon,
     Widget? action,
+    Widget? trailing,
     Widget? secondaryAction,
     VoidCallback? onDismiss,
     bool dismissible = true,
@@ -121,8 +129,10 @@ class OiBanner extends StatefulWidget {
          message: message,
          level: OiBannerLevel.success,
          title: title,
+         inlineTitle: inlineTitle,
          icon: icon,
          action: action,
+         trailing: trailing,
          secondaryAction: secondaryAction,
          onDismiss: onDismiss,
          dismissible: dismissible,
@@ -138,8 +148,10 @@ class OiBanner extends StatefulWidget {
   const OiBanner.warning({
     required String message,
     String? title,
+    bool inlineTitle = false,
     IconData? icon,
     Widget? action,
+    Widget? trailing,
     Widget? secondaryAction,
     VoidCallback? onDismiss,
     bool dismissible = true,
@@ -153,8 +165,10 @@ class OiBanner extends StatefulWidget {
          message: message,
          level: OiBannerLevel.warning,
          title: title,
+         inlineTitle: inlineTitle,
          icon: icon,
          action: action,
+         trailing: trailing,
          secondaryAction: secondaryAction,
          onDismiss: onDismiss,
          dismissible: dismissible,
@@ -170,8 +184,10 @@ class OiBanner extends StatefulWidget {
   const OiBanner.error({
     required String message,
     String? title,
+    bool inlineTitle = false,
     IconData? icon,
     Widget? action,
+    Widget? trailing,
     Widget? secondaryAction,
     VoidCallback? onDismiss,
     bool dismissible = true,
@@ -185,8 +201,10 @@ class OiBanner extends StatefulWidget {
          message: message,
          level: OiBannerLevel.error,
          title: title,
+         inlineTitle: inlineTitle,
          icon: icon,
          action: action,
+         trailing: trailing,
          secondaryAction: secondaryAction,
          onDismiss: onDismiss,
          dismissible: dismissible,
@@ -202,8 +220,10 @@ class OiBanner extends StatefulWidget {
   const OiBanner.neutral({
     required String message,
     String? title,
+    bool inlineTitle = false,
     IconData? icon,
     Widget? action,
+    Widget? trailing,
     Widget? secondaryAction,
     VoidCallback? onDismiss,
     bool dismissible = true,
@@ -217,8 +237,10 @@ class OiBanner extends StatefulWidget {
          message: message,
          level: OiBannerLevel.neutral,
          title: title,
+         inlineTitle: inlineTitle,
          icon: icon,
          action: action,
+         trailing: trailing,
          secondaryAction: secondaryAction,
          onDismiss: onDismiss,
          dismissible: dismissible,
@@ -245,6 +267,7 @@ class OiBanner extends StatefulWidget {
   const OiBanner.loading({
     required String message,
     String? title,
+    bool inlineTitle = false,
     bool compact = false,
     bool border = true,
     bool? visible,
@@ -256,6 +279,7 @@ class OiBanner extends StatefulWidget {
          message: message,
          level: OiBannerLevel.loading,
          title: title,
+         inlineTitle: inlineTitle,
          dismissible: false,
          compact: compact,
          border: border,
@@ -272,6 +296,9 @@ class OiBanner extends StatefulWidget {
   /// Primary message text. Always visible.
   final String message;
 
+  /// Keeps a title and message on one wrapping line.
+  final bool inlineTitle;
+
   /// Optional bold title above the message.
   final String? title;
 
@@ -281,6 +308,9 @@ class OiBanner extends StatefulWidget {
   /// Primary action widget — typically an `OiButton.ghost` or
   /// `OiButton.outline`.
   final Widget? action;
+
+  /// Noninteractive context displayed at the trailing edge of the banner.
+  final Widget? trailing;
 
   /// Secondary action widget — typically an `OiButton.ghost`.
   final Widget? secondaryAction;
@@ -505,12 +535,22 @@ class _OiBannerState extends State<OiBanner>
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          if (widget.title != null)
+                          if (widget.inlineTitle)
+                            Wrap(
+                              spacing: 6,
+                              runSpacing: 2,
+                              children: [
+                                if (widget.title != null)
+                                  OiLabel.bodyStrong(widget.title!),
+                                OiLabel.body(widget.message),
+                              ],
+                            ),
+                          if (!widget.inlineTitle && widget.title != null)
                             Padding(
                               padding: const EdgeInsets.only(bottom: 2),
                               child: OiLabel.bodyStrong(widget.title!),
                             ),
-                          OiLabel.body(widget.message),
+                          if (!widget.inlineTitle) OiLabel.body(widget.message),
                           if (widget.action != null ||
                               widget.secondaryAction != null)
                             Padding(
@@ -528,6 +568,10 @@ class _OiBannerState extends State<OiBanner>
                         ],
                       ),
                     ),
+                    if (widget.trailing != null) ...[
+                      SizedBox(width: spacing.sm),
+                      widget.trailing!,
+                    ],
                     if (widget.dismissible)
                       OiIconButton(
                         icon: OiIcons.x,

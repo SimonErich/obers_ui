@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
+import 'package:obers_ui/src/primitives/display/oi_icon.dart';
 
 /// A permission in the matrix.
 ///
@@ -295,7 +296,11 @@ class _OiCheckbox extends StatelessWidget {
       ),
       child: checked
           ? Center(
-              child: Icon(OiIcons.check, size: 14, color: colors.textOnPrimary),
+              child: OiIcon.raw(
+                OiIcons.check,
+                size: 14,
+                color: colors.textOnPrimary,
+              ),
             )
           : null,
     );

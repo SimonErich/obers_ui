@@ -3,6 +3,7 @@ import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_color_scheme.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/primitives/animation/oi_shimmer.dart';
+import 'package:obers_ui/src/primitives/display/oi_icon.dart';
 
 /// The size of an [OiAvatar].
 ///
@@ -63,6 +64,8 @@ class OiAvatar extends StatelessWidget {
     this.skeleton = false,
     this.presence,
     this.backgroundColor,
+    this.foregroundColor,
+    this.borderRadius,
     super.key,
   });
 
@@ -89,6 +92,13 @@ class OiAvatar extends StatelessWidget {
   /// When set, this overrides the default `colors.primary.base` background
   /// used for initials and icon fallbacks.
   final Color? backgroundColor;
+
+  /// Optional initials/icon color for pale or custom avatar backgrounds.
+  final Color? foregroundColor;
+
+  /// Rounded shape for organization or product identities. Null remains circular.
+  /// The same shape applies to images, initials, loading and presence rings.
+  final BorderRadius? borderRadius;
 
   /// Accessibility label announced by screen readers.
   final String semanticLabel;
@@ -194,18 +204,20 @@ class OiAvatar extends StatelessWidget {
           height: d,
           decoration: BoxDecoration(
             color: colors.surfaceHover,
-            shape: BoxShape.circle,
+            shape: borderRadius == null ? BoxShape.circle : BoxShape.rectangle,
+            borderRadius: borderRadius,
           ),
         ),
       );
     } else {
-      avatar = ClipOval(
-        child: SizedBox(
-          width: d,
-          height: d,
-          child: _buildContent(context, colors, d),
-        ),
+      final content = SizedBox(
+        width: d,
+        height: d,
+        child: _buildContent(context, colors, d),
       );
+      avatar = borderRadius == null
+          ? ClipOval(child: content)
+          : ClipRRect(borderRadius: borderRadius!, child: content);
     }
 
     if (presence != null && !skeleton) {
@@ -227,7 +239,13 @@ class OiAvatar extends StatelessWidget {
               width: totalD,
               height: totalD,
               decoration: BoxDecoration(
-                shape: BoxShape.circle,
+                shape: borderRadius == null
+                    ? BoxShape.circle
+                    : BoxShape.rectangle,
+                borderRadius: borderRadius == null
+                    ? null
+                    : borderRadius! +
+                          BorderRadius.circular(ringWidth + ringGap),
                 border: Border.all(color: ringColor, width: ringWidth),
               ),
             ),
@@ -245,7 +263,7 @@ class OiAvatar extends StatelessWidget {
                   shape: BoxShape.circle,
                 ),
                 child: Center(
-                  child: Icon(
+                  child: OiIcon.raw(
                     _presenceIcon(presence!),
                     size: indicatorSize * 0.7,
                     color: ringColor,
@@ -293,7 +311,7 @@ class OiAvatar extends StatelessWidget {
           child: Text(
             text,
             style: TextStyle(
-              color: colors.textOnPrimary,
+              color: foregroundColor ?? colors.textOnPrimary,
               fontSize: _fontSize,
               fontWeight: FontWeight.w600,
               height: 1,
@@ -307,7 +325,11 @@ class OiAvatar extends StatelessWidget {
       return ColoredBox(
         color: backgroundColor ?? colors.primary.base,
         child: Center(
-          child: Icon(icon, size: _iconSize, color: colors.textOnPrimary),
+          child: OiIcon.raw(
+            icon,
+            size: _iconSize,
+            color: foregroundColor ?? colors.textOnPrimary,
+          ),
         ),
       );
     }
@@ -316,7 +338,11 @@ class OiAvatar extends StatelessWidget {
     return ColoredBox(
       color: colors.surfaceHover,
       child: Center(
-        child: Icon(OiIcons.user, size: _iconSize, color: colors.textMuted),
+        child: OiIcon.raw(
+          OiIcons.user,
+          size: _iconSize,
+          color: colors.textMuted,
+        ),
       ),
     );
   }

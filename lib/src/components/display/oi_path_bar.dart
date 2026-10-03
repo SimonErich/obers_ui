@@ -4,6 +4,7 @@ import 'package:obers_ui/src/components/navigation/oi_breadcrumbs.dart';
 import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/primitives/animation/oi_morph.dart';
+import 'package:obers_ui/src/primitives/display/oi_icon.dart';
 
 /// A path segment for the [OiPathBar].
 ///
@@ -171,7 +172,7 @@ class _OiPathBarState extends State<OiPathBar> {
               if (showIcon)
                 Padding(
                   padding: const EdgeInsets.only(right: 4),
-                  child: Icon(
+                  child: OiIcon.raw(
                     OiIcons.folder, // folder
                     size: 16,
                     color: (colors as dynamic).textSubtle as Color,

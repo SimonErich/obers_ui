@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
+import 'package:obers_ui/src/primitives/display/oi_icon.dart';
 
 /// An event in the timeline.
 ///
@@ -153,7 +154,7 @@ class _OiTimelineEntryState extends State<_OiTimelineEntry> {
       decoration: BoxDecoration(color: dotColor, shape: BoxShape.circle),
       child: widget.event.icon != null
           ? Center(
-              child: Icon(
+              child: OiIcon.raw(
                 widget.event.icon,
                 size: dotSize * 0.6,
                 color: colors.textOnPrimary,

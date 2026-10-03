@@ -151,7 +151,7 @@ class _FilterChipState extends State<_FilterChip> {
                       child: AnimatedScale(
                         scale: _closeHovered ? 1.3 : 1.0,
                         duration: const Duration(milliseconds: 150),
-                        child: Icon(
+                        child: OiIcon.raw(
                           OiIcons.x,
                           size: 14,
                           weight: _closeHovered ? 700 : 400,
@@ -164,7 +164,7 @@ class _FilterChipState extends State<_FilterChip> {
               else
                 Padding(
                   padding: const EdgeInsets.only(left: 4, right: 8),
-                  child: Icon(
+                  child: OiIcon.raw(
                     OiIcons.chevronDown,
                     size: 14,
                     color: colors.textMuted,

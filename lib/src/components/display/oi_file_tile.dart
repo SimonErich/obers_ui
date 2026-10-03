@@ -2,6 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/modules/oi_file_manager.dart';
+import 'package:obers_ui/src/primitives/display/oi_icon.dart';
 import 'package:obers_ui/src/utils/file_utils.dart';
 
 /// A single row in the list view of a file explorer.
@@ -66,7 +67,7 @@ class OiFileTile extends StatelessWidget {
           ),
           child: Row(
             children: [
-              Icon(
+              OiIcon.raw(
                 file.folder ? OiIcons.folder : OiIcons.file,
                 size: 24,
                 color: file.folder ? colors.warning.base : colors.textSubtle,

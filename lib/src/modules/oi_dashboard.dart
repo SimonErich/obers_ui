@@ -7,6 +7,7 @@ import 'package:obers_ui/src/foundation/persistence/oi_settings_mixin.dart';
 import 'package:obers_ui/src/foundation/persistence/oi_settings_provider.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/models/settings/oi_dashboard_settings.dart';
+import 'package:obers_ui/src/primitives/display/oi_icon.dart';
 
 // ---------------------------------------------------------------------------
 // Supporting types
@@ -259,7 +260,7 @@ class _OiDashboardState extends State<OiDashboard>
           Positioned(
             top: 4,
             right: 4,
-            child: Icon(
+            child: OiIcon.raw(
               OiIcons.alignJustify,
               size: 16,
               color: colors.textMuted,

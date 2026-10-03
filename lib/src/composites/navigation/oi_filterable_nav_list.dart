@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/display/oi_badge.dart';
 import 'package:obers_ui/src/components/display/oi_progress.dart';
@@ -420,9 +418,9 @@ class _GroupSectionState<T> extends State<_GroupSection<T>>
     super.didUpdateWidget(oldWidget);
     if (widget.expanded != oldWidget.expanded) {
       if (widget.expanded) {
-        unawaited(_animController.forward());
+        _animController.forward();
       } else {
-        unawaited(_animController.reverse());
+        _animController.reverse();
       }
     }
   }
@@ -478,7 +476,7 @@ class _GroupSectionState<T> extends State<_GroupSection<T>>
         // Group items with animated expand/collapse
         SizeTransition(
           sizeFactor: _animation,
-          axisAlignment: -1,
+          alignment: AlignmentDirectional.topStart,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,

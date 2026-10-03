@@ -4,6 +4,7 @@ import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/oi_responsive.dart';
 import 'package:obers_ui/src/foundation/theme/oi_decoration_theme.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
+import 'package:obers_ui/src/primitives/display/oi_icon.dart';
 import 'package:obers_ui/src/primitives/display/oi_surface.dart';
 import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
 import 'package:obers_ui/src/primitives/layout/oi_column.dart';
@@ -89,7 +90,11 @@ class _OiProductGalleryState extends State<OiProductGallery> {
           color: colors.surfaceSubtle,
           borderRadius: context.radius.md,
           child: Center(
-            child: Icon(_kImagePlaceholder, size: 48, color: colors.textMuted),
+            child: OiIcon.raw(
+              _kImagePlaceholder,
+              size: 48,
+              color: colors.textMuted,
+            ),
           ),
         ),
       );

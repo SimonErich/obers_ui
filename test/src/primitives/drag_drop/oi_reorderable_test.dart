@@ -1,5 +1,6 @@
 // Tests do not require documentation comments.
 
+import 'package:flutter/semantics.dart' show CustomSemanticsAction;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui/src/foundation/oi_app.dart';
@@ -143,12 +144,50 @@ void main() {
     final gesture = await tester.startGesture(firstItemCenter);
     // Simulate the long-press-style hold needed by drag start listeners.
     await tester.pump(const Duration(milliseconds: 500));
+    await gesture.moveBy(const Offset(0, 20));
+    await tester.pump();
     await gesture.moveBy(const Offset(0, 80));
     await tester.pump();
     await gesture.up();
     await tester.pumpAndSettle();
 
-    expect(capturedOld, isNotNull);
-    expect(capturedNew, isNotNull);
+    expect(capturedOld, 0);
+    expect(capturedNew, 3);
+  });
+
+  testWidgets('accessible reorder retains pre-removal insertion indices', (
+    tester,
+  ) async {
+    (int, int)? move;
+    await tester.pumpObers(
+      OiReorderable(
+        onReorder: (oldIndex, newIndex) => move = (oldIndex, newIndex),
+        children: const [
+          SizedBox(key: ValueKey('a'), height: 60, child: Text('alpha')),
+          SizedBox(key: ValueKey('b'), height: 60, child: Text('beta')),
+          SizedBox(key: ValueKey('c'), height: 60, child: Text('gamma')),
+        ],
+      ),
+    );
+    final actions = tester
+        .widgetList<Semantics>(find.byType(Semantics))
+        .map((widget) => widget.properties.customSemanticsActions)
+        .whereType<Map<CustomSemanticsAction, VoidCallback>>()
+        .toList();
+    final labels = WidgetsLocalizations.of(
+      tester.element(find.byType(OiReorderable)),
+    );
+    actions.first.entries
+        .firstWhere((entry) => entry.key.label == labels.reorderItemDown)
+        .value();
+    expect(move, (0, 2));
+    actions.last.entries
+        .firstWhere((entry) => entry.key.label == labels.reorderItemUp)
+        .value();
+    expect(move, (2, 1));
+    actions.first.entries
+        .firstWhere((entry) => entry.key.label == labels.reorderItemToEnd)
+        .value();
+    expect(move, (0, 3));
   });
 }

@@ -11,11 +11,23 @@ extension _OiTableHeader<T> on _OiTableState<T> {
 
   Widget _buildHeaderRow() {
     final cols = _visibleColumns;
-    return ColoredBox(
+    return DecoratedBox(
       key: const Key('oi_table_header'),
-      color: context.colors.surfaceSubtle,
+      decoration: BoxDecoration(
+        color:
+            context.components.table?.headerBackground ??
+            context.colors.surfaceSubtle,
+        border: Border(
+          bottom: BorderSide(
+            color:
+                context.components.table?.borderColor ??
+                context.colors.borderSubtle,
+          ),
+        ),
+      ),
       child: Row(
         children: [
+          if (widget.expandedRowBuilder != null) const SizedBox(width: 32),
           if (widget.selectable) _buildSelectAllCheckbox(),
           for (var i = 0; i < cols.length; i++)
             if (_isFlexColumn(cols[i]))
@@ -64,7 +76,9 @@ extension _OiTableHeader<T> on _OiTableState<T> {
                 child: Text(
                   col.header,
                   textDirection: TextDirection.ltr,
-                  style: TextStyle(color: context.colors.text),
+                  style: context.textTheme.body
+                      .merge(context.components.table?.headerTextStyle)
+                      .copyWith(color: context.colors.text),
                 ),
               ),
             ),
@@ -99,30 +113,35 @@ extension _OiTableHeader<T> on _OiTableState<T> {
     if (!widget.multiSelect) {
       return const SizedBox(width: 40);
     }
-    return GestureDetector(
-      onTap: () {
-        if (_ctrl.selectAll) {
-          _ctrl.clearSelection();
-        } else {
-          final allKeys = <String>{};
-          for (var i = 0; i < widget.rows.length; i++) {
-            allKeys.add(_rowKeyAt(widget.rows[i], i));
-          }
-          _ctrl.selectAllRows(allKeys);
-        }
-        widget.onSelectionChanged?.call(Set<String>.from(_ctrl.selectedRows));
-      },
-      child: SizedBox(
-        width: 40,
-        height: _headerRowHeight,
-        child: Center(
-          child: Icon(
-            _ctrl.selectAll ? OiIcons.squareCheckBig : OiIcons.square,
-            size: 16,
-            color: _ctrl.selectAll
-                ? context.colors.primary.base
-                : context.colors.textMuted,
-          ),
+    final visibleKeys = {
+      for (var i = 0; i < widget.rows.length; i++) _rowKeyAt(widget.rows[i], i),
+    };
+    final allSelected =
+        visibleKeys.isNotEmpty &&
+        visibleKeys.every(_ctrl.selectedRows.contains);
+    final someSelected = visibleKeys.any(_ctrl.selectedRows.contains);
+    return SizedBox(
+      width: 40,
+      height: _headerRowHeight,
+      child: Center(
+        child: OiCheckbox(
+          value: allSelected
+              ? true
+              : someSelected
+              ? null
+              : false,
+          enabled: visibleKeys.isNotEmpty,
+          semanticLabel: widget.labels.bulkBar.selectAll,
+          onChanged: (selected) {
+            if (selected) {
+              _ctrl.selectAllRows(visibleKeys);
+            } else {
+              _ctrl.clearSelection();
+            }
+            widget.onSelectionChanged?.call(
+              Set<String>.from(_ctrl.selectedRows),
+            );
+          },
         ),
       ),
     );
@@ -132,14 +151,20 @@ extension _OiTableHeader<T> on _OiTableState<T> {
     final isSorted = _ctrl.sortColumnId == col.id;
     final width = _ctrl.columnWidths[col.id] ?? col.width;
     final colors = context.colors;
-
-    // Estimate minimum width needed for the header label to avoid cut-off.
-    // ~7px per character at fontSize 12 + 16px horizontal padding + sort icon.
-    final labelMinWidth = col.header.length * 7.0 + 16 + (isSorted ? 18 : 0);
-    final effectiveMinWidth = math.max(col.minWidth, labelMinWidth);
+    final themedStyle = context.components.table?.headerTextStyle;
+    final headerStyle = context.textTheme.body
+        .merge(themedStyle)
+        .copyWith(
+          fontSize: themedStyle?.fontSize ?? 14,
+          fontWeight: themedStyle?.fontWeight ?? FontWeight.w600,
+          color: themedStyle?.color ?? colors.textSubtle,
+        );
 
     final innerContent = Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8),
+      padding:
+          col.cellPadding ??
+          context.components.table?.cellPadding ??
+          const EdgeInsets.symmetric(horizontal: 8),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -147,23 +172,15 @@ extension _OiTableHeader<T> on _OiTableState<T> {
             child: _HoverText(
               text: col.header,
               textAlign: col.textAlign,
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: colors.textSubtle,
-              ),
-              hoverStyle: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w700,
-                color: colors.text,
-              ),
+              style: headerStyle,
+              hoverStyle: headerStyle.copyWith(color: colors.text),
               sortable: col.sortable,
             ),
           ),
           if (isSorted)
             Padding(
               padding: const EdgeInsets.only(left: 2),
-              child: Icon(
+              child: OiIcon.raw(
                 _ctrl.sortAscending ? _arrowUp : _arrowDown,
                 size: 14,
                 color: colors.primary.base,
@@ -175,12 +192,12 @@ extension _OiTableHeader<T> on _OiTableState<T> {
     final isFlex = _isFlexColumn(col);
     final resolvedWidth = isFlex
         ? null
-        : width ?? effectiveMinWidth.clamp(effectiveMinWidth, col.maxWidth);
+        : width ?? col.minWidth.clamp(col.minWidth, col.maxWidth);
     final headerContent = GestureDetector(
       onTap: () => _handleHeaderTap(col),
       child: Container(
         height: _headerRowHeight,
-        alignment: AlignmentDirectional.centerStart,
+        alignment: _OiTableStatus._alignmentFromTextAlign(col.textAlign),
         child: innerContent,
       ),
     );

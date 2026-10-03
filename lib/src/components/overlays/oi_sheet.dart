@@ -1,8 +1,11 @@
 import 'dart:async';
 
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/src/components/buttons/oi_button.dart';
+import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/oi_overlays.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
+import 'package:obers_ui/src/primitives/display/oi_label.dart';
 import 'package:obers_ui/src/primitives/interaction/oi_focus_trap.dart';
 
 /// The side from which an [OiSheet] slides in.
@@ -51,6 +54,11 @@ class OiSheet extends StatefulWidget {
     this.dismissible = true,
     this.dragHandle = false,
     this.snapPoints,
+    this.inset,
+    this.header,
+    this.showHeader = false,
+    this.footer,
+    this.scrollable = false,
     super.key,
   });
 
@@ -85,6 +93,23 @@ class OiSheet extends StatefulWidget {
   /// a drag ends. Dragging past the lowest snap point closes the sheet.
   final List<double>? snapPoints;
 
+  /// Distance between the sheet and viewport edges.
+  final EdgeInsetsGeometry? inset;
+
+  /// Header pinned above the scrollable body.
+  final Widget? header;
+
+  /// Shows a standard pinned [label] and an accessible close button.
+  ///
+  /// An explicit [header] takes precedence. The close button uses [onClose].
+  final bool showHeader;
+
+  /// Footer pinned below the scrollable body.
+  final Widget? footer;
+
+  /// Whether the sheet scrolls intrinsically sized body content.
+  final bool scrollable;
+
   /// Shows a sheet above the current widget tree.
   ///
   /// Uses [OiOverlays.of] when available; otherwise falls back to the raw
@@ -98,6 +123,11 @@ class OiSheet extends StatefulWidget {
     bool dismissible = true,
     bool dragHandle = false,
     List<double>? snapPoints,
+    EdgeInsetsGeometry? inset,
+    Widget? header,
+    bool showHeader = false,
+    Widget? footer,
+    bool scrollable = false,
     VoidCallback? onClose,
   }) {
     final service = OiOverlays.maybeOf(context);
@@ -116,6 +146,11 @@ class OiSheet extends StatefulWidget {
           dismissible: dismissible,
           dragHandle: dragHandle,
           snapPoints: snapPoints,
+          inset: inset,
+          header: header,
+          showHeader: showHeader,
+          footer: footer,
+          scrollable: scrollable,
           onClose: () {
             onClose?.call();
             handle.dismiss();
@@ -139,6 +174,11 @@ class OiSheet extends StatefulWidget {
         dismissible: dismissible,
         dragHandle: dragHandle,
         snapPoints: snapPoints,
+        inset: inset,
+        header: header,
+        showHeader: showHeader,
+        footer: footer,
+        scrollable: scrollable,
         onClose: () {
           onClose?.call();
           entry
@@ -168,6 +208,11 @@ class OiSheet extends StatefulWidget {
     bool dismissible = true,
     bool dragHandle = false,
     List<double>? snapPoints,
+    EdgeInsetsGeometry? inset,
+    Widget? header,
+    bool showHeader = false,
+    Widget? footer,
+    bool scrollable = false,
   }) async {
     final completer = Completer<T?>();
     late OiOverlayHandle handle;
@@ -197,6 +242,11 @@ class OiSheet extends StatefulWidget {
           dismissible: dismissible,
           dragHandle: dragHandle,
           snapPoints: snapPoints,
+          inset: inset,
+          header: header,
+          showHeader: showHeader,
+          footer: footer,
+          scrollable: scrollable,
           onClose: close,
           child: builder(close),
         ),
@@ -213,6 +263,11 @@ class OiSheet extends StatefulWidget {
           dismissible: dismissible,
           dragHandle: dragHandle,
           snapPoints: snapPoints,
+          inset: inset,
+          header: header,
+          showHeader: showHeader,
+          footer: footer,
+          scrollable: scrollable,
           onClose: () {
             close();
             entry
@@ -266,7 +321,7 @@ class _OiSheetState extends State<OiSheet> with SingleTickerProviderStateMixin {
     _controller.duration = newDuration;
     // Start the open animation if the sheet is open and hasn't started yet.
     if (widget.open && _controller.status == AnimationStatus.dismissed) {
-      unawaited(_controller.forward());
+      _controller.forward();
     }
   }
 
@@ -276,9 +331,9 @@ class _OiSheetState extends State<OiSheet> with SingleTickerProviderStateMixin {
     if (widget.open != oldWidget.open) {
       if (widget.open) {
         _closing = false;
-        unawaited(_controller.forward());
+        _controller.forward();
       } else {
-        unawaited(_controller.reverse());
+        _controller.reverse();
       }
     }
   }
@@ -374,20 +429,59 @@ class _OiSheetState extends State<OiSheet> with SingleTickerProviderStateMixin {
       );
     }
 
+    final sheetTheme = context.components.sheet;
+    final inset = (widget.inset ?? sheetTheme?.inset ?? EdgeInsets.zero)
+        .resolve(Directionality.of(context));
+    final availableWidth = (screenSize.width - inset.horizontal).clamp(
+      0.0,
+      double.infinity,
+    );
+    final availableHeight = (screenSize.height - inset.vertical).clamp(
+      0.0,
+      double.infinity,
+    );
+    final header =
+        widget.header ??
+        (widget.showHeader
+            ? Row(
+                children: [
+                  Expanded(child: OiLabel.h3(widget.label)),
+                  OiButton.icon(
+                    icon: OiIcons.x,
+                    label: 'Close ${widget.label}',
+                    onTap: widget.onClose,
+                  ),
+                ],
+              )
+            : null);
+    final constrainedBody =
+        widget.scrollable || header != null || widget.footer != null;
+    final body = widget.scrollable
+        ? SingleChildScrollView(child: widget.child)
+        : widget.child;
+
     // Build the panel content.
     Widget panel = Container(
-      width: _isVertical ? null : widget.size,
-      height: _isVertical ? widget.size : null,
+      width: _isVertical
+          ? availableWidth
+          : widget.size?.clamp(0.0, availableWidth),
+      height: _isVertical
+          ? widget.size?.clamp(0.0, availableHeight)
+          : constrainedBody
+          ? availableHeight
+          : null,
       decoration: BoxDecoration(
-        color: colors.surface,
-        borderRadius: _borderRadius(),
-        boxShadow: [
-          BoxShadow(
-            color: colors.overlay.withValues(alpha: 0.15),
-            blurRadius: 24,
-            offset: _shadowOffset(),
-          ),
-        ],
+        color: sheetTheme?.backgroundColor ?? colors.surface,
+        borderRadius: sheetTheme?.borderRadius ?? _borderRadius(),
+        boxShadow:
+            sheetTheme?.shadow ??
+            [
+              BoxShadow(
+                color: colors.overlay.withValues(alpha: 0.15),
+                blurRadius: 24,
+                offset: _shadowOffset(),
+              ),
+            ],
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -398,7 +492,21 @@ class _OiSheetState extends State<OiSheet> with SingleTickerProviderStateMixin {
               padding: const EdgeInsets.only(top: 8, bottom: 4),
               child: Center(child: handle),
             ),
-          Flexible(child: widget.child),
+          if (header != null)
+            Padding(
+              padding:
+                  sheetTheme?.headerPadding ??
+                  EdgeInsets.all(context.spacing.lg),
+              child: header,
+            ),
+          Flexible(child: body),
+          if (widget.footer != null)
+            Padding(
+              padding:
+                  sheetTheme?.footerPadding ??
+                  EdgeInsets.all(context.spacing.lg),
+              child: widget.footer,
+            ),
           if (handle != null && widget.side == OiPanelSide.top)
             Padding(
               padding: const EdgeInsets.only(bottom: 8, top: 4),
@@ -447,15 +555,23 @@ class _OiSheetState extends State<OiSheet> with SingleTickerProviderStateMixin {
                   child: AnimatedBuilder(
                     animation: _controller,
                     builder: (_, _) => ColoredBox(
-                      color: colors.overlay.withValues(
-                        alpha: 0.6 * _controller.value,
-                      ),
+                      color:
+                          (sheetTheme?.barrierColor ??
+                                  colors.overlay.withValues(alpha: .6))
+                              .withValues(
+                                alpha:
+                                    (sheetTheme?.barrierColor?.a ?? .6) *
+                                    _controller.value,
+                              ),
                     ),
                   ),
                 ),
               ),
             // Panel aligned to the correct edge.
-            Align(alignment: _alignment(), child: panel),
+            Padding(
+              padding: inset,
+              child: Align(alignment: _alignment(), child: panel),
+            ),
           ],
         ),
       ),

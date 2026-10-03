@@ -1,10 +1,13 @@
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_account_switcher_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_action_bar_theme_data.dart';
+import 'package:obers_ui/src/foundation/theme/component_themes/oi_app_shell_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_avatar_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_badge_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_banner_theme_data.dart';
+import 'package:obers_ui/src/foundation/theme/component_themes/oi_bulk_bar_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_button_theme_data.dart';
+import 'package:obers_ui/src/foundation/theme/component_themes/oi_capacity_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_card_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_chart_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_checkbox_theme_data.dart';
@@ -18,19 +21,24 @@ import 'package:obers_ui/src/foundation/theme/component_themes/oi_field_display_
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_file_explorer_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_form_select_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_grouped_list_theme_data.dart';
+import 'package:obers_ui/src/foundation/theme/component_themes/oi_icon_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_index_bar_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_key_value_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_navigation_rail_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_pagination_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_progress_theme_data.dart';
+import 'package:obers_ui/src/foundation/theme/component_themes/oi_radio_theme_data.dart';
+import 'package:obers_ui/src/foundation/theme/component_themes/oi_radio_tile_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_refresh_indicator_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_reorderable_list_theme_data.dart';
+import 'package:obers_ui/src/foundation/theme/component_themes/oi_search_trigger_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_segmented_control_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_select_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_sheet_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_sidebar_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_slider_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_sliver_header_theme_data.dart';
+import 'package:obers_ui/src/foundation/theme/component_themes/oi_stepper_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_switch_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_switch_tile_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_tab_view_theme_data.dart';
@@ -43,10 +51,13 @@ import 'package:obers_ui/src/foundation/theme/component_themes/oi_week_strip_the
 
 export 'component_themes/oi_account_switcher_theme_data.dart';
 export 'component_themes/oi_action_bar_theme_data.dart';
+export 'component_themes/oi_app_shell_theme_data.dart';
 export 'component_themes/oi_avatar_theme_data.dart';
 export 'component_themes/oi_badge_theme_data.dart';
 export 'component_themes/oi_banner_theme_data.dart';
+export 'component_themes/oi_bulk_bar_theme_data.dart';
 export 'component_themes/oi_button_theme_data.dart';
+export 'component_themes/oi_capacity_theme_data.dart';
 export 'component_themes/oi_card_theme_data.dart';
 export 'component_themes/oi_chart_palette.dart';
 export 'component_themes/oi_chart_theme_data.dart';
@@ -61,20 +72,25 @@ export 'component_themes/oi_field_display_theme.dart';
 export 'component_themes/oi_file_explorer_theme_data.dart';
 export 'component_themes/oi_form_select_theme_data.dart';
 export 'component_themes/oi_grouped_list_theme_data.dart';
+export 'component_themes/oi_icon_theme_data.dart';
 export 'component_themes/oi_index_bar_theme_data.dart';
 export 'component_themes/oi_key_value_theme_data.dart';
 export 'component_themes/oi_navigation_rail_theme_data.dart';
 export 'component_themes/oi_otp_theme_data.dart';
 export 'component_themes/oi_pagination_theme_data.dart';
 export 'component_themes/oi_progress_theme_data.dart';
+export 'component_themes/oi_radio_theme_data.dart';
+export 'component_themes/oi_radio_tile_theme_data.dart';
 export 'component_themes/oi_refresh_indicator_theme_data.dart';
 export 'component_themes/oi_reorderable_list_theme_data.dart';
+export 'component_themes/oi_search_trigger_theme_data.dart';
 export 'component_themes/oi_segmented_control_theme_data.dart';
 export 'component_themes/oi_select_theme_data.dart';
 export 'component_themes/oi_sheet_theme_data.dart';
 export 'component_themes/oi_sidebar_theme_data.dart';
 export 'component_themes/oi_slider_theme_data.dart';
 export 'component_themes/oi_sliver_header_theme_data.dart';
+export 'component_themes/oi_stepper_theme_data.dart';
 export 'component_themes/oi_switch_theme_data.dart';
 export 'component_themes/oi_switch_tile_theme_data.dart';
 export 'component_themes/oi_tab_view_theme_data.dart';
@@ -96,11 +112,15 @@ export 'component_themes/oi_week_strip_theme_data.dart';
 class OiComponentThemes {
   /// Creates an [OiComponentThemes] with all override fields specified.
   const OiComponentThemes({
+    this.appShell,
+    this.searchTrigger,
+    this.icon,
     this.button,
     this.textInput,
     this.select,
     this.card,
     this.chart,
+    this.capacity,
     this.dialog,
     this.toast,
     this.tooltip,
@@ -109,12 +129,15 @@ class OiComponentThemes {
     this.badge,
     this.banner,
     this.checkbox,
+    this.radioTile,
+    this.radio,
     this.contextMenu,
     this.switchTheme,
     this.sheet,
     this.avatar,
     this.progress,
     this.sidebar,
+    this.stepper,
     this.fileExplorer,
     this.fieldDisplay,
     this.pagination,
@@ -131,6 +154,7 @@ class OiComponentThemes {
     this.dataGrid,
     this.keyValue,
     this.actionBar,
+    this.bulkBar,
     this.indexBar,
     this.accountSwitcher,
     this.weekStrip,
@@ -143,11 +167,15 @@ class OiComponentThemes {
   ///
   /// Components will fall back to their built-in defaults.
   const OiComponentThemes.empty()
-    : button = null,
+    : icon = null,
+      appShell = null,
+      searchTrigger = null,
+      button = null,
       textInput = null,
       select = null,
       card = null,
       chart = null,
+      capacity = null,
       dialog = null,
       toast = null,
       tooltip = null,
@@ -156,12 +184,15 @@ class OiComponentThemes {
       badge = null,
       banner = null,
       checkbox = null,
+      radioTile = null,
+      radio = null,
       contextMenu = null,
       switchTheme = null,
       sheet = null,
       avatar = null,
       progress = null,
       sidebar = null,
+      stepper = null,
       fileExplorer = null,
       fieldDisplay = null,
       pagination = null,
@@ -178,12 +209,22 @@ class OiComponentThemes {
       dataGrid = null,
       keyValue = null,
       actionBar = null,
+      bulkBar = null,
       indexBar = null,
       accountSwitcher = null,
       weekStrip = null,
       dateRangePicker = null,
       groupedList = null,
       slider = null;
+
+  /// Theme overrides for appShell.
+  final OiAppShellThemeData? appShell;
+
+  /// Command/search overlay trigger appearance.
+  final OiSearchTriggerThemeData? searchTrigger;
+
+  /// Theme overrides for icon.
+  final OiIconThemeData? icon;
 
   /// Theme overrides for button components.
   final OiButtonThemeData? button;
@@ -199,6 +240,9 @@ class OiComponentThemes {
 
   /// Theme overrides for chart / data-visualization components.
   final OiChartThemeData? chart;
+
+  /// Tokens for bounded capacity tracks and ratios.
+  final OiCapacityThemeData? capacity;
 
   /// Theme overrides for dialog components.
   final OiDialogThemeData? dialog;
@@ -224,6 +268,12 @@ class OiComponentThemes {
   /// Theme overrides for checkbox components.
   final OiCheckboxThemeData? checkbox;
 
+  /// Radio selection component overrides.
+  final OiRadioTileThemeData? radioTile;
+
+  /// Radio selection component overrides.
+  final OiRadioThemeData? radio;
+
   /// Theme overrides for context menu components.
   final OiContextMenuThemeData? contextMenu;
 
@@ -241,6 +291,9 @@ class OiComponentThemes {
 
   /// Theme overrides for sidebar / navigation-rail components.
   final OiSidebarThemeData? sidebar;
+
+  /// Appearance of step indicators and detailed timeline rails.
+  final OiStepperThemeData? stepper;
 
   /// Theme overrides for file explorer components.
   final OiFileExplorerThemeData? fileExplorer;
@@ -290,6 +343,9 @@ class OiComponentThemes {
   /// Theme overrides for action bar components.
   final OiActionBarThemeData? actionBar;
 
+  /// Theme overrides for selection toolbars.
+  final OiBulkBarThemeData? bulkBar;
+
   /// Theme overrides for index bar components.
   final OiIndexBarThemeData? indexBar;
 
@@ -310,11 +366,15 @@ class OiComponentThemes {
 
   /// Creates a copy with optionally overridden component theme fields.
   OiComponentThemes copyWith({
+    OiAppShellThemeData? appShell,
+    OiSearchTriggerThemeData? searchTrigger,
+    OiIconThemeData? icon,
     OiButtonThemeData? button,
     OiTextInputThemeData? textInput,
     OiSelectThemeData? select,
     OiCardThemeData? card,
     OiChartThemeData? chart,
+    OiCapacityThemeData? capacity,
     OiDialogThemeData? dialog,
     OiToastThemeData? toast,
     OiTooltipThemeData? tooltip,
@@ -323,12 +383,15 @@ class OiComponentThemes {
     OiBadgeThemeData? badge,
     OiBannerThemeData? banner,
     OiCheckboxThemeData? checkbox,
+    OiRadioTileThemeData? radioTile,
+    OiRadioThemeData? radio,
     OiContextMenuThemeData? contextMenu,
     OiSwitchThemeData? switchTheme,
     OiSheetThemeData? sheet,
     OiAvatarThemeData? avatar,
     OiProgressThemeData? progress,
     OiSidebarThemeData? sidebar,
+    OiStepperThemeData? stepper,
     OiFileExplorerThemeData? fileExplorer,
     OiFieldDisplayThemeData? fieldDisplay,
     OiPaginationThemeData? pagination,
@@ -345,6 +408,7 @@ class OiComponentThemes {
     OiDataGridThemeData? dataGrid,
     OiKeyValueThemeData? keyValue,
     OiActionBarThemeData? actionBar,
+    OiBulkBarThemeData? bulkBar,
     OiIndexBarThemeData? indexBar,
     OiAccountSwitcherThemeData? accountSwitcher,
     OiWeekStripThemeData? weekStrip,
@@ -353,11 +417,15 @@ class OiComponentThemes {
     OiSliderThemeData? slider,
   }) {
     return OiComponentThemes(
+      appShell: appShell ?? this.appShell,
+      searchTrigger: searchTrigger ?? this.searchTrigger,
+      icon: icon ?? this.icon,
       button: button ?? this.button,
       textInput: textInput ?? this.textInput,
       select: select ?? this.select,
       card: card ?? this.card,
       chart: chart ?? this.chart,
+      capacity: capacity ?? this.capacity,
       dialog: dialog ?? this.dialog,
       toast: toast ?? this.toast,
       tooltip: tooltip ?? this.tooltip,
@@ -366,12 +434,15 @@ class OiComponentThemes {
       badge: badge ?? this.badge,
       banner: banner ?? this.banner,
       checkbox: checkbox ?? this.checkbox,
+      radioTile: radioTile ?? this.radioTile,
+      radio: radio ?? this.radio,
       contextMenu: contextMenu ?? this.contextMenu,
       switchTheme: switchTheme ?? this.switchTheme,
       sheet: sheet ?? this.sheet,
       avatar: avatar ?? this.avatar,
       progress: progress ?? this.progress,
       sidebar: sidebar ?? this.sidebar,
+      stepper: stepper ?? this.stepper,
       fileExplorer: fileExplorer ?? this.fileExplorer,
       fieldDisplay: fieldDisplay ?? this.fieldDisplay,
       pagination: pagination ?? this.pagination,
@@ -388,6 +459,7 @@ class OiComponentThemes {
       dataGrid: dataGrid ?? this.dataGrid,
       keyValue: keyValue ?? this.keyValue,
       actionBar: actionBar ?? this.actionBar,
+      bulkBar: bulkBar ?? this.bulkBar,
       indexBar: indexBar ?? this.indexBar,
       accountSwitcher: accountSwitcher ?? this.accountSwitcher,
       weekStrip: weekStrip ?? this.weekStrip,
@@ -401,11 +473,15 @@ class OiComponentThemes {
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
     return other is OiComponentThemes &&
+        other.icon == icon &&
+        other.appShell == appShell &&
+        other.searchTrigger == searchTrigger &&
         other.button == button &&
         other.textInput == textInput &&
         other.select == select &&
         other.card == card &&
         other.chart == chart &&
+        other.capacity == capacity &&
         other.dialog == dialog &&
         other.toast == toast &&
         other.tooltip == tooltip &&
@@ -414,12 +490,15 @@ class OiComponentThemes {
         other.badge == badge &&
         other.banner == banner &&
         other.checkbox == checkbox &&
+        other.radioTile == radioTile &&
+        other.radio == radio &&
         other.contextMenu == contextMenu &&
         other.switchTheme == switchTheme &&
         other.sheet == sheet &&
         other.avatar == avatar &&
         other.progress == progress &&
         other.sidebar == sidebar &&
+        other.stepper == stepper &&
         other.fileExplorer == fileExplorer &&
         other.fieldDisplay == fieldDisplay &&
         other.pagination == pagination &&
@@ -436,6 +515,7 @@ class OiComponentThemes {
         other.dataGrid == dataGrid &&
         other.keyValue == keyValue &&
         other.actionBar == actionBar &&
+        other.bulkBar == bulkBar &&
         other.indexBar == indexBar &&
         other.accountSwitcher == accountSwitcher &&
         other.weekStrip == weekStrip &&
@@ -446,11 +526,11 @@ class OiComponentThemes {
 
   @override
   int get hashCode => Object.hash(
-    button,
+    Object.hash(icon, appShell, searchTrigger, button),
     textInput,
     select,
     card,
-    chart,
+    Object.hash(chart, capacity),
     dialog,
     toast,
     tooltip,
@@ -459,12 +539,14 @@ class OiComponentThemes {
     badge,
     banner,
     checkbox,
+    radioTile,
+    radio,
     switchTheme,
     sheet,
     avatar,
     Object.hash(
       progress,
-      sidebar,
+      Object.hash(sidebar, stepper),
       fileExplorer,
       fieldDisplay,
       pagination,
@@ -482,6 +564,7 @@ class OiComponentThemes {
       keyValue,
       Object.hash(
         actionBar,
+        bulkBar,
         accountSwitcher,
         indexBar,
         weekStrip,

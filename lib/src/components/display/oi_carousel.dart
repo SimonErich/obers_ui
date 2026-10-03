@@ -162,12 +162,10 @@ class _OiCarouselState extends State<OiCarousel> {
         context.animations.reducedMotion ||
         MediaQuery.disableAnimationsOf(context);
     if (animate && !reduceMotion) {
-      unawaited(
-        _controller.animateToPage(
-          index,
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeInOut,
-        ),
+      _controller.animateToPage(
+        index,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
       );
     } else {
       _controller.jumpToPage(index);

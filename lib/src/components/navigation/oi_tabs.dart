@@ -2,12 +2,14 @@ import 'dart:async';
 
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/src/components/display/oi_badge.dart';
 import 'package:obers_ui/src/foundation/oi_responsive.dart';
 import 'package:obers_ui/src/foundation/persistence/oi_settings_driver.dart';
 import 'package:obers_ui/src/foundation/persistence/oi_settings_mixin.dart';
 import 'package:obers_ui/src/foundation/persistence/oi_settings_provider.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/models/settings/oi_tabs_settings.dart';
+import 'package:obers_ui/src/primitives/display/oi_icon.dart';
 import 'package:obers_ui/src/primitives/layout/oi_row.dart';
 
 /// A single tab entry in an [OiTabs] bar.
@@ -16,7 +18,13 @@ import 'package:obers_ui/src/primitives/layout/oi_row.dart';
 @immutable
 class OiTabItem {
   /// Creates an [OiTabItem].
-  const OiTabItem({required this.label, this.icon, this.badge});
+  const OiTabItem({
+    required this.label,
+    this.icon,
+    this.badge,
+    this.trailing,
+    this.semanticLabel,
+  });
 
   /// The text label shown for this tab.
   final String label;
@@ -24,8 +32,14 @@ class OiTabItem {
   /// An optional icon shown alongside the label.
   final IconData? icon;
 
-  /// An optional badge count shown over the icon.
+  /// An optional count shown over the icon, or after a text-only tab's label.
   final int? badge;
+
+  /// Optional metadata after the label, such as a formatted record count.
+  final Widget? trailing;
+
+  /// Accessible name including metadata when its visual content is customized.
+  final String? semanticLabel;
 }
 
 /// How the active-tab indicator is drawn.
@@ -246,15 +260,15 @@ class _OiTabsState extends State<OiTabs>
     Widget label = Text(
       tab.label,
       style: baseLabelStyle.copyWith(
-        fontWeight: (isSelected || isHovered)
-            ? FontWeight.w600
-            : FontWeight.w400,
+        fontWeight:
+            baseLabelStyle.fontWeight ??
+            ((isSelected || isHovered) ? FontWeight.w600 : FontWeight.w400),
         color: textColor,
       ),
     );
 
     if (tab.icon != null) {
-      Widget iconWidget = Icon(tab.icon, size: 18, color: textColor);
+      Widget iconWidget = OiIcon.raw(tab.icon, size: 18, color: textColor);
       if (tab.badge != null && tab.badge! > 0) {
         iconWidget = Stack(
           clipBehavior: Clip.none,
@@ -289,6 +303,28 @@ class _OiTabsState extends State<OiTabs>
       );
     }
 
+    if (tab.icon == null && tab.badge != null && tab.badge! > 0) {
+      label = Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          label,
+          const SizedBox(width: 8),
+          OiBadge.counter(
+            label: '${tab.badge}',
+            color: OiBadgeColor.neutral,
+            style: OiBadgeStyle.soft,
+          ),
+        ],
+      );
+    }
+
+    if (tab.trailing != null) {
+      label = Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [label, const SizedBox(width: 8), tab.trailing!],
+      );
+    }
+
     final animDuration =
         context.animations.reducedMotion ||
             MediaQuery.disableAnimationsOf(context)
@@ -311,39 +347,48 @@ class _OiTabsState extends State<OiTabs>
     );
 
     if (widget.indicatorStyle == OiTabIndicatorStyle.underline) {
-      tabContent = Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          tabContent,
-          AnimatedContainer(
-            duration: animDuration,
-            height: tt?.indicatorThickness ?? 2,
-            decoration: BoxDecoration(
-              color: isSelected ? indicatorColor : const Color(0x00000000),
-              borderRadius: BorderRadius.circular(1),
+      tabContent = IntrinsicWidth(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            tabContent,
+            AnimatedContainer(
+              duration: animDuration,
+              height: tt?.indicatorThickness ?? 2,
+              decoration: BoxDecoration(
+                color: isSelected ? indicatorColor : const Color(0x00000000),
+                borderRadius: BorderRadius.circular(1),
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       );
     }
 
-    return Focus(
-      focusNode: _tabFocusNodes[index],
-      onKeyEvent: (node, event) {
-        _handleKey(index, event);
-        return KeyEventResult.ignored;
-      },
-      child: MouseRegion(
-        cursor: SystemMouseCursors.click,
-        onEnter: (_) => setState(() => _hoveredTabIndices.add(index)),
-        onExit: (_) => setState(() => _hoveredTabIndices.remove(index)),
-        child: GestureDetector(
-          onTap: () {
-            _tabFocusNodes[index].requestFocus();
-            widget.onSelected(index);
-          },
-          behavior: HitTestBehavior.opaque,
-          child: tabContent,
+    return Semantics(
+      label: tab.semanticLabel,
+      button: true,
+      selected: isSelected,
+      excludeSemantics: tab.semanticLabel != null,
+      child: Focus(
+        focusNode: _tabFocusNodes[index],
+        onKeyEvent: (node, event) {
+          _handleKey(index, event);
+          return KeyEventResult.ignored;
+        },
+        child: MouseRegion(
+          cursor: SystemMouseCursors.click,
+          onEnter: (_) => setState(() => _hoveredTabIndices.add(index)),
+          onExit: (_) => setState(() => _hoveredTabIndices.remove(index)),
+          child: GestureDetector(
+            onTap: () {
+              _tabFocusNodes[index].requestFocus();
+              widget.onSelected(index);
+            },
+            behavior: HitTestBehavior.opaque,
+            child: tabContent,
+          ),
         ),
       ),
     );
@@ -365,10 +410,14 @@ class _OiTabsState extends State<OiTabs>
                 ? MainAxisSize.min
                 : MainAxisSize.max,
             children: [
-              for (var i = 0; i < widget.tabs.length; i++)
-                widget.scrollable
-                    ? _buildTab(context, i)
-                    : Expanded(child: _buildTab(context, i)),
+              for (var i = 0; i < widget.tabs.length; i++) ...[
+                if (i > 0 && widget.scrollable)
+                  SizedBox(width: context.components.tabs?.tabSpacing ?? 0),
+                if (widget.scrollable)
+                  _buildTab(context, i)
+                else
+                  Expanded(child: _buildTab(context, i)),
+              ],
             ],
           );
 
@@ -379,7 +428,10 @@ class _OiTabsState extends State<OiTabs>
       );
     }
 
-    final bar = DecoratedBox(
+    // The divider belongs below the tab controls, rather than painting over
+    // their active indicator. Container includes its border in layout.
+    // ignore: use_decorated_box
+    final bar = Container(
       decoration: BoxDecoration(
         border: widget.indicatorStyle == OiTabIndicatorStyle.underline
             ? Border(bottom: BorderSide(color: colors.borderSubtle))
@@ -495,10 +547,17 @@ class _PillTabRowState extends State<_PillTabRow> {
         label = Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(tab.icon, size: 18, color: textColor),
+            OiIcon.raw(tab.icon, size: 18, color: textColor),
             const SizedBox(width: 6),
             label,
           ],
+        );
+      }
+
+      if (tab.trailing != null) {
+        label = Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [label, const SizedBox(width: 8), tab.trailing!],
         );
       }
 
@@ -511,47 +570,53 @@ class _PillTabRowState extends State<_PillTabRow> {
 
       final index = i;
       children.add(
-        Focus(
-          focusNode: _focusNodes[index],
-          onKeyEvent: (node, event) {
-            if (event is! KeyDownEvent) return KeyEventResult.ignored;
-            if (event.logicalKey == LogicalKeyboardKey.arrowRight) {
-              final next = (index + 1) % widget.tabs.length;
-              _focusNodes[next].requestFocus();
-              widget.onSelected(next);
-              return KeyEventResult.handled;
-            }
-            if (event.logicalKey == LogicalKeyboardKey.arrowLeft) {
-              final prev =
-                  (index - 1 + widget.tabs.length) % widget.tabs.length;
-              _focusNodes[prev].requestFocus();
-              widget.onSelected(prev);
-              return KeyEventResult.handled;
-            }
-            return KeyEventResult.ignored;
-          },
-          child: MouseRegion(
-            cursor: SystemMouseCursors.click,
-            onEnter: (_) => setState(() => _hoveredIndices.add(index)),
-            onExit: (_) => setState(() => _hoveredIndices.remove(index)),
-            child: GestureDetector(
-              key: _keys[index],
-              onTap: () {
-                _focusNodes[index].requestFocus();
-                widget.onSelected(index);
-              },
-              behavior: HitTestBehavior.opaque,
-              child: AnimatedContainer(
-                duration: animDuration,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 10,
+        Semantics(
+          label: tab.semanticLabel,
+          button: true,
+          selected: isSelected,
+          excludeSemantics: tab.semanticLabel != null,
+          child: Focus(
+            focusNode: _focusNodes[index],
+            onKeyEvent: (node, event) {
+              if (event is! KeyDownEvent) return KeyEventResult.ignored;
+              if (event.logicalKey == LogicalKeyboardKey.arrowRight) {
+                final next = (index + 1) % widget.tabs.length;
+                _focusNodes[next].requestFocus();
+                widget.onSelected(next);
+                return KeyEventResult.handled;
+              }
+              if (event.logicalKey == LogicalKeyboardKey.arrowLeft) {
+                final prev =
+                    (index - 1 + widget.tabs.length) % widget.tabs.length;
+                _focusNodes[prev].requestFocus();
+                widget.onSelected(prev);
+                return KeyEventResult.handled;
+              }
+              return KeyEventResult.ignored;
+            },
+            child: MouseRegion(
+              cursor: SystemMouseCursors.click,
+              onEnter: (_) => setState(() => _hoveredIndices.add(index)),
+              onExit: (_) => setState(() => _hoveredIndices.remove(index)),
+              child: GestureDetector(
+                key: _keys[index],
+                onTap: () {
+                  _focusNodes[index].requestFocus();
+                  widget.onSelected(index);
+                },
+                behavior: HitTestBehavior.opaque,
+                child: AnimatedContainer(
+                  duration: animDuration,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 10,
+                  ),
+                  decoration: BoxDecoration(
+                    color: bgColor,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: label,
                 ),
-                decoration: BoxDecoration(
-                  color: bgColor,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: label,
               ),
             ),
           ),

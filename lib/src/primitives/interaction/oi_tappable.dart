@@ -32,13 +32,24 @@ class OiTappable extends StatefulWidget {
     this.onHover,
     this.onFocusChange,
     this.enabled = true,
+    this.disabledOpacity = 0.4,
     this.focusable = true,
     this.dragging = false,
     this.semanticLabel,
     this.cursor,
     this.clipBorderRadius,
+    this.statesController,
+    this.applyBackgroundOverlay = true,
     super.key,
   });
+
+  /// Optional observer for hover, focus and pressed states. The caller owns it.
+  /// Enables stateful component themes without duplicating gesture handling.
+  final WidgetStatesController? statesController;
+
+  /// Applies the theme overlay. Components with explicit state colors can
+  /// disable this while retaining keyboard focus rings and gesture behavior.
+  final bool applyBackgroundOverlay;
 
   /// The widget to render inside the tappable area.
   final Widget child;
@@ -63,6 +74,9 @@ class OiTappable extends StatefulWidget {
   /// When `false`, callbacks are suppressed and the widget renders at 0.4
   /// opacity to indicate its disabled state.
   final bool enabled;
+
+  /// Opacity applied when disabled; one preserves informational legibility.
+  final double disabledOpacity;
 
   /// Whether the widget participates in keyboard focus traversal.
   ///
@@ -124,15 +138,24 @@ class _OiTappableState extends State<OiTappable> {
   // ── State helpers ──────────────────────────────────────────────────────────
 
   void _setHovered(bool value) {
-    if (_isHovered != value) setState(() => _isHovered = value);
+    if (_isHovered != value) {
+      setState(() => _isHovered = value);
+      widget.statesController?.update(WidgetState.hovered, value);
+    }
   }
 
   void _setPressed(bool value) {
-    if (_isPressed != value) setState(() => _isPressed = value);
+    if (_isPressed != value) {
+      setState(() => _isPressed = value);
+      widget.statesController?.update(WidgetState.pressed, value);
+    }
   }
 
   void _setFocused(bool value) {
-    if (_isFocused != value) setState(() => _isFocused = value);
+    if (_isFocused != value) {
+      setState(() => _isFocused = value);
+      widget.statesController?.update(WidgetState.focused, value);
+    }
   }
 
   // ── Effective style ────────────────────────────────────────────────────────
@@ -212,7 +235,7 @@ class _OiTappableState extends State<OiTappable> {
     // AnimatedOpacity can smoothly transition it in and out.
     {
       final overlayColor = style.backgroundOverlay;
-      final showOverlay = overlayColor.a > 0;
+      final showOverlay = widget.applyBackgroundOverlay && overlayColor.a > 0;
       Widget overlay = IgnorePointer(
         child: AnimatedOpacity(
           opacity: showOverlay ? 1.0 : 0.0,
@@ -272,7 +295,7 @@ class _OiTappableState extends State<OiTappable> {
 
     // Reduced opacity when disabled.
     if (!widget.enabled) {
-      content = Opacity(opacity: 0.4, child: content);
+      content = Opacity(opacity: widget.disabledOpacity, child: content);
     }
 
     // Enforce minimum touch target. Always rendered (even when minTarget is

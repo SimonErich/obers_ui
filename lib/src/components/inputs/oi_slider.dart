@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/_internal/oi_input_frame.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
@@ -119,7 +117,7 @@ class _OiSliderState extends State<OiSlider>
         _animController.value = 1.0;
       } else {
         _animController.value = 0.0;
-        unawaited(_animController.animateTo(1, curve: Curves.easeOutCubic));
+        _animController.animateTo(1, curve: Curves.easeOutCubic);
       }
     }
   }

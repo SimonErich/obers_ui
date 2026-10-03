@@ -17,6 +17,10 @@ class OiSegmentedControlThemeData {
     this.borderRadius,
     this.borderColor,
     this.height,
+    this.inset,
+    this.innerRadius,
+    this.labelStyle,
+    this.spacing,
   });
 
   /// The background color of the segmented control track.
@@ -40,6 +44,18 @@ class OiSegmentedControlThemeData {
   /// The height of the segmented control in logical pixels.
   final double? height;
 
+  /// Insets individually rounded segments inside the shared track; defaults to 0.
+  final double? inset;
+
+  /// Radius of each segment when [inset] is positive.
+  final BorderRadius? innerRadius;
+
+  /// Typography for labels, including an optional shared emphasis weight.
+  final TextStyle? labelStyle;
+
+  /// Space between labelled segments. Icon-only controls remain contiguous.
+  final double? spacing;
+
   /// Creates a copy with optionally overridden values.
   OiSegmentedControlThemeData copyWith({
     Color? backgroundColor,
@@ -49,6 +65,10 @@ class OiSegmentedControlThemeData {
     BorderRadius? borderRadius,
     Color? borderColor,
     double? height,
+    double? inset,
+    BorderRadius? innerRadius,
+    TextStyle? labelStyle,
+    double? spacing,
   }) {
     return OiSegmentedControlThemeData(
       backgroundColor: backgroundColor ?? this.backgroundColor,
@@ -58,6 +78,10 @@ class OiSegmentedControlThemeData {
       borderRadius: borderRadius ?? this.borderRadius,
       borderColor: borderColor ?? this.borderColor,
       height: height ?? this.height,
+      inset: inset ?? this.inset,
+      innerRadius: innerRadius ?? this.innerRadius,
+      labelStyle: labelStyle ?? this.labelStyle,
+      spacing: spacing ?? this.spacing,
     );
   }
 
@@ -71,7 +95,11 @@ class OiSegmentedControlThemeData {
         other.unselectedTextColor == unselectedTextColor &&
         other.borderRadius == borderRadius &&
         other.borderColor == borderColor &&
-        other.height == height;
+        other.height == height &&
+        other.inset == inset &&
+        other.innerRadius == innerRadius &&
+        other.labelStyle == labelStyle &&
+        other.spacing == spacing;
   }
 
   @override
@@ -83,5 +111,9 @@ class OiSegmentedControlThemeData {
     borderRadius,
     borderColor,
     height,
+    inset,
+    innerRadius,
+    labelStyle,
+    spacing,
   );
 }

@@ -35,7 +35,7 @@ extension _OiTableData<T> on _OiTableState<T> {
       !_needsHorizontalScroll && _resolvedColumnWidth(col) == null;
 
   double _computeTotalColumnsWidth() {
-    var total = 0.0;
+    var total = widget.expandedRowBuilder == null ? 0.0 : 32.0;
     if (widget.selectable) total += 40; // checkbox column
     for (final col in _visibleColumns) {
       final w = _ctrl.columnWidths[col.id] ?? col.width;

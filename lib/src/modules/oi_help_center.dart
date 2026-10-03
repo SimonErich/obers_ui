@@ -9,6 +9,7 @@ import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/oi_responsive.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/primitives/display/oi_divider.dart';
+import 'package:obers_ui/src/primitives/display/oi_icon.dart';
 import 'package:obers_ui/src/primitives/display/oi_label.dart';
 import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
 
@@ -84,8 +85,7 @@ enum _HelpTab {
   faq('FAQ', OiIcons.helpCircle),
   contact('Contact', OiIcons.messageCircle),
   articles('Articles', OiIcons.bookOpen),
-  feedback('Feedback', OiIcons.star)
-  ;
+  feedback('Feedback', OiIcons.star);
 
   const _HelpTab(this.label, this.icon);
   final String label;
@@ -305,7 +305,7 @@ class _OiHelpCenterState extends State<OiHelpCenter> {
               ),
               child: Row(
                 children: [
-                  Icon(
+                  OiIcon.raw(
                     tabs[i].icon,
                     size: 16,
                     color: _activeTab == i
@@ -387,7 +387,7 @@ class _OiHelpCenterState extends State<OiHelpCenter> {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
+            OiIcon.raw(
               tab.icon,
               size: 16,
               color: isActive
@@ -461,7 +461,7 @@ class _OiHelpCenterState extends State<OiHelpCenter> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
+            OiIcon.raw(
               OiIcons.messageCircle,
               size: 48,
               color: context.colors.success.base,
@@ -586,7 +586,7 @@ class _OiHelpCenterState extends State<OiHelpCenter> {
                 ),
                 child: Row(
                   children: [
-                    Icon(
+                    OiIcon.raw(
                       OiIcons.bookOpen,
                       size: 16,
                       color: context.colors.textMuted,
@@ -605,7 +605,7 @@ class _OiHelpCenterState extends State<OiHelpCenter> {
                         ],
                       ),
                     ),
-                    Icon(
+                    OiIcon.raw(
                       OiIcons.chevronDown,
                       size: 14,
                       color: context.colors.textMuted,
@@ -635,7 +635,7 @@ class _OiHelpCenterState extends State<OiHelpCenter> {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(
+                    OiIcon.raw(
                       OiIcons.arrowLeft,
                       size: 16,
                       color: context.colors.primary.base,
@@ -688,7 +688,11 @@ class _OiHelpCenterState extends State<OiHelpCenter> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(OiIcons.star, size: 48, color: context.colors.warning.base),
+            OiIcon.raw(
+              OiIcons.star,
+              size: 48,
+              color: context.colors.warning.base,
+            ),
             SizedBox(height: context.spacing.sm),
             const OiLabel.h3('Thank you!'),
             SizedBox(height: context.spacing.xs),

@@ -22,9 +22,23 @@ import 'package:obers_ui/src/foundation/theme/oi_theme_data.dart';
 /// (see `oi_theme_scope.dart`).
 ///
 /// {@category Foundation}
-class OiTheme extends InheritedWidget {
+class OiTheme extends StatelessWidget {
   /// Creates an [OiTheme] that provides [data] to all descendants.
-  const OiTheme({required this.data, required super.child, super.key});
+  const OiTheme({required this.data, required this.child, super.key});
+
+  /// The themed subtree.
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) => _OiInheritedTheme(
+    data: data,
+    child: DefaultTextStyle(
+      style: data.textTheme.body.copyWith(
+        color: data.textTheme.body.color ?? data.colors.text,
+      ),
+      child: child,
+    ),
+  );
 
   /// The theme data to inject into the subtree.
   final OiThemeData data;
@@ -45,11 +59,18 @@ class OiTheme extends InheritedWidget {
 
   /// Returns the nearest [OiThemeData], or null if none is found.
   static OiThemeData? maybeOf(BuildContext context) {
-    return context.dependOnInheritedWidgetOfExactType<OiTheme>()?.data;
+    return context
+        .dependOnInheritedWidgetOfExactType<_OiInheritedTheme>()
+        ?.data;
   }
+}
 
+class _OiInheritedTheme extends InheritedWidget {
+  const _OiInheritedTheme({required this.data, required super.child});
+  final OiThemeData data;
   @override
-  bool updateShouldNotify(OiTheme oldWidget) => data != oldWidget.data;
+  bool updateShouldNotify(_OiInheritedTheme oldWidget) =>
+      data != oldWidget.data;
 }
 
 /// Extensions on [BuildContext] for convenient access to [OiThemeData].

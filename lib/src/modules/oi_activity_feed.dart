@@ -5,6 +5,7 @@ import 'package:obers_ui/src/components/display/oi_empty_state.dart';
 import 'package:obers_ui/src/components/display/oi_progress.dart';
 import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
+import 'package:obers_ui/src/primitives/display/oi_icon.dart';
 import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
 
 // ---------------------------------------------------------------------------
@@ -322,7 +323,7 @@ class _OiActivityEventTile extends StatelessWidget {
             shape: BoxShape.circle,
           ),
           child: Center(
-            child: Icon(
+            child: OiIcon.raw(
               event.icon ?? OiIcons.check,
               size: 16,
               color: colors.primary.base,

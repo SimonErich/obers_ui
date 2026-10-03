@@ -23,7 +23,6 @@ extension _OiButtonContent on _OiButtonState {
     required OiIconPosition iconPosition,
     required Color foreground,
     required bool loading,
-    bool bold = false,
   }) {
     if (loading) {
       return _buildLoadingIndicator(foreground);
@@ -31,7 +30,10 @@ extension _OiButtonContent on _OiButtonState {
 
     final bt = context.components.button;
     final effectiveIconSize = bt?.iconSize ?? _iconSize();
-    final effectiveIconGap = bt?.iconGap ?? context.spacing.xs;
+    final effectiveIconGap =
+        (widget.size == OiButtonSize.small ? bt?.smallIconGap : null) ??
+        bt?.iconGap ??
+        context.spacing.xs;
     final iconWidget = icon != null
         ? Padding(
             padding: EdgeInsets.only(
@@ -53,15 +55,18 @@ extension _OiButtonContent on _OiButtonState {
     final labelWidget = label != null
         ? Text(
             label,
-            style: TextStyle(
-              fontSize: _fontSize(context),
-              // The pressed/highlighted state bumps the weight; otherwise
-              // the per-size weight from the theme scale (defaulting to
-              // w500) wins.
-              fontWeight: bold ? FontWeight.w700 : _fontWeight(context),
-              color: foreground,
-              height: 1,
-            ),
+            style: context.textTheme.body
+                .merge(context.components.button?.textStyle)
+                .copyWith(
+                  fontSize:
+                      context.components.button?.textStyle?.fontSize ??
+                      _fontSize(context),
+                  fontWeight:
+                      context.components.button?.textStyle?.fontWeight ??
+                      _fontWeight(context),
+                  color: foreground,
+                  height: 1,
+                ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           )

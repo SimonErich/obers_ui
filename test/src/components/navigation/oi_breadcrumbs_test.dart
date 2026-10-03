@@ -1,11 +1,62 @@
 // Tests do not require documentation comments.
 
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui/src/components/navigation/oi_breadcrumbs.dart';
+import 'package:obers_ui/src/foundation/theme/oi_theme_data.dart';
 
 import '../../../helpers/pump_app.dart';
 
 void main() {
+  testWidgets('icon separator allocates its size and two declared gaps', (
+    tester,
+  ) async {
+    await tester.pumpObers(
+      const OiBreadcrumbs(
+        items: [
+          OiBreadcrumbItem(label: 'Orders'),
+          OiBreadcrumbItem(label: 'ORD-1'),
+        ],
+        separatorIcon: IconData(1),
+        separatorSpacing: 8,
+      ),
+    );
+    expect(
+      tester.getTopLeft(find.text('ORD-1')).dx -
+          tester.getTopRight(find.text('Orders')).dx,
+      32,
+    );
+    expect(find.text('/'), findsNothing);
+  });
+
+  testWidgets('breadcrumb honors plain link role and current code label', (
+    tester,
+  ) async {
+    final base = OiThemeData.light();
+    await tester.pumpObers(
+      OiBreadcrumbs(
+        items: [
+          OiBreadcrumbItem(label: 'Orders', onTap: () {}),
+          const OiBreadcrumbItem(label: 'ORD-1', monospace: true),
+        ],
+        linkStyle: const TextStyle(
+          color: Color(0xff123456),
+          fontWeight: FontWeight.w400,
+        ),
+      ),
+      theme: base.copyWith(
+        textTheme: base.textTheme.copyWith(link: const TextStyle(fontSize: 14)),
+      ),
+    );
+    final link = tester.widget<Text>(find.text('Orders')).style!;
+    expect(link.decoration, isNull);
+    expect(link.color, const Color(0xff123456));
+    expect(
+      tester.widget<Text>(find.text('ORD-1')).style!.fontFamily,
+      'monospace',
+    );
+  });
+
   // ── Rendering ──────────────────────────────────────────────────────────────
 
   testWidgets('renders all item labels', (tester) async {

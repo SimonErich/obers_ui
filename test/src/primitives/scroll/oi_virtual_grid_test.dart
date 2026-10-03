@@ -91,7 +91,7 @@ void main() {
       ),
     );
     final gv = tester.widget<GridView>(find.byType(GridView));
-    expect(gv.cacheExtent, 300);
+    expect(gv.scrollCacheExtent?.value, 300);
   });
 
   // ── 6. shrinkWrap embeds in Column without error ───────────────────────────

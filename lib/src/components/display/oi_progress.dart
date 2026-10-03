@@ -1,10 +1,10 @@
-import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/buttons/oi_button.dart';
 import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
+import 'package:obers_ui/src/primitives/display/oi_icon.dart';
 
 /// The visual style of an [OiProgress] indicator.
 ///
@@ -219,7 +219,7 @@ class _OiProgressState extends State<OiProgress>
       vsync: this,
       duration: const Duration(milliseconds: 1200),
     );
-    if (widget.indeterminate) unawaited(_controller.repeat());
+    if (widget.indeterminate) _controller.repeat();
   }
 
   @override
@@ -236,7 +236,7 @@ class _OiProgressState extends State<OiProgress>
   void didUpdateWidget(OiProgress oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.indeterminate && !_controller.isAnimating) {
-      unawaited(_controller.repeat());
+      _controller.repeat();
     } else if (!widget.indeterminate && _controller.isAnimating) {
       _controller.stop();
     }
@@ -319,7 +319,7 @@ class _OiProgressState extends State<OiProgress>
                 ),
                 child: isActive
                     ? Center(
-                        child: Icon(
+                        child: OiIcon.raw(
                           OiIcons.check, // check
                           size: dotSize * 0.7,
                           color: colors.textOnPrimary,

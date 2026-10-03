@@ -70,6 +70,7 @@ void main() {
 
     // After delay — visible.
     await tester.pump(const Duration(milliseconds: 150));
+    await tester.pump(); // The portal opens after the visibility frame.
     expect(find.text('Hover tip'), findsOneWidget);
   });
 
@@ -92,7 +93,8 @@ void main() {
     addTearDown(gesture.removePointer);
     await tester.pump();
 
-    // With reducedMotion, the tooltip should appear immediately — no delay.
+    // Reduced motion skips the hover timer; the portal opens on the next frame.
+    await tester.pump();
     expect(find.text('Instant tip'), findsOneWidget);
   });
 

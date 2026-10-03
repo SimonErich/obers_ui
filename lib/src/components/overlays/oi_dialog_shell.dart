@@ -93,49 +93,60 @@ class OiDialogShell extends StatelessWidget {
   }) {
     final navigator = Navigator.maybeOf(context, rootNavigator: true);
     if (navigator != null) {
-      return navigator.push<T>(
-        RawDialogRoute<T>(
-          requestFocus: false,
-          barrierDismissible: false,
-          barrierColor: const Color(0x00000000),
-          barrierLabel: semanticLabel ?? 'Dialog',
-          transitionDuration: Duration.zero,
-          pageBuilder: (routeContext, animation, secondaryAnimation) {
-            void close([T? result]) {
-              if (routeContext.mounted) {
-                Navigator.of(routeContext).pop(result);
-              }
+      final route = RawDialogRoute<T>(
+        requestFocus: false,
+        barrierDismissible: false,
+        barrierColor: const Color(0x00000000),
+        barrierLabel: semanticLabel ?? 'Dialog',
+        transitionDuration: Duration.zero,
+        pageBuilder: (routeContext, animation, secondaryAnimation) {
+          void close([T? result]) {
+            if (routeContext.mounted) {
+              Navigator.of(routeContext).pop(result);
             }
+          }
 
-            return _OiDialogShellOverlay<T>(
-              onClose: close,
-              barrierDismissible: barrierDismissible,
-              barrierColor: barrierColor,
-              semanticLabel: semanticLabel,
-              width: width,
-              minWidth: minWidth,
-              maxWidth: maxWidth,
-              maxHeight: maxHeight,
-              backgroundColor: backgroundColor,
-              borderRadius: borderRadius,
-              padding: padding,
-              initialFocus: initialFocus,
-              builder: builder,
-            );
-          },
-        ),
+          return _OiDialogShellOverlay<T>(
+            onClose: close,
+            barrierDismissible: barrierDismissible,
+            barrierColor: barrierColor,
+            semanticLabel: semanticLabel,
+            width: width,
+            minWidth: minWidth,
+            maxWidth: maxWidth,
+            maxHeight: maxHeight,
+            backgroundColor: backgroundColor,
+            borderRadius: borderRadius,
+            padding: padding,
+            initialFocus: initialFocus,
+            builder: builder,
+          );
+        },
       );
+      navigator.push<T>(route);
+      // A pop result resolves before the route subtree is disposed. Callers
+      // commonly release controllers after awaiting a dialog, so wait until
+      // its overlay entries have actually been removed.
+      return route.completed;
     }
 
     // Fallback when no [Navigator] is available (e.g. isolated widget tests).
     final completer = Completer<T?>();
     late OiOverlayHandle handle;
+    var closing = false;
 
     void close([T? result]) {
-      if (!completer.isCompleted) {
-        completer.complete(result);
-        handle.dismiss();
-      }
+      if (closing) return;
+      closing = true;
+      handle.dismiss();
+      // OverlayEntry.remove schedules removal in the widget pipeline.
+      // Complete after that frame so external controllers remain alive while
+      // the disappearing dialog still has attached listeners.
+      unawaited(
+        WidgetsBinding.instance.endOfFrame.then((_) {
+          if (!completer.isCompleted) completer.complete(result);
+        }),
+      );
     }
 
     Widget overlayContent(BuildContext ctx) {
@@ -296,7 +307,7 @@ class _OiDialogShellOverlayState<T> extends State<_OiDialogShellOverlay<T>>
       ),
     );
 
-    unawaited(_controller.forward());
+    _controller.forward();
   }
 
   @override

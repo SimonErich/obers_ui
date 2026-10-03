@@ -1,3 +1,4 @@
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 
@@ -19,10 +20,15 @@ class OiCheckbox extends StatefulWidget {
     required this.value,
     this.onChanged,
     this.label,
+    this.labelWidget,
+    this.semanticLabel,
     this.labelStyle,
     this.enabled = true,
     super.key,
-  });
+  }) : assert(
+         labelWidget == null || semanticLabel != null,
+         'Rich checkbox labels require semanticLabel for an accessible name.',
+       );
 
   /// The current checkbox state.
   ///
@@ -37,6 +43,12 @@ class OiCheckbox extends StatefulWidget {
   /// Optional label rendered to the right of the checkbox.
   final String? label;
 
+  /// Rich noninteractive label content. Provide [semanticLabel] for its text.
+  final Widget? labelWidget;
+
+  /// Accessible name when the checkbox has no visible label, such as a table.
+  final String? semanticLabel;
+
   /// Optional style override for the label text.
   final TextStyle? labelStyle;
 
@@ -49,9 +61,19 @@ class OiCheckbox extends StatefulWidget {
 
 class _OiCheckboxState extends State<OiCheckbox> {
   bool _hovered = false;
+  bool _focused = false;
+  bool _showFocus = false;
+  final _focusNode = FocusNode();
+
+  @override
+  void dispose() {
+    _focusNode.dispose();
+    super.dispose();
+  }
 
   void _handleTap() {
-    if (widget.onChanged == null) return;
+    if (!widget.enabled || widget.onChanged == null) return;
+    _focusNode.requestFocus();
     if (widget.value ?? false) {
       widget.onChanged!(false);
     } else {
@@ -70,9 +92,11 @@ class _OiCheckboxState extends State<OiCheckbox> {
     final isChecked = widget.value ?? false;
     final isIndeterminate = widget.value == null;
     final cht = themeData.components.checkbox;
-    final isActive = widget.enabled;
+    final isActive = widget.enabled && widget.onChanged != null;
 
-    final checkedColor = cht?.checkedColor ?? colors.primary.base;
+    final checkedColor = !isActive && cht?.disabledColor != null
+        ? cht!.disabledColor!
+        : cht?.checkedColor ?? colors.primary.base;
     final Color fillColor;
     final Color borderColor;
 
@@ -95,33 +119,80 @@ class _OiCheckboxState extends State<OiCheckbox> {
         borderColor: borderColor,
         checkColor: cht?.checkmarkColor ?? colors.textOnPrimary,
         borderRadius: borderRadius,
+        borderWidth: cht?.borderWidth ?? 1.5,
       ),
     );
 
-    if (widget.label != null) {
+    if (_showFocus && isActive) {
+      box = DecoratedBox(
+        decoration: BoxDecoration(
+          borderRadius: borderRadius,
+          boxShadow: [BoxShadow(color: colors.borderFocus, spreadRadius: 2)],
+        ),
+        child: box,
+      );
+    }
+
+    if (widget.label != null || widget.labelWidget != null) {
       box = Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           box,
           const SizedBox(width: 8),
-          Text(
-            widget.label!,
-            style:
-                widget.labelStyle ??
-                TextStyle(fontSize: 14, color: colors.text),
+          Flexible(
+            child:
+                widget.labelWidget ??
+                Text(
+                  widget.label!,
+                  style:
+                      widget.labelStyle ??
+                      TextStyle(fontSize: 14, color: colors.text),
+                ),
           ),
         ],
       );
     }
 
-    return MouseRegion(
-      cursor: isActive ? SystemMouseCursors.click : SystemMouseCursors.basic,
-      onEnter: (_) => setState(() => _hovered = true),
-      onExit: (_) => setState(() => _hovered = false),
-      child: GestureDetector(
-        onTap: isActive ? _handleTap : null,
-        behavior: HitTestBehavior.opaque,
-        child: box,
+    return Semantics(
+      label: widget.semanticLabel ?? widget.label,
+      checked: widget.value == true,
+      mixed: widget.value == null,
+      enabled: isActive,
+      focusable: isActive,
+      focused: _focused,
+      onTap: isActive ? _handleTap : null,
+      onFocus: isActive ? _focusNode.requestFocus : null,
+      child: FocusableActionDetector(
+        enabled: isActive,
+        focusNode: _focusNode,
+        includeFocusSemantics: false,
+        onFocusChange: (value) => setState(() => _focused = value),
+        onShowFocusHighlight: (value) => setState(() => _showFocus = value),
+        shortcuts: const {
+          SingleActivator(LogicalKeyboardKey.space): ActivateIntent(),
+          SingleActivator(LogicalKeyboardKey.enter): ActivateIntent(),
+        },
+        actions: {
+          ActivateIntent: CallbackAction<ActivateIntent>(
+            onInvoke: (_) {
+              _handleTap();
+              return null;
+            },
+          ),
+        },
+        child: MouseRegion(
+          cursor: isActive
+              ? SystemMouseCursors.click
+              : SystemMouseCursors.basic,
+          onEnter: (_) => setState(() => _hovered = true),
+          onExit: (_) => setState(() => _hovered = false),
+          child: GestureDetector(
+            onTap: isActive ? _handleTap : null,
+            excludeFromSemantics: true,
+            behavior: HitTestBehavior.opaque,
+            child: ExcludeSemantics(child: box),
+          ),
+        ),
       ),
     );
   }
@@ -138,6 +209,7 @@ class _OiCheckboxPainter extends CustomPainter {
     required this.borderColor,
     required this.checkColor,
     required this.borderRadius,
+    required this.borderWidth,
   });
 
   final bool? state;
@@ -145,6 +217,7 @@ class _OiCheckboxPainter extends CustomPainter {
   final Color borderColor;
   final Color checkColor;
   final BorderRadius borderRadius;
+  final double borderWidth;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -155,11 +228,11 @@ class _OiCheckboxPainter extends CustomPainter {
       ..drawRRect(rrect, Paint()..color = fillColor)
       // Border.
       ..drawRRect(
-        rrect,
+        rrect.deflate(borderWidth / 2),
         Paint()
           ..color = borderColor
           ..style = PaintingStyle.stroke
-          ..strokeWidth = 1.5,
+          ..strokeWidth = borderWidth,
       );
 
     final paint = Paint()
@@ -192,5 +265,6 @@ class _OiCheckboxPainter extends CustomPainter {
       old.fillColor != fillColor ||
       old.borderColor != borderColor ||
       old.checkColor != checkColor ||
-      old.borderRadius != borderRadius;
+      old.borderRadius != borderRadius ||
+      old.borderWidth != borderWidth;
 }

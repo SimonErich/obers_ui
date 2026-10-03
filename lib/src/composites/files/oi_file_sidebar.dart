@@ -9,6 +9,7 @@ import 'package:obers_ui/src/foundation/theme/oi_color_scheme.dart';
 import 'package:obers_ui/src/foundation/theme/oi_spacing_scale.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/models/oi_file_node_data.dart';
+import 'package:obers_ui/src/primitives/display/oi_icon.dart';
 import 'package:obers_ui/src/primitives/drag_drop/oi_drop_zone.dart';
 
 /// A quick-access item for the sidebar.
@@ -485,7 +486,7 @@ class _QuickAccessRow extends StatelessWidget {
           ),
           child: Row(
             children: [
-              Icon(item.icon, size: 16, color: colors.textSubtle),
+              OiIcon.raw(item.icon, size: 16, color: colors.textSubtle),
               SizedBox(width: spacing.sm),
               Expanded(
                 child: Text(
@@ -551,7 +552,7 @@ class _FavoriteRow extends StatelessWidget {
           ),
           child: Row(
             children: [
-              Icon(
+              OiIcon.raw(
                 OiIcons.star,
                 size: 14,
                 color: colors.warning.base,

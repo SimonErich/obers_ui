@@ -16,7 +16,8 @@ extension _OiTableStatus<T> on _OiTableState<T> {
         child: OiBulkBar(
           selectedCount: selectedCount,
           totalCount: totalCount,
-          label: 'rows',
+          label: widget.labels.rows,
+          labels: widget.labels.bulkBar,
           actions: widget.bulkActions!,
           allSelected: _ctrl.selectAll,
           onSelectAll: () {
@@ -46,6 +47,7 @@ extension _OiTableStatus<T> on _OiTableState<T> {
     return _PaginationBar(
       key: const Key('oi_table_pagination'),
       pagination: _ctrl.pagination,
+      labels: widget.labels,
       pageSizeOptions: widget.pageSizeOptions,
       onPageSizeChanged: widget.onPageSizeChanged,
     );
@@ -64,13 +66,15 @@ extension _OiTableStatus<T> on _OiTableState<T> {
         child: Row(
           children: [
             Text(
-              '$totalShown rows',
+              widget.labels.rowCount?.call(totalShown) ??
+                  '$totalShown ${widget.labels.rows}',
               style: TextStyle(color: context.colors.textMuted),
             ),
             if (selected > 0) ...[
               const SizedBox(width: 16),
               Text(
-                '$selected selected',
+                widget.labels.selectedCount?.call(selected) ??
+                    '$selected selected',
                 style: TextStyle(color: context.colors.textMuted),
               ),
             ],
@@ -83,9 +87,12 @@ extension _OiTableStatus<T> on _OiTableState<T> {
   // ── Helpers ───────────────────────────────────────────────────────────────
 
   double get _effectiveRowHeight =>
-      widget.rowHeight ?? (widget.dense ? 32 : 48);
+      widget.rowHeight ??
+      context.components.table?.rowHeight ??
+      (widget.dense ? 32 : 48);
 
-  double get _headerRowHeight => widget.dense ? 28 : 36;
+  double get _headerRowHeight =>
+      context.components.table?.headerHeight ?? (widget.dense ? 28 : 36);
 
   static AlignmentGeometry _alignmentFromTextAlign(TextAlign align) {
     return switch (align) {

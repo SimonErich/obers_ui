@@ -7,6 +7,7 @@ import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/oi_responsive.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/models/oi_cart_item.dart';
+import 'package:obers_ui/src/primitives/display/oi_icon.dart';
 import 'package:obers_ui/src/primitives/display/oi_label.dart';
 import 'package:obers_ui/src/primitives/gesture/oi_swipeable.dart';
 import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
@@ -95,7 +96,7 @@ class OiCartItemRow extends StatelessWidget {
         borderRadius: context.radius.sm,
       ),
       child: Center(
-        child: Icon(
+        child: OiIcon.raw(
           _kImageIcon,
           size: compact ? 20 : 28,
           color: context.colors.textMuted,

@@ -17,7 +17,15 @@ class OiCardThemeData {
     this.borderColor,
     this.borderWidth,
     this.shadow,
+    this.headerAlignment,
+    this.subtitleGap,
   });
+
+  /// Vertical alignment of trailing actions beside the title.
+  final CrossAxisAlignment? headerAlignment;
+
+  /// Gap between title and subtitle.
+  final double? subtitleGap;
 
   /// The corner radius of the card surface.
   final BorderRadius? borderRadius;
@@ -49,8 +57,12 @@ class OiCardThemeData {
     Color? borderColor,
     double? borderWidth,
     List<BoxShadow>? shadow,
+    CrossAxisAlignment? headerAlignment,
+    double? subtitleGap,
   }) {
     return OiCardThemeData(
+      headerAlignment: headerAlignment ?? this.headerAlignment,
+      subtitleGap: subtitleGap ?? this.subtitleGap,
       borderRadius: borderRadius ?? this.borderRadius,
       elevation: elevation ?? this.elevation,
       padding: padding ?? this.padding,
@@ -73,7 +85,9 @@ class OiCardThemeData {
     } else if (shadow != other.shadow) {
       return false;
     }
-    return other.borderRadius == borderRadius &&
+    return other.headerAlignment == headerAlignment &&
+        other.subtitleGap == subtitleGap &&
+        other.borderRadius == borderRadius &&
         other.elevation == elevation &&
         other.padding == padding &&
         other.backgroundColor == backgroundColor &&
@@ -90,5 +104,7 @@ class OiCardThemeData {
     borderColor,
     borderWidth,
     shadow != null ? Object.hashAll(shadow!) : null,
+    headerAlignment,
+    subtitleGap,
   );
 }

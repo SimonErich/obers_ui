@@ -3,10 +3,55 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui/src/components/navigation/oi_drawer.dart';
+import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
 
 import '../../../helpers/pump_app.dart';
 
 void main() {
+  testWidgets('closed drawer cannot expose or focus its hidden actions', (
+    tester,
+  ) async {
+    final semantics = tester.ensureSemantics();
+    final hiddenFocus = FocusNode();
+    var backgroundTaps = 0;
+    await tester.pumpObers(
+      Stack(
+        children: [
+          Center(
+            child: OiTappable(
+              semanticLabel: 'Visible search',
+              onTap: () => backgroundTaps++,
+              child: const ExcludeSemantics(child: Text('Visible search')),
+            ),
+          ),
+          OiDrawer(
+            open: false,
+            child: Focus(
+              focusNode: hiddenFocus,
+              child: OiTappable(
+                semanticLabel: 'Hidden navigation',
+                onTap: () {},
+                child: const ExcludeSemantics(child: Text('Hidden navigation')),
+              ),
+            ),
+          ),
+        ],
+      ),
+      surfaceSize: const Size(320, 844),
+    );
+    expect(find.bySemanticsLabel('Visible search'), findsOneWidget);
+    expect(find.bySemanticsLabel('Hidden navigation'), findsNothing);
+    hiddenFocus.requestFocus();
+    await tester.pump();
+    expect(hiddenFocus.hasFocus, isFalse);
+    await tester.tap(find.text('Visible search'));
+    await tester.pump();
+    expect(backgroundTaps, 1);
+    await tester.pumpWidget(const SizedBox());
+    hiddenFocus.dispose();
+    semantics.dispose();
+  });
+
   // ── Visibility ─────────────────────────────────────────────────────────────
 
   testWidgets('renders child when open=true', (tester) async {

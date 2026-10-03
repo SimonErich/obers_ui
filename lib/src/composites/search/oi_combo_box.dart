@@ -3,10 +3,11 @@ import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/_internal/oi_input_frame.dart';
-import 'package:obers_ui/src/components/display/oi_badge.dart';
 import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
+import 'package:obers_ui/src/primitives/display/oi_icon.dart';
 import 'package:obers_ui/src/primitives/input/oi_raw_input.dart';
+import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
 import 'package:obers_ui/src/primitives/overlay/oi_floating.dart';
 
 /// A searchable select box with type-ahead filtering.
@@ -21,6 +22,7 @@ class OiComboBox<T> extends StatefulWidget {
   const OiComboBox({
     required this.label,
     required this.labelOf,
+    this.showLabel = true,
     super.key,
     this.items = const [],
     this.value,
@@ -36,6 +38,7 @@ class OiComboBox<T> extends StatefulWidget {
     this.selectedValues = const [],
     this.onMultiSelect,
     this.maxChipsVisible,
+    this.addItemLabel,
     this.groupBy,
     this.groupOrder,
     this.recentItems,
@@ -49,6 +52,9 @@ class OiComboBox<T> extends StatefulWidget {
 
   /// Accessibility label for the combo box.
   final String label;
+
+  /// Shows the label above the field; accessible naming remains available.
+  final bool showLabel;
 
   /// Function to get display label from an item.
   final String Function(T) labelOf;
@@ -96,6 +102,10 @@ class OiComboBox<T> extends StatefulWidget {
 
   /// Maximum number of chips visible in multi-select trigger.
   final int? maxChipsVisible;
+
+  /// Optional invitation below selected chips in a multi-select field.
+  /// Keeps adding values discoverable while each selected chip is removable.
+  final String? addItemLabel;
 
   /// Function to group options under headers.
   final String Function(T)? groupBy;
@@ -542,6 +552,23 @@ class _OiComboBoxState<T> extends State<OiComboBox<T>> {
 
   // ── Build trigger ─────────────────────────────────────────────────────────
 
+  Widget _clearButton(BuildContext context) => Semantics(
+    container: true,
+    child: OiTappable(
+      enabled: widget.enabled,
+      semanticLabel: 'Clear ${widget.label}',
+      onTap: _clearSelection,
+      child: Padding(
+        padding: const EdgeInsets.only(left: 4),
+        child: OiIcon.decorative(
+          icon: OiIcons.x,
+          size: 16,
+          color: context.colors.textMuted,
+        ),
+      ),
+    ),
+  );
+
   Widget _buildTrigger(BuildContext context) {
     final colors = context.colors;
 
@@ -551,39 +578,87 @@ class _OiComboBoxState<T> extends State<OiComboBox<T>> {
       final visibleItems = widget.selectedValues.take(visible).toList();
       final remaining = widget.selectedValues.length - visible;
 
-      return Row(
+      final chips = Wrap(
+        spacing: 4,
+        runSpacing: 4,
         children: [
-          Expanded(
-            child: Wrap(
-              spacing: 4,
-              runSpacing: 2,
-              children: [
-                for (final item in visibleItems)
-                  OiBadge.soft(
-                    label: widget.labelOf(item),
-                    size: OiBadgeSize.small,
-                    color: OiBadgeColor.neutral,
+          for (final item in visibleItems)
+            Container(
+              decoration: BoxDecoration(
+                color: colors.surfaceSubtle,
+                borderRadius: BorderRadius.circular(4),
+              ),
+              padding: const EdgeInsets.only(left: 8),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Flexible(
+                    child: Text(
+                      widget.labelOf(item),
+                      style: context.textTheme.body,
+                    ),
                   ),
-                if (remaining > 0)
-                  Text(
-                    '+$remaining',
-                    style: TextStyle(fontSize: 12, color: colors.textMuted),
-                  ),
-              ],
+                  if (widget.clearable)
+                    OiTappable(
+                      semanticLabel: 'Remove ${widget.labelOf(item)}',
+                      enabled: widget.enabled,
+                      onTap: () => widget.onMultiSelect?.call([
+                        for (final selected in widget.selectedValues)
+                          if (selected != item) selected,
+                      ]),
+                      child: const SizedBox.square(
+                        dimension: 28,
+                        child: Center(
+                          child: OiIcon.decorative(icon: OiIcons.x, size: 12),
+                        ),
+                      ),
+                    )
+                  else
+                    const SizedBox(width: 8, height: 28),
+                ],
+              ),
             ),
-          ),
-          if (widget.clearable)
-            GestureDetector(
-              onTap: _clearSelection,
+          if (remaining > 0)
+            Text(
+              '+$remaining',
+              style: context.textTheme.caption.copyWith(
+                color: colors.textMuted,
+              ),
+            ),
+        ],
+      );
+      if (widget.addItemLabel case final String label) {
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            chips,
+            const SizedBox(height: 4),
+            OiTappable(
+              semanticLabel: label,
+              enabled: widget.enabled,
+              onTap: _openDropdown,
               child: Padding(
-                padding: const EdgeInsets.only(left: 4),
-                child: Icon(
-                  OiIcons.x,
-                  size: 16,
-                  color: colors.textMuted,
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                child: ExcludeSemantics(
+                  child: Text(
+                    label,
+                    style: context.textTheme.body.copyWith(
+                      color: colors.textMuted,
+                    ),
+                  ),
                 ),
               ),
             ),
+          ],
+        );
+      }
+      return Row(
+        children: [
+          Expanded(
+            child: chips,
+          ),
+          if (widget.clearable) _clearButton(context),
         ],
       );
     }
@@ -607,18 +682,7 @@ class _OiComboBoxState<T> extends State<OiComboBox<T>> {
             overflow: TextOverflow.ellipsis,
           ),
         ),
-        if (hasValue && widget.clearable)
-          GestureDetector(
-            onTap: _clearSelection,
-            child: Padding(
-              padding: const EdgeInsets.only(left: 4),
-              child: Icon(
-                OiIcons.x,
-                size: 16,
-                color: colors.textMuted,
-              ),
-            ),
-          ),
+        if (hasValue && widget.clearable) _clearButton(context),
       ],
     );
   }
@@ -629,25 +693,33 @@ class _OiComboBoxState<T> extends State<OiComboBox<T>> {
   Widget build(BuildContext context) {
     final colors = context.colors;
 
-    final chevron = Icon(
+    final chevron = OiIcon.raw(
       OiIcons.arrowDown,
       size: 16,
       color: colors.textMuted,
     );
 
     final anchor = Semantics(
-      label: widget.label,
+      container: true,
+      button: true,
+      label: widget.showLabel ? null : widget.label,
       enabled: widget.enabled,
-      child: GestureDetector(
-        onTap: widget.enabled ? _openDropdown : null,
-        behavior: HitTestBehavior.opaque,
+      child: OiTappable(
+        enabled: widget.enabled,
+        disabledOpacity: 1,
+        onTap: _openDropdown,
         child: OiInputFrame(
-          label: widget.label,
+          label: widget.showLabel ? widget.label : null,
           hint: widget.hint,
           error: widget.error,
           focused: _open,
           enabled: widget.enabled,
-          trailing: chevron,
+          trailing: widget.multiSelect && widget.addItemLabel != null
+              ? null
+              : chevron,
+          padding: widget.multiSelect && widget.addItemLabel != null
+              ? const EdgeInsets.symmetric(horizontal: 4, vertical: 5)
+              : null,
           child: _buildTrigger(context),
         ),
       ),
@@ -766,7 +838,7 @@ class _OiCheckMark extends StatelessWidget {
         color: checked ? colors.primary.base : null,
       ),
       child: checked
-          ? Icon(
+          ? OiIcon.raw(
               OiIcons.check,
               size: 12,
               color: colors.textOnPrimary,

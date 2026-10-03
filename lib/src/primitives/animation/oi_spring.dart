@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/physics.dart';
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
@@ -125,7 +123,7 @@ class _OiSpringState extends State<OiSpring>
       damping: widget.damping,
     );
     final sim = SpringSimulation(desc, from, to, velocity);
-    unawaited(_controller.animateWith(sim));
+    _controller.animateWith(sim);
   }
 
   @override

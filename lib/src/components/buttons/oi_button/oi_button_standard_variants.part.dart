@@ -9,7 +9,7 @@ extension _OiButtonStandardVariants on _OiButtonState {
     final density = OiDensityScope.of(context);
     final bt = context.components.button;
     final height = bt?.height ?? _buttonHeight(density);
-    final hPad = _hPadding(context);
+    final padding = _padding(context);
     final foreground = _foregroundColor(context, widget.variant);
     final themeRadius = bt?.borderRadius;
     final effectiveRadius =
@@ -22,25 +22,30 @@ extension _OiButtonStandardVariants on _OiButtonState {
     final isActive = widget.enabled && !widget.loading;
 
     Widget button = OiTappable(
+      statesController: _states,
+      applyBackgroundOverlay: !_usesStateBackground(context),
       onTap: isActive ? widget.onTap : null,
       enabled: isActive,
+      disabledOpacity: 1,
       semanticLabel: widget.semanticLabel ?? widget.label,
       clipBorderRadius: effectiveRadius,
-      child: Opacity(
-        opacity: widget.enabled ? 1 : 0.4,
-        child: Container(
-          height: height,
-          padding: EdgeInsets.symmetric(horizontal: hPad),
-          decoration: decoration,
-          child: Center(
-            widthFactor: 1,
-            child: _buildContent(
-              context,
-              label: widget.label,
-              icon: widget.icon,
-              iconPosition: widget.iconPosition,
-              foreground: foreground,
-              loading: widget.loading,
+      child: ExcludeSemantics(
+        child: Opacity(
+          opacity: widget.enabled ? 1 : 0.4,
+          child: Container(
+            height: height,
+            padding: padding,
+            decoration: decoration,
+            child: Center(
+              widthFactor: 1,
+              child: _buildContent(
+                context,
+                label: widget.label,
+                icon: widget.icon,
+                iconPosition: widget.iconPosition,
+                foreground: foreground,
+                loading: widget.loading,
+              ),
             ),
           ),
         ),
@@ -65,6 +70,8 @@ extension _OiButtonStandardVariants on _OiButtonState {
       return OiTooltip(
         label: widget.tooltip!,
         message: widget.tooltip!,
+        excludeFromSemantics:
+            widget.tooltip == (widget.semanticLabel ?? widget.label),
         child: button,
       );
     }
@@ -75,13 +82,18 @@ extension _OiButtonStandardVariants on _OiButtonState {
     final density = OiDensityScope.of(context);
     final bt = context.components.button;
     final height = bt?.height ?? _buttonHeight(density);
-    final hPad = _hPadding(context);
+    final padding = _padding(context);
     final foreground = _foregroundColor(context, widget.variant);
     final isActive = widget.enabled && !widget.loading;
 
     Widget content = Container(
       height: height,
-      padding: EdgeInsets.symmetric(horizontal: hPad),
+      padding: padding,
+      decoration: _decoration(
+        context,
+        widget.variant,
+        borderRadius: widget.borderRadius,
+      ),
       child: Center(
         widthFactor: 1,
         child: _buildContent(
@@ -91,7 +103,6 @@ extension _OiButtonStandardVariants on _OiButtonState {
           iconPosition: widget.iconPosition,
           foreground: foreground,
           loading: widget.loading,
-          bold: _highlighted,
         ),
       ),
     );
@@ -100,36 +111,17 @@ extension _OiButtonStandardVariants on _OiButtonState {
       content = Opacity(opacity: 0.4, child: content);
     }
 
-    content = GestureDetector(
+    content = OiTappable(
+      statesController: _states,
+      applyBackgroundOverlay: !_usesStateBackground(context),
       onTap: isActive ? widget.onTap : null,
-      behavior: HitTestBehavior.opaque,
-      child: content,
+      enabled: isActive,
+      disabledOpacity: 1,
+      semanticLabel: widget.semanticLabel ?? widget.label,
+      clipBorderRadius:
+          widget.borderRadius ?? bt?.borderRadius ?? context.radius.sm,
+      child: ExcludeSemantics(child: content),
     );
-
-    content = MouseRegion(
-      cursor: isActive ? SystemMouseCursors.click : SystemMouseCursors.basic,
-      onEnter: (_) {
-        if (isActive) _setHighlighted(true);
-      },
-      onExit: (_) => _setHighlighted(false),
-      child: content,
-    );
-
-    content = Focus(
-      canRequestFocus: isActive,
-      onFocusChange: _setHighlighted,
-      child: content,
-    );
-
-    final semLabel = widget.semanticLabel ?? widget.label;
-    if (semLabel != null) {
-      content = Semantics(
-        label: semLabel,
-        button: true,
-        enabled: widget.enabled,
-        child: content,
-      );
-    }
 
     var button = content;
 
@@ -151,6 +143,8 @@ extension _OiButtonStandardVariants on _OiButtonState {
       return OiTooltip(
         label: widget.tooltip!,
         message: widget.tooltip!,
+        excludeFromSemantics:
+            widget.tooltip == (widget.semanticLabel ?? widget.label),
         child: button,
       );
     }
@@ -161,19 +155,26 @@ extension _OiButtonStandardVariants on _OiButtonState {
     final density = OiDensityScope.of(context);
     final height = context.components.button?.height ?? _buttonHeight(density);
     final foreground = _foregroundColor(context, widget.variant);
-    final highlightColor = context.colors.primary.base;
     final isActive = widget.enabled && !widget.loading;
-    final iconSize = _iconSize();
-    final highlightedSize = iconSize + 2;
+    final iconSize = context.components.button?.iconSize ?? _iconSize();
 
-    Widget content = SizedBox(
+    final radius =
+        widget.borderRadius ??
+        context.components.button?.borderRadius ??
+        context.radius.sm;
+    Widget content = Container(
       width: height,
       height: height,
+      decoration: _decoration(
+        context,
+        widget.variant,
+        borderRadius: widget.borderRadius,
+      ),
       child: Center(
-        child: Icon(
+        child: OiIcon.raw(
           widget.icon,
-          size: _highlighted ? highlightedSize : iconSize,
-          color: _highlighted ? highlightColor : foreground,
+          size: iconSize,
+          color: foreground,
         ),
       ),
     );
@@ -182,37 +183,20 @@ extension _OiButtonStandardVariants on _OiButtonState {
       content = Opacity(opacity: 0.4, child: content);
     }
 
-    content = GestureDetector(
+    content = OiTappable(
+      statesController: _states,
+      applyBackgroundOverlay: !_usesStateBackground(context),
       onTap: isActive ? widget.onTap : null,
-      behavior: HitTestBehavior.opaque,
-      child: content,
+      enabled: isActive,
+      disabledOpacity: 1,
+      semanticLabel: widget.semanticLabel ?? widget.label,
+      clipBorderRadius: radius,
+      child: ExcludeSemantics(child: content),
     );
 
-    content = MouseRegion(
-      cursor: isActive ? SystemMouseCursors.click : SystemMouseCursors.basic,
-      onEnter: (_) {
-        if (isActive) _setHighlighted(true);
-      },
-      onExit: (_) => _setHighlighted(false),
-      child: content,
-    );
-
-    content = Focus(
-      canRequestFocus: isActive,
-      onFocusChange: _setHighlighted,
-      child: content,
-    );
-
-    final semLabel = widget.semanticLabel ?? widget.label;
-    if (semLabel != null) {
-      content = Semantics(
-        label: semLabel,
-        button: true,
-        enabled: widget.enabled,
-        child: content,
-      );
-    }
-
-    return content;
+    // Keep the icon control's explicit square geometry even when input
+    // modality changes. The interaction layer must fit the same constraints
+    // as the visible control (including compact table and quantity actions).
+    return SizedBox(width: height, height: height, child: content);
   }
 }

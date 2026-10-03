@@ -9,6 +9,7 @@ import 'package:obers_ui/src/components/navigation/oi_date_picker.dart';
 import 'package:obers_ui/src/components/overlays/oi_dialog_shell.dart';
 import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
+import 'package:obers_ui/src/primitives/display/oi_icon.dart';
 import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
 
 /// A preset for the [OiDateRangePickerField] that resolves to a date range.
@@ -398,10 +399,10 @@ class OiDateRangePickerField extends StatelessWidget {
             onTap: onCleared,
             child: Padding(
               padding: const EdgeInsets.only(right: 4),
-              child: Icon(OiIcons.x, size: 16, color: colors.textMuted),
+              child: OiIcon.raw(OiIcons.x, size: 16, color: colors.textMuted),
             ),
           ),
-        Icon(OiIcons.calendarRange, size: 18, color: colors.textMuted),
+        OiIcon.raw(OiIcons.calendarRange, size: 18, color: colors.textMuted),
       ],
     );
 
@@ -540,7 +541,11 @@ class _DateRangeDialogContentState extends State<_DateRangeDialogContent> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         if (preset.icon != null) ...[
-                          Icon(preset.icon, size: 14, color: colors.textMuted),
+                          OiIcon.raw(
+                            preset.icon,
+                            size: 14,
+                            color: colors.textMuted,
+                          ),
                           const SizedBox(width: 4),
                         ],
                         Text(

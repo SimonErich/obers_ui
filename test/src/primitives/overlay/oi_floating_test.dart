@@ -30,6 +30,31 @@ void main() {
     expect(find.text('floating'), findsNothing);
   });
 
+  testWidgets(
+    'hidden floating content has no fullscreen accessibility surface',
+    (tester) async {
+      final semantics = tester.ensureSemantics();
+      try {
+        await tester.pumpObers(
+          const OiFloating(
+            anchor: Text('Anchor'),
+            child: Text('Hidden tooltip'),
+          ),
+        );
+        await tester.pumpAndSettle();
+        final overlayNodes = tester.allRenderObjects
+            .map((object) => object.debugSemantics)
+            .where(
+              (node) =>
+                  node?.getSemanticsData().traversalChildIdentifier != null,
+            );
+        expect(overlayNodes, isEmpty);
+      } finally {
+        semantics.dispose();
+      }
+    },
+  );
+
   // ── 3. visible=true shows child ────────────────────────────────────────────
 
   testWidgets('floating child is visible', (tester) async {

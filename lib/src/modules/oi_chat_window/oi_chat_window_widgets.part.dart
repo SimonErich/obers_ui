@@ -22,7 +22,7 @@ class _StreamingCursorState extends State<_StreamingCursor>
       vsync: this,
       duration: const Duration(milliseconds: 500),
     );
-    unawaited(_controller.repeat(reverse: true));
+    _controller.repeat(reverse: true);
   }
 
   @override

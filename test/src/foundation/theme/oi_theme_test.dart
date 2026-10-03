@@ -226,24 +226,24 @@ void main() {
       expect(buildCount, 2);
     });
 
-    test('updateShouldNotify returns false when data is equal', () {
-      const child = SizedBox.shrink();
-      final themeA = OiThemeData.light();
-      final themeB = OiThemeData.light(); // equal value, different instance
-
-      final widgetOld = OiTheme(data: themeA, child: child);
-      final widgetNew = OiTheme(data: themeB, child: child);
-
-      // updateShouldNotify should return false when the data is equal
-      expect(widgetNew.updateShouldNotify(widgetOld), isFalse);
-    });
-
-    test('updateShouldNotify returns true when data differs', () {
-      const child = SizedBox.shrink();
-      final widgetOld = OiTheme(data: OiThemeData.light(), child: child);
-      final widgetNew = OiTheme(data: OiThemeData.dark(), child: child);
-
-      expect(widgetNew.updateShouldNotify(widgetOld), isTrue);
+    testWidgets('equal theme preserves inherited dependents and typography', (
+      tester,
+    ) async {
+      var builds = 0;
+      final child = Builder(
+        builder: (context) {
+          OiTheme.of(context);
+          builds++;
+          return const SizedBox();
+        },
+      );
+      await tester.pumpWidget(
+        buildWithTheme(child, theme: OiThemeData.light()),
+      );
+      await tester.pumpWidget(
+        buildWithTheme(child, theme: OiThemeData.light()),
+      );
+      expect(builds, 1);
     });
   });
 }

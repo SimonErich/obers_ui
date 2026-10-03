@@ -291,7 +291,10 @@ class _OiArrayInputState<T> extends State<OiArrayInput<T>> {
           OiLabel.smallStrong(widget.label),
           const SizedBox(height: 4),
           if (widget.items.isNotEmpty)
-            widget.reorderable ? _buildReorderableList() : _buildAnimatedList(),
+            if (widget.reorderable)
+              _buildReorderableList()
+            else
+              _buildAnimatedList(),
           if (showAdd)
             Center(
               child: Padding(

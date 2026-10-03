@@ -110,12 +110,17 @@ class OiButtonThemeData {
   const OiButtonThemeData({
     this.borderRadius,
     this.padding,
+    this.iconLabelPadding,
     this.textStyle,
     this.fontSizes,
+    this.smallHeight,
+    this.mediumHeight,
+    this.largeHeight,
     this.height,
     this.minWidth,
     this.iconSize,
     this.iconGap,
+    this.smallIconGap,
     this.primaryStyle,
     this.outlineStyle,
     this.ghostStyle,
@@ -130,6 +135,11 @@ class OiButtonThemeData {
   /// The internal padding of the button.
   final EdgeInsets? padding;
 
+  /// Optional regular icon-and-label insets: start is the icon side, end the
+  /// label side. Trailing icons reverse these insets. Small and icon-only
+  /// controls retain [padding]. Null preserves ordinary padding resolution.
+  final EdgeInsetsDirectional? iconLabelPadding;
+
   /// The text style for button labels.
   final TextStyle? textStyle;
 
@@ -140,6 +150,15 @@ class OiButtonThemeData {
   /// Override button height (ignores size/density calculation).
   final double? height;
 
+  /// Large control height.
+  final double? largeHeight;
+
+  /// Medium control height.
+  final double? mediumHeight;
+
+  /// Small control height.
+  final double? smallHeight;
+
   /// Minimum width constraint for buttons.
   final double? minWidth;
 
@@ -148,6 +167,9 @@ class OiButtonThemeData {
 
   /// Gap between icon and label text.
   final double? iconGap;
+
+  /// Small-button icon gap; null retains [iconGap] or the built-in spacing.
+  final double? smallIconGap;
 
   /// Color overrides for the primary button variant.
   final OiButtonVariantStyle? primaryStyle;
@@ -171,12 +193,17 @@ class OiButtonThemeData {
   OiButtonThemeData copyWith({
     BorderRadius? borderRadius,
     EdgeInsets? padding,
+    EdgeInsetsDirectional? iconLabelPadding,
     TextStyle? textStyle,
     OiButtonFontSizeScale? fontSizes,
+    double? smallHeight,
+    double? mediumHeight,
+    double? largeHeight,
     double? height,
     double? minWidth,
     double? iconSize,
     double? iconGap,
+    double? smallIconGap,
     OiButtonVariantStyle? primaryStyle,
     OiButtonVariantStyle? outlineStyle,
     OiButtonVariantStyle? ghostStyle,
@@ -187,12 +214,17 @@ class OiButtonThemeData {
     return OiButtonThemeData(
       borderRadius: borderRadius ?? this.borderRadius,
       padding: padding ?? this.padding,
+      iconLabelPadding: iconLabelPadding ?? this.iconLabelPadding,
       textStyle: textStyle ?? this.textStyle,
       fontSizes: fontSizes ?? this.fontSizes,
+      smallHeight: smallHeight ?? this.smallHeight,
+      mediumHeight: mediumHeight ?? this.mediumHeight,
+      largeHeight: largeHeight ?? this.largeHeight,
       height: height ?? this.height,
       minWidth: minWidth ?? this.minWidth,
       iconSize: iconSize ?? this.iconSize,
       iconGap: iconGap ?? this.iconGap,
+      smallIconGap: smallIconGap ?? this.smallIconGap,
       primaryStyle: primaryStyle ?? this.primaryStyle,
       outlineStyle: outlineStyle ?? this.outlineStyle,
       ghostStyle: ghostStyle ?? this.ghostStyle,
@@ -206,14 +238,19 @@ class OiButtonThemeData {
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
     return other is OiButtonThemeData &&
+        other.largeHeight == largeHeight &&
+        other.mediumHeight == mediumHeight &&
+        other.smallHeight == smallHeight &&
         other.borderRadius == borderRadius &&
         other.padding == padding &&
+        other.iconLabelPadding == iconLabelPadding &&
         other.textStyle == textStyle &&
         other.fontSizes == fontSizes &&
         other.height == height &&
         other.minWidth == minWidth &&
         other.iconSize == iconSize &&
         other.iconGap == iconGap &&
+        other.smallIconGap == smallIconGap &&
         other.primaryStyle == primaryStyle &&
         other.outlineStyle == outlineStyle &&
         other.ghostStyle == ghostStyle &&
@@ -226,12 +263,14 @@ class OiButtonThemeData {
   int get hashCode => Object.hash(
     borderRadius,
     padding,
+    iconLabelPadding,
     textStyle,
     fontSizes,
-    height,
+    Object.hash(largeHeight, mediumHeight, smallHeight, height),
     minWidth,
     iconSize,
     iconGap,
+    smallIconGap,
     primaryStyle,
     outlineStyle,
     ghostStyle,

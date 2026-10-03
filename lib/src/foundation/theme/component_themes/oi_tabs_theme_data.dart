@@ -17,6 +17,7 @@ class OiTabsThemeData {
     this.activeLabelColor,
     this.inactiveLabelColor,
     this.tabPadding,
+    this.tabSpacing,
   });
 
   /// The color of the active-tab indicator bar or highlight.
@@ -40,6 +41,9 @@ class OiTabsThemeData {
   /// Internal padding within each tab.
   final EdgeInsets? tabPadding;
 
+  /// Space between scrollable tabs, independent of the active underline width.
+  final double? tabSpacing;
+
   /// Creates a copy with optionally overridden values.
   OiTabsThemeData copyWith({
     Color? indicatorColor,
@@ -49,6 +53,7 @@ class OiTabsThemeData {
     Color? activeLabelColor,
     Color? inactiveLabelColor,
     EdgeInsets? tabPadding,
+    double? tabSpacing,
   }) {
     return OiTabsThemeData(
       indicatorColor: indicatorColor ?? this.indicatorColor,
@@ -58,6 +63,7 @@ class OiTabsThemeData {
       activeLabelColor: activeLabelColor ?? this.activeLabelColor,
       inactiveLabelColor: inactiveLabelColor ?? this.inactiveLabelColor,
       tabPadding: tabPadding ?? this.tabPadding,
+      tabSpacing: tabSpacing ?? this.tabSpacing,
     );
   }
 
@@ -71,7 +77,8 @@ class OiTabsThemeData {
         other.labelStyle == labelStyle &&
         other.activeLabelColor == activeLabelColor &&
         other.inactiveLabelColor == inactiveLabelColor &&
-        other.tabPadding == tabPadding;
+        other.tabPadding == tabPadding &&
+        other.tabSpacing == tabSpacing;
   }
 
   @override
@@ -83,5 +90,6 @@ class OiTabsThemeData {
     activeLabelColor,
     inactiveLabelColor,
     tabPadding,
+    tabSpacing,
   );
 }

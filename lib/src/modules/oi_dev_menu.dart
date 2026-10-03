@@ -5,6 +5,7 @@ import 'package:obers_ui/src/components/inputs/oi_text_input.dart';
 import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/primitives/display/oi_divider.dart';
+import 'package:obers_ui/src/primitives/display/oi_icon.dart';
 import 'package:obers_ui/src/primitives/display/oi_label.dart';
 import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
 
@@ -363,14 +364,14 @@ class _OiDevMenuState extends State<OiDevMenu> {
       ),
       child: Row(
         children: [
-          Icon(OiIcons.wrench, size: 18, color: colors.textSubtle),
+          OiIcon.raw(OiIcons.wrench, size: 18, color: colors.textSubtle),
           SizedBox(width: spacing.sm),
           const Expanded(child: OiLabel.h4('Developer Menu')),
           if (widget._mode == _MenuMode.trigger)
             OiTappable(
               onTap: _close,
               semanticLabel: 'Close developer menu',
-              child: Icon(OiIcons.x, size: 18, color: colors.textSubtle),
+              child: OiIcon.raw(OiIcons.x, size: 18, color: colors.textSubtle),
             ),
         ],
       ),
@@ -415,7 +416,7 @@ class _OiDevMenuState extends State<OiDevMenu> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(
+                    OiIcon.raw(
                       _tabIcons[i],
                       size: 14,
                       color: active ? colors.primary.base : colors.textMuted,
@@ -549,7 +550,7 @@ class _OiDevMenuState extends State<OiDevMenu> {
                   ),
                 ),
                 if (selected)
-                  Icon(
+                  OiIcon.raw(
                     OiIcons.check,
                     size: 16,
                     color: colors.primary.foreground,

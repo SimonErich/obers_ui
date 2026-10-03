@@ -10,6 +10,7 @@ import 'package:obers_ui/src/foundation/oi_responsive.dart';
 import 'package:obers_ui/src/foundation/theme/oi_spacing_scale.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/primitives/display/oi_divider.dart';
+import 'package:obers_ui/src/primitives/display/oi_icon.dart';
 import 'package:obers_ui/src/primitives/display/oi_label.dart';
 import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
 
@@ -271,12 +272,10 @@ class _OiProfilePageState extends State<OiProfilePage> {
     final key = entries[index].key;
     final ctx = key.currentContext;
     if (ctx != null) {
-      unawaited(
-        Scrollable.ensureVisible(
-          ctx,
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeInOut,
-        ),
+      Scrollable.ensureVisible(
+        ctx,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
       );
     }
     setState(() => _activeNavIndex = index);
@@ -491,7 +490,7 @@ class _OiProfilePageState extends State<OiProfilePage> {
                         border: Border.all(color: colors.surface, width: 2),
                       ),
                       child: Center(
-                        child: Icon(
+                        child: OiIcon.raw(
                           OiIcons.camera,
                           size: 14,
                           color: colors.primary.foreground,
@@ -533,7 +532,7 @@ class _OiProfilePageState extends State<OiProfilePage> {
           header: true,
           child: Row(
             children: [
-              Icon(OiIcons.user, size: 18, color: colors.text),
+              OiIcon.raw(OiIcons.user, size: 18, color: colors.text),
               SizedBox(width: sp.xs),
               const OiLabel.h4('Personal Information'),
             ],
@@ -629,7 +628,7 @@ class _OiProfilePageState extends State<OiProfilePage> {
           header: true,
           child: Row(
             children: [
-              Icon(OiIcons.link, size: 18, color: colors.text),
+              OiIcon.raw(OiIcons.link, size: 18, color: colors.text),
               SizedBox(width: sp.xs),
               const OiLabel.h4('Linked Accounts'),
             ],
@@ -652,7 +651,7 @@ class _OiProfilePageState extends State<OiProfilePage> {
           Row(
             children: [
               if (account.icon != null) ...[
-                Icon(account.icon, size: 20, color: colors.text),
+                OiIcon.raw(account.icon, size: 20, color: colors.text),
                 SizedBox(width: sp.sm),
               ],
               Expanded(
@@ -717,7 +716,7 @@ class _OiProfilePageState extends State<OiProfilePage> {
               child: Row(
                 children: [
                   if (section.icon != null) ...[
-                    Icon(section.icon, size: 18, color: colors.text),
+                    OiIcon.raw(section.icon, size: 18, color: colors.text),
                     SizedBox(width: sp.xs),
                   ],
                   OiLabel.h4(section.title),
@@ -754,7 +753,7 @@ class _OiProfilePageState extends State<OiProfilePage> {
             header: true,
             child: Row(
               children: [
-                Icon(OiIcons.shield, size: 18, color: colors.error.base),
+                OiIcon.raw(OiIcons.shield, size: 18, color: colors.error.base),
                 SizedBox(width: sp.xs),
                 OiLabel.h4('Danger Zone', color: colors.error.base),
               ],

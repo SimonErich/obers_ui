@@ -8,6 +8,36 @@ import 'package:obers_ui/src/primitives/animation/oi_shimmer.dart';
 import '../../../helpers/pump_app.dart';
 
 void main() {
+  testWidgets(
+    'rounded organization avatar clips its content at the requested size',
+    (tester) async {
+      const radius = BorderRadius.all(Radius.circular(6));
+      await tester.pumpObers(
+        const Center(
+          child: OiAvatar(
+            semanticLabel: 'Company',
+            initials: 'NE',
+            borderRadius: radius,
+          ),
+        ),
+      );
+      final clip = find.descendant(
+        of: find.byType(OiAvatar),
+        matching: find.byType(ClipRRect),
+      );
+      expect(clip, findsOneWidget);
+      expect(tester.widget<ClipRRect>(clip).borderRadius, radius);
+      expect(tester.getSize(clip), const Size(40, 40));
+      expect(
+        find.descendant(
+          of: find.byType(OiAvatar),
+          matching: find.byType(ClipOval),
+        ),
+        findsNothing,
+      );
+    },
+  );
+
   testWidgets('renders initials when no image', (tester) async {
     await tester.pumpObers(
       const OiAvatar(semanticLabel: 'User', initials: 'AB'),

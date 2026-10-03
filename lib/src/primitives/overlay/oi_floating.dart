@@ -165,14 +165,12 @@ class OiFloating extends StatefulWidget {
 class _OiFloatingState extends State<OiFloating> {
   final OverlayPortalController _portalController = OverlayPortalController();
   ScrollPosition? _scrollPosition;
+  bool _visibilityScheduled = false;
 
   @override
   void initState() {
     super.initState();
-    // Always show the portal — visibility is controlled by the builder
-    // returning SizedBox.shrink() when not visible. This avoids calling
-    // show()/hide() during build phases which can trigger assertions.
-    _portalController.show();
+    if (widget.visible) _portalController.show();
   }
 
   @override
@@ -184,10 +182,27 @@ class _OiFloatingState extends State<OiFloating> {
   @override
   void didUpdateWidget(OiFloating oldWidget) {
     super.didUpdateWidget(oldWidget);
+    if (widget.visible != oldWidget.visible) _scheduleVisibility();
     if (widget.visible != oldWidget.visible ||
         widget.onDismiss != oldWidget.onDismiss) {
       _updateScrollListener();
     }
+  }
+
+  void _scheduleVisibility() {
+    if (_visibilityScheduled) return;
+    _visibilityScheduled = true;
+    // A widget update can happen while its enclosing overlay is building.
+    // Synchronize after that frame, using the latest requested visibility.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _visibilityScheduled = false;
+      if (!mounted || _portalController.isShowing == widget.visible) return;
+      if (widget.visible) {
+        _portalController.show();
+      } else {
+        _portalController.hide();
+      }
+    });
   }
 
   void _updateScrollListener() {
@@ -234,8 +249,7 @@ class _OiFloatingState extends State<OiFloating> {
   }
 
   Widget _buildOverlayChild(BuildContext context, OverlayChildLayoutInfo info) {
-    // When not visible, return an empty widget so the portal can stay
-    // "shown" without rendering anything.
+    // A closing portal may build once before its post-frame hide completes.
     if (!widget.visible) return const SizedBox.shrink();
 
     Widget content;

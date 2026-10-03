@@ -2,11 +2,15 @@
 // REQ-0014: Required props enforce correctness — buttons require label.
 // REQ-0019: OiButton accessibility enforcement tests.
 
+import 'dart:ui' show PointerDeviceKind;
+
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui/src/components/buttons/oi_button.dart';
 import 'package:obers_ui/src/components/display/oi_tooltip.dart';
 import 'package:obers_ui/src/foundation/oi_app.dart';
+import 'package:obers_ui/src/foundation/theme/component_themes/oi_button_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme_data.dart';
 import 'package:obers_ui/src/primitives/animation/oi_pulse.dart';
 import 'package:obers_ui/src/primitives/display/oi_icon.dart';
@@ -16,6 +20,346 @@ import '../../../helpers/pump_app.dart';
 const _kIcon = IconData(0xe318, fontFamily: 'MaterialIcons');
 
 void main() {
+  testWidgets(
+    'regular icon insets follow icon side and leave small controls unchanged',
+    (tester) async {
+      final base = OiThemeData.light();
+      const ordinary = EdgeInsets.symmetric(horizontal: 12);
+      const iconInsets = EdgeInsetsDirectional.fromSTEB(12, 0, 14, 0);
+      const theme = OiButtonThemeData(
+        padding: ordinary,
+        iconLabelPadding: iconInsets,
+      );
+      expect(theme.copyWith(), theme);
+      expect(theme.copyWith().hashCode, theme.hashCode);
+      expect(theme, isNot(const OiButtonThemeData(padding: ordinary)));
+      await tester.pumpObers(
+        Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              for (final size in [OiButtonSize.small, OiButtonSize.medium])
+                for (final position in OiIconPosition.values)
+                  OiButton.secondary(
+                    key: ValueKey((size, position)),
+                    label: 'Action',
+                    icon: _kIcon,
+                    size: size,
+                    iconPosition: position,
+                    onTap: () {},
+                  ),
+              OiButton.secondary(
+                key: const ValueKey('plain'),
+                label: 'Plain',
+                onTap: () {},
+              ),
+            ],
+          ),
+        ),
+        theme: base.copyWith(
+          components: base.components.copyWith(button: theme),
+        ),
+      );
+      for (final size in [OiButtonSize.small, OiButtonSize.medium]) {
+        for (final position in OiIconPosition.values) {
+          final containers = tester.widgetList<Container>(
+            find.descendant(
+              of: find.byKey(ValueKey((size, position))),
+              matching: find.byType(Container),
+            ),
+          );
+          final expected = size == OiButtonSize.small
+              ? ordinary
+              : position == OiIconPosition.leading
+              ? iconInsets
+              : const EdgeInsetsDirectional.fromSTEB(14, 0, 12, 0);
+          expect(
+            containers.any((container) => container.padding == expected),
+            isTrue,
+          );
+        }
+      }
+      final plain = tester.widgetList<Container>(
+        find.descendant(
+          of: find.byKey(const ValueKey('plain')),
+          matching: find.byType(Container),
+        ),
+      );
+      expect(plain.any((container) => container.padding == ordinary), isTrue);
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  test('small icon gap participates in theme copying and equality', () {
+    const original = OiButtonThemeData(iconGap: 8, smallIconGap: 6);
+    expect(original.copyWith(), original);
+    expect(original.copyWith().hashCode, original.hashCode);
+    expect(
+      original.copyWith(smallIconGap: 4),
+      const OiButtonThemeData(iconGap: 8, smallIconGap: 4),
+    );
+    expect(original, isNot(const OiButtonThemeData(iconGap: 8)));
+  });
+  testWidgets(
+    'small icon gap overrides only small buttons and preserves fallback',
+    (tester) async {
+      final base = OiThemeData.light();
+      Future<Map<OiButtonSize, double>> widths(OiButtonThemeData theme) async {
+        await tester.pumpObers(
+          Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                for (final size in OiButtonSize.values)
+                  OiButton.secondary(
+                    key: ValueKey(size),
+                    label: 'Action',
+                    icon: _kIcon,
+                    size: size,
+                    onTap: () {},
+                  ),
+              ],
+            ),
+          ),
+          theme: base.copyWith(
+            components: base.components.copyWith(button: theme),
+          ),
+        );
+        return {
+          for (final size in OiButtonSize.values)
+            size: tester.getSize(find.byKey(ValueKey(size))).width,
+        };
+      }
+
+      final global = await widths(const OiButtonThemeData(iconGap: 8));
+      final sized = await widths(
+        const OiButtonThemeData(iconGap: 8, smallIconGap: 6),
+      );
+      expect(
+        sized[OiButtonSize.small],
+        closeTo(global[OiButtonSize.small]! - 2, .01),
+      );
+      expect(sized[OiButtonSize.medium], global[OiButtonSize.medium]);
+      expect(sized[OiButtonSize.large], global[OiButtonSize.large]);
+      final defaultGap = await widths(const OiButtonThemeData());
+      final explicitDefault = await widths(
+        OiButtonThemeData(iconGap: base.spacing.xs),
+      );
+      expect(defaultGap, explicitDefault);
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets('theme hover and pressed colors preserve ghost text geometry', (
+    tester,
+  ) async {
+    final base = OiThemeData.light();
+    const normal = Color(0xff333333);
+    const hovered = Color(0xff444444);
+    const pressed = Color(0xff555555);
+    await tester.pumpObers(
+      Center(
+        child: OiButton.ghost(label: 'Stable action', onTap: () {}),
+      ),
+      theme: base.copyWith(
+        components: base.components.copyWith(
+          button: const OiButtonThemeData(
+            ghostStyle: OiButtonVariantStyle(
+              background: normal,
+              backgroundHover: hovered,
+              backgroundPressed: pressed,
+              foreground: Color(0xffffffff),
+            ),
+          ),
+        ),
+      ),
+    );
+    final button = find.byType(OiButton);
+    final bounds = tester.getRect(button);
+    final textStyle = tester.widget<Text>(find.text('Stable action')).style!;
+    Color? background() =>
+        (tester
+                    .widgetList<Container>(
+                      find.descendant(
+                        of: button,
+                        matching: find.byType(Container),
+                      ),
+                    )
+                    .firstWhere(
+                      (container) => container.decoration is BoxDecoration,
+                    )
+                    .decoration!
+                as BoxDecoration)
+            .color;
+    expect(background(), normal);
+    final mouse = await tester.createGesture(kind: PointerDeviceKind.mouse);
+    await mouse.addPointer(location: Offset.zero);
+    await mouse.moveTo(bounds.center);
+    await tester.pumpAndSettle();
+    expect(background(), hovered);
+    expect(tester.getRect(button), bounds);
+    expect(
+      tester.widget<Text>(find.text('Stable action')).style!.fontWeight,
+      textStyle.fontWeight,
+    );
+    await mouse.down(bounds.center);
+    await tester.pump(const Duration(milliseconds: 120));
+    expect(background(), pressed);
+    expect(tester.getRect(button), bounds);
+    await mouse.up();
+    await mouse.moveTo(Offset.zero);
+    await tester.pumpAndSettle();
+    expect(background(), normal);
+    expect(tester.takeException(), isNull);
+    await mouse.removePointer();
+  });
+
+  testWidgets(
+    'theme padding reaches the rendered standard and compact buttons',
+    (tester) async {
+      final base = OiThemeData.light();
+      const padding = EdgeInsets.fromLTRB(12, 0, 14, 0);
+      await tester.pumpObers(
+        Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              OiButton.primary(label: 'Primary', onTap: () {}),
+              OiButton.ghost(
+                label: 'Compact',
+                size: OiButtonSize.small,
+                onTap: () {},
+              ),
+            ],
+          ),
+        ),
+        theme: base.copyWith(
+          components: base.components.copyWith(
+            button: const OiButtonThemeData(padding: padding),
+          ),
+        ),
+      );
+      for (final label in ['Primary', 'Compact']) {
+        final button = find.ancestor(
+          of: find.text(label),
+          matching: find.byType(OiButton),
+        );
+        final containers = tester.widgetList<Container>(
+          find.descendant(of: button, matching: find.byType(Container)),
+        );
+        expect(
+          containers.any((container) => container.padding == padding),
+          isTrue,
+        );
+      }
+    },
+  );
+
+  testWidgets('matching tooltip does not repeat a button accessible name', (
+    tester,
+  ) async {
+    final handle = tester.ensureSemantics();
+    await tester.pumpObers(
+      OiButton.outline(
+        label: 'Confirm',
+        semanticLabel: 'Confirm with kitchen',
+        tooltip: 'Confirm with kitchen',
+        onTap: () {},
+      ),
+    );
+    expect(find.bySemanticsLabel('Confirm with kitchen'), findsOneWidget);
+    expect(
+      find.bySemanticsLabel('Confirm with kitchen\nConfirm with kitchen'),
+      findsNothing,
+    );
+    expect(find.byType(OiTooltip), findsOneWidget);
+    handle.dispose();
+  });
+
+  testWidgets('compact icon geometry survives touch and keyboard input', (
+    tester,
+  ) async {
+    var taps = 0;
+    await tester.pumpObers(
+      Align(
+        alignment: Alignment.topLeft,
+        child: SizedBox(
+          width: 40,
+          child: Row(
+            children: [
+              OiButton.icon(
+                label: 'Row actions',
+                icon: _kIcon,
+                size: OiButtonSize.small,
+                onTap: () => taps++,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+    final button = find.byType(OiButton);
+    final initial = tester.getSize(button);
+    expect(initial.width, lessThanOrEqualTo(40));
+    expect(initial.width, initial.height);
+    await tester.tap(button);
+    await tester.pump();
+    expect(taps, 1);
+    expect(tester.getSize(button), initial);
+    expect(tester.takeException(), isNull);
+    await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+    await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+    await tester.pump();
+    expect(taps, 2);
+    expect(tester.getSize(button), initial);
+    expect(tester.takeException(), isNull);
+  });
+
+  for (final icon in [false, true]) {
+    testWidgets(
+      '${icon ? 'icon' : 'ghost'} button supports keyboard activation and a single name',
+      (tester) async {
+        final handle = tester.ensureSemantics();
+        var taps = 0;
+        final button = icon
+            ? OiButton.icon(
+                label: 'Open options',
+                icon: _kIcon,
+                onTap: () => taps++,
+              )
+            : OiButton.ghost(label: 'Open options', onTap: () => taps++);
+        await tester.pumpObers(button);
+        await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+        await tester.pump();
+        await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+        await tester.pump();
+        expect(taps, 1);
+        expect(find.bySemanticsLabel('Open options'), findsOneWidget);
+        handle.dispose();
+      },
+    );
+  }
+
+  testWidgets('a button announces its explicit label once while loading', (
+    tester,
+  ) async {
+    final handle = tester.ensureSemantics();
+    await tester.pumpObers(
+      const OiButton.primary(label: 'Save', semanticLabel: 'Save order'),
+    );
+    expect(find.bySemanticsLabel('Save order'), findsOneWidget);
+    expect(find.bySemanticsLabel('Save order\nSave'), findsNothing);
+    await tester.pumpObers(
+      const OiButton.primary(
+        label: 'Save',
+        semanticLabel: 'Save order',
+        loading: true,
+      ),
+    );
+    expect(find.bySemanticsLabel('Save order'), findsOneWidget);
+    handle.dispose();
+  });
+
   // ── Variant rendering ──────────────────────────────────────────────────────
 
   testWidgets('primary variant renders label', (tester) async {
@@ -218,6 +562,74 @@ void main() {
     expect((size.width - size.height).abs(), lessThan(2));
   });
 
+  testWidgets(
+    'icon variants retain themed surfaces through hover and disabled',
+    (
+      tester,
+    ) async {
+      final base = OiThemeData.light();
+      const normal = Color(0xff223344);
+      const hover = Color(0xff334455);
+      const disabled = Color(0xff445566);
+      const border = Color(0xff778899);
+      final theme = base.copyWith(
+        components: base.components.copyWith(
+          button: const OiButtonThemeData(
+            secondaryStyle: OiButtonVariantStyle(
+              background: normal,
+              backgroundHover: hover,
+              backgroundDisabled: disabled,
+              border: border,
+            ),
+          ),
+        ),
+      );
+      Future<void> mount(OiButtonVariant variant, {bool enabled = true}) =>
+          tester.pumpObers(
+            Center(
+              child: OiButton.icon(
+                icon: _kIcon,
+                label: 'More',
+                variant: variant,
+                enabled: enabled,
+                onTap: () {},
+              ),
+            ),
+            theme: theme,
+          );
+      BoxDecoration decoration() => tester
+          .widgetList<Container>(
+            find.descendant(
+              of: find.byType(OiButton),
+              matching: find.byType(Container),
+            ),
+          )
+          .map((container) => container.decoration)
+          .whereType<BoxDecoration>()
+          .single;
+      await mount(OiButtonVariant.secondary);
+      final bounds = tester.getRect(find.byType(OiButton));
+      expect(decoration().color, normal);
+      expect(decoration().border, Border.all(color: border));
+      final mouse = await tester.createGesture(kind: PointerDeviceKind.mouse);
+      await mouse.addPointer(location: Offset.zero);
+      await mouse.moveTo(bounds.center);
+      await tester.pumpAndSettle();
+      expect(decoration().color, hover);
+      expect(tester.getRect(find.byType(OiButton)), bounds);
+      await mount(OiButtonVariant.secondary, enabled: false);
+      expect(decoration().color, disabled);
+      await mouse.moveTo(Offset.zero);
+      await mount(OiButtonVariant.outline);
+      expect(decoration().border, Border.all(color: base.colors.border));
+      await mount(OiButtonVariant.ghost);
+      expect(decoration().border, isNull);
+      expect(decoration().color, const Color(0x00000000));
+      expect(tester.takeException(), isNull);
+      await mouse.removePointer();
+    },
+  );
+
   // ── OiButton accessibility (REQ-0019) ────────────────────────────────────
 
   group('OiButton accessibility', () {
@@ -365,7 +777,7 @@ void main() {
     final icons = find.byType(Icon);
     expect(icons, findsOneWidget); // only the chevron — no label icon
     await tester.tap(icons);
-    await tester.pump();
+    await tester.pumpAndSettle();
     expect(find.text('CSV option'), findsOneWidget);
   });
 

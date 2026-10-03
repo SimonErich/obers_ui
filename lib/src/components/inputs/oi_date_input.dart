@@ -1,10 +1,34 @@
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/_internal/oi_input_frame.dart';
+import 'package:obers_ui/src/components/inputs/oi_segmented_control.dart';
 import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
+import 'package:obers_ui/src/primitives/display/oi_icon.dart';
+import 'package:obers_ui/src/primitives/display/oi_label.dart';
 import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
 import 'package:obers_ui/src/primitives/overlay/oi_floating.dart'
     show OiFloating;
+import 'package:obers_ui/src/utils/formatters.dart';
+
+/// One explicit date choice before the custom date picker.
+@immutable
+class OiDatePreset {
+  /// Creates a labeled calendar date without introducing a second value owner.
+  const OiDatePreset({
+    required this.date,
+    required this.label,
+    this.enabled = true,
+  });
+
+  /// Calendar date represented by this preset; time-of-day is ignored.
+  final DateTime date;
+
+  /// Visible label, which may include the formatted date.
+  final String label;
+
+  /// Whether the preset can currently be chosen.
+  final bool enabled;
+}
 
 /// A date-picker input that displays a formatted date and opens an overlay
 /// picker when tapped.
@@ -21,10 +45,15 @@ class OiDateInput extends StatefulWidget {
     this.firstDate,
     this.lastDate,
     this.label,
+    this.semanticLabel,
+    this.leadingIcon = false,
     this.hint,
     this.error,
     this.enabled = true,
     this.dateFormat,
+    this.locale,
+    this.presets = const [],
+    this.pickerLabel = 'Pick a date',
     super.key,
   });
 
@@ -43,6 +72,12 @@ class OiDateInput extends StatefulWidget {
   /// Optional label rendered above the frame.
   final String? label;
 
+  /// Accessible name when the visible label is omitted in a compact layout.
+  final String? semanticLabel;
+
+  /// Places the calendar icon before the value instead of after it.
+  final bool leadingIcon;
+
   /// Optional hint rendered below the frame.
   final String? hint;
 
@@ -52,8 +87,18 @@ class OiDateInput extends StatefulWidget {
   /// Whether the field accepts interaction.
   final bool enabled;
 
-  /// Date format string, e.g. `'yyyy-MM-dd'`. Defaults to `'yyyy-MM-dd'`.
+  /// An intl date pattern, e.g. `'dd MMM yyyy'`. Defaults to `'yyyy-MM-dd'`.
   final String? dateFormat;
+
+  /// Locale used by the intl pattern; null preserves intl's default locale.
+  final String? locale;
+
+  /// Compact shortcuts rendered beside one custom-date action.
+  /// Empty retains the ordinary date field. Both modes use the same picker.
+  final List<OiDatePreset> presets;
+
+  /// Label of the custom picker when the value matches a preset.
+  final String pickerLabel;
 
   @override
   State<OiDateInput> createState() => _OiDateInputState();
@@ -129,10 +174,7 @@ class _OiDateInputState extends State<OiDateInput> {
 
   String _formatDate(DateTime d) {
     final fmt = widget.dateFormat ?? 'yyyy-MM-dd';
-    return fmt
-        .replaceAll('yyyy', d.year.toString().padLeft(4, '0'))
-        .replaceAll('MM', d.month.toString().padLeft(2, '0'))
-        .replaceAll('dd', d.day.toString().padLeft(2, '0'));
+    return OiFormatters.dateTime(d, pattern: fmt, locale: widget.locale);
   }
 
   int _daysInMonth(int year, int month) => DateTime(year, month + 1, 0).day;
@@ -307,25 +349,32 @@ class _OiDateInputState extends State<OiDateInput> {
 
   @override
   Widget build(BuildContext context) {
+    assert(
+      widget.presets.length <= 4,
+      'At most four date presets precede the custom picker',
+    );
     final colors = context.colors;
     final displayText = widget.value != null ? _formatDate(widget.value!) : '';
 
-    final calendarIcon = Icon(
+    final calendarIcon = OiIcon.raw(
       OiIcons.calendarDays,
       size: 18,
       color: colors.textMuted,
     );
 
-    final anchor = GestureDetector(
+    final field = OiTappable(
+      semanticLabel: widget.semanticLabel,
+      enabled: widget.enabled,
       onTap: widget.enabled ? _togglePicker : null,
-      behavior: HitTestBehavior.opaque,
       child: OiInputFrame(
         label: widget.label,
         hint: widget.hint,
         error: widget.error,
         focused: _open,
         enabled: widget.enabled,
-        trailing: calendarIcon,
+        leading: widget.leadingIcon ? calendarIcon : null,
+        leadingGap: widget.leadingIcon ? 8 : 0,
+        trailing: widget.leadingIcon ? null : calendarIcon,
         child: Text(
           displayText,
           style: TextStyle(
@@ -335,6 +384,68 @@ class _OiDateInputState extends State<OiDateInput> {
         ),
       ),
     );
+
+    final matchedPreset = widget.presets.indexWhere(
+      (preset) =>
+          widget.value != null &&
+          preset.date.year == widget.value!.year &&
+          preset.date.month == widget.value!.month &&
+          preset.date.day == widget.value!.day,
+    );
+    final anchor = widget.presets.isEmpty
+        ? field
+        : Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (widget.label != null) ...[
+                OiLabel.bodyStrong(widget.label!),
+                const SizedBox(height: 8),
+              ],
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: OiSegmentedControl<int>(
+                  semanticLabel: widget.semanticLabel ?? widget.label ?? 'Date',
+                  selected: matchedPreset,
+                  enabled: widget.enabled,
+                  onReselected: (index) {
+                    if (index < 0) _togglePicker();
+                  },
+                  segments: [
+                    for (var index = 0; index < widget.presets.length; index++)
+                      OiSegment(
+                        value: index,
+                        label: widget.presets[index].label,
+                        enabled: widget.presets[index].enabled,
+                      ),
+                    OiSegment(
+                      value: -1,
+                      label: matchedPreset < 0 && widget.value != null
+                          ? displayText
+                          : widget.pickerLabel,
+                      icon: OiIcons.calendarDays,
+                    ),
+                  ],
+                  onChanged: (index) {
+                    if (index < 0) {
+                      _togglePicker();
+                    } else {
+                      if (_open) setState(() => _open = false);
+                      widget.onChanged?.call(widget.presets[index].date);
+                    }
+                  },
+                ),
+              ),
+              if (widget.hint != null) ...[
+                const SizedBox(height: 4),
+                OiLabel.caption(widget.hint!, color: colors.textMuted),
+              ],
+              if (widget.error != null) ...[
+                const SizedBox(height: 4),
+                OiLabel.caption(widget.error!, color: colors.error.base),
+              ],
+            ],
+          );
 
     return OiFloating(
       visible: _open,

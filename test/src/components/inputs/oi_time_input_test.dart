@@ -32,7 +32,7 @@ void main() {
   testWidgets('tapping opens picker overlay', (tester) async {
     await tester.pumpObers(const OiTimeInput());
     await tester.tap(find.byType(GestureDetector).first);
-    await tester.pump();
+    await tester.pumpAndSettle();
     expect(find.text('OK'), findsOneWidget);
     expect(find.text('Cancel'), findsOneWidget);
   });

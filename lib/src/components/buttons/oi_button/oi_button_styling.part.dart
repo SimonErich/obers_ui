@@ -17,6 +17,13 @@ OiButtonVariantStyle? _variantStyle(
 
 extension _OiButtonStyling on _OiButtonState {
   double _buttonHeight(OiDensity density) {
+    final theme = context.components.button;
+    final configured = switch (widget.size) {
+      OiButtonSize.small => theme?.smallHeight,
+      OiButtonSize.medium => theme?.mediumHeight,
+      OiButtonSize.large => theme?.largeHeight,
+    };
+    if (configured != null) return configured;
     switch (widget.size) {
       case OiButtonSize.small:
         switch (density) {
@@ -83,20 +90,49 @@ extension _OiButtonStyling on _OiButtonState {
     }
   }
 
-  double _hPadding(BuildContext context) {
+  EdgeInsetsGeometry _padding(BuildContext context) {
+    if (context.components.button?.iconLabelPadding case final padding?
+        when widget.size != OiButtonSize.small &&
+            widget.icon != null &&
+            widget.label != null) {
+      return widget.iconPosition == OiIconPosition.leading
+          ? padding
+          : EdgeInsetsDirectional.fromSTEB(
+              padding.end,
+              padding.top,
+              padding.start,
+              padding.bottom,
+            );
+    }
+    if (context.components.button?.padding case final padding?) return padding;
     final sp = context.spacing;
     switch (widget.size) {
       case OiButtonSize.small:
-        return sp.sm;
+        return EdgeInsets.symmetric(horizontal: sp.sm);
       case OiButtonSize.medium:
-        return sp.md;
+        return EdgeInsets.symmetric(horizontal: sp.md);
       case OiButtonSize.large:
-        return sp.lg;
+        return EdgeInsets.symmetric(horizontal: sp.lg);
     }
   }
 
   Color _backgroundColor(BuildContext context, OiButtonVariant variant) {
     final vs = _variantStyle(context.components.button, variant);
+    if (!widget.enabled && vs?.backgroundDisabled != null) {
+      return vs!.backgroundDisabled!;
+    }
+    if (widget.enabled &&
+        !widget.loading &&
+        _states.value.contains(WidgetState.pressed) &&
+        vs?.backgroundPressed != null) {
+      return vs!.backgroundPressed!;
+    }
+    if (widget.enabled &&
+        !widget.loading &&
+        _states.value.contains(WidgetState.hovered) &&
+        vs?.backgroundHover != null) {
+      return vs!.backgroundHover!;
+    }
     if (vs?.background != null) return vs!.background!;
     final c = context.colors;
     switch (variant) {
@@ -117,6 +153,21 @@ extension _OiButtonStyling on _OiButtonState {
 
   Color _foregroundColor(BuildContext context, OiButtonVariant variant) {
     final vs = _variantStyle(context.components.button, variant);
+    if (!widget.enabled && vs?.foregroundDisabled != null) {
+      return vs!.foregroundDisabled!;
+    }
+    if (widget.enabled &&
+        !widget.loading &&
+        _states.value.contains(WidgetState.pressed) &&
+        vs?.foregroundPressed != null) {
+      return vs!.foregroundPressed!;
+    }
+    if (widget.enabled &&
+        !widget.loading &&
+        _states.value.contains(WidgetState.hovered) &&
+        vs?.foregroundHover != null) {
+      return vs!.foregroundHover!;
+    }
     if (vs?.foreground != null) return vs!.foreground!;
     final c = context.colors;
     switch (variant) {
@@ -147,8 +198,15 @@ extension _OiButtonStyling on _OiButtonState {
 
     final vs = _variantStyle(bt, variant);
     final Border? border;
-    if (vs?.border != null) {
-      border = Border.all(color: vs!.border!);
+    final stateBorder = !widget.enabled
+        ? vs?.borderDisabled
+        : _states.value.contains(WidgetState.pressed)
+        ? vs?.borderPressed
+        : _states.value.contains(WidgetState.hovered)
+        ? vs?.borderHover
+        : null;
+    if (stateBorder != null || vs?.border != null) {
+      border = Border.all(color: stateBorder ?? vs!.border!);
     } else if (variant == OiButtonVariant.outline) {
       border = Border.all(color: context.colors.border);
     } else {

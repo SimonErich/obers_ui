@@ -1,5 +1,6 @@
 // Tests do not require documentation comments.
 
+import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -108,6 +109,41 @@ void main() {
   });
 
   // ── textAlign ─────────────────────────────────────────────────────────────
+
+  testWidgets('visible single-line labels paint their complete text run', (
+    tester,
+  ) async {
+    for (final query in [null, 'Direct']) {
+      await tester.pumpObers(
+        Center(
+          child: SizedBox(
+            width: 80,
+            child: OiLabel.variant(
+              'SEPA Direct Debit',
+              variant: OiLabelVariant.body,
+              maxLines: 1,
+              overflow: TextOverflow.visible,
+              highlightQuery: query,
+            ),
+          ),
+        ),
+      );
+      final paragraph = tester.renderObject<RenderParagraph>(
+        find.byType(RichText),
+      );
+      final boxes = paragraph.getBoxesForSelection(
+        const TextSelection(baseOffset: 0, extentOffset: 17),
+      );
+      expect(
+        boxes.last.right,
+        greaterThan(80),
+        reason:
+            'The final word remains in the first line beyond the narrow layout box.',
+      );
+      expect(boxes.last.top, boxes.first.top);
+      expect(tester.takeException(), isNull);
+    }
+  });
 
   testWidgets('applies textAlign', (tester) async {
     await tester.pumpObers(

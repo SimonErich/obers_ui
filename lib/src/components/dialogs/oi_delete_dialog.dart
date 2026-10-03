@@ -7,6 +7,7 @@ import 'package:obers_ui/src/components/inputs/oi_checkbox.dart';
 import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/models/oi_file_node_data.dart';
+import 'package:obers_ui/src/primitives/display/oi_icon.dart';
 
 /// A confirmation dialog for deleting files/folders.
 ///
@@ -149,7 +150,7 @@ class _OiDeleteDialogState extends State<OiDeleteDialog> {
                 SizedBox(height: spacing.sm),
                 Row(
                   children: [
-                    Icon(
+                    OiIcon.raw(
                       OiIcons.circleAlert, // warning
                       size: 16,
                       color: colors.warning.base,

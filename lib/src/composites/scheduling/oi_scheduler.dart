@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
+import 'package:obers_ui/src/primitives/display/oi_icon.dart';
 
 /// A time slot in the scheduler.
 ///
@@ -220,7 +221,11 @@ class _OiSchedulerState extends State<OiScheduler> {
             onTap: _goBackward,
             child: Padding(
               padding: const EdgeInsets.all(8),
-              child: Icon(OiIcons.chevronLeft, size: 20, color: colors.text),
+              child: OiIcon.raw(
+                OiIcons.chevronLeft,
+                size: 20,
+                color: colors.text,
+              ),
             ),
           ),
           Expanded(
@@ -241,7 +246,11 @@ class _OiSchedulerState extends State<OiScheduler> {
             onTap: _goForward,
             child: Padding(
               padding: const EdgeInsets.all(8),
-              child: Icon(OiIcons.chevronRight, size: 20, color: colors.text),
+              child: OiIcon.raw(
+                OiIcons.chevronRight,
+                size: 20,
+                color: colors.text,
+              ),
             ),
           ),
         ],

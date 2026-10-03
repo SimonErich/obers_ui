@@ -32,10 +32,12 @@ class _FilterPopoverState extends State<_FilterPopover> {
   late Set<String> _selectedValues;
   final FocusNode _textFocusNode = FocusNode();
   String _searchQuery = '';
+  OiColumnFilter? _draftFilter;
 
   @override
   void initState() {
     super.initState();
+    _draftFilter = widget.currentFilter;
     final initial = widget.currentFilter?.value?.toString() ?? '';
     _textController = TextEditingController(text: initial);
 
@@ -270,36 +272,21 @@ class _FilterPopoverState extends State<_FilterPopover> {
   Widget _buildTextInput(BuildContext context) {
     final colors = context.colors;
 
-    if (widget.definition.type == OiFilterType.custom &&
-        widget.definition.customBuilder != null) {
-      return widget.definition.customBuilder!(
-        widget.currentFilter?.value,
-        (v) => _textController.text = v.toString(),
-      );
-    }
-
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-          decoration: BoxDecoration(
-            border: Border.all(color: colors.border),
-            borderRadius: BorderRadius.circular(6),
-          ),
-          child: EditableText(
-            controller: _textController,
-            focusNode: _textFocusNode,
-            style: TextStyle(fontSize: 14, color: colors.text),
-            cursorColor: colors.primary.base,
-            backgroundCursorColor: colors.border,
-          ),
+        OiFilterInput(
+          definition: widget.definition,
+          value: _draftFilter,
+          onChanged: (value) => setState(() => _draftFilter = value),
         ),
         const SizedBox(height: 8),
         GestureDetector(
           key: const Key('oi_filter_apply'),
-          onTap: _apply,
+          onTap: () {
+            if (_draftFilter != null) widget.onApply(_draftFilter!);
+          },
           child: Container(
             padding: const EdgeInsets.symmetric(vertical: 8),
             decoration: BoxDecoration(

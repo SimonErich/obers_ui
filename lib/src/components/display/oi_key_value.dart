@@ -30,6 +30,11 @@ class OiKeyValue extends StatelessWidget {
     this.leading,
     this.trailing,
     this.valueWidget,
+    this.labelWidget,
+    this.valueAtEnd = false,
+    this.crossAxisAlignment = CrossAxisAlignment.start,
+    this.valueMaxWidthFraction = .5,
+    this.padding,
     this.emptyText = '---',
     this.copyable = false,
     this.onTap,
@@ -60,6 +65,22 @@ class OiKeyValue extends StatelessWidget {
   /// Custom widget to render instead of a text value.
   /// When provided, [value] is ignored for display (but still used for copy).
   final Widget? valueWidget;
+
+  /// Custom label content, for example a title with a tax explanation below it.
+  final Widget? labelWidget;
+
+  /// Gives the label the remaining width and aligns the value to the trailing
+  /// edge. Useful for totals and compact summaries with varying label lengths.
+  final bool valueAtEnd;
+
+  /// Vertical alignment of a horizontal label and value.
+  final CrossAxisAlignment crossAxisAlignment;
+
+  /// Maximum horizontal space occupied by a trailing value.
+  final double valueMaxWidthFraction;
+
+  /// Overrides the normal row padding.
+  final EdgeInsetsGeometry? padding;
 
   /// Placeholder when [value] is null or empty.
   final String emptyText;
@@ -129,9 +150,9 @@ class OiKeyValue extends StatelessWidget {
       );
     }
 
-    final labelWidget = SizedBox(
+    final labelContent = SizedBox(
       width: effectiveDirection == Axis.horizontal ? labelWidth : null,
-      child: OiLabel.small(label, color: colors.textSubtle),
+      child: labelWidget ?? OiLabel.small(label, color: colors.textSubtle),
     );
 
     final paddingVertical = dense ? spacing.xs / 2 : spacing.xs;
@@ -139,22 +160,40 @@ class OiKeyValue extends StatelessWidget {
     Widget content;
     if (effectiveDirection == Axis.horizontal) {
       content = Padding(
-        padding: EdgeInsets.symmetric(vertical: paddingVertical),
-        child: OiRow(
-          breakpoint: breakpoint,
-          gap: OiResponsive<double>(spacing.sm),
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            ?leading,
-            labelWidget,
-            Expanded(child: valueContent),
-            ?trailing,
-          ],
+        padding: padding ?? EdgeInsets.symmetric(vertical: paddingVertical),
+        child: LayoutBuilder(
+          builder: (context, constraints) => OiRow(
+            breakpoint: breakpoint,
+            gap: OiResponsive<double>(spacing.sm),
+            crossAxisAlignment: crossAxisAlignment,
+            children: [
+              ?leading,
+              if (valueAtEnd) ...[
+                Expanded(child: labelContent),
+                ConstrainedBox(
+                  constraints: BoxConstraints(
+                    maxWidth: constraints.maxWidth.isFinite
+                        ? constraints.maxWidth * valueMaxWidthFraction
+                        : double.infinity,
+                  ),
+                  child: Align(
+                    alignment: AlignmentDirectional.topEnd,
+                    widthFactor: 1,
+                    child: valueContent,
+                  ),
+                ),
+              ] else ...[
+                labelContent,
+                Expanded(child: valueContent),
+              ],
+              ?trailing,
+            ],
+          ),
         ),
       );
     } else {
       content = Padding(
-        padding: EdgeInsets.symmetric(vertical: paddingVertical),
+        padding: padding ?? EdgeInsets.symmetric(vertical: paddingVertical),
         child: OiColumn(
           breakpoint: breakpoint,
           gap: OiResponsive<double>(spacing.xs / 2),
@@ -164,10 +203,10 @@ class OiKeyValue extends StatelessWidget {
               OiRow(
                 breakpoint: breakpoint,
                 gap: OiResponsive<double>(spacing.xs),
-                children: [leading!, labelWidget],
+                children: [leading!, labelContent],
               )
             else
-              labelWidget,
+              labelContent,
             valueContent,
             ?trailing,
           ],
@@ -235,6 +274,11 @@ class _OiKeyValueGroup extends StatelessWidget {
           leading: child.leading,
           trailing: child.trailing,
           valueWidget: child.valueWidget,
+          labelWidget: child.labelWidget,
+          valueAtEnd: child.valueAtEnd,
+          crossAxisAlignment: child.crossAxisAlignment,
+          valueMaxWidthFraction: child.valueMaxWidthFraction,
+          padding: child.padding,
           emptyText: child.emptyText,
           copyable: child.copyable,
           onTap: child.onTap,

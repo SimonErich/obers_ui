@@ -7,6 +7,7 @@ import 'package:obers_ui/src/foundation/persistence/oi_settings_mixin.dart';
 import 'package:obers_ui/src/foundation/persistence/oi_settings_provider.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/models/settings/oi_calendar_settings.dart';
+import 'package:obers_ui/src/primitives/display/oi_icon.dart';
 
 /// A calendar event.
 ///
@@ -371,7 +372,11 @@ class _OiCalendarState extends State<OiCalendar>
             onTap: _goBackward,
             child: Padding(
               padding: const EdgeInsets.all(8),
-              child: Icon(OiIcons.chevronLeft, size: 20, color: colors.text),
+              child: OiIcon.raw(
+                OiIcons.chevronLeft,
+                size: 20,
+                color: colors.text,
+              ),
             ),
           ),
           Expanded(
@@ -392,7 +397,11 @@ class _OiCalendarState extends State<OiCalendar>
             onTap: _goForward,
             child: Padding(
               padding: const EdgeInsets.all(8),
-              child: Icon(OiIcons.chevronRight, size: 20, color: colors.text),
+              child: OiIcon.raw(
+                OiIcons.chevronRight,
+                size: 20,
+                color: colors.text,
+              ),
             ),
           ),
         ],

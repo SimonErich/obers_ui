@@ -299,7 +299,11 @@ extension _OiChatWindowMessages on _OiChatWindowState {
                 Clipboard.setData(ClipboardData(text: message.content)),
             child: Padding(
               padding: const EdgeInsets.all(4),
-              child: Icon(OiIcons.copy, size: 14, color: colors.textMuted),
+              child: OiIcon.raw(
+                OiIcons.copy,
+                size: 14,
+                color: colors.textMuted,
+              ),
             ),
           ),
         ),
@@ -344,7 +348,7 @@ extension _OiChatWindowMessages on _OiChatWindowState {
               onTap: () => _startEditing(message),
               child: Padding(
                 padding: const EdgeInsets.all(4),
-                child: Icon(
+                child: OiIcon.raw(
                   OiIcons.pencil,
                   size: 14,
                   color: colors.textMuted,
@@ -377,7 +381,7 @@ extension _OiChatWindowMessages on _OiChatWindowState {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(OiIcons.paperclip, size: 12, color: colors.textMuted),
+            OiIcon.raw(OiIcons.paperclip, size: 12, color: colors.textMuted),
             SizedBox(width: spacing.xs / 2),
             Text(
               attachment.name,

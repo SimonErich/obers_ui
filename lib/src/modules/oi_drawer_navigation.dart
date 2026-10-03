@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/display/oi_avatar.dart';
 import 'package:obers_ui/src/components/display/oi_badge.dart';
@@ -7,6 +5,7 @@ import 'package:obers_ui/src/components/inputs/oi_switch_tile.dart';
 import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/primitives/display/oi_divider.dart';
+import 'package:obers_ui/src/primitives/display/oi_icon.dart';
 import 'package:obers_ui/src/primitives/display/oi_label.dart';
 import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
 
@@ -233,8 +232,9 @@ class _OiDrawerNavigationState extends State<OiDrawerNavigation>
       _slideDirection = 1;
       _submenuStack.add(parent);
     });
-    _animationController.reset();
-    unawaited(_animationController.forward());
+    _animationController
+      ..reset()
+      ..forward();
   }
 
   void _popSubmenu() {
@@ -242,8 +242,9 @@ class _OiDrawerNavigationState extends State<OiDrawerNavigation>
       _slideDirection = -1;
       _submenuStack.removeLast();
     });
-    _animationController.reset();
-    unawaited(_animationController.forward());
+    _animationController
+      ..reset()
+      ..forward();
   }
 
   void _handleItemTap(OiDrawerItem item) {
@@ -437,7 +438,7 @@ class _OiDrawerNavigationState extends State<OiDrawerNavigation>
       if (item.icon != null)
         Padding(
           padding: EdgeInsets.only(right: spacing.sm),
-          child: Icon(
+          child: OiIcon.raw(
             item.icon,
             size: iconSize,
             color: item.disabled
@@ -472,7 +473,11 @@ class _OiDrawerNavigationState extends State<OiDrawerNavigation>
       if (hasChildren)
         Padding(
           padding: EdgeInsets.only(left: spacing.xs),
-          child: Icon(OiIcons.chevronRight, size: 16, color: colors.textMuted),
+          child: OiIcon.raw(
+            OiIcons.chevronRight,
+            size: 16,
+            color: colors.textMuted,
+          ),
         ),
     ];
 
@@ -511,7 +516,7 @@ class _OiDrawerNavigationState extends State<OiDrawerNavigation>
       value: toggle.value,
       onChanged: toggle.onChanged,
       leading: toggle.icon != null
-          ? Icon(toggle.icon, size: 20, color: context.colors.text)
+          ? OiIcon.raw(toggle.icon, size: 20, color: context.colors.text)
           : null,
       dense: true,
       semanticLabel: toggle.label,
@@ -541,7 +546,7 @@ class _OiDrawerNavigationState extends State<OiDrawerNavigation>
               ),
               child: Row(
                 children: [
-                  Icon(OiIcons.arrowLeft, size: 20, color: colors.text),
+                  OiIcon.raw(OiIcons.arrowLeft, size: 20, color: colors.text),
                   SizedBox(width: spacing.sm),
                   Expanded(
                     child: OiLabel.body(

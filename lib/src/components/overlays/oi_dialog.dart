@@ -385,14 +385,12 @@ class OiDialog extends StatelessWidget {
               hPad,
               bottomPad,
             ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                for (var i = 0; i < actionList.length; i++) ...[
-                  if (i > 0) SizedBox(width: buttonGap),
-                  actionList[i],
-                ],
-              ],
+            child: Wrap(
+              alignment: WrapAlignment.end,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              spacing: buttonGap,
+              runSpacing: buttonGap,
+              children: actionList,
             ),
           ),
       ],

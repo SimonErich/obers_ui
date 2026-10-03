@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
+import 'package:obers_ui/src/primitives/display/oi_icon.dart';
 import 'package:obers_ui/src/primitives/input/oi_raw_input.dart';
 
 /// A search result item.
@@ -337,7 +338,11 @@ class _OiSearchState extends State<OiSearch> {
                   if (filter.icon != null)
                     Padding(
                       padding: const EdgeInsets.only(right: 4),
-                      child: Icon(filter.icon, size: 14, color: colors.text),
+                      child: OiIcon.raw(
+                        filter.icon,
+                        size: 14,
+                        color: colors.text,
+                      ),
                     ),
                   Text(
                     active ?? filter.label,
@@ -395,7 +400,7 @@ class _OiSearchState extends State<OiSearch> {
                 onChanged: _onQueryChanged,
                 leading: Padding(
                   padding: const EdgeInsets.only(right: 8),
-                  child: Icon(
+                  child: OiIcon.raw(
                     OiIcons.search,
                     size: 20,
                     color: colors.textMuted,
@@ -526,7 +531,7 @@ class _OiSearchState extends State<OiSearch> {
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
           child: Row(
             children: [
-              Icon(icon, size: 14, color: colors.textMuted),
+              OiIcon.raw(icon, size: 14, color: colors.textMuted),
               const SizedBox(width: 6),
               Text(
                 category,

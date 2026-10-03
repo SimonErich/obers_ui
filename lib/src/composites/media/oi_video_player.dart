@@ -4,6 +4,7 @@ import 'package:obers_ui/src/composites/media/_oi_video_player_stub.dart'
     as platform;
 import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
+import 'package:obers_ui/src/primitives/display/oi_icon.dart';
 import 'package:obers_ui/src/primitives/display/oi_image.dart';
 
 /// A video player widget with controls and progress bar.
@@ -204,7 +205,7 @@ class _OiVideoPlayerState extends State<OiVideoPlayer> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(
+                  OiIcon.raw(
                     OiIcons.play,
                     size: 32,
                     color: colors.textInverse,
@@ -250,7 +251,7 @@ class _OiVideoPlayerState extends State<OiVideoPlayer> {
                           child: Semantics(
                             label: _isPlaying ? 'Pause' : 'Play',
                             button: true,
-                            child: Icon(
+                            child: OiIcon.raw(
                               _isPlaying ? OiIcons.pause : OiIcons.play,
                               key: const Key('oi_video_player_play_icon'),
                               size: 24,

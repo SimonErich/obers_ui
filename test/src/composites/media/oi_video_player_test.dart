@@ -5,6 +5,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui/src/composites/media/oi_video_player.dart';
 import 'package:obers_ui/src/foundation/oi_icons.dart';
+import 'package:obers_ui/src/primitives/display/oi_icon.dart';
 
 import '../../../helpers/pump_app.dart';
 
@@ -217,8 +218,8 @@ void main() {
       await tester.pumpObers(_player(), surfaceSize: const Size(400, 300));
       await tester.pump();
 
-      // Initially should show the play Icon widget.
-      final playIcon = tester.widget<Icon>(
+      // The common icon renderer preserves the play/pause semantic token.
+      final playIcon = tester.widget<OiIcon>(
         find.byKey(const Key('oi_video_player_play_icon')),
       );
       expect(playIcon.icon, OiIcons.play);
@@ -227,7 +228,7 @@ void main() {
       await tester.tap(find.byKey(const Key('oi_video_player_controls')));
       await tester.pump();
 
-      final pauseIcon = tester.widget<Icon>(
+      final pauseIcon = tester.widget<OiIcon>(
         find.byKey(const Key('oi_video_player_play_icon')),
       );
       expect(pauseIcon.icon, OiIcons.pause);

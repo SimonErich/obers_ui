@@ -3,6 +3,7 @@ import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/inputs/oi_text_input.dart';
 import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
+import 'package:obers_ui/src/primitives/display/oi_icon.dart';
 
 /// Illegal characters in file/folder names.
 const _illegalChars = <String>['/', r'\', ':', '*', '?', '"', '<', '>', '|'];
@@ -197,7 +198,7 @@ class _OiRenameFieldState extends State<OiRenameField> {
             const SizedBox(width: 4),
             GestureDetector(
               onTap: _submit,
-              child: Icon(
+              child: OiIcon.raw(
                 OiIcons.check, // check
                 size: 18,
                 color: colors.success.base,
@@ -206,7 +207,7 @@ class _OiRenameFieldState extends State<OiRenameField> {
             const SizedBox(width: 2),
             GestureDetector(
               onTap: _cancel,
-              child: Icon(
+              child: OiIcon.raw(
                 OiIcons.x, // close
                 size: 18,
                 color: colors.error.base,

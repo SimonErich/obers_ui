@@ -5,6 +5,7 @@ import 'package:obers_ui/src/components/feedback/oi_star_rating.dart';
 import 'package:obers_ui/src/components/inputs/oi_text_input.dart';
 import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
+import 'package:obers_ui/src/primitives/display/oi_icon.dart';
 import 'package:obers_ui/src/primitives/display/oi_label.dart';
 import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
 
@@ -311,7 +312,11 @@ class _OiFeedbackSheetState extends State<OiFeedbackSheet> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(OiIcons.circleCheck, size: 64, color: colors.success.base),
+            OiIcon.raw(
+              OiIcons.circleCheck,
+              size: 64,
+              color: colors.success.base,
+            ),
             SizedBox(height: spacing.md),
             OiLabel.h3(widget.thankYouTitle),
             SizedBox(height: spacing.sm),

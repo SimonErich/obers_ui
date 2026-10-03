@@ -9,6 +9,7 @@ import 'package:obers_ui/src/components/inputs/oi_text_input.dart';
 import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/primitives/display/oi_divider.dart';
+import 'package:obers_ui/src/primitives/display/oi_icon.dart';
 import 'package:obers_ui/src/primitives/display/oi_label.dart';
 import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
 
@@ -423,7 +424,7 @@ class _OiSearchOverlayState extends State<OiSearchOverlay> {
             mainAxisSize: MainAxisSize.min,
             children: [
               if (icon != null) ...[
-                Icon(icon, size: 14, color: context.colors.textSubtle),
+                OiIcon.raw(icon, size: 14, color: context.colors.textSubtle),
                 SizedBox(width: context.spacing.xs),
               ],
               OiLabel.small(
@@ -525,7 +526,7 @@ class _OiSearchOverlayState extends State<OiSearchOverlay> {
           child: Row(
             children: [
               if (suggestion.icon != null) ...[
-                Icon(suggestion.icon, size: 18, color: colors.textSubtle),
+                OiIcon.raw(suggestion.icon, size: 18, color: colors.textSubtle),
                 SizedBox(width: spacing.sm),
               ],
               Expanded(
@@ -626,7 +627,7 @@ class _RecentSearchItemState extends State<_RecentSearchItem> {
             padding: EdgeInsets.symmetric(vertical: spacing.xs),
             child: Row(
               children: [
-                Icon(OiIcons.clock, size: 16, color: iconColor),
+                OiIcon.raw(OiIcons.clock, size: 16, color: iconColor),
                 SizedBox(width: spacing.sm),
                 Expanded(
                   child: OiLabel.body(
@@ -635,7 +636,7 @@ class _RecentSearchItemState extends State<_RecentSearchItem> {
                     color: textColor,
                   ),
                 ),
-                Icon(OiIcons.arrowRight, size: 14, color: iconColor),
+                OiIcon.raw(OiIcons.arrowRight, size: 14, color: iconColor),
               ],
             ),
           ),

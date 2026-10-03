@@ -16,23 +16,22 @@ extension _OiUploadDialogInteraction on _OiUploadDialogState {
     if (_picking) return;
     _updateState(() => _picking = true);
     try {
-      final result = await FilePicker.pickFiles(
-        allowMultiple: true,
+      final picked = await FilePicker.pickFiles(
         type: widget.allowedExtensions != null ? FileType.custom : FileType.any,
         allowedExtensions: widget.allowedExtensions,
-        withData: true,
       );
-      if (result != null && mounted) {
-        final files = result.files
-            .map(
-              (f) => OiFileData(
-                name: f.name,
-                size: f.size,
-                bytes: f.bytes,
-                mimeType: OiFileUtils.mimeType(OiFileUtils.extension(f.name)),
-              ),
-            )
-            .toList();
+      final files = <OiFileData>[];
+      for (final f in picked) {
+        files.add(
+          OiFileData(
+            name: f.name,
+            size: await f.length(),
+            bytes: await f.readAsBytes(),
+            mimeType: OiFileUtils.mimeType(OiFileUtils.extension(f.name)),
+          ),
+        );
+      }
+      if (files.isNotEmpty && mounted) {
         _addFiles(files);
       }
     } finally {

@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
+import 'package:obers_ui/src/primitives/display/oi_icon.dart';
 
 /// An item in the "What's New" dialog.
 ///
@@ -177,7 +178,7 @@ class _OiWhatsNewItemTile extends StatelessWidget {
         if (item.icon != null)
           Padding(
             padding: const EdgeInsets.only(right: 12, top: 2),
-            child: Icon(item.icon, size: 24, color: colors.primary.base),
+            child: OiIcon.raw(item.icon, size: 24, color: colors.primary.base),
           ),
 
         // Text content.

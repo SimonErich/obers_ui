@@ -231,6 +231,11 @@ class OiThemeData {
   bool get isLight => brightness == Brightness.light;
 
   /// Creates a copy with optionally overridden fields.
+  ///
+  /// Token groups are independent: changing [colors] retains [decoration] and
+  /// [effects]. When replacing a palette, also supply semantic decoration and
+  /// effect colors, for example with [OiDecorationTheme.standard]. Explicit
+  /// component overrides retain precedence over these defaults.
   OiThemeData copyWith({
     Brightness? brightness,
     OiColorScheme? colors,

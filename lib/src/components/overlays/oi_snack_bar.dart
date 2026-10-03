@@ -234,7 +234,7 @@ class _OiSnackBarState extends State<OiSnackBar>
 
     if (!_animationStarted) {
       _animationStarted = true;
-      unawaited(_controller.forward());
+      _controller.forward();
     }
   }
 

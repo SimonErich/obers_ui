@@ -4,6 +4,7 @@ import 'package:obers_ui/src/components/display/oi_sliver_header.dart'
     show OiSliverHeader;
 import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
+import 'package:obers_ui/src/primitives/display/oi_icon.dart';
 
 /// A themed back-navigation button.
 ///
@@ -48,7 +49,7 @@ class _OiBackButtonState extends State<OiBackButton> {
     final iconColor = _highlighted
         ? colors.primary.base
         : widget.color ?? colors.text;
-    Widget icon = Icon(
+    Widget icon = OiIcon.raw(
       isRtl ? OiIcons.chevronRight : OiIcons.chevronLeft,
       size: widget.size,
       color: iconColor,

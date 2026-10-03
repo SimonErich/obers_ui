@@ -1,5 +1,8 @@
 // Tests do not require documentation comments.
 
+import 'dart:ui' show Tristate;
+
+import 'package:flutter/semantics.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -14,6 +17,134 @@ const _segments = [
 ];
 
 void main() {
+  testWidgets(
+    'label typography and gaps preserve geometry when selection changes',
+    (tester) async {
+      final base = OiThemeData.light();
+      final theme = base.copyWith(
+        components: base.components.copyWith(
+          segmentedControl: const OiSegmentedControlThemeData(
+            labelStyle: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+            spacing: 2,
+          ),
+        ),
+      );
+      Future<void> mount(String selected) => tester.pumpObers(
+        Center(
+          child: OiSegmentedControl<String>(
+            segments: _segments,
+            selected: selected,
+            onChanged: (_) {},
+          ),
+        ),
+        theme: theme,
+      );
+      await mount('day');
+      Finder container(String label) => find
+          .ancestor(
+            of: find.text(label),
+            matching: find.byType(AnimatedContainer),
+          )
+          .first;
+      final day = tester.getRect(container('Day'));
+      final week = tester.getRect(container('Week'));
+      expect(week.left - day.right, 2);
+      await mount('week');
+      expect(tester.getRect(container('Day')), day);
+      expect(tester.getRect(container('Week')), week);
+      expect(
+        tester.widget<Text>(find.text('Week')).style!.fontWeight,
+        FontWeight.w500,
+      );
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets(
+    'icon-only segments retain names, selection and square geometry',
+    (
+      tester,
+    ) async {
+      var selected = false;
+      await tester.pumpObers(
+        Center(
+          child: OiSegmentedControl<bool>(
+            showLabels: false,
+            size: OiSegmentedControlSize.small,
+            segments: const [
+              OiSegment(
+                value: false,
+                label: 'Chart view',
+                icon: OiIcons.chartColumn,
+              ),
+              OiSegment(value: true, label: 'Table view', icon: OiIcons.table),
+            ],
+            selected: selected,
+            onChanged: (value) => selected = value,
+          ),
+        ),
+      );
+      expect(find.text('Chart view'), findsNothing);
+      expect(find.bySemanticsLabel('Chart view'), findsOneWidget);
+      final chartButton = tester.getSemantics(
+        find.bySemanticsLabel('Chart view'),
+      );
+      final tableButton = tester.getSemantics(
+        find.bySemanticsLabel('Table view'),
+      );
+      expect(chartButton.flagsCollection.isButton, isTrue);
+      expect(chartButton.flagsCollection.isSelected, Tristate.isTrue);
+      expect(tableButton.flagsCollection.isButton, isTrue);
+      expect(tableButton.flagsCollection.isSelected, Tristate.isFalse);
+      final group = tester.getSize(find.byType(OiSegmentedControl<bool>));
+      expect(group.width, group.height * 2);
+      await tester.tap(find.bySemanticsLabel('Table view'));
+      await tester.pump();
+      expect(selected, isTrue);
+    },
+  );
+
+  testWidgets('each labeled segment exposes one named button with live state', (
+    tester,
+  ) async {
+    var selected = 'day';
+    await tester.pumpObers(
+      StatefulBuilder(
+        builder: (context, setState) => OiSegmentedControl<String>(
+          semanticLabel: 'Time range',
+          segments: const [
+            OiSegment(value: 'day', label: 'Day', semanticLabel: 'Daily range'),
+            OiSegment(value: 'week', label: 'Week'),
+            OiSegment(value: 'month', label: 'Month', enabled: false),
+          ],
+          selected: selected,
+          onChanged: (value) => setState(() => selected = value),
+        ),
+      ),
+    );
+
+    List<SemanticsNode> accessibleButtons() => tester.semantics
+        .simulatedAccessibilityTraversal()
+        .where((node) => node.flagsCollection.isButton)
+        .toList();
+
+    final buttons = accessibleButtons();
+    expect(buttons.map((node) => node.label), ['Daily range', 'Week', 'Month']);
+    expect(buttons.first.flagsCollection.isSelected, Tristate.isTrue);
+    expect(buttons.last.flagsCollection.isEnabled, Tristate.isFalse);
+    expect(
+      buttons.last.getSemanticsData().hasAction(SemanticsAction.tap),
+      isFalse,
+    );
+
+    await tester.tap(find.text('Week'));
+    await tester.pump();
+    final updated = accessibleButtons();
+    expect(updated, hasLength(3));
+    expect(updated[0].flagsCollection.isSelected, Tristate.isFalse);
+    expect(updated[1].flagsCollection.isSelected, Tristate.isTrue);
+  });
+
   testWidgets('renders all segment labels', (tester) async {
     await tester.pumpObers(
       OiSegmentedControl<String>(

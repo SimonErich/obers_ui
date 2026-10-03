@@ -11,6 +11,7 @@ import 'package:obers_ui/src/foundation/persistence/oi_settings_provider.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/models/settings/oi_sidebar_settings.dart'
     hide OiSidebarMode;
+import 'package:obers_ui/src/primitives/display/oi_icon.dart';
 import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
 
 // ── Data models ──────────────────────────────────────────────────────────────
@@ -59,6 +60,8 @@ class OiSidebarItem {
     this.badgeCount,
     this.children,
     this.disabled = false,
+    this.contextChild = false,
+    this.monospace = false,
   });
 
   /// A unique identifier used to track selection.
@@ -80,6 +83,13 @@ class OiSidebarItem {
   /// When non-null the item acts as a parent that can be expanded to reveal
   /// its children.
   final List<OiSidebarItem>? children;
+
+  /// Shows a contextual branch instead of a repeated destination icon.
+  /// Ordinary expandable groups retain their icon and indentation by default.
+  final bool contextChild;
+
+  /// Uses the semantic code role for record identifiers.
+  final bool monospace;
 
   /// Whether this item is non-interactive.
   final bool disabled;
@@ -128,8 +138,8 @@ class OiSidebar extends StatefulWidget {
     required this.onSelect,
     required this.label,
     this.mode = OiSidebarMode.full,
-    this.width = 260,
-    this.compactWidth = 64,
+    this.width,
+    this.compactWidth,
     this.resizable = false,
     this.header,
     this.footer,
@@ -157,10 +167,10 @@ class OiSidebar extends StatefulWidget {
   final OiSidebarMode mode;
 
   /// The width in logical pixels when [mode] is [OiSidebarMode.full].
-  final double width;
+  final double? width;
 
   /// The width in logical pixels when [mode] is [OiSidebarMode.compact].
-  final double compactWidth;
+  final double? compactWidth;
 
   /// Whether the sidebar edge can be dragged to resize.
   final bool resizable;
@@ -233,13 +243,33 @@ class _OiSidebarState extends State<OiSidebar>
     _resolvedDriver = widget.settingsDriver;
     super.initState();
     _focusNode = FocusNode();
+    _revealSelectedParents();
     _rebuildFlatItems();
   }
 
   @override
   void didUpdateWidget(OiSidebar oldWidget) {
     super.didUpdateWidget(oldWidget);
+    if (oldWidget.selectedId != widget.selectedId) {
+      _revealSelectedParents();
+    }
     _rebuildFlatItems();
+  }
+
+  void _revealSelectedParents() {
+    bool visit(OiSidebarItem item) {
+      final containsSelection =
+          item.children?.map(visit).fold(false, (a, b) => a || b) ?? false;
+      if (containsSelection) {
+        _expandedParents.add(item.id);
+        _expandControllers[item.id]?.value = 1;
+      }
+      return item.id == widget.selectedId || containsSelection;
+    }
+
+    for (final section in widget.sections) {
+      section.items.forEach(visit);
+    }
   }
 
   @override
@@ -290,6 +320,10 @@ class _OiSidebarState extends State<OiSidebar>
     );
   }
 
+  bool _contextOnly(OiSidebarItem item) =>
+      item.children?.isNotEmpty == true &&
+      item.children!.every((child) => child.contextChild);
+
   void _rebuildFlatItems() {
     final items = <_FlatItem>[];
     for (var si = 0; si < widget.sections.length; si++) {
@@ -298,7 +332,8 @@ class _OiSidebarState extends State<OiSidebar>
       if (_collapsedSections.contains(sectionKey)) continue;
       for (final item in section.items) {
         items.add(_FlatItem(item: item, depth: 0));
-        if (item.children != null && _expandedParents.contains(item.id)) {
+        if (item.children != null &&
+            (_contextOnly(item) || _expandedParents.contains(item.id))) {
           for (final child in item.children!) {
             items.add(_FlatItem(item: child, depth: 1));
           }
@@ -368,10 +403,10 @@ class _OiSidebarState extends State<OiSidebar>
     setState(() {
       if (_expandedParents.contains(parentId)) {
         _expandedParents.remove(parentId);
-        unawaited(controller.reverse());
+        controller.reverse();
       } else {
         _expandedParents.add(parentId);
-        unawaited(controller.forward());
+        controller.forward();
       }
       _rebuildFlatItems();
     });
@@ -387,26 +422,39 @@ class _OiSidebarState extends State<OiSidebar>
 
     final compact = widget.mode == OiSidebarMode.compact;
 
-    return Semantics(
-      label: widget.label,
-      explicitChildNodes: true,
-      child: Focus(
-        focusNode: _focusNode,
-        onKeyEvent: _handleKeyEvent,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            if (widget.header != null) widget.header!,
-            Expanded(
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: _buildSections(context, compact),
+    return SizedBox(
+      width: compact
+          ? widget.compactWidth ??
+                context.components.sidebar?.compactWidth ??
+                64
+          : widget.width ?? context.components.sidebar?.width ?? 260,
+      child: ColoredBox(
+        color:
+            context.components.sidebar?.backgroundColor ??
+            context.colors.surface,
+        child: Semantics(
+          label: widget.label,
+          explicitChildNodes: true,
+          child: Focus(
+            focusNode: _focusNode,
+            onKeyEvent: _handleKeyEvent,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                if (widget.header != null) widget.header!,
+                Expanded(
+                  child: SingleChildScrollView(
+                    padding: context.components.sidebar?.padding,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: _buildSections(context, compact),
+                    ),
+                  ),
                 ),
-              ),
+                if (widget.footer != null) widget.footer!,
+              ],
             ),
-            if (widget.footer != null) widget.footer!,
-          ],
+          ),
         ),
       ),
     );
@@ -429,6 +477,12 @@ class _OiSidebarState extends State<OiSidebar>
       // Items.
       if (!collapsed) {
         for (final item in section.items) {
+          if (widgets.isNotEmpty &&
+              context.components.sidebar?.itemSpacing != null) {
+            widgets.add(
+              SizedBox(height: context.components.sidebar!.itemSpacing),
+            );
+          }
           widgets.add(_buildItem(context, item, 0, compact));
           if (item.children != null && item.children!.isNotEmpty) {
             final controller = _controllerFor(item.id);
@@ -440,23 +494,34 @@ class _OiSidebarState extends State<OiSidebar>
                   _buildItem(context, child, 1, compact),
               ],
             );
-            widgets.add(
-              AnimatedBuilder(
-                animation: controller,
-                builder: (context, child) {
-                  if (controller.isDismissed) return const SizedBox.shrink();
-                  return SizeTransition(
-                    sizeFactor: CurvedAnimation(
-                      parent: controller,
-                      curve: Curves.easeInOut,
-                    ),
-                    axisAlignment: -1,
-                    child: child,
-                  );
-                },
-                child: childColumn,
-              ),
-            );
+            if (_contextOnly(item)) {
+              widgets.add(
+                Padding(
+                  padding: EdgeInsets.only(
+                    top: context.components.sidebar?.itemSpacing ?? 0,
+                  ),
+                  child: childColumn,
+                ),
+              );
+            } else {
+              widgets.add(
+                AnimatedBuilder(
+                  animation: controller,
+                  builder: (context, child) {
+                    if (controller.isDismissed) return const SizedBox.shrink();
+                    return SizeTransition(
+                      sizeFactor: CurvedAnimation(
+                        parent: controller,
+                        curve: Curves.easeInOut,
+                      ),
+                      alignment: AlignmentDirectional.topStart,
+                      child: child,
+                    );
+                  },
+                  child: childColumn,
+                ),
+              );
+            }
           }
         }
       }
@@ -504,8 +569,12 @@ class _OiSidebarState extends State<OiSidebar>
     bool compact,
   ) {
     final colors = context.colors;
+    final sidebarTheme = context.components.sidebar;
     final selected = item.id == widget.selectedId;
-    final hasKids = item.children != null && item.children!.isNotEmpty;
+    final hasKids =
+        item.children != null &&
+        item.children!.isNotEmpty &&
+        !_contextOnly(item);
     final kidsExpanded = _expandedParents.contains(item.id);
 
     // Determine the flat index for keyboard focus styling.
@@ -514,7 +583,9 @@ class _OiSidebarState extends State<OiSidebar>
 
     Color bg;
     if (selected) {
-      bg = colors.primary.base.withValues(alpha: 0.1);
+      bg =
+          sidebarTheme?.selectedBackground ??
+          colors.primary.base.withValues(alpha: 0.1);
     } else if (isFocused) {
       bg = colors.surfaceHover;
     } else {
@@ -522,16 +593,18 @@ class _OiSidebarState extends State<OiSidebar>
     }
 
     final textColor = selected
-        ? colors.primary.base
+        ? sidebarTheme?.selectedForeground ?? colors.primary.base
         : item.disabled
         ? colors.textMuted
-        : colors.text;
+        : sidebarTheme?.foreground ?? colors.text;
 
     final iconColor = selected
-        ? colors.primary.base
+        ? sidebarTheme?.selectedIconColor ??
+              sidebarTheme?.selectedForeground ??
+              colors.primary.base
         : item.disabled
         ? colors.textMuted
-        : colors.textSubtle;
+        : sidebarTheme?.iconColor ?? colors.textSubtle;
 
     // Unified layout so icons hold position during the animated width
     // transition. The icon sits in a fixed-width leading area that matches
@@ -539,57 +612,146 @@ class _OiSidebarState extends State<OiSidebar>
     // by the parent AnimatedContainer as it shrinks.
     final indent = depth * 24.0;
 
-    final Widget content = Container(
-      clipBehavior: Clip.hardEdge,
-      decoration: BoxDecoration(color: bg),
-      constraints: const BoxConstraints(minHeight: 40),
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Row(
-        children: [
-          SizedBox(
-            width: widget.compactWidth,
-            child: Center(
-              child: Icon(item.icon, size: 20, color: iconColor),
-            ),
-          ),
-          if (indent > 0) SizedBox(width: indent),
-          if (!compact) ...[
-            Expanded(
-              child: Text(
-                item.label,
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
-                  color: textColor,
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-            if (item.badgeCount != null && item.badgeCount! > 0)
-              OiBadge.filled(
-                label: item.badgeCount.toString(),
-                size: OiBadgeSize.small,
-              ),
-            if (hasKids)
-              Padding(
-                padding: const EdgeInsets.only(left: 4),
-                child: AnimatedRotation(
-                  turns: kidsExpanded ? 0.25 : 0.0,
-                  duration: const Duration(milliseconds: 200),
-                  curve: Curves.easeInOut,
-                  child: Icon(
-                    OiIcons.chevronRight,
-                    size: 14,
-                    color: colors.textMuted,
+    final content = item.contextChild && !compact
+        ? Row(
+            children: [
+              SizedBox(
+                width: (sidebarTheme?.iconWidth ?? 24) + 12,
+                height: sidebarTheme?.itemHeight ?? 40,
+                child: CustomPaint(
+                  key: const Key('oi_sidebar_context_branch'),
+                  painter: _ContextBranchPainter(
+                    sidebarTheme?.contextBranchColor ?? colors.borderSubtle,
+                    Directionality.of(context),
                   ),
                 ),
               ),
-            const SizedBox(width: 12),
-          ],
-        ],
-      ),
-    );
+              Expanded(
+                child: Container(
+                  constraints: BoxConstraints(
+                    minHeight: sidebarTheme?.itemHeight ?? 40,
+                  ),
+                  alignment: AlignmentDirectional.centerStart,
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  decoration: BoxDecoration(
+                    color: bg,
+                    borderRadius: sidebarTheme?.itemRadius,
+                    border:
+                        selected && sidebarTheme?.selectedBorderColor != null
+                        ? Border.all(color: sidebarTheme!.selectedBorderColor!)
+                        : null,
+                  ),
+                  child: Text(
+                    item.label,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style:
+                        (item.monospace
+                                ? context.textTheme.code
+                                : context.textTheme.body)
+                            .copyWith(
+                              color: textColor,
+                              fontWeight: selected ? FontWeight.w500 : null,
+                            ),
+                  ),
+                ),
+              ),
+            ],
+          )
+        : Container(
+            clipBehavior: Clip.hardEdge,
+            decoration: BoxDecoration(
+              color: bg,
+              borderRadius: sidebarTheme?.itemRadius,
+            ),
+            foregroundDecoration: BoxDecoration(
+              borderRadius: sidebarTheme?.itemRadius,
+              border: selected && sidebarTheme?.selectedBorderColor != null
+                  ? Border.all(color: sidebarTheme!.selectedBorderColor!)
+                  : null,
+            ),
+            constraints: BoxConstraints(
+              minHeight: sidebarTheme?.itemHeight ?? 40,
+            ),
+            padding:
+                sidebarTheme?.itemPadding ??
+                const EdgeInsets.symmetric(vertical: 8),
+            child: Row(
+              children: [
+                SizedBox(
+                  width:
+                      sidebarTheme?.iconWidth ??
+                      widget.compactWidth ??
+                      sidebarTheme?.compactWidth ??
+                      64,
+                  child: Center(
+                    child: OiIcon.raw(
+                      item.icon,
+                      size: sidebarTheme?.iconSize ?? 20,
+                      color: iconColor,
+                    ),
+                  ),
+                ),
+                if (indent > 0) SizedBox(width: indent),
+                if (!compact) ...[
+                  SizedBox(width: sidebarTheme?.labelGap ?? 0),
+                  Expanded(
+                    child: Text(
+                      item.label,
+                      style:
+                          (item.monospace
+                                  ? context.textTheme.code
+                                  : context.textTheme.body)
+                              .copyWith(
+                                fontSize: 14,
+                                fontWeight: selected
+                                    ? FontWeight.w600
+                                    : FontWeight.w400,
+                              )
+                              .merge(
+                                selected
+                                    ? sidebarTheme?.selectedTextStyle ??
+                                          sidebarTheme?.textStyle
+                                    : sidebarTheme?.textStyle,
+                              )
+                              .copyWith(color: textColor),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  if (item.badgeCount != null && item.badgeCount! > 0)
+                    if (sidebarTheme?.plainBadges ?? false)
+                      Text(
+                        item.badgeCount.toString(),
+                        style: context.textTheme.small
+                            .copyWith(color: colors.textMuted)
+                            .merge(sidebarTheme?.badgeTextStyle),
+                      )
+                    else
+                      OiBadge.filled(
+                        label: item.badgeCount.toString(),
+                        size: OiBadgeSize.small,
+                      ),
+                  if (hasKids)
+                    Padding(
+                      padding: const EdgeInsets.only(left: 4),
+                      child: AnimatedRotation(
+                        turns: kidsExpanded ? 0.25 : 0.0,
+                        duration: const Duration(milliseconds: 200),
+                        curve: Curves.easeInOut,
+                        child: OiIcon.raw(
+                          OiIcons.chevronRight,
+                          size: 14,
+                          color: colors.textMuted,
+                        ),
+                      ),
+                    ),
+                  if (sidebarTheme?.itemPadding == null)
+                    const SizedBox(width: 12),
+                ],
+              ],
+            ),
+          );
 
     Widget result = OiTappable(
       enabled: !item.disabled,
@@ -624,4 +786,41 @@ class _FlatItem {
 
   /// The nesting depth (0 for top-level, 1 for children).
   final int depth;
+}
+
+// The branch is decorative; the containing OiTappable owns semantics and focus.
+class _ContextBranchPainter extends CustomPainter {
+  const _ContextBranchPainter(this.color, this.direction);
+  final Color color;
+  final TextDirection direction;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    if (direction == TextDirection.rtl) {
+      canvas
+        ..translate(size.width, 0)
+        ..scale(-1, 1);
+    }
+    final x = size.width - 15 + .5;
+    final y = size.height / 2 - .5;
+    canvas.drawPath(
+      Path()
+        ..moveTo(x, 0)
+        ..lineTo(x, y - 8)
+        ..arcToPoint(
+          Offset(x + 8, y),
+          radius: const Radius.circular(8),
+          clockwise: false,
+        )
+        ..lineTo(x + 11, y),
+      Paint()
+        ..color = color
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1,
+    );
+  }
+
+  @override
+  bool shouldRepaint(_ContextBranchPainter oldDelegate) =>
+      oldDelegate.color != color || oldDelegate.direction != direction;
 }

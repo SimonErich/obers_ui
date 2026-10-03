@@ -8,6 +8,7 @@ import 'package:obers_ui/src/foundation/oi_overlays.dart';
 import 'package:obers_ui/src/foundation/oi_responsive.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/primitives/display/oi_divider.dart';
+import 'package:obers_ui/src/primitives/display/oi_icon.dart';
 import 'package:obers_ui/src/primitives/display/oi_label.dart';
 import 'package:obers_ui/src/primitives/display/oi_surface.dart';
 
@@ -300,7 +301,7 @@ class _OiConsentBannerState extends State<OiConsentBanner> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(OiIcons.cookie, size: 20, color: colors.text),
+                  OiIcon.raw(OiIcons.cookie, size: 20, color: colors.text),
                   SizedBox(width: spacing.sm),
                   OiLabel.h4(widget.title, color: colors.text),
                 ],

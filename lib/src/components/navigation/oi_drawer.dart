@@ -54,53 +54,62 @@ class OiDrawer extends StatelessWidget {
         ? Duration.zero
         : const Duration(milliseconds: 280);
 
-    return Stack(
-      fit: StackFit.expand,
-      children: [
-        // ── Scrim ────────────────────────────────────────────────────────────
-        Positioned.fill(
-          child: IgnorePointer(
-            ignoring: !open,
-            child: GestureDetector(
-              onTap: onClose,
-              child: AnimatedOpacity(
-                opacity: open ? 1.0 : 0.0,
-                duration: animDuration,
-                curve: Curves.easeInOut,
-                child: ColoredBox(color: colors.overlay),
-              ),
-            ),
-          ),
-        ),
-
-        // ── Drawer panel ─────────────────────────────────────────────────────
-        Align(
-          alignment: Alignment.centerLeft,
-          child: SizedBox(
-            width: width,
-            child: AnimatedSlide(
-              offset: Offset(slideOffset, 0),
-              duration: animDuration,
-              curve: Curves.easeOutCubic,
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  color: colors.surface,
-                  boxShadow: open
-                      ? const [
-                          BoxShadow(
-                            color: Color(0x1F000000),
-                            blurRadius: 24,
-                            offset: Offset(4, 0),
-                          ),
-                        ]
-                      : null,
+    return ExcludeFocus(
+      excluding: !open,
+      child: ExcludeSemantics(
+        excluding: !open,
+        child: IgnorePointer(
+          ignoring: !open,
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              // ── Scrim ────────────────────────────────────────────────────────────
+              Positioned.fill(
+                child: IgnorePointer(
+                  ignoring: !open,
+                  child: GestureDetector(
+                    onTap: onClose,
+                    child: AnimatedOpacity(
+                      opacity: open ? 1.0 : 0.0,
+                      duration: animDuration,
+                      curve: Curves.easeInOut,
+                      child: ColoredBox(color: colors.overlay),
+                    ),
+                  ),
                 ),
-                child: child,
               ),
-            ),
+
+              // ── Drawer panel ─────────────────────────────────────────────────────
+              Align(
+                alignment: Alignment.centerLeft,
+                child: SizedBox(
+                  width: width,
+                  child: AnimatedSlide(
+                    offset: Offset(slideOffset, 0),
+                    duration: animDuration,
+                    curve: Curves.easeOutCubic,
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        color: colors.surface,
+                        boxShadow: open
+                            ? const [
+                                BoxShadow(
+                                  color: Color(0x1F000000),
+                                  blurRadius: 24,
+                                  offset: Offset(4, 0),
+                                ),
+                              ]
+                            : null,
+                      ),
+                      child: child,
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
-      ],
+      ),
     );
   }
 }

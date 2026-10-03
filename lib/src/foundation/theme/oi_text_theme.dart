@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/painting.dart';
+import 'package:obers_ui/src/foundation/oi_responsive.dart';
 
 /// Semantic text-style variants used throughout the Obers UI design system.
 ///
@@ -76,6 +77,7 @@ class OiTextTheme {
     required this.code,
     required this.overline,
     required this.link,
+    this.headingScale,
   });
 
   /// Builds the standard Obers UI type scale.
@@ -182,7 +184,8 @@ class OiTextTheme {
   /// [t] must be in the range [0, 1]. At [t] = 0 the result equals [a];
   /// at [t] = 1 the result equals [b].
   OiTextTheme.lerp(OiTextTheme a, OiTextTheme b, double t)
-    : display = TextStyle.lerp(a.display, b.display, t)!,
+    : headingScale = t < .5 ? a.headingScale : b.headingScale,
+      display = TextStyle.lerp(a.display, b.display, t)!,
       h1 = TextStyle.lerp(a.h1, b.h1, t)!,
       h2 = TextStyle.lerp(a.h2, b.h2, t)!,
       h3 = TextStyle.lerp(a.h3, b.h3, t)!,
@@ -201,6 +204,10 @@ class OiTextTheme {
 
   /// Hero / marketing display text — largest size.
   final TextStyle display;
+
+  /// Explicit scale applied to display/h1/h2 at each breakpoint.
+  /// Set `const OiResponsive<double>(1)` for an exact type scale.
+  final OiResponsive<double>? headingScale;
 
   /// Top-level heading.
   final TextStyle h1;
@@ -279,6 +286,7 @@ class OiTextTheme {
 
   /// Creates a copy of this theme with the specified styles replaced.
   OiTextTheme copyWith({
+    OiResponsive<double>? headingScale,
     TextStyle? display,
     TextStyle? h1,
     TextStyle? h2,
@@ -295,6 +303,7 @@ class OiTextTheme {
     TextStyle? link,
   }) {
     return OiTextTheme(
+      headingScale: headingScale ?? this.headingScale,
       display: display ?? this.display,
       h1: h1 ?? this.h1,
       h2: h2 ?? this.h2,
@@ -316,6 +325,7 @@ class OiTextTheme {
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
     return other is OiTextTheme &&
+        other.headingScale == headingScale &&
         other.display == display &&
         other.h1 == h1 &&
         other.h2 == h2 &&
@@ -334,6 +344,7 @@ class OiTextTheme {
 
   @override
   int get hashCode => Object.hashAll([
+    headingScale,
     display,
     h1,
     h2,

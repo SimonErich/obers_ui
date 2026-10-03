@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
+import 'package:obers_ui/src/primitives/display/oi_icon.dart';
 import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
 import 'package:obers_ui/src/primitives/overlay/oi_floating.dart'
     show OiFloating;
@@ -10,10 +11,17 @@ import 'package:obers_ui/src/primitives/overlay/oi_floating.dart'
 @immutable
 class OiBreadcrumbItem {
   /// Creates an [OiBreadcrumbItem].
-  const OiBreadcrumbItem({required this.label, this.onTap});
+  const OiBreadcrumbItem({
+    required this.label,
+    this.onTap,
+    this.monospace = false,
+  });
 
   /// The text shown for this breadcrumb.
   final String label;
+
+  /// Uses the code role for a record identifier.
+  final bool monospace;
 
   /// Called when the crumb is tapped.
   ///
@@ -37,15 +45,27 @@ class OiBreadcrumbs extends StatefulWidget {
   const OiBreadcrumbs({
     required this.items,
     this.separator = '/',
+    this.separatorIcon,
+    this.separatorSpacing = 6,
     this.maxVisible,
+    this.linkStyle,
     super.key,
   });
 
   /// The ordered list of breadcrumb items, last being the current page.
   final List<OiBreadcrumbItem> items;
 
+  /// Overrides the theme link role for navigable crumbs.
+  final TextStyle? linkStyle;
+
   /// The separator string rendered between items. Defaults to `'/'`.
   final String separator;
+
+  /// Optional decorative16px icon replacing the separator string.
+  final IconData? separatorIcon;
+
+  /// Space on each side of the separator; defaults to6.
+  final double separatorSpacing;
 
   /// When set, collapses middle items into `…` when items.length exceeds
   /// this value.
@@ -79,11 +99,17 @@ class _OiBreadcrumbsState extends State<OiBreadcrumbs> {
     }
 
     final sep = Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 6),
-      child: Text(
-        widget.separator,
-        style: TextStyle(fontSize: 14, color: colors.textMuted),
-      ),
+      padding: EdgeInsets.symmetric(horizontal: widget.separatorSpacing),
+      child: widget.separatorIcon != null
+          ? OiIcon.raw(
+              widget.separatorIcon,
+              size: 16,
+              color: colors.textSubtle,
+            )
+          : Text(
+              widget.separator,
+              style: TextStyle(fontSize: 14, color: colors.textMuted),
+            ),
     );
 
     final rowChildren = <Widget>[];
@@ -112,11 +138,15 @@ class _OiBreadcrumbsState extends State<OiBreadcrumbs> {
         rowChildren.add(
           Text(
             item.label,
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-              color: colors.text,
-            ),
+            style:
+                (item.monospace
+                        ? context.textTheme.code
+                        : context.textTheme.body)
+                    .copyWith(
+                      fontSize: item.monospace ? null : 14,
+                      fontWeight: FontWeight.w500,
+                      color: colors.text,
+                    ),
           ),
         );
       } else {
@@ -132,13 +162,14 @@ class _OiBreadcrumbsState extends State<OiBreadcrumbs> {
               behavior: HitTestBehavior.opaque,
               child: Text(
                 item.label,
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: isHovered ? FontWeight.w600 : FontWeight.w400,
-                  color: colors.primary.base,
-                  decoration: TextDecoration.underline,
-                  decorationColor: colors.primary.base,
-                ),
+                style: context.textTheme.link
+                    .copyWith(
+                      fontSize: 14,
+                      fontWeight: isHovered ? FontWeight.w600 : FontWeight.w400,
+                      color: colors.primary.base,
+                      decorationColor: colors.primary.base,
+                    )
+                    .merge(widget.linkStyle),
               ),
             ),
           ),

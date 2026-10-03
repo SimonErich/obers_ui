@@ -4,12 +4,18 @@ part of '../oi_table.dart';
 
 extension _OiTableBody<T> on _OiTableState<T> {
   Widget _buildBody() {
-    if (widget.loading) return _buildLoadingState();
+    if (widget.loading) {
+      final loading = _buildLoadingState();
+      return widget.shrinkWrap
+          ? SizedBox(height: 120, child: loading)
+          : loading;
+    }
     final rows = _displayRows;
 
     Widget body;
     if (rows.isEmpty && !_ctrl.loading) {
       body = widget.emptyState ?? _buildDefaultEmptyState();
+      if (widget.shrinkWrap) body = SizedBox(height: 160, child: body);
     } else if (widget.groupBy != null || _ctrl.groupByColumnId != null) {
       body = _buildGroupedBody(rows);
     } else {
@@ -46,6 +52,7 @@ extension _OiTableBody<T> on _OiTableState<T> {
       return _buildReorderableBody(rows);
     }
     return ListView.builder(
+      shrinkWrap: widget.shrinkWrap,
       controller: _scrollController,
       itemCount: rows.length + (_loadingMore ? 1 : 0),
       itemBuilder: (ctx, i) {
@@ -62,12 +69,16 @@ extension _OiTableBody<T> on _OiTableState<T> {
 
   Widget _buildReorderableBody(List<T> rows) {
     return CustomScrollView(
+      shrinkWrap: widget.shrinkWrap,
       controller: _scrollController,
       slivers: [
         SliverReorderableList(
           itemCount: rows.length,
-          onReorder: (oldIndex, newIndex) {
-            widget.onRowReordered?.call(oldIndex, newIndex);
+          onReorderItem: (oldIndex, newIndex) {
+            widget.onRowReordered?.call(
+              oldIndex,
+              newIndex > oldIndex ? newIndex + 1 : newIndex,
+            );
           },
           itemBuilder: (context, index) {
             return ReorderableDragStartListener(
@@ -112,9 +123,9 @@ extension _OiTableBody<T> on _OiTableState<T> {
             onTap: () {
               final willExpand = !_ctrl.expandedGroups.contains(groupKey);
               if (willExpand) {
-                unawaited(animCtrl.forward());
+                animCtrl.forward();
               } else {
-                unawaited(animCtrl.reverse());
+                animCtrl.reverse();
               }
               _ctrl.toggleGroup(groupKey);
             },
@@ -133,7 +144,7 @@ extension _OiTableBody<T> on _OiTableState<T> {
                   parent: animCtrl,
                   curve: Curves.easeInOut,
                 ),
-                axisAlignment: -1,
+                alignment: AlignmentDirectional.topStart,
                 child: child,
               );
             },
@@ -147,7 +158,11 @@ extension _OiTableBody<T> on _OiTableState<T> {
           ),
         );
     }
-    return ListView(controller: _scrollController, children: items);
+    return ListView(
+      shrinkWrap: widget.shrinkWrap,
+      controller: _scrollController,
+      children: items,
+    );
   }
 
   Widget _buildDefaultGroupHeader(String groupKey, int count, bool expanded) {
@@ -161,7 +176,7 @@ extension _OiTableBody<T> on _OiTableState<T> {
             turns: expanded ? 0.25 : 0.0,
             duration: const Duration(milliseconds: 200),
             curve: Curves.easeInOut,
-            child: Icon(
+            child: OiIcon.raw(
               OiIcons.chevronRight,
               size: 16,
               color: colors.textSubtle,
@@ -183,36 +198,62 @@ extension _OiTableBody<T> on _OiTableState<T> {
     final isEven = index.isEven;
     Color? bg;
     if (isSelected) {
-      bg = context.colors.primary.muted.withValues(alpha: 0.3);
+      bg =
+          context.components.table?.selectedBackground ??
+          context.colors.primary.muted.withValues(alpha: 0.3);
     } else if (isHovered) {
-      bg = context.colors.surfaceHover;
+      bg =
+          context.components.table?.hoverBackground ??
+          context.colors.surfaceHover;
     } else if (widget.striped && isEven) {
       bg = context.colors.surfaceSubtle;
     }
+    final recordKey = _rowKeyAt(row, index);
+    final expanded = widget.expandedRowKeys.contains(recordKey);
     final rowContent = Row(
       children: [
-        if (widget.selectable)
-          GestureDetector(
-            behavior: HitTestBehavior.opaque,
-            onTap: () {
-              final key = _rowKeyAt(row, index);
-              _ctrl.toggleRow(key);
-              _lastSelectedIndex = index;
-              widget.onSelectionChanged?.call(
-                Set<String>.from(_ctrl.selectedRows),
-              );
-            },
-            child: SizedBox(
-              width: 40,
-              height: _effectiveRowHeight,
+        if (widget.expandedRowBuilder != null)
+          SizedBox(
+            width: 32,
+            height: _effectiveRowHeight,
+            child: OiTappable(
+              semanticLabel: expanded ? 'Collapse row' : 'Expand row',
+              enabled: widget.onExpandedRowsChanged != null,
+              onTap: () {
+                final next = Set<String>.of(widget.expandedRowKeys);
+                if (expanded) {
+                  next.remove(recordKey);
+                } else {
+                  next.add(recordKey);
+                }
+                widget.onExpandedRowsChanged?.call(next);
+              },
               child: Center(
-                child: Icon(
-                  isSelected ? OiIcons.squareCheckBig : OiIcons.square,
+                child: OiIcon.decorative(
+                  icon: expanded ? OiIcons.chevronDown : OiIcons.chevronRight,
                   size: 16,
-                  color: isSelected
-                      ? context.colors.primary.base
-                      : context.colors.textMuted,
                 ),
+              ),
+            ),
+          ),
+        if (widget.selectable)
+          SizedBox(
+            width: 40,
+            height: _effectiveRowHeight,
+            child: Center(
+              child: OiCheckbox(
+                value: isSelected,
+                semanticLabel:
+                    widget.labels.selectRow?.call(index + 1) ??
+                    'Select row ${index + 1}',
+                onChanged: (_) {
+                  final key = _rowKeyAt(row, index);
+                  _ctrl.toggleRow(key);
+                  _lastSelectedIndex = index;
+                  widget.onSelectionChanged?.call(
+                    Set<String>.from(_ctrl.selectedRows),
+                  );
+                },
               ),
             ),
           ),
@@ -233,10 +274,30 @@ extension _OiTableBody<T> on _OiTableState<T> {
         key: key ?? ValueKey('row_$index'),
         behavior: HitTestBehavior.opaque,
         onTap: () => _handleRowTap(row, index),
-        onDoubleTap: () => _handleRowDoubleTap(row, index),
-        child: ColoredBox(
-          color: bg ?? const Color(0x00000000),
-          child: rowContent,
+        onDoubleTap: widget.onRowDoubleTap == null
+            ? null
+            : () => _handleRowDoubleTap(row, index),
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            color: bg ?? const Color(0x00000000),
+            borderRadius: context.components.table?.rowBorderRadius,
+            border: context.components.table?.borderColor == null
+                ? null
+                : Border(
+                    bottom: BorderSide(
+                      color: context.components.table!.borderColor!,
+                    ),
+                  ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              rowContent,
+              if (expanded && widget.expandedRowBuilder != null)
+                widget.expandedRowBuilder!(context, row),
+            ],
+          ),
         ),
       ),
     );
@@ -252,7 +313,13 @@ extension _OiTableBody<T> on _OiTableState<T> {
       content = Text(
         text,
         textAlign: col.textAlign,
-        style: TextStyle(color: context.colors.text),
+        style: context.textTheme.body
+            .merge(context.components.table?.cellTextStyle)
+            .copyWith(
+              color:
+                  context.components.table?.cellTextStyle?.color ??
+                  context.colors.text,
+            ),
       );
     }
     if (widget.onCellChanged != null) {
@@ -273,7 +340,10 @@ extension _OiTableBody<T> on _OiTableState<T> {
       width: resolvedWidth,
       height: _effectiveRowHeight,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8),
+        padding:
+            col.cellPadding ??
+            context.components.table?.cellPadding ??
+            const EdgeInsets.symmetric(horizontal: 8),
         child: Align(
           alignment: _OiTableStatus._alignmentFromTextAlign(col.textAlign),
           child: content,

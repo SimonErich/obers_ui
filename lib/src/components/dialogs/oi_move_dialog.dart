@@ -6,6 +6,7 @@ import 'package:obers_ui/src/composites/data/oi_tree.dart';
 import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/models/oi_file_node_data.dart';
+import 'package:obers_ui/src/primitives/display/oi_icon.dart';
 
 /// A dialog for moving/copying files to a different folder.
 ///
@@ -201,7 +202,7 @@ class _OiMoveDialogState extends State<OiMoveDialog> {
                               ),
                               child: Row(
                                 children: [
-                                  Icon(
+                                  OiIcon.raw(
                                     OiIcons.folder,
                                     size: 16,
                                     color: colors.warning.base,

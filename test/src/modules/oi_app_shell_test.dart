@@ -3,9 +3,13 @@
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:obers_ui/src/components/buttons/oi_button.dart';
 import 'package:obers_ui/src/components/navigation/oi_breadcrumbs.dart';
 import 'package:obers_ui/src/components/navigation/oi_drawer.dart';
 import 'package:obers_ui/src/composites/navigation/oi_sidebar.dart';
+import 'package:obers_ui/src/foundation/oi_icons.dart';
+import 'package:obers_ui/src/foundation/theme/component_themes/oi_sidebar_theme_data.dart';
+import 'package:obers_ui/src/foundation/theme/oi_theme_data.dart';
 import 'package:obers_ui/src/modules/oi_app_shell.dart';
 
 import '../../helpers/pump_app.dart';
@@ -44,6 +48,198 @@ void main() {
     ];
 
     // ── Existing tests ──────────────────────────────────────────────────────
+
+    testWidgets('desktop search does not leave unused space after actions', (
+      tester,
+    ) async {
+      const accountKey = ValueKey('account');
+      await tester.pumpObers(
+        OiAppShell(
+          label: 'Admin',
+          title: 'Orders',
+          navigation: testNav,
+          search: const SizedBox(width: 360, child: Text('Search records')),
+          actions: const [SizedBox(width: 36), SizedBox(width: 36)],
+          userMenu: const SizedBox(key: accountKey, width: 32, height: 32),
+          child: const Text('Content'),
+        ),
+        surfaceSize: const Size(1440, 900),
+      );
+      expect(tester.getRect(find.byKey(accountKey)).right, 1440 - 16);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets(
+      'long desktop breadcrumbs retain search and actions without overflow',
+      (tester) async {
+        const searchKey = ValueKey('long-title-search');
+        const accountKey = ValueKey('long-title-account');
+        await tester.pumpObers(
+          OiAppShell(
+            label: 'Admin',
+            navigation: testNav,
+            breadcrumbs: [
+              OiBreadcrumbItem(
+                label: 'Delivery profiles with a very long resource name',
+                onTap: () {},
+              ),
+              const OiBreadcrumbItem(
+                label:
+                    'Nordlicht Energie GmbH employee company delivery profile',
+              ),
+            ],
+            search: const SizedBox(
+              key: searchKey,
+              width: 360,
+              child: Text('Search records'),
+            ),
+            actions: const [SizedBox(width: 36), SizedBox(width: 36)],
+            userMenu: const SizedBox(key: accountKey, width: 32, height: 32),
+            child: const Text('Content'),
+          ),
+          surfaceSize: const Size(1440, 900),
+        );
+        expect(tester.getSize(find.byKey(searchKey)).width, 360);
+        expect(tester.getRect(find.byKey(accountKey)).right, 1440 - 16);
+        expect(tester.takeException(), isNull);
+      },
+    );
+
+    testWidgets('compact search keeps its icon, name and activation', (
+      tester,
+    ) async {
+      final semantics = tester.ensureSemantics();
+      var opens = 0;
+      for (final width in [320.0, 390.0]) {
+        await tester.pumpObers(
+          OiAppShell(
+            label: 'Admin',
+            navigation: testNav,
+            search: const SizedBox(width: 360, child: Text('Search field')),
+            searchLabel: 'Search orders and customers',
+            onSearch: () => opens++,
+            actions: const [
+              SizedBox(width: 32),
+              SizedBox(width: 32),
+              SizedBox(width: 32),
+            ],
+            userMenu: const SizedBox(width: 32),
+            child: const Text('Content'),
+          ),
+          surfaceSize: Size(width, 844),
+        );
+        expect(find.text('Search field'), findsNothing);
+        final button = find.byWidgetPredicate(
+          (widget) =>
+              widget is OiButton &&
+              widget.semanticLabel == 'Search orders and customers',
+        );
+        expect(button.hitTestable(), findsOneWidget);
+        expect(tester.getSize(button).width, greaterThanOrEqualTo(32));
+        final icon = find.descendant(
+          of: button,
+          matching: find.byIcon(OiIcons.search),
+        );
+        expect(icon, findsOneWidget);
+        expect(tester.getRect(button).contains(tester.getCenter(icon)), isTrue);
+        expect(
+          find.bySemanticsLabel('Search orders and customers'),
+          findsOneWidget,
+        );
+        final before = opens;
+        await tester.tap(button);
+        await tester.pumpAndSettle();
+        expect(opens, before + 1);
+        Focus.of(tester.element(icon)).requestFocus();
+        await tester.pump();
+        await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+        await tester.pumpAndSettle();
+        expect(opens, before + 2);
+        expect(tester.takeException(), isNull);
+      }
+      semantics.dispose();
+    });
+
+    testWidgets('routed content preserves shell action semantics', (
+      tester,
+    ) async {
+      final semantics = tester.ensureSemantics();
+      for (final width in [320.0, 1200.0]) {
+        await tester.pumpObers(
+          OiAppShell(
+            label: 'Admin',
+            navigation: testNav,
+            searchLabel: 'Search all records',
+            onSearch: () {},
+            child: Navigator(
+              onGenerateRoute: (_) => PageRouteBuilder<void>(
+                pageBuilder: (_, _, _) => const Text('Routed content'),
+              ),
+            ),
+          ),
+          surfaceSize: Size(width, 844),
+        );
+        await tester.pumpAndSettle();
+        expect(find.bySemanticsLabel('Search all records'), findsOneWidget);
+        expect(find.bySemanticsLabel('Routed content'), findsOneWidget);
+        if (width == 320) {
+          expect(find.bySemanticsLabel('Open navigation'), findsOneWidget);
+        }
+      }
+      semantics.dispose();
+    });
+
+    testWidgets('desktop keeps the supplied search field', (tester) async {
+      await tester.pumpObers(
+        OiAppShell(
+          label: 'Admin',
+          navigation: testNav,
+          search: const Text('Search field'),
+          onSearch: () {},
+          child: const Text('Content'),
+        ),
+        surfaceSize: const Size(1400, 900),
+      );
+      expect(find.text('Search field'), findsOneWidget);
+      expect(find.byIcon(OiIcons.search), findsNothing);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets(
+      'sidebar theme covers contextual header as well as navigation',
+      (tester) async {
+        const sidebarColor = Color(0xFF123456);
+        final base = OiThemeData.light();
+        await tester.pumpObers(
+          OiAppShell(
+            label: 'Workspace',
+            navigation: testNav,
+            navigationHeader: const Text('Workspace heading'),
+            child: const Text('Content'),
+          ),
+          theme: base.copyWith(
+            components: base.components.copyWith(
+              sidebar: const OiSidebarThemeData(backgroundColor: sidebarColor),
+            ),
+          ),
+          surfaceSize: const Size(1200, 800),
+        );
+        final backgrounds = tester.widgetList<DecoratedBox>(
+          find.ancestor(
+            of: find.text('Workspace heading'),
+            matching: find.byType(DecoratedBox),
+          ),
+        );
+        expect(
+          backgrounds.any(
+            (box) =>
+                box.decoration is BoxDecoration &&
+                (box.decoration as BoxDecoration).color == sidebarColor,
+          ),
+          isTrue,
+        );
+      },
+    );
 
     testWidgets('desktop layout renders sidebar and content', (tester) async {
       await tester.pumpObers(

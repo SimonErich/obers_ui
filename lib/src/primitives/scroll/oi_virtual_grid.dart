@@ -1,3 +1,4 @@
+import 'package:flutter/rendering.dart' show ScrollCacheExtent;
 import 'package:flutter/widgets.dart';
 
 /// A virtualised, lazily-rendered grid of items.
@@ -64,6 +65,9 @@ class OiVirtualGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GridView.builder(
+      scrollCacheExtent: cacheExtent == null
+          ? null
+          : ScrollCacheExtent.pixels(cacheExtent!),
       itemCount: itemCount,
       itemBuilder: itemBuilder,
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -72,7 +76,6 @@ class OiVirtualGrid extends StatelessWidget {
         crossAxisSpacing: crossAxisSpacing,
         childAspectRatio: childAspectRatio,
       ),
-      cacheExtent: cacheExtent,
       controller: controller,
       padding: padding,
       shrinkWrap: shrinkWrap,

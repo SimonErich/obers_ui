@@ -10,6 +10,7 @@ import 'package:obers_ui/src/foundation/oi_responsive.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/models/oi_product_data.dart';
 import 'package:obers_ui/src/primitives/animation/oi_shimmer.dart';
+import 'package:obers_ui/src/primitives/display/oi_icon.dart';
 import 'package:obers_ui/src/primitives/display/oi_label.dart';
 import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
 import 'package:obers_ui/src/primitives/layout/oi_column.dart';
@@ -155,7 +156,11 @@ class OiProductCard extends StatelessWidget {
           height: height ?? 160,
           color: context.colors.surfaceSubtle,
           child: Center(
-            child: Icon(_kImageIcon, size: 32, color: context.colors.textMuted),
+            child: OiIcon.raw(
+              _kImageIcon,
+              size: 32,
+              color: context.colors.textMuted,
+            ),
           ),
         ),
       );

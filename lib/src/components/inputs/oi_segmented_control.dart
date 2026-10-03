@@ -1,6 +1,7 @@
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
+import 'package:obers_ui/src/primitives/display/oi_icon.dart';
 import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
 
 /// A single segment entry in an [OiSegmentedControl].
@@ -93,9 +94,11 @@ class OiSegmentedControl<T> extends StatefulWidget {
     required this.segments,
     required this.selected,
     required this.onChanged,
+    this.onReselected,
     this.enabled = true,
     this.size = OiSegmentedControlSize.medium,
     this.expand = false,
+    this.showLabels = true,
     this.semanticLabel,
     super.key,
   }) : assert(segments.length <= 5, 'At most 5 segments are allowed');
@@ -107,11 +110,20 @@ class OiSegmentedControl<T> extends StatefulWidget {
   /// list renders nothing, and a single segment renders as a standalone pill.
   final List<OiSegment<T>> segments;
 
+  /// Whether labels are visible beside icons. When false, segments with icons
+  /// become square icon controls; labels remain their accessible names.
+  /// Segments without icons continue to show their labels.
+  final bool showLabels;
+
   /// The currently selected segment value.
   final T selected;
 
   /// Called with the new value when the user selects a different segment.
   final ValueChanged<T> onChanged;
+
+  /// Optional activation of an already-selected segment, for example reopening
+  /// a custom picker without changing the current selection.
+  final ValueChanged<T>? onReselected;
 
   /// Whether the entire control is interactive.
   ///
@@ -249,6 +261,7 @@ class _OiSegmentedControlState<T> extends State<OiSegmentedControl<T>> {
 
     // Resolve the base radius value from the theme override or sm scale.
     final baseRadius = themeData?.borderRadius?.topLeft ?? radius.sm.topLeft;
+    final inset = themeData?.inset ?? 0;
 
     final children = <Widget>[];
 
@@ -258,24 +271,33 @@ class _OiSegmentedControlState<T> extends State<OiSegmentedControl<T>> {
       final isFirst = i == 0;
       final isLast = i == widget.segments.length - 1;
       final isEnabled = widget.enabled && segment.enabled;
+      final iconOnly = !widget.showLabels && segment.icon != null;
 
       // Compute per-segment border radius: left on first, right on last.
-      final segmentRadius = BorderRadius.only(
-        topLeft: isFirst ? baseRadius : Radius.zero,
-        bottomLeft: isFirst ? baseRadius : Radius.zero,
-        topRight: isLast ? baseRadius : Radius.zero,
-        bottomRight: isLast ? baseRadius : Radius.zero,
-      );
+      final segmentRadius = inset > 0
+          ? themeData?.innerRadius ?? BorderRadius.all(baseRadius)
+          : BorderRadius.only(
+              topLeft: isFirst ? baseRadius : Radius.zero,
+              bottomLeft: isFirst ? baseRadius : Radius.zero,
+              topRight: isLast ? baseRadius : Radius.zero,
+              bottomRight: isLast ? baseRadius : Radius.zero,
+            );
 
-      final bgColor = isSelected ? selectedColor : backgroundColor;
+      final bgColor = isSelected
+          ? selectedColor
+          : inset > 0
+          ? const Color(0x00000000)
+          : backgroundColor;
       final textColor = isSelected ? selectedTextColor : unselectedTextColor;
 
       // Build label content.
       Widget labelWidget = Text(
         segment.label,
-        style: TextStyle(
-          fontSize: fontSize,
-          fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+        style: (themeData?.labelStyle ?? const TextStyle()).copyWith(
+          fontSize: themeData?.labelStyle?.fontSize ?? fontSize,
+          fontWeight:
+              themeData?.labelStyle?.fontWeight ??
+              (isSelected ? FontWeight.w600 : FontWeight.w400),
           color: textColor,
         ),
         maxLines: 1,
@@ -283,12 +305,18 @@ class _OiSegmentedControlState<T> extends State<OiSegmentedControl<T>> {
       );
 
       // Prepend icon if present.
-      if (segment.icon != null) {
+      if (iconOnly) {
+        labelWidget = OiIcon.decorative(
+          icon: segment.icon,
+          size: iconSize,
+          color: textColor,
+        );
+      } else if (segment.icon != null) {
         labelWidget = Row(
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(segment.icon, size: iconSize, color: textColor),
+            OiIcon.raw(segment.icon, size: iconSize, color: textColor),
             const SizedBox(width: 4),
             Flexible(child: labelWidget),
           ],
@@ -310,38 +338,47 @@ class _OiSegmentedControlState<T> extends State<OiSegmentedControl<T>> {
 
       Widget segmentWidget = AnimatedContainer(
         duration: animDuration,
-        height: segmentHeight,
-        padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+        height: (segmentHeight - 2 * inset).clamp(0, double.infinity),
+        width: iconOnly && !widget.expand ? segmentHeight - 2 * inset : null,
+        padding: iconOnly
+            ? EdgeInsets.zero
+            : EdgeInsets.symmetric(horizontal: horizontalPadding),
         decoration: BoxDecoration(
           color: bgColor,
           borderRadius: segmentRadius,
-          border: segmentBorder,
+          border: inset > 0 ? null : segmentBorder,
         ),
         alignment: Alignment.center,
         child: labelWidget,
       );
 
-      segmentWidget = Semantics(
-        selected: isSelected,
-        enabled: isEnabled,
-        label: segment.semanticLabel ?? segment.label,
-        child: OiTappable(
-          onTap: isEnabled
-              ? () {
-                  _segmentFocusNodes[i].requestFocus();
-                  if (!isSelected) {
-                    widget.onChanged(segment.value);
+      // Keep the name, selected state and activation action on one button.
+      // The arrow-key focus handler is an implementation detail, not another
+      // accessible control nested inside the segment.
+      segmentWidget = MergeSemantics(
+        child: Semantics(
+          selected: isSelected,
+          child: OiTappable(
+            semanticLabel: segment.semanticLabel ?? segment.label,
+            onTap: isEnabled
+                ? () {
+                    _segmentFocusNodes[i].requestFocus();
+                    if (!isSelected) {
+                      widget.onChanged(segment.value);
+                    } else {
+                      widget.onReselected?.call(segment.value);
+                    }
                   }
-                }
-              : null,
-          enabled: isEnabled,
-          child: _SegmentKeyboardHandler<T>(
-            index: i,
+                : null,
             enabled: isEnabled,
-            focusNode: _segmentFocusNodes[i],
-            nextEnabledIndex: _nextEnabledIndex,
-            onSelectIndex: _selectSegmentAt,
-            child: segmentWidget,
+            child: _SegmentKeyboardHandler<T>(
+              index: i,
+              enabled: isEnabled,
+              focusNode: _segmentFocusNodes[i],
+              nextEnabledIndex: _nextEnabledIndex,
+              onSelectIndex: _selectSegmentAt,
+              child: ExcludeSemantics(child: segmentWidget),
+            ),
           ),
         ),
       );
@@ -350,17 +387,32 @@ class _OiSegmentedControlState<T> extends State<OiSegmentedControl<T>> {
         segmentWidget = Expanded(child: segmentWidget);
       }
 
+      if (children.isNotEmpty &&
+          widget.showLabels &&
+          (themeData?.spacing ?? 0) > 0) {
+        children.add(SizedBox(width: themeData!.spacing));
+      }
       children.add(segmentWidget);
     }
 
+    Widget row = Row(
+      mainAxisSize: widget.expand ? MainAxisSize.max : MainAxisSize.min,
+      children: children,
+    );
+    if (inset > 0) {
+      row = DecoratedBox(
+        decoration: BoxDecoration(
+          color: backgroundColor,
+          borderRadius: themeData?.borderRadius ?? BorderRadius.all(baseRadius),
+        ),
+        child: Padding(padding: EdgeInsets.all(inset), child: row),
+      );
+    }
     // Wrap with group-level semantics.
     return Semantics(
       container: true,
       label: widget.semanticLabel,
-      child: Row(
-        mainAxisSize: widget.expand ? MainAxisSize.max : MainAxisSize.min,
-        children: children,
-      ),
+      child: row,
     );
   }
 }
@@ -387,6 +439,7 @@ class _SegmentKeyboardHandler<T> extends StatelessWidget {
   Widget build(BuildContext context) {
     return Focus(
       focusNode: focusNode,
+      includeSemantics: false,
       onKeyEvent: (node, event) {
         if (!enabled) return KeyEventResult.ignored;
         if (event is! KeyDownEvent) return KeyEventResult.ignored;

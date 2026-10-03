@@ -21,10 +21,12 @@ class OiPopover extends StatefulWidget {
     this.onClose,
     this.alignment = OiFloatingAlignment.bottomStart,
     this.initialFocus = true,
+    this.borderRadius,
     super.key,
   });
 
-  /// The accessible label describing this popover for screen readers.
+  /// The accessible label describing the open popover content.
+  /// The [anchor] owns its trigger label independently.
   final String label;
 
   /// The widget that serves as the anchor for positioning.
@@ -46,6 +48,9 @@ class OiPopover extends StatefulWidget {
   /// popover opens.
   final bool initialFocus;
 
+  /// Surface corners; defaults to an 8-pixel radius.
+  final BorderRadius? borderRadius;
+
   @override
   State<OiPopover> createState() => _OiPopoverState();
 }
@@ -61,7 +66,7 @@ class _OiPopoverState extends State<OiPopover> {
       child: DecoratedBox(
         decoration: BoxDecoration(
           color: colors.surface,
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: widget.borderRadius ?? BorderRadius.circular(8),
           boxShadow: [
             BoxShadow(
               color: colors.overlay.withValues(alpha: 0.12),
@@ -75,13 +80,15 @@ class _OiPopoverState extends State<OiPopover> {
       ),
     );
 
-    return Semantics(
-      label: widget.label,
-      child: OiFloating(
-        visible: widget.open,
-        alignment: widget.alignment,
-        onDismiss: widget.onClose,
-        anchor: widget.anchor,
+    return OiFloating(
+      visible: widget.open,
+      alignment: widget.alignment,
+      onDismiss: widget.onClose,
+      anchor: widget.anchor,
+      child: Semantics(
+        container: true,
+        explicitChildNodes: true,
+        label: widget.label,
         child: popoverContent,
       ),
     );

@@ -2,6 +2,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
+import 'package:obers_ui/src/primitives/display/oi_icon.dart';
 import 'package:obers_ui/src/primitives/display/oi_label.dart';
 
 /// A sticky sliver header with support for collapsing, flexible space,
@@ -201,7 +202,7 @@ class OiSliverHeader extends StatelessWidget {
         button: true,
         child: const Padding(
           padding: EdgeInsets.all(8),
-          child: Icon(OiIcons.chevronLeft, size: 20),
+          child: OiIcon.raw(OiIcons.chevronLeft, size: 20),
         ),
       ),
     );

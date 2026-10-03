@@ -4,6 +4,7 @@ import 'package:obers_ui/src/components/inputs/oi_select_scope.dart';
 import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_color_scheme.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
+import 'package:obers_ui/src/primitives/display/oi_icon.dart';
 import 'package:obers_ui/src/primitives/input/oi_raw_input.dart';
 import 'package:obers_ui/src/primitives/overlay/oi_floating.dart';
 import 'package:obers_ui/src/primitives/scroll/oi_virtual_list.dart';
@@ -296,13 +297,13 @@ class _OiSelectState<T> extends State<OiSelect<T>> {
                 overflow: TextOverflow.ellipsis,
               ),
               const SizedBox(width: 4),
-              Icon(OiIcons.arrowDown, size: 14, color: colors.textMuted),
+              OiIcon.raw(OiIcons.arrowDown, size: 14, color: colors.textMuted),
             ],
           ),
         ),
       );
     } else {
-      final chevron = Icon(
+      final chevron = OiIcon.raw(
         OiIcons.arrowDown,
         size: 16,
         color: colors.textMuted,
@@ -405,7 +406,7 @@ class _SelectDropdownItemState<T> extends State<_SelectDropdownItem<T>> {
                 ),
               ),
               if (widget.showCheckmark && widget.selected)
-                Icon(OiIcons.check, size: 16, color: colors.text),
+                OiIcon.raw(OiIcons.check, size: 16, color: colors.text),
             ],
           ),
         ),

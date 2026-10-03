@@ -78,16 +78,12 @@ void main() {
           ],
         ),
       );
-      // In connected mode, the OiSurface provides the outer radius and
-      // ClipRRect clips the children. Individual buttons don't carry their
-      // own border radius — verify a ClipRRect exists inside the group.
-      expect(
-        find.descendant(
-          of: find.byType(OiButtonGroup),
-          matching: find.byType(ClipRRect),
-        ),
-        findsOneWidget,
-      );
+      final buttons = tester
+          .widgetList<OiButton>(find.byType(OiButton))
+          .toList();
+      expect(buttons[1].borderRadius, BorderRadius.zero);
+      expect(buttons.first.borderRadius!.topRight, Radius.zero);
+      expect(buttons.last.borderRadius!.topLeft, Radius.zero);
     },
   );
 

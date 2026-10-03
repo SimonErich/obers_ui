@@ -1,15 +1,18 @@
 // Internal widget — no need for public doc comments on private class
 
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/src/components/inputs/oi_field_label.dart';
 import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_decoration_theme.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
-import 'package:obers_ui/src/primitives/display/oi_label.dart';
+import 'package:obers_ui/src/primitives/display/oi_icon.dart';
 
 class OiInputFrame extends StatelessWidget {
   const OiInputFrame({
     required this.child,
     this.label,
+    this.semanticLabel,
+    this.semanticHint,
     this.hint,
     this.error,
     this.focused = false,
@@ -26,6 +29,8 @@ class OiInputFrame extends StatelessWidget {
 
   final Widget child;
   final String? label;
+  final String? semanticLabel;
+  final String? semanticHint;
   final String? hint;
   final String? error;
   final bool focused;
@@ -58,16 +63,25 @@ class OiInputFrame extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final border = _resolveBorder(context);
+    final hasValidationError = error != null && error!.isNotEmpty;
     final colors = context.colors;
     final ti = context.components.textInput;
     final anim = context.animations;
     final effectivePadding =
-        padding ?? const EdgeInsets.symmetric(horizontal: 12, vertical: 8);
+        padding ??
+        ti?.contentPadding ??
+        const EdgeInsets.symmetric(horizontal: 12, vertical: 8);
 
     final row = Row(
       children: [
         if (leading != null) ...[leading!, SizedBox(width: leadingGap)],
-        Expanded(child: child),
+        Expanded(
+          child: Semantics(
+            label: semanticLabel ?? label,
+            hint: semanticHint ?? hint,
+            child: child,
+          ),
+        ),
         if (trailing != null) ...[SizedBox(width: trailingGap), trailing!],
       ],
     );
@@ -82,21 +96,39 @@ class OiInputFrame extends StatelessWidget {
       bgColor = ti?.backgroundColor ?? colors.surface;
     }
 
-    final resolvedRadius = border.borderRadius ?? BorderRadius.circular(8);
+    final resolvedRadius =
+        ti?.borderRadius ?? border.borderRadius ?? context.radius.md;
+    final borderColor = hasValidationError
+        ? ti?.validationErrorColor ?? border.color
+        : focused
+        ? ti?.focusBorderColor ?? border.color
+        : ti?.borderColor ?? border.color;
 
     // RepaintBoundary isolates the implicit focus/error border+background
     // animation to this field's own layer, so it doesn't invalidate and
     // repaint sibling fields across the rest of the form.
     final surfaceWidget = RepaintBoundary(
       child: _AnimatedInputSurface(
-        borderColor: border.color,
+        borderColor: borderColor,
         borderWidth: border.width,
         borderRadius: resolvedRadius,
         backgroundColor: bgColor,
-        duration: anim.fast,
+        duration: hasValidationError
+            ? ti?.errorAnimationDuration ?? anim.fast
+            : anim.fast,
         curve: Curves.easeOut,
         padding: effectivePadding,
-        child: row,
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            minHeight: ti?.height == null
+                ? 0
+                : (ti!.height! - effectivePadding.vertical).clamp(
+                    0,
+                    double.infinity,
+                  ),
+          ),
+          child: row,
+        ),
       ),
     );
 
@@ -113,18 +145,18 @@ class OiInputFrame extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (label != null && label!.isNotEmpty) ...[
-          OiLabel.smallStrong(label!),
-          const SizedBox(height: 4),
+          OiFieldLabel(label!),
+          SizedBox(height: ti?.labelGap ?? 4),
         ],
         frame,
         if (hasError) ...[
-          const SizedBox(height: 4),
+          SizedBox(height: ti?.supportingGap ?? 4),
           Semantics(
             liveRegion: true,
             child: Row(
               children: [
                 // REQ-0025: error icon so color is never the sole indicator.
-                Icon(
+                OiIcon.raw(
                   OiIcons.circleAlert, // error
                   size: 14,
                   color: colors.error.base,
@@ -143,20 +175,30 @@ class OiInputFrame extends StatelessWidget {
               ],
             ),
           ),
-        ] else if (hint != null) ...[
-          const SizedBox(height: 4),
-          Text(
-            hint!,
-            style: TextStyle(
-              fontSize: 12,
-              color: colors.textMuted,
-              height: 1.3,
-            ),
-          ),
         ],
-        if (counter != null) ...[
-          const SizedBox(height: 4),
-          Semantics(child: counter),
+        if ((!hasError && hint != null) || counter != null) ...[
+          SizedBox(height: ti?.supportingGap ?? 4),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: !hasError && hint != null
+                    ? Text(
+                        hint!,
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: colors.textMuted,
+                          height: 1.3,
+                        ),
+                      )
+                    : const SizedBox.shrink(),
+              ),
+              if (counter != null) ...[
+                const SizedBox(width: 8),
+                Semantics(child: counter),
+              ],
+            ],
+          ),
         ],
       ],
     );

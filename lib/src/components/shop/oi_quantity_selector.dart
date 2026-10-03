@@ -11,7 +11,7 @@ import 'package:obers_ui/src/primitives/display/oi_surface.dart';
 import 'package:obers_ui/src/primitives/layout/oi_row.dart';
 
 // Material Icons codepoints.
-const IconData _kRemoveIcon = OiIcons.circleMinus;
+const IconData _kRemoveIcon = OiIcons.minus;
 const IconData _kAddIcon = OiIcons.plus;
 
 /// A compact, touch-friendly number stepper for product quantities.
@@ -34,7 +34,10 @@ class OiQuantitySelector extends StatelessWidget {
     this.min = 1,
     this.max = 99,
     this.compact = false,
+    this.width,
     this.disabled = false,
+    this.decreaseLabel = 'Decrease quantity',
+    this.increaseLabel = 'Increase quantity',
     super.key,
   });
 
@@ -56,8 +59,17 @@ class OiQuantitySelector extends StatelessWidget {
   /// When `true`, renders smaller controls suitable for cart rows.
   final bool compact;
 
+  /// Optional bounded width, with the value taking remaining control space.
+  final double? width;
+
   /// When `true`, all controls are disabled.
   final bool disabled;
+
+  /// Accessible decrement action, optionally including the item identity.
+  final String decreaseLabel;
+
+  /// Accessible increment action, optionally including the item identity.
+  final String increaseLabel;
 
   /// Whether the value is at the minimum.
   bool get _atMin => value <= min;
@@ -71,7 +83,7 @@ class OiQuantitySelector extends StatelessWidget {
   Widget _buildMinusButton(BuildContext context) {
     return OiIconButton(
       icon: _kRemoveIcon,
-      semanticLabel: 'Decrease quantity',
+      semanticLabel: decreaseLabel,
       onTap: _interactive && !_atMin ? () => onChange!(value - 1) : null,
       size: compact ? OiButtonSize.small : OiButtonSize.medium,
       enabled: _interactive && !_atMin,
@@ -81,7 +93,7 @@ class OiQuantitySelector extends StatelessWidget {
   Widget _buildPlusButton(BuildContext context) {
     return OiIconButton(
       icon: _kAddIcon,
-      semanticLabel: 'Increase quantity',
+      semanticLabel: increaseLabel,
       onTap: _interactive && !_atMax ? () => onChange!(value + 1) : null,
       size: compact ? OiButtonSize.small : OiButtonSize.medium,
       enabled: _interactive && !_atMax,
@@ -94,6 +106,7 @@ class OiQuantitySelector extends StatelessWidget {
       constraints: BoxConstraints(minWidth: minWidth),
       child: Center(
         widthFactor: 1,
+        heightFactor: 1,
         child: compact
             ? OiLabel.small('$value', textAlign: TextAlign.center)
             : OiLabel.body('$value', textAlign: TextAlign.center),
@@ -129,20 +142,36 @@ class OiQuantitySelector extends StatelessWidget {
       gap: OiResponsive<double>(compact ? 2 : 4),
       children: [
         _buildMinusButton(context),
-        _buildValueDisplay(context),
+        if (width == null)
+          _buildValueDisplay(context)
+        else
+          Expanded(child: _buildValueDisplay(context)),
         _buildPlusButton(context),
       ],
     );
 
     content = OiSurface(
       borderRadius: context.radius.sm,
-      border: OiBorderStyle.solid(colors.borderSubtle, 1),
+      border: compact ? null : OiBorderStyle.solid(colors.borderSubtle, 1),
       padding: EdgeInsets.symmetric(
         horizontal: compact ? 2 : 4,
-        vertical: compact ? 2 : sp.xs,
+        vertical: compact ? 0 : sp.xs,
       ),
       child: content,
     );
+    if (width != null) content = SizedBox(width: width, child: content);
+    if (compact) {
+      content = DecoratedBox(
+        position: DecorationPosition.foreground,
+        decoration: BoxDecoration(
+          borderRadius: context.radius.sm,
+          border: Border.all(
+            color: context.components.textInput?.borderColor ?? colors.border,
+          ),
+        ),
+        child: content,
+      );
+    }
 
     if (disabled) {
       content = Opacity(opacity: 0.4, child: content);
@@ -153,9 +182,11 @@ class OiQuantitySelector extends StatelessWidget {
       value: '$value',
       increasedValue: _atMax ? null : '${value + 1}',
       decreasedValue: _atMin ? null : '${value - 1}',
+      onIncrease: _interactive && !_atMax ? () => onChange!(value + 1) : null,
+      onDecrease: _interactive && !_atMin ? () => onChange!(value - 1) : null,
       child: Focus(
         onKeyEvent: _onKeyEvent,
-        child: ExcludeSemantics(child: content),
+        child: content,
       ),
     );
   }

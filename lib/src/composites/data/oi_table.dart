@@ -6,6 +6,7 @@ import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/buttons/oi_button.dart';
 import 'package:obers_ui/src/components/display/oi_pagination.dart';
 import 'package:obers_ui/src/components/feedback/oi_bulk_bar.dart';
+import 'package:obers_ui/src/components/inputs/oi_checkbox.dart';
 import 'package:obers_ui/src/components/panels/oi_resizable.dart';
 import 'package:obers_ui/src/composites/data/oi_pagination_controller.dart';
 import 'package:obers_ui/src/composites/data/oi_table_controller.dart';
@@ -15,6 +16,8 @@ import 'package:obers_ui/src/foundation/persistence/oi_settings_mixin.dart';
 import 'package:obers_ui/src/foundation/persistence/oi_settings_provider.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/models/settings/oi_table_settings.dart';
+import 'package:obers_ui/src/primitives/display/oi_icon.dart';
+import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
 
 part 'oi_table/oi_table_body.part.dart';
 part 'oi_table/oi_table_column_manager.part.dart';
@@ -51,6 +54,7 @@ class OiTableColumn<T> {
     this.valueGetter,
     this.comparator,
     this.textAlign = TextAlign.start,
+    this.cellPadding,
   });
 
   /// Unique identifier for this column.
@@ -100,6 +104,82 @@ class OiTableColumn<T> {
 
   /// Alignment of text within each cell.
   final TextAlign textAlign;
+
+  /// Insets shared by this column's header and cells. Useful for narrow action
+  /// columns; null inherits the table theme's cell padding.
+  final EdgeInsetsGeometry? cellPadding;
+}
+
+// ── Labels ────────────────────────────────────────────────────────────────────
+
+/// User-visible strings for [OiTable]'s chrome — the pagination footer, the
+/// status bar, the bulk bar, and the column manager.
+///
+/// Every field defaults to the English text [OiTable] has always shown, so
+/// omitting this object changes nothing. Supply a localized instance to
+/// translate the table chrome — the app's own l10n system owns the
+/// translations, this package only accepts finished strings.
+///
+/// The count-bearing strings are callbacks rather than plain text so that a
+/// consumer can pluralize correctly for its locale (`1 Zeile` / `2 Zeilen`).
+///
+/// ```dart
+/// OiTable<Person>(
+///   label: 'Mitarbeiterabrechnung',
+///   rows: people,
+///   columns: columns,
+///   labels: OiTableLabels(
+///     rows: 'Zeilen',
+///     pagination: OiPaginationLabels(perPage: 'Pro Seite:'),
+///     rowCount: (count) => count == 1 ? '1 Zeile' : '$count Zeilen',
+///     selectedCount: (count) => '$count ausgewählt',
+///   ),
+/// )
+/// ```
+///
+/// {@category Composites}
+@immutable
+class OiTableLabels {
+  /// Creates an [OiTableLabels].
+  const OiTableLabels({
+    this.rows = 'rows',
+    this.pagination = const OiPaginationLabels(),
+    this.bulkBar = const OiBulkBarLabels(),
+    this.rowCount,
+    this.selectedCount,
+    this.columns = 'Columns',
+    this.manageColumns = 'Manage visible columns',
+    this.selectRow,
+  });
+
+  /// Noun for the items being paginated, used by the pagination footer's total
+  /// (`1–3 of 3 rows`) and by the bulk bar (`2 of 3 rows selected`).
+  final String rows;
+
+  /// Strings for the pagination footer, including its `Per page:` prefix and
+  /// the accessible labels of its navigation buttons.
+  final OiPaginationLabels pagination;
+
+  /// Strings for the bulk bar shown when rows are selected — its select-all
+  /// toggle, selection count, action confirmation prefix, and accessible
+  /// label. [rows] supplies the item noun the defaults build on.
+  final OiBulkBarLabels bulkBar;
+
+  /// Builds the status bar's row count. Defaults to `'$count rows'`, using
+  /// [rows] as the noun.
+  final String Function(int count)? rowCount;
+
+  /// Builds the status bar's selection count. Defaults to `'$count selected'`.
+  final String Function(int count)? selectedCount;
+
+  /// Label of the column manager button.
+  final String columns;
+
+  /// Accessible label of the column manager button.
+  final String manageColumns;
+
+  /// Accessible selection label for the one-based visible row index.
+  final String Function(int index)? selectRow;
 }
 
 // ── Pagination mode ───────────────────────────────────────────────────────────
@@ -189,6 +269,11 @@ class OiTable<T> extends StatefulWidget {
     this.settingsKey,
     this.settingsNamespace = 'oi_table',
     this.bulkActions,
+    this.shrinkWrap = false,
+    this.labels = const OiTableLabels(),
+    this.expandedRowKeys = const {},
+    this.expandedRowBuilder,
+    this.onExpandedRowsChanged,
     this.settingsSaveDebounce = const Duration(milliseconds: 500),
     super.key,
   });
@@ -197,6 +282,9 @@ class OiTable<T> extends StatefulWidget {
 
   /// Accessible label describing the table for screen readers.
   final String label;
+
+  /// Localized labels for table and pagination chrome.
+  final OiTableLabels labels;
 
   // ── Data ──────────────────────────────────────────────────────────────────
 
@@ -298,6 +386,9 @@ class OiTable<T> extends StatefulWidget {
   final bool reorderable;
 
   /// Called after the user drops a row at a new position.
+  ///
+  /// `newIndex` is the insertion index before removing the row at `oldIndex`.
+  /// When moving forward, subtract one before inserting into the updated list.
   final void Function(int oldIndex, int newIndex)? onRowReordered;
 
   // ── Copy ──────────────────────────────────────────────────────────────────
@@ -327,6 +418,12 @@ class OiTable<T> extends StatefulWidget {
   /// Whether alternating rows have a subtle background tint.
   final bool striped;
 
+  /// Sizes a small table to its visible rows while retaining bounded scrolling.
+  ///
+  /// Leave false for large virtualized viewports. Shrink wrapping measures the
+  /// current page, so prefer it for short paginated lists and embedded tables.
+  final bool shrinkWrap;
+
   /// Whether to use compact row heights.
   final bool dense;
 
@@ -340,6 +437,15 @@ class OiTable<T> extends StatefulWidget {
   final List<OiBulkAction>? bulkActions;
 
   // ── Status bar ────────────────────────────────────────────────────────────
+
+  /// Expanded records identified by stable row keys.
+  final Set<String> expandedRowKeys;
+
+  /// Content rendered beneath an expanded record's cells.
+  final Widget Function(BuildContext context, T row)? expandedRowBuilder;
+
+  /// Requests a controlled expansion change when the disclosure is activated.
+  final ValueChanged<Set<String>>? onExpandedRowsChanged;
 
   /// Whether to show the status bar at the bottom of the table.
   final bool showStatusBar;
@@ -573,10 +679,12 @@ class _OiTableState<T> extends State<OiTable<T>>
           }
         },
         child: Column(
+          mainAxisSize: widget.shrinkWrap ? MainAxisSize.min : MainAxisSize.max,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             if (widget.showColumnManager) _buildColumnManagerBar(),
-            Expanded(
+            Flexible(
+              fit: widget.shrinkWrap ? FlexFit.loose : FlexFit.tight,
               child: LayoutBuilder(
                 builder: (context, constraints) {
                   final totalWidth = _computeTotalColumnsWidth();
@@ -587,7 +695,10 @@ class _OiTableState<T> extends State<OiTable<T>>
                       : constraints.maxWidth;
 
                   final header = _buildHeaderRow();
-                  final body = Expanded(child: _buildBody());
+                  final body = Flexible(
+                    fit: widget.shrinkWrap ? FlexFit.loose : FlexFit.tight,
+                    child: _buildBody(),
+                  );
 
                   if (needsScroll) {
                     // Wrap header and body to scroll horizontally in sync.
@@ -597,6 +708,9 @@ class _OiTableState<T> extends State<OiTable<T>>
                       child: SizedBox(
                         width: tableWidth,
                         child: Column(
+                          mainAxisSize: widget.shrinkWrap
+                              ? MainAxisSize.min
+                              : MainAxisSize.max,
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [header, body],
                         ),
@@ -605,6 +719,9 @@ class _OiTableState<T> extends State<OiTable<T>>
                   }
 
                   return Column(
+                    mainAxisSize: widget.shrinkWrap
+                        ? MainAxisSize.min
+                        : MainAxisSize.max,
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [header, body],
                   );

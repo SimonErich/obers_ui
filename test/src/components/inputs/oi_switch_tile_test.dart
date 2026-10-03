@@ -1,5 +1,7 @@
 // Tests do not require documentation comments.
 
+import 'package:flutter/rendering.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui/obers_ui.dart';
 
@@ -109,6 +111,71 @@ void main() {
   // ── OiRadioTile ───────────────────────────────────────────────────────────
 
   group('OiRadioTile', () {
+    testWidgets('compact cards keep the full title without indicator space', (
+      tester,
+    ) async {
+      String? selected;
+      await tester.pumpObers(
+        Center(
+          child: SizedBox(
+            width: 121,
+            child: OiRadioTile<String>.card(
+              title: '12:00–12:30',
+              titleWidget: const Text(
+                '12:00–12:30',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(fontSize: 14),
+              ),
+              value: 'noon',
+              groupValue: 'noon',
+              indicator: OiRadioTileIndicator.none,
+              contentPadding: const EdgeInsets.all(12),
+              onChanged: (value) => selected = value,
+            ),
+          ),
+        ),
+      );
+      final title = tester.renderObject<RenderParagraph>(
+        find.text('12:00–12:30'),
+      );
+      expect(title.size.width, greaterThanOrEqualTo(95));
+      expect(title.size.width, lessThanOrEqualTo(97));
+      await tester.tap(find.text('12:00–12:30'));
+      await tester.pump();
+      expect(selected, 'noon');
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('card body spans the content below the leading control', (
+      tester,
+    ) async {
+      String? selected;
+      await tester.pumpObers(
+        SizedBox(
+          width: 320,
+          child: OiRadioTile<String>.card(
+            title: 'Company profile',
+            value: 'company',
+            groupValue: null,
+            controlLeading: true,
+            bodyWidget: const Text(
+              'Address and delivery instructions',
+              key: Key('body'),
+            ),
+            onChanged: (value) => selected = value,
+          ),
+        ),
+      );
+      expect(
+        tester.getTopLeft(find.byKey(const Key('body'))).dx,
+        lessThan(tester.getTopLeft(find.text('Company profile')).dx),
+      );
+      await tester.tap(find.byKey(const Key('body')));
+      await tester.pump();
+      expect(selected, 'company');
+    });
+
     testWidgets('renders title and radio', (tester) async {
       await tester.pumpObers(
         OiRadioTile<String>(
@@ -120,7 +187,7 @@ void main() {
       );
 
       expect(find.text('Option A'), findsOneWidget);
-      expect(find.byType(OiRadio<String>), findsOneWidget);
+      expect(find.byType(OiRadioIndicator), findsOneWidget);
     });
 
     testWidgets('tapping tile selects value', (tester) async {

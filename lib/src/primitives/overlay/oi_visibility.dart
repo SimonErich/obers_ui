@@ -144,7 +144,7 @@ class _OiVisibilityState extends State<OiVisibility>
     if (widget.visible != oldWidget.visible) {
       if (widget.visible) {
         setState(() => _inTree = true);
-        unawaited(_controller.forward());
+        _controller.forward();
       } else {
         unawaited(
           _controller.reverse().whenComplete(() {

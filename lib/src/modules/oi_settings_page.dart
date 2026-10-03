@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/buttons/oi_button.dart';
 import 'package:obers_ui/src/components/inputs/oi_select.dart';
@@ -10,6 +8,7 @@ import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/oi_responsive.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/primitives/display/oi_divider.dart';
+import 'package:obers_ui/src/primitives/display/oi_icon.dart';
 import 'package:obers_ui/src/primitives/display/oi_label.dart';
 import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
 
@@ -321,7 +320,7 @@ class _OiSettingsPageState extends State<OiSettingsPage> {
         child: Row(
           children: [
             if (group.icon != null) ...[
-              Icon(group.icon, size: 20, color: colors.text),
+              OiIcon.raw(group.icon, size: 20, color: colors.text),
               SizedBox(width: spacing.sm),
             ],
             Expanded(
@@ -350,7 +349,7 @@ class _OiSettingsPageState extends State<OiSettingsPage> {
                   semanticLabel: 'Reset ${group.title} settings',
                 ),
               ),
-            Icon(
+            OiIcon.raw(
               expanded ? OiIcons.chevronUp : OiIcons.chevronDown,
               size: 18,
               color: colors.textMuted,
@@ -371,7 +370,7 @@ class _OiSettingsPageState extends State<OiSettingsPage> {
       subtitle: item.subtitle,
       value: _effectiveValue(group.key, item) as bool? ?? false,
       leading: item.icon != null
-          ? Icon(item.icon, size: 20, color: context.colors.textMuted)
+          ? OiIcon.raw(item.icon, size: 20, color: context.colors.textMuted)
           : null,
       onChanged: (value) {
         _handleValueChanged(group.key, item.key, value);
@@ -399,7 +398,7 @@ class _OiSettingsPageState extends State<OiSettingsPage> {
         child: Row(
           children: [
             if (item.icon != null) ...[
-              Icon(item.icon, size: 20, color: colors.textMuted),
+              OiIcon.raw(item.icon, size: 20, color: colors.textMuted),
               SizedBox(width: spacing.sm),
             ],
             Expanded(
@@ -418,7 +417,7 @@ class _OiSettingsPageState extends State<OiSettingsPage> {
                 ],
               ),
             ),
-            Icon(OiIcons.chevronRight, size: 18, color: colors.textMuted),
+            OiIcon.raw(OiIcons.chevronRight, size: 18, color: colors.textMuted),
           ],
         ),
       ),
@@ -441,7 +440,7 @@ class _OiSettingsPageState extends State<OiSettingsPage> {
       child: Row(
         children: [
           if (item.icon != null) ...[
-            Icon(item.icon, size: 20, color: context.colors.textMuted),
+            OiIcon.raw(item.icon, size: 20, color: context.colors.textMuted),
             SizedBox(width: spacing.sm),
           ],
           Expanded(
@@ -584,12 +583,10 @@ class _OiSettingsPageState extends State<OiSettingsPage> {
     final groupKey = _groupKeys[widget.groups[index].key];
     if (groupKey?.currentContext == null) return;
 
-    unawaited(
-      Scrollable.ensureVisible(
-        groupKey!.currentContext!,
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeInOut,
-      ),
+    Scrollable.ensureVisible(
+      groupKey!.currentContext!,
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
     );
   }
 
@@ -620,7 +617,7 @@ class _OiSettingsPageState extends State<OiSettingsPage> {
         child: Row(
           children: [
             if (group.icon != null) ...[
-              Icon(
+              OiIcon.raw(
                 group.icon,
                 size: 18,
                 color: isSelected ? colors.primary.base : colors.textMuted,

@@ -446,8 +446,16 @@ class OiButton extends StatefulWidget {
 // ── State ───────────────────────────────────────────────────────────────────
 
 class _OiButtonState extends State<OiButton> {
-  // ── Ghost hover / focus state ───────────────────────────────────────────────
-  bool _highlighted = false;
+  final WidgetStatesController _states = WidgetStatesController();
+
+  void _statesChanged() {
+    if (mounted) setState(() {});
+  }
+
+  bool _usesStateBackground(BuildContext context) {
+    final style = _variantStyle(context.components.button, widget.variant);
+    return style?.backgroundHover != null || style?.backgroundPressed != null;
+  }
 
   // ── Confirm state ──────────────────────────────────────────────────────────
   bool _confirmPending = false;
@@ -458,11 +466,6 @@ class _OiButtonState extends State<OiButton> {
   // ── Countdown state ────────────────────────────────────────────────────────
   int _remaining = 0;
   Timer? _countdownTimer;
-
-  void _setHighlighted(bool value) {
-    if (_highlighted == value) return;
-    setState(() => _highlighted = value);
-  }
 
   void _toggleDropdownVisible() {
     setState(() => _dropdownVisible = !_dropdownVisible);
@@ -493,6 +496,7 @@ class _OiButtonState extends State<OiButton> {
   @override
   void initState() {
     super.initState();
+    _states.addListener(_statesChanged);
     if (widget._kind == _OiButtonKind.countdown &&
         widget.countdownSeconds != null) {
       _remaining = widget.countdownSeconds!;
@@ -513,6 +517,9 @@ class _OiButtonState extends State<OiButton> {
 
   @override
   void dispose() {
+    _states
+      ..removeListener(_statesChanged)
+      ..dispose();
     _countdownTimer?.cancel();
     super.dispose();
   }

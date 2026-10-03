@@ -4,6 +4,7 @@ import 'package:obers_ui/src/components/_internal/oi_input_frame.dart';
 import 'package:obers_ui/src/components/navigation/oi_date_picker.dart';
 import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
+import 'package:obers_ui/src/primitives/display/oi_icon.dart';
 import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
 
 /// A date input field that displays a formatted date and opens a calendar
@@ -153,14 +154,14 @@ class OiDatePickerField extends StatelessWidget {
             onTap: _clear,
             child: Padding(
               padding: const EdgeInsets.only(right: 4),
-              child: Icon(
+              child: OiIcon.raw(
                 OiIcons.x,
                 size: 16,
                 color: colors.textMuted,
               ),
             ),
           ),
-        Icon(
+        OiIcon.raw(
           OiIcons.calendarDays,
           size: 18,
           color: colors.textMuted,

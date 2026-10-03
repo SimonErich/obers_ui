@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 
@@ -68,7 +66,7 @@ class _OiShimmerState extends State<OiShimmer>
       duration: widget.duration ?? const Duration(milliseconds: 1500),
     );
     if (widget.active) {
-      unawaited(_controller.repeat());
+      _controller.repeat();
     }
   }
 
@@ -94,7 +92,7 @@ class _OiShimmerState extends State<OiShimmer>
         MediaQuery.disableAnimationsOf(context);
     if (widget.active && !reduced) {
       if (!_controller.isAnimating) {
-        unawaited(_controller.repeat());
+        _controller.repeat();
       }
     } else {
       _controller.stop();

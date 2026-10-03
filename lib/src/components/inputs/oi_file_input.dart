@@ -4,6 +4,7 @@ import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/_internal/oi_input_frame.dart';
 import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
+import 'package:obers_ui/src/primitives/display/oi_icon.dart';
 import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
 
 /// A file-picker input that opens the platform file browser.
@@ -79,18 +80,23 @@ class _OiFileInputState extends State<OiFileInput> {
     if (!widget.enabled || _picking) return;
     setState(() => _picking = true);
     try {
-      final result = await FilePicker.pickFiles(
-        allowMultiple: widget.multipleFiles,
-        type: widget.allowedExtensions != null ? FileType.custom : FileType.any,
-        allowedExtensions: widget.allowedExtensions,
-      );
-      if (result != null) {
-        final paths = result.files.map((f) => f.name).toList();
-        if (widget.multipleFiles) {
-          _updateFiles([..._effectiveFiles, ...paths]);
-        } else {
-          _updateFiles(paths);
+      final type = widget.allowedExtensions != null
+          ? FileType.custom
+          : FileType.any;
+      if (widget.multipleFiles) {
+        final picked = await FilePicker.pickFiles(
+          type: type,
+          allowedExtensions: widget.allowedExtensions,
+        );
+        if (picked.isNotEmpty) {
+          _updateFiles([..._effectiveFiles, ...picked.map((f) => f.name)]);
         }
+      } else {
+        final picked = await FilePicker.pickFile(
+          type: type,
+          allowedExtensions: widget.allowedExtensions,
+        );
+        if (picked != null) _updateFiles([picked.name]);
       }
     } finally {
       if (mounted) setState(() => _picking = false);
@@ -125,7 +131,7 @@ class _OiFileInputState extends State<OiFileInput> {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
+          OiIcon.raw(
             OiIcons.file,
             size: 14,
             color: colors.textMuted,
@@ -144,7 +150,7 @@ class _OiFileInputState extends State<OiFileInput> {
             const SizedBox(width: 4),
             OiTappable(
               onTap: () => _removeFile(index),
-              child: Icon(
+              child: OiIcon.raw(
                 OiIcons.x,
                 size: 14,
                 color: colors.textMuted,
@@ -186,7 +192,7 @@ class _OiFileInputState extends State<OiFileInput> {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(
+                OiIcon.raw(
                   OiIcons.cloudUpload,
                   size: 16,
                   color: _isDragOver ? colors.primary.base : colors.textMuted,
@@ -242,7 +248,7 @@ class _OiFileInputState extends State<OiFileInput> {
                 ),
               )
             else
-              Icon(
+              OiIcon.raw(
                 OiIcons.upload,
                 size: 16,
                 color: colors.primary.base,

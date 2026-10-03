@@ -39,15 +39,15 @@ void main() {
   // ── REQ-0012: Name by what it _is_ in the UI ──────────────────────────────
 
   group('REQ-0012 – Widget classes named by what they are in the UI', () {
-    // Matches `class OiFoo extends Stateless/StatefulWidget`.
+    // Includes generic declarations such as `class OiFoo<T> extends ...`.
     final widgetClassPattern = RegExp(
-      r'class\s+(Oi\w+)\s+extends\s+State(?:ful|less)Widget',
+      r'class\s+(Oi\w+)(?:\s*<[^;{}]+>)?\s+extends\s+State(?:ful|less)Widget',
     );
 
     // Matches any public class that extends Stateless/StatefulWidget but does
     // NOT start with the Oi prefix.
     final nonOiWidgetPattern = RegExp(
-      r'class\s+([A-Z]\w+)\s+extends\s+State(?:ful|less)Widget',
+      r'class\s+([A-Z]\w+)(?:\s*<[^;{}]+>)?\s+extends\s+State(?:ful|less)Widget',
     );
 
     test('all public widgets use the Oi prefix', () {

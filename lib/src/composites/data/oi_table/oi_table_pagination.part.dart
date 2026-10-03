@@ -7,12 +7,14 @@ part of '../oi_table.dart';
 class _PaginationBar extends StatelessWidget {
   const _PaginationBar({
     required this.pagination,
+    this.labels = const OiTableLabels(),
     this.pageSizeOptions = const [10, 25, 50, 100],
     this.onPageSizeChanged,
     super.key,
   });
 
   final OiPaginationController pagination;
+  final OiTableLabels labels;
   final List<int> pageSizeOptions;
   final ValueChanged<int>? onPageSizeChanged;
 
@@ -24,7 +26,8 @@ class _PaginationBar extends StatelessWidget {
         return OiPagination(
           totalItems: pagination.totalItems,
           currentPage: pagination.currentPage,
-          label: 'rows',
+          label: labels.rows,
+          labels: labels.pagination,
           perPage: pagination.pageSize,
           perPageOptions: pageSizeOptions,
           onPageChange: pagination.goToPage,

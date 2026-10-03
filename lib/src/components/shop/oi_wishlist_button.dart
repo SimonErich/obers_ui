@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
+import 'package:obers_ui/src/primitives/display/oi_icon.dart';
 
 // Material Icons codepoints.
 const IconData _kHeartOutline = OiIcons.heart; // favorite_border
@@ -61,9 +62,9 @@ class _OiWishlistButtonState extends State<OiWishlistButton> {
       );
     } else if (_hovered) {
       // Outlined heart with active-colored stroke on hover.
-      content = Icon(_kHeartOutline, size: 24, color: activeColor);
+      content = OiIcon.raw(_kHeartOutline, size: 24, color: activeColor);
     } else {
-      content = Icon(_kHeartOutline, size: 24, color: inactiveColor);
+      content = OiIcon.raw(_kHeartOutline, size: 24, color: inactiveColor);
     }
 
     if (widget.loading) {

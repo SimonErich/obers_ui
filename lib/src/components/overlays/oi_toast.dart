@@ -355,7 +355,7 @@ class _OiToastState extends State<OiToast> with SingleTickerProviderStateMixin {
     _controller.duration = reduced ? Duration.zero : _animDuration;
     if (!_animationStarted) {
       _animationStarted = true;
-      unawaited(_controller.forward());
+      _controller.forward();
     }
   }
 

@@ -1,8 +1,8 @@
-import 'dart:async';
-
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/buttons/oi_button.dart';
 import 'package:obers_ui/src/components/inputs/oi_checkbox.dart';
+import 'package:obers_ui/src/foundation/oi_icons.dart';
+import 'package:obers_ui/src/foundation/theme/component_themes/oi_button_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/primitives/display/oi_surface.dart';
 
@@ -56,6 +56,69 @@ class OiBulkAction {
   final String? confirmLabel;
 }
 
+// ── Labels ────────────────────────────────────────────────────────────────────
+
+/// User-visible strings for [OiBulkBar].
+///
+/// Every field defaults to the English text [OiBulkBar] has always shown, so
+/// omitting this object changes nothing. Supply a localized instance to
+/// translate the bar — the app's own l10n system owns the translations, this
+/// package only accepts finished strings.
+///
+/// The count-bearing string is a callback rather than a format string so that
+/// a consumer can pluralize and order the words for its locale.
+///
+/// ```dart
+/// OiBulkBarLabels(
+///   selectAll: 'Alle auswählen',
+///   deselectAll: 'Auswahl aufheben',
+///   selectionCount: (selected, total, noun) =>
+///       '$selected von $total $noun ausgewählt',
+///   confirmAction: (action) => '$action bestätigen',
+///   bulkActions: (noun) => 'Massenaktionen für $noun',
+/// )
+/// ```
+///
+/// {@category Components}
+@immutable
+class OiBulkBarLabels {
+  /// Creates an [OiBulkBarLabels].
+  const OiBulkBarLabels({
+    this.selectAll = 'Select all',
+    this.deselectAll = 'Deselect all',
+    this.dismissSelection = 'Clear selection',
+    this.selectionCount,
+    this.confirmAction,
+    this.bulkActions,
+  });
+
+  /// Label of the select-all checkbox when not everything is selected.
+  final String selectAll;
+
+  /// Label of the select-all checkbox when everything is selected.
+  final String deselectAll;
+
+  /// Accessible label of the optional dismiss action.
+  final String dismissSelection;
+
+  /// Builds the selection-count sentence. Receives the selected count, the
+  /// total, and the item noun ([OiBulkBar.label]).
+  ///
+  /// Defaults to `'3 of 10 items selected'`.
+  final String Function(int selected, int total, String itemLabel)?
+  selectionCount;
+
+  /// Builds the confirmation label for a two-press action. Receives the
+  /// action's own label. Defaults to `'Confirm Delete'`.
+  ///
+  /// An [OiBulkAction.confirmLabel] set on the action itself wins over this.
+  final String Function(String actionLabel)? confirmAction;
+
+  /// Builds the bar's accessible label. Receives the item noun
+  /// ([OiBulkBar.label]). Defaults to `'items bulk actions'`.
+  final String Function(String itemLabel)? bulkActions;
+}
+
 /// A floating toolbar that appears when items are selected in a list or table.
 ///
 /// Slides in from the bottom when [selectedCount] >= 1. Displays the selection
@@ -97,6 +160,11 @@ class OiBulkBar extends StatefulWidget {
     this.onSelectAll,
     this.onDeselectAll,
     this.allSelected = false,
+    this.showSelectAll = true,
+    this.compact = false,
+    this.inverse = false,
+    this.onDismiss,
+    this.labels = const OiBulkBarLabels(),
     super.key,
   });
 
@@ -120,6 +188,21 @@ class OiBulkBar extends StatefulWidget {
 
   /// Whether all items are currently selected.
   final bool allSelected;
+
+  /// Whether to display the select-all checkbox.
+  final bool showSelectAll;
+
+  /// Uses a content-sized, wrapping row suited to a floating selection toolbar.
+  final bool compact;
+
+  /// Uses the theme's text and inverse-text colors for surface and foreground.
+  final bool inverse;
+
+  /// Optional action that clears/dismisses the current selection.
+  final VoidCallback? onDismiss;
+
+  /// User-visible strings. Defaults to English.
+  final OiBulkBarLabels labels;
 
   @override
   State<OiBulkBar> createState() => _OiBulkBarState();
@@ -168,9 +251,9 @@ class _OiBulkBarState extends State<OiBulkBar>
       _animationController.value = forward ? 1.0 : 0.0;
     } else {
       if (forward) {
-        unawaited(_animationController.forward());
+        _animationController.forward();
       } else {
-        unawaited(_animationController.reverse());
+        _animationController.reverse();
       }
     }
   }
@@ -194,7 +277,7 @@ class _OiBulkBarState extends State<OiBulkBar>
       fontSize: 12,
       fontWeight: FontWeight.w600,
       color: colors.text,
-    );
+    ).merge(context.components.bulkBar?.labelStyle);
   }
 
   Widget _buildCheckbox(BuildContext context) {
@@ -207,14 +290,21 @@ class _OiBulkBarState extends State<OiBulkBar>
           widget.onSelectAll?.call();
         }
       },
-      label: widget.allSelected ? 'Deselect all' : 'Select all',
+      label: widget.allSelected
+          ? widget.labels.deselectAll
+          : widget.labels.selectAll,
       labelStyle: _labelStyle(context),
     );
   }
 
   Widget _buildCountLabel(BuildContext context) {
     return Text(
-      '$_clampedCount of ${widget.totalCount} ${widget.label} selected',
+      widget.labels.selectionCount?.call(
+            _clampedCount,
+            widget.totalCount,
+            widget.label,
+          ) ??
+          '$_clampedCount of ${widget.totalCount} ${widget.label} selected',
       style: _labelStyle(context),
     );
   }
@@ -223,7 +313,10 @@ class _OiBulkBarState extends State<OiBulkBar>
     if (action.confirm) {
       return OiButton.confirm(
         label: action.label,
-        confirmLabel: action.confirmLabel ?? 'Confirm ${action.label}',
+        confirmLabel:
+            action.confirmLabel ??
+            widget.labels.confirmAction?.call(action.label) ??
+            'Confirm ${action.label}',
         onConfirm: action.onTap,
         variant: action.variant == OiBulkActionVariant.destructive
             ? OiButtonVariant.destructive
@@ -271,38 +364,115 @@ class _OiBulkBarState extends State<OiBulkBar>
 
   @override
   Widget build(BuildContext context) {
+    if (!widget.inverse &&
+        context.components.bulkBar?.actionStyle == null &&
+        context.components.bulkBar?.destructiveActionStyle == null) {
+      return _buildBar(context);
+    }
+    final colors = context.colors;
+    final button = context.components.button ?? const OiButtonThemeData();
+    return OiTheme(
+      data: context.theme.copyWith(
+        colors: widget.inverse
+            ? colors.copyWith(
+                surface: colors.text,
+                text: colors.textInverse,
+                textInverse: colors.text,
+                surfaceHover: colors.textInverse.withValues(alpha: 0.12),
+                surfaceActive: colors.textInverse.withValues(alpha: 0.2),
+                borderSubtle: colors.textInverse.withValues(alpha: 0.24),
+              )
+            : colors,
+        components: context.components.copyWith(
+          button: button.copyWith(
+            ghostStyle:
+                context.components.bulkBar?.actionStyle ??
+                (widget.inverse
+                    ? OiButtonVariantStyle(
+                        foreground: colors.textInverse,
+                        foregroundHover: colors.textInverse,
+                        foregroundPressed: colors.textInverse,
+                      )
+                    : button.ghostStyle),
+            destructiveStyle:
+                context.components.bulkBar?.destructiveActionStyle ??
+                button.destructiveStyle,
+          ),
+        ),
+      ),
+      child: Builder(builder: _buildBar),
+    );
+  }
+
+  Widget _buildDismiss() => OiButton.icon(
+    icon: OiIcons.x,
+    label: widget.labels.dismissSelection,
+    size: OiButtonSize.small,
+    onTap: widget.onDismiss,
+  );
+
+  Widget _buildBar(BuildContext context) {
     final spacing = context.spacing;
     final colors = context.colors;
     final shadows = context.shadows;
     return SlideTransition(
       position: _slideAnimation,
       child: Semantics(
-        label: '${widget.label} bulk actions',
+        label:
+            widget.labels.bulkActions?.call(widget.label) ??
+            '${widget.label} bulk actions',
         container: true,
         explicitChildNodes: true,
         child: OiSurface(
           color: colors.surface,
           shadow: shadows.lg,
-          borderRadius: context.radius.md,
-          padding: EdgeInsets.symmetric(
-            horizontal: spacing.md,
-            vertical: spacing.sm,
-          ),
+          borderRadius:
+              context.components.bulkBar?.borderRadius ?? context.radius.md,
+          padding:
+              context.components.bulkBar?.padding ??
+              EdgeInsets.symmetric(
+                horizontal: spacing.md,
+                vertical: spacing.sm,
+              ),
           child: LayoutBuilder(
             builder: (context, constraints) {
               // Use actual available width rather than viewport breakpoint,
               // since the bar may be inside a constrained parent.
               final narrow = constraints.maxWidth < 480;
 
+              if (widget.compact) {
+                return Wrap(
+                  spacing: spacing.sm,
+                  runSpacing: spacing.xs,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: [
+                    if (widget.showSelectAll) _buildCheckbox(context),
+                    _buildCountLabel(context),
+                    if (context.components.bulkBar?.compactSeparator ?? false)
+                      Container(
+                        width: 1,
+                        height: 20,
+                        color: colors.borderSubtle,
+                      ),
+                    for (final action in widget.actions)
+                      _buildActionButton(context, action),
+                    if (widget.onDismiss != null) _buildDismiss(),
+                  ],
+                );
+              }
+
               if (narrow) {
                 return Column(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _buildCheckbox(context),
-                    SizedBox(height: spacing.xs),
+                    if (widget.showSelectAll) ...[
+                      _buildCheckbox(context),
+                      SizedBox(height: spacing.xs),
+                    ],
                     _buildCountLabel(context),
-                    if (widget.actions.isNotEmpty) ...[
+                    if (widget.actions.isNotEmpty ||
+                        widget.onDismiss != null) ...[
                       Padding(
                         padding: EdgeInsets.symmetric(vertical: spacing.xs),
                         child: Container(
@@ -316,6 +486,7 @@ class _OiBulkBarState extends State<OiBulkBar>
                         children: [
                           for (final action in widget.actions)
                             _buildActionButton(context, action),
+                          if (widget.onDismiss != null) _buildDismiss(),
                         ],
                       ),
                     ],
@@ -325,8 +496,10 @@ class _OiBulkBarState extends State<OiBulkBar>
 
               return Row(
                 children: [
-                  _buildCheckbox(context),
-                  SizedBox(width: spacing.sm),
+                  if (widget.showSelectAll) ...[
+                    _buildCheckbox(context),
+                    SizedBox(width: spacing.sm),
+                  ],
                   Flexible(child: _buildCountLabel(context)),
                   if (widget.actions.isNotEmpty) ...[
                     SizedBox(width: spacing.md),
@@ -337,6 +510,10 @@ class _OiBulkBarState extends State<OiBulkBar>
                     ),
                     SizedBox(width: spacing.md),
                     Flexible(child: _buildActions(context)),
+                  ],
+                  if (widget.onDismiss != null) ...[
+                    SizedBox(width: spacing.sm),
+                    _buildDismiss(),
                   ],
                 ],
               );

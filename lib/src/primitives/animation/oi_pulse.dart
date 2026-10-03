@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 
@@ -17,7 +15,7 @@ import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 /// OiPulse(
 ///   active: isLoading,
 ///   minOpacity: 0.3,
-///   child: Icon(Icons.circle),
+///   child: OiIcon.raw(Icons.circle),
 /// )
 /// ```
 ///
@@ -78,7 +76,7 @@ class _OiPulseState extends State<OiPulse> with SingleTickerProviderStateMixin {
     );
     _buildAnimations();
     if (widget.active) {
-      unawaited(_controller.repeat(reverse: true));
+      _controller.repeat(reverse: true);
     }
   }
 
@@ -121,7 +119,7 @@ class _OiPulseState extends State<OiPulse> with SingleTickerProviderStateMixin {
         MediaQuery.disableAnimationsOf(context);
     if (widget.active && !reduced) {
       if (!_controller.isAnimating) {
-        unawaited(_controller.repeat(reverse: true));
+        _controller.repeat(reverse: true);
       }
     } else {
       _controller.stop();

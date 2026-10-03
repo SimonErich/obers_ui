@@ -10,6 +10,32 @@ import 'package:obers_ui/src/foundation/oi_icons.dart';
 import '../../../helpers/pump_app.dart';
 
 void main() {
+  testWidgets('default and custom avatars share one named menu trigger', (
+    tester,
+  ) async {
+    final semantics = tester.ensureSemantics();
+    for (final avatar in [
+      null,
+      const OiAvatar(semanticLabel: 'Marie Novak', initials: 'MN'),
+    ]) {
+      await tester.pumpObers(
+        OiUserMenu(
+          label: 'Marie Novak account menu',
+          userName: 'Marie Novak',
+          avatar: avatar,
+          avatarInitials: 'MN',
+          items: const [],
+        ),
+      );
+      expect(find.bySemanticsLabel('Marie Novak account menu'), findsOneWidget);
+      expect(
+        find.bySemanticsLabel(RegExp('Marie Novak.*Marie Novak', dotAll: true)),
+        findsNothing,
+      );
+    }
+    semantics.dispose();
+  });
+
   // ── Rendering ────────────────────────────────────────────────────────────
 
   testWidgets('renders avatar with initials when no imageUrl', (tester) async {
@@ -38,6 +64,32 @@ void main() {
   });
 
   // ── Popover interaction ──────────────────────────────────────────────────
+
+  testWidgets('custom avatar keeps menu trigger and actions', (tester) async {
+    var opened = false;
+    await tester.pumpObers(
+      Center(
+        child: OiUserMenu(
+          label: 'User menu',
+          userName: 'Marie Novak',
+          avatar: const OiAvatar(
+            semanticLabel: 'Marie Novak',
+            initials: 'MN',
+            size: OiAvatarSize.sm,
+            backgroundColor: Color(0xFFE5F5FA),
+          ),
+          items: [OiMenuItem(label: 'Profile', onTap: () => opened = true)],
+        ),
+      ),
+    );
+    expect(tester.getSize(find.byType(OiAvatar)), const Size(32, 32));
+    await tester.tap(find.byType(OiAvatar));
+    await tester.pumpAndSettle();
+    expect(find.text('Marie Novak'), findsOneWidget);
+    await tester.tap(find.text('Profile'));
+    await tester.pumpAndSettle();
+    expect(opened, isTrue);
+  });
 
   testWidgets('tapping avatar opens popover', (tester) async {
     await tester.pumpObers(

@@ -101,7 +101,7 @@ class _MenuItemRowState extends State<_MenuItemRow>
 
     if (item.icon != null) {
       children
-        ..add(OiIcon.decorative(icon: item.icon!, size: 14, color: textColor))
+        ..add(OiIcon.decorative(icon: item.icon, size: 14, color: textColor))
         ..add(SizedBox(width: spacing.sm));
     }
 

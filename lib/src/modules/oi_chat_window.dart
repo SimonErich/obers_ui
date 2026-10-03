@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/buttons/oi_button.dart';
@@ -11,11 +9,12 @@ import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_color_scheme.dart';
 import 'package:obers_ui/src/foundation/theme/oi_radius_scale.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
+import 'package:obers_ui/src/primitives/display/oi_icon.dart';
 import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
 
-part 'oi_chat_window/oi_chat_window_widgets.part.dart';
 part 'oi_chat_window/oi_chat_window_input.part.dart';
 part 'oi_chat_window/oi_chat_window_messages.part.dart';
+part 'oi_chat_window/oi_chat_window_widgets.part.dart';
 
 // ---------------------------------------------------------------------------
 // Data classes
@@ -292,12 +291,10 @@ class _OiChatWindowState extends State<OiChatWindow> {
   void _scrollToBottom() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_scrollController.hasClients) {
-        unawaited(
-          _scrollController.animateTo(
-            0,
-            duration: const Duration(milliseconds: 200),
-            curve: Curves.easeOut,
-          ),
+        _scrollController.animateTo(
+          0,
+          duration: const Duration(milliseconds: 200),
+          curve: Curves.easeOut,
         );
       }
     });

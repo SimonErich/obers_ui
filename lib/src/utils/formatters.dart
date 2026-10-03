@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 
 /// Utility class for formatting values for display.
@@ -158,12 +161,24 @@ class OiFormatters {
     return '$y ${y == 1 ? 'year' : 'years'} $suffix';
   }
 
-  /// Formats a [DateTime] with a pattern.
+  static bool _dateSymbolsReady = false;
+
+  /// Formats a [DateTime] with an intl [pattern] and optional [locale].
   ///
-  /// Uses the `intl` package's [DateFormat] patterns.
-  /// [pattern] defaults to `'yyyy-MM-dd'`.
-  static String dateTime(DateTime dateTime, {String pattern = 'yyyy-MM-dd'}) {
-    final formatter = DateFormat(pattern);
+  /// Bundled locale data is initialized automatically. [pattern] defaults to
+  /// `'yyyy-MM-dd'`; null [locale] preserves intl's default locale.
+  static String dateTime(
+    DateTime dateTime, {
+    String pattern = 'yyyy-MM-dd',
+    String? locale,
+  }) {
+    if (!_dateSymbolsReady) {
+      // The local loader installs all bundled symbols synchronously; its future
+      // is only an API compatibility wrapper. No network or startup step is needed.
+      unawaited(initializeDateFormatting());
+      _dateSymbolsReady = true;
+    }
+    final formatter = DateFormat(pattern, locale);
     return formatter.format(dateTime);
   }
 

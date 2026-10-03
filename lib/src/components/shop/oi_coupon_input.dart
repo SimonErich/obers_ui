@@ -213,7 +213,8 @@ class _OiCouponInputState extends State<OiCouponInput> {
   @override
   Widget build(BuildContext context) {
     return Semantics(
-      label: widget.label,
+      // The editable input supplies its own accessible label.
+      label: widget.appliedCode == null ? null : widget.label,
       child: widget.appliedCode != null
           ? _buildAppliedMode(context)
           : _buildInputMode(context),

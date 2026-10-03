@@ -3,7 +3,10 @@ import 'package:obers_ui/obers_ui.dart' show OiWizard;
 import 'package:obers_ui/src/composites/forms/oi_wizard.dart' show OiWizard;
 import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_color_scheme.dart';
+import 'package:obers_ui/src/foundation/theme/oi_text_theme.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
+import 'package:obers_ui/src/primitives/display/oi_icon.dart';
+import 'package:obers_ui/src/primitives/display/oi_label.dart';
 
 /// The style of the stepper.
 ///
@@ -40,13 +43,19 @@ class OiStepper extends StatelessWidget {
     required this.currentStep,
     super.key,
     this.stepLabels,
+    this.stepDetails,
+    this.labelStyle,
+    this.timeline = false,
+    this.completedColor,
+    this.currentOutlined = false,
+    this.indicatorSize = 28,
     this.stepIcons,
     this.style = OiStepperStyle.horizontal,
     this.onStepTap,
     this.completedSteps = const {},
     this.errorSteps = const {},
     this.enabledSteps,
-  });
+  }) : assert(indicatorSize > 0, 'indicatorSize must be greater than zero.');
 
   /// The total number of steps in the process.
   final int totalSteps;
@@ -57,6 +66,26 @@ class OiStepper extends StatelessWidget {
   /// Optional labels displayed below (horizontal) or beside (vertical)
   /// each step indicator. Must have [totalSteps] entries when provided.
   final List<String>? stepLabels;
+
+  /// Optional record details under each label. Horizontal steps share the
+  /// available width and align their indicators above the details.
+  final List<Widget>? stepDetails;
+
+  /// Typography for milestone labels, inherited from the active theme.
+  final TextStyle? labelStyle;
+
+  /// Connects vertical detailed items beside their intrinsic content height.
+  /// Horizontal and compact layouts retain their ordinary presentation.
+  final bool timeline;
+
+  /// Overrides the completed indicator and connector color.
+  final Color? completedColor;
+
+  /// Draws the current indicator as an outlined circle instead of a solid fill.
+  final bool currentOutlined;
+
+  /// Diameter of each indicator, independent of the text scale.
+  final double indicatorSize;
 
   /// Optional icons displayed inside each step circle.
   /// Must have [totalSteps] entries when provided.
@@ -106,6 +135,13 @@ class OiStepper extends StatelessWidget {
       icon: stepIcons != null && index < stepIcons!.length
           ? stepIcons![index]
           : null,
+      completedColor: completedColor,
+      currentOutlined: currentOutlined,
+      size: indicatorSize,
+      borderColor: context.components.stepper?.indicatorBorderColor,
+      borderWidth:
+          context.components.stepper?.indicatorBorderWidth ??
+          (timeline && style == OiStepperStyle.vertical ? 1 : 2),
       onTap: _isStepEnabled(index) ? () => onStepTap!(index) : null,
     );
   }
@@ -114,7 +150,9 @@ class OiStepper extends StatelessWidget {
   Widget _buildConnector(BuildContext context, int beforeIndex) {
     final colors = context.colors;
     final isCompleted = completedSteps.contains(beforeIndex);
-    final lineColor = isCompleted ? colors.success.base : colors.borderSubtle;
+    final lineColor = isCompleted
+        ? completedColor ?? colors.success.base
+        : context.components.stepper?.connectorColor ?? colors.borderSubtle;
 
     if (style == OiStepperStyle.horizontal) {
       return Expanded(child: Container(height: 2, color: lineColor));
@@ -127,7 +165,9 @@ class OiStepper extends StatelessWidget {
   Widget _buildCompact(BuildContext context) {
     final colors = context.colors;
     return Semantics(
-      label: 'Step ${currentStep + 1} of $totalSteps',
+      label: currentStep < 0
+          ? '$totalSteps planned steps'
+          : 'Step ${currentStep + 1} of $totalSteps',
       child: Text(
         'Step ${currentStep + 1} of $totalSteps',
         style: TextStyle(
@@ -141,6 +181,7 @@ class OiStepper extends StatelessWidget {
 
   /// Builds the horizontal layout.
   Widget _buildHorizontal(BuildContext context) {
+    if (stepDetails != null) return _buildDetailedHorizontal(context);
     final children = <Widget>[];
 
     for (var i = 0; i < totalSteps; i++) {
@@ -177,8 +218,54 @@ class OiStepper extends StatelessWidget {
     return Row(mainAxisSize: MainAxisSize.min, children: children);
   }
 
+  Widget _buildDetailedHorizontal(BuildContext context) => Row(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      for (var i = 0; i < totalSteps; i++)
+        Expanded(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  _buildStep(context, i),
+                  if (i < totalSteps - 1) ...[
+                    const SizedBox(width: 8),
+                    _buildConnector(context, i),
+                    const SizedBox(width: 8),
+                  ],
+                ],
+              ),
+              const SizedBox(height: 8),
+              if (stepLabels != null && i < stepLabels!.length)
+                Padding(
+                  padding: const EdgeInsets.only(right: 8),
+                  child: OiLabel.body(
+                    stepLabels![i],
+                    style: TextStyle(
+                      fontWeight: i <= currentStep
+                          ? FontWeight.w500
+                          : FontWeight.w400,
+                    ),
+                  ),
+                ),
+              if (i < stepDetails!.length)
+                Padding(
+                  padding: const EdgeInsets.only(right: 8),
+                  child: stepDetails![i],
+                ),
+            ],
+          ),
+        ),
+    ],
+  );
+
   /// Builds the vertical layout.
   Widget _buildVertical(BuildContext context) {
+    if (timeline && stepDetails != null) {
+      return _buildTimeline(context);
+    }
     final children = <Widget>[];
 
     for (var i = 0; i < totalSteps; i++) {
@@ -197,16 +284,36 @@ class OiStepper extends StatelessWidget {
         children.add(
           Row(
             mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: stepDetails == null
+                ? CrossAxisAlignment.center
+                : CrossAxisAlignment.start,
             children: [
               step,
-              const SizedBox(width: 8),
-              Text(
-                stepLabels![i],
-                style: TextStyle(
-                  fontSize: 13,
-                  color: i == currentStep
-                      ? context.colors.text
-                      : context.colors.textMuted,
+              SizedBox(width: stepDetails == null ? 8 : 12),
+              Flexible(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (stepDetails == null)
+                      Text(
+                        stepLabels![i],
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: i == currentStep
+                              ? context.colors.text
+                              : context.colors.textMuted,
+                        ),
+                      )
+                    else
+                      OiLabel.variant(
+                        stepLabels![i],
+                        variant: OiLabelVariant.body,
+                        style: labelStyle,
+                      ),
+                    if (stepDetails != null && i < stepDetails!.length)
+                      stepDetails![i],
+                  ],
                 ),
               ),
             ],
@@ -224,6 +331,78 @@ class OiStepper extends StatelessWidget {
     );
   }
 
+  Widget _buildTimeline(BuildContext context) {
+    final appearance = context.components.stepper;
+    final spacing = appearance?.stepSpacing ?? 20;
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        for (var i = 0; i < totalSteps; i++)
+          ConstrainedBox(
+            constraints: BoxConstraints(
+              minHeight: i < totalSteps - 1
+                  ? indicatorSize + 32
+                  : indicatorSize,
+            ),
+            child: IntrinsicHeight(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  SizedBox(
+                    width: indicatorSize,
+                    child: Column(
+                      children: [
+                        _buildStep(context, i),
+                        if (i < totalSteps - 1) ...[
+                          const SizedBox(height: 4),
+                          Expanded(
+                            child: Container(
+                              width: 2,
+                              constraints: const BoxConstraints(minHeight: 24),
+                              decoration: BoxDecoration(
+                                color: completedSteps.contains(i)
+                                    ? completedColor ??
+                                          context.colors.success.base
+                                    : appearance?.connectorColor ??
+                                          context.colors.border,
+                                borderRadius: BorderRadius.circular(1),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                        ],
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Padding(
+                      padding: EdgeInsets.only(
+                        bottom: i < totalSteps - 1 ? spacing : 0,
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (stepLabels != null && i < stepLabels!.length)
+                            OiLabel.body(stepLabels![i], style: labelStyle),
+                          if (i < stepDetails!.length) ...[
+                            SizedBox(height: appearance?.detailsSpacing ?? 2),
+                            stepDetails![i],
+                          ],
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     Widget content;
@@ -238,7 +417,9 @@ class OiStepper extends StatelessWidget {
     }
 
     return Semantics(
-      label: 'Step ${currentStep + 1} of $totalSteps',
+      label: currentStep < 0
+          ? '$totalSteps planned steps'
+          : 'Step ${currentStep + 1} of $totalSteps',
       child: content,
     );
   }
@@ -259,6 +440,11 @@ class _OiStepCircle extends StatefulWidget {
     required this.disabled,
     this.icon,
     this.onTap,
+    this.completedColor,
+    this.currentOutlined = false,
+    this.size = 28,
+    this.borderColor,
+    this.borderWidth = 2,
   });
 
   final int index;
@@ -269,6 +455,11 @@ class _OiStepCircle extends StatefulWidget {
   final bool disabled;
   final IconData? icon;
   final VoidCallback? onTap;
+  final Color? completedColor;
+  final bool currentOutlined;
+  final double size;
+  final Color? borderColor;
+  final double borderWidth;
 
   @override
   State<_OiStepCircle> createState() => _OiStepCircleState();
@@ -279,28 +470,34 @@ class _OiStepCircleState extends State<_OiStepCircle> {
 
   static const IconData _checkIcon = OiIcons.check;
   static const IconData _errorIcon = OiIcons.circleAlert;
-  static const _circleSize = 28.0;
-
   Color _borderColor(OiColorScheme colors) {
     if (widget.disabled) return colors.borderSubtle;
     if (widget.errored) return colors.error.base;
-    if (widget.completed) return colors.success.base;
+    if (widget.completed) return widget.completedColor ?? colors.success.base;
     if (_hovered) return colors.primary.base;
     if (widget.current) return colors.primary.base;
-    return colors.borderSubtle;
+    return widget.borderColor ?? colors.borderSubtle;
   }
 
   Color _fillColor(OiColorScheme colors) {
     if (widget.disabled) return colors.surface;
     if (widget.errored) return colors.error.base;
-    if (widget.completed) return colors.success.base;
-    if (widget.current) return colors.primary.base;
+    if (widget.completed) return widget.completedColor ?? colors.success.base;
+    if (widget.current) {
+      return widget.currentOutlined ? colors.surface : colors.primary.base;
+    }
     if (_hovered) return colors.primary.base.withValues(alpha: 0.2);
     return colors.surface;
   }
 
   Color _contentColor(OiColorScheme colors) {
     if (widget.disabled) return colors.textMuted;
+    if (widget.current &&
+        widget.currentOutlined &&
+        !widget.completed &&
+        !widget.errored) {
+      return colors.primary.base;
+    }
     if (widget.errored || widget.completed || widget.current) {
       return colors.textOnPrimary;
     }
@@ -311,13 +508,13 @@ class _OiStepCircleState extends State<_OiStepCircle> {
   Widget? _buildIcon(OiColorScheme colors) {
     final color = _contentColor(colors);
     if (widget.errored) {
-      return Icon(_errorIcon, size: 14, color: color);
+      return OiIcon.raw(_errorIcon, size: 14, color: color);
     }
     if (widget.completed) {
-      return Icon(_checkIcon, size: 14, color: color);
+      return OiIcon.raw(_checkIcon, size: 14, color: color);
     }
     if (widget.icon != null) {
-      return Icon(widget.icon, size: 14, color: color);
+      return OiIcon.raw(widget.icon, size: 14, color: color);
     }
     return null;
   }
@@ -329,12 +526,17 @@ class _OiStepCircleState extends State<_OiStepCircle> {
 
     Widget circle = AnimatedContainer(
       duration: const Duration(milliseconds: 150),
-      width: _circleSize,
-      height: _circleSize,
+      width: widget.size,
+      height: widget.size,
       decoration: BoxDecoration(
         color: _fillColor(colors),
         shape: BoxShape.circle,
-        border: Border.all(color: _borderColor(colors), width: 2),
+        border: Border.all(
+          color: _borderColor(colors),
+          width: widget.current || widget.completed || widget.errored
+              ? 2
+              : widget.borderWidth,
+        ),
       ),
       child: Center(
         child:

@@ -22,7 +22,7 @@ class _OiTableLoadingBarState extends State<_OiTableLoadingBar>
       vsync: this,
       duration: const Duration(milliseconds: 1500),
     );
-    unawaited(_ctrl.repeat());
+    _ctrl.repeat();
   }
 
   @override
@@ -39,7 +39,7 @@ class _OiTableLoadingBarState extends State<_OiTableLoadingBar>
         ..stop()
         ..value = 0;
     } else if (!reduced && !_ctrl.isAnimating) {
-      unawaited(_ctrl.repeat());
+      _ctrl.repeat();
     }
   }
 
@@ -123,7 +123,7 @@ class _OiTableSpinnerState extends State<_OiTableSpinner>
       vsync: this,
       duration: const Duration(milliseconds: 800),
     );
-    unawaited(_ctrl.repeat());
+    _ctrl.repeat();
   }
 
   @override
@@ -140,7 +140,7 @@ class _OiTableSpinnerState extends State<_OiTableSpinner>
         ..stop()
         ..value = 0;
     } else if (!reduced && !_ctrl.isAnimating) {
-      unawaited(_ctrl.repeat());
+      _ctrl.repeat();
     }
   }
 
