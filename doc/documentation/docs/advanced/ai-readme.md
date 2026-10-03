@@ -1,57 +1,40 @@
 # AI Integration Guide
 
-ObersUI ships with an **AI-optimized reference document** (`AI_README.md`) designed to enable coding AIs to implement ObersUI into applications fully automatically.
+If you use an AI coding assistant (Claude, Copilot, Cursor, and the like) to build
+with ObersUI, point it at the single-file reference that ships with the library:
+[`AI_README.md`](https://github.com/simonerich/obers_ui/blob/main/AI_README.md) at
+the repo root.
 
-## What is AI_README.md?
+## What it is
 
-`AI_README.md` is a comprehensive markdown file at the project root that documents:
+`AI_README.md` is one long, structured document written for machines to read. It
+lists every widget with its parameters, tags, tier, and usage rules, plus a
+decision matrix, best practices, and anti-patterns. It is the same source of truth
+these docs are built from, in a format an assistant can load in one shot.
 
-- **Every single widget** in the library with parameters, usage patterns, and tags
-- **Theme system** with complete token reference
-- **Decision matrix** — "I need X → use Y" lookup table
-- **Best practices and anti-patterns** — what to do and what to avoid
-- **Searchable tags index** — keyword → widget mapping for quick lookup
-- **Planned widgets** — what's coming but not yet available
+## How to use it
 
-## Where to Find It
+Add it to your assistant's context. A few common ways:
 
-The file lives at the project root:
+- Drop the file into the chat or project context directly.
+- Reference it from a rules file (for example a `CLAUDE.md`, `.cursorrules`, or
+  similar) so the assistant reads it on every session.
+- Paste the relevant section when you ask for a specific widget.
 
-```text
-obers_ui/
-├── AI_README.md    ← This file
-├── lib/
-└── ...
-```
+## The rules it enforces
 
-## How to Use It
+The reference tells an assistant to:
 
-Pass `AI_README.md` as context to any coding AI (Claude, GPT, Copilot, etc.) along with your design requirements:
+- Prefer an existing ObersUI widget over hand-rolled UI.
+- Use the highest tier that fits (modules over composites over components over primitives).
+- Never use Material or Cupertino widgets. Use `OiApp`, not `MaterialApp`.
+- Read all colors and spacing from the theme, never hardcode them.
+- Use `OiLabel` for text and `OiRow` / `OiColumn` / `OiGrid` for layout.
+- Give every interactive widget a `label` or `semanticLabel`.
 
-```text
-"Here is the ObersUI reference: [AI_README.md contents]
+## Keeping it current
 
-Build this design: [your design description]"
-```
-
-The AI will automatically:
-
-1. Select the best available widgets for each part of the design
-2. Use the correct constructors and parameters
-3. Follow ObersUI conventions (no Material widgets, theme-driven colors, etc.)
-4. Compose higher-tier widgets where appropriate (modules > composites > components)
-
-## Maintenance
-
-`AI_README.md` must be kept in sync with the codebase. When you:
-
-- **Add a widget** — add its entry to the catalog and tags index
-- **Modify a widget** — update its parameters and description
-- **Remove a widget** — remove its entry and update the tags index
-- **Implement a planned widget** — move it from "Planned" to the main catalog
-
-This file is the AI's single source of truth. If it's out of date, the AI will generate incorrect code.
-
-## Claude Code Skill
-
-If you use [Claude Code](https://claude.com/claude-code), you can invoke the `/obers-ui` skill to get widget recommendations based on a design description. The skill reads `AI_README.md` and provides guidance on which widgets to use.
+`AI_README.md` is kept in sync with the codebase. When widgets are added, changed,
+or removed, the reference and these docs are updated together. If you fork the
+library, regenerate or edit the reference so your assistant does not suggest
+widgets that no longer exist.

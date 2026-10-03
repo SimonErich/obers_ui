@@ -1,5 +1,5 @@
 site_name: ObersUI
-site_description: "The creamiest Flutter UI kit — 100+ accessible, themeable, responsive components."
+site_description: "A Flutter UI kit with 250+ accessible, themeable, responsive widgets and 30+ charts."
 site_url: https://simonerich.github.io/obers_ui/
 repo_url: https://github.com/simonerich/obers_ui
 repo_name: simonerich/obers_ui
@@ -79,42 +79,90 @@ nav:
   - Getting Started:
       - getting-started/index.md
       - Installation: getting-started/installation.md
-      - Quick Start: getting-started/quick-start.md
-      - Project Structure: getting-started/project-structure.md
+      - Your First App: getting-started/quick-start.md
+      - Core Ideas: getting-started/core-ideas.md
+      - Structuring Your App: getting-started/project-structure.md
   - Core Concepts:
       - core-concepts/index.md
-      - Component Tiers: core-concepts/component-tiers.md
+      - The Four Tiers: core-concepts/component-tiers.md
       - Theming: core-concepts/theming.md
       - Responsive Design: core-concepts/responsive.md
+      - Density: core-concepts/density.md
       - Accessibility: core-concepts/accessibility.md
       - Icons: core-concepts/icons.md
-      - Density: core-concepts/density.md
-  - Components:
-      - components/index.md
-      - Primitives: components/primitives.md
-      - Components: components/components.md
-      - Composites: components/composites.md
-      - Modules: components/modules.md
+      - Overlays & Z-Order: core-concepts/overlays.md
+      - Navigation & Routing: core-concepts/navigation-and-routing.md
+      - State, Undo & Persistence: core-concepts/state-and-persistence.md
   - Theming:
       - theming/index.md
       - Quick Brand Setup: theming/quick-brand.md
       - Color System: theming/color-system.md
       - Typography: theming/typography.md
-      - Tokens: theming/tokens.md
+      - Design Tokens: theming/tokens.md
       - Component Themes: theming/component-themes.md
       - Dark Mode: theming/dark-mode.md
+      - Extending Themes: theming/extending-themes.md
+      - Theme Tools: theming/theme-tools.md
   - Layout:
       - layout/index.md
+      - Rows & Columns: layout/flex.md
       - Grid System: layout/grid.md
       - Page & Section: layout/page-and-section.md
-      - Flex Layouts: layout/flex.md
-  - Settings:
-      - settings/index.md
+      - Panels & App Shells: layout/panels-and-shells.md
+  - Widgets:
+      - widgets/index.md
+      - Input & Forms:
+          - Buttons & Actions: widgets/buttons.md
+          - Text & Number Inputs: widgets/text-inputs.md
+          - Selection Controls: widgets/selection-controls.md
+          - Date & Time Pickers: widgets/date-time.md
+          - Forms & Wizards: widgets/forms.md
+          - Inline Editing: widgets/inline-edit.md
+          - Search & Command: widgets/search-command.md
+      - Content & Feedback:
+          - Display & Content: widgets/display.md
+          - Feedback & Status: widgets/feedback.md
+          - Overlays & Menus: widgets/overlays.md
+          - Editors, Code & Markdown: widgets/editors.md
+      - Data & Navigation:
+          - Data & Tables: widgets/data-tables.md
+          - Navigation: widgets/navigation.md
+          - Scrolling & Virtualization: widgets/scroll.md
+      - Rich Features:
+          - Media: widgets/media.md
+          - Scheduling & Calendars: widgets/scheduling.md
+          - Files & File Management: widgets/files.md
+          - Commerce & Shop: widgets/commerce.md
+          - Social & Presence: widgets/social.md
+          - Workflow & Diagrams: widgets/workflow-diagrams.md
+          - Onboarding & Tours: widgets/onboarding.md
+      - Interaction & Motion:
+          - Gestures & Interaction: widgets/gestures.md
+          - Animation & Motion: widgets/animation.md
+  - Charts:
+      - charts/index.md
+      - Line, Area & Bar: charts/cartesian.md
+      - Distribution & Financial: charts/distribution.md
+      - Pie, Donut & Hierarchy: charts/part-to-whole.md
+      - Radar, Gauge, Heatmap & Flow: charts/specialized.md
+  - Modules:
+      - modules/index.md
+      - App Shell & Navigation: modules/app-shell.md
+      - Dashboards, Lists & Boards: modules/data-views.md
+      - File Management: modules/files.md
+      - Chat, Comments & Notifications: modules/communication.md
+      - Accounts & Settings: modules/account.md
+      - Commerce Screens: modules/commerce.md
+      - Support & System Pages: modules/support-and-system.md
   - Advanced:
       - advanced/index.md
-      - Custom Modules: advanced/custom-modules.md
-      - Extending Themes: advanced/extending-themes.md
-      - Performance: advanced/performance.md
+      - Composing Custom Modules: advanced/custom-modules.md
       - AutoForms: advanced/autoforms.md
+      - Data Scales: advanced/data-scales.md
+      - Custom Persistence Drivers: advanced/persistence-drivers.md
+      - Performance: advanced/performance.md
+      - Developer Tools: advanced/developer-tools.md
       - Contributing: advanced/contributing.md
       - AI Integration Guide: advanced/ai-readme.md
+  - Reference:
+      - Widget Index: reference/widget-index.md

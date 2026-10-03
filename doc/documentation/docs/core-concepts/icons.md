@@ -1,170 +1,173 @@
 # Icons
 
-ObersUI ships with [Lucide](https://lucide.dev) v0.577.0 — a comprehensive open-source icon set with **1,951 icons** embedded as a font. Zero external dependencies, zero network requests.
+ObersUI ships with [Lucide](https://lucide.dev) v0.577.0, an open-source icon set
+of 1,950+ glyphs embedded as a font. There are no external dependencies and no
+network requests. You reach for icons through two things: the `OiIcons` class,
+which holds every glyph as a named constant, and the `OiIcon` widget, which draws
+one on screen.
 
-## Quick Start
+| Piece | What it does |
+| --- | --- |
+| `OiIcons` | A static class of 1,950+ `IconData` constants. You never draw it, you pick from it. |
+| `OiIcon` | The widget that renders a glyph with the right size, color, and accessibility semantics. |
+
+## OiIcons
+
+`OiIcons` is a static class. Every icon is a `static const` field on it, so you
+reference glyphs by name and let the compiler catch typos.
 
 ```dart
-import 'package:obers_ui/obers_ui.dart';
-
-// Semantic icon (requires accessibility label)
 OiIcon(icon: OiIcons.search, label: 'Search')
-
-// Decorative icon (excluded from accessibility tree)
-OiIcon.decorative(icon: OiIcons.chevronRight)
-
-// Icon button
-OiIconButton(icon: OiIcons.settings, semanticLabel: 'Settings', onTap: () {})
 ```
 
-## OiIcons Reference
-
-All icons are accessed as static constants on the `OiIcons` class. Names use **camelCase** converted from Lucide's kebab-case naming.
+Names use camelCase, converted from Lucide's kebab-case. Numbers in a Lucide name
+stay in the constant.
 
 ```dart
 OiIcons.chevronLeft   // chevron-left
 OiIcons.arrowRight    // arrow-right
 OiIcons.fileText      // file-text
 OiIcons.circleCheck   // circle-check
+OiIcons.trash2        // trash-2
 ```
 
-Browse the full catalog at [lucide.dev/icons](https://lucide.dev/icons).
+There are too many icons to list here. Browse the full catalog at
+[lucide.dev/icons](https://lucide.dev/icons), find the name you want, and convert
+it to camelCase.
 
-### Arrows & Navigation
+!!! warning "Always use OiIcons.xxx, never Material Icons.xxx"
+    ObersUI has zero Material dependency. Material's `Icons.xxx` glyphs are not
+    available and will not render. Every icon you use comes from `OiIcons`. This
+    is the single most common icon mistake, so check your imports.
 
-| Icon | Constant |
-| ------ | ---------- |
-| Chevrons | `chevronLeft`, `chevronRight`, `chevronUp`, `chevronDown` |
-| Double chevrons | `chevronsLeft`, `chevronsRight`, `chevronsUp`, `chevronsDown`, `chevronsUpDown` |
-| Arrows | `arrowLeft`, `arrowRight`, `arrowUp`, `arrowDown`, `arrowUpLeft`, `arrowUpRight`, `arrowDownLeft`, `arrowDownRight` |
-| Undo/Redo | `undo2`, `redo2` |
-| Trends | `trendingUp`, `trendingDown` |
-| External | `externalLink`, `logIn`, `logOut` |
-| Download/Upload | `download`, `upload` |
+### Categories
 
-### Actions
+The constants are grouped by purpose. These are a few from each group to give you
+a feel for the naming. The full set is far larger.
 
-| Icon | Constant |
-| ------ | ---------- |
-| Add/Remove | `plus`, `minus`, `x`, `check` |
-| Circle variants | `circlePlus`, `circleMinus`, `circleX`, `circleCheck` |
-| Edit | `pencil`, `squarePen`, `eraser` |
-| Search | `search`, `zoomIn`, `zoomOut` |
-| Clipboard | `copy`, `clipboard`, `clipboardList`, `clipboardCheck` |
-| Misc | `trash2`, `share2`, `send`, `link`, `scissors`, `power` |
+| Category | A few constants |
+| --- | --- |
+| Arrows and navigation | `chevronLeft`, `chevronRight`, `arrowUp`, `arrowDown`, `externalLink`, `undo2`, `redo2` |
+| Actions | `plus`, `minus`, `x`, `check`, `search`, `download`, `upload`, `copy`, `trash2`, `squarePen` |
+| Files and folders | `file`, `fileText`, `filePlus`, `folder`, `folderOpen`, `archive`, `clipboardList` |
+| Media and communication | `image`, `video`, `music`, `play`, `mail`, `messageSquare`, `phone`, `bell` |
+| Users and people | `user`, `users`, `userPlus`, `circleUser` |
+| Status and feedback | `circleCheck`, `circleAlert`, `triangleAlert`, `info`, `circleHelp`, `ban` |
+| Layout and display | `menu`, `layoutGrid`, `columns3`, `table`, `list`, `slidersHorizontal`, `ellipsis` |
+| Data and charts | `barChart3`, `pieChart`, `trendingUp`, `trendingDown`, `presentation` |
+| Devices and hardware | `monitor`, `server`, `database`, `cpu`, `hardDrive` |
+| Appearance | `sun`, `moon`, `eye`, `eyeOff`, `sparkles`, `palette` |
+| Objects and symbols | `star`, `heart`, `house`, `mapPin`, `shoppingCart`, `creditCard`, `tag`, `rocket`, `zap` |
 
-### Files & Folders
+## OiIcon
 
-| Icon | Constant |
-| ------ | ---------- |
-| Files | `file`, `fileText`, `filePlus`, `fileMinus`, `fileCheck`, `fileSearch`, `fileUp`, `fileDown` |
-| Folders | `folder`, `folderOpen`, `folderPlus`, `folderMinus` |
-| Archive | `archive`, `archiveRestore`, `archiveX` |
-| Storage | `database`, `server`, `layers`, `hardDrive` |
-
-### Media & Communication
-
-| Icon | Constant |
-| ------ | ---------- |
-| Images | `image`, `camera` |
-| Video/Audio | `video`, `videoOff`, `music`, `play`, `circlePlay`, `pause`, `volume2`, `volumeX` |
-| Messages | `mail`, `mailOpen`, `messageSquare`, `messagesSquare`, `messageCircle` |
-| Notifications | `bell`, `bellRing`, `bellOff` |
-| Contact | `phone`, `send`, `paperclip`, `atSign` |
-
-### Users & People
-
-| Icon | Constant |
-| ------ | ---------- |
-| Single | `user`, `circleUser`, `userPlus`, `userMinus`, `userCheck`, `userX` |
-| Group | `users` |
-| Reactions | `thumbsUp`, `thumbsDown`, `hand` |
-
-### Status & Feedback
-
-| Icon | Constant |
-| ------ | ---------- |
-| Success | `circleCheck`, `badgeCheck`, `shieldCheck` |
-| Warning | `circleAlert`, `triangleAlert` |
-| Info | `info`, `circleHelp` |
-| Error | `circleX`, `ban` |
-
-### Layout & Display
-
-| Icon | Constant |
-| ------ | ---------- |
-| Menu | `menu`, `alignJustify`, `alignLeft` |
-| Grid | `layoutGrid`, `columns3`, `table`, `list` |
-| Settings | `slidersHorizontal`, `slidersVertical`, `settings` |
-| Overflow | `ellipsis`, `ellipsisVertical` |
-
-### Data & Charts
-
-| Icon | Constant |
-| ------ | ---------- |
-| Charts | `barChart3`, `pieChart`, `trendingUp`, `trendingDown` |
-| Presentation | `presentation` |
-
-### Appearance
-
-| Icon | Constant |
-| ------ | ---------- |
-| Theme | `sun`, `moon`, `monitor` |
-| Visibility | `eye`, `eyeOff` |
-| Design | `sparkles`, `paintbrush`, `palette`, `pipette` |
-
-### Objects & Symbols
-
-| Icon | Constant |
-| ------ | ---------- |
-| Places | `house`, `mapPin`, `globe`, `flag` |
-| Commerce | `shoppingCart`, `creditCard`, `tag`, `receiptText` |
-| Favorites | `star`, `heart`, `bookmark` |
-| Time | `clock`, `calendar`, `calendarDays`, `calendarRange` |
-| Security | `lock`, `lockOpen`, `key`, `fingerprint`, `shield` |
-| Dev | `code`, `terminal`, `flaskConical`, `rocket`, `zap`, `cpu` |
-| Text | `hash`, `languages`, `newspaper`, `bookOpen` |
-
-## OiIcon Widget
-
-The `OiIcon` primitive renders an icon with proper sizing and accessibility semantics.
+`OiIcon` draws a single glyph. Reach for it any time you show an icon on its own.
+It takes a `label` for screen readers, so a meaningful icon is never silent to
+assistive tech. For a purely visual glyph, use the `OiIcon.decorative` constructor
+instead, which drops the label and hides the icon from the accessibility tree.
 
 ```dart
-// Semantic: announced by screen readers
+// Meaningful icon: announced by screen readers.
 OiIcon(icon: OiIcons.lock, label: 'Locked')
 
-// Decorative: hidden from accessibility tree
+// Decorative icon: hidden from the accessibility tree.
 OiIcon.decorative(icon: OiIcons.chevronRight)
-
-// Custom size and color
-OiIcon(icon: OiIcons.star, label: 'Favorite', size: 24, color: Colors.amber)
 ```
 
-**Size** defaults to the theme's body font size. Override with `size`.
+### Size and color
 
-## OiIconButton
-
-An icon-only button with a required accessibility label. Defined in [oi_icon_button.dart](lib/src/components/buttons/oi_icon_button.dart).
+`size` is in logical pixels. When you leave it out, `OiIcon` uses the body font
+size from the active theme, so icons line up with body text by default. `color`
+defaults to `context.colors.text`. Pull any override from the theme, do not
+hardcode a hex value.
 
 ```dart
-OiIconButton(
-  icon: OiIcons.trash2,
-  semanticLabel: 'Delete',
-  onTap: () {},
-  size: OiButtonSize.medium,       // optional
-  variant: OiButtonVariant.ghost,  // optional — defaults to ghost
+OiIcon(
+  icon: OiIcons.star,
+  label: 'Favorite',
+  size: 24,
+  color: context.colors.primary.base,
 )
 ```
 
-## Best Practices
+You can lay icons out like any other widget.
 
-!!! tip "Do"
-    - Use `OiIcon` with a `label` for interactive/meaningful icons
-    - Use `OiIcon.decorative()` for purely visual icons (e.g., chevrons in accordions)
-    - Use `OiIcons.xxx` constants — never `Icons.xxx` from Material
-    - Browse [lucide.dev](https://lucide.dev) to find the right icon name
+```dart
+OiRow(
+  children: [
+    OiIcon(icon: OiIcons.circleCheck, label: 'Done', color: context.colors.success.base),
+    OiLabel.body('Task complete'),
+  ],
+)
+```
 
-!!! warning "Don't"
-    - Don't use `Icon()` directly — use `OiIcon()` for consistent sizing and semantics
-    - Don't use Material `Icons.xxx` — use `OiIcons.xxx`
-    - Don't hardcode icon codepoints — always use named constants
+| Parameter | Type | Default | Description |
+| --- | --- | --- | --- |
+| `icon` | `OiIconData` | **required** | The glyph to draw. Use a constant from `OiIcons`. `OiIconData` is a typedef for `IconData`. |
+| `label` | `String` | **required** | Screen-reader text. Not shown on screen. Omitted by `OiIcon.decorative`. |
+| `size` | `double?` | `null` | Size in logical pixels. Falls back to the theme body font size. |
+| `color` | `Color?` | `null` | Glyph color. Falls back to `context.colors.text`. |
+
+!!! note
+    `OiIcon.decorative` takes the same `icon`, `size`, and `color`, but no
+    `label`. Use it for glyphs that repeat a nearby text label, like a chevron in
+    an accordion header.
+
+## Icons in other widgets
+
+Most ObersUI widgets that take an icon accept a raw `OiIcons` constant, not an
+`OiIcon` widget. The widget builds the `OiIcon` for you and sizes it to match.
+
+Buttons take an `icon` parameter directly.
+
+```dart
+OiButton.primary(
+  label: 'Download',
+  icon: OiIcons.download,
+  onTap: () {},
+)
+
+// Icon-only button. The label becomes the screen-reader text.
+OiIconButton(
+  icon: OiIcons.settings,
+  semanticLabel: 'Settings',
+  onTap: () {},
+)
+```
+
+Text inputs place a glyph on the leading or trailing edge. The `leading` and
+`trailing` slots take a widget, so pass an `OiIcon`. The `OiTextInput.search`
+constructor already puts a search glyph in the leading slot for you.
+
+```dart
+// Built-in search field with a leading OiIcons.search.
+OiTextInput.search(
+  onChanged: (value) => runSearch(value),
+)
+
+// A custom leading glyph on a labeled field.
+OiTextInput(
+  label: 'Email',
+  leading: OiIcon.decorative(icon: OiIcons.mail),
+  onChanged: (value) => setEmail(value),
+)
+```
+
+## Related
+
+- [Buttons and Actions](../widgets/buttons.md) for `OiButton` and `OiIconButton`.
+- [Theming](theming.md) for `context.colors` and the values `OiIcon` reads.
+
+## Theme-selected vector sources
+
+Every built-in icon renders through `OiIcon`, including shell, input and button
+icons. Existing `IconData` tokens and `OiIcons` constants remain valid. Set
+`components.icon` to `OiIconThemeData(sources: {...})` to replace tokens with local
+`OiIconSource.svg(markup)`, `OiIconSource.asset(path, package: ...)`, or
+`OiIconSource.font(glyph)` sources. Unmapped tokens keep their font glyphs.
+
+SVG sources retain their authored geometry (including stroke width), resolve
+`currentColor`, and receive the component's size/color. The shared renderer uses
+`flutter_svg`; applications do not need custom painters or per-control adapters.
+Use non-const maps for `IconData` keys, while source values can be const. Decorative
+icons stay outside the accessibility tree; meaningful icons retain their labels.

@@ -1,8 +1,9 @@
 # obers_ui — AI Integration Reference
 
-> **Version:** Synced with codebase as of 2026-03-29 (includes Shop, Admin & new UI elements)
-> **Single import:** `import 'package:obers_ui/obers_ui.dart';`
+> **Version:** Synced with codebase as of 2026-03-29 (includes Shop, Admin & new UI elements). Charts package and additional widgets added 2026-07-02.
+> **Single import:** `import 'package:obers_ui/obers_ui.dart';` (charts: `import 'package:obers_ui_charts/obers_ui_charts.dart';`, auto-forms: `import 'package:obers_ui_autoforms/obers_ui_autoforms.dart';`)
 > **Zero Material dependency** — do NOT use MaterialApp, Scaffold, AppBar, or any Material/Cupertino widgets.
+> **Human docs:** The full documentation site lives in `doc/documentation` (MkDocs). It groups every widget, chart, and module by function, with source-verified examples. Keep both this file and that site in sync when widgets change.
 
 ---
 
@@ -87,6 +88,10 @@ lib/
     models/                  <- Data classes
     tools/                   <- Dev tools
     utils/                   <- Helpers
+
+packages/
+  obers_ui_charts/           <- Charts package (30+ chart types) — see "obers_ui_charts" section
+  obers_ui_autoforms/        <- Auto-form package — see "obers_ui_autoforms" section
 ```
 
 ---
@@ -144,6 +149,17 @@ final components = context.components; // OiComponentThemes
 
 // Full theme
 final theme = OiTheme.of(context);
+```
+
+### Overriding the Theme for a Subtree — OiThemeScope
+
+Wrap any subtree in `OiThemeScope` to give it a different `OiThemeData`. Everything below reads the new theme; the rest of the app is unchanged.
+
+```dart
+OiThemeScope(
+  data: OiThemeData.dark(),
+  child: mySidebar, // dark, even in a light app
+)
 ```
 
 ### Color System — OiColorScheme
@@ -958,6 +974,20 @@ Responsive grid layout with column count or min column width.
 
 ---
 
+#### OiSpan
+**Tags:** `layout`, `grid`, `span`, `colspan`, `rowspan`
+
+Wraps an `OiGrid` child to make it span multiple columns or rows, or to reorder it. Pass an `OiSpanData` describing the span.
+
+**Key Parameters:**
+- `data` (OiSpanData, required) — `columnSpan`, `columnStart`, `columnOrder`, `rowSpan`
+- `child` (Widget, required)
+
+**Use When:** A grid cell needs to be wider or taller than the rest.
+**Combine With:** `OiGrid`
+
+---
+
 #### OiGridZoomControls
 **Tags:** `grid`, `zoom`, `columns`, `controls`, `resize`
 **Tier:** Primitive
@@ -1473,9 +1503,12 @@ Placeholder for empty views.
 - `description` (String?)
 - `action` (Widget?) — Usually an `OiButton`
 
-**Use When:** Empty lists, empty search results, error pages (404/403/500).
+**Named Constructors:**
+- `OiEmptyState.notFound()` — 404-style empty state
+- `OiEmptyState.forbidden()` — 403-style empty state
+- `OiEmptyState.error()` — generic error empty state
 
-> **Note:** Planned additions include `.notFound()`, `.forbidden()`, `.error()` factory constructors for common error states. For full-page error displays now, use `OiErrorPage`.
+**Use When:** Empty lists, empty search results, inline error states. For full-page error screens use `OiErrorPage`.
 
 ---
 
@@ -2705,6 +2738,35 @@ Selector for payment methods (credit card, PayPal, bank transfer, saved cards).
 
 ---
 
+#### [SHOP] OiPaymentOption
+**Tags:** `payment`, `option`, `row`, `radio`, `shop`
+**Tier:** Component
+
+A single selectable payment-method row. Used inside `OiPaymentMethodPicker`, or on its own.
+
+**Key Parameters:**
+- `method` (OiPaymentMethod, required) — The payment method to show
+- `label` (String, required) — Accessibility label
+- `selected` (bool, default: false)
+- `onSelect` (VoidCallback?)
+
+---
+
+#### [SHOP] OiShippingOption
+**Tags:** `shipping`, `option`, `row`, `radio`, `shop`
+**Tier:** Component
+
+A single selectable shipping-method row (name, price, ETA). Used inside `OiShippingMethodPicker`.
+
+**Key Parameters:**
+- `method` (OiShippingMethod, required) — The shipping method to show
+- `label` (String, required) — Accessibility label
+- `selected` (bool, default: false)
+- `onSelect` (VoidCallback?)
+- `currencyCode` (String, default: 'EUR')
+
+---
+
 ### COMPONENTS — Interaction
 
 ---
@@ -2909,11 +2971,43 @@ Calendar UI for date selection with month/year navigation.
 static Future<DateTime?> OiDatePicker.show(
   BuildContext context, {
   DateTime? initialDate,
-  DateTime? minDate,
-  DateTime? maxDate,
+  DateTime? firstDate,
+  DateTime? lastDate,
   String semanticLabel,
 })
 ```
+
+---
+
+#### OiMonthPicker
+**Tags:** `picker`, `month`, `year`, `date`
+**Tier:** Component
+
+Wheel-style month and year picker. The value is an `OiMonth(year, month)`.
+
+**Key Parameters:**
+- `value` (OiMonth?) — Selected month
+- `onChanged` (ValueChanged<OiMonth>?) — Fires on selection
+- `minYear` (int, default: 1900)
+- `maxYear` (int, default: 2100)
+
+Also available as a dialog: `OiMonthPicker.show(context, ...)` returns `Future<OiMonth?>`.
+
+---
+
+#### OiCalendarWeekPicker
+**Tags:** `picker`, `week`, `calendar`, `iso-week`
+**Tier:** Component
+
+ISO week picker. The value is an `OiCalendarWeek(week, year)`.
+
+**Key Parameters:**
+- `value` (OiCalendarWeek?) — Selected week
+- `onChanged` (ValueChanged<OiCalendarWeek>?) — Fires on selection
+- `highlightedWeeks` (Set<OiCalendarWeek>?) — Weeks to emphasize
+- `weekFormatter` (String Function(OiCalendarWeek)?) — Custom label builder
+
+Also available as a dialog: `OiCalendarWeekPicker.show(context, ...)`.
 
 ---
 
@@ -4642,6 +4736,26 @@ Dual-calendar date range selector with quick-select presets. Two side-by-side ca
 
 ---
 
+#### OiDateRangeInput
+**Tags:** `date`, `range`, `input`, `field`, `presets`
+**Tier:** Composite
+
+A form field that opens an `OiDateRangePicker` and shows the chosen range as text. Use this in a form; use `OiDateRangePicker` when you want the calendar directly.
+
+**Key Parameters:**
+- `label` (String, required) — Accessibility and field label
+- `startDate`/`endDate` (DateTime?) — Current range
+- `onChanged` (void Function(DateTime?, DateTime?)?) — Fires when the range changes
+- `presets` (List<OiDateRangePreset>?) — Quick-select presets
+- `firstDate`/`lastDate` (DateTime?) — Constraints
+- `hint` (String?) / `error` (String?) — Field hint and error text
+- `enabled` (bool, default: true) / `required` (bool, default: false) / `clearable` (bool, default: true)
+- `displayFormat` (DateFormat?) — Custom display format
+
+**Use When:** Date range as a field in a form or filter bar.
+
+---
+
 #### OiCalendar
 **Tags:** `calendar`, `events`, `schedule`, `day`, `week`, `month`
 **Tier:** Composite
@@ -6183,6 +6297,906 @@ This document must be kept in sync with the codebase. When widgets are added, mo
 
 ---
 
+## obers_ui_charts — Charts Package
+
+> **Package:** `packages/obers_ui_charts`
+> **Import:** `import 'package:obers_ui_charts/obers_ui_charts.dart';`
+> **Prefix:** `Oi` (same as core, e.g. `OiLineChart`, `OiBarChart`, `OiGauge`)
+> **Depends on:** `obers_ui` (core theme, tokens, and layout)
+
+30+ chart types plus the building blocks (axes, legends, tooltips), interaction behaviors, scales, and dashboards for data visualization. Charts read their colors from `context.colors.chart` and `OiChartThemeData`, so they match the app theme. Every chart takes a `label` for accessibility (except `OiBubbleChart`, where it is optional). Data models come in two styles: a simple pre-mapped model (for example `OiLineSeries` + `OiLinePoint`) and a generic mapper-first model (for example `OiAreaSeries<T>` or `OiLineSeriesData<T>` with `xMapper` / `yMapper`) that binds straight to your own objects.
+
+### CHARTS — Cartesian (Line, Area, Bar)
+
+#### OiLineChart
+**Tags:** `chart`, `line`, `trend`, `timeseries`, `cartesian`
+**Tier:** Composite (charts)
+
+The everyday x/y trend chart. Draws one or more lines from a list of `OiLineSeries`, each holding `OiLinePoint(x, y)` values. Legend appears automatically with two or more series.
+
+**Key Parameters:**
+- `label` (String, required) — accessibility label for the chart
+- `series` (List<OiLineSeries>, required) — the lines; each has a `label` and a list of `OiLinePoint`
+- `mode` (OiLineChartMode, default: straight) — `straight`, `stepped`, or `smooth` (also exposed as named constructors `.straight` / `.stepped` / `.smooth`)
+- `xAxis` / `yAxis` (OiChartAxis<num>?, default: null) — axis config (labels, min, max, divisions, format)
+- `showGrid` (bool, default: true) — background grid lines
+- `showLegend` (bool, default: true) — legend when 2+ series
+- `showPoints` (bool, default: false) — dot at each data point
+- `stacked` (bool, default: false) — stack series cumulatively
+- `onPointTap` (void Function(int, int)?, default: null) — series and point index on tap
+
+Each `OiLineSeries` also takes `color`, `strokeWidth`, `dashed`, `fill`, `fillOpacity`. For a single series bound to your model, use `OiLineChart.fromData<T>(label:, data:, x:, y:)`.
+
+**Use When:** Showing trends over time or comparing a few lines.
+**Avoid When:** Comparing values across named categories (use OiBarChart) or showing volume/part-to-whole (use OiAreaChart).
+
+---
+
+#### OiAreaChart
+**Tags:** `chart`, `area`, `volume`, `stacked`, `cartesian`
+**Tier:** Composite (charts)
+
+A line chart with the area below filled, for volume or part-to-whole trends. Unlike OiLineChart, each `OiAreaSeries<T>` maps values straight from your own model via `xMapper` / `yMapper`.
+
+**Key Parameters:**
+- `label` (String, required) — accessibility label
+- `series` (List<OiAreaSeries<T>>, required) — each has `id`, `label`, `data`, `xMapper`, `yMapper`
+- `xAxis` / `yAxis` (OiChartAxis<num>?, default: null) — axis config
+- `showGrid` (bool, default: true) — background grid lines
+- `showLegend` (bool, default: true) — legend when 2+ series
+- `showPoints` (bool, default: false) — dot at each data point
+- `stacked` (bool, default: false) — stack cumulatively (or set a shared `stackGroup` per series)
+- `onPointTap` (void Function(int, int)?, default: null) — series and point index on tap
+
+Each `OiAreaSeries` also takes `fillOpacity` (default 0.3), `showLine` (default true), `color`, and `stackGroup`.
+
+**Use When:** Emphasizing magnitude/volume or stacked part-to-whole over a continuous x.
+**Avoid When:** You only need line trends (use OiLineChart) or a low/high band (use OiRangeAreaChart).
+
+---
+
+#### OiBarChart
+**Tags:** `chart`, `bar`, `category`, `grouped`, `stacked`
+**Tier:** Composite (charts)
+
+Compares values across named categories. Build a list of `OiBarCategory`, each with a `label` and a list of `values` (one per series); for a single series give each category a one-element list.
+
+**Key Parameters:**
+- `label` (String, required) — accessibility label
+- `categories` (List<OiBarCategory>, required) — each has `label` and one value per series
+- `mode` (OiBarChartMode, default: grouped) — `grouped`, `stacked`, `horizontalGrouped`, `horizontalStacked` (also named constructors)
+- `series` (List<OiBarSeries>?, default: null) — named series for legend and colors
+- `showValues` (bool, default: false) — print each value on its bar
+- `showGrid` (bool, default: true) — background grid lines
+- `showLegend` (bool, default: true) — legend when 2+ series
+- `barRadius` (double, default: 4.0) — bar corner radius
+- `yAxis` (OiChartAxis<num>?, default: null) — value axis config
+- `onBarTap` (void Function(int, int?)?, default: null) — category and series index on tap
+
+**Use When:** Comparing discrete categories, grouped or stacked.
+**Avoid When:** X is continuous/time-based (use OiLineChart or OiAreaChart) or bars span start-to-end (use OiRangeBarChart).
+
+---
+
+#### OiRangeBarChart
+**Tags:** `chart`, `range`, `gantt`, `timeline`, `bar`
+**Tier:** Composite (charts)
+
+Draws each bar spanning from a start value to an end value instead of from zero. Good for timelines and Gantt-style views. Each `OiRangeBarSeries<T>` maps a category, start, and end from your model.
+
+**Key Parameters:**
+- `label` (String, required) — accessibility label
+- `series` (List<OiRangeBarSeries<T>>, required) — each has `id`, `label`, `data`, `categoryMapper`, `startMapper`, `endMapper`
+- `horizontal` (bool, default: true) — categories run down the y-axis (Gantt-style); `false` for vertical floating bars
+- `showGrid` (bool, default: true) — background grid lines
+- `xAxis` / `yAxis` (OiChartAxis<num>?, default: null) — value axis vs. category axis depending on orientation
+
+Each `OiRangeBarSeries` also takes `color`, a per-item `colorMapper`, `visible` (default true), and `semanticLabel`.
+
+**Use When:** Rendering task timelines or floating start-to-end bars.
+**Avoid When:** Bars start at zero (use OiBarChart) or you need a shaded low/high band (use OiRangeAreaChart).
+
+---
+
+#### OiRangeAreaChart
+**Tags:** `chart`, `range`, `band`, `confidence`, `area`
+**Tier:** Composite (charts)
+
+Shades a band between a low and a high value across an x-domain, for min/max envelopes or confidence bands. Each `OiRangeAreaSeries<T>` maps an x, a `yMin`, and a `yMax`, with an optional mid-line.
+
+**Key Parameters:**
+- `label` (String, required) — accessibility label
+- `series` (List<OiRangeAreaSeries<T>>, required) — each has `id`, `label`, `data`, `xMapper`, `yMinMapper`, `yMaxMapper`, and optional `midLineMapper`
+- `showMidLine` (bool, default: true) — draw a center line when a `midLineMapper` is provided
+- `fillOpacity` (double, default: 0.2) — opacity of the shaded band (0.0–1.0)
+- `showGrid` (bool, default: true) — background grid lines
+- `xAxis` / `yAxis` (OiChartAxis<num>?, default: null) — axis config
+
+**Use When:** Showing a value range, uncertainty band, or min/max envelope over x.
+**Avoid When:** You have discrete start/end bars (use OiRangeBarChart) or a single filled line (use OiAreaChart).
+
+---
+
+#### OiScatterPlot
+**Tags:** `chart`, `scatter`, `correlation`, `points`, `cartesian`
+**Tier:** Composite (charts)
+
+Plots dots to show correlation between two variables. Pass a list of `OiScatterSeries`, each with a list of `OiScatterPoint(x, y)` values.
+
+**Key Parameters:**
+- `label` (String, required) — accessibility label
+- `series` (List<OiScatterSeries>, required) — each has a `label` and a list of `OiScatterPoint`
+- `xAxis` / `yAxis` (OiChartAxis<num>?, default: null) — axis config
+- `showGrid` (bool, default: true) — background grid lines
+- `showLegend` (bool, default: true) — legend when 2+ series
+- `onPointTap` (void Function(int, int)?, default: null) — series and point index on tap
+
+Each `OiScatterSeries` also takes `color`, `pointRadius` (default 4.0), and a `shape` (`circle`, `square`, `diamond`, `triangle`).
+
+**Use When:** Visualizing correlation or distribution of individual (x, y) points.
+**Avoid When:** X is ordered/continuous and you want connected trends (use OiLineChart).
+
+---
+
+#### OiComboChart
+**Tags:** `chart`, `combo`, `mixed`, `line`, `bar`
+**Tier:** Composite (charts)
+
+Draws several series types on one shared grid — mix line, area, bar, and scatter series (for example revenue bars behind a target line). Each series maps `x` and `y` from your model via `xMapper` / `yMapper`.
+
+**Key Parameters:**
+- `label` (String, required) — accessibility label
+- `series` (List<OiCartesianSeries<T>>, required) — mixed-type series: `OiComboBarSeries` (bars), `OiComboScatterSeries` (dots), `OiAreaSeries` (filled area), or any other `OiCartesianSeries` such as `OiLineSeriesData` (line)
+- `xAxis` (OiChartAxis<dynamic>?, default: null) — x-axis config
+- `yAxis` (OiChartAxis<num>?, default: null) — y-axis config
+- `showGrid` (bool, default: true) — background grid lines
+- `showLegend` (bool, default: true) — legend when 2+ series
+- `onPointTap` (void Function(int, int)?, default: null) — series and point index on tap
+- `theme` (OiComboChartTheme?, default: null) — overrides for series colors, grid, and bar radius
+
+**Use When:** One chart must combine different series types on a shared coordinate system.
+**Avoid When:** All series are the same type (use the dedicated chart, e.g. OiBarChart or OiLineChart).
+
+---
+
+#### OiCartesianChart
+**Tags:** `chart`, `cartesian`, `low-level`, `custom`, `advanced`
+**Tier:** Composite (charts)
+
+The low-level base the other cartesian charts are built on. Reach for it only when you need the full pipeline: composable `behaviors` (tooltip, crosshair, zoom), a `controller`, multiple y-axes, `annotations`, `thresholds`, decimation, and settings persistence. You supply a `seriesBuilder` that paints series inside the computed plot area.
+
+**Key Parameters:**
+- `label` (String, required) — accessibility label
+- `series` (List<OiCartesianSeries<T>>, required) — mapper-first series to render
+- `xAxis` (OiChartAxis<dynamic>?, default: null) — x-axis config
+- `yAxes` (List<OiChartAxis<num>>?, default: null) — one or more y-axes for multi-axis charts
+- `seriesBuilder` (Widget Function(context, viewport, visibleSeries)?, default: null) — paints series in the plot area; only the frame renders without it
+- `behaviors` (List<OiChartBehavior>, default: const []) — tooltip, crosshair, zoom, selection, etc.
+- `controller` (OiChartController?, default: null) — programmatic state; internal one used if null
+- `annotations` (List<OiChartAnnotation>, default: const []) — reference lines, regions, points, labels
+- `thresholds` (List<OiChartThreshold>, default: const []) — threshold reference lines
+- `performance` (OiChartPerformanceConfig?, default: null) — decimation / rendering mode for large datasets
+- `syncGroup` (OiChartSyncGroup?, default: null) — links viewport across charts
+- `settings` (OiChartSettings?, default: null) — persists chart state
+
+**Use When:** Building a custom cartesian chart or needing behaviors/multi-axis/annotations the wrappers do not expose.
+**Avoid When:** Any standard chart fits — use OiLineChart, OiAreaChart, OiBarChart, OiScatterPlot, or OiComboChart instead.
+
+### CHARTS — Distribution & Financial
+
+#### OiHistogram
+**Tags:** `chart`, `distribution`, `histogram`, `bins`, `frequency`
+**Tier:** Composite (charts)
+
+Groups continuous numbers into equal-width bins and draws one bar per bin to reveal the shape of a distribution. Use `OiHistogram.fromValues` for a single list of numbers; use the generic `OiHistogram<T>` with `OiHistogramSeries` (id, label, data, valueMapper) to map bins out of your own objects or plot multiple series. Import from `package:obers_ui_charts/obers_ui_charts.dart`.
+
+**Key Parameters (`OiHistogram.fromValues`):**
+- `label` (String, required) — accessibility label and default series label
+- `values` (List<double>, required) — the numbers to bin
+- `binCount` (int?, default: null) — number of bins; when null, chosen with the Sturges formula
+- `binWidth` (double?, default: null) — fixed bin width, overrides `binCount`
+- `showGrid` (bool, default: true) — draw background grid lines
+- `cumulative` (bool, default: false) — overlay a cumulative frequency line
+- `normalized` (bool, default: false) — show relative frequency (0 to 1) instead of raw counts
+- `semanticLabel` (String?, default: null) — overrides the auto-generated screen-reader label
+
+**Use When:** You want to see how often values fall into ranges (distribution shape, clustering, spread).
+**Avoid When:** You are plotting one value per named category — use OiBarChart instead.
+
+---
+
+#### OiBoxPlotChart
+**Tags:** `chart`, `distribution`, `box-plot`, `quartiles`, `statistics`
+**Tier:** Composite (charts)
+
+Shows the five-number summary (min, Q1, median, Q3, max) per category so distributions can be compared side by side. Generic `OiBoxPlotChart<T>` takes `series` of `OiBoxPlotSeries` (id, label, data, categoryMapper); give it raw measurements via `valuesMapper` to let the chart compute stats, or pass the pre-computed mappers (`minMapper`, `q1Mapper`, `medianMapper`, `q3Mapper`, `maxMapper`). Supply one API or the other. Import from `package:obers_ui_charts/obers_ui_charts.dart`.
+
+**Key Parameters:**
+- `label` (String, required) — accessibility label
+- `series` (List<OiBoxPlotSeries<T>>, required) — the boxes to draw
+- `showMean` (bool, default: false) — draw a dot at the mean inside each box
+- `showNotch` (bool, default: false) — draw a confidence-interval notch at the median
+- `whiskerMode` (OiWhiskerMode, default: minMax) — `minMax`, `iqr1_5`, or `percentile5_95`; the latter two also plot outlier dots
+- `horizontal` (bool, default: false) — run categories along the y-axis
+- `showGrid` (bool, default: true) — draw background grid lines
+- `yAxis` (OiChartAxis<num>?, default: null) — value-axis configuration
+- `semanticLabel` (String?, default: null) — overrides the auto-generated screen-reader label
+
+**Use When:** Comparing spread, median, and outliers across categories.
+**Avoid When:** You only have a single value per category — use OiBarChart; for a full binned distribution use OiHistogram.
+
+---
+
+#### OiCandlestickChart
+**Tags:** `chart`, `financial`, `candlestick`, `ohlc`, `time-series`
+**Tier:** Composite (charts)
+
+Plots four prices per period (open, high, low, close): a wick from low to high and a body from open to close. Bullish candles (close ≥ open) use the theme positive color, bearish use the negative color. Generic `OiCandlestickChart<T>` takes `series` of `OiCandlestickSeries` (id, label, data, xMapper, and the four price mappers openMapper/highMapper/lowMapper/closeMapper, plus optional bullColor/bearColor). Import from `package:obers_ui_charts/obers_ui_charts.dart`.
+
+**Key Parameters:**
+- `label` (String, required) — accessibility label
+- `series` (List<OiCandlestickSeries<T>>, required) — the candle series to draw
+- `xAxis` (OiChartAxis<dynamic>?, default: null) — time or numeric x-axis configuration
+- `yAxis` (OiChartAxis<num>?, default: null) — price-axis configuration
+- `showGrid` (bool, default: true) — draw background grid lines
+- `showLegend` (bool, default: true) — show a legend when there are multiple series
+- `onCandleTap` (void Function(int, int)?, default: null) — called with series and candle index on tap
+- `theme` (OiCandlestickChartTheme?, default: null) — overrides for grid, axis, bull, and bear colors
+- `semanticLabel` (String?, default: null) — overrides the auto-generated screen-reader label
+
+**Use When:** Visualizing OHLC financial price movement over time.
+**Avoid When:** You only track a single price line over time — use OiLineChart or OiAreaChart.
+
+---
+
+#### OiWaterfallChart
+**Tags:** `chart`, `waterfall`, `running-total`, `financial`, `steps`
+**Tier:** Composite (charts)
+
+Shows how a starting value grows and shrinks through a sequence of steps, each bar floating where the previous ended so gains and losses stack into a running total. Mark summary bars with `isTotal` to reset them to the baseline. Generic `OiWaterfallChart<T>` takes `series` of `OiWaterfallSeries` (id, label, data, categoryMapper, valueMapper, optional isTotal); only the first visible series renders. Import from `package:obers_ui_charts/obers_ui_charts.dart`.
+
+**Key Parameters:**
+- `label` (String, required) — accessibility label
+- `series` (List<OiWaterfallSeries<T>>, required) — the steps to draw (only the first visible series renders)
+- `showConnectors` (bool, default: true) — draw lines between consecutive bar tops
+- `positiveColor` (Color?, default: null) — color for increases; defaults to theme positive color
+- `negativeColor` (Color?, default: null) — color for decreases; defaults to theme negative color
+- `totalColor` (Color?, default: null) — color for total bars; defaults to theme neutral color
+- `showGrid` (bool, default: true) — draw background grid lines
+- `yAxis` (OiChartAxis<num>?, default: null) — value-axis configuration
+- `semanticLabel` (String?, default: null) — overrides the auto-generated screen-reader label
+
+**Use When:** Explaining how sequential positive/negative contributions build to a total (e.g. revenue breakdown, budget bridge).
+**Avoid When:** Steps are independent categories with no running total — use OiBarChart.
+
+---
+
+#### OiBubbleChart
+**Tags:** `chart`, `bubble`, `scatter`, `three-dimensional`, `size`
+**Tier:** Composite (charts)
+
+Plots each point by three values — x position, y position, and a size mapped to bubble radius. Use it when a scatter plot needs a third dimension (e.g. revenue by price and market size). Pass an `OiBubbleChartData` holding `OiBubbleSeries` (name, points) of pre-mapped `OiBubblePoint(x, y, size, label)`, plus an optional `OiBubbleSizeConfig` (minRadius, maxRadius, sizeLabel). Import from `package:obers_ui_charts/obers_ui_charts.dart`.
+
+**Key Parameters:**
+- `data` (OiBubbleChartData, required) — series and optional size configuration
+- `label` (String?, default: null) — accessibility label; when null, one is generated from the data (optional here, unlike other charts — always pass it or `semanticLabel`)
+- `semanticLabel` (String?, default: null) — alias for `label`
+- `theme` (OiBubbleChartTheme?, default: null) — color and opacity overrides
+- `interactionMode` (OiChartInteractionMode?, default: null) — force touch or pointer interaction
+- `compact` (bool?, default: null) — force compact layout; when null, based on width
+
+**Use When:** A scatter relationship needs a third (size) dimension per point.
+**Avoid When:** Only x and y matter — use a scatter/line chart; for one value per category use OiBarChart.
+
+---
+
+#### OiSparkline
+**Tags:** `chart`, `sparkline`, `inline`, `trend`, `micro-chart`
+**Tier:** Composite (charts)
+
+A tiny axis-less, label-less line that fits inside a table cell, list tile, or metric card to show a trend at a glance. Give it a flat list of numbers. Import from `package:obers_ui_charts/obers_ui_charts.dart`.
+
+**Key Parameters:**
+- `label` (String, required) — accessibility label
+- `values` (List<double>, required) — the numbers to plot
+- `color` (Color?, default: null) — line color; defaults to theme primary color
+- `fill` (bool, default: false) — fill the area below the line
+- `fillOpacity` (double, default: 0.15) — opacity of the area fill when `fill` is on
+- `strokeWidth` (double, default: 1.5) — line thickness
+- `showLastPoint` (bool, default: false) — draw a dot at the last value
+- `showMinMax` (bool, default: false) — draw dots at the lowest and highest values
+- `height` (double, default: 32) — height in logical pixels
+- `width` (double?, default: null) — width; when null, fills the available width
+
+**Use When:** Embedding a compact trend indicator inline with other content.
+**Avoid When:** You need axes, labels, tooltips, or a full-size trend view — use OiLineChart.
+
+---
+
+### CHARTS — Part-to-Whole & Hierarchy
+
+#### OiPieChart
+**Tags:** `chart`, `pie`, `proportion`, `part-to-whole`, `share`
+**Tier:** Composite (charts)
+
+Splits a circle into segments sized by value; the first chart to reach for when showing shares of a whole. Import from `package:obers_ui_charts/obers_ui_charts.dart`. Set `donut: true` for a hollow center.
+
+**Key Parameters:**
+- `label` (String, required) — accessibility label for the chart
+- `segments` (List\<OiPieSegment\>, required) — the slices; each `OiPieSegment` has `label`, `value`, optional `color`
+- `donut` (bool, default: false) — render with a hollow center
+- `donutWidth` (double, default: 0.4) — ring width as a ratio of the radius when `donut` is on
+- `centerLabel` (String?, default: null) — text shown in the donut center
+- `showLabels` (bool, default: true) — draw segment labels on the chart
+- `showPercentages` (bool, default: true) — draw each segment's percentage
+- `showValues` (bool, default: false) — draw each segment's raw value
+- `showLegend` (bool, default: true) — show a legend below the chart
+- `onSegmentTap` (ValueChanged\<int\>?, default: null) — fires with the tapped segment index
+
+**Use When:** Showing how a few categories divide a whole (traffic sources, budget split).
+**Avoid When:** Many small segments or comparing precise values; use OiBarChart. For a headline number in the hole, prefer OiDonutChart.
+
+---
+
+#### OiDonutChart
+**Tags:** `chart`, `donut`, `proportion`, `part-to-whole`, `summary`
+**Tier:** Composite (charts)
+
+A pie with a hollow center, ideal for placing a total or headline number in the middle via `centerLabel`. Takes the same `OiPieSegment` list as OiPieChart.
+
+**Key Parameters:**
+- `label` (String, required) — accessibility label for the chart
+- `segments` (List\<OiPieSegment\>, required) — the slices; each has `label`, `value`, optional `color`
+- `innerRadiusFraction` (double, default: 0.4) — inner radius as a fraction of the outer radius; higher is thinner
+- `centerLabel` (String?, default: null) — text shown in the hollow center
+- `showLabels` (bool, default: true) — draw segment labels
+- `showPercentages` (bool, default: true) — draw each segment's percentage
+- `showValues` (bool, default: false) — draw each segment's raw value
+- `showLegend` (bool, default: true) — show a legend below the chart
+- `onSegmentTap` (void Function(int)?, default: null) — fires with the tapped segment index
+- `semanticLabel` (String?, default: null) — overrides `label` for screen readers
+
+**Use When:** Part-to-whole split that also needs a summary value in the center.
+**Avoid When:** You don't need the center hole; use OiPieChart.
+
+---
+
+#### OiFunnelChart
+**Tags:** `chart`, `funnel`, `conversion`, `stages`, `flow`
+**Tier:** Composite (charts)
+
+Stacked stages that narrow from top to bottom, showing how a count drops across an ordered flow (like a signup funnel). Build stages with `OiFunnelStage`, widest first; each shows its percentage relative to the first stage.
+
+**Key Parameters:**
+- `label` (String, required) — accessibility label for the chart
+- `stages` (List\<OiFunnelStage\>, required) — ordered stages; each `OiFunnelStage` has `label`, `value`, optional `color`
+- `showValues` (bool, default: true) — show the raw value on each stage
+- `showPercentages` (bool, default: true) — show the percentage of the first stage
+- `formatValue` (String Function(double)?, default: null) — custom formatter for stage values
+- `onStageTap` (ValueChanged\<int\>?, default: null) — fires with the tapped stage index
+
+**Use When:** Sequential drop-off across ordered stages (conversion, pipeline).
+**Avoid When:** Stages aren't ordered or don't strictly decrease; use OiBarChart.
+
+---
+
+#### OiRadialBarChart
+**Tags:** `chart`, `radial`, `progress`, `arc`, `gauge-like`
+**Tier:** Composite (charts)
+
+Draws each value as a concentric arc ring on a shared 0-to-`maxValue` scale; reads well for progress-style metrics side by side. Mapper-first: pass one `OiRadialBarSeries<T>` with `categoryMapper` and `valueMapper` (the simplest item type is a plain record). Only the first visible series renders, one ring per data item.
+
+**Key Parameters:**
+- `label` (String, required) — accessibility label for the chart
+- `series` (List\<OiRadialBarSeries\<T\>\>, required) — ring data; each series needs `id`, `label`, `data`, `categoryMapper`, `valueMapper`, optional `maxValue` (default 100) and `color`
+- `startAngle` (double, default: -90) — start angle in degrees; -90 starts at the top
+- `innerRadius` (double, default: 0.3) — hollow center as a fraction of the radius
+- `barSpacing` (double, default: 4) — gap in pixels between rings
+- `showLabels` (bool, default: true) — draw a label beside each ring
+- `showBackground` (bool, default: true) — draw a full-circle track behind each ring
+- `compact` (bool?, default: null) — force compact layout; when null, derived from width
+- `semanticLabel` (String?, default: null) — overrides `label` for screen readers
+
+**Use When:** Comparing a handful of progress/percentage metrics on one shared scale.
+**Avoid When:** Showing part-to-whole of one total; use OiPieChart or OiDonutChart.
+
+---
+
+#### OiTreemap
+**Tags:** `chart`, `treemap`, `hierarchy`, `nested`, `space`
+**Tier:** Composite (charts)
+
+Fills a rectangle with smaller rectangles sized by value; good for seeing where space or spend goes at a glance. Build nodes with `OiTreemapNode`, which take an optional `children` list for nested data.
+
+**Key Parameters:**
+- `label` (String, required) — accessibility label for the treemap
+- `nodes` (List\<OiTreemapNode\>, required) — top-level nodes; each has `key`, `label`, `value`, optional `color` and `children`
+- `showLabels` (bool, default: true) — draw a label inside each rectangle
+- `showValues` (bool, default: false) — draw the value inside each rectangle
+- `onNodeTap` (ValueChanged\<OiTreemapNode\>?, default: null) — fires with the tapped node
+
+**Use When:** Comparing sizes of many categories (or nested categories) by area.
+**Avoid When:** Precise value comparison matters; use OiBarChart. For radial drill-down, use OiSunburstChart.
+
+---
+
+#### OiSunburstChart
+**Tags:** `chart`, `sunburst`, `hierarchy`, `tree`, `drill-down`
+**Tier:** Composite (charts)
+
+Draws a tree as concentric rings (center is the root, first ring is depth 1, etc.). Mapper-first over a flat list: give every node an id and parent id and it builds the tree; roots are nodes whose `parentId` returns null. Branch values are summed from children, so `value` only matters on leaves.
+
+**Key Parameters:**
+- `label` (String, required) — accessibility label for the chart
+- `data` (List\<TNode\>, required) — flat list of nodes, including the root
+- `nodeId` (String Function(TNode), required) — reads the unique id of a node
+- `parentId` (String? Function(TNode), required) — reads the parent id; return null for a root
+- `value` (num Function(TNode), required) — reads a leaf node's value
+- `nodeLabel` (String Function(TNode), required) — reads a node's display label
+- `maxDepth` (int?, default: null) — limit the number of rings drawn
+- `centerContent` (Widget?, default: null) — widget shown in the center circle
+- `onNodeTap` (void Function(TNode)?, default: null) — fires with the tapped item
+- `compact` (bool?, default: null) — suppress arc labels; when null, derived from width
+- `semanticLabel` (String?, default: null) — overrides `label` for screen readers
+
+**Use When:** Showing a multi-level hierarchy where depth and share both matter.
+**Avoid When:** Flat single-level data; use OiPieChart. For rectangular area layout, use OiTreemap.
+
+---
+
+#### OiHierarchicalChart
+**Tags:** `chart`, `hierarchy`, `tree`, `base`, `custom`
+**Tier:** Composite (charts)
+
+The base tree builder behind OiTreemap and OiSunburstChart. It takes a flat list, builds a tree via `OiHierarchicalSeries`, and hands the computed roots to your `seriesBuilder` to draw. Reach for it only when you need a custom tree rendering; otherwise use OiTreemap or OiSunburstChart.
+
+**Key Parameters:**
+- `label` (String, required) — accessibility label for the chart
+- `series` (OiHierarchicalSeries\<TNode\>, required) — data plus its mappers: `id`, `label`, `data`, `nodeIdMapper`, `parentIdMapper`, `valueMapper`, `nodeLabelMapper` (roots are items whose `parentIdMapper` returns null)
+- `seriesBuilder` (Widget Function(context, viewport, roots)?, default: null) — renders the computed roots; without it the tree is built but nothing is drawn
+- `emptyState` (Widget?, default: null) — shown when there is no data
+- `loadingState` (Widget?, default: null) — shown while the controller reports loading
+- `errorState` (Widget?, default: null) — shown when the controller reports an error
+- `semanticLabel` (String?, default: null) — overrides `label` for screen readers
+
+**Use When:** Building a bespoke hierarchical visualization not covered by the standard tree charts.
+**Avoid When:** A treemap or sunburst fits; use OiTreemap or OiSunburstChart directly.
+
+### CHARTS — Specialized (Radar, Gauge, Heatmap, Flow)
+
+#### OiRadarChart
+**Tags:** `radar`, `spider`, `chart`, `comparison`, `multi-axis`
+**Tier:** Composite (charts)
+
+A radar / spider chart that renders one or more series as overlapping polygons across shared radial axes. Reach for it to compare a few series on the same set of dimensions, like skill ratings or product scores.
+
+**Key Parameters:**
+- `axes` (List<String>, required) — axis labels around the perimeter
+- `series` (List<OiRadarSeries>, required) — the polygons to draw; each `OiRadarSeries` takes `label`, `values` (one per axis), optional `color`, `fillOpacity` (default 0.2)
+- `label` (String, required) — accessibility label
+- `showLegend` (bool, default: true) — legend below the chart
+- `showValues` (bool, default: false) — draw the numeric value at each vertex
+- `maxValue` (double?, default: null) — radial scale max; defaults to the largest value
+- `size` (double?, default: null) — chart diameter
+
+Note: a mapper-first `OiRadarSeriesData<T>` exists for extracting values from domain models.
+
+**Use When:** Comparing 2-4 series across the same handful of labeled dimensions.
+**Avoid When:** Order around a circle encodes a value or you have one series of categories — use OiPolarAreaChart.
+
+---
+
+#### OiPolarChart
+**Tags:** `polar`, `radial`, `base`, `custom-paint`, `pie`, `donut`
+**Tier:** Composite (charts)
+
+Base composite for radial layouts (pie, donut, radar). It handles arc layout, angular hit testing, center content, and behaviors, but paints nothing by itself — you pass a `seriesBuilder`. Use only when building a custom radial chart.
+
+**Key Parameters:**
+- `label` (String, required) — accessibility label
+- `series` (List<OiPolarSeries<T>>, required) — mapper-first data; each `OiPolarSeries` takes `id`, `label`, `valueMapper`, `labelMapper` required, plus optional `data`, `color`, `visible`
+- `seriesBuilder` (Widget Function(context, viewport, visibleSeries)?, default: null) — draws the arcs; without it the chart is blank
+- `angleAxis` (OiPolarAngleAxis?, default: null) — angle axis config
+- `radiusAxis` (OiPolarRadiusAxis?, default: null) — radius axis config
+- `centerContent` (Widget?, default: null) — center widget, e.g. a donut label
+- `controller` (OiChartController?, default: null) — external controller
+
+**Use When:** Building a bespoke radial chart the ready-made widgets do not cover.
+**Avoid When:** You want a working radar, pie, or donut out of the box — use OiRadarChart or OiPieChart/OiDonutChart.
+
+---
+
+#### OiPolarAreaChart
+**Tags:** `polar-area`, `radial`, `wedge`, `chart`, `cyclic`
+**Tier:** Composite (charts)
+
+Equal-angle wedges whose radius encodes a value. Reach for it when the order around the circle matters, like months of the year. Unlike OiPolarChart, it paints itself.
+
+**Key Parameters:**
+- `label` (String, required) — accessibility label
+- `series` (List<OiPolarAreaSeries<T>>, required) — mapper-first; each `OiPolarAreaSeries` takes `id`, `label`, `data`, `categoryMapper`, `valueMapper` required, plus optional `color`, `visible`. All visible series must have the same item count.
+- `startAngle` (double, default: -90) — start angle in degrees; -90 starts at the top
+- `showLabels` (bool, default: true) — category labels around the perimeter
+- `showLegend` (bool, default: true) — legend below the chart
+- `fillOpacity` (double, default: 0.65) — wedge fill opacity
+- `compact` (bool?, default: null) — hide labels and legend; auto below 120 px wide
+
+**Use When:** Cyclic categorical data where angular position is meaningful.
+**Avoid When:** Comparing several series on named axes — use OiRadarChart.
+
+---
+
+#### OiGauge
+**Tags:** `gauge`, `speedometer`, `kpi`, `single-value`, `progress`
+**Tier:** Composite (charts)
+
+A speedometer arc showing one value within a range. Reach for it to show CPU load, a score, or progress toward a target. It renders a single measurement, so there is no series to build.
+
+**Key Parameters:**
+- `value` (double, required) — the value the needle points to (clamped to min/max)
+- `label` (String, required) — accessibility label
+- `min` (double, default: 0) — range minimum
+- `max` (double, default: 100) — range maximum
+- `segments` (List<OiGaugeSegment>?, default: null) — colored range bands; each `OiGaugeSegment` takes `from`, `to`, `color` required, optional `label`
+- `target` (double?, default: null) — goal marker on the arc
+- `showValue` (bool, default: true) — show the numeric value below the arc
+- `formatValue` (String Function(double)?, default: null) — custom value formatter
+- `size` (double?, default: null) — gauge diameter
+
+**Use When:** Displaying one metric against a known range or target.
+**Avoid When:** Showing a value over time or many categories — use OiLineChart or OiBarChart.
+
+---
+
+#### OiHeatmap
+**Tags:** `heatmap`, `grid`, `matrix`, `chart`, `intensity`
+**Tier:** Composite (charts)
+
+A grid of cells each colored on a low-to-high gradient by its value. Reach for it to show a small matrix, like activity by day and hour. Cells are placed by zero-based row and column index; the value shows inside each cell by default so color is never the only cue.
+
+**Key Parameters:**
+- `cells` (List<OiHeatmapCell>, required) — the grid cells; each `OiHeatmapCell` takes `row`, `column`, `value`, all required
+- `label` (String, required) — accessibility label
+- `rowLabels` (List<String>?, default: null) — labels down the left edge
+- `columnLabels` (List<String>?, default: null) — labels across the top edge
+- `minValue` / `maxValue` (double?, default: null) — color scale bounds; default to the data range
+- `lowColor` / `highColor` (Color?, default: null) — gradient endpoints
+- `showValues` (bool, default: true) — draw the value inside each cell
+- `onCellTap` (ValueChanged<OiHeatmapCell>?, default: null) — cell tap callback
+
+**Use When:** A small, index-addressed matrix of values.
+**Avoid When:** Showing daily activity across a calendar year — use OiCalendarHeatmap.
+
+---
+
+#### OiCalendarHeatmap
+**Tags:** `calendar-heatmap`, `contribution-grid`, `github`, `activity`, `time-series`
+**Tier:** Composite (charts)
+
+A GitHub-style contribution grid where columns are weeks and rows are days. Reach for it to show daily activity over weeks or a year. You supply your own data type and mapper functions; items on the same date are summed.
+
+**Key Parameters:**
+- `label` (String, required) — accessibility label
+- `data` (List<T>, required) — your activity records
+- `dateMapper` (DateTime Function(T), required) — extracts the date from a record
+- `valueMapper` (num Function(T), required) — extracts the value from a record
+- `startDate` (DateTime?, default: null) — first date shown; defaults to one year before endDate
+- `endDate` (DateTime?, default: null) — last date shown; defaults to today
+- `colorScale` (OiColorScale?, default: null) — value-to-color mapping; defaults to a green scale
+- `weekStartsOn` (int, default: DateTime.monday) — first day of each week column
+- `showMonthLabels` / `showDayLabels` (bool, default: true) — axis labels
+- `cellSize` (double, default: 12) / `cellSpacing` (double, default: 2) — cell geometry in px
+
+**Use When:** Visualizing per-day activity across weeks or a full year.
+**Avoid When:** A small arbitrary row/column matrix — use OiHeatmap.
+
+---
+
+#### OiMatrixChart
+**Tags:** `matrix`, `base`, `custom-paint`, `heatmap`, `correlation`
+**Tier:** Composite (charts)
+
+Base composite for cell-grid charts like heatmaps and correlation matrices. It handles grid layout, color scaling, and cell hit testing, but you supply a `seriesBuilder` to paint the cells. Use only when building a custom grid.
+
+**Key Parameters:**
+- `label` (String, required) — accessibility label
+- `series` (List<OiMatrixSeries<T>>, required) — mapper-first; each `OiMatrixSeries` takes `id`, `label`, `rowMapper`, `columnMapper`, `valueMapper` required, plus optional `data`, `color`, `visible`
+- `seriesBuilder` (Widget Function(context, viewport, visibleSeries)?, default: null) — draws the cells; without it the chart is blank
+- `xAxis` / `yAxis` (OiChartAxis?, default: null) — axis config
+- `colorScale` (OiColorScale?, default: null) — value-to-color mapping
+- `controller` (OiChartController?, default: null) — external controller
+
+**Use When:** Building a bespoke cell-grid chart the ready-made widgets do not cover.
+**Avoid When:** You want a working grid out of the box — use OiHeatmap.
+
+---
+
+#### OiSankey
+**Tags:** `sankey`, `flow`, `diagram`, `funnel`, `part-to-whole`
+**Tier:** Composite (charts)
+
+A Sankey diagram showing how an amount splits and flows between stages, like a budget or a conversion funnel. Nodes sit in columns derived from the link graph, and link width is proportional to value.
+
+**Key Parameters:**
+- `nodes` (List<OiSankeyNode>, required) — the nodes; each `OiSankeyNode` takes `key`, `label` required, optional `color`
+- `links` (List<OiSankeyLink>, required) — the flows; each `OiSankeyLink` takes `source`, `target`, `value` required, optional `color`
+- `label` (String, required) — accessibility label
+- `showLabels` (bool, default: true) — label next to each node
+- `showValues` (bool, default: false) — each node's total value
+- `onNodeTap` (ValueChanged<OiSankeyNode>?, default: null) — node tap callback
+- `onLinkTap` (ValueChanged<OiSankeyLink>?, default: null) — link tap callback
+
+**Use When:** Tracing how quantities move and split between stages.
+**Avoid When:** You need a fully custom flow/network layout — use OiFlowChart.
+
+---
+
+#### OiFlowChart
+**Tags:** `flow`, `network`, `base`, `custom-paint`, `sankey`
+**Tier:** Composite (charts)
+
+Base composite for flow and network layouts (Sankey, alluvial). It handles node and link layout and flow scaling, but you supply a `seriesBuilder` to draw the bands. Use only when building a custom flow diagram.
+
+**Key Parameters:**
+- `label` (String, required) — accessibility label
+- `series` (OiFlowSeries<TNode, TLink>, required) — a single mapper-first series taking `id`, `label`, `data`, `links`, `nodeIdMapper`, `nodeLabelMapper`, `sourceIdMapper`, `targetIdMapper`, `linkValueMapper` required, plus optional `color`, `visible`
+- `seriesBuilder` (Widget Function(context, viewport, series)?, default: null) — draws nodes and links; without it the chart is blank
+- `controller` (OiChartController?, default: null) — external controller
+
+**Use When:** Building a bespoke flow or network diagram the ready-made widgets do not cover.
+**Avoid When:** You want a working flow diagram out of the box — use OiSankey.
+
+### CHARTS — Infrastructure, Behaviors, Scales & Theming
+
+#### OiKpiBoard
+**Tags:** `kpi`, `metrics`, `dashboard`, `sparkline`, `charts`
+**Tier:** Module (charts)
+
+Responsive Wrap-based grid of `OiKpiCard` widgets for showing key metrics with deltas, sparklines, and target progress. Column count adapts to available width (drops columns below a 160px minimum card width). Import from `package:obers_ui_charts/obers_ui_charts.dart`.
+
+**Key Parameters:**
+- `label` (String, required) — accessibility label for the board container
+- `metrics` (List\<OiKpiMetric>, required) — the metrics to render; each has `id`, `title`, `value`, optional `previousValue`, `format`, `sparklineData`, `target`, `status`. Empty list shows an empty state.
+- `columns` (int, default: 3) — preferred max column count; actual count reduces on narrow screens
+- `cardStyle` (OiKpiCardStyle, default: standard) — `standard`, `compact`, or `detailed`, applied to every card
+- `showSparklines` (bool, default: true) — inline sparklines when data available (ignored for compact)
+- `showDeltas` (bool, default: true) — delta arrow and percentage change
+- `showTargets` (bool, default: true) — target progress bar when a target is set (ignored for compact)
+- `spacing` (double, default: 12.0) — gap between cards
+- `settings` (OiChartSettingsDriverBinding?, default: null) — optional persistence of board config
+- `semanticLabel` (String?, default: null) — overrides `label` for screen readers
+
+**Use When:** Showing a top-of-dashboard row/grid of headline metrics with trend and target context.
+**Avoid When:** Displaying a single metric (use `OiKpiCard` directly) or plotting a full time series (use `OiLineChart`).
+
+---
+
+#### OiKpiCard
+**Tags:** `kpi`, `metric`, `card`, `sparkline`, `charts`
+**Tier:** Module (charts)
+
+Single-metric display card driven by one `OiKpiMetric`. Renders title, value, delta badge, optional sparkline, and target progress bar. Color adapts to the metric's `status` (onTrack=success, needsAttention=warning, critical=error, neutral=primary). Usually placed inside `OiKpiBoard` but usable standalone.
+
+**Key Parameters:**
+- `metric` (OiKpiMetric, required) — the metric data (`id`, `title`, `value`, optional `previousValue`, `format`, `sparklineData`, `target`, `status`)
+- `style` (OiKpiCardStyle, default: standard) — `standard` (title/value/delta/sparkline/target), `compact` (title/value/delta only), or `detailed` (standard plus min/max/avg stats)
+- `showSparkline` (bool, default: true) — show inline sparkline when data present (standard/detailed only)
+- `showDelta` (bool, default: true) — show delta arrow and percentage change
+- `showTarget` (bool, default: true) — show target progress bar when a target is set (standard/detailed only)
+
+Note: `OiKpiCard` takes no `label`; accessibility text is derived from the metric title and value.
+
+**Use When:** Displaying one headline number with trend, delta, and target context.
+**Avoid When:** Showing many metrics at once (use `OiKpiBoard`) or a large interactive trend chart (use `OiLineChart`/`OiSparkline`).
+
+---
+
+#### OiAnalyticsDashboard
+**Tags:** `dashboard`, `charts`, `grid`, `sync`, `analytics`
+**Tier:** Module (charts)
+
+Multi-panel dashboard that lays several charts out in a grid and can synchronize their hover/crosshair/selection interactions. Each panel is an `OiDashboardPanel` naming its grid position and holding a chart. Set a `syncGroup` and hovering one panel highlights the matching spot on the others.
+
+**Key Parameters:**
+- `label` (String, required) — accessibility label for the dashboard
+- `panels` (List\<OiDashboardPanel>, required) — the chart panels; each has `id`, `title`, `gridPosition` (`OiGridPosition` with row/col/colSpan/rowSpan), and `chart`. Empty shows an empty state.
+- `syncGroup` (String?, default: null) — links panels so hover and crosshair sync across them
+- `columns` (int, default: 3) — logical grid columns; reduced on narrow screens
+- `rowHeight` (double, default: 250.0) — height of each grid row in pixels
+- `spacing` (double, default: 16.0) — gap between panels
+- `filters` (List\<OiDashboardFilter>, default: []) — optional filter bar above the grid
+- `onFilterChange` (ValueChanged\<List\<OiDashboardFilter>>?, default: null) — fires when a filter changes
+- `semanticLabel` (String?, default: null) — overrides `label` for screen readers
+
+**Use When:** Building a synced multi-chart analytics view with a fixed grid layout.
+**Avoid When:** You need user-driven pivoting of one dataset (use `OiChartExplorer`) or a simple metric grid (use `OiKpiBoard`).
+
+---
+
+#### OiChartSurface
+**Tags:** `surface`, `container`, `card`, `charts`, `theming`
+**Tier:** Component (charts)
+
+Themed container to sit a chart inside, built on `OiSurface`, matching the card background, border, and shadow of `OiCard` and the rest of the library. Default constructor is a card; named constructors switch the look.
+
+**Key Parameters:**
+- `child` (Widget, required) — the chart to render inside
+- `padding` (EdgeInsetsGeometry?, default: varies by preset) — inner padding (16 card, 8 compact, 0 atom)
+- `border` (OiBorderStyle?, default: null) — border override
+- `gradient` (OiGradientStyle?, default: null) — background gradient, replaces fill color
+- `halo` (OiHaloStyle?, default: null) — optional glow around the surface
+- `semanticLabel` (String?, default: null) — accessibility label
+
+Constructors: `OiChartSurface(...)` (card with shadow), `.atom(...)` (bare, no chrome/padding), `.compact(...)` (reduced padding), `.soft(...)` (tinted background, no shadow), `.frosted(...)` (frosted-glass backdrop blur).
+
+**Use When:** Wrapping a chart so it visually matches surrounding cards.
+**Avoid When:** The chart already sits inside an `OiCard` or needs no chrome (use `.atom` or omit).
+
+---
+
+#### OiChartLegend
+**Tags:** `legend`, `series`, `toggle`, `charts`, `accessibility`
+**Tier:** Composite (charts)
+
+Shows a color marker and label per series with tap-to-toggle visibility and double-tap to isolate one series. Keyboard operable and moves below the chart on compact screens. Most charts render a legend for you via `showLegend`; reach for this directly only in custom layouts.
+
+**Key Parameters:**
+- `items` (List\<OiChartLegendItem>, required) — one entry per series; each has `id`, `label`, `color`, `visible`
+- `position` (OiChartLegendPosition, default: bottom) — `top`, `bottom`, `left`, `right`, or `floating` (forced to `bottom` on compact)
+- `markerShape` (OiLegendMarkerShape, default: square) — `square`, `circle`, `line`, `diamond`, or `triangle`
+- `onToggle` (ValueChanged\<String>?, default: null) — fires with the tapped series id
+- `onExclusiveFocus` (ValueChanged\<String>?, default: null) — fires on double-tap to isolate one series
+- `itemBuilder` (OiLegendItemBuilder?, default: null) — custom legend-item builder
+- `legendTheme` (OiChartLegendTheme?, default: null) — per-legend theme override
+- `semanticLabel` (String?, default: null) — accessibility label for the legend container
+
+**Use When:** Placing a legend yourself in a custom chart layout, or reusing the toggle UI outside a chart.
+**Avoid When:** You want the legend to manage visibility state for you (use `OiChartSeriesToggle`) or the chart's built-in `showLegend` suffices.
+
+---
+
+#### OiChartSeriesToggle
+**Tags:** `legend`, `series`, `visibility`, `toggle`, `charts`
+**Tier:** Composite (charts)
+
+Wraps `OiChartLegend` and owns the visibility logic, adding "Show All" / "Hide All" bulk controls. You hold the hidden set in your state and update it in `onVisibilityChanged`.
+
+**Key Parameters:**
+- `series` (List\<OiSeriesInfo>, required) — all series, each with `id`, `label`, `color`
+- `onVisibilityChanged` (ValueChanged\<Set\<String>>, required) — fires with the updated set of hidden ids
+- `hiddenSeriesIds` (Set\<String>, default: {}) — the currently hidden series
+- `legendPosition` (OiChartLegendPosition, default: bottom) — position of the embedded legend
+- `markerShape` (OiLegendMarkerShape, default: square) — marker shape for legend items
+- `showBulkControls` (bool, default: true) — show the "Show All" / "Hide All" row
+- `semanticLabel` (String?, default: null) — accessibility label for the control area
+
+**Use When:** You want ready-made series show/hide with bulk controls and managed state.
+**Avoid When:** You need a bare legend and manage visibility yourself (use `OiChartLegend`).
+
+---
+
+#### OiChartAxis
+**Tags:** `axis`, `scale`, `ticks`, `grid`, `charts`
+**Tier:** Composite (charts)
+
+Configures a single axis, passed to a Cartesian chart's `xAxis` or `yAxis`. Generic over its domain type; use `OiChartAxis<num>` for a numeric axis. Omit it and the chart infers a sensible axis from the data.
+
+**Key Parameters:**
+- `label` (String?, default: null) — axis title shown beside the axis
+- `scaleType` (OiAxisScaleType?, default: null/inferred) — `linear`, `logarithmic`, `time`, `category`, `band`, `point`, `quantile`, or `threshold`
+- `position` (OiAxisPosition?, default: null) — `top`, `bottom`, `left`, or `right`
+- `min` / `max` (double?, default: null) — fixed numeric range; determined from data when null
+- `divisions` (int?, default: null) — number of grid divisions
+- `labels` (List\<String>?, default: null) — fixed tick labels instead of generated ones
+- `format` (String Function(double)?, default: null) — formats numeric tick values
+- `formatter` (OiAxisFormatter\<TDomain>?, default: null) — typed formatter with theme/locale context (preferred for new code)
+- `tickStrategy` (OiTickStrategy, default: auto) — `auto`, `even`, `all`, or `minMax`
+- `showGrid` (bool, default: true) — draw grid lines for this axis
+- `showAxisLine` (bool, default: true) — draw the axis line
+- `showTickMarks` (bool, default: true) — draw tick marks
+- `labelOverflow` (OiChartLabelOverflow, default: skip) — how to handle overlapping labels
+
+**Use When:** You need a fixed range, custom tick formatting, a specific scale type, or a category axis.
+**Avoid When:** The inferred default axis is fine (omit the parameter).
+
+---
+
+#### OiChartZoomControls
+**Tags:** `zoom`, `controls`, `viewport`, `charts`, `touch`
+**Tier:** Component (charts)
+
+Touch-friendly zoom-in / zoom-out / reset buttons for driving a chart viewport. A thin control widget; you wire the callbacks to your zoom state or a chart controller/`OiZoomPanBehavior`.
+
+**Key Parameters:**
+- `onZoomIn` (VoidCallback, required) — called when the zoom-in (+) button is pressed
+- `onZoomOut` (VoidCallback, required) — called when the zoom-out (−) button is pressed
+- `onReset` (VoidCallback?, default: null) — called on reset; when null, no reset button is shown
+
+Note: This widget takes no `label`; its buttons carry their own semantic labels.
+
+**Use When:** Exposing explicit zoom buttons on a touch device alongside gesture-based zoom.
+**Avoid When:** Gesture-only zoom is enough (use `OiZoomPanBehavior` on the chart directly).
+
+---
+
+#### OiChartExplorer
+**Tags:** `explorer`, `pivot`, `interactive`, `charts`, `data`
+**Tier:** Module (charts)
+
+Interactive data-exploration widget (generic over your row type `T`). Users assign columns to X, Y, and group-by by tapping column chips (cycles X → Y → groupBy → unassigned) and switch chart type among line, bar, scatter, pie, heatmap, and histogram. Renders a column picker beside a live chart area.
+
+**Key Parameters:**
+- `label` (String, required) — accessibility label for the explorer
+- `data` (List\<T>, required) — the domain objects to explore
+- `columns` (List\<OiExplorerColumn\<T>>, required) — column descriptors; each has `id`, `label`, `accessor`, and `type` (`OiColumnType.numeric`/`categorical`/`date`)
+- `initialChart` (OiExplorerChartType, default: line) — chart type on first render (ignored when `controller` is given)
+- `xColumn` / `yColumn` / `groupBy` (String?, default: null) — initial axis/group column ids (ignored when `controller` is given)
+- `controller` (OiExplorerController?, default: null) — external controller; when set, the widget is fully controlled and the initial* params are ignored
+- `semanticLabel` (String?, default: null) — overrides `label` for screen readers
+
+**Use When:** Letting users pivot and re-chart a single dataset interactively.
+**Avoid When:** The layout is fixed and predetermined (use `OiAnalyticsDashboard` or a single chart).
+
+---
+
+#### OiChartSyncProvider
+**Tags:** `sync`, `crosshair`, `hover`, `charts`, `inherited-widget`
+**Tier:** Foundation (charts)
+
+`InheritedWidget` that shares an `OiChartSyncGroup` coordinator with descendant charts so hover/crosshair, selection, and keyboard focus sync across them. Charts read it via `OiChartSyncProvider.of(context)`. `OiAnalyticsDashboard` sets this up automatically for its panels; use it directly for custom multi-chart layouts.
+
+**Key Parameters:**
+- `syncGroup` (String, required) — group name; charts sharing it participate in synced interactions (looked up in `OiChartSyncGroupRegistry`)
+- `child` (Widget, required) — subtree containing the charts to sync
+- `options` (OiChartSyncOptions, default: const OiChartSyncOptions()) — which channels sync: `syncCrosshair` (true), `syncSelection` (true), `syncViewport` (false), `syncKeyboardFocus` (true)
+
+Alternate: `OiChartSyncProvider.withCoordinator({coordinator, child})` to supply an explicit `OiChartSyncGroup`.
+
+**Use When:** Wiring hover/crosshair sync across charts in a custom (non-dashboard) layout.
+**Avoid When:** Using `OiAnalyticsDashboard` (pass its `syncGroup` instead).
+
+---
+
+#### Chart Interaction Behaviors
+
+Small attachable interaction objects passed to a Cartesian chart's `behaviors:` list. Each takes callbacks that fire as the user interacts so you keep your own state in sync. All extend `OiChartBehavior`.
+
+- `OiZoomPanBehavior` — scroll-wheel zoom, pinch zoom, and drag pan. Params: `config` (`OiZoomPanConfig` with `minZoom` 0.5, `maxZoom` 20.0, `wheelZoomFactor` 0.1, `enableWheelZoom`, `enablePinchZoom`, `enableDragPan`), `onZoomChanged(zoomLevel, panOffset)`.
+- `OiHoverSyncBehavior` — broadcasts the hover domain position to charts in the same sync group. Param: `onHoverPositionChanged(double? domainPosition)`.
+- `OiSelectionBehavior` — manages point/series/domain-group/brush selection. Params: `mode` (`OiSelectionMode`, default `point`), `multiSelect` (default false), `onChanged(Set<(seriesId, index)>)`.
+- `OiSeriesToggleBehavior` — tracks per-series visibility, usually driven by a legend. Param: `onVisibilityChanged(Map<String, bool>)`.
+- `OiKeyboardExploreBehavior` — arrow-key navigation across points and series, Enter to select. Params: `onPointFocused(seriesIndex, pointIndex)`, `onPointSelected(seriesIndex, pointIndex)`, `onSelectionCleared`.
+
+---
+
+#### Chart Scales
+
+Scales map a data domain to a pixel (or color) range and back; they power axis placement and value positioning. They live in obers_ui core (`lib/src/foundation/`, re-exported by the charts package) and are used to build charts. All extend `OiChartScale<T>`. You rarely construct them directly — set `scaleType` on an `OiChartAxis` instead — but they are available for custom rendering.
+
+- `OiLinearScale` — continuous numeric domain mapped linearly to pixels.
+- `OiLogarithmicScale` — continuous numeric domain mapped logarithmically.
+- `OiTimeScale` — `DateTime` domain mapped linearly to pixels.
+- `OiBandScale` — discrete string categories mapped to pixel bands with width (bar charts).
+- `OiPointScale` — discrete string categories mapped to evenly-spaced points (no width).
+- `OiCategoryScale` — discrete string categories mapped to pixel positions.
+- `OiQuantileScale` — continuous numeric input bucketed into discrete output by quantiles.
+- `OiThresholdScale` — continuous numeric input bucketed into discrete output by explicit thresholds.
+
+---
+
+#### Chart Theming
+
+Charts read colors and visual tokens from the theme like everything else. Series colors come from `context.colors.chart`, an ordered categorical list. To customize charts globally, provide an `OiChartThemeData`, reachable at `context.components.chart`.
+
+- `OiChartThemeData` — groups every visual token into optional sub-themes: `palette`, `axis`, `grid`, `legend`, `tooltip`, `crosshair`, `annotation`, `selection`, `state`, `motion`, and `density`. Override only what you need, e.g. `const OiChartThemeData(grid: OiChartGridTheme(dashPattern: [4, 2]), density: OiChartDensityTheme(lineWidth: 3))`. Accessed via `context.components.chart`.
+- `OiChartPalette` — the color side of the theme. Fields: `categorical` (List\<Color>, series colors assigned by index and cycled), `positive`, `negative`, `neutral`, `highlight` (semantic colors), and optional `sequential` / `diverging` (List\<Color>? gradients for continuous scales like heatmaps). Build one with the `OiChartPalette.colors(scheme)` factory from a color scheme, or `OiChartPalette.atom(color:)` for a single-color chart.
+
+#### Chart Internals (advanced)
+
+The package also exports the low-level render widgets that the charts above compose. You rarely build these by hand; use the chart widgets and `OiChartSurface` instead. They exist for building a custom chart type: `OiChartCanvas`, `OiChartAxisWidget`, `OiChartCrosshairWidget`, `OiChartTooltipWidget`, `OiChartBrushWidget`, `OiChartAnnotationLayer`, and the per-chart legend widgets (`OiLineChartLegend`, `OiBarChartLegend`, `OiAreaChartLegend`, `OiBubbleChartLegend`, `OiBubbleChartSizeLegend`). For a normal legend, use `OiChartLegend`.
+
+---
+
 ## obers_ui_autoforms — Auto-Form Package
 
 > **Package:** `packages/obers_ui_autoforms`
@@ -6260,6 +7274,8 @@ OiAfForm<MyField, Map<String, dynamic>>(
 | `OiAfColorInput<TField>` | `OiColorInput` | `Color` |
 | `OiAfFileInput<TField>` | `OiFileInput` | `List<String>` |
 | `OiAfSegmentedControl<TField, TValue>` | `OiSegmentedControl<TValue>` | `TValue` |
+| `OiAfArrayInput<TField, TValue>` | `OiArrayInput` | `List<TValue>` |
+| `OiAfRichEditor<TField>` | `OiRichEditor` | rich content |
 
 ### Aggregate Widgets
 
@@ -6268,6 +7284,13 @@ OiAfForm<MyField, Map<String, dynamic>>(
 | `OiAfErrorSummary<TField>` | Displays all form errors with focus-on-tap. |
 | `OiAfSubmitButton<TField, TData>` | Submit button with loading state. |
 | `OiAfResetButton<TField>` | Reset button with configurable mode. |
+
+### Other Widgets
+
+| Widget | Purpose |
+|---|---|
+| `OiAfScope<TField, TData>` | Provides the controller to a subtree. `OiAfForm` wraps this; use it directly when you do not want the form frame. |
+| `OiAfDebugOverlay` | Development overlay showing each field's value, dirty state, and errors. |
 
 ### Controller Registration Helpers
 
@@ -6300,3 +7323,35 @@ addFormValidator(validator)
 | `autoform` | OiAfForm, OiAfController, OiAfTextInput, OiAfSubmitButton, ... |
 | `form` | OiAfForm, OiAfErrorSummary, OiAfSubmitButton, OiAfResetButton |
 | `validation` | OiAfValidators, OiAfValidationContext |
+
+### Controlled admin presentations
+
+- `OiAppShell`: optional `primaryNavigation`, `currentPrimaryRoute`,
+  `onPrimaryNavigate`, `primaryLeading`, `primaryTrailing`, `navigationHeader`,
+  `navigationFooter`, and `search`; theme geometry uses `components.appShell`.
+- `OiPageHeader`: existing header plus `subtitle`, `metadata`, `leading`,
+  `trailing`, `padding`, `titleVariant`; actions wrap on narrow screens.
+- `OiPageLayout`: bounded `header`, `navigation`, `child`, `aside`, `footer`;
+  `scrollable` selects owned scrolling, compact asides use `OiSheet`.
+- `OiWizardLayout`: controlled `steps`, `currentStep`, `completedSteps`,
+  `enabledSteps`, `onStepTap`, `header`, `child`, `footer`, `aside`; no form state.
+- `OiWizardStepPresentation`: `title`, optional `description` and `summary`.
+- `OiRadioTile.card`: rich `details` and `badge` around the standard radio choice.
+- `OiTable`: controlled `expandedRowKeys`, `expandedRowBuilder`,
+  `onExpandedRowsChanged`, all keyed through the existing `rowKey`.
+- `OiFilterPanel`/`OiFilterSection`/`OiFilterInput`: expanded typed filters sharing
+  `OiFilterDefinition` with the compact filter bar.
+- `OiSheet`: `inset`, `header`, `footer`, `scrollable` on constructor/show/showAsync.
+- `OiIconSource`: SVG string/asset/font replacements mapped by existing IconData
+  tokens in `OiIconThemeData.sources`; all component icons use the shared renderer.
+- `OiTextTheme.headingScale`: explicit responsive heading scale; null preserves
+  legacy scaling. Component typography preserves TextStyle font variations.
+- Charts: `OiBarPattern`, category patterns/colors/group, rich donut center/legend,
+  and `OiChartLegendItem.value`.
+- `OiCapacityIndicator`: semantic value/max progress, optional warning threshold,
+  striped remainder, and `horizontal` label/track/value alignment.
+- `OiRadioTileIndicator.check`: compact selected-only check with radio semantics.
+- `OiAvatar.foregroundColor`: explicit initials/icon color for tinted identities.
+
+
+`OiHatchPlaceholder(label:, height:)` renders a themed, static empty-selection region without a loading implication. `OiLabel.body` and `.variant` accept an optional `style` merged over the theme; explicit label colors still win. `OiInputFrame` associates its visible label and hint with the actual editable control for browser and screen-reader semantics. Rich radio cards expose one named selectable control including their detail text.

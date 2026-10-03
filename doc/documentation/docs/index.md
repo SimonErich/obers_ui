@@ -1,14 +1,14 @@
 # ObersUI
 
-**The creamiest Flutter UI kit.**
+**A Flutter UI kit with everything you need to build a real app.**
 
-*"Obers"* is the Austrian word for cream — the kind you pour into coffee or whip into something wonderful. Just like Obers makes everything richer, ObersUI gives your Flutter apps a smooth, polished foundation to build on.
+*"Obers"* is the Austrian word for cream, the kind you pour into coffee or whip into something nice. ObersUI works the same way. Pour it into your Flutter app and you get a smooth, consistent foundation to build on.
 
 ---
 
 ## What is ObersUI?
 
-ObersUI is a comprehensive, open-source Flutter UI library built for modern, complex applications. It ships with **100+ components** across four carefully designed tiers — from low-level primitives to full-featured modules you can drop into your app.
+ObersUI is an open-source Flutter UI library for modern, data-heavy applications. It ships 250+ widgets across five tiers, from small primitives to full-screen modules you can drop straight into your app. It has no Material or Cupertino dependency. Everything is built from scratch and styled by a single theme.
 
 <div class="grid cards" markdown>
 
@@ -16,7 +16,7 @@ ObersUI is a comprehensive, open-source Flutter UI library built for modern, com
 
     ---
 
-    Install ObersUI, set up `OiApp`, and render your first widget in under 5 minutes.
+    Install ObersUI, set up `OiApp`, and render your first screen in a few minutes.
 
     [:octicons-arrow-right-24: Get started](getting-started/index.md)
 
@@ -24,37 +24,45 @@ ObersUI is a comprehensive, open-source Flutter UI library built for modern, com
 
     ---
 
-    One line for brand colors, full control when you need it. Design tokens for everything.
+    One line for brand colors, full control when you want it. Tokens for everything.
 
     [:octicons-arrow-right-24: Explore theming](theming/index.md)
 
-- :material-view-grid-outline:{ .lg .middle } **Components**
+- :material-view-grid-outline:{ .lg .middle } **Widgets**
 
     ---
 
-    Buttons, tables, charts, file explorers, kanban boards — browse the full catalog.
+    Buttons, inputs, tables, file explorers, kanban boards, and more. Browse the catalog.
 
-    [:octicons-arrow-right-24: Browse components](components/index.md)
+    [:octicons-arrow-right-24: Browse widgets](widgets/index.md)
+
+- :material-chart-line:{ .lg .middle } **Charts**
+
+    ---
+
+    30+ chart types in the companion package, built on the same theme.
+
+    [:octicons-arrow-right-24: See charts](charts/index.md)
 
 </div>
 
 ---
 
-## Highlights
+## Why teams pick it
 
 | Feature | Details |
 | --- | --- |
-| **100+ widgets** | Primitives, components, composites, and full modules |
-| **Design tokens** | Colors, typography, spacing, radius, shadows, animations |
-| **Responsive** | 5 breakpoints, adaptive layouts, density modes |
-| **Accessible** | WCAG AA, reduced motion, 48dp touch targets, semantic labels |
-| **Persistent settings** | User preferences auto-saved via pluggable drivers |
-| **Platform-adaptive** | Web, iOS, Android, macOS, Windows, Linux |
-| **Zero Material dependency** | Pure widgets — no `MaterialApp` required |
+| **250+ widgets** | Primitives, components, composites, and full modules. |
+| **Design tokens** | Colors, typography, spacing, radius, shadows, motion. |
+| **Responsive** | 5 breakpoints, adaptive layouts, density modes. |
+| **Accessible** | Required labels, 48dp touch targets, reduced-motion support. |
+| **Persistent settings** | User preferences saved through pluggable drivers. |
+| **Platform-adaptive** | Web, iOS, Android, macOS, Windows, Linux. |
+| **No Material required** | Pure widgets, no `MaterialApp`. |
 
 ---
 
-## Quick taste
+## A quick taste
 
 ```dart
 import 'package:obers_ui/obers_ui.dart';
@@ -63,22 +71,30 @@ void main() {
   runApp(
     OiApp(
       theme: OiThemeData.fromBrand(color: Color(0xFF8B6914)),
-      home: Center(
-        child: OiButton.primary(
-          label: 'Pour some Obers',
-          onTap: () {},
-        ),
+      home: OiPage(
+        breakpoint: OiBreakpoint.compact,
+        children: [
+          OiLabel.h1('Pour some Obers'),
+          OiButton.primary(label: 'Get started', onTap: () {}),
+        ],
       ),
     ),
   );
 }
 ```
 
-That's it. One import, one theme, one app widget. Creamy smooth.
+One import, one theme, one app widget. From here, every widget you add reads its colors and spacing from the theme.
 
 ---
 
-## Explore more
+## Find your way around
 
-- [**API Reference**](/obers_ui/api/) — Full generated dart doc
-- [**GitHub**](https://github.com/SimonErich/obers_ui) — Source code & issues
+- **New here?** Read [Getting Started](getting-started/index.md), then [Core Ideas](getting-started/core-ideas.md).
+- **Looking for a widget?** The [Widgets catalog](widgets/index.md) groups everything by what it does.
+- **Building a full screen?** See the [Modules](modules/index.md) that wrap whole features.
+- **Styling the app?** Start with [Quick Brand Setup](theming/quick-brand.md).
+- **Need the reference?** The [AI Integration Guide](advanced/ai-readme.md) points to the full single-file catalog.
+
+---
+
+- [**GitHub**](https://github.com/simonerich/obers_ui) for source and issues.

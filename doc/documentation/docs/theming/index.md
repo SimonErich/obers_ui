@@ -1,31 +1,41 @@
-# Theming
+# Theming & Configuration
 
-ObersUI's theming system is designed with a simple philosophy: **easy to start, powerful when you need it.** Like a good Obers — smooth by default, whippable into anything.
+One theme drives the look of your whole app. You can start with a single brand
+color and never think about it again, or reach in and control every token when you
+need to. Nothing is hardcoded, so a change in one place updates everywhere.
 
-## Choose your level
+## Start here
 
-| Level | Effort | For whom |
-| --- | --- | --- |
-| [**Quick Brand Setup**](quick-brand.md) | One line | "Just make it match my brand color" |
-| [**Color System**](color-system.md) | Token overrides | "I want specific colors" |
-| [**Typography**](typography.md) | Font swap | "I want my own fonts" |
-| [**Tokens**](tokens.md) | Scale adjustments | "I want different spacing or radius" |
-| [**Component Themes**](component-themes.md) | Per-widget | "I want this specific button to look different" |
-| [**Dark Mode**](dark-mode.md) | Light/dark | "My app needs both modes" |
+- [**Quick Brand Setup**](quick-brand.md) turns one color into a full palette.
+- [**Dark Mode**](dark-mode.md) adds a dark theme and a system toggle.
 
-## Architecture at a glance
+## The token system
+
+- [**Color System**](color-system.md) covers the semantic swatches and the surface and text tokens.
+- [**Typography**](typography.md) covers the text styles and `OiLabel`.
+- [**Design Tokens**](tokens.md) covers spacing, radius, shadows, and motion.
+
+## Going further
+
+- [**Component Themes**](component-themes.md) restyle individual widgets without touching the rest.
+- [**Extending Themes**](extending-themes.md) gives full control with `copyWith` and per-subtree overrides.
+- [**Theme Tools**](theme-tools.md) cover exporting, previewing, and hot-swapping themes.
+
+## What lives on the theme
+
+`OiThemeData` holds every token family:
 
 ```text
 OiThemeData
-├── OiColorScheme        (semantic colors)
-├── OiTextTheme          (14 text styles)
-├── OiSpacingScale       (6 core values `xs`–`xxl` + 5 per-breakpoint page gutters)
-├── OiRadiusScale        (border radii)
-├── OiShadowScale        (elevation shadows)
-├── OiAnimationConfig    (durations + reduced motion)
-├── OiEffectsTheme       (hover, focus, active feedback)
-├── OiDecorationTheme    (border styles)
-└── OiComponentThemes    (per-widget overrides)
+├── OiColorScheme        semantic colors (primary, accent, success, ...)
+├── OiTextTheme          14 text styles, used through OiLabel
+├── OiSpacingScale       spacing (xs, sm, md, lg, xl, xxl)
+├── OiRadiusScale        corner radii
+├── OiShadowScale        elevation shadows
+├── OiAnimationConfig    durations, curves, reduced motion
+├── OiEffectsTheme       hover, focus, and active feedback
+├── OiDecorationTheme    borders and gradients
+└── OiComponentThemes    per-widget overrides
 ```
 
-All tokens are immutable. Use `copyWith` to derive modified versions.
+Every token is immutable. Use `copyWith` to derive a changed version.
