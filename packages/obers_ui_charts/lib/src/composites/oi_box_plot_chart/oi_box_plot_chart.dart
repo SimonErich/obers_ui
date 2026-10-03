@@ -252,6 +252,7 @@ class _OiBoxPlotChartState<T> extends State<OiBoxPlotChart<T>> {
                       horizontal: widget.horizontal,
                       showGrid: widget.showGrid,
                       gridColor: colors.borderSubtle,
+                      labelGap: context.components.chart?.axis?.labelGap ?? 4,
                       axisLabelColor: colors.textMuted,
                       highContrast: isHighContrast,
                       compact: isCompact,

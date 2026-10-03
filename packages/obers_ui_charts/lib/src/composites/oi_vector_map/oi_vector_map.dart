@@ -174,9 +174,10 @@ class _OiVectorMapState extends State<OiVectorMap> {
     if (values == null || values.isEmpty) return source;
     return [
       for (final region in source)
-        values.containsKey(region.id)
-            ? region.withValue(values[region.id])
-            : region,
+        if (values.containsKey(region.id))
+          region.withValue(values[region.id])
+        else
+          region,
     ];
   }
 

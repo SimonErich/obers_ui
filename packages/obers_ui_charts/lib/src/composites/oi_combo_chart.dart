@@ -160,6 +160,7 @@ class _OiComboChartPainter extends CustomPainter {
     required this.barRadius,
     this.hoveredSeriesIndex,
     this.hoveredPointIndex,
+    this.labelGap = 4,
   });
 
   final List<_ResolvedComboSeries> resolvedSeries;
@@ -171,6 +172,9 @@ class _OiComboChartPainter extends CustomPainter {
   final bool showGrid;
   final Color gridColor;
   final Color axisLabelColor;
+
+  /// Distance between grid axes and their tick labels.
+  final double labelGap;
   final bool highContrast;
   final bool compact;
   final List<String> xLabels;
@@ -222,12 +226,14 @@ class _OiComboChartPainter extends CustomPainter {
       chartRect,
       labels: xLabels,
       labelColor: axisLabelColor,
+      labelGap: labelGap,
     );
     OiChartGrid.paintYLabels(
       canvas,
       chartRect,
       labels: yLabels,
       labelColor: axisLabelColor,
+      labelGap: labelGap,
     );
 
     // Compute slot width for bar series (based on number of x-values).
@@ -458,6 +464,7 @@ class _OiComboChartPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(_OiComboChartPainter oldDelegate) =>
+      oldDelegate.labelGap != labelGap ||
       oldDelegate.resolvedSeries != resolvedSeries ||
       oldDelegate.showGrid != showGrid ||
       oldDelegate.gridColor != gridColor ||
@@ -907,6 +914,7 @@ class _OiComboChartState<T> extends State<OiComboChart<T>> {
                 maxY: range.maxY,
                 showGrid: widget.showGrid,
                 gridColor: widget.theme?.gridColor ?? colors.borderSubtle,
+                labelGap: context.components.chart?.axis?.labelGap ?? 4,
                 axisLabelColor:
                     widget.theme?.axisLabelColor ?? colors.textMuted,
                 highContrast: isHighContrast,

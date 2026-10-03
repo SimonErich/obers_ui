@@ -6,6 +6,45 @@ import 'package:obers_ui_charts/obers_ui_charts.dart';
 import '../../helpers/pump_chart_app.dart';
 
 void main() {
+  testWidgets(
+    'value list aligns numeric ends and keeps label content available',
+    (tester) async {
+      await tester.pumpChartApp(
+        const Center(
+          child: SizedBox(
+            width: 220,
+            child: OiChartLegend(
+              valueList: true,
+              items: [
+                OiChartLegendItem(
+                  id: 'ready',
+                  label: 'Ready',
+                  color: Color(0xff336699),
+                  value: '1',
+                ),
+                OiChartLegendItem(
+                  id: 'waiting',
+                  label: 'Waiting',
+                  color: Color(0xff993366),
+                  value: '128',
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+      expect(
+        tester.getRect(find.text('1')).right,
+        tester.getRect(find.text('128')).right,
+      );
+      expect(
+        tester.getRect(find.text('Ready')).left,
+        tester.getRect(find.text('Waiting')).left,
+      );
+      expect(tester.takeException(), isNull);
+    },
+  );
+
   const redItem = OiChartLegendItem(
     id: 'revenue',
     label: 'Revenue',

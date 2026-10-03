@@ -3,11 +3,13 @@
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:obers_ui/src/foundation/theme/component_themes/oi_chart_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme_data.dart';
 import 'package:obers_ui_charts/src/composites/oi_bar_chart/oi_bar_chart.dart';
 import 'package:obers_ui_charts/src/composites/oi_bar_chart/oi_bar_chart_accessibility.dart';
 import 'package:obers_ui_charts/src/composites/oi_bar_chart/oi_bar_chart_data.dart'
     show OiBarCategory, OiBarChartMode, OiBarSeries;
+import 'package:obers_ui_charts/src/composites/oi_bar_chart/oi_bar_chart_painter.dart';
 import 'package:obers_ui_charts/src/composites/oi_bubble_chart/oi_bubble_chart_interaction.dart';
 
 import '../../../helpers/pump_chart_app.dart';
@@ -69,6 +71,56 @@ Widget _barChart({
 // ── Tests ─────────────────────────────────────────────────────────────────────
 
 void main() {
+  testWidgets('axis labels honor typography and color from chart theme', (
+    tester,
+  ) async {
+    final base = OiThemeData.light();
+    const label = TextStyle(fontSize: 17, height: 1.3, letterSpacing: .2);
+    await tester.pumpChartApp(
+      _barChart(),
+      theme: base.copyWith(
+        components: base.components.copyWith(
+          chart: const OiChartThemeData(
+            axis: OiChartAxisTheme(
+              labelStyle: label,
+              labelColor: Color(0xFF123456),
+              labelGap: 8,
+            ),
+            density: OiChartDensityTheme(
+              padding: EdgeInsets.fromLTRB(50, 12, 20, 40),
+            ),
+          ),
+        ),
+      ),
+    );
+    final painter =
+        tester
+                .widget<CustomPaint>(
+                  find.byKey(const Key('oi_bar_chart_painter')),
+                )
+                .painter!
+            as OiBarChartPainter;
+    expect(painter.labelStyle?.fontSize, 17);
+    expect(painter.labelStyle?.letterSpacing, .2);
+    expect(painter.axisLabelColor, const Color(0xFF123456));
+    expect(painter.numericLabelGap, 8);
+    expect(painter.axisLabelGap, 8);
+    expect(painter.chartRect.left, 50);
+    expect(painter.chartRect.top, 12);
+  });
+
+  testWidgets('numeric labels retain four pixel default gap', (tester) async {
+    await tester.pumpChartApp(_barChart());
+    final painter =
+        tester
+                .widget<CustomPaint>(
+                  find.byKey(const Key('oi_bar_chart_painter')),
+                )
+                .painter!
+            as OiBarChartPainter;
+    expect(painter.numericLabelGap, 4);
+  });
+
   testWidgets('renders without errors', (tester) async {
     await tester.pumpChartApp(_barChart());
     expect(find.byType(OiBarChart), findsOneWidget);

@@ -304,6 +304,7 @@ class _OiRangeBarChartState<T> extends State<OiRangeBarChart<T>> {
                       horizontal: widget.horizontal,
                       showGrid: widget.showGrid,
                       gridColor: colors.borderSubtle,
+                      labelGap: context.components.chart?.axis?.labelGap ?? 4,
                       axisLabelColor: colors.textMuted,
                       highContrast: isHighContrast,
                       compact: isCompact,
@@ -349,6 +350,7 @@ class _OiRangeBarPainter<T> extends CustomPainter {
     required this.compact,
     required this.valueLabels,
     required this.valueDiv,
+    this.labelGap = 4,
   });
 
   final List<OiRangeBarSeries<T>> series;
@@ -361,6 +363,9 @@ class _OiRangeBarPainter<T> extends CustomPainter {
   final bool showGrid;
   final Color gridColor;
   final Color axisLabelColor;
+
+  /// Distance between grid axes and their tick labels.
+  final double labelGap;
   final bool highContrast;
   final bool compact;
   final List<String> valueLabels;
@@ -437,12 +442,14 @@ class _OiRangeBarPainter<T> extends CustomPainter {
         chartRect,
         labels: valueLabels,
         labelColor: axisLabelColor,
+        labelGap: labelGap,
       );
       OiChartGrid.paintYLabels(
         canvas,
         chartRect,
         labels: categories,
         labelColor: axisLabelColor,
+        labelGap: labelGap,
       );
     } else {
       OiChartGrid.paintYLabels(
@@ -450,12 +457,14 @@ class _OiRangeBarPainter<T> extends CustomPainter {
         chartRect,
         labels: valueLabels,
         labelColor: axisLabelColor,
+        labelGap: labelGap,
       );
       OiChartGrid.paintXLabels(
         canvas,
         chartRect,
         labels: categories,
         labelColor: axisLabelColor,
+        labelGap: labelGap,
       );
     }
 
@@ -553,6 +562,7 @@ class _OiRangeBarPainter<T> extends CustomPainter {
 
   @override
   bool shouldRepaint(_OiRangeBarPainter<T> oldDelegate) =>
+      oldDelegate.labelGap != labelGap ||
       oldDelegate.series != series ||
       oldDelegate.categories != categories ||
       oldDelegate.resolvedColors != resolvedColors ||

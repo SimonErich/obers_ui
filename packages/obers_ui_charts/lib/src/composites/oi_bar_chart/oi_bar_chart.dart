@@ -5,6 +5,7 @@ import 'package:obers_ui/obers_ui.dart';
 import 'package:obers_ui_charts/src/composites/_chart_grid_painter.dart';
 import 'package:obers_ui_charts/src/composites/oi_bar_chart/oi_bar_chart_accessibility.dart';
 import 'package:obers_ui_charts/src/composites/oi_bar_chart/oi_bar_chart_data.dart';
+import 'package:obers_ui_charts/src/composites/oi_bar_chart/oi_bar_chart_layout.dart';
 import 'package:obers_ui_charts/src/composites/oi_bar_chart/oi_bar_chart_legend.dart';
 import 'package:obers_ui_charts/src/composites/oi_bar_chart/oi_bar_chart_painter.dart';
 import 'package:obers_ui_charts/src/composites/oi_bar_chart/oi_bar_chart_theme.dart';
@@ -260,6 +261,7 @@ class _OiBarChartState extends State<OiBarChart> {
   ({int categoryIndex, int seriesIndex})? _hitTest(
     Offset position,
     Rect chartRect,
+    BarCategoryLayout layout,
   ) {
     if (widget.categories.isEmpty) return null;
 
@@ -270,20 +272,17 @@ class _OiBarChartState extends State<OiBarChart> {
       // Simplified: return first series.
       return (categoryIndex: ci, seriesIndex: 0);
     } else {
-      final catWidth = chartRect.width / widget.categories.length;
-      final ci = ((position.dx - chartRect.left) / catWidth).floor();
-      if (ci < 0 || ci >= widget.categories.length) return null;
-
+      final ci = layout.categoryAt(position.dx);
+      if (ci == null) return null;
       if (_isStacked || _numSeries == 1) {
         return (categoryIndex: ci, seriesIndex: 0);
       }
-
-      // Determine which bar in the group.
-      final catX = chartRect.left + ci * catWidth;
-      final padding = catWidth * 0.15;
-      final barW = (catWidth - padding * 2) / _numSeries;
-      final localX = position.dx - catX - padding;
-      final si = (localX / barW).floor().clamp(0, _numSeries - 1);
+      final bounds = layout.bars[ci];
+      final barW = bounds.width / _numSeries;
+      final si = ((position.dx - bounds.left) / barW).floor().clamp(
+        0,
+        _numSeries - 1,
+      );
       return (categoryIndex: ci, seriesIndex: si);
     }
   }
@@ -331,9 +330,35 @@ class _OiBarChartState extends State<OiBarChart> {
           );
           final effectiveRadius = widget.theme?.barRadius ?? widget.barRadius;
 
-          final chartRect = OiChartGrid.computeChartRect(
+          var chartRect = OiChartGrid.computeChartRect(
             chartSize,
             compact: isCompact,
+          );
+          if (context.components.chart?.density?.padding case final padding?) {
+            chartRect = Rect.fromLTRB(
+              padding.left,
+              padding.top,
+              math.max(padding.left, chartSize.width - padding.right),
+              math.max(padding.top, chartSize.height - padding.bottom),
+            );
+          }
+
+          if (!_isHorizontal &&
+              widget.categories.any((category) => category.group != null)) {
+            chartRect = Rect.fromLTRB(
+              chartRect.left,
+              chartRect.top,
+              chartRect.right,
+              math.max(chartRect.top, chartRect.bottom - 20),
+            );
+          }
+
+          final categoryLayout = BarCategoryLayout(
+            plot: chartRect,
+            groups: [for (final category in widget.categories) category.group],
+            barWidth: context.components.chart?.density?.barWidth,
+            sectionSpacing:
+                context.components.chart?.density?.sectionSpacing ?? 0,
           );
 
           // Resolve colors.
@@ -367,7 +392,9 @@ class _OiBarChartState extends State<OiBarChart> {
               }
             }
           }
-          if (maxVal == 0) maxVal = 1;
+          final minVal = widget.yAxis?.min ?? 0.0;
+          maxVal = widget.yAxis?.max ?? maxVal;
+          if (maxVal <= minVal) maxVal = minVal + 1;
 
           final yDiv = widget.yAxis?.divisions ?? (isCompact ? 3 : 5);
           final yLabels =
@@ -375,7 +402,7 @@ class _OiBarChartState extends State<OiBarChart> {
               List.generate(
                 yDiv + 1,
                 (i) => (widget.yAxis ?? const OiChartAxis()).formatValue(
-                  maxVal * i / yDiv,
+                  minVal + (maxVal - minVal) * i / yDiv,
                 ),
               );
 
@@ -391,17 +418,67 @@ class _OiBarChartState extends State<OiBarChart> {
               size: chartSize,
               painter: OiBarChartPainter(
                 categoryLabels: widget.categories.map((c) => c.label).toList(),
+                categoryLayout: categoryLayout,
+                axisLabelGap:
+                    context.components.chart?.axis?.labelGap ??
+                    context.spacing.sm,
+                numericLabelGap: context.components.chart?.axis?.labelGap ?? 4,
+                valueLabelGap: context.spacing.xs,
                 values: allValues,
+                domainMin: minVal,
+                domainMax: maxVal,
                 colors: resolvedColors,
+                patterns: [
+                  for (final category in widget.categories)
+                    [
+                      for (var i = 0; i < numSeries; i++)
+                        if (category.patterns != null &&
+                            i < category.patterns!.length)
+                          category.patterns![i]
+                        else if (widget.series != null &&
+                            i < widget.series!.length)
+                          widget.series![i].pattern
+                        else
+                          OiBarPattern.solid,
+                    ],
+                ],
+                categoryColors: [
+                  for (final category in widget.categories)
+                    [
+                      for (var i = 0; i < numSeries; i++)
+                        if (category.colors != null &&
+                            i < category.colors!.length)
+                          category.colors![i]
+                        else
+                          resolvedColors[i],
+                    ],
+                ],
+                emphasizedCategories: [
+                  for (final c in widget.categories) c.emphasized,
+                ],
+                gridDashPattern: context.components.chart?.grid?.dashPattern,
+                gridWidth: context.components.chart?.grid?.width,
+                categoryGroups: [
+                  for (final category in widget.categories) category.group,
+                ],
+                labelStyle: context.textTheme.caption.merge(
+                  context.components.chart?.axis?.labelStyle,
+                ),
                 chartRect: chartRect,
                 horizontal: _isHorizontal,
                 stacked: _isStacked,
                 showValues: widget.showValues,
                 showGrid: widget.showGrid,
                 barRadius: effectiveRadius,
-                gridColor: widget.theme?.gridColor ?? colors.borderSubtle,
+                gridColor:
+                    widget.theme?.gridColor ??
+                    context.components.chart?.grid?.color ??
+                    colors.borderSubtle,
                 axisLabelColor:
-                    widget.theme?.axisLabelColor ?? colors.textMuted,
+                    widget.theme?.axisLabelColor ??
+                    context.components.chart?.axis?.labelColor ??
+                    context.components.chart?.axis?.labelStyle?.color ??
+                    colors.textMuted,
                 textColor: colors.text,
                 highContrast: isHighContrast,
                 compact: isCompact,
@@ -421,7 +498,11 @@ class _OiBarChartState extends State<OiBarChart> {
               key: const Key('oi_bar_chart_touch'),
               behavior: HitTestBehavior.opaque,
               onTapDown: (d) {
-                final hit = _hitTest(d.localPosition, chartRect);
+                final hit = _hitTest(
+                  d.localPosition,
+                  chartRect,
+                  categoryLayout,
+                );
                 if (hit != null) {
                   widget.onBarTap?.call(
                     hit.categoryIndex,
@@ -435,7 +516,11 @@ class _OiBarChartState extends State<OiBarChart> {
             interactiveChart = MouseRegion(
               key: const Key('oi_bar_chart_pointer'),
               onHover: (e) {
-                final hit = _hitTest(e.localPosition, chartRect);
+                final hit = _hitTest(
+                  e.localPosition,
+                  chartRect,
+                  categoryLayout,
+                );
                 if (hit?.categoryIndex != _hoveredCategoryIndex ||
                     hit?.seriesIndex != _hoveredSeriesIndex) {
                   setState(() {

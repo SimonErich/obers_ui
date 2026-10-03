@@ -320,6 +320,7 @@ class _OiHistogramState<T> extends State<OiHistogram<T>> {
                     maxBarValue: range.maxBarValue,
                     showGrid: widget.showGrid,
                     gridColor: colors.borderSubtle,
+                    labelGap: context.components.chart?.axis?.labelGap ?? 4,
                     axisLabelColor: colors.textMuted,
                     highContrast: isHighContrast,
                     compact: isCompact,
