@@ -9,6 +9,7 @@ import 'package:obers_ui/src/primitives/display/oi_icon.dart';
 /// optional description, and an optional action widget.
 ///
 /// Typically used to fill a container when there is no data to display.
+/// Short containers use compact spacing and scroll vertically when needed.
 ///
 /// {@category Components}
 class OiEmptyState extends StatelessWidget {
@@ -132,46 +133,68 @@ class OiEmptyState extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.colors;
 
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(32),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            if (illustration != null)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 16),
-                child: illustration,
-              )
-            else if (icon != null)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 16),
-                child: OiIcon.raw(icon, size: 56, color: colors.textMuted),
-              ),
-            Text(
-              title,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-                color: colors.text,
-              ),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final compact =
+            constraints.hasBoundedHeight && constraints.maxHeight < 160;
+        final content = Center(
+          child: Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: compact ? 16 : 32,
+              vertical: compact ? 8 : 32,
             ),
-            if (description != null) ...[
-              const SizedBox(height: 8),
-              Text(
-                description!,
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 14, color: colors.textMuted),
-              ),
-            ],
-            if (action != null) ...[
-              const SizedBox(height: 16),
-              action!,
-            ],
-          ],
-        ),
-      ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (illustration != null)
+                  Padding(
+                    padding: EdgeInsets.only(bottom: compact ? 8 : 16),
+                    child: illustration,
+                  )
+                else if (icon != null)
+                  Padding(
+                    padding: EdgeInsets.only(bottom: compact ? 8 : 16),
+                    child: OiIcon.raw(
+                      icon,
+                      size: compact ? 24 : 56,
+                      color: colors.textMuted,
+                    ),
+                  ),
+                Text(
+                  title,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                    color: colors.text,
+                  ),
+                ),
+                if (description != null) ...[
+                  const SizedBox(height: 8),
+                  Text(
+                    description!,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 14, color: colors.textMuted),
+                  ),
+                ],
+                if (action != null) ...[
+                  const SizedBox(height: 16),
+                  action!,
+                ],
+              ],
+            ),
+          ),
+        );
+        if (!constraints.hasBoundedHeight) return content;
+        // Keep all text and actions accessible when a small panel cannot fit them.
+        return SingleChildScrollView(
+          primary: false,
+          child: ConstrainedBox(
+            constraints: BoxConstraints(minHeight: constraints.maxHeight),
+            child: content,
+          ),
+        );
+      },
     );
   }
 }

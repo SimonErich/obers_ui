@@ -168,6 +168,7 @@ final range = await OiSheet.showAsync<DateRange>(
 | `side` | `OiPanelSide` | `bottom` | `top`, `bottom`, `left`, or `right`. |
 | `size` | `double?` | `null` | Height for top/bottom, width for left/right. Sizes to content when null. |
 | `dismissible` | `bool` | `true` | Whether tapping the scrim closes the sheet. |
+| `initialFocus` | `bool` | `true` | Request focus in the sheet when opened; set false to preserve caller focus. |
 | `dragHandle` | `bool` | `false` | Show a pill handle on the near edge. |
 | `snapPoints` | `List<double>?` | `null` | Drag snap fractions, for example `[0.3, 0.7, 1.0]`. |
 
@@ -250,7 +251,8 @@ OiMenuItem(
 
 A notification that appears in a screen corner and dismisses itself. Use it for
 passive feedback: a save confirmation, a copy notice, or an error that does not
-block work. Stacked toasts pile up instead of overlapping.
+block work. Toasts stack within each requested position. Concurrent requests
+keep their own six-position anchors and preserve insertion order per group.
 
 ```dart
 OiToast.show(
@@ -263,6 +265,30 @@ OiToast.show(
 The `OiToast` widget also exists if you build a custom overlay, but `OiToast.show`
 is the usual entry point. It returns an `OiOverlayHandle` you can dismiss early.
 
+If no `OiOverlays` service exists, `show` uses the nearest native Flutter
+`Overlay`. Outside `OiApp`, provide the usual theme, density, platform,
+media-query and text-direction scopes yourself; the fallback is not an
+environment-free host.
+
+Stacks that exceed the available height scroll while retaining every entry and
+action. Top stacks initially show the oldest entry; bottom stacks show the
+newest. The returned handle's `isDismissed` also reflects removal by expiry or
+the close control. Calling `handle.dismiss()` removes immediately without the
+close animation or `onDismiss` callback. Close/expiry callbacks run once; a
+throwing callback still removes its queued entry and propagates the exception.
+
+Service-level `OiOverlays.of(context).dismissAll()` immediately marks the handles
+belonging to that toast overlay dismissed, without invoking their callbacks,
+including a close/expiry callback pending its final animation frame. The next
+`show` discards that old generation instead of reviving it. The queue is shared;
+separate `OiApp` hosts do not provide isolated toast queues.
+
+Adding or removing another position preserves surviving timer, hover and scroll
+state. Spatially separated overflow groups scroll independently. This is not an
+adaptive collision/overflow partitioning policy for top/bottom groups sharing
+the same horizontal anchor; fixed-width cards can geometrically overlap across
+neighboring groups on narrow viewports.
+
 ### Attributes
 
 For `OiToast.show`:
@@ -272,15 +298,23 @@ For `OiToast.show`:
 | `message` | `String` | **required** | The notification text. |
 | `level` | `OiToastLevel` | `info` | `info`, `success`, `warning`, or `error`. Sets the accent and icon. |
 | `position` | `OiToastPosition` | `bottomRight` | One of six corners or centers. |
-| `duration` | `Duration` | `4s` | How long before it dismisses. |
+| `duration` | `Duration?` | `4s` | How long before it dismisses; null leaves expiry to the owner. |
 | `pauseOnHover` | `bool` | `true` | Pause the dismiss timer while hovered. |
+| `dismissible` | `bool` | `true` | Show a button for manual dismissal. |
+| `dismissLabel` | `String` | `Dismiss` | Localized accessible name for the dismiss button. |
 | `action` | `Widget?` | `null` | An action widget shown to the right of the message. |
-| `onDismiss` | `VoidCallback?` | `null` | Called just before dismissal. |
+| `onDismiss` | `VoidCallback?` | `null` | Called for close/expiry, not handle or service dismissal. |
 
 The `OiToast` widget constructor also requires a `label` for accessibility. The
 `show` helper derives one for you.
+When `duration` is null, `onPauseRequested` and `onResumeRequested` let the widget
+pause and resume an external expiry timer without maintaining a second timer.
 
 **Theme:** `context.components.toast` → `OiToastThemeData`
+
+The toast theme controls background, radius, physical padding, icon size, gap
+and shadow. Message foreground comes from `context.colors.text`, not a toast-
+specific foreground field.
 
 !!! tip "Toast or snack bar?"
     Use `OiToast` for corner notifications that may stack. Use `OiSnackBar` for a

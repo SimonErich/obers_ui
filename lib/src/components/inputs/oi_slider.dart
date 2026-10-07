@@ -1,3 +1,4 @@
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/_internal/oi_input_frame.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
@@ -25,8 +26,25 @@ class OiSlider extends StatefulWidget {
     this.showLabels = false,
     this.showTicks = false,
     this.enabled = true,
+    this.semanticLabel,
+    this.secondarySemanticLabel,
+    this.surfaceBuilder,
+    this.height,
     super.key,
   });
+
+  /// Accessible name without a visible form label.
+  final String? semanticLabel;
+
+  /// Accessible name of the upper thumb of a range.
+  final String? secondarySemanticLabel;
+
+  /// Optional complete visual surface. Fractions are normalized to 0–1;
+  /// OiSlider retains pointer, keyboard, focus and semantic interactions.
+  final Widget Function(BuildContext, double, double?)? surfaceBuilder;
+
+  /// Height of a custom surface (ordinary sliders retain their standard size).
+  final double? height;
 
   /// The current primary (or lower-range) thumb value.
   final double value;
@@ -70,6 +88,7 @@ class _OiSliderState extends State<OiSlider>
     with SingleTickerProviderStateMixin {
   // Which thumb is being dragged: 0 = primary, 1 = secondary.
   int? _draggingThumb;
+  int? _focusedThumb;
 
   late AnimationController _animController;
   late double _startValue;
@@ -131,13 +150,14 @@ class _OiSliderState extends State<OiSlider>
   double _snap(double v) {
     if (widget.divisions == null || widget.divisions! <= 0) return v;
     final step = (widget.max - widget.min) / widget.divisions!;
-    return (v / step).round() * step;
+    return widget.min + ((v - widget.min) / step).round() * step;
   }
 
   double _clamp(double v) => v.clamp(widget.min, widget.max);
 
   double _valueFromPosition(double dx, double width) {
-    final ratio = (dx / width).clamp(0.0, 1.0);
+    final inset = widget.surfaceBuilder == null ? 10.0 : 0.0;
+    final ratio = ((dx - inset) / (width - 2 * inset)).clamp(0.0, 1.0);
     return _clamp(_snap(widget.min + ratio * (widget.max - widget.min)));
   }
 
@@ -194,6 +214,110 @@ class _OiSliderState extends State<OiSlider>
     }
   }
 
+  double _fraction(double value) =>
+      ((value - widget.min) / (widget.max - widget.min)).clamp(0.0, 1.0);
+
+  void _adjust(int thumb, int direction) {
+    if (!widget.enabled) return;
+    final step = (widget.max - widget.min) / (widget.divisions ?? 100);
+    if (widget.secondaryValue == null) {
+      widget.onChanged?.call(_clamp(widget.value + direction * step));
+    } else if (thumb == 0) {
+      widget.onRangeChanged?.call(
+        (widget.value + direction * step).clamp(
+          widget.min,
+          widget.secondaryValue!,
+        ),
+        widget.secondaryValue!,
+      );
+    } else {
+      widget.onRangeChanged?.call(
+        widget.value,
+        (widget.secondaryValue! + direction * step).clamp(
+          widget.value,
+          widget.max,
+        ),
+      );
+    }
+  }
+
+  Widget _semanticThumb(
+    BuildContext context,
+    int thumb,
+    double width,
+    double height,
+  ) {
+    final value = thumb == 0 ? widget.value : widget.secondaryValue!;
+    final step = (widget.max - widget.min) / (widget.divisions ?? 100);
+    final lower = thumb == 0 ? widget.min : widget.value;
+    final upper = thumb == 0 ? widget.secondaryValue ?? widget.max : widget.max;
+    final inset = widget.surfaceBuilder == null ? 10.0 : 0.0;
+    final x = inset + _fraction(value) * (width - 2 * inset);
+    return Positioned(
+      left: (x - 22).clamp(0.0, (width - 44).clamp(0.0, double.infinity)),
+      top: 0,
+      width: 44,
+      height: height,
+      child: Focus(
+        canRequestFocus: widget.enabled,
+        onFocusChange: (focused) => setState(() {
+          _focusedThumb = focused
+              ? thumb
+              : _focusedThumb == thumb
+              ? null
+              : _focusedThumb;
+        }),
+        onKeyEvent: (_, event) {
+          if (event is! KeyDownEvent && event is! KeyRepeatEvent) {
+            return KeyEventResult.ignored;
+          }
+          final key = event.logicalKey;
+          if (key == LogicalKeyboardKey.arrowRight ||
+              key == LogicalKeyboardKey.arrowUp) {
+            _adjust(thumb, 1);
+            return KeyEventResult.handled;
+          }
+          if (key == LogicalKeyboardKey.arrowLeft ||
+              key == LogicalKeyboardKey.arrowDown) {
+            _adjust(thumb, -1);
+            return KeyEventResult.handled;
+          }
+          return KeyEventResult.ignored;
+        },
+        child: Semantics(
+          container: true,
+          slider: true,
+          enabled: widget.enabled,
+          label: thumb == 0
+              ? widget.semanticLabel ?? widget.label
+              : widget.secondarySemanticLabel ??
+                    widget.semanticLabel ??
+                    widget.label,
+          value: value.toStringAsFixed(1),
+          increasedValue: (value + step).clamp(lower, upper).toStringAsFixed(1),
+          decreasedValue: (value - step).clamp(lower, upper).toStringAsFixed(1),
+          onIncrease: widget.enabled ? () => _adjust(thumb, 1) : null,
+          onDecrease: widget.enabled ? () => _adjust(thumb, -1) : null,
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              border:
+                  _focusedThumb == thumb &&
+                      FocusManager.instance.highlightMode ==
+                          FocusHighlightMode.traditional
+                  ? Border.all(
+                      color: context.effects.focusRing.enforced.color,
+                      width: context.effects.focusRing.enforced.width,
+                    )
+                  : null,
+              borderRadius: context.effects.focusRing.enforced.borderRadius,
+            ),
+            child: const SizedBox.expand(),
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
@@ -207,7 +331,7 @@ class _OiSliderState extends State<OiSlider>
     }
     const trackHeight = 4.0;
     const thumbRadius = 10.0;
-    const totalHeight = 28.0;
+    final totalHeight = widget.height ?? 28.0;
 
     Widget slider = LayoutBuilder(
       builder: (ctx, constraints) {
@@ -229,29 +353,50 @@ class _OiSliderState extends State<OiSlider>
               child: RepaintBoundary(
                 child: AnimatedBuilder(
                   animation: _animController,
-                  builder: (context, _) => CustomPaint(
-                    painter: _OiSliderPainter(
-                      value: _displayValue,
-                      secondaryValue: widget.secondaryValue != null
-                          ? _displaySecondary
-                          : null,
-                      labelValue: widget.value,
-                      labelSecondaryValue: widget.secondaryValue,
-                      min: widget.min,
-                      max: widget.max,
-                      divisions: widget.divisions,
-                      trackColor: colors.border,
-                      activeColor: colors.primary.base,
-                      thumbColor: colors.primary.base,
-                      thumbInnerColor: colors.surface,
-                      labelColor: colors.text,
-                      trackHeight: trackHeight,
-                      thumbRadius: thumbRadius,
-                      totalHeight: totalHeight,
-                      showLabels: widget.showLabels,
-                      showTicks: widget.showTicks,
-                      enabled: widget.enabled,
-                    ),
+                  builder: (context, _) => Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      Positioned.fill(
+                        child:
+                            widget.surfaceBuilder?.call(
+                              context,
+                              _fraction(_displayValue),
+                              widget.secondaryValue == null
+                                  ? null
+                                  : _fraction(_displaySecondary),
+                            ) ??
+                            CustomPaint(
+                              painter: _OiSliderPainter(
+                                value: _displayValue,
+                                secondaryValue: widget.secondaryValue != null
+                                    ? _displaySecondary
+                                    : null,
+                                labelValue: widget.value,
+                                labelSecondaryValue: widget.secondaryValue,
+                                min: widget.min,
+                                max: widget.max,
+                                divisions: widget.divisions,
+                                trackColor: colors.border,
+                                activeColor: colors.primary.base,
+                                thumbColor: colors.primary.base,
+                                thumbInnerColor: colors.surface,
+                                labelColor: colors.text,
+                                trackHeight: trackHeight,
+                                thumbRadius: thumbRadius,
+                                totalHeight: totalHeight,
+                                showLabels: widget.showLabels,
+                                showTicks: widget.showTicks,
+                                enabled: widget.enabled,
+                              ),
+                            ),
+                      ),
+                      for (
+                        var thumb = 0;
+                        thumb < (widget.secondaryValue == null ? 1 : 2);
+                        thumb++
+                      )
+                        _semanticThumb(context, thumb, width, totalHeight),
+                    ],
                   ),
                 ),
               ),

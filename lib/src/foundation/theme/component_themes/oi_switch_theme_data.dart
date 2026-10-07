@@ -15,6 +15,7 @@ class OiSwitchThemeData {
     this.activeTrackColor,
     this.inactiveTrackColor,
     this.thumbColor,
+    this.thumbInset,
   });
 
   /// The total width of the switch track in logical pixels.
@@ -32,6 +33,9 @@ class OiSwitchThemeData {
   /// Thumb (knob) color.
   final Color? thumbColor;
 
+  /// Inset around the thumb inside its track; defaults to 2 pixels.
+  final double? thumbInset;
+
   /// Creates a copy with optionally overridden values.
   OiSwitchThemeData copyWith({
     double? width,
@@ -39,6 +43,7 @@ class OiSwitchThemeData {
     Color? activeTrackColor,
     Color? inactiveTrackColor,
     Color? thumbColor,
+    double? thumbInset,
   }) {
     return OiSwitchThemeData(
       width: width ?? this.width,
@@ -46,6 +51,7 @@ class OiSwitchThemeData {
       activeTrackColor: activeTrackColor ?? this.activeTrackColor,
       inactiveTrackColor: inactiveTrackColor ?? this.inactiveTrackColor,
       thumbColor: thumbColor ?? this.thumbColor,
+      thumbInset: thumbInset ?? this.thumbInset,
     );
   }
 
@@ -57,7 +63,8 @@ class OiSwitchThemeData {
         other.height == height &&
         other.activeTrackColor == activeTrackColor &&
         other.inactiveTrackColor == inactiveTrackColor &&
-        other.thumbColor == thumbColor;
+        other.thumbColor == thumbColor &&
+        other.thumbInset == thumbInset;
   }
 
   @override
@@ -67,5 +74,6 @@ class OiSwitchThemeData {
     activeTrackColor,
     inactiveTrackColor,
     thumbColor,
+    thumbInset,
   );
 }

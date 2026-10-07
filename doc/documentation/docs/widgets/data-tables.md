@@ -21,6 +21,11 @@ handles sorting, filtering, pagination, column resize and reorder, row selection
 grouping, and inline cell editing. You pass typed `rows` and a list of
 `OiTableColumn<T>` that describe each column.
 
+Wide headers and populated rows scroll horizontally together. Empty and loading
+bodies stay at the visible viewport width so their message or indicator remains
+visible while the headers scroll. Use `OiEmptyState` for a placeholder that also
+handles short panels and longer descriptions or actions.
+
 ```dart
 OiTable<User>(
   label: 'Users',

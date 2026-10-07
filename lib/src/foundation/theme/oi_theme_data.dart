@@ -10,7 +10,9 @@ import 'package:obers_ui/src/foundation/theme/oi_component_size_scale.dart';
 import 'package:obers_ui/src/foundation/theme/oi_component_themes.dart';
 import 'package:obers_ui/src/foundation/theme/oi_decoration_theme.dart';
 import 'package:obers_ui/src/foundation/theme/oi_effects_theme.dart';
+import 'package:obers_ui/src/foundation/theme/oi_legacy_semantic_colors.dart';
 import 'package:obers_ui/src/foundation/theme/oi_radius_scale.dart';
+import 'package:obers_ui/src/foundation/theme/oi_semantic_colors.dart';
 import 'package:obers_ui/src/foundation/theme/oi_shadow_scale.dart';
 import 'package:obers_ui/src/foundation/theme/oi_spacing_scale.dart';
 import 'package:obers_ui/src/foundation/theme/oi_text_theme.dart';
@@ -38,6 +40,7 @@ class OiThemeData {
     required this.effects,
     required this.decoration,
     required this.components,
+    this.semanticColors,
     OiBreakpointScale? breakpoints,
     OiComponentSizeScale? componentSizes,
     this.performanceConfig = const OiPerformanceConfig.high(),
@@ -184,6 +187,16 @@ class OiThemeData {
   /// The color scheme providing all semantic color tokens.
   final OiColorScheme colors;
 
+  /// Optional explicit semantic groups; existing widgets still use [colors].
+  ///
+  /// Null preserves legacy defaults. Supplying this does not automatically
+  /// derive colors, replace legacy roles, or change component rendering.
+  final OiSemanticColors? semanticColors;
+
+  /// Explicit groups, or a snapshot projection of the current legacy scheme.
+  OiSemanticColors get resolvedSemanticColors =>
+      semanticColors ?? OiLegacySemanticColors.fromScheme(colors);
+
   /// The typography scale.
   final OiTextTheme textTheme;
 
@@ -236,9 +249,12 @@ class OiThemeData {
   /// [effects]. When replacing a palette, also supply semantic decoration and
   /// effect colors, for example with [OiDecorationTheme.standard]. Explicit
   /// component overrides retain precedence over these defaults.
+  /// [clearSemanticColors] takes precedence over supplied semantic groups.
   OiThemeData copyWith({
     Brightness? brightness,
     OiColorScheme? colors,
+    OiSemanticColors? semanticColors,
+    bool clearSemanticColors = false,
     OiTextTheme? textTheme,
     OiSpacingScale? spacing,
     OiRadiusScale? radius,
@@ -256,6 +272,9 @@ class OiThemeData {
     return OiThemeData(
       brightness: brightness ?? this.brightness,
       colors: colors ?? this.colors,
+      semanticColors: clearSemanticColors
+          ? null
+          : semanticColors ?? this.semanticColors,
       textTheme: textTheme ?? this.textTheme,
       spacing: spacing ?? this.spacing,
       radius: radius ?? this.radius,
@@ -278,6 +297,7 @@ class OiThemeData {
     return copyWith(
       brightness: other.brightness,
       colors: other.colors,
+      semanticColors: other.semanticColors,
       textTheme: other.textTheme,
       spacing: other.spacing,
       radius: other.radius,
@@ -295,6 +315,10 @@ class OiThemeData {
   }
 
   /// Linearly interpolates between two [OiThemeData] instances.
+  ///
+  /// Legacy colors keep their existing interpolation. When either endpoint
+  /// authors semantic groups, those resolved groups use
+  /// [OiSemanticColors.lerp] (raw sRGB with premultiplied alpha).
   // lerp is a static method by Flutter convention, not a constructor.
   // ignore: prefer_constructors_over_static_methods
   static OiThemeData lerp(OiThemeData a, OiThemeData b, double t) {
@@ -303,6 +327,13 @@ class OiThemeData {
     return OiThemeData(
       brightness: t < 0.5 ? a.brightness : b.brightness,
       colors: OiColorScheme.lerp(a.colors, b.colors, t),
+      semanticColors: a.semanticColors == null && b.semanticColors == null
+          ? null
+          : OiSemanticColors.lerp(
+              a.resolvedSemanticColors,
+              b.resolvedSemanticColors,
+              t,
+            ),
       textTheme: OiTextTheme.lerp(a.textTheme, b.textTheme, t),
       spacing: t < 0.5 ? a.spacing : b.spacing,
       radius: t < 0.5 ? a.radius : b.radius,
@@ -325,6 +356,7 @@ class OiThemeData {
     return other is OiThemeData &&
         other.brightness == brightness &&
         other.colors == colors &&
+        other.semanticColors == semanticColors &&
         other.textTheme == textTheme &&
         other.spacing == spacing &&
         other.radius == radius &&
@@ -357,5 +389,6 @@ class OiThemeData {
     performanceConfig,
     fontFamily,
     monoFontFamily,
+    if (semanticColors != null) semanticColors,
   ]);
 }

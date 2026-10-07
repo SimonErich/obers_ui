@@ -1,101 +1,11 @@
 import 'package:flutter/widgets.dart';
-import 'package:obers_ui/src/foundation/theme/oi_button_font_size_scale.dart';
-import 'package:obers_ui/src/foundation/theme/oi_color_scheme.dart';
+import 'package:obers_ui/obers_ui.dart' show OiButtonFontSizeScale;
+import 'package:obers_ui/src/foundation/theme/component_themes/oi_button_size_styles.dart';
+import 'package:obers_ui/src/foundation/theme/component_themes/oi_button_variant_style.dart';
 
-/// Per-variant color overrides for button states.
-///
-/// All fields are nullable; a `null` value instructs the button to derive
-/// colors from [OiColorScheme] swatches as usual.
-///
-/// {@category Foundation}
-@immutable
-class OiButtonVariantStyle {
-  /// Creates an [OiButtonVariantStyle].
-  const OiButtonVariantStyle({
-    this.background,
-    this.backgroundHover,
-    this.backgroundPressed,
-    this.backgroundDisabled,
-    this.foreground,
-    this.foregroundHover,
-    this.foregroundPressed,
-    this.foregroundDisabled,
-    this.border,
-    this.borderHover,
-    this.borderPressed,
-    this.borderDisabled,
-  });
-
-  /// Default background color.
-  final Color? background;
-
-  /// Background color on pointer hover.
-  final Color? backgroundHover;
-
-  /// Background color when pressed.
-  final Color? backgroundPressed;
-
-  /// Background color when disabled.
-  final Color? backgroundDisabled;
-
-  /// Foreground (label/icon) color.
-  final Color? foreground;
-
-  /// Foreground color on pointer hover.
-  final Color? foregroundHover;
-
-  /// Foreground color when pressed.
-  final Color? foregroundPressed;
-
-  /// Foreground color when disabled.
-  final Color? foregroundDisabled;
-
-  /// Border color in default state.
-  final Color? border;
-
-  /// Border color on pointer hover.
-  final Color? borderHover;
-
-  /// Border color when pressed.
-  final Color? borderPressed;
-
-  /// Border color when disabled.
-  final Color? borderDisabled;
-
-  @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-    return other is OiButtonVariantStyle &&
-        other.background == background &&
-        other.backgroundHover == backgroundHover &&
-        other.backgroundPressed == backgroundPressed &&
-        other.backgroundDisabled == backgroundDisabled &&
-        other.foreground == foreground &&
-        other.foregroundHover == foregroundHover &&
-        other.foregroundPressed == foregroundPressed &&
-        other.foregroundDisabled == foregroundDisabled &&
-        other.border == border &&
-        other.borderHover == borderHover &&
-        other.borderPressed == borderPressed &&
-        other.borderDisabled == borderDisabled;
-  }
-
-  @override
-  int get hashCode => Object.hash(
-    background,
-    backgroundHover,
-    backgroundPressed,
-    backgroundDisabled,
-    foreground,
-    foregroundHover,
-    foregroundPressed,
-    foregroundDisabled,
-    border,
-    borderHover,
-    borderPressed,
-    borderDisabled,
-  );
-}
+export 'oi_button_size_style.dart';
+export 'oi_button_size_styles.dart';
+export 'oi_button_variant_style.dart';
 
 /// Theme data for button components.
 ///
@@ -108,6 +18,7 @@ class OiButtonVariantStyle {
 class OiButtonThemeData {
   /// Creates an [OiButtonThemeData].
   const OiButtonThemeData({
+    this.sizeStyles,
     this.borderRadius,
     this.padding,
     this.iconLabelPadding,
@@ -128,6 +39,9 @@ class OiButtonThemeData {
     this.softStyle,
     this.secondaryStyle,
   });
+
+  /// Opt-in size-specific typography and geometry; null preserves legacy output.
+  final OiButtonSizeStyles? sizeStyles;
 
   /// The corner radius applied to button shapes.
   final BorderRadius? borderRadius;
@@ -189,7 +103,10 @@ class OiButtonThemeData {
   /// Color overrides for the secondary button variant.
   final OiButtonVariantStyle? secondaryStyle;
 
-  /// Creates a copy with optionally overridden values.
+  /// Copies legacy tokens and retains the current size styles.
+  ///
+  /// Use [merge] with a partial theme to override size styles. Keeping this
+  /// signature stable preserves existing subclass overrides.
   OiButtonThemeData copyWith({
     BorderRadius? borderRadius,
     EdgeInsets? padding,
@@ -212,6 +129,7 @@ class OiButtonThemeData {
     OiButtonVariantStyle? secondaryStyle,
   }) {
     return OiButtonThemeData(
+      sizeStyles: sizeStyles,
       borderRadius: borderRadius ?? this.borderRadius,
       padding: padding ?? this.padding,
       iconLabelPadding: iconLabelPadding ?? this.iconLabelPadding,
@@ -234,10 +152,43 @@ class OiButtonThemeData {
     );
   }
 
+  /// Applies non-null overrides while retaining inherited state and size styles.
+  OiButtonThemeData merge(OiButtonThemeData? other) {
+    if (other == null) return this;
+    return OiButtonThemeData(
+      sizeStyles: sizeStyles?.merge(other.sizeStyles) ?? other.sizeStyles,
+      borderRadius: other.borderRadius ?? borderRadius,
+      padding: other.padding ?? padding,
+      iconLabelPadding: other.iconLabelPadding ?? iconLabelPadding,
+      textStyle: textStyle?.merge(other.textStyle) ?? other.textStyle,
+      fontSizes: other.fontSizes ?? fontSizes,
+      height: other.height ?? height,
+      largeHeight: other.largeHeight ?? largeHeight,
+      mediumHeight: other.mediumHeight ?? mediumHeight,
+      smallHeight: other.smallHeight ?? smallHeight,
+      minWidth: other.minWidth ?? minWidth,
+      iconSize: other.iconSize ?? iconSize,
+      iconGap: other.iconGap ?? iconGap,
+      smallIconGap: other.smallIconGap ?? smallIconGap,
+      primaryStyle:
+          primaryStyle?.merge(other.primaryStyle) ?? other.primaryStyle,
+      outlineStyle:
+          outlineStyle?.merge(other.outlineStyle) ?? other.outlineStyle,
+      ghostStyle: ghostStyle?.merge(other.ghostStyle) ?? other.ghostStyle,
+      destructiveStyle:
+          destructiveStyle?.merge(other.destructiveStyle) ??
+          other.destructiveStyle,
+      softStyle: softStyle?.merge(other.softStyle) ?? other.softStyle,
+      secondaryStyle:
+          secondaryStyle?.merge(other.secondaryStyle) ?? other.secondaryStyle,
+    );
+  }
+
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
     return other is OiButtonThemeData &&
+        other.sizeStyles == sizeStyles &&
         other.largeHeight == largeHeight &&
         other.mediumHeight == mediumHeight &&
         other.smallHeight == smallHeight &&
@@ -261,6 +212,7 @@ class OiButtonThemeData {
 
   @override
   int get hashCode => Object.hash(
+    sizeStyles,
     borderRadius,
     padding,
     iconLabelPadding,

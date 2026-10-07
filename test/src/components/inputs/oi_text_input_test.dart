@@ -8,6 +8,28 @@ import 'package:obers_ui/src/primitives/input/oi_raw_input.dart';
 import '../../../helpers/pump_app.dart';
 
 void main() {
+  testWidgets('email and password autofill reach the platform editor', (
+    tester,
+  ) async {
+    await tester.pumpObers(
+      const OiTextInput(
+        keyboardType: TextInputType.emailAddress,
+        autofillHints: [AutofillHints.email],
+      ),
+    );
+    var editor = tester.widget<EditableText>(find.byType(EditableText));
+    expect(editor.autofillHints, [AutofillHints.email]);
+    expect(editor.keyboardType, TextInputType.emailAddress);
+    await tester.pumpObers(
+      const OiTextInput.password(
+        autofillHints: [AutofillHints.newPassword],
+      ),
+    );
+    editor = tester.widget<EditableText>(find.byType(EditableText));
+    expect(editor.autofillHints, [AutofillHints.newPassword]);
+    expect(editor.obscureText, isTrue);
+  });
+
   testWidgets('multiline hint and counter share a footer without clipping', (
     tester,
   ) async {

@@ -109,6 +109,7 @@ nav:
       - Grid System: layout/grid.md
       - Page & Section: layout/page-and-section.md
       - Panels & App Shells: layout/panels-and-shells.md
+      - Minimal Media Designs: layout/minimal-media-designs.md
   - Widgets:
       - widgets/index.md
       - Input & Forms:

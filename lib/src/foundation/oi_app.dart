@@ -6,11 +6,14 @@ import 'package:flutter/services.dart'
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/inputs/oi_select_scope.dart';
 import 'package:obers_ui/src/foundation/oi_accessibility.dart';
+import 'package:obers_ui/src/foundation/oi_density.dart';
+import 'package:obers_ui/src/foundation/oi_density_scope.dart';
 import 'package:obers_ui/src/foundation/oi_input_modality_detector.dart';
 import 'package:obers_ui/src/foundation/oi_overlays.dart';
 import 'package:obers_ui/src/foundation/oi_platform.dart';
 import 'package:obers_ui/src/foundation/oi_scroll_behavior.dart';
 import 'package:obers_ui/src/foundation/oi_shortcut_scope.dart';
+import 'package:obers_ui/src/foundation/oi_theme_mode.dart';
 import 'package:obers_ui/src/foundation/oi_tour_scope.dart';
 import 'package:obers_ui/src/foundation/oi_undo_stack.dart';
 import 'package:obers_ui/src/foundation/persistence/oi_settings_driver.dart';
@@ -19,73 +22,12 @@ import 'package:obers_ui/src/foundation/theme/oi_animation_config.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme_data.dart';
 
-/// Controls which theme is used by [OiApp].
-///
-/// {@category Foundation}
-enum OiThemeMode {
-  /// Always use the light theme.
-  light,
+export 'oi_density.dart';
+export 'oi_density_scope.dart';
+export 'oi_theme_mode.dart';
 
-  /// Always use the dark theme.
-  dark,
-
-  /// Follow the system's brightness setting.
-  system,
-}
-
-/// The information density mode for the UI.
-///
-/// {@category Foundation}
-enum OiDensity {
-  /// Comfortable density — larger touch targets and more padding.
-  ///
-  /// Typically used on touch devices.
-  comfortable,
-
-  /// Compact density — balanced sizing suitable for most platforms.
-  ///
-  /// The default for pointer devices.
-  compact,
-
-  /// Dense density — maximised information density with minimal padding.
-  ///
-  /// Suitable for data-heavy desktop applications.
-  dense,
-}
-
-/// Provides the current [OiDensity] to all descendant widgets.
-///
-/// {@category Foundation}
-class OiDensityScope extends InheritedWidget {
-  /// Creates an [OiDensityScope] that provides [density] to descendants.
-  const OiDensityScope({
-    required this.density,
-    required super.child,
-    super.key,
-  });
-
-  /// The active information density.
-  final OiDensity density;
-
-  /// Returns the [OiDensity] from the nearest [OiDensityScope].
-  ///
-  /// Throws a [FlutterError] if no [OiDensityScope] ancestor is found.
-  /// Wrap your widget tree with [OiApp] to provide a density scope.
-  static OiDensity of(BuildContext context) {
-    final scope = context.dependOnInheritedWidgetOfExactType<OiDensityScope>();
-    if (scope == null) {
-      throw FlutterError.fromParts(<DiagnosticsNode>[
-        ErrorSummary('No OiDensityScope found in the widget tree.'),
-        ErrorHint('Ensure that OiApp wraps your widget.'),
-      ]);
-    }
-    return scope.density;
-  }
-
-  @override
-  bool updateShouldNotify(OiDensityScope oldWidget) =>
-      density != oldWidget.density;
-}
+part 'oi_app/oi_app_state.part.dart';
+part 'oi_app/oi_attached_focus_policy.part.dart';
 
 /// The root widget of an obers_ui application.
 ///
@@ -93,6 +35,10 @@ class OiDensityScope extends InheritedWidget {
 /// root widget. It injects all design-system services — theme, overlays,
 /// undo stack, accessibility scope, platform data, density, shortcut scope,
 /// tour scope, and optional settings persistence — into the widget tree.
+///
+/// System reduced motion zeroes authored durations without replacing page
+/// transition kinds or curves. When the preference clears, the current theme's
+/// authored configuration is used again.
 ///
 /// Use the default constructor for simple (non-router) apps, and
 /// [OiApp.router] for apps that use a declarative routing package such as
@@ -214,196 +160,4 @@ class OiApp extends StatefulWidget {
 
   @override
   State<OiApp> createState() => _OiAppState();
-}
-
-class _OiAppState extends State<OiApp> {
-  late final OiUndoStack _undoStack;
-  late final OiOverlaysService _overlaysService;
-  final HeroController _heroController = HeroController();
-
-  @override
-  void initState() {
-    super.initState();
-    if (kIsWeb) unawaited(BrowserContextMenu.disableContextMenu());
-    _undoStack = OiUndoStack(maxHistory: widget.undoStackMaxHistory);
-    _overlaysService = createOiOverlaysService();
-  }
-
-  @override
-  void dispose() {
-    _undoStack.dispose();
-    super.dispose();
-  }
-
-  OiThemeData _resolveTheme(Brightness platformBrightness) {
-    final lightTheme = widget.theme ?? OiThemeData.light();
-    // When darkTheme is null, use the primary (light) theme for both modes.
-    final darkTheme = widget.darkTheme ?? lightTheme;
-
-    OiThemeData resolved;
-    switch (widget.themeMode) {
-      case OiThemeMode.light:
-        resolved = lightTheme;
-      case OiThemeMode.dark:
-        resolved = darkTheme;
-      case OiThemeMode.system:
-        resolved = platformBrightness == Brightness.dark
-            ? darkTheme
-            : lightTheme;
-    }
-
-    if (widget.performanceConfig != null) {
-      return resolved.copyWith(performanceConfig: widget.performanceConfig);
-    }
-    return resolved;
-  }
-
-  OiDensity _resolveDensity() {
-    if (widget.density != null) return widget.density!;
-    // Auto-detect: use comfortable on touch devices
-    if (kIsWeb) return OiDensity.compact;
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.iOS:
-      case TargetPlatform.android:
-        return OiDensity.comfortable;
-      case TargetPlatform.macOS:
-      case TargetPlatform.windows:
-      case TargetPlatform.linux:
-      case TargetPlatform.fuchsia:
-        return OiDensity.compact;
-    }
-  }
-
-  /// Maps a [Locale] to the appropriate [TextDirection].
-  ///
-  /// RTL is used for Arabic, Hebrew, Persian, Urdu, and related scripts.
-  /// Falls back to [TextDirection.ltr] when [locale] is null.
-  TextDirection _resolveTextDirection(Locale? locale) {
-    if (locale == null) return TextDirection.ltr;
-    const rtlLanguageCodes = {
-      'ar', // Arabic
-      'he', // Hebrew
-      'fa', // Persian / Farsi
-      'ur', // Urdu
-      'ps', // Pashto
-      'sd', // Sindhi
-      'ug', // Uyghur
-      'yi', // Yiddish
-      'dv', // Divehi / Maldivian
-    };
-    return rtlLanguageCodes.contains(locale.languageCode)
-        ? TextDirection.rtl
-        : TextDirection.ltr;
-  }
-
-  /// Builds the full injection scaffold that wraps the navigated content.
-  ///
-  /// Injection order (outermost → innermost):
-  /// [OiTheme] → [Directionality] → [OiDensityScope] → [OiA11yScope]
-  /// → [OiInputModalityDetector] (provides [OiPlatform])
-  /// → [OiUndoStackProvider] → [OiShortcutScope]
-  /// → [OiTourScope] → OiOverlaysHost
-  Widget _buildScaffold(BuildContext context, Widget? child) {
-    final platformBrightness = MediaQuery.platformBrightnessOf(context);
-    var themeData = _resolveTheme(platformBrightness);
-
-    if (MediaQuery.disableAnimationsOf(context)) {
-      themeData = themeData.copyWith(
-        animations: const OiAnimationConfig.standard(reducedMotion: true),
-      );
-    }
-
-    Widget result = OiTheme(
-      data: themeData,
-      child: ColoredBox(
-        color: themeData.colors.background,
-        child: Directionality(
-          textDirection: _resolveTextDirection(widget.locale),
-          child: OiDensityScope(
-            density: _resolveDensity(),
-            child: OiA11yScope(
-              child: OiInputModalityDetector(
-                child: OiUndoStackProvider(
-                  stack: _undoStack,
-                  child: OiShortcutScope(
-                    child: OiTourScope(
-                      child: OiSelectScope(
-                        child: buildOiOverlaysHost(
-                          service: _overlaysService,
-                          child: child ?? const SizedBox(),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-
-    result = ScrollConfiguration(
-      behavior: const OiScrollBehavior(),
-      child: result,
-    );
-
-    if (widget.settingsDriver != null) {
-      result = OiSettingsProvider(
-        driver: widget.settingsDriver!,
-        child: result,
-      );
-    }
-
-    // Provide a HeroController for router-based navigation where
-    // navigatorObservers is not available on WidgetsApp.router.
-    if (widget._useRouter) {
-      result = HeroControllerScope(
-        controller: _heroController,
-        child: result,
-      );
-    }
-
-    return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: themeData.colors.background.computeLuminance() > 0.5
-          ? SystemUiOverlayStyle.dark
-          : SystemUiOverlayStyle.light,
-      child: result,
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    if (widget._useRouter) {
-      return WidgetsApp.router(
-        color: const Color(0xFF2563EB),
-        locale: widget.locale,
-        localizationsDelegates: widget.localizationsDelegates,
-        supportedLocales: widget.supportedLocales,
-        title: widget.title,
-        debugShowCheckedModeBanner: widget.debugShowCheckedModeBanner,
-        routerConfig: widget.routerConfig,
-        builder: _buildScaffold,
-      );
-    }
-
-    return WidgetsApp(
-      color: const Color(0xFF2563EB),
-      locale: widget.locale,
-      localizationsDelegates: widget.localizationsDelegates,
-      supportedLocales: widget.supportedLocales,
-      title: widget.title,
-      debugShowCheckedModeBanner: widget.debugShowCheckedModeBanner,
-      navigatorObservers: [HeroController()],
-      pageRouteBuilder: <T>(settings, builder) {
-        return PageRouteBuilder<T>(
-          settings: settings,
-          pageBuilder: (context, animation, secondaryAnimation) =>
-              builder(context),
-        );
-      },
-      builder: _buildScaffold,
-      home: widget.home,
-    );
-  }
 }

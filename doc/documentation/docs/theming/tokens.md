@@ -183,16 +183,44 @@ The same config sets how routes animate. `OiPageRoute` reads these values.
 
 ### Reduced motion
 
-`reducedMotion` collapses `fast`, `normal`, `slow`, and the page transition to
-`Duration.zero`. It is a constructor argument, not runtime magic. Wire it up
-yourself when you build the theme, usually from
-`MediaQuery.of(context).disableAnimations`.
+`OiApp` follows the live system `MediaQuery.disableAnimations` preference.
+While enabled, it copies the selected authored animation configuration with
+`reducedMotion: true` and `fast`, `normal`, `slow`, and `pageTransitionDuration`
+set to `Duration.zero`. Page transition kind and entry/exit curves are retained,
+as are performance settings and other theme groups. Clearing the preference
+re-resolves the authored theme, including any manually reduced-motion choice.
+
+Outside `OiApp`, `OiAnimationConfig.standard(reducedMotion: true)` constructs
+zero durations. The explicit constructor and `copyWith` retain the durations
+you supply: changing only their flag does not normalize those fields.
+Individual animation consumers must still respect the motion policy.
 
 ```dart
 OiAnimationConfig.standard(
   reducedMotion: MediaQuery.of(context).disableAnimations,
 )
 ```
+
+### Explicit motion curves
+
+`OiPiecewiseCurve` linearly interpolates a list of `(input, output)` `Offset`
+stops. It snapshots the list and rejects invalid stops immediately, including
+in release builds: at least two finite stops, strictly increasing inputs within
+0–1, and endpoints `(0,0)` and `(1,1)`. Outputs can overshoot; they are not
+clamped. Use it wherever a Flutter `Curve` is accepted.
+
+```dart
+final curve = OiPiecewiseCurve([
+  Offset.zero,
+  const Offset(0.2, 1.1),
+  const Offset(1, 1),
+]);
+```
+
+This expresses authored stops, not fitted spring physics. It does not parse
+CSS, support repeated inputs/discontinuities, or define extrapolation outside
+Flutter's 0–1 input contract. Creating a curve changes no animation defaults;
+the consumer owns its duration, interruption policy and reduced-motion handling.
 
 ## Effects
 

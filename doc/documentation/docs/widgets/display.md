@@ -3,8 +3,8 @@
 These widgets show data. Cards group content, badges and status dots flag state,
 avatars and metrics summarize an entity, and read-only field widgets render values
 without an editor. Tooltips and popovers layer extra detail on hover or tap. Every
-one reads its colors, spacing, and radius from the theme, so they match without
-extra work.
+Most read their colors, spacing, and radius from the theme. `OiHatch` instead
+uses explicit authored colors and geometry.
 
 | Widget | What it does |
 | --- | --- |
@@ -24,6 +24,45 @@ extra work.
 | `OiStorageIndicator` | A used/total storage bar with optional breakdown. |
 | `OiPageIndicator` | A row of dots for carousels and onboarding. |
 | `OiPagination` | A standalone page control for lists outside a table. |
+| `OiHatch` | Static decorative diagonal bands behind optional content. |
+
+## OiHatch
+
+Continuous135-degree hatch bands. Supply a size through the parent and explicit
+ink; this low-level primitive does not infer theme colors or create animation.
+
+```dart
+SizedBox(
+  width: 160,
+  height: 24,
+  child: OiHatch(
+    stripeColor: const Color(0x47131417),
+    pitch: 5,
+    stripeWidth: 1,
+  ),
+)
+```
+
+| Parameter | Type | Default | Description |
+| --- | --- | --- | --- |
+| `stripeColor` | `Color` | **required** | Ink, including authored alpha. |
+| `backgroundColor` | `Color` | transparent | Color beneath the bands. |
+| `pitch` | `double` | `5` | Finite positive perpendicular repeat distance. |
+| `stripeWidth` | `double` | `1` | Finite thickness between zero and pitch, inclusive. |
+| `phase` | `double` | `0` | Finite perpendicular translation; wraps at pitch. |
+| `child` | `Widget?` | `null` | Content painted above the pattern. |
+
+Distances are perpendicular to the bands, not horizontal spacing. Positive
+phase advances them along `(x+y)/sqrt(2)`; finite floating-point precision still
+limits representable distances. Zero thickness paints only the background;
+thickness equal to pitch paints solid ink over it. Invalid geometry throws an
+`ArgumentError` in release builds too.
+
+Only its own paint clips to the box. Child clipping, semantics and interaction
+remain caller-owned. The hatch adds no intrinsic size, semantic label, hit
+target or self-scheduled frame. It is distinct from the unchanged themed
+`OiHatchPlaceholder`; continuous phase control does not certify CSS
+background-image tile motion. Subpixel rendering is backend dependent.
 
 ## OiCard
 
@@ -376,6 +415,10 @@ OiFieldDisplay.pair(
 A centered placeholder for empty views: empty lists, no search results, and error
 pages. It shows an icon or illustration, a title, an optional description, and an
 optional action.
+
+Short containers use compact spacing. When bounded height cannot fit all of the
+content, the placeholder scrolls vertically so descriptions and actions remain
+reachable without reducing text size.
 
 ```dart
 OiEmptyState(

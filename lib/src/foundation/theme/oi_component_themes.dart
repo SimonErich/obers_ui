@@ -11,12 +11,14 @@ import 'package:obers_ui/src/foundation/theme/component_themes/oi_capacity_theme
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_card_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_chart_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_checkbox_theme_data.dart';
+import 'package:obers_ui/src/foundation/theme/component_themes/oi_choice_scale_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_context_menu_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_data_grid_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_date_picker_field_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_date_range_picker_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_dialog_shell_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_dialog_theme_data.dart';
+import 'package:obers_ui/src/foundation/theme/component_themes/oi_docked_page_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_field_display_theme.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_file_explorer_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_form_select_theme_data.dart';
@@ -24,6 +26,7 @@ import 'package:obers_ui/src/foundation/theme/component_themes/oi_grouped_list_t
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_icon_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_index_bar_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_key_value_theme_data.dart';
+import 'package:obers_ui/src/foundation/theme/component_themes/oi_media_tile_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_navigation_rail_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_pagination_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_progress_theme_data.dart';
@@ -48,6 +51,7 @@ import 'package:obers_ui/src/foundation/theme/component_themes/oi_text_input_the
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_toast_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_tooltip_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_week_strip_theme_data.dart';
+import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 
 export 'component_themes/oi_account_switcher_theme_data.dart';
 export 'component_themes/oi_action_bar_theme_data.dart';
@@ -62,12 +66,14 @@ export 'component_themes/oi_card_theme_data.dart';
 export 'component_themes/oi_chart_palette.dart';
 export 'component_themes/oi_chart_theme_data.dart';
 export 'component_themes/oi_checkbox_theme_data.dart';
+export 'component_themes/oi_choice_scale_theme_data.dart';
 export 'component_themes/oi_context_menu_theme_data.dart';
 export 'component_themes/oi_data_grid_theme_data.dart';
 export 'component_themes/oi_date_picker_field_theme_data.dart';
 export 'component_themes/oi_date_range_picker_theme_data.dart';
 export 'component_themes/oi_dialog_shell_theme_data.dart';
 export 'component_themes/oi_dialog_theme_data.dart';
+export 'component_themes/oi_docked_page_theme_data.dart';
 export 'component_themes/oi_field_display_theme.dart';
 export 'component_themes/oi_file_explorer_theme_data.dart';
 export 'component_themes/oi_form_select_theme_data.dart';
@@ -75,6 +81,7 @@ export 'component_themes/oi_grouped_list_theme_data.dart';
 export 'component_themes/oi_icon_theme_data.dart';
 export 'component_themes/oi_index_bar_theme_data.dart';
 export 'component_themes/oi_key_value_theme_data.dart';
+export 'component_themes/oi_media_tile_theme_data.dart';
 export 'component_themes/oi_navigation_rail_theme_data.dart';
 export 'component_themes/oi_otp_theme_data.dart';
 export 'component_themes/oi_pagination_theme_data.dart';
@@ -161,6 +168,9 @@ class OiComponentThemes {
     this.dateRangePicker,
     this.groupedList,
     this.slider,
+    this.choiceScale,
+    this.dockedPage,
+    this.mediaTile,
   });
 
   /// Creates an [OiComponentThemes] with all fields set to `null`.
@@ -215,7 +225,10 @@ class OiComponentThemes {
       weekStrip = null,
       dateRangePicker = null,
       groupedList = null,
-      slider = null;
+      slider = null,
+      mediaTile = null,
+      dockedPage = null,
+      choiceScale = null;
 
   /// Theme overrides for appShell.
   final OiAppShellThemeData? appShell;
@@ -364,6 +377,15 @@ class OiComponentThemes {
   /// Theme overrides for slider / range-slider components.
   final OiSliderThemeData? slider;
 
+  /// Theme overrides for discrete choice scales.
+  final OiChoiceScaleThemeData? choiceScale;
+
+  /// OiDockedPageThemeData overrides.
+  final OiDockedPageThemeData? dockedPage;
+
+  /// OiMediaTileThemeData overrides.
+  final OiMediaTileThemeData? mediaTile;
+
   /// Creates a copy with optionally overridden component theme fields.
   OiComponentThemes copyWith({
     OiAppShellThemeData? appShell,
@@ -415,6 +437,9 @@ class OiComponentThemes {
     OiDateRangePickerThemeData? dateRangePicker,
     OiGroupedListThemeData? groupedList,
     OiSliderThemeData? slider,
+    OiChoiceScaleThemeData? choiceScale,
+    OiDockedPageThemeData? dockedPage,
+    OiMediaTileThemeData? mediaTile,
   }) {
     return OiComponentThemes(
       appShell: appShell ?? this.appShell,
@@ -466,6 +491,9 @@ class OiComponentThemes {
       dateRangePicker: dateRangePicker ?? this.dateRangePicker,
       groupedList: groupedList ?? this.groupedList,
       slider: slider ?? this.slider,
+      choiceScale: choiceScale ?? this.choiceScale,
+      dockedPage: dockedPage ?? this.dockedPage,
+      mediaTile: mediaTile ?? this.mediaTile,
     );
   }
 
@@ -521,7 +549,10 @@ class OiComponentThemes {
         other.weekStrip == weekStrip &&
         other.dateRangePicker == dateRangePicker &&
         other.groupedList == groupedList &&
-        other.slider == slider;
+        other.slider == slider &&
+        other.mediaTile == mediaTile &&
+        other.dockedPage == dockedPage &&
+        other.choiceScale == choiceScale;
   }
 
   @override
@@ -571,6 +602,9 @@ class OiComponentThemes {
         dateRangePicker,
         groupedList,
         slider,
+        choiceScale,
+        mediaTile,
+        dockedPage,
         contextMenu,
       ),
     ),
@@ -609,6 +643,12 @@ class OiButtonThemeScope extends InheritedWidget {
     return context
         .dependOnInheritedWidgetOfExactType<OiButtonThemeScope>()
         ?.theme;
+  }
+
+  /// Resolves a scoped partial override over the global button theme.
+  static OiButtonThemeData? resolve(BuildContext context) {
+    final override = of(context);
+    return context.components.button?.merge(override) ?? override;
   }
 
   @override

@@ -45,6 +45,79 @@ void main() {
     expect(find.byType(EditableText), findsOneWidget);
   });
 
+  testWidgets('a click cannot move the caret after newer keyboard input', (
+    tester,
+  ) async {
+    final controller = TextEditingController(text: 'previous translation name');
+    final focus = FocusNode();
+    addTearDown(controller.dispose);
+    addTearDown(focus.dispose);
+    await tester.pumpObers(
+      Center(
+        child: SizedBox(
+          width: 400,
+          child: buildInput(controller: controller, focusNode: focus),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.tapAt(
+      tester.getTopLeft(find.byType(EditableText)) + const Offset(80, 10),
+    );
+    await tester.pump(const Duration(milliseconds: 16));
+    expect(focus.hasFocus, isTrue);
+    tester.testTextInput.updateEditingValue(
+      const TextEditingValue(
+        text: 'qa-workflows-17910',
+        selection: TextSelection.collapsed(offset: 18),
+      ),
+    );
+    await tester.pump(const Duration(milliseconds: 400));
+    expect(controller.text, 'qa-workflows-17910');
+    expect(controller.selection, const TextSelection.collapsed(offset: 18));
+  });
+
+  for (final placeholder in <String?>[null, 'Enter a name']) {
+    testWidgets(
+      'double tap selects the tapped word with placeholder $placeholder',
+      (
+        tester,
+      ) async {
+        final controller = TextEditingController(text: 'one second third');
+        final focus = FocusNode();
+        addTearDown(controller.dispose);
+        addTearDown(focus.dispose);
+        await tester.pumpObers(
+          Center(
+            child: SizedBox(
+              width: 400,
+              child: buildInput(
+                controller: controller,
+                focusNode: focus,
+                placeholder: placeholder,
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+        final render = tester
+            .state<EditableTextState>(find.byType(EditableText))
+            .renderEditable;
+        final point = render.localToGlobal(
+          render.getLocalRectForCaret(const TextPosition(offset: 6)).center,
+        );
+        await tester.tapAt(point);
+        await tester.pump(const Duration(milliseconds: 40));
+        await tester.tapAt(point);
+        await tester.pump();
+        expect(controller.selection.start, 4);
+        expect(controller.selection.end, 10);
+        expect(controller.text, 'one second third');
+        expect(tester.takeException(), isNull);
+      },
+    );
+  }
+
   testWidgets(
     'enabled input exposes editable web semantics and accessible focus',
     (tester) async {

@@ -20,6 +20,23 @@ import '../../../helpers/pump_app.dart';
 const _kIcon = IconData(0xe318, fontFamily: 'MaterialIcons');
 
 void main() {
+  testWidgets('two-line labels wrap and preserve the full accessible action', (tester) async {
+    const label = 'Make a video from these';
+    var tapped = 0;
+    await tester.pumpObers(Center(child: SizedBox(width: 214,
+      child: OiButton.primary(label: label, labelMaxLines: 2, fullWidth: true,
+        size: OiButtonSize.large, onTap: () => tapped++),
+    )));
+    final text = tester.widget<Text>(find.text(label));
+    expect(text.maxLines, 2);
+    final semantics = tester.ensureSemantics();
+    expect(find.bySemanticsLabel(label), findsOneWidget);
+    await tester.tap(find.text(label));
+    expect(tapped, 1);
+    expect(tester.takeException(), isNull);
+    semantics.dispose();
+  });
+
   testWidgets(
     'regular icon insets follow icon side and leave small controls unchanged',
     (tester) async {

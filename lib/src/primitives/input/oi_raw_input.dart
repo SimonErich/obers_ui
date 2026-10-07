@@ -30,6 +30,7 @@ class OiRawInput extends StatefulWidget {
     this.onChanged,
     this.onEditingComplete,
     this.onSubmitted,
+    this.autofillHints,
     this.enabled = true,
     this.readOnly = false,
     this.obscureText = false,
@@ -96,6 +97,9 @@ class OiRawInput extends StatefulWidget {
   /// Called when the user submits the input.
   final ValueChanged<String>? onSubmitted;
 
+  /// Autofill hints forwarded to the platform editable control.
+  final Iterable<String>? autofillHints;
+
   /// Whether the field accepts user input.
   ///
   /// Disabling releases focus and blocks focus requests while preserving the
@@ -151,7 +155,19 @@ class OiRawInput extends StatefulWidget {
   State<OiRawInput> createState() => _OiRawInputState();
 }
 
-class _OiRawInputState extends State<OiRawInput> {
+class _OiRawInputState extends State<OiRawInput>
+    implements TextSelectionGestureDetectorBuilderDelegate {
+  @override
+  final GlobalKey<EditableTextState> editableTextKey =
+      GlobalKey<EditableTextState>();
+
+  @override
+  bool get forcePressEnabled => false;
+
+  @override
+  bool get selectionEnabled => widget.enabled;
+
+  late final TextSelectionGestureDetectorBuilder _selectionGestures;
   // EditableText treats changed selection controls as a replacement overlay.
   // Keep their identity stable across controller, focus and theme rebuilds.
   final OiTextSelectionControls _selectionControls = OiTextSelectionControls();
@@ -161,6 +177,7 @@ class _OiRawInputState extends State<OiRawInput> {
   @override
   void initState() {
     super.initState();
+    _selectionGestures = TextSelectionGestureDetectorBuilder(delegate: this);
     _showPlaceholder = widget.controller.text.isEmpty;
     widget.controller.addListener(_handleTextChanged);
     widget.focusNode.addListener(_handleFocusChanged);
@@ -223,42 +240,6 @@ class _OiRawInputState extends State<OiRawInput> {
     }
   }
 
-  // ── Word selection ───────────────────────────────────────────────────────
-
-  void _selectWordAtCursor() {
-    final text = widget.controller.text;
-    if (text.isEmpty) return;
-
-    final offset = widget.controller.selection.baseOffset.clamp(0, text.length);
-
-    // Find word boundaries around the cursor position.
-    var start = offset;
-    var end = offset;
-
-    while (start > 0 && _isWordChar(text[start - 1])) {
-      start--;
-    }
-    while (end < text.length && _isWordChar(text[end])) {
-      end++;
-    }
-
-    if (start != end) {
-      widget.controller.selection = TextSelection(
-        baseOffset: start,
-        extentOffset: end,
-      );
-    }
-  }
-
-  static bool _isWordChar(String c) {
-    final code = c.codeUnitAt(0);
-    return (code >= 0x30 && code <= 0x39) || // 0-9
-        (code >= 0x41 && code <= 0x5A) || // A-Z
-        (code >= 0x61 && code <= 0x7A) || // a-z
-        code == 0x5F || // _
-        code >= 0x80; // non-ASCII (accented chars, etc.)
-  }
-
   // ── Style helpers ─────────────────────────────────────────────────────────
 
   TextStyle _resolveStyle(BuildContext context) {
@@ -295,6 +276,7 @@ class _OiRawInputState extends State<OiRawInput> {
 
     // The core EditableText widget.
     final editableText = EditableText(
+      key: editableTextKey,
       controller: widget.controller,
       focusNode: widget.focusNode,
       style: effectiveStyle,
@@ -303,6 +285,7 @@ class _OiRawInputState extends State<OiRawInput> {
           OiTheme.maybeOf(context)?.colors.text ?? const Color(0xFF000000),
       keyboardType: widget.keyboardType,
       textInputAction: widget.textInputAction,
+      autofillHints: widget.autofillHints,
       textCapitalization: widget.textCapitalization,
       onChanged: widget.onChanged,
       onEditingComplete: widget.onEditingComplete,
@@ -315,7 +298,12 @@ class _OiRawInputState extends State<OiRawInput> {
       cursorHeight: widget.cursorHeight,
       textAlign: widget.textAlign,
       autofocus: widget.autofocus,
-      inputFormatters: widget.inputFormatters,
+      rendererIgnoresPointer: true,
+      inputFormatters: [
+        ...?widget.inputFormatters,
+        if (widget.maxLength != null)
+          LengthLimitingTextInputFormatter(widget.maxLength),
+      ],
       scrollController: widget.scrollController,
       selectionControls: widget.selectionControls ?? _selectionControls,
       contextMenuBuilder: widget.contextMenuBuilder,
@@ -323,22 +311,16 @@ class _OiRawInputState extends State<OiRawInput> {
       selectionColor: effectiveCursorColor.withValues(alpha: 0.3),
     );
 
-    // Wrap in a GestureDetector to support double-tap word selection.
-    // Use onDoubleTapDown so EditableText still receives the gesture for
-    // cursor positioning. The actual selection is applied in a post-frame
-    // callback so it runs after EditableText has processed the tap.
-    final interactiveEditable = GestureDetector(
+    // One selection recognizer handles clicks and multi-taps together. Separate
+    // double-tap recognition delays RenderEditable's single click, allowing it
+    // to overwrite the caret after subsequent keyboard input.
+    final interactiveEditable = _selectionGestures.buildGestureDetector(
       behavior: HitTestBehavior.translucent,
-      onDoubleTapDown: (_) {
-        SchedulerBinding.instance.addPostFrameCallback((_) {
-          if (mounted) _selectWordAtCursor();
-        });
-      },
       child: editableText,
     );
 
     // Wrap in a Stack to overlay the placeholder text.
-    var fieldWidget = interactiveEditable as Widget;
+    var fieldWidget = interactiveEditable;
     if (widget.placeholder != null) {
       final themePlaceholderColor = OiTheme.maybeOf(
         context,
@@ -371,7 +353,7 @@ class _OiRawInputState extends State<OiRawInput> {
                 ),
               ),
             ),
-          editableText,
+          interactiveEditable,
         ],
       );
     }

@@ -59,6 +59,7 @@ class OiSheet extends StatefulWidget {
     this.showHeader = false,
     this.footer,
     this.scrollable = false,
+    this.initialFocus = true,
     super.key,
   });
 
@@ -110,6 +111,9 @@ class OiSheet extends StatefulWidget {
   /// Whether the sheet scrolls intrinsically sized body content.
   final bool scrollable;
 
+  /// Whether the first focusable child receives focus when the sheet opens.
+  final bool initialFocus;
+
   /// Shows a sheet above the current widget tree.
   ///
   /// Uses [OiOverlays.of] when available; otherwise falls back to the raw
@@ -128,6 +132,7 @@ class OiSheet extends StatefulWidget {
     bool showHeader = false,
     Widget? footer,
     bool scrollable = false,
+    bool initialFocus = true,
     VoidCallback? onClose,
   }) {
     final service = OiOverlays.maybeOf(context);
@@ -151,6 +156,7 @@ class OiSheet extends StatefulWidget {
           showHeader: showHeader,
           footer: footer,
           scrollable: scrollable,
+          initialFocus: initialFocus,
           onClose: () {
             onClose?.call();
             handle.dismiss();
@@ -179,6 +185,7 @@ class OiSheet extends StatefulWidget {
         showHeader: showHeader,
         footer: footer,
         scrollable: scrollable,
+        initialFocus: initialFocus,
         onClose: () {
           onClose?.call();
           entry
@@ -213,6 +220,7 @@ class OiSheet extends StatefulWidget {
     bool showHeader = false,
     Widget? footer,
     bool scrollable = false,
+    bool initialFocus = true,
   }) async {
     final completer = Completer<T?>();
     late OiOverlayHandle handle;
@@ -247,6 +255,7 @@ class OiSheet extends StatefulWidget {
           showHeader: showHeader,
           footer: footer,
           scrollable: scrollable,
+          initialFocus: initialFocus,
           onClose: close,
           child: builder(close),
         ),
@@ -268,6 +277,7 @@ class OiSheet extends StatefulWidget {
           showHeader: showHeader,
           footer: footer,
           scrollable: scrollable,
+          initialFocus: initialFocus,
           onClose: () {
             close();
             entry
@@ -532,6 +542,7 @@ class _OiSheetState extends State<OiSheet> with SingleTickerProviderStateMixin {
     }
 
     panel = OiFocusTrap(
+      initialFocus: widget.initialFocus,
       onEscape: _animateClose,
       child: SlideTransition(position: slideAnim, child: panel),
     );

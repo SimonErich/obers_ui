@@ -95,14 +95,13 @@ OiButton.confirm(
 
 ### Attributes
 
-Shared by the variant constructors (`primary`, `secondary`, `outline`, `ghost`,
-`destructive`, `soft`):
+Common attributes for the variant constructors (`primary`, `secondary`,
+`outline`, `ghost`, `destructive`, `soft`), with exceptions noted:
 
 | Parameter | Type | Default | Description |
 | --- | --- | --- | --- |
 | `label` | `String` | **required** | The button text. |
-| `onTap` | `VoidCallback?` | `null` | Called on tap. `null` disables the button. |
-| `variant` | `OiButtonVariant` | set by constructor | Visual style. |
+| `onTap` | `VoidCallback?` | `null` | Tap callback; null means no action, not an authored disabled state. |
 | `size` | `OiButtonSize` | `medium` | `small`, `medium`, or `large`. |
 | `icon` | `IconData?` | `null` | Optional leading or trailing icon. |
 | `iconPosition` | `OiIconPosition` | `leading` | `leading` or `trailing`. |
@@ -110,13 +109,54 @@ Shared by the variant constructors (`primary`, `secondary`, `outline`, `ghost`,
 | `loading` | `bool` | `false` | Shows a spinner and blocks taps. |
 | `fullWidth` | `bool` | `false` | Stretch to the parent's width. |
 | `semanticLabel` | `String?` | `null` | Screen-reader text if it differs from `label`. |
-| `tooltip` | `String?` | `null` | Message shown on hover or long-press. |
+| `tooltip` | `String?` | `null` | Hover/long-press message; primary/secondary/outline only. |
+| `borderRadius` | `BorderRadius?` | `null` | Explicit radius; ghost/soft only. |
 
 !!! note
     `OiButton.icon` requires `label` too. It is not shown on screen, but it is
     read aloud by screen readers, so icon-only buttons stay accessible.
 
 **Theme:** `context.components.button` → `OiButtonThemeData`
+
+### Opt-in styles per size
+
+Leave `sizeStyles` null to retain legacy rendering, or configure independently
+optional small/medium/large values through the theme constructor:
+
+```dart
+final buttonTheme = OiButtonThemeData(
+  sizeStyles: OiButtonSizeStyles(
+    medium: OiButtonSizeStyle(
+      textStyle: const TextStyle(fontSize: 14, height: 20 / 14),
+      iconSize: 16,
+      iconGap: 6,
+      padding: const EdgeInsetsDirectional.symmetric(horizontal: 12),
+      minWidth: 80,
+    ),
+  ),
+);
+```
+
+Each field is nullable and falls back independently. Numeric geometry and every
+resolved LTR/RTL inset edge are validated as finite and nonnegative in release
+builds. Explicit zero is an override, not an absent value.
+
+| Field | Where it applies | Null fallback |
+| --- | --- | --- |
+| `textStyle` | Normal, split, countdown and confirm labels | Legacy typography. Current state foreground always wins over selected color/Paint. |
+| `iconSize` | Label-adjacent glyph and split chevron | Adjacent: global then size; split: size only, retaining its legacy global exclusion. |
+| `iconOnlySize` | Icon-only glyph | Selected iconSize, global, then size. Does not change its square target. |
+| `iconLabelPadding` | Explicit icon+label insets, including SMALL; trailing swaps start/end | Selected plain padding, then exact legacy insets. |
+| `padding` | Content insets, including icon-only interior | Exact legacy global/density resolution. |
+| `iconGap` | Directional space between glyph and label, including zero | Legacy absolute left/right gap; its inherited RTL behavior is unchanged. |
+| `minWidth` | Textual frames and split main, not its chevron or icon square | Global width only for legacy normal/ghost; old other-form exclusions remain. |
+
+The selected label style merges after legacy typography, preserving authored
+line height and font variations. It does not replace interaction-state colors.
+There is no new height, disabled-opacity policy or target enlargement. Parent
+constraints still govern final layout. The old virtual `OiButtonThemeData.copyWith`
+signature remains compatible: it preserves the current size-style group, but
+configure a replacement group through the constructor.
 
 !!! tip "When to reach for something else"
     Use `OiToggleButton` for on/off state, not `OiButton`. For navigation links,

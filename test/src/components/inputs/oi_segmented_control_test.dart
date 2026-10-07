@@ -18,6 +18,105 @@ const _segments = [
 
 void main() {
   testWidgets(
+    'selected elevation follows the selected segment without changing its bounds',
+    (
+      tester,
+    ) async {
+      const shadow = [BoxShadow(blurRadius: 2)];
+      final base = OiThemeData.light();
+      await tester.pumpObers(
+        Center(
+          child: OiThemeScope(
+            data: base.copyWith(
+              components: base.components.copyWith(
+                segmentedControl: const OiSegmentedControlThemeData(
+                  height: 52,
+                  inset: 4,
+                  selectedShadow: shadow,
+                ),
+              ),
+            ),
+            child: OiSegmentedControl<String>(
+              segments: _segments,
+              selected: 'week',
+              onChanged: (_) {},
+            ),
+          ),
+        ),
+      );
+      final elevated = find.byWidgetPredicate(
+        (w) =>
+            w is AnimatedContainer &&
+            (w.decoration as BoxDecoration?)?.boxShadow != null,
+      );
+      expect(elevated, findsOneWidget);
+      expect(tester.getSize(elevated).height, 44);
+      expect(
+        find.descendant(of: elevated, matching: find.text('Week')),
+        findsOneWidget,
+      );
+    },
+  );
+  testWidgets('custom subtitle typography fits a compact themed control', (
+    tester,
+  ) async {
+    await tester.pumpObers(
+      OiThemeScope(
+        data: OiThemeData.light().copyWith(
+          components: const OiComponentThemes(
+            segmentedControl: OiSegmentedControlThemeData(
+              height: 56,
+              inset: 4,
+              labelStyle: TextStyle(fontSize: 15, height: 1),
+              subtitleStyle: TextStyle(fontSize: 12, height: 1),
+              subtitleGap: 2,
+            ),
+          ),
+        ),
+        child: Center(
+          child: OiSegmentedControl<int>(
+            segments: const [
+              OiSegment(value: 1, label: 'Short', subtitle: '0:20'),
+              OiSegment(value: 2, label: 'Long', subtitle: '1:00'),
+            ],
+            selected: 1,
+            onChanged: (_) {},
+            semanticLabel: 'Length',
+          ),
+        ),
+      ),
+    );
+    expect(tester.takeException(), isNull);
+    expect(tester.getSize(find.byType(OiSegmentedControl<int>)).height, 56);
+    expect(tester.widget<Text>(find.text('Short')).style?.fontSize, 15);
+    expect(tester.widget<Text>(find.text('0:20')).style?.fontSize, 12);
+  });
+
+  testWidgets(
+    'duration subtitles render and participate in the accessible name',
+    (tester) async {
+      final semantics = tester.ensureSemantics();
+      String? selected;
+      await tester.pumpObers(
+        OiSegmentedControl<String>(
+          segments: const [
+            OiSegment(value: 'short', label: 'Short', subtitle: '~ 0:20'),
+            OiSegment(value: 'long', label: 'Long', subtitle: '~ 1:00'),
+          ],
+          selected: 'short',
+          onChanged: (value) => selected = value,
+          semanticLabel: 'Length',
+        ),
+      );
+      expect(find.text('~ 0:20'), findsOneWidget);
+      expect(find.text('~ 1:00'), findsOneWidget);
+      expect(find.bySemanticsLabel('Long, ~ 1:00'), findsOneWidget);
+      await tester.tap(find.text('Long'));
+      expect(selected, 'long');
+      semantics.dispose();
+    },
+  );
+  testWidgets(
     'label typography and gaps preserve geometry when selection changes',
     (tester) async {
       final base = OiThemeData.light();

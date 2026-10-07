@@ -701,21 +701,36 @@ class _OiTableState<T> extends State<OiTable<T>>
                   );
 
                   if (needsScroll) {
-                    // Wrap header and body to scroll horizontally in sync.
-                    return SingleChildScrollView(
+                    // Placeholder content belongs to the visible viewport;
+                    // populated rows scroll horizontally with their headers.
+                    final bodyUsesViewport =
+                        widget.loading || _displayRows.isEmpty;
+                    final scrollableTable = SingleChildScrollView(
                       controller: _horizontalScrollController,
                       scrollDirection: Axis.horizontal,
                       child: SizedBox(
                         width: tableWidth,
-                        child: Column(
-                          mainAxisSize: widget.shrinkWrap
-                              ? MainAxisSize.min
-                              : MainAxisSize.max,
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [header, body],
-                        ),
+                        child: bodyUsesViewport
+                            ? header
+                            : Column(
+                                mainAxisSize: widget.shrinkWrap
+                                    ? MainAxisSize.min
+                                    : MainAxisSize.max,
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [header, body],
+                              ),
                       ),
                     );
+                    if (bodyUsesViewport) {
+                      return Column(
+                        mainAxisSize: widget.shrinkWrap
+                            ? MainAxisSize.min
+                            : MainAxisSize.max,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [scrollableTable, body],
+                      );
+                    }
+                    return scrollableTable;
                   }
 
                   return Column(

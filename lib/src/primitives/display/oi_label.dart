@@ -57,6 +57,8 @@ class OiLabel extends StatelessWidget {
     this.decoration,
     this.decorationColor,
     this.style,
+    this.strutStyle,
+    this.textHeightBehavior,
     this.highlightQuery,
     super.key,
   });
@@ -80,6 +82,8 @@ class OiLabel extends StatelessWidget {
     TextDecoration? decoration,
     Color? decorationColor,
     TextStyle? style,
+    StrutStyle? strutStyle,
+    TextHeightBehavior? textHeightBehavior,
     String? highlightQuery,
     Key? key,
   }) : this._(
@@ -95,6 +99,8 @@ class OiLabel extends StatelessWidget {
          decoration: decoration,
          decorationColor: decorationColor,
          style: style,
+         strutStyle: strutStyle,
+         textHeightBehavior: textHeightBehavior,
          highlightQuery: highlightQuery,
          key: key,
        );
@@ -524,6 +530,12 @@ class OiLabel extends StatelessWidget {
   /// Optional overrides merged over the themed variant before explicit colors.
   final TextStyle? style;
 
+  /// Optional minimum line metrics. System text scaling still applies.
+  final StrutStyle? strutStyle;
+
+  /// Controls paragraph leading; defaults to the text theme's policy.
+  final TextHeightBehavior? textHeightBehavior;
+
   /// The text content to render.
   final String text;
 
@@ -592,8 +604,9 @@ class OiLabel extends StatelessWidget {
   // Build
   // ---------------------------------------------------------------------------
 
-  @override
-  Widget build(BuildContext context) {
+  /// Resolves the exact style painted by this label, including heading scale.
+  /// Custom text layout should measure this style with the system text scaler.
+  TextStyle resolveStyle(BuildContext context) {
     final baseStyle = context.textTheme.styleFor(variant).merge(this.style);
     final scale = _scaleFactor(context);
 
@@ -621,6 +634,14 @@ class OiLabel extends StatelessWidget {
       );
     }
 
+    return style;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final style = resolveStyle(context);
+    final heightBehavior =
+        textHeightBehavior ?? context.textTheme.textHeightBehavior;
     Widget textWidget;
 
     if (variant == OiLabelVariant.link) {
@@ -630,6 +651,8 @@ class OiLabel extends StatelessWidget {
         maxLines: maxLines,
         overflow: overflow,
         textAlign: textAlign,
+        strutStyle: strutStyle,
+        textHeightBehavior: heightBehavior,
       );
     } else if (highlightQuery?.trim().isNotEmpty == true) {
       final query = highlightQuery!.trim();
@@ -661,6 +684,8 @@ class OiLabel extends StatelessWidget {
             : null,
         textAlign: textAlign,
         semanticsLabel: text,
+        strutStyle: strutStyle,
+        textHeightBehavior: heightBehavior,
       );
     } else {
       textWidget = Text(
@@ -672,6 +697,8 @@ class OiLabel extends StatelessWidget {
             ? false
             : null,
         textAlign: textAlign,
+        strutStyle: strutStyle,
+        textHeightBehavior: heightBehavior,
       );
     }
 
@@ -690,7 +717,14 @@ class OiLabel extends StatelessWidget {
       );
     }
 
-    return textWidget;
+    final heading = const {
+      OiLabelVariant.display,
+      OiLabelVariant.h1,
+      OiLabelVariant.h2,
+      OiLabelVariant.h3,
+      OiLabelVariant.h4,
+    }.contains(variant);
+    return heading ? Semantics(header: true, child: textWidget) : textWidget;
   }
 }
 
@@ -738,6 +772,8 @@ class _OiLinkHover extends StatefulWidget {
     this.maxLines,
     this.overflow,
     this.textAlign,
+    this.strutStyle,
+    this.textHeightBehavior,
   });
 
   final String text;
@@ -745,6 +781,9 @@ class _OiLinkHover extends StatefulWidget {
   final int? maxLines;
   final TextOverflow? overflow;
   final TextAlign? textAlign;
+
+  final StrutStyle? strutStyle;
+  final TextHeightBehavior? textHeightBehavior;
 
   @override
   State<_OiLinkHover> createState() => _OiLinkHoverState();
@@ -776,6 +815,8 @@ class _OiLinkHoverState extends State<_OiLinkHover> {
           maxLines: widget.maxLines,
           overflow: widget.overflow,
           textAlign: widget.textAlign,
+          strutStyle: widget.strutStyle,
+          textHeightBehavior: widget.textHeightBehavior,
         ),
       ),
     );

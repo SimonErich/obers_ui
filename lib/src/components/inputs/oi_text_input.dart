@@ -32,6 +32,7 @@ class OiTextInput extends StatefulWidget {
     this.onChanged,
     this.onEditingComplete,
     this.onSubmitted,
+    this.autofillHints,
     this.enabled = true,
     this.readOnly = false,
     this.obscureText = false,
@@ -62,6 +63,7 @@ class OiTextInput extends StatefulWidget {
     this.controller,
     this.onChanged,
     this.onSubmitted,
+    this.autofillHints,
     this.autofocus = false,
     this.enabled = true,
     this.focusNode,
@@ -111,6 +113,7 @@ class OiTextInput extends StatefulWidget {
     this.onChanged,
     this.onEditingComplete,
     this.onSubmitted,
+    this.autofillHints,
     this.enabled = true,
     this.readOnly = false,
     this.autofocus = false,
@@ -157,6 +160,7 @@ class OiTextInput extends StatefulWidget {
     this.onChanged,
     this.onEditingComplete,
     this.onSubmitted,
+    this.autofillHints,
     this.enabled = true,
     this.readOnly = false,
     this.autofocus = false,
@@ -216,6 +220,7 @@ class OiTextInput extends StatefulWidget {
        textInputAction = null,
        onEditingComplete = null,
        onSubmitted = null,
+       autofillHints = null,
        readOnly = false,
        obscureText = false,
        inputFormatters = null,
@@ -277,6 +282,9 @@ class OiTextInput extends StatefulWidget {
 
   /// Called when the user submits the input.
   final ValueChanged<String>? onSubmitted;
+
+  /// Platform autofill hints for email, usernames and passwords.
+  final Iterable<String>? autofillHints;
 
   /// Whether the field accepts input. Defaults to true.
   final bool enabled;
@@ -508,6 +516,7 @@ class _OiTextInputState extends State<OiTextInput> {
         },
         onEditingComplete: widget.onEditingComplete,
         onSubmitted: widget.onSubmitted,
+        autofillHints: widget.autofillHints,
         enabled: widget.enabled,
         readOnly: widget.readOnly,
         obscureText: effectiveObscure,

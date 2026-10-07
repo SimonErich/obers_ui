@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.1.0] - Unreleased
 
+- Combobox dropdowns use the native search input with explicit editor semantics,
+  retain the latest asynchronous result, ignore responses after closing, and
+  safely handle arrow navigation while no results are available.
+- Raw text inputs use Flutter's text-selection gesture handling, so a click
+  cannot reset the caret after typing starts. Word selection works with
+  placeholders as well as ordinary inputs.
+- Table empty and loading states stay within the visible viewport while wide
+  headers scroll; populated rows retain synchronized horizontal scrolling.
+- Empty states use compact spacing in short panels and retain vertical scroll
+  access to longer descriptions and actions instead of overflowing.
+- Add asynchronous `OiAutocomplete` with stale-result protection, keyboard
+  selection, localized empty state and automatic reset after selection.
+- Wizard controls accept localized labels; sheets can preserve initial focus.
+  Checkbox label spacing and quantity suffixes are configurable.
+- Toasts support external expiry timers, pause/resume callbacks and localized
+  dismissal controls. Raw text inputs enforce maximum grapheme length after
+  caller-provided formatters.
+
 - Icon buttons honor their requested variant surface, border and interaction
   colors while preserving square bounds. Detailed steppers can opt into an
   intrinsic connected timeline rail, with appearance from `OiStepperThemeData`;

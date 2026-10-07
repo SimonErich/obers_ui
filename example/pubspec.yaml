@@ -21,3 +21,16 @@ dev_dependencies:
   integration_test:
     sdk: flutter
   very_good_analysis: ^7.0.0
+
+flutter:
+  assets:
+    - assets/minimal_designs/photo.png
+  fonts:
+    - family: Figtree
+      fonts:
+        - asset: assets/minimal_designs/Figtree.ttf
+    - family: Newsreader
+      fonts:
+        - asset: assets/minimal_designs/Newsreader.ttf
+        - asset: assets/minimal_designs/Newsreader-Italic.ttf
+          style: italic

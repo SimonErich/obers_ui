@@ -37,6 +37,7 @@ class OiSwitch extends StatefulWidget {
     this.size = OiSwitchSize.medium,
     this.enabled = true,
     this.label,
+    this.semanticLabel,
     this.labelLeading = false,
     super.key,
   });
@@ -55,6 +56,9 @@ class OiSwitch extends StatefulWidget {
 
   /// Optional label rendered to the right of the switch.
   final String? label;
+
+  /// Accessible name when the visible label is omitted, or an override.
+  final String? semanticLabel;
 
   /// Places the visible label before the switch, useful in trailing toolbars.
   final bool labelLeading;
@@ -82,7 +86,7 @@ class _OiSwitchState extends State<OiSwitch> {
     final st = context.components.switchTheme;
     final trackW = st?.width ?? dim.width;
     final trackH = st?.height ?? dim.height;
-    const padding = 2.0;
+    final padding = st?.thumbInset ?? 2.0;
     final thumbSize = trackH - padding * 2;
     final travelDistance = trackW - thumbSize - padding * 2;
 
@@ -170,6 +174,15 @@ class _OiSwitchState extends State<OiSwitch> {
       );
     }
 
-    return content;
+    return Semantics(
+      container: true,
+      toggled: widget.value,
+      enabled: widget.enabled,
+      label: widget.semanticLabel ?? widget.label,
+      onTap: widget.enabled && widget.onChanged != null
+          ? () => widget.onChanged!(!widget.value)
+          : null,
+      child: ExcludeSemantics(child: content),
+    );
   }
 }

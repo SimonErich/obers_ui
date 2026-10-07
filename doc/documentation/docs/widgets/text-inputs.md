@@ -26,6 +26,10 @@ technology. It stays the same while typing; the placeholder is exposed as a
 hint and does not become part of that name. Search, password and multiline
 constructors accept the same option.
 
+Caret placement and text selection follow Flutter's standard gestures, including
+double-tap word selection and pointer dragging. A click finishes its selection
+before subsequent keyboard edits, including when a placeholder is configured.
+
 ```dart
 OiTextInput(
   label: 'Email',

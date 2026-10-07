@@ -3,10 +3,10 @@ import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/_internal/oi_input_frame.dart';
+import 'package:obers_ui/src/components/inputs/oi_text_input.dart';
 import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/primitives/display/oi_icon.dart';
-import 'package:obers_ui/src/primitives/input/oi_raw_input.dart';
 import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
 import 'package:obers_ui/src/primitives/overlay/oi_floating.dart';
 
@@ -148,6 +148,7 @@ class _OiComboBoxState<T> extends State<OiComboBox<T>> {
   List<T> _asyncResults = [];
   bool _loading = false;
   Timer? _debounce;
+  int _searchRevision = 0;
 
   @override
   void initState() {
@@ -178,8 +179,9 @@ class _OiComboBoxState<T> extends State<OiComboBox<T>> {
   void _applyFilter(String query) {
     if (widget.search != null) {
       _debounce?.cancel();
+      final revision = ++_searchRevision;
       _debounce = Timer(const Duration(milliseconds: 200), () {
-        unawaited(_performAsyncSearch(query));
+        unawaited(_performAsyncSearch(query, revision));
       });
       return;
     }
@@ -197,11 +199,12 @@ class _OiComboBoxState<T> extends State<OiComboBox<T>> {
     });
   }
 
-  Future<void> _performAsyncSearch(String query) async {
+  Future<void> _performAsyncSearch(String query, int revision) async {
+    if (!mounted || revision != _searchRevision) return;
     setState(() => _loading = true);
     try {
       final results = await widget.search!(query);
-      if (mounted) {
+      if (mounted && revision == _searchRevision) {
         setState(() {
           _asyncResults = results;
           _filteredItems = results;
@@ -210,7 +213,7 @@ class _OiComboBoxState<T> extends State<OiComboBox<T>> {
         });
       }
     } on Exception {
-      if (mounted) {
+      if (mounted && revision == _searchRevision) {
         setState(() {
           _loading = false;
           _filteredItems = [];
@@ -268,7 +271,12 @@ class _OiComboBoxState<T> extends State<OiComboBox<T>> {
   }
 
   void _closeDropdown() {
-    setState(() => _open = false);
+    _debounce?.cancel();
+    ++_searchRevision;
+    setState(() {
+      _open = false;
+      _loading = false;
+    });
     _textController.clear();
   }
 
@@ -314,6 +322,12 @@ class _OiComboBoxState<T> extends State<OiComboBox<T>> {
     }
 
     final items = _effectiveItems;
+
+    if (items.isEmpty &&
+        (event.logicalKey == LogicalKeyboardKey.arrowDown ||
+            event.logicalKey == LogicalKeyboardKey.arrowUp)) {
+      return KeyEventResult.handled;
+    }
 
     if (event.logicalKey == LogicalKeyboardKey.arrowDown) {
       setState(() {
@@ -383,10 +397,10 @@ class _OiComboBoxState<T> extends State<OiComboBox<T>> {
             // Search input
             Padding(
               padding: const EdgeInsets.all(8),
-              child: OiRawInput(
+              child: OiTextInput.search(
+                semanticLabel: 'Search\u2026',
                 controller: _textController,
                 focusNode: _inputFocusNode,
-                placeholder: 'Search\u2026',
                 onChanged: _applyFilter,
               ),
             ),

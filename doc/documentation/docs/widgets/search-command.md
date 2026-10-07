@@ -6,10 +6,30 @@ shortcut manager with a built-in help dialog.
 
 | Widget | What it does |
 | --- | --- |
+| `OiAutocomplete` | An asynchronous suggestion input that clears after selecting a result. |
 | `OiSearch` | A global search overlay that queries several sources and groups the results. |
 | `OiCommandBar` | A Cmd+K command palette with fuzzy search and nested commands. |
 | `OiFilterBar` | A row of filter chips that open popovers to refine a data list. |
 | `OiShortcuts` | Registers keyboard shortcuts and shows a help dialog on `?`. |
+
+## OiAutocomplete
+
+Use `OiAutocomplete<T>` when an item is added or opened immediately after a pick.
+Provide `label`, `placeholder`, `emptyLabel`, `search`, `labelOf` and `onSelect`.
+Blank queries skip the search. An older request cannot replace a newer result.
+Arrow keys choose a suggestion; the keyboard search action submits the pick and
+clears the field. Empty results display the supplied localized message.
+
+```dart
+OiAutocomplete<Product>(
+  label: 'Product search',
+  placeholder: 'Find a product',
+  emptyLabel: 'No products found',
+  search: repository.search,
+  labelOf: (product) => product.name,
+  onSelect: addProduct,
+)
+```
 
 ## OiSearch
 

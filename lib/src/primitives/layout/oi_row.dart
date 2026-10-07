@@ -34,6 +34,7 @@ class OiRow extends StatelessWidget {
     this.gap = const OiResponsive<double>(0),
     this.mainAxisAlignment = MainAxisAlignment.start,
     this.crossAxisAlignment = CrossAxisAlignment.center,
+    this.textBaseline,
     this.mainAxisSize = MainAxisSize.min,
     this.collapse,
     this.scale = OiBreakpointScale.defaultScale,
@@ -51,6 +52,10 @@ class OiRow extends StatelessWidget {
 
   /// How children are aligned along the cross axis.
   final CrossAxisAlignment crossAxisAlignment;
+
+  /// Baseline used when horizontally aligning different text sizes.
+  /// A collapsed vertical layout uses start alignment instead of baseline.
+  final TextBaseline? textBaseline;
 
   /// How much space the layout occupies along its main axis.
   ///
@@ -99,7 +104,9 @@ class OiRow extends StatelessWidget {
       return Column(
         mainAxisSize: mainAxisSize,
         mainAxisAlignment: mainAxisAlignment,
-        crossAxisAlignment: crossAxisAlignment,
+        crossAxisAlignment: crossAxisAlignment == CrossAxisAlignment.baseline
+            ? CrossAxisAlignment.start
+            : crossAxisAlignment,
         children: spaced,
       );
     }
@@ -108,6 +115,7 @@ class OiRow extends StatelessWidget {
       mainAxisSize: mainAxisSize,
       mainAxisAlignment: mainAxisAlignment,
       crossAxisAlignment: crossAxisAlignment,
+      textBaseline: textBaseline,
       children: spaced,
     );
   }

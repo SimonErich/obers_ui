@@ -34,8 +34,11 @@ class OiTappable extends StatefulWidget {
     this.enabled = true,
     this.disabledOpacity = 0.4,
     this.focusable = true,
+    this.focusNode,
     this.dragging = false,
     this.semanticLabel,
+    this.semanticHint,
+    this.semanticContainer = false,
     this.cursor,
     this.clipBorderRadius,
     this.statesController,
@@ -83,6 +86,9 @@ class OiTappable extends StatefulWidget {
   /// When `false`, the [Focus] node cannot receive focus.
   final bool focusable;
 
+  /// Optional externally owned node for groups with roving keyboard focus.
+  final FocusNode? focusNode;
+
   /// Whether the widget is currently being dragged.
   ///
   /// This state is managed externally (e.g. by a parent [Draggable] or
@@ -93,6 +99,14 @@ class OiTappable extends StatefulWidget {
   /// An optional label announced by screen readers in place of the child's
   /// semantic content.
   final String? semanticLabel;
+
+  /// Additional context announced with the named action.
+  final String? semanticHint;
+
+  /// Isolates the action from surrounding semantics, including sliver indexes.
+  ///
+  /// Defaults to false so enclosing checkbox/radio semantics can still merge.
+  final bool semanticContainer;
 
   /// The mouse cursor to display when hovering over this widget.
   ///
@@ -342,6 +356,7 @@ class _OiTappableState extends State<OiTappable> {
 
     // Keyboard focus.
     content = Focus(
+      focusNode: widget.focusNode,
       canRequestFocus: widget.focusable && widget.enabled,
       onFocusChange: (focused) {
         _setFocused(focused);
@@ -352,9 +367,11 @@ class _OiTappableState extends State<OiTappable> {
     );
 
     // Semantics label.
-    if (widget.semanticLabel != null) {
+    if (widget.semanticLabel != null || widget.semanticHint != null) {
       content = Semantics(
+        container: widget.semanticContainer,
         label: widget.semanticLabel,
+        hint: widget.semanticHint,
         button: true,
         enabled: widget.enabled,
         child: content,

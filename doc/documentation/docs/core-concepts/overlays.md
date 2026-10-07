@@ -79,18 +79,33 @@ variant as the `dialog` argument.
 
 ### OiToast.show
 
-Queues a toast at the `toast` level. Toasts stack and auto-dismiss.
+Queues a toast at the `toast` level. Toasts stack within each requested position
+and auto-dismiss when a duration is supplied. Concurrent positions retain their
+own anchors; no adaptive cross-group collision partitioning is promised.
+
+Without an `OiOverlays` service, `show` inserts into the nearest native Flutter
+`Overlay`. That host still needs the usual theme, density, platform, media-query
+and text-direction scopes. `OiApp` normally provides this environment.
 
 | Parameter | Type | Default | Description |
 | --- | --- | --- | --- |
-| `context` | `BuildContext` | **required** | Locates the overlay service. |
+| `context` | `BuildContext` | **required** | Locates the overlay service or native Overlay fallback. |
 | `message` | `String` | **required** | The toast text. |
 | `level` | `OiToastLevel` | `info` | `info`, `success`, `warning`, or `error`. |
 | `position` | `OiToastPosition` | `bottomRight` | One of six screen corners or edges. |
-| `duration` | `Duration` | `4s` | How long the toast stays before it fades. |
+| `duration` | `Duration?` | `4s` | How long before it fades; null leaves expiry to the owner. |
 | `pauseOnHover` | `bool` | `true` | Pause the auto-dismiss timer while hovered. |
+| `dismissible` | `bool` | `true` | Show the dismiss button. |
+| `dismissLabel` | `String` | `Dismiss` | Localized accessible name for the dismiss button. |
 | `action` | `Widget?` | `null` | An optional action widget, like an undo button. |
-| `onDismiss` | `VoidCallback?` | `null` | Called when the toast closes. |
+| `onDismiss` | `VoidCallback?` | `null` | Close/expiry callback, not called by handle or service dismissal. |
+
+The returned handle reflects close/expiry removal. `handle.dismiss()` removes
+immediately without a close animation or callback. `OiOverlays.of(context).dismissAll()`
+also immediately invalidates the handles belonging to that toast overlay and
+suppresses its pending close/expiry callbacks. The next toast starts a clean
+queue generation; it does not revive dismissed entries. The toast queue is
+currently shared, not isolated per `OiApp` host.
 
 ### OiSheet.show
 

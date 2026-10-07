@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui/src/composites/search/oi_combo_box.dart';
+import 'package:obers_ui/src/primitives/interaction/oi_focus_trap.dart';
 
 import '../../../helpers/pump_app.dart';
 
@@ -104,6 +105,85 @@ void main() {
     expect(changes, isEmpty);
     expect(find.text('Banana'), findsOneWidget);
     semantics.dispose();
+  });
+
+  testWidgets('dialog search keeps a labeled editor and keyboard connection', (
+    tester,
+  ) async {
+    final semantics = tester.ensureSemantics();
+    final queries = <String>[];
+    await tester.pumpObers(
+      OiFocusTrap(
+        child: _comboBox(
+          search: (query) async {
+            queries.add(query);
+            return _fruits.where((item) => item.contains(query)).toList();
+          },
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.bySemanticsLabel('Fruit'));
+    await tester.pumpAndSettle();
+    final editor = tester.widget<EditableText>(find.byType(EditableText));
+    expect(editor.focusNode.hasPrimaryFocus, isTrue);
+    expect(tester.testTextInput.hasAnyClients, isTrue);
+    expect(find.bySemanticsLabel('Search…'), findsOneWidget);
+    tester.testTextInput.updateEditingValue(
+      const TextEditingValue(
+        text: 'Ban',
+        selection: TextSelection.collapsed(offset: 3),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.pump(const Duration(milliseconds: 250));
+    await tester.pumpAndSettle();
+    expect(queries.last, 'Ban');
+    expect(find.text('Banana'), findsOneWidget);
+    expect(find.text('Cherry'), findsNothing);
+    semantics.dispose();
+  });
+
+  testWidgets('latest search wins when responses arrive out of order', (
+    tester,
+  ) async {
+    final pending = <String, Completer<List<String>>>{};
+    await tester.pumpObers(
+      _comboBox(
+        search: (query) {
+          final result = Completer<List<String>>();
+          pending[query] = result;
+          return result.future;
+        },
+      ),
+    );
+    await tester.tap(find.byType(GestureDetector).first);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 250));
+    await tester.pump();
+    await tester.enterText(find.byType(EditableText), 'old');
+    await tester.pump(const Duration(milliseconds: 250));
+    await tester.enterText(find.byType(EditableText), 'new');
+    await tester.pump(const Duration(milliseconds: 250));
+    pending['new']!.complete(['New result']);
+    await tester.pump();
+    pending['old']!.complete(['Old result']);
+    pending['']!.complete(['Initial result']);
+    await tester.pumpAndSettle();
+    expect(find.text('New result'), findsOneWidget);
+    expect(find.text('Old result'), findsNothing);
+    expect(find.text('Initial result'), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('arrow navigation is safe with no results', (tester) async {
+    await tester.pumpObers(_comboBox(items: const []));
+    await tester.tap(find.byType(GestureDetector).first);
+    await tester.pumpAndSettle();
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowUp);
+    await tester.pump();
+    expect(tester.takeException(), isNull);
   });
 
   testWidgets('renders without error', (tester) async {

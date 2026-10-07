@@ -23,6 +23,7 @@ class OiCheckbox extends StatefulWidget {
     this.labelWidget,
     this.semanticLabel,
     this.labelStyle,
+    this.labelGap,
     this.enabled = true,
     super.key,
   }) : assert(
@@ -51,6 +52,9 @@ class OiCheckbox extends StatefulWidget {
 
   /// Optional style override for the label text.
   final TextStyle? labelStyle;
+
+  /// Space between the checkbox and its visible label; defaults to eight pixels.
+  final double? labelGap;
 
   /// Whether the checkbox responds to taps.
   final bool enabled;
@@ -138,7 +142,7 @@ class _OiCheckboxState extends State<OiCheckbox> {
         mainAxisSize: MainAxisSize.min,
         children: [
           box,
-          const SizedBox(width: 8),
+          SizedBox(width: widget.labelGap ?? 8),
           Flexible(
             child:
                 widget.labelWidget ??

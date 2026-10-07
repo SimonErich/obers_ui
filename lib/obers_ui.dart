@@ -49,6 +49,8 @@ export 'src/components/display/oi_image_preview_card.dart';
 export 'src/components/display/oi_key_value.dart';
 export 'src/components/display/oi_list_tile.dart';
 export 'src/components/display/oi_markdown.dart';
+export 'src/components/display/oi_media_strip.dart';
+export 'src/components/display/oi_media_tile.dart';
 export 'src/components/display/oi_metric.dart';
 export 'src/components/display/oi_page_indicator.dart';
 export 'src/components/display/oi_pagination.dart';
@@ -87,6 +89,7 @@ export 'src/components/inline_edit/oi_editable_text.dart';
 
 export 'src/components/inputs/oi_array_input.dart';
 export 'src/components/inputs/oi_checkbox.dart';
+export 'src/components/inputs/oi_choice_scale.dart';
 export 'src/components/inputs/oi_color_input.dart';
 export 'src/components/inputs/oi_color_palette_picker.dart';
 export 'src/components/inputs/oi_date_input.dart';
@@ -237,6 +240,7 @@ export 'src/composites/scheduling/oi_scheduler.dart';
 export 'src/composites/scheduling/oi_timeline.dart';
 // ── Composites: Search ───────────────────────────────────────────────────────
 
+export 'src/composites/search/oi_autocomplete.dart';
 export 'src/composites/search/oi_combo_box.dart';
 export 'src/composites/search/oi_command_bar.dart';
 export 'src/composites/search/oi_search.dart';
@@ -267,6 +271,7 @@ export 'src/foundation/icons/oi_icon_data.dart';
 export 'src/foundation/icons/oi_icon_source.dart';
 // ── Foundation: Core Services ────────────────────────────────────────────────
 
+export 'src/foundation/motion/oi_piecewise_curve.dart';
 export 'src/foundation/oi_accessibility.dart';
 export 'src/foundation/oi_app.dart';
 export 'src/foundation/oi_icons.dart';
@@ -293,17 +298,33 @@ export 'src/foundation/persistence/oi_settings_mixin.dart';
 export 'src/foundation/persistence/oi_settings_provider.dart';
 // ── Foundation: Theme ────────────────────────────────────────────────────────
 
+export 'src/foundation/theme/color/oi_brand_charts.dart';
+export 'src/foundation/theme/color/oi_brand_palette.dart';
+export 'src/foundation/theme/color/oi_color_mix.dart';
+export 'src/foundation/theme/color/oi_hue_interpolation.dart';
+export 'src/foundation/theme/color/oi_oklab.dart';
+export 'src/foundation/theme/color/oi_oklch.dart';
 export 'src/foundation/theme/oi_animation_config.dart';
 export 'src/foundation/theme/oi_button_font_size_scale.dart';
+export 'src/foundation/theme/oi_chart_colors.dart';
+export 'src/foundation/theme/oi_color_ramp.dart';
 export 'src/foundation/theme/oi_color_scheme.dart';
 export 'src/foundation/theme/oi_color_swatch.dart';
 export 'src/foundation/theme/oi_component_size_scale.dart';
 export 'src/foundation/theme/oi_component_themes.dart';
 export 'src/foundation/theme/oi_decoration_theme.dart';
 export 'src/foundation/theme/oi_effects_theme.dart';
+export 'src/foundation/theme/oi_ink_colors.dart';
+export 'src/foundation/theme/oi_inset_shadow.dart';
+export 'src/foundation/theme/oi_legacy_semantic_colors.dart';
 export 'src/foundation/theme/oi_radius_scale.dart';
+export 'src/foundation/theme/oi_rail_colors.dart';
+export 'src/foundation/theme/oi_role_colors.dart';
+export 'src/foundation/theme/oi_semantic_colors.dart';
 export 'src/foundation/theme/oi_shadow_scale.dart';
 export 'src/foundation/theme/oi_spacing_scale.dart';
+export 'src/foundation/theme/oi_surface_colors.dart';
+export 'src/foundation/theme/oi_surface_decoration.dart';
 export 'src/foundation/theme/oi_text_theme.dart';
 export 'src/foundation/theme/oi_theme.dart';
 export 'src/foundation/theme/oi_theme_data.dart';
@@ -355,6 +376,7 @@ export 'src/modules/oi_comments.dart';
 export 'src/modules/oi_consent_banner.dart';
 export 'src/modules/oi_dashboard.dart';
 export 'src/modules/oi_dev_menu.dart';
+export 'src/modules/oi_docked_page.dart';
 export 'src/modules/oi_drawer_navigation.dart';
 export 'src/modules/oi_feedback_sheet.dart';
 export 'src/modules/oi_file_explorer.dart';
@@ -391,7 +413,9 @@ export 'src/primitives/clipboard/oi_copyable.dart';
 export 'src/primitives/clipboard/oi_paste_zone.dart';
 // ── Primitives: Display ──────────────────────────────────────────────────────
 
+export 'src/primitives/display/oi_balanced_text.dart';
 export 'src/primitives/display/oi_divider.dart';
+export 'src/primitives/display/oi_hatch.dart';
 export 'src/primitives/display/oi_icon.dart';
 export 'src/primitives/display/oi_label.dart';
 export 'src/primitives/display/oi_surface.dart';
@@ -445,6 +469,7 @@ export 'src/tools/oi_dynamic_theme.dart';
 export 'src/tools/oi_playground.dart';
 export 'src/tools/oi_theme_exporter.dart';
 export 'src/tools/oi_theme_preview.dart';
+export 'src/tools/oi_visual_snapshot.dart';
 // ── Utils ────────────────────────────────────────────────────────────────────
 
 export 'src/utils/calendar_utils.dart';

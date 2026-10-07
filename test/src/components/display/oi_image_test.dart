@@ -1,3 +1,5 @@
+import 'dart:convert';
+import 'dart:typed_data';
 // Tests do not require documentation comments.
 // REQ-0014: OiImage required-prop enforcement tests.
 
@@ -8,6 +10,17 @@ import 'package:obers_ui/src/components/display/oi_image.dart';
 import '../../../helpers/pump_app.dart';
 
 void main() {
+  testWidgets('provider images retain image identity, fit and alternative text', (tester) async {
+    final bytes = Uint8List.fromList(base64Decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jg/0AAAAASUVORK5CYII='));
+    final provider = MemoryImage(bytes);
+    final semantics = tester.ensureSemantics();
+    await tester.pumpObers(OiImage.provider(provider: provider, alt: 'An imported photo', width: 80, height: 80, fit: BoxFit.cover));
+    await tester.pumpAndSettle();
+    final image = tester.widget<Image>(find.byType(Image));
+    expect(image.image, provider); expect(image.fit, BoxFit.cover);
+    expect(find.bySemanticsLabel('An imported photo'), findsOneWidget); semantics.dispose();
+  });
+
   // Asset paths below do not need to exist — errorWidget suppresses the load
   // error so tests focus on semantics, not image rendering.
 

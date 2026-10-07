@@ -238,6 +238,7 @@ OiWizardStep(
 | Parameter | Type | Default | Description |
 | --- | --- | --- | --- |
 | `steps` | `List<OiWizardStep>` | **required** | The steps to walk through. |
+| `labels` | `OiWizardLabels` | English defaults | Localize next, previous, complete, skip, cancel and summary controls. |
 | `onComplete` | `ValueChanged<Map<String, dynamic>>?` | `null` | Fires on the last step with the final values. |
 | `onCancel` | `VoidCallback?` | `null` | Fires when the user cancels. Shows a Cancel control when set. |
 | `onStepChange` | `ValueChanged<int>?` | `null` | Fires with the new step index. |

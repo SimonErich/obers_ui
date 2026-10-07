@@ -48,6 +48,40 @@ Widget pointerApp(Widget child) => OiApp(
 );
 
 void main() {
+  testWidgets('isolated sliver action retains its label, hint and callback', (
+    tester,
+  ) async {
+    final semantics = tester.ensureSemantics();
+    var taps = 0;
+    await tester.pumpObers(
+      IndexedSemantics(
+        index: 0,
+        child: Column(
+          children: [
+            const Text('Overview'),
+            OiTappable(
+              semanticLabel: 'Invite',
+              semanticHint: 'Share this collection',
+              semanticContainer: true,
+              onTap: () => taps++,
+              child: const ExcludeSemantics(child: Text('Visible action')),
+            ),
+          ],
+        ),
+      ),
+    );
+    final action = find.bySemanticsLabel('Invite');
+    expect(action, findsOneWidget);
+    expect(
+      tester.getSemantics(action).getSemanticsData().hint,
+      'Share this collection',
+    );
+    await tester.tap(action);
+    expect(taps, 1);
+    expect(find.bySemanticsLabel('Overview'), findsOneWidget);
+    semantics.dispose();
+  });
+
   // ── 1. Renders child ───────────────────────────────────────────────────────
 
   testWidgets('renders child widget', (tester) async {

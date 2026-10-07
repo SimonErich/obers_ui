@@ -2,6 +2,38 @@ import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/composites/forms/oi_stepper.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 
+/// User-facing labels for wizard navigation and summary headings.
+@immutable
+class OiWizardLabels {
+  /// Creates labels with the existing English defaults.
+  const OiWizardLabels({
+    this.next = 'Next',
+    this.previous = 'Previous',
+    this.complete = 'Complete',
+    this.skip = 'Skip',
+    this.cancel = 'Cancel',
+    this.summary = 'Summary',
+  });
+
+  /// Advances to the next step.
+  final String next;
+
+  /// Returns to the previous step.
+  final String previous;
+
+  /// Completes the wizard.
+  final String complete;
+
+  /// Skips an optional step.
+  final String skip;
+
+  /// Cancels the wizard.
+  final String cancel;
+
+  /// Titles the summary section.
+  final String summary;
+}
+
 // ── OiWizardContext ─────────────────────────────────────────────────────────
 
 /// Context passed to wizard step builders.
@@ -115,6 +147,7 @@ class OiWizard extends StatefulWidget {
     this.stepperStyle = OiStepperStyle.horizontal,
     this.animated = true,
     this.initialValues,
+    this.labels = const OiWizardLabels(),
   });
 
   /// The steps in the wizard.
@@ -147,6 +180,9 @@ class OiWizard extends StatefulWidget {
 
   /// Initial values seeded into the wizard's shared value map.
   final Map<String, dynamic>? initialValues;
+
+  /// Localized navigation and summary labels.
+  final OiWizardLabels labels;
 
   @override
   State<OiWizard> createState() => _OiWizardState();
@@ -233,7 +269,7 @@ class _OiWizardState extends State<OiWizard> {
       mainAxisSize: MainAxisSize.min,
       children: [
         Text(
-          'Summary',
+          widget.labels.summary,
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w600,
@@ -371,7 +407,7 @@ class _OiWizardState extends State<OiWizard> {
                         vertical: 8,
                       ),
                       child: Text(
-                        'Cancel',
+                        widget.labels.cancel,
                         style: TextStyle(fontSize: 14, color: colors.textMuted),
                       ),
                     ),
@@ -389,7 +425,7 @@ class _OiWizardState extends State<OiWizard> {
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: Text(
-                        'Previous',
+                        widget.labels.previous,
                         style: TextStyle(fontSize: 14, color: colors.text),
                       ),
                     ),
@@ -410,7 +446,7 @@ class _OiWizardState extends State<OiWizard> {
                         vertical: 8,
                       ),
                       child: Text(
-                        'Skip',
+                        widget.labels.skip,
                         style: TextStyle(fontSize: 14, color: colors.textMuted),
                       ),
                     ),
@@ -427,7 +463,7 @@ class _OiWizardState extends State<OiWizard> {
                       borderRadius: BorderRadius.circular(6),
                     ),
                     child: Text(
-                      isLastStep ? 'Complete' : 'Next',
+                      isLastStep ? widget.labels.complete : widget.labels.next,
                       style: TextStyle(
                         fontSize: 14,
                         color: colors.textOnPrimary,

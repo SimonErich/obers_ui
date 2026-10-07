@@ -35,6 +35,7 @@ class OiQuantitySelector extends StatelessWidget {
     this.max = 99,
     this.compact = false,
     this.width,
+    this.suffix,
     this.disabled = false,
     this.decreaseLabel = 'Decrease quantity',
     this.increaseLabel = 'Increase quantity',
@@ -70,6 +71,9 @@ class OiQuantitySelector extends StatelessWidget {
 
   /// Accessible increment action, optionally including the item identity.
   final String increaseLabel;
+
+  /// Visible unit following the selector, also included in its accessible name.
+  final String? suffix;
 
   /// Whether the value is at the minimum.
   bool get _atMin => value <= min;
@@ -147,6 +151,7 @@ class OiQuantitySelector extends StatelessWidget {
         else
           Expanded(child: _buildValueDisplay(context)),
         _buildPlusButton(context),
+        if (suffix != null) OiLabel.small(suffix!),
       ],
     );
 

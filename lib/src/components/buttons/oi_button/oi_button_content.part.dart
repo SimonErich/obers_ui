@@ -1,49 +1,61 @@
 part of '../oi_button.dart';
 
-Widget _buildLoadingIndicator(Color color) {
-  return OiPulse(
-    child: SizedBox(
-      width: 16,
-      height: 16,
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: color.withValues(alpha: 0.7),
-          shape: BoxShape.circle,
-        ),
-      ),
-    ),
-  );
-}
+class _OiButtonContentView extends StatelessWidget {
+  const _OiButtonContentView({
+    required this.state,
+    required this.label,
+    required this.icon,
+    required this.iconPosition,
+    required this.foreground,
+    required this.loading,
+  });
+  final _OiButtonState state;
+  final String? label;
+  final IconData? icon;
+  final OiIconPosition iconPosition;
+  final Color foreground;
+  final bool loading;
+  @override
+  Widget build(BuildContext context) {
+    final widget = state.widget;
 
-extension _OiButtonContent on _OiButtonState {
-  Widget _buildContent(
-    BuildContext context, {
-    required String? label,
-    required IconData? icon,
-    required OiIconPosition iconPosition,
-    required Color foreground,
-    required bool loading,
-  }) {
     if (loading) {
-      return _buildLoadingIndicator(foreground);
+      return _OiButtonLoadingIndicator(color: foreground);
     }
 
-    final bt = context.components.button;
-    final effectiveIconSize = bt?.iconSize ?? _iconSize();
+    final bt = _buttonTheme(context);
+    final selected = state._sizeStyle(context);
+    final effectiveIconSize =
+        selected?.iconSize ?? bt?.iconSize ?? state._iconSize();
     final effectiveIconGap =
+        selected?.iconGap ??
         (widget.size == OiButtonSize.small ? bt?.smallIconGap : null) ??
         bt?.iconGap ??
         context.spacing.xs;
     final iconWidget = icon != null
         ? Padding(
-            padding: EdgeInsets.only(
-              right: (iconPosition == OiIconPosition.leading && label != null)
-                  ? effectiveIconGap
-                  : 0,
-              left: (iconPosition == OiIconPosition.trailing && label != null)
-                  ? effectiveIconGap
-                  : 0,
-            ),
+            padding: selected?.iconGap != null
+                ? EdgeInsetsDirectional.only(
+                    end: iconPosition == OiIconPosition.leading && label != null
+                        ? effectiveIconGap
+                        : 0,
+                    start:
+                        iconPosition == OiIconPosition.trailing && label != null
+                        ? effectiveIconGap
+                        : 0,
+                  )
+                : EdgeInsets.only(
+                    right:
+                        (iconPosition == OiIconPosition.leading &&
+                            label != null)
+                        ? effectiveIconGap
+                        : 0,
+                    left:
+                        (iconPosition == OiIconPosition.trailing &&
+                            label != null)
+                        ? effectiveIconGap
+                        : 0,
+                  ),
             child: OiIcon.decorative(
               icon: icon,
               size: effectiveIconSize,
@@ -53,22 +65,10 @@ extension _OiButtonContent on _OiButtonState {
         : null;
 
     final labelWidget = label != null
-        ? Text(
-            label,
-            style: context.textTheme.body
-                .merge(context.components.button?.textStyle)
-                .copyWith(
-                  fontSize:
-                      context.components.button?.textStyle?.fontSize ??
-                      _fontSize(context),
-                  fontWeight:
-                      context.components.button?.textStyle?.fontWeight ??
-                      _fontWeight(context),
-                  color: foreground,
-                  height: 1,
-                ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
+        ? _OiButtonLabel(
+            state: state,
+            label: label!,
+            foreground: foreground,
           )
         : null;
 
@@ -80,10 +80,30 @@ extension _OiButtonContent on _OiButtonState {
         ? [iconWidget!, labelWidget!]
         : [labelWidget!, iconWidget!];
 
-    return Row(
-      mainAxisSize: MainAxisSize.min,
+    return OiRow(
+      breakpoint: context.breakpoint,
       mainAxisAlignment: MainAxisAlignment.center,
       children: children,
+    );
+  }
+}
+
+class _OiButtonLoadingIndicator extends StatelessWidget {
+  const _OiButtonLoadingIndicator({required this.color});
+  final Color color;
+  @override
+  Widget build(BuildContext context) {
+    return OiPulse(
+      child: SizedBox(
+        width: 16,
+        height: 16,
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            color: color.withValues(alpha: 0.7),
+            shape: BoxShape.circle,
+          ),
+        ),
+      ),
     );
   }
 }

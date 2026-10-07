@@ -198,6 +198,31 @@ OiThemeScope(
 | `glassBorder` | Frosted glass border |
 | `chart` | `List<Color>` for data viz |
 
+**Opt-in perceptual color arithmetic:** `OiOklab` and `OiOklch` are immutable
+numeric D65 colors; `OiColorMix.oklab`, `.oklch`, and `.srgb` use CSS percentage
+and premultiplied-alpha semantics. `OiHueInterpolation` selects the circular hue
+arc. `OiOklch.hue == null` means missing hue; an authored numeric hue is retained
+even at zero chroma. `toColor()` returns unclipped extended sRGB;
+`toSrgbClipped()` explicitly clips channels, not perceptual gamut mapping.
+`OiOklab.toXyzD65()`, `.relativeLuminance`, and `.scaleLuminance(factor)` support
+uncomposited XYZ arithmetic. These helpers do not change `OiColorSwatch.from`
+HSL derivation, `OiThemeData.fromBrand`, or any existing theme defaults. See
+[Color System](doc/documentation/docs/theming/color-system.md#perceptual-color-arithmetic).
+
+**Opt-in explicit semantic groups:** `OiThemeData.semanticColors` accepts an
+immutable `OiSemanticColors`; `resolvedSemanticColors` uses
+`OiLegacySemanticColors.fromScheme(colors)` when absent. Existing widgets still
+use legacy colors. Surface/ink/role/rail/chart groups have const constructors,
+copy/equality/lerp and explicit optional-field clear flags; `OiColorRamp` and chart
+views retain no mutable list aliases. `overlaySurface` is not the legacy scrim.
+`OiBrandPalette.derive(primary:, secondary:, highlight:, brightness:, tint:)`
+uses typed OKLCH and raw XYZ/OKLab arithmetic; `applyTo(base)` replaces only
+source-derived roles, retaining info foreground/ink, secondary/highlight
+interactions, chart4–6 and divergent negative. This pure generic engine is
+separate from legacy HSL factories and hand-tuned presets. Semantic lerp uses
+raw premultiplied sRGB; absent optional endpoints are carried. See
+[Explicit semantic groups](doc/documentation/docs/theming/color-system.md#explicit-semantic-groups-and-generic-branding).
+
 ### Typography — OiTextTheme
 
 14 text style variants, used via `OiLabel`:
@@ -329,6 +354,8 @@ OiApp(
 **Tags:** `app`, `root`, `setup`, `theme`, `entry-point`
 
 Root widget replacing `MaterialApp`. Injects theme, overlays, undo stack, accessibility, platform info, density, shortcuts, tour scope, settings. Also injects `HeroController` (via `HeroControllerScope` for router, `navigatorObservers` for non-router), `AnnotatedRegion<SystemUiOverlayStyle>` for status-bar styling, and `ScrollConfiguration` with `OiScrollBehavior` to strip Material overscroll glow.
+
+**System motion:** Live OS reduced-motion preference zeroes the resolved theme's four animation durations while retaining its page transition kind and entry/exit curves. Clearing the preference restores the selected authored configuration; an authored reduced-motion choice is not cleared. Performance and other theme groups remain unchanged. Individual animation consumers must still honor the motion policy.
 
 **Key Parameters:**
 - `home` (Widget, required) — Root widget for basic navigation
@@ -549,6 +576,18 @@ Page transition animation type.
 
 ---
 
+### OiPiecewiseCurve
+**Tags:** `animation`, `curve`, `motion`, `easing`
+**Tier:** Foundation
+
+A Flutter `Curve` that linearly interpolates explicit `Offset(input, output)` stops, preserving overshoot. `OiPiecewiseCurve(stops)` snapshots its list and rejects fewer than two stops, nonfinite values, non-increasing/out-of-range inputs, or endpoints other than `(0,0)` and `(1,1)` with `ArgumentError` in release too.
+
+**Use When:** Matching authored finite motion stops exactly.
+**Combine With:** APIs accepting `Curve`, such as `CurvedAnimation` or `OiAnimationConfig`.
+**Scope:** No CSS parsing, repeated input stops or out-of-domain extrapolation. The consumer controls duration and reduced motion; existing defaults are unchanged.
+
+---
+
 ## Widget Catalog
 
 ---
@@ -687,6 +726,27 @@ Separator line (horizontal/vertical). Supports solid/dashed/dotted styles.
 
 ---
 
+#### OiHatch
+**Tags:** `hatch`, `pattern`
+**Tier:** Primitive
+
+Static, continuous 135-degree decorative bands with optional content above them.
+
+**Key Parameters:**
+- `stripeColor` (Color, required) — Explicit ink, including alpha; no theme fallback
+- `backgroundColor` (Color, default: transparent)
+- `pitch` (double, default: 5) — Finite positive perpendicular repeat distance
+- `stripeWidth` (double, default: 1) — Finite thickness from zero through pitch
+- `phase` (double, default: 0) — Finite perpendicular translation
+- `child` (Widget?) — Caller-owned content and interaction
+
+**Contract:** Geometry is validated in release builds. Painting clips to the box, but the child is not clipped. The primitive adds no intrinsic size, semantics, pointer capture or animation loop; supply constraints and animate phase only when wanted. Subpixel rendering remains backend/precision dependent.
+
+**Use When:** Authored hatch backgrounds or remainder regions.
+**Avoid When:** Empty-selection explanation — use the separate, unchanged `OiHatchPlaceholder`. This primitive does not reproduce CSS background-image tile animation by itself.
+
+---
+
 #### OiIcon
 **Tags:** `icon`, `glyph`, `symbol`
 **Tier:** Primitive
@@ -743,6 +803,7 @@ Themed container primitive. Renders backgrounds, borders, shadows, halos, glass 
 - `border` (OiBorderStyle?)
 - `borderRadius` (BorderRadius?)
 - `shadow` (List<BoxShadow>?)
+- `insetShadows` (List<OiInsetShadow>?) — Opt-in inner shadows; null/empty preserves the original decoration path
 - `padding` (EdgeInsetsGeometry?)
 - `halo` (OiHaloStyle?)
 - `frosted` (bool, default: false) — Frosted glass blur effect
@@ -755,6 +816,12 @@ Themed container primitive. Renders backgrounds, borders, shadows, halos, glass 
 
 **Use When:** Custom containers with visual styling. Building new component layouts.
 **Avoid When:** Standard card layouts — use `OiCard` instead (it handles title/footer/interaction).
+
+**Inset decoration:** `OiSurfaceDecoration(base: BoxDecoration, insetShadows:)`
+is reusable anywhere a Flutter `Decoration` is accepted. Insets are front-to-back
+and use explicit Gaussian `blurSigma`; existing outer-shadow order is unchanged.
+Only the inset and retained outer-shadow lists are snapshotted. See
+[Inner Surface Shadows](doc/documentation/docs/theming/surface-effects.md).
 
 ---
 
@@ -854,6 +921,9 @@ Swipe actions (left/right reveals action buttons).
 **Tier:** Primitive
 
 Unstyled text editing wrapper. Used internally by all styled inputs.
+Uses Flutter's text-selection gestures for immediate caret placement, word
+selection, long press and pointer dragging; keyboard edits retain their latest
+selection after a click.
 
 **Use When:** Building a completely custom input widget.
 **Avoid When:** Standard text input — use `OiTextInput` instead.
@@ -1216,7 +1286,7 @@ Universal button with variant factories.
 - `fullWidth` (bool, default: false)
 - `semanticLabel` (String?)
 - `tooltip` (String?)
-- `borderRadius` (BorderRadius?)
+- `borderRadius` (BorderRadius?) — Ghost/soft constructors only
 
 **Named Constructors (Variants):**
 - `OiButton.primary()` — Main action (filled, primary color)
@@ -1233,6 +1303,10 @@ Universal button with variant factories.
 - `OiButton.confirm(label:, confirmLabel:, onConfirm:)` — Two-click confirmation
 
 **Theme:** `context.components.button` -> `OiButtonThemeData`
+
+**Opt-in Size Styles:** `copyWith(sizeStyles:)` can replace the size configuration. Configure `OiButtonThemeData(sizeStyles: OiButtonSizeStyles(small:, medium:, large:))`. Each nullable `OiButtonSizeStyle` supplies `textStyle`, `iconSize`, `iconOnlySize`, `padding`, `iconLabelPadding`, `iconGap`, and `minWidth`; numeric geometry and resolved LTR/RTL inset edges must be finite and nonnegative. Null/empty/missing slots retain exact legacy resolution. Label style merges after legacy typography in normal/split/countdown/confirm, while the current state's foreground still wins (including authored Paint/shader inputs).
+
+**Geometry Precedence:** Adjacent glyph uses selected iconSize → global → old size. Icon-only adds selected iconOnlySize first, keeps its old height square and ignores minimum widths. Split chevron uses selected iconSize → old size, retaining its old global-icon exclusion. Selected iconLabelPadding applies even to SMALL and swaps start/end for trailing content, before selected plain padding. Explicit iconGap is directional, including zero; null preserves the old absolute gap/RTL behavior. Selected minWidth affects textual frames and split main only, never its chevron square; null preserves the old global-width exclusions. Size styles do not add a height or enlarge touch targets. The existing virtual theme `copyWith` signature is unchanged: it retains the current group, but configure a replacement group through the constructor.
 
 **Use When:** Any clickable action.
 **Avoid When:** Navigation links (use OiLabel.link or router navigation). Toggle state (use OiToggleButton).
@@ -1496,6 +1570,9 @@ Visual feedback when item hovers over drop zone.
 
 Placeholder for empty views.
 
+Short containers use compact spacing. Bounded content scrolls vertically when
+needed, preserving the title, description and action at their ordinary text size.
+
 **Key Parameters:**
 - `title` (String, required) — e.g., "No items found"
 - `icon` (IconData?)
@@ -1622,6 +1699,7 @@ Standardized list row.
 - `selected` (bool, default: false)
 - `enabled` (bool, default: true)
 - `dense` (bool, default: false)
+- `titleMaxLines` (int?, default: 1), `subtitleMaxLines` (int?, default: 2) — null permits unrestricted wrapping; row height grows with its text.
 
 **Use When:** List items, settings rows, navigation menus.
 **Combine With:** `OiAvatar` (leading), `OiBadge` (trailing), `OiSwipeable`
@@ -2104,6 +2182,7 @@ Standard text input field with validation, OTP, password, and multiline support.
 - `textAlign` (TextAlign, default: start)
 - `onChanged` (ValueChanged<String>?)
 - `onSubmitted` (ValueChanged<String>?)
+- `autofillHints` (Iterable<String>?) — platform email, username and password autofill
 - `onTap` (VoidCallback?)
 - `onTapOutside` (VoidCallback?)
 - `enabled` (bool, default: true)
@@ -2217,6 +2296,23 @@ Dropdown selector from options list.
 
 ---
 
+#### OiAutocomplete
+**Tags:** `search`, `input`, `autocomplete`, `async`, `suggestions`
+**Tier:** Composite
+
+Search field for selecting a result and immediately clearing the query.
+
+**Key Parameters:**
+- `label`, `placeholder`, `emptyLabel` (String, required) — Localized accessible name and display text
+- `search` (Future<List<T>> Function(String), required) — Blank queries are skipped and stale completions ignored
+- `labelOf` (String Function(T), required)
+- `onSelect` (ValueChanged<T>, required)
+
+Arrow keys move the highlight, the keyboard search action selects a result,
+and Escape closes suggestions. The empty state never reports an item.
+
+---
+
 #### OiComboBox (Composite-tier, but important input)
 **Tags:** `input`, `combobox`, `search`, `autocomplete`, `async`, `typeahead`
 **Tier:** Composite
@@ -2262,6 +2358,7 @@ Checkbox with 3-state support (unchecked/checked/indeterminate).
 - `value` (bool?, required) — null = indeterminate
 - `onChanged` (ValueChanged<bool>?)
 - `label` (String?)
+- `labelGap` (double?, default: 8) — Space before the visible label
 - `enabled` (bool, default: true)
 
 **Theme:** `context.components.checkbox` -> `OiCheckboxThemeData`
@@ -2330,6 +2427,8 @@ Range slider (single or dual track).
 **Use When:** Numeric range selection, volume, brightness.
 
 ---
+
+**Custom surfaces and accessibility:** `surfaceBuilder(context, lowerFraction, upperFraction)` supplies only the visual surface; `height` sets its extent. `OiSlider` keeps range dragging, tap-to-seek, keyboard arrows, focus rings and increase/decrease semantics. Name handles with `semanticLabel` and `secondarySemanticLabel`. Fractions stay in 0–1; a nonzero `min` is respected when snapping divisions. On Flutter web the engine places the accessible label on the enclosing `flt-semantics` element and the range input inside it; browser automation can locate the named host then its slider.
 
 #### OiTagInput
 **Tags:** `input`, `tag`, `multi-value`, `chips`, `labels`
@@ -2673,6 +2772,7 @@ Compact number stepper for product quantities. Minus/value/plus layout.
 - `min` (int, default: 1)
 - `max` (int, default: 99)
 - `compact` (bool, default: false)
+- `suffix` (String?) — Localized quantity unit, also included in semantics
 - `disabled` (bool, default: false)
 
 **Use When:** Cart item quantities, product detail add-to-cart.
@@ -3692,12 +3792,21 @@ Auto-dismissing notification.
 - `message` (String, required)
 - `level` (OiToastLevel, default: info) — info/success/warning/error
 - `position` (OiToastPosition, default: bottomRight) — 6 positions
-- `duration` (Duration, default: 4s)
+- `duration` (Duration?, default: 4s) — Null leaves expiry to the owner
 - `pauseOnHover` (bool, default: true)
+- `onPauseRequested` / `onResumeRequested` (VoidCallback?) — Pause/resume an owner's timer
+- `dismissible` (bool, default: true) — Render dismissal when `onDismiss` is supplied
+- `dismissLabel` (String, default: Dismiss) — Localized dismiss button label
 - `action` (Widget?) — Action button
 - `onDismiss` (VoidCallback?)
 
 **Static Method:** `OiToast.show(context, message: '...', level: OiToastLevel.success)`
+
+**Queue/Handle:** Entries stack in insertion order within each requested position. Concurrent requests keep their own six-position anchors; adding/removing another group preserves surviving timer, hover and scroll state. Overflowing stacks scroll without dropping entries. Top stacks start at the oldest entry; bottom stacks start at the newest. This is not adaptive collision/overflow partitioning for groups sharing a horizontal anchor. The returned handle reflects close/expiry removal. `handle.dismiss()` removes immediately without animation or `onDismiss`; close/expiry callbacks run once, and queue cleanup still occurs if the callback throws (the exception propagates).
+
+**Service Dismissal:** `OiOverlays.of(context).dismissAll()` immediately invalidates the handles belonging to that toast overlay and suppresses pending close/expiry callbacks. The next `show` drops the old generation instead of reviving it. The toast queue is shared, not isolated per `OiApp` host; this does not establish automatic cleanup merely from host disposal.
+
+**Native Fallback:** Without an `OiOverlays` service, `show` inserts into the nearest Flutter `Overlay`. Outside `OiApp`, still provide the usual theme, density, platform, media-query and text-direction scopes. `OiToastThemeData` controls background/radius/physical padding/icon size/gap/shadow; message foreground comes from `context.colors.text`.
 
 **Theme:** `context.components.toast` -> `OiToastThemeData`
 
@@ -3907,6 +4016,9 @@ Generic data list with automatic grouping, sticky headers, and collapsible secti
 **Tier:** Composite
 
 Advanced data table with virtual scroll, column operations, inline editing, bulk selection.
+
+Wide headers and populated rows scroll horizontally together. Empty and loading
+bodies fill the visible viewport so their feedback stays on screen.
 
 **Key Parameters:**
 - `label` (String, required)
@@ -4372,6 +4484,7 @@ Multi-step form/workflow with step indicator.
 
 **Key Parameters:**
 - `steps` (List<OiWizardStep>, required)
+- `labels` (OiWizardLabels) — Localized next, previous, complete, skip, cancel and summary text
 
 **OiWizardStep:**
 - `title` (String, required)
@@ -6015,7 +6128,7 @@ Searchable keyword -> widget mapping for quick lookup.
 | `ai` | OiChatWindow |
 | `alert` | OiDialog.alert, OiToast |
 | `adaptive` | OiResponsiveShell |
-| `animation` | OiAnimatedList, OiMorph, OiPulse, OiShimmer, OiSpring, OiStagger, OiPageTransitionType |
+| `animation` | OiAnimatedList, OiMorph, OiPulse, OiShimmer, OiSpring, OiStagger, OiPageTransitionType, OiPiecewiseCurve |
 | `app` | OiApp |
 | `appbar` | OiSliverHeader |
 | `auth` | OiAuthPage, OiSocialLogin |
@@ -6041,7 +6154,7 @@ Searchable keyword -> widget mapping for quick lookup.
 | `clock` | OiTimePickerField, OiTimePicker |
 | `code` | OiCodeBlock, OiLabel.code, OiDiffView |
 | `collapse` | OiAccordion, OiCard(collapsible) |
-| `color` | OiColorInput, OiColorScheme, OiColorSwatch, OiColorPalettePicker |
+| `color` | OiColorInput, OiColorScheme, OiColorSwatch, OiColorPalettePicker, OiOklab, OiOklch, OiColorMix, OiHueInterpolation, OiSemanticColors, OiBrandPalette, OiColorRamp |
 | `column` | OiColumn, OiTableColumn |
 | `conversation` | OiChatWindow |
 | `counter` | OiProgress.bulk |
@@ -6109,6 +6222,7 @@ Searchable keyword -> widget mapping for quick lookup.
 | `grid` | OiGrid, OiMasonry, OiVirtualGrid, OiFileGridView, OiGridZoomControls |
 | `group` | OiButtonGroup, OiAccordion, OiFormSection |
 | `header` | OiSliverHeader, OiPanelHeader, OiPageHeader |
+| `hatch` | OiHatch |
 | `heading` | OiLabel.h1, .h2, .h3, .h4 |
 | `help` | OiHelpCenter |
 | `hierarchy` | OiTree, OiFolderTreeItem |
@@ -6155,6 +6269,7 @@ Searchable keyword -> widget mapping for quick lookup.
 | `password` | OiTextInput.password |
 | `panel` | OiPanel, OiResizable, OiSplitPane, OiPanelHeader |
 | `path` | OiPathBar, OiBreadcrumbs |
+| `pattern` | OiHatch |
 | `payment` | OiPaymentMethod, OiPaymentMethodPicker |
 | `permission` | OiPermissions |
 | `phone` | OiFieldDisplay(phone) |
@@ -7355,3 +7470,112 @@ addFormValidator(validator)
 
 
 `OiHatchPlaceholder(label:, height:)` renders a themed, static empty-selection region without a loading implication. `OiLabel.body` and `.variant` accept an optional `style` merged over the theme; explicit label colors still win. `OiInputFrame` associates its visible label and hint with the actual editable control for browser and screen-reader semantics. Rich radio cards expose one named selectable control including their detail text.
+
+The `OiSegmentedControlThemeData` `subtitleStyle` and `subtitleGap` tokens style optional duration subtitles independently of labels. They participate in `copyWith`, equality, and automatic minimum-height calculation.
+
+### Attached focus traversal
+
+`OiApp` supplies reading-order traversal that ignores focus nodes whose render
+objects are detached or have not been laid out. This protects browser view-focus
+events during asynchronous form handoffs while preserving reading order for
+attached controls. Custom nested traversal policies remain caller-controlled.
+
+### Segment elevation and label-free switches
+
+`OiSegmentedControlThemeData.selectedShadow` optionally paints elevation behind
+the selected segment. It participates in theme copying and value equality.
+`OiSwitch.semanticLabel` names a switch independently of its optional visible
+label; `OiSwitchThemeData.thumbInset` controls the thumb's track inset (default 2).
+
+
+## Reusable minimal layouts and media (2026-10-05)
+
+These APIs are exported from `package:obers_ui/obers_ui.dart` and contain no
+application or rendering dependencies.
+
+- `OiBalancedText(text, variant: OiLabelVariant.h1, style: ..., textAlign: ...,
+  maxLines: ..., overflow: ..., semanticsLabel: ..., strutStyle: ...,
+  textHeightBehavior: ...)`: balances up to six lines using the exact painted
+  font, locale, direction and system text scaler. Original accessible text and
+  explicit newlines are preserved. Long/unbounded paragraphs use ordinary label
+  wrapping. `OiLabel.variant` accepts the same strut/leading options;
+  `OiLabel.resolveStyle(context)` returns the actual style for measurement.
+- `OiTextTheme.headingScale`: `OiResponsive<double>` multiplying heading sizes.
+  Use `const OiResponsive<double>(1)` when the design supplies explicit sizes.
+  `textHeightBehavior` supplies shared leading policy for all labels.
+- `OiChoiceScale<T>(options: List<OiChoiceScaleOption<T>>, value: T, label: String,
+  onChanged: ValueChanged<T>?)`: controlled discrete scale. Values must be unique.
+  Options have `value`, `label`, `enabled`. Radio group semantics, roving Tab focus,
+  reading-direction arrows, Home/End, disabled-choice skipping, and reflow for
+  narrow/large-text layouts are included. Theme: `components.choiceScale` /
+  `OiChoiceScaleThemeData` (label styles, marker/line colors and geometry).
+- `OiMediaTile(child: Widget, label: String, selected: bool, onChanged:
+  ValueChanged<bool>?, enabled: bool, aspectRatio: double, overlays: List<Widget>,
+  style: OiMediaTileThemeData?)`: source-independent selection frame. Overlays
+  remain opaque; selection borders do not move content. A null callback is
+  read-only. Theme: `components.mediaTile` (radius, fill, outline, unselected
+  opacity/desaturation, transition duration). Reduced motion disables animation.
+- `OiDockedPage(child: Widget, header: Widget?, dock: Widget?, centered: bool,
+  maxWidth: double?, scrollController: ScrollController?)`: bounded page composed
+  with `OiPageLayout`; safe areas, keyboard insets, fixed chrome and independently
+  scrolling body. Parent must provide bounded height and must not consume the
+  same keyboard inset. Theme: `components.dockedPage` /
+  `OiDockedPageThemeData` (responsive header/body/body-with-header/dock padding,
+  maximum content width, background and dock decoration).
+- `OiImage`, `.decorative`, `.provider`: `cacheWidth`, `cacheHeight` are optional
+  physical decode pixel bounds; `filterQuality` defaults to medium. Multiply
+  logical thumbnail bounds by device pixel ratio. Original media is untouched.
+- `OiButtonThemeScope(theme: OiButtonThemeData(...), child: ...)` now resolves
+  partial overrides over `components.button`, including nested size/variant
+  styles. The nearest scope wins. Unspecified global tokens are retained.
+  Theme/size/variant data also expose `merge` for partial overrides.
+- `OiTappable.focusNode`: optional caller-owned focus node; its owner disposes it.
+
+### Current text input tokens
+
+`OiTextInputThemeData` supports `textStyle`, `labelStyle`, `labelGap`,
+`supportingGap`, `height` (minimum surface height, grows with text),
+`contentPadding`, `multilineContentPadding`, border/focus/background colors,
+and `borderRadius`. `OiTextInput` and `OiFieldLabel` resolve these tokens;
+use a scoped `OiThemeScope` only when the field presentation differs.
+
+`OiRow.textBaseline` forwards an explicit `TextBaseline` when using
+`CrossAxisAlignment.baseline`; collapsed columns use start alignment.
+
+`OiMediaStrip(children: List<Widget>, itemExtent: double, itemAspectRatio: double = 1,
+gap: double?, outlinePadding: double?, horizontalBleed: double?,
+contentPadding: EdgeInsetsGeometry?, controller: ScrollController?)` lays out
+uniform media in an outline-safe horizontal scroller. It requires bounded width. The first item
+aligns with the surrounding gutter; outline padding bleeds outside the gutter
+and increases the strip height. Gap/padding default to theme spacing.
+`itemExtent` is width; height is width divided by `itemAspectRatio`.
+`contentPadding` supports directional gutters and independent vertical space;
+`horizontalBleed` defaults to outline padding. For a tappable edge-to-edge
+carousel, use a full-width parent and content gutters inside the strip.
+Overflow outside a narrow ancestor only provides paint space, not a larger hit area.
+`OiMediaTileThemeData.selectedBorder` supports `BorderSide.strokeAlignOutside`;
+external outlines paint without changing or clipping item bounds.
+
+`OiVisualSnapshot.capture(RenderObject root, viewport: Rect)` captures visible
+painted paragraphs after a frame, including labels excluded from semantics.
+`texts` contains logical layout/visible bounds, tight line boxes and resolved
+font tokens. Offstage, transparent and fully clipped children are excluded.
+RenderView input uses its logical child origin, avoiding DPR multiplication.
+This read-only diagnostic adds no widgets and has no web/application dependency;
+tight font boxes describe metrics, not glyph ink pixels.
+
+`OiChoiceScaleThemeData.lineOffset` optionally specifies the connecting line's
+top inset; null keeps it centered in the shared marker row. Up/Down move through
+choices in option order, independent of reading direction.
+
+`OiDockedPage.slivers(slivers: List<Widget>, header:, dock:, maxWidth:,
+scrollController:)` supplies a lazy `CustomScrollView` beneath the same fixed
+header/dock and safe-area/keyboard handling. Both constructors accept an optional
+`bodyPadding: EdgeInsetsGeometry` override for content with its own section
+gutters; header/dock insets remain themed. Body padding and maximum width match
+the intrinsic child constructor. Compose existing `OiSliverGrid`/`OiSliverList`
+for large collections; vertical centering applies only to intrinsic children.
+
+`OiTappable.semanticHint` attaches context to the named action.
+`semanticContainer: true` isolates it from surrounding indexed/sliver semantics.
+The default is false, preserving enclosing radio/checkbox flag merging.

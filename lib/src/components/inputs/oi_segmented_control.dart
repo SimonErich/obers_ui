@@ -19,6 +19,7 @@ class OiSegment<T> {
     this.icon,
     this.enabled = true,
     this.semanticLabel,
+    this.subtitle,
   });
 
   /// The value this segment represents.
@@ -28,6 +29,9 @@ class OiSegment<T> {
 
   /// The text label displayed inside the segment.
   final String label;
+
+  /// Optional supporting text below the label, included in its accessible name.
+  final String? subtitle;
 
   /// An optional icon displayed alongside [label].
   final IconData? icon;
@@ -233,7 +237,7 @@ class _OiSegmentedControlState<T> extends State<OiSegmentedControl<T>> {
         animations.reducedMotion || MediaQuery.disableAnimationsOf(context);
     final animDuration = reducedMotion ? Duration.zero : animations.fast;
 
-    final segmentHeight =
+    var segmentHeight =
         themeData?.height ??
         switch (widget.size) {
           OiSegmentedControlSize.small => 28.0,
@@ -263,6 +267,20 @@ class _OiSegmentedControlState<T> extends State<OiSegmentedControl<T>> {
     final baseRadius = themeData?.borderRadius?.topLeft ?? radius.sm.topLeft;
     final inset = themeData?.inset ?? 0;
 
+    // A second text line needs enough room even in an unthemed control.
+    if (widget.showLabels &&
+        widget.segments.any((segment) => segment.subtitle != null)) {
+      final primary = themeData?.labelStyle?.fontSize ?? fontSize;
+      final subtitle = themeData?.subtitleStyle?.fontSize ?? fontSize - 2;
+      final minimum =
+          primary * (themeData?.labelStyle?.height ?? 1.2) +
+          subtitle * (themeData?.subtitleStyle?.height ?? 1.2) +
+          (themeData?.subtitleGap ?? 0) +
+          4 +
+          2 * inset +
+          8;
+      if (segmentHeight < minimum) segmentHeight = minimum;
+    }
     final children = <Widget>[];
 
     for (var i = 0; i < widget.segments.length; i++) {
@@ -323,6 +341,33 @@ class _OiSegmentedControlState<T> extends State<OiSegmentedControl<T>> {
         );
       }
 
+      if (!iconOnly && segment.subtitle != null) {
+        labelWidget = Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            labelWidget,
+            SizedBox(height: themeData?.subtitleGap ?? 0),
+            Text(
+              segment.subtitle!,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style:
+                  (themeData?.subtitleStyle ??
+                          themeData?.labelStyle ??
+                          const TextStyle())
+                      .copyWith(
+                        fontSize:
+                            themeData?.subtitleStyle?.fontSize ?? fontSize - 2,
+                        fontWeight:
+                            themeData?.subtitleStyle?.fontWeight ??
+                            FontWeight.w400,
+                        color: textColor,
+                      ),
+            ),
+          ],
+        );
+      }
+
       // Build the segment border. Shared borders: only the left border is
       // drawn on non-first segments to avoid double borders.
       final segmentBorder = Border(
@@ -345,6 +390,7 @@ class _OiSegmentedControlState<T> extends State<OiSegmentedControl<T>> {
             : EdgeInsets.symmetric(horizontal: horizontalPadding),
         decoration: BoxDecoration(
           color: bgColor,
+          boxShadow: isSelected ? themeData?.selectedShadow : null,
           borderRadius: segmentRadius,
           border: inset > 0 ? null : segmentBorder,
         ),
@@ -359,7 +405,12 @@ class _OiSegmentedControlState<T> extends State<OiSegmentedControl<T>> {
         child: Semantics(
           selected: isSelected,
           child: OiTappable(
-            semanticLabel: segment.semanticLabel ?? segment.label,
+            semanticLabel:
+                segment.semanticLabel ??
+                [
+                  segment.label,
+                  if (segment.subtitle != null) segment.subtitle!,
+                ].join(', '),
             onTap: isEnabled
                 ? () {
                     _segmentFocusNodes[i].requestFocus();

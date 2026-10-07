@@ -5,8 +5,8 @@ import 'package:flutter/widgets.dart';
 /// [OiImage] renders a network or asset image and wraps it in a
 /// [Semantics] node so that screen readers can describe the image.
 ///
-/// - For URLs beginning with `http://` or `https://`, [Image.network] is used.
-/// - For all other [src] values, [Image.asset] is used.
+/// - For URLs beginning with `http://` or `https://`, [NetworkImage] is used.
+/// - For all other [src] values, [AssetImage] is used.
 /// - Supply [placeholder] to show a widget while the image loads.
 /// - Supply [errorWidget] to show a widget when loading fails.
 ///
@@ -27,10 +27,14 @@ class OiImage extends StatelessWidget {
     this.width,
     this.height,
     this.fit,
+    this.cacheWidth,
+    this.cacheHeight,
+    this.filterQuality = FilterQuality.medium,
     this.placeholder,
     this.errorWidget,
     super.key,
-  }) : _decorative = false;
+  }) : _provider = null,
+       _decorative = false;
 
   /// Creates a purely decorative [OiImage] excluded from the accessibility
   /// tree.
@@ -42,11 +46,35 @@ class OiImage extends StatelessWidget {
     this.width,
     this.height,
     this.fit,
+    this.cacheWidth,
+    this.cacheHeight,
+    this.filterQuality = FilterQuality.medium,
     this.placeholder,
     this.errorWidget,
     super.key,
-  }) : alt = '',
+  }) : _provider = null,
+       alt = '',
        _decorative = true;
+
+  /// Renders an existing provider, including authenticated network or local
+  /// memory/file images, with the same alt, loading and error behavior.
+  const OiImage.provider({
+    required ImageProvider<Object> provider,
+    required this.alt,
+    this.width,
+    this.height,
+    this.fit,
+    this.cacheWidth,
+    this.cacheHeight,
+    this.filterQuality = FilterQuality.medium,
+    this.placeholder,
+    this.errorWidget,
+    super.key,
+  }) : _provider = provider,
+       src = '',
+       _decorative = false;
+
+  final ImageProvider<Object>? _provider;
 
   /// The image source: a network URL (`http://` / `https://`) or asset path.
   final String src;
@@ -66,7 +94,16 @@ class OiImage extends StatelessWidget {
   /// How the image should be inscribed into the allocated space.
   final BoxFit? fit;
 
-  /// Widget shown while the image is loading (network images only).
+  /// Optional decoded width in physical pixels; originals are never resized.
+  final int? cacheWidth;
+
+  /// Optional decoded height in physical pixels; aspect ratio is always preserved.
+  final int? cacheHeight;
+
+  /// Sampling quality used when painting the decoded image.
+  final FilterQuality filterQuality;
+
+  /// Widget shown while the image is loading.
   final Widget? placeholder;
 
   /// Widget shown when the image fails to load.
@@ -74,36 +111,35 @@ class OiImage extends StatelessWidget {
 
   final bool _decorative;
 
-  bool get _isNetwork =>
-      src.startsWith('http://') || src.startsWith('https://');
+  ImageProvider<Object> _sourceProvider() =>
+      _provider ??
+      (src.startsWith('http://') || src.startsWith('https://')
+          ? NetworkImage(src)
+          : AssetImage(src));
 
   Widget _buildImage() {
-    if (_isNetwork) {
-      return Image.network(
-        src,
-        width: width,
-        height: height,
-        fit: fit,
-        loadingBuilder: placeholder == null
-            ? null
-            : (context, child, loadingProgress) {
-                if (loadingProgress == null) return child;
-                return placeholder!;
-              },
-        errorBuilder: errorWidget == null
-            ? null
-            : (context, error, stackTrace) => errorWidget!,
-      );
-    }
-
-    return Image.asset(
-      src,
+    final original = _sourceProvider();
+    final image = cacheWidth == null && cacheHeight == null
+        ? original
+        : ResizeImage(
+            original,
+            width: cacheWidth,
+            height: cacheHeight,
+            policy: ResizeImagePolicy.fit,
+          );
+    return Image(
+      image: image,
       width: width,
       height: height,
       fit: fit,
+      filterQuality: filterQuality,
+      frameBuilder: placeholder == null
+          ? null
+          : (context, child, frame, sync) =>
+                sync || frame != null ? child : placeholder!,
       errorBuilder: errorWidget == null
           ? null
-          : (context, error, stackTrace) => errorWidget!,
+          : (context, error, trace) => errorWidget!,
     );
   }
 

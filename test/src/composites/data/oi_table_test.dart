@@ -589,6 +589,43 @@ void main() {
   });
 
   // 17. Empty state shows custom widget
+  testWidgets('wide empty tables center their message in the mobile viewport', (
+    tester,
+  ) async {
+    const viewportKey = Key('mobile_table_viewport');
+    await tester.pumpObers(
+      const Align(
+        alignment: Alignment.topLeft,
+        child: SizedBox(
+          key: viewportKey,
+          width: 375,
+          height: 300,
+          child: OiTable<_Row>(
+            label: 'Wide empty table',
+            rows: [],
+            columns: [
+              OiTableColumn(id: 'first', header: 'First', width: 600),
+              OiTableColumn(id: 'last', header: 'Last', width: 600),
+            ],
+            showStatusBar: false,
+            emptyState: Center(child: Text('No entries')),
+          ),
+        ),
+      ),
+      surfaceSize: const Size(375, 812),
+    );
+
+    expect(tester.takeException(), isNull);
+    final viewport = tester.getRect(find.byKey(viewportKey));
+    final message = find.text('No entries');
+    expect(tester.getCenter(message).dx, closeTo(viewport.center.dx, 1));
+    expect(viewport.contains(tester.getRect(message).topLeft), isTrue);
+    expect(viewport.contains(tester.getRect(message).bottomRight), isTrue);
+    await tester.drag(find.text('First'), const Offset(-500, 0));
+    await tester.pumpAndSettle();
+    expect(tester.getCenter(message).dx, closeTo(viewport.center.dx, 1));
+  });
+
   testWidgets('empty rows renders custom emptyState widget', (tester) async {
     await tester.pumpObers(
       _table(rows: const [], emptyState: const Text('Nothing here')),

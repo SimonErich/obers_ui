@@ -109,3 +109,12 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for setup and guidelines.
 ## License
 
 MIT License. See [LICENSE](LICENSE).
+
+### Minimal media layouts
+
+[Quiet Album and Workshop](doc/documentation/docs/layout/minimal-media-designs.md)
+show how to compose the same public `OiBalancedText`, `OiChoiceScale`,
+`OiMediaTile`, `OiMediaStrip` and `OiDockedPage` modules with independent themes.
+The example includes real-font/image accessibility goldens and controlled state
+actions. `OiVisualSnapshot` supplies read-only painted-text geometry for host
+visual-regression tools.

@@ -14,6 +14,7 @@ need to. Nothing is hardcoded, so a change in one place updates everywhere.
 - [**Color System**](color-system.md) covers the semantic swatches and the surface and text tokens.
 - [**Typography**](typography.md) covers the text styles and `OiLabel`.
 - [**Design Tokens**](tokens.md) covers spacing, radius, shadows, and motion.
+- [**Inner Surface Shadows**](surface-effects.md) covers opt-in inset geometry and reusable decorations.
 
 ## Going further
 
