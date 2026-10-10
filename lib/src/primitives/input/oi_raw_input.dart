@@ -147,6 +147,16 @@ class OiRawInput extends StatefulWidget {
 
 class _OiRawInputState extends State<OiRawInput> {
   // Track whether the placeholder should be visible.
+  /// One shared instance, like Material's `materialTextSelectionControls`.
+  /// A new one per build makes [EditableText] treat the controls as changed
+  /// and rebuild its selection overlay on every rebuild; inside an overlay
+  /// that is itself building (e.g. a sheet in OiOverlays during its open
+  /// animation or a keyboard change), that inserts and disposes handle
+  /// entries mid-build and breaks the [Overlay] ("Null check operator",
+  /// duplicate GlobalKey).
+  static final TextSelectionControls _defaultSelectionControls =
+      OiTextSelectionControls();
+
   bool _showPlaceholder = true;
 
   @override
@@ -317,7 +327,7 @@ class _OiRawInputState extends State<OiRawInput> {
           LengthLimitingTextInputFormatter(widget.maxLength),
       ],
       scrollController: widget.scrollController,
-      selectionControls: widget.selectionControls ?? OiTextSelectionControls(),
+      selectionControls: widget.selectionControls ?? _defaultSelectionControls,
       contextMenuBuilder: widget.contextMenuBuilder,
       // Required: renderedCursorColor drives the actual cursor painting.
       selectionColor: effectiveCursorColor.withValues(alpha: 0.3),
