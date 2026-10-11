@@ -1,5 +1,6 @@
 // Tests do not require documentation comments.
 
+import 'package:flutter/gestures.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -94,6 +95,95 @@ void main() {
   ) async {
     await tester.pumpObers(buildInput(placeholder: 'Enter text'));
     expect(find.text('Enter text'), findsOneWidget);
+  });
+
+  testWidgets('a multi-line placeholder sits on the first line', (
+    tester,
+  ) async {
+    await tester.pumpObers(
+      SizedBox(
+        height: 200,
+        child: buildInput(
+          placeholder: 'Write something',
+          maxLines: null,
+        ),
+      ),
+    );
+
+    final field = tester.getRect(find.byType(EditableText));
+    final placeholder = tester.getRect(find.text('Write something'));
+    expect(placeholder.top, field.top);
+  });
+
+  testWidgets('a single-line placeholder stays centred', (tester) async {
+    await tester.pumpObers(
+      SizedBox(height: 60, child: buildInput(placeholder: 'Search')),
+    );
+
+    final field = tester.getRect(find.byType(EditableText));
+    final placeholder = tester.getRect(find.text('Search'));
+    expect(placeholder.center.dy, closeTo(field.center.dy, 1));
+  });
+
+  testWidgets('dragging with the mouse selects text', (tester) async {
+    final controller = TextEditingController(text: 'hello wonderful world');
+    await tester.pumpObers(
+      SizedBox(width: 400, child: buildInput(controller: controller)),
+    );
+
+    final field = tester.getRect(find.byType(EditableText));
+    final gesture = await tester.startGesture(
+      field.centerLeft + const Offset(2, 0),
+      kind: PointerDeviceKind.mouse,
+    );
+    await tester.pump();
+    await gesture.moveTo(field.center);
+    await tester.pump();
+    await gesture.up();
+    await tester.pumpAndSettle();
+
+    expect(controller.selection.isCollapsed, isFalse);
+  });
+
+  testWidgets('dragging selects text in a field with a placeholder', (
+    tester,
+  ) async {
+    final controller = TextEditingController(text: 'hello wonderful world');
+    await tester.pumpObers(
+      SizedBox(
+        width: 400,
+        child: buildInput(controller: controller, placeholder: 'Write…'),
+      ),
+    );
+
+    final field = tester.getRect(find.byType(EditableText));
+    final gesture = await tester.startGesture(
+      field.centerLeft + const Offset(2, 0),
+      kind: PointerDeviceKind.mouse,
+    );
+    await tester.pump();
+    await gesture.moveTo(field.center);
+    await tester.pump();
+    await gesture.up();
+    await tester.pumpAndSettle();
+
+    expect(controller.selection.isCollapsed, isFalse);
+  });
+
+  testWidgets('a double tap selects the word', (tester) async {
+    final controller = TextEditingController(text: 'hello world');
+    await tester.pumpObers(
+      SizedBox(width: 400, child: buildInput(controller: controller)),
+    );
+
+    final field = tester.getRect(find.byType(EditableText));
+    final word = field.centerLeft + const Offset(8, 0);
+    await tester.tapAt(word);
+    await tester.pump(const Duration(milliseconds: 50));
+    await tester.tapAt(word);
+    await tester.pumpAndSettle();
+
+    expect(controller.selection.textInside(controller.text), 'hello');
   });
 
   testWidgets('placeholder hidden when controller has text', (tester) async {
