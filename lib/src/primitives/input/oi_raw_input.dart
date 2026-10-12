@@ -145,7 +145,25 @@ class OiRawInput extends StatefulWidget {
   State<OiRawInput> createState() => _OiRawInputState();
 }
 
-class _OiRawInputState extends State<OiRawInput> {
+class _OiRawInputState extends State<OiRawInput>
+    implements TextSelectionGestureDetectorBuilderDelegate {
+  // The selection gestures EditableText does not have on its own: drag to
+  // select, double/triple tap, shift-click, long-press and handles on
+  // touch, right-click for the menu. The same builder TextField uses.
+  final GlobalKey<EditableTextState> _editableKey =
+      GlobalKey<EditableTextState>();
+  late final TextSelectionGestureDetectorBuilder _selectionGestures =
+      TextSelectionGestureDetectorBuilder(delegate: this);
+
+  @override
+  GlobalKey<EditableTextState> get editableTextKey => _editableKey;
+
+  @override
+  bool get forcePressEnabled => false;
+
+  @override
+  bool get selectionEnabled => widget.enabled;
+
   // Track whether the placeholder should be visible.
   /// One shared instance, like Material's `materialTextSelectionControls`.
   /// A new one per build makes [EditableText] treat the controls as changed
@@ -225,42 +243,6 @@ class _OiRawInputState extends State<OiRawInput> {
     }
   }
 
-  // ── Word selection ───────────────────────────────────────────────────────
-
-  void _selectWordAtCursor() {
-    final text = widget.controller.text;
-    if (text.isEmpty) return;
-
-    final offset = widget.controller.selection.baseOffset.clamp(0, text.length);
-
-    // Find word boundaries around the cursor position.
-    var start = offset;
-    var end = offset;
-
-    while (start > 0 && _isWordChar(text[start - 1])) {
-      start--;
-    }
-    while (end < text.length && _isWordChar(text[end])) {
-      end++;
-    }
-
-    if (start != end) {
-      widget.controller.selection = TextSelection(
-        baseOffset: start,
-        extentOffset: end,
-      );
-    }
-  }
-
-  static bool _isWordChar(String c) {
-    final code = c.codeUnitAt(0);
-    return (code >= 0x30 && code <= 0x39) || // 0-9
-        (code >= 0x41 && code <= 0x5A) || // A-Z
-        (code >= 0x61 && code <= 0x7A) || // a-z
-        code == 0x5F || // _
-        code >= 0x80; // non-ASCII (accented chars, etc.)
-  }
-
   // ── Style helpers ─────────────────────────────────────────────────────────
 
   TextStyle _resolveStyle(BuildContext context) {
@@ -296,6 +278,9 @@ class _OiRawInputState extends State<OiRawInput> {
 
     // The core EditableText widget.
     final editableText = EditableText(
+      key: _editableKey,
+      // The gesture detector below handles the pointer.
+      rendererIgnoresPointer: true,
       controller: widget.controller,
       focusNode: widget.focusNode,
       style: effectiveStyle,
@@ -333,22 +318,13 @@ class _OiRawInputState extends State<OiRawInput> {
       selectionColor: effectiveCursorColor.withValues(alpha: 0.3),
     );
 
-    // Wrap in a GestureDetector to support double-tap word selection.
-    // Use onDoubleTapDown so EditableText still receives the gesture for
-    // cursor positioning. The actual selection is applied in a post-frame
-    // callback so it runs after EditableText has processed the tap.
-    final interactiveEditable = GestureDetector(
+    final interactiveEditable = _selectionGestures.buildGestureDetector(
       behavior: HitTestBehavior.translucent,
-      onDoubleTapDown: (_) {
-        SchedulerBinding.instance.addPostFrameCallback((_) {
-          if (mounted) _selectWordAtCursor();
-        });
-      },
       child: editableText,
     );
 
     // Wrap in a Stack to overlay the placeholder text.
-    var fieldWidget = interactiveEditable as Widget;
+    var fieldWidget = interactiveEditable;
     if (widget.placeholder != null) {
       final themePlaceholderColor = OiTheme.maybeOf(
         context,
@@ -359,6 +335,10 @@ class _OiRawInputState extends State<OiRawInput> {
                   const Color(0xFF000000))
               .withValues(alpha: 0.45);
       final placeholderColor = themePlaceholderColor ?? defaultPlaceholderColor;
+      // A multi-line field starts typing at its top line, so its
+      // placeholder sits there too (and may wrap); a single line keeps it
+      // centred.
+      final multiline = widget.maxLines != 1;
       fieldWidget = Stack(
         fit: StackFit.passthrough,
         children: [
@@ -366,17 +346,21 @@ class _OiRawInputState extends State<OiRawInput> {
             Positioned.fill(
               child: IgnorePointer(
                 child: Align(
-                  alignment: Alignment.centerLeft,
+                  alignment: multiline
+                      ? AlignmentDirectional.topStart
+                      : AlignmentDirectional.centerStart,
                   child: Text(
                     widget.placeholder!,
                     style: effectiveStyle.copyWith(color: placeholderColor),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+                    maxLines: multiline ? null : 1,
+                    overflow: multiline ? null : TextOverflow.ellipsis,
                   ),
                 ),
               ),
             ),
-          editableText,
+          // The field with its selection gestures, not the bare
+          // EditableText.
+          interactiveEditable,
         ],
       );
     }
