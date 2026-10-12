@@ -1,11 +1,29 @@
 part of '../oi_button.dart';
 
 extension _OiButtonSpecialVariants on _OiButtonState {
+  /// The hover state for a special button's label colour.
+  ///
+  /// Only ghost buttons react here: the other variants keep their resting
+  /// foreground and rely on [OiTappable]'s background overlay for hover.
+  _OiButtonVisualState _textHoverState(
+    OiButtonVariant variant, {
+    required bool active,
+  }) {
+    return variant == OiButtonVariant.ghost && active && _hovered
+        ? _OiButtonVisualState.hovered
+        : _OiButtonVisualState.normal;
+  }
+
   Widget _buildSplitButton(BuildContext context) {
     final density = OiDensityScope.of(context);
     final height = context.components.button?.height ?? _buttonHeight(density);
     final hPad = _hPadding(context);
-    final foreground = _foregroundColor(context, widget.variant);
+    final isGhost = widget.variant == OiButtonVariant.ghost;
+    final foreground = _foregroundColor(
+      context,
+      widget.variant,
+      state: _textHoverState(widget.variant, active: widget.enabled),
+    );
     final bgColor = _backgroundColor(context, widget.variant);
     final borderRadius =
         context.components.button?.borderRadius ?? context.radius.sm;
@@ -21,7 +39,9 @@ extension _OiButtonSpecialVariants on _OiButtonState {
 
     final mainPart = OiTappable(
       onTap: widget.onTap,
+      onHover: _setHovered,
       enabled: widget.enabled,
+      applyBackgroundOverlay: !isGhost,
       child: Container(
         height: height,
         padding: EdgeInsets.symmetric(horizontal: hPad),
@@ -42,7 +62,9 @@ extension _OiButtonSpecialVariants on _OiButtonState {
 
     final chevronPart = OiTappable(
       onTap: widget.enabled ? _toggleDropdownVisible : null,
+      onHover: _setHovered,
       enabled: widget.enabled,
+      applyBackgroundOverlay: !isGhost,
       child: Container(
         height: height,
         width: height,
@@ -81,12 +103,18 @@ extension _OiButtonSpecialVariants on _OiButtonState {
     final density = OiDensityScope.of(context);
     final height = context.components.button?.height ?? _buttonHeight(density);
     final hPad = _hPadding(context);
-    final foreground = _foregroundColor(context, widget.variant);
+    final foreground = _foregroundColor(
+      context,
+      widget.variant,
+      state: _textHoverState(widget.variant, active: isExpired),
+    );
     final decoration = _decoration(context, widget.variant);
 
     Widget button = OiTappable(
       onTap: widget.onTap,
+      onHover: _setHovered,
       enabled: isExpired,
+      applyBackgroundOverlay: widget.variant != OiButtonVariant.ghost,
       child: Container(
         height: height,
         padding: EdgeInsets.symmetric(horizontal: hPad),
@@ -130,10 +158,16 @@ extension _OiButtonSpecialVariants on _OiButtonState {
     final displayLabel = _confirmPending
         ? (widget.confirmLabel ?? widget.label ?? '')
         : (widget.label ?? '');
-    final foreground = _foregroundColor(context, activeVariant);
+    final foreground = _foregroundColor(
+      context,
+      activeVariant,
+      state: _textHoverState(activeVariant, active: true),
+    );
     final decoration = _decoration(context, activeVariant);
 
     Widget button = OiTappable(
+      onHover: _setHovered,
+      applyBackgroundOverlay: activeVariant != OiButtonVariant.ghost,
       onTap: () {
         if (_confirmPending) {
           _setConfirmPending(false);

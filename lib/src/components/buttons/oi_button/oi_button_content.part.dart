@@ -23,7 +23,6 @@ extension _OiButtonContent on _OiButtonState {
     required OiIconPosition iconPosition,
     required Color foreground,
     required bool loading,
-    bool bold = false,
   }) {
     if (loading) {
       return _buildLoadingIndicator(foreground);
@@ -55,10 +54,7 @@ extension _OiButtonContent on _OiButtonState {
             label,
             style: TextStyle(
               fontSize: _fontSize(context),
-              // The pressed/highlighted state bumps the weight; otherwise
-              // the per-size weight from the theme scale (defaulting to
-              // w500) wins.
-              fontWeight: bold ? FontWeight.w700 : _fontWeight(context),
+              fontWeight: _fontWeight(context),
               color: foreground,
               height: 1,
             ),

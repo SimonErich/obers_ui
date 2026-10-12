@@ -895,4 +895,88 @@ void main() {
     expect(hasBackground(tester, theme.colors.primary.base), isTrue);
     expect(hasVisibleColoredBox(tester, const Color(0x0A000000)), isTrue);
   });
+
+  // ── Ghost (text) button hover ──────────────────────────────────────────────
+
+  testWidgets('hovering a ghost button colours its label, not its background', (
+    tester,
+  ) async {
+    final theme = OiThemeData.light();
+    await tester.pumpObers(
+      OiButton.ghost(label: 'Skip', onTap: () {}),
+      theme: theme,
+    );
+    final restingWeight = tester
+        .widget<Text>(find.text('Skip'))
+        .style!
+        .fontWeight;
+
+    final gesture = await hoverOver(tester, find.text('Skip'));
+
+    expect(hasForeground(tester, theme.colors.primary.base), isTrue);
+    expect(
+      tester.widget<Text>(find.text('Skip')).style!.fontWeight,
+      restingWeight,
+    );
+    expect(hasVisibleColoredBox(tester, const Color(0x0A000000)), isFalse);
+
+    await gesture.moveTo(Offset.zero);
+    await tester.pumpAndSettle();
+
+    expect(hasForeground(tester, theme.colors.text), isTrue);
+  });
+
+  testWidgets('a ghost foregroundHover override wins over the primary colour', (
+    tester,
+  ) async {
+    final base = OiThemeData.light();
+    await tester.pumpObers(
+      OiButton.ghost(label: 'Skip', onTap: () {}),
+      theme: base.copyWith(
+        components: base.components.copyWith(
+          button: const OiButtonThemeData(
+            ghostStyle: OiButtonVariantStyle(
+              foregroundHover: Color(0xFF123456),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    await hoverOver(tester, find.text('Skip'));
+
+    expect(hasForeground(tester, const Color(0xFF123456)), isTrue);
+  });
+
+  testWidgets('a disabled ghost button ignores hover', (tester) async {
+    final theme = OiThemeData.light();
+    await tester.pumpObers(
+      const OiButton.ghost(label: 'Skip', enabled: false),
+      theme: theme,
+    );
+
+    await hoverOver(tester, find.text('Skip'));
+
+    expect(hasForeground(tester, theme.colors.primary.base), isFalse);
+  });
+
+  testWidgets('hovering a ghost confirm button skips the grey overlay', (
+    tester,
+  ) async {
+    final theme = OiThemeData.light();
+    await tester.pumpObers(
+      OiButton.confirm(
+        label: 'Delete',
+        confirmLabel: 'Sure?',
+        onConfirm: () {},
+        variant: OiButtonVariant.ghost,
+      ),
+      theme: theme,
+    );
+
+    await hoverOver(tester, find.text('Delete'));
+
+    expect(hasForeground(tester, theme.colors.primary.base), isTrue);
+    expect(hasVisibleColoredBox(tester, const Color(0x0A000000)), isFalse);
+  });
 }

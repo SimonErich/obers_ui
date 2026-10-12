@@ -161,8 +161,14 @@ extension _OiButtonStyling on _OiButtonState {
       disabled: (s) => s.foregroundDisabled,
     );
     if (override != null) return override;
-    if (vs?.foreground != null) return vs!.foreground!;
     final c = context.colors;
+    // Ghost buttons have no fill to tint, so hover is signalled by colouring
+    // the label instead of a grey background.
+    if (variant == OiButtonVariant.ghost &&
+        state == _OiButtonVisualState.hovered) {
+      return c.primary.base;
+    }
+    if (vs?.foreground != null) return vs!.foreground!;
     switch (variant) {
       case OiButtonVariant.primary:
         return c.primary.foreground;

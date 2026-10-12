@@ -97,8 +97,14 @@ extension _OiButtonStandardVariants on _OiButtonState {
     final bt = context.components.button;
     final height = bt?.height ?? _buttonHeight(density);
     final hPad = _hPadding(context);
-    final foreground = _foregroundColor(context, widget.variant);
     final isActive = widget.enabled && !widget.loading;
+    final foreground = _foregroundColor(
+      context,
+      widget.variant,
+      state: isActive && _highlighted
+          ? _OiButtonVisualState.hovered
+          : _OiButtonVisualState.normal,
+    );
 
     Widget content = Container(
       height: height,
@@ -112,7 +118,6 @@ extension _OiButtonStandardVariants on _OiButtonState {
           iconPosition: widget.iconPosition,
           foreground: foreground,
           loading: widget.loading,
-          bold: _highlighted,
         ),
       ),
     );
