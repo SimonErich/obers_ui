@@ -46,7 +46,12 @@ class OiStepper extends StatelessWidget {
     this.completedSteps = const {},
     this.errorSteps = const {},
     this.enabledSteps,
+    this.progressLabel = englishProgressLabel,
   });
+
+  /// "Step 2 of 4": the default [progressLabel].
+  static String englishProgressLabel(int step, int total) =>
+      'Step $step of $total';
 
   /// The total number of steps in the process.
   final int totalSteps;
@@ -82,6 +87,11 @@ class OiStepper extends StatelessWidget {
   /// When provided, only steps in this set are tappable and show hover
   /// effects; all other steps appear visually disabled.
   final Set<int>? enabledSteps;
+
+  /// "Step 2 of 4" for the one-based step of the total: read by screen
+  /// readers, and shown by the compact style. Defaults to English;
+  /// pass a localized one, e.g. `(step, total) => 'Schritt $step von $total'`.
+  final String Function(int step, int total) progressLabel;
 
   /// Whether a step at [index] is enabled for interaction.
   bool _isStepEnabled(int index) {
@@ -127,9 +137,9 @@ class OiStepper extends StatelessWidget {
   Widget _buildCompact(BuildContext context) {
     final colors = context.colors;
     return Semantics(
-      label: 'Step ${currentStep + 1} of $totalSteps',
+      label: progressLabel(currentStep + 1, totalSteps),
       child: Text(
-        'Step ${currentStep + 1} of $totalSteps',
+        progressLabel(currentStep + 1, totalSteps),
         style: TextStyle(
           fontSize: 14,
           fontWeight: FontWeight.w500,
@@ -238,7 +248,7 @@ class OiStepper extends StatelessWidget {
     }
 
     return Semantics(
-      label: 'Step ${currentStep + 1} of $totalSteps',
+      label: progressLabel(currentStep + 1, totalSteps),
       child: content,
     );
   }

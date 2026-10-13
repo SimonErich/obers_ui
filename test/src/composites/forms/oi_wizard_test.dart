@@ -1,7 +1,10 @@
 // Tests do not require documentation comments.
 
+import 'dart:async';
+
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:obers_ui/src/components/buttons/oi_button.dart';
 import 'package:obers_ui/src/composites/forms/oi_stepper.dart';
 import 'package:obers_ui/src/composites/forms/oi_wizard.dart';
 
@@ -485,5 +488,125 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Summary'), findsOneWidget);
+  });
+
+  // 25. onNext: the wizard waits for it, then advances.
+  testWidgets('onNext is awaited, with a busy Next, before advancing', (
+    tester,
+  ) async {
+    final check = Completer<bool>();
+    var busySeen = false;
+    await tester.pumpObers(
+      _wizard(
+        steps: [
+          OiWizardStep(
+            title: 'Token',
+            nextLabel: 'Connect',
+            onNext: (_) => check.future,
+            builder: (wizard) {
+              if (wizard.busy) busySeen = true;
+              return const Text('Content One');
+            },
+          ),
+          OiWizardStep(
+            title: 'Done',
+            builder: (ctx) => const Text('Content Two'),
+          ),
+        ],
+      ),
+    );
+
+    await tester.tap(find.text('Connect'));
+    await tester.pump();
+    // A second press while busy does not run it again.
+    await tester.tap(find.byType(OiButton).last, warnIfMissed: false);
+    await tester.pump();
+
+    expect(find.text('Content One'), findsOneWidget);
+    expect(busySeen, isTrue);
+    expect(
+      tester.widget<OiButton>(find.byType(OiButton).last).loading,
+      isTrue,
+    );
+
+    check.complete(true);
+    await tester.pumpAndSettle();
+
+    expect(find.text('Content Two'), findsOneWidget);
+  });
+
+  // 26. onNext returning false keeps the step.
+  testWidgets('onNext returning false stays on the step', (tester) async {
+    var calls = 0;
+    await tester.pumpObers(
+      _wizard(
+        steps: [
+          OiWizardStep(
+            title: 'Token',
+            onNext: (_) async {
+              calls++;
+              return false;
+            },
+            builder: (ctx) => const Text('Content One'),
+          ),
+          OiWizardStep(
+            title: 'Done',
+            builder: (ctx) => const Text('Content Two'),
+          ),
+        ],
+      ),
+    );
+
+    await tester.tap(find.text('Next'));
+    await tester.pumpAndSettle();
+
+    expect(calls, 1);
+    expect(find.text('Content One'), findsOneWidget);
+    expect(find.text('Next'), findsOneWidget, reason: 'no longer busy');
+  });
+
+  // 27. onNext on the last step gates completion.
+  testWidgets('onNext on the last step runs before onComplete', (
+    tester,
+  ) async {
+    final order = <String>[];
+    await tester.pumpObers(
+      _wizard(
+        showSummary: false,
+        onComplete: (_) => order.add('complete'),
+        steps: [
+          OiWizardStep(
+            title: 'Only',
+            onNext: (_) async {
+              order.add('onNext');
+              return true;
+            },
+            builder: (ctx) => const Text('Content One'),
+          ),
+        ],
+      ),
+    );
+
+    await tester.tap(find.text('Complete'));
+    await tester.pumpAndSettle();
+
+    expect(order, ['onNext', 'complete']);
+  });
+
+  // 28. The step indicator's "Step N of M" follows the labels.
+  testWidgets('step indicator reads the localized progress', (tester) async {
+    final semantics = tester.ensureSemantics();
+    await tester.pumpObers(
+      _wizard(
+        labels: OiWizardLabels(
+          stepOf: (step, total) => 'Schritt $step von $total',
+        ),
+      ),
+    );
+
+    // The indicator's label is merged with the step names below it.
+    expect(find.bySemanticsLabel(RegExp('Schritt 1 von 3')), findsWidgets);
+    expect(find.bySemanticsLabel(RegExp(r'Step \d+ of')), findsNothing);
+    semantics.dispose();
   });
 }
