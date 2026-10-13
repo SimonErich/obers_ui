@@ -4298,6 +4298,7 @@ Multi-step form/workflow with step indicator.
 
 **Key Parameters:**
 - `steps` (List<OiWizardStep>, required)
+- `labels` (OiWizardLabels) — Button texts, summary heading and the step indicator's "Step N of M" (`stepOf`), English by default
 
 **OiWizardStep:**
 - `title` (String, required)
@@ -4305,9 +4306,11 @@ Multi-step form/workflow with step indicator.
 - `subtitle` (String?)
 - `icon` (IconData?)
 - `validate` (bool Function(Map)?) — Step validation
+- `onNext` (Future<bool> Function(Map)?) — Async work that must succeed before advancing (e.g. a server check); Next shows busy meanwhile, stays on `false`
+- `nextLabel` (String?) — This step's Next label, e.g. "Connect"
 - `optional` (bool, default: false)
 
-**OiWizardContext:** Provides `values`, `currentStep`, `totalSteps`, `goNext()`, `goPrevious()`, `goToStep()`, `setValue()`.
+**OiWizardContext:** Provides `values`, `currentStep`, `totalSteps`, `busy` (while `onNext` runs), `goNext()`, `goPrevious()`, `goToStep()`, `setValue()`.
 
 **Use When:** Multi-step forms, setup flows, checkout processes.
 **Combine With:** `OiStepper` (visual step indicator)

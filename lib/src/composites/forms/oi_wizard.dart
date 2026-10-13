@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/src/components/buttons/oi_button.dart';
 import 'package:obers_ui/src/composites/forms/oi_stepper.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 
@@ -20,6 +21,7 @@ class OiWizardContext {
     required this.goPrevious,
     required this.goToStep,
     required this.setValue,
+    this.busy = false,
   });
 
   /// The shared values map across all wizard steps.
@@ -42,6 +44,10 @@ class OiWizardContext {
 
   /// Sets a value in the shared values map.
   final void Function(String key, dynamic value) setValue;
+
+  /// Whether the step's [OiWizardStep.onNext] is running, e.g. so the step
+  /// can lock its fields meanwhile.
+  final bool busy;
 }
 
 // ── OiWizardStep ────────────────────────────────────────────────────────────
@@ -62,6 +68,8 @@ class OiWizardStep {
     this.subtitle,
     this.icon,
     this.validate,
+    this.onNext,
+    this.nextLabel,
     this.optional = false,
   }) : _stepperLabel = stepperLabel;
 
@@ -88,6 +96,27 @@ class OiWizardStep {
   /// the step is valid and the user may advance.
   final bool Function(Map<String, dynamic>)? validate;
 
+  /// Work that must succeed before the wizard advances, e.g. checking an
+  /// entry on a server. Runs when the user presses Next, after [validate]
+  /// passes; the Next button shows it is busy meanwhile and does not react
+  /// to further presses. The wizard advances (or completes, on the last
+  /// step) only when it returns `true`; on `false` it stays, and the step
+  /// shows why.
+  ///
+  /// ```dart
+  /// OiWizardStep(
+  ///   title: 'Token',
+  ///   nextLabel: 'Connect',
+  ///   onNext: (values) => api.connect(values['token'] as String),
+  ///   builder: (wizard) => TokenField(enabled: !wizard.busy),
+  /// )
+  /// ```
+  final Future<bool> Function(Map<String, dynamic>)? onNext;
+
+  /// The Next button's label on this step, e.g. "Connect", in place of
+  /// [OiWizardLabels.next] (or [OiWizardLabels.complete] on the last step).
+  final String? nextLabel;
+
   /// Whether this step can be skipped.
   final bool optional;
 }
@@ -111,6 +140,7 @@ class OiWizardStep {
 ///     complete: 'Fertig',
 ///     cancel: 'Abbrechen',
 ///     summary: 'Übersicht',
+///     stepOf: (step, total) => 'Schritt $step von $total',
 ///   ),
 /// )
 /// ```
@@ -126,6 +156,7 @@ class OiWizardLabels {
     this.complete = 'Complete',
     this.cancel = 'Cancel',
     this.summary = 'Summary',
+    this.stepOf = OiStepper.englishProgressLabel,
   });
 
   /// Label of the button that advances to the next step.
@@ -146,6 +177,10 @@ class OiWizardLabels {
 
   /// Heading of the summary block, shown when [OiWizard.showSummary] is set.
   final String summary;
+
+  /// "Step 2 of 4" for the one-based step of the total, read by screen
+  /// readers on the step indicator ([OiStepper.progressLabel]).
+  final String Function(int step, int total) stepOf;
 }
 
 // ── OiWizard ────────────────────────────────────────────────────────────────
@@ -218,6 +253,9 @@ class _OiWizardState extends State<OiWizard> {
   final Set<int> _completedSteps = {};
   final Set<int> _errorSteps = {};
 
+  /// While the current step's [OiWizardStep.onNext] runs.
+  bool _busy = false;
+
   @override
   void initState() {
     super.initState();
@@ -280,14 +318,29 @@ class _OiWizardState extends State<OiWizard> {
     widget.onStepChange?.call(index);
   }
 
-  void _goNext() {
+  Future<void> _goNext() async {
+    if (_busy) return;
     // Validate current step before advancing.
-    final step = widget.steps[_currentStep];
+    final index = _currentStep;
+    final step = widget.steps[index];
     if (step.validate != null && !step.validate!(_values)) {
       setState(() {
-        _errorSteps.add(_currentStep);
+        _errorSteps.add(index);
       });
       return;
+    }
+
+    final onNext = step.onNext;
+    if (onNext != null) {
+      setState(() => _busy = true);
+      final bool passed;
+      try {
+        passed = await onNext(Map<String, dynamic>.unmodifiable(_values));
+      } finally {
+        if (mounted) setState(() => _busy = false);
+      }
+      // Gone, or moved meanwhile (e.g. Previous): this result is stale.
+      if (!mounted || _currentStep != index || !passed) return;
     }
 
     setState(() {
@@ -390,6 +443,7 @@ class _OiWizardState extends State<OiWizard> {
       goPrevious: _goPrevious,
       goToStep: _goToStep,
       setValue: _setValue,
+      busy: _busy,
     );
 
     final stepContent = step.builder(wizardContext);
@@ -424,6 +478,7 @@ class _OiWizardState extends State<OiWizard> {
           completedSteps: _completedSteps,
           errorSteps: _errorSteps,
           onStepTap: widget.linear ? null : _handleStepTap,
+          progressLabel: widget.labels.stepOf,
         ),
         const SizedBox(height: 16),
 
@@ -467,36 +522,18 @@ class _OiWizardState extends State<OiWizard> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 if (widget.onCancel != null)
-                  GestureDetector(
+                  OiButton.ghost(
+                    label: widget.labels.cancel,
                     onTap: widget.onCancel,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 8,
-                      ),
-                      child: Text(
-                        widget.labels.cancel,
-                        style: TextStyle(fontSize: 14, color: colors.textMuted),
-                      ),
-                    ),
+                    enabled: !_busy,
                   ),
+                if (widget.onCancel != null && !isFirstStep)
+                  const SizedBox(width: 8),
                 if (!isFirstStep)
-                  GestureDetector(
+                  OiButton.outline(
+                    label: widget.labels.previous,
                     onTap: _goPrevious,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 8,
-                      ),
-                      decoration: BoxDecoration(
-                        border: Border.all(color: colors.border),
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: Text(
-                        widget.labels.previous,
-                        style: TextStyle(fontSize: 14, color: colors.text),
-                      ),
-                    ),
+                    enabled: !_busy,
                   ),
               ],
             ),
@@ -505,39 +542,22 @@ class _OiWizardState extends State<OiWizard> {
             Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                if (widget.allowSkip && step.optional && !isLastStep)
-                  GestureDetector(
+                if (widget.allowSkip && step.optional && !isLastStep) ...[
+                  OiButton.ghost(
+                    label: widget.labels.skip,
                     onTap: () => _goToStep(_currentStep + 1),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 8,
-                      ),
-                      child: Text(
-                        widget.labels.skip,
-                        style: TextStyle(fontSize: 14, color: colors.textMuted),
-                      ),
-                    ),
+                    enabled: !_busy,
                   ),
-                GestureDetector(
+                  const SizedBox(width: 8),
+                ],
+                OiButton.primary(
+                  label:
+                      step.nextLabel ??
+                      (isLastStep
+                          ? widget.labels.complete
+                          : widget.labels.next),
                   onTap: _goNext,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 8,
-                    ),
-                    decoration: BoxDecoration(
-                      color: colors.primary.base,
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: Text(
-                      isLastStep ? widget.labels.complete : widget.labels.next,
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: colors.textOnPrimary,
-                      ),
-                    ),
-                  ),
+                  loading: _busy,
                 ),
               ],
             ),
