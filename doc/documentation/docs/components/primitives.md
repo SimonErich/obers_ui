@@ -147,7 +147,7 @@ OiTappable(
 )
 ```
 
-Automatically handles: hover overlay, focus ring, active/press feedback, disabled state (0.4 opacity), and touch-target enforcement via `OiA11y.minTouchTarget` (48dp on touch platforms, 0 on pointer).
+Automatically handles: hover overlay, focus ring (shown only while the keyboard is used, see `OiFocusVisibility`), active/press feedback, disabled state (0.4 opacity), and touch-target enforcement via `OiA11y.minTouchTarget` (48dp on touch platforms, 0 on pointer).
 
 ## Animation
 

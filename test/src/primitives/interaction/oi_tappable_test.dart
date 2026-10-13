@@ -8,6 +8,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui/obers_ui.dart' show OiA11y;
 import 'package:obers_ui/src/foundation/oi_accessibility.dart' show OiA11y;
 import 'package:obers_ui/src/foundation/oi_app.dart';
+import 'package:obers_ui/src/foundation/oi_focus_visibility.dart';
 import 'package:obers_ui/src/foundation/oi_platform.dart';
 import 'package:obers_ui/src/foundation/theme/oi_effects_theme.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme_data.dart';
@@ -438,6 +439,67 @@ void main() {
           .widgetList<DecoratedBox>(find.byType(DecoratedBox))
           .where((b) => b.position == DecorationPosition.foreground);
       expect(keyboardForegroundBoxes, isNotEmpty);
+    },
+  );
+
+  // ── TC-focus-ring-pointer-hidden: no ring after a click ──────────────────────
+
+  testWidgets(
+    'TC-focus-ring-pointer-hidden: no focus ring when focus follows a click',
+    (tester) async {
+      // Flutter treats the mouse as traditional highlight mode; the ring must
+      // still stay hidden until a key is pressed.
+      OiFocusVisibility.reset();
+      addTearDown(OiFocusVisibility.reset);
+      await tester.pumpObers(
+        const OiTappable(child: SizedBox(width: 60, height: 60)),
+      );
+      final gesture = await tester.createGesture(kind: PointerDeviceKind.mouse);
+      await gesture.down(tester.getCenter(find.byType(OiTappable)));
+      await gesture.up();
+      await tester.pump();
+
+      final gestureElement = tester.element(find.byType(GestureDetector));
+      Focus.of(gestureElement).requestFocus();
+      await tester.pump();
+      await tester.pump();
+
+      final foregroundBoxes = tester
+          .widgetList<DecoratedBox>(find.byType(DecoratedBox))
+          .where((b) => b.position == DecorationPosition.foreground);
+      expect(foregroundBoxes, isEmpty);
+    },
+  );
+
+  // ── TC-focus-ring-key-shows: a key press shows the ring ─────────────────────
+
+  testWidgets(
+    'TC-focus-ring-key-shows: a key press shows the ring, a click hides it',
+    (tester) async {
+      OiFocusVisibility.reset();
+      addTearDown(OiFocusVisibility.reset);
+      await tester.pumpObers(
+        const OiTappable(child: SizedBox(width: 60, height: 60)),
+      );
+      final gestureElement = tester.element(find.byType(GestureDetector));
+      Focus.of(gestureElement).requestFocus();
+      await tester.pump();
+      await tester.pump();
+
+      Iterable<DecoratedBox> rings() => tester
+          .widgetList<DecoratedBox>(find.byType(DecoratedBox))
+          .where((b) => b.position == DecorationPosition.foreground);
+      expect(rings(), isEmpty, reason: 'no key pressed yet');
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.shift);
+      await tester.pump();
+      expect(rings(), isNotEmpty);
+
+      final gesture = await tester.createGesture(kind: PointerDeviceKind.mouse);
+      await gesture.down(const Offset(1, 1));
+      await gesture.up();
+      await tester.pump();
+      expect(rings(), isEmpty);
     },
   );
 
