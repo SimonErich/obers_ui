@@ -259,6 +259,7 @@ export 'src/foundation/icons/oi_icon_data.dart';
 
 export 'src/foundation/oi_accessibility.dart';
 export 'src/foundation/oi_app.dart';
+export 'src/foundation/oi_focus_visibility.dart';
 export 'src/foundation/oi_icons.dart';
 export 'src/foundation/oi_input_modality_detector.dart';
 export 'src/foundation/oi_optimistic_action.dart';

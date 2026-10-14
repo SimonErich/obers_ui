@@ -1,6 +1,7 @@
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/foundation/oi_accessibility.dart';
+import 'package:obers_ui/src/foundation/oi_focus_visibility.dart';
 import 'package:obers_ui/src/foundation/theme/oi_effects_theme.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/primitives/interaction/oi_touch_target.dart';
@@ -117,7 +118,6 @@ class _OiTappableState extends State<OiTappable> {
   bool _isHovered = false;
   bool _isPressed = false;
   bool _isFocused = false;
-  FocusHighlightMode _highlightMode = FocusHighlightMode.touch;
 
   /// Last non-transparent override colour, kept so [AnimatedOpacity] can fade
   /// the fill out instead of snapping to transparent.
@@ -126,21 +126,27 @@ class _OiTappableState extends State<OiTappable> {
   @override
   void initState() {
     super.initState();
-    _highlightMode = FocusManager.instance.highlightMode;
+    OiFocusVisibility.listenable.addListener(_handleFocusVisibilityChange);
+    // Reports a change of FocusManager.highlightStrategy.
     FocusManager.instance.addHighlightModeListener(_handleHighlightModeChange);
   }
 
   @override
   void dispose() {
+    OiFocusVisibility.listenable.removeListener(_handleFocusVisibilityChange);
     FocusManager.instance.removeHighlightModeListener(
       _handleHighlightModeChange,
     );
     super.dispose();
   }
 
-  void _handleHighlightModeChange(FocusHighlightMode mode) {
-    if (_highlightMode != mode) setState(() => _highlightMode = mode);
+  // Only a focused tappable shows the change, so only it rebuilds.
+  void _handleFocusVisibilityChange() {
+    if (_isFocused) setState(() {});
   }
+
+  void _handleHighlightModeChange(FocusHighlightMode _) =>
+      _handleFocusVisibilityChange();
 
   // ── State helpers ──────────────────────────────────────────────────────────
 
@@ -295,12 +301,13 @@ class _OiTappableState extends State<OiTappable> {
     }
 
     // Focus ring — foreground border rendered on top of content when keyboard
-    // navigation is active. Suppressed on touch-only interaction to reduce
-    // visual noise; reappears immediately on any keyboard event.
+    // navigation is active. Suppressed after a click or tap, so a tappable
+    // that gets focus from the pointer (e.g. the first item of a menu that
+    // opens) shows none; reappears immediately on any keyboard event.
     if (_isFocused &&
         widget.focusable &&
         widget.enabled &&
-        _highlightMode == FocusHighlightMode.traditional) {
+        OiFocusVisibility.visible) {
       final ring = effects.focusRing.enforced;
       content = DecoratedBox(
         position: DecorationPosition.foreground,
