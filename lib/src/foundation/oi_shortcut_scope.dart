@@ -62,6 +62,9 @@ class _OiShortcutScopeInherited extends InheritedWidget {
 /// Registers global keyboard shortcuts (Ctrl+Z undo, Ctrl+K command bar,
 /// `?` help) and provides [OiShortcutScopeState] to descendants.
 ///
+/// Ctrl+Z (Cmd+Z) undoes the [OiUndoStack], but in a focused text field it
+/// undoes the typing, as in any text field.
+///
 /// [OiApp] places this widget above the content so that the shortcuts are
 /// available throughout the entire application.
 ///
@@ -131,11 +134,8 @@ class _OiShortcutScopeState extends State<OiShortcutScope> {
         },
         child: Actions(
           actions: {
-            OiUndoIntent: CallbackAction<OiUndoIntent>(
-              onInvoke: (_) {
-                OiUndoStack.maybeOf(context)?.undo();
-                return null;
-              },
+            OiUndoIntent: _OiUndoAction(
+              () => OiUndoStack.maybeOf(context)?.undo(),
             ),
             OiCommandBarIntent: CallbackAction<OiCommandBarIntent>(
               onInvoke: (_) {
@@ -149,5 +149,31 @@ class _OiShortcutScopeState extends State<OiShortcutScope> {
         ),
       ),
     );
+  }
+}
+
+/// Undoes the last step of the [OiUndoStack], except while a text field
+/// has the focus: there Ctrl+Z (Cmd+Z) undoes the typing.
+///
+/// Not enabled then, so the key goes on to Flutter's text editing
+/// shortcuts above this scope (in the `WidgetsApp`), which undo the
+/// field's own history. Enabled, this action would take the key from them.
+class _OiUndoAction extends Action<OiUndoIntent> {
+  _OiUndoAction(this._undo);
+
+  final VoidCallback _undo;
+
+  // The getter `isEnabled` reads, not `isEnabled` itself: public
+  // is-prefixed bool methods are against REQ-0017.
+  @override
+  bool get isActionEnabled =>
+      FocusManager.instance.primaryFocus?.context
+          ?.findAncestorStateOfType<EditableTextState>() ==
+      null;
+
+  @override
+  Object? invoke(OiUndoIntent intent) {
+    _undo();
+    return null;
   }
 }
