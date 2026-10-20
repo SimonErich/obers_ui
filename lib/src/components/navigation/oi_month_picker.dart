@@ -91,12 +91,17 @@ class OiMonthPicker extends StatefulWidget {
   /// The dialog stays open while the user scrolls through months and years.
   /// It closes and returns the result when the user taps the confirm button,
   /// or returns `null` if dismissed by tapping outside.
+  ///
+  /// [cancelLabel] and [confirmLabel] name the dialog's buttons; pass
+  /// translations to localize them.
   static Future<OiMonth?> show(
     BuildContext context, {
     OiMonth? initialValue,
     int minYear = 1900,
     int maxYear = 2100,
     String semanticLabel = 'Select month and year',
+    String cancelLabel = 'Cancel',
+    String confirmLabel = 'OK',
   }) {
     return OiDialogShell.show<OiMonth>(
       context: context,
@@ -106,6 +111,8 @@ class OiMonthPicker extends StatefulWidget {
         initialValue: initialValue,
         minYear: minYear,
         maxYear: maxYear,
+        cancelLabel: cancelLabel,
+        confirmLabel: confirmLabel,
         onConfirm: close,
       ),
     );
@@ -288,6 +295,8 @@ class _MonthWheelItemState extends State<_MonthWheelItem> {
 class _OiMonthPickerDialog extends StatefulWidget {
   const _OiMonthPickerDialog({
     required this.onConfirm,
+    required this.cancelLabel,
+    required this.confirmLabel,
     this.initialValue,
     this.minYear = 1900,
     this.maxYear = 2100,
@@ -296,6 +305,8 @@ class _OiMonthPickerDialog extends StatefulWidget {
   final OiMonth? initialValue;
   final int minYear;
   final int maxYear;
+  final String cancelLabel;
+  final String confirmLabel;
   final void Function([OiMonth?]) onConfirm;
 
   @override
@@ -328,17 +339,19 @@ class _OiMonthPickerDialogState extends State<_OiMonthPickerDialog> {
           const SizedBox(height: 12),
           const OiDivider(),
           const SizedBox(height: 12),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+          // Wraps so long translated labels stack instead of overflowing.
+          Wrap(
+            alignment: WrapAlignment.center,
             spacing: 8,
+            runSpacing: 8,
             children: [
               OiButton.ghost(
-                label: 'Cancel',
+                label: widget.cancelLabel,
                 size: OiButtonSize.small,
                 onTap: () => widget.onConfirm(null),
               ),
               OiButton.primary(
-                label: 'OK',
+                label: widget.confirmLabel,
                 size: OiButtonSize.small,
                 onTap: () => widget.onConfirm(_current),
               ),

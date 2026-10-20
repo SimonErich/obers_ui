@@ -80,12 +80,18 @@ class OiCalendarWeekPicker extends StatefulWidget {
   /// Shows a calendar week picker in a dialog and returns the selected week.
   ///
   /// Returns `null` if the dialog is dismissed without selecting a week.
+  ///
+  /// [cancelLabel] and [confirmLabel] name the dialog's buttons; pass
+  /// translations to localize them. They are also used by the year picker
+  /// that opens from the dialog.
   static Future<OiCalendarWeek?> show(
     BuildContext context, {
     OiCalendarWeek? initialValue,
     Set<OiCalendarWeek>? highlightedWeeks,
     String Function(int week, int year)? weekFormatter,
     String semanticLabel = 'Select calendar week',
+    String cancelLabel = 'Cancel',
+    String confirmLabel = 'OK',
   }) {
     return OiDialogShell.show<OiCalendarWeek>(
       context: context,
@@ -95,6 +101,8 @@ class OiCalendarWeekPicker extends StatefulWidget {
         initialValue: initialValue,
         highlightedWeeks: highlightedWeeks,
         weekFormatter: weekFormatter,
+        cancelLabel: cancelLabel,
+        confirmLabel: confirmLabel,
         onConfirm: close,
       ),
     );
@@ -281,6 +289,8 @@ class _WeekWheelItemState extends State<_WeekWheelItem> {
 class _OiCalendarWeekPickerDialog extends StatefulWidget {
   const _OiCalendarWeekPickerDialog({
     required this.onConfirm,
+    required this.cancelLabel,
+    required this.confirmLabel,
     this.initialValue,
     this.highlightedWeeks,
     this.weekFormatter,
@@ -289,6 +299,8 @@ class _OiCalendarWeekPickerDialog extends StatefulWidget {
   final OiCalendarWeek? initialValue;
   final Set<OiCalendarWeek>? highlightedWeeks;
   final String Function(int week, int year)? weekFormatter;
+  final String cancelLabel;
+  final String confirmLabel;
   final void Function([OiCalendarWeek?]) onConfirm;
 
   @override
@@ -311,6 +323,8 @@ class _OiCalendarWeekPickerDialogState
     final result = await OiMonthPicker.show(
       context,
       initialValue: OiMonth(year: _current.year, month: 1),
+      cancelLabel: widget.cancelLabel,
+      confirmLabel: widget.confirmLabel,
     );
     if (result == null) return;
     // Switch to the selected year, keep week clamped.
@@ -351,17 +365,19 @@ class _OiCalendarWeekPickerDialogState
           const SizedBox(height: 12),
           const OiDivider(),
           const SizedBox(height: 12),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+          // Wraps so long translated labels stack instead of overflowing.
+          Wrap(
+            alignment: WrapAlignment.center,
             spacing: 8,
+            runSpacing: 8,
             children: [
               OiButton.ghost(
-                label: 'Cancel',
+                label: widget.cancelLabel,
                 size: OiButtonSize.small,
                 onTap: () => widget.onConfirm(null),
               ),
               OiButton.primary(
-                label: 'OK',
+                label: widget.confirmLabel,
                 size: OiButtonSize.small,
                 onTap: () => widget.onConfirm(_current),
               ),
