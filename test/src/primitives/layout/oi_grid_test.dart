@@ -2366,4 +2366,65 @@ void main() {
       },
     );
   });
+
+  // ── stretchRows ───────────────────────────────────────────────────────────
+
+  group('stretchRows', () {
+    testWidgets('stretches every child to the tallest in its row', (
+      tester,
+    ) async {
+      await tester.pumpObers(
+        const OiGrid(
+          breakpoint: OiBreakpoint.compact,
+          columns: OiResponsive<int>(2),
+          stretchRows: true,
+          children: [
+            SizedBox(key: Key('short'), height: 50),
+            SizedBox(key: Key('tall'), height: 120),
+          ],
+        ),
+      );
+
+      expect(tester.getSize(find.byKey(const Key('short'))).height, 120);
+      expect(tester.getSize(find.byKey(const Key('tall'))).height, 120);
+    });
+
+    testWidgets('re-measures the row when a child grows after layout', (
+      tester,
+    ) async {
+      final height = ValueNotifier<double>(50);
+      addTearDown(height.dispose);
+
+      await tester.pumpObers(
+        OiGrid(
+          breakpoint: OiBreakpoint.compact,
+          columns: const OiResponsive<int>(2),
+          stretchRows: true,
+          children: [
+            // The change happens deep inside the child, so only the child
+            // marks itself dirty, the way a text reflow after a font load does.
+            Column(
+              key: const Key('growing'),
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ValueListenableBuilder<double>(
+                  valueListenable: height,
+                  builder: (context, value, _) => SizedBox(height: value),
+                ),
+              ],
+            ),
+            const SizedBox(key: Key('sibling'), height: 80),
+          ],
+        ),
+      );
+      expect(tester.getSize(find.byKey(const Key('growing'))).height, 80);
+
+      height.value = 150;
+      await tester.pump();
+
+      expect(tester.getSize(find.byKey(const Key('growing'))).height, 150);
+      expect(tester.getSize(find.byKey(const Key('sibling'))).height, 150);
+      expect(tester.takeException(), isNull);
+    });
+  });
 }

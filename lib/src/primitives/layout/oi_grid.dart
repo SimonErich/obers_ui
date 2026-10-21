@@ -682,10 +682,17 @@ class _RenderOiGrid extends RenderBox
           targetHeight += rowHeights[r];
           if (r < p.row + p.rowSpan - 1) targetHeight += effectiveRowGap;
         }
-        p.renderBox.layout(
-          BoxConstraints.tight(Size(childWidth, targetHeight)),
-          parentUsesSize: true,
-        );
+        p.renderBox
+          ..layout(
+            BoxConstraints.tight(Size(childWidth, targetHeight)),
+            parentUsesSize: true,
+          )
+          // Tight constraints make the child a relayout boundary, so when its
+          // content grows later (e.g. text reflowing after a font loads) only
+          // the child is laid out again and the row keeps its stale height.
+          // Reading the baseline registers a layout dependency that survives
+          // the boundary: Flutter relayouts this grid whenever the child does.
+          ..getDistanceToBaseline(TextBaseline.alphabetic, onlyReal: true);
       }
     }
 
