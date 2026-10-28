@@ -74,6 +74,7 @@ class _OiToastQueue {
     required bool dismissible,
     Widget? action,
     VoidCallback? onDismiss,
+    OiToastLabels labels = const OiToastLabels(),
   }) {
     final entry = _OiToastEntry(
       message: message,
@@ -84,11 +85,12 @@ class _OiToastQueue {
       dismissible: dismissible,
       action: action,
       onDismiss: onDismiss,
+      labels: labels,
     );
     _entries.add(entry);
 
     if (_handle == null || _handle!.isDismissed) {
-      _createOverlay(context, position);
+      _createOverlay(context, position, labels.container);
     } else {
       _handle!.update();
     }
@@ -109,7 +111,11 @@ class _OiToastQueue {
     _notifier.notify();
   }
 
-  void _createOverlay(BuildContext context, OiToastPosition position) {
+  void _createOverlay(
+    BuildContext context,
+    OiToastPosition position,
+    String label,
+  ) {
     final service = OiOverlays.maybeOf(context);
 
     Widget builder(BuildContext _) => ListenableBuilder(
@@ -122,7 +128,7 @@ class _OiToastQueue {
 
     if (service != null) {
       _handle = service.show(
-        label: 'Toast notifications',
+        label: label,
         builder: builder,
         zOrder: OiOverlayZOrder.toast,
         dismissible: false,
@@ -151,6 +157,7 @@ class _OiToastEntry {
     required this.dismissible,
     this.action,
     this.onDismiss,
+    this.labels = const OiToastLabels(),
   });
 
   final String message;
@@ -161,6 +168,7 @@ class _OiToastEntry {
   final bool dismissible;
   final Widget? action;
   final VoidCallback? onDismiss;
+  final OiToastLabels labels;
 }
 
 /// A fake handle that dismisses a single entry from the queue.
@@ -243,6 +251,7 @@ class _OiToastColumn extends StatelessWidget {
                 pauseOnHover: entry.pauseOnHover,
                 dismissible: entry.dismissible,
                 action: entry.action,
+                labels: entry.labels,
                 onDismiss: () {
                   entry.onDismiss?.call();
                   onEntryDismissed(entry);
@@ -255,6 +264,38 @@ class _OiToastColumn extends StatelessWidget {
       ),
     );
   }
+}
+
+/// The texts of an [OiToast], in English by default; pass translations
+/// to localize the toast.
+///
+/// {@category Components}
+class OiToastLabels {
+  /// Creates an [OiToastLabels].
+  const OiToastLabels({
+    this.level = englishLevel,
+    this.dismiss = 'Dismiss',
+    this.container = 'Toast notifications',
+  });
+
+  /// "Info", "Success", "Warning", "Error": the default [level].
+  static String englishLevel(OiToastLevel level) => switch (level) {
+    OiToastLevel.info => 'Info',
+    OiToastLevel.success => 'Success',
+    OiToastLevel.warning => 'Warning',
+    OiToastLevel.error => 'Error',
+  };
+
+  /// Screen-reader label of the icon of a toast's level.
+  final String Function(OiToastLevel level) level;
+
+  /// Screen-reader label of the close button.
+  final String dismiss;
+
+  /// Screen-reader label of the container that stacks the toasts. The
+  /// container is shared by all toasts, so it takes this label from the toast
+  /// that opens it.
+  final String container;
 }
 
 /// A transient notification banner that auto-dismisses after [duration].
@@ -291,6 +332,7 @@ class OiToast extends StatefulWidget {
     this.onDismiss,
     this.onPauseRequested,
     this.onResumeRequested,
+    this.labels = const OiToastLabels(),
     super.key,
   });
 
@@ -333,6 +375,9 @@ class OiToast extends StatefulWidget {
   /// Called when the pointer leaves the toast, or a long press ends.
   final VoidCallback? onResumeRequested;
 
+  /// The toast's texts; pass translations to localize it.
+  final OiToastLabels labels;
+
   /// Shows a toast notification above the current widget tree.
   ///
   /// Multiple toasts are stacked vertically instead of overlapping.
@@ -347,6 +392,7 @@ class OiToast extends StatefulWidget {
     bool dismissible = true,
     Widget? action,
     VoidCallback? onDismiss,
+    OiToastLabels labels = const OiToastLabels(),
   }) {
     return _OiToastQueue._shared.addToast(
       context,
@@ -358,6 +404,7 @@ class OiToast extends StatefulWidget {
       dismissible: dismissible,
       action: action,
       onDismiss: onDismiss,
+      labels: labels,
     );
   }
 
@@ -454,18 +501,7 @@ class _OiToastState extends State<OiToast> with SingleTickerProviderStateMixin {
     }
   }
 
-  String _iconSemanticLabel() {
-    switch (widget.level) {
-      case OiToastLevel.info:
-        return 'Info';
-      case OiToastLevel.success:
-        return 'Success';
-      case OiToastLevel.warning:
-        return 'Warning';
-      case OiToastLevel.error:
-        return 'Error';
-    }
-  }
+  String _iconSemanticLabel() => widget.labels.level(widget.level);
 
   @override
   Widget build(BuildContext context) {
@@ -551,7 +587,7 @@ class _OiToastState extends State<OiToast> with SingleTickerProviderStateMixin {
                           SizedBox(width: effectiveGap),
                           OiIconButton(
                             icon: OiIcons.x,
-                            semanticLabel: 'Dismiss',
+                            semanticLabel: widget.labels.dismiss,
                             onTap: _dismiss,
                             size: OiButtonSize.small,
                           ),

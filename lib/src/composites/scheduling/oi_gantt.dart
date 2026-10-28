@@ -78,6 +78,7 @@ class OiGantt extends StatefulWidget {
   const OiGantt({
     required this.tasks,
     required this.label,
+    this.taskColumnLabel = 'Task',
     super.key,
     this.viewStart,
     this.viewEnd,
@@ -149,6 +150,9 @@ class OiGantt extends StatefulWidget {
 
   /// Debounce duration for auto-saving settings after changes.
   final Duration settingsSaveDebounce;
+
+  /// Header of the task column.
+  final String taskColumnLabel;
 
   @override
   State<OiGantt> createState() => _OiGanttState();
@@ -418,7 +422,7 @@ class _OiGanttState extends State<OiGantt>
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8),
               child: Text(
-                'Task',
+                widget.taskColumnLabel,
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 12,

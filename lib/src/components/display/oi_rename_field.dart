@@ -31,6 +31,7 @@ class OiRenameField extends StatefulWidget {
     this.validate,
     this.showButtons = false,
     this.semanticsLabel,
+    this.emptyNameLabel = 'Name cannot be empty',
     super.key,
   });
 
@@ -54,6 +55,9 @@ class OiRenameField extends StatefulWidget {
 
   /// Accessibility label.
   final String? semanticsLabel;
+
+  /// Error shown when the name is empty.
+  final String emptyNameLabel;
 
   @override
   State<OiRenameField> createState() => _OiRenameFieldState();
@@ -123,7 +127,7 @@ class _OiRenameFieldState extends State<OiRenameField> {
   }
 
   String? _validate(String value) {
-    if (value.trim().isEmpty) return 'Name cannot be empty';
+    if (value.trim().isEmpty) return widget.emptyNameLabel;
     for (final char in _illegalChars) {
       if (value.contains(char)) return 'Name cannot contain "$char"';
     }

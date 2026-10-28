@@ -31,6 +31,7 @@ import 'package:obers_ui/src/models/oi_file_explorer_controller.dart';
 import 'package:obers_ui/src/models/oi_file_node_data.dart';
 import 'package:obers_ui/src/models/settings/oi_file_explorer_settings.dart';
 import 'package:obers_ui/src/modules/oi_chat.dart';
+import 'package:obers_ui/src/modules/oi_file_explorer_labels.dart';
 
 part 'oi_file_explorer/oi_file_explorer_content.part.dart';
 part 'oi_file_explorer/oi_file_explorer_context_menus.part.dart';
@@ -83,6 +84,7 @@ class OiFileExplorer extends StatefulWidget {
     this.maxUploadFileSize,
     this.filePreviewBuilder,
     this.customContextMenuItems,
+    this.labels = const OiFileExplorerLabels(),
     super.key,
   });
 
@@ -201,6 +203,9 @@ class OiFileExplorer extends StatefulWidget {
   /// Custom context menu items for files.
   final List<OiMenuItem> Function(OiFileNodeData)? customContextMenuItems;
 
+  /// The explorer's texts; pass translations to localize it.
+  final OiFileExplorerLabels labels;
+
   @override
   State<OiFileExplorer> createState() => _OiFileExplorerState();
 }
@@ -259,9 +264,9 @@ class _OiFileExplorerState extends State<OiFileExplorer> {
         setState(() => _folderTree = tree);
         // Navigate to root so the content area shows initial files.
         if (widget.controller.currentFolder == null) {
-          const rootFolder = OiFileNodeData(
+          final rootFolder = OiFileNodeData(
             id: 'root',
-            name: 'Home',
+            name: widget.labels.rootFolder,
             folder: true,
           );
           await widget.controller.navigateTo('root', folder: rootFolder);
@@ -285,7 +290,7 @@ class _OiFileExplorerState extends State<OiFileExplorer> {
     final folder = widget.controller.currentFolder;
     if (folder == null) return [];
     return [
-      const OiPathSegment(id: 'root', label: 'Home'),
+      OiPathSegment(id: 'root', label: widget.labels.rootFolder),
       if (folder.parentId != null)
         OiPathSegment(id: folder.parentId!, label: folder.parentId!),
       OiPathSegment(id: folder.id.toString(), label: folder.name),

@@ -49,6 +49,7 @@ class OiRelativeTime extends StatefulWidget {
     this.live = true,
     this.formatAbsolute,
     this.semanticsLabel,
+    this.formatter,
     super.key,
   });
 
@@ -80,6 +81,19 @@ class OiRelativeTime extends StatefulWidget {
   /// always say "5 minutes ago" even when the visual shows "5m".
   final String? semanticsLabel;
 
+  /// Optional override for the whole text, e.g. to localize it.
+  ///
+  /// Receives the [dateTime], the style to format it in (the visual [style],
+  /// or [OiRelativeTimeStyle.long] for screen readers) and the current time.
+  /// When provided, it replaces the built-in English formatting, including
+  /// [formatAbsolute]; [capitalize] still applies.
+  final String Function(
+    DateTime dateTime,
+    OiRelativeTimeStyle style,
+    DateTime now,
+  )?
+  formatter;
+
   // ---------------------------------------------------------------------------
   // Formatting logic (static for testability)
   // ---------------------------------------------------------------------------
@@ -87,14 +101,24 @@ class OiRelativeTime extends StatefulWidget {
   /// Formats [dateTime] as a relative string using [style].
   ///
   /// [now] can be injected for testing; defaults to [DateTime.now].
+  /// [formatter] replaces the built-in formatting; see
+  /// [OiRelativeTime.formatter].
   static String format(
     DateTime dateTime, {
     OiRelativeTimeStyle style = OiRelativeTimeStyle.short,
     bool capitalize = false,
     String Function(DateTime)? formatAbsolute,
+    String Function(DateTime dateTime, OiRelativeTimeStyle style, DateTime now)?
+    formatter,
     DateTime? now,
   }) {
     final ref = now ?? DateTime.now();
+    if (formatter != null) {
+      final result = formatter(dateTime, style, ref);
+      return capitalize && result.isNotEmpty
+          ? result[0].toUpperCase() + result.substring(1)
+          : result;
+    }
     final elapsed = ref.difference(dateTime);
     final seconds = elapsed.inSeconds;
     final minutes = elapsed.inMinutes;
@@ -318,6 +342,7 @@ class _OiRelativeTimeState extends State<OiRelativeTime> {
     style: widget.style,
     capitalize: widget.capitalize,
     formatAbsolute: widget.formatAbsolute,
+    formatter: widget.formatter,
   );
 
   void _scheduleTimer() {
@@ -341,6 +366,7 @@ class _OiRelativeTimeState extends State<OiRelativeTime> {
       widget.dateTime,
       style: OiRelativeTimeStyle.long,
       formatAbsolute: widget.formatAbsolute,
+      formatter: widget.formatter,
     );
   }
 

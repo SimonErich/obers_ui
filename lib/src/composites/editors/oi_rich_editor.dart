@@ -11,6 +11,67 @@ export 'package:obers_ui/src/composites/editors/oi_rich_editor_controller.dart';
 
 // ── Widget ───────────────────────────────────────────────────────────────────
 
+/// The texts of an [OiRichEditor], in English by default; pass translations
+/// to localize the editor.
+///
+/// {@category Composites}
+class OiRichEditorLabels {
+  /// Creates an [OiRichEditorLabels].
+  const OiRichEditorLabels({
+    this.bold = 'Bold',
+    this.italic = 'Italic',
+    this.underline = 'Underline',
+    this.heading1 = 'Heading 1',
+    this.heading2 = 'Heading 2',
+    this.heading3 = 'Heading 3',
+    this.bulletList = 'Bullet list',
+    this.numberedList = 'Numbered list',
+    this.codeBlock = 'Code block',
+    this.quote = 'Quote',
+    this.toolbarLabel = 'Editor toolbar',
+    this.wordCount = englishWordCount,
+  });
+
+  /// "42 words": the default [wordCount].
+  static String englishWordCount(int count) => '$count words';
+
+  /// Screen-reader label of the bold button.
+  final String bold;
+
+  /// Screen-reader label of the italic button.
+  final String italic;
+
+  /// Screen-reader label of the underline button.
+  final String underline;
+
+  /// Screen-reader label of the first heading button.
+  final String heading1;
+
+  /// Screen-reader label of the second heading button.
+  final String heading2;
+
+  /// Screen-reader label of the third heading button.
+  final String heading3;
+
+  /// Screen-reader label of the bullet list button.
+  final String bulletList;
+
+  /// Screen-reader label of the numbered list button.
+  final String numberedList;
+
+  /// Screen-reader label of the code block button.
+  final String codeBlock;
+
+  /// Screen-reader label of the quote button.
+  final String quote;
+
+  /// Screen-reader label of the toolbar.
+  final String toolbarLabel;
+
+  /// Shown when word counting is on, by the number of words.
+  final String Function(int count) wordCount;
+}
+
 /// A block-based rich text editor with toolbar and slash commands.
 ///
 /// Supports headings, bold/italic/underline, lists, code blocks, quotes,
@@ -25,6 +86,7 @@ class OiRichEditor extends StatefulWidget {
   const OiRichEditor({
     required this.controller,
     required this.label,
+    this.labels = const OiRichEditorLabels(),
     super.key,
     this.toolbar = OiToolbarMode.fixed,
     this.placeholder,
@@ -97,6 +159,9 @@ class OiRichEditor extends StatefulWidget {
 
   /// Called when focus changes.
   final ValueChanged<bool>? onFocusChange;
+
+  /// The editor's texts; pass translations to localize it.
+  final OiRichEditorLabels labels;
 
   @override
   State<OiRichEditor> createState() => _OiRichEditorState();
@@ -512,7 +577,7 @@ class _OiRichEditorState extends State<OiRichEditor> {
             color: iconColor,
           ),
         ),
-        semanticLabel: 'Bold',
+        semanticLabel: widget.labels.bold,
         onPressed: widget.readOnly ? null : () => _toggleFormatting('bold'),
       ),
       _ToolbarButton(
@@ -524,7 +589,7 @@ class _OiRichEditorState extends State<OiRichEditor> {
             color: iconColor,
           ),
         ),
-        semanticLabel: 'Italic',
+        semanticLabel: widget.labels.italic,
         onPressed: widget.readOnly ? null : () => _toggleFormatting('italic'),
       ),
       _ToolbarButton(
@@ -536,7 +601,7 @@ class _OiRichEditorState extends State<OiRichEditor> {
             color: iconColor,
           ),
         ),
-        semanticLabel: 'Underline',
+        semanticLabel: widget.labels.underline,
         onPressed: widget.readOnly
             ? null
             : () => _toggleFormatting('underline'),
@@ -552,7 +617,7 @@ class _OiRichEditorState extends State<OiRichEditor> {
             color: iconColor,
           ),
         ),
-        semanticLabel: 'Heading 1',
+        semanticLabel: widget.labels.heading1,
         onPressed: widget.readOnly
             ? null
             : () => _insertBlock(OiBlockType.heading1),
@@ -567,7 +632,7 @@ class _OiRichEditorState extends State<OiRichEditor> {
               color: iconColor,
             ),
           ),
-          semanticLabel: 'Heading 2',
+          semanticLabel: widget.labels.heading2,
           onPressed: widget.readOnly
               ? null
               : () => _insertBlock(OiBlockType.heading2),
@@ -581,7 +646,7 @@ class _OiRichEditorState extends State<OiRichEditor> {
               color: iconColor,
             ),
           ),
-          semanticLabel: 'Heading 3',
+          semanticLabel: widget.labels.heading3,
           onPressed: widget.readOnly
               ? null
               : () => _insertBlock(OiBlockType.heading3),
@@ -589,7 +654,7 @@ class _OiRichEditorState extends State<OiRichEditor> {
       ],
       _ToolbarButton(
         icon: Text('\u2022', style: TextStyle(fontSize: 16, color: iconColor)),
-        semanticLabel: 'Bullet list',
+        semanticLabel: widget.labels.bulletList,
         onPressed: widget.readOnly
             ? null
             : () => _insertBlock(OiBlockType.bulletList),
@@ -603,7 +668,7 @@ class _OiRichEditorState extends State<OiRichEditor> {
             color: iconColor,
           ),
         ),
-        semanticLabel: 'Numbered list',
+        semanticLabel: widget.labels.numberedList,
         onPressed: widget.readOnly
             ? null
             : () => _insertBlock(OiBlockType.numberedList),
@@ -618,7 +683,7 @@ class _OiRichEditorState extends State<OiRichEditor> {
               color: iconColor,
             ),
           ),
-          semanticLabel: 'Code block',
+          semanticLabel: widget.labels.codeBlock,
           onPressed: widget.readOnly
               ? null
               : () => _insertBlock(OiBlockType.code),
@@ -629,7 +694,7 @@ class _OiRichEditorState extends State<OiRichEditor> {
             '\u275D',
             style: TextStyle(fontSize: 14, color: iconColor),
           ),
-          semanticLabel: 'Quote',
+          semanticLabel: widget.labels.quote,
           onPressed: widget.readOnly
               ? null
               : () => _insertBlock(OiBlockType.quote),
@@ -647,7 +712,7 @@ class _OiRichEditorState extends State<OiRichEditor> {
         ),
       ),
       child: Semantics(
-        label: 'Editor toolbar',
+        label: widget.labels.toolbarLabel,
         child: SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: Row(children: actions),
@@ -743,7 +808,7 @@ class _OiRichEditorState extends State<OiRichEditor> {
         ? Padding(
             padding: const EdgeInsets.only(top: 4),
             child: Text(
-              '${widget.controller.wordCount} words',
+              widget.labels.wordCount(widget.controller.wordCount),
               style: TextStyle(
                 fontSize: 12,
                 color: colors?.textMuted ?? const Color(0xFF6B7280),

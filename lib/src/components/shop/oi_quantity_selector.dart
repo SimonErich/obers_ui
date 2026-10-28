@@ -37,6 +37,8 @@ class OiQuantitySelector extends StatelessWidget {
     this.compact = false,
     this.disabled = false,
     this.suffix,
+    this.decreaseLabel = 'Decrease quantity',
+    this.increaseLabel = 'Increase quantity',
     super.key,
   });
 
@@ -67,6 +69,12 @@ class OiQuantitySelector extends StatelessWidget {
   /// announced quantity value.
   final String? suffix;
 
+  /// Screen-reader label of the decrease button.
+  final String decreaseLabel;
+
+  /// Screen-reader label of the increase button.
+  final String increaseLabel;
+
   /// Whether the value is at the minimum.
   bool get _atMin => value <= min;
 
@@ -79,7 +87,7 @@ class OiQuantitySelector extends StatelessWidget {
   Widget _buildMinusButton(BuildContext context) {
     return OiIconButton(
       icon: _kRemoveIcon,
-      semanticLabel: 'Decrease quantity',
+      semanticLabel: decreaseLabel,
       onTap: _interactive && !_atMin ? () => onChange!(value - 1) : null,
       size: compact ? OiButtonSize.small : OiButtonSize.medium,
       enabled: _interactive && !_atMin,
@@ -89,7 +97,7 @@ class OiQuantitySelector extends StatelessWidget {
   Widget _buildPlusButton(BuildContext context) {
     return OiIconButton(
       icon: _kAddIcon,
-      semanticLabel: 'Increase quantity',
+      semanticLabel: increaseLabel,
       onTap: _interactive && !_atMax ? () => onChange!(value + 1) : null,
       size: compact ? OiButtonSize.small : OiButtonSize.medium,
       enabled: _interactive && !_atMax,

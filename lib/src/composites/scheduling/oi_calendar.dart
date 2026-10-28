@@ -66,6 +66,29 @@ class OiCalendar extends StatefulWidget {
   const OiCalendar({
     required this.events,
     required this.label,
+    this.weekdayLabels = const [
+      'Mon',
+      'Tue',
+      'Wed',
+      'Thu',
+      'Fri',
+      'Sat',
+      'Sun',
+    ],
+    this.monthLabels = const [
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December',
+    ],
     super.key,
     this.mode = OiCalendarMode.month,
     this.initialDate,
@@ -126,6 +149,14 @@ class OiCalendar extends StatefulWidget {
 
   /// Top-level namespace for settings storage.
   final String settingsNamespace;
+
+  /// Weekday abbreviations indexed 0–6 (Monday–Sunday); pass translations to
+  /// localize the day headers.
+  final List<String> weekdayLabels;
+
+  /// Month names indexed 0–11 (January–December); pass translations to
+  /// localize the header title.
+  final List<String> monthLabels;
 
   /// Debounce duration for auto-saving settings after changes.
   final Duration settingsSaveDebounce;
@@ -256,9 +287,8 @@ class _OiCalendarState extends State<OiCalendar>
 
   /// Returns the ordered day-of-week headers starting from firstDayOfWeek.
   List<String> get _dayHeaders {
-    const names = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
     final start = widget.firstDayOfWeek - 1; // 0-based index
-    return [for (var i = 0; i < 7; i++) names[(start + i) % 7]];
+    return [for (var i = 0; i < 7; i++) widget.weekdayLabels[(start + i) % 7]];
   }
 
   /// Returns the ISO 8601 week number for [date].
@@ -297,20 +327,7 @@ class _OiCalendarState extends State<OiCalendar>
 
   /// The title for the navigation header.
   String get _headerTitle {
-    const months = [
-      'January',
-      'February',
-      'March',
-      'April',
-      'May',
-      'June',
-      'July',
-      'August',
-      'September',
-      'October',
-      'November',
-      'December',
-    ];
+    final months = widget.monthLabels;
     switch (_mode) {
       case OiCalendarMode.day:
         final m = months[_focusDate.month - 1];

@@ -109,6 +109,9 @@ class OiSearch extends StatefulWidget {
   const OiSearch({
     required this.sources,
     required this.label,
+    this.recentLabel = 'Recent',
+    this.typeToSearchLabel = 'Type to search',
+    this.noResultsLabel = 'No results found',
     super.key,
     this.onSelect,
     this.onDismiss,
@@ -145,6 +148,15 @@ class OiSearch extends StatefulWidget {
 
   /// Accessibility label for the search overlay.
   final String label;
+
+  /// Heading of the recent searches.
+  final String recentLabel;
+
+  /// Shown while the query is empty.
+  final String typeToSearchLabel;
+
+  /// Shown when nothing matches the query.
+  final String noResultsLabel;
 
   @override
   State<OiSearch> createState() => _OiSearchState();
@@ -458,7 +470,7 @@ class _OiSearchState extends State<OiSearch> {
       if (widget.showRecent && _recentItems.isNotEmpty) {
         return _buildCategorySection(
           context,
-          'Recent',
+          widget.recentLabel,
           OiIcons.clock,
           _recentItems,
           allResults,
@@ -468,7 +480,7 @@ class _OiSearchState extends State<OiSearch> {
         padding: const EdgeInsets.all(16),
         child: Center(
           child: Text(
-            'Type to search',
+            widget.typeToSearchLabel,
             style: TextStyle(color: colors.textMuted, fontSize: 14),
           ),
         ),
@@ -480,7 +492,7 @@ class _OiSearchState extends State<OiSearch> {
         padding: const EdgeInsets.all(16),
         child: Center(
           child: Text(
-            'No results found',
+            widget.noResultsLabel,
             style: TextStyle(color: colors.textMuted, fontSize: 14),
           ),
         ),

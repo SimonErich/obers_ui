@@ -63,6 +63,7 @@ class OiMaintenancePage extends StatefulWidget {
     this.retryLabel = 'Try Again',
     this.socialLinks = const [],
     this.maxWidth = 480,
+    this.countdownLabel = englishCountdown,
     super.key,
   });
 
@@ -80,6 +81,7 @@ class OiMaintenancePage extends StatefulWidget {
     String retryLabel = 'Try Again',
     List<OiSocialLink> socialLinks = const [],
     double maxWidth = 480,
+    String Function(Duration remaining) countdownLabel = englishCountdown,
     Key? key,
   }) {
     return OiMaintenancePage(
@@ -97,6 +99,7 @@ class OiMaintenancePage extends StatefulWidget {
       retryLabel: retryLabel,
       socialLinks: socialLinks,
       maxWidth: maxWidth,
+      countdownLabel: countdownLabel,
     );
   }
 
@@ -109,6 +112,7 @@ class OiMaintenancePage extends StatefulWidget {
     String retryLabel = 'Try Again',
     List<OiSocialLink> socialLinks = const [],
     double maxWidth = 480,
+    String Function(Duration remaining) countdownLabel = englishCountdown,
     Key? key,
   }) {
     return OiMaintenancePage(
@@ -122,6 +126,7 @@ class OiMaintenancePage extends StatefulWidget {
       retryLabel: retryLabel,
       socialLinks: socialLinks,
       maxWidth: maxWidth,
+      countdownLabel: countdownLabel,
     );
   }
 
@@ -137,6 +142,7 @@ class OiMaintenancePage extends StatefulWidget {
     VoidCallback? onStatusPageTap,
     List<OiSocialLink> socialLinks = const [],
     double maxWidth = 480,
+    String Function(Duration remaining) countdownLabel = englishCountdown,
     Key? key,
   }) {
     return OiMaintenancePage(
@@ -152,6 +158,7 @@ class OiMaintenancePage extends StatefulWidget {
       retryLabel: retryLabel,
       socialLinks: socialLinks,
       maxWidth: maxWidth,
+      countdownLabel: countdownLabel,
     );
   }
 
@@ -164,6 +171,7 @@ class OiMaintenancePage extends StatefulWidget {
     String retryLabel = 'Try Again',
     List<OiSocialLink> socialLinks = const [],
     double maxWidth = 480,
+    String Function(Duration remaining) countdownLabel = englishCountdown,
     Key? key,
   }) {
     return OiMaintenancePage(
@@ -177,6 +185,7 @@ class OiMaintenancePage extends StatefulWidget {
       retryLabel: retryLabel,
       socialLinks: socialLinks,
       maxWidth: maxWidth,
+      countdownLabel: countdownLabel,
     );
   }
 
@@ -224,6 +233,22 @@ class OiMaintenancePage extends StatefulWidget {
 
   /// Maximum width of the content area.
   final double maxWidth;
+
+  /// "Returning in 2h 5m", or "Back any moment now..." once the time is up:
+  /// the default [countdownLabel].
+  static String englishCountdown(Duration remaining) {
+    if (remaining <= Duration.zero) return 'Back any moment now...';
+    final hours = remaining.inHours;
+    final minutes = remaining.inMinutes.remainder(60);
+    final seconds = remaining.inSeconds.remainder(60);
+    return hours > 0
+        ? 'Returning in ${hours}h ${minutes}m'
+        : 'Returning in ${minutes}m ${seconds}s';
+  }
+
+  /// The countdown text, by the time remaining until [estimatedReturn]; pass
+  /// a translation to localize it.
+  final String Function(Duration remaining) countdownLabel;
 
   @override
   State<OiMaintenancePage> createState() => _OiMaintenancePageState();
@@ -361,20 +386,7 @@ class _OiMaintenancePageState extends State<OiMaintenancePage> {
     final colors = context.colors;
     final sp = context.spacing;
 
-    final String text;
-    if (_remaining <= Duration.zero) {
-      text = 'Back any moment now...';
-    } else {
-      final hours = _remaining.inHours;
-      final minutes = _remaining.inMinutes.remainder(60);
-      final seconds = _remaining.inSeconds.remainder(60);
-
-      if (hours > 0) {
-        text = 'Returning in ${hours}h ${minutes}m';
-      } else {
-        text = 'Returning in ${minutes}m ${seconds}s';
-      }
-    }
+    final text = widget.countdownLabel(_remaining);
 
     return Row(
       mainAxisSize: MainAxisSize.min,

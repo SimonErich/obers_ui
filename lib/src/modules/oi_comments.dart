@@ -62,6 +62,9 @@ class OiComments extends StatefulWidget {
     required this.comments,
     required this.currentUserId,
     required this.label,
+    this.formatTimestamp = englishFormatTimestamp,
+    this.postLabel = 'Post',
+    this.postSemanticLabel = 'Post comment',
     super.key,
     this.onComment,
     this.onReply,
@@ -120,6 +123,24 @@ class OiComments extends StatefulWidget {
   /// Provide this to request focus from a parent widget.
   final FocusNode? inputFocusNode;
 
+  /// "Just now", "5m ago", "3h ago", "2d ago": the default [formatTimestamp].
+  static String englishFormatTimestamp(DateTime dt) {
+    final diff = DateTime.now().difference(dt);
+    if (diff.inMinutes < 1) return 'Just now';
+    if (diff.inMinutes < 60) return '${diff.inMinutes}m ago';
+    if (diff.inHours < 24) return '${diff.inHours}h ago';
+    return '${diff.inDays}d ago';
+  }
+
+  /// Formats the timestamps; pass a translation to localize them.
+  final String Function(DateTime timestamp) formatTimestamp;
+
+  /// Label of the post button.
+  final String postLabel;
+
+  /// Screen-reader label of the post button.
+  final String postSemanticLabel;
+
   @override
   State<OiComments> createState() => _OiCommentsState();
 }
@@ -142,14 +163,7 @@ class _OiCommentsState extends State<OiComments> {
     _controller.clear();
   }
 
-  String _formatTimestamp(DateTime dt) {
-    final now = DateTime.now();
-    final diff = now.difference(dt);
-    if (diff.inMinutes < 1) return 'Just now';
-    if (diff.inMinutes < 60) return '${diff.inMinutes}m ago';
-    if (diff.inHours < 24) return '${diff.inHours}h ago';
-    return '${diff.inDays}d ago';
-  }
+  String _formatTimestamp(DateTime dt) => widget.formatTimestamp(dt);
 
   // ---------------------------------------------------------------------------
   // Build
@@ -205,7 +219,7 @@ class _OiCommentsState extends State<OiComments> {
                 GestureDetector(
                   onTap: _handleSubmit,
                   child: Semantics(
-                    label: 'Post comment',
+                    label: widget.postSemanticLabel,
                     button: true,
                     child: Container(
                       padding: EdgeInsets.all(spacing.sm),
@@ -214,7 +228,7 @@ class _OiCommentsState extends State<OiComments> {
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
-                        'Post',
+                        widget.postLabel,
                         style: TextStyle(
                           color: colors.textOnPrimary,
                           fontSize: 14,

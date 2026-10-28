@@ -58,6 +58,29 @@ class OiScheduler extends StatefulWidget {
   const OiScheduler({
     required this.slots,
     required this.label,
+    this.weekdayLabels = const [
+      'Mon',
+      'Tue',
+      'Wed',
+      'Thu',
+      'Fri',
+      'Sat',
+      'Sun',
+    ],
+    this.monthLabels = const [
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December',
+    ],
     super.key,
     this.date,
     this.mode = OiSchedulerMode.day,
@@ -91,6 +114,14 @@ class OiScheduler extends StatefulWidget {
 
   /// Called when an empty time cell is tapped.
   final ValueChanged<DateTime>? onTimeSlotTap;
+
+  /// Weekday abbreviations indexed 0–6 (Monday–Sunday); pass translations to
+  /// localize the day headers.
+  final List<String> weekdayLabels;
+
+  /// Month names indexed 0–11 (January–December); pass translations to
+  /// localize the header title.
+  final List<String> monthLabels;
 
   /// Called when a slot is moved to a new time range.
   final void Function(OiScheduleSlot slot, DateTime start, DateTime end)?
@@ -152,27 +183,14 @@ class _OiSchedulerState extends State<OiScheduler> {
   }
 
   /// The ordered day-of-week headers starting from Monday.
-  static const _dayHeaders = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  List<String> get _dayHeaders => widget.weekdayLabels;
 
   /// The number of hour rows to display.
   int get _hourCount => widget.endHour - widget.startHour;
 
   /// The title for the navigation header.
   String get _headerTitle {
-    const months = [
-      'January',
-      'February',
-      'March',
-      'April',
-      'May',
-      'June',
-      'July',
-      'August',
-      'September',
-      'October',
-      'November',
-      'December',
-    ];
+    final months = widget.monthLabels;
     switch (_mode) {
       case OiSchedulerMode.day:
         final m = months[_focusDate.month - 1];

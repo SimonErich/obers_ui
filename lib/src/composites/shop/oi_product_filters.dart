@@ -104,6 +104,36 @@ const Map<String, ({String symbol, _CurrencyPosition position})> _currencyMap =
       'CHF': (symbol: 'CHF', position: _CurrencyPosition.before),
     };
 
+/// The texts of an [OiProductFilters], in English by default; pass
+/// translations to localize the filters.
+///
+/// {@category Composites}
+class OiProductFiltersLabels {
+  /// Creates an [OiProductFiltersLabels].
+  const OiProductFiltersLabels({
+    this.priceRange = 'Price Range',
+    this.category = 'Category',
+    this.minimumRating = 'Minimum Rating',
+    this.anyRating = 'Any',
+    this.inStockOnly = 'In Stock Only',
+  });
+
+  /// Heading of the price filter.
+  final String priceRange;
+
+  /// Heading of the category filter.
+  final String category;
+
+  /// Heading of the rating filter.
+  final String minimumRating;
+
+  /// Shown by the rating filter while no minimum is set.
+  final String anyRating;
+
+  /// Label of the in-stock switch.
+  final String inStockOnly;
+}
+
 /// A filter panel for product listings with price range, category checkboxes,
 /// rating filter, and in-stock toggle.
 ///
@@ -124,6 +154,7 @@ class OiProductFilters extends StatefulWidget {
     this.currencyCode = 'EUR',
     this.priceRangeMin = 0,
     this.priceRangeMax = 1000,
+    this.labels = const OiProductFiltersLabels(),
     super.key,
   });
 
@@ -147,6 +178,9 @@ class OiProductFilters extends StatefulWidget {
 
   /// Maximum value for the price range slider.
   final double priceRangeMax;
+
+  /// The filters' texts; pass translations to localize them.
+  final OiProductFiltersLabels labels;
 
   @override
   State<OiProductFilters> createState() => _OiProductFiltersState();
@@ -188,7 +222,7 @@ class _OiProductFiltersState extends State<OiProductFilters> {
       gap: OiResponsive(sp.xs),
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSectionLabel(context, 'Price Range'),
+        _buildSectionLabel(context, widget.labels.priceRange),
         OiRow(
           breakpoint: breakpoint,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -221,7 +255,7 @@ class _OiProductFiltersState extends State<OiProductFilters> {
       gap: OiResponsive(sp.xs),
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSectionLabel(context, 'Category'),
+        _buildSectionLabel(context, widget.labels.category),
         ...widget.availableCategories.map((category) {
           final selected = _data.categories.contains(category);
           return OiCheckbox(
@@ -252,7 +286,7 @@ class _OiProductFiltersState extends State<OiProductFilters> {
       gap: OiResponsive(sp.xs),
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSectionLabel(context, 'Minimum Rating'),
+        _buildSectionLabel(context, widget.labels.minimumRating),
         OiRow(
           breakpoint: breakpoint,
           gap: OiResponsive(sp.xs),
@@ -273,7 +307,7 @@ class _OiProductFiltersState extends State<OiProductFilters> {
               child: OiLabel.small(
                 currentRating > 0
                     ? '${currentRating.toStringAsFixed(0)}+'
-                    : 'Any',
+                    : widget.labels.anyRating,
                 textAlign: TextAlign.end,
               ),
             ),
@@ -286,7 +320,7 @@ class _OiProductFiltersState extends State<OiProductFilters> {
   Widget _buildStockFilter(BuildContext context) {
     return OiSwitch(
       value: _data.inStockOnly,
-      label: 'In Stock Only',
+      label: widget.labels.inStockOnly,
       onChanged: (value) {
         _emit(_data.copyWith(inStockOnly: value));
       },

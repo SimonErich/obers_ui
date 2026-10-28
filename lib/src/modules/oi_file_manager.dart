@@ -99,6 +99,9 @@ class OiFileManager extends StatefulWidget {
     this.settingsDriver,
     this.settingsKey,
     this.settingsNamespace = 'oi_file_explorer',
+    this.rootFolderLabel = 'Home',
+    this.emptyFolderLabel = 'This folder is empty',
+    this.uploadFilesLabel = 'Upload files',
   });
 
   /// The list of files and folders to display.
@@ -166,6 +169,15 @@ class OiFileManager extends StatefulWidget {
 
   /// Top-level namespace for settings storage.
   final String settingsNamespace;
+
+  /// Name of the top folder, shown first in the breadcrumbs.
+  final String rootFolderLabel;
+
+  /// Title of the empty state of an empty folder.
+  final String emptyFolderLabel;
+
+  /// Label of the empty state's upload button.
+  final String uploadFilesLabel;
 
   @override
   State<OiFileManager> createState() => _OiFileManagerState();
@@ -323,10 +335,10 @@ class _OiFileManagerState extends State<OiFileManager>
             child: items.isEmpty
                 ? OiEmptyState(
                     icon: OiIcons.folder,
-                    title: 'This folder is empty',
+                    title: widget.emptyFolderLabel,
                     action: widget.onUpload != null
                         ? OiButton.primary(
-                            label: 'Upload files',
+                            label: widget.uploadFilesLabel,
                             icon: OiIcons.cloudUpload,
                             onTap: () => widget.onUpload?.call(const []),
                           )
@@ -356,7 +368,7 @@ class _OiFileManagerState extends State<OiFileManager>
           GestureDetector(
             onTap: () => widget.onNavigate?.call(const []),
             child: Text(
-              'Home',
+              widget.rootFolderLabel,
               style: TextStyle(color: colors.primary.base, fontSize: 14),
             ),
           ),

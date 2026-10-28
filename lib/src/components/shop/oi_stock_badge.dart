@@ -15,6 +15,37 @@ enum OiStockStatus {
   outOfStock,
 }
 
+/// The texts of an [OiStockBadge], in English by default; pass translations
+/// to localize the badge.
+///
+/// {@category Components}
+class OiStockBadgeLabels {
+  /// Creates an [OiStockBadgeLabels].
+  const OiStockBadgeLabels({
+    this.inStock = englishInStock,
+    this.lowStock = englishLowStock,
+    this.outOfStock = 'Out of Stock',
+  });
+
+  /// "In Stock (12)", or "In Stock" without a count: the default [inStock].
+  static String englishInStock(int? count) =>
+      count != null ? 'In Stock ($count)' : 'In Stock';
+
+  /// "Low Stock (3 left)", or "Low Stock" without a count: the default
+  /// [lowStock].
+  static String englishLowStock(int? count) =>
+      count != null ? 'Low Stock ($count left)' : 'Low Stock';
+
+  /// Shown while in stock, with the remaining count when known.
+  final String Function(int? count) inStock;
+
+  /// Shown while low on stock, with the remaining count when known.
+  final String Function(int? count) lowStock;
+
+  /// Shown while out of stock.
+  final String outOfStock;
+}
+
 /// A badge indicating the stock availability of a product.
 ///
 /// Coverage: REQ-0071
@@ -33,6 +64,7 @@ class OiStockBadge extends StatelessWidget {
     required this.status,
     required this.label,
     this.count,
+    this.labels = const OiStockBadgeLabels(),
     super.key,
   });
 
@@ -45,6 +77,7 @@ class OiStockBadge extends StatelessWidget {
     required int? stockCount,
     required String label,
     int lowStockThreshold = 5,
+    OiStockBadgeLabels labels = const OiStockBadgeLabels(),
     Key? key,
   }) {
     final OiStockStatus resolvedStatus;
@@ -61,6 +94,7 @@ class OiStockBadge extends StatelessWidget {
       status: resolvedStatus,
       label: label,
       count: stockCount,
+      labels: labels,
       key: key,
     );
   }
@@ -74,14 +108,17 @@ class OiStockBadge extends StatelessWidget {
   /// Optional remaining item count shown alongside the status text.
   final int? count;
 
+  /// The badge's texts; pass translations to localize it.
+  final OiStockBadgeLabels labels;
+
   String get _statusText {
     switch (status) {
       case OiStockStatus.inStock:
-        return count != null ? 'In Stock ($count)' : 'In Stock';
+        return labels.inStock(count);
       case OiStockStatus.lowStock:
-        return count != null ? 'Low Stock ($count left)' : 'Low Stock';
+        return labels.lowStock(count);
       case OiStockStatus.outOfStock:
-        return 'Out of Stock';
+        return labels.outOfStock;
     }
   }
 

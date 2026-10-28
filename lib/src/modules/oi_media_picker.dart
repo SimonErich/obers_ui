@@ -120,6 +120,15 @@ class OiMediaPicker extends StatefulWidget {
     this.galleryItems = const [],
     this.onLoadMoreGallery,
     this.moreGalleryAvailable = false,
+    this.sourceLabel = englishSource,
+    this.emptyTitle = 'No media available',
+    this.emptyDescription = 'There are no gallery items to display.',
+    this.loadMoreLabel = 'Load more',
+    this.loadMoreSemanticLabel = 'Load more gallery items',
+    this.browseFilesLabel = 'Browse Files',
+    this.browseFilesSemanticLabel = 'Browse files to upload',
+    this.dropHint = 'or drag and drop files here',
+    this.selectedCountLabel = englishSelectedCount,
     super.key,
   });
 
@@ -158,6 +167,43 @@ class OiMediaPicker extends StatefulWidget {
 
   /// Whether more gallery items are available to load.
   final bool moreGalleryAvailable;
+
+  /// "Gallery", "Files": the default [sourceLabel].
+  static String englishSource(OiMediaSource source) => switch (source) {
+    OiMediaSource.gallery => 'Gallery',
+    OiMediaSource.files => 'Files',
+  };
+
+  /// "2/5 selected": the default [selectedCountLabel].
+  static String englishSelectedCount(int count, int max) =>
+      '$count/$max selected';
+
+  /// Names a media source tab.
+  final String Function(OiMediaSource source) sourceLabel;
+
+  /// Title shown while the gallery is empty.
+  final String emptyTitle;
+
+  /// Description shown while the gallery is empty.
+  final String emptyDescription;
+
+  /// Label of the load more button.
+  final String loadMoreLabel;
+
+  /// Screen-reader label of the load more button.
+  final String loadMoreSemanticLabel;
+
+  /// Label of the browse button.
+  final String browseFilesLabel;
+
+  /// Screen-reader label of the browse button.
+  final String browseFilesSemanticLabel;
+
+  /// Hint below the browse button.
+  final String dropHint;
+
+  /// Shown while items are selected, by their number and the maximum.
+  final String Function(int count, int max) selectedCountLabel;
 
   @override
   State<OiMediaPicker> createState() => _OiMediaPickerState();
@@ -284,10 +330,7 @@ class _OiMediaPickerState extends State<OiMediaPicker> {
   }
 
   String _sourceLabel(OiMediaSource source) {
-    return switch (source) {
-      OiMediaSource.gallery => 'Gallery',
-      OiMediaSource.files => 'Files',
-    };
+    return widget.sourceLabel(source);
   }
 
   Widget _buildActiveContent(BuildContext context) {
@@ -305,10 +348,10 @@ class _OiMediaPickerState extends State<OiMediaPicker> {
     final spacing = context.spacing;
 
     if (widget.galleryItems.isEmpty) {
-      return const OiEmptyState(
-        title: 'No media available',
+      return OiEmptyState(
+        title: widget.emptyTitle,
         icon: OiIcons.images,
-        description: 'There are no gallery items to display.',
+        description: widget.emptyDescription,
       );
     }
 
@@ -334,9 +377,9 @@ class _OiMediaPickerState extends State<OiMediaPicker> {
             child: Padding(
               padding: EdgeInsets.symmetric(vertical: spacing.md),
               child: OiButton.ghost(
-                label: 'Load more',
+                label: widget.loadMoreLabel,
                 icon: OiIcons.plus,
-                semanticLabel: 'Load more gallery items',
+                semanticLabel: widget.loadMoreSemanticLabel,
                 onTap: widget.onLoadMoreGallery != null
                     ? () => widget.onLoadMoreGallery!()
                     : null,
@@ -447,15 +490,15 @@ class _OiMediaPickerState extends State<OiMediaPicker> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               OiButton.primary(
-                label: 'Browse Files',
+                label: widget.browseFilesLabel,
                 icon: OiIcons.file,
-                semanticLabel: 'Browse files to upload',
+                semanticLabel: widget.browseFilesSemanticLabel,
                 onTap: widget.onSelect != null ? () {} : null,
               ),
             ],
           ),
           SizedBox(height: spacing.sm),
-          OiLabel.small('or drag and drop files here', color: colors.textMuted),
+          OiLabel.small(widget.dropHint, color: colors.textMuted),
           if (widget.maxFileSize != null) ...[
             SizedBox(height: spacing.xs),
             OiLabel.caption(
@@ -488,7 +531,7 @@ class _OiMediaPickerState extends State<OiMediaPicker> {
           Padding(
             padding: EdgeInsets.only(bottom: spacing.xs),
             child: OiLabel.small(
-              '${selectedItems.length}/${widget.maxItems} selected',
+              widget.selectedCountLabel(selectedItems.length, widget.maxItems),
               color: colors.textMuted,
             ),
           ),

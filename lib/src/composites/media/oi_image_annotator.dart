@@ -69,6 +69,7 @@ class OiImageAnnotator extends StatefulWidget {
   const OiImageAnnotator({
     required this.image,
     required this.label,
+    this.toolLabel = englishTool,
     super.key,
     this.annotations = const [],
     this.onAnnotationsChange,
@@ -106,6 +107,18 @@ class OiImageAnnotator extends StatefulWidget {
   /// Whether annotations are read-only (no drawing allowed).
   final bool readOnly;
 
+  /// "Draw", "Rect", "Circle", "Arrow", "Text": the default [toolLabel].
+  static String englishTool(OiAnnotationType tool) => switch (tool) {
+    OiAnnotationType.freehand => 'Draw',
+    OiAnnotationType.rectangle => 'Rect',
+    OiAnnotationType.circle => 'Circle',
+    OiAnnotationType.arrow => 'Arrow',
+    OiAnnotationType.text => 'Text',
+  };
+
+  /// Names an annotation tool.
+  final String Function(OiAnnotationType tool) toolLabel;
+
   @override
   State<OiImageAnnotator> createState() => _OiImageAnnotatorState();
 }
@@ -116,14 +129,6 @@ class _OiImageAnnotatorState extends State<OiImageAnnotator> {
   OiAnnotationType? _hoveredTool;
 
   // ── Tool labels ─────────────────────────────────────────────────────────
-
-  static const Map<OiAnnotationType, String> _toolLabels = {
-    OiAnnotationType.freehand: 'Draw',
-    OiAnnotationType.rectangle: 'Rect',
-    OiAnnotationType.circle: 'Circle',
-    OiAnnotationType.arrow: 'Arrow',
-    OiAnnotationType.text: 'Text',
-  };
 
   // ── Drawing handlers ────────────────────────────────────────────────────
 
@@ -254,7 +259,7 @@ class _OiImageAnnotatorState extends State<OiImageAnnotator> {
                       borderRadius: BorderRadius.circular(4),
                     ),
                     child: Text(
-                      _toolLabels[tool]!,
+                      widget.toolLabel(tool),
                       style: TextStyle(
                         color: widget.selectedTool == tool
                             ? colors.textOnPrimary

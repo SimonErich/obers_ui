@@ -9,6 +9,7 @@ import 'package:obers_ui/src/models/oi_file_explorer_controller.dart';
 import 'package:obers_ui/src/models/oi_file_node_data.dart';
 import 'package:obers_ui/src/models/settings/oi_file_explorer_settings.dart';
 import 'package:obers_ui/src/modules/oi_file_explorer.dart';
+import 'package:obers_ui/src/modules/oi_file_explorer_labels.dart';
 
 import '../../helpers/pump_app.dart';
 
@@ -73,6 +74,7 @@ Widget _explorer({
   bool enableKeyboardShortcuts = false,
   List<OiQuickAccessItem>? quickAccess,
   OiStorageData? storage,
+  OiFileExplorerLabels labels = const OiFileExplorerLabels(),
 }) {
   return SizedBox(
     width: 1400,
@@ -101,6 +103,7 @@ Widget _explorer({
       enableKeyboardShortcuts: enableKeyboardShortcuts,
       quickAccess: quickAccess,
       storage: storage,
+      labels: labels,
     ),
   );
 }
@@ -586,6 +589,37 @@ void main() {
         ),
         findsOneWidget,
       );
+    });
+
+    testWidgets('renders the given labels, including nested ones', (
+      tester,
+    ) async {
+      await _pumpExplorer(
+        tester,
+        _explorer(
+          labels: const OiFileExplorerLabels(
+            listView: 'Liste',
+            listViewLabels: OiFileListViewLabels(size: 'Größe'),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('Liste'), findsWidgets);
+      expect(find.textContaining('Größe'), findsOneWidget);
+    });
+
+    testWidgets('renders the given empty folder label', (tester) async {
+      await _pumpExplorer(
+        tester,
+        _explorer(
+          loadFolder: (_) async => [],
+          labels: const OiFileExplorerLabels(
+            emptyFolder: 'Dieser Ordner ist leer',
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('Dieser Ordner ist leer'), findsOneWidget);
     });
   });
 }

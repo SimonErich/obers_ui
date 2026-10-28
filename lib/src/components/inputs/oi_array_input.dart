@@ -35,6 +35,9 @@ class OiArrayInput<T> extends StatefulWidget {
     this.minItems,
     this.maxItems,
     this.addLabel = 'Add',
+    this.reorderLabel = 'Drag to reorder',
+    this.removeLabel = 'Remove',
+    this.errorLabel = 'Error',
     super.key,
   });
 
@@ -83,6 +86,15 @@ class OiArrayInput<T> extends StatefulWidget {
 
   /// Label for the Add button. Defaults to `'Add'`.
   final String addLabel;
+
+  /// Screen-reader label of an item's drag handle.
+  final String reorderLabel;
+
+  /// Screen-reader label of an item's remove button.
+  final String removeLabel;
+
+  /// Screen-reader label of an item's error.
+  final String errorLabel;
 
   @override
   State<OiArrayInput<T>> createState() => _OiArrayInputState<T>();
@@ -182,7 +194,7 @@ class _OiArrayInputState<T> extends State<OiArrayInput<T>> {
             padding: const EdgeInsets.only(right: 4, top: 4),
             child: OiIcon(
               icon: OiIcons.ellipsisVertical,
-              label: 'Drag to reorder',
+              label: widget.reorderLabel,
               size: 20,
               color: colors.textMuted,
             ),
@@ -192,7 +204,7 @@ class _OiArrayInputState<T> extends State<OiArrayInput<T>> {
           Padding(
             padding: const EdgeInsets.only(left: 4),
             child: OiButton.ghost(
-              label: 'Remove',
+              label: widget.removeLabel,
               icon: OiIcons.x,
               size: OiButtonSize.small,
               onTap: () => _handleRemove(index),
@@ -311,7 +323,7 @@ class _OiArrayInputState<T> extends State<OiArrayInput<T>> {
               children: [
                 OiIcon(
                   icon: OiIcons.circleAlert,
-                  label: 'Error',
+                  label: widget.errorLabel,
                   size: 14,
                   color: colors.error.base,
                 ),

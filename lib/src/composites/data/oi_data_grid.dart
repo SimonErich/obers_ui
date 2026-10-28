@@ -175,6 +175,8 @@ class OiDataGrid<T> extends StatelessWidget {
     this.emptyState,
     this.loading = false,
     this.semanticLabel,
+    this.selectAllLabel = 'Select all',
+    this.emptyLabel = 'No data',
     super.key,
   });
 
@@ -235,6 +237,12 @@ class OiDataGrid<T> extends StatelessWidget {
 
   /// Accessibility label for the data grid.
   final String? semanticLabel;
+
+  /// Screen-reader label of the select all checkbox.
+  final String selectAllLabel;
+
+  /// Shown while there are no rows.
+  final String emptyLabel;
 
   // ── Helpers ──────────────────────────────────────────────────────────────
 
@@ -311,7 +319,7 @@ class OiDataGrid<T> extends StatelessWidget {
             child: OiCheckbox(
               value: _allSelected ? true : (_someSelected ? null : false),
               onChanged: (_) => _toggleAll(),
-              label: 'Select all',
+              label: selectAllLabel,
             ),
           ),
         ),
@@ -517,7 +525,7 @@ class OiDataGrid<T> extends StatelessWidget {
       child:
           emptyState ??
           OiLabel.body(
-            'No data',
+            emptyLabel,
             color: colors.textMuted,
           ),
     );

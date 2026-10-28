@@ -65,6 +65,11 @@ class OiImageCropper extends StatefulWidget {
     this.aspectRatioOptions,
     this.enableRotate = true,
     this.enableFlip = true,
+    this.rotateLabel = 'Rotate image',
+    this.flipHorizontalLabel = 'Flip horizontal',
+    this.flipVerticalLabel = 'Flip vertical',
+    this.confirmLabel = 'Crop',
+    this.confirmSemanticLabel = 'Confirm crop',
     super.key,
   });
 
@@ -89,6 +94,21 @@ class OiImageCropper extends StatefulWidget {
 
   /// Semantic label for the cropper widget.
   final String label;
+
+  /// Screen-reader label of the rotate button.
+  final String rotateLabel;
+
+  /// Screen-reader label of the horizontal flip button.
+  final String flipHorizontalLabel;
+
+  /// Screen-reader label of the vertical flip button.
+  final String flipVerticalLabel;
+
+  /// Label of the confirm button.
+  final String confirmLabel;
+
+  /// Screen-reader label of the confirm button.
+  final String confirmSemanticLabel;
 
   @override
   State<OiImageCropper> createState() => _OiImageCropperState();
@@ -284,7 +304,7 @@ class _OiImageCropperState extends State<OiImageCropper> {
                       key: const Key('oi_image_cropper_rotate'),
                       onTap: _rotate,
                       child: Semantics(
-                        label: 'Rotate image',
+                        label: widget.rotateLabel,
                         button: true,
                         child: Container(
                           width: 40,
@@ -316,7 +336,7 @@ class _OiImageCropperState extends State<OiImageCropper> {
                       key: const Key('oi_image_cropper_flip_h'),
                       onTap: _flipHorizontal,
                       child: Semantics(
-                        label: 'Flip horizontal',
+                        label: widget.flipHorizontalLabel,
                         button: true,
                         child: Container(
                           width: 40,
@@ -347,7 +367,7 @@ class _OiImageCropperState extends State<OiImageCropper> {
                       key: const Key('oi_image_cropper_flip_v'),
                       onTap: _flipVertical,
                       child: Semantics(
-                        label: 'Flip vertical',
+                        label: widget.flipVerticalLabel,
                         button: true,
                         child: Container(
                           width: 40,
@@ -438,7 +458,7 @@ class _OiImageCropperState extends State<OiImageCropper> {
                     key: const Key('oi_image_cropper_confirm'),
                     onTap: _onConfirm,
                     child: Semantics(
-                      label: 'Confirm crop',
+                      label: widget.confirmSemanticLabel,
                       button: true,
                       child: Container(
                         padding: const EdgeInsets.symmetric(
@@ -452,7 +472,7 @@ class _OiImageCropperState extends State<OiImageCropper> {
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(
-                          'Crop',
+                          widget.confirmLabel,
                           style: textTheme.body.copyWith(
                             color: colors.textOnPrimary,
                           ),

@@ -17,6 +17,51 @@ import 'package:obers_ui/src/primitives/layout/oi_column.dart';
 // Material Icons codepoints.
 const IconData _kCartIcon = OiIcons.shoppingCart;
 
+/// The texts of an [OiCartPanel], in English by default; pass translations
+/// to localize the panel.
+///
+/// {@category Composites}
+class OiCartPanelLabels {
+  /// Creates an [OiCartPanelLabels].
+  const OiCartPanelLabels({
+    this.title = englishTitle,
+    this.couponCode = 'Coupon code',
+    this.continueShopping = 'Continue Shopping',
+    this.emptyTitle = 'Your cart is empty',
+    this.emptyDescription = 'Add items to your cart to get started.',
+    this.totals = const OiOrderTotalsLabels(),
+    this.itemRow = const OiCartItemRowLabels(),
+    this.coupon = const OiCouponInputLabels(),
+  });
+
+  /// "Shopping Cart (3)": the default [title].
+  static String englishTitle(int count) => 'Shopping Cart ($count)';
+
+  /// Heading of the panel, by the number of items.
+  final String Function(int count) title;
+
+  /// Screen-reader label of the coupon input.
+  final String couponCode;
+
+  /// Label of the continue shopping buttons.
+  final String continueShopping;
+
+  /// Title of the empty state.
+  final String emptyTitle;
+
+  /// Description of the empty state.
+  final String emptyDescription;
+
+  /// The labels of the totals rows.
+  final OiOrderTotalsLabels totals;
+
+  /// The texts of each item row.
+  final OiCartItemRowLabels itemRow;
+
+  /// The texts of the coupon input.
+  final OiCouponInputLabels coupon;
+}
+
 /// A full shopping cart view with item list, optional coupon input, order
 /// summary lines, checkout button, and continue-shopping link.
 ///
@@ -45,6 +90,7 @@ class OiCartPanel extends StatelessWidget {
     this.checkoutLabel = 'Proceed to Checkout',
     this.currencyCode = 'EUR',
     this.loading = false,
+    this.labels = const OiCartPanelLabels(),
     super.key,
   });
 
@@ -93,6 +139,9 @@ class OiCartPanel extends StatelessWidget {
   /// Defaults to `false`.
   final bool loading;
 
+  /// The panel's texts; pass translations to localize it.
+  final OiCartPanelLabels labels;
+
   Widget _buildItemList(BuildContext context) {
     final breakpoint = context.breakpoint;
     final sp = context.spacing;
@@ -106,6 +155,7 @@ class OiCartPanel extends StatelessWidget {
             item: item,
             label: '${item.name} × ${item.quantity}',
             currencyCode: currencyCode,
+            labels: labels.itemRow,
             onQuantityChange: onQuantityChange != null
                 ? (qty) => onQuantityChange!((
                     productKey: item.productKey,
@@ -122,7 +172,8 @@ class OiCartPanel extends StatelessWidget {
 
   Widget _buildCouponSection(BuildContext context) {
     return OiCouponInput(
-      label: 'Coupon code',
+      label: labels.couponCode,
+      labels: labels.coupon,
       onApply: onApplyCoupon!,
       onRemove: onRemoveCoupon,
       appliedCode: appliedCouponCode,
@@ -139,40 +190,45 @@ class OiCartPanel extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         OiOrderSummaryLine(
-          label: 'Subtotal',
+          label: labels.totals.subtotal,
           amount: summary.subtotal,
           currencyCode: currencyCode,
           loading: loading,
+          loadingLabel: labels.totals.loading,
         ),
         if (summary.discount != null)
           OiOrderSummaryLine(
-            label: summary.discountLabel ?? 'Discount',
+            label: summary.discountLabel ?? labels.totals.discount,
             amount: summary.discount!,
             currencyCode: currencyCode,
             negative: true,
             loading: loading,
+            loadingLabel: labels.totals.loading,
           ),
         if (summary.shipping != null)
           OiOrderSummaryLine(
-            label: summary.shippingLabel ?? 'Shipping',
+            label: summary.shippingLabel ?? labels.totals.shipping,
             amount: summary.shipping!,
             currencyCode: currencyCode,
             loading: loading,
+            loadingLabel: labels.totals.loading,
           ),
         if (summary.tax != null)
           OiOrderSummaryLine(
-            label: summary.taxLabel ?? 'Tax',
+            label: summary.taxLabel ?? labels.totals.tax,
             amount: summary.tax!,
             currencyCode: currencyCode,
             loading: loading,
+            loadingLabel: labels.totals.loading,
           ),
         const OiDivider(),
         OiOrderSummaryLine(
-          label: 'Total',
+          label: labels.totals.total,
           amount: summary.total,
           currencyCode: currencyCode,
           bold: true,
           loading: loading,
+          loadingLabel: labels.totals.loading,
         ),
       ],
     );
@@ -195,9 +251,9 @@ class OiCartPanel extends StatelessWidget {
         ),
         if (onContinueShopping != null)
           OiButton.ghost(
-            label: 'Continue Shopping',
+            label: labels.continueShopping,
             onTap: onContinueShopping,
-            semanticLabel: 'Continue Shopping',
+            semanticLabel: labels.continueShopping,
           ),
       ],
     );
@@ -205,14 +261,14 @@ class OiCartPanel extends StatelessWidget {
 
   Widget _buildEmptyState(BuildContext context) {
     return OiEmptyState(
-      title: 'Your cart is empty',
+      title: labels.emptyTitle,
       icon: _kCartIcon,
-      description: 'Add items to your cart to get started.',
+      description: labels.emptyDescription,
       action: onContinueShopping != null
           ? OiButton.primary(
-              label: 'Continue Shopping',
+              label: labels.continueShopping,
               onTap: onContinueShopping,
-              semanticLabel: 'Continue Shopping',
+              semanticLabel: labels.continueShopping,
             )
           : null,
     );
@@ -234,7 +290,7 @@ class OiCartPanel extends StatelessWidget {
         gap: OiResponsive(sp.md),
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          OiLabel.bodyStrong('Shopping Cart (${items.length})'),
+          OiLabel.bodyStrong(labels.title(items.length)),
           _buildItemList(context),
           const OiDivider(),
           if (onApplyCoupon != null) _buildCouponSection(context),

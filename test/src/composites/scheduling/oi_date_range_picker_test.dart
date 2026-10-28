@@ -205,4 +205,13 @@ void main() {
       expect(OiDateRangePreset.defaults.length, greaterThanOrEqualTo(6));
     });
   });
+
+  // ── OiDateRangePreset.withLabel ────────────────────────────────────────────
+
+  test('withLabel replaces the label and keeps the range', () {
+    final preset = OiDateRangePreset.today;
+    final translated = preset.withLabel('Heute');
+    expect(translated.label, 'Heute');
+    expect(translated.resolve(), preset.resolve());
+  });
 }

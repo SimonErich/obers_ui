@@ -101,6 +101,56 @@ class OiPricingPlan {
 
 // ── Main Widget ─────────────────────────────────────────────────────────────
 
+/// The texts of an [OiPricingTable], in English by default; pass translations
+/// to localize the pricing table.
+///
+/// {@category Modules}
+class OiPricingTableLabels {
+  /// Creates an [OiPricingTableLabels].
+  const OiPricingTableLabels({
+    this.monthly = 'Monthly',
+    this.yearly = 'Yearly',
+    this.billingCycle = 'Billing cycle',
+    this.perMonth = '/mo',
+    this.recommended = 'Recommended',
+    this.currentPlan = 'Current Plan',
+    this.contactSales = 'Contact Sales',
+    this.featureComparison = 'Feature Comparison',
+    this.included = 'Included',
+    this.notIncluded = 'Not included',
+  });
+
+  /// Label of the monthly option of the billing cycle switch.
+  final String monthly;
+
+  /// Label of the yearly option of the billing cycle switch.
+  final String yearly;
+
+  /// Screen-reader label of the billing cycle switch.
+  final String billingCycle;
+
+  /// Suffix of the prices.
+  final String perMonth;
+
+  /// Badge of the recommended plan, unless it has a badge of its own.
+  final String recommended;
+
+  /// Badge and button label of the current plan.
+  final String currentPlan;
+
+  /// Shown in place of the price of a plan that needs contacting sales.
+  final String contactSales;
+
+  /// Heading of the feature matrix.
+  final String featureComparison;
+
+  /// Screen-reader label of an included feature.
+  final String included;
+
+  /// Screen-reader label of a feature that is not included.
+  final String notIncluded;
+}
+
 /// A pricing plan comparison table with feature matrix, billing cycle
 /// toggle, and recommended plan highlighting.
 ///
@@ -120,6 +170,7 @@ class OiPricingTable extends StatefulWidget {
     this.showFeatureMatrix = true,
     this.maxWidth = 1200,
     this.mobileBreakpoint = OiBreakpoint.expanded,
+    this.labels = const OiPricingTableLabels(),
     super.key,
   });
 
@@ -158,6 +209,9 @@ class OiPricingTable extends StatefulWidget {
 
   /// Breakpoint below which mobile layout is used.
   final OiBreakpoint mobileBreakpoint;
+
+  /// The table's texts; pass translations to localize it.
+  final OiPricingTableLabels labels;
 
   @override
   State<OiPricingTable> createState() => _OiPricingTableState();
@@ -247,19 +301,19 @@ class _OiPricingTableState extends State<OiPricingTable> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         OiSegmentedControl<OiBillingCycle>(
-          segments: const [
+          segments: [
             OiSegment<OiBillingCycle>(
               value: OiBillingCycle.monthly,
-              label: 'Monthly',
+              label: widget.labels.monthly,
             ),
             OiSegment<OiBillingCycle>(
               value: OiBillingCycle.yearly,
-              label: 'Yearly',
+              label: widget.labels.yearly,
             ),
           ],
           selected: _billingCycle,
           onChanged: _toggleBillingCycle,
-          semanticLabel: 'Billing cycle',
+          semanticLabel: widget.labels.billingCycle,
         ),
         if (widget.yearlyDiscount != null) ...[
           SizedBox(width: sp.sm),
@@ -336,7 +390,7 @@ class _OiPricingTableState extends State<OiPricingTable> {
                 Expanded(child: OiLabel.h4(plan.name)),
                 if (isRecommended)
                   OiBadge.filled(
-                    label: plan.badge ?? 'Recommended',
+                    label: plan.badge ?? widget.labels.recommended,
                     size: OiBadgeSize.small,
                   )
                 else if (plan.badge != null)
@@ -345,10 +399,10 @@ class _OiPricingTableState extends State<OiPricingTable> {
             ),
             if (plan.currentPlan) ...[
               SizedBox(height: sp.xs),
-              const Align(
+              Align(
                 alignment: AlignmentDirectional.centerStart,
                 child: OiBadge.outline(
-                  label: 'Current Plan',
+                  label: widget.labels.currentPlan,
                   color: OiBadgeColor.info,
                   size: OiBadgeSize.small,
                 ),
@@ -394,7 +448,9 @@ class _OiPricingTableState extends State<OiPricingTable> {
             // CTA Button
             if (isRecommended)
               OiButton.primary(
-                label: plan.currentPlan ? 'Current Plan' : plan.ctaLabel,
+                label: plan.currentPlan
+                    ? widget.labels.currentPlan
+                    : plan.ctaLabel,
                 onTap: plan.currentPlan
                     ? null
                     : () => widget.onPlanSelect?.call(plan, _billingCycle),
@@ -403,7 +459,9 @@ class _OiPricingTableState extends State<OiPricingTable> {
               )
             else
               OiButton.secondary(
-                label: plan.currentPlan ? 'Current Plan' : plan.ctaLabel,
+                label: plan.currentPlan
+                    ? widget.labels.currentPlan
+                    : plan.ctaLabel,
                 onTap: plan.currentPlan
                     ? null
                     : () => widget.onPlanSelect?.call(plan, _billingCycle),
@@ -423,7 +481,7 @@ class _OiPricingTableState extends State<OiPricingTable> {
     final sp = context.spacing;
 
     if (plan.contactSales) {
-      return const OiLabel.h2('Contact Sales');
+      return OiLabel.h2(widget.labels.contactSales);
     }
 
     final double price;
@@ -436,10 +494,10 @@ class _OiPricingTableState extends State<OiPricingTable> {
       } else {
         price = plan.monthlyPrice;
       }
-      suffix = '/mo';
+      suffix = widget.labels.perMonth;
     } else {
       price = plan.monthlyPrice;
-      suffix = '/mo';
+      suffix = widget.labels.perMonth;
     }
 
     // Format price: remove trailing zeros.
@@ -470,7 +528,7 @@ class _OiPricingTableState extends State<OiPricingTable> {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const OiLabel.h3('Feature Comparison'),
+        OiLabel.h3(widget.labels.featureComparison),
         SizedBox(height: sp.md),
 
         // Header row
@@ -553,7 +611,7 @@ class _OiPricingTableState extends State<OiPricingTable> {
 
     if (value == true) {
       return Semantics(
-        label: 'Included',
+        label: widget.labels.included,
         child: OiIcon.decorative(
           icon: OiIcons.check,
           size: 16,
@@ -564,7 +622,7 @@ class _OiPricingTableState extends State<OiPricingTable> {
 
     if (value == false || value == null) {
       return Semantics(
-        label: 'Not included',
+        label: widget.labels.notIncluded,
         child: OiIcon.decorative(
           icon: OiIcons.x,
           size: 16,

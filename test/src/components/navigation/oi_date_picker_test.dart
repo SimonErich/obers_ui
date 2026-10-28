@@ -83,4 +83,54 @@ void main() {
     expect(rs?.day, 5);
     expect(re?.day, 10);
   });
+
+  // ── Labels ─────────────────────────────────────────────────────────────────
+
+  const germanLabels = OiDatePickerLabels(
+    months: [
+      'Januar',
+      'Februar',
+      'März',
+      'April',
+      'Mai',
+      'Juni',
+      'Juli',
+      'August',
+      'September',
+      'Oktober',
+      'November',
+      'Dezember',
+    ],
+    weekdays: ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'],
+    previousMonth: 'Vorheriger Monat',
+    nextMonth: 'Nächster Monat',
+    cancel: 'Abbrechen',
+    confirm: 'Übernehmen',
+  );
+
+  testWidgets('renders the given month and weekday labels', (tester) async {
+    await tester.pumpObers(
+      OiDatePicker(value: DateTime(2024, 3, 15), labels: germanLabels),
+    );
+    expect(find.text('März 2024'), findsOneWidget);
+    expect(find.text('Di'), findsOneWidget);
+    expect(find.text('So'), findsOneWidget);
+  });
+
+  testWidgets('labels the month arrows for screen readers', (tester) async {
+    await tester.pumpObers(const OiDatePicker(labels: germanLabels));
+    expect(find.bySemanticsLabel('Vorheriger Monat'), findsOneWidget);
+    expect(find.bySemanticsLabel('Nächster Monat'), findsOneWidget);
+  });
+
+  testWidgets('passes its labels on to the month picker', (tester) async {
+    await tester.pumpObers(
+      OiDatePicker(value: DateTime(2024, 3, 15), labels: germanLabels),
+    );
+    await tester.tap(find.text('März 2024'));
+    await tester.pumpAndSettle();
+    expect(find.text('Abbrechen'), findsOneWidget);
+    expect(find.text('Übernehmen'), findsOneWidget);
+    expect(find.text('Februar'), findsWidgets);
+  });
 }

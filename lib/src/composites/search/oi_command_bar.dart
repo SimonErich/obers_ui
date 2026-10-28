@@ -72,6 +72,9 @@ class OiCommandBar extends StatefulWidget {
   const OiCommandBar({
     required this.commands,
     required this.label,
+    this.backLabel = 'Back',
+    this.recentLabel = 'Recent',
+    this.noCommandsLabel = 'No commands found',
     super.key,
     this.onDismiss,
     this.showRecent = true,
@@ -100,6 +103,15 @@ class OiCommandBar extends StatefulWidget {
 
   /// Accessibility label for the command bar.
   final String label;
+
+  /// Shown in place of the parent command's name while in a nested list.
+  final String backLabel;
+
+  /// Heading of the recent commands.
+  final String recentLabel;
+
+  /// Shown when no command matches the query.
+  final String noCommandsLabel;
 
   @override
   State<OiCommandBar> createState() => _OiCommandBarState();
@@ -427,7 +439,7 @@ class _OiCommandBarState extends State<OiCommandBar> {
                                 borderRadius: BorderRadius.circular(4),
                               ),
                               child: Text(
-                                _parentLabel ?? 'Back',
+                                _parentLabel ?? widget.backLabel,
                                 style: TextStyle(
                                   fontSize: 12,
                                   color: colors.text,
@@ -505,7 +517,7 @@ class _OiCommandBarState extends State<OiCommandBar> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              _buildCategoryHeader(context, 'Recent'),
+              _buildCategoryHeader(context, widget.recentLabel),
               for (final cmd in _recentCommands)
                 _buildCommandTile(context, cmd),
             ],
@@ -517,7 +529,7 @@ class _OiCommandBarState extends State<OiCommandBar> {
         padding: const EdgeInsets.all(16),
         child: Center(
           child: Text(
-            'No commands found',
+            widget.noCommandsLabel,
             style: TextStyle(color: colors.textMuted, fontSize: 14),
           ),
         ),

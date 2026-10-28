@@ -8,6 +8,44 @@ import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/models/oi_file_node_data.dart';
 import 'package:obers_ui/src/utils/file_utils.dart';
 
+/// The texts of an [OiRenameDialog], in English by default; pass
+/// translations to localize the dialog.
+///
+/// {@category Components}
+class OiRenameDialogLabels {
+  /// Creates an [OiRenameDialogLabels].
+  const OiRenameDialogLabels({
+    this.title = 'Rename',
+    this.nameEmpty = 'Name cannot be empty',
+    this.nameInvalidCharacter = englishNameInvalidCharacter,
+    this.cancel = 'Cancel',
+    this.rename = 'Rename',
+    this.dialog = 'Rename dialog',
+  });
+
+  /// 'Name cannot contain "/"': the default [nameInvalidCharacter].
+  static String englishNameInvalidCharacter(String character) =>
+      'Name cannot contain "$character"';
+
+  /// Title of the dialog.
+  final String title;
+
+  /// Error shown when the name is empty.
+  final String nameEmpty;
+
+  /// Error shown when the name contains a character that is not allowed.
+  final String Function(String character) nameInvalidCharacter;
+
+  /// Label of the cancel button.
+  final String cancel;
+
+  /// Label of the rename button.
+  final String rename;
+
+  /// Screen-reader label of the dialog.
+  final String dialog;
+}
+
 /// A dialog for renaming a file or folder.
 ///
 /// Pre-fills the current name with the filename portion selected (not extension).
@@ -20,6 +58,7 @@ class OiRenameDialog extends StatefulWidget {
     required this.onRename,
     this.onCancel,
     this.validate,
+    this.labels = const OiRenameDialogLabels(),
     super.key,
   });
 
@@ -34,6 +73,9 @@ class OiRenameDialog extends StatefulWidget {
 
   /// Custom validation. Return an error string or null.
   final String? Function(String)? validate;
+
+  /// The dialog's texts; pass translations to localize it.
+  final OiRenameDialogLabels labels;
 
   @override
   State<OiRenameDialog> createState() => _OiRenameDialogState();
@@ -89,9 +131,9 @@ class _OiRenameDialogState extends State<OiRenameDialog> {
   }
 
   String? _validate(String value) {
-    if (value.trim().isEmpty) return 'Name cannot be empty';
+    if (value.trim().isEmpty) return widget.labels.nameEmpty;
     for (final char in OiFileUtils.illegalNameChars) {
-      if (value.contains(char)) return 'Name cannot contain "$char"';
+      if (value.contains(char)) return widget.labels.nameInvalidCharacter(char);
     }
     return widget.validate?.call(value);
   }
@@ -116,7 +158,7 @@ class _OiRenameDialogState extends State<OiRenameDialog> {
     final spacing = context.spacing;
 
     return Semantics(
-      label: 'Rename dialog',
+      label: widget.labels.dialog,
       child: KeyboardListener(
         focusNode: _escapeFocusNode,
         onKeyEvent: (event) {
@@ -143,7 +185,7 @@ class _OiRenameDialogState extends State<OiRenameDialog> {
                     ),
                   SizedBox(width: spacing.sm),
                   Text(
-                    'Rename',
+                    widget.labels.title,
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
@@ -174,10 +216,13 @@ class _OiRenameDialogState extends State<OiRenameDialog> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  OiButton.ghost(label: 'Cancel', onTap: widget.onCancel),
+                  OiButton.ghost(
+                    label: widget.labels.cancel,
+                    onTap: widget.onCancel,
+                  ),
                   SizedBox(width: spacing.sm),
                   OiButton.primary(
-                    label: 'Rename',
+                    label: widget.labels.rename,
                     onTap: _isValid ? _submit : null,
                   ),
                 ],

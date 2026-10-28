@@ -129,6 +129,10 @@ class OiChat extends StatefulWidget {
     required this.messages,
     required this.currentUserId,
     required this.label,
+    this.emptyLabel = 'No messages yet',
+    this.attachFileLabel = 'Attach file',
+    this.sendMessageLabel = 'Send message',
+    this.typingLabel = englishTyping,
     super.key,
     this.onSend,
     this.onAttach,
@@ -201,6 +205,26 @@ class OiChat extends StatefulWidget {
   ///
   /// Only applies when [groupConsecutive] is `true`. Defaults to 2 minutes.
   final Duration consecutiveThreshold;
+
+  /// "Anna is typing...", "Anna and Ben are typing...", "Anna and 3 others
+  /// are typing...": the default [typingLabel].
+  static String englishTyping(List<String> users) {
+    if (users.length == 1) return '${users[0]} is typing...';
+    if (users.length == 2) return '${users[0]} and ${users[1]} are typing...';
+    return '${users[0]} and ${users.length - 1} others are typing...';
+  }
+
+  /// Shown while there are no messages.
+  final String emptyLabel;
+
+  /// Screen-reader label of the attach button.
+  final String attachFileLabel;
+
+  /// Screen-reader label of the send button.
+  final String sendMessageLabel;
+
+  /// Says who is typing, by their names.
+  final String Function(List<String> users) typingLabel;
 
   @override
   State<OiChat> createState() => _OiChatState();
@@ -285,7 +309,7 @@ class _OiChatState extends State<OiChat> {
             child: widget.messages.isEmpty
                 ? Center(
                     child: Text(
-                      'No messages yet',
+                      widget.emptyLabel,
                       style: TextStyle(color: colors.textMuted),
                     ),
                   )
@@ -329,7 +353,7 @@ class _OiChatState extends State<OiChat> {
                       padding: EdgeInsets.only(right: spacing.xs),
                       child: OiIconButton(
                         icon: OiIcons.paperclip,
-                        semanticLabel: 'Attach file',
+                        semanticLabel: widget.attachFileLabel,
                         onTap: _handleAttach,
                       ),
                     ),
@@ -348,7 +372,7 @@ class _OiChatState extends State<OiChat> {
                     child: Semantics(
                       container: true,
                       explicitChildNodes: true,
-                      label: 'Send message',
+                      label: widget.sendMessageLabel,
                       button: true,
                       child: Container(
                         padding: EdgeInsets.all(spacing.sm),
@@ -667,11 +691,7 @@ class _OiChatState extends State<OiChat> {
     );
   }
 
-  String _typingText(List<String> users) {
-    if (users.length == 1) return '${users[0]} is typing...';
-    if (users.length == 2) return '${users[0]} and ${users[1]} are typing...';
-    return '${users[0]} and ${users.length - 1} others are typing...';
-  }
+  String _typingText(List<String> users) => widget.typingLabel(users);
 }
 
 /// A "+" button that opens the full [OiEmojiPicker] in an overlay.

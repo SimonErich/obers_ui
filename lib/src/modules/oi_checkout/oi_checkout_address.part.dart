@@ -43,39 +43,39 @@ extension _OiCheckoutAddress on _OiCheckoutState {
 
     final errors = <String, String?>{};
     if (_shipFirstName.text.isEmpty) {
-      errors['shipFirstName'] = 'First name is required';
+      errors['shipFirstName'] = widget.labels.firstNameRequired;
     }
     if (_shipLastName.text.isEmpty) {
-      errors['shipLastName'] = 'Last name is required';
+      errors['shipLastName'] = widget.labels.lastNameRequired;
     }
     if (_shipAddress1.text.isEmpty) {
-      errors['shipAddress1'] = 'Address is required';
+      errors['shipAddress1'] = widget.labels.addressRequired;
     }
     if (_shipCity.text.isEmpty) {
-      errors['shipCity'] = 'City is required';
+      errors['shipCity'] = widget.labels.cityRequired;
     }
     if (_shipPostalCode.text.isEmpty) {
-      errors['shipPostalCode'] = 'Postal code is required';
+      errors['shipPostalCode'] = widget.labels.postalCodeRequired;
     }
     if (_shippingAddress.country == null || _shippingAddress.country!.isEmpty) {
-      errors['shipCountry'] = 'Country is required';
+      errors['shipCountry'] = widget.labels.countryRequired;
     }
 
     if (!_sameBilling) {
       if (_billFirstName.text.isEmpty) {
-        errors['billFirstName'] = 'First name is required';
+        errors['billFirstName'] = widget.labels.firstNameRequired;
       }
       if (_billLastName.text.isEmpty) {
-        errors['billLastName'] = 'Last name is required';
+        errors['billLastName'] = widget.labels.lastNameRequired;
       }
       if (_billAddress1.text.isEmpty) {
-        errors['billAddress1'] = 'Address is required';
+        errors['billAddress1'] = widget.labels.addressRequired;
       }
       if (_billCity.text.isEmpty) {
-        errors['billCity'] = 'City is required';
+        errors['billCity'] = widget.labels.cityRequired;
       }
       if (_billPostalCode.text.isEmpty) {
-        errors['billPostalCode'] = 'Postal code is required';
+        errors['billPostalCode'] = widget.labels.postalCodeRequired;
       }
     }
 
@@ -94,7 +94,7 @@ extension _OiCheckoutAddress on _OiCheckoutState {
       gap: OiResponsive(sp.md),
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const OiLabel.h3('Shipping Address'),
+        OiLabel.h3(widget.labels.shippingAddress),
         _buildAddressFields(
           context,
           firstNameCtrl: _shipFirstName,
@@ -116,13 +116,13 @@ extension _OiCheckoutAddress on _OiCheckoutState {
         ),
         OiCheckbox(
           value: _sameBilling,
-          label: 'Billing address same as shipping',
+          label: widget.labels.sameBilling,
           onChanged: (v) => _setSameBilling(sameBilling: v),
         ),
         if (!_sameBilling) ...[
           Padding(
             padding: EdgeInsets.only(top: sp.sm),
-            child: const OiLabel.h3('Billing Address'),
+            child: OiLabel.h3(widget.labels.billingAddress),
           ),
           _buildAddressFields(
             context,
@@ -171,7 +171,7 @@ extension _OiCheckoutAddress on _OiCheckoutState {
             Expanded(
               child: OiTextInput(
                 controller: firstNameCtrl,
-                label: 'First Name',
+                label: widget.labels.firstName,
                 error: _addressErrors['${errorPrefix}FirstName'],
                 onChanged: (_) => _syncShippingAddress(),
               ),
@@ -180,7 +180,7 @@ extension _OiCheckoutAddress on _OiCheckoutState {
             Expanded(
               child: OiTextInput(
                 controller: lastNameCtrl,
-                label: 'Last Name',
+                label: widget.labels.lastName,
                 error: _addressErrors['${errorPrefix}LastName'],
                 onChanged: (_) => _syncShippingAddress(),
               ),
@@ -190,14 +190,14 @@ extension _OiCheckoutAddress on _OiCheckoutState {
         SizedBox(height: sp.sm),
         OiTextInput(
           controller: address1Ctrl,
-          label: 'Address',
+          label: widget.labels.address,
           error: _addressErrors['${errorPrefix}Address1'],
           onChanged: (_) => _syncShippingAddress(),
         ),
         SizedBox(height: sp.sm),
         OiTextInput(
           controller: address2Ctrl,
-          label: 'Apartment, suite, etc. (optional)',
+          label: widget.labels.address2,
           onChanged: (_) => _syncShippingAddress(),
         ),
         SizedBox(height: sp.sm),
@@ -206,7 +206,7 @@ extension _OiCheckoutAddress on _OiCheckoutState {
             Expanded(
               child: OiTextInput(
                 controller: cityCtrl,
-                label: 'City',
+                label: widget.labels.city,
                 error: _addressErrors['${errorPrefix}City'],
                 onChanged: (_) => _syncShippingAddress(),
               ),
@@ -215,7 +215,7 @@ extension _OiCheckoutAddress on _OiCheckoutState {
             Expanded(
               child: OiTextInput(
                 controller: stateCtrl,
-                label: 'State / Province',
+                label: widget.labels.state,
                 onChanged: (_) => _syncShippingAddress(),
               ),
             ),
@@ -227,7 +227,7 @@ extension _OiCheckoutAddress on _OiCheckoutState {
             Expanded(
               child: OiTextInput(
                 controller: postalCodeCtrl,
-                label: 'Postal Code',
+                label: widget.labels.postalCode,
                 error: _addressErrors['${errorPrefix}PostalCode'],
                 onChanged: (_) => _syncShippingAddress(),
               ),
@@ -242,13 +242,13 @@ extension _OiCheckoutAddress on _OiCheckoutState {
                           )
                           .toList(),
                       value: selectedCountry,
-                      label: 'Country',
+                      label: widget.labels.country,
                       error: _addressErrors['${errorPrefix}Country'],
-                      placeholder: 'Select country',
+                      placeholder: widget.labels.selectCountry,
                       onChanged: onCountryChanged,
                     )
                   : OiTextInput(
-                      label: 'Country',
+                      label: widget.labels.country,
                       error: _addressErrors['${errorPrefix}Country'],
                       controller: TextEditingController(
                         text: selectedCountry ?? '',
@@ -265,7 +265,7 @@ extension _OiCheckoutAddress on _OiCheckoutState {
               Expanded(
                 child: OiTextInput(
                   controller: phoneCtrl,
-                  label: 'Phone (optional)',
+                  label: widget.labels.phone,
                   onChanged: (_) => _syncShippingAddress(),
                 ),
               ),
@@ -274,7 +274,7 @@ extension _OiCheckoutAddress on _OiCheckoutState {
                 Expanded(
                   child: OiTextInput(
                     controller: emailCtrl,
-                    label: 'Email (optional)',
+                    label: widget.labels.email,
                     onChanged: (_) => _syncShippingAddress(),
                   ),
                 ),

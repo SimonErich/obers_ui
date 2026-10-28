@@ -71,6 +71,7 @@ class OiMonthPicker extends StatefulWidget {
     this.onChanged,
     this.minYear = 1900,
     this.maxYear = 2100,
+    this.monthLabels = kOiMonthLabels,
     super.key,
   });
 
@@ -86,14 +87,18 @@ class OiMonthPicker extends StatefulWidget {
   /// The latest selectable year. Defaults to 2100.
   final int maxYear;
 
+  /// Month names indexed 0–11 (January–December); pass translations to
+  /// localize the month wheel. Defaults to [kOiMonthLabels].
+  final List<String> monthLabels;
+
   /// Shows a month picker in a dialog and returns the selected month.
   ///
   /// The dialog stays open while the user scrolls through months and years.
   /// It closes and returns the result when the user taps the confirm button,
   /// or returns `null` if dismissed by tapping outside.
   ///
-  /// [cancelLabel] and [confirmLabel] name the dialog's buttons; pass
-  /// translations to localize them.
+  /// [cancelLabel] and [confirmLabel] name the dialog's buttons and
+  /// [monthLabels] the months; pass translations to localize them.
   static Future<OiMonth?> show(
     BuildContext context, {
     OiMonth? initialValue,
@@ -102,6 +107,7 @@ class OiMonthPicker extends StatefulWidget {
     String semanticLabel = 'Select month and year',
     String cancelLabel = 'Cancel',
     String confirmLabel = 'OK',
+    List<String> monthLabels = kOiMonthLabels,
   }) {
     return OiDialogShell.show<OiMonth>(
       context: context,
@@ -113,6 +119,7 @@ class OiMonthPicker extends StatefulWidget {
         maxYear: maxYear,
         cancelLabel: cancelLabel,
         confirmLabel: confirmLabel,
+        monthLabels: monthLabels,
         onConfirm: close,
       ),
     );
@@ -206,7 +213,7 @@ class _OiMonthPickerState extends State<OiMonthPicker> {
         wheel(
           width: 100,
           itemCount: 12,
-          label: (i) => kOiMonthLabels[i],
+          label: (i) => widget.monthLabels[i],
           controller: _monthCtrl,
           onChanged: _onMonthChanged,
           selectedIndex: _month - 1,
@@ -297,6 +304,7 @@ class _OiMonthPickerDialog extends StatefulWidget {
     required this.onConfirm,
     required this.cancelLabel,
     required this.confirmLabel,
+    required this.monthLabels,
     this.initialValue,
     this.minYear = 1900,
     this.maxYear = 2100,
@@ -307,6 +315,7 @@ class _OiMonthPickerDialog extends StatefulWidget {
   final int maxYear;
   final String cancelLabel;
   final String confirmLabel;
+  final List<String> monthLabels;
   final void Function([OiMonth?]) onConfirm;
 
   @override
@@ -334,6 +343,7 @@ class _OiMonthPickerDialogState extends State<_OiMonthPickerDialog> {
             value: _current,
             minYear: widget.minYear,
             maxYear: widget.maxYear,
+            monthLabels: widget.monthLabels,
             onChanged: (value) => setState(() => _current = value),
           ),
           const SizedBox(height: 12),

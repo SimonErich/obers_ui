@@ -61,6 +61,10 @@ class OiNotificationCenter extends StatelessWidget {
   const OiNotificationCenter({
     required this.notifications,
     required this.label,
+    this.formatTimestamp = englishFormatTimestamp,
+    this.titleLabel = 'Notifications',
+    this.markAllReadLabel = 'Mark all read',
+    this.emptyLabel = 'No notifications',
     super.key,
     this.onNotificationTap,
     this.onMarkRead,
@@ -106,18 +110,32 @@ class OiNotificationCenter extends StatelessWidget {
   /// Whether the notification center updates in real time.
   final bool realTime;
 
-  // ---------------------------------------------------------------------------
-  // Helpers
-  // ---------------------------------------------------------------------------
-
-  String _formatTimestamp(DateTime dt) {
-    final now = DateTime.now();
-    final diff = now.difference(dt);
+  /// "Just now", "5m ago", "3h ago", "2d ago": the default [formatTimestamp].
+  static String englishFormatTimestamp(DateTime dt) {
+    final diff = DateTime.now().difference(dt);
     if (diff.inMinutes < 1) return 'Just now';
     if (diff.inMinutes < 60) return '${diff.inMinutes}m ago';
     if (diff.inHours < 24) return '${diff.inHours}h ago';
     return '${diff.inDays}d ago';
   }
+
+  /// Formats the timestamps; pass a translation to localize them.
+  final String Function(DateTime timestamp) formatTimestamp;
+
+  /// Heading of the notification center.
+  final String titleLabel;
+
+  /// Label of the mark all read button.
+  final String markAllReadLabel;
+
+  /// Shown while there are no notifications.
+  final String emptyLabel;
+
+  // ---------------------------------------------------------------------------
+  // Helpers
+  // ---------------------------------------------------------------------------
+
+  String _formatTimestamp(DateTime dt) => formatTimestamp(dt);
 
   // ---------------------------------------------------------------------------
   // Build
@@ -144,7 +162,7 @@ class OiNotificationCenter extends StatelessWidget {
                   child: Row(
                     children: [
                       Text(
-                        'Notifications',
+                        titleLabel,
                         style: TextStyle(
                           color: colors.text,
                           fontSize: 18,
@@ -177,7 +195,7 @@ class OiNotificationCenter extends StatelessWidget {
                 ),
                 if (onMarkAllRead != null)
                   OiButton.outline(
-                    label: 'Mark all read',
+                    label: markAllReadLabel,
                     onTap: onMarkAllRead,
                   ),
               ],
@@ -198,7 +216,7 @@ class OiNotificationCenter extends StatelessWidget {
                         ),
                         SizedBox(height: spacing.sm),
                         Text(
-                          'No notifications',
+                          emptyLabel,
                           style: TextStyle(color: colors.textMuted),
                         ),
                       ],

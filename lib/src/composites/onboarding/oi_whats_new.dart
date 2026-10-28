@@ -47,6 +47,8 @@ class OiWhatsNew extends StatelessWidget {
     required this.items,
     this.onDismiss,
     this.title = "What's New",
+    this.emptyLabel = 'No updates at this time.',
+    this.dismissLabel = 'Got it',
     super.key,
   });
 
@@ -58,6 +60,12 @@ class OiWhatsNew extends StatelessWidget {
 
   /// The heading displayed at the top of the dialog.
   final String title;
+
+  /// Shown while there are no items.
+  final String emptyLabel;
+
+  /// Label of the dismiss button.
+  final String dismissLabel;
 
   @override
   Widget build(BuildContext context) {
@@ -100,7 +108,7 @@ class OiWhatsNew extends StatelessWidget {
                   vertical: 16,
                 ),
                 child: Text(
-                  'No updates at this time.',
+                  emptyLabel,
                   key: const Key('oi_whats_new_empty'),
                   style: textTheme.body.copyWith(color: colors.textMuted),
                 ),
@@ -142,7 +150,7 @@ class OiWhatsNew extends StatelessWidget {
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: Text(
-                        'Got it',
+                        dismissLabel,
                         style: textTheme.small.copyWith(
                           color: colors.textOnPrimary,
                         ),

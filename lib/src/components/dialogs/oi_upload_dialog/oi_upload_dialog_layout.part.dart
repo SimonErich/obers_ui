@@ -6,7 +6,7 @@ extension _OiUploadDialogLayout on _OiUploadDialogState {
     final spacing = context.spacing;
 
     return Semantics(
-      label: 'Upload dialog',
+      label: widget.labels.dialog,
       child: Focus(
         focusNode: _escapeFocusNode,
         autofocus: true,
@@ -26,7 +26,7 @@ extension _OiUploadDialogLayout on _OiUploadDialogState {
             children: [
               if (widget.destinationPath != null)
                 Text(
-                  'Upload to: ${widget.destinationPath}',
+                  widget.labels.uploadTo(widget.destinationPath!),
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
@@ -35,7 +35,7 @@ extension _OiUploadDialogLayout on _OiUploadDialogState {
                 )
               else
                 Text(
-                  'Upload Files',
+                  widget.labels.title,
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
@@ -47,7 +47,7 @@ extension _OiUploadDialogLayout on _OiUploadDialogState {
               if (_entries.isNotEmpty) ...[
                 SizedBox(height: spacing.md),
                 Text(
-                  'Files to upload:',
+                  widget.labels.filesToUpload,
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
@@ -78,7 +78,7 @@ extension _OiUploadDialogLayout on _OiUploadDialogState {
                 Padding(
                   padding: EdgeInsets.only(top: spacing.xs),
                   child: Text(
-                    'Maximum ${widget.maxFiles} files allowed',
+                    widget.labels.maxFiles(widget.maxFiles!),
                     style: TextStyle(fontSize: 11, color: colors.warning.base),
                   ),
                 ),
@@ -86,7 +86,7 @@ extension _OiUploadDialogLayout on _OiUploadDialogState {
               Row(
                 children: [
                   Text(
-                    'If file exists:',
+                    widget.labels.ifFileExists,
                     style: TextStyle(fontSize: 12, color: colors.textSubtle),
                   ),
                   SizedBox(width: spacing.sm),
@@ -97,8 +97,7 @@ extension _OiUploadDialogLayout on _OiUploadDialogState {
                           .map(
                             (r) => OiSelectOption(
                               value: r,
-                              label:
-                                  r.name[0].toUpperCase() + r.name.substring(1),
+                              label: widget.labels.conflictResolution(r),
                             ),
                           )
                           .toList(),
@@ -113,12 +112,15 @@ extension _OiUploadDialogLayout on _OiUploadDialogState {
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  OiButton.ghost(label: 'Cancel', onTap: widget.onCancel),
+                  OiButton.ghost(
+                    label: widget.labels.cancel,
+                    onTap: widget.onCancel,
+                  ),
                   SizedBox(width: spacing.sm),
                   OiButton.primary(
                     label: _validFiles.isEmpty
-                        ? 'Upload'
-                        : 'Upload ${_validFiles.length} file${_validFiles.length == 1 ? '' : 's'}',
+                        ? widget.labels.upload
+                        : widget.labels.uploadCount(_validFiles.length),
                     onTap: _validFiles.isNotEmpty ? _submit : null,
                   ),
                 ],
@@ -165,8 +167,8 @@ extension _OiUploadDialogLayout on _OiUploadDialogState {
                 SizedBox(height: spacing.xs),
                 Text(
                   _isDragOver
-                      ? 'Release to add files'
-                      : 'Drop files here or browse',
+                      ? widget.labels.releaseToAdd
+                      : widget.labels.dropFiles,
                   style: TextStyle(
                     fontSize: 13,
                     fontWeight: _isDragOver

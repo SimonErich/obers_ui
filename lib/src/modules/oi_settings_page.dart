@@ -148,6 +148,14 @@ class OiSettingsPage extends StatefulWidget {
     this.onResetAll,
     this.searchEnabled = true,
     this.showResetButtons = true,
+    this.resetAllLabel = 'Reset All Settings',
+    this.resetAllSemanticLabel = 'Reset all settings to defaults',
+    this.resetLabel = 'Reset',
+    this.resetGroupLabel = englishResetGroup,
+    this.groupLabel = englishGroup,
+    this.sectionLabel = englishSection,
+    this.selectPlaceholder = 'Select...',
+    this.sectionsHeading = 'SECTIONS',
     super.key,
   });
 
@@ -177,6 +185,40 @@ class OiSettingsPage extends StatefulWidget {
 
   /// Whether to show per-group and global reset buttons.
   final bool showResetButtons;
+
+  /// "Reset Privacy settings": the default [resetGroupLabel].
+  static String englishResetGroup(String group) => 'Reset $group settings';
+
+  /// "Privacy settings group, expanded": the default [groupLabel].
+  static String englishGroup(String group, {required bool expanded}) =>
+      '$group settings group, ${expanded ? 'expanded' : 'collapsed'}';
+
+  /// "Privacy settings section": the default [sectionLabel].
+  static String englishSection(String group) => '$group settings section';
+
+  /// Label of the reset all button.
+  final String resetAllLabel;
+
+  /// Screen-reader label of the reset all button.
+  final String resetAllSemanticLabel;
+
+  /// Label of a group's reset button.
+  final String resetLabel;
+
+  /// Screen-reader label of the named group's reset button.
+  final String Function(String group) resetGroupLabel;
+
+  /// Screen-reader label of the named group's header.
+  final String Function(String group, {required bool expanded}) groupLabel;
+
+  /// Screen-reader label of the named group's section.
+  final String Function(String group) sectionLabel;
+
+  /// Placeholder of the select settings.
+  final String selectPlaceholder;
+
+  /// Heading of the section navigation.
+  final String sectionsHeading;
 
   @override
   State<OiSettingsPage> createState() => _OiSettingsPageState();
@@ -283,10 +325,10 @@ class _OiSettingsPageState extends State<OiSettingsPage> {
       child: Align(
         alignment: Alignment.centerRight,
         child: OiButton.ghost(
-          label: 'Reset All Settings',
+          label: widget.resetAllLabel,
           icon: OiIcons.rotateCcw,
           onTap: widget.onResetAll,
-          semanticLabel: 'Reset all settings to defaults',
+          semanticLabel: widget.resetAllSemanticLabel,
         ),
       ),
     );
@@ -301,8 +343,7 @@ class _OiSettingsPageState extends State<OiSettingsPage> {
     final spacing = context.spacing;
 
     return OiTappable(
-      semanticLabel:
-          '${group.title} settings group, ${expanded ? 'expanded' : 'collapsed'}',
+      semanticLabel: widget.groupLabel(group.title, expanded: expanded),
       clipBorderRadius: context.radius.sm,
       onTap: () {
         setState(() {
@@ -344,10 +385,10 @@ class _OiSettingsPageState extends State<OiSettingsPage> {
               Padding(
                 padding: EdgeInsets.only(right: spacing.sm),
                 child: OiButton.ghost(
-                  label: 'Reset',
+                  label: widget.resetLabel,
                   icon: OiIcons.rotateCcw,
                   onTap: () => widget.onResetGroup?.call(group.key),
-                  semanticLabel: 'Reset ${group.title} settings',
+                  semanticLabel: widget.resetGroupLabel(group.title),
                 ),
               ),
             Icon(
@@ -472,7 +513,7 @@ class _OiSettingsPageState extends State<OiSettingsPage> {
               onChanged: (value) {
                 _handleValueChanged(group.key, item.key, value);
               },
-              placeholder: 'Select...',
+              placeholder: widget.selectPlaceholder,
             ),
           ),
         ],
@@ -603,7 +644,7 @@ class _OiSettingsPageState extends State<OiSettingsPage> {
     final isSelected = index == _selectedGroupIndex;
 
     return OiTappable(
-      semanticLabel: '${group.title} settings section',
+      semanticLabel: widget.sectionLabel(group.title),
       onTap: () => _scrollToGroup(index),
       clipBorderRadius: context.radius.md,
       child: Container(
@@ -655,7 +696,10 @@ class _OiSettingsPageState extends State<OiSettingsPage> {
           children: [
             Padding(
               padding: EdgeInsets.only(left: spacing.md, bottom: spacing.sm),
-              child: OiLabel.small('SECTIONS', color: colors.textMuted),
+              child: OiLabel.small(
+                widget.sectionsHeading,
+                color: colors.textMuted,
+              ),
             ),
             for (var i = 0; i < visibleGroups.length; i++)
               _buildSidebarItem(context, i, visibleGroups[i]),

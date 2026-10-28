@@ -36,6 +36,9 @@ class OiLightbox extends StatefulWidget {
     this.showThumbnails = true,
     this.enableZoom = true,
     this.enableSwipe = true,
+    this.closeLabel = 'Close lightbox',
+    this.previousLabel = 'Previous image',
+    this.nextLabel = 'Next image',
     super.key,
   });
 
@@ -59,6 +62,15 @@ class OiLightbox extends StatefulWidget {
 
   /// Semantic label for the lightbox widget.
   final String label;
+
+  /// Screen-reader label of the close button.
+  final String closeLabel;
+
+  /// Screen-reader label of the previous button.
+  final String previousLabel;
+
+  /// Screen-reader label of the next button.
+  final String nextLabel;
 
   @override
   State<OiLightbox> createState() => _OiLightboxState();
@@ -207,7 +219,7 @@ class _OiLightboxState extends State<OiLightbox> {
                   key: const Key('oi_lightbox_close'),
                   onTap: widget.onDismiss,
                   child: Semantics(
-                    label: 'Close lightbox',
+                    label: widget.closeLabel,
                     button: true,
                     child: Container(
                       width: 40,
@@ -249,7 +261,7 @@ class _OiLightboxState extends State<OiLightbox> {
                       key: const Key('oi_lightbox_previous'),
                       onTap: _previous,
                       child: Semantics(
-                        label: 'Previous image',
+                        label: widget.previousLabel,
                         button: true,
                         child: Container(
                           width: 40,
@@ -292,7 +304,7 @@ class _OiLightboxState extends State<OiLightbox> {
                       key: const Key('oi_lightbox_next'),
                       onTap: _next,
                       child: Semantics(
-                        label: 'Next image',
+                        label: widget.nextLabel,
                         button: true,
                         child: Container(
                           width: 40,

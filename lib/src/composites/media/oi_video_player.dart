@@ -19,6 +19,8 @@ class OiVideoPlayer extends StatefulWidget {
     required this.src,
     required this.label,
     this.autoPlay = false,
+    this.playLabel = 'Play',
+    this.pauseLabel = 'Pause',
     super.key,
     this.loop = false,
     this.showControls = true,
@@ -56,6 +58,12 @@ class OiVideoPlayer extends StatefulWidget {
 
   /// Called when playback is paused.
   final VoidCallback? onPause;
+
+  /// Screen-reader label of the play button.
+  final String playLabel;
+
+  /// Screen-reader label of the pause button.
+  final String pauseLabel;
 
   @override
   State<OiVideoPlayer> createState() => _OiVideoPlayerState();
@@ -248,7 +256,9 @@ class _OiVideoPlayerState extends State<OiVideoPlayer> {
                         ),
                         child: Center(
                           child: Semantics(
-                            label: _isPlaying ? 'Pause' : 'Play',
+                            label: _isPlaying
+                                ? widget.pauseLabel
+                                : widget.playLabel,
                             button: true,
                             child: Icon(
                               _isPlaying ? OiIcons.pause : OiIcons.play,
