@@ -144,6 +144,48 @@ class OiChatWindowMessage {
 // Main widget
 // ---------------------------------------------------------------------------
 
+/// The texts of an [OiChatWindow], in English by default; pass translations
+/// to localize the chat window.
+///
+/// {@category Modules}
+class OiChatWindowLabels {
+  /// Creates an [OiChatWindowLabels].
+  const OiChatWindowLabels({
+    this.send = 'Send',
+    this.save = 'Save',
+    this.cancel = 'Cancel',
+    this.copy = 'Copy',
+    this.copyMessage = 'Copy message',
+    this.goodResponse = 'Good response',
+    this.badResponse = 'Bad response',
+    this.editMessage = 'Edit message',
+  });
+
+  /// Label of the send button.
+  final String send;
+
+  /// Label of the button that saves an edited message.
+  final String save;
+
+  /// Label of the button that cancels editing a message.
+  final String cancel;
+
+  /// Tooltip of the copy button.
+  final String copy;
+
+  /// Screen-reader label of the copy button.
+  final String copyMessage;
+
+  /// Tooltip and screen-reader label of the thumbs-up button.
+  final String goodResponse;
+
+  /// Tooltip and screen-reader label of the thumbs-down button.
+  final String badResponse;
+
+  /// Tooltip and screen-reader label of the edit button.
+  final String editMessage;
+}
+
 /// An LLM-focused chat interface with streaming support and suggestion chips.
 ///
 /// Displays a list of [OiChatWindowMessage] objects with user messages aligned
@@ -172,6 +214,7 @@ class OiChatWindow extends StatefulWidget {
     this.onMessageReaction,
     this.onMessageEdit,
     this.submitOnEnter = false,
+    this.labels = const OiChatWindowLabels(),
     super.key,
   });
 
@@ -234,6 +277,9 @@ class OiChatWindow extends StatefulWidget {
   /// When `false` (default), Cmd/Ctrl+Enter submits. This mirrors the
   /// preference of different LLM interfaces.
   final bool submitOnEnter;
+
+  /// The chat window's texts; pass translations to localize it.
+  final OiChatWindowLabels labels;
 
   @override
   State<OiChatWindow> createState() => _OiChatWindowState();

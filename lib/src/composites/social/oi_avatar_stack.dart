@@ -31,6 +31,8 @@ class OiAvatarStack extends StatelessWidget {
   /// Creates an [OiAvatarStack].
   const OiAvatarStack({
     required this.users,
+    this.moreUsersLabel = 'More users',
+    this.usersLabel = englishUsers,
     super.key,
     this.maxVisible = 4,
     this.size = OiAvatarSize.sm,
@@ -52,6 +54,15 @@ class OiAvatarStack extends StatelessWidget {
 
   /// Called when a user avatar is tapped.
   final ValueChanged<OiAvatarStackItem>? onTap;
+
+  /// "5 users": the default [usersLabel].
+  static String englishUsers(int count) => '$count users';
+
+  /// Screen-reader label of the overflow avatar.
+  final String moreUsersLabel;
+
+  /// Screen-reader label of the stack, by the number of users.
+  final String Function(int count) usersLabel;
 
   double get _diameter {
     switch (size) {
@@ -133,7 +144,7 @@ class OiAvatarStack extends StatelessWidget {
         Positioned(
           left: left,
           child: OiTooltip(
-            label: 'More users',
+            label: moreUsersLabel,
             message: users.skip(maxVisible).map((u) => u.label).join(', '),
             child: Container(
               width: d,
@@ -167,7 +178,7 @@ class OiAvatarStack extends StatelessWidget {
         : 0.0;
 
     return Semantics(
-      label: '${users.length} users',
+      label: usersLabel(users.length),
       child: SizedBox(
         width: totalWidth,
         height: d + 4,

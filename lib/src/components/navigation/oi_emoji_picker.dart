@@ -22,6 +22,8 @@ class OiEmojiPicker extends StatefulWidget {
   const OiEmojiPicker({
     required this.onSelected,
     this.showSearch = true,
+    this.emptyLabel = 'No emoji found',
+    this.categoryLabel = englishCategory,
     super.key,
   });
 
@@ -30,6 +32,16 @@ class OiEmojiPicker extends StatefulWidget {
 
   /// Whether to show the search input at the top of the picker.
   final bool showSearch;
+
+  /// Shown when the search finds no emoji.
+  final String emptyLabel;
+
+  /// Returns the English [category] name unchanged: the default
+  /// [categoryLabel].
+  static String englishCategory(String category) => category;
+
+  /// Names an emoji category, by its English name (Smileys, People, Animals, Food, Activities, Travel, Objects, Symbols).
+  final String Function(String category) categoryLabel;
 
   @override
   State<OiEmojiPicker> createState() => _OiEmojiPickerState();
@@ -111,7 +123,7 @@ class _OiEmojiPickerState extends State<OiEmojiPicker> {
               padding: const EdgeInsets.all(24),
               child: Center(
                 child: Text(
-                  'No emoji found',
+                  widget.emptyLabel,
                   style: TextStyle(fontSize: 14, color: colors.textMuted),
                 ),
               ),
@@ -121,7 +133,7 @@ class _OiEmojiPickerState extends State<OiEmojiPicker> {
               Padding(
                 padding: const EdgeInsets.fromLTRB(12, 10, 12, 4),
                 child: Text(
-                  cat.name,
+                  widget.categoryLabel(cat.name),
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,

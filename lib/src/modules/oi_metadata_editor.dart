@@ -65,6 +65,9 @@ class OiMetadataEditor extends StatefulWidget {
     required this.fields,
     required this.onChange,
     required this.label,
+    this.yesLabel = 'Yes',
+    this.noLabel = 'No',
+    this.addFieldLabel = 'Add field',
     super.key,
     this.enabled = true,
     this.allowAdd = true,
@@ -92,6 +95,15 @@ class OiMetadataEditor extends StatefulWidget {
 
   /// When provided, restricts new-field keys to this set of values.
   final List<String>? availableKeys;
+
+  /// Shown for a true value.
+  final String yesLabel;
+
+  /// Shown for a false value.
+  final String noLabel;
+
+  /// Label of the button that adds a field.
+  final String addFieldLabel;
 
   @override
   State<OiMetadataEditor> createState() => _OiMetadataEditorState();
@@ -340,7 +352,7 @@ class _OiMetadataEditorState extends State<OiMetadataEditor> {
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  boolValue ? 'Yes' : 'No',
+                  boolValue ? widget.yesLabel : widget.noLabel,
                   style: TextStyle(fontSize: 13, color: colors.text),
                 ),
               ],
@@ -379,7 +391,7 @@ class _OiMetadataEditorState extends State<OiMetadataEditor> {
       child: Center(
         child: OiTappable(
           onTap: _addField,
-          semanticLabel: 'Add field',
+          semanticLabel: widget.addFieldLabel,
           clipBorderRadius: BorderRadius.circular(6),
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -397,7 +409,7 @@ class _OiMetadataEditorState extends State<OiMetadataEditor> {
                 ),
                 const SizedBox(width: 6),
                 Text(
-                  'Add field',
+                  widget.addFieldLabel,
                   style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w500,

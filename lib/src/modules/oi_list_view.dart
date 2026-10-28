@@ -84,6 +84,10 @@ class OiListView<T> extends StatefulWidget {
     required this.itemBuilder,
     required this.itemKey,
     required this.label,
+    this.filtersLabel = 'Filters',
+    this.searchPlaceholder = 'Search...',
+    this.selectedCountLabel = englishSelectedCount,
+    this.emptyLabel = 'No items',
     super.key,
     this.searchQuery,
     this.onSearch,
@@ -208,6 +212,21 @@ class OiListView<T> extends StatefulWidget {
 
   /// Debounce duration for auto-saving settings after changes.
   final Duration settingsSaveDebounce;
+
+  /// "3 selected": the default [selectedCountLabel].
+  static String englishSelectedCount(int count) => '$count selected';
+
+  /// Heading and screen-reader label of the filters.
+  final String filtersLabel;
+
+  /// Placeholder of the search inputs.
+  final String searchPlaceholder;
+
+  /// Shown while items are selected, by their number.
+  final String Function(int count) selectedCountLabel;
+
+  /// Shown while there are no items and no emptyState is given.
+  final String emptyLabel;
 
   @override
   State<OiListView<T>> createState() => _OiListViewState<T>();
@@ -351,7 +370,7 @@ class _OiListViewState<T> extends State<OiListView<T>>
     _dismissFilterSheet?.call();
     final handle = OiSheet.show(
       context,
-      label: 'Filters',
+      label: widget.filtersLabel,
       dragHandle: true,
       onClose: () => _dismissFilterSheet = null,
       child: Padding(
@@ -360,7 +379,7 @@ class _OiListViewState<T> extends State<OiListView<T>>
           crossAxisAlignment: CrossAxisAlignment.stretch,
           mainAxisSize: MainAxisSize.min,
           children: [
-            const OiLabel.h4('Filters'),
+            OiLabel.h4(widget.filtersLabel),
             const SizedBox(height: 12),
             OiFilterBar(
               filters: widget.filters!,
@@ -431,7 +450,7 @@ class _OiListViewState<T> extends State<OiListView<T>>
             if (widget.onSearch != null) ...[
               const SizedBox(height: 12),
               OiTextInput(
-                placeholder: 'Search...',
+                placeholder: widget.searchPlaceholder,
                 onChanged: widget.onSearch,
                 controller: _searchController,
               ),
@@ -462,7 +481,7 @@ class _OiListViewState<T> extends State<OiListView<T>>
                   if (widget.onSearch != null)
                     Expanded(
                       child: OiTextInput(
-                        placeholder: 'Search...',
+                        placeholder: widget.searchPlaceholder,
                         onChanged: widget.onSearch,
                         controller: _searchController,
                       ),
@@ -518,7 +537,7 @@ class _OiListViewState<T> extends State<OiListView<T>>
           children: [
             Icon(OiIcons.alignLeft, size: 16, color: colors.text),
             const SizedBox(width: 4),
-            OiLabel.small('Filters', color: colors.text),
+            OiLabel.small(widget.filtersLabel, color: colors.text),
             if (activeCount > 0) ...[
               const SizedBox(width: 4),
               Container(
@@ -574,7 +593,7 @@ class _OiListViewState<T> extends State<OiListView<T>>
       child: Row(
         children: [
           OiLabel.smallStrong(
-            '${widget.selectedKeys.length} selected',
+            widget.selectedCountLabel(widget.selectedKeys.length),
             color: colors.text,
           ),
           const Spacer(),
@@ -590,7 +609,7 @@ class _OiListViewState<T> extends State<OiListView<T>>
     }
 
     if (widget.items.isEmpty && !widget.loading) {
-      return widget.emptyState ?? const OiEmptyState(title: 'No items');
+      return widget.emptyState ?? OiEmptyState(title: widget.emptyLabel);
     }
 
     Widget buildItem(BuildContext context, int index) {

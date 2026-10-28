@@ -80,29 +80,89 @@ class OiVersionEntry {
   final String? summary;
 }
 
-// ── Month names for date formatting ─────────────────────────────────────────
-
-const _monthNames = [
-  'Jan',
-  'Feb',
-  'Mar',
-  'Apr',
-  'May',
-  'Jun',
-  'Jul',
-  'Aug',
-  'Sep',
-  'Oct',
-  'Nov',
-  'Dec',
-];
-
-String _formatDate(DateTime date) {
-  final month = _monthNames[date.month - 1];
-  return '$month ${date.day}, ${date.year}';
-}
-
 // ── Main widget ─────────────────────────────────────────────────────────────
+
+/// The texts of an [OiChangelogView], in English by default; pass translations
+/// to localize the changelog.
+///
+/// {@category Modules}
+class OiChangelogViewLabels {
+  /// Creates an [OiChangelogViewLabels].
+  const OiChangelogViewLabels({
+    this.changeType = englishChangeType,
+    this.filter = englishFilter,
+    this.noMatches = 'No matching changes',
+    this.noMatchesDescription = 'Try adjusting your search or filters.',
+    this.showOlder = englishShowOlder,
+    this.version = englishVersion,
+    this.newBadge = 'NEW',
+    this.formatDate = englishFormatDate,
+  });
+
+  /// "Added", "Changed", "Fixed", "Removed", "Security", "Deprecated": the
+  /// default [changeType].
+  static String englishChangeType(OiChangeType type) => switch (type) {
+    OiChangeType.added => 'Added',
+    OiChangeType.changed => 'Changed',
+    OiChangeType.fixed => 'Fixed',
+    OiChangeType.removed => 'Removed',
+    OiChangeType.security => 'Security',
+    OiChangeType.deprecated => 'Deprecated',
+  };
+
+  /// "Fixed filter": the default [filter].
+  static String englishFilter(String type) => '$type filter';
+
+  /// "Show older versions (4 more)": the default [showOlder].
+  static String englishShowOlder(int count) =>
+      'Show older versions ($count more)';
+
+  /// "Version 2.1.0": the default [version].
+  static String englishVersion(String version) => 'Version $version';
+
+  /// "Mar 5, 2026": the default [formatDate].
+  static String englishFormatDate(DateTime date) {
+    const months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
+    return '${months[date.month - 1]} ${date.day}, ${date.year}';
+  }
+
+  /// Names a type of change.
+  final String Function(OiChangeType type) changeType;
+
+  /// Screen-reader label of the filter of the named type.
+  final String Function(String type) filter;
+
+  /// Title shown when the search or filters match nothing.
+  final String noMatches;
+
+  /// Description shown when the search or filters match nothing.
+  final String noMatchesDescription;
+
+  /// Label of the button that shows the remaining versions, by their number.
+  final String Function(int count) showOlder;
+
+  /// Screen-reader label of the named version.
+  final String Function(String version) version;
+
+  /// Badge of a new version.
+  final String newBadge;
+
+  /// Formats a version's release date.
+  final String Function(DateTime date) formatDate;
+}
 
 /// A version-grouped changelog / release notes viewer.
 ///
@@ -120,6 +180,7 @@ class OiChangelogView extends StatefulWidget {
     this.showSearch = true,
     this.showTypeFilters = true,
     this.maxWidth = 720,
+    this.labels = const OiChangelogViewLabels(),
     super.key,
   });
 
@@ -143,6 +204,9 @@ class OiChangelogView extends StatefulWidget {
 
   /// Maximum width constraint for the changelog content.
   final double maxWidth;
+
+  /// The changelog's texts; pass translations to localize it.
+  final OiChangelogViewLabels labels;
 
   @override
   State<OiChangelogView> createState() => _OiChangelogViewState();
@@ -175,16 +239,7 @@ class _OiChangelogViewState extends State<OiChangelogView> {
     };
   }
 
-  String _labelForType(OiChangeType type) {
-    return switch (type) {
-      OiChangeType.added => 'Added',
-      OiChangeType.changed => 'Changed',
-      OiChangeType.fixed => 'Fixed',
-      OiChangeType.removed => 'Removed',
-      OiChangeType.security => 'Security',
-      OiChangeType.deprecated => 'Deprecated',
-    };
-  }
+  String _labelForType(OiChangeType type) => widget.labels.changeType(type);
 
   // ---------------------------------------------------------------------------
   // Filtering
@@ -268,7 +323,7 @@ class _OiChangelogViewState extends State<OiChangelogView> {
     final badgeColor = _colorForType(type, colors);
 
     return OiTappable(
-      semanticLabel: '${_labelForType(type)} filter',
+      semanticLabel: widget.labels.filter(_labelForType(type)),
       onTap: () {
         setState(() {
           if (isActive) {
@@ -310,9 +365,9 @@ class _OiChangelogViewState extends State<OiChangelogView> {
     final breakpoint = context.breakpoint;
 
     if (filtered.isEmpty) {
-      return const OiEmptyState(
-        title: 'No matching changes',
-        description: 'Try adjusting your search or filters.',
+      return OiEmptyState(
+        title: widget.labels.noMatches,
+        description: widget.labels.noMatchesDescription,
       );
     }
 
@@ -330,7 +385,7 @@ class _OiChangelogViewState extends State<OiChangelogView> {
           _buildVersionEntry(context, filtered[i]),
         if (remaining > 0 && !_showAll)
           OiButton.ghost(
-            label: 'Show older versions ($remaining more)',
+            label: widget.labels.showOlder(remaining),
             fullWidth: true,
             onTap: () {
               setState(() {
@@ -358,7 +413,7 @@ class _OiChangelogViewState extends State<OiChangelogView> {
     }
 
     return OiTappable(
-      semanticLabel: 'Version ${version.version}',
+      semanticLabel: widget.labels.version(version.version),
       onTap: widget.onVersionTap != null
           ? () => widget.onVersionTap!(version)
           : null,
@@ -391,11 +446,14 @@ class _OiChangelogViewState extends State<OiChangelogView> {
                       color: colors.primary.base.withValues(alpha: 0.15),
                       borderRadius: context.radius.sm,
                     ),
-                    child: OiLabel.caption('NEW', color: colors.primary.base),
+                    child: OiLabel.caption(
+                      widget.labels.newBadge,
+                      color: colors.primary.base,
+                    ),
                   ),
                 if (version.date != null)
                   OiLabel.small(
-                    _formatDate(version.date!),
+                    widget.labels.formatDate(version.date!),
                     color: colors.textMuted,
                   ),
               ],

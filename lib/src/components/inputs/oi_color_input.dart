@@ -25,6 +25,7 @@ class OiColorInput extends StatefulWidget {
     this.enabled = true,
     this.showHex = true,
     this.showOpacity = false,
+    this.opacityLabel = 'Opacity',
     super.key,
   });
 
@@ -51,6 +52,9 @@ class OiColorInput extends StatefulWidget {
 
   /// Whether to show an opacity slider inside the picker.
   final bool showOpacity;
+
+  /// Label of the opacity slider.
+  final String opacityLabel;
 
   @override
   State<OiColorInput> createState() => _OiColorInputState();
@@ -87,6 +91,7 @@ String _colorToHex(Color c) {
 
 Color? _hexToColor(String hex) {
   final clean = hex.replaceAll('#', '').trim();
+
   if (clean.length == 6) {
     final v = int.tryParse('FF$clean', radix: 16);
     if (v != null) return Color(v);
@@ -204,7 +209,7 @@ class _OiColorInputState extends State<OiColorInput> {
           if (widget.showOpacity) ...[
             const SizedBox(height: 12),
             Text(
-              'Opacity',
+              widget.opacityLabel,
               style: TextStyle(fontSize: 12, color: colors.textMuted),
             ),
             const SizedBox(height: 4),

@@ -35,6 +35,8 @@ class OiGridZoomControls extends StatefulWidget {
     this.gap = const OiResponsive<double>(0),
     this.rowGap,
     this.scale = OiBreakpointScale.defaultScale,
+    this.decreaseLabel = 'Decrease columns',
+    this.increaseLabel = 'Increase columns',
     super.key,
   });
 
@@ -64,6 +66,12 @@ class OiGridZoomControls extends StatefulWidget {
 
   /// Breakpoint scale for responsive value resolution.
   final OiBreakpointScale scale;
+
+  /// Screen-reader label of the decrease button.
+  final String decreaseLabel;
+
+  /// Screen-reader label of the increase button.
+  final String increaseLabel;
 
   @override
   State<OiGridZoomControls> createState() => _OiGridZoomControlsState();
@@ -135,7 +143,7 @@ class _OiGridZoomControlsState extends State<OiGridZoomControls> {
                 children: [
                   OiIconButton(
                     icon: OiIcons.minus,
-                    semanticLabel: 'Decrease columns',
+                    semanticLabel: widget.decreaseLabel,
                     onTap: _currentColumns > widget.minColumns
                         ? _decrement
                         : null,
@@ -150,7 +158,7 @@ class _OiGridZoomControlsState extends State<OiGridZoomControls> {
                   ),
                   OiIconButton(
                     icon: OiIcons.plus,
-                    semanticLabel: 'Increase columns',
+                    semanticLabel: widget.increaseLabel,
                     onTap: _currentColumns < widget.maxColumns
                         ? _increment
                         : null,

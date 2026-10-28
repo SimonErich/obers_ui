@@ -95,6 +95,7 @@ class OiSmartInput extends StatefulWidget {
   /// Creates an [OiSmartInput].
   const OiSmartInput({
     required this.label,
+    this.loadingLabel = 'Loading…',
     super.key,
     this.value,
     this.onChange,
@@ -152,6 +153,9 @@ class OiSmartInput extends StatefulWidget {
 
   /// An optional external focus node. When null one is created internally.
   final FocusNode? focusNode;
+
+  /// Shown while suggestions load.
+  final String loadingLabel;
 
   @override
   State<OiSmartInput> createState() => _OiSmartInputState();
@@ -485,6 +489,7 @@ class _OiSmartInputState extends State<OiSmartInput> {
           suggestions: _suggestions,
           selectedIndex: _selectedSuggestionIndex,
           onSelect: _selectSuggestion,
+          loadingLabel: widget.loadingLabel,
           loading: _loadingSuggestions,
         ),
       ),
@@ -669,12 +674,14 @@ class _OiSuggestionPopup extends StatelessWidget {
     required this.selectedIndex,
     required this.onSelect,
     required this.loading,
+    required this.loadingLabel,
   });
 
   final List<OiSuggestion> suggestions;
   final int selectedIndex;
   final ValueChanged<OiSuggestion> onSelect;
   final bool loading;
+  final String loadingLabel;
 
   @override
   Widget build(BuildContext context) {
@@ -696,7 +703,7 @@ class _OiSuggestionPopup extends StatelessWidget {
         padding: const EdgeInsets.all(12),
         decoration: decoration,
         child: Text(
-          'Loading…',
+          loadingLabel,
           style: TextStyle(fontSize: 14, color: colors.textMuted),
         ),
       );

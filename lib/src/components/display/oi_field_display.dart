@@ -53,6 +53,12 @@ class OiFieldDisplay extends StatelessWidget {
     this.formatValue,
     this.onTap,
     this.leading,
+    this.yesLabel = 'Yes',
+    this.noLabel = 'No',
+    this.unknownLabel = 'Unknown',
+    this.imageLabel = 'Image',
+    this.colorValueLabel = 'Color value',
+    this.fullValueLabel = 'Full value',
     super.key,
   }) : _isPair = false,
        _direction = Axis.horizontal,
@@ -82,6 +88,12 @@ class OiFieldDisplay extends StatelessWidget {
     this.formatValue,
     this.onTap,
     this.leading,
+    this.yesLabel = 'Yes',
+    this.noLabel = 'No',
+    this.unknownLabel = 'Unknown',
+    this.imageLabel = 'Image',
+    this.colorValueLabel = 'Color value',
+    this.fullValueLabel = 'Full value',
     super.key,
   }) : _isPair = true,
        _direction = direction,
@@ -142,6 +154,24 @@ class OiFieldDisplay extends StatelessWidget {
   final bool _isPair;
   final Axis _direction;
   final double? _labelWidth;
+
+  /// Shown for a true value.
+  final String yesLabel;
+
+  /// Shown for a false value.
+  final String noLabel;
+
+  /// Shown for a missing boolean value.
+  final String unknownLabel;
+
+  /// Alt text of an image value without a label.
+  final String imageLabel;
+
+  /// Screen-reader label of a color value.
+  final String colorValueLabel;
+
+  /// Screen-reader label of the full value of a truncated value without a label.
+  final String fullValueLabel;
 
   // ── Helpers ───────────────────────────────────────────────────────────────
 

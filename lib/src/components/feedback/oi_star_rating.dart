@@ -101,6 +101,7 @@ class OiStarRating extends StatefulWidget {
     this.size = 20.0,
     this.activeColor,
     this.inactiveColor,
+    this.ratingLabel = englishRating,
     super.key,
   });
 
@@ -130,6 +131,13 @@ class OiStarRating extends StatefulWidget {
 
   /// Color of empty stars. Defaults to the theme border color.
   final Color? inactiveColor;
+
+  /// "Rating 4.5 out of 5": the default [ratingLabel].
+  static String englishRating(double value, int max) =>
+      'Rating $value out of $max';
+
+  /// Read by screen readers after the label, by the value and the number of stars.
+  final String Function(double value, int max) ratingLabel;
 
   @override
   State<OiStarRating> createState() => _OiStarRatingState();
@@ -221,7 +229,7 @@ class _OiStarRatingState extends State<OiStarRating> {
 
     final baseLabel = widget.label != null ? '${widget.label}, ' : '';
     final semanticLabel =
-        '${baseLabel}Rating ${widget.value} out of ${widget.maxStars}';
+        '$baseLabel${widget.ratingLabel(widget.value, widget.maxStars)}';
 
     final stars = Row(
       mainAxisSize: MainAxisSize.min,

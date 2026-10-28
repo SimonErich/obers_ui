@@ -185,6 +185,28 @@ class _OiShowHelpAction extends Action<_OiShowHelpIntent> {
 
 // ── OiShortcuts widget ──────────────────────────────────────────────────────
 
+/// The texts of an [OiShortcuts], in English by default; pass translations
+/// to localize the shortcut help.
+///
+/// {@category Composites}
+class OiShortcutsLabels {
+  /// Creates an [OiShortcutsLabels].
+  const OiShortcutsLabels({
+    this.title = 'Keyboard Shortcuts',
+    this.close = 'Close',
+    this.general = 'General',
+  });
+
+  /// Title of the help overlay.
+  final String title;
+
+  /// Label of the help overlay's close button.
+  final String close;
+
+  /// Category of shortcuts that have none of their own.
+  final String general;
+}
+
 /// Keyboard shortcut manager with optional help overlay.
 ///
 /// Registers shortcuts globally or per-scope, and shows a "?" help
@@ -198,6 +220,7 @@ class OiShortcuts extends StatefulWidget {
     required this.child,
     required this.shortcuts,
     this.showHelpOnQuestionMark = true,
+    this.labels = const OiShortcutsLabels(),
     super.key,
   });
 
@@ -211,6 +234,9 @@ class OiShortcuts extends StatefulWidget {
   ///
   /// Defaults to `true`.
   final bool showHelpOnQuestionMark;
+
+  /// The texts of the help overlay; pass translations to localize it.
+  final OiShortcutsLabels labels;
 
   @override
   State<OiShortcuts> createState() => _OiShortcutsState();
@@ -235,6 +261,7 @@ class _OiShortcutsState extends State<OiShortcuts> {
     final entry = OverlayEntry(
       builder: (context) => _OiShortcutHelpOverlay(
         bindings: widget.shortcuts,
+        labels: widget.labels,
         onDismiss: _removeHelpOverlay,
       ),
     );
@@ -293,8 +320,12 @@ class _OiShortcutHelpOverlay extends StatelessWidget {
   /// Creates an [_OiShortcutHelpOverlay].
   const _OiShortcutHelpOverlay({
     required this.bindings,
+    required this.labels,
     required this.onDismiss,
   });
+
+  /// The texts of the overlay.
+  final OiShortcutsLabels labels;
 
   /// The shortcut bindings to display.
   final List<OiShortcutBinding> bindings;
@@ -307,7 +338,7 @@ class _OiShortcutHelpOverlay extends StatelessWidget {
     // Group bindings by category.
     final grouped = <String, List<OiShortcutBinding>>{};
     for (final binding in bindings) {
-      final cat = binding.category ?? 'General';
+      final cat = binding.category ?? labels.general;
       grouped.putIfAbsent(cat, () => []).add(binding);
     }
 
@@ -361,9 +392,12 @@ class _OiShortcutHelpOverlay extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'Keyboard Shortcuts',
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                  Text(
+                    labels.title,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20,
+                    ),
                   ),
                   const SizedBox(height: 16),
                   Flexible(
@@ -379,7 +413,7 @@ class _OiShortcutHelpOverlay extends StatelessWidget {
                     alignment: Alignment.centerRight,
                     child: GestureDetector(
                       onTap: onDismiss,
-                      child: const Text('Close'),
+                      child: Text(labels.close),
                     ),
                   ),
                 ],

@@ -81,20 +81,148 @@ class OiKnowledgeArticle {
 // ---------------------------------------------------------------------------
 
 enum _HelpTab {
-  faq('FAQ', OiIcons.helpCircle),
-  contact('Contact', OiIcons.messageCircle),
-  articles('Articles', OiIcons.bookOpen),
-  feedback('Feedback', OiIcons.star)
+  faq(OiIcons.helpCircle),
+  contact(OiIcons.messageCircle),
+  articles(OiIcons.bookOpen),
+  feedback(OiIcons.star)
   ;
 
-  const _HelpTab(this.label, this.icon);
-  final String label;
+  const _HelpTab(this.icon);
   final IconData icon;
 }
 
 // ---------------------------------------------------------------------------
 // Widget
 // ---------------------------------------------------------------------------
+
+/// The texts of an [OiHelpCenter], in English by default; pass translations
+/// to localize the help center.
+///
+/// {@category Modules}
+class OiHelpCenterLabels {
+  /// Creates an [OiHelpCenterLabels].
+  const OiHelpCenterLabels({
+    this.faq = 'FAQ',
+    this.contact = 'Contact',
+    this.articles = 'Articles',
+    this.feedback = 'Feedback',
+    this.tab = englishTab,
+    this.noSections = 'No help sections available',
+    this.noMatchingQuestions = 'No matching questions',
+    this.messageSent = 'Message sent',
+    this.messageSentDescription =
+        'We will get back to you as soon as possible.',
+    this.subject = 'Subject',
+    this.subjectPlaceholder = 'What do you need help with?',
+    this.email = 'Email (optional)',
+    this.emailPlaceholder = 'your@email.com',
+    this.message = 'Message',
+    this.messagePlaceholder = 'Describe your issue...',
+    this.sendMessage = 'Send message',
+    this.sendMessageSemantic = 'Send contact message',
+    this.noMatchingArticles = 'No matching articles',
+    this.back = 'Back',
+    this.backToArticles = 'Back to articles',
+    this.lastUpdated = englishLastUpdated,
+    this.thankYou = 'Thank you!',
+    this.thankYouDescription = 'Your feedback helps us improve.',
+    this.ratingQuestion = 'How would you rate your experience?',
+    this.rating = 'Experience rating',
+    this.comments = 'Additional comments (optional)',
+    this.commentsPlaceholder = 'Tell us more about your experience...',
+    this.submitFeedback = 'Submit feedback',
+  });
+
+  /// "FAQ tab": the default [tab].
+  static String englishTab(String tab) => '$tab tab';
+
+  /// "Last updated: 2026-03-05": the default [lastUpdated].
+  static String englishLastUpdated(String date) => 'Last updated: $date';
+
+  /// Label of the FAQ tab.
+  final String faq;
+
+  /// Label of the contact tab.
+  final String contact;
+
+  /// Label of the articles tab.
+  final String articles;
+
+  /// Label of the feedback tab.
+  final String feedback;
+
+  /// Screen-reader label of the named tab.
+  final String Function(String tab) tab;
+
+  /// Shown when no section is enabled.
+  final String noSections;
+
+  /// Shown when the search finds no question.
+  final String noMatchingQuestions;
+
+  /// Title shown after the contact form is sent.
+  final String messageSent;
+
+  /// Description shown after the contact form is sent.
+  final String messageSentDescription;
+
+  /// Label of the subject input.
+  final String subject;
+
+  /// Placeholder of the subject input.
+  final String subjectPlaceholder;
+
+  /// Label of the email input.
+  final String email;
+
+  /// Placeholder of the email input.
+  final String emailPlaceholder;
+
+  /// Label of the message input.
+  final String message;
+
+  /// Placeholder of the message input.
+  final String messagePlaceholder;
+
+  /// Label of the send button.
+  final String sendMessage;
+
+  /// Screen-reader label of the send button.
+  final String sendMessageSemantic;
+
+  /// Shown when the search finds no article.
+  final String noMatchingArticles;
+
+  /// Label of the link back to the articles.
+  final String back;
+
+  /// Screen-reader label of the link back to the articles.
+  final String backToArticles;
+
+  /// Names the date an article was last updated.
+  final String Function(String date) lastUpdated;
+
+  /// Title shown after feedback is sent.
+  final String thankYou;
+
+  /// Description shown after feedback is sent.
+  final String thankYouDescription;
+
+  /// Question above the rating.
+  final String ratingQuestion;
+
+  /// Screen-reader label of the rating.
+  final String rating;
+
+  /// Label of the comments input.
+  final String comments;
+
+  /// Placeholder of the comments input.
+  final String commentsPlaceholder;
+
+  /// Label of the submit button.
+  final String submitFeedback;
+}
 
 /// A help center module with FAQ, contact form, knowledge base, and feedback.
 ///
@@ -116,6 +244,7 @@ class OiHelpCenter extends StatefulWidget {
     this.showKnowledgeBase = true,
     this.showFeedback = true,
     this.searchEnabled = true,
+    this.labels = const OiHelpCenterLabels(),
     super.key,
   });
 
@@ -155,6 +284,9 @@ class OiHelpCenter extends StatefulWidget {
 
   /// Whether the search bar is visible.
   final bool searchEnabled;
+
+  /// The help center's texts; pass translations to localize it.
+  final OiHelpCenterLabels labels;
 
   @override
   State<OiHelpCenter> createState() => _OiHelpCenterState();
@@ -230,7 +362,7 @@ class _OiHelpCenterState extends State<OiHelpCenter> {
       return Semantics(
         label: widget.label,
         container: true,
-        child: const OiEmptyState(title: 'No help sections available'),
+        child: OiEmptyState(title: widget.labels.noSections),
       );
     }
 
@@ -290,7 +422,7 @@ class _OiHelpCenterState extends State<OiHelpCenter> {
       children: [
         for (var i = 0; i < tabs.length; i++)
           OiTappable(
-            semanticLabel: '${tabs[i].label} tab',
+            semanticLabel: widget.labels.tab(_tabLabel(tabs[i])),
             onTap: () => setState(() => _activeTab = i),
             child: Container(
               padding: EdgeInsets.symmetric(
@@ -315,7 +447,7 @@ class _OiHelpCenterState extends State<OiHelpCenter> {
                   SizedBox(width: spacing.sm),
                   Expanded(
                     child: OiLabel.body(
-                      tabs[i].label,
+                      _tabLabel(tabs[i]),
                       color: _activeTab == i
                           ? colors.primary.base
                           : colors.textMuted,
@@ -367,7 +499,7 @@ class _OiHelpCenterState extends State<OiHelpCenter> {
   ) {
     final isActive = _activeTab == index;
     return OiTappable(
-      semanticLabel: '${tab.label} tab',
+      semanticLabel: widget.labels.tab(_tabLabel(tab)),
       onTap: () => setState(() => _activeTab = index),
       child: Container(
         padding: EdgeInsets.symmetric(
@@ -396,7 +528,7 @@ class _OiHelpCenterState extends State<OiHelpCenter> {
             ),
             SizedBox(width: context.spacing.xs),
             OiLabel.small(
-              tab.label,
+              _tabLabel(tab),
               color: isActive
                   ? context.colors.primary.base
                   : context.colors.textMuted,
@@ -429,9 +561,9 @@ class _OiHelpCenterState extends State<OiHelpCenter> {
     }).toList();
 
     if (filtered.isEmpty) {
-      return const Center(
+      return Center(
         child: OiEmptyState(
-          title: 'No matching questions',
+          title: widget.labels.noMatchingQuestions,
           icon: OiIcons.helpCircle,
         ),
       );
@@ -467,10 +599,10 @@ class _OiHelpCenterState extends State<OiHelpCenter> {
               color: context.colors.success.base,
             ),
             SizedBox(height: context.spacing.sm),
-            const OiLabel.h3('Message sent'),
+            OiLabel.h3(widget.labels.messageSent),
             SizedBox(height: context.spacing.xs),
             OiLabel.body(
-              'We will get back to you as soon as possible.',
+              widget.labels.messageSentDescription,
               color: context.colors.textMuted,
             ),
           ],
@@ -485,21 +617,21 @@ class _OiHelpCenterState extends State<OiHelpCenter> {
         children: [
           OiTextInput(
             controller: _subjectController,
-            label: 'Subject',
-            placeholder: 'What do you need help with?',
+            label: widget.labels.subject,
+            placeholder: widget.labels.subjectPlaceholder,
           ),
           SizedBox(height: context.spacing.sm),
           OiTextInput(
             controller: _emailController,
-            label: 'Email (optional)',
-            placeholder: 'your@email.com',
+            label: widget.labels.email,
+            placeholder: widget.labels.emailPlaceholder,
             keyboardType: TextInputType.emailAddress,
           ),
           SizedBox(height: context.spacing.sm),
           OiTextInput.multiline(
             controller: _messageController,
-            label: 'Message',
-            placeholder: 'Describe your issue...',
+            label: widget.labels.message,
+            placeholder: widget.labels.messagePlaceholder,
             minLines: 4,
           ),
           SizedBox(height: context.spacing.md),
@@ -507,8 +639,8 @@ class _OiHelpCenterState extends State<OiHelpCenter> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               OiButton.primary(
-                label: 'Send message',
-                semanticLabel: 'Send contact message',
+                label: widget.labels.sendMessage,
+                semanticLabel: widget.labels.sendMessageSemantic,
                 loading: _contactSubmitting,
                 enabled: !_contactSubmitting,
                 onTap: _handleContactSubmit,
@@ -561,9 +693,9 @@ class _OiHelpCenterState extends State<OiHelpCenter> {
     }).toList();
 
     if (filtered.isEmpty) {
-      return const Center(
+      return Center(
         child: OiEmptyState(
-          title: 'No matching articles',
+          title: widget.labels.noMatchingArticles,
           icon: OiIcons.bookOpen,
         ),
       );
@@ -630,7 +762,7 @@ class _OiHelpCenterState extends State<OiHelpCenter> {
           child: Row(
             children: [
               OiTappable(
-                semanticLabel: 'Back to articles',
+                semanticLabel: widget.labels.backToArticles,
                 onTap: () => setState(() => _selectedArticle = null),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
@@ -641,7 +773,10 @@ class _OiHelpCenterState extends State<OiHelpCenter> {
                       color: context.colors.primary.base,
                     ),
                     SizedBox(width: context.spacing.xs),
-                    OiLabel.small('Back', color: context.colors.primary.base),
+                    OiLabel.small(
+                      widget.labels.back,
+                      color: context.colors.primary.base,
+                    ),
                   ],
                 ),
               ),
@@ -659,7 +794,9 @@ class _OiHelpCenterState extends State<OiHelpCenter> {
                 if (article.lastUpdated != null) ...[
                   SizedBox(height: context.spacing.xs),
                   OiLabel.caption(
-                    'Last updated: ${_formatDate(article.lastUpdated!)}',
+                    widget.labels.lastUpdated(
+                      _formatDate(article.lastUpdated!),
+                    ),
                     color: context.colors.textMuted,
                   ),
                 ],
@@ -672,6 +809,13 @@ class _OiHelpCenterState extends State<OiHelpCenter> {
       ],
     );
   }
+
+  String _tabLabel(_HelpTab tab) => switch (tab) {
+    _HelpTab.faq => widget.labels.faq,
+    _HelpTab.contact => widget.labels.contact,
+    _HelpTab.articles => widget.labels.articles,
+    _HelpTab.feedback => widget.labels.feedback,
+  };
 
   String _formatDate(DateTime date) {
     return '${date.year}-${date.month.toString().padLeft(2, '0')}-'
@@ -690,10 +834,10 @@ class _OiHelpCenterState extends State<OiHelpCenter> {
           children: [
             Icon(OiIcons.star, size: 48, color: context.colors.warning.base),
             SizedBox(height: context.spacing.sm),
-            const OiLabel.h3('Thank you!'),
+            OiLabel.h3(widget.labels.thankYou),
             SizedBox(height: context.spacing.xs),
             OiLabel.body(
-              'Your feedback helps us improve.',
+              widget.labels.thankYouDescription,
               color: context.colors.textMuted,
             ),
           ],
@@ -706,10 +850,10 @@ class _OiHelpCenterState extends State<OiHelpCenter> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const OiLabel.bodyStrong('How would you rate your experience?'),
+          OiLabel.bodyStrong(widget.labels.ratingQuestion),
           SizedBox(height: context.spacing.sm),
           OiStarRating(
-            label: 'Experience rating',
+            label: widget.labels.rating,
             value: _feedbackRating,
             size: 32,
             onChanged: (value) => setState(() => _feedbackRating = value),
@@ -717,13 +861,13 @@ class _OiHelpCenterState extends State<OiHelpCenter> {
           SizedBox(height: context.spacing.md),
           OiTextInput.multiline(
             controller: _feedbackCommentController,
-            label: 'Additional comments (optional)',
-            placeholder: 'Tell us more about your experience...',
+            label: widget.labels.comments,
+            placeholder: widget.labels.commentsPlaceholder,
           ),
           SizedBox(height: context.spacing.md),
           OiButton.primary(
-            label: 'Submit feedback',
-            semanticLabel: 'Submit feedback',
+            label: widget.labels.submitFeedback,
+            semanticLabel: widget.labels.submitFeedback,
             loading: _feedbackSubmitting,
             enabled: !_feedbackSubmitting && _feedbackRating > 0,
             onTap: _handleFeedbackSubmit,

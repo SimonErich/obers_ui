@@ -104,6 +104,7 @@ class OiCodeBlock extends StatelessWidget {
     this.showCopyButton = true,
     this.lineNumbers = false,
     this.maxHeight,
+    this.copyLabel = 'Copy code',
     super.key,
   });
 
@@ -121,6 +122,9 @@ class OiCodeBlock extends StatelessWidget {
 
   /// Maximum height before the block scrolls.
   final double? maxHeight;
+
+  /// Screen-reader label of the copy button.
+  final String copyLabel;
 
   @override
   Widget build(BuildContext context) {
@@ -202,7 +206,7 @@ class OiCodeBlock extends StatelessWidget {
           right: 2,
           child: OiCopyButton(
             value: code,
-            semanticLabel: 'Copy code',
+            semanticLabel: copyLabel,
           ),
         ),
       ],

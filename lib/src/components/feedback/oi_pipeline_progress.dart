@@ -76,6 +76,8 @@ class OiPipelineProgress extends StatelessWidget {
     this.error,
     this.onRetry,
     this.collapseCompleted = false,
+    this.cancelLabel = 'Cancel',
+    this.retryLabel = 'Retry',
     super.key,
   });
 
@@ -106,6 +108,12 @@ class OiPipelineProgress extends StatelessWidget {
   /// Useful when the pipeline has many steps and scrolling past them all is
   /// cumbersome.
   final bool collapseCompleted;
+
+  /// Label of the cancel button.
+  final String cancelLabel;
+
+  /// Label of a failed step's retry button.
+  final String retryLabel;
 
   // ── Constants ────────────────────────────────────────────────────────────
 
@@ -180,7 +188,7 @@ class OiPipelineProgress extends StatelessWidget {
           if (onCancel != null) ...[
             SizedBox(height: spacing.md),
             OiButton.ghost(
-              label: 'Cancel',
+              label: cancelLabel,
               onTap: onCancel,
               size: OiButtonSize.small,
             ),
@@ -280,7 +288,7 @@ class OiPipelineProgress extends StatelessWidget {
                   Align(
                     widthFactor: 1,
                     child: OiButton.outline(
-                      label: 'Retry',
+                      label: retryLabel,
                       onTap: onRetry,
                       size: OiButtonSize.small,
                     ),
