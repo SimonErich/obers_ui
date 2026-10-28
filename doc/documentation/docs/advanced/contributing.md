@@ -99,7 +99,7 @@ flutter test --update-goldens
 
 ### Test helpers
 
-ObersUI provides helpers in [test/helpers/](test/helpers/platform_helpers.dart) — all top-level functions that take the `WidgetTester` as the first argument:
+ObersUI provides helpers in [test/helpers/](https://github.com/SimonErich/obers_ui/blob/main/test/helpers/platform_helpers.dart) — all top-level functions that take the `WidgetTester` as the first argument:
 
 ```dart
 // Pump a widget with touch device simulation

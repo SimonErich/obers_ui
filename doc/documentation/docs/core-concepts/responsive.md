@@ -4,7 +4,7 @@ ObersUI is responsive by default. Layouts, spacing, and component behavior adapt
 
 ## Breakpoints
 
-The library defines five breakpoints in [oi_responsive.dart](lib/src/foundation/oi_responsive.dart):
+The library defines five breakpoints in [oi_responsive.dart](https://github.com/SimonErich/obers_ui/blob/main/lib/src/foundation/oi_responsive.dart):
 
 | Breakpoint | Width (dp) | Typical device |
 | --- | --- | --- |
@@ -88,11 +88,11 @@ ObersUI ships navigation primitives that you can switch between by breakpoint. T
 
 | Widget | Typical use |
 | --- | --- |
-| [OiBottomBar](lib/src/components/navigation/oi_bottom_bar.dart) | Compact: primary destinations at the bottom |
-| [OiDrawer](lib/src/components/navigation/oi_drawer.dart) | Compact: full-height navigation panel |
-| [OiNavigationRail](lib/src/components/navigation/oi_navigation_rail.dart) | Medium: compact vertical rail (default width 72dp) |
-| [OiSidebar](lib/src/composites/navigation/oi_sidebar.dart) | Expanded+: full-width labeled sidebar |
-| [OiResponsiveShell](lib/src/composites/navigation/oi_responsive_shell.dart) | A composite that switches between the above per breakpoint |
+| [OiBottomBar](https://github.com/SimonErich/obers_ui/blob/main/lib/src/components/navigation/oi_bottom_bar.dart) | Compact: primary destinations at the bottom |
+| [OiDrawer](https://github.com/SimonErich/obers_ui/blob/main/lib/src/components/navigation/oi_drawer.dart) | Compact: full-height navigation panel |
+| [OiNavigationRail](https://github.com/SimonErich/obers_ui/blob/main/lib/src/components/navigation/oi_navigation_rail.dart) | Medium: compact vertical rail (default width 72dp) |
+| [OiSidebar](https://github.com/SimonErich/obers_ui/blob/main/lib/src/composites/navigation/oi_sidebar.dart) | Expanded+: full-width labeled sidebar |
+| [OiResponsiveShell](https://github.com/SimonErich/obers_ui/blob/main/lib/src/composites/navigation/oi_responsive_shell.dart) | A composite that switches between the above per breakpoint |
 
 ## Page gutters
 
@@ -114,7 +114,7 @@ final gutter = scale.resolvePageGutter(context.breakpoint);
 final maxWidth = scale.resolveContentMaxWidth(context.breakpoint);
 ```
 
-`OiPage` does not apply gutters automatically — use [OiContainer](lib/src/primitives/layout/oi_container.dart) for a centered max-width shell, or pass the resolved gutter into `padding:` explicitly.
+`OiPage` does not apply gutters automatically — use [OiContainer](https://github.com/SimonErich/obers_ui/blob/main/lib/src/primitives/layout/oi_container.dart) for a centered max-width shell, or pass the resolved gutter into `padding:` explicitly.
 
 ## Custom breakpoints
 

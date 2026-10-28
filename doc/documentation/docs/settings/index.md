@@ -172,7 +172,7 @@ load-on-init, debounced saves, and defaults.
 
 Mixin on `State<W>` where `W extends StatefulWidget` and
 `T extends OiSettingsData`. Source:
-[lib/src/foundation/persistence/oi_settings_mixin.dart](../../../lib/src/foundation/persistence/oi_settings_mixin.dart).
+[lib/src/foundation/persistence/oi_settings_mixin.dart](https://github.com/SimonErich/obers_ui/blob/main/lib/src/foundation/persistence/oi_settings_mixin.dart).
 
 **Abstract members you must implement:**
 
@@ -218,7 +218,7 @@ wraps your app in one automatically when you pass `settingsDriver`; you
 can also place one manually to scope a driver to a subtree.
 
 Source:
-[lib/src/foundation/persistence/oi_settings_provider.dart](../../../lib/src/foundation/persistence/oi_settings_provider.dart).
+[lib/src/foundation/persistence/oi_settings_provider.dart](https://github.com/SimonErich/obers_ui/blob/main/lib/src/foundation/persistence/oi_settings_provider.dart).
 
 | Member | Type | Description |
 | --- | --- | --- |
