@@ -1,6 +1,8 @@
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/inputs/oi_date_input.dart';
 import 'package:obers_ui/src/components/inputs/oi_time_input.dart';
+import 'package:obers_ui/src/components/navigation/oi_time_picker.dart'
+    show OiTimePickerLabels;
 import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/primitives/display/oi_label.dart';
@@ -27,6 +29,7 @@ class OiDateTimeInput extends StatefulWidget {
     this.required = false,
     this.readOnly = false,
     this.enabled = true,
+    this.labels = const OiTimePickerLabels(),
     super.key,
   });
 
@@ -59,6 +62,10 @@ class OiDateTimeInput extends StatefulWidget {
 
   /// Whether the field accepts interaction.
   final bool enabled;
+
+  /// The texts of the date and time pickers; pass translations to localize
+  /// them.
+  final OiTimePickerLabels labels;
 
   @override
   State<OiDateTimeInput> createState() => _OiDateTimeInputState();
@@ -144,6 +151,8 @@ class _OiDateTimeInputState extends State<OiDateTimeInput> {
                   firstDate: widget.min,
                   lastDate: widget.max,
                   enabled: effectiveEnabled,
+                  cancelLabel: widget.labels.cancel,
+                  confirmLabel: widget.labels.confirm,
                 ),
               ),
               const SizedBox(width: 8),
@@ -152,6 +161,7 @@ class _OiDateTimeInputState extends State<OiDateTimeInput> {
                   value: _extractTime(widget.value),
                   onChanged: _handleTimeChanged,
                   enabled: effectiveEnabled,
+                  labels: widget.labels,
                 ),
               ),
             ],

@@ -25,6 +25,8 @@ class OiDateInput extends StatefulWidget {
     this.error,
     this.enabled = true,
     this.dateFormat,
+    this.cancelLabel = 'Cancel',
+    this.confirmLabel = 'OK',
     super.key,
   });
 
@@ -54,6 +56,12 @@ class OiDateInput extends StatefulWidget {
 
   /// Date format string, e.g. `'yyyy-MM-dd'`. Defaults to `'yyyy-MM-dd'`.
   final String? dateFormat;
+
+  /// Label of the picker's cancel button.
+  final String cancelLabel;
+
+  /// Label of the picker's confirm button.
+  final String confirmLabel;
 
   @override
   State<OiDateInput> createState() => _OiDateInputState();
@@ -276,7 +284,7 @@ class _OiDateInputState extends State<OiDateInput> {
                     vertical: 8,
                   ),
                   child: Text(
-                    'Cancel',
+                    widget.cancelLabel,
                     style: TextStyle(color: colors.textMuted),
                   ),
                 ),
@@ -290,7 +298,7 @@ class _OiDateInputState extends State<OiDateInput> {
                     vertical: 8,
                   ),
                   child: Text(
-                    'OK',
+                    widget.confirmLabel,
                     style: TextStyle(
                       color: colors.primary.base,
                       fontWeight: FontWeight.w600,

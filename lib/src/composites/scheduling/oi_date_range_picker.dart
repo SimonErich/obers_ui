@@ -3,6 +3,8 @@ import 'package:obers_ui/src/components/buttons/oi_button.dart';
 import 'package:obers_ui/src/components/inputs/oi_date_range_picker_field.dart';
 import 'package:obers_ui/src/components/inputs/oi_time_input.dart';
 import 'package:obers_ui/src/components/navigation/oi_date_picker.dart';
+import 'package:obers_ui/src/components/navigation/oi_time_picker.dart'
+    show OiTimePickerLabels;
 import 'package:obers_ui/src/foundation/oi_responsive.dart';
 import 'package:obers_ui/src/foundation/theme/oi_spacing_scale.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
@@ -43,6 +45,10 @@ class OiDateRangePicker extends StatefulWidget {
     this.locale,
     this.firstDayOfWeek,
     this.showTimePicker = false,
+    this.startTimeLabel = 'Start time',
+    this.endTimeLabel = 'End time',
+    this.pickerLabels = const OiDatePickerLabels(),
+    this.timePickerLabels = const OiTimePickerLabels(),
     super.key,
   });
 
@@ -86,6 +92,18 @@ class OiDateRangePicker extends StatefulWidget {
 
   /// Accessibility label.
   final String? semanticLabel;
+
+  /// Label of the start time input shown when [showTimePicker] is set.
+  final String startTimeLabel;
+
+  /// Label of the end time input shown when [showTimePicker] is set.
+  final String endTimeLabel;
+
+  /// The texts of the calendars; pass translations to localize them.
+  final OiDatePickerLabels pickerLabels;
+
+  /// The texts of the time inputs shown when [showTimePicker] is set.
+  final OiTimePickerLabels timePickerLabels;
 
   /// Specific dates that cannot be selected.
   final Set<DateTime>? disabledDates;
@@ -284,12 +302,14 @@ class _OiDateRangePickerState extends State<OiDateRangePicker> {
                 firstDayOfWeek: widget.firstDayOfWeek,
                 displayMonth: _leftMonth,
                 onDisplayMonthChanged: _onLeftMonthChanged,
+                labels: widget.pickerLabels,
               ),
               if (widget.showTimePicker)
                 Padding(
                   padding: EdgeInsets.only(top: spacing.sm),
                   child: OiTimeInput(
-                    label: 'Start time',
+                    label: widget.startTimeLabel,
+                    labels: widget.timePickerLabels,
                     value: _startTime,
                     onChanged: (time) => setState(() => _startTime = time),
                   ),
@@ -314,12 +334,14 @@ class _OiDateRangePickerState extends State<OiDateRangePicker> {
                 firstDayOfWeek: widget.firstDayOfWeek,
                 displayMonth: _rightMonth,
                 onDisplayMonthChanged: _onRightMonthChanged,
+                labels: widget.pickerLabels,
               ),
               if (widget.showTimePicker)
                 Padding(
                   padding: EdgeInsets.only(top: spacing.sm),
                   child: OiTimeInput(
-                    label: 'End time',
+                    label: widget.endTimeLabel,
+                    labels: widget.timePickerLabels,
                     value: _endTime,
                     onChanged: (time) => setState(() => _endTime = time),
                   ),
@@ -356,16 +378,19 @@ class _OiDateRangePickerState extends State<OiDateRangePicker> {
           firstDayOfWeek: widget.firstDayOfWeek,
           displayMonth: _leftMonth,
           onDisplayMonthChanged: _onLeftMonthChanged,
+          labels: widget.pickerLabels,
         ),
         if (widget.showTimePicker)
           OiTimeInput(
-            label: 'Start time',
+            label: widget.startTimeLabel,
+            labels: widget.timePickerLabels,
             value: _startTime,
             onChanged: (time) => setState(() => _startTime = time),
           ),
         if (widget.showTimePicker)
           OiTimeInput(
-            label: 'End time',
+            label: widget.endTimeLabel,
+            labels: widget.timePickerLabels,
             value: _endTime,
             onChanged: (time) => setState(() => _endTime = time),
           ),

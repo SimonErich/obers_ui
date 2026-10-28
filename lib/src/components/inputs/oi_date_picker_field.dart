@@ -46,6 +46,8 @@ class OiDatePickerField extends StatelessWidget {
     this.onSaved,
     this.autovalidateMode,
     this.semanticLabel,
+    this.clearLabel = 'Clear date',
+    this.pickerLabels = const OiDatePickerLabels(),
     super.key,
   });
 
@@ -113,6 +115,13 @@ class OiDatePickerField extends StatelessWidget {
   /// Semantic label for accessibility.
   final String? semanticLabel;
 
+  /// Screen-reader label of the clear button shown when [clearable] is set.
+  final String clearLabel;
+
+  /// The texts of the date picker that opens from the field; pass
+  /// translations to localize it.
+  final OiDatePickerLabels pickerLabels;
+
   String _formatDate(DateTime date) {
     final pattern = dateFormat ?? 'MMM d, yyyy';
     return DateFormat(pattern).format(date);
@@ -127,6 +136,7 @@ class OiDatePickerField extends StatelessWidget {
       firstDate: minDate,
       lastDate: maxDate,
       semanticLabel: semanticLabel ?? 'Select date',
+      labels: pickerLabels,
     );
 
     if (selected != null) {
@@ -151,6 +161,7 @@ class OiDatePickerField extends StatelessWidget {
         if (clearable && hasValue && enabled && !readOnly)
           OiTappable(
             onTap: _clear,
+            semanticLabel: clearLabel,
             child: Padding(
               padding: const EdgeInsets.only(right: 4),
               child: Icon(
