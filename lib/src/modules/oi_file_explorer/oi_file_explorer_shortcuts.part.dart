@@ -13,30 +13,30 @@ extension _OiFileExplorerShortcuts on _OiFileExplorerState {
   List<OiShortcutBinding> get _shortcuts => [
     OiShortcutBinding(
       activator: OiShortcutActivator.primary(LogicalKeyboardKey.keyA),
-      label: 'Select all',
-      category: 'Selection',
+      label: widget.labels.shortcuts.selectAll,
+      category: widget.labels.shortcuts.selection,
       onInvoke: () {
         if (!widget.enableMultiSelect) return;
         widget.controller.selectAll();
-        _announce('All items selected');
+        _announce(widget.labels.announcements.allSelected);
       },
     ),
     OiShortcutBinding(
       activator: const SingleActivator(LogicalKeyboardKey.delete),
-      label: 'Delete',
-      category: 'Actions',
+      label: widget.labels.shortcuts.delete,
+      category: widget.labels.shortcuts.actions,
       onInvoke: _deleteSelectedFiles,
     ),
     OiShortcutBinding(
       activator: const SingleActivator(LogicalKeyboardKey.backspace),
-      label: 'Delete',
-      category: 'Actions',
+      label: widget.labels.shortcuts.delete,
+      category: widget.labels.shortcuts.actions,
       onInvoke: _deleteSelectedFiles,
     ),
     OiShortcutBinding(
       activator: const SingleActivator(LogicalKeyboardKey.f2),
-      label: 'Rename',
-      category: 'Actions',
+      label: widget.labels.shortcuts.rename,
+      category: widget.labels.shortcuts.actions,
       onInvoke: () {
         if (!widget.enableRename) return;
         final selected = widget.controller.selectedFiles;
@@ -46,8 +46,8 @@ extension _OiFileExplorerShortcuts on _OiFileExplorerState {
     ),
     OiShortcutBinding(
       activator: OiShortcutActivator.primary(LogicalKeyboardKey.keyF),
-      label: 'Search',
-      category: 'Navigation',
+      label: widget.labels.shortcuts.search,
+      category: widget.labels.shortcuts.navigation,
       onInvoke: () {
         if (!widget.enableSearch) return;
         _setSearchActive(active: true);
@@ -55,8 +55,8 @@ extension _OiFileExplorerShortcuts on _OiFileExplorerState {
     ),
     OiShortcutBinding(
       activator: const SingleActivator(LogicalKeyboardKey.escape),
-      label: 'Cancel / close search',
-      category: 'Navigation',
+      label: widget.labels.shortcuts.closeSearch,
+      category: widget.labels.shortcuts.navigation,
       onInvoke: () {
         if (_searchActive) {
           _setSearchActive(active: false);
@@ -65,28 +65,26 @@ extension _OiFileExplorerShortcuts on _OiFileExplorerState {
           widget.controller.cancelRename();
         } else if (widget.controller.selectedKeys.isNotEmpty) {
           widget.controller.clearSelection();
-          _announce('Selection cleared');
+          _announce(widget.labels.announcements.selectionCleared);
         }
       },
     ),
     OiShortcutBinding(
       activator: OiShortcutActivator.primary(LogicalKeyboardKey.keyX),
-      label: 'Cut (for keyboard move)',
-      category: 'Clipboard',
+      label: widget.labels.shortcuts.cut,
+      category: widget.labels.shortcuts.clipboard,
       onInvoke: () {
         final selected = widget.controller.selectedFiles;
         if (selected.isEmpty) return;
         _clipboard = List.of(selected);
         _clipboardIsCut = true;
-        _announce(
-          '${selected.length} item${selected.length == 1 ? '' : 's'} cut',
-        );
+        _announce(widget.labels.announcements.cut(selected.length));
       },
     ),
     OiShortcutBinding(
       activator: OiShortcutActivator.primary(LogicalKeyboardKey.keyC),
-      label: 'Copy (for keyboard copy)',
-      category: 'Clipboard',
+      label: widget.labels.shortcuts.copy,
+      category: widget.labels.shortcuts.clipboard,
       onInvoke: () {
         if (widget.onCopy == null) return;
         final selected = widget.controller.selectedFiles;
@@ -94,28 +92,24 @@ extension _OiFileExplorerShortcuts on _OiFileExplorerState {
         _clipboard = List.of(selected);
         _clipboardIsCut = false;
         _announce(
-          '${selected.length} item${selected.length == 1 ? '' : 's'} copied to clipboard',
+          widget.labels.announcements.copiedToClipboard(selected.length),
         );
       },
     ),
     OiShortcutBinding(
       activator: OiShortcutActivator.primary(LogicalKeyboardKey.keyV),
-      label: 'Paste (move/copy here)',
-      category: 'Clipboard',
+      label: widget.labels.shortcuts.paste,
+      category: widget.labels.shortcuts.clipboard,
       onInvoke: () async {
         if (_clipboard.isEmpty) return;
         final folder = widget.controller.currentFolder;
         if (folder == null) return;
         if (_clipboardIsCut) {
           await widget.onMove(_clipboard, folder);
-          _announce(
-            '${_clipboard.length} item${_clipboard.length == 1 ? '' : 's'} moved here',
-          );
+          _announce(widget.labels.announcements.movedHere(_clipboard.length));
         } else {
           await widget.onCopy?.call(_clipboard, folder);
-          _announce(
-            '${_clipboard.length} item${_clipboard.length == 1 ? '' : 's'} copied here',
-          );
+          _announce(widget.labels.announcements.copiedHere(_clipboard.length));
         }
         _clipboard = [];
         _clipboardIsCut = false;
@@ -125,8 +119,8 @@ extension _OiFileExplorerShortcuts on _OiFileExplorerState {
     ),
     OiShortcutBinding(
       activator: OiShortcutActivator.primary(LogicalKeyboardKey.keyU),
-      label: 'Upload',
-      category: 'Actions',
+      label: widget.labels.shortcuts.upload,
+      category: widget.labels.shortcuts.actions,
       onInvoke: () {
         if (!widget.enableUpload) return;
         _showUploadDialog();
@@ -137,20 +131,20 @@ extension _OiFileExplorerShortcuts on _OiFileExplorerState {
         LogicalKeyboardKey.keyN,
         shift: true,
       ),
-      label: 'New folder',
-      category: 'Actions',
+      label: widget.labels.shortcuts.newFolder,
+      category: widget.labels.shortcuts.actions,
       onInvoke: () async {
         final folderId =
             widget.controller.currentFolder?.id.toString() ?? 'root';
-        await widget.onCreateFolder(folderId, 'New Folder');
+        await widget.onCreateFolder(folderId, widget.labels.newFolderName);
         unawaited(widget.controller.refresh());
-        _announce('New folder created');
+        _announce(widget.labels.announcements.newFolderCreated);
       },
     ),
     OiShortcutBinding(
       activator: const SingleActivator(LogicalKeyboardKey.backspace, alt: true),
-      label: 'Go back',
-      category: 'Navigation',
+      label: widget.labels.shortcuts.goBack,
+      category: widget.labels.shortcuts.navigation,
       onInvoke: () {
         if (widget.controller.canGoBack) {
           widget.controller.goBack();
@@ -163,8 +157,8 @@ extension _OiFileExplorerShortcuts on _OiFileExplorerState {
         alt: true,
         shift: true,
       ),
-      label: 'Go forward',
-      category: 'Navigation',
+      label: widget.labels.shortcuts.goForward,
+      category: widget.labels.shortcuts.navigation,
       onInvoke: () {
         if (widget.controller.canGoForward) {
           widget.controller.goForward();

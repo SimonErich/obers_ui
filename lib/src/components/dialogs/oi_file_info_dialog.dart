@@ -7,6 +7,76 @@ import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/models/oi_file_node_data.dart';
 import 'package:obers_ui/src/utils/file_utils.dart';
 
+/// The texts of an [OiFileInfoDialog], in English by default; pass
+/// translations to localize the dialog.
+///
+/// {@category Components}
+class OiFileInfoDialogLabels {
+  /// Creates an [OiFileInfoDialogLabels].
+  const OiFileInfoDialogLabels({
+    this.folder = 'Folder',
+    this.size = 'Size',
+    this.location = 'Location',
+    this.created = 'Created',
+    this.modified = 'Modified',
+    this.items = 'Items',
+    this.close = 'Close',
+    this.dialog = 'File info dialog',
+    this.fileTypeName = OiFileUtils.fileTypeName,
+    this.formatDate = englishFormatDate,
+  });
+
+  /// "March 5, 2026 at 14:30": the default [formatDate].
+  static String englishFormatDate(DateTime date) {
+    const months = [
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December',
+    ];
+    return '${months[date.month - 1]} ${date.day}, ${date.year} at '
+        '${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}';
+  }
+
+  /// Type shown for a folder.
+  final String folder;
+
+  /// Label of the size row.
+  final String size;
+
+  /// Label of the location row.
+  final String location;
+
+  /// Label of the created row.
+  final String created;
+
+  /// Label of the modified row.
+  final String modified;
+
+  /// Label of a folder's item count row.
+  final String items;
+
+  /// Label of the close button.
+  final String close;
+
+  /// Screen-reader label of the dialog.
+  final String dialog;
+
+  /// Type shown for a file, by its extension.
+  final String Function(String extension) fileTypeName;
+
+  /// Formats the created and modified dates.
+  final String Function(DateTime date) formatDate;
+}
+
 /// A dialog showing detailed metadata about a file or folder.
 ///
 /// Displays name, type, size, location, created/modified dates, and custom
@@ -19,6 +89,7 @@ class OiFileInfoDialog extends StatelessWidget {
     required this.file,
     this.onClose,
     this.extraMetadata,
+    this.labels = const OiFileInfoDialogLabels(),
     super.key,
   });
 
@@ -31,6 +102,9 @@ class OiFileInfoDialog extends StatelessWidget {
   /// Additional key-value metadata to display.
   final Map<String, String>? extraMetadata;
 
+  /// The dialog's texts; pass translations to localize it.
+  final OiFileInfoDialogLabels labels;
+
   bool get _isImage {
     final ext = file.resolvedExtension.toLowerCase();
     return const {'png', 'jpg', 'jpeg', 'gif', 'svg', 'webp'}.contains(ext);
@@ -42,7 +116,7 @@ class OiFileInfoDialog extends StatelessWidget {
     final spacing = context.spacing;
 
     return Semantics(
-      label: 'File info dialog',
+      label: labels.dialog,
       child: Padding(
         padding: EdgeInsets.all(spacing.lg),
         child: Column(
@@ -81,8 +155,8 @@ class OiFileInfoDialog extends StatelessWidget {
                       SizedBox(height: spacing.xs),
                       Text(
                         file.folder
-                            ? 'Folder'
-                            : OiFileUtils.fileTypeName(file.resolvedExtension),
+                            ? labels.folder
+                            : labels.fileTypeName(file.resolvedExtension),
                         style: TextStyle(
                           fontSize: 13,
                           color: colors.textSubtle,
@@ -100,32 +174,32 @@ class OiFileInfoDialog extends StatelessWidget {
             // Info rows
             if (!file.folder && file.size != null)
               _InfoRow(
-                label: 'Size',
+                label: labels.size,
                 value: file.formattedSize,
                 colors: colors,
               ),
             if (file.parentId != null)
               _InfoRow(
-                label: 'Location',
+                label: labels.location,
                 value: file.parentId!,
                 colors: colors,
                 copyable: true,
               ),
             if (file.created != null)
               _InfoRow(
-                label: 'Created',
-                value: _formatDate(file.created!),
+                label: labels.created,
+                value: labels.formatDate(file.created!),
                 colors: colors,
               ),
             if (file.modified != null)
               _InfoRow(
-                label: 'Modified',
-                value: _formatDate(file.modified!),
+                label: labels.modified,
+                value: labels.formatDate(file.modified!),
                 colors: colors,
               ),
             if (file.folder && file.itemCount != null)
               _InfoRow(
-                label: 'Items',
+                label: labels.items,
                 value: '${file.itemCount}',
                 colors: colors,
               ),
@@ -141,31 +215,12 @@ class OiFileInfoDialog extends StatelessWidget {
             // Close button
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
-              children: [OiButton.ghost(label: 'Close', onTap: onClose)],
+              children: [OiButton.ghost(label: labels.close, onTap: onClose)],
             ),
           ],
         ),
       ),
     );
-  }
-
-  static String _formatDate(DateTime date) {
-    final months = [
-      'January',
-      'February',
-      'March',
-      'April',
-      'May',
-      'June',
-      'July',
-      'August',
-      'September',
-      'October',
-      'November',
-      'December',
-    ];
-    return '${months[date.month - 1]} ${date.day}, ${date.year} at '
-        '${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}';
   }
 }
 

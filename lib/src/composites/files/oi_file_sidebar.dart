@@ -59,6 +59,66 @@ class OiStorageData {
   final List<OiStorageCategory>? breakdown;
 }
 
+/// The texts of an [OiFileSidebar], in English by default; pass
+/// translations to localize the sidebar.
+///
+/// {@category Composites}
+class OiFileSidebarLabels {
+  /// Creates an [OiFileSidebarLabels].
+  const OiFileSidebarLabels({
+    this.quickAccess = 'Quick Access',
+    this.favorites = 'Favorites',
+    this.folders = 'Folders',
+    this.folderTree = 'Folder tree',
+    this.folderMenu = englishFolderMenu,
+    this.newSubfolder = 'New subfolder',
+    this.rename = 'Rename',
+    this.delete = 'Delete',
+    this.newFolder = '+ New Folder',
+    this.rootFolder = 'Home',
+    this.favorite = englishFavorite,
+  });
+
+  /// "Folder Documents context menu": the default [folderMenu].
+  static String englishFolderMenu(String name) => 'Folder $name context menu';
+
+  /// "Favorite: Documents": the default [favorite].
+  static String englishFavorite(String name) => 'Favorite: $name';
+
+  /// Heading of the quick access section.
+  final String quickAccess;
+
+  /// Heading of the favorites section.
+  final String favorites;
+
+  /// Heading of the folder tree.
+  final String folders;
+
+  /// Screen-reader label of the folder tree.
+  final String folderTree;
+
+  /// Screen-reader label of the context menu of the named folder.
+  final String Function(String name) folderMenu;
+
+  /// Label of the context menu entry that creates a subfolder.
+  final String newSubfolder;
+
+  /// Label of the context menu entry that renames a folder.
+  final String rename;
+
+  /// Label of the context menu entry that deletes a folder.
+  final String delete;
+
+  /// Label of the button that creates a folder.
+  final String newFolder;
+
+  /// Name of the folder a new folder is created in while the tree is empty.
+  final String rootFolder;
+
+  /// Screen-reader label of the named favorite folder.
+  final String Function(String name) favorite;
+}
+
 /// The left sidebar panel of the file explorer.
 ///
 /// Shows a folder tree with drag-and-drop support, quick-access sections
@@ -88,6 +148,7 @@ class OiFileSidebar extends StatefulWidget {
     this.resizable = true,
     this.collapsible = true,
     this.semanticsLabel,
+    this.labels = const OiFileSidebarLabels(),
     super.key,
   });
 
@@ -159,6 +220,9 @@ class OiFileSidebar extends StatefulWidget {
 
   /// Accessibility label.
   final String? semanticsLabel;
+
+  /// The sidebar's texts; pass translations to localize it.
+  final OiFileSidebarLabels labels;
 
   @override
   State<OiFileSidebar> createState() => _OiFileSidebarState();
@@ -237,7 +301,10 @@ class _OiFileSidebarState extends State<OiFileSidebar> {
               // Quick access section
               if (widget.quickAccess != null &&
                   widget.quickAccess!.isNotEmpty) ...[
-                _SectionHeader(label: 'Quick Access', colors: colors),
+                _SectionHeader(
+                  label: widget.labels.quickAccess,
+                  colors: colors,
+                ),
                 for (final item in widget.quickAccess!)
                   _QuickAccessRow(
                     item: item,
@@ -255,10 +322,11 @@ class _OiFileSidebarState extends State<OiFileSidebar> {
               ],
               // Favorites section
               if (widget.favorites != null && widget.favorites!.isNotEmpty) ...[
-                _SectionHeader(label: 'Favorites', colors: colors),
+                _SectionHeader(label: widget.labels.favorites, colors: colors),
                 for (final fav in widget.favorites!)
                   _FavoriteRow(
                     folder: fav,
+                    label: widget.labels.favorite(fav.name),
                     onTap: () => widget.onFavoriteTap?.call(fav),
                     onFileDrop: widget.onFileDrop,
                     colors: colors,
@@ -273,10 +341,10 @@ class _OiFileSidebarState extends State<OiFileSidebar> {
                 ),
               ],
               // Folder tree
-              _SectionHeader(label: 'Folders', colors: colors),
+              _SectionHeader(label: widget.labels.folders, colors: colors),
               Expanded(
                 child: OiTree<OiFileNodeData>(
-                  label: 'Folder tree',
+                  label: widget.labels.folderTree,
                   nodes: widget.folderTree,
                   controller: _treeController,
                   selectable: true,
@@ -340,23 +408,23 @@ class _OiFileSidebarState extends State<OiFileSidebar> {
                             widget.onDeleteFolder != null ||
                             widget.onNewFolder != null) {
                           treeItem = OiContextMenu(
-                            label: 'Folder ${folder.name} context menu',
+                            label: widget.labels.folderMenu(folder.name),
                             items: [
                               if (widget.onNewFolder != null)
                                 OiMenuItem(
-                                  label: 'New subfolder',
+                                  label: widget.labels.newSubfolder,
                                   icon: OiIcons.folderOpen,
                                   onTap: () => widget.onNewFolder!(folder),
                                 ),
                               if (widget.onRenameFolder != null)
                                 OiMenuItem(
-                                  label: 'Rename',
+                                  label: widget.labels.rename,
                                   icon: OiIcons.pencil,
                                   onTap: () => widget.onRenameFolder!(folder),
                                 ),
                               if (widget.onDeleteFolder != null)
                                 OiMenuItem(
-                                  label: 'Delete',
+                                  label: widget.labels.delete,
                                   icon: OiIcons.trash2,
                                   onTap: () => widget.onDeleteFolder!(folder),
                                 ),
@@ -374,7 +442,7 @@ class _OiFileSidebarState extends State<OiFileSidebar> {
                 Padding(
                   padding: EdgeInsets.all(spacing.sm),
                   child: OiButton.outline(
-                    label: '+ New Folder',
+                    label: widget.labels.newFolder,
                     fullWidth: true,
                     onTap: () {
                       // Resolve selected folder, falling back to the first
@@ -389,9 +457,9 @@ class _OiFileSidebarState extends State<OiFileSidebar> {
                           selected ??
                           (widget.folderTree.isNotEmpty
                               ? widget.folderTree.first.data
-                              : const OiFileNodeData(
+                              : OiFileNodeData(
                                   id: 'root',
-                                  name: 'Home',
+                                  name: widget.labels.rootFolder,
                                   folder: true,
                                 ));
                       if (target != null) {
@@ -523,6 +591,7 @@ class _QuickAccessRow extends StatelessWidget {
 class _FavoriteRow extends StatelessWidget {
   const _FavoriteRow({
     required this.folder,
+    required this.label,
     required this.onTap,
     required this.colors,
     required this.spacing,
@@ -530,6 +599,7 @@ class _FavoriteRow extends StatelessWidget {
   });
 
   final OiFileNodeData folder;
+  final String label;
   final VoidCallback onTap;
   final OiColorScheme colors;
   final OiSpacingScale spacing;
@@ -540,7 +610,7 @@ class _FavoriteRow extends StatelessWidget {
   Widget build(BuildContext context) {
     Widget row = Semantics(
       button: true,
-      label: 'Favorite: ${folder.name}',
+      label: label,
       child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,

@@ -16,6 +16,69 @@ import 'package:obers_ui/src/models/oi_file_node_data.dart';
 import 'package:obers_ui/src/primitives/drag_drop/oi_draggable.dart';
 import 'package:obers_ui/src/primitives/drag_drop/oi_drop_zone.dart';
 
+/// The texts of an [OiFileGridView], in English by default; pass
+/// translations to localize the view.
+///
+/// {@category Composites}
+class OiFileGridViewLabels {
+  /// Creates an [OiFileGridViewLabels].
+  const OiFileGridViewLabels({
+    this.backgroundMenu = 'File grid background menu',
+    this.folder = 'folder',
+    this.describeFile = englishDescribeFile,
+    this.rename = englishRename,
+    this.contextMenu = englishContextMenu,
+    this.dragCount = englishDragCount,
+    this.itemCount = englishItemCount,
+    this.empty = 'Empty',
+  });
+
+  /// "report.pdf, pdf, selected": the default [describeFile].
+  static String englishDescribeFile(
+    String name,
+    String type, {
+    required bool selected,
+  }) => '$name, $type${selected ? ', selected' : ''}';
+
+  /// "Rename report.pdf": the default [rename].
+  static String englishRename(String name) => 'Rename $name';
+
+  /// "Context menu for report.pdf": the default [contextMenu].
+  static String englishContextMenu(String name) => 'Context menu for $name';
+
+  /// "3 items": the default [dragCount].
+  static String englishDragCount(int count) => '$count items';
+
+  /// "4 items": the default [itemCount].
+  static String englishItemCount(int count) => '$count items';
+
+  /// Screen-reader label of the context menu on the empty area.
+  final String backgroundMenu;
+
+  /// Type read out for a folder by [describeFile].
+  final String folder;
+
+  /// Screen-reader description of a file by its name, its type (the
+  /// extension, or [folder]) and whether it is selected.
+  final String Function(String name, String type, {required bool selected})
+  describeFile;
+
+  /// Screen-reader label of the inline rename field of the named file.
+  final String Function(String name) rename;
+
+  /// Screen-reader label of the context menu of the named file.
+  final String Function(String name) contextMenu;
+
+  /// Shown while several files, counted by the argument, are dragged.
+  final String Function(int count) dragCount;
+
+  /// Subtitle of a folder card, by the number of items in it.
+  final String Function(int count) itemCount;
+
+  /// Subtitle of a folder card when it holds no items.
+  final String empty;
+}
+
 /// The grid view of files.
 ///
 /// Renders a virtualized grid of file cards. Same selection, drag-and-drop,
@@ -44,6 +107,7 @@ class OiFileGridView extends StatefulWidget {
     this.searchQuery,
     this.loading = false,
     this.semanticsLabel,
+    this.labels = const OiFileGridViewLabels(),
     super.key,
   });
 
@@ -104,6 +168,9 @@ class OiFileGridView extends StatefulWidget {
 
   /// Accessibility label.
   final String? semanticsLabel;
+
+  /// The view's texts; pass translations to localize it.
+  final OiFileGridViewLabels labels;
 
   @override
   State<OiFileGridView> createState() => _OiFileGridViewState();
@@ -274,7 +341,7 @@ class _OiFileGridViewState extends State<OiFileGridView> {
           onSelectionStart: () {},
           onSelectionEnd: () {},
           child: OiContextMenu(
-            label: 'File grid background menu',
+            label: widget.labels.backgroundMenu,
             items: widget.backgroundContextMenu?.call() ?? [],
             enabled: widget.backgroundContextMenu != null,
             child: GridView.builder(
@@ -315,9 +382,14 @@ class _OiFileGridViewState extends State<OiFileGridView> {
     OiColorScheme colors,
     OiSpacingScale spacing,
   ) {
-    final fileType = file.folder ? 'folder' : file.resolvedExtension;
-    final semanticLabel =
-        '${file.name}, $fileType${selected ? ', selected' : ''}';
+    final fileType = file.folder
+        ? widget.labels.folder
+        : file.resolvedExtension;
+    final semanticLabel = widget.labels.describeFile(
+      file.name,
+      fileType,
+      selected: selected,
+    );
 
     Widget card = Semantics(
       label: semanticLabel,
@@ -365,14 +437,16 @@ class _OiFileGridViewState extends State<OiFileGridView> {
                   folder: file.folder,
                   onRename: widget.onRename ?? (_) {},
                   onCancel: widget.onCancelRename ?? () {},
-                  semanticsLabel: 'Rename ${file.name}',
+                  semanticsLabel: widget.labels.rename(file.name),
                 )
               else
                 _buildName(file, colors),
               // Subtitle
               if (file.folder)
                 Text(
-                  file.itemCount != null ? '${file.itemCount} items' : 'Empty',
+                  file.itemCount != null
+                      ? widget.labels.itemCount(file.itemCount!)
+                      : widget.labels.empty,
                   style: TextStyle(fontSize: 10, color: colors.textMuted),
                 )
               else if (!renaming)
@@ -389,7 +463,7 @@ class _OiFileGridViewState extends State<OiFileGridView> {
     // Wrap with context menu
     if (widget.contextMenuBuilder != null) {
       card = OiContextMenu(
-        label: 'Context menu for ${file.name}',
+        label: widget.labels.contextMenu(file.name),
         items: widget.contextMenuBuilder!(file),
         child: card,
       );
@@ -475,7 +549,7 @@ class _OiFileGridViewState extends State<OiFileGridView> {
   Widget _buildDragFeedback(List<OiFileNodeData> files, OiColorScheme colors) {
     final label = files.length == 1
         ? files.first.name
-        : '${files.length} items';
+        : widget.labels.dragCount(files.length);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(

@@ -349,6 +349,7 @@ export 'src/modules/oi_dev_menu.dart';
 export 'src/modules/oi_drawer_navigation.dart';
 export 'src/modules/oi_feedback_sheet.dart';
 export 'src/modules/oi_file_explorer.dart';
+export 'src/modules/oi_file_explorer_labels.dart';
 export 'src/modules/oi_file_manager.dart';
 export 'src/modules/oi_help_center.dart';
 export 'src/modules/oi_kanban.dart';

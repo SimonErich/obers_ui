@@ -183,5 +183,22 @@ void main() {
         findsOneWidget,
       );
     });
+
+    testWidgets('renders the given labels', (tester) async {
+      await tester.pumpObers(
+        OiDeleteDialog(
+          files: [_file('a.txt'), _file('b.txt')],
+          onDelete: () {},
+          labels: OiDeleteDialogLabels(
+            deleteMany: (count) => '$count Elemente löschen?',
+            cancel: 'Abbrechen',
+            delete: 'Löschen',
+          ),
+        ),
+      );
+      expect(find.text('2 Elemente löschen?'), findsOneWidget);
+      expect(find.widgetWithText(OiButton, 'Abbrechen'), findsOneWidget);
+      expect(find.widgetWithText(OiButton, 'Löschen'), findsOneWidget);
+    });
   });
 }
