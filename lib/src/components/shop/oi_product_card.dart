@@ -34,6 +34,43 @@ enum OiProductCardVariant {
   compact,
 }
 
+/// The texts of an [OiProductCard], in English by default; pass translations
+/// to localize the card.
+///
+/// {@category Components}
+class OiProductCardLabels {
+  /// Creates an [OiProductCardLabels].
+  const OiProductCardLabels({
+    this.sale = 'Sale',
+    this.outOfStock = 'Out of Stock',
+    this.priceFor = englishPriceFor,
+    this.addToCart = 'Add to Cart',
+    this.add = 'Add',
+    this.wishlist = 'Wishlist',
+  });
+
+  /// "Price for Coffee": the default [priceFor].
+  static String englishPriceFor(String name) => 'Price for $name';
+
+  /// Badge shown while the product is on sale.
+  final String sale;
+
+  /// Badge shown while the product is out of stock.
+  final String outOfStock;
+
+  /// Screen-reader label of the named product's price.
+  final String Function(String name) priceFor;
+
+  /// Label of the add-to-cart button of the vertical card.
+  final String addToCart;
+
+  /// Label of the add-to-cart button of the horizontal card.
+  final String add;
+
+  /// Screen-reader label of the wishlist button.
+  final String wishlist;
+}
+
 /// A product display card for grid/list layouts showing image, name, price,
 /// rating, and quick-action buttons.
 ///
@@ -63,6 +100,7 @@ class OiProductCard extends StatelessWidget {
     this.showWishlist = false,
     this.loading = false,
     this.variant = OiProductCardVariant.vertical,
+    this.labels = const OiProductCardLabels(),
     super.key,
   });
 
@@ -79,6 +117,7 @@ class OiProductCard extends StatelessWidget {
     this.showAddToCart = true,
     this.showWishlist = false,
     this.loading = false,
+    this.labels = const OiProductCardLabels(),
     super.key,
   });
 
@@ -93,6 +132,7 @@ class OiProductCard extends StatelessWidget {
     bool showAddToCart = true,
     bool showWishlist = false,
     bool loading = false,
+    OiProductCardLabels labels = const OiProductCardLabels(),
     Key? key,
   }) : this._(
          product: product,
@@ -105,6 +145,7 @@ class OiProductCard extends StatelessWidget {
          showWishlist: showWishlist,
          loading: loading,
          variant: OiProductCardVariant.horizontal,
+         labels: labels,
          key: key,
        );
 
@@ -137,6 +178,9 @@ class OiProductCard extends StatelessWidget {
 
   /// The layout variant.
   final OiProductCardVariant variant;
+
+  /// The card's texts; pass translations to localize it.
+  final OiProductCardLabels labels;
 
   /// Whether the product is on sale.
   bool get _isOnSale =>
@@ -175,8 +219,8 @@ class OiProductCard extends StatelessWidget {
 
     if (_isOnSale) {
       badges.add(
-        const OiBadge.filled(
-          label: 'Sale',
+        OiBadge.filled(
+          label: labels.sale,
           color: OiBadgeColor.error,
           size: OiBadgeSize.small,
         ),
@@ -185,8 +229,8 @@ class OiProductCard extends StatelessWidget {
 
     if (_isOutOfStock) {
       badges.add(
-        const OiBadge.filled(
-          label: 'Out of Stock',
+        OiBadge.filled(
+          label: labels.outOfStock,
           color: OiBadgeColor.neutral,
           size: OiBadgeSize.small,
         ),
@@ -219,7 +263,7 @@ class OiProductCard extends StatelessWidget {
       ),
       OiPriceTag(
         price: product.price,
-        label: 'Price for ${product.name}',
+        label: labels.priceFor(product.name),
         compareAtPrice: product.compareAtPrice,
         currencyCode: product.currencyCode,
         size: isCompact ? OiPriceTagSize.small : OiPriceTagSize.medium,
@@ -265,7 +309,7 @@ class OiProductCard extends StatelessWidget {
     if (showAddToCart) {
       actions.add(
         OiButton.primary(
-          label: 'Add to Cart',
+          label: labels.addToCart,
           icon: _kCartIcon,
           size: OiButtonSize.small,
           onTap: _isOutOfStock ? null : onAddToCart,
@@ -277,7 +321,7 @@ class OiProductCard extends StatelessWidget {
     if (showWishlist) {
       actions.add(
         OiButton.ghost(
-          label: 'Wishlist',
+          label: labels.wishlist,
           icon: _kWishlistIcon,
           size: OiButtonSize.small,
           onTap: onWishlist,
@@ -399,7 +443,7 @@ class OiProductCard extends StatelessWidget {
             Expanded(child: _buildDetails(context)),
             if (showAddToCart)
               OiButton.primary(
-                label: 'Add',
+                label: labels.add,
                 icon: _kCartIcon,
                 size: OiButtonSize.small,
                 onTap: _isOutOfStock ? null : onAddToCart,

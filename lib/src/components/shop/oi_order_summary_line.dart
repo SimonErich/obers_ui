@@ -7,6 +7,43 @@ import 'package:obers_ui/src/primitives/display/oi_label.dart';
 import 'package:obers_ui/src/primitives/layout/oi_column.dart';
 import 'package:obers_ui/src/primitives/layout/oi_row.dart';
 
+/// The labels of the totals rows ([OiOrderSummaryLine]s) that the cart and
+/// order summaries show, in English by default.
+///
+/// The discount, shipping and tax rows prefer the labels of the
+/// `OiCartSummary` they show, when it has them.
+///
+/// {@category Components}
+class OiOrderTotalsLabels {
+  /// Creates an [OiOrderTotalsLabels].
+  const OiOrderTotalsLabels({
+    this.subtotal = 'Subtotal',
+    this.discount = 'Discount',
+    this.shipping = 'Shipping',
+    this.tax = 'Tax',
+    this.total = 'Total',
+    this.loading = 'loading',
+  });
+
+  /// Label of the subtotal row.
+  final String subtotal;
+
+  /// Label of the discount row.
+  final String discount;
+
+  /// Label of the shipping row.
+  final String shipping;
+
+  /// Label of the tax row.
+  final String tax;
+
+  /// Label of the total row.
+  final String total;
+
+  /// Read by screen readers in place of an amount that is loading.
+  final String loading;
+}
+
 /// A single summary row showing a label on the left and an amount on the right.
 ///
 /// Coverage: REQ-0031
@@ -28,6 +65,7 @@ class OiOrderSummaryLine extends StatelessWidget {
     this.negative = false,
     this.loading = false,
     this.subtitle,
+    this.loadingLabel = 'loading',
     super.key,
   });
 
@@ -54,6 +92,9 @@ class OiOrderSummaryLine extends StatelessWidget {
   ///
   /// Defaults to `false`.
   final bool loading;
+
+  /// Read by screen readers in place of the amount while [loading].
+  final String loadingLabel;
 
   /// Optional subtitle below the label (e.g. coupon code 'SUMMER20').
   final String? subtitle;
@@ -117,7 +158,7 @@ class OiOrderSummaryLine extends StatelessWidget {
     final breakpoint = context.breakpoint;
 
     return Semantics(
-      label: '$label: ${loading ? 'loading' : amount.toStringAsFixed(2)}',
+      label: '$label: ${loading ? loadingLabel : amount.toStringAsFixed(2)}',
       child: ExcludeSemantics(
         child: OiRow(
           breakpoint: breakpoint,

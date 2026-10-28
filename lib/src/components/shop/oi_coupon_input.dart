@@ -14,6 +14,40 @@ import 'package:obers_ui/src/primitives/layout/oi_row.dart';
 const IconData _kCheckIcon = OiIcons.circleCheck;
 const IconData _kCloseIcon = OiIcons.x;
 
+/// The texts of an [OiCouponInput], in English by default; pass
+/// translations to localize the input.
+///
+/// {@category Components}
+class OiCouponInputLabels {
+  /// Creates an [OiCouponInputLabels].
+  const OiCouponInputLabels({
+    this.placeholder = 'Enter coupon code',
+    this.apply = 'Apply',
+    this.applied = 'Applied',
+    this.removeCoupon = 'Remove coupon',
+    this.invalidCode = 'Invalid code',
+    this.genericError = 'Something went wrong. Please try again.',
+  });
+
+  /// Placeholder of the code input.
+  final String placeholder;
+
+  /// Label of the apply button.
+  final String apply;
+
+  /// Shown next to an applied code.
+  final String applied;
+
+  /// Screen-reader label of the button that removes the applied code.
+  final String removeCoupon;
+
+  /// Error shown when a code is rejected without a message of its own.
+  final String invalidCode;
+
+  /// Error shown when applying the code fails.
+  final String genericError;
+}
+
 /// A text input field with 'Apply' button for discount/coupon codes.
 ///
 /// Coverage: REQ-0032
@@ -33,6 +67,7 @@ class OiCouponInput extends StatefulWidget {
     this.onRemove,
     this.appliedCode,
     this.loading = false,
+    this.labels = const OiCouponInputLabels(),
     super.key,
   });
 
@@ -52,6 +87,9 @@ class OiCouponInput extends StatefulWidget {
   ///
   /// Defaults to `false`.
   final bool loading;
+
+  /// The input's texts; pass translations to localize it.
+  final OiCouponInputLabels labels;
 
   @override
   State<OiCouponInput> createState() => _OiCouponInputState();
@@ -106,14 +144,14 @@ class _OiCouponInputState extends State<OiCouponInput> {
       } else {
         setState(() {
           _submitting = false;
-          _errorMessage = result.message ?? 'Invalid code';
+          _errorMessage = result.message ?? widget.labels.invalidCode;
         });
       }
     } on Exception catch (_) {
       if (!mounted) return;
       setState(() {
         _submitting = false;
-        _errorMessage = 'Something went wrong. Please try again.';
+        _errorMessage = widget.labels.genericError;
       });
     }
   }
@@ -143,14 +181,14 @@ class _OiCouponInputState extends State<OiCouponInput> {
           Expanded(
             child: OiTextInput(
               controller: _controller,
-              placeholder: 'Enter coupon code',
+              placeholder: widget.labels.placeholder,
               label: widget.label,
               enabled: !isLoading,
               onSubmitted: buttonEnabled ? (_) => _handleApply() : null,
             ),
           ),
           OiButton.primary(
-            label: 'Apply',
+            label: widget.labels.apply,
             onTap: buttonEnabled ? _handleApply : null,
             enabled: buttonEnabled,
             loading: isLoading,
@@ -190,7 +228,7 @@ class _OiCouponInputState extends State<OiCouponInput> {
       children: [
         OiIcon(
           icon: _kCheckIcon,
-          label: 'Applied',
+          label: widget.labels.applied,
           size: 18,
           color: colors.success.base,
         ),
@@ -201,7 +239,7 @@ class _OiCouponInputState extends State<OiCouponInput> {
           ),
         ),
         OiButton.ghost(
-          label: 'Remove coupon',
+          label: widget.labels.removeCoupon,
           icon: _kCloseIcon,
           size: OiButtonSize.small,
           onTap: _handleRemove,

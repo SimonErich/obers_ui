@@ -32,12 +32,15 @@ extension _OiCheckoutLayout on _OiCheckoutState {
           mainAxisSize: MainAxisSize.min,
           children: [
             if (widget.onCancel != null)
-              OiButton.ghost(label: 'Cancel', onTap: widget.onCancel),
+              OiButton.ghost(
+                label: widget.labels.cancel,
+                onTap: widget.onCancel,
+              ),
             if (!isFirst)
               Padding(
                 padding: const EdgeInsets.only(left: 8),
                 child: OiButton.outline(
-                  label: 'Previous',
+                  label: widget.labels.previous,
                   onTap: _isPlacingOrder ? null : _goPrevious,
                 ),
               ),
@@ -45,12 +48,12 @@ extension _OiCheckoutLayout on _OiCheckoutState {
         ),
         if (isReview)
           OiButton.primary(
-            label: widget.placeOrderLabel ?? 'Place Order',
+            label: widget.placeOrderLabel ?? widget.labels.placeOrder,
             onTap: _isPlacingOrder ? null : _handlePlaceOrder,
             loading: _isPlacingOrder,
           )
         else
-          OiButton.primary(label: 'Next', onTap: _goNext),
+          OiButton.primary(label: widget.labels.next, onTap: _goNext),
       ],
     );
   }
@@ -75,6 +78,7 @@ extension _OiCheckoutLayout on _OiCheckoutState {
                 totalSteps: widget.steps.length,
                 currentStep: _currentStepIndex,
                 stepLabels: widget.steps.map(_stepLabel).toList(),
+                progressLabel: widget.labels.stepOf,
                 completedSteps: _completedSteps,
                 onStepTap: _goToStep,
               ),
@@ -90,7 +94,8 @@ extension _OiCheckoutLayout on _OiCheckoutState {
             child: OiOrderSummary(
               summary: widget.summary,
               items: widget.items,
-              label: 'Order summary',
+              label: widget.labels.orderSummary,
+              labels: widget.labels.summary,
               currencyCode: widget.currencyCode,
               expandedByDefault: true,
             ),
@@ -115,11 +120,12 @@ extension _OiCheckoutLayout on _OiCheckoutState {
           OiAccordion(
             sections: [
               OiAccordionSection(
-                title: 'Order Summary',
+                title: widget.labels.orderSummaryTitle,
                 content: OiOrderSummary(
                   summary: widget.summary,
                   items: widget.items,
-                  label: 'Order summary',
+                  label: widget.labels.orderSummary,
+                  labels: widget.labels.summary,
                   currencyCode: widget.currencyCode,
                 ),
               ),
@@ -129,6 +135,7 @@ extension _OiCheckoutLayout on _OiCheckoutState {
           totalSteps: widget.steps.length,
           currentStep: _currentStepIndex,
           stepLabels: widget.steps.map(_stepLabel).toList(),
+          progressLabel: widget.labels.stepOf,
           completedSteps: _completedSteps,
           onStepTap: _goToStep,
           style: OiStepperStyle.compact,

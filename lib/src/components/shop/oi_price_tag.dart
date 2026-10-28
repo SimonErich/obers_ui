@@ -70,6 +70,7 @@ class OiPriceTag extends StatelessWidget {
     this.currencySymbol,
     this.decimalPlaces = 2,
     this.size = OiPriceTagSize.medium,
+    this.freeLabel = 'Free',
     super.key,
   });
 
@@ -93,6 +94,9 @@ class OiPriceTag extends StatelessWidget {
 
   /// The size variant.
   final OiPriceTagSize size;
+
+  /// Shown in place of a price of zero.
+  final String freeLabel;
 
   /// Whether the price is zero.
   bool get _isFree => price == 0;
@@ -141,11 +145,11 @@ class OiPriceTag extends StatelessWidget {
       final freeColor = context.colors.success.base;
       switch (size) {
         case OiPriceTagSize.small:
-          return OiLabel.tiny('Free', color: freeColor);
+          return OiLabel.tiny(freeLabel, color: freeColor);
         case OiPriceTagSize.medium:
-          return OiLabel.smallStrong('Free', color: freeColor);
+          return OiLabel.smallStrong(freeLabel, color: freeColor);
         case OiPriceTagSize.large:
-          return OiLabel.h4('Free', color: freeColor);
+          return OiLabel.h4(freeLabel, color: freeColor);
       }
     }
 

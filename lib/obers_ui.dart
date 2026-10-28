@@ -342,6 +342,7 @@ export 'src/modules/oi_changelog_view.dart';
 export 'src/modules/oi_chat.dart' hide OiFileData, OiReactionData;
 export 'src/modules/oi_chat_window.dart';
 export 'src/modules/oi_checkout.dart';
+export 'src/modules/oi_checkout_labels.dart';
 export 'src/modules/oi_comments.dart';
 export 'src/modules/oi_consent_banner.dart';
 export 'src/modules/oi_dashboard.dart';

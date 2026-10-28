@@ -18,6 +18,140 @@ import 'package:obers_ui/src/primitives/display/oi_label.dart';
 import 'package:obers_ui/src/primitives/layout/oi_column.dart';
 import 'package:obers_ui/src/primitives/layout/oi_row.dart';
 
+/// The texts of an [OiShopProductDetail], in English by default; pass
+/// translations to localize the page.
+///
+/// {@category Modules}
+class OiShopProductDetailLabels {
+  /// Creates an [OiShopProductDetailLabels].
+  const OiShopProductDetailLabels({
+    this.price = 'Product price',
+    this.outOfStock = 'Out of Stock',
+    this.stockStatus = 'Stock status',
+    this.toggleWishlist = englishToggleWishlist,
+    this.sku = englishSku,
+    this.quantity = 'Quantity',
+    this.decreaseQuantity = 'Decrease quantity',
+    this.increaseQuantity = 'Increase quantity',
+    this.addToCart = 'Add to Cart',
+    this.wishlist = 'Wishlist',
+    this.variant = 'Variant',
+    this.selectVariant = 'Select variant',
+    this.selectAttribute = englishSelectAttribute,
+    this.description = 'Description',
+    this.specifications = 'Specifications',
+    this.reviews = 'Reviews',
+    this.relatedProducts = 'Related Products',
+    this.relatedPrice = 'Price',
+    this.gallery = englishGallery,
+    this.noImage = 'No image available',
+    this.imageNotAvailable = 'Image not available',
+    this.imageOf = englishImageOf,
+    this.rating = englishRating,
+    this.reviewCount = englishReviewCount,
+    this.stock = const OiStockBadgeLabels(),
+  });
+
+  /// "Toggle wishlist for Coffee": the default [toggleWishlist].
+  static String englishToggleWishlist(String name) =>
+      'Toggle wishlist for $name';
+
+  /// "SKU: AB-123": the default [sku].
+  static String englishSku(String sku) => 'SKU: $sku';
+
+  /// "4.5 out of 5 stars": the default [rating].
+  static String englishRating(double rating) => '$rating out of 5 stars';
+
+  /// "(12 reviews)": the default [reviewCount].
+  static String englishReviewCount(int count) => '($count reviews)';
+
+  /// "Select color": the default [selectAttribute].
+  static String englishSelectAttribute(String attribute) => 'Select $attribute';
+
+  /// "Coffee gallery": the default [gallery].
+  static String englishGallery(String name) => '$name gallery';
+
+  /// "Product image 2 of 5": the default [imageOf].
+  static String englishImageOf(int number, int total) =>
+      'Product image $number of $total';
+
+  /// Screen-reader label of the price.
+  final String price;
+
+  /// Badge shown while the product is out of stock.
+  final String outOfStock;
+
+  /// Screen-reader label of the stock badge.
+  final String stockStatus;
+
+  /// Screen-reader label of the wishlist toggle of the named product.
+  final String Function(String name) toggleWishlist;
+
+  /// Shows the product's stock keeping unit.
+  final String Function(String sku) sku;
+
+  /// Screen-reader label of the quantity selector.
+  final String quantity;
+
+  /// Screen-reader label of the quantity selector's decrease button.
+  final String decreaseQuantity;
+
+  /// Screen-reader label of the quantity selector's increase button.
+  final String increaseQuantity;
+
+  /// Label of the add-to-cart button.
+  final String addToCart;
+
+  /// Label of the wishlist button.
+  final String wishlist;
+
+  /// Label of the variant select.
+  final String variant;
+
+  /// Placeholder of the variant select.
+  final String selectVariant;
+
+  /// Placeholder of the select of the named variant attribute.
+  final String Function(String attribute) selectAttribute;
+
+  /// Label of the description tab.
+  final String description;
+
+  /// Label of the specifications tab.
+  final String specifications;
+
+  /// Label of the reviews tab.
+  final String reviews;
+
+  /// Heading of the related products.
+  final String relatedProducts;
+
+  /// Screen-reader label of a related product's price.
+  final String relatedPrice;
+
+  /// Screen-reader label of the named product's image gallery.
+  final String Function(String name) gallery;
+
+  /// Shown in place of the gallery when the product has no images.
+  final String noImage;
+
+  /// Shown in place of an image that fails to load.
+  final String imageNotAvailable;
+
+  /// Screen-reader label of a thumbnail, by its one-based position and the
+  /// number of images.
+  final String Function(int number, int total) imageOf;
+
+  /// Screen-reader label of the star rating.
+  final String Function(double rating) rating;
+
+  /// Shown next to the star rating, by the number of reviews.
+  final String Function(int count) reviewCount;
+
+  /// The texts of the stock badge.
+  final OiStockBadgeLabels stock;
+}
+
 /// A complete product detail page layout showing gallery, title, price,
 /// description, variant selectors, quantity, add to cart, and related info.
 ///
@@ -48,6 +182,7 @@ class OiShopProductDetail extends StatefulWidget {
     this.specifications,
     this.related,
     this.onRelatedProductTap,
+    this.labels = const OiShopProductDetailLabels(),
     super.key,
   });
 
@@ -92,6 +227,9 @@ class OiShopProductDetail extends StatefulWidget {
 
   /// Called when the user taps a related product.
   final ValueChanged<OiProductData>? onRelatedProductTap;
+
+  /// The page's texts; pass translations to localize it.
+  final OiShopProductDetailLabels labels;
 
   @override
   State<OiShopProductDetail> createState() => _OiShopProductDetailState();
@@ -191,7 +329,8 @@ class _OiShopProductDetailState extends State<OiShopProductDetail> {
           _galleryIndex = i;
         });
       },
-      label: '${widget.product.name} gallery',
+      label: widget.labels.gallery(widget.product.name),
+      labels: widget.labels,
     );
   }
 
@@ -221,11 +360,11 @@ class _OiShopProductDetailState extends State<OiShopProductDetail> {
               OiStarRating(
                 readOnly: true,
                 value: widget.product.rating!,
-                label: '${widget.product.rating} out of 5 stars',
+                label: widget.labels.rating(widget.product.rating!),
               ),
               if (widget.product.reviewCount != null)
                 OiLabel.small(
-                  '(${widget.product.reviewCount} reviews)',
+                  widget.labels.reviewCount(widget.product.reviewCount!),
                   color: colors.textMuted,
                 ),
             ],
@@ -238,21 +377,22 @@ class _OiShopProductDetailState extends State<OiShopProductDetail> {
             OiPriceTag(
               size: OiPriceTagSize.large,
               price: _effectivePrice,
-              label: 'Product price',
+              label: widget.labels.price,
               compareAtPrice: widget.product.compareAtPrice,
               currencyCode: widget.product.currencyCode,
             ),
             const Spacer(),
             if (!_isInStock)
-              const OiBadge.soft(label: 'Out of Stock')
+              OiBadge.soft(label: widget.labels.outOfStock)
             else
               OiStockBadge.fromCount(
                 stockCount: _selectedVariant?.stockCount,
-                label: 'Stock status',
+                label: widget.labels.stockStatus,
+                labels: widget.labels.stock,
               ),
             SizedBox(width: sp.sm),
             OiWishlistButton(
-              label: 'Toggle wishlist for ${widget.product.name}',
+              label: widget.labels.toggleWishlist(widget.product.name),
               active: widget.wishlisted,
               onToggle: widget.onWishlist,
             ),
@@ -261,7 +401,10 @@ class _OiShopProductDetailState extends State<OiShopProductDetail> {
 
         // SKU.
         if (widget.product.sku != null)
-          OiLabel.small('SKU: ${widget.product.sku}', color: colors.textMuted),
+          OiLabel.small(
+            widget.labels.sku(widget.product.sku!),
+            color: colors.textMuted,
+          ),
 
         // Variant selectors.
         if (widget.product.variants.isNotEmpty) _buildVariantSelectors(context),
@@ -270,7 +413,9 @@ class _OiShopProductDetailState extends State<OiShopProductDetail> {
         SizedBox(height: sp.xs),
         OiQuantitySelector(
           value: _quantity,
-          label: 'Quantity',
+          label: widget.labels.quantity,
+          decreaseLabel: widget.labels.decreaseQuantity,
+          increaseLabel: widget.labels.increaseQuantity,
           onChange: _handleQuantityChange,
           max: _selectedVariant?.stockCount ?? 99,
           disabled: !_isInStock,
@@ -284,11 +429,14 @@ class _OiShopProductDetailState extends State<OiShopProductDetail> {
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
             OiButton.primary(
-              label: 'Add to Cart',
+              label: widget.labels.addToCart,
               onTap: _isInStock ? _handleAddToCart : null,
             ),
             if (widget.onWishlist != null)
-              OiButton.outline(label: 'Wishlist', onTap: widget.onWishlist),
+              OiButton.outline(
+                label: widget.labels.wishlist,
+                onTap: widget.onWishlist,
+              ),
           ],
         ),
       ],
@@ -320,8 +468,8 @@ class _OiShopProductDetailState extends State<OiShopProductDetail> {
             )
             .toList(),
         value: _selectedVariant?.key,
-        label: 'Variant',
-        placeholder: 'Select variant',
+        label: widget.labels.variant,
+        placeholder: widget.labels.selectVariant,
         onChanged: (key) {
           final variant = variants.firstWhere((v) => v.key == key);
           _handleVariantChange(variant);
@@ -350,7 +498,7 @@ class _OiShopProductDetailState extends State<OiShopProductDetail> {
                 .toList(),
             value: _selectedVariant?.attributes[attrKey],
             label: attrKey,
-            placeholder: 'Select $attrKey',
+            placeholder: widget.labels.selectAttribute(attrKey),
             onChanged: (val) {
               // Find the matching variant.
               final match = variants.where((v) {
@@ -377,15 +525,15 @@ class _OiShopProductDetailState extends State<OiShopProductDetail> {
     final tabContents = <Widget>[];
 
     if (widget.description != null) {
-      tabItems.add(const OiTabItem(label: 'Description'));
+      tabItems.add(OiTabItem(label: widget.labels.description));
       tabContents.add(widget.description!);
     }
     if (widget.specifications != null) {
-      tabItems.add(const OiTabItem(label: 'Specifications'));
+      tabItems.add(OiTabItem(label: widget.labels.specifications));
       tabContents.add(widget.specifications!);
     }
     if (widget.reviews != null) {
-      tabItems.add(const OiTabItem(label: 'Reviews'));
+      tabItems.add(OiTabItem(label: widget.labels.reviews));
       tabContents.add(widget.reviews!);
     }
     if (tabItems.isEmpty) return const SizedBox.shrink();
@@ -466,7 +614,7 @@ class _OiShopProductDetailState extends State<OiShopProductDetail> {
       gap: OiResponsive(sp.sm),
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const OiLabel.h3('Related Products'),
+        OiLabel.h3(widget.labels.relatedProducts),
         SizedBox(
           height: 260,
           child: ListView.separated(
@@ -515,7 +663,7 @@ class _OiShopProductDetailState extends State<OiShopProductDetail> {
                         SizedBox(height: sp.xs),
                         OiPriceTag(
                           price: product.price,
-                          label: 'Price',
+                          label: widget.labels.relatedPrice,
                           currencyCode: product.currencyCode,
                         ),
                       ],
@@ -556,6 +704,7 @@ class _OiProductGallery extends StatelessWidget {
     required this.imageUrls,
     required this.selectedIndex,
     required this.label,
+    required this.labels,
     this.onIndexChange,
   });
 
@@ -571,6 +720,9 @@ class _OiProductGallery extends StatelessWidget {
   /// Accessibility label for the gallery.
   final String label;
 
+  /// The texts of the gallery.
+  final OiShopProductDetailLabels labels;
+
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
@@ -585,7 +737,7 @@ class _OiProductGallery extends StatelessWidget {
             color: colors.surfaceSubtle,
             borderRadius: context.radius.md,
           ),
-          child: const Center(child: OiLabel.body('No image available')),
+          child: Center(child: OiLabel.body(labels.noImage)),
         ),
       );
     }
@@ -609,7 +761,7 @@ class _OiProductGallery extends StatelessWidget {
                 fit: BoxFit.contain,
                 errorBuilder: (_, _, _) => Center(
                   child: OiLabel.body(
-                    'Image not available',
+                    labels.imageNotAvailable,
                     color: colors.textMuted,
                   ),
                 ),
@@ -631,8 +783,7 @@ class _OiProductGallery extends StatelessWidget {
                   return GestureDetector(
                     onTap: () => onIndexChange?.call(index),
                     child: Semantics(
-                      label:
-                          'Product image ${index + 1} of ${imageUrls.length}',
+                      label: labels.imageOf(index + 1, imageUrls.length),
                       selected: isSelected,
                       child: Container(
                         width: 64,
