@@ -47,18 +47,6 @@ jobs:
           mkdir -p _site/api
           cp -r doc/api/* _site/api/
 
-      # Build Widgetbook
-      - name: Install Widgetbook dependencies
-        working-directory: widgetbook
-        run: flutter pub get
-      - name: Build Widgetbook for web
-        working-directory: widgetbook
-        run: flutter build web --release --base-href /obers_ui/widgetbook/
-      - name: Copy Widgetbook to _site/widgetbook/
-        run: |
-          mkdir -p _site/widgetbook
-          cp -r widgetbook/build/web/* _site/widgetbook/
-
       - uses: actions/upload-pages-artifact@v3
         with:
           path: _site
