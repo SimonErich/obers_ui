@@ -15,16 +15,8 @@ extension _OiButtonStandardVariants on _OiButtonState {
         widget.borderRadius ?? themeRadius ?? context.radius.sm;
     final isActive = widget.enabled && !widget.loading;
     final vs = _variantStyle(bt, widget.variant);
-    final hasDisabledOverride =
-        vs?.backgroundDisabled != null ||
-        vs?.foregroundDisabled != null ||
-        vs?.borderDisabled != null;
-
-    final visualState = !widget.enabled
-        ? _OiButtonVisualState.disabled
-        : (isActive && _hovered)
-        ? _OiButtonVisualState.hovered
-        : _OiButtonVisualState.normal;
+    final hasDisabledOverride = _hasDisabledOverride(vs);
+    final visualState = _filledVisualState();
     final foreground = _foregroundColor(
       context,
       widget.variant,
@@ -183,11 +175,22 @@ extension _OiButtonStandardVariants on _OiButtonState {
     return button;
   }
 
+  /// An icon-only button. A ghost one has no fill to tint, so hover and
+  /// focus colour and enlarge the icon; every other variant is drawn by
+  /// [_buildFilledIconButton] with its fill or border.
   Widget _buildIconButton(BuildContext context) {
+    if (widget.variant != OiButtonVariant.ghost) {
+      return _buildFilledIconButton(context);
+    }
+
     final density = OiDensityScope.of(context);
     final height = context.components.button?.height ?? _buttonHeight(density);
     final foreground = _foregroundColor(context, widget.variant);
-    final highlightColor = context.colors.primary.base;
+    final highlightColor = _foregroundColor(
+      context,
+      widget.variant,
+      state: _OiButtonVisualState.hovered,
+    );
     final isActive = widget.enabled && !widget.loading;
     final iconSize = _iconSize();
     final highlightedSize = iconSize + 2;
@@ -240,5 +243,59 @@ extension _OiButtonStandardVariants on _OiButtonState {
     }
 
     return content;
+  }
+
+  /// An icon-only button in a variant with a fill or border: a square with
+  /// the variant's decoration, which reacts to hover and disabled like
+  /// [_buildStandardButton] does. The icon keeps its size and colour on
+  /// hover, so it stays readable on the fill.
+  Widget _buildFilledIconButton(BuildContext context) {
+    final density = OiDensityScope.of(context);
+    final bt = context.components.button;
+    final height = bt?.height ?? _buttonHeight(density);
+    final radius = bt?.borderRadius ?? context.radius.sm;
+    final isActive = widget.enabled && !widget.loading;
+    final vs = _variantStyle(bt, widget.variant);
+    final hasDisabledOverride = _hasDisabledOverride(vs);
+    final visualState = _filledVisualState();
+
+    // Square even in a tight slot, so the fill never stretches.
+    return UnconstrainedBox(
+      child: OiTappable(
+        onTap: isActive ? widget.onTap : null,
+        onHover: _setHovered,
+        enabled: isActive,
+        applyBackgroundOverlay:
+            visualState != _OiButtonVisualState.hovered ||
+            vs?.backgroundHover == null,
+        dimWhenDisabled: widget.enabled || !hasDisabledOverride,
+        semanticLabel: widget.semanticLabel,
+        clipBorderRadius: radius,
+        child: Opacity(
+          opacity: widget.enabled || hasDisabledOverride ? 1 : 0.4,
+          child: Container(
+            width: height,
+            height: height,
+            decoration: _decoration(
+              context,
+              widget.variant,
+              borderRadius: radius,
+              state: visualState,
+            ),
+            child: Center(
+              child: Icon(
+                widget.icon,
+                size: _iconSize(),
+                color: _foregroundColor(
+                  context,
+                  widget.variant,
+                  state: visualState,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }
