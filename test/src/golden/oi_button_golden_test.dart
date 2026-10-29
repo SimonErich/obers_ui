@@ -1,6 +1,7 @@
 // Golden tests have no public API.
 
 import 'package:alchemist/alchemist.dart';
+import 'package:flutter/widgets.dart';
 import 'package:obers_ui/obers_ui.dart';
 
 import '../../helpers/golden_helper.dart';
@@ -138,6 +139,34 @@ Future<void> main() async {
         ),
         'Soft disabled': const OiButton.soft(label: 'Click', enabled: false),
       },
+    ),
+  );
+
+  // ── Icon-only ─────────────────────────────────────────────────────────────
+
+  Map<String, Widget> iconVariants() => {
+    for (final variant in OiButtonVariant.values)
+      variant.name: OiButton.icon(
+        icon: OiIcons.settings,
+        label: 'Settings',
+        variant: variant,
+        onTap: () {},
+      ),
+  };
+
+  await goldenTest(
+    'OiButton.icon variants — light',
+    fileName: 'oi_button_icon_variants_light',
+    builder: () => obersGoldenGroup(columns: 3, children: iconVariants()),
+  );
+
+  await goldenTest(
+    'OiButton.icon variants — dark',
+    fileName: 'oi_button_icon_variants_dark',
+    builder: () => obersGoldenGroup(
+      columns: 3,
+      theme: OiThemeData.dark(),
+      children: iconVariants(),
     ),
   );
 }
