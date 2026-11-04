@@ -90,7 +90,10 @@ enum OiFloatingAlignment {
 ///
 /// When [onDismiss] is provided, a transparent barrier is placed behind the
 /// floating content. Tapping the barrier calls [onDismiss], enabling
-/// click-outside-to-close behaviour.
+/// click-outside-to-close behaviour. A tap on the [anchor] itself is not
+/// outside: it leaves [onDismiss] uncalled, so an anchor that toggles
+/// [visible] closes the content with its own tap instead of the barrier
+/// closing it first and the anchor opening it again.
 ///
 /// {@category Primitives}
 class OiFloating extends StatefulWidget {
@@ -152,10 +155,11 @@ class OiFloating extends StatefulWidget {
   /// [EdgeInsets.zero] if the overlay should be allowed to touch screen edges.
   final EdgeInsets screenPadding;
 
-  /// Called when the user taps outside the floating content.
+  /// Called when the user taps outside the floating content and the anchor.
   ///
   /// When non-null, a transparent barrier is placed behind the floating
-  /// content. Tapping the barrier calls this callback.
+  /// content. Tapping the barrier calls this callback, except over the
+  /// anchor, whose own tap is left to decide.
   final VoidCallback? onDismiss;
 
   @override
@@ -261,15 +265,21 @@ class _OiFloatingState extends State<OiFloating> {
     }
 
     if (widget.onDismiss != null) {
+      final anchorRect = _anchorRectFromInfo(info);
       return Stack(
         children: [
           // Barrier that dismisses on tap but lets scroll gestures pass
           // through so the page behind can still scroll (which in turn
-          // triggers dismiss via the ScrollPosition listener).
+          // triggers dismiss via the ScrollPosition listener). Not over the
+          // anchor: a tap there reaches the anchor too, and dismissing first
+          // would make an anchor that toggles open the content again.
           Positioned.fill(
             child: Listener(
               behavior: HitTestBehavior.translucent,
-              onPointerDown: (_) => widget.onDismiss?.call(),
+              onPointerDown: (event) {
+                if (anchorRect.contains(event.localPosition)) return;
+                widget.onDismiss?.call();
+              },
             ),
           ),
           content,
