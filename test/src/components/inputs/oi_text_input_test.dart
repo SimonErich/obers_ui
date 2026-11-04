@@ -63,4 +63,25 @@ void main() {
     await tester.pumpObers(const OiTextInput());
     expect(find.byType(OiRawInput), findsOneWidget);
   });
+
+  testWidgets('selectAllOnFocus selects the text on focus', (tester) async {
+    final controller = TextEditingController(text: '10');
+    final node = FocusNode();
+    addTearDown(controller.dispose);
+    addTearDown(node.dispose);
+    await tester.pumpObers(
+      OiTextInput(
+        controller: controller,
+        focusNode: node,
+        selectAllOnFocus: true,
+        contentPadding: const EdgeInsets.all(2),
+      ),
+    );
+    node.requestFocus();
+    await tester.pump();
+    expect(
+      controller.selection,
+      const TextSelection(baseOffset: 0, extentOffset: 2),
+    );
+  });
 }
