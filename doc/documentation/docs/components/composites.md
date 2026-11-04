@@ -152,10 +152,10 @@ OiDataGrid<User>(
 
 | Widget | Description |
 | --- | --- |
-| [OiFormSection](lib/src/composites/forms/oi_form_section.dart) | Grouped form fields with heading, description, and inline validation |
-| [OiStepper](lib/src/composites/forms/oi_stepper.dart) | Step-by-step form |
-| [OiWizard](lib/src/composites/forms/oi_wizard.dart) | Multi-page wizard with progress |
-| [OiFormDialog](lib/src/composites/forms/oi_form_dialog.dart) | Form dialog with managed lifecycle (loading, error, submit states) |
+| [OiFormSection](https://github.com/SimonErich/obers_ui/blob/main/lib/src/composites/forms/oi_form_section.dart) | Grouped form fields with heading, description, and inline validation |
+| [OiStepper](https://github.com/SimonErich/obers_ui/blob/main/lib/src/composites/forms/oi_stepper.dart) | Step-by-step form |
+| [OiWizard](https://github.com/SimonErich/obers_ui/blob/main/lib/src/composites/forms/oi_wizard.dart) | Multi-page wizard with progress |
+| [OiFormDialog](https://github.com/SimonErich/obers_ui/blob/main/lib/src/composites/forms/oi_form_dialog.dart) | Form dialog with managed lifecycle (loading, error, submit states) |
 
 For schema-driven forms with validation, auto-binding, and submit logic, use `OiAfForm` from the sibling [`obers_ui_autoforms`](../advanced/autoforms.md) package. Plain form composition uses Flutter's built-in `Form` with any ObersUI input widget.
 

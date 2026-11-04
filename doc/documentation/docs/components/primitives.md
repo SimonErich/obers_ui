@@ -8,18 +8,18 @@ All layout primitives require an explicit `breakpoint:` — the library's zero-m
 
 | Widget | Description |
 | --- | --- |
-| [OiGrid](lib/src/primitives/layout/oi_grid.dart) | Responsive CSS Grid-like layout with column spans |
-| [OiRow](lib/src/primitives/layout/oi_row.dart) | Horizontal flex with responsive gap |
-| [OiColumn](lib/src/primitives/layout/oi_column.dart) | Vertical flex with responsive gap |
-| [OiSection](lib/src/primitives/layout/oi_section.dart) | Semantic grouping — children, gap, padding, semanticLabel |
-| [OiPage](lib/src/primitives/layout/oi_page.dart) | Full-page vertical layout with responsive gap and padding |
-| [OiContainer](lib/src/primitives/layout/oi_container.dart) | Max-width centered wrapper |
-| [OiMasonry](lib/src/primitives/layout/oi_masonry.dart) | Masonry (Pinterest-style) layout |
-| [OiAspectRatio](lib/src/primitives/layout/oi_aspect_ratio.dart) | Fixed aspect ratio container |
-| [OiSpacer](lib/src/primitives/layout/oi_spacer.dart) | Flexible space |
-| [OiWrapLayout](lib/src/primitives/layout/oi_wrap_layout.dart) | Flow/wrap layout |
-| [OiSpan](lib/src/foundation/oi_span.dart) | Per-child grid span (via `.span()` extension on `Widget`) |
-| [OiGridZoomControls](lib/src/primitives/layout/oi_grid_zoom_controls.dart) | Wraps `OiGrid` with +/- zoom controls for column count |
+| [OiGrid](https://github.com/SimonErich/obers_ui/blob/main/lib/src/primitives/layout/oi_grid.dart) | Responsive CSS Grid-like layout with column spans |
+| [OiRow](https://github.com/SimonErich/obers_ui/blob/main/lib/src/primitives/layout/oi_row.dart) | Horizontal flex with responsive gap |
+| [OiColumn](https://github.com/SimonErich/obers_ui/blob/main/lib/src/primitives/layout/oi_column.dart) | Vertical flex with responsive gap |
+| [OiSection](https://github.com/SimonErich/obers_ui/blob/main/lib/src/primitives/layout/oi_section.dart) | Semantic grouping — children, gap, padding, semanticLabel |
+| [OiPage](https://github.com/SimonErich/obers_ui/blob/main/lib/src/primitives/layout/oi_page.dart) | Full-page vertical layout with responsive gap and padding |
+| [OiContainer](https://github.com/SimonErich/obers_ui/blob/main/lib/src/primitives/layout/oi_container.dart) | Max-width centered wrapper |
+| [OiMasonry](https://github.com/SimonErich/obers_ui/blob/main/lib/src/primitives/layout/oi_masonry.dart) | Masonry (Pinterest-style) layout |
+| [OiAspectRatio](https://github.com/SimonErich/obers_ui/blob/main/lib/src/primitives/layout/oi_aspect_ratio.dart) | Fixed aspect ratio container |
+| [OiSpacer](https://github.com/SimonErich/obers_ui/blob/main/lib/src/primitives/layout/oi_spacer.dart) | Flexible space |
+| [OiWrapLayout](https://github.com/SimonErich/obers_ui/blob/main/lib/src/primitives/layout/oi_wrap_layout.dart) | Flow/wrap layout |
+| [OiSpan](https://github.com/SimonErich/obers_ui/blob/main/lib/src/foundation/oi_span.dart) | Per-child grid span (via `.span()` extension on `Widget`) |
+| [OiGridZoomControls](https://github.com/SimonErich/obers_ui/blob/main/lib/src/primitives/layout/oi_grid_zoom_controls.dart) | Wraps `OiGrid` with +/- zoom controls for column count |
 
 ### OiGrid
 
@@ -65,11 +65,11 @@ OiGridZoomControls(
 
 | Widget | Description |
 | --- | --- |
-| [OiDivider](lib/src/primitives/display/oi_divider.dart) | Horizontal or vertical separator line |
-| [OiIcon](lib/src/primitives/display/oi_icon.dart) | Icon display with semantic or decorative variant |
-| [OiImage](lib/src/primitives/display/oi_image.dart) | Themed image primitive with loading and error states |
-| [OiLabel](lib/src/primitives/display/oi_label.dart) | Text display using theme text styles (includes `.copyable()` constructor) |
-| [OiSurface](lib/src/primitives/display/oi_surface.dart) | Container with background, border, radius, shadow (includes `.transparent()`, `.elevated()`) |
+| [OiDivider](https://github.com/SimonErich/obers_ui/blob/main/lib/src/primitives/display/oi_divider.dart) | Horizontal or vertical separator line |
+| [OiIcon](https://github.com/SimonErich/obers_ui/blob/main/lib/src/primitives/display/oi_icon.dart) | Icon display with semantic or decorative variant |
+| [OiImage](https://github.com/SimonErich/obers_ui/blob/main/lib/src/primitives/display/oi_image.dart) | Themed image primitive with loading and error states |
+| [OiLabel](https://github.com/SimonErich/obers_ui/blob/main/lib/src/primitives/display/oi_label.dart) | Text display using theme text styles (includes `.copyable()` constructor) |
+| [OiSurface](https://github.com/SimonErich/obers_ui/blob/main/lib/src/primitives/display/oi_surface.dart) | Container with background, border, radius, shadow (includes `.transparent()`, `.elevated()`) |
 
 ### OiLabel
 
@@ -127,9 +127,9 @@ OiSurface.elevated(
 
 | Widget | Description |
 | --- | --- |
-| [OiTappable](lib/src/primitives/interaction/oi_tappable.dart) | Tap handler with hover, focus, active feedback — foundation for all interactive widgets |
-| [OiTouchTarget](lib/src/primitives/interaction/oi_touch_target.dart) | Ensures 48×48dp minimum touch area on touch devices |
-| [OiFocusTrap](lib/src/primitives/interaction/oi_focus_trap.dart) | Confines keyboard focus within a subtree (for dialogs, panels) |
+| [OiTappable](https://github.com/SimonErich/obers_ui/blob/main/lib/src/primitives/interaction/oi_tappable.dart) | Tap handler with hover, focus, active feedback — foundation for all interactive widgets |
+| [OiTouchTarget](https://github.com/SimonErich/obers_ui/blob/main/lib/src/primitives/interaction/oi_touch_target.dart) | Ensures 48×48dp minimum touch area on touch devices |
+| [OiFocusTrap](https://github.com/SimonErich/obers_ui/blob/main/lib/src/primitives/interaction/oi_focus_trap.dart) | Confines keyboard focus within a subtree (for dialogs, panels) |
 
 ### OiTappable
 
@@ -153,12 +153,12 @@ Automatically handles: hover overlay, focus ring (shown only while the keyboard 
 
 | Widget | Description |
 | --- | --- |
-| [OiAnimatedList](lib/src/primitives/animation/oi_animated_list.dart) | List item entry/exit animations |
-| [OiMorph](lib/src/primitives/animation/oi_morph.dart) | Shape morphing animation |
-| [OiPulse](lib/src/primitives/animation/oi_pulse.dart) | Pulsing scale animation |
-| [OiShimmer](lib/src/primitives/animation/oi_shimmer.dart) | Loading shimmer effect |
-| [OiSpring](lib/src/primitives/animation/oi_spring.dart) | Spring physics animation |
-| [OiStagger](lib/src/primitives/animation/oi_stagger.dart) | Staggered entry animation for lists |
+| [OiAnimatedList](https://github.com/SimonErich/obers_ui/blob/main/lib/src/primitives/animation/oi_animated_list.dart) | List item entry/exit animations |
+| [OiMorph](https://github.com/SimonErich/obers_ui/blob/main/lib/src/primitives/animation/oi_morph.dart) | Shape morphing animation |
+| [OiPulse](https://github.com/SimonErich/obers_ui/blob/main/lib/src/primitives/animation/oi_pulse.dart) | Pulsing scale animation |
+| [OiShimmer](https://github.com/SimonErich/obers_ui/blob/main/lib/src/primitives/animation/oi_shimmer.dart) | Loading shimmer effect |
+| [OiSpring](https://github.com/SimonErich/obers_ui/blob/main/lib/src/primitives/animation/oi_spring.dart) | Spring physics animation |
+| [OiStagger](https://github.com/SimonErich/obers_ui/blob/main/lib/src/primitives/animation/oi_stagger.dart) | Staggered entry animation for lists |
 
 All animations respect `OiAnimationConfig.reducedMotion` — when the OS has reduce-motion enabled, durations collapse to zero.
 
@@ -166,12 +166,12 @@ All animations respect `OiAnimationConfig.reducedMotion` — when the OS has red
 
 | Widget | Description |
 | --- | --- |
-| [OiVirtualList](lib/src/primitives/scroll/oi_virtual_list.dart) | Virtualized scrollable list (for 10k+ items) |
-| [OiVirtualGrid](lib/src/primitives/scroll/oi_virtual_grid.dart) | Virtualized scrollable grid |
-| [OiInfiniteScroll](lib/src/primitives/scroll/oi_infinite_scroll.dart) | Infinite scroll trigger at list end |
-| [OiScrollbar](lib/src/primitives/scroll/oi_scrollbar.dart) | Platform-adaptive scrollbar |
-| [OiSliverList](lib/src/primitives/scroll/oi_sliver_list.dart) | Themed sliver list wrapper with separators and padding |
-| [OiSliverGrid](lib/src/primitives/scroll/oi_sliver_grid.dart) | Themed sliver grid wrapper with responsive columns |
+| [OiVirtualList](https://github.com/SimonErich/obers_ui/blob/main/lib/src/primitives/scroll/oi_virtual_list.dart) | Virtualized scrollable list (for 10k+ items) |
+| [OiVirtualGrid](https://github.com/SimonErich/obers_ui/blob/main/lib/src/primitives/scroll/oi_virtual_grid.dart) | Virtualized scrollable grid |
+| [OiInfiniteScroll](https://github.com/SimonErich/obers_ui/blob/main/lib/src/primitives/scroll/oi_infinite_scroll.dart) | Infinite scroll trigger at list end |
+| [OiScrollbar](https://github.com/SimonErich/obers_ui/blob/main/lib/src/primitives/scroll/oi_scrollbar.dart) | Platform-adaptive scrollbar |
+| [OiSliverList](https://github.com/SimonErich/obers_ui/blob/main/lib/src/primitives/scroll/oi_sliver_list.dart) | Themed sliver list wrapper with separators and padding |
+| [OiSliverGrid](https://github.com/SimonErich/obers_ui/blob/main/lib/src/primitives/scroll/oi_sliver_grid.dart) | Themed sliver grid wrapper with responsive columns |
 
 ### OiSliverList
 
@@ -243,38 +243,38 @@ OiSliverGrid.extent(
 
 | Widget | Description |
 | --- | --- |
-| [OiDraggable](lib/src/primitives/drag_drop/oi_draggable.dart) | Makes any widget draggable |
-| [OiDropZone](lib/src/primitives/drag_drop/oi_drop_zone.dart) | Drop target area |
-| [OiDragGhost](lib/src/primitives/drag_drop/oi_drag_ghost.dart) | Custom drag preview |
-| [OiReorderable](lib/src/primitives/drag_drop/oi_reorderable.dart) | Reorderable list primitive |
+| [OiDraggable](https://github.com/SimonErich/obers_ui/blob/main/lib/src/primitives/drag_drop/oi_draggable.dart) | Makes any widget draggable |
+| [OiDropZone](https://github.com/SimonErich/obers_ui/blob/main/lib/src/primitives/drag_drop/oi_drop_zone.dart) | Drop target area |
+| [OiDragGhost](https://github.com/SimonErich/obers_ui/blob/main/lib/src/primitives/drag_drop/oi_drag_ghost.dart) | Custom drag preview |
+| [OiReorderable](https://github.com/SimonErich/obers_ui/blob/main/lib/src/primitives/drag_drop/oi_reorderable.dart) | Reorderable list primitive |
 
 ## Gesture
 
 | Widget | Description |
 | --- | --- |
-| [OiDoubleTap](lib/src/primitives/gesture/oi_double_tap.dart) | Double-tap handler |
-| [OiLongPressMenu](lib/src/primitives/gesture/oi_long_press_menu.dart) | Long-press context menu (mobile alternative to right-click) |
-| [OiPinchZoom](lib/src/primitives/gesture/oi_pinch_zoom.dart) | Pinch-to-zoom and pan |
-| [OiSwipeable](lib/src/primitives/gesture/oi_swipeable.dart) | Swipe gesture handling |
+| [OiDoubleTap](https://github.com/SimonErich/obers_ui/blob/main/lib/src/primitives/gesture/oi_double_tap.dart) | Double-tap handler |
+| [OiLongPressMenu](https://github.com/SimonErich/obers_ui/blob/main/lib/src/primitives/gesture/oi_long_press_menu.dart) | Long-press context menu (mobile alternative to right-click) |
+| [OiPinchZoom](https://github.com/SimonErich/obers_ui/blob/main/lib/src/primitives/gesture/oi_pinch_zoom.dart) | Pinch-to-zoom and pan |
+| [OiSwipeable](https://github.com/SimonErich/obers_ui/blob/main/lib/src/primitives/gesture/oi_swipeable.dart) | Swipe gesture handling |
 
 ## Clipboard
 
 | Widget | Description |
 | --- | --- |
-| [OiCopyable](lib/src/primitives/clipboard/oi_copyable.dart) | Wraps content with copy-on-tap |
-| [OiCopyButton](lib/src/primitives/clipboard/oi_copy_button.dart) | One-click copy button |
-| [OiPasteZone](lib/src/primitives/clipboard/oi_paste_zone.dart) | Paste target area |
+| [OiCopyable](https://github.com/SimonErich/obers_ui/blob/main/lib/src/primitives/clipboard/oi_copyable.dart) | Wraps content with copy-on-tap |
+| [OiCopyButton](https://github.com/SimonErich/obers_ui/blob/main/lib/src/primitives/clipboard/oi_copy_button.dart) | One-click copy button |
+| [OiPasteZone](https://github.com/SimonErich/obers_ui/blob/main/lib/src/primitives/clipboard/oi_paste_zone.dart) | Paste target area |
 
 ## Input
 
 | Widget | Description |
 | --- | --- |
-| [OiRawInput](lib/src/primitives/input/oi_raw_input.dart) | Low-level text entry primitive used by higher-level input components |
+| [OiRawInput](https://github.com/SimonErich/obers_ui/blob/main/lib/src/primitives/input/oi_raw_input.dart) | Low-level text entry primitive used by higher-level input components |
 
 ## Overlay
 
 | Widget | Description |
 | --- | --- |
-| [OiFloating](lib/src/primitives/overlay/oi_floating.dart) | Floating action button / element |
-| [OiPortal](lib/src/primitives/overlay/oi_portal.dart) | Overlay portal for tooltips, popovers |
-| [OiVisibility](lib/src/primitives/overlay/oi_visibility.dart) | Visibility wrapper |
+| [OiFloating](https://github.com/SimonErich/obers_ui/blob/main/lib/src/primitives/overlay/oi_floating.dart) | Floating action button / element |
+| [OiPortal](https://github.com/SimonErich/obers_ui/blob/main/lib/src/primitives/overlay/oi_portal.dart) | Overlay portal for tooltips, popovers |
+| [OiVisibility](https://github.com/SimonErich/obers_ui/blob/main/lib/src/primitives/overlay/oi_visibility.dart) | Visibility wrapper |

@@ -144,7 +144,7 @@ OiIcon(icon: OiIcons.star, label: 'Favorite', size: 24, color: Colors.amber)
 
 ## OiIconButton
 
-An icon-only button with a required accessibility label. Defined in [oi_icon_button.dart](lib/src/components/buttons/oi_icon_button.dart).
+An icon-only button with a required accessibility label. Defined in [oi_icon_button.dart](https://github.com/SimonErich/obers_ui/blob/main/lib/src/components/buttons/oi_icon_button.dart).
 
 ```dart
 OiIconButton(

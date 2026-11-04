@@ -99,7 +99,7 @@ Grouped by area:
 | `OiFileExplorer` | `OiFileExplorerThemeData` |
 
 For the exact field list see
-[lib/src/foundation/theme/oi_component_themes.dart](../../../lib/src/foundation/theme/oi_component_themes.dart).
+[lib/src/foundation/theme/oi_component_themes.dart](https://github.com/SimonErich/obers_ui/blob/main/lib/src/foundation/theme/oi_component_themes.dart).
 
 ## Accessing component themes
 

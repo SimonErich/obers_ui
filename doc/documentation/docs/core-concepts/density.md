@@ -4,7 +4,7 @@ Density controls how much information fits on screen. ObersUI adapts padding, si
 
 ## Modes
 
-`OiDensity` is a three-value enum defined in [oi_app.dart](lib/src/foundation/oi_app.dart):
+`OiDensity` is a three-value enum defined in [oi_app.dart](https://github.com/SimonErich/obers_ui/blob/main/lib/src/foundation/oi_app.dart):
 
 | Mode | Default on | Typical use |
 | --- | --- | --- |
@@ -50,4 +50,4 @@ Density changes padding and sizing, not functionality:
 - **List tiles** expand to accommodate touch targets
 - **Input fields** adjust their height
 
-The key principle: density controls information density, not accessibility. On touch devices, [OiA11y.minTouchTarget(context)](lib/src/foundation/oi_accessibility.dart) enforces a 48dp tap area regardless of the active density — `OiTappable` uses this internally.
+The key principle: density controls information density, not accessibility. On touch devices, [OiA11y.minTouchTarget(context)](https://github.com/SimonErich/obers_ui/blob/main/lib/src/foundation/oi_accessibility.dart) enforces a 48dp tap area regardless of the active density — `OiTappable` uses this internally.

@@ -4,7 +4,7 @@ ObersUI is designed to run smoothly on everything from budget phones to powerful
 
 ## Performance config
 
-[OiPerformanceConfig](lib/src/foundation/theme/oi_animation_config.dart) toggles the expensive visual effects in the design system. Four presets ship:
+[OiPerformanceConfig](https://github.com/SimonErich/obers_ui/blob/main/lib/src/foundation/theme/oi_animation_config.dart) toggles the expensive visual effects in the design system. Four presets ship:
 
 | Preset | Blur | Shadows | Halo | Animations |
 | --- | --- | --- | --- | --- |
@@ -71,7 +71,7 @@ OiInfiniteScroll(
 
 ## Image optimization
 
-[OiImage](lib/src/primitives/display/oi_image.dart) handles network / asset loading, a placeholder slot, and error state:
+[OiImage](https://github.com/SimonErich/obers_ui/blob/main/lib/src/primitives/display/oi_image.dart) handles network / asset loading, a placeholder slot, and error state:
 
 ```dart
 OiImage(

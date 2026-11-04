@@ -6,13 +6,13 @@ Components are the standard UI widgets you'll use every day. They're built from 
 
 | Widget | Description |
 | --- | --- |
-| [OiButton](lib/src/components/buttons/oi_button.dart) | Six visual variants (primary, secondary, outline, ghost, destructive, soft) plus four special forms (icon, split, countdown, confirm) |
-| [OiIconButton](lib/src/components/buttons/oi_icon_button.dart) | Icon-only button with required `semanticLabel` |
-| [OiToggleButton](lib/src/components/buttons/oi_toggle_button.dart) | Two-state toggle button |
-| [OiButtonGroup](lib/src/components/buttons/oi_button_group.dart) | Multi-button toolbar |
-| [OiSortButton](lib/src/components/buttons/oi_sort_button.dart) | Dropdown button for sorting non-table lists (card grids, feeds) |
-| [OiExportButton](lib/src/components/buttons/oi_export_button.dart) | Export data in various formats (CSV, XLSX, JSON, PDF) |
-| [OiBackButton](lib/src/components/buttons/oi_back_button.dart) | RTL-aware back navigation button |
+| [OiButton](https://github.com/SimonErich/obers_ui/blob/main/lib/src/components/buttons/oi_button.dart) | Six visual variants (primary, secondary, outline, ghost, destructive, soft) plus four special forms (icon, split, countdown, confirm) |
+| [OiIconButton](https://github.com/SimonErich/obers_ui/blob/main/lib/src/components/buttons/oi_icon_button.dart) | Icon-only button with required `semanticLabel` |
+| [OiToggleButton](https://github.com/SimonErich/obers_ui/blob/main/lib/src/components/buttons/oi_toggle_button.dart) | Two-state toggle button |
+| [OiButtonGroup](https://github.com/SimonErich/obers_ui/blob/main/lib/src/components/buttons/oi_button_group.dart) | Multi-button toolbar |
+| [OiSortButton](https://github.com/SimonErich/obers_ui/blob/main/lib/src/components/buttons/oi_sort_button.dart) | Dropdown button for sorting non-table lists (card grids, feeds) |
+| [OiExportButton](https://github.com/SimonErich/obers_ui/blob/main/lib/src/components/buttons/oi_export_button.dart) | Export data in various formats (CSV, XLSX, JSON, PDF) |
+| [OiBackButton](https://github.com/SimonErich/obers_ui/blob/main/lib/src/components/buttons/oi_back_button.dart) | RTL-aware back navigation button |
 
 ### OiButton
 
@@ -90,7 +90,7 @@ OiExportButton(
 
 ### OiBackButton
 
-A themed back-navigation button that renders a chevron-left icon, automatically flipping to chevron-right in RTL layouts. Typically used as the leading widget in [OiSliverHeader](lib/src/components/display/oi_sliver_header.dart) or custom app bars.
+A themed back-navigation button that renders a chevron-left icon, automatically flipping to chevron-right in RTL layouts. Typically used as the leading widget in [OiSliverHeader](https://github.com/SimonErich/obers_ui/blob/main/lib/src/components/display/oi_sliver_header.dart) or custom app bars.
 
 ```dart
 OiBackButton(
@@ -115,29 +115,29 @@ OiBackButton(
 
 | Widget | Description |
 | --- | --- |
-| [OiTextInput](lib/src/components/inputs/oi_text_input.dart) | Text field with validation, prefix/suffix, counter, plus `.password()`, `.multiline()`, `.otp()` constructors |
-| [OiCheckbox](lib/src/components/inputs/oi_checkbox.dart) | Checkbox with label |
-| [OiRadio](lib/src/components/inputs/oi_radio.dart) | Radio group (pass `OiRadioOption<T>` list) |
-| [OiSwitch](lib/src/components/inputs/oi_switch.dart) | Toggle switch |
-| [OiSlider](lib/src/components/inputs/oi_slider.dart) | Single- or dual-thumb range slider |
-| [OiSelect](lib/src/components/inputs/oi_select.dart) | Dropdown select (accepts `OiSelectOption<T>` list) |
-| [OiNumberInput](lib/src/components/inputs/oi_number_input.dart) | Number input with increment/decrement |
-| [OiDateInput](lib/src/components/inputs/oi_date_input.dart) | Date picker input |
-| [OiTimeInput](lib/src/components/inputs/oi_time_input.dart) | Time picker input (also defines `OiTimeOfDay`) |
-| [OiDateTimeInput](lib/src/components/inputs/oi_date_time_input.dart) | Combined date + time input |
-| [OiColorInput](lib/src/components/inputs/oi_color_input.dart) | Color picker input |
-| [OiTagInput](lib/src/components/inputs/oi_tag_input.dart) | Multi-value tag input with suggestions |
-| [OiArrayInput](lib/src/components/inputs/oi_array_input.dart) | Repeatable form field group with add/remove/reorder |
-| [OiFileInput](lib/src/components/inputs/oi_file_input.dart) | File selection input |
-| [OiFormSelect](lib/src/components/inputs/oi_form_select.dart) | Form-integrated dropdown with validation |
-| [OiSwitchTile](lib/src/components/inputs/oi_switch_tile.dart) | Toggle tile with switch, label, and subtitle |
-| [OiCheckboxTile](lib/src/components/inputs/oi_switch_tile.dart) | Toggle tile with checkbox, label, and subtitle |
-| [OiRadioTile](lib/src/components/inputs/oi_switch_tile.dart) | Toggle tile with radio indicator, label, and subtitle |
-| [OiSegmentedControl](lib/src/components/inputs/oi_segmented_control.dart) | Exclusive segment toggle (2–5 options) |
-| [OiDatePickerField](lib/src/components/inputs/oi_date_picker_field.dart) | Date input with calendar dialog |
-| [OiDateRangePickerField](lib/src/components/inputs/oi_date_range_picker_field.dart) | Date range input with presets and calendar dialog |
-| [OiTimePickerField](lib/src/components/inputs/oi_time_picker_field.dart) | Time input with time picker dialog |
-| [OiColorPalettePicker](lib/src/components/inputs/oi_color_palette_picker.dart) | Multi-slot color palette picker with preset palettes |
+| [OiTextInput](https://github.com/SimonErich/obers_ui/blob/main/lib/src/components/inputs/oi_text_input.dart) | Text field with validation, prefix/suffix, counter, plus `.password()`, `.multiline()`, `.otp()` constructors |
+| [OiCheckbox](https://github.com/SimonErich/obers_ui/blob/main/lib/src/components/inputs/oi_checkbox.dart) | Checkbox with label |
+| [OiRadio](https://github.com/SimonErich/obers_ui/blob/main/lib/src/components/inputs/oi_radio.dart) | Radio group (pass `OiRadioOption<T>` list) |
+| [OiSwitch](https://github.com/SimonErich/obers_ui/blob/main/lib/src/components/inputs/oi_switch.dart) | Toggle switch |
+| [OiSlider](https://github.com/SimonErich/obers_ui/blob/main/lib/src/components/inputs/oi_slider.dart) | Single- or dual-thumb range slider |
+| [OiSelect](https://github.com/SimonErich/obers_ui/blob/main/lib/src/components/inputs/oi_select.dart) | Dropdown select (accepts `OiSelectOption<T>` list) |
+| [OiNumberInput](https://github.com/SimonErich/obers_ui/blob/main/lib/src/components/inputs/oi_number_input.dart) | Number input with increment/decrement |
+| [OiDateInput](https://github.com/SimonErich/obers_ui/blob/main/lib/src/components/inputs/oi_date_input.dart) | Date picker input |
+| [OiTimeInput](https://github.com/SimonErich/obers_ui/blob/main/lib/src/components/inputs/oi_time_input.dart) | Time picker input (also defines `OiTimeOfDay`) |
+| [OiDateTimeInput](https://github.com/SimonErich/obers_ui/blob/main/lib/src/components/inputs/oi_date_time_input.dart) | Combined date + time input |
+| [OiColorInput](https://github.com/SimonErich/obers_ui/blob/main/lib/src/components/inputs/oi_color_input.dart) | Color picker input |
+| [OiTagInput](https://github.com/SimonErich/obers_ui/blob/main/lib/src/components/inputs/oi_tag_input.dart) | Multi-value tag input with suggestions |
+| [OiArrayInput](https://github.com/SimonErich/obers_ui/blob/main/lib/src/components/inputs/oi_array_input.dart) | Repeatable form field group with add/remove/reorder |
+| [OiFileInput](https://github.com/SimonErich/obers_ui/blob/main/lib/src/components/inputs/oi_file_input.dart) | File selection input |
+| [OiFormSelect](https://github.com/SimonErich/obers_ui/blob/main/lib/src/components/inputs/oi_form_select.dart) | Form-integrated dropdown with validation |
+| [OiSwitchTile](https://github.com/SimonErich/obers_ui/blob/main/lib/src/components/inputs/oi_switch_tile.dart) | Toggle tile with switch, label, and subtitle |
+| [OiCheckboxTile](https://github.com/SimonErich/obers_ui/blob/main/lib/src/components/inputs/oi_switch_tile.dart) | Toggle tile with checkbox, label, and subtitle |
+| [OiRadioTile](https://github.com/SimonErich/obers_ui/blob/main/lib/src/components/inputs/oi_switch_tile.dart) | Toggle tile with radio indicator, label, and subtitle |
+| [OiSegmentedControl](https://github.com/SimonErich/obers_ui/blob/main/lib/src/components/inputs/oi_segmented_control.dart) | Exclusive segment toggle (2–5 options) |
+| [OiDatePickerField](https://github.com/SimonErich/obers_ui/blob/main/lib/src/components/inputs/oi_date_picker_field.dart) | Date input with calendar dialog |
+| [OiDateRangePickerField](https://github.com/SimonErich/obers_ui/blob/main/lib/src/components/inputs/oi_date_range_picker_field.dart) | Date range input with presets and calendar dialog |
+| [OiTimePickerField](https://github.com/SimonErich/obers_ui/blob/main/lib/src/components/inputs/oi_time_picker_field.dart) | Time input with time picker dialog |
+| [OiColorPalettePicker](https://github.com/SimonErich/obers_ui/blob/main/lib/src/components/inputs/oi_color_palette_picker.dart) | Multi-slot color palette picker with preset palettes |
 
 ### OiTextInput
 

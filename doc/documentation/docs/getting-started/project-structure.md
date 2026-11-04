@@ -62,7 +62,6 @@ Within each tier, widgets are grouped by function:
 
 | Directory | Purpose |
 | --- | --- |
-| `widgetbook/` | Interactive component showcase (separate Flutter app) |
 | `example/` | Minimal example app |
 | `test/` | Widget tests, golden tests, integration tests, benchmarks |
 | `doc/` | Generated API docs and this documentation |
