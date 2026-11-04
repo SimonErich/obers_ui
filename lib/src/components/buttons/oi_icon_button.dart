@@ -36,6 +36,10 @@ class OiIconButton extends StatelessWidget {
   final OiButtonSize size;
 
   /// The visual style variant.
+  ///
+  /// [OiButtonVariant.ghost] draws no fill and tints the icon on hover; every
+  /// other variant draws the same fill or border as a text button of that
+  /// variant, including the theme's per-variant styles.
   final OiButtonVariant variant;
 
   /// Whether the button responds to interactions.

@@ -1238,7 +1238,7 @@ Convenience wrapper around `OiButton.icon()`.
 - `semanticLabel` (String, required)
 - `onTap` (VoidCallback?)
 - `size` (OiButtonSize, default: medium)
-- `variant` (OiButtonVariant, default: ghost)
+- `variant` (OiButtonVariant, default: ghost) — ghost: no fill, the icon tints on hover; any other variant fills the square like the text button of that variant (theme variant styles apply)
 - `enabled` (bool, default: true)
 
 ---

@@ -307,7 +307,8 @@ class OiButton extends StatefulWidget {
   /// Creates an icon-only button with a square aspect ratio.
   ///
   /// The button has equal padding on all sides; no label is shown.
-  /// [label] is required and announced by screen readers.
+  /// [label] is required and announced by screen readers. A [variant] other
+  /// than ghost fills the square like the text button of that variant.
   const OiButton.icon({
     required IconData icon,
     required String label,

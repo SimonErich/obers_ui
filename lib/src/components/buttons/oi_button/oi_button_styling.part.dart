@@ -95,6 +95,23 @@ extension _OiButtonStyling on _OiButtonState {
     }
   }
 
+  /// The visual state of a button with a fill: hover comes from the pointer
+  /// only, as focus is shown by [OiTappable]'s ring.
+  _OiButtonVisualState _filledVisualState() {
+    if (!widget.enabled) return _OiButtonVisualState.disabled;
+    if (widget.enabled && !widget.loading && _hovered) {
+      return _OiButtonVisualState.hovered;
+    }
+    return _OiButtonVisualState.normal;
+  }
+
+  /// Whether the theme gives [vs] a look of its own for disabled, which then
+  /// replaces the generic fade.
+  bool _hasDisabledOverride(OiButtonVariantStyle? vs) =>
+      vs?.backgroundDisabled != null ||
+      vs?.foregroundDisabled != null ||
+      vs?.borderDisabled != null;
+
   /// Resolves the per-state override for [state] from [vs], falling back to
   /// the variant's default colour when the theme leaves it unset.
   ///
