@@ -99,6 +99,9 @@ class OiAppShell extends StatefulWidget {
     this.settingsDriver,
     this.settingsKey,
     this.settingsNamespace = 'oi_app_shell',
+    this.openNavigationLabel = 'Open navigation',
+    this.expandSidebarLabel = 'Expand sidebar',
+    this.collapseSidebarLabel = 'Collapse sidebar',
     super.key,
   });
 
@@ -160,6 +163,15 @@ class OiAppShell extends StatefulWidget {
 
   /// Top-level namespace for settings storage.
   final String settingsNamespace;
+
+  /// Screen-reader label of the button that opens the navigation.
+  final String openNavigationLabel;
+
+  /// Screen-reader label of the button that expands the sidebar.
+  final String expandSidebarLabel;
+
+  /// Screen-reader label of the button that collapses the sidebar.
+  final String collapseSidebarLabel;
 
   @override
   State<OiAppShell> createState() => _OiAppShellState();
@@ -336,7 +348,7 @@ class _OiAppShellState extends State<OiAppShell>
             Padding(
               padding: const EdgeInsets.only(right: 12),
               child: OiTappable(
-                semanticLabel: 'Open navigation',
+                semanticLabel: widget.openNavigationLabel,
                 onTap: () => setState(() => _drawerOpen = true),
                 child: Icon(
                   OiIcons.menu, // menu
@@ -403,7 +415,9 @@ class _OiAppShellState extends State<OiAppShell>
   Widget _buildCollapseToggle(BuildContext context) {
     final colors = context.colors;
     return OiTappable(
-      semanticLabel: _sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar',
+      semanticLabel: _sidebarCollapsed
+          ? widget.expandSidebarLabel
+          : widget.collapseSidebarLabel,
       onTap: _toggleSidebar,
       child: Container(
         height: 48,

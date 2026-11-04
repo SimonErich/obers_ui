@@ -249,5 +249,28 @@ void main() {
         findsOneWidget,
       );
     });
+
+    testWidgets('renders the given labels, including nested ones', (
+      tester,
+    ) async {
+      await tester.pumpObers(
+        SingleChildScrollView(
+          child: OiCartPanel(
+            items: _items,
+            summary: _summary,
+            label: 'Cart',
+            onRemove: (_) {},
+            labels: OiCartPanelLabels(
+              title: (count) => 'Warenkorb ($count)',
+              totals: const OiOrderTotalsLabels(total: 'Gesamt'),
+              itemRow: const OiCartItemRowLabels(remove: 'Entfernen'),
+            ),
+          ),
+        ),
+      );
+      expect(find.text('Warenkorb (2)'), findsOneWidget);
+      expect(find.text('Gesamt'), findsOneWidget);
+      expect(find.text('Entfernen'), findsWidgets);
+    });
   });
 }

@@ -66,6 +66,11 @@ class OiResourcePage extends StatelessWidget {
     this.breadcrumbs,
     this.wrapInCard = true,
     this.onAction,
+    this.createLabel = 'Create',
+    this.editLabel = 'Edit',
+    this.deleteLabel = 'Delete',
+    this.cancelLabel = 'Cancel',
+    this.saveLabel = 'Save',
     super.key,
   });
 
@@ -102,6 +107,21 @@ class OiResourcePage extends StatelessWidget {
   ///
   /// Action names: `'create'`, `'edit'`, `'delete'`, `'save'`, `'cancel'`.
   final OiResourceAction? onAction;
+
+  /// Label of the create button.
+  final String createLabel;
+
+  /// Label of the edit button.
+  final String editLabel;
+
+  /// Label of the delete button.
+  final String deleteLabel;
+
+  /// Label of the cancel button.
+  final String cancelLabel;
+
+  /// Label of the save button.
+  final String saveLabel;
 
   @override
   Widget build(BuildContext context) {
@@ -223,7 +243,7 @@ class OiResourcePage extends StatelessWidget {
   List<Widget> _listActions(BuildContext context) {
     return [
       OiButton.primary(
-        label: 'Create',
+        label: createLabel,
         icon: OiIcons.plus, // add
         onTap: () => onAction?.call('create'),
       ),
@@ -233,12 +253,12 @@ class OiResourcePage extends StatelessWidget {
   List<Widget> _showActions(BuildContext context) {
     return [
       OiButton.outline(
-        label: 'Edit',
+        label: editLabel,
         icon: OiIcons.pencil, // edit
         onTap: () => onAction?.call('edit'),
       ),
       OiButton.destructive(
-        label: 'Delete',
+        label: deleteLabel,
         icon: OiIcons.trash2, // delete
         onTap: () => onAction?.call('delete'),
       ),
@@ -247,9 +267,9 @@ class OiResourcePage extends StatelessWidget {
 
   List<Widget> _editCreateActions(BuildContext context) {
     return [
-      OiButton.ghost(label: 'Cancel', onTap: () => onAction?.call('cancel')),
+      OiButton.ghost(label: cancelLabel, onTap: () => onAction?.call('cancel')),
       OiButton.primary(
-        label: 'Save',
+        label: saveLabel,
         icon: OiIcons.archiveRestore, // save
         onTap: () => onAction?.call('save'),
       ),

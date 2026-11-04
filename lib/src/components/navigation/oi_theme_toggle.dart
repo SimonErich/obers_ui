@@ -28,6 +28,7 @@ class OiThemeToggle extends StatefulWidget {
     required this.onModeChange,
     this.label = 'Toggle theme',
     this.showSystemOption = true,
+    this.modeLabel = englishMode,
     super.key,
   });
 
@@ -44,6 +45,16 @@ class OiThemeToggle extends StatefulWidget {
   /// When `false`, tapping cycles between light and dark.
   final bool showSystemOption;
 
+  /// "Light mode", "Dark mode", "System mode": the default [modeLabel].
+  static String englishMode(OiThemeMode mode) => switch (mode) {
+    OiThemeMode.light => 'Light mode',
+    OiThemeMode.dark => 'Dark mode',
+    OiThemeMode.system => 'System mode',
+  };
+
+  /// Names a theme mode.
+  final String Function(OiThemeMode mode) modeLabel;
+
   @override
   State<OiThemeToggle> createState() => _OiThemeToggleState();
 }
@@ -57,11 +68,7 @@ class _OiThemeToggleState extends State<OiThemeToggle> {
     OiThemeMode.system => OiIcons.monitor,
   };
 
-  static String _labelForMode(OiThemeMode mode) => switch (mode) {
-    OiThemeMode.light => 'Light mode',
-    OiThemeMode.dark => 'Dark mode',
-    OiThemeMode.system => 'System mode',
-  };
+  String _labelForMode(OiThemeMode mode) => widget.modeLabel(mode);
 
   static OiThemeMode _nextMode(OiThemeMode current) => switch (current) {
     OiThemeMode.light => OiThemeMode.dark,

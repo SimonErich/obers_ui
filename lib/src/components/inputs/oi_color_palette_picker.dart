@@ -121,6 +121,7 @@ class OiColorPalettePicker extends StatelessWidget {
     this.showPresets = true,
     this.lockSlotIds = const <String>{},
     this.onRandomize,
+    this.randomizeLabel = 'Randomize',
     super.key,
   });
 
@@ -157,6 +158,9 @@ class OiColorPalettePicker extends StatelessWidget {
   ///
   /// When non-null, a shuffle button is shown below the slot row.
   final VoidCallback? onRandomize;
+
+  /// Label of the randomize button.
+  final String randomizeLabel;
 
   @override
   Widget build(BuildContext context) {
@@ -247,7 +251,7 @@ class OiColorPalettePicker extends StatelessWidget {
               if (onRandomize != null) ...[
                 SizedBox(width: spacing.sm),
                 OiButton.ghost(
-                  label: 'Randomize',
+                  label: randomizeLabel,
                   icon: OiIcons.shuffle,
                   onTap: onRandomize,
                   size: OiButtonSize.small,

@@ -83,7 +83,8 @@ class OiCalendarWeekPicker extends StatefulWidget {
   ///
   /// [cancelLabel] and [confirmLabel] name the dialog's buttons; pass
   /// translations to localize them. They are also used by the year picker
-  /// that opens from the dialog.
+  /// that opens from the dialog, along with [monthLabels] and
+  /// [yearPickerSemanticLabel].
   static Future<OiCalendarWeek?> show(
     BuildContext context, {
     OiCalendarWeek? initialValue,
@@ -92,6 +93,8 @@ class OiCalendarWeekPicker extends StatefulWidget {
     String semanticLabel = 'Select calendar week',
     String cancelLabel = 'Cancel',
     String confirmLabel = 'OK',
+    List<String> monthLabels = kOiMonthLabels,
+    String yearPickerSemanticLabel = 'Select month and year',
   }) {
     return OiDialogShell.show<OiCalendarWeek>(
       context: context,
@@ -103,6 +106,8 @@ class OiCalendarWeekPicker extends StatefulWidget {
         weekFormatter: weekFormatter,
         cancelLabel: cancelLabel,
         confirmLabel: confirmLabel,
+        monthLabels: monthLabels,
+        yearPickerSemanticLabel: yearPickerSemanticLabel,
         onConfirm: close,
       ),
     );
@@ -291,6 +296,8 @@ class _OiCalendarWeekPickerDialog extends StatefulWidget {
     required this.onConfirm,
     required this.cancelLabel,
     required this.confirmLabel,
+    required this.monthLabels,
+    required this.yearPickerSemanticLabel,
     this.initialValue,
     this.highlightedWeeks,
     this.weekFormatter,
@@ -301,6 +308,8 @@ class _OiCalendarWeekPickerDialog extends StatefulWidget {
   final String Function(int week, int year)? weekFormatter;
   final String cancelLabel;
   final String confirmLabel;
+  final List<String> monthLabels;
+  final String yearPickerSemanticLabel;
   final void Function([OiCalendarWeek?]) onConfirm;
 
   @override
@@ -323,8 +332,10 @@ class _OiCalendarWeekPickerDialogState
     final result = await OiMonthPicker.show(
       context,
       initialValue: OiMonth(year: _current.year, month: 1),
+      semanticLabel: widget.yearPickerSemanticLabel,
       cancelLabel: widget.cancelLabel,
       confirmLabel: widget.confirmLabel,
+      monthLabels: widget.monthLabels,
     );
     if (result == null) return;
     // Switch to the selected year, keep week clamped.

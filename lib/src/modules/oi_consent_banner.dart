@@ -65,6 +65,52 @@ enum OiConsentPosition {
 // OiConsentBanner
 // ---------------------------------------------------------------------------
 
+/// The texts of the preferences dialog of an [OiConsentBanner], in English by default; pass translations
+/// to localize the preferences dialog.
+///
+/// {@category Modules}
+class OiConsentPreferencesLabels {
+  /// Creates an [OiConsentPreferencesLabels].
+  const OiConsentPreferencesLabels({
+    this.dialog = 'Consent preferences',
+    this.form = 'Cookie preferences',
+    this.title = 'Cookie Preferences',
+    this.description =
+        'Choose which cookies you want to allow. Required cookies cannot be disabled.',
+    this.cancel = 'Cancel',
+    this.save = 'Save Preferences',
+    this.required = 'Required',
+    this.toggle = englishToggle,
+  });
+
+  /// "Analytics consent toggle": the default [toggle].
+  static String englishToggle(String category) => '$category consent toggle';
+
+  /// Screen-reader label of the dialog.
+  final String dialog;
+
+  /// Screen-reader label of the form inside the dialog.
+  final String form;
+
+  /// Title of the dialog.
+  final String title;
+
+  /// Description of the dialog.
+  final String description;
+
+  /// Label of the cancel button.
+  final String cancel;
+
+  /// Label of the save button.
+  final String save;
+
+  /// Badge of a category that cannot be disabled.
+  final String required;
+
+  /// Screen-reader label of the named category's switch.
+  final String Function(String category) toggle;
+}
+
 /// A GDPR / cookie consent banner with an optional preferences dialog.
 ///
 /// Displays a dismissible banner at the [position] edge of the screen with
@@ -94,6 +140,7 @@ class OiConsentBanner extends StatefulWidget {
     this.visible = true,
     this.position = OiConsentPosition.bottom,
     this.maxWidth = 960,
+    this.preferencesLabels = const OiConsentPreferencesLabels(),
     super.key,
   }) : _showManage = true;
 
@@ -111,11 +158,12 @@ class OiConsentBanner extends StatefulWidget {
     this.position = OiConsentPosition.bottom,
     this.maxWidth = 960,
     this.visible = true,
+    this.privacyPolicyLabel = 'Privacy Policy',
+    this.acceptAllLabel = 'Accept All',
+    this.rejectAllLabel = 'Reject All',
+    this.preferencesLabels = const OiConsentPreferencesLabels(),
     super.key,
-  }) : privacyPolicyLabel = 'Privacy Policy',
-       onSavePreferences = null,
-       acceptAllLabel = 'Accept All',
-       rejectAllLabel = 'Reject All',
+  }) : onSavePreferences = null,
        manageLabel = 'Manage Preferences',
        _showManage = false;
 
@@ -167,6 +215,9 @@ class OiConsentBanner extends StatefulWidget {
 
   /// Maximum width of the banner content area.
   final double maxWidth;
+
+  /// The texts of the preferences dialog; pass translations to localize it.
+  final OiConsentPreferencesLabels preferencesLabels;
 
   /// Whether the manage-preferences button is shown.
   final bool _showManage;
@@ -233,9 +284,10 @@ class _OiConsentBannerState extends State<OiConsentBanner> {
   void _showPreferencesDialog() {
     _dialogHandle = OiDialog.show(
       context,
-      label: 'Consent preferences',
+      label: widget.preferencesLabels.dialog,
       dialog: _ConsentPreferencesDialog(
         categories: widget.categories,
+        labels: widget.preferencesLabels,
         preferences: Map<String, bool>.from(_preferences),
         onSave: (prefs) {
           setState(() => _preferences = prefs);
@@ -406,7 +458,10 @@ class _ConsentPreferencesDialog extends StatefulWidget {
     required this.preferences,
     required this.onSave,
     required this.onCancel,
+    required this.labels,
   });
+
+  final OiConsentPreferencesLabels labels;
 
   final List<OiConsentCategory> categories;
   final Map<String, bool> preferences;
@@ -441,16 +496,15 @@ class _ConsentPreferencesDialogState extends State<_ConsentPreferencesDialog> {
     }
 
     return OiDialog.form(
-      label: 'Cookie preferences',
-      title: 'Cookie Preferences',
+      label: widget.labels.form,
+      title: widget.labels.title,
       onClose: widget.onCancel,
       content: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           OiLabel.body(
-            'Choose which cookies you want to allow. Required cookies '
-            'cannot be disabled.',
+            widget.labels.description,
             color: context.colors.textMuted,
           ),
           SizedBox(height: spacing.md),
@@ -458,9 +512,9 @@ class _ConsentPreferencesDialogState extends State<_ConsentPreferencesDialog> {
         ],
       ),
       actions: [
-        OiButton.ghost(label: 'Cancel', onTap: widget.onCancel),
+        OiButton.ghost(label: widget.labels.cancel, onTap: widget.onCancel),
         OiButton.primary(
-          label: 'Save Preferences',
+          label: widget.labels.save,
           onTap: () => widget.onSave(_localPrefs),
         ),
       ],
@@ -491,13 +545,13 @@ class _ConsentPreferencesDialogState extends State<_ConsentPreferencesDialog> {
                       : (value) {
                           setState(() => _localPrefs[cat.key] = value);
                         },
-                  semanticLabel: '${cat.name} consent toggle',
+                  semanticLabel: widget.labels.toggle(cat.name),
                 ),
               ),
               if (isRequired) ...[
                 SizedBox(width: spacing.sm),
-                const OiBadge.soft(
-                  label: 'Required',
+                OiBadge.soft(
+                  label: widget.labels.required,
                   color: OiBadgeColor.neutral,
                   size: OiBadgeSize.small,
                 ),

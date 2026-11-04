@@ -334,5 +334,26 @@ void main() {
         findsOneWidget,
       );
     });
+
+    testWidgets('renders the given tab labels', (tester) async {
+      await tester.pumpObers(
+        const SizedBox(
+          width: 800,
+          height: 600,
+          child: OiHelpCenter(
+            label: 'Help',
+            faq: _faq,
+            showKnowledgeBase: false,
+            showFeedback: false,
+            labels: OiHelpCenterLabels(
+              faq: 'Häufige Fragen',
+              contact: 'Kontakt',
+            ),
+          ),
+        ),
+      );
+      expect(find.text('Häufige Fragen'), findsOneWidget);
+      expect(find.text('Kontakt'), findsOneWidget);
+    });
   });
 }

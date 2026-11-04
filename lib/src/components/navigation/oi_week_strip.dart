@@ -31,6 +31,32 @@ const List<String> _kMonthNames = [
   'December',
 ];
 
+/// The texts of an [OiWeekStrip], in English by default; pass translations
+/// to localize the strip.
+///
+/// {@category Components}
+class OiWeekStripLabels {
+  /// Creates an [OiWeekStripLabels].
+  const OiWeekStripLabels({
+    this.weekdays = _kDayAbbreviations,
+    this.months = _kMonthNames,
+    this.previousWeek = 'Previous week',
+    this.nextWeek = 'Next week',
+  });
+
+  /// Weekday abbreviations indexed 0–6 (Monday–Sunday).
+  final List<String> weekdays;
+
+  /// Month names indexed 0–11 (January–December), shown in the week's date range.
+  final List<String> months;
+
+  /// Screen-reader label of the arrow that shows the previous week.
+  final String previousWeek;
+
+  /// Screen-reader label of the arrow that shows the next week.
+  final String nextWeek;
+}
+
 /// A compact horizontal 7-day week selector.
 ///
 /// Displays a single week as a horizontal row of day cells (abbreviation +
@@ -66,6 +92,7 @@ class OiWeekStrip extends StatefulWidget {
     this.locale,
     this.compact = false,
     this.semanticLabel,
+    this.labels = const OiWeekStripLabels(),
     super.key,
   });
 
@@ -124,6 +151,9 @@ class OiWeekStrip extends StatefulWidget {
 
   /// Optional semantic label for screen readers.
   final String? semanticLabel;
+
+  /// The strip's texts; pass translations to localize it.
+  final OiWeekStripLabels labels;
 
   @override
   State<OiWeekStrip> createState() => _OiWeekStripState();
@@ -249,12 +279,12 @@ class _OiWeekStripState extends State<OiWeekStrip> {
   /// (e.g. "Mar – Apr"). Year shown only when [OiWeekStrip.showYear] is true.
   String _monthLabel() {
     final weekEnd = _weekStart.add(const Duration(days: 6));
-    final startMonth = _kMonthNames[_weekStart.month - 1];
+    final startMonth = widget.labels.months[_weekStart.month - 1];
     final year = widget.showYear ? ' ${_weekStart.year}' : '';
     if (_weekStart.month == weekEnd.month && _weekStart.year == weekEnd.year) {
       return '$startMonth$year';
     }
-    final endMonth = _kMonthNames[weekEnd.month - 1];
+    final endMonth = widget.labels.months[weekEnd.month - 1];
     if (_weekStart.year == weekEnd.year) {
       return '$startMonth \u2013 $endMonth$year';
     }
@@ -266,10 +296,10 @@ class _OiWeekStripState extends State<OiWeekStrip> {
   /// Returns the day abbreviation for the given weekday, respecting
   /// [OiWeekStrip.firstDayOfWeek].
   String _dayAbbreviation(int index) {
-    // _kDayAbbreviations is 0-indexed starting at Monday (index 0).
+    // weekdays is 0-indexed starting at Monday (index 0).
     // firstDayOfWeek: 1=Mon, 7=Sun
     final weekdayIndex = (widget.firstDayOfWeek - 1 + index) % 7;
-    return _kDayAbbreviations[weekdayIndex];
+    return widget.labels.weekdays[weekdayIndex];
   }
 
   @override
@@ -382,7 +412,7 @@ class _OiWeekStripState extends State<OiWeekStrip> {
                       OiTappable(
                         onTap: prevEnabled ? _prevWeek : null,
                         enabled: prevEnabled,
-                        semanticLabel: 'Previous week',
+                        semanticLabel: widget.labels.previousWeek,
                         child: OiIcon.decorative(
                           icon: OiIcons.chevronLeft,
                           color: prevEnabled ? colors.text : colors.textMuted,
@@ -411,7 +441,7 @@ class _OiWeekStripState extends State<OiWeekStrip> {
                       OiTappable(
                         onTap: nextEnabled ? _nextWeek : null,
                         enabled: nextEnabled,
-                        semanticLabel: 'Next week',
+                        semanticLabel: widget.labels.nextWeek,
                         child: OiIcon.decorative(
                           icon: OiIcons.chevronRight,
                           color: nextEnabled ? colors.text : colors.textMuted,

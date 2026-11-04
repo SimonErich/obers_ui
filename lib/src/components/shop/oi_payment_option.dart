@@ -29,6 +29,7 @@ class OiPaymentOption extends StatelessWidget {
     required this.label,
     this.selected = false,
     this.onSelect,
+    this.defaultLabel = 'Default',
     super.key,
   });
 
@@ -43,6 +44,9 @@ class OiPaymentOption extends StatelessWidget {
 
   /// Called when the user taps this option.
   final ValueChanged<OiPaymentMethod>? onSelect;
+
+  /// Marker shown on the default payment method.
+  final String defaultLabel;
 
   IconData _resolveIcon() {
     return method.icon ?? _kPaymentIcon;
@@ -101,7 +105,7 @@ class OiPaymentOption extends StatelessWidget {
           ),
         ),
         if (method.defaultMethod)
-          OiLabel.tiny('Default', color: colors.primary.base),
+          OiLabel.tiny(defaultLabel, color: colors.primary.base),
       ],
     );
 

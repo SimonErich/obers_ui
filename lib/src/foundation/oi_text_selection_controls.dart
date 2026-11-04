@@ -116,18 +116,42 @@ class _HandlePainter extends CustomPainter {
 ///
 /// Pass this as the `contextMenuBuilder` argument of [EditableText]
 /// (or [OiRawInput]) to replace the platform-default context menu.
+///
+/// Pass [buttonLabel] to localize the buttons, e.g. with
+/// `contextMenuBuilder: (context, state) => buildOiSelectionToolbar(context,
+/// state, buttonLabel: myLabels)`; it defaults to
+/// [englishSelectionButtonLabel].
 Widget buildOiSelectionToolbar(
   BuildContext context,
-  EditableTextState editableTextState,
-) {
+  EditableTextState editableTextState, {
+  String Function(ContextMenuButtonType type) buttonLabel =
+      englishSelectionButtonLabel,
+}) {
   final items = editableTextState.contextMenuButtonItems;
   if (items.isEmpty) return const SizedBox.shrink();
 
   return _OiSelectionToolbar(
     anchor: editableTextState.contextMenuAnchors.primaryAnchor,
     buttonItems: items,
+    buttonLabel: buttonLabel,
   );
 }
+
+/// "Cut", "Copy", "Paste", …: the default `buttonLabel` of
+/// [buildOiSelectionToolbar].
+String englishSelectionButtonLabel(ContextMenuButtonType type) =>
+    switch (type) {
+      ContextMenuButtonType.cut => 'Cut',
+      ContextMenuButtonType.copy => 'Copy',
+      ContextMenuButtonType.paste => 'Paste',
+      ContextMenuButtonType.selectAll => 'Select All',
+      ContextMenuButtonType.delete => 'Delete',
+      ContextMenuButtonType.lookUp => 'Look Up',
+      ContextMenuButtonType.searchWeb => 'Search',
+      ContextMenuButtonType.share => 'Share',
+      ContextMenuButtonType.liveTextInput => 'Scan Text',
+      ContextMenuButtonType.custom => '',
+    };
 
 // ── Toolbar widget ──────────────────────────────────────────────────────────
 
@@ -135,10 +159,12 @@ class _OiSelectionToolbar extends StatelessWidget {
   const _OiSelectionToolbar({
     required this.anchor,
     required this.buttonItems,
+    required this.buttonLabel,
   });
 
   final Offset anchor;
   final List<ContextMenuButtonItem> buttonItems;
+  final String Function(ContextMenuButtonType type) buttonLabel;
 
   @override
   Widget build(BuildContext context) {
@@ -181,20 +207,9 @@ class _OiSelectionToolbar extends StatelessWidget {
     );
   }
 
-  static String _labelFor(ContextMenuButtonItem item) {
+  String _labelFor(ContextMenuButtonItem item) {
     if (item.label != null && item.label!.isNotEmpty) return item.label!;
-    return switch (item.type) {
-      ContextMenuButtonType.cut => 'Cut',
-      ContextMenuButtonType.copy => 'Copy',
-      ContextMenuButtonType.paste => 'Paste',
-      ContextMenuButtonType.selectAll => 'Select All',
-      ContextMenuButtonType.delete => 'Delete',
-      ContextMenuButtonType.lookUp => 'Look Up',
-      ContextMenuButtonType.searchWeb => 'Search',
-      ContextMenuButtonType.share => 'Share',
-      ContextMenuButtonType.liveTextInput => 'Scan Text',
-      ContextMenuButtonType.custom => '',
-    };
+    return buttonLabel(item.type);
   }
 }
 

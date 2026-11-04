@@ -41,7 +41,7 @@ extension _OiChatWindowInput on _OiChatWindowState {
             ),
             SizedBox(width: spacing.xs),
             OiButton.primary(
-              label: 'Send',
+              label: widget.labels.send,
               icon: OiIcons.sendHorizontal,
               onTap: widget.streaming ? null : _handleSend,
               enabled: !widget.streaming,

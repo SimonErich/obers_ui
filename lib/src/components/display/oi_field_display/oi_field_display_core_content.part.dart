@@ -59,7 +59,7 @@ extension _OiFieldDisplayCoreContent on OiFieldDisplay {
   Widget _wrapTooltip(Widget child) {
     if (type == OiFieldType.color && !_isEmpty) {
       return OiTooltip(
-        label: 'Color value',
+        label: colorValueLabel,
         message: _valueString,
         child: child,
       );
@@ -67,7 +67,7 @@ extension _OiFieldDisplayCoreContent on OiFieldDisplay {
 
     if (maxLines != null && !_isEmpty) {
       return OiTooltip(
-        label: label.isEmpty ? 'Full value' : label,
+        label: label.isEmpty ? fullValueLabel : label,
         message: _valueString,
         child: child,
       );

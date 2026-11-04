@@ -86,6 +86,8 @@ class OiFilterableNavList<T> extends StatefulWidget {
     this.itemLoadingIds,
     this.emptyState,
     this.onGroupHeaderTap,
+    this.chipFilterLabel = englishChipFilter,
+    this.groupLabel = englishGroup,
     super.key,
   });
 
@@ -147,6 +149,19 @@ class OiFilterableNavList<T> extends StatefulWidget {
   /// Receives the [OiNavGroup] that was tapped. When null, group headers still
   /// toggle expand/collapse but no extra callback is fired.
   final void Function(OiNavGroup group)? onGroupHeaderTap;
+
+  /// "Active filter": the default [chipFilterLabel].
+  static String englishChipFilter(String chip) => '$chip filter';
+
+  /// "Recent group, collapse": the default [groupLabel].
+  static String englishGroup(String group, {required bool expanded}) =>
+      '$group group, ${expanded ? "collapse" : "expand"}';
+
+  /// Screen-reader label of the named chip filter.
+  final String Function(String chip) chipFilterLabel;
+
+  /// Screen-reader label of the named group's header.
+  final String Function(String group, {required bool expanded}) groupLabel;
 
   @override
   State<OiFilterableNavList<T>> createState() => _OiFilterableNavListState<T>();
@@ -259,6 +274,7 @@ class _OiFilterableNavListState<T> extends State<OiFilterableNavList<T>> {
                         padding: EdgeInsets.only(right: context.spacing.xs),
                         child: _ChipFilterButton(
                           chip: chip,
+                          label: widget.chipFilterLabel(chip.label),
                           active: _activeChipIds.contains(chip.id),
                           onToggle: () {
                             setState(() {
@@ -301,6 +317,7 @@ class _OiFilterableNavListState<T> extends State<OiFilterableNavList<T>> {
 
                       return _GroupSection<T>(
                         group: group,
+                        groupLabel: widget.groupLabel,
                         expanded: isExpanded,
                         onToggle: () {
                           setState(() {
@@ -342,11 +359,13 @@ class _GroupedItems<T> {
 class _ChipFilterButton extends StatelessWidget {
   const _ChipFilterButton({
     required this.chip,
+    required this.label,
     required this.active,
     required this.onToggle,
   });
 
   final OiChipFilter chip;
+  final String label;
   final bool active;
   final VoidCallback onToggle;
 
@@ -354,7 +373,7 @@ class _ChipFilterButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return OiTappable(
       onTap: onToggle,
-      semanticLabel: '${chip.label} filter',
+      semanticLabel: label,
       child: Opacity(
         opacity: active ? 1.0 : 0.6,
         child: OiBadge.soft(
@@ -370,6 +389,7 @@ class _ChipFilterButton extends StatelessWidget {
 class _GroupSection<T> extends StatefulWidget {
   const _GroupSection({
     required this.group,
+    required this.groupLabel,
     required this.expanded,
     required this.onToggle,
     required this.selectedItemId,
@@ -382,6 +402,7 @@ class _GroupSection<T> extends StatefulWidget {
   });
 
   final _GroupedItems<T> group;
+  final String Function(String group, {required bool expanded}) groupLabel;
   final bool expanded;
   final VoidCallback onToggle;
   final String? selectedItemId;
@@ -444,9 +465,10 @@ class _GroupSectionState<T> extends State<_GroupSection<T>>
         // Group header
         OiTappable(
           onTap: widget.onToggle,
-          semanticLabel:
-              '${widget.group.group.label} group, '
-              '${widget.expanded ? "collapse" : "expand"}',
+          semanticLabel: widget.groupLabel(
+            widget.group.group.label,
+            expanded: widget.expanded,
+          ),
           child: Padding(
             padding: EdgeInsets.symmetric(
               horizontal: spacing.sm,

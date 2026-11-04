@@ -27,6 +27,97 @@ enum OiAuthMode {
   lock,
 }
 
+/// The texts of an [OiAuthPage], in English by default; pass translations
+/// to localize the page.
+///
+/// {@category Modules}
+class OiAuthPageLabels {
+  /// Creates an [OiAuthPageLabels].
+  const OiAuthPageLabels({
+    this.signIn = 'Sign In',
+    this.createAccount = 'Create Account',
+    this.signUp = 'Sign Up',
+    this.resetPassword = 'Reset Password',
+    this.resetDescription =
+        'Enter your email and we will send you a reset link.',
+    this.sendResetLink = 'Send Reset Link',
+    this.backToSignIn = 'Back to Sign In',
+    this.forgotPassword = 'Forgot password?',
+    this.noAccount = "Don't have an account? ",
+    this.haveAccount = 'Already have an account? ',
+    this.email = 'Email',
+    this.emailPlaceholder = 'you@example.com',
+    this.password = 'Password',
+    this.passwordPlaceholder = 'Enter your password',
+    this.newPasswordPlaceholder = 'Choose a password',
+    this.fullName = 'Full Name',
+    this.fullNamePlaceholder = 'Jane Doe',
+    this.unlock = 'Unlock',
+    this.defaultUserName = 'User',
+    this.operationFailed = 'Operation failed. Please try again.',
+  });
+
+  /// Title and button label of the sign-in form, and the link to it.
+  final String signIn;
+
+  /// Title and button label of the sign-up form.
+  final String createAccount;
+
+  /// Label of the link to the sign-up form.
+  final String signUp;
+
+  /// Title of the reset password form.
+  final String resetPassword;
+
+  /// Description of the reset password form.
+  final String resetDescription;
+
+  /// Label of the reset password button.
+  final String sendResetLink;
+
+  /// Label of the link from the reset form back to sign in.
+  final String backToSignIn;
+
+  /// Label of the link to the reset password form.
+  final String forgotPassword;
+
+  /// Text before the link to the sign-up form.
+  final String noAccount;
+
+  /// Text before the link to the sign-in form.
+  final String haveAccount;
+
+  /// Label of the email inputs.
+  final String email;
+
+  /// Placeholder of the email inputs.
+  final String emailPlaceholder;
+
+  /// Label of the password inputs.
+  final String password;
+
+  /// Placeholder of the sign-in and unlock password inputs.
+  final String passwordPlaceholder;
+
+  /// Placeholder of the sign-up password input.
+  final String newPasswordPlaceholder;
+
+  /// Label of the name input.
+  final String fullName;
+
+  /// Placeholder of the name input.
+  final String fullNamePlaceholder;
+
+  /// Label of the unlock button.
+  final String unlock;
+
+  /// Name shown on the lock screen when no user name is given.
+  final String defaultUserName;
+
+  /// Error shown when an action fails.
+  final String operationFailed;
+}
+
 /// A full-page authentication module with login, registration,
 /// forgot-password, and lock-screen flows.
 ///
@@ -54,6 +145,7 @@ class OiAuthPage extends StatefulWidget {
     this.avatar,
     this.logo,
     this.footer,
+    this.labels = const OiAuthPageLabels(),
     super.key,
   });
 
@@ -64,6 +156,7 @@ class OiAuthPage extends StatefulWidget {
     this.onModeChanged,
     this.logo,
     this.footer,
+    this.labels = const OiAuthPageLabels(),
     super.key,
   }) : initialMode = OiAuthMode.login,
        onRegister = null,
@@ -79,6 +172,7 @@ class OiAuthPage extends StatefulWidget {
     this.onModeChanged,
     this.logo,
     this.footer,
+    this.labels = const OiAuthPageLabels(),
     super.key,
   }) : initialMode = OiAuthMode.register,
        onLogin = null,
@@ -99,6 +193,7 @@ class OiAuthPage extends StatefulWidget {
     this.onModeChanged,
     this.logo,
     this.footer,
+    this.labels = const OiAuthPageLabels(),
     super.key,
   }) : initialMode = OiAuthMode.lock,
        onLogin = null,
@@ -142,6 +237,9 @@ class OiAuthPage extends StatefulWidget {
 
   /// An optional footer widget displayed below the form.
   final Widget? footer;
+
+  /// The page's texts; pass translations to localize it.
+  final OiAuthPageLabels labels;
 
   @override
   State<OiAuthPage> createState() => _OiAuthPageState();
@@ -217,7 +315,7 @@ class _OiAuthPageState extends State<OiAuthPage> {
       }
       if (!success && mounted) {
         setState(() {
-          _error = 'Operation failed. Please try again.';
+          _error = widget.labels.operationFailed;
         });
       }
     } on Exception catch (e) {
@@ -261,22 +359,22 @@ class _OiAuthPageState extends State<OiAuthPage> {
       gap: OiResponsive(sp.sm),
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const OiLabel.h2(
-          'Sign In',
+        OiLabel.h2(
+          widget.labels.signIn,
           textAlign: TextAlign.center,
         ),
         SizedBox(height: sp.sm),
         OiTextInput(
           controller: _emailController,
-          label: 'Email',
-          placeholder: 'you@example.com',
+          label: widget.labels.email,
+          placeholder: widget.labels.emailPlaceholder,
           keyboardType: TextInputType.emailAddress,
           textInputAction: TextInputAction.next,
         ),
         OiTextInput(
           controller: _passwordController,
-          label: 'Password',
-          placeholder: 'Enter your password',
+          label: widget.labels.password,
+          placeholder: widget.labels.passwordPlaceholder,
           obscureText: true,
           textInputAction: TextInputAction.done,
           onSubmitted: _canSubmit && !_isSubmitting ? (_) => _submit() : null,
@@ -284,7 +382,7 @@ class _OiAuthPageState extends State<OiAuthPage> {
         if (_error != null) _buildError(context),
         SizedBox(height: sp.sm),
         OiButton.primary(
-          label: 'Sign In',
+          label: widget.labels.signIn,
           onTap: _canSubmit && !_isSubmitting ? _submit : null,
           loading: _isSubmitting,
         ),
@@ -293,14 +391,14 @@ class _OiAuthPageState extends State<OiAuthPage> {
         SizedBox(height: sp.sm),
         if (widget.onForgotPassword != null)
           _buildLink(
-            'Forgot password?',
+            widget.labels.forgotPassword,
             () => _switchMode(OiAuthMode.forgotPassword),
           ),
         if (widget.onRegister != null)
           _buildLink(
-            'Sign Up',
+            widget.labels.signUp,
             () => _switchMode(OiAuthMode.register),
-            prefix: "Don't have an account? ",
+            prefix: widget.labels.noAccount,
           ),
       ],
     );
@@ -319,28 +417,28 @@ class _OiAuthPageState extends State<OiAuthPage> {
       gap: OiResponsive(sp.sm),
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const OiLabel.h2(
-          'Create Account',
+        OiLabel.h2(
+          widget.labels.createAccount,
           textAlign: TextAlign.center,
         ),
         SizedBox(height: sp.sm),
         OiTextInput(
           controller: _nameController,
-          label: 'Full Name',
-          placeholder: 'Jane Doe',
+          label: widget.labels.fullName,
+          placeholder: widget.labels.fullNamePlaceholder,
           textInputAction: TextInputAction.next,
         ),
         OiTextInput(
           controller: _emailController,
-          label: 'Email',
-          placeholder: 'you@example.com',
+          label: widget.labels.email,
+          placeholder: widget.labels.emailPlaceholder,
           keyboardType: TextInputType.emailAddress,
           textInputAction: TextInputAction.next,
         ),
         OiTextInput(
           controller: _passwordController,
-          label: 'Password',
-          placeholder: 'Choose a password',
+          label: widget.labels.password,
+          placeholder: widget.labels.newPasswordPlaceholder,
           obscureText: true,
           textInputAction: TextInputAction.done,
           onSubmitted: _canSubmit && !_isSubmitting ? (_) => _submit() : null,
@@ -348,7 +446,7 @@ class _OiAuthPageState extends State<OiAuthPage> {
         if (_error != null) _buildError(context),
         SizedBox(height: sp.sm),
         OiButton.primary(
-          label: 'Create Account',
+          label: widget.labels.createAccount,
           onTap: _canSubmit && !_isSubmitting ? _submit : null,
           loading: _isSubmitting,
           fullWidth: true,
@@ -358,9 +456,9 @@ class _OiAuthPageState extends State<OiAuthPage> {
         SizedBox(height: sp.sm),
         if (widget.onLogin != null)
           _buildLink(
-            'Sign In',
+            widget.labels.signIn,
             () => _switchMode(OiAuthMode.login),
-            prefix: 'Already have an account? ',
+            prefix: widget.labels.haveAccount,
           ),
       ],
     );
@@ -379,18 +477,18 @@ class _OiAuthPageState extends State<OiAuthPage> {
       gap: OiResponsive(sp.sm),
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const OiLabel.h2(
-          'Reset Password',
+        OiLabel.h2(
+          widget.labels.resetPassword,
           textAlign: TextAlign.center,
         ),
         SizedBox(height: sp.sm),
-        const OiLabel.body(
-          'Enter your email and we will send you a reset link.',
+        OiLabel.body(
+          widget.labels.resetDescription,
         ),
         OiTextInput(
           controller: _emailController,
-          label: 'Email',
-          placeholder: 'you@example.com',
+          label: widget.labels.email,
+          placeholder: widget.labels.emailPlaceholder,
           keyboardType: TextInputType.emailAddress,
           textInputAction: TextInputAction.done,
           onSubmitted: _canSubmit && !_isSubmitting ? (_) => _submit() : null,
@@ -398,7 +496,7 @@ class _OiAuthPageState extends State<OiAuthPage> {
         if (_error != null) _buildError(context),
         SizedBox(height: sp.sm),
         OiButton.primary(
-          label: 'Send Reset Link',
+          label: widget.labels.sendResetLink,
           onTap: _canSubmit && !_isSubmitting ? _submit : null,
           loading: _isSubmitting,
           fullWidth: true,
@@ -407,7 +505,10 @@ class _OiAuthPageState extends State<OiAuthPage> {
         const OiDivider(),
         SizedBox(height: sp.sm),
         if (widget.onLogin != null)
-          _buildLink('Back to Sign In', () => _switchMode(OiAuthMode.login)),
+          _buildLink(
+            widget.labels.backToSignIn,
+            () => _switchMode(OiAuthMode.login),
+          ),
       ],
     );
   }
@@ -419,7 +520,7 @@ class _OiAuthPageState extends State<OiAuthPage> {
   Widget _buildLockForm(BuildContext context) {
     final sp = context.spacing;
     final breakpoint = context.breakpoint;
-    final name = widget.userName ?? 'User';
+    final name = widget.userName ?? widget.labels.defaultUserName;
 
     return OiColumn(
       breakpoint: breakpoint,
@@ -440,8 +541,8 @@ class _OiAuthPageState extends State<OiAuthPage> {
         SizedBox(height: sp.sm),
         OiTextInput(
           controller: _passwordController,
-          label: 'Password',
-          placeholder: 'Enter your password',
+          label: widget.labels.password,
+          placeholder: widget.labels.passwordPlaceholder,
           obscureText: true,
           textInputAction: TextInputAction.done,
           onSubmitted: _canSubmit && !_isSubmitting ? (_) => _submit() : null,
@@ -449,7 +550,7 @@ class _OiAuthPageState extends State<OiAuthPage> {
         if (_error != null) _buildError(context),
         SizedBox(height: sp.sm),
         OiButton.primary(
-          label: 'Unlock',
+          label: widget.labels.unlock,
           onTap: _canSubmit && !_isSubmitting ? _submit : null,
           loading: _isSubmitting,
           fullWidth: true,

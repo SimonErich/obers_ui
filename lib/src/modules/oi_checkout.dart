@@ -18,6 +18,7 @@ import 'package:obers_ui/src/models/oi_country_option.dart';
 import 'package:obers_ui/src/models/oi_order_data.dart';
 import 'package:obers_ui/src/models/oi_payment_method.dart';
 import 'package:obers_ui/src/models/oi_shipping_method.dart';
+import 'package:obers_ui/src/modules/oi_checkout_labels.dart';
 import 'package:obers_ui/src/primitives/display/oi_divider.dart';
 import 'package:obers_ui/src/primitives/display/oi_label.dart';
 import 'package:obers_ui/src/primitives/layout/oi_column.dart';
@@ -84,6 +85,7 @@ class OiCheckout extends StatefulWidget {
     this.sameBillingDefault = true,
     this.currencyCode = 'USD',
     this.placeOrderLabel,
+    this.labels = const OiCheckoutLabels(),
     super.key,
   });
 
@@ -150,6 +152,9 @@ class OiCheckout extends StatefulWidget {
 
   /// Custom label for the place-order button. Defaults to `'Place Order'`.
   final String? placeOrderLabel;
+
+  /// The checkout's texts; pass translations to localize it.
+  final OiCheckoutLabels labels;
 
   @override
   State<OiCheckout> createState() => _OiCheckoutState();
@@ -370,7 +375,7 @@ class _OiCheckoutState extends State<OiCheckout> {
     if (widget.items.isEmpty) {
       return Semantics(
         label: widget.label,
-        child: const Center(child: OiLabel.body('Your cart is empty.')),
+        child: Center(child: OiLabel.body(widget.labels.emptyCart)),
       );
     }
 

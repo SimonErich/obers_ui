@@ -43,6 +43,117 @@ class OiFileColumnDef {
   final bool sortable;
 }
 
+/// The texts of an [OiFileListView], in English by default; pass
+/// translations to localize the view.
+///
+/// {@category Composites}
+class OiFileListViewLabels {
+  /// Creates an [OiFileListViewLabels].
+  const OiFileListViewLabels({
+    this.backgroundMenu = 'File list background menu',
+    this.folder = 'folder',
+    this.describeFile = englishDescribeFile,
+    this.rename = englishRename,
+    this.contextMenu = englishContextMenu,
+    this.dragCount = englishDragCount,
+    this.columnHeaders = 'Column headers',
+    this.name = 'Name',
+    this.size = 'Size',
+    this.modified = 'Modified',
+    this.type = 'Type',
+    this.sortByName = 'Sort by name',
+    this.sortBySize = 'Sort by size',
+    this.sortByModified = 'Sort by modified date',
+    this.sortByType = 'Sort by type',
+    this.formatDate = englishFormatDate,
+  });
+
+  /// "report.pdf, pdf, selected": the default [describeFile].
+  static String englishDescribeFile(
+    String name,
+    String type, {
+    required bool selected,
+  }) => '$name, $type${selected ? ', selected' : ''}';
+
+  /// "Rename report.pdf": the default [rename].
+  static String englishRename(String name) => 'Rename $name';
+
+  /// "Context menu for report.pdf": the default [contextMenu].
+  static String englishContextMenu(String name) => 'Context menu for $name';
+
+  /// "3 items": the default [dragCount].
+  static String englishDragCount(int count) => '$count items';
+
+  /// "Mar 5, 2026": the default [formatDate].
+  static String englishFormatDate(DateTime date) {
+    const months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
+    return '${months[date.month - 1]} ${date.day}, ${date.year}';
+  }
+
+  /// Screen-reader label of the context menu on the empty area.
+  final String backgroundMenu;
+
+  /// Type read out for a folder by [describeFile].
+  final String folder;
+
+  /// Screen-reader description of a file by its name, its type (the
+  /// extension, or [folder]) and whether it is selected.
+  final String Function(String name, String type, {required bool selected})
+  describeFile;
+
+  /// Screen-reader label of the inline rename field of the named file.
+  final String Function(String name) rename;
+
+  /// Screen-reader label of the context menu of the named file.
+  final String Function(String name) contextMenu;
+
+  /// Shown while several files, counted by the argument, are dragged.
+  final String Function(int count) dragCount;
+
+  /// Screen-reader label of the header row.
+  final String columnHeaders;
+
+  /// Header of the name column.
+  final String name;
+
+  /// Header of the size column.
+  final String size;
+
+  /// Header of the modified column.
+  final String modified;
+
+  /// Header of the type column.
+  final String type;
+
+  /// Screen-reader label of the name header, which sorts by name.
+  final String sortByName;
+
+  /// Screen-reader label of the size header, which sorts by size.
+  final String sortBySize;
+
+  /// Screen-reader label of the modified header, which sorts by date.
+  final String sortByModified;
+
+  /// Screen-reader label of the type header, which sorts by type.
+  final String sortByType;
+
+  /// Formats the modified date.
+  final String Function(DateTime date) formatDate;
+}
+
 /// The list (table-like) view of files.
 ///
 /// Renders a sortable column header + virtualized rows of file tiles.
@@ -77,6 +188,7 @@ class OiFileListView extends StatefulWidget {
     this.searchQuery,
     this.loading = false,
     this.semanticsLabel,
+    this.labels = const OiFileListViewLabels(),
     super.key,
   });
 
@@ -152,6 +264,9 @@ class OiFileListView extends StatefulWidget {
 
   /// Accessibility label.
   final String? semanticsLabel;
+
+  /// The view's texts; pass translations to localize it.
+  final OiFileListViewLabels labels;
 
   @override
   State<OiFileListView> createState() => _OiFileListViewState();
@@ -323,7 +438,7 @@ class _OiFileListViewState extends State<OiFileListView> {
           onSelectionStart: () {},
           onSelectionEnd: () {},
           child: OiContextMenu(
-            label: 'File list background menu',
+            label: widget.labels.backgroundMenu,
             items: widget.backgroundContextMenu?.call() ?? [],
             enabled: widget.backgroundContextMenu != null,
             child: Column(
@@ -373,7 +488,7 @@ class _OiFileListViewState extends State<OiFileListView> {
     }
 
     return Semantics(
-      label: 'Column headers',
+      label: widget.labels.columnHeaders,
       child: Container(
         padding: EdgeInsets.symmetric(
           horizontal: (spacing as dynamic).md as double,
@@ -394,9 +509,9 @@ class _OiFileListViewState extends State<OiFileListView> {
                 onTap: () => _toggleSort(OiFileSortField.name),
                 child: Semantics(
                   button: true,
-                  label: 'Sort by name',
+                  label: widget.labels.sortByName,
                   child: Text(
-                    'Name${sortIndicator(OiFileSortField.name)}',
+                    '${widget.labels.name}${sortIndicator(OiFileSortField.name)}',
                     style: textStyle,
                   ),
                 ),
@@ -408,9 +523,9 @@ class _OiFileListViewState extends State<OiFileListView> {
                   onTap: () => _toggleSort(OiFileSortField.size),
                   child: Semantics(
                     button: true,
-                    label: 'Sort by size',
+                    label: widget.labels.sortBySize,
                     child: Text(
-                      'Size${sortIndicator(OiFileSortField.size)}',
+                      '${widget.labels.size}${sortIndicator(OiFileSortField.size)}',
                       style: textStyle,
                     ),
                   ),
@@ -423,9 +538,9 @@ class _OiFileListViewState extends State<OiFileListView> {
                   onTap: () => _toggleSort(OiFileSortField.modified),
                   child: Semantics(
                     button: true,
-                    label: 'Sort by modified date',
+                    label: widget.labels.sortByModified,
                     child: Text(
-                      'Modified${sortIndicator(OiFileSortField.modified)}',
+                      '${widget.labels.modified}${sortIndicator(OiFileSortField.modified)}',
                       style: textStyle,
                     ),
                   ),
@@ -437,9 +552,9 @@ class _OiFileListViewState extends State<OiFileListView> {
                   onTap: () => _toggleSort(OiFileSortField.type),
                   child: Semantics(
                     button: true,
-                    label: 'Sort by type',
+                    label: widget.labels.sortByType,
                     child: Text(
-                      'Type${sortIndicator(OiFileSortField.type)}',
+                      '${widget.labels.type}${sortIndicator(OiFileSortField.type)}',
                       style: textStyle,
                     ),
                   ),
@@ -460,9 +575,14 @@ class _OiFileListViewState extends State<OiFileListView> {
     OiColorScheme colors,
     OiSpacingScale spacing,
   ) {
-    final fileType = file.folder ? 'folder' : file.resolvedExtension;
-    final semanticLabel =
-        '${file.name}, $fileType${selected ? ', selected' : ''}';
+    final fileType = file.folder
+        ? widget.labels.folder
+        : file.resolvedExtension;
+    final semanticLabel = widget.labels.describeFile(
+      file.name,
+      fileType,
+      selected: selected,
+    );
 
     Widget row = Semantics(
       label: semanticLabel,
@@ -503,7 +623,7 @@ class _OiFileListViewState extends State<OiFileListView> {
                         folder: file.folder,
                         onRename: widget.onRename ?? (_) {},
                         onCancel: widget.onCancelRename ?? () {},
-                        semanticsLabel: 'Rename ${file.name}',
+                        semanticsLabel: widget.labels.rename(file.name),
                       )
                     : _buildName(file, colors),
               ),
@@ -524,7 +644,7 @@ class _OiFileListViewState extends State<OiFileListView> {
                   flex: 2,
                   child: Text(
                     file.modified != null
-                        ? _formatShortDate(file.modified!)
+                        ? widget.labels.formatDate(file.modified!)
                         : '—',
                     style: TextStyle(
                       fontSize: 12,
@@ -552,7 +672,7 @@ class _OiFileListViewState extends State<OiFileListView> {
     // Wrap with context menu
     if (widget.contextMenuBuilder != null) {
       row = OiContextMenu(
-        label: 'Context menu for ${file.name}',
+        label: widget.labels.contextMenu(file.name),
         items: widget.contextMenuBuilder!(file),
         child: row,
       );
@@ -638,7 +758,7 @@ class _OiFileListViewState extends State<OiFileListView> {
   Widget _buildDragFeedback(List<OiFileNodeData> files, OiColorScheme colors) {
     final label = files.length == 1
         ? files.first.name
-        : '${files.length} items';
+        : widget.labels.dragCount(files.length);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
@@ -716,24 +836,6 @@ class _OiFileListViewState extends State<OiFileListView> {
         ),
       ],
     );
-  }
-
-  static String _formatShortDate(DateTime date) {
-    const months = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec',
-    ];
-    return '${months[date.month - 1]} ${date.day}, ${date.year}';
   }
 }
 

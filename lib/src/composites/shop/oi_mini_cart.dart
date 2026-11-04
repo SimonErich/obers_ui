@@ -30,6 +30,52 @@ enum OiMiniCartDisplay {
   sheet,
 }
 
+/// The texts of an [OiMiniCart], in English by default; pass translations
+/// to localize the mini cart.
+///
+/// {@category Composites}
+class OiMiniCartLabels {
+  /// Creates an [OiMiniCartLabels].
+  const OiMiniCartLabels({
+    this.title = 'Cart',
+    this.empty = 'Cart is empty',
+    this.moreItems = englishMoreItems,
+    this.total = 'Total',
+    this.cartTotal = 'Cart total',
+    this.viewCart = 'View Cart',
+    this.checkout = 'Checkout',
+    this.itemRow = const OiCartItemRowLabels(),
+  });
+
+  /// "2 more items": the default [moreItems].
+  static String englishMoreItems(int count) =>
+      '$count more item${count == 1 ? '' : 's'}';
+
+  /// Heading of the mini cart.
+  final String title;
+
+  /// Shown while the cart is empty.
+  final String empty;
+
+  /// Shown below the list when more items are in the cart than it shows.
+  final String Function(int count) moreItems;
+
+  /// Label of the total row.
+  final String total;
+
+  /// Screen-reader label of the total price.
+  final String cartTotal;
+
+  /// Label of the view cart button.
+  final String viewCart;
+
+  /// Label of the checkout button.
+  final String checkout;
+
+  /// The texts of each item row.
+  final OiCartItemRowLabels itemRow;
+}
+
 /// A compact cart widget: an icon button with badge count that opens a popover
 /// or sheet showing a condensed cart preview.
 ///
@@ -56,6 +102,7 @@ class OiMiniCart extends StatefulWidget {
     this.maxVisibleItems = 3,
     this.display = OiMiniCartDisplay.popover,
     this.currencyCode = 'EUR',
+    this.labels = const OiMiniCartLabels(),
     super.key,
   });
 
@@ -88,6 +135,9 @@ class OiMiniCart extends StatefulWidget {
 
   /// ISO 4217 currency code. Defaults to `'EUR'`.
   final String currencyCode;
+
+  /// The mini cart's texts; pass translations to localize it.
+  final OiMiniCartLabels labels;
 
   @override
   State<OiMiniCart> createState() => _OiMiniCartState();
@@ -132,7 +182,7 @@ class _OiMiniCartState extends State<OiMiniCart> {
 
     return Padding(
       padding: EdgeInsets.all(sp.lg),
-      child: const Center(child: OiLabel.body('Cart is empty')),
+      child: Center(child: OiLabel.body(widget.labels.empty)),
     );
   }
 
@@ -153,13 +203,14 @@ class _OiMiniCartState extends State<OiMiniCart> {
           gap: OiResponsive(sp.sm),
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const OiLabel.bodyStrong('Cart'),
+            OiLabel.bodyStrong(widget.labels.title),
             for (final item in visibleItems)
               OiCartItemRow(
                 item: item,
                 label: '${item.name} × ${item.quantity}',
                 compact: true,
                 currencyCode: widget.currencyCode,
+                labels: widget.labels.itemRow,
                 onQuantityChange: widget.onQuantityChange != null
                     ? (qty) => widget.onQuantityChange!(
                         (productKey: item.productKey, quantity: qty),
@@ -172,19 +223,17 @@ class _OiMiniCartState extends State<OiMiniCart> {
             if (overflowCount > 0)
               Padding(
                 padding: EdgeInsets.only(left: sp.sm),
-                child: OiLabel.small(
-                  '$overflowCount more item${overflowCount == 1 ? '' : 's'}',
-                ),
+                child: OiLabel.small(widget.labels.moreItems(overflowCount)),
               ),
             const OiDivider(),
             OiRow(
               breakpoint: breakpoint,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const OiLabel.bodyStrong('Total'),
+                OiLabel.bodyStrong(widget.labels.total),
                 OiPriceTag(
                   price: widget.summary.total,
-                  label: 'Cart total',
+                  label: widget.labels.cartTotal,
                   currencyCode: widget.currencyCode,
                 ),
               ],
@@ -195,18 +244,18 @@ class _OiMiniCartState extends State<OiMiniCart> {
               children: [
                 Expanded(
                   child: OiButton.ghost(
-                    label: 'View Cart',
+                    label: widget.labels.viewCart,
                     onTap: widget.onViewCart,
                     fullWidth: true,
-                    semanticLabel: 'View Cart',
+                    semanticLabel: widget.labels.viewCart,
                   ),
                 ),
                 Expanded(
                   child: OiButton.primary(
-                    label: 'Checkout',
+                    label: widget.labels.checkout,
                     onTap: widget.onCheckout,
                     fullWidth: true,
-                    semanticLabel: 'Checkout',
+                    semanticLabel: widget.labels.checkout,
                   ),
                 ),
               ],

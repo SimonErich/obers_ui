@@ -62,6 +62,8 @@ class OiOrderTracker extends StatelessWidget {
     this.timeline,
     this.showTimeline = false,
     this.statusLabels,
+    this.historyTitle = 'Order History',
+    this.formatTimestamp = englishFormatTimestamp,
     super.key,
   });
 
@@ -72,6 +74,8 @@ class OiOrderTracker extends StatelessWidget {
     required OiOrderData order,
     this.label = 'Order tracker',
     this.statusLabels,
+    this.historyTitle = 'Order History',
+    this.formatTimestamp = englishFormatTimestamp,
     super.key,
   }) : currentStatus = order.status,
        timeline = order.timeline,
@@ -94,6 +98,12 @@ class OiOrderTracker extends StatelessWidget {
   /// Custom labels for each order status. When not provided, default labels
   /// are used via [OiOrderStatusBadge.defaultLabel].
   final Map<OiOrderStatus, String>? statusLabels;
+
+  /// Title of the timeline shown when [showTimeline] is set.
+  final String historyTitle;
+
+  /// Formats the timestamps of the timeline.
+  final String Function(DateTime timestamp) formatTimestamp;
 
   // ---------------------------------------------------------------------------
   // Status helpers
@@ -184,6 +194,7 @@ class OiOrderTracker extends StatelessWidget {
     return OiOrderStatusBadge(
       status: currentStatus,
       label: _labelForStatus(currentStatus),
+      statusLabels: statusLabels,
     );
   }
 
@@ -201,7 +212,7 @@ class OiOrderTracker extends StatelessWidget {
     return OiAccordion(
       sections: [
         OiAccordionSection(
-          title: 'Order History',
+          title: historyTitle,
           initiallyExpanded: true,
           content: Column(
             mainAxisSize: MainAxisSize.min,
@@ -229,7 +240,7 @@ class OiOrderTracker extends StatelessWidget {
   }) {
     final sp = context.spacing;
     final dotColor = _colorForStatus(context, event.status);
-    final formattedTime = _formatTimestamp(event.timestamp);
+    final formattedTime = formatTimestamp(event.timestamp);
 
     return IntrinsicHeight(
       child: Row(
@@ -283,8 +294,8 @@ class OiOrderTracker extends StatelessWidget {
     );
   }
 
-  /// Formats a [DateTime] as "Jan 1, 2024 10:00".
-  static String _formatTimestamp(DateTime dt) {
+  /// "Jan 1, 2024 10:00": the default [formatTimestamp].
+  static String englishFormatTimestamp(DateTime dt) {
     final month = _months[dt.month - 1];
     final hour = dt.hour.toString().padLeft(2, '0');
     final minute = dt.minute.toString().padLeft(2, '0');

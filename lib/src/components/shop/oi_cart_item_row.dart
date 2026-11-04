@@ -17,6 +17,42 @@ import 'package:obers_ui/src/primitives/layout/oi_row.dart';
 const IconData _kDeleteIcon = OiIcons.trash2;
 const IconData _kImageIcon = OiIcons.image;
 
+/// The texts of an [OiCartItemRow], in English by default; pass
+/// translations to localize the row.
+///
+/// {@category Components}
+class OiCartItemRowLabels {
+  /// Creates an [OiCartItemRowLabels].
+  const OiCartItemRowLabels({
+    this.remove = 'Remove',
+    this.lineTotal = englishLineTotal,
+    this.quantity = englishQuantity,
+    this.decreaseQuantity = 'Decrease quantity',
+    this.increaseQuantity = 'Increase quantity',
+  });
+
+  /// "Line total for Coffee": the default [lineTotal].
+  static String englishLineTotal(String name) => 'Line total for $name';
+
+  /// "Coffee quantity": the default [quantity].
+  static String englishQuantity(String name) => '$name quantity';
+
+  /// Label of the remove button.
+  final String remove;
+
+  /// Screen-reader label of the named item's line total.
+  final String Function(String name) lineTotal;
+
+  /// Screen-reader label of the named item's quantity selector.
+  final String Function(String name) quantity;
+
+  /// Screen-reader label of the quantity selector's decrease button.
+  final String decreaseQuantity;
+
+  /// Screen-reader label of the quantity selector's increase button.
+  final String increaseQuantity;
+}
+
 /// A single line item row for the shopping cart.
 ///
 /// Coverage: REQ-0030
@@ -40,6 +76,7 @@ class OiCartItemRow extends StatelessWidget {
     this.editable = true,
     this.compact = false,
     this.currencyCode = 'EUR',
+    this.labels = const OiCartItemRowLabels(),
     super.key,
   });
 
@@ -70,6 +107,9 @@ class OiCartItemRow extends StatelessWidget {
 
   /// ISO 4217 currency code for price display. Defaults to `'EUR'`.
   final String currencyCode;
+
+  /// The row's texts; pass translations to localize it.
+  final OiCartItemRowLabels labels;
 
   Widget _buildThumbnail(BuildContext context) {
     final size = compact ? 48.0 : 72.0;
@@ -145,7 +185,9 @@ class OiCartItemRow extends StatelessWidget {
       children.add(
         OiQuantitySelector(
           value: item.quantity,
-          label: '${item.name} quantity',
+          label: labels.quantity(item.name),
+          decreaseLabel: labels.decreaseQuantity,
+          increaseLabel: labels.increaseQuantity,
           max: item.maxQuantity ?? 99,
           compact: compact,
           onChange: onQuantityChange,
@@ -156,7 +198,7 @@ class OiCartItemRow extends StatelessWidget {
     children.add(
       OiPriceTag(
         price: item.totalPrice,
-        label: 'Line total for ${item.name}',
+        label: labels.lineTotal(item.name),
         currencyCode: currencyCode,
         size: compact ? OiPriceTagSize.small : OiPriceTagSize.medium,
       ),
@@ -165,7 +207,7 @@ class OiCartItemRow extends StatelessWidget {
     if (editable && onRemove != null) {
       children.add(
         OiButton.ghost(
-          label: 'Remove',
+          label: labels.remove,
           icon: _kDeleteIcon,
           size: OiButtonSize.small,
           onTap: onRemove,
@@ -218,7 +260,7 @@ class OiCartItemRow extends StatelessWidget {
       content = OiSwipeable(
         trailingActions: [
           OiSwipeAction(
-            label: 'Remove',
+            label: labels.remove,
             color: context.colors.error.base,
             icon: _kDeleteIcon,
             onTap: onRemove!,

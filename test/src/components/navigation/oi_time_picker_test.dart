@@ -76,4 +76,20 @@ void main() {
     expect(tester.takeException(), isNull);
     expect(find.byType(ListWheelScrollView), findsNWidgets(2));
   });
+
+  // ── Labels ─────────────────────────────────────────────────────────────────
+
+  testWidgets('12-hour mode: renders the given AM and PM labels', (
+    tester,
+  ) async {
+    await tester.pumpObers(
+      const OiTimePicker(
+        value: OiTimeOfDay(hour: 8, minute: 0),
+        use24Hour: false,
+        labels: OiTimePickerLabels(beforeNoon: 'vorm.', afterNoon: 'nachm.'),
+      ),
+    );
+    expect(find.text('vorm.'), findsOneWidget);
+    expect(find.text('nachm.'), findsOneWidget);
+  });
 }

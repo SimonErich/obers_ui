@@ -103,6 +103,94 @@ class OiProfileSection {
 // Main widget
 // ---------------------------------------------------------------------------
 
+/// The texts of an [OiProfilePage], in English by default; pass translations
+/// to localize the page.
+///
+/// {@category Modules}
+class OiProfilePageLabels {
+  /// Creates an [OiProfilePageLabels].
+  const OiProfilePageLabels({
+    this.personalInformation = 'Personal Information',
+    this.linkedAccounts = 'Linked Accounts',
+    this.dangerZone = 'Danger Zone',
+    this.navigateTo = englishNavigateTo,
+    this.profilePhoto = englishProfilePhoto,
+    this.changePhoto = 'Change profile photo',
+    this.name = 'Name',
+    this.email = 'Email',
+    this.phone = 'Phone',
+    this.bio = 'Bio',
+    this.save = englishSave,
+    this.connected = 'Connected',
+    this.connect = 'Connect',
+    this.disconnect = 'Disconnect',
+    this.deleteWarning =
+        'Permanently delete your account and all associated data. This action cannot be undone.',
+    this.deleteAccount = 'Delete Account',
+    this.confirmDelete = 'Are you sure? Tap again to confirm',
+  });
+
+  /// "Navigate to Danger Zone": the default [navigateTo].
+  static String englishNavigateTo(String section) => 'Navigate to $section';
+
+  /// "Profile photo of Jane Doe": the default [profilePhoto].
+  static String englishProfilePhoto(String name) => 'Profile photo of $name';
+
+  /// "Save Name": the default [save].
+  static String englishSave(String field) => 'Save $field';
+
+  /// Heading of the personal information section and its navigation entry.
+  final String personalInformation;
+
+  /// Heading of the linked accounts section and its navigation entry.
+  final String linkedAccounts;
+
+  /// Heading of the danger zone and its navigation entry.
+  final String dangerZone;
+
+  /// Screen-reader label of the navigation entry of the named section.
+  final String Function(String section) navigateTo;
+
+  /// Screen-reader label of the named user's photo.
+  final String Function(String name) profilePhoto;
+
+  /// Screen-reader label of the change photo button.
+  final String changePhoto;
+
+  /// Label of the name field.
+  final String name;
+
+  /// Label of the email field.
+  final String email;
+
+  /// Label of the phone field.
+  final String phone;
+
+  /// Label of the bio field.
+  final String bio;
+
+  /// Label of the save button of the named field.
+  final String Function(String field) save;
+
+  /// Badge of a connected account.
+  final String connected;
+
+  /// Label of the connect button.
+  final String connect;
+
+  /// Label of the disconnect button.
+  final String disconnect;
+
+  /// Warning in the danger zone.
+  final String deleteWarning;
+
+  /// Label of the delete account button.
+  final String deleteAccount;
+
+  /// Label of the delete account button after the first tap.
+  final String confirmDelete;
+}
+
 /// A user profile page with avatar, editable fields, linked accounts,
 /// and a danger zone for account deletion.
 ///
@@ -121,6 +209,7 @@ class OiProfilePage extends StatefulWidget {
     this.onDeleteAccount,
     this.sections = const [],
     this.showDangerZone = true,
+    this.labels = const OiProfilePageLabels(),
     super.key,
   });
 
@@ -159,6 +248,9 @@ class OiProfilePage extends StatefulWidget {
 
   /// Whether to show the danger zone for account deletion.
   final bool showDangerZone;
+
+  /// The page's texts; pass translations to localize it.
+  final OiProfilePageLabels labels;
 
   @override
   State<OiProfilePage> createState() => _OiProfilePageState();
@@ -250,16 +342,16 @@ class _OiProfilePageState extends State<OiProfilePage> {
   /// Builds the ordered list of sidebar navigation entries with their keys.
   List<_NavEntry> _buildNavEntries() {
     final entries = <_NavEntry>[
-      _NavEntry('Personal Information', _personalInfoKey),
+      _NavEntry(widget.labels.personalInformation, _personalInfoKey),
     ];
     if (widget.linkedAccounts != null && widget.linkedAccounts!.isNotEmpty) {
-      entries.add(_NavEntry('Linked Accounts', _linkedAccountsKey));
+      entries.add(_NavEntry(widget.labels.linkedAccounts, _linkedAccountsKey));
     }
     for (var i = 0; i < widget.sections.length; i++) {
       entries.add(_NavEntry(widget.sections[i].title, _customSectionKeys[i]!));
     }
     if (widget.showDangerZone) {
-      entries.add(_NavEntry('Danger Zone', _dangerZoneKey));
+      entries.add(_NavEntry(widget.labels.dangerZone, _dangerZoneKey));
     }
     return entries;
   }
@@ -364,8 +456,9 @@ class _OiProfilePageState extends State<OiProfilePage> {
                     children: [
                       // Large avatar
                       OiAvatar(
-                        semanticLabel:
-                            'Profile photo of ${widget.profile.name}',
+                        semanticLabel: widget.labels.profilePhoto(
+                          widget.profile.name,
+                        ),
                         imageUrl: widget.profile.avatarUrl,
                         initials: _initialsFromName(widget.profile.name),
                         size: OiAvatarSize.xl,
@@ -394,7 +487,9 @@ class _OiProfilePageState extends State<OiProfilePage> {
                           padding: EdgeInsets.only(bottom: sp.xs),
                           child: OiTappable(
                             onTap: () => _scrollToSection(i),
-                            semanticLabel: 'Navigate to ${entry.title}',
+                            semanticLabel: widget.labels.navigateTo(
+                              entry.title,
+                            ),
                             clipBorderRadius: context.radius.sm,
                             child: Container(
                               width: double.infinity,
@@ -470,7 +565,7 @@ class _OiProfilePageState extends State<OiProfilePage> {
           child: Stack(
             children: [
               OiAvatar(
-                semanticLabel: 'Profile photo of ${widget.profile.name}',
+                semanticLabel: widget.labels.profilePhoto(widget.profile.name),
                 imageUrl: widget.profile.avatarUrl,
                 initials: _initialsFromName(widget.profile.name),
                 size: OiAvatarSize.xl,
@@ -481,7 +576,7 @@ class _OiProfilePageState extends State<OiProfilePage> {
                   bottom: 0,
                   child: OiTappable(
                     onTap: () => widget.onAvatarChange?.call('image_picker'),
-                    semanticLabel: 'Change profile photo',
+                    semanticLabel: widget.labels.changePhoto,
                     child: Container(
                       width: 28,
                       height: 28,
@@ -535,21 +630,21 @@ class _OiProfilePageState extends State<OiProfilePage> {
             children: [
               Icon(OiIcons.user, size: 18, color: colors.text),
               SizedBox(width: sp.xs),
-              const OiLabel.h4('Personal Information'),
+              OiLabel.h4(widget.labels.personalInformation),
             ],
           ),
         ),
         SizedBox(height: sp.md),
         _buildFieldRow(
           context,
-          label: 'Name',
+          label: widget.labels.name,
           controller: _nameController,
           field: 'name',
         ),
         SizedBox(height: sp.sm),
         _buildFieldRow(
           context,
-          label: 'Email',
+          label: widget.labels.email,
           controller: _emailController,
           field: 'email',
           keyboardType: TextInputType.emailAddress,
@@ -557,7 +652,7 @@ class _OiProfilePageState extends State<OiProfilePage> {
         SizedBox(height: sp.sm),
         _buildFieldRow(
           context,
-          label: 'Phone',
+          label: widget.labels.phone,
           controller: _phoneController,
           field: 'phone',
           keyboardType: TextInputType.phone,
@@ -565,7 +660,7 @@ class _OiProfilePageState extends State<OiProfilePage> {
         SizedBox(height: sp.sm),
         _buildFieldRow(
           context,
-          label: 'Bio',
+          label: widget.labels.bio,
           controller: _bioController,
           field: 'bio',
           maxLines: 3,
@@ -602,7 +697,7 @@ class _OiProfilePageState extends State<OiProfilePage> {
         if (widget.onFieldSave != null) ...[
           SizedBox(width: sp.sm),
           OiButton.ghost(
-            label: 'Save $label',
+            label: widget.labels.save(label),
             icon: OiIcons.check,
             size: OiButtonSize.small,
             onTap: () => _saveField(field, controller.text),
@@ -631,7 +726,7 @@ class _OiProfilePageState extends State<OiProfilePage> {
             children: [
               Icon(OiIcons.link, size: 18, color: colors.text),
               SizedBox(width: sp.xs),
-              const OiLabel.h4('Linked Accounts'),
+              OiLabel.h4(widget.labels.linkedAccounts),
             ],
           ),
         ),
@@ -668,20 +763,20 @@ class _OiProfilePageState extends State<OiProfilePage> {
               if (account.connected)
                 Padding(
                   padding: EdgeInsets.only(right: sp.sm),
-                  child: const OiBadge.soft(
-                    label: 'Connected',
+                  child: OiBadge.soft(
+                    label: widget.labels.connected,
                     color: OiBadgeColor.success,
                   ),
                 ),
               if (account.connected && widget.onAccountUnlink != null)
                 OiButton.ghost(
-                  label: 'Disconnect',
+                  label: widget.labels.disconnect,
                   size: OiButtonSize.small,
                   onTap: () => widget.onAccountUnlink?.call(account),
                 )
               else if (!account.connected && widget.onAccountLink != null)
                 OiButton.primary(
-                  label: 'Connect',
+                  label: widget.labels.connect,
                   size: OiButtonSize.small,
                   onTap: () => widget.onAccountLink?.call(account),
                 ),
@@ -756,21 +851,20 @@ class _OiProfilePageState extends State<OiProfilePage> {
               children: [
                 Icon(OiIcons.shield, size: 18, color: colors.error.base),
                 SizedBox(width: sp.xs),
-                OiLabel.h4('Danger Zone', color: colors.error.base),
+                OiLabel.h4(widget.labels.dangerZone, color: colors.error.base),
               ],
             ),
           ),
           SizedBox(height: sp.sm),
           OiLabel.small(
-            'Permanently delete your account and all associated data. '
-            'This action cannot be undone.',
+            widget.labels.deleteWarning,
             color: colors.textMuted,
           ),
           SizedBox(height: sp.md),
           OiButton.destructive(
             label: _deleteConfirmPending
-                ? 'Are you sure? Tap again to confirm'
-                : 'Delete Account',
+                ? widget.labels.confirmDelete
+                : widget.labels.deleteAccount,
             icon: OiIcons.trash2,
             onTap: widget.onDeleteAccount != null ? _handleDelete : null,
           ),

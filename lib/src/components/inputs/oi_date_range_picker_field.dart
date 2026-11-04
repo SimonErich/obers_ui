@@ -36,6 +36,11 @@ class OiDateRangePreset {
   /// Optional icon displayed alongside the label in the chip.
   final IconData? icon;
 
+  /// This preset with [label] in place of its own, e.g. to translate a
+  /// built-in one: `OiDateRangePreset.today.withLabel('Heute')`.
+  OiDateRangePreset withLabel(String label) =>
+      OiDateRangePreset(label: label, resolve: resolve, icon: icon);
+
   // ── Built-in presets ────────────────────────────────────────────────────
 
   /// Today (midnight to 23:59:59).
@@ -220,6 +225,40 @@ class OiDateRangePreset {
   ];
 }
 
+/// The texts of an [OiDateRangePickerField], in English by default; pass
+/// translations to localize the field.
+///
+/// The preset chips take their labels from [OiDateRangePreset.label]; see
+/// [OiDateRangePreset.withLabel] to translate the built-in ones.
+///
+/// {@category Components}
+class OiDateRangePickerFieldLabels {
+  /// Creates an [OiDateRangePickerFieldLabels].
+  const OiDateRangePickerFieldLabels({
+    this.placeholder = 'Select date range',
+    this.clear = 'Clear date range',
+    this.cancel = 'Cancel',
+    this.apply = 'Apply',
+    this.picker = const OiDatePickerLabels(),
+  });
+
+  /// Text shown in the field while no range is selected.
+  final String placeholder;
+
+  /// Screen-reader label of the clear button shown when
+  /// [OiDateRangePickerField.clearable] is set.
+  final String clear;
+
+  /// Label of the dialog's cancel button.
+  final String cancel;
+
+  /// Label of the dialog's apply button.
+  final String apply;
+
+  /// The texts of the calendar inside the dialog.
+  final OiDatePickerLabels picker;
+}
+
 /// A date range input field that opens a dialog with optional preset chips
 /// and an [OiDatePicker] in range mode.
 ///
@@ -259,6 +298,7 @@ class OiDateRangePickerField extends StatelessWidget {
     this.onSaved,
     this.autovalidateMode,
     this.semanticLabel,
+    this.labels = const OiDateRangePickerFieldLabels(),
     super.key,
   });
 
@@ -333,6 +373,9 @@ class OiDateRangePickerField extends StatelessWidget {
   /// Semantic label for accessibility.
   final String? semanticLabel;
 
+  /// The field's texts; pass translations to localize it.
+  final OiDateRangePickerFieldLabels labels;
+
   String _formatDate(DateTime date) {
     final pattern = dateFormat ?? 'MMM d, yyyy';
     return DateFormat(pattern).format(date);
@@ -372,6 +415,7 @@ class OiDateRangePickerField extends StatelessWidget {
         presets: showPresets
             ? (presets ?? OiDateRangePreset.defaults)
             : const [],
+        labels: labels,
         onApply: close,
         onCancel: () => close(),
       ),
@@ -387,7 +431,7 @@ class OiDateRangePickerField extends StatelessWidget {
     final hasValue = startDate != null && endDate != null;
     final displayText = hasValue
         ? _formatRange(startDate!, endDate!)
-        : 'Select date range';
+        : labels.placeholder;
     final effectiveLabel = required && label != null ? '$label *' : label;
 
     final trailing = Row(
@@ -396,6 +440,7 @@ class OiDateRangePickerField extends StatelessWidget {
         if (clearable && hasValue && enabled)
           OiTappable(
             onTap: onCleared,
+            semanticLabel: labels.clear,
             child: Padding(
               padding: const EdgeInsets.only(right: 4),
               child: Icon(OiIcons.x, size: 16, color: colors.textMuted),
@@ -458,6 +503,7 @@ class _DateRangeDialogContent extends StatefulWidget {
   const _DateRangeDialogContent({
     required this.onApply,
     required this.onCancel,
+    required this.labels,
     this.initialStart,
     this.initialEnd,
     this.minDate,
@@ -470,6 +516,7 @@ class _DateRangeDialogContent extends StatefulWidget {
   final DateTime? minDate;
   final DateTime? maxDate;
   final List<OiDateRangePreset> presets;
+  final OiDateRangePickerFieldLabels labels;
   final void Function([(DateTime, DateTime)?]) onApply;
   final VoidCallback onCancel;
 
@@ -564,6 +611,7 @@ class _DateRangeDialogContentState extends State<_DateRangeDialogContent> {
             firstDate: widget.minDate,
             lastDate: widget.maxDate,
             onRangeChanged: _onRangeChanged,
+            labels: widget.labels.picker,
           ),
 
           const SizedBox(height: 12),
@@ -580,7 +628,7 @@ class _DateRangeDialogContentState extends State<_DateRangeDialogContent> {
                     vertical: 8,
                   ),
                   child: Text(
-                    'Cancel',
+                    widget.labels.cancel,
                     style: TextStyle(fontSize: 14, color: colors.textMuted),
                   ),
                 ),
@@ -595,7 +643,7 @@ class _DateRangeDialogContentState extends State<_DateRangeDialogContent> {
                     vertical: 8,
                   ),
                   child: Text(
-                    'Apply',
+                    widget.labels.apply,
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,

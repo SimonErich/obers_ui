@@ -9,6 +9,88 @@ import 'package:obers_ui/src/primitives/display/oi_label.dart';
 import 'package:obers_ui/src/primitives/layout/oi_column.dart';
 import 'package:obers_ui/src/primitives/layout/oi_row.dart';
 
+/// The texts of an [OiAddressForm], in English by default; pass
+/// translations to localize the form.
+///
+/// {@category Components}
+class OiAddressFormLabels {
+  /// Creates an [OiAddressFormLabels].
+  const OiAddressFormLabels({
+    this.firstName = 'First name',
+    this.lastName = 'Last name',
+    this.company = 'Company',
+    this.companyPlaceholder = 'Company (optional)',
+    this.line1 = 'Address line 1',
+    this.line1Placeholder = 'Street address',
+    this.line2 = 'Address line 2',
+    this.line2Placeholder = 'Apartment, suite, etc. (optional)',
+    this.city = 'City',
+    this.state = 'State / Province',
+    this.postalCode = 'Postal code',
+    this.country = 'Country',
+    this.phone = 'Phone',
+    this.phonePlaceholder = 'Phone number',
+    this.line1Required = 'Street address is required',
+    this.cityRequired = 'City is required',
+    this.postalCodeRequired = 'Postal code is required',
+    this.countryRequired = 'Country is required',
+  });
+
+  /// Label and placeholder of the first name input.
+  final String firstName;
+
+  /// Label and placeholder of the last name input.
+  final String lastName;
+
+  /// Label of the company input.
+  final String company;
+
+  /// Placeholder of the company input.
+  final String companyPlaceholder;
+
+  /// Label of the first address line input.
+  final String line1;
+
+  /// Placeholder of the first address line input.
+  final String line1Placeholder;
+
+  /// Label of the second address line input.
+  final String line2;
+
+  /// Placeholder of the second address line input.
+  final String line2Placeholder;
+
+  /// Label and placeholder of the city input.
+  final String city;
+
+  /// Label and placeholder of the state / province input.
+  final String state;
+
+  /// Label and placeholder of the postal code input.
+  final String postalCode;
+
+  /// Label and placeholder of the country input.
+  final String country;
+
+  /// Label of the phone input.
+  final String phone;
+
+  /// Placeholder of the phone input.
+  final String phonePlaceholder;
+
+  /// Error shown when the first address line is empty.
+  final String line1Required;
+
+  /// Error shown when the city is empty.
+  final String cityRequired;
+
+  /// Error shown when the postal code is empty.
+  final String postalCodeRequired;
+
+  /// Error shown when no country is given.
+  final String countryRequired;
+}
+
 /// A form for entering a postal / shipping address.
 ///
 /// Coverage: REQ-0001, REQ-0002, REQ-0003
@@ -38,11 +120,13 @@ class OiAddressForm extends StatefulWidget {
     this.showName = true,
     this.readOnly = false,
     this.error,
+    this.labels = const OiAddressFormLabels(),
     super.key,
   });
 
   /// Creates an [OiAddressForm] pre-labelled for shipping addresses.
   const OiAddressForm.shipping({
+    this.label = 'Shipping address',
     this.initialValue,
     this.onChange,
     this.onSubmit,
@@ -52,11 +136,13 @@ class OiAddressForm extends StatefulWidget {
     this.showName = true,
     this.readOnly = false,
     this.error,
+    this.labels = const OiAddressFormLabels(),
     super.key,
-  }) : label = 'Shipping address';
+  });
 
   /// Creates an [OiAddressForm] pre-labelled for billing addresses.
   const OiAddressForm.billing({
+    this.label = 'Billing address',
     this.initialValue,
     this.onChange,
     this.onSubmit,
@@ -66,8 +152,9 @@ class OiAddressForm extends StatefulWidget {
     this.showName = true,
     this.readOnly = false,
     this.error,
+    this.labels = const OiAddressFormLabels(),
     super.key,
-  }) : label = 'Billing address';
+  });
 
   /// Accessibility label for the form region.
   final String label;
@@ -104,6 +191,9 @@ class OiAddressForm extends StatefulWidget {
 
   /// An optional global error message for the form.
   final String? error;
+
+  /// The form's texts; pass translations to localize it.
+  final OiAddressFormLabels labels;
 
   @override
   State<OiAddressForm> createState() => _OiAddressFormState();
@@ -215,21 +305,21 @@ class _OiAddressFormState extends State<OiAddressForm> {
   Map<String, String> _validate() {
     final errors = <String, String>{};
     if (_emptyToNull(_line1Ctrl.text) == null) {
-      errors['line1'] = 'Street address is required';
+      errors['line1'] = widget.labels.line1Required;
     }
     if (_emptyToNull(_cityCtrl.text) == null) {
-      errors['city'] = 'City is required';
+      errors['city'] = widget.labels.cityRequired;
     }
     if (_emptyToNull(_postalCodeCtrl.text) == null) {
-      errors['postalCode'] = 'Postal code is required';
+      errors['postalCode'] = widget.labels.postalCodeRequired;
     }
     if (widget.countries != null) {
       if (_selectedCountryCode == null) {
-        errors['country'] = 'Country is required';
+        errors['country'] = widget.labels.countryRequired;
       }
     } else {
       if (_emptyToNull(_countryCtrl.text) == null) {
-        errors['country'] = 'Country is required';
+        errors['country'] = widget.labels.countryRequired;
       }
     }
     return errors;
@@ -254,8 +344,8 @@ class _OiAddressFormState extends State<OiAddressForm> {
   Widget _buildNameRow(bool isWide) {
     final firstName = OiTextInput(
       controller: _firstNameCtrl,
-      label: 'First name',
-      placeholder: 'First name',
+      label: widget.labels.firstName,
+      placeholder: widget.labels.firstName,
       readOnly: widget.readOnly,
       enabled: !widget.readOnly,
       error: _validationErrorFor('firstName'),
@@ -263,8 +353,8 @@ class _OiAddressFormState extends State<OiAddressForm> {
     );
     final lastName = OiTextInput(
       controller: _lastNameCtrl,
-      label: 'Last name',
-      placeholder: 'Last name',
+      label: widget.labels.lastName,
+      placeholder: widget.labels.lastName,
       readOnly: widget.readOnly,
       enabled: !widget.readOnly,
       error: _validationErrorFor('lastName'),
@@ -294,8 +384,8 @@ class _OiAddressFormState extends State<OiAddressForm> {
     return [
       OiTextInput(
         controller: _line1Ctrl,
-        label: 'Address line 1',
-        placeholder: 'Street address',
+        label: widget.labels.line1,
+        placeholder: widget.labels.line1Placeholder,
         readOnly: widget.readOnly,
         enabled: !widget.readOnly,
         error: _validationErrorFor('line1'),
@@ -303,8 +393,8 @@ class _OiAddressFormState extends State<OiAddressForm> {
       ),
       OiTextInput(
         controller: _line2Ctrl,
-        label: 'Address line 2',
-        placeholder: 'Apartment, suite, etc. (optional)',
+        label: widget.labels.line2,
+        placeholder: widget.labels.line2Placeholder,
         readOnly: widget.readOnly,
         enabled: !widget.readOnly,
         error: _validationErrorFor('line2'),
@@ -319,8 +409,8 @@ class _OiAddressFormState extends State<OiAddressForm> {
         country.states != null &&
         country.states!.isNotEmpty) {
       return OiSelect<String>(
-        label: 'State / Province',
-        placeholder: 'State / Province',
+        label: widget.labels.state,
+        placeholder: widget.labels.state,
         value: _selectedStateValue,
         options: country.states!
             .map((s) => OiSelectOption<String>(value: s.code, label: s.name))
@@ -335,8 +425,8 @@ class _OiAddressFormState extends State<OiAddressForm> {
     }
     return OiTextInput(
       controller: _stateCtrl,
-      label: 'State / Province',
-      placeholder: 'State / Province',
+      label: widget.labels.state,
+      placeholder: widget.labels.state,
       readOnly: widget.readOnly,
       enabled: !widget.readOnly,
       error: _validationErrorFor('state'),
@@ -347,8 +437,8 @@ class _OiAddressFormState extends State<OiAddressForm> {
   Widget _buildCityStateRow(bool isWide) {
     final city = OiTextInput(
       controller: _cityCtrl,
-      label: 'City',
-      placeholder: 'City',
+      label: widget.labels.city,
+      placeholder: widget.labels.city,
       readOnly: widget.readOnly,
       enabled: !widget.readOnly,
       error: _validationErrorFor('city'),
@@ -378,8 +468,8 @@ class _OiAddressFormState extends State<OiAddressForm> {
   Widget _buildCountryFieldRaw() {
     if (widget.countries != null && widget.countries!.isNotEmpty) {
       return OiSelect<String>(
-        label: 'Country',
-        placeholder: 'Country',
+        label: widget.labels.country,
+        placeholder: widget.labels.country,
         value: _selectedCountryCode,
         options: widget.countries!
             .map((c) => OiSelectOption<String>(value: c.code, label: c.name))
@@ -399,8 +489,8 @@ class _OiAddressFormState extends State<OiAddressForm> {
     }
     return OiTextInput(
       controller: _countryCtrl,
-      label: 'Country',
-      placeholder: 'Country',
+      label: widget.labels.country,
+      placeholder: widget.labels.country,
       readOnly: widget.readOnly,
       enabled: !widget.readOnly,
       error: _validationErrorFor('country'),
@@ -411,8 +501,8 @@ class _OiAddressFormState extends State<OiAddressForm> {
   Widget _buildPostalCountryRow(bool isWide) {
     final postalCode = OiTextInput(
       controller: _postalCodeCtrl,
-      label: 'Postal code',
-      placeholder: 'Postal code',
+      label: widget.labels.postalCode,
+      placeholder: widget.labels.postalCode,
       readOnly: widget.readOnly,
       enabled: !widget.readOnly,
       error: _validationErrorFor('postalCode'),
@@ -457,8 +547,8 @@ class _OiAddressFormState extends State<OiAddressForm> {
           if (widget.showCompany)
             OiTextInput(
               controller: _companyCtrl,
-              label: 'Company',
-              placeholder: 'Company (optional)',
+              label: widget.labels.company,
+              placeholder: widget.labels.companyPlaceholder,
               readOnly: widget.readOnly,
               enabled: !widget.readOnly,
               error: _validationErrorFor('company'),
@@ -470,8 +560,8 @@ class _OiAddressFormState extends State<OiAddressForm> {
           if (widget.showPhone)
             OiTextInput(
               controller: _phoneCtrl,
-              label: 'Phone',
-              placeholder: 'Phone number',
+              label: widget.labels.phone,
+              placeholder: widget.labels.phonePlaceholder,
               readOnly: widget.readOnly,
               enabled: !widget.readOnly,
               error: _validationErrorFor('phone'),

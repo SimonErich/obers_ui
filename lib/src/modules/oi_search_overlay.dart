@@ -106,6 +106,9 @@ class OiSearchOverlay extends StatefulWidget {
     this.emptyStateTitle = 'No results found',
     this.emptyStateDescription = 'Try a different search term.',
     this.maxWidth = 640,
+    this.recentSearchesLabel = 'Recent Searches',
+    this.clearRecentLabel = 'Clear',
+    this.clearRecentSemanticLabel = 'Clear recent searches',
     super.key,
   });
 
@@ -153,6 +156,15 @@ class OiSearchOverlay extends StatefulWidget {
 
   /// Maximum width of the overlay container.
   final double maxWidth;
+
+  /// Heading of the recent searches.
+  final String recentSearchesLabel;
+
+  /// Label of the button that clears the recent searches.
+  final String clearRecentLabel;
+
+  /// Screen-reader label of the button that clears the recent searches.
+  final String clearRecentSemanticLabel;
 
   @override
   State<OiSearchOverlay> createState() => _OiSearchOverlayState();
@@ -570,13 +582,19 @@ class _OiSearchOverlayState extends State<OiSearchOverlay> {
         Row(
           children: [
             Expanded(
-              child: OiLabel.small('Recent Searches', color: colors.textMuted),
+              child: OiLabel.small(
+                widget.recentSearchesLabel,
+                color: colors.textMuted,
+              ),
             ),
             if (widget.onClearRecents != null)
               OiTappable(
                 onTap: widget.onClearRecents,
-                semanticLabel: 'Clear recent searches',
-                child: OiLabel.small('Clear', color: colors.primary.base),
+                semanticLabel: widget.clearRecentSemanticLabel,
+                child: OiLabel.small(
+                  widget.clearRecentLabel,
+                  color: colors.primary.base,
+                ),
               ),
           ],
         ),

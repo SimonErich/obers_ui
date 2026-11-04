@@ -6,13 +6,13 @@ extension _OiCheckoutSteps on _OiCheckoutState {
   String _stepLabel(OiCheckoutStep step) {
     switch (step) {
       case OiCheckoutStep.address:
-        return 'Address';
+        return widget.labels.addressStep;
       case OiCheckoutStep.shipping:
-        return 'Shipping';
+        return widget.labels.shippingStep;
       case OiCheckoutStep.payment:
-        return 'Payment';
+        return widget.labels.paymentStep;
       case OiCheckoutStep.review:
-        return 'Review';
+        return widget.labels.reviewStep;
     }
   }
 
@@ -24,7 +24,7 @@ extension _OiCheckoutSteps on _OiCheckoutState {
     final methods = widget.shippingMethods ?? [];
 
     if (methods.isEmpty) {
-      return const OiLabel.body('No shipping options available.');
+      return OiLabel.body(widget.labels.noShippingOptions);
     }
 
     return OiColumn(
@@ -32,11 +32,12 @@ extension _OiCheckoutSteps on _OiCheckoutState {
       gap: OiResponsive(sp.sm),
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const OiLabel.h3('Shipping Method'),
+        OiLabel.h3(widget.labels.shippingMethod),
         for (final method in methods)
           OiShippingOption(
             method: method,
-            label: '${method.label} shipping option',
+            label: widget.labels.shippingOption(method.label),
+            freeLabel: widget.labels.free,
             selected: _selectedShipping?.key == method.key,
             currencyCode: widget.currencyCode,
             onSelect: (m) {
@@ -56,7 +57,7 @@ extension _OiCheckoutSteps on _OiCheckoutState {
     final methods = widget.paymentMethods ?? [];
 
     if (methods.isEmpty) {
-      return const OiLabel.body('No payment options available.');
+      return OiLabel.body(widget.labels.noPaymentOptions);
     }
 
     return OiColumn(
@@ -64,11 +65,12 @@ extension _OiCheckoutSteps on _OiCheckoutState {
       gap: OiResponsive(sp.sm),
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const OiLabel.h3('Payment Method'),
+        OiLabel.h3(widget.labels.paymentMethod),
         for (final method in methods)
           OiPaymentOption(
             method: method,
-            label: '${method.label} payment option',
+            label: widget.labels.paymentOption(method.label),
+            defaultLabel: widget.labels.defaultPayment,
             selected: _selectedPayment?.key == method.key,
             onSelect: (m) {
               _setSelectedPayment(m);
@@ -92,9 +94,9 @@ extension _OiCheckoutSteps on _OiCheckoutState {
       return GestureDetector(
         onTap: _isPlacingOrder ? null : () => _goToStep(targetIndex),
         child: Semantics(
-          label: 'Edit $text',
+          label: widget.labels.editSection(text),
           button: true,
-          child: OiLabel.link('Edit', color: colors.primary.base),
+          child: OiLabel.link(widget.labels.edit, color: colors.primary.base),
         ),
       );
     }
@@ -127,15 +129,15 @@ extension _OiCheckoutSteps on _OiCheckoutState {
       gap: OiResponsive(sp.md),
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const OiLabel.h3('Review Your Order'),
+        OiLabel.h3(widget.labels.reviewTitle),
 
         // Shipping address.
         if (widget.steps.contains(OiCheckoutStep.address)) ...[
-          sectionHeader('Shipping Address', OiCheckoutStep.address),
+          sectionHeader(widget.labels.shippingAddress, OiCheckoutStep.address),
           OiLabel.body(formatAddress(_shippingAddress)),
           if (!_sameBilling) ...[
             SizedBox(height: sp.xs),
-            sectionHeader('Billing Address', OiCheckoutStep.address),
+            sectionHeader(widget.labels.billingAddress, OiCheckoutStep.address),
             OiLabel.body(formatAddress(_billingAddress)),
           ],
           const OiDivider(),
@@ -144,7 +146,7 @@ extension _OiCheckoutSteps on _OiCheckoutState {
         // Shipping method.
         if (widget.steps.contains(OiCheckoutStep.shipping) &&
             _selectedShipping != null) ...[
-          sectionHeader('Shipping Method', OiCheckoutStep.shipping),
+          sectionHeader(widget.labels.shippingMethod, OiCheckoutStep.shipping),
           OiLabel.body(_selectedShipping!.label),
           if (_selectedShipping!.estimatedDelivery != null)
             OiLabel.small(_selectedShipping!.estimatedDelivery!),
@@ -154,7 +156,7 @@ extension _OiCheckoutSteps on _OiCheckoutState {
         // Payment method.
         if (widget.steps.contains(OiCheckoutStep.payment) &&
             _selectedPayment != null) ...[
-          sectionHeader('Payment Method', OiCheckoutStep.payment),
+          sectionHeader(widget.labels.paymentMethod, OiCheckoutStep.payment),
           OiLabel.body(_selectedPayment!.label),
           if (_selectedPayment!.description != null)
             OiLabel.small(_selectedPayment!.description!),

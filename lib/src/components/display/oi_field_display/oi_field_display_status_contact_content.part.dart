@@ -13,7 +13,7 @@ extension _OiFieldDisplayStatusContactContent on OiFieldDisplay {
             size: 18,
           ),
           const SizedBox(width: 4),
-          OiLabel.small('Unknown', color: colors.textMuted),
+          OiLabel.small(unknownLabel, color: colors.textMuted),
         ],
       );
     }
@@ -31,7 +31,7 @@ extension _OiFieldDisplayStatusContactContent on OiFieldDisplay {
           size: 18,
         ),
         const SizedBox(width: 4),
-        OiLabel.small(boolValue ? 'Yes' : 'No'),
+        OiLabel.small(boolValue ? yesLabel : noLabel),
       ],
     );
   }

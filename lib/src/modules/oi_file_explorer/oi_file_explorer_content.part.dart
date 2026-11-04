@@ -24,7 +24,7 @@ extension _OiFileExplorerContent on _OiFileExplorerState {
       await widget.onRename(renamingFile, newName);
       controller.cancelRename();
       await controller.refresh();
-      _announce('Renamed to $newName');
+      _announce(widget.labels.announcements.renamedTo(newName));
     }
   }
 
@@ -36,7 +36,7 @@ extension _OiFileExplorerContent on _OiFileExplorerState {
       widget.controller.clearSelection();
       await widget.controller.refresh();
       _announce(
-        '${movedFiles.length} item${movedFiles.length == 1 ? '' : 's'} moved to ${folder.name}',
+        widget.labels.announcements.movedTo(movedFiles.length, folder.name),
       );
     };
   }
@@ -61,11 +61,12 @@ extension _OiFileExplorerContent on _OiFileExplorerState {
               widget.controller.clearSelection();
               unawaited(widget.controller.refresh());
               _announce(
-                '${files.length} item${files.length == 1 ? '' : 's'} moved to ${folder.name}',
+                widget.labels.announcements.movedTo(files.length, folder.name),
               );
             }
           : null,
-      semanticsLabel: 'File explorer sidebar',
+      semanticsLabel: widget.labels.sidebarLabel,
+      labels: widget.labels.sidebar,
     );
   }
 
@@ -86,7 +87,10 @@ extension _OiFileExplorerContent on _OiFileExplorerState {
                 await widget.onMove(droppedFiles, targetFolder);
                 unawaited(controller.refresh());
                 _announce(
-                  '${droppedFiles.length} item${droppedFiles.length == 1 ? '' : 's'} moved to ${targetFolder.name}',
+                  widget.labels.announcements.movedTo(
+                    droppedFiles.length,
+                    targetFolder.name,
+                  ),
                 );
               }
             },
@@ -96,7 +100,7 @@ extension _OiFileExplorerContent on _OiFileExplorerState {
               await widget.onUpload(externalFiles, folderId);
               unawaited(controller.refresh());
               _announce(
-                '${externalFiles.length} file${externalFiles.length == 1 ? '' : 's'} uploaded',
+                widget.labels.announcements.uploaded(externalFiles.length),
               );
             },
             enabled: widget.enableDragDrop && !_isDialogOpen,
@@ -134,9 +138,9 @@ extension _OiFileExplorerContent on _OiFileExplorerState {
       if (controller.searchQuery.isNotEmpty) {
         return OiEmptyState(
           icon: OiIcons.search,
-          title: "No files match '${controller.searchQuery}'",
+          title: widget.labels.noMatches(controller.searchQuery),
           action: OiButton.ghost(
-            label: 'Clear search',
+            label: widget.labels.clearSearch,
             onTap: () {
               controller.setSearchQuery('');
               _setSearchActive(active: false);
@@ -145,14 +149,14 @@ extension _OiFileExplorerContent on _OiFileExplorerState {
         );
       }
       return OiContextMenu(
-        label: 'Empty folder context menu',
+        label: widget.labels.emptyFolderMenu,
         items: _buildBackgroundContextMenu(),
         child: OiEmptyState(
           icon: OiIcons.folder,
-          title: 'This folder is empty',
+          title: widget.labels.emptyFolder,
           action: widget.enableUpload
               ? OiButton.primary(
-                  label: 'Upload files',
+                  label: widget.labels.uploadFiles,
                   icon: OiIcons.cloudUpload,
                   onTap: _showUploadDialog,
                 )
@@ -180,7 +184,8 @@ extension _OiFileExplorerContent on _OiFileExplorerState {
         contextMenuBuilder: _buildFileContextMenu,
         backgroundContextMenu: _buildBackgroundContextMenu,
         searchQuery: controller.searchQuery,
-        semanticsLabel: 'File list with ${files.length} items',
+        semanticsLabel: widget.labels.listWithCount(files.length),
+        labels: widget.labels.listViewLabels,
       );
     }
 
@@ -198,7 +203,8 @@ extension _OiFileExplorerContent on _OiFileExplorerState {
       contextMenuBuilder: _buildFileContextMenu,
       backgroundContextMenu: _buildBackgroundContextMenu,
       searchQuery: controller.searchQuery,
-      semanticsLabel: 'File grid with ${files.length} items',
+      semanticsLabel: widget.labels.gridWithCount(files.length),
+      labels: widget.labels.gridViewLabels,
     );
   }
 }

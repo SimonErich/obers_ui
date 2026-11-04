@@ -104,6 +104,13 @@ class OiFeedbackSheet extends StatefulWidget {
     this.metadata = const {},
     this.thankYouTitle = 'Thank you!',
     this.thankYouDescription = 'Your feedback helps us improve.',
+    this.experienceQuestion = 'How was your experience?',
+    this.ratingLabel = 'Rating',
+    this.categoryHeading = 'Category',
+    this.categoryLabel = englishCategory,
+    this.messageLabel = 'Message',
+    this.messagePlaceholder = 'Tell us more...',
+    this.submitLabel = 'Submit Feedback',
     super.key,
   });
 
@@ -131,6 +138,37 @@ class OiFeedbackSheet extends StatefulWidget {
 
   /// Description shown after a successful submission.
   final String thankYouDescription;
+
+  /// "Bug Report", "Feature Request", "General", "Other": the default
+  /// [categoryLabel].
+  static String englishCategory(OiFeedbackCategory category) =>
+      switch (category) {
+        OiFeedbackCategory.bug => 'Bug Report',
+        OiFeedbackCategory.featureRequest => 'Feature Request',
+        OiFeedbackCategory.general => 'General',
+        OiFeedbackCategory.other => 'Other',
+      };
+
+  /// Question above the rating.
+  final String experienceQuestion;
+
+  /// Screen-reader label of the rating.
+  final String ratingLabel;
+
+  /// Heading of the category choice.
+  final String categoryHeading;
+
+  /// Names a feedback category.
+  final String Function(OiFeedbackCategory category) categoryLabel;
+
+  /// Label of the message input.
+  final String messageLabel;
+
+  /// Placeholder of the message input.
+  final String messagePlaceholder;
+
+  /// Label of the submit button.
+  final String submitLabel;
 
   @override
   State<OiFeedbackSheet> createState() => _OiFeedbackSheetState();
@@ -188,7 +226,7 @@ class _OiFeedbackSheetState extends State<OiFeedbackSheet> {
       children: [
         Padding(
           padding: EdgeInsets.only(bottom: spacing.sm),
-          child: const OiLabel.body('How was your experience?'),
+          child: OiLabel.body(widget.experienceQuestion),
         ),
         if (widget.ratingType == OiFeedbackRatingType.sentiment)
           OiSentiment(
@@ -200,7 +238,7 @@ class _OiFeedbackSheetState extends State<OiFeedbackSheet> {
           )
         else
           OiStarRating(
-            label: 'Rating',
+            label: widget.ratingLabel,
             value: (_rating ?? 0).toDouble(),
             size: 28,
             onChanged: (value) => setState(() {
@@ -222,7 +260,7 @@ class _OiFeedbackSheetState extends State<OiFeedbackSheet> {
       children: [
         Padding(
           padding: EdgeInsets.only(bottom: spacing.sm),
-          child: const OiLabel.smallStrong('Category'),
+          child: OiLabel.smallStrong(widget.categoryHeading),
         ),
         Wrap(
           spacing: spacing.sm,
@@ -237,7 +275,7 @@ class _OiFeedbackSheetState extends State<OiFeedbackSheet> {
 
             return Semantics(
               button: true,
-              label: _categoryLabel(cat),
+              label: widget.categoryLabel(cat),
               selected: selected,
               child: OiTappable(
                 onTap: () => setState(() => _selectedCategory = cat),
@@ -255,7 +293,10 @@ class _OiFeedbackSheetState extends State<OiFeedbackSheet> {
                       color: borderColor,
                     ),
                   ),
-                  child: OiLabel.small(_categoryLabel(cat), color: textColor),
+                  child: OiLabel.small(
+                    widget.categoryLabel(cat),
+                    color: textColor,
+                  ),
                 ),
               ),
             );
@@ -268,8 +309,8 @@ class _OiFeedbackSheetState extends State<OiFeedbackSheet> {
   Widget _buildMessage() {
     return OiTextInput(
       controller: _messageController,
-      label: 'Message',
-      placeholder: 'Tell us more...',
+      label: widget.messageLabel,
+      placeholder: widget.messagePlaceholder,
       maxLines: 4,
       minLines: 3,
     );
@@ -291,7 +332,7 @@ class _OiFeedbackSheetState extends State<OiFeedbackSheet> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         OiButton.primary(
-          label: 'Submit Feedback',
+          label: widget.submitLabel,
           onTap: hasCategory ? _handleSubmit : null,
           loading: _isSubmitting,
           enabled: hasCategory && !_isSubmitting,
@@ -370,11 +411,3 @@ class _OiFeedbackSheetState extends State<OiFeedbackSheet> {
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
-
-/// Returns a human-readable label for the given [OiFeedbackCategory].
-String _categoryLabel(OiFeedbackCategory cat) => switch (cat) {
-  OiFeedbackCategory.bug => 'Bug Report',
-  OiFeedbackCategory.featureRequest => 'Feature Request',
-  OiFeedbackCategory.general => 'General',
-  OiFeedbackCategory.other => 'Other',
-};

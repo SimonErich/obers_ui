@@ -13,9 +13,9 @@ extension _OiFileExplorerDialogs on _OiFileExplorerState {
     _dismissDialog();
     _dialogHandle = OiDialog.show(
       context,
-      label: 'Delete confirmation',
+      label: widget.labels.deleteConfirmation,
       dialog: OiDialog.confirm(
-        label: 'Delete confirmation',
+        label: widget.labels.deleteConfirmation,
         content: OiDeleteDialog(
           files: files,
           onDelete: () async {
@@ -23,12 +23,11 @@ extension _OiFileExplorerDialogs on _OiFileExplorerState {
             await widget.onDelete(files);
             widget.controller.clearSelection();
             unawaited(widget.controller.refresh());
-            _announce(
-              '${files.length} item${files.length == 1 ? '' : 's'} deleted',
-            );
+            _announce(widget.labels.announcements.deleted(files.length));
           },
           onCancel: _dismissDialog,
           permanent: true,
+          labels: widget.labels.deleteDialog,
         ),
         onClose: _dismissDialog,
       ),
@@ -41,13 +40,18 @@ extension _OiFileExplorerDialogs on _OiFileExplorerState {
     _dismissDialog();
     _dialogHandle = OiDialog.show(
       context,
-      label: copyMode ? 'Copy dialog' : 'Move dialog',
+      label: copyMode
+          ? widget.labels.copyDialogLabel
+          : widget.labels.moveDialogLabel,
       dialog: OiDialog.form(
-        label: copyMode ? 'Copy dialog' : 'Move dialog',
+        label: copyMode
+            ? widget.labels.copyDialogLabel
+            : widget.labels.moveDialogLabel,
         content: OiMoveDialog(
           files: files,
           folderTree: _folderTree,
           copyMode: copyMode,
+          labels: widget.labels.moveDialog,
           onMove: (destination) async {
             _dismissDialog();
             if (copyMode) {
@@ -57,9 +61,16 @@ extension _OiFileExplorerDialogs on _OiFileExplorerState {
             }
             widget.controller.clearSelection();
             unawaited(widget.controller.refresh());
-            final action = copyMode ? 'copied' : 'moved';
             _announce(
-              '${files.length} item${files.length == 1 ? '' : 's'} $action to ${destination.name}',
+              copyMode
+                  ? widget.labels.announcements.copiedTo(
+                      files.length,
+                      destination.name,
+                    )
+                  : widget.labels.announcements.movedTo(
+                      files.length,
+                      destination.name,
+                    ),
             );
           },
           onCancel: _dismissDialog,
@@ -74,20 +85,19 @@ extension _OiFileExplorerDialogs on _OiFileExplorerState {
     final folderId = widget.controller.currentFolder?.id.toString() ?? 'root';
     _dialogHandle = OiDialog.show(
       context,
-      label: 'Upload dialog',
+      label: widget.labels.uploadDialogLabel,
       dialog: OiDialog.form(
-        label: 'Upload dialog',
+        label: widget.labels.uploadDialogLabel,
         content: OiUploadDialog(
           allowedExtensions: widget.allowedUploadExtensions,
           maxFileSize: widget.maxUploadFileSize,
           destinationPath: widget.controller.currentFolder?.name,
+          labels: widget.labels.uploadDialog,
           onUpload: (files, _) async {
             _dismissDialog();
             await widget.onUpload(files, folderId);
             unawaited(widget.controller.refresh());
-            _announce(
-              '${files.length} file${files.length == 1 ? '' : 's'} uploaded',
-            );
+            _announce(widget.labels.announcements.uploaded(files.length));
           },
           onCancel: _dismissDialog,
         ),
@@ -99,7 +109,9 @@ extension _OiFileExplorerDialogs on _OiFileExplorerState {
 
   void _showNewFolderDialog() {
     _dismissDialog();
-    final nameController = TextEditingController(text: 'New Folder');
+    final nameController = TextEditingController(
+      text: widget.labels.newFolderName,
+    );
 
     void closeAndDispose() {
       _dismissDialog();
@@ -108,12 +120,13 @@ extension _OiFileExplorerDialogs on _OiFileExplorerState {
 
     _dialogHandle = OiDialog.show(
       context,
-      label: 'New folder',
+      label: widget.labels.newFolder,
       dialog: OiDialog.form(
-        label: 'New folder',
-        title: 'New Folder',
+        label: widget.labels.newFolder,
+        title: widget.labels.newFolderTitle,
         content: _NewFolderDialogContent(
           nameController: nameController,
+          labels: widget.labels,
           onApply: () async {
             final name = nameController.text.trim();
             if (name.isEmpty) return;
@@ -123,7 +136,7 @@ extension _OiFileExplorerDialogs on _OiFileExplorerState {
             await widget.onCreateFolder(folderId, name);
             unawaited(widget.controller.refresh());
             unawaited(_loadFolderTree());
-            _announce('Folder "$name" created');
+            _announce(widget.labels.announcements.folderCreated(name));
           },
           onCancel: closeAndDispose,
         ),
@@ -139,11 +152,13 @@ extension _OiFileExplorerDialogs on _OiFileExplorerState {
 class _NewFolderDialogContent extends StatelessWidget {
   const _NewFolderDialogContent({
     required this.nameController,
+    required this.labels,
     required this.onApply,
     required this.onCancel,
   });
 
   final TextEditingController nameController;
+  final OiFileExplorerLabels labels;
   final VoidCallback onApply;
   final VoidCallback onCancel;
 
@@ -155,7 +170,7 @@ class _NewFolderDialogContent extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         OiTextInput(
-          label: 'Folder name',
+          label: labels.folderName,
           controller: nameController,
           autofocus: true,
           onSubmitted: (_) => onApply(),
@@ -164,9 +179,9 @@ class _NewFolderDialogContent extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
-            OiButton.ghost(label: 'Cancel', onTap: onCancel),
+            OiButton.ghost(label: labels.cancel, onTap: onCancel),
             SizedBox(width: spacing.sm),
-            OiButton.primary(label: 'Apply', onTap: onApply),
+            OiButton.primary(label: labels.apply, onTap: onApply),
           ],
         ),
       ],

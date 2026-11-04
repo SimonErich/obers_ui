@@ -133,6 +133,7 @@ class OiActionBar extends StatelessWidget {
     this.size = OiButtonSize.medium,
     this.separator = false,
     this.semanticLabel,
+    this.moreLabel = 'More actions',
     super.key,
   });
 
@@ -169,6 +170,9 @@ class OiActionBar extends StatelessWidget {
   /// An optional semantic label override for the bar container.
   final String? semanticLabel;
 
+  /// Screen-reader label of the overflow button.
+  final String moreLabel;
+
   @override
   Widget build(BuildContext context) {
     if (actions.isEmpty && overflowActions == null) {
@@ -204,7 +208,13 @@ class OiActionBar extends StatelessWidget {
 
     // Add overflow "more" button when overflowActions is populated.
     if (overflowActions != null && overflowActions!.isNotEmpty) {
-      children.add(_OverflowMenuButton(actions: overflowActions!, size: size));
+      children.add(
+        _OverflowMenuButton(
+          actions: overflowActions!,
+          size: size,
+          label: moreLabel,
+        ),
+      );
     }
 
     if (trailing != null) {
@@ -349,10 +359,15 @@ class OiActionBar extends StatelessWidget {
 
 /// An overflow "more" button that opens a popover listing [actions].
 class _OverflowMenuButton extends StatefulWidget {
-  const _OverflowMenuButton({required this.actions, required this.size});
+  const _OverflowMenuButton({
+    required this.actions,
+    required this.size,
+    required this.label,
+  });
 
   final List<OiActionBarItem> actions;
   final OiButtonSize size;
+  final String label;
 
   @override
   State<_OverflowMenuButton> createState() => _OverflowMenuButtonState();
@@ -372,7 +387,7 @@ class _OverflowMenuButtonState extends State<_OverflowMenuButton> {
       onClose: () => setState(() => _open = false),
       anchor: OiIconButton(
         icon: OiIcons.ellipsisVertical,
-        semanticLabel: 'More actions',
+        semanticLabel: widget.label,
         size: widget.size,
         onTap: () => setState(() => _open = !_open),
       ),

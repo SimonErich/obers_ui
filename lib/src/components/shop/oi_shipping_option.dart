@@ -40,6 +40,7 @@ class OiShippingOption extends StatelessWidget {
     this.selected = false,
     this.onSelect,
     this.currencyCode = 'EUR',
+    this.freeLabel = 'Free',
     super.key,
   });
 
@@ -58,8 +59,11 @@ class OiShippingOption extends StatelessWidget {
   /// ISO 4217 currency code for price formatting. Defaults to `'EUR'`.
   final String currencyCode;
 
+  /// Shown in place of the price of a free method.
+  final String freeLabel;
+
   String _formatPrice(double price) {
-    if (price == 0) return 'Free';
+    if (price == 0) return freeLabel;
     final currency = _currencyMap[currencyCode.toUpperCase()];
     final formatted = price.toStringAsFixed(2);
     if (currency != null) {

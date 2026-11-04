@@ -6,12 +6,14 @@ extension _OiUploadDialogValidation on _OiUploadDialogState {
     if (widget.allowedExtensions != null) {
       final ext = OiFileUtils.extension(file.name).toLowerCase();
       if (!widget.allowedExtensions!.contains(ext)) {
-        return 'File type .$ext not allowed';
+        return widget.labels.typeNotAllowed(ext);
       }
     }
     // Size check
     if (widget.maxFileSize != null && file.size > widget.maxFileSize!) {
-      return 'Exceeds ${OiFileUtils.formatSize(widget.maxFileSize!)} limit';
+      return widget.labels.exceedsLimit(
+        OiFileUtils.formatSize(widget.maxFileSize!),
+      );
     }
     return null;
   }

@@ -41,6 +41,7 @@ class OiRefreshIndicator extends StatefulWidget {
     this.strokeWidth = 3.0,
     this.semanticLabel,
     this.notificationPredicate = defaultScrollNotificationPredicate,
+    this.completeLabel = 'Refresh complete',
     super.key,
   });
 
@@ -88,6 +89,9 @@ class OiRefreshIndicator extends StatefulWidget {
   /// Defaults to [defaultScrollNotificationPredicate], which only accepts
   /// notifications from the nearest scrollable ancestor.
   final ScrollNotificationPredicate notificationPredicate;
+
+  /// Read by screen readers when a refresh completes.
+  final String completeLabel;
 
   @override
   State<OiRefreshIndicator> createState() => _OiRefreshIndicatorState();
@@ -204,7 +208,7 @@ class _OiRefreshIndicatorState extends State<OiRefreshIndicator>
         unawaited(
           SemanticsService.sendAnnouncement(
             View.of(context),
-            'Refresh complete',
+            widget.completeLabel,
             Directionality.of(context),
           ),
         );

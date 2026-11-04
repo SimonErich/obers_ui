@@ -90,6 +90,7 @@ Widget _buildCheckout({
   bool sameBillingDefault = true,
   String currencyCode = 'USD',
   String? placeOrderLabel,
+  OiCheckoutLabels labels = const OiCheckoutLabels(),
 }) {
   return SingleChildScrollView(
     child: OiCheckout(
@@ -119,6 +120,7 @@ Widget _buildCheckout({
       sameBillingDefault: sameBillingDefault,
       currencyCode: currencyCode,
       placeOrderLabel: placeOrderLabel,
+      labels: labels,
     ),
   );
 }
@@ -603,5 +605,27 @@ void main() {
         semantics.dispose();
       },
     );
+
+    // ── Labels ───────────────────────────────────────────────────────────────
+
+    testWidgets('renders the given labels, including the order summary', (
+      tester,
+    ) async {
+      await tester.pumpObers(
+        _buildCheckout(
+          labels: const OiCheckoutLabels(
+            addressStep: 'Adresse',
+            next: 'Weiter',
+            shippingAddress: 'Lieferadresse',
+            summary: OiOrderSummaryLabels(title: 'Bestellübersicht'),
+          ),
+        ),
+        surfaceSize: const Size(1400, 1400),
+      );
+      expect(find.text('Adresse'), findsWidgets);
+      expect(find.text('Weiter'), findsOneWidget);
+      expect(find.text('Lieferadresse'), findsOneWidget);
+      expect(find.text('Bestellübersicht'), findsOneWidget);
+    });
   });
 }

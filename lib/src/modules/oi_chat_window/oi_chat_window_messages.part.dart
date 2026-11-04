@@ -183,13 +183,13 @@ extension _OiChatWindowMessages on _OiChatWindowState {
           mainAxisSize: MainAxisSize.min,
           children: [
             OiButton.primary(
-              label: 'Save',
+              label: widget.labels.save,
               onTap: () => _confirmEdit(message),
               size: OiButtonSize.small,
             ),
             SizedBox(width: spacing.xs),
             OiButton.ghost(
-              label: 'Cancel',
+              label: widget.labels.cancel,
               onTap: _cancelEdit,
               size: OiButtonSize.small,
             ),
@@ -291,10 +291,10 @@ extension _OiChatWindowMessages on _OiChatWindowState {
       mainAxisSize: MainAxisSize.min,
       children: [
         OiTooltip(
-          label: 'Copy',
-          message: 'Copy',
+          label: widget.labels.copy,
+          message: widget.labels.copy,
           child: OiTappable(
-            semanticLabel: 'Copy message',
+            semanticLabel: widget.labels.copyMessage,
             onTap: () =>
                 Clipboard.setData(ClipboardData(text: message.content)),
             child: Padding(
@@ -305,10 +305,10 @@ extension _OiChatWindowMessages on _OiChatWindowState {
         ),
         if (!fromUser && widget.onMessageReaction != null) ...[
           OiTooltip(
-            label: 'Good response',
-            message: 'Good response',
+            label: widget.labels.goodResponse,
+            message: widget.labels.goodResponse,
             child: OiTappable(
-              semanticLabel: 'Good response',
+              semanticLabel: widget.labels.goodResponse,
               onTap: () => widget.onMessageReaction!(message, '👍'),
               child: Padding(
                 padding: const EdgeInsets.all(4),
@@ -320,10 +320,10 @@ extension _OiChatWindowMessages on _OiChatWindowState {
             ),
           ),
           OiTooltip(
-            label: 'Bad response',
-            message: 'Bad response',
+            label: widget.labels.badResponse,
+            message: widget.labels.badResponse,
             child: OiTappable(
-              semanticLabel: 'Bad response',
+              semanticLabel: widget.labels.badResponse,
               onTap: () => widget.onMessageReaction!(message, '👎'),
               child: Padding(
                 padding: const EdgeInsets.all(4),
@@ -337,10 +337,10 @@ extension _OiChatWindowMessages on _OiChatWindowState {
         ],
         if (fromUser && widget.onMessageEdit != null)
           OiTooltip(
-            label: 'Edit message',
-            message: 'Edit message',
+            label: widget.labels.editMessage,
+            message: widget.labels.editMessage,
             child: OiTappable(
-              semanticLabel: 'Edit message',
+              semanticLabel: widget.labels.editMessage,
               onTap: () => _startEditing(message),
               child: Padding(
                 padding: const EdgeInsets.all(4),

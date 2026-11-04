@@ -22,6 +22,7 @@ class OiTypingIndicator extends StatefulWidget {
   /// Creates an [OiTypingIndicator].
   const OiTypingIndicator({
     required this.typingUsers,
+    this.messageLabel = englishMessage,
     super.key,
     this.showAvatars = false,
     this.userDetails,
@@ -37,6 +38,17 @@ class OiTypingIndicator extends StatefulWidget {
   /// Optional avatar details corresponding to [typingUsers]. When provided
   /// and [showAvatars] is `true`, an [OiAvatar] is rendered for each user.
   final List<OiAvatarStackItem>? userDetails;
+
+  /// "Anna is typing", "Anna and Ben are typing", "3 people are typing": the
+  /// default [messageLabel].
+  static String englishMessage(List<String> names) {
+    if (names.length == 1) return '${names.first} is typing';
+    if (names.length == 2) return '${names[0]} and ${names[1]} are typing';
+    return '${names.length} people are typing';
+  }
+
+  /// Says who is typing, by their names.
+  final String Function(List<String> names) messageLabel;
 
   @override
   State<OiTypingIndicator> createState() => _OiTypingIndicatorState();
@@ -80,16 +92,7 @@ class _OiTypingIndicatorState extends State<OiTypingIndicator>
     super.dispose();
   }
 
-  String _buildMessage() {
-    final names = widget.typingUsers;
-    if (names.length == 1) {
-      return '${names.first} is typing';
-    } else if (names.length == 2) {
-      return '${names[0]} and ${names[1]} are typing';
-    } else {
-      return '${names.length} people are typing';
-    }
-  }
+  String _buildMessage() => widget.messageLabel(widget.typingUsers);
 
   @override
   Widget build(BuildContext context) {

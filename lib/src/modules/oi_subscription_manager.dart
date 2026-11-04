@@ -164,29 +164,154 @@ class OiPaymentMethodInfo {
   final IconData? icon;
 }
 
-// ── Month name lookup ───────────────────────────────────────────────────────
-
-const _monthNames = [
-  'Jan',
-  'Feb',
-  'Mar',
-  'Apr',
-  'May',
-  'Jun',
-  'Jul',
-  'Aug',
-  'Sep',
-  'Oct',
-  'Nov',
-  'Dec',
-];
-
-String _formatDate(DateTime date) {
-  final month = _monthNames[date.month - 1];
-  return '$month ${date.day}, ${date.year}';
-}
-
 // ── Main Widget ─────────────────────────────────────────────────────────────
+
+/// The texts of an [OiSubscriptionManager], in English by default; pass translations
+/// to localize the page.
+///
+/// {@category Modules}
+class OiSubscriptionManagerLabels {
+  /// Creates an [OiSubscriptionManagerLabels].
+  const OiSubscriptionManagerLabels({
+    this.perMonth = '/mo',
+    this.perYear = '/yr',
+    this.renewsOn = englishRenewsOn,
+    this.formatDate = englishFormatDate,
+    this.status = englishStatus,
+    this.statusLabel = englishStatusLabel,
+    this.upgrade = 'Upgrade',
+    this.upgradeSemantic = 'Upgrade subscription plan',
+    this.downgrade = 'Downgrade',
+    this.downgradeSemantic = 'Downgrade subscription plan',
+    this.cancel = 'Cancel',
+    this.cancelSemantic = 'Cancel subscription',
+    this.usage = 'Usage',
+    this.quotaUsage = englishQuotaUsage,
+    this.billingHistory = 'Billing History',
+    this.paid = 'Paid',
+    this.pending = 'Pending',
+    this.failed = 'Failed',
+    this.downloadInvoice = englishDownloadInvoice,
+    this.paymentMethod = 'Payment Method',
+    this.expires = englishExpires,
+    this.update = 'Update',
+    this.updateSemantic = 'Update payment method',
+  });
+
+  /// "Renews on Mar 5, 2026": the default [renewsOn].
+  static String englishRenewsOn(String date) => 'Renews on $date';
+
+  /// "Mar 5, 2026": the default [formatDate].
+  static String englishFormatDate(DateTime date) {
+    const months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
+    return '${months[date.month - 1]} ${date.day}, ${date.year}';
+  }
+
+  /// "Active", "Trial", "Past Due", "Canceled", "Expired": the default
+  /// [status].
+  static String englishStatus(OiSubscriptionStatus status) => switch (status) {
+    OiSubscriptionStatus.active => 'Active',
+    OiSubscriptionStatus.trialing => 'Trial',
+    OiSubscriptionStatus.pastDue => 'Past Due',
+    OiSubscriptionStatus.canceled => 'Canceled',
+    OiSubscriptionStatus.expired => 'Expired',
+  };
+
+  /// "Status: Active": the default [statusLabel].
+  static String englishStatusLabel(String status) => 'Status: $status';
+
+  /// "Storage usage": the default [quotaUsage].
+  static String englishQuotaUsage(String quota) => '$quota usage';
+
+  /// "Download invoice March 2026": the default [downloadInvoice].
+  static String englishDownloadInvoice(String invoice) =>
+      'Download invoice $invoice';
+
+  /// "Expires 12/27": the default [expires].
+  static String englishExpires(String date) => 'Expires $date';
+
+  /// Suffix of a monthly price.
+  final String perMonth;
+
+  /// Suffix of a yearly price.
+  final String perYear;
+
+  /// Names the formatted renewal date.
+  final String Function(String date) renewsOn;
+
+  /// Formats the renewal and invoice dates.
+  final String Function(DateTime date) formatDate;
+
+  /// Names a subscription status.
+  final String Function(OiSubscriptionStatus status) status;
+
+  /// Screen-reader label of the named status.
+  final String Function(String status) statusLabel;
+
+  /// Label of the upgrade button.
+  final String upgrade;
+
+  /// Screen-reader label of the upgrade button.
+  final String upgradeSemantic;
+
+  /// Label of the downgrade button.
+  final String downgrade;
+
+  /// Screen-reader label of the downgrade button.
+  final String downgradeSemantic;
+
+  /// Label of the cancel button.
+  final String cancel;
+
+  /// Screen-reader label of the cancel button.
+  final String cancelSemantic;
+
+  /// Heading of the usage meters.
+  final String usage;
+
+  /// Screen-reader label of the named quota's meter.
+  final String Function(String quota) quotaUsage;
+
+  /// Heading of the invoices.
+  final String billingHistory;
+
+  /// Badge of a paid invoice.
+  final String paid;
+
+  /// Badge of a pending invoice.
+  final String pending;
+
+  /// Badge of a failed invoice.
+  final String failed;
+
+  /// Screen-reader label of the described invoice's download button.
+  final String Function(String invoice) downloadInvoice;
+
+  /// Heading of the payment method.
+  final String paymentMethod;
+
+  /// Names the payment method's expiry.
+  final String Function(String date) expires;
+
+  /// Label of the update payment method button.
+  final String update;
+
+  /// Screen-reader label of the update payment method button.
+  final String updateSemantic;
+}
 
 /// A subscription management page with current plan, usage meters,
 /// billing history, and payment method.
@@ -206,6 +331,7 @@ class OiSubscriptionManager extends StatelessWidget {
     this.onUpdatePayment,
     this.onInvoiceDownload,
     this.currencySymbol = r'$',
+    this.labels = const OiSubscriptionManagerLabels(),
     super.key,
   });
 
@@ -241,6 +367,9 @@ class OiSubscriptionManager extends StatelessWidget {
   /// Called when the user taps a download button on an invoice.
   final void Function(OiInvoice)? onInvoiceDownload;
 
+  /// The page's texts; pass translations to localize it.
+  final OiSubscriptionManagerLabels labels;
+
   /// Currency symbol used to format prices.
   final String currencySymbol;
 
@@ -249,8 +378,8 @@ class OiSubscriptionManager extends StatelessWidget {
   String _formatPrice(double price) {
     final formatted = price.toStringAsFixed(2);
     final suffix = currentPlan.billingCycle == OiBillingCycle.monthly
-        ? '/mo'
-        : '/yr';
+        ? labels.perMonth
+        : labels.perYear;
     return '$currencySymbol$formatted$suffix';
   }
 
@@ -361,7 +490,7 @@ class OiSubscriptionManager extends StatelessWidget {
             if (currentPlan.renewalDate != null) ...[
               SizedBox(height: spacing.xs),
               OiLabel.small(
-                'Renews on ${_formatDate(currentPlan.renewalDate!)}',
+                labels.renewsOn(labels.formatDate(currentPlan.renewalDate!)),
               ),
             ],
             if (currentPlan.features.isNotEmpty) ...[
@@ -388,21 +517,21 @@ class OiSubscriptionManager extends StatelessWidget {
               children: [
                 if (onUpgrade != null)
                   OiButton.primary(
-                    label: 'Upgrade',
+                    label: labels.upgrade,
                     onTap: onUpgrade,
-                    semanticLabel: 'Upgrade subscription plan',
+                    semanticLabel: labels.upgradeSemantic,
                   ),
                 if (onDowngrade != null)
                   OiButton.ghost(
-                    label: 'Downgrade',
+                    label: labels.downgrade,
                     onTap: onDowngrade,
-                    semanticLabel: 'Downgrade subscription plan',
+                    semanticLabel: labels.downgradeSemantic,
                   ),
                 if (onCancel != null)
                   OiButton.ghost(
-                    label: 'Cancel',
+                    label: labels.cancel,
                     onTap: () => onCancel!(),
-                    semanticLabel: 'Cancel subscription',
+                    semanticLabel: labels.cancelSemantic,
                   ),
               ],
             ),
@@ -413,38 +542,18 @@ class OiSubscriptionManager extends StatelessWidget {
   }
 
   Widget _buildStatusBadge(OiSubscriptionStatus status) {
-    final String statusLabel;
-    final Widget badge;
-    switch (status) {
-      case OiSubscriptionStatus.active:
-        statusLabel = 'Active';
-        badge = const OiBadge.soft(
-          label: 'Active',
-          color: OiBadgeColor.success,
-        );
-      case OiSubscriptionStatus.trialing:
-        statusLabel = 'Trial';
-        badge = const OiBadge.soft(label: 'Trial', color: OiBadgeColor.info);
-      case OiSubscriptionStatus.pastDue:
-        statusLabel = 'Past Due';
-        badge = const OiBadge.soft(
-          label: 'Past Due',
-          color: OiBadgeColor.warning,
-        );
-      case OiSubscriptionStatus.canceled:
-        statusLabel = 'Canceled';
-        badge = const OiBadge.soft(
-          label: 'Canceled',
-          color: OiBadgeColor.error,
-        );
-      case OiSubscriptionStatus.expired:
-        statusLabel = 'Expired';
-        badge = const OiBadge.soft(
-          label: 'Expired',
-          color: OiBadgeColor.neutral,
-        );
-    }
-    return Semantics(label: 'Status: $statusLabel', child: badge);
+    final statusLabel = labels.status(status);
+    final color = switch (status) {
+      OiSubscriptionStatus.active => OiBadgeColor.success,
+      OiSubscriptionStatus.trialing => OiBadgeColor.info,
+      OiSubscriptionStatus.pastDue => OiBadgeColor.warning,
+      OiSubscriptionStatus.canceled => OiBadgeColor.error,
+      OiSubscriptionStatus.expired => OiBadgeColor.neutral,
+    };
+    return Semantics(
+      label: labels.statusLabel(statusLabel),
+      child: OiBadge.soft(label: statusLabel, color: color),
+    );
   }
 
   Widget _buildUsageMeters(BuildContext context) {
@@ -453,7 +562,7 @@ class OiSubscriptionManager extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const OiLabel.h3('Usage'),
+        OiLabel.h3(labels.usage),
         SizedBox(height: spacing.md),
         ...usage.map(
           (quota) => Padding(
@@ -506,7 +615,7 @@ class OiSubscriptionManager extends StatelessWidget {
         OiProgress.linear(
           value: clampedRatio,
           color: progressColor,
-          label: '${quota.label} usage',
+          label: labels.quotaUsage(quota.label),
         ),
       ],
     );
@@ -518,7 +627,7 @@ class OiSubscriptionManager extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const OiLabel.h3('Billing History'),
+        OiLabel.h3(labels.billingHistory),
         SizedBox(height: spacing.md),
         ...invoices.map(
           (invoice) => Padding(
@@ -536,18 +645,18 @@ class OiSubscriptionManager extends StatelessWidget {
     final radius = context.radius;
 
     final statusBadge = switch (invoice.status.toLowerCase()) {
-      'paid' => const OiBadge.soft(
-        label: 'Paid',
+      'paid' => OiBadge.soft(
+        label: labels.paid,
         color: OiBadgeColor.success,
         size: OiBadgeSize.small,
       ),
-      'pending' => const OiBadge.soft(
-        label: 'Pending',
+      'pending' => OiBadge.soft(
+        label: labels.pending,
         color: OiBadgeColor.warning,
         size: OiBadgeSize.small,
       ),
-      'failed' => const OiBadge.soft(
-        label: 'Failed',
+      'failed' => OiBadge.soft(
+        label: labels.failed,
         color: OiBadgeColor.error,
         size: OiBadgeSize.small,
       ),
@@ -578,7 +687,7 @@ class OiSubscriptionManager extends StatelessWidget {
                 children: [
                   OiLabel.body(invoice.description),
                   SizedBox(height: spacing.xs),
-                  OiLabel.small(_formatDate(invoice.date)),
+                  OiLabel.small(labels.formatDate(invoice.date)),
                 ],
               ),
             ),
@@ -591,7 +700,7 @@ class OiSubscriptionManager extends StatelessWidget {
             if (onInvoiceDownload != null) ...[
               SizedBox(width: spacing.sm),
               OiTappable(
-                semanticLabel: 'Download invoice ${invoice.description}',
+                semanticLabel: labels.downloadInvoice(invoice.description),
                 onTap: () => onInvoiceDownload!(invoice),
                 child: Icon(
                   OiIcons.download,
@@ -615,7 +724,7 @@ class OiSubscriptionManager extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const OiLabel.h3('Payment Method'),
+        OiLabel.h3(labels.paymentMethod),
         SizedBox(height: spacing.md),
         DecoratedBox(
           decoration: BoxDecoration(
@@ -640,16 +749,16 @@ class OiSubscriptionManager extends StatelessWidget {
                       OiLabel.bodyStrong(pm.label),
                       if (pm.expiresAt != null) ...[
                         SizedBox(height: spacing.xs),
-                        OiLabel.small('Expires ${pm.expiresAt}'),
+                        OiLabel.small(labels.expires(pm.expiresAt!)),
                       ],
                     ],
                   ),
                 ),
                 if (onUpdatePayment != null)
                   OiButton.ghost(
-                    label: 'Update',
+                    label: labels.update,
                     onTap: onUpdatePayment,
-                    semanticLabel: 'Update payment method',
+                    semanticLabel: labels.updateSemantic,
                   ),
               ],
             ),

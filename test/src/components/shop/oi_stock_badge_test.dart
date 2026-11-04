@@ -128,5 +128,16 @@ void main() {
         findsOneWidget,
       );
     });
+
+    testWidgets('renders the given labels', (tester) async {
+      await tester.pumpObers(
+        OiStockBadge.fromCount(
+          stockCount: 3,
+          label: 'Stock',
+          labels: OiStockBadgeLabels(lowStock: (count) => 'Nur noch $count'),
+        ),
+      );
+      expect(find.text('Nur noch 3'), findsOneWidget);
+    });
   });
 }

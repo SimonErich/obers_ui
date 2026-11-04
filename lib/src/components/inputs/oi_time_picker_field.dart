@@ -46,6 +46,8 @@ class OiTimePickerField extends StatelessWidget {
     this.onSaved,
     this.autovalidateMode,
     this.semanticLabel,
+    this.clearLabel = 'Clear time',
+    this.pickerLabels = const OiTimePickerLabels(),
     super.key,
   });
 
@@ -114,13 +116,22 @@ class OiTimePickerField extends StatelessWidget {
   /// Semantic label for accessibility.
   final String? semanticLabel;
 
+  /// Screen-reader label of the clear button shown when [clearable] is set.
+  final String clearLabel;
+
+  /// The texts of the time picker that opens from the field; pass
+  /// translations to localize it.
+  final OiTimePickerLabels pickerLabels;
+
   String _formatTime(OiTimeOfDay time) {
     if (use24Hour) {
       return '${time.hour.toString().padLeft(2, '0')}:'
           '${time.minute.toString().padLeft(2, '0')}';
     }
     final h = time.hour % 12 == 0 ? 12 : time.hour % 12;
-    final ampm = time.hour < 12 ? 'AM' : 'PM';
+    final ampm = time.hour < 12
+        ? pickerLabels.beforeNoon
+        : pickerLabels.afterNoon;
     return '${h.toString().padLeft(2, '0')}:'
         '${time.minute.toString().padLeft(2, '0')} $ampm';
   }
@@ -133,6 +144,7 @@ class OiTimePickerField extends StatelessWidget {
       initialTime: value,
       use24Hour: use24Hour,
       semanticLabel: semanticLabel ?? 'Select time',
+      labels: pickerLabels,
     );
 
     if (selected != null) {
@@ -157,6 +169,7 @@ class OiTimePickerField extends StatelessWidget {
         if (clearable && hasValue && enabled)
           OiTappable(
             onTap: _clear,
+            semanticLabel: clearLabel,
             child: Padding(
               padding: const EdgeInsets.only(right: 4),
               child: Icon(

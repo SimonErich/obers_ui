@@ -53,6 +53,8 @@ class OiSelect<T> extends StatefulWidget {
     this.searchable = false,
     this.bottomSheetOnCompact = false,
     this.inline = false,
+    this.searchPlaceholder = 'Search…',
+    this.noOptionsLabel = 'No options',
     super.key,
   });
 
@@ -68,6 +70,8 @@ class OiSelect<T> extends StatefulWidget {
     this.enabled = true,
     this.searchable = false,
     this.bottomSheetOnCompact = false,
+    this.searchPlaceholder = 'Search…',
+    this.noOptionsLabel = 'No options',
     super.key,
   }) : inline = true,
        label = null,
@@ -107,6 +111,12 @@ class OiSelect<T> extends StatefulWidget {
   /// When true renders an inline trigger (label + chevron) without an input
   /// frame. The dropdown shows a checkmark next to the selected option.
   final bool inline;
+
+  /// Placeholder of the search input.
+  final String searchPlaceholder;
+
+  /// Shown when the search matches no option.
+  final String noOptionsLabel;
 
   @override
   State<OiSelect<T>> createState() => _OiSelectState<T>();
@@ -224,7 +234,7 @@ class _OiSelectState<T> extends State<OiSelect<T>> {
                 child: OiRawInput(
                   controller: _searchCtrl,
                   focusNode: _searchFocus,
-                  placeholder: 'Search…',
+                  placeholder: widget.searchPlaceholder,
                   onChanged: (v) => setState(() => _query = v),
                 ),
               ),
@@ -232,7 +242,7 @@ class _OiSelectState<T> extends State<OiSelect<T>> {
               Padding(
                 padding: const EdgeInsets.all(12),
                 child: Text(
-                  'No options',
+                  widget.noOptionsLabel,
                   style: TextStyle(color: colors.textMuted, fontSize: 14),
                 ),
               )

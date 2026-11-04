@@ -14,6 +14,8 @@ class _FilterPopover extends StatefulWidget {
     required this.onApply,
     required this.onClose,
     required this.anchor,
+    required this.noResultsLabel,
+    required this.applyLabel,
     this.currentFilter,
   });
 
@@ -22,6 +24,8 @@ class _FilterPopover extends StatefulWidget {
   final ValueChanged<OiColumnFilter> onApply;
   final VoidCallback onClose;
   final Offset anchor;
+  final String noResultsLabel;
+  final String applyLabel;
 
   @override
   State<_FilterPopover> createState() => _FilterPopoverState();
@@ -257,7 +261,7 @@ class _FilterPopoverState extends State<_FilterPopover> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
             child: Text(
-              'No results',
+              widget.noResultsLabel,
               style: TextStyle(fontSize: 13, color: colors.textMuted),
               textAlign: TextAlign.center,
             ),
@@ -308,7 +312,7 @@ class _FilterPopoverState extends State<_FilterPopover> {
             ),
             alignment: Alignment.center,
             child: Text(
-              'Apply',
+              widget.applyLabel,
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,

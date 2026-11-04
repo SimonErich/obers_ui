@@ -27,6 +27,10 @@ class OiFileInput extends StatefulWidget {
     this.multipleFiles = false,
     this.allowedExtensions,
     this.dropZone = false,
+    this.chooseFileLabel = 'Choose file…',
+    this.chooseFilesLabel = 'Choose files…',
+    this.dropFilesLabel = 'Drop files here or browse',
+    this.releaseToAddLabel = 'Release to add files',
     super.key,
   });
 
@@ -56,6 +60,19 @@ class OiFileInput extends StatefulWidget {
 
   /// When true a drop-zone UI hint is shown beneath the file chips.
   final bool dropZone;
+
+  /// Label of the button that opens the file chooser for a single file.
+  final String chooseFileLabel;
+
+  /// Label of the button that opens the file chooser when [multipleFiles] is
+  /// set.
+  final String chooseFilesLabel;
+
+  /// Text of the drop zone shown when [dropZone] is set.
+  final String dropFilesLabel;
+
+  /// Text of the drop zone while files are dragged over it.
+  final String releaseToAddLabel;
 
   @override
   State<OiFileInput> createState() => _OiFileInputState();
@@ -202,8 +219,8 @@ class _OiFileInputState extends State<OiFileInput> {
                 const SizedBox(width: 6),
                 Text(
                   _isDragOver
-                      ? 'Release to add files'
-                      : 'Drop files here or browse',
+                      ? widget.releaseToAddLabel
+                      : widget.dropFilesLabel,
                   style: TextStyle(
                     fontSize: 13,
                     fontWeight: _isDragOver
@@ -257,7 +274,9 @@ class _OiFileInputState extends State<OiFileInput> {
               ),
             const SizedBox(width: 6),
             Text(
-              widget.multipleFiles ? 'Choose files…' : 'Choose file…',
+              widget.multipleFiles
+                  ? widget.chooseFilesLabel
+                  : widget.chooseFileLabel,
               style: TextStyle(
                 fontSize: 13,
                 color: colors.primary.base,

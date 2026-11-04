@@ -23,6 +23,9 @@ class OiFileToolbar extends StatefulWidget {
     this.selectedCount = 0,
     this.bulkActions = const [],
     this.onSearch,
+    this.searchLabel = 'Search',
+    this.closeSearchLabel = 'Close search',
+    this.selectedCountLabel = englishSelectedCount,
     super.key,
   });
 
@@ -39,6 +42,19 @@ class OiFileToolbar extends StatefulWidget {
   /// Called with the search query after a 300 ms debounce. When null the
   /// search icon is hidden.
   final ValueChanged<String>? onSearch;
+
+  /// Screen-reader label of the search button.
+  final String searchLabel;
+
+  /// Screen-reader label of the search button while the search is open.
+  final String closeSearchLabel;
+
+  /// "3 selected": the default [selectedCountLabel].
+  static String englishSelectedCount(int count) => '$count selected';
+
+  /// Shown in place of the breadcrumbs while files are selected, by the
+  /// number of [selectedCount].
+  final String Function(int count) selectedCountLabel;
 
   /// Semantic label for the toolbar.
   final String label;
@@ -109,7 +125,9 @@ class _OiFileToolbarState extends State<OiFileToolbar> {
                 ? OiIcons
                       .x // close
                 : OiIcons.search, // search
-            semanticLabel: _searchOpen ? 'Close search' : 'Search',
+            semanticLabel: _searchOpen
+                ? widget.closeSearchLabel
+                : widget.searchLabel,
             onTap: _toggleSearch,
           ),
       ],
@@ -123,7 +141,7 @@ class _OiFileToolbarState extends State<OiFileToolbar> {
       children: [
         Expanded(
           child: Text(
-            '${widget.selectedCount} selected',
+            widget.selectedCountLabel(widget.selectedCount),
             style: theme.textTheme.body,
           ),
         ),

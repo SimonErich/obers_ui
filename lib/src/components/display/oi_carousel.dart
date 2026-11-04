@@ -47,6 +47,9 @@ class OiCarousel extends StatefulWidget {
     this.showIndicator = true,
     this.viewportFraction = 1.0,
     this.onPageChanged,
+    this.previousLabel = 'Previous',
+    this.nextLabel = 'Next',
+    this.pageIndicatorLabel = englishPageIndicator,
     super.key,
   });
 
@@ -87,6 +90,19 @@ class OiCarousel extends StatefulWidget {
 
   /// Called with the new page index whenever the current page changes.
   final ValueChanged<int>? onPageChanged;
+
+  /// "Featured page indicator": the default [pageIndicatorLabel].
+  static String englishPageIndicator(String carousel) =>
+      '$carousel page indicator';
+
+  /// Screen-reader label of the previous button.
+  final String previousLabel;
+
+  /// Screen-reader label of the next button.
+  final String nextLabel;
+
+  /// Screen-reader label of the page indicator, by the carousel's label.
+  final String Function(String carousel) pageIndicatorLabel;
 
   @override
   State<OiCarousel> createState() => _OiCarouselState();
@@ -220,7 +236,7 @@ class _OiCarouselState extends State<OiCarousel> {
             _Arrow(
               alignment: Alignment.centerLeft,
               icon: OiIcons.chevronLeft,
-              semanticLabel: 'Previous',
+              semanticLabel: widget.previousLabel,
               buttonKey: const Key('oi_carousel_prev'),
               onTap: _currentPage > 0 || widget.loop
                   ? () => _goTo(_previousIndex(), animate: true)
@@ -229,7 +245,7 @@ class _OiCarouselState extends State<OiCarousel> {
             _Arrow(
               alignment: Alignment.centerRight,
               icon: OiIcons.chevronRight,
-              semanticLabel: 'Next',
+              semanticLabel: widget.nextLabel,
               buttonKey: const Key('oi_carousel_next'),
               onTap: _currentPage < _maxIndex || widget.loop
                   ? () => _goTo(_nextIndex(), animate: true)
@@ -259,7 +275,7 @@ class _OiCarouselState extends State<OiCarousel> {
             OiPageIndicator(
               count: _pageCount,
               current: _currentPage,
-              semanticLabel: '${widget.label} page indicator',
+              semanticLabel: widget.pageIndicatorLabel(widget.label),
               onDotTap: (index) => _goTo(index, animate: true),
             ),
           ],

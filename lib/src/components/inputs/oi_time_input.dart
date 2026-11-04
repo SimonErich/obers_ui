@@ -1,5 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/_internal/oi_input_frame.dart';
+import 'package:obers_ui/src/components/navigation/oi_time_picker.dart'
+    show OiTimePickerLabels;
 import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
@@ -48,9 +50,10 @@ class OiTimeOfDay implements Comparable<OiTimeOfDay> {
     return '$hh:$mm';
   }
 
-  /// Formats as 12-hour `h:MM AM/PM`.
-  String format12() {
-    final period = hour < 12 ? 'AM' : 'PM';
+  /// Formats as 12-hour `h:MM AM/PM`; pass [beforeNoon] and [afterNoon] to
+  /// localize the period markers.
+  String format12({String beforeNoon = 'AM', String afterNoon = 'PM'}) {
+    final period = hour < 12 ? beforeNoon : afterNoon;
     final h = hour == 0 ? 12 : (hour > 12 ? hour - 12 : hour);
     final mm = minute.toString().padLeft(2, '0');
     return '$h:$mm $period';
@@ -94,6 +97,7 @@ class OiTimeInput extends StatefulWidget {
     this.error,
     this.enabled = true,
     this.use24Hour = true,
+    this.labels = const OiTimePickerLabels(),
     super.key,
   });
 
@@ -117,6 +121,9 @@ class OiTimeInput extends StatefulWidget {
 
   /// When true the picker uses 24-hour format; otherwise 12-hour with AM/PM.
   final bool use24Hour;
+
+  /// The input's texts; pass translations to localize it.
+  final OiTimePickerLabels labels;
 
   @override
   State<OiTimeInput> createState() => _OiTimeInputState();
@@ -196,7 +203,9 @@ class _OiTimeInputState extends State<OiTimeInput> {
       return '${t.hour.toString().padLeft(2, '0')}:${t.minute.toString().padLeft(2, '0')}';
     }
     final h = t.hour % 12 == 0 ? 12 : t.hour % 12;
-    final ampm = t.hour < 12 ? 'AM' : 'PM';
+    final ampm = t.hour < 12
+        ? widget.labels.beforeNoon
+        : widget.labels.afterNoon;
     return '${h.toString().padLeft(2, '0')}:${t.minute.toString().padLeft(2, '0')} $ampm';
   }
 
@@ -333,7 +342,7 @@ class _OiTimeInputState extends State<OiTimeInput> {
                     vertical: 8,
                   ),
                   child: Text(
-                    'Cancel',
+                    widget.labels.cancel,
                     style: TextStyle(color: colors.textMuted),
                   ),
                 ),
@@ -347,7 +356,7 @@ class _OiTimeInputState extends State<OiTimeInput> {
                     vertical: 8,
                   ),
                   child: Text(
-                    'OK',
+                    widget.labels.confirm,
                     style: TextStyle(
                       color: colors.primary.base,
                       fontWeight: FontWeight.w600,

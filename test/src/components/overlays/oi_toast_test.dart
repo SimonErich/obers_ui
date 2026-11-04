@@ -340,4 +340,15 @@ void main() {
     );
     expect(fadeTransition.opacity.value, 1.0);
   });
+
+  testWidgets('renders the given dismiss label', (tester) async {
+    await tester.pumpObers(
+      const OiToast(
+        label: 'Toast',
+        message: 'Gespeichert',
+        labels: OiToastLabels(dismiss: 'Schließen'),
+      ),
+    );
+    expect(find.bySemanticsLabel('Schließen'), findsOneWidget);
+  });
 }

@@ -9,7 +9,7 @@ extension _OiFileExplorerToolbar on _OiFileExplorerState {
     final isSelectionMode = controller.selectedKeys.isNotEmpty;
 
     return Semantics(
-      label: 'File explorer toolbar',
+      label: widget.labels.toolbar,
       child: ClipRect(
         child: Container(
           padding: EdgeInsets.symmetric(
@@ -47,7 +47,7 @@ extension _OiFileExplorerToolbar on _OiFileExplorerState {
           ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 260),
             child: Semantics(
-              label: 'Search files',
+              label: widget.labels.searchFiles,
               child: OiTextInput.search(
                 autofocus: true,
                 onChanged: (q) {
@@ -60,7 +60,9 @@ extension _OiFileExplorerToolbar on _OiFileExplorerState {
         if (widget.enableSearch)
           OiIconButton(
             icon: _searchActive ? OiIcons.x : OiIcons.search,
-            semanticLabel: _searchActive ? 'Close search' : 'Search',
+            semanticLabel: _searchActive
+                ? widget.labels.closeSearch
+                : widget.labels.search,
             onTap: () {
               _setSearchActive(active: !_searchActive);
               if (!_searchActive) controller.setSearchQuery('');
@@ -69,7 +71,7 @@ extension _OiFileExplorerToolbar on _OiFileExplorerState {
         SizedBox(width: spacing.sm),
         // View toggle
         OiButtonGroup(
-          label: 'View mode',
+          label: widget.labels.viewMode,
           exclusive: true,
           selectedIndex: controller.viewMode == OiFileViewMode.list ? 0 : 1,
           onSelect: (index) {
@@ -77,29 +79,35 @@ extension _OiFileExplorerToolbar on _OiFileExplorerState {
               index == 0 ? OiFileViewMode.list : OiFileViewMode.grid,
             );
           },
-          items: const [
-            OiButtonGroupItem(icon: OiIcons.layoutList, label: 'List view'),
-            OiButtonGroupItem(icon: OiIcons.layoutGrid, label: 'Grid view'),
+          items: [
+            OiButtonGroupItem(
+              icon: OiIcons.layoutList,
+              label: widget.labels.listView,
+            ),
+            OiButtonGroupItem(
+              icon: OiIcons.layoutGrid,
+              label: widget.labels.gridView,
+            ),
           ],
         ),
         SizedBox(width: spacing.sm),
         // Actions
         if (widget.enableUpload)
           OiTooltip(
-            label: 'Upload File',
-            message: 'Upload File',
+            label: widget.labels.uploadFile,
+            message: widget.labels.uploadFile,
             child: OiIconButton(
               icon: OiIcons.cloudUpload,
-              semanticLabel: 'Upload files',
+              semanticLabel: widget.labels.uploadFiles,
               onTap: _showUploadDialog,
             ),
           ),
         OiTooltip(
-          label: 'Add New Folder',
-          message: 'Add New Folder',
+          label: widget.labels.addNewFolder,
+          message: widget.labels.addNewFolder,
           child: OiIconButton(
             icon: OiIcons.folderOpen,
-            semanticLabel: 'New folder',
+            semanticLabel: widget.labels.newFolder,
             onTap: _showNewFolderDialog,
           ),
         ),
@@ -116,7 +124,7 @@ extension _OiFileExplorerToolbar on _OiFileExplorerState {
           child: Semantics(
             liveRegion: true,
             child: Text(
-              '$count selected',
+              widget.labels.selectedCount(count),
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
@@ -127,25 +135,25 @@ extension _OiFileExplorerToolbar on _OiFileExplorerState {
         ),
         if (widget.enableMove)
           OiButton.ghost(
-            label: 'Move',
+            label: widget.labels.move,
             onTap: () => _showMoveDialog(controller.selectedFiles),
           ),
         if (widget.enableCopy && widget.onCopy != null)
           OiButton.ghost(
-            label: 'Copy',
+            label: widget.labels.copy,
             onTap: () =>
                 _showMoveDialog(controller.selectedFiles, copyMode: true),
           ),
         if (widget.enableDelete)
           OiButton.ghost(
-            label: 'Delete',
+            label: widget.labels.delete,
             onTap: () => _showDeleteDialog(controller.selectedFiles),
           ),
         OiButton.ghost(
-          label: 'Clear',
+          label: widget.labels.clear,
           onTap: () {
             controller.clearSelection();
-            _announce('Selection cleared');
+            _announce(widget.labels.announcements.selectionCleared);
           },
         ),
       ],

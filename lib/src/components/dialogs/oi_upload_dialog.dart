@@ -35,6 +35,99 @@ enum OiConflictResolution {
   rename,
 }
 
+/// The texts of an [OiUploadDialog], in English by default; pass
+/// translations to localize the dialog.
+///
+/// {@category Components}
+class OiUploadDialogLabels {
+  /// Creates an [OiUploadDialogLabels].
+  const OiUploadDialogLabels({
+    this.title = 'Upload Files',
+    this.uploadTo = englishUploadTo,
+    this.filesToUpload = 'Files to upload:',
+    this.maxFiles = englishMaxFiles,
+    this.ifFileExists = 'If file exists:',
+    this.conflictResolution = englishConflictResolution,
+    this.upload = 'Upload',
+    this.uploadCount = englishUploadCount,
+    this.cancel = 'Cancel',
+    this.dropFiles = 'Drop files here or browse',
+    this.releaseToAdd = 'Release to add files',
+    this.typeNotAllowed = englishTypeNotAllowed,
+    this.exceedsLimit = englishExceedsLimit,
+    this.dialog = 'Upload dialog',
+  });
+
+  /// "Upload to: /Documents": the default [uploadTo].
+  static String englishUploadTo(String path) => 'Upload to: $path';
+
+  /// "Maximum 10 files allowed": the default [maxFiles].
+  static String englishMaxFiles(int count) => 'Maximum $count files allowed';
+
+  /// "Ask", "Replace", "Skip", "Rename": the default [conflictResolution].
+  static String englishConflictResolution(OiConflictResolution resolution) =>
+      switch (resolution) {
+        OiConflictResolution.ask => 'Ask',
+        OiConflictResolution.replace => 'Replace',
+        OiConflictResolution.skip => 'Skip',
+        OiConflictResolution.rename => 'Rename',
+      };
+
+  /// "Upload 3 files": the default [uploadCount].
+  static String englishUploadCount(int count) =>
+      'Upload $count file${count == 1 ? '' : 's'}';
+
+  /// "File type .exe not allowed": the default [typeNotAllowed].
+  static String englishTypeNotAllowed(String extension) =>
+      'File type .$extension not allowed';
+
+  /// "Exceeds 10 MB limit": the default [exceedsLimit].
+  static String englishExceedsLimit(String size) => 'Exceeds $size limit';
+
+  /// Title of the dialog.
+  final String title;
+
+  /// Names the destination, shown when [OiUploadDialog.destinationPath] is
+  /// set.
+  final String Function(String path) uploadTo;
+
+  /// Heading of the list of added files.
+  final String filesToUpload;
+
+  /// Shown when [OiUploadDialog.maxFiles] is set.
+  final String Function(int count) maxFiles;
+
+  /// Label of the conflict resolution select.
+  final String ifFileExists;
+
+  /// Names an option of the conflict resolution select.
+  final String Function(OiConflictResolution resolution) conflictResolution;
+
+  /// Label of the upload button while no valid file is added.
+  final String upload;
+
+  /// Label of the upload button, by the number of valid files.
+  final String Function(int count) uploadCount;
+
+  /// Label of the cancel button.
+  final String cancel;
+
+  /// Text of the drop zone.
+  final String dropFiles;
+
+  /// Text of the drop zone while files are dragged over it.
+  final String releaseToAdd;
+
+  /// Error of a file whose extension, the argument, is not allowed.
+  final String Function(String extension) typeNotAllowed;
+
+  /// Error of a file larger than the limit, the formatted argument.
+  final String Function(String size) exceedsLimit;
+
+  /// Screen-reader label of the dialog.
+  final String dialog;
+}
+
 /// A dialog for uploading files with a drop zone, progress tracking,
 /// conflict resolution, and batch controls.
 ///
@@ -49,6 +142,7 @@ class OiUploadDialog extends StatefulWidget {
     this.maxFiles,
     this.defaultResolution = OiConflictResolution.ask,
     this.destinationPath,
+    this.labels = const OiUploadDialogLabels(),
     super.key,
   });
 
@@ -73,6 +167,9 @@ class OiUploadDialog extends StatefulWidget {
 
   /// Destination folder path for context.
   final String? destinationPath;
+
+  /// The dialog's texts; pass translations to localize it.
+  final OiUploadDialogLabels labels;
 
   @override
   State<OiUploadDialog> createState() => _OiUploadDialogState();

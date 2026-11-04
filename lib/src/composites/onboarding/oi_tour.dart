@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui/src/composites/forms/oi_stepper.dart';
 import 'package:obers_ui/src/composites/onboarding/oi_spotlight.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/primitives/overlay/oi_floating.dart';
@@ -43,6 +44,36 @@ class OiTourStep {
   final VoidCallback? onAction;
 }
 
+/// The texts of an [OiTour], in English by default; pass translations
+/// to localize the tour.
+///
+/// {@category Composites}
+class OiTourLabels {
+  /// Creates an [OiTourLabels].
+  const OiTourLabels({
+    this.stepOf = OiStepper.englishProgressLabel,
+    this.skip = 'Skip',
+    this.previous = 'Previous',
+    this.next = 'Next',
+    this.finish = 'Finish',
+  });
+
+  /// Progress shown on each step, by the one-based step and the number of steps.
+  final String Function(int step, int total) stepOf;
+
+  /// Label of the skip button.
+  final String skip;
+
+  /// Label of the previous button.
+  final String previous;
+
+  /// Label of the next button.
+  final String next;
+
+  /// Label of the next button on the last step.
+  final String finish;
+}
+
 /// A guided tour that highlights target widgets with tooltips.
 ///
 /// Steps through a sequence of [OiTourStep]s, spotlighting each target
@@ -61,6 +92,7 @@ class OiTour extends StatefulWidget {
     this.overlayColor,
     this.dismissOnOutsideTap = false,
     this.child,
+    this.labels = const OiTourLabels(),
     super.key,
   });
 
@@ -90,6 +122,9 @@ class OiTour extends StatefulWidget {
 
   /// The child widget tree rendered beneath the tour overlay.
   final Widget? child;
+
+  /// The tour's texts; pass translations to localize it.
+  final OiTourLabels labels;
 
   @override
   State<OiTour> createState() => _OiTourState();
@@ -170,6 +205,7 @@ class _OiTourState extends State<OiTour> {
           onNext: _next,
           onPrevious: _currentStep > 0 ? _previous : null,
           onSkip: _skip,
+          labels: widget.labels,
         ),
       ],
     );
@@ -188,6 +224,7 @@ class _TourTooltip extends StatefulWidget {
     required this.onNext,
     required this.onPrevious,
     required this.onSkip,
+    required this.labels,
     super.key,
   });
 
@@ -200,6 +237,7 @@ class _TourTooltip extends StatefulWidget {
   final VoidCallback onNext;
   final VoidCallback? onPrevious;
   final VoidCallback onSkip;
+  final OiTourLabels labels;
 
   @override
   State<_TourTooltip> createState() => _TourTooltipState();
@@ -319,7 +357,10 @@ class _TourTooltipState extends State<_TourTooltip> {
               Padding(
                 padding: const EdgeInsets.only(bottom: 8),
                 child: Text(
-                  'Step ${widget.currentStep + 1} of ${widget.totalSteps}',
+                  widget.labels.stepOf(
+                    widget.currentStep + 1,
+                    widget.totalSteps,
+                  ),
                   key: const Key('oi_tour_progress'),
                   style: textTheme.small.copyWith(color: colors.textMuted),
                 ),
@@ -336,7 +377,7 @@ class _TourTooltipState extends State<_TourTooltip> {
                     child: Padding(
                       padding: const EdgeInsets.symmetric(vertical: 8),
                       child: Text(
-                        'Skip',
+                        widget.labels.skip,
                         key: const Key('oi_tour_skip'),
                         style: textTheme.small.copyWith(
                           color: colors.textMuted,
@@ -350,7 +391,7 @@ class _TourTooltipState extends State<_TourTooltip> {
                     child: Padding(
                       padding: const EdgeInsets.symmetric(vertical: 8),
                       child: Text(
-                        'Previous',
+                        widget.labels.previous,
                         key: const Key('oi_tour_previous'),
                         style: textTheme.small.copyWith(
                           color: colors.primary.base,
@@ -371,7 +412,9 @@ class _TourTooltipState extends State<_TourTooltip> {
                       borderRadius: BorderRadius.circular(6),
                     ),
                     child: Text(
-                      widget.lastStep ? 'Finish' : 'Next',
+                      widget.lastStep
+                          ? widget.labels.finish
+                          : widget.labels.next,
                       style: textTheme.small.copyWith(
                         color: colors.textOnPrimary,
                       ),

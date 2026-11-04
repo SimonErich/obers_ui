@@ -549,4 +549,18 @@ void main() {
       expect(find.text('5 minutes ago'), findsOneWidget);
     });
   });
+
+  group('formatter', () {
+    test('replaces the built-in formatting', () {
+      final now = DateTime(2026, 3, 5, 12);
+      final result = OiRelativeTime.format(
+        now.subtract(const Duration(minutes: 5)),
+        now: now,
+        capitalize: true,
+        formatter: (dateTime, style, now) =>
+            'vor ${now.difference(dateTime).inMinutes} Minuten',
+      );
+      expect(result, 'Vor 5 Minuten');
+    });
+  });
 }

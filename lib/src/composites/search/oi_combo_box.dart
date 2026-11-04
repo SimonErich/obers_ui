@@ -21,6 +21,9 @@ class OiComboBox<T> extends StatefulWidget {
   const OiComboBox({
     required this.label,
     required this.labelOf,
+    this.noResultsLabel = 'No results',
+    this.recentLabel = 'Recent',
+    this.favoritesLabel = 'Favorites',
     super.key,
     this.items = const [],
     this.value,
@@ -120,6 +123,15 @@ class OiComboBox<T> extends StatefulWidget {
 
   /// Whether there are more items to load.
   final bool moreAvailable;
+
+  /// Shown when nothing matches the query.
+  final String noResultsLabel;
+
+  /// Heading of the recent options.
+  final String recentLabel;
+
+  /// Heading of the favorite options.
+  final String favoritesLabel;
 
   /// Custom option builder.
   final Widget Function(T, {required bool highlighted, required bool selected})?
@@ -399,7 +411,7 @@ class _OiComboBoxState<T> extends State<OiComboBox<T>> {
                   runSpacing: 4,
                   children: [
                     Text(
-                      'No results',
+                      widget.noResultsLabel,
                       style: TextStyle(color: colors.textMuted, fontSize: 14),
                     ),
                     if (widget.onCreate != null &&
@@ -431,7 +443,7 @@ class _OiComboBoxState<T> extends State<OiComboBox<T>> {
                     children: [
                       // Recent section
                       if (hasRecent) ...[
-                        _buildSectionHeader(context, 'Recent'),
+                        _buildSectionHeader(context, widget.recentLabel),
                         ...widget.recentItems!.map(
                           (item) => _buildOptionTile(
                             context,
@@ -442,7 +454,7 @@ class _OiComboBoxState<T> extends State<OiComboBox<T>> {
                       ],
                       // Favorites section
                       if (hasFavorite) ...[
-                        _buildSectionHeader(context, 'Favorites'),
+                        _buildSectionHeader(context, widget.favoritesLabel),
                         ...widget.favoriteItems!.map(
                           (item) => _buildOptionTile(
                             context,

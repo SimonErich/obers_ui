@@ -28,6 +28,8 @@ class OiProductGallery extends StatefulWidget {
     this.initialIndex = 0,
     this.onIndexChanged,
     this.showThumbnails = true,
+    this.thumbnailLabel = englishThumbnail,
+    this.imageLabel = englishImage,
     super.key,
   });
 
@@ -45,6 +47,20 @@ class OiProductGallery extends StatefulWidget {
 
   /// Whether to show the thumbnail strip. Defaults to `true`.
   final bool showThumbnails;
+
+  /// "Thumbnail 2": the default [thumbnailLabel].
+  static String englishThumbnail(int number) => 'Thumbnail $number';
+
+  /// Alt text of a thumbnail, by its one-based position.
+  final String Function(int number) thumbnailLabel;
+
+  /// "Coffee image 2": the default [imageLabel].
+  static String englishImage(String gallery, int number) =>
+      '$gallery image $number';
+
+  /// Alt text of the main image, by the gallery's [label] and the image's
+  /// one-based position.
+  final String Function(String gallery, int number) imageLabel;
 
   @override
   State<OiProductGallery> createState() => _OiProductGalleryState();
@@ -101,7 +117,7 @@ class _OiProductGalleryState extends State<OiProductGallery> {
         aspectRatio: 1,
         child: OiImage(
           src: widget.imageUrls[_currentIndex],
-          alt: '${widget.label} image ${_currentIndex + 1}',
+          alt: widget.imageLabel(widget.label, _currentIndex + 1),
           fit: BoxFit.cover,
         ),
       ),
@@ -140,7 +156,7 @@ class _OiProductGalleryState extends State<OiProductGallery> {
                   height: 64,
                   child: OiImage(
                     src: widget.imageUrls[index],
-                    alt: 'Thumbnail ${index + 1}',
+                    alt: widget.thumbnailLabel(index + 1),
                     fit: BoxFit.cover,
                   ),
                 ),

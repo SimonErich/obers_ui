@@ -5,6 +5,32 @@ import 'package:obers_ui/src/components/overlays/oi_dialog_shell.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
 
+/// The texts of an [OiTimePicker] and the time inputs built on it, in
+/// English by default; pass translations to localize them.
+///
+/// {@category Components}
+class OiTimePickerLabels {
+  /// Creates an [OiTimePickerLabels].
+  const OiTimePickerLabels({
+    this.beforeNoon = 'AM',
+    this.afterNoon = 'PM',
+    this.cancel = 'Cancel',
+    this.confirm = 'OK',
+  });
+
+  /// Marker of times before noon, shown when the 12-hour clock is used.
+  final String beforeNoon;
+
+  /// Marker of times from noon on, shown when the 12-hour clock is used.
+  final String afterNoon;
+
+  /// Label of the cancel button.
+  final String cancel;
+
+  /// Label of the confirm button.
+  final String confirm;
+}
+
 /// A standalone time picker with scrollable hour and minute wheels.
 ///
 /// Displays two [ListWheelScrollView] columns — one for hours, one for
@@ -20,6 +46,7 @@ class OiTimePicker extends StatefulWidget {
     this.value,
     this.onChanged,
     this.use24Hour = true,
+    this.labels = const OiTimePickerLabels(),
     super.key,
   });
 
@@ -32,6 +59,9 @@ class OiTimePicker extends StatefulWidget {
   /// When `true` the hour wheel shows 0–23; otherwise 1–12 with AM/PM.
   final bool use24Hour;
 
+  /// The picker's texts; pass translations to localize it.
+  final OiTimePickerLabels labels;
+
   /// Shows a time picker in a dialog and returns the selected time.
   ///
   /// Returns `null` if the dialog is dismissed without selecting a time.
@@ -40,6 +70,7 @@ class OiTimePicker extends StatefulWidget {
     OiTimeOfDay? initialTime,
     bool use24Hour = true,
     String semanticLabel = 'Select time',
+    OiTimePickerLabels labels = const OiTimePickerLabels(),
   }) {
     return OiDialogShell.show<OiTimeOfDay>(
       context: context,
@@ -48,6 +79,7 @@ class OiTimePicker extends StatefulWidget {
       builder: (close) => _OiTimePickerDialog(
         initialTime: initialTime,
         use24Hour: use24Hour,
+        labels: labels,
         onConfirm: close,
         onCancel: () => close(),
       ),
@@ -200,13 +232,13 @@ class _OiTimePickerState extends State<OiTimePicker> {
             mainAxisSize: MainAxisSize.min,
             children: [
               _AmPmButton(
-                label: 'AM',
+                label: widget.labels.beforeNoon,
                 selected: !_isPm,
                 onTap: _isPm ? _toggleAmPm : null,
               ),
               const SizedBox(width: 8),
               _AmPmButton(
-                label: 'PM',
+                label: widget.labels.afterNoon,
                 selected: _isPm,
                 onTap: !_isPm ? _toggleAmPm : null,
               ),
@@ -330,12 +362,14 @@ class _OiTimePickerDialog extends StatefulWidget {
   const _OiTimePickerDialog({
     required this.onConfirm,
     required this.onCancel,
+    required this.labels,
     this.initialTime,
     this.use24Hour = true,
   });
 
   final OiTimeOfDay? initialTime;
   final bool use24Hour;
+  final OiTimePickerLabels labels;
   final void Function([OiTimeOfDay?]) onConfirm;
   final VoidCallback onCancel;
 
@@ -363,6 +397,7 @@ class _OiTimePickerDialogState extends State<_OiTimePickerDialog> {
           OiTimePicker(
             value: widget.initialTime,
             use24Hour: widget.use24Hour,
+            labels: widget.labels,
             onChanged: (time) => _selected = time,
           ),
           const SizedBox(height: 16),
@@ -377,7 +412,7 @@ class _OiTimePickerDialogState extends State<_OiTimePickerDialog> {
                     vertical: 8,
                   ),
                   child: Text(
-                    'Cancel',
+                    widget.labels.cancel,
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
@@ -399,7 +434,7 @@ class _OiTimePickerDialogState extends State<_OiTimePickerDialog> {
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(
-                    'OK',
+                    widget.labels.confirm,
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,

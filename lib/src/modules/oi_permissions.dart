@@ -63,6 +63,9 @@ class OiPermissions extends StatelessWidget {
     required this.matrix,
     required this.onChange,
     required this.label,
+    this.emptyLabel = 'No permissions configured',
+    this.permissionLabel = 'Permission',
+    this.cellLabel = englishCell,
     super.key,
     this.enabled = true,
   });
@@ -84,6 +87,19 @@ class OiPermissions extends StatelessWidget {
 
   /// Whether the matrix is editable.
   final bool enabled;
+
+  /// "Edit for Admin": the default [cellLabel].
+  static String englishCell(String permission, String role) =>
+      '$permission for $role';
+
+  /// Shown while there are no permissions.
+  final String emptyLabel;
+
+  /// Header of the permission column.
+  final String permissionLabel;
+
+  /// Screen-reader label of the switch of the named permission and role.
+  final String Function(String permission, String role) cellLabel;
 
   // ---------------------------------------------------------------------------
   // Helpers
@@ -122,7 +138,7 @@ class OiPermissions extends StatelessWidget {
         label: label,
         child: Center(
           child: Text(
-            'No permissions configured',
+            emptyLabel,
             style: TextStyle(color: colors.textMuted),
           ),
         ),
@@ -148,7 +164,7 @@ class OiPermissions extends StatelessWidget {
                     child: Padding(
                       padding: EdgeInsets.all(spacing.sm),
                       child: Text(
-                        'Permission',
+                        permissionLabel,
                         style: TextStyle(
                           color: colors.text,
                           fontSize: 14,
@@ -243,7 +259,7 @@ class OiPermissions extends StatelessWidget {
                   child: Semantics(
                     container: true,
                     explicitChildNodes: true,
-                    label: '${permission.label} for ${role.label}',
+                    label: cellLabel(permission.label, role.label),
                     toggled: _isGranted(role.key, permission.key),
                     child: _OiCheckbox(
                       checked: _isGranted(role.key, permission.key),

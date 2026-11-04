@@ -65,6 +65,7 @@ class OiBanner extends StatefulWidget {
     this.semanticLabel,
     this.loadingOnDismiss,
     this.padding,
+    this.dismissLabel = 'Dismiss',
     super.key,
   });
 
@@ -316,6 +317,9 @@ class OiBanner extends StatefulWidget {
   /// `OiBannerThemeData.padding` and then to the level + [compact] default.
   final EdgeInsetsGeometry? padding;
 
+  /// Screen-reader label of the dismiss button.
+  final String dismissLabel;
+
   @override
   State<OiBanner> createState() => _OiBannerState();
 }
@@ -531,7 +535,7 @@ class _OiBannerState extends State<OiBanner>
                     if (widget.dismissible)
                       OiIconButton(
                         icon: OiIcons.x,
-                        semanticLabel: 'Dismiss',
+                        semanticLabel: widget.dismissLabel,
                         onTap: _dismiss,
                         size: OiButtonSize.small,
                       ),

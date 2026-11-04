@@ -38,6 +38,8 @@ class OiThumbs extends StatelessWidget {
     this.showCount = false,
     this.upCount = 0,
     this.downCount = 0,
+    this.upLabel = 'Thumbs up',
+    this.downLabel = 'Thumbs down',
     super.key,
   });
 
@@ -61,6 +63,12 @@ class OiThumbs extends StatelessWidget {
 
   /// Number of thumbs-down votes shown when [showCount] is `true`.
   final int downCount;
+
+  /// Screen-reader label of the thumbs-up button.
+  final String upLabel;
+
+  /// Screen-reader label of the thumbs-down button.
+  final String downLabel;
 
   void _handleTap(OiThumbsValue tapped) {
     if (!enabled) return;
@@ -120,14 +128,14 @@ class OiThumbs extends StatelessWidget {
       children: [
         buildThumb(
           thumb: OiThumbsValue.up,
-          semanticLabel: 'Thumbs up',
+          semanticLabel: upLabel,
           up: true,
           count: upCount,
         ),
         const SizedBox(width: 8),
         buildThumb(
           thumb: OiThumbsValue.down,
-          semanticLabel: 'Thumbs down',
+          semanticLabel: downLabel,
           up: false,
           count: downCount,
         ),

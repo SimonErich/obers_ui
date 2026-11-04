@@ -61,6 +61,7 @@ class OiGallery extends StatelessWidget {
     required this.items,
     required this.label,
     this.columns = 4,
+    this.uploadLabel = 'Upload media',
     super.key,
     this.selectionMode = OiSelectionMode.none,
     this.selectedKeys = const {},
@@ -101,6 +102,9 @@ class OiGallery extends StatelessWidget {
 
   /// The gap in logical pixels between grid cells.
   final double gap;
+
+  /// Screen-reader label of the upload tile.
+  final String uploadLabel;
 
   void _handleTap(OiGalleryItem item) {
     onItemTap?.call(item);
@@ -162,7 +166,7 @@ class OiGallery extends StatelessWidget {
               key: const Key('oi_gallery_upload'),
               onTap: () => onUpload?.call(const []),
               child: Semantics(
-                label: 'Upload media',
+                label: uploadLabel,
                 button: true,
                 child: DecoratedBox(
                   decoration: BoxDecoration(

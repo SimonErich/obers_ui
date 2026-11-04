@@ -167,6 +167,9 @@ class OiFilterBar extends StatefulWidget {
     this.settingsKey,
     this.settingsNamespace = 'oi_filter_bar',
     this.settingsSaveDebounce = const Duration(milliseconds: 500),
+    this.filterLabel = englishFilter,
+    this.noResultsLabel = 'No results',
+    this.applyLabel = 'Apply',
     super.key,
   });
 
@@ -195,6 +198,18 @@ class OiFilterBar extends StatefulWidget {
 
   /// Debounce duration for auto-saving settings after changes.
   final Duration settingsSaveDebounce;
+
+  /// "Status filter": the default [filterLabel].
+  static String englishFilter(String filter) => '$filter filter';
+
+  /// Screen-reader label of the named filter's chip.
+  final String Function(String filter) filterLabel;
+
+  /// Shown in a filter's options when nothing matches the search.
+  final String noResultsLabel;
+
+  /// Label of a filter's apply button.
+  final String applyLabel;
 
   @override
   State<OiFilterBar> createState() => _OiFilterBarState();
@@ -311,6 +326,8 @@ class _OiFilterBarState extends State<OiFilterBar>
     Widget popoverBuilder(BuildContext ctx) {
       return _FilterPopover(
         definition: filter,
+        noResultsLabel: widget.noResultsLabel,
+        applyLabel: widget.applyLabel,
         currentFilter: widget.activeFilters[filter.key],
         anchor: Offset(position.dx, position.dy + box.size.height + 4),
         onApply: (value) {
@@ -327,7 +344,7 @@ class _OiFilterBarState extends State<OiFilterBar>
     final service = OiOverlays.maybeOf(chipContext);
     if (service != null) {
       _filterHandle = service.show(
-        label: '${filter.label} filter',
+        label: widget.filterLabel(filter.label),
         builder: popoverBuilder,
         zOrder: OiOverlayZOrder.dropdown,
         dismissOnScroll: true,

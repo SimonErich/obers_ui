@@ -314,5 +314,17 @@ void main() {
       // Default OiAvatar renders the derived initials "AL".
       expect(find.text('AL'), findsOneWidget);
     });
+
+    testWidgets('renders the given labels', (tester) async {
+      await tester.pumpObers(
+        const OiAuthPage(
+          label: 'Auth',
+          labels: OiAuthPageLabels(signIn: 'Anmelden', password: 'Passwort'),
+        ),
+        surfaceSize: const Size(800, 600),
+      );
+      expect(find.text('Anmelden'), findsNWidgets(2));
+      expect(find.text('Passwort'), findsOneWidget);
+    });
   });
 }

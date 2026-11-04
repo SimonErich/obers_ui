@@ -11,6 +11,46 @@ import 'package:obers_ui/src/utils/calendar_utils.dart';
 // Weekday abbreviations, index 0=Monday ... 6=Sunday (matches DateTime.weekday-1).
 const List<String> _kWeekdays = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'];
 
+/// The texts of an [OiDatePicker], in English by default; pass translations
+/// to localize the picker.
+///
+/// {@category Components}
+class OiDatePickerLabels {
+  /// Creates an [OiDatePickerLabels].
+  const OiDatePickerLabels({
+    this.months = kOiMonthLabels,
+    this.weekdays = _kWeekdays,
+    this.previousMonth = 'Previous month',
+    this.nextMonth = 'Next month',
+    this.monthPicker = 'Select month and year',
+    this.cancel = 'Cancel',
+    this.confirm = 'OK',
+  });
+
+  /// Month names indexed 0–11 (January–December), shown in the header and
+  /// in the month picker that opens from it.
+  final List<String> months;
+
+  /// Weekday abbreviations indexed 0–6 (Monday–Sunday), shown above the
+  /// grid.
+  final List<String> weekdays;
+
+  /// Screen-reader label of the arrow that shows the previous month.
+  final String previousMonth;
+
+  /// Screen-reader label of the arrow that shows the next month.
+  final String nextMonth;
+
+  /// Screen-reader label of the month picker that opens from the header.
+  final String monthPicker;
+
+  /// Label of the month picker's cancel button.
+  final String cancel;
+
+  /// Label of the month picker's confirm button.
+  final String confirm;
+}
+
 /// A calendar date picker with optional date-range selection.
 ///
 /// Displays a month-view calendar grid. The user can navigate between months
@@ -45,6 +85,7 @@ class OiDatePicker extends StatefulWidget {
     this.disabledDaysOfWeek,
     this.firstDayOfWeek,
     this.headerBuilder,
+    this.labels = const OiDatePickerLabels(),
     super.key,
   });
 
@@ -115,6 +156,9 @@ class OiDatePicker extends StatefulWidget {
   /// allowing the parent to update the controlled month.
   final ValueChanged<DateTime>? onDisplayMonthChanged;
 
+  /// The picker's texts; pass translations to localize it.
+  final OiDatePickerLabels labels;
+
   /// Shows a date picker in a dialog and returns the selected date.
   ///
   /// Returns `null` if the dialog is dismissed without selecting a date.
@@ -124,6 +168,7 @@ class OiDatePicker extends StatefulWidget {
     DateTime? firstDate,
     DateTime? lastDate,
     String semanticLabel = 'Select date',
+    OiDatePickerLabels labels = const OiDatePickerLabels(),
   }) {
     return OiDialogShell.show<DateTime>(
       context: context,
@@ -139,6 +184,7 @@ class OiDatePicker extends StatefulWidget {
               value: initialDate,
               firstDate: firstDate,
               lastDate: lastDate,
+              labels: labels,
               onChanged: close,
             ),
           ],
@@ -336,6 +382,10 @@ class _OiDatePickerState extends State<OiDatePicker> {
         year: _effectiveDisplayMonth.year,
         month: _effectiveDisplayMonth.month,
       ),
+      semanticLabel: widget.labels.monthPicker,
+      cancelLabel: widget.labels.cancel,
+      confirmLabel: widget.labels.confirm,
+      monthLabels: widget.labels.months,
     );
     if (result == null) return;
     final target = DateTime(result.year, result.month);
@@ -456,6 +506,7 @@ class _OiDatePickerState extends State<OiDatePicker> {
               children: [
                 OiTappable(
                   onTap: _prevMonth,
+                  semanticLabel: widget.labels.previousMonth,
                   child: Padding(
                     padding: const EdgeInsets.all(5),
                     child: Icon(
@@ -472,13 +523,13 @@ class _OiDatePickerState extends State<OiDatePicker> {
                       if (widget.headerBuilder != null) ...[
                         widget.headerBuilder!(context, _effectiveDisplayMonth),
                         OiLabel.tiny(
-                          '${kOiMonthLabels[_effectiveDisplayMonth.month - 1]} ${_effectiveDisplayMonth.year}',
+                          '${widget.labels.months[_effectiveDisplayMonth.month - 1]} ${_effectiveDisplayMonth.year}',
                           color: colors.textMuted,
                         ),
                       ] else
                         _MonthYearLabel(
                           label:
-                              '${kOiMonthLabels[_effectiveDisplayMonth.month - 1]} ${_effectiveDisplayMonth.year}',
+                              '${widget.labels.months[_effectiveDisplayMonth.month - 1]} ${_effectiveDisplayMonth.year}',
                           onTap: _openMonthPicker,
                         ),
                     ],
@@ -486,6 +537,7 @@ class _OiDatePickerState extends State<OiDatePicker> {
                 ),
                 OiTappable(
                   onTap: _nextMonth,
+                  semanticLabel: widget.labels.nextMonth,
                   child: Padding(
                     padding: const EdgeInsets.all(5),
                     child: Icon(
@@ -503,12 +555,12 @@ class _OiDatePickerState extends State<OiDatePicker> {
           Row(
             children: List.generate(7, (col) {
               // Reorder weekdays to start from firstDayOfWeek.
-              // DateTime.weekday: 1=Mon...7=Sun; _kWeekdays index: 0=Mon...6=Sun.
+              // DateTime.weekday: 1=Mon...7=Sun; weekdays index: 0=Mon...6=Sun.
               final dayIndex = (fdow - 1 + col) % 7;
               return Expanded(
                 child: Center(
                   child: Text(
-                    _kWeekdays[dayIndex],
+                    widget.labels.weekdays[dayIndex],
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w500,

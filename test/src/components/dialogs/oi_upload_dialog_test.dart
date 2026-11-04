@@ -172,5 +172,23 @@ void main() {
       expect(find.widgetWithText(OiButton, 'Cancel'), findsOneWidget);
       expect(find.widgetWithText(OiButton, 'Upload'), findsOneWidget);
     });
+
+    testWidgets('renders the given labels', (tester) async {
+      await tester.pumpObers(
+        OiUploadDialog(
+          onUpload: (_, _) {},
+          labels: OiUploadDialogLabels(
+            title: 'Dateien hochladen',
+            conflictResolution: (resolution) => switch (resolution) {
+              OiConflictResolution.ask => 'Nachfragen',
+              _ => resolution.name,
+            },
+          ),
+        ),
+        surfaceSize: const Size(600, 800),
+      );
+      expect(find.text('Dateien hochladen'), findsOneWidget);
+      expect(find.text('Nachfragen'), findsOneWidget);
+    });
   });
 }

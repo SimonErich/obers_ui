@@ -54,6 +54,7 @@ class OiSliverHeader extends StatelessWidget {
     this.titleSpacing = 16,
     this.toolbarHeight = 56,
     this.semanticLabel,
+    this.backLabel = 'Go back',
     super.key,
   });
 
@@ -64,11 +65,13 @@ class OiSliverHeader extends StatelessWidget {
   OiSliverHeader.simple({
     required String title,
     VoidCallback? onBack,
+    String backLabel = 'Go back',
     List<Widget> actions = const [],
     String? semanticLabel,
     Key? key,
   }) : this(
-         leading: onBack != null ? _buildBackButton(onBack) : null,
+         leading: onBack != null ? _buildBackButton(onBack, backLabel) : null,
+         backLabel: backLabel,
          title: OiLabel.body(title),
          actions: actions,
          pinned: true,
@@ -84,12 +87,14 @@ class OiSliverHeader extends StatelessWidget {
     required String title,
     String? subtitle,
     VoidCallback? onBack,
+    String backLabel = 'Go back',
     List<Widget> actions = const [],
     double expandedHeight = 120,
     String? semanticLabel,
     Key? key,
   }) : this(
-         leading: onBack != null ? _buildBackButton(onBack) : null,
+         leading: onBack != null ? _buildBackButton(onBack, backLabel) : null,
+         backLabel: backLabel,
          title: OiLabel.h3(title),
          subtitle: subtitle != null ? OiLabel.small(subtitle) : null,
          actions: actions,
@@ -107,12 +112,14 @@ class OiSliverHeader extends StatelessWidget {
     required Widget flexibleSpace,
     Widget? title,
     VoidCallback? onBack,
+    String backLabel = 'Go back',
     List<Widget> actions = const [],
     double expandedHeight = 200,
     String? semanticLabel,
     Key? key,
   }) : this(
-         leading: onBack != null ? _buildBackButton(onBack) : null,
+         leading: onBack != null ? _buildBackButton(onBack, backLabel) : null,
+         backLabel: backLabel,
          title: title,
          flexibleSpace: flexibleSpace,
          actions: actions,
@@ -190,14 +197,17 @@ class OiSliverHeader extends StatelessWidget {
   /// The accessibility label for the header.
   final String? semanticLabel;
 
+  /// Screen-reader label of the back button.
+  final String backLabel;
+
   // ── Helpers ───────────────────────────────────────────────────────────────
 
-  static Widget _buildBackButton(VoidCallback onBack) {
+  static Widget _buildBackButton(VoidCallback onBack, String label) {
     return GestureDetector(
       onTap: onBack,
       behavior: HitTestBehavior.opaque,
       child: Semantics(
-        label: 'Go back',
+        label: label,
         button: true,
         child: const Padding(
           padding: EdgeInsets.all(8),

@@ -79,6 +79,7 @@ class OiOnboardingFlow extends StatefulWidget {
     this.showSkip = true,
     this.showPageIndicator = true,
     this.maxWidth = 600,
+    this.pageOfLabel = englishPageOf,
     super.key,
   });
 
@@ -116,6 +117,12 @@ class OiOnboardingFlow extends StatefulWidget {
 
   /// Maximum width of the onboarding content. Defaults to `600`.
   final double maxWidth;
+
+  /// "Page 2 of 4": the default [pageOfLabel].
+  static String englishPageOf(int page, int total) => 'Page $page of $total';
+
+  /// Screen-reader label of the page indicator, by the one-based page and the number of pages.
+  final String Function(int page, int total) pageOfLabel;
 
   @override
   State<OiOnboardingFlow> createState() => _OiOnboardingFlowState();
@@ -259,8 +266,10 @@ class _OiOnboardingFlowState extends State<OiOnboardingFlow> {
               count: widget.pages.length,
               current: _currentPage,
               onDotTap: _goToPage,
-              semanticLabel:
-                  'Page ${_currentPage + 1} of ${widget.pages.length}',
+              semanticLabel: widget.pageOfLabel(
+                _currentPage + 1,
+                widget.pages.length,
+              ),
             ),
         ],
       ),

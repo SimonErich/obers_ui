@@ -60,6 +60,8 @@ class OiKanban<T> extends StatefulWidget {
   const OiKanban({
     required this.columns,
     required this.label,
+    this.emptyColumnLabel = 'No items',
+    this.addColumnLabel = 'Add column',
     super.key,
     this.onCardMove,
     this.onColumnReorder,
@@ -127,6 +129,12 @@ class OiKanban<T> extends StatefulWidget {
 
   /// Top-level namespace for settings storage.
   final String settingsNamespace;
+
+  /// Shown in a column without cards.
+  final String emptyColumnLabel;
+
+  /// Label of the button that adds a column.
+  final String addColumnLabel;
 
   @override
   State<OiKanban<T>> createState() => _OiKanbanState<T>();
@@ -536,7 +544,7 @@ class _OiKanbanState<T> extends State<OiKanban<T>>
             Padding(
               padding: const EdgeInsets.all(8),
               child: Text(
-                'No items',
+                widget.emptyColumnLabel,
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 13, color: colors.textMuted),
               ),
@@ -660,7 +668,7 @@ class _OiKanbanState<T> extends State<OiKanban<T>>
               ),
               const SizedBox(width: 6),
               Text(
-                'Add column',
+                widget.addColumnLabel,
                 style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w500,

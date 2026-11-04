@@ -11,6 +11,35 @@ import 'package:obers_ui/src/primitives/display/oi_divider.dart';
 import 'package:obers_ui/src/primitives/display/oi_label.dart';
 import 'package:obers_ui/src/primitives/layout/oi_column.dart';
 
+/// The texts of an [OiOrderSummary], in English by default; pass
+/// translations to localize the summary.
+///
+/// {@category Composites}
+class OiOrderSummaryLabels {
+  /// Creates an [OiOrderSummaryLabels].
+  const OiOrderSummaryLabels({
+    this.title = 'Order Summary',
+    this.items = englishItems,
+    this.totals = const OiOrderTotalsLabels(),
+    this.itemRow = const OiCartItemRowLabels(),
+  });
+
+  /// "Items (3)": the default [items].
+  static String englishItems(int count) => 'Items ($count)';
+
+  /// Heading of the summary.
+  final String title;
+
+  /// Title of the collapsible item list, by the number of items.
+  final String Function(int count) items;
+
+  /// The labels of the totals rows.
+  final OiOrderTotalsLabels totals;
+
+  /// The texts of each item row.
+  final OiCartItemRowLabels itemRow;
+}
+
 /// A complete order summary card showing all line items (subtotal, discount,
 /// shipping, tax, total) with an optional expandable item list.
 ///
@@ -32,6 +61,7 @@ class OiOrderSummary extends StatelessWidget {
     this.showItems = true,
     this.expandedByDefault = false,
     this.currencyCode = 'EUR',
+    this.labels = const OiOrderSummaryLabels(),
     super.key,
   });
 
@@ -57,6 +87,9 @@ class OiOrderSummary extends StatelessWidget {
   /// ISO 4217 currency code. Defaults to `'EUR'`.
   final String currencyCode;
 
+  /// The summary's texts; pass translations to localize it.
+  final OiOrderSummaryLabels labels;
+
   Widget _buildItemList(BuildContext context) {
     final breakpoint = context.breakpoint;
     final sp = context.spacing;
@@ -65,7 +98,7 @@ class OiOrderSummary extends StatelessWidget {
       allowMultiple: true,
       sections: [
         OiAccordionSection(
-          title: 'Items (${items!.length})',
+          title: labels.items(items!.length),
           initiallyExpanded: expandedByDefault,
           content: OiColumn(
             breakpoint: breakpoint,
@@ -77,6 +110,7 @@ class OiOrderSummary extends StatelessWidget {
                   label: '${item.name} × ${item.quantity}',
                   editable: false,
                   currencyCode: currencyCode,
+                  labels: labels.itemRow,
                 ),
             ],
           ),
@@ -95,32 +129,32 @@ class OiOrderSummary extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         OiOrderSummaryLine(
-          label: 'Subtotal',
+          label: labels.totals.subtotal,
           amount: summary.subtotal,
           currencyCode: currencyCode,
         ),
         if (summary.discount != null)
           OiOrderSummaryLine(
-            label: summary.discountLabel ?? 'Discount',
+            label: summary.discountLabel ?? labels.totals.discount,
             amount: summary.discount!,
             currencyCode: currencyCode,
             negative: true,
           ),
         if (summary.shipping != null)
           OiOrderSummaryLine(
-            label: summary.shippingLabel ?? 'Shipping',
+            label: summary.shippingLabel ?? labels.totals.shipping,
             amount: summary.shipping!,
             currencyCode: currencyCode,
           ),
         if (summary.tax != null)
           OiOrderSummaryLine(
-            label: summary.taxLabel ?? 'Tax',
+            label: summary.taxLabel ?? labels.totals.tax,
             amount: summary.tax!,
             currencyCode: currencyCode,
           ),
         const OiDivider(),
         OiOrderSummaryLine(
-          label: 'Total',
+          label: labels.totals.total,
           amount: summary.total,
           currencyCode: currencyCode,
           bold: true,
@@ -143,7 +177,7 @@ class OiOrderSummary extends StatelessWidget {
           gap: OiResponsive(sp.sm),
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const OiLabel.bodyStrong('Order Summary'),
+            OiLabel.bodyStrong(labels.title),
             if (hasItems) ...[_buildItemList(context), const OiDivider()],
             _buildSummaryLines(context),
           ],

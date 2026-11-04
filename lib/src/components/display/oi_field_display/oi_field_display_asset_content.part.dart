@@ -52,7 +52,7 @@ extension _OiFieldDisplayAssetContent on OiFieldDisplay {
   Widget _buildImageDisplay(BuildContext context) {
     return OiImage(
       src: _valueString,
-      alt: label.isEmpty ? 'Image' : label,
+      alt: label.isEmpty ? imageLabel : label,
       width: 64,
       height: 64,
       fit: BoxFit.cover,
