@@ -609,4 +609,78 @@ void main() {
     expect(find.bySemanticsLabel(RegExp(r'Step \d+ of')), findsNothing);
     semantics.dispose();
   });
+
+  // 29. canGoNext: false disables Next and keeps the step.
+  List<OiWizardStep> gatedSteps({required bool canGoNext}) => [
+    OiWizardStep(
+      title: 'Address',
+      canGoNext: canGoNext,
+      builder: (ctx) => const Text('Content One'),
+    ),
+    OiWizardStep(title: 'Done', builder: (ctx) => const Text('Content Two')),
+  ];
+
+  testWidgets('canGoNext false disables Next and keeps the step', (
+    tester,
+  ) async {
+    await tester.pumpObers(
+      _wizard(animated: false, steps: gatedSteps(canGoNext: false)),
+    );
+
+    expect(
+      tester.widget<OiButton>(find.byType(OiButton).last).enabled,
+      isFalse,
+    );
+
+    await tester.tap(find.text('Next'), warnIfMissed: false);
+    await tester.pump();
+
+    expect(find.text('Content One'), findsOneWidget);
+  });
+
+  // 30. A programmatic goNext is ignored too.
+  testWidgets('canGoNext false also ignores goNext from the step', (
+    tester,
+  ) async {
+    late OiWizardContext wizard;
+    await tester.pumpObers(
+      _wizard(
+        animated: false,
+        steps: [
+          OiWizardStep(
+            title: 'Address',
+            canGoNext: false,
+            builder: (ctx) {
+              wizard = ctx;
+              return const Text('Content One');
+            },
+          ),
+          OiWizardStep(
+            title: 'Done',
+            builder: (ctx) => const Text('Content Two'),
+          ),
+        ],
+      ),
+    );
+
+    wizard.goNext();
+    await tester.pump();
+
+    expect(find.text('Content One'), findsOneWidget);
+  });
+
+  // 31. Next works again once the step allows it.
+  testWidgets('Next advances once canGoNext turns true', (tester) async {
+    await tester.pumpObers(
+      _wizard(animated: false, steps: gatedSteps(canGoNext: false)),
+    );
+    await tester.pumpObers(
+      _wizard(animated: false, steps: gatedSteps(canGoNext: true)),
+    );
+
+    await tester.tap(find.text('Next'));
+    await tester.pump();
+
+    expect(find.text('Content Two'), findsOneWidget);
+  });
 }

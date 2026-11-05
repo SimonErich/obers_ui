@@ -70,6 +70,7 @@ class OiWizardStep {
     this.validate,
     this.onNext,
     this.nextLabel,
+    this.canGoNext = true,
     this.optional = false,
   }) : _stepperLabel = stepperLabel;
 
@@ -116,6 +117,21 @@ class OiWizardStep {
   /// The Next button's label on this step, e.g. "Connect", in place of
   /// [OiWizardLabels.next] (or [OiWizardLabels.complete] on the last step).
   final String? nextLabel;
+
+  /// Whether the user may go on from this step. `false` disables the Next
+  /// button (Complete, on the last step) and ignores
+  /// [OiWizardContext.goNext], e.g. while the step shows why it cannot go
+  /// on. Unlike [validate], which runs on a press, the button shows it up
+  /// front; rebuild the wizard with `true` once the step can go on.
+  ///
+  /// ```dart
+  /// OiWizardStep(
+  ///   title: 'Address',
+  ///   canGoNext: address.isDeliverable,
+  ///   builder: (wizard) => AddressStep(address: address),
+  /// )
+  /// ```
+  final bool canGoNext;
 
   /// Whether this step can be skipped.
   final bool optional;
@@ -323,6 +339,7 @@ class _OiWizardState extends State<OiWizard> {
     // Validate current step before advancing.
     final index = _currentStep;
     final step = widget.steps[index];
+    if (!step.canGoNext) return;
     if (step.validate != null && !step.validate!(_values)) {
       setState(() {
         _errorSteps.add(index);
@@ -557,6 +574,7 @@ class _OiWizardState extends State<OiWizard> {
                           ? widget.labels.complete
                           : widget.labels.next),
                   onTap: _goNext,
+                  enabled: step.canGoNext,
                   loading: _busy,
                 ),
               ],
