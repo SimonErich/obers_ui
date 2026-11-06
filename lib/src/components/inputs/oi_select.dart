@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/_internal/oi_input_frame.dart';
 import 'package:obers_ui/src/components/inputs/oi_select_scope.dart';
@@ -170,8 +172,25 @@ class _OiSelectState<T> extends State<OiSelect<T>> {
         .toList();
   }
 
+  /// The field the menu opens from, to give the menu its width.
+  final GlobalKey _anchorKey = GlobalKey();
+
+  /// The menu's width: as wide as the field it opened from, or null (the
+  /// default width) for an [OiSelect.inline].
+  double? _menuWidth;
+
+  /// A menu is never narrower than this, even under a narrow field.
+  static const _minMenuWidth = 160.0;
+
+  /// The width the menu has when nothing says otherwise.
+  static const _defaultMenuWidth = 240.0;
+
   void _open_() {
     if (!widget.enabled) return;
+    final field = _anchorKey.currentContext?.findRenderObject();
+    _menuWidth = !widget.inline && field is RenderBox && field.hasSize
+        ? math.max(field.size.width, _minMenuWidth)
+        : null;
     _query = '';
     _searchCtrl.clear();
     _scope?.requestOpen(widget.key ?? this);
@@ -220,11 +239,12 @@ class _OiSelectState<T> extends State<OiSelect<T>> {
           ),
         ],
       ),
-      // Width 240 is a loose default; the OiFloating layout delegate's
-      // getConstraintsForChild will cap this to (screenWidth − screenPadding)
-      // on narrow screens, so the dropdown is never wider than the viewport.
+      // As wide as the field (240 for an inline select); the OiFloating layout
+      // delegate's getConstraintsForChild caps it to (screenWidth −
+      // screenPadding) on narrow screens, so it is never wider than the
+      // viewport.
       child: SizedBox(
-        width: 240,
+        width: _menuWidth ?? _defaultMenuWidth,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -318,6 +338,7 @@ class _OiSelectState<T> extends State<OiSelect<T>> {
         color: colors.textMuted,
       );
       anchor = GestureDetector(
+        key: _anchorKey,
         onTap: widget.enabled ? _open_ : null,
         behavior: HitTestBehavior.opaque,
         child: OiInputFrame(
