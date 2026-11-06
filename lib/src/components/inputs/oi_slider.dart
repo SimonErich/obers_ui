@@ -227,6 +227,9 @@ class _OiSliderState extends State<OiSlider>
           onHorizontalDragUpdate: (d) => _handleDragUpdate(d, width),
           onHorizontalDragEnd: _handleDragEnd,
           behavior: HitTestBehavior.opaque,
+          // The slider's own semantics (increase / decrease per thumb) replace
+          // the scroll and tap actions a gesture detector would add.
+          excludeFromSemantics: true,
           child: Padding(
             padding: EdgeInsets.only(top: widget.showLabels ? 16.0 : 0.0),
             child: SizedBox(
