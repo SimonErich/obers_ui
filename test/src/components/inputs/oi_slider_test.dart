@@ -133,6 +133,30 @@ void main() {
       handle.dispose();
     });
 
+    testWidgets('offers increase / decrease, not scroll or tap', (
+      tester,
+    ) async {
+      final handle = tester.ensureSemantics();
+      await tester.pumpObers(
+        OiSlider(
+          value: 5,
+          min: 0,
+          max: 10,
+          semanticLabel: 'Vol',
+          onChanged: (_) {},
+        ),
+      );
+
+      expect(find.semantics.byAction(SemanticsAction.scrollLeft), findsNothing);
+      expect(
+        find.semantics.byAction(SemanticsAction.scrollRight),
+        findsNothing,
+      );
+      expect(find.semantics.byAction(SemanticsAction.tap), findsNothing);
+      expect(find.semantics.byAction(SemanticsAction.increase), findsOneWidget);
+      handle.dispose();
+    });
+
     testWidgets('says a value as it is shown: 0.25 stays 0.25', (tester) async {
       final handle = tester.ensureSemantics();
       await tester.pumpObers(
