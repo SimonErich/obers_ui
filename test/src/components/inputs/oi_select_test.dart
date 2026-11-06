@@ -3,6 +3,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui/src/components/inputs/oi_select.dart';
+import 'package:obers_ui/src/primitives/scroll/oi_virtual_list.dart';
 
 import '../../../helpers/pump_app.dart';
 
@@ -357,4 +358,48 @@ void main() {
       expect(dropTop, greaterThanOrEqualTo(anchorRect.bottom - 1));
     },
   );
+
+  group('menu width', () {
+    Future<double> menuWidth(WidgetTester tester, double fieldWidth) async {
+      await tester.pumpObers(
+        Align(
+          alignment: Alignment.topLeft,
+          child: SizedBox(
+            width: fieldWidth,
+            child: const OiSelect<String>(options: _kOptions, value: 'a'),
+          ),
+        ),
+        surfaceSize: const Size(900, 600),
+      );
+      await tester.tap(find.byType(OiSelect<String>));
+      await tester.pumpAndSettle();
+      return tester.getSize(find.byType(OiVirtualList)).width;
+    }
+
+    testWidgets('is as wide as the field it opens from', (tester) async {
+      expect(await menuWidth(tester, 400), 400);
+    });
+
+    testWidgets('a wide field gets a wide menu, not 240', (tester) async {
+      expect(await menuWidth(tester, 600), 600);
+    });
+
+    testWidgets('a very narrow field still gets a usable menu', (tester) async {
+      expect(await menuWidth(tester, 100), 160);
+    });
+
+    testWidgets('an inline select keeps its default width', (tester) async {
+      await tester.pumpObers(
+        const Align(
+          alignment: Alignment.topLeft,
+          child: OiSelect<String>.inline(options: _kOptions, value: 'a'),
+        ),
+        surfaceSize: const Size(900, 600),
+      );
+      await tester.tap(find.byType(OiSelect<String>));
+      await tester.pumpAndSettle();
+
+      expect(tester.getSize(find.byType(OiVirtualList)).width, 240);
+    });
+  });
 }
