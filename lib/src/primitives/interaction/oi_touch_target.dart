@@ -11,8 +11,9 @@ import 'package:obers_ui/src/foundation/oi_accessibility.dart';
 /// minSize instead.
 ///
 /// This widget only inflates the layout size — the child's visual appearance
-/// is unchanged. The extra area is transparent and responds to hit-testing,
-/// ensuring WCAG minimum tap-target compliance.
+/// is unchanged, and it stays centred in the inflated area. The extra area is
+/// transparent; it responds to taps when a gesture detector wraps this widget
+/// (as `OiTappable` does), ensuring WCAG minimum tap-target compliance.
 ///
 /// {@category Primitives}
 class OiTouchTarget extends StatelessWidget {
@@ -67,8 +68,10 @@ class _TouchTargetPadding extends SingleChildRenderObjectWidget {
   }
 }
 
-class _RenderTouchTargetPadding extends RenderProxyBox {
-  _RenderTouchTargetPadding({required double minSize}) : _minSize = minSize;
+class _RenderTouchTargetPadding extends RenderShiftedBox {
+  _RenderTouchTargetPadding({required double minSize})
+    : _minSize = minSize,
+      super(null);
 
   double _minSize;
 
@@ -88,22 +91,32 @@ class _RenderTouchTargetPadding extends RenderProxyBox {
   double computeMinIntrinsicHeight(double width) =>
       math.max(super.computeMinIntrinsicHeight(width), _minSize);
 
+  Size _sizeFor(Size childSize, BoxConstraints constraints) =>
+      constraints.constrain(
+        Size(
+          math.max(childSize.width, _minSize),
+          math.max(childSize.height, _minSize),
+        ),
+      );
+
   @override
-  Size computeDryLayout(BoxConstraints constraints) {
-    final childSize = super.computeDryLayout(constraints);
-    return constraints.constrain(
-      Size(
-        math.max(childSize.width, _minSize),
-        math.max(childSize.height, _minSize),
-      ),
-    );
-  }
+  Size computeDryLayout(BoxConstraints constraints) =>
+      _sizeFor(child?.getDryLayout(constraints) ?? Size.zero, constraints);
 
   @override
   void performLayout() {
-    super.performLayout();
-    size = constraints.constrain(
-      Size(math.max(size.width, _minSize), math.max(size.height, _minSize)),
+    final child = this.child;
+    if (child == null) {
+      size = _sizeFor(Size.zero, constraints);
+      return;
+    }
+    child.layout(constraints, parentUsesSize: true);
+    size = _sizeFor(child.size, constraints);
+    // Centred, so the inflated area surrounds the child evenly: a 32 dp
+    // button in a 48 dp target stays 8 dp from the top and the bottom, and
+    // lines up with its neighbours in a row.
+    (child.parentData! as BoxParentData).offset = Alignment.center.alongOffset(
+      (size - child.size) as Offset,
     );
   }
 }
