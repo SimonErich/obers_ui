@@ -152,25 +152,39 @@ class _OiRadioOptionTileState<T> extends State<_OiRadioOptionTile<T>> {
 
     final labelColor = widget.disabled ? colors.textMuted : colors.text;
 
-    return MouseRegion(
-      onEnter: (_) => setState(() => _hovered = true),
-      onExit: (_) => setState(() => _hovered = false),
-      cursor: isActive ? SystemMouseCursors.click : SystemMouseCursors.basic,
-      child: GestureDetector(
-        onTap: isActive ? widget.onTap : null,
-        behavior: HitTestBehavior.opaque,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 4),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              circle,
-              const SizedBox(width: 8),
-              Text(
-                widget.option.label,
-                style: TextStyle(fontSize: 14, color: labelColor),
+    // One node per option for screen readers: its label, selected or not, in
+    // a group where one option is picked, with a tap action.
+    return Semantics(
+      container: true,
+      label: widget.option.label,
+      inMutuallyExclusiveGroup: true,
+      checked: isSelected,
+      enabled: isActive,
+      onTap: isActive ? widget.onTap : null,
+      child: ExcludeSemantics(
+        child: MouseRegion(
+          onEnter: (_) => setState(() => _hovered = true),
+          onExit: (_) => setState(() => _hovered = false),
+          cursor: isActive
+              ? SystemMouseCursors.click
+              : SystemMouseCursors.basic,
+          child: GestureDetector(
+            onTap: isActive ? widget.onTap : null,
+            behavior: HitTestBehavior.opaque,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 4),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  circle,
+                  const SizedBox(width: 8),
+                  Text(
+                    widget.option.label,
+                    style: TextStyle(fontSize: 14, color: labelColor),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
         ),
       ),

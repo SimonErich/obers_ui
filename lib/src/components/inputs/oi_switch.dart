@@ -36,6 +36,7 @@ class OiSwitch extends StatefulWidget {
     this.size = OiSwitchSize.medium,
     this.enabled = true,
     this.label,
+    this.semanticLabel,
     super.key,
   });
 
@@ -53,6 +54,12 @@ class OiSwitch extends StatefulWidget {
 
   /// Optional label rendered to the right of the switch.
   final String? label;
+
+  /// The name screen readers announce for the switch, when it has no visible
+  /// [label] (the surrounding UI shows the text), or to say it differently.
+  ///
+  /// Defaults to [label]. Nothing is drawn for it.
+  final String? semanticLabel;
 
   @override
   State<OiSwitch> createState() => _OiSwitchState();
@@ -164,6 +171,17 @@ class _OiSwitchState extends State<OiSwitch> {
       );
     }
 
-    return content;
+    // One node for screen readers: named, with its on/off state and a tap
+    // action, instead of the unlabelled button the inner [OiTappable] makes.
+    return Semantics(
+      container: true,
+      label: widget.semanticLabel ?? widget.label,
+      toggled: widget.value,
+      enabled: widget.enabled,
+      onTap: widget.enabled && widget.onChanged != null
+          ? () => widget.onChanged!(!widget.value)
+          : null,
+      child: ExcludeSemantics(child: content),
+    );
   }
 }

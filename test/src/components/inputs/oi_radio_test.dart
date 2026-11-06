@@ -67,4 +67,46 @@ void main() {
     await tester.pump();
     expect(selected, isNull);
   });
+
+  testWidgets('each option is a labelled, selectable node in a group', (
+    tester,
+  ) async {
+    final handle = tester.ensureSemantics();
+    String? picked;
+    await tester.pumpObers(
+      OiRadio<String>(
+        options: _kOptions,
+        value: _kOptions.first.value,
+        onChanged: (v) => picked = v,
+      ),
+    );
+
+    expect(
+      tester.getSemantics(find.bySemanticsLabel(_kOptions.first.label)),
+      matchesSemantics(
+        label: _kOptions.first.label,
+        hasCheckedState: true,
+        isChecked: true,
+        isInMutuallyExclusiveGroup: true,
+        hasEnabledState: true,
+        isEnabled: true,
+        hasTapAction: true,
+      ),
+    );
+
+    tester.semantics.tap(find.semantics.byLabel('Beta'));
+    expect(picked, 'b');
+
+    // The disabled option can't be picked.
+    expect(
+      tester.getSemantics(find.bySemanticsLabel('Gamma')),
+      matchesSemantics(
+        label: 'Gamma',
+        hasCheckedState: true,
+        isInMutuallyExclusiveGroup: true,
+        hasEnabledState: true,
+      ),
+    );
+    handle.dispose();
+  });
 }
