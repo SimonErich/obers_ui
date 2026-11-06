@@ -92,4 +92,56 @@ void main() {
     await tester.pump();
     expect(result, isNull);
   });
+
+  group('semantics', () {
+    testWidgets('names the box with its state and a tap action', (
+      tester,
+    ) async {
+      final handle = tester.ensureSemantics();
+      bool? result;
+      await tester.pumpObers(
+        OiCheckbox(
+          value: true,
+          semanticLabel: 'Accept terms',
+          onChanged: (v) => result = v,
+        ),
+      );
+
+      expect(
+        tester.getSemantics(find.bySemanticsLabel('Accept terms')),
+        matchesSemantics(
+          label: 'Accept terms',
+          hasCheckedState: true,
+          isChecked: true,
+          hasEnabledState: true,
+          isEnabled: true,
+          hasTapAction: true,
+        ),
+      );
+
+      tester.semantics.tap(find.semantics.byLabel('Accept terms'));
+      expect(result, isFalse);
+      handle.dispose();
+    });
+
+    testWidgets('an indeterminate box is mixed', (tester) async {
+      final handle = tester.ensureSemantics();
+      await tester.pumpObers(
+        OiCheckbox(value: null, label: 'All', onChanged: (_) {}),
+      );
+
+      expect(
+        tester.getSemantics(find.bySemanticsLabel('All')),
+        matchesSemantics(
+          label: 'All',
+          hasCheckedState: true,
+          isCheckStateMixed: true,
+          hasEnabledState: true,
+          isEnabled: true,
+          hasTapAction: true,
+        ),
+      );
+      handle.dispose();
+    });
+  });
 }

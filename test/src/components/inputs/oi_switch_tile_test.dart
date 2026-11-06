@@ -1,5 +1,8 @@
 // Tests do not require documentation comments.
 
+import 'dart:ui' show CheckedState, Tristate;
+
+import 'package:flutter/semantics.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui/obers_ui.dart';
 
@@ -156,6 +159,49 @@ void main() {
       await tester.pump();
 
       expect(result, isNull);
+    });
+  });
+
+  group('semantics', () {
+    // A tile is one node for screen readers; its switch / box / radio is only
+    // its picture, so nothing inside announces a second state.
+    int statefulNodes(WidgetTester tester, Finder tile) {
+      var count = 0;
+      void visit(SemanticsNode node) {
+        final data = node.getSemanticsData();
+        final flags = data.flagsCollection;
+        if (flags.isToggled != Tristate.none ||
+            flags.isChecked != CheckedState.none) {
+          count++;
+        }
+        node.visitChildren((child) {
+          visit(child);
+          return true;
+        });
+      }
+
+      visit(tester.getSemantics(tile));
+      return count;
+    }
+
+    testWidgets('OiSwitchTile is one toggled node', (tester) async {
+      final handle = tester.ensureSemantics();
+      await tester.pumpObers(
+        OiSwitchTile(title: 'Notifications', value: true, onChanged: (_) {}),
+      );
+
+      expect(statefulNodes(tester, find.byType(OiSwitchTile)), 1);
+      handle.dispose();
+    });
+
+    testWidgets('OiCheckboxTile is one checked node', (tester) async {
+      final handle = tester.ensureSemantics();
+      await tester.pumpObers(
+        OiCheckboxTile(title: 'Terms', value: true, onChanged: (_) {}),
+      );
+
+      expect(statefulNodes(tester, find.byType(OiCheckboxTile)), 1);
+      handle.dispose();
     });
   });
 }
