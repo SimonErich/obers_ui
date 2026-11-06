@@ -1,5 +1,8 @@
 // Tests do not require documentation comments.
 
+import 'dart:ui' show Tristate;
+
+import 'package:flutter/semantics.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui/src/components/navigation/oi_tabs.dart';
@@ -141,5 +144,38 @@ void main() {
       selectedText.style?.fontWeight,
       isNot(equals(unselectedText.style?.fontWeight)),
     );
+  });
+
+  group('semantics', () {
+    testWidgets('each tab is a tab; only the selected one is selected', (
+      tester,
+    ) async {
+      final handle = tester.ensureSemantics();
+      int? picked;
+      await tester.pumpObers(
+        OiTabs(tabs: _tabs, selectedIndex: 1, onSelected: (i) => picked = i),
+      );
+
+      for (final (label, selected) in [
+        ('Alpha', false),
+        ('Beta', true),
+        ('Gamma', false),
+      ]) {
+        final data = tester
+            .getSemantics(find.bySemanticsLabel(label))
+            .getSemanticsData();
+        expect(data.role, SemanticsRole.tab, reason: label);
+        expect(
+          data.flagsCollection.isSelected,
+          selected ? Tristate.isTrue : Tristate.isFalse,
+          reason: label,
+        );
+        expect(data.hasAction(SemanticsAction.tap), isTrue, reason: label);
+      }
+
+      tester.semantics.tap(find.semantics.byLabel('Gamma'));
+      expect(picked, 2);
+      handle.dispose();
+    });
   });
 }
