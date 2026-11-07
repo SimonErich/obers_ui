@@ -11,8 +11,8 @@ import 'package:obers_ui/src/foundation/oi_accessibility.dart';
 /// minSize instead.
 ///
 /// This widget only inflates the layout size — the child's visual appearance
-/// is unchanged. The extra area is transparent; a tap in it counts as a tap
-/// on the child's centre, ensuring WCAG minimum tap-target compliance. A
+/// is unchanged. The extra area is transparent; a tap in it reaches the
+/// child, ensuring WCAG minimum tap-target compliance. A
 /// child smaller than the target is placed in it by [alignment] (centred by
 /// default), so a small icon lines up with the controls around it.
 ///
@@ -206,23 +206,31 @@ class _RenderTouchTargetPadding extends RenderShiftedBox {
     );
   }
 
-  // A tap in the padding around a smaller child counts as a tap on the
-  // child's centre, so a gesture detector inside this widget gets the whole
-  // touch target, not only the child's own area (as Material's buttons do).
-  // A tap on the child itself is left alone, so a transparent spot there
-  // stays transparent.
+  // A tap in the padding reaches the child, so a gesture detector inside
+  // this widget gets the whole touch target, not only the child's own area.
+  // The tap moves onto the child across it and keeps its place along it: a
+  // tap above a wide row hits what is below it in the row, a tap beside a
+  // small icon hits the icon's middle. A tap on the child itself is left
+  // alone, so a transparent spot there stays transparent.
   @override
   bool hitTest(BoxHitTestResult result, {required Offset position}) {
     if (super.hitTest(result, position: position)) return true;
     final child = this.child;
     if (child == null || !size.contains(position)) return false;
-    final childOffset = (child.parentData! as BoxParentData).offset;
-    if ((childOffset & child.size).contains(position)) return false;
-    final center = child.size.center(Offset.zero);
+    final childRect = (child.parentData! as BoxParentData).offset & child.size;
+    if (childRect.contains(position)) return false;
+    final local = Offset(
+      position.dx >= childRect.left && position.dx < childRect.right
+          ? position.dx - childRect.left
+          : child.size.width / 2,
+      position.dy >= childRect.top && position.dy < childRect.bottom
+          ? position.dy - childRect.top
+          : child.size.height / 2,
+    );
     return result.addWithRawTransform(
-      transform: MatrixUtils.forceToPoint(center),
-      position: center,
-      hitTest: (result, position) => child.hitTest(result, position: center),
+      transform: MatrixUtils.forceToPoint(local),
+      position: local,
+      hitTest: (result, position) => child.hitTest(result, position: local),
     );
   }
 
