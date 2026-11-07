@@ -123,7 +123,14 @@ class OiSelect<T> extends StatefulWidget {
 }
 
 class _OiSelectState<T> extends State<OiSelect<T>> {
+  static const _itemHeight = 44.0;
+  static const _maxListHeight = 300.0;
+
   bool _open = false;
+
+  /// Scrolls the menu of the current opening; made fresh on each open so
+  /// the menu starts with the selected option in view.
+  ScrollController? _listCtrl;
   bool _hovered = false;
   String _query = '';
   late TextEditingController _searchCtrl;
@@ -159,6 +166,7 @@ class _OiSelectState<T> extends State<OiSelect<T>> {
     _scope?.removeListener(_onScopeChanged);
     _searchCtrl.dispose();
     _searchFocus.dispose();
+    _listCtrl?.dispose();
     super.dispose();
   }
 
@@ -174,6 +182,10 @@ class _OiSelectState<T> extends State<OiSelect<T>> {
     if (!widget.enabled) return;
     _query = '';
     _searchCtrl.clear();
+    // The closed menu is out of the tree, so the old controller is free.
+    final previous = _listCtrl;
+    if (previous != null && !previous.hasClients) previous.dispose();
+    _listCtrl = ScrollController(initialScrollOffset: _initialOffset());
     _scope?.requestOpen(widget.key ?? this);
     setState(() => _open = true);
     if (widget.searchable) {
@@ -194,6 +206,26 @@ class _OiSelectState<T> extends State<OiSelect<T>> {
     _close();
   }
 
+  /// The height the menu's list gets for [count] options.
+  static double _listHeight(int count) =>
+      (_itemHeight * count).clamp(0.0, _maxListHeight);
+
+  /// Where the list starts so the selected option is in view, in the
+  /// middle when the list scrolls that far; 0 without a value or when all
+  /// options fit.
+  double _initialOffset() {
+    final options = widget.options;
+    final index = widget.value == null
+        ? -1
+        : options.indexWhere((o) => o.value == widget.value);
+    if (index < 0) return 0;
+    final height = _listHeight(options.length);
+    final maxOffset = _itemHeight * options.length - height;
+    if (maxOffset <= 0) return 0;
+    final centred = _itemHeight * index - (height - _itemHeight) / 2;
+    return centred.clamp(0.0, maxOffset);
+  }
+
   String? get _selectedLabel {
     if (widget.value == null) return null;
     for (final o in widget.options) {
@@ -205,8 +237,7 @@ class _OiSelectState<T> extends State<OiSelect<T>> {
   Widget _buildDropdown(BuildContext context) {
     final colors = context.colors;
     final filtered = _filtered;
-    const itemHeight = 44.0;
-    final maxHeight = (itemHeight * 6).clamp(0.0, 300.0);
+    const itemHeight = _itemHeight;
 
     return DecoratedBox(
       decoration: BoxDecoration(
@@ -235,7 +266,11 @@ class _OiSelectState<T> extends State<OiSelect<T>> {
                   controller: _searchCtrl,
                   focusNode: _searchFocus,
                   placeholder: widget.searchPlaceholder,
-                  onChanged: (v) => setState(() => _query = v),
+                  onChanged: (v) {
+                    // A new query lists from its first match.
+                    if (_listCtrl?.hasClients ?? false) _listCtrl?.jumpTo(0);
+                    setState(() => _query = v);
+                  },
                 ),
               ),
             if (filtered.isEmpty)
@@ -248,8 +283,9 @@ class _OiSelectState<T> extends State<OiSelect<T>> {
               )
             else
               SizedBox(
-                height: (itemHeight * filtered.length).clamp(0.0, maxHeight),
+                height: _listHeight(filtered.length),
                 child: OiVirtualList(
+                  controller: _listCtrl,
                   itemCount: filtered.length,
                   itemBuilder: (ctx, i) {
                     final option = filtered[i];

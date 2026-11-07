@@ -79,6 +79,55 @@ void main() {
     expect(find.text('Banana'), findsOneWidget);
   });
 
+  testWidgets('opens with the selected option in view', (tester) async {
+    final options = [
+      for (var i = 0; i < 30; i++) OiSelectOption(value: i, label: 'Option $i'),
+    ];
+    await tester.pumpObers(OiSelect<int>(options: options, value: 20));
+    await tester.tap(find.byType(GestureDetector).first);
+    await tester.pumpAndSettle();
+
+    // The trigger and the menu both show it; the top of the list is not
+    // built, the menu starts further down.
+    expect(find.text('Option 20'), findsNWidgets(2));
+    expect(find.text('Option 0'), findsNothing);
+  });
+
+  testWidgets('a search lists from its first match', (tester) async {
+    final options = [
+      for (var i = 0; i < 30; i++) OiSelectOption(value: i, label: 'Option $i'),
+    ];
+    await tester.pumpObers(
+      OiSelect<int>(options: options, value: 25, searchable: true),
+    );
+    await tester.tap(find.byType(GestureDetector).first);
+    await tester.pumpAndSettle();
+    expect(find.text('Option 1'), findsNothing);
+
+    // Eleven matches (1, 10–19): more than the menu shows at once.
+    await tester.enterText(find.byType(EditableText), 'Option 1');
+    await tester.pumpAndSettle();
+
+    // Not the search field, which holds the query: the row.
+    expect(
+      find.byWidgetPredicate((w) => w is Text && w.data == 'Option 1'),
+      findsOneWidget,
+    );
+    expect(find.text('Option 19'), findsNothing);
+  });
+
+  testWidgets('opens at the top without a value', (tester) async {
+    final options = [
+      for (var i = 0; i < 30; i++) OiSelectOption(value: i, label: 'Option $i'),
+    ];
+    await tester.pumpObers(OiSelect<int>(options: options));
+    await tester.tap(find.byType(GestureDetector).first);
+    await tester.pumpAndSettle();
+
+    expect(find.text('Option 0'), findsOneWidget);
+    expect(find.text('Option 20'), findsNothing);
+  });
+
   testWidgets('selecting option calls onChanged', (tester) async {
     // The dropdown items are inside a CompositedTransformFollower overlay which
     // is not hittable in widget tests; verify the callback wiring by triggering

@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `OiSelect` opens its menu with the selected option in view instead of at the top
 - Initial package scaffold with directory structure
 - Test infrastructure (widget tests, golden tests)
 - Example catalog app
