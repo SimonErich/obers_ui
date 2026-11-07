@@ -69,10 +69,13 @@ class OiSwitchTile extends StatelessWidget {
       dense: dense,
       enabled: enabled,
       onTap: enabled ? () => onChanged(!value) : null,
-      trailing: OiSwitch(
-        value: value,
-        onChanged: enabled ? onChanged : null,
-        enabled: enabled,
+      // The tile is the one semantics node; the switch is only its picture.
+      trailing: ExcludeSemantics(
+        child: OiSwitch(
+          value: value,
+          onChanged: enabled ? onChanged : null,
+          enabled: enabled,
+        ),
       ),
     );
 
@@ -177,10 +180,13 @@ class OiCheckboxTile extends StatelessWidget {
       dense: dense,
       enabled: enabled,
       onTap: enabled ? _handleTap : null,
-      trailing: OiCheckbox(
-        value: value,
-        onChanged: enabled ? onChanged : null,
-        enabled: enabled,
+      // The tile is the one semantics node; the checkbox is only its picture.
+      trailing: ExcludeSemantics(
+        child: OiCheckbox(
+          value: value,
+          onChanged: enabled ? onChanged : null,
+          enabled: enabled,
+        ),
       ),
     );
 
@@ -280,7 +286,8 @@ class OiRadioTile<T> extends StatelessWidget {
       enabled: enabled,
       selected: isSelected,
       onTap: enabled ? () => onChanged(value) : null,
-      trailing: radioIndicator,
+      // The tile is the one semantics node; the radio is only its picture.
+      trailing: ExcludeSemantics(child: radioIndicator),
     );
 
     if (contentPadding != null) {

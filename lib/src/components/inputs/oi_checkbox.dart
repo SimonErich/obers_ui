@@ -22,6 +22,7 @@ class OiCheckbox extends StatefulWidget {
     this.labelStyle,
     this.labelGap,
     this.enabled = true,
+    this.semanticLabel,
     super.key,
   });
 
@@ -48,6 +49,12 @@ class OiCheckbox extends StatefulWidget {
 
   /// Whether the checkbox responds to taps.
   final bool enabled;
+
+  /// The name screen readers announce, when there is no visible [label] (the
+  /// surrounding UI shows the text), or to say it differently.
+  ///
+  /// Defaults to [label]. Nothing is drawn for it.
+  final String? semanticLabel;
 
   @override
   State<OiCheckbox> createState() => _OiCheckboxState();
@@ -120,14 +127,28 @@ class _OiCheckboxState extends State<OiCheckbox> {
       );
     }
 
-    return MouseRegion(
-      cursor: isActive ? SystemMouseCursors.click : SystemMouseCursors.basic,
-      onEnter: (_) => setState(() => _hovered = true),
-      onExit: (_) => setState(() => _hovered = false),
-      child: GestureDetector(
-        onTap: isActive ? _handleTap : null,
-        behavior: HitTestBehavior.opaque,
-        child: box,
+    // One node for screen readers: named, checked / unchecked / mixed, with a
+    // tap action.
+    return Semantics(
+      container: true,
+      label: widget.semanticLabel ?? widget.label,
+      checked: widget.value ?? false,
+      mixed: widget.value == null,
+      enabled: widget.enabled,
+      onTap: isActive ? _handleTap : null,
+      child: ExcludeSemantics(
+        child: MouseRegion(
+          cursor: isActive
+              ? SystemMouseCursors.click
+              : SystemMouseCursors.basic,
+          onEnter: (_) => setState(() => _hovered = true),
+          onExit: (_) => setState(() => _hovered = false),
+          child: GestureDetector(
+            onTap: isActive ? _handleTap : null,
+            behavior: HitTestBehavior.opaque,
+            child: box,
+          ),
+        ),
       ),
     );
   }

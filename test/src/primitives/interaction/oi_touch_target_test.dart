@@ -3,6 +3,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:obers_ui/src/components/buttons/oi_button.dart';
 import 'package:obers_ui/src/foundation/oi_app.dart';
 import 'package:obers_ui/src/foundation/oi_platform.dart';
 import 'package:obers_ui/src/primitives/interaction/oi_touch_target.dart';
@@ -130,5 +131,64 @@ void main() {
       expect(size.height, greaterThanOrEqualTo(48));
     },
     variant: TargetPlatformVariant.only(TargetPlatform.linux),
+  );
+
+  // ── 5. The child is centred in the inflated area ──────────────────────────
+
+  testWidgets(
+    'OiTouchTarget centres the child in the inflated area',
+    (tester) async {
+      await tester.pumpWidget(
+        touchApp(
+          const Center(
+            child: OiTouchTarget(
+              child: SizedBox(key: Key('child'), width: 24, height: 24),
+            ),
+          ),
+        ),
+      );
+      await tester.pump();
+
+      expect(tester.getSize(find.byType(OiTouchTarget)), const Size(48, 48));
+      expect(
+        tester.getCenter(find.byKey(const Key('child'))),
+        tester.getCenter(find.byType(OiTouchTarget)),
+      );
+    },
+    variant: TargetPlatformVariant.only(TargetPlatform.android),
+  );
+
+  testWidgets(
+    'buttons of different variants line up in a row on touch',
+    (tester) async {
+      await tester.pumpWidget(
+        touchApp(
+          Center(
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                OiButton.secondary(
+                  key: const Key('filled'),
+                  label: 'Save',
+                  onTap: () {},
+                ),
+                OiButton.ghost(
+                  key: const Key('ghost'),
+                  label: 'Cancel',
+                  onTap: () {},
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+      await tester.pump();
+
+      expect(
+        tester.getCenter(find.text('Save')).dy,
+        tester.getCenter(find.text('Cancel')).dy,
+      );
+    },
+    variant: TargetPlatformVariant.only(TargetPlatform.android),
   );
 }
