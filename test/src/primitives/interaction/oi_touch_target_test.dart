@@ -376,4 +376,36 @@ void main() {
     },
     variant: TargetPlatformVariant.only(TargetPlatform.android),
   );
+
+  // ── 12. A drag that starts in the padding keeps its movement ───────────────
+
+  testWidgets(
+    'OiTouchTarget passes the movement of a drag from the padding',
+    (tester) async {
+      var moved = Offset.zero;
+      await tester.pumpWidget(
+        touchApp(
+          Center(
+            child: OiTouchTarget(
+              child: GestureDetector(
+                onPanUpdate: (details) => moved += details.delta,
+                child: const ColoredBox(
+                  color: Color(0xFF000000),
+                  child: SizedBox(width: 24, height: 24),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+
+      final target = tester.getRect(find.byType(OiTouchTarget));
+      await tester.dragFrom(
+        target.topLeft + const Offset(2, 2),
+        const Offset(60, 0),
+      );
+      expect(moved.dx, greaterThan(0));
+    },
+    variant: TargetPlatformVariant.only(TargetPlatform.android),
+  );
 }
