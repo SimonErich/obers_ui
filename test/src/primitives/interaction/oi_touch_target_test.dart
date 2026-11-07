@@ -191,4 +191,90 @@ void main() {
     },
     variant: TargetPlatformVariant.only(TargetPlatform.android),
   );
+
+  // ── 6. alignment places a small child ──────────────────────────────────────
+
+  testWidgets(
+    'OiTouchTarget places a small child by alignment',
+    (tester) async {
+      await tester.pumpWidget(
+        touchApp(
+          const Center(
+            child: OiTouchTarget(
+              alignment: AlignmentDirectional.topStart,
+              child: SizedBox(key: Key('mark'), width: 24, height: 24),
+            ),
+          ),
+        ),
+      );
+
+      final target = tester.getRect(find.byType(OiTouchTarget));
+      final mark = tester.getRect(find.byKey(const Key('mark')));
+      expect(mark.topLeft, target.topLeft);
+    },
+    variant: TargetPlatformVariant.only(TargetPlatform.android),
+  );
+
+  // ── 7. A slot that forces the width keeps the child at full width ──────────
+
+  testWidgets(
+    'OiTouchTarget passes a forced width through to the child',
+    (tester) async {
+      await tester.pumpWidget(
+        touchApp(
+          const Align(
+            alignment: Alignment.topLeft,
+            child: SizedBox(
+              width: 300,
+              child: OiTouchTarget(
+                child: SizedBox(key: Key('row'), height: 20),
+              ),
+            ),
+          ),
+        ),
+      );
+
+      final target = tester.getRect(find.byType(OiTouchTarget));
+      final row = tester.getRect(find.byKey(const Key('row')));
+      expect(target.size, const Size(300, 48));
+      expect(row.left, target.left);
+      expect(row.width, 300);
+      expect(row.center.dy, target.center.dy);
+    },
+    variant: TargetPlatformVariant.only(TargetPlatform.android),
+  );
+
+  // ── 8. Intrinsic sizes include the touch target ────────────────────────────
+
+  testWidgets(
+    'OiTouchTarget reports the touch target as its intrinsic size',
+    (tester) async {
+      await tester.pumpWidget(
+        touchApp(
+          Align(
+            alignment: Alignment.topLeft,
+            child: IntrinsicHeight(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const OiTouchTarget(
+                    child: SizedBox(key: Key('mark'), width: 24, height: 24),
+                  ),
+                  Container(key: const Key('neighbour'), width: 10),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+
+      expect(tester.takeException(), isNull);
+      expect(tester.getSize(find.byKey(const Key('neighbour'))).height, 48);
+      final target = tester.getRect(find.byType(OiTouchTarget));
+      final mark = tester.getRect(find.byKey(const Key('mark')));
+      expect(target.size, const Size(48, 48));
+      expect(mark.center, target.center);
+    },
+    variant: TargetPlatformVariant.only(TargetPlatform.android),
+  );
 }

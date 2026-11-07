@@ -205,6 +205,28 @@ void main() {
     variant: TargetPlatformVariant.only(TargetPlatform.linux),
   );
 
+  testWidgets(
+    'touch device: touchTargetAlignment places a small child',
+    (tester) async {
+      await tester.pumpWidget(
+        touchApp(
+          Center(
+            child: OiTappable(
+              onTap: () {},
+              touchTargetAlignment: AlignmentDirectional.centerStart,
+              child: const SizedBox(key: Key('mark'), width: 20, height: 20),
+            ),
+          ),
+        ),
+      );
+
+      final target = tester.getRect(find.byType(OiTappable));
+      final mark = tester.getRect(find.byKey(const Key('mark')));
+      expect(mark.left, target.left);
+      expect(mark.center.dy, target.center.dy);
+    },
+  );
+
   // ── TC-touch-compact: compact density still enforces 48dp on touch ────────
   // Density no longer suppresses the 48 dp touch-target floor — touch
   // targets are always enforced on touch devices regardless of density.

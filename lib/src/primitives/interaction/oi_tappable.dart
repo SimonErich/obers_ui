@@ -40,6 +40,7 @@ class OiTappable extends StatefulWidget {
     this.semanticLabel,
     this.cursor,
     this.clipBorderRadius,
+    this.touchTargetAlignment = Alignment.center,
     super.key,
   });
 
@@ -109,6 +110,12 @@ class OiTappable extends StatefulWidget {
   /// clipped to this radius so they match the visible shape of the child
   /// (e.g. a rounded button).
   final BorderRadius? clipBorderRadius;
+
+  /// Where [child] sits in the minimum touch target when it is smaller
+  /// (touch devices only; see [OiTouchTarget.alignment]).
+  ///
+  /// Defaults to [Alignment.center].
+  final AlignmentGeometry touchTargetAlignment;
 
   @override
   State<OiTappable> createState() => _OiTappableState();
@@ -333,7 +340,11 @@ class _OiTappableState extends State<OiTappable> {
     // zero) so the widget-tree structure stays stable across input-modality
     // changes (pointer ↔ touch). With minTarget == 0, OiTouchTarget.custom
     // behaves as a no-op pass-through.
-    content = OiTouchTarget.custom(minSize: minTarget, child: content);
+    content = OiTouchTarget.custom(
+      minSize: minTarget,
+      alignment: widget.touchTargetAlignment,
+      child: content,
+    );
 
     // Gesture detection.
     content = GestureDetector(
