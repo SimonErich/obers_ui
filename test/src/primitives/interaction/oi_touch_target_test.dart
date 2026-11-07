@@ -336,4 +336,44 @@ void main() {
     },
     variant: TargetPlatformVariant.only(TargetPlatform.android),
   );
+
+  // ── 11. A tap above a wide row hits what is below it ──────────────────────
+
+  testWidgets(
+    'OiTouchTarget keeps a padding tap in place along a wide child',
+    (tester) async {
+      final taps = <String>[];
+      Widget part(String name) => Expanded(
+        child: GestureDetector(
+          onTap: () => taps.add(name),
+          child: const ColoredBox(color: Color(0xFF000000)),
+        ),
+      );
+      await tester.pumpWidget(
+        touchApp(
+          Align(
+            alignment: Alignment.topLeft,
+            child: SizedBox(
+              width: 300,
+              child: OiTouchTarget(
+                child: SizedBox(
+                  height: 20,
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [part('left'), part('middle'), part('right')],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+
+      final target = tester.getRect(find.byType(OiTouchTarget));
+      await tester.tapAt(target.topLeft + const Offset(10, 2));
+      await tester.tapAt(target.bottomRight - const Offset(10, 2));
+      expect(taps, ['left', 'right']);
+    },
+    variant: TargetPlatformVariant.only(TargetPlatform.android),
+  );
 }
