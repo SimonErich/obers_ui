@@ -3,6 +3,9 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui/src/components/inputs/oi_text_input.dart';
+import 'package:obers_ui/src/foundation/oi_icons.dart';
+import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
+import 'package:obers_ui/src/foundation/theme/oi_theme_data.dart';
 import 'package:obers_ui/src/primitives/input/oi_raw_input.dart';
 
 import '../../../helpers/pump_app.dart';
@@ -62,5 +65,51 @@ void main() {
   testWidgets('uses OiRawInput internally', (tester) async {
     await tester.pumpObers(const OiTextInput());
     expect(find.byType(OiRawInput), findsOneWidget);
+  });
+
+  group('slot icon colour', () {
+    Color iconColor(WidgetTester tester, IconData icon) =>
+        IconTheme.of(tester.element(find.byIcon(icon))).color!;
+
+    for (final dark in [false, true]) {
+      testWidgets('the search icon is readable in ${dark ? 'dark' : 'light'}', (
+        tester,
+      ) async {
+        await tester.pumpObers(
+          const SizedBox(width: 300, child: OiTextInput.search()),
+          theme: dark ? OiThemeData.dark() : OiThemeData.light(),
+        );
+
+        final colors = tester.element(find.byType(OiTextInput)).colors;
+        expect(iconColor(tester, OiIcons.search), colors.textMuted);
+        expect(
+          iconColor(tester, OiIcons.search),
+          isNot(const Color(0xFF000000)),
+        );
+      });
+    }
+
+    testWidgets('a trailing icon gets the colour too; its own colour wins', (
+      tester,
+    ) async {
+      await tester.pumpObers(
+        const SizedBox(
+          width: 300,
+          child: OiTextInput(
+            leading: Icon(OiIcons.search),
+            trailing: Icon(OiIcons.check, color: Color(0xFF123456)),
+          ),
+        ),
+        theme: OiThemeData.dark(),
+      );
+
+      final colors = tester.element(find.byType(OiTextInput)).colors;
+      expect(iconColor(tester, OiIcons.search), colors.textMuted);
+      // The Icon widget's own colour is used in place of the theme's.
+      expect(
+        tester.widget<Icon>(find.byIcon(OiIcons.check)).color,
+        const Color(0xFF123456),
+      );
+    });
   });
 }

@@ -64,11 +64,20 @@ class OiInputFrame extends StatelessWidget {
     final effectivePadding =
         padding ?? const EdgeInsets.symmetric(horizontal: 12, vertical: 8);
 
+    // Icons in the slots take a theme colour; without it they fall back to
+    // black, which disappears on a dark surface. An icon's own colour wins.
+    final iconTheme = IconThemeData(color: colors.textMuted);
     final row = Row(
       children: [
-        if (leading != null) ...[leading!, SizedBox(width: leadingGap)],
+        if (leading != null) ...[
+          IconTheme.merge(data: iconTheme, child: leading!),
+          SizedBox(width: leadingGap),
+        ],
         Expanded(child: child),
-        if (trailing != null) ...[SizedBox(width: trailingGap), trailing!],
+        if (trailing != null) ...[
+          SizedBox(width: trailingGap),
+          IconTheme.merge(data: iconTheme, child: trailing!),
+        ],
       ],
     );
 
