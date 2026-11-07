@@ -12,9 +12,9 @@ import 'package:obers_ui/src/foundation/oi_accessibility.dart';
 ///
 /// This widget only inflates the layout size — the child's visual appearance
 /// is unchanged. The extra area is transparent; a tap in it reaches the
-/// child, ensuring WCAG minimum tap-target compliance. A
-/// child smaller than the target is placed in it by [alignment] (centred by
-/// default), so a small icon lines up with the controls around it.
+/// child, ensuring WCAG minimum tap-target compliance. A child smaller than
+/// the target is placed in it by [alignment] (centred by default), so a small
+/// icon lines up with the controls around it.
 ///
 /// The child gets the incoming constraints unchanged: in a slot that forces
 /// its width (an `Expanded` row) it fills that width, and only its height
