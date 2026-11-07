@@ -54,6 +54,9 @@ class OiTextInput extends StatefulWidget {
 
   /// Creates a search-style [OiTextInput] with a leading search icon,
   /// "Search\u2026" placeholder, and [TextInputAction.search].
+  ///
+  /// Pass [placeholder] and [leading] to override the defaults, e.g. for a
+  /// command palette that filters commands rather than searching content.
   const OiTextInput.search({
     this.controller,
     this.onChanged,
@@ -61,12 +64,12 @@ class OiTextInput extends StatefulWidget {
     this.autofocus = false,
     this.enabled = true,
     this.focusNode,
+    this.placeholder = 'Search\u2026',
+    this.leading = const Icon(OiIcons.search, size: 18),
     super.key,
   }) : label = null,
        hint = null,
-       placeholder = 'Search\u2026',
        error = null,
-       leading = const Icon(OiIcons.search, size: 18),
        trailing = null,
        maxLines = 1,
        minLines = null,
