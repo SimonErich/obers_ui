@@ -277,4 +277,63 @@ void main() {
     },
     variant: TargetPlatformVariant.only(TargetPlatform.android),
   );
+
+  // ── 9. A tap in the padding reaches a gesture detector inside ──────────────
+
+  testWidgets(
+    'OiTouchTarget sends a tap in the padding to the child',
+    (tester) async {
+      var taps = 0;
+      await tester.pumpWidget(
+        touchApp(
+          Center(
+            child: OiTouchTarget(
+              child: GestureDetector(
+                onTap: () => taps++,
+                child: const ColoredBox(
+                  color: Color(0xFF000000),
+                  child: SizedBox(width: 24, height: 24),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+
+      final target = tester.getRect(find.byType(OiTouchTarget));
+      await tester.tapAt(target.topLeft + const Offset(2, 2));
+      await tester.tapAt(target.bottomRight - const Offset(2, 2));
+      expect(taps, 2);
+    },
+    variant: TargetPlatformVariant.only(TargetPlatform.android),
+  );
+
+  // ── 10. Outside the touch target nothing is hit ────────────────────────────
+
+  testWidgets(
+    'OiTouchTarget ignores a tap outside the touch target',
+    (tester) async {
+      var taps = 0;
+      await tester.pumpWidget(
+        touchApp(
+          Center(
+            child: OiTouchTarget(
+              child: GestureDetector(
+                onTap: () => taps++,
+                child: const ColoredBox(
+                  color: Color(0xFF000000),
+                  child: SizedBox(width: 24, height: 24),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+
+      final target = tester.getRect(find.byType(OiTouchTarget));
+      await tester.tapAt(target.topLeft - const Offset(4, 4));
+      expect(taps, 0);
+    },
+    variant: TargetPlatformVariant.only(TargetPlatform.android),
+  );
 }
