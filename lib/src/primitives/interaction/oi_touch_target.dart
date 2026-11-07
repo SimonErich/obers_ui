@@ -227,10 +227,13 @@ class _RenderTouchTargetPadding extends RenderShiftedBox {
           ? position.dy - childRect.top
           : child.size.height / 2,
     );
-    return result.addWithRawTransform(
-      transform: MatrixUtils.forceToPoint(local),
-      position: local,
-      hitTest: (result, position) => child.hitTest(result, position: local),
+    // Shifted by a fixed offset rather than pinned to one point, so a drag
+    // that starts here still moves.
+    return result.addWithPaintOffset(
+      offset: position - local,
+      position: position,
+      hitTest: (result, transformed) =>
+          child.hitTest(result, position: transformed),
     );
   }
 
