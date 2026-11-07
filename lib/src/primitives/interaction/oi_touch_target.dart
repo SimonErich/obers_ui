@@ -11,11 +11,10 @@ import 'package:obers_ui/src/foundation/oi_accessibility.dart';
 /// minSize instead.
 ///
 /// This widget only inflates the layout size — the child's visual appearance
-/// is unchanged. The extra area is transparent; it responds to taps when a
-/// gesture detector wraps this widget (as `OiTappable` does), ensuring WCAG
-/// minimum tap-target compliance. A child smaller than the target is placed
-/// in it by [alignment] (centred by default), so a small icon lines up with
-/// the controls around it.
+/// is unchanged. The extra area is transparent; a tap in it counts as a tap
+/// on the child's centre, ensuring WCAG minimum tap-target compliance. A
+/// child smaller than the target is placed in it by [alignment] (centred by
+/// default), so a small icon lines up with the controls around it.
 ///
 /// The child gets the incoming constraints unchanged: in a slot that forces
 /// its width (an `Expanded` row) it fills that width, and only its height
@@ -204,6 +203,26 @@ class _RenderTouchTargetPadding extends RenderShiftedBox {
     (child.parentData! as BoxParentData).offset = _childOffset(
       size,
       child.size,
+    );
+  }
+
+  // A tap in the padding around a smaller child counts as a tap on the
+  // child's centre, so a gesture detector inside this widget gets the whole
+  // touch target, not only the child's own area (as Material's buttons do).
+  // A tap on the child itself is left alone, so a transparent spot there
+  // stays transparent.
+  @override
+  bool hitTest(BoxHitTestResult result, {required Offset position}) {
+    if (super.hitTest(result, position: position)) return true;
+    final child = this.child;
+    if (child == null || !size.contains(position)) return false;
+    final childOffset = (child.parentData! as BoxParentData).offset;
+    if ((childOffset & child.size).contains(position)) return false;
+    final center = child.size.center(Offset.zero);
+    return result.addWithRawTransform(
+      transform: MatrixUtils.forceToPoint(center),
+      position: center,
+      hitTest: (result, position) => child.hitTest(result, position: center),
     );
   }
 
