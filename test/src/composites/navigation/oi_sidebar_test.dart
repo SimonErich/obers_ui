@@ -263,9 +263,7 @@ void main() {
 
   testWidgets(
     'selected nested destinations reveal their parent automatically',
-    (
-      tester,
-    ) async {
+    (tester) async {
       await tester.pumpObers(_sidebar(selectedId: 'task_1'));
       await tester.pumpAndSettle();
       expect(find.text('Task 1').hitTestable(), findsOneWidget);
@@ -334,6 +332,43 @@ void main() {
       // Icons should still be present.
       expect(find.byType(Icon), findsWidgets);
     });
+
+    testWidgets(
+      'compact mode with horizontal theme padding does not overflow',
+      (tester) async {
+        final base = OiThemeData.light();
+        await tester.pumpObers(
+          SizedBox(
+            width: 64,
+            height: 600,
+            child: OiSidebar(
+              sections: _sections,
+              selectedId: 'home',
+              onSelect: (_) {},
+              label: 'Test sidebar',
+              mode: OiSidebarMode.compact,
+              compactWidth: 64,
+            ),
+          ),
+          theme: base.copyWith(
+            components: base.components.copyWith(
+              sidebar: const OiSidebarThemeData(
+                width: 264,
+                compactWidth: 64,
+                iconWidth: 24,
+                iconSize: 18,
+                itemPadding: EdgeInsets.symmetric(horizontal: 12),
+                padding: EdgeInsets.fromLTRB(12, 2, 12, 0),
+              ),
+            ),
+          ),
+        );
+
+        expect(tester.takeException(), isNull);
+        expect(find.text('Main'), findsNothing);
+        expect(find.byType(Icon), findsWidgets);
+      },
+    );
 
     testWidgets('hidden mode shows nothing', (tester) async {
       await tester.pumpObers(_sidebar(mode: OiSidebarMode.hidden));

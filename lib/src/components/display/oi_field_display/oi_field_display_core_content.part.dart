@@ -77,32 +77,41 @@ extension _OiFieldDisplayCoreContent on OiFieldDisplay {
   }
 
   Widget _buildEmpty(BuildContext context) {
-    final colors = context.colors;
-    return OiLabel.small(emptyText, color: colors.textMuted);
+    final theme = context.components.fieldDisplay;
+    return OiLabel.body(
+      emptyText,
+      color: theme?.emptyStyle?.color ?? context.colors.textMuted,
+      style: theme?.emptyStyle,
+    );
   }
 
   Widget _buildCustomFormatted(BuildContext context) {
+    final theme = context.components.fieldDisplay;
     try {
       final formatted = formatValue!(value);
-      return OiLabel.small(
+      return OiLabel.body(
         formatted,
         maxLines: maxLines,
         overflow: maxLines != null ? TextOverflow.ellipsis : null,
+        style: theme?.valueStyle,
       );
     } on Exception catch (_) {
-      return OiLabel.small(
+      return OiLabel.body(
         _valueString,
         maxLines: maxLines,
         overflow: maxLines != null ? TextOverflow.ellipsis : null,
+        style: theme?.valueStyle,
       );
     }
   }
 
   Widget _buildTextDisplay(BuildContext context) {
-    return OiLabel.small(
+    final theme = context.components.fieldDisplay;
+    return OiLabel.body(
       _valueString,
       maxLines: maxLines,
       overflow: maxLines != null ? TextOverflow.ellipsis : null,
+      style: theme?.valueStyle,
     );
   }
 }

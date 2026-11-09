@@ -7,6 +7,7 @@ import 'package:obers_ui/src/components/display/oi_code_block.dart';
 import 'package:obers_ui/src/components/display/oi_image.dart';
 import 'package:obers_ui/src/components/display/oi_tooltip.dart';
 import 'package:obers_ui/src/foundation/oi_icons.dart';
+import 'package:obers_ui/src/foundation/theme/oi_text_theme.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/models/oi_field_type.dart';
 import 'package:obers_ui/src/primitives/clipboard/oi_copyable.dart';

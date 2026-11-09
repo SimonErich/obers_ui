@@ -2,6 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/display/oi_card.dart';
 import 'package:obers_ui/src/components/display/oi_field_display.dart';
 import 'package:obers_ui/src/foundation/oi_responsive.dart';
+import 'package:obers_ui/src/foundation/theme/oi_text_theme.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/primitives/clipboard/oi_copyable.dart';
 import 'package:obers_ui/src/primitives/display/oi_label.dart';
@@ -134,6 +135,7 @@ class OiKeyValue extends StatelessWidget {
 
     final hasValue = value != null && value!.isNotEmpty;
     final displayValue = hasValue ? value! : emptyText;
+    final fieldTheme = context.components.fieldDisplay;
 
     Widget valueContent;
     if (valueWidget != null) {
@@ -141,18 +143,32 @@ class OiKeyValue extends StatelessWidget {
     } else if (copyable && hasValue) {
       valueContent = OiCopyable(
         value: value!,
-        child: OiLabel.body(displayValue, color: colors.text),
+        child: OiLabel.body(
+          displayValue,
+          color: fieldTheme?.valueStyle?.color ?? colors.text,
+          style: fieldTheme?.valueStyle,
+        ),
       );
     } else {
       valueContent = OiLabel.body(
         displayValue,
-        color: hasValue ? colors.text : colors.textMuted,
+        color: hasValue
+            ? (fieldTheme?.valueStyle?.color ?? colors.text)
+            : (fieldTheme?.emptyStyle?.color ?? colors.textMuted),
+        style: hasValue ? fieldTheme?.valueStyle : fieldTheme?.emptyStyle,
       );
     }
 
     final labelContent = SizedBox(
       width: effectiveDirection == Axis.horizontal ? labelWidth : null,
-      child: labelWidget ?? OiLabel.small(label, color: colors.textSubtle),
+      child:
+          labelWidget ??
+          OiLabel.variant(
+            label,
+            variant: OiLabelVariant.small,
+            color: fieldTheme?.labelStyle?.color ?? colors.textSubtle,
+            style: fieldTheme?.labelStyle,
+          ),
     );
 
     final paddingVertical = dense ? spacing.xs / 2 : spacing.xs;

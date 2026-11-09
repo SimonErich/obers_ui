@@ -444,7 +444,13 @@ class _OiSidebarState extends State<OiSidebar>
                 if (widget.header != null) widget.header!,
                 Expanded(
                   child: SingleChildScrollView(
-                    padding: context.components.sidebar?.padding,
+                    padding: compact
+                        ? EdgeInsets.symmetric(
+                            vertical:
+                                context.components.sidebar?.padding?.vertical ??
+                                0,
+                          )
+                        : context.components.sidebar?.padding,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: _buildSections(context, compact),
@@ -467,15 +473,16 @@ class _OiSidebarState extends State<OiSidebar>
       final sectionKey = section.title ?? 'section_$si';
       final collapsed = _collapsedSections.contains(sectionKey);
 
-      // Section header.
-      if (section.title != null) {
+      // Section headers need horizontal room for the label; hide them on the
+      // icon rail so compact padding cannot overflow.
+      if (section.title != null && !compact) {
         widgets.add(
           _buildSectionHeader(context, section, sectionKey, collapsed),
         );
       }
 
       // Items.
-      if (!collapsed) {
+      if (!collapsed || compact) {
         for (final item in section.items) {
           if (widgets.isNotEmpty &&
               context.components.sidebar?.itemSpacing != null) {
@@ -673,17 +680,28 @@ class _OiSidebarState extends State<OiSidebar>
             constraints: BoxConstraints(
               minHeight: sidebarTheme?.itemHeight ?? 40,
             ),
-            padding:
-                sidebarTheme?.itemPadding ??
-                const EdgeInsets.symmetric(vertical: 8),
+            padding: compact
+                ? EdgeInsets.symmetric(
+                    vertical:
+                        (sidebarTheme?.itemPadding ??
+                                const EdgeInsets.symmetric(vertical: 8))
+                            .vertical /
+                        2,
+                  )
+                : sidebarTheme?.itemPadding ??
+                      const EdgeInsets.symmetric(vertical: 8),
             child: Row(
+              mainAxisAlignment: compact
+                  ? MainAxisAlignment.center
+                  : MainAxisAlignment.start,
               children: [
                 SizedBox(
-                  width:
-                      sidebarTheme?.iconWidth ??
-                      widget.compactWidth ??
-                      sidebarTheme?.compactWidth ??
-                      64,
+                  width: compact
+                      ? sidebarTheme?.iconSize ?? 20
+                      : sidebarTheme?.iconWidth ??
+                            widget.compactWidth ??
+                            sidebarTheme?.compactWidth ??
+                            64,
                   child: Center(
                     child: OiIcon.raw(
                       item.icon,
@@ -692,7 +710,7 @@ class _OiSidebarState extends State<OiSidebar>
                     ),
                   ),
                 ),
-                if (indent > 0) SizedBox(width: indent),
+                if (!compact && indent > 0) SizedBox(width: indent),
                 if (!compact) ...[
                   SizedBox(width: sidebarTheme?.labelGap ?? 0),
                   Expanded(
@@ -766,11 +784,7 @@ class _OiSidebarState extends State<OiSidebar>
     );
 
     if (compact) {
-      result = OiTooltip(
-        label: item.label,
-        message: item.label,
-        child: result,
-      );
+      result = OiTooltip(label: item.label, message: item.label, child: result);
     }
 
     return result;
