@@ -22,11 +22,34 @@ String _stripComments(String source) {
   return result.replaceAll(RegExp(r'//[^\n]*'), '');
 }
 
+/// The source of `OiButton`: its library file plus the part files under
+/// `oi_button/`, where the shared base constructor and the variant
+/// constructors' fields live.
+String _oiButtonSource() {
+  final library = File('lib/src/components/buttons/oi_button.dart');
+  final parts =
+      Directory('lib/src/components/buttons/oi_button')
+          .listSync()
+          .whereType<File>()
+          .where((f) => f.path.endsWith('.part.dart'))
+          .toList()
+        ..sort((a, b) => a.path.compareTo(b.path));
+  return [library, ...parts].map((f) => f.readAsStringSync()).join('\n');
+}
+
 /// Maps file basenames to imperative callback names that are exempted from the
 /// on* naming convention in that specific file only.
 const _imperativeCallbackAllowlist = <String, Set<String>>{
   'oi_undo_stack.dart': {'execute', 'undo', 'merge'},
   'oi_wizard.dart': {'goNext', 'goPrevious', 'goToStep', 'setValue'},
+};
+
+/// Maps file basenames to bool fields with a procedural prefix (`can…`,
+/// `do…`, `should…`) that are exempted from the adjective-form rule in that
+/// file only. These ship in the public API; renaming them would break callers.
+const _proceduralBoolAllowlist = <String, Set<String>>{
+  // OiWizardStep.canGoNext: "may the user go on from this step".
+  'oi_wizard.dart': {'canGoNext'},
 };
 
 /// Short parameter names (< 3 characters) that are acceptable.
@@ -393,8 +416,7 @@ void main() {
       );
 
       // OiButton
-      final buttonFile = File('lib/src/components/buttons/oi_button.dart');
-      final buttonContent = buttonFile.readAsStringSync();
+      final buttonContent = _oiButtonSource();
       expect(
         buttonContent,
         contains('this.enabled'),
@@ -900,8 +922,7 @@ void main() {
       // as specified by REQ-0017: enabled, dismissible, searchable, loading.
 
       // OiButton — enabled, loading
-      final buttonFile = File('lib/src/components/buttons/oi_button.dart');
-      final buttonContent = buttonFile.readAsStringSync();
+      final buttonContent = _oiButtonSource();
       expect(
         buttonContent,
         contains('this.enabled'),
@@ -1243,6 +1264,10 @@ void main() {
         for (final m in matches) {
           final name = m.group(1)!;
           if (name.startsWith('_')) continue;
+          final basename = file.path.split('/').last;
+          if (_proceduralBoolAllowlist[basename]?.contains(name) ?? false) {
+            continue;
+          }
           final line = content.substring(0, m.start).split('\n').length;
           violations.add('${file.path}:$line — $name');
         }
@@ -1313,8 +1338,7 @@ void main() {
     });
 
     test('OiButton variant constructors require label', () {
-      final file = File('lib/src/components/buttons/oi_button.dart');
-      final content = file.readAsStringSync();
+      final content = _oiButtonSource();
 
       // Each named variant constructor must have `required String label`.
       const variants = [
@@ -1343,9 +1367,14 @@ void main() {
         final paramBlock = content.substring(paramStart, paramEnd);
 
         // Every variant must require either `label` or (for icon-only)
-        // map it to semanticLabel.
-        final requiresLabel = paramBlock.contains('required String label');
-        final requiresIcon = paramBlock.contains('required IconData icon');
+        // map it to semanticLabel. The variants forward these to the shared
+        // base constructor with `super.` parameters.
+        final requiresLabel = RegExp(
+          r'required String (?:super\.)?label\b',
+        ).hasMatch(paramBlock);
+        final requiresIcon = RegExp(
+          r'required IconData (?:super\.)?icon\b',
+        ).hasMatch(paramBlock);
 
         expect(
           requiresLabel || requiresIcon,
@@ -1357,7 +1386,7 @@ void main() {
 
         if (requiresLabel) {
           expect(
-            paramBlock.contains('required String label'),
+            requiresLabel,
             isTrue,
             reason: '$variant must mark label as required at compile time',
           );
@@ -1720,13 +1749,19 @@ void main() {
     });
 
     test('OiButton provides factory constructors for each variant', () {
-      final file = File('lib/src/components/buttons/oi_button.dart');
-      final content = file.readAsStringSync();
+      final content = _oiButtonSource();
 
+      // The variants share one private base: a private class whose
+      // constructor every named variant forwards to.
       expect(
         content,
-        contains('OiButton._({'),
+        contains('const _OiButtonBase('),
         reason: 'OiButton must use a private base constructor',
+      );
+      expect(
+        content,
+        contains('class OiButton extends _OiButtonBase'),
+        reason: 'OiButton must build on the private base class',
       );
 
       const variants = [
