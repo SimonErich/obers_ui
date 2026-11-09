@@ -18,12 +18,6 @@ analyzer:
     # CI runs `dart analyze` inside each package directory instead.
     - packages/obers_ui_autoforms/**
     - packages/obers_ui_charts/**
-    - android/**
-    - ios/**
-    - web/**
-    - windows/**
-    - macos/**
-    - linux/**
   errors:
     close_sinks: warning       # VGA ignores; we want it active
 
