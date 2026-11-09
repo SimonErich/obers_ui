@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `OiClockDial`: a clock face that picks a time of day by tapping the hour, then the minute (drag for the exact one)
 - `OiSelect` opens its menu with the selected option in view instead of at the top
 - Initial package scaffold with directory structure
 - Test infrastructure (widget tests, golden tests)
