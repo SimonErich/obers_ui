@@ -34,41 +34,44 @@ class _OiToastContent extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.colors;
     final textTheme = context.textTheme;
-    return Row(
-      children: [
-        Semantics(
-          label: _iconSemanticLabel(),
-          container: true,
-          excludeSemantics: true,
-          child: Text(
-            _icon(),
-            style: TextStyle(
-              color: accent,
-              fontSize: effectiveIconSize,
-              fontWeight: FontWeight.w700,
+    return _OiToastBody(
+      gap: effectiveGap,
+      // The icon, its gap and room for a few words of the message.
+      minLeadWidth: effectiveIconSize + effectiveGap + 96,
+      lead: Row(
+        children: [
+          Semantics(
+            label: _iconSemanticLabel(),
+            container: true,
+            excludeSemantics: true,
+            child: Text(
+              _icon(),
+              style: TextStyle(
+                color: accent,
+                fontSize: effectiveIconSize,
+                fontWeight: FontWeight.w700,
+              ),
             ),
           ),
-        ),
-        SizedBox(width: effectiveGap),
-        Expanded(
-          child: Text(
-            toast.message,
-            style: textTheme.small.copyWith(color: colors.text),
-          ),
-        ),
-        if (toast.action != null) ...[
           SizedBox(width: effectiveGap),
-          toast.action!,
-        ],
-        if (toast.dismissible) ...[
-          SizedBox(width: effectiveGap),
-          OiIconButton(
-            icon: OiIcons.x,
-            semanticLabel: toast.dismissLabel ?? toast.labels.dismiss,
-            onTap: onDismiss,
+          Expanded(
+            child: Text(
+              toast.message,
+              style: textTheme.small.copyWith(color: colors.text),
+            ),
           ),
         ],
-      ],
+      ),
+      action: toast.action == null
+          ? null
+          : _OiToastActionFit(child: toast.action!),
+      dismiss: toast.dismissible
+          ? OiIconButton(
+              icon: OiIcons.x,
+              semanticLabel: toast.dismissLabel ?? toast.labels.dismiss,
+              onTap: onDismiss,
+            )
+          : null,
     );
   }
 }

@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/buttons/oi_icon_button.dart';
 import 'package:obers_ui/src/foundation/oi_icons.dart';
@@ -13,6 +14,7 @@ part 'oi_toast/oi_toast_groups.part.dart';
 part 'oi_toast/oi_toast_state.part.dart';
 part 'oi_toast/oi_toast_surface.part.dart';
 part 'oi_toast/oi_toast_content.part.dart';
+part 'oi_toast/oi_toast_body.part.dart';
 
 /// The severity level of an [OiToast] notification.
 ///
