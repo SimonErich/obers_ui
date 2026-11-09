@@ -8,7 +8,7 @@ your app in `OiApp` instead of `MaterialApp`.
 
 | Requirement | Minimum version |
 | --- | --- |
-| Flutter | 3.41.0 |
+| Flutter | 3.47.0 |
 | Dart | 3.11.0 |
 
 These are the floors from the package `pubspec.yaml`. Older SDKs will not

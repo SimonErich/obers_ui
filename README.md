@@ -36,7 +36,7 @@ dependencies:
     path: ../obers_ui
 ```
 
-Requires Flutter 3.41.0 or newer and Dart 3.11.0 or newer.
+Requires Flutter 3.47.0 or newer and Dart 3.11.0 or newer.
 
 ## Quick start
 

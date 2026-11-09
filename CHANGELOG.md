@@ -200,6 +200,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - GitHub Actions CI (analyze, test, golden tests, docs)
 - Documentation setup (dartdoc, README, CONTRIBUTING)
 
+### Changed
+
+- The minimum supported Flutter is 3.47.0 (was 3.41.0). The scroll cache
+  extent, reorderable-list and alignment APIs now used by the library do not
+  exist in Flutter 3.41, and the `unnecessary_unawaited` lint of 3.47 replaced
+  the `unawaited` calls around futures the framework marks as not needing an
+  await. CI and `.tool-versions` now use Flutter 3.47.8; the Dart floor stays
+  3.11.0.
+
 ### Fixed
 
 - Toggle buttons size to their natural content width.
