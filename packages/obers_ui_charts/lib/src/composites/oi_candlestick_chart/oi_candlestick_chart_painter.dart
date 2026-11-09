@@ -87,6 +87,7 @@ class OiCandlestickChartPainter extends CustomPainter {
     required this.yDivisions,
     this.hoveredSeriesIndex,
     this.hoveredCandleIndex,
+    this.labelGap = 4,
   });
 
   /// The resolved series list (typically one series for financial charts).
@@ -115,6 +116,9 @@ class OiCandlestickChartPainter extends CustomPainter {
 
   /// Axis label color.
   final Color axisLabelColor;
+
+  /// Distance between grid axes and their tick labels.
+  final double labelGap;
 
   /// High-contrast accessibility mode.
   final bool highContrast;
@@ -181,12 +185,14 @@ class OiCandlestickChartPainter extends CustomPainter {
       chartRect,
       labels: xLabels,
       labelColor: axisLabelColor,
+      labelGap: labelGap,
     );
     OiChartGrid.paintYLabels(
       canvas,
       chartRect,
       labels: yLabels,
       labelColor: axisLabelColor,
+      labelGap: labelGap,
     );
 
     for (var si = 0; si < resolvedSeries.length; si++) {
@@ -254,6 +260,7 @@ class OiCandlestickChartPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(OiCandlestickChartPainter oldDelegate) =>
+      oldDelegate.labelGap != labelGap ||
       oldDelegate.resolvedSeries != resolvedSeries ||
       oldDelegate.showGrid != showGrid ||
       oldDelegate.gridColor != gridColor ||

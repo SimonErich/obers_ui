@@ -8,6 +8,7 @@ import 'package:obers_ui/src/foundation/persistence/oi_settings_mixin.dart';
 import 'package:obers_ui/src/foundation/persistence/oi_settings_provider.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/models/settings/oi_kanban_settings.dart';
+import 'package:obers_ui/src/primitives/display/oi_icon.dart';
 import 'package:obers_ui/src/primitives/gesture/oi_double_tap.dart';
 import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
 
@@ -336,17 +337,15 @@ class _OiKanbanState<T> extends State<OiKanban<T>>
                         if (reduced) {
                           _pageController.jumpToPage(next);
                         } else {
-                          unawaited(
-                            _pageController.animateToPage(
-                              next,
-                              duration: const Duration(milliseconds: 300),
-                              curve: Curves.easeInOut,
-                            ),
+                          _pageController.animateToPage(
+                            next,
+                            duration: const Duration(milliseconds: 300),
+                            curve: Curves.easeInOut,
                           );
                         }
                       }
                     : null,
-                child: Icon(
+                child: OiIcon.raw(
                   OiIcons.chevronLeft,
                   size: 20,
                   color: _compactPageIndex > 0 ? colors.text : colors.textMuted,
@@ -370,17 +369,15 @@ class _OiKanbanState<T> extends State<OiKanban<T>>
                         if (reduced) {
                           _pageController.jumpToPage(next);
                         } else {
-                          unawaited(
-                            _pageController.animateToPage(
-                              next,
-                              duration: const Duration(milliseconds: 300),
-                              curve: Curves.easeInOut,
-                            ),
+                          _pageController.animateToPage(
+                            next,
+                            duration: const Duration(milliseconds: 300),
+                            curve: Curves.easeInOut,
                           );
                         }
                       }
                     : null,
-                child: Icon(
+                child: OiIcon.raw(
                   OiIcons.chevronRight,
                   size: 20,
                   color: _compactPageIndex < totalColumns - 1
@@ -516,7 +513,7 @@ class _OiKanbanState<T> extends State<OiKanban<T>>
               ),
               if (widget.collapsibleColumns) ...[
                 const SizedBox(width: 4),
-                Icon(
+                OiIcon.raw(
                   collapsed ? OiIcons.chevronDown : OiIcons.chevronUp,
                   size: 16,
                   color: colors.textMuted,
@@ -661,7 +658,7 @@ class _OiKanbanState<T> extends State<OiKanban<T>>
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(
+              OiIcon.raw(
                 OiIcons.plus,
                 size: 16,
                 color: colors.textMuted,

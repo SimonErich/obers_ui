@@ -33,7 +33,7 @@ extension _OiUploadDialogInteraction on _OiUploadDialogState {
           ),
         );
       }
-      if (mounted) _addFiles(files);
+      if (files.isNotEmpty && mounted) _addFiles(files);
     } finally {
       if (mounted) _escapeFocusNode.requestFocus();
       _updateState(() => _picking = false);

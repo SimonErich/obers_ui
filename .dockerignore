@@ -1,0 +1,11 @@
+.git
+.dart_tool
+**/.dart_tool
+build
+**/build
+coverage
+**/coverage
+**/node_modules
+**/failures
+.env
+.env.*

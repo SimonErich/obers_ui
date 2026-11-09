@@ -27,6 +27,7 @@ class OiUserMenu extends StatefulWidget {
     this.userEmail,
     this.avatarUrl,
     this.avatarInitials,
+    this.avatar,
     this.header,
     super.key,
   });
@@ -45,6 +46,9 @@ class OiUserMenu extends StatefulWidget {
 
   /// Fallback initials displayed when [avatarUrl] is not provided.
   final String? avatarInitials;
+
+  /// Optional avatar presentation; the menu retains its trigger and semantics.
+  final Widget? avatar;
 
   /// The list of menu items displayed below the header.
   final List<OiMenuItem> items;
@@ -91,7 +95,7 @@ class _OiUserMenuState extends State<OiUserMenu> {
             OiListTile(
               title: item.label,
               leading: item.icon != null
-                  ? OiIcon.decorative(icon: item.icon!)
+                  ? OiIcon.decorative(icon: item.icon)
                   : null,
               onTap: !item.enabled
                   ? null
@@ -114,10 +118,14 @@ class _OiUserMenuState extends State<OiUserMenu> {
     final avatar = OiTappable(
       semanticLabel: widget.label,
       onTap: () => setState(() => _isOpen = !_isOpen),
-      child: OiAvatar(
-        semanticLabel: widget.label,
-        imageUrl: widget.avatarUrl,
-        initials: widget.avatarInitials,
+      child: ExcludeSemantics(
+        child:
+            widget.avatar ??
+            OiAvatar(
+              semanticLabel: widget.label,
+              imageUrl: widget.avatarUrl,
+              initials: widget.avatarInitials,
+            ),
       ),
     );
 

@@ -56,6 +56,10 @@ class OiLabel extends StatelessWidget {
     this.color,
     this.decoration,
     this.decorationColor,
+    this.style,
+    this.strutStyle,
+    this.textHeightBehavior,
+    this.highlightQuery,
     super.key,
   });
 
@@ -77,6 +81,10 @@ class OiLabel extends StatelessWidget {
     Color? color,
     TextDecoration? decoration,
     Color? decorationColor,
+    TextStyle? style,
+    StrutStyle? strutStyle,
+    TextHeightBehavior? textHeightBehavior,
+    String? highlightQuery,
     Key? key,
   }) : this._(
          variant: variant,
@@ -90,6 +98,10 @@ class OiLabel extends StatelessWidget {
          color: color,
          decoration: decoration,
          decorationColor: decorationColor,
+         style: style,
+         strutStyle: strutStyle,
+         textHeightBehavior: textHeightBehavior,
+         highlightQuery: highlightQuery,
          key: key,
        );
 
@@ -245,6 +257,7 @@ class OiLabel extends StatelessWidget {
     Color? color,
     TextDecoration? decoration,
     Color? decorationColor,
+    TextStyle? style,
     Key? key,
   }) : this._(
          variant: OiLabelVariant.body,
@@ -258,6 +271,7 @@ class OiLabel extends StatelessWidget {
          color: color,
          decoration: decoration,
          decorationColor: decorationColor,
+         style: style,
          key: key,
        );
 
@@ -513,6 +527,15 @@ class OiLabel extends StatelessWidget {
          key: key,
        );
 
+  /// Optional overrides merged over the themed variant before explicit colors.
+  final TextStyle? style;
+
+  /// Optional minimum line metrics. System text scaling still applies.
+  final StrutStyle? strutStyle;
+
+  /// Controls paragraph leading; defaults to the text theme's policy.
+  final TextHeightBehavior? textHeightBehavior;
+
   /// The text content to render.
   final String text;
 
@@ -551,6 +574,10 @@ class OiLabel extends StatelessWidget {
   /// Color of the text decoration. Only used when [decoration] is set.
   final Color? decorationColor;
 
+  /// Case-insensitive literal search matches, using the theme's warning tint.
+  /// The full label remains one coherent accessible text value.
+  final String? highlightQuery;
+
   // ---------------------------------------------------------------------------
   // Responsive scale helpers
   // ---------------------------------------------------------------------------
@@ -563,6 +590,10 @@ class OiLabel extends StatelessWidget {
 
   double _scaleFactor(BuildContext context) {
     if (!_responsiveVariants.contains(variant)) return 1;
+    final explicit = context.textTheme.headingScale;
+    if (explicit != null) {
+      return explicit.resolve(context.breakpoint, context.breakpointScale);
+    }
     final width = MediaQuery.sizeOf(context).width;
     if (width >= OiBreakpoint.expanded.minWidth) return 1.2;
     if (width >= OiBreakpoint.medium.minWidth) return 1.1;
@@ -573,9 +604,10 @@ class OiLabel extends StatelessWidget {
   // Build
   // ---------------------------------------------------------------------------
 
-  @override
-  Widget build(BuildContext context) {
-    final baseStyle = context.textTheme.styleFor(variant);
+  /// Resolves the exact style painted by this label, including heading scale.
+  /// Custom text layout should measure this style with the system text scaler.
+  TextStyle resolveStyle(BuildContext context) {
+    final baseStyle = context.textTheme.styleFor(variant).merge(this.style);
     final scale = _scaleFactor(context);
 
     var style = baseStyle;
@@ -602,6 +634,14 @@ class OiLabel extends StatelessWidget {
       );
     }
 
+    return style;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final style = resolveStyle(context);
+    final heightBehavior =
+        textHeightBehavior ?? context.textTheme.textHeightBehavior;
     Widget textWidget;
 
     if (variant == OiLabelVariant.link) {
@@ -611,6 +651,41 @@ class OiLabel extends StatelessWidget {
         maxLines: maxLines,
         overflow: overflow,
         textAlign: textAlign,
+        strutStyle: strutStyle,
+        textHeightBehavior: heightBehavior,
+      );
+    } else if (highlightQuery?.trim().isNotEmpty == true) {
+      final query = highlightQuery!.trim();
+      final matches = RegExp(
+        RegExp.escape(query),
+        caseSensitive: false,
+      ).allMatches(text);
+      final spans = <TextSpan>[];
+      var offset = 0;
+      for (final match in matches) {
+        if (match.start > offset) {
+          spans.add(TextSpan(text: text.substring(offset, match.start)));
+        }
+        spans.add(
+          TextSpan(
+            text: text.substring(match.start, match.end),
+            style: TextStyle(backgroundColor: context.colors.warning.muted),
+          ),
+        );
+        offset = match.end;
+      }
+      spans.add(TextSpan(text: text.substring(offset)));
+      textWidget = Text.rich(
+        TextSpan(style: style, children: spans),
+        maxLines: maxLines,
+        overflow: overflow,
+        softWrap: maxLines == 1 && overflow == TextOverflow.visible
+            ? false
+            : null,
+        textAlign: textAlign,
+        semanticsLabel: text,
+        strutStyle: strutStyle,
+        textHeightBehavior: heightBehavior,
       );
     } else {
       textWidget = Text(
@@ -618,7 +693,12 @@ class OiLabel extends StatelessWidget {
         style: style,
         maxLines: maxLines,
         overflow: overflow,
+        softWrap: maxLines == 1 && overflow == TextOverflow.visible
+            ? false
+            : null,
         textAlign: textAlign,
+        strutStyle: strutStyle,
+        textHeightBehavior: heightBehavior,
       );
     }
 
@@ -637,7 +717,14 @@ class OiLabel extends StatelessWidget {
       );
     }
 
-    return textWidget;
+    final heading = const {
+      OiLabelVariant.display,
+      OiLabelVariant.h1,
+      OiLabelVariant.h2,
+      OiLabelVariant.h3,
+      OiLabelVariant.h4,
+    }.contains(variant);
+    return heading ? Semantics(header: true, child: textWidget) : textWidget;
   }
 }
 
@@ -685,6 +772,8 @@ class _OiLinkHover extends StatefulWidget {
     this.maxLines,
     this.overflow,
     this.textAlign,
+    this.strutStyle,
+    this.textHeightBehavior,
   });
 
   final String text;
@@ -692,6 +781,9 @@ class _OiLinkHover extends StatefulWidget {
   final int? maxLines;
   final TextOverflow? overflow;
   final TextAlign? textAlign;
+
+  final StrutStyle? strutStyle;
+  final TextHeightBehavior? textHeightBehavior;
 
   @override
   State<_OiLinkHover> createState() => _OiLinkHoverState();
@@ -723,6 +815,8 @@ class _OiLinkHoverState extends State<_OiLinkHover> {
           maxLines: widget.maxLines,
           overflow: widget.overflow,
           textAlign: widget.textAlign,
+          strutStyle: widget.strutStyle,
+          textHeightBehavior: widget.textHeightBehavior,
         ),
       ),
     );

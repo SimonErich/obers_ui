@@ -4,7 +4,8 @@ extension _OiFieldDisplayNumericContent on OiFieldDisplay {
   Widget _buildNumberDisplay(BuildContext context) {
     final numValue = value is num ? value as num : num.tryParse(_valueString);
     if (numValue == null) return _buildTextDisplay(context);
-    return OiLabel.small(_formatNumber(numValue));
+    final theme = context.components.fieldDisplay;
+    return OiLabel.body(_formatNumber(numValue), style: theme?.valueStyle);
   }
 
   String _formatNumber(num numValue) {
@@ -33,7 +34,11 @@ extension _OiFieldDisplayNumericContent on OiFieldDisplay {
     parts.add(formatted);
     if (code.isNotEmpty && symbol.isEmpty) parts.add(code);
 
-    return OiLabel.small(parts.join(symbol.isNotEmpty ? '' : ' '));
+    final theme = context.components.fieldDisplay;
+    return OiLabel.body(
+      parts.join(symbol.isNotEmpty ? '' : ' '),
+      style: theme?.valueStyle,
+    );
   }
 
   String _formatCurrencyNumber(num numValue) {

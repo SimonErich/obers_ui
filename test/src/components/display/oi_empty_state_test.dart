@@ -8,6 +8,64 @@ import 'package:obers_ui/src/components/display/oi_empty_state.dart';
 import '../../../helpers/pump_app.dart';
 
 void main() {
+  testWidgets('short mobile panels keep their wrapped title visible', (
+    tester,
+  ) async {
+    const title = 'Noch keine Bestellungen vorhanden';
+    const panelKey = Key('short_empty_panel');
+    await tester.pumpObers(
+      const Align(
+        alignment: Alignment.topLeft,
+        child: SizedBox(
+          key: panelKey,
+          width: 375,
+          height: 96,
+          child: OiEmptyState(title: title),
+        ),
+      ),
+      surfaceSize: const Size(375, 812),
+    );
+
+    expect(tester.takeException(), isNull);
+    final panel = tester.getRect(find.byKey(panelKey));
+    final text = tester.getRect(find.text(title));
+    expect(text.left, greaterThanOrEqualTo(panel.left));
+    expect(text.top, greaterThanOrEqualTo(panel.top));
+    expect(text.right, lessThanOrEqualTo(panel.right));
+    expect(text.bottom, lessThanOrEqualTo(panel.bottom));
+  });
+
+  testWidgets('short panels keep longer descriptions and actions reachable', (
+    tester,
+  ) async {
+    var tapped = false;
+    await tester.pumpObers(
+      Align(
+        alignment: Alignment.topLeft,
+        child: SizedBox(
+          width: 375,
+          height: 96,
+          child: OiEmptyState(
+            title: 'No orders yet',
+            description: 'Create an order to see your recent activity here.',
+            action: OiButton.primary(
+              label: 'Create order',
+              semanticLabel: 'Create order',
+              onTap: () => tapped = true,
+            ),
+          ),
+        ),
+      ),
+      surfaceSize: const Size(375, 812),
+    );
+
+    expect(tester.takeException(), isNull);
+    await tester.ensureVisible(find.text('Create order'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Create order'));
+    expect(tapped, isTrue);
+  });
+
   testWidgets('renders title', (tester) async {
     await tester.pumpObers(const OiEmptyState(title: 'Nothing here'));
     expect(find.text('Nothing here'), findsOneWidget);

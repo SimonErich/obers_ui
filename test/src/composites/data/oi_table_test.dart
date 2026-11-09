@@ -8,6 +8,7 @@ import 'package:obers_ui/src/components/buttons/oi_button.dart';
 import 'package:obers_ui/src/components/display/oi_pagination.dart';
 import 'package:obers_ui/src/components/display/oi_tooltip.dart';
 import 'package:obers_ui/src/components/feedback/oi_bulk_bar.dart';
+import 'package:obers_ui/src/components/inputs/oi_checkbox.dart';
 import 'package:obers_ui/src/components/panels/oi_resizable.dart';
 import 'package:obers_ui/src/composites/data/oi_pagination_controller.dart';
 import 'package:obers_ui/src/composites/data/oi_table.dart';
@@ -16,6 +17,8 @@ import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/persistence/drivers/oi_in_memory_driver.dart';
 import 'package:obers_ui/src/foundation/persistence/oi_settings_driver.dart';
 import 'package:obers_ui/src/foundation/persistence/oi_settings_provider.dart';
+import 'package:obers_ui/src/foundation/theme/component_themes/oi_table_theme_data.dart';
+import 'package:obers_ui/src/foundation/theme/oi_theme_data.dart';
 import 'package:obers_ui/src/models/settings/oi_table_settings.dart';
 
 import '../../../helpers/pump_app.dart';
@@ -140,6 +143,126 @@ Widget _table({
 // ── Tests ─────────────────────────────────────────────────────────────────────
 
 void main() {
+  testWidgets('sortable header hover preserves configured typography', (
+    tester,
+  ) async {
+    final theme = OiThemeData.light();
+    await tester.pumpObers(
+      _table(),
+      theme: theme.copyWith(
+        components: theme.components.copyWith(
+          table: const OiTableThemeData(
+            headerTextStyle: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+              height: 4 / 3,
+              letterSpacing: .12,
+            ),
+          ),
+        ),
+      ),
+    );
+    final label = find.text('Name');
+    final before = tester.widget<Text>(label).style!;
+    final size = tester.getSize(label);
+    final mouse = await tester.createGesture(kind: PointerDeviceKind.mouse);
+    await mouse.addPointer(location: Offset.zero);
+    await mouse.moveTo(tester.getCenter(label));
+    await tester.pump();
+    final hovered = tester.widget<Text>(label).style!;
+    expect(hovered.copyWith(color: before.color), before);
+    expect(hovered.color, theme.colors.text);
+    expect(tester.getSize(label), size);
+    await mouse.removePointer();
+  });
+
+  testWidgets(
+    'narrow action columns retain full targets and aligned header insets',
+    (tester) async {
+      var tapped = false;
+      await tester.pumpObers(
+        OiTable<String>(
+          label: 'Actions',
+          rows: const ['row'],
+          columns: [
+            const OiTableColumn(id: 'name', header: 'Name'),
+            OiTableColumn(
+              id: 'actions',
+              header: 'A',
+              width: 44,
+              minWidth: 44,
+              sortable: false,
+              filterable: false,
+              resizable: false,
+              cellPadding: const EdgeInsets.symmetric(horizontal: 6),
+              cellBuilder: (_, _, _) => GestureDetector(
+                key: const Key('action-target'),
+                behavior: HitTestBehavior.opaque,
+                onTap: () => tapped = true,
+                child: const SizedBox(
+                  width: 32,
+                  height: 32,
+                ),
+              ),
+            ),
+          ],
+        ),
+        surfaceSize: const Size(600, 400),
+      );
+      await tester.pumpAndSettle();
+      final target = find.byKey(const Key('action-target'));
+      expect(tester.getSize(target), const Size(32, 32));
+      expect(
+        tester.getTopLeft(target).dx,
+        tester.getTopLeft(find.text('A')).dx,
+      );
+      await tester.tap(target);
+      expect(tapped, isTrue);
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets('long headers share body widths when scrolling horizontally', (
+    tester,
+  ) async {
+    await tester.pumpObers(
+      SizedBox(
+        width: 180,
+        height: 400,
+        child: OiTable<_Row>(
+          label: 'Records',
+          rows: _rows,
+          showStatusBar: false,
+          columns: const [
+            OiTableColumn<_Row>(
+              id: 'name',
+              header: 'A deliberately long display name heading',
+              minWidth: 120,
+              valueGetter: _nameGetter,
+            ),
+            OiTableColumn<_Row>(
+              id: 'value',
+              header: 'An equally long numeric value heading',
+              minWidth: 120,
+              valueGetter: _valueGetter,
+            ),
+          ],
+        ),
+      ),
+      surfaceSize: const Size(180, 400),
+    );
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
+    final nameHeader = find.byKey(const ValueKey('resize_name'));
+    final valueHeader = find.byKey(const ValueKey('resize_value'));
+    expect(tester.getSize(nameHeader).width, 120);
+    expect(tester.getSize(valueHeader).width, 120);
+    expect(
+      tester.getTopLeft(valueHeader).dx - tester.getTopLeft(nameHeader).dx,
+      120,
+    );
+  });
+
   // 1. Renders column headers (REQ-0438)
   testWidgets('renders column headers', (tester) async {
     await tester.pumpObers(_table());
@@ -474,6 +597,43 @@ void main() {
   });
 
   // 17. Empty state shows custom widget
+  testWidgets('wide empty tables center their message in the mobile viewport', (
+    tester,
+  ) async {
+    const viewportKey = Key('mobile_table_viewport');
+    await tester.pumpObers(
+      const Align(
+        alignment: Alignment.topLeft,
+        child: SizedBox(
+          key: viewportKey,
+          width: 375,
+          height: 300,
+          child: OiTable<_Row>(
+            label: 'Wide empty table',
+            rows: [],
+            columns: [
+              OiTableColumn(id: 'first', header: 'First', width: 600),
+              OiTableColumn(id: 'last', header: 'Last', width: 600),
+            ],
+            showStatusBar: false,
+            emptyState: Center(child: Text('No entries')),
+          ),
+        ),
+      ),
+      surfaceSize: const Size(375, 812),
+    );
+
+    expect(tester.takeException(), isNull);
+    final viewport = tester.getRect(find.byKey(viewportKey));
+    final message = find.text('No entries');
+    expect(tester.getCenter(message).dx, closeTo(viewport.center.dx, 1));
+    expect(viewport.contains(tester.getRect(message).topLeft), isTrue);
+    expect(viewport.contains(tester.getRect(message).bottomRight), isTrue);
+    await tester.drag(find.text('First'), const Offset(-500, 0));
+    await tester.pumpAndSettle();
+    expect(tester.getCenter(message).dx, closeTo(viewport.center.dx, 1));
+  });
+
   testWidgets('empty rows renders custom emptyState widget', (tester) async {
     await tester.pumpObers(
       _table(rows: const [], emptyState: const Text('Nothing here')),
@@ -2053,21 +2213,21 @@ void main() {
       ),
     );
     await tester.pumpAndSettle();
-    // Tap the header checkbox (OiIcons.square = unchecked)
+    // Tap the shared accessible header checkbox.
     final headerArea = find.byKey(const Key('oi_table_header'));
     final checkbox = find.descendant(
       of: headerArea,
-      matching: find.byIcon(OiIcons.square),
+      matching: find.byType(OiCheckbox),
     );
     await tester.tap(checkbox);
     await tester.pump();
     expect(ctrl.selectAll, isTrue);
     expect(ctrl.selectedRows.length, _rows.length);
 
-    // Tap again to deselect all (now shows OiIcons.squareCheckBig)
+    // Tap again to deselect all.
     final checkedBox = find.descendant(
       of: headerArea,
-      matching: find.byIcon(OiIcons.squareCheckBig),
+      matching: find.byType(OiCheckbox),
     );
     await tester.tap(checkedBox.first);
     await tester.pump();

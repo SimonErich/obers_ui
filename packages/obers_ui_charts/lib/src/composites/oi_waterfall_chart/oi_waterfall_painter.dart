@@ -29,6 +29,7 @@ class OiWaterfallPainter extends CustomPainter {
     required this.xLabels,
     required this.yLabels,
     required this.yDivisions,
+    this.labelGap = 4,
   });
 
   /// The pre-computed waterfall bars.
@@ -63,6 +64,9 @@ class OiWaterfallPainter extends CustomPainter {
 
   /// Axis label color.
   final Color axisLabelColor;
+
+  /// Distance between grid axes and their tick labels.
+  final double labelGap;
 
   /// High-contrast accessibility mode.
   final bool highContrast;
@@ -139,6 +143,7 @@ class OiWaterfallPainter extends CustomPainter {
       chartRect,
       labels: yLabels,
       labelColor: axisLabelColor,
+      labelGap: labelGap,
     );
 
     OiChartGrid.paintXLabels(
@@ -146,6 +151,7 @@ class OiWaterfallPainter extends CustomPainter {
       chartRect,
       labels: xLabels,
       labelColor: axisLabelColor,
+      labelGap: labelGap,
     );
 
     // Draw connectors first so bars render on top.
@@ -231,6 +237,7 @@ class OiWaterfallPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(OiWaterfallPainter oldDelegate) =>
+      oldDelegate.labelGap != labelGap ||
       oldDelegate.bars != bars ||
       oldDelegate.chartRect != chartRect ||
       oldDelegate.minY != minY ||

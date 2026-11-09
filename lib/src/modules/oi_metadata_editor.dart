@@ -2,6 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/inputs/oi_text_input.dart';
 import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
+import 'package:obers_ui/src/primitives/display/oi_icon.dart';
 import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
 
 // ---------------------------------------------------------------------------
@@ -343,7 +344,7 @@ class _OiMetadataEditorState extends State<OiMetadataEditor> {
                     ),
                   ),
                   child: boolValue
-                      ? Icon(
+                      ? OiIcon.raw(
                           OiIcons.check,
                           size: 14,
                           color: colors.primary.foreground,
@@ -402,7 +403,7 @@ class _OiMetadataEditorState extends State<OiMetadataEditor> {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(
+                OiIcon.raw(
                   OiIcons.plus,
                   size: 16,
                   color: colors.textMuted,
@@ -458,7 +459,7 @@ class _RemoveButtonState extends State<_RemoveButton> {
               scale: _hovered ? 1.3 : 1.0,
               duration: const Duration(milliseconds: 150),
               curve: Curves.easeInOut,
-              child: Icon(
+              child: OiIcon.raw(
                 OiIcons.x,
                 size: 18,
                 color: colors.error.base,

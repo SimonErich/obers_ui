@@ -3,6 +3,7 @@ import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/interaction/oi_kbd.dart';
 import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
+import 'package:obers_ui/src/primitives/display/oi_icon.dart';
 import 'package:obers_ui/src/primitives/input/oi_raw_input.dart';
 
 /// A command in the command bar.
@@ -459,7 +460,7 @@ class _OiCommandBarState extends State<OiCommandBar> {
                             onChanged: _applyFilter,
                             leading: Padding(
                               padding: const EdgeInsets.only(right: 8),
-                              child: Icon(
+                              child: OiIcon.raw(
                                 OiIcons.arrowDown,
                                 size: 16,
                                 color: colors.textMuted,
@@ -586,7 +587,7 @@ class _OiCommandBarState extends State<OiCommandBar> {
               if (cmd.icon != null)
                 Padding(
                   padding: const EdgeInsets.only(right: 8),
-                  child: Icon(cmd.icon, size: 16, color: colors.text),
+                  child: OiIcon.raw(cmd.icon, size: 16, color: colors.text),
                 ),
               Expanded(
                 child: Column(
@@ -612,7 +613,7 @@ class _OiCommandBarState extends State<OiCommandBar> {
               if (hasChildren)
                 Padding(
                   padding: const EdgeInsets.only(left: 8),
-                  child: Icon(
+                  child: OiIcon.raw(
                     OiIcons.chevronRight,
                     size: 14,
                     color: colors.textMuted,

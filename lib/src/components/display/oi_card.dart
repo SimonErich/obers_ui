@@ -1,10 +1,9 @@
-import 'dart:async';
-
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_decoration_theme.dart';
 import 'package:obers_ui/src/foundation/theme/oi_effects_theme.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
+import 'package:obers_ui/src/primitives/display/oi_icon.dart';
 import 'package:obers_ui/src/primitives/display/oi_surface.dart';
 import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
 
@@ -62,8 +61,12 @@ class OiCard extends StatefulWidget {
     this.onTap,
     this.label,
     this.collapsible = false,
+    this.collapseLeading = false,
     this.defaultCollapsed = false,
+    this.collapsed,
+    this.onCollapsedChanged,
     this.padding,
+    this.headerGap = 0,
     this.border,
     this.gradient,
     this.halo,
@@ -88,8 +91,12 @@ class OiCard extends StatefulWidget {
     this.onTap,
     this.label,
     this.collapsible = false,
+    this.collapseLeading = false,
     this.defaultCollapsed = false,
+    this.collapsed,
+    this.onCollapsedChanged,
     this.padding,
+    this.headerGap = 0,
     this.border,
     this.gradient,
     this.halo,
@@ -113,8 +120,12 @@ class OiCard extends StatefulWidget {
     VoidCallback? onTap,
     String? label,
     bool collapsible = false,
+    bool collapseLeading = false,
     bool defaultCollapsed = false,
+    bool? collapsed,
+    ValueChanged<bool>? onCollapsedChanged,
     EdgeInsetsGeometry? padding,
+    double headerGap = 0,
     OiBorderStyle? border,
     OiGradientStyle? gradient,
     OiHaloStyle? halo,
@@ -132,8 +143,12 @@ class OiCard extends StatefulWidget {
       onTap: onTap,
       label: label,
       collapsible: collapsible,
+      collapseLeading: collapseLeading,
       defaultCollapsed: defaultCollapsed,
+      collapsed: collapsed,
+      onCollapsedChanged: onCollapsedChanged,
       padding: padding,
+      headerGap: headerGap,
       border: border,
       gradient: gradient,
       halo: halo,
@@ -157,8 +172,12 @@ class OiCard extends StatefulWidget {
     VoidCallback? onTap,
     String? label,
     bool collapsible = false,
+    bool collapseLeading = false,
     bool defaultCollapsed = false,
+    bool? collapsed,
+    ValueChanged<bool>? onCollapsedChanged,
     EdgeInsetsGeometry? padding,
+    double headerGap = 0,
     OiBorderStyle? border,
     OiGradientStyle? gradient,
     OiHaloStyle? halo,
@@ -176,8 +195,12 @@ class OiCard extends StatefulWidget {
       onTap: onTap,
       label: label,
       collapsible: collapsible,
+      collapseLeading: collapseLeading,
       defaultCollapsed: defaultCollapsed,
+      collapsed: collapsed,
+      onCollapsedChanged: onCollapsedChanged,
       padding: padding,
+      headerGap: headerGap,
       border: border,
       gradient: gradient,
       halo: halo,
@@ -201,8 +224,12 @@ class OiCard extends StatefulWidget {
     Widget? footer,
     VoidCallback? onTap,
     bool collapsible = false,
+    bool collapseLeading = false,
     bool defaultCollapsed = false,
+    bool? collapsed,
+    ValueChanged<bool>? onCollapsedChanged,
     EdgeInsetsGeometry? padding,
+    double headerGap = 0,
     OiBorderStyle? border,
     OiGradientStyle? gradient,
     OiHaloStyle? halo,
@@ -220,8 +247,12 @@ class OiCard extends StatefulWidget {
       footer: footer,
       onTap: onTap,
       collapsible: collapsible,
+      collapseLeading: collapseLeading,
       defaultCollapsed: defaultCollapsed,
+      collapsed: collapsed,
+      onCollapsedChanged: onCollapsedChanged,
       padding: padding,
+      headerGap: headerGap,
       border: border,
       gradient: gradient,
       halo: halo,
@@ -243,8 +274,12 @@ class OiCard extends StatefulWidget {
     VoidCallback? onTap,
     String? label,
     bool collapsible = false,
+    bool collapseLeading = false,
     bool defaultCollapsed = false,
+    bool? collapsed,
+    ValueChanged<bool>? onCollapsedChanged,
     EdgeInsetsGeometry? padding,
+    double headerGap = 0,
     OiBorderStyle? border,
     OiGradientStyle? gradient,
     OiHaloStyle? halo,
@@ -262,8 +297,12 @@ class OiCard extends StatefulWidget {
       onTap: onTap,
       label: label,
       collapsible: collapsible,
+      collapseLeading: collapseLeading,
       defaultCollapsed: defaultCollapsed,
+      collapsed: collapsed,
+      onCollapsedChanged: onCollapsedChanged,
       padding: padding,
+      headerGap: headerGap,
       border: border,
       gradient: gradient,
       halo: halo,
@@ -303,12 +342,24 @@ class OiCard extends StatefulWidget {
   /// chevron in the header.
   final bool collapsible;
 
+  /// Places the disclosure before the title, pointing right while collapsed.
+  final bool collapseLeading;
+
   /// When true and [collapsible] is true, the card starts collapsed.
   final bool defaultCollapsed;
+
+  /// Controlled collapsed state; null lets the card own its expansion state.
+  final bool? collapsed;
+
+  /// Reports a user-requested collapsed state, for controlled presentations.
+  final ValueChanged<bool>? onCollapsedChanged;
 
   /// Padding inside the card surface. Defaults to `EdgeInsets.all(16)` for
   /// most variants and `EdgeInsets.all(8)` for [OiCard.compact].
   final EdgeInsetsGeometry? padding;
+
+  /// Space between the header and body, without adding a gap to headerless cards.
+  final double headerGap;
 
   /// Explicit border override. When null, [OiCard.outlined] and
   /// [OiCard.interactive] fall back to [OiDecorationTheme.defaultBorder].
@@ -340,7 +391,8 @@ class _OiCardState extends State<OiCard> with SingleTickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    _collapsed = widget.collapsible && widget.defaultCollapsed;
+    _collapsed =
+        widget.collapsible && (widget.collapsed ?? widget.defaultCollapsed);
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 250),
@@ -357,6 +409,11 @@ class _OiCardState extends State<OiCard> with SingleTickerProviderStateMixin {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.collapsible && !widget.collapsible) {
       _controller.value = 1.0;
+    } else if (widget.collapsible &&
+        widget.collapsed != null &&
+        widget.collapsed != _collapsed) {
+      _collapsed = widget.collapsed!;
+      _animateExpansion();
     }
   }
 
@@ -367,16 +424,23 @@ class _OiCardState extends State<OiCard> with SingleTickerProviderStateMixin {
   }
 
   void _toggleCollapsed() {
+    final next = !_collapsed;
+    widget.onCollapsedChanged?.call(next);
+    if (widget.collapsed != null) return;
+    setState(() => _collapsed = next);
+    _animateExpansion();
+  }
+
+  void _animateExpansion() {
     final reducedMotion =
         context.animations.reducedMotion ||
         MediaQuery.disableAnimationsOf(context);
-    setState(() => _collapsed = !_collapsed);
     if (reducedMotion) {
       _controller.value = _collapsed ? 0.0 : 1.0;
     } else if (_collapsed) {
-      unawaited(_controller.reverse());
+      _controller.reverse();
     } else {
-      unawaited(_controller.forward());
+      _controller.forward();
     }
   }
 
@@ -413,10 +477,20 @@ class _OiCardState extends State<OiCard> with SingleTickerProviderStateMixin {
 
     switch (widget._kind) {
       case _OiCardKind.elevated:
-        shadow = ct?.shadow ?? defaultElevatedShadow;
-        effectiveBorder = widget.border;
+        shadow =
+            ct?.shadow ??
+            (ct?.elevation == null
+                ? defaultElevatedShadow
+                : [
+                    BoxShadow(
+                      color: colors.overlay.withValues(alpha: .12),
+                      blurRadius: ct!.elevation! * 2,
+                      offset: Offset(0, ct.elevation! / 2),
+                    ),
+                  ]);
+        effectiveBorder = widget.border ?? themeBorder;
       case _OiCardKind.flat:
-        effectiveBorder = widget.border;
+        effectiveBorder = widget.border ?? themeBorder;
       case _OiCardKind.outlined:
         effectiveBorder =
             widget.border ?? themeBorder ?? context.decoration.defaultBorder;
@@ -424,12 +498,23 @@ class _OiCardState extends State<OiCard> with SingleTickerProviderStateMixin {
         effectiveBorder =
             widget.border ?? themeBorder ?? context.decoration.defaultBorder;
       case _OiCardKind.compact:
-        shadow = ct?.shadow ?? defaultElevatedShadow;
-        effectiveBorder = widget.border;
+        shadow =
+            ct?.shadow ??
+            (ct?.elevation == null
+                ? defaultElevatedShadow
+                : [
+                    BoxShadow(
+                      color: colors.overlay.withValues(alpha: .12),
+                      blurRadius: ct!.elevation! * 2,
+                      offset: Offset(0, ct.elevation! / 2),
+                    ),
+                  ]);
+        effectiveBorder = widget.border ?? themeBorder;
     }
 
     final effectivePadding =
         widget.padding ??
+        ct?.padding ??
         (widget._kind == _OiCardKind.compact
             ? const EdgeInsets.all(8)
             : const EdgeInsets.all(16));
@@ -441,24 +526,46 @@ class _OiCardState extends State<OiCard> with SingleTickerProviderStateMixin {
         widget.trailing != null ||
         widget.collapsible;
 
-    final bodyAndFooter = _buildBodyAndFooter(context);
+    final body = _buildBodyAndFooter(context);
+    final bodyAndFooter = hasHeader && widget.headerGap > 0
+        ? Padding(
+            padding: EdgeInsets.only(top: widget.headerGap),
+            child: body,
+          )
+        : body;
 
     Widget collapsibleContent;
     if (widget.collapsible) {
       collapsibleContent = SizeTransition(
         sizeFactor: _expandAnimation,
-        axisAlignment: -1,
-        child: FadeTransition(opacity: _expandAnimation, child: bodyAndFooter),
+        alignment: Alignment.topCenter,
+        child: ExcludeFocus(
+          excluding: _collapsed,
+          child: ExcludeSemantics(
+            excluding: _collapsed,
+            child: FadeTransition(
+              opacity: _expandAnimation,
+              child: bodyAndFooter,
+            ),
+          ),
+        ),
       );
     } else {
       collapsibleContent = bodyAndFooter;
     }
 
-    final content = Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      mainAxisSize: MainAxisSize.min,
-      children: [if (hasHeader) _buildHeader(context), collapsibleContent],
-    );
+    // A plain surface must forward its constraints. An unnecessary Column
+    // makes a bounded table/scroll view receive infinite available height.
+    final content = !hasHeader && widget.footer == null
+        ? collapsibleContent
+        : Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (hasHeader) _buildHeader(context),
+              collapsibleContent,
+            ],
+          );
 
     final surface = OiSurface(
       border: effectiveBorder,
@@ -527,8 +634,29 @@ class _OiCardState extends State<OiCard> with SingleTickerProviderStateMixin {
     final animationDuration = reducedMotion
         ? Duration.zero
         : context.animations.normal;
+    final disclosure = OiTappable(
+      onTap: _toggleCollapsed,
+      semanticLabel:
+          '${_collapsed ? 'Expand' : 'Collapse'} ${widget.label ?? 'card'}',
+      child: AnimatedRotation(
+        turns: widget.collapseLeading
+            ? (_collapsed ? -.25 : 0)
+            : (_collapsed ? 0 : .5),
+        duration: animationDuration,
+        child: OiIcon.raw(
+          _kChevronIcon,
+          size: widget.collapseLeading ? 14 : null,
+        ),
+      ),
+    );
     return Row(
+      crossAxisAlignment:
+          context.components.card?.headerAlignment ?? CrossAxisAlignment.center,
       children: [
+        if (widget.collapsible && widget.collapseLeading) ...[
+          disclosure,
+          const SizedBox(width: 12),
+        ],
         if (widget.leading != null) widget.leading!,
         Expanded(
           child: Column(
@@ -536,20 +664,16 @@ class _OiCardState extends State<OiCard> with SingleTickerProviderStateMixin {
             mainAxisSize: MainAxisSize.min,
             children: [
               if (widget.title != null) widget.title!,
-              if (widget.subtitle != null) widget.subtitle!,
+              if (widget.subtitle != null) ...[
+                if (widget.title != null)
+                  SizedBox(height: context.components.card?.subtitleGap ?? 0),
+                widget.subtitle!,
+              ],
             ],
           ),
         ),
         if (widget.trailing != null) widget.trailing!,
-        if (widget.collapsible)
-          GestureDetector(
-            onTap: _toggleCollapsed,
-            child: AnimatedRotation(
-              turns: _collapsed ? 0.0 : 0.5,
-              duration: animationDuration,
-              child: const Icon(_kChevronIcon),
-            ),
-          ),
+        if (widget.collapsible && !widget.collapseLeading) disclosure,
       ],
     );
   }

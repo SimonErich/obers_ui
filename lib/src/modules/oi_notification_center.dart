@@ -2,6 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/buttons/oi_button.dart';
 import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
+import 'package:obers_ui/src/primitives/display/oi_icon.dart';
 
 /// A notification item displayed in the [OiNotificationCenter].
 ///
@@ -209,7 +210,7 @@ class OiNotificationCenter extends StatelessWidget {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(
+                        OiIcon.raw(
                           OiIcons.users,
                           size: 48,
                           color: colors.textMuted,
@@ -266,7 +267,7 @@ class OiNotificationCenter extends StatelessWidget {
             else if (notification.icon != null)
               Padding(
                 padding: EdgeInsets.only(right: spacing.sm),
-                child: Icon(
+                child: OiIcon.raw(
                   notification.icon,
                   size: 24,
                   color: colors.textSubtle,

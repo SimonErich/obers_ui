@@ -8,6 +8,7 @@ import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_decoration_theme.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
+import 'package:obers_ui/src/primitives/display/oi_icon.dart';
 import 'package:obers_ui/src/primitives/display/oi_surface.dart';
 
 /// Internal OTP digit input rendered as a row of individual boxes.
@@ -258,7 +259,7 @@ class _OiOtpInputState extends State<OiOtpInput> {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(
+                OiIcon.raw(
                   OiIcons.circleAlert,
                   size: 14,
                   color: colors.error.base,

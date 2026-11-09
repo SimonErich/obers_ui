@@ -115,7 +115,7 @@ class OiStatusBarItem extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.only(right: 4),
             child: OiIcon.decorative(
-              icon: icon!,
+              icon: icon,
               size: 14,
               color: colors.textSubtle,
             ),

@@ -22,6 +22,7 @@ class OiChartAxisTheme {
     this.tickWidth,
     this.labelStyle,
     this.labelColor,
+    this.labelGap,
     this.titleStyle,
     this.titleColor,
   });
@@ -47,6 +48,9 @@ class OiChartAxisTheme {
   /// Color override for axis labels (applied on top of [labelStyle]).
   final Color? labelColor;
 
+  /// Plot-to-tick label gap; null retains each chart's existing defaults.
+  final double? labelGap;
+
   /// Text style for the axis title.
   final TextStyle? titleStyle;
 
@@ -62,6 +66,7 @@ class OiChartAxisTheme {
     double? tickWidth,
     TextStyle? labelStyle,
     Color? labelColor,
+    double? labelGap,
     TextStyle? titleStyle,
     Color? titleColor,
   }) {
@@ -73,6 +78,7 @@ class OiChartAxisTheme {
       tickWidth: tickWidth ?? this.tickWidth,
       labelStyle: labelStyle ?? this.labelStyle,
       labelColor: labelColor ?? this.labelColor,
+      labelGap: labelGap ?? this.labelGap,
       titleStyle: titleStyle ?? this.titleStyle,
       titleColor: titleColor ?? this.titleColor,
     );
@@ -89,6 +95,7 @@ class OiChartAxisTheme {
         other.tickWidth == tickWidth &&
         other.labelStyle == labelStyle &&
         other.labelColor == labelColor &&
+        other.labelGap == labelGap &&
         other.titleStyle == titleStyle &&
         other.titleColor == titleColor;
   }
@@ -102,6 +109,7 @@ class OiChartAxisTheme {
     tickWidth,
     labelStyle,
     labelColor,
+    labelGap,
     titleStyle,
     titleColor,
   );
@@ -179,9 +187,29 @@ class OiChartLegendTheme {
     this.labelStyle,
     this.labelColor,
     this.iconSize,
+    this.valueIconSize,
+    this.markerGap,
     this.spacing,
     this.padding,
+    this.valueLabelStyle,
+    this.valueStyle,
+    this.valueSpacing,
   });
+
+  /// Label typography for full-width value lists.
+  final TextStyle? valueLabelStyle;
+
+  /// Numeric typography for full-width value lists.
+  final TextStyle? valueStyle;
+
+  /// Vertical gap between full-width value rows.
+  final double? valueSpacing;
+
+  /// Marker size for a full-width value list.
+  final double? valueIconSize;
+
+  /// Space between inline markers and their labels.
+  final double? markerGap;
 
   /// Text style for legend labels.
   final TextStyle? labelStyle;
@@ -203,10 +231,20 @@ class OiChartLegendTheme {
     TextStyle? labelStyle,
     Color? labelColor,
     double? iconSize,
+    double? valueIconSize,
+    double? markerGap,
     double? spacing,
     EdgeInsets? padding,
+    TextStyle? valueLabelStyle,
+    TextStyle? valueStyle,
+    double? valueSpacing,
   }) {
     return OiChartLegendTheme(
+      valueIconSize: valueIconSize ?? this.valueIconSize,
+      markerGap: markerGap ?? this.markerGap,
+      valueLabelStyle: valueLabelStyle ?? this.valueLabelStyle,
+      valueStyle: valueStyle ?? this.valueStyle,
+      valueSpacing: valueSpacing ?? this.valueSpacing,
       labelStyle: labelStyle ?? this.labelStyle,
       labelColor: labelColor ?? this.labelColor,
       iconSize: iconSize ?? this.iconSize,
@@ -219,6 +257,11 @@ class OiChartLegendTheme {
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
     return other is OiChartLegendTheme &&
+        other.valueIconSize == valueIconSize &&
+        other.markerGap == markerGap &&
+        other.valueLabelStyle == valueLabelStyle &&
+        other.valueStyle == valueStyle &&
+        other.valueSpacing == valueSpacing &&
         other.labelStyle == labelStyle &&
         other.labelColor == labelColor &&
         other.iconSize == iconSize &&
@@ -227,8 +270,18 @@ class OiChartLegendTheme {
   }
 
   @override
-  int get hashCode =>
-      Object.hash(labelStyle, labelColor, iconSize, spacing, padding);
+  int get hashCode => Object.hash(
+    labelStyle,
+    labelColor,
+    iconSize,
+    spacing,
+    padding,
+    valueLabelStyle,
+    valueStyle,
+    valueSpacing,
+    valueIconSize,
+    markerGap,
+  );
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -701,7 +754,19 @@ class OiChartDensityTheme {
     this.barSpacing,
     this.barGroupSpacing,
     this.padding,
+    this.barWidth,
+    this.sectionSpacing,
+    this.radialInset,
   });
+
+  /// Inset around radial charts, shared by paint and pointer hit testing.
+  final double? radialInset;
+
+  /// Maximum width of one category, keeping sparse charts visually balanced.
+  final double? barWidth;
+
+  /// Extra space between labelled category sections (for example weeks).
+  final double? sectionSpacing;
 
   /// Default data-point radius in logical pixels.
   final double? pointSize;
@@ -725,8 +790,14 @@ class OiChartDensityTheme {
     double? barSpacing,
     double? barGroupSpacing,
     EdgeInsets? padding,
+    double? barWidth,
+    double? sectionSpacing,
+    double? radialInset,
   }) {
     return OiChartDensityTheme(
+      radialInset: radialInset ?? this.radialInset,
+      barWidth: barWidth ?? this.barWidth,
+      sectionSpacing: sectionSpacing ?? this.sectionSpacing,
       pointSize: pointSize ?? this.pointSize,
       lineWidth: lineWidth ?? this.lineWidth,
       barSpacing: barSpacing ?? this.barSpacing,
@@ -739,6 +810,9 @@ class OiChartDensityTheme {
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
     return other is OiChartDensityTheme &&
+        other.radialInset == radialInset &&
+        other.barWidth == barWidth &&
+        other.sectionSpacing == sectionSpacing &&
         other.pointSize == pointSize &&
         other.lineWidth == lineWidth &&
         other.barSpacing == barSpacing &&
@@ -747,8 +821,16 @@ class OiChartDensityTheme {
   }
 
   @override
-  int get hashCode =>
-      Object.hash(pointSize, lineWidth, barSpacing, barGroupSpacing, padding);
+  int get hashCode => Object.hash(
+    pointSize,
+    lineWidth,
+    barSpacing,
+    barGroupSpacing,
+    padding,
+    barWidth,
+    sectionSpacing,
+    radialInset,
+  );
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -771,6 +853,7 @@ class OiChartDensityTheme {
 class OiChartThemeData {
   /// Creates an [OiChartThemeData] with explicit sub-theme values.
   const OiChartThemeData({
+    this.centerValueStyle,
     this.palette,
     this.axis,
     this.grid,
@@ -783,6 +866,9 @@ class OiChartThemeData {
     this.motion,
     this.density,
   });
+
+  /// Typography for a primary number inside a radial chart.
+  final TextStyle? centerValueStyle;
 
   /// The color palette for chart series and semantic colors.
   final OiChartPalette? palette;
@@ -819,6 +905,7 @@ class OiChartThemeData {
 
   /// Creates a copy with optionally overridden values.
   OiChartThemeData copyWith({
+    TextStyle? centerValueStyle,
     OiChartPalette? palette,
     OiChartAxisTheme? axis,
     OiChartGridTheme? grid,
@@ -832,6 +919,7 @@ class OiChartThemeData {
     OiChartDensityTheme? density,
   }) {
     return OiChartThemeData(
+      centerValueStyle: centerValueStyle ?? this.centerValueStyle,
       palette: palette ?? this.palette,
       axis: axis ?? this.axis,
       grid: grid ?? this.grid,
@@ -850,6 +938,7 @@ class OiChartThemeData {
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
     return other is OiChartThemeData &&
+        other.centerValueStyle == centerValueStyle &&
         other.palette == palette &&
         other.axis == axis &&
         other.grid == grid &&
@@ -865,6 +954,7 @@ class OiChartThemeData {
 
   @override
   int get hashCode => Object.hash(
+    centerValueStyle,
     palette,
     axis,
     grid,

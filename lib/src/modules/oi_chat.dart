@@ -6,6 +6,7 @@ import 'package:obers_ui/src/components/navigation/oi_emoji_picker.dart';
 import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_spacing_scale.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
+import 'package:obers_ui/src/primitives/display/oi_icon.dart';
 import 'package:obers_ui/src/primitives/gesture/oi_long_press_menu.dart';
 import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
 import 'package:obers_ui/src/primitives/scroll/oi_infinite_scroll.dart';
@@ -380,7 +381,7 @@ class _OiChatState extends State<OiChat> {
                           color: colors.primary.base,
                           shape: BoxShape.circle,
                         ),
-                        child: Icon(
+                        child: OiIcon.raw(
                           OiIcons.sendHorizontal,
                           size: 20,
                           color: colors.textOnPrimary,
@@ -658,7 +659,7 @@ class _OiChatState extends State<OiChat> {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
+            OiIcon.raw(
               OiIcons.mail,
               size: 14,
               color: ownMessage ? colors.textOnPrimary : colors.textSubtle,
@@ -773,7 +774,11 @@ class _MoreEmojiButtonState extends State<_MoreEmojiButton> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: _showPicker,
-      child: const Icon(OiIcons.smilePlus, size: 20, color: Color(0xFF888888)),
+      child: const OiIcon.raw(
+        OiIcons.smilePlus,
+        size: 20,
+        color: Color(0xFF888888),
+      ),
     );
   }
 }

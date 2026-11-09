@@ -318,6 +318,7 @@ class _OiRangeAreaChartState<T> extends State<OiRangeAreaChart<T>> {
                       fillOpacity: widget.fillOpacity,
                       showGrid: widget.showGrid,
                       gridColor: colors.borderSubtle,
+                      labelGap: context.components.chart?.axis?.labelGap ?? 4,
                       axisLabelColor: colors.textMuted,
                       highContrast: isHighContrast,
                       compact: isCompact,
@@ -369,6 +370,7 @@ class _OiRangeAreaPainter<T> extends CustomPainter {
     required this.yLabels,
     required this.xDivisions,
     required this.yDivisions,
+    this.labelGap = 4,
   });
 
   final List<OiRangeAreaSeries<T>> series;
@@ -383,6 +385,9 @@ class _OiRangeAreaPainter<T> extends CustomPainter {
   final bool showGrid;
   final Color gridColor;
   final Color axisLabelColor;
+
+  /// Distance between grid axes and their tick labels.
+  final double labelGap;
   final bool highContrast;
   final bool compact;
   final List<String> xLabels;
@@ -431,12 +436,14 @@ class _OiRangeAreaPainter<T> extends CustomPainter {
       chartRect,
       labels: xLabels,
       labelColor: axisLabelColor,
+      labelGap: labelGap,
     );
     OiChartGrid.paintYLabels(
       canvas,
       chartRect,
       labels: yLabels,
       labelColor: axisLabelColor,
+      labelGap: labelGap,
     );
 
     for (var si = 0; si < series.length; si++) {
@@ -545,6 +552,7 @@ class _OiRangeAreaPainter<T> extends CustomPainter {
 
   @override
   bool shouldRepaint(_OiRangeAreaPainter<T> oldDelegate) =>
+      oldDelegate.labelGap != labelGap ||
       oldDelegate.series != series ||
       oldDelegate.colors != colors ||
       oldDelegate.minX != minX ||

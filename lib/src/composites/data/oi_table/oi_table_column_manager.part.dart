@@ -76,8 +76,6 @@ class _ColumnManagerPanel<T> extends StatelessWidget {
   });
 
   final List<OiTableColumn<T>> columns;
-
-  /// Heading shown above the column list.
   final String title;
   final Map<String, bool> visibility;
   final void Function(String columnId, {required bool visible}) onToggle;
@@ -130,7 +128,7 @@ class _ColumnManagerPanel<T> extends StatelessWidget {
                 ),
                 child: Row(
                   children: [
-                    Icon(
+                    OiIcon.raw(
                       (visibility[col.id] ?? true)
                           ? OiIcons.squareCheckBig
                           : OiIcons.square,

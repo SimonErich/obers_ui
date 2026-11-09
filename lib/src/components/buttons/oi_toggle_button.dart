@@ -2,6 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/buttons/oi_button.dart';
 import 'package:obers_ui/src/foundation/oi_app.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
+import 'package:obers_ui/src/primitives/display/oi_icon.dart';
 import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
 
 /// A button that toggles between selected and unselected states.
@@ -140,7 +141,7 @@ class OiToggleButton extends StatelessWidget {
       content = Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: _iconSize(), color: fgColor),
+          OiIcon.raw(icon, size: _iconSize(), color: fgColor),
           SizedBox(width: spacing.xs),
           Text(
             label!,
@@ -154,7 +155,7 @@ class OiToggleButton extends StatelessWidget {
         ],
       );
     } else if (icon != null) {
-      content = Icon(icon, size: _iconSize(), color: fgColor);
+      content = OiIcon.raw(icon, size: _iconSize(), color: fgColor);
     } else {
       content = Text(
         label ?? '',
@@ -181,7 +182,7 @@ class OiToggleButton extends StatelessWidget {
           borderRadius: borderRadius,
           border: border,
         ),
-        child: Center(child: content),
+        child: Center(widthFactor: 1, child: content),
       ),
     );
   }

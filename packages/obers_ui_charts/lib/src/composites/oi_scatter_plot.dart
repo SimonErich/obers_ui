@@ -340,6 +340,7 @@ class _OiScatterPlotState extends State<OiScatterPlot> {
                 chartRect: chartRect,
                 showGrid: widget.showGrid,
                 gridColor: colors.borderSubtle,
+                labelGap: context.components.chart?.axis?.labelGap ?? 4,
                 axisLabelColor: colors.textMuted,
                 highContrast: isHighContrast,
                 compact: isCompact,
@@ -487,6 +488,7 @@ class _OiScatterPlotPainter extends CustomPainter {
     required this.yDivisions,
     this.hoveredSeriesIndex,
     this.hoveredPointIndex,
+    this.labelGap = 4,
   });
 
   final List<OiScatterSeries> series;
@@ -496,6 +498,9 @@ class _OiScatterPlotPainter extends CustomPainter {
   final bool showGrid;
   final Color gridColor;
   final Color axisLabelColor;
+
+  /// Distance between grid axes and their tick labels.
+  final double labelGap;
   final bool highContrast;
   final bool compact;
   final List<String> xLabels;
@@ -532,12 +537,14 @@ class _OiScatterPlotPainter extends CustomPainter {
       chartRect,
       labels: xLabels,
       labelColor: axisLabelColor,
+      labelGap: labelGap,
     );
     OiChartGrid.paintYLabels(
       canvas,
       chartRect,
       labels: yLabels,
       labelColor: axisLabelColor,
+      labelGap: labelGap,
     );
 
     // Draw points.
@@ -608,6 +615,7 @@ class _OiScatterPlotPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(_OiScatterPlotPainter oldDelegate) =>
+      oldDelegate.labelGap != labelGap ||
       oldDelegate.series != series ||
       oldDelegate.colors != colors ||
       oldDelegate.showGrid != showGrid ||

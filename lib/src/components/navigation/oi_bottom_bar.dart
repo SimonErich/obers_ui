@@ -9,6 +9,7 @@ import 'package:obers_ui/src/composites/navigation/oi_responsive_shell.dart'
 import 'package:obers_ui/src/foundation/oi_responsive.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/models/oi_navigation_item.dart';
+import 'package:obers_ui/src/primitives/display/oi_icon.dart';
 
 /// The visual style of an [OiBottomBar].
 ///
@@ -371,7 +372,7 @@ class _OiBottomBarState extends State<OiBottomBar> {
     Color iconColor,
   ) {
     final colors = context.colors;
-    Widget iconWidget = Icon(iconData, size: 24, color: iconColor);
+    Widget iconWidget = OiIcon.raw(iconData, size: 24, color: iconColor);
 
     final badgeText = item.badge;
     final hasBadge = badgeText != null && badgeText.isNotEmpty;

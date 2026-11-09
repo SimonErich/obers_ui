@@ -308,7 +308,16 @@ void main() {
       );
       await tester.pump();
 
-      final fade = tester.widget<FadeTransition>(find.byType(FadeTransition));
+      // The toast's own fade is the outermost one; its dismiss button
+      // contains fades of its own (the interaction layer's state fills).
+      final fade = tester.widget<FadeTransition>(
+        find
+            .descendant(
+              of: find.byType(OiToast),
+              matching: find.byType(FadeTransition),
+            )
+            .first,
+      );
       expect(fade.opacity.value, 1.0);
     });
   });

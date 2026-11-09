@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/obers_ui.dart' show OiTree;
 import 'package:obers_ui/src/components/display/oi_badge.dart';
@@ -8,6 +6,7 @@ import 'package:obers_ui/src/composites/data/oi_tree.dart' show OiTree;
 import 'package:obers_ui/src/composites/workflow/oi_pipeline.dart';
 import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
+import 'package:obers_ui/src/primitives/display/oi_icon.dart';
 import 'package:obers_ui/src/primitives/display/oi_label.dart';
 import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
 
@@ -302,11 +301,11 @@ class _OiWorkflowTreeState<T> extends State<OiWorkflowTree<T>>
 
     // Drive the animation to match the controller.
     if (expanded && ac.status != AnimationStatus.forward && ac.value != 1) {
-      unawaited(ac.forward());
+      ac.forward();
     } else if (!expanded &&
         ac.status != AnimationStatus.reverse &&
         ac.value != 0) {
-      unawaited(ac.reverse());
+      ac.reverse();
     }
 
     final aggStatus = _aggregateStatus(group.items);
@@ -337,7 +336,7 @@ class _OiWorkflowTreeState<T> extends State<OiWorkflowTree<T>>
                   duration: context.animations.reducedMotion
                       ? Duration.zero
                       : const Duration(milliseconds: 200),
-                  child: Icon(
+                  child: OiIcon.raw(
                     OiIcons.chevronRight,
                     size: 14,
                     color: colors.textSubtle,
@@ -345,7 +344,7 @@ class _OiWorkflowTreeState<T> extends State<OiWorkflowTree<T>>
                 ),
                 SizedBox(width: spacing.xs),
                 if (group.icon != null) ...[
-                  Icon(group.icon, size: 14, color: colors.textSubtle),
+                  OiIcon.raw(group.icon, size: 14, color: colors.textSubtle),
                   SizedBox(width: spacing.xs),
                 ],
                 OiStatusDot(
@@ -370,7 +369,7 @@ class _OiWorkflowTreeState<T> extends State<OiWorkflowTree<T>>
         // Animated children.
         SizeTransition(
           sizeFactor: ac,
-          axisAlignment: -1,
+          alignment: AlignmentDirectional.topStart,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [

@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/foundation/theme/oi_color_scheme.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
+import 'package:obers_ui/src/primitives/display/oi_icon.dart';
 
 /// A node in the flow graph.
 ///
@@ -259,7 +260,7 @@ class _OiFlowGraphState extends State<OiFlowGraph> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               if (node.icon != null) ...[
-                Icon(node.icon, size: 16, color: colors.text),
+                OiIcon.raw(node.icon, size: 16, color: colors.text),
                 const SizedBox(width: 6),
               ],
               Flexible(

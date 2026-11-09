@@ -110,6 +110,13 @@ class _OiAutocompleteState<T> extends State<OiAutocomplete<T>> {
     if (_open) setState(() => _open = false);
   }
 
+  /// The IME's search action (soft keyboards have no Enter key event) picks
+  /// the highlighted suggestion, like Enter does.
+  void _onSubmitted(String _) {
+    if (!_open || _results.isEmpty) return;
+    _select(_results[_highlighted]);
+  }
+
   void _select(T item) {
     _queryId++;
     _controller.clear();
@@ -158,6 +165,7 @@ class _OiAutocompleteState<T> extends State<OiAutocomplete<T>> {
               leading: const Icon(OiIcons.search, size: 18),
               textInputAction: TextInputAction.search,
               onChanged: _onChanged,
+              onSubmitted: _onSubmitted,
             ),
           ),
         ),

@@ -13,6 +13,55 @@ const _tabs = [
 ];
 
 void main() {
+  testWidgets('text-only tabs expose visible counts without requiring icons', (
+    tester,
+  ) async {
+    await tester.pumpObers(
+      Center(
+        child: OiTabs(
+          tabs: const [
+            OiTabItem(label: 'Items', badge: 4),
+            OiTabItem(label: 'Empty', badge: 0),
+          ],
+          selectedIndex: 0,
+          onSelected: (_) {},
+        ),
+      ),
+    );
+    expect(find.text('4'), findsOneWidget);
+    expect(find.text('0'), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
+  for (final style in [
+    OiTabIndicatorStyle.underline,
+    OiTabIndicatorStyle.filled,
+  ]) {
+    testWidgets('$style divider owns space below its tab controls', (
+      tester,
+    ) async {
+      await tester.pumpObers(
+        Center(
+          child: OiTabs(
+            tabs: const [OiTabItem(label: 'Tab', semanticLabel: 'First tab')],
+            selectedIndex: 0,
+            onSelected: (_) {},
+            indicatorStyle: style,
+          ),
+        ),
+      );
+      final tab = find.byWidgetPredicate(
+        (widget) =>
+            widget is Semantics && widget.properties.label == 'First tab',
+      );
+      expect(
+        tester.getSize(find.byType(OiTabs)).height - tester.getSize(tab).height,
+        style == OiTabIndicatorStyle.underline ? 1 : 0,
+      );
+      expect(tester.takeException(), isNull);
+    });
+  }
+
   // ── Rendering ──────────────────────────────────────────────────────────────
 
   testWidgets('renders all tab labels', (tester) async {
@@ -112,6 +161,46 @@ void main() {
     );
     expect(find.byType(SingleChildScrollView), findsOneWidget);
   });
+
+  testWidgets(
+    'scrollable underline spans the label and follows controlled selection',
+    (tester) async {
+      var selected = 0;
+      await tester.pumpObers(
+        StatefulBuilder(
+          builder: (context, setState) => OiTabs(
+            tabs: _tabs,
+            selectedIndex: selected,
+            scrollable: true,
+            onSelected: (index) => setState(() => selected = index),
+          ),
+        ),
+      );
+      Finder activeIndicator() => find.byWidgetPredicate(
+        (widget) =>
+            widget is AnimatedContainer &&
+            widget.constraints?.maxHeight == 2 &&
+            (widget.decoration as BoxDecoration?)?.color?.a == 1,
+      );
+      expect(activeIndicator(), findsOneWidget);
+      expect(
+        tester.getSize(activeIndicator()).width,
+        greaterThan(tester.getSize(find.text('Alpha')).width),
+      );
+      expect(
+        tester.getTopLeft(activeIndicator()).dx,
+        lessThan(tester.getTopLeft(find.text('Alpha')).dx),
+      );
+      await tester.tap(find.text('Beta'));
+      await tester.pumpAndSettle();
+      expect(activeIndicator(), findsOneWidget);
+      expect(
+        tester.getCenter(activeIndicator()).dx,
+        closeTo(tester.getCenter(find.text('Beta')).dx, .1),
+      );
+      expect(tester.takeException(), isNull);
+    },
+  );
 
   // ── Content ────────────────────────────────────────────────────────────────
 

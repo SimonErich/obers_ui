@@ -48,7 +48,7 @@ class _ContextMenuRootState extends State<_ContextMenuRoot>
         ? Duration.zero
         : const Duration(milliseconds: 150);
     if (!_controller.isAnimating && _controller.value == 0) {
-      unawaited(_controller.forward());
+      _controller.forward();
     }
   }
 

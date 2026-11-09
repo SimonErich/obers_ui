@@ -1,12 +1,13 @@
 // Tests do not require documentation comments.
 
 import 'dart:async';
+import 'dart:ui' show SemanticsAction;
 
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:obers_ui/src/components/display/oi_badge.dart';
 import 'package:obers_ui/src/composites/search/oi_combo_box.dart';
+import 'package:obers_ui/src/primitives/interaction/oi_focus_trap.dart';
 
 import '../../../helpers/pump_app.dart';
 
@@ -65,6 +66,126 @@ Widget _comboBox({
 // ── Tests ─────────────────────────────────────────────────────────────────────
 
 void main() {
+  testWidgets('hidden visual label preserves accessible field identity', (
+    tester,
+  ) async {
+    final semantics = tester.ensureSemantics();
+    await tester.pumpObers(
+      SizedBox(
+        width: 300,
+        child: OiComboBox<String>(
+          label: 'Size',
+          showLabel: false,
+          value: 'Regular',
+          items: const ['Regular', 'Large'],
+          labelOf: (value) => value,
+        ),
+      ),
+    );
+    expect(find.text('Size'), findsNothing);
+    expect(find.bySemanticsLabel(RegExp('Size')), findsWidgets);
+    await tester.tap(find.text('Regular'));
+    await tester.pumpAndSettle();
+    expect(find.text('Large'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+    semantics.dispose();
+  });
+  testWidgets('selected field semantic action opens options without clearing', (
+    tester,
+  ) async {
+    final semantics = tester.ensureSemantics();
+    final changes = <String?>[];
+    await tester.pumpObers(_comboBox(value: 'Apple', onSelect: changes.add));
+    final field = tester.getSemantics(find.bySemanticsLabel('Fruit\nApple'));
+    field.owner!.performAction(
+      field.id,
+      SemanticsAction.tap,
+    );
+    await tester.pumpAndSettle();
+    expect(changes, isEmpty);
+    expect(find.text('Banana'), findsOneWidget);
+    semantics.dispose();
+  });
+
+  testWidgets('dialog search keeps a labeled editor and keyboard connection', (
+    tester,
+  ) async {
+    final semantics = tester.ensureSemantics();
+    final queries = <String>[];
+    await tester.pumpObers(
+      OiFocusTrap(
+        child: _comboBox(
+          search: (query) async {
+            queries.add(query);
+            return _fruits.where((item) => item.contains(query)).toList();
+          },
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.bySemanticsLabel('Fruit'));
+    await tester.pumpAndSettle();
+    final editor = tester.widget<EditableText>(find.byType(EditableText));
+    expect(editor.focusNode.hasPrimaryFocus, isTrue);
+    expect(tester.testTextInput.hasAnyClients, isTrue);
+    expect(find.bySemanticsLabel('Search…'), findsOneWidget);
+    tester.testTextInput.updateEditingValue(
+      const TextEditingValue(
+        text: 'Ban',
+        selection: TextSelection.collapsed(offset: 3),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.pump(const Duration(milliseconds: 250));
+    await tester.pumpAndSettle();
+    expect(queries.last, 'Ban');
+    expect(find.text('Banana'), findsOneWidget);
+    expect(find.text('Cherry'), findsNothing);
+    semantics.dispose();
+  });
+
+  testWidgets('latest search wins when responses arrive out of order', (
+    tester,
+  ) async {
+    final pending = <String, Completer<List<String>>>{};
+    await tester.pumpObers(
+      _comboBox(
+        search: (query) {
+          final result = Completer<List<String>>();
+          pending[query] = result;
+          return result.future;
+        },
+      ),
+    );
+    await tester.tap(find.byType(GestureDetector).first);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 250));
+    await tester.pump();
+    await tester.enterText(find.byType(EditableText), 'old');
+    await tester.pump(const Duration(milliseconds: 250));
+    await tester.enterText(find.byType(EditableText), 'new');
+    await tester.pump(const Duration(milliseconds: 250));
+    pending['new']!.complete(['New result']);
+    await tester.pump();
+    pending['old']!.complete(['Old result']);
+    pending['']!.complete(['Initial result']);
+    await tester.pumpAndSettle();
+    expect(find.text('New result'), findsOneWidget);
+    expect(find.text('Old result'), findsNothing);
+    expect(find.text('Initial result'), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('arrow navigation is safe with no results', (tester) async {
+    await tester.pumpObers(_comboBox(items: const []));
+    await tester.tap(find.byType(GestureDetector).first);
+    await tester.pumpAndSettle();
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowUp);
+    await tester.pump();
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('renders without error', (tester) async {
     await tester.pumpObers(_comboBox());
     expect(find.byType(OiComboBox<String>), findsOneWidget);
@@ -136,6 +257,26 @@ void main() {
   testWidgets('hint is shown when no error', (tester) async {
     await tester.pumpObers(_comboBox(hint: 'Choose your favorite'));
     expect(find.text('Choose your favorite'), findsOneWidget);
+  });
+
+  testWidgets('locked selections stay readable with one disabled opacity', (
+    tester,
+  ) async {
+    await tester.pumpObers(
+      _comboBox(enabled: false, value: 'Apple', clearable: false),
+    );
+    await tester.pumpAndSettle();
+    var opacity = 1.0;
+    tester.element(find.text('Apple')).visitAncestorElements((element) {
+      final widget = element.widget;
+      if (widget is Opacity) opacity *= widget.opacity;
+      if (widget is AnimatedOpacity) opacity *= widget.opacity;
+      return true;
+    });
+    expect(opacity, closeTo(.6, .001));
+    await tester.tap(find.text('Apple'), warnIfMissed: false);
+    await tester.pumpAndSettle();
+    expect(find.byType(EditableText), findsNothing);
   });
 
   testWidgets('disabled blocks interaction', (tester) async {
@@ -281,10 +422,37 @@ void main() {
       _comboBox(multiSelect: true, selectedValues: const ['Apple', 'Banana']),
     );
 
-    // Both selected items should show as OiBadge chips.
     expect(find.text('Apple'), findsOneWidget);
     expect(find.text('Banana'), findsOneWidget);
-    expect(find.byType(OiBadge), findsNWidgets(2));
+    expect(find.bySemanticsLabel('Remove Apple'), findsOneWidget);
+    expect(find.bySemanticsLabel('Remove Banana'), findsOneWidget);
+  });
+
+  testWidgets('selected chips remove independently and add row opens choices', (
+    tester,
+  ) async {
+    var selected = ['Apple', 'Banana'];
+    await tester.pumpObers(
+      StatefulBuilder(
+        builder: (context, setState) => OiComboBox<String>(
+          label: 'Fruit',
+          labelOf: (item) => item,
+          items: _fruits,
+          multiSelect: true,
+          addItemLabel: 'Add fruit',
+          selectedValues: selected,
+          onMultiSelect: (items) => setState(() => selected = items),
+        ),
+      ),
+    );
+    await tester.tap(find.bySemanticsLabel('Remove Apple'));
+    await tester.pumpAndSettle();
+    expect(selected, ['Banana']);
+    expect(find.text('Apple'), findsNothing);
+    expect(find.text('Search…'), findsNothing);
+    await tester.tap(find.bySemanticsLabel('Add fruit'));
+    await tester.pumpAndSettle();
+    expect(find.text('Apple'), findsOneWidget);
   });
 
   testWidgets('maxChipsVisible limits visible chips', (tester) async {

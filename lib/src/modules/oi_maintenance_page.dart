@@ -5,6 +5,7 @@ import 'package:obers_ui/src/components/buttons/oi_button.dart';
 import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/oi_responsive.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
+import 'package:obers_ui/src/primitives/display/oi_icon.dart';
 import 'package:obers_ui/src/primitives/display/oi_label.dart';
 import 'package:obers_ui/src/primitives/layout/oi_container.dart';
 
@@ -360,7 +361,7 @@ class _OiMaintenancePageState extends State<OiMaintenancePage> {
     if (widget.icon != null) {
       return Padding(
         padding: EdgeInsets.only(bottom: sp.lg),
-        child: Icon(widget.icon, size: 64, color: colors.textMuted),
+        child: OiIcon.raw(widget.icon, size: 64, color: colors.textMuted),
       );
     }
 
@@ -391,7 +392,7 @@ class _OiMaintenancePageState extends State<OiMaintenancePage> {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(OiIcons.clock, size: 14, color: colors.textMuted),
+        OiIcon.raw(OiIcons.clock, size: 14, color: colors.textMuted),
         SizedBox(width: sp.xs),
         OiLabel.small(text, color: colors.textMuted),
       ],
@@ -452,7 +453,7 @@ class _OiMaintenancePageState extends State<OiMaintenancePage> {
               child: Padding(
                 padding: EdgeInsets.all(sp.xs),
                 child: link.icon != null
-                    ? Icon(link.icon, size: 20, color: colors.textMuted)
+                    ? OiIcon.raw(link.icon, size: 20, color: colors.textMuted)
                     : OiLabel.small(link.label, color: colors.textMuted),
               ),
             ),

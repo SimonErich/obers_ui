@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
+import 'package:obers_ui/src/primitives/display/oi_icon.dart';
 
 /// The open/closed state of an [OiFolderIcon].
 ///
@@ -200,7 +201,7 @@ class OiFolderIcon extends StatelessWidget {
                 Positioned(
                   right: 0,
                   bottom: 0,
-                  child: Icon(
+                  child: OiIcon.raw(
                     _variantOverlayIcon,
                     size: dims.overlaySize,
                     color: colors.textSubtle,

@@ -143,7 +143,7 @@ void main() {
       ),
     );
     final lv = tester.widget<ListView>(find.byType(ListView));
-    expect(lv.cacheExtent, 500);
+    expect(lv.scrollCacheExtent?.value, 500);
   });
 
   // ── 9. Reduced motion: refresh spinner stops animating ──────────────────

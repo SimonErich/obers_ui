@@ -127,6 +127,48 @@ void main() {
     expect(selected, ['Apricot']);
   });
 
+  testWidgets('the keyboard search action selects the highlighted suggestion', (
+    tester,
+  ) async {
+    final selected = await _pump(tester);
+    await _type(tester, 'ap');
+
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+    await tester.testTextInput.receiveAction(TextInputAction.search);
+    await tester.pumpAndSettle();
+
+    expect(selected, ['Apricot']);
+    expect(
+      tester.widget<EditableText>(find.byType(EditableText)).controller.text,
+      isEmpty,
+      reason: 'the query is cleared',
+    );
+    expect(find.text('Apricot'), findsNothing);
+  });
+
+  testWidgets('a blank query never searches, and the search action on an empty '
+      'result selects nothing', (tester) async {
+    var searches = 0;
+    final selected = await _pump(
+      tester,
+      search: (_) async {
+        searches++;
+        return [];
+      },
+    );
+
+    await _type(tester, '   ');
+    expect(searches, 0);
+
+    await _type(tester, 'missing');
+    expect(find.text('Nothing found'), findsOneWidget);
+    expect(searches, 1);
+
+    await tester.testTextInput.receiveAction(TextInputAction.search);
+    await tester.pumpAndSettle();
+    expect(selected, isEmpty);
+  });
+
   testWidgets('Escape closes the list without selecting', (tester) async {
     final selected = await _pump(tester);
     await _type(tester, 'ap');

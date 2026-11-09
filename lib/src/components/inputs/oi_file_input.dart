@@ -4,6 +4,7 @@ import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/_internal/oi_input_frame.dart';
 import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
+import 'package:obers_ui/src/primitives/display/oi_icon.dart';
 import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
 
 /// A file-picker input that opens the platform file browser.
@@ -150,7 +151,7 @@ class _OiFileInputState extends State<OiFileInput> {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
+          OiIcon.raw(
             OiIcons.file,
             size: 14,
             color: colors.textMuted,
@@ -169,7 +170,7 @@ class _OiFileInputState extends State<OiFileInput> {
             const SizedBox(width: 4),
             OiTappable(
               onTap: () => _removeFile(index),
-              child: Icon(
+              child: OiIcon.raw(
                 OiIcons.x,
                 size: 14,
                 color: colors.textMuted,
@@ -211,7 +212,7 @@ class _OiFileInputState extends State<OiFileInput> {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(
+                OiIcon.raw(
                   OiIcons.cloudUpload,
                   size: 16,
                   color: _isDragOver ? colors.primary.base : colors.textMuted,
@@ -267,7 +268,7 @@ class _OiFileInputState extends State<OiFileInput> {
                 ),
               )
             else
-              Icon(
+              OiIcon.raw(
                 OiIcons.upload,
                 size: 16,
                 color: colors.primary.base,

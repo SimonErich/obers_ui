@@ -26,6 +26,26 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets('changed configured dimensions reset the matching axis', (
+    tester,
+  ) async {
+    Future<void> pump(double width, double height) => tester.pumpObers(
+      Align(
+        alignment: Alignment.topLeft,
+        child: OiResizable(
+          initialWidth: width,
+          initialHeight: height,
+          child: const SizedBox(),
+        ),
+      ),
+    );
+    await pump(240, 80);
+    expect(tester.getSize(find.byType(OiResizable)), const Size(240, 80));
+    await pump(160, 96);
+    expect(tester.getSize(find.byType(OiResizable)), const Size(160, 96));
+    expect(tester.takeException(), isNull);
+  });
+
   // ── onResized callback ─────────────────────────────────────────────────────
 
   testWidgets('dragging right edge fires onResized', (tester) async {

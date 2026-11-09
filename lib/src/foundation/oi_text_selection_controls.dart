@@ -95,11 +95,13 @@ class _HandlePainter extends CustomPainter {
 
     switch (type) {
       case TextSelectionHandleType.left:
-        canvas.drawRect(Rect.fromLTWH(radius * 2 - 1, 0, 2, stem), paint);
-        canvas.drawCircle(Offset(radius, radius + stem), radius, paint);
+        canvas
+          ..drawRect(Rect.fromLTWH(radius * 2 - 1, 0, 2, stem), paint)
+          ..drawCircle(Offset(radius, radius + stem), radius, paint);
       case TextSelectionHandleType.right:
-        canvas.drawRect(const Rect.fromLTWH(0, 0, 2, stem), paint);
-        canvas.drawCircle(Offset(radius, radius + stem), radius, paint);
+        canvas
+          ..drawRect(const Rect.fromLTWH(0, 0, 2, stem), paint)
+          ..drawCircle(Offset(radius, radius + stem), radius, paint);
       case TextSelectionHandleType.collapsed:
         canvas.drawCircle(Offset(radius, radius), radius * 0.6, paint);
     }

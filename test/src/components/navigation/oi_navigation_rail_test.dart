@@ -1,8 +1,12 @@
 // Tests do not require documentation comments.
 
+import 'package:flutter/gestures.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui/src/components/navigation/oi_navigation_rail.dart';
+import 'package:obers_ui/src/foundation/theme/component_themes/oi_navigation_rail_theme_data.dart';
+import 'package:obers_ui/src/foundation/theme/oi_theme_data.dart';
 import 'package:obers_ui/src/models/oi_navigation_item.dart';
 
 import '../../../helpers/pump_app.dart';
@@ -39,6 +43,170 @@ void main() {
       expect(find.byIcon(_kIcon), findsOneWidget);
       expect(find.byIcon(_kIcon2), findsOneWidget);
       expect(find.byIcon(_kIcon3), findsOneWidget);
+    });
+
+    testWidgets('hover preserves contrast on a custom dark rail', (
+      tester,
+    ) async {
+      const unselected = Color(0xffc2c1ce);
+      const selected = Color(0xff22212a);
+      final base = OiThemeData.light();
+      await tester.pumpObers(
+        OiNavigationRail(
+          items: _kItems,
+          currentIndex: 1,
+          onTap: (_) {},
+          labelBehavior: OiRailLabelBehavior.none,
+        ),
+        theme: base.copyWith(
+          components: base.components.copyWith(
+            navigationRail: const OiNavigationRailThemeData(
+              backgroundColor: Color(0xff1e1e28),
+              indicatorColor: Color(0xffc4c1ef),
+              selectedIconColor: selected,
+              unselectedIconColor: unselected,
+            ),
+          ),
+        ),
+        surfaceSize: const Size(400, 600),
+      );
+      Color? color(IconData icon) =>
+          tester.widget<Icon>(find.byIcon(icon)).color;
+      expect(color(_kIcon), unselected);
+      expect(color(_kIcon2), selected);
+      final mouse = await tester.createGesture(kind: PointerDeviceKind.mouse);
+      await mouse.addPointer(location: const Offset(390, 590));
+      await mouse.moveTo(tester.getCenter(find.byIcon(_kIcon)));
+      await tester.pumpAndSettle();
+      expect(color(_kIcon), unselected);
+      expect(color(_kIcon2), selected);
+      await mouse.moveTo(const Offset(390, 590));
+      await tester.pumpAndSettle();
+      expect(color(_kIcon), unselected);
+      await mouse.removePointer();
+    });
+
+    for (final expanded in <bool?>[null, true]) {
+      testWidgets(
+        'hover styling remains independent of selection ($expanded)',
+        (
+          tester,
+        ) async {
+          const selectedForeground = Color(0xff16161e);
+          const hoverForeground = Color(0xffeeeeff);
+          const hoverBackground = Color(0xff333340);
+          const selectedBackground = Color(0xffbfbde9);
+          final base = OiThemeData.light();
+          await tester.pumpObers(
+            OiNavigationRail(
+              items: _kItems,
+              currentIndex: 1,
+              onTap: (_) {},
+              expanded: expanded,
+              width: 160,
+            ),
+            theme: base.copyWith(
+              components: base.components.copyWith(
+                navigationRail: const OiNavigationRailThemeData(
+                  backgroundColor: Color(0xff1e1e28),
+                  indicatorColor: selectedBackground,
+                  selectedIconColor: selectedForeground,
+                  unselectedIconColor: Color(0xffaaaaaa),
+                  hoverIconColor: hoverForeground,
+                  hoverColor: hoverBackground,
+                  selectedLabelStyle: TextStyle(color: selectedForeground),
+                  unselectedLabelStyle: TextStyle(color: Color(0xffaaaaaa)),
+                  hoverLabelStyle: TextStyle(color: hoverForeground),
+                ),
+              ),
+            ),
+            surfaceSize: const Size(400, 600),
+          );
+          Color? iconColor(IconData icon) =>
+              tester.widget<Icon>(find.byIcon(icon)).color;
+          Color? backgroundFor(IconData icon) => tester
+              .widgetList<DecoratedBox>(
+                find.ancestor(
+                  of: find.byIcon(icon),
+                  matching: find.byType(DecoratedBox),
+                ),
+              )
+              .map((box) => box.decoration)
+              .whereType<ShapeDecoration>()
+              .firstOrNull
+              ?.color;
+          final mouse = await tester.createGesture(
+            kind: PointerDeviceKind.mouse,
+          );
+          await mouse.addPointer(location: const Offset(390, 590));
+          await mouse.moveTo(tester.getCenter(find.byIcon(_kIcon)));
+          await tester.pumpAndSettle();
+          expect(iconColor(_kIcon), hoverForeground);
+          expect(
+            tester.widget<Text>(find.text('Home')).style?.color,
+            hoverForeground,
+          );
+          expect(backgroundFor(_kIcon), hoverBackground);
+          expect(backgroundFor(_kIcon2), selectedBackground);
+          await mouse.moveTo(tester.getCenter(find.byIcon(_kIcon2)));
+          await tester.pumpAndSettle();
+          expect(iconColor(_kIcon2), selectedForeground);
+          expect(backgroundFor(_kIcon2), selectedBackground);
+          expect(
+            tester.widget<Text>(find.text('Search')).style?.color,
+            selectedForeground,
+          );
+          expect(backgroundFor(_kIcon), isNull);
+          await mouse.removePointer();
+        },
+      );
+    }
+
+    testWidgets('keyboard entry paints and exit removes the rail focus ring', (
+      tester,
+    ) async {
+      await tester.pumpObers(
+        Column(
+          children: [
+            Expanded(
+              child: OiNavigationRail(
+                items: _kItems,
+                currentIndex: 1,
+                onTap: (_) {},
+              ),
+            ),
+            const Focus(child: SizedBox(width: 20, height: 20)),
+          ],
+        ),
+        surfaceSize: const Size(400, 600),
+      );
+      final ring = find.descendant(
+        of: find.byType(OiNavigationRail),
+        matching: find.byWidgetPredicate(
+          (widget) =>
+              widget is DecoratedBox &&
+              widget.position == DecorationPosition.foreground,
+        ),
+      );
+      expect(ring, findsNothing);
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.pumpAndSettle();
+      final railFocus = tester
+          .widget<Focus>(
+            find
+                .descendant(
+                  of: find.byType(OiNavigationRail),
+                  matching: find.byType(Focus),
+                )
+                .first,
+          )
+          .focusNode!;
+      expect(railFocus.hasFocus, isTrue);
+      expect(ring, findsOneWidget);
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.pumpAndSettle();
+      expect(railFocus.hasFocus, isFalse);
+      expect(ring, findsNothing);
     });
 
     // ── Selection ────────────────────────────────────────────────────────────

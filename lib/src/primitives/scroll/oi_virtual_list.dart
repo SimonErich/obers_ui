@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/rendering.dart' show ScrollCacheExtent;
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/foundation/oi_app.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
@@ -123,9 +124,11 @@ class _OiVirtualListState extends State<OiVirtualList> {
   @override
   Widget build(BuildContext context) {
     final list = ListView.builder(
+      scrollCacheExtent: widget.cacheExtent == null
+          ? null
+          : ScrollCacheExtent.pixels(widget.cacheExtent!),
       itemCount: widget.itemCount,
       itemBuilder: widget.itemBuilder,
-      cacheExtent: widget.cacheExtent,
       controller: widget.controller,
       scrollDirection: widget.scrollDirection,
       reverse: widget.reverse,
@@ -181,7 +184,7 @@ class _OiSpinnerState extends State<_OiSpinner>
       vsync: this,
       duration: const Duration(milliseconds: 800),
     );
-    unawaited(_controller.repeat());
+    _controller.repeat();
   }
 
   @override
@@ -198,7 +201,7 @@ class _OiSpinnerState extends State<_OiSpinner>
         ..stop()
         ..value = 0;
     } else if (!reduced && !_controller.isAnimating) {
-      unawaited(_controller.repeat());
+      _controller.repeat();
     }
   }
 

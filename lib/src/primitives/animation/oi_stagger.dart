@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/primitives/overlay/oi_visibility.dart';
@@ -110,7 +108,7 @@ class OiStaggerState extends State<OiStagger>
     if (reduced) {
       _controller.value = 1.0;
     } else {
-      unawaited(_controller.forward(from: 0));
+      _controller.forward(from: 0);
     }
   }
 

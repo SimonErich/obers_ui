@@ -33,15 +33,24 @@ class OiTappable extends StatefulWidget {
     this.onHover,
     this.onFocusChange,
     this.enabled = true,
+    this.disabledOpacity = 0.4,
     this.focusable = true,
+    this.focusNode,
     this.dragging = false,
     this.applyBackgroundOverlay = true,
     this.dimWhenDisabled = true,
     this.semanticLabel,
+    this.semanticHint,
+    this.semanticContainer = false,
     this.cursor,
     this.clipBorderRadius,
+    this.statesController,
     super.key,
   });
+
+  /// Optional observer for hover, focus and pressed states. The caller owns it.
+  /// Enables stateful component themes without duplicating gesture handling.
+  final WidgetStatesController? statesController;
 
   /// The widget to render inside the tappable area.
   final Widget child;
@@ -63,14 +72,21 @@ class OiTappable extends StatefulWidget {
 
   /// Whether the widget responds to interactions.
   ///
-  /// When `false`, callbacks are suppressed. The widget also fades to 0.4
-  /// opacity unless [dimWhenDisabled] is `false`.
+  /// When `false`, callbacks are suppressed. The widget also fades to
+  /// [disabledOpacity] unless [dimWhenDisabled] is `false`.
   final bool enabled;
+
+  /// Opacity applied when disabled (and [dimWhenDisabled] is `true`); one
+  /// preserves informational legibility.
+  final double disabledOpacity;
 
   /// Whether the widget participates in keyboard focus traversal.
   ///
   /// When `false`, the [Focus] node cannot receive focus.
   final bool focusable;
+
+  /// Optional externally owned node for groups with roving keyboard focus.
+  final FocusNode? focusNode;
 
   /// Whether the widget is currently being dragged.
   ///
@@ -82,13 +98,15 @@ class OiTappable extends StatefulWidget {
   /// Whether to paint [OiInteractiveStyle.backgroundOverlay] for the current
   /// state.
   ///
-  /// Set to `false` when the child already paints a per-state fill so the
-  /// overlay does not tint that colour. Ignored when the current style sets
+  /// Set to `false` when the child already paints a per-state fill (for
+  /// example a component with explicit per-state theme colours) so the overlay
+  /// does not tint that colour; keyboard focus rings and gesture behaviour are
+  /// kept. Ignored when the current style sets
   /// [OiInteractiveStyle.backgroundOverride] — a concrete fill always
   /// replaces the tint.
   final bool applyBackgroundOverlay;
 
-  /// When [enabled] is `false`, whether to fade the child to 0.4 opacity.
+  /// When [enabled] is `false`, whether to fade the child to [disabledOpacity].
   ///
   /// Set to `false` when the child already paints a disabled appearance.
   final bool dimWhenDisabled;
@@ -96,6 +114,14 @@ class OiTappable extends StatefulWidget {
   /// An optional label announced by screen readers in place of the child's
   /// semantic content.
   final String? semanticLabel;
+
+  /// Additional context announced with the named action.
+  final String? semanticHint;
+
+  /// Isolates the action from surrounding semantics, including sliver indexes.
+  ///
+  /// Defaults to false so enclosing checkbox/radio semantics can still merge.
+  final bool semanticContainer;
 
   /// The mouse cursor to display when hovering over this widget.
   ///
@@ -151,15 +177,24 @@ class _OiTappableState extends State<OiTappable> {
   // ── State helpers ──────────────────────────────────────────────────────────
 
   void _setHovered(bool value) {
-    if (_isHovered != value) setState(() => _isHovered = value);
+    if (_isHovered != value) {
+      setState(() => _isHovered = value);
+      widget.statesController?.update(WidgetState.hovered, value);
+    }
   }
 
   void _setPressed(bool value) {
-    if (_isPressed != value) setState(() => _isPressed = value);
+    if (_isPressed != value) {
+      setState(() => _isPressed = value);
+      widget.statesController?.update(WidgetState.pressed, value);
+    }
   }
 
   void _setFocused(bool value) {
-    if (_isFocused != value) setState(() => _isFocused = value);
+    if (_isFocused != value) {
+      setState(() => _isFocused = value);
+      widget.statesController?.update(WidgetState.focused, value);
+    }
   }
 
   // ── Effective style ────────────────────────────────────────────────────────
@@ -326,7 +361,7 @@ class _OiTappableState extends State<OiTappable> {
 
     // Reduced opacity when disabled.
     if (!widget.enabled && widget.dimWhenDisabled) {
-      content = Opacity(opacity: 0.4, child: content);
+      content = Opacity(opacity: widget.disabledOpacity, child: content);
     }
 
     // Enforce minimum touch target. Always rendered (even when minTarget is
@@ -373,6 +408,7 @@ class _OiTappableState extends State<OiTappable> {
 
     // Keyboard focus.
     content = Focus(
+      focusNode: widget.focusNode,
       canRequestFocus: widget.focusable && widget.enabled,
       onFocusChange: (focused) {
         _setFocused(focused);
@@ -383,9 +419,11 @@ class _OiTappableState extends State<OiTappable> {
     );
 
     // Semantics label.
-    if (widget.semanticLabel != null) {
+    if (widget.semanticLabel != null || widget.semanticHint != null) {
       content = Semantics(
+        container: widget.semanticContainer,
         label: widget.semanticLabel,
+        hint: widget.semanticHint,
         button: true,
         enabled: widget.enabled,
         child: content,

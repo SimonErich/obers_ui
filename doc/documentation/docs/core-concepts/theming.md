@@ -1,79 +1,40 @@
-# Theming Overview
+# Theming
 
-ObersUI uses a **token-based design system**. Every visual decision — color, spacing, font size, border radius, shadow, animation duration — comes from a theme token, not a hardcoded value.
+ObersUI uses a token-based design system. Every visual choice (color, spacing,
+font size, corner radius, shadow, motion) comes from a theme token, not a
+hardcoded value. Set the theme once, and every widget follows it.
 
-## How it works
+## The short version
 
-1. `OiApp` injects an `OiThemeData` into the widget tree
-2. All widgets read their visual properties from this theme
-3. You customize the theme — every widget updates automatically
+You give `OiApp` a theme. The fastest way is one brand color:
 
 ```dart
 OiApp(
-  theme: OiThemeData.light(),   // or .dark(), or .fromBrand()
-  home: const MyHomePage(),
+  theme: OiThemeData.fromBrand(color: Color(0xFF8B6914)),
+  home: myHome,
 )
 ```
 
-## Accessing the theme
+`fromBrand` builds a full palette from that single color. From there, every widget
+reads its colors and spacing from the theme.
 
-Inside any widget, use `BuildContext` extensions:
-
-```dart
-final colors = context.colors;      // OiColorScheme
-final text = context.textTheme;     // OiTextTheme
-final space = context.spacing;      // OiSpacingScale
-final radii = context.radius;       // OiRadiusScale
-```
-
-No `Theme.of(context)` wrappers needed. Just `context.colors`, `context.spacing`, etc.
-
-## What's in a theme?
-
-`OiThemeData` aggregates all design tokens:
-
-| Token | Class | What it controls |
-| --- | --- | --- |
-| Colors | `OiColorScheme` | Semantic colors (primary, accent, success, warning, error, info), surfaces, text, borders |
-| Typography | `OiTextTheme` | 14 text styles (display, h1–h4, body, bodyStrong, small, smallStrong, tiny, caption, code, overline, link) |
-| Spacing | `OiSpacingScale` | 6 spacing values (xs=4, sm=8, md=16, lg=24, xl=32, xxl=48) + page gutters |
-| Radius | `OiRadiusScale` | Border radii with preference (sharp, medium, rounded) |
-| Shadows | `OiShadowScale` | Elevation-based shadows |
-| Animations | `OiAnimationConfig` | Durations (fast=150ms, normal=250ms, slow=400ms) + reduced motion |
-| Effects | `OiEffectsTheme` | Six interaction states: hover, focus, active, selected, dragging, disabled |
-| Decoration | `OiDecorationTheme` | Border styles (solid, dashed, dotted, gradient) |
-| Components | `OiComponentThemes` | Per-widget theme overrides |
-
-## Three levels of customization
-
-### Level 1: Just works (beginner)
-
-Use the built-in light or dark theme:
+You read tokens in your own code through context extensions:
 
 ```dart
-OiThemeData.light()
-OiThemeData.dark()
+final blue = context.colors.primary.base;
+final gap = context.spacing.md;
+final round = context.radius.lg;
 ```
 
-### Level 2: Brand it (intermediate)
+## Where to go next
 
-One color in, full theme out:
+This page is the quick tour. The [Theming section](../theming/index.md) has the
+full detail:
 
-```dart
-OiThemeData.fromBrand(color: Color(0xFF8B6914))
-```
-
-### Level 3: Full control (advanced)
-
-Override any token:
-
-```dart
-OiThemeData.light().copyWith(
-  colors: OiColorScheme.light().copyWith(
-    primary: OiColorSwatch.from(Color(0xFF8B6914)),
-  ),
-  textTheme: OiTextTheme.standard(fontFamily: 'Poppins'),
-)
-```
-
-For the full theming guide, see [Theming](../theming/index.md).
+- [Quick Brand Setup](../theming/quick-brand.md) for the one-color path.
+- [Color System](../theming/color-system.md) for swatches and surface tokens.
+- [Typography](../theming/typography.md) for text styles and `OiLabel`.
+- [Design Tokens](../theming/tokens.md) for spacing, radius, shadows, and motion.
+- [Component Themes](../theming/component-themes.md) to restyle individual widgets.
+- [Dark Mode](../theming/dark-mode.md) for light and dark themes.
+- [Extending Themes](../theming/extending-themes.md) for full control with `copyWith`.

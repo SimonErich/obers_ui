@@ -3,6 +3,7 @@ import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/display/oi_badge.dart';
 import 'package:obers_ui/src/components/overlays/oi_context_menu.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
+import 'package:obers_ui/src/primitives/display/oi_icon.dart';
 import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
 
 // ── Data model ───────────────────────────────────────────────────────────────
@@ -257,7 +258,7 @@ class _OiNavMenuBodyState extends State<_OiNavMenuBody> {
       child: Row(
         children: [
           if (item.icon != null) ...[
-            Icon(
+            OiIcon.raw(
               item.icon,
               size: 18,
               color: item.disabled ? colors.textMuted : iconColor,

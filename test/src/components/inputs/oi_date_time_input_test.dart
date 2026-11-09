@@ -2,6 +2,7 @@
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:obers_ui/src/components/inputs/oi_date_input.dart';
 import 'package:obers_ui/src/components/inputs/oi_date_time_input.dart';
 import 'package:obers_ui/src/components/inputs/oi_time_input.dart';
@@ -9,6 +10,20 @@ import 'package:obers_ui/src/components/inputs/oi_time_input.dart';
 import '../../../helpers/pump_app.dart';
 
 void main() {
+  setUpAll(() => initializeDateFormatting('en_IE'));
+
+  testWidgets('date half retains explicit locale and pattern', (tester) async {
+    await tester.pumpObers(
+      OiDateTimeInput(
+        label: 'Delivery',
+        value: DateTime(2026, 9, 29, 11, 30),
+        dateFormat: 'dd MMM yyyy',
+        locale: 'en_IE',
+      ),
+    );
+    expect(find.text('29 Sept 2026'), findsOneWidget);
+    expect(find.text('11:30'), findsOneWidget);
+  });
   testWidgets('renders without error', (tester) async {
     await tester.pumpObers(const OiDateTimeInput(label: 'Test'));
     expect(find.byType(OiDateTimeInput), findsOneWidget);
@@ -71,7 +86,7 @@ void main() {
           matching: find.byType(GestureDetector),
         ),
       );
-      await tester.pump();
+      await tester.pumpAndSettle();
 
       // Confirm the picker (keeps existing date, fires callback)
       await tester.tap(find.text('OK'));
@@ -104,7 +119,7 @@ void main() {
           matching: find.byType(GestureDetector),
         ),
       );
-      await tester.pump();
+      await tester.pumpAndSettle();
 
       // Confirm the picker
       await tester.tap(find.text('OK'));
@@ -134,7 +149,7 @@ void main() {
         matching: find.byType(GestureDetector),
       ),
     );
-    await tester.pump();
+    await tester.pumpAndSettle();
 
     await tester.tap(find.text('OK'));
     await tester.pump();
@@ -160,7 +175,7 @@ void main() {
         matching: find.byType(GestureDetector),
       ),
     );
-    await tester.pump();
+    await tester.pumpAndSettle();
 
     await tester.tap(find.text('OK'));
     await tester.pump();

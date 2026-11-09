@@ -1,8 +1,7 @@
-import 'dart:async';
-
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
+import 'package:obers_ui/src/primitives/display/oi_icon.dart';
 import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
 
 /// A floating button that appears when the user scrolls past a threshold
@@ -86,20 +85,18 @@ class _OiScrollToTopState extends State<OiScrollToTop>
     if (shouldShow != _visible) {
       _visible = shouldShow;
       if (_visible) {
-        unawaited(_fadeController.forward());
+        _fadeController.forward();
       } else {
-        unawaited(_fadeController.reverse());
+        _fadeController.reverse();
       }
     }
   }
 
   void _scrollToTop() {
-    unawaited(
-      widget.controller.animateTo(
-        0,
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeOutCubic,
-      ),
+    widget.controller.animateTo(
+      0,
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeOutCubic,
     );
   }
 
@@ -116,7 +113,7 @@ class _OiScrollToTopState extends State<OiScrollToTop>
         shape: BoxShape.circle,
         boxShadow: shadows.md,
       ),
-      child: Icon(
+      child: OiIcon.raw(
         OiIcons.chevronUp,
         size: 20,
         color: colors.text,

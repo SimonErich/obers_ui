@@ -3,45 +3,48 @@ part of '../oi_field_display.dart';
 extension _OiFieldDisplayLayout on OiFieldDisplay {
   Widget _buildPairLayout(BuildContext context) {
     final colors = context.colors;
-    final labelWidget = OiLabel.smallStrong(
+    final theme = context.components.fieldDisplay;
+    final pairGap = theme?.pairGap ?? 4.0;
+    final labelStyle = theme?.labelStyle;
+    final labelWidget = OiLabel.variant(
       label,
+      variant: OiLabelVariant.small,
       overflow: TextOverflow.ellipsis,
       maxLines: 1,
+      color: labelStyle?.color ?? colors.textSubtle,
+      style: labelStyle,
     );
 
     final valueWidget = _wrapInteraction(context, _buildContent(context));
 
+    Widget content;
     if (_direction == Axis.vertical) {
-      return Column(
+      content = Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          DefaultTextStyle(
-            style: TextStyle(color: colors.textMuted),
-            child: labelWidget,
-          ),
-          const SizedBox(height: 4),
+          labelWidget,
+          SizedBox(height: pairGap),
           valueWidget,
+        ],
+      );
+    } else {
+      content = Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (_labelWidth != null)
+            SizedBox(width: _labelWidth, child: labelWidget)
+          else
+            labelWidget,
+          if (_labelWidth == null) SizedBox(width: pairGap + 4),
+          Expanded(child: valueWidget),
         ],
       );
     }
 
-    final labelChild = DefaultTextStyle(
-      style: TextStyle(color: colors.textMuted),
-      child: labelWidget,
-    );
-
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        if (_labelWidth != null)
-          SizedBox(width: _labelWidth, child: labelChild)
-        else
-          labelChild,
-        if (_labelWidth == null) const SizedBox(width: 8),
-        Expanded(child: valueWidget),
-      ],
-    );
+    final padding = theme?.padding;
+    if (padding == null) return content;
+    return Padding(padding: padding, child: content);
   }
 
   Widget _wrapInteraction(BuildContext context, Widget child) {

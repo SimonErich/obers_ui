@@ -1,6 +1,7 @@
 // Tests do not require documentation comments.
 
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui/src/components/buttons/oi_icon_button.dart';
 import 'package:obers_ui/src/components/shop/oi_quantity_selector.dart';
@@ -9,6 +10,71 @@ import 'package:obers_ui/src/primitives/display/oi_label.dart';
 import '../../../helpers/pump_app.dart';
 
 void main() {
+  testWidgets(
+    'bounded compact quantities retain width and increment behavior',
+    (tester) async {
+      int? changed;
+      await tester.pumpObers(
+        Center(
+          child: OiQuantitySelector(
+            value: 2,
+            label: 'Soup',
+            compact: true,
+            width: 90,
+            onChange: (value) => changed = value,
+          ),
+        ),
+      );
+      expect(tester.getSize(find.byType(OiQuantitySelector)).width, 90);
+      await tester.tap(find.byType(OiIconButton).last);
+      expect(changed, 3);
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets(
+    'compact quantity frame adds no height around its action targets',
+    (tester) async {
+      await tester.pumpObers(
+        Center(
+          child: OiQuantitySelector(
+            value: 2,
+            label: 'Soup',
+            compact: true,
+            onChange: (_) {},
+          ),
+        ),
+      );
+      final height = tester.getSize(find.byType(OiQuantitySelector)).height;
+      final actionHeight = tester
+          .getSize(find.byType(OiIconButton).first)
+          .height;
+      expect(height, actionHeight);
+    },
+  );
+
+  testWidgets('quantity actions expose item-specific buttons and semantics', (
+    tester,
+  ) async {
+    final semantics = tester.ensureSemantics();
+    int? changed;
+    await tester.pumpObers(
+      OiQuantitySelector(
+        value: 2,
+        label: 'Soup',
+        compact: true,
+        increaseLabel: 'Increase Soup',
+        decreaseLabel: 'Decrease Soup',
+        onChange: (value) => changed = value,
+      ),
+    );
+    expect(find.bySemanticsLabel('Increase Soup'), findsOneWidget);
+    expect(find.bySemanticsLabel('Decrease Soup'), findsOneWidget);
+    await tester.tap(find.bySemanticsLabel('Increase Soup'));
+    expect(changed, 3);
+    expect(tester.takeException(), isNull);
+    semantics.dispose();
+  });
   group('OiQuantitySelector', () {
     testWidgets('renders minus button, value, and plus button', (tester) async {
       await tester.pumpObers(

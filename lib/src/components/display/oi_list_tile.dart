@@ -21,6 +21,13 @@ class OiListTile extends StatelessWidget {
     this.selected = false,
     this.enabled = true,
     this.dense = false,
+    this.padding,
+    this.gap,
+    this.titleStyle,
+    this.subtitleStyle,
+    this.titleMaxLines = 1,
+    this.subtitleMaxLines = 2,
+    this.semanticLabel,
     super.key,
   });
 
@@ -50,6 +57,28 @@ class OiListTile extends StatelessWidget {
   /// When `true`, vertical padding is reduced for a more compact appearance.
   final bool dense;
 
+  /// Optional insets; null preserves the standard or dense layout.
+  final EdgeInsetsGeometry? padding;
+
+  /// Space between leading, content and trailing children.
+  final double? gap;
+
+  /// Typography merged with the default title style.
+  final TextStyle? titleStyle;
+
+  /// Typography merged with the default subtitle style.
+  final TextStyle? subtitleStyle;
+
+  /// Maximum primary text lines; null allows wrapping without a line limit.
+  /// The default retains the compact, single-line row.
+  final int? titleMaxLines;
+
+  /// Maximum secondary text lines; null allows wrapping without a line limit.
+  final int? subtitleMaxLines;
+
+  /// Accessible name for the action; defaults to the title.
+  final String? semanticLabel;
+
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
@@ -61,37 +90,50 @@ class OiListTile extends StatelessWidget {
         fontSize: 14,
         fontWeight: FontWeight.w500,
         color: enabled ? colors.text : colors.textMuted,
-      ),
-      maxLines: 1,
-      overflow: TextOverflow.ellipsis,
+      ).merge(titleStyle),
+      maxLines: titleMaxLines,
+      overflow: titleMaxLines == null
+          ? TextOverflow.clip
+          : TextOverflow.ellipsis,
     );
 
-    var content = titleWidget as Widget;
+    // The action supplies its title once; nested text must not repeat it.
+    final namedTitle = onTap == null
+        ? titleWidget
+        : ExcludeSemantics(child: titleWidget);
+    var content = namedTitle;
 
     if (subtitle != null) {
       content = Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          titleWidget,
+          namedTitle,
           const SizedBox(height: 2),
           Text(
             subtitle!,
-            style: TextStyle(fontSize: 12, color: colors.textMuted),
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              fontSize: 12,
+              color: colors.textMuted,
+            ).merge(subtitleStyle),
+            maxLines: subtitleMaxLines,
+            overflow: subtitleMaxLines == null
+                ? TextOverflow.clip
+                : TextOverflow.ellipsis,
           ),
         ],
       );
     }
 
     final row = Padding(
-      padding: EdgeInsets.symmetric(horizontal: 16, vertical: verticalPadding),
+      padding:
+          padding ??
+          EdgeInsets.symmetric(horizontal: 16, vertical: verticalPadding),
       child: Row(
         children: [
-          if (leading != null) ...[leading!, const SizedBox(width: 12)],
+          if (leading != null) ...[leading!, SizedBox(width: gap ?? 12)],
           Expanded(child: content),
-          if (trailing != null) ...[const SizedBox(width: 12), trailing!],
+          if (trailing != null) ...[SizedBox(width: gap ?? 12), trailing!],
         ],
       ),
     );
@@ -106,6 +148,15 @@ class OiListTile extends StatelessWidget {
       tile = row;
     }
 
-    return OiTappable(onTap: onTap, enabled: enabled, child: tile);
+    if (onTap == null) {
+      return tile;
+    }
+
+    return OiTappable(
+      onTap: onTap,
+      enabled: enabled,
+      semanticLabel: semanticLabel ?? title,
+      child: tile,
+    );
   }
 }

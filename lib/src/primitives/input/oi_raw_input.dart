@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
@@ -20,6 +18,7 @@ class OiRawInput extends StatefulWidget {
     required this.controller,
     required this.focusNode,
     this.placeholder,
+    this.excludePlaceholderSemantics = false,
     this.leading,
     this.trailing,
     this.maxLines = 1,
@@ -31,6 +30,7 @@ class OiRawInput extends StatefulWidget {
     this.onChanged,
     this.onEditingComplete,
     this.onSubmitted,
+    this.autofillHints,
     this.enabled = true,
     this.readOnly = false,
     this.obscureText = false,
@@ -56,6 +56,10 @@ class OiRawInput extends StatefulWidget {
 
   /// Placeholder text shown when [controller] text is empty.
   final String? placeholder;
+
+  /// Prevents a visual placeholder from being merged into an explicit label.
+  /// The owning input should expose it as a semantic hint instead.
+  final bool excludePlaceholderSemantics;
 
   /// An optional widget placed before the text field.
   final Widget? leading;
@@ -93,7 +97,13 @@ class OiRawInput extends StatefulWidget {
   /// Called when the user submits the input.
   final ValueChanged<String>? onSubmitted;
 
+  /// Autofill hints forwarded to the platform editable control.
+  final Iterable<String>? autofillHints;
+
   /// Whether the field accepts user input.
+  ///
+  /// Disabling releases focus and blocks focus requests while preserving the
+  /// controller, selection and caller-owned [focusNode] settings.
   final bool enabled;
 
   /// Whether the field is read-only (shows text but ignores input).
@@ -149,14 +159,15 @@ class _OiRawInputState extends State<OiRawInput>
     implements TextSelectionGestureDetectorBuilderDelegate {
   // The selection gestures EditableText does not have on its own: drag to
   // select, double/triple tap, shift-click, long-press and handles on
-  // touch, right-click for the menu. The same builder TextField uses.
-  final GlobalKey<EditableTextState> _editableKey =
+  // touch, right-click for the menu. The same builder TextField uses. One
+  // recognizer handles clicks and multi-taps together: separate double-tap
+  // recognition would delay RenderEditable's single click, allowing it to
+  // overwrite the caret after subsequent keyboard input.
+  @override
+  final GlobalKey<EditableTextState> editableTextKey =
       GlobalKey<EditableTextState>();
   late final TextSelectionGestureDetectorBuilder _selectionGestures =
       TextSelectionGestureDetectorBuilder(delegate: this);
-
-  @override
-  GlobalKey<EditableTextState> get editableTextKey => _editableKey;
 
   @override
   bool get forcePressEnabled => false;
@@ -164,7 +175,6 @@ class _OiRawInputState extends State<OiRawInput>
   @override
   bool get selectionEnabled => widget.enabled;
 
-  // Track whether the placeholder should be visible.
   /// One shared instance, like Material's `materialTextSelectionControls`.
   /// A new one per build makes [EditableText] treat the controls as changed
   /// and rebuild its selection overlay on every rebuild; inside an overlay
@@ -175,6 +185,7 @@ class _OiRawInputState extends State<OiRawInput>
   static final TextSelectionControls _defaultSelectionControls =
       OiTextSelectionControls();
 
+  // Track whether the placeholder should be visible.
   bool _showPlaceholder = true;
 
   @override
@@ -222,14 +233,12 @@ class _OiRawInputState extends State<OiRawInput>
               context.animations.reducedMotion ||
               MediaQuery.disableAnimationsOf(context);
           Scrollable.maybeOf(context)?.position; // trigger dependency
-          unawaited(
-            Scrollable.ensureVisible(
-              context,
-              alignment: 0.5,
-              duration: reduced
-                  ? Duration.zero
-                  : const Duration(milliseconds: 200),
-            ),
+          Scrollable.ensureVisible(
+            context,
+            alignment: 0.5,
+            duration: reduced
+                ? Duration.zero
+                : const Duration(milliseconds: 200),
           );
         }
       });
@@ -251,7 +260,8 @@ class _OiRawInputState extends State<OiRawInput>
     if (themeData != null) {
       return themeData.textTheme
           .styleFor(OiLabelVariant.small)
-          .copyWith(color: themeData.colors.text, height: 1.2);
+          .copyWith(color: themeData.colors.text, height: 1.2)
+          .merge(themeData.components.textInput?.textStyle);
     }
     return const TextStyle(
       fontSize: 14,
@@ -278,7 +288,7 @@ class _OiRawInputState extends State<OiRawInput>
 
     // The core EditableText widget.
     final editableText = EditableText(
-      key: _editableKey,
+      key: editableTextKey,
       // The gesture detector below handles the pointer.
       rendererIgnoresPointer: true,
       controller: widget.controller,
@@ -289,6 +299,7 @@ class _OiRawInputState extends State<OiRawInput>
           OiTheme.maybeOf(context)?.colors.text ?? const Color(0xFF000000),
       keyboardType: widget.keyboardType,
       textInputAction: widget.textInputAction,
+      autofillHints: widget.autofillHints,
       textCapitalization: widget.textCapitalization,
       onChanged: widget.onChanged,
       onEditingComplete: widget.onEditingComplete,
@@ -349,11 +360,14 @@ class _OiRawInputState extends State<OiRawInput>
                   alignment: multiline
                       ? AlignmentDirectional.topStart
                       : AlignmentDirectional.centerStart,
-                  child: Text(
-                    widget.placeholder!,
-                    style: effectiveStyle.copyWith(color: placeholderColor),
-                    maxLines: multiline ? null : 1,
-                    overflow: multiline ? null : TextOverflow.ellipsis,
+                  child: ExcludeSemantics(
+                    excluding: widget.excludePlaceholderSemantics,
+                    child: Text(
+                      widget.placeholder!,
+                      style: effectiveStyle.copyWith(color: placeholderColor),
+                      maxLines: widget.maxLines,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
                 ),
               ),
@@ -365,19 +379,40 @@ class _OiRawInputState extends State<OiRawInput>
       );
     }
 
-    // Build the Row with optional leading / trailing.
-    if (widget.leading == null && widget.trailing == null) {
-      return Listener(onPointerDown: _handlePointerDown, child: fieldWidget);
+    // EditableText delegates enabled/focus semantics to its input wrapper.
+    // Without this contract the web engine emits a disabled native text field.
+    void focusInput() {
+      if (!widget.enabled || !widget.focusNode.canRequestFocus) return;
+      if (!widget.controller.selection.isValid) {
+        widget.controller.selection = TextSelection.collapsed(
+          offset: widget.controller.text.length,
+        );
+      }
+      widget.focusNode.requestFocus();
     }
 
-    return Listener(
-      onPointerDown: _handlePointerDown,
-      child: Row(
-        children: [
-          if (widget.leading != null) widget.leading!,
-          Expanded(child: fieldWidget),
-          if (widget.trailing != null) widget.trailing!,
-        ],
+    // A temporarily disabled editor must release its input connection. Merely
+    // making EditableText read-only leaves it focused and can retain a stale
+    // read-only web editing configuration when it becomes enabled again.
+    // ExcludeFocus also respects caller-owned FocusNode settings on re-enable.
+    return ExcludeFocus(
+      excluding: !widget.enabled,
+      child: Semantics(
+        enabled: widget.enabled,
+        onTap: widget.enabled && !widget.readOnly ? focusInput : null,
+        onFocus: widget.enabled ? focusInput : null,
+        child: Listener(
+          onPointerDown: _handlePointerDown,
+          child: widget.leading == null && widget.trailing == null
+              ? fieldWidget
+              : Row(
+                  children: [
+                    if (widget.leading != null) widget.leading!,
+                    Expanded(child: fieldWidget),
+                    if (widget.trailing != null) widget.trailing!,
+                  ],
+                ),
+        ),
       ),
     );
   }

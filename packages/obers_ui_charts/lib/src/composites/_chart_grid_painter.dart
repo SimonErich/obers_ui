@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/painting.dart';
 import 'package:obers_ui_charts/obers_ui_charts.dart'
     show OiBarChart, OiLineChart, OiScatterPlot;
@@ -61,29 +63,44 @@ abstract final class OiChartGrid {
     bool highContrast = false,
     int horizontalDivisions = 5,
     int verticalDivisions = 5,
+    List<double>? dashPattern,
+    double? strokeWidth,
   }) {
     final paint = Paint()
       ..color = gridColor
-      ..strokeWidth = highContrast ? 1.0 : 0.5;
-
-    // Horizontal grid lines.
-    for (var i = 1; i < horizontalDivisions; i++) {
-      final y = chartRect.top + chartRect.height * i / horizontalDivisions;
-      canvas.drawLine(
-        Offset(chartRect.left, y),
-        Offset(chartRect.right, y),
-        paint,
-      );
+      ..strokeWidth = strokeWidth ?? (highContrast ? 1.0 : .5);
+    final dashes = dashPattern?.where((v) => v > 0 && v.isFinite).toList();
+    void line(Offset start, Offset end) {
+      if (dashes == null || dashes.isEmpty) {
+        canvas.drawLine(start, end, paint);
+        return;
+      }
+      final vector = end - start;
+      final distance = vector.distance;
+      if (distance <= 0) return;
+      var offset = 0.0;
+      var index = 0;
+      while (offset < distance) {
+        final next = math.min(distance, offset + dashes[index % dashes.length]);
+        if (index.isEven) {
+          canvas.drawLine(
+            start + vector * (offset / distance),
+            start + vector * (next / distance),
+            paint,
+          );
+        }
+        offset = next;
+        index++;
+      }
     }
 
-    // Vertical grid lines.
+    for (var i = dashes == null ? 1 : 0; i < horizontalDivisions; i++) {
+      final y = chartRect.top + chartRect.height * i / horizontalDivisions;
+      line(Offset(chartRect.left, y), Offset(chartRect.right, y));
+    }
     for (var i = 1; i < verticalDivisions; i++) {
       final x = chartRect.left + chartRect.width * i / verticalDivisions;
-      canvas.drawLine(
-        Offset(x, chartRect.top),
-        Offset(x, chartRect.bottom),
-        paint,
-      );
+      line(Offset(x, chartRect.top), Offset(x, chartRect.bottom));
     }
   }
 
@@ -94,6 +111,8 @@ abstract final class OiChartGrid {
     required List<String> labels,
     required Color labelColor,
     double fontSize = 10,
+    TextStyle? labelStyle,
+    double labelGap = 4,
   }) {
     if (labels.isEmpty) return;
     for (var i = 0; i < labels.length; i++) {
@@ -103,11 +122,13 @@ abstract final class OiChartGrid {
       final tp = TextPainter(
         text: TextSpan(
           text: labels[i],
-          style: TextStyle(color: labelColor, fontSize: fontSize),
+          style: TextStyle(
+            fontSize: fontSize,
+          ).merge(labelStyle).copyWith(color: labelColor),
         ),
         textDirection: TextDirection.ltr,
       )..layout();
-      tp.paint(canvas, Offset(x - tp.width / 2, chartRect.bottom + 4));
+      tp.paint(canvas, Offset(x - tp.width / 2, chartRect.bottom + labelGap));
     }
   }
 
@@ -118,21 +139,27 @@ abstract final class OiChartGrid {
     required List<String> labels,
     required Color labelColor,
     double fontSize = 10,
+    TextStyle? labelStyle,
+    double labelGap = 4,
   }) {
     if (labels.isEmpty) return;
     for (var i = 0; i < labels.length; i++) {
       // Labels go from bottom (index 0) to top (last index).
-      final y = chartRect.bottom - chartRect.height * i / (labels.length - 1);
+      final y = labels.length == 1
+          ? chartRect.center.dy
+          : chartRect.bottom - chartRect.height * i / (labels.length - 1);
       final tp = TextPainter(
         text: TextSpan(
           text: labels[i],
-          style: TextStyle(color: labelColor, fontSize: fontSize),
+          style: TextStyle(
+            fontSize: fontSize,
+          ).merge(labelStyle).copyWith(color: labelColor),
         ),
         textDirection: TextDirection.ltr,
       )..layout();
       tp.paint(
         canvas,
-        Offset(chartRect.left - tp.width - 4, y - tp.height / 2),
+        Offset(chartRect.left - tp.width - labelGap, y - tp.height / 2),
       );
     }
   }

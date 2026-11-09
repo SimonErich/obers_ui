@@ -1,11 +1,38 @@
 // Tests do not require documentation comments.
 
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui/src/components/inputs/oi_number_input.dart';
 
 import '../../../helpers/pump_app.dart';
 
 void main() {
+  testWidgets('plain amounts keep units and editable left-aligned value', (
+    tester,
+  ) async {
+    double? changed;
+    await tester.pumpObers(
+      OiNumberInput(
+        value: 4.25,
+        showSteppers: false,
+        prefix: const Text('Price'),
+        suffix: const Text('EUR'),
+        onChanged: (value) => changed = value,
+      ),
+    );
+    expect(find.text('Price'), findsOneWidget);
+    expect(find.text('EUR'), findsOneWidget);
+    expect(find.text('+'), findsNothing);
+    expect(find.text('-'), findsNothing);
+    expect(
+      tester.widget<EditableText>(find.byType(EditableText)).textAlign,
+      TextAlign.start,
+    );
+    await tester.enterText(find.byType(EditableText), '40.25');
+    await tester.testTextInput.receiveAction(TextInputAction.done);
+    expect(changed, 40.25);
+  });
+
   testWidgets('renders without error', (tester) async {
     await tester.pumpObers(const OiNumberInput());
     expect(find.byType(OiNumberInput), findsOneWidget);

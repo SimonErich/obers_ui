@@ -49,6 +49,7 @@ class OiHistogramPainter extends CustomPainter {
     required this.yLabels,
     required this.xDivisions,
     required this.yDivisions,
+    this.labelGap = 4,
   });
 
   /// The resolved series data.
@@ -74,6 +75,9 @@ class OiHistogramPainter extends CustomPainter {
 
   /// Axis label color.
   final Color axisLabelColor;
+
+  /// Distance between grid axes and their tick labels.
+  final double labelGap;
 
   /// High-contrast accessibility mode.
   final bool highContrast;
@@ -137,12 +141,14 @@ class OiHistogramPainter extends CustomPainter {
       chartRect,
       labels: xLabels,
       labelColor: axisLabelColor,
+      labelGap: labelGap,
     );
     OiChartGrid.paintYLabels(
       canvas,
       chartRect,
       labels: yLabels,
       labelColor: axisLabelColor,
+      labelGap: labelGap,
     );
 
     for (final series in resolvedSeries) {
@@ -241,6 +247,7 @@ class OiHistogramPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(OiHistogramPainter oldDelegate) =>
+      oldDelegate.labelGap != labelGap ||
       oldDelegate.resolvedSeries != resolvedSeries ||
       oldDelegate.chartRect != chartRect ||
       oldDelegate.dataMin != dataMin ||

@@ -18,6 +18,7 @@ class OiTooltip extends StatefulWidget {
     required this.message,
     required this.child,
     this.content,
+    this.excludeFromSemantics = false,
     this.showDelay = const Duration(milliseconds: 600),
     this.alignment = OiFloatingAlignment.topCenter,
     super.key,
@@ -36,6 +37,10 @@ class OiTooltip extends StatefulWidget {
 
   /// Optional rich content that overrides [message].
   final Widget? content;
+
+  /// Omits this label when the child already supplies the same accessible name.
+  /// The visible hover and long-press explanation remains available.
+  final bool excludeFromSemantics;
 
   /// Delay before the tooltip appears after hover/long-press starts.
   final Duration showDelay;
@@ -138,7 +143,7 @@ class _OiTooltipState extends State<OiTooltip> {
     );
 
     return Semantics(
-      label: widget.label,
+      label: widget.excludeFromSemantics ? null : widget.label,
       child: OiFloating(
         visible: _visible,
         alignment: widget.alignment,

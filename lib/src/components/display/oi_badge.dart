@@ -3,6 +3,7 @@ import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_color_scheme.dart';
 import 'package:obers_ui/src/foundation/theme/oi_color_swatch.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
+import 'package:obers_ui/src/primitives/display/oi_icon.dart';
 
 /// The semantic color of an [OiBadge].
 ///
@@ -62,6 +63,7 @@ enum OiBadgeStyle {
 ///
 /// Supports three rendering styles and seven semantic [color]s.
 /// When [dot] is `true` a small circle is shown with no text.
+/// Use [showDot] to retain the label beside a decorative status marker.
 ///
 /// Use the named constructors for each visual style:
 /// - [OiBadge.filled]: solid coloured background with contrasting text.
@@ -85,6 +87,9 @@ class OiBadge extends StatelessWidget {
     this.size = OiBadgeSize.medium,
     this.icon,
     this.dot = false,
+    this.showDot = false,
+    this.compactToken = false,
+    this.counter = false,
     super.key,
   });
 
@@ -97,6 +102,7 @@ class OiBadge extends StatelessWidget {
     OiBadgeSize size = OiBadgeSize.medium,
     IconData? icon,
     bool dot = false,
+    bool showDot = false,
     Key? key,
   }) : this._(
          label: label,
@@ -105,6 +111,7 @@ class OiBadge extends StatelessWidget {
          size: size,
          icon: icon,
          dot: dot,
+         showDot: showDot,
          key: key,
        );
 
@@ -115,6 +122,7 @@ class OiBadge extends StatelessWidget {
     OiBadgeSize size = OiBadgeSize.medium,
     IconData? icon,
     bool dot = false,
+    bool showDot = false,
     Key? key,
   }) : this._(
          label: label,
@@ -123,6 +131,7 @@ class OiBadge extends StatelessWidget {
          size: size,
          icon: icon,
          dot: dot,
+         showDot: showDot,
          key: key,
        );
 
@@ -133,6 +142,7 @@ class OiBadge extends StatelessWidget {
     OiBadgeSize size = OiBadgeSize.medium,
     IconData? icon,
     bool dot = false,
+    bool showDot = false,
     Key? key,
   }) : this._(
          label: label,
@@ -141,8 +151,43 @@ class OiBadge extends StatelessWidget {
          size: size,
          icon: icon,
          dot: dot,
+         showDot: showDot,
          key: key,
        );
+
+  /// A small unread count, styled separately from status pills.
+  const OiBadge.counter({
+    required String label,
+    OiBadgeColor color = OiBadgeColor.primary,
+    OiBadgeStyle style = OiBadgeStyle.filled,
+    Key? key,
+  }) : this._(
+         label: label,
+         style: style,
+         color: color,
+         counter: true,
+         key: key,
+       );
+
+  /// A compact square code token, such as an allergen or keyboard-sized tag.
+  /// Unlike status pills, tokens use a 20px minimum width and height.
+  const OiBadge.token({
+    required String label,
+    OiBadgeColor color = OiBadgeColor.neutral,
+    Key? key,
+  }) : this._(
+         label: label,
+         style: OiBadgeStyle.soft,
+         color: color,
+         compactToken: true,
+         key: key,
+       );
+
+  /// Uses compact square token geometry instead of the status badge theme.
+  final bool compactToken;
+
+  /// Whether this is a compact unread counter.
+  final bool counter;
 
   /// The text label. Ignored when [dot] is `true`.
   final String label;
@@ -161,6 +206,12 @@ class OiBadge extends StatelessWidget {
 
   /// When `true`, renders a small dot with no text.
   final bool dot;
+
+  /// Shows a decorative six-pixel status marker before the visible label.
+  ///
+  /// The marker follows the badge foreground, so it contrasts with each style.
+  /// The label remains the accessible name. [dot] takes precedence when true.
+  final bool showDot;
 
   // ---------------------------------------------------------------------------
   // Helpers
@@ -205,21 +256,28 @@ class OiBadge extends StatelessWidget {
   }
 
   ({Color background, Color textColor, Color? borderColor}) _resolveColors(
-    OiColorScheme colors,
-  ) {
+    OiColorScheme colors, {
+    required bool useSwatchColors,
+  }) {
     final swatch = _swatch(colors);
     final base = swatch.base;
     switch (style) {
       case OiBadgeStyle.filled:
         return (
           background: base,
-          textColor: colors.textOnPrimary,
+          textColor: useSwatchColors ? swatch.foreground : colors.textOnPrimary,
           borderColor: null,
         );
       case OiBadgeStyle.soft:
         return (
-          background: base.withValues(alpha: 0.2),
-          textColor: swatch.dark,
+          background: !useSwatchColors
+              ? base.withValues(alpha: 0.2)
+              : color == OiBadgeColor.neutral
+              ? colors.surfaceSubtle
+              : swatch.muted,
+          textColor: useSwatchColors && color == OiBadgeColor.neutral
+              ? colors.textMuted
+              : swatch.dark,
           borderColor: null,
         );
       case OiBadgeStyle.outline:
@@ -265,12 +323,25 @@ class OiBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
-    final resolved = _resolveColors(colors);
+    final resolved = _resolveColors(
+      colors,
+      useSwatchColors: context.components.badge?.useSwatchColors ?? false,
+    );
     final dims = _resolveDimensions();
     final bt = context.components.badge;
-    final effectivePadding = bt?.padding ?? dims.padding;
-    final effectiveBorderRadius =
-        bt?.borderRadius ?? BorderRadius.circular(100);
+    final compact = compactToken || counter;
+    final metrics = counter
+        ? bt?.counter
+        : compactToken
+        ? bt?.token
+        : null;
+    final compactHeight = metrics?.height ?? (counter ? 18.0 : 20.0);
+    final effectivePadding = compact
+        ? metrics?.padding ?? const EdgeInsets.symmetric(horizontal: 4)
+        : bt?.padding ?? dims.padding;
+    final effectiveBorderRadius = compact
+        ? metrics?.borderRadius ?? BorderRadius.circular(counter ? 6 : 4)
+        : bt?.borderRadius ?? BorderRadius.circular(100);
 
     if (dot) {
       final dotColor = resolved.background == const Color(0x00000000)
@@ -293,7 +364,7 @@ class OiBadge extends StatelessWidget {
           ),
           child: dotIconData != null
               ? Center(
-                  child: Icon(
+                  child: OiIcon.raw(
                     dotIconData,
                     size: dims.dotSize * 0.7,
                     color: colors.textOnPrimary,
@@ -304,30 +375,56 @@ class OiBadge extends StatelessWidget {
       );
     }
 
-    final textStyle =
-        bt?.textStyle?.copyWith(color: resolved.textColor) ??
-        TextStyle(
-          fontSize: dims.fontSize,
-          fontWeight: FontWeight.w700,
-          color: resolved.textColor,
-          height: 1,
-        );
+    final textStyle = compact
+        ? (metrics?.textStyle ??
+                  context.textTheme.caption.copyWith(
+                    fontSize: 12,
+                    height: 1,
+                    fontWeight: FontWeight.w600,
+                    fontVariations: const [],
+                  ))
+              .copyWith(color: resolved.textColor)
+        : bt?.textStyle?.copyWith(color: resolved.textColor) ??
+              TextStyle(
+                fontSize: dims.fontSize,
+                fontWeight: FontWeight.w700,
+                color: resolved.textColor,
+                height: 1,
+              );
 
     Widget content = Text(label, style: textStyle);
 
-    if (icon != null) {
+    if (icon != null || showDot) {
       content = Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: dims.iconSize, color: resolved.textColor),
-          const SizedBox(width: 4),
+          if (showDot) ...[
+            ExcludeSemantics(
+              child: Container(
+                width: 6,
+                height: 6,
+                decoration: BoxDecoration(
+                  color: resolved.textColor,
+                  shape: BoxShape.circle,
+                ),
+              ),
+            ),
+            const SizedBox(width: 6),
+          ],
+          if (icon != null) ...[
+            OiIcon.raw(icon, size: dims.iconSize, color: resolved.textColor),
+            const SizedBox(width: 4),
+          ],
           Text(label, style: textStyle),
         ],
       );
     }
 
     final Widget badge = Container(
-      height: bt?.height,
+      height: compact ? compactHeight : bt?.height,
+      constraints: compact
+          ? BoxConstraints(minWidth: metrics?.minWidth ?? compactHeight)
+          : null,
       padding: effectivePadding,
       decoration: BoxDecoration(
         color: resolved.background,
@@ -336,7 +433,9 @@ class OiBadge extends StatelessWidget {
             ? Border.all(color: resolved.borderColor!)
             : null,
       ),
-      child: bt?.height != null ? Center(child: content) : content,
+      child: compact || bt?.height != null
+          ? Center(widthFactor: 1, heightFactor: 1, child: content)
+          : content,
     );
     return badge;
   }

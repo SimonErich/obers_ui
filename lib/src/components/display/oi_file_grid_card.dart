@@ -2,6 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/modules/oi_file_manager.dart';
+import 'package:obers_ui/src/primitives/display/oi_icon.dart';
 
 /// A single card in the grid view of a file explorer.
 ///
@@ -62,7 +63,7 @@ class OiFileGridCard extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(
+              OiIcon.raw(
                 file.folder ? OiIcons.folder : OiIcons.file,
                 size: 40,
                 color: file.folder ? colors.warning.base : colors.textSubtle,

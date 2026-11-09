@@ -3,6 +3,16 @@ import 'package:obers_ui/obers_ui.dart' show OiColorScheme;
 import 'package:obers_ui_charts/obers_ui_charts.dart';
 
 void main() {
+  test('axis label gap participates in copy, equality and hash', () {
+    const defaults = OiChartAxisTheme();
+    final themed = defaults.copyWith(labelGap: 8);
+    expect(defaults.labelGap, isNull);
+    expect(themed, const OiChartAxisTheme(labelGap: 8));
+    expect(themed.hashCode, const OiChartAxisTheme(labelGap: 8).hashCode);
+    expect(themed, isNot(defaults));
+    expect(themed.copyWith(), themed);
+  });
+
   group('OiChartPalette', () {
     test('categorical returns at least 8 colors', () {
       final palette = OiChartPalette.colors(OiColorScheme.light());

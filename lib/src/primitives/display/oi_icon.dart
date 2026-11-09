@@ -1,82 +1,151 @@
 import 'package:flutter/widgets.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:obers_ui/src/foundation/icons/oi_icon_data.dart';
+import 'package:obers_ui/src/foundation/icons/oi_icon_source.dart';
 import 'package:obers_ui/src/foundation/theme/oi_text_theme.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 
-/// A semantically-annotated icon widget.
+/// The common semantic icon renderer for font and local SVG sources.
 ///
-/// [OiIcon] wraps an [IconData] with an [Icon] widget and adds a
-/// [Semantics] node so that screen readers can announce the icon's purpose.
-///
-/// **Accessibility (REQ-0020):** [label] is required so every meaningful icon
-/// has an accessible description. Use [OiIcon.decorative] for purely decorative
-/// icons that should be excluded from the accessibility tree.
-///
-/// The [size] defaults to the body font size from the active theme when not
-/// supplied.
-///
-/// {@category Primitives}
+/// Existing [IconData] tokens can be remapped through the icon component theme.
+/// Explicit widget size/color wins over theme defaults. Vector sources retain
+/// their authored stroke geometry and use the resolved foreground color.
 class OiIcon extends StatelessWidget {
-  /// Creates a semantic [OiIcon].
-  ///
-  /// [label] is announced by screen readers; it is required so that
-  /// every meaningful icon has an accessible description.
+  /// Creates a meaningful icon, announced with [label].
   const OiIcon({
     required this.icon,
     required this.label,
     this.size,
     this.color,
     super.key,
-  }) : _decorative = false;
+  }) : textDirection = null,
+       shadows = null,
+       weight = null,
+       fill = null,
+       grade = null,
+       opticalSize = null,
+       applyTextScaling = false,
+       _decorative = false;
 
-  /// Creates a purely decorative [OiIcon] that is excluded from the
-  /// accessibility tree.
+  /// Creates an icon excluded from the accessibility tree.
   const OiIcon.decorative({
     required this.icon,
     this.size,
     this.color,
     super.key,
   }) : label = '',
+       textDirection = null,
+       shadows = null,
+       weight = null,
+       fill = null,
+       grade = null,
+       opticalSize = null,
+       applyTextScaling = false,
        _decorative = true;
 
-  /// The icon glyph to render.
-  final OiIconData icon;
-
-  /// The accessibility label announced by screen readers.
+  /// Flutter-compatible internal rendering entry point for existing controls.
   ///
-  /// Empty for decorative icons created via [OiIcon.decorative].
+  /// Use the named semantic/decorative constructors in application code.
+  const OiIcon.raw(
+    this.icon, {
+    this.size,
+    this.color,
+    this.textDirection,
+    this.shadows,
+    this.weight,
+    this.fill,
+    this.grade,
+    this.opticalSize,
+    this.applyTextScaling,
+    String? semanticLabel,
+    super.key,
+  }) : label = semanticLabel ?? '',
+       _decorative = semanticLabel == null;
+
+  /// Stable font token, optionally replaced by the active icon set.
+  final OiIconData? icon;
+
+  /// Accessible label.
   final String label;
 
-  /// The size of the icon in logical pixels.
-  ///
-  /// Defaults to the body font size from the nearest [OiTheme].
+  /// Explicit size in logical pixels.
   final double? size;
 
-  /// The color of the icon.
-  ///
-  /// When null the nearest [DefaultTextStyle] color is used.
+  /// Explicit foreground color.
   final Color? color;
 
+  /// Direction used for directional font glyphs.
+  final TextDirection? textDirection;
+
+  /// Font glyph shadows.
+  final List<Shadow>? shadows;
+
+  /// Variable icon font weight, when supported by the source font.
+  final double? weight;
+
+  /// Variable icon font fill.
+  final double? fill;
+
+  /// Variable icon font grade.
+  final double? grade;
+
+  /// Variable icon font optical size.
+  final double? opticalSize;
+
+  /// Whether system text scaling applies to font icons.
+  final bool? applyTextScaling;
   final bool _decorative;
 
   @override
   Widget build(BuildContext context) {
+    final theme = OiTheme.maybeOf(context);
+    final iconTheme = theme?.components.icon;
+    final inherited = IconTheme.of(context);
     final resolvedSize =
         size ??
-        context.textTheme.styleFor(OiLabelVariant.body).fontSize ??
-        16.0;
-
-    final resolvedColor = color ?? context.colors.text;
-    final iconWidget = Icon(icon, size: resolvedSize, color: resolvedColor);
-
-    if (_decorative) {
-      return ExcludeSemantics(child: iconWidget);
-    }
-
-    return Semantics(
-      label: label,
-      image: true,
-      child: ExcludeSemantics(child: iconWidget),
-    );
+        iconTheme?.size ??
+        theme?.textTheme.styleFor(OiLabelVariant.body).fontSize ??
+        inherited.size ??
+        16;
+    final resolvedColor =
+        color ?? iconTheme?.color ?? theme?.colors.text ?? inherited.color;
+    final source = iconTheme?.sources[icon];
+    final Widget child = switch (source) {
+      OiSvgIconSource(:final markup) => SvgPicture.string(
+        markup,
+        width: resolvedSize,
+        height: resolvedSize,
+        theme: SvgTheme(currentColor: resolvedColor ?? const Color(0xff000000)),
+        colorFilter: resolvedColor == null
+            ? null
+            : ColorFilter.mode(resolvedColor, BlendMode.srcIn),
+      ),
+      OiAssetIconSource(:final asset, :final package) => SvgPicture.asset(
+        asset,
+        package: package,
+        width: resolvedSize,
+        height: resolvedSize,
+        theme: SvgTheme(currentColor: resolvedColor ?? const Color(0xff000000)),
+        colorFilter: resolvedColor == null
+            ? null
+            : ColorFilter.mode(resolvedColor, BlendMode.srcIn),
+      ),
+      _ => Icon(
+        source is OiFontIconSource ? source.icon : icon,
+        size: resolvedSize,
+        color: resolvedColor,
+        textDirection: textDirection,
+        shadows: shadows,
+        weight: weight,
+        fill: fill,
+        grade: grade,
+        opticalSize: opticalSize,
+        applyTextScaling: applyTextScaling,
+      ),
+    };
+    final excluded = ExcludeSemantics(child: child);
+    return _decorative
+        ? excluded
+        : Semantics(label: label, image: true, child: excluded);
   }
 }

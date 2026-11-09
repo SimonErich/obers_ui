@@ -71,3 +71,12 @@ Tests cover all 7 mini-apps, home screen navigation, and theme switching.
 ## Demo Credentials
 
 For the Auth screen: `leopold@alpenglueck.at` / `Sachertorte42!`
+
+## Minimal media designs
+
+Run `flutter run -t lib/minimal_designs.dart -d chrome` for Quiet Album and
+Workshop, two independently themed compositions of public balanced text, choice
+scale, media tile and docked page modules. Real images/fonts are bundled locally.
+Run `flutter test test/minimal_designs_test.dart` for eight real-media goldens
+(including RTL/200% text/DPR 2) and the controlled interaction test.
+See [the composition guide](../doc/documentation/docs/layout/minimal-media-designs.md).
