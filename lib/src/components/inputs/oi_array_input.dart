@@ -192,11 +192,16 @@ class _OiArrayInputState<T> extends State<OiArrayInput<T>> {
         if (widget.reorderable)
           Padding(
             padding: const EdgeInsets.only(right: 4, top: 4),
-            child: OiIcon(
-              icon: OiIcons.ellipsisVertical,
-              label: widget.reorderLabel,
-              size: 20,
-              color: colors.textMuted,
+            // A container of its own, so the handle keeps its name instead of
+            // merging with the tappable item content beside it.
+            child: Semantics(
+              container: true,
+              child: OiIcon(
+                icon: OiIcons.ellipsisVertical,
+                label: widget.reorderLabel,
+                size: 20,
+                color: colors.textMuted,
+              ),
             ),
           ),
         Expanded(child: content),
