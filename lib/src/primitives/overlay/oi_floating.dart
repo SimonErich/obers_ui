@@ -173,9 +173,9 @@ class _OiFloatingState extends State<OiFloating> {
   @override
   void initState() {
     super.initState();
-    // Always show the portal — visibility is controlled by the builder
-    // returning SizedBox.shrink() when not visible. This avoids calling
-    // show()/hide() during build phases which can trigger assertions.
+    // Always show the portal — visibility is controlled in build() by the
+    // overlay child builder. This avoids calling show()/hide() during build
+    // phases, which asserts.
     _portalController.show();
   }
 
@@ -238,10 +238,6 @@ class _OiFloatingState extends State<OiFloating> {
   }
 
   Widget _buildOverlayChild(BuildContext context, OverlayChildLayoutInfo info) {
-    // When not visible, return an empty widget so the portal can stay
-    // "shown" without rendering anything.
-    if (!widget.visible) return const SizedBox.shrink();
-
     Widget content;
 
     if (_useBottomSheet) {
@@ -290,6 +286,9 @@ class _OiFloatingState extends State<OiFloating> {
     return content;
   }
 
+  static Widget _buildHiddenOverlayChild(BuildContext context) =>
+      const SizedBox.shrink();
+
   @override
   void dispose() {
     _scrollPosition?.removeListener(_onAncestorScroll);
@@ -299,6 +298,20 @@ class _OiFloatingState extends State<OiFloating> {
 
   @override
   Widget build(BuildContext context) {
+    // While hidden, the overlay child is an empty box, not a layout builder.
+    // Flutter lays out a layout builder again on every frame and asserts it
+    // still has the overlay's size. When this widget sits on a route covered
+    // by an opaque one, the overlay no longer lays that child out, so after
+    // a resize the sizes differ and every animation frame throws. Both
+    // constructors build the same OverlayPortal, so the anchor keeps its
+    // state when visible changes.
+    if (!widget.visible) {
+      return OverlayPortal(
+        controller: _portalController,
+        overlayChildBuilder: _buildHiddenOverlayChild,
+        child: widget.anchor,
+      );
+    }
     return OverlayPortal.overlayChildLayoutBuilder(
       controller: _portalController,
       overlayChildBuilder: _buildOverlayChild,

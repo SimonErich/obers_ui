@@ -1,5 +1,7 @@
 // Tests do not require documentation comments.
 
+import 'dart:async';
+
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui/src/primitives/overlay/oi_floating.dart';
@@ -274,4 +276,90 @@ void main() {
 
     expect(find.text('floating'), findsOneWidget);
   });
+
+  // ── 14. toggling visible keeps the anchor's state ─────────────────────────
+
+  testWidgets('toggling visible keeps the state of the anchor', (
+    tester,
+  ) async {
+    final notifier = ValueNotifier<bool>(false);
+    addTearDown(notifier.dispose);
+    final anchorKey = GlobalKey<_CounterState>();
+
+    await tester.pumpObers(
+      ValueListenableBuilder<bool>(
+        valueListenable: notifier,
+        builder: (context, showFloating, _) => OiFloating(
+          anchor: _Counter(key: anchorKey),
+          visible: showFloating,
+          child: const Text('floating'),
+        ),
+      ),
+    );
+    final state = anchorKey.currentState;
+
+    notifier.value = true;
+    await tester.pumpAndSettle();
+    expect(anchorKey.currentState, same(state));
+
+    notifier.value = false;
+    await tester.pumpAndSettle();
+    expect(anchorKey.currentState, same(state));
+  });
+
+  // ── 15. hidden content on a covered route survives a resize ───────────────
+
+  testWidgets(
+    'hidden floating on a covered route does not assert after a resize',
+    (tester) async {
+      final anchorKey = GlobalKey();
+      await tester.pumpObers(
+        Center(
+          child: OiFloating(
+            anchor: SizedBox(key: anchorKey, width: 80, height: 40),
+            child: const Text('floating'),
+          ),
+        ),
+      );
+
+      // Cover the route with an opaque page, so the overlay stops laying
+      // out its content, then resize the overlay.
+      final navigator = Navigator.of(anchorKey.currentContext!);
+      unawaited(
+        navigator.push(
+          PageRouteBuilder<void>(pageBuilder: (_, _, _) => const SizedBox()),
+        ),
+      );
+      await tester.pumpAndSettle();
+      tester.view.physicalSize = const Size(1000, 700);
+      addTearDown(tester.view.resetPhysicalSize);
+      await tester.pump();
+
+      // Any animation runs frames; before the fix each one asserted
+      // `size == theater.size` in the overlay's layout builder.
+      unawaited(
+        navigator.push(
+          PageRouteBuilder<void>(
+            opaque: false,
+            pageBuilder: (_, _, _) => const SizedBox(),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(tester.takeException(), isNull);
+    },
+  );
+}
+
+class _Counter extends StatefulWidget {
+  const _Counter({super.key});
+
+  @override
+  State<_Counter> createState() => _CounterState();
+}
+
+class _CounterState extends State<_Counter> {
+  @override
+  Widget build(BuildContext context) => const SizedBox(width: 80, height: 40);
 }
