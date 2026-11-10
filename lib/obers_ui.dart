@@ -83,6 +83,7 @@ export 'src/components/inline_edit/oi_editable_text.dart';
 
 export 'src/components/inputs/oi_array_input.dart';
 export 'src/components/inputs/oi_checkbox.dart';
+export 'src/components/inputs/oi_clock_dial.dart';
 export 'src/components/inputs/oi_color_input.dart';
 export 'src/components/inputs/oi_color_palette_picker.dart';
 export 'src/components/inputs/oi_date_input.dart';

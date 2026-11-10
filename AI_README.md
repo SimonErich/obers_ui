@@ -2578,6 +2578,24 @@ A time input field that displays a formatted time and opens an `OiTimePicker` di
 
 ---
 
+#### OiClockDial
+**Tags:** `time`, `picker`, `clock`, `dial`, `touch`
+**Tier:** Component
+
+A clock face for picking a time of day with taps: the hour on the outer ring (12 and 1–11) or the inner one (00 and 13–23), then the face turns to minutes; a tap on a minute (steps of five, drag for the exact one) reports the time. A readout above the face shows the time and switches between the two faces when tapped. The pick is marked with the primary fill; the digits use the code face.
+
+**Key Parameters:**
+- `onChanged` (ValueChanged\<OiTimeOfDay\>, required) — Called once a minute is picked
+- `value` (OiTimeOfDay?) — The time to start from (default: 9:00)
+- `labels` (OiClockDialLabels) — Screen reader names of the two faces (`hours`, `minutes`)
+- `size` (double, default: 240) — The face's diameter
+
+**Use When:** Picking a time by touch, inside a popover or a dialog next to a calendar; reminders, alarms.
+**Avoid When:** Typing is quicker (desktop forms) -- use `OiTimeInput`. A field that opens a dialog -- use `OiTimePickerField`.
+**Combine With:** `OiPopover`, `OiDatePicker`, `OiDialog`
+
+---
+
 #### [ADMIN] OiArrayInput
 **Tags:** `input`, `array`, `repeatable`, `dynamic-fields`, `form`, `list-input`
 **Tier:** Component
@@ -5948,7 +5966,7 @@ Searchable keyword -> widget mapping for quick lookup.
 | `checkbox` | OiCheckbox, OiCheckboxTile |
 | `checkout` | OiCheckout, OiCheckoutData |
 | `clipboard` | OiCopyButton, OiCopyable, OiPasteZone, OiLabel.copyable |
-| `clock` | OiTimePickerField, OiTimePicker |
+| `clock` | OiTimePickerField, OiTimePicker, OiClockDial |
 | `code` | OiCodeBlock, OiLabel.code, OiDiffView |
 | `collapse` | OiAccordion, OiCard(collapsible) |
 | `color` | OiColorInput, OiColorScheme, OiColorSwatch, OiColorPalettePicker |
