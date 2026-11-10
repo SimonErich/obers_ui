@@ -4308,7 +4308,7 @@ Multi-step form/workflow with step indicator.
 - `validate` (bool Function(Map)?) — Step validation
 - `onNext` (Future<bool> Function(Map)?) — Async work that must succeed before advancing (e.g. a server check); Next shows busy meanwhile, stays on `false`
 - `nextLabel` (String?) — This step's Next label, e.g. "Connect"
-- `canGoNext` (bool, default: true) — `false` disables Next (shown up front, unlike `validate`) and ignores `goNext()`; rebuild with `true` once the step can go on
+- `nextEnabled` (bool, default: true) — `false` disables Next (shown up front, unlike `validate`) and ignores `goNext()`; rebuild with `true` once the step can go on
 - `optional` (bool, default: false)
 
 **OiWizardContext:** Provides `values`, `currentStep`, `totalSteps`, `busy` (while `onNext` runs), `goNext()`, `goPrevious()`, `goToStep()`, `setValue()`.

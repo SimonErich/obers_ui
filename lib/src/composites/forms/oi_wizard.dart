@@ -70,7 +70,7 @@ class OiWizardStep {
     this.validate,
     this.onNext,
     this.nextLabel,
-    this.canGoNext = true,
+    this.nextEnabled = true,
     this.optional = false,
   }) : _stepperLabel = stepperLabel;
 
@@ -127,11 +127,11 @@ class OiWizardStep {
   /// ```dart
   /// OiWizardStep(
   ///   title: 'Address',
-  ///   canGoNext: address.isDeliverable,
+  ///   nextEnabled: address.isDeliverable,
   ///   builder: (wizard) => AddressStep(address: address),
   /// )
   /// ```
-  final bool canGoNext;
+  final bool nextEnabled;
 
   /// Whether this step can be skipped.
   final bool optional;
@@ -339,7 +339,7 @@ class _OiWizardState extends State<OiWizard> {
     // Validate current step before advancing.
     final index = _currentStep;
     final step = widget.steps[index];
-    if (!step.canGoNext) return;
+    if (!step.nextEnabled) return;
     if (step.validate != null && !step.validate!(_values)) {
       setState(() {
         _errorSteps.add(index);
@@ -574,7 +574,7 @@ class _OiWizardState extends State<OiWizard> {
                           ? widget.labels.complete
                           : widget.labels.next),
                   onTap: _goNext,
-                  enabled: step.canGoNext,
+                  enabled: step.nextEnabled,
                   loading: _busy,
                 ),
               ],

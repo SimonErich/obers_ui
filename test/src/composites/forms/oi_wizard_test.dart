@@ -610,21 +610,21 @@ void main() {
     semantics.dispose();
   });
 
-  // 29. canGoNext: false disables Next and keeps the step.
-  List<OiWizardStep> gatedSteps({required bool canGoNext}) => [
+  // 29. nextEnabled: false disables Next and keeps the step.
+  List<OiWizardStep> gatedSteps({required bool nextEnabled}) => [
     OiWizardStep(
       title: 'Address',
-      canGoNext: canGoNext,
+      nextEnabled: nextEnabled,
       builder: (ctx) => const Text('Content One'),
     ),
     OiWizardStep(title: 'Done', builder: (ctx) => const Text('Content Two')),
   ];
 
-  testWidgets('canGoNext false disables Next and keeps the step', (
+  testWidgets('nextEnabled false disables Next and keeps the step', (
     tester,
   ) async {
     await tester.pumpObers(
-      _wizard(animated: false, steps: gatedSteps(canGoNext: false)),
+      _wizard(animated: false, steps: gatedSteps(nextEnabled: false)),
     );
 
     expect(
@@ -639,7 +639,7 @@ void main() {
   });
 
   // 30. A programmatic goNext is ignored too.
-  testWidgets('canGoNext false also ignores goNext from the step', (
+  testWidgets('nextEnabled false also ignores goNext from the step', (
     tester,
   ) async {
     late OiWizardContext wizard;
@@ -649,7 +649,7 @@ void main() {
         steps: [
           OiWizardStep(
             title: 'Address',
-            canGoNext: false,
+            nextEnabled: false,
             builder: (ctx) {
               wizard = ctx;
               return const Text('Content One');
@@ -670,12 +670,12 @@ void main() {
   });
 
   // 31. Next works again once the step allows it.
-  testWidgets('Next advances once canGoNext turns true', (tester) async {
+  testWidgets('Next advances once nextEnabled turns true', (tester) async {
     await tester.pumpObers(
-      _wizard(animated: false, steps: gatedSteps(canGoNext: false)),
+      _wizard(animated: false, steps: gatedSteps(nextEnabled: false)),
     );
     await tester.pumpObers(
-      _wizard(animated: false, steps: gatedSteps(canGoNext: true)),
+      _wizard(animated: false, steps: gatedSteps(nextEnabled: true)),
     );
 
     await tester.tap(find.text('Next'));
