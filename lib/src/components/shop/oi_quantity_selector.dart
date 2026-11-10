@@ -35,8 +35,9 @@ class OiQuantitySelector extends StatelessWidget {
     this.min = 1,
     this.max = 99,
     this.compact = false,
-    this.disabled = false,
+    this.width,
     this.suffix,
+    this.disabled = false,
     this.decreaseLabel = 'Decrease quantity',
     this.increaseLabel = 'Increase quantity',
     super.key,
@@ -60,6 +61,10 @@ class OiQuantitySelector extends StatelessWidget {
   /// When `true`, renders smaller controls suitable for cart rows.
   final bool compact;
 
+  /// Optional bounded width of the whole selector (including [suffix]), with
+  /// the value taking the remaining control space.
+  final double? width;
+
   /// When `true`, all controls are disabled.
   final bool disabled;
 
@@ -69,10 +74,12 @@ class OiQuantitySelector extends StatelessWidget {
   /// announced quantity value.
   final String? suffix;
 
-  /// Screen-reader label of the decrease button.
+  /// Screen-reader label of the decrease button, optionally including the
+  /// item identity.
   final String decreaseLabel;
 
-  /// Screen-reader label of the increase button.
+  /// Screen-reader label of the increase button, optionally including the
+  /// item identity.
   final String increaseLabel;
 
   /// Whether the value is at the minimum.
@@ -110,6 +117,7 @@ class OiQuantitySelector extends StatelessWidget {
       constraints: BoxConstraints(minWidth: minWidth),
       child: Center(
         widthFactor: 1,
+        heightFactor: 1,
         child: compact
             ? OiLabel.small('$value', textAlign: TextAlign.center)
             : OiLabel.body('$value', textAlign: TextAlign.center),
@@ -145,29 +153,48 @@ class OiQuantitySelector extends StatelessWidget {
       gap: OiResponsive<double>(compact ? 2 : 4),
       children: [
         _buildMinusButton(context),
-        _buildValueDisplay(context),
+        if (width == null)
+          _buildValueDisplay(context)
+        else
+          Expanded(child: _buildValueDisplay(context)),
         _buildPlusButton(context),
       ],
     );
 
     content = OiSurface(
       borderRadius: context.radius.sm,
-      border: OiBorderStyle.solid(colors.borderSubtle, 1),
+      border: compact ? null : OiBorderStyle.solid(colors.borderSubtle, 1),
       padding: EdgeInsets.symmetric(
         horizontal: compact ? 2 : 4,
-        vertical: compact ? 2 : sp.xs,
+        vertical: compact ? 0 : sp.xs,
       ),
       child: content,
     );
+    if (compact) {
+      content = DecoratedBox(
+        position: DecorationPosition.foreground,
+        decoration: BoxDecoration(
+          borderRadius: context.radius.sm,
+          border: Border.all(
+            color: context.components.textInput?.borderColor ?? colors.border,
+          ),
+        ),
+        child: content,
+      );
+    }
 
     final unit = suffix;
     if (unit != null) {
       content = OiRow(
         breakpoint: breakpoint,
         gap: OiResponsive<double>(sp.xs),
-        children: [content, OiLabel.smallStrong(unit)],
+        children: [
+          if (width == null) content else Expanded(child: content),
+          OiLabel.smallStrong(unit),
+        ],
       );
     }
+    if (width != null) content = SizedBox(width: width, child: content);
 
     if (disabled) {
       content = Opacity(opacity: 0.4, child: content);
@@ -180,9 +207,11 @@ class OiQuantitySelector extends StatelessWidget {
       value: quantity(value),
       increasedValue: _atMax ? null : quantity(value + 1),
       decreasedValue: _atMin ? null : quantity(value - 1),
+      onIncrease: _interactive && !_atMax ? () => onChange!(value + 1) : null,
+      onDecrease: _interactive && !_atMin ? () => onChange!(value - 1) : null,
       child: Focus(
         onKeyEvent: _onKeyEvent,
-        child: ExcludeSemantics(child: content),
+        child: content,
       ),
     );
   }

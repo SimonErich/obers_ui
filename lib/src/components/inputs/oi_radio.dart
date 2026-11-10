@@ -1,5 +1,4 @@
 import 'package:flutter/widgets.dart';
-import 'package:obers_ui/obers_ui.dart' show OiTappable;
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart'
     show OiTappable;
@@ -26,7 +25,7 @@ class OiRadioOption<T> {
   final bool enabled;
 }
 
-/// A group of radio-button options rendered in a row or column.
+/// A group of radio-button options rendered in a wrapping row or column.
 ///
 /// Each option shows a circular indicator and a text label, wrapped in an
 /// [OiTappable]. Only one option may be selected at a time; tapping an option
@@ -66,18 +65,17 @@ class OiRadio<T> extends StatelessWidget {
           (o) => _OiRadioOptionTile<T>(
             option: o,
             selected: o.value == value,
-            disabled: !enabled || !o.enabled,
+            disabled: !enabled || !o.enabled || onChanged == null,
             onTap: () => onChanged?.call(o.value),
           ),
         )
         .toList();
 
     if (direction == Axis.horizontal) {
-      return Row(
-        mainAxisSize: MainAxisSize.min,
-        children:
-            children.expand((w) => [w, const SizedBox(width: 16)]).toList()
-              ..removeLast(),
+      return Wrap(
+        spacing: context.components.radio?.optionSpacing ?? 16,
+        runSpacing: 8,
+        children: children,
       );
     }
 
@@ -121,58 +119,92 @@ class _OiRadioOptionTileState<T> extends State<_OiRadioOptionTile<T>> {
     final isActive = !widget.disabled;
     final highlighted = isActive && _hovered;
 
-    const outerSize = 18.0;
-    const innerSize = 8.0;
-
-    final Color outerColor;
-    final Color fillColor;
-
-    if (isSelected) {
-      outerColor = colors.primary.base;
-      fillColor = colors.primary.base;
-    } else if (highlighted) {
-      outerColor = colors.primary.base;
-      fillColor = colors.primary.base.withValues(alpha: 0.1);
-    } else {
-      outerColor = colors.border;
-      fillColor = const Color(0x00000000);
-    }
-
-    final circle = CustomPaint(
-      size: const Size(outerSize, outerSize),
-      painter: _OiRadioPainter(
-        selected: isSelected,
-        outerColor: outerColor,
-        fillColor: fillColor,
-        innerColor: colors.textOnPrimary,
-        outerSize: outerSize,
-        innerSize: innerSize,
-      ),
+    final circle = OiRadioIndicator(
+      selected: isSelected,
+      highlighted: highlighted,
     );
 
     final labelColor = widget.disabled ? colors.textMuted : colors.text;
 
-    return MouseRegion(
-      onEnter: (_) => setState(() => _hovered = true),
-      onExit: (_) => setState(() => _hovered = false),
-      cursor: isActive ? SystemMouseCursors.click : SystemMouseCursors.basic,
-      child: GestureDetector(
-        onTap: isActive ? widget.onTap : null,
-        behavior: HitTestBehavior.opaque,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 4),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              circle,
-              const SizedBox(width: 8),
-              Text(
-                widget.option.label,
-                style: TextStyle(fontSize: 14, color: labelColor),
-              ),
-            ],
+    return Semantics(
+      container: true,
+      label: widget.option.label,
+      checked: isSelected,
+      inMutuallyExclusiveGroup: true,
+      enabled: isActive,
+      child: OiTappable(
+        enabled: isActive,
+        disabledOpacity: 1,
+        onTap: widget.onTap,
+        onHover: (hovered) => setState(() => _hovered = hovered),
+        child: ExcludeSemantics(
+          child: Padding(
+            padding:
+                context.components.radio?.optionPadding ??
+                const EdgeInsets.symmetric(vertical: 4),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                circle,
+                const SizedBox(width: 8),
+                Flexible(
+                  child: Text(
+                    widget.option.label,
+                    style: context.textTheme.body
+                        .copyWith(color: labelColor)
+                        .merge(
+                          context.components.radio?.labelStyle,
+                        ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+/// The noninteractive indicator shared by radio groups and rich radio tiles.
+///
+/// The containing control owns interaction, focus and selection semantics.
+/// Using this instead of a one-option group avoids phantom label spacing.
+class OiRadioIndicator extends StatelessWidget {
+  /// Creates a radio indicator.
+  const OiRadioIndicator({
+    required this.selected,
+    this.highlighted = false,
+    super.key,
+  });
+
+  /// Whether the option is selected.
+  final bool selected;
+
+  /// Whether an enabled option is hovered.
+  final bool highlighted;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    final theme = context.components.radio;
+    final size = theme?.size ?? 18;
+    final active = theme?.selectedBorderColor ?? colors.primary.base;
+    return CustomPaint(
+      size: Size.square(size),
+      painter: _OiRadioPainter(
+        selected: selected,
+        outerColor: selected || highlighted
+            ? active
+            : theme?.borderColor ?? colors.border,
+        fillColor: selected
+            ? theme?.selectedFillColor ?? colors.primary.base
+            : highlighted
+            ? active.withValues(alpha: .1)
+            : const Color(0x00000000),
+        innerColor: theme?.selectedDotColor ?? colors.textOnPrimary,
+        innerSize: theme?.dotSize ?? 8,
+        borderWidth: theme?.borderWidth ?? 1.5,
       ),
     );
   }
@@ -188,7 +220,7 @@ class _OiRadioPainter extends CustomPainter {
     required this.outerColor,
     required this.fillColor,
     required this.innerColor,
-    required this.outerSize,
+    required this.borderWidth,
     required this.innerSize,
   });
 
@@ -196,13 +228,13 @@ class _OiRadioPainter extends CustomPainter {
   final Color outerColor;
   final Color fillColor;
   final Color innerColor;
-  final double outerSize;
+  final double borderWidth;
   final double innerSize;
 
   @override
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height / 2);
-    final radius = outerSize / 2;
+    final radius = (size.shortestSide - borderWidth) / 2;
 
     canvas
       ..drawCircle(
@@ -216,7 +248,7 @@ class _OiRadioPainter extends CustomPainter {
         Paint()
           ..color = outerColor
           ..style = PaintingStyle.stroke
-          ..strokeWidth = 1.5,
+          ..strokeWidth = borderWidth,
       );
 
     if (selected) {
@@ -234,5 +266,7 @@ class _OiRadioPainter extends CustomPainter {
       old.selected != selected ||
       old.outerColor != outerColor ||
       old.fillColor != fillColor ||
-      old.innerColor != innerColor;
+      old.innerColor != innerColor ||
+      old.innerSize != innerSize ||
+      old.borderWidth != borderWidth;
 }

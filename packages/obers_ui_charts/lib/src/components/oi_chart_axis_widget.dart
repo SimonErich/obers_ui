@@ -123,7 +123,7 @@ class _OiAxisCompositePainter extends CustomPainter {
   static const double _fallbackLineWidth = 1;
   static const double _fallbackTickLength = 6;
   static const double _fallbackTickWidth = 1;
-  static const double _labelGap = 4;
+  double get _labelGap => themeAxis?.labelGap ?? 4;
   static const double _maxLabelWidth = 80;
 
   @override

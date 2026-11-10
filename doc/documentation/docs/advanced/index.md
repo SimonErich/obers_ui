@@ -1,13 +1,14 @@
-# Advanced Topics
+# Advanced
 
-This section is for power users who want to go beyond using ObersUI's built-in components — building custom modules, extending the theme system, optimizing performance, or contributing to the library itself.
+Deeper topics for when you are pushing past the basics: composing your own modules,
+schema-driven forms, custom persistence, charts foundations, performance, and the
+tools that help while you build.
 
-## Topics
-
-| Guide | For whom |
-| --- | --- |
-| [**Custom Modules**](custom-modules.md) | "I want to build my own module from ObersUI composites" |
-| [**Extending Themes**](extending-themes.md) | "I want dynamic theming, theme export, or a theme playground" |
-| [**Performance**](performance.md) | "I need to optimize for low-end devices or very large datasets" |
-| [**Contributing**](contributing.md) | "I want to contribute to ObersUI" |
-| [**AI Integration Guide**](ai-readme.md) | "I want an AI to implement ObersUI in my app" |
+- [**Composing Custom Modules**](custom-modules.md) to build a full feature when none of the built-ins fit.
+- [**AutoForms**](autoforms.md) for the `obers_ui_autoforms` package: controller-first, schema-driven forms.
+- [**Data Scales**](data-scales.md) for the scale classes that map data to pixels and colors.
+- [**Custom Persistence Drivers**](persistence-drivers.md) to save settings to your own backend.
+- [**Performance**](performance.md) for virtualization and rebuild tips.
+- [**Developer Tools**](developer-tools.md) for the playground, theme preview, and dev menu.
+- [**Contributing**](contributing.md) for setup, tests, and conventions.
+- [**AI Integration Guide**](ai-readme.md) for using ObersUI with AI coding assistants.

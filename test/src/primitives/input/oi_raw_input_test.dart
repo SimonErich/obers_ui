@@ -1,5 +1,7 @@
 // Tests do not require documentation comments.
 
+import 'dart:ui' show SemanticsAction, Tristate;
+
 import 'package:flutter/gestures.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
@@ -87,6 +89,99 @@ void main() {
 
     expect(controller.text, '123');
   });
+
+  testWidgets('a click cannot move the caret after newer keyboard input', (
+    tester,
+  ) async {
+    final controller = TextEditingController(text: 'previous translation name');
+    final focus = FocusNode();
+    addTearDown(controller.dispose);
+    addTearDown(focus.dispose);
+    await tester.pumpObers(
+      Center(
+        child: SizedBox(
+          width: 400,
+          child: buildInput(controller: controller, focusNode: focus),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.tapAt(
+      tester.getTopLeft(find.byType(EditableText)) + const Offset(80, 10),
+    );
+    await tester.pump(const Duration(milliseconds: 16));
+    expect(focus.hasFocus, isTrue);
+    tester.testTextInput.updateEditingValue(
+      const TextEditingValue(
+        text: 'qa-workflows-17910',
+        selection: TextSelection.collapsed(offset: 18),
+      ),
+    );
+    await tester.pump(const Duration(milliseconds: 400));
+    expect(controller.text, 'qa-workflows-17910');
+    expect(controller.selection, const TextSelection.collapsed(offset: 18));
+  });
+
+  for (final placeholder in <String?>[null, 'Enter a name']) {
+    testWidgets(
+      'double tap selects the tapped word with placeholder $placeholder',
+      (
+        tester,
+      ) async {
+        final controller = TextEditingController(text: 'one second third');
+        final focus = FocusNode();
+        addTearDown(controller.dispose);
+        addTearDown(focus.dispose);
+        await tester.pumpObers(
+          Center(
+            child: SizedBox(
+              width: 400,
+              child: buildInput(
+                controller: controller,
+                focusNode: focus,
+                placeholder: placeholder,
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+        final render = tester
+            .state<EditableTextState>(find.byType(EditableText))
+            .renderEditable;
+        final point = render.localToGlobal(
+          render.getLocalRectForCaret(const TextPosition(offset: 6)).center,
+        );
+        await tester.tapAt(point);
+        await tester.pump(const Duration(milliseconds: 40));
+        await tester.tapAt(point);
+        await tester.pump();
+        expect(controller.selection.start, 4);
+        expect(controller.selection.end, 10);
+        expect(controller.text, 'one second third');
+        expect(tester.takeException(), isNull);
+      },
+    );
+  }
+
+  testWidgets(
+    'enabled input exposes editable web semantics and accessible focus',
+    (tester) async {
+      final handle = tester.ensureSemantics();
+      final focus = FocusNode();
+      addTearDown(focus.dispose);
+      await tester.pumpObers(buildInput(focusNode: focus));
+      final node = tester.getSemantics(find.byType(EditableText));
+      expect(node.flagsCollection.isEnabled, Tristate.isTrue);
+      expect(node.getSemanticsData().hasAction(SemanticsAction.tap), isTrue);
+      node.owner!.performAction(
+        node.id,
+        SemanticsAction.tap,
+      );
+      await tester.pump();
+      expect(focus.hasFocus, isTrue);
+      handle.dispose();
+    },
+  );
 
   // ── Placeholder ────────────────────────────────────────────────────────────
 
@@ -275,6 +370,54 @@ void main() {
     await tester.pumpObers(buildInput(controller: controller, enabled: false));
     final et = tester.widget<EditableText>(find.byType(EditableText));
     expect(et.readOnly, isTrue);
+  });
+
+  testWidgets('disabling releases focus and reenabling permits editing', (
+    tester,
+  ) async {
+    final controller = TextEditingController(text: 'MISSING');
+    final focus = FocusNode();
+    final enabled = ValueNotifier(true);
+    addTearDown(controller.dispose);
+    addTearDown(focus.dispose);
+    addTearDown(enabled.dispose);
+    await tester.pumpObers(
+      ValueListenableBuilder<bool>(
+        valueListenable: enabled,
+        builder: (context, value, child) => buildInput(
+          controller: controller,
+          focusNode: focus,
+          enabled: value,
+        ),
+      ),
+    );
+    focus.requestFocus();
+    await tester.pumpAndSettle();
+    expect(focus.hasFocus, isTrue);
+    controller.selection = const TextSelection(baseOffset: 0, extentOffset: 7);
+
+    enabled.value = false;
+    await tester.pumpAndSettle();
+    expect(focus.hasFocus, isFalse);
+    focus.requestFocus();
+    await tester.pumpAndSettle();
+    expect(focus.hasFocus, isFalse);
+    expect(controller.text, 'MISSING');
+    expect(
+      controller.selection,
+      const TextSelection(baseOffset: 0, extentOffset: 7),
+    );
+
+    focus.canRequestFocus = false;
+    enabled.value = true;
+    await tester.pumpAndSettle();
+    expect(focus.canRequestFocus, isFalse);
+    focus.canRequestFocus = true;
+    await tester.tap(find.byType(EditableText));
+    await tester.pumpAndSettle();
+    expect(focus.hasFocus, isTrue);
+    await tester.enterText(find.byType(EditableText), 'lunch15');
+    expect(controller.text, 'lunch15');
   });
 
   // ── obscureText ───────────────────────────────────────────────────────────

@@ -4,6 +4,10 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui/src/components/display/oi_pagination.dart';
+import 'package:obers_ui/src/foundation/theme/component_themes/oi_button_theme_data.dart';
+import 'package:obers_ui/src/foundation/theme/component_themes/oi_pagination_theme_data.dart';
+import 'package:obers_ui/src/foundation/theme/component_themes/oi_text_input_theme_data.dart';
+import 'package:obers_ui/src/foundation/theme/oi_theme_data.dart';
 
 import '../../../helpers/pump_app.dart';
 
@@ -13,6 +17,140 @@ void main() {
   const wide = Size(1200, 600);
 
   group('OiPagination - pages variant', () {
+    testWidgets(
+      'distributed layout gives natural-width groups equal free gaps',
+      (tester) async {
+        await tester.pumpObers(
+          OiPagination(
+            totalItems: 413,
+            currentPage: 0,
+            label: 'orders',
+            distributed: true,
+            showFirstLast: false,
+            onPageChange: (_) {},
+            labels: OiPaginationLabels(
+              perPage: 'A wider page size label',
+              total: (start, end, count, label) => '413',
+            ),
+          ),
+          surfaceSize: wide,
+        );
+        final left = tester.getRect(
+          find.byKey(const Key('oi_pagination_total')),
+        );
+        final previous = tester.getRect(
+          find.byKey(const Key('oi_pagination_prev')),
+        );
+        final next = tester.getRect(
+          find.byKey(const Key('oi_pagination_next')),
+        );
+        final right = tester.getRect(find.text('A wider page size label'));
+        expect(previous.left - left.right, closeTo(right.left - next.right, 1));
+        expect((previous.left + next.right) / 2, lessThan(wide.width / 2));
+        expect(tester.takeException(), isNull);
+      },
+    );
+
+    testWidgets('configured size aligns pages arrows and page-size control', (
+      tester,
+    ) async {
+      final base = OiThemeData.light();
+      await tester.pumpObers(
+        OiPagination(
+          totalItems: 25000,
+          currentPage: 0,
+          label: 'rows',
+          onPageChange: (_) {},
+        ),
+        theme: base.copyWith(
+          components: base.components.copyWith(
+            button: const OiButtonThemeData(height: 36),
+            textInput: const OiTextInputThemeData(height: 36),
+            pagination: const OiPaginationThemeData(buttonSize: 32),
+          ),
+        ),
+        surfaceSize: wide,
+      );
+      expect(
+        tester.getSize(find.byKey(const Key('oi_pagination_page_0'))),
+        const Size(32, 32),
+      );
+      expect(
+        tester.getSize(find.byKey(const Key('oi_pagination_next'))),
+        const Size(32, 32),
+      );
+      expect(
+        tester.getSize(find.byKey(const Key('oi_pagination_per_page'))).height,
+        32,
+      );
+      // Long page numbers can grow to fit their text instead of being clipped.
+      final last = find.byKey(const Key('oi_pagination_page_999'));
+      expect(tester.getSize(last).width, greaterThan(32));
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('configured size permits accessible text to grow', (
+      tester,
+    ) async {
+      final base = OiThemeData.light();
+      await tester.pumpObers(
+        const MediaQuery(
+          data: MediaQueryData(textScaler: TextScaler.linear(2)),
+          child: OiPagination(
+            totalItems: 75,
+            currentPage: 0,
+            label: 'rows',
+            showTotal: false,
+          ),
+        ),
+        theme: base.copyWith(
+          components: base.components.copyWith(
+            pagination: const OiPaginationThemeData(buttonSize: 32),
+          ),
+        ),
+        surfaceSize: wide,
+      );
+      expect(
+        tester.getSize(find.byKey(const Key('oi_pagination_page_0'))).height,
+        greaterThan(32),
+      );
+      expect(
+        tester.getSize(find.byKey(const Key('oi_pagination_per_page'))).height,
+        greaterThan(32),
+      );
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('compact metadata fits long localized labels', (tester) async {
+      int? navigatedTo;
+      await tester.pumpObers(
+        Center(
+          child: SizedBox(
+            width: 260,
+            child: OiPagination(
+              totalItems: 48213,
+              currentPage: 20,
+              perPage: 15,
+              siblingCount: 2,
+              label: 'records',
+              labels: const OiPaginationLabels(
+                perPage: 'Records shown per page',
+              ),
+              onPageChange: (page) => navigatedTo = page,
+            ),
+          ),
+        ),
+        surfaceSize: const Size(320, 844),
+      );
+      expect(tester.takeException(), isNull);
+      final next = find.byKey(const Key('oi_pagination_next'));
+      expect(next.hitTestable(), findsOneWidget);
+      await tester.tap(next);
+      await tester.pumpAndSettle();
+      expect(navigatedTo, 21);
+      expect(tester.takeException(), isNull);
+    });
+
     testWidgets('renders page numbers for multi-page data', (tester) async {
       await tester.pumpObers(
         OiPagination(

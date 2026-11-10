@@ -36,6 +36,7 @@ class OiBoxPlotPainter extends CustomPainter {
     required this.categoryLabels,
     required this.yLabels,
     required this.yDivisions,
+    this.labelGap = 4,
   });
 
   /// The resolved boxes to paint.
@@ -70,6 +71,9 @@ class OiBoxPlotPainter extends CustomPainter {
 
   /// Axis label color.
   final Color axisLabelColor;
+
+  /// Distance between grid axes and their tick labels.
+  final double labelGap;
 
   /// High-contrast accessibility mode.
   final bool highContrast;
@@ -160,12 +164,14 @@ class OiBoxPlotPainter extends CustomPainter {
         chartRect,
         labels: yLabels,
         labelColor: axisLabelColor,
+        labelGap: labelGap,
       );
       OiChartGrid.paintYLabels(
         canvas,
         chartRect,
         labels: categoryLabels,
         labelColor: axisLabelColor,
+        labelGap: labelGap,
       );
     } else {
       OiChartGrid.paintYLabels(
@@ -173,12 +179,14 @@ class OiBoxPlotPainter extends CustomPainter {
         chartRect,
         labels: yLabels,
         labelColor: axisLabelColor,
+        labelGap: labelGap,
       );
       OiChartGrid.paintXLabels(
         canvas,
         chartRect,
         labels: categoryLabels,
         labelColor: axisLabelColor,
+        labelGap: labelGap,
       );
     }
 
@@ -425,6 +433,7 @@ class OiBoxPlotPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(OiBoxPlotPainter oldDelegate) =>
+      oldDelegate.labelGap != labelGap ||
       oldDelegate.boxes != boxes ||
       oldDelegate.categoryCount != categoryCount ||
       oldDelegate.chartRect != chartRect ||

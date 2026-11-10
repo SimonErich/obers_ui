@@ -159,7 +159,7 @@ extension _OiUploadDialogLayout on _OiUploadDialogState {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(
+                OiIcon.raw(
                   OiIcons.cloudUpload,
                   size: 28,
                   color: _isDragOver ? colors.primary.base : colors.textMuted,
@@ -225,7 +225,7 @@ extension _OiUploadDialogLayout on _OiUploadDialogState {
           SizedBox(width: spacing.xs),
           GestureDetector(
             onTap: () => _removeEntry(index),
-            child: Icon(OiIcons.x, size: 14, color: colors.textMuted),
+            child: OiIcon.raw(OiIcons.x, size: 14, color: colors.textMuted),
           ),
         ],
       ),

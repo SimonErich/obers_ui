@@ -16,7 +16,7 @@ import 'package:obers_ui/src/primitives/display/oi_label.dart';
 /// {@category Components}
 class OiKbd extends StatelessWidget {
   /// Creates an [OiKbd].
-  const OiKbd({required this.keys, super.key});
+  const OiKbd({required this.keys, this.combineKeys = false, super.key});
 
   /// The logical key names to display.
   ///
@@ -25,6 +25,9 @@ class OiKbd extends StatelessWidget {
   /// `left`, `right`, `space`. Any unrecognized string is passed
   /// through capitalized.
   final List<String> keys;
+
+  /// Displays a compact chord in one keycap, useful beside a search hint.
+  final bool combineKeys;
 
   static bool get _isApple =>
       defaultTargetPlatform == TargetPlatform.iOS ||
@@ -57,6 +60,30 @@ class OiKbd extends StatelessWidget {
     final colors = context.colors;
     final spacing = context.spacing;
     final radius = context.radius;
+
+    if (combineKeys) {
+      return Semantics(
+        label: keys.join(' + '),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+          decoration: BoxDecoration(
+            color: colors.background,
+            border: Border.all(color: colors.border),
+            borderRadius: radius.xs,
+          ),
+          child: Text(
+            keys.map(_mapKey).join(),
+            style: context.textTheme.caption.copyWith(
+              fontFamily: context.textTheme.code.fontFamily,
+              fontFamilyFallback: context.textTheme.code.fontFamilyFallback,
+              fontWeight: context.textTheme.code.fontWeight ?? FontWeight.w400,
+              letterSpacing: 0,
+              color: colors.textMuted,
+            ),
+          ),
+        ),
+      );
+    }
 
     return Semantics(
       label: keys.join(' + '),

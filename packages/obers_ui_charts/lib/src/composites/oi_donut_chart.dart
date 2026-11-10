@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:obers_ui_charts/src/composites/oi_chart_legend.dart';
 
 import 'package:obers_ui_charts/src/composites/oi_pie_chart.dart';
 import 'package:obers_ui_charts/src/foundation/oi_chart_behavior.dart';
@@ -18,6 +19,10 @@ class OiDonutChart extends StatelessWidget {
     super.key,
     this.innerRadiusFraction = 0.4,
     this.centerLabel,
+    this.center,
+    this.legend,
+    this.legendPosition = OiChartLegendPosition.bottom,
+    this.legendWidth = 140,
     this.showLabels = true,
     this.showPercentages = true,
     this.showValues = false,
@@ -45,6 +50,18 @@ class OiDonutChart extends StatelessWidget {
   ///
   /// Commonly used for a summary value or label.
   final String? centerLabel;
+
+  /// Rich center content; takes precedence over centerLabel.
+  final Widget? center;
+
+  /// Optional shared legend content.
+  final Widget? legend;
+
+  /// Position of the legend relative to the chart.
+  final OiChartLegendPosition legendPosition;
+
+  /// Width reserved for a left/right legend.
+  final double legendWidth;
 
   /// Whether to show segment labels.
   final bool showLabels;
@@ -79,8 +96,12 @@ class OiDonutChart extends StatelessWidget {
       label: semanticLabel ?? label,
       segments: segments,
       donut: true,
-      donutWidth: innerRadiusFraction,
+      donutWidth: 1 - innerRadiusFraction,
       centerLabel: centerLabel,
+      center: center,
+      legend: legend,
+      legendPosition: legendPosition,
+      legendWidth: legendWidth,
       showLabels: showLabels,
       showPercentages: showPercentages,
       showValues: showValues,

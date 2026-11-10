@@ -1,127 +1,234 @@
-# Component Tiers
+# The Four Tiers
 
-ObersUI organizes its 100+ widgets into four tiers. Each tier builds on the one below — like layers of a well-structured dessert.
+ObersUI sorts its widgets into layers. Each layer builds on the one below it. This
+page explains what lives in each layer, shows a few widgets from each, and tells
+you when to build at that level. Two simple rules keep the whole library
+predictable, and they are at the bottom of this page.
+
+There is a base layer plus four widget tiers. The base layer, Foundation, holds
+the services every widget relies on. Above it sit Primitives, Components,
+Composites, and Modules. The higher you go, the more a single widget does for you.
 
 ```mermaid
 graph TD
-    A[Foundation<br/>Theme, Accessibility, Persistence] --> B[Primitives<br/>OiTappable, OiGrid, OiShimmer]
-    B --> C[Components<br/>OiButton, OiTextInput, OiDialog]
-    C --> D[Composites<br/>OiTable, OiCalendar, OiSearch]
-    D --> E[Modules<br/>OiFileExplorer, OiChat, OiKanban]
+    F[Foundation<br/>Theme, OiApp, overlays, responsive, persistence] --> P[Primitives<br/>OiLabel, OiSurface, OiTappable, OiRow, OiGrid]
+    P --> C[Components<br/>OiButton, OiTextInput, OiCard]
+    C --> X[Composites<br/>OiTable, OiFormSection, OiSidebar, OiCalendar]
+    X --> M[Modules<br/>OiListView, OiKanban, OiChat, OiFileExplorer]
 ```
+
+## At a glance
+
+| Tier | What it is | Reach for it when |
+| --- | --- | --- |
+| Foundation | Theme and app services, no visible widgets | You configure the app or read a theme token. |
+| Primitives | Single-purpose building blocks | You build a widget of your own. |
+| Components | Everyday UI elements | You lay out a custom screen. |
+| Composites | Multi-component patterns | You need a table, a form, or a calendar. |
+| Modules | Full-feature screens | You want a whole screen ready to drop in. |
 
 ## Foundation
 
-The base layer. Not visible widgets, but the services everything depends on.
+The base layer. These are services, not widgets you place on screen. Everything
+above depends on them. `OiApp` sets them up, and you read them through `context`
+extensions.
 
-- **Theme** — Design tokens (colors, spacing, typography, radius, shadows, animations)
-- **Accessibility** — Reduced motion detection, touch target enforcement, screen reader support
-- **Persistence** — Settings drivers that auto-save user preferences
-- **Platform** — Input modality detection, safe areas, platform adaptation
+What lives here:
 
-You interact with the foundation through `OiApp` and `context` extensions. See [Theming](theming.md) for details.
+- **Theme.** Design tokens for colors, spacing, typography, radius, shadows, and
+  animation.
+- **Overlays.** The host that dialogs, toasts, and menus render into.
+- **Responsive.** Breakpoints and the current screen size.
+- **Persistence.** Drivers that save user settings like theme mode.
+- **Accessibility.** Reduced-motion detection and touch-target enforcement.
 
-## Tier 1: Primitives
+You wrap your app in `OiApp` once at the root.
 
-Single-purpose, low-level widgets. They render one thing and do it well.
+```dart
+OiApp(
+  theme: OiThemeData.light(),
+  darkTheme: OiThemeData.dark(),
+  home: const HomeScreen(),
+)
+```
 
-**Examples:**
+Inside the app, you read tokens from `context`.
 
-| Widget | Purpose |
+```dart
+OiSurface(
+  color: context.colors.surface,
+  padding: EdgeInsets.all(context.spacing.md),
+  child: OiLabel.body('Reads its color and padding from the theme'),
+)
+```
+
+Build at this level only to configure the app or to read a token. See
+[Theming](theming.md) for the full token set.
+
+## Primitives
+
+Single-purpose widgets. Each renders one thing. Components are built from these,
+so you often use them without noticing. Reach for a primitive when you build a
+widget of your own and no component fits.
+
+A few you will meet:
+
+| Widget | What it does |
 | --- | --- |
-| `OiTappable` | Tap handler with hover, focus, and press feedback |
-| `OiGrid` | Responsive CSS Grid-like layout |
-| `OiShimmer` | Loading shimmer animation |
-| `OiDraggable` | Makes any widget draggable |
-| `OiVirtualList` | Virtualized scrollable list |
-| `OiTouchTarget` | Enforces 48x48dp minimum touch area |
-| `OiSliverList` | Themed sliver list wrapper |
-| `OiSliverGrid` | Themed sliver grid wrapper |
+| `OiLabel` | All text display. Use it instead of `Text`. |
+| `OiSurface` | A themed box with background, border, and radius. |
+| `OiTappable` | A tap target with hover, focus, and press states. |
+| `OiRow` | A horizontal layout with a themed gap and collapse. |
+| `OiColumn` | The vertical version of `OiRow`. |
+| `OiGrid` | A responsive grid that reflows by breakpoint. |
+| `OiTouchTarget` | Enforces a minimum 48 by 48 tap area. |
 
-Primitives are the Lego bricks. Most users won't use them directly — components are built from them.
+Text and layout always go through these. Use `OiLabel` in place of `Text`, and
+`OiRow`, `OiColumn`, or `OiGrid` in place of `Row`, `Column`, or `GridView`.
 
-## Tier 2: Components
+```dart
+OiColumn(
+  gap: OiResponsive<double>(context.spacing.md),
+  children: [
+    OiLabel.h3('Profile'),
+    OiRow(
+      gap: OiResponsive<double>(context.spacing.sm),
+      children: [
+        OiLabel.body('Name'),
+        OiLabel.bodyStrong('Ada Lovelace'),
+      ],
+    ),
+  ],
+)
+```
 
-Standard UI components that you'll use every day. Built from primitives, styled by the theme.
+Build at this level when you write a reusable widget for your own design system.
+Most app code does not touch primitives directly.
 
-**Examples:**
+## Components
 
-| Widget | Purpose |
+The everyday UI elements. You will use this tier the most. Each component is built
+from primitives and styled by the theme, so they all match without extra work.
+
+Common ones:
+
+| Widget | What it does |
 | --- | --- |
-| `OiButton` | Primary, secondary, outline, ghost, destructive variants |
-| `OiTextInput` | Text field with validation and formatting |
-| `OiSelect` | Dropdown select with search |
-| `OiDialog` | Modal dialog with configurable actions |
-| `OiToast` | Toast notification system |
-| `OiTabs` | Tab navigation with persistence |
-| `OiCard` | Content container with shadow |
-| `OiAvatar` | User avatar with image or initials |
-| `OiNavigationRail` | Compact vertical navigation rail |
-| `OiSliverHeader` | Sticky sliver header with collapsing variants |
-| `OiDialogShell` | Low-level dialog container |
-| `OiSnackBar` | Brief action feedback bar |
-| `OiRefreshIndicator` | Pull-to-refresh wrapper |
-| `OiPageIndicator` | Dot indicators for paged content |
-| `OiScrollToTop` | Floating scroll-to-top button |
-| `OiBackButton` | RTL-aware back navigation button |
-| `OiFormSelect` | Form-integrated dropdown with validation |
-| `OiSwitchTile` | Toggle tile with switch, label, and subtitle |
-| `OiCheckboxTile` | Toggle tile with checkbox, label, and subtitle |
-| `OiRadioTile` | Toggle tile with radio indicator |
-| `OiSegmentedControl` | Exclusive segment toggle (2-5 options) |
-| `OiDatePickerField` | Date input with calendar dialog |
-| `OiDateRangePickerField` | Date range input with presets |
-| `OiTimePickerField` | Time input with time picker dialog |
-| `OiTabView` | Tab bar with content switching and lazy loading |
+| `OiButton` | The everyday button, with six variants. |
+| `OiTextInput` | A text field with validation and formatting. |
+| `OiSelect` | A dropdown with optional search. |
+| `OiCard` | A content container with a border and shadow. |
+| `OiDialog` | A modal dialog with configurable actions. |
+| `OiToast` | A brief notification. |
+| `OiTabs` | Tab navigation. |
+| `OiAvatar` | A user avatar from an image or initials. |
 
-This is the tier most developers will interact with the most.
+Here is a small card built from components and layout primitives.
 
-## Tier 3: Composites
+```dart
+OiCard(
+  child: OiColumn(
+    gap: OiResponsive<double>(context.spacing.md),
+    children: [
+      OiLabel.h3('Invite a teammate'),
+      OiLabel.body('They will get access to this workspace.'),
+      OiButton.primary(
+        label: 'Send invite',
+        onTap: () => sendInvite(),
+      ),
+    ],
+  ),
+)
+```
 
-Multi-component patterns that solve complex UI problems. Built from components.
+Build at this level when you assemble a custom screen and no composite or module
+covers the whole pattern. See [Buttons and Actions](../widgets/buttons.md) for one
+component group in full.
 
-**Examples:**
+## Composites
 
-| Widget | Purpose |
+Multi-component patterns that solve a larger problem in one widget. A composite
+wires several components together and manages their shared state. Reach for one
+when you need a table, a form, a calendar, or a side navigation.
+
+A few examples:
+
+| Widget | What it does |
 | --- | --- |
-| `OiTable` | Full data table with sort, filter, resize, pagination, inline edit |
-| `OiFormSection` | Grouped form fields with heading, description, and validation |
-| `OiFormDialog` | Form dialog with managed submit lifecycle |
-| `OiCalendar` | Day/week/month calendar view |
-| `OiSearch` | Full-text search with filters |
-| `OiCommandBar` | Ctrl+K command palette |
-| `OiGantt` | Gantt chart timeline |
-| `OiTour` | Multi-step guided onboarding |
-| `OiResponsiveShell` | Responsive navigation shell |
-| `OiReorderableList` | Drag-to-reorder list with keyboard support |
-| `OiDataGrid` | Lightweight data grid with sorting and selection |
+| `OiTable` | A data table with sort, filter, resize, pagination, and inline edit. |
+| `OiFormSection` | A group of form fields with a heading and validation. |
+| `OiFormDialog` | A form inside a dialog with a managed submit lifecycle. |
+| `OiSidebar` | A collapsible side navigation. |
+| `OiCalendar` | A day, week, or month calendar view. |
+| `OiDataGrid` | A lighter grid with sorting and selection. |
+| `OiReorderableList` | A drag-to-reorder list with keyboard support. |
 
-## Tier 4: Modules
+A form section groups fields and shows one heading over them.
 
-Complete, feature-rich screens you can drop into your app. Built from composites.
+```dart
+OiFormSection(
+  title: 'Account',
+  children: [
+    OiTextInput(label: 'Email', onChanged: (v) => email = v),
+    OiTextInput(label: 'Display name', onChanged: (v) => name = v),
+  ],
+)
+```
 
-**Examples:**
+Build at this level when a full data table or form is the job. You do not
+reassemble one from components each time.
 
-| Widget | Purpose |
+## Modules
+
+Complete screens you drop into your app. A module handles a whole feature, from
+layout to interaction to empty states. It is the highest tier, and a single module
+can take many parameters.
+
+Some of what ships here:
+
+| Widget | What it does |
 | --- | --- |
-| `OiFileExplorer` | Full file browser with sidebar, toolbar, grid/list views |
-| `OiChat` | Messaging interface with threads, reactions, attachments |
-| `OiDashboard` | Draggable, resizable widget grid |
-| `OiKanban` | Kanban board with drag-and-drop |
-| `OiComments` | Threaded discussion system |
-| `OiNotificationCenter` | Notification panel |
+| `OiListView` | A full list screen with search, filters, and selection. |
+| `OiKanban` | A board with drag-and-drop columns and cards. |
+| `OiChat` | A messaging view with threads, reactions, and attachments. |
+| `OiFileExplorer` | A file browser with sidebar, toolbar, and grid or list views. |
+| `OiDashboard` | A draggable, resizable widget grid. |
+| `OiComments` | A threaded discussion view. |
+| `OiNotificationCenter` | A notification panel. |
 
-Modules are the richest layer — they can have 60+ parameters and handle complex interactions out of the box.
+You give a module its data and its callbacks, and it renders the rest.
 
-## The rule
+```dart
+OiKanban(
+  label: 'Task board',
+  columns: boardColumns,
+  onCardMove: (item, fromColumn, toColumn, newIndex) =>
+      moveCard(item, toColumn, newIndex),
+)
+```
 
-> **Each tier only imports from the tier below it.**
+Build at this level when a whole screen matches a module. It saves the most work.
 
-Primitives don't know about components. Components don't know about composites. This keeps the dependency graph clean and makes each layer independently testable.
+## The two rules
 
-## Which tier should I use?
+Keep these two rules in mind and the library stays predictable.
 
-- **Building a screen?** Start with **modules** — they handle the heavy lifting
-- **Building a form?** Use **composites** like `OiFormSection`, `OiFormDialog`, and `OiTable`
-- **Building custom UI?** Compose from **components**
-- **Building a design system on top of ObersUI?** Work with **primitives**
+**Each tier only imports from the tier below.** Primitives do not know about
+components. Components do not know about composites. Composites do not know about
+modules. This keeps the dependency graph clean and lets each layer be tested on
+its own.
+
+**Reach for the highest tier that fits, then drop down.** Start at Modules. If no
+module matches, try a Composite. If that does not fit, build from Components. Drop
+to Primitives only when you write a reusable widget of your own. Working top-down
+means you write less code and inherit more behavior.
+
+!!! tip
+    A common mistake is rebuilding a table or a form from components by hand.
+    Check the Composites tier first. `OiTable` and `OiFormSection` already handle
+    sorting, validation, and layout for you.
+
+## Related
+
+- [Theming](theming.md) for the Foundation tokens and how to brand them.
+- [Buttons and Actions](../widgets/buttons.md) for a Components group in detail.

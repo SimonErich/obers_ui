@@ -2,11 +2,68 @@
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:obers_ui/src/components/buttons/oi_button.dart';
 import 'package:obers_ui/src/components/overlays/oi_dialog.dart';
+import 'package:obers_ui/src/foundation/theme/component_themes/oi_button_theme_data.dart';
+import 'package:obers_ui/src/foundation/theme/oi_theme_data.dart';
 
 import '../../../helpers/pump_app.dart';
 
 void main() {
+  testWidgets(
+    'dialog actions wrap at320 and retain desktop order and callbacks',
+    (tester) async {
+      var stay = 0;
+      var discard = 0;
+      for (final width in [320.0, 600.0]) {
+        final base = OiThemeData.light();
+        await tester.pumpObers(
+          Center(
+            child: SizedBox(
+              width: width - 64,
+              child: OiDialog.confirm(
+                label: 'Discard changes',
+                title: 'Discard changes?',
+                actions: [
+                  OiButton.outline(label: 'Stay', onTap: () => stay++),
+                  OiButton.primary(
+                    label: 'Discard changes',
+                    onTap: () => discard++,
+                  ),
+                ],
+              ),
+            ),
+          ),
+          // Ahem has square glyphs; keep each action narrower than its run.
+          theme: base.copyWith(
+            components: base.components.copyWith(
+              button: const OiButtonThemeData(
+                textStyle: TextStyle(fontSize: 10),
+              ),
+            ),
+          ),
+          surfaceSize: Size(width, 600),
+        );
+        await tester.pumpAndSettle();
+        final first = tester.getRect(find.text('Stay'));
+        final last = tester.getRect(find.text('Discard changes'));
+        if (width == 320) {
+          expect(last.top, greaterThan(first.bottom));
+        } else {
+          expect(last.top, first.top);
+          expect(last.left, greaterThan(first.right));
+        }
+        expect(find.text('Stay').hitTestable(), findsOneWidget);
+        expect(find.text('Discard changes').hitTestable(), findsOneWidget);
+        await tester.tap(find.text('Stay'));
+        await tester.tap(find.text('Discard changes'));
+        expect(tester.takeException(), isNull);
+      }
+      expect(stay, 2);
+      expect(discard, 2);
+    },
+  );
+
   testWidgets('renders title text', (tester) async {
     await tester.pumpObers(
       const OiDialog.standard(label: 'dialog', title: 'Confirm delete'),

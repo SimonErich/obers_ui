@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/obers_ui.dart';
 import 'package:obers_ui_charts/src/composites/oi_bubble_chart/oi_bubble_chart_interaction.dart';
+import 'package:obers_ui_charts/src/composites/oi_chart_legend.dart';
 import 'package:obers_ui_charts/src/foundation/oi_chart_behavior.dart';
 import 'package:obers_ui_charts/src/foundation/oi_chart_controller.dart';
 
@@ -40,6 +41,10 @@ class OiPieChart extends StatefulWidget {
     this.donut = false,
     this.donutWidth = 0.4,
     this.centerLabel,
+    this.center,
+    this.legend,
+    this.legendPosition = OiChartLegendPosition.bottom,
+    this.legendWidth = 140,
     this.showLabels = true,
     this.showPercentages = true,
     this.showValues = false,
@@ -65,6 +70,18 @@ class OiPieChart extends StatefulWidget {
 
   /// Optional text displayed in the donut center.
   final String? centerLabel;
+
+  /// Rich center content; takes precedence over centerLabel.
+  final Widget? center;
+
+  /// Optional shared legend content.
+  final Widget? legend;
+
+  /// Position of the legend relative to the chart.
+  final OiChartLegendPosition legendPosition;
+
+  /// Width reserved for a left/right legend.
+  final double legendWidth;
 
   /// Whether to show segment labels on the chart.
   final bool showLabels;
@@ -117,7 +134,11 @@ class _OiPieChartState extends State<OiPieChart> {
 
   int? _hitTest(Offset position, Size chartSize) {
     final center = Offset(chartSize.width / 2, chartSize.height / 2);
-    final radius = math.min(chartSize.width, chartSize.height) / 2 * 0.85;
+    final half = math.min(chartSize.width, chartSize.height) / 2;
+    final radius = math.max<double>(
+      0,
+      half - (context.components.chart?.density?.radialInset ?? half * .15),
+    );
     final dx = position.dx - center.dx;
     final dy = position.dy - center.dy;
     final distance = math.sqrt(dx * dx + dy * dy);
@@ -192,9 +213,19 @@ class _OiPieChartState extends State<OiPieChart> {
 
           // Reserve space for legend below.
           final legendSpace = widget.showLegend && widget.segments.isNotEmpty
-              ? 30.0
-              : 0.0;
-          final chartDim = math.min(w, h - legendSpace);
+              ? 30
+              : 0;
+          final sideLegend =
+              widget.showLegend &&
+              (widget.legendPosition == OiChartLegendPosition.left ||
+                  widget.legendPosition == OiChartLegendPosition.right);
+          final chartDim = math.max<double>(
+            0,
+            math.min(
+              sideLegend ? w - widget.legendWidth - 16 : w,
+              sideLegend ? h : h - legendSpace,
+            ),
+          );
           final chartSize = Size(chartDim, chartDim);
 
           // Resolve segment colors.
@@ -212,6 +243,7 @@ class _OiPieChartState extends State<OiPieChart> {
               segments: widget.segments,
               colors: resolvedColors,
               total: _total,
+              radialInset: context.components.chart?.density?.radialInset,
               donut: widget.donut,
               donutWidth: widget.donutWidth,
               showLabels: widget.showLabels,
@@ -222,13 +254,17 @@ class _OiPieChartState extends State<OiPieChart> {
               labelColor: colors.text,
               borderColor: colors.surface,
             ),
-            child: widget.donut && widget.centerLabel != null
+            child:
+                widget.donut &&
+                    (widget.center != null || widget.centerLabel != null)
                 ? Center(
-                    child: OiLabel.body(
-                      widget.centerLabel!,
-                      key: const Key('oi_pie_chart_center_label'),
-                      color: colors.text,
-                    ),
+                    child:
+                        widget.center ??
+                        OiLabel.body(
+                          widget.centerLabel!,
+                          key: const Key('oi_pie_chart_center_label'),
+                          color: colors.text,
+                        ),
                   )
                 : null,
           );
@@ -247,45 +283,77 @@ class _OiPieChartState extends State<OiPieChart> {
               key: const Key('oi_pie_chart_pointer'),
               onHover: (e) => _handleHover(e, chartSize),
               onExit: (_) => setState(() => _hoveredSegmentIndex = null),
-              child: SizedBox.fromSize(size: chartSize, child: painter),
+              child: GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTapDown: (details) => _handleTapDown(details, chartSize),
+                child: SizedBox.fromSize(size: chartSize, child: painter),
+              ),
             );
           }
 
           // Legend.
           final legendWidget = widget.showLegend
-              ? Wrap(
-                  key: const Key('oi_pie_chart_legend'),
-                  spacing: 16,
-                  runSpacing: 4,
-                  children: [
-                    for (var i = 0; i < widget.segments.length; i++)
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Container(
-                            width: 12,
-                            height: 12,
-                            decoration: BoxDecoration(
-                              color: resolvedColors[i],
-                              shape: BoxShape.circle,
-                            ),
+              ? widget.legend ??
+                    Wrap(
+                      key: const Key('oi_pie_chart_legend'),
+                      spacing: 16,
+                      runSpacing: 4,
+                      children: [
+                        for (var i = 0; i < widget.segments.length; i++)
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Container(
+                                width: 12,
+                                height: 12,
+                                decoration: BoxDecoration(
+                                  color: resolvedColors[i],
+                                  shape: BoxShape.circle,
+                                ),
+                              ),
+                              const SizedBox(width: 4),
+                              OiLabel.caption(
+                                widget.segments[i].label,
+                                color: colors.textMuted,
+                              ),
+                            ],
                           ),
-                          const SizedBox(width: 4),
-                          OiLabel.caption(
-                            widget.segments[i].label,
-                            color: colors.textMuted,
-                          ),
-                        ],
-                      ),
-                  ],
-                )
+                      ],
+                    )
               : null;
 
+          if (sideLegend && legendWidget != null) {
+            final legend = SizedBox(
+              width: widget.legendWidth,
+              child: legendWidget,
+            );
+            return Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (widget.legendPosition == OiChartLegendPosition.left) ...[
+                  legend,
+                  const SizedBox(width: 16),
+                ],
+                interactiveChart,
+                if (widget.legendPosition == OiChartLegendPosition.right) ...[
+                  const SizedBox(width: 16),
+                  legend,
+                ],
+              ],
+            );
+          }
           return Column(
             mainAxisSize: MainAxisSize.min,
             children: [
+              if (legendWidget != null &&
+                  widget.legendPosition == OiChartLegendPosition.top)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: legendWidget,
+                ),
               interactiveChart,
-              if (legendWidget != null)
+              if (legendWidget != null &&
+                  widget.legendPosition != OiChartLegendPosition.top)
                 Padding(
                   padding: const EdgeInsets.only(top: 8),
                   child: legendWidget,
@@ -312,6 +380,7 @@ class _OiPieChartPainter extends CustomPainter {
     required this.labelColor,
     required this.borderColor,
     this.hoveredIndex,
+    this.radialInset,
   });
 
   final List<OiPieSegment> segments;
@@ -326,14 +395,16 @@ class _OiPieChartPainter extends CustomPainter {
   final Color labelColor;
   final Color borderColor;
   final int? hoveredIndex;
+  final double? radialInset;
 
   @override
   void paint(Canvas canvas, Size size) {
     if (segments.isEmpty || total <= 0) return;
 
     final center = Offset(size.width / 2, size.height / 2);
-    final radius = math.min(size.width, size.height) / 2 * 0.85;
-    final innerRadius = donut ? radius * (1 - donutWidth) : 0.0;
+    final half = math.min(size.width, size.height) / 2;
+    final radius = math.max<double>(0, half - (radialInset ?? half * .15));
+    final innerRadius = donut ? radius * (1 - donutWidth) : 0;
 
     var startAngle = -math.pi / 2; // Start at top.
 
@@ -444,6 +515,7 @@ class _OiPieChartPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(_OiPieChartPainter oldDelegate) =>
+      oldDelegate.radialInset != radialInset ||
       oldDelegate.segments != segments ||
       oldDelegate.colors != colors ||
       oldDelegate.total != total ||

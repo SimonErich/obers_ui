@@ -58,7 +58,6 @@ extension _OiTableStatus<T> on _OiTableState<T> {
   Widget _buildStatusBar() {
     final totalShown = _displayRows.length;
     final selected = _ctrl.selectedRows.length;
-    final labels = widget.labels;
     return ColoredBox(
       key: const Key('oi_table_status_bar'),
       color: context.colors.surfaceSubtle,
@@ -67,13 +66,15 @@ extension _OiTableStatus<T> on _OiTableState<T> {
         child: Row(
           children: [
             Text(
-              labels.rowCount?.call(totalShown) ?? '$totalShown ${labels.rows}',
+              widget.labels.rowCount?.call(totalShown) ??
+                  '$totalShown ${widget.labels.rows}',
               style: TextStyle(color: context.colors.textMuted),
             ),
             if (selected > 0) ...[
               const SizedBox(width: 16),
               Text(
-                labels.selectedCount?.call(selected) ?? '$selected selected',
+                widget.labels.selectedCount?.call(selected) ??
+                    '$selected selected',
                 style: TextStyle(color: context.colors.textMuted),
               ),
             ],
@@ -86,9 +87,12 @@ extension _OiTableStatus<T> on _OiTableState<T> {
   // ── Helpers ───────────────────────────────────────────────────────────────
 
   double get _effectiveRowHeight =>
-      widget.rowHeight ?? (widget.dense ? 32 : 48);
+      widget.rowHeight ??
+      context.components.table?.rowHeight ??
+      (widget.dense ? 32 : 48);
 
-  double get _headerRowHeight => widget.dense ? 28 : 36;
+  double get _headerRowHeight =>
+      context.components.table?.headerHeight ?? (widget.dense ? 28 : 36);
 
   static AlignmentGeometry _alignmentFromTextAlign(TextAlign align) {
     return switch (align) {

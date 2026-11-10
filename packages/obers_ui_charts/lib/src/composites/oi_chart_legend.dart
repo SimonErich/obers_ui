@@ -37,6 +37,9 @@ enum OiLegendMarkerShape {
   /// A small square with rounded corners.
   square,
 
+  /// Diagonal stripes distinguish forecasts or unused capacity without color.
+  hatched,
+
   /// A circle.
   circle,
 
@@ -67,6 +70,7 @@ class OiChartLegendItem {
     this.visible = true,
     this.emphasized = false,
     this.markerShape,
+    this.value,
   });
 
   /// Unique identifier for this series.
@@ -87,6 +91,9 @@ class OiChartLegendItem {
   /// Optional marker shape override for this item.
   final OiLegendMarkerShape? markerShape;
 
+  /// Optional formatted count or value displayed beside the label.
+  final String? value;
+
   /// Returns a copy with the specified fields replaced.
   OiChartLegendItem copyWith({
     String? id,
@@ -95,6 +102,7 @@ class OiChartLegendItem {
     bool? visible,
     bool? emphasized,
     OiLegendMarkerShape? markerShape,
+    String? value,
   }) {
     return OiChartLegendItem(
       id: id ?? this.id,
@@ -103,6 +111,7 @@ class OiChartLegendItem {
       visible: visible ?? this.visible,
       emphasized: emphasized ?? this.emphasized,
       markerShape: markerShape ?? this.markerShape,
+      value: value ?? this.value,
     );
   }
 
@@ -110,6 +119,7 @@ class OiChartLegendItem {
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
     return other is OiChartLegendItem &&
+        other.value == value &&
         other.id == id &&
         other.label == label &&
         other.color == color &&
@@ -120,7 +130,7 @@ class OiChartLegendItem {
 
   @override
   int get hashCode =>
-      Object.hash(id, label, color, visible, emphasized, markerShape);
+      Object.hash(id, label, color, visible, emphasized, markerShape, value);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -179,7 +189,11 @@ class OiChartLegend extends StatelessWidget {
     this.itemBuilder,
     this.legendTheme,
     this.semanticLabel,
+    this.valueList = false,
   });
+
+  /// Uses full-width rows with aligned values, suitable below radial charts.
+  final bool valueList;
 
   /// The legend items to display.
   final List<OiChartLegendItem> items;
@@ -221,26 +235,54 @@ class OiChartLegend extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.colors;
     final theme = legendTheme ?? context.components.chart?.legend;
-    final iconSize = theme?.iconSize ?? 12.0;
+    final iconSize = valueList
+        ? theme?.valueIconSize ?? theme?.iconSize ?? 10.0
+        : theme?.iconSize ?? 12.0;
     final spacing = theme?.spacing ?? 16.0;
     final padding = theme?.padding ?? EdgeInsets.zero;
-    final labelStyle = (theme?.labelStyle ?? const TextStyle(fontSize: 12))
-        .copyWith(color: theme?.labelColor ?? colors.textMuted);
+    final labelStyle =
+        (valueList
+                ? theme?.valueLabelStyle ??
+                      theme?.labelStyle ??
+                      context.textTheme.body
+                : theme?.labelStyle ?? const TextStyle(fontSize: 12))
+            .copyWith(
+              color:
+                  theme?.labelColor ??
+                  (valueList ? colors.text : colors.textMuted),
+            );
 
     return Semantics(
       label: semanticLabel ?? 'Chart legend',
       container: true,
       child: Padding(
         padding: padding,
-        child: Wrap(
-          key: const Key('oi_chart_legend'),
-          spacing: spacing,
-          runSpacing: 4,
-          children: [
-            for (var i = 0; i < items.length; i++)
-              _buildItem(context, items[i], i, iconSize, labelStyle),
-          ],
-        ),
+        child: valueList
+            ? Column(
+                key: const Key('oi_chart_legend'),
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  for (var i = 0; i < items.length; i++) ...[
+                    if (i > 0) SizedBox(height: theme?.valueSpacing ?? 4),
+                    _buildItem(context, items[i], i, iconSize, labelStyle),
+                  ],
+                ],
+              )
+            : Wrap(
+                key: const Key('oi_chart_legend'),
+                direction:
+                    resolvePosition(context) == OiChartLegendPosition.left ||
+                        resolvePosition(context) == OiChartLegendPosition.right
+                    ? Axis.vertical
+                    : Axis.horizontal,
+                spacing: spacing,
+                runSpacing: 4,
+                children: [
+                  for (var i = 0; i < items.length; i++)
+                    _buildItem(context, items[i], i, iconSize, labelStyle),
+                ],
+              ),
       ),
     );
   }
@@ -266,6 +308,7 @@ class OiChartLegend extends StatelessWidget {
 
     return Focus(
       key: Key('oi_chart_legend_item_${item.id}'),
+      canRequestFocus: onTap != null || onDoubleTap != null,
       onKeyEvent: (node, event) {
         if (event is! KeyDownEvent) return KeyEventResult.ignored;
         if (event.logicalKey == LogicalKeyboardKey.enter ||
@@ -282,8 +325,8 @@ class OiChartLegend extends StatelessWidget {
       },
       child: Semantics(
         label: '${item.label}, ${item.visible ? "visible" : "hidden"}',
-        toggled: item.visible,
-        button: true,
+        toggled: onTap == null ? null : item.visible,
+        button: onTap != null || onDoubleTap != null,
         child: GestureDetector(
           onTap: onTap,
           onDoubleTap: onDoubleTap,
@@ -298,8 +341,34 @@ class OiChartLegend extends StatelessWidget {
                   size: iconSize,
                   emphasized: item.emphasized,
                 ),
-                SizedBox(width: iconSize / 3),
-                OiLabel.caption(item.label, color: labelStyle.color),
+                SizedBox(
+                  width: valueList
+                      ? context.spacing.sm
+                      : (legendTheme ?? context.components.chart?.legend)
+                                ?.markerGap ??
+                            iconSize / 3,
+                ),
+                if (valueList)
+                  Expanded(child: Text(item.label, style: labelStyle))
+                else
+                  Text(
+                    item.label,
+                    style: context.textTheme.caption.merge(labelStyle),
+                  ),
+                if (item.value != null) ...[
+                  const SizedBox(width: 12),
+                  Text(
+                    item.value!,
+                    style: valueList
+                        ? (legendTheme ?? context.components.chart?.legend)
+                                  ?.valueStyle ??
+                              context.textTheme.body.copyWith(
+                                fontWeight: FontWeight.w500,
+                                fontVariations: const [],
+                              )
+                        : context.textTheme.smallStrong,
+                  ),
+                ],
               ],
             ),
           ),
@@ -366,6 +435,26 @@ class _MarkerPainter extends CustomPainter {
         );
         canvas.drawRRect(rect, paint);
         if (emphasized) canvas.drawRRect(rect, strokePaint);
+
+      case OiLegendMarkerShape.hatched:
+        canvas
+          ..save()
+          ..clipRect(Offset.zero & size)
+          ..drawRect(
+            Offset.zero & size,
+            Paint()..color = color.withValues(alpha: .12),
+          );
+        final hatch = Paint()
+          ..color = color
+          ..strokeWidth = 1;
+        for (var x = -size.height; x < size.width; x += 4) {
+          canvas.drawLine(
+            Offset(x, size.height),
+            Offset(x + size.height, 0),
+            hatch,
+          );
+        }
+        canvas.restore();
 
       case OiLegendMarkerShape.circle:
         final r = size.shortestSide / 2;

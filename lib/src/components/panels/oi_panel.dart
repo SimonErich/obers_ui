@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/overlays/oi_sheet.dart'
     show OiPanelSide, OiSheet;
@@ -96,9 +94,9 @@ class _OiPanelState extends State<OiPanel> with SingleTickerProviderStateMixin {
     super.didUpdateWidget(oldWidget);
     if (widget.open != oldWidget.open) {
       if (widget.open) {
-        unawaited(_controller.forward());
+        _controller.forward();
       } else {
-        unawaited(_controller.reverse());
+        _controller.reverse();
       }
     }
   }

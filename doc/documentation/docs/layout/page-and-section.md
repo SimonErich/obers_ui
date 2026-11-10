@@ -1,24 +1,30 @@
 # Page & Section
 
-`OiPage` and `OiSection` are simple, explicit vertical-layout primitives that
-structure content into well-organized, responsive pages.
+These primitives frame a screen. `OiPage` is the outermost vertical layout.
+`OiSection` groups related content with spacing. `OiContainer` limits how wide
+the content grows. `OiAspectRatio` locks a child to a fixed shape.
 
-Both widgets follow the library's **zero magic** principle: the active
-`breakpoint` is a required parameter — resolve it once at the page/layout level
-(e.g. `context.breakpoint`) and pass it down explicitly.
+All four follow the library's zero magic rule. The active `breakpoint` is a
+required parameter. Resolve it once at the top of your screen with
+`context.breakpoint`, then pass it down to every layout primitive.
+
+| Widget | What it does |
+| --- | --- |
+| `OiPage` | The outermost vertical layout for a screen. Fills its parent. |
+| `OiSection` | Groups children vertically with a gap and an optional semantic label. |
+| `OiContainer` | Caps content width and centers it, with optional padding. |
+| `OiAspectRatio` | Forces a child to a width-to-height ratio. |
 
 ## OiPage
 
-A full-page vertical layout that arranges `children` in a `Column` with
-optional responsive `gap` and `padding`:
+The outermost layout for a screen. It stacks its `children` in a column and
+inserts a responsive `gap` between them. Reach for it as the root of a screen
+body.
 
 ```dart
 OiPage(
   breakpoint: context.breakpoint,
-  gap: OiResponsive.breakpoints({
-    OiBreakpoint.compact: 16,
-    OiBreakpoint.expanded: 24,
-  }),
+  gap: const OiResponsive<double>(24),
   padding: OiResponsive.breakpoints({
     OiBreakpoint.compact: EdgeInsets.all(16),
     OiBreakpoint.expanded: EdgeInsets.all(32),
@@ -30,99 +36,194 @@ OiPage(
 )
 ```
 
-**What it does:**
+`OiPage` fills its parent by default (`mainAxisSize: MainAxisSize.max`) and
+stretches children to the full width (`crossAxisAlignment:
+CrossAxisAlignment.stretch`). Set `mainAxisSize` to `MainAxisSize.min` when you
+nest a page inside another layout.
 
-- Lays out `children` in a `Column` that fills available space by default
-  (`mainAxisSize: MainAxisSize.max`).
-- Inserts responsive `gap` spacing between children.
-- Optionally applies responsive `padding` around the content.
-- Defaults `crossAxisAlignment` to `CrossAxisAlignment.stretch` so children
-  fill the page width.
+| Parameter | Type | Default | Description |
+| --- | --- | --- | --- |
+| `breakpoint` | `OiBreakpoint` | **required** | The active breakpoint. Pass `context.breakpoint`. |
+| `children` | `List<Widget>` | **required** | The widgets to stack vertically. |
+| `gap` | `OiResponsive<double>` | `OiResponsive<double>(0)` | Space inserted between children. |
+| `padding` | `OiResponsive<EdgeInsetsGeometry>?` | `null` | Padding around the content. |
+| `crossAxisAlignment` | `CrossAxisAlignment` | `stretch` | How children align across the page. |
+| `mainAxisSize` | `MainAxisSize` | `max` | Use `min` when nesting inside another layout. |
+| `scale` | `OiBreakpointScale` | `defaultScale` | The scale used to resolve responsive values. |
 
-### Parameters
-
-| Parameter | Type | Description |
-| --- | --- | --- |
-| `breakpoint` | `OiBreakpoint` | **Required.** The active breakpoint. |
-| `children` | `List<Widget>` | **Required.** The children to lay out vertically. |
-| `gap` | `OiResponsive<double>` | Spacing between children. Defaults to `0`. |
-| `padding` | `OiResponsive<EdgeInsetsGeometry>?` | Optional padding around the content. |
-| `crossAxisAlignment` | `CrossAxisAlignment` | Defaults to `CrossAxisAlignment.stretch`. |
-| `mainAxisSize` | `MainAxisSize` | Defaults to `MainAxisSize.max`. Use `MainAxisSize.min` for nesting. |
-| `scale` | `OiBreakpointScale` | Defaults to `OiBreakpointScale.defaultScale`. |
-
-`OiPage` is **not** scrollable on its own. Wrap it in a `SingleChildScrollView`
-(or place it inside a scrolling parent) if you need scrolling.
+!!! note
+    `OiPage` does not scroll on its own, and it does not cap content width. Wrap
+    it in a `SingleChildScrollView` for scrolling. Wrap it in an `OiContainer`
+    to cap the width.
 
 ## OiSection
 
-A semantic grouping widget that arranges `children` vertically with optional
-responsive `gap` and `padding`. It renders a `Semantics` container so assistive
-technologies can announce section boundaries.
+Groups a set of related widgets. It stacks `children` in a column with a
+responsive `gap` and renders a `Semantics` container. Pass `semanticLabel` so
+assistive technology can announce the group.
 
 ```dart
 OiSection(
   breakpoint: context.breakpoint,
-  semanticLabel: 'Notifications',
-  gap: OiResponsive.breakpoints({
-    OiBreakpoint.compact: 8,
-    OiBreakpoint.expanded: 16,
-  }),
-  padding: OiResponsive.breakpoints({
-    OiBreakpoint.compact: EdgeInsets.all(16),
-    OiBreakpoint.expanded: EdgeInsets.all(32),
-  }),
-  children: [
-    // ...
-  ],
-)
-```
-
-### Parameters
-
-| Parameter | Type | Description |
-| --- | --- | --- |
-| `breakpoint` | `OiBreakpoint` | **Required.** The active breakpoint. |
-| `children` | `List<Widget>` | **Required.** The children to lay out vertically. |
-| `gap` | `OiResponsive<double>` | Spacing between children. Defaults to `0`. |
-| `padding` | `OiResponsive<EdgeInsetsGeometry>?` | Optional padding around the content. |
-| `crossAxisAlignment` | `CrossAxisAlignment` | Defaults to `CrossAxisAlignment.start`. |
-| `mainAxisSize` | `MainAxisSize` | Defaults to `MainAxisSize.min` — shrink-wraps its children. |
-| `semanticLabel` | `String?` | Optional label announced by assistive technologies. |
-| `scale` | `OiBreakpointScale` | Defaults to `OiBreakpointScale.defaultScale`. |
-
-`OiSection` does **not** render a visible header, title, icon, description,
-actions, or collapsible affordance — it is a structural/semantic primitive
-only. Compose visible headings from your own widgets as children.
-
-## Section with grid
-
-Combine sections with [`OiGrid`](./grid) for form layouts:
-
-```dart
-OiSection(
-  breakpoint: context.breakpoint,
+  semanticLabel: 'Account details',
   gap: const OiResponsive<double>(16),
   children: [
-    OiGrid(
-      breakpoint: context.breakpoint,
-      columns: OiResponsive.breakpoints({
-        OiBreakpoint.compact: 1,
-        OiBreakpoint.medium: 2,
-      }),
-      gap: const OiResponsive<double>(16),
-      children: [
-        const OiTextInput(label: 'First Name'),
-        const OiTextInput(label: 'Last Name'),
-        const OiTextInput(label: 'Email').span(
-          columnSpan: OiResponsive<int>(2),
-        ),
-      ],
-    ),
+    OiLabel.h3('Account details'),
+    OiTextInput(label: 'Email'),
+    OiTextInput(label: 'Display name'),
   ],
 )
 ```
 
-Children can be positioned in the grid using the `.span()` extension (or the
-`OiSpan` widget) — see the [Grid documentation](./grid) for details on
-`columnSpan`, `columnStart`, `columnOrder`, and `rowSpan`.
+`OiSection` shrink-wraps its children by default (`mainAxisSize:
+MainAxisSize.min`), so it nests inside other layouts without unbounded-height
+errors. It aligns children to the start of the cross axis.
+
+| Parameter | Type | Default | Description |
+| --- | --- | --- | --- |
+| `breakpoint` | `OiBreakpoint` | **required** | The active breakpoint. |
+| `children` | `List<Widget>` | **required** | The widgets to stack vertically. |
+| `gap` | `OiResponsive<double>` | `OiResponsive<double>(0)` | Space inserted between children. |
+| `padding` | `OiResponsive<EdgeInsetsGeometry>?` | `null` | Padding around the section. |
+| `crossAxisAlignment` | `CrossAxisAlignment` | `start` | How children align across the section. |
+| `mainAxisSize` | `MainAxisSize` | `min` | Shrink-wraps children so the section nests safely. |
+| `semanticLabel` | `String?` | `null` | Label announced by screen readers. |
+| `scale` | `OiBreakpointScale` | `defaultScale` | The scale used to resolve responsive values. |
+
+!!! note
+    `OiSection` does not draw a visible header, title, icon, or divider. It is a
+    structural and semantic group. Build a visible heading from `OiLabel.h2` or
+    `OiLabel.h3` as the first child.
+
+## OiContainer
+
+Caps how wide the content grows and centers it. Use it around an `OiPage` so
+text and forms stay readable on wide screens. It is a layout wrapper, not a
+themed box.
+
+```dart
+OiContainer(
+  breakpoint: context.breakpoint,
+  maxWidth: OiResponsive.breakpoints({
+    OiBreakpoint.compact: double.infinity,
+    OiBreakpoint.expanded: 960,
+    OiBreakpoint.large: 1200,
+  }),
+  child: OiPage(
+    breakpoint: context.breakpoint,
+    children: [/* ... */],
+  ),
+)
+```
+
+| Parameter | Type | Default | Description |
+| --- | --- | --- | --- |
+| `breakpoint` | `OiBreakpoint` | **required** | The active breakpoint. |
+| `child` | `Widget?` | `null` | The content to constrain. |
+| `maxWidth` | `OiResponsive<double>?` | `null` | Maximum content width per breakpoint. |
+| `padding` | `OiResponsive<EdgeInsetsGeometry>?` | `null` | Padding around the child. |
+| `centered` | `bool` | `true` | Center the child horizontally. Set `false` to align left. |
+| `scale` | `OiBreakpointScale` | `defaultScale` | The scale used to resolve responsive values. |
+
+## OiAspectRatio
+
+Forces a child to a width-to-height ratio. It wraps Flutter's `AspectRatio` with
+a named `ratio` parameter. Reach for it around images, video, and map tiles.
+
+```dart
+OiAspectRatio(
+  breakpoint: context.breakpoint,
+  ratio: OiResponsive.breakpoints({
+    OiBreakpoint.compact: 4 / 3,
+    OiBreakpoint.expanded: 16 / 9,
+  }),
+  child: OiSurface(
+    color: context.colors.surfaceSubtle,
+    child: const SizedBox.expand(),
+  ),
+)
+```
+
+| Parameter | Type | Default | Description |
+| --- | --- | --- | --- |
+| `breakpoint` | `OiBreakpoint` | **required** | The active breakpoint. |
+| `ratio` | `OiResponsive<double>` | **required** | Width divided by height, for example `16 / 9`. |
+| `child` | `Widget` | **required** | The widget to constrain. |
+| `scale` | `OiBreakpointScale` | `defaultScale` | The scale used to resolve responsive values. |
+
+## A full screen
+
+Here is a screen assembled from the pieces above. `OiContainer` caps the width.
+`SingleChildScrollView` handles scrolling. `OiPage` stacks the sections. Each
+`OiSection` groups one block of content.
+
+```dart
+@override
+Widget build(BuildContext context) {
+  final breakpoint = context.breakpoint;
+
+  return SingleChildScrollView(
+    child: OiContainer(
+      breakpoint: breakpoint,
+      maxWidth: OiResponsive.breakpoints({
+        OiBreakpoint.compact: double.infinity,
+        OiBreakpoint.expanded: 1040,
+      }),
+      padding: OiResponsive.breakpoints({
+        OiBreakpoint.compact: EdgeInsets.all(16),
+        OiBreakpoint.expanded: EdgeInsets.all(32),
+      }),
+      child: OiPage(
+        breakpoint: breakpoint,
+        gap: const OiResponsive<double>(24),
+        children: [
+          OiSection(
+            breakpoint: breakpoint,
+            semanticLabel: 'Header',
+            gap: const OiResponsive<double>(8),
+            children: [
+              OiRow(
+                breakpoint: breakpoint,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  OiLabel.h1('Projects'),
+                  OiButton.primary(label: 'New project', onTap: createProject),
+                ],
+              ),
+              OiLabel.body('Everything your team is working on.'),
+            ],
+          ),
+          OiSection(
+            breakpoint: breakpoint,
+            semanticLabel: 'Project grid',
+            gap: const OiResponsive<double>(16),
+            children: [
+              OiGrid(
+                breakpoint: breakpoint,
+                columns: OiResponsive.breakpoints({
+                  OiBreakpoint.compact: 1,
+                  OiBreakpoint.medium: 2,
+                  OiBreakpoint.expanded: 3,
+                }),
+                gap: const OiResponsive<double>(16),
+                children: [
+                  for (final project in projects)
+                    OiCard(
+                      title: project.name,
+                      child: OiLabel.body(project.summary),
+                    ),
+                ],
+              ),
+            ],
+          ),
+        ],
+      ),
+    ),
+  );
+}
+```
+
+## Related
+
+- [Grid](grid.md) for multi-column layouts inside a section.
+- [Flex](flex.md) for `OiRow` and `OiColumn`.

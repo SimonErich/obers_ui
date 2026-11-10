@@ -4,6 +4,7 @@ import 'dart:ui';
 
 import 'package:flutter/painting.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:obers_ui/src/foundation/theme/oi_color_scheme.dart';
 import 'package:obers_ui/src/foundation/theme/oi_color_swatch.dart';
 import 'package:obers_ui/src/foundation/theme/oi_component_themes.dart';
 import 'package:obers_ui/src/foundation/theme/oi_decoration_theme.dart';
@@ -178,6 +179,33 @@ void main() {
     });
 
     group('copyWith', () {
+      test(
+        'palette replacement preserves independent decoration overrides',
+        () {
+          final base = OiThemeData.light();
+          final palette = OiColorScheme.dark();
+          final explicit = base.decoration.copyWith(
+            errorBorder: base.decoration.errorBorder.copyWith(
+              color: const Color(0xFFB64F4F),
+            ),
+          );
+          final modified = base.copyWith(colors: palette, decoration: explicit);
+          expect(
+            modified.decoration.errorBorder.color,
+            const Color(0xFFB64F4F),
+          );
+          expect(base.copyWith(colors: palette).decoration, base.decoration);
+          final derived = base.copyWith(
+            colors: palette,
+            decoration: OiDecorationTheme.standard(
+              primaryColor: palette.primary.base,
+              errorColor: palette.error.base,
+            ),
+          );
+          expect(derived.decoration.errorBorder.color, palette.error.base);
+        },
+      );
+
       test('overrides brightness', () {
         final light = OiThemeData.light();
         final modified = light.copyWith(brightness: Brightness.dark);

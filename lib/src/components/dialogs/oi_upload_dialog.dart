@@ -12,6 +12,7 @@ import 'package:obers_ui/src/foundation/theme/oi_color_scheme.dart';
 import 'package:obers_ui/src/foundation/theme/oi_spacing_scale.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/modules/oi_chat.dart';
+import 'package:obers_ui/src/primitives/display/oi_icon.dart';
 import 'package:obers_ui/src/utils/file_utils.dart';
 
 part 'oi_upload_dialog/oi_upload_dialog_interaction.part.dart';

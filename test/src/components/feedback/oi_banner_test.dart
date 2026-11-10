@@ -11,6 +11,71 @@ import 'package:obers_ui/src/primitives/display/oi_icon.dart';
 import '../../../helpers/pump_app.dart';
 
 void main() {
+  testWidgets(
+    'inline title stays beside message and wraps on narrow surfaces',
+    (tester) async {
+      await tester.pumpObers(
+        const SizedBox(
+          width: 800,
+          child: OiBanner.neutral(
+            inlineTitle: true,
+            title: 'Open for changes',
+            message: 'The kitchen sees your changes.',
+            dismissible: false,
+          ),
+        ),
+      );
+      expect(
+        tester.getTopLeft(find.text('Open for changes')).dy,
+        tester.getTopLeft(find.text('The kitchen sees your changes.')).dy,
+      );
+      await tester.pumpObers(
+        const Center(
+          child: SizedBox(
+            width: 220,
+            child: OiBanner.neutral(
+              inlineTitle: true,
+              title: 'Open for changes',
+              message: 'The kitchen sees your changes.',
+              dismissible: false,
+            ),
+          ),
+        ),
+      );
+      expect(tester.takeException(), isNull);
+      expect(find.text('The kitchen sees your changes.'), findsOneWidget);
+    },
+  );
+
+  testWidgets('trailing context stays beside an inline notice', (tester) async {
+    await tester.pumpObers(
+      const Center(
+        child: SizedBox(
+          width: 1000,
+          child: OiBanner.neutral(
+            inlineTitle: true,
+            title: 'Changes',
+            message: 'Until 10:30.',
+            dismissible: false,
+            trailing: Text(
+              '48 minutes left',
+              style: TextStyle(fontSize: 12, height: 4 / 3),
+            ),
+          ),
+        ),
+      ),
+    );
+    expect(
+      tester.getCenter(find.text('48 minutes left')).dy,
+      closeTo(tester.getCenter(find.text('Until 10:30.')).dy, 10),
+    );
+    expect(
+      tester.getTopLeft(find.text('48 minutes left')).dx,
+      greaterThan(tester.getTopLeft(find.text('Until 10:30.')).dx),
+    );
+    expect(tester.takeException(), isNull);
+  });
+
   // ── Rendering ─────────────────────────────────────────────────────────────
 
   testWidgets('renders message text', (tester) async {

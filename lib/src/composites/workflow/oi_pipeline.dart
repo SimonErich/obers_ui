@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
+import 'package:obers_ui/src/primitives/display/oi_icon.dart';
 
 /// The status of a pipeline stage.
 ///
@@ -145,7 +146,7 @@ class OiPipeline extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(statusIcon(stage.status), color: stageColor, size: 24),
+          OiIcon.raw(statusIcon(stage.status), color: stageColor, size: 24),
           const SizedBox(height: 4),
           Text(
             stage.label,
@@ -196,7 +197,7 @@ class OiPipeline extends StatelessWidget {
         width: isHorizontal ? arrowSize : null,
         height: isHorizontal ? null : arrowSize,
         child: Center(
-          child: Icon(
+          child: OiIcon.raw(
             isHorizontal ? OiIcons.chevronRight : OiIcons.chevronDown,
             color: colors.textMuted,
             size: arrowSize,

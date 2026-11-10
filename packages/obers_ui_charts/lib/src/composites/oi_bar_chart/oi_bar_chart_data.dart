@@ -27,6 +27,15 @@ enum OiBarChartMode {
   horizontalStacked,
 }
 
+/// Fill treatment for distinguishing forecast or tentative bars without color alone.
+enum OiBarPattern {
+  /// A solid fill.
+  solid,
+
+  /// Diagonal strokes over a translucent fill.
+  diagonal,
+}
+
 /// A category (group) of bars in a bar chart.
 ///
 /// Each category has a [label] displayed along the category axis and a list
@@ -36,7 +45,17 @@ enum OiBarChartMode {
 /// {@category Composites}
 class OiBarCategory {
   /// Creates an [OiBarCategory].
-  const OiBarCategory({required this.label, required this.values, this.colors});
+  const OiBarCategory({
+    required this.label,
+    required this.values,
+    this.colors,
+    this.patterns,
+    this.group,
+    this.emphasized = false,
+  });
+
+  /// Highlights the axis label and shows this category’s value.
+  final bool emphasized;
 
   /// The display label for this category.
   final String label;
@@ -46,6 +65,12 @@ class OiBarCategory {
 
   /// Optional per-bar color overrides (one per series).
   final List<Color>? colors;
+
+  /// Per-bar fill patterns, overriding the series pattern.
+  final List<OiBarPattern>? patterns;
+
+  /// Optional second-level category label (for example an ISO week).
+  final String? group;
 }
 
 /// A named data series in a bar chart.
@@ -56,13 +81,20 @@ class OiBarCategory {
 /// {@category Composites}
 class OiBarSeries {
   /// Creates an [OiBarSeries].
-  const OiBarSeries({required this.label, this.color});
+  const OiBarSeries({
+    required this.label,
+    this.color,
+    this.pattern = OiBarPattern.solid,
+  });
 
   /// The display name for this series (shown in legend).
   final String label;
 
   /// An optional color override for all bars in this series.
   final Color? color;
+
+  /// Fill pattern inherited by this series.
+  final OiBarPattern pattern;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

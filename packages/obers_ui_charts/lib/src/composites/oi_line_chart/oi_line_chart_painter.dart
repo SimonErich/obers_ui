@@ -66,6 +66,7 @@ class OiLineChartPainter extends CustomPainter {
     required this.yDivisions,
     this.hoveredSeriesIndex,
     this.hoveredPointIndex,
+    this.labelGap = 4,
   });
 
   /// The resolved series data.
@@ -94,6 +95,9 @@ class OiLineChartPainter extends CustomPainter {
 
   /// Axis label color.
   final Color axisLabelColor;
+
+  /// Distance between grid axes and their tick labels.
+  final double labelGap;
 
   /// High-contrast mode.
   final bool highContrast;
@@ -170,12 +174,14 @@ class OiLineChartPainter extends CustomPainter {
       chartRect,
       labels: xLabels,
       labelColor: axisLabelColor,
+      labelGap: labelGap,
     );
     OiChartGrid.paintYLabels(
       canvas,
       chartRect,
       labels: yLabels,
       labelColor: axisLabelColor,
+      labelGap: labelGap,
     );
 
     // Track cumulative Y offsets for stacked mode.
@@ -344,6 +350,7 @@ class OiLineChartPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(OiLineChartPainter oldDelegate) =>
+      oldDelegate.labelGap != labelGap ||
       oldDelegate.resolvedSeries != resolvedSeries ||
       oldDelegate.showGrid != showGrid ||
       oldDelegate.gridColor != gridColor ||

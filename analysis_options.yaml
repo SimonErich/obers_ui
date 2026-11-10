@@ -20,8 +20,6 @@ analyzer:
     - packages/obers_ui_charts/**
   errors:
     close_sinks: warning       # VGA ignores; we want it active
-  plugins:
-    - custom_lint               # Remove if not using custom_lint
 
 linter:
   rules:

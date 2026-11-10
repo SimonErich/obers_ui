@@ -10,7 +10,8 @@ extension _OiFieldDisplayDateTimeContent on OiFieldDisplay {
       );
       return _buildTextDisplay(context);
     }
-    return OiLabel.small(_formatDate(date));
+    final theme = context.components.fieldDisplay;
+    return OiLabel.body(_formatDate(date), style: theme?.valueStyle);
   }
 
   Widget _buildDateTimeDisplay(BuildContext context) {
@@ -22,7 +23,8 @@ extension _OiFieldDisplayDateTimeContent on OiFieldDisplay {
       );
       return _buildTextDisplay(context);
     }
-    return OiLabel.small(_formatDateTime(date));
+    final theme = context.components.fieldDisplay;
+    return OiLabel.body(_formatDateTime(date), style: theme?.valueStyle);
   }
 
   DateTime? _parseDate() {

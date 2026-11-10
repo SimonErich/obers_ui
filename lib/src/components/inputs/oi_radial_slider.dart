@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/widgets.dart';
@@ -200,7 +199,7 @@ class _OiRadialSliderState extends State<OiRadialSlider>
         _animController.value = 1;
       } else {
         _animController.value = 0;
-        unawaited(_animController.animateTo(1, curve: Curves.easeOutCubic));
+        _animController.animateTo(1, curve: Curves.easeOutCubic);
       }
     }
   }

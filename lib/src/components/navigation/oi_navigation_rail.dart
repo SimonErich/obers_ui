@@ -1,12 +1,10 @@
-import 'dart:async';
-
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/display/oi_badge.dart';
 import 'package:obers_ui/src/components/display/oi_tooltip.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/models/oi_navigation_item.dart';
-import 'package:obers_ui/src/primitives/display/oi_label.dart';
+import 'package:obers_ui/src/primitives/display/oi_icon.dart';
 
 /// Controls when labels are visible on an [OiNavigationRail].
 ///
@@ -53,7 +51,7 @@ class OiNavigationRail extends StatefulWidget {
     required this.onTap,
     this.leading,
     this.trailing,
-    this.width = 72,
+    this.width,
     this.collapsedWidth,
     this.expanded,
     this.expandDuration = const Duration(milliseconds: 200),
@@ -87,7 +85,7 @@ class OiNavigationRail extends StatefulWidget {
 
   /// The width of the rail in logical pixels (expanded state when [expanded]
   /// is used, or the fixed width otherwise).
-  final double width;
+  final double? width;
 
   /// The width when collapsed. Only used when [expanded] is non-null.
   /// Defaults to 48 logical pixels.
@@ -192,9 +190,9 @@ class _OiNavigationRailState extends State<OiNavigationRail>
     }
     if (widget.expanded != oldWidget.expanded && _expandController != null) {
       if (widget.expanded!) {
-        unawaited(_expandController!.forward());
+        _expandController!.forward();
       } else {
-        unawaited(_expandController!.reverse());
+        _expandController!.reverse();
       }
     }
   }
@@ -245,19 +243,24 @@ class _OiNavigationRailState extends State<OiNavigationRail>
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
+    final railTheme = context.components.navigationRail;
     final animations = context.animations;
     final reducedMotion =
         animations.reducedMotion || MediaQuery.disableAnimationsOf(context);
-    final effectiveBg = widget.backgroundColor ?? colors.surface;
-    final effectiveBorderColor = widget.borderColor ?? colors.borderSubtle;
-    final effectiveBorderWidth = widget.borderWidth ?? 1.0;
+    final effectiveBg =
+        widget.backgroundColor ?? railTheme?.backgroundColor ?? colors.surface;
+    final effectiveBorderColor =
+        widget.borderColor ?? railTheme?.borderColor ?? colors.borderSubtle;
+    final effectiveBorderWidth =
+        widget.borderWidth ?? railTheme?.borderWidth ?? 1.0;
 
+    final effectiveWidth = widget.width ?? railTheme?.width ?? 72;
     final effectiveCollapsedWidth = widget.collapsedWidth ?? 48.0;
 
     // Build the items list.
     final itemWidgets = <Widget>[];
     for (var i = 0; i < widget.items.length; i++) {
-      if (i > 0) itemWidgets.add(const SizedBox(height: 4));
+      if (i > 0) itemWidgets.add(SizedBox(height: railTheme?.itemSpacing ?? 4));
       itemWidgets.add(_buildItem(context, i, reducedMotion));
     }
 
@@ -317,13 +320,13 @@ class _OiNavigationRailState extends State<OiNavigationRail>
           final w =
               effectiveCollapsedWidth +
               (_expandController!.value *
-                  (widget.width - effectiveCollapsedWidth));
+                  (effectiveWidth - effectiveCollapsedWidth));
           return SizedBox(width: w, child: child);
         },
         child: rail,
       );
     } else {
-      sized = SizedBox(width: widget.width, child: rail);
+      sized = SizedBox(width: effectiveWidth, child: rail);
     }
 
     return Semantics(
@@ -331,6 +334,7 @@ class _OiNavigationRailState extends State<OiNavigationRail>
       label: widget.semanticLabel ?? 'Navigation',
       child: Focus(
         focusNode: _focusNode,
+        onFocusChange: (_) => setState(() {}),
         onKeyEvent: _handleKeyEvent,
         child: _isExpandable ? ClipRect(child: sized) : sized,
       ),
@@ -341,16 +345,30 @@ class _OiNavigationRailState extends State<OiNavigationRail>
 
   Widget _buildItem(BuildContext context, int index, bool reducedMotion) {
     final colors = context.colors;
+    final railTheme = context.components.navigationRail;
     final item = widget.items[index];
     final isSelected = index == widget.currentIndex;
     final isFocused = index == _focusedIndex && _focusNode.hasFocus;
     final isHovered = _hoveredIndices.contains(index);
-    final iconColor = (isSelected || isHovered)
-        ? colors.primary.base
-        : colors.textMuted;
-    final labelColor = (isSelected || isHovered)
-        ? colors.primary.base
-        : colors.textMuted;
+    // Selected foregrounds are paired with the selected indicator. Hovering an
+    // unselected destination must not borrow that foreground without its surface.
+    final iconColor = isSelected
+        ? railTheme?.selectedIconColor ?? colors.primary.base
+        : isHovered
+        ? railTheme?.hoverIconColor ??
+              railTheme?.unselectedIconColor ??
+              colors.primary.base
+        : railTheme?.unselectedIconColor ?? colors.textMuted;
+    final labelStyle = isSelected
+        ? railTheme?.selectedLabelStyle
+        : isHovered
+        ? (railTheme?.unselectedLabelStyle ?? const TextStyle()).merge(
+            railTheme?.hoverLabelStyle,
+          )
+        : railTheme?.unselectedLabelStyle;
+    final labelColor =
+        labelStyle?.color ??
+        ((isSelected || isHovered) ? colors.primary.base : colors.textMuted);
 
     // Determine whether to show the label (non-expandable mode).
     final showLabel = switch (widget.labelBehavior) {
@@ -361,18 +379,37 @@ class _OiNavigationRailState extends State<OiNavigationRail>
 
     // ── Icon with indicator background ──────────────────────────────────
 
-    final iconWidget = Icon(
+    final iconWidget = OiIcon.raw(
       isSelected ? (item.activeIcon ?? item.icon) : item.icon,
-      size: 24,
+      size: railTheme?.iconSize ?? 24,
       color: iconColor,
     );
 
-    final iconWidth = _isExpandable ? (widget.collapsedWidth ?? 48.0) : 56.0;
+    final iconWidth = _isExpandable
+        ? (widget.collapsedWidth ?? 48.0)
+        : railTheme?.itemWidth ?? 56.0;
     Widget iconArea = SizedBox(
       width: iconWidth,
-      height: 32,
+      height: railTheme?.itemHeight ?? 32,
       child: Center(child: iconWidget),
     );
+
+    if (isSelected || (isHovered && railTheme?.hoverColor != null)) {
+      iconArea = DecoratedBox(
+        decoration: ShapeDecoration(
+          shape:
+              widget.indicatorShape ??
+              railTheme?.indicatorShape ??
+              const StadiumBorder(),
+          color: isSelected
+              ? widget.indicatorColor ??
+                    railTheme?.indicatorColor ??
+                    colors.primary.muted
+              : railTheme?.hoverColor,
+        ),
+        child: iconArea,
+      );
+    }
 
     // ── Badge overlay ───────────────────────────────────────────────────
 
@@ -412,9 +449,11 @@ class _OiNavigationRailState extends State<OiNavigationRail>
               ),
               child: Padding(
                 padding: const EdgeInsets.only(left: 4, right: 8),
-                child: OiLabel.small(
+                child: Text(
                   item.label,
-                  color: labelColor,
+                  style: context.textTheme.small
+                      .merge(labelStyle)
+                      .copyWith(color: labelColor),
                   maxLines: 1,
                   overflow: TextOverflow.clip,
                 ),
@@ -431,9 +470,11 @@ class _OiNavigationRailState extends State<OiNavigationRail>
           iconArea,
           if (showLabel) ...[
             const SizedBox(height: 4),
-            OiLabel.tiny(
+            Text(
               item.label,
-              color: labelColor,
+              style: context.textTheme.tiny
+                  .merge(labelStyle)
+                  .copyWith(color: labelColor),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
@@ -469,8 +510,13 @@ class _OiNavigationRailState extends State<OiNavigationRail>
           label: item.label,
           button: true,
           child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 4),
-            child: tappableContent,
+            padding:
+                railTheme?.itemPadding ??
+                const EdgeInsets.symmetric(vertical: 4),
+            child: DefaultTextStyle.merge(
+              style: labelStyle,
+              child: tappableContent,
+            ),
           ),
         ),
       ),

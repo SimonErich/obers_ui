@@ -7,6 +7,7 @@ import 'package:obers_ui/src/components/buttons/oi_button.dart';
 import 'package:obers_ui/src/components/display/oi_pagination.dart';
 import 'package:obers_ui/src/components/display/oi_tooltip.dart';
 import 'package:obers_ui/src/components/feedback/oi_bulk_bar.dart';
+import 'package:obers_ui/src/components/inputs/oi_checkbox.dart';
 import 'package:obers_ui/src/components/panels/oi_resizable.dart';
 import 'package:obers_ui/src/composites/data/oi_pagination_controller.dart';
 import 'package:obers_ui/src/composites/data/oi_table_controller.dart';
@@ -16,6 +17,8 @@ import 'package:obers_ui/src/foundation/persistence/oi_settings_mixin.dart';
 import 'package:obers_ui/src/foundation/persistence/oi_settings_provider.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/models/settings/oi_table_settings.dart';
+import 'package:obers_ui/src/primitives/display/oi_icon.dart';
+import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
 
 part 'oi_table/oi_table_body.part.dart';
 part 'oi_table/oi_table_column_manager.part.dart';
@@ -53,6 +56,7 @@ class OiTableColumn<T> {
     this.valueGetter,
     this.comparator,
     this.textAlign = TextAlign.start,
+    this.cellPadding,
   });
 
   /// Unique identifier for this column.
@@ -109,6 +113,10 @@ class OiTableColumn<T> {
 
   /// Alignment of text within each cell.
   final TextAlign textAlign;
+
+  /// Insets shared by this column's header and cells. Useful for narrow action
+  /// columns; null inherits the table theme's cell padding.
+  final EdgeInsetsGeometry? cellPadding;
 }
 
 // ── Labels ────────────────────────────────────────────────────────────────────
@@ -150,6 +158,7 @@ class OiTableLabels {
     this.selectedCount,
     this.columns = 'Columns',
     this.manageColumns = 'Manage visible columns',
+    this.selectRow,
   });
 
   /// Noun for the items being paginated, used by the pagination footer's total
@@ -177,6 +186,9 @@ class OiTableLabels {
 
   /// Accessible label of the column manager button.
   final String manageColumns;
+
+  /// Accessible selection label for the one-based visible row index.
+  final String Function(int index)? selectRow;
 }
 
 // ── Pagination mode ───────────────────────────────────────────────────────────
@@ -266,9 +278,12 @@ class OiTable<T> extends StatefulWidget {
     this.settingsKey,
     this.settingsNamespace = 'oi_table',
     this.bulkActions,
-    this.settingsSaveDebounce = const Duration(milliseconds: 500),
     this.shrinkWrap = false,
     this.labels = const OiTableLabels(),
+    this.expandedRowKeys = const {},
+    this.expandedRowBuilder,
+    this.onExpandedRowsChanged,
+    this.settingsSaveDebounce = const Duration(milliseconds: 500),
     super.key,
   }) : assert(
          !shrinkWrap ||
@@ -393,6 +408,9 @@ class OiTable<T> extends StatefulWidget {
   final bool reorderable;
 
   /// Called after the user drops a row at a new position.
+  ///
+  /// `newIndex` is the insertion index before removing the row at `oldIndex`.
+  /// When moving forward, subtract one before inserting into the updated list.
   final void Function(int oldIndex, int newIndex)? onRowReordered;
 
   // ── Copy ──────────────────────────────────────────────────────────────────
@@ -422,6 +440,26 @@ class OiTable<T> extends StatefulWidget {
   /// Whether alternating rows have a subtle background tint.
   final bool striped;
 
+  /// Whether the table sizes itself to its rows instead of expanding to fill
+  /// its parent.
+  ///
+  /// By default the table expands, which requires a parent that provides a
+  /// bounded height. When `true`, the body shrink-wraps its rows. The table
+  /// can then be placed inside unbounded-height containers such as a [Column]
+  /// inside a scroll view; there every row is built and laid out eagerly, and
+  /// scrolling is left to the surrounding scrollable. Inside a parent with a
+  /// bounded height (e.g. a [Flexible] in a [Column]) the table takes only the
+  /// height its rows need, up to the bounds, and scrolls its body internally
+  /// beyond that.
+  ///
+  /// Shrink wrapping measures the current page: prefer the default for large
+  /// datasets and virtualized viewports.
+  ///
+  /// Cannot be combined with [OiTablePaginationMode.infinite] or
+  /// [OiTablePaginationMode.virtual], which both depend on the table owning
+  /// its own scroll position.
+  final bool shrinkWrap;
+
   /// Whether to use compact row heights.
   final bool dense;
 
@@ -435,6 +473,15 @@ class OiTable<T> extends StatefulWidget {
   final List<OiBulkAction>? bulkActions;
 
   // ── Status bar ────────────────────────────────────────────────────────────
+
+  /// Expanded records identified by stable row keys.
+  final Set<String> expandedRowKeys;
+
+  /// Content rendered beneath an expanded record's cells.
+  final Widget Function(BuildContext context, T row)? expandedRowBuilder;
+
+  /// Requests a controlled expansion change when the disclosure is activated.
+  final ValueChanged<Set<String>>? onExpandedRowsChanged;
 
   /// Whether to show the status bar at the bottom of the table.
   final bool showStatusBar;
@@ -455,25 +502,6 @@ class OiTable<T> extends StatefulWidget {
   /// Default: 500ms. Set to [Duration.zero] for immediate saves.
   final Duration settingsSaveDebounce;
 
-  // ── Layout ────────────────────────────────────────────────────────────────
-
-  /// Whether the table sizes itself to its rows instead of expanding to fill
-  /// its parent.
-  ///
-  /// By default the table expands, which requires a parent that provides a
-  /// bounded height. When `true`, the body shrink-wraps its rows so the table
-  /// can be placed inside unbounded-height containers such as a [Column]
-  /// inside a scroll view.
-  ///
-  /// Rows are no longer virtualised in this mode — every row is built and laid
-  /// out eagerly, and scrolling is left to the surrounding scrollable. Prefer
-  /// the default for large datasets.
-  ///
-  /// Cannot be combined with [OiTablePaginationMode.infinite] or
-  /// [OiTablePaginationMode.virtual], which both depend on the table owning
-  /// its own scroll position.
-  final bool shrinkWrap;
-
   @override
   State<OiTable<T>> createState() => _OiTableState<T>();
 }
@@ -493,6 +521,12 @@ class _OiTableState<T> extends State<OiTable<T>>
   int _prevPage = 0;
   int _prevPageSize = 25;
   bool _needsHorizontalScroll = false;
+
+  /// Whether a [OiTable.shrinkWrap] table has no bounded height to fill, as
+  /// inside a scroll view: its body then builds every row eagerly and leaves
+  /// scrolling to the surrounding scrollable. In a bounded parent a
+  /// shrink-wrapped body still scrolls internally.
+  bool _eagerBody = false;
   int? _hoveredRowIndex;
 
   /// Tracks the last row index selected by a single click, used for
@@ -669,12 +703,36 @@ class _OiTableState<T> extends State<OiTable<T>>
   /// Wraps the header + body area so it expands to fill the available height,
   /// or sizes to its content when [OiTable.shrinkWrap] is set.
   Widget _wrapTableArea(Widget child) {
-    if (widget.shrinkWrap) return child;
-    return Expanded(child: child);
+    if (!widget.shrinkWrap) return Expanded(child: child);
+    // Without a bounded height there is nothing to flex within.
+    if (_eagerBody) return child;
+    return Flexible(child: child);
+  }
+
+  /// The body inside the header + body column. A shrink-wrapped body sizes to
+  /// its rows, so it must not claim flex from the surrounding [Column] when
+  /// that has no bounded height.
+  Widget _wrapBody(Widget body) {
+    if (!widget.shrinkWrap) return Expanded(child: body);
+    if (_eagerBody) return body;
+    return Flexible(child: body);
   }
 
   @override
   Widget build(BuildContext context) {
+    if (!widget.shrinkWrap) {
+      _eagerBody = false;
+      return _buildTable(context);
+    }
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        _eagerBody = !constraints.hasBoundedHeight;
+        return _buildTable(context);
+      },
+    );
+  }
+
+  Widget _buildTable(BuildContext context) {
     final hasBulkActions =
         widget.bulkActions != null && widget.bulkActions!.isNotEmpty;
 
@@ -709,28 +767,39 @@ class _OiTableState<T> extends State<OiTable<T>>
                       : constraints.maxWidth;
 
                   final header = _buildHeaderRow();
-                  // When shrink-wrapping the body sizes to its rows, so it
-                  // must not claim flex from the surrounding Column.
-                  final body = widget.shrinkWrap
-                      ? _buildBody()
-                      : Expanded(child: _buildBody());
+                  final body = _wrapBody(_buildBody());
 
                   if (needsScroll) {
-                    // Wrap header and body to scroll horizontally in sync.
-                    return SingleChildScrollView(
+                    // Placeholder content belongs to the visible viewport;
+                    // populated rows scroll horizontally with their headers.
+                    final bodyUsesViewport =
+                        widget.loading || _displayRows.isEmpty;
+                    final scrollableTable = SingleChildScrollView(
                       controller: _horizontalScrollController,
                       scrollDirection: Axis.horizontal,
                       child: SizedBox(
                         width: tableWidth,
-                        child: Column(
-                          mainAxisSize: widget.shrinkWrap
-                              ? MainAxisSize.min
-                              : MainAxisSize.max,
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [header, body],
-                        ),
+                        child: bodyUsesViewport
+                            ? header
+                            : Column(
+                                mainAxisSize: widget.shrinkWrap
+                                    ? MainAxisSize.min
+                                    : MainAxisSize.max,
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [header, body],
+                              ),
                       ),
                     );
+                    if (bodyUsesViewport) {
+                      return Column(
+                        mainAxisSize: widget.shrinkWrap
+                            ? MainAxisSize.min
+                            : MainAxisSize.max,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [scrollableTable, body],
+                      );
+                    }
+                    return scrollableTable;
                   }
 
                   return Column(

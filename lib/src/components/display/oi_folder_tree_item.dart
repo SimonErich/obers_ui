@@ -6,6 +6,7 @@ import 'package:obers_ui/src/components/overlays/oi_context_menu.dart';
 import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/models/oi_file_node_data.dart';
+import 'package:obers_ui/src/primitives/display/oi_icon.dart';
 
 /// A specialized tree node widget for the folder sidebar.
 ///
@@ -110,7 +111,7 @@ class OiFolderTreeItem extends StatelessWidget {
                 child: SizedBox(
                   width: 16,
                   height: 16,
-                  child: Icon(
+                  child: OiIcon.raw(
                     expanded
                         ? OiIcons
                               .chevronDown // expand_more

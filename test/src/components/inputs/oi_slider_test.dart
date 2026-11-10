@@ -1,5 +1,6 @@
 // Tests do not require documentation comments.
 
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui/src/components/inputs/oi_slider.dart';
@@ -77,5 +78,52 @@ void main() {
       const OiSlider(value: 20, secondaryValue: 80, min: 0, max: 100),
     );
     expect(find.byType(OiSlider), findsOneWidget);
+  });
+  testWidgets('custom film surfaces keep range gestures and keyboard actions', (
+    tester,
+  ) async {
+    var lower = 2.0;
+    var upper = 8.0;
+    await tester.pumpObers(
+      Center(
+        child: StatefulBuilder(
+          builder: (context, setState) => OiSlider(
+            value: lower,
+            secondaryValue: upper,
+            min: 0,
+            max: 10,
+            height: 72,
+            semanticLabel: 'Start',
+            secondarySemanticLabel: 'End',
+            surfaceBuilder: (_, a, b) =>
+                const ColoredBox(color: Color(0xff123456)),
+            onRangeChanged: (a, b) => setState(() {
+              lower = a;
+              upper = b;
+            }),
+          ),
+        ),
+      ),
+      surfaceSize: const Size(400, 200),
+    );
+    final semantics = tester.ensureSemantics();
+    await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);
+    await tester.pumpAndSettle();
+    expect(lower, closeTo(2.1, .001));
+    expect(upper, 8);
+    await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowLeft);
+    await tester.pumpAndSettle();
+    expect(upper, closeTo(7.9, .001));
+    final box = tester.getRect(find.byType(OiSlider));
+    await tester.dragFrom(
+      Offset(box.left + box.width * .21, box.center.dy),
+      Offset(box.width * .09, 0),
+    );
+    await tester.pumpAndSettle();
+    expect(lower, closeTo(3, .01));
+    expect(tester.getSize(find.byType(OiSlider)).height, 72);
+    semantics.dispose();
   });
 }

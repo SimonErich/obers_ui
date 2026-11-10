@@ -3,9 +3,67 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui/src/components/feedback/oi_bulk_bar.dart';
+import 'package:obers_ui/src/foundation/theme/oi_theme_data.dart';
+import 'package:obers_ui/src/primitives/display/oi_surface.dart';
 import '../../../helpers/pump_app.dart';
 
 void main() {
+  for (final width in [900.0, 220.0]) {
+    testWidgets('compact inverse bulk bar wraps and dismisses at $width', (
+      tester,
+    ) async {
+      var archived = false;
+      var dismissed = false;
+      final theme = OiThemeData.light();
+      await tester.pumpObers(
+        Center(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(maxWidth: width),
+            child: OiBulkBar(
+              selectedCount: 3,
+              totalCount: 10,
+              label: 'orders',
+              compact: true,
+              inverse: true,
+              showSelectAll: false,
+              onDismiss: () => dismissed = true,
+              actions: [
+                OiBulkAction(
+                  label: 'Archive',
+                  icon: const IconData(0xe149, fontFamily: 'MaterialIcons'),
+                  onTap: () => archived = true,
+                ),
+              ],
+            ),
+          ),
+        ),
+        theme: theme,
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('Select all'), findsNothing);
+      expect(
+        tester.widget<OiSurface>(find.byType(OiSurface)).color,
+        theme.colors.text,
+      );
+      final count = tester.widget<Text>(find.text('3 of 10 orders selected'));
+      expect(count.style!.color, theme.colors.textInverse);
+      expect(
+        tester.getSize(find.byType(OiSurface)).width,
+        lessThanOrEqualTo(width),
+      );
+      if (width > 500) {
+        expect(tester.getSize(find.byType(OiSurface)).width, lessThan(500));
+      }
+      await tester.tap(find.text('Archive'));
+      await tester.pumpAndSettle();
+      expect(archived, isTrue);
+      await tester.tap(find.bySemanticsLabel('Clear selection'));
+      await tester.pumpAndSettle();
+      expect(dismissed, isTrue);
+      expect(tester.takeException(), isNull);
+    });
+  }
+
   final deleteAction = OiBulkAction(
     label: 'Delete',
     icon: const IconData(0xe872, fontFamily: 'MaterialIcons'),

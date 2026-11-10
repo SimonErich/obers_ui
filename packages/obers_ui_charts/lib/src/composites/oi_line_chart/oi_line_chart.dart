@@ -479,6 +479,7 @@ class _OiLineChartState extends State<OiLineChart> {
                 maxY: range.maxY,
                 showGrid: widget.showGrid,
                 gridColor: widget.theme?.gridColor ?? colors.borderSubtle,
+                labelGap: context.components.chart?.axis?.labelGap ?? 4,
                 axisLabelColor:
                     widget.theme?.axisLabelColor ?? colors.textMuted,
                 highContrast: isHighContrast,

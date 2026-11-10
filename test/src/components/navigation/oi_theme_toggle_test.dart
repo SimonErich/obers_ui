@@ -10,6 +10,29 @@ import 'package:obers_ui/src/foundation/oi_icons.dart';
 import '../../../helpers/pump_app.dart';
 
 void main() {
+  testWidgets('trigger exposes one accessible name in both modes', (
+    tester,
+  ) async {
+    final semantics = tester.ensureSemantics();
+    for (final showSystem in [false, true]) {
+      await tester.pumpObers(
+        OiThemeToggle(
+          currentMode: OiThemeMode.system,
+          onModeChange: (_) {},
+          showSystemOption: showSystem,
+        ),
+      );
+      expect(find.bySemanticsLabel('Toggle theme'), findsOneWidget);
+      expect(
+        find.bySemanticsLabel(
+          RegExp('Toggle theme.*Toggle theme', dotAll: true),
+        ),
+        findsNothing,
+      );
+    }
+    semantics.dispose();
+  });
+
   // ── Rendering ────────────────────────────────────────────────────────────
 
   testWidgets('renders sun icon for light mode', (tester) async {

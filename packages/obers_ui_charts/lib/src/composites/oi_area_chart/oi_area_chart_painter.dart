@@ -68,6 +68,7 @@ class OiAreaChartPainter extends CustomPainter {
     required this.yDivisions,
     this.hoveredSeriesIndex,
     this.hoveredPointIndex,
+    this.labelGap = 4,
   });
 
   /// The resolved series data.
@@ -96,6 +97,9 @@ class OiAreaChartPainter extends CustomPainter {
 
   /// Axis label color.
   final Color axisLabelColor;
+
+  /// Distance between grid axes and their tick labels.
+  final double labelGap;
 
   /// High-contrast accessibility mode.
   final bool highContrast;
@@ -168,12 +172,14 @@ class OiAreaChartPainter extends CustomPainter {
       chartRect,
       labels: xLabels,
       labelColor: axisLabelColor,
+      labelGap: labelGap,
     );
     OiChartGrid.paintYLabels(
       canvas,
       chartRect,
       labels: yLabels,
       labelColor: axisLabelColor,
+      labelGap: labelGap,
     );
 
     // Cumulative stack baselines: maps x-value → top-of-stack y.
@@ -290,6 +296,7 @@ class OiAreaChartPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(OiAreaChartPainter oldDelegate) =>
+      oldDelegate.labelGap != labelGap ||
       oldDelegate.resolvedSeries != resolvedSeries ||
       oldDelegate.showGrid != showGrid ||
       oldDelegate.gridColor != gridColor ||

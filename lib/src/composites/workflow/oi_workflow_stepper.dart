@@ -207,7 +207,7 @@ class OiWorkflowStepper extends StatelessWidget {
       } else if (phase.icon != null) {
         pillContent
           ..add(
-            OiIcon.decorative(icon: phase.icon!, size: 14, color: textColor),
+            OiIcon.decorative(icon: phase.icon, size: 14, color: textColor),
           )
           ..add(SizedBox(width: spacing.xs));
       }
@@ -318,7 +318,7 @@ class OiWorkflowStepper extends StatelessWidget {
           ..add(SizedBox(width: spacing.xs));
       } else if (step.icon != null) {
         pillContent
-          ..add(OiIcon.decorative(icon: step.icon!, size: 14, color: textColor))
+          ..add(OiIcon.decorative(icon: step.icon, size: 14, color: textColor))
           ..add(SizedBox(width: spacing.xs));
       }
 
@@ -408,7 +408,7 @@ class OiWorkflowStepper extends StatelessWidget {
               color: colors.success.base,
             )
           : phase.icon != null
-          ? OiIcon.decorative(icon: phase.icon!, size: 14, color: textColor)
+          ? OiIcon.decorative(icon: phase.icon, size: 14, color: textColor)
           : null;
 
       Widget header = Container(
@@ -494,7 +494,7 @@ class OiWorkflowStepper extends StatelessWidget {
               ),
               SizedBox(width: spacing.xs),
             ] else if (step.icon != null) ...[
-              OiIcon.decorative(icon: step.icon!, size: 12, color: stepText),
+              OiIcon.decorative(icon: step.icon, size: 12, color: stepText),
               SizedBox(width: spacing.xs),
             ],
             OiLabel.small(step.label, color: stepText),

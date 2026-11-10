@@ -4,6 +4,7 @@ import 'package:obers_ui/src/components/navigation/oi_month_picker.dart';
 import 'package:obers_ui/src/components/overlays/oi_dialog_shell.dart';
 import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
+import 'package:obers_ui/src/primitives/display/oi_icon.dart';
 import 'package:obers_ui/src/primitives/display/oi_label.dart';
 import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
 import 'package:obers_ui/src/utils/calendar_utils.dart';
@@ -509,7 +510,7 @@ class _OiDatePickerState extends State<OiDatePicker> {
                   semanticLabel: widget.labels.previousMonth,
                   child: Padding(
                     padding: const EdgeInsets.all(5),
-                    child: Icon(
+                    child: OiIcon.raw(
                       OiIcons.chevronLeft,
                       size: 17,
                       color: colors.textMuted,
@@ -540,7 +541,7 @@ class _OiDatePickerState extends State<OiDatePicker> {
                   semanticLabel: widget.labels.nextMonth,
                   child: Padding(
                     padding: const EdgeInsets.all(5),
-                    child: Icon(
+                    child: OiIcon.raw(
                       OiIcons.chevronRight,
                       size: 17,
                       color: colors.textMuted,
@@ -633,7 +634,7 @@ class _MonthYearLabelState extends State<_MonthYearLabel> {
               ),
             ),
             const SizedBox(width: 4),
-            Icon(
+            OiIcon.raw(
               OiIcons.chevronDown,
               size: 14,
               color: color,

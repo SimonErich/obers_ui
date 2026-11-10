@@ -402,8 +402,8 @@ class OiChartHitTestIndex implements OiChartHitTester {
         // nearest), prefer the one with the highest series index.
         final nearest = _selectNearest(results);
         final threshold = math.min(nearest.distance + 4, config.tolerance);
-        final cluster = results.where((r) => r.distance <= threshold).toList();
-        cluster.sort((a, b) => b.ref.seriesIndex.compareTo(a.ref.seriesIndex));
+        final cluster = results.where((r) => r.distance <= threshold).toList()
+          ..sort((a, b) => b.ref.seriesIndex.compareTo(a.ref.seriesIndex));
         return cluster.first;
 
       case OiHitTestPreference.verticalNearest:

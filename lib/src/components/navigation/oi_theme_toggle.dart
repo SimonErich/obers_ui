@@ -107,6 +107,7 @@ class _OiThemeToggleState extends State<OiThemeToggle> {
       return OiTooltip(
         label: widget.label,
         message: currentLabel,
+        excludeFromSemantics: true,
         child: iconButton,
       );
     }
@@ -114,6 +115,7 @@ class _OiThemeToggleState extends State<OiThemeToggle> {
     return OiTooltip(
       label: widget.label,
       message: currentLabel,
+      excludeFromSemantics: true,
       child: OiPopover(
         label: widget.label,
         open: _isOpen,

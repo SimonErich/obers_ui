@@ -8,6 +8,7 @@ import 'package:obers_ui/src/foundation/persistence/oi_settings_provider.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme_scope.dart';
 import 'package:obers_ui/src/models/settings/oi_accordion_settings.dart';
+import 'package:obers_ui/src/primitives/display/oi_icon.dart';
 
 /// A single section within an [OiAccordion].
 ///
@@ -196,14 +197,14 @@ class _OiAccordionState extends State<OiAccordion>
       // Close all others.
       for (var i = 0; i < _controllers.length; i++) {
         if (i != index && _controllers[i].value > 0) {
-          unawaited(_controllers[i].reverse());
+          _controllers[i].reverse();
         }
       }
     }
     if (isCurrentlyOpen) {
-      unawaited(_controllers[index].reverse());
+      _controllers[index].reverse();
     } else {
-      unawaited(_controllers[index].forward());
+      _controllers[index].forward();
     }
     updateSettings(_toSettings(), debounce: widget.settingsSaveDebounce);
   }
@@ -262,7 +263,7 @@ class _OiAccordionState extends State<OiAccordion>
                                   ? Duration.zero
                                   : const Duration(milliseconds: 200),
                               curve: Curves.easeInOut,
-                              child: Icon(
+                              child: OiIcon.raw(
                                 // chevron_down icon
                                 OiIcons.chevronDown,
                                 size: 18,
@@ -276,7 +277,7 @@ class _OiAccordionState extends State<OiAccordion>
                   ),
                   SizeTransition(
                     sizeFactor: _animations[i],
-                    axisAlignment: -1,
+                    alignment: AlignmentDirectional.topStart,
                     child: Padding(
                       padding: const EdgeInsets.only(top: 14),
                       child: Align(

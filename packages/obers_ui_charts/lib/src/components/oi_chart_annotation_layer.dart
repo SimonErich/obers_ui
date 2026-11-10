@@ -178,13 +178,14 @@ class _OiAnnotationLayerPainter extends CustomPainter {
           right,
           plotBounds.bottom,
         );
-        canvas.drawRect(
-          regionRect,
-          Paint()
-            ..color = fill
-            ..style = PaintingStyle.fill,
-        );
-        canvas.drawRect(regionRect, linePaint);
+        canvas
+          ..drawRect(
+            regionRect,
+            Paint()
+              ..color = fill
+              ..style = PaintingStyle.fill,
+          )
+          ..drawRect(regionRect, linePaint);
         if (annotation.label != null) {
           _paintLineLabel(
             canvas,

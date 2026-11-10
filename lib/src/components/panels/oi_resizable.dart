@@ -34,7 +34,8 @@ enum OiResizeEdge {
 /// The set of draggable [resizeEdges] controls which handles are active.
 /// [minWidth], [maxWidth], [minHeight], and [maxHeight] clamp the dimensions.
 /// [initialWidth] and [initialHeight] set the starting size; when null the
-/// panel sizes to its content.
+/// panel sizes to its content. Changing an explicit size resets that dimension;
+/// rebuilds with unchanged sizes retain user resizing.
 ///
 /// [onResized] is called whenever the size changes.
 ///
@@ -105,6 +106,17 @@ class _OiResizableState extends State<OiResizable> {
     super.initState();
     _width = widget.initialWidth;
     _height = widget.initialHeight;
+  }
+
+  @override
+  void didUpdateWidget(OiResizable oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.initialWidth != widget.initialWidth) {
+      _width = widget.initialWidth;
+    }
+    if (oldWidget.initialHeight != widget.initialHeight) {
+      _height = widget.initialHeight;
+    }
   }
 
   double _clampW(double v) {

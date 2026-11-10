@@ -129,7 +129,7 @@ class _InfiniteScrollSpinnerState extends State<_InfiniteScrollSpinner>
       vsync: this,
       duration: const Duration(milliseconds: 800),
     );
-    unawaited(_controller.repeat());
+    _controller.repeat();
   }
 
   @override
@@ -146,7 +146,7 @@ class _InfiniteScrollSpinnerState extends State<_InfiniteScrollSpinner>
         ..stop()
         ..value = 0;
     } else if (!reduced && !_controller.isAnimating) {
-      unawaited(_controller.repeat());
+      _controller.repeat();
     }
   }
 

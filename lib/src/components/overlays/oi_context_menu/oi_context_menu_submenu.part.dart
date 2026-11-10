@@ -50,7 +50,7 @@ class _SubMenuWrapperState extends State<_SubMenuWrapper>
         ? Duration.zero
         : const Duration(milliseconds: 120);
     if (!_controller.isAnimating && _controller.value == 0) {
-      unawaited(_controller.forward());
+      _controller.forward();
     }
   }
 

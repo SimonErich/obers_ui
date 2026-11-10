@@ -10,6 +10,39 @@ import '../../../helpers/pump_app.dart';
 const _kIcon = IconData(0xe318, fontFamily: 'MaterialIcons');
 
 void main() {
+  testWidgets('toggle buttons keep natural widths inside wrapping presets', (
+    tester,
+  ) async {
+    await tester.pumpObers(
+      const Center(
+        child: SizedBox(
+          width: 432,
+          child: Wrap(
+            spacing: 8,
+            children: [
+              OiToggleButton(
+                selected: true,
+                label: 'Today',
+                semanticLabel: 'Today',
+              ),
+              OiToggleButton(
+                selected: false,
+                label: 'Tomorrow',
+                semanticLabel: 'Tomorrow',
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+    final first = tester.getRect(find.byType(OiToggleButton).first);
+    final second = tester.getRect(find.byType(OiToggleButton).last);
+    expect(first.width, lessThan(200));
+    expect(second.top, first.top);
+    expect(second.left, greaterThan(first.right));
+    expect(tester.takeException(), isNull);
+  });
+
   // ── REQ-0014: Required props enforce correctness ──────────────────────────
 
   group('OiToggleButton accessibility (REQ-0014)', () {

@@ -1,30 +1,81 @@
 import 'package:flutter/widgets.dart';
 
-/// Theme data for bottom-sheet / side-sheet components.
+/// Theme overrides for modal sheets.
 ///
-/// All fields are nullable; a `null` value instructs the component to use
-/// its built-in defaults.
-///
-/// {@category Foundation}
+/// Explicit widget properties override these values. Null uses semantic defaults.
 @immutable
 class OiSheetThemeData {
-  /// Creates an [OiSheetThemeData].
-  const OiSheetThemeData({this.borderRadius});
+  /// Creates theme overrides for sheet.
+  const OiSheetThemeData({
+    this.borderRadius,
+    this.inset,
+    this.backgroundColor,
+    this.barrierColor,
+    this.shadow,
+    this.headerPadding,
+    this.footerPadding,
+  });
 
-  /// The corner radius applied to the top corners of the sheet surface.
+  /// Sheet corner radius.
   final BorderRadius? borderRadius;
 
-  /// Creates a copy with optionally overridden values.
-  OiSheetThemeData copyWith({BorderRadius? borderRadius}) {
-    return OiSheetThemeData(borderRadius: borderRadius ?? this.borderRadius);
-  }
+  /// Distance from the viewport edges.
+  final EdgeInsetsGeometry? inset;
+
+  /// Panel surface.
+  final Color? backgroundColor;
+
+  /// Modal scrim color.
+  final Color? barrierColor;
+
+  /// Panel shadows.
+  final List<BoxShadow>? shadow;
+
+  /// Header insets.
+  final EdgeInsetsGeometry? headerPadding;
+
+  /// Footer insets.
+  final EdgeInsetsGeometry? footerPadding;
+
+  /// Returns a copy with the supplied overrides.
+  OiSheetThemeData copyWith({
+    BorderRadius? borderRadius,
+    EdgeInsetsGeometry? inset,
+    Color? backgroundColor,
+    Color? barrierColor,
+    List<BoxShadow>? shadow,
+    EdgeInsetsGeometry? headerPadding,
+    EdgeInsetsGeometry? footerPadding,
+  }) => OiSheetThemeData(
+    borderRadius: borderRadius ?? this.borderRadius,
+    inset: inset ?? this.inset,
+    backgroundColor: backgroundColor ?? this.backgroundColor,
+    barrierColor: barrierColor ?? this.barrierColor,
+    shadow: shadow ?? this.shadow,
+    headerPadding: headerPadding ?? this.headerPadding,
+    footerPadding: footerPadding ?? this.footerPadding,
+  );
 
   @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-    return other is OiSheetThemeData && other.borderRadius == borderRadius;
-  }
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is OiSheetThemeData &&
+          other.borderRadius == borderRadius &&
+          other.inset == inset &&
+          other.backgroundColor == backgroundColor &&
+          other.barrierColor == barrierColor &&
+          other.shadow == shadow &&
+          other.headerPadding == headerPadding &&
+          other.footerPadding == footerPadding;
 
   @override
-  int get hashCode => borderRadius.hashCode;
+  int get hashCode => Object.hashAll([
+    borderRadius,
+    inset,
+    backgroundColor,
+    barrierColor,
+    shadow,
+    headerPadding,
+    footerPadding,
+  ]);
 }

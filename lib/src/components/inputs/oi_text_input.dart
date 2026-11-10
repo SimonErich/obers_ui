@@ -4,6 +4,7 @@ import 'package:obers_ui/src/components/_internal/oi_input_frame.dart';
 import 'package:obers_ui/src/components/_internal/oi_otp_input.dart';
 import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
+import 'package:obers_ui/src/primitives/display/oi_icon.dart';
 import 'package:obers_ui/src/primitives/input/oi_raw_input.dart';
 
 /// A themed single- or multi-line text input component.
@@ -17,6 +18,7 @@ class OiTextInput extends StatefulWidget {
   const OiTextInput({
     this.controller,
     this.label,
+    this.semanticLabel,
     this.hint,
     this.placeholder,
     this.error,
@@ -30,6 +32,7 @@ class OiTextInput extends StatefulWidget {
     this.onChanged,
     this.onEditingComplete,
     this.onSubmitted,
+    this.autofillHints,
     this.enabled = true,
     this.readOnly = false,
     this.obscureText = false,
@@ -55,18 +58,20 @@ class OiTextInput extends StatefulWidget {
   /// Creates a search-style [OiTextInput] with a leading search icon,
   /// "Search\u2026" placeholder, and [TextInputAction.search].
   const OiTextInput.search({
+    this.semanticLabel,
+    this.placeholder = 'Search\u2026',
     this.controller,
     this.onChanged,
     this.onSubmitted,
+    this.autofillHints,
     this.autofocus = false,
     this.enabled = true,
     this.focusNode,
     super.key,
   }) : label = null,
        hint = null,
-       placeholder = 'Search\u2026',
        error = null,
-       leading = const Icon(OiIcons.search, size: 18),
+       leading = const OiIcon.raw(OiIcons.search, size: 18),
        trailing = null,
        maxLines = 1,
        minLines = null,
@@ -99,6 +104,7 @@ class OiTextInput extends StatefulWidget {
   const OiTextInput.password({
     this.controller,
     this.label,
+    this.semanticLabel,
     this.hint,
     this.placeholder,
     this.error,
@@ -107,6 +113,7 @@ class OiTextInput extends StatefulWidget {
     this.onChanged,
     this.onEditingComplete,
     this.onSubmitted,
+    this.autofillHints,
     this.enabled = true,
     this.readOnly = false,
     this.autofocus = false,
@@ -141,6 +148,7 @@ class OiTextInput extends StatefulWidget {
   const OiTextInput.multiline({
     this.controller,
     this.label,
+    this.semanticLabel,
     this.hint,
     this.placeholder,
     this.error,
@@ -152,6 +160,7 @@ class OiTextInput extends StatefulWidget {
     this.onChanged,
     this.onEditingComplete,
     this.onSubmitted,
+    this.autofillHints,
     this.enabled = true,
     this.readOnly = false,
     this.autofocus = false,
@@ -199,6 +208,7 @@ class OiTextInput extends StatefulWidget {
        _isPassword = false,
        controller = null,
        label = null,
+       semanticLabel = null,
        hint = null,
        placeholder = null,
        leading = null,
@@ -210,6 +220,7 @@ class OiTextInput extends StatefulWidget {
        textInputAction = null,
        onEditingComplete = null,
        onSubmitted = null,
+       autofillHints = null,
        readOnly = false,
        obscureText = false,
        inputFormatters = null,
@@ -228,6 +239,9 @@ class OiTextInput extends StatefulWidget {
 
   /// Optional label rendered above the input frame.
   final String? label;
+
+  /// Accessible name when a visible label is omitted or needs an override.
+  final String? semanticLabel;
 
   /// Optional hint text rendered below the input frame.
   final String? hint;
@@ -268,6 +282,9 @@ class OiTextInput extends StatefulWidget {
 
   /// Called when the user submits the input.
   final ValueChanged<String>? onSubmitted;
+
+  /// Platform autofill hints for email, usernames and passwords.
+  final Iterable<String>? autofillHints;
 
   /// Whether the field accepts input. Defaults to true.
   final bool enabled;
@@ -442,7 +459,7 @@ class _OiTextInputState extends State<OiTextInput> {
         behavior: HitTestBehavior.opaque,
         child: Padding(
           padding: const EdgeInsets.only(left: 8),
-          child: Icon(
+          child: OiIcon.raw(
             _passwordVisible ? OiIcons.eyeOff : OiIcons.eye,
             size: 18,
             color: iconColor,
@@ -467,6 +484,8 @@ class _OiTextInputState extends State<OiTextInput> {
 
     Widget input = OiInputFrame(
       label: widget.label,
+      semanticLabel: widget.semanticLabel,
+      semanticHint: widget.hint ?? widget.placeholder,
       hint: widget.hint,
       error: resolvedError,
       focused: _focused,
@@ -475,10 +494,15 @@ class _OiTextInputState extends State<OiTextInput> {
       leading: widget.leading,
       trailing: effectiveTrailing,
       counter: showCounterWidget ? _buildCounter(context) : null,
+      padding: widget.maxLines == null || widget.maxLines! > 1
+          ? context.components.textInput?.multilineContentPadding
+          : null,
       child: OiRawInput(
         controller: _controller,
         focusNode: _focusNode,
         placeholder: widget.placeholder,
+        excludePlaceholderSemantics:
+            widget.semanticLabel != null || widget.label != null,
         maxLines: widget.maxLines,
         minLines: widget.minLines,
         maxLength: widget.maxLength,
@@ -492,6 +516,7 @@ class _OiTextInputState extends State<OiTextInput> {
         },
         onEditingComplete: widget.onEditingComplete,
         onSubmitted: widget.onSubmitted,
+        autofillHints: widget.autofillHints,
         enabled: widget.enabled,
         readOnly: widget.readOnly,
         obscureText: effectiveObscure,

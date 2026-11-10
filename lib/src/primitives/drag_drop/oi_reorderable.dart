@@ -27,6 +27,9 @@ class OiReorderable extends StatelessWidget {
   final List<Widget> children;
 
   /// Called with the old and new indices when an item is moved.
+  ///
+  /// `newIndex` is the insertion index before removing the item at `oldIndex`.
+  /// When moving forward, subtract one before inserting into the updated list.
   final void Function(int oldIndex, int newIndex) onReorder;
 
   /// The scroll direction of the list.
@@ -70,7 +73,10 @@ class OiReorderable extends StatelessWidget {
 
     final sliver = SliverReorderableList(
       itemCount: children.length,
-      onReorder: onReorder,
+      onReorderItem: (oldIndex, newIndex) => onReorder(
+        oldIndex,
+        newIndex > oldIndex ? newIndex + 1 : newIndex,
+      ),
       itemBuilder: (context, index) => wrapItem(index, children[index]),
     );
 

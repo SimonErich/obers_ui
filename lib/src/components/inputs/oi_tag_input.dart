@@ -6,6 +6,7 @@ import 'package:obers_ui/src/components/_internal/oi_input_frame.dart';
 import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/primitives/animation/oi_shimmer.dart';
+import 'package:obers_ui/src/primitives/display/oi_icon.dart';
 import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
 
 /// A tag/chip input that lets users add and remove string tags.
@@ -283,7 +284,7 @@ class _OiTagInputState extends State<OiTagInput> {
             const SizedBox(width: 4),
             OiTappable(
               onTap: () => _removeTag(index),
-              child: Icon(
+              child: OiIcon.raw(
                 OiIcons.x,
                 size: 14,
                 color: colors.primary.base,

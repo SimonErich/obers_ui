@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
+import 'package:obers_ui/src/primitives/display/oi_icon.dart';
 
 /// The visual style of an [OiDropHighlight].
 ///
@@ -100,7 +101,7 @@ class OiDropHighlight extends StatelessWidget {
                       if (icon != null)
                         Padding(
                           padding: const EdgeInsets.only(bottom: 8),
-                          child: Icon(
+                          child: OiIcon.raw(
                             icon,
                             size: 32,
                             color: colors.primary.base,

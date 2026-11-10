@@ -13,11 +13,18 @@ class OiTextInputThemeData {
   const OiTextInputThemeData({
     this.borderRadius,
     this.contentPadding,
+    this.multilineContentPadding,
     this.borderColor,
     this.focusBorderColor,
     this.validationErrorColor,
     this.errorAnimationDuration,
     this.otp,
+    this.textStyle,
+    this.labelStyle,
+    this.labelMarkerColor,
+    this.labelMarkerDescription,
+    this.labelGap,
+    this.supportingGap,
     this.height,
     this.placeholderColor,
     this.backgroundColor,
@@ -30,6 +37,9 @@ class OiTextInputThemeData {
 
   /// The padding between the border and the input text.
   final EdgeInsets? contentPadding;
+
+  /// Textarea inset, falling back to [contentPadding] when omitted.
+  final EdgeInsets? multilineContentPadding;
 
   /// The color of the input border in its default (unfocused) state.
   final Color? borderColor;
@@ -47,6 +57,24 @@ class OiTextInputThemeData {
 
   /// OTP-specific sub-theme for digit box dimensions and styling.
   final OiOtpThemeData? otp;
+
+  /// Input value typography, merged over the semantic input defaults.
+  final TextStyle? textStyle;
+
+  /// Label typography, preserving default small strong labels when omitted.
+  final TextStyle? labelStyle;
+
+  /// Optional small marker beside the field label in a scoped input theme.
+  final Color? labelMarkerColor;
+
+  /// Accessible marker explanation; defaults to "Modified".
+  final String? labelMarkerDescription;
+
+  /// Gap between the label and input surface.
+  final double? labelGap;
+
+  /// Gap between the surface and its supporting text.
+  final double? supportingGap;
 
   /// Override input field height.
   final double? height;
@@ -67,11 +95,18 @@ class OiTextInputThemeData {
   OiTextInputThemeData copyWith({
     BorderRadius? borderRadius,
     EdgeInsets? contentPadding,
+    EdgeInsets? multilineContentPadding,
     Color? borderColor,
     Color? focusBorderColor,
     Color? validationErrorColor,
     Duration? errorAnimationDuration,
     OiOtpThemeData? otp,
+    TextStyle? textStyle,
+    TextStyle? labelStyle,
+    Color? labelMarkerColor,
+    String? labelMarkerDescription,
+    double? labelGap,
+    double? supportingGap,
     double? height,
     Color? placeholderColor,
     Color? backgroundColor,
@@ -81,12 +116,21 @@ class OiTextInputThemeData {
     return OiTextInputThemeData(
       borderRadius: borderRadius ?? this.borderRadius,
       contentPadding: contentPadding ?? this.contentPadding,
+      multilineContentPadding:
+          multilineContentPadding ?? this.multilineContentPadding,
       borderColor: borderColor ?? this.borderColor,
       focusBorderColor: focusBorderColor ?? this.focusBorderColor,
       validationErrorColor: validationErrorColor ?? this.validationErrorColor,
       errorAnimationDuration:
           errorAnimationDuration ?? this.errorAnimationDuration,
       otp: otp ?? this.otp,
+      textStyle: textStyle ?? this.textStyle,
+      labelStyle: labelStyle ?? this.labelStyle,
+      labelMarkerColor: labelMarkerColor ?? this.labelMarkerColor,
+      labelMarkerDescription:
+          labelMarkerDescription ?? this.labelMarkerDescription,
+      labelGap: labelGap ?? this.labelGap,
+      supportingGap: supportingGap ?? this.supportingGap,
       height: height ?? this.height,
       placeholderColor: placeholderColor ?? this.placeholderColor,
       backgroundColor: backgroundColor ?? this.backgroundColor,
@@ -100,8 +144,15 @@ class OiTextInputThemeData {
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
     return other is OiTextInputThemeData &&
+        other.textStyle == textStyle &&
+        other.labelStyle == labelStyle &&
+        other.labelMarkerColor == labelMarkerColor &&
+        other.labelMarkerDescription == labelMarkerDescription &&
+        other.labelGap == labelGap &&
+        other.supportingGap == supportingGap &&
         other.borderRadius == borderRadius &&
         other.contentPadding == contentPadding &&
+        other.multilineContentPadding == multilineContentPadding &&
         other.borderColor == borderColor &&
         other.focusBorderColor == focusBorderColor &&
         other.validationErrorColor == validationErrorColor &&
@@ -118,11 +169,18 @@ class OiTextInputThemeData {
   int get hashCode => Object.hash(
     borderRadius,
     contentPadding,
+    multilineContentPadding,
     borderColor,
     focusBorderColor,
     validationErrorColor,
     errorAnimationDuration,
     otp,
+    textStyle,
+    labelStyle,
+    labelMarkerColor,
+    labelMarkerDescription,
+    labelGap,
+    supportingGap,
     height,
     placeholderColor,
     backgroundColor,
