@@ -21,6 +21,7 @@ void main() {
     int? maxLength,
     bool enabled = true,
     bool obscureText = false,
+    bool selectAllOnFocus = false,
     List<TextInputFormatter>? inputFormatters,
     ValueChanged<String>? onChanged,
     ValueChanged<String>? onSubmitted,
@@ -35,6 +36,7 @@ void main() {
       maxLength: maxLength,
       enabled: enabled,
       obscureText: obscureText,
+      selectAllOnFocus: selectAllOnFocus,
       inputFormatters: inputFormatters,
       onChanged: onChanged,
       onSubmitted: onSubmitted,
@@ -168,6 +170,130 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(controller.selection.isCollapsed, isFalse);
+  });
+
+  testWidgets('a click places the cursor and typing inserts there', (
+    tester,
+  ) async {
+    final controller = TextEditingController(text: '10');
+    addTearDown(controller.dispose);
+    await tester.pumpObers(
+      SizedBox(width: 400, child: buildInput(controller: controller)),
+    );
+
+    final field = tester.getRect(find.byType(EditableText));
+    final gesture = await tester.startGesture(
+      field.centerLeft + const Offset(1, 0),
+      kind: PointerDeviceKind.mouse,
+    );
+    await gesture.up();
+    await tester.pumpAndSettle();
+
+    expect(controller.selection.isCollapsed, isTrue);
+    expect(controller.selection.baseOffset, 0);
+  });
+
+  testWidgets('selectAllOnFocus: a click selects all, typing replaces it', (
+    tester,
+  ) async {
+    final controller = TextEditingController(text: '10');
+    addTearDown(controller.dispose);
+    await tester.pumpObers(
+      SizedBox(
+        width: 400,
+        child: buildInput(controller: controller, selectAllOnFocus: true),
+      ),
+    );
+
+    final field = tester.getRect(find.byType(EditableText));
+    final gesture = await tester.startGesture(
+      field.centerLeft + const Offset(1, 0),
+      kind: PointerDeviceKind.mouse,
+    );
+    await gesture.up();
+    await tester.pumpAndSettle();
+
+    expect(
+      controller.selection,
+      const TextSelection(baseOffset: 0, extentOffset: 2),
+    );
+
+    tester.testTextInput.updateEditingValue(
+      controller.value.copyWith(
+        text: '35',
+        selection: const TextSelection.collapsed(offset: 2),
+      ),
+    );
+    await tester.pump();
+    expect(controller.text, '35');
+  });
+
+  testWidgets('selectAllOnFocus: a second click while focused places cursor', (
+    tester,
+  ) async {
+    final controller = TextEditingController(text: '1000');
+    addTearDown(controller.dispose);
+    await tester.pumpObers(
+      SizedBox(
+        width: 400,
+        child: buildInput(controller: controller, selectAllOnFocus: true),
+      ),
+    );
+
+    final field = tester.getRect(find.byType(EditableText));
+    for (var i = 0; i < 2; i++) {
+      final g = await tester.startGesture(
+        field.centerLeft + const Offset(1, 0),
+        kind: PointerDeviceKind.mouse,
+      );
+      await g.up();
+      await tester.pump(const Duration(seconds: 1));
+    }
+
+    expect(controller.selection.isCollapsed, isTrue);
+  });
+
+  testWidgets('without selectAllOnFocus focusing does not select', (
+    tester,
+  ) async {
+    final controller = TextEditingController(text: '10');
+    final node = FocusNode();
+    addTearDown(controller.dispose);
+    addTearDown(node.dispose);
+    await tester.pumpObers(
+      SizedBox(
+        width: 400,
+        child: buildInput(controller: controller, focusNode: node),
+      ),
+    );
+    node.requestFocus();
+    await tester.pump();
+    expect(controller.selection.isCollapsed, isTrue);
+  });
+
+  testWidgets('selectAllOnFocus selects when focused programmatically', (
+    tester,
+  ) async {
+    final controller = TextEditingController(text: '10');
+    final node = FocusNode();
+    addTearDown(controller.dispose);
+    addTearDown(node.dispose);
+    await tester.pumpObers(
+      SizedBox(
+        width: 400,
+        child: buildInput(
+          controller: controller,
+          focusNode: node,
+          selectAllOnFocus: true,
+        ),
+      ),
+    );
+    node.requestFocus();
+    await tester.pump();
+    expect(
+      controller.selection.extentOffset - controller.selection.baseOffset,
+      2,
+    );
   });
 
   testWidgets('a double tap selects the word', (tester) async {

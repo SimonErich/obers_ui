@@ -45,6 +45,8 @@ class OiTextInput extends StatefulWidget {
     this.counterBuilder,
     this.onTap,
     this.onTapOutside,
+    this.selectAllOnFocus = false,
+    this.contentPadding,
     super.key,
   }) : _isOtp = false,
        _otpLength = 0,
@@ -62,7 +64,9 @@ class OiTextInput extends StatefulWidget {
     this.enabled = true,
     this.focusNode,
     super.key,
-  }) : label = null,
+  }) : selectAllOnFocus = false,
+       contentPadding = null,
+       label = null,
        hint = null,
        placeholder = 'Search\u2026',
        error = null,
@@ -118,7 +122,9 @@ class OiTextInput extends StatefulWidget {
     this.onTap,
     this.onTapOutside,
     super.key,
-  }) : maxLines = 1,
+  }) : selectAllOnFocus = false,
+       contentPadding = null,
+       maxLines = 1,
        minLines = null,
        keyboardType = TextInputType.visiblePassword,
        textInputAction = null,
@@ -167,7 +173,9 @@ class OiTextInput extends StatefulWidget {
     this.onTap,
     this.onTapOutside,
     super.key,
-  }) : keyboardType = TextInputType.multiline,
+  }) : selectAllOnFocus = false,
+       contentPadding = null,
+       keyboardType = TextInputType.multiline,
        textInputAction = TextInputAction.newline,
        obscureText = false,
        _isOtp = false,
@@ -192,7 +200,9 @@ class OiTextInput extends StatefulWidget {
     this.autovalidateMode,
     this.onSaved,
     super.key,
-  }) : _isOtp = true,
+  }) : selectAllOnFocus = false,
+       contentPadding = null,
+       _isOtp = true,
        _otpLength = length,
        _otpOnCompleted = onCompleted,
        _otpObscure = obscure,
@@ -280,6 +290,15 @@ class OiTextInput extends StatefulWidget {
 
   /// Whether to request focus when first inserted into the tree.
   final bool autofocus;
+
+  /// Whether the whole text is selected whenever the field gains focus, so
+  /// typing replaces it. Meant for number and count fields; leave it off for
+  /// normal text fields so the cursor stays where the user clicks.
+  final bool selectAllOnFocus;
+
+  /// Padding between the frame and the text. Defaults to 12 horizontal and
+  /// 8 vertical; pass a smaller value for narrow fields.
+  final EdgeInsetsGeometry? contentPadding;
 
   /// Optional list of input formatters applied to each keystroke.
   final List<TextInputFormatter>? inputFormatters;
@@ -472,6 +491,7 @@ class _OiTextInputState extends State<OiTextInput> {
       focused: _focused,
       enabled: widget.enabled,
       readOnly: widget.readOnly,
+      padding: widget.contentPadding,
       leading: widget.leading,
       trailing: effectiveTrailing,
       counter: showCounterWidget ? _buildCounter(context) : null,
@@ -496,6 +516,7 @@ class _OiTextInputState extends State<OiTextInput> {
         readOnly: widget.readOnly,
         obscureText: effectiveObscure,
         autofocus: widget.autofocus,
+        selectAllOnFocus: widget.selectAllOnFocus,
         inputFormatters: widget.inputFormatters,
       ),
     );

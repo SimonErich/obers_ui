@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/gestures.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
@@ -41,6 +42,7 @@ class OiRawInput extends StatefulWidget {
     this.textAlign = TextAlign.start,
     this.textAlignVertical,
     this.autofocus = false,
+    this.selectAllOnFocus = false,
     this.inputFormatters,
     this.scrollController,
     this.selectionControls,
@@ -125,6 +127,13 @@ class OiRawInput extends StatefulWidget {
   /// Whether the field should request focus when first inserted into the tree.
   final bool autofocus;
 
+  /// Whether the whole text is selected each time the field gains focus, so
+  /// typing replaces it. Meant for number and count fields.
+  ///
+  /// A click that gives the field focus selects everything instead of placing
+  /// the cursor; further clicks while focused behave normally.
+  final bool selectAllOnFocus;
+
   /// Optional input formatters applied before [onChanged] is fired.
   final List<TextInputFormatter>? inputFormatters;
 
@@ -153,7 +162,7 @@ class _OiRawInputState extends State<OiRawInput>
   final GlobalKey<EditableTextState> _editableKey =
       GlobalKey<EditableTextState>();
   late final TextSelectionGestureDetectorBuilder _selectionGestures =
-      TextSelectionGestureDetectorBuilder(delegate: this);
+      _SelectionGestures(this);
 
   @override
   GlobalKey<EditableTextState> get editableTextKey => _editableKey;
@@ -215,6 +224,9 @@ class _OiRawInputState extends State<OiRawInput>
 
   void _handleFocusChanged() {
     if (widget.focusNode.hasFocus) {
+      if (widget.selectAllOnFocus && !widget.readOnly && widget.enabled) {
+        _selectAll();
+      }
       // Scroll this widget into view after the frame is laid out.
       SchedulerBinding.instance.addPostFrameCallback((_) {
         if (mounted) {
@@ -236,9 +248,25 @@ class _OiRawInputState extends State<OiRawInput>
     }
   }
 
+  void _selectAll() {
+    final c = widget.controller;
+    c.selection = TextSelection(baseOffset: 0, extentOffset: c.text.length);
+  }
+
+  // True while the pointer that is down is the one that gives the field
+  // focus; its tap must not collapse the select-all to the click position.
+  bool _focusingTap = false;
+
+  // The tap-up callback can run after this listener, so clear the flag only
+  // once the event has been fully dispatched.
+  void _handlePointerEnd(PointerEvent _) {
+    scheduleMicrotask(() => _focusingTap = false);
+  }
+
   void _handlePointerDown(PointerDownEvent _) {
     if (!widget.enabled || widget.readOnly) return;
     if (!widget.focusNode.hasFocus) {
+      _focusingTap = widget.selectAllOnFocus;
       widget.focusNode.requestFocus();
     }
   }
@@ -367,11 +395,18 @@ class _OiRawInputState extends State<OiRawInput>
 
     // Build the Row with optional leading / trailing.
     if (widget.leading == null && widget.trailing == null) {
-      return Listener(onPointerDown: _handlePointerDown, child: fieldWidget);
+      return Listener(
+        onPointerDown: _handlePointerDown,
+        onPointerUp: _handlePointerEnd,
+        onPointerCancel: _handlePointerEnd,
+        child: fieldWidget,
+      );
     }
 
     return Listener(
       onPointerDown: _handlePointerDown,
+      onPointerUp: _handlePointerEnd,
+      onPointerCancel: _handlePointerEnd,
       child: Row(
         children: [
           if (widget.leading != null) widget.leading!,
@@ -380,5 +415,19 @@ class _OiRawInputState extends State<OiRawInput>
         ],
       ),
     );
+  }
+}
+
+/// [TextSelectionGestureDetectorBuilder] that leaves the selection alone for
+/// the tap that focuses a [OiRawInput.selectAllOnFocus] field.
+class _SelectionGestures extends TextSelectionGestureDetectorBuilder {
+  _SelectionGestures(this._state) : super(delegate: _state);
+
+  final _OiRawInputState _state;
+
+  @override
+  void onSingleTapUp(TapDragUpDetails details) {
+    if (_state._focusingTap) return;
+    super.onSingleTapUp(details);
   }
 }
