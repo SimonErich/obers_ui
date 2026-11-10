@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/semantics.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/foundation/oi_responsive.dart';
@@ -327,23 +328,28 @@ class _OiTabsState extends State<OiTabs>
       );
     }
 
-    return Focus(
-      focusNode: _tabFocusNodes[index],
-      onKeyEvent: (node, event) {
-        _handleKey(index, event);
-        return KeyEventResult.ignored;
-      },
-      child: MouseRegion(
-        cursor: SystemMouseCursors.click,
-        onEnter: (_) => setState(() => _hoveredTabIndices.add(index)),
-        onExit: (_) => setState(() => _hoveredTabIndices.remove(index)),
-        child: GestureDetector(
-          onTap: () {
-            _tabFocusNodes[index].requestFocus();
-            widget.onSelected(index);
-          },
-          behavior: HitTestBehavior.opaque,
-          child: tabContent,
+    // For screen readers: a tab, and whether it is the selected one.
+    return Semantics(
+      role: SemanticsRole.tab,
+      selected: isSelected,
+      child: Focus(
+        focusNode: _tabFocusNodes[index],
+        onKeyEvent: (node, event) {
+          _handleKey(index, event);
+          return KeyEventResult.ignored;
+        },
+        child: MouseRegion(
+          cursor: SystemMouseCursors.click,
+          onEnter: (_) => setState(() => _hoveredTabIndices.add(index)),
+          onExit: (_) => setState(() => _hoveredTabIndices.remove(index)),
+          child: GestureDetector(
+            onTap: () {
+              _tabFocusNodes[index].requestFocus();
+              widget.onSelected(index);
+            },
+            behavior: HitTestBehavior.opaque,
+            child: tabContent,
+          ),
         ),
       ),
     );

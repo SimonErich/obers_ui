@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/components/_internal/oi_input_frame.dart';
+import 'package:obers_ui/src/components/_internal/oi_slider_semantics.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 
 /// A draggable slider for selecting a value in a continuous or discrete range.
@@ -27,6 +28,7 @@ class OiSlider extends StatefulWidget {
     this.showLabels = false,
     this.showTicks = false,
     this.enabled = true,
+    this.semanticLabel,
     super.key,
   });
 
@@ -63,6 +65,11 @@ class OiSlider extends StatefulWidget {
 
   /// Whether the slider responds to drag gestures.
   final bool enabled;
+
+  /// The name screen readers announce, in place of [label].
+  ///
+  /// Defaults to [label]. Nothing is drawn for it.
+  final String? semanticLabel;
 
   @override
   State<OiSlider> createState() => _OiSliderState();
@@ -220,6 +227,9 @@ class _OiSliderState extends State<OiSlider>
           onHorizontalDragUpdate: (d) => _handleDragUpdate(d, width),
           onHorizontalDragEnd: _handleDragEnd,
           behavior: HitTestBehavior.opaque,
+          // The slider's own semantics (increase / decrease per thumb) replace
+          // the scroll and tap actions a gesture detector would add.
+          excludeFromSemantics: true,
           child: Padding(
             padding: EdgeInsets.only(top: widget.showLabels ? 16.0 : 0.0),
             child: SizedBox(
@@ -233,6 +243,22 @@ class _OiSliderState extends State<OiSlider>
                   animation: _animController,
                   builder: (context, _) => CustomPaint(
                     painter: _OiSliderPainter(
+                      semantics: (size) => oiSliderSemantics(
+                        size: size,
+                        thumbRadius: thumbRadius,
+                        value: widget.value,
+                        secondaryValue: widget.secondaryValue,
+                        min: widget.min,
+                        max: widget.max,
+                        divisions: widget.divisions,
+                        enabled: widget.enabled,
+                        label: widget.semanticLabel ?? widget.label,
+                        textDirection:
+                            Directionality.maybeOf(context) ??
+                            TextDirection.ltr,
+                        onChanged: widget.onChanged,
+                        onRangeChanged: widget.onRangeChanged,
+                      ),
                       value: _displayValue,
                       secondaryValue: widget.secondaryValue != null
                           ? _displaySecondary
@@ -277,6 +303,7 @@ class _OiSliderState extends State<OiSlider>
 
 class _OiSliderPainter extends CustomPainter {
   const _OiSliderPainter({
+    required this.semantics,
     required this.value,
     required this.min,
     required this.max,
@@ -296,6 +323,12 @@ class _OiSliderPainter extends CustomPainter {
     this.labelSecondaryValue,
     this.divisions,
   });
+
+  /// One semantics node per thumb, built for the painted size.
+  final SemanticsBuilderCallback semantics;
+
+  @override
+  SemanticsBuilderCallback get semanticsBuilder => semantics;
 
   final double value;
   final double? secondaryValue;
@@ -397,9 +430,7 @@ class _OiSliderPainter extends CustomPainter {
       );
 
     if (showLabels) {
-      final label = v == v.truncateToDouble()
-          ? v.toStringAsFixed(0)
-          : v.toStringAsFixed(1);
+      final label = oiSliderValueText(v);
       final tp = TextPainter(
         text: TextSpan(
           text: label,
@@ -422,5 +453,16 @@ class _OiSliderPainter extends CustomPainter {
       old.max != max ||
       old.divisions != divisions ||
       old.activeColor != activeColor ||
+      old.enabled != enabled;
+
+  // Follows the real values, not the animated position, so a slide does not
+  // rebuild the semantics on every frame.
+  @override
+  bool shouldRebuildSemantics(_OiSliderPainter old) =>
+      old.labelValue != labelValue ||
+      old.labelSecondaryValue != labelSecondaryValue ||
+      old.min != min ||
+      old.max != max ||
+      old.divisions != divisions ||
       old.enabled != enabled;
 }

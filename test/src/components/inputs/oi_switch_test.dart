@@ -56,4 +56,66 @@ void main() {
     await tester.pump();
     expect(result, isNull);
   });
+
+  group('semantics', () {
+    testWidgets('names the switch with its on/off state and a tap action', (
+      tester,
+    ) async {
+      final handle = tester.ensureSemantics();
+      bool? result;
+      await tester.pumpObers(
+        OiSwitch(
+          value: true,
+          semanticLabel: 'Dark mode',
+          onChanged: (v) => result = v,
+        ),
+      );
+
+      expect(find.text('Dark mode'), findsNothing, reason: 'nothing drawn');
+      expect(
+        tester.getSemantics(find.bySemanticsLabel('Dark mode')),
+        matchesSemantics(
+          label: 'Dark mode',
+          hasToggledState: true,
+          isToggled: true,
+          hasEnabledState: true,
+          isEnabled: true,
+          hasTapAction: true,
+        ),
+      );
+
+      tester.semantics.tap(find.semantics.byLabel('Dark mode'));
+      expect(result, isFalse);
+      handle.dispose();
+    });
+
+    testWidgets('the visible label names it when no semanticLabel is given', (
+      tester,
+    ) async {
+      final handle = tester.ensureSemantics();
+      await tester.pumpObers(
+        OiSwitch(value: false, label: 'Dark mode', onChanged: (_) {}),
+      );
+
+      expect(find.bySemanticsLabel('Dark mode'), findsOneWidget);
+      handle.dispose();
+    });
+
+    testWidgets('a disabled switch has no tap action', (tester) async {
+      final handle = tester.ensureSemantics();
+      await tester.pumpObers(
+        const OiSwitch(value: false, enabled: false, semanticLabel: 'Sound'),
+      );
+
+      expect(
+        tester.getSemantics(find.bySemanticsLabel('Sound')),
+        matchesSemantics(
+          label: 'Sound',
+          hasToggledState: true,
+          hasEnabledState: true,
+        ),
+      );
+      handle.dispose();
+    });
+  });
 }
