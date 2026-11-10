@@ -171,5 +171,31 @@ void main() {
       expect(rawInput.keyboardType, TextInputType.multiline);
       expect(rawInput.textInputAction, TextInputAction.newline);
     });
+
+    testWidgets('search constructor shows the search icon and placeholder '
+        'by default', (tester) async {
+      await tester.pumpObers(const OiTextInput.search());
+
+      expect(find.text('Search\u2026'), findsOneWidget);
+      expect(find.byIcon(OiIcons.search), findsOneWidget);
+      final rawInput = tester.widget<OiRawInput>(find.byType(OiRawInput));
+      expect(rawInput.textInputAction, TextInputAction.search);
+    });
+
+    testWidgets('search constructor takes a custom placeholder and leading', (
+      tester,
+    ) async {
+      await tester.pumpObers(
+        const OiTextInput.search(
+          placeholder: 'Type a command\u2026',
+          leading: Icon(OiIcons.chevronRight, size: 18),
+        ),
+      );
+
+      expect(find.text('Type a command\u2026'), findsOneWidget);
+      expect(find.text('Search\u2026'), findsNothing);
+      expect(find.byIcon(OiIcons.chevronRight), findsOneWidget);
+      expect(find.byIcon(OiIcons.search), findsNothing);
+    });
   });
 }
