@@ -42,4 +42,22 @@ void main() {
       expect(semantics, findsOneWidget);
     });
   });
+
+  group('OiKbd combined keys', () {
+    testWidgets('a word key is joined with a plus', (tester) async {
+      await tester.pumpObers(
+        const OiKbd(keys: ['meta', 'K'], combineKeys: true),
+      );
+
+      expect(find.text('Ctrl+K'), findsOneWidget);
+    }, variant: TargetPlatformVariant.only(TargetPlatform.linux));
+
+    testWidgets('glyph keys run together', (tester) async {
+      await tester.pumpObers(
+        const OiKbd(keys: ['meta', 'shift', 'K'], combineKeys: true),
+      );
+
+      expect(find.text('⌘⇧K'), findsOneWidget);
+    }, variant: TargetPlatformVariant.only(TargetPlatform.macOS));
+  });
 }

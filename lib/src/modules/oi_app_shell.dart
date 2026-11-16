@@ -125,6 +125,7 @@ class OiAppShell extends StatefulWidget {
     this.openNavigationLabel = 'Open navigation',
     this.expandSidebarLabel = 'Expand sidebar',
     this.collapseSidebarLabel = 'Collapse sidebar',
+    this.primaryNavigationLabel,
     super.key,
   });
 
@@ -227,6 +228,10 @@ class OiAppShell extends StatefulWidget {
 
   /// Screen-reader label of the button that collapses the sidebar.
   final String collapseSidebarLabel;
+
+  /// Screen-reader label of the primary rail; defaults to
+  /// "[label] primary navigation".
+  final String? primaryNavigationLabel;
 
   @override
   State<OiAppShell> createState() => _OiAppShellState();
@@ -601,7 +606,8 @@ class _OiAppShellState extends State<OiAppShell>
       leading: widget.primaryLeading,
       trailing: widget.primaryTrailing,
       labelBehavior: OiRailLabelBehavior.none,
-      semanticLabel: '${widget.label} primary navigation',
+      semanticLabel:
+          widget.primaryNavigationLabel ?? '${widget.label} primary navigation',
     );
   }
 
@@ -612,24 +618,40 @@ class _OiAppShellState extends State<OiAppShell>
 
   Widget _buildCollapseToggle(BuildContext context) {
     final colors = context.colors;
-    return OiTappable(
-      semanticLabel: _sidebarCollapsed
-          ? widget.expandSidebarLabel
-          : widget.collapseSidebarLabel,
-      onTap: _toggleSidebar,
-      child: Container(
-        height: 48,
-        decoration: BoxDecoration(
-          border: Border(top: BorderSide(color: colors.borderSubtle)),
+    final sidebar = context.components.sidebar;
+    final size = sidebar?.itemHeight ?? 36;
+    // The divider follows the shell's own border, so a borderless shell gets
+    // no stray line above the toggle.
+    return Container(
+      decoration: BoxDecoration(
+        border: Border(
+          top: BorderSide(
+            color:
+                context.components.appShell?.borderColor ?? colors.borderSubtle,
+          ),
         ),
-        alignment: Alignment.center,
-        child: OiIcon.raw(
-          _sidebarCollapsed
-              ? OiIcons
-                    .chevronRight // chevron_right
-              : OiIcons.chevronLeft, // chevron_left
-          size: 20,
-          color: colors.textMuted,
+      ),
+      padding: const EdgeInsets.fromLTRB(12, 8, 12, 12),
+      alignment: _sidebarCollapsed
+          ? Alignment.center
+          : AlignmentDirectional.centerStart,
+      child: OiTappable(
+        semanticLabel: _sidebarCollapsed
+            ? widget.expandSidebarLabel
+            : widget.collapseSidebarLabel,
+        onTap: _toggleSidebar,
+        clipBorderRadius: sidebar?.itemRadius ?? context.radius.md,
+        child: SizedBox.square(
+          dimension: size,
+          child: Center(
+            child: OiIcon.raw(
+              _sidebarCollapsed
+                  ? OiIcons.panelLeftOpen
+                  : OiIcons.panelLeftClose,
+              size: sidebar?.iconSize ?? 20,
+              color: colors.textMuted,
+            ),
+          ),
         ),
       ),
     );

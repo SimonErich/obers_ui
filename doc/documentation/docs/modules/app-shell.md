@@ -83,6 +83,9 @@ OiAppShell(
 | `sidebarWidth` | `double` | `256` | Sidebar width when expanded. |
 | `sidebarCollapsedWidth` | `double` | `64` | Sidebar width in icon-only mode. |
 | `mobileBreakpoint` | `OiBreakpoint` | `OiBreakpoint.medium` | Below this width the sidebar becomes a drawer. |
+| `expandSidebarLabel` | `String` | `'Expand sidebar'` | Screen-reader label of the toggle while the sidebar is collapsed. |
+| `collapseSidebarLabel` | `String` | `'Collapse sidebar'` | Screen-reader label of the toggle while the sidebar is expanded. |
+| `primaryNavigationLabel` | `String?` | `null` | Screen-reader label of the primary rail; defaults to "`label` primary navigation". |
 
 ### OiNavItem
 

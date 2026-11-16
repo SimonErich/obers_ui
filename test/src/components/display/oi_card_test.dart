@@ -659,4 +659,16 @@ void main() {
       expect(find.text('tag'), findsOneWidget);
     });
   });
+
+  group('OiCard color', () {
+    testWidgets('overrides the theme background', (tester) async {
+      const fill = Color(0xFFFDF2E0);
+      await tester.pumpObers(
+        const OiCard(color: fill, child: Text('Featured')),
+      );
+
+      final surface = tester.widget<OiSurface>(find.byType(OiSurface).first);
+      expect(surface.color, fill);
+    });
+  });
 }

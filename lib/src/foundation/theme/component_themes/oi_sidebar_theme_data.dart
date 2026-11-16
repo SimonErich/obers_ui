@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 
 /// Theme overrides for sidebar navigation.
@@ -32,6 +33,9 @@ class OiSidebarThemeData {
     this.selectedTextStyle,
     this.plainBadges,
     this.badgeTextStyle,
+    this.sectionHeaderStyle,
+    this.sectionHeaderPadding,
+    this.selectedShadow,
   });
 
   /// Expanded width; defaults to 260.
@@ -109,6 +113,15 @@ class OiSidebarThemeData {
   /// Typography for plain count labels.
   final TextStyle? badgeTextStyle;
 
+  /// Typography of a section heading; defaults to an 11 px tracked label.
+  final TextStyle? sectionHeaderStyle;
+
+  /// Insets around a section heading; defaults to 16, 16, 16, 4.
+  final EdgeInsetsGeometry? sectionHeaderPadding;
+
+  /// Shadow under the selected destination, lifting it off the sidebar.
+  final List<BoxShadow>? selectedShadow;
+
   /// Returns a copy with the supplied overrides.
   OiSidebarThemeData copyWith({
     double? width,
@@ -136,6 +149,9 @@ class OiSidebarThemeData {
     TextStyle? selectedTextStyle,
     bool? plainBadges,
     TextStyle? badgeTextStyle,
+    TextStyle? sectionHeaderStyle,
+    EdgeInsetsGeometry? sectionHeaderPadding,
+    List<BoxShadow>? selectedShadow,
   }) => OiSidebarThemeData(
     width: width ?? this.width,
     headerHeight: headerHeight ?? this.headerHeight,
@@ -162,6 +178,9 @@ class OiSidebarThemeData {
     selectedTextStyle: selectedTextStyle ?? this.selectedTextStyle,
     plainBadges: plainBadges ?? this.plainBadges,
     badgeTextStyle: badgeTextStyle ?? this.badgeTextStyle,
+    sectionHeaderStyle: sectionHeaderStyle ?? this.sectionHeaderStyle,
+    sectionHeaderPadding: sectionHeaderPadding ?? this.sectionHeaderPadding,
+    selectedShadow: selectedShadow ?? this.selectedShadow,
   );
 
   @override
@@ -192,7 +211,10 @@ class OiSidebarThemeData {
           other.textStyle == textStyle &&
           other.selectedTextStyle == selectedTextStyle &&
           other.plainBadges == plainBadges &&
-          other.badgeTextStyle == badgeTextStyle;
+          other.badgeTextStyle == badgeTextStyle &&
+          other.sectionHeaderStyle == sectionHeaderStyle &&
+          other.sectionHeaderPadding == sectionHeaderPadding &&
+          listEquals(other.selectedShadow, selectedShadow);
 
   @override
   int get hashCode => Object.hashAll([
@@ -221,5 +243,8 @@ class OiSidebarThemeData {
     selectedTextStyle,
     plainBadges,
     badgeTextStyle,
+    sectionHeaderStyle,
+    sectionHeaderPadding,
+    Object.hashAll(selectedShadow ?? const []),
   ]);
 }

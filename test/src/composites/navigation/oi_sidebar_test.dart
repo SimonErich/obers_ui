@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui/src/composites/navigation/oi_sidebar.dart';
+import 'package:obers_ui/src/foundation/oi_icons.dart';
 import 'package:obers_ui/src/foundation/theme/component_themes/oi_sidebar_theme_data.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme_data.dart';
 
@@ -84,6 +85,11 @@ Widget _sidebar({
 }
 
 // ── Tests ────────────────────────────────────────────────────────────────────
+
+OiThemeData _withSidebar(OiSidebarThemeData sidebar) {
+  final base = OiThemeData.light();
+  return base.copyWith(components: base.components.copyWith(sidebar: sidebar));
+}
 
 void main() {
   testWidgets(
@@ -466,6 +472,87 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Home'), findsOneWidget);
+    });
+  });
+
+  group('OiSidebar theming', () {
+    const style = TextStyle(fontSize: 12, height: 16 / 12);
+    const shadow = [BoxShadow(color: Color(0x0F000000), blurRadius: 2)];
+
+    testWidgets('section headings read the themed style and padding', (
+      tester,
+    ) async {
+      await tester.pumpObers(
+        OiSidebar(
+          label: 'Navigation',
+          selectedId: 'a',
+          onSelect: (_) {},
+          sections: const [
+            OiSidebarSection(
+              title: 'Pinned views',
+              items: [
+                OiSidebarItem(id: 'a', label: 'Orders', icon: OiIcons.box),
+              ],
+            ),
+          ],
+        ),
+        theme: _withSidebar(
+          const OiSidebarThemeData(
+            sectionHeaderStyle: style,
+            sectionHeaderPadding: EdgeInsets.fromLTRB(12, 20, 12, 6),
+            selectedShadow: shadow,
+          ),
+        ),
+      );
+
+      final heading = tester.widget<Text>(find.text('Pinned views'));
+      expect(heading.style, style);
+      final padding = tester.widget<Padding>(
+        find
+            .ancestor(
+              of: find.text('Pinned views'),
+              matching: find.byType(Padding),
+            )
+            .first,
+      );
+      expect(padding.padding, const EdgeInsets.fromLTRB(12, 20, 12, 6));
+    });
+
+    testWidgets('the selected item carries the themed shadow', (tester) async {
+      await tester.pumpObers(
+        OiSidebar(
+          label: 'Navigation',
+          selectedId: 'a',
+          onSelect: (_) {},
+          sections: const [
+            OiSidebarSection(
+              items: [
+                OiSidebarItem(id: 'a', label: 'Orders', icon: OiIcons.box),
+                OiSidebarItem(id: 'b', label: 'Invoices', icon: OiIcons.box),
+              ],
+            ),
+          ],
+        ),
+        theme: _withSidebar(const OiSidebarThemeData(selectedShadow: shadow)),
+      );
+
+      final shadows = tester
+          .widgetList<Container>(find.byType(Container))
+          .map((c) => c.decoration)
+          .whereType<BoxDecoration>()
+          .where((d) => d.boxShadow != null)
+          .toList();
+      expect(shadows, hasLength(1));
+      expect(shadows.single.boxShadow, shadow);
+    });
+
+    test('theme data compares the new fields', () {
+      const a = OiSidebarThemeData(selectedShadow: shadow);
+      const b = OiSidebarThemeData(selectedShadow: shadow);
+      expect(a, b);
+      expect(a.hashCode, b.hashCode);
+      expect(a.copyWith(sectionHeaderStyle: style).sectionHeaderStyle, style);
+      expect(a, isNot(const OiSidebarThemeData()));
     });
   });
 }

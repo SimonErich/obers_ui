@@ -1518,6 +1518,7 @@ Content container with optional title, subtitle, footer, interaction.
 - `padding` (EdgeInsetsGeometry?)
 - `border` (OiBorderStyle?)
 - `gradient` (OiGradientStyle?)
+- `color` (Color?) — Fill override, e.g. a soft highlight on the card a page leads with; null uses the theme's card background
 - `halo` (OiHaloStyle?)
 
 **Named Constructors:**
@@ -2891,6 +2892,7 @@ Displays a sequence of keyboard keys as styled chips with platform-specific glyp
 **Key Parameters:**
 
 - `keys` (List\<String\>, required) — Logical key names to display
+- `combineKeys` (bool, default: false) — One cap for the whole shortcut: glyphs run together (`⌘K`), a word key is joined with a plus (`Ctrl+K`)
 
 **Recognised Keys (case-insensitive):** `meta`/`cmd`, `ctrl`, `shift`, `alt`/`option`, `enter`, `tab`, `esc`, `backspace`, `delete`, `up`, `down`, `left`, `right`, `space`. Unrecognised strings pass through capitalised.
 

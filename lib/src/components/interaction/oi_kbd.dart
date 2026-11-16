@@ -55,6 +55,19 @@ class OiKbd extends StatelessWidget {
     };
   }
 
+  /// Joins mapped keys into one cap: glyphs run together (`⌘K`), a word
+  /// such as `Ctrl` is separated by a plus (`Ctrl+K`).
+  static String _combined(List<String> mapped) {
+    final buffer = StringBuffer();
+    for (var i = 0; i < mapped.length; i++) {
+      if (i > 0 && (mapped[i - 1].length > 1 || mapped[i].length > 1)) {
+        buffer.write('+');
+      }
+      buffer.write(mapped[i]);
+    }
+    return buffer.toString();
+  }
+
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
@@ -72,7 +85,7 @@ class OiKbd extends StatelessWidget {
             borderRadius: radius.xs,
           ),
           child: Text(
-            keys.map(_mapKey).join(),
+            _combined(keys.map(_mapKey).toList()),
             style: context.textTheme.caption.copyWith(
               fontFamily: context.textTheme.code.fontFamily,
               fontFamilyFallback: context.textTheme.code.fontFamilyFallback,

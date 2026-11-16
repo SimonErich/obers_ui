@@ -69,6 +69,7 @@ class OiCard extends StatefulWidget {
     this.headerGap = 0,
     this.border,
     this.gradient,
+    this.color,
     this.halo,
     this.statusBadge,
     this.statusBadgePosition = OiBadgePosition.topRight,
@@ -99,6 +100,7 @@ class OiCard extends StatefulWidget {
     this.headerGap = 0,
     this.border,
     this.gradient,
+    this.color,
     this.halo,
     this.statusBadge,
     this.statusBadgePosition = OiBadgePosition.topRight,
@@ -128,6 +130,7 @@ class OiCard extends StatefulWidget {
     double headerGap = 0,
     OiBorderStyle? border,
     OiGradientStyle? gradient,
+    Color? color,
     OiHaloStyle? halo,
     Widget? statusBadge,
     OiBadgePosition statusBadgePosition = OiBadgePosition.topRight,
@@ -151,6 +154,7 @@ class OiCard extends StatefulWidget {
       headerGap: headerGap,
       border: border,
       gradient: gradient,
+      color: color,
       halo: halo,
       statusBadge: statusBadge,
       statusBadgePosition: statusBadgePosition,
@@ -180,6 +184,7 @@ class OiCard extends StatefulWidget {
     double headerGap = 0,
     OiBorderStyle? border,
     OiGradientStyle? gradient,
+    Color? color,
     OiHaloStyle? halo,
     Widget? statusBadge,
     OiBadgePosition statusBadgePosition = OiBadgePosition.topRight,
@@ -203,6 +208,7 @@ class OiCard extends StatefulWidget {
       headerGap: headerGap,
       border: border,
       gradient: gradient,
+      color: color,
       halo: halo,
       statusBadge: statusBadge,
       statusBadgePosition: statusBadgePosition,
@@ -232,6 +238,7 @@ class OiCard extends StatefulWidget {
     double headerGap = 0,
     OiBorderStyle? border,
     OiGradientStyle? gradient,
+    Color? color,
     OiHaloStyle? halo,
     Widget? statusBadge,
     OiBadgePosition statusBadgePosition = OiBadgePosition.topRight,
@@ -255,6 +262,7 @@ class OiCard extends StatefulWidget {
       headerGap: headerGap,
       border: border,
       gradient: gradient,
+      color: color,
       halo: halo,
       statusBadge: statusBadge,
       statusBadgePosition: statusBadgePosition,
@@ -282,6 +290,7 @@ class OiCard extends StatefulWidget {
     double headerGap = 0,
     OiBorderStyle? border,
     OiGradientStyle? gradient,
+    Color? color,
     OiHaloStyle? halo,
     Widget? statusBadge,
     OiBadgePosition statusBadgePosition = OiBadgePosition.topRight,
@@ -305,6 +314,7 @@ class OiCard extends StatefulWidget {
       headerGap: headerGap,
       border: border,
       gradient: gradient,
+      color: color,
       halo: halo,
       statusBadge: statusBadge,
       statusBadgePosition: statusBadgePosition,
@@ -367,6 +377,10 @@ class OiCard extends StatefulWidget {
 
   /// Optional background gradient. Overrides the surface fill colour.
   final OiGradientStyle? gradient;
+
+  /// Fill override, for example a soft highlight on the one card a page
+  /// leads with. Null uses the theme's card background.
+  final Color? color;
 
   /// Optional halo/glow effect rendered around the card.
   final OiHaloStyle? halo;
@@ -571,7 +585,7 @@ class _OiCardState extends State<OiCard> with SingleTickerProviderStateMixin {
       border: effectiveBorder,
       shadow: shadow,
       borderRadius: ct?.borderRadius ?? BorderRadius.circular(8),
-      color: ct?.backgroundColor,
+      color: widget.color ?? ct?.backgroundColor,
       padding: effectivePadding,
       gradient: widget.gradient,
       halo: widget.halo,

@@ -543,16 +543,21 @@ class _OiSidebarState extends State<OiSidebar>
     bool collapsed,
   ) {
     final colors = context.colors;
+    final sidebarTheme = context.components.sidebar;
     Widget header = Padding(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
+      padding:
+          sidebarTheme?.sectionHeaderPadding ??
+          const EdgeInsets.fromLTRB(16, 16, 16, 4),
       child: Text(
         section.title!,
-        style: TextStyle(
-          fontSize: 11,
-          fontWeight: FontWeight.w600,
-          letterSpacing: 1.5,
-          color: colors.textMuted,
-        ),
+        style:
+            sidebarTheme?.sectionHeaderStyle ??
+            TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+              letterSpacing: 1.5,
+              color: colors.textMuted,
+            ),
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
       ),
@@ -643,6 +648,7 @@ class _OiSidebarState extends State<OiSidebar>
                   decoration: BoxDecoration(
                     color: bg,
                     borderRadius: sidebarTheme?.itemRadius,
+                    boxShadow: selected ? sidebarTheme?.selectedShadow : null,
                     border:
                         selected && sidebarTheme?.selectedBorderColor != null
                         ? Border.all(color: sidebarTheme!.selectedBorderColor!)
@@ -670,6 +676,7 @@ class _OiSidebarState extends State<OiSidebar>
             decoration: BoxDecoration(
               color: bg,
               borderRadius: sidebarTheme?.itemRadius,
+              boxShadow: selected ? sidebarTheme?.selectedShadow : null,
             ),
             foregroundDecoration: BoxDecoration(
               borderRadius: sidebarTheme?.itemRadius,

@@ -261,7 +261,9 @@ Component themes are for systematic overrides, not individual widgets.
 `OiSidebarThemeData.plainBadges` displays counts as text instead of filled
 badges. `badgeTextStyle`, `labelGap`, and `itemSpacing` control their typography
 and spacing. `selectedIconColor` and `selectedBorderColor` style the active
-destination independently of its label and background.
+destination independently of its label and background, and `selectedShadow`
+lifts it off the sidebar. `sectionHeaderStyle` and `sectionHeaderPadding` style
+the headings above groups of destinations.
 
 `OiPaginationThemeData.distributed` places the range, page buttons, and page-size
 control in three aligned areas when space permits; compact widths still wrap.
