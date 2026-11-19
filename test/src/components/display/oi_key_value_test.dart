@@ -61,6 +61,28 @@ void main() {
     expect(tapped, isTrue);
   });
 
+  testWidgets('trailing control stays reachable in a tappable row', (
+    tester,
+  ) async {
+    final handle = tester.ensureSemantics();
+    await tester.pumpObers(
+      OiKeyValue(
+        label: 'Role',
+        value: 'Admin',
+        onTap: () {},
+        trailing: OiIconButton(
+          icon: OiIcons.pencil,
+          semanticLabel: 'Edit',
+          onTap: () {},
+        ),
+      ),
+    );
+
+    expect(find.bySemanticsLabel('Edit'), findsOneWidget);
+    expect(find.bySemanticsLabel(RegExp('Role: Admin')), findsOneWidget);
+    handle.dispose();
+  });
+
   // ── Value widget ──────────────────────────────────────────────────────────
 
   testWidgets('valueWidget overrides text value', (tester) async {

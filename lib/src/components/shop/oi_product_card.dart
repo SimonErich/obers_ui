@@ -427,9 +427,8 @@ class OiProductCard extends StatelessWidget {
     final sp = context.spacing;
     final breakpoint = context.breakpoint;
 
-    return OiTappable(
+    final row = OiTappable(
       onTap: onTap,
-      semanticLabel: label,
       child: Padding(
         padding: EdgeInsets.symmetric(vertical: sp.xs, horizontal: sp.sm),
         child: OiRow(
@@ -453,6 +452,11 @@ class OiProductCard extends StatelessWidget {
         ),
       ),
     );
+
+    // The label goes on a Semantics wrapper, not on the tappable: a
+    // tappable's semanticLabel replaces everything its child announces,
+    // which would hide the product details and the Add button.
+    return Semantics(label: label, child: row);
   }
 
   // ── Build ─────────────────────────────────────────────────────────────────

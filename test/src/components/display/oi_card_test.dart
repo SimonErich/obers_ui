@@ -2,6 +2,7 @@
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:obers_ui/src/components/buttons/oi_button.dart';
 import 'package:obers_ui/src/components/display/oi_badge.dart';
 import 'package:obers_ui/src/components/display/oi_card.dart';
 import 'package:obers_ui/src/foundation/theme/oi_decoration_theme.dart';
@@ -148,12 +149,33 @@ void main() {
       expect(tapped, isTrue);
     });
 
-    testWidgets('label is set as semanticLabel on OiTappable', (tester) async {
+    testWidgets('label is announced with the card content', (tester) async {
+      final handle = tester.ensureSemantics();
       await tester.pumpObers(
         OiCard(onTap: () {}, label: 'My Card', child: const Text('content')),
       );
-      final tappable = tester.widget<OiTappable>(find.byType(OiTappable));
-      expect(tappable.semanticLabel, equals('My Card'));
+      final node = tester.getSemantics(find.text('content'));
+      expect(node.label, 'My Card\ncontent');
+      expect(node, isSemantics(isButton: true, hasTapAction: true));
+      handle.dispose();
+    });
+
+    testWidgets('a control inside a labelled tappable card stays reachable', (
+      tester,
+    ) async {
+      final handle = tester.ensureSemantics();
+      await tester.pumpObers(
+        OiCard(
+          onTap: () {},
+          label: 'My Card',
+          child: OiButton.primary(label: 'Buy', onTap: () {}),
+        ),
+      );
+      expect(
+        tester.getSemantics(find.text('Buy')),
+        isSemantics(label: 'Buy', isButton: true, hasTapAction: true),
+      );
+      handle.dispose();
     });
 
     testWidgets('assert triggers when onTap provided without label', (

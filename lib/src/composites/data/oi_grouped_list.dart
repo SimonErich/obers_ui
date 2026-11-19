@@ -368,10 +368,15 @@ class _OiGroupedListState<T> extends State<OiGroupedList<T>>
     }
 
     if (widget.collapsible) {
-      header = OiTappable(
-        onTap: () => _controller.toggleGroup(key),
-        semanticLabel: collapsed ? 'Expand $key' : 'Collapse $key',
-        child: header,
+      // The label goes on a Semantics wrapper, not on the tappable: a
+      // tappable's semanticLabel replaces everything its child announces,
+      // which would hide a custom header and its controls.
+      header = Semantics(
+        label: collapsed ? 'Expand $key' : 'Collapse $key',
+        child: OiTappable(
+          onTap: () => _controller.toggleGroup(key),
+          child: header,
+        ),
       );
     }
 

@@ -88,6 +88,15 @@ void main() {
     );
   }
 
+  testWidgets('a version card announces its changes', (tester) async {
+    final handle = tester.ensureSemantics();
+    await tester.pumpObers(buildWidget(), surfaceSize: const Size(800, 900));
+
+    expect(find.bySemanticsLabel(RegExp('Version 2.1.0')), findsWidgets);
+    expect(find.bySemanticsLabel(RegExp('Dark mode support')), findsWidgets);
+    handle.dispose();
+  });
+
   testWidgets('renders version numbers', (tester) async {
     await tester.pumpObers(buildWidget());
     await tester.pumpAndSettle();
