@@ -27,8 +27,12 @@ class OiLinearScale extends OiChartScale<double> {
 
   /// Creates an [OiLinearScale] from a list of [values].
   ///
-  /// The domain is set to the extent of [values]. When [nice] is true,
-  /// the domain bounds are rounded to human-friendly numbers.
+  /// The domain is set to the extent of the finite [values]; NaN and
+  /// infinite entries are ignored. When [nice] is true, the domain bounds
+  /// are rounded to human-friendly numbers.
+  ///
+  /// A single distinct value is padded by 10 % of its magnitude on each
+  /// side (±1 for zero) so the domain is never degenerate.
   factory OiLinearScale.fromData({
     required List<double> values,
     required double rangeMin,
@@ -36,7 +40,15 @@ class OiLinearScale extends OiChartScale<double> {
     bool clamp = false,
     bool nice = true,
   }) {
-    if (values.isEmpty) {
+    var lo = double.infinity;
+    var hi = double.negativeInfinity;
+    for (final v in values) {
+      if (!v.isFinite) continue;
+      if (v < lo) lo = v;
+      if (v > hi) hi = v;
+    }
+    if (lo > hi) {
+      // No finite values.
       return OiLinearScale(
         domainMin: 0,
         domainMax: 1,
@@ -45,15 +57,10 @@ class OiLinearScale extends OiChartScale<double> {
         clamp: clamp,
       );
     }
-    var lo = values.first;
-    var hi = values.first;
-    for (final v in values) {
-      if (v < lo) lo = v;
-      if (v > hi) hi = v;
-    }
     if (lo == hi) {
-      lo = lo - 1;
-      hi = hi + 1;
+      final padding = lo == 0 ? 1.0 : lo.abs() * 0.1;
+      lo = lo - padding;
+      hi = hi + padding;
     }
     if (nice) {
       final niced = _niceExtent(lo, hi);
@@ -105,6 +112,7 @@ class OiLinearScale extends OiChartScale<double> {
   @override
   List<OiTick<double>> buildTicks({int count = 5}) {
     if (count < 1) return const [];
+    if (!domainMin.isFinite || !domainMax.isFinite) return const [];
     if (count == 1) {
       final mid = (domainMin + domainMax) / 2;
       return [OiTick(value: mid, position: toPixel(mid))];
@@ -169,7 +177,7 @@ class OiLinearScale extends OiChartScale<double> {
       Object.hashAll([domainMin, domainMax, rangeMin, rangeMax, clamp, nice]);
 
   static double _niceStep(double roughStep) {
-    if (roughStep <= 0) return 1;
+    if (!roughStep.isFinite || roughStep <= 0) return 1;
     final exp = (math.log(roughStep) / math.ln10).floor();
     final frac = roughStep / math.pow(10, exp);
     double niceFrac;

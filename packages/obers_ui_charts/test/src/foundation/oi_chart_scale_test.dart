@@ -106,15 +106,15 @@ void main() {
       expect(s.domainMax, 1);
     });
 
-    test('fromData with single value expands domain by ±1', () {
+    test('fromData with single value expands domain by 10 %', () {
       final s = OiLinearScale.fromData(
         values: const [5.0],
         rangeMin: 0,
         rangeMax: 100,
         nice: false,
       );
-      expect(s.domainMin, 4);
-      expect(s.domainMax, 6);
+      expect(s.domainMin, 4.5);
+      expect(s.domainMax, 5.5);
     });
 
     test('inverted range (rangeMax < rangeMin) maps correctly', () {
@@ -156,9 +156,9 @@ void main() {
       expect(scale.fromPixel(300), closeTo(1000, 0.001));
     });
 
-    test('toPixel with non-positive value returns rangeMin', () {
-      expect(scale.toPixel(0), scale.rangeMin);
-      expect(scale.toPixel(-1), scale.rangeMin);
+    test('toPixel with non-positive value returns NaN', () {
+      expect(scale.toPixel(0), isNaN);
+      expect(scale.toPixel(-1), isNaN);
     });
 
     test('buildTicks generates one tick per power of base', () {
