@@ -145,6 +145,7 @@ class _OiPolarChartState<T> extends State<OiPolarChart<T>>
   @override
   void didUpdateWidget(covariant OiPolarChart<T> oldWidget) {
     super.didUpdateWidget(oldWidget);
+    syncStreamingAdapters();
     if (oldWidget.behaviors != widget.behaviors ||
         oldWidget.controller != widget.controller) {
       attachBehaviors();

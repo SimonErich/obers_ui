@@ -7,6 +7,7 @@ import 'package:obers_ui_charts/obers_ui_charts.dart'
 import 'package:obers_ui_charts/src/components/oi_chart_empty_state.dart';
 import 'package:obers_ui_charts/src/components/oi_chart_error_state.dart';
 import 'package:obers_ui_charts/src/components/oi_chart_loading_state.dart';
+import 'package:obers_ui_charts/src/composites/_cartesian_hit_tester.dart';
 import 'package:obers_ui_charts/src/composites/_chart_behavior_host.dart';
 import 'package:obers_ui_charts/src/composites/_chart_streaming_host.dart';
 import 'package:obers_ui_charts/src/composites/oi_chart_axis.dart';
@@ -91,6 +92,14 @@ class OiCartesianChart<T> extends StatefulWidget {
   ///
   /// Receives the current [OiChartViewport] and the resolved series list.
   /// If null, the chart renders only its frame (axes, grid, surface).
+  ///
+  /// Behaviors that resolve a pointer position to a data point (such as a
+  /// crosshair that snaps to the nearest point) assume the usual cartesian
+  /// layout: x and y are mapped linearly from the data extent, or from the
+  /// bounds set on [xAxis] and the first of [yAxes], onto
+  /// [OiChartViewport.plotBounds], and category x values sit at the centre
+  /// of equal bands. A builder that draws its points elsewhere will not
+  /// line up with them.
   final Widget Function(
     BuildContext context,
     OiChartViewport viewport,
@@ -157,8 +166,6 @@ class _OiCartesianChartState<T> extends State<OiCartesianChart<T>>
   OiChartViewport _viewport = const OiChartViewport(size: Size.zero);
 
   /// Cached normalized data from the last build, keyed by series id.
-  // Cached for future use by seriesBuilder once the API is exposed.
-  // ignore: unused_field
   Map<String, List<OiChartDatum>> _lastNormalizedData = const {};
 
   // ── ChartBehaviorHost overrides ──────────────────────────────────────
@@ -175,7 +182,7 @@ class _OiCartesianChartState<T> extends State<OiCartesianChart<T>>
   @override
   OiChartHitTester get hitTester => _hitTester;
 
-  final OiChartHitTester _hitTester = NoOpHitTester();
+  final OiCartesianChartHitTester _hitTester = OiCartesianChartHitTester();
 
   // ── ChartStreamingHost overrides ───────────────────────────────────
 
@@ -199,6 +206,7 @@ class _OiCartesianChartState<T> extends State<OiCartesianChart<T>>
   @override
   void didUpdateWidget(covariant OiCartesianChart<T> oldWidget) {
     super.didUpdateWidget(oldWidget);
+    syncStreamingAdapters();
     if (oldWidget.behaviors != widget.behaviors ||
         oldWidget.controller != widget.controller) {
       attachBehaviors();
@@ -396,6 +404,19 @@ class _OiCartesianChartState<T> extends State<OiCartesianChart<T>>
 
           // Normalize series data through the foundation pipeline.
           _lastNormalizedData = _applyDecimation(_normalizeVisibleSeries());
+
+          // Keep the hit tester in step with what is on screen. Behaviors
+          // hold on to it, so it is updated in place.
+          final yAxis = widget.yAxes?.firstOrNull;
+          _hitTester.update(
+            data: _lastNormalizedData,
+            seriesIds: [for (final s in widget.series) s.id],
+            viewport: _viewport,
+            xMin: widget.xAxis?.min,
+            xMax: widget.xAxis?.max,
+            yMin: yAxis?.min,
+            yMax: yAxis?.max,
+          );
 
           // Attach behaviors and sync now that we have a valid context.
           if (behaviors.isNotEmpty && behaviors.any((b) => !b.isAttached)) {

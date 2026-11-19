@@ -128,6 +128,16 @@ abstract class OiChartController extends ChangeNotifier {
   /// Toggles the visibility of the series with the given [seriesId].
   void toggleSeries(String seriesId);
 
+  /// Shows or hides the series with the given [seriesId].
+  ///
+  /// Unlike [toggleSeries] this is idempotent: asking for the state the
+  /// series is already in changes nothing and notifies no one. Use it to
+  /// apply a known target state, for example when restoring persisted
+  /// settings.
+  void setSeriesVisible(String seriesId, {required bool visible}) {
+    if (legendState.isVisible(seriesId) != visible) toggleSeries(seriesId);
+  }
+
   /// Sets exclusive focus on the series with the given [seriesId].
   ///
   /// If the series is already focused, clears the focus.

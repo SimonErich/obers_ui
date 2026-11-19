@@ -146,6 +146,7 @@ class _OiMatrixChartState<T> extends State<OiMatrixChart<T>>
   @override
   void didUpdateWidget(covariant OiMatrixChart<T> oldWidget) {
     super.didUpdateWidget(oldWidget);
+    syncStreamingAdapters();
     if (oldWidget.behaviors != widget.behaviors ||
         oldWidget.controller != widget.controller) {
       attachBehaviors();

@@ -137,6 +137,28 @@ void main() {
         expect(notifyCount, 2);
       });
 
+      test('setSeriesVisible is idempotent', () {
+        var notifyCount = 0;
+        controller
+          ..addListener(() => notifyCount++)
+          ..setSeriesVisible('series-1', visible: false);
+        expect(controller.legendState.isVisible('series-1'), isFalse);
+        expect(notifyCount, 1);
+
+        // Hiding a hidden series changes nothing.
+        controller.setSeriesVisible('series-1', visible: false);
+        expect(controller.legendState.isVisible('series-1'), isFalse);
+        expect(notifyCount, 1);
+
+        controller.setSeriesVisible('series-1', visible: true);
+        expect(controller.legendState.isVisible('series-1'), isTrue);
+        expect(notifyCount, 2);
+
+        // Showing a visible series changes nothing.
+        controller.setSeriesVisible('series-1', visible: true);
+        expect(notifyCount, 2);
+      });
+
       test('focusSeries toggles focus', () {
         var notifyCount = 0;
         controller
