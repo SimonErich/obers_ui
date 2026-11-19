@@ -5,6 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui/src/composites/scheduling/oi_gantt.dart';
 import 'package:obers_ui/src/foundation/persistence/drivers/oi_in_memory_driver.dart';
 import 'package:obers_ui/src/foundation/persistence/oi_settings_provider.dart';
+import 'package:obers_ui/src/foundation/theme/oi_theme_data.dart';
 import 'package:obers_ui/src/models/settings/oi_gantt_settings.dart';
 
 import '../../../helpers/pump_app.dart';
@@ -434,6 +435,145 @@ void main() {
       await tester.pump(const Duration(milliseconds: 600));
     },
   );
+
+  group('scroll restore with tasks that arrive later', () {
+    // Without tasks the view is one week: 280px, nothing to scroll.
+    Widget gantt(OiInMemorySettingsDriver driver, List<OiGanttTask> tasks) {
+      return OiGantt(
+        tasks: tasks,
+        label: 'Gantt',
+        zoom: OiGanttZoom.day,
+        showToday: false,
+        viewStart: DateTime(2025, 6),
+        viewEnd: tasks.isEmpty ? DateTime(2025, 6, 8) : null,
+        settingsDriver: driver,
+      );
+    }
+
+    Future<OiInMemorySettingsDriver> driverWith(double scrollPosition) async {
+      final driver = OiInMemorySettingsDriver();
+      await driver.save<OiGanttSettings>(
+        namespace: 'oi_gantt',
+        data: OiGanttSettings(scrollPosition: scrollPosition),
+        serialize: (settings) => settings.toJson(),
+      );
+      return driver;
+    }
+
+    testWidgets('the position is restored once the timeline is long enough', (
+      tester,
+    ) async {
+      final driver = await driverWith(500);
+
+      await tester.pumpObers(gantt(driver, const []));
+      await tester.pumpAndSettle();
+      expect(_horizontalOffsets(tester), [0, 0]);
+
+      await tester.pumpObers(gantt(driver, _tasks));
+      await tester.pumpAndSettle();
+      expect(_horizontalOffsets(tester), [500, 500]);
+
+      await tester.pump(const Duration(milliseconds: 600));
+    });
+
+    testWidgets('waiting for the timeline does not overwrite the saved value', (
+      tester,
+    ) async {
+      final driver = await driverWith(500);
+
+      await tester.pumpObers(gantt(driver, const []));
+      await tester.pumpAndSettle();
+      await tester.pump(const Duration(milliseconds: 600));
+
+      final saved = await driver.load<OiGanttSettings>(
+        namespace: 'oi_gantt',
+        deserialize: OiGanttSettings.fromJson,
+      );
+      expect(saved?.scrollPosition, 500);
+    });
+
+    testWidgets('a scroll by the user cancels the pending restore', (
+      tester,
+    ) async {
+      final driver = await driverWith(500);
+      // 20 days at 40px = 800 wide in a 640 wide viewport: 500 does not fit.
+      final shortTasks = [
+        OiGanttTask(
+          key: 't1',
+          label: 'Design',
+          start: DateTime(2025, 6),
+          end: DateTime(2025, 6, 21),
+        ),
+      ];
+
+      await tester.pumpObers(gantt(driver, shortTasks));
+      await tester.pumpAndSettle();
+      // As far as the short timeline goes, still waiting for the rest.
+      expect(_horizontalOffsets(tester), [160, 160]);
+
+      await tester.drag(
+        find.byKey(const ValueKey('gantt_task_t1')),
+        const Offset(100, 0),
+      );
+      await tester.pumpAndSettle();
+      final userOffset = _horizontalOffsets(tester).last;
+      expect(userOffset, lessThan(160));
+
+      await tester.pumpObers(gantt(driver, _tasks));
+      await tester.pumpAndSettle();
+      expect(_horizontalOffsets(tester), [userOffset, userOffset]);
+
+      await tester.pump(const Duration(milliseconds: 600));
+    });
+  });
+
+  testWidgets('painters repaint when anything they draw changes', (
+    tester,
+  ) async {
+    List<CustomPainter> painters() => [
+      for (final paint in tester.widgetList<CustomPaint>(
+        find.descendant(
+          of: find.byType(OiGantt),
+          matching: find.byType(CustomPaint),
+        ),
+      ))
+        if (paint.painter != null) paint.painter!,
+    ];
+
+    await tester.pumpObers(_gantt());
+    final light = painters();
+    expect(light, hasLength(3));
+
+    // Same data, same theme: nothing to repaint.
+    await tester.pumpObers(_gantt(label: 'Renamed'));
+    final same = painters();
+    for (var i = 0; i < 3; i++) {
+      expect(same[i].shouldRepaint(light[i]), isFalse, reason: '${same[i]}');
+    }
+
+    // Every painter draws with theme colours.
+    await tester.pumpObers(_gantt(), theme: OiThemeData.dark());
+    final dark = painters();
+    for (var i = 0; i < 3; i++) {
+      expect(dark[i].shouldRepaint(light[i]), isTrue, reason: '${dark[i]}');
+    }
+
+    // Grouping moves the rows the dependency arrows connect.
+    await tester.pumpObers(
+      _gantt(groupBy: (task) => task.key == 't1' ? 'A' : 'B'),
+      theme: OiThemeData.dark(),
+    );
+    final grouped = painters();
+    expect(
+      grouped
+          .where((p) => '$p'.contains('Dependency'))
+          .single
+          .shouldRepaint(
+            dark.where((p) => '$p'.contains('Dependency')).single,
+          ),
+      isTrue,
+    );
+  });
 
   testWidgets('a saved scroll position beyond the timeline is clamped', (
     tester,

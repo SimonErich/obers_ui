@@ -97,13 +97,18 @@ class OiCalendarUtils {
     return woy;
   }
 
-  /// Returns the local midnight of the calendar date [days] after [date]
-  /// (before it when [days] is negative).
+  /// Returns the start of the calendar date [days] after [date] (before it
+  /// when [days] is negative), in local time.
   ///
   /// A day is a calendar date, not 24 hours: adding `Duration(days: n)` to a
   /// local midnight lands on 23:00 or 01:00 once the range crosses a
   /// daylight-saving change, which repeats or skips a date. Any time of day
   /// on [date] is dropped.
+  ///
+  /// The result is midnight, except in the few zones that change their
+  /// clocks at midnight: there the day in question has no 00:00 and starts
+  /// at 01:00. Read its date from `year`, `month` and `day` and do not rely
+  /// on `hour` being 0; [daysBetween] only looks at the date.
   static DateTime addDays(DateTime date, int days) {
     return DateTime(date.year, date.month, date.day + days);
   }
@@ -126,8 +131,11 @@ class OiCalendarUtils {
   /// midnight.
   ///
   /// The whole days come from [daysBetween] and the fraction from the
-  /// wall-clock time, so a daylight-saving change in between never shifts
-  /// the result by a day.
+  /// wall-clock time of each value (its `hour`, `minute`, ... fields, local
+  /// or UTC as given), so a daylight-saving change in between never shifts
+  /// the result by a day. To measure from the start of a day, pass a [from]
+  /// whose time of day is zero; a UTC date such as `DateTime.utc(y, m, d)`
+  /// always is, a local one is not where the clocks skip midnight.
   static double fractionalDaysBetween(DateTime from, DateTime to) {
     return daysBetween(from, to) + _dayFraction(to) - _dayFraction(from);
   }

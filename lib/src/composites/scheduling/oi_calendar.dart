@@ -190,6 +190,13 @@ class _OiCalendarState extends State<OiCalendar>
   late DateTime _focusDate;
   late OiCalendarMode _mode;
 
+  /// Whether the settings of the initial load have been taken over.
+  bool _initialSettingsAdopted = false;
+
+  /// Whether the user or the parent set the mode after the running settings
+  /// load started; such a mode outranks the loaded one.
+  bool _modeSetSinceLoadStarted = false;
+
   /// Resolved driver: explicit widget prop → OiSettingsProvider → null.
   OiSettingsDriver? _resolvedDriver;
 
@@ -234,7 +241,13 @@ class _OiCalendarState extends State<OiCalendar>
   @override
   void didUpdateWidget(OiCalendar oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.mode != oldWidget.mode) _mode = widget.mode;
+    if (widget.mode != oldWidget.mode) {
+      // Stored like a pick by the user, or the saved mode would come back
+      // with the next settings load.
+      _mode = widget.mode;
+      _modeSetSinceLoadStarted = true;
+      updateSettings(_toSettings(), debounce: widget.settingsSaveDebounce);
+    }
     final oldDate = oldWidget.initialDate;
     final newDate = widget.initialDate;
     final sameDate = oldDate == null || newDate == null
@@ -250,12 +263,32 @@ class _OiCalendarState extends State<OiCalendar>
     if (newDriver != _resolvedDriver) {
       _resolvedDriver = newDriver;
       if (settingsLoaded) {
-        unawaited(reloadSettings());
+        _modeSetSinceLoadStarted = false;
+        unawaited(
+          reloadSettings().then((_) {
+            if (mounted) setState(_adoptLoadedSettings);
+          }),
+        );
       }
     }
-    if (settingsLoaded && settingsDriver != null) {
+  }
+
+  /// Takes over the mode of settings that have just been loaded.
+  ///
+  /// Runs once per load and never on a plain dependency change (a theme
+  /// switch, say), which would undo a mode set since. A mode that the user
+  /// or the parent chose while the load was running wins and is saved
+  /// instead.
+  void _adoptLoadedSettings() {
+    if (settingsDriver == null) return;
+    if (!_modeSetSinceLoadStarted) {
       _applySettings(currentSettings);
+      return;
     }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      updateSettings(_toSettings(), debounce: widget.settingsSaveDebounce);
+    });
   }
 
   void _applySettings(OiCalendarSettings settings) {
@@ -312,6 +345,7 @@ class _OiCalendarState extends State<OiCalendar>
 
   void _setMode(OiCalendarMode mode) {
     setState(() => _mode = mode);
+    _modeSetSinceLoadStarted = true;
     updateSettings(_toSettings(), debounce: widget.settingsSaveDebounce);
   }
 
@@ -406,6 +440,25 @@ class _OiCalendarState extends State<OiCalendar>
     }).toList();
   }
 
+  /// The start of the hour cell [hour] on the day of [date], or `null` when
+  /// the clocks skip that hour on that day (a daylight-saving change).
+  ///
+  /// `DateTime` moves a skipped hour on to the next one, so without this the
+  /// row of the skipped hour would repeat the cell below it.
+  DateTime? _hourCellStart(DateTime date, int hour) {
+    final start = DateTime(date.year, date.month, date.day, hour);
+    return start.hour == hour ? start : null;
+  }
+
+  /// The timed (not all-day) events in the hour cell starting at
+  /// [cellStart]; none for a skipped hour.
+  List<OiCalendarEvent> _timedEventsIn(DateTime? cellStart) {
+    if (cellStart == null) return const [];
+    return widget.events
+        .where((e) => !e.allDay && _occupiesHour(e, cellStart))
+        .toList();
+  }
+
   /// Whether [event] takes up any part of the hour that starts at
   /// [cellStart]: its time range overlaps `[cellStart, cellStart + 1h)`.
   ///
@@ -427,6 +480,13 @@ class _OiCalendarState extends State<OiCalendar>
 
   @override
   Widget build(BuildContext context) {
+    // The first load finishes after initState; this is the first build that
+    // sees its result.
+    if (settingsLoaded && !_initialSettingsAdopted) {
+      _initialSettingsAdopted = true;
+      _adoptLoadedSettings();
+    }
+
     final sp = context.spacing;
     final allDayEvents = widget.showAllDayRow
         ? _visibleAllDayEvents()
@@ -695,11 +755,12 @@ class _OiCalendarState extends State<OiCalendar>
   /// [target] when moves are enabled; [builder] receives whether a drag is
   /// hovering so the cell can highlight.
   Widget _eventDropTarget({
-    required DateTime target,
+    required DateTime? target,
     required bool preserveTimeOfDay,
     required Widget Function({required bool hovering}) builder,
   }) {
-    if (!_canMoveEvents) return builder(hovering: false);
+    // No target: the cell of an hour the clocks skip takes no drops.
+    if (!_canMoveEvents || target == null) return builder(hovering: false);
     return DragTarget<OiCalendarEvent>(
       onAcceptWithDetails: (details) => _moveEvent(
         details.data,
@@ -868,17 +929,15 @@ class _OiCalendarState extends State<OiCalendar>
 
   Widget _buildWeekCell(BuildContext context, DateTime date, int hour) {
     final colors = context.colors;
-    final cellTime = DateTime(date.year, date.month, date.day, hour);
-    final dayEvents = widget.events
-        .where((e) => !e.allDay && _occupiesHour(e, cellTime))
-        .toList();
+    final cellTime = _hourCellStart(date, hour);
+    final dayEvents = _timedEventsIn(cellTime);
 
     return _eventDropTarget(
       target: cellTime,
       preserveTimeOfDay: false,
       builder: ({required hovering}) => GestureDetector(
         behavior: HitTestBehavior.opaque,
-        onTap: widget.onDateTap != null
+        onTap: widget.onDateTap != null && cellTime != null
             ? () => widget.onDateTap!(cellTime)
             : null,
         child: Container(
@@ -935,22 +994,15 @@ class _OiCalendarState extends State<OiCalendar>
     return ListView.builder(
       itemCount: 24,
       itemBuilder: (context, hour) {
-        final cellTime = DateTime(
-          _focusDate.year,
-          _focusDate.month,
-          _focusDate.day,
-          hour,
-        );
-        final hourEvents = widget.events
-            .where((e) => !e.allDay && _occupiesHour(e, cellTime))
-            .toList();
+        final cellTime = _hourCellStart(_focusDate, hour);
+        final hourEvents = _timedEventsIn(cellTime);
 
         return _eventDropTarget(
           target: cellTime,
           preserveTimeOfDay: false,
           builder: ({required hovering}) => GestureDetector(
             behavior: HitTestBehavior.opaque,
-            onTap: widget.onDateTap != null
+            onTap: widget.onDateTap != null && cellTime != null
                 ? () => widget.onDateTap!(cellTime)
                 : null,
             child: Container(

@@ -4,13 +4,16 @@
 //
 // A widget test only meets a daylight-saving change when the process runs in
 // a zone that has one, so this file is written to pass in any zone and is run
-// twice, here and in CI:
+// under several (CI runs the New York one in addition to its own UTC):
 //
 //   TZ=UTC flutter test test/src/composites/scheduling/scheduling_dst_test.dart
 //   TZ=America/New_York flutter test test/src/composites/scheduling/scheduling_dst_test.dart
+//   TZ=America/Santiago flutter test test/src/composites/scheduling/scheduling_dst_test.dart
+//   TZ=Europe/Berlin flutter test test/src/composites/scheduling/scheduling_dst_test.dart
 //
 // In New York, 8 March 2026 is the spring-forward day (23 hours long) and
-// 1 November 2026 is the fall-back day (25 hours long).
+// 1 November 2026 is the fall-back day (25 hours long). In Santiago the
+// clocks skip midnight on 6 September 2026, so that day starts at 01:00.
 
 import 'dart:io' show Platform;
 
@@ -46,63 +49,147 @@ List<int> _gridDayNumbers(WidgetTester tester) => [
     if (int.tryParse(text.data ?? '') case final int day) day,
 ];
 
+/// Matches a list of [DateTime]s that are the first moment of each of
+/// [dates] (year, month, day): on that date, and with no earlier moment of
+/// the same date. That moment is midnight unless the zone skips it.
+Matcher _startsOfDays(List<(int, int, int)> dates) {
+  return predicate<List<DateTime>>((days) {
+    if (days.length != dates.length) return false;
+    for (var i = 0; i < days.length; i++) {
+      final day = days[i];
+      final (year, month, date) = dates[i];
+      if (day.isUtc) return false;
+      if (day.year != year || day.month != month || day.day != date) {
+        return false;
+      }
+      final justBefore = day.subtract(const Duration(microseconds: 1));
+      if (justBefore.day == date) return false;
+    }
+    return true;
+  }, 'the first moments of $dates');
+}
+
+/// The first wall-clock hour of 2026 that does not exist in this zone, as
+/// (year, month, day, hour); null when the zone skips none.
+(int, int, int, int)? _firstSkippedHour() {
+  for (var dayOfYear = 0; dayOfYear < 365; dayOfYear++) {
+    final date = DateTime.utc(2026, 1, 1 + dayOfYear);
+    for (var hour = 0; hour < 24; hour++) {
+      final local = DateTime(date.year, date.month, date.day, hour);
+      if (local.hour != hour) return (date.year, date.month, date.day, hour);
+    }
+  }
+  return null;
+}
+
+/// The horizontal scroll views of an [OiGantt]: its header, then its body.
+Finder _ganttTimeline() => find.byWidgetPredicate(
+  (widget) =>
+      widget is SingleChildScrollView &&
+      widget.scrollDirection == Axis.horizontal,
+);
+
+/// The width of the timeline of an [OiGantt].
+double _timelineWidth(WidgetTester tester) {
+  final view = tester.widget<SingleChildScrollView>(_ganttTimeline().first);
+  return (view.child! as SizedBox).width!;
+}
+
 void main() {
   group('time zone', () {
-    test('the New York run really has the 2026 transitions', () {
-      if (Platform.environment['TZ'] != 'America/New_York') return;
-      // Guards against a runner that ignores TZ: without the transitions the
-      // rest of this file would pass without testing anything.
-      expect(
-        DateTime(2026, 3, 9).difference(DateTime(2026, 3, 8)).inHours,
-        23,
-        reason: '8 Mar 2026 is spring-forward in New York',
-      );
-      expect(
-        DateTime(2026, 11, 2).difference(DateTime(2026, 11)).inHours,
-        25,
-        reason: '1 Nov 2026 is fall-back in New York',
-      );
-    });
+    // Whether the zone this process runs in changes its UTC offset in 2026.
+    // Found from DateTime itself, so it holds for any zone and any way of
+    // selecting it.
+    final offsets = {
+      for (var month = 1; month <= 12; month++)
+        DateTime(2026, month, 15).timeZoneOffset,
+    };
+    final hasTransition = offsets.length > 1;
+    final wantsNewYork = Platform.environment['TZ'] == 'America/New_York';
+
+    test(
+      'this run crosses a daylight-saving change',
+      () {
+        // Without a transition the rest of this file passes without testing
+        // the cases it is here for.
+        expect(hasTransition, isTrue, reason: 'TZ is set but not honoured');
+        if (!wantsNewYork) return;
+        expect(
+          DateTime(2026, 3, 9).difference(DateTime(2026, 3, 8)).inHours,
+          23,
+          reason: '8 Mar 2026 is spring-forward in New York',
+        );
+        expect(
+          DateTime(2026, 11, 2).difference(DateTime(2026, 11)).inHours,
+          25,
+          reason: '1 Nov 2026 is fall-back in New York',
+        );
+      },
+      // A New York run without transitions must fail, not skip.
+      skip: hasTransition || wantsNewYork
+          ? false
+          : 'zone ${DateTime.now().timeZoneName} has no 2026 daylight-saving '
+                'change; the tests below only cover plain dates here',
+    );
   });
 
   group('OiCalendarUtils.addDays', () {
     test('steps over the fall-back day one date at a time', () {
       final start = DateTime(2026, 10, 26);
-      final days = [
-        for (var n = 0; n < 14; n++) OiCalendarUtils.addDays(start, n),
-      ];
-
-      expect(days.map((d) => d.day), [
-        26,
-        27,
-        28,
-        29,
-        30,
-        31,
-        1,
-        2,
-        3,
-        4,
-        5,
-        6,
-        7,
-        8,
-      ]);
-      for (final day in days) {
-        expect(day, DateTime(day.year, day.month, day.day), reason: '$day');
-      }
+      expect(
+        [for (var n = 0; n < 14; n++) OiCalendarUtils.addDays(start, n)],
+        _startsOfDays(const [
+          (2026, 10, 26),
+          (2026, 10, 27),
+          (2026, 10, 28),
+          (2026, 10, 29),
+          (2026, 10, 30),
+          (2026, 10, 31),
+          (2026, 11, 1),
+          (2026, 11, 2),
+          (2026, 11, 3),
+          (2026, 11, 4),
+          (2026, 11, 5),
+          (2026, 11, 6),
+          (2026, 11, 7),
+          (2026, 11, 8),
+        ]),
+      );
     });
 
     test('steps over the spring-forward day one date at a time', () {
       final start = DateTime(2026, 3, 6);
-      final days = [
-        for (var n = 0; n < 6; n++) OiCalendarUtils.addDays(start, n),
-      ];
+      expect(
+        [for (var n = 0; n < 6; n++) OiCalendarUtils.addDays(start, n)],
+        _startsOfDays(const [
+          (2026, 3, 6),
+          (2026, 3, 7),
+          (2026, 3, 8),
+          (2026, 3, 9),
+          (2026, 3, 10),
+          (2026, 3, 11),
+        ]),
+      );
+    });
 
-      expect(days.map((d) => d.day), [6, 7, 8, 9, 10, 11]);
-      for (final day in days) {
-        expect(day, DateTime(day.year, day.month, day.day), reason: '$day');
-      }
+    test('steps over a day whose midnight is skipped (Santiago)', () {
+      // In Santiago the clocks go from 24:00 on 5 Sep 2026 straight to 01:00
+      // on the 6th, so that day has no midnight.
+      final start = DateTime(2026, 9, 4);
+      expect(
+        [for (var n = 0; n < 5; n++) OiCalendarUtils.addDays(start, n)],
+        _startsOfDays(const [
+          (2026, 9, 4),
+          (2026, 9, 5),
+          (2026, 9, 6),
+          (2026, 9, 7),
+          (2026, 9, 8),
+        ]),
+      );
+      expect(
+        OiCalendarUtils.addDays(DateTime(2026, 9, 7, 15), -1).day,
+        6,
+      );
     });
 
     test('steps backwards and drops the time of day', () {
@@ -291,9 +378,136 @@ void main() {
       await tester.pump();
       expect(find.text('2 November 2026'), findsOneWidget);
     });
+
+    group('an hour the clocks skip', () {
+      // The hour this zone skips in 2026 (02:00 on 8 Mar in New York, 00:00
+      // on 6 Sep in Santiago). Zones without one use an ordinary hour, which
+      // must then behave like any other.
+      final skipped = _firstSkippedHour();
+      final (year, month, day, hour) = skipped ?? (2026, 3, 8, 2);
+      final rowLabel = '${hour.toString().padLeft(2, '0')}:00';
+      final events = [
+        OiCalendarEvent(
+          key: 'after',
+          title: 'After the gap',
+          start: DateTime(year, month, day, hour + 1),
+          end: DateTime(year, month, day, hour + 2),
+        ),
+      ];
+
+      Widget calendar(OiCalendarMode mode, {ValueChanged<DateTime>? onTap}) {
+        return OiCalendar(
+          events: events,
+          label: 'Calendar',
+          mode: mode,
+          initialDate: DateTime(year, month, day, 12),
+          onDateTap: onTap,
+        );
+      }
+
+      testWidgets('shows the following event once in the day view', (
+        tester,
+      ) async {
+        await tester.pumpObers(calendar(OiCalendarMode.day));
+        expect(find.text('After the gap'), findsOneWidget);
+      });
+
+      testWidgets('shows the following event once in the week view', (
+        tester,
+      ) async {
+        await tester.pumpObers(calendar(OiCalendarMode.week));
+        expect(find.text('After the gap'), findsOneWidget);
+      });
+
+      testWidgets('does not report a tap as the hour after it', (tester) async {
+        DateTime? tapped;
+        await tester.pumpObers(
+          calendar(OiCalendarMode.day, onTap: (date) => tapped = date),
+        );
+
+        await tester.tap(find.text(rowLabel));
+        expect(
+          tapped,
+          skipped == null ? DateTime(year, month, day, hour) : isNull,
+        );
+      });
+    });
   });
 
   group('OiGantt', () {
+    Rect bar(WidgetTester tester, String key) =>
+        tester.getRect(find.byKey(ValueKey('gantt_task_$key')));
+
+    Widget gantt(List<OiGanttTask> tasks, {DateTime? viewStart}) {
+      return OiGantt(
+        label: 'Gantt',
+        zoom: OiGanttZoom.day,
+        showToday: false,
+        viewStart: viewStart,
+        tasks: tasks,
+      );
+    }
+
+    testWidgets('UTC dates use their own date and time, like the bars', (
+      tester,
+    ) async {
+      await tester.pumpObers(
+        gantt([
+          OiGanttTask(
+            key: 'a',
+            label: 'A',
+            start: DateTime.utc(2026, 1, 5),
+            end: DateTime.utc(2026, 1, 9, 3),
+          ),
+        ]),
+      );
+
+      // 5 Jan up to the end of 9 Jan, whatever the local zone is.
+      expect(_timelineWidth(tester), 5 * 40);
+      final rect = bar(tester, 'a');
+      expect(rect.left, tester.getTopLeft(_ganttTimeline().last).dx);
+      expect(rect.width, closeTo((4 + 3 / 24) * 40, 0.01));
+    });
+
+    testWidgets('a UTC midnight end does not add a day', (tester) async {
+      await tester.pumpObers(
+        gantt([
+          OiGanttTask(
+            key: 'a',
+            label: 'A',
+            start: DateTime.utc(2026, 1, 5),
+            end: DateTime.utc(2026, 1, 10),
+          ),
+        ]),
+      );
+
+      expect(_timelineWidth(tester), 5 * 40);
+      expect(bar(tester, 'a').width, 5 * 40);
+    });
+
+    testWidgets('columns start at the date line when midnight is skipped', (
+      tester,
+    ) async {
+      // In Santiago 6 Sep 2026 starts at 01:00.
+      await tester.pumpObers(
+        gantt(
+          [
+            OiGanttTask(
+              key: 'a',
+              label: 'A',
+              start: DateTime(2026, 9, 7),
+              end: DateTime(2026, 9, 9),
+            ),
+          ],
+          viewStart: DateTime(2026, 9, 6),
+        ),
+      );
+
+      final origin = tester.getTopLeft(_ganttTimeline().last).dx;
+      expect(bar(tester, 'a').left - origin, 40);
+      expect(_timelineWidth(tester), 3 * 40);
+    });
+
     testWidgets('a bar after spring-forward sits in its own column', (
       tester,
     ) async {

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math' as math;
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/foundation/persistence/oi_settings_driver.dart';
 import 'package:obers_ui/src/foundation/persistence/oi_settings_mixin.dart';
@@ -18,6 +19,10 @@ import 'package:obers_ui/src/utils/calendar_utils.dart';
 /// from 5 Jan 00:00 to 6 Jan 00:00 is one day long; one that should fill the
 /// 5th and the 6th ends on 7 Jan 00:00. The time of day counts, so a task
 /// from 09:00 to 17:00 on one day covers a third of that day's column.
+///
+/// Dates are placed by the date and time they show (their `year`, `month`,
+/// `day`, `hour`, ... fields), whether they are local or UTC values; nothing
+/// is converted between time zones.
 @immutable
 class OiGanttTask {
   /// Creates an [OiGanttTask].
@@ -186,6 +191,13 @@ class _OiGanttState extends State<OiGantt>
   /// Whether the settings of the initial load have been applied.
   bool _initialSettingsApplied = false;
 
+  /// The saved scroll position that still has to be reached, or `null` when
+  /// there is none, it has been reached, or the user scrolled first.
+  double? _pendingScrollRestore;
+
+  /// Whether the scroll in progress is a jump made by the restore.
+  bool _restoringScroll = false;
+
   /// Resolved driver: explicit widget prop → OiSettingsProvider → null.
   OiSettingsDriver? _resolvedDriver;
 
@@ -228,6 +240,11 @@ class _OiGanttState extends State<OiGantt>
 
   void _onBodyScroll() {
     _mirrorOffset(from: _bodyScroll, to: _headerScroll);
+    // The restore's own jumps are not a new position to save: until it is
+    // done the saved value is still the one to reach.
+    if (_restoringScroll) return;
+    // Any other scroll is the user's and ends the restore.
+    _pendingScrollRestore = null;
     updateSettings(_toSettings(), debounce: widget.settingsSaveDebounce);
   }
 
@@ -258,28 +275,50 @@ class _OiGanttState extends State<OiGantt>
         );
       }
     }
-    if (settingsLoaded && settingsDriver != null) {
-      _applySettings(currentSettings);
-    }
   }
 
-  /// Restores the saved scroll position once the timeline is laid out.
+  /// Starts restoring the scroll position of freshly loaded [settings].
   ///
-  /// Settings arrive before the scroll views exist or know how far they can
-  /// scroll, so the jump waits for the end of the frame.
+  /// Called once per settings load. The position cannot be applied here:
+  /// the scroll views may not exist yet, and the timeline may still be too
+  /// short for it (tasks that arrive after the first build). It is kept as
+  /// pending and retried after every build.
   void _applySettings(OiGanttSettings settings) {
     final target = settings.scrollPosition;
-    if (target <= 0) return;
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted || !_bodyScroll.hasClients) return;
-      final position = _bodyScroll.position;
-      if (!position.hasContentDimensions) return;
-      final offset = target.clamp(
-        position.minScrollExtent,
-        position.maxScrollExtent,
-      );
-      if (offset != position.pixels) _bodyScroll.jumpTo(offset);
-    });
+    _pendingScrollRestore = target > 0 ? target : null;
+    _scheduleScrollRestore();
+  }
+
+  /// Retries the pending restore once the current frame is laid out.
+  void _scheduleScrollRestore() {
+    if (_pendingScrollRestore == null) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) => _restoreScroll());
+  }
+
+  /// Scrolls towards the pending saved position.
+  ///
+  /// While the timeline is too short it goes as far as it can and stays
+  /// pending; it is done when the saved position is reached. A scroll by the
+  /// user ends it at any point (see [_onBodyScroll]).
+  void _restoreScroll() {
+    final target = _pendingScrollRestore;
+    if (target == null || !mounted || !_bodyScroll.hasClients) return;
+    final position = _bodyScroll.position;
+    if (!position.hasContentDimensions) return;
+
+    final offset = target.clamp(
+      position.minScrollExtent,
+      position.maxScrollExtent,
+    );
+    if (offset != position.pixels) {
+      _restoringScroll = true;
+      try {
+        _bodyScroll.jumpTo(offset);
+      } finally {
+        _restoringScroll = false;
+      }
+    }
+    if (offset == target) _pendingScrollRestore = null;
   }
 
   OiGanttSettings _toSettings() {
@@ -302,42 +341,46 @@ class _OiGanttState extends State<OiGantt>
   /// Walks all tasks, so [build] calls it once and hands the result down.
   _GanttViewport _resolveViewport() {
     final tasks = widget.tasks;
+    final now = _wallClock(DateTime.now());
 
-    var start = widget.viewStart;
+    var start = widget.viewStart == null ? null : _wallClock(widget.viewStart!);
     if (start == null) {
       for (final task in tasks) {
-        final taskStart = task.start;
+        final taskStart = _wallClock(task.start);
         if (start == null || taskStart.isBefore(start)) start = taskStart;
       }
     }
-    start = _dateOnly(start ?? DateTime.now());
+    final startDay = _dateOnly(start ?? now);
 
-    var end = widget.viewEnd;
+    var end = widget.viewEnd == null ? null : _wallClock(widget.viewEnd!);
     if (end == null) {
       for (final task in tasks) {
-        final taskEnd = task.end;
+        final taskEnd = _wallClock(task.end);
         if (end == null || taskEnd.isAfter(end)) end = taskEnd;
       }
     }
     // Ends are exclusive: a midnight closes the day before it, any later
     // time needs the rest of its day shown as well.
-    end = end == null
-        ? OiCalendarUtils.addDays(DateTime.now(), 30)
+    final endDay = end == null
+        ? DateTime.utc(now.year, now.month, now.day + 30)
         : _endOfLastDay(end);
 
     return _GanttViewport(
-      start: start,
+      start: startDay,
       // Always at least one column, e.g. for a single milestone at midnight.
-      totalDays: math.max(1, OiCalendarUtils.daysBetween(start, end)),
+      totalDays: math.max(1, OiCalendarUtils.daysBetween(startDay, endDay)),
       columnWidth: _columnWidth,
     );
   }
 
-  /// The midnight at which the last day containing time before [end] is
-  /// over: [end] itself when it is a midnight, else the following midnight.
+  /// The midnight at which the last day containing time before the
+  /// wall-clock value [end] is over: [end] itself when it is a midnight,
+  /// else the following midnight.
   DateTime _endOfLastDay(DateTime end) {
     final midnight = _dateOnly(end);
-    return end.isAfter(midnight) ? OiCalendarUtils.addDays(end, 1) : midnight;
+    return end.isAfter(midnight)
+        ? DateTime.utc(end.year, end.month, end.day + 1)
+        : midnight;
   }
 
   /// The width of each time column in logical pixels.
@@ -360,8 +403,27 @@ class _OiGanttState extends State<OiGantt>
   /// The width of the label column on the left.
   static const _labelColumnWidth = 160.0;
 
-  /// Strips time from a [DateTime].
-  DateTime _dateOnly(DateTime dt) => DateTime(dt.year, dt.month, dt.day);
+  /// The date and time [dt] shows (its year, month, day, hour, ... fields),
+  /// detached from any time zone.
+  ///
+  /// The chart places everything by these fields, for local and UTC values
+  /// alike, so the view range and the bars always agree. Carrying them in a
+  /// UTC value keeps comparisons and day steps free of daylight-saving
+  /// changes, including zones where a day has no midnight.
+  static DateTime _wallClock(DateTime dt) => DateTime.utc(
+    dt.year,
+    dt.month,
+    dt.day,
+    dt.hour,
+    dt.minute,
+    dt.second,
+    dt.millisecond,
+    dt.microsecond,
+  );
+
+  /// Midnight of the calendar date of [dt], as a [_wallClock] value.
+  static DateTime _dateOnly(DateTime dt) =>
+      DateTime.utc(dt.year, dt.month, dt.day);
 
   /// Ordered task list, optionally grouped.
   List<_GanttRow> get _rows {
@@ -397,6 +459,9 @@ class _OiGanttState extends State<OiGantt>
     if (settingsLoaded && !_initialSettingsApplied) {
       _initialSettingsApplied = true;
       _applySettings(currentSettings);
+    } else {
+      // The timeline may have grown with this build.
+      _scheduleScrollRestore();
     }
 
     return Semantics(
@@ -441,7 +506,6 @@ class _OiGanttState extends State<OiGantt>
                                     rows.length * _rowHeight,
                                   ),
                                   painter: _DependencyPainter(
-                                    tasks: widget.tasks,
                                     rows: rows,
                                     viewport: viewport,
                                     rowHeight: _rowHeight,
@@ -696,7 +760,9 @@ class _GanttViewport {
     required this.columnWidth,
   });
 
-  /// Local midnight of the first visible day.
+  /// Midnight of the first visible day, as a UTC value that only carries
+  /// the calendar date: every day has such a midnight, also where the local
+  /// clocks skip it.
   final DateTime start;
 
   /// The number of day columns.
@@ -708,11 +774,14 @@ class _GanttViewport {
   /// The width of all day columns.
   double get width => totalDays * columnWidth;
 
-  /// The date of the day column at [index].
-  DateTime dayAt(int index) => OiCalendarUtils.addDays(start, index);
+  /// The date of the day column at [index], in the same form as [start].
+  DateTime dayAt(int index) =>
+      DateTime.utc(start.year, start.month, start.day + index);
 
   /// The horizontal offset of [date] within the timeline, with the time of
   /// day as a fraction of its column.
+  ///
+  /// Uses the date and time [date] shows, whether it is local or UTC.
   double dateToX(DateTime date) =>
       OiCalendarUtils.fractionalDaysBetween(start, date) * columnWidth;
 
@@ -730,6 +799,7 @@ class _GanttViewport {
 // ── Row model ─────────────────────────────────────────────────────────────────
 
 /// Internal model for a row in the Gantt chart (either a task or a group header).
+@immutable
 class _GanttRow {
   const _GanttRow._({this.task, this.groupKey});
 
@@ -742,6 +812,25 @@ class _GanttRow {
   final OiGanttTask? task;
   final Object? groupKey;
   bool get isHeader => task == null;
+
+  /// Rows are equal when they would be drawn the same by the dependency
+  /// painter: the same header, or a task with the same key, dates and
+  /// dependencies. Rows are rebuilt on every build, so identity says nothing.
+  @override
+  bool operator ==(Object other) {
+    if (other is! _GanttRow || other.groupKey != groupKey) return false;
+    final a = task;
+    final b = other.task;
+    if (a == null || b == null) return a == b;
+    return identical(a, b) ||
+        (a.key == b.key &&
+            a.start == b.start &&
+            a.end == b.end &&
+            listEquals(a.dependsOn, b.dependsOn));
+  }
+
+  @override
+  int get hashCode => Object.hash(groupKey, task?.key);
 }
 
 // ── Dependency painter ────────────────────────────────────────────────────────
@@ -749,14 +838,12 @@ class _GanttRow {
 /// Paints dependency arrows between tasks.
 class _DependencyPainter extends CustomPainter {
   const _DependencyPainter({
-    required this.tasks,
     required this.rows,
     required this.viewport,
     required this.rowHeight,
     required this.arrowColor,
   });
 
-  final List<OiGanttTask> tasks;
   final List<_GanttRow> rows;
   final _GanttViewport viewport;
   final double rowHeight;
@@ -817,7 +904,10 @@ class _DependencyPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(_DependencyPainter oldDelegate) =>
-      oldDelegate.tasks != tasks || oldDelegate.viewport != viewport;
+      !listEquals(oldDelegate.rows, rows) ||
+      oldDelegate.viewport != viewport ||
+      oldDelegate.rowHeight != rowHeight ||
+      oldDelegate.arrowColor != arrowColor;
 }
 
 // ── Header painter ────────────────────────────────────────────────────────────
@@ -879,7 +969,10 @@ class _HeaderPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(_HeaderPainter oldDelegate) =>
-      oldDelegate.viewport != viewport || oldDelegate.zoom != zoom;
+      oldDelegate.viewport != viewport ||
+      oldDelegate.zoom != zoom ||
+      oldDelegate.textColor != textColor ||
+      oldDelegate.lineColor != lineColor;
 }
 
 // ── Weekend painter ───────────────────────────────────────────────────────────
@@ -910,5 +1003,6 @@ class _WeekendPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(_WeekendPainter oldDelegate) =>
-      oldDelegate.viewport != viewport;
+      oldDelegate.viewport != viewport ||
+      oldDelegate.shadingColor != shadingColor;
 }

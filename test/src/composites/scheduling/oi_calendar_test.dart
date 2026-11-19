@@ -5,6 +5,9 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui/src/composites/scheduling/oi_calendar.dart';
 import 'package:obers_ui/src/composites/scheduling/oi_calendar_labels.dart';
+import 'package:obers_ui/src/foundation/persistence/drivers/oi_in_memory_driver.dart';
+import 'package:obers_ui/src/foundation/theme/oi_theme_data.dart';
+import 'package:obers_ui/src/models/settings/oi_calendar_settings.dart';
 
 import '../../../helpers/pump_app.dart';
 
@@ -541,6 +544,109 @@ void main() {
   });
 
   // ── All-day row ───────────────────────────────────────────────────────────
+
+  group('persisted mode', () {
+    Widget calendar(
+      OiInMemorySettingsDriver driver, {
+      OiCalendarMode mode = OiCalendarMode.month,
+    }) {
+      return OiCalendar(
+        events: const [],
+        label: 'Calendar',
+        mode: mode,
+        initialDate: _initialDate,
+        settingsDriver: driver,
+      );
+    }
+
+    Future<void> save(
+      OiInMemorySettingsDriver driver,
+      OiCalendarViewType viewType,
+    ) {
+      return driver.save<OiCalendarSettings>(
+        namespace: 'oi_calendar',
+        data: OiCalendarSettings(viewType: viewType),
+        serialize: (settings) => settings.toJson(),
+      );
+    }
+
+    Future<OiCalendarViewType?> saved(OiInMemorySettingsDriver driver) async {
+      final settings = await driver.load<OiCalendarSettings>(
+        namespace: 'oi_calendar',
+        deserialize: OiCalendarSettings.fromJson,
+      );
+      return settings?.viewType;
+    }
+
+    testWidgets('a saved mode is applied once it has loaded', (tester) async {
+      final driver = OiInMemorySettingsDriver();
+      await save(driver, OiCalendarViewType.day);
+
+      await tester.pumpObers(calendar(driver));
+      await tester.pump();
+
+      expect(find.text('15 June 2025'), findsOneWidget);
+    });
+
+    testWidgets('a mode from the parent survives a theme change', (
+      tester,
+    ) async {
+      final driver = OiInMemorySettingsDriver();
+      await tester.pumpObers(calendar(driver));
+      await tester.pump();
+      expect(find.text('June 2025'), findsOneWidget);
+
+      await tester.pumpObers(calendar(driver, mode: OiCalendarMode.day));
+      expect(find.text('15 June 2025'), findsOneWidget);
+
+      await tester.pumpObers(
+        calendar(driver, mode: OiCalendarMode.day),
+        theme: OiThemeData.dark(),
+      );
+      await tester.pump(const Duration(milliseconds: 600));
+
+      expect(find.text('15 June 2025'), findsOneWidget);
+      expect(await saved(driver), OiCalendarViewType.day);
+    });
+
+    testWidgets('a mode from the parent replaces the one the user picked', (
+      tester,
+    ) async {
+      final driver = OiInMemorySettingsDriver();
+      await tester.pumpObers(calendar(driver));
+      await tester.pump();
+      await tester.tap(find.byKey(const ValueKey('calendar_mode_week')));
+      await tester.pump(const Duration(milliseconds: 600));
+      expect(await saved(driver), OiCalendarViewType.week);
+
+      await tester.pumpObers(calendar(driver, mode: OiCalendarMode.day));
+      await tester.pumpObers(
+        calendar(driver, mode: OiCalendarMode.day),
+        theme: OiThemeData.dark(),
+      );
+      await tester.pump(const Duration(milliseconds: 600));
+
+      expect(find.text('15 June 2025'), findsOneWidget);
+      expect(await saved(driver), OiCalendarViewType.day);
+    });
+
+    testWidgets('the mode the user picked survives a theme change', (
+      tester,
+    ) async {
+      final driver = OiInMemorySettingsDriver();
+      await save(driver, OiCalendarViewType.day);
+      await tester.pumpObers(calendar(driver));
+      await tester.pump();
+      await tester.tap(find.byKey(const ValueKey('calendar_mode_month')));
+      await tester.pump();
+      expect(find.text('June 2025'), findsOneWidget);
+
+      await tester.pumpObers(calendar(driver), theme: OiThemeData.dark());
+      await tester.pump(const Duration(milliseconds: 600));
+
+      expect(find.text('June 2025'), findsOneWidget);
+    });
+  });
 
   group('all-day row', () {
     final events = [
