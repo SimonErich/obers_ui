@@ -7,8 +7,20 @@ library;
 
 // ── Foundation: Theme (re-exported from obers_ui) ────────────────────────────
 
-export 'package:obers_ui/src/foundation/theme/component_themes/oi_chart_palette.dart';
-export 'package:obers_ui/src/foundation/theme/component_themes/oi_chart_theme_data.dart';
+export 'package:obers_ui/obers_ui.dart'
+    show
+        OiChartAnnotationTheme,
+        OiChartAxisTheme,
+        OiChartCrosshairTheme,
+        OiChartDensityTheme,
+        OiChartGridTheme,
+        OiChartLegendTheme,
+        OiChartMotionTheme,
+        OiChartPalette,
+        OiChartSelectionTheme,
+        OiChartStateTheme,
+        OiChartThemeData,
+        OiChartTooltipTheme;
 
 // ── Foundation: Behaviors ────────────────────────────────────────────────────
 

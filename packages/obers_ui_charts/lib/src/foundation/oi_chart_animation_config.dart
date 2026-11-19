@@ -199,8 +199,10 @@ class OiChartAnimationConfig {
   /// If [respectReducedMotion] is true and the system reports reduced
   /// motion, returns a copy with all durations set to [Duration.zero].
   ///
-  /// If the `OiPerformanceConfig` has `reduceAnimations` true, durations
-  /// are scaled by `OiPerformanceConfig.animationScale`.
+  /// Otherwise the config is returned unchanged. The performance settings
+  /// `OiPerformanceConfig.reduceAnimations` and
+  /// `OiPerformanceConfig.animationScale` are not applied: durations are
+  /// not scaled by them.
   OiChartAnimationConfig resolve(BuildContext context) {
     if (!enabled) return this;
 
