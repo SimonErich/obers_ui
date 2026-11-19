@@ -19,6 +19,7 @@ import 'package:obers_ui/src/models/settings/oi_list_view_settings.dart'
 import 'package:obers_ui/src/primitives/display/oi_label.dart';
 import 'package:obers_ui/src/primitives/interaction/oi_tappable.dart';
 import 'package:obers_ui/src/primitives/layout/oi_grid.dart';
+import 'package:obers_ui/src/primitives/scroll/oi_load_more_latch.dart';
 
 // ---------------------------------------------------------------------------
 // Supporting types
@@ -235,6 +236,7 @@ class OiListView<T> extends StatefulWidget {
 class _OiListViewState<T> extends State<OiListView<T>>
     with OiSettingsMixin<OiListView<T>, OiListViewSettings> {
   final ScrollController _scrollController = ScrollController();
+  final OiLoadMoreLatch _loadMoreLatch = OiLoadMoreLatch();
   final TextEditingController _searchController = TextEditingController();
   bool _isRefreshing = false;
   double _overscrollAccumulated = 0;
@@ -278,6 +280,7 @@ class _OiListViewState<T> extends State<OiListView<T>>
     _resolvedDriver = widget.settingsDriver;
     super.initState();
     _scrollController.addListener(_onScroll);
+    _checkLoadMoreAfterLayout();
     _searchController.text = widget.searchQuery ?? '';
   }
 
@@ -307,13 +310,31 @@ class _OiListViewState<T> extends State<OiListView<T>>
     super.dispose();
   }
 
+  @override
+  void didUpdateWidget(OiListView<T> oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.items.length != widget.items.length ||
+        oldWidget.loading != widget.loading ||
+        oldWidget.moreAvailable != widget.moreAvailable) {
+      _loadMoreLatch.reset();
+      _checkLoadMoreAfterLayout();
+    }
+  }
+
+  /// Checks once the list is laid out, so a first page that does not fill the
+  /// viewport loads the next one without the user scrolling.
+  void _checkLoadMoreAfterLayout() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _onScroll();
+    });
+  }
+
   void _onScroll() {
     if (!widget.moreAvailable || widget.loading) return;
     if (widget.onLoadMore == null) return;
-    final maxScroll = _scrollController.position.maxScrollExtent;
-    final currentScroll = _scrollController.position.pixels;
-    if (currentScroll >= maxScroll - 100) {
-      unawaited(widget.onLoadMore!());
+    if (!_scrollController.hasClients) return;
+    if (_loadMoreLatch.shouldFire(_scrollController.position, threshold: 100)) {
+      unawaited(_loadMoreLatch.track(widget.onLoadMore!()));
     }
   }
 

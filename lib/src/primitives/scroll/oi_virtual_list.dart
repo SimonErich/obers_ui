@@ -1,10 +1,9 @@
 import 'dart:async';
 
 import 'package:flutter/widgets.dart';
-import 'package:obers_ui/src/foundation/oi_app.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 
-/// The overscroll distance required to trigger a pull-to-refresh.
+/// The default pull distance required to trigger a pull-to-refresh.
 const double _kRefreshTriggerDistance = 60;
 
 /// A virtualised, lazily-rendered list of items.
@@ -12,10 +11,12 @@ const double _kRefreshTriggerDistance = 60;
 /// Uses [ListView.builder] under the hood for efficient rendering of large
 /// datasets. Only items near the visible viewport are built.
 ///
-/// When [onRefresh] is provided and the active density is
-/// [OiDensity.comfortable] (touch devices), a pull-to-refresh gesture is
-/// enabled: pulling the list down beyond [_kRefreshTriggerDistance] pixels
-/// triggers [onRefresh] and shows a loading indicator at the top of the list.
+/// When [onRefresh] is provided, a pull-to-refresh gesture is enabled on
+/// vertical lists: dragging the list down past its top edge by the theme's
+/// refresh trigger distance (60 px by default) calls [onRefresh] once per
+/// pull and shows a loading indicator at the top of the list until the
+/// returned future completes. It works with both clamping and bouncing
+/// scroll physics and at every density.
 ///
 /// ```dart
 /// OiVirtualList(
@@ -51,11 +52,10 @@ class OiVirtualList extends StatefulWidget {
   /// Cache extent in pixels beyond the viewport.
   final double? cacheExtent;
 
-  /// Called when the user pulls to refresh (touch devices only).
+  /// Called when the user pulls the list down past its top edge.
   ///
-  /// When non-null and the active density is [OiDensity.comfortable], an
-  /// overscroll past [_kRefreshTriggerDistance] pixels will invoke this
-  /// callback and display a loading indicator while it completes.
+  /// Called once per pull, and not again while a previous call is still
+  /// running. A loading indicator is shown until the future completes.
   final Future<void> Function()? onRefresh;
 
   /// An optional scroll controller.
@@ -85,11 +85,18 @@ class OiVirtualList extends StatefulWidget {
 
 class _OiVirtualListState extends State<OiVirtualList> {
   bool _isRefreshing = false;
-  double _overscrollAccumulated = 0;
 
-  bool get _refreshEnabled =>
-      widget.onRefresh != null &&
-      OiDensityScope.of(context) == OiDensity.comfortable;
+  /// How far the current drag has pulled the list past its leading edge.
+  double _pullDistance = 0;
+
+  /// Set once a pull has triggered a refresh, so the same pull cannot trigger
+  /// another one however quickly [OiVirtualList.onRefresh] completes. Cleared
+  /// when the scroll gesture ends.
+  bool _pullLatched = false;
+
+  double get _triggerDistance =>
+      context.components.refreshIndicator?.triggerDistance ??
+      _kRefreshTriggerDistance;
 
   Future<void> _triggerRefresh() async {
     if (_isRefreshing) return;
@@ -102,20 +109,37 @@ class _OiVirtualListState extends State<OiVirtualList> {
   }
 
   bool _handleScrollNotification(ScrollNotification notification) {
-    if (!_refreshEnabled) return false;
+    if (widget.onRefresh == null) return false;
+    // Only this list's own vertical scrolling counts, not a nested scrollable.
+    if (notification.depth != 0) return false;
+    if (notification.metrics.axis != Axis.vertical) return false;
+
+    if (notification is ScrollStartNotification ||
+        notification is ScrollEndNotification) {
+      _pullDistance = 0;
+      _pullLatched = false;
+      return false;
+    }
+
     if (notification is OverscrollNotification) {
-      // overscroll < 0 means pulling past the top on a vertical list.
-      if (notification.overscroll < 0) {
-        _overscrollAccumulated += notification.overscroll.abs();
-        if (_overscrollAccumulated >= _kRefreshTriggerDistance &&
-            !_isRefreshing) {
-          _overscrollAccumulated = 0;
-          unawaited(_triggerRefresh());
-        }
+      // Clamping physics: the position stays at the edge and the unused drag
+      // is reported as overscroll (negative past the leading edge).
+      if (notification.dragDetails != null && notification.overscroll < 0) {
+        _pullDistance += -notification.overscroll;
+      }
+    } else if (notification is ScrollUpdateNotification) {
+      // Bouncing physics never report overscroll; the position itself moves
+      // past the leading edge instead.
+      final metrics = notification.metrics;
+      final beyond = metrics.minScrollExtent - metrics.pixels;
+      if (notification.dragDetails != null && beyond > 0) {
+        if (beyond > _pullDistance) _pullDistance = beyond;
       }
     }
-    if (notification is ScrollEndNotification) {
-      _overscrollAccumulated = 0;
+
+    if (!_pullLatched && !_isRefreshing && _pullDistance >= _triggerDistance) {
+      _pullLatched = true;
+      unawaited(_triggerRefresh());
     }
     return false;
   }
@@ -143,15 +167,18 @@ class _OiVirtualListState extends State<OiVirtualList> {
         children: [
           list,
           if (_isRefreshing && widget.scrollDirection == Axis.vertical)
-            const Positioned(
+            Positioned(
               top: 0,
               left: 0,
               right: 0,
               child: Center(
                 child: Padding(
-                  padding: EdgeInsets.all(8),
+                  padding: EdgeInsets.all(context.spacing.sm),
                   child: _OiSpinner(
-                    key: ValueKey('oi_virtual_list_refresh_indicator'),
+                    key: const ValueKey('oi_virtual_list_refresh_indicator'),
+                    color:
+                        context.components.refreshIndicator?.indicatorColor ??
+                        context.colors.primary.base,
                   ),
                 ),
               ),
@@ -164,7 +191,9 @@ class _OiVirtualListState extends State<OiVirtualList> {
 
 /// A simple platform-native spinner used as a loading indicator.
 class _OiSpinner extends StatefulWidget {
-  const _OiSpinner({super.key});
+  const _OiSpinner({required this.color, super.key});
+
+  final Color color;
 
   @override
   State<_OiSpinner> createState() => _OiSpinnerState();
@@ -212,22 +241,24 @@ class _OiSpinnerState extends State<_OiSpinner>
   Widget build(BuildContext context) {
     return RotationTransition(
       turns: _controller,
-      child: const SizedBox(
+      child: SizedBox(
         width: 24,
         height: 24,
-        child: CustomPaint(painter: _SpinnerPainter()),
+        child: CustomPaint(painter: _SpinnerPainter(widget.color)),
       ),
     );
   }
 }
 
 class _SpinnerPainter extends CustomPainter {
-  const _SpinnerPainter();
+  const _SpinnerPainter(this.color);
+
+  final Color color;
 
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = const Color(0xFF2563EB)
+      ..color = color
       ..strokeWidth = 2.5
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round;
@@ -242,5 +273,5 @@ class _SpinnerPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(_SpinnerPainter oldDelegate) => false;
+  bool shouldRepaint(_SpinnerPainter oldDelegate) => oldDelegate.color != color;
 }

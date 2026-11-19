@@ -228,4 +228,180 @@ void main() {
     completer.complete();
     await tester.pump();
   });
+
+  // ── Short first page, nested scrollables, one load per arrival ────────────
+
+  testWidgets('a first page shorter than the viewport loads without a scroll', (
+    tester,
+  ) async {
+    var items = 2;
+    var loads = 0;
+    late StateSetter rebuild;
+
+    await tester.pumpObers(
+      StatefulBuilder(
+        builder: (context, setState) {
+          rebuild = setState;
+          return OiInfiniteScroll(
+            moreAvailable: items < 8,
+            onLoadMore: () async {
+              loads++;
+              rebuild(() => items += 2);
+            },
+            child: ListView.builder(
+              itemCount: items,
+              itemBuilder: (_, i) => SizedBox(height: 60, child: Text('s$i')),
+            ),
+          );
+        },
+      ),
+      surfaceSize: const Size(400, 300),
+    );
+    await tester.pumpAndSettle();
+
+    // 2 → 4 → 6 → 8 items (480 px > 300 px viewport); then moreAvailable is
+    // false.
+    expect(loads, 3);
+    expect(items, 8);
+  });
+
+  testWidgets('a load that changes nothing is not repeated in a loop', (
+    tester,
+  ) async {
+    var loads = 0;
+    await tester.pumpObers(
+      _buildScroll(
+        itemCount: 2,
+        moreAvailable: true,
+        onLoadMore: () async => loads++,
+      ),
+      surfaceSize: const Size(400, 300),
+    );
+    await tester.pumpAndSettle();
+    for (var frame = 0; frame < 5; frame++) {
+      await tester.pump(const Duration(milliseconds: 16));
+    }
+
+    expect(loads, 1);
+  });
+
+  testWidgets('dragging a nested horizontal list does not load', (
+    tester,
+  ) async {
+    var loads = 0;
+    await tester.pumpObers(
+      OiInfiniteScroll(
+        moreAvailable: true,
+        onLoadMore: () async => loads++,
+        child: ListView(
+          children: [
+            SizedBox(
+              height: 60,
+              child: ListView.builder(
+                key: const Key('nested'),
+                scrollDirection: Axis.horizontal,
+                itemCount: 20,
+                itemBuilder: (_, i) => SizedBox(width: 60, child: Text('h$i')),
+              ),
+            ),
+            for (var i = 0; i < 40; i++)
+              SizedBox(height: 60, child: Text('v$i')),
+          ],
+        ),
+      ),
+      surfaceSize: const Size(400, 300),
+    );
+    await tester.pumpAndSettle();
+    expect(loads, 0);
+
+    await tester.drag(find.byKey(const Key('nested')), const Offset(-2000, 0));
+    await tester.pumpAndSettle();
+
+    expect(loads, 0);
+  });
+
+  testWidgets('a sibling scrollable on the other axis does not load', (
+    tester,
+  ) async {
+    var loads = 0;
+    await tester.pumpObers(
+      OiInfiniteScroll(
+        moreAvailable: true,
+        onLoadMore: () async => loads++,
+        child: Column(
+          children: [
+            SizedBox(
+              height: 60,
+              child: ListView.builder(
+                key: const Key('chips'),
+                scrollDirection: Axis.horizontal,
+                itemCount: 3,
+                itemBuilder: (_, i) => SizedBox(width: 60, child: Text('c$i')),
+              ),
+            ),
+            Expanded(
+              child: ListView.builder(
+                itemCount: 40,
+                itemBuilder: (_, i) => SizedBox(height: 60, child: Text('v$i')),
+              ),
+            ),
+          ],
+        ),
+      ),
+      surfaceSize: const Size(400, 300),
+    );
+    await tester.pumpAndSettle();
+
+    expect(loads, 0);
+  });
+
+  testWidgets('scrollDirection: horizontal loads from a horizontal list', (
+    tester,
+  ) async {
+    var loads = 0;
+    await tester.pumpObers(
+      OiInfiniteScroll(
+        moreAvailable: true,
+        scrollDirection: Axis.horizontal,
+        onLoadMore: () async => loads++,
+        child: ListView.builder(
+          scrollDirection: Axis.horizontal,
+          itemCount: 40,
+          itemBuilder: (_, i) => SizedBox(width: 60, child: Text('h$i')),
+        ),
+      ),
+      surfaceSize: const Size(400, 300),
+    );
+    await tester.pumpAndSettle();
+    expect(loads, 0);
+
+    await tester.drag(find.byType(ListView), const Offset(-3000, 0));
+    await tester.pumpAndSettle();
+
+    expect(loads, 1);
+  });
+
+  testWidgets('one arrival at the bottom loads once, however fast the load', (
+    tester,
+  ) async {
+    var loads = 0;
+    await tester.pumpObers(
+      _buildScroll(
+        itemCount: 20,
+        moreAvailable: true,
+        onLoadMore: () async => loads++,
+      ),
+      surfaceSize: const Size(400, 300),
+    );
+
+    final gesture = await tester.startGesture(const Offset(200, 250));
+    for (var step = 0; step < 30; step++) {
+      await gesture.moveBy(const Offset(0, -30));
+      await tester.pump(const Duration(milliseconds: 16));
+    }
+    await gesture.up();
+    await tester.pumpAndSettle();
+
+    expect(loads, 1);
+  });
 }
