@@ -1,5 +1,6 @@
 // Tests do not require documentation comments.
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:obers_ui/src/foundation/oi_accessibility.dart';
@@ -340,6 +341,110 @@ void main() {
         ),
       );
       expect(captured, equals(TextDirection.ltr));
+    });
+
+    testWidgets('device locale ar with supportedLocales [en, ar] is rtl', (
+      tester,
+    ) async {
+      tester.binding.platformDispatcher.localesTestValue = const [
+        Locale('ar'),
+      ];
+      addTearDown(tester.binding.platformDispatcher.clearLocalesTestValue);
+      late TextDirection captured;
+      late Locale resolved;
+      await tester.pumpWidget(
+        OiApp(
+          supportedLocales: const [Locale('en'), Locale('ar')],
+          home: Builder(
+            builder: (ctx) {
+              captured = Directionality.of(ctx);
+              resolved = Localizations.localeOf(ctx);
+              return const SizedBox();
+            },
+          ),
+        ),
+      );
+      expect(resolved.languageCode, 'ar');
+      expect(captured, TextDirection.rtl);
+    });
+
+    testWidgets('device locale ar that is not supported stays ltr', (
+      tester,
+    ) async {
+      tester.binding.platformDispatcher.localesTestValue = const [
+        Locale('ar'),
+      ];
+      addTearDown(tester.binding.platformDispatcher.clearLocalesTestValue);
+      late TextDirection captured;
+      await tester.pumpWidget(
+        OiApp(
+          home: Builder(
+            builder: (ctx) {
+              captured = Directionality.of(ctx);
+              return const SizedBox();
+            },
+          ),
+        ),
+      );
+      expect(captured, TextDirection.ltr);
+    });
+
+    testWidgets('an explicit locale wins over the device locale', (
+      tester,
+    ) async {
+      tester.binding.platformDispatcher.localesTestValue = const [
+        Locale('ar'),
+      ];
+      addTearDown(tester.binding.platformDispatcher.clearLocalesTestValue);
+      late TextDirection captured;
+      await tester.pumpWidget(
+        OiApp(
+          locale: const Locale('en'),
+          supportedLocales: const [Locale('en'), Locale('ar')],
+          home: Builder(
+            builder: (ctx) {
+              captured = Directionality.of(ctx);
+              return const SizedBox();
+            },
+          ),
+        ),
+      );
+      expect(captured, TextDirection.ltr);
+    });
+
+    // ── HeroController lifetime ───────────────────────────────────────────
+
+    testWidgets('rebuilds reuse one HeroController and dispose it', (
+      tester,
+    ) async {
+      var created = 0;
+      var disposed = 0;
+      void track(ObjectEvent event) {
+        if (event.object is! HeroController) return;
+        if (event is ObjectCreated) created++;
+        if (event is ObjectDisposed) disposed++;
+      }
+
+      FlutterMemoryAllocations.instance.addListener(track);
+      addTearDown(
+        () => FlutterMemoryAllocations.instance.removeListener(track),
+      );
+
+      final observers = <NavigatorObserver>{};
+      for (final title in ['a', 'b', 'c']) {
+        await tester.pumpWidget(OiApp(title: title, home: const SizedBox()));
+        observers.addAll(
+          tester
+              .widget<WidgetsApp>(find.byType(WidgetsApp))
+              .navigatorObservers!,
+        );
+      }
+
+      expect(observers, hasLength(1));
+      expect(created, 1);
+
+      await tester.pumpWidget(const SizedBox());
+      expect(disposed, 1);
     });
 
     // TC-17

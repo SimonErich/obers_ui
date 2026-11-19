@@ -198,6 +198,11 @@ class OiApp extends StatefulWidget {
   final int undoStackMaxHistory;
 
   /// The locale for this app.
+  ///
+  /// When set, it also decides the text direction (right-to-left for Arabic,
+  /// Hebrew, Persian, Urdu and related languages). When null, the direction
+  /// follows the locale resolved from the device locales and
+  /// [supportedLocales].
   final Locale? locale;
 
   /// Localization delegates.
@@ -221,6 +226,10 @@ class _OiAppState extends State<OiApp> {
   late final OiOverlaysService _overlaysService;
   final HeroController _heroController = HeroController();
 
+  /// Built once: a new list (or a new controller) on every build would make
+  /// the navigator swap its observers on each rebuild.
+  late final List<NavigatorObserver> _navigatorObservers = [_heroController];
+
   @override
   void initState() {
     super.initState();
@@ -232,6 +241,7 @@ class _OiAppState extends State<OiApp> {
   @override
   void dispose() {
     _undoStack.dispose();
+    _heroController.dispose();
     super.dispose();
   }
 
@@ -318,7 +328,13 @@ class _OiAppState extends State<OiApp> {
       child: ColoredBox(
         color: themeData.colors.background,
         child: Directionality(
-          textDirection: _resolveTextDirection(widget.locale),
+          // An explicit locale decides the direction. Otherwise follow the
+          // locale WidgetsApp resolved from the device locales and
+          // supportedLocales. The Directionality that Localizations provides
+          // cannot be relied on: DefaultWidgetsLocalizations is always LTR.
+          textDirection: _resolveTextDirection(
+            widget.locale ?? Localizations.maybeLocaleOf(context),
+          ),
           child: OiDensityScope(
             density: _resolveDensity(),
             child: OiA11yScope(
@@ -394,7 +410,7 @@ class _OiAppState extends State<OiApp> {
       supportedLocales: widget.supportedLocales,
       title: widget.title,
       debugShowCheckedModeBanner: widget.debugShowCheckedModeBanner,
-      navigatorObservers: [HeroController()],
+      navigatorObservers: _navigatorObservers,
       pageRouteBuilder: <T>(settings, builder) {
         return PageRouteBuilder<T>(
           settings: settings,
