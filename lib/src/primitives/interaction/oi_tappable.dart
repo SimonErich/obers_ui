@@ -1,3 +1,5 @@
+import 'dart:ui' show SemanticsRole;
+
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:obers_ui/src/foundation/oi_accessibility.dart';
@@ -5,6 +7,36 @@ import 'package:obers_ui/src/foundation/oi_focus_visibility.dart';
 import 'package:obers_ui/src/foundation/theme/oi_effects_theme.dart';
 import 'package:obers_ui/src/foundation/theme/oi_theme.dart';
 import 'package:obers_ui/src/primitives/interaction/oi_touch_target.dart';
+
+/// What an [OiTappable] is announced as by assistive technology.
+///
+/// {@category Primitives}
+enum OiTappableRole {
+  /// A push button. The default.
+  button,
+
+  /// A checkbox. Pass its state as [OiTappable.checked] or
+  /// [OiTappable.mixed].
+  checkbox,
+
+  /// One option of a radio group. Pass its state as [OiTappable.checked];
+  /// [OiTappable.inMutuallyExclusiveGroup] defaults to `true`.
+  radio,
+
+  /// An on/off switch. Pass its state as [OiTappable.toggled].
+  toggle,
+
+  /// A tab of a tab bar. [OiTappable.selected] must be set, and the tappable
+  /// needs an [OiTappable.onTap] unless it is disabled.
+  tab,
+
+  /// An item of a menu. An ancestor must carry the menu or menu bar role.
+  menuItem,
+
+  /// No role: only the enabled state, the actions and any state flags are
+  /// announced. Use it when the child (or a parent) already carries a role.
+  none,
+}
 
 /// A foundational interactive widget that handles tap, double-tap, long-press,
 /// hover, focus, and disabled states with animated visual feedback.
@@ -17,6 +49,17 @@ import 'package:obers_ui/src/primitives/interaction/oi_touch_target.dart';
 /// - **Hovered**: [OiEffectsTheme.hover] (pointer devices only)
 /// - **Focused**: [OiEffectsTheme.focus]
 /// - **Disabled**: 0.4 opacity, all interaction suppressed
+///
+/// The wrappers that draw these states are always in the tree, with neutral
+/// values while a state is inactive, so [child] keeps its [State] when the
+/// tappable is pressed, hovered, focused, dragged or disabled.
+///
+/// To assistive technology an [OiTappable] that can be activated (or is
+/// disabled) is one node with a [role], its enabled state and, while enabled,
+/// its tap and long-press actions. [checked], [mixed], [toggled], [selected],
+/// [expanded] and [inMutuallyExclusiveGroup] add state to that node, which
+/// makes it a base for checkboxes, radios, switches, tabs and disclosure
+/// headers.
 ///
 /// On touch platforms (Android, iOS) a transparent padding region ensures a
 /// minimum 48 × 48 dp tap target via [OiA11y.minTouchTarget].  On pointer
@@ -41,6 +84,15 @@ class OiTappable extends StatefulWidget {
     this.cursor,
     this.clipBorderRadius,
     this.touchTargetAlignment = Alignment.center,
+    this.role = OiTappableRole.button,
+    this.checked,
+    this.mixed,
+    this.toggled,
+    this.selected,
+    this.expanded,
+    this.inMutuallyExclusiveGroup,
+    this.onKeyEvent,
+    this.skipTraversal = false,
     super.key,
   });
 
@@ -96,6 +148,9 @@ class OiTappable extends StatefulWidget {
 
   /// An optional label announced by screen readers in place of the child's
   /// semantic content.
+  ///
+  /// When set, everything [child] would announce is dropped, including
+  /// interactive widgets nested in it.
   final String? semanticLabel;
 
   /// The mouse cursor to display when hovering over this widget.
@@ -116,6 +171,56 @@ class OiTappable extends StatefulWidget {
   ///
   /// Defaults to [Alignment.center].
   final AlignmentGeometry touchTargetAlignment;
+
+  /// What the tappable is announced as. Defaults to
+  /// [OiTappableRole.button].
+  ///
+  /// An enabled tappable with the default role, no [onTap], [onDoubleTap] or
+  /// [onLongPress], no [semanticLabel] and no state announces no role, so a
+  /// wrapper that only tracks hover is not read out as a button.
+  final OiTappableRole role;
+
+  /// Whether the tappable is announced as checked (`true`) or unchecked
+  /// (`false`). `null` (the default) announces no checked state.
+  ///
+  /// Must not be `true` together with [mixed].
+  final bool? checked;
+
+  /// Whether the tappable is announced as partially checked (a tristate
+  /// checkbox). `null` (the default) announces nothing.
+  final bool? mixed;
+
+  /// Whether the tappable is announced as switched on (`true`) or off
+  /// (`false`). `null` (the default) announces no toggled state.
+  final bool? toggled;
+
+  /// Whether the tappable is announced as selected. `null` (the default)
+  /// announces no selected state.
+  final bool? selected;
+
+  /// Whether the tappable is announced as expanded (`true`) or collapsed
+  /// (`false`). `null` (the default) announces no expanded state.
+  final bool? expanded;
+
+  /// Whether the tappable is announced as one of a group in which only one
+  /// can be chosen. `null` (the default) means `true` for
+  /// [OiTappableRole.radio] and nothing otherwise.
+  final bool? inMutuallyExclusiveGroup;
+
+  /// Called with every key event that reaches the tappable while it is
+  /// [enabled], before the built-in Enter / Space activation.
+  ///
+  /// Return [KeyEventResult.ignored] to let the built-in handling run. Any
+  /// other result is returned as is and the built-in handling is skipped.
+  /// Use it for arrow keys, Home / End or Escape.
+  final FocusOnKeyEventCallback? onKeyEvent;
+
+  /// Whether Tab and directional traversal pass over the tappable.
+  ///
+  /// It can still be focused with a click or in code, which is what a
+  /// roving-tab-index group needs for all but its current item. Defaults to
+  /// `false`.
+  final bool skipTraversal;
 
   @override
   State<OiTappable> createState() => _OiTappableState();
@@ -203,6 +308,9 @@ class _OiTappableState extends State<OiTappable> {
   KeyEventResult _handleKeyEvent(FocusNode node, KeyEvent event) {
     if (!widget.enabled) return KeyEventResult.ignored;
 
+    final custom = widget.onKeyEvent?.call(node, event);
+    if (custom != null && custom != KeyEventResult.ignored) return custom;
+
     final isActivationKey =
         event.logicalKey == LogicalKeyboardKey.enter ||
         event.logicalKey == LogicalKeyboardKey.space;
@@ -239,8 +347,12 @@ class _OiTappableState extends State<OiTappable> {
         (widget.enabled ? SystemMouseCursors.click : SystemMouseCursors.basic);
 
     // ── Build inner content with state overlay ───────────────────────────────
-    // ignore: omit_local_variable_types
-    Widget content = widget.child;
+    // A label replaces what the child would announce. Always in the tree so
+    // adding or dropping the label does not move the child.
+    Widget content = ExcludeSemantics(
+      excluding: widget.semanticLabel != null,
+      child: widget.child,
+    );
 
     // Background for the current state — both layers stay in the tree so
     // AnimatedOpacity can smoothly transition them in and out without shifting
@@ -297,44 +409,52 @@ class _OiTappableState extends State<OiTappable> {
       }
     }
 
+    // The four wrappers below are always built, with neutral values while
+    // their state is inactive. Inserting them only when needed would change
+    // the widget type at this position and rebuild the child from scratch,
+    // losing its State, on every press, focus change or enable/disable.
+
     // Halo / glow rendered as a DecoratedBox behind the content.
     final halo = style.halo;
-    if (halo != OiHaloStyle.none &&
-        (halo.color.a > 0 || halo.spread > 0 || halo.blur > 0)) {
-      content = DecoratedBox(
-        decoration: BoxDecoration(boxShadow: [halo.toBoxShadow()]),
-        child: content,
-      );
-    }
+    final showHalo =
+        halo != OiHaloStyle.none &&
+        (halo.color.a > 0 || halo.spread > 0 || halo.blur > 0);
+    content = DecoratedBox(
+      decoration: showHalo
+          ? BoxDecoration(boxShadow: [halo.toBoxShadow()])
+          : const BoxDecoration(),
+      child: content,
+    );
 
     // Focus ring — foreground border rendered on top of content when keyboard
     // navigation is active. Suppressed after a click or tap, so a tappable
     // that gets focus from the pointer (e.g. the first item of a menu that
     // opens) shows none; reappears immediately on any keyboard event.
-    if (_isFocused &&
+    final showFocusRing =
+        _isFocused &&
         widget.focusable &&
         widget.enabled &&
-        OiFocusVisibility.visible) {
-      final ring = effects.focusRing.enforced;
-      content = DecoratedBox(
-        position: DecorationPosition.foreground,
-        decoration: BoxDecoration(
-          border: Border.all(color: ring.color, width: ring.width),
-          borderRadius: ring.borderRadius,
-        ),
-        child: content,
-      );
-    }
+        OiFocusVisibility.visible;
+    final ring = effects.focusRing.enforced;
+    content = DecoratedBox(
+      position: DecorationPosition.foreground,
+      decoration: showFocusRing
+          ? BoxDecoration(
+              border: Border.all(color: ring.color, width: ring.width),
+              borderRadius: ring.borderRadius,
+            )
+          : const BoxDecoration(),
+      child: content,
+    );
 
-    // Scale transform for pressed states.
-    if (style.scale != 1) {
-      content = Transform.scale(scale: style.scale, child: content);
-    }
+    // Scale transform for pressed states (1 paints the child untouched).
+    content = Transform.scale(scale: style.scale, child: content);
 
-    // Reduced opacity when disabled.
-    if (!widget.enabled && widget.dimWhenDisabled) {
-      content = Opacity(opacity: 0.4, child: content);
-    }
+    // Reduced opacity when disabled (1 paints the child untouched).
+    content = Opacity(
+      opacity: !widget.enabled && widget.dimWhenDisabled ? 0.4 : 1,
+      child: content,
+    );
 
     // Enforce minimum touch target. Always rendered (even when minTarget is
     // zero) so the widget-tree structure stays stable across input-modality
@@ -346,8 +466,13 @@ class _OiTappableState extends State<OiTappable> {
       child: content,
     );
 
-    // Gesture detection.
+    // Gesture detection. The recognisers stay registered while disabled so a
+    // disabled tappable still swallows the tap instead of passing it to a
+    // tappable ancestor; the callbacks themselves are suppressed. The actions
+    // offered to assistive technology come from the Semantics node below,
+    // which drops them while disabled.
     content = GestureDetector(
+      excludeFromSemantics: true,
       onTap: widget.onTap != null ? _handleTap : null,
       onDoubleTap: widget.onDoubleTap != null ? _handleDoubleTap : null,
       onLongPress: widget.onLongPress != null ? _handleLongPress : null,
@@ -385,6 +510,7 @@ class _OiTappableState extends State<OiTappable> {
     // Keyboard focus.
     content = Focus(
       canRequestFocus: widget.focusable && widget.enabled,
+      skipTraversal: widget.skipTraversal,
       onFocusChange: (focused) {
         _setFocused(focused);
         widget.onFocusChange?.call(focused);
@@ -393,15 +519,49 @@ class _OiTappableState extends State<OiTappable> {
       child: content,
     );
 
-    // Semantics label.
-    if (widget.semanticLabel != null) {
-      content = Semantics(
-        label: widget.semanticLabel,
-        button: true,
-        enabled: widget.enabled,
-        child: content,
-      );
-    }
+    // Semantics: role, enabled state, state flags and actions. Always in the
+    // tree; an enabled tappable with nothing to activate, no label and no
+    // state stays silent so a hover-only wrapper is not announced as a button.
+    final role = widget.role;
+    final inGroup =
+        widget.inMutuallyExclusiveGroup ??
+        (role == OiTappableRole.radio ? true : null);
+    final hasState =
+        widget.checked != null ||
+        widget.mixed != null ||
+        widget.toggled != null ||
+        widget.selected != null ||
+        widget.expanded != null ||
+        inGroup != null;
+    final announce =
+        widget.onTap != null ||
+        widget.onDoubleTap != null ||
+        widget.onLongPress != null ||
+        !widget.enabled ||
+        widget.semanticLabel != null ||
+        role != OiTappableRole.button ||
+        hasState;
+    content = Semantics(
+      label: widget.semanticLabel,
+      button: announce && role == OiTappableRole.button ? true : null,
+      role: switch (role) {
+        OiTappableRole.tab => SemanticsRole.tab,
+        OiTappableRole.menuItem => SemanticsRole.menuItem,
+        _ => null,
+      },
+      enabled: announce ? widget.enabled : null,
+      checked: widget.checked,
+      mixed: widget.mixed,
+      toggled: widget.toggled,
+      selected: widget.selected,
+      expanded: widget.expanded,
+      inMutuallyExclusiveGroup: inGroup,
+      onTap: widget.enabled && widget.onTap != null ? _handleTap : null,
+      onLongPress: widget.enabled && widget.onLongPress != null
+          ? _handleLongPress
+          : null,
+      child: content,
+    );
 
     // Animated wrapper for smooth state transitions.
     return AnimatedOpacity(

@@ -873,8 +873,25 @@ Foundation of every interactive element. Manages tap/long-press/double-tap/hover
 - `onFocusChange` (ValueChanged<bool>?)
 - `enabled` (bool, default: true)
 - `focusable` (bool, default: true)
-- `semanticLabel` (String?)
+- `semanticLabel` (String?) — replaces everything the child announces, nested controls included; for a tappable that wraps other controls put the label on a `Semantics` wrapper instead
 - `cursor` (MouseCursor?)
+- `role` (OiTappableRole, default: button) — `button`, `checkbox`, `radio`, `toggle`, `tab`, `menuItem`, `none`
+- `checked`, `mixed`, `toggled`, `selected`, `expanded`, `inMutuallyExclusiveGroup` (bool?) — semantic state, announced only when set
+- `onKeyEvent` (FocusOnKeyEventCallback?) — runs before the built-in Enter/Space activation; return `KeyEventResult.ignored` to let that run (arrows, Home/End, Escape)
+- `skipTraversal` (bool, default: false) — Tab passes over it, focus in code still works (roving tab index)
+
+**Semantics:** One node with the role, the enabled state and, while enabled, the tap / long-press actions. A disabled tappable is announced as disabled and offers no action. An enabled tappable without any callback, label or state announces nothing of its own. The `tab` role needs `selected`; the `menuItem` role needs an ancestor with the menu or menu bar role.
+
+**State:** The child keeps its `State` across press, hover, focus, drag and enable/disable.
+
+```dart
+OiTappable(
+  role: OiTappableRole.checkbox,
+  checked: value,
+  onTap: () => onChanged(!value),
+  child: box,
+)
+```
 
 **Use When:** Making any widget interactive. All higher-tier interactive widgets use this internally.
 **Avoid When:** Standard buttons — use `OiButton`. Standard list items — use `OiListTile`.
