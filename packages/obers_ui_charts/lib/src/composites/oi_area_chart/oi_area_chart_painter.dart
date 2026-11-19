@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/rendering.dart';
 import 'package:obers_ui_charts/src/composites/_chart_grid_painter.dart';
 import 'package:obers_ui_charts/src/composites/oi_area_chart/oi_area_chart.dart'
@@ -290,13 +291,48 @@ class OiAreaChartPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(OiAreaChartPainter oldDelegate) =>
-      oldDelegate.resolvedSeries != resolvedSeries ||
+      !_sameSeries(oldDelegate.resolvedSeries, resolvedSeries) ||
+      oldDelegate.chartRect != chartRect ||
+      oldDelegate.minX != minX ||
+      oldDelegate.maxX != maxX ||
+      oldDelegate.minY != minY ||
+      oldDelegate.maxY != maxY ||
+      !listEquals(oldDelegate.xLabels, xLabels) ||
+      !listEquals(oldDelegate.yLabels, yLabels) ||
+      oldDelegate.xDivisions != xDivisions ||
+      oldDelegate.yDivisions != yDivisions ||
       oldDelegate.showGrid != showGrid ||
       oldDelegate.gridColor != gridColor ||
+      oldDelegate.axisLabelColor != axisLabelColor ||
       oldDelegate.highContrast != highContrast ||
-      oldDelegate.compact != compact ||
       oldDelegate.showPoints != showPoints ||
       oldDelegate.stacked != stacked ||
       oldDelegate.hoveredSeriesIndex != hoveredSeriesIndex ||
       oldDelegate.hoveredPointIndex != hoveredPointIndex;
+
+  /// Whether [a] and [b] paint the same thing.
+  ///
+  /// The series list is rebuilt on every build, so it is compared by value.
+  /// Labels are left out: the painter does not draw them.
+  static bool _sameSeries(
+    List<ResolvedAreaSeries> a,
+    List<ResolvedAreaSeries> b,
+  ) {
+    if (identical(a, b)) return true;
+    if (a.length != b.length) return false;
+    for (var i = 0; i < a.length; i++) {
+      final x = a[i];
+      final y = b[i];
+      if (x.color != y.color ||
+          x.fillOpacity != y.fillOpacity ||
+          x.showLine != y.showLine ||
+          x.strokeWidth != y.strokeWidth ||
+          x.stackGroup != y.stackGroup ||
+          !listEquals(x.xValues, y.xValues) ||
+          !listEquals(x.yValues, y.yValues)) {
+        return false;
+      }
+    }
+    return true;
+  }
 }

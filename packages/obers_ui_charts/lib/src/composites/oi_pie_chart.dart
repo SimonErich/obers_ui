@@ -102,7 +102,8 @@ class _OiPieChartState extends State<OiPieChart> {
 
   static const double _minViableSize = 80;
 
-  double get _total => widget.segments.fold(0, (sum, s) => sum + s.value);
+  double get _total =>
+      widget.segments.fold(0, (sum, s) => sum + _segmentWeight(s));
 
   OiChartInteractionMode _resolveInteractionMode(BuildContext context) {
     if (widget.interactionMode != null &&
@@ -136,7 +137,9 @@ class _OiPieChartState extends State<OiPieChart> {
 
     var cumulative = 0.0;
     for (var i = 0; i < widget.segments.length; i++) {
-      cumulative += widget.segments[i].value;
+      final weight = _segmentWeight(widget.segments[i]);
+      if (weight == 0) continue;
+      cumulative += weight;
       final segmentAngle = 2 * math.pi * cumulative / total;
       if (angle <= segmentAngle) return i;
     }
@@ -298,6 +301,16 @@ class _OiPieChartState extends State<OiPieChart> {
   }
 }
 
+/// The share of the circle [segment] claims.
+///
+/// Only a positive, finite value can be drawn as an arc. Negative, NaN and
+/// infinite values count as zero so they neither distort the other
+/// segments nor break the total.
+double _segmentWeight(OiPieSegment segment) {
+  final value = segment.value;
+  return value.isFinite && value > 0 ? value : 0;
+}
+
 class _OiPieChartPainter extends CustomPainter {
   _OiPieChartPainter({
     required this.segments,
@@ -339,7 +352,10 @@ class _OiPieChartPainter extends CustomPainter {
 
     for (var i = 0; i < segments.length; i++) {
       final segment = segments[i];
-      final sweepAngle = 2 * math.pi * segment.value / total;
+      final weight = _segmentWeight(segment);
+      // A segment without a share of the circle is not drawn.
+      if (weight == 0) continue;
+      final sweepAngle = 2 * math.pi * weight / total;
 
       final isHovered = hoveredIndex == i;
       final drawRadius = isHovered ? radius + 4 : radius;
@@ -409,7 +425,7 @@ class _OiPieChartPainter extends CustomPainter {
         final parts = <String>[];
         if (showLabels) parts.add(segment.label);
         if (showPercentages) {
-          parts.add('${(segment.value / total * 100).toStringAsFixed(0)}%');
+          parts.add('${(weight / total * 100).toStringAsFixed(0)}%');
         }
         if (showValues) {
           parts.add(segment.value.toStringAsFixed(0));
@@ -434,7 +450,9 @@ class _OiPieChartPainter extends CustomPainter {
             center.dx + labelRadius * math.cos(midAngle) - tp.width / 2,
             center.dy + labelRadius * math.sin(midAngle) - tp.height / 2,
           );
-          tp.paint(canvas, labelPos);
+          tp
+            ..paint(canvas, labelPos)
+            ..dispose();
         }
       }
 

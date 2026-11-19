@@ -466,6 +466,8 @@ class _OiRadialBarLabelPainter<T> extends CustomPainter {
 
       labelTp.paint(canvas, Offset(0, yTop));
       valueTp.paint(canvas, Offset(0, yTop + labelTp.height));
+      labelTp.dispose();
+      valueTp.dispose();
     }
   }
 

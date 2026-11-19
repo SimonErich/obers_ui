@@ -250,6 +250,7 @@ class OiChartLabelPainter extends OiChartLayerPainter {
     this.activeBreakpoint,
     this.breakpointScale,
     this.themeAxis,
+    this.textDirection = TextDirection.ltr,
   });
 
   /// Which edge of the plot area labels sit beside.
@@ -295,9 +296,18 @@ class OiChartLabelPainter extends OiChartLayerPainter {
   /// Optional theme tokens for fallback styling.
   final OiChartAxisTheme? themeAxis;
 
+  /// The reading direction used to lay out the labels.
+  ///
+  /// Pass `Directionality.of(context)` so right-to-left labels are shaped
+  /// correctly. Defaults to [TextDirection.ltr].
+  final TextDirection textDirection;
+
   // ── Text layout cache ─────────────────────────────────────────────────
 
-  /// Cache of laid-out [TextPainter]s keyed by (label string, effective style).
+  /// Cache of laid-out [TextPainter]s keyed by everything that affects the
+  /// layout: label string, effective style, [maxLabelWidth] and
+  /// [textDirection]. The cache is shared by all instances, so two axes that
+  /// differ in any of these must not share an entry.
   ///
   /// This avoids re-creating and re-laying-out text painters for identical
   /// labels across repaint frames.
@@ -380,7 +390,7 @@ class OiChartLabelPainter extends OiChartLayerPainter {
   }
 
   TextPainter _getOrCreateTextPainter(String text, TextStyle style) {
-    final key = _TextCacheKey(text, style);
+    final key = _TextCacheKey(text, style, maxLabelWidth, textDirection);
     final cached = _textCache[key];
     if (cached != null) return cached;
 
@@ -397,7 +407,7 @@ class OiChartLabelPainter extends OiChartLayerPainter {
 
     final tp = TextPainter(
       text: TextSpan(text: text, style: style),
-      textDirection: TextDirection.ltr,
+      textDirection: textDirection,
       maxLines: 1,
       ellipsis: '…',
     )..layout(maxWidth: maxLabelWidth);
@@ -526,7 +536,8 @@ class OiChartLabelPainter extends OiChartLayerPainter {
         oldPainter.labelGap != labelGap ||
         oldPainter.maxVisibleTicks != maxVisibleTicks ||
         oldPainter.activeBreakpoint != activeBreakpoint ||
-        oldPainter.themeAxis != themeAxis;
+        oldPainter.themeAxis != themeAxis ||
+        oldPainter.textDirection != textDirection;
   }
 }
 
@@ -536,16 +547,22 @@ class OiChartLabelPainter extends OiChartLayerPainter {
 
 @immutable
 class _TextCacheKey {
-  const _TextCacheKey(this.text, this.style);
+  const _TextCacheKey(this.text, this.style, this.maxWidth, this.textDirection);
 
   final String text;
   final TextStyle style;
+  final double maxWidth;
+  final TextDirection textDirection;
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is _TextCacheKey && other.text == text && other.style == style;
+      other is _TextCacheKey &&
+          other.text == text &&
+          other.style == style &&
+          other.maxWidth == maxWidth &&
+          other.textDirection == textDirection;
 
   @override
-  int get hashCode => Object.hash(text, style);
+  int get hashCode => Object.hash(text, style, maxWidth, textDirection);
 }

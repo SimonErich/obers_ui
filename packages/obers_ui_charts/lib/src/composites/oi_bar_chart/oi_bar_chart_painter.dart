@@ -159,10 +159,12 @@ class OiBarChartPainter extends CustomPainter {
         ),
         textDirection: TextDirection.ltr,
       )..layout(maxWidth: catWidth);
-      labelTp.paint(
-        canvas,
-        Offset(catX + catWidth / 2 - labelTp.width / 2, chartRect.bottom + 4),
-      );
+      labelTp
+        ..paint(
+          canvas,
+          Offset(catX + catWidth / 2 - labelTp.width / 2, chartRect.bottom + 4),
+        )
+        ..dispose();
 
       if (stacked) {
         _paintStackedVertical(
@@ -230,10 +232,12 @@ class OiBarChartPainter extends CustomPainter {
           ),
           textDirection: TextDirection.ltr,
         )..layout();
-        valTp.paint(
-          canvas,
-          Offset(x + barW / 2 - valTp.width / 2, y - valTp.height - 2),
-        );
+        valTp
+          ..paint(
+            canvas,
+            Offset(x + barW / 2 - valTp.width / 2, y - valTp.height - 2),
+          )
+          ..dispose();
       }
     }
   }
@@ -303,13 +307,15 @@ class OiBarChartPainter extends CustomPainter {
         ),
         textDirection: TextDirection.ltr,
       )..layout();
-      labelTp.paint(
-        canvas,
-        Offset(
-          chartRect.left - labelTp.width - 4,
-          catY + catHeight / 2 - labelTp.height / 2,
-        ),
-      );
+      labelTp
+        ..paint(
+          canvas,
+          Offset(
+            chartRect.left - labelTp.width - 4,
+            catY + catHeight / 2 - labelTp.height / 2,
+          ),
+        )
+        ..dispose();
 
       if (stacked) {
         var cumW = 0.0;
@@ -353,13 +359,15 @@ class OiBarChartPainter extends CustomPainter {
               ),
               textDirection: TextDirection.ltr,
             )..layout();
-            valTp.paint(
-              canvas,
-              Offset(
-                chartRect.left + barW + 4,
-                y + barH / 2 - valTp.height / 2,
-              ),
-            );
+            valTp
+              ..paint(
+                canvas,
+                Offset(
+                  chartRect.left + barW + 4,
+                  y + barH / 2 - valTp.height / 2,
+                ),
+              )
+              ..dispose();
           }
         }
       }

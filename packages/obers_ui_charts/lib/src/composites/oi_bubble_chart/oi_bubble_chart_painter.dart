@@ -188,11 +188,35 @@ class OiBubbleChartPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(OiBubbleChartPainter oldDelegate) =>
-      oldDelegate.bubbles != bubbles ||
+      !_sameBubbles(oldDelegate.bubbles, bubbles) ||
       oldDelegate.gridColor != gridColor ||
       oldDelegate.highContrast != highContrast ||
       oldDelegate.compact != compact ||
       oldDelegate.hoveredIndex != hoveredIndex;
+
+  /// Whether [a] and [b] paint the same thing.
+  ///
+  /// The bubble list is rebuilt on every build, so it is compared by value.
+  /// The series and point indices are left out: the painter does not use
+  /// them.
+  static bool _sameBubbles(List<ResolvedBubble> a, List<ResolvedBubble> b) {
+    if (identical(a, b)) return true;
+    if (a.length != b.length) return false;
+    for (var i = 0; i < a.length; i++) {
+      final x = a[i];
+      final y = b[i];
+      if (x.x != y.x ||
+          x.y != y.y ||
+          x.radius != y.radius ||
+          x.color != y.color ||
+          x.opacity != y.opacity ||
+          x.borderWidth != y.borderWidth ||
+          x.borderColor != y.borderColor) {
+        return false;
+      }
+    }
+    return true;
+  }
 }
 
 /// Finds the index of the nearest bubble to [position] within [maxDistance].

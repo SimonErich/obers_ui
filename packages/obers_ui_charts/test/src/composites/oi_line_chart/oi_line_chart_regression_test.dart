@@ -1,0 +1,420 @@
+// Tests do not require documentation comments.
+// ignore_for_file: public_member_api_docs
+
+import 'package:flutter/widgets.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:obers_ui_charts/src/composites/oi_bubble_chart/oi_bubble_chart_interaction.dart';
+import 'package:obers_ui_charts/src/composites/oi_chart_axis.dart';
+import 'package:obers_ui_charts/src/composites/oi_line_chart/oi_line_chart.dart';
+import 'package:obers_ui_charts/src/composites/oi_line_chart/oi_line_chart_data.dart'
+    show OiLineChartMode, OiLinePoint, OiLineSeries;
+import 'package:obers_ui_charts/src/composites/oi_line_chart/oi_line_chart_layout.dart';
+import 'package:obers_ui_charts/src/composites/oi_line_chart/oi_line_chart_painter.dart';
+
+import '../../../helpers/pump_chart_app.dart';
+
+Widget _chart(
+  List<OiLineSeries> series, {
+  bool stacked = false,
+  OiChartAxis<num>? yAxis,
+  OiChartInteractionMode? interactionMode,
+  void Function(int, int)? onPointTap,
+}) {
+  return Align(
+    alignment: Alignment.topLeft,
+    child: SizedBox(
+      width: 500,
+      height: 400,
+      child: OiLineChart(
+        label: 'Regression chart',
+        series: series,
+        stacked: stacked,
+        yAxis: yAxis,
+        interactionMode: interactionMode,
+        onPointTap: onPointTap,
+      ),
+    ),
+  );
+}
+
+OiLineChartPainter _painter(WidgetTester tester) {
+  final paint = tester.widget<CustomPaint>(
+    find.byKey(const Key('oi_line_chart_painter')),
+  );
+  return paint.painter! as OiLineChartPainter;
+}
+
+OiLineSeries _series(List<double> ys, {String label = 'a'}) => OiLineSeries(
+  label: label,
+  points: [
+    for (var i = 0; i < ys.length; i++) OiLinePoint(x: i.toDouble(), y: ys[i]),
+  ],
+);
+
+void main() {
+  // ── Non-finite data ─────────────────────────────────────────────────────────
+
+  group('non-finite data', () {
+    testWidgets('a NaN point is left out of the range and the labels', (
+      tester,
+    ) async {
+      await tester.pumpChartApp(
+        _chart([
+          _series([10, double.nan, 30]),
+        ]),
+      );
+
+      final painter = _painter(tester);
+      expect(painter.minY.isFinite, isTrue);
+      expect(painter.maxY.isFinite, isTrue);
+      expect(painter.minY, lessThanOrEqualTo(10));
+      expect(painter.maxY, greaterThanOrEqualTo(30));
+      expect(painter.yLabels, isNot(contains('NaN')));
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('an infinite point does not break the build', (tester) async {
+      await tester.pumpChartApp(
+        _chart([
+          _series([10, double.infinity, 30, double.negativeInfinity]),
+        ]),
+      );
+
+      expect(tester.takeException(), isNull);
+      final painter = _painter(tester);
+      expect(painter.minY.isFinite, isTrue);
+      expect(painter.maxY.isFinite, isTrue);
+    });
+
+    testWidgets('a non-finite x is ignored as well', (tester) async {
+      await tester.pumpChartApp(
+        _chart(const [
+          OiLineSeries(
+            label: 'a',
+            points: [
+              OiLinePoint(x: 0, y: 1),
+              OiLinePoint(x: double.nan, y: 2),
+              OiLinePoint(x: double.infinity, y: 3),
+              OiLinePoint(x: 4, y: 5),
+            ],
+          ),
+        ]),
+      );
+
+      expect(tester.takeException(), isNull);
+      final painter = _painter(tester);
+      expect(painter.minX, 0);
+      expect(painter.maxX, 4);
+    });
+
+    testWidgets('a series with only non-finite points still renders', (
+      tester,
+    ) async {
+      await tester.pumpChartApp(
+        _chart([
+          _series([double.nan, double.infinity]),
+        ]),
+      );
+
+      expect(tester.takeException(), isNull);
+      final painter = _painter(tester);
+      expect(painter.minY.isFinite, isTrue);
+      expect(painter.maxY.isFinite, isTrue);
+    });
+
+    test('non-finite points are not laid out', () {
+      final layouts = layoutLineSeries(
+        [
+          const [
+            OiLinePoint(x: 0, y: 0),
+            OiLinePoint(x: 1, y: double.nan),
+            OiLinePoint(x: 2, y: 10),
+          ],
+        ],
+        chartRect: const Rect.fromLTWH(0, 0, 100, 100),
+        minX: 0,
+        maxX: 2,
+        minY: 0,
+        maxY: 10,
+        stacked: false,
+      );
+
+      expect(layouts.single.points, [
+        const Offset(0, 100),
+        null,
+        const Offset(100, 0),
+      ]);
+    });
+  });
+
+  // ── Round axis labels ───────────────────────────────────────────────────────
+
+  group('y axis labels', () {
+    testWidgets('are round numbers covering the data', (tester) async {
+      await tester.pumpChartApp(
+        _chart([
+          _series([3.7, 12.9, 5]),
+        ]),
+      );
+
+      final painter = _painter(tester);
+      expect(painter.yLabels, ['2', '4', '6', '8', '10', '12', '14']);
+      expect(painter.minY, 2);
+      expect(painter.maxY, 14);
+      // Grid lines stay aligned with the labels.
+      expect(painter.yDivisions, painter.yLabels.length - 1);
+    });
+
+    testWidgets('use decimals when the step is below one', (tester) async {
+      await tester.pumpChartApp(
+        _chart([
+          _series([0.12, 0.48]),
+        ]),
+      );
+
+      final painter = _painter(tester);
+      expect(painter.yLabels, ['0.1', '0.2', '0.3', '0.4', '0.5']);
+    });
+
+    testWidgets('keep an explicit axis range that is already round', (
+      tester,
+    ) async {
+      await tester.pumpChartApp(
+        _chart([
+          _series([3.7, 12.9, 5]),
+        ], yAxis: const OiChartAxis<num>(min: 0, max: 20)),
+      );
+
+      final painter = _painter(tester);
+      expect(painter.minY, 0);
+      expect(painter.maxY, 20);
+      expect(painter.yLabels, ['0', '5', '10', '15', '20']);
+    });
+
+    testWidgets('respect an explicit axis range that is not round', (
+      tester,
+    ) async {
+      await tester.pumpChartApp(
+        _chart([
+          _series([3.7, 12.9, 5]),
+        ], yAxis: const OiChartAxis<num>(min: 3.3, max: 13.3)),
+      );
+
+      final painter = _painter(tester);
+      expect(painter.minY, 3.3);
+      expect(painter.maxY, 13.3);
+      expect(painter.yLabels.first, '3.3');
+      expect(painter.yLabels.last, '13.3');
+    });
+
+    testWidgets('respect explicit labels', (tester) async {
+      await tester.pumpChartApp(
+        _chart([
+          _series([3.7, 12.9, 5]),
+        ], yAxis: const OiChartAxis<num>(labels: ['low', 'high'])),
+      );
+
+      final painter = _painter(tester);
+      expect(painter.yLabels, ['low', 'high']);
+      expect(painter.minY, 3.7);
+      expect(painter.maxY, 12.9);
+    });
+
+    testWidgets('use the axis format callback', (tester) async {
+      await tester.pumpChartApp(
+        _chart([
+          _series([3.7, 12.9, 5]),
+        ], yAxis: OiChartAxis<num>(format: (v) => '${v.toInt()} kg')),
+      );
+
+      final painter = _painter(tester);
+      expect(painter.yLabels.first, '2 kg');
+      expect(painter.yLabels.last, '14 kg');
+    });
+  });
+
+  // ── Stacked hit-testing ─────────────────────────────────────────────────────
+
+  group('stacked hit-testing', () {
+    testWidgets('a tap hits the series where it is drawn', (tester) async {
+      final taps = <(int, int)>[];
+      await tester.pumpChartApp(
+        _chart(
+          [
+            _series([10, 10, 10]),
+            _series([10, 10, 10], label: 'b'),
+          ],
+          stacked: true,
+          interactionMode: OiChartInteractionMode.touch,
+          onPointTap: (si, pi) => taps.add((si, pi)),
+        ),
+      );
+
+      final painter = _painter(tester);
+      final rect = painter.chartRect;
+      final origin = tester.getTopLeft(
+        find.byKey(const Key('oi_line_chart_touch')),
+      );
+      Offset at(double x, double y) =>
+          origin +
+          Offset(
+            rect.left +
+                rect.width * (x - painter.minX) / (painter.maxX - painter.minX),
+            rect.bottom -
+                rect.height *
+                    (y - painter.minY) /
+                    (painter.maxY - painter.minY),
+          );
+
+      // Series b sits on top of series a, so it is drawn at y = 20.
+      await tester.tapAt(at(1, 20));
+      expect(taps, [(1, 1)]);
+
+      taps.clear();
+      await tester.tapAt(at(1, 10));
+      expect(taps, [(0, 1)]);
+
+      // Nothing is drawn at the bottom of the chart.
+      taps.clear();
+      await tester.tapAt(at(1, 0));
+      expect(taps, isEmpty);
+    });
+
+    test('layout stacks series and exposes the fill baseline', () {
+      final layouts = layoutLineSeries(
+        [
+          const [OiLinePoint(x: 0, y: 10), OiLinePoint(x: 1, y: 10)],
+          const [OiLinePoint(x: 0, y: 10), OiLinePoint(x: 1, y: 5)],
+        ],
+        chartRect: const Rect.fromLTWH(0, 0, 100, 100),
+        minX: 0,
+        maxX: 1,
+        minY: 0,
+        maxY: 20,
+        stacked: true,
+      );
+
+      expect(layouts[0].points, [const Offset(0, 50), const Offset(100, 50)]);
+      expect(layouts[0].baselines, [
+        const Offset(0, 100),
+        const Offset(100, 100),
+      ]);
+      expect(layouts[1].points, [Offset.zero, const Offset(100, 25)]);
+      expect(layouts[1].baselines, layouts[0].points);
+    });
+  });
+
+  // ── shouldRepaint ───────────────────────────────────────────────────────────
+
+  group('OiLineChartPainter.shouldRepaint', () {
+    OiLineChartPainter build({
+      List<ResolvedLineSeries>? resolvedSeries,
+      Rect chartRect = const Rect.fromLTWH(40, 20, 400, 300),
+      double minX = 0,
+      double maxX = 10,
+      double minY = 0,
+      double maxY = 100,
+      bool showGrid = true,
+      Color gridColor = const Color(0xFF111111),
+      Color axisLabelColor = const Color(0xFF222222),
+      bool highContrast = false,
+      bool compact = false,
+      OiLineChartMode mode = OiLineChartMode.straight,
+      bool showPoints = false,
+      bool stacked = false,
+      List<String>? xLabels,
+      List<String>? yLabels,
+      int xDivisions = 5,
+      int yDivisions = 5,
+      int? hoveredSeriesIndex,
+      int? hoveredPointIndex,
+    }) {
+      return OiLineChartPainter(
+        resolvedSeries: resolvedSeries ?? [_resolved()],
+        chartRect: chartRect,
+        minX: minX,
+        maxX: maxX,
+        minY: minY,
+        maxY: maxY,
+        showGrid: showGrid,
+        gridColor: gridColor,
+        axisLabelColor: axisLabelColor,
+        highContrast: highContrast,
+        compact: compact,
+        mode: mode,
+        showPoints: showPoints,
+        stacked: stacked,
+        xLabels: xLabels ?? ['0', '10'],
+        yLabels: yLabels ?? ['0', '100'],
+        xDivisions: xDivisions,
+        yDivisions: yDivisions,
+        hoveredSeriesIndex: hoveredSeriesIndex,
+        hoveredPointIndex: hoveredPointIndex,
+      );
+    }
+
+    test('is false for equal input built from fresh lists', () {
+      expect(build().shouldRepaint(build()), isFalse);
+    });
+
+    final variants = <String, OiLineChartPainter Function()>{
+      'chartRect': () =>
+          build(chartRect: const Rect.fromLTWH(40, 20, 401, 300)),
+      'minX': () => build(minX: 1),
+      'maxX': () => build(maxX: 11),
+      'minY': () => build(minY: 1),
+      'maxY': () => build(maxY: 101),
+      'showGrid': () => build(showGrid: false),
+      'gridColor': () => build(gridColor: const Color(0xFF333333)),
+      'axisLabelColor': () => build(axisLabelColor: const Color(0xFF333333)),
+      'highContrast': () => build(highContrast: true),
+      'mode': () => build(mode: OiLineChartMode.smooth),
+      'showPoints': () => build(showPoints: true),
+      'stacked': () => build(stacked: true),
+      'xLabels': () => build(xLabels: ['0', '11']),
+      'yLabels': () => build(yLabels: ['0', '101']),
+      'xDivisions': () => build(xDivisions: 4),
+      'yDivisions': () => build(yDivisions: 4),
+      'hoveredSeriesIndex': () => build(hoveredSeriesIndex: 0),
+      'hoveredPointIndex': () => build(hoveredPointIndex: 0),
+      'series count': () => build(resolvedSeries: [_resolved(), _resolved()]),
+      'point value': () => build(resolvedSeries: [_resolved(lastY: 4)]),
+      'series color': () =>
+          build(resolvedSeries: [_resolved(color: const Color(0xFF00FF00))]),
+      'series strokeWidth': () =>
+          build(resolvedSeries: [_resolved(strokeWidth: 3)]),
+      'series dashed': () => build(resolvedSeries: [_resolved(dashed: true)]),
+      'series fill': () => build(resolvedSeries: [_resolved(fill: true)]),
+      'series fillOpacity': () =>
+          build(resolvedSeries: [_resolved(fillOpacity: 0.5)]),
+    };
+
+    for (final entry in variants.entries) {
+      test('is true when ${entry.key} changes', () {
+        expect(entry.value().shouldRepaint(build()), isTrue);
+      });
+    }
+  });
+}
+
+ResolvedLineSeries _resolved({
+  double lastY = 3,
+  Color color = const Color(0xFFFF0000),
+  double strokeWidth = 2,
+  bool dashed = false,
+  bool fill = false,
+  double fillOpacity = 0.15,
+}) {
+  return ResolvedLineSeries(
+    points: [
+      const OiLinePoint(x: 0, y: 1),
+      OiLinePoint(x: 10, y: lastY),
+    ],
+    color: color,
+    strokeWidth: strokeWidth,
+    dashed: dashed,
+    fill: fill,
+    fillOpacity: fillOpacity,
+    label: 'a',
+  );
+}
